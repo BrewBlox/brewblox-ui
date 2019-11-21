@@ -39,23 +39,20 @@ export default class LiquidSourceCard extends PartCard {
 </script>
 
 <template>
-  <q-list dark>
-    <q-separator dark />
-    <q-item dark>
+  <q-list>
+    <q-separator />
+    <q-item>
       <q-item-section>
-        <q-item-label caption>
-          Enabled
-        </q-item-label>
-        <q-toggle v-model="pressured" />
+        <LabeledField label="Enabled">
+          <q-toggle v-model="pressured" dense />
+        </LabeledField>
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-item-label caption>
-          Liquid color
-        </q-item-label>
         <ColorField
           v-model="color"
           clearable
           title="Liquid color"
+          label="Color"
           message="Choose a fill color for this source."
         />
       </q-item-section>

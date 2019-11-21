@@ -64,12 +64,12 @@ export default class BuilderFull extends CrudComponent<BuilderConfig> {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-select
             v-model="currentLayout"
@@ -77,8 +77,6 @@ export default class BuilderFull extends CrudComponent<BuilderConfig> {
             label="Currently displayed layout"
             option-label="title"
             option-value="id"
-            dark
-            options-dark
             clearable
           />
         </q-item-section>
@@ -98,7 +96,7 @@ export default class BuilderFull extends CrudComponent<BuilderConfig> {
           class="text-italic q-ml-md"
         >These are the displayed layouts. Drag to add, remove, or change the display order.</small>
         <draggable v-model="activeLayouts" class="col" group="layout-selector">
-          <q-item v-for="lay in activeLayouts" :key="lay.id" dark dense>
+          <q-item v-for="lay in activeLayouts" :key="lay.id" dense>
             <q-item-section
               :class="{grabbable: true, ['text-primary']: lay.id === currentId}"
             >
@@ -113,7 +111,7 @@ export default class BuilderFull extends CrudComponent<BuilderConfig> {
           class="text-italic q-ml-md"
         >These are all available layouts. They can be displayed by any Builder Widget.</small>
         <draggable :list="inactiveLayouts" class="col" group="layout-selector">
-          <q-item v-for="lay in inactiveLayouts" :key="lay.id" dark dense>
+          <q-item v-for="lay in inactiveLayouts" :key="lay.id" dense>
             <q-item-section class="grabbable">
               {{ lay.title }}
             </q-item-section>

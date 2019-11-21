@@ -6,6 +6,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { round } from '@/helpers/functional';
 
+const validator = (v: any): boolean => ['text', 'number'].includes(v);
+
 @Component
 export default class InputDialog extends DialogBase {
   local: string | number | null = null;
@@ -13,7 +15,7 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: [String, Number] })
   public readonly value!: string | number;
 
-  @Prop({ type: String, default: 'text', validator: v => ['text', 'number'].includes(v) })
+  @Prop({ type: String, default: 'text', validator })
   public readonly type!: string;
 
   @Prop({ type: Number, default: 2 })
@@ -30,6 +32,9 @@ export default class InputDialog extends DialogBase {
 
   @Prop({ type: Boolean, default: true })
   public readonly autogrow!: boolean;
+
+  @Prop({ type: String, default: '170%' })
+  public readonly fontSize!: string;
 
   get error(): boolean {
     return this.rules
@@ -60,7 +65,7 @@ export default class InputDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -76,8 +81,7 @@ export default class InputDialog extends DialogBase {
           :clearable="clearable"
           :label="label"
           :autogrow="autogrow"
-          input-style="font-size: 170%"
-          dark
+          :input-style="{fontSize}"
           autofocus
           step="any"
         />

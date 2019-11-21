@@ -23,7 +23,7 @@ export default class TempSensorOneWireWidget extends BlockWidgetBase {
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
     </template>
 
-    <q-card dark :class="cardClass" :style="cardStyle">
+    <q-card :class="cardClass" :style="cardStyle">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
 
       <q-card-section>
@@ -32,37 +32,25 @@ export default class TempSensorOneWireWidget extends BlockWidgetBase {
             OneWire Sensor could not be read.
           </template>
         </CardWarning>
-        <q-item v-else>
-          <q-item-section>
-            <q-item-label caption>
-              Value
-            </q-item-label>
-            <UnitField :value="block.data.value" readonly tag="big" />
-          </q-item-section>
-        </q-item>
+        <UnitField v-else :value="block.data.value" label="Value" readonly item-aligned tag="big" />
+
 
         <template v-if="mode === 'Full'">
-          <q-item dark>
-            <q-item-section class="col-grow">
-              <q-item-label caption>
-                Address
-              </q-item-label>
-              <InputField
-                :value="block.data.address"
-                title="Address"
-                tag="big"
-                @input="v => { block.data.address = v; saveBlock(); }"
-              />
-            </q-item-section>
+          <q-item>
             <q-item-section>
-              <q-item-label caption>
-                Offset
-              </q-item-label>
               <UnitField
                 :value="block.data.offset"
                 title="Offset"
-                tag="big"
+                label="Offset"
                 @input="v => { block.data.offset = v; saveBlock(); }"
+              />
+            </q-item-section>
+            <q-item-section>
+              <InputField
+                :value="block.data.address"
+                title="Address"
+                label="Address"
+                @input="v => { block.data.address = v; saveBlock(); }"
               />
             </q-item-section>
           </q-item>

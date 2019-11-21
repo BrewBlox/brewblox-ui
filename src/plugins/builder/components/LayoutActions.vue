@@ -33,7 +33,6 @@ export default class LayoutActions extends Vue {
     createDialog({
       title: 'Add Layout',
       message: 'Create a new Brewery Builder layout',
-      dark: true,
       cancel: true,
       prompt: {
         model: 'Brewery Layout',
@@ -78,7 +77,6 @@ export default class LayoutActions extends Vue {
     createDialog({
       title: 'Change Layout title',
       message: `Choose a new name for ${this.layout.title}`,
-      dark: true,
       cancel: true,
       prompt: {
         model: this.layout.title,
@@ -96,7 +94,6 @@ export default class LayoutActions extends Vue {
     createDialog({
       title: 'Remove parts',
       message: 'Are you sure you wish to remove all parts?',
-      dark: true,
       noBackdropDismiss: true,
       cancel: true,
     })
@@ -110,7 +107,6 @@ export default class LayoutActions extends Vue {
     createDialog({
       title: 'Remove layout',
       message: `Are you sure you wish to remove ${this.layout.title}?`,
-      dark: true,
       noBackdropDismiss: true,
       cancel: true,
     })
@@ -131,7 +127,6 @@ export default class LayoutActions extends Vue {
       parent: this,
       title: 'Copy widget',
       message: `On which dashboard do you want to create a widget for ${this.layout.title}?`,
-      dark: true,
       options: {
         type: 'radio',
         model: undefined,
@@ -169,7 +164,7 @@ export default class LayoutActions extends Vue {
 
 
 <template>
-  <q-list dark bordered>
+  <q-list bordered>
     <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
     <template v-if="!!layout">
       <ActionItem icon="file_copy" label="Copy Layout" @click="startAddLayout(true)" />

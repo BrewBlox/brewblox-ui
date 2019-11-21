@@ -13,7 +13,7 @@ export default class WidgetActions extends CrudComponent {
 
 <template>
   <q-expansion-item v-if="isStoreWidget" label="Widget Actions">
-    <q-list dark>
+    <q-list>
       <slot name="widget-actions" />
       <ActionItem icon="file_copy" label="Copy" @click="startCopyWidget" />
       <ActionItem icon="exit_to_app" label="Move" @click="startMoveWidget" />

@@ -12,36 +12,30 @@ export default class ActuatorAnalogMockBasic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark class="align-children">
+      <q-item>
         <q-item-section>
-          <q-item-label caption>
-            Setting
-          </q-item-label>
-          <div :style="block.data.setting === block.data.desiredSetting ? '' : 'color: orange'">
-            <SliderField
-              :value="block.data.setting"
-              :readonly="isDriven"
-              style="display: inline-block"
-              title="Analog actuator Setting"
-              tag="big"
-              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-            />
-          </div>
+          <SliderField
+            :value="block.data.setting"
+            :readonly="isDriven"
+            title="Analog actuator Setting"
+            label="Setting"
+            tag="big"
+            class="self-start"
+            :tag-class="{'text-orange': block.data.setting !== block.data.desiredSetting}"
+            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+          />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Value
-          </q-item-label>
-          <big>{{ block.data.value | round }}</big>
+          <LabeledField :value="block.data.value" type="number" tag="big" />
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           <ConstraintsField

@@ -1,6 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -8,6 +7,7 @@ import { BlockSpec, ChangeField } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
 import { StepAction } from '../types';
+import ActionBase from './ActionBase';
 
 interface BlockPatchOpts {
   block: string;
@@ -21,17 +21,7 @@ interface BlockPatchAction extends StepAction {
 }
 
 @Component
-export default class BlockPatch extends Vue {
-  @Prop({ type: Object, required: true })
-  public readonly action!: BlockPatchAction;
-
-  saveAction(action: BlockPatchAction = this.action): void {
-    this.$emit('update:action', action);
-  }
-
-  get opts(): BlockPatchOpts {
-    return this.action.opts;
-  }
+export default class BlockPatch extends ActionBase<BlockPatchOpts> {
 
   get spec(): BlockSpec {
     return sparkStore.specs[this.opts.type];
@@ -74,29 +64,56 @@ export default class BlockPatch extends Vue {
     this.$delete(this.opts.data, change.key);
     this.saveAction();
   }
+
+  saveEnabled(value: boolean): void {
+    this.action.enabled = value;
+    this.saveAction();
+  }
 }
 </script>
 
 <template>
-  <q-list dark dense>
-    <q-item dark>
+  <q-list dense :class="{'darkish': !action.enabled}">
+    <q-item>
       <q-item-section class="text-h6 text-italic">
         Change Block
       </q-item-section>
       <q-item-section class="col-auto">
-        <LinkField
+        <q-toggle :value="action.enabled" @input="saveEnabled">
+          <q-tooltip>Toggle enabled</q-tooltip>
+        </q-toggle>
+      </q-item-section>
+    </q-item>
+    <q-item>
+      <q-item-section>
+        <BlockField
           v-model="link"
           :service-id="opts.service"
           :clearable="false"
-          tag="big"
+          class="q-mr-md"
         />
       </q-item-section>
     </q-item>
     <q-item
       v-for="change in spec.changes"
       :key="change.key"
-      dark
     >
+      <q-item-section class="col-auto ">
+        <template v-if="isActive(change.key)">
+          <q-btn dense flat round icon="mdi-checkbox-marked-outline" @click="removeChange(change)">
+            <q-tooltip>
+              Remove field change from action
+            </q-tooltip>
+          </q-btn>
+        </template>
+        <template v-else>
+          <q-btn dense flat round icon="mdi-checkbox-blank-outline" @click="addChange(change)">
+            <q-tooltip>
+              Add field change to action
+            </q-tooltip>
+          </q-btn>
+        </template>
+      </q-item-section>
       <q-item-section :class="{darkened: !isActive(change.key)}">
         {{ change.title }}
       </q-item-section>
@@ -111,22 +128,6 @@ export default class BlockPatch extends Vue {
           lazy
           @input="v => saveChange(change, v)"
         />
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <template v-if="isActive(change.key)">
-          <q-btn flat round icon="delete" @click="removeChange(change)">
-            <q-tooltip>
-              Remove field change from action
-            </q-tooltip>
-          </q-btn>
-        </template>
-        <template v-else>
-          <q-btn flat round icon="add" @click="addChange(change)">
-            <q-tooltip>
-              Add field change to action
-            </q-tooltip>
-          </q-btn>
-        </template>
       </q-item-section>
     </q-item>
   </q-list>

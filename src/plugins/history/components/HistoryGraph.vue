@@ -164,7 +164,7 @@ export default class HistoryGraph extends Vue {
       :revision="revision"
     />
     <!-- Error message -->
-    <q-item v-else dark class="absolute-center">
+    <q-item v-else class="absolute-center">
       <q-item-section avatar>
         <q-icon name="warning" />
       </q-item-section>

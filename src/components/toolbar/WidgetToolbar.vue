@@ -47,7 +47,7 @@ export default class WidgetToolbar extends CrudComponent {
     <template #buttons>
       <slot name="buttons">
         <q-btn-dropdown :split="!!mode" flat :icon="moreIcon" @click="more">
-          <q-list dark bordered>
+          <q-list bordered>
             <slot name="actions">
               <WidgetActions :crud="crud" />
             </slot>

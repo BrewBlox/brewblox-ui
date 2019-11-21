@@ -2,11 +2,11 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
-import { stepperStore } from '../store';
+import { automationStore } from '../store';
 
 
 @Component
-export default class StepperWatcher extends Vue {
+export default class AutomationWatcher extends Vue {
   dismissFunc: Function | null = null;
 
   @Watch('lastUpdate')
@@ -27,29 +27,29 @@ export default class StepperWatcher extends Vue {
       timeout: 0,
       color: 'warning',
       icon: 'warning',
-      message: 'Lost connection to the Stepper service',
+      message: 'Lost connection to the Automation service',
       actions: [
         {
           label: 'Retry',
           textColor: 'white',
           handler: () => {
             this.dismissFunc = null;
-            stepperStore.subscribe();
+            automationStore.subscribe();
           },
         },
       ],
     });
 
     // Maybe it's only a hiccup -> schedule a retry
-    setTimeout(() => { this.lastUpdate > 0 || stepperStore.subscribe(); }, 3000);
+    setTimeout(() => { this.lastUpdate > 0 || automationStore.subscribe(); }, 3000);
   }
 
   get source(): EventSource | null {
-    return stepperStore.source;
+    return automationStore.source;
   }
 
   get lastUpdate(): number {
-    return stepperStore.lastUpdate;
+    return automationStore.lastUpdate;
   }
 
   tryDismiss(): void {
@@ -60,7 +60,7 @@ export default class StepperWatcher extends Vue {
   }
 
   created(): void {
-    stepperStore.subscribe();
+    automationStore.subscribe();
   }
 
   render(): null {

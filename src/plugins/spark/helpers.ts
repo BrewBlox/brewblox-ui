@@ -165,7 +165,6 @@ export const startResetBlocks = (serviceId: string): void => {
   createDialog({
     title: 'Reset Blocks',
     message: `This will remove all Blocks on ${serviceId}. Are you sure?`,
-    dark: true,
     noBackdropDismiss: true,
     cancel: true,
     options: {

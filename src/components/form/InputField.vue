@@ -15,9 +15,6 @@ export default class InputField extends FieldBase {
   @Prop({ type: String, default: 'text' })
   public readonly type!: string;
 
-  @Prop({ type: String, default: 'value' })
-  public readonly label!: string;
-
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
@@ -65,19 +62,22 @@ export default class InputField extends FieldBase {
 </script>
 
 <template>
-  <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{editable: !readonly}, tagClass]"
-    @click="openDialog"
+  <q-field
+    :label="label"
+    :class="[{pointer: !readonly}, $attrs.class]"
+    stack-label
+    v-bind="$attrs"
+    @click.native="openDialog"
   >
-    <slot name="pre" />
-    <slot name="value">
-      {{ displayValue }}
-    </slot>
-    <slot name="append" />
-    <q-tooltip v-if="!readonly">
-      Set {{ label }}
-    </q-tooltip>
-  </component>
+    <template v-if="!!$scopedSlots.before" #before>
+      <slot name="before" />
+    </template>
+    <template #control>
+      <component :is="tag" :class="['q-mt-sm', tagClass]">
+        <slot name="value">
+          {{ displayValue }}
+        </slot>
+      </component>
+    </template>
+  </q-field>
 </template>

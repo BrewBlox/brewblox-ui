@@ -63,7 +63,7 @@ export default class CreateMockMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card dark class="widget-modal">
+    <q-card class="widget-modal">
       <DialogToolbar>
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
@@ -74,7 +74,7 @@ export default class CreateMockMenu extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-space />
           <q-item-section class="col-auto">
             <q-btn unelevated color="primary" :loading="busy" label="Create Mock Sensor" @click="createSensor" />

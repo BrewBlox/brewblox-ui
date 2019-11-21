@@ -122,13 +122,13 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-list dark>
-        <q-item v-if="values.length === 0" dark>
+      <q-list>
+        <q-item v-if="values.length === 0">
           <q-item-section avatar>
             <q-icon name="warning" />
           </q-item-section>
@@ -137,24 +137,25 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
             <q-btn flat text-color="white" label="Add metrics" @click="modalOpen = true" />
           </q-item-section>
         </q-item>
-        <q-item v-for="val in values" :key="val.field" dark>
-          <q-item-section>
-            <q-item-label caption>
-              {{ val.name }}
-            </q-item-label>
-            <div class="row items-center">
-              <big :class="{darkened: val.stale}">
-                {{ val.value | round(fieldDecimals(val.field)) }}
-              </big>
-              <q-icon v-if="val.stale" name="warning" right size="24px" />
-            </div>
-            <q-tooltip v-if="val.stale">
+        <LabeledField
+          v-for="val in values"
+          :key="val.field"
+          :label="val.name"
+          item-aligned
+          class="q-py-none"
+        >
+          <big :class="{darkened: val.stale}">
+            {{ val.value | round(fieldDecimals(val.field)) }}
+          </big>
+          <template v-if="val.stale" #after>
+            <q-icon name="warning" size="24px" />
+            <q-tooltip>
               {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
               <br />
               Last update: {{ new Date(val.time).toLocaleString() }}.
             </q-tooltip>
-          </q-item-section>
-        </q-item>
+          </template>
+        </LabeledField>
       </q-list>
     </q-card-section>
   </q-card>

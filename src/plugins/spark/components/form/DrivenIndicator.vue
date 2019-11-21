@@ -46,12 +46,11 @@ export default class DrivenIndicator extends Vue {
 </script>
 
 <template>
-  <q-list dark no-border>
+  <q-list no-border>
     <q-item
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"
       clickable
-      dark
       style="padding: 5px 0; min-height: 0"
       @click="showDialog(chainIdx)"
     >
@@ -66,7 +65,7 @@ export default class DrivenIndicator extends Vue {
       </q-item-section>
     </q-item>
     <!-- Display message if not driven -->
-    <q-item v-if="!isDriven" dark style="padding: 5px 0; min-height: 0;">
+    <q-item v-if="!isDriven" style="padding: 5px 0; min-height: 0;">
       <q-item-section>
         <small class="darkish">Not driven</small>
       </q-item-section>

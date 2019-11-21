@@ -24,6 +24,7 @@ export class BuilderModule extends VuexModule {
 
   public editorActive = false;
   public editorMode = '';
+  public activeLayoutId: string | null = null;
   public layouts: Mapped<BuilderLayout> = {};
 
   public get layoutIds(): string[] {
@@ -70,6 +71,11 @@ export class BuilderModule extends VuexModule {
   @Mutation
   public commitEditorMode(tool: string): void {
     this.editorMode = tool;
+  }
+
+  @Mutation
+  public commitActiveLayoutId(id: string | null): void {
+    this.activeLayoutId = id;
   }
 
   @Mutation

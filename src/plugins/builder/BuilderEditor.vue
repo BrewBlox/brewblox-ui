@@ -52,7 +52,6 @@ interface ActionTool extends EditorAction {
 export default class BuilderEditor extends DialogBase {
   squares = squares;
 
-  layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
@@ -182,6 +181,14 @@ export default class BuilderEditor extends DialogBase {
 
   get layouts(): BuilderLayout[] {
     return builderStore.layoutValues;
+  }
+
+  get layoutId(): string | null {
+    return builderStore.activeLayoutId;
+  }
+
+  set layoutId(val: string | null) {
+    builderStore.commitActiveLayoutId(val);
   }
 
   get layout(): BuilderLayout | null {
@@ -728,7 +735,7 @@ export default class BuilderEditor extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized no-esc-dismiss @hide="onDialogHide">
-    <q-card ref="card" class="maximized bg-dark editor-card" tabindex="-1" dark>
+    <q-card ref="card" class="maximized bg-dark editor-card" tabindex="-1">
       <DialogToolbar>
         Brewery Builder Editor
         <q-space />
@@ -741,8 +748,8 @@ export default class BuilderEditor extends DialogBase {
             class="col"
             size="md"
           >
-            <q-list dark bordered>
-              <q-list dark>
+            <q-list bordered>
+              <q-list>
                 <ActionItem
                   v-for="lo in layouts"
                   :key="lo.id"
@@ -796,9 +803,9 @@ export default class BuilderEditor extends DialogBase {
       </q-dialog>
 
       <q-card-section class="row no-wrap">
-        <q-list v-if="!!layout" dark bordered class="col-auto scroll">
+        <q-list v-if="!!layout" bordered class="col-auto scroll">
           <q-expansion-item label="Modes" header-class="text-h6" default-opened>
-            <q-separator dark inset />
+            <q-separator inset />
             <ActionItem
               v-for="mode in modes"
               :key="mode.value"
@@ -811,7 +818,7 @@ export default class BuilderEditor extends DialogBase {
           </q-expansion-item>
 
           <q-expansion-item label="Tools" header-class="text-h6" default-opened>
-            <q-separator dark inset />
+            <q-separator inset />
             <ActionItem
               v-for="tool in tools"
               :key="tool.value"
@@ -827,8 +834,8 @@ export default class BuilderEditor extends DialogBase {
           </q-expansion-item>
 
           <q-expansion-item label="Layout size" header-class="text-h6" default-opened>
-            <q-separator dark inset />
-            <q-item dark>
+            <q-separator inset />
+            <q-item>
               <q-item-section>
                 <q-item-label caption>
                   Width
@@ -843,7 +850,7 @@ export default class BuilderEditor extends DialogBase {
                 />
               </q-item-section>
             </q-item>
-            <q-item dark>
+            <q-item>
               <q-item-section>
                 <q-item-label caption>
                   Height
@@ -992,8 +999,8 @@ export default class BuilderEditor extends DialogBase {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
   background-color: rgba(0, 0, 0, 0.5);
   transition: 1s;
 }

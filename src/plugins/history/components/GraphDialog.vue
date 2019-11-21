@@ -32,7 +32,7 @@ export default class GraphDialog extends DialogBase {
       },
       [
         h('q-card',
-          { props: { dark: true }, class: 'bg-dark' },
+          { class: 'bg-dark' },
           [
             h('HistoryGraph',
               {

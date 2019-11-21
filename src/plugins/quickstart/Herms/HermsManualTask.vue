@@ -21,10 +21,10 @@ export default class HermsManualTask extends WizardTaskBase<HermsConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <big>About your new HERMS dashboard</big>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <p>
             While the wizard is configuring the Spark and your new dashboard,
@@ -54,7 +54,7 @@ export default class HermsManualTask extends WizardTaskBase<HermsConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-space />

@@ -14,7 +14,7 @@ export default class Toolbar extends Vue {
 
 <template>
   <q-card-section class="q-pa-xs" style="max-width: 100%">
-    <q-item dark>
+    <q-item>
       <q-item-section>
         <q-item-label class="ellipsis text-h6">
           {{ title }}
@@ -27,6 +27,6 @@ export default class Toolbar extends Vue {
       <q-space />
       <slot name="buttons" />
     </q-item>
-    <q-separator dark inset />
+    <q-separator inset />
   </q-card-section>
 </template>

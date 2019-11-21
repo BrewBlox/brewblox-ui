@@ -5,7 +5,7 @@ import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
-import { suggestId, validator, valOrDefault } from '@/helpers/functional';
+import { suggestId, validator } from '@/helpers/functional';
 import { typeName as sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -61,7 +61,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   }
 
   get prefix(): string {
-    return valOrDefault(this.config.prefix, 'HERMS');
+    return this.config.prefix ?? 'HERMS';
   }
 
   set prefix(prefix: string) {
@@ -69,7 +69,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   }
 
   get dashboardTitle(): string {
-    return valOrDefault(this.config.dashboardTitle, 'HERMS');
+    return this.config.dashboardTitle ?? 'HERMS';
   }
 
   set dashboardTitle(id: string) {
@@ -77,10 +77,8 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   }
 
   get dashboardId(): string {
-    return valOrDefault(
-      this.config.dashboardId,
-      suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules))
-    );
+    return this.config.dashboardId
+      ?? suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules));
   }
 
   set dashboardId(dashboardId: string) {
@@ -152,7 +150,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   <div>
     <q-card-section style="height: 60vh">
       <q-scroll-area>
-        <q-item dark class="text-weight-light">
+        <q-item class="text-weight-light">
           <q-item-section>
             <q-item-label class="text-subtitle1">
               Name your new dashboard and blocks
@@ -216,7 +214,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
       </q-scroll-area>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions>
       <q-btn unelevated label="Back" @click="back" />

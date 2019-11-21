@@ -65,7 +65,7 @@ export default class GraphDisplayDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title ellipsis">
         {{ title }}
       </q-card-section>
@@ -74,47 +74,22 @@ export default class GraphDisplayDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <q-list dark dense>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Label
-              </q-item-label>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <InputField v-model="rename" title="Label" />
-            </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Line color
-              </q-item-label>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <ColorField
-                v-model="color"
-                title="Line color"
-                null-text="automatic"
-                clearable
-              />
-            </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Y-axis
-              </q-item-label>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <q-btn-toggle
-                v-model="axis"
-                :options="axisOpts"
-                flat
-                stretch
-              />
-            </q-item-section>
-          </q-item>
+        <q-list dense>
+          <InputField v-model="rename" title="Label" label="Label" />
+          <ColorField
+            v-model="color"
+            title="Line color"
+            label="Line color"
+            null-text="automatic"
+            clearable
+          />
+          <LabeledField label="Y-axis">
+            <q-btn-toggle
+              v-model="axis"
+              :options="axisOpts"
+              flat
+            />
+          </LabeledField>
         </q-list>
       </q-card-section>
       <q-card-actions align="right">

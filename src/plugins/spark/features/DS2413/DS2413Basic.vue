@@ -12,7 +12,7 @@ export default class D2413Basic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
     <IoArray :crud="crud" />

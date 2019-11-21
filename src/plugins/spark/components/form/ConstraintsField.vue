@@ -57,8 +57,8 @@ export default class ConstraintsField extends FieldBase {
 </script>
 
 <template>
-  <q-list dark>
-    <q-item dark clickable style="padding: 5px 0; min-height: 0" @click="openDialog">
+  <q-list>
+    <q-item clickable style="padding: 5px 0; min-height: 0" @click="openDialog">
       <q-tooltip>Edit constraints</q-tooltip>
       <q-item-section class="col-auto darkish">
         <small v-if="limiters.length">

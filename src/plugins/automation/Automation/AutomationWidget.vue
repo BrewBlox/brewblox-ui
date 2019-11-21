@@ -7,8 +7,8 @@ import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 import { blockTypes } from '@/plugins/spark/block-types';
 
-import { stepperStore } from '../store';
-import { Process, ProcessStep, Runtime, StepperConfig } from '../types';
+import { automationStore } from '../store';
+import { AutomationConfig, Process, ProcessStep, Runtime } from '../types';
 
 
 const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -25,13 +25,13 @@ const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 
 @Component
-export default class StepperWidget extends WidgetBase<StepperConfig> {
+export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   get processes(): Process[] {
-    return stepperStore.processValues;
+    return automationStore.processValues;
   }
 
   get runtimes(): Runtime[] {
-    return stepperStore.runtimeValues;
+    return automationStore.runtimeValues;
   }
 
   conditionsString(runtime: Runtime | null): string {
@@ -47,31 +47,31 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
   }
 
   async start(process: Process): Promise<void> {
-    await stepperStore.startRuntime(process);
+    await automationStore.startRuntime(process);
   }
 
   async advance(runtime: Runtime): Promise<void> {
-    await stepperStore.advanceRuntime(runtime);
+    await automationStore.advanceRuntime(runtime);
   }
 
   async stop(runtime: Runtime): Promise<void> {
-    await stepperStore.stopRuntime(runtime);
+    await automationStore.stopRuntime(runtime);
   }
 
   async remove(process: Process): Promise<void> {
-    await stepperStore.removeProcess(process);
+    await automationStore.removeProcess(process);
   }
 
   startEditor(): void {
     createDialog({
-      component: 'StepperEditor',
+      component: 'AutomationEditor',
       parent: this,
     });
   }
 
   async clear(): Promise<void> {
-    for (const process of stepperStore.processValues) {
-      await stepperStore.removeProcess(process);
+    for (const process of automationStore.processValues) {
+      await automationStore.removeProcess(process);
     }
   }
 
@@ -106,6 +106,16 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
               data: {
                 value: new Unit(5, 'degC'),
               },
+            },
+          },
+          {
+            id: uid(),
+            enabled: true,
+            type: 'TaskCreate',
+            opts: {
+              ref: 'task-one',
+              title: 'Test Task',
+              message: lipsum,
             },
           },
         ],
@@ -198,7 +208,7 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
       },
     ]);
 
-    stepperStore.createProcess({
+    automationStore.createProcess({
       id: uid(),
       title: 'Test Process',
       steps: [
@@ -212,7 +222,7 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
 </script>
 
 <template>
-  <q-card dark :class="cardClass">
+  <q-card :class="cardClass">
     <component :is="toolbarComponent" :crud="crud">
       <template #actions>
         <ActionItem icon="settings" label="Editor" @click="startEditor" />
@@ -233,7 +243,7 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
       </q-item-section>
       <q-item-section side>
         <q-btn-dropdown flat split icon="settings" @click="showDialog(null)">
-          <q-list dark bordered>
+          <q-list bordered>
             <ActionItem icon="add" label="New" @click="make" />
             <ActionItem icon="refresh" label="Refresh" @click="fetch" />
             <WidgetActions :crud="crud" />
@@ -242,13 +252,13 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
       </q-item-section>
     </WidgetToolbar> -->
     <q-card-section v-for="process in processes" :key="process.id">
-      <q-item dark>
+      <q-item>
         <q-item-section>{{ process.title }}</q-item-section>
       </q-item>
     </q-card-section>
 
     <!-- <q-card-section v-for="group in groups" :key="group.id">
-      <q-item dark class="row no-wrap">
+      <q-item class="row no-wrap">
         <q-item-section>
           <template v-if="group.runtime">
             <q-select
@@ -257,11 +267,9 @@ export default class StepperWidget extends WidgetBase<StepperConfig> {
               :options="stepOptions(group.process)"
               emit-value
               map-options
-              dark
-              options-dark
             >
               <template #no-option>
-                <q-item dark>
+                <q-item>
                   <q-item-section class="text-grey">
                     No results
                   </q-item-section>

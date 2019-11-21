@@ -43,7 +43,6 @@ export default class ServiceIndex extends Vue {
       parent: this,
       title: 'Remove service',
       message: `Are you sure you want to remove ${service.title}?`,
-      dark: true,
       ok: 'Confirm',
       cancel: 'Cancel',
     })
@@ -55,7 +54,6 @@ export default class ServiceIndex extends Vue {
       parent: this,
       title: 'Change service Title',
       message: "Change your service's display name",
-      dark: true,
       cancel: true,
       prompt: {
         model: service.title,
@@ -81,7 +79,7 @@ export default class ServiceIndex extends Vue {
 
 <template>
   <div>
-    <q-item dark class="q-pb-none">
+    <q-item class="q-pb-none">
       <q-item-section>
         <q-item-section class="text-bold">
           Services
@@ -125,7 +123,6 @@ export default class ServiceIndex extends Vue {
         :inset-level="0.2"
         :class="{hoverable: editing && !dragging,bordered: editing, 'q-pb-sm': true}"
         style="min-height: 0px"
-        dark
       >
         <q-item-section :class="{'text-italic': editing, ellipsis: true}">
           {{ service.title }}
@@ -135,7 +132,7 @@ export default class ServiceIndex extends Vue {
             <q-icon name="mdi-chevron-down" />
           </q-item-section>
           <q-menu :offset="[-50, 0]">
-            <q-list dark bordered>
+            <q-list bordered>
               <ActionItem
                 icon="edit"
                 label="Change service title"

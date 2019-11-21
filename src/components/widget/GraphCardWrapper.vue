@@ -24,10 +24,10 @@ export default class GraphCardWrapper extends Vue {
 </script>
 
 <template>
-  <q-card v-if="!show" class="passthrough-card column" dark>
+  <q-card v-if="!show" class="passthrough-card column">
     <slot />
   </q-card>
-  <q-card v-else dark class="row wrapper-card">
+  <q-card v-else class="row wrapper-card">
     <slot />
     <template v-if="$q.screen.gt.md">
       <div :class="buttonParentClass" style="min-height: 100%">
@@ -56,7 +56,7 @@ export default class GraphCardWrapper extends Vue {
         </q-btn>
       </div>
       <div v-if="!collapsed" style="width: 600px;">
-        <q-card dark class="q-pa-none bg-dark-bright graph-container">
+        <q-card class="q-pa-none bg-dark-bright graph-container">
           <slot name="graph" />
         </q-card>
       </div>

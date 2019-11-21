@@ -32,9 +32,9 @@ export default class BuilderWizard extends WidgetWizardBase<BuilderConfig> {
 <template>
   <div>
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-input v-model="widgetTitle" dark label="Widget name" />
+          <q-input v-model="widgetTitle" label="Widget name" />
         </q-item-section>
       </q-item>
     </q-card-section>

@@ -14,7 +14,7 @@ export default class DS2408Basic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />

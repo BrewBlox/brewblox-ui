@@ -149,11 +149,11 @@ export default class BlockWizard extends Vue {
 </script>
 
 <template>
-  <q-card dark class="widget-modal" @keyup.enter="createBlock">
+  <q-card class="widget-modal" @keyup.enter="createBlock">
     <DialogToolbar>Block wizard</DialogToolbar>
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <q-select
             v-model="feature"
@@ -161,15 +161,13 @@ export default class BlockWizard extends Vue {
             :rules="[v => !!v || 'You must select a block type']"
             :disable="!!initialFeature"
             label="Block Type"
-            dark
             use-input
-            options-dark
             autofocus
             @filter="filterFn"
             @change="block = null; widget = null;"
           >
             <template #no-option>
-              <q-item dark>
+              <q-item>
                 <q-item-section class="text-grey">
                   No results
                 </q-item-section>
@@ -178,9 +176,9 @@ export default class BlockWizard extends Vue {
           </q-select>
         </q-item-section>
       </q-item>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-input v-model="blockId" :rules="blockIdRules" dark label="Block name">
+          <q-input v-model="blockId" :rules="blockIdRules" label="Block name">
             <template #append>
               <q-icon name="mdi-information">
                 <q-tooltip>
@@ -202,7 +200,7 @@ export default class BlockWizard extends Vue {
       </q-item>
     </q-card-section>
 
-    <q-separator dark />
+    <q-separator />
 
     <q-card-actions align="right">
       <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock" />

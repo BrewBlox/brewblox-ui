@@ -42,7 +42,7 @@ export default class SliderDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -51,15 +51,15 @@ export default class SliderDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>
+            <q-slider v-model="local" :min="min" :max="max" label-always />
             <q-item-label caption>
               {{ label }}
             </q-item-label>
-            <q-slider v-model="local" :min="min" :max="max" dark label-always />
           </q-item-section>
         </q-item>
-        <q-item v-if="quickActions.length" dark>
+        <q-item v-if="quickActions.length">
           <q-item-section v-for="q in quickActions" :key="'quick'+q.value">
             <q-btn unelevated :label="q.label" @click="local = q.value" />
           </q-item-section>

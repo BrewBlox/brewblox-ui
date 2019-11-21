@@ -26,8 +26,8 @@ export default class QuickStartNameField extends Vue {
 </script>
 
 <template>
-  <q-item dark dense>
-    <q-input v-model="local" v-bind="$attrs" :error="!optional && !local" dark dense>
+  <q-item dense>
+    <q-input v-model="local" v-bind="$attrs" :error="!optional && !local" dense>
       <template #append>
         <q-btn
           icon="mdi-backup-restore"

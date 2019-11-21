@@ -58,15 +58,15 @@ export default class SessionViewBasic extends CrudComponent<SessionViewConfig> {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
     <slot name="graph" />
 
     <q-card-section>
-      <q-item dark>
+      <q-item>
         <q-item-section>
-          <q-input v-model="sessionFilter" placeholder="Search Session" clearable dark>
+          <q-input v-model="sessionFilter" placeholder="Search Session" clearable>
             <template #append>
               <q-icon name="search" />
             </template>
@@ -76,7 +76,7 @@ export default class SessionViewBasic extends CrudComponent<SessionViewConfig> {
           <q-btn flat rounded icon="add" label="New" class="text-white" @click="createSession" />
         </q-item-section>
       </q-item>
-      <q-item v-for="session in sessions" :key="session.id" dark>
+      <q-item v-for="session in sessions" :key="session.id">
         <q-item-section>
           {{ session.name }}
           <q-item-label caption>

@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { mutate } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
-import { blockTypes,MotorValveBlock } from '@/plugins/spark/block-types';
+import { blockTypes, MotorValveBlock } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
@@ -127,7 +127,7 @@ export default class ValveArray extends BlockCrudComponent {
 
 <template>
   <q-card-section>
-    <q-item v-for="channel in channels" :key="channel.id" dark>
+    <q-item v-for="channel in channels" :key="channel.id">
       <q-item-section>{{ channelName(channel) }}</q-item-section>
       <q-item-section>
         <DigitalStateField
@@ -143,10 +143,13 @@ export default class ValveArray extends BlockCrudComponent {
         </div>
       </q-item-section>
       <q-item-section>
-        <LinkField
+        <BlockField
           :value="driverLink(channel)"
           :service-id="serviceId"
           title="Driver"
+          label="Driver"
+          no-show
+          dense
           @input="link => saveDriver(channel, link)"
         />
       </q-item-section>

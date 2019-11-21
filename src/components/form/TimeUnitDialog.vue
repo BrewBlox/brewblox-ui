@@ -1,9 +1,10 @@
 <script lang="ts">
+import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { durationString, unitDurationString } from '@/helpers/functional';
+import { durationString, unitDurationString, validator } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 
 @Component
@@ -36,11 +37,26 @@ export default class TimeUnitDialog extends DialogBase {
     return parseDuration(`${this.local}${this.defaultUnit}`);
   }
 
+  get valueOk(): boolean {
+    return validator(this.rules)(this.localNumber);
+  }
+
+  get error(): string | null {
+    for (const rule of this.rules) {
+      const res = rule(this.localNumber);
+      if (isString(res)) {
+        return res;
+      }
+    }
+    return null;
+  }
+
   normalize(): void {
     this.local = durationString(this.localNumber);
   }
 
   save(): void {
+    if (!this.valueOk) { return; }
     const val = new Unit(this.localNumber, 'ms');
     this.onDialogOk(val);
   }
@@ -54,7 +70,7 @@ export default class TimeUnitDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -67,15 +83,15 @@ export default class TimeUnitDialog extends DialogBase {
           v-model="local"
           :label="label"
           :suffix="defaultUnit"
-          :rules="rules"
+          :error="!!error"
+          :error-message="error"
           autofocus
-          dark
           @change="normalize"
         />
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn flat label="OK" color="primary" @click="save" />
+        <q-btn :disable="!valueOk" flat label="OK" color="primary" @click="save" />
       </q-card-actions>
     </q-card>
   </q-dialog>

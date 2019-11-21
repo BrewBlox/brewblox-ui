@@ -16,12 +16,7 @@ export default class DatepickerDialog extends DialogBase {
   public readonly label!: string;
 
   get parsed(): Date {
-    const args =
-      (this.stringValue.match(/^(\d*)\/(\d*)\/(\d*) (\d*):(\d*):(\d*)$/) || [])
-        .map(Number);
-    // Months start at 0 in JavaScript
-    // I have no words. At least: none that needn't be censored.
-    return new Date(args[1], args[2] - 1, args[3], args[4], args[5], args[6]);
+    return qdate.extractDate(this.stringValue, 'YYYY/MM/DD HH:mm:ss');
   }
 
   get valid(): boolean {
@@ -46,7 +41,7 @@ export default class DatepickerDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -59,17 +54,16 @@ export default class DatepickerDialog extends DialogBase {
         <q-tab name="time" label="Time" />
       </q-tabs>
       <q-tab-panels v-model="tab" animated>
-        <q-tab-panel dark name="date" class="q-pa-none">
+        <q-tab-panel name="date" class="q-pa-none">
           <q-date
             v-model="stringValue"
-            dark
             mask="YYYY/MM/DD HH:mm:ss"
             class="maximized"
             @input="tab='time'"
           />
         </q-tab-panel>
-        <q-tab-panel dark name="time" class="q-pa-none">
-          <q-time v-model="stringValue" dark mask="YYYY/MM/DD HH:mm:ss" class="maximized" />
+        <q-tab-panel name="time" class="q-pa-none">
+          <q-time v-model="stringValue" mask="YYYY/MM/DD HH:mm:ss" class="maximized" />
         </q-tab-panel>
       </q-tab-panels>
       <q-card-actions align="right">

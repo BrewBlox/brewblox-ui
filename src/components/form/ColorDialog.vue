@@ -21,7 +21,7 @@ export default class ColorDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="onDialogOk(local)">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -30,7 +30,7 @@ export default class ColorDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <q-color v-model="local" dark format-model="hex" />
+        <q-color v-model="local" format-model="hex" />
       </q-card-section>
       <q-card-actions align="right">
         <q-btn color="primary" flat label="Cancel" @click="onDialogCancel" />

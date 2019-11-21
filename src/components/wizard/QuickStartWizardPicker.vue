@@ -69,7 +69,7 @@ export default class QuickStartWizardPicker extends Vue {
     <!-- Select a wizard -->
     <template v-else>
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section class="text-weight-light">
             <q-item-label class="text-subtitle1">
               Control blocks
@@ -104,7 +104,7 @@ export default class QuickStartWizardPicker extends Vue {
         </q-item>
       </q-card-section>
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-select
               v-model="wizardModel"
@@ -112,14 +112,12 @@ export default class QuickStartWizardPicker extends Vue {
               label="Please select a brewing process"
               option-label="displayName"
               option-value="id"
-              dark
-              options-dark
             />
           </q-item-section>
         </q-item>
       </q-card-section>
 
-      <q-separator dark />
+      <q-separator />
 
       <q-card-actions class="row justify-between">
         <q-btn unelevated label="Back" @click="back" />

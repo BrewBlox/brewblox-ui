@@ -17,12 +17,12 @@ export default class MutexBasic extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
     <q-card-section>
-      <q-item dark class="align-children">
+      <q-item class="align-children">
         <q-item-section>
           <q-item-label caption>
             Held by

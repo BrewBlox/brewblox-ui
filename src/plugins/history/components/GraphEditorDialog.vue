@@ -31,8 +31,8 @@ export default class GraphEditorDialog extends DialogBase {
 
   loadShared(): void {
     createDialog({
-      title: 'Import graph config',
-      dark: true,
+      title: 'Import config',
+      message: 'Copy configuration from another graph',
       options: {
         type: 'radio',
         model: '',
@@ -60,18 +60,20 @@ export default class GraphEditorDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="widget-modal" dark>
+    <q-card class="widget-modal">
       <DialogToolbar>{{ title }}</DialogToolbar>
       <q-card-section class="scroll-parent">
         <q-scroll-area>
           <GraphEditor :config.sync="local" :no-period="noPeriod" />
         </q-scroll-area>
       </q-card-section>
-      <q-separator dark />
+      <q-separator />
       <q-card-actions>
         <q-btn flat label="Cancel" @click="onDialogCancel" />
         <q-space />
-        <q-btn :disable="shared.length === 0" flat label="Import config" @click="loadShared" />
+        <q-btn :disable="shared.length === 0" flat label="Import config" @click="loadShared">
+          <q-tooltip>Copy configuration from another graph</q-tooltip>
+        </q-btn>
         <q-btn unelevated label="Save" color="primary" @click="save" />
       </q-card-actions>
     </q-card>

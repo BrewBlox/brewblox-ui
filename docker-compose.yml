@@ -70,17 +70,17 @@ services:
   #      --device-host=192.168.0.78
   #      --discovery=usb
 
-  stepper:
-    image: brewblox/brewblox-stepper:develop
+  automation:
+    image: brewblox/brewblox-automation:develop
     privileged: true
     depends_on:
       - eventbus
       - datastore
     labels:
       - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /stepper"
+      - "traefik.frontend.rule=PathPrefix: /automation"
     # volumes:
-    #   - "../brewblox-stepper/:/app/"
+    #   - "../brewblox-automation/:/app/"
 
   ui:
     image: brewblox/brewblox-ui:develop

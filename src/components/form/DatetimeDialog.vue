@@ -6,9 +6,12 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { validator } from '@/helpers/functional';
 
+const dateExp = /^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$/;
+
 @Component
 export default class DatetimeDialog extends DialogBase {
-  stringValue = '';
+  dateString = '';
+  timeString = '';
 
   @Prop({ type: Date, required: true })
   public readonly value!: Date;
@@ -22,18 +25,16 @@ export default class DatetimeDialog extends DialogBase {
   @Prop({ type: Array, default: () => [] })
   public readonly rules!: InputRule[];
 
-  get parsed(): Date {
-    const args =
-      (this.stringValue.match(/^(\d*)\/(\d*)\/(\d*) (\d*):(\d*):(\d*)$/) || [])
-        .map(Number);
-    // Months start at 0 in JavaScript
-    // I have no words. At least: none that needn't be censored.
-    return new Date(args[1], args[2] - 1, args[3], args[4], args[5], args[6]);
+  get parsed(): Date | null {
+    const combined = `${this.dateString} ${this.timeString}`;
+    return dateExp.test(combined) && qdate.isValid(combined)
+      ? qdate.extractDate(combined, 'YYYY/MM/DD HH:mm:ss')
+      : null;
   }
 
   get parsedRules(): InputRule[] {
     return [
-      () => !Number.isNaN(this.parsed.getTime()) || 'Invalid date',
+      () => this.parsed !== null || 'Invalid date',
       ...this.rules.map(rule => () => rule(this.parsed)),
     ];
   }
@@ -43,7 +44,8 @@ export default class DatetimeDialog extends DialogBase {
   }
 
   setStringVal(dateVal: Date): void {
-    this.stringValue = qdate.formatDate(dateVal, 'YYYY/MM/DD HH:mm:ss');
+    this.dateString = qdate.formatDate(dateVal, 'YYYY/MM/DD');
+    this.timeString = qdate.formatDate(dateVal, 'HH:mm:ss');
   }
 
   save(): void {
@@ -53,6 +55,7 @@ export default class DatetimeDialog extends DialogBase {
   }
 
   openPicker(): void {
+    if (!this.valid) { return; }
     createDialog({
       component: 'DatepickerDialog',
       title: this.title,
@@ -73,7 +76,7 @@ export default class DatetimeDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark" dark>
+    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
       <q-card-section class="q-dialog__title">
         {{ title }}
       </q-card-section>
@@ -82,16 +85,24 @@ export default class DatetimeDialog extends DialogBase {
       </q-card-section>
       <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
       <q-card-section class="scroll">
-        <q-item dark>
+        <q-item>
           <q-item-section>
             <q-input
-              v-model="stringValue"
+              v-model="dateString"
               :rules="parsedRules"
-              :label="label"
-              hint="YYYY/MM/DD hh:mm:ss"
-              mask="####/##/## ##:##:##"
-              dark
+              label="Date"
+              hint="YYYY/MM/DD"
+              mask="####/##/##"
               autofocus
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-input
+              v-model="timeString"
+              :rules="parsedRules"
+              label="Time"
+              hint="HH:mm:ss"
+              mask="##:##:##"
             />
           </q-item-section>
           <q-item-section class="col-auto">

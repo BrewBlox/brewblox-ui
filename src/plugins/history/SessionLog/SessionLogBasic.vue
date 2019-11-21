@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { shortDateString } from '@/helpers/functional';
+import { shortDateString, spliceById } from '@/helpers/functional';
 
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
@@ -38,11 +38,8 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
   }
 
   saveNote(note: SessionNote): void {
-    const idx = this.notes.findIndex(n => n.id === note.id);
-    if (idx >= 0) {
-      this.$set(this.notes, idx, note);
-      this.saveSession();
-    }
+    spliceById(this.notes, note);
+    this.saveSession();
   }
 
   openNote(note: SessionNote): void {
@@ -112,25 +109,27 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
 
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
     <slot name="graph" />
 
     <q-card-section v-if="session !== null">
-      <q-item dark dense>
-        <q-item-section class="col-auto text-grey-2">
-          <span class="text-italic">{{ session.title }}</span>
-          <span>{{ new Date(session.date).toLocaleString() }}</span>
-        </q-item-section>
-      </q-item>
+      <div class="row text-grey-2 q-px-md q-my-xs items-baseline">
+        <div class="col-auto text-italic text-bold" style="font-size: 120%">
+          {{ session.title }}
+        </div>
+        <q-space />
+        <div class="col-auto">
+          {{ new Date(session.date).toLocaleString() }}
+        </div>
+      </div>
       <div class="row">
         <q-item
           v-for="note in notes"
           :key="note.id"
-          dark
           clickable
-          :class="[`col-${note.col}`, 'align-children']"
+          :class="[`col-${note.col}`, 'align-children', 'self-start']"
           @click="openNote(note)"
         >
           <!-- Text note -->
@@ -142,7 +141,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
               </q-item-label>
               <!-- No line breaks to allow correctly rendering whitespace -->
               <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-              <div v-if="!!note.value" class="note-text">{{ note.value }}</div>
+              <div v-if="!!note.value" style="white-space: pre-wrap">{{ note.value }}</div>
               <div v-else class="text-grey text-italic">
                 Click to set
               </div>
@@ -182,9 +181,3 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     </q-card-section>
   </q-card>
 </template>
-
-<style scoped>
-.note-text {
-  white-space: pre-wrap;
-}
-</style>

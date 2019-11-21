@@ -4,7 +4,8 @@ import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { durationString } from '@/helpers/functional';
+import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
+import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
@@ -98,6 +99,21 @@ export default class BlockGraph extends Vue {
       });
   }
 
+  chooseDuration(): void {
+    const current = this.graphCfg.params.duration ?? '1h';
+    createDialog({
+      component: 'TimeUnitDialog',
+      parent: this,
+      title: 'Custom graph duration',
+      value: new Unit(durationMs(current), 'ms'),
+      label: 'Duration',
+    })
+      .onOk(unit => {
+        this.graphCfg.params = { duration: unitDurationString(unit) };
+        this.change(this.graphCfg);
+      });
+  }
+
   @Watch('graphCfg')
   onCfgChange(newVal): void {
     // Vue considers configuration "changed" with every block data update
@@ -116,28 +132,25 @@ export default class BlockGraph extends Vue {
 
 <template>
   <q-dialog v-model="dialogOpen" maximized>
-    <q-card v-if="dialogOpen" class="text-white bg-dark-bright" dark>
+    <q-card v-if="dialogOpen" class="text-white bg-dark-bright">
       <HistoryGraph ref="graph" :graph-id="id" :config="graphCfg">
         <template #controls>
           <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
-            <q-item
+            <ActionItem
               v-for="(preset, idx) in presets"
               :key="idx"
               :active="preset.duration === graphCfg.params.duration"
-              dark
-              link
-              clickable
+              :label="preset.duration"
               @click="applyPreset(preset)"
-            >
-              <q-item-section>{{ preset.duration }}</q-item-section>
-            </q-item>
+            />
+            <ActionItem label="Custom" @click="chooseDuration" />
           </q-btn-dropdown>
           <q-btn-dropdown flat label="settings" icon="settings">
             <ExportGraphAction
               :config="graphCfg"
               :header="graphCfg.layout.title"
             />
-            <q-item dark link clickable @click="updateDuration">
+            <q-item link clickable @click="updateDuration">
               <q-item-section>Duration</q-item-section>
               <q-item-section class="col-auto">
                 {{ durationString(graphCfg.params.duration) }}
@@ -147,7 +160,6 @@ export default class BlockGraph extends Vue {
               <q-item
                 v-for="[key, renamed] in targetKeys"
                 :key="key"
-                dark
                 link
                 clickable
                 @click="updateKeySide(key, !isRightAxis(key))"

@@ -38,10 +38,9 @@ export default class ColorField extends FieldBase {
       backgroundColor: this.value ? this.color : null,
       border: `1px ${this.value ? 'solid' : 'dashed'} ${this.color}`,
       borderRadius: '50%',
-      height: '1em',
-      width: '1em',
+      height: '20px',
+      width: '20px',
       display: 'inline-block',
-      marginStart: '0.5em',
     };
   }
 
@@ -65,22 +64,25 @@ export default class ColorField extends FieldBase {
 </script>
 
 <template>
-  <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{ editable: !readonly }, tagClass]"
-    @click="openDialog"
+  <q-field
+    :label="label"
+    :class="[{pointer: !readonly}, $attrs.class]"
+    :borderless="readonly"
+    stack-label
+    v-bind="$attrs"
+    @click.native="openDialog"
   >
-    <slot name="pre" />
-    <slot name="value">
-      {{ colorString }}
-    </slot>
-    <slot name="indicator">
-      <span :style="colorStyle" />
-    </slot>
-    <slot />
-    <q-tooltip v-if="!readonly">
-      Choose color
-    </q-tooltip>
-  </component>
+    <template #control>
+      <component :is="tag" class="q-mt-sm">
+        <slot name="value">
+          {{ colorString }}
+        </slot>
+      </component>
+    </template>
+    <template #after>
+      <slot name="indicator">
+        <span class="self-end q-mb-sm" :style="colorStyle" />
+      </slot>
+    </template>
+  </q-field>
 </template>

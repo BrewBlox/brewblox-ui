@@ -121,104 +121,89 @@ export default class DisplaySettingsFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings" />
 
-    <q-card-section class="row">
-      <q-item v-for="(slot, idx) in slots" :key="idx" dark class="row q-pa-sm col-4">
-        <q-list :style="`border: 2px solid ${slotColor(slot)}`" dark class="col-12">
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Block
-              </q-item-label>
-              <LinkField
-                :value="slotLink(slot)"
-                :filter="linkFilter"
-                :service-id="serviceId"
-                no-create
-                title="Block"
-                @input="v => updateSlotLink(idx, v)"
-              />
-            </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Display name
-              </q-item-label>
-              <InputField
-                v-if="slot"
-                :value="slot.name"
-                :rules="slotNameRules"
-                title="Slot name"
-                message="Choose the LCD display name for this block"
-                @input="v => updateSlotName(idx, v)"
-              />
-              <span v-else>-</span>
-            </q-item-section>
-          </q-item>
-          <q-item dark>
-            <q-item-section>
-              <q-item-label caption>
-                Color
-              </q-item-label>
-              <ColorField
-                v-if="slot"
-                :value="slot.color"
-                title="Color"
-                message="Choose the LCD display background color for this block"
-                @input="v => updateSlotColor(idx, v)"
-              />
-              <span v-else>-</span>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-item>
+    <q-card-section>
+      <div class="grid-container">
+        <div
+          v-for="(slot, idx) in slots"
+          :key="idx"
+          :style="`border: 2px solid ${slotColor(slot)}; grid-column-end: span 1`"
+          class="q-pa-sm column justify-between"
+        >
+          <BlockField
+            :value="slotLink(slot)"
+            :filter="linkFilter"
+            :service-id="serviceId"
+            no-create
+            title="Block"
+            label="Block"
+            @input="v => updateSlotLink(idx, v)"
+          />
+          <template v-if="slot">
+            <InputField
+              :value="slot.name"
+              :rules="slotNameRules"
+              label="Slot name"
+              title="Slot name"
+              message="Choose the LCD display name for this block"
+              @input="v => updateSlotName(idx, v)"
+            />
+            <ColorField
+              :value="slot.color"
+              title="Color"
+              label="Color"
+              message="Choose the LCD display background color for this block"
+              @input="v => updateSlotColor(idx, v)"
+            />
+          </template>
+        </div>
+      </div>
     </q-card-section>
 
-    <q-separator dark inset />
+    <q-separator inset />
 
-    <q-card-section>
-      <q-list dark>
-        <q-item dark class="align-children">
-          <q-item-section>
-            <q-item-label caption>
-              Footer text
-            </q-item-label>
-            <InputField
-              :value="block.data.name"
-              :rules="footerRules"
-              title="footer text"
-              @input="v => {block.data.name = v; saveBlock()}"
-            />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label caption>
-              Temperature Unit
-            </q-item-label>
-            <SelectField
-              :value="block.data.tempUnit"
-              :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
-              title="Temperature Unit"
-              @input="v => { block.data.tempUnit = v; saveBlock(); }"
-            />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label caption>
-              Display brightness
-            </q-item-label>
-            <q-slider
-              :value="block.data.brightness || 255"
-              :min="20"
-              :max="255"
-              dark
-              @change="v => { block.data.brightness = v; saveBlock(); }"
-            />
-          </q-item-section>
-        </q-item>
-      </q-list>
+    <q-card-section class="row items-start q-x-sm">
+      <InputField
+        :value="block.data.name"
+        :rules="footerRules"
+        class="col"
+        label="Footer text"
+        title="footer text"
+        @input="v => {block.data.name = v; saveBlock()}"
+      />
+      <SelectField
+        :value="block.data.tempUnit"
+        :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
+        label="Temperature unit"
+        title="Temperature unit"
+        class="col q-pl-sm"
+        @input="v => { block.data.tempUnit = v; saveBlock(); }"
+      />
+      <q-field
+        label="Display brightness"
+        stack-label
+        class="col q-px-sm"
+        borderless
+      >
+        <q-slider
+          :value="block.data.brightness || 255"
+          :min="20"
+          :max="255"
+          @change="v => { block.data.brightness = v; saveBlock(); }"
+        />
+      </q-field>
     </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+}
+</style>

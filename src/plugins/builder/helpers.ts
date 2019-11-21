@@ -157,7 +157,6 @@ export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
     const link = settingsLink(part, key);
     if (!!link.serviceId && !!link.blockId) {
       createDialog({
-        dark: true,
         title: 'Broken Link',
         message: `Block '${link.blockId}' was not found. Use the editor to change the link.`,
       });
@@ -179,7 +178,6 @@ export function showLinkedWidgetDialog(part: PersistentPart, key: string): void 
   }
   else {
     createDialog({
-      dark: true,
       title: 'Broken Link',
       message: 'Widget was not found. Use the editor to change the link.',
     });

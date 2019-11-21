@@ -22,7 +22,7 @@ export default class ActuatorPwmFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card dark v-bind="$attrs">
+  <q-card v-bind="$attrs">
     <slot name="toolbar" />
     <slot name="warnings">
       <BlockEnableToggle
@@ -33,68 +33,62 @@ export default class ActuatorPwmFull extends BlockCrudComponent {
     </slot>
 
     <q-card-section>
-      <q-item dark>
-        <q-item-section>
-          <q-item-label caption>
-            Period
-          </q-item-label>
+      <q-item>
+        <q-item-section class="col-4">
           <TimeUnitField
             :value="block.data.period"
             title="Period"
+            label="Period"
             tag="big"
             @input="v => { block.data.period = v; saveBlock(); }"
           />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Digital Actuator Target
-          </q-item-label>
-          <LinkField
+          <BlockField
             :value="block.data.actuatorId"
             :service-id="serviceId"
             title="target"
+            label="Digital Actuator Target"
             tag="big"
             @input="v => { block.data.actuatorId = v; saveBlock(); }"
           />
         </q-item-section>
-        <q-item-section />
       </q-item>
-      <q-item dark class="align-children">
+      <q-item class="align-children">
         <q-item-section>
-          <q-item-label caption>
-            Duty setting
-          </q-item-label>
-          <div :class="{['text-orange']: isConstrained}">
-            <SliderField
-              :value="block.data.setting"
-              :readonly="isDriven"
-              :quick-actions="quickValues"
-              tag="big"
-              title="Setting"
-              @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-            />
-          </div>
+          <SliderField
+            :value="block.data.setting"
+            :readonly="isDriven"
+            :quick-actions="quickValues"
+            label="Duty setting"
+            tag="big"
+            :tag-class="{['text-orange']: isConstrained}"
+            title="Setting"
+            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+          />
         </q-item-section>
         <q-item-section>
-          <q-item-label caption>
-            Duty Achieved
-          </q-item-label>
-          <big>{{ block.data.value | round }}</big>
+          <LabeledField
+            :value="block.data.value"
+            number
+            label="Duty achieved"
+            tag="big"
+            suffix="%"
+          />
         </q-item-section>
         <q-item-section>
-          <template v-if="isConstrained">
-            <q-item-label caption>
-              Unconstrained setting
-            </q-item-label>
-            <div>
-              <big>{{ block.data.desiredSetting | round }}</big>
-              <small class="q-ml-xs">%</small>
-            </div>
-          </template>
+          <LabeledField
+            v-if="isConstrained"
+            label="Unconstrained setting"
+            :value="block.data.desiredSetting"
+            number
+            tag="big"
+            suffix="%"
+          />
         </q-item-section>
       </q-item>
 
-      <q-item dark>
+      <q-item>
         <q-item-section>
           <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
           <ConstraintsField

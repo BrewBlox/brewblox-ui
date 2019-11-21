@@ -6,7 +6,6 @@ import { sparkStore } from '@/plugins/spark/store';
 
 import ValEditBase from '../ValEditBase';
 
-
 @Component
 export default class UnitValEdit extends ValEditBase {
   prettify = prettify;
@@ -14,18 +13,16 @@ export default class UnitValEdit extends ValEditBase {
   field!: Unit;
 
   get inputListeners(): Mapped<Function> {
-    const func = (v: any): void => {
-      this.field.value = v;
+    const func = (v: number | null): void => {
+      this.field.value = (v === null || Number.isNaN(v)) ? null : v;
       this.saveField(this.field);
     };
-    return this.lazy
-      ? { change: func }
-      : { input: func };
+    return this.lazy ? { change: func } : { input: func };
   }
 
   get unitOpts(): { label: string; value: string }[] {
-    const vals = Object.values(sparkStore.unitAlternatives(this.serviceId))
-      .find(vals => vals.includes(this.field.unit)) || [];
+    const vals =
+      Object.values(sparkStore.unitAlternatives(this.serviceId)).find(vals => vals.includes(this.field.unit)) || [];
 
     return vals.map(v => ({ label: prettify(v), value: v }));
   }
@@ -33,15 +30,14 @@ export default class UnitValEdit extends ValEditBase {
 </script>
 
 <template>
-  <q-item v-if="editable" dark>
+  <q-item v-if="editable">
     <q-input
       :value="field.value"
       step="any"
-      dark
       :dense="dense"
       :label="' '"
       type="number"
-      class="q-mr-md"
+      class="q-mr-xs"
       v-on="inputListeners"
     />
     <q-select
@@ -50,8 +46,6 @@ export default class UnitValEdit extends ValEditBase {
       :display-value="field.notation"
       :dense="dense"
       :label="' '"
-      dark
-      options-dark
       emit-value
       @input="v => { field.unit = v; saveField(field); }"
     />

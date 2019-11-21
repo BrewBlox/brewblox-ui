@@ -39,7 +39,6 @@ export default class GroupsField extends FieldBase {
     createDialog({
       title: this.title,
       message: this.message,
-      dark: true,
       cancel: true,
       options: {
         type: 'checkbox',
@@ -53,16 +52,19 @@ export default class GroupsField extends FieldBase {
 </script>
 
 <template>
-  <component
-    :is="tag"
-    v-bind="tagProps"
-    :class="[{editable: !readonly}, tagClass]"
-    @click="openDialog"
+  <q-field
+    :label="label"
+    :class="[{pointer: !readonly}, $attrs.class]"
+    stack-label
+    v-bind="$attrs"
+    @click.native="openDialog"
   >
-    <slot name="pre" />
-    <slot name="value">
-      {{ displayValue }}
-    </slot>
-    <slot />
-  </component>
+    <template #control>
+      <component :is="tag" class="q-mt-sm">
+        <slot name="value">
+          {{ displayValue }}
+        </slot>
+      </component>
+    </template>
+  </q-field>
 </template>

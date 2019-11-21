@@ -74,7 +74,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card dark class="widget-modal">
+    <q-card class="widget-modal">
       <DialogToolbar>
         <q-item-section>
           <q-item-label>{{ service.id }}</q-item-label>
@@ -85,16 +85,16 @@ export default class FirmwareUpdateDialog extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
-        <q-item dark>
+        <q-item>
           <q-item-section>{{ updateAvailableText }}</q-item-section>
         </q-item>
-        <q-list dark dense>
-          <q-item v-for="(msg, idx) in messages" :key="idx" dark>
+        <q-list dense>
+          <q-item v-for="(msg, idx) in messages" :key="idx">
             <q-item-section>{{ msg }}</q-item-section>
           </q-item>
         </q-list>
       </q-card-section>
-      <q-separator dark />
+      <q-separator />
       <q-card-actions align="right">
         <q-btn
           :disable="!buttonEnabled"
