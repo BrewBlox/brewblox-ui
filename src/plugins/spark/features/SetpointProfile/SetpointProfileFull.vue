@@ -213,9 +213,10 @@ export default class SetpointProfileFull extends BlockCrudComponent {
         <q-item-section class="self-end">
           <DatetimeField
             :value="start"
+            :html="true"
             label="Start time"
             title="Start time"
-            message-html="This will shift all points.
+            message="This will shift all points.
               <br>Offset time will remain the same, absolute time values will change.
               <br>The offset for the first point is always 0s."
             @input="updateStartTime"
@@ -243,9 +244,10 @@ export default class SetpointProfileFull extends BlockCrudComponent {
           <div style="grid-column-end: span 2" class="self-end">
             <DurationInputField
               :value="durationString(point.offsetMs)"
+              :html="true"
               title="Offset from start time"
               label="Offset"
-              message-html="
+              message="
             This will change the point offset.
               <br>The absolute point time will be changed to start time + offset.
               <br>Changing point offset may change point order.
@@ -256,9 +258,10 @@ export default class SetpointProfileFull extends BlockCrudComponent {
           <div style="grid-column-end: span 4" class="self-end">
             <DatetimeField
               :value="point.absTimeMs"
+              :html="true"
               title="Time"
               label="Time"
-              message-html="
+              message="
               This will change the absolute point time.
               <br>Changing point time may change point order.
               <br>Point offset is changed to point time - start time.

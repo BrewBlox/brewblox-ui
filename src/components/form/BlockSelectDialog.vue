@@ -45,34 +45,26 @@ export default class BlockSelectDialog extends DialogBase {
     @hide="onDialogHide"
     @keyup.enter="block && onDialogOk(block)"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-select
-          v-model="block"
-          :options="blockOpts"
-          :clearable="clearable"
-          :label="label"
-          autofocus
-          option-label="id"
-          option-value="id"
-        >
-          <template #no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-      </q-card-section>
-      <q-card-actions align="right">
+    <DialogCard v-bind="{title, message, html}">
+      <q-select
+        v-model="block"
+        :options="blockOpts"
+        :clearable="clearable"
+        :label="label"
+        autofocus
+        item-aligned
+        option-label="id"
+        option-value="id"
+      >
+        <template #no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+      <template #actions>
         <q-btn color="primary" flat label="Cancel" @click="onDialogCancel" />
         <q-btn
           :disable="!clearable && !block"
@@ -81,7 +73,7 @@ export default class BlockSelectDialog extends DialogBase {
           label="OK"
           @click="onDialogOk(block)"
         />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

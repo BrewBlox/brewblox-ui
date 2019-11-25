@@ -93,31 +93,26 @@ export default class SessionCreateDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title ellipsis">
-        {{ title }}
-      </q-card-section>
-      <q-card-section class="scroll">
-        <q-input
-          v-model="sessionTitle"
-          label="Session name"
-          autofocus
-          item-aligned
-        />
-        <q-select
-          v-model="sourceId"
-          :options="sessionOpts"
-          label="Copy notes from:"
-          clearable
-          emit-value
-          map-options
-          item-aligned
-        />
-      </q-card-section>
-      <q-card-actions align="right">
+    <DialogCard :title="title">
+      <q-input
+        v-model="sessionTitle"
+        label="Session name"
+        autofocus
+        item-aligned
+      />
+      <q-select
+        v-model="sourceId"
+        :options="sessionOpts"
+        label="Copy notes from:"
+        clearable
+        emit-value
+        map-options
+        item-aligned
+      />
+      <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

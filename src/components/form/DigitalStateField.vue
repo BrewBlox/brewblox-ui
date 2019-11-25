@@ -68,7 +68,7 @@ export default class DigitalStateField extends Vue {
 </script>
 
 <template>
-  <div>
+  <LabeledField v-bind="{...$attrs, ...$props, readonly: true}">
     <q-btn-toggle
       v-if="known"
       :value="value"
@@ -109,8 +109,5 @@ export default class DigitalStateField extends Vue {
         <i>inactive</i>
       </q-tooltip>
     </q-btn>
-  </div>
+  </LabeledField>
 </template>
-
-<style>
-</style>

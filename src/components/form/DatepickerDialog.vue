@@ -41,35 +41,30 @@ export default class DatepickerDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-tabs v-model="tab" dense active-color="primary" align="justify" narrow-indicator>
-        <q-tab name="date" label="Date" />
-        <q-tab name="time" label="Time" />
-      </q-tabs>
-      <q-tab-panels v-model="tab" animated>
-        <q-tab-panel name="date" class="q-pa-none">
-          <q-date
-            v-model="stringValue"
-            mask="YYYY/MM/DD HH:mm:ss"
-            class="maximized"
-            @input="tab='time'"
-          />
-        </q-tab-panel>
-        <q-tab-panel name="time" class="q-pa-none">
-          <q-time v-model="stringValue" mask="YYYY/MM/DD HH:mm:ss" class="maximized" />
-        </q-tab-panel>
-      </q-tab-panels>
-      <q-card-actions align="right">
+    <DialogCard v-bind="{title, message, html}">
+      <template #body>
+        <q-tabs v-model="tab" dense active-color="primary" align="justify" narrow-indicator>
+          <q-tab name="date" label="Date" />
+          <q-tab name="time" label="Time" />
+        </q-tabs>
+        <q-tab-panels v-model="tab" animated>
+          <q-tab-panel name="date" class="q-pa-none">
+            <q-date
+              v-model="stringValue"
+              mask="YYYY/MM/DD HH:mm:ss"
+              class="maximized"
+              @input="tab='time'"
+            />
+          </q-tab-panel>
+          <q-tab-panel name="time" class="q-pa-none">
+            <q-time v-model="stringValue" mask="YYYY/MM/DD HH:mm:ss" class="maximized" />
+          </q-tab-panel>
+        </q-tab-panels>
+      </template>
+      <template #actions>
         <q-btn flat color="primary" label="Cancel" @click="onDialogCancel" />
         <q-btn :disable="!valid" flat color="primary" label="OK" @click="save" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>
