@@ -47,7 +47,7 @@ export default class InputField extends FieldBase {
       component: 'InputDialog',
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       parent: this,
       value: this.value,
       decimals: this.decimals,
@@ -62,22 +62,12 @@ export default class InputField extends FieldBase {
 </script>
 
 <template>
-  <q-field
-    :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    stack-label
-    v-bind="$attrs"
-    @click.native="openDialog"
-  >
+  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <template v-if="!!$scopedSlots.before" #before>
       <slot name="before" />
     </template>
-    <template #control>
-      <component :is="tag" :class="['q-mt-sm', tagClass]">
-        <slot name="value">
-          {{ displayValue }}
-        </slot>
-      </component>
-    </template>
-  </q-field>
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
+  </LabeledField>
 </template>

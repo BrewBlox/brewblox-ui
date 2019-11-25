@@ -46,7 +46,7 @@ export default class ConstraintsField extends FieldBase {
       component: 'ConstraintsDialog',
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       value: this.value,
       serviceId: this.serviceId,
       type: this.type,

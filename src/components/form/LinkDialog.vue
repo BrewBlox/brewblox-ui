@@ -94,44 +94,36 @@ export default class LinkDialog extends DialogBase {
     @hide="onDialogHide"
     @keyup.enter="(link || clearable) && onDialogOk(link)"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-select
-          :value="link"
-          :options="linkOpts"
-          :clearable="clearable"
-          :label="label"
-          option-label="id"
-          option-value="id"
-          autofocus
-          @input="updateLink"
-        >
-          <template #no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-if="!noCreate" #after>
-            <q-btn v-if="linkBlock" flat round icon="mdi-pencil" @click="edit">
-              <q-tooltip>Edit {{ link.id }}</q-tooltip>
-            </q-btn>
-            <q-btn v-else disable flat round icon="mdi-pencil-off" />
-            <q-btn flat round icon="add" @click="create">
-              <q-tooltip>Create new Block</q-tooltip>
-            </q-btn>
-          </template>
-        </q-select>
-      </q-card-section>
-      <q-card-actions align="right">
+    <DialogCard v-bind="{title, message, html}">
+      <q-select
+        :value="link"
+        :options="linkOpts"
+        :clearable="clearable"
+        :label="label"
+        option-label="id"
+        option-value="id"
+        autofocus
+        item-aligned
+        @input="updateLink"
+      >
+        <template #no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+        <template v-if="!noCreate" #after>
+          <q-btn v-if="linkBlock" flat round icon="mdi-pencil" @click="edit">
+            <q-tooltip>Edit {{ link.id }}</q-tooltip>
+          </q-btn>
+          <q-btn v-else disable flat round icon="mdi-pencil-off" />
+          <q-btn flat round icon="add" @click="create">
+            <q-tooltip>Create new Block</q-tooltip>
+          </q-btn>
+        </template>
+      </q-select>
+      <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
           :disable="!clearable && !link"
@@ -140,7 +132,7 @@ export default class LinkDialog extends DialogBase {
           color="primary"
           @click="onDialogOk(link)"
         />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

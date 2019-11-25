@@ -1,6 +1,6 @@
 <script lang="ts">
 import clamp from 'lodash/clamp';
-import { debounce, dom, uid } from 'quasar';
+import { dom, uid } from 'quasar';
 import { Component, Ref } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';

@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { mutate } from '@/helpers/functional';
+import { mutate, spliceById } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
@@ -79,7 +79,7 @@ export default class QuickActionsFull extends CrudComponent {
       }));
   }
 
-  saveSteps(steps: StepDisplay[]): void {
+  saveSteps(steps: StepDisplay[] = this.steps): void {
     this.saveConfig({
       ...this.widgetConfig,
       steps: serialize(steps.map(step => ({
@@ -87,6 +87,11 @@ export default class QuickActionsFull extends CrudComponent {
         changes: step.changes.map(this.asBlockChange),
       }))),
     });
+  }
+
+  saveStep(step: StepDisplay): void {
+    spliceById(this.steps, step);
+    this.saveSteps();
   }
 
   get blockIdOpts(): string[] {
@@ -128,14 +133,14 @@ export default class QuickActionsFull extends CrudComponent {
     })
       .onOk(name => {
         this.steps.push({ name, id: uid(), changes: [] });
-        this.saveSteps(this.steps);
+        this.saveSteps();
       });
   }
 
   duplicateStep(step: StepDisplay): void {
     const duplicated = deepCopy(step);
     this.steps.push({ ...duplicated, id: uid(), name: `${duplicated.name} (copy)` });
-    this.saveSteps(this.steps);
+    this.saveSteps();
   }
 
   renameStep(step: StepDisplay): void {
@@ -150,10 +155,9 @@ export default class QuickActionsFull extends CrudComponent {
       },
     })
       .onOk(newName => {
-        const updatedStep = this.steps.find(s => s.id === step.id);
-        if (step.name !== newName && updatedStep) {
-          updatedStep.name = newName;
-          this.saveSteps(this.steps);
+        if (newName !== stepName) {
+          step.name = newName;
+          this.saveStep(step);
         }
       });
   }
@@ -170,7 +174,7 @@ export default class QuickActionsFull extends CrudComponent {
 
   saveChanges(step: StepDisplay, changes: BlockChangeDisplay[]): void {
     step.changes = changes;
-    this.saveSteps(this.steps);
+    this.saveStep(step);
   }
 
   addChange(step: StepDisplay): void {
@@ -185,12 +189,9 @@ export default class QuickActionsFull extends CrudComponent {
       serviceId: this.serviceId,
     })
       .onOk(block => {
-        const updatedStep = this.steps.find(s => s.id === step.id);
-        if (updatedStep) {
-          const newChange: BlockChange = { blockId: block.id, data: {}, confirmed: {} };
-          updatedStep.changes.push(this.asBlockChangeDisplay(step.id, newChange));
-          this.saveSteps(this.steps);
-        }
+        const newChange: BlockChange = { blockId: block.id, data: {}, confirmed: {} };
+        step.changes.push(this.asBlockChangeDisplay(step.id, newChange));
+        this.saveStep(step);
       });
   }
 
@@ -210,41 +211,40 @@ export default class QuickActionsFull extends CrudComponent {
       serviceId: this.serviceId,
     })
       .onOk(block => {
-        const updatedChange: BlockChange = {
-          blockId: block.id,
-          data: { ...current.data },
-          confirmed: { ...current.confirmed },
-        };
-        step.changes.splice(idx, 1, this.asBlockChangeDisplay(step.id, updatedChange));
-        this.saveSteps(this.steps);
+        const updated = step.changes[idx];
+        if (updated && block.id !== updated.blockId) {
+          updated.blockId = block.id;
+          step.changes.splice(idx, 1, this.asBlockChangeDisplay(step.id, updated));
+          this.saveStep(step);
+        }
       });
   }
 
   removeChange(step: StepDisplay, key: string): void {
     step.changes = step.changes.filter(change => change.key !== key);
-    this.saveSteps(this.steps);
+    this.saveSteps();
   }
 
   addField(change: BlockChangeDisplay, key: string): void {
     const prop = this.findProp(change, key);
     this.$set(change.data, key, prop.generate());
-    this.saveSteps(this.steps);
+    this.saveSteps();
   }
 
   updateField(change: BlockChangeDisplay, key: string, val: any): void {
     this.$set(change.data, key, val);
-    this.saveSteps(this.steps);
+    this.saveSteps();
   }
 
   toggleConfirmation(change: BlockChangeDisplay, key: string): void {
     this.$set(change.confirmed, key, !change.confirmed[key]);
-    this.saveSteps(this.steps);
+    this.saveSteps();
   }
 
   removeField(change: BlockChangeDisplay, key: string): void {
     this.$delete(change.data, key);
     this.$delete(change.confirmed, key);
-    this.saveSteps(this.steps);
+    this.saveSteps();
   }
 }
 </script>
