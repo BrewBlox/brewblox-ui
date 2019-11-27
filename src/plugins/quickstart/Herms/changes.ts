@@ -17,7 +17,7 @@ import {
   PidData,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { AnalogConstraint, Block, DigitalConstraint, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
@@ -378,16 +378,23 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
             {
               blockId: config.names.hltSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
               blockId: config.names.mtSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
               blockId: config.names.bkSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Constant HLT Temp',
@@ -396,6 +403,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
             {
               blockId: config.names.mtSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
               blockId: config.names.hltSetpoint,
@@ -407,7 +415,10 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
                 storedSetting: true,
               },
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Constant MT Temp',
@@ -428,8 +439,12 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
               data: {
                 enabled: true,
               },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<ActuatorOffsetBlock>,
+            ],
         },
         {
           name: 'Constant BK Temp',
@@ -445,7 +460,9 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
                 storedSetting: true,
               },
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
       ]),
     },

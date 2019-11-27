@@ -16,7 +16,7 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
@@ -379,7 +379,10 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
               blockId: config.names.beerProfile,
               data: { enabled: false },
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
         {
           name: 'Constant beer temperature',
@@ -388,6 +391,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
             {
               blockId: config.names.beerProfile,
               data: { enabled: false },
+              confirmed: {},
             },
             {
               blockId: config.names.beerSetpoint,
@@ -399,7 +403,10 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
                 storedSetting: true,
               },
             },
-          ],
+          ] as [
+              BlockChange<SetpointProfileBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Follow temperature profile',
@@ -407,14 +414,18 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
           changes: [
             {
               blockId: config.names.beerSetpoint,
-              data: { enabled: true },
+              data: { settingEnabled: true },
+              confirmed: {},
             },
             {
               blockId: config.names.beerProfile,
               data: { enabled: true, start: new Date().getTime() / 1000 },
               confirmed: { start: true },
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
       ]),
     },

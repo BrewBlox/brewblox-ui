@@ -17,7 +17,7 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
@@ -349,7 +349,10 @@ export const defineWidgets = (
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: true },
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Disable control',
@@ -367,7 +370,11 @@ export const defineWidgets = (
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
-          ],
+          ] as [
+              BlockChange<SetpointProfileBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Constant fridge temperature',
@@ -384,6 +391,7 @@ export const defineWidgets = (
             {
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
               blockId: config.names.coolPid,
@@ -391,6 +399,7 @@ export const defineWidgets = (
                 inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeCoolConfig,
               },
+              confirmed: {},
             },
             {
               blockId: config.names.heatPid,
@@ -398,12 +407,20 @@ export const defineWidgets = (
                 inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeHeatConfig,
               },
+              confirmed: {},
             },
             {
               blockId: config.names.tempProfile,
               data: { targetId: new Link(config.names.fridgeSetpoint) },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<PidBlock>,
+              BlockChange<PidBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
         {
           name: 'Constant beer temperature',
@@ -412,6 +429,7 @@ export const defineWidgets = (
             {
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
               blockId: config.names.beerSetpoint,
@@ -427,6 +445,7 @@ export const defineWidgets = (
                 inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerCoolConfig,
               },
+              confirmed: {},
             },
             {
               blockId: config.names.heatPid,
@@ -434,12 +453,20 @@ export const defineWidgets = (
                 inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerHeatConfig,
               },
+              confirmed: {},
             },
             {
               blockId: config.names.tempProfile,
               data: { targetId: new Link(config.names.beerSetpoint) },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<PidBlock>,
+              BlockChange<PidBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
         {
           name: 'Start profile',
@@ -450,7 +477,9 @@ export const defineWidgets = (
               data: { enabled: true, start: 0 },
               confirmed: { start: true },
             },
-          ],
+          ] as [
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
         {
           name: 'Disable profile',
@@ -460,7 +489,9 @@ export const defineWidgets = (
               blockId: config.names.tempProfile,
               data: { enabled: false },
             },
-          ],
+          ] as [
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
       ]),
     },
