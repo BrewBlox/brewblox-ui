@@ -15,7 +15,7 @@ import {
   PidData,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
@@ -267,12 +267,17 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
             {
               blockId: config.names.pumpAct,
               data: { desiredState: DigitalState.Active },
+              confirmed: {},
             },
             {
               blockId: config.names.kettleSetpoint,
               data: { settingEnabled: true },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<DigitalActuatorBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Disable pump and heater',
@@ -281,12 +286,17 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
             {
               blockId: config.names.kettleSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
               blockId: config.names.pumpAct,
               data: { desiredState: DigitalState.Inactive },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<DigitalActuatorBlock>,
+            ],
         },
         {
           name: 'Enable pump',
@@ -295,8 +305,11 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
             {
               blockId: config.names.pumpAct,
               data: { desiredState: DigitalState.Active },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<DigitalActuatorBlock>,
+            ],
         },
         {
           name: 'Disable heater',
@@ -305,8 +318,11 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
             {
               blockId: config.names.kettleSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
       ]),
     },

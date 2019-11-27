@@ -1,5 +1,7 @@
 import { PersistentWidget } from '@/store/dashboards';
 
+import { Block } from '../../types';
+
 export interface QuickActionsConfig {
   serviceId: string;
   steps: Step[];
@@ -9,11 +11,9 @@ export interface QuickActionsItem extends PersistentWidget {
   config: QuickActionsConfig;
 }
 
-export interface BlockChange {
+export interface BlockChange<BlockT extends Block = Block> {
   blockId: string;
-  data: {
-    [key: string]: any;
-  };
+  data: Partial<BlockT['data']>;
   confirmed: {
     [key: string]: boolean;
   };
