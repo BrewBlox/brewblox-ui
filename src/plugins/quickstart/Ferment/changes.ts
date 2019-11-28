@@ -342,10 +342,12 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: true },
             },
             {
+              id: uid(),
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: true },
             },
@@ -359,14 +361,17 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { enabled: false },
             },
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
             },
             {
+              id: uid(),
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
@@ -381,6 +386,7 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.fridgeSetpoint,
               data: {
                 settingEnabled: true,
@@ -389,11 +395,13 @@ export const defineWidgets = (
               confirmed: { storedSetting: true },
             },
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.coolPid,
               data: {
                 inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
@@ -402,6 +410,7 @@ export const defineWidgets = (
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.heatPid,
               data: {
                 inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
@@ -410,6 +419,7 @@ export const defineWidgets = (
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { targetId: new Link(config.names.fridgeSetpoint) },
               confirmed: {},
@@ -427,11 +437,13 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: {
                 settingEnabled: true,
@@ -440,6 +452,7 @@ export const defineWidgets = (
               confirmed: { storedSetting: true },
             },
             {
+              id: uid(),
               blockId: config.names.coolPid,
               data: {
                 inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
@@ -448,6 +461,7 @@ export const defineWidgets = (
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.heatPid,
               data: {
                 inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
@@ -456,6 +470,7 @@ export const defineWidgets = (
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { targetId: new Link(config.names.beerSetpoint) },
               confirmed: {},
@@ -473,6 +488,7 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { enabled: true, start: 0 },
               confirmed: { start: true },
@@ -486,6 +502,7 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { enabled: false },
             },

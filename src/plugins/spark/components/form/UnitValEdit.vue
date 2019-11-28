@@ -35,7 +35,6 @@ export default class UnitValEdit extends ValEditBase {
       :value="field.value"
       step="any"
       :dense="dense"
-      :label="' '"
       type="number"
       class="q-mr-xs"
       v-on="inputListeners"
@@ -45,7 +44,6 @@ export default class UnitValEdit extends ValEditBase {
       :options="unitOpts"
       :display-value="field.notation"
       :dense="dense"
-      :label="' '"
       emit-value
       @input="v => { field.unit = v; saveField(field); }"
     />

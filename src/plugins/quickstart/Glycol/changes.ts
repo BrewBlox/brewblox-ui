@@ -325,7 +325,6 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
             `${config.names.beerSensor}/value[${userTemp}]`,
             `${config.names.beerSetpoint}/setting[${userTemp}]`,
             `${config.names.coolPwm}/value`,
-
             `${config.names.coolAct}/state`,
           ],
         },
@@ -372,12 +371,16 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.beerProfile,
               data: { enabled: false },
+              confirmed: {},
             },
           ] as [
               BlockChange<SetpointSensorPairBlock>,
@@ -389,11 +392,13 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.beerProfile,
               data: { enabled: false },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: {
                 settingEnabled: true,
@@ -413,11 +418,13 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: true },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.beerProfile,
               data: { enabled: true, start: new Date().getTime() / 1000 },
               confirmed: { start: true },

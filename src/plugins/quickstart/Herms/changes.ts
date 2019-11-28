@@ -376,16 +376,19 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.hltSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.bkSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
@@ -401,11 +404,13 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.hltSetpoint,
               data: {
                 settingEnabled: true,
@@ -425,6 +430,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.mtSetpoint,
               data: {
                 settingEnabled: true,
@@ -435,6 +441,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
               },
             },
             {
+              id: uid(),
               blockId: config.names.hltDriver,
               data: {
                 enabled: true,
@@ -451,6 +458,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.bkSetpoint,
               data: {
                 settingEnabled: true,
