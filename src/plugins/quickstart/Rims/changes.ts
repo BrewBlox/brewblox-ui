@@ -265,11 +265,13 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.pumpAct,
               data: { desiredState: DigitalState.Active },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.kettleSetpoint,
               data: { settingEnabled: true },
               confirmed: {},
@@ -284,11 +286,13 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.kettleSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.pumpAct,
               data: { desiredState: DigitalState.Inactive },
               confirmed: {},
@@ -303,6 +307,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.pumpAct,
               data: { desiredState: DigitalState.Active },
               confirmed: {},
@@ -316,6 +321,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.kettleSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
