@@ -63,6 +63,15 @@ export default class QuickActionChange extends Vue {
     };
   }
 
+  get unknownValues(): string[] {
+    const keys = Object.keys(this.value.data ?? {});
+    if (this.change.spec === null) {
+      return [];
+    }
+    const fields = this.change.spec.changes;
+    return keys.filter(k => !fields.some(c => c.key === k));
+  }
+
   saveChange(change: EditableBlockChange = this.change): void {
     const data = {};
     const confirmed = {};
@@ -96,7 +105,7 @@ export default class QuickActionChange extends Vue {
 <template>
   <q-list
     v-if="editable"
-    class="q-mb-sm"
+    class="q-mb-sm q-ml-md"
     bordered
     dense
   >
@@ -105,12 +114,12 @@ export default class QuickActionChange extends Vue {
         {{ change.blockId }}
       </q-item-section>
       <q-item-section side>
-        <q-btn flat round icon="clear" @click="removeChange(step, change.key)">
+        <q-btn flat round icon="clear" @click="$emit('remove')">
           <q-tooltip>Remove Block Change from Step</q-tooltip>
         </q-btn>
       </q-item-section>
       <q-item-section side>
-        <q-btn flat round icon="mdi-rename-box" @click="editChangeBlock(step, change.key)">
+        <q-btn flat round icon="mdi-rename-box" @click="$emit('switch')">
           <q-tooltip>Switch target Block</q-tooltip>
         </q-btn>
       </q-item-section>
@@ -135,22 +144,22 @@ export default class QuickActionChange extends Vue {
           dense
           @click="toggleField(field)"
         >
-          <q-tooltip>Change value when the Step is applied.</q-tooltip>
+          <q-tooltip>Change value when the step is applied.</q-tooltip>
         </q-btn>
       </q-item-section>
-      <q-item-section class="col-auto">
+      <q-item-section class="col-1">
         <q-btn
-          :color="field.confirmed ? 'primary' : ''"
-          :disable="field.value === null"
+          v-if="field.value !== null"
+          :class="{darkened: !field.confirmed, 'self-start': true}"
+          icon="mdi-comment-question-outline"
           flat
           dense
-          icon="mdi-comment-question"
           @click="field.confirmed = !field.confirmed; saveField(field)"
         >
-          <q-tooltip>Edit value when the Step is applied.</q-tooltip>
+          <q-tooltip>Edit value in popup when the step is applied.</q-tooltip>
         </q-btn>
       </q-item-section>
-      <q-item-section class="col-shrink">
+      <q-item-section :class="{darkish: field.value === null, 'col-shrink': true}">
         {{ field.cfield.title }}
       </q-item-section>
       <q-space />
@@ -168,11 +177,22 @@ export default class QuickActionChange extends Vue {
         />
       </q-item-section>
     </q-item>
+    <q-item v-if="unknownValues.length">
+      <q-item-section avatar>
+        <q-icon name="warning" color="warning" />
+      </q-item-section>
+      <q-item-section>
+        Unknown fields: {{ unknownValues.map(v => `'${v}'`).join(', ') }}
+      </q-item-section>
+      <q-item-section class="col-auto">
+        <q-btn flat label="Remove" @click="saveChange()" />
+      </q-item-section>
+    </q-item>
   </q-list>
 
   <q-list
     v-else
-    class="q-mb-sm"
+    class="q-mb-sm q-ml-md"
     bordered
     dense
   >
@@ -213,6 +233,17 @@ export default class QuickActionChange extends Vue {
         </q-item-section>
       </q-item>
     </template>
+    <q-item v-if="unknownValues.length">
+      <q-item-section avatar>
+        <q-icon name="warning" color="warning" />
+      </q-item-section>
+      <q-item-section>
+        Unknown fields: {{ unknownValues.map(v => `'${v}'`).join(', ') }}
+      </q-item-section>
+      <q-item-section class="col-auto">
+        <q-btn flat label="Remove" @click="saveChange()" />
+      </q-item-section>
+    </q-item>
   </q-list>
 </template>
 
