@@ -137,6 +137,7 @@ export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus
       synchronize: false,
       compatible: true, // no idea - assume yes
       latest: true, // no idea - assume yes
+      valid: true, // no idea - assume yes
       info: [],
       error,
     };

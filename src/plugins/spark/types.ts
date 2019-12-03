@@ -102,6 +102,7 @@ export interface SystemStatus {
   synchronize: boolean;
   compatible: boolean;
   latest: boolean;
+  valid: boolean;
   info: string[];
   error?: any;
 }
