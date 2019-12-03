@@ -82,9 +82,10 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           <SelectField
             :value="block.data.filter"
             :options="filterOpts"
+            :html="true"
             title="Filter"
             label="Filter period"
-            message-html="
+            message="
               <p>
                 A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
                 Changes faster than the filter period will be filted out.
@@ -100,9 +101,10 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
         <q-item-section class="col-4">
           <UnitField
             :value="block.data.filterThreshold"
+            :html="true"
             title="Filter bypass threshold"
             label="Bypass threshold"
-            message-html="
+            message="
               <p>
                 The filter can detect when a large step occurs at the input and temporary bypass slow filtering.
                 The threshold for an input change that should trigger this can be set here.

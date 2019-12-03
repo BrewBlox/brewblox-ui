@@ -58,6 +58,7 @@ export default class LinkValEdit extends ValEditBase {
     dense
     clearable
     use-input
+    item-aligned
     @input="v => { field.id = v; saveField(field); }"
     @filter="filterFn"
   />

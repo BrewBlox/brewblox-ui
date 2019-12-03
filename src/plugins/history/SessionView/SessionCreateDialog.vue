@@ -70,36 +70,31 @@ export default class SessionCreateDialog extends DialogBase {
     @hide="onDialogHide"
     @keyup.enter="createSession"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        Create new session
-      </q-card-section>
-      <q-card-section class="q-dialog__message scroll">
+    <DialogCard title="Create new session">
+      <template #message>
         Pick a name for your new Session. <br />
         If you want, you can import configuration from a Graph Widget.
-      </q-card-section>
-      <q-card-section class="scroll">
-        <q-input v-model="sessionName" label="Session name" />
-        <q-select
-          v-model="importGraph"
-          :options="graphOpts"
-          label="Import from Graph"
-          clearable
-          autofocus
-        >
-          <template #no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-      </q-card-section>
-      <q-card-actions align="right">
+      </template>
+      <q-input v-model="sessionName" label="Session name" />
+      <q-select
+        v-model="importGraph"
+        :options="graphOpts"
+        label="Import from Graph"
+        clearable
+        autofocus
+      >
+        <template #no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+      <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="createSession" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

@@ -3,9 +3,9 @@ import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { durationMs, durationString } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 
-import { durationMs, durationString } from '../../../helpers/functional';
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/getters';
 import { MetricsConfig } from '../Metrics/types';
 import { defaultLabel } from '../nodes';
@@ -61,32 +61,24 @@ export default class MetricsDisplayDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title ellipsis">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-list dense>
-          <InputField v-model="rename" title="Label" label="Label" />
-          <InputField v-model="fresh" title="Warn when older than" label="Warn when older than" />
-          <InputField
-            v-model="decimals"
-            :decimals="0"
-            :rules="[v => v >= 0 || 'Must be 0 or more']"
-            type="number"
-            title="Number of decimals"
-            label="Number of decimals"
-          />
-        </q-list>
-      </q-card-section>
-      <q-card-actions align="right">
+    <DialogCard v-bind="{title, message, html}">
+      <q-list dense>
+        <InputField v-model="rename" title="Label" label="Label" />
+        <InputField v-model="fresh" title="Warn when older than" label="Warn when older than" />
+        <InputField
+          v-model="decimals"
+          :decimals="0"
+          :rules="[v => v >= 0 || 'Must be 0 or more']"
+          type="number"
+          title="Number of decimals"
+          label="Number of decimals"
+        />
+      </q-list>
+
+      <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

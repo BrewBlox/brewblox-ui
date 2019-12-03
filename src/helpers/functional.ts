@@ -225,13 +225,13 @@ export const mapEntries =
   (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
     fromEntries(Object.entries(obj).map(callback));
 
-export const spliceById =
-  (arr: HasId[], obj: HasId, insert = true): typeof arr => {
-    const idx = arr.findIndex(v => v.id === obj.id);
-    if (idx !== -1) {
-      insert
-        ? arr.splice(idx, 1, obj)
-        : arr.splice(idx, 1);
-    }
-    return arr;
-  };
+export function spliceById<T extends HasId>
+  (arr: T[], obj: T, insert = true): T[] {
+  const idx = arr.findIndex(v => v.id === obj.id);
+  if (idx !== -1) {
+    insert
+      ? arr.splice(idx, 1, obj)
+      : arr.splice(idx, 1);
+  }
+  return arr;
+}

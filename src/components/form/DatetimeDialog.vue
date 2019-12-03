@@ -60,7 +60,7 @@ export default class DatetimeDialog extends DialogBase {
       component: 'DatepickerDialog',
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       parent: this,
       value: this.parsed,
       label: this.label,
@@ -76,57 +76,48 @@ export default class DatetimeDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-item>
-          <q-item-section>
-            <q-input
-              v-model="dateString"
-              :rules="parsedRules"
-              label="Date"
-              hint="YYYY/MM/DD"
-              mask="####/##/##"
-              autofocus
-            />
-          </q-item-section>
-          <q-item-section>
-            <q-input
-              v-model="timeString"
-              :rules="parsedRules"
-              label="Time"
-              hint="HH:mm:ss"
-              mask="##:##:##"
-            />
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn :disable="!valid" icon="mdi-calendar-edit" flat dense @click="openPicker">
-              <q-tooltip>Pick a date and time</q-tooltip>
-            </q-btn>
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <q-btn
-              :icon="resetIcon"
-              flat
-              dense
-              class="text-white"
-              @click="setStringVal(new Date())"
-            >
-              <q-tooltip>Reset to current date and time</q-tooltip>
-            </q-btn>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-      <q-card-actions align="right">
+    <DialogCard v-bind="{title, message, html}">
+      <q-item>
+        <q-item-section>
+          <q-input
+            v-model="dateString"
+            :rules="parsedRules"
+            label="Date"
+            hint="YYYY/MM/DD"
+            mask="####/##/##"
+            autofocus
+          />
+        </q-item-section>
+        <q-item-section>
+          <q-input
+            v-model="timeString"
+            :rules="parsedRules"
+            label="Time"
+            hint="HH:mm:ss"
+            mask="##:##:##"
+          />
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn :disable="!valid" icon="mdi-calendar-edit" flat dense @click="openPicker">
+            <q-tooltip>Pick a date and time</q-tooltip>
+          </q-btn>
+        </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn
+            :icon="resetIcon"
+            flat
+            dense
+            class="text-white"
+            @click="setStringVal(new Date())"
+          >
+            <q-tooltip>Reset to current date and time</q-tooltip>
+          </q-btn>
+        </q-item-section>
+      </q-item>
+      <template #actions>
         <q-btn flat color="primary" label="Cancel" @click="onDialogCancel" />
         <q-btn :disable="!valid" flat color="primary" label="OK" @click="save" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

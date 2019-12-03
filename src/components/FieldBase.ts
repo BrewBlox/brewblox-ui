@@ -3,6 +3,16 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class FieldBase extends Vue {
+  public fieldSlots = [
+    'prepend',
+    'append',
+    'before',
+    'after',
+    'error',
+    'hint',
+    'counter',
+    'loading',
+  ];
 
   @Prop({ type: String, default: 'span' })
   public readonly tag!: string;
@@ -16,8 +26,8 @@ export default class FieldBase extends Vue {
   @Prop({ type: String })
   public readonly message!: string;
 
-  @Prop({ type: String })
-  public readonly messageHtml!: string;
+  @Prop({ type: Boolean, default: false })
+  public readonly html!: boolean;
 
   @Prop({ type: Boolean, default: false })
   public readonly readonly!: boolean;
@@ -28,7 +38,7 @@ export default class FieldBase extends Vue {
   @Prop({ type: Object, default: () => ({}) })
   public readonly tagProps!: Mapped<any>;
 
-  @Prop({ type: [Array, Object, String] })
+  @Prop({ type: [Array, Object, String], default: '' })
   public readonly tagClass!: string[] | Mapped<string> | string;
 
   @Prop({ type: Array, default: () => [] })

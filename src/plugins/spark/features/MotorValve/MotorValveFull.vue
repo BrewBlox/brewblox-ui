@@ -100,15 +100,14 @@ export default class MotorValveFull extends BlockCrudComponent {
       </q-item>
       <q-item>
         <q-item-section>
-          <LabeledField label="State">
-            <DigitalStateField
-              :value="block.data.desiredState"
-              :pending="block.data.state !== block.data.desiredState"
-              :pending-reason="constrainers"
-              :disable="isDriven"
-              @input="v => { block.data.desiredState = v; saveBlock(); }"
-            />
-          </LabeledField>
+          <DigitalStateField
+            :value="block.data.desiredState"
+            :pending="block.data.state !== block.data.desiredState"
+            :pending-reason="constrainers"
+            :disable="isDriven"
+            label="State"
+            @input="v => { block.data.desiredState = v; saveBlock(); }"
+          />
         </q-item-section>
         <q-item-section>
           <LabeledField :value="valveStateName" label="Valve State" />

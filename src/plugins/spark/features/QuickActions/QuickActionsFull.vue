@@ -1,119 +1,53 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { mutate } from '@/helpers/functional';
+import { spliceById } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, ChangeField } from '@/plugins/spark/types';
-import { featureStore } from '@/store/features';
 
+import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, QuickActionsConfig, Step } from './types';
 
-interface BlockChangeDisplay extends BlockChange {
-  key: string;
-  block: Block;
-  displayName: string;
-  props: ChangeField[];
-}
-
-interface StepDisplay extends Step {
-  changes: BlockChangeDisplay[];
-}
-
-@Component
-export default class QuickActionsFull extends CrudComponent {
+@Component({
+  components: {
+    QuickActionChange,
+  },
+})
+export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> {
   draggingStep = false;
   editableChanges: Mapped<boolean> = {};
 
   @Prop({ type: String })
   readonly openStep!: string;
 
-  get widgetConfig(): QuickActionsConfig {
-    return this.widget.config;
-  }
-
   get serviceId(): string {
-    return this.widgetConfig.serviceId;
+    return this.config.serviceId;
   }
 
-  get changeFields(): Mapped<ChangeField[]> {
-    return sparkStore.specValues
-      .reduce(
-        (acc, spec) => {
-          if (spec.changes.length) {
-            acc[spec.id] = spec.changes;
-          }
-          return acc;
-        },
-        {});
+  get steps(): Step[] {
+    const steps = deserialize(this.config.steps);
+    for (const step of steps) {
+      for (const change of step.changes) {
+        change.id = change.id ?? uid();
+      }
+    }
+    return steps;
   }
 
-  asBlockChangeDisplay(stepId: string, change: BlockChange): BlockChangeDisplay {
-    const block = sparkStore.blocks(this.serviceId)[change.blockId];
-    return {
-      ...change,
-      block,
-      key: `__${stepId}__${change.blockId}`,
-      displayName: block ? featureStore.displayName(block.type) : 'Unknown',
-      props: block ? this.changeFields[block.type] : [],
-      data: change.data || {},
-      confirmed: change.confirmed || {},
-    };
-  }
-
-  asBlockChange(change: BlockChangeDisplay): BlockChange {
-    const { blockId, data, confirmed } = change;
-    return { blockId, data, confirmed };
-  }
-
-  get steps(): StepDisplay[] {
-    return deserialize(this.widgetConfig.steps)
-      .map(step => ({
-        ...step,
-        changes: step.changes.map(change => this.asBlockChangeDisplay(step.id, change)),
-      }));
-  }
-
-  saveSteps(steps: StepDisplay[]): void {
+  saveSteps(steps: Step[] = this.steps): void {
     this.saveConfig({
-      ...this.widgetConfig,
-      steps: serialize(steps.map(step => ({
-        ...step,
-        changes: step.changes.map(this.asBlockChange),
-      }))),
+      ...this.config,
+      steps: serialize(steps),
     });
   }
 
-  get blockIdOpts(): string[] {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => !!get(this.changeFields, [block.type, 'length']))
-      .map(block => block.id);
-  }
-
-  allData(change: BlockChangeDisplay): { [key: string]: any } {
-    const placeholders = change.props.reduce((acc, p) => mutate(acc, p.key, null), {});
-    return {
-      ...placeholders,
-      ...change.data,
-    };
-  }
-
-  findProp(change: BlockChangeDisplay, key: string): ChangeField {
-    return (change.props.find(prop => prop.key === key) || {}) as ChangeField;
-  }
-
-  componentProps(change: BlockChangeDisplay, key: string): any {
-    const prop = this.findProp(change, key);
-    return {
-      serviceId: this.serviceId,
-      blockId: change.blockId,
-      ...prop.componentProps || {},
-    };
+  saveStep(step: Step): void {
+    spliceById(this.steps, step);
+    this.saveSteps();
   }
 
   addStep(): void {
@@ -128,17 +62,20 @@ export default class QuickActionsFull extends CrudComponent {
     })
       .onOk(name => {
         this.steps.push({ name, id: uid(), changes: [] });
-        this.saveSteps(this.steps);
+        this.saveSteps();
       });
   }
 
-  duplicateStep(step: StepDisplay): void {
-    const duplicated = deepCopy(step);
-    this.steps.push({ ...duplicated, id: uid(), name: `${duplicated.name} (copy)` });
-    this.saveSteps(this.steps);
+  duplicateStep(step: Step): void {
+    this.steps.push({
+      id: uid(),
+      name: `${step.name} (copy)`,
+      changes: step.changes.map(change => ({ ...deepCopy(change), id: uid() })),
+    });
+    this.saveSteps();
   }
 
-  renameStep(step: StepDisplay): void {
+  renameStep(step: Step): void {
     const stepName = step.name;
     createDialog({
       title: 'Change Step name',
@@ -150,15 +87,14 @@ export default class QuickActionsFull extends CrudComponent {
       },
     })
       .onOk(newName => {
-        const updatedStep = this.steps.find(s => s.id === step.id);
-        if (step.name !== newName && updatedStep) {
-          updatedStep.name = newName;
-          this.saveSteps(this.steps);
+        if (newName !== stepName) {
+          step.name = newName;
+          this.saveStep(step);
         }
       });
   }
 
-  removeStep(step: StepDisplay): void {
+  startRemoveStep(step: Step): void {
     createDialog({
       title: 'Remove Step',
       message: `Are you sure you want to remove ${step.name}?`,
@@ -168,83 +104,57 @@ export default class QuickActionsFull extends CrudComponent {
       .onOk(() => this.saveSteps(this.steps.filter(s => s.id !== step.id)));
   }
 
-  saveChanges(step: StepDisplay, changes: BlockChangeDisplay[]): void {
-    step.changes = changes;
-    this.saveSteps(this.steps);
-  }
-
-  addChange(step: StepDisplay): void {
+  startAddChange(step: Step): void {
     createDialog({
       component: 'BlockSelectDialog',
       title: 'Choose a Block',
       filter: block => {
-        return !!this.changeFields[block.type]
-          && !step.changes.some(change => block.id === change.blockId);
+        const spec = sparkStore.specs[block.type];
+        return !!spec
+          && spec.changes.length > 0
+          && step.changes.every(change => change.blockId !== block.id);
       },
       parent: this,
       serviceId: this.serviceId,
     })
       .onOk(block => {
-        const updatedStep = this.steps.find(s => s.id === step.id);
-        if (updatedStep) {
-          const newChange: BlockChange = { blockId: block.id, data: {}, confirmed: {} };
-          updatedStep.changes.push(this.asBlockChangeDisplay(step.id, newChange));
-          this.saveSteps(this.steps);
-        }
+        step.changes.push({ id: uid(), blockId: block.id, data: {}, confirmed: {} });
+        this.saveStep(step);
       });
   }
 
-  editChangeBlock(step: StepDisplay, key: string): void {
-    const idx = step.changes.findIndex(change => change.key === key);
-    if (idx < 0) { return; }
+  saveChanges(step: Step, changes: BlockChange[]): void {
+    step.changes = changes;
+    this.saveStep(step);
+  }
 
-    const current = step.changes[idx];
+  saveChange(step: Step, change: BlockChange): void {
+    spliceById(step.changes, change);
+    this.saveStep(step);
+  }
+
+  removeChange(step: Step, change: BlockChange): void {
+    spliceById(step.changes, change, false);
+    this.saveStep(step);
+  }
+
+  startSwitchBlock(step: Step, change: BlockChange): void {
+    const currentBlock = sparkStore.tryBlockById(this.serviceId, change.blockId);
     createDialog({
       component: 'BlockSelectDialog',
-      title: `Switch target Block '${current.blockId}'`,
-      filter: block => {
-        return block.type === current.block.type
-          && !step.changes.some(change => block.id === change.blockId);
-      },
       parent: this,
+      title: `Switch target Block '${change.blockId}'`,
       serviceId: this.serviceId,
+      filter: block => {
+        return currentBlock === null
+          || block.type === currentBlock.type
+          && step.changes.every(c => c.blockId !== block.id);
+      },
     })
       .onOk(block => {
-        const updatedChange: BlockChange = {
-          blockId: block.id,
-          data: { ...current.data },
-          confirmed: { ...current.confirmed },
-        };
-        step.changes.splice(idx, 1, this.asBlockChangeDisplay(step.id, updatedChange));
-        this.saveSteps(this.steps);
+        change.blockId = block.id;
+        this.saveChange(step, change);
       });
-  }
-
-  removeChange(step: StepDisplay, key: string): void {
-    step.changes = step.changes.filter(change => change.key !== key);
-    this.saveSteps(this.steps);
-  }
-
-  addField(change: BlockChangeDisplay, key: string): void {
-    const prop = this.findProp(change, key);
-    this.$set(change.data, key, prop.generate());
-    this.saveSteps(this.steps);
-  }
-
-  updateField(change: BlockChangeDisplay, key: string, val: any): void {
-    this.$set(change.data, key, val);
-    this.saveSteps(this.steps);
-  }
-
-  toggleConfirmation(change: BlockChangeDisplay, key: string): void {
-    this.$set(change.confirmed, key, !change.confirmed[key]);
-    this.saveSteps(this.steps);
-  }
-
-  removeField(change: BlockChangeDisplay, key: string): void {
-    this.$delete(change.data, key);
-    this.$delete(change.confirmed, key);
-    this.saveSteps(this.steps);
   }
 }
 </script>
@@ -269,160 +179,58 @@ export default class QuickActionsFull extends CrudComponent {
               :label="step.name"
               :default-opened="openStep === step.id"
               :disable="draggingStep"
+              header-class="text-h6"
               group="steps"
               icon="mdi-format-list-checks"
+              class="step-container q-mr-md q-mb-sm"
             >
               <draggable :value="step.changes" @input="v => saveChanges(step, v)">
-                <q-list
+                <QuickActionChange
                   v-for="change in step.changes"
-                  :key="change.blockId"
-                  bordered
-                  class="q-mb-sm"
-                  dense
-                >
-                  <q-item>
-                    <q-item-section
-                      :class="{'text-h6': true, grabbable: true, 'text-red': !change.block}"
-                    >
-                      {{ change.blockId }}
-                      <q-tooltip v-if="!change.block">
-                        Block not found
-                      </q-tooltip>
-                    </q-item-section>
-                    <template v-if="editableChanges[change.key]">
-                      <q-item-section side>
-                        <q-btn flat round icon="delete" @click="removeChange(step, change.key)">
-                          <q-tooltip>Remove Block Change from Step</q-tooltip>
-                        </q-btn>
-                      </q-item-section>
-                      <q-item-section side>
-                        <q-btn flat round icon="mdi-rename-box" @click="editChangeBlock(step, change.key)">
-                          <q-tooltip>Switch target Block</q-tooltip>
-                        </q-btn>
-                      </q-item-section>
-                      <q-item-section side>
-                        <q-btn
-                          round
-                          flat
-                          color="primary"
-                          icon="mdi-check"
-                          @click="$set(editableChanges, change.key, false)"
-                        >
-                          <q-tooltip>Stop editing</q-tooltip>
-                        </q-btn>
-                      </q-item-section>
-                    </template>
-                    <template v-else>
-                      <q-item-section side>
-                        <q-btn
-                          flat
-                          round
-                          icon="edit"
-                          @click="$set(editableChanges, change.key, true)"
-                        >
-                          <q-tooltip>Edit Block Change</q-tooltip>
-                        </q-btn>
-                      </q-item-section>
-                    </template>
-                  </q-item>
-                  <template v-if="editableChanges[change.key]">
-                    <q-item v-for="(val, key) in allData(change)" :key="key">
-                      <q-item-section>{{ findProp(change, key).title }}</q-item-section>
-                      <template v-if="val === null">
-                        <q-item-section />
-                        <q-item-section side>
-                          <q-btn flat round icon="add" @click="addField(change, key)">
-                            <q-tooltip>
-                              Add field to Block Change
-                              <br />The field will be changed when the Step is applied.
-                            </q-tooltip>
-                          </q-btn>
-                        </q-item-section>
-                      </template>
-                      <template v-else>
-                        <q-item-section>
-                          <component
-                            :is="findProp(change, key).component"
-                            v-bind="componentProps(change, key)"
-                            :value="val"
-                            editable
-                            @input="v => updateField(change, key, v)"
-                          />
-                        </q-item-section>
-                        <q-item-section side>
-                          <q-btn
-                            :color="change.confirmed[key] ? 'primary' : ''"
-                            flat
-                            icon="mdi-comment-question"
-                            @click="toggleConfirmation(change, key)"
-                          >
-                            <q-tooltip>Edit value when the Step is applied.</q-tooltip>
-                          </q-btn>
-                        </q-item-section>
-                        <q-item-section side>
-                          <q-btn flat round icon="mdi-close" @click="removeField(change, key)">
-                            <q-tooltip>
-                              Remove field from Block Change.
-                              <br />The field will not be changed when the Step is applied.
-                            </q-tooltip>
-                          </q-btn>
-                        </q-item-section>
-                      </template>
-                    </q-item>
-                  </template>
-                  <template v-else>
-                    <q-item v-for="(val, key) in change.data" :key="key">
-                      <q-item-section>{{ findProp(change, key).title }}</q-item-section>
-                      <q-item-section>
-                        <component
-                          :is="findProp(change, key).component"
-                          v-bind="componentProps(change, key)"
-                          :value="val"
-                        />
-                      </q-item-section>
-                    </q-item>
-                  </template>
-                </q-list>
+                  :key="`change--${step.id}--${change.id}`"
+                  :service-id="serviceId"
+                  :value="change"
+                  @input="saveChange(step, change)"
+                  @remove="removeChange(step, change)"
+                  @switch="startSwitchBlock(step, change)"
+                />
               </draggable>
-              <q-item>
-                <q-item-section class="col-auto">
-                  <q-btn size="sm" label="Add Block" flat icon="mdi-cube" @click="addChange(step)" />
-                  <q-space />
-                </q-item-section>
-                <q-space />
-                <q-item-section class="col-auto">
-                  <q-btn
-                    size="sm"
-                    label="Copy Step"
-                    icon="file_copy"
-                    align="left"
-                    flat
-                    @click="duplicateStep(step)"
-                  />
-                  <q-btn
-                    size="sm"
-                    label="Rename Step"
-                    icon="edit"
-                    align="left"
-                    flat
-                    @click="renameStep(step)"
-                  />
-                  <q-btn
-                    size="sm"
-                    label="Remove Step"
-                    icon="delete"
-                    align="left"
-                    flat
-                    @click="removeStep(step)"
-                  />
-                </q-item-section>
-              </q-item>
+              <div class="row justify-end q-px-md q-mt-md step-actions">
+                <q-btn
+                  size="sm"
+                  label="Add Block"
+                  icon="mdi-cube"
+                  flat
+                  @click="startAddChange(step)"
+                />
+                <q-btn
+                  size="sm"
+                  label="Copy"
+                  icon="file_copy"
+                  flat
+                  @click="duplicateStep(step)"
+                />
+                <q-btn
+                  size="sm"
+                  label="Rename"
+                  icon="edit"
+                  flat
+                  @click="renameStep(step)"
+                />
+                <q-btn
+                  size="sm"
+                  label="Remove"
+                  icon="delete"
+                  flat
+                  @click="startRemoveStep(step)"
+                />
+              </div>
             </q-expansion-item>
           </draggable>
           <q-item>
-            <q-item-section />
-            <q-item-section side>
-              <q-btn fab outline icon="add" @click="addStep">
+            <q-space />
+            <q-item-section class="col-auto">
+              <q-btn round outline icon="add" @click="addStep">
                 <q-tooltip>Add Step</q-tooltip>
               </q-btn>
             </q-item-section>
@@ -438,7 +246,10 @@ export default class QuickActionsFull extends CrudComponent {
   height: 600px;
   max-height: 80vh;
 }
-.grabbable {
-  cursor: grab;
+.step-container:nth-child(odd) {
+  border-left: 2px solid dodgerblue;
+}
+.step-container:nth-child(even) {
+  border-left: 2px solid red;
 }
 </style>

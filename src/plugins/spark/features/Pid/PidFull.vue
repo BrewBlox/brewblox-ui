@@ -95,10 +95,11 @@ export default class PidFull extends BlockCrudComponent {
           <BlockField
             :value="block.data.inputId"
             :service-id="serviceId"
+            :html="true"
             title="Input"
             label="Input Block"
             no-show
-            message-html="
+            message="
               <p>A PID block drives its output to regulate its input.</p>
               <p>
                 This input is a process value: something that has a target value and an actual value.
@@ -133,10 +134,11 @@ export default class PidFull extends BlockCrudComponent {
           <BlockField
             :value="block.data.outputId"
             :service-id="serviceId"
+            :html="true"
             title="Output"
             label="Output Block"
             no-show
-            message-html="
+            message="
               <p>The PID sets its output block to the result from the PID calculation.</p>
               <p>
                 The output value is the sum of 3 parts derived from the input error:
@@ -186,8 +188,10 @@ export default class PidFull extends BlockCrudComponent {
         <q-item-section>
           <SliderField
             :value="block.data.boilMinOutput"
+            :decimals="0"
             title="Minimum output"
             label="Minimum output when boiling"
+            suffix="%"
             @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
           />
         </q-item-section>
@@ -209,9 +213,10 @@ export default class PidFull extends BlockCrudComponent {
         <div class="span-2">
           <UnitField
             :value="block.data.kp"
+            :html="true"
             title="Proportional gain Kp"
             label="Kp"
-            message-html="
+            message="
               <p>
                 Kp is the proportional gain, which is directly mutiplied by the filtered error.
                 The output of the PID is Kp * input error.
@@ -262,9 +267,10 @@ export default class PidFull extends BlockCrudComponent {
               v => v >= 0 || 'Value must be positive',
               v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
             ]"
+            :html="true"
             title="Integral time constant Ti"
             label="Ti"
-            message-html="
+            message="
               <p>
                 The purpose of the integrator is to remove steady state errors.
                 The integrator slowly builds up when the error is not zero.
@@ -293,10 +299,11 @@ export default class PidFull extends BlockCrudComponent {
         <div class="span-2">
           <InputField
             :value="block.data.i"
+            :html="true"
             type="number"
             title="Manually set integral"
             label="I"
-            message-html="
+            message="
               <p>
                 The integrator slowly builds up when the error is not zero.
                 If you don't want to wait for that, you can manually set the integral part of the output here.
@@ -338,9 +345,10 @@ export default class PidFull extends BlockCrudComponent {
               v => v >= 0 || 'Value must be positive',
               v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
             ]"
+            :html="true"
             title="Derivative time constant Td"
             label="Td"
-            message-html="
+            message="
               <p>
               When the input is approaching its target fast,
               the derivative action (D) can counteract the proportional action (P).

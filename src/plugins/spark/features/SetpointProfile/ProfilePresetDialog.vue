@@ -117,49 +117,38 @@ export default class ProfilePresetDialog extends DialogBase {
     no-backdrop-dismiss
     @hide="onDialogHide"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-item>
-          <q-item-section>
-            <q-select
-              v-model="selected"
-              :options="options"
-              label="Profiles"
-              autofocus
-            >
-              <template #no-option>
-                <q-item>
-                  <q-item-section class="text-grey">
-                    No results
-                  </q-item-section>
-                </q-item>
-              </template>
-              <template v-if="!!selected" #after>
-                <q-btn flat round icon="edit" @click="editSelected">
-                  <q-tooltip>Rename profile</q-tooltip>
-                </q-btn>
-                <q-btn flat round icon="delete" @click="removeSelected">
-                  <q-tooltip>Remove profile</q-tooltip>
-                </q-btn>
-              </template>
-            </q-select>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-      <q-card-actions align="right">
+    <DialogCard v-bind="{title, message, html}">
+      <q-select
+        v-model="selected"
+        :options="options"
+        label="Profiles"
+        autofocus
+        item-aligned
+      >
+        <template #no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+        <template v-if="!!selected" #after>
+          <q-btn flat round icon="edit" @click="editSelected">
+            <q-tooltip>Rename profile</q-tooltip>
+          </q-btn>
+          <q-btn flat round icon="delete" @click="removeSelected">
+            <q-tooltip>Remove profile</q-tooltip>
+          </q-btn>
+        </template>
+      </q-select>
+
+      <template #actions>
         <q-btn flat label="Cancel" @click="onDialogCancel" />
         <q-space />
         <q-btn :disable="!selected" color="primary" flat label="load" @click="loadSelected" />
         <q-btn :disable="!selected" color="primary" flat label="save" @click="saveSelected" />
         <q-btn color="primary" flat label="New" @click="createPreset" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>
