@@ -65,6 +65,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       component: SessionLoadDialog,
       parent: this,
       title: 'Select Session',
+      initialValue: this.config.currentSession,
     })
       .onOk(id => {
         this.config.currentSession = id;
