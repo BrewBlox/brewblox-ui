@@ -59,7 +59,7 @@ export default class PidDisplay extends PartBase {
         <q-space />
         <q-icon v-if="!kp" name="mdi-calculator-variant" class="q-mr-xs" />
         <br />
-        {{ outputSetting | truncateRound }}
+        {{ outputSetting | truncateRound }}<small v-if="!!block" style="margin-left: 2px">%</small>
       </div>
     </foreignObject>
     <g class="outline">
