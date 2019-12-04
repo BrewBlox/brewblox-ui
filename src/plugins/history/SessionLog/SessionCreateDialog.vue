@@ -103,7 +103,7 @@ export default class SessionCreateDialog extends DialogBase {
       <q-select
         v-model="sourceId"
         :options="sessionOpts"
-        label="Copy notes from:"
+        label="Use same fields as:"
         clearable
         emit-value
         map-options

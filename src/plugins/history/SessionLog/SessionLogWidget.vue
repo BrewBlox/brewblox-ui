@@ -73,6 +73,11 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       });
   }
 
+  exitSession(): void {
+    this.config.currentSession = null;
+    this.saveConfig();
+  }
+
   renderDate(date: number | null): string {
     return date !== null
       ? new Date(date).toLocaleString()
@@ -151,7 +156,8 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
           <!-- TODO -->
           <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
           <ActionItem icon="add" label="New session" @click="startAddSession" />
-          <ActionItem icon="mdi-swap-vertical-bold" label="Select session" @click="startLoadSession" />
+          <ActionItem icon="mdi-swap-vertical-bold" label="Open session" @click="startLoadSession" />
+          <ActionItem :disabled="!session" icon="mdi-exit-run" label="Exit session" @click="exitSession" />
           <ActionItem :disabled="!session" icon="mdi-file-export" label="Export session" @click="exportSession" />
           <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
           <ActionItem icon="delete" label="Remove session" @click="startRemoveSession" />
