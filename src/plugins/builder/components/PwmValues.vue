@@ -66,7 +66,7 @@ export default class PwmValues extends Vue {
         <q-icon name="mdi-gauge" />
         <q-icon v-if="!block" name="mdi-link-variant-off" class="q-ml-xs" />
         <br />
-        {{ pwmValue | truncateRound }}<small v-if="!!block">%</small>
+        {{ pwmValue | truncateRound }}<small v-if="!!block" style="margin-left: 2px">%</small>
       </div>
     </foreignObject>
     <rect
