@@ -69,7 +69,7 @@ export default class ProfileDisplay extends PartBase {
   <g>
     <foreignObject :width="squares(2)" :height="squares(1)">
       <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="!block" name="mdi-link-variant-off" size="lg" class="maximized" />
+      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
       <div v-else :class="['text-white', 'text-bold', 'q-ml-sm', 'q-mt-xs']">
         <small>Setpoint Profile</small>
         <q-space />
