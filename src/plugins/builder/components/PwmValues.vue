@@ -63,11 +63,10 @@ export default class PwmValues extends Vue {
       <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
       <q-icon v-else-if="block && !block.data.enabled" name="mdi-sleep" size="lg" class="maximized" color="warning" />
       <div v-else class="text-white text-bold text-center">
-        <q-icon name="mdi-gauge" class="q-mr-xs" />
-        <q-icon v-if="!block" name="mdi-link-variant-off" />
-        <small v-else>%</small>
+        <q-icon name="mdi-gauge" />
+        <q-icon v-if="!block" name="mdi-link-variant-off" class="q-ml-xs" />
         <br />
-        {{ pwmValue | truncateRound }}
+        {{ pwmValue | truncateRound }}<small v-if="!!block">%</small>
       </div>
     </foreignObject>
     <rect
