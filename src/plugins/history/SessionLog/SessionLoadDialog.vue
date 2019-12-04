@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 
@@ -11,6 +11,9 @@ import { LoggedSession } from '../types';
 export default class SessionLoadDialog extends DialogBase {
   selected: string | null = null;
   filteredOpts: SelectOption[] = [];
+
+  @Prop({ type: String })
+  public readonly initialValue!: string | null;
 
   get sessions(): LoggedSession[] {
     return historyStore.sessionValues;
@@ -37,10 +40,12 @@ export default class SessionLoadDialog extends DialogBase {
     });
   }
 
+  created(): void {
+    this.selected = this.initialValue;
+  }
+
   save(): void {
-    if (this.selected !== null) {
-      this.onDialogOk(this.selected);
-    }
+    this.onDialogOk(this.selected);
   }
 }
 </script>
@@ -52,7 +57,6 @@ export default class SessionLoadDialog extends DialogBase {
       <q-select
         v-model="selected"
         :options="filteredOpts"
-        :rules="[v => !!v || 'You must select a session']"
         label="Available sessions"
         autofocus
         clearable
@@ -73,7 +77,7 @@ export default class SessionLoadDialog extends DialogBase {
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn :disable="selected === null" flat label="OK" color="primary" @click="save" />
+        <q-btn flat label="OK" color="primary" @click="save" />
       </template>
     </DialogCard>
   </q-dialog>
