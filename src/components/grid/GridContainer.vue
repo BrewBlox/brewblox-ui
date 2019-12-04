@@ -86,6 +86,7 @@ export default class GridContainer extends Vue {
   grid-auto-columns: 100px;
   grid-auto-rows: 100px;
   justify-content: center;
+  padding-bottom: 150px;
 }
 
 .grid-container-overlay {
