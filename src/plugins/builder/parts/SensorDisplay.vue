@@ -36,10 +36,10 @@ export default class SensorDisplay extends PartBase {
   <g>
     <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
       <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <q-icon v-else-if="!block" name="mdi-link-variant-off" size="lg" class="maximized" />
       <div v-else class="text-white text-bold text-center">
         <q-icon name="mdi-thermometer" />
-        <q-icon v-if="!block" name="mdi-link-variant-off" />
-        <small v-else>{{ tempUnit }}</small>
+        <small>{{ tempUnit }}</small>
         <br />
         {{ temperature | round(1) }}
       </div>

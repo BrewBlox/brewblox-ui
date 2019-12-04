@@ -5,13 +5,21 @@ import { objectSorter } from '@/helpers/functional';
 import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
 
 import PartBase from '../components/PartBase';
-import { settingsBlock } from '../helpers';
+import { settingsBlock, settingsLink } from '../helpers';
 
 
 @Component
 export default class ProfileDisplay extends PartBase {
   get block(): SetpointProfileBlock | null {
     return settingsBlock(this.part, 'profile');
+  }
+
+  get isBroken(): boolean {
+    if (this.block) {
+      return false;
+    }
+    const link = settingsLink(this.part, 'profile');
+    return !!link.serviceId && !!link.blockId;
   }
 
   get points(): Setpoint[] {
@@ -60,10 +68,12 @@ export default class ProfileDisplay extends PartBase {
 <template>
   <g>
     <foreignObject :width="squares(2)" :height="squares(1)">
-      <div :class="['text-white', 'text-bold', 'q-ml-sm', 'q-mt-xs']">
+      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <q-icon v-else-if="!block" name="mdi-link-variant-off" size="lg" class="maximized" />
+      <div v-else :class="['text-white', 'text-bold', 'q-ml-sm', 'q-mt-xs']">
         <small>Setpoint Profile</small>
         <q-space />
-        <div v-if="block" class="row q-ml-xs">
+        <div class="row q-ml-xs">
           <div class="col-auto q-mr-xs no-wrap">
             {{ currentValue | round(0) }}
           </div>
@@ -73,9 +83,6 @@ export default class ProfileDisplay extends PartBase {
           <div class="col-auto">
             {{ nextValue | round(0) }}
           </div>
-        </div>
-        <div v-else class="q-ml-lg">
-          <q-icon v-if="!block" name="mdi-link-variant-off" />
         </div>
       </div>
     </foreignObject>
