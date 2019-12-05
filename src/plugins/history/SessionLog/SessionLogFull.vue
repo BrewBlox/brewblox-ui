@@ -11,12 +11,17 @@ import { emptyGraphConfig } from '../getters';
 import { sharedWidgetConfigs } from '../helpers';
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote, SharedGraphConfig } from '../types';
+import SessionHeaderField from './SessionHeaderField.vue';
 import { SessionLogConfig } from './types';
 
 const { width } = dom;
 
 
-@Component
+@Component({
+  components: {
+    SessionHeaderField,
+  },
+})
 export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   colSizes = [3, 4, 6, 8, 9, 12];
   initialCol = 0;
@@ -58,20 +63,6 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
           return { id, title: `(Note) ${title}`, config };
         }),
     ];
-  }
-
-  saveSessionTitle(title: string): void {
-    if (this.session) {
-      this.session.title = title;
-      this.saveSession();
-    }
-  }
-
-  saveSessionDate(date: Date): void {
-    if (this.session) {
-      this.session.date = date.getTime();
-      this.saveSession();
-    }
   }
 
   saveTitle(note: SessionNote, title: string): void {
@@ -186,27 +177,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
 
     <q-card-section v-if="session !== null">
       <q-list>
-        <q-item>
-          <q-item-section>
-            <InputField
-              :value="session.title"
-              title="Session name"
-              label="Session name"
-              dense
-              @input="saveSessionTitle"
-            />
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <DatetimeField
-              :value="session.date"
-              label="Session date"
-              title="Session date"
-              default-now
-              dense
-              @input="saveSessionDate"
-            />
-          </q-item-section>
-        </q-item>
+        <SessionHeaderField :session="session" @update:session="saveSession" />
         <draggable ref="notebox" v-model="notes" class="row q-gutter-xs">
           <div
             v-for="note in notes"

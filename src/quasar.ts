@@ -9,6 +9,7 @@ import {
   Cookies,
   Dialog,
   Notify,
+  QBadge,
   QBar,
   QBtn,
   QBtnDropdown,
@@ -17,6 +18,7 @@ import {
   QCardActions,
   QCardSection,
   QCheckbox,
+  QChip,
   QColor,
   QDate,
   QDialog,
@@ -70,6 +72,7 @@ import Vue from 'vue';
 
 Vue.use(Quasar, {
   components: {
+    QBadge,
     QBar,
     QBtn,
     QBtnDropdown,
@@ -78,6 +81,7 @@ Vue.use(Quasar, {
     QCardActions,
     QCardSection,
     QCheckbox,
+    QChip,
     QColor,
     QDate,
     QDialog,
