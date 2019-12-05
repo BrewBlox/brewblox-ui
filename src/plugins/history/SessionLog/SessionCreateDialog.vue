@@ -8,15 +8,43 @@ import { deepCopy } from '@/helpers/units/parseObject';
 import { emptyGraphConfig } from '../getters';
 import { historyStore } from '../store';
 import { LoggedSession, SessionNote } from '../types';
+import SessionSelectField from './SessionSelectField.vue';
 
 
-@Component
+@Component({
+  components: {
+    SessionSelectField,
+  },
+})
 export default class SessionCreateDialog extends DialogBase {
-  exampleId = uid();
-  sourceId: string | null = null;
   sessionTitle = 'New Session'
   tags: string[] = [];
   customTags = false;
+  source: LoggedSession | null = null;
+  example: LoggedSession = {
+    id: uid(),
+    title: 'Example session',
+    date: new Date().getTime(),
+    notes: [
+      {
+        id: uid(),
+        title: 'Example note',
+        type: 'Text',
+        value: '',
+        col: 12,
+      },
+      {
+        id: uid(),
+        title: 'Subprocess graph',
+        type: 'Graph',
+        start: null,
+        end: null,
+        config: emptyGraphConfig(),
+        col: 12,
+      },
+    ],
+    tags: [],
+  }
 
   @Prop({ type: String, required: false })
   public readonly preselected!: string | null;
@@ -24,24 +52,24 @@ export default class SessionCreateDialog extends DialogBase {
   @Prop({ type: Array, required: true })
   public readonly widgetTags!: string[];
 
-  @Watch('sourceId', { immediate: true })
-  watchSource(newId): void {
+  @Watch('source', { immediate: true })
+  watchSource(newSource): void {
     if (!this.customTags) {
-      this.resetTags(newId);
+      this.resetTags(newSource);
     }
   }
 
-  get sessions(): LoggedSession[] {
-    return historyStore.sessionValues;
+  created(): void {
+    this.source = this.preselected
+      ? historyStore.sessionById(this.preselected)
+      : this.example;
+    this.example.tags = [...this.widgetTags];
   }
 
-  get sessionOpts(): SelectOption[] {
+  get sessions(): LoggedSession[] {
     return [
-      { label: 'Example Session', value: this.exampleId },
-      ...this.sessions.map(session => ({
-        label: `${session.title} (${new Date(session.date).toLocaleDateString()})`,
-        value: session.id,
-      })),
+      this.example,
+      ...historyStore.sessionValues,
     ];
   }
 
@@ -54,42 +82,19 @@ export default class SessionCreateDialog extends DialogBase {
     this.tags = tags;
   }
 
-  resetTags(sessionId: string | null = this.sourceId): void {
+  resetTags(source: LoggedSession | null = this.source): void {
     this.customTags = false;
-    this.tags = [...this.widgetTags];
-    if (sessionId && sessionId !== this.exampleId) {
-      const session = historyStore.sessionById(sessionId);
-      this.tags.push(...session?.tags?.filter(t => !t.startsWith('on:')) ?? []);
-    }
+    this.tags = [
+      ...this.widgetTags,
+      ...source?.tags?.filter(t => !t.startsWith('on:')) ?? [],
+    ];
   }
 
   sourceNotes(): SessionNote[] {
-    if (this.sourceId === null) {
+    if (this.source === null) {
       return [];
     }
-
-    if (this.sourceId === this.exampleId) {
-      return [
-        {
-          id: uid(),
-          title: 'Example note',
-          type: 'Text',
-          value: '',
-          col: 12,
-        },
-        {
-          id: uid(),
-          title: 'Subprocess graph',
-          type: 'Graph',
-          start: null,
-          end: null,
-          config: emptyGraphConfig(),
-          col: 12,
-        },
-      ];
-    }
-
-    return historyStore.sessionById(this.sourceId)?.notes
+    return this.source.notes
       .map(note => {
         const copy = deepCopy(note);
         copy.id = uid();
@@ -100,12 +105,7 @@ export default class SessionCreateDialog extends DialogBase {
           return { ...copy, start: null, end: null };
         }
         return copy;
-      })
-      ?? [];
-  }
-
-  created(): void {
-    this.sourceId = this.preselected ?? this.exampleId;
+      });
   }
 
   async save(): Promise<void> {
@@ -132,14 +132,10 @@ export default class SessionCreateDialog extends DialogBase {
         autofocus
         item-aligned
       />
-      <q-select
-        v-model="sourceId"
-        :options="sessionOpts"
+      <SessionSelectField
+        v-model="source"
+        :sessions="sessions"
         label="Use same fields as:"
-        clearable
-        emit-value
-        map-options
-        item-aligned
       />
       <TagSelectField
         :value="tags"
@@ -147,9 +143,8 @@ export default class SessionCreateDialog extends DialogBase {
         class="tag-select"
         @input="saveTags"
       >
-        <template #after>
+        <template v-if="customTags" #append>
           <q-btn
-            :disable="!customTags"
             icon="mdi-backup-restore"
             flat
             round
@@ -157,7 +152,7 @@ export default class SessionCreateDialog extends DialogBase {
             class="self-center"
             @click="resetTags()"
           >
-            <q-tooltip v-if="customTags">
+            <q-tooltip>
               Undo tag changes
             </q-tooltip>
           </q-btn>
@@ -173,7 +168,7 @@ export default class SessionCreateDialog extends DialogBase {
 
 
 <style>
-.tag-select .q-field__after {
-  align-self: center;
+.tag-select .q-field__append {
+  align-self: flex-end;
 }
 </style>
