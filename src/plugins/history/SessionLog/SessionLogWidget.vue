@@ -69,10 +69,9 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       component: SessionLoadDialog,
       parent: this,
       title: 'Open existing session',
-      initialValue: this.config.currentSession,
     })
-      .onOk(id => {
-        this.config.currentSession = id;
+      .onOk((session: LoggedSession) => {
+        this.config.currentSession = session?.id ?? null;
         this.saveConfig();
       });
   }
@@ -160,8 +159,8 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
           <!-- TODO -->
           <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
           <ActionItem icon="add" label="New session" @click="startAddSession" />
-          <ActionItem icon="mdi-swap-vertical-bold" label="Open session" @click="startLoadSession" />
-          <ActionItem :disabled="!session" icon="mdi-exit-run" label="Exit session" @click="exitSession" />
+          <ActionItem icon="mdi-playlist-check" label="Load session" @click="startLoadSession" />
+          <ActionItem :disabled="!session" icon="mdi-playlist-remove" label="Exit session" @click="exitSession" />
           <ActionItem :disabled="!session" icon="mdi-file-export" label="Export session" @click="exportSession" />
           <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
           <ActionItem icon="delete" label="Remove session" @click="startRemoveSession" />

@@ -67,6 +67,9 @@ export default class TagSelectField extends FieldBase {
           {{ scope.opt }}
         </q-chip>
       </template>
+      <template v-if="!!$scopedSlots.append" #append>
+        <slot name="append" />
+      </template>
       <template v-if="!!$scopedSlots.after" #after>
         <slot name="after" />
       </template>
