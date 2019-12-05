@@ -8,6 +8,7 @@ import { shortDateString, spliceById } from '@/helpers/functional';
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
+import SessionHeaderField from './SessionHeaderField.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
 import { SessionLogConfig } from './types';
 
@@ -16,6 +17,7 @@ import { SessionLogConfig } from './types';
   components: {
     SessionTextNoteDialog,
     SessionGraphNoteDialog,
+    SessionHeaderField,
   },
 })
 export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
@@ -115,15 +117,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     <slot name="graph" />
 
     <q-card-section v-if="session !== null">
-      <div class="row text-grey-2 q-px-md q-my-xs items-baseline">
-        <div class="col-auto text-italic text-bold" style="font-size: 120%">
-          {{ session.title }}
-        </div>
-        <q-space />
-        <div class="col-auto">
-          {{ new Date(session.date).toLocaleString() }}
-        </div>
-      </div>
+      <SessionHeaderField :session="session" @update:session="saveSession" />
       <div class="row">
         <q-item
           v-for="note in notes"

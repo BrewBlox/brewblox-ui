@@ -5,6 +5,7 @@ import { Component } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
+import { dashboardStore } from '@/store/dashboards';
 
 import { historyStore } from '../store';
 import { LoggedSession, SessionNote } from '../types';
@@ -51,11 +52,14 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     createDialog({
       component: SessionCreateDialog,
       parent: this,
-      title: 'New Session',
+      title: 'New session',
       preselected: this.config.currentSession,
+      widgetTags: [
+        `on: ${dashboardStore.dashboardById(this.widget.dashboard).title}`,
+      ],
     })
-      .onOk(id => {
-        this.config.currentSession = id;
+      .onOk((session: LoggedSession) => {
+        this.config.currentSession = session.id;
         this.saveConfig();
       });
   }
@@ -64,7 +68,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     createDialog({
       component: SessionLoadDialog,
       parent: this,
-      title: 'Select Session',
+      title: 'Open existing session',
       initialValue: this.config.currentSession,
     })
       .onOk(id => {

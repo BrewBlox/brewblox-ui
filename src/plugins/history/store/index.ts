@@ -33,6 +33,10 @@ export class HistoryModule extends VuexModule {
     return id => this.sessions[id] || null;
   }
 
+  public get sessionTags(): string[] {
+    return [...new Set(this.sessionValues.flatMap(session => session.tags ?? []))];
+  }
+
   public get sourceIds(): string[] {
     return Object.keys(this.sources);
   }
