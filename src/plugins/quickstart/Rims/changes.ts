@@ -258,6 +258,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Per
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      changeIdMigrated: true,
       serviceId: config.serviceId,
       steps: serialize([
         {
