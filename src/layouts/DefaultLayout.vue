@@ -83,17 +83,22 @@ export default class DefaultLayout extends Vue {
         </q-item-section>
         <q-item-section>BrewBlox</q-item-section>
       </q-item>
-
       <q-separator />
-      <DashboardIndex v-model="dashboardEditing" />
-      <ServiceIndex v-model="serviceEditing" />
 
-      <q-separator class="q-mt-sm" />
-      <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
-      <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
-      <template v-if="automationFeatureEnabled">
-        <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
-      </template>
+      <q-scroll-area
+        :style="{height: 'calc(100% - 100px)'}"
+        :thumb-style="{opacity: 0.5, background: 'silver'}"
+      >
+        <DashboardIndex v-model="dashboardEditing" />
+        <ServiceIndex v-model="serviceEditing" />
+
+        <q-separator class="q-mt-sm" />
+        <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
+        <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
+        <template v-if="automationFeatureEnabled">
+          <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
+        </template>
+      </q-scroll-area>
 
       <q-item class="bottomed">
         <q-item-section class="col-auto">

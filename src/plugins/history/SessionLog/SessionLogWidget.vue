@@ -5,6 +5,7 @@ import { Component } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
+import { dashboardStore } from '@/store/dashboards';
 
 import { historyStore } from '../store';
 import { LoggedSession, SessionNote } from '../types';
@@ -51,11 +52,14 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     createDialog({
       component: SessionCreateDialog,
       parent: this,
-      title: 'New Session',
+      title: 'New session',
       preselected: this.config.currentSession,
+      widgetTags: [
+        `on: ${dashboardStore.dashboardById(this.widget.dashboard).title}`,
+      ],
     })
-      .onOk(id => {
-        this.config.currentSession = id;
+      .onOk((session: LoggedSession) => {
+        this.config.currentSession = session.id;
         this.saveConfig();
       });
   }
@@ -64,12 +68,17 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     createDialog({
       component: SessionLoadDialog,
       parent: this,
-      title: 'Select Session',
+      title: 'Open existing session',
     })
-      .onOk(id => {
-        this.config.currentSession = id;
+      .onOk((session: LoggedSession) => {
+        this.config.currentSession = session?.id ?? null;
         this.saveConfig();
       });
+  }
+
+  exitSession(): void {
+    this.config.currentSession = null;
+    this.saveConfig();
   }
 
   renderDate(date: number | null): string {
@@ -149,11 +158,38 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
         <template #actions>
           <!-- TODO -->
           <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
-          <ActionItem icon="add" label="New session" @click="startAddSession" />
-          <ActionItem icon="mdi-swap-vertical-bold" label="Select session" @click="startLoadSession" />
-          <ActionItem :disabled="!session" icon="mdi-file-export" label="Export session" @click="exportSession" />
-          <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
-          <ActionItem icon="delete" label="Remove session" @click="startRemoveSession" />
+          <ActionItem
+            icon="mdi-file-plus"
+            label="New session"
+            @click="startAddSession"
+          />
+          <ActionItem
+            icon="mdi-file-document-edit"
+            label="Open session"
+            @click="startLoadSession"
+          />
+          <ActionItem
+            :disabled="!session"
+            icon="mdi-file-remove"
+            label="Close session"
+            @click="exitSession"
+          />
+          <ActionItem
+            :disabled="!session"
+            icon="mdi-file-export"
+            label="Export session"
+            @click="exportSession"
+          />
+          <ActionItem
+            icon="mdi-file-restore"
+            label="Clear session notes"
+            @click="clearNotes"
+          />
+          <ActionItem
+            icon="delete"
+            label="Remove session"
+            @click="startRemoveSession"
+          />
           <WidgetActions :crud="crud" />
         </template>
       </component>

@@ -108,5 +108,6 @@ export interface LoggedSession {
   title: string;
   date: number;
   notes: SessionNote[];
+  tags?: string[];
   _rev?: string;
 }

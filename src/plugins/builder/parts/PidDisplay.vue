@@ -1,7 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { blockTypes } from '@/plugins/spark/block-types';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
+import { sparkStore } from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { COLD_WATER, HOT_WATER } from '../getters';
@@ -42,6 +45,25 @@ export default class PidDisplay extends PartBase {
       ? this.block.data.kp.value
       : null;
   }
+
+  get target(): Block | null {
+    return this.block === null
+      ? null
+      : sparkStore.tryBlockById(this.block.serviceId, this.block.data.outputId.id);
+  }
+
+  get drivingOffset(): boolean {
+    return this.target !== null
+      && this.target.type === blockTypes.SetpointDriver;
+  }
+
+  get suffix(): string {
+    return this.outputSetting === null
+      ? ''
+      : this.drivingOffset
+        ? '°C'
+        : '%';
+  }
 }
 </script>
 
@@ -49,17 +71,18 @@ export default class PidDisplay extends PartBase {
   <g>
     <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
       <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="block && !block.data.enabled" name="mdi-sleep" size="lg" class="maximized" color="warning" />
+      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
+      <q-icon v-else-if="!block.data.enabled" name="mdi-sleep" size="lg" class="maximized" color="warning" />
       <div v-else class="text-white text-bold text-center">
-        <svg>
-          <HeatingIcon v-if="kp && kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" x="12" />
-          <CoolingIcon v-else-if="kp && kp < 0" :stroke="outputValue ? COLD_WATER : 'white'" x="12" />
+        <svg v-if="!drivingOffset && kp !== null">
+          <HeatingIcon v-if="kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" x="12" />
+          <CoolingIcon v-else-if="kp < 0" :stroke="outputValue ? COLD_WATER : 'white'" x="12" />
         </svg>
         <q-space />
-        <q-icon v-if="!kp" name="mdi-calculator-variant" class="q-mr-xs" />
-        <q-icon v-if="!block" name="mdi-link-variant-off" />
+        <q-icon v-if="drivingOffset && kp !== null" name="mdi-plus-minus" size="sm" />
+        <q-icon v-if="kp === null" name="mdi-calculator-variant" class="q-mr-xs" />
         <br />
-        {{ outputSetting | truncateRound }}
+        {{ outputSetting | truncateRound }}<small v-if="!!block" style="margin-left: 2px">{{ suffix }}</small>
       </div>
     </foreignObject>
     <g class="outline">

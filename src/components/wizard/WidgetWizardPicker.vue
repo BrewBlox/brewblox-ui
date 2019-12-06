@@ -132,12 +132,22 @@ export default class WidgetWizardPicker extends Vue {
             </q-select>
           </q-item-section>
         </q-item>
-        <q-item>
-          <q-item-section>
-            <q-item-label>Dashboard</q-item-label>
-            <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" />
-          </q-item-section>
-        </q-item>
+        <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
+          <q-option-group
+            v-model="chosenDashboardId"
+            :options="dashboardOptions"
+            label="test"
+          />
+        </LabeledField>
+        <q-select
+          v-else
+          v-model="chosenDashboardId"
+          :options="dashboardOptions"
+          label="Dashboard"
+          map-options
+          emit-value
+          item-aligned
+        />
       </q-card-section>
 
       <q-separator />

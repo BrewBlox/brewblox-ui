@@ -364,6 +364,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      changeIdMigrated: true,
       serviceId: config.serviceId,
       steps: serialize([
         {

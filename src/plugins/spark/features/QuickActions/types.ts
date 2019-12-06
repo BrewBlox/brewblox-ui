@@ -18,6 +18,7 @@ export interface Step {
 export interface QuickActionsConfig {
   serviceId: string;
   steps: Step[];
+  changeIdMigrated: boolean;
 }
 
 export interface QuickActionsItem extends PersistentWidget {

@@ -127,6 +127,7 @@ export default class LayoutActions extends Vue {
       parent: this,
       title: 'Copy widget',
       message: `On which dashboard do you want to create a widget for ${this.layout.title}?`,
+      style: 'overflow-y: scroll',
       options: {
         type: 'radio',
         model: undefined,

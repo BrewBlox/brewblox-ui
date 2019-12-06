@@ -132,6 +132,7 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
       parent: this,
       title: 'Make widget',
       message: `On which dashboard do you want to create a widget for '${this.widget.title}'?`,
+      style: 'overflow-y: scroll',
       options: {
         type: 'radio',
         model: undefined,

@@ -38,7 +38,7 @@ const paths = {
 export default class ActuatorValve extends PartBase {
   readonly paths = paths;
 
-  get valveBlock(): Block | null {
+  get block(): Block | null {
     return settingsBlock(this.part, 'valve');
   }
 
@@ -51,12 +51,12 @@ export default class ActuatorValve extends PartBase {
   }
 
   get closed(): boolean {
-    return !this.valveBlock || this.valveBlock.data.state !== DigitalState.Active;
+    return !this.block || this.block.data.state !== DigitalState.Active;
   }
 
   get valveRotation(): number {
-    if (this.valveBlock) {
-      switch (this.valveBlock.data.state) {
+    if (this.block) {
+      switch (this.block.data.state) {
         case DigitalState.Inactive:
           return 90;
         case DigitalState.Active:
@@ -68,7 +68,7 @@ export default class ActuatorValve extends PartBase {
     return 90;
   }
 
-  @Watch('valveBlock')
+  @Watch('block')
   triggerUpdate(block, prevBlock): void {
     if (block === null
       || prevBlock === null
@@ -81,7 +81,7 @@ export default class ActuatorValve extends PartBase {
 
 <template>
   <g>
-    <foreignObject v-if="!valveBlock" :height="squares(1)" :width="squares(1)">
+    <foreignObject v-if="!block" :height="squares(1)" :width="squares(1)">
       <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;" />
     </foreignObject>
     <g key="valve-outer" class="outline">

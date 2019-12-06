@@ -36,6 +36,14 @@ export default class HistoryGraph extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly sharedSources!: boolean;
 
+  @Prop({ type: String, default: '' })
+  public readonly refreshTrigger!: string;
+
+  @Watch('refreshTrigger')
+  watchTrigger(): void {
+    this.refresh();
+  }
+
   get params(): QueryParams {
     return this.config.params || {};
   }

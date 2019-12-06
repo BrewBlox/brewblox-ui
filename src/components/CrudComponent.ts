@@ -85,6 +85,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       parent: this,
       title: 'Copy widget',
       message: `To which dashboard do you want to copy widget ${this.widget.title}?`,
+      style: 'overflow-y: scroll',
       options: {
         type: 'radio',
         model: undefined,
@@ -111,6 +112,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       parent: this,
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${this.widget.title}?`,
+      style: 'overflow-y: scroll',
       options: {
         type: 'radio',
         model: undefined,

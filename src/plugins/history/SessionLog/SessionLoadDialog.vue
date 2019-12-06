@@ -5,75 +5,36 @@ import DialogBase from '@/components/DialogBase';
 
 import { historyStore } from '../store';
 import { LoggedSession } from '../types';
+import SessionSelectField from './SessionSelectField.vue';
 
 
-@Component
+@Component({
+  components: {
+    SessionSelectField,
+  },
+})
 export default class SessionLoadDialog extends DialogBase {
-  selected: string | null = null;
-  filteredOpts: SelectOption[] = [];
+  selected: LoggedSession | null = null;
 
   get sessions(): LoggedSession[] {
     return historyStore.sessionValues;
   }
 
-  get sessionOpts(): SelectOption[] {
-    return this.sessions.map(session => ({
-      label: `${session.title} (${new Date(session.date).toLocaleDateString()})`,
-      value: session.id,
-    }));
-  }
-
-
-  filterFn(val, update): void {
-    if (val === '') {
-      update(() => this.filteredOpts = this.sessionOpts);
-      return;
-    }
-
-    update(() => {
-      const needle = val.toLowerCase();
-      this.filteredOpts = this.sessionOpts
-        .filter(opt => opt.label.toLowerCase().match(needle));
-    });
-  }
-
   save(): void {
-    if (this.selected !== null) {
-      this.onDialogOk(this.selected);
-    }
+    this.onDialogOk(this.selected);
   }
 }
 </script>
 
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
     <DialogCard v-bind="{title, message, html}">
-      <q-select
-        v-model="selected"
-        :options="filteredOpts"
-        :rules="[v => !!v || 'You must select a session']"
-        label="Available sessions"
-        autofocus
-        clearable
-        emit-value
-        map-options
-        item-aligned
-        use-input
-        @filter="filterFn"
-      >
-        <template #no-option>
-          <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
+      <SessionSelectField v-model="selected" :sessions="sessions" label="Select session" />
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn :disable="selected === null" flat label="OK" color="primary" @click="save" />
+        <q-btn flat label="OK" color="primary" @click="save" />
       </template>
     </DialogCard>
   </q-dialog>

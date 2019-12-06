@@ -369,6 +369,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
     config: {
+      changeIdMigrated: true,
       serviceId: config.serviceId,
       steps: serialize([
         {

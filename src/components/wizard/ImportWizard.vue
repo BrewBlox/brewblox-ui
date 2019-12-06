@@ -1,23 +1,31 @@
 <script lang="ts">
-import get from 'lodash/get';
+import isString from 'lodash/isString';
 import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { deserialize } from '@/helpers/units/parseObject';
-import { dashboardStore } from '@/store/dashboards';
+import { showImportDialog } from '@/helpers/dialog';
+import { ruleChecker } from '@/helpers/functional';
+import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+
+const widgetRules: InputRule[] = [
+  v => v !== null || 'Widget must have a value',
+  v => isString(v.title) || 'Widget must have a title',
+  v => isString(v.feature) || 'Widget must have a type',
+  v => featureStore.featureIds.includes(v.feature) || 'Widget type is unknown',
+  v => !!v.config || 'Widget must have config settings',
+];
+
+const checker = ruleChecker(widgetRules);
 
 @Component
 export default class ImportWizard extends Vue {
+  localChosenDashboardId = '';
+  widget: PersistentWidget | null = null;
 
   @Prop({ type: String, default: '' })
   readonly dashboardId!: string;
-
-  reader: FileReader = new FileReader();
-  serializedWidget = '';
-
-  localChosenDashboardId = '';
 
   get chosenDashboardId(): string {
     return this.localChosenDashboardId
@@ -35,22 +43,41 @@ export default class ImportWizard extends Vue {
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 
+  get widgetError(): string | null {
+    return checker(this.widget);
+  }
+
+  get widgetOk(): boolean {
+    return this.widgetError === null;
+  }
+
+  get widgetString(): string {
+    if (this.widget === null) {
+      return '';
+    }
+    if (!this.widgetOk) {
+      return '<invalid config>';
+    }
+    const typeName = featureStore.displayName(this.widget.feature) ?? 'Unknown';
+    return `[${typeName}] ${this.widget.title}`;
+  }
+
   get valuesOk(): boolean {
-    return !!this.chosenDashboardId && !!this.serializedWidget;
+    return !!this.chosenDashboardId && this.widgetOk;
   }
 
   async createWidget(): Promise<void> {
+    if (this.widget === null) { return; }
     try {
-      const item = {
-        ...deserialize(JSON.parse(this.serializedWidget)),
+      await dashboardStore.appendPersistentWidget({
+        ...this.widget,
         id: uid(),
         dashboard: this.chosenDashboardId,
-      };
-      await dashboardStore.appendPersistentWidget(item);
+      });
       this.$q.notify({
         icon: 'mdi-check-all',
         color: 'positive',
-        message: `Created ${featureStore.displayName(item.feature)} '${item.title}'`,
+        message: `Created ${featureStore.displayName(this.widget.feature)} '${this.widget.title}'`,
       });
       this.$emit('close');
     } catch (e) {
@@ -66,18 +93,12 @@ export default class ImportWizard extends Vue {
     this.$emit('back');
   }
 
-  handleFileSelect(evt): void {
-    const file = evt.target.files[0];
-    if (file) {
-      this.reader.readAsText(file);
-    } else {
-      this.serializedWidget = '';
-    }
-  }
-
   mounted(): void {
     this.$emit('title', 'Import wizard');
-    this.reader.onload = e => this.serializedWidget = get(e, 'target.result', '');
+  }
+
+  startImport(): void {
+    showImportDialog<PersistentWidget>(v => this.widget = v);
   }
 }
 </script>
@@ -85,14 +106,35 @@ export default class ImportWizard extends Vue {
 <template>
   <div>
     <q-card-section>
+      <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
+        <q-option-group
+          v-model="chosenDashboardId"
+          :options="dashboardOptions"
+          label="test"
+        />
+      </LabeledField>
+      <q-select
+        v-else
+        v-model="chosenDashboardId"
+        :options="dashboardOptions"
+        label="Dashboard"
+        map-options
+        emit-value
+        item-aligned
+      />
       <q-item>
         <q-item-section>
-          <q-item-label>Dashboard</q-item-label>
-          <q-option-group v-model="chosenDashboardId" :options="dashboardOptions" />
+          <q-input
+            label="Loaded widget"
+            readonly
+            :value="widgetString"
+            :error-message="widgetError"
+            :error="widget !== null && !widgetOk"
+          />
         </q-item-section>
-      </q-item>
-      <q-item>
-        <input type="file" @change="handleFileSelect" />
+        <q-item-section class="col-auto">
+          <q-btn flat label="Load" @click="startImport" />
+        </q-item-section>
       </q-item>
     </q-card-section>
 

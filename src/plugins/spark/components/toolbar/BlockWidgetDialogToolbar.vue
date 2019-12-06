@@ -23,7 +23,7 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
   <WidgetDialogToolbar :crud="crud" :mode="mode" @update:mode="updateMode">
     <BlockGraph
       v-if="graphModalOpen"
-      :id="widget.id"
+      :id="`graph-full-toolbar--${widget.id}`"
       v-model="graphModalOpen"
       :config.sync="graphCfg"
     />

@@ -210,6 +210,18 @@ export const validator =
   (rules: InputRule[]): ((val: any) => boolean) =>
     val => rules.every(rule => !isString(rule(val)));
 
+export const ruleChecker =
+  (rules: InputRule[]): ((val: any) => string | null) =>
+    val => {
+      for (const rule of rules) {
+        const res = rule(val);
+        if (isString(res)) {
+          return res;
+        }
+      }
+      return null;
+    };
+
 export const mutate =
   (acc, key: keyof any, val: any): typeof acc => {
     acc[key] = val;
