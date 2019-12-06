@@ -29,13 +29,17 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   }
 
   get steps(): Step[] {
-    const steps = deserialize(this.config.steps);
-    for (const step of steps) {
-      for (const change of step.changes) {
-        change.id = change.id ?? uid();
-      }
+    return deserialize(this.config.steps);
+  }
+
+  created(): void {
+    // Change IDs were added after initial release
+    // Check if the migration still has to happen, and then assign any undefined IDs
+    if (!this.config.changeIdMigrated) {
+      this.steps.forEach(step => step.changes.forEach(change => change.id = change.id ?? uid()));
+      this.config.changeIdMigrated = true;
+      this.saveSteps();
     }
-    return steps;
   }
 
   saveSteps(steps: Step[] = this.steps): void {

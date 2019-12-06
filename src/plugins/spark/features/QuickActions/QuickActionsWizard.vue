@@ -5,9 +5,11 @@ import { Component } from 'vue-property-decorator';
 import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { Service, serviceStore } from '@/store/services';
 
+import { QuickActionsConfig } from './types';
+
 
 @Component
-export default class QuickActionsWizard extends WidgetWizardBase {
+export default class QuickActionsWizard extends WidgetWizardBase<QuickActionsConfig> {
   service: Service | null = null;
 
   get serviceId(): string {
@@ -33,6 +35,7 @@ export default class QuickActionsWizard extends WidgetWizardBase {
       config: {
         serviceId: this.serviceId,
         steps: [],
+        changeIdMigrated: true,
       },
       ...this.defaultWidgetSize,
     });
