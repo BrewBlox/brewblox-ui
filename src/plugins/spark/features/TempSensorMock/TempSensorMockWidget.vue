@@ -20,7 +20,7 @@ export default class TempSensorMockWidget extends BlockWidgetBase {
 <template>
   <GraphCardWrapper :show="inDialog">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
     <q-card :class="cardClass" :style="cardStyle">
