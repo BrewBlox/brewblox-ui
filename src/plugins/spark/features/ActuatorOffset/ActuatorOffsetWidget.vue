@@ -26,7 +26,7 @@ export default class ActuatorOffsetWidget extends BlockWidgetBase {
 <template>
   <GraphCardWrapper :show="inDialog">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
     <component :is="mode" :crud="crud" :class="cardClass">
