@@ -158,12 +158,38 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
         <template #actions>
           <!-- TODO -->
           <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
-          <ActionItem icon="add" label="New session" @click="startAddSession" />
-          <ActionItem icon="mdi-playlist-check" label="Load session" @click="startLoadSession" />
-          <ActionItem :disabled="!session" icon="mdi-playlist-remove" label="Exit session" @click="exitSession" />
-          <ActionItem :disabled="!session" icon="mdi-file-export" label="Export session" @click="exportSession" />
-          <ActionItem icon="clear" label="Clear session notes" @click="clearNotes" />
-          <ActionItem icon="delete" label="Remove session" @click="startRemoveSession" />
+          <ActionItem
+            icon="mdi-file-plus"
+            label="New session"
+            @click="startAddSession"
+          />
+          <ActionItem
+            icon="mdi-file-document-edit"
+            label="Open session"
+            @click="startLoadSession"
+          />
+          <ActionItem
+            :disabled="!session"
+            icon="mdi-file-remove"
+            label="Close session"
+            @click="exitSession"
+          />
+          <ActionItem
+            :disabled="!session"
+            icon="mdi-file-export"
+            label="Export session"
+            @click="exportSession"
+          />
+          <ActionItem
+            icon="mdi-file-restore"
+            label="Clear session notes"
+            @click="clearNotes"
+          />
+          <ActionItem
+            icon="delete"
+            label="Remove session"
+            @click="startRemoveSession"
+          />
           <WidgetActions :crud="crud" />
         </template>
       </component>
