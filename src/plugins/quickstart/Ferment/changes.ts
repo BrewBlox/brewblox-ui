@@ -335,6 +335,7 @@ export const defineWidgets = (
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      changeIdMigrated: true,
       serviceId,
       steps: serialize([
         {
