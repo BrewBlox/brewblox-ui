@@ -6,6 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
+import { saveFile } from '@/helpers/import-export';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { GraphConfig } from '@/plugins/history/types';
@@ -188,6 +189,10 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
       component: 'BlockInfoDialog',
       block: this.block,
     });
+  }
+
+  public exportBlock(): void {
+    saveFile(this.block, `${this.block.id}.json`);
   }
 
   public startRemoveBlock(): void {

@@ -185,10 +185,13 @@ export default class RelationsDiagram extends Vue {
 <style>
 .node * {
   cursor: pointer;
+}
+
+.node rect {
   fill: #fff;
 }
 
-.node:hover * {
+.node:hover rect {
   fill-opacity: 0.8;
 }
 

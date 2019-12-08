@@ -23,6 +23,7 @@ export default class BlockActions extends BlockCrudComponent { }
       <CloneBlockAction :crud="crud" />
       <BlockGroupsAction :crud="crud" />
       <BlockPresetsAction :crud="crud" />
+      <ActionItem icon="mdi-file-export" label="Export Block" @click="exportBlock"/>
       <RemoveBlockAction :crud="crud" />
     </q-list>
   </q-expansion-item>
