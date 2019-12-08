@@ -221,6 +221,5 @@ export default class DashboardPage extends Vue {
 </template>
 
 <style lang="stylus" scoped>
-@import '../styles/quasar.variables.styl';
 @import '../styles/quasar.styl';
 </style>

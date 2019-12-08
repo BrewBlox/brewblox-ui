@@ -18,12 +18,12 @@ import { Block } from '../types';
 
 
 @Component
-export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
+export default class BlockCrudComponent<BlockT extends Block = Block> extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
-  public readonly crud!: BlockCrud;
+  public readonly crud!: BlockCrud<BlockT>;
 
-  public get block(): Block {
+  public get block(): BlockT {
     return this.crud.block;
   }
 
@@ -91,7 +91,7 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
     });
   }
 
-  public async saveBlock(block: Block = this.block): Promise<void> {
+  public async saveBlock(block: BlockT = this.block): Promise<void> {
     await this.crud.saveBlock(block);
   }
 

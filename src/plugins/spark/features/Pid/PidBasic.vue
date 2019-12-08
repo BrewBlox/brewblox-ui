@@ -9,8 +9,8 @@ import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
 @Component
-export default class PidBasic extends BlockCrudComponent {
-  readonly block!: PidBlock;
+export default class PidBasic
+  extends BlockCrudComponent<PidBlock> {
   inputFormOpen = false;
   relationsOpen = false;
 

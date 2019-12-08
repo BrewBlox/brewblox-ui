@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { ActuatorOffsetBlock } from './types';
 
 @Component
-export default class ActuatorOffsetBasic extends BlockCrudComponent {
-  readonly block!: ActuatorOffsetBlock;
+export default class ActuatorOffsetBasic
+  extends BlockCrudComponent<ActuatorOffsetBlock> {
 }
 </script>
 

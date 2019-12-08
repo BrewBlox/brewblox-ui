@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DisplaySettingsBlock, DisplaySlot } from './types';
 
 @Component
-export default class DisplaySettingsBasic extends BlockCrudComponent {
-  readonly block!: DisplaySettingsBlock;
+export default class DisplaySettingsBasic
+  extends BlockCrudComponent<DisplaySettingsBlock> {
 
   get slots(): DisplaySlot[] {
     const slots = Array<DisplaySlot>(6);

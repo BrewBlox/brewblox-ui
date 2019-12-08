@@ -16,8 +16,8 @@ import { MotorValveBlock } from './types';
     Full: MotorValveFull,
   },
 })
-export default class MotorValveWidget extends BlockWidgetBase {
-  readonly block!: MotorValveBlock;
+export default class MotorValveWidget
+  extends BlockWidgetBase<MotorValveBlock> {
 
   get pins(): Spark3PinsBlock | null {
     const block = sparkStore.blockValues(this.serviceId)

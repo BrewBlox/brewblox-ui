@@ -13,8 +13,8 @@ import { DS2408Block } from './types';
     Full: DS2408Full,
   },
 })
-export default class DS2408Widget extends BlockWidgetBase {
-  readonly block!: DS2408Block;
+export default class DS2408Widget
+  extends BlockWidgetBase<DS2408Block> {
 }
 </script>
 

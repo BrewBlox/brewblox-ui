@@ -76,10 +76,10 @@ export interface BlockConfig {
 
 export type DashboardBlock = PersistentWidget<BlockConfig>;
 
-export interface BlockCrud extends Crud<BlockConfig> {
-  block: Block;
+export interface BlockCrud<BlockT extends Block = Block> extends Crud<BlockConfig> {
+  block: BlockT;
   isStoreBlock: boolean;
-  saveBlock: (block: Block) => unknown | Promise<unknown>;
+  saveBlock: (block: BlockT) => unknown | Promise<unknown>;
 }
 
 export interface UserUnits {

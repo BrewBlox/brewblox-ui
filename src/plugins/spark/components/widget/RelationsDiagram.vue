@@ -67,8 +67,8 @@ export default class RelationsDiagram extends Vue {
     const nodeTemplate = (id: string, type: string): string => {
       return `
         <div class="block-label">
-          <div class="type">${type}</div>
-          <div class="id">${id}</div>
+          <div class="block-type">${type}</div>
+          <div class="block-id">${id}</div>
         </div>
         `.replace(/\n\s+/gm, '');
     };
@@ -90,7 +90,7 @@ export default class RelationsDiagram extends Vue {
         height: LABEL_HEIGHT,
         rx: 5,
         ry: 5,
-        style: 'fill: #fff; cursor: pointer;',
+        style: 'fill: #fff',
       });
     });
 
@@ -158,10 +158,10 @@ export default class RelationsDiagram extends Vue {
           // Dagre has issues setting the correct height/width on the generated ForeignObject elements
           // This seems fixed on Linux, but still present on Windows
           // Enforce values here to guarantee correctness
+          // el.setAttribute('class', 'label-node');
           el.setAttribute('width', `${LABEL_WIDTH}`);
           el.setAttribute('height', `${LABEL_HEIGHT}`);
-          (el.parentElement as HTMLElement)
-            .setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
+          el.parentElement!.setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
         });
     });
   }
@@ -182,37 +182,35 @@ export default class RelationsDiagram extends Vue {
   </div>
 </template>
 
-<style lang="stylus" scoped>
-/deep/ .node .block-label {
+<style>
+.node * {
+  cursor: pointer;
+  fill: #fff;
+}
+
+.node:hover * {
+  fill-opacity: 0.8;
+}
+
+.block-label {
   height: 50px;
   width: 150px;
 }
 
-/deep/ .node .id {
+.block-label > div {
+  width: 100%;
+  text-align: center;
   font-weight: 300;
+}
+
+.block-label > .block-type {
+  font-size: 12px;
+  color: green;
+}
+
+.block-label > .block-id {
   font-size: 14px;
   color: black;
   padding: 10px;
-  width: 100%;
-  text-align: center;
-  cursor: pointer;
-}
-
-/deep/ .node .type {
-  font-weight: 300;
-  font-size: 12px;
-  color: green;
-  width: 100%;
-  text-align: center;
-  cursor: pointer;
-}
-
-/deep/ .node rect {
-  fill: #fff;
-  cursor: pointer;
-}
-
-/deep/ .node:hover rect {
-  fill-opacity: 0.8;
 }
 </style>

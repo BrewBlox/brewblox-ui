@@ -13,8 +13,8 @@ import { ActuatorOffsetBlock } from './types';
     Full: ActuatorOffsetFull,
   },
 })
-export default class ActuatorOffsetWidget extends BlockWidgetBase {
-  readonly block!: ActuatorOffsetBlock;
+export default class ActuatorOffsetWidget
+  extends BlockWidgetBase<ActuatorOffsetBlock> {
 
   enable(): void {
     this.block.data.enabled = true;

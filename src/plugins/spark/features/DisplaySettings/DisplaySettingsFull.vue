@@ -7,8 +7,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/features/DisplaySettings/types';
 
 @Component
-export default class DisplaySettingsFull extends BlockCrudComponent {
-  readonly block!: DisplaySettingsBlock;
+export default class DisplaySettingsFull
+  extends BlockCrudComponent<DisplaySettingsBlock> {
 
   validDisplayTypes = [
     blockTypes.TempSensorMock,

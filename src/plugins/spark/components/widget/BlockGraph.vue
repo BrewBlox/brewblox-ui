@@ -120,7 +120,7 @@ export default class BlockGraph extends Vue {
     // To avoid constantly refreshing sources, we need to do a deep compare
     if (JSON.stringify(newVal) !== this.configString) {
       this.configString = JSON.stringify(newVal);
-      this.$nextTick(() => this.graph && this.graph.resetSources());
+      this.$nextTick(() => this.graph?.resetSources());
     }
   }
 

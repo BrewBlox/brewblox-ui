@@ -7,8 +7,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { MotorValveBlock, ValveState } from './types';
 
 @Component
-export default class MotorValveBasic extends BlockCrudComponent {
-  readonly block!: MotorValveBlock;
+export default class MotorValveBasic
+  extends BlockCrudComponent<MotorValveBlock> {
 
   get valveStateName(): string {
     return spaceCased(ValveState[this.block.data.valveState]);

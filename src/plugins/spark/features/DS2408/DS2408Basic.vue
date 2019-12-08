@@ -6,10 +6,10 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2408Block, DS2408Id, ValveStartId } from './types';
 
 @Component
-export default class DS2408Basic extends BlockCrudComponent {
+export default class DS2408Basic
+  extends BlockCrudComponent<DS2408Block> {
   DS2408Id = DS2408Id;
   ValveStartId = ValveStartId;
-  readonly block!: DS2408Block;
 }
 </script>
 
