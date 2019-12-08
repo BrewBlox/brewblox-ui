@@ -11,13 +11,13 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud } from '../types';
 
 @Component
-export default class BlockWidgetBase extends WidgetBase {
+export default class BlockWidgetBase<BlockT extends Block = Block> extends WidgetBase {
 
   @Prop({ type: Boolean, default: false })
   public readonly volatileBlock!: boolean;
 
-  public get crud(): BlockCrud {
-    const initial = this.initialCrud as BlockCrud;
+  public get crud(): BlockCrud<BlockT> {
+    const initial = this.initialCrud as BlockCrud<BlockT>;
     // We want to avoid calling member getters, as this may create circular lookups
     const { serviceId, blockId } = initial.widget.config;
     return initial.block !== undefined
@@ -25,8 +25,8 @@ export default class BlockWidgetBase extends WidgetBase {
       : {
         ...this.initialCrud,
         isStoreBlock: true,
-        block: sparkStore.blockById(serviceId, blockId),
-        saveBlock: async (block: Block) => sparkStore.saveBlock([serviceId, block]),
+        block: sparkStore.blockById(serviceId, blockId) as BlockT,
+        saveBlock: async (block: BlockT) => sparkStore.saveBlock([serviceId, block]),
       };
   }
 
@@ -38,7 +38,7 @@ export default class BlockWidgetBase extends WidgetBase {
     return this.widget.config.blockId;
   }
 
-  public get block(): Block {
+  public get block(): BlockT {
     return this.crud.block;
   }
 
@@ -113,7 +113,7 @@ export default class BlockWidgetBase extends WidgetBase {
       .catch(() => { });
   }
 
-  public async saveBlock(block: Block = this.block): Promise<void> {
+  public async saveBlock(block: BlockT = this.block): Promise<void> {
     try {
       await this.crud.saveBlock(block);
     } catch {

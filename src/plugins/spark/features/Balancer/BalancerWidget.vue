@@ -8,8 +8,8 @@ import { sparkStore } from '../../store';
 import { BalancerBlock } from './types';
 
 @Component
-export default class BalancerWidget extends BlockWidgetBase {
-  readonly block!: BalancerBlock;
+export default class BalancerWidget
+  extends BlockWidgetBase<BalancerBlock> {
 
   get clientNames(): Mapped<string> {
     const result = {};

@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { ActuatorPwmBlock } from './types';
 
 @Component
-export default class ActuatorPwmBasic extends BlockCrudComponent {
-  readonly block!: ActuatorPwmBlock;
+export default class ActuatorPwmBasic
+  extends BlockCrudComponent<ActuatorPwmBlock> {
 
   get isConstrained(): boolean {
     return this.block.data.enabled

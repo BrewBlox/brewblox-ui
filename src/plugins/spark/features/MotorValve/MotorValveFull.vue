@@ -13,8 +13,8 @@ import { typeName } from './getters';
 import { MotorValveBlock, ValveState } from './types';
 
 @Component
-export default class MotorValveFull extends BlockCrudComponent {
-  readonly block!: MotorValveBlock;
+export default class MotorValveFull
+  extends BlockCrudComponent<MotorValveBlock> {
 
   get hwBlock(): Block | null {
     const blockId = this.block.data.hwDevice.id;

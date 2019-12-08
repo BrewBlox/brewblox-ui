@@ -13,8 +13,8 @@ interface GridOpts {
 }
 
 @Component
-export default class PidFull extends BlockCrudComponent {
-  readonly block!: PidBlock;
+export default class PidFull
+  extends BlockCrudComponent<PidBlock> {
 
   get inputId(): string | null {
     return this.block.data.inputId.id;

@@ -18,12 +18,11 @@ interface DisplaySetpoint {
 }
 
 @Component
-export default class SetpointProfileFull extends BlockCrudComponent {
+export default class SetpointProfileFull
+  extends BlockCrudComponent<SetpointProfileBlock> {
   durationString = durationString;
   durationMs = durationMs;
   defaultTempValues = { degC: 20, degF: 68, degK: 293 };
-
-  readonly block!: SetpointProfileBlock;
 
   get tempUnit(): string {
     return sparkStore.units(this.block.serviceId).Temp;

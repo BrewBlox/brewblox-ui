@@ -34,7 +34,6 @@
     "dagre-d3": "^0.6.4",
     "file-saver": "^2.0.2",
     "fromentries": "^1.2.0",
-    "html2canvas": "^1.0.0-rc.5",
     "lodash": "^4.17.15",
     "marked": "^0.7.0",
     "parse-duration": "^0.1.1",

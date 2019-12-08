@@ -6,8 +6,8 @@ import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { TempSensorMockBlock } from './types';
 
 @Component
-export default class TempSensorMockWidget extends BlockWidgetBase {
-  readonly block!: TempSensorMockBlock;
+export default class TempSensorMockWidget
+  extends BlockWidgetBase<TempSensorMockBlock> {
 
   get cardStyle(): Mapped<string> {
     return this.inDialog

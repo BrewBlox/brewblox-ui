@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
@@ -9,8 +8,8 @@ import { Block } from '@/plugins/spark/types';
 import { FilterChoice, SetpointSensorPairBlock } from './types';
 
 @Component
-export default class SetpointSensorPairForm extends BlockCrudComponent {
-  readonly block!: SetpointSensorPairBlock;
+export default class SetpointSensorPairForm
+  extends BlockCrudComponent<SetpointSensorPairBlock> {
 
   get filterOpts(): SelectOption[] {
     return Object.keys(FilterChoice)
@@ -26,7 +25,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
       return [];
     }
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => get(block, 'data.inputId.id') === this.blockId);
+      .filter(block => block.data.inputId?.id === this.blockId);
   }
 }
 </script>

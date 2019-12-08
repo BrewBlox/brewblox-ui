@@ -6,8 +6,8 @@ import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { TempSensorOneWireBlock } from './types';
 
 @Component
-export default class TempSensorOneWireWidget extends BlockWidgetBase {
-  readonly block!: TempSensorOneWireBlock;
+export default class TempSensorOneWireWidget
+  extends BlockWidgetBase<TempSensorOneWireBlock> {
 
   get cardStyle(): Mapped<string> {
     return this.inDialog

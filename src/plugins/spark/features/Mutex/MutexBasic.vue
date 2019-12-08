@@ -7,8 +7,8 @@ import { getMutexClients, MutexBlocks } from './getters';
 import { MutexBlock } from './types';
 
 @Component
-export default class MutexBasic extends BlockCrudComponent {
-  readonly block!: MutexBlock;
+export default class MutexBasic
+  extends BlockCrudComponent<MutexBlock> {
 
   get mutexClients(): MutexBlocks {
     return getMutexClients(this.serviceId, this.blockId);
