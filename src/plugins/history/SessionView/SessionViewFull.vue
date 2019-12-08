@@ -1,5 +1,5 @@
 <script lang="ts">
-import shortid from 'shortid';
+import { uid } from 'quasar';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
@@ -84,7 +84,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
       idx += 1;
     }
 
-    const newSession = { ...session, name: copyName(idx), id: shortid.generate() };
+    const newSession = { ...session, name: copyName(idx), id: uid() };
     this.saveConfig({
       ...this.widget.config,
       sessions: [...this.sessions, newSession],
