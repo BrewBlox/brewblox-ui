@@ -19,12 +19,12 @@ export default class CardWarning extends Vue {
         <q-icon :name="icon" :color="color" />
       </q-item-section>
       <q-item-section>
-        <slot name="message"></slot>
+        <slot name="message" />
       </q-item-section>
       <q-item-section side>
-        <slot name="actions"></slot>
+        <slot name="actions" />
       </q-item-section>
     </q-item>
-    <slot></slot>
+    <slot />
   </q-card-section>
 </template>
