@@ -12,8 +12,14 @@ export default class WidgetDialogToolbar extends CrudComponent {
 
   get toggleIcon(): string {
     return this.mode === 'Basic'
-      ? 'mdi-arrow-expand-all'
-      : 'mdi-arrow-collapse-all';
+      ? 'mdi-unfold-more-horizontal'
+      : 'mdi-unfold-less-horizontal';
+  }
+
+  get toggleTooltip(): string {
+    return this.mode === 'Basic'
+      ? 'Show full widget'
+      : 'Show basic widget';
   }
 
   public toggle(): void {
@@ -32,14 +38,23 @@ export default class WidgetDialogToolbar extends CrudComponent {
     </q-item-section>
     <slot />
     <template #buttons>
-      <q-btn v-if="!!mode" :icon="toggleIcon" flat stretch size="md" @click="toggle" />
-      <q-btn-dropdown flat stretch size="md" icon="mdi-menu">
-        <q-list bordered>
-          <slot name="actions">
-            <WidgetActions :crud="crud" />
-          </slot>
-        </q-list>
-      </q-btn-dropdown>
+      <q-btn v-if="!!mode" :icon="toggleIcon" flat stretch size="md" @click="toggle">
+        <q-tooltip>
+          {{ toggleTooltip }}
+        </q-tooltip>
+      </q-btn>
+      <q-btn flat stretch size="md" icon="mdi-menu">
+        <q-tooltip>
+          Show menu
+        </q-tooltip>
+        <q-menu>
+          <q-list bordered>
+            <slot name="actions">
+              <WidgetActions :crud="crud" />
+            </slot>
+          </q-list>
+        </q-menu>
+      </q-btn>
     </template>
   </DialogToolbar>
 </template>

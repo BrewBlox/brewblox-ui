@@ -10,30 +10,20 @@ export default class WidgetToolbar extends CrudComponent {
   @Prop({ type: String, required: false })
   public readonly mode!: WidgetMode | null;
 
-  get moreIcon(): string {
-    if (!this.mode) {
-      return 'mdi-menu';
-    }
-    return this.mode === 'Full'
-      ? 'mdi-launch'
-      : 'settings';
+  get toggleIcon(): string {
+    return this.mode === 'Basic'
+      ? 'mdi-unfold-more-horizontal'
+      : 'mdi-unfold-less-horizontal';
   }
 
-  public more(): void {
-    if (!this.mode) {
-      return;
-    }
-    else if (this.mode === 'Basic') {
-      this.$emit('update:mode', 'Full');
-    }
-    else {
-      this.$emit('update:mode', 'Basic');
-      this.showDialog();
-    }
+  get toggleTooltip(): string {
+    return this.mode === 'Basic'
+      ? 'Show full widget'
+      : 'Show basic widget';
   }
 
-  public less(): void {
-    this.$emit('update:mode', 'Basic');
+  public toggle(): void {
+    this.$emit('update:mode', this.mode === 'Basic' ? 'Full' : 'Basic');
   }
 }
 </script>
@@ -41,18 +31,32 @@ export default class WidgetToolbar extends CrudComponent {
 <template>
   <Toolbar :title="widget.title" :subtitle="displayName">
     <slot />
-    <q-item-section v-if="mode === 'Full'" side>
-      <q-btn flat icon="mdi-arrow-left-circle" color="white" @click="less" />
+    <q-item-section side>
     </q-item-section>
     <template #buttons>
       <slot name="buttons">
-        <q-btn-dropdown :split="!!mode" flat :icon="moreIcon" @click="more">
-          <q-list bordered>
-            <slot name="actions">
-              <WidgetActions :crud="crud" />
-            </slot>
-          </q-list>
-        </q-btn-dropdown>
+        <q-btn v-if="!!mode" flat :icon="toggleIcon" @click="toggle">
+          <q-tooltip>
+            {{ toggleTooltip }}
+          </q-tooltip>
+        </q-btn>
+        <q-btn flat icon="mdi-launch" color="white" @click="showDialog">
+          <q-tooltip>
+            Show in dialog
+          </q-tooltip>
+        </q-btn>
+        <q-btn flat icon="mdi-menu">
+          <q-tooltip>
+            Show menu
+          </q-tooltip>
+          <q-menu>
+            <q-list bordered>
+              <slot name="actions">
+                <WidgetActions :crud="crud" />
+              </slot>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </slot>
     </template>
   </Toolbar>

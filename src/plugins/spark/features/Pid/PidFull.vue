@@ -120,10 +120,10 @@ export default class PidFull
         </q-item-section>
 
         <q-item-section class="col-1 self-center">
-          <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
+          <q-btn v-if="hasInputBlock" flat icon="mdi-launch" @click="showInput">
             <q-tooltip>Edit {{ inputId }}</q-tooltip>
           </q-btn>
-          <q-btn v-else disable flat icon="mdi-pencil-off" />
+          <q-btn v-else disable flat icon="mdi-launch" />
         </q-item-section>
       </q-item>
       <q-separator inset />
@@ -162,10 +162,10 @@ export default class PidFull
         </q-item-section>
 
         <q-item-section class="col-1 self-center">
-          <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
+          <q-btn v-if="hasOutputBlock" flat icon="mdi-launch" @click="showOutput">
             <q-tooltip>Edit {{ outputId }}</q-tooltip>
           </q-btn>
-          <q-btn v-else disable flat icon="mdi-pencil-off" />
+          <q-btn v-else disable flat icon="mdi-launch" />
         </q-item-section>
       </q-item>
       <q-separator inset />

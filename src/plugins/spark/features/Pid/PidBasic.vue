@@ -77,7 +77,7 @@ export default class PidBasic
           <UnitField :value="block.data.inputValue" label="Measured" tag="big" readonly />
         </q-item-section>
         <q-item-section side>
-          <q-icon :name="hasInputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
+          <q-icon name="mdi-launch" />
         </q-item-section>
       </q-item>
 
@@ -99,7 +99,7 @@ export default class PidBasic
           <LabeledField :value="block.data.outputValue" number label="Measured" tag="big" />
         </q-item-section>
         <q-item-section side>
-          <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
+          <q-icon name="mdi-launch" />
         </q-item-section>
       </q-item>
 
