@@ -84,7 +84,7 @@ export default class IoArray extends BlockCrudComponent {
     }
     if (link.id) {
       const newDriver: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id);
-      newDriver.data.hwDevice.id = this.blockId;
+      newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
       newDriver.data.channel = channel.id;
       await sparkStore.saveBlock([this.serviceId, newDriver]);
     }

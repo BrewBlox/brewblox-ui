@@ -96,7 +96,7 @@ export default class ValveArray extends BlockCrudComponent {
     }
     if (link.id) {
       const newDriver: MotorValveBlock = sparkStore.blockById(this.serviceId, link.id);
-      newDriver.data.hwDevice.id = this.blockId;
+      newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
       newDriver.data.startChannel = channel.id;
       await sparkStore.saveBlock([this.serviceId, newDriver]);
     }
