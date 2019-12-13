@@ -14,7 +14,7 @@ export default class ActionMenu extends Vue {
     <q-tooltip>
       Show menu
     </q-tooltip>
-    <q-menu content-class="row q-gutter-x-sm bordered action-menu">
+    <q-menu content-class="row q-gutter-x-sm bordered">
       <template v-if="$slots.actions">
         <ActionSubmenu label="Actions">
           <slot name="actions" />
@@ -24,4 +24,3 @@ export default class ActionMenu extends Vue {
     </q-menu>
   </q-btn>
 </template>
-

@@ -13,9 +13,9 @@ export default class WidgetActions extends CrudComponent {
 
 <template>
   <ActionSubmenu v-if="isStoreWidget" label="Widget">
-    <slot name="widget-actions" />
     <ActionItem icon="file_copy" label="Copy" @click="startCopyWidget" />
     <ActionItem icon="exit_to_app" label="Move" @click="startMoveWidget" />
+    <slot />
     <RenameWidgetAction v-if="!noRename" :crud="crud" />
     <ActionItem icon="delete" label="Delete" @click="startRemoveWidget" />
   </ActionSubmenu>
