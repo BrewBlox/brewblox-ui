@@ -16,10 +16,9 @@ export default class BlockActions extends BlockCrudComponent { }
       label="Make widget"
       @click="startMakeWidget"
     />
-    <ActionItem icon="edit" label="Rename Block" @click="startChangeBlockId" />
+    <ActionItem icon="edit" label="Rename" @click="startChangeBlockId" />
     <BlockGroupsAction v-if="!crud.isStoreWidget" :crud="crud" />
-    <BlockPresetsAction :crud="crud" />
-    <ActionItem icon="mdi-file-export" label="Export Block" @click="exportBlock" />
+    <ActionItem icon="mdi-file-export" label="Export" @click="exportBlock" />
     <RemoveBlockAction v-if="!crud.isStoreWidget" :crud="crud" />
   </ActionSubmenu>
 </template>

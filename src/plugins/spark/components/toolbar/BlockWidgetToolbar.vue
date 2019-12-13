@@ -31,7 +31,7 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
       <ActionItem
         v-if="hasGraph"
         icon="mdi-chart-line"
-        label="Show graph"
+        label="Graph"
         @click="graphModalOpen = true"
       />
       <slot name="actions" />
