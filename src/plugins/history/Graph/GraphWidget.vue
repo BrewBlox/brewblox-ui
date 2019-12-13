@@ -182,20 +182,21 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
-          <q-expansion-item label="Timespan">
-            <q-list>
-              <ActionItem
-                v-for="(preset, idx) in presets"
-                :key="idx"
-                :label="preset.duration"
-                :item-props="{insetLevel: 0.5}"
-                :active="isActivePreset(preset)"
-                @click="applyPreset(preset)"
-              />
-              <ActionItem label="Custom" :item-props="{insetLevel: 0.5}" @click="chooseDuration" />
-            </q-list>
-          </q-expansion-item>
+        </template>
+
+        <template #menus>
           <WidgetActions :crud="crud" />
+          <ActionSubmenu label="Timespan">
+            <ActionItem
+              v-for="(preset, idx) in presets"
+              :key="idx"
+              :label="preset.duration"
+              :item-props="{insetLevel: 0.1}"
+              :active="isActivePreset(preset)"
+              @click="applyPreset(preset)"
+            />
+            <ActionItem label="Custom" :item-props="{insetLevel: 0.1}" @click="chooseDuration" />
+          </ActionSubmenu>
         </template>
       </component>
       <div class="col">
@@ -215,7 +216,6 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
-          <WidgetActions :crud="crud" />
         </template>
       </component>
       <div :class="{'col-grow': true, 'scroll-parent': inDialog}">

@@ -29,7 +29,6 @@ export default class MetricsWidget extends WidgetBase {
             label="Refresh"
             @click="revision++"
           />
-          <WidgetActions :crud="crud" />
         </template>
       </component>
     </template>

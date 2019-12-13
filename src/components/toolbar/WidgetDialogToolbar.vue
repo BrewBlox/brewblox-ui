@@ -43,18 +43,16 @@ export default class WidgetDialogToolbar extends CrudComponent {
           {{ toggleTooltip }}
         </q-tooltip>
       </q-btn>
-      <q-btn flat stretch size="md" icon="mdi-menu">
-        <q-tooltip>
-          Show menu
-        </q-tooltip>
-        <q-menu>
-          <q-list bordered>
-            <slot name="actions">
-              <WidgetActions :crud="crud" />
-            </slot>
-          </q-list>
-        </q-menu>
-      </q-btn>
+      <ActionMenu stretch size="md">
+        <template #actions>
+          <slot name="actions" />
+        </template>
+        <template #menus>
+          <slot name="menus">
+            <WidgetActions :crud="crud" />
+          </slot>
+        </template>
+      </ActionMenu>
     </template>
   </DialogToolbar>
 </template>

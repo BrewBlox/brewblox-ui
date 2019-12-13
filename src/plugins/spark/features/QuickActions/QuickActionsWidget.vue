@@ -24,7 +24,6 @@ export default class QuickActionsWidget extends WidgetBase {
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ExportAction :crud="crud" />
-          <WidgetActions :crud="crud" />
         </template>
       </component>
     </template>

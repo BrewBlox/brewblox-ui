@@ -71,7 +71,6 @@ export default class BuilderWidget extends WidgetBase {
         <template #actions>
           <ActionItem icon="mdi-pipe" label="Builder Editor" @click="startEditor" />
           <ExportAction :crud="crud" />
-          <WidgetActions :crud="crud" />
         </template>
       </component>
     </template>
