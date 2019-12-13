@@ -45,18 +45,16 @@ export default class WidgetToolbar extends CrudComponent {
             Show in dialog
           </q-tooltip>
         </q-btn>
-        <q-btn flat icon="mdi-menu">
-          <q-tooltip>
-            Show menu
-          </q-tooltip>
-          <q-menu>
-            <q-list bordered>
-              <slot name="actions">
-                <WidgetActions :crud="crud" />
-              </slot>
-            </q-list>
-          </q-menu>
-        </q-btn>
+        <ActionMenu>
+          <template #actions>
+            <slot name="actions" />
+          </template>
+          <template #menus>
+            <slot name="menus">
+              <WidgetActions :crud="crud" />
+            </slot>
+          </template>
+        </ActionMenu>
       </slot>
     </template>
   </Toolbar>

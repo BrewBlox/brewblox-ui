@@ -190,7 +190,6 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
             label="Remove session"
             @click="startRemoveSession"
           />
-          <WidgetActions :crud="crud" />
         </template>
       </component>
     </template>

@@ -197,6 +197,9 @@ export const suggestId =
     let idx = 2;
     while (!validate(copyName(idx))) {
       idx += 1;
+      if (idx > 100) {
+        throw new Error('Max suggestions exceeded');
+      }
     }
 
     return copyName(idx);

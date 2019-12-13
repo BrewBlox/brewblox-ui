@@ -175,54 +175,50 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       />
     </template>
 
-    <!-- Basic -->
-    <q-card v-if="mode === 'Basic'" :class="graphCardClass" :style="graphCardStyle">
+    <q-card :class="graphCardClass" :style="graphCardStyle">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
-          <q-expansion-item label="Timespan">
-            <q-list>
-              <ActionItem
+        </template>
+        <template #menus>
+          <WidgetActions :crud="crud" />
+          <ActionSubmenu label="Timespan">
+            <div class="row wrap" style="max-width: 300px">
+              <q-btn
                 v-for="(preset, idx) in presets"
                 :key="idx"
                 :label="preset.duration"
-                :item-props="{insetLevel: 0.5}"
-                :active="isActivePreset(preset)"
+                :color="isActivePreset(preset) ? 'primary' : 'white'"
+                class="col-3"
+                no-caps
+                flat
                 @click="applyPreset(preset)"
               />
-              <ActionItem label="Custom" :item-props="{insetLevel: 0.5}" @click="chooseDuration" />
-            </q-list>
-          </q-expansion-item>
-          <WidgetActions :crud="crud" />
+              <q-btn label="Custom" class="col-3" flat no-caps @click="chooseDuration" />
+            </div>
+          </ActionSubmenu>
         </template>
       </component>
-      <div class="col">
-        <HistoryGraph
-          ref="widgetGraph"
-          :graph-id="widgetGraphId"
-          :config="config"
-          @downsample="v => downsampling = v"
-        />
-      </div>
-    </q-card>
 
-    <!-- Full -->
-    <q-card v-if="mode === 'Full'" :class="graphCardClass" :style="graphCardStyle">
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
-        <template #actions>
-          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
-          <ExportGraphAction :config="config" :header="widget.title" />
-          <ActionItem icon="refresh" label="Refresh" @click="regraph" />
-          <WidgetActions :crud="crud" />
-        </template>
-      </component>
-      <div :class="{'col-grow': true, 'scroll-parent': inDialog}">
-        <component :is="inDialog ? 'q-scroll-area' : 'div'">
-          <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
-        </component>
-      </div>
+      <template v-if="mode === 'Basic'">
+        <div class="col">
+          <HistoryGraph
+            ref="widgetGraph"
+            :graph-id="widgetGraphId"
+            :config="config"
+            @downsample="v => downsampling = v"
+          />
+        </div>
+      </template>
+      <template v-else>
+        <div :class="{'col-grow': true, 'scroll-parent': inDialog}">
+          <component :is="inDialog ? 'q-scroll-area' : 'div'">
+            <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
+          </component>
+        </div>
+      </template>
     </q-card>
   </GraphCardWrapper>
 </template>

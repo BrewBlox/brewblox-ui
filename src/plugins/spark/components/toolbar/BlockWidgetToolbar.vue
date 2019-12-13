@@ -35,7 +35,9 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
         @click="graphModalOpen = true"
       />
       <slot name="actions" />
-      <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
+    </template>
+
+    <template #menus>
       <WidgetActions :crud="crud" no-rename />
       <BlockActions :crud="crud" />
     </template>
