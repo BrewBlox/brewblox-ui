@@ -30,7 +30,7 @@ export class FlowSegment {
         let equivalentSplitFrictions = toTransform.map(v => v.friction);
         let totalPressureDiff = input.pressureDiff;
 
-        if (input.pressureDiff !== 0) {
+        if (input.pressureDiff !== 0 || allPaths.some(v => v.pressureDiff !== 0)) {
           // convert pressure difference + friction on each split to only an equivalent (possibly negative) friction
           equivalentSplitFrictions = toTransform.map((entry): number =>
             nodePressure * entry.friction / (nodePressure + entry.pressureDiff));
@@ -38,7 +38,6 @@ export class FlowSegment {
         else {
           totalPressureDiff = nodePressure;
         }
-
         const eqInv = equivalentSplitFrictions.map(v => 1 / v);
         const eqFriction = 1 / eqInv.reduce((acc, entry) => acc + entry, 0);
         return {
@@ -63,6 +62,7 @@ export class FlowSegment {
         friction: split.inRoute.friction !== undefined ? split.inRoute.friction : DEFAULT_FRICTION,
       }));
       const splitFriction = equivalentFriction(splitPF, series);
+      //console.dir(splitFriction); console.dir(splitPF);
       series = splitFriction.total;
       this.splitDivide = splitFriction.split;
     }
