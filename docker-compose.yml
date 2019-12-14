@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3"
 
 services:
   eventbus:
@@ -28,7 +28,7 @@ services:
 
   sparksimulator:
     image: brewblox/firmware-simulator:develop
-    init: true
+    # init: true
     ports:
       - "7376:7376"
 
@@ -67,7 +67,6 @@ services:
       --device-serial=/dev/ttyACM0
     volumes:
       - "../brewblox-devcon-spark/:/app/"
-
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
