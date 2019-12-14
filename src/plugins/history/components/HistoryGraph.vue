@@ -36,24 +36,32 @@ export default class HistoryGraph extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly sharedSources!: boolean;
 
+  @Prop({ type: String, default: '' })
+  public readonly refreshTrigger!: string;
+
+  @Watch('refreshTrigger')
+  watchRefresh(): void {
+    this.refresh();
+  }
+
   get params(): QueryParams {
-    return this.config.params || {};
+    return this.config.params ?? {};
   }
 
   get targets(): QueryTarget[] {
-    return this.config.targets || [];
+    return this.config.targets ?? [];
   }
 
   get renames(): DisplayNames {
-    return this.config.renames || {};
+    return this.config.renames ?? {};
   }
 
   get axes(): GraphValueAxes {
-    return this.config.axes || {};
+    return this.config.axes ?? {};
   }
 
   get colors(): LineColors {
-    return this.config.colors || {};
+    return this.config.colors ?? {};
   }
 
   get presets(): QueryParams[] {

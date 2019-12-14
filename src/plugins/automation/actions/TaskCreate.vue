@@ -16,7 +16,6 @@ interface TaskCreateOpts {
 @Component
 export default class TaskCreate extends ActionBase<TaskCreateOpts> {
 
-
   editRef(): void {
     createDialog({
       component: 'TextAreaDialog',
@@ -57,6 +56,11 @@ export default class TaskCreate extends ActionBase<TaskCreateOpts> {
         this.opts.message = message;
         this.saveAction();
       });
+  }
+
+  saveEnabled(val: boolean): void {
+    this.action.enabled = val;
+    this.saveAction();
   }
 }
 </script>

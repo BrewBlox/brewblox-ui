@@ -197,6 +197,9 @@ export const suggestId =
     let idx = 2;
     while (!validate(copyName(idx))) {
       idx += 1;
+      if (idx > 100) {
+        throw new Error('Max suggestions exceeded');
+      }
     }
 
     return copyName(idx);
@@ -209,6 +212,18 @@ export const isAbsoluteUrl =
 export const validator =
   (rules: InputRule[]): ((val: any) => boolean) =>
     val => rules.every(rule => !isString(rule(val)));
+
+export const ruleChecker =
+  (rules: InputRule[]): ((val: any) => string | null) =>
+    val => {
+      for (const rule of rules) {
+        const res = rule(val);
+        if (isString(res)) {
+          return res;
+        }
+      }
+      return null;
+    };
 
 export const mutate =
   (acc, key: keyof any, val: any): typeof acc => {
@@ -225,13 +240,13 @@ export const mapEntries =
   (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
     fromEntries(Object.entries(obj).map(callback));
 
-export const spliceById =
-  (arr: HasId[], obj: HasId, insert = true): typeof arr => {
-    const idx = arr.findIndex(v => v.id === obj.id);
-    if (idx !== -1) {
-      insert
-        ? arr.splice(idx, 1, obj)
-        : arr.splice(idx, 1);
-    }
-    return arr;
-  };
+export function spliceById<T extends HasId>
+  (arr: T[], obj: T, insert = true): T[] {
+  const idx = arr.findIndex(v => v.id === obj.id);
+  if (idx !== -1) {
+    insert
+      ? arr.splice(idx, 1, obj)
+      : arr.splice(idx, 1);
+  }
+  return arr;
+}

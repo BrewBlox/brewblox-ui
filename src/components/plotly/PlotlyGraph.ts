@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 import Plotly, { Config, Frame, Layout, PlotData } from 'plotly.js';
 import { debounce } from 'quasar';
@@ -129,6 +130,25 @@ export default class PlotlyGraph extends Vue {
     }
   }
 
+  get extendedConfig(): Partial<Config> {
+    return {
+      ...this.config,
+      modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
+      modeBarButtonsToAdd: [{
+        name: 'toImageLarge',
+        title: 'Download plot as a png',
+        icon: Plotly['Icons'].camera,
+        click: (el) =>
+          Plotly.downloadImage(el, {
+            format: 'png',
+            width: 3000,
+            height: 1500,
+            filename: get(this.layout, 'title.text', this.layout.title) || 'graph',
+          }),
+      }],
+    };
+  }
+
   private async createPlot(): Promise<void> {
     if (!this.plotlyElement) {
       return;
@@ -139,7 +159,7 @@ export default class PlotlyGraph extends Vue {
         this.plotlyElement,
         this.data,
         this.resizedLayout(),
-        this.config,
+        this.extendedConfig,
       );
       this.attachListeners();
     } catch (e) {
@@ -160,7 +180,7 @@ export default class PlotlyGraph extends Vue {
         this.plotlyElement,
         this.data,
         this.resizedLayout(),
-        this.config,
+        this.extendedConfig,
       );
     } catch (e) {
       this.$emit('error', e.message);

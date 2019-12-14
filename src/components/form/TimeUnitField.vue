@@ -28,10 +28,11 @@ export default class TimeUnitField extends FieldBase {
       component: 'TimeUnitDialog',
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       parent: this,
       value: this.value,
       label: this.label,
+      rules: this.rules,
     })
       .onOk(this.change);
   }
@@ -39,19 +40,9 @@ export default class TimeUnitField extends FieldBase {
 </script>
 
 <template>
-  <q-field
-    :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    v-bind="$attrs"
-    stack-label
-    @click.native="openDialog"
-  >
-    <template #control>
-      <component :is="tag" class="q-mt-sm">
-        <slot name="value">
-          {{ value | unitDuration }}
-        </slot>
-      </component>
-    </template>
-  </q-field>
+  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+    <slot name="value">
+      {{ value | unitDuration }}
+    </slot>
+  </LabeledField>
 </template>

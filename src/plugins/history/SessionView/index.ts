@@ -6,7 +6,7 @@ import { SessionViewConfig } from './types';
 
 const feature: Feature = {
   id: 'SessionView',
-  displayName: 'Session View',
+  displayName: 'Session View (Deprecated)',
   widgetComponent: selector(widget),
   widgetSize: {
     cols: 4,

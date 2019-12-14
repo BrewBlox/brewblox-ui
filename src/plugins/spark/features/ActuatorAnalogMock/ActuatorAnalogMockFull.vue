@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { ActuatorAnalogMockBlock } from './types';
 
 @Component
-export default class ActuatorAnalogMockFull extends BlockCrudComponent {
-  readonly block!: ActuatorAnalogMockBlock;
+export default class ActuatorAnalogMockFull
+  extends BlockCrudComponent<ActuatorAnalogMockBlock> {
 }
 </script>
 

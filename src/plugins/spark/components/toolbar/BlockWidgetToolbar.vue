@@ -22,7 +22,7 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
   <WidgetToolbar :crud="crud" :mode="mode" @update:mode="updateMode">
     <BlockGraph
       v-if="graphModalOpen"
-      :id="widget.id"
+      :id="`graph-full--${widget.id}`"
       v-model="graphModalOpen"
       :config.sync="graphCfg"
     />
@@ -31,11 +31,13 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
       <ActionItem
         v-if="hasGraph"
         icon="mdi-chart-line"
-        label="Show graph"
+        label="Graph"
         @click="graphModalOpen = true"
       />
       <slot name="actions" />
-      <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
+    </template>
+
+    <template #menus>
       <WidgetActions :crud="crud" no-rename />
       <BlockActions :crud="crud" />
     </template>

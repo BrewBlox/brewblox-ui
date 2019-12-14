@@ -65,7 +65,7 @@ export default class BlockField extends FieldBase {
       clearable: this.clearable,
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       filter: this.filter,
       value: this.value,
       serviceId: this.serviceId,
@@ -78,22 +78,14 @@ export default class BlockField extends FieldBase {
 </script>
 
 <template>
-  <q-field
-    :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    stack-label
-    v-bind="$attrs"
-    @click.native="openDialog"
-  >
-    <template #control>
-      <div class="self-center full-width no-outline" :tabindex="0">
-        {{ displayValue | truncated }}
-      </div>
-    </template>
+  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+    <slot name="value">
+      {{ displayValue | truncated }}
+    </slot>
     <template #append>
-      <q-btn v-if="linkBlock && !noShow" flat round icon="mdi-message-draw" @click.stop="editBlock">
+      <q-btn v-if="linkBlock && !noShow" flat round icon="mdi-launch" @click.stop="editBlock">
         <q-tooltip>Show {{ value.id }}</q-tooltip>
       </q-btn>
     </template>
-  </q-field>
+  </LabeledField>
 </template>

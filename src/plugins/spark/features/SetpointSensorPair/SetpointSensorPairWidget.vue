@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
@@ -16,15 +15,15 @@ import { SetpointSensorPairBlock } from './types';
     Full: SetpointSensorPairFull,
   },
 })
-export default class SetpointSensorPairWidget extends BlockWidgetBase {
-  readonly block!: SetpointSensorPairBlock;
+export default class SetpointSensorPairWidget
+  extends BlockWidgetBase<SetpointSensorPairBlock> {
 
   get usedBy(): Block[] {
     if (!this.crud.isStoreBlock) {
       return [];
     }
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => get(block, 'data.inputId.id') === this.blockId);
+      .filter(block => block.data.inputId?.id === this.blockId);
   }
 
   get unused(): boolean {
@@ -46,7 +45,7 @@ export default class SetpointSensorPairWidget extends BlockWidgetBase {
 <template>
   <GraphCardWrapper :show="inDialog">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
     <component :is="mode" :crud="crud" :class="cardClass">

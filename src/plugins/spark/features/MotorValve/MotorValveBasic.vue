@@ -7,8 +7,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { MotorValveBlock, ValveState } from './types';
 
 @Component
-export default class MotorValveBasic extends BlockCrudComponent {
-  readonly block!: MotorValveBlock;
+export default class MotorValveBasic
+  extends BlockCrudComponent<MotorValveBlock> {
 
   get valveStateName(): string {
     return spaceCased(ValveState[this.block.data.valveState]);
@@ -23,15 +23,14 @@ export default class MotorValveBasic extends BlockCrudComponent {
       <q-card-section>
         <q-item class="items-start">
           <q-item-section>
-            <LabeledField label="State">
-              <DigitalStateField
-                :value="block.data.desiredState"
-                :pending="block.data.state !== block.data.desiredState"
-                :pending-reason="constrainers"
-                :disable="isDriven"
-                @input="v => { block.data.desiredState = v; saveBlock(); }"
-              />
-            </LabeledField>
+            <DigitalStateField
+              :value="block.data.desiredState"
+              :pending="block.data.state !== block.data.desiredState"
+              :pending-reason="constrainers"
+              :disable="isDriven"
+              label="State"
+              @input="v => { block.data.desiredState = v; saveBlock(); }"
+            />
           </q-item-section>
           <q-item-section>
             <LabeledField :value="valveStateName" label="Valve State" />

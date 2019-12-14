@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { SetpointSensorPairBlock } from './types';
 
 @Component
-export default class SetpointSensorPairBasic extends BlockCrudComponent {
-  readonly block!: SetpointSensorPairBlock;
+export default class SetpointSensorPairBasic
+  extends BlockCrudComponent<SetpointSensorPairBlock> {
 }
 </script>
 

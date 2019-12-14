@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { SetpointProfileBlock } from './types';
 
 @Component
-export default class SetpointProfileBasic extends BlockCrudComponent {
-  readonly block!: SetpointProfileBlock;
+export default class SetpointProfileBasic
+  extends BlockCrudComponent<SetpointProfileBlock> {
 }
 </script>
 

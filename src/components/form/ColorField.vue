@@ -18,9 +18,7 @@ export default class ColorField extends FieldBase {
 
   @Emit('input')
   public change(v: string | null): string | null {
-    return v === null
-      ? v
-      : v.replace('#', '');
+    return v?.replace('#', '') ?? null;
   }
 
   get color(): string {
@@ -29,7 +27,9 @@ export default class ColorField extends FieldBase {
   }
 
   get colorString(): string {
-    return this.value || this.nullText;
+    return !!this.value
+      ? this.color
+      : this.nullText;
   }
 
   get colorStyle(): Mapped<any> {
@@ -53,7 +53,7 @@ export default class ColorField extends FieldBase {
       component: 'ColorDialog',
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       parent: this,
       value: this.color,
       clearable: this.clearable,
@@ -64,25 +64,14 @@ export default class ColorField extends FieldBase {
 </script>
 
 <template>
-  <q-field
-    :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    :borderless="readonly"
-    stack-label
-    v-bind="$attrs"
-    @click.native="openDialog"
-  >
-    <template #control>
-      <component :is="tag" class="q-mt-sm">
-        <slot name="value">
-          {{ colorString }}
-        </slot>
-      </component>
-    </template>
+  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+    <slot name="value">
+      {{ colorString }}
+    </slot>
     <template #after>
       <slot name="indicator">
         <span class="self-end q-mb-sm" :style="colorStyle" />
       </slot>
     </template>
-  </q-field>
+  </LabeledField>
 </template>

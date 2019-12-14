@@ -13,15 +13,15 @@ import { ActuatorPwmBlock } from './types';
     Full: ActuatorPwmFull,
   },
 })
-export default class ActuatorPwmWidget extends BlockWidgetBase {
-  readonly block!: ActuatorPwmBlock;
+export default class ActuatorPwmWidget
+  extends BlockWidgetBase<ActuatorPwmBlock> {
 }
 </script>
 
 <template>
   <GraphCardWrapper :show="inDialog">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
     <component :is="mode" :crud="crud" :class="cardClass">

@@ -9,8 +9,8 @@ import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
 @Component
-export default class PidBasic extends BlockCrudComponent {
-  readonly block!: PidBlock;
+export default class PidBasic
+  extends BlockCrudComponent<PidBlock> {
   inputFormOpen = false;
   relationsOpen = false;
 
@@ -77,7 +77,7 @@ export default class PidBasic extends BlockCrudComponent {
           <UnitField :value="block.data.inputValue" label="Measured" tag="big" readonly />
         </q-item-section>
         <q-item-section side>
-          <q-icon :name="hasInputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
+          <q-icon name="mdi-launch" />
         </q-item-section>
       </q-item>
 
@@ -99,7 +99,7 @@ export default class PidBasic extends BlockCrudComponent {
           <LabeledField :value="block.data.outputValue" number label="Measured" tag="big" />
         </q-item-section>
         <q-item-section side>
-          <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
+          <q-icon name="mdi-launch" />
         </q-item-section>
       </q-item>
 

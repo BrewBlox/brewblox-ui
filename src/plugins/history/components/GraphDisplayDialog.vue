@@ -65,37 +65,29 @@ export default class GraphDisplayDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title ellipsis">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-list dense>
-          <InputField v-model="rename" title="Label" label="Label" />
-          <ColorField
-            v-model="color"
-            title="Line color"
-            label="Line color"
-            null-text="automatic"
-            clearable
+    <DialogCard v-bind="{title, message, html}">
+      <q-list dense>
+        <InputField v-model="rename" title="Label" label="Label" />
+        <ColorField
+          v-model="color"
+          title="Line color"
+          label="Line color"
+          null-text="automatic"
+          clearable
+        />
+        <LabeledField label="Y-axis">
+          <q-btn-toggle
+            v-model="axis"
+            :options="axisOpts"
+            flat
           />
-          <LabeledField label="Y-axis">
-            <q-btn-toggle
-              v-model="axis"
-              :options="axisOpts"
-              flat
-            />
-          </LabeledField>
-        </q-list>
-      </q-card-section>
-      <q-card-actions align="right">
+        </LabeledField>
+      </q-list>
+
+      <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

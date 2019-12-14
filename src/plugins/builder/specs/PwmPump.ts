@@ -39,7 +39,7 @@ const spec: PartSpec = {
   interactHandler: (part: PersistentPart) => {
     const block = settingsBlock<ActuatorPwmBlock>(part, 'pwm');
     if (block) {
-      const limiterWarning = block.data.constrainedBy.constraints.length
+      const limiterWarning = block.data.constrainedBy?.constraints.length
         ? 'The value may be limited by constraints'
         : '';
       createDialog({

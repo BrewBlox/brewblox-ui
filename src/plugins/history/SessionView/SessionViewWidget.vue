@@ -1,10 +1,14 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { shortDateString } from '@/helpers/functional';
+import { deepCopy } from '@/helpers/units/parseObject';
 
+import { historyStore } from '../store';
+import { SessionNote } from '../types';
 import SessionCreateDialog from './SessionCreateDialog.vue';
 import SessionViewBasic from './SessionViewBasic.vue';
 import SessionViewFull from './SessionViewFull.vue';
@@ -84,6 +88,41 @@ export default class SessionViewWidget extends WidgetBase<SessionViewConfig> {
         this.showSessionDialog(session);
       });
   }
+
+  async migrate(): Promise<void> {
+    for (const session of this.config.sessions) {
+      const notes: SessionNote[] = [
+        {
+          id: uid(),
+          title: `${session.name} graph`,
+          col: 12,
+          type: 'Graph',
+          start: session.start,
+          end: session.end,
+          config: deepCopy(session.graphCfg),
+        },
+        {
+          id: uid(),
+          title: `${session.name} text`,
+          col: 12,
+          type: 'Text',
+          value: session.notes,
+        },
+      ];
+      await historyStore.createSession({
+        id: uid(),
+        title: session.name,
+        date: session.start ?? new Date().getTime(),
+        tags: [`Session View: ${this.widget.title}`],
+        notes,
+      });
+    }
+    this.$q.notify({
+      icon: 'mdi-check-all',
+      color: 'positive',
+      message: `Migrated ${this.config.sessions.length} sessions`,
+    });
+  }
 }
 </script>
 
@@ -98,6 +137,18 @@ export default class SessionViewWidget extends WidgetBase<SessionViewConfig> {
   >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
+    <template #warnings>
+      <CardWarning>
+        <template #message>
+          <span>
+            Session View has been replaced by the <b>Session Log</b> widget.
+          </span>
+        </template>
+        <template #actions>
+          <q-btn flat label="Migrate" @click="migrate" />
+        </template>
+      </CardWarning>
     </template>
     <template #graph>
       <BlockGraph

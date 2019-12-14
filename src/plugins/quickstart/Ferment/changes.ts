@@ -17,7 +17,7 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
@@ -335,6 +335,7 @@ export const defineWidgets = (
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      changeIdMigrated: true,
       serviceId,
       steps: serialize([
         {
@@ -342,38 +343,51 @@ export const defineWidgets = (
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: true },
             },
             {
+              id: uid(),
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: true },
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Disable control',
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { enabled: false },
             },
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
             },
             {
+              id: uid(),
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
-          ],
+          ] as [
+              BlockChange<SetpointProfileBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Constant fridge temperature',
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.fridgeSetpoint,
               data: {
                 settingEnabled: true,
@@ -382,38 +396,55 @@ export const defineWidgets = (
               confirmed: { storedSetting: true },
             },
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.coolPid,
               data: {
                 inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeCoolConfig,
               },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.heatPid,
               data: {
                 inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeHeatConfig,
               },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { targetId: new Link(config.names.fridgeSetpoint) },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<PidBlock>,
+              BlockChange<PidBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
         {
           name: 'Constant beer temperature',
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.fridgeSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: {
                 settingEnabled: true,
@@ -422,45 +453,63 @@ export const defineWidgets = (
               confirmed: { storedSetting: true },
             },
             {
+              id: uid(),
               blockId: config.names.coolPid,
               data: {
                 inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerCoolConfig,
               },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.heatPid,
               data: {
                 inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerHeatConfig,
               },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { targetId: new Link(config.names.beerSetpoint) },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<PidBlock>,
+              BlockChange<PidBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
         {
           name: 'Start profile',
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { enabled: true, start: 0 },
               confirmed: { start: true },
             },
-          ],
+          ] as [
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
         {
           name: 'Disable profile',
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.tempProfile,
               data: { enabled: false },
             },
-          ],
+          ] as [
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
       ]),
     },

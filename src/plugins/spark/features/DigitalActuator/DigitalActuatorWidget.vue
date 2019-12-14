@@ -13,15 +13,15 @@ import { DigitalActuatorBlock } from './types';
     Full: DigitalActuatorFull,
   },
 })
-export default class DigitalActuatorWidget extends BlockWidgetBase {
-  readonly block!: DigitalActuatorBlock;
+export default class DigitalActuatorWidget
+  extends BlockWidgetBase<DigitalActuatorBlock> {
 }
 </script>
 
 <template>
   <GraphCardWrapper :show="inDialog">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
     <component :is="mode" :crud="crud" :class="cardClass">

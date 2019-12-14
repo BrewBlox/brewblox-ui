@@ -14,8 +14,8 @@ import { SetpointProfileBlock } from './types';
     Full: SetpointProfileFull,
   },
 })
-export default class SetpointProfileWidget extends BlockWidgetBase {
-  readonly block!: SetpointProfileBlock;
+export default class SetpointProfileWidget
+  extends BlockWidgetBase<SetpointProfileBlock> {
   revision = 0;
 
   get cardClass(): string[] {

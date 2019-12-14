@@ -6,6 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { showBlockDialog } from '@/helpers/dialog';
+import { saveFile } from '@/helpers/import-export';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { GraphConfig } from '@/plugins/history/types';
@@ -18,12 +19,12 @@ import { Block } from '../types';
 
 
 @Component
-export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
+export default class BlockCrudComponent<BlockT extends Block = Block> extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
-  public readonly crud!: BlockCrud;
+  public readonly crud!: BlockCrud<BlockT>;
 
-  public get block(): Block {
+  public get block(): BlockT {
     return this.crud.block;
   }
 
@@ -91,7 +92,7 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
     });
   }
 
-  public async saveBlock(block: Block = this.block): Promise<void> {
+  public async saveBlock(block: BlockT = this.block): Promise<void> {
     await this.crud.saveBlock(block);
   }
 
@@ -132,6 +133,7 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
       parent: this,
       title: 'Make widget',
       message: `On which dashboard do you want to create a widget for '${this.widget.title}'?`,
+      style: 'overflow-y: scroll',
       options: {
         type: 'radio',
         model: undefined,
@@ -169,24 +171,8 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
       });
   }
 
-  public startSwitchBlock(): void {
-    createDialog({
-      parent: this,
-      component: 'BlockSelectDialog',
-      title: 'Choose a Block',
-      message: 'You can change the Block that will be displayed by this widget',
-      filter: block => block.type === this.block.type,
-      serviceId: this.block.serviceId,
-    })
-      .onOk(block => this.switchBlock(block.id));
-  }
-
-  public startBlockInfo(): void {
-    createDialog({
-      parent: this,
-      component: 'BlockInfoDialog',
-      block: this.block,
-    });
+  public exportBlock(): void {
+    saveFile(this.block, `${this.block.id}.json`);
   }
 
   public startRemoveBlock(): void {

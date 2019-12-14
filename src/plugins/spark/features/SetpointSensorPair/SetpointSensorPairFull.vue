@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
@@ -9,8 +8,8 @@ import { Block } from '@/plugins/spark/types';
 import { FilterChoice, SetpointSensorPairBlock } from './types';
 
 @Component
-export default class SetpointSensorPairForm extends BlockCrudComponent {
-  readonly block!: SetpointSensorPairBlock;
+export default class SetpointSensorPairForm
+  extends BlockCrudComponent<SetpointSensorPairBlock> {
 
   get filterOpts(): SelectOption[] {
     return Object.keys(FilterChoice)
@@ -26,7 +25,7 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
       return [];
     }
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => get(block, 'data.inputId.id') === this.blockId);
+      .filter(block => block.data.inputId?.id === this.blockId);
   }
 }
 </script>
@@ -82,9 +81,10 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
           <SelectField
             :value="block.data.filter"
             :options="filterOpts"
+            :html="true"
             title="Filter"
             label="Filter period"
-            message-html="
+            message="
               <p>
                 A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
                 Changes faster than the filter period will be filted out.
@@ -100,9 +100,10 @@ export default class SetpointSensorPairForm extends BlockCrudComponent {
         <q-item-section class="col-4">
           <UnitField
             :value="block.data.filterThreshold"
+            :html="true"
             title="Filter bypass threshold"
             label="Bypass threshold"
-            message-html="
+            message="
               <p>
                 The filter can detect when a large step occurs at the input and temporary bypass slow filtering.
                 The threshold for an input change that should trigger this can be set here.

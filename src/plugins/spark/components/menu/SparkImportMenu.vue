@@ -1,25 +1,23 @@
 <script lang="ts">
-import get from 'lodash/get';
+import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
+import { createDialog, showImportDialog } from '@/helpers/dialog';
+import { suggestId } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
-import { deserialize } from '@/helpers/units/parseObject';
+import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
-
 
 @Component
 export default class SparkImportMenu extends DialogBase {
+  importBusy = false;
+  messages: string[] = [];
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
-
-  reader: FileReader = new FileReader();
-  serializedData = '';
-  importBusy = false;
-  messages: string[] = [];
 
   get service(): Service {
     return serviceStore.serviceById(this.serviceId);
@@ -30,31 +28,25 @@ export default class SparkImportMenu extends DialogBase {
     saveFile(exported, `brewblox-blocks-${this.service.id}.json`);
   }
 
-  handleImportFileSelect(evt): void {
-    const file = evt.target.files[0];
-    if (file) {
-      this.reader.readAsText(file);
-    } else {
-      this.serializedData = '';
-    }
+  startImport(): void {
+    showImportDialog(this.confirmImport);
   }
 
-  startImportBlocks(): void {
+  confirmImport(values: any): void {
     createDialog({
       title: 'Reset Blocks',
       message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
       noBackdropDismiss: true,
       cancel: true,
     })
-      .onOk(async () => this.importBlocks());
+      .onOk(() => this.importBlocks(values));
   }
 
-  async importBlocks(): Promise<void> {
+  async importBlocks(values: any): Promise<void> {
     try {
       this.importBusy = true;
       this.messages = [];
-      const exported = deserialize(JSON.parse(this.serializedData));
-      this.messages = await sparkStore.serviceImport([this.service.id, exported]);
+      this.messages = await sparkStore.serviceImport([this.service.id, values]);
       this.$q.notify(
         this.messages.length > 0
           ? {
@@ -77,8 +69,43 @@ export default class SparkImportMenu extends DialogBase {
     this.importBusy = false;
   }
 
-  mounted(): void {
-    this.reader.onload = e => this.serializedData = get(e, 'target.result', '');
+  startImportSingle(): void {
+    showImportDialog(this.importSingleBlock);
+  }
+
+  validateBlockId(val: string): boolean {
+    return !blockIdRules(this.serviceId)
+      .map(rule => rule(val))
+      .some(isString);
+  }
+
+  async importSingleBlock(block: Block): Promise<void> {
+    try {
+      this.importBusy = true;
+      this.messages = [];
+      const id = suggestId(block.id ?? 'imported', this.validateBlockId);
+      await sparkStore.createBlock([
+        this.serviceId,
+        {
+          ...block,
+          id,
+          nid: undefined,
+          serviceId: this.serviceId,
+        },
+      ]);
+      this.$q.notify({
+        icon: 'mdi-check-all',
+        color: 'positive',
+        message: `Imported ${id}`,
+      });
+    } catch (e) {
+      this.$q.notify({
+        icon: 'error',
+        color: 'negative',
+        message: `Failed to import block: ${e.toString()}`,
+      });
+    }
+    this.importBusy = false;
   }
 }
 </script>
@@ -98,18 +125,12 @@ export default class SparkImportMenu extends DialogBase {
       <q-card-section>
         <q-item>
           <q-item-section>
-            <input type="file" @change="handleImportFileSelect" />
+            <q-btn :loading="importBusy" outline label="Import single Block" @click="startImportSingle" />
           </q-item-section>
         </q-item>
         <q-item>
           <q-item-section>
-            <q-btn
-              :disable="!serializedData"
-              :loading="importBusy"
-              outline
-              label="Import Blocks from file"
-              @click="startImportBlocks"
-            />
+            <q-btn :loading="importBusy" outline label="Import Blocks" @click="startImport" />
           </q-item-section>
         </q-item>
         <q-item>

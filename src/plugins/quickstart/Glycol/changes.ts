@@ -16,7 +16,7 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
@@ -325,7 +325,6 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
             `${config.names.beerSensor}/value[${userTemp}]`,
             `${config.names.beerSetpoint}/setting[${userTemp}]`,
             `${config.names.coolPwm}/value`,
-
             `${config.names.coolAct}/state`,
           ],
         },
@@ -365,6 +364,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      changeIdMigrated: true,
       serviceId: config.serviceId,
       steps: serialize([
         {
@@ -372,24 +372,34 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: { settingEnabled: false },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.beerProfile,
               data: { enabled: false },
+              confirmed: {},
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
         {
           name: 'Constant beer temperature',
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.beerProfile,
               data: { enabled: false },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
               data: {
                 settingEnabled: true,
@@ -399,22 +409,31 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
                 storedSetting: true,
               },
             },
-          ],
+          ] as [
+              BlockChange<SetpointProfileBlock>,
+              BlockChange<SetpointSensorPairBlock>,
+            ],
         },
         {
           name: 'Follow temperature profile',
           id: uid(),
           changes: [
             {
+              id: uid(),
               blockId: config.names.beerSetpoint,
-              data: { enabled: true },
+              data: { settingEnabled: true },
+              confirmed: {},
             },
             {
+              id: uid(),
               blockId: config.names.beerProfile,
               data: { enabled: true, start: new Date().getTime() / 1000 },
               confirmed: { start: true },
             },
-          ],
+          ] as [
+              BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
         },
       ]),
     },

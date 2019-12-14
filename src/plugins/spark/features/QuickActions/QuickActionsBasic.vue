@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
+import { spliceById } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
@@ -40,7 +41,7 @@ export default class QuickActionsBasic extends CrudComponent {
     return deserialize(this.widget.config.steps);
   }
 
-  set steps(steps: Step[]) {
+  saveSteps(steps: Step[] = this.steps): void {
     this.saveConfig({
       ...this.widget.config,
       steps: serialize(steps),
@@ -105,9 +106,13 @@ export default class QuickActionsBasic extends CrudComponent {
     const actualChanges: [Block, any][] = [];
     for (const change of changes) {
       const block = sparkStore.blockById(this.serviceId, change.blockId);
+      const spec = sparkStore.specs[block.type];
       const actualData = deepCopy(change.data);
       for (const key in change.data) {
-        if (change.confirmed && change.confirmed[key]) {
+        if (!spec.changes.some(c => c.key === key)) {
+          delete actualData[key];
+        }
+        if (change.confirmed?.[key]) {
           actualData[key] = await this.confirmStepChange(block, key, actualData[key]);
         }
       }
@@ -117,7 +122,7 @@ export default class QuickActionsBasic extends CrudComponent {
       await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...actualData } }]);
     }
     step.changes = step.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
-    this.steps = this.steps.map(s => s.id === step.id ? step : s);
+    this.saveSteps(spliceById(this.steps, step));
   }
 
   applyStep(step: Step): void {

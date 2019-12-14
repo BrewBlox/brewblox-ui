@@ -1,6 +1,7 @@
 <script lang="ts">
-import { debounce, uid } from 'quasar';
-import { Component } from 'vue-property-decorator';
+import clamp from 'lodash/clamp';
+import { dom, uid } from 'quasar';
+import { Component, Ref } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
@@ -10,12 +11,24 @@ import { emptyGraphConfig } from '../getters';
 import { sharedWidgetConfigs } from '../helpers';
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote, SharedGraphConfig } from '../types';
+import SessionHeaderField from './SessionHeaderField.vue';
 import { SessionLogConfig } from './types';
 
+const { width } = dom;
 
-@Component
+
+@Component({
+  components: {
+    SessionHeaderField,
+  },
+})
 export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   colSizes = [3, 4, 6, 8, 9, 12];
+  initialCol = 0;
+  colDistance = 0;
+
+  @Ref()
+  readonly notebox!: any;
 
   get session(): LoggedSession | null {
     return this.config.currentSession === null
@@ -52,30 +65,6 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     ];
   }
 
-  saveSessionTitle(title: string): void {
-    if (this.session) {
-      this.session.title = title;
-      this.saveSession();
-    }
-  }
-
-  saveSessionDate(date: Date): void {
-    if (this.session) {
-      this.session.date = date.getTime();
-      this.saveSession();
-    }
-  }
-
-  debouncedSave = debounce(this.saveSession, 1000);
-
-  saveSize(note: SessionNote, idx: number): void {
-    const col = this.colSizes[idx];
-    if (col && col !== note.col) {
-      note.col = col;
-      this.debouncedSave();
-    }
-  }
-
   saveTitle(note: SessionNote, title: string): void {
     if (title !== note.title) {
       note.title = title;
@@ -104,7 +93,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       component: 'InputDialog',
       value: 'New text field',
       title: 'Add field',
-      label: 'title',
+      label: 'Name',
     })
       .onOk(title => {
         this.notes.push({
@@ -123,7 +112,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       component: 'InputDialog',
       value: 'New graph field',
       title: 'Add field',
-      label: 'title',
+      label: 'Name',
     })
       .onOk(title => {
         this.notes.push({
@@ -160,6 +149,22 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   addSession(): void {
     this.$emit('add');
   }
+
+  onSwipe(args: PanArguments, note: SessionNote): void {
+    if (args.isFirst) {
+      this.initialCol = note.col;
+      this.colDistance = this.notebox !== undefined
+        ? (width(this.notebox.$el) || 600) / 12
+        : 50;
+    }
+
+    const delta = Math.round(args.offset.x / this.colDistance);
+    note.col = clamp(this.initialCol + delta, 3, 12);
+
+    if (args.isFinal && note.col !== this.initialCol) {
+      this.saveSession();
+    }
+  }
 }
 </script>
 
@@ -172,77 +177,64 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
 
     <q-card-section v-if="session !== null">
       <q-list>
-        <q-item>
-          <q-item-section>
-            <InputField
-              :value="session.title"
-              title="Session title"
-              label="Session title"
-              dense
-              class="self-start"
-              @input="saveSessionTitle"
-            />
-          </q-item-section>
-          <q-item-section class="col-auto">
-            <DatetimeField
-              :value="session.date"
-              label="Session date"
-              title="Session date"
-              default-now
-              dense
-              @input="saveSessionDate"
-            />
-          </q-item-section>
-        </q-item>
-        <draggable v-model="notes" class="row q-gutter-xs">
+        <SessionHeaderField :session="session" @update:session="saveSession" />
+        <draggable ref="notebox" v-model="notes" class="row q-gutter-xs">
           <div
             v-for="note in notes"
             :key="note.id"
             :class="[`col-${note.col}`, 'q-pa-xs', 'q-ma-none']"
           >
-            <q-item style="border: 1px solid silver">
-              <q-item-section class="col-auto">
-                <InputField
-                  :value="note.title"
-                  title="Note title"
-                  label="Title"
-                  dense
-                  tag-class="ellipsis-3-lines"
-                  style="max-width: 100%"
-                  @input="v => saveTitle(note, v)"
-                />
-              </q-item-section>
-              <q-space />
-              <q-item-section v-if="note.type === 'Graph'" class="col-auto">
-                <q-btn icon="edit" flat dense @click="editGraph(note)">
-                  <q-tooltip>Select graph data</q-tooltip>
-                </q-btn>
-              </q-item-section>
-              <q-item-section class="col-auto">
-                <q-btn icon="mdi-dots-vertical" flat dense>
-                  <q-menu>
-                    <q-list bordered>
-                      <ActionItem label="Clear content" icon="clear" @click="clearNote(note)" />
-                      <ActionItem label="Remove note" icon="delete" @click="removeNote(note)" />
-                      <q-item>
-                        <q-item-section avatar>
-                          <q-icon name="mdi-arrow-expand-horizontal" />
-                        </q-item-section>
-                        <q-item-section>
-                          <q-slider
-                            :min="0"
-                            :max="colSizes.length-1"
-                            :value="colSizes.indexOf(note.col)"
-                            snap
-                            @input="v => saveSize(note, v)"
-                          />
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn>
-              </q-item-section>
-            </q-item>
+            <div style="border: 1px solid silver; border-right: 3px dotted silver;" class="relative-position">
+              <div
+                v-touch-pan.prevent.stop.mouse="v => onSwipe(v, note)"
+                class="move-border"
+              />
+              <q-item>
+                <q-item-section class="col-shrink">
+                  <InputField
+                    :value="note.title"
+                    title="Note name"
+                    label="Note name"
+                    dense
+                    tag-class="ellipsis-3-lines text-info"
+                    style="max-width: 100%;"
+                    @input="v => saveTitle(note, v)"
+                  >
+                    <template #before>
+                      <q-icon
+                        :name="note.type === 'Graph' ? 'mdi-chart-line' : 'mdi-text-subject'"
+                        size="xs"
+                        class="self-end q-mb-none"
+                        color="info"
+                      />
+                    </template>
+                  </InputField>
+                </q-item-section>
+                <q-space />
+                <q-item-section v-if="note.type === 'Graph'" class="col-shrink">
+                  <q-btn icon="settings" flat dense @click="editGraph(note)">
+                    <q-tooltip>Select graph data</q-tooltip>
+                  </q-btn>
+                </q-item-section>
+                <q-item-section class="col-shrink">
+                  <q-btn icon="mdi-dots-vertical" flat dense>
+                    <q-menu>
+                      <q-list bordered>
+                        <ActionItem label="Clear content" icon="clear" @click="clearNote(note)" />
+                        <ActionItem label="Remove note" icon="delete" @click="removeNote(note)" />
+                      </q-list>
+                    </q-menu>
+                  </q-btn>
+                </q-item-section>
+              </q-item>
+              <q-item v-if="note.type === 'Text'">
+                <q-item-section class="darkish">
+                  <!-- No line breaks to allow correctly rendering whitespace -->
+                  <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
+                  <div style="white-space: pre-wrap; cursor: default;">{{ note.value }}</div>
+                </q-item-section>
+              </q-item>
+            </div>
           </div>
         </draggable>
         <q-item>
@@ -268,3 +260,19 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     </q-card-section>
   </q-card>
 </template>
+
+<style scoped>
+.move-border {
+  position: absolute;
+  right: -10px;
+  top: 0;
+  width: 20px;
+  height: 100%;
+  cursor: ew-resize;
+  z-index: 10;
+}
+
+.move-border:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+</style>

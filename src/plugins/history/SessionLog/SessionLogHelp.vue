@@ -18,21 +18,13 @@ export default class SessionLogHelp extends DialogBase {
     @hide="onDialogHide"
     @keyup.enter="onDialogOk"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        About sessions
-      </q-card-section>
-      <q-card-section class="scroll">
+    <DialogCard title="About sessions">
+      <template #message>
         Insert help text here
-      </q-card-section>
-      <q-card-actions align="right">
-        <q-btn
-          flat
-          label="OK"
-          color="primary"
-          @click="onDialogOk"
-        />
-      </q-card-actions>
-    </q-card>
+      </template>
+      <template #actions>
+        <q-btn flat label="OK" color="primary" @click="onDialogOk" />
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

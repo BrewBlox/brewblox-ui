@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DigitalActuatorBlock } from './types';
 
 @Component
-export default class DigitalActuatorBasic extends BlockCrudComponent {
-  readonly block!: DigitalActuatorBlock;
+export default class DigitalActuatorBasic
+  extends BlockCrudComponent<DigitalActuatorBlock> {
 }
 </script>
 
@@ -16,19 +16,16 @@ export default class DigitalActuatorBasic extends BlockCrudComponent {
     <slot name="toolbar" />
     <slot name="warnings">
       <q-card-section>
-        <q-item>
-          <q-item-section>
-            <LabeledField label="State" dense>
-              <DigitalStateField
-                :value="block.data.desiredState"
-                :pending="block.data.state !== block.data.desiredState"
-                :pending-reason="constrainers"
-                :disable="isDriven"
-                @input="v => { block.data.desiredState = v; saveBlock(); }"
-              />
-            </LabeledField>
-          </q-item-section>
-        </q-item>
+        <DigitalStateField
+          :value="block.data.desiredState"
+          :pending="block.data.state !== block.data.desiredState"
+          :pending-reason="constrainers"
+          :disable="isDriven"
+          dense
+          label="State"
+          item-aligned
+          @input="v => { block.data.desiredState = v; saveBlock(); }"
+        />
         <q-item>
           <q-item-section>
             <DrivenIndicator :block-id="block.id" :service-id="serviceId" />

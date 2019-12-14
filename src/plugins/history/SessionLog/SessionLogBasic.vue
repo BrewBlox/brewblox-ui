@@ -8,6 +8,7 @@ import { shortDateString, spliceById } from '@/helpers/functional';
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
+import SessionHeaderField from './SessionHeaderField.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
 import { SessionLogConfig } from './types';
 
@@ -16,6 +17,7 @@ import { SessionLogConfig } from './types';
   components: {
     SessionTextNoteDialog,
     SessionGraphNoteDialog,
+    SessionHeaderField,
   },
 })
 export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
@@ -115,18 +117,13 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     <slot name="graph" />
 
     <q-card-section v-if="session !== null">
-      <q-item dense>
-        <q-item-section class="col-auto text-grey-2">
-          <span class="text-italic">{{ session.title }}</span>
-          <span>{{ new Date(session.date).toLocaleString() }}</span>
-        </q-item-section>
-      </q-item>
+      <SessionHeaderField :session="session" @update:session="saveSession" />
       <div class="row">
         <q-item
           v-for="note in notes"
           :key="note.id"
           clickable
-          :class="[`col-${note.col}`, 'align-children']"
+          :class="[`col-${note.col}`, 'align-children', 'self-start']"
           @click="openNote(note)"
         >
           <!-- Text note -->
@@ -138,7 +135,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
               </q-item-label>
               <!-- No line breaks to allow correctly rendering whitespace -->
               <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-              <div v-if="!!note.value" class="note-text">{{ note.value }}</div>
+              <div v-if="!!note.value" style="white-space: pre-wrap">{{ note.value }}</div>
               <div v-else class="text-grey text-italic">
                 Click to set
               </div>
@@ -178,9 +175,3 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     </q-card-section>
   </q-card>
 </template>
-
-<style scoped>
-.note-text {
-  white-space: pre-wrap;
-}
-</style>

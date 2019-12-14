@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2413Block } from './types';
 
 @Component
-export default class DS2413Full extends BlockCrudComponent {
-  readonly block!: DS2413Block;
+export default class DS2413Full
+  extends BlockCrudComponent<DS2413Block> {
 }
 </script>
 

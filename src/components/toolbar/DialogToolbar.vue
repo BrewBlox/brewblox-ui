@@ -11,6 +11,6 @@ export default class DialogToolbar extends Vue { }
     <slot />
     <q-space />
     <slot name="buttons" />
-    <q-btn v-close-popup flat icon="mdi-close-circle" size="md" @click="$emit('close')" />
+    <q-btn v-close-popup flat stretch icon="mdi-close-circle" size="md" @click="$emit('close')" />
   </q-bar>
 </template>

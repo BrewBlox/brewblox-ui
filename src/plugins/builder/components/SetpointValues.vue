@@ -93,16 +93,15 @@ export default class SetpointValues extends Vue {
   <g v-if="block || !hideUnset" :transform="`translate(${squares(startX)}, ${squares(startY)})`">
     <foreignObject :width="squares(2)" :height="squares(1)">
       <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
+      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
       <div v-else :class="[`text-${textColor}`, 'text-bold', 'q-ml-md', 'q-mt-xs']">
         <q-icon name="mdi-thermometer" class="q-mr-sm" />
         {{ setpointValue | round(1) }}
-        <q-icon v-if="!block" name="mdi-link-variant-off" />
-        <small v-else>{{ setpointUnit }}</small>
+        <small>{{ setpointUnit }}</small>
         <br />
         <q-icon :name="isDriven ? 'mdi-swap-vertical-bold' : 'mdi-bullseye-arrow'" class="q-mr-sm" />
         {{ setpointSetting | round(1) }}
-        <q-icon v-if="!block" name="mdi-link-variant-off" />
-        <small v-else>{{ setpointUnit }}</small>
+        <small>{{ setpointUnit }}</small>
       </div>
     </foreignObject>
   </g>
