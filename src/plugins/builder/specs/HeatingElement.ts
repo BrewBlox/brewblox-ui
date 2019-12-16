@@ -1,6 +1,6 @@
 import { blockTypes } from '@/plugins/spark/block-types';
 
-import { showLinkedBlockDialog } from '../helpers';
+import { showDrivingBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 5;
@@ -30,7 +30,7 @@ const spec: PartSpec = {
     SIZE_Y,
   ],
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'pwm'),
+  interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, 'pwm'),
 };
 
 export default spec;

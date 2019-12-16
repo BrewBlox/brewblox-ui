@@ -1,7 +1,7 @@
 import { Coordinates } from '@/helpers/coordinates';
 import { blockTypes } from '@/plugins/spark/block-types';
 
-import { showLinkedBlockDialog } from '../helpers';
+import { showDrivingBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart, Transitions } from '../types';
 
 const DEFAULT_SIZE_X = 4;
@@ -39,7 +39,7 @@ const spec: PartSpec = {
       [rightOut]: [{ outCoords: ENTRY, friction: sizeX - 1 }],
     };
   },
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'pwm'),
+  interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, 'pwm'),
 };
 
 export default spec;
