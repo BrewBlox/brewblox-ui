@@ -96,6 +96,12 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
     await this.crud.saveBlock(block);
   }
 
+  public async saveStoreBlock(block: Block | null): Promise<void> {
+    if (block !== null) {
+      await sparkStore.saveBlock([block.serviceId, block]);
+    }
+  }
+
   public async removeBlock(): Promise<void> {
     if (this.isStoreBlock) {
       await sparkStore.removeBlock([this.serviceId, this.block]);
