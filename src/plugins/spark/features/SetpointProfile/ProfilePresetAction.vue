@@ -4,9 +4,12 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
+import { SetpointProfileBlock } from './types';
+
 
 @Component
-export default class ProfilePresetAction extends BlockCrudComponent {
+export default class ProfilePresetAction
+  extends BlockCrudComponent<SetpointProfileBlock> {
 
   @Prop({ type: String, default: 'mdi-file' })
   readonly icon!: string;

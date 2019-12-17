@@ -83,7 +83,7 @@ export default class BlockField extends FieldBase {
       {{ displayValue | truncated }}
     </slot>
     <template #append>
-      <q-btn v-if="linkBlock && !noShow" flat round icon="mdi-message-draw" @click.stop="editBlock">
+      <q-btn v-if="linkBlock && !noShow" flat round icon="mdi-launch" @click.stop="editBlock">
         <q-tooltip>Show {{ value.id }}</q-tooltip>
       </q-btn>
     </template>

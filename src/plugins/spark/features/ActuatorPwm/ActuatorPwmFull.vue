@@ -5,8 +5,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
 
 @Component
-export default class ActuatorPwmFull extends BlockCrudComponent {
-  readonly block!: ActuatorPwmBlock;
+export default class ActuatorPwmFull
+  extends BlockCrudComponent<ActuatorPwmBlock> {
 
   quickValues = [
     { label: '0%', value: 0 },

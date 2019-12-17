@@ -120,7 +120,7 @@ export default class BlockGraph extends Vue {
     // To avoid constantly refreshing sources, we need to do a deep compare
     if (JSON.stringify(newVal) !== this.configString) {
       this.configString = JSON.stringify(newVal);
-      this.$nextTick(() => this.graph && this.graph.resetSources());
+      this.$nextTick(() => this.graph?.resetSources());
     }
   }
 
@@ -160,6 +160,7 @@ export default class BlockGraph extends Vue {
               <q-item
                 v-for="[key, renamed] in targetKeys"
                 :key="key"
+                :inset-level="0.2"
                 link
                 clickable
                 @click="updateKeySide(key, !isRightAxis(key))"

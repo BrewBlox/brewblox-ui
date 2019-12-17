@@ -13,8 +13,8 @@ import { ActuatorAnalogMockBlock } from './types';
     Full: ActuatorAnalogMockFull,
   },
 })
-export default class ActuatorAnalogMockWidget extends BlockWidgetBase {
-  readonly block!: ActuatorAnalogMockBlock;
+export default class ActuatorAnalogMockWidget
+  extends BlockWidgetBase<ActuatorAnalogMockBlock> {
 }
 </script>
 

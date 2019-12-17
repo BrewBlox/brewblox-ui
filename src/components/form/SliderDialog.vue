@@ -34,6 +34,10 @@ export default class SliderDialog extends DialogBase {
     this.onDialogOk(this.local);
   }
 
+  apply(value: number): void {
+    this.onDialogOk(value);
+  }
+
   created(): void {
     this.local = this.value;
   }
@@ -53,7 +57,7 @@ export default class SliderDialog extends DialogBase {
       </q-item>
       <q-item v-if="quickActions.length">
         <q-item-section v-for="q in quickActions" :key="'quick'+q.value">
-          <q-btn unelevated :label="q.label" @click="local = q.value" />
+          <q-btn unelevated :label="q.label" @click="apply(q.value)" />
         </q-item-section>
       </q-item>
 

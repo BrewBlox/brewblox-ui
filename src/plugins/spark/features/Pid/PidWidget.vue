@@ -1,10 +1,13 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
+import PidShareDialog from './PidShareDialog.vue';
 import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
@@ -12,10 +15,11 @@ import { PidBlock } from './types';
   components: {
     Basic: PidBasic,
     Full: PidFull,
+    PidShareDialog,
   },
 })
-export default class PidWidget extends BlockWidgetBase {
-  readonly block!: PidBlock;
+export default class PidWidget
+  extends BlockWidgetBase<PidBlock> {
 
   get inputId(): string | null {
     return this.block.data.inputId.id;
@@ -33,6 +37,16 @@ export default class PidWidget extends BlockWidgetBase {
   showRelations(): void {
     startRelationsDialog(this.block);
   }
+
+  showShareDialog(): void {
+    createDialog({
+      component: PidShareDialog,
+      parent: this,
+      graphId: uid(),
+      graphCfg: this.graphCfg,
+      block: this.block,
+    });
+  }
 }
 </script>
 
@@ -46,7 +60,9 @@ export default class PidWidget extends BlockWidgetBase {
       <template #toolbar>
         <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
           <template #actions>
-            <ActionItem icon="mdi-vector-line" label="Show Relations" @click="showRelations" />
+            <ActionItem icon="mdi-vector-line" label="Relations" @click="showRelations" />
+            <!-- TODO(Elco): decide what values should appear in tuning view -->
+            <!-- <ActionItem icon="mdi-cube-scan" label="Tuning view" @click="showShareDialog" /> -->
           </template>
         </component>
       </template>

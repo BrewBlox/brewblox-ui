@@ -6,7 +6,7 @@ import CrudComponent from '@/components/CrudComponent';
 @Component
 export default class RenameWidgetAction extends CrudComponent {
 
-  @Prop({ type: String, default: 'Rename Widget' })
+  @Prop({ type: String, default: 'Rename' })
   readonly label!: string;
 
   @Prop({ type: String, default: 'edit' })

@@ -6,8 +6,8 @@ import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { Spark3PinsBlock } from './types';
 
 @Component
-export default class Spark3PinsWidget extends BlockWidgetBase {
-  readonly block!: Spark3PinsBlock;
+export default class Spark3PinsWidget
+  extends BlockWidgetBase<Spark3PinsBlock> {
 }
 </script>
 

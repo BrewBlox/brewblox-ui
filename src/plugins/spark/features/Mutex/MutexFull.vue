@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { MutexBlock } from './types';
 
 @Component
-export default class MutexFull extends BlockCrudComponent {
-  readonly block!: MutexBlock;
+export default class MutexFull
+  extends BlockCrudComponent<MutexBlock> {
 }
 </script>
 

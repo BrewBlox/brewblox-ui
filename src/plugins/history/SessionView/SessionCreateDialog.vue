@@ -1,5 +1,5 @@
 <script lang="ts">
-import shortid from 'shortid';
+import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
@@ -13,7 +13,7 @@ import { Session } from './types';
 
 @Component
 export default class SessionCreateDialog extends DialogBase {
-  sessionId = shortid.generate();
+  sessionId = uid();
   sessionName = 'Brew session ' + new Date().toLocaleDateString();
   importGraph: SelectOption | null = null;
 

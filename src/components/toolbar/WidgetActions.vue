@@ -12,13 +12,11 @@ export default class WidgetActions extends CrudComponent {
 </script>
 
 <template>
-  <q-expansion-item v-if="isStoreWidget" label="Widget Actions">
-    <q-list>
-      <slot name="widget-actions" />
-      <ActionItem icon="file_copy" label="Copy" @click="startCopyWidget" />
-      <ActionItem icon="exit_to_app" label="Move" @click="startMoveWidget" />
-      <RenameWidgetAction v-if="!noRename" :crud="crud" />
-      <ActionItem icon="delete" label="Delete" @click="startRemoveWidget" />
-    </q-list>
-  </q-expansion-item>
+  <ActionSubmenu v-if="isStoreWidget" label="Widget">
+    <ActionItem icon="file_copy" label="Copy" @click="startCopyWidget" />
+    <ActionItem icon="exit_to_app" label="Move" @click="startMoveWidget" />
+    <slot />
+    <RenameWidgetAction v-if="!noRename" :crud="crud" />
+    <ActionItem icon="delete" label="Delete" @click="startRemoveWidget" />
+  </ActionSubmenu>
 </template>

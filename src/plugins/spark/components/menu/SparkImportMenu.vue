@@ -1,12 +1,15 @@
 <script lang="ts">
+import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog, showImportDialog } from '@/helpers/dialog';
+import { suggestId } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
+import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
-
 
 @Component
 export default class SparkImportMenu extends DialogBase {
@@ -36,7 +39,7 @@ export default class SparkImportMenu extends DialogBase {
       noBackdropDismiss: true,
       cancel: true,
     })
-      .onOk(async () => this.importBlocks(values));
+      .onOk(() => this.importBlocks(values));
   }
 
   async importBlocks(values: any): Promise<void> {
@@ -65,6 +68,45 @@ export default class SparkImportMenu extends DialogBase {
     }
     this.importBusy = false;
   }
+
+  startImportSingle(): void {
+    showImportDialog(this.importSingleBlock);
+  }
+
+  validateBlockId(val: string): boolean {
+    return !blockIdRules(this.serviceId)
+      .map(rule => rule(val))
+      .some(isString);
+  }
+
+  async importSingleBlock(block: Block): Promise<void> {
+    try {
+      this.importBusy = true;
+      this.messages = [];
+      const id = suggestId(block.id ?? 'imported', this.validateBlockId);
+      await sparkStore.createBlock([
+        this.serviceId,
+        {
+          ...block,
+          id,
+          nid: undefined,
+          serviceId: this.serviceId,
+        },
+      ]);
+      this.$q.notify({
+        icon: 'mdi-check-all',
+        color: 'positive',
+        message: `Imported ${id}`,
+      });
+    } catch (e) {
+      this.$q.notify({
+        icon: 'error',
+        color: 'negative',
+        message: `Failed to import block: ${e.toString()}`,
+      });
+    }
+    this.importBusy = false;
+  }
 }
 </script>
 
@@ -81,6 +123,11 @@ export default class SparkImportMenu extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
+        <q-item>
+          <q-item-section>
+            <q-btn :loading="importBusy" outline label="Import single Block" @click="startImportSingle" />
+          </q-item-section>
+        </q-item>
         <q-item>
           <q-item-section>
             <q-btn :loading="importBusy" outline label="Import Blocks" @click="startImport" />

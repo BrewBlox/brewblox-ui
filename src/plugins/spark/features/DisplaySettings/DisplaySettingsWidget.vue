@@ -13,8 +13,8 @@ import { DisplaySettingsBlock } from './types';
     Full: DisplaySettingsFull,
   },
 })
-export default class DisplaySettingsWidget extends BlockWidgetBase {
-  readonly block!: DisplaySettingsBlock;
+export default class DisplaySettingsWidget
+  extends BlockWidgetBase<DisplaySettingsBlock> {
 }
 </script>
 

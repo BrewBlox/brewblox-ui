@@ -13,8 +13,8 @@ import { MutexBlock } from './types';
     Full: MutexFull,
   },
 })
-export default class MutexWidget extends BlockWidgetBase {
-  readonly block!: MutexBlock;
+export default class MutexWidget
+  extends BlockWidgetBase<MutexBlock> {
 }
 </script>
 

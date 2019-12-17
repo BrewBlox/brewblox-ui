@@ -3,9 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import { showBlockDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
+import { SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import { sparkStore } from '@/plugins/spark/store';
+import { Block } from '@/plugins/spark/types';
 
 interface GridOpts {
   start?: number;
@@ -13,29 +15,21 @@ interface GridOpts {
 }
 
 @Component
-export default class PidFull extends BlockCrudComponent {
-  readonly block!: PidBlock;
+export default class PidFull
+  extends BlockCrudComponent<PidBlock> {
 
-  get inputId(): string | null {
-    return this.block.data.inputId.id;
+  get inputBlock(): SetpointSensorPairBlock | null {
+    return sparkStore.tryBlockById(this.serviceId, this.block.data.inputId.id);
   }
 
-  get outputId(): string | null {
-    return this.block.data.outputId.id;
+  get inputDriven(): boolean {
+    return this.inputBlock !== null
+      && sparkStore.drivenChains(this.serviceId)
+        .some((chain: string[]) => chain[0] === this.inputBlock!.id);
   }
 
-  get hasInputBlock(): boolean {
-    return !!this.inputId
-      && sparkStore
-        .blockIds(this.serviceId)
-        .includes(this.inputId);
-  }
-
-  get hasOutputBlock(): boolean {
-    return !!this.outputId
-      && sparkStore
-        .blockIds(this.serviceId)
-        .includes(this.outputId);
+  get outputBlock(): Block | null {
+    return sparkStore.tryBlockById(this.serviceId, this.block.data.outputId.id);
   }
 
   get baseOutput(): number {
@@ -59,11 +53,11 @@ export default class PidFull extends BlockCrudComponent {
   }
 
   showInput(): void {
-    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
+    showBlockDialog(this.inputBlock);
   }
 
   showOutput(): void {
-    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
+    showBlockDialog(this.outputBlock);
   }
 
   grid(opts: GridOpts): Mapped<string> {
@@ -90,7 +84,7 @@ export default class PidFull extends BlockCrudComponent {
       <q-separator inset />
 
       <!-- Input row -->
-      <q-item class="items-start">
+      <q-item class="items-end">
         <q-item-section>
           <BlockField
             :value="block.data.inputId"
@@ -112,24 +106,33 @@ export default class PidFull extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <UnitField :value="block.data.inputSetting" label="Target value is" tag="b" readonly />
+          <UnitField
+            v-if="!!inputBlock"
+            :value="inputBlock.data.storedSetting"
+            :readonly="inputDriven"
+            :class="{darkened: !inputBlock.data.settingEnabled}"
+            label="Setting"
+            tag="b"
+            @input="v => { inputBlock.data.storedSetting = v; saveStoreBlock(inputBlock); }"
+          />
+          <UnitField v-else :value="block.data.inputSetting" label="Setting" tag="b" readonly />
         </q-item-section>
 
         <q-item-section>
-          <UnitField :value="block.data.inputValue" label="Current value is" tag="b" readonly />
+          <UnitField :value="block.data.inputValue" label="Measured" tag="b" readonly />
         </q-item-section>
 
-        <q-item-section class="col-1 self-center">
-          <q-btn v-if="hasInputBlock" flat icon="mdi-pencil" @click="showInput">
-            <q-tooltip>Edit {{ inputId }}</q-tooltip>
+        <q-item-section class="col-1">
+          <q-btn v-if="!!inputBlock" flat icon="mdi-launch" @click="showInput">
+            <q-tooltip>Edit {{ inputBlock.id }}</q-tooltip>
           </q-btn>
-          <q-btn v-else disable flat icon="mdi-pencil-off" />
+          <q-btn v-else disable flat icon="mdi-launch" />
         </q-item-section>
       </q-item>
       <q-separator inset />
 
       <!-- Output row -->
-      <q-item class="items-start">
+      <q-item class="items-end">
         <q-item-section>
           <BlockField
             :value="block.data.outputId"
@@ -154,18 +157,18 @@ export default class PidFull extends BlockCrudComponent {
         </q-item-section>
 
         <q-item-section>
-          <LabeledField :value="block.data.outputSetting" number label="Target value is" tag="b" />
+          <LabeledField :value="block.data.outputSetting" number label="Target value" tag="b" />
         </q-item-section>
 
         <q-item-section>
-          <LabeledField :value="block.data.outputValue" number label="Achieved value is" tag="b" />
+          <LabeledField :value="block.data.outputValue" number label="Achieved value" tag="b" />
         </q-item-section>
 
-        <q-item-section class="col-1 self-center">
-          <q-btn v-if="hasOutputBlock" flat icon="mdi-pencil" @click="showOutput">
-            <q-tooltip>Edit {{ outputId }}</q-tooltip>
+        <q-item-section class="col-1">
+          <q-btn v-if="!!outputBlock" flat icon="mdi-launch" @click="showOutput">
+            <q-tooltip>Edit {{ outputBlock.id }}</q-tooltip>
           </q-btn>
-          <q-btn v-else disable flat icon="mdi-pencil-off" />
+          <q-btn v-else disable flat icon="mdi-launch" />
         </q-item-section>
       </q-item>
       <q-separator inset />
@@ -189,6 +192,11 @@ export default class PidFull extends BlockCrudComponent {
           <SliderField
             :value="block.data.boilMinOutput"
             :decimals="0"
+            :quick-actions="[
+              { label: '0%', value: 0 },
+              { label: '50%', value: 50 },
+              { label: '100%', value: 100 },
+            ]"
             title="Minimum output"
             label="Minimum output when boiling"
             suffix="%"

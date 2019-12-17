@@ -11,8 +11,8 @@ import { typeName } from './getters';
 import { DigitalActuatorBlock } from './types';
 
 @Component
-export default class DigitalActuatorForm extends BlockCrudComponent {
-  readonly block!: DigitalActuatorBlock;
+export default class DigitalActuatorForm
+  extends BlockCrudComponent<DigitalActuatorBlock> {
 
   get hwBlock(): Block | null {
     const blockId = this.block.data.hwDevice.id;

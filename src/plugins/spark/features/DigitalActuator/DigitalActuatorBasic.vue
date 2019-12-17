@@ -6,8 +6,8 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DigitalActuatorBlock } from './types';
 
 @Component
-export default class DigitalActuatorBasic extends BlockCrudComponent {
-  readonly block!: DigitalActuatorBlock;
+export default class DigitalActuatorBasic
+  extends BlockCrudComponent<DigitalActuatorBlock> {
 }
 </script>
 
