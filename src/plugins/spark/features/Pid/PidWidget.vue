@@ -61,7 +61,8 @@ export default class PidWidget
         <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
           <template #actions>
             <ActionItem icon="mdi-vector-line" label="Relations" @click="showRelations" />
-            <ActionItem icon="mdi-cube-scan" label="Tuning view" @click="showShareDialog" />
+            <!-- TODO(Elco): decide what values should appear in tuning view -->
+            <!-- <ActionItem icon="mdi-cube-scan" label="Tuning view" @click="showShareDialog" /> -->
           </template>
         </component>
       </template>

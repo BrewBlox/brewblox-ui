@@ -1,6 +1,6 @@
+import escapeRegExp from 'lodash/escapeRegExp';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { } from 'quasar';
 
 import { sentenceCased } from '@/helpers/functional';
 import { prettify } from '@/helpers/units';
@@ -90,19 +90,19 @@ export const nodeBuilder =
       .map(([k, v]) => nodeRecurser([], k, v, partial));
   };
 
-export const expandedNodes =
+export const filteredNodes =
   (nodes: QuasarNode[], filter: string): string[] => {
-    const lowerFilter = filter.toLowerCase();
-    const compare = (node: QuasarNode): boolean => !!node.label.toLowerCase().match(lowerFilter);
+    const exp = new RegExp(escapeRegExp(filter), 'i');
+
+    const compare = (node: QuasarNode): boolean =>
+      exp.test(node.label) || exp.test(node.value);
 
     const checkNode = (node: QuasarNode): string[] => {
-      const vals = node.children
-        ? node.children.flatMap(n => checkNode(n))
-        : [];
-      if (node.children && node.children.some(compare)) {
-        vals.push(node.value);
+      const selected = (node.children ?? []).flatMap(checkNode);
+      if (selected.length > 0 || compare(node)) {
+        selected.push(node.value);
       }
-      return vals;
+      return selected;
     };
 
     return nodes.flatMap(n => checkNode(n));
