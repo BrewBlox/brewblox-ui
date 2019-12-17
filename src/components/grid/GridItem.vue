@@ -311,8 +311,7 @@ export default class GridItem extends Vue {
   </div>
 </template>
 
-<style lang="stylus" scoped>
-@import '../../styles/quasar.styl';
+<style lang="scss" scoped>
 
 .grid-item {
   position: relative;

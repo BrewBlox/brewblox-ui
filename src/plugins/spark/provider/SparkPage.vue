@@ -574,10 +574,7 @@ export default class SparkPage extends Vue {
   </div>
 </template>
 
-<style lang="stylus" scoped>
-@import '../../../styles/quasar.styl';
-@import '../../../styles/quasar.variables.styl';
-
+<style lang="scss" scoped>
 .widget-index {
   padding: 0;
 }

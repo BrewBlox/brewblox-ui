@@ -124,7 +124,7 @@ export default class GenericGraph extends Vue {
   />
 </template>
 
-<style lang="stylus">
+<style>
 .js-plotly-plot .plotly .modebar {
   left: 0px;
   background: transparent;
@@ -134,11 +134,12 @@ export default class GenericGraph extends Vue {
   fill: rgba(255, 255, 255, 0.6);
 }
 
-.js-plotly-plot .plotly .modebar-btn.active path, .js-plotly-plot .plotly .modebar-btn:hover path {
+.js-plotly-plot .plotly .modebar-btn.active path,
+.js-plotly-plot .plotly .modebar-btn:hover path {
   fill: rgba(255, 255, 255, 1);
 }
 
-/deep/ .xy2 {
+.xy2 {
   color: green;
 }
 </style>

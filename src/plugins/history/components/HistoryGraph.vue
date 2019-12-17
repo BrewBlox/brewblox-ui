@@ -185,7 +185,7 @@ export default class HistoryGraph extends Vue {
   </span>
 </template>
 
-<style scoped lang="stylus">
+<style scoped lang="scss">
 .graph-controls {
   position: absolute;
   top: 10px;

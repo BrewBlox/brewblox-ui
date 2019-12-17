@@ -17,6 +17,7 @@ If you're determined to make it work on either Windows or Mac, feel free to cont
 
 ``` bash
 # install dependencies
+$ npm install -g @quasar/cli
 $ npm install
 $ docker-compose pull
 

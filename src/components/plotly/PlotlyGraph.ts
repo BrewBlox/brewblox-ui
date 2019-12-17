@@ -130,7 +130,7 @@ export default class PlotlyGraph extends Vue {
     }
   }
 
-  get extendedConfig(): Partial<Config> {
+  private get extendedConfig(): Partial<Config> {
     return {
       ...this.config,
       modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],

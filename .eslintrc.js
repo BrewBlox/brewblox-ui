@@ -1,6 +1,6 @@
 module.exports = {
   'root': true,
-  'parser': 'vue-eslint-parser',
+  // 'parser': 'vue-eslint-parser',
   'parserOptions': {
     'ecmaVersion': 2018,
     'sourceType': 'module',
@@ -9,9 +9,10 @@ module.exports = {
   'extends': [
     'plugin:vue/recommended',
     'plugin:@typescript-eslint/recommended',
-    '@vue/typescript'
+    '@vue/typescript',
+    "plugin:quasar/standard",
   ],
-  'plugins': ['simple-import-sort'],
+  'plugins': ['simple-import-sort', 'quasar'],
   'rules': {
     'quotes': ['error', 'single', { 'avoidEscape': true }],
     'class-methods-use-this': 0,

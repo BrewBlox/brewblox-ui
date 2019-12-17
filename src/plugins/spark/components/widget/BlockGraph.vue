@@ -179,7 +179,7 @@ export default class BlockGraph extends Vue {
   </q-dialog>
 </template>
 
-<style scoped lang="stylus">
+<style scoped lang="scss">
 .mirrored {
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
