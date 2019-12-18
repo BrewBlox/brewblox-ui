@@ -87,24 +87,26 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       : '??';
   }
 
+  *sessionLines() {
+    yield '';
+    for (const note of this.notes) {
+      yield note.title;
+      yield '-'.repeat(note.title.length);
+      if (note.type === 'Text') {
+        yield note.value;
+      }
+      if (note.type === 'Graph') {
+        yield `${this.renderDate(note.start)} - ${this.renderDate(note.end)}`;
+      }
+      yield '';
+    }
+  }
+
   exportSession(): void {
     if (this.session === null) { return; }
     const session = this.session!;
     const name = `${this.widget.title} ${session.title} ${this.renderDate(session.date)}`;
-    const lines: string[] = [
-      name,
-      '',
-      ...this.notes.map(note => {
-        const title = `${note.title}\n${'-'.repeat(note.title.length)}`;
-        if (note.type === 'Text') {
-          return `${title}\n${note.value}\n`;
-        }
-        if (note.type === 'Graph') {
-          return `${title}\n${this.renderDate(note.start)} - ${this.renderDate(note.end)}\n`;
-        }
-        return title;
-      }),
-    ];
+    const lines: string[] = [name, ...this.sessionLines()];
     saveFile(marked(lines.join('\n')), `${name}.html`, true);
   }
 
