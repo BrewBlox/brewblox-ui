@@ -1,0 +1,6 @@
+{
+  "@quasar/typescript": {
+    "webpack": "plugin",
+    "prettier": false
+  }
+}

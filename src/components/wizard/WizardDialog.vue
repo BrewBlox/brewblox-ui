@@ -43,7 +43,7 @@ export default class WizardDialog extends DialogBase {
 
       <q-scroll-area v-else style="height: 80vh;">
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'QuickStartWizardPicker'">
+          <q-item clickable @click="wizardComponent = 'QuickStartWizardPicker'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Quick Start
@@ -65,7 +65,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'DashboardWizard'">
+          <q-item clickable @click="wizardComponent = 'DashboardWizard'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Dashboard
@@ -83,7 +83,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'WidgetWizardPicker'">
+          <q-item clickable @click="wizardComponent = 'WidgetWizardPicker'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Widget
@@ -108,7 +108,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'ImportWizard'">
+          <q-item clickable @click="wizardComponent = 'ImportWizard'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Import Widget
@@ -128,7 +128,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'ServiceWizardPicker'">
+          <q-item clickable @click="wizardComponent = 'ServiceWizardPicker'">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New service

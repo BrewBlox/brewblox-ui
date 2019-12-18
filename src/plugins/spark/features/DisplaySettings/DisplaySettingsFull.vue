@@ -19,7 +19,7 @@ export default class DisplaySettingsFull
     blockTypes.Pid,
   ];
 
-  get slots(): Array<any> {
+  get slots(): any[] {
     const slots = Array(6);
     this.block.data.widgets
       .forEach((w) => { slots[w.pos - 1] = w; });

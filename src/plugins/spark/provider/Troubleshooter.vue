@@ -178,19 +178,19 @@ export default class Troubleshooter extends Vue {
           <!-- awaiting handshake -->
           <span v-else-if="!lastStatus.handshake">
             Your Spark service is waiting for the controller handshake.
-            <br />
+            <br>
             <b>This status is usually temporary</b>
           </span>
           <!-- not compatible -->
           <span v-else-if="!lastStatus.compatible">
             Your Spark service is not compatible with the firmware
-            <br />
+            <br>
             <b>Please run brewblox-ctl update</b>
           </span>
           <!-- not valid -->
           <span v-else-if="!lastStatus.valid">
             The controller device ID doesn't match the service <i>--device-id</i> setting.
-            <br />
+            <br>
             <b>Please check your connection settings</b>
           </span>
           <!-- not synchronized -->

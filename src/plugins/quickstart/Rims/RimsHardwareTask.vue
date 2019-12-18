@@ -112,7 +112,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
-            Select which hardware should be used for each function.<br />
+            Select which hardware should be used for each function.<br>
             You can unplug or heat sensors to identify them.
             The current value will be shown under each dropdown menu.
           </p>

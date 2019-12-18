@@ -191,7 +191,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
           >
             <template #help>
               The unique identifier for your dashboard.
-              <br /> By default, this is an URL-safe version of the dashboard title.
+              <br> By default, this is an URL-safe version of the dashboard title.
             </template>
           </QuickStartNameField>
           <QuickStartNameField
@@ -202,8 +202,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
             :rules="nameRules"
             @clear="clearName(nKey)"
             @input="v => updateName(nKey, v)"
-          >
-          </QuickStartNameField>
+          />
         </q-expansion-item>
       </q-scroll-area>
     </q-card-section>

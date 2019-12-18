@@ -67,7 +67,7 @@ export default class PwmValues extends Vue {
         <svg>
           <PwmIcon stroke="white" class="q-ml-xs" x="12" />
         </svg>
-        <br />
+        <br>
         {{ pwmValue | truncateRound }}<small v-if="!!block" style="margin-left: 2px">%</small>
       </div>
     </foreignObject>

@@ -176,7 +176,7 @@ export default class DashboardPage extends Vue {
         <q-btn-dropdown color="primary" label="actions">
           <q-list>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
-            <q-item link clickable @click="toggleDefaultDashboard">
+            <q-item clickable @click="toggleDefaultDashboard">
               <q-item-section avatar>
                 <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
               </q-item-section>
@@ -188,7 +188,7 @@ export default class DashboardPage extends Vue {
           </q-list>
         </q-btn-dropdown>
       </portal>
-      <q-list v-if="isMobile" no-border>
+      <q-list v-if="isMobile">
         <q-item v-for="val in validatedWidgets" :key="val.id">
           <q-item-section>
             <component
@@ -220,6 +220,5 @@ export default class DashboardPage extends Vue {
   </q-page>
 </template>
 
-<style lang="stylus" scoped>
-@import '../styles/quasar.styl';
+<style scoped>
 </style>

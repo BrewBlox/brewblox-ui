@@ -84,7 +84,7 @@ export default class PwmPump extends PartBase {
   </g>
 </template>
 
-<style lang="stylus" scoped>
+<style lang="scss" scoped>
 /deep/ .ballLiquid path {
   stroke-width: 15px !important;
 }

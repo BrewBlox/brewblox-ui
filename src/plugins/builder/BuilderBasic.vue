@@ -233,6 +233,6 @@ export default class BuilderBasic extends CrudComponent<BuilderConfig> {
   </q-card>
 </template>
 
-<style lang="stylus" scoped>
-@import './grid.styl';
+<style lang="sass" scoped>
+@import './grid.sass';
 </style>

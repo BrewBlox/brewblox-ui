@@ -105,7 +105,7 @@ export default class ServiceWizardPicker extends Vue {
                 <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service ID is how the service is contacted.
-                    <br />This should match the ID in docker-compose.
+                    <br>This should match the ID in docker-compose.
                   </q-tooltip>
                 </q-icon>
               </template>
@@ -119,8 +119,8 @@ export default class ServiceWizardPicker extends Vue {
                 <q-icon name="mdi-information">
                   <q-tooltip>
                     The Service title is how the service is displayed in the UI.
-                    <br />This choice is purely graphical: pick a name that makes sense to you.
-                    <br />If left empty, the service ID will be used.
+                    <br>This choice is purely graphical: pick a name that makes sense to you.
+                    <br>If left empty, the service ID will be used.
                   </q-tooltip>
                 </q-icon>
               </template>

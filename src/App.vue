@@ -19,8 +19,6 @@ export default class App extends Vue {
   </div>
 </template>
 
-<style lang="stylus">
+<style lang="scss">
 // We import global styling here
-@import './styles/quasar.styl';
-@import './styles/quasar.variables.styl';
 </style>

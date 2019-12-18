@@ -34,10 +34,10 @@ export default class GraphCardWrapper extends Vue {
         <q-btn
           v-if="collapsed"
           key="show-button"
+          flat
           dense
           class="col-auto tab-show q-py-md q-mr-sm bg-dark"
           icon="mdi-chart-line"
-          flat
           @click="collapsed = false"
         >
           <q-tooltip>Show Graph</q-tooltip>
@@ -45,11 +45,10 @@ export default class GraphCardWrapper extends Vue {
         <q-btn
           v-else
           key="hide-button"
-          colog="primary"
+          flat
           dense
           class="col-auto tab-hide q-py-md q-ml-sm bg-dark"
           icon="mdi-arrow-collapse-left"
-          flat
           @click="collapsed = true"
         >
           <q-tooltip>Hide Graph</q-tooltip>

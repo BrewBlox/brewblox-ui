@@ -22,7 +22,7 @@ export default class InactiveObjectWidget extends BlockWidgetBase {
     <CardWarning v-if="!block.data.connected">
       <template #message>
         This {{ actualDisplayName }} block is disabled.
-        <br />To enable it, ensure that it is in an enabled group.
+        <br>To enable it, ensure that it is in an enabled group.
       </template>
     </CardWarning>
   </q-card>

@@ -203,79 +203,85 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     ];
 
   if (config.glycolControl === 'Control') {
-    blocks.push(
-      // Setpoint
-      {
-        id: config.names.glycolSetpoint,
-        type: blockTypes.SetpointSensorPair,
-        serviceId,
-        groups,
-        data: {
-          sensorId: new Link(config.names.glycolSensor),
-          storedSetting: glycolSetting,
-          settingEnabled: true,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.Filter15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
-          resetFilter: false,
-        },
-      } as SetpointSensorPairBlock,
-      {
-        id: config.names.glycolAct,
-        type: blockTypes.DigitalActuator,
-        serviceId,
-        groups,
-        data: {
-          hwDevice: new Link(config.glycolPin!.arrayId),
-          channel: config.glycolPin!.pinId,
-          invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
-          constrainedBy: {
-            constraints: [
-              { minOff: new Unit(300, 'second'), limiting: false },
-              { minOn: new Unit(180, 'second'), limiting: false },
-            ],
+    const glycolControlBlocks: [
+      SetpointSensorPairBlock,
+      DigitalActuatorBlock,
+      ActuatorPwmBlock,
+      PidBlock
+    ] = [
+        // Setpoint
+        {
+          id: config.names.glycolSetpoint,
+          type: blockTypes.SetpointSensorPair,
+          serviceId,
+          groups,
+          data: {
+            sensorId: new Link(config.names.glycolSensor),
+            storedSetting: glycolSetting,
+            settingEnabled: true,
+            setting: new Unit(null, 'degC'),
+            value: new Unit(null, 'degC'),
+            valueUnfiltered: new Unit(null, 'degC'),
+            filter: FilterChoice.Filter15s,
+            filterThreshold: new Unit(5, 'delta_degC'),
+            resetFilter: false,
           },
         },
-      } as DigitalActuatorBlock,
-
-      // PWM
-      {
-        id: config.names.glycolPwm,
-        type: blockTypes.ActuatorPwm,
-        serviceId,
-        groups,
-        data: {
-          enabled: true,
-          period: new Unit(30, 'minute'),
-          actuatorId: new Link(config.names.glycolAct),
-          drivenActuatorId: new Link(null),
-          setting: 0,
-          desiredSetting: 0,
-          value: 0,
-          constrainedBy: { constraints: [] },
+        // Digital actuator
+        {
+          id: config.names.glycolAct,
+          type: blockTypes.DigitalActuator,
+          serviceId,
+          groups,
+          data: {
+            hwDevice: new Link(config.glycolPin!.arrayId),
+            channel: config.glycolPin!.pinId,
+            invert: false,
+            desiredState: DigitalState.Inactive,
+            state: DigitalState.Inactive,
+            constrainedBy: {
+              constraints: [
+                { minOff: new Unit(300, 'second'), limiting: false },
+                { minOn: new Unit(180, 'second'), limiting: false },
+              ],
+            },
+          },
         },
-      } as ActuatorPwmBlock,
-
-      {
-        id: config.names.glycolPid,
-        type: blockTypes.Pid,
-        serviceId,
-        groups,
-        data: {
-          ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
-          kp: new Unit(-20, '1/degC'),
-          ti: new Unit(2, 'hour'),
-          td: new Unit(5, 'min'),
-          enabled: true,
-          inputId: new Link(config.names.glycolSetpoint),
-          outputId: new Link(config.names.glycolPwm),
+        // PWM
+        {
+          id: config.names.glycolPwm,
+          type: blockTypes.ActuatorPwm,
+          serviceId,
+          groups,
+          data: {
+            enabled: true,
+            period: new Unit(30, 'minute'),
+            actuatorId: new Link(config.names.glycolAct),
+            drivenActuatorId: new Link(null),
+            setting: 0,
+            desiredSetting: 0,
+            value: 0,
+            constrainedBy: { constraints: [] },
+          },
         },
-      } as PidBlock,
-    );
+        {
+          id: config.names.glycolPid,
+          type: blockTypes.Pid,
+          serviceId,
+          groups,
+          data: {
+            ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+            kp: new Unit(-20, '1/degC'),
+            ti: new Unit(2, 'hour'),
+            td: new Unit(5, 'min'),
+            enabled: true,
+            inputId: new Link(config.names.glycolSetpoint),
+            outputId: new Link(config.names.glycolPwm),
+          },
+        },
+      ];
+
+    blocks.push(...glycolControlBlocks);
   }
 
   return config.heated

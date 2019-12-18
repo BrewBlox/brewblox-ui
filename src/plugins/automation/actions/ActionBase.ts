@@ -8,11 +8,11 @@ export default class ActionBase<T = any> extends Vue {
   @Prop({ type: Object, required: true })
   public readonly action!: StepAction<T>;
 
-  saveAction(action: StepAction<T> = this.action): void {
+  public saveAction(action: StepAction<T> = this.action): void {
     this.$emit('update:action', action);
   }
 
-  get opts(): T {
+  public get opts(): T {
     return this.action.opts;
   }
 }
