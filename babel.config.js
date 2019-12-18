@@ -1,8 +1,6 @@
 module.exports = {
-  presets: ['@quasar/babel-preset-app'],
-  plugins: [
-    '@babel/plugin-syntax-dynamic-import',
-    '@babel/plugin-proposal-optional-chaining',
-    '@babel/plugin-proposal-nullish-coalescing-operator',
+  extends: './.babelrc',
+  presets: [
+    '@quasar/babel-preset-app',
   ],
 };

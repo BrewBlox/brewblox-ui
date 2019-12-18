@@ -10,7 +10,7 @@ module.exports = {
     'plugin:vue/recommended',
     'plugin:@typescript-eslint/recommended',
     '@vue/typescript',
-    "plugin:quasar/standard",
+    'plugin:quasar/standard',
   ],
   'plugins': ['simple-import-sort', 'quasar'],
   'rules': {
@@ -30,7 +30,12 @@ module.exports = {
     'no-param-reassign': 0,
     'no-console': 'warn',
     'no-multiple-empty-lines': 'error',
-    'vue/max-attributes-per-line': ['warn', {
+    "vue/max-attributes-per-line": ["warn", {
+      "singleline": 8,
+      "multiline": {
+        "max": 1,
+        "allowFirstLine": false
+      },
       'order': [
         'DEFINITION',
         'LIST_RENDERING',
@@ -44,13 +49,6 @@ module.exports = {
         'EVENTS',
         'CONTENT'
       ]
-    }],
-    "vue/max-attributes-per-line": ["warn", {
-      "singleline": 8,
-      "multiline": {
-        "max": 1,
-        "allowFirstLine": false
-      }
     }],
     'comma-dangle': [
       'error',
