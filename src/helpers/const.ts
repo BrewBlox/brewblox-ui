@@ -1,2 +1,4 @@
 
-export const HOST = `https://${window.location.hostname}:${process.env.BLOX_API_PORT ?? 443}`;
+export const HOST = process.env.BLOX_API_PORT
+  ? `https://${window.location.hostname}:${process.env.BLOX_API_PORT}`
+  : `https://${window.location.host}`;

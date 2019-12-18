@@ -18,12 +18,11 @@
     "serve": "quasar dev",
     "start": "npm run compose:new && npm run serve",
     "build": "quasar build",
-    "devbuild": "rm -r dev/dist/*; quasar build --dest dev/dist/ --no-clean",
+    "devbuild": "rm -r dev/dist/*; quasar build && cp -r dist/* dev/dist/",
     "test": "npm run cert:check && quasar test",
     "test:watch": "quasar test --watchAll",
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ./src",
-    "fix": "npm run lint -- --fix",
-    "validate": "tsc --noEmit"
+    "fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "@quasar/extras": "^1.3.3",

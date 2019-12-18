@@ -147,9 +147,14 @@ module.exports = function (ctx) {
       publicPath: '/ui/',
       vueRouterMode: 'history',
 
-      analyze: true,
+      distDir: 'dist',
+      analyze: false,
       gzip: true,
       extractCSS: true,
+
+      devtool: ctx.dev
+        ? 'cheap-module-eval-source-map'
+        : undefined,
 
       env: ctx.dev
         ? {
@@ -171,9 +176,6 @@ module.exports = function (ctx) {
             .options
             .terserOptions
             .keep_fnames = true;
-        }
-        else {
-          config.devtool = 'cheap-module-eval-source-map';
         }
       },
 
