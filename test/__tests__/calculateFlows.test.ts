@@ -185,7 +185,7 @@ describe('A single path without splits', () => {
   });
 
   it('Should have a friction value of 3', () => {
-    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    const { friction } = path.friction({ pressureDiff: 0, friction: 0 });
     expect(friction).toEqual(3);
   });
 
@@ -342,7 +342,7 @@ describe('A path with a split, but no joins', () => {
   });
 
   it('Should have a friction value of 3.25', () => {
-    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    const { friction } = path.friction({ pressureDiff: 0, friction: 0 });
     expect(friction).toEqual(3.25);
   });
 
@@ -839,7 +839,7 @@ describe('Two sources joining', () => {
   });
 
   it('Should have the expected friction for that path', () => {
-    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    const { friction } = path.friction({ pressureDiff: 0, friction: 0 });
     expect(friction).toBe(3.75);
   });
 
