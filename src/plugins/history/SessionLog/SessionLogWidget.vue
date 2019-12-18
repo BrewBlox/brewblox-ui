@@ -100,7 +100,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
           return `${title}\n${note.value}\n`;
         }
         if (note.type === 'Graph') {
-          return `${title}\n${this.renderDate(note.start)} - ${this.renderDate(note.end)}`;
+          return `${title}\n${this.renderDate(note.start)} - ${this.renderDate(note.end)}\n`;
         }
         return title;
       }),
