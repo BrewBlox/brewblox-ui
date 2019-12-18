@@ -167,6 +167,7 @@ module.exports = function (ctx) {
 
       extendWebpack: config => {
         config.plugins.push(new IgnoreNotFoundExportPlugin());
+        config.performance.hints = ctx.prod ? 'warning' : false;
 
         if (ctx.prod) {
           // Function names are required to set up functions for VueX functionality
