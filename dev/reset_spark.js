@@ -1,15 +1,14 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const request = require('request-promise-native');
-require('dotenv').config({ path: '.env.development' });
-/* eslint-enable */
 
 // Ignore errors about our self-signed certificate
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
 const fileName = process.argv[2];
 const service = process.argv[3];
-const host = process.env.VUE_APP_API_URI;
+const host = 'https://localhost:9001';
 
 const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 

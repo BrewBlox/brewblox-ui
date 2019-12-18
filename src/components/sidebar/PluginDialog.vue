@@ -68,7 +68,7 @@ export default class PluginDialog extends DialogBase {
             </template>
             <template v-else>
               <q-tooltip>{{ result.error }}</q-tooltip>
-              <q-icon name="warning" color="warning"></q-icon>
+              <q-icon name="warning" color="warning" />
             </template>
           </q-item-section>
           <q-item-section>
@@ -85,7 +85,7 @@ export default class PluginDialog extends DialogBase {
           </q-item-section>
         </q-item>
         <q-item>
-          <q-item-section></q-item-section>
+          <q-item-section />
           <q-item-section class="col-auto">
             <q-tooltip>Add plugin</q-tooltip>
             <q-btn flat icon="add" @click="addPlugin" />

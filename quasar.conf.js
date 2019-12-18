@@ -4,8 +4,22 @@
 const { gitDescribeSync } = require('git-describe');
 const fs = require('fs');
 const path = require('path');
+const IgnoreNotFoundExportPlugin = require('./build/ignore-not-found');
 
 module.exports = function (ctx) {
+  const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
+  const gitVersion = `"${gitInfo.semverString}"`;
+  const buildDate = `"${new Date().toString()}"`;
+
+  const sharedEnv = {
+    BLOX_VERSION: gitVersion,
+    BLOX_DATE: buildDate,
+    BLOX_API_HOST: null,
+    API_PORT: null,
+    BLOX_PERFORMANCE: false,
+    BLOX_FEATURE_AUTOMATION: false,
+  };
+
   return {
     preFetch: false,
     supportIE: false,
@@ -39,7 +53,6 @@ module.exports = function (ctx) {
 
     framework: {
       all: false,
-      dark: true,
 
       components: [
         'QBadge',
@@ -107,10 +120,10 @@ module.exports = function (ctx) {
       plugins: ['Cookies', 'Notify', 'Dialog'],
 
       config: {
+        dark: true,
         notify: { message: '', color: 'info' },
       },
     },
-
 
     devServer: {
       open: false,
@@ -123,18 +136,33 @@ module.exports = function (ctx) {
     },
 
     build: {
+      // Do not open a browser window after build is done
       open: false,
+
+      // Setting scopeHoisting to true hides all TS error messages
       scopeHoisting: false,
-      // scopeHoisting: true,
+
+      // Root path for the UI is /ui/ to prevent the backend proxy to having to route
+      // wildcard requests to the UI
       publicPath: '/ui/',
-      analyze: true,
-      // vueCompiler: true,
-      // preloadChunks: false,
       vueRouterMode: 'history',
+
+      analyze: true,
       gzip: true,
       extractCSS: true,
 
+      env: ctx.dev
+        ? {
+          ...sharedEnv,
+          BLOX_API_PORT: 9001,
+        }
+        : {
+          ...sharedEnv,
+        },
+
       extendWebpack: config => {
+        config.plugins.push(new IgnoreNotFoundExportPlugin());
+
         if (ctx.prod) {
           // Function names are required to set up functions for VueX functionality
           config
@@ -147,8 +175,6 @@ module.exports = function (ctx) {
         else {
           config.devtool = 'cheap-module-eval-source-map';
         }
-
-        config.context = __dirname;
       },
 
       //
@@ -156,41 +182,12 @@ module.exports = function (ctx) {
       //
       /** @type { import("webpack-chain") } */
       chainWebpack: config => {
-
-        // This setting is useless for a SPA that loads most of its code on startup
-        // config.plugins.delete('prefetch');
-
         // We're only using a subset from plotly
         // Add alias to enable typing regardless
         config.resolve.alias.set('plotly.js', 'plotly.js-basic-dist');
 
+        // This matches the @ alias set in tsconfig.json
         config.resolve.alias.set('@', path.resolve(__dirname, './src'));
-
-        // enable ts checking
-        // config.module
-        //   .rule('typescript')
-        //   .test(/\.tsx?$/)
-        //   .use('ts-loader')
-        //   .loader('ts-loader')
-        //   .tap(options => ({
-        //     ...options,
-        //     transpileOnly: true,
-        //     appendTsSuffixTo: [/\.vue$/],
-        //   }));
-
-        config.module.rules.delete('eslint');
-
-        // Write git version to a file that can be imported
-        // src/build-env.json is gitignored, and will be replaced every time
-        config
-          .plugin('define')
-          .tap((args) => {
-            const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
-            const version = gitInfo.semverString;
-            const date = new Date().toString();
-            fs.writeFileSync(path.resolve(__dirname, 'src/build-env.json'), JSON.stringify({ version, date }));
-            return args;
-          });
       },
     },
   };

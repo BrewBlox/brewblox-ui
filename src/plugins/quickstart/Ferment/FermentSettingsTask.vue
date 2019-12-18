@@ -71,7 +71,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
           <p>
             To change which temperature is actively controlled,
             you will change which setpoint is used as input by the PIDs.
-            The quick actions on your dashboard will help you switch and reconfigure the PIDs.<br />
+            The quick actions on your dashboard will help you switch and reconfigure the PIDs.<br>
           </p>
           <p>You can set the initial values now.</p>
         </q-item-section>

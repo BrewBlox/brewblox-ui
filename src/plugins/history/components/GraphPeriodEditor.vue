@@ -129,8 +129,8 @@ export default class GraphPeriodEditor extends Vue {
           <template #append>
             <q-icon name="mdi-chart-timeline" size="sm">
               <q-tooltip>
-                <i>To improve performance, the history service automatically selects an averaging period.</i> <br />
-                <i>One point is returned per period, with the average value of all points in that period.</i> <br />
+                <i>To improve performance, the history service automatically selects an averaging period.</i> <br>
+                <i>One point is returned per period, with the average value of all points in that period.</i> <br>
                 <div class="row q-mt-sm ">
                   <LabeledField
                     v-for="(rate, meas) in downsampling"

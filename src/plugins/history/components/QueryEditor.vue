@@ -128,7 +128,7 @@ export default class QueryEditor extends Vue {
           </template>
           <q-tooltip>
             Only fields that have been updated the last 24 hours are shown.
-            <br />This includes renamed or deleted blocks.
+            <br>This includes renamed or deleted blocks.
           </q-tooltip>
         </q-input>
       </q-item-section>

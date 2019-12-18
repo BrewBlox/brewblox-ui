@@ -46,7 +46,7 @@ export default class DrivenIndicator extends Vue {
 </script>
 
 <template>
-  <q-list no-border>
+  <q-list>
     <q-item
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"

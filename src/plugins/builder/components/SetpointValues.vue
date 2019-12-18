@@ -98,7 +98,7 @@ export default class SetpointValues extends Vue {
         <q-icon name="mdi-thermometer" class="q-mr-sm" />
         {{ setpointValue | round(1) }}
         <small>{{ setpointUnit }}</small>
-        <br />
+        <br>
         <q-icon :name="isDriven ? 'mdi-swap-vertical-bold' : 'mdi-bullseye-arrow'" class="q-mr-sm" />
         {{ setpointSetting | round(1) }}
         <small>{{ setpointUnit }}</small>

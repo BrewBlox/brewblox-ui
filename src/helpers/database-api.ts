@@ -5,7 +5,7 @@ import { deserialize, serialize } from './units/parseObject';
 type ChangeCallback = (doc: any) => void;
 type DeleteCallback = (id: string) => void;
 
-export type DatabaseApi<T> = {
+export interface DatabaseApi<T> {
   setup(onChanged: ChangeCallback, onDeleted: DeleteCallback): void;
   fetch(): Promise<T[]>;
   fetchById(id: string): Promise<T>;

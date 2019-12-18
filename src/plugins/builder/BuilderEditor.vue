@@ -989,7 +989,7 @@ export default class BuilderEditor extends DialogBase {
 </template>
 
 <style lang="scss" scoped>
-@import './grid.sass';
+@import "./grid.sass";
 
 .editor-card {
   outline: none;

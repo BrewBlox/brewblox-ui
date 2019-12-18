@@ -187,7 +187,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
           >
             <template #help>
               The unique identifier for your dashboard.
-              <br /> By default, this is an URL-safe version of the dashboard title.
+              <br> By default, this is an URL-safe version of the dashboard title.
             </template>
           </QuickStartNameField>
           <QuickStartNameField
@@ -198,8 +198,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
             :rules="nameRules"
             @clear="clearName(nKey)"
             @input="v => updateName(nKey, v)"
-          >
-          </QuickStartNameField>
+          />
         </q-expansion-item>
       </q-scroll-area>
     </q-card-section>

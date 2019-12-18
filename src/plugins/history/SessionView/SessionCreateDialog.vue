@@ -72,7 +72,7 @@ export default class SessionCreateDialog extends DialogBase {
   >
     <DialogCard title="Create new session">
       <template #message>
-        Pick a name for your new Session. <br />
+        Pick a name for your new Session. <br>
         If you want, you can import configuration from a Graph Widget.
       </template>
       <q-input v-model="sessionName" label="Session name" />

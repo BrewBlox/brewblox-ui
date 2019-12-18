@@ -2,6 +2,7 @@ import PortalVue from 'portal-vue';
 import { PluginObject } from 'vue';
 
 import { externalComponent } from '@/helpers/component-ref';
+import { HOST } from '@/helpers/const';
 import automation from '@/plugins/automation';
 import builder from '@/plugins/builder';
 import database from '@/plugins/database';
@@ -37,14 +38,11 @@ async function setup(Vue): Promise<void> {
   Object.defineProperty(window, 'Vue', { value: Vue });
 
   // Enable the Vue devtools performance tab
-  Vue.config.performance = (
-    process.env.NODE_ENV === 'development'
-    && process.env.VUE_APP_PERFORMANCE === 'true'
-  );
+  Vue.config.performance = process.env.DEV && process.env.BLOX_PERFORMANCE;
 
   // Install the database. We need it to fetch remote plugins
   Vue.use(database, {
-    host: process.env.VUE_APP_API_URI || window.location.origin,
+    host: HOST,
     name: 'brewblox-ui-store',
   });
 
