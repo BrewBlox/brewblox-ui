@@ -6,7 +6,7 @@ import { createDialog } from '@/helpers/dialog';
 import { shortDateString, spliceById } from '@/helpers/functional';
 
 import { historyStore } from '../store';
-import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
+import { GraphAnnotation, LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
 import SessionHeaderField from './SessionHeaderField.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
@@ -44,6 +44,11 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     this.saveSession();
   }
 
+  saveAnnotations(note: SessionGraphNote, annotations: GraphAnnotation[]): void {
+    note.config.layout.annotations = annotations;
+    this.saveNote(note);
+  }
+
   openNote(note: SessionNote): void {
     if (note.type === 'Text') {
       createDialog({
@@ -62,6 +67,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
         component: 'GraphDialog',
         parent: this,
         graphId: note.id,
+        saveAnnotations: v => this.saveAnnotations(note, v),
         config: {
           ...note.config,
           params: {

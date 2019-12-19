@@ -170,6 +170,8 @@ export default class HistoryGraph extends Vue {
       :data="graphData"
       :layout="graphLayout"
       :revision="revision"
+      v-bind="$attrs"
+      v-on="$listeners"
     />
     <!-- Error message -->
     <q-item v-else class="absolute-center">

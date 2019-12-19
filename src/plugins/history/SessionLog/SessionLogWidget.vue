@@ -97,6 +97,11 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       }
       if (note.type === 'Graph') {
         yield `${this.renderDate(note.start)} - ${this.renderDate(note.end)}`;
+        yield '';
+        for (const annotation of note.config.layout?.annotations ?? []) {
+          yield `${annotation.x} :: ${annotation.text}`;
+          yield '';
+        }
       }
       yield '';
     }
