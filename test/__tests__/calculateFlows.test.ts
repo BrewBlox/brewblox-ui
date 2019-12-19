@@ -1450,3 +1450,130 @@ describe('A kettle with flow back to itself', () => {
   });
 });
 
+
+describe('A kettle with flow back to itself', () => {
+  let parts: PersistentPart[] = [
+    {
+      'id': '1',
+      'rotate': 0,
+      'settings': { 'sizeX': 2, 'sizeY': 3, 'emptySpace': 0, 'color': '#69bcff', 'fillPct': 100 },
+      'flipped': false,
+      'type': 'Kettle',
+      'x': 2,
+      'y': 0,
+    },
+    {
+      'id': '2',
+      'rotate': 0,
+      'settings': {},
+      'flipped': false,
+      'type': 'ElbowTube',
+      'x': 0,
+      'y': 2,
+    }, {
+      'id': '3',
+      'rotate': 90,
+      'settings': {},
+      'flipped': false,
+      'type': 'ElbowTube',
+      'x': 0,
+      'y': 0,
+    },
+    {
+      'id': '4',
+      'rotate': 0,
+      'settings': {},
+      'flipped': false,
+      'type': 'TeeTube',
+      'x': 1,
+      'y': 2,
+    },
+    {
+      'id': '5',
+      'rotate': 180,
+      'settings': {},
+      'flipped': false,
+      'type': 'TeeTube',
+      'x': 1,
+      'y': 0,
+    },
+    {
+      'id': '6',
+      'rotate': 0,
+      'settings': {},
+      'flipped': false,
+      'type': 'StraightInletTube',
+      'x': 2,
+      'y': 0,
+    },
+    {
+      'id': '7',
+      'rotate': 0,
+      'settings': {},
+      'flipped': false,
+      'type': 'StraightInletTube',
+      'x': 2,
+      'y': 2,
+    },
+  ];
+
+
+  describe('with both pumps disabled', () => {
+    parts = [...parts,
+    {
+      'id': '8',
+      'rotate': 90,
+      'settings': { 'enabled': false },
+      'flipped': false,
+      'type': 'Pump',
+      'x': 1,
+      'y': 1,
+    },
+    {
+      'id': '9',
+      'rotate': 90,
+      'settings': { 'enabled': false },
+      'flipped': false,
+      'type': 'Pump',
+      'x': 0,
+      'y': 1,
+    }];
+
+    const flowParts = asFlowParts(parts.map(asStatePart));
+    it('Should have liquid but no flow', () => {
+      const start = flowParts[0];
+
+      const path = findPaths(flowParts, start)[0];
+
+      const visitedTypes = propertyWalker([], path, ['root', 'type']);
+      expect(visitedTypes).toEqual(
+        [
+          'Kettle',
+          'StraightInletTube',
+          'TeeTube',
+          'TeeTube',
+          [
+            [
+              'Pump',
+              'TeeTube',
+            ],
+            [
+              'ElbowTube',
+              'Pump',
+              'ElbowTube',
+              'TeeTube',
+            ],
+          ],
+          'TeeTube',
+          'StraightInletTube',
+          'Kettle',
+        ]);
+
+
+      const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+      expect(friction).toEqual(1 + 0.5 + 0.5 + (1.5 * 3.5) / (1.5 + 3.5) + 0.5 + 1);
+      expect(pressureDiff).toEqual(0);
+    });
+  });
+});
+
