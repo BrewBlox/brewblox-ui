@@ -6,7 +6,7 @@ import Automation from './Automation';
 
 export default {
   install() {
-    if (process.env.BLOX_FEATURE_AUTOMATION) {
+    if (!process.env.BLOX_FEATURE_AUTOMATION) {
       return;
     }
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
