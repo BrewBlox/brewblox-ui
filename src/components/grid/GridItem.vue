@@ -293,17 +293,17 @@ export default class GridItem extends Vue {
       v-touch-pan.mouse="movePanHandler"
       class="grid-item-move-handle grid-item-movable"
     >
-      <div class="row">
-        <div class="column">
-          <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed" />
-          <p class="shadowed">
-            drag
-          </p>
-        </div>
+      <div class="column">
+        <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed self-center" />
+        <p class="col-auto text-center shadowed">
+          Drag to reposition
+        </p>
         <q-btn
           :icon="widget.pinnedPosition ? 'mdi-pin-off' : 'mdi-pin'"
-          fab
+          :label="widget.pinnedPosition ? 'Unpin' : 'Pin'"
+          unelevated
           color="primary"
+          class="self-center q-mt-sm"
           @click="() => (widget.pinnedPosition ? unpin : pin)()"
         />
       </div>
@@ -311,8 +311,7 @@ export default class GridItem extends Vue {
   </div>
 </template>
 
-<style lang="stylus" scoped>
-@import '../../styles/quasar.styl';
+<style lang="scss" scoped>
 
 .grid-item {
   position: relative;
@@ -340,7 +339,7 @@ export default class GridItem extends Vue {
   left: 0;
   top: 0;
   position: absolute;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.4);
   color: #fff;
   display: flex;
   align-items: center;

@@ -12,6 +12,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
 import WizardTaskBase from '../components/WizardTaskBase';
+import { maybeSpace } from '../helpers';
 import { RimsBlockNames, RimsConfig } from './types';
 
 
@@ -86,7 +87,7 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
   get names(): RimsBlockNames {
     return {
       ...mapValues(this.defaultNames,
-        v => suggestId(`${this.prefix} ${v}`, validator(blockIdRules(this.serviceId)))),
+        v => suggestId(maybeSpace(this.prefix, v), validator(blockIdRules(this.serviceId)))),
       ...this.chosenNames,
     };
   }
@@ -169,17 +170,10 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
             The name for the new dashboard.
           </template>
         </QuickStartNameField>
-        <QuickStartNameField
+        <QuickStartPrefixField
           v-model="prefix"
-          optional
-          label="Prefix for names"
           @clear="clearKey('prefix')"
-        >
-          <template #help>
-            By default all block names are prefixed.
-            You can override this for individual blocks.
-          </template>
-        </QuickStartNameField>
+        />
 
         <!-- Block names -->
         <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
@@ -191,7 +185,7 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
           >
             <template #help>
               The unique identifier for your dashboard.
-              <br /> By default, this is an URL-safe version of the dashboard title.
+              <br> By default, this is an URL-safe version of the dashboard title.
             </template>
           </QuickStartNameField>
           <QuickStartNameField
@@ -202,8 +196,7 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
             :rules="nameRules"
             @clear="clearName(nKey)"
             @input="v => updateName(nKey, v)"
-          >
-          </QuickStartNameField>
+          />
         </q-expansion-item>
       </q-scroll-area>
     </q-card-section>

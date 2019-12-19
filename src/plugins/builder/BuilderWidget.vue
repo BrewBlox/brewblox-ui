@@ -70,8 +70,6 @@ export default class BuilderWidget extends WidgetBase {
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ActionItem icon="mdi-pipe" label="Builder Editor" @click="startEditor" />
-          <ExportAction :crud="crud" />
-          <WidgetActions :crud="crud" />
         </template>
       </component>
     </template>

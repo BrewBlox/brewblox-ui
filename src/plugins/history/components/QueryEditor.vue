@@ -6,7 +6,7 @@ import { Watch } from 'vue-property-decorator';
 
 import {
   defaultLabel,
-  expandedNodes,
+  filteredNodes,
   nodeBuilder,
   QuasarNode,
   targetBuilder,
@@ -30,7 +30,7 @@ export default class QueryEditor extends Vue {
   @Watch('selectFilter')
   updateExpanded(filter: string): void {
     if (filter) {
-      this.expandedKeys = expandedNodes(this.nodes, filter);
+      this.expandedKeys = filteredNodes(this.nodes, filter);
     }
   }
 
@@ -128,7 +128,7 @@ export default class QueryEditor extends Vue {
           </template>
           <q-tooltip>
             Only fields that have been updated the last 24 hours are shown.
-            <br />This includes renamed or deleted blocks.
+            <br>This includes renamed or deleted blocks.
           </q-tooltip>
         </q-input>
       </q-item-section>
@@ -139,15 +139,15 @@ export default class QueryEditor extends Vue {
         ref="tree"
         :nodes="nodes"
         :ticked.sync="ticked"
-        :filter="selectFilter"
         :expanded.sync="expandedKeys"
+        :filter="selectFilter"
         :filter-method="nodeFilter"
-        tick-strategy="leaf-filtered"
+        tick-strategy="leaf"
         node-key="value"
       >
-        <template #header-leaf="{node}">
+        <template #header-leaf="props">
           <div class="editable q-py-xs leaf-node-header">
-            <slot name="leaf" :node="node" />
+            <slot name="leaf" :node="props.node" />
           </div>
         </template>
       </q-tree>

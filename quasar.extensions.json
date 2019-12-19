@@ -1,0 +1,18 @@
+{
+  "@quasar/typescript": {
+    "webpack": "plugin",
+    "prettier": false
+  },
+  "@quasar/testing": {
+    "harnesses": [
+      "unit-jest"
+    ]
+  },
+  "@quasar/testing-unit-jest": {
+    "babel": "babelrc",
+    "options": [
+      "scripts",
+      "SFC"
+    ]
+  }
+}

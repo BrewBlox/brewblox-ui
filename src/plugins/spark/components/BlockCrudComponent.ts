@@ -96,6 +96,12 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
     await this.crud.saveBlock(block);
   }
 
+  public async saveStoreBlock(block: Block | null): Promise<void> {
+    if (block !== null) {
+      await sparkStore.saveBlock([block.serviceId, block]);
+    }
+  }
+
   public async removeBlock(): Promise<void> {
     if (this.isStoreBlock) {
       await sparkStore.removeBlock([this.serviceId, this.block]);
@@ -169,26 +175,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
         await this.changeBlockId(newId);
         this.closeDialog();
       });
-  }
-
-  public startSwitchBlock(): void {
-    createDialog({
-      parent: this,
-      component: 'BlockSelectDialog',
-      title: 'Choose a Block',
-      message: 'You can change the Block that will be displayed by this widget',
-      filter: block => block.type === this.block.type,
-      serviceId: this.block.serviceId,
-    })
-      .onOk(block => this.switchBlock(block.id));
-  }
-
-  public startBlockInfo(): void {
-    createDialog({
-      parent: this,
-      component: 'BlockInfoDialog',
-      block: this.block,
-    });
   }
 
   public exportBlock(): void {

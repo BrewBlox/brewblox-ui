@@ -1,4 +1,4 @@
-import { Layout } from 'plotly.js';
+import { Annotations, Layout } from 'plotly.js';
 
 export interface QueryParams {
   database?: string;
@@ -70,6 +70,8 @@ export interface MetricsResult {
 export interface MetricsSource extends HistorySource {
   transformer: (source: MetricsSource, result: MetricsResult[]) => HistorySource;
 }
+
+export type GraphAnnotation = Partial<Annotations>;
 
 export interface GraphConfig extends QueryConfig {
   layout: Partial<Layout>;

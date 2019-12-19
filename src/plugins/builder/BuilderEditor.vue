@@ -988,8 +988,8 @@ export default class BuilderEditor extends DialogBase {
   </q-dialog>
 </template>
 
-<style lang="stylus" scoped>
-@import './grid.styl';
+<style lang="scss" scoped>
+@import "./grid.sass";
 
 .editor-card {
   outline: none;

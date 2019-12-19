@@ -228,7 +228,6 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
         <ActionItem icon="settings" label="Editor" @click="startEditor" />
         <ActionItem icon="add" label="New" @click="make" />
         <ActionItem icon="delete" label="Clear" @click="clear" />
-        <WidgetActions :crud="crud" />
       </template>
     </component>
 

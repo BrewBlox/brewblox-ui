@@ -122,7 +122,6 @@ export default class DashboardIndex extends Vue {
           <q-menu :offset="[-50, 0]">
             <q-list bordered>
               <q-item
-                link
                 clickable
                 @click="toggleDefaultDashboard(dashboard)"
               >

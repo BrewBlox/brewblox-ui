@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-console */
 const request = require('request-promise-native');
-require('dotenv').config({ path: '.env.development' });
-/* eslint-enable */
 
 // Ignore errors about our self-signed certificate
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
-const host = `${process.env.VUE_APP_API_URI}/datastore`;
+const host = 'https://localhost:9001/datastore';
 
 const sleep = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 

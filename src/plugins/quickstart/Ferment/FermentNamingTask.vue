@@ -172,17 +172,10 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
             The name for the new dashboard.
           </template>
         </QuickStartNameField>
-        <QuickStartNameField
+        <QuickStartPrefixField
           v-model="prefix"
-          optional
-          label="Prefix for names"
           @clear="clearKey('prefix')"
-        >
-          <template #help>
-            By default all block names are prefixed.
-            You can override this for individual blocks.
-          </template>
-        </QuickStartNameField>
+        />
 
         <!-- Block names -->
         <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
@@ -194,7 +187,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
           >
             <template #help>
               The unique identifier for your dashboard.
-              <br /> By default, this is an URL-safe version of the dashboard title.
+              <br> By default, this is an URL-safe version of the dashboard title.
             </template>
           </QuickStartNameField>
           <QuickStartNameField
@@ -205,8 +198,7 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
             :rules="nameRules"
             @clear="clearName(nKey)"
             @input="v => updateName(nKey, v)"
-          >
-          </QuickStartNameField>
+          />
         </q-expansion-item>
       </q-scroll-area>
     </q-card-section>

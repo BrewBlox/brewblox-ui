@@ -49,7 +49,6 @@ export default class SessionHeaderField extends Vue {
         <q-badge
           v-for="tag in tags"
           :key="`tag--${tag}`"
-          dense
           color="blue-grey-7"
         >
           <small>{{ tag }}</small>

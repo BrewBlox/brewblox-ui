@@ -1,6 +1,6 @@
 import { blockTypes } from '@/plugins/spark/block-types';
 
-import { showLinkedBlockDialog } from '../helpers';
+import { showDrivingBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
 const SIZE_X = 1;
@@ -15,7 +15,7 @@ const spec: PartSpec = {
     props: { settingsKey: 'pwm', types: [blockTypes.ActuatorPwm], label: 'PWM' },
   }],
   size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'pwm'),
+  interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, 'pwm'),
 };
 
 export default spec;

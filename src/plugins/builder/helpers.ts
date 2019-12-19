@@ -148,19 +148,40 @@ export function elbow(dX: number, dY: number, horizontal: boolean): string {
   return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
 }
 
+export function showAbsentBlock(part: PersistentPart, key: string): void {
+  const link = settingsLink(part, key);
+  if (!!link.serviceId && !!link.blockId) {
+    createDialog({
+      title: 'Broken Link',
+      message: `Block '${link.blockId}' was not found. Use the editor to change the link.`,
+    });
+  }
+}
+
 export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
   const block = settingsBlock(part, key);
-  if (block) {
-    showBlockDialog(block, { mode: 'Basic' });
+  block !== null
+    ? showBlockDialog(block, { mode: 'Basic' })
+    : showAbsentBlock(part, key);
+}
+
+export function showDrivingBlockDialog(part: PersistentPart, key: string): void {
+  const block = settingsBlock(part, key);
+
+  if (!block) {
+    return showAbsentBlock(part, key);
   }
-  else {
-    const link = settingsLink(part, key);
-    if (!!link.serviceId && !!link.blockId) {
-      createDialog({
-        title: 'Broken Link',
-        message: `Block '${link.blockId}' was not found. Use the editor to change the link.`,
-      });
-    }
+
+  const driveChain = sparkStore
+    .drivenChains(block.serviceId)
+    .find(chain => chain[0] === block.id);
+
+  const actual = driveChain !== undefined
+    ? sparkStore.tryBlockById(block.serviceId, driveChain[driveChain.length - 1])
+    : block;
+
+  if (actual) {
+    showBlockDialog(actual, { mode: 'Basic' });
   }
 }
 

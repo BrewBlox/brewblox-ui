@@ -389,7 +389,7 @@ export default class SparkPage extends Vue {
         ]"
       />
       <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
-        <q-list link>
+        <q-list>
           <ActionItem
             icon="add"
             label="New Block"
@@ -445,7 +445,7 @@ export default class SparkPage extends Vue {
     </portal>
 
     <!-- Shown if service was found in store, but not ok -->
-    <q-list v-if="statusNok" no-border>
+    <q-list v-if="statusNok">
       <q-item>
         <q-item-section>
           <Troubleshooter :service-id="service.id" class="bg-dark" />
@@ -466,7 +466,7 @@ export default class SparkPage extends Vue {
       <!-- Normal display -->
       <div class="row no-wrap justify-start" :style="contentStyle">
         <q-scroll-area class="row no-wrap col-auto" style="width: 500px">
-          <q-list no-border class="col">
+          <q-list class="col">
             <!-- Selection controls -->
             <q-item class="q-mb-md">
               <q-item-section>
@@ -574,10 +574,7 @@ export default class SparkPage extends Vue {
   </div>
 </template>
 
-<style lang="stylus" scoped>
-@import '../../../styles/quasar.styl';
-@import '../../../styles/quasar.variables.styl';
-
+<style lang="scss" scoped>
 .widget-index {
   padding: 0;
 }

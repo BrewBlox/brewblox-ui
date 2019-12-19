@@ -1,16 +1,28 @@
 <script lang="ts">
+import pick from 'lodash/pick';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
+import { createDialog, showBlockDialog } from '@/helpers/dialog';
 import { durationMs, unitDurationString } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { featureStore } from '@/store/features';
 
+import { sparkStore } from '../../store';
+import { Block } from '../../types';
+import { ActuatorOffsetBlock } from '../ActuatorOffset/types';
+import { SetpointSensorPairBlock } from '../SetpointSensorPair/types';
 import { PidBlock } from './types';
 
+interface BlockDisplay {
+  role: string;
+  block: Block | null;
+  typeName: string;
+  notes: Mapped<any>;
+}
 
 @Component
 export default class PidShareDialog extends DialogBase {
@@ -39,6 +51,10 @@ export default class PidShareDialog extends DialogBase {
     };
   }
 
+  get serviceId(): string {
+    return this.block.serviceId;
+  }
+
   applyParams(params: QueryParams): void {
     this.params = { ...params };
     this.$nextTick(() => this.graph?.resetSources());
@@ -54,6 +70,113 @@ export default class PidShareDialog extends DialogBase {
       label: 'Duration',
     })
       .onOk(unit => this.applyParams({ duration: unitDurationString(unit) }));
+  }
+
+  blockById(id: string | null): Block | null {
+    return id !== null ? sparkStore.tryBlockById(this.serviceId, id) : null;
+  }
+
+  name(block: Block | null): string {
+    return block !== null
+      ? featureStore.displayName(block.type)
+      : 'Not set';
+  }
+
+  get driveChains(): string[][] {
+    return sparkStore.drivenChains(this.serviceId);
+  }
+
+  get pidData(): Mapped<any> {
+    return pick(this.block.data, 'enabled', 'outputSetting', 'p', 'i', 'd');
+  }
+
+  get input(): SetpointSensorPairBlock | null {
+    return this.blockById(this.block.data.inputId.id);
+  }
+
+  get inputData(): Mapped<any> {
+    if (this.input === null) {
+      return {};
+    }
+    return [
+      `ID: ${this.input.id}`,
+    ];
+  }
+
+  get driver(): ActuatorOffsetBlock | null {
+    if (this.input === null) {
+      return null;
+    }
+    const chain = this.driveChains.find(chain => chain[0] === this.input!.id);
+    return this.blockById(chain?.[1] ?? null);
+  }
+
+  get driverData(): Mapped<any> {
+    if (this.driver === null) {
+      return {};
+    }
+    return pick(this.driver.data, 'referenceSettingOrValue');
+  }
+
+  get output(): Block | null {
+    return this.blockById(this.block.data.outputId.id);
+  }
+
+  get outputData(): Mapped<any> {
+    if (this.output === null) {
+      return {};
+    }
+    return {};
+  }
+
+  get actuator(): Block | null {
+    return this.blockById(this.output?.data.actuatorId?.id ?? null);
+  }
+
+  get actuatorData(): Mapped<any> {
+    if (this.actuator === null) {
+      return {};
+    }
+    return {};
+  }
+
+  get displays(): BlockDisplay[] {
+    return [
+      {
+        role: 'Driver',
+        block: this.driver,
+        typeName: this.name(this.driver),
+        notes: this.driverData,
+      },
+      {
+        role: 'Input',
+        block: this.input,
+        typeName: this.name(this.input),
+        notes: this.inputData,
+      },
+      {
+        role: 'PID',
+        block: this.block,
+        typeName: this.name(this.block),
+        notes: this.pidData,
+      },
+      {
+        role: 'Output',
+        block: this.output,
+        typeName: this.name(this.output),
+        notes: this.outputData,
+      },
+      {
+        role: 'Actuator',
+        block: this.actuator,
+        typeName: this.name(this.actuator),
+        notes: this.actuatorData,
+      },
+    ];
+  }
+
+  showBlock(block: Block): void {
+    showBlockDialog(block);
   }
 }
 </script>
@@ -77,18 +200,26 @@ export default class PidShareDialog extends DialogBase {
         </template>
       </DialogToolbar>
       <div ref="viewparent" class="col row full-width bg-dark">
-        <div class="col-3 q-pa-md">
-          <q-list dense>
-            <q-item>
-              <q-item-section class="text-h6">
-                {{ block.id }}
-              </q-item-section>
-            </q-item>
-            <q-item v-for="(v, k) in block.data" :key="`data-${k}`">
-              <q-item-section>{{ k }}</q-item-section>
-              <q-item-section>{{ v }}</q-item-section>
-            </q-item>
-          </q-list>
+        <div class="col-3 q-pa-md column q-gutter-y-sm sidebar">
+          <div v-for="d in displays" :key="d.role" class="col">
+            <q-btn
+              :disable="d.block === null"
+              flat
+              icon="mdi-launch"
+              class="float-right z-top"
+              @click="showBlock(d.block)"
+            >
+              <q-tooltip v-if="d.block">
+                Open in dialog
+              </q-tooltip>
+            </q-btn>
+            <div class="text-h6 darkish">
+              {{ d.role }} ({{ d.typeName }})
+            </div>
+            <div v-if="d.block" class="text-italic" style="font-size: 120%">
+              {{ d.block.id }}
+            </div>
+          </div>
         </div>
         <q-separator vertical inset />
         <HistoryGraph ref="graph" class="col" :graph-id="graphId" :config="activeGraphCfg" />
@@ -96,3 +227,11 @@ export default class PidShareDialog extends DialogBase {
     </q-card>
   </q-dialog>
 </template>
+
+<style scoped>
+.sidebar > div {
+  width: 100%;
+  border: 1px dashed silver;
+  padding: 5px;
+}
+</style>

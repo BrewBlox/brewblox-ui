@@ -101,7 +101,7 @@ export default class ActuatorValve extends PartBase {
   </g>
 </template>
 
-<style lang="stylus" scoped>
+<style lang="scss" scoped>
 /deep/ .power-icon path {
   stroke-width: 1px;
   stroke: black;

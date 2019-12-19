@@ -151,7 +151,7 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
             <q-icon name="warning" size="24px" />
             <q-tooltip>
               {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
-              <br />
+              <br>
               Last update: {{ new Date(val.time).toLocaleString() }}.
             </q-tooltip>
           </template>

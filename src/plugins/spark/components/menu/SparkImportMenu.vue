@@ -3,9 +3,9 @@ import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createDialog, showImportDialog } from '@/helpers/dialog';
+import { createDialog } from '@/helpers/dialog';
 import { suggestId } from '@/helpers/functional';
-import { saveFile } from '@/helpers/import-export';
+import { loadFile, saveFile } from '@/helpers/import-export';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
@@ -29,7 +29,7 @@ export default class SparkImportMenu extends DialogBase {
   }
 
   startImport(): void {
-    showImportDialog(this.confirmImport);
+    loadFile(this.confirmImport);
   }
 
   confirmImport(values: any): void {
@@ -70,7 +70,7 @@ export default class SparkImportMenu extends DialogBase {
   }
 
   startImportSingle(): void {
-    showImportDialog(this.importSingleBlock);
+    loadFile(this.importSingleBlock);
   }
 
   validateBlockId(val: string): boolean {
@@ -123,21 +123,41 @@ export default class SparkImportMenu extends DialogBase {
       </DialogToolbar>
 
       <q-card-section>
-        <q-item>
+        <div class="column q-gutter-y-sm">
+          <q-btn
+            :loading="importBusy"
+            outline
+            label="Import single Block"
+            class="col-auto full-width"
+            @click="startImportSingle"
+          />
+          <q-btn
+            :loading="importBusy"
+            outline
+            label="Import Blocks"
+            class="col-auto full-width"
+            @click="startImport"
+          />
+          <q-btn
+            :loading="importBusy"
+            outline
+            label="Export Blocks"
+            class="col-auto full-width"
+            @click="exportBlocks"
+          />
+        </div>
+        <!-- <q-item>
           <q-item-section>
-            <q-btn :loading="importBusy" outline label="Import single Block" @click="startImportSingle" />
           </q-item-section>
         </q-item>
         <q-item>
           <q-item-section>
-            <q-btn :loading="importBusy" outline label="Import Blocks" @click="startImport" />
           </q-item-section>
         </q-item>
         <q-item>
           <q-item-section>
-            <q-btn :loading="importBusy" outline label="Export Blocks" @click="exportBlocks" />
           </q-item-section>
-        </q-item>
+        </q-item> -->
         <q-item v-if="messages.length > 0">
           <q-item-section>
             Reported problems during last import:

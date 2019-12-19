@@ -4,8 +4,8 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { showImportDialog } from '@/helpers/dialog';
 import { ruleChecker } from '@/helpers/functional';
+import { loadFile } from '@/helpers/import-export';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -98,7 +98,7 @@ export default class ImportWizard extends Vue {
   }
 
   startImport(): void {
-    showImportDialog<PersistentWidget>(v => this.widget = v);
+    loadFile<PersistentWidget>(v => this.widget = v);
   }
 }
 </script>

@@ -86,7 +86,6 @@ export default class SessionSelectField extends FieldBase {
               <q-badge
                 v-for="tag in opt.session.tags"
                 :key="`tag-${opt.value}-${tag}`"
-                dense
                 color="blue-grey-8"
               >
                 <small>{{ tag }}</small>

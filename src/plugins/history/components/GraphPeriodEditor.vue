@@ -1,8 +1,9 @@
 <script lang="ts">
 import find from 'lodash/find';
+import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import { durationMs, durationString } from '@/helpers/functional';
 
@@ -47,6 +48,18 @@ export default class GraphPeriodEditor extends Vue {
   @Prop({ type: Object, required: true })
   public readonly config!: QueryConfig;
 
+  @Watch('config.params', { immediate: true })
+  watchParams(params: QueryParams): void {
+    const period: PeriodDisplay = {
+      start: params?.start !== undefined,
+      duration: params?.duration !== undefined,
+      end: params?.end !== undefined,
+    };
+    const opts = this.periodOptions.map(opt => opt.value);
+    const matching = opts.some(v => isEqual(v, period));
+    this.period = matching ? period : opts[0];
+  }
+
   saveConfig(config: QueryConfig = this.config): void {
     this.$emit('update:config', config);
   }
@@ -59,41 +72,20 @@ export default class GraphPeriodEditor extends Vue {
     };
   }
 
-  sanitizeParams(period: PeriodDisplay): void {
-    const defaults = this.paramDefaults();
-    Object.entries(period)
-      .forEach(([key, isPresent]: [string, boolean]) =>
-        this.$set(
-          this.config.params,
-          key,
-          (isPresent
-            ? this.config.params[key] || defaults[key]
-            : undefined)
-        ));
+  get shownPeriod(): PeriodDisplay {
+    return this.period ?? this.periodOptions[0].value;
   }
 
-  get shownPeriod(): PeriodDisplay {
-    if (this.period === null) {
-      const keys = ['start', 'duration', 'end'];
-      const compare = (opt, k): boolean => {
-        const val = this.config.params[k];
-        return opt.value[k] === (val !== null && val !== undefined);
-      };
-      const matching = this.periodOptions
-        .find(opt => keys.every(k => compare(opt, k)));
-
-      // set local variable
-      this.period = matching
-        ? matching.value
-        : this.periodOptions[0].value;
-
-      // if no match was found, params must be sanitized
-      if (!matching) {
-        this.sanitizeParams(this.period!);
-        this.saveConfig(this.config);
-      }
-    }
-    return this.period!;
+  saveSanitized(period: PeriodDisplay = this.shownPeriod): void {
+    const defaults = this.paramDefaults();
+    const current = this.config.params;
+    this.config.params = {
+      ...this.config.params,
+      start: !period.start ? undefined : (current.start ?? defaults.start),
+      duration: !period.duration ? undefined : (current.duration ?? defaults.duration),
+      end: !period.end ? undefined : (current.end ?? defaults.end),
+    };
+    this.saveConfig();
   }
 
   get isLive(): boolean {
@@ -101,25 +93,23 @@ export default class GraphPeriodEditor extends Vue {
     return opt !== undefined && opt.label.startsWith('Live');
   }
 
-  saveShownPeriod(val: PeriodDisplay): void {
-    this.period = val;
-    this.sanitizeParams(val);
-    this.saveConfig(this.config);
+  saveShownPeriod(period: PeriodDisplay): void {
+    this.saveSanitized(period);
   }
 
   saveStart(val: Date): void {
     this.config.params.start = val.getTime();
-    this.saveConfig();
+    this.saveSanitized();
   }
 
   saveDuration(val: string): void {
     this.config.params.duration = durationString(val || '10m');
-    this.saveConfig();
+    this.saveSanitized();
   }
 
   saveEnd(val: Date): void {
     this.config.params.end = val.getTime();
-    this.saveConfig();
+    this.saveSanitized();
   }
 }
 </script>
@@ -139,8 +129,8 @@ export default class GraphPeriodEditor extends Vue {
           <template #append>
             <q-icon name="mdi-chart-timeline" size="sm">
               <q-tooltip>
-                <i>To improve performance, the history service automatically selects an averaging period.</i> <br />
-                <i>One point is returned per period, with the average value of all points in that period.</i> <br />
+                <i>To improve performance, the history service automatically selects an averaging period.</i> <br>
+                <i>One point is returned per period, with the average value of all points in that period.</i> <br>
                 <div class="row q-mt-sm ">
                   <LabeledField
                     v-for="(rate, meas) in downsampling"

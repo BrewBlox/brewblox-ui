@@ -31,11 +31,13 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
       <ActionItem
         v-if="hasGraph"
         icon="mdi-chart-line"
-        label="Show graph"
+        label="Graph"
         @click="graphModalOpen = true"
       />
       <slot name="actions" />
-      <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
+    </template>
+
+    <template #menus>
       <WidgetActions :crud="crud" no-rename />
       <BlockActions :crud="crud" />
     </template>

@@ -62,7 +62,7 @@ export default class ImmersionCoil extends PartBase {
   </g>
 </template>
 
-<style lang="stylus" scoped>
+<style lang="scss" scoped>
 /deep/ .coil-liquid path {
   stroke-linecap: round;
 }
