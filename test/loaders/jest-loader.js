@@ -3,7 +3,6 @@
  */
 
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const loaderUtils = require('loader-utils');
 const path = require('path');

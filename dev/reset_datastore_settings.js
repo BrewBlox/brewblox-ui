@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const request = require('request-promise-native');
 
 // Ignore errors about our self-signed certificate

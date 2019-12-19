@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/camelcase */
 
 const { gitDescribeSync } = require('git-describe');
@@ -23,10 +22,6 @@ module.exports = function (ctx) {
   return {
     preFetch: false,
     supportIE: false,
-
-    // vendor: {
-    //   remove: ['d3'],
-    // },
 
     sourceFiles: {
       router: 'src/router.ts',
@@ -180,10 +175,6 @@ module.exports = function (ctx) {
         }
       },
 
-      //
-      // ChainWebpack configuration
-      //
-      /** @type { import("webpack-chain") } */
       chainWebpack: config => {
         // We're only using a subset from plotly
         // Add alias to enable typing regardless

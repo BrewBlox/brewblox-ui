@@ -16,7 +16,7 @@ export default class DefaultLayout extends Vue {
   }
 
   // env flag
-  automationFeatureEnabled = process.env.BLOX_FEATURE_AUTOMATION === 'true';
+  automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
 
   get version(): string {
     return process.env.BLOX_VERSION || 'UNKNOWN';

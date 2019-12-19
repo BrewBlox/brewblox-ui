@@ -30,11 +30,11 @@ module.exports = {
     'no-param-reassign': 0,
     'no-console': 'warn',
     'no-multiple-empty-lines': 'error',
-    "vue/max-attributes-per-line": ["warn", {
-      "singleline": 8,
-      "multiline": {
-        "max": 1,
-        "allowFirstLine": false
+    'vue/max-attributes-per-line': ['warn', {
+      'singleline': 8,
+      'multiline': {
+        'max': 1,
+        'allowFirstLine': false
       },
       'order': [
         'DEFINITION',
@@ -77,5 +77,13 @@ module.exports = {
     'vue-require-component-is': 0,
     '@typescript-eslint/no-empty-function': 0,
     'vue/no-v-html': 0
-  }
+  },
+  'overrides': [
+    {
+      'files': ['*.js'],
+      'rules': {
+        '@typescript-eslint/no-var-requires': 'off'
+      }
+    }
+  ]
 }

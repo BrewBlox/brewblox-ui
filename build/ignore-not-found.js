@@ -9,7 +9,6 @@
  * date: 2019/12/18
 */
 
-/* eslint-disable @typescript-eslint/no-var-requires */
 const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 
 module.exports = class IgnoreNotFoundExportPlugin {
