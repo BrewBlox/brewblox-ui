@@ -26,7 +26,7 @@ export default class PwmPump extends PartBase {
 
   get duration(): number {
     const pwmMod = 2 / (this.pwmSetting / 100 + 0.0001);
-    const calculated = pwmMod * DEFAULT_PUMP_PRESSURE / (this.settings.onPressure || DEFAULT_PUMP_PRESSURE);
+    const calculated = pwmMod * DEFAULT_PUMP_PRESSURE / (this.settings.onPressure ?? DEFAULT_PUMP_PRESSURE);
     return Math.max(calculated, 0.5);
   }
 

@@ -18,6 +18,10 @@ export class FlowSegment {
   public friction(input: PathFriction): PathFriction {
     const equivalentFriction =
       (toTransform: PathFriction[], splitInput: PathFriction): { total: PathFriction; split: number[] } => {
+
+        const basePressure = splitInput.pressureDiff ? 0 : 0.01;
+        splitInput.pressureDiff += basePressure; // zero input pressure throws off calculation.
+
         // Apply Millman’s Theorem Equation to calculate node pressure on the split
         const allPaths = [splitInput, ...toTransform.map(entry => ({
           pressureDiff: -entry.pressureDiff,
@@ -47,25 +51,31 @@ export class FlowSegment {
       };
 
     let series = input;
+    //console.log(this.inRoute, this.root.type);
+    //console.log(this.root.transitions);
 
     if (this.next) {
       // add next before processing split (can be moved to front because all parts are in series)
-      series.friction += this.next.inRoute.friction !== undefined ? this.next.inRoute.friction : DEFAULT_FRICTION;
-      series.pressureDiff += this.next.inRoute.pressure || 0;
+      series.friction += this.next.inRoute.friction ?? DEFAULT_FRICTION;
+      series.pressureDiff += this.next.inRoute.pressure ?? 0;
       series = this.next.friction(series);
     }
+
 
     if (this.splits.length > 1) {
       // splitting. Convert the combined paths into an equivalent series friction
       const splitPF = this.splits.map(split => split.friction({
-        pressureDiff: split.inRoute.pressure || 0,
-        friction: split.inRoute.friction !== undefined ? split.inRoute.friction : DEFAULT_FRICTION,
+        pressureDiff: split.inRoute.pressure ?? 0,
+        friction: split.inRoute.friction ?? DEFAULT_FRICTION,
       }));
+      //console.log(this.splits);
       const splitFriction = equivalentFriction(splitPF, series);
       //console.dir(splitFriction); console.dir(splitPF);
       series = splitFriction.total;
       this.splitDivide = splitFriction.split;
     }
+
+    //console.log(series, this.inRoute, this.root.type, this.root.x, this.root.y);
 
     return series;
   }

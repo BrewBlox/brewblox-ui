@@ -37,7 +37,7 @@ export default class MetricsEditor extends Vue {
   }
 
   freshDuration(node: QuasarNode): string {
-    return durationString(this.config.freshDuration[node.value] || DEFAULT_FRESH_DURATION);
+    return durationString(this.config.freshDuration[node.value] ?? DEFAULT_FRESH_DURATION);
   }
 
   decimals(node: QuasarNode): number {

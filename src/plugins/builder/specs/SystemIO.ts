@@ -22,7 +22,7 @@ const spec: PartSpec = {
   transitions: (part: PersistentPart) => {
     const enabled = get(part.settings, 'enabled', !!part.settings.pressure);
     const pressure = enabled
-      ? part.settings.onPressure || DEFAULT_IO_PRESSURE
+      ? part.settings.onPressure ?? DEFAULT_IO_PRESSURE
       : 0;
     return {
       [CENTER]: [{

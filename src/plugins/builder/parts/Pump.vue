@@ -25,7 +25,7 @@ export default class Pump extends PartBase {
   }
 
   get duration(): number {
-    const calculated = 60 / (this.settings.onPressure || DEFAULT_PUMP_PRESSURE);
+    const calculated = 60 / (this.settings.onPressure ?? DEFAULT_PUMP_PRESSURE);
     return Math.max(calculated, 0.5); // Max out animation speed at 120 pressure
   }
 

@@ -52,11 +52,11 @@ export default class GraphDisplayEditor extends Vue {
   }
 
   fieldRename(field): string {
-    return this.config.renames[field] || defaultLabel(field);
+    return this.config.renames[field] ?? defaultLabel(field);
   }
 
   saveRename(field: string, label: string | null): void {
-    this.config.renames[field] = label || defaultLabel(field);
+    this.config.renames[field] = label ?? defaultLabel(field);
     this.saveConfig();
   }
 }

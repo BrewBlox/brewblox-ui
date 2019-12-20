@@ -1451,14 +1451,23 @@ describe('A kettle with flow back to itself', () => {
 });
 
 
-describe('A kettle with flow back to itself', () => {
-  let parts: PersistentPart[] = [
+describe('A forking and joining path with a pump in each fork', () => {
+  const partsBase: PersistentPart[] = [
     {
-      'id': '1',
-      'rotate': 0,
-      'settings': { 'sizeX': 2, 'sizeY': 3, 'emptySpace': 0, 'color': '#69bcff', 'fillPct': 100 },
+      'id': '1a',
+      'rotate': 180,
+      'settings': { 'liquids': ['#DB0023'], 'enabled': true, 'onPressure': 0 },
       'flipped': false,
-      'type': 'Kettle',
+      'type': 'SystemIO',
+      'x': 2,
+      'y': 2,
+    },
+    {
+      'id': '1b',
+      'rotate': 180,
+      'settings': {},
+      'flipped': false,
+      'type': 'SystemIO',
       'x': 2,
       'y': 0,
     },
@@ -1497,29 +1506,11 @@ describe('A kettle with flow back to itself', () => {
       'x': 1,
       'y': 0,
     },
-    {
-      'id': '6',
-      'rotate': 0,
-      'settings': {},
-      'flipped': false,
-      'type': 'StraightInletTube',
-      'x': 2,
-      'y': 0,
-    },
-    {
-      'id': '7',
-      'rotate': 0,
-      'settings': {},
-      'flipped': false,
-      'type': 'StraightInletTube',
-      'x': 2,
-      'y': 2,
-    },
   ];
 
 
-  describe('with both pumps disabled', () => {
-    parts = [...parts,
+  it('has no flow with both pumps disabled', () => {
+    const parts = [...partsBase,
     {
       'id': '8',
       'rotate': 90,
@@ -1540,40 +1531,201 @@ describe('A kettle with flow back to itself', () => {
     }];
 
     const flowParts = asFlowParts(parts.map(asStatePart));
-    it('Should have liquid but no flow', () => {
-      const start = flowParts[0];
 
-      const path = findPaths(flowParts, start)[0];
+    const start = flowParts[0];
 
-      const visitedTypes = propertyWalker([], path, ['root', 'type']);
-      expect(visitedTypes).toEqual(
+    const path = findPaths(flowParts, start)[0];
+
+    const visitedTypes = propertyWalker([], path, ['root', 'type']);
+    expect(visitedTypes).toEqual(
+      [
+        'SystemIO',
+        'TeeTube',
+        'TeeTube',
         [
-          'Kettle',
-          'StraightInletTube',
-          'TeeTube',
-          'TeeTube',
           [
-            [
-              'Pump',
-              'TeeTube',
-            ],
-            [
-              'ElbowTube',
-              'Pump',
-              'ElbowTube',
-              'TeeTube',
-            ],
+            'Pump',
+            'TeeTube',
           ],
-          'TeeTube',
-          'StraightInletTube',
-          'Kettle',
-        ]);
+          [
+            'ElbowTube',
+            'Pump',
+            'ElbowTube',
+            'TeeTube',
+          ],
+        ],
+        'TeeTube',
+        'SystemIO',
+      ]);
 
 
-      const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
-      expect(friction).toEqual(1 + 0.5 + 0.5 + (1.5 * 3.5) / (1.5 + 3.5) + 0.5 + 1);
-      expect(pressureDiff).toEqual(0);
-    });
+    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    expect(friction).toEqual(1 + 0.5 + 0.5 + (1.5 * 3.5) / (1.5 + 3.5) + 0.5 + 1);
+
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(0, 2);
+  });
+
+
+  it('has flow with one pump enabled', () => {
+    const parts = [...partsBase,
+    {
+      'id': '10',
+      'rotate': 90,
+      'settings': { 'enabled': true, 'onPressure': 10 },
+      'flipped': false,
+      'type': 'Pump',
+      'x': 1,
+      'y': 1,
+    },
+    {
+      'id': '11',
+      'rotate': 90,
+      'settings': { 'enabled': false, 'onPressure': 10 },
+      'flipped': false,
+      'type': 'Pump',
+      'x': 0,
+      'y': 1,
+    }];
+
+    const flowParts = asFlowParts(parts.map(asStatePart));
+
+    const start = flowParts[0];
+
+    const path = findPaths(flowParts, start)[0];
+
+    const visitedTypes = propertyWalker([], path, ['root', 'type']);
+    expect(visitedTypes).toEqual(
+      [
+        'SystemIO',
+        'TeeTube',
+        'TeeTube',
+        [
+          [
+            'Pump',
+            'TeeTube',
+          ],
+          [
+            'ElbowTube',
+            'Pump',
+            'ElbowTube',
+            'TeeTube',
+          ],
+        ],
+        'TeeTube',
+        'SystemIO',
+      ]);
+
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(1.54, 2);
+  });
+
+  it('has flow with the other pump enabled', () => {
+    const parts = [...partsBase,
+    {
+      'id': '10',
+      'rotate': 90,
+      'settings': { 'enabled': false, 'onPressure': 10 },
+      'flipped': false,
+      'type': 'Pump',
+      'x': 1,
+      'y': 1,
+    },
+    {
+      'id': '11',
+      'rotate': 90,
+      'settings': { 'enabled': true, 'onPressure': 10 },
+      'flipped': false,
+      'type': 'Pump',
+      'x': 0,
+      'y': 1,
+    }];
+
+    const flowParts = asFlowParts(parts.map(asStatePart));
+
+    const start = flowParts[0];
+
+    const path = findPaths(flowParts, start)[0];
+
+    const visitedTypes = propertyWalker([], path, ['root', 'type']);
+    expect(visitedTypes).toEqual(
+      [
+        'SystemIO',
+        'TeeTube',
+        'TeeTube',
+        [
+          [
+            'Pump',
+            'TeeTube',
+          ],
+          [
+            'ElbowTube',
+            'Pump',
+            'ElbowTube',
+            'TeeTube',
+          ],
+        ],
+        'TeeTube',
+        'SystemIO',
+      ]);
+
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(0.66, 2);
+  });
+
+
+  it('has more flow with both pumps', () => {
+    const parts = [...partsBase,
+    {
+      'id': '10',
+      'rotate': 90,
+      'settings': { 'enabled': true, 'onPressure': 10 },
+      'flipped': false,
+      'type': 'Pump',
+      'x': 1,
+      'y': 1,
+    },
+    {
+      'id': '11',
+      'rotate': 90,
+      'settings': { 'enabled': true, 'onPressure': 10 },
+      'flipped': false,
+      'type': 'Pump',
+      'x': 0,
+      'y': 1,
+    }];
+
+    const flowParts = asFlowParts(parts.map(asStatePart));
+
+    const start = flowParts[0];
+
+    const path = findPaths(flowParts, start)[0];
+
+    const visitedTypes = propertyWalker([], path, ['root', 'type']);
+    expect(visitedTypes).toEqual(
+      [
+        'SystemIO',
+        'TeeTube',
+        'TeeTube',
+        [
+          [
+            'Pump',
+            'TeeTube',
+          ],
+          [
+            'ElbowTube',
+            'Pump',
+            'ElbowTube',
+            'TeeTube',
+          ],
+        ],
+        'TeeTube',
+        'SystemIO',
+      ]);
+
+    const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
+    expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(2.20, 2);
   });
 });
+
 

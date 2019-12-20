@@ -19,11 +19,11 @@ export default class PressureCard extends PartCard {
   public readonly max!: number;
 
   get value(): number {
-    return this.part.settings[this.settingsKey] || this.defaultValue;
+    return this.part.settings[this.settingsKey] ?? this.defaultValue;
   }
 
   save(val: number): void {
-    const pressure = val || this.defaultValue;
+    const pressure = val ?? this.defaultValue;
     this.savePartSettings({ ...this.part.settings, [this.settingsKey]: pressure });
   }
 

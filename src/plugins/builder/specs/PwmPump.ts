@@ -29,7 +29,7 @@ const spec: PartSpec = {
   transitions: (part: PersistentPart) => {
     const block = settingsBlock<ActuatorPwmBlock>(part, 'pwm');
     const pressure = block
-      ? (block.data.setting / 100) * (part.settings.onPressure || DEFAULT_PUMP_PRESSURE)
+      ? (block.data.setting / 100) * (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE)
       : 0;
     return {
       [LEFT]: [{ outCoords: RIGHT, source: true }],
