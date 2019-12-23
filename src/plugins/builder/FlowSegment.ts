@@ -51,8 +51,6 @@ export class FlowSegment {
       };
 
     let series = input;
-    //console.log(this.inRoute, this.root.type);
-    //console.log(this.root.transitions);
 
     if (this.next) {
       // add next before processing split (can be moved to front because all parts are in series)
@@ -68,14 +66,11 @@ export class FlowSegment {
         pressureDiff: split.inRoute.pressure ?? 0,
         friction: split.inRoute.friction ?? DEFAULT_FRICTION,
       }));
-      //console.log(this.splits);
+
       const splitFriction = equivalentFriction(splitPF, series);
-      //console.dir(splitFriction); console.dir(splitPF);
       series = splitFriction.total;
       this.splitDivide = splitFriction.split;
     }
-
-    //console.log(series, this.inRoute, this.root.type, this.root.x, this.root.y);
 
     return series;
   }

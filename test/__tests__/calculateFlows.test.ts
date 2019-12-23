@@ -1559,7 +1559,7 @@ describe('A forking and joining path with a pump in each fork', () => {
       ]);
 
 
-    const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+    const { friction } = path.friction({ pressureDiff: 0, friction: 0 });
     expect(friction).toEqual(1 + 0.5 + 0.5 + (1.5 * 3.5) / (1.5 + 3.5) + 0.5 + 1);
 
     const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));

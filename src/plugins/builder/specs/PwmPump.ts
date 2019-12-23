@@ -20,6 +20,7 @@ const spec: PartSpec = {
       component: 'PressureCard',
       props: {
         settingsKey: 'onPressure',
+        label: 'Pressure at 100%',
         min: MIN_PUMP_PRESSURE,
         max: MAX_PUMP_PRESSURE,
         defaultValue: DEFAULT_PUMP_PRESSURE,

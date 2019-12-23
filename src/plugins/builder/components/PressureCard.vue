@@ -9,6 +9,9 @@ export default class PressureCard extends PartCard {
   @Prop({ type: String, required: true })
   public readonly settingsKey!: string;
 
+  @Prop({ type: String, default: 'Pressure' })
+  public readonly label!: string;
+
   @Prop({ type: Number, required: true })
   public readonly defaultValue!: number;
 
@@ -41,7 +44,7 @@ export default class PressureCard extends PartCard {
     <q-item>
       <q-item-section>
         <q-item-label caption>
-          Pressure
+          {{ label }}
         </q-item-label>
         <q-slider :value="value" :min="min" :max="max" @change="debouncedSave" />
       </q-item-section>
