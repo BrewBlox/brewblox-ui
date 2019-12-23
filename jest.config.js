@@ -56,4 +56,12 @@ module.exports = {
   snapshotSerializers: [
     '<rootDir>/node_modules/jest-serializer-vue',
   ],
+
+  watchPathIgnorePatterns: [
+    '<rootDir>/dev',
+    '<rootDir>/dist',
+    '<rootDir>/node_modules',
+    '<rootDir>/docker',
+    '<rootDir>/build',
+  ],
 };

@@ -33,11 +33,11 @@ export default class GraphDisplayDialog extends DialogBase {
   }
 
   get rename(): string {
-    return this.local!.renames[this.field] || defaultLabel(this.field);
+    return this.local!.renames[this.field] ?? defaultLabel(this.field);
   }
 
   set rename(val: string) {
-    this.$set(this.local!.renames, this.field, val || defaultLabel(this.field));
+    this.$set(this.local!.renames, this.field, val ?? defaultLabel(this.field));
   }
 
   get axis(): GraphConfig['axes'][''] {

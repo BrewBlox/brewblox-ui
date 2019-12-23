@@ -19,21 +19,29 @@
       "type": "node",
       "name": "vscode-jest-tests",
       "request": "launch",
-      "args": ["test:unit", "--runInBand"],
+      "args": [
+        "test:unit",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "program": "${workspaceFolder}/node_modules/@vue/cli-service/bin/vue-cli-service.js",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
       "sourceMapPathOverrides": {
         "webpack:///./src/*": "${webRoot}/*"
       }
     },
     {
-      "type": "node",
+      "type": "chrome",
       "request": "launch",
-      "name": "Launch Webpack",
-      "program": "${workspaceFolder}/node_modules/.bin/vue-cli-service.js",
-      "args": ["serve"]
+      "name": "Debug Quasar",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/src",
+      "breakOnLoad": true,
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./src/*": "${webRoot}/*"
+      }
     }
   ]
 }
