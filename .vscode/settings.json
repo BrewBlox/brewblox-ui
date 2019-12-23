@@ -11,9 +11,8 @@
   ],
   "editor.formatOnSave": true,
   "jest.debugMode": true,
-  "jest.pathToJest": "node_modules/@vue/cli-service/bin/vue-cli-service.js test:unit",
   "jest.pathToConfig": "jest.config.js",
-  "jestTestExplorer.pathToJest": "node_modules/@vue/cli-service/bin/vue-cli-service.js test:unit",
+  "jestTestExplorer.pathToJest": "./node_modules/.bin/jest",
   "jestTestExplorer.pathToJestConfig": "jest.config.js",
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
