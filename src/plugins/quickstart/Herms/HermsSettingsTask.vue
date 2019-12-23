@@ -139,9 +139,9 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
             </q-item-label>
             <p>
               To heat the wort in your mash tun, it is pumped through a coil in the HLT.
-              <br />
+              <br>
               We don't want to use a static HLT temperature a bit higher than the mash tun.
-              <br />
+              <br>
               We can do better than that, by using a third PID to change the HLT setpoint dynamically.
             </p>
             <p>

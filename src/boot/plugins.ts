@@ -1,22 +1,16 @@
-import './quasar';
-import './externals';
-
 import PortalVue from 'portal-vue';
-import Vue, { PluginObject } from 'vue';
+import { PluginObject } from 'vue';
 
-import App from './App.vue';
-import { autoRegister, externalComponent } from './helpers/component-ref';
-import automation from './plugins/automation';
-import builder from './plugins/builder';
-import database from './plugins/database';
-import history from './plugins/history';
-import quickstart from './plugins/quickstart';
-import spark from './plugins/spark';
-import router from './router';
-import store from './store';
-import { pluginStore, UIPlugin } from './store/plugins';
-
-autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
+import { externalComponent } from '@/helpers/component-ref';
+import { HOST } from '@/helpers/const';
+import automation from '@/plugins/automation';
+import builder from '@/plugins/builder';
+import database from '@/plugins/database';
+import history from '@/plugins/history';
+import quickstart from '@/plugins/quickstart';
+import spark from '@/plugins/spark';
+import store from '@/store';
+import { pluginStore, UIPlugin } from '@/store/plugins';
 
 const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> => {
   try {
@@ -39,19 +33,16 @@ const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> =>
   }
 };
 
-async function setup(): Promise<void> {
+async function setup(Vue): Promise<void> {
   // Make Vue accessible as global variable in plugins
   Object.defineProperty(window, 'Vue', { value: Vue });
 
   // Enable the Vue devtools performance tab
-  Vue.config.performance = (
-    process.env.NODE_ENV === 'development'
-    && process.env.VUE_APP_PERFORMANCE === 'true'
-  );
+  Vue.config.performance = process.env.DEV && process.env.BLOX_PERFORMANCE;
 
   // Install the database. We need it to fetch remote plugins
   Vue.use(database, {
-    host: process.env.VUE_APP_API_URI || window.location.origin,
+    host: HOST,
     name: 'brewblox-ui-store',
   });
 
@@ -85,12 +76,6 @@ async function setup(): Promise<void> {
   plugins.forEach(plugin => Vue.use(plugin, { store }));
 };
 
-setup().then(() => {
-  new Vue({
-    router,
-    store,
-    // q-app is defined by public/index.html
-    el: document.getElementById('q-app') as HTMLElement,
-    render: h => h(App),
-  });
-});
+export default async ({ Vue }): Promise<void> => {
+  await setup(Vue);
+};

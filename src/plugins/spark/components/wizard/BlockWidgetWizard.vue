@@ -178,8 +178,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
               <q-icon name="mdi-information">
                 <q-tooltip>
                   The name of the Spark Controller Block.
-                  <br />Multiple widgets can display the same Block.
-                  <br />Rules:
+                  <br>Multiple widgets can display the same Block.
+                  <br>Rules:
                   <ul>
                     <li>The name must not be empty.</li>
                     <li>The name must be unique.</li>

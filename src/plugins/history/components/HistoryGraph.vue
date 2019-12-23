@@ -170,6 +170,8 @@ export default class HistoryGraph extends Vue {
       :data="graphData"
       :layout="graphLayout"
       :revision="revision"
+      v-bind="$attrs"
+      v-on="$listeners"
     />
     <!-- Error message -->
     <q-item v-else class="absolute-center">
@@ -185,7 +187,7 @@ export default class HistoryGraph extends Vue {
   </span>
 </template>
 
-<style scoped lang="stylus">
+<style scoped lang="scss">
 .graph-controls {
   position: absolute;
   top: 10px;

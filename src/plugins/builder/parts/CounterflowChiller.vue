@@ -83,7 +83,7 @@ export default class CounterflowChiller extends PartBase {
   </g>
 </template>
 
-<style lang="stylus" scoped>
+<style lang="scss" scoped>
 /deep/ .bulbLiquid path {
   stroke-width: 18pt !important;
   stroke-linecap: round;

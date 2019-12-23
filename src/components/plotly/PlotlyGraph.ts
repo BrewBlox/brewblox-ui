@@ -37,7 +37,6 @@ const eventNames = [
 
 @Component
 export default class PlotlyGraph extends Vue {
-  private firstRender = false;
   private zoomed = false;
   private skippedRender = false;
 
@@ -65,7 +64,7 @@ export default class PlotlyGraph extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly autoResize!: boolean;
 
-  @Prop({ type: Number })
+  @Prop({ type: Number, default: 0 })
   public readonly revision!: number;
 
   @Prop({ type: String, default: '100%' })
@@ -108,12 +107,21 @@ export default class PlotlyGraph extends Vue {
       : this.layout;
   }
 
-  private relayoutPlot(): void {
-    Plotly.relayout(this.plotlyElement, this.resizedLayout());
+  private async relayoutPlot(): Promise<void> {
+    await Plotly.relayout(this.plotlyElement, this.resizedLayout());
   }
 
-  private resizePlot(): void {
+  private async resizePlot(): Promise<void> {
     Plotly.Plots.resize(this.plotlyElement);
+  }
+
+  private async reactPlot(): Promise<void> {
+    await Plotly.react(
+      this.plotlyElement,
+      this.data,
+      this.resizedLayout(),
+      this.extendedConfig,
+    );
   }
 
   private onRelayout(eventdata: Mapped<any>): void {
@@ -130,7 +138,7 @@ export default class PlotlyGraph extends Vue {
     }
   }
 
-  get extendedConfig(): Partial<Config> {
+  private get extendedConfig(): Partial<Config> {
     return {
       ...this.config,
       modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
@@ -167,7 +175,7 @@ export default class PlotlyGraph extends Vue {
     }
   }
 
-  private async renderPlot(): Promise<void> {
+  private async renderPlot(layoutChanged = false): Promise<void> {
     if (!this.plotlyElement) {
       return;
     }
@@ -176,12 +184,9 @@ export default class PlotlyGraph extends Vue {
       return;
     }
     try {
-      await Plotly.react(
-        this.plotlyElement,
-        this.data,
-        this.resizedLayout(),
-        this.extendedConfig,
-      );
+      layoutChanged
+        ? await this.relayoutPlot()
+        : await this.reactPlot();
     } catch (e) {
       this.$emit('error', e.message);
     }
@@ -197,13 +202,13 @@ export default class PlotlyGraph extends Vue {
   }
 
   public created(): void {
-    const updateFunc = debounce(this.renderPlot, 50, false) as (this: this, n: any, o: any) => void;
+    const updateFunc = debounce(this.renderPlot, 50, false);
 
-    this.$watch('config', updateFunc);
-    this.$watch('data', updateFunc);
-    this.$watch('frames', updateFunc);
-    this.$watch('layout', updateFunc);
-    this.$watch('revision', updateFunc);
+    this.$watch('config', () => updateFunc());
+    this.$watch('data', () => updateFunc());
+    this.$watch('frames', () => updateFunc());
+    this.$watch('layout', () => updateFunc(true), { deep: true });
+    this.$watch('revision', () => updateFunc());
   }
 
   public mounted(): void {

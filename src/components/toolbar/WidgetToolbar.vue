@@ -31,8 +31,7 @@ export default class WidgetToolbar extends CrudComponent {
 <template>
   <Toolbar :title="widget.title" :subtitle="displayName">
     <slot />
-    <q-item-section side>
-    </q-item-section>
+    <q-item-section side />
     <template #buttons>
       <slot name="buttons">
         <q-btn v-if="!!mode" flat :icon="toggleIcon" @click="toggle">

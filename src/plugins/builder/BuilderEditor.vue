@@ -18,6 +18,7 @@ import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
 interface Floater extends XYPosition {
+  moving: boolean;
   parts: PersistentPart[];
 }
 
@@ -354,7 +355,7 @@ export default class BuilderEditor extends DialogBase {
   }
 
   isBusy(part: PersistentPart): boolean {
-    return (!!this.floater && this.floater.parts.some(p => p.id === part.id))
+    return this.floater?.parts.some(p => p.id === part.id)
       || this.selectedParts.some(p => p.id === part.id);
   }
 
@@ -552,6 +553,7 @@ export default class BuilderEditor extends DialogBase {
       })
         .onOk((part: PersistentPart) => {
           this.floater = {
+            moving: false,
             x: 0,
             y: 0,
             parts: [part],
@@ -571,6 +573,7 @@ export default class BuilderEditor extends DialogBase {
       const startPos = this.hoverPos || { x: 0, y: 0 };
       this.floater = {
         ...startPos,
+        moving: true,
         parts: parts.map(part => ({
           ...deepCopy(part),
           x: part.x - minX,
@@ -587,9 +590,10 @@ export default class BuilderEditor extends DialogBase {
     else if (parts.length) {
       const minX = Math.min(...parts.map(part => part.x));
       const minY = Math.min(...parts.map(part => part.y));
-      const startPos = this.hoverPos || { x: 0, y: 0 };
+      const startPos = this.hoverPos ?? { x: 0, y: 0 };
       this.floater = {
         ...startPos,
+        moving: false,
         parts: parts.map(part => ({
           ...deepCopy(part),
           id: uid(),
@@ -933,7 +937,7 @@ export default class BuilderEditor extends DialogBase {
                     </g>
                   </g>
                   <!-- Selected parts -->
-                  <template v-else>
+                  <template v-if="!floater || !floater.moving">
                     <g
                       v-for="part in selectedParts"
                       :key="`selected-${part.id}`"
@@ -988,8 +992,8 @@ export default class BuilderEditor extends DialogBase {
   </q-dialog>
 </template>
 
-<style lang="stylus" scoped>
-@import './grid.styl';
+<style lang="scss" scoped>
+@import "./grid.sass";
 
 .editor-card {
   outline: none;

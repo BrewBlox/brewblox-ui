@@ -109,7 +109,7 @@ export default class PidBasic
   </q-card>
 </template>
 
-<style lang="stylus" scoped>
+<style lang="scss" scoped>
 .q-card__section .q-separator {
   opacity: 0.2;
 }

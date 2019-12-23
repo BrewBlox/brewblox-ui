@@ -1,3 +1,4 @@
+import { HOST } from '@/helpers/const';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 
 interface FetchError {
@@ -8,7 +9,6 @@ interface FetchError {
   body: string;
 }
 
-const host = process.env.VUE_APP_API_URI;
 const fetchErrors: FetchError[] = [];
 
 export const getErrors =
@@ -45,12 +45,12 @@ export const fetchJson =
   };
 
 export const get =
-  async (url: string): Promise<any> => fetchJson(`${host}${url}`);
+  async (url: string): Promise<any> => fetchJson(`${HOST}${url}`);
 
 export const post =
   async (url: string, data: any, method = 'POST'): Promise<any> =>
     fetchJson(
-      `${host}${url}`,
+      `${HOST}${url}`,
       {
         method,
         body: JSON.stringify(serialize(data)),
@@ -70,4 +70,4 @@ export const del =
   async (url: string, data: any): Promise<any> => post(url, data, 'DELETE');
 
 export const sse =
-  (url: string): EventSource => new EventSource(`${host}${url}`);
+  (url: string): EventSource => new EventSource(`${HOST}${url}`);

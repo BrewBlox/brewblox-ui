@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import buildEnv from '@/build-env.json';
 import { checkDatastore } from '@/helpers/datastore';
 import { createDialog } from '@/helpers/dialog';
 
@@ -17,14 +16,14 @@ export default class DefaultLayout extends Vue {
   }
 
   // env flag
-  automationFeatureEnabled = process.env.VUE_APP_AUTOMATION_FEATURE === 'true';
+  automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
 
   get version(): string {
-    return buildEnv.version || 'UNKNOWN';
+    return process.env.BLOX_VERSION || 'UNKNOWN';
   }
 
   get buildDate(): string {
-    return buildEnv.date || 'UNKNOWN';
+    return process.env.BLOX_DATE || 'UNKNOWN';
   }
 
   showWizard(): void {
@@ -130,7 +129,9 @@ export default class DefaultLayout extends Vue {
   </q-layout>
 </template>
 
-<style scoped>
+<style lang="scss">
+@import "src/css/app.sass";
+
 .bottomed {
   bottom: 0;
   position: absolute;

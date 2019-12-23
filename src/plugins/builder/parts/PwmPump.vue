@@ -25,9 +25,9 @@ export default class PwmPump extends PartBase {
   }
 
   get duration(): number {
-    const pwmMod = 2 / (this.pwmSetting / 100 + 0.0001);
-    const calculated = pwmMod * DEFAULT_PUMP_PRESSURE / (this.settings.onPressure || DEFAULT_PUMP_PRESSURE);
-    return Math.max(calculated, 0.5);
+    const pressure = ((this.settings.onPressure ?? DEFAULT_PUMP_PRESSURE) / 100 * this.pwmSetting) || 0.01;
+    const animationDuration = 60 / pressure;
+    return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
   }
 
   @Watch('pwmBlock')
@@ -84,7 +84,7 @@ export default class PwmPump extends PartBase {
   </g>
 </template>
 
-<style lang="stylus" scoped>
+<style lang="scss" scoped>
 /deep/ .ballLiquid path {
   stroke-width: 15px !important;
 }

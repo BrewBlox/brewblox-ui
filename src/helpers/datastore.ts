@@ -1,7 +1,8 @@
 import { Notify } from 'quasar';
 
+import { HOST } from '@/helpers/const';
+
 export const checkDatastore = (): void => {
-  const HOST = process.env.VUE_APP_API_URI || window.location.origin;
   const addr = `${HOST}/datastore`;
 
   const request = new XMLHttpRequest();

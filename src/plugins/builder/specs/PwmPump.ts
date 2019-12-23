@@ -20,6 +20,7 @@ const spec: PartSpec = {
       component: 'PressureCard',
       props: {
         settingsKey: 'onPressure',
+        label: 'Pressure at 100%',
         min: MIN_PUMP_PRESSURE,
         max: MAX_PUMP_PRESSURE,
         defaultValue: DEFAULT_PUMP_PRESSURE,
@@ -29,7 +30,7 @@ const spec: PartSpec = {
   transitions: (part: PersistentPart) => {
     const block = settingsBlock<ActuatorPwmBlock>(part, 'pwm');
     const pressure = block
-      ? (block.data.setting / 100) * (part.settings.onPressure || DEFAULT_PUMP_PRESSURE)
+      ? (block.data.setting / 100) * (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE)
       : 0;
     return {
       [LEFT]: [{ outCoords: RIGHT, source: true }],

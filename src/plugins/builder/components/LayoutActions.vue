@@ -3,8 +3,8 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog, showImportDialog } from '@/helpers/dialog';
-import { saveFile } from '@/helpers/import-export';
+import { createDialog } from '@/helpers/dialog';
+import { loadFile, saveFile } from '@/helpers/import-export';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { dashboardStore } from '@/store/dashboards';
 
@@ -54,7 +54,7 @@ export default class LayoutActions extends Vue {
 
 
   async importLayout(): Promise<void> {
-    showImportDialog<BuilderLayout>(async layout => {
+    loadFile<BuilderLayout>(async layout => {
       const id = uid();
       await builderStore.createLayout({ ...layout, id });
       this.selectLayout(id);

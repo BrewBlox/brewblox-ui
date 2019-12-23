@@ -7,7 +7,7 @@ import { deepCopy } from '@/helpers/units/parseObject';
 
 import { emptyGraphConfig } from '../getters';
 import { historyStore } from '../store';
-import { LoggedSession, SessionNote } from '../types';
+import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
 
 
@@ -102,6 +102,7 @@ export default class SessionCreateDialog extends DialogBase {
           return { ...copy, value: '' };
         }
         if (note.type === 'Graph') {
+          (copy as SessionGraphNote).config.layout.annotations = [];
           return { ...copy, start: null, end: null };
         }
         return copy;

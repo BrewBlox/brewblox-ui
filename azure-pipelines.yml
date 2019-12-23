@@ -34,12 +34,12 @@ steps:
 
 - bash: |
     npm ci
-    npm run cert:check
+    npm run makecert
   displayName: NPM install
 
 - bash: |
     npm run lint
-  #  npm run test
+    npm run test
   displayName: NPM test
 
 - bash: |

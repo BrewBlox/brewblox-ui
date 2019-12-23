@@ -26,20 +26,20 @@ export default class MetricsDisplayDialog extends DialogBase {
   }
 
   get rename(): string {
-    return this.local!.renames[this.field] || defaultLabel(this.field);
+    return this.local!.renames[this.field] ?? defaultLabel(this.field);
   }
 
   set rename(val: string) {
-    this.$set(this.local!.renames, this.field, val || defaultLabel(this.field));
+    this.$set(this.local!.renames, this.field, val ?? defaultLabel(this.field));
   }
 
   get fresh(): string {
     return durationString(
-      this.local!.freshDuration[this.field] || DEFAULT_FRESH_DURATION);
+      this.local!.freshDuration[this.field] ?? DEFAULT_FRESH_DURATION);
   }
 
   set fresh(val: string) {
-    const ms = durationMs(val) || DEFAULT_FRESH_DURATION;
+    const ms = durationMs(val) ?? DEFAULT_FRESH_DURATION;
     this.$set(this.local!.freshDuration, this.field, ms);
   }
 

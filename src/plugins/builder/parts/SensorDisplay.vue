@@ -40,7 +40,7 @@ export default class SensorDisplay extends PartBase {
       <div v-else class="text-white text-bold text-center">
         <q-icon name="mdi-thermometer" />
         <small>{{ tempUnit }}</small>
-        <br />
+        <br>
         {{ temperature | round(1) }}
       </div>
     </foreignObject>

@@ -81,7 +81,7 @@ export default class PidDisplay extends PartBase {
         <q-space />
         <q-icon v-if="drivingOffset && kp !== null" name="mdi-plus-minus" size="sm" />
         <q-icon v-if="kp === null" name="mdi-calculator-variant" class="q-mr-xs" />
-        <br />
+        <br>
         {{ outputSetting | truncateRound }}<small v-if="!!block" style="margin-left: 2px">{{ suffix }}</small>
       </div>
     </foreignObject>

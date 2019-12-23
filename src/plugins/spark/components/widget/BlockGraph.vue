@@ -150,7 +150,7 @@ export default class BlockGraph extends Vue {
               :config="graphCfg"
               :header="graphCfg.layout.title"
             />
-            <q-item link clickable @click="updateDuration">
+            <q-item clickable @click="updateDuration">
               <q-item-section>Duration</q-item-section>
               <q-item-section class="col-auto">
                 {{ durationString(graphCfg.params.duration) }}
@@ -161,7 +161,6 @@ export default class BlockGraph extends Vue {
                 v-for="[key, renamed] in targetKeys"
                 :key="key"
                 :inset-level="0.2"
-                link
                 clickable
                 @click="updateKeySide(key, !isRightAxis(key))"
               >
@@ -179,7 +178,7 @@ export default class BlockGraph extends Vue {
   </q-dialog>
 </template>
 
-<style scoped lang="stylus">
+<style scoped lang="scss">
 .mirrored {
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
