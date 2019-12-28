@@ -32,7 +32,6 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   }
 
   mounted(): void {
-    console.log(this.$q.platform);
     this.$watch('widget.cols', this.refresh);
     this.$watch('widget.rows', this.refresh);
   }
