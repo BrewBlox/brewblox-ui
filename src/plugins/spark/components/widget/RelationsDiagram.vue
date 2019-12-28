@@ -44,9 +44,6 @@ export default class RelationsDiagram extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly hideUnrelated!: boolean;
 
-  @Prop({ type: Object, required: true })
-  public readonly contentStyle!: Mapped<string>;
-
   get drawnNodes(): RelationNode[] {
     return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
       .map(id => this.nodes.find(node => node.id === id) || { id, type: '???' });
@@ -173,7 +170,7 @@ export default class RelationsDiagram extends Vue {
 </script>
 
 <template>
-  <div class="row overflow-auto" :style="contentStyle">
+  <div class="row overflow-auto full-width full-height">
     <q-space />
     <svg ref="svg" class="col-auto">
       <g ref="diagram" />

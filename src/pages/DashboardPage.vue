@@ -164,6 +164,7 @@ export default class DashboardPage extends Vue {
       </portal>
       <portal to="toolbar-buttons">
         <q-btn-toggle
+          v-if="!dense"
           v-model="widgetEditable"
           class="q-mr-md"
           flat
