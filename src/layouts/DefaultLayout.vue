@@ -7,7 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen = true;
+  leftDrawerOpen = this.$q.screen.gt.md;
   dashboardEditing = false;
   serviceEditing = false;
 
