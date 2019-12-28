@@ -39,23 +39,17 @@ export default class SetpointProfileWidget
     }
   }
 
-  get cardStyle(): Mapped<string> {
-    return {};
-    // return this.inDialog && this.mode === 'Basic'
-    //   ? { height: '60vh' }
-    //   : {};
-  }
-
   get graphProps(): GraphProps {
     return profileGraphProps(this.block);
   }
 
+  refresh(): void {
+    this.revision++;
+  }
+
   mounted(): void {
-    const updateGraph = (): any => this.revision++;
-    this.$watch('block.data.targetId.id', updateGraph);
-    this.$watch('block.data.enabled', updateGraph);
-    this.$watch('widget.cols', updateGraph);
-    this.$watch('widget.rows', updateGraph);
+    this.$watch('block.data.targetId.id', this.refresh);
+    this.$watch('block.data.enabled', this.refresh);
   }
 }
 </script>
@@ -66,7 +60,7 @@ export default class SetpointProfileWidget
       <GenericGraph v-bind="graphProps" :revision="revision" />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass" :style="cardStyle">
+    <component :is="mode" :crud="crud" :class="cardClass">
       <template #toolbar>
         <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
           <template #actions>
@@ -100,6 +94,7 @@ export default class SetpointProfileWidget
       </template>
 
       <template #graph>
+        <q-resize-observer :debounce="200" @resize="refresh" />
         <GenericGraph v-bind="graphProps" :revision="revision" auto-fit auto-resize />
       </template>
     </component>

@@ -31,11 +31,6 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     this.wrapperGraphId = uid();
   }
 
-  mounted(): void {
-    this.$watch('widget.cols', this.refresh);
-    this.$watch('widget.rows', this.refresh);
-  }
-
   get config(): GraphConfig {
     return {
       ...emptyGraphConfig(),
@@ -210,6 +205,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
 
       <template v-if="mode === 'Basic'">
         <div class="col">
+          <q-resize-observer :debounce="200" @resize="refresh" />
           <HistoryGraph
             ref="widgetGraph"
             :graph-id="widgetGraphId"
