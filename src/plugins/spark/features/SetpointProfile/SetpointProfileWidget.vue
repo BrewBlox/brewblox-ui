@@ -18,23 +18,32 @@ export default class SetpointProfileWidget
   extends BlockWidgetBase<SetpointProfileBlock> {
   revision = 0;
 
-  get cardClass(): string[] {
-    if (this.inDialog) {
-      return this.mode === 'Full'
-        ? ['widget-modal']
-        : ['widget-modal', 'col', 'column'];
+  // Overrides WidgetBase
+  *cardClassGenerator(): Generator<string, void, undefined> {
+    yield 'bg-dark';
+
+    yield this.inDialog
+      ? 'widget-modal'
+      : 'widget-dashboard';
+
+    if (this.$q.screen.lt.lg) {
+      yield 'widget-dense';
     }
-    else {
-      return this.mode === 'Full'
-        ? ['widget-dashboard', 'overflow-auto', 'scroll']
-        : ['widget-dashboard', 'overflow-unset', 'col', 'column'];
+
+    if (this.mode === 'Basic') {
+      yield* ['col', 'column'];
+    }
+
+    if (this.mode === 'Full' && !this.inDialog) {
+      yield* ['overflow-auto', 'scroll'];
     }
   }
 
   get cardStyle(): Mapped<string> {
-    return this.inDialog && this.mode === 'Basic'
-      ? { height: '60vh' }
-      : {};
+    return {};
+    // return this.inDialog && this.mode === 'Basic'
+    //   ? { height: '60vh' }
+    //   : {};
   }
 
   get graphProps(): GraphProps {

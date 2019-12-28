@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
-import { createDialog, showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
@@ -161,7 +161,7 @@ export function showAbsentBlock(part: PersistentPart, key: string): void {
 export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
   const block = settingsBlock(part, key);
   block !== null
-    ? showBlockDialog(block, { mode: 'Basic' })
+    ? createBlockDialog(block, { mode: 'Basic' })
     : showAbsentBlock(part, key);
 }
 
@@ -181,7 +181,7 @@ export function showDrivingBlockDialog(part: PersistentPart, key: string): void 
     : block;
 
   if (actual) {
-    showBlockDialog(actual, { mode: 'Basic' });
+    createBlockDialog(actual, { mode: 'Basic' });
   }
 }
 

@@ -24,12 +24,20 @@
 
 .widget-modal
   width: 800px
+  height: 800px
   max-width: 100vw
+  max-height: 100vh
   background: $dark_bright
-  max-height: 80vh
 
 .widget-dashboard
   background: $dark
+
+.dialog-content
+  height: calc(100% - 50px)
+
+.q-dialog__inner--maximized .dialog-toolbar
+  position: fixed
+  width: 100vw
 
 .editable
   text-decoration: underline

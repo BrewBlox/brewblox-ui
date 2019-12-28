@@ -43,7 +43,7 @@ export default class WidgetDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
+  <q-dialog ref="dialog" :maximized="$q.screen.lt.lg" no-backdrop-dismiss class="row" @hide="onDialogHide">
     <component
       :is="widgetComponent"
       :initial-crud="crud"

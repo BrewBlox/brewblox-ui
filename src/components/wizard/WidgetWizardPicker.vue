@@ -98,7 +98,7 @@ export default class WidgetWizardPicker extends Vue {
 </script>
 
 <template>
-  <div>
+  <div class="dialog-content">
     <component
       :is="feature.component"
       v-if="wizardActive"
@@ -109,7 +109,7 @@ export default class WidgetWizardPicker extends Vue {
       @close="close"
     />
 
-    <template v-else>
+    <WizardCard v-else>
       <q-card-section>
         <q-item>
           <q-item-section>
@@ -150,12 +150,11 @@ export default class WidgetWizardPicker extends Vue {
         />
       </q-card-section>
 
-      <q-separator />
-
-      <q-card-actions class="row justify-between">
+      <template #actions>
         <q-btn unelevated label="Back" @click="back" />
+        <q-space />
         <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="next" />
-      </q-card-actions>
-    </template>
+      </template>
+    </WizardCard>
   </div>
 </template>

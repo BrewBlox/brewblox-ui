@@ -32,6 +32,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   }
 
   mounted(): void {
+    console.log(this.$q.platform);
     this.$watch('widget.cols', this.refresh);
     this.$watch('widget.rows', this.refresh);
   }
@@ -49,20 +50,26 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     this.regraph();
   }
 
-  get graphCardClass(): string[] {
-    if (this.inDialog) {
-      return this.mode === 'Full'
-        ? ['widget-modal']
-        : ['widget-modal', 'col', 'column'];
+  // Overrides WidgetBase
+  *cardClassGenerator(): Generator<string, void, undefined> {
+    yield this.inDialog
+      ? 'widget-modal'
+      : 'widget-dashboard';
+
+    if (this.$q.screen.lt.lg) {
+      yield 'widget-dense';
     }
-    else {
-      return this.mode === 'Full'
-        ? ['widget-dashboard', 'overflow-auto', 'scroll']
-        : ['widget-dashboard', 'overflow-unset', 'col', 'column'];
+
+    if (this.mode === 'Basic') {
+      yield* ['col', 'column'];
+    }
+
+    if (this.mode === 'Full' && !this.inDialog) {
+      yield* ['overflow-auto', 'scroll'];
     }
   }
 
-  get graphCardStyle(): Mapped<string> {
+  get cardStyle(): Mapped<string> {
     return this.inDialog && this.mode === 'Basic'
       ? { height: '60vh' }
       : {};
@@ -175,7 +182,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       />
     </template>
 
-    <q-card :class="graphCardClass" :style="graphCardStyle">
+    <q-card :class="cardClass" :style="cardStyle">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
@@ -225,7 +232,9 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
 
 <style scoped>
 .scroll-parent {
-  height: 500px;
-  max-height: 60vh;
+  height: calc(100% - 50px);
+}
+.widget-dashboard.widget-dense {
+  height: 100vh;
 }
 </style>

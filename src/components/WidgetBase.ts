@@ -60,10 +60,20 @@ export default class WidgetBase<ConfigT = any> extends Vue {
       : 'WidgetToolbar';
   }
 
+  public *cardClassGenerator(): Generator<string, void, undefined> {
+    yield 'overflow-auto';
+
+    yield* this.inDialog
+      ? ['widget-modal']
+      : ['widget-dashboard', 'scroll'];
+
+    if (this.$q.screen.lt.lg) {
+      yield 'widget-dense';
+    }
+  }
+
   public get cardClass(): string[] {
-    return this.inDialog
-      ? ['widget-modal', 'overflow-auto']
-      : ['widget-dashboard', 'overflow-auto', 'scroll'];
+    return [...this.cardClassGenerator()];
   }
 
   public saveWidget(widget: PersistentWidget = this.crud.widget): void {

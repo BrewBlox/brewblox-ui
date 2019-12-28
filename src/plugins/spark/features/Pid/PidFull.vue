@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 import { SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
@@ -53,11 +53,11 @@ export default class PidFull
   }
 
   showInput(): void {
-    showBlockDialog(this.inputBlock);
+    createBlockDialog(this.inputBlock);
   }
 
   showOutput(): void {
-    showBlockDialog(this.outputBlock);
+    createBlockDialog(this.outputBlock);
   }
 
   grid(opts: GridOpts): Mapped<string> {

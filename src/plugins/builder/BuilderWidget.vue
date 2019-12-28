@@ -34,10 +34,23 @@ export default class BuilderWidget extends WidgetBase {
       this.widget.config.currentLayoutId || '');
   }
 
-  get builderCardClass(): string[] {
-    return this.inDialog
-      ? ['widget-modal', 'column']
-      : ['widget-dashboard', 'column', 'overflow-unset'];
+  get dense(): boolean {
+    return this.$q.screen.lt.lg;
+  }
+
+  get editorDisabled(): boolean {
+    const { ie, edge } = this.$q.platform.is;
+    return Boolean(ie || edge) || this.dense;
+  }
+
+  public *cardClassGenerator(): Generator<string, void, undefined> {
+    yield* ['column', 'no-wrap'];
+    yield* this.inDialog
+      ? ['widget-modal']
+      : ['widget-dashboard', 'overflow-unset'];
+    if (this.dense) {
+      yield 'widget-dense';
+    }
   }
 
   get builderCardStyle(): Mapped<string> {
@@ -54,9 +67,9 @@ export default class BuilderWidget extends WidgetBase {
       const toolbarSpace = 50;
       return {
         height: `${height + toolbarSpace + pickerSpace}px`, // not an exact science
-        maxHeight: '90vh',
+        maxHeight: this.dense ? '100vh' : '90vh',
         width: `${width}px`,
-        maxWidth: '95vw',
+        maxWidth: this.dense ? '100vw' : '95vw',
       };
     }
     return {};
@@ -65,11 +78,11 @@ export default class BuilderWidget extends WidgetBase {
 </script>
 
 <template>
-  <component :is="mode" :crud="crud" :class="builderCardClass" :style="builderCardStyle">
+  <component :is="mode" :crud="crud" :class="cardClass" :style="builderCardStyle" :editor-disabled="editorDisabled">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
-          <ActionItem icon="mdi-pipe" label="Builder Editor" @click="startEditor" />
+          <ActionItem v-if="!editorDisabled" icon="mdi-pipe" label="Builder Editor" @click="startEditor" />
         </template>
       </component>
     </template>

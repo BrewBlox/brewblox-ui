@@ -81,7 +81,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
 </script>
 
 <template>
-  <div>
+  <WizardCard>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -171,12 +171,10 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
       </CardWarning>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
-    </q-card-actions>
-  </div>
+    </template>
+  </WizardCard>
 </template>

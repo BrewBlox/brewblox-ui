@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog, showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
@@ -51,7 +51,7 @@ export default class BlockField extends FieldBase {
   }
 
   editBlock(): void {
-    showBlockDialog(this.linkBlock);
+    createBlockDialog(this.linkBlock);
   }
 
   openDialog(): void {

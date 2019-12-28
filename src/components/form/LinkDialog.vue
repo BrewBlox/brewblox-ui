@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -65,7 +65,7 @@ export default class LinkDialog extends DialogBase {
   }
 
   edit(): void {
-    showBlockDialog(this.linkBlock);
+    createBlockDialog(this.linkBlock);
   }
 
   create(): void {

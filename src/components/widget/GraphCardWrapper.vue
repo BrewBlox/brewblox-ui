@@ -79,7 +79,7 @@ export default class GraphCardWrapper extends Vue {
 .wrapper-card {
   padding: 0;
   margin: 0;
-  max-width: 95vw;
+  max-width: 100vw;
   background-color: rgba(0, 0, 0, 0);
 }
 

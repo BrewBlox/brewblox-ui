@@ -55,6 +55,27 @@ export default class SparkPage extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  @Watch('statusNok', { immediate: true })
+  autoRecheck(): void {
+    if (this.statusNok && !this.statusCheckInterval) {
+      this.statusCheckInterval = setInterval(
+        () => sparkStore.fetchServiceStatus(this.service.id),
+        5000,
+      );
+    }
+    if (!this.statusNok && this.statusCheckInterval) {
+      sparkStore.fetchAll(this.service.id);
+      sparkStore.createUpdateSource(this.service.id);
+      clearTimeout(this.statusCheckInterval);
+      this.statusCheckInterval = null;
+      this.$forceUpdate();
+    }
+  }
+
+  destroyed(): void {
+    this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
+  }
+
   get service(): Spark {
     return serviceStore.serviceById(this.serviceId) as Spark;
   }
@@ -111,6 +132,10 @@ export default class SparkPage extends Vue {
   set pageMode(mode: PageMode) {
     this.service.config.pageMode = mode;
     this.saveServiceConfig();
+  }
+
+  get dense(): boolean {
+    return this.$q.screen.lt.lg;
   }
 
   get allSorters(): { [id: string]: (a: ValidatedWidget, b: ValidatedWidget) => number } {
@@ -292,23 +317,6 @@ export default class SparkPage extends Vue {
     this.expandedBlocks = {};
   }
 
-  @Watch('statusNok', { immediate: true })
-  autoRecheck(): void {
-    if (this.statusNok && !this.statusCheckInterval) {
-      this.statusCheckInterval = setInterval(
-        () => sparkStore.fetchServiceStatus(this.service.id),
-        5000,
-      );
-    }
-    if (!this.statusNok && this.statusCheckInterval) {
-      sparkStore.fetchAll(this.service.id);
-      sparkStore.createUpdateSource(this.service.id);
-      clearTimeout(this.statusCheckInterval);
-      this.statusCheckInterval = null;
-      this.$forceUpdate();
-    }
-  }
-
   saveWidget(widget: PersistentWidget): void {
     this.volatileWidgets[this.volatileKey(widget.id)] = { ...widget };
     this.$q.notify({
@@ -365,8 +373,20 @@ export default class SparkPage extends Vue {
     this.$q.notify({ message, icon: 'mdi-tag-remove' });
   }
 
-  destroyed(): void {
-    this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
+  onBlockClick(val: ValidatedWidget): void {
+    if (this.dense) {
+      createDialog({
+        component: 'WidgetDialog',
+        parent: this,
+        getCrud: () => val.crud,
+      });
+    }
+    else if (val.expanded) {
+      this.scrollTo(val.id);
+    }
+    else {
+      this.updateExpandedBlock(val.id, true);
+    }
   }
 }
 </script>
@@ -384,64 +404,71 @@ export default class SparkPage extends Vue {
         dense
         no-caps
         :options="[
-          {icon:'mdi-format-list-checkbox', value: 'List', label: 'List view'},
-          {icon:'mdi-vector-line', value: 'Relations', label: 'Relation view'},
+          {icon:'mdi-format-list-checkbox', value: 'List'},
+          {icon:'mdi-vector-line', value: 'Relations'},
         ]"
       />
-      <q-btn-dropdown :disable="!isReady || statusNok" color="primary" label="actions">
-        <q-list>
-          <ActionItem
-            icon="add"
-            label="New Block"
-            @click="startDialog('BlockWizardDialog')"
-          />
-          <ActionItem
-            icon="mdi-magnify-plus-outline"
-            label="Discover new OneWire Blocks"
-            @click="discoverBlocks"
-          />
-          <ActionItem
-            icon="mdi-tag-remove"
-            label="Remove unused Block names"
-            @click="cleanUnusedNames"
-          />
-          <ActionItem
-            icon="mdi-download-network"
-            label="Update firmware"
-            @click="startDialog('FirmwareUpdateDialog')"
-          />
-          <ActionItem
-            icon="wifi"
-            label="Configure Wifi"
-            @click="startDialog('SparkWifiMenu')"
-          />
-          <ActionItem
-            icon="mdi-checkbox-multiple-marked"
-            label="Groups"
-            @click="startDialog('SparkGroupMenu')"
-          />
-          <ActionItem
-            icon="mdi-temperature-celsius"
-            label="Units"
-            @click="startDialog('SparkUnitMenu')"
-          />
-          <ActionItem
-            icon="mdi-file-export"
-            label="Import/Export Blocks"
-            @click="startDialog('SparkImportMenu')"
-          />
-          <ActionItem
-            icon="mdi-test-tube"
-            label="Create Mock Blocks"
-            @click="startDialog('CreateMockMenu')"
-          />
-          <ActionItem
-            icon="delete"
-            label="Remove all Blocks"
-            @click="startResetBlocks(service.id)"
-          />
-        </q-list>
-      </q-btn-dropdown>
+      <q-btn
+        :disable="!isReady || statusNok"
+        icon="mdi-dots-vertical"
+        unelevated
+      >
+        <q-tooltip>Actions</q-tooltip>
+        <q-menu>
+          <q-list bordered>
+            <ActionItem
+              icon="add"
+              label="New Block"
+              @click="startDialog('BlockWizardDialog')"
+            />
+            <ActionItem
+              icon="mdi-magnify-plus-outline"
+              label="Discover new OneWire Blocks"
+              @click="discoverBlocks"
+            />
+            <ActionItem
+              icon="mdi-tag-remove"
+              label="Remove unused Block names"
+              @click="cleanUnusedNames"
+            />
+            <ActionItem
+              icon="mdi-download-network"
+              label="Update firmware"
+              @click="startDialog('FirmwareUpdateDialog')"
+            />
+            <ActionItem
+              icon="wifi"
+              label="Configure Wifi"
+              @click="startDialog('SparkWifiMenu')"
+            />
+            <ActionItem
+              icon="mdi-checkbox-multiple-marked"
+              label="Groups"
+              @click="startDialog('SparkGroupMenu')"
+            />
+            <ActionItem
+              icon="mdi-temperature-celsius"
+              label="Units"
+              @click="startDialog('SparkUnitMenu')"
+            />
+            <ActionItem
+              icon="mdi-file-export"
+              label="Import/Export Blocks"
+              @click="startDialog('SparkImportMenu')"
+            />
+            <ActionItem
+              icon="mdi-test-tube"
+              label="Create Mock Blocks"
+              @click="startDialog('CreateMockMenu')"
+            />
+            <ActionItem
+              icon="delete"
+              label="Remove all Blocks"
+              @click="startResetBlocks(service.id)"
+            />
+          </q-list>
+        </q-menu>
+      </q-btn>
     </portal>
 
     <!-- Shown if service was found in store, but not ok -->
@@ -477,31 +504,35 @@ export default class SparkPage extends Vue {
                 </q-input>
               </q-item-section>
               <q-item-section class="col-auto">
-                <q-btn-dropdown :label="sorting" icon="mdi-sort" flat>
-                  <q-list>
-                    <ActionItem
-                      v-for="(func, name) in allSorters"
-                      :key="name"
-                      :active="sorting === name"
-                      :label="capitalized(name)"
-                      @click="sorting = name"
-                    />
-                  </q-list>
-                </q-btn-dropdown>
-                <q-tooltip>Sort Blocks</q-tooltip>
+                <q-btn icon="mdi-sort" flat>
+                  <q-tooltip>Sort Blocks</q-tooltip>
+                  <q-menu>
+                    <q-list>
+                      <ActionItem
+                        v-for="(func, name) in allSorters"
+                        :key="name"
+                        :active="sorting === name"
+                        :label="capitalized(name)"
+                        @click="sorting = name"
+                      />
+                    </q-list>
+                  </q-menu>
+                </q-btn>
               </q-item-section>
               <q-item-section class="col-auto">
-                <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone" />
-                <q-tooltip>Unselect all</q-tooltip>
+                <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
+                  <q-tooltip>Unselect all</q-tooltip>
+                </q-btn>
               </q-item-section>
               <q-item-section class="col-auto">
-                <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll" />
-                <q-tooltip>Select all</q-tooltip>
+                <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
+                  <q-tooltip>Select all</q-tooltip>
+                </q-btn>
               </q-item-section>
             </q-item>
             <!-- Service -->
             <q-item v-if="serviceShown" class="text-white widget-index">
-              <q-item-section side class="q-mx-none q-px-none">
+              <q-item-section v-if="!dense" side class="q-mx-none q-px-none">
                 <ToggleButton v-model="serviceExpanded" />
               </q-item-section>
               <q-item-section>
@@ -510,9 +541,13 @@ export default class SparkPage extends Vue {
                     <q-icon name="mdi-information-variant" />
                     <q-tooltip>Device Info</q-tooltip>
                   </q-item-section>
-                  <q-item-section>{{ serviceId }}</q-item-section>
-                  <q-item-section side>
-                    Device Info
+                  <q-item-section>
+                    <q-item-label caption class="text-italic">
+                      Device info
+                    </q-item-label>
+                    <div style="font-size: larger">
+                      {{ serviceId }}
+                    </div>
                   </q-item-section>
                 </q-item>
               </q-item-section>
@@ -523,21 +558,25 @@ export default class SparkPage extends Vue {
               :key="val.key"
               class="non-selectable text-white widget-index"
             >
-              <q-item-section side class="q-mx-none q-px-none">
+              <q-item-section v-if="!dense" side class="q-mx-none q-px-none">
                 <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
               </q-item-section>
               <q-item-section>
                 <q-item
                   clickable
-                  @click="val.expanded ? scrollTo(val.id) : updateExpandedBlock(val.id, true)"
+                  @click="onBlockClick(val)"
                 >
                   <q-item-section avatar>
                     <q-icon :name="roleIcons[val.role]" />
                     <q-tooltip>{{ val.role }}</q-tooltip>
                   </q-item-section>
-                  <q-item-section>{{ val.id }}</q-item-section>
-                  <q-item-section side>
-                    {{ val.displayName }}
+                  <q-item-section>
+                    <q-item-label caption class="text-italic darkish">
+                      {{ val.displayName }}
+                    </q-item-label>
+                    <div style="font-size: larger">
+                      {{ val.id }}
+                    </div>
                   </q-item-section>
                 </q-item>
               </q-item-section>
@@ -546,7 +585,11 @@ export default class SparkPage extends Vue {
         </q-scroll-area>
 
         <!-- Widget List -->
-        <q-scroll-area class="col-auto q-ml-xl" style="min-width: 500px; max-width: 500px">
+        <q-scroll-area
+          v-if="!dense"
+          class="col-auto q-ml-xl"
+          style="min-width: 500px; max-width: 500px"
+        >
           <q-list>
             <!-- Service -->
             <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">

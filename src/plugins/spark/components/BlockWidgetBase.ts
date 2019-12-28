@@ -8,10 +8,11 @@ import { postfixedDisplayNames } from '@/helpers/units';
 import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { Block, BlockCrud } from '../types';
+import { Block, BlockConfig, BlockCrud } from '../types';
 
 @Component
-export default class BlockWidgetBase<BlockT extends Block = Block> extends WidgetBase {
+export default class BlockWidgetBase<BlockT extends Block = Block>
+  extends WidgetBase<BlockConfig> {
 
   @Prop({ type: Boolean, default: false })
   public readonly volatileBlock!: boolean;

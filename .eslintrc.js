@@ -14,8 +14,7 @@ module.exports = {
   ],
   'plugins': ['simple-import-sort', 'quasar'],
   'rules': {
-    // disabled until https://github.com/quasarframework/quasar/issues/5908 is fixed
-    'quasar/check-valid-props': 'off',
+    'quasar/check-valid-props': 'warn',
     'quotes': ['error', 'single', { 'avoidEscape': true }],
     'class-methods-use-this': 0,
     'simple-import-sort/sort': 'error',

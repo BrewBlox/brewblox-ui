@@ -92,8 +92,8 @@ export default class DashboardPage extends Vue {
       });
   }
 
-  get isMobile(): boolean {
-    return this.$q.platform.is.mobile;
+  get dense(): boolean {
+    return this.$q.screen.lt.lg;
   }
 
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
@@ -173,33 +173,33 @@ export default class DashboardPage extends Vue {
             {icon:'mdi-lock', value: false},
           ]"
         />
-        <q-btn-dropdown color="primary" label="actions">
-          <q-list>
-            <ActionItem icon="add" label="New Widget" @click="showWizard" />
-            <q-item clickable @click="toggleDefaultDashboard">
-              <q-item-section avatar>
-                <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
-              </q-item-section>
-              <q-item-section>Toggle default dashboard</q-item-section>
-            </q-item>
-            <ActionItem icon="edit" label="Change dashboard ID" @click="changeDashboardId" />
-            <ActionItem icon="edit" label="Change dashboard Title" @click="changeDashboardTitle" />
-            <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
-          </q-list>
-        </q-btn-dropdown>
+        <q-btn icon="mdi-dots-vertical" unelevated>
+          <q-tooltip>Actions</q-tooltip>
+          <q-menu>
+            <q-list bordered>
+              <ActionItem icon="add" label="New Widget" @click="showWizard" />
+              <q-item clickable @click="toggleDefaultDashboard">
+                <q-item-section avatar>
+                  <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
+                </q-item-section>
+                <q-item-section>Toggle default dashboard</q-item-section>
+              </q-item>
+              <ActionItem icon="edit" label="Change dashboard ID" @click="changeDashboardId" />
+              <ActionItem icon="edit" label="Change dashboard Title" @click="changeDashboardTitle" />
+              <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
+            </q-list>
+          </q-menu>
+        </q-btn>
       </portal>
-      <q-list v-if="isMobile">
-        <q-item v-for="val in validatedWidgets" :key="val.id">
-          <q-item-section>
-            <component
-              :is="val.component"
-              :initial-crud="val.crud"
-              :context="context"
-              class="dashboard-widget"
-            />
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <div v-if="dense" class="column q-gutter-y-sm">
+        <div v-for="val in validatedWidgets" :key="val.id" class="col full-width">
+          <component
+            :is="val.component"
+            :initial-crud="val.crud"
+            :context="context"
+          />
+        </div>
+      </div>
       <GridContainer
         v-else
         :editable="widgetEditable"
@@ -219,6 +219,3 @@ export default class DashboardPage extends Vue {
     </div>
   </q-page>
 </template>
-
-<style scoped>
-</style>

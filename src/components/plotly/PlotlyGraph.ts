@@ -6,34 +6,31 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
 // This component forwards all events emitted by Plotly
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-const eventNames = [
-  'plotly_afterexport',
-  'plotly_afterplot',
-  'plotly_animated',
-  'plotly_animatingframe',
-  'plotly_animationinterrupted',
-  'plotly_autosize',
-  'plotly_beforeexport',
-  'plotly_buttonclicked',
-  'plotly_click',
-  'plotly_clickannotation',
-  'plotly_deselect',
-  'plotly_doubleclick',
-  'plotly_framework',
-  'plotly_hover',
-  'plotly_relayout',
-  'plotly_restyle',
-  'plotly_redraw',
-  'plotly_selected',
-  'plotly_selecting',
-  'plotly_sliderchange',
-  'plotly_sliderend',
-  'plotly_sliderstart',
-  'plotly_transitioning',
-  'plotly_transitioninterrupted',
-  'plotly_unhover',
-];
+// 'plotly_afterexport',
+// 'plotly_afterplot',
+// 'plotly_animated',
+// 'plotly_animatingframe',
+// 'plotly_animationinterrupted',
+// 'plotly_autosize',
+// 'plotly_beforeexport',
+// 'plotly_buttonclicked',
+// 'plotly_click',
+// 'plotly_clickannotation',
+// 'plotly_deselect',
+// 'plotly_doubleclick',
+// 'plotly_framework',
+// 'plotly_hover',
+// 'plotly_relayout',
+// 'plotly_restyle',
+// 'plotly_redraw',
+// 'plotly_selected',
+// 'plotly_selecting',
+// 'plotly_sliderchange',
+// 'plotly_sliderend',
+// 'plotly_sliderstart',
+// 'plotly_transitioning',
+// 'plotly_transitioninterrupted',
+// 'plotly_unhover',
 
 @Component
 export default class PlotlyGraph extends Vue {
@@ -214,11 +211,13 @@ export default class PlotlyGraph extends Vue {
   public mounted(): void {
     this.createPlot();
     window.addEventListener('resize', this.resizeHandler);
+    window.addEventListener('orientationchange', this.resizeHandler);
     this.$watch('revision', this.resizePlot);
   }
 
   public beforeDestroy(): void {
     window.removeEventListener('resize', this.resizeHandler);
+    window.removeEventListener('orientationchange', this.resizeHandler);
     Plotly.purge(this.plotlyElement);
   }
 

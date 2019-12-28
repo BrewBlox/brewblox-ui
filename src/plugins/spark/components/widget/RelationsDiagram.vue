@@ -6,7 +6,7 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
@@ -167,7 +167,7 @@ export default class RelationsDiagram extends Vue {
   }
 
   openSettings(id: string): void {
-    showBlockDialog(sparkStore.blocks(this.serviceId)[id], { mode: 'Basic' });
+    createBlockDialog(sparkStore.blocks(this.serviceId)[id], { mode: 'Basic' });
   }
 }
 </script>

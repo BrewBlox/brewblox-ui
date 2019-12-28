@@ -55,7 +55,7 @@ export default class QuickStartWizardPicker extends Vue {
 </script>
 
 <template>
-  <div>
+  <div class="dialog-content">
     <!-- Display selected wizard -->
     <component
       :is="wizardModel.wizardComponent"
@@ -67,7 +67,7 @@ export default class QuickStartWizardPicker extends Vue {
     />
 
     <!-- Select a wizard -->
-    <template v-else>
+    <WizardCard v-else>
       <q-card-section>
         <q-item>
           <q-item-section class="text-weight-light">
@@ -117,12 +117,11 @@ export default class QuickStartWizardPicker extends Vue {
         </q-item>
       </q-card-section>
 
-      <q-separator />
-
-      <q-card-actions class="row justify-between">
+      <template #actions>
         <q-btn unelevated label="Back" @click="back" />
+        <q-space />
         <q-btn unelevated label="Next" color="primary" @click="next" />
-      </q-card-actions>
-    </template>
+      </template>
+    </WizardCard>
   </div>
 </template>

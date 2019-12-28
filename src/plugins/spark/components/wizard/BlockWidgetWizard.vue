@@ -138,122 +138,125 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
 </script>
 
 <template>
-  <q-stepper
-    v-model="currentStep"
-    :bordered="false"
-    class="bg-dark-bright no-border"
-    vertical
-    animated
-  >
-    <q-step name="start" title="Select Service">
-      <LabeledField label="Service" item-aligned>
-        <q-option-group v-model="service" :options="serviceOpts" />
-      </LabeledField>
-      <q-stepper-navigation class="row">
-        <q-btn unelevated label="Back" @click="back" />
-        <q-space />
-        <q-btn
-          :disable="!startOk"
-          unelevated
-          label="Create new Block"
-          color="primary"
-          class="q-mx-md"
-          @click="isStoreBlock = false; currentStep = 'create'"
-        />
-        <q-btn
-          :disable="!startOk"
-          unelevated
-          label="Use existing Block"
-          color="primary"
-          @click="isStoreBlock = true; currentStep = 'existing'"
-        />
-      </q-stepper-navigation>
-    </q-step>
+  <WizardCard>
+    <q-stepper
+      v-model="currentStep"
+      :bordered="false"
+      class="bg-dark-bright no-border"
+      vertical
+      animated
+    >
+      <q-step name="start" title="Select Service">
+        <LabeledField label="Service" item-aligned>
+          <q-option-group v-model="service" :options="serviceOpts" />
+        </LabeledField>
+        <portal to="widget-wizard-nav">
+          <q-btn unelevated label="Back" @click="back" />
+          <q-space />
+          <q-btn
+            :disable="!startOk"
+            unelevated
+            label="Create new Block"
+            color="primary"
+            @click="isStoreBlock = false; currentStep = 'create'"
+          />
+          <q-btn
+            :disable="!startOk"
+            unelevated
+            label="Use existing Block"
+            color="primary"
+            @click="isStoreBlock = true; currentStep = 'existing'"
+          />
+        </portal>
+      </q-step>
 
-    <q-step name="create" title="Create new Block">
-      <q-item>
-        <q-item-section>
-          <q-input v-model="blockId" :rules="blockIdRules" autofocus label="Block name">
-            <template #append>
-              <q-icon name="mdi-information">
-                <q-tooltip>
-                  The name of the Spark Controller Block.
-                  <br>Multiple widgets can display the same Block.
-                  <br>Rules:
-                  <ul>
-                    <li>The name must not be empty.</li>
-                    <li>The name must be unique.</li>
-                    <li>The name must begin with a letter.</li>
-                    <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
-                    <li>The name must be less than 200 characters.</li>
-                  </ul>
-                </q-tooltip>
-              </q-icon>
-            </template>
-          </q-input>
-        </q-item-section>
-      </q-item>
-      <q-stepper-navigation class="row">
-        <q-btn unelevated label="Back" @click="block = null; currentStep = 'start'" />
-        <q-space />
-        <q-btn
-          :disable="!createOk"
-          flat
-          label="Configure Block"
-          class="q-mx-md"
-          @click="configureBlock"
-        />
-        <q-btn
-          :disable="!createOk"
-          unelevated
-          label="Create"
-          color="primary"
-          @click="createWidget"
-        />
-      </q-stepper-navigation>
-    </q-step>
+      <q-step name="create" title="Create new Block">
+        <q-item>
+          <q-item-section>
+            <q-input v-model="blockId" :rules="blockIdRules" autofocus label="Block name">
+              <template #append>
+                <q-icon name="mdi-information">
+                  <q-tooltip>
+                    The name of the Spark Controller Block.
+                    <br>Multiple widgets can display the same Block.
+                    <br>Rules:
+                    <ul>
+                      <li>The name must not be empty.</li>
+                      <li>The name must be unique.</li>
+                      <li>The name must begin with a letter.</li>
+                      <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
+                      <li>The name must be less than 200 characters.</li>
+                    </ul>
+                  </q-tooltip>
+                </q-icon>
+              </template>
+            </q-input>
+          </q-item-section>
+        </q-item>
+        <portal to="widget-wizard-nav">
+          <q-btn unelevated label="Back" @click="block = null; currentStep = 'start'" />
+          <q-space />
+          <q-btn
+            :disable="!createOk"
+            flat
+            label="Configure Block"
+            @click="configureBlock"
+          />
+          <q-btn
+            :disable="!createOk"
+            unelevated
+            label="Create"
+            color="primary"
+            @click="createWidget"
+          />
+        </portal>
+      </q-step>
 
-    <q-step name="existing" title="Use existing Block">
-      <q-item>
-        <q-item-section>
-          <q-select
-            :value="block"
-            :options="blockOpts"
-            :rules="[v => !!v || 'You must select a Block']"
-            option-label="id"
-            option-value="id"
-            label="Block"
-            autofocus
-            @input="v => { block = v; widget = null}"
-          >
-            <template #no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                  No results
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-        </q-item-section>
-      </q-item>
-      <q-stepper-navigation class="row">
-        <q-btn unelevated label="Back" @click="block = null; currentStep = 'start'" />
-        <q-space />
-        <q-btn
-          :disable="!existingOk"
-          flat
-          label="Configure Block"
-          class="q-mx-md"
-          @click="configureBlock"
-        />
-        <q-btn
-          :disable="!existingOk"
-          unelevated
-          label="Create"
-          color="primary"
-          @click="createWidget"
-        />
-      </q-stepper-navigation>
-    </q-step>
-  </q-stepper>
+      <q-step name="existing" title="Use existing Block">
+        <q-item>
+          <q-item-section>
+            <q-select
+              :value="block"
+              :options="blockOpts"
+              :rules="[v => !!v || 'You must select a Block']"
+              option-label="id"
+              option-value="id"
+              label="Block"
+              autofocus
+              @input="v => { block = v; widget = null}"
+            >
+              <template #no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+          </q-item-section>
+        </q-item>
+        <portal to="widget-wizard-nav">
+          <q-btn unelevated label="Back" @click="block = null; currentStep = 'start'" />
+          <q-space />
+          <q-btn
+            :disable="!existingOk"
+            flat
+            label="Configure Block"
+            @click="configureBlock"
+          />
+          <q-btn
+            :disable="!existingOk"
+            unelevated
+            label="Create"
+            color="primary"
+            @click="createWidget"
+          />
+        </portal>
+      </q-step>
+    </q-stepper>
+
+    <template #actions>
+      <portal-target name="widget-wizard-nav" class="full-width row justify-end q-gutter-sm" />
+    </template>
+  </WizardCard>
 </template>
