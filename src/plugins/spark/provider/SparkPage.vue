@@ -400,18 +400,6 @@ export default class SparkPage extends Vue {
       <div>Blocks</div>
     </portal>
     <portal to="toolbar-buttons">
-      <q-btn-toggle
-        v-if="false"
-        v-model="pageMode"
-        class="q-mr-md"
-        flat
-        dense
-        no-caps
-        :options="[
-          {icon:'mdi-format-list-checkbox', value: 'List'},
-          {icon:'mdi-vector-line', value: 'Relations'},
-        ]"
-      />
       <q-btn-group flat>
         <q-btn
           flat
