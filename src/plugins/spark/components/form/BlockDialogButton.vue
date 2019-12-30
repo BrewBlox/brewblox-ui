@@ -3,7 +3,7 @@ import isString from 'lodash/isString';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
@@ -23,7 +23,7 @@ export default class BlockDialogButton extends Vue {
   }
 
   openDialog(): void {
-    showBlockDialog(this.block);
+    createBlockDialog(this.block);
   }
 }
 </script>

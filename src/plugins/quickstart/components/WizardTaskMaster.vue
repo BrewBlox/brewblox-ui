@@ -55,7 +55,7 @@ export default class WizardTaskMaster extends Vue {
 </script>
 
 <template>
-  <div>
+  <div class="full-height">
     <component
       :is="currentTask"
       v-if="currentTask"

@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
@@ -130,7 +130,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   }
 
   public showOtherBlock(block: Block, props: any = {}): void {
-    showBlockDialog(block, { props });
+    createBlockDialog(block, { props });
   }
 
   public startMakeWidget(): void {

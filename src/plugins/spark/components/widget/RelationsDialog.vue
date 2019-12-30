@@ -7,11 +7,6 @@ import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
 @Component
 export default class RelationsDialog extends DialogBase {
-  // Start with a ballpark approximation
-  contentStyle = {
-    width: `${window.innerWidth}px`,
-    height: `${window.innerHeight - 50}px`,
-  }
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -27,13 +22,6 @@ export default class RelationsDialog extends DialogBase {
 
   @Prop({ type: Boolean, default: false })
   public readonly hideUnrelated!: boolean;
-
-  onResize({ width, height }): void {
-    this.contentStyle = {
-      width: `${width}px`,
-      height: `${height}px`,
-    };
-  }
 }
 </script>
 
@@ -43,12 +31,8 @@ export default class RelationsDialog extends DialogBase {
       <DialogToolbar>
         {{ title }}
       </DialogToolbar>
-      <div class="col" style="width: 100%">
-        <q-resize-observer @resize="onResize" />
-        <RelationsDiagram
-          :content-style="contentStyle"
-          v-bind="$props"
-        />
+      <div class="col full-width dialog-content">
+        <RelationsDiagram v-bind="$props" />
       </div>
     </q-card>
   </q-dialog>

@@ -6,7 +6,7 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
@@ -43,9 +43,6 @@ export default class RelationsDiagram extends Vue {
 
   @Prop({ type: Boolean, default: false })
   public readonly hideUnrelated!: boolean;
-
-  @Prop({ type: Object, required: true })
-  public readonly contentStyle!: Mapped<string>;
 
   get drawnNodes(): RelationNode[] {
     return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
@@ -167,13 +164,13 @@ export default class RelationsDiagram extends Vue {
   }
 
   openSettings(id: string): void {
-    showBlockDialog(sparkStore.blocks(this.serviceId)[id], { mode: 'Basic' });
+    createBlockDialog(sparkStore.blocks(this.serviceId)[id], { mode: 'Basic' });
   }
 }
 </script>
 
 <template>
-  <div class="row overflow-auto" :style="contentStyle">
+  <div class="row overflow-auto full-width full-height">
     <q-space />
     <svg ref="svg" class="col-auto">
       <g ref="diagram" />

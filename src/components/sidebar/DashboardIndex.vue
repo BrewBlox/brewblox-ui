@@ -131,7 +131,9 @@ export default class DashboardIndex extends Vue {
                     name="home"
                   />
                 </q-item-section>
-                <q-item-section>Toggle default dashboard</q-item-section>
+                <q-item-section>
+                  {{ dashboard.primary ? 'Is home page' : 'Make home page' }}
+                </q-item-section>
               </q-item>
               <ActionItem
                 icon="edit"

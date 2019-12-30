@@ -17,13 +17,16 @@ export default class BlockWizardDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <BlockWizard
-      :service-id="serviceId"
-      :initial-feature="initialFeature"
-      :filter="filter"
-      @close="onDialogHide"
-      @created="onDialogOk"
-    />
+  <q-dialog ref="dialog" :maximized="$q.screen.lt.md" no-backdrop-dismiss @hide="onDialogHide">
+    <q-card class="widget-modal">
+      <DialogToolbar>Block wizard</DialogToolbar>
+      <BlockWizard
+        :service-id="serviceId"
+        :initial-feature="initialFeature"
+        :filter="filter"
+        @close="onDialogHide"
+        @created="onDialogOk"
+      />
+    </q-card>
   </q-dialog>
 </template>

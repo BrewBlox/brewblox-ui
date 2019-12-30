@@ -14,6 +14,10 @@ export default class TempSensorOneWireWidget
       ? { minHeight: '40vh' }
       : {};
   }
+
+  get hasValue(): boolean {
+    return this.block.data.value.value !== null;
+  }
 }
 </script>
 
@@ -25,15 +29,14 @@ export default class TempSensorOneWireWidget
 
     <q-card :class="cardClass" :style="cardStyle">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <CardWarning v-if="!hasValue">
+        <template #message>
+          OneWire Sensor could not be read.
+        </template>
+      </CardWarning>
 
       <q-card-section>
-        <CardWarning v-if="block.data.value.val === null">
-          <template #message>
-            OneWire Sensor could not be read.
-          </template>
-        </CardWarning>
-        <UnitField v-else :value="block.data.value" label="Value" readonly item-aligned tag="big" />
-
+        <UnitField v-if="hasValue" :value="block.data.value" label="Value" readonly item-aligned tag="big" />
 
         <template v-if="mode === 'Full'">
           <q-item>

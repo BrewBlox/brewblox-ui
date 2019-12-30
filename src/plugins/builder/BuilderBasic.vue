@@ -1,6 +1,6 @@
 <script lang="ts">
 import { debounce, uid } from 'quasar';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
@@ -16,6 +16,9 @@ import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } f
 export default class BuilderBasic extends CrudComponent<BuilderConfig> {
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
+
+  @Prop({ type: Boolean, default: false })
+  public readonly editorDisabled!: boolean;
 
   get widgetConfig(): BuilderConfig {
     return {
@@ -47,10 +50,6 @@ export default class BuilderBasic extends CrudComponent<BuilderConfig> {
       .filter(v => !!v);
   }
 
-  get wrongBrowser(): boolean {
-    return /(Edge|MSIE)/.test(window.navigator.userAgent);
-  }
-
   get editorActive(): boolean {
     return builderStore.editorActive;
   }
@@ -64,6 +63,19 @@ export default class BuilderBasic extends CrudComponent<BuilderConfig> {
       ...this.widgetConfig,
       currentLayoutId: idx >= 0 ? this.activeLayouts[idx].id : null,
     });
+  }
+
+  get gridHeight(): number {
+    return this.squares(this.layout?.height ?? 10);
+  }
+
+  get gridWidth(): number {
+    return this.squares(this.layout?.width ?? 10);
+  }
+
+  get gridViewBox(): string {
+    return [0, 0, this.gridWidth, this.gridHeight]
+      .join(' ');
   }
 
   async saveParts(parts: PersistentPart[]): Promise<void> {
@@ -184,7 +196,7 @@ export default class BuilderBasic extends CrudComponent<BuilderConfig> {
         <q-btn :disable="currentIdx <= 0" icon="mdi-chevron-left" flat @click="currentIdx--" />
       </q-item-section>
       <q-item-section>
-        <q-btn-dropdown :label="layout ? layout.title : 'None'" flat no-caps icon="widgets">
+        <q-btn-dropdown flat no-caps icon="widgets" class="self-center">
           <q-list bordered>
             <ActionItem
               v-for="lay in activeLayouts"
@@ -216,9 +228,9 @@ export default class BuilderBasic extends CrudComponent<BuilderConfig> {
           class="q-mb-md"
           @click="showDialog"
         />
-        <q-btn v-if="!wrongBrowser" outline label="Edit Layout" @click="startEditor" />
+        <q-btn v-if="!editorDisabled" outline label="Edit Layout" @click="startEditor" />
       </span>
-      <svg ref="grid" class="grid-base">
+      <svg ref="grid" :viewBox="gridViewBox" class="grid-base">
         <g
           v-for="part in flowParts"
           :key="part.id"

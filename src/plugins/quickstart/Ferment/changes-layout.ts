@@ -11,8 +11,8 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
     {
       id: uid(),
       title: maybeSpace(config.prefix, 'Layout'),
-      width: 6,
-      height: 10,
+      width: 8,
+      height: 9,
       parts: [
         {
           id: uid(),

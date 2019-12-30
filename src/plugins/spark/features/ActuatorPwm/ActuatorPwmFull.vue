@@ -49,7 +49,6 @@ export default class ActuatorPwmFull
             :service-id="serviceId"
             title="target"
             label="Digital Actuator Target"
-            tag="big"
             @input="v => { block.data.actuatorId = v; saveBlock(); }"
           />
         </q-item-section>

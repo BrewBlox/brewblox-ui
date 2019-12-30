@@ -18,35 +18,38 @@ export default class SetpointProfileWidget
   extends BlockWidgetBase<SetpointProfileBlock> {
   revision = 0;
 
-  get cardClass(): string[] {
-    if (this.inDialog) {
-      return this.mode === 'Full'
-        ? ['widget-modal']
-        : ['widget-modal', 'col', 'column'];
-    }
-    else {
-      return this.mode === 'Full'
-        ? ['widget-dashboard', 'overflow-auto', 'scroll']
-        : ['widget-dashboard', 'overflow-unset', 'col', 'column'];
-    }
-  }
+  // Overrides WidgetBase
+  *cardClassGenerator(): Generator<string, void, undefined> {
+    yield 'bg-dark';
 
-  get cardStyle(): Mapped<string> {
-    return this.inDialog && this.mode === 'Basic'
-      ? { height: '60vh' }
-      : {};
+    yield this.inDialog
+      ? 'widget-modal'
+      : 'widget-dashboard';
+
+    if (this.$q.screen.lt.md) {
+      yield 'widget-dense';
+    }
+
+    if (this.mode === 'Basic') {
+      yield* ['col', 'column'];
+    }
+
+    if (this.mode === 'Full' && !this.inDialog) {
+      yield* ['overflow-auto', 'scroll'];
+    }
   }
 
   get graphProps(): GraphProps {
     return profileGraphProps(this.block);
   }
 
+  refresh(): void {
+    this.revision++;
+  }
+
   mounted(): void {
-    const updateGraph = (): any => this.revision++;
-    this.$watch('block.data.targetId.id', updateGraph);
-    this.$watch('block.data.enabled', updateGraph);
-    this.$watch('widget.cols', updateGraph);
-    this.$watch('widget.rows', updateGraph);
+    this.$watch('block.data.targetId.id', this.refresh);
+    this.$watch('block.data.enabled', this.refresh);
   }
 }
 </script>
@@ -57,7 +60,7 @@ export default class SetpointProfileWidget
       <GenericGraph v-bind="graphProps" :revision="revision" />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass" :style="cardStyle">
+    <component :is="mode" :crud="crud" :class="cardClass">
       <template #toolbar>
         <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
           <template #actions>
@@ -91,6 +94,7 @@ export default class SetpointProfileWidget
       </template>
 
       <template #graph>
+        <q-resize-observer :debounce="200" @resize="refresh" />
         <GenericGraph v-bind="graphProps" :revision="revision" auto-fit auto-resize />
       </template>
     </component>

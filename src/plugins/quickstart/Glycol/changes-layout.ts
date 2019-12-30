@@ -65,8 +65,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
     {
       id: uid(),
       title: maybeSpace(config.prefix, 'Layout'),
-      width: 20,
-      height: 15,
+      width: 9,
+      height: 11,
       parts: [
         ...heatingParts,
         ...glycolParts,

@@ -7,7 +7,7 @@ export function createDialog(opts: QDialogOptions & { [prop: string]: any }): Di
   return Dialog.create(opts);
 }
 
-export function showBlockDialog(block: Block | null, opts: { props?: any; mode?: WidgetMode } = {}): void {
+export function createBlockDialog(block: Block | null, opts: { props?: any; mode?: WidgetMode } = {}): void {
   if (!block) {
     return;
   }
@@ -20,4 +20,3 @@ export function showBlockDialog(block: Block | null, opts: { props?: any; mode?:
     getProps: () => props || {},
   });
 };
-

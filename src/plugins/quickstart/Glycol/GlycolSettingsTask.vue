@@ -43,7 +43,7 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
 </script>
 
 <template>
-  <div>
+  <WizardCard>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -78,12 +78,10 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn unelevated label="Done" color="primary" @click="done" />
-    </q-card-actions>
-  </div>
+    </template>
+  </WizardCard>
 </template>

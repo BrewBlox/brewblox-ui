@@ -74,12 +74,13 @@ export default class GraphCardWrapper extends Vue {
 .passthrough-card {
   padding: 0;
   margin: 0;
+  max-width: 100%;
 }
 
 .wrapper-card {
   padding: 0;
   margin: 0;
-  max-width: 95vw;
+  max-width: 100vw;
   background-color: rgba(0, 0, 0, 0);
 }
 

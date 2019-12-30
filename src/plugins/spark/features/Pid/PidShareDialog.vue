@@ -3,7 +3,7 @@ import pick from 'lodash/pick';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createDialog, showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { durationMs, unitDurationString } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
@@ -176,7 +176,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   showBlock(block: Block): void {
-    showBlockDialog(block);
+    createBlockDialog(block);
   }
 }
 </script>

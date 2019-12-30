@@ -1,11 +1,7 @@
 import get from 'lodash/get';
-import * as quasar from 'quasar';
+import { exportFile } from 'quasar';
 
 import { deserialize, serialize } from './units/parseObject';
-
-// exportFile is missing from the typings, even though it is implemented
-// TODO(Bob): replace with correct import once it's fixed in quasar
-const exportFile: ((title: string, content: string) => void) = quasar['exportFile'];
 
 export function saveFile(exported: any, title: string, raw = false): void {
   const content = raw ? exported : JSON.stringify(serialize(exported));

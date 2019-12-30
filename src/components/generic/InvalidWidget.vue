@@ -12,15 +12,7 @@ export default class InvalidWidget extends WidgetBase {
 
 <template>
   <q-card class="text-white scroll">
-    <WidgetToolbar :crud="crud">
-      <q-item-section side>
-        <q-btn-dropdown flat label="Menu">
-          <q-list bordered>
-            <RemoveWidgetAction :crud="crud" />
-          </q-list>
-        </q-btn-dropdown>
-      </q-item-section>
-    </WidgetToolbar>
+    <component :is="toolbarComponent" :crud="crud" />
 
     <CardWarning color="negative">
       <template #message>

@@ -14,8 +14,6 @@ module.exports = {
   ],
   'plugins': ['simple-import-sort', 'quasar'],
   'rules': {
-    // disabled until https://github.com/quasarframework/quasar/issues/5908 is fixed
-    'quasar/check-valid-props': 'off',
     'quotes': ['error', 'single', { 'avoidEscape': true }],
     'class-methods-use-this': 0,
     'simple-import-sort/sort': 'error',
@@ -30,26 +28,6 @@ module.exports = {
     'no-param-reassign': 0,
     'no-console': 'warn',
     'no-multiple-empty-lines': 'error',
-    'vue/max-attributes-per-line': ['warn', {
-      'singleline': 8,
-      'multiline': {
-        'max': 1,
-        'allowFirstLine': false
-      },
-      'order': [
-        'DEFINITION',
-        'LIST_RENDERING',
-        'CONDITIONALS',
-        'RENDER_MODIFIERS',
-        'GLOBAL',
-        'UNIQUE',
-        'TWO_WAY_BINDING',
-        'OTHER_DIRECTIVES',
-        'OTHER_ATTR',
-        'EVENTS',
-        'CONTENT'
-      ]
-    }],
     'comma-dangle': [
       'error',
       'always-multiline'
@@ -67,16 +45,21 @@ module.exports = {
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/no-explicit-any': 0,
     '@typescript-eslint/no-non-null-assertion': 0,
+    '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/explicit-function-return-type': ['warn', {
       allowExpressions: true,
       allowTypedFunctionExpressions: true,
       allowHigherOrderFunctions: true,
     }],
-    // temporary disabled because of incompatibility issues between vue-eslint-plugin and eslint 6:
-    // see https://github.com/vuejs/eslint-plugin-vue/issues/944
-    'vue-require-component-is': 0,
-    '@typescript-eslint/no-empty-function': 0,
-    'vue/no-v-html': 0
+    'quasar/check-valid-props': 'warn',
+    'vue/no-v-html': 0,
+    'vue/max-attributes-per-line': ['warn', {
+      'singleline': 8,
+      'multiline': {
+        'max': 1,
+        'allowFirstLine': false
+      },
+    }]
   },
   'overrides': [
     {

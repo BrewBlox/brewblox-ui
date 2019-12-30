@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog, showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
@@ -33,6 +33,9 @@ export default class BlockField extends FieldBase {
   @Prop({ type: Boolean, default: false })
   public readonly noShow!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noEdit!: boolean;
+
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
@@ -51,7 +54,7 @@ export default class BlockField extends FieldBase {
   }
 
   editBlock(): void {
-    showBlockDialog(this.linkBlock);
+    createBlockDialog(this.linkBlock);
   }
 
   openDialog(): void {
@@ -71,6 +74,7 @@ export default class BlockField extends FieldBase {
       serviceId: this.serviceId,
       label: this.label,
       noCreate: this.noCreate,
+      noEdit: this.noEdit,
     })
       .onOk(this.save);
   }

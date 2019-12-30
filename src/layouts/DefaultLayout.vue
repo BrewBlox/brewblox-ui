@@ -7,7 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen = true;
+  leftDrawerOpen = !this.dense;
   dashboardEditing = false;
   serviceEditing = false;
 
@@ -24,6 +24,15 @@ export default class DefaultLayout extends Vue {
 
   get buildDate(): string {
     return process.env.BLOX_DATE || 'UNKNOWN';
+  }
+
+  get dense(): boolean {
+    return this.$q.screen.lt.md;
+  }
+
+  get editorDisabled(): boolean {
+    const { ie, edge } = this.$q.platform.is;
+    return Boolean(ie || edge) || this.dense;
   }
 
   showWizard(): void {
@@ -93,7 +102,7 @@ export default class DefaultLayout extends Vue {
 
         <q-separator class="q-mt-sm" />
         <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
-        <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
+        <ActionItem v-if="!editorDisabled" icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
         <template v-if="automationFeatureEnabled">
           <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
         </template>
