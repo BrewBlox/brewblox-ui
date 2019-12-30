@@ -55,18 +55,12 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     }
 
     if (this.mode === 'Basic') {
-      yield* ['col', 'column'];
+      yield* ['column'];
     }
 
     if (this.mode === 'Full' && !this.inDialog) {
       yield* ['overflow-auto', 'scroll'];
     }
-  }
-
-  get cardStyle(): Mapped<string> {
-    return this.inDialog && this.mode === 'Basic'
-      ? { height: '60vh' }
-      : {};
   }
 
   get presets(): QueryParams[] {
@@ -176,7 +170,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       />
     </template>
 
-    <q-card :class="cardClass" :style="cardStyle">
+    <q-card :class="cardClass">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />

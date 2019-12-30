@@ -9,12 +9,6 @@ import { TempSensorOneWireBlock } from './types';
 export default class TempSensorOneWireWidget
   extends BlockWidgetBase<TempSensorOneWireBlock> {
 
-  get cardStyle(): Mapped<string> {
-    return this.inDialog
-      ? { minHeight: '40vh' }
-      : {};
-  }
-
   get hasValue(): boolean {
     return this.block.data.value.value !== null;
   }
@@ -27,7 +21,7 @@ export default class TempSensorOneWireWidget
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
-    <q-card :class="cardClass" :style="cardStyle">
+    <q-card :class="cardClass">
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
       <CardWarning v-if="!hasValue">
         <template #message>

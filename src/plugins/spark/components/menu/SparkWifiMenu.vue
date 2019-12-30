@@ -61,59 +61,62 @@ export default class SparkWifiMenu extends DialogBase {
         </q-item-section>
       </DialogToolbar>
 
-      <q-card-section>
-        <q-item>
-          <q-item-section>
-            <q-input v-model="values.ssid" label="SSID" autofocus />
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <q-select
-              v-model="values.security"
-              :options="securityOpts"
-              label="Security"
-              emit-value
-              map-options
-            />
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <q-input
-              v-model="values.password"
-              :disable="values.security === 0"
-              :type="isPwd ? 'password' : 'text'"
-              label="Password"
-            >
-              <template #append>
-                <q-icon
-                  :name="isPwd ? 'visibility_off' : 'visibility'"
-                  class="cursor-pointer"
-                  @click="isPwd = !isPwd"
+      <div class="dialog-content">
+        <WizardCard>
+          <q-card-section>
+            <q-item>
+              <q-item-section>
+                <q-input v-model="values.ssid" label="SSID" autofocus />
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-select
+                  v-model="values.security"
+                  :options="securityOpts"
+                  label="Security"
+                  emit-value
+                  map-options
                 />
-              </template>
-            </q-input>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <q-select
-              v-model="values.cipher"
-              :options="cipherOpts"
-              label="Cipher"
-              map-options
-              emit-value
-            />
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-      <q-separator />
-      <q-card-actions align="right">
-        <q-btn flat label="Cancel" @click="onDialogCancel" />
-        <q-space />
-        <q-btn unelevated label="Connect" color="primary" @click="save" />
-      </q-card-actions>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-input
+                  v-model="values.password"
+                  :disable="values.security === 0"
+                  :type="isPwd ? 'password' : 'text'"
+                  label="Password"
+                >
+                  <template #append>
+                    <q-icon
+                      :name="isPwd ? 'visibility_off' : 'visibility'"
+                      class="cursor-pointer"
+                      @click="isPwd = !isPwd"
+                    />
+                  </template>
+                </q-input>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
+                <q-select
+                  v-model="values.cipher"
+                  :options="cipherOpts"
+                  label="Cipher"
+                  map-options
+                  emit-value
+                />
+              </q-item-section>
+            </q-item>
+          </q-card-section>
+          <template #actions>
+            <q-btn flat label="Cancel" @click="onDialogCancel" />
+            <q-space />
+            <q-btn unelevated label="Connect" color="primary" @click="save" />
+          </template>
+        </WizardCard>
+      </div>
     </q-card>
   </q-dialog>
 </template>
