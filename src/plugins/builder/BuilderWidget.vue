@@ -35,7 +35,7 @@ export default class BuilderWidget extends WidgetBase {
   }
 
   get dense(): boolean {
-    return this.$q.screen.lt.lg;
+    return this.$q.screen.lt.md;
   }
 
   get editorDisabled(): boolean {

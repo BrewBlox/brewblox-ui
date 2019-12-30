@@ -27,7 +27,7 @@ export default class WizardDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$q.screen.lt.lg" no-backdrop-dismiss class="row" @hide="onDialogHide">
+  <q-dialog ref="dialog" :maximized="$q.screen.lt.md" no-backdrop-dismiss class="row" @hide="onDialogHide">
     <q-card class="widget-modal">
       <DialogToolbar>
         <q-icon name="mdi-creation" class="q-mx-sm" />

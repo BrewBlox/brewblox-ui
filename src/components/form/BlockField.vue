@@ -33,6 +33,9 @@ export default class BlockField extends FieldBase {
   @Prop({ type: Boolean, default: false })
   public readonly noShow!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noEdit!: boolean;
+
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
@@ -71,6 +74,7 @@ export default class BlockField extends FieldBase {
       serviceId: this.serviceId,
       label: this.label,
       noCreate: this.noCreate,
+      noEdit: this.noEdit,
     })
       .onOk(this.save);
   }

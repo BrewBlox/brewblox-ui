@@ -17,7 +17,7 @@ export default class BlockWizardDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$q.screen.lt.lg" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog ref="dialog" :maximized="$q.screen.lt.md" no-backdrop-dismiss @hide="onDialogHide">
     <q-card class="widget-modal">
       <DialogToolbar>Block wizard</DialogToolbar>
       <BlockWizard

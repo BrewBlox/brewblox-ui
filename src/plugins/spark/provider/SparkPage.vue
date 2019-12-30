@@ -135,7 +135,7 @@ export default class SparkPage extends Vue {
   }
 
   get dense(): boolean {
-    return this.$q.screen.lt.lg;
+    return this.$q.screen.lt.md;
   }
 
   get allSorters(): { [id: string]: (a: ValidatedWidget, b: ValidatedWidget) => number } {
@@ -380,6 +380,7 @@ export default class SparkPage extends Vue {
       createDialog({
         component: 'WidgetDialog',
         parent: this,
+        mode: 'Basic',
         getCrud: () => val.crud,
       });
     }
@@ -400,6 +401,7 @@ export default class SparkPage extends Vue {
     </portal>
     <portal to="toolbar-buttons">
       <q-btn-toggle
+        v-if="false"
         v-model="pageMode"
         class="q-mr-md"
         flat
@@ -410,6 +412,24 @@ export default class SparkPage extends Vue {
           {icon:'mdi-vector-line', value: 'Relations'},
         ]"
       />
+      <q-btn-group flat>
+        <q-btn
+          flat
+          :class="{'selected-mode': pageMode === 'List'}"
+          icon="mdi-format-list-checkbox"
+          @click="pageMode = 'List'"
+        >
+          <q-tooltip>Show blocks as list</q-tooltip>
+        </q-btn>
+        <q-btn
+          flat
+          :class="{'selected-mode': pageMode === 'Relations'}"
+          icon="mdi-vector-line"
+          @click="pageMode = 'Relations'"
+        >
+          <q-tooltip>Show blocks as diagram</q-tooltip>
+        </q-btn>
+      </q-btn-group>
       <ActionMenu :disable="!isReady || statusNok">
         <template #actions>
           <ActionItem
@@ -476,7 +496,7 @@ export default class SparkPage extends Vue {
     </q-list>
 
     <template v-else-if="pageMode === 'Relations'">
-      <div class="page-content full-width">
+      <div class="page-height full-width">
         <RelationsDiagram
           :service-id="service.id"
           :nodes="nodes"
@@ -487,8 +507,8 @@ export default class SparkPage extends Vue {
 
     <template v-else>
       <!-- Normal display -->
-      <div class="row no-wrap justify-start page-content q-gutter-x-xl">
-        <q-list class="content-column">
+      <div class="row no-wrap justify-start page-height">
+        <q-list class="content-column q-pr-md">
           <!-- Selection controls -->
           <q-item class="q-mb-md">
             <q-item-section>
@@ -579,7 +599,7 @@ export default class SparkPage extends Vue {
         </q-list>
 
         <!-- Widget List -->
-        <q-list v-if="!dense" class="content-column">
+        <q-list v-if="!dense" class="content-column q-ml-lg q-pr-lg">
           <!-- Service -->
           <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
             <q-item-section>
@@ -599,7 +619,7 @@ export default class SparkPage extends Vue {
             </q-item-section>
           </q-item>
           <!-- Blank space to always be able to show a widget at the top -->
-          <q-item class="page-content" />
+          <q-item class="page-height" />
         </q-list>
       </div>
     </template>
@@ -610,13 +630,16 @@ export default class SparkPage extends Vue {
 .widget-index {
   padding: 0;
 }
-.page-content {
+.page-height {
   height: calc(100vh - 100px);
 }
 .content-column {
-  width: 500px;
+  width: 550px;
   max-width: 100vw;
   height: 100%;
   overflow: auto;
+}
+.selected-mode {
+  border-bottom: 2px solid $secondary;
 }
 </style>

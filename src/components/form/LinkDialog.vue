@@ -32,6 +32,9 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noEdit!: boolean;
+
   get compatibleTypes(): string[] | null {
     if (!this.value.type) {
       return null;
@@ -113,12 +116,12 @@ export default class LinkDialog extends DialogBase {
             </q-item-section>
           </q-item>
         </template>
-        <template v-if="!noCreate" #after>
-          <q-btn v-if="linkBlock" flat round icon="mdi-pencil" @click="edit">
+        <template #after>
+          <q-btn v-if="linkBlock && !noEdit" flat round icon="mdi-launch" @click="edit">
             <q-tooltip>Edit {{ link.id }}</q-tooltip>
           </q-btn>
-          <q-btn v-else disable flat round icon="mdi-pencil-off" />
-          <q-btn flat round icon="add" @click="create">
+          <q-btn v-else disable flat round icon="mdi-launch" />
+          <q-btn v-if="!noCreate" flat round icon="add" @click="create">
             <q-tooltip>Create new Block</q-tooltip>
           </q-btn>
         </template>

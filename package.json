@@ -91,7 +91,6 @@
     "ts-loader": "^6.2.1",
     "tsutils": "^3.17.1",
     "typescript": "^3.7.4",
-    "vue-eslint-parser": "^5.0.0",
     "vue-template-compiler": "^2.6.11",
     "vuex-module-decorators": "^0.9.11"
   },

@@ -54,6 +54,7 @@ module.exports = function (ctx) {
         'QBar',
         'QBtn',
         'QBtnDropdown',
+        'QBtnGroup',
         'QBtnToggle',
         'QCard',
         'QCardActions',
@@ -117,6 +118,10 @@ module.exports = function (ctx) {
       config: {
         dark: true,
         notify: { message: '', color: 'info' },
+        brand: {
+          'dark': '#282c34',
+          'dark-bright': '#454c59',
+        },
       },
     },
 

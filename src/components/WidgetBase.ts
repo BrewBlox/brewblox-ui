@@ -67,7 +67,7 @@ export default class WidgetBase<ConfigT = any> extends Vue {
       ? ['widget-modal']
       : ['widget-dashboard', 'scroll'];
 
-    if (this.$q.screen.lt.lg) {
+    if (this.$q.screen.lt.md) {
       yield 'widget-dense';
     }
   }

@@ -77,7 +77,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       </q-item>
     </q-card-section>
 
-    <q-dialog v-model="modalOpen" :maximized="$q.screen.lt.lg" no-backdrop-dismiss class="row">
+    <q-dialog v-model="modalOpen" :maximized="$q.screen.lt.md" no-backdrop-dismiss class="row">
       <component
         :is="widgetComponent"
         :initial-crud="crud"

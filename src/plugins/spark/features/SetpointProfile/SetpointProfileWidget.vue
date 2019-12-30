@@ -26,7 +26,7 @@ export default class SetpointProfileWidget
       ? 'widget-modal'
       : 'widget-dashboard';
 
-    if (this.$q.screen.lt.lg) {
+    if (this.$q.screen.lt.md) {
       yield 'widget-dense';
     }
 

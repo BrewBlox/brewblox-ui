@@ -11,10 +11,7 @@ export default class ActionMenu extends Vue {
 
 <template>
   <q-btn v-bind="$attrs" flat icon="mdi-dots-vertical">
-    <q-tooltip>
-      Show menu
-    </q-tooltip>
-    <q-menu content-class="row q-gutter-x-sm bordered">
+    <q-menu content-class="row q-gutter-x-sm bordered" anchor="bottom right" self="top right">
       <template v-if="$slots.actions">
         <ActionSubmenu label="Actions">
           <slot name="actions" />

@@ -48,7 +48,7 @@ export default class StoreWidgetDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$q.screen.lt.lg" no-backdrop-dismiss class="row" @hide="onDialogHide">
+  <q-dialog ref="dialog" :maximized="$q.screen.lt.md" no-backdrop-dismiss class="row" @hide="onDialogHide">
     <component
       :is="widgetComponent"
       v-if="!!widget"

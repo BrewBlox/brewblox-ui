@@ -138,6 +138,7 @@ export default class DisplaySettingsFull
             :filter="linkFilter"
             :service-id="serviceId"
             no-create
+            no-show
             title="Block"
             label="Block"
             @input="v => updateSlotLink(idx, v)"
@@ -189,6 +190,7 @@ export default class DisplaySettingsFull
         borderless
       >
         <q-slider
+          label
           :value="block.data.brightness || 255"
           :min="20"
           :max="255"
