@@ -174,23 +174,20 @@ export default class DashboardPage extends Vue {
             {icon:'mdi-lock', value: false},
           ]"
         />
-        <q-btn icon="mdi-dots-vertical" unelevated>
-          <q-tooltip>Actions</q-tooltip>
-          <q-menu>
-            <q-list bordered>
-              <ActionItem icon="add" label="New Widget" @click="showWizard" />
-              <q-item clickable @click="toggleDefaultDashboard">
-                <q-item-section avatar>
-                  <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
-                </q-item-section>
-                <q-item-section>Toggle default dashboard</q-item-section>
-              </q-item>
-              <ActionItem icon="edit" label="Change dashboard ID" @click="changeDashboardId" />
-              <ActionItem icon="edit" label="Change dashboard Title" @click="changeDashboardTitle" />
-              <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
-            </q-list>
-          </q-menu>
-        </q-btn>
+        <ActionMenu>
+          <template #actions>
+            <ActionItem icon="add" label="New Widget" @click="showWizard" />
+            <q-item clickable @click="toggleDefaultDashboard">
+              <q-item-section avatar>
+                <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
+              </q-item-section>
+              <q-item-section>Toggle default dashboard</q-item-section>
+            </q-item>
+            <ActionItem icon="edit" label="Change dashboard ID" @click="changeDashboardId" />
+            <ActionItem icon="edit" label="Change dashboard Title" @click="changeDashboardTitle" />
+            <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
+          </template>
+        </ActionMenu>
       </portal>
       <div v-if="dense" class="column q-gutter-y-sm">
         <div v-for="val in validatedWidgets" :key="val.id" class="col full-width">

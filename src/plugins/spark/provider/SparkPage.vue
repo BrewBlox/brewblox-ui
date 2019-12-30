@@ -410,67 +410,60 @@ export default class SparkPage extends Vue {
           {icon:'mdi-vector-line', value: 'Relations'},
         ]"
       />
-      <q-btn
-        :disable="!isReady || statusNok"
-        icon="mdi-dots-vertical"
-        unelevated
-      >
-        <q-tooltip>Actions</q-tooltip>
-        <q-menu>
-          <q-list bordered>
-            <ActionItem
-              icon="add"
-              label="New Block"
-              @click="startDialog('BlockWizardDialog')"
-            />
-            <ActionItem
-              icon="mdi-magnify-plus-outline"
-              label="Discover new OneWire Blocks"
-              @click="discoverBlocks"
-            />
-            <ActionItem
-              icon="mdi-tag-remove"
-              label="Remove unused Block names"
-              @click="cleanUnusedNames"
-            />
-            <ActionItem
-              icon="mdi-download-network"
-              label="Update firmware"
-              @click="startDialog('FirmwareUpdateDialog')"
-            />
-            <ActionItem
-              icon="wifi"
-              label="Configure Wifi"
-              @click="startDialog('SparkWifiMenu')"
-            />
-            <ActionItem
-              icon="mdi-checkbox-multiple-marked"
-              label="Groups"
-              @click="startDialog('SparkGroupMenu')"
-            />
-            <ActionItem
-              icon="mdi-temperature-celsius"
-              label="Units"
-              @click="startDialog('SparkUnitMenu')"
-            />
-            <ActionItem
-              icon="mdi-file-export"
-              label="Import/Export Blocks"
-              @click="startDialog('SparkImportMenu')"
-            />
-            <ActionItem
-              icon="mdi-test-tube"
-              label="Create Mock Blocks"
-              @click="startDialog('CreateMockMenu')"
-            />
-            <ActionItem
-              icon="delete"
-              label="Remove all Blocks"
-              @click="startResetBlocks(service.id)"
-            />
-          </q-list>
-        </q-menu>
-      </q-btn>
+      <ActionMenu :disable="!isReady || statusNok">
+        <template #actions>
+          <ActionItem
+            icon="add"
+            label="New Block"
+            @click="startDialog('BlockWizardDialog')"
+          />
+          <ActionItem
+            icon="mdi-magnify-plus-outline"
+            label="Discover new OneWire Blocks"
+            @click="discoverBlocks"
+          />
+          <ActionItem
+            icon="mdi-tag-remove"
+            label="Remove unused Block names"
+            @click="cleanUnusedNames"
+          />
+          <ActionItem
+            icon="mdi-download-network"
+            label="Update firmware"
+            @click="startDialog('FirmwareUpdateDialog')"
+          />
+          <ActionItem
+            icon="wifi"
+            label="Configure Wifi"
+            @click="startDialog('SparkWifiMenu')"
+          />
+          <ActionItem
+            icon="mdi-checkbox-multiple-marked"
+            label="Groups"
+            @click="startDialog('SparkGroupMenu')"
+          />
+          <ActionItem
+            icon="mdi-temperature-celsius"
+            label="Units"
+            @click="startDialog('SparkUnitMenu')"
+          />
+          <ActionItem
+            icon="mdi-file-export"
+            label="Import/Export Blocks"
+            @click="startDialog('SparkImportMenu')"
+          />
+          <ActionItem
+            icon="mdi-test-tube"
+            label="Create Mock Blocks"
+            @click="startDialog('CreateMockMenu')"
+          />
+          <ActionItem
+            icon="delete"
+            label="Remove all Blocks"
+            @click="startResetBlocks(service.id)"
+          />
+        </template>
+      </ActionMenu>
     </portal>
 
     <!-- Shown if service was found in store, but not ok -->

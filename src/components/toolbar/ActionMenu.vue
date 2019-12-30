@@ -10,7 +10,7 @@ export default class ActionMenu extends Vue {
 </script>
 
 <template>
-  <q-btn v-bind="$attrs" flat icon="mdi-menu">
+  <q-btn v-bind="$attrs" flat icon="mdi-dots-vertical">
     <q-tooltip>
       Show menu
     </q-tooltip>
