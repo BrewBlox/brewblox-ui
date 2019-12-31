@@ -182,8 +182,13 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
   }
 
   interact(part: FlowPart): void {
-    const handler = builderStore.spec(part).interactHandler;
-    handler && handler(part, this.updater);
+    builderStore.spec(part).interactHandler?.(part, this.updater);
+  }
+
+  onDoubleClick(part: FlowPart): void {
+    if (!this.isClickable(part)) {
+      this.startEditor();
+    }
   }
 
   async calculate(): Promise<void> {
@@ -280,6 +285,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ pointer: isClickable(part), [part.type]: true }"
           @click="interact(part)"
+          @dblclick.stop="onDoubleClick(part)"
         >
           <PartWrapper :part="part" @update:part="savePart" @dirty="debouncedCalculate" />
         </g>

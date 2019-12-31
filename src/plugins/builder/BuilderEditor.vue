@@ -536,8 +536,7 @@ export default class BuilderEditor extends DialogBase {
 
   interactClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (part) {
-      const handler = builderStore.spec(part).interactHandler;
-      handler && handler(part, this.updater);
+      builderStore.spec(part).interactHandler?.(part, this.updater);
     }
   }
 
@@ -640,8 +639,7 @@ export default class BuilderEditor extends DialogBase {
   useInteract(parts: PersistentPart[]): void {
     if (!this.floater && parts.length === 1) {
       const [part] = parts;
-      const handler = builderStore.spec(part).interactHandler;
-      handler && handler(part, this.updater);
+      builderStore.spec(part).interactHandler?.(part, this.updater);
     }
   }
 
