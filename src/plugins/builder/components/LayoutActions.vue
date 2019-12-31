@@ -165,16 +165,18 @@ export default class LayoutActions extends Vue {
 
 
 <template>
-  <q-list bordered>
-    <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
-    <template v-if="!!layout">
-      <ActionItem icon="file_copy" label="Copy Layout" @click="startAddLayout(true)" />
-      <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
-      <ActionItem icon="edit" label="Rename Layout" @click="renameLayout" />
-      <ActionItem icon="dashboard" label="Show Layout on dashboard" @click="createLayoutWidget" />
-      <ActionItem icon="mdi-file-export" label="Export Layout" @click="exportLayout" />
-      <ActionItem icon="delete" label="Delete all parts" @click="clearParts" />
-      <ActionItem icon="delete" label="Delete Layout" @click="removeLayout" />
+  <ActionMenu v-bind="$attrs">
+    <template #actions>
+      <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
+      <template v-if="!!layout">
+        <ActionItem icon="file_copy" label="Copy Layout" @click="startAddLayout(true)" />
+        <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
+        <ActionItem icon="edit" label="Rename Layout" @click="renameLayout" />
+        <ActionItem icon="dashboard" label="Show Layout on dashboard" @click="createLayoutWidget" />
+        <ActionItem icon="mdi-file-export" label="Export Layout" @click="exportLayout" />
+        <ActionItem icon="delete" label="Delete all parts" @click="clearParts" />
+        <ActionItem icon="delete" label="Delete Layout" @click="removeLayout" />
+      </template>
     </template>
-  </q-list>
+  </ActionMenu>
 </template>
