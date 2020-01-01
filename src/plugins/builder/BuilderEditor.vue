@@ -782,82 +782,91 @@ export default class BuilderEditor extends Vue {
       </template>
     </LayoutHeader>
 
-    <q-drawer v-model="drawerOpen" content-class="bg-dark" elevated>
-      <q-item exact to="/">
-        <q-item-section avatar>
-          <q-icon name="mdi-home" />
-        </q-item-section>
-        <q-item-section>BrewBlox</q-item-section>
-      </q-item>
-      <q-separator />
+    <q-drawer v-model="drawerOpen" content-class="bg-dark column" elevated>
+      <div class="col-auto">
+        <ActionItem to="/" exact icon="mdi-home" label="BrewBlox" />
+        <ActionItem to="/builder" icon="mdi-pipe" label="Brewery Builder" />
+        <q-separator />
+      </div>
 
       <q-scroll-area
         v-if="!!layout"
-        :style="{height: 'calc(100% - 100px)'}"
+        class="col"
         :thumb-style="{opacity: 0.5, background: 'silver'}"
       >
-        <q-expansion-item label="Modes" header-class="text-h6" default-opened>
-          <q-separator inset />
-          <ActionItem
-            v-for="mode in modes"
-            :key="mode.value"
-            :active="currentMode.value === mode.value"
-            :icon="mode.icon"
-            :label="mode.label"
-            no-close
-            @click="currentMode = mode"
-          />
-        </q-expansion-item>
+        <q-item class="q-pb-none">
+          <q-item-section class="text-bold">
+            Modes
+          </q-item-section>
+        </q-item>
 
-        <q-expansion-item label="Tools" header-class="text-h6" default-opened>
-          <q-separator inset />
-          <ActionItem
-            v-for="tool in tools"
-            :key="tool.value"
-            :icon="tool.icon"
-            :label="tool.label"
-            no-close
-            @click="tool.use(findActionParts())"
-          >
-            <q-item-section side class="text-uppercase">
-              {{ tool.shortcut }}
-            </q-item-section>
-          </ActionItem>
-        </q-expansion-item>
+        <ActionItem
+          v-for="mode in modes"
+          :key="'mode-' + mode.value"
+          :active="currentMode.value === mode.value"
+          :icon="mode.icon"
+          :label="mode.label"
+          :inset-level="0.2"
+          style="min-height: 0px"
+          @click="currentMode = mode"
+        />
 
-        <q-expansion-item label="Layout size" header-class="text-h6" default-opened>
-          <q-separator inset />
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>
-                Width
-              </q-item-label>
-              <q-slider
-                :value="layout.width"
-                :min="5"
-                :max="50"
-                label
-                label-always
-                @change="v => { layout.width = v; saveLayout() }"
-              />
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-item-label caption>
-                Height
-              </q-item-label>
-              <q-slider
-                :value="layout.height"
-                :min="5"
-                :max="50"
-                label
-                label-always
-                @change="v => { layout.height = v; saveLayout() }"
-              />
-            </q-item-section>
-          </q-item>
-        </q-expansion-item>
+        <q-item class="q-pb-none">
+          <q-item-section class="text-bold">
+            Tools
+          </q-item-section>
+        </q-item>
+
+        <ActionItem
+          v-for="tool in tools"
+          :key="'tool-' + tool.value"
+          :icon="tool.icon"
+          :label="tool.label"
+          :inset-level="0.2"
+          style="min-height: 0px"
+          @click="tool.use(findActionParts())"
+        >
+          <q-item-section side class="text-uppercase">
+            {{ tool.shortcut }}
+          </q-item-section>
+        </ActionItem>
+
+        <q-item class="q-pb-none">
+          <q-item-section class="text-bold">
+            Layout size
+          </q-item-section>
+        </q-item>
+
+        <q-item :inset-level="0.2">
+          <q-item-section>
+            <q-item-label caption>
+              Width
+            </q-item-label>
+            <q-slider
+              :value="layout.width"
+              :min="5"
+              :max="50"
+              label
+              label-always
+              @change="v => { layout.width = v; saveLayout() }"
+            />
+          </q-item-section>
+        </q-item>
+        <q-item :inset-level="0.2">
+          <q-item-section>
+            <q-item-label caption>
+              Height
+            </q-item-label>
+            <q-slider
+              :value="layout.height"
+              :min="5"
+              :max="50"
+              label
+              label-always
+              @change="v => { layout.height = v; saveLayout() }"
+            />
+          </q-item-section>
+        </q-item>
       </q-scroll-area>
     </q-drawer>
 
