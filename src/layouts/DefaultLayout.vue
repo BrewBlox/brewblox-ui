@@ -49,13 +49,6 @@ export default class DefaultLayout extends Vue {
     });
   }
 
-  showBuilderEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'BuilderEditor',
-    });
-  }
-
   showAutomationEditor(): void {
     createDialog({
       parent: this,
@@ -72,17 +65,16 @@ export default class DefaultLayout extends Vue {
 
 <template>
   <q-layout view="lHh Lpr lFf" class="bg-dark-bright">
-    <q-header class="glossy bg-dark">
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
-        <q-toolbar-title>
-          <portal-target name="toolbar-title">
-            BrewBlox
-          </portal-target>
-        </q-toolbar-title>
+    <LayoutHeader @menu="leftDrawerOpen = !leftDrawerOpen">
+      <template #title>
+        <portal-target name="toolbar-title">
+          BrewBlox
+        </portal-target>
+      </template>
+      <template #buttons>
         <portal-target name="toolbar-buttons" class="toolbar-buttons" />
-      </q-toolbar>
-    </q-header>
+      </template>
+    </LayoutHeader>
 
     <q-drawer v-model="leftDrawerOpen" content-class="bg-dark" elevated>
       <q-item exact to="/">
@@ -102,7 +94,7 @@ export default class DefaultLayout extends Vue {
 
         <q-separator class="q-mt-sm" />
         <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
-        <ActionItem v-if="!editorDisabled" icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
+        <ActionItem v-if="!editorDisabled" icon="mdi-pipe" label="Brewery Builder" to="/builder" />
         <template v-if="automationFeatureEnabled">
           <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
         </template>

@@ -3,7 +3,6 @@ import { debounce, uid } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
-import { createDialog } from '@/helpers/dialog';
 import { spliceById } from '@/helpers/functional';
 
 import { calculateNormalizedFlows } from './calculateFlows';
@@ -21,11 +20,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   @Watch('layout')
   watchLayout(): void {
-    this.debouncedCalculate();
-  }
-
-  @Watch('editorActive')
-  watchActive(): void {
     this.debouncedCalculate();
   }
 
@@ -115,16 +109,8 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   startEditor(): void {
     if (!this.editorDisabled) {
-      createDialog({
-        parent: this,
-        component: 'BuilderEditor',
-        initialLayout: this.config.currentLayoutId,
-      });
+      this.$router.push('/builder');
     }
-  }
-
-  get editorActive(): boolean {
-    return builderStore.editorActive;
   }
 
   get gridViewBox(): string {
@@ -185,7 +171,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     builderStore.spec(part).interactHandler?.(part, this.updater);
   }
 
-  onDoubleClick(part: FlowPart): void {
+  edit(part: FlowPart): void {
     if (!this.isClickable(part)) {
       this.startEditor();
     }
@@ -193,9 +179,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   async calculate(): Promise<void> {
     await this.$nextTick();
-    if (!this.editorActive) {
-      this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
-    }
+    this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
   }
 
   async migrate(): Promise<void> {
@@ -285,7 +269,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ pointer: isClickable(part), [part.type]: true }"
           @click="interact(part)"
-          @dblclick.stop="onDoubleClick(part)"
+          @dblclick.stop="edit(part)"
         >
           <PartWrapper :part="part" @update:part="savePart" @dirty="debouncedCalculate" />
         </g>
@@ -293,7 +277,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     </div>
   </q-card>
 </template>
-
 
 <style lang="sass" scoped>
 @import './grid.sass';

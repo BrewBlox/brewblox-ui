@@ -30,6 +30,7 @@ export default class ActionItem extends Vue {
       clickable: !this.disabled,
       active: this.active && !this.disabled,
       ...this.itemProps,
+      ...this.$attrs,
     };
   }
 
