@@ -154,7 +154,7 @@ export default class DashboardPage extends Vue {
 </script>
 
 <template>
-  <q-page padding>
+  <q-page padding class="bg-dark-bright">
     <q-inner-loading v-if="!dashboard">
       <q-spinner size="50px" color="primary" />
     </q-inner-loading>

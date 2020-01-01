@@ -60,6 +60,7 @@ export default class BuilderEditor extends Vue {
 
   drawerOpen = !this.dense;
   menuDialogOpen = false;
+  focusWarning = true;
 
   selectedTime = 0;
   selectArea: SelectArea | null = null;
@@ -402,20 +403,20 @@ export default class BuilderEditor extends Vue {
   }
 
   findGridSquare(rawPos: XYPosition | null): XYPosition | null {
-    // The page offset in clicks has appeared and disappeared in various quasar releases
-    // Comment or uncomment these lines when required
-    // x -= window.pageXOffset;
-    // y -= window.pageYOffset;
     if (rawPos === null) { return null; }
     const grid = this.gridRect();
-    const { x, y } = rawPos;
-    if (!rectContains(grid, x, y)) {
-      return null;
-    }
-    return {
-      x: Math.floor((x - grid.x) / SQUARE_SIZE),
-      y: Math.floor((y - grid.y) / SQUARE_SIZE),
-    };
+    let { x, y } = rawPos;
+
+    // Compensate for page scrolling
+    x -= window.pageXOffset;
+    y -= window.pageYOffset;
+
+    return rectContains(grid, x, y)
+      ? {
+        x: Math.floor((x - grid.x) / SQUARE_SIZE),
+        y: Math.floor((y - grid.y) / SQUARE_SIZE),
+      }
+      : null;
   }
 
   findClickSquare(evt: ClickEvent): XYPosition | null {
@@ -833,7 +834,7 @@ export default class BuilderEditor extends Vue {
 
         <q-item class="q-pb-none">
           <q-item-section class="text-bold">
-            Layout size
+            Layout
           </q-item-section>
         </q-item>
 
@@ -867,6 +868,15 @@ export default class BuilderEditor extends Vue {
             />
           </q-item-section>
         </q-item>
+        <ActionItem
+          :active="focusWarning"
+          :inset-level="0.2"
+          :icon="focusWarning
+            ? 'mdi-checkbox-marked-outline'
+            : 'mdi-checkbox-blank-outline'"
+          label="Show focus warning"
+          @click="focusWarning = !focusWarning"
+        />
       </q-scroll-area>
     </q-drawer>
 
@@ -881,125 +891,122 @@ export default class BuilderEditor extends Vue {
       />
     </q-dialog>
 
-    <q-page-container>
-      <q-page class="row justify-center no-wrap bg-dark q-pt-md">
-        <div class="col-auto column no-wrap full-height">
-          <!-- Grid wrapper -->
-          <div class="col column no-wrap scroll maximized">
-            <div
-              v-if="!!layout"
-              v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
-              :style="{
-                width: `${squares(layout.width)}px`,
-                height: `${squares(layout.height)}px`,
-              }"
-              class="q-mb-md"
+    <q-page-container class="bg-dark">
+      <q-page class="row no-wrap justify-center q-pa-md">
+        <div class="col-auto column no-wrap">
+          <div
+            v-if="!!layout"
+            v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
+            :style="{
+              width: `${squares(layout.width)}px`,
+              height: `${squares(layout.height)}px`,
+            }"
+            class="q-mb-md"
+          >
+            <svg
+              ref="grid"
+              class="grid-base grid-editable"
+              @click="v => clickHandler(v, null)"
+              @mouseenter="onGridMove"
+              @mousemove="onGridMove"
+              @mouseleave="onGridLeave"
             >
-              <svg
-                ref="grid"
-                class="grid-base grid-editable"
-                @click="v => clickHandler(v, null)"
-                @mouseenter="onGridMove"
-                @mousemove="onGridMove"
-                @mouseleave="onGridLeave"
+              <!-- Coordinate numbers -->
+              <text
+                v-for="x in layout.width"
+                :key="`edge-x-${x}`"
+                :x="squares(x-1)+20"
+                :y="8"
+                fill="white"
+                class="grid-square-text"
+              >{{ x-1 }}</text>
+              <text
+                v-for="y in layout.height"
+                :key="`edge-y-${y}`"
+                :x="0"
+                :y="squares(y-1)+28"
+                fill="white"
+                class="grid-square-text"
+              >{{ y-1 }}</text>
+              <!-- All parts, hidden if selected or floating -->
+              <g
+                v-for="part in flowParts"
+                v-show="!isBusy(part)"
+                :key="part.id"
+                v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
+                :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+                :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
+                @click.stop="v => clickHandler(v, part)"
               >
-                <!-- Coordinate numbers -->
-                <text
-                  v-for="x in layout.width"
-                  :key="`edge-x-${x}`"
-                  :x="squares(x-1)+20"
-                  :y="8"
-                  fill="white"
-                  class="grid-square-text"
-                >{{ x-1 }}</text>
-                <text
-                  v-for="y in layout.height"
-                  :key="`edge-y-${y}`"
-                  :x="0"
-                  :y="squares(y-1)+28"
-                  fill="white"
-                  class="grid-square-text"
-                >{{ y-1 }}</text>
-                <!-- All parts, hidden if selected or floating -->
+                <PartWrapper
+                  :part="part"
+                  show-hover
+                  @update:part="savePart"
+                  @dirty="debouncedCalculate"
+                />
+              </g>
+              <!-- Floating parts -->
+              <g v-if="floater" :transform="`translate(${squares(floater.x)}, ${squares(floater.y)})`">
                 <g
-                  v-for="part in flowParts"
-                  v-show="!isBusy(part)"
-                  :key="part.id"
-                  v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
+                  v-for="part in floater.parts"
+                  :key="`floating-${part.id}`"
+                  :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+                  :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
+                >
+                  <PartWrapper :part="part" selected />
+                </g>
+              </g>
+              <!-- Selected parts -->
+              <template v-if="!floater || !floater.moving">
+                <g
+                  v-for="part in selectedParts"
+                  :key="`selected-${part.id}`"
                   :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
                   :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
                   @click.stop="v => clickHandler(v, part)"
                 >
-                  <PartWrapper
-                    :part="part"
-                    show-hover
-                    @update:part="savePart"
-                    @dirty="debouncedCalculate"
-                  />
+                  <PartWrapper :part="part" selected />
                 </g>
-                <!-- Floating parts -->
-                <g v-if="floater" :transform="`translate(${squares(floater.x)}, ${squares(floater.y)})`">
-                  <g
-                    v-for="part in floater.parts"
-                    :key="`floating-${part.id}`"
-                    :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-                    :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
-                  >
-                    <PartWrapper :part="part" selected />
-                  </g>
-                </g>
-                <!-- Selected parts -->
-                <template v-if="!floater || !floater.moving">
-                  <g
-                    v-for="part in selectedParts"
-                    :key="`selected-${part.id}`"
-                    :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-                    :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
-                    @click.stop="v => clickHandler(v, part)"
-                  >
-                    <PartWrapper :part="part" selected />
-                  </g>
-                </template>
-                <!-- Overlap indicators -->
-                <g
-                  v-for="([coord, val], idx) in overlaps"
-                  :key="idx"
-                  :transform="`translate(${squares(coord.x) + 40}, ${squares(coord.y) + 4})`"
-                >
-                  <circle r="8" fill="dodgerblue" />
-                  <text
-                    y="4"
-                    text-anchor="middle"
-                    fill="white"
-                    class="grid-square-text"
-                  >{{ val }}</text>
-                </g>
-                <!-- Selection area -->
-                <rect
-                  v-if="selectArea"
-                  v-bind="unflippedArea(selectArea)"
-                  stroke="white"
-                  fill="dodgerblue"
-                  opacity="0.3"
-                  style="pointer-events: none;"
-                />
-              </svg>
-            </div>
+              </template>
+              <!-- Overlap indicators -->
+              <g
+                v-for="([coord, val], idx) in overlaps"
+                :key="idx"
+                :transform="`translate(${squares(coord.x) + 40}, ${squares(coord.y) + 4})`"
+              >
+                <circle r="8" fill="dodgerblue" />
+                <text
+                  y="4"
+                  text-anchor="middle"
+                  fill="white"
+                  class="grid-square-text"
+                >{{ val }}</text>
+              </g>
+              <!-- Selection area -->
+              <rect
+                v-if="selectArea"
+                v-bind="unflippedArea(selectArea)"
+                stroke="white"
+                fill="dodgerblue"
+                opacity="0.3"
+                style="pointer-events: none;"
+              />
+            </svg>
           </div>
+        </div>
+        <div
+          v-if="!pageFocused && focusWarning"
+          class="unfocus-overlay"
+          @click.stop="checkFocus"
+        >
+          <transition appear name="fade">
+            <div class="text-h5 text-white fixed-center q-pa-lg resume-message">
+              Click to resume editing
+            </div>
+          </transition>
         </div>
       </q-page>
     </q-page-container>
-    <div
-      v-if="!pageFocused"
-      class="unfocus-overlay"
-      @click.stop="checkFocus"
-    >
-      <transition appear name="fade">
-        <div class="text-h5 text-white fixed-center q-pa-lg resume-message">
-          Click to resume editing
-        </div>
-      </transition>
-    </div>
   </q-layout>
 </template>
 
@@ -1008,6 +1015,12 @@ export default class BuilderEditor extends Vue {
 
 .editor-page {
   outline: none;
+}
+
+.q-page-container {
+  overflow: auto;
+  max-height: 100vh;
+  max-width: 100vw;
 }
 
 .unfocus-overlay {
