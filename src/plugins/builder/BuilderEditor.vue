@@ -834,7 +834,7 @@ export default class BuilderEditor extends Vue {
 
         <q-item class="q-pb-none">
           <q-item-section class="text-bold">
-            Layout
+            Grid size
           </q-item-section>
         </q-item>
 
@@ -868,6 +868,13 @@ export default class BuilderEditor extends Vue {
             />
           </q-item-section>
         </q-item>
+
+        <q-item class="q-pb-none">
+          <q-item-section class="text-bold">
+            Editor options
+          </q-item-section>
+        </q-item>
+
         <ActionItem
           :active="focusWarning"
           :inset-level="0.2"
