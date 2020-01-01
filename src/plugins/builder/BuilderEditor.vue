@@ -536,8 +536,7 @@ export default class BuilderEditor extends DialogBase {
 
   interactClickHandler(evt: ClickEvent, part: FlowPart): void {
     if (part) {
-      const handler = builderStore.spec(part).interactHandler;
-      handler && handler(part, this.updater);
+      builderStore.spec(part).interactHandler?.(part, this.updater);
     }
   }
 
@@ -640,8 +639,7 @@ export default class BuilderEditor extends DialogBase {
   useInteract(parts: PersistentPart[]): void {
     if (!this.floater && parts.length === 1) {
       const [part] = parts;
-      const handler = builderStore.spec(part).interactHandler;
-      handler && handler(part, this.updater);
+      builderStore.spec(part).interactHandler?.(part, this.updater);
     }
   }
 
@@ -770,6 +768,7 @@ export default class BuilderEditor extends DialogBase {
           <q-btn
             :disable="!history.length"
             flat
+            stretch
             icon="mdi-undo"
             class="col-auto"
             @click="undo"
@@ -781,6 +780,7 @@ export default class BuilderEditor extends DialogBase {
           <q-btn
             :disable="!undoneHistory.length"
             flat
+            stretch
             icon="mdi-redo"
             class="col-auto"
             @click="redo"
@@ -789,9 +789,13 @@ export default class BuilderEditor extends DialogBase {
               Redo (ctrl-Y)
             </q-tooltip>
           </q-btn>
-          <q-btn-dropdown flat icon="mdi-menu" class="col-auto">
-            <LayoutActions :layout="layout" :select-layout="selectLayout" :save-parts="saveParts" />
-          </q-btn-dropdown>
+
+          <LayoutActions
+            :layout="layout"
+            :select-layout="selectLayout"
+            :save-parts="saveParts"
+            stretch
+          />
         </template>
       </DialogToolbar>
 
@@ -915,7 +919,7 @@ export default class BuilderEditor extends DialogBase {
                     :key="part.id"
                     v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
                     :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-                    :class="{ clickable: currentMode.cursor(part), [part.type]: true }"
+                    :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
                     @click.stop="v => clickHandler(v, part)"
                   >
                     <PartWrapper
@@ -931,7 +935,7 @@ export default class BuilderEditor extends DialogBase {
                       v-for="part in floater.parts"
                       :key="`floating-${part.id}`"
                       :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-                      :class="{ clickable: currentMode.cursor(part), [part.type]: true }"
+                      :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
                     >
                       <PartWrapper :part="part" selected />
                     </g>
@@ -942,7 +946,7 @@ export default class BuilderEditor extends DialogBase {
                       v-for="part in selectedParts"
                       :key="`selected-${part.id}`"
                       :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-                      :class="{ clickable: currentMode.cursor(part), [part.type]: true }"
+                      :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
                       @click.stop="v => clickHandler(v, part)"
                     >
                       <PartWrapper :part="part" selected />

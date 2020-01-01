@@ -35,8 +35,8 @@ export class BuilderModule extends VuexModule {
     return Object.values(this.layouts);
   }
 
-  public get layoutById(): (id: string) => BuilderLayout {
-    return id => this.layouts[id] || null;
+  public get layoutById(): (id: string | null) => BuilderLayout | null {
+    return id => this.layouts[id ?? ''] ?? null;
   }
 
   public get specIds(): string[] {
