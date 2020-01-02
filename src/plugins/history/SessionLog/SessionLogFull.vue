@@ -30,6 +30,10 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   @Ref()
   readonly notebox!: any;
 
+  get dense(): boolean {
+    return this.$q.screen.lt.md;
+  }
+
   get session(): LoggedSession | null {
     return this.config.currentSession === null
       ? null
@@ -178,7 +182,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
     <q-card-section v-if="session !== null">
       <q-list>
         <SessionHeaderField :session="session" @update:session="saveSession" />
-        <draggable ref="notebox" v-model="notes" class="row q-gutter-xs">
+        <draggable ref="notebox" v-model="notes" :disabled="dense" class="row q-gutter-xs">
           <div
             v-for="note in notes"
             :key="note.id"
