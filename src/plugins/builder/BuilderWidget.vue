@@ -56,11 +56,10 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
   }
 
   showLayout(layout: BuilderLayout | null): void {
-    const id = layout ? layout.id : null;
-    const currentLayoutId = this.layout?.id === id
-      ? null
-      : id;
-    this.saveConfig({ ...this.config, currentLayoutId });
+    this.saveConfig({
+      ...this.config,
+      currentLayoutId: layout ? layout.id : null,
+    });
   }
 
   selectLayout(layout: BuilderLayout, selected: boolean): void {
@@ -205,7 +204,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 <template>
   <q-card :class="cardClass" :style="builderCardStyle">
     <component :is="toolbarComponent" :crud="crud">
-      <ActionMenu icon="mdi-widgets" :stretch="inDialog">
+      <ActionMenu icon="mdi-file-document-edit" :stretch="inDialog">
         <template #menus>
           <q-list>
             <q-select
@@ -215,7 +214,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
               item-aligned
               option-label="title"
               option-value="id"
-              clearable
               @input="v => showLayout(v)"
             >
               <template #option="scope">
@@ -246,7 +244,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
               :key="v.id"
               :label="v.title"
               :active="layout && layout.id === v.id"
-              icon="mdi-star"
+              icon="mdi-widgets"
               no-close
               @click="showLayout(v)"
             />

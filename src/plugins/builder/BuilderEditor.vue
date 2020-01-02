@@ -464,6 +464,10 @@ export default class BuilderEditor extends Vue {
     this.$nextTick(this.setFocus);
   }
 
+  leaveEditor(): void {
+    this.$router.back();
+  }
+
   ////////////////////////////////////////////////////////////////
   // Modes
   ////////////////////////////////////////////////////////////////
@@ -722,7 +726,7 @@ export default class BuilderEditor extends Vue {
   >
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
-        Brewery Builder Editor
+        Brewery Builder
       </template>
       <template #buttons>
         <div class="row">
@@ -748,30 +752,6 @@ export default class BuilderEditor extends Vue {
             </q-list>
           </q-btn-dropdown>
         </div>
-        <q-btn
-          :disable="!history.length"
-          flat
-          stretch
-          icon="mdi-undo"
-          class="col-auto"
-          @click="undo"
-        >
-          <q-tooltip v-if="history.length">
-            Undo (ctrl-Z)
-          </q-tooltip>
-        </q-btn>
-        <q-btn
-          :disable="!undoneHistory.length"
-          flat
-          stretch
-          icon="mdi-redo"
-          class="col-auto"
-          @click="redo"
-        >
-          <q-tooltip v-if="undoneHistory.length">
-            Redo (ctrl-Y)
-          </q-tooltip>
-        </q-btn>
 
         <LayoutActions
           :layout="layout"
@@ -779,6 +759,8 @@ export default class BuilderEditor extends Vue {
           :save-parts="saveParts"
           stretch
         />
+
+        <q-btn flat stretch icon="mdi-close-circle" size="md" @click="leaveEditor" />
       </template>
     </LayoutHeader>
 
@@ -818,6 +800,31 @@ export default class BuilderEditor extends Vue {
         </q-item>
 
         <ActionItem
+          :disable="!history.length"
+          icon="mdi-undo"
+          label="Undo"
+          :inset-level="0.2"
+          style="min-height: 0px"
+          @click="undo"
+        >
+          <q-item-section side class="text-uppercase">
+            ctrl-Z
+          </q-item-section>
+        </ActionItem>
+        <ActionItem
+          :disable="!undoneHistory.length"
+          icon="mdi-redo"
+          label="Redo"
+          :inset-level="0.2"
+          style="min-height: 0px"
+          @click="redo"
+        >
+          <q-item-section side class="text-uppercase">
+            ctrl-Y
+          </q-item-section>
+        </ActionItem>
+
+        <ActionItem
           v-for="tool in tools"
           :key="'tool-' + tool.value"
           :icon="tool.icon"
@@ -833,7 +840,7 @@ export default class BuilderEditor extends Vue {
 
         <q-item class="q-pb-none">
           <q-item-section class="text-bold">
-            Grid size
+            Editor
           </q-item-section>
         </q-item>
 
@@ -865,12 +872,6 @@ export default class BuilderEditor extends Vue {
               label-always
               @change="v => { layout.height = v; saveLayout() }"
             />
-          </q-item-section>
-        </q-item>
-
-        <q-item class="q-pb-none">
-          <q-item-section class="text-bold">
-            Editor options
           </q-item-section>
         </q-item>
 
