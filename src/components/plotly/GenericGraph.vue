@@ -1,7 +1,7 @@
 <script lang="ts">
 import merge from 'lodash/merge';
 import { ClickAnnotationEvent, Config, Layout, PlotData, PlotMouseEvent } from 'plotly.js';
-import { uid } from 'quasar';
+import { colors, uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -9,6 +9,7 @@ import { createDialog } from '@/helpers/dialog';
 import { GraphAnnotation } from '@/plugins/history/types';
 
 /* eslint-disable @typescript-eslint/camelcase */
+const dark = colors.getBrand('dark')!;
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
   font: {
@@ -46,8 +47,8 @@ const layoutDefaults = (): Partial<Layout> => ({
       color: '#aef',
     },
   },
-  paper_bgcolor: '#282c34',
-  plot_bgcolor: '#282c34',
+  paper_bgcolor: dark,
+  plot_bgcolor: dark,
   hovermode: 'closest',
 });
 /* eslint-enable */

@@ -144,71 +144,67 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
 </script>
 
 <template>
-  <div>
-    <q-card-section style="height: 60vh">
-      <q-scroll-area>
-        <q-item class="text-weight-light">
-          <q-item-section>
-            <q-item-label class="text-subtitle1">
-              Name your new dashboard and blocks
-            </q-item-label>
-          </q-item-section>
-        </q-item>
+  <WizardCard>
+    <q-card-section>
+      <q-item class="text-weight-light">
+        <q-item-section>
+          <q-item-label class="text-subtitle1">
+            Name your new dashboard and blocks
+          </q-item-label>
+        </q-item-section>
+      </q-item>
 
-        <CardWarning v-if="groupError">
-          <template #message>
-            {{ groupError }}
-          </template>
-        </CardWarning>
+      <CardWarning v-if="groupError">
+        <template #message>
+          {{ groupError }}
+        </template>
+      </CardWarning>
 
-        <!-- Generic settings -->
-        <QuickStartServiceField v-model="serviceId" :services="services" />
+      <!-- Generic settings -->
+      <QuickStartServiceField v-model="serviceId" :services="services" />
+      <QuickStartNameField
+        v-model="dashboardTitle"
+        label="Dashboard name"
+        @clear="clearKey('dashboardTitle')"
+      >
+        <template #help>
+          The name for the new dashboard.
+        </template>
+      </QuickStartNameField>
+      <QuickStartPrefixField
+        v-model="prefix"
+        @clear="clearKey('prefix')"
+      />
+
+      <!-- Block names -->
+      <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
         <QuickStartNameField
-          v-model="dashboardTitle"
-          label="Dashboard name"
-          @clear="clearKey('dashboardTitle')"
+          v-model="dashboardId"
+          label="Dashboard ID"
+          :rules="dashboardIdRules"
+          @clear="clearKey('dashboardId')"
         >
           <template #help>
-            The name for the new dashboard.
+            The unique identifier for your dashboard.
+            <br> By default, this is an URL-safe version of the dashboard title.
           </template>
         </QuickStartNameField>
-        <QuickStartPrefixField
-          v-model="prefix"
-          @clear="clearKey('prefix')"
+        <QuickStartNameField
+          v-for="(nVal, nKey) in names"
+          :key="nKey"
+          :value="nVal"
+          :label="defaultNames[nKey]"
+          :rules="nameRules"
+          @clear="clearName(nKey)"
+          @input="v => updateName(nKey, v)"
         />
-
-        <!-- Block names -->
-        <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
-          <QuickStartNameField
-            v-model="dashboardId"
-            label="Dashboard ID"
-            :rules="dashboardIdRules"
-            @clear="clearKey('dashboardId')"
-          >
-            <template #help>
-              The unique identifier for your dashboard.
-              <br> By default, this is an URL-safe version of the dashboard title.
-            </template>
-          </QuickStartNameField>
-          <QuickStartNameField
-            v-for="(nVal, nKey) in names"
-            :key="nKey"
-            :value="nVal"
-            :label="defaultNames[nKey]"
-            :rules="nameRules"
-            @clear="clearName(nKey)"
-            @input="v => updateName(nKey, v)"
-          />
-        </q-expansion-item>
-      </q-scroll-area>
+      </q-expansion-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
-    </q-card-actions>
-  </div>
+    </template>
+  </WizardCard>
 </template>

@@ -78,7 +78,7 @@ export default class PidWidget
             PID has no input Block configured.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.enabled">
+        <CardWarning v-else-if="!block.data.enabled && mode !== 'Full'">
           <template #message>
             <span>
               PID is disabled:

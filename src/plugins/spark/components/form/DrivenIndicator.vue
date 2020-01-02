@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
 @Component
@@ -40,7 +40,7 @@ export default class DrivenIndicator extends Vue {
   }
 
   showDialog(chainIdx: number): void {
-    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.bossDriver(chainIdx)));
+    createBlockDialog(sparkStore.tryBlockById(this.serviceId, this.bossDriver(chainIdx)));
   }
 }
 </script>

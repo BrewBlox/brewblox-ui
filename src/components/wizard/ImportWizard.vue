@@ -104,45 +104,46 @@ export default class ImportWizard extends Vue {
 </script>
 
 <template>
-  <div>
-    <q-card-section>
-      <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
-        <q-option-group
+  <div class="dialog-content">
+    <WizardCard>
+      <q-card-section>
+        <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
+          <q-option-group
+            v-model="chosenDashboardId"
+            :options="dashboardOptions"
+            label="test"
+          />
+        </LabeledField>
+        <q-select
+          v-else
           v-model="chosenDashboardId"
           :options="dashboardOptions"
-          label="test"
+          label="Dashboard"
+          map-options
+          emit-value
+          item-aligned
         />
-      </LabeledField>
-      <q-select
-        v-else
-        v-model="chosenDashboardId"
-        :options="dashboardOptions"
-        label="Dashboard"
-        map-options
-        emit-value
-        item-aligned
-      />
-      <q-item>
-        <q-item-section>
-          <q-input
-            label="Loaded widget"
-            readonly
-            :value="widgetString"
-            :error-message="widgetError"
-            :error="widget !== null && !widgetOk"
-          />
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn flat label="Load" @click="startImport" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+        <q-item>
+          <q-item-section>
+            <q-input
+              label="Loaded widget"
+              readonly
+              :value="widgetString"
+              :error-message="widgetError"
+              :error="widget !== null && !widgetOk"
+            />
+          </q-item-section>
+          <q-item-section class="col-auto">
+            <q-btn flat label="Load" @click="startImport" />
+          </q-item-section>
+        </q-item>
+      </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions class="row justify-between">
-      <q-btn unelevated label="Back" @click="back" />
-      <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="createWidget" />
-    </q-card-actions>
+      <template #actions>
+        <q-btn unelevated label="Back" @click="back" />
+        <q-space />
+        <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="createWidget" />
+      </template>
+    </WizardCard>
   </div>
 </template>

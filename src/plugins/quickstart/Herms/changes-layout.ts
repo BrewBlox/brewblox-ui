@@ -10,8 +10,8 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
     {
       id: uid(),
       title: maybeSpace(config.prefix, 'Layout'),
-      width: 28,
-      height: 15,
+      width: 26,
+      height: 11,
       parts: [
         {
           id: uid(),

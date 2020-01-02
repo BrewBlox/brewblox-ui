@@ -52,7 +52,7 @@ export default class LabeledField extends FieldBase {
   >
     <template #control>
       <slot name="control">
-        <component :is="tag" :class="['q-mt-sm', tagClass]">
+        <component :is="tag" :class="['q-mt-sm', tagClass]" :style="tagStyle">
           <slot>
             {{ displayValue }}
           </slot>

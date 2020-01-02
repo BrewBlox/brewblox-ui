@@ -9,11 +9,6 @@ import { TempSensorMockBlock } from './types';
 export default class TempSensorMockWidget
   extends BlockWidgetBase<TempSensorMockBlock> {
 
-  get cardStyle(): Mapped<string> {
-    return this.inDialog
-      ? { minHeight: '40vh' }
-      : {};
-  }
 }
 </script>
 
@@ -23,7 +18,7 @@ export default class TempSensorMockWidget
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
-    <q-card :class="cardClass" :style="cardStyle">
+    <q-card :class="cardClass">
       <component :is="toolbarComponent" :crud="crud" />
 
       <q-card-section>

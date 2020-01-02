@@ -58,41 +58,42 @@ export default class BuilderCatalog extends DialogBase {
   <q-dialog ref="dialog" @hide="onDialogHide">
     <q-card class="widget-modal">
       <DialogToolbar>Part Catalog</DialogToolbar>
+      <div class="dialog-content column q-pb-md">
+        <q-item class="q-mb-md">
+          <q-item-section>
+            <q-input v-model="partFilter" placeholder="Search Parts" clearable autofocus>
+              <template #append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </q-item-section>
+        </q-item>
 
-      <q-item class="q-mb-md">
-        <q-item-section>
-          <q-input v-model="partFilter" placeholder="Search Parts" clearable autofocus>
-            <template #append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </q-item-section>
-      </q-item>
-
-      <q-scroll-area style="min-height: 400px; height: 60vh;">
-        <q-card-section>
-          <div class="row">
-            <q-item
-              v-for="v in available"
-              :key="v.spec.id"
-              clickable
-              class="col-6"
-              @click="selectPart(v)"
-            >
-              <q-item-section side>
-                <svg
-                  :width="`${SQUARE_SIZE}px`"
-                  :height="`${SQUARE_SIZE}px`"
-                  :viewBox="`0 0 ${partViewBox(v)}`"
-                >
-                  <PartWrapper :part="v.part" />
-                </svg>
-              </q-item-section>
-              <q-item-section>{{ v.spec.title }}</q-item-section>
-            </q-item>
-          </div>
-        </q-card-section>
-      </q-scroll-area>
+        <q-scroll-area class="col">
+          <q-card-section>
+            <div class="row">
+              <q-item
+                v-for="v in available"
+                :key="v.spec.id"
+                clickable
+                class="col-6"
+                @click="selectPart(v)"
+              >
+                <q-item-section side>
+                  <svg
+                    :width="`${SQUARE_SIZE}px`"
+                    :height="`${SQUARE_SIZE}px`"
+                    :viewBox="`0 0 ${partViewBox(v)}`"
+                  >
+                    <PartWrapper :part="v.part" />
+                  </svg>
+                </q-item-section>
+                <q-item-section>{{ v.spec.title }}</q-item-section>
+              </q-item>
+            </div>
+          </q-card-section>
+        </q-scroll-area>
+      </div>
     </q-card>
   </q-dialog>
 </template>

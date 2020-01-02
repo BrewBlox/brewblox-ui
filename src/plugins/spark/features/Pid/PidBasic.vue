@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
@@ -38,11 +38,11 @@ export default class PidBasic
   }
 
   showInput(): void {
-    showBlockDialog(this.inputBlock);
+    createBlockDialog(this.inputBlock);
   }
 
   showOutput(): void {
-    showBlockDialog(this.outputBlock);
+    createBlockDialog(this.outputBlock);
   }
 }
 </script>

@@ -4,15 +4,24 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { WidgetContext } from '@/store/features';
 
 import { blockTypes, SysInfoBlock, TicksBlock, WiFiSettingsBlock } from '../block-types';
 import { isReady } from './getters';
 
 @Component
 export default class SparkWidget extends Vue {
+  infoClass = 'col-lg-5 col-11';
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
+
+  @Prop({ type: Object, default: () => ({ mode: 'Basic', container: 'Dashboard' }) })
+  public readonly context!: WidgetContext;
+
+  get inDialog(): boolean {
+    return this.context.container === 'Dialog';
+  }
 
   sysBlock<T extends Block>(blockType: string): T {
     return sparkStore.blockValues(this.serviceId)
@@ -57,7 +66,18 @@ export default class SparkWidget extends Vue {
 
 <template>
   <q-card v-if="ready" class="text-white scroll">
-    <Toolbar :title="serviceId" subtitle="Device Info">
+    <DialogToolbar v-if="inDialog">
+      <q-item-section>
+        <q-item-label>{{ serviceId }}</q-item-label>
+        <q-item-label caption>
+          Device info
+        </q-item-label>
+      </q-item-section>
+      <template #buttons>
+        <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
+      </template>
+    </DialogToolbar>
+    <Toolbar v-else :title="serviceId" subtitle="Device info">
       <template #buttons>
         <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
       </template>
@@ -73,36 +93,26 @@ export default class SparkWidget extends Vue {
     </CardWarning>
 
     <q-card-section>
-      <q-list dense>
-        <q-item>
-          <q-item-section>
-            <LabeledField :value="sysInfo.data.version" label="Firmware version" />
-          </q-item-section>
-          <q-item-section>
-            <LabeledField :value="sysInfo.data.releaseDate" label="Firmware release date" />
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <LabeledField :value="sysDate" label="Device time" />
-          </q-item-section>
-          <q-item-section>
-            <LabeledField label="Time since boot">
-              {{ ticks.data.millisSinceBoot | duration }}
-            </LabeledField>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <LabeledField label="Device ID">
-              <span style="word-wrap: break-word;">{{ sysInfo.data.deviceId }}</span>
-            </LabeledField>
-          </q-item-section>
-          <q-item-section>
-            <LabeledField :value="wifi.data.ip" label="IP address" />
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <div class="row wrap q-gutter-x-md">
+        <LabeledField label="Firmware version" :class="infoClass">
+          {{ sysInfo.data.version }}
+        </LabeledField>
+        <LabeledField label="Firmware release date" :class="infoClass">
+          {{ sysInfo.data.releaseDate }}
+        </LabeledField>
+        <LabeledField label="Device time" :class="infoClass">
+          {{ sysDate }}
+        </LabeledField>
+        <LabeledField label="Time since boot" :class="infoClass">
+          {{ ticks.data.millisSinceBoot | duration }}
+        </LabeledField>
+        <LabeledField label="Device ID" :class="infoClass" tag-style="word-wrap: break-word;">
+          {{ sysInfo.data.deviceId }}
+        </LabeledField>
+        <LabeledField label="IP address" :class="infoClass">
+          {{ wifi.data.ip }}
+        </LabeledField>
+      </div>
     </q-card-section>
   </q-card>
 </template>

@@ -22,7 +22,6 @@ const rawError = true;
 export class BuilderModule extends VuexModule {
   private specs: Mapped<PartSpec> = {};
 
-  public editorActive = false;
   public editorMode = '';
   public activeLayoutId: string | null = null;
   public layouts: Mapped<BuilderLayout> = {};
@@ -35,8 +34,8 @@ export class BuilderModule extends VuexModule {
     return Object.values(this.layouts);
   }
 
-  public get layoutById(): (id: string) => BuilderLayout {
-    return id => this.layouts[id] || null;
+  public get layoutById(): (id: string | null) => BuilderLayout | null {
+    return id => this.layouts[id ?? ''] ?? null;
   }
 
   public get specIds(): string[] {
@@ -61,11 +60,6 @@ export class BuilderModule extends VuexModule {
   @Mutation
   public registerPart(spec: PartSpec): void {
     Vue.set(this.specs, spec.id, { ...spec });
-  }
-
-  @Mutation
-  public commitEditorActive(active: boolean): void {
-    this.editorActive = active;
   }
 
   @Mutation

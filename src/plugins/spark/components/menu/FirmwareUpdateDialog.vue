@@ -83,28 +83,30 @@ export default class FirmwareUpdateDialog extends DialogBase {
           </q-item-label>
         </q-item-section>
       </DialogToolbar>
-
-      <q-card-section>
-        <q-item>
-          <q-item-section>{{ updateAvailableText }}</q-item-section>
-        </q-item>
-        <q-list dense>
-          <q-item v-for="(msg, idx) in messages" :key="idx">
-            <q-item-section>{{ msg }}</q-item-section>
-          </q-item>
-        </q-list>
-      </q-card-section>
-      <q-separator />
-      <q-card-actions align="right">
-        <q-btn
-          :disable="!buttonEnabled"
-          :loading="busy"
-          :color="buttonColor"
-          unelevated
-          label="Flash"
-          @click="updateFirmware"
-        />
-      </q-card-actions>
+      <div class="dialog-content">
+        <WizardCard>
+          <q-card-section>
+            <q-item>
+              <q-item-section>{{ updateAvailableText }}</q-item-section>
+            </q-item>
+            <q-list dense>
+              <q-item v-for="(msg, idx) in messages" :key="idx">
+                <q-item-section>{{ msg }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-card-section>
+          <template #actions>
+            <q-btn
+              :disable="!buttonEnabled"
+              :loading="busy"
+              :color="buttonColor"
+              unelevated
+              label="Flash"
+              @click="updateFirmware"
+            />
+          </template>
+        </WizardCard>
+      </div>
     </q-card>
   </q-dialog>
 </template>

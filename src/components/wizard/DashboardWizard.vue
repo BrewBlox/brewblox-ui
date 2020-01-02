@@ -56,38 +56,38 @@ export default class DashboardWizard extends Vue {
 </script>
 
 <template>
-  <div>
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <q-input v-model="dashboardTitle" label="Dashboard Title" />
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <q-input v-model="dashboardId" :rules="dashboardIdRules" label="Dashboard URL" />
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn
-            icon="mdi-backup-restore"
-            flat
-            round
-            size="sm"
-            color="white"
-            @click="chosenId = null"
-          >
-            <q-tooltip>Reset to default</q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+  <div class="dialog-content">
+    <WizardCard>
+      <q-card-section>
+        <q-item>
+          <q-item-section>
+            <q-input v-model="dashboardTitle" label="Dashboard Title" />
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <q-input v-model="dashboardId" :rules="dashboardIdRules" label="Dashboard URL" />
+          </q-item-section>
+          <q-item-section class="col-auto">
+            <q-btn
+              icon="mdi-backup-restore"
+              flat
+              round
+              size="sm"
+              color="white"
+              @click="chosenId = null"
+            >
+              <q-tooltip>Reset to default</q-tooltip>
+            </q-btn>
+          </q-item-section>
+        </q-item>
+      </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions align="right">
-      <q-btn unelevated label="Back" @click="back" />
-      <q-space />
-      <q-btn :disable="!valid" unelevated label="Create" color="primary" @click="createDashboard" />
-    </q-card-actions>
+      <template #actions>
+        <q-btn unelevated label="Back" @click="back" />
+        <q-space />
+        <q-btn :disable="!valid" unelevated label="Create" color="primary" @click="createDashboard" />
+      </template>
+    </WizardCard>
   </div>
 </template>

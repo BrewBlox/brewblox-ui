@@ -19,7 +19,7 @@ export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
 </script>
 
 <template>
-  <div>
+  <WizardCard>
     <q-card-section>
       <q-item>
         <big>About your new RIMS dashboard</big>
@@ -57,10 +57,7 @@ export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
-      <q-space />
+    <template #actions>
       <q-btn
         :loading="busyExecuting"
         unelevated
@@ -72,6 +69,6 @@ export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
           Creating everything...
         </q-tooltip>
       </q-btn>
-    </q-card-actions>
-  </div>
+    </template>
+  </WizardCard>
 </template>

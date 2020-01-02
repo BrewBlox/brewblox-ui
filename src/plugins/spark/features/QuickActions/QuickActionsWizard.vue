@@ -48,7 +48,7 @@ export default class QuickActionsWizard extends WidgetWizardBase<QuickActionsCon
 </script>
 
 <template>
-  <div>
+  <WizardCard>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -60,12 +60,10 @@ export default class QuickActionsWizard extends WidgetWizardBase<QuickActionsCon
       </LabeledField>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions align="right">
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn :disable="!service" unelevated label="Create" color="primary" @click="createWidget" />
-    </q-card-actions>
-  </div>
+    </template>
+  </WizardCard>
 </template>
