@@ -198,9 +198,8 @@ export default class BuilderEditor extends Vue {
   get layout(): BuilderLayout | null {
     return builderStore.layoutById(
       this.layoutId
-      || this.initialLayout
-      || builderStore.layoutIds[0]
-      || '');
+      ?? this.$route.params.id
+      ?? builderStore.layoutIds[0]);
   }
 
   get parts(): PersistentPart[] {

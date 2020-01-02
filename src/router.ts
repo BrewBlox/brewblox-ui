@@ -6,7 +6,7 @@ Vue.use(VueRouter);
 const router = new VueRouter({
   routes: [
     {
-      path: '/builder',
+      path: '/builder/:id?',
       component: () => import('@/plugins/builder/BuilderEditor.vue'),
     },
     {

@@ -109,7 +109,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   startEditor(): void {
     if (!this.editorDisabled) {
-      this.$router.push('/builder');
+      this.$router.push(`/builder/${this.layout?.id ?? ''}`);
     }
   }
 
