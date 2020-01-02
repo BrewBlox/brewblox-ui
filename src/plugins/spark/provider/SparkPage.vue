@@ -134,10 +134,6 @@ export default class SparkPage extends Vue {
     this.saveServiceConfig();
   }
 
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
-
   get allSorters(): { [id: string]: (a: ValidatedWidget, b: ValidatedWidget) => number } {
     return {
       unsorted: () => 0,
@@ -208,7 +204,7 @@ export default class SparkPage extends Vue {
   }
 
   selectService(): void {
-    if (this.dense && this.isReady) {
+    if (this.$dense && this.isReady) {
       createDialog({
         component: 'SparkWidgetDialog',
         serviceId: this.serviceId,
@@ -376,7 +372,7 @@ export default class SparkPage extends Vue {
   }
 
   onBlockClick(val: ValidatedWidget): void {
-    if (this.dense) {
+    if (this.$dense) {
       createDialog({
         component: 'WidgetDialog',
         parent: this,
@@ -522,12 +518,12 @@ export default class SparkPage extends Vue {
                 </q-menu>
               </q-btn>
             </q-item-section>
-            <q-item-section v-if="!dense" class="col-auto">
+            <q-item-section v-if="!$dense" class="col-auto">
               <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
                 <q-tooltip>Unselect all</q-tooltip>
               </q-btn>
             </q-item-section>
-            <q-item-section v-if="!dense" class="col-auto">
+            <q-item-section v-if="!$dense" class="col-auto">
               <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
                 <q-tooltip>Select all</q-tooltip>
               </q-btn>
@@ -535,7 +531,7 @@ export default class SparkPage extends Vue {
           </q-item>
           <!-- Service -->
           <q-item v-if="serviceShown" class="text-white widget-index">
-            <q-item-section v-if="!dense" side class="q-mx-none q-px-none">
+            <q-item-section v-if="!$dense" side class="q-mx-none q-px-none">
               <ToggleButton v-model="serviceExpanded" />
             </q-item-section>
             <q-item-section>
@@ -561,7 +557,7 @@ export default class SparkPage extends Vue {
             :key="val.key"
             class="non-selectable text-white widget-index"
           >
-            <q-item-section v-if="!dense" side class="q-mx-none q-px-none">
+            <q-item-section v-if="!$dense" side class="q-mx-none q-px-none">
               <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
             </q-item-section>
             <q-item-section>
@@ -587,7 +583,7 @@ export default class SparkPage extends Vue {
         </q-list>
 
         <!-- Widget List -->
-        <q-list v-if="!dense" class="content-column q-ml-lg q-pr-lg">
+        <q-list v-if="!$dense" class="content-column q-ml-lg q-pr-lg">
           <!-- Service -->
           <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
             <q-item-section>

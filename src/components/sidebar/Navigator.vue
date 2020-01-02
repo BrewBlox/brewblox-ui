@@ -14,13 +14,9 @@ export default class Navigator extends Vue {
   @Prop({ type: String, required: false })
   public readonly activeSection!: string;
 
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
-
   get editorDisabled(): boolean {
     const { ie, edge } = this.$q.platform.is;
-    return Boolean(ie || edge) || this.dense;
+    return Boolean(ie || edge) || this.$dense;
   }
 
   showWizard(): void {

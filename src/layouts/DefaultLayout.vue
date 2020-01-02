@@ -7,7 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen = !this.dense;
+  leftDrawerOpen = !this.$dense;
   dashboardEditing = false;
   serviceEditing = false;
 
@@ -21,10 +21,6 @@ export default class DefaultLayout extends Vue {
 
   get buildDate(): string {
     return process.env.BLOX_DATE || 'UNKNOWN';
-  }
-
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
   }
 
   showWizard(): void {

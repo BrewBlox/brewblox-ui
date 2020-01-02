@@ -58,7 +58,7 @@ export default class BuilderEditor extends Vue {
   history: string[] = [];
   undoneHistory: string[] = [];
 
-  drawerOpen = !this.dense;
+  drawerOpen = !this.$dense;
   menuDialogOpen = false;
   focusWarning = true;
 
@@ -178,10 +178,6 @@ export default class BuilderEditor extends Vue {
       use: this.useDelete,
     },
   ]
-
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
 
   get layouts(): BuilderLayout[] {
     return builderStore.layoutValues;
@@ -731,7 +727,7 @@ export default class BuilderEditor extends Vue {
       <template #buttons>
         <div class="row">
           <q-btn-dropdown
-            :label="layout ? (dense ? '' : layout.title) : 'None'"
+            :label="layout ? ($dense ? '' : layout.title) : 'None'"
             flat
             no-caps
             icon="widgets"

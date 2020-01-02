@@ -1,16 +1,7 @@
-declare module '*.vue' {
-  import Vue from 'vue';
-  export default Vue;
+import Vue from 'vue';
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    $dense: boolean;
+  }
 }
-
-declare module '*.json' {
-  const value: any;
-  export default value;
-}
-
-declare module 'portal-vue';
-declare module 'vuedraggable';
-declare module 'url-safe-string';
-declare module 'parse-duration';
-
-declare module '*.svg';

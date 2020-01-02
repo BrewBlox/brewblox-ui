@@ -29,10 +29,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     this.debouncedCalculate();
   }
 
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
-
   get allLayouts(): BuilderLayout[] {
     return builderStore.layoutValues;
   }
@@ -80,7 +76,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   get editorDisabled(): boolean {
     const { ie, edge } = this.$q.platform.is;
-    return Boolean(this.dense || ie || edge);
+    return Boolean(this.$dense || ie || edge);
   }
 
   public *cardClassGenerator(): Generator<string, void, undefined> {
@@ -88,7 +84,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     yield* this.inDialog
       ? ['widget-modal']
       : ['widget-dashboard', 'overflow-unset'];
-    if (this.dense) {
+    if (this.$dense) {
       yield 'widget-dense';
     }
   }
@@ -100,9 +96,9 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     const toolbarSpace = 50; // not an exact science
     return {
       height: `${this.gridHeight + toolbarSpace}px`,
-      maxHeight: this.dense ? '100vh' : '90vh',
+      maxHeight: this.$dense ? '100vh' : '90vh',
       width: `${this.gridWidth}px`,
-      maxWidth: this.dense ? '100vw' : '95vw',
+      maxWidth: this.$dense ? '100vw' : '95vw',
     };
   }
 

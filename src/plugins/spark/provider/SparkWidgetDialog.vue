@@ -21,7 +21,7 @@ export default class SparkWidgetDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$q.screen.lt.md" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
     <SparkWidget :service-id="serviceId" :context="context" class="bg-dark-bright" />
   </q-dialog>
 </template>

@@ -92,10 +92,6 @@ export default class DashboardPage extends Vue {
       });
   }
 
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
-
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
     try {
       // Make a local change to the validated item, to avoid it jumping during the store round trip
@@ -163,7 +159,7 @@ export default class DashboardPage extends Vue {
         {{ dashboard.title }}
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn-group v-if="!dense" flat>
+        <q-btn-group v-if="!$dense" flat>
           <q-btn
             flat
             :class="{'selected-mode': widgetEditable}"
@@ -194,7 +190,7 @@ export default class DashboardPage extends Vue {
           </template>
         </ActionMenu>
       </portal>
-      <div v-if="dense" class="column q-gutter-y-sm">
+      <div v-if="$dense" class="column q-gutter-y-sm">
         <div v-for="val in validatedWidgets" :key="val.id" class="col full-width">
           <component
             :is="val.component"
