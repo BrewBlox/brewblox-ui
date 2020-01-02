@@ -312,9 +312,9 @@ export default class GridItem extends Vue {
 </template>
 
 <style lang="scss" scoped>
-
 .grid-item {
   position: relative;
+  background: $dark;
 }
 
 .grid-item-resize-handle {
@@ -363,6 +363,7 @@ export default class GridItem extends Vue {
 }
 
 .shadowed {
-  text-shadow: 0px 2px 0px $dark, 0px -2px 0px $dark, 2px 0px 0px $dark, -2px 0px 0px $dark;
+  text-shadow: 0px 2px 0px $dark, 0px -2px 0px $dark, 2px 0px 0px $dark,
+    -2px 0px 0px $dark;
 }
 </style>

@@ -1,14 +1,11 @@
 import { autoRegister, ref } from '@/helpers/component-ref';
 import { Feature, featureStore } from '@/store/features';
 
-import BuilderEditor from './BuilderEditor.vue';
 import widget from './BuilderWidget.vue';
 import { typeName } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
 import { BuilderConfig } from './types';
-
-ref(BuilderEditor);
 
 const feature: Feature = {
   id: typeName,

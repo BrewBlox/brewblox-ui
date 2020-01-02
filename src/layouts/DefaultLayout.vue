@@ -15,9 +15,6 @@ export default class DefaultLayout extends Vue {
     checkDatastore();
   }
 
-  // env flag
-  automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
-
   get version(): string {
     return process.env.BLOX_VERSION || 'UNKNOWN';
   }
@@ -28,11 +25,6 @@ export default class DefaultLayout extends Vue {
 
   get dense(): boolean {
     return this.$q.screen.lt.md;
-  }
-
-  get editorDisabled(): boolean {
-    const { ie, edge } = this.$q.platform.is;
-    return Boolean(ie || edge) || this.dense;
   }
 
   showWizard(): void {
@@ -49,20 +41,6 @@ export default class DefaultLayout extends Vue {
     });
   }
 
-  showBuilderEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'BuilderEditor',
-    });
-  }
-
-  showAutomationEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'AutomationEditor',
-    });
-  }
-
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
@@ -72,43 +50,29 @@ export default class DefaultLayout extends Vue {
 
 <template>
   <q-layout view="lHh Lpr lFf" class="bg-dark-bright">
-    <q-header class="glossy bg-dark">
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
-        <q-toolbar-title>
-          <portal-target name="toolbar-title">
-            BrewBlox
-          </portal-target>
-        </q-toolbar-title>
+    <LayoutHeader @menu="leftDrawerOpen = !leftDrawerOpen">
+      <template #title>
+        <portal-target name="toolbar-title">
+          BrewBlox
+        </portal-target>
+      </template>
+      <template #buttons>
         <portal-target name="toolbar-buttons" class="toolbar-buttons" />
-      </q-toolbar>
-    </q-header>
+      </template>
+    </LayoutHeader>
 
-    <q-drawer v-model="leftDrawerOpen" content-class="bg-dark" elevated>
-      <q-item exact to="/">
-        <q-item-section avatar>
-          <q-icon name="mdi-home" />
-        </q-item-section>
-        <q-item-section>BrewBlox</q-item-section>
-      </q-item>
-      <q-separator />
+    <q-drawer v-model="leftDrawerOpen" content-class="bg-dark column" elevated>
+      <Navigator active-section="dashboards" />
 
       <q-scroll-area
-        :style="{height: 'calc(100% - 100px)'}"
+        class="col"
         :thumb-style="{opacity: 0.5, background: 'silver'}"
       >
         <DashboardIndex v-model="dashboardEditing" />
         <ServiceIndex v-model="serviceEditing" />
-
-        <q-separator class="q-mt-sm" />
-        <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
-        <ActionItem v-if="!editorDisabled" icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
-        <template v-if="automationFeatureEnabled">
-          <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
-        </template>
       </q-scroll-area>
 
-      <q-item class="bottomed">
+      <q-item class="col-auto">
         <q-item-section class="col-auto">
           <q-btn flat text-color="white" icon="mdi-puzzle" @click="showPlugins">
             <q-tooltip>
@@ -138,14 +102,9 @@ export default class DefaultLayout extends Vue {
   </q-layout>
 </template>
 
-<style lang="scss">
+<style lang="sass">
 @import "src/css/app.sass";
 
-.bottomed {
-  bottom: 0;
-  position: absolute;
-}
-.q-layout {
-  overflow-x: auto;
-}
+.q-layout
+  overflow-x: auto
 </style>
