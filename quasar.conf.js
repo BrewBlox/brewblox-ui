@@ -32,6 +32,7 @@ module.exports = function (ctx) {
       'externals',
       'register',
       'plugins',
+      'dense',
     ],
 
     css: [

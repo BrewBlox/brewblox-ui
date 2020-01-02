@@ -24,10 +24,6 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   @Prop({ type: String })
   readonly openStep!: string;
 
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
-
   get serviceId(): string {
     return this.config.serviceId;
   }
@@ -174,7 +170,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
 
     <q-card-section>
       <draggable
-        :disabled="dense"
+        :disabled="$dense"
         :value="steps"
         @input="saveSteps"
         @start="draggingStep=true"
@@ -191,7 +187,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
           icon="mdi-format-list-checks"
           class="step-container q-mr-md q-mb-sm"
         >
-          <draggable :disabled="dense" :value="step.changes" @input="v => saveChanges(step, v)">
+          <draggable :disabled="$dense" :value="step.changes" @input="v => saveChanges(step, v)">
             <QuickActionChange
               v-for="change in step.changes"
               :key="`change--${step.id}--${change.id}`"
