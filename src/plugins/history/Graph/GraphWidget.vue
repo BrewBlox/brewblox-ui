@@ -54,13 +54,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       yield 'widget-dense';
     }
 
-    if (this.mode === 'Basic') {
-      yield* ['column'];
-    }
-
-    if (this.mode === 'Full' && !this.inDialog) {
-      yield* ['overflow-auto', 'scroll'];
-    }
+    yield 'column maximized';
   }
 
   get presets(): QueryParams[] {
@@ -209,20 +203,15 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         </div>
       </template>
       <template v-else>
-        <div :class="{'col-grow': true, 'scroll-parent': inDialog}">
-          <component :is="inDialog ? 'q-scroll-area' : 'div'">
-            <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
-          </component>
-        </div>
+        <q-scroll-area class="col">
+          <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
+        </q-scroll-area>
       </template>
     </q-card>
   </GraphCardWrapper>
 </template>
 
 <style scoped>
-.scroll-parent {
-  height: calc(100% - 50px);
-}
 .widget-dashboard.widget-dense {
   height: 100vh;
 }

@@ -522,12 +522,12 @@ export default class SparkPage extends Vue {
                 </q-menu>
               </q-btn>
             </q-item-section>
-            <q-item-section class="col-auto">
+            <q-item-section v-if="!dense" class="col-auto">
               <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
                 <q-tooltip>Unselect all</q-tooltip>
               </q-btn>
             </q-item-section>
-            <q-item-section class="col-auto">
+            <q-item-section v-if="!dense" class="col-auto">
               <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
                 <q-tooltip>Select all</q-tooltip>
               </q-btn>
