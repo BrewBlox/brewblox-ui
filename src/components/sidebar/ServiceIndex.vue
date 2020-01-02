@@ -14,6 +14,10 @@ export default class ServiceIndex extends Vue {
   @Prop({ type: Boolean, required: true })
   public readonly value!: boolean;
 
+  get dense(): boolean {
+    return this.$q.screen.lt.md;
+  }
+
   get editing(): boolean {
     return this.value;
   }
@@ -112,7 +116,7 @@ export default class ServiceIndex extends Vue {
 
     <draggable
       v-model="services"
-      :disabled="!editing"
+      :disabled="dense || !editing"
       @start="dragging=true"
       @end="dragging=false"
     >
