@@ -41,8 +41,8 @@ export default class Fridge extends PartBase {
           :height="squares(sizeY)"
         >
           <div
-            class="text-white text-bold text-center text-h6 q-mt-xs"
-            style="max-width: 100%"
+            class="text-white text-bold text-center q-mt-sm full-width"
+            style="font-size: 130%"
           >
             {{ titleText }}
           </div>

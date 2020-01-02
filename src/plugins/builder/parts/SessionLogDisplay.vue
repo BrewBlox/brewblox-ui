@@ -48,10 +48,10 @@ export default class SessionLogDisplay extends PartBase {
         </div>
 
         <template v-if="sizeX === 1" />
-        <div v-else-if="!isLinked" class="col text-h6 q-mt-sm ellipsis">
+        <div v-else-if="!isLinked" class="col q-mt-sm ellipsis" style="font-size: 130%">
           Not linked
         </div>
-        <div v-else class="col text-h6 q-mt-sm ellipsis">
+        <div v-else class="col q-mt-sm ellipsis" style="font-size: 130%">
           {{ session ? session.title : 'No active session' }}
         </div>
       </div>
