@@ -25,7 +25,7 @@ export default class UrlDisplay extends PartBase {
         y="1"
         rx="6"
         ry="6"
-        stroke="none"
+        stroke="white"
       />
       <g>
         <foreignObject
@@ -34,8 +34,8 @@ export default class UrlDisplay extends PartBase {
           :height="squares(sizeY)"
         >
           <div
-            class="text-white text-bold text-center text-h6 q-mt-xs"
-            style="max-width: 100%; text-decoration: underline"
+            class="text-white text-bold text-center q-mt-sm grid-label full-width"
+            style="text-decoration: underline; font-size: 130%"
           >
             {{ titleText }}
           </div>
