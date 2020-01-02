@@ -204,7 +204,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 <template>
   <q-card :class="cardClass" :style="builderCardStyle">
     <component :is="toolbarComponent" :crud="crud">
-      <ActionMenu icon="mdi-file-document-edit" :stretch="inDialog">
+      <ActionMenu icon="mdi-format-list-bulleted" :stretch="inDialog">
         <template #menus>
           <q-list>
             <q-select
@@ -244,7 +244,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
               :key="v.id"
               :label="v.title"
               :active="layout && layout.id === v.id"
-              icon="mdi-widgets"
               no-close
               @click="showLayout(v)"
             />
@@ -252,7 +251,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
         </template>
       </ActionMenu>
       <template #actions>
-        <ActionItem v-if="!editorDisabled" icon="mdi-pipe" label="Builder Editor" @click="startEditor" />
+        <ActionItem v-if="!editorDisabled" icon="mdi-tools" label="Edit layout" @click="startEditor" />
       </template>
     </component>
 

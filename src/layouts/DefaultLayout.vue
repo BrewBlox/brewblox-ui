@@ -15,9 +15,6 @@ export default class DefaultLayout extends Vue {
     checkDatastore();
   }
 
-  // env flag
-  automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
-
   get version(): string {
     return process.env.BLOX_VERSION || 'UNKNOWN';
   }
@@ -28,11 +25,6 @@ export default class DefaultLayout extends Vue {
 
   get dense(): boolean {
     return this.$q.screen.lt.md;
-  }
-
-  get editorDisabled(): boolean {
-    const { ie, edge } = this.$q.platform.is;
-    return Boolean(ie || edge) || this.dense;
   }
 
   showWizard(): void {
@@ -46,13 +38,6 @@ export default class DefaultLayout extends Vue {
     createDialog({
       parent: this,
       component: 'PluginDialog',
-    });
-  }
-
-  showAutomationEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'AutomationEditor',
     });
   }
 
@@ -77,11 +62,7 @@ export default class DefaultLayout extends Vue {
     </LayoutHeader>
 
     <q-drawer v-model="leftDrawerOpen" content-class="bg-dark column" elevated>
-      <div class="col-auto">
-        <ActionItem to="/" exact icon="mdi-home" label="BrewBlox" />
-        <ActionItem v-if="!editorDisabled" to="/builder" icon="mdi-pipe" label="Brewery Builder" />
-        <q-separator />
-      </div>
+      <Navigator active-section="dashboards" />
 
       <q-scroll-area
         class="col"
@@ -89,12 +70,6 @@ export default class DefaultLayout extends Vue {
       >
         <DashboardIndex v-model="dashboardEditing" />
         <ServiceIndex v-model="serviceEditing" />
-
-        <q-separator class="q-mt-sm" />
-        <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
-        <template v-if="automationFeatureEnabled">
-          <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
-        </template>
       </q-scroll-area>
 
       <q-item class="col-auto">

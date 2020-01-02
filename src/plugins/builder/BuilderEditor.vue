@@ -765,11 +765,7 @@ export default class BuilderEditor extends Vue {
     </LayoutHeader>
 
     <q-drawer v-model="drawerOpen" content-class="bg-dark column" elevated>
-      <div class="col-auto">
-        <ActionItem to="/" exact icon="mdi-home" label="BrewBlox" />
-        <ActionItem to="/builder" icon="mdi-pipe" label="Brewery Builder" />
-        <q-separator />
-      </div>
+      <Navigator active-section="builder" />
 
       <q-scroll-area
         v-if="!!layout"
@@ -800,6 +796,20 @@ export default class BuilderEditor extends Vue {
         </q-item>
 
         <ActionItem
+          v-for="tool in tools"
+          :key="'tool-' + tool.value"
+          :icon="tool.icon"
+          :label="tool.label"
+          :inset-level="0.2"
+          style="min-height: 0px"
+          @click="tool.use(findActionParts())"
+        >
+          <q-item-section side class="text-uppercase">
+            {{ tool.shortcut }}
+          </q-item-section>
+        </ActionItem>
+
+        <ActionItem
           :disable="!history.length"
           icon="mdi-undo"
           label="Undo"
@@ -821,20 +831,6 @@ export default class BuilderEditor extends Vue {
         >
           <q-item-section side class="text-uppercase">
             ctrl-Y
-          </q-item-section>
-        </ActionItem>
-
-        <ActionItem
-          v-for="tool in tools"
-          :key="'tool-' + tool.value"
-          :icon="tool.icon"
-          :label="tool.label"
-          :inset-level="0.2"
-          style="min-height: 0px"
-          @click="tool.use(findActionParts())"
-        >
-          <q-item-section side class="text-uppercase">
-            {{ tool.shortcut }}
           </q-item-section>
         </ActionItem>
 
@@ -881,7 +877,7 @@ export default class BuilderEditor extends Vue {
           :icon="focusWarning
             ? 'mdi-checkbox-marked-outline'
             : 'mdi-checkbox-blank-outline'"
-          label="Show focus warning"
+          label="Dim editor when focus is lost"
           @click="focusWarning = !focusWarning"
         />
       </q-scroll-area>
