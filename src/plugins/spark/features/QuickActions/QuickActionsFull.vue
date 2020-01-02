@@ -24,6 +24,10 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   @Prop({ type: String })
   readonly openStep!: string;
 
+  get dense(): boolean {
+    return this.$q.screen.lt.md;
+  }
+
   get serviceId(): string {
     return this.config.serviceId;
   }
@@ -169,87 +173,80 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
     <slot name="warnings" />
 
     <q-card-section>
-      <div class="scroll-parent">
-        <q-scroll-area>
-          <draggable
-            :value="steps"
-            @input="saveSteps"
-            @start="draggingStep=true"
-            @end="draggingStep=false"
-          >
-            <q-expansion-item
-              v-for="step in steps"
-              :key="step.id"
-              :label="step.name"
-              :default-opened="openStep === step.id"
-              :disable="draggingStep"
-              header-class="text-h6"
-              group="steps"
-              icon="mdi-format-list-checks"
-              class="step-container q-mr-md q-mb-sm"
-            >
-              <draggable :value="step.changes" @input="v => saveChanges(step, v)">
-                <QuickActionChange
-                  v-for="change in step.changes"
-                  :key="`change--${step.id}--${change.id}`"
-                  :service-id="serviceId"
-                  :value="change"
-                  @input="saveChange(step, change)"
-                  @remove="removeChange(step, change)"
-                  @switch="startSwitchBlock(step, change)"
-                />
-              </draggable>
-              <div class="row justify-end q-px-md q-mt-md step-actions">
-                <q-btn
-                  size="sm"
-                  label="Add Block"
-                  icon="mdi-cube"
-                  flat
-                  @click="startAddChange(step)"
-                />
-                <q-btn
-                  size="sm"
-                  label="Copy"
-                  icon="file_copy"
-                  flat
-                  @click="duplicateStep(step)"
-                />
-                <q-btn
-                  size="sm"
-                  label="Rename"
-                  icon="edit"
-                  flat
-                  @click="renameStep(step)"
-                />
-                <q-btn
-                  size="sm"
-                  label="Remove"
-                  icon="delete"
-                  flat
-                  @click="startRemoveStep(step)"
-                />
-              </div>
-            </q-expansion-item>
+      <draggable
+        :disabled="dense"
+        :value="steps"
+        @input="saveSteps"
+        @start="draggingStep=true"
+        @end="draggingStep=false"
+      >
+        <q-expansion-item
+          v-for="step in steps"
+          :key="step.id"
+          :label="step.name"
+          :default-opened="openStep === step.id"
+          :disable="draggingStep"
+          header-style="font-size: 120%"
+          group="steps"
+          icon="mdi-format-list-checks"
+          class="step-container q-mr-md q-mb-sm"
+        >
+          <draggable :disabled="dense" :value="step.changes" @input="v => saveChanges(step, v)">
+            <QuickActionChange
+              v-for="change in step.changes"
+              :key="`change--${step.id}--${change.id}`"
+              :service-id="serviceId"
+              :value="change"
+              @input="saveChange(step, change)"
+              @remove="removeChange(step, change)"
+              @switch="startSwitchBlock(step, change)"
+            />
           </draggable>
-          <q-item>
-            <q-space />
-            <q-item-section class="col-auto">
-              <q-btn round outline icon="add" @click="addStep">
-                <q-tooltip>Add Step</q-tooltip>
-              </q-btn>
-            </q-item-section>
-          </q-item>
-        </q-scroll-area>
-      </div>
+          <div class="row justify-end q-px-md q-mt-md step-actions">
+            <q-btn
+              size="sm"
+              label="Add Block"
+              icon="mdi-cube"
+              flat
+              @click="startAddChange(step)"
+            />
+            <q-btn
+              size="sm"
+              label="Copy"
+              icon="file_copy"
+              flat
+              @click="duplicateStep(step)"
+            />
+            <q-btn
+              size="sm"
+              label="Rename"
+              icon="edit"
+              flat
+              @click="renameStep(step)"
+            />
+            <q-btn
+              size="sm"
+              label="Remove"
+              icon="delete"
+              flat
+              @click="startRemoveStep(step)"
+            />
+          </div>
+        </q-expansion-item>
+      </draggable>
+      <q-item>
+        <q-space />
+        <q-item-section class="col-auto">
+          <q-btn round outline icon="add" @click="addStep">
+            <q-tooltip>Add Step</q-tooltip>
+          </q-btn>
+        </q-item-section>
+      </q-item>
     </q-card-section>
   </q-card>
 </template>
 
 <style scoped>
-.scroll-parent {
-  height: 600px;
-  max-height: 80vh;
-}
 .step-container:nth-child(odd) {
   border-left: 2px solid dodgerblue;
 }
