@@ -1,20 +1,13 @@
 <script lang="ts">
-/* eslint-disable vue/attribute-hyphenation */
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 @Component
-export default class HeatingIcon extends Vue {
-  @Prop({ type: String, default: '25' })
-  public readonly width!: string;
-
-  @Prop({ type: String, default: '25' })
-  public readonly height!: string;
-}
+export default class HeatingIcon extends Vue { }
 </script>
 
 <template>
-  <svg v-bind="{...$attrs, ...$props}" viewBox="0,0,50,50">
+  <SvgIcon v-bind="$attrs">
     <circle cx="25" cy="25" r="15" />
     <path
       d="M23.7,35.9
@@ -43,5 +36,5 @@ export default class HeatingIcon extends Vue {
       c0.9,1.8,2.5,4.3,2.5,8
       C32,32.1,28.3,34.7,28.3,34.7z"
     />
-  </svg>
+  </SvgIcon>
 </template>

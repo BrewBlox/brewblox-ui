@@ -30,32 +30,31 @@ export default class SessionLogDisplay extends PartBase {
       ? historyStore.sessionById(this.widget.config.currentSession)
       : null;
   }
+
+  get displayText(): string {
+    if (!this.isLinked) {
+      return 'Not linked';
+    }
+    return this.session?.title ?? 'No active session';
+  }
 }
 </script>
 
 <template>
   <g>
-    <foreignObject
-
-      :transform="textTransformation([sizeX, sizeY])"
+    <SvgEmbedded
       :width="squares(sizeX)"
       :height="squares(sizeY)"
     >
-      <div class="full-width full-height row">
-        <div class="col-auto" :style="`min-width: ${squares(1)}px`">
-          <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-          <q-icon v-else name="mdi-text-subject" size="lg" class="maximized" />
-        </div>
+      <div class="col row no-wrap items-center q-pa-sm full-width">
+        <BrokenIcon v-if="isBroken" />
+        <q-icon v-else name="mdi-text-subject" size="lg" class="col-auto static" />
 
-        <template v-if="sizeX === 1" />
-        <div v-else-if="!isLinked" class="col q-mt-sm ellipsis" style="font-size: 130%">
-          Not linked
-        </div>
-        <div v-else class="col q-mt-sm ellipsis" style="font-size: 130%">
-          {{ session ? session.title : 'No active session' }}
+        <div v-if="sizeX >= 1" class="col text-center ellipsis" style="font-size: 130%">
+          {{ displayText }}
         </div>
       </div>
-    </foreignObject>
+    </SvgEmbedded>
     <g class="outline">
       <rect
         :width="squares(sizeX)-2"
