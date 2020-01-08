@@ -98,6 +98,9 @@ export default class BuilderEditor extends Vue {
   }
 
   async mounted(): Promise<void> {
+    if (this.routeId) {
+      builderStore.commitLastLayoutId(this.routeId);
+    }
     await this.$nextTick();
     this.setFocus();
   }
@@ -183,19 +186,16 @@ export default class BuilderEditor extends Vue {
     return builderStore.layoutValues;
   }
 
-  get layoutId(): string | null {
-    return builderStore.activeLayoutId;
+  get routeId(): string | null {
+    return this.$route.params.id ?? null;
   }
 
-  set layoutId(val: string | null) {
-    builderStore.commitActiveLayoutId(val);
+  get lastId(): string | null {
+    return builderStore.lastLayoutId;
   }
 
   get layout(): BuilderLayout | null {
-    return builderStore.layoutById(
-      this.layoutId
-      ?? this.$route.params.id
-      ?? builderStore.layoutIds[0]);
+    return builderStore.layoutById(this.routeId ?? this.lastId ?? builderStore.layoutIds[0]);
   }
 
   get parts(): PersistentPart[] {
@@ -245,10 +245,8 @@ export default class BuilderEditor extends Vue {
     builderStore.commitEditorMode(tool.value);
   }
 
-  async selectLayout(id: string | null): Promise<void> {
-    this.layoutId = id;
-    await this.$nextTick();
-    this.setFocus();
+  selectLayout(id: string | null): void {
+    this.$router.push(`/builder/${id ?? ''}`);
   }
 
   setFocus(): void {
@@ -270,7 +268,7 @@ export default class BuilderEditor extends Vue {
     } else {
       const id = uid();
       await builderStore.createLayout({ ...layout, id });
-      this.layoutId = id;
+      this.selectLayout(id);
     }
   }
 

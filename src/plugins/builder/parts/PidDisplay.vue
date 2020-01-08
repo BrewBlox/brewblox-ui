@@ -69,22 +69,29 @@ export default class PidDisplay extends PartBase {
 
 <template>
   <g>
-    <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
-      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
-      <q-icon v-else-if="!block.data.enabled" name="mdi-sleep" size="lg" class="maximized" color="warning" />
-      <div v-else class="text-white text-bold text-center">
-        <svg v-if="!drivingOffset && kp !== null">
-          <HeatingIcon v-if="kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" x="12" />
-          <CoolingIcon v-else-if="kp < 0" :stroke="outputValue ? COLD_WATER : 'white'" x="12" />
-        </svg>
-        <q-space />
-        <q-icon v-if="drivingOffset && kp !== null" name="mdi-plus-minus" size="sm" />
-        <q-icon v-if="kp === null" name="mdi-calculator-variant" class="q-mr-xs" />
-        <br>
-        {{ outputSetting | truncateRound }}<small v-if="!!block" style="margin-left: 2px">{{ suffix }}</small>
-      </div>
-    </foreignObject>
+    <SvgEmbedded
+      :transform="textTransformation([1,1])"
+      :width="squares(1)"
+      :height="squares(1)"
+    >
+      <BrokenIcon v-if="isBroken" />
+      <UnlinkedIcon v-else-if="!block" />
+      <SleepingIcon v-else-if="!block.data.enabled" />
+      <template v-else>
+        <div class="col row items-center">
+          <q-icon v-if="kp === null" name="mdi-calculator-variant" class="col static" size="20px" />
+          <q-icon v-else-if="drivingOffset" name="mdi-plus-minus" class="col static" size="20px" />
+          <template v-else>
+            <HeatingIcon v-if="kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" />
+            <CoolingIcon v-if="kp < 0" :stroke="outputValue ? COLD_WATER : 'white'" />
+          </template>
+        </div>
+        <div class="col text-bold">
+          {{ outputSetting | truncateRound }}
+          <small v-if="!!block">{{ suffix }}</small>
+        </div>
+      </template>
+    </SvgEmbedded>
     <g class="outline">
       <rect
         :width="squares(1)-2"

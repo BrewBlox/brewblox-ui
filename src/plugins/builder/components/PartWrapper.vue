@@ -76,7 +76,7 @@ export default class PartWrapper extends Vue {
   </g>
 </template>
 
-<style>
+<style lang="scss">
 /* not scoped */
 .BuilderPart,
 .BuilderPart svg {

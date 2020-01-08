@@ -53,34 +53,35 @@ export default class PwmValues extends Vue {
 
 <template>
   <g>
-    <foreignObject
+    <g class="outline">
+      <rect
+        v-if="!noBorder"
+        :width="squares(1)-2"
+        :height="squares(1)-2"
+        :x="squares(startX)+1"
+        :y="squares(startY)+1"
+        rx="6"
+        ry="6"
+        stroke-width="2px"
+      />
+    </g>
+    <SvgEmbedded
       :x="squares(startX)"
       :y="squares(startY)"
       :transform="transform"
       :width="squares(1)"
       :height="squares(1)"
     >
-      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
-      <q-icon v-else-if="!block.data.enabled" name="mdi-sleep" size="lg" class="maximized" color="warning" />
-      <div v-else class="text-white text-bold text-center">
-        <svg>
-          <PwmIcon stroke="white" class="q-ml-xs" x="12" />
-        </svg>
-        <br>
-        {{ pwmValue | truncateRound }}<small v-if="!!block" style="margin-left: 2px">%</small>
-      </div>
-    </foreignObject>
-    <rect
-      v-if="!noBorder"
-      class="outline"
-      :width="squares(1)-2"
-      :height="squares(1)-2"
-      :x="squares(startX)+1"
-      :y="squares(startY)+1"
-      rx="6"
-      ry="6"
-      stroke-width="2px"
-    />
+      <BrokenIcon v-if="isBroken" />
+      <UnlinkedIcon v-else-if="!block" />
+      <SleepingIcon v-else-if="!block.data.enabled" />
+      <template v-else>
+        <PwmIcon class="col outline" />
+        <div class="col text-bold">
+          {{ pwmValue | truncateRound }}
+          <small v-if="!!block">%</small>
+        </div>
+      </template>
+    </SvgEmbedded>
   </g>
 </template>

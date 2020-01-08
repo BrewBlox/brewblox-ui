@@ -23,7 +23,7 @@ export class BuilderModule extends VuexModule {
   private specs: Mapped<PartSpec> = {};
 
   public editorMode = '';
-  public activeLayoutId: string | null = null;
+  public lastLayoutId: string | null = null;
   public layouts: Mapped<BuilderLayout> = {};
 
   public get layoutIds(): string[] {
@@ -68,8 +68,8 @@ export class BuilderModule extends VuexModule {
   }
 
   @Mutation
-  public commitActiveLayoutId(id: string | null): void {
-    this.activeLayoutId = id;
+  public commitLastLayoutId(id: string | null): void {
+    this.lastLayoutId = id;
   }
 
   @Mutation

@@ -44,20 +44,15 @@ export default class Kettle extends PartBase {
         ry="8"
         stroke-width="4px"
       />
-      <g>
-        <foreignObject
-          :transform="textTransformation([sizeX, sizeY], false)"
-          :width="squares(sizeX)"
-          :height="squares(sizeY)"
-        >
-          <div
-            class="text-white text-bold text-center q-mt-sm full-width"
-            style="font-size: 130%"
-          >
-            {{ titleText }}
-          </div>
-        </foreignObject>
-      </g>
     </g>
+    <SvgEmbedded
+      :transform="textTransformation([sizeX, sizeY], false)"
+      :width="squares(sizeX)"
+      :height="squares(sizeY)"
+    >
+      <div class="col-auto text-bold text-center q-pt-sm full-width" style="font-size: 130%">
+        {{ titleText }}
+      </div>
+    </SvgEmbedded>
   </g>
 </template>

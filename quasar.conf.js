@@ -49,6 +49,7 @@ module.exports = function (ctx) {
 
     framework: {
       all: false,
+      iconSet: 'mdi-v4',
 
       components: [
         'QBadge',
