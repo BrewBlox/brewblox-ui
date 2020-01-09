@@ -2,6 +2,7 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import notify from '@/plugins/logging/notify';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -42,16 +43,8 @@ export default class WidgetWizardBase<ConfigT = any> extends Vue {
 
   protected async createItem(item: PersistentWidget<ConfigT>): Promise<void> {
     await dashboardStore.appendPersistentWidget(item)
-      .then(() => this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName(item.feature)} '${item.title}'`,
-      }))
-      .catch(e => this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create widget: ${e.toString()}`,
-      }))
+      .then(() => notify.done(`Created ${featureStore.displayName(item.feature)} '${item.title}'`))
+      .catch(e => notify.error(`Failed to create widget: ${e.toString()}`))
       .finally(this.close);
   }
 }

@@ -11,6 +11,8 @@ import { Block } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
 
+import notify from '../../../logging/notify';
+
 
 @Component
 export default class CreateMockMenu extends DialogBase {
@@ -33,17 +35,9 @@ export default class CreateMockMenu extends DialogBase {
     this.busy = true;
     try {
       await sparkStore.createBlock([this.serviceId, block]);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName(block.type)} '${block.id}'`,
-      });
+      notify.done(`Created ${featureStore.displayName(block.type)} '${block.id}'`);
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create Block: ${e.toString()}`,
-      });
+      notify.error(`Failed to create Block: ${e.toString()}`);
     }
     this.busy = false;
   }

@@ -9,6 +9,8 @@ import { loadFile } from '@/helpers/import-export';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
+import notify from '../../plugins/logging/notify';
+
 const widgetRules: InputRule[] = [
   v => v !== null || 'Widget must have a value',
   v => isString(v.title) || 'Widget must have a title',
@@ -74,18 +76,10 @@ export default class ImportWizard extends Vue {
         id: uid(),
         dashboard: this.chosenDashboardId,
       });
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName(this.widget.feature)} '${this.widget.title}'`,
-      });
+      notify.done(`Created ${featureStore.displayName(this.widget.feature)} '${this.widget.title}'`);
       this.$emit('close');
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create widget: ${e.toString()}`,
-      });
+      notify.error(`Failed to create widget: ${e.toString()}`);
     }
   }
 

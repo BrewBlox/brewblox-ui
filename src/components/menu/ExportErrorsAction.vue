@@ -2,9 +2,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { getErrors as getFetchErrors } from '@/helpers/fetch';
 import { saveFile } from '@/helpers/import-export';
-import database from '@/plugins/database';
+import { loggingStore } from '@/plugins/logging/store';
 
 @Component
 export default class ExportErrorsAction extends Vue {
@@ -12,23 +11,16 @@ export default class ExportErrorsAction extends Vue {
   @Prop({ type: String, default: 'mdi-file-export' })
   public readonly icon!: string;
 
-  @Prop({ type: String, default: 'Export API errors' })
+  @Prop({ type: String, default: 'Export UI logs' })
   public readonly label!: string;
 
-  get itemProps(): Mapped<any> {
-    return {
-      ...this.$attrs,
-      ...this.$props,
-    };
-  }
-
   async showDialog(): Promise<void> {
-    const errors = { fetch: getFetchErrors(), database: database.getErrors() };
-    saveFile(JSON.stringify(errors, null, 2), 'brewblox-errors.json', true);
+    const logs = loggingStore.entries;
+    saveFile(JSON.stringify(logs, null, 2), 'brewblox-logs.json', true);
   }
 }
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="showDialog" />
+  <ActionItem v-bind="{...$attrs, icon, label}" @click="showDialog" />
 </template>

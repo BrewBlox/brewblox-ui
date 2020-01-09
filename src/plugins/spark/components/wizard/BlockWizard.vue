@@ -13,6 +13,8 @@ import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { providerStore } from '@/store/providers';
 
+import notify from '../../../logging/notify';
+
 
 @Component
 export default class BlockWizard extends Vue {
@@ -125,18 +127,10 @@ export default class BlockWizard extends Vue {
     this.ensureLocalBlock();
     try {
       await sparkStore.createBlock([this.serviceId, this.block as Block]);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName((this.block as Block).type)} Block '${this.blockId}'`,
-      });
+      notify.done(`Created ${featureStore.displayName((this.block as Block).type)} Block '${this.blockId}'`);
       this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create Block: ${e.toString()}`,
-      });
+      notify.error(`Failed to create Block: ${e.toString()}`);
     }
     this.close();
   }

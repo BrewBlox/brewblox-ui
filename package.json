@@ -89,6 +89,7 @@
     "request-promise-native": "^1.0.8",
     "sass-loader": "^8.0.0",
     "ts-loader": "^6.2.1",
+    "tsargs": "^1.4.0",
     "tsutils": "^3.17.1",
     "typescript": "^3.7.4",
     "vue-template-compiler": "^2.6.11",

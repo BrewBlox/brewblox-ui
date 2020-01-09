@@ -6,9 +6,9 @@ import { createDialog } from '@/helpers/dialog';
 
 
 @Component
-export default class Navigator extends Vue {
+export default class SidebarNavigator extends Vue {
 
-  // env flag
+  // Set in quasar.conf
   automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
 
   @Prop({ type: String, required: false })
@@ -23,6 +23,13 @@ export default class Navigator extends Vue {
     createDialog({
       parent: this,
       component: 'WizardDialog',
+    });
+  }
+
+  showNotifications(): void {
+    createDialog({
+      parent: this,
+      component: 'NotificationDialog',
     });
   }
 
@@ -70,6 +77,15 @@ export default class Navigator extends Vue {
         no-caps
         class="col-auto q-py-sm"
         @click="showWizard"
+      />
+      <q-btn
+        icon="mdi-bell"
+        label="Notifications"
+        stack
+        flat
+        no-caps
+        class="col-auto q-py-sm"
+        @click="showNotifications"
       />
       <q-btn
         v-if="automationFeatureEnabled"

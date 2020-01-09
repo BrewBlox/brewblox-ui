@@ -7,6 +7,8 @@ import { prettify } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { UserUnits } from '@/plugins/spark/types';
 
+import notify from '../../../logging/notify';
+
 
 @Component
 export default class SparkUnitMenu extends DialogBase {
@@ -26,11 +28,7 @@ export default class SparkUnitMenu extends DialogBase {
 
   saveUnits(vals: UserUnits = this.units): void {
     sparkStore.saveUnits([this.serviceId, vals])
-      .catch(reason => this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to change unit: ${reason}`,
-      }));
+      .catch(e => notify.error(`Failed to change unit: ${e.message}`));
   }
 
   mounted(): void {

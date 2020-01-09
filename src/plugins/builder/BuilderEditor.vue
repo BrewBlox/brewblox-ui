@@ -759,7 +759,7 @@ export default class BuilderEditor extends Vue {
     </LayoutHeader>
 
     <q-drawer v-model="drawerOpen" content-class="bg-dark column" elevated>
-      <Navigator active-section="builder" />
+      <SidebarNavigator active-section="builder" />
 
       <q-scroll-area
         v-if="!!layout"

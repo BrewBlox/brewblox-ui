@@ -1,4 +1,3 @@
-import { Notify } from 'quasar';
 import { VueConstructor } from 'vue';
 
 import { ref } from '@/helpers/component-ref';
@@ -16,6 +15,7 @@ import {
 } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import { Link, Unit } from '@/helpers/units';
+import notify from '@/plugins/logging/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { Crud, WidgetSelector } from '@/store/features';
 
@@ -146,18 +146,9 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
         .map(block => [serviceId, block.id, addresses[block.data.address]]);
       await Promise.all(renameArgs.map(sparkStore.renameBlock));
     }
-
-    Notify.create({
-      icon: 'mdi-check-all',
-      color: 'positive',
-      message: 'Removed all Blocks' + (opts.restore ? ', and restored discovered blocks' : ''),
-    });
+    notify.done('Removed all Blocks' + (opts.restore ? ', and restored discovered blocks' : ''));
   } catch (e) {
-    Notify.create({
-      icon: 'error',
-      color: 'negative',
-      message: `Failed to remove Blocks: ${e.toString()}`,
-    });
+    notify.error(`Failed to remove Blocks: ${e.toString()}`);
   }
 };
 

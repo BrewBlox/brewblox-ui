@@ -7,6 +7,7 @@ import automation from '@/plugins/automation';
 import builder from '@/plugins/builder';
 import database from '@/plugins/database';
 import history from '@/plugins/history';
+import logging from '@/plugins/logging';
 import quickstart from '@/plugins/quickstart';
 import spark from '@/plugins/spark';
 import store from '@/store';
@@ -48,6 +49,7 @@ async function setup(Vue): Promise<void> {
 
   const plugins: PluginObject<any>[] = [
     PortalVue,
+    logging,
     automation,
     history,
     spark,

@@ -58,7 +58,7 @@ export default class DefaultLayout extends Vue {
     </LayoutHeader>
 
     <q-drawer v-model="leftDrawerOpen" content-class="bg-dark column" elevated>
-      <Navigator active-section="dashboards" />
+      <SidebarNavigator active-section="dashboards" />
 
       <q-scroll-area
         class="col"

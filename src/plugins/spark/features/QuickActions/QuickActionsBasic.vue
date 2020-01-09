@@ -9,6 +9,7 @@ import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
 
+import notify from '../../../logging/notify';
 import { BlockChange, Step } from './types';
 
 interface FieldDiff {
@@ -128,20 +129,8 @@ export default class QuickActionsBasic extends CrudComponent {
   applyStep(step: Step): void {
     this.applying = true;
     this.applyChanges(step)
-      .then(() => this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Applied ${step.name}`,
-      }))
-      .catch((e) => {
-        if (e) {
-          this.$q.notify({
-            icon: 'warning',
-            color: 'negative',
-            message: `Failed to apply ${step.name}: ${e.message}`,
-          });
-        }
-      })
+      .then(() => notify.done(`Applied ${step.name}`))
+      .catch(e => notify.warn(`Failed to apply ${step.name}: ${e.message}`))
       .finally(() => { this.applying = false; });
   }
 

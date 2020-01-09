@@ -10,6 +10,7 @@ import { saveFile } from '@/helpers/import-export';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { GraphConfig } from '@/plugins/history/types';
+import notify from '@/plugins/logging/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockConfig, BlockCrud } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
@@ -153,11 +154,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
           return;
         }
         dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`,
-        });
+        notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`);
       });
   }
 

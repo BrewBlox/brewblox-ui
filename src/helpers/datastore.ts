@@ -1,16 +1,13 @@
-import { Notify } from 'quasar';
-
 import { HOST } from '@/helpers/const';
+import notify from '@/plugins/logging/notify';
 
 export const checkDatastore = (): void => {
   const addr = `${HOST}/datastore`;
 
   const request = new XMLHttpRequest();
   request.open('GET', addr, true);
-  request.onerror = () => Notify.create({
+  request.onerror = () => notify.error({
     timeout: 0,
-    color: 'negative',
-    icon: 'error',
     message: 'Failed to access the datastore',
     actions: [
       {

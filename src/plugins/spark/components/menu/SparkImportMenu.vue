@@ -11,6 +11,8 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
 
+import notify from '../../../logging/notify';
+
 @Component
 export default class SparkImportMenu extends DialogBase {
   importBusy = false;
@@ -47,24 +49,16 @@ export default class SparkImportMenu extends DialogBase {
       this.importBusy = true;
       this.messages = [];
       this.messages = await sparkStore.serviceImport([this.service.id, values]);
-      this.$q.notify(
-        this.messages.length > 0
-          ? {
-            icon: 'warning',
-            color: 'warning',
-            message: `Some Blocks could not be imported on ${this.service.id}`,
-          }
-          : {
-            icon: 'mdi-check-all',
-            color: 'positive',
-            message: `Imported Blocks on ${this.service.id}`,
-          });
+      if (this.messages.length > 0) {
+        notify.warn(`Some Blocks could not be imported on ${this.service.id}`);
+        this.messages
+          .forEach(msg => notify.info('Block import error: ' + msg, { silent: true }));
+      }
+      else {
+        notify.done(`Imported Blocks on ${this.service.id}`);
+      }
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to import blocks: ${e.toString()}`,
-      });
+      notify.error(`Failed to import blocks: ${e.toString()}`);
     }
     this.importBusy = false;
   }
@@ -93,17 +87,9 @@ export default class SparkImportMenu extends DialogBase {
           serviceId: this.serviceId,
         },
       ]);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Imported ${id}`,
-      });
+      notify.done(`Imported block '${id}'`);
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to import block: ${e.toString()}`,
-      });
+      notify.error(`Failed to import block: ${e.toString()}`);
     }
     this.importBusy = false;
   }

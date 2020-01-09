@@ -15,6 +15,7 @@ import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards'
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
+import notify from '../../logging/notify';
 import { isReady } from './getters';
 import Troubleshooter from './Troubleshooter.vue';
 
@@ -358,7 +359,7 @@ export default class SparkPage extends Vue {
       ? `Discovered ${discovered.join(', ')}.`
       : 'Discovered no new blocks.';
 
-    this.$q.notify({ message, icon: 'mdi-magnify-plus-outline' });
+    notify.info({ message, icon: 'mdi-magnify-plus-outline' });
   }
 
   async cleanUnusedNames(): Promise<void> {
@@ -368,7 +369,7 @@ export default class SparkPage extends Vue {
       ? `Cleaned ${names.join(', ')}.`
       : 'No unused names found.';
 
-    this.$q.notify({ message, icon: 'mdi-tag-remove' });
+    notify.info({ message, icon: 'mdi-tag-remove' });
   }
 
   onBlockClick(val: ValidatedWidget): void {

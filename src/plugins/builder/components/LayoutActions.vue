@@ -6,6 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { loadFile, saveFile } from '@/helpers/import-export';
 import { deepCopy } from '@/helpers/units/parseObject';
+import notify from '@/plugins/logging/notify';
 import { dashboardStore } from '@/store/dashboards';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '../getters';
@@ -152,11 +153,7 @@ export default class LayoutActions extends Vue {
           },
         };
         await dashboardStore.appendPersistentWidget(widget);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Created ${layout.title} widget on ${dashboardStore.dashboardById(dashboard).title}`,
-        });
+        notify.done(`Created ${layout.title} widget on ${dashboardStore.dashboardById(dashboard).title}`);
       });
   }
 

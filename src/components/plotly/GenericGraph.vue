@@ -7,6 +7,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { GraphAnnotation } from '@/plugins/history/types';
+import notify from '@/plugins/logging/notify';
 
 /* eslint-disable @typescript-eslint/camelcase */
 const dark = colors.getBrand('dark')!;
@@ -92,11 +93,7 @@ export default class GenericGraph extends Vue {
   }
 
   displayError(msg: string): void {
-    this.$q.notify({
-      icon: 'warning',
-      color: 'warning',
-      message: `Failed to render graph: ${msg}`,
-    });
+    notify.warn(`Failed to render graph: ${msg}`);
   }
 
   onGraphClick(evt: PlotMouseEvent): void {

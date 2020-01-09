@@ -7,6 +7,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { providerStore } from '@/store/providers';
 import { serviceStore } from '@/store/services';
 
+import notify from '../../logging/notify';
 import { Spark } from '../types';
 
 @Component
@@ -32,20 +33,12 @@ export default class SparkWizard extends Vue {
       type: typeName,
     };
     await serviceStore.createService(service);
-    this.$q.notify({
-      icon: 'mdi-check-all',
-      color: 'positive',
-      message: `Added ${providerStore.displayName(service.type)} ${service.title}`,
-    });
+    notify.done(`Added ${providerStore.displayName(service.type)} '${service.title}'`);
     this.$emit('close');
   }
 
   async cancel(): Promise<void> {
-    this.$q.notify({
-      color: 'negative',
-      icon: 'error',
-      message: `Service with ID '${this.serviceId}' invalid or not found`,
-    });
+    notify.error(`Service with ID '${this.serviceId}' invalid or not found`);
     this.$emit('back');
   }
 

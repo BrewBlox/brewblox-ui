@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/units/parseObject';
+import notify from '@/plugins/logging/notify';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetMode } from '@/store/features';
 
@@ -99,11 +100,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
           return;
         }
         dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Copied ${this.widget.title} to ${dashboardStore.dashboardById(dashboard).title}`,
-        });
+        notify.done(`Copied ${this.widget.title} to ${dashboardStore.dashboardById(dashboard).title}`);
       });
   }
 
