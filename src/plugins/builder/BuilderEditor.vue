@@ -246,7 +246,7 @@ export default class BuilderEditor extends Vue {
   }
 
   selectLayout(id: string | null): void {
-    this.$router.push(`/builder/${id ?? ''}`);
+    this.$router.replace(`/builder/${id ?? ''}`);
   }
 
   setFocus(): void {
