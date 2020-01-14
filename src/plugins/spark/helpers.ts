@@ -14,8 +14,8 @@ import {
   unitDurationString,
 } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
 import { Link, Unit } from '@/helpers/units';
-import notify from '@/plugins/logging/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { Crud, WidgetSelector } from '@/store/features';
 

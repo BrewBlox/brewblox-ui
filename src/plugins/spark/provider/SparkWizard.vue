@@ -2,12 +2,12 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import notify from '@/helpers/notify';
 import { typeName } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
 import { providerStore } from '@/store/providers';
 import { serviceStore } from '@/store/services';
 
-import notify from '../../logging/notify';
 import { Spark } from '../types';
 
 @Component

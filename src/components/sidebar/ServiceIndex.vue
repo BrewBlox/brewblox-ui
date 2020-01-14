@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
-import notify from '@/plugins/logging/notify';
+import notify from '@/helpers/notify';
 import { Service, serviceStore } from '@/store/services';
 
 

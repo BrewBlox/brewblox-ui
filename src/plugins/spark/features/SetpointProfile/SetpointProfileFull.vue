@@ -8,6 +8,7 @@ import { deepCopy } from '@/helpers/units/parseObject';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 
+import notify from '../../../notify';
 import { profileGraphProps } from './helpers';
 import { Setpoint, SetpointProfileBlock } from './types';
 
@@ -83,11 +84,7 @@ export default class SetpointProfileFull
   }
 
   notifyInvalidTime(): void {
-    this.$q.notify({
-      icon: 'error',
-      color: 'negative',
-      message: 'Point time must be later than start time',
-    });
+    notify.warn('Point time must be later than start time', { logged: false });
   }
 
   intermediateTemp(points: DisplaySetpoint[], dateMs: number): Unit | null {

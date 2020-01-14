@@ -5,9 +5,8 @@ import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
 import { suggestId, validator } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
-
-import notify from '../../plugins/logging/notify';
 
 @Component
 export default class DashboardWizard extends Vue {

@@ -4,7 +4,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import notify from '@/plugins/logging/notify';
+import notify from '@/helpers/notify';
 import { providerStore } from '@/store/providers';
 import { serviceStore } from '@/store/services';
 

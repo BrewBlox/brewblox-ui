@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import notify from '@/plugins/logging/notify';
+import notify from '@/helpers/notify';
 
 export type WizardAction = (config: any) => Promise<void>;
 

@@ -6,10 +6,9 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { ruleChecker } from '@/helpers/functional';
 import { loadFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
-
-import notify from '../../plugins/logging/notify';
 
 const widgetRules: InputRule[] = [
   v => v !== null || 'Widget must have a value',

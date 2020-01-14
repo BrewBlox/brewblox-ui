@@ -1,6 +1,6 @@
 import { generate } from '@/helpers/database-api';
 import { get, post, sse } from '@/helpers/fetch';
-import notify from '@/plugins/logging/notify';
+import notify from '@/helpers/notify';
 
 import { Process, Runtime } from '../types';
 

@@ -1,12 +1,9 @@
 <script lang="ts">
-import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { shortDateString } from '@/helpers/functional';
-
-import { loggingStore } from '../store';
-import { LogEntry } from '../types';
+import { LogEntry, loggingStore } from '@/store/logging';
 
 
 @Component

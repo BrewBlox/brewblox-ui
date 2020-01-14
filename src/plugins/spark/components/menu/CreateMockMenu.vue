@@ -4,14 +4,13 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { suggestId } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { blockTypes } from '@/plugins/spark/block-types';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
-
-import notify from '../../../logging/notify';
 
 
 @Component

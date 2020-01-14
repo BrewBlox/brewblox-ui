@@ -1,13 +1,12 @@
 import { HOST } from '@/helpers/const';
+import notify from '@/helpers/notify';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
-
-import notify from '../plugins/logging/notify';
 
 const fetch =
   async (info: RequestInfo, init: RequestInit = {}): Promise<Response> =>
     window.fetch(info, { cache: 'no-store', ...init })
       .catch(e => {
-        notify.error(`Failed to fetch '${info}': ${e.message}`, { silent: true });
+        notify.error(`Failed to fetch '${info}': ${e.message}`, { shown: false });
         throw e;
       });
 
@@ -17,7 +16,7 @@ export const fetchJson =
 
     if (!response.ok || response.status >= 400) {
       const body = await response.text();
-      notify.error(`Fetch error response: '${info}' (${response.status}) ---- ${body}`, { silent: true });
+      notify.error(`Fetch error response: '${info}' (${response.status}) ---- ${body}`, { shown: false });
       throw new Error(body);
     }
 

@@ -4,12 +4,12 @@ import { Component } from 'vue-property-decorator';
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { spliceById } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, ChangeField } from '@/plugins/spark/types';
 
-import notify from '../../../logging/notify';
 import { BlockChange, Step } from './types';
 
 interface FieldDiff {

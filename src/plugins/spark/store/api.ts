@@ -1,8 +1,8 @@
 import pick from 'lodash/pick';
 
 import { del, get, post, put, sse } from '@/helpers/fetch';
+import notify from '@/helpers/notify';
 import { deserialize } from '@/helpers/units/parseObject';
-import notify from '@/plugins/logging/notify';
 
 import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
 

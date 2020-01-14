@@ -2,7 +2,13 @@ import { getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators'
 
 import store from '@/store';
 
-import { LogEntry } from './types';
+export type LogLevel = 'DEBUG' | 'INFO' | 'DONE' | 'WARN' | 'ERROR'
+
+export interface LogEntry {
+  level: LogLevel;
+  time: Date;
+  message: string;
+}
 
 @Module({ store, namespaced: true, dynamic: true, name: 'logging' })
 export class LoggingModule extends VuexModule {

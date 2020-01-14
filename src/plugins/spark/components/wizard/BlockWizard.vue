@@ -6,14 +6,13 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud } from '@/plugins/spark/types';
 import { PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { providerStore } from '@/store/providers';
-
-import notify from '../../../logging/notify';
 
 
 @Component

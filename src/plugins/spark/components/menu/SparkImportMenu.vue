@@ -6,12 +6,11 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { suggestId } from '@/helpers/functional';
 import { loadFile, saveFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
-
-import notify from '../../../logging/notify';
 
 @Component
 export default class SparkImportMenu extends DialogBase {
@@ -52,7 +51,7 @@ export default class SparkImportMenu extends DialogBase {
       if (this.messages.length > 0) {
         notify.warn(`Some Blocks could not be imported on ${this.service.id}`);
         this.messages
-          .forEach(msg => notify.info('Block import error: ' + msg, { silent: true }));
+          .forEach(msg => notify.info('Block import error: ' + msg, { shown: false }));
       }
       else {
         notify.done(`Imported Blocks on ${this.service.id}`);
@@ -132,18 +131,6 @@ export default class SparkImportMenu extends DialogBase {
             @click="exportBlocks"
           />
         </div>
-        <!-- <q-item>
-          <q-item-section>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-          </q-item-section>
-        </q-item> -->
         <q-item v-if="messages.length > 0">
           <q-item-section>
             Reported problems during last import:

@@ -6,8 +6,8 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import notify from '@/helpers/notify';
 import { GraphAnnotation } from '@/plugins/history/types';
-import notify from '@/plugins/logging/notify';
 
 /* eslint-disable @typescript-eslint/camelcase */
 const dark = colors.getBrand('dark')!;

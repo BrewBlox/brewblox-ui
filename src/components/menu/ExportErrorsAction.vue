@@ -3,8 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { saveFile } from '@/helpers/import-export';
-import { loggingStore } from '@/plugins/logging/store';
-
+import { loggingStore } from '@/store/logging';
 @Component
 export default class ExportErrorsAction extends Vue {
 

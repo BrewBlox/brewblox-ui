@@ -5,8 +5,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { loadFile, saveFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
 import { deepCopy } from '@/helpers/units/parseObject';
-import notify from '@/plugins/logging/notify';
 import { dashboardStore } from '@/store/dashboards';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '../getters';

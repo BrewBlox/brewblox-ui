@@ -1,5 +1,5 @@
 import { HOST } from '@/helpers/const';
-import notify from '@/plugins/logging/notify';
+import notify from '@/helpers/notify';
 
 export const checkDatastore = (): void => {
   const addr = `${HOST}/datastore`;

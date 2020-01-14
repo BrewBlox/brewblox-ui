@@ -3,11 +3,10 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { spaceCased } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { prettify } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { UserUnits } from '@/plugins/spark/types';
-
-import notify from '../../../logging/notify';
 
 
 @Component

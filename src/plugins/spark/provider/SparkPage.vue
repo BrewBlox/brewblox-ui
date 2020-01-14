@@ -7,6 +7,7 @@ import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { isSystemBlock } from '@/plugins/spark/block-types';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -15,7 +16,6 @@ import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards'
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
-import notify from '../../logging/notify';
 import { isReady } from './getters';
 import Troubleshooter from './Troubleshooter.vue';
 
@@ -318,10 +318,7 @@ export default class SparkPage extends Vue {
 
   saveWidget(widget: PersistentWidget): void {
     this.volatileWidgets[this.volatileKey(widget.id)] = { ...widget };
-    this.$q.notify({
-      color: 'warning',
-      message: 'Changes will not be persisted',
-    });
+    notify.warn('Changes will not be persisted', { logged: false });
   }
 
   async saveBlock(block: Block): Promise<void> {

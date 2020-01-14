@@ -2,7 +2,7 @@ import isString from 'lodash/isString';
 import UrlSafeString from 'url-safe-string';
 
 import { createDialog } from '@/helpers/dialog';
-import notify from '@/plugins/logging/notify';
+import notify from '@/helpers/notify';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { suggestId } from './functional';
