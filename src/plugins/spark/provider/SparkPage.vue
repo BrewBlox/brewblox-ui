@@ -391,7 +391,7 @@ export default class SparkPage extends Vue {
 <template>
   <div>
     <portal to="toolbar-title">
-      <div>Blocks</div>
+      {{ service.title }}
     </portal>
     <portal to="toolbar-buttons">
       <q-btn-group flat>
