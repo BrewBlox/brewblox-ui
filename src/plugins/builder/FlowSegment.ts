@@ -1,3 +1,5 @@
+import { Notify } from 'quasar';
+
 import { DEFAULT_FRICTION } from './getters';
 import { FlowPart, FlowRoute, PathFriction } from './types';
 
@@ -161,12 +163,13 @@ const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSeg
         }
       }
       if (unTouchedSplits.length !== 0) {
-        throw (`Calculating current flow path is not supported.
-        Cannot merge friction and pressures of a multi-sink split.`);
+        Notify.create({
+          icon: 'warning',
+          color: 'warning',
+          message: 'The flows split and re-join in too many places. Some flows might be incorrect.',
+        });
       }
-      else {
-        return { splits: combinedSplits, end: end };
-      }
+      return { splits: combinedSplits, end: end };
     }
     if (walker.next) {
       walker = walker.next;
