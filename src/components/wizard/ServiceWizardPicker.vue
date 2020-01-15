@@ -4,6 +4,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { providerStore } from '@/store/providers';
 import { serviceStore } from '@/store/services';
 
@@ -54,11 +55,7 @@ export default class ServiceWizardPicker extends Vue {
       .filter(isString);
 
     if (errors.length > 0) {
-      this.$q.notify({
-        message: errors.join(', '),
-        color: 'negative',
-        icon: 'error',
-      });
+      notify.error(errors.join(', '));
       return;
     }
 

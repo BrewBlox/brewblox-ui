@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import notify from '@/helpers/notify';
 import { typeName } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
 import { providerStore } from '@/store/providers';
@@ -32,20 +33,12 @@ export default class SparkWizard extends Vue {
       type: typeName,
     };
     await serviceStore.createService(service);
-    this.$q.notify({
-      icon: 'mdi-check-all',
-      color: 'positive',
-      message: `Added ${providerStore.displayName(service.type)} ${service.title}`,
-    });
+    notify.done(`Added ${providerStore.displayName(service.type)} '${service.title}'`);
     this.$emit('close');
   }
 
   async cancel(): Promise<void> {
-    this.$q.notify({
-      color: 'negative',
-      icon: 'error',
-      message: `Service with ID '${this.serviceId}' invalid or not found`,
-    });
+    notify.error(`Service with ID '${this.serviceId}' invalid or not found`);
     this.$emit('back');
   }
 

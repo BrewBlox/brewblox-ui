@@ -7,6 +7,7 @@ import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { isSystemBlock } from '@/plugins/spark/block-types';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -317,10 +318,7 @@ export default class SparkPage extends Vue {
 
   saveWidget(widget: PersistentWidget): void {
     this.volatileWidgets[this.volatileKey(widget.id)] = { ...widget };
-    this.$q.notify({
-      color: 'warning',
-      message: 'Changes will not be persisted',
-    });
+    notify.warn('Changes will not be persisted', { logged: false });
   }
 
   async saveBlock(block: Block): Promise<void> {
@@ -358,7 +356,7 @@ export default class SparkPage extends Vue {
       ? `Discovered ${discovered.join(', ')}.`
       : 'Discovered no new blocks.';
 
-    this.$q.notify({ message, icon: 'mdi-magnify-plus-outline' });
+    notify.info({ message, icon: 'mdi-magnify-plus-outline' });
   }
 
   async cleanUnusedNames(): Promise<void> {
@@ -368,7 +366,7 @@ export default class SparkPage extends Vue {
       ? `Cleaned ${names.join(', ')}.`
       : 'No unused names found.';
 
-    this.$q.notify({ message, icon: 'mdi-tag-remove' });
+    notify.info({ message, icon: 'mdi-tag-remove' });
   }
 
   onBlockClick(val: ValidatedWidget): void {
@@ -393,12 +391,13 @@ export default class SparkPage extends Vue {
 <template>
   <div>
     <portal to="toolbar-title">
-      <div>Blocks</div>
+      {{ service.title }}
     </portal>
     <portal to="toolbar-buttons">
-      <q-btn-group flat>
+      <q-btn-group flat stretch>
         <q-btn
           flat
+          stretch
           :class="{'selected-mode': pageMode === 'List'}"
           icon="mdi-format-list-checkbox"
           @click="pageMode = 'List'"
@@ -407,6 +406,7 @@ export default class SparkPage extends Vue {
         </q-btn>
         <q-btn
           flat
+          stretch
           :class="{'selected-mode': pageMode === 'Relations'}"
           icon="mdi-vector-line"
           @click="pageMode = 'Relations'"
@@ -414,7 +414,7 @@ export default class SparkPage extends Vue {
           <q-tooltip>Show blocks as diagram</q-tooltip>
         </q-btn>
       </q-btn-group>
-      <ActionMenu :disable="!isReady || statusNok">
+      <ActionMenu :disable="!isReady || statusNok" stretch>
         <template #actions>
           <ActionItem
             icon="add"
@@ -610,20 +610,19 @@ export default class SparkPage extends Vue {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.widget-index {
-  padding: 0;
-}
-.page-height {
-  height: calc(100vh - 100px);
-}
-.content-column {
-  width: 550px;
-  max-width: 100vw;
-  height: 100%;
-  overflow: auto;
-}
-.selected-mode {
-  border-bottom: 2px solid $secondary;
-}
+<style lang="sass" scoped>
+.widget-index
+  padding: 0
+
+.page-height
+  height: calc(100vh - 40px - 30px - 50px)
+
+.content-column
+  width: 550px
+  max-width: 100vw
+  height: 100%
+  overflow: auto
+
+.selected-mode
+  border-bottom: 2px solid $secondary
 </style>

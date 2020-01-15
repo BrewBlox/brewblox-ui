@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, objectSorter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
@@ -83,11 +84,7 @@ export default class SetpointProfileFull
   }
 
   notifyInvalidTime(): void {
-    this.$q.notify({
-      icon: 'error',
-      color: 'negative',
-      message: 'Point time must be later than start time',
-    });
+    notify.warn('Point time must be later than start time', { logged: false });
   }
 
   intermediateTemp(points: DisplaySetpoint[], dateMs: number): Unit | null {

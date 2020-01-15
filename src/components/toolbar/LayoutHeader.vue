@@ -11,12 +11,13 @@ export default class LayoutHeader extends Vue {
 
 <template>
   <q-header class="glossy bg-dark">
-    <q-toolbar>
-      <q-btn flat dense round icon="menu" @click="$emit('menu')" />
-      <q-toolbar-title>
+    <q-bar class="bg-transparent q-px-none">
+      <q-btn flat stretch icon="menu" @click="$emit('menu')" />
+      <q-btn flat stretch no-caps label="BrewBlox" to="/" />
+      <q-toolbar-title class="col text-center">
         <slot name="title" />
       </q-toolbar-title>
       <slot name="buttons" />
-    </q-toolbar>
+    </q-bar>
   </q-header>
 </template>

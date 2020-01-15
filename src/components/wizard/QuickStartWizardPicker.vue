@@ -36,11 +36,6 @@ export default class QuickStartWizardPicker extends Vue {
 
   next(): void {
     if (!this.wizardModel) {
-      this.$q.notify({
-        message: 'Please select a wizard',
-        color: 'negative',
-        icon: 'error',
-      });
       return;
     }
     this.setTitle(`${this.wizardModel.displayName} wizard`);
@@ -120,7 +115,7 @@ export default class QuickStartWizardPicker extends Vue {
       <template #actions>
         <q-btn unelevated label="Back" @click="back" />
         <q-space />
-        <q-btn unelevated label="Next" color="primary" @click="next" />
+        <q-btn :disable="!wizardModel" unelevated label="Next" color="primary" @click="next" />
       </template>
     </WizardCard>
   </div>

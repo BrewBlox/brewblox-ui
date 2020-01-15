@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { Service, serviceStore } from '@/store/services';
 
 
@@ -67,11 +68,7 @@ export default class ServiceIndex extends Vue {
         }
 
         await serviceStore.saveService({ ...service, title: newTitle });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'edit',
-          message: `Renamed service '${oldTitle}' to '${newTitle}'`,
-        });
+        notify.done(`Renamed service '${oldTitle}' to '${newTitle}'`);
       });
   }
 }

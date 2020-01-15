@@ -1,30 +1,12 @@
 import { HOST } from '@/helpers/const';
+import notify from '@/helpers/notify';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
-
-interface FetchError {
-  time: string;
-  info: RequestInfo;
-  init?: RequestInit;
-  status: number;
-  body: string;
-}
-
-const fetchErrors: FetchError[] = [];
-
-export const getErrors =
-  (clear = false): FetchError[] => {
-    const retval = [...fetchErrors];
-    if (clear) {
-      fetchErrors.length = 0;
-    }
-    return retval;
-  };
 
 const fetch =
   async (info: RequestInfo, init: RequestInit = {}): Promise<Response> =>
     window.fetch(info, { cache: 'no-store', ...init })
       .catch(e => {
-        fetchErrors.push({ info, init, time: new Date().toString(), body: e.message, status: -1 });
+        notify.error(`Failed to fetch '${info}': ${e.message}`, { shown: false });
         throw e;
       });
 
@@ -32,9 +14,9 @@ export const fetchJson =
   async (info: RequestInfo, init?: RequestInit): Promise<any> => {
     const response = await fetch(info, init);
 
-    if (!response.ok) {
+    if (!response.ok || response.status >= 400) {
       const body = await response.text();
-      fetchErrors.push({ info, init, body, time: new Date().toString(), status: response.status });
+      notify.error(`Fetch error response: '${info}' (${response.status}) ---- ${body}`, { shown: false });
       throw new Error(body);
     }
 

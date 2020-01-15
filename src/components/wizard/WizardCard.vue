@@ -14,7 +14,7 @@ export default class WizardCard extends Vue {
     <div class="col scroll">
       <slot />
     </div>
-    <div class="col-auto">
+    <div v-if="$slots.actions" class="col-auto">
       <q-separator />
       <q-card-actions align="right">
         <slot name="actions" />

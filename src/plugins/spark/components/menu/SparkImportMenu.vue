@@ -6,6 +6,7 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { suggestId } from '@/helpers/functional';
 import { loadFile, saveFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
@@ -47,24 +48,16 @@ export default class SparkImportMenu extends DialogBase {
       this.importBusy = true;
       this.messages = [];
       this.messages = await sparkStore.serviceImport([this.service.id, values]);
-      this.$q.notify(
-        this.messages.length > 0
-          ? {
-            icon: 'warning',
-            color: 'warning',
-            message: `Some Blocks could not be imported on ${this.service.id}`,
-          }
-          : {
-            icon: 'mdi-check-all',
-            color: 'positive',
-            message: `Imported Blocks on ${this.service.id}`,
-          });
+      if (this.messages.length > 0) {
+        notify.warn(`Some Blocks could not be imported on ${this.service.id}`);
+        this.messages
+          .forEach(msg => notify.info('Block import error: ' + msg, { shown: false }));
+      }
+      else {
+        notify.done(`Imported Blocks on ${this.service.id}`);
+      }
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to import blocks: ${e.toString()}`,
-      });
+      notify.error(`Failed to import blocks: ${e.toString()}`);
     }
     this.importBusy = false;
   }
@@ -93,17 +86,9 @@ export default class SparkImportMenu extends DialogBase {
           serviceId: this.serviceId,
         },
       ]);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Imported ${id}`,
-      });
+      notify.done(`Imported block '${id}'`);
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to import block: ${e.toString()}`,
-      });
+      notify.error(`Failed to import block: ${e.toString()}`);
     }
     this.importBusy = false;
   }
@@ -146,18 +131,6 @@ export default class SparkImportMenu extends DialogBase {
             @click="exportBlocks"
           />
         </div>
-        <!-- <q-item>
-          <q-item-section>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-          </q-item-section>
-        </q-item> -->
         <q-item v-if="messages.length > 0">
           <q-item-section>
             Reported problems during last import:
