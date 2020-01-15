@@ -394,9 +394,10 @@ export default class SparkPage extends Vue {
       {{ service.title }}
     </portal>
     <portal to="toolbar-buttons">
-      <q-btn-group flat>
+      <q-btn-group flat stretch>
         <q-btn
           flat
+          stretch
           :class="{'selected-mode': pageMode === 'List'}"
           icon="mdi-format-list-checkbox"
           @click="pageMode = 'List'"
@@ -405,6 +406,7 @@ export default class SparkPage extends Vue {
         </q-btn>
         <q-btn
           flat
+          stretch
           :class="{'selected-mode': pageMode === 'Relations'}"
           icon="mdi-vector-line"
           @click="pageMode = 'Relations'"
@@ -412,7 +414,7 @@ export default class SparkPage extends Vue {
           <q-tooltip>Show blocks as diagram</q-tooltip>
         </q-btn>
       </q-btn-group>
-      <ActionMenu :disable="!isReady || statusNok">
+      <ActionMenu :disable="!isReady || statusNok" stretch>
         <template #actions>
           <ActionItem
             icon="add"
@@ -608,20 +610,19 @@ export default class SparkPage extends Vue {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.widget-index {
-  padding: 0;
-}
-.page-height {
-  height: calc(100vh - 100px);
-}
-.content-column {
-  width: 550px;
-  max-width: 100vw;
-  height: 100%;
-  overflow: auto;
-}
-.selected-mode {
-  border-bottom: 2px solid $secondary;
-}
+<style lang="sass" scoped>
+.widget-index
+  padding: 0
+
+.page-height
+  height: calc(100vh - 40px - 30px - 50px)
+
+.content-column
+  width: 550px
+  max-width: 100vw
+  height: 100%
+  overflow: auto
+
+.selected-mode
+  border-bottom: 2px solid $secondary
 </style>

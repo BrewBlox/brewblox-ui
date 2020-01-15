@@ -26,13 +26,6 @@ export default class SidebarNavigator extends Vue {
     });
   }
 
-  showNotifications(): void {
-    createDialog({
-      parent: this,
-      component: 'NotificationDialog',
-    });
-  }
-
   showAutomationEditor(): void {
     createDialog({
       parent: this,
@@ -44,7 +37,6 @@ export default class SidebarNavigator extends Vue {
 
 <template>
   <div class="col-auto">
-    <ActionItem icon="mdi-home" label="BrewBlox" to="/" exact />
     <q-separator />
 
     <div class="row wrap">
@@ -77,15 +69,6 @@ export default class SidebarNavigator extends Vue {
         no-caps
         class="col-auto q-py-sm"
         @click="showWizard"
-      />
-      <q-btn
-        icon="mdi-bell"
-        label="Notifications"
-        stack
-        flat
-        no-caps
-        class="col-auto q-py-sm"
-        @click="showNotifications"
       />
       <q-btn
         v-if="automationFeatureEnabled"

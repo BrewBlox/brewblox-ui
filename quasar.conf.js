@@ -68,6 +68,7 @@ module.exports = function (ctx) {
         'QDialog',
         'QExpansionItem',
         'QField',
+        'QFooter',
         'QIcon',
         'QInnerLoading',
         'QInput',

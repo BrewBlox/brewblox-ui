@@ -11,7 +11,7 @@ export interface RecordOpts {
   logged: boolean;
 }
 
-const notifyColors: Record<LogLevel, string> = {
+export const notifyColors: Record<LogLevel, string> = {
   DEBUG: 'info',
   INFO: 'info',
   DONE: 'positive',
@@ -19,7 +19,7 @@ const notifyColors: Record<LogLevel, string> = {
   ERROR: 'negative',
 };
 
-const notifyIcons: Record<LogLevel, string> = {
+export const notifyIcons: Record<LogLevel, string> = {
   DEBUG: '',
   INFO: '',
   DONE: 'mdi-check-all',

@@ -712,7 +712,7 @@ export default class BuilderEditor extends Vue {
 <template>
   <q-layout
     ref="page"
-    view="lHh Lpr lFf"
+    view="hHh Lpr fFf"
     class="editor-page"
     tabindex="-1"
     @keyup.native="keyHandler"
@@ -757,6 +757,7 @@ export default class BuilderEditor extends Vue {
         <q-btn flat stretch icon="mdi-close-circle" size="md" @click="leaveEditor" />
       </template>
     </LayoutHeader>
+    <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="bg-dark column" elevated>
       <SidebarNavigator active-section="builder" />
@@ -888,7 +889,7 @@ export default class BuilderEditor extends Vue {
       />
     </q-dialog>
 
-    <q-page-container class="bg-dark">
+    <q-page-container class="bg-dark-bright">
       <q-page class="row no-wrap justify-center q-pa-md">
         <div class="col-auto column no-wrap">
           <div

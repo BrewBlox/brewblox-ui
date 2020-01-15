@@ -159,20 +159,18 @@ export default class DashboardPage extends Vue {
         {{ dashboard.title }}
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn-group v-if="!$dense" flat>
-          <q-btn
-            flat
-            :class="{'selected-mode': widgetEditable}"
-            icon="mdi-arrow-all"
-            @click="widgetEditable = true"
-          />
-          <q-btn
-            flat
-            :class="{'selected-mode': !widgetEditable}"
-            icon="mdi-lock"
-            @click="widgetEditable = false"
-          />
-        </q-btn-group>
+        <q-btn
+          v-if="!$dense"
+          unelevated
+          stretch
+          icon="mdi-arrow-all"
+          :color="widgetEditable ? 'primary' : ''"
+          @click="widgetEditable = !widgetEditable"
+        >
+          <q-tooltip v-if="!widgetEditable">
+            Rearrange widgets
+          </q-tooltip>
+        </q-btn>
         <ActionMenu>
           <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
