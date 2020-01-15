@@ -166,7 +166,7 @@ const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSeg
         Notify.create({
           icon: 'warning',
           color: 'warning',
-          message: 'The flows split and re-join in too many places. Some flows might be incorrect.',
+          message: 'The flows split and rejoin in too many places. Some flows might be incorrect.',
         });
       }
       return { splits: combinedSplits, end: end };
