@@ -73,6 +73,11 @@ export default class SparkPage extends Vue {
     }
   }
 
+  @Watch('service.title', { immediate: true })
+  watchTitle(newV: string): void {
+    document.title = `Brewblox | ${newV ?? 'Spark service'}`;
+  }
+
   destroyed(): void {
     this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
   }

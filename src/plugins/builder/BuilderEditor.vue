@@ -92,6 +92,11 @@ export default class BuilderEditor extends Vue {
     this.debouncedCalculate();
   }
 
+  @Watch('layout.title', { immediate: true })
+  watchTitle(newV: string): void {
+    document.title = `Brewblox | ${newV ?? 'Builder editor'}`;
+  }
+
   created(): void {
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
