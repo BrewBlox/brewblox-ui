@@ -6,7 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 @Component
 export default class SvgEmbedded extends Vue {
 
-  @Prop({ type: [String, Array, Object], default: 'full-size column items-center' })
+  @Prop({ type: [String, Array, Object], default: 'fit column items-center' })
   public readonly contentClass!: any;
 
 }
