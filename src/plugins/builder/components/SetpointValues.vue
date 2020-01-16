@@ -7,12 +7,12 @@ import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensor
 import { sparkStore } from '@/plugins/spark/store';
 
 import { blockTypes } from '../../spark/block-types';
-import { SQUARE_SIZE } from '../getters';
-import { settingsBlock, settingsLink } from '../helpers';
+import { settingsBlock, settingsLink, squares } from '../helpers';
 import { PersistentPart } from '../types';
 
 @Component
 export default class SetpointValues extends Vue {
+  squares = squares;
 
   @Prop({ type: Object, required: true })
   public readonly part!: PersistentPart;
@@ -81,10 +81,6 @@ export default class SetpointValues extends Vue {
     return this.block
       ? this.block.data.storedSetting.notation
       : '';
-  }
-
-  public squares(val: number): number {
-    return SQUARE_SIZE * val;
   }
 }
 </script>

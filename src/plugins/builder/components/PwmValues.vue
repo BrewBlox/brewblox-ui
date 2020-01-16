@@ -76,7 +76,7 @@ export default class PwmValues extends Vue {
       <UnlinkedIcon v-else-if="!block" />
       <SleepingIcon v-else-if="!block.data.enabled" />
       <template v-else>
-        <PwmIcon class="col outline" />
+        <PwmIcon />
         <div class="col text-bold">
           {{ pwmValue | truncateRound }}
           <small v-if="!!block">%</small>

@@ -79,11 +79,11 @@ export default class PidDisplay extends PartBase {
       <SleepingIcon v-else-if="!block.data.enabled" />
       <template v-else>
         <div class="col row items-center">
-          <q-icon v-if="kp === null" name="mdi-calculator-variant" class="col static" size="20px" />
-          <q-icon v-else-if="drivingOffset" name="mdi-plus-minus" class="col static" size="20px" />
+          <q-icon v-if="kp === null" name="mdi-calculator-variant" class="col static q-mt-xs" size="20px" />
+          <q-icon v-else-if="drivingOffset" name="mdi-plus-minus" class="col static q-mt-xs" size="20px" />
           <template v-else>
-            <HeatingIcon v-if="kp > 0" :stroke="outputValue ? HOT_WATER : 'white'" />
-            <CoolingIcon v-if="kp < 0" :stroke="outputValue ? COLD_WATER : 'white'" />
+            <HeatingIcon v-if="kp > 0" :color="outputValue ? HOT_WATER : 'white'" />
+            <CoolingIcon v-if="kp < 0" :color="outputValue ? COLD_WATER : 'white'" />
           </template>
         </div>
         <div class="col text-bold">
