@@ -31,12 +31,17 @@ export default class DashboardPage extends Vue {
     this.widgetEditable = false;
   }
 
-  @Watch('dashboard')
-  onChangeDashboard(newDash, oldDash): void {
-    if (oldDash && !newDash) {
+  @Watch('dashboard', { immediate: true })
+  onChangeDashboard(newV: Dashboard, oldV: Dashboard): void {
+    if (!newV && oldV) {
       // Dashboard was removed
       this.$router.replace('/');
     }
+  }
+
+  @Watch('dashboard.title', { immediate: true })
+  watchTitle(newV: string): void {
+    document.title = `Brewblox | ${newV ?? 'Dashboard'}`;
   }
 
   get dashboardId(): string {
@@ -171,7 +176,7 @@ export default class DashboardPage extends Vue {
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu>
+        <ActionMenu stretch>
           <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
             <q-item clickable @click="toggleDefaultDashboard">
