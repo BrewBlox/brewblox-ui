@@ -142,7 +142,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     <q-stepper
       v-model="currentStep"
       :bordered="false"
-      class="bg-dark-bright no-border"
+      class="no-border"
       vertical
       animated
     >

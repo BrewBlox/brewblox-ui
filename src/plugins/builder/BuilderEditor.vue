@@ -764,7 +764,7 @@ export default class BuilderEditor extends Vue {
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="drawerOpen" content-class="bg-dark column" elevated>
+    <q-drawer v-model="drawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="builder" />
 
       <q-scroll-area
@@ -894,7 +894,7 @@ export default class BuilderEditor extends Vue {
       />
     </q-dialog>
 
-    <q-page-container class="bg-dark-bright">
+    <q-page-container>
       <q-page class="row no-wrap justify-center q-pa-md">
         <div class="col-auto column no-wrap">
           <div
@@ -908,7 +908,7 @@ export default class BuilderEditor extends Vue {
           >
             <svg
               ref="grid"
-              class="grid-base grid-editable"
+              class="fit grid-editable"
               @click="v => clickHandler(v, null)"
               @mouseenter="onGridMove"
               @mousemove="onGridMove"

@@ -255,7 +255,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
       <span v-if="parts.length === 0" class="absolute-center">
         {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
       </span>
-      <svg ref="grid" :viewBox="gridViewBox" class="grid-base">
+      <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
         <g
           v-for="part in flowParts"
           :key="part.id"

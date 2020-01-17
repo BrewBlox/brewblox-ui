@@ -132,7 +132,7 @@ export default class BlockGraph extends Vue {
 
 <template>
   <q-dialog v-model="dialogOpen" maximized>
-    <q-card v-if="dialogOpen" class="text-white bg-dark-bright">
+    <q-card v-if="dialogOpen" class="text-white">
       <HistoryGraph ref="graph" :graph-id="id" :config="graphCfg">
         <template #controls>
           <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">

@@ -35,7 +35,6 @@ export default class GraphDialog extends DialogBase {
       },
       [
         h('q-card',
-          { class: 'bg-dark' },
           [
             h('HistoryGraph',
               {

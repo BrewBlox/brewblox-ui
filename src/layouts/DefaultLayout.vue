@@ -45,7 +45,7 @@ export default class DefaultLayout extends Vue {
 </script>
 
 <template>
-  <q-layout view="hHh Lpr fFf" class="bg-dark-bright">
+  <q-layout view="hHh Lpr fFf">
     <LayoutHeader @menu="leftDrawerOpen = !leftDrawerOpen">
       <template #title>
         <portal-target name="toolbar-title">
@@ -58,7 +58,7 @@ export default class DefaultLayout extends Vue {
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="leftDrawerOpen" content-class="bg-dark column" elevated>
+    <q-drawer v-model="leftDrawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="dashboards" />
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">

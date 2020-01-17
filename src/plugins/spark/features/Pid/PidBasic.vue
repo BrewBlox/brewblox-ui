@@ -52,8 +52,8 @@ export default class PidBasic
     <slot name="toolbar" />
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item class="items-start">
+    <q-card-section class="q-pa-sm">
+      <q-item class="items-start depth-1">
         <q-item-section>
           <UnitField
             v-if="!!inputBlock"
@@ -69,32 +69,26 @@ export default class PidBasic
         <q-item-section>
           <UnitField :value="block.data.inputValue" label="Input measured" tag="big" readonly />
         </q-item-section>
-        <q-item-section :class="{hoverable: !!inputBlock}">
-          <LabeledField label="Show block" @click="showInput">
-            <q-icon :class="{darkish: !inputBlock}" name="mdi-launch" size="24px" />
-          </LabeledField>
+        <q-item-section class="self-center">
+          <q-btn label="Open" flat align="left" class="depth-1" no-caps icon="mdi-launch" @click="showInput" />
         </q-item-section>
       </q-item>
 
-      <q-separator inset />
 
-      <q-item class="items-start">
+      <q-item class="items-start depth-1">
         <q-item-section>
           <LabeledField :value="block.data.outputSetting" number label="Output target" tag="big" />
         </q-item-section>
         <q-item-section>
           <LabeledField :value="block.data.outputValue" number label="Output achieved" tag="big" />
         </q-item-section>
-        <q-item-section :class="{hoverable: !!outputBlock}">
-          <LabeledField label="Show block" @click="showOutput">
-            <q-icon :class="{darkish: !outputBlock}" name="mdi-launch" size="24px" />
-          </LabeledField>
+        <q-item-section class="self-center">
+          <q-btn label="Open" flat class="depth-1" no-caps icon="mdi-launch" @click="showOutput" />
         </q-item-section>
       </q-item>
 
-      <q-separator inset />
 
-      <q-item>
+      <q-item class="depth-1">
         <q-item-section>
           <LabeledField :value="block.data.p" label="P" number />
         </q-item-section>

@@ -273,7 +273,7 @@ export default class GridItem extends Vue {
 </script>
 
 <template>
-  <div ref="container" :style="style" class="grid-item">
+  <div ref="container" :style="style" class="grid-item depth-1">
     <!-- Actual item -->
     <slot />
     <!-- Drag effects -->
@@ -314,14 +314,12 @@ export default class GridItem extends Vue {
 <style lang="scss" scoped>
 .grid-item {
   position: relative;
-  background: $dark;
 }
 
 .grid-item-resize-handle {
   border: 0;
   width: 34px;
   height: 34px;
-  background: transparent;
   position: absolute;
   padding: 0;
   display: flex;
@@ -333,6 +331,7 @@ export default class GridItem extends Vue {
   bottom: 0;
   cursor: nwse-resize;
   right: 0;
+  background: transparent;
 }
 
 .grid-item-move-handle {

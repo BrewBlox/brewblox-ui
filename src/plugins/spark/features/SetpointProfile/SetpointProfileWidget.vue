@@ -20,8 +20,6 @@ export default class SetpointProfileWidget
 
   // Overrides WidgetBase
   *cardClassGenerator(): Generator<string, void, undefined> {
-    yield 'bg-dark';
-
     yield this.inDialog
       ? 'widget-modal'
       : 'widget-dashboard';

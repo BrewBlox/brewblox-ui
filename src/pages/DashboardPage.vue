@@ -155,7 +155,7 @@ export default class DashboardPage extends Vue {
 </script>
 
 <template>
-  <q-page padding class="bg-dark-bright">
+  <q-page padding>
     <q-inner-loading v-if="!dashboard">
       <q-spinner size="50px" color="primary" />
     </q-inner-loading>
@@ -215,7 +215,7 @@ export default class DashboardPage extends Vue {
           :initial-crud="val.crud"
           :context="context"
           :error="val.error"
-          class="bg-dark maximized"
+          class="fit"
         />
       </GridContainer>
     </div>

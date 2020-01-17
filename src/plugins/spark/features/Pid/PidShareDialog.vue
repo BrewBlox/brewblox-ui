@@ -183,7 +183,7 @@ export default class PidShareDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized @hide="onDialogHide">
-    <q-card class="maximized bg-dark-bright column">
+    <q-card class="maximized column">
       <DialogToolbar class="col-auto">
         {{ block.id }}
         <template #buttons>
@@ -199,7 +199,7 @@ export default class PidShareDialog extends DialogBase {
           </q-btn-dropdown>
         </template>
       </DialogToolbar>
-      <div ref="viewparent" class="col row full-width bg-dark">
+      <div ref="viewparent" class="col row full-width">
         <div class="col-3 q-pa-md column q-gutter-y-sm sidebar">
           <div v-for="d in displays" :key="d.role" class="col">
             <q-btn

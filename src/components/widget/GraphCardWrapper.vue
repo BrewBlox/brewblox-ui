@@ -36,7 +36,7 @@ export default class GraphCardWrapper extends Vue {
           key="show-button"
           flat
           dense
-          class="col-auto tab-show q-py-md q-mr-sm bg-dark"
+          class="col-auto tab-show q-py-md q-mr-sm"
           icon="mdi-chart-line"
           @click="collapsed = false"
         >
@@ -47,7 +47,7 @@ export default class GraphCardWrapper extends Vue {
           key="hide-button"
           flat
           dense
-          class="col-auto tab-hide q-py-md q-ml-sm bg-dark"
+          class="col-auto tab-hide q-py-md q-ml-sm"
           icon="mdi-arrow-collapse-left"
           @click="collapsed = true"
         >
@@ -55,7 +55,7 @@ export default class GraphCardWrapper extends Vue {
         </q-btn>
       </div>
       <div v-if="!collapsed" style="width: 600px;">
-        <q-card class="q-pa-none bg-dark-bright graph-container">
+        <q-card class="q-pa-none graph-container">
           <slot name="graph" />
         </q-card>
       </div>
@@ -81,7 +81,7 @@ export default class GraphCardWrapper extends Vue {
   padding: 0;
   margin: 0;
   max-width: 100vw;
-  background-color: rgba(0, 0, 0, 0);
+  /* background-color: rgba(0, 0, 0, 0); */
 }
 
 .tab-show {
