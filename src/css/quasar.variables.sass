@@ -50,12 +50,13 @@
 // $breakpoint-xl-min: map-get($sizes, "xl") !default
 // $breakpoint-xl-max: 9999px !default
 
-// $h1:        (size: 6rem,     line-height: 6rem,     letter-spacing: -.01562em, weight: 300) !default
-// $h2:        (size: 3.75rem,  line-height: 3.75rem,  letter-spacing: -.00833em, weight: 300) !default
-// $h3:        (size: 3rem,     line-height: 3.125rem, letter-spacing: normal,    weight: 400) !default
-// $h4:        (size: 2.125rem, line-height: 2.5rem,   letter-spacing: .00735em,  weight: 400) !default
-// $h5:        (size: 1.5rem,   line-height: 2rem,     letter-spacing: normal,    weight: 400) !default
-// $h6:        (size: 1.25rem,  line-height: 2rem,     letter-spacing: .0125em,   weight: 500) !default
+$h1:        (size: 3rem,     line-height: 3rem,     letter-spacing: normal, weight: 300) !default
+$h2:        (size: 2.5rem, line-height: 2.5rem,   letter-spacing: .00735em,  weight: 300) !default
+$h3:        (size: 2rem, line-height: 2rem,   letter-spacing: .00735em,  weight: 300) !default
+$h4:        (size: 1.5rem,   line-height: 2rem,     letter-spacing: normal,    weight: 300) !default
+$h5:        (size: 1.25rem,  line-height: 1.5rem,     letter-spacing: .0125em,   weight: 400) !default
+$h6:        (size: 1rem,  line-height: 1.25rem,     letter-spacing: .0125em,   weight: 400) !default
+
 // $subtitle1: (size: 1rem,     line-height: 1.75rem,  letter-spacing: .00937em,  weight: 400) !default
 // $subtitle2: (size: .875rem,  line-height: 1.375rem, letter-spacing: .00714em,  weight: 500) !default
 // $body1:     (size: 1rem,     line-height: 1.5rem,   letter-spacing: .03125em,  weight: 400) !default
@@ -72,310 +73,341 @@
 // // sorry for long line; we need .sass and it doesn't support multi-line list
 // $text-weights: (thin: 100, light: 300, regular: 400, medium: 500, bold: 700, bolder: 900) !default
 
-// $primary   : #027BE3 !default
-// $secondary : #26A69A !default
-// $accent    : #9C27B0 !default
-
-// // used by dark mode
-// $dark-page : #121212 !default
-// $dark      : #1d1d1d !default
-
-// $positive  : #21BA45 !default
-// $negative  : #C10015 !default
-// $info      : #31CCEC !default
-// $warning   : #F2C037 !default
-
 // $dimmed-background       : rgba(0, 0, 0, .4) !default
 // $light-dimmed-background : rgba(255, 255, 255, .6) !default
 
 // $separator-color         : rgba(0, 0, 0, .12) !default
 // $separator-dark-color    : rgba(255, 255, 255, .28) !default
 
-// $red : #f44336 !default
-// $red-1 : #ffebee !default
-// $red-2 : #ffcdd2 !default
-// $red-3 : #ef9a9a !default
-// $red-4 : #e57373 !default
-// $red-5 : #ef5350 !default
-// $red-6 : #f44336 !default
-// $red-7 : #e53935 !default
-// $red-8 : #d32f2f !default
-// $red-9 : #c62828 !default
-// $red-10 : #b71c1c !default
-// $red-11 : #ff8a80 !default
-// $red-12 : #ff5252 !default
-// $red-13 : #ff1744 !default
-// $red-14 : #d50000 !default
-// $pink : #e91e63 !default
-// $pink-1 : #fce4ec !default
-// $pink-2 : #f8bbd0 !default
-// $pink-3 : #f48fb1 !default
-// $pink-4 : #f06292 !default
-// $pink-5 : #ec407a !default
-// $pink-6 : #e91e63 !default
-// $pink-7 : #d81b60 !default
-// $pink-8 : #c2185b !default
-// $pink-9 : #ad1457 !default
-// $pink-10 : #880e4f !default
-// $pink-11 : #ff80ab !default
-// $pink-12 : #ff4081 !default
-// $pink-13 : #f50057 !default
-// $pink-14 : #c51162 !default
-// $purple : #9c27b0 !default
-// $purple-1 : #f3e5f5 !default
-// $purple-2 : #e1bee7 !default
-// $purple-3 : #ce93d8 !default
-// $purple-4 : #ba68c8 !default
-// $purple-5 : #ab47bc !default
-// $purple-6 : #9c27b0 !default
-// $purple-7 : #8e24aa !default
-// $purple-8 : #7b1fa2 !default
-// $purple-9 : #6a1b9a !default
-// $purple-10 : #4a148c !default
-// $purple-11 : #ea80fc !default
-// $purple-12 : #e040fb !default
-// $purple-13 : #d500f9 !default
-// $purple-14 : #aa00ff !default
-// $deep-purple : #673ab7 !default
-// $deep-purple-1 : #ede7f6 !default
-// $deep-purple-2 : #d1c4e9 !default
-// $deep-purple-3 : #b39ddb !default
-// $deep-purple-4 : #9575cd !default
-// $deep-purple-5 : #7e57c2 !default
-// $deep-purple-6 : #673ab7 !default
-// $deep-purple-7 : #5e35b1 !default
-// $deep-purple-8 : #512da8 !default
-// $deep-purple-9 : #4527a0 !default
-// $deep-purple-10 : #311b92 !default
-// $deep-purple-11 : #b388ff !default
-// $deep-purple-12 : #7c4dff !default
-// $deep-purple-13 : #651fff !default
-// $deep-purple-14 : #6200ea !default
-// $indigo : #3f51b5 !default
-// $indigo-1 : #e8eaf6 !default
-// $indigo-2 : #c5cae9 !default
-// $indigo-3 : #9fa8da !default
-// $indigo-4 : #7986cb !default
-// $indigo-5 : #5c6bc0 !default
-// $indigo-6 : #3f51b5 !default
-// $indigo-7 : #3949ab !default
-// $indigo-8 : #303f9f !default
-// $indigo-9 : #283593 !default
-// $indigo-10 : #1a237e !default
-// $indigo-11 : #8c9eff !default
-// $indigo-12 : #536dfe !default
-// $indigo-13 : #3d5afe !default
-// $indigo-14 : #304ffe !default
-// $blue : #2196f3 !default
-// $blue-1 : #e3f2fd !default
-// $blue-2 : #bbdefb !default
-// $blue-3 : #90caf9 !default
-// $blue-4 : #64b5f6 !default
-// $blue-5 : #42a5f5 !default
-// $blue-6 : #2196f3 !default
-// $blue-7 : #1e88e5 !default
-// $blue-8 : #1976d2 !default
-// $blue-9 : #1565c0 !default
-// $blue-10 : #0d47a1 !default
-// $blue-11 : #82b1ff !default
-// $blue-12 : #448aff !default
-// $blue-13 : #2979ff !default
-// $blue-14 : #2962ff !default
-// $light-blue : #03a9f4 !default
-// $light-blue-1 : #e1f5fe !default
-// $light-blue-2 : #b3e5fc !default
-// $light-blue-3 : #81d4fa !default
-// $light-blue-4 : #4fc3f7 !default
-// $light-blue-5 : #29b6f6 !default
-// $light-blue-6 : #03a9f4 !default
-// $light-blue-7 : #039be5 !default
-// $light-blue-8 : #0288d1 !default
-// $light-blue-9 : #0277bd !default
-// $light-blue-10 : #01579b !default
-// $light-blue-11 : #80d8ff !default
-// $light-blue-12 : #40c4ff !default
-// $light-blue-13 : #00b0ff !default
-// $light-blue-14 : #0091ea !default
-// $cyan : #00bcd4 !default
-// $cyan-1 : #e0f7fa !default
-// $cyan-2 : #b2ebf2 !default
-// $cyan-3 : #80deea !default
-// $cyan-4 : #4dd0e1 !default
-// $cyan-5 : #26c6da !default
-// $cyan-6 : #00bcd4 !default
-// $cyan-7 : #00acc1 !default
-// $cyan-8 : #0097a7 !default
-// $cyan-9 : #00838f !default
-// $cyan-10 : #006064 !default
-// $cyan-11 : #84ffff !default
-// $cyan-12 : #18ffff !default
-// $cyan-13 : #00e5ff !default
-// $cyan-14 : #00b8d4 !default
-// $teal : #009688 !default
-// $teal-1 : #e0f2f1 !default
-// $teal-2 : #b2dfdb !default
-// $teal-3 : #80cbc4 !default
-// $teal-4 : #4db6ac !default
-// $teal-5 : #26a69a !default
-// $teal-6 : #009688 !default
-// $teal-7 : #00897b !default
-// $teal-8 : #00796b !default
-// $teal-9 : #00695c !default
-// $teal-10 : #004d40 !default
-// $teal-11 : #a7ffeb !default
-// $teal-12 : #64ffda !default
-// $teal-13 : #1de9b6 !default
-// $teal-14 : #00bfa5 !default
-// $green : #4caf50 !default
-// $green-1 : #e8f5e9 !default
-// $green-2 : #c8e6c9 !default
-// $green-3 : #a5d6a7 !default
-// $green-4 : #81c784 !default
-// $green-5 : #66bb6a !default
-// $green-6 : #4caf50 !default
-// $green-7 : #43a047 !default
-// $green-8 : #388e3c !default
-// $green-9 : #2e7d32 !default
-// $green-10 : #1b5e20 !default
-// $green-11 : #b9f6ca !default
-// $green-12 : #69f0ae !default
-// $green-13 : #00e676 !default
-// $green-14 : #00c853 !default
-// $light-green : #8bc34a !default
-// $light-green-1 : #f1f8e9 !default
-// $light-green-2 : #dcedc8 !default
-// $light-green-3 : #c5e1a5 !default
-// $light-green-4 : #aed581 !default
-// $light-green-5 : #9ccc65 !default
-// $light-green-6 : #8bc34a !default
-// $light-green-7 : #7cb342 !default
-// $light-green-8 : #689f38 !default
-// $light-green-9 : #558b2f !default
-// $light-green-10 : #33691e !default
-// $light-green-11 : #ccff90 !default
-// $light-green-12 : #b2ff59 !default
-// $light-green-13 : #76ff03 !default
-// $light-green-14 : #64dd17 !default
-// $lime : #cddc39 !default
-// $lime-1 : #f9fbe7 !default
-// $lime-2 : #f0f4c3 !default
-// $lime-3 : #e6ee9c !default
-// $lime-4 : #dce775 !default
-// $lime-5 : #d4e157 !default
-// $lime-6 : #cddc39 !default
-// $lime-7 : #c0ca33 !default
-// $lime-8 : #afb42b !default
-// $lime-9 : #9e9d24 !default
-// $lime-10 : #827717 !default
-// $lime-11 : #f4ff81 !default
-// $lime-12 : #eeff41 !default
-// $lime-13 : #c6ff00 !default
-// $lime-14 : #aeea00 !default
-// $yellow : #ffeb3b !default
-// $yellow-1 : #fffde7 !default
-// $yellow-2 : #fff9c4 !default
-// $yellow-3 : #fff59d !default
-// $yellow-4 : #fff176 !default
-// $yellow-5 : #ffee58 !default
-// $yellow-6 : #ffeb3b !default
-// $yellow-7 : #fdd835 !default
-// $yellow-8 : #fbc02d !default
-// $yellow-9 : #f9a825 !default
-// $yellow-10 : #f57f17 !default
-// $yellow-11 : #ffff8d !default
-// $yellow-12 : #ffff00 !default
-// $yellow-13 : #ffea00 !default
-// $yellow-14 : #ffd600 !default
-// $amber : #ffc107 !default
-// $amber-1 : #fff8e1 !default
-// $amber-2 : #ffecb3 !default
-// $amber-3 : #ffe082 !default
-// $amber-4 : #ffd54f !default
-// $amber-5 : #ffca28 !default
-// $amber-6 : #ffc107 !default
-// $amber-7 : #ffb300 !default
-// $amber-8 : #ffa000 !default
-// $amber-9 : #ff8f00 !default
-// $amber-10 : #ff6f00 !default
-// $amber-11 : #ffe57f !default
-// $amber-12 : #ffd740 !default
-// $amber-13 : #ffc400 !default
-// $amber-14 : #ffab00 !default
-// $orange : #ff9800 !default
-// $orange-1 : #fff3e0 !default
-// $orange-2 : #ffe0b2 !default
-// $orange-3 : #ffcc80 !default
-// $orange-4 : #ffb74d !default
-// $orange-5 : #ffa726 !default
-// $orange-6 : #ff9800 !default
-// $orange-7 : #fb8c00 !default
-// $orange-8 : #f57c00 !default
-// $orange-9 : #ef6c00 !default
-// $orange-10 : #e65100 !default
-// $orange-11 : #ffd180 !default
-// $orange-12 : #ffab40 !default
-// $orange-13 : #ff9100 !default
-// $orange-14 : #ff6d00 !default
-// $deep-orange : #ff5722 !default
-// $deep-orange-1 : #fbe9e7 !default
-// $deep-orange-2 : #ffccbc !default
-// $deep-orange-3 : #ffab91 !default
-// $deep-orange-4 : #ff8a65 !default
-// $deep-orange-5 : #ff7043 !default
-// $deep-orange-6 : #ff5722 !default
-// $deep-orange-7 : #f4511e !default
-// $deep-orange-8 : #e64a19 !default
-// $deep-orange-9 : #d84315 !default
-// $deep-orange-10 : #bf360c !default
-// $deep-orange-11 : #ff9e80 !default
-// $deep-orange-12 : #ff6e40 !default
-// $deep-orange-13 : #ff3d00 !default
-// $deep-orange-14 : #dd2c00 !default
-// $brown : #795548 !default
-// $brown-1 : #efebe9 !default
-// $brown-2 : #d7ccc8 !default
-// $brown-3 : #bcaaa4 !default
-// $brown-4 : #a1887f !default
-// $brown-5 : #8d6e63 !default
-// $brown-6 : #795548 !default
-// $brown-7 : #6d4c41 !default
-// $brown-8 : #5d4037 !default
-// $brown-9 : #4e342e !default
-// $brown-10 : #3e2723 !default
-// $brown-11 : #d7ccc8 !default
-// $brown-12 : #bcaaa4 !default
-// $brown-13 : #8d6e63 !default
-// $brown-14 : #5d4037 !default
-// $grey : #9e9e9e !default
-// $grey-1 : #fafafa !default
-// $grey-2 : #f5f5f5 !default
-// $grey-3 : #eeeeee !default
-// $grey-4 : #e0e0e0 !default
-// $grey-5 : #bdbdbd !default
-// $grey-6 : #9e9e9e !default
-// $grey-7 : #757575 !default
-// $grey-8 : #616161 !default
-// $grey-9 : #424242 !default
-// $grey-10 : #212121 !default
-// $grey-11 : #f5f5f5 !default
-// $grey-12 : #eeeeee !default
-// $grey-13 : #bdbdbd !default
-// $grey-14 : #616161 !default
-// $blue-grey : #607d8b !default
-// $blue-grey-1 : #eceff1 !default
-// $blue-grey-2 : #cfd8dc !default
-// $blue-grey-3 : #b0bec5 !default
-// $blue-grey-4 : #90a4ae !default
-// $blue-grey-5 : #78909c !default
-// $blue-grey-6 : #607d8b !default
-// $blue-grey-7 : #546e7a !default
-// $blue-grey-8 : #455a64 !default
-// $blue-grey-9 : #37474f !default
-// $blue-grey-10 : #263238 !default
-// $blue-grey-11 : #cfd8dc !default
-// $blue-grey-12 : #b0bec5 !default
-// $blue-grey-13 : #78909c !default
-// $blue-grey-14 : #455a64 !default
+@function shade($c, $n)
+  @if($n <= 7)
+    @return lighten($c, (7 - $n) / 7 * (100 - lightness($c)))
+  @else
+    @return darken($c, ($n - 7) / 8 * lightness($c))
+
+$red : #e44e55
+$pink : #e252a6
+$purple : #915adf
+$deep-purple : #5c44d4
+$indigo : #3d60d3
+$blue: #48a6fd
+$light-blue : #73c5ff
+$cyan : #56c6d4
+$teal : #33bbad
+$green : #6ece50
+$light-green : #a2ee5b
+$lime : #c4e043
+$yellow : #e4e151
+$amber : #e9c65e
+$orange : #d9871b
+$deep-orange : #dd6a3c
+$brown : #795548
+$grey : #7f8b94
+$blue-grey : #558299
+
+$primary   : shade($blue, 6)
+$secondary : shade($cyan, 9)
+$accent    : shade($amber, 6)
+
+// used by dark mode
+$dark-page : hsl(211,20,10)
+$dark      : hsl(215,20,18)
+
+.bg-dark
+  background: $dark !important
+
+.q-dark
+  background: $dark !important
+
+$positive  : shade($green, 6)
+$negative  : shade($red, 6)
+$warning:  shade($orange,6)
+$info      : shade($light-blue, 6)
+
+$red-1: shade($red, 1) !default
+$red-2: shade($red, 2) !default
+$red-3: shade($red, 3) !default
+$red-4: shade($red, 4) !default
+$red-5: shade($red, 5) !default
+$red-6: shade($red, 6) !default
+$red-7: shade($red, 7) !default
+$red-8: shade($red, 8) !default
+$red-9: shade($red, 9) !default
+$red-10: shade($red, 10) !default
+$red-11: shade($red, 11) !default
+$red-12: shade($red, 12) !default
+$red-13: shade($red, 13) !default
+$red-14: shade($red, 14) !default
+
+$pink-1: shade(pink, 1) !default
+$pink-2: shade($pink, 2) !default
+$pink-3: shade($pink, 3) !default
+$pink-4: shade($pink, 4) !default
+$pink-5: shade($pink, 5) !default
+$pink-6: shade($pink, 6) !default
+$pink-7: shade($pink, 7) !default
+$pink-8: shade($pink, 8) !default
+$pink-9: shade($pink, 9) !default
+$pink-10: shade($pink, 10) !default
+$pink-11: shade($pink, 11) !default
+$pink-12: shade($pink, 12) !default
+$pink-13: shade($pink, 13) !default
+$pink-14: shade($pink, 14) !default
+
+$purple-1: shade($purple, 1) !default
+$purple-2: shade($purple, 2) !default
+$purple-3: shade($purple, 3) !default
+$purple-4: shade($purple, 4) !default
+$purple-5: shade($purple, 5) !default
+$purple-6: shade($purple, 6) !default
+$purple-7: shade($purple, 7) !default
+$purple-8: shade($purple, 8) !default
+$purple-9: shade($purple, 9) !default
+$purple-10: shade($purple, 10) !default
+$purple-11: shade($purple, 11) !default
+$purple-12: shade($purple, 12) !default
+$purple-13: shade($purple, 13) !default
+$purple-14: shade($purple, 14) !default
+
+$deep-purple-1: shade($deep-purple, 1) !default
+$deep-purple-2: shade($deep-purple, 2) !default
+$deep-purple-3: shade($deep-purple, 3) !default
+$deep-purple-4: shade($deep-purple, 4) !default
+$deep-purple-5: shade($deep-purple, 5) !default
+$deep-purple-6: shade($deep-purple, 6) !default
+$deep-purple-7: shade($deep-purple, 7) !default
+$deep-purple-8: shade($deep-purple, 8) !default
+$deep-purple-9: shade($deep-purple, 9) !default
+$deep-purple-10: shade($deep-purple, 10) !default
+$deep-purple-11: shade($deep-purple, 11) !default
+$deep-purple-12: shade($deep-purple, 12) !default
+$deep-purple-13: shade($deep-purple, 13) !default
+$deep-purple-14: shade($deep-purple, 14) !default
+
+$indigo-1: shade($indigo, 1) !default
+$indigo-2: shade($indigo, 2) !default
+$indigo-3: shade($indigo, 3) !default
+$indigo-4: shade($indigo, 4) !default
+$indigo-5: shade($indigo, 5) !default
+$indigo-6: shade($indigo, 6) !default
+$indigo-7: shade($indigo, 7) !default
+$indigo-8: shade($indigo, 8) !default
+$indigo-9: shade($indigo, 9) !default
+$indigo-10: shade($indigo, 10) !default
+$indigo-11: shade($indigo, 11) !default
+$indigo-12: shade($indigo, 12) !default
+$indigo-13: shade($indigo, 13) !default
+$indigo-14: shade($indigo, 14) !default
+
+$blue-1: shade($blue, 1) !default
+$blue-2: shade($blue, 2) !default
+$blue-3: shade($blue, 3) !default
+$blue-4: shade($blue, 4) !default
+$blue-5: shade($blue, 5) !default
+$blue-6: shade($blue, 6) !default
+$blue-7: shade($blue, 7) !default
+$blue-8: shade($blue, 8) !default
+$blue-9: shade($blue, 9) !default
+$blue-10: shade($blue, 10) !default
+$blue-11: shade($blue, 11) !default
+$blue-12: shade($blue, 12) !default
+$blue-13: shade($blue, 13) !default
+$blue-14: shade($blue, 14) !default
+
+$light-blue-1: shade($light-blue, 1) !default
+$light-blue-2: shade($light-blue, 2) !default
+$light-blue-3: shade($light-blue, 3) !default
+$light-blue-4: shade($light-blue, 4) !default
+$light-blue-5: shade($light-blue, 5) !default
+$light-blue-6: shade($light-blue, 6) !default
+$light-blue-7: shade($light-blue, 7) !default
+$light-blue-8: shade($light-blue, 8) !default
+$light-blue-9: shade($light-blue, 9) !default
+$light-blue-10: shade($light-blue, 10) !default
+$light-blue-11: shade($light-blue, 11) !default
+$light-blue-12: shade($light-blue, 12) !default
+$light-blue-13: shade($light-blue, 13) !default
+$light-blue-14: shade($light-blue, 14) !default
+
+$cyan-1: shade($cyan, 1) !default
+$cyan-2: shade($cyan, 2) !default
+$cyan-3: shade($cyan, 3) !default
+$cyan-4: shade($cyan, 4) !default
+$cyan-5: shade($cyan, 5) !default
+$cyan-6: shade($cyan, 6) !default
+$cyan-7: shade($cyan, 7) !default
+$cyan-8: shade($cyan, 8) !default
+$cyan-9: shade($cyan, 9) !default
+$cyan-10: shade($cyan, 10) !default
+$cyan-11: shade($cyan, 11) !default
+$cyan-12: shade($cyan, 12) !default
+$cyan-13: shade($cyan, 13) !default
+$cyan-14: shade($cyan, 14) !default
+
+$teal-1: shade($teal, 1) !default
+$teal-2: shade($teal, 2) !default
+$teal-3: shade($teal, 3) !default
+$teal-4: shade($teal, 4) !default
+$teal-5: shade($teal, 5) !default
+$teal-6: shade($teal, 6) !default
+$teal-7: shade($teal, 7) !default
+$teal-8: shade($teal, 8) !default
+$teal-9: shade($teal, 9) !default
+$teal-10: shade($teal, 10) !default
+$teal-11: shade($teal, 11) !default
+$teal-12: shade($teal, 12) !default
+$teal-13: shade($teal, 13) !default
+$teal-14: shade($teal, 14) !default
+
+$green-1: shade($green, 1) !default
+$green-2: shade($green, 2) !default
+$green-3: shade($green, 3) !default
+$green-4: shade($green, 4) !default
+$green-5: shade($green, 5) !default
+$green-6: shade($green, 6) !default
+$green-7: shade($green, 7) !default
+$green-8: shade($green, 8) !default
+$green-9: shade($green, 9) !default
+$green-10: shade($green, 10) !default
+$green-11: shade($green, 11) !default
+$green-12: shade($green, 12) !default
+$green-13: shade($green, 13) !default
+$green-14: shade($green, 14) !default
+
+$light-green-1: shade($light-green, 1) !default
+$light-green-2: shade($light-green, 2) !default
+$light-green-3: shade($light-green, 3) !default
+$light-green-4: shade($light-green, 4) !default
+$light-green-5: shade($light-green, 5) !default
+$light-green-6: shade($light-green, 6) !default
+$light-green-7: shade($light-green, 7) !default
+$light-green-8: shade($light-green, 8) !default
+$light-green-9: shade($light-green, 9) !default
+$light-green-10: shade($light-green, 10) !default
+$light-green-11: shade($light-green, 11) !default
+$light-green-12: shade($light-green, 12) !default
+$light-green-13: shade($light-green, 13) !default
+$light-green-14: shade($light-green, 14) !default
+
+$lime-1: shade($lime, 1) !default
+$lime-2: shade($lime, 2) !default
+$lime-3: shade($lime, 3) !default
+$lime-4: shade($lime, 4) !default
+$lime-5: shade($lime, 5) !default
+$lime-6: shade($lime, 6) !default
+$lime-7: shade($lime, 7) !default
+$lime-8: shade($lime, 8) !default
+$lime-9: shade($lime, 9) !default
+$lime-10: shade($lime, 10) !default
+$lime-11: shade($lime, 11) !default
+$lime-12: shade($lime, 12) !default
+$lime-13: shade($lime, 13) !default
+$lime-14: shade($lime, 14) !default
+
+$yellow-1: shade($yellow, 1) !default
+$yellow-2: shade($yellow, 2) !default
+$yellow-3: shade($yellow, 3) !default
+$yellow-4: shade($yellow, 4) !default
+$yellow-5: shade($yellow, 5) !default
+$yellow-6: shade($yellow, 6) !default
+$yellow-7: shade($yellow, 7) !default
+$yellow-8: shade($yellow, 8) !default
+$yellow-9: shade($yellow, 9) !default
+$yellow-10: shade($yellow, 10) !default
+$yellow-11: shade($yellow, 11) !default
+$yellow-12: shade($yellow, 12) !default
+$yellow-13: shade($yellow, 13) !default
+$yellow-14: shade($yellow, 14) !default
+
+$amber-1: shade($amber, 1) !default
+$amber-2: shade($amber, 2) !default
+$amber-3: shade($amber, 3) !default
+$amber-4: shade($amber, 4) !default
+$amber-5: shade($amber, 5) !default
+$amber-6: shade($amber, 6) !default
+$amber-7: shade($amber, 7) !default
+$amber-8: shade($amber, 8) !default
+$amber-9: shade($amber, 9) !default
+$amber-10: shade($amber, 10) !default
+$amber-11: shade($amber, 11) !default
+$amber-12: shade($amber, 12) !default
+$amber-13: shade($amber, 13) !default
+$amber-14: shade($amber, 14) !default
+
+$orange-1: shade($orange, 1) !default
+$orange-2: shade($orange, 2) !default
+$orange-3: shade($orange, 3) !default
+$orange-4: shade($orange, 4) !default
+$orange-5: shade($orange, 5) !default
+$orange-6: shade($orange, 6) !default
+$orange-7: shade($orange, 7) !default
+$orange-8: shade($orange, 8) !default
+$orange-9: shade($orange, 9) !default
+$orange-10: shade($orange, 10) !default
+$orange-11: shade($orange, 11) !default
+$orange-12: shade($orange, 12) !default
+$orange-13: shade($orange, 13) !default
+$orange-14: shade($orange, 14) !default
+
+$deep-orange-1: shade($deep-orange, 1) !default
+$deep-orange-2: shade($deep-orange, 2) !default
+$deep-orange-3: shade($deep-orange, 3) !default
+$deep-orange-4: shade($deep-orange, 4) !default
+$deep-orange-5: shade($deep-orange, 5) !default
+$deep-orange-6: shade($deep-orange, 6) !default
+$deep-orange-7: shade($deep-orange, 7) !default
+$deep-orange-8: shade($deep-orange, 8) !default
+$deep-orange-9: shade($deep-orange, 9) !default
+$deep-orange-10: shade($deep-orange, 10) !default
+$deep-orange-11: shade($deep-orange, 11) !default
+$deep-orange-12: shade($deep-orange, 12) !default
+$deep-orange-13: shade($deep-orange, 13) !default
+$deep-orange-14: shade($deep-orange, 14) !default
+
+$brown-1: shade($brown, 1) !default
+$brown-2: shade($brown, 2) !default
+$brown-3: shade($brown, 3) !default
+$brown-4: shade($brown, 4) !default
+$brown-5: shade($brown, 5) !default
+$brown-6: shade($brown, 6) !default
+$brown-7: shade($brown, 7) !default
+$brown-8: shade($brown, 8) !default
+$brown-9: shade($brown, 9) !default
+$brown-10: shade($brown, 10) !default
+$brown-11: shade($brown, 11) !default
+$brown-12: shade($brown, 12) !default
+$brown-13: shade($brown, 13) !default
+$brown-14: shade($brown, 14) !default
+
+$grey-1: shade($grey, 1) !default
+$grey-2: shade($grey, 2) !default
+$grey-3: shade($grey, 3) !default
+$grey-4: shade($grey, 4) !default
+$grey-5: shade($grey, 5) !default
+$grey-6: shade($grey, 6) !default
+$grey-7: shade($grey, 7) !default
+$grey-8: shade($grey, 8) !default
+$grey-9: shade($grey, 9) !default
+$grey-10: shade($grey, 10) !default
+$grey-11: shade($grey, 11) !default
+$grey-12: shade($grey, 12) !default
+$grey-13: shade($grey, 13) !default
+$grey-14: shade($grey, 14) !default
+
+$blue-grey-1: shade($blue-grey, 1) !default
+$blue-grey-2: shade($blue-grey, 2) !default
+$blue-grey-3: shade($blue-grey, 3) !default
+$blue-grey-4: shade($blue-grey, 4) !default
+$blue-grey-5: shade($blue-grey, 5) !default
+$blue-grey-6: shade($blue-grey, 6) !default
+$blue-grey-7: shade($blue-grey, 7) !default
+$blue-grey-8: shade($blue-grey, 8) !default
+$blue-grey-9: shade($blue-grey, 9) !default
+$blue-grey-10: shade($blue-grey, 10) !default
+$blue-grey-11: shade($blue-grey, 11) !default
+$blue-grey-12: shade($blue-grey, 12) !default
+$blue-grey-13: shade($blue-grey, 13) !default
+$blue-grey-14: shade($blue-grey, 14) !default
 
 // $ios-statusbar-height : 20px !default
 

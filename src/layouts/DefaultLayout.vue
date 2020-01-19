@@ -84,6 +84,13 @@ export default class DefaultLayout extends Vue {
             </q-list>
           </q-btn-dropdown>
         </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn flat text-color="white" icon="mdi-format-paint" to="/styles">
+            <q-tooltip>
+              Theming
+            </q-tooltip>
+          </q-btn>
+        </q-item-section>
       </q-item>
     </q-drawer>
 
