@@ -1039,7 +1039,7 @@ export default class BuilderEditor extends Vue {
 .resume-message {
   border-radius: 40px;
   border: 2px solid silver;
-  background: $dark_bright;
+  // background: $dark_bright;
 }
 
 .fade-enter-active {
