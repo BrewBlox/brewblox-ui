@@ -34,16 +34,19 @@ export default class SensorDisplay extends PartBase {
 
 <template>
   <g>
-    <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
-      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
-      <div v-else class="text-white text-bold text-center">
-        <q-icon name="mdi-thermometer" />
-        <small>{{ tempUnit }}</small>
-        <br>
-        {{ temperature | round(1) }}
-      </div>
-    </foreignObject>
+    <SvgEmbedded :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
+      <BrokenIcon v-if="isBroken" />
+      <UnlinkedIcon v-else-if="!block" />
+      <template v-else>
+        <div class="col row q-pt-xs">
+          <q-icon name="mdi-thermometer" size="20px" />
+          <small>{{ tempUnit }}</small>
+        </div>
+        <div class="col text-bold text-center">
+          {{ temperature | round(1) }}
+        </div>
+      </template>
+    </SvgEmbedded>
     <g class="outline">
       <rect
         :width="squares(1)-2"

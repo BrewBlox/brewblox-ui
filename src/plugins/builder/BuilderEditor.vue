@@ -58,7 +58,7 @@ export default class BuilderEditor extends Vue {
   history: string[] = [];
   undoneHistory: string[] = [];
 
-  drawerOpen = !this.dense;
+  drawerOpen = !this.$dense;
   menuDialogOpen = false;
   focusWarning = true;
 
@@ -92,12 +92,20 @@ export default class BuilderEditor extends Vue {
     this.debouncedCalculate();
   }
 
+  @Watch('layout.title', { immediate: true })
+  watchTitle(newV: string): void {
+    document.title = `Brewblox | ${newV ?? 'Builder editor'}`;
+  }
+
   created(): void {
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
 
   async mounted(): Promise<void> {
+    if (this.routeId) {
+      builderStore.commitLastLayoutId(this.routeId);
+    }
     await this.$nextTick();
     this.setFocus();
   }
@@ -179,27 +187,20 @@ export default class BuilderEditor extends Vue {
     },
   ]
 
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
-
   get layouts(): BuilderLayout[] {
     return builderStore.layoutValues;
   }
 
-  get layoutId(): string | null {
-    return builderStore.activeLayoutId;
+  get routeId(): string | null {
+    return this.$route.params.id ?? null;
   }
 
-  set layoutId(val: string | null) {
-    builderStore.commitActiveLayoutId(val);
+  get lastId(): string | null {
+    return builderStore.lastLayoutId;
   }
 
   get layout(): BuilderLayout | null {
-    return builderStore.layoutById(
-      this.layoutId
-      ?? this.$route.params.id
-      ?? builderStore.layoutIds[0]);
+    return builderStore.layoutById(this.routeId ?? this.lastId ?? builderStore.layoutIds[0]);
   }
 
   get parts(): PersistentPart[] {
@@ -249,10 +250,8 @@ export default class BuilderEditor extends Vue {
     builderStore.commitEditorMode(tool.value);
   }
 
-  async selectLayout(id: string | null): Promise<void> {
-    this.layoutId = id;
-    await this.$nextTick();
-    this.setFocus();
+  selectLayout(id: string | null): void {
+    this.$router.replace(`/builder/${id ?? ''}`);
   }
 
   setFocus(): void {
@@ -274,7 +273,7 @@ export default class BuilderEditor extends Vue {
     } else {
       const id = uid();
       await builderStore.createLayout({ ...layout, id });
-      this.layoutId = id;
+      this.selectLayout(id);
     }
   }
 
@@ -718,7 +717,7 @@ export default class BuilderEditor extends Vue {
 <template>
   <q-layout
     ref="page"
-    view="lHh Lpr lFf"
+    view="hHh Lpr fFf"
     class="editor-page"
     tabindex="-1"
     @keyup.native="keyHandler"
@@ -731,7 +730,7 @@ export default class BuilderEditor extends Vue {
       <template #buttons>
         <div class="row">
           <q-btn-dropdown
-            :label="layout ? (dense ? '' : layout.title) : 'None'"
+            :label="layout ? ($dense ? '' : layout.title) : 'None'"
             flat
             no-caps
             icon="widgets"
@@ -763,9 +762,10 @@ export default class BuilderEditor extends Vue {
         <q-btn flat stretch icon="mdi-close-circle" size="md" @click="leaveEditor" />
       </template>
     </LayoutHeader>
+    <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="bg-dark column" elevated>
-      <Navigator active-section="builder" />
+      <SidebarNavigator active-section="builder" />
 
       <q-scroll-area
         v-if="!!layout"
@@ -894,7 +894,7 @@ export default class BuilderEditor extends Vue {
       />
     </q-dialog>
 
-    <q-page-container class="bg-dark">
+    <q-page-container class="bg-dark-bright">
       <q-page class="row no-wrap justify-center q-pa-md">
         <div class="col-auto column no-wrap">
           <div

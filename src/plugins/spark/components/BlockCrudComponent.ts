@@ -7,6 +7,7 @@ import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { GraphConfig } from '@/plugins/history/types';
@@ -153,11 +154,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
           return;
         }
         dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`,
-        });
+        notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`);
       });
   }
 

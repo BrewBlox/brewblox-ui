@@ -31,12 +31,17 @@ export default class DashboardPage extends Vue {
     this.widgetEditable = false;
   }
 
-  @Watch('dashboard')
-  onChangeDashboard(newDash, oldDash): void {
-    if (oldDash && !newDash) {
+  @Watch('dashboard', { immediate: true })
+  onChangeDashboard(newV: Dashboard, oldV: Dashboard): void {
+    if (!newV && oldV) {
       // Dashboard was removed
       this.$router.replace('/');
     }
+  }
+
+  @Watch('dashboard.title', { immediate: true })
+  watchTitle(newV: string): void {
+    document.title = `Brewblox | ${newV ?? 'Dashboard'}`;
   }
 
   get dashboardId(): string {
@@ -90,10 +95,6 @@ export default class DashboardPage extends Vue {
           };
         }
       });
-  }
-
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
   }
 
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
@@ -163,21 +164,19 @@ export default class DashboardPage extends Vue {
         {{ dashboard.title }}
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn-group v-if="!dense" flat>
-          <q-btn
-            flat
-            :class="{'selected-mode': widgetEditable}"
-            icon="mdi-arrow-all"
-            @click="widgetEditable = true"
-          />
-          <q-btn
-            flat
-            :class="{'selected-mode': !widgetEditable}"
-            icon="mdi-lock"
-            @click="widgetEditable = false"
-          />
-        </q-btn-group>
-        <ActionMenu>
+        <q-btn
+          v-if="!$dense"
+          unelevated
+          stretch
+          icon="mdi-arrow-all"
+          :color="widgetEditable ? 'primary' : ''"
+          @click="widgetEditable = !widgetEditable"
+        >
+          <q-tooltip v-if="!widgetEditable">
+            Rearrange widgets
+          </q-tooltip>
+        </q-btn>
+        <ActionMenu stretch>
           <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
             <q-item clickable @click="toggleDefaultDashboard">
@@ -194,7 +193,7 @@ export default class DashboardPage extends Vue {
           </template>
         </ActionMenu>
       </portal>
-      <div v-if="dense" class="column q-gutter-y-sm">
+      <div v-if="$dense" class="column q-gutter-y-sm">
         <div v-for="val in validatedWidgets" :key="val.id" class="col full-width">
           <component
             :is="val.component"

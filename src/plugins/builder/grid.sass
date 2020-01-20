@@ -1,5 +1,7 @@
 @import 'src/css/app.sass'
 
+$grid-line: rgba(255, 255, 255, 0.3)
+
 .grid-base
   width: 100%
   height: 100%
@@ -7,8 +9,7 @@
   background-position: 0 -1px, -1px 0
 
 .grid-editable
-  border: 1px solid $dark_bright
-  background-image: linear-gradient($dark_bright 1px,transparent 1px), linear-gradient(90deg,$dark_bright 1px,transparent 1px)
+  background-image: linear-gradient($grid-line 1px, transparent 1px), linear-gradient(90deg, $grid-line 1px, transparent 1px)
 
 .grid-square-text
   font-size: x-small

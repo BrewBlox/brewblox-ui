@@ -34,20 +34,15 @@ export default class Fridge extends PartBase {
       <line :x1="2" :y1="squares(sizeY-1)" :x2="squares(sizeX)-4" :y2="squares(sizeY-1)" />
       <!-- Shelf divider-->
       <line :x1="2" :y1="squares(shelfY)" :x2="squares(sizeX)-4" :y2="squares(shelfY)" />
-      <g>
-        <foreignObject
-          :transform="textTransformation([sizeX, sizeY], false)"
-          :width="squares(sizeX)"
-          :height="squares(sizeY)"
-        >
-          <div
-            class="text-white text-bold text-center q-mt-sm full-width"
-            style="font-size: 130%"
-          >
-            {{ titleText }}
-          </div>
-        </foreignObject>
-      </g>
     </g>
+    <SvgEmbedded
+      :transform="textTransformation([sizeX, sizeY], false)"
+      :width="squares(sizeX)"
+      :height="squares(sizeY)"
+    >
+      <div class="col-auto text-bold text-center q-pt-sm full-width" style="font-size: 130%">
+        {{ titleText }}
+      </div>
+    </SvgEmbedded>
   </g>
 </template>

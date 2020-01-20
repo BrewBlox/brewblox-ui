@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { suggestId } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { blockTypes } from '@/plugins/spark/block-types';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -33,17 +34,9 @@ export default class CreateMockMenu extends DialogBase {
     this.busy = true;
     try {
       await sparkStore.createBlock([this.serviceId, block]);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName(block.type)} '${block.id}'`,
-      });
+      notify.done(`Created ${featureStore.displayName(block.type)} '${block.id}'`);
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create Block: ${e.toString()}`,
-      });
+      notify.error(`Failed to create Block: ${e.toString()}`);
     }
     this.busy = false;
   }

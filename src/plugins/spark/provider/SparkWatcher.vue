@@ -3,6 +3,7 @@ import { Component, Watch } from 'vue-property-decorator';
 
 import WatcherBase from '@/components/WatcherBase';
 import { createDialog } from '@/helpers/dialog';
+import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { SystemStatus } from '../types';
@@ -97,9 +98,8 @@ export default class SparkWatcher extends WatcherBase {
     }
 
     this.notifiedUpdate = true;
-    this.$q.notify({
+    notify.info({
       timeout: 0,
-      color: 'info',
       icon: 'mdi-download-network',
       message: `Firmware update available for ${this.service.title}`,
       actions: [

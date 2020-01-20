@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { Service, serviceStore } from '@/store/services';
 
 
@@ -13,10 +14,6 @@ export default class ServiceIndex extends Vue {
 
   @Prop({ type: Boolean, required: true })
   public readonly value!: boolean;
-
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
 
   get editing(): boolean {
     return this.value;
@@ -71,11 +68,7 @@ export default class ServiceIndex extends Vue {
         }
 
         await serviceStore.saveService({ ...service, title: newTitle });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'edit',
-          message: `Renamed service '${oldTitle}' to '${newTitle}'`,
-        });
+        notify.done(`Renamed service '${oldTitle}' to '${newTitle}'`);
       });
   }
 }
@@ -116,7 +109,7 @@ export default class ServiceIndex extends Vue {
 
     <draggable
       v-model="services"
-      :disabled="dense || !editing"
+      :disabled="$dense || !editing"
       @start="dragging=true"
       @end="dragging=false"
     >

@@ -5,6 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { shortDateString } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { deepCopy } from '@/helpers/units/parseObject';
 
 import { historyStore } from '../store';
@@ -117,11 +118,7 @@ export default class SessionViewWidget extends WidgetBase<SessionViewConfig> {
         notes,
       });
     }
-    this.$q.notify({
-      icon: 'mdi-check-all',
-      color: 'positive',
-      message: `Migrated ${this.config.sessions.length} sessions`,
-    });
+    notify.done(`Migrated ${this.config.sessions.length} sessions`);
   }
 }
 </script>

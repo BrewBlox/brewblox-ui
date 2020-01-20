@@ -81,9 +81,9 @@ export default class ActuatorValve extends PartBase {
 
 <template>
   <g>
-    <foreignObject v-if="!block" :height="squares(1)" :width="squares(1)">
-      <q-icon name="mdi-link-variant-off" size="sm" class="absolute-right" style="height: 15px;" />
-    </foreignObject>
+    <SvgEmbedded v-if="!block" height="15" width="15">
+      <UnlinkedIcon size="15px" class="self-end" />
+    </SvgEmbedded>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]" />
       <path :d="paths.outerValve[1]" />

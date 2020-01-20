@@ -50,7 +50,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       ? 'widget-modal'
       : 'widget-dashboard';
 
-    if (this.$q.screen.lt.md) {
+    if (this.$dense) {
       yield 'widget-dense';
     }
 

@@ -32,6 +32,7 @@ module.exports = function (ctx) {
       'externals',
       'register',
       'plugins',
+      'dense',
     ],
 
     css: [
@@ -48,6 +49,7 @@ module.exports = function (ctx) {
 
     framework: {
       all: false,
+      iconSet: 'mdi-v4',
 
       components: [
         'QBadge',
@@ -66,6 +68,7 @@ module.exports = function (ctx) {
         'QDialog',
         'QExpansionItem',
         'QField',
+        'QFooter',
         'QIcon',
         'QInnerLoading',
         'QInput',

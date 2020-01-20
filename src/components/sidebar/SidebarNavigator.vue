@@ -6,21 +6,17 @@ import { createDialog } from '@/helpers/dialog';
 
 
 @Component
-export default class Navigator extends Vue {
+export default class SidebarNavigator extends Vue {
 
-  // env flag
+  // Set in quasar.conf
   automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
 
   @Prop({ type: String, required: false })
   public readonly activeSection!: string;
 
-  get dense(): boolean {
-    return this.$q.screen.lt.md;
-  }
-
   get editorDisabled(): boolean {
     const { ie, edge } = this.$q.platform.is;
-    return Boolean(ie || edge) || this.dense;
+    return Boolean(ie || edge) || this.$dense;
   }
 
   showWizard(): void {
@@ -41,7 +37,6 @@ export default class Navigator extends Vue {
 
 <template>
   <div class="col-auto">
-    <ActionItem icon="mdi-home" label="BrewBlox" to="/" exact />
     <q-separator />
 
     <div class="row wrap">

@@ -6,6 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { ruleChecker } from '@/helpers/functional';
 import { loadFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -74,18 +75,10 @@ export default class ImportWizard extends Vue {
         id: uid(),
         dashboard: this.chosenDashboardId,
       });
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName(this.widget.feature)} '${this.widget.title}'`,
-      });
+      notify.done(`Created ${featureStore.displayName(this.widget.feature)} '${this.widget.title}'`);
       this.$emit('close');
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create widget: ${e.toString()}`,
-      });
+      notify.error(`Failed to create widget: ${e.toString()}`);
     }
   }
 

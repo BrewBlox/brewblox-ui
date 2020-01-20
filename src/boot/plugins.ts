@@ -1,5 +1,5 @@
 import PortalVue from 'portal-vue';
-import { PluginObject } from 'vue';
+import { PluginObject, VueConstructor } from 'vue';
 
 import { externalComponent } from '@/helpers/component-ref';
 import { HOST } from '@/helpers/const';
@@ -33,12 +33,12 @@ const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> =>
   }
 };
 
-async function setup(Vue): Promise<void> {
+async function setup(Vue: VueConstructor): Promise<void> {
   // Make Vue accessible as global variable in plugins
   Object.defineProperty(window, 'Vue', { value: Vue });
 
   // Enable the Vue devtools performance tab
-  Vue.config.performance = process.env.DEV && process.env.BLOX_PERFORMANCE;
+  Vue.config.performance = Boolean(process.env.DEV && process.env.BLOX_PERFORMANCE);
 
   // Install the database. We need it to fetch remote plugins
   Vue.use(database, {
@@ -66,9 +66,9 @@ async function setup(Vue): Promise<void> {
 
     // Append '?safe' to the URL to disable installing remote plugins
     const url = new URL(window.location.href);
-    const arg = url.searchParams.get('safe');
+    const safeArg = url.searchParams.get('safe');
 
-    if (arg === null) {
+    if (safeArg === null) {
       plugins.push(...loaded);
     }
   } catch (e) { }

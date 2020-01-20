@@ -1,7 +1,7 @@
 import pick from 'lodash/pick';
-import { Notify } from 'quasar';
 
 import { del, get, post, put, sse } from '@/helpers/fetch';
+import notify from '@/helpers/notify';
 import { deserialize } from '@/helpers/units/parseObject';
 
 import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
@@ -15,11 +15,7 @@ const asBlock =
 const intercept =
   (message: string): ((e: Error) => never) =>
     (e: Error) => {
-      Notify.create({
-        color: 'warning',
-        icon: 'warning',
-        message: `${message}: ${e.message}`,
-      });
+      notify.warn(`${message}: ${e.message}`);
       throw e;
     };
 

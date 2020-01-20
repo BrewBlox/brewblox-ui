@@ -4,12 +4,13 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { clampRotation } from '@/helpers/functional';
 
-import { SQUARE_SIZE } from './getters';
+import { squares } from './helpers';
 import { builderStore } from './store';
 import { CardSpec, FlowPart, PartSpec } from './types';
 
 @Component
 export default class BuilderPartMenu extends Vue {
+  squares = squares;
 
   @Prop({ type: Object, required: true })
   readonly part!: FlowPart;
@@ -45,10 +46,6 @@ export default class BuilderPartMenu extends Vue {
       return 1;
     }
     return 2;
-  }
-
-  squares(val: number): number {
-    return SQUARE_SIZE * val;
   }
 }
 </script>

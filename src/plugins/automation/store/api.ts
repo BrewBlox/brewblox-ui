@@ -1,17 +1,12 @@
-import { Notify } from 'quasar';
-
 import { generate } from '@/helpers/database-api';
 import { get, post, sse } from '@/helpers/fetch';
+import notify from '@/helpers/notify';
 
 import { Process, Runtime } from '../types';
 
 const intercept = (message: string): (e: Error) => never =>
   (e: Error) => {
-    Notify.create({
-      color: 'warning',
-      icon: 'warning',
-      message: `${message}: ${e.message}`,
-    });
+    notify.warn(`${message}: ${e.message}`);
     throw e;
   };
 

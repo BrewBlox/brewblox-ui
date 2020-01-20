@@ -6,6 +6,7 @@ import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { durationString } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { targetBuilder, targetSplitter } from '@/plugins/history/nodes';
 
 import { sharedWidgetConfigs } from '../helpers';
@@ -44,7 +45,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
 
   startSession(session: Session, time: number): void {
     if (time && session.end && time > session.end) {
-      this.$q.notify({ message: 'Session start must be before its end' });
+      notify.warn('Session start must be before its end', { logged: false });
       return;
     }
     session.start = time;
@@ -54,7 +55,7 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
 
   endSession(session: Session, time: number): void {
     if (time && session.start && time < session.start) {
-      this.$q.notify({ message: 'Session end must be after its start' });
+      notify.warn('Session end must be after its start', { logged: false });
       return;
     }
     session.end = time;

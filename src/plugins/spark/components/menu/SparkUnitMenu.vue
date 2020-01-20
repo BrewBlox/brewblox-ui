@@ -3,6 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { spaceCased } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { prettify } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { UserUnits } from '@/plugins/spark/types';
@@ -26,11 +27,7 @@ export default class SparkUnitMenu extends DialogBase {
 
   saveUnits(vals: UserUnits = this.units): void {
     sparkStore.saveUnits([this.serviceId, vals])
-      .catch(reason => this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to change unit: ${reason}`,
-      }));
+      .catch(e => notify.error(`Failed to change unit: ${e.message}`));
   }
 
   mounted(): void {

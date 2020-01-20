@@ -6,6 +6,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud } from '@/plugins/spark/types';
@@ -125,18 +126,10 @@ export default class BlockWizard extends Vue {
     this.ensureLocalBlock();
     try {
       await sparkStore.createBlock([this.serviceId, this.block as Block]);
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName((this.block as Block).type)} Block '${this.blockId}'`,
-      });
+      notify.done(`Created ${featureStore.displayName((this.block as Block).type)} Block '${this.blockId}'`);
       this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create Block: ${e.toString()}`,
-      });
+      notify.error(`Failed to create Block: ${e.toString()}`);
     }
     this.close();
   }
