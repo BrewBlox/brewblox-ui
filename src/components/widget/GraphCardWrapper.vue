@@ -15,22 +15,17 @@ export default class GraphCardWrapper extends Vue {
   created(): void {
     this.collapsed = !this.showInitial;
   }
-
-  get buttonParentClass(): string[] {
-    const vals = ['col', 'column', 'justify-center'];
-    return this.collapsed ? [...vals, 'offside'] : vals;
-  }
 }
 </script>
 
 <template>
-  <q-card v-if="!show" class="passthrough-card column">
+  <div v-if="!show" class="passthrough-card column">
     <slot />
-  </q-card>
-  <q-card v-else class="row wrapper-card">
+  </div>
+  <div v-else class="row wrapper-card">
     <slot />
     <template v-if="$q.screen.gt.md">
-      <div :class="buttonParentClass" style="min-height: 100%">
+      <div class="col column justify-center" style="min-height: 100%">
         <q-btn
           v-if="collapsed"
           key="show-button"
@@ -60,21 +55,15 @@ export default class GraphCardWrapper extends Vue {
         </q-card>
       </div>
     </template>
-  </q-card>
+  </div>
 </template>
 
 <style scoped>
-.offside {
-  position: absolute;
-  top: 0px;
-  left: 100%;
-  height: 100%;
-}
-
 .passthrough-card {
   padding: 0;
   margin: 0;
   max-width: 100%;
+  min-height: 100%;
 }
 
 .wrapper-card {

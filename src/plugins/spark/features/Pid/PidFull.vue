@@ -74,17 +74,16 @@ export default class PidFull
     <slot name="toolbar" />
     <slot name="warnings" />
 
-    <q-card-section>
+    <q-card-section class="q-pa-sm col column justify-around">
       <BlockEnableToggle
         :crud="crud"
         :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to output of PID.`"
         :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
         class="full-width bordered"
       />
-      <q-separator inset />
 
       <!-- Input row -->
-      <q-item class="items-end">
+      <q-item class="items-center">
         <q-item-section>
           <BlockField
             :value="block.data.inputId"
@@ -129,7 +128,6 @@ export default class PidFull
           <q-btn v-else disable flat icon="mdi-launch" />
         </q-item-section>
       </q-item>
-      <q-separator inset />
 
       <!-- Output row -->
       <q-item class="items-end">
@@ -171,7 +169,6 @@ export default class PidFull
           <q-btn v-else disable flat icon="mdi-launch" />
         </q-item-section>
       </q-item>
-      <q-separator inset />
 
       <!-- Boil mode settings -->
       <q-item>
@@ -204,8 +201,6 @@ export default class PidFull
           />
         </q-item-section>
       </q-item>
-      <q-separator inset />
-
 
       <div class="grid-container q-mx-md q-mt-md q-item--dark">
         <div class="span-2">
