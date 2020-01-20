@@ -24,6 +24,10 @@ export default class StyleGuide extends Vue {
       'brown',
       'grey',
       'blue-grey'];
+
+  created() {
+    document.title = 'Brewblox | Style Guide';
+  }
 }
 </script>
 

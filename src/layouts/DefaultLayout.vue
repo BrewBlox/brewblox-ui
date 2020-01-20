@@ -23,6 +23,10 @@ export default class DefaultLayout extends Vue {
     return process.env.BLOX_DATE || 'UNKNOWN';
   }
 
+  get devMode() {
+    return process.env.DEV;
+  }
+
   showWizard(): void {
     createDialog({
       parent: this,
@@ -41,6 +45,7 @@ export default class DefaultLayout extends Vue {
     this.dashboardEditing = false;
     this.serviceEditing = false;
   }
+
 }
 </script>
 
@@ -84,7 +89,7 @@ export default class DefaultLayout extends Vue {
             </q-list>
           </q-btn-dropdown>
         </q-item-section>
-        <q-item-section class="col-auto">
+        <q-item-section v-if="devMode" class="col-auto">
           <q-btn flat text-color="white" icon="mdi-format-paint" to="/styles">
             <q-tooltip>
               Theming
