@@ -34,6 +34,7 @@ export default class StoreWidgetDialog extends DialogBase {
     return {
       container: 'Dialog',
       mode: this.mode,
+      size: 'Fixed',
     };
   }
 
