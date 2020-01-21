@@ -51,6 +51,7 @@ export default class SparkPage extends Vue {
   context: WidgetContext = {
     mode: 'Basic',
     container: 'Dashboard',
+    size: 'Content',
   };
 
   @Prop({ type: String, required: true })

@@ -12,11 +12,10 @@ export default class DS2413Full
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
-
     <IoArray :crud="crud" />
+
     <q-separator inset />
 
     <q-card-section>
@@ -35,5 +34,5 @@ export default class DS2413Full
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

@@ -193,8 +193,7 @@ export default class SetpointProfileFull
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings">
       <BlockEnableToggle
         v-if="block.data.targetId.id !== null"
@@ -203,6 +202,7 @@ export default class SetpointProfileFull
         :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
       />
     </slot>
+
     <q-card-section>
       <q-separator v-if="block.data.targetId.id !== null" />
       <q-item class="q-py-md">
@@ -229,7 +229,6 @@ export default class SetpointProfileFull
         </q-item-section>
       </q-item>
       <q-separator />
-
 
       <div class="q-mx-sm q-mt-md">
         <div
@@ -286,7 +285,7 @@ export default class SetpointProfileFull
         </div>
       </div>
     </q-card-section>
-  </q-card>
+  </div>
 </template>
 
 <style scoped>

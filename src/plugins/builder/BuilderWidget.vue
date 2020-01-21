@@ -79,29 +79,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     return Boolean(this.$dense || ie || edge);
   }
 
-  public *cardClassGenerator(): Generator<string, void, undefined> {
-    yield* ['column', 'no-wrap'];
-    yield* this.inDialog
-      ? ['widget-modal']
-      : ['widget-dashboard', 'overflow-unset'];
-    if (this.$dense) {
-      yield 'widget-dense';
-    }
-  }
-
-  get builderCardStyle(): Mapped<string> {
-    if (!this.inDialog) {
-      return {};
-    }
-    const toolbarSpace = 50; // not an exact science
-    return {
-      height: `${this.gridHeight + toolbarSpace}px`,
-      maxHeight: this.$dense ? '100vh' : '90vh',
-      width: `${this.gridWidth}px`,
-      maxWidth: this.$dense ? '100vw' : '95vw',
-    };
-  }
-
   startEditor(): void {
     if (!this.editorDisabled) {
       this.$router.push(`/builder/${this.layout?.id ?? ''}`);
@@ -198,60 +175,62 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 </script>
 
 <template>
-  <q-card :class="cardClass" :style="builderCardStyle">
-    <component :is="toolbarComponent" :crud="crud">
-      <ActionMenu icon="mdi-format-list-bulleted" :stretch="inDialog">
-        <template #menus>
-          <q-list>
-            <q-select
-              :value="layout"
-              :options="allLayouts"
-              label="Active layout"
-              item-aligned
-              option-label="title"
-              option-value="id"
-              @input="v => showLayout(v)"
-            >
-              <template #option="scope">
-                <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-                  <q-item-section>{{ scope.opt.title }}</q-item-section>
-                  <q-item-section class="col-auto">
-                    <q-btn
-                      v-if="isActive(scope.opt)"
-                      flat
-                      round
-                      icon="mdi-star"
-                      color="amber"
-                      @click.stop="selectLayout(scope.opt, false)"
-                    />
-                    <q-btn
-                      v-else
-                      flat
-                      round
-                      icon="mdi-star-outline"
-                      @click.stop="selectLayout(scope.opt, true)"
-                    />
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-            <ActionItem
-              v-for="v in layouts"
-              :key="v.id"
-              :label="v.title"
-              :active="layout && layout.id === v.id"
-              no-close
-              @click="showLayout(v)"
-            />
-          </q-list>
+  <CardWrapper no-scroll v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud">
+        <ActionMenu icon="mdi-format-list-bulleted" :stretch="inDialog">
+          <template #menus>
+            <q-list>
+              <q-select
+                :value="layout"
+                :options="allLayouts"
+                label="Active layout"
+                item-aligned
+                option-label="title"
+                option-value="id"
+                @input="v => showLayout(v)"
+              >
+                <template #option="scope">
+                  <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+                    <q-item-section>{{ scope.opt.title }}</q-item-section>
+                    <q-item-section class="col-auto">
+                      <q-btn
+                        v-if="isActive(scope.opt)"
+                        flat
+                        round
+                        icon="mdi-star"
+                        color="amber"
+                        @click.stop="selectLayout(scope.opt, false)"
+                      />
+                      <q-btn
+                        v-else
+                        flat
+                        round
+                        icon="mdi-star-outline"
+                        @click.stop="selectLayout(scope.opt, true)"
+                      />
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+              <ActionItem
+                v-for="v in layouts"
+                :key="v.id"
+                :label="v.title"
+                :active="layout && layout.id === v.id"
+                no-close
+                @click="showLayout(v)"
+              />
+            </q-list>
+          </template>
+        </ActionMenu>
+        <template #actions>
+          <ActionItem v-if="!editorDisabled" icon="mdi-tools" label="Edit layout" @click="startEditor" />
         </template>
-      </ActionMenu>
-      <template #actions>
-        <ActionItem v-if="!editorDisabled" icon="mdi-tools" label="Edit layout" @click="startEditor" />
-      </template>
-    </component>
+      </component>
+    </template>
 
-    <div class="col" @dblclick="startEditor">
+    <div class="fit" @dblclick="startEditor">
       <span v-if="parts.length === 0" class="absolute-center">
         {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
       </span>
@@ -268,7 +247,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
         </g>
       </svg>
     </div>
-  </q-card>
+  </CardWrapper>
 </template>
 
 <style lang="sass" scoped>

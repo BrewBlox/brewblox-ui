@@ -12,8 +12,10 @@ export default class Spark2PinsWidget
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <component :is="toolbarComponent" :crud="crud" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" />
+    </template>
     <IoArray :crud="crud" />
-  </q-card>
+  </CardWrapper>
 </template>

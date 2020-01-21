@@ -92,7 +92,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
 </script>
 
 <template>
-  <WizardCard>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -222,5 +222,5 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </template>
-  </WizardCard>
+  </WizardBody>
 </template>

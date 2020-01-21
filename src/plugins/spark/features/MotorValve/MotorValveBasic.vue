@@ -17,8 +17,7 @@ export default class MotorValveBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings">
       <q-card-section>
         <q-item class="items-start">
@@ -49,5 +48,5 @@ export default class MotorValveBasic
         </q-item>
       </q-card-section>
     </slot>
-  </q-card>
+  </div>
 </template>

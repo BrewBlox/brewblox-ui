@@ -44,19 +44,6 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     this.regraph();
   }
 
-  // Overrides WidgetBase
-  *cardClassGenerator(): Generator<string, void, undefined> {
-    yield this.inDialog
-      ? 'widget-modal'
-      : 'widget-dashboard';
-
-    if (this.$dense) {
-      yield 'widget-dense';
-    }
-
-    yield 'column maximized';
-  }
-
   get presets(): QueryParams[] {
     return defaultPresets();
   }
@@ -110,8 +97,8 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       {
         props: {
           flat: true,
+          stretch: true,
           autoClose: true,
-          label: 'presets',
           icon: 'mdi-timelapse',
         },
       },
@@ -154,7 +141,12 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
 </script>
 
 <template>
-  <GraphCardWrapper show-initial :show="inDialog && mode === 'Full'">
+  <GraphCardWrapper
+    show-initial
+    :show="inDialog && mode === 'Full'"
+    :no-scroll="mode === 'Basic'"
+    v-bind="{context}"
+  >
     <template #graph>
       <HistoryGraph
         ref="wrapperGraph"
@@ -164,7 +156,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       />
     </template>
 
-    <q-card :class="cardClass">
+    <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
@@ -190,29 +182,24 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
           </ActionSubmenu>
         </template>
       </component>
+    </template>
 
-      <template v-if="mode === 'Basic'">
-        <div class="col">
-          <q-resize-observer :debounce="200" @resize="refresh" />
-          <HistoryGraph
-            ref="widgetGraph"
-            :graph-id="widgetGraphId"
-            :config="config"
-            @downsample="v => downsampling = v"
-          />
-        </div>
-      </template>
-      <template v-else>
-        <q-scroll-area class="col">
-          <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
-        </q-scroll-area>
-      </template>
-    </q-card>
+    <div v-if="mode === 'Basic'" class="fit">
+      <q-resize-observer :debounce="200" @resize="refresh" />
+      <HistoryGraph
+        ref="widgetGraph"
+        :graph-id="widgetGraphId"
+        :config="config"
+        @downsample="v => downsampling = v"
+      />
+    </div>
+    <div v-else>
+      <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
+    </div>
   </GraphCardWrapper>
 </template>
 
-<style scoped>
-.widget-dashboard.widget-dense {
-  height: 100vh;
-}
+<style lang="sass" scoped>
+.card__Dashboard.card__dense
+  height: 100vh !important
 </style>

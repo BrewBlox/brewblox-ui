@@ -19,7 +19,7 @@ export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
 </script>
 
 <template>
-  <WizardCard>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <big>About your new fermentation dashboard</big>
@@ -74,5 +74,5 @@ export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
         </q-tooltip>
       </q-btn>
     </template>
-  </WizardCard>
+  </WizardBody>
 </template>

@@ -164,8 +164,7 @@ export default class QuickActionsBasic extends CrudComponent {
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
 
     <q-card-section>
@@ -222,5 +221,5 @@ export default class QuickActionsBasic extends CrudComponent {
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

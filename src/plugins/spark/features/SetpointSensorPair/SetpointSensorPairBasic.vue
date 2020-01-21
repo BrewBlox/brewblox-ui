@@ -12,8 +12,7 @@ export default class SetpointSensorPairBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
 
     <q-card-section>
@@ -48,5 +47,5 @@ export default class SetpointSensorPairBasic
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

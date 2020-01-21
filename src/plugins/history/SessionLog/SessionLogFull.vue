@@ -170,10 +170,8 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
 
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
-    <slot name="graph" />
 
     <q-card-section v-if="session !== null">
       <q-list>
@@ -258,7 +256,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
         <q-btn outline label="New session" @click="addSession" />
       </div>
     </q-card-section>
-  </q-card>
+  </div>
 </template>
 
 <style scoped>

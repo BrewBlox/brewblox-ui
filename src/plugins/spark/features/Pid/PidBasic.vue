@@ -48,12 +48,11 @@ export default class PidBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <!-- <slot name="warnings" /> -->
 
-    <q-card-section class="q-pa-sm col column justify-around">
-      <q-item class="items-center col">
+    <q-card-section class="q-pa-sm col column">
+      <q-item class="items-center col-auto">
         <q-item-section>
           <UnitField
             v-if="!!inputBlock"
@@ -75,7 +74,7 @@ export default class PidBasic
       </q-item>
 
 
-      <q-item class="items-center col ">
+      <q-item class="items-center col-auto">
         <q-item-section>
           <LabeledField :value="block.data.outputSetting" number label="Output target" tag="big" />
         </q-item-section>
@@ -88,7 +87,7 @@ export default class PidBasic
       </q-item>
 
 
-      <q-item class="col">
+      <q-item class="items-center col-auto">
         <q-item-section>
           <LabeledField :value="block.data.p" label="P" number />
         </q-item-section>
@@ -100,11 +99,5 @@ export default class PidBasic
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </div>
 </template>
-
-<style lang="scss" scoped>
-.q-card__section .q-separator {
-  opacity: 0.2;
-}
-</style>

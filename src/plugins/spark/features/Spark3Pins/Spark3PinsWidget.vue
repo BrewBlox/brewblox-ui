@@ -12,8 +12,10 @@ export default class Spark3PinsWidget
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
 
     <IoArray :crud="crud" />
 
@@ -54,5 +56,5 @@ export default class Spark3PinsWidget
         </q-item>
       </q-card-section>
     </template>
-  </q-card>
+  </CardWrapper>
 </template>

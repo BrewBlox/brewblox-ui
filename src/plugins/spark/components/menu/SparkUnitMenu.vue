@@ -37,16 +37,18 @@ export default class SparkUnitMenu extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ serviceId }}</q-item-label>
-          <q-item-label caption>
-            Unit preferences
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
+    <CardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar>
+          <q-item-section>
+            <q-item-label>{{ serviceId }}</q-item-label>
+            <q-item-label caption>
+              Unit preferences
+            </q-item-label>
+          </q-item-section>
+        </DialogToolbar>
+      </template>
 
       <q-card-section>
         <q-item>
@@ -61,6 +63,6 @@ export default class SparkUnitMenu extends DialogBase {
           </q-item-section>
         </q-item>
       </q-card-section>
-    </q-card>
+    </CardWrapper>
   </q-dialog>
 </template>

@@ -11,8 +11,7 @@ export default class ActuatorOffsetFull
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings">
       <BlockEnableToggle
         :crud="crud"
@@ -80,5 +79,5 @@ export default class ActuatorOffsetFull
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

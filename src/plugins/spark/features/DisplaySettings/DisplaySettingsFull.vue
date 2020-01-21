@@ -121,11 +121,10 @@ export default class DisplaySettingsFull
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
 
-    <q-card-section>
+    <q-card-section class="q-gutter-y-sm">
       <div class="grid-container">
         <div
           v-for="(slot, idx) in slots"
@@ -162,43 +161,41 @@ export default class DisplaySettingsFull
           </template>
         </div>
       </div>
-    </q-card-section>
 
-    <q-separator inset />
-
-    <q-card-section class="row items-start q-x-sm">
-      <InputField
-        :value="block.data.name"
-        :rules="footerRules"
-        class="col"
-        label="Footer text"
-        title="footer text"
-        @input="v => {block.data.name = v; saveBlock()}"
-      />
-      <SelectField
-        :value="block.data.tempUnit"
-        :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
-        label="Temperature unit"
-        title="Temperature unit"
-        class="col q-pl-sm"
-        @input="v => { block.data.tempUnit = v; saveBlock(); }"
-      />
-      <q-field
-        label="Display brightness"
-        stack-label
-        class="col q-px-sm"
-        borderless
-      >
-        <q-slider
-          label
-          :value="block.data.brightness || 255"
-          :min="20"
-          :max="255"
-          @change="v => { block.data.brightness = v; saveBlock(); }"
+      <div class="row items-start">
+        <InputField
+          :value="block.data.name"
+          :rules="footerRules"
+          class="col"
+          label="Footer text"
+          title="footer text"
+          @input="v => {block.data.name = v; saveBlock()}"
         />
-      </q-field>
+        <SelectField
+          :value="block.data.tempUnit"
+          :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
+          label="Temperature unit"
+          title="Temperature unit"
+          class="col q-pl-sm"
+          @input="v => { block.data.tempUnit = v; saveBlock(); }"
+        />
+        <q-field
+          label="Display brightness"
+          stack-label
+          class="col q-px-sm"
+          borderless
+        >
+          <q-slider
+            label
+            :value="block.data.brightness || 255"
+            :min="20"
+            :max="255"
+            @change="v => { block.data.brightness = v; saveBlock(); }"
+          />
+        </q-field>
+      </div>
     </q-card-section>
-  </q-card>
+  </div>
 </template>
 
 <style scoped>

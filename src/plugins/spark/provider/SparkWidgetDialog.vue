@@ -15,6 +15,7 @@ export default class SparkWidgetDialog extends DialogBase {
     return {
       mode: 'Basic',
       container: 'Dialog',
+      size: 'Fixed',
     };
   }
 }

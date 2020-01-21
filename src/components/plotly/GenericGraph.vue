@@ -1,7 +1,7 @@
 <script lang="ts">
 import merge from 'lodash/merge';
 import { ClickAnnotationEvent, Config, Layout, PlotData, PlotMouseEvent } from 'plotly.js';
-import { colors, uid } from 'quasar';
+import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -10,7 +10,6 @@ import notify from '@/helpers/notify';
 import { GraphAnnotation } from '@/plugins/history/types';
 
 /* eslint-disable @typescript-eslint/camelcase */
-const dark = colors.getBrand('dark')!;
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
   font: {
@@ -48,8 +47,8 @@ const layoutDefaults = (): Partial<Layout> => ({
       color: '#aef',
     },
   },
-  paper_bgcolor: dark,
-  plot_bgcolor: dark,
+  paper_bgcolor: 'transparent',
+  plot_bgcolor: 'transparent',
   hovermode: 'closest',
 });
 /* eslint-enable */
@@ -158,22 +157,18 @@ export default class GenericGraph extends Vue {
   />
 </template>
 
-<style>
-.js-plotly-plot .plotly .modebar {
-  left: 0px;
-  background: transparent;
-}
+<style lang="sass">
+.plotly
+  .modebar
+    left: 0px
+  .modebar-group
+    background: transparent !important
+  .modebar-btn path
+    fill: rgba(255, 255, 255, 0.6)
+  .modebar-btn.active path, .modebar-btn:hover path
+    fill: rgba(255, 255, 255, 1)
 
-.js-plotly-plot .plotly .modebar-btn path {
-  fill: rgba(255, 255, 255, 0.6);
-}
+.xy2
+  color: green
 
-.js-plotly-plot .plotly .modebar-btn.active path,
-.js-plotly-plot .plotly .modebar-btn:hover path {
-  fill: rgba(255, 255, 255, 1);
-}
-
-.xy2 {
-  color: green;
-}
 </style>

@@ -16,43 +16,44 @@ export default class TempSensorOneWireWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
-    <q-card :class="cardClass">
+    <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
-      <CardWarning v-if="!hasValue">
-        <template #message>
-          OneWire Sensor could not be read.
-        </template>
-      </CardWarning>
+    </template>
 
-      <q-card-section>
-        <UnitField v-if="hasValue" :value="block.data.value" label="Value" readonly item-aligned tag="big" />
+    <CardWarning v-if="!hasValue">
+      <template #message>
+        OneWire Sensor could not be read.
+      </template>
+    </CardWarning>
 
-        <template v-if="mode === 'Full'">
-          <q-item>
-            <q-item-section>
-              <UnitField
-                :value="block.data.offset"
-                title="Offset"
-                label="Offset"
-                @input="v => { block.data.offset = v; saveBlock(); }"
-              />
-            </q-item-section>
-            <q-item-section>
-              <InputField
-                :value="block.data.address"
-                title="Address"
-                label="Address"
-                @input="v => { block.data.address = v; saveBlock(); }"
-              />
-            </q-item-section>
-          </q-item>
-        </template>
-      </q-card-section>
-    </q-card>
+    <q-card-section>
+      <UnitField v-if="hasValue" :value="block.data.value" label="Value" readonly item-aligned tag="big" />
+
+      <template v-if="mode === 'Full'">
+        <q-item>
+          <q-item-section>
+            <UnitField
+              :value="block.data.offset"
+              title="Offset"
+              label="Offset"
+              @input="v => { block.data.offset = v; saveBlock(); }"
+            />
+          </q-item-section>
+          <q-item-section>
+            <InputField
+              :value="block.data.address"
+              title="Address"
+              label="Address"
+              @input="v => { block.data.address = v; saveBlock(); }"
+            />
+          </q-item-section>
+        </q-item>
+      </template>
+    </q-card-section>
   </GraphCardWrapper>
 </template>

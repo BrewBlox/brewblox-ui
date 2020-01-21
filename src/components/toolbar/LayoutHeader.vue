@@ -17,11 +17,11 @@ export default class LayoutHeader extends Vue {
         <slot name="title" />
       </div>
       <q-btn flat stretch to="/" class="absolute-center">
-        <img src="~assets/logo-wordmark-dark.svg" style="height: 30px" class="q-py-xs ">
+        <img v-if="$dense" src="~assets/logo-x.svg" style="height: 30px" class="q-py-xs">
+        <img v-else src="~assets/logo-wordmark-dark.svg" style="height: 30px" class="q-py-xs">
       </q-btn>
       <q-space />
       <slot name="buttons" />
     </q-bar>
   </q-header>
 </template>
-

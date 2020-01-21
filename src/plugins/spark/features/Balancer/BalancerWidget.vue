@@ -31,8 +31,10 @@ export default class BalancerWidget
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <component :is="toolbarComponent" :crud="crud" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" />
+    </template>
 
     <q-card-section>
       <q-item dense style="opacity: 0.5">
@@ -50,5 +52,5 @@ export default class BalancerWidget
         </q-item>
       </q-list>
     </q-card-section>
-  </q-card>
+  </CardWrapper>
 </template>

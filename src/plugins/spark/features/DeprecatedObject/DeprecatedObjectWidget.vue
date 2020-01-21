@@ -24,16 +24,18 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <DialogToolbar v-if="inDialog">
-      <q-item-section>
-        <q-item-label>{{ widget.title }}</q-item-label>
-        <q-item-label caption>
-          {{ displayName }}
-        </q-item-label>
-      </q-item-section>
-    </DialogToolbar>
-    <WidgetToolbar v-else :crud="crud" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <DialogToolbar v-if="inDialog">
+        <q-item-section>
+          <q-item-label>{{ widget.title }}</q-item-label>
+          <q-item-label caption>
+            {{ displayName }}
+          </q-item-label>
+        </q-item-section>
+      </DialogToolbar>
+      <WidgetToolbar v-else :crud="crud" />
+    </template>
 
     <q-card-section>
       <q-item>
@@ -48,5 +50,5 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </CardWrapper>
 </template>

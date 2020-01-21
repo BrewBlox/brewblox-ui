@@ -883,16 +883,14 @@ export default class BuilderEditor extends Vue {
       </q-scroll-area>
     </q-drawer>
 
-    <q-dialog v-model="menuDialogOpen" no-backdrop-dismiss @keyup.esc="closeMenu">
-      <BuilderPartMenu
-        v-if="menuDialogOpen"
-        :part="configuredPart"
-        @update:part="savePart"
-        @remove:part="removePart"
-        @dirty="debouncedCalculate"
-        @close="closeMenu"
-      />
-    </q-dialog>
+    <BuilderPartMenu
+      v-if="menuDialogOpen"
+      :part="configuredPart"
+      @update:part="savePart"
+      @remove:part="removePart"
+      @dirty="debouncedCalculate"
+      @close="closeMenu"
+    />
 
     <q-page-container>
       <q-page class="row no-wrap justify-center q-pa-md">

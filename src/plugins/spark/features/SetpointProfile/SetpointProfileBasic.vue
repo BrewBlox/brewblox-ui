@@ -12,11 +12,10 @@ export default class SetpointProfileBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="fit column">
     <slot name="warnings" />
-    <div class="col full-width">
+    <div class="col">
       <slot name="graph" />
     </div>
-  </q-card>
+  </div>
 </template>

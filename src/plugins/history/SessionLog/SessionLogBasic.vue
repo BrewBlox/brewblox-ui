@@ -117,11 +117,8 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
 
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
-    <slot name="graph" />
-
     <q-card-section v-if="session !== null">
       <SessionHeaderField :session="session" @update:session="saveSession" />
       <div class="row">
@@ -179,5 +176,5 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
         <q-btn outline label="New session" @click="addSession" />
       </div>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

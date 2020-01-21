@@ -43,6 +43,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     return {
       container: 'Dialog',
       mode: 'Full',
+      size: 'Fixed',
     };
   }
 
@@ -68,7 +69,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
 </script>
 
 <template>
-  <WizardCard>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -77,7 +78,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       </q-item>
     </q-card-section>
 
-    <q-dialog v-model="modalOpen" :maximized="$dense" no-backdrop-dismiss class="row">
+    <q-dialog v-model="modalOpen" :maximized="$dense" no-backdrop-dismiss>
       <component
         :is="widgetComponent"
         :initial-crud="crud"
@@ -92,5 +93,5 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       <q-btn unelevated label="Configure" @click="modalOpen = true" />
       <q-btn unelevated label="Create" color="primary" @click="createWidget" />
     </template>
-  </WizardCard>
+  </WizardBody>
 </template>

@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { clampRotation } from '@/helpers/functional';
+import { WidgetContext } from '@/store/features';
 
 import { squares } from './helpers';
 import { builderStore } from './store';
@@ -14,6 +15,18 @@ export default class BuilderPartMenu extends Vue {
 
   @Prop({ type: Object, required: true })
   readonly part!: FlowPart;
+
+  close(): void {
+    this.$emit('close');
+  }
+
+  get context(): WidgetContext {
+    return {
+      container: 'Dialog',
+      size: 'Fixed',
+      mode: 'Basic',
+    };
+  }
 
   get spec(): PartSpec {
     return builderStore.spec(this.part);
@@ -51,32 +64,36 @@ export default class BuilderPartMenu extends Vue {
 </script>
 
 <template>
-  <q-card class="widget-modal">
-    <DialogToolbar @close="$emit('close')">
-      {{ partTitle }}
-    </DialogToolbar>
+  <q-dialog :value="true" no-backdrop-dismiss @input="close" @keyup.esc="close">
+    <CardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar @close="close">
+          {{ partTitle }}
+        </DialogToolbar>
+      </template>
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <svg
-            :width="`${squares(rotatedSize[0]) * displayScale}px`"
-            :height="`${squares(rotatedSize[1] * displayScale)}px`"
-            :viewBox="`0, 0, ${squares(rotatedSize[0])}, ${squares(rotatedSize[1])}`"
-            class="q-mx-auto"
-          >
-            <PartWrapper :part="part" />
-          </svg>
-        </q-item-section>
-      </q-item>
-      <component
-        :is="card.component"
-        v-for="(card, idx) in cards"
-        :key="idx"
-        :part="part"
-        v-bind="card.props || {}"
-        v-on="$listeners"
-      />
-    </q-card-section>
-  </q-card>
+      <q-card-section>
+        <q-item>
+          <q-item-section>
+            <svg
+              :width="`${squares(rotatedSize[0]) * displayScale}px`"
+              :height="`${squares(rotatedSize[1] * displayScale)}px`"
+              :viewBox="`0, 0, ${squares(rotatedSize[0])}, ${squares(rotatedSize[1])}`"
+              class="q-mx-auto"
+            >
+              <PartWrapper :part="part" />
+            </svg>
+          </q-item-section>
+        </q-item>
+        <component
+          :is="card.component"
+          v-for="(card, idx) in cards"
+          :key="idx"
+          :part="part"
+          v-bind="card.props || {}"
+          v-on="$listeners"
+        />
+      </q-card-section>
+    </CardWrapper>
+  </q-dialog>
 </template>

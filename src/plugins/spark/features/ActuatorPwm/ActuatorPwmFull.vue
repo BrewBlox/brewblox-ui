@@ -22,8 +22,7 @@ export default class ActuatorPwmFull
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings">
       <BlockEnableToggle
         :crud="crud"
@@ -99,5 +98,5 @@ export default class ActuatorPwmFull
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

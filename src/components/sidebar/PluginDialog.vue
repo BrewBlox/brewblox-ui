@@ -45,15 +45,17 @@ export default class PluginDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>UI Plugins</q-item-label>
-        </q-item-section>
-        <template #buttons>
-          <q-btn flat label="Reload page" @click="reloadPage" />
-        </template>
-      </DialogToolbar>
+    <CardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar>
+          <q-item-section>
+            <q-item-label>UI Plugins</q-item-label>
+          </q-item-section>
+          <template #buttons>
+            <q-btn flat label="Reload page" @click="reloadPage" />
+          </template>
+        </DialogToolbar>
+      </template>
 
       <q-card-section>
         <q-item v-for="[plugin, result] in combos" :key="plugin.id">
@@ -92,6 +94,6 @@ export default class PluginDialog extends DialogBase {
           </q-item-section>
         </q-item>
       </q-card-section>
-    </q-card>
+    </CardWrapper>
   </q-dialog>
 </template>

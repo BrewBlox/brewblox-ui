@@ -21,11 +21,6 @@ interface ValidatedWidget {
 export default class DashboardPage extends Vue {
   widgetEditable = false;
 
-  context: WidgetContext = {
-    mode: 'Basic',
-    container: 'Dashboard',
-  }
-
   @Watch('dashboardId')
   onChangeDashboardId(): void {
     this.widgetEditable = false;
@@ -42,6 +37,14 @@ export default class DashboardPage extends Vue {
   @Watch('dashboard.title', { immediate: true })
   watchTitle(newV: string): void {
     document.title = `Brewblox | ${newV ?? 'Dashboard'}`;
+  }
+
+  get context(): WidgetContext {
+    return {
+      mode: 'Basic',
+      container: 'Dashboard',
+      size: this.$dense ? 'Content' : 'Fixed',
+    };
   }
 
   get dashboardId(): string {
@@ -194,7 +197,7 @@ export default class DashboardPage extends Vue {
         </ActionMenu>
       </portal>
       <div v-if="$dense" class="column q-gutter-y-sm">
-        <div v-for="val in validatedWidgets" :key="val.id" class="col full-width">
+        <div v-for="val in validatedWidgets" :key="val.id" class="col-auto full-width">
           <component
             :is="val.component"
             :initial-crud="val.crud"

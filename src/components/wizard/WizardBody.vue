@@ -4,13 +4,13 @@ import { Component } from 'vue-property-decorator';
 
 
 @Component
-export default class WizardCard extends Vue {
+export default class WizardBody extends Vue {
 
 }
 </script>
 
 <template>
-  <div class="full-height col column justify-between">
+  <div class="fit col column justify-between">
     <div class="col scroll">
       <slot />
     </div>
@@ -22,9 +22,3 @@ export default class WizardCard extends Vue {
     </div>
   </div>
 </template>
-
-<style scoped>
-.quickstart-card-body {
-  height: calc(100% - 60px) !important;
-}
-</style>

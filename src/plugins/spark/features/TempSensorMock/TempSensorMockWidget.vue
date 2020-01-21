@@ -13,14 +13,16 @@ export default class TempSensorMockWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
-    <q-card :class="cardClass">
+    <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" />
+    </template>
 
+    <div>
       <q-card-section>
         <q-item>
           <q-item-section>
@@ -45,6 +47,6 @@ export default class TempSensorMockWidget
           </q-item-section>
         </q-item>
       </q-card-section>
-    </q-card>
+    </div>
   </GraphCardWrapper>
 </template>

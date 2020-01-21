@@ -74,39 +74,39 @@ export default class FirmwareUpdateDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>
-            Firmware update
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
-      <div class="dialog-content">
-        <WizardCard>
-          <q-card-section>
-            <q-item>
-              <q-item-section>{{ updateAvailableText }}</q-item-section>
-            </q-item>
-            <q-list dense>
-              <q-item v-for="(msg, idx) in messages" :key="idx">
-                <q-item-section>{{ msg }}</q-item-section>
-              </q-item>
-            </q-list>
-          </q-card-section>
-          <template #actions>
-            <q-btn
-              :disable="!buttonEnabled"
-              :loading="busy"
-              :color="buttonColor"
-              unelevated
-              label="Flash"
-              @click="updateFirmware"
-            />
-          </template>
-        </WizardCard>
-      </div>
-    </q-card>
+    <ActionCardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar>
+          <q-item-section>
+            <q-item-label>{{ service.id }}</q-item-label>
+            <q-item-label caption>
+              Firmware update
+            </q-item-label>
+          </q-item-section>
+        </DialogToolbar>
+      </template>
+
+      <q-card-section>
+        <q-item>
+          <q-item-section>{{ updateAvailableText }}</q-item-section>
+        </q-item>
+        <q-list dense>
+          <q-item v-for="(msg, idx) in messages" :key="idx">
+            <q-item-section>{{ msg }}</q-item-section>
+          </q-item>
+        </q-list>
+      </q-card-section>
+
+      <template #actions>
+        <q-btn
+          :disable="!buttonEnabled"
+          :loading="busy"
+          :color="buttonColor"
+          unelevated
+          label="Flash"
+          @click="updateFirmware"
+        />
+      </template>
+    </ActionCardWrapper>
   </q-dialog>
 </template>

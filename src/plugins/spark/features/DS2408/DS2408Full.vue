@@ -14,11 +14,10 @@ export default class DS2408Full
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
-
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
+
     <q-separator inset />
 
     <q-card-section>
@@ -37,5 +36,5 @@ export default class DS2408Full
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

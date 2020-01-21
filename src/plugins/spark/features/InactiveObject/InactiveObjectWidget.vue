@@ -17,13 +17,15 @@ export default class InactiveObjectWidget extends BlockWidgetBase {
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <component :is="toolbarComponent" :crud="crud" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" />
+    </template>
     <CardWarning v-if="!block.data.connected">
       <template #message>
         This {{ actualDisplayName }} block is disabled.
         <br>To enable it, ensure that it is in an enabled group.
       </template>
     </CardWarning>
-  </q-card>
+  </CardWrapper>
 </template>

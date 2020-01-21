@@ -19,16 +19,19 @@ export default class DS2408Widget
 </script>
 
 <template>
-  <component :is="mode" :crud="crud" :class="cardClass">
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
-    <template #warnings>
-      <CardWarning v-if="!block.data.connected">
-        <template #message>
-          DS2408 is not connected
-        </template>
-      </CardWarning>
-    </template>
-  </component>
+
+    <component :is="mode" :crud="crud">
+      <template #warnings>
+        <CardWarning v-if="!block.data.connected">
+          <template #message>
+            DS2408 is not connected
+          </template>
+        </CardWarning>
+      </template>
+    </component>
+  </CardWrapper>
 </template>

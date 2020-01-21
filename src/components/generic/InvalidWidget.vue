@@ -11,13 +11,15 @@ export default class InvalidWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card class="text-white scroll">
-    <component :is="toolbarComponent" :crud="crud" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" />
+    </template>
 
-    <CardWarning color="negative">
+    <CardWarning color="negative" class="items-center">
       <template #message>
-        <span>{{ error }}</span>
+        {{ error }}
       </template>
     </CardWarning>
-  </q-card>
+  </CardWrapper>
 </template>

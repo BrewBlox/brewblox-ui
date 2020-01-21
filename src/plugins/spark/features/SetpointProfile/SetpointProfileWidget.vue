@@ -18,25 +18,6 @@ export default class SetpointProfileWidget
   extends BlockWidgetBase<SetpointProfileBlock> {
   revision = 0;
 
-  // Overrides WidgetBase
-  *cardClassGenerator(): Generator<string, void, undefined> {
-    yield this.inDialog
-      ? 'widget-modal'
-      : 'widget-dashboard';
-
-    if (this.$dense) {
-      yield 'widget-dense';
-    }
-
-    if (this.mode === 'Basic') {
-      yield* ['col', 'column'];
-    }
-
-    if (this.mode === 'Full' && !this.inDialog) {
-      yield* ['overflow-auto', 'scroll'];
-    }
-  }
-
   get graphProps(): GraphProps {
     return profileGraphProps(this.block);
   }
@@ -53,20 +34,25 @@ export default class SetpointProfileWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog && mode ==='Full'">
+  <GraphCardWrapper
+    show-initial
+    :show="inDialog && mode ==='Full'"
+    :no-scroll="mode === 'Basic'"
+    v-bind="{context}"
+  >
     <template #graph>
       <GenericGraph v-bind="graphProps" :revision="revision" />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass">
-      <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
-          <template #actions>
-            <ProfilePresetAction :crud="crud" />
-          </template>
-        </component>
-      </template>
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+        <template #actions>
+          <ProfilePresetAction :crud="crud" />
+        </template>
+      </component>
+    </template>
 
+    <component :is="mode" :crud="crud">
       <template #warnings>
         <CardWarning v-if="!block.data.targetId.id">
           <template #message>

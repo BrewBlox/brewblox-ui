@@ -65,23 +65,26 @@ export default class SparkWidget extends Vue {
 </script>
 
 <template>
-  <q-card v-if="ready" class="text-white scroll">
-    <DialogToolbar v-if="inDialog">
-      <q-item-section>
-        <q-item-label>{{ serviceId }}</q-item-label>
-        <q-item-label caption>
-          Device info
-        </q-item-label>
-      </q-item-section>
-      <template #buttons>
-        <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
-      </template>
-    </DialogToolbar>
-    <Toolbar v-else :title="serviceId" subtitle="Device info">
-      <template #buttons>
-        <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
-      </template>
-    </Toolbar>
+  <CardWrapper v-if="ready" v-bind="{context}">
+    <template #toolbar>
+      <DialogToolbar v-if="inDialog">
+        <q-item-section>
+          <q-item-label>{{ serviceId }}</q-item-label>
+          <q-item-label caption>
+            Device info
+          </q-item-label>
+        </q-item-section>
+        <template #buttons>
+          <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
+        </template>
+      </DialogToolbar>
+      <Toolbar v-else :title="serviceId" subtitle="Device info">
+        <template #buttons>
+          <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
+        </template>
+      </Toolbar>
+    </template>
+
 
     <CardWarning v-if="!updating">
       <template #message>
@@ -114,5 +117,5 @@ export default class SparkWidget extends Vue {
         </LabeledField>
       </div>
     </q-card-section>
-  </q-card>
+  </CardWrapper>
 </template>

@@ -3,6 +3,7 @@ import { PersistentWidget } from '@/store/dashboards';
 export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
+export type WidgetSize = 'Fixed' | 'Content';
 
 export interface Crud<ConfigT = any> {
   widget: PersistentWidget<ConfigT>;
@@ -46,4 +47,5 @@ export interface Watcher {
 export interface WidgetContext {
   mode: WidgetMode;
   container: WidgetContainer;
+  size: WidgetSize;
 }

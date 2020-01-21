@@ -124,39 +124,40 @@ export default class SessionViewWidget extends WidgetBase<SessionViewConfig> {
 </script>
 
 <template>
-  <component
-    :is="mode"
-    :crud="crud"
-    :class="cardClass"
-    :initial-session="initialSession"
-    @create="createSession"
-    @graph="showSessionGraph"
-  >
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
-    <template #warnings>
-      <CardWarning>
-        <template #message>
-          <span>
-            Session View has been replaced by the <b>Session Log</b> widget.
-          </span>
-        </template>
-        <template #actions>
-          <q-btn flat label="Migrate" @click="migrate" />
-        </template>
-      </CardWarning>
-    </template>
-    <template #graph>
-      <BlockGraph
-        v-if="graphSession"
-        :id="`${widget.id}::${graphSession.id}`"
-        :value="true"
-        :config="graphSession.graphCfg"
-        no-duration
-        @update:config="v => { graphSession.graphCfg = v; saveConfig(widgetConfig); }"
-        @input="v => {if(!v) graphSessionId = null;}"
-      />
-    </template>
-  </component>
+    <component
+      :is="mode"
+      :crud="crud"
+      :initial-session="initialSession"
+      @create="createSession"
+      @graph="showSessionGraph"
+    >
+      <template #warnings>
+        <CardWarning>
+          <template #message>
+            <span>
+              Session View has been replaced by the <b>Session Log</b> widget.
+            </span>
+          </template>
+          <template #actions>
+            <q-btn flat label="Migrate" @click="migrate" />
+          </template>
+        </CardWarning>
+      </template>
+      <template #graph>
+        <BlockGraph
+          v-if="graphSession"
+          :id="`${widget.id}::${graphSession.id}`"
+          :value="true"
+          :config="graphSession.graphCfg"
+          no-duration
+          @update:config="v => { graphSession.graphCfg = v; saveConfig(widgetConfig); }"
+          @input="v => {if(!v) graphSessionId = null;}"
+        />
+      </template>
+    </component>
+  </CardWrapper>
 </template>

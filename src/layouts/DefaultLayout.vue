@@ -7,11 +7,12 @@ import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen = !this.$dense;
+  leftDrawerOpen = true;
   dashboardEditing = false;
   serviceEditing = false;
 
   created(): void {
+    this.leftDrawerOpen = !this.$dense;
     checkDatastore();
   }
 

@@ -122,10 +122,7 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
-    <slot name="warnings" />
-
+  <div>
     <q-card-section>
       <q-list>
         <q-item v-if="values.length === 0">
@@ -158,5 +155,5 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
         </LabeledField>
       </q-list>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

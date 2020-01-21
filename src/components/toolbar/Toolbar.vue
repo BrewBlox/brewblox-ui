@@ -13,7 +13,7 @@ export default class Toolbar extends Vue {
 </script>
 
 <template>
-  <q-card-section class="q-pa-none depth-1">
+  <q-card-section class="toolbar__Dashboard q-pa-none">
     <q-item dense class="q-pr-sm q-pt-xs q-gutter-x-sm">
       <q-item-section>
         <q-item-label class="ellipsis text-deep-purple-3 text-h6">

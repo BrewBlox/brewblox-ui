@@ -40,15 +40,17 @@ export default class SparkGroupMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>
-            Group menu
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+    <ActionCardWrapper>
+      <template #toolbar>
+        <DialogToolbar>
+          <q-item-section>
+            <q-item-label>{{ service.id }}</q-item-label>
+            <q-item-label caption>
+              Group menu
+            </q-item-label>
+          </q-item-section>
+        </DialogToolbar>
+      </template>
 
       <q-card-section>
         <GroupsField
@@ -72,6 +74,6 @@ export default class SparkGroupMenu extends DialogBase {
           />
         </div>
       </q-card-section>
-    </q-card>
+    </ActionCardWrapper>
   </q-dialog>
 </template>

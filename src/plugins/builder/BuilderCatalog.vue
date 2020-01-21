@@ -56,9 +56,12 @@ export default class BuilderCatalog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>Part Catalog</DialogToolbar>
-      <div class="dialog-content column q-pb-md">
+    <CardWrapper no-scroll v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar>Part Catalog</DialogToolbar>
+      </template>
+
+      <div class="fit column q-pb-md">
         <q-item class="q-mb-md">
           <q-item-section>
             <q-input v-model="partFilter" placeholder="Search Parts" clearable autofocus>
@@ -94,6 +97,6 @@ export default class BuilderCatalog extends DialogBase {
           </q-card-section>
         </q-scroll-area>
       </div>
-    </q-card>
+    </CardWrapper>
   </q-dialog>
 </template>
