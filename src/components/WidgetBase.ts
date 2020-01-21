@@ -61,7 +61,7 @@ export default class WidgetBase<ConfigT = any> extends Vue {
   }
 
   public *cardClassGenerator(): Generator<string, void, undefined> {
-    yield 'overflow-auto full-height column';
+    yield 'full-height column';
 
     yield* this.inDialog
       ? ['widget-modal']

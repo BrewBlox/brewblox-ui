@@ -19,42 +19,42 @@ export default class GraphCardWrapper extends Vue {
 </script>
 
 <template>
-  <div v-if="!show" class="passthrough-card column">
+  <div v-if="!show || !$q.screen.gt.md" class="passthrough-card column">
     <slot />
   </div>
-  <div v-else class="row wrapper-card">
-    <slot />
-    <template v-if="$q.screen.gt.md">
-      <div class="col column justify-center" style="min-height: 100%">
-        <q-btn
-          v-if="collapsed"
-          key="show-button"
-          flat
-          dense
-          class="col-auto tab-show q-py-md q-mr-sm"
-          icon="mdi-chart-line"
-          @click="collapsed = false"
-        >
-          <q-tooltip>Show Graph</q-tooltip>
-        </q-btn>
-        <q-btn
-          v-else
-          key="hide-button"
-          flat
-          dense
-          class="col-auto tab-hide q-py-md q-ml-sm"
-          icon="mdi-arrow-collapse-left"
-          @click="collapsed = true"
-        >
-          <q-tooltip>Hide Graph</q-tooltip>
-        </q-btn>
-      </div>
-      <div v-if="!collapsed" style="width: 600px;">
-        <q-card class="q-pa-none graph-container">
-          <slot name="graph" />
-        </q-card>
-      </div>
-    </template>
+  <div v-else class="row wrapper-card" style="min-height: 80vh">
+    <div class="col-auto column passtrough-card">
+      <slot />
+    </div>
+    <div class="col-auto column justify-center" style="min-height: 100%">
+      <q-btn
+        v-if="collapsed"
+        key="show-button"
+        flat
+        dense
+        class="col-auto tab-show q-py-md q-mr-sm"
+        icon="mdi-chart-line"
+        @click="collapsed = false"
+      >
+        <q-tooltip>Show Graph</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-else
+        key="hide-button"
+        flat
+        dense
+        class="col-auto tab-hide q-py-md q-ml-sm"
+        icon="mdi-arrow-collapse-left"
+        @click="collapsed = true"
+      >
+        <q-tooltip>Hide Graph</q-tooltip>
+      </q-btn>
+    </div>
+    <div v-if="!collapsed" style="width: 40vw">
+      <q-card class="q-pa-none graph-container">
+        <slot name="graph" />
+      </q-card>
+    </div>
   </div>
 </template>
 
