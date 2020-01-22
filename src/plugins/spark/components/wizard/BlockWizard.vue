@@ -142,7 +142,7 @@ export default class BlockWizard extends Vue {
 </script>
 
 <template>
-  <WizardBody @keyup.ctrl.enter="createBlock">
+  <ActionCardBody @keyup.ctrl.enter="createBlock">
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -201,5 +201,5 @@ export default class BlockWizard extends Vue {
         @click="createBlock"
       />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

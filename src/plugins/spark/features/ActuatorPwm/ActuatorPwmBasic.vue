@@ -17,57 +17,51 @@ export default class ActuatorPwmBasic
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <SliderField
-            :value="block.data.setting"
-            :readonly="isDriven"
-            :tag-class="{['text-orange']: isConstrained}"
-            title="Duty Setting"
-            label="Setting"
-            suffix="%"
-            tag="big"
-            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-          />
-        </q-item-section>
-
-        <q-item-section>
-          <LabeledField
-            :value="block.data.value"
-            label="Duty achieved"
-            number
-            suffix="%"
-            tag="big"
-          />
-        </q-item-section>
-
-        <q-item-section>
-          <LabeledField
-            v-if="isConstrained"
-            label="Unconstrained setting"
-            :value="block.data.desiredSetting"
-            number
-            suffix="%"
-            tag="big"
-          />
-        </q-item-section>
-      </q-item>
-
-      <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="analog"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+    <div class="widget-body row">
+      <SliderField
+        :value="block.data.setting"
+        :readonly="isDriven"
+        :tag-class="{['text-orange']: isConstrained}"
+        title="Duty Setting"
+        label="Setting"
+        suffix="%"
+        tag="big"
+        class="col-grow"
+        @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+      />
+      <LabeledField
+        :value="block.data.value"
+        label="Duty achieved"
+        number
+        suffix="%"
+        tag="big"
+        class="col-grow"
+      />
+      <LabeledField
+        v-if="isConstrained"
+        label="Unconstrained setting"
+        :value="block.data.desiredSetting"
+        number
+        suffix="%"
+        tag="big"
+        class="col-grow"
+      />
+      <div class="col-break" />
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
+      <ConstraintsField
+        :value="block.data.constrainedBy"
+        :service-id="serviceId"
+        type="analog"
+        class="col-grow"
+        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+      />
+    </div>
   </div>
 </template>

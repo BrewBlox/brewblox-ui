@@ -108,7 +108,7 @@ export default class WidgetWizardPicker extends Vue {
     @close="close"
   />
 
-  <WizardBody v-else>
+  <ActionCardBody v-else>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -154,5 +154,5 @@ export default class WidgetWizardPicker extends Vue {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="next" />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

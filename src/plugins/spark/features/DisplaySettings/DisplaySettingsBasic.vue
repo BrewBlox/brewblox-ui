@@ -34,7 +34,7 @@ export default class DisplaySettingsBasic
 </script>
 
 <template>
-  <div class="q-pa-lg">
+  <div class="q-pa-lg widget-lg">
     <slot name="warnings" />
 
     <div class="q-gutter-y-sm">

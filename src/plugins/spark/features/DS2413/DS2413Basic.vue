@@ -12,7 +12,7 @@ export default class D2413Basic
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings" />
     <IoArray :crud="crud" />
   </div>

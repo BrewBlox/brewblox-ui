@@ -61,7 +61,7 @@ export default class QuickStartWizardPicker extends Vue {
   />
 
   <!-- Select a wizard -->
-  <WizardBody v-else>
+  <ActionCardBody v-else>
     <q-card-section>
       <q-item>
         <q-item-section class="text-weight-light">
@@ -116,5 +116,5 @@ export default class QuickStartWizardPicker extends Vue {
       <q-space />
       <q-btn :disable="!wizardModel" unelevated label="Next" color="primary" @click="next" />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

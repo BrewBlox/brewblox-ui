@@ -69,7 +69,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
 </script>
 
 <template>
-  <WizardBody>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -93,5 +93,5 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       <q-btn unelevated label="Configure" @click="modalOpen = true" />
       <q-btn unelevated label="Create" color="primary" @click="createWidget" />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

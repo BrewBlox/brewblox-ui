@@ -70,30 +70,26 @@ export default class PidFull
 </script>
 
 <template>
-  <div>
-    <slot name="warnings" />
+  <div class="widget-lg">
+    <slot name="warnings">
+      <BlockEnableToggle
+        :crud="crud"
+        :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to output of PID.`"
+        :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
+        class="col"
+      />
+    </slot>
 
-    <q-card-section class="col q-pa-sm">
-      <div class="column q-gutter-y-md q-px-sm">
-        <slot name="warnings" />
-        <BlockEnableToggle
-          :crud="crud"
-          :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to output of PID.`"
-          :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
-          class="col"
-        />
-
-        <!-- Input row -->
-        <div class="row items-stretch q-gutter-x-sm">
-          <BlockField
-            :value="block.data.inputId"
-            :service-id="serviceId"
-            :html="true"
-            title="Input"
-            label="Input Block"
-            no-show
-            class="col"
-            message="
+    <div class="widget-body row">
+      <!-- Input row -->
+      <BlockField
+        :value="block.data.inputId"
+        :service-id="serviceId"
+        :html="true"
+        title="Input"
+        label="Input Block"
+        no-show
+        message="
               <p>A PID block drives its output to regulate its input.</p>
               <p>
                 This input is a process value: something that has a target value and an actual value.
@@ -101,41 +97,52 @@ export default class PidFull
               </p>
               <p>The input target minus the input value is called the error</p>
               "
-            @input="v => { block.data.inputId = v; saveBlock(); }"
-          />
+        class="col-grow"
+        @input="v => { block.data.inputId = v; saveBlock(); }"
+      />
+      <div class="col-grow">
+        <UnitField
+          v-if="!!inputBlock"
+          :value="inputBlock.data.storedSetting"
+          :readonly="inputDriven"
+          :class="[{darkened: !inputBlock.data.settingEnabled}, 'col']"
+          label="Setting"
+          tag="b"
+          @input="v => { inputBlock.data.storedSetting = v; saveStoreBlock(inputBlock); }"
+        />
+        <UnitField
+          v-else
+          :value="block.data.inputSetting"
+          label="Setting"
+          tag="b"
+          readonly
+        />
+      </div>
+      <UnitField
+        :value="block.data.inputValue"
+        label="Measured"
+        tag="b"
+        class="col-grow"
+        readonly
+      />
+      <div class="col-auto">
+        <q-btn v-if="!!inputBlock" flat icon="mdi-launch" @click="showInput">
+          <q-tooltip>Edit {{ inputBlock.id }}</q-tooltip>
+        </q-btn>
+        <q-btn v-else disable flat icon="mdi-launch" />
+      </div>
 
+      <!-- Output row -->
+      <div class="col-break" />
 
-          <UnitField
-            v-if="!!inputBlock"
-            :value="inputBlock.data.storedSetting"
-            :readonly="inputDriven"
-            :class="[{darkened: !inputBlock.data.settingEnabled}, 'col']"
-            label="Setting"
-            tag="b"
-            @input="v => { inputBlock.data.storedSetting = v; saveStoreBlock(inputBlock); }"
-          />
-          <UnitField v-else :value="block.data.inputSetting" label="Setting" tag="b" readonly class="col-3" />
-
-
-          <UnitField :value="block.data.inputValue" label="Measured" tag="b" class="col" readonly />
-
-          <q-btn v-if="!!inputBlock" flat icon="mdi-launch" class="col-auto" @click="showInput">
-            <q-tooltip>Edit {{ inputBlock.id }}</q-tooltip>
-          </q-btn>
-          <q-btn v-else disable flat icon="mdi-launch" class="col-auto" />
-        </div>
-
-        <!-- Output row -->
-        <div class="row items-stretch q-gutter-x-sm">
-          <BlockField
-            :value="block.data.outputId"
-            :service-id="serviceId"
-            :html="true"
-            title="Output"
-            label="Output Block"
-            no-show
-            class="col"
-            message="
+      <BlockField
+        :value="block.data.outputId"
+        :service-id="serviceId"
+        :html="true"
+        title="Output"
+        label="Output Block"
+        no-show
+        message="
               <p>The PID sets its output block to the result from the PID calculation.</p>
               <p>
                 The output value is the sum of 3 parts derived from the input error:
@@ -146,67 +153,81 @@ export default class PidFull
                 A digital actuator can be driven indirectly via a PWM actuator.
               </p>
               "
-            @input="v => { block.data.outputId = v; saveBlock(); }"
-          />
+        class="col-grow"
+        @input="v => { block.data.outputId = v; saveBlock(); }"
+      />
+      <LabeledField
+        :value="block.data.outputSetting"
+        number
+        label="Target value"
+        tag="b"
+        class="col-grow"
+      />
+      <LabeledField
+        :value="block.data.outputValue"
+        number
+        label="Achieved value"
+        tag="b"
+        class="col-grow"
+      />
+      <div class="col-auto">
+        <q-btn v-if="!!outputBlock" flat icon="mdi-launch" @click="showOutput">
+          <q-tooltip>Edit {{ outputBlock.id }}</q-tooltip>
+        </q-btn>
+        <q-btn v-else disable flat icon="mdi-launch" />
+      </div>
 
-          <LabeledField :value="block.data.outputSetting" number label="Target value" tag="b" class="col" />
-          <LabeledField :value="block.data.outputValue" number label="Achieved value" tag="b" class="col" />
-          <q-btn v-if="!!outputBlock" flat icon="mdi-launch" class="col-auto" @click="showOutput">
-            <q-tooltip>Edit {{ outputBlock.id }}</q-tooltip>
-          </q-btn>
-          <q-btn v-else disable flat icon="mdi-launch" class="col-auto" />
-        </div>
+      <!-- Boil mode settings -->
+      <div class="col-break" />
+      <UnitField
+        :value="block.data.boilPointAdjust"
+        title="Boil point adjustment"
+        label="Boil temperature setting"
+        class="col-grow"
+        @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
+      >
+        <template #value>
+          <span class="darkish">{{ waterBoilTemp.value | round(0) }}</span> +
+          <b>{{ block.data.boilPointAdjust.value | round }}</b>
+        </template>
+      </UnitField>
+      <SliderField
+        :value="block.data.boilMinOutput"
+        :decimals="0"
+        :quick-actions="[
+          { label: '0%', value: 0 },
+          { label: '50%', value: 50 },
+          { label: '100%', value: 100 },
+        ]"
+        title="Minimum output"
+        label="Minimum output when boiling"
+        suffix="%"
+        class="col-grow"
+        @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
+      />
+    </div>
 
-        <!-- Boil mode settings -->
-        <div class="row items-stretch q-gutter-x-sm">
-          <UnitField
-            :value="block.data.boilPointAdjust"
-            title="Boil point adjustment"
-            label="Boil temperature setting"
-            class="col"
-            q-mx-xs
-            @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
-          >
-            <template #value>
-              <span class="darkish">{{ waterBoilTemp.value | round(0) }}</span> +
-              <b>{{ block.data.boilPointAdjust.value | round }}</b>
-            </template>
-          </UnitField>
+    <q-separator inset />
 
-          <SliderField
-            :value="block.data.boilMinOutput"
-            :decimals="0"
-            :quick-actions="[
-              { label: '0%', value: 0 },
-              { label: '50%', value: 50 },
-              { label: '100%', value: 100 },
-            ]"
-            title="Minimum output"
-            label="Minimum output when boiling"
-            suffix="%"
-            class="col"
-            @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
-          />
-        </div>
+    <!-- Calculation grid -->
+    <div class="widget-body items-center grid-container">
+      <div class="span-2">
+        <LabeledField label="Error">
+          {{ block.data.error | unit }}
+        </LabeledField>
+      </div>
 
-        <div class="col q-mt-xl items-center grid-container">
-          <div class="span-2">
-            <LabeledField label="Error">
-              {{ block.data.error | unit }}
-            </LabeledField>
-          </div>
+      <div class="span-1 self-center text-center">
+        *
+      </div>
 
-          <div class="span-1 self-center text-center">
-            *
-          </div>
-
-          <div class="span-2">
-            <UnitField
-              :value="block.data.kp"
-              :html="true"
-              title="Proportional gain Kp"
-              label="Kp"
-              message="
+      <div class="span-2">
+        <UnitField
+          :value="block.data.kp"
+          :html="true"
+          title="Proportional gain Kp"
+          label="Kp"
+          message="
               <p>
                 Kp is the proportional gain, which is directly mutiplied by the filtered error.
                 The output of the PID is Kp * input error.
@@ -214,53 +235,52 @@ export default class PidFull
               </p>
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
               "
-              borderless
-              class="dashed-input"
-              @input="v => { block.data.kp = v; saveBlock(); }"
-            />
-          </div>
+          borderless
+          @input="v => { block.data.kp = v; saveBlock(); }"
+        />
+      </div>
 
-          <div :style="grid({start: 9})" class="self-center text-center">
-            =
-          </div>
+      <div :style="grid({start: 9})" class="self-center text-center">
+        =
+      </div>
 
-          <div class="span-2">
-            <LabeledField label="P">
-              {{ block.data.p | round }}
-            </LabeledField>
-          </div>
+      <div class="span-2">
+        <LabeledField label="P">
+          {{ block.data.p | round }}
+        </LabeledField>
+      </div>
 
-          <!-- Break -->
+      <!-- Break -->
 
-          <div class="span-2">
-            <LabeledField label="Integral">
-              {{ block.data.integral | unit }}
-            </LabeledField>
-          </div>
+      <div class="span-2">
+        <LabeledField label="Integral">
+          {{ block.data.integral | unit }}
+        </LabeledField>
+      </div>
 
-          <div class="span-1 self-center text-center">
-            *
-          </div>
+      <div class="span-1 self-center text-center">
+        *
+      </div>
 
-          <div class="span-2">
-            <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
-          </div>
+      <div class="span-2">
+        <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
+      </div>
 
-          <div class="span-1 self-center text-center">
-            /
-          </div>
+      <div class="span-1 self-center text-center">
+        /
+      </div>
 
-          <div class="span-2">
-            <TimeUnitField
-              :value="block.data.ti"
-              :rules="[
-                v => v >= 0 || 'Value must be positive',
-                v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
-              ]"
-              :html="true"
-              title="Integral time constant Ti"
-              label="Ti"
-              message="
+      <div class="span-2">
+        <TimeUnitField
+          :value="block.data.ti"
+          :rules="[
+            v => v >= 0 || 'Value must be positive',
+            v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
+          ]"
+          :html="true"
+          title="Integral time constant Ti"
+          label="Ti"
+          message="
               <p>
                 The purpose of the integrator is to remove steady state errors.
                 The integrator slowly builds up when the error is not zero.
@@ -276,24 +296,23 @@ export default class PidFull
               </p>
               <p>Setting Ti to zero will disable the integrator.</p>
               "
-              borderless
-              class="dashed-input"
-              @input="v => { block.data.ti = v; saveBlock(); }"
-            />
-          </div>
+          borderless
+          @input="v => { block.data.ti = v; saveBlock(); }"
+        />
+      </div>
 
-          <div class="span-1 self-center text-center">
-            =
-          </div>
+      <div class="span-1 self-center text-center">
+        =
+      </div>
 
-          <div class="span-2">
-            <InputField
-              :value="block.data.i"
-              :html="true"
-              type="number"
-              title="Manually set integral"
-              label="I"
-              message="
+      <div class="span-2">
+        <InputField
+          :value="block.data.i"
+          :html="true"
+          type="number"
+          title="Manually set integral"
+          label="I"
+          message="
               <p>
                 The integrator slowly builds up when the error is not zero.
                 If you don't want to wait for that, you can manually set the integral part of the output here.
@@ -302,43 +321,42 @@ export default class PidFull
                 It will continue to adjust automatically afterwards.
               </p>
               "
-              borderless
-              class="dashed-input"
-              @input="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
-            />
-          </div>
+          borderless
+          @input="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
+        />
+      </div>
 
-          <!-- Break -->
+      <!-- Break -->
 
-          <div class="span-2">
-            <LabeledField :tag-class="{darkish: block.data.td.val === 0}" label="Derivative">
-              {{ block.data.derivative | unit }}
-            </LabeledField>
-          </div>
+      <div class="span-2">
+        <LabeledField :tag-class="{darkish: block.data.td.val === 0}" label="Derivative">
+          {{ block.data.derivative | unit }}
+        </LabeledField>
+      </div>
 
-          <div class="span-1 self-center text-center">
-            *
-          </div>
+      <div class="span-1 self-center text-center">
+        *
+      </div>
 
-          <div class="span-2">
-            <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
-          </div>
+      <div class="span-2">
+        <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
+      </div>
 
-          <div class="span-1 self-center text-center">
-            *
-          </div>
+      <div class="span-1 self-center text-center">
+        *
+      </div>
 
-          <div class="span-2">
-            <TimeUnitField
-              :value="block.data.td"
-              :rules="[
-                v => v >= 0 || 'Value must be positive',
-                v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
-              ]"
-              :html="true"
-              title="Derivative time constant Td"
-              label="Td"
-              message="
+      <div class="span-2">
+        <TimeUnitField
+          :value="block.data.td"
+          :rules="[
+            v => v >= 0 || 'Value must be positive',
+            v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
+          ]"
+          :html="true"
+          title="Derivative time constant Td"
+          label="Td"
+          message="
               <p>
               When the input is approaching its target fast,
               the derivative action (D) can counteract the proportional action (P).
@@ -352,50 +370,47 @@ export default class PidFull
               When there is no overshoot in the system, Td should be set to zero.
               </p>
               "
-              borderless
-              class="dashed-input"
-              @input="v => { block.data.td = v; saveBlock(); }"
-            />
-          </div>
-
-          <div class="span-1 q-pt-sm self-center text-center">
-            =
-          </div>
-
-          <div class="span-2 calc-line">
-            <LabeledField label="D">
-              {{ block.data.d | round }}
-              <template #after>
-                <sub class="self-end">+</sub>
-              </template>
-            </LabeledField>
-          </div>
-
-          <!-- Break -->
-
-          <div
-            v-if="boiling"
-            class="calc-line"
-            :style="grid({start: 10, span: 2})"
-          >
-            <LabeledField label="Boil mode">
-              {{ boilAdjustment | round }}
-              <template #after>
-                <sub class="self-end">+</sub>
-              </template>
-            </LabeledField>
-          </div>
-
-          <!-- Break -->
-
-          <div :style="grid({start: 10, span: 2})">
-            <LabeledField label="Output">
-              {{ baseOutput + boilAdjustment | round }}
-            </LabeledField>
-          </div>
-        </div>
+          borderless
+          @input="v => { block.data.td = v; saveBlock(); }"
+        />
       </div>
-    </q-card-section>
+
+      <div class="span-1 q-pt-sm self-center text-center">
+        =
+      </div>
+
+      <div class="span-2 calc-line">
+        <LabeledField label="D">
+          {{ block.data.d | round }}
+          <template #after>
+            <sub class="self-end">+</sub>
+          </template>
+        </LabeledField>
+      </div>
+
+      <!-- Break -->
+
+      <div
+        v-if="boiling"
+        class="calc-line"
+        :style="grid({start: 10, span: 2})"
+      >
+        <LabeledField label="Boil mode">
+          {{ boilAdjustment | round }}
+          <template #after>
+            <sub class="self-end">+</sub>
+          </template>
+        </LabeledField>
+      </div>
+
+      <!-- Break -->
+
+      <div :style="grid({start: 10, span: 2})">
+        <LabeledField label="Output">
+          {{ baseOutput + boilAdjustment | round }}
+        </LabeledField>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -418,9 +433,5 @@ export default class PidFull
 
 .calc-line {
   border-bottom: 2px solid white;
-}
-
-.dashed-input {
-  border-bottom: 1px dashed grey;
 }
 </style>

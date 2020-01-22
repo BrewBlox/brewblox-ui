@@ -37,18 +37,23 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
       <WidgetToolbar v-else :crud="crud" />
     </template>
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <LabeledField :value="actual ? actual.id : 'Unknown'" label="ID" />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="actual ? actual.type : 'Unknown'" label="Type" />
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn icon="delete" flat @click="removeBlock" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+    <div class="widget-md widget-body">
+      <LabeledField
+        :value="actual ? actual.id : 'Unknown'"
+        label="ID"
+        class="col-grow"
+      />
+      <LabeledField
+        :value="actual ? actual.type : 'Unknown'"
+        label="Type"
+        class="col-grow"
+      />
+      <q-btn
+        icon="delete"
+        flat
+        class="col-grow"
+        @click="removeBlock"
+      />
+    </div>
   </CardWrapper>
 </template>

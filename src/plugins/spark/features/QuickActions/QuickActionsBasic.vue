@@ -164,62 +164,80 @@ export default class QuickActionsBasic extends CrudComponent {
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item v-for="step in stepDisplays" :key="step.id">
-        <q-item-section>
-          {{ step.name }}
-          <q-item-label caption>
+    <div class="widget-body column">
+      <div
+        v-for="step in stepDisplays"
+        :key="step.id"
+        class="row"
+      >
+        <div
+          class="col-grow q-py-xs q-px-sm rounded clickable"
+          style="min-width: 100px"
+          @click="showStepDialog(step)"
+        >
+          <div :class="step.active ? 'text-positive': ''">
+            {{ step.name }}
+          </div>
+          <q-item-label caption class="darkened">
             {{ step.changes.length }} Blocks changed
           </q-item-label>
           <q-tooltip v-if="step.applicable">
-            <q-list dense>
-              <q-item v-for="bdiff in step.diffs" :key="`bdiff-${step.id}-${bdiff.blockId}`">
-                <q-item-section class="col-3">
+            <div class="column">
+              <div class="col-auto text-italic" style="font-size: 120%">
+                {{ step.active ? 'Step is active' : 'Step changes' }}
+              </div>
+              <div
+                v-for="bdiff in step.diffs"
+                :key="`bdiff-${step.id}-${bdiff.blockId}`"
+                class="row q-gutter-x-sm items-baseline"
+              >
+                <div class="col-3 text-italic">
                   {{ bdiff.blockId }}
-                </q-item-section>
-                <q-item-section>
-                  <ul>
-                    <li v-for="fdiff in bdiff.diffs" :key="`fdiff-${step.id}-${bdiff.blockId}-${fdiff.key}`">
-                      {{ fdiff.key }}:
-                      <template v-if="fdiff.changed">
-                        <span style="color: red">{{ fdiff.oldV }}</span>
-                        =>
-                        <span style="color: lime">{{ fdiff.newV }}</span>
-                      </template>
-                      <template v-else>
-                        {{ fdiff.newV }}
-                      </template>
-                    </li>
-                  </ul>
-                </q-item-section>
-              </q-item>
-            </q-list>
+                </div>
+                <div class="col column q-py-sm">
+                  <div
+                    v-for="fdiff in bdiff.diffs"
+                    :key="`fdiff-${step.id}-${bdiff.blockId}-${fdiff.key}`"
+                    class="q-gutter-x-xs"
+                  >
+                    <span>{{ fdiff.key }}:</span>
+                    <template v-if="fdiff.changed">
+                      <span class="text-negative">{{ fdiff.oldV }}</span>
+                      <span>=></span>
+                      <span class="text-positive">{{ fdiff.newV }}</span>
+                    </template>
+                    <span v-else>
+                      {{ fdiff.newV }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </q-tooltip>
           <q-tooltip v-else>
             Step is not applicable. Do all changed blocks exist?
           </q-tooltip>
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn flat round icon="settings" @click="showStepDialog(step)" />
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn
-            :disable="!step.applicable"
-            :loading="applying"
-            :color="step.active ? 'positive': ''"
-            :label="step.active ? 'active': 'apply'"
-            outline
-            @click="applyStep(step)"
-          >
-            <q-tooltip v-if="step.active">
-              Step is applied
-            </q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+        </div>
+        <q-btn
+          flat
+          round
+          :disable="!step.applicable"
+          icon="mdi-play-circle"
+          :color="step.active ? 'positive' : ''"
+          class="col-auto q-ml-sm"
+          @click="applyStep(step)"
+        >
+          <q-tooltip v-if="step.active">
+            Step is active
+          </q-tooltip>
+          <q-tooltip v-else-if="step.applicable">
+            Apply step
+          </q-tooltip>
+        </q-btn>
+      </div>
+    </div>
   </div>
 </template>

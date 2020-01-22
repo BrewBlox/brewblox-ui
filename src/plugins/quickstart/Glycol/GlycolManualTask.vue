@@ -19,7 +19,7 @@ export default class GlycolManualTask extends WizardTaskBase<GlycolConfig> {
 </script>
 
 <template>
-  <WizardBody>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <big>About your new fermentation dashboard</big>
@@ -68,5 +68,5 @@ export default class GlycolManualTask extends WizardTaskBase<GlycolConfig> {
         </q-tooltip>
       </q-btn>
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

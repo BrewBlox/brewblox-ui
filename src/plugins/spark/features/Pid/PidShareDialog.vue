@@ -183,7 +183,7 @@ export default class PidShareDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized @hide="onDialogHide">
-    <q-card class="maximized column">
+    <q-card class="fit column">
       <DialogToolbar class="col-auto">
         {{ block.id }}
         <template #buttons>

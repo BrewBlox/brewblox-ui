@@ -90,7 +90,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
 </script>
 
 <template>
-  <WizardBody>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -174,5 +174,5 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

@@ -53,7 +53,7 @@ export default class DashboardWizard extends Vue {
 </script>
 
 <template>
-  <WizardBody>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -84,5 +84,5 @@ export default class DashboardWizard extends Vue {
       <q-space />
       <q-btn :disable="!valid" unelevated label="Create" color="primary" @click="createDashboard" />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

@@ -75,6 +75,8 @@ export default class DigitalStateField extends Vue {
       :options="options"
       :disable="disable"
       dense
+      unelevated
+      class="depth-1"
       @click="toggle"
     >
       <template #off>

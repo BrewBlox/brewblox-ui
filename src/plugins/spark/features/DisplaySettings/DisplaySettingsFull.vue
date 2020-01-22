@@ -121,7 +121,7 @@ export default class DisplaySettingsFull
 </script>
 
 <template>
-  <div>
+  <div class="widget-lg">
     <slot name="warnings" />
 
     <q-card-section class="q-gutter-y-sm">
@@ -130,7 +130,7 @@ export default class DisplaySettingsFull
           v-for="(slot, idx) in slots"
           :key="idx"
           :style="`border: 2px solid ${slotColor(slot)}; grid-column-end: span 1`"
-          class="q-pa-sm column justify-between"
+          class="q-pa-sm column q-gutter-y-xs"
         >
           <BlockField
             :value="slotLink(slot)"
@@ -162,11 +162,11 @@ export default class DisplaySettingsFull
         </div>
       </div>
 
-      <div class="row items-start">
+      <div class="row q-gutter-sm">
         <InputField
           :value="block.data.name"
           :rules="footerRules"
-          class="col"
+          class="col-grow"
           label="Footer text"
           title="footer text"
           @input="v => {block.data.name = v; saveBlock()}"
@@ -176,14 +176,15 @@ export default class DisplaySettingsFull
           :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
           label="Temperature unit"
           title="Temperature unit"
-          class="col q-pl-sm"
+          class="col-grow"
           @input="v => { block.data.tempUnit = v; saveBlock(); }"
         />
         <q-field
           label="Display brightness"
           stack-label
-          class="col q-px-sm"
+          class="col-grow"
           borderless
+          style="min-width: 100px"
         >
           <q-slider
             label

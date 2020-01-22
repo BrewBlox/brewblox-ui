@@ -17,36 +17,37 @@ export default class MotorValveBasic
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings">
-      <q-card-section>
-        <q-item class="items-start">
-          <q-item-section>
-            <DigitalStateField
-              :value="block.data.desiredState"
-              :pending="block.data.state !== block.data.desiredState"
-              :pending-reason="constrainers"
-              :disable="isDriven"
-              label="State"
-              @input="v => { block.data.desiredState = v; saveBlock(); }"
-            />
-          </q-item-section>
-          <q-item-section>
-            <LabeledField :value="valveStateName" label="Valve State" />
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-            <ConstraintsField
-              :value="block.data.constrainedBy"
-              :service-id="serviceId"
-              type="digital"
-              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-            />
-          </q-item-section>
-        </q-item>
-      </q-card-section>
+      <div class="widget-body row">
+        <DigitalStateField
+          :value="block.data.desiredState"
+          :pending="block.data.state !== block.data.desiredState"
+          :pending-reason="constrainers"
+          :disable="isDriven"
+          label="State"
+          class="col-grow"
+          @input="v => { block.data.desiredState = v; saveBlock(); }"
+        />
+        <LabeledField
+          :value="valveStateName"
+          label="Valve State"
+          class="col-grow"
+        />
+        <div class="col-break" />
+        <DrivenIndicator
+          :block-id="block.id"
+          :service-id="serviceId"
+          class="col-grow"
+        />
+        <ConstraintsField
+          :value="block.data.constrainedBy"
+          :service-id="serviceId"
+          type="digital"
+          class="col-grow"
+          @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+        />
+      </div>
     </slot>
   </div>
 </template>

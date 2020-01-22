@@ -22,7 +22,7 @@ export default class ActuatorPwmFull
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings">
       <BlockEnableToggle
         :crud="crud"
@@ -31,72 +31,69 @@ export default class ActuatorPwmFull
       />
     </slot>
 
-    <q-card-section>
-      <q-item>
-        <q-item-section class="col-4">
-          <TimeUnitField
-            :value="block.data.period"
-            title="Period"
-            label="Period"
-            tag="big"
-            @input="v => { block.data.period = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <BlockField
-            :value="block.data.actuatorId"
-            :service-id="serviceId"
-            title="target"
-            label="Digital Actuator Target"
-            @input="v => { block.data.actuatorId = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-      <q-item class="align-children">
-        <q-item-section>
-          <SliderField
-            :value="block.data.setting"
-            :readonly="isDriven"
-            :quick-actions="quickValues"
-            label="Duty setting"
-            tag="big"
-            :tag-class="{['text-orange']: isConstrained}"
-            title="Setting"
-            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField
-            :value="block.data.value"
-            number
-            label="Duty achieved"
-            tag="big"
-            suffix="%"
-          />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField
-            v-if="isConstrained"
-            label="Unconstrained setting"
-            :value="block.data.desiredSetting"
-            number
-            tag="big"
-            suffix="%"
-          />
-        </q-item-section>
-      </q-item>
+    <div class="widget-body row">
+      <SliderField
+        :value="block.data.setting"
+        :readonly="isDriven"
+        :quick-actions="quickValues"
+        label="Duty setting"
+        tag="big"
+        :tag-class="{['text-orange']: isConstrained}"
+        title="Setting"
+        class="col-grow"
+        @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+      />
+      <LabeledField
+        :value="block.data.value"
+        number
+        label="Duty achieved"
+        tag="big"
+        suffix="%"
+        class="col-grow"
+      />
+      <LabeledField
+        v-if="isConstrained"
+        label="Unconstrained setting"
+        :value="block.data.desiredSetting"
+        number
+        tag="big"
+        suffix="%"
+        class="col-grow"
+      />
 
-      <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="analog"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+      <div class="col-break" />
+
+      <TimeUnitField
+        :value="block.data.period"
+        title="Period"
+        label="Period"
+        tag="big"
+        class="col-grow"
+        @input="v => { block.data.period = v; saveBlock(); }"
+      />
+      <BlockField
+        :value="block.data.actuatorId"
+        :service-id="serviceId"
+        title="target"
+        label="Digital Actuator Target"
+        class="col-grow"
+        @input="v => { block.data.actuatorId = v; saveBlock(); }"
+      />
+
+      <div class="col-break" />
+
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
+      <ConstraintsField
+        :value="block.data.constrainedBy"
+        :service-id="serviceId"
+        type="analog"
+        class="col-grow"
+        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+      />
+    </div>
   </div>
 </template>

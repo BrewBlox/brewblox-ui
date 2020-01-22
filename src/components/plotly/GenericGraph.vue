@@ -149,7 +149,7 @@ export default class GenericGraph extends Vue {
     :data="data"
     :layout="plotlyLayout"
     :config="plotlyConfig"
-    class="maximized"
+    class="fit"
     v-bind="$attrs"
     @error="displayError"
     @plotly_click="onGraphClick"

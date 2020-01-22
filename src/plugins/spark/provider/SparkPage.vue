@@ -498,7 +498,7 @@ export default class SparkPage extends Vue {
     <template v-else>
       <!-- Normal display -->
       <div class="row no-wrap justify-start page-height">
-        <q-scroll-area class="content-column rounded-borders bg-dark">
+        <q-scroll-area visible class="content-column rounded-borders bg-dark">
           <q-list class="q-pr-md">
             <!-- Selection controls -->
             <q-item class="q-mb-md">
@@ -591,8 +591,8 @@ export default class SparkPage extends Vue {
         </q-scroll-area>
 
         <!-- Widget List -->
-        <q-scroll-area v-if="!$dense" class="content-column">
-          <q-list class="q-ml-lg q-pr-lg">
+        <q-scroll-area v-if="!$dense" visible class="content-column">
+          <q-list class="q-ml-lg q-pr-none">
             <!-- Service -->
             <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
               <q-item-section>

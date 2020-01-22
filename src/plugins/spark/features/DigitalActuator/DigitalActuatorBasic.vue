@@ -12,9 +12,9 @@ export default class DigitalActuatorBasic
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings">
-      <q-card-section>
+      <div class="widget-body row">
         <DigitalStateField
           :value="block.data.desiredState"
           :pending="block.data.state !== block.data.desiredState"
@@ -22,21 +22,23 @@ export default class DigitalActuatorBasic
           :disable="isDriven"
           dense
           label="State"
-          item-aligned
+          class="col-grow"
           @input="v => { block.data.desiredState = v; saveBlock(); }"
         />
-        <q-item>
-          <q-item-section>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-            <ConstraintsField
-              :value="block.data.constrainedBy"
-              :service-id="serviceId"
-              type="digital"
-              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-            />
-          </q-item-section>
-        </q-item>
-      </q-card-section>
+        <div class="col-break" />
+        <DrivenIndicator
+          :block-id="block.id"
+          :service-id="serviceId"
+          class="col-grow"
+        />
+        <ConstraintsField
+          :value="block.data.constrainedBy"
+          :service-id="serviceId"
+          type="digital"
+          class="col-grow"
+          @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+        />
+      </div>
     </slot>
   </div>
 </template>

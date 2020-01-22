@@ -48,56 +48,94 @@ export default class PidBasic
 </script>
 
 <template>
-  <div>
-    <!-- <slot name="warnings" /> -->
+  <div class="widget-md">
+    <slot name="warnings" />
 
-    <q-card-section class="q-pa-sm col column">
-      <q-item class="items-center col-auto">
-        <q-item-section>
-          <UnitField
-            v-if="!!inputBlock"
-            :value="inputBlock.data.storedSetting"
-            :readonly="inputDriven"
-            :class="{darkened: !inputBlock.data.settingEnabled}"
-            label="Input setting"
-            tag="big"
-            @input="v => { inputBlock.data.storedSetting = v; saveStoreBlock(inputBlock); }"
-          />
-          <UnitField v-else :value="block.data.inputSetting" label="Input setting" tag="big" readonly />
-        </q-item-section>
-        <q-item-section>
-          <UnitField :value="block.data.inputValue" label="Input measured" tag="big" readonly />
-        </q-item-section>
-        <q-item-section class="self-center">
-          <q-btn label="Open" flat align="left" class="depth-1" no-caps icon="mdi-launch" @click="showInput" />
-        </q-item-section>
-      </q-item>
+    <div class="widget-body row">
+      <UnitField
+        v-if="!!inputBlock"
+        :value="inputBlock.data.storedSetting"
+        :readonly="inputDriven"
+        :class="{darkened: !inputBlock.data.settingEnabled}"
+        label="Input setting"
+        tag="big"
+        class="col min-width"
+        @input="v => { inputBlock.data.storedSetting = v; saveStoreBlock(inputBlock); }"
+      />
+      <UnitField
+        v-else
+        :value="block.data.inputSetting"
+        label="Input setting"
+        tag="big"
+        readonly
+        class="col min-width"
+      />
+      <UnitField
+        :value="block.data.inputValue"
+        label="Input measured"
+        tag="big"
+        readonly
+        class="col min-width"
+      />
+      <q-btn
+        label="Open"
+        icon="mdi-launch"
+        flat
+        no-caps
+        class="depth-1 col min-width"
+        @click="showInput"
+      />
 
+      <div class="col-break" />
 
-      <q-item class="items-center col-auto">
-        <q-item-section>
-          <LabeledField :value="block.data.outputSetting" number label="Output target" tag="big" />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.outputValue" number label="Output achieved" tag="big" />
-        </q-item-section>
-        <q-item-section class="self-center">
-          <q-btn label="Open" flat class="depth-1" no-caps icon="mdi-launch" @click="showOutput" />
-        </q-item-section>
-      </q-item>
+      <LabeledField
+        :value="block.data.outputSetting"
+        number
+        label="Output target"
+        tag="big"
+        class="col min-width"
+      />
+      <LabeledField
+        :value="block.data.outputValue"
+        number
+        label="Output achieved"
+        tag="big"
+        class="col min-width"
+      />
+      <q-btn
+        label="Open"
+        icon="mdi-launch"
+        flat
+        no-caps
+        class="depth-1 col min-width"
+        @click="showOutput"
+      />
 
+      <div class="col-break" />
 
-      <q-item class="items-center col-auto">
-        <q-item-section>
-          <LabeledField :value="block.data.p" label="P" number />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.i" label="I" number />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.d" label="D" number />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+      <LabeledField
+        :value="block.data.p"
+        label="P"
+        number
+        class="col min-width"
+      />
+      <LabeledField
+        :value="block.data.i"
+        label="I"
+        number
+        class="col min-width"
+      />
+      <LabeledField
+        :value="block.data.d"
+        label="D"
+        number
+        class="col min-width"
+      />
+    </div>
   </div>
 </template>
+
+<style lang="sass" scoped>
+.min-width
+  min-width: 75px !important
+</style>

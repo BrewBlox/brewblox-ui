@@ -97,7 +97,7 @@ export default class ImportWizard extends Vue {
 </script>
 
 <template>
-  <WizardBody>
+  <ActionCardBody>
     <q-card-section>
       <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
         <q-option-group
@@ -136,5 +136,5 @@ export default class ImportWizard extends Vue {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="createWidget" />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

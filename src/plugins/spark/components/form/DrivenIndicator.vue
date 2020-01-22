@@ -46,32 +46,23 @@ export default class DrivenIndicator extends Vue {
 </script>
 
 <template>
-  <q-list>
-    <q-item
+  <q-list :class="[{clickable: isDriven}]">
+    <div
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"
-      clickable
-      style="padding: 5px 0; min-height: 0"
+      class="col-auto q-pa-sm q-gutter-x-sm text-indigo-4 row"
       @click="showDialog(chainIdx)"
     >
       <q-tooltip>Edit {{ bossDriver(chainIdx) }}</q-tooltip>
-      <q-item-section class="q-mr-md">
+      <q-icon name="mdi-fast-forward-outline" class="col-auto" size="sm" />
+      <div class="col-auto">
         <div v-for="text in chain" :key="text">
           <small class="darkish" v-html="text" />
         </div>
-      </q-item-section>
-      <q-item-section side>
-        <q-icon name="mdi-pencil" />
-      </q-item-section>
-    </q-item>
-    <!-- Display message if not driven -->
-    <q-item v-if="!isDriven" style="padding: 5px 0; min-height: 0;">
-      <q-item-section>
-        <small class="darkish">Not driven</small>
-      </q-item-section>
-      <q-item-section side>
-        <q-icon name="mdi-pencil-off" />
-      </q-item-section>
-    </q-item>
+      </div>
+    </div>
+    <div v-if="!isDriven" class="col-auto q-pa-sm darkish text-italic">
+      <small>Not driven</small>
+    </div>
   </q-list>
 </template>

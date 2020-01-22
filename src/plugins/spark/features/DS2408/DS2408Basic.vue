@@ -14,7 +14,7 @@ export default class DS2408Basic
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings" />
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
   </div>

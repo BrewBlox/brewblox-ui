@@ -18,16 +18,11 @@ export default class ActionCardWrapper extends Vue {
     <template #toolbar>
       <slot name="toolbar" />
     </template>
-    <div class="fit column">
-      <q-scroll-area class="col">
-        <slot />
-      </q-scroll-area>
-      <div v-if="$slots.actions" class="col-auto">
-        <q-separator />
-        <q-card-actions align="right">
-          <slot name="actions" />
-        </q-card-actions>
-      </div>
-    </div>
+    <ActionCardBody>
+      <slot />
+      <template #actions>
+        <slot name="actions" />
+      </template>
+    </ActionCardBody>
   </CardWrapper>
 </template>

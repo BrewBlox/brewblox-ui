@@ -90,7 +90,7 @@ export default class AutomationEditor extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized no-esc-dismiss @hide="onDialogHide">
-    <q-card class="maximized column">
+    <q-card class="fit column">
       <DialogToolbar>
         Step Editor
         <q-space />

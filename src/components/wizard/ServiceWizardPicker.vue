@@ -83,7 +83,7 @@ export default class ServiceWizardPicker extends Vue {
   />
 
   <!-- Select a wizard -->
-  <WizardBody v-else>
+  <ActionCardBody v-else>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -130,5 +130,5 @@ export default class ServiceWizardPicker extends Vue {
       <q-space />
       <q-btn unelevated label="Next" color="primary" @click="next" />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

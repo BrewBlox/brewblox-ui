@@ -36,21 +36,34 @@ export default class BalancerWidget
       <component :is="toolbarComponent" :crud="crud" />
     </template>
 
-    <q-card-section>
-      <q-item dense style="opacity: 0.5">
-        <q-item-section>Client</q-item-section>
-        <q-item-section>Granted</q-item-section>
-        <q-item-section>Requested</q-item-section>
-      </q-item>
-      <q-list dense>
-        <q-item v-for="client in block.data.clients" :key="client.id.id">
-          <q-item-section>
-            <i>{{ clientName(client.id) }}</i>
-          </q-item-section>
-          <q-item-section>{{ client.granted | round }}</q-item-section>
-          <q-item-section>{{ client.requested | round }}</q-item-section>
-        </q-item>
-      </q-list>
-    </q-card-section>
+    <div class="widget-md column q-ma-md q-gutter-y-sm">
+      <div class="col-auto row q-gutter-x-sm darkened">
+        <div class="col">
+          Client
+        </div>
+        <div class="col">
+          Granted
+        </div>
+        <div class="col">
+          Requested
+        </div>
+      </div>
+
+      <div
+        v-for="client in block.data.clients"
+        :key="client.id.id"
+        class="col-auto row q-gutter-x-sm"
+      >
+        <div class="col text-italic">
+          {{ clientName(client.id) }}
+        </div>
+        <div class="col">
+          {{ client.granted | round }}
+        </div>
+        <div class="col">
+          {{ client.requested | round }}
+        </div>
+      </div>
+    </div>
   </CardWrapper>
 </template>

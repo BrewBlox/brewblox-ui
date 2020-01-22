@@ -126,10 +126,19 @@ export default class ValveArray extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card-section>
-    <q-item v-for="channel in channels" :key="channel.id">
-      <q-item-section>{{ channelName(channel) }}</q-item-section>
-      <q-item-section>
+  <div class="widget-body column">
+    <div
+      v-for="channel in channels"
+      :key="channel.id"
+      class="col row q-gutter-x-sm items-stretch justify-end"
+    >
+      <div class="col-auto q-pr-md q-pt-sm self-center text-h6">
+        {{ channelName(channel) }}
+      </div>
+      <div
+        class="col-auto self-center justify-center"
+        style="min-width: 100px"
+      >
         <DigitalStateField
           v-if="channel.driver"
           :disable="driverDriven(channel.driver)"
@@ -138,34 +147,19 @@ export default class ValveArray extends BlockCrudComponent {
           :pending-reason="driverLimitedBy(channel.driver)"
           @input="v => saveState(channel, v)"
         />
-        <div v-else>
-          ---
+        <div v-else class="darkened text-italic q-pa-sm">
+          Not set
         </div>
-      </q-item-section>
-      <q-item-section>
-        <BlockField
-          :value="driverLink(channel)"
-          :service-id="serviceId"
-          title="Driver"
-          label="Driver"
-          no-show
-          dense
-          @input="link => saveDriver(channel, link)"
-        />
-      </q-item-section>
-      <q-item-section side>
-        <BlockDialogButton
-          v-if="channel.driver"
-          :block-id="channel.driver.id"
-          :service-id="serviceId"
-          flat
-        >
-          <q-tooltip>Configure valve</q-tooltip>
-        </BlockDialogButton>
-        <q-btn v-else flat icon="add" @click="createActuator(channel)">
-          <q-tooltip>Create new valve</q-tooltip>
-        </q-btn>
-      </q-item-section>
-    </q-item>
-  </q-card-section>
+      </div>
+      <BlockField
+        :value="driverLink(channel)"
+        :service-id="serviceId"
+        title="Driver"
+        label="Driver"
+        dense
+        class="col-grow"
+        @input="link => saveDriver(channel, link)"
+      />
+    </div>
+  </div>
 </template>

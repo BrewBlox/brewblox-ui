@@ -142,7 +142,7 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
 </script>
 
 <template>
-  <WizardBody>
+  <ActionCardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -204,5 +204,5 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </template>
-  </WizardBody>
+  </ActionCardBody>
 </template>

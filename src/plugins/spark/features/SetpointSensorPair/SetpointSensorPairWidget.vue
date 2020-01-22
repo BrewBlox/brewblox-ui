@@ -65,7 +65,6 @@ export default class SetpointSensorPairWidget
           :text-disabled="disabledString"
           text-enabled="Setpoint is enabled."
           data-key="settingEnabled"
-          class="full-width bordered"
         />
       </template>
     </component>

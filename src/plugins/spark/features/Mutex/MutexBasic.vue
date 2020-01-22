@@ -17,60 +17,57 @@ export default class MutexBasic
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item class="align-children">
-        <q-item-section>
-          <q-item-label caption>
-            Held by
-          </q-item-label>
-          <div v-for="client in mutexClients.active" :key="client">
+    <div class="widget-body row items-start mutex-body">
+      <LabeledField
+        label="Held by"
+        class="col-grow"
+      >
+        <div v-for="client in mutexClients.active" :key="client">
+          {{ client }}
+        </div>
+        <div v-if="mutexClients.active.length === 0">
+          --
+        </div>
+      </LabeledField>
+      <div
+        class="col-grow column"
+      >
+        <LabeledField label="Waiting">
+          <div v-for="client in mutexClients.waiting" :key="client">
             {{ client }}
           </div>
-          <div v-if="mutexClients.active.length === 0">
+          <div v-if="mutexClients.waiting.length === 0">
             --
           </div>
-        </q-item-section>
-        <q-item-section>
-          <div>
-            <q-item-label caption>
-              Waiting
-            </q-item-label>
-            <div v-for="client in mutexClients.waiting" :key="client">
-              {{ client }}
-            </div>
-            <div v-if="mutexClients.waiting.length === 0">
-              --
-            </div>
+        </LabeledField>
+        <LabeledField label="Wait time remaining">
+          <div v-if="mutexClients.waiting.length > 0 && block.data.waitRemaining.value">
+            {{ block.data.waitRemaining | unitDuration }}
           </div>
-          <div class="q-mt-md">
-            <q-item-label caption>
-              Wait time remaining
-            </q-item-label>
-            <div
-              v-if="mutexClients.waiting.length > 0 && block.data.waitRemaining.value"
-            >
-              {{ block.data.waitRemaining | unitDuration }}
-            </div>
-            <div v-else>
-              --
-            </div>
-          </div>
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>
-            Idle
-          </q-item-label>
-          <div v-for="client in mutexClients.idle" :key="client">
-            {{ client }}
-          </div>
-          <div v-if="mutexClients.idle.length === 0">
+          <div v-else>
             --
           </div>
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+        </LabeledField>
+      </div>
+      <LabeledField
+        label="Idle"
+        class="col-grow"
+      >
+        <div v-for="client in mutexClients.idle" :key="client">
+          {{ client }}
+        </div>
+        <div v-if="mutexClients.idle.length === 0">
+          --
+        </div>
+      </LabeledField>
+    </div>
   </div>
 </template>
+
+<style lang="sass" scoped>
+.mutex-body > *
+  min-width: 75px !important
+</style>

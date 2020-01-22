@@ -18,7 +18,7 @@ export default class BlockWizardDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
-    <CardWrapper v-bind="{context}">
+    <CardWrapper no-scroll v-bind="{context}">
       <template #toolbar>
         <DialogToolbar>Block wizard</DialogToolbar>
       </template>

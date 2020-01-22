@@ -29,7 +29,7 @@ export default class WidgetToolbar extends CrudComponent {
 </script>
 
 <template>
-  <Toolbar :title="widget.title" :subtitle="mode === 'Full' ? displayName : null">
+  <Toolbar :title="widget.title" :subtitle="displayName">
     <q-item-section side />
     <slot />
     <template #buttons>

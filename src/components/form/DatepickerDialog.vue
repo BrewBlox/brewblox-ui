@@ -52,12 +52,12 @@ export default class DatepickerDialog extends DialogBase {
             <q-date
               v-model="stringValue"
               mask="YYYY/MM/DD HH:mm:ss"
-              class="maximized"
+              class="fit"
               @input="tab='time'"
             />
           </q-tab-panel>
           <q-tab-panel name="time" class="q-pa-none">
-            <q-time v-model="stringValue" mask="YYYY/MM/DD HH:mm:ss" class="maximized" />
+            <q-time v-model="stringValue" mask="YYYY/MM/DD HH:mm:ss" class="fit" />
           </q-tab-panel>
         </q-tab-panels>
       </template>

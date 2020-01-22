@@ -21,16 +21,12 @@ export default class CardWrapper extends Vue {
     return !this.noScroll && this.context.size === 'Fixed';
   }
 
-  *cardClassGenerator(): Generator<string, void, undefined> {
-    yield `card__${this.context.container} depth-1`;
-
-    if (this.$dense) {
-      yield 'card__dense';
-    }
-  }
-
   get cardClass(): string {
-    return [...this.cardClassGenerator()].join(' ');
+    const listed = [`card__${this.context.container} depth-1`];
+    if (this.$dense) {
+      listed.push('card__dense');
+    }
+    return listed.join(' ');
   }
 
   get toolbarClass(): string {
@@ -49,7 +45,11 @@ export default class CardWrapper extends Vue {
       <slot name="toolbar" />
     </div>
     <div :class="bodyClass">
-      <component :is="scrollable ? 'q-scroll-area' : 'div'" visible :class="['fit', contentClass]">
+      <component
+        :is="scrollable ? 'q-scroll-area' : 'div'"
+        :class="['fit', contentClass]"
+        visible
+      >
         <slot />
       </component>
     </div>
