@@ -110,8 +110,6 @@ export default class DefaultLayout extends Vue {
 </template>
 
 <style lang="sass">
-@import 'src/css/app.sass'
-
 .q-layout
   overflow-x: auto
 </style>
