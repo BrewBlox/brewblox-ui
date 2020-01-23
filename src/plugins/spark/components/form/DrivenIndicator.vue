@@ -46,7 +46,7 @@ export default class DrivenIndicator extends Vue {
 </script>
 
 <template>
-  <q-list :class="[{clickable: isDriven}]">
+  <q-list :class="[{clickable: isDriven}]" class="rounded-borders">
     <div
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"

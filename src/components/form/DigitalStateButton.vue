@@ -5,7 +5,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 import { DigitalState } from '@/plugins/spark/types';
 
 @Component
-export default class DigitalStateField extends Vue {
+export default class DigitalStateButton extends Vue {
   on = DigitalState.Active;
   off = DigitalState.Inactive;
 
@@ -68,48 +68,44 @@ export default class DigitalStateField extends Vue {
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props, readonly: true}">
-    <q-btn-toggle
-      v-if="known"
-      :value="value"
-      :options="options"
-      :disable="disable"
-      dense
-      unelevated
-      class="depth-1"
-      @click="toggle"
-    >
-      <template #off>
-        <span class="row">
-          <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
-          <q-spinner v-if="pending && value === off" />
-          <span v-else>Off</span>
-        </span>
-      </template>
-      <template #on>
-        <span class="row">
-          <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
-          <q-spinner v-if="pending && value === on" />
-          <span v-else>On</span>
-        </span>
-      </template>
-    </q-btn-toggle>
-    <q-btn
-      v-else
-      :disable="disable"
-      class="reset-button"
-      dense
-      no-caps
-      flat
-      color="warning"
-      style="padding: 0px"
-      @click="toggle"
-    >
-      Unknown state!
-      <q-tooltip>
-        Click to try to set to
-        <i>inactive</i>
-      </q-tooltip>
-    </q-btn>
-  </LabeledField>
+  <q-btn-toggle
+    v-if="known"
+    v-bind="{value, options, disable, ...$attrs}"
+    :class="['depth-1', $attrs.class]"
+    dense
+    unelevated
+    @click="toggle"
+  >
+    <template #off>
+      <span class="row">
+        <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
+        <q-spinner v-if="pending && value === off" />
+        <span v-else>Off</span>
+      </span>
+    </template>
+    <template #on>
+      <span class="row">
+        <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
+        <q-spinner v-if="pending && value === on" />
+        <span v-else>On</span>
+      </span>
+    </template>
+  </q-btn-toggle>
+  <q-btn
+    v-else
+    :disable="disable"
+    class="reset-button"
+    dense
+    no-caps
+    flat
+    color="warning"
+    style="padding: 0px"
+    @click="toggle"
+  >
+    Unknown state!
+    <q-tooltip>
+      Click to try to set to
+      <i>inactive</i>
+    </q-tooltip>
+  </q-btn>
 </template>

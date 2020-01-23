@@ -174,7 +174,7 @@ export default class QuickActionsBasic extends CrudComponent {
         class="row"
       >
         <div
-          class="col-grow q-py-xs q-px-sm rounded clickable"
+          class="col-grow q-py-xs q-px-sm rounded-borders clickable"
           style="min-width: 100px"
           @click="showStepDialog(step)"
         >

@@ -25,35 +25,42 @@ export default class TempSensorOneWireWidget
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
 
-    <CardWarning v-if="!hasValue">
-      <template #message>
-        OneWire Sensor could not be read.
-      </template>
-    </CardWarning>
+    <div class="widget-md">
+      <CardWarning v-if="!hasValue">
+        <template #message>
+          OneWire Sensor could not be read.
+        </template>
+      </CardWarning>
 
-    <q-card-section>
-      <UnitField v-if="hasValue" :value="block.data.value" label="Value" readonly item-aligned tag="big" />
+      <div class="widget-body row">
+        <UnitField
+          v-if="hasValue"
+          :value="block.data.value"
+          label="Value"
+          readonly
+          item-aligned
+          tag="big"
+          class="col-grow"
+        />
 
-      <template v-if="mode === 'Full'">
-        <q-item>
-          <q-item-section>
-            <UnitField
-              :value="block.data.offset"
-              title="Offset"
-              label="Offset"
-              @input="v => { block.data.offset = v; saveBlock(); }"
-            />
-          </q-item-section>
-          <q-item-section>
-            <InputField
-              :value="block.data.address"
-              title="Address"
-              label="Address"
-              @input="v => { block.data.address = v; saveBlock(); }"
-            />
-          </q-item-section>
-        </q-item>
-      </template>
-    </q-card-section>
+        <template v-if="mode === 'Full'">
+          <div class="col-break" />
+          <UnitField
+            :value="block.data.offset"
+            title="Offset"
+            label="Offset"
+            class="col-grow"
+            @input="v => { block.data.offset = v; saveBlock(); }"
+          />
+          <InputField
+            :value="block.data.address"
+            title="Address"
+            label="Address"
+            class="col-grow"
+            @input="v => { block.data.address = v; saveBlock(); }"
+          />
+        </template>
+      </div>
+    </div>
   </GraphCardWrapper>
 </template>

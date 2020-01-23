@@ -182,9 +182,8 @@ export default class DisplaySettingsFull
         <q-field
           label="Display brightness"
           stack-label
-          class="col-grow"
           borderless
-          style="min-width: 100px"
+          class="col-grow min-width-md"
         >
           <q-slider
             label

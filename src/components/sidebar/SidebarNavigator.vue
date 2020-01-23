@@ -37,8 +37,6 @@ export default class SidebarNavigator extends Vue {
 
 <template>
   <div class="col-auto">
-    <q-separator />
-
     <div class="row wrap">
       <q-btn
         icon="mdi-view-dashboard"

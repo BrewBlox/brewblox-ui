@@ -16,6 +16,8 @@ export default class Spark2PinsWidget
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" />
     </template>
-    <IoArray :crud="crud" />
+    <div class="widget-md">
+      <IoArray :crud="crud" />
+    </div>
   </CardWrapper>
 </template>

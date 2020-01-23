@@ -130,21 +130,19 @@ export default class ValveArray extends BlockCrudComponent {
     <div
       v-for="channel in channels"
       :key="channel.id"
-      class="col row q-gutter-x-sm items-stretch justify-end"
+      class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
     >
-      <div class="col-auto q-pr-md q-pt-sm self-center text-h6">
+      <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
         {{ channelName(channel) }}
       </div>
-      <div
-        class="col-auto self-center justify-center"
-        style="min-width: 100px"
-      >
-        <DigitalStateField
+      <div class="col-auto row items-baseline min-width-sm">
+        <DigitalStateButton
           v-if="channel.driver"
           :disable="driverDriven(channel.driver)"
           :value="channel.driver.data.desiredState"
           :pending="channel.driver.data.state !== channel.driver.data.desiredState"
           :pending-reason="driverLimitedBy(channel.driver)"
+          class="col-auto self-center"
           @input="v => saveState(channel, v)"
         />
         <div v-else class="darkened text-italic q-pa-sm">

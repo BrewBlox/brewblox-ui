@@ -21,7 +21,7 @@ export default class Toolbar extends Vue {
         <q-item-label v-if="titleMode" class="text-deep-purple-3 text-h6">
           {{ title }}
         </q-item-label>
-        <q-item-label v-else class="text-indigo-4 text-italic text-bold">
+        <q-item-label v-else class="text-indigo-4 text-h6 text-italic">
           {{ subtitle }}
         </q-item-label>
       </q-item-section>

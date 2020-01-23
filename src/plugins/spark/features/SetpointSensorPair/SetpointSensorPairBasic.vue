@@ -15,9 +15,7 @@ export default class SetpointSensorPairBasic
   <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section
-      class="row q-mx-md q-gutter-y-sm justify-between"
-    >
+    <div class="widget-body row">
       <UnitField
         :class="{darkened: !block.data.settingEnabled}"
         :value="block.data.storedSetting"
@@ -25,7 +23,7 @@ export default class SetpointSensorPairBasic
         title="Setting"
         label="Setting"
         tag="big"
-        class="col-auto"
+        class="col-grow"
         @input="v => {block.data.storedSetting = v; saveBlock()}"
       />
       <UnitField
@@ -33,20 +31,23 @@ export default class SetpointSensorPairBasic
         label="Sensor"
         tag="big"
         readonly
-        class="col-auto"
+        class="col-grow"
       />
       <UnitField
         :value="block.data.valueUnfiltered"
         label="Unfiltered sensor"
         tag="big"
-        class="col-auto"
+        class="col-grow"
         readonly
       />
+
+      <div class="col-break" />
+
       <DrivenIndicator
         :block-id="block.id"
         :service-id="serviceId"
-        class="col-12"
+        class="col-grow"
       />
-    </q-card-section>
+    </div>
   </div>
 </template>

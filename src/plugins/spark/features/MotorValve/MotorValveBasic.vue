@@ -20,15 +20,18 @@ export default class MotorValveBasic
   <div class="widget-md">
     <slot name="warnings">
       <div class="widget-body row">
-        <DigitalStateField
-          :value="block.data.desiredState"
-          :pending="block.data.state !== block.data.desiredState"
-          :pending-reason="constrainers"
-          :disable="isDriven"
+        <LabeledField
           label="State"
           class="col-grow"
-          @input="v => { block.data.desiredState = v; saveBlock(); }"
-        />
+        >
+          <DigitalStateButton
+            :value="block.data.desiredState"
+            :pending="block.data.state !== block.data.desiredState"
+            :pending-reason="constrainers"
+            :disable="isDriven"
+            @input="v => { block.data.desiredState = v; saveBlock(); }"
+          />
+        </LabeledField>
         <LabeledField
           :value="valveStateName"
           label="Valve State"

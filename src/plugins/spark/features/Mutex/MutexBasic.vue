@@ -20,10 +20,10 @@ export default class MutexBasic
   <div class="widget-md">
     <slot name="warnings" />
 
-    <div class="widget-body row items-start mutex-body">
+    <div class="widget-body row items-start">
       <LabeledField
         label="Held by"
-        class="col-grow"
+        class="col-grow min-width-sm"
       >
         <div v-for="client in mutexClients.active" :key="client">
           {{ client }}
@@ -33,7 +33,7 @@ export default class MutexBasic
         </div>
       </LabeledField>
       <div
-        class="col-grow column"
+        class="col-grow column min-width-sm"
       >
         <LabeledField label="Waiting">
           <div v-for="client in mutexClients.waiting" :key="client">
@@ -54,7 +54,7 @@ export default class MutexBasic
       </div>
       <LabeledField
         label="Idle"
-        class="col-grow"
+        class="col-grow min-width-sm"
       >
         <div v-for="client in mutexClients.idle" :key="client">
           {{ client }}
@@ -66,8 +66,3 @@ export default class MutexBasic
     </div>
   </div>
 </template>
-
-<style lang="sass" scoped>
-.mutex-body > *
-  min-width: 75px !important
-</style>

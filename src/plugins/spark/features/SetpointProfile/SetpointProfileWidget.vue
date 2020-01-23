@@ -78,7 +78,7 @@ export default class SetpointProfileWidget
       </template>
 
       <template #graph>
-        <q-resize-observer :debounce="200" @resize="refresh" />
+        <q-resize-observer @resize="refresh" />
         <GenericGraph v-bind="graphProps" :revision="revision" auto-fit auto-resize />
       </template>
     </component>

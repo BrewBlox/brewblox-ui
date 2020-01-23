@@ -38,7 +38,7 @@ export default class SessionHeaderField extends Vue {
 </script>
 
 <template>
-  <div class="row text-grey-2 q-px-md q-my-xs items-baseline hoverable" @click="showDialog">
+  <div class="row text-grey-2 q-px-md items-baseline hoverable" @click="showDialog">
     <q-tooltip
       v-if="tags.length > 0"
       content-style="background: transparent"

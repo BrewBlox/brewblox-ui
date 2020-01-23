@@ -11,7 +11,6 @@ import { isReady } from './getters';
 
 @Component
 export default class SparkWidget extends Vue {
-  infoClass = 'col-lg-5 col-11';
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -80,42 +79,41 @@ export default class SparkWidget extends Vue {
       </DialogToolbar>
       <Toolbar v-else :title="serviceId" subtitle="Device info">
         <template #buttons>
-          <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
+          <q-btn flat dense icon="refresh" class="darkish" @click="fetchAll" />
         </template>
       </Toolbar>
     </template>
 
+    <div>
+      <CardWarning v-if="!updating">
+        <template #message>
+          <span>Unable to update automatically</span>
+        </template>
+        <template #actions>
+          <q-btn label="Retry" color="warning" outline @click="retryUpdateSource" />
+        </template>
+      </CardWarning>
 
-    <CardWarning v-if="!updating">
-      <template #message>
-        <span>Unable to update automatically</span>
-      </template>
-      <template #actions>
-        <q-btn label="Retry" color="warning" outline @click="retryUpdateSource" />
-      </template>
-    </CardWarning>
-
-    <q-card-section>
-      <div class="row wrap q-gutter-x-md">
-        <LabeledField label="Firmware version" :class="infoClass">
+      <div class="widget-body row">
+        <LabeledField label="Firmware version" class="col-lg-5 col-11">
           {{ sysInfo.data.version }}
         </LabeledField>
-        <LabeledField label="Firmware release date" :class="infoClass">
+        <LabeledField label="Firmware release date" class="col-lg-5 col-11">
           {{ sysInfo.data.releaseDate }}
         </LabeledField>
-        <LabeledField label="Device time" :class="infoClass">
+        <LabeledField label="Device time" class="col-lg-5 col-11">
           {{ sysDate }}
         </LabeledField>
-        <LabeledField label="Time since boot" :class="infoClass">
+        <LabeledField label="Time since boot" class="col-lg-5 col-11">
           {{ ticks.data.millisSinceBoot | duration }}
         </LabeledField>
-        <LabeledField label="Device ID" :class="infoClass" tag-style="word-wrap: break-word;">
-          {{ sysInfo.data.deviceId }}
-        </LabeledField>
-        <LabeledField label="IP address" :class="infoClass">
+        <LabeledField label="IP address" class="col-lg-5 col-11">
           {{ wifi.data.ip }}
         </LabeledField>
+        <LabeledField label="Device ID" class="col-lg-5 col-11" tag-style="word-wrap: break-word;">
+          {{ sysInfo.data.deviceId }}
+        </LabeledField>
       </div>
-    </q-card-section>
+    </div>
   </CardWrapper>
 </template>

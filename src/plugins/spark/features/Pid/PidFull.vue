@@ -125,12 +125,22 @@ export default class PidFull
         class="col-grow"
         readonly
       />
-      <div class="col-auto">
-        <q-btn v-if="!!inputBlock" flat icon="mdi-launch" @click="showInput">
-          <q-tooltip>Edit {{ inputBlock.id }}</q-tooltip>
-        </q-btn>
-        <q-btn v-else disable flat icon="mdi-launch" />
-      </div>
+      <q-btn
+        v-if="!!inputBlock"
+        flat
+        icon="mdi-launch"
+        class="col-auto depth-1"
+        @click="showInput"
+      >
+        <q-tooltip>Edit {{ inputBlock.id }}</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-else
+        disable
+        flat
+        class="col-auto"
+        icon="mdi-cancel"
+      />
 
       <!-- Output row -->
       <div class="col-break" />
@@ -170,12 +180,22 @@ export default class PidFull
         tag="b"
         class="col-grow"
       />
-      <div class="col-auto">
-        <q-btn v-if="!!outputBlock" flat icon="mdi-launch" @click="showOutput">
-          <q-tooltip>Edit {{ outputBlock.id }}</q-tooltip>
-        </q-btn>
-        <q-btn v-else disable flat icon="mdi-launch" />
-      </div>
+      <q-btn
+        v-if="!!outputBlock"
+        flat
+        icon="mdi-launch"
+        class="col-auto depth-1"
+        @click="showOutput"
+      >
+        <q-tooltip>Edit {{ outputBlock.id }}</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-else
+        disable
+        flat
+        icon="mdi-cancel"
+        class="col-auto"
+      />
 
       <!-- Boil mode settings -->
       <div class="col-break" />

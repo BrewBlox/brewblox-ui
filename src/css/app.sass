@@ -30,11 +30,11 @@
   max-width: 100%
 
   &__Dialog
-    height: calc(100% - 51px)
+    height: calc(100% - 50px)
     background-color: $dark
 
   &__Dashboard
-    height: calc(100% - 41px)
+    height: calc(100% - 40px)
 
 .widget
   &-sm
@@ -46,6 +46,16 @@
 
 .widget-body
   @extend .q-ma-md, .q-gutter-sm
+
+.min-width
+  &-xs
+    min-width: 50px !important
+  &-sm
+    min-width: 75px !important
+  &-md
+    min-width: 100px !important
+  &-lg
+    min-width: 150px !important
 
 .editable
   text-decoration: underline
@@ -76,9 +86,6 @@
 .clickable:hover
   background-color: $hover
   cursor: pointer
-
-.rounded
-  border-radius: 2px
 
 .static
   position: static !important

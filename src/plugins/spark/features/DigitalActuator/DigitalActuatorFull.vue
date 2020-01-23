@@ -91,15 +91,18 @@ export default class DigitalActuatorForm
 
       <div class="col-break" />
 
-      <DigitalStateField
-        :value="block.data.desiredState"
-        :pending="block.data.state !== block.data.desiredState"
-        :pending-reason="constrainers"
-        :disable="isDriven"
+      <LabeledField
         label="State"
         class="col-grow"
-        @input="v => { block.data.desiredState = v; saveBlock(); }"
-      />
+      >
+        <DigitalStateButton
+          :value="block.data.desiredState"
+          :pending="block.data.state !== block.data.desiredState"
+          :pending-reason="constrainers"
+          :disable="isDriven"
+          @input="v => { block.data.desiredState = v; saveBlock(); }"
+        />
+      </LabeledField>
       <LabeledField
         label="Invert"
         class="col-grow"

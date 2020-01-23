@@ -15,16 +15,19 @@ export default class DigitalActuatorBasic
   <div class="widget-md">
     <slot name="warnings">
       <div class="widget-body row">
-        <DigitalStateField
-          :value="block.data.desiredState"
-          :pending="block.data.state !== block.data.desiredState"
-          :pending-reason="constrainers"
-          :disable="isDriven"
-          dense
+        <LabeledField
           label="State"
           class="col-grow"
-          @input="v => { block.data.desiredState = v; saveBlock(); }"
-        />
+        >
+          <DigitalStateButton
+            :value="block.data.desiredState"
+            :pending="block.data.state !== block.data.desiredState"
+            :pending-reason="constrainers"
+            :disable="isDriven"
+            dense
+            @input="v => { block.data.desiredState = v; saveBlock(); }"
+          />
+        </LabeledField>
         <div class="col-break" />
         <DrivenIndicator
           :block-id="block.id"

@@ -170,88 +170,98 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
 
 
 <template>
-  <div>
+  <div class="widget-lg">
     <slot name="warnings" />
 
-    <q-card-section v-if="session !== null">
-      <q-list>
-        <SessionHeaderField :session="session" @update:session="saveSession" />
-        <draggable ref="notebox" v-model="notes" :disabled="$dense" class="row q-gutter-xs">
-          <div
-            v-for="note in notes"
-            :key="note.id"
-            :class="[`col-${note.col}`, 'q-pa-xs', 'q-ma-none']"
-          >
-            <div style="border: 1px solid silver; border-right: 3px dotted silver;" class="relative-position">
-              <div
-                v-touch-pan.prevent.stop.mouse="v => onSwipe(v, note)"
-                class="move-border"
-              />
-              <q-item>
-                <q-item-section class="col-shrink">
-                  <InputField
-                    :value="note.title"
-                    title="Note name"
-                    label="Note name"
-                    dense
-                    tag-class="ellipsis-3-lines text-info"
-                    style="max-width: 100%;"
-                    @input="v => saveTitle(note, v)"
-                  >
-                    <template #before>
-                      <q-icon
-                        :name="note.type === 'Graph' ? 'mdi-chart-line' : 'mdi-text-subject'"
-                        size="xs"
-                        class="self-end q-mb-none"
-                        color="info"
-                      />
-                    </template>
-                  </InputField>
-                </q-item-section>
-                <q-space />
-                <q-item-section v-if="note.type === 'Graph'" class="col-shrink">
-                  <q-btn icon="settings" flat dense @click="editGraph(note)">
-                    <q-tooltip>Select graph data</q-tooltip>
-                  </q-btn>
-                </q-item-section>
-                <q-item-section class="col-shrink">
-                  <q-btn icon="mdi-dots-vertical" flat dense>
-                    <q-menu>
-                      <q-list bordered>
-                        <ActionItem label="Clear content" icon="clear" @click="clearNote(note)" />
-                        <ActionItem label="Remove note" icon="delete" @click="removeNote(note)" />
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-              <q-item v-if="note.type === 'Text'">
-                <q-item-section class="darkish">
+    <div v-if="session !== null" class="widget-body row">
+      <SessionHeaderField
+        :session="session"
+        class="col q-py-sm"
+        @update:session="saveSession"
+      />
+
+      <div class="col-break" />
+      <draggable
+        ref="notebox"
+        v-model="notes"
+        :disabled="$dense"
+        class="col row q-gutter-xs"
+      >
+        <div
+          v-for="note in notes"
+          :key="note.id"
+          :class="[`col-${note.col}`, 'q-pa-xs', 'q-ma-none']"
+        >
+          <div style="border: 1px solid silver; border-right: 3px dotted silver;" class="relative-position">
+            <div
+              v-touch-pan.prevent.stop.mouse="v => onSwipe(v, note)"
+              class="move-border"
+            />
+            <div class="row q-gutter-x-sm q-pa-xs">
+              <InputField
+                :value="note.title"
+                title="Note name"
+                label="Note name"
+                dense
+                tag-class="ellipsis-3-lines text-info"
+                style="max-width: 100%;"
+                class="col-auto"
+                @input="v => saveTitle(note, v)"
+              >
+                <template #before>
+                  <q-icon
+                    :name="note.type === 'Graph' ? 'mdi-chart-line' : 'mdi-text-subject'"
+                    size="xs"
+                    class="self-end q-mb-none"
+                    color="info"
+                  />
+                </template>
+              </InputField>
+              <q-space />
+              <div v-if="note.type === 'Graph'" class="col-shrink">
+                <q-btn icon="settings" flat dense @click="editGraph(note)">
+                  <q-tooltip>Select graph data</q-tooltip>
+                </q-btn>
+              </div>
+              <div class="col-auto">
+                <q-btn icon="mdi-dots-vertical" flat dense>
+                  <q-menu>
+                    <q-list bordered>
+                      <ActionItem label="Clear content" icon="clear" @click="clearNote(note)" />
+                      <ActionItem label="Remove note" icon="delete" @click="removeNote(note)" />
+                    </q-list>
+                  </q-menu>
+                </q-btn>
+              </div>
+              <template v-if="note.type === 'Text'">
+                <div class="col-break" />
+                <div class="col darkish ellipsis q-pa-xs">
                   <!-- No line breaks to allow correctly rendering whitespace -->
                   <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
                   <div style="white-space: pre-wrap; cursor: default;">{{ note.value }}</div>
-                </q-item-section>
-              </q-item>
+                </div>
+              </template>
             </div>
           </div>
-        </draggable>
-        <q-item>
-          <q-space />
-          <q-item-section class="col-auto">
-            <q-btn outline round icon="add">
-              <q-menu>
-                <q-list>
-                  <ActionItem label="Add text note" @click="addTextNote" />
-                  <ActionItem label="Add graph note" @click="addGraphNote" />
-                </q-list>
-              </q-menu>
-            </q-btn>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-card-section>
+        </div>
+      </draggable>
 
-    <q-card-section v-else class="column justify-end" style="height: 40%">
+      <div class="col-break" />
+      <div class="col row justify-end q-mt-sm">
+        <q-btn fab-mini color="accent" icon="add">
+          <q-menu>
+            <q-list>
+              <ActionItem label="Add text note" @click="addTextNote" />
+              <ActionItem label="Add graph note" @click="addGraphNote" />
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </div>
+    </div>
+
+    <div v-else class="widget-body" />
+
+    <q-card-section v-if="false" class="column justify-end" style="height: 40%">
       <div class="col-auto row justify-center">
         <q-btn outline label="New session" @click="addSession" />
       </div>

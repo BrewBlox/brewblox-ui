@@ -31,59 +31,44 @@ export default class SetpointSensorPairForm
 </script>
 
 <template>
-  <div>
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-separator inset />
+    <div class="widget-body row">
+      <UnitField
+        :value="block.data.storedSetting"
+        :readonly="isDriven"
+        :class="{darkened: !block.data.settingEnabled}"
+        title="Setting"
+        label="Setting"
+        tag="big"
+        class="col-grow"
+        @input="v => { block.data.storedSetting = v; saveBlock(); }"
+      />
+      <UnitField
+        :value="block.data.value"
+        label="Sensor"
+        readonly
+        tag="big"
+        class="col-grow"
+      />
+      <UnitField
+        :value="block.data.valueUnfiltered"
+        label="Unfiltered sensor"
+        readonly
+        tag="big"
+        class="col-grow"
+      />
 
-      <q-item class="items-start">
-        <q-item-section class="col-4">
-          <UnitField
-            :value="block.data.storedSetting"
-            :readonly="isDriven"
-            :class="{darkened: !block.data.settingEnabled}"
-            title="Setting"
-            label="Setting"
-            class="self-start"
-            tag="big"
-            @input="v => { block.data.storedSetting = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section v-if="usedBy.length">
-          <LabeledField label="Input for:">
-            <div class="row">
-              <q-btn
-                v-for="block in usedBy"
-                :key="block.id"
-                :label="block.id"
-                dense
-                no-caps
-                flat
-                class="q-py-xs"
-                style="text-decoration: underline"
-                @click="showOtherBlock(block)"
-              />
-            </div>
-          </LabeledField>
-        </q-item-section>
-        <template v-else>
-          <q-item-section>This setpoint is not used as PID input</q-item-section>
-        </template>
-      </q-item>
+      <div class="col-break" />
 
-      <q-item class="items-end">
-        <q-item-section class="col-4">
-          <UnitField :value="block.data.value" label="Sensor value" tag="big" readonly />
-        </q-item-section>
-        <q-item-section class="col-3">
-          <SelectField
-            :value="block.data.filter"
-            :options="filterOpts"
-            :html="true"
-            title="Filter"
-            label="Filter period"
-            message="
+      <SelectField
+        :value="block.data.filter"
+        :options="filterOpts"
+        :html="true"
+        title="Filter"
+        label="Filter period"
+        message="
               <p>
                 A filter averages multiple sensor values to remove noise, spikes and sudden jumps.
                 Changes faster than the filter period will be filted out.
@@ -93,58 +78,98 @@ export default class SetpointSensorPairForm
                 This delay is equal to the chosen period.
               </p>
               "
-            @input="v => { block.data.filter = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section class="col-4">
-          <UnitField
-            :value="block.data.filterThreshold"
-            :html="true"
-            title="Filter bypass threshold"
-            label="Bypass threshold"
-            message="
+        class="col-grow"
+        @input="v => { block.data.filter = v; saveBlock(); }"
+      />
+      <UnitField
+        :value="block.data.filterThreshold"
+        :html="true"
+        title="Filter bypass threshold"
+        label="Bypass threshold"
+        message="
               <p>
                 The filter can detect when a large step occurs at the input and temporary bypass slow filtering.
                 The threshold for an input change that should trigger this can be set here.
               </p>
               "
-            @input="v => { block.data.filterThreshold = v; saveBlock(); }"
+        class="col-grow"
+        @input="v => { block.data.filterThreshold = v; saveBlock(); }"
+      >
+        <template #append>
+          <q-btn
+            flat
+            round
+            icon="mdi-skip-forward"
+            class="self-end"
+            @click="block.data.resetFilter = true; saveBlock()"
           >
-            <template #append>
-              <q-btn
-                flat
-                round
-                icon="mdi-skip-forward"
-                class="self-end"
-                @click="block.data.resetFilter = true; saveBlock()"
-              >
-                <q-tooltip>Bypass filter now</q-tooltip>
-              </q-btn>
-            </template>
-          </UnitField>
-        </q-item-section>
-      </q-item>
+            <q-tooltip>Bypass filter now</q-tooltip>
+          </q-btn>
+        </template>
+      </UnitField>
 
-      <q-item>
-        <q-item-section class="col-4">
-          <UnitField :value="block.data.valueUnfiltered" label="Unfiltered sensor value" tag="big" readonly />
-        </q-item-section>
-        <q-item-section class="col-7">
-          <BlockField
-            :value="block.data.sensorId"
-            :service-id="serviceId"
-            title="Sensor Block"
-            label="Sensor Block"
-            tag="span"
-            @input="v => { block.data.sensorId = v; saveBlock(); }"
+      <div class="col-break" />
+
+      <BlockField
+        :value="block.data.sensorId"
+        :service-id="serviceId"
+        title="Sensor Block"
+        label="Sensor Block"
+        tag="span"
+        class="col-grow"
+        @input="v => { block.data.sensorId = v; saveBlock(); }"
+      />
+      <LabeledField
+        label="Input for:"
+        class="col-grow"
+      >
+        <div class="row">
+          <q-btn
+            v-for="block in usedBy"
+            :key="block.id"
+            :label="block.id"
+            dense
+            no-caps
+            flat
+            class="depth-1"
+            @click="showOtherBlock(block)"
           />
-        </q-item-section>
+          <div v-if="usedBy.length === 0">
+            This setpoint is not used as PID input
+          </div>
+        </div>
+      </LabeledField>
+
+      <div class="col-break" />
+
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
+    </div>
+
+    <q-card-section v-if="false">
+      <q-separator inset />
+
+      <q-item class="items-start">
+        <q-item-section class="col-4" />
+        <q-item-section v-if="usedBy.length" />
+      </q-item>
+
+      <q-item class="items-end">
+        <q-item-section class="col-4" />
+        <q-item-section class="col-3" />
+        <q-item-section class="col-4" />
       </q-item>
 
       <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-        </q-item-section>
+        <q-item-section class="col-4" />
+        <q-item-section class="col-7" />
+      </q-item>
+
+      <q-item>
+        <q-item-section />
       </q-item>
     </q-card-section>
   </div>
