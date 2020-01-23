@@ -173,14 +173,13 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   <div class="widget-lg">
     <slot name="warnings" />
 
-    <div v-if="session !== null" class="widget-body row">
+    <div v-if="session !== null" class="column q-ma-md">
       <SessionHeaderField
         :session="session"
-        class="col q-py-sm"
+        class="col q-mb-sm"
         @update:session="saveSession"
       />
 
-      <div class="col-break" />
       <draggable
         ref="notebox"
         v-model="notes"
@@ -190,22 +189,22 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
         <div
           v-for="note in notes"
           :key="note.id"
-          :class="[`col-${note.col}`, 'q-pa-xs', 'q-ma-none']"
+          :class="[`col-${note.col}`, 'q-pa-xs q-ma-none']"
         >
           <div style="border: 1px solid silver; border-right: 3px dotted silver;" class="relative-position">
             <div
               v-touch-pan.prevent.stop.mouse="v => onSwipe(v, note)"
               class="move-border"
             />
-            <div class="row q-gutter-x-sm q-pa-xs">
+            <div class="row q-gutter-x-xs q-pa-xs">
               <InputField
                 :value="note.title"
                 title="Note name"
                 label="Note name"
                 dense
-                tag-class="ellipsis-3-lines text-info"
+                tag-class="ellipsis-3-lines text-secondary"
                 style="max-width: 100%;"
-                class="col-auto"
+                class="col q-pb-xs"
                 @input="v => saveTitle(note, v)"
               >
                 <template #before>
@@ -213,18 +212,31 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
                     :name="note.type === 'Graph' ? 'mdi-chart-line' : 'mdi-text-subject'"
                     size="xs"
                     class="self-end q-mb-none"
-                    color="info"
+                    color="secondary"
                   />
                 </template>
               </InputField>
-              <q-space />
-              <div v-if="note.type === 'Graph'" class="col-shrink">
-                <q-btn icon="settings" flat dense @click="editGraph(note)">
+              <div
+                v-if="note.type === 'Graph'"
+                class="col-auto row"
+              >
+                <q-btn
+                  icon="settings"
+                  flat
+
+                  class="col self-stretch depth-1"
+                  @click="editGraph(note)"
+                >
                   <q-tooltip>Select graph data</q-tooltip>
                 </q-btn>
               </div>
-              <div class="col-auto">
-                <q-btn icon="mdi-dots-vertical" flat dense>
+              <div class="col-auto row q-mr-sm">
+                <q-btn
+                  icon="mdi-dots-vertical"
+                  flat
+                  dense
+                  class="col self-stretch depth-1"
+                >
                   <q-menu>
                     <q-list bordered>
                       <ActionItem label="Clear content" icon="clear" @click="clearNote(note)" />
@@ -233,7 +245,7 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
                   </q-menu>
                 </q-btn>
               </div>
-              <template v-if="note.type === 'Text'">
+              <template v-if="note.type === 'Text' && note.value">
                 <div class="col-break" />
                 <div class="col darkish ellipsis q-pa-xs">
                   <!-- No line breaks to allow correctly rendering whitespace -->
@@ -246,9 +258,8 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
         </div>
       </draggable>
 
-      <div class="col-break" />
       <div class="col row justify-end q-mt-sm">
-        <q-btn fab-mini color="accent" icon="add">
+        <q-btn fab-mini color="secondary" icon="add">
           <q-menu>
             <q-list>
               <ActionItem label="Add text note" @click="addTextNote" />
@@ -259,25 +270,22 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
       </div>
     </div>
 
-    <div v-else class="widget-body" />
-
-    <q-card-section v-if="false" class="column justify-end" style="height: 40%">
-      <div class="col-auto row justify-center">
-        <q-btn outline label="New session" @click="addSession" />
-      </div>
-    </q-card-section>
+    <div v-else class="widget-body row justify-center">
+      <q-btn outline label="New session" @click="addSession" />
+    </div>
   </div>
 </template>
 
 <style scoped>
 .move-border {
   position: absolute;
-  right: -10px;
-  top: 0;
+  right: -11px;
+  top: 1px;
   width: 20px;
-  height: 100%;
+  height: calc(100% - 2px);
   cursor: ew-resize;
   z-index: 10;
+  border-radius: 4px;
 }
 
 .move-border:hover {

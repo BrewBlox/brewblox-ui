@@ -193,7 +193,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         @downsample="v => downsampling = v"
       />
     </div>
-    <div v-else>
+    <div v-else class="widget-md">
       <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
     </div>
   </GraphCardWrapper>

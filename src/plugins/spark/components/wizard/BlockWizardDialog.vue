@@ -20,7 +20,7 @@ export default class BlockWizardDialog extends DialogBase {
   <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
     <CardWrapper no-scroll v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar>Block wizard</DialogToolbar>
+        <DialogToolbar icon="mdi-creation" title="Block wizard" />
       </template>
       <BlockWizard
         :service-id="serviceId"

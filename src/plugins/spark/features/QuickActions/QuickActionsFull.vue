@@ -233,7 +233,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       <q-item>
         <q-space />
         <q-item-section class="col-auto">
-          <q-btn fab-mini color="accent" icon="add" @click="addStep">
+          <q-btn fab-mini color="secondary" icon="add" @click="addStep">
             <q-tooltip>Add Step</q-tooltip>
           </q-btn>
         </q-item-section>

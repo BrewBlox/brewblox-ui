@@ -53,14 +53,7 @@ export default class SparkWifiMenu extends DialogBase {
   <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar>
-          <q-item-section>
-            <q-item-label>{{ serviceId }}</q-item-label>
-            <q-item-label caption>
-              Wifi Configuration
-            </q-item-label>
-          </q-item-section>
-        </DialogToolbar>
+        <DialogToolbar :title="serviceId" subtitle="Wifi Configuration" />
       </template>
 
       <q-card-section>

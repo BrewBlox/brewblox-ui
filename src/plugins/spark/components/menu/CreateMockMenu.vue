@@ -58,14 +58,7 @@ export default class CreateMockMenu extends DialogBase {
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar>
-          <q-item-section>
-            <q-item-label>{{ service.id }}</q-item-label>
-            <q-item-label caption>
-              Create Mock Blocks
-            </q-item-label>
-          </q-item-section>
-        </DialogToolbar>
+        <DialogToolbar :title="serviceId" subtitle="Create Mock Blocks" />
       </template>
 
       <q-card-section>

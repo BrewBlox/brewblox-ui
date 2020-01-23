@@ -40,14 +40,7 @@ export default class SparkUnitMenu extends DialogBase {
   <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
     <CardWrapper v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar>
-          <q-item-section>
-            <q-item-label>{{ serviceId }}</q-item-label>
-            <q-item-label caption>
-              Unit preferences
-            </q-item-label>
-          </q-item-section>
-        </DialogToolbar>
+        <DialogToolbar :title="serviceId" subtitle="Unit preferences" />
       </template>
 
       <q-card-section>

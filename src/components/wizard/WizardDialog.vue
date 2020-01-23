@@ -30,10 +30,7 @@ export default class WizardDialog extends DialogBase {
   <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
     <CardWrapper :no-scroll="!!wizardComponent" v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar>
-          <q-icon name="mdi-creation" class="q-mx-sm" />
-          {{ dialogTitle }}
-        </DialogToolbar>
+        <DialogToolbar icon="mdi-creation" :title="dialogTitle" />
       </template>
 
       <component

@@ -71,7 +71,7 @@ export default class DigitalStateButton extends Vue {
   <q-btn-toggle
     v-if="known"
     v-bind="{value, options, disable, ...$attrs}"
-    :class="['depth-1', $attrs.class]"
+    :class="['shadow-1', $attrs.class]"
     dense
     unelevated
     @click="toggle"

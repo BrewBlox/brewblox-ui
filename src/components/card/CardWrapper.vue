@@ -30,7 +30,7 @@ export default class CardWrapper extends Vue {
   }
 
   get toolbarClass(): string {
-    return `toolbar__${this.context.container} depth-1`;
+    return `toolbar__${this.context.container}`;
   }
 
   get bodyClass(): string {

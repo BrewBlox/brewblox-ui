@@ -26,14 +26,7 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
 <template>
   <CardWrapper v-bind="{context}">
     <template #toolbar>
-      <DialogToolbar v-if="inDialog">
-        <q-item-section>
-          <q-item-label>{{ widget.title }}</q-item-label>
-          <q-item-label caption>
-            {{ displayName }}
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+      <DialogToolbar v-if="inDialog" :title="widget.title" :subtitle="displayName" />
       <WidgetToolbar v-else :crud="crud" />
     </template>
 

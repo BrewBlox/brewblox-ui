@@ -26,5 +26,5 @@ export default class MetricsFull extends CrudComponent<MetricsConfig> {
 </script>
 
 <template>
-  <MetricsEditor :config="config" @update:config="saveConfig" />
+  <MetricsEditor :config="config" class="widget-md" @update:config="saveConfig" />
 </template>

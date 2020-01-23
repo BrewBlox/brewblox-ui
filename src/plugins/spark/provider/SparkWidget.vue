@@ -66,20 +66,14 @@ export default class SparkWidget extends Vue {
 <template>
   <CardWrapper v-if="ready" v-bind="{context}">
     <template #toolbar>
-      <DialogToolbar v-if="inDialog">
-        <q-item-section>
-          <q-item-label>{{ serviceId }}</q-item-label>
-          <q-item-label caption>
-            Device info
-          </q-item-label>
-        </q-item-section>
+      <DialogToolbar v-if="inDialog" :title="serviceId" subtitle="Device info">
         <template #buttons>
-          <q-btn flat round icon="refresh" class="darkish" @click="fetchAll" />
+          <q-btn flat round icon="refresh" @click="fetchAll" />
         </template>
       </DialogToolbar>
       <Toolbar v-else :title="serviceId" subtitle="Device info">
         <template #buttons>
-          <q-btn flat dense icon="refresh" class="darkish" @click="fetchAll" />
+          <q-btn flat dense icon="refresh" @click="fetchAll" />
         </template>
       </Toolbar>
     </template>

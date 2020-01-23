@@ -196,14 +196,16 @@ export default class DashboardPage extends Vue {
           </template>
         </ActionMenu>
       </portal>
+
       <div v-if="$dense" class="column q-gutter-y-sm">
-        <div v-for="val in validatedWidgets" :key="val.id" class="col-auto full-width">
-          <component
-            :is="val.component"
-            :initial-crud="val.crud"
-            :context="context"
-          />
-        </div>
+        <component
+          :is="val.component"
+          v-for="val in validatedWidgets"
+          :key="val.id"
+          :initial-crud="val.crud"
+          :context="context"
+          class="col full-width"
+        />
       </div>
       <GridContainer
         v-else

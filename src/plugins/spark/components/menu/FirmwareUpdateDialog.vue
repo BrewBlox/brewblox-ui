@@ -76,14 +76,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar>
-          <q-item-section>
-            <q-item-label>{{ service.id }}</q-item-label>
-            <q-item-label caption>
-              Firmware update
-            </q-item-label>
-          </q-item-section>
-        </DialogToolbar>
+        <DialogToolbar :title="service.id" subtitle="Firmware update" />
       </template>
 
       <q-card-section>

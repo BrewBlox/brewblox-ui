@@ -58,7 +58,7 @@ export default class BuilderCatalog extends DialogBase {
   <q-dialog ref="dialog" @hide="onDialogHide">
     <CardWrapper no-scroll v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar>Part Catalog</DialogToolbar>
+        <DialogToolbar title="Part Catalog" />
       </template>
 
       <div class="fit column q-pb-md">
