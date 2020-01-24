@@ -162,40 +162,25 @@ export default class HistoryGraph extends Vue {
 </script>
 
 <template>
-  <span>
-    <!-- Normal display -->
-    <GenericGraph
-      v-if="!error"
-      ref="display"
-      :data="graphData"
-      :layout="graphLayout"
-      :revision="revision"
-      v-bind="$attrs"
-      v-on="$listeners"
-    />
-    <!-- Error message -->
-    <q-item v-else class="absolute-center">
-      <q-item-section avatar>
-        <q-icon name="warning" />
-      </q-item-section>
-      <q-item-section>{{ error }}</q-item-section>
-    </q-item>
-
-    <div class="row graph-controls z-top">
+  <div class="fit column">
+    <div class="col-auto row justify-end z-top">
       <slot name="controls" />
     </div>
-  </span>
+    <div v-if="error" class="col row justify-center items-center text-h5 q-gutter-x-md">
+      <q-icon name="warning" color="negative" />
+      <div class="col-auto">
+        {{ error }}
+      </div>
+    </div>
+    <div v-else class="col">
+      <GenericGraph
+        ref="display"
+        :data="graphData"
+        :layout="graphLayout"
+        :revision="revision"
+        v-bind="$attrs"
+        v-on="$listeners"
+      />
+    </div>
+  </div>
 </template>
-
-<style scoped lang="scss">
-.graph-controls {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-/deep/ .graph-controls .q-field * {
-  align-items: center;
-  margin-top: 0px !important;
-}
-</style>

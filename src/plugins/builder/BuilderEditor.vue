@@ -764,7 +764,7 @@ export default class BuilderEditor extends Vue {
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="drawerOpen" content-class="bg-dark column" elevated>
+    <q-drawer v-model="drawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="builder" />
 
       <q-scroll-area
@@ -883,18 +883,16 @@ export default class BuilderEditor extends Vue {
       </q-scroll-area>
     </q-drawer>
 
-    <q-dialog v-model="menuDialogOpen" no-backdrop-dismiss @keyup.esc="closeMenu">
-      <BuilderPartMenu
-        v-if="menuDialogOpen"
-        :part="configuredPart"
-        @update:part="savePart"
-        @remove:part="removePart"
-        @dirty="debouncedCalculate"
-        @close="closeMenu"
-      />
-    </q-dialog>
+    <BuilderPartMenu
+      v-if="menuDialogOpen"
+      :part="configuredPart"
+      @update:part="savePart"
+      @remove:part="removePart"
+      @dirty="debouncedCalculate"
+      @close="closeMenu"
+    />
 
-    <q-page-container class="bg-dark-bright">
+    <q-page-container>
       <q-page class="row no-wrap justify-center q-pa-md">
         <div class="col-auto column no-wrap">
           <div
@@ -908,7 +906,7 @@ export default class BuilderEditor extends Vue {
           >
             <svg
               ref="grid"
-              class="grid-base grid-editable"
+              class="fit grid-editable"
               @click="v => clickHandler(v, null)"
               @mouseenter="onGridMove"
               @mousemove="onGridMove"
@@ -1039,7 +1037,7 @@ export default class BuilderEditor extends Vue {
 .resume-message {
   border-radius: 40px;
   border: 2px solid silver;
-  background: $dark_bright;
+  // background: $dark_bright;
 }
 
 .fade-enter-active {

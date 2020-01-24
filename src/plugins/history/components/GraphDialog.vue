@@ -35,7 +35,6 @@ export default class GraphDialog extends DialogBase {
       },
       [
         h('q-card',
-          { class: 'bg-dark' },
           [
             h('HistoryGraph',
               {
@@ -55,7 +54,7 @@ export default class GraphDialog extends DialogBase {
                     this.renderControls && this.renderControls(h),
                     h('q-btn',
                       {
-                        props: { flat: true, label: 'close' },
+                        props: { flat: true, stretch: true, icon: 'mdi-close-circle' },
                         directives: [ClosePopup],
                       }),
                   ],

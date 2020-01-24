@@ -7,11 +7,12 @@ import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen = !this.$dense;
+  leftDrawerOpen = true;
   dashboardEditing = false;
   serviceEditing = false;
 
   created(): void {
+    this.leftDrawerOpen = !this.$dense;
     checkDatastore();
   }
 
@@ -21,6 +22,10 @@ export default class DefaultLayout extends Vue {
 
   get buildDate(): string {
     return process.env.BLOX_DATE || 'UNKNOWN';
+  }
+
+  get devMode() {
+    return process.env.DEV;
   }
 
   showWizard(): void {
@@ -41,11 +46,12 @@ export default class DefaultLayout extends Vue {
     this.dashboardEditing = false;
     this.serviceEditing = false;
   }
+
 }
 </script>
 
 <template>
-  <q-layout view="hHh Lpr fFf" class="bg-dark-bright">
+  <q-layout view="hHh Lpr fFf">
     <LayoutHeader @menu="leftDrawerOpen = !leftDrawerOpen">
       <template #title>
         <portal-target name="toolbar-title">
@@ -58,7 +64,7 @@ export default class DefaultLayout extends Vue {
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="leftDrawerOpen" content-class="bg-dark column" elevated>
+    <q-drawer v-model="leftDrawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="dashboards" />
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
@@ -84,6 +90,13 @@ export default class DefaultLayout extends Vue {
             </q-list>
           </q-btn-dropdown>
         </q-item-section>
+        <q-item-section v-if="devMode" class="col-auto">
+          <q-btn flat text-color="white" icon="mdi-format-paint" to="/styles">
+            <q-tooltip>
+              Theming
+            </q-tooltip>
+          </q-btn>
+        </q-item-section>
       </q-item>
     </q-drawer>
 
@@ -97,8 +110,6 @@ export default class DefaultLayout extends Vue {
 </template>
 
 <style lang="sass">
-@import "src/css/app.sass";
-
 .q-layout
   overflow-x: auto
 </style>

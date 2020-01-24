@@ -76,7 +76,7 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
 </script>
 
 <template>
-  <WizardCard>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -167,5 +167,5 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </template>
-  </WizardCard>
+  </ActionCardBody>
 </template>

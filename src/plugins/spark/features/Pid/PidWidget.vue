@@ -51,22 +51,22 @@ export default class PidWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass">
-      <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
-          <template #actions>
-            <ActionItem icon="mdi-vector-line" label="Relations" @click="showRelations" />
-            <!-- TODO(Elco): decide what values should appear in tuning view -->
-            <!-- <ActionItem icon="mdi-cube-scan" label="Tuning view" @click="showShareDialog" /> -->
-          </template>
-        </component>
-      </template>
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+        <template #actions>
+          <ActionItem icon="mdi-vector-line" label="Relations" @click="showRelations" />
+          <!-- TODO(Elco): decide what values should appear in tuning view -->
+          <!-- <ActionItem icon="mdi-cube-scan" label="Tuning view" @click="showShareDialog" /> -->
+        </template>
+      </component>
+    </template>
 
+    <component :is="mode" :crud="crud">
       <template #warnings>
         <CardWarning v-if="!outputId">
           <template #message>

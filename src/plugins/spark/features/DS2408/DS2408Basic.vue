@@ -14,9 +14,8 @@ export default class DS2408Basic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md">
     <slot name="warnings" />
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
-  </q-card>
+  </div>
 </template>

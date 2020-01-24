@@ -19,9 +19,10 @@ export default class ActuatorAnalogMockWidget
 </script>
 
 <template>
-  <component :is="mode" :crud="crud" :class="cardClass">
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
-  </component>
+    <component :is="mode" :crud="crud" />
+  </CardWrapper>
 </template>

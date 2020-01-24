@@ -40,17 +40,12 @@ export default class SparkGroupMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>
-            Group menu
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+    <ActionCardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="service.id" subtitle="Group menu" />
+      </template>
 
-      <q-card-section>
+      <div class="widget-body column">
         <GroupsField
           :value="groups.data.active"
           :service-id="service.id"
@@ -60,18 +55,21 @@ export default class SparkGroupMenu extends DialogBase {
           @input="v => { groups.data.active = v; saveBlock(groups); }"
         />
 
-        <div class="row q-px-sm q-mt-md">
-          <InputField
+        <div class="row q-mt-sm">
+          <div
             v-for="(name, idx) in groupNames"
             :key="idx"
-            class="col-4 item-aligned q-px-sm"
-            :value="name"
-            :label="`Group ${idx + 1} name`"
-            title="Group name"
-            @input="v => { groupNames[idx] = v; saveGroupNames(); }"
-          />
+            class="col-4 q-pa-xs"
+          >
+            <InputField
+              :value="name"
+              :label="`Group ${idx + 1} name`"
+              title="Group name"
+              @input="v => { groupNames[idx] = v; saveGroupNames(); }"
+            />
+          </div>
         </div>
-      </q-card-section>
-    </q-card>
+      </div>
+    </ActionCardWrapper>
   </q-dialog>
 </template>

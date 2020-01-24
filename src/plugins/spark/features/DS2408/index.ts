@@ -26,7 +26,7 @@ const feature: Feature = {
   widgetComponent: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 3,
   },
   // Discovered objects can't be created or deleted
   wizardComponent: null,

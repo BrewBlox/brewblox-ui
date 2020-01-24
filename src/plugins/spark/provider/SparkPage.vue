@@ -51,6 +51,7 @@ export default class SparkPage extends Vue {
   context: WidgetContext = {
     mode: 'Basic',
     container: 'Dashboard',
+    size: 'Content',
   };
 
   @Prop({ type: String, required: true })
@@ -479,7 +480,7 @@ export default class SparkPage extends Vue {
     <q-list v-if="statusNok">
       <q-item>
         <q-item-section>
-          <Troubleshooter :service-id="service.id" class="bg-dark" />
+          <Troubleshooter :service-id="service.id" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -497,119 +498,122 @@ export default class SparkPage extends Vue {
     <template v-else>
       <!-- Normal display -->
       <div class="row no-wrap justify-start page-height">
-        <q-list class="content-column q-pr-md">
-          <!-- Selection controls -->
-          <q-item class="q-mb-md">
-            <q-item-section>
-              <q-input v-model="blockFilter" placeholder="Search Blocks" clearable>
-                <template #append>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <q-btn icon="mdi-sort" flat>
-                <q-tooltip>Sort Blocks</q-tooltip>
-                <q-menu>
-                  <q-list>
-                    <ActionItem
-                      v-for="(func, name) in allSorters"
-                      :key="name"
-                      :active="sorting === name"
-                      :label="capitalized(name)"
-                      @click="sorting = name"
-                    />
-                  </q-list>
-                </q-menu>
-              </q-btn>
-            </q-item-section>
-            <q-item-section v-if="!$dense" class="col-auto">
-              <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
-                <q-tooltip>Unselect all</q-tooltip>
-              </q-btn>
-            </q-item-section>
-            <q-item-section v-if="!$dense" class="col-auto">
-              <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
-                <q-tooltip>Select all</q-tooltip>
-              </q-btn>
-            </q-item-section>
-          </q-item>
-          <!-- Service -->
-          <q-item v-if="serviceShown" class="text-white widget-index">
-            <q-item-section v-if="!$dense" side class="q-mx-none q-px-none">
-              <ToggleButton v-model="serviceExpanded" />
-            </q-item-section>
-            <q-item-section>
-              <q-item class="non-selectable" clickable @click="selectService">
-                <q-item-section avatar>
-                  <q-icon name="mdi-information-variant" />
-                  <q-tooltip>Device Info</q-tooltip>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label caption class="text-italic">
-                    Device info
-                  </q-item-label>
-                  <div style="font-size: larger">
-                    {{ serviceId }}
-                  </div>
-                </q-item-section>
-              </q-item>
-            </q-item-section>
-          </q-item>
-          <!-- Blocks -->
-          <q-item
-            v-for="val in filteredItems"
-            :key="val.key"
-            class="non-selectable text-white widget-index"
-          >
-            <q-item-section v-if="!$dense" side class="q-mx-none q-px-none">
-              <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
-            </q-item-section>
-            <q-item-section>
-              <q-item
-                clickable
-                @click="onBlockClick(val)"
-              >
-                <q-item-section avatar>
-                  <q-icon :name="roleIcons[val.role]" />
-                  <q-tooltip>{{ val.role }}</q-tooltip>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label caption class="text-italic darkish">
-                    {{ val.displayName }}
-                  </q-item-label>
-                  <div style="font-size: larger">
-                    {{ val.id }}
-                  </div>
-                </q-item-section>
-              </q-item>
-            </q-item-section>
-          </q-item>
-        </q-list>
+        <q-scroll-area visible class="content-column rounded-borders bg-dark">
+          <q-list class="q-pr-md">
+            <!-- Selection controls -->
+            <q-item class="q-mb-md">
+              <q-item-section>
+                <q-input v-model="blockFilter" placeholder="Search Blocks" clearable>
+                  <template #append>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </q-item-section>
+              <q-item-section class="col-auto">
+                <q-btn icon="mdi-sort" flat>
+                  <q-tooltip>Sort Blocks</q-tooltip>
+                  <q-menu>
+                    <q-list>
+                      <ActionItem
+                        v-for="(func, name) in allSorters"
+                        :key="name"
+                        :active="sorting === name"
+                        :label="capitalized(name)"
+                        @click="sorting = name"
+                      />
+                    </q-list>
+                  </q-menu>
+                </q-btn>
+              </q-item-section>
+              <q-item-section v-if="!$dense" class="col-auto">
+                <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
+                  <q-tooltip>Unselect all</q-tooltip>
+                </q-btn>
+              </q-item-section>
+              <q-item-section v-if="!$dense" class="col-auto">
+                <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
+                  <q-tooltip>Select all</q-tooltip>
+                </q-btn>
+              </q-item-section>
+            </q-item>
+            <!-- Service -->
+            <q-item v-if="serviceShown" class="text-white widget-index">
+              <q-item-section v-if="!$dense" side class="q-px-sm">
+                <ToggleButton v-model="serviceExpanded" />
+              </q-item-section>
+              <q-item-section>
+                <q-item class="non-selectable" clickable @click="selectService">
+                  <q-item-section avatar>
+                    <q-icon name="mdi-information-variant" />
+                    <q-tooltip>Device Info</q-tooltip>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label caption class="text-italic">
+                      Device info
+                    </q-item-label>
+                    <div style="font-size: larger">
+                      {{ serviceId }}
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </q-item-section>
+            </q-item>
+            <!-- Blocks -->
+            <q-item
+              v-for="val in filteredItems"
+              :key="val.key"
+              class="non-selectable text-white widget-index"
+            >
+              <q-item-section v-if="!$dense" side class="q-px-sm">
+                <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
+              </q-item-section>
+              <q-item-section>
+                <q-item
+                  clickable
+                  @click="onBlockClick(val)"
+                >
+                  <q-item-section avatar>
+                    <q-icon :name="roleIcons[val.role]" />
+                    <q-tooltip>{{ val.role }}</q-tooltip>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label caption class="text-italic darkish">
+                      {{ val.displayName }}
+                    </q-item-label>
+                    <div style="font-size: larger">
+                      {{ val.id }}
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-scroll-area>
 
         <!-- Widget List -->
-        <q-list v-if="!$dense" class="content-column q-ml-lg q-pr-lg">
-          <!-- Service -->
-          <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
-            <q-item-section>
-              <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark" />
-            </q-item-section>
-          </q-item>
-          <!-- Blocks -->
-          <q-item v-for="val in expandedItems" :ref="`widget-${val.key}`" :key="val.key">
-            <q-item-section>
-              <component
-                :is="val.component"
-                :initial-crud="val.crud"
-                :context="context"
-                :error="val.error"
-                class="bg-dark"
-              />
-            </q-item-section>
-          </q-item>
-          <!-- Blank space to always be able to show a widget at the top -->
-          <q-item class="page-height" />
-        </q-list>
+        <q-scroll-area v-if="!$dense" visible class="content-column">
+          <q-list class="q-ml-lg q-pr-none">
+            <!-- Service -->
+            <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
+              <q-item-section>
+                <SparkWidget v-if="isReady" :service-id="service.id" />
+              </q-item-section>
+            </q-item>
+            <!-- Blocks -->
+            <q-item v-for="val in expandedItems" :ref="`widget-${val.key}`" :key="val.key" class="q-pt-none q-pb-md">
+              <q-item-section>
+                <component
+                  :is="val.component"
+                  :initial-crud="val.crud"
+                  :context="context"
+                  :error="val.error"
+                />
+              </q-item-section>
+            </q-item>
+            <!-- Blank space to always be able to show a widget at the top -->
+            <q-item class="page-height" />
+          </q-list>
+        </q-scroll-area>
       </div>
     </template>
   </div>
@@ -626,7 +630,7 @@ export default class SparkPage extends Vue {
   width: 550px
   max-width: 100vw
   height: 100%
-  overflow: auto
+
 
 .selected-mode
   border-bottom: 2px solid $secondary

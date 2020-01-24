@@ -90,25 +90,20 @@ export default class AutomationEditor extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized no-esc-dismiss @hide="onDialogHide">
-    <q-card class="maximized bg-dark column">
-      <DialogToolbar>
-        Step Editor
-        <q-space />
-
-        <div class="row">
-          <q-btn-dropdown :label="process ? process.title : 'None'" flat no-caps icon="widgets" class="col" size="md">
-            <q-list bordered>
-              <ActionItem
-                v-for="proc in processes"
-                :key="proc.id"
-                :label="proc.title"
-                :active="process && proc.id === process.id"
-                icon="mdi-view-dashboard-outline"
-                @click="processId = proc.id"
-              />
-            </q-list>
-          </q-btn-dropdown>
-        </div>
+    <q-card class="fit column">
+      <DialogToolbar title="Step Editor">
+        <q-btn-dropdown :label="process ? process.title : 'None'" flat no-caps icon="widgets" class="col" size="md">
+          <q-list bordered>
+            <ActionItem
+              v-for="proc in processes"
+              :key="proc.id"
+              :label="proc.title"
+              :active="process && proc.id === process.id"
+              icon="mdi-view-dashboard-outline"
+              @click="processId = proc.id"
+            />
+          </q-list>
+        </q-btn-dropdown>
         <template #buttons>
           <q-btn-dropdown flat icon="menu" class="col-auto">
             <q-list bordered>

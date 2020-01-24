@@ -96,16 +96,11 @@ export default class SparkImportMenu extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>
-            Import/Export Blocks
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
+    <ActionCardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="serviceId" subtitle="Import/Export blocks" />
+      </template>
 
       <q-card-section>
         <div class="column q-gutter-y-sm">
@@ -142,6 +137,6 @@ export default class SparkImportMenu extends DialogBase {
           </q-item-section>
         </q-item>
       </q-card-section>
-    </q-card>
+    </ActionCardWrapper>
   </q-dialog>
 </template>

@@ -105,8 +105,7 @@ export default class QuickActionChange extends Vue {
 <template>
   <q-list
     v-if="editable"
-    class="q-mb-sm q-ml-md"
-    bordered
+    class="q-mb-sm q-ml-md depth-1"
     dense
   >
     <q-item>
@@ -114,7 +113,7 @@ export default class QuickActionChange extends Vue {
         {{ change.blockId }}
       </q-item-section>
       <q-item-section side>
-        <q-btn flat round icon="clear" @click="$emit('remove')">
+        <q-btn flat round icon="delete" @click="$emit('remove')">
           <q-tooltip>Remove Block Change from Step</q-tooltip>
         </q-btn>
       </q-item-section>
@@ -192,13 +191,12 @@ export default class QuickActionChange extends Vue {
 
   <q-list
     v-else
-    class="q-mb-sm q-ml-md"
-    bordered
+    class="q-mb-sm q-ml-md depth-1"
     dense
   >
     <q-item>
       <q-item-section
-        :class="{'text-h6': true, grabbable: true, 'text-red': !change.block}"
+        :class="['text-h6 grabbable', {'text-red': !change.block}]"
       >
         {{ change.blockId }}
         <q-tooltip v-if="!change.block">

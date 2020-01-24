@@ -4,9 +4,16 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { SystemStatus } from '@/plugins/spark/types';
+import { WidgetContext } from '@/store/features';
 
 @Component
 export default class Troubleshooter extends Vue {
+  context: WidgetContext = {
+    container: 'Dashboard',
+    size: 'Content',
+    mode: 'Basic',
+  };
+
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
@@ -56,168 +63,147 @@ export default class Troubleshooter extends Vue {
       .catch(() => { });
   }
 
-  iconName(val: boolean): string {
-    return val ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline';
-  }
-
-  iconColor(val: boolean): string {
-    return val ? 'positive' : 'negative';
+  iconProps(val: boolean): Mapped<any> {
+    return {
+      name: val ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline',
+      color: val ? 'positive' : 'negative',
+      size: 'md',
+      class: 'col-auto q-mr-sm',
+    };
   }
 }
 </script>
 
 <template>
-  <q-card class="text-white scroll" style="max-width: 500px">
-    <Toolbar :title="serviceId" subtitle="Troubleshooter">
-      <q-item-section class="dense" side>
-        <q-btn unelevated label="force refresh" color="primary" icon="refresh" @click="refresh" />
-      </q-item-section>
-    </Toolbar>
+  <CardWrapper v-bind="{context}" class="widget-md">
+    <template #toolbar>
+      <Toolbar :title="serviceId" subtitle="Troubleshooter">
+        <template #buttons>
+          <q-btn
+            flat
+            dense
+            icon="refresh"
+            @click="refresh"
+          />
+        </template>
+      </Toolbar>
+    </template>
 
-    <q-card-section>
-      <template v-if="lastStatus">
-        <q-item>
-          <q-item-section avatar>
-            <q-spinner size="24px" />
-          </q-item-section>
-          <q-item-section>
-            <LabeledField label="Last update">
-              <big>{{ lastStatus.checkedAt.toLocaleString() }}</big>
-            </LabeledField>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section avatar>
-            <q-icon
-              :name="iconName(lastStatus.available)"
-              :color="iconColor(lastStatus.available)"
-              size="24px"
-            />
-          </q-item-section>
-          <q-item-section>{{ textAvailable }}</q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section avatar>
-            <q-icon
-              :name="iconName(lastStatus.connect)"
-              :color="iconColor(lastStatus.connect)"
-              size="24px"
-            />
-          </q-item-section>
-          <q-item-section>{{ textConnect }}</q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section avatar>
-            <q-icon
-              :name="iconName(lastStatus.handshake)"
-              :color="iconColor(lastStatus.handshake)"
-              size="24px"
-            />
-          </q-item-section>
-          <q-item-section>{{ textHandshake }}</q-item-section>
-        </q-item>
-        <!-- Only show after handshake -->
-        <q-item v-if="lastStatus.handshake">
-          <q-item-section avatar>
-            <q-icon
-              :name="iconName(lastStatus.compatible)"
-              :color="iconColor(lastStatus.compatible)"
-              size="24px"
-            />
-          </q-item-section>
-          <q-item-section>{{ textCompatible }}</q-item-section>
-        </q-item>
-        <!-- Only show after handshake -->
-        <q-item v-if="lastStatus.handshake">
-          <q-item-section avatar>
-            <q-icon
-              :name="iconName(lastStatus.valid)"
-              :color="iconColor(lastStatus.valid)"
-              size="24px"
-            />
-          </q-item-section>
-          <q-item-section>{{ textValid }}</q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section avatar>
-            <q-icon
-              :name="iconName(lastStatus.synchronize)"
-              :color="iconColor(lastStatus.synchronize)"
-              size="24px"
-            />
-          </q-item-section>
-          <q-item-section>{{ textSynchronize }}</q-item-section>
-        </q-item>
+    <div v-if="lastStatus" class="widget-body row items-center">
+      <q-spinner
+        size="24px"
+        class="col-auto self-center"
+      />
+      <LabeledField
+        label="Last update"
+        tag="big"
+        class="col-grow"
+      >
+        {{ lastStatus.checkedAt.toLocaleString() }}
+      </LabeledField>
+
+      <div class="col-break" />
+      <q-icon v-bind="iconProps(lastStatus.available)" />
+      <div>
+        {{ textAvailable }}
+      </div>
+
+      <div class="col-break" />
+      <q-icon v-bind="iconProps(lastStatus.connect)" />
+      <div>
+        {{ textConnect }}
+      </div>
+
+      <div class="col-break" />
+      <q-icon v-bind="iconProps(lastStatus.handshake)" />
+      <div>
+        {{ textHandshake }}
+      </div>
+
+      <template v-if="lastStatus.handshake">
+        <div class="col-break" />
+        <q-icon v-bind="iconProps(lastStatus.compatible)" />
+        <div>
+          {{ textCompatible }}
+        </div>
+
+        <div class="col-break" />
+        <q-icon v-bind="iconProps(lastStatus.valid)" />
+        <div>
+          {{ textValid }}
+        </div>
       </template>
-    </q-card-section>
 
-    <q-card-section v-if="lastStatus">
-      <q-item>
-        <q-item-section>
-          <!-- not available -->
-          <span v-if="!lastStatus.available">
-            Your Spark service is offline.
-            <ul>
-              <li>Is your backend reachable?</li>
-              <li>Is the container present in your docker-compose file?</li>
-              <li>Is the container running?</li>
-            </ul>
-          </span>
-          <!-- not connected -->
-          <span v-else-if="!lastStatus.connect">
-            Your Spark service is online, but not connected to your controller.
-            <ul>
-              <li>Is your controller turned on?</li>
-              <li>Does your controller have the correct firmware?</li>
-              <li>WiFi: Does your controller display its IP address?</li>
-              <li>Are there any error messages in your service logs?</li>
-              <li>USB: Your service must have been (re)started after plugging in the USB cable.</li>
-              <li>USB: Can your service access USB devices? (Mac hosts)</li>
-            </ul>
-          </span>
-          <!-- awaiting handshake -->
-          <span v-else-if="!lastStatus.handshake">
-            Your Spark service is waiting for the controller handshake.
-            <br>
-            <b>This status is usually temporary</b>
-          </span>
-          <!-- not compatible -->
-          <span v-else-if="!lastStatus.compatible">
-            Your Spark service is not compatible with the firmware
-            <br>
-            <b>Please run brewblox-ctl update</b>
-          </span>
-          <!-- not valid -->
-          <span v-else-if="!lastStatus.valid">
-            The controller device ID doesn't match the service <i>--device-id</i> setting.
-            <br>
-            <b>Please check your connection settings</b>
-          </span>
-          <!-- not synchronized -->
-          <span v-else-if="!lastStatus.synchronize">
-            Your Spark service is connected to your controller, but not yet synchronized.
-            <b>This status is usually temporary.</b>
-            <ul>
-              <li>Is your datastore container running?</li>
-              <li>Are there any error messages in your service container logs?</li>
-              <li>Does your controller have the correct firmware?</li>
-            </ul>
-          </span>
-        </q-item-section>
-      </q-item>
+      <div class="col-break" />
+      <q-icon v-bind="iconProps(lastStatus.synchronize)" />
+      <div>
+        {{ textSynchronize }}
+      </div>
+
+      <div class="col-break" />
+      <div class="col">
+        <!-- not available -->
+        <span v-if="!lastStatus.available">
+          Your Spark service is offline.
+          <ul>
+            <li>Is your backend reachable?</li>
+            <li>Is the container present in your docker-compose file?</li>
+            <li>Is the container running?</li>
+          </ul>
+        </span>
+        <!-- not connected -->
+        <span v-else-if="!lastStatus.connect">
+          Your Spark service is online, but not connected to your controller.
+          <ul>
+            <li>Is your controller turned on?</li>
+            <li>Does your controller have the correct firmware?</li>
+            <li>WiFi: Does your controller display its IP address?</li>
+            <li>Are there any error messages in your service logs?</li>
+            <li>USB: Your service must have been (re)started after plugging in the USB cable.</li>
+            <li>USB: Can your service access USB devices? (Mac hosts)</li>
+          </ul>
+        </span>
+        <!-- awaiting handshake -->
+        <span v-else-if="!lastStatus.handshake">
+          Your Spark service is waiting for the controller handshake.
+          <br>
+          <b>This status is usually temporary</b>
+        </span>
+        <!-- not compatible -->
+        <span v-else-if="!lastStatus.compatible">
+          Your Spark service is not compatible with the firmware
+          <br>
+          <b>Please run brewblox-ctl update</b>
+        </span>
+        <!-- not valid -->
+        <span v-else-if="!lastStatus.valid">
+          The controller device ID doesn't match the service <i>--device-id</i> setting.
+          <br>
+          <b>Please check your connection settings</b>
+        </span>
+        <!-- not synchronized -->
+        <span v-else-if="!lastStatus.synchronize">
+          Your Spark service is connected to your controller, but not yet synchronized.
+          <b>This status is usually temporary.</b>
+          <ul>
+            <li>Is your datastore container running?</li>
+            <li>Are there any error messages in your service container logs?</li>
+            <li>Does your controller have the correct firmware?</li>
+          </ul>
+        </span>
+      </div>
+
       <template v-if="(lastStatus.info || []).length > 0">
-        <q-separator inset />
-        <q-item>
-          <q-item-section>
-            <b>Service info:</b>
-          </q-item-section>
-        </q-item>
-        <q-list dense>
-          <q-item v-for="(val, idx) in lastStatus.info" :key="idx">
-            <q-item-section>{{ val }}</q-item-section>
-          </q-item>
-        </q-list>
+        <div class="col-break" />
+        <div class="col">
+          <b>Service info:</b>
+          <q-list dense>
+            <q-item v-for="(val, idx) in lastStatus.info" :key="`info-${idx}`">
+              <q-item-section>{{ val }}</q-item-section>
+            </q-item>
+          </q-list>
+        </div>
       </template>
-    </q-card-section>
-  </q-card>
+    </div>
+  </CardWrapper>
 </template>

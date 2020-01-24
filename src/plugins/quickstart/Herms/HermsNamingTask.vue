@@ -148,7 +148,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
 </script>
 
 <template>
-  <WizardCard>
+  <ActionCardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -210,5 +210,5 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </template>
-  </WizardCard>
+  </ActionCardBody>
 </template>

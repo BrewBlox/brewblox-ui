@@ -132,10 +132,10 @@ export default class BlockGraph extends Vue {
 
 <template>
   <q-dialog v-model="dialogOpen" maximized>
-    <q-card v-if="dialogOpen" class="text-white bg-dark-bright">
+    <q-card v-if="dialogOpen" class="text-white">
       <HistoryGraph ref="graph" :graph-id="id" :config="graphCfg">
         <template #controls>
-          <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
+          <q-btn-dropdown v-if="!noDuration" auto-close flat icon="mdi-timelapse">
             <ActionItem
               v-for="(preset, idx) in presets"
               :key="idx"
@@ -145,7 +145,7 @@ export default class BlockGraph extends Vue {
             />
             <ActionItem label="Custom" @click="chooseDuration" />
           </q-btn-dropdown>
-          <q-btn-dropdown flat label="settings" icon="settings">
+          <q-btn-dropdown flat icon="settings">
             <ExportGraphAction
               :config="graphCfg"
               :header="graphCfg.layout.title"
@@ -171,7 +171,7 @@ export default class BlockGraph extends Vue {
               </q-item>
             </q-expansion-item>
           </q-btn-dropdown>
-          <q-btn v-close-popup flat label="close" />
+          <q-btn v-close-popup flat icon="mdi-close-circle" />
         </template>
       </HistoryGraph>
     </q-card>

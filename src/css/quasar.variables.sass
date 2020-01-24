@@ -1,33 +1,626 @@
-$dark_darker : #1b1d21
-$dark : #282c34
-$dark_bright : #454c59
-$red : #E06C75
-$red_bright : #FF7A85
-$green : #70c358
-$green_bright : #B5E890
-$yellow : #E5C07B
-$yellow_bright : #FFD68A
-$blue : #4aa0ef
-$blue_bright : #31CCEC
-$blue_dimmed: #337ec4
-$magenta : #C678DD
-$magenta_bright : #E48AFF
-$cyan : #56B6C2
-$cyan_bright : #66D9E8
-$white : #ABB2BF
-$white_bright : #CFD7E6
-$white_very : #fffafa
+// $space-base   : 16px !default
+// $space-x-base : $space-base !default
+// $space-y-base : $space-base !default
 
-$standard-text-color : $white_very
+// $space-none : (x: 0, y: 0) !default
+// $space-xs   : (x: ($space-x-base * .25), y: ($space-y-base * .25)) !default
+// $space-sm   : (x: ($space-x-base * .5), y: ($space-y-base * .5)) !default
+// $space-md   : (x: $space-x-base, y: $space-y-base) !default
+// $space-lg   : (x: ($space-x-base * 1.5), y: ($space-y-base * 1.5)) !default
+// $space-xl   : (x: ($space-x-base * 3), y: ($space-y-base * 3)) !default
 
-$body-background : $dark_darker
-$body-color : $standard-text-color
+// // sorry for long line; we need .sass and it doesn't support multi-line list
+// $spaces: ('none': $space-none, 'xs': $space-xs, 'sm': $space-sm, 'md': $space-md, 'lg': $space-lg, 'xl': $space-xl) !default
 
-$primary   : $blue
-$secondary : $blue_dimmed
-$accent    : #af23cf
+// // Max width at which point
+// // current size ends
+// $breakpoint-xs: 599px !default
+// $breakpoint-sm: 1023px !default
+// $breakpoint-md: 1439px !default
+// $breakpoint-lg: 1919px !default
 
-$positive  : $green
-$negative  : $red
-$info      : $blue_bright
-$warning   : $yellow
+// $flex-cols      : 12 !default
+// $flex-gutter-xs : ($space-base * .25) !default
+// $flex-gutter-sm : ($space-base * .5) !default
+// $flex-gutter-md : $space-base !default
+// $flex-gutter-lg : ($space-base * 1.5) !default
+// $flex-gutter-xl : ($space-base * 3) !default
+
+// $body-font-size   : 14px !default
+// $body-line-height : 1.5 !default
+
+// // sorry for long line; we need .sass and it doesn't support multi-line list
+// $flex-gutter: ('none': 0, 'xs': $flex-gutter-xs, 'sm': $flex-gutter-sm, 'md': $flex-gutter-md, 'lg': $flex-gutter-lg, 'xl': $flex-gutter-xl) !default
+
+// // sorry for long line; we need .sass and it doesn't support multi-line list
+// $sizes: ('xs': 0, 'sm': ($breakpoint-xs + 1), 'md': ($breakpoint-sm + 1), 'lg': ($breakpoint-md + 1), 'xl': ($breakpoint-lg + 1)) !default
+
+// $breakpoint-xs-min: 0 !default
+// $breakpoint-xs-max: $breakpoint-xs !default
+
+// $breakpoint-sm-min: map-get($sizes, "sm") !default
+// $breakpoint-sm-max: $breakpoint-sm !default
+
+// $breakpoint-md-min: map-get($sizes, "md") !default
+// $breakpoint-md-max: $breakpoint-md !default
+
+// $breakpoint-lg-min: map-get($sizes, "lg") !default
+// $breakpoint-lg-max: $breakpoint-lg !default
+
+// $breakpoint-xl-min: map-get($sizes, "xl") !default
+// $breakpoint-xl-max: 9999px !default
+
+$h1: (size: 3rem,    line-height: 3rem,     letter-spacing: normal,    weight: 300)
+$h2: (size: 2.5rem,  line-height: 2.5rem,   letter-spacing: .00735em,  weight: 300)
+$h3: (size: 2rem,    line-height: 2rem,     letter-spacing: .00735em,  weight: 300)
+$h4: (size: 1.5rem,  line-height: 2rem,     letter-spacing: normal,    weight: 300)
+$h5: (size: 1.25rem, line-height: 1.5rem,   letter-spacing: .0125em,   weight: 400)
+$h6: (size: 1rem,    line-height: 1.25rem,  letter-spacing: .025em,    weight: 400)
+
+// $subtitle1: (size: 1rem,     line-height: 1.75rem,  letter-spacing: .00937em,  weight: 400) !default
+// $subtitle2: (size: .875rem,  line-height: 1.375rem, letter-spacing: .00714em,  weight: 500) !default
+// $body1:     (size: 1rem,     line-height: 1.5rem,   letter-spacing: .03125em,  weight: 400) !default
+// $body2:     (size: .875rem,  line-height: 1.25rem,  letter-spacing: .01786em,  weight: 400) !default
+// $overline:  (size: .75rem,   line-height: 2rem,     letter-spacing: .16667em,  weight: 500) !default
+// $caption:   (size: .75rem,   line-height: 1.25rem,  letter-spacing: .03333em,  weight: 400) !default
+
+// // sorry for long line; we need .sass and it doesn't support multi-line list
+// $headings: ('h1': $h1, 'h2': $h2, 'h3': $h3, 'h4': $h4, 'h5': $h5, 'h6': $h6, 'subtitle1': $subtitle1, 'subtitle2': $subtitle2, 'body1': $body1, 'body2': $body2, 'overline': $overline, 'caption': $caption) !default
+
+// // sorry for long line; we need .sass and it doesn't support multi-line list
+// $h-tags: (h1: map-get($headings, "h1"), h2: map-get($headings, "h2"), h3: map-get($headings, "h3"), h4: map-get($headings, "h4"), h5: map-get($headings, "h5"), h6: map-get($headings, "h6")) !default
+
+// // sorry for long line; we need .sass and it doesn't support multi-line list
+// $text-weights: (thin: 100, light: 300, regular: 400, medium: 500, bold: 700, bolder: 900) !default
+
+// $dimmed-background       : rgba(0, 0, 0, .4) !default
+// $light-dimmed-background : rgba(255, 255, 255, .6) !default
+
+// $separator-color         : rgba(0, 0, 0, .12) !default
+// $separator-dark-color    : rgba(255, 255, 255, .28) !default
+
+@function shade($c, $n)
+  @if($n <= 7)
+    @return lighten($c, (7 - $n) / 7 * (100 - lightness($c)))
+  @else
+    @return darken($c, ($n - 7) / 8 * lightness($c))
+
+$red : #e44e55
+$pink : #e252a6
+$purple : #915adf
+$deep-purple : #5c44d4
+$indigo : #3d60d3
+$blue: #48a6fd
+$light-blue : #73c5ff
+$cyan : #56c6d4
+$teal : #33bbad
+$green : #6ece50
+$light-green : #a2ee5b
+$lime : #c4e043
+$yellow : #e4e151
+$amber : #e9c65e
+$orange : #d9871b
+$deep-orange : #dd6a3c
+$brown : #795548
+$grey : #7f8b94
+$blue-grey : #558299
+
+$primary   : shade($blue, 6)
+$secondary : shade($cyan, 9)
+$accent    : shade($amber, 6)
+$hover     : rgba(255, 255, 255, 0.18)
+
+// used by dark mode
+$dark-page : hsl(211,20,10)
+$dark      : hsl(215,20,18)
+
+.bg-dark
+  background: $dark !important
+
+.q-dark
+  background: $dark !important
+
+$positive  : shade($green, 6)
+$negative  : shade($red, 6)
+$warning   : shade($orange,6)
+$info      : shade($deep-purple, 7)
+
+$red-1: shade($red, 1)
+$red-2: shade($red, 2)
+$red-3: shade($red, 3)
+$red-4: shade($red, 4)
+$red-5: shade($red, 5)
+$red-6: shade($red, 6)
+$red-7: shade($red, 7)
+$red-8: shade($red, 8)
+$red-9: shade($red, 9)
+$red-10: shade($red, 10)
+$red-11: shade($red, 11)
+$red-12: shade($red, 12)
+$red-13: shade($red, 13)
+$red-14: shade($red, 14)
+
+$pink-1: shade($pink, 1)
+$pink-2: shade($pink, 2)
+$pink-3: shade($pink, 3)
+$pink-4: shade($pink, 4)
+$pink-5: shade($pink, 5)
+$pink-6: shade($pink, 6)
+$pink-7: shade($pink, 7)
+$pink-8: shade($pink, 8)
+$pink-9: shade($pink, 9)
+$pink-10: shade($pink, 10)
+$pink-11: shade($pink, 11)
+$pink-12: shade($pink, 12)
+$pink-13: shade($pink, 13)
+$pink-14: shade($pink, 14)
+
+$purple-1: shade($purple, 1)
+$purple-2: shade($purple, 2)
+$purple-3: shade($purple, 3)
+$purple-4: shade($purple, 4)
+$purple-5: shade($purple, 5)
+$purple-6: shade($purple, 6)
+$purple-7: shade($purple, 7)
+$purple-8: shade($purple, 8)
+$purple-9: shade($purple, 9)
+$purple-10: shade($purple, 10)
+$purple-11: shade($purple, 11)
+$purple-12: shade($purple, 12)
+$purple-13: shade($purple, 13)
+$purple-14: shade($purple, 14)
+
+$deep-purple-1: shade($deep-purple, 1)
+$deep-purple-2: shade($deep-purple, 2)
+$deep-purple-3: shade($deep-purple, 3)
+$deep-purple-4: shade($deep-purple, 4)
+$deep-purple-5: shade($deep-purple, 5)
+$deep-purple-6: shade($deep-purple, 6)
+$deep-purple-7: shade($deep-purple, 7)
+$deep-purple-8: shade($deep-purple, 8)
+$deep-purple-9: shade($deep-purple, 9)
+$deep-purple-10: shade($deep-purple, 10)
+$deep-purple-11: shade($deep-purple, 11)
+$deep-purple-12: shade($deep-purple, 12)
+$deep-purple-13: shade($deep-purple, 13)
+$deep-purple-14: shade($deep-purple, 14)
+
+$indigo-1: shade($indigo, 1)
+$indigo-2: shade($indigo, 2)
+$indigo-3: shade($indigo, 3)
+$indigo-4: shade($indigo, 4)
+$indigo-5: shade($indigo, 5)
+$indigo-6: shade($indigo, 6)
+$indigo-7: shade($indigo, 7)
+$indigo-8: shade($indigo, 8)
+$indigo-9: shade($indigo, 9)
+$indigo-10: shade($indigo, 10)
+$indigo-11: shade($indigo, 11)
+$indigo-12: shade($indigo, 12)
+$indigo-13: shade($indigo, 13)
+$indigo-14: shade($indigo, 14)
+
+$blue-1: shade($blue, 1)
+$blue-2: shade($blue, 2)
+$blue-3: shade($blue, 3)
+$blue-4: shade($blue, 4)
+$blue-5: shade($blue, 5)
+$blue-6: shade($blue, 6)
+$blue-7: shade($blue, 7)
+$blue-8: shade($blue, 8)
+$blue-9: shade($blue, 9)
+$blue-10: shade($blue, 10)
+$blue-11: shade($blue, 11)
+$blue-12: shade($blue, 12)
+$blue-13: shade($blue, 13)
+$blue-14: shade($blue, 14)
+
+$light-blue-1: shade($light-blue, 1)
+$light-blue-2: shade($light-blue, 2)
+$light-blue-3: shade($light-blue, 3)
+$light-blue-4: shade($light-blue, 4)
+$light-blue-5: shade($light-blue, 5)
+$light-blue-6: shade($light-blue, 6)
+$light-blue-7: shade($light-blue, 7)
+$light-blue-8: shade($light-blue, 8)
+$light-blue-9: shade($light-blue, 9)
+$light-blue-10: shade($light-blue, 10)
+$light-blue-11: shade($light-blue, 11)
+$light-blue-12: shade($light-blue, 12)
+$light-blue-13: shade($light-blue, 13)
+$light-blue-14: shade($light-blue, 14)
+
+$cyan-1: shade($cyan, 1)
+$cyan-2: shade($cyan, 2)
+$cyan-3: shade($cyan, 3)
+$cyan-4: shade($cyan, 4)
+$cyan-5: shade($cyan, 5)
+$cyan-6: shade($cyan, 6)
+$cyan-7: shade($cyan, 7)
+$cyan-8: shade($cyan, 8)
+$cyan-9: shade($cyan, 9)
+$cyan-10: shade($cyan, 10)
+$cyan-11: shade($cyan, 11)
+$cyan-12: shade($cyan, 12)
+$cyan-13: shade($cyan, 13)
+$cyan-14: shade($cyan, 14)
+
+$teal-1: shade($teal, 1)
+$teal-2: shade($teal, 2)
+$teal-3: shade($teal, 3)
+$teal-4: shade($teal, 4)
+$teal-5: shade($teal, 5)
+$teal-6: shade($teal, 6)
+$teal-7: shade($teal, 7)
+$teal-8: shade($teal, 8)
+$teal-9: shade($teal, 9)
+$teal-10: shade($teal, 10)
+$teal-11: shade($teal, 11)
+$teal-12: shade($teal, 12)
+$teal-13: shade($teal, 13)
+$teal-14: shade($teal, 14)
+
+$green-1: shade($green, 1)
+$green-2: shade($green, 2)
+$green-3: shade($green, 3)
+$green-4: shade($green, 4)
+$green-5: shade($green, 5)
+$green-6: shade($green, 6)
+$green-7: shade($green, 7)
+$green-8: shade($green, 8)
+$green-9: shade($green, 9)
+$green-10: shade($green, 10)
+$green-11: shade($green, 11)
+$green-12: shade($green, 12)
+$green-13: shade($green, 13)
+$green-14: shade($green, 14)
+
+$light-green-1: shade($light-green, 1)
+$light-green-2: shade($light-green, 2)
+$light-green-3: shade($light-green, 3)
+$light-green-4: shade($light-green, 4)
+$light-green-5: shade($light-green, 5)
+$light-green-6: shade($light-green, 6)
+$light-green-7: shade($light-green, 7)
+$light-green-8: shade($light-green, 8)
+$light-green-9: shade($light-green, 9)
+$light-green-10: shade($light-green, 10)
+$light-green-11: shade($light-green, 11)
+$light-green-12: shade($light-green, 12)
+$light-green-13: shade($light-green, 13)
+$light-green-14: shade($light-green, 14)
+
+$lime-1: shade($lime, 1)
+$lime-2: shade($lime, 2)
+$lime-3: shade($lime, 3)
+$lime-4: shade($lime, 4)
+$lime-5: shade($lime, 5)
+$lime-6: shade($lime, 6)
+$lime-7: shade($lime, 7)
+$lime-8: shade($lime, 8)
+$lime-9: shade($lime, 9)
+$lime-10: shade($lime, 10)
+$lime-11: shade($lime, 11)
+$lime-12: shade($lime, 12)
+$lime-13: shade($lime, 13)
+$lime-14: shade($lime, 14)
+
+$yellow-1: shade($yellow, 1)
+$yellow-2: shade($yellow, 2)
+$yellow-3: shade($yellow, 3)
+$yellow-4: shade($yellow, 4)
+$yellow-5: shade($yellow, 5)
+$yellow-6: shade($yellow, 6)
+$yellow-7: shade($yellow, 7)
+$yellow-8: shade($yellow, 8)
+$yellow-9: shade($yellow, 9)
+$yellow-10: shade($yellow, 10)
+$yellow-11: shade($yellow, 11)
+$yellow-12: shade($yellow, 12)
+$yellow-13: shade($yellow, 13)
+$yellow-14: shade($yellow, 14)
+
+$amber-1: shade($amber, 1)
+$amber-2: shade($amber, 2)
+$amber-3: shade($amber, 3)
+$amber-4: shade($amber, 4)
+$amber-5: shade($amber, 5)
+$amber-6: shade($amber, 6)
+$amber-7: shade($amber, 7)
+$amber-8: shade($amber, 8)
+$amber-9: shade($amber, 9)
+$amber-10: shade($amber, 10)
+$amber-11: shade($amber, 11)
+$amber-12: shade($amber, 12)
+$amber-13: shade($amber, 13)
+$amber-14: shade($amber, 14)
+
+$orange-1: shade($orange, 1)
+$orange-2: shade($orange, 2)
+$orange-3: shade($orange, 3)
+$orange-4: shade($orange, 4)
+$orange-5: shade($orange, 5)
+$orange-6: shade($orange, 6)
+$orange-7: shade($orange, 7)
+$orange-8: shade($orange, 8)
+$orange-9: shade($orange, 9)
+$orange-10: shade($orange, 10)
+$orange-11: shade($orange, 11)
+$orange-12: shade($orange, 12)
+$orange-13: shade($orange, 13)
+$orange-14: shade($orange, 14)
+
+$deep-orange-1: shade($deep-orange, 1)
+$deep-orange-2: shade($deep-orange, 2)
+$deep-orange-3: shade($deep-orange, 3)
+$deep-orange-4: shade($deep-orange, 4)
+$deep-orange-5: shade($deep-orange, 5)
+$deep-orange-6: shade($deep-orange, 6)
+$deep-orange-7: shade($deep-orange, 7)
+$deep-orange-8: shade($deep-orange, 8)
+$deep-orange-9: shade($deep-orange, 9)
+$deep-orange-10: shade($deep-orange, 10)
+$deep-orange-11: shade($deep-orange, 11)
+$deep-orange-12: shade($deep-orange, 12)
+$deep-orange-13: shade($deep-orange, 13)
+$deep-orange-14: shade($deep-orange, 14)
+
+$brown-1: shade($brown, 1)
+$brown-2: shade($brown, 2)
+$brown-3: shade($brown, 3)
+$brown-4: shade($brown, 4)
+$brown-5: shade($brown, 5)
+$brown-6: shade($brown, 6)
+$brown-7: shade($brown, 7)
+$brown-8: shade($brown, 8)
+$brown-9: shade($brown, 9)
+$brown-10: shade($brown, 10)
+$brown-11: shade($brown, 11)
+$brown-12: shade($brown, 12)
+$brown-13: shade($brown, 13)
+$brown-14: shade($brown, 14)
+
+$grey-1: shade($grey, 1)
+$grey-2: shade($grey, 2)
+$grey-3: shade($grey, 3)
+$grey-4: shade($grey, 4)
+$grey-5: shade($grey, 5)
+$grey-6: shade($grey, 6)
+$grey-7: shade($grey, 7)
+$grey-8: shade($grey, 8)
+$grey-9: shade($grey, 9)
+$grey-10: shade($grey, 10)
+$grey-11: shade($grey, 11)
+$grey-12: shade($grey, 12)
+$grey-13: shade($grey, 13)
+$grey-14: shade($grey, 14)
+
+$blue-grey-1: shade($blue-grey, 1)
+$blue-grey-2: shade($blue-grey, 2)
+$blue-grey-3: shade($blue-grey, 3)
+$blue-grey-4: shade($blue-grey, 4)
+$blue-grey-5: shade($blue-grey, 5)
+$blue-grey-6: shade($blue-grey, 6)
+$blue-grey-7: shade($blue-grey, 7)
+$blue-grey-8: shade($blue-grey, 8)
+$blue-grey-9: shade($blue-grey, 9)
+$blue-grey-10: shade($blue-grey, 10)
+$blue-grey-11: shade($blue-grey, 11)
+$blue-grey-12: shade($blue-grey, 12)
+$blue-grey-13: shade($blue-grey, 13)
+$blue-grey-14: shade($blue-grey, 14)
+
+// $ios-statusbar-height : 20px !default
+
+// $z-fab                : 990 !default
+// $z-side               : 1000 !default
+// $z-marginals          : 2000 !default
+// $z-fixed-drawer       : 3000 !default
+// $z-fullscreen         : 6000 !default
+// $z-menu               : 6000 !default
+// $z-top                : 7000 !default
+// $z-tooltip            : 9000 !default
+// $z-notify             : 9500 !default
+// $z-max                : 9998 !default
+
+// $shadow-color         : #000 !default
+// $shadow-transition    : box-shadow .28s cubic-bezier(.4, 0, .2, 1) !default
+// $inset-shadow         : 0 7px 9px -7px rgba($shadow-color, .7) inset !default
+
+// $elevation-umbra      : rgba($shadow-color, .2) !default
+// $elevation-penumbra   : rgba($shadow-color, .14) !default
+// $elevation-ambient    : rgba($shadow-color, .12) !default
+
+// $shadow-0  : 0 0 0 $elevation-umbra, 0 0 0 $elevation-penumbra, 0 0 0 $elevation-ambient !default
+// $shadow-1  : 0 1px 3px $elevation-umbra, 0 1px 1px $elevation-penumbra, 0 2px 1px -1px $elevation-ambient !default
+// $shadow-2  : 0 1px 5px $elevation-umbra, 0 2px 2px $elevation-penumbra, 0 3px 1px -2px $elevation-ambient !default
+// $shadow-3  : 0 1px 8px $elevation-umbra, 0 3px 4px $elevation-penumbra, 0 3px 3px -2px $elevation-ambient !default
+// $shadow-4  : 0 2px 4px -1px $elevation-umbra, 0 4px 5px $elevation-penumbra, 0 1px 10px $elevation-ambient !default
+// $shadow-5  : 0 3px 5px -1px $elevation-umbra, 0 5px 8px $elevation-penumbra, 0 1px 14px $elevation-ambient !default
+// $shadow-6  : 0 3px 5px -1px $elevation-umbra, 0 6px 10px $elevation-penumbra, 0 1px 18px $elevation-ambient !default
+// $shadow-7  : 0 4px 5px -2px $elevation-umbra, 0 7px 10px 1px $elevation-penumbra, 0 2px 16px 1px $elevation-ambient !default
+// $shadow-8  : 0 5px 5px -3px $elevation-umbra, 0 8px 10px 1px $elevation-penumbra, 0 3px 14px 2px $elevation-ambient !default
+// $shadow-9  : 0 5px 6px -3px $elevation-umbra, 0 9px 12px 1px $elevation-penumbra, 0 3px 16px 2px $elevation-ambient !default
+// $shadow-10 : 0 6px 6px -3px $elevation-umbra, 0 10px 14px 1px $elevation-penumbra, 0 4px 18px 3px $elevation-ambient !default
+// $shadow-11 : 0 6px 7px -4px $elevation-umbra, 0 11px 15px 1px $elevation-penumbra, 0 4px 20px 3px $elevation-ambient !default
+// $shadow-12 : 0 7px 8px -4px $elevation-umbra, 0 12px 17px 2px $elevation-penumbra, 0 5px 22px 4px $elevation-ambient !default
+// $shadow-13 : 0 7px 8px -4px $elevation-umbra, 0 13px 19px 2px $elevation-penumbra, 0 5px 24px 4px $elevation-ambient !default
+// $shadow-14 : 0 7px 9px -4px $elevation-umbra, 0 14px 21px 2px $elevation-penumbra, 0 5px 26px 4px $elevation-ambient !default
+// $shadow-15 : 0 8px 9px -5px $elevation-umbra, 0 15px 22px 2px $elevation-penumbra, 0 6px 28px 5px $elevation-ambient !default
+// $shadow-16 : 0 8px 10px -5px $elevation-umbra, 0 16px 24px 2px $elevation-penumbra, 0 6px 30px 5px $elevation-ambient !default
+// $shadow-17 : 0 8px 11px -5px $elevation-umbra, 0 17px 26px 2px $elevation-penumbra, 0 6px 32px 5px $elevation-ambient !default
+// $shadow-18 : 0 9px 11px -5px $elevation-umbra, 0 18px 28px 2px $elevation-penumbra, 0 7px 34px 6px $elevation-ambient !default
+// $shadow-19 : 0 9px 12px -6px $elevation-umbra, 0 19px 29px 2px $elevation-penumbra, 0 7px 36px 6px $elevation-ambient !default
+// $shadow-20 : 0 10px 13px -6px $elevation-umbra, 0 20px 31px 3px $elevation-penumbra, 0 8px 38px 7px $elevation-ambient !default
+// $shadow-21 : 0 10px 13px -6px $elevation-umbra, 0 21px 33px 3px $elevation-penumbra, 0 8px 40px 7px $elevation-ambient !default
+// $shadow-22 : 0 10px 14px -6px $elevation-umbra, 0 22px 35px 3px $elevation-penumbra, 0 8px 42px 7px $elevation-ambient !default
+// $shadow-23 : 0 11px 14px -7px $elevation-umbra, 0 23px 36px 3px $elevation-penumbra, 0 9px 44px 8px $elevation-ambient !default
+// $shadow-24 : 0 11px 15px -7px $elevation-umbra, 0 24px 38px 3px $elevation-penumbra, 0 9px 46px 8px $elevation-ambient !default
+
+// // sorry for long line; we need .sass and it doesn't support multi-line list
+// $shadows: ($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10, $shadow-11, $shadow-12, $shadow-13, $shadow-14, $shadow-15, $shadow-16, $shadow-17, $shadow-18, $shadow-19, $shadow-20, $shadow-21, $shadow-22, $shadow-23, $shadow-24)
+
+// $shadow-up-0  : 0 0 0 $elevation-umbra, 0 0 0 $elevation-penumbra, 0 0 0 $elevation-ambient !default
+// $shadow-up-1  : 0 -1px 3px $elevation-umbra, 0 -1px 1px $elevation-penumbra, 0 -2px 1px -1px $elevation-ambient !default
+// $shadow-up-2  : 0 -1px 5px $elevation-umbra, 0 -2px 2px $elevation-penumbra, 0 -3px 1px -2px $elevation-ambient !default
+// $shadow-up-3  : 0 -1px 8px $elevation-umbra, 0 -3px 4px $elevation-penumbra, 0 -3px 3px -2px $elevation-ambient !default
+// $shadow-up-4  : 0 -2px 4px -1px $elevation-umbra, 0 -4px 5px $elevation-penumbra, 0 -1px 10px $elevation-ambient !default
+// $shadow-up-5  : 0 -3px 5px -1px $elevation-umbra, 0 -5px 8px $elevation-penumbra, 0 -1px 14px $elevation-ambient !default
+// $shadow-up-6  : 0 -3px 5px -1px $elevation-umbra, 0 -6px 10px $elevation-penumbra, 0 -1px 18px $elevation-ambient !default
+// $shadow-up-7  : 0 -4px 5px -2px $elevation-umbra, 0 -7px 10px 1px $elevation-penumbra, 0 -2px 16px 1px $elevation-ambient !default
+// $shadow-up-8  : 0 -5px 5px -3px $elevation-umbra, 0 -8px 10px 1px $elevation-penumbra, 0 -3px 14px 2px $elevation-ambient !default
+// $shadow-up-9  : 0 -5px 6px -3px $elevation-umbra, 0 -9px 12px 1px $elevation-penumbra, 0 -3px 16px 2px $elevation-ambient !default
+// $shadow-up-10 : 0 -6px 6px -3px $elevation-umbra, 0 -10px 14px 1px $elevation-penumbra, 0 -4px 18px 3px $elevation-ambient !default
+// $shadow-up-11 : 0 -6px 7px -4px $elevation-umbra, 0 -11px 15px 1px $elevation-penumbra, 0 -4px 20px 3px $elevation-ambient !default
+// $shadow-up-12 : 0 -7px 8px -4px $elevation-umbra, 0 -12px 17px 2px $elevation-penumbra, 0 -5px 22px 4px $elevation-ambient !default
+// $shadow-up-13 : 0 -7px 8px -4px $elevation-umbra, 0 -13px 19px 2px $elevation-penumbra, 0 -5px 24px 4px $elevation-ambient !default
+// $shadow-up-14 : 0 -7px 9px -4px $elevation-umbra, 0 -14px 21px 2px $elevation-penumbra, 0 -5px 26px 4px $elevation-ambient !default
+// $shadow-up-15 : 0 -8px 9px -5px $elevation-umbra, 0 -15px 22px 2px $elevation-penumbra, 0 -6px 28px 5px $elevation-ambient !default
+// $shadow-up-16 : 0 -8px 10px -5px $elevation-umbra, 0 -16px 24px 2px $elevation-penumbra, 0 -6px 30px 5px $elevation-ambient !default
+// $shadow-up-17 : 0 -8px 11px -5px $elevation-umbra, 0 -17px 26px 2px $elevation-penumbra, 0 -6px 32px 5px $elevation-ambient !default
+// $shadow-up-18 : 0 -9px 11px -5px $elevation-umbra, 0 -18px 28px 2px $elevation-penumbra, 0 -7px 34px 6px $elevation-ambient !default
+// $shadow-up-19 : 0 -9px 12px -6px $elevation-umbra, 0 -19px 29px 2px $elevation-penumbra, 0 -7px 36px 6px $elevation-ambient !default
+// $shadow-up-20 : 0 -10px 13px -6px $elevation-umbra, 0 -20px 31px 3px $elevation-penumbra, 0 -8px 38px 7px $elevation-ambient !default
+// $shadow-up-21 : 0 -10px 13px -6px $elevation-umbra, 0 -21px 33px 3px $elevation-penumbra, 0 -8px 40px 7px $elevation-ambient !default
+// $shadow-up-22 : 0 -10px 14px -6px $elevation-umbra, 0 -22px 35px 3px $elevation-penumbra, 0 -8px 42px 7px $elevation-ambient !default
+// $shadow-up-23 : 0 -11px 14px -7px $elevation-umbra, 0 -23px 36px 3px $elevation-penumbra, 0 -9px 44px 8px $elevation-ambient !default
+// $shadow-up-24 : 0 -11px 15px -7px $elevation-umbra, 0 -24px 38px 3px $elevation-penumbra, 0 -9px 46px 8px $elevation-ambient !default
+
+// // sorry for long line; we need .sass and it doesn't support multi-line list
+// $shadows-up: ($shadow-up-1, $shadow-up-2, $shadow-up-3, $shadow-up-4, $shadow-up-5, $shadow-up-6, $shadow-up-7, $shadow-up-8, $shadow-up-9, $shadow-up-10, $shadow-up-11, $shadow-up-12, $shadow-up-13, $shadow-up-14, $shadow-up-15, $shadow-up-16, $shadow-up-17, $shadow-up-18, $shadow-up-19, $shadow-up-20, $shadow-up-21, $shadow-up-22, $shadow-up-23, $shadow-up-24)
+
+// $generic-border-radius          : 4px !default
+// $generic-hover-transition       : .3s cubic-bezier(.25, .8, .5, 1) !default
+// $typography-font-family         : 'Roboto', '-apple-system', 'Helvetica Neue', Helvetica, Arial, sans-serif !default
+// $min-line-height                : 1.12 !default
+
+// $button-border-radius           : 3px !default
+// $button-padding                 : 4px 16px !default
+// $button-dense-padding           : .285em !default
+// $button-transition              : $generic-hover-transition !default
+// $button-font-size               : 14px !default
+// $button-line-height             : 1.715em !default
+// $button-font-weight             : 500 !default
+// $button-shadow                  : $shadow-2 !default
+// $button-shadow-active           : $shadow-5 !default
+// $button-rounded-border-radius   : 28px !default
+// $button-push-border-radius      : 7px !default
+
+// $chat-message-received-color    : #000 !default
+// $chat-message-received-bg       : $green-4 !default
+// $chat-message-sent-color        : #000 !default
+// $chat-message-sent-bg           : $grey-4 !default
+// $chat-message-avatar-size       : 48px !default
+// $chat-message-border-radius     : $generic-border-radius !default
+// $chat-message-distance          : 8px !default
+// $chat-message-text-padding      : 8px !default
+
+// $item-base-color                : $grey-5 !default
+
+// $editor-border-color            : $separator-color !default
+// $editor-border-dark-color       : $separator-dark-color !default
+// $editor-content-padding         : 10px !default
+// $editor-content-min-height      : 10em !default
+// $editor-toolbar-padding         : 4px !default
+// $editor-hr-color                : $editor-border-color !default
+// $editor-hr-dark-color           : $editor-border-dark-color !default
+// $editor-button-gutter           : 4px !default
+
+// $fab-margin                     : 5px !default
+
+// $table-transition               : $generic-hover-transition !default
+// $table-border-radius            : $generic-border-radius !default
+// $table-box-shadow               : $shadow-2 !default
+
+// $table-border-color             : $separator-color !default
+// $table-hover-background         : rgba(0, 0, 0, .03) !default
+// $table-selected-background      : rgba(0, 0, 0, .06) !default
+
+// $table-dark-border-color        : $separator-dark-color !default
+// $table-dark-hover-background    : rgba(255, 255, 255, .07) !default
+// $table-dark-selected-background : rgba(255, 255, 255, .1) !default
+
+// $toolbar-min-height             : 50px !default
+// $toolbar-padding                : 0 12px !default
+// $toolbar-inset-size             : 58px !default
+// $toolbar-title-font-size        : 21px !default
+// $toolbar-title-font-weight      : normal !default
+// $toolbar-title-letter-spacing   : .01em !default
+// $toolbar-title-padding          : 0 12px !default
+
+// $layout-border                  : 1px solid $separator-color !default
+// $layout-shadow                  : 0 0 10px 2px rgba(0,0,0,0.2), 0 0px 10px rgba(0,0,0,0.24) !default
+
+// $menu-background                : #fff !default
+// $menu-box-shadow                : $shadow-2 !default
+// $menu-max-width                 : 95vw !default
+
+// $rating-grade-color             : $yellow !default
+// $rating-shadow                  : 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24) !default
+
+// $tooltip-color                  : #fafafa !default
+// $tooltip-background             : $grey-7 !default
+// $tooltip-padding                : 6px 10px !default
+// $tooltip-border-radius          : $generic-border-radius !default
+// $tooltip-fontsize               : 10px !default
+// $tooltip-mobile-padding         : 8px 16px !default
+// $tooltip-mobile-fontsize        : 14px !default
+
+// $option-focus-transition        : .22s cubic-bezier(0,0,.2,1) !default
+
+// $input-font-size                : 14px !default
+// $input-text-color               : rgba(0,0,0,.87) !default
+// $input-label-color              : rgba(0,0,0,.6) !default
+// $input-autofill-color           : inherit !default
+
+// $img-width                      : 100% !default
+// $img-background-repeat          : no-repeat !default
+// $img-loading-font-size          : 50px !default
+// $img-content-position           : absolute !default
+// $img-content-padding            : 16px !default
+// $img-content-color              : #fff !default
+// $img-content-background         : rgba(0, 0, 0, .47) !default
+
+// $dark_darker : #1b1d21
+// $dark : #0f0// #15232e
+// $dark_bright : #f00 // #243643
+// $red : #E06C75
+// $red_bright : #FF7A85
+// $green : #70c358
+// $green_bright : #B5E890
+// $yellow : #E5C07B
+// $yellow_bright : #FFD68A
+// $blue : #4aa0ef
+// $blue_bright : #31CCEC
+// $blue_dimmed: #337ec4
+// $magenta : #C678DD
+// $magenta_bright : #E48AFF
+// $cyan : #56B6C2
+// $cyan_bright : #66D9E8
+// $white : #ABB2BF
+// $white_bright : #CFD7E6
+// $white_very : #fffafa
+
+// $standard-text-color : $white_very
+
+// // $body-background : $dark_darker
+// // $body-color : $standard-text-color
+
+// $primary   : lighten(#037CD5, 20%)
+// $secondary : #182560
+// $accent    : #F2B021
+
+// $positive  : $green
+// $negative  : $red
+// $info      : $blue_bright
+// $warning   : $yellow
+// $header: $secondary
+
+// .bg-dark
+//   background: $dark
+
+// body.body--dark
+//   background: $dark
+
+// .bg-dark-bright
+//   background: $dark_bright

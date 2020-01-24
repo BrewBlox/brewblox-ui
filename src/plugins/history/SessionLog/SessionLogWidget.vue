@@ -154,12 +154,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
 </script>
 
 <template>
-  <component
-    :is="mode"
-    :crud="crud"
-    :class="cardClass"
-    @add="startAddSession"
-  >
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
@@ -200,5 +195,6 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
         </template>
       </component>
     </template>
-  </component>
+    <component :is="mode" :crud="crud" @add="startAddSession" />
+  </CardWrapper>
 </template>

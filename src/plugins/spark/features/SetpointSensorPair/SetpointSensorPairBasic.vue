@@ -12,41 +12,42 @@ export default class SetpointSensorPairBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <UnitField
-            :class="{darkened: !block.data.settingEnabled}"
-            :value="block.data.storedSetting"
-            :readonly="isDriven"
-            title="Setting"
-            label="Setting"
-            tag="big"
-            class="self-start"
-            @input="v => {block.data.storedSetting = v; saveBlock()}"
-          />
-        </q-item-section>
-        <q-item-section>
-          <UnitField :value="block.data.value" label="Sensor" tag="big" readonly />
-        </q-item-section>
-        <q-item-section>
-          <UnitField
-            :value="block.data.valueUnfiltered"
-            label="Unfiltered sensor"
-            tag="big"
-            readonly
-          />
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+    <div class="widget-body row">
+      <UnitField
+        :class="{darkened: !block.data.settingEnabled}"
+        :value="block.data.storedSetting"
+        :readonly="isDriven"
+        title="Setting"
+        label="Setting"
+        tag="big"
+        class="col-grow"
+        @input="v => {block.data.storedSetting = v; saveBlock()}"
+      />
+      <UnitField
+        :value="block.data.value"
+        label="Sensor"
+        tag="big"
+        readonly
+        class="col-grow"
+      />
+      <UnitField
+        :value="block.data.valueUnfiltered"
+        label="Unfiltered sensor"
+        tag="big"
+        class="col-grow"
+        readonly
+      />
+
+      <div class="col-break" />
+
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
+    </div>
+  </div>
 </template>
