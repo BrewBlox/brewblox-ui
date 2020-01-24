@@ -147,7 +147,7 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
 </script>
 
 <template>
-  <WizardCard>
+  <ActionCardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -209,5 +209,5 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </template>
-  </WizardCard>
+  </ActionCardBody>
 </template>

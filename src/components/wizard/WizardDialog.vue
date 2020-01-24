@@ -27,12 +27,11 @@ export default class WizardDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss class="row" @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-icon name="mdi-creation" class="q-mx-sm" />
-        {{ dialogTitle }}
-      </DialogToolbar>
+  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
+    <CardWrapper :no-scroll="!!wizardComponent" v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar icon="mdi-creation" :title="dialogTitle" />
+      </template>
 
       <component
         :is="wizardComponent"
@@ -42,7 +41,7 @@ export default class WizardDialog extends DialogBase {
         @close="onDialogHide"
       />
 
-      <q-scroll-area v-else class="dialog-content">
+      <template v-else>
         <q-card-section>
           <q-item clickable @click="wizardComponent = 'QuickStartWizardPicker'">
             <q-item-section side class="col-4">
@@ -148,7 +147,7 @@ export default class WizardDialog extends DialogBase {
             </q-item-section>
           </q-item>
         </q-card-section>
-      </q-scroll-area>
-    </q-card>
+      </template>
+    </CardWrapper>
   </q-dialog>
 </template>

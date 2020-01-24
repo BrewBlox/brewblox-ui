@@ -128,12 +128,10 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
     <slot name="graph" />
 
-    <!-- <q-scroll-area> -->
     <q-expansion-item
       v-for="session in sessions"
       :key="session.id"
@@ -228,13 +226,6 @@ export default class SessionViewFull extends CrudComponent<SessionViewConfig> {
         </q-btn>
       </q-item-section>
     </q-item>
-    <!-- </q-scroll-area> -->
-  </q-card>
+  </div>
 </template>
 
-<style scoped>
-.scroll-parent {
-  height: 300px;
-  max-height: 30vh;
-}
-</style>

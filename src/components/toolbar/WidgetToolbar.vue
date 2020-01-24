@@ -30,31 +30,28 @@ export default class WidgetToolbar extends CrudComponent {
 
 <template>
   <Toolbar :title="widget.title" :subtitle="displayName">
-    <q-item-section side />
     <slot />
     <template #buttons>
-      <slot name="buttons">
-        <q-btn v-if="!!mode" flat :icon="toggleIcon" @click="toggle">
-          <q-tooltip>
-            {{ toggleTooltip }}
-          </q-tooltip>
-        </q-btn>
-        <q-btn flat icon="mdi-launch" color="white" @click="showDialog">
-          <q-tooltip>
-            Show in dialog
-          </q-tooltip>
-        </q-btn>
-        <ActionMenu>
-          <template #actions>
-            <slot name="actions" />
-          </template>
-          <template #menus>
-            <slot name="menus">
-              <WidgetActions :crud="crud" />
-            </slot>
-          </template>
-        </ActionMenu>
-      </slot>
+      <q-btn v-if="!!mode" flat dense :icon="toggleIcon" @click="toggle">
+        <q-tooltip>
+          {{ toggleTooltip }}
+        </q-tooltip>
+      </q-btn>
+      <q-btn flat icon="mdi-launch" dense @click="showDialog">
+        <q-tooltip>
+          Show in dialog
+        </q-tooltip>
+      </q-btn>
+      <ActionMenu dense>
+        <template #actions>
+          <slot name="actions" />
+        </template>
+        <template #menus>
+          <slot name="menus">
+            <WidgetActions :crud="crud" />
+          </slot>
+        </template>
+      </ActionMenu>
     </template>
   </Toolbar>
 </template>

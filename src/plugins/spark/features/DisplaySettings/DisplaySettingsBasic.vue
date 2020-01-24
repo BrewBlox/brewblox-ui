@@ -34,12 +34,11 @@ export default class DisplaySettingsBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="q-pa-lg widget-lg">
     <slot name="warnings" />
 
-    <q-card-section class="q-pa-lg">
-      <div class="grid-container q-mt-sm">
+    <div class="q-gutter-y-sm">
+      <div class="grid-container">
         <div
           v-for="(slot, idx) in slots"
           :key="idx"
@@ -62,8 +61,8 @@ export default class DisplaySettingsBasic
         title="footer text"
         @input="v => { block.data.name = v; saveBlock(); }"
       />
-    </q-card-section>
-  </q-card>
+    </div>
+  </div>
 </template>
 
 <style scoped>

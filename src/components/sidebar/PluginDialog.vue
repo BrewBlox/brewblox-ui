@@ -45,15 +45,10 @@ export default class PluginDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>UI Plugins</q-item-label>
-        </q-item-section>
-        <template #buttons>
-          <q-btn flat label="Reload page" @click="reloadPage" />
-        </template>
-      </DialogToolbar>
+    <ActionCardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar title="UI Plugins" />
+      </template>
 
       <q-card-section>
         <q-item v-for="[plugin, result] in combos" :key="plugin.id">
@@ -81,17 +76,15 @@ export default class PluginDialog extends DialogBase {
           </q-item-section>
           <q-item-section class="col-auto">
             <q-tooltip>Remove plugin</q-tooltip>
-            <q-btn flat icon="delete" @click="removePlugin(plugin)" />
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section />
-          <q-item-section class="col-auto">
-            <q-tooltip>Add plugin</q-tooltip>
-            <q-btn flat icon="add" @click="addPlugin" />
+            <q-btn flat round icon="delete" @click="removePlugin(plugin)" />
           </q-item-section>
         </q-item>
       </q-card-section>
-    </q-card>
+
+      <template #actions>
+        <q-btn flat label="Reload page" @click="reloadPage" />
+        <q-btn flat label="Add plugin" @click="addPlugin" />
+      </template>
+    </ActionCardWrapper>
   </q-dialog>
 </template>

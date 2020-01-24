@@ -60,30 +60,24 @@ export default class GraphEditorDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="widget-modal">
-      <DialogToolbar>{{ title }}</DialogToolbar>
-      <q-card-section class="scroll-parent">
-        <q-scroll-area>
+    <CardWrapper no-scroll v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="title" />
+      </template>
+
+      <div class="fit column">
+        <q-scroll-area class="col">
           <GraphEditor :config.sync="local" :no-period="noPeriod" />
         </q-scroll-area>
-      </q-card-section>
-      <q-separator />
-      <q-card-actions>
-        <q-btn flat label="Cancel" @click="onDialogCancel" />
-        <q-space />
-        <q-btn :disable="shared.length === 0" flat label="Import config" @click="loadShared">
-          <q-tooltip>Copy configuration from another graph</q-tooltip>
-        </q-btn>
-        <q-btn unelevated label="Save" color="primary" @click="save" />
-      </q-card-actions>
-    </q-card>
+        <q-card-actions class="col-auto" style="border-top: 1px solid silver">
+          <q-btn flat label="Cancel" @click="onDialogCancel" />
+          <q-space />
+          <q-btn :disable="shared.length === 0" flat label="Import config" @click="loadShared">
+            <q-tooltip>Copy configuration from another graph</q-tooltip>
+          </q-btn>
+          <q-btn unelevated label="Save" color="primary" @click="save" />
+        </q-card-actions>
+      </div>
+    </CardWrapper>
   </q-dialog>
 </template>
-
-
-<style scoped>
-.scroll-parent {
-  height: 700px;
-  max-height: 80vh;
-}
-</style>

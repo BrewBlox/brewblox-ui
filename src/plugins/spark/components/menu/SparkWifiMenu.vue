@@ -50,73 +50,64 @@ export default class SparkWifiMenu extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ serviceId }}</q-item-label>
-          <q-item-label caption>
-            Wifi Configuration
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
+    <ActionCardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="serviceId" subtitle="Wifi Configuration" />
+      </template>
 
-      <div class="dialog-content">
-        <WizardCard>
-          <q-card-section>
-            <q-item>
-              <q-item-section>
-                <q-input v-model="values.ssid" label="SSID" autofocus />
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-select
-                  v-model="values.security"
-                  :options="securityOpts"
-                  label="Security"
-                  emit-value
-                  map-options
+      <q-card-section>
+        <q-item>
+          <q-item-section>
+            <q-input v-model="values.ssid" label="SSID" autofocus />
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <q-select
+              v-model="values.security"
+              :options="securityOpts"
+              label="Security"
+              emit-value
+              map-options
+            />
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <q-input
+              v-model="values.password"
+              :disable="values.security === 0"
+              :type="isPwd ? 'password' : 'text'"
+              label="Password"
+            >
+              <template #append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
                 />
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-input
-                  v-model="values.password"
-                  :disable="values.security === 0"
-                  :type="isPwd ? 'password' : 'text'"
-                  label="Password"
-                >
-                  <template #append>
-                    <q-icon
-                      :name="isPwd ? 'visibility_off' : 'visibility'"
-                      class="cursor-pointer"
-                      @click="isPwd = !isPwd"
-                    />
-                  </template>
-                </q-input>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-select
-                  v-model="values.cipher"
-                  :options="cipherOpts"
-                  label="Cipher"
-                  map-options
-                  emit-value
-                />
-              </q-item-section>
-            </q-item>
-          </q-card-section>
-          <template #actions>
-            <q-btn flat label="Cancel" @click="onDialogCancel" />
-            <q-space />
-            <q-btn unelevated label="Connect" color="primary" @click="save" />
-          </template>
-        </WizardCard>
-      </div>
-    </q-card>
+              </template>
+            </q-input>
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <q-select
+              v-model="values.cipher"
+              :options="cipherOpts"
+              label="Cipher"
+              map-options
+              emit-value
+            />
+          </q-item-section>
+        </q-item>
+      </q-card-section>
+      <template #actions>
+        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-space />
+        <q-btn unelevated label="Connect" color="primary" @click="save" />
+      </template>
+    </ActionCardWrapper>
   </q-dialog>
 </template>

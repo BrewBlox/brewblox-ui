@@ -44,9 +44,9 @@ export default class LabeledField extends FieldBase {
 <template>
   <q-field
     :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    :borderless="readonly"
+    :class="[{pointer: !readonly, 'depth-1': !readonly}, $attrs.class, 'rounded-borders', 'q-px-sm']"
     v-bind="$attrs"
+    borderless
     stack-label
     @click.native="$emit('click')"
   >

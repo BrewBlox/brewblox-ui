@@ -26,21 +26,5 @@ export default class MetricsFull extends CrudComponent<MetricsConfig> {
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
-    <slot name="warnings" />
-
-    <div :class="{'col-grow': true, 'scroll-parent': inDialog}">
-      <component :is="inDialog ? 'q-scroll-area' : 'div'">
-        <MetricsEditor :config="config" @update:config="saveConfig" />
-      </component>
-    </div>
-  </q-card>
+  <MetricsEditor :config="config" class="widget-md" @update:config="saveConfig" />
 </template>
-
-<style scoped>
-.scroll-parent {
-  height: 500px;
-  max-height: 60vh;
-}
-</style>

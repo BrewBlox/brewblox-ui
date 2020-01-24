@@ -27,13 +27,13 @@ export default class RelationsDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="maximized bg-dark-bright column">
-      <DialogToolbar>
-        {{ title }}
-      </DialogToolbar>
-      <div class="col full-width dialog-content">
+    <CardWrapper no-scroll v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="title" subtitle="Relations diagram" />
+      </template>
+      <div class="fit bg-dark">
         <RelationsDiagram v-bind="$props" />
       </div>
-    </q-card>
+    </CardWrapper>
   </q-dialog>
 </template>

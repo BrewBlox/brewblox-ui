@@ -142,66 +142,64 @@ export default class BlockWizard extends Vue {
 </script>
 
 <template>
-  <div class="dialog-content" @keyup.ctrl.enter="createBlock">
-    <WizardCard>
-      <q-card-section>
-        <q-item>
-          <q-item-section>
-            <q-select
-              v-model="feature"
-              :options="filteredOptions"
-              :rules="[v => !!v || 'You must select a block type']"
-              :disable="!!initialFeature"
-              label="Block Type"
-              use-input
-              autofocus
-              @filter="filterFn"
-              @change="block = null; widget = null;"
-            >
-              <template #no-option>
-                <q-item>
-                  <q-item-section class="text-grey">
-                    No results
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <q-input v-model="blockId" :rules="blockIdRules" label="Block name">
-              <template #append>
-                <q-icon name="mdi-information">
-                  <q-tooltip>
-                    The name of the Spark Controller Block.
-                    <br>Multiple widgets can display the same Block.
-                    <br>Rules:
-                    <ul>
-                      <li>The name must not be empty.</li>
-                      <li>The name must be unique.</li>
-                      <li>The name must begin with a letter.</li>
-                      <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
-                      <li>The name must be less than 200 characters.</li>
-                    </ul>
-                  </q-tooltip>
-                </q-icon>
-              </template>
-            </q-input>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
+  <ActionCardBody @keyup.ctrl.enter="createBlock">
+    <q-card-section>
+      <q-item>
+        <q-item-section>
+          <q-select
+            v-model="feature"
+            :options="filteredOptions"
+            :rules="[v => !!v || 'You must select a block type']"
+            :disable="!!initialFeature"
+            label="Block Type"
+            use-input
+            autofocus
+            @filter="filterFn"
+            @change="block = null; widget = null;"
+          >
+            <template #no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                  No results
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section>
+          <q-input v-model="blockId" :rules="blockIdRules" label="Block name">
+            <template #append>
+              <q-icon name="mdi-information">
+                <q-tooltip>
+                  The name of the Spark Controller Block.
+                  <br>Multiple widgets can display the same Block.
+                  <br>Rules:
+                  <ul>
+                    <li>The name must not be empty.</li>
+                    <li>The name must be unique.</li>
+                    <li>The name must begin with a letter.</li>
+                    <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
+                    <li>The name must be less than 200 characters.</li>
+                  </ul>
+                </q-tooltip>
+              </q-icon>
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
 
-      <template #actions>
-        <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock" />
-        <q-btn
-          :disable="!createReady"
-          unelevated
-          label="Create"
-          color="primary"
-          @click="createBlock"
-        />
-      </template>
-    </WizardCard>
-  </div>
+    <template #actions>
+      <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock" />
+      <q-btn
+        :disable="!createReady"
+        unelevated
+        label="Create"
+        color="primary"
+        @click="createBlock"
+      />
+    </template>
+  </ActionCardBody>
 </template>

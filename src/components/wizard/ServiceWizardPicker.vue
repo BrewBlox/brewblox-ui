@@ -71,66 +71,64 @@ export default class ServiceWizardPicker extends Vue {
 </script>
 
 <template>
-  <div class="dialog-content">
-    <!-- Display selected wizard -->
-    <component
-      :is="serviceTypeModel.value"
-      v-if="serviceWizardActive"
-      :service-id="serviceId"
-      :service-title="serviceTitle"
-      @title="setTitle"
-      @back="reset"
-      @close="close"
-    />
+  <!-- Display selected wizard -->
+  <component
+    :is="serviceTypeModel.value"
+    v-if="serviceWizardActive"
+    :service-id="serviceId"
+    :service-title="serviceTitle"
+    @title="setTitle"
+    @back="reset"
+    @close="close"
+  />
 
-    <!-- Select a wizard -->
-    <WizardCard v-else>
-      <q-card-section>
-        <q-item>
-          <q-item-section>
-            <q-select
-              v-model="serviceTypeModel"
-              :options="wizardOptions"
-              label="Service type"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <q-input v-model="serviceId" :rules="serviceIdRules" label="Service ID" lazy-rules>
-              <template #append>
-                <q-icon name="mdi-information">
-                  <q-tooltip>
-                    The Service ID is how the service is contacted.
-                    <br>This should match the ID in docker-compose.
-                  </q-tooltip>
-                </q-icon>
-              </template>
-            </q-input>
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
-            <q-input v-model="serviceTitle" label="Service title">
-              <template #append>
-                <q-icon name="mdi-information">
-                  <q-tooltip>
-                    The Service title is how the service is displayed in the UI.
-                    <br>This choice is purely graphical: pick a name that makes sense to you.
-                    <br>If left empty, the service ID will be used.
-                  </q-tooltip>
-                </q-icon>
-              </template>
-            </q-input>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
+  <!-- Select a wizard -->
+  <ActionCardBody v-else>
+    <q-card-section>
+      <q-item>
+        <q-item-section>
+          <q-select
+            v-model="serviceTypeModel"
+            :options="wizardOptions"
+            label="Service type"
+          />
+        </q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section>
+          <q-input v-model="serviceId" :rules="serviceIdRules" label="Service ID" lazy-rules>
+            <template #append>
+              <q-icon name="mdi-information">
+                <q-tooltip>
+                  The Service ID is how the service is contacted.
+                  <br>This should match the ID in docker-compose.
+                </q-tooltip>
+              </q-icon>
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section>
+          <q-input v-model="serviceTitle" label="Service title">
+            <template #append>
+              <q-icon name="mdi-information">
+                <q-tooltip>
+                  The Service title is how the service is displayed in the UI.
+                  <br>This choice is purely graphical: pick a name that makes sense to you.
+                  <br>If left empty, the service ID will be used.
+                </q-tooltip>
+              </q-icon>
+            </template>
+          </q-input>
+        </q-item-section>
+      </q-item>
+    </q-card-section>
 
-      <template #actions>
-        <q-btn unelevated label="Back" @click="back" />
-        <q-space />
-        <q-btn unelevated label="Next" color="primary" @click="next" />
-      </template>
-    </WizardCard>
-  </div>
+    <template #actions>
+      <q-btn unelevated label="Back" @click="back" />
+      <q-space />
+      <q-btn unelevated label="Next" color="primary" @click="next" />
+    </template>
+  </ActionCardBody>
 </template>

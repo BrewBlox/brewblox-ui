@@ -12,32 +12,36 @@ export default class DigitalActuatorBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md">
     <slot name="warnings">
-      <q-card-section>
-        <DigitalStateField
-          :value="block.data.desiredState"
-          :pending="block.data.state !== block.data.desiredState"
-          :pending-reason="constrainers"
-          :disable="isDriven"
-          dense
+      <div class="widget-body row">
+        <LabeledField
           label="State"
-          item-aligned
-          @input="v => { block.data.desiredState = v; saveBlock(); }"
+          class="col-grow"
+        >
+          <DigitalStateButton
+            :value="block.data.desiredState"
+            :pending="block.data.state !== block.data.desiredState"
+            :pending-reason="constrainers"
+            :disable="isDriven"
+            dense
+            @input="v => { block.data.desiredState = v; saveBlock(); }"
+          />
+        </LabeledField>
+        <div class="col-break" />
+        <DrivenIndicator
+          :block-id="block.id"
+          :service-id="serviceId"
+          class="col-grow"
         />
-        <q-item>
-          <q-item-section>
-            <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-            <ConstraintsField
-              :value="block.data.constrainedBy"
-              :service-id="serviceId"
-              type="digital"
-              @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-            />
-          </q-item-section>
-        </q-item>
-      </q-card-section>
+        <ConstraintsField
+          :value="block.data.constrainedBy"
+          :service-id="serviceId"
+          type="digital"
+          class="col-grow"
+          @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+        />
+      </div>
     </slot>
-  </q-card>
+  </div>
 </template>

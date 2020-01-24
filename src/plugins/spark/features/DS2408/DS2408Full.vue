@@ -14,28 +14,25 @@ export default class DS2408Full
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md">
     <slot name="warnings" />
-
     <ValveArray :crud="crud" :id-enum="DS2408Id" :name-enum="ValveStartId" />
+
     <q-separator inset />
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <InputField
-            :value="block.data.address"
-            title="Address"
-            label="Address"
-            class="self-start"
-            @input="v => { block.data.address = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.connected ? 'Yes' : 'No'" label="Connected" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+    <div class="widget-body row">
+      <LabeledField
+        :value="block.data.connected ? 'Yes' : 'No'"
+        label="Connected"
+        class="col-grow"
+      />
+      <InputField
+        :value="block.data.address"
+        title="Address"
+        label="Address"
+        class="col-grow"
+        @input="v => { block.data.address = v; saveBlock(); }"
+      />
+    </div>
+  </div>
 </template>

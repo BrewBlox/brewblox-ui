@@ -28,47 +28,51 @@ export default class SessionGraphNoteDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <DialogCard v-bind="{title, message, html}">
-      <q-item>
-        <q-item-section>
-          <q-item-label caption>
-            Start
-          </q-item-label>
-          <DatetimeField
-            v-model="local.start"
-            :rules="[
-              date => local.end === null
-                || date.getTime() < local.end
-                || 'Start must be before than end']"
-            title="Start"
-            clear-label="Not started"
-            default-now
-          />
-        </q-item-section>
-        <q-item-section v-if="local.start !== null" class="col-auto">
-          <q-btn :disable="local.end !== null" icon="clear" flat @click="local.start = null" />
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <q-item-label caption>
-            End
-          </q-item-label>
-          <DatetimeField
-            v-model="local.end"
-            :rules="[
-              date => local.start === null
-                || date.getTime() > local.start
-                || 'End must be after start']"
-            title="End"
-            :readonly="local.start === null"
-            :clear-label="local.start === null ? 'Not started' : 'In progress'"
-            default-now
-          />
-        </q-item-section>
-        <q-item-section v-if="local.end !== null" class="col-auto">
-          <q-btn icon="clear" flat @click="local.end = null" />
-        </q-item-section>
-      </q-item>
+      <div class="row q-gutter-xs q-ml-md">
+        <DatetimeField
+          v-model="local.start"
+          :rules="[
+            date => local.end === null
+              || date.getTime() < local.end
+              || 'Start must be before than end']"
+          title="Start"
+          label="Start"
+          clear-label="Not started"
+          default-now
+          class="col-grow"
+        />
+        <q-btn
+          v-if="local.start !== null"
+          :disable="local.end !== null"
+          icon="clear"
+          flat
+          class="col-auto"
+          @click="local.start = null"
+        />
+
+        <div class="col-break" />
+
+        <DatetimeField
+          v-model="local.end"
+          :rules="[
+            date => local.start === null
+              || date.getTime() > local.start
+              || 'End must be after start']"
+          title="End"
+          label="End"
+          :readonly="local.start === null"
+          :clear-label="local.start === null ? 'Not started' : 'In progress'"
+          default-now
+          class="col-grow"
+        />
+        <q-btn
+          v-if="local.end !== null"
+          icon="clear"
+          flat
+          class="col-auto"
+          @click="local.end = null"
+        />
+      </div>
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

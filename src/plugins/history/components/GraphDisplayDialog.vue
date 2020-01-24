@@ -66,7 +66,7 @@ export default class GraphDisplayDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <DialogCard v-bind="{title, message, html}">
-      <q-list dense>
+      <div class="column q-gutter-xs">
         <InputField v-model="rename" title="Label" label="Label" />
         <ColorField
           v-model="color"
@@ -75,14 +75,15 @@ export default class GraphDisplayDialog extends DialogBase {
           null-text="automatic"
           clearable
         />
-        <LabeledField label="Y-axis">
+        <LabeledField label="Y-axis" class="depth-1">
           <q-btn-toggle
             v-model="axis"
             :options="axisOpts"
             flat
+            class="depth-1"
           />
         </LabeledField>
-      </q-list>
+      </div>
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

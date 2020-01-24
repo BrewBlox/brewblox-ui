@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
+import { WidgetContext } from '@/store/features';
+
 
 @Component
 export default class DialogBase extends Vue {
@@ -15,6 +17,14 @@ export default class DialogBase extends Vue {
 
   @Prop({ type: Boolean, default: false })
   public readonly html!: boolean;
+
+  public get context(): WidgetContext {
+    return {
+      container: 'Dialog',
+      size: 'Fixed',
+      mode: 'Basic',
+    };
+  }
 
   // following method is REQUIRED
   // (don't change its name --> "show")

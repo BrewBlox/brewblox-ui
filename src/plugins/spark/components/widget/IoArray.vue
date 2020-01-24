@@ -114,46 +114,38 @@ export default class IoArray extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card-section>
-    <q-item v-for="channel in channels" :key="channel.id">
-      <q-item-section>{{ channel.name }}</q-item-section>
-      <q-item-section>
-        <DigitalStateField
+  <div class="widget-body column">
+    <div
+      v-for="channel in channels"
+      :key="channel.id"
+      class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
+    >
+      <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
+        {{ channel.name }}
+      </div>
+      <div class="col-auto row items-baseline min-width-sm">
+        <DigitalStateButton
           v-if="channel.driver"
           :disable="driverDriven(channel.driver)"
           :value="channel.driver.data.desiredState"
           :pending="channel.driver.data.state !== channel.driver.data.desiredState"
           :pending-reason="driverLimitedBy(channel.driver)"
+          class="col-auto self-center"
           @input="v => saveState(channel, v)"
         />
-        <div v-else>
-          ---
+        <div v-else class="darkened text-italic q-pa-sm">
+          Not set
         </div>
-      </q-item-section>
-      <q-item-section>
-        <BlockField
-          :value="driverLink(channel)"
-          :service-id="serviceId"
-          title="Driver"
-          label="Driver"
-          no-show
-          dense
-          @input="link => saveDriver(channel, link)"
-        />
-      </q-item-section>
-      <q-item-section side>
-        <BlockDialogButton
-          v-if="channel.driver"
-          :block-id="channel.driver.id"
-          :service-id="serviceId"
-          flat
-        >
-          <q-tooltip>Configure Digital Actuator</q-tooltip>
-        </BlockDialogButton>
-        <q-btn v-else flat icon="add" @click="createActuator(channel)">
-          <q-tooltip>Create new Digital Actuator</q-tooltip>
-        </q-btn>
-      </q-item-section>
-    </q-item>
-  </q-card-section>
+      </div>
+      <BlockField
+        :value="driverLink(channel)"
+        :service-id="serviceId"
+        title="Driver"
+        label="Driver"
+        dense
+        class="col-grow"
+        @input="link => saveDriver(channel, link)"
+      />
+    </div>
+  </div>
 </template>

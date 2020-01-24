@@ -36,7 +36,7 @@ export default class DialogCard extends Vue {
       {{ message }}
     </q-card-section>
     <slot name="body">
-      <q-card-section class="scroll">
+      <q-card-section class="scroll q-gutter-xs">
         <slot />
       </q-card-section>
     </slot>

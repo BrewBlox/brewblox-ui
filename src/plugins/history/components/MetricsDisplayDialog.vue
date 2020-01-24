@@ -62,7 +62,7 @@ export default class MetricsDisplayDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <DialogCard v-bind="{title, message, html}">
-      <q-list dense>
+      <div class="column q-gutter-xs">
         <InputField v-model="rename" title="Label" label="Label" />
         <InputField v-model="fresh" title="Warn when older than" label="Warn when older than" />
         <InputField
@@ -73,7 +73,7 @@ export default class MetricsDisplayDialog extends DialogBase {
           title="Number of decimals"
           label="Number of decimals"
         />
-      </q-list>
+      </div>
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

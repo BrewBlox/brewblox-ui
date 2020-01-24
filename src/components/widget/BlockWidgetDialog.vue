@@ -64,6 +64,7 @@ export default class BlockWidgetDialog extends DialogBase {
     return {
       container: 'Dialog',
       mode: this.mode,
+      size: 'Fixed',
     };
   }
 

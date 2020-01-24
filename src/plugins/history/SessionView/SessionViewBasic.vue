@@ -58,8 +58,7 @@ export default class SessionViewBasic extends CrudComponent<SessionViewConfig> {
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div>
     <slot name="warnings" />
     <slot name="graph" />
 
@@ -91,5 +90,5 @@ export default class SessionViewBasic extends CrudComponent<SessionViewConfig> {
         </q-item-section>
       </q-item>
     </q-card-section>
-  </q-card>
+  </div>
 </template>

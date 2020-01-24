@@ -21,11 +21,6 @@ interface ValidatedWidget {
 export default class DashboardPage extends Vue {
   widgetEditable = false;
 
-  context: WidgetContext = {
-    mode: 'Basic',
-    container: 'Dashboard',
-  }
-
   @Watch('dashboardId')
   onChangeDashboardId(): void {
     this.widgetEditable = false;
@@ -42,6 +37,14 @@ export default class DashboardPage extends Vue {
   @Watch('dashboard.title', { immediate: true })
   watchTitle(newV: string): void {
     document.title = `Brewblox | ${newV ?? 'Dashboard'}`;
+  }
+
+  get context(): WidgetContext {
+    return {
+      mode: 'Basic',
+      container: 'Dashboard',
+      size: this.$dense ? 'Content' : 'Fixed',
+    };
   }
 
   get dashboardId(): string {
@@ -155,7 +158,7 @@ export default class DashboardPage extends Vue {
 </script>
 
 <template>
-  <q-page padding class="bg-dark-bright">
+  <q-page padding>
     <q-inner-loading v-if="!dashboard">
       <q-spinner size="50px" color="primary" />
     </q-inner-loading>
@@ -193,14 +196,16 @@ export default class DashboardPage extends Vue {
           </template>
         </ActionMenu>
       </portal>
+
       <div v-if="$dense" class="column q-gutter-y-sm">
-        <div v-for="val in validatedWidgets" :key="val.id" class="col full-width">
-          <component
-            :is="val.component"
-            :initial-crud="val.crud"
-            :context="context"
-          />
-        </div>
+        <component
+          :is="val.component"
+          v-for="val in validatedWidgets"
+          :key="val.id"
+          :initial-crud="val.crud"
+          :context="context"
+          class="col full-width"
+        />
       </div>
       <GridContainer
         v-else
@@ -215,7 +220,7 @@ export default class DashboardPage extends Vue {
           :initial-crud="val.crud"
           :context="context"
           :error="val.error"
-          class="bg-dark maximized"
+          class="fit"
         />
       </GridContainer>
     </div>

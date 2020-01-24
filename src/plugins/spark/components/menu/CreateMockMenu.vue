@@ -56,15 +56,10 @@ export default class CreateMockMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>
-            Create Mock Blocks
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+    <ActionCardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="serviceId" subtitle="Create Mock Blocks" />
+      </template>
 
       <q-card-section>
         <q-item>
@@ -75,6 +70,6 @@ export default class CreateMockMenu extends DialogBase {
           <q-space />
         </q-item>
       </q-card-section>
-    </q-card>
+    </ActionCardWrapper>
   </q-dialog>
 </template>

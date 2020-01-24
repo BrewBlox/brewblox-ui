@@ -15,6 +15,7 @@ export default class SparkWidgetDialog extends DialogBase {
     return {
       mode: 'Basic',
       container: 'Dialog',
+      size: 'Fixed',
     };
   }
 }
@@ -22,6 +23,6 @@ export default class SparkWidgetDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
-    <SparkWidget :service-id="serviceId" :context="context" class="bg-dark-bright" />
+    <SparkWidget :service-id="serviceId" :context="context" />
   </q-dialog>
 </template>

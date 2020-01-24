@@ -53,7 +53,7 @@ export default class UnknownBlockWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card :class="cardClass">
+  <q-card>
     <component :is="toolbarComponent" :crud="crud">
       <template #actions>
         <ActionItem

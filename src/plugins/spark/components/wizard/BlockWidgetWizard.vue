@@ -138,11 +138,11 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
 </script>
 
 <template>
-  <WizardCard>
+  <ActionCardBody>
     <q-stepper
       v-model="currentStep"
       :bordered="false"
-      class="bg-dark-bright no-border"
+      class="no-border"
       vertical
       animated
     >
@@ -258,5 +258,5 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     <template #actions>
       <portal-target name="widget-wizard-nav" class="full-width row justify-end q-gutter-sm" />
     </template>
-  </WizardCard>
+  </ActionCardBody>
 </template>

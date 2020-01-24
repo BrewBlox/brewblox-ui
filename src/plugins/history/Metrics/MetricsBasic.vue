@@ -40,6 +40,10 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
     this.resetSources();
   }
 
+  destroyed(): void {
+    this.removeSources();
+  }
+
   get widgetCfg(): MetricsConfig {
     return {
       targets: [],
@@ -114,49 +118,38 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
     this.removeSources();
     this.addSources();
   }
-
-  destroyed(): void {
-    this.removeSources();
-  }
 }
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
-    <slot name="warnings" />
+  <div class="widget-md">
+    <CardWarning v-if="values.length === 0">
+      <template #message>
+        No metrics selected.
+      </template>
+      <template #actions>
+        <q-btn flat label="Add metrics" @click="$emit('mode', 'Full')" />
+      </template>
+    </CardWarning>
 
-    <q-card-section>
-      <q-list>
-        <q-item v-if="values.length === 0">
-          <q-item-section avatar>
-            <q-icon name="warning" />
-          </q-item-section>
-          <q-item-section>No metrics selected.</q-item-section>
-          <q-item-section side>
-            <q-btn flat text-color="white" label="Add metrics" @click="modalOpen = true" />
-          </q-item-section>
-        </q-item>
-        <LabeledField
-          v-for="val in values"
-          :key="val.field"
-          :label="val.name"
-          item-aligned
-          class="q-py-none"
-        >
-          <big :class="{darkened: val.stale}">
-            {{ val.value | round(fieldDecimals(val.field)) }}
-          </big>
-          <template v-if="val.stale" #after>
-            <q-icon name="warning" size="24px" />
-            <q-tooltip>
-              {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
-              <br>
-              Last update: {{ new Date(val.time).toLocaleString() }}.
-            </q-tooltip>
-          </template>
-        </LabeledField>
-      </q-list>
-    </q-card-section>
-  </q-card>
+    <div v-else class="column q-ma-md">
+      <LabeledField
+        v-for="val in values"
+        :key="val.field"
+        :label="val.name"
+      >
+        <big :class="{darkened: val.stale}">
+          {{ val.value | round(fieldDecimals(val.field)) }}
+        </big>
+        <template v-if="val.stale" #after>
+          <q-icon name="warning" size="24px" />
+          <q-tooltip>
+            {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
+            <br>
+            Last update: {{ new Date(val.time).toLocaleString() }}.
+          </q-tooltip>
+        </template>
+      </LabeledField>
+    </div>
+  </div>
 </template>

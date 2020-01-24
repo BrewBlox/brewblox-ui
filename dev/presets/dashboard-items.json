@@ -264,6 +264,18 @@
       "feature": "Automation",
       "dashboard": "dashboard-home",
       "config": {}
+    },
+    {
+      "_id": "dashboard-items__bb7aa0b4-a045-ad38-4887-308967ca8d63",
+      "title": "Mr Beancounter",
+      "order": 5,
+      "cols": 4,
+      "rows": 5,
+      "feature": "SessionLog",
+      "dashboard": "dashboard-home",
+      "config": {
+        "currentSession": "3d15296d-0abd-4d45-383c-0bec436ae319"
+      }
     }
   ]
 }

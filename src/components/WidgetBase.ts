@@ -27,7 +27,7 @@ export default class WidgetBase<ConfigT = any> extends Vue {
   }
 
   public get mode(): WidgetMode {
-    return this.activeMode || this.context.mode;
+    return this.activeMode ?? this.context.mode;
   }
 
   public set mode(val: WidgetMode) {
@@ -58,22 +58,6 @@ export default class WidgetBase<ConfigT = any> extends Vue {
     return this.inDialog
       ? 'WidgetDialogToolbar'
       : 'WidgetToolbar';
-  }
-
-  public *cardClassGenerator(): Generator<string, void, undefined> {
-    yield 'overflow-auto';
-
-    yield* this.inDialog
-      ? ['widget-modal']
-      : ['widget-dashboard', 'scroll'];
-
-    if (this.$dense) {
-      yield 'widget-dense';
-    }
-  }
-
-  public get cardClass(): string[] {
-    return [...this.cardClassGenerator()];
   }
 
   public saveWidget(widget: PersistentWidget = this.crud.widget): void {
