@@ -35,8 +35,8 @@ services:
 
   emitter:
     image: brewblox/brewblox-emitter:develop
-    volumes:
-      - "../brewblox-emitter/:/app/"
+    # volumes:
+    #   - "../brewblox-emitter/:/app/"
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /emitter"
