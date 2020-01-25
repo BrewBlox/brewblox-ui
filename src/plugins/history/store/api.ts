@@ -2,8 +2,9 @@ import mapKeys from 'lodash/mapKeys';
 import queryString from 'query-string';
 
 import { generate } from '@/helpers/database-api';
-import { get, post, sse } from '@/helpers/fetch';
+import { get, post } from '@/helpers/fetch';
 import { snakeCased } from '@/helpers/functional';
+import { sse } from '@/helpers/sse';
 
 import { LoggedSession, QueryParams, QueryResult, QueryTarget } from '../types';
 

@@ -1,7 +1,9 @@
+import pick from 'lodash/pick';
+
 import { Link } from '@/helpers/units';
 
 import { constraintLabels } from '../helpers';
-import { Block, ConstraintsObj, Limiters, RelationEdge } from '../types';
+import { Block, ConstraintsObj, DataBlock, Limiters, RelationEdge } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];
@@ -93,3 +95,9 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
 
   return limited;
 };
+
+export const asDataBlock =
+  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
+
+export const asBlock =
+  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });

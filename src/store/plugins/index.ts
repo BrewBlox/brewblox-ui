@@ -93,16 +93,16 @@ export class PluginModule extends VuexModule {
   }
 
   @Action({ rawError })
+  public async init(): Promise<void> {
+    this.commitSetupActions([]);
+    api.setup(() => { }, () => { });
+  }
+
+  @Action({ rawError })
   public async setup(): Promise<void> {
     await Promise.all(
       this.setupActions
         .map(a => store.dispatch(a)));
-  }
-
-  @Action({ rawError })
-  public async init(): Promise<void> {
-    this.commitSetupActions([]);
-    api.setup(() => { }, () => { });
   }
 }
 

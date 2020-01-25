@@ -20,7 +20,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
   }
 
   get status(): SystemStatus | null {
-    return sparkStore.lastStatus(this.serviceId);
+    return sparkStore.status(this.serviceId);
   }
 
   get updateAvailableText(): string {
@@ -57,9 +57,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
       .catch(e => {
         this.pushMessage(`Update failed: ${e.toString()}`);
         this.pushMessage('This feature is still experimental.');
-        this.pushMessage(`If retrying the update does not work,
-                          or your firmware is older than 2019-07-18,
-                          please run 'brewblox-ctl flash' to enable UI firmware updates.`);
+        this.pushMessage('If retrying the update does not work, please run \'brewblox-ctl flash\'.');
         if (this.status) {
           this.status.info.forEach(this.pushMessage);
         }

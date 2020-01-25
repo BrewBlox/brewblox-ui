@@ -2,10 +2,10 @@ import PortalVue from 'portal-vue';
 import { PluginObject, VueConstructor } from 'vue';
 
 import { externalComponent } from '@/helpers/component-ref';
-import { HOST } from '@/helpers/const';
 import automation from '@/plugins/automation';
 import builder from '@/plugins/builder';
 import database from '@/plugins/database';
+import eventbus from '@/plugins/eventbus';
 import history from '@/plugins/history';
 import quickstart from '@/plugins/quickstart';
 import spark from '@/plugins/spark';
@@ -33,18 +33,15 @@ const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> =>
   }
 };
 
-async function setup(Vue: VueConstructor): Promise<void> {
-  // Make Vue accessible as global variable in plugins
+export default async ({ Vue }: { Vue: VueConstructor }): Promise<void> => {
+  // Make Vue accessible as global variable in umd plugins
   Object.defineProperty(window, 'Vue', { value: Vue });
 
   // Enable the Vue devtools performance tab
   Vue.config.performance = Boolean(process.env.DEV && process.env.BLOX_PERFORMANCE);
 
-  // Install the database. We need it to fetch remote plugins
-  Vue.use(database, {
-    host: HOST,
-    name: 'brewblox-ui-store',
-  });
+  Vue.use(database);
+  Vue.use(eventbus);
 
   const plugins: PluginObject<any>[] = [
     PortalVue,
@@ -74,8 +71,4 @@ async function setup(Vue: VueConstructor): Promise<void> {
   } catch (e) { }
 
   plugins.forEach(plugin => Vue.use(plugin, { store }));
-};
-
-export default async ({ Vue }): Promise<void> => {
-  await setup(Vue);
 };

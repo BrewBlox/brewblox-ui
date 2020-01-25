@@ -51,5 +51,3 @@ export const patch =
 export const del =
   async (url: string, data: any): Promise<any> => post(url, data, 'DELETE');
 
-export const sse =
-  (url: string): EventSource => new EventSource(`${HOST}${url}`);

@@ -25,8 +25,8 @@ const initService = async (service: Service): Promise<void> => {
 
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
-  public replicating = false;
   public services: Mapped<Service> = {};
+  public now: Date = new Date();
 
   public get serviceIds(): string[] {
     return Object.keys(this.services);
@@ -59,6 +59,11 @@ export class ServiceModule extends VuexModule {
 
   public get serviceExists(): (id: string) => boolean {
     return id => !!this.services[id];
+  }
+
+  @Mutation
+  public updateTime(): void {
+    this.now = new Date();
   }
 
   @Mutation
@@ -127,6 +132,7 @@ export class ServiceModule extends VuexModule {
     await Promise.all(services.map(initService));
 
     api.setup(onChange, onDelete);
+    setInterval(() => this.updateTime(), 10 * 1000);
   }
 }
 

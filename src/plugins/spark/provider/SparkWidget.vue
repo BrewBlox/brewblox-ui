@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { shortDateString } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
@@ -20,6 +21,10 @@ export default class SparkWidget extends Vue {
 
   get inDialog(): boolean {
     return this.context.container === 'Dialog';
+  }
+
+  get lastUpdate(): string {
+    return shortDateString(sparkStore.lastUpdate(this.serviceId), 'Unknown');
   }
 
   sysBlock<T extends Block>(blockType: string): T {
@@ -43,22 +48,13 @@ export default class SparkWidget extends Vue {
     return isReady(this.serviceId);
   }
 
-  get updating(): boolean {
-    return sparkStore.updateSource(this.serviceId) !== null;
-  }
-
   get sysDate(): string {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
   }
 
   fetchAll(): void {
-    sparkStore.fetchAll(this.serviceId);
+    sparkStore.fetchSettings(this.serviceId);
     sparkStore.fetchBlocks(this.serviceId);
-  }
-
-  retryUpdateSource(): void {
-    sparkStore.fetchServiceStatus(this.serviceId);
-    sparkStore.createUpdateSource(this.serviceId);
   }
 }
 </script>
@@ -78,16 +74,7 @@ export default class SparkWidget extends Vue {
       </Toolbar>
     </template>
 
-    <div>
-      <CardWarning v-if="!updating">
-        <template #message>
-          <span>Unable to update automatically</span>
-        </template>
-        <template #actions>
-          <q-btn label="Retry" color="warning" outline @click="retryUpdateSource" />
-        </template>
-      </CardWarning>
-
+    <div class="widget-md">
       <div class="widget-body row">
         <LabeledField label="Firmware version" class="col-lg-5 col-11">
           {{ sysInfo.data.version }}
@@ -95,17 +82,20 @@ export default class SparkWidget extends Vue {
         <LabeledField label="Firmware release date" class="col-lg-5 col-11">
           {{ sysInfo.data.releaseDate }}
         </LabeledField>
-        <LabeledField label="Device time" class="col-lg-5 col-11">
+        <LabeledField label="Controller date / time" class="col-lg-5 col-11">
           {{ sysDate }}
         </LabeledField>
-        <LabeledField label="Time since boot" class="col-lg-5 col-11">
+        <LabeledField label="Controller uptime" class="col-lg-5 col-11">
           {{ ticks.data.millisSinceBoot | duration }}
         </LabeledField>
         <LabeledField label="IP address" class="col-lg-5 col-11">
           {{ wifi.data.ip }}
         </LabeledField>
-        <LabeledField label="Device ID" class="col-lg-5 col-11" tag-style="word-wrap: break-word;">
+        <LabeledField label="Controller ID" class="col-lg-5 col-11" tag-style="word-wrap: break-word;">
           {{ sysInfo.data.deviceId }}
+        </LabeledField>
+        <LabeledField label="Last blocks update" class="col-lg-5 col-11">
+          {{ lastUpdate }}
         </LabeledField>
       </div>
     </div>

@@ -1,16 +1,9 @@
-import pick from 'lodash/pick';
 
-import { del, get, post, put, sse } from '@/helpers/fetch';
+import { del, get, post, put } from '@/helpers/fetch';
 import notify from '@/helpers/notify';
-import { deserialize } from '@/helpers/units/parseObject';
 
 import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
-
-const asDataBlock =
-  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
-
-const asBlock =
-  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
+import { asBlock, asDataBlock } from './helpers';
 
 const intercept =
   (message: string): ((e: Error) => never) =>
@@ -98,23 +91,6 @@ export const validateService = async (serviceId: string): Promise<boolean> =>
   get(`/${encodeURIComponent(serviceId)}/_service/status`)
     .then(retv => retv.status === 'ok')
     .catch(() => false);
-
-export const fetchUpdateSource = async (
-  serviceId: string,
-  onData: (blocks: Block[]) => void,
-  onClose: () => void,
-): Promise<EventSource> => {
-  const source = sse(`/${encodeURIComponent(serviceId)}/sse/objects`);
-  source.onerror = () => {
-    source.close();
-    onClose();
-  };
-  source.onmessage = (event: MessageEvent) =>
-    onData(deserialize(JSON.parse(event.data))
-      .map(((block: DataBlock) => asBlock(block, serviceId))));
-
-  return source;
-};
 
 export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> => {
   try {

@@ -1,4 +1,6 @@
-import database, { StoreObject } from '@/plugins/database';
+import Vue from 'vue';
+
+import { StoreObject } from '@/plugins/database';
 
 import { deserialize, serialize } from './units/parseObject';
 
@@ -19,26 +21,26 @@ export function generate<T extends StoreObject>(moduleId: string, serialized = f
   const dehydrate: ((v: any) => any) = serialized ? serialize : (v => v);
   return {
     setup(onChanged: ChangeCallback, onDeleted: DeleteCallback): void {
-      database.registerModule({
+      Vue.$database.registerModule({
         id: moduleId,
         onChanged: v => onChanged(hydrate(v)),
         onDeleted,
       });
     },
     async fetch(): Promise<T[]> {
-      return hydrate(await database.fetchAll(moduleId));
+      return hydrate(await Vue.$database.fetchAll(moduleId));
     },
     async fetchById(id: string): Promise<T> {
-      return hydrate(await database.fetchById(moduleId, id));
+      return hydrate(await Vue.$database.fetchById(moduleId, id));
     },
     async create(val: T): Promise<T> {
-      return hydrate(await database.create(moduleId, dehydrate(val)));
+      return hydrate(await Vue.$database.create(moduleId, dehydrate(val)));
     },
     async persist(val: T): Promise<T> {
-      return hydrate(await database.persist(moduleId, dehydrate(val)));
+      return hydrate(await Vue.$database.persist(moduleId, dehydrate(val)));
     },
     async remove(val: T): Promise<T> {
-      return hydrate(await database.remove(moduleId, dehydrate(val)));
+      return hydrate(await Vue.$database.remove(moduleId, dehydrate(val)));
     },
   };
 }

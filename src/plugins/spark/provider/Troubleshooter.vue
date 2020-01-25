@@ -17,49 +17,48 @@ export default class Troubleshooter extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  get lastStatus(): SystemStatus | null {
-    return sparkStore.lastStatus(this.serviceId);
+  get status(): SystemStatus | null {
+    return sparkStore.status(this.serviceId);
   }
 
   get textAvailable(): string {
-    return this.lastStatus?.available
+    return this.status?.available
       ? 'Service running'
       : 'Unable to connect to service';
   }
 
   get textConnect(): string {
-    return this.lastStatus?.connect
+    return this.status?.connect
       ? 'Service connected to controller'
       : 'Service not connected to controller';
   }
 
   get textHandshake(): string {
-    return this.lastStatus?.handshake
+    return this.status?.handshake
       ? 'Handshake performed'
       : 'Handshake not performed';
   }
 
   get textCompatible(): string {
-    return this.lastStatus?.compatible
+    return this.status?.compatible
       ? 'Firmware compatible'
       : 'Firmware not compatible';
   }
 
   get textValid(): string {
-    return this.lastStatus?.valid
+    return this.status?.valid
       ? 'Valid device ID'
       : 'Invalid device ID';
   }
 
   get textSynchronize(): string {
-    return this.lastStatus?.synchronize
+    return this.status?.synchronize
       ? 'Service synchronized'
       : 'Service not synchronized';
   }
 
   refresh(): void {
     sparkStore.fetchServiceStatus(this.serviceId)
-      .then(() => sparkStore.createUpdateSource(this.serviceId))
       .catch(() => { });
   }
 
@@ -89,7 +88,7 @@ export default class Troubleshooter extends Vue {
       </Toolbar>
     </template>
 
-    <div v-if="lastStatus" class="widget-body row items-center">
+    <div v-if="status" class="widget-body row items-center">
       <q-spinner
         size="24px"
         class="col-auto self-center"
@@ -99,43 +98,43 @@ export default class Troubleshooter extends Vue {
         tag="big"
         class="col-grow"
       >
-        {{ lastStatus.checkedAt.toLocaleString() }}
+        {{ status.checkedAt.toLocaleString() }}
       </LabeledField>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(lastStatus.available)" />
+      <q-icon v-bind="iconProps(status.available)" />
       <div>
         {{ textAvailable }}
       </div>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(lastStatus.connect)" />
+      <q-icon v-bind="iconProps(status.connect)" />
       <div>
         {{ textConnect }}
       </div>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(lastStatus.handshake)" />
+      <q-icon v-bind="iconProps(status.handshake)" />
       <div>
         {{ textHandshake }}
       </div>
 
-      <template v-if="lastStatus.handshake">
+      <template v-if="status.handshake">
         <div class="col-break" />
-        <q-icon v-bind="iconProps(lastStatus.compatible)" />
+        <q-icon v-bind="iconProps(status.compatible)" />
         <div>
           {{ textCompatible }}
         </div>
 
         <div class="col-break" />
-        <q-icon v-bind="iconProps(lastStatus.valid)" />
+        <q-icon v-bind="iconProps(status.valid)" />
         <div>
           {{ textValid }}
         </div>
       </template>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(lastStatus.synchronize)" />
+      <q-icon v-bind="iconProps(status.synchronize)" />
       <div>
         {{ textSynchronize }}
       </div>
@@ -143,7 +142,7 @@ export default class Troubleshooter extends Vue {
       <div class="col-break" />
       <div class="col">
         <!-- not available -->
-        <span v-if="!lastStatus.available">
+        <span v-if="!status.available">
           Your Spark service is offline.
           <ul>
             <li>Is your backend reachable?</li>
@@ -152,7 +151,7 @@ export default class Troubleshooter extends Vue {
           </ul>
         </span>
         <!-- not connected -->
-        <span v-else-if="!lastStatus.connect">
+        <span v-else-if="!status.connect">
           Your Spark service is online, but not connected to your controller.
           <ul>
             <li>Is your controller turned on?</li>
@@ -164,25 +163,25 @@ export default class Troubleshooter extends Vue {
           </ul>
         </span>
         <!-- awaiting handshake -->
-        <span v-else-if="!lastStatus.handshake">
+        <span v-else-if="!status.handshake">
           Your Spark service is waiting for the controller handshake.
           <br>
           <b>This status is usually temporary</b>
         </span>
         <!-- not compatible -->
-        <span v-else-if="!lastStatus.compatible">
+        <span v-else-if="!status.compatible">
           Your Spark service is not compatible with the firmware
           <br>
           <b>Please run brewblox-ctl update</b>
         </span>
         <!-- not valid -->
-        <span v-else-if="!lastStatus.valid">
+        <span v-else-if="!status.valid">
           The controller device ID doesn't match the service <i>--device-id</i> setting.
           <br>
           <b>Please check your connection settings</b>
         </span>
         <!-- not synchronized -->
-        <span v-else-if="!lastStatus.synchronize">
+        <span v-else-if="!status.synchronize">
           Your Spark service is connected to your controller, but not yet synchronized.
           <b>This status is usually temporary.</b>
           <ul>
@@ -193,12 +192,12 @@ export default class Troubleshooter extends Vue {
         </span>
       </div>
 
-      <template v-if="(lastStatus.info || []).length > 0">
+      <template v-if="(status.info || []).length > 0">
         <div class="col-break" />
         <div class="col">
           <b>Service info:</b>
           <q-list dense>
-            <q-item v-for="(val, idx) in lastStatus.info" :key="`info-${idx}`">
+            <q-item v-for="(val, idx) in status.info" :key="`info-${idx}`">
               <q-item-section>{{ val }}</q-item-section>
             </q-item>
           </q-list>

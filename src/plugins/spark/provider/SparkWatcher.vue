@@ -3,22 +3,26 @@ import { Component, Watch } from 'vue-property-decorator';
 
 import WatcherBase from '@/components/WatcherBase';
 import { createDialog } from '@/helpers/dialog';
+import { durationMs } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
+import { serviceStore } from '@/store/services';
 
 import { SystemStatus } from '../types';
+
+const snoozeDuration = durationMs('1d');
+const updateValidDuration = durationMs('30s');
 
 @Component
 export default class SparkWatcher extends WatcherBase {
   notifiedUpdate = false;
-  dismissFunc: Function | null = null;
 
-  get status(): SystemStatus | null {
-    return sparkStore.lastStatus(this.service.id);
+  get now(): Date {
+    return serviceStore.now;
   }
 
-  get lastUpdate(): Date | null {
-    return sparkStore.lastUpdate(this.service.id);
+  get status(): SystemStatus | null {
+    return sparkStore.status(this.serviceId);
   }
 
   get cookieName(): string {
@@ -32,58 +36,17 @@ export default class SparkWatcher extends WatcherBase {
     return Date.parse(this.$q.cookies.get(this.cookieName));
   }
 
-  notifying(): boolean {
-    return !!this.dismissFunc;
-  }
+  @Watch('now')
+  checkUpdateFresh(): void {
+    const date = sparkStore.lastUpdate(this.serviceId);
+    const fresh = !!date && date.getTime() + updateValidDuration > new Date().getTime();
 
-  retryUpdateSource(): void {
-    sparkStore.fetchServiceStatus(this.service.id);
-    sparkStore.createUpdateSource(this.service.id);
-  }
-
-  tryDismiss(): void {
-    if (this.dismissFunc) {
-      this.dismissFunc();
-      this.dismissFunc = null;
+    if (!fresh && date) {
+      sparkStore.invalidateBlocks(this.serviceId);
     }
-  }
-
-  @Watch('lastUpdate')
-  async handleUpdateChange(date: Date | null): Promise<void> {
-    // Update received from source -> dismiss prompt
-    if (date) {
-      this.tryDismiss();
-      return;
+    if (!fresh || !this.status?.synchronize) {
+      sparkStore.fetchServiceStatus(this.serviceId);
     }
-
-    // Service was removed -> dismiss prompt
-    if (!sparkStore.serviceAvailable(this.service.id)) {
-      this.tryDismiss();
-      return;
-    }
-
-    // Already showing notification -> wait for user action
-    if (this.notifying()) {
-      return;
-    }
-
-    // Show prompt to user
-    this.dismissFunc = this.$q.notify({
-      timeout: 0,
-      color: 'warning',
-      icon: 'warning',
-      message: `Lost connection to ${this.service.title}`,
-      actions: [
-        {
-          label: 'Retry',
-          textColor: 'white',
-          handler: this.retryUpdateSource,
-        },
-      ],
-    });
-
-    // Maybe it's only a hiccup -> schedule a retry
-    setTimeout(() => { this.lastUpdate || this.retryUpdateSource(); }, 3000);
   }
 
   @Watch('status')
@@ -92,7 +55,7 @@ export default class SparkWatcher extends WatcherBase {
       || !status
       || !status.connect
       || status.latest
-      || this.snoozeTime > new Date().getTime() - (24 * 60 * 60 * 1000)
+      || this.snoozeTime > new Date().getTime() - snoozeDuration
     ) {
       return;
     }

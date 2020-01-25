@@ -12,10 +12,7 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'dashboards' })
 export class DashboardModule extends VuexModule {
-  public replicatingDashboards = false;
   public dashboards: Mapped<Dashboard> = {};
-
-  public replicatingItems = false;
   public widgets: Mapped<PersistentWidget> = {};
 
   public get dashboardIds(): string[] {
@@ -79,11 +76,6 @@ export class DashboardModule extends VuexModule {
   }
 
   @Mutation
-  public commitReplicatingDashboards(val: boolean): void {
-    this.replicatingDashboards = val;
-  }
-
-  @Mutation
   public commitPersistentWidget(widget: PersistentWidget): void {
     Vue.set(this.widgets, widget.id, { ...widget });
   }
@@ -96,11 +88,6 @@ export class DashboardModule extends VuexModule {
   @Mutation
   public commitRemovePersistentWidget(widget: PersistentWidget): void {
     Vue.delete(this.widgets, widget.id);
-  }
-
-  @Mutation
-  public commitReplicatingItems(val: boolean): void {
-    this.replicatingItems = val;
   }
 
   @Action({ rawError, commit: 'commitDashboard' })

@@ -1,5 +1,4 @@
 <script lang="ts">
-import { clearTimeout, setInterval } from 'timers';
 import { isArray } from 'util';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
@@ -45,7 +44,6 @@ export default class SparkPage extends Vue {
   startResetBlocks = startResetBlocks;
 
   volatileWidgets: { [blockId: string]: PersistentWidget } = {};
-  statusCheckInterval: NodeJS.Timeout | null = null;
   blockFilter = '';
 
   context: WidgetContext = {
@@ -54,33 +52,30 @@ export default class SparkPage extends Vue {
     size: 'Content',
   };
 
+  roleOrder: Record<FeatureRole, number> = {
+    Display: 0,
+    Process: 1,
+    Control: 2,
+    Output: 3,
+    Constraint: 4,
+    Other: 5,
+  };
+
+  roleIcons: Record<FeatureRole, string> = {
+    Display: 'mdi-monitor-dashboard',
+    Process: 'mdi-thermometer',
+    Control: 'mdi-calculator-variant',
+    Output: 'mdi-power-plug',
+    Constraint: 'mdi-lock-outline',
+    Other: 'mdi-cube',
+  };
+
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
-
-  @Watch('statusNok', { immediate: true })
-  autoRecheck(): void {
-    if (this.statusNok && !this.statusCheckInterval) {
-      this.statusCheckInterval = setInterval(
-        () => sparkStore.fetchServiceStatus(this.service.id),
-        5000,
-      );
-    }
-    if (!this.statusNok && this.statusCheckInterval) {
-      sparkStore.fetchAll(this.service.id);
-      sparkStore.createUpdateSource(this.service.id);
-      clearTimeout(this.statusCheckInterval);
-      this.statusCheckInterval = null;
-      this.$forceUpdate();
-    }
-  }
 
   @Watch('service.title', { immediate: true })
   watchTitle(newV: string): void {
     document.title = `Brewblox | ${newV ?? 'Spark service'}`;
-  }
-
-  destroyed(): void {
-    this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
   }
 
   get service(): Spark {
@@ -92,48 +87,31 @@ export default class SparkPage extends Vue {
   }
 
   get isAvailable(): boolean {
-    return sparkStore.serviceAvailable(this.service.id);
+    return sparkStore.serviceAvailable(this.serviceId);
+  }
+
+  get lastUpdate(): Date | null {
+    return sparkStore.lastUpdate(this.serviceId);
   }
 
   get isReady(): boolean {
-    return this.isAvailable && isReady(this.service.id);
+    return this.isAvailable && isReady(this.serviceId);
   }
 
   get status(): SystemStatus | null {
-    if (!this.isAvailable) {
-      return null;
-    }
-    return sparkStore.lastStatus(this.service.id);
+    return this.isAvailable
+      ? sparkStore.status(this.serviceId)
+      : null;
   }
 
   get statusNok(): boolean {
-    return Boolean(this.isAvailable && this.status && !this.status.synchronize);
-  }
-
-  get roleOrder(): Record<FeatureRole, number> {
-    return {
-      Display: 0,
-      Process: 1,
-      Control: 2,
-      Output: 3,
-      Constraint: 4,
-      Other: 5,
-    };
-  }
-
-  get roleIcons(): Record<FeatureRole, string> {
-    return {
-      Display: 'mdi-monitor-dashboard',
-      Process: 'mdi-thermometer',
-      Control: 'mdi-calculator-variant',
-      Output: 'mdi-power-plug',
-      Constraint: 'mdi-lock-outline',
-      Other: 'mdi-cube',
-    };
+    return this.isAvailable
+      && !!this.status
+      && !this.status.synchronize;
   }
 
   get pageMode(): PageMode {
-    return this.service.config.pageMode || 'List';
+    return this.service.config.pageMode ?? 'List';
   }
 
   set pageMode(mode: PageMode) {

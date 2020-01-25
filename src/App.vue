@@ -7,8 +7,9 @@ import { pluginStore } from '@/store/plugins';
 @Component
 export default class App extends Vue {
 
-  created(): void {
-    pluginStore.setup();
+  async created(): Promise<void> {
+    await pluginStore.setup();
+    await Vue.$eventbus.start();
   }
 }
 </script>
@@ -18,7 +19,3 @@ export default class App extends Vue {
     <router-view />
   </div>
 </template>
-
-<style lang="scss">
-// We import global styling here
-</style>
