@@ -67,13 +67,10 @@ export class BrewbloxDatabase {
             .changes({ live: true, include_docs: true, since: 'now' })
             .on('change', (evt: ChangeEvent) => {
               const handler = this.modules.find(m => checkInModule(m.id, evt.id));
-              if (!handler) {
-                return;
-              }
               if (evt.deleted) {
-                handler.onDeleted(cleanId(handler.id, evt.id));
+                handler?.onDeleted(cleanId(handler.id, evt.id));
               } else {
-                handler.onChanged(asStoreObject(handler.id, evt.doc));
+                handler?.onChanged(asStoreObject(handler.id, evt.doc));
               }
             });
 
@@ -83,17 +80,16 @@ export class BrewbloxDatabase {
   }
 
   private async checkRemote(db: PouchDB.Database): Promise<void> {
-    try {
-      await db.info();
-    } catch (e) {
-      this.dbErrors.push({
-        message: 'Remote database unavailable',
-        moduleId: 'all',
-        time: new Date().toString(),
-        content: '',
-        error: e.message,
+    await db.info()
+      .catch((e) => {
+        this.dbErrors.push({
+          message: 'Remote database unavailable',
+          moduleId: 'all',
+          time: new Date().toString(),
+          content: '',
+          error: e.message,
+        });
       });
-    }
   };
 
   private intercept(message: string, moduleId: string, obj: any = null): (e: Error) => never {

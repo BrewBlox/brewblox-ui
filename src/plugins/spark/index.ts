@@ -2,7 +2,6 @@ import { VueConstructor } from 'vue';
 
 import { autoRegister } from '@/helpers/component-ref';
 import { Feature, featureStore } from '@/store/features';
-import { pluginStore } from '@/store/plugins';
 import { providerStore } from '@/store/providers';
 
 import features from './features';
@@ -40,7 +39,6 @@ export default {
       .map(spec => spec.block) as BlockSpec[];
 
     sparkStore.commitAllSpecs(specs);
-    pluginStore.onSetup('spark/setup');
 
     providerStore.createProvider({
       id: typeName,
@@ -53,5 +51,7 @@ export default {
       page: 'SparkPage',
       watcher: 'SparkWatcher',
     });
+
+    Vue.$startup.onStart(() => sparkStore.start());
   },
 };

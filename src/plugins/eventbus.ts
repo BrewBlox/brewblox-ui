@@ -16,7 +16,7 @@ export class BrewbloxEventbus {
   private source: ReconnectingEventSource | null = null;
   private lastOk = true;
 
-  public start(): void {
+  public async start(): Promise<void> {
     this.source?.close();
     this.source = sse('/emitter/sse', 3000);
 

@@ -1,11 +1,13 @@
+import { VueConstructor } from 'vue';
+
 import { autoRegister } from '@/helpers/component-ref';
 import { featureStore } from '@/store/features';
-import { pluginStore } from '@/store/plugins';
 
 import Automation from './Automation';
+import { automationStore } from './store';
 
 export default {
-  install() {
+  install(Vue: VueConstructor) {
     if (!process.env.BLOX_FEATURE_AUTOMATION) {
       return;
     }
@@ -13,6 +15,7 @@ export default {
 
     featureStore.createFeature(Automation.feature);
     featureStore.createWatcher({ component: 'AutomationWatcher', props: {} });
-    pluginStore.onSetup('automation/setup');
+
+    Vue.$startup.onStart(() => automationStore.start());
   },
 };

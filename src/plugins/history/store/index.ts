@@ -180,7 +180,7 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async setup(): Promise<void> {
+  public async start(): Promise<void> {
     const onChange = (session: LoggedSession): void => {
       const existing = this.sessionById(session.id);
       if (!existing || existing._rev !== session._rev) {

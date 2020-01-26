@@ -6,7 +6,7 @@ import { createDialog } from '@/helpers/dialog';
 import { durationMs } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
-import { serviceStore } from '@/store/services';
+import { systemStore } from '@/store/system';
 
 import { SystemStatus } from '../types';
 
@@ -18,7 +18,7 @@ export default class SparkWatcher extends WatcherBase {
   notifiedUpdate = false;
 
   get now(): Date {
-    return serviceStore.now;
+    return systemStore.now;
   }
 
   get status(): SystemStatus | null {

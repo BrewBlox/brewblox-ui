@@ -190,7 +190,7 @@ export class DashboardModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async setup(): Promise<void> {
+  public async start(): Promise<void> {
     const onDashboardChange = (dashboard: Dashboard): void => {
       const existing = this.dashboardById(dashboard.id);
       if (!existing || existing._rev !== dashboard._rev) {

@@ -483,7 +483,7 @@ export class SparkModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async setup(): Promise<void> {
+  public async start(): Promise<void> {
     const onChange = async (preset: StoredDataPreset): Promise<void> => {
       const existing = this.presets[preset.id];
       if (!existing || existing._rev !== preset._rev) {
