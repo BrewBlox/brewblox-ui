@@ -155,7 +155,7 @@ export class AutomationModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async setup(): Promise<void> {
+  public async start(): Promise<void> {
     const onChange = (process: Process): void => {
       const existing = this.processById(process.id);
       if (!existing || existing._rev !== process._rev) {

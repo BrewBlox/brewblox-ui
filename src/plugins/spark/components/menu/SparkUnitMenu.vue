@@ -16,6 +16,10 @@ export default class SparkUnitMenu extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  created(): void {
+    sparkStore.fetchSettings(this.serviceId);
+  }
+
   get units(): UserUnits {
     return sparkStore.units(this.serviceId) || {};
   }
@@ -28,10 +32,6 @@ export default class SparkUnitMenu extends DialogBase {
   saveUnits(vals: UserUnits = this.units): void {
     sparkStore.saveUnits([this.serviceId, vals])
       .catch(e => notify.error(`Failed to change unit: ${e.message}`));
-  }
-
-  mounted(): void {
-    sparkStore.fetchAll(this.serviceId);
   }
 }
 </script>

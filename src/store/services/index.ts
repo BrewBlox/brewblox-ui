@@ -25,7 +25,6 @@ const initService = async (service: Service): Promise<void> => {
 
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
-  public replicating = false;
   public services: Mapped<Service> = {};
 
   public get serviceIds(): string[] {
@@ -105,7 +104,7 @@ export class ServiceModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async setup(): Promise<void> {
+  public async start(): Promise<void> {
     const onChange = async (service: Service): Promise<void> => {
       const existing = this.tryServiceById(service.id);
       if (!existing) {

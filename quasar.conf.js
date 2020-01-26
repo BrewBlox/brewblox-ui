@@ -32,7 +32,7 @@ module.exports = function (ctx) {
       'externals',
       'register',
       'plugins',
-      'dense',
+      'mixins',
     ],
 
     css: [

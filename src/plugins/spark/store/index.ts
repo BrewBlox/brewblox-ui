@@ -4,6 +4,8 @@ import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { mutate, objReducer } from '@/helpers/functional';
+import { deserialize } from '@/helpers/units/parseObject';
+import { EventMessage } from '@/plugins/eventbus';
 import store from '@/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
@@ -13,6 +15,7 @@ import {
   Block,
   BlockSpec,
   CompatibleTypes,
+  DataBlock,
   Limiters,
   RelationEdge,
   Spark,
@@ -23,7 +26,7 @@ import {
   UserUnits,
 } from '../types';
 import * as api from './api';
-import { calculateDrivenChains, calculateLimiters, calculateRelations } from './helpers';
+import { asBlock, calculateDrivenChains, calculateLimiters, calculateRelations } from './helpers';
 import presetsApi from './presets-api';
 
 const rawError = true;
@@ -39,8 +42,7 @@ interface SparkServiceState {
   unitAlternatives: UnitAlternatives;
   compatibleTypes: Mapped<string[]>;
   discoveredBlocks: string[];
-  updateSource: EventSource | null;
-  lastStatus: SystemStatus | null;
+  status: SystemStatus | null;
   lastUpdate: Date | null;
 }
 
@@ -128,12 +130,8 @@ export class SparkModule extends VuexModule {
     return serviceId => this.services[serviceId].discoveredBlocks;
   }
 
-  public get updateSource(): (serviceId: string) => EventSource | null {
-    return serviceId => this.services[serviceId].updateSource;
-  }
-
-  public get lastStatus(): (serviceId: string) => SystemStatus | null {
-    return serviceId => this.services[serviceId].lastStatus;
+  public get status(): (serviceId: string) => SystemStatus | null {
+    return serviceId => this.services[serviceId].status;
   }
 
   public get lastUpdate(): (serviceId: string) => Date | null {
@@ -259,10 +257,16 @@ export class SparkModule extends VuexModule {
 
   @Mutation
   public commitAllBlocks([serviceId, blocks]: [string, Block[]]): void {
-    Vue.set(
-      this.services[serviceId],
-      'blocks',
-      blocks.reduce(objReducer('id'), {}));
+    const service = this.services[serviceId];
+    Vue.set(service, 'blocks', blocks.reduce(objReducer('id'), {}));
+    Vue.set(service, 'lastUpdate', new Date());
+  }
+
+  @Mutation
+  public invalidateBlocks(serviceId: string): void {
+    const service = this.services[serviceId];
+    Vue.set(service, 'blocks', []);
+    Vue.set(service, 'lastUpdate', null);
   }
 
   @Mutation
@@ -286,18 +290,9 @@ export class SparkModule extends VuexModule {
   }
 
   @Mutation
-  public commitUpdateSource([serviceId, source]: [string, EventSource | null]): void {
-    Vue.set(this.services[serviceId], 'updateSource', source);
-  }
-
-  @Mutation
-  public commitLastStatus([serviceId, status]: [string, SystemStatus]): void {
-    Vue.set(this.services[serviceId], 'lastStatus', status);
-  }
-
-  @Mutation
-  public commitLastUpdate([serviceId, date]: [string, Date | null]): void {
-    Vue.set(this.services[serviceId], 'lastUpdate', date);
+  public commitStatus([serviceId, status]: [string, SystemStatus]): void {
+    const service = this.services[serviceId];
+    Vue.set(service, 'status', status);
   }
 
   @Action({ rawError })
@@ -319,7 +314,7 @@ export class SparkModule extends VuexModule {
   @Action({ rawError })
   public async addService(serviceId: string): Promise<void> {
     if (this.services[serviceId]) {
-      throw new Error(`Service ${serviceId} already exists`);
+      throw new Error(`Service '${serviceId}' already exists`);
     }
     const empty: SparkServiceState = {
       blocks: {},
@@ -327,15 +322,26 @@ export class SparkModule extends VuexModule {
       unitAlternatives: {},
       compatibleTypes: {},
       discoveredBlocks: [],
-      updateSource: null,
-      lastStatus: null,
+      status: null,
       lastUpdate: null,
     };
     this.commitService([serviceId, empty]);
+
+    Vue.$eventbus.addListener(serviceId, (msg: EventMessage) => {
+      const blocks: Block[] = msg.data
+        .map(deserialize)
+        .map((block: DataBlock) => asBlock(block, serviceId));
+      this.commitAllBlocks([serviceId, blocks]);
+    });
+
+    await this.fetchServiceStatus(serviceId);
+    await this.fetchDiscoveredBlocks(serviceId)
+      .catch(() => { });
   }
 
   @Action({ rawError })
   public async removeService(serviceId: string): Promise<void> {
+    Vue.$eventbus.removeListener(serviceId);
     this.commitRemoveService(serviceId);
   }
 
@@ -402,7 +408,7 @@ export class SparkModule extends VuexModule {
   @Action({ rawError })
   public async fetchServiceStatus(serviceId: string): Promise<SystemStatus> {
     const status = await api.fetchSystemStatus(serviceId);
-    this.commitLastStatus([serviceId, status]);
+    this.commitStatus([serviceId, status]);
     return status;
   }
 
@@ -443,9 +449,8 @@ export class SparkModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchAll(serviceId: string): Promise<void> {
-    const status = await api.fetchSystemStatus(serviceId);
-    this.commitLastStatus([serviceId, status]);
+  public async fetchSettings(serviceId: string): Promise<void> {
+    const status = await this.fetchServiceStatus(serviceId);
     if (status.synchronize) {
       await Promise.all([
         this.fetchUnits(serviceId),
@@ -453,24 +458,6 @@ export class SparkModule extends VuexModule {
         this.fetchCompatibleTypes(serviceId),
       ]);
     }
-  }
-
-  @Action({ rawError })
-  public async createUpdateSource(serviceId: string): Promise<void> {
-    this.commitUpdateSource([
-      serviceId,
-      await api.fetchUpdateSource(
-        serviceId,
-        blocks => {
-          this.commitAllBlocks([serviceId, blocks]);
-          this.commitLastUpdate([serviceId, new Date()]);
-        },
-        () => {
-          this.commitUpdateSource([serviceId, null]);
-          this.commitLastUpdate([serviceId, null]);
-        },
-      ),
-    ]);
   }
 
   @Action({ rawError })
@@ -496,7 +483,7 @@ export class SparkModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async setup(): Promise<void> {
+  public async start(): Promise<void> {
     const onChange = async (preset: StoredDataPreset): Promise<void> => {
       const existing = this.presets[preset.id];
       if (!existing || existing._rev !== preset._rev) {

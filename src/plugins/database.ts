@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import PouchDB from 'pouchdb';
-import { VueConstructor } from 'vue';
+import { VueConstructor } from 'vue/types/umd';
+
+import { HOST } from '@/helpers/const';
 
 type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
-
-interface InstallOpts {
-  host: string;
-  name: string;
-}
 
 export interface StoreObject {
   id: string;
@@ -53,29 +50,15 @@ const asNewDocument = (moduleId: string, obj: any): any => {
   return asDocument(moduleId, obj);
 };
 
-export class BrewBloxDatabase {
-  private _db: Promise<PouchDB.Database> | null = null;
+export class BrewbloxDatabase {
+  private promisedDb: Promise<PouchDB.Database>;
 
   private modules: Module[] = [];
   private dbErrors: DBError[] = [];
 
-  /*
-  * The database is used as a singleton with explicit construction.
-  * The install() function creates the Promise<PouchDB.Database>.
-  * All functions that use the database must wait for the promise to resolve.
-  */
-  private get promisedDb(): Promise<PouchDB.Database> {
-    if (this._db === null) {
-      throw new Error('Database must be installed before it can be used');
-    }
-    return this._db;
-  }
-
-  // install(Vue, options) is a required entrypoint for a Vue plugin
-  public install(Vue: VueConstructor, opts: InstallOpts): void {
-    this._db = new Promise((resolve) => {
-      const { host, name } = opts;
-      const remoteAddress = `${host}/datastore/${name}`;
+  public constructor() {
+    this.promisedDb = new Promise((resolve) => {
+      const remoteAddress = `${HOST}/datastore/brewblox-ui-store`;
       const remoteDb: PouchDB.Database = new PouchDB(remoteAddress);
 
       this.checkRemote(remoteDb)
@@ -84,36 +67,29 @@ export class BrewBloxDatabase {
             .changes({ live: true, include_docs: true, since: 'now' })
             .on('change', (evt: ChangeEvent) => {
               const handler = this.modules.find(m => checkInModule(m.id, evt.id));
-              if (!handler) {
-                return;
-              }
               if (evt.deleted) {
-                handler.onDeleted(cleanId(handler.id, evt.id));
+                handler?.onDeleted(cleanId(handler.id, evt.id));
               } else {
-                handler.onChanged(asStoreObject(handler.id, evt.doc));
+                handler?.onChanged(asStoreObject(handler.id, evt.doc));
               }
             });
 
           resolve(remoteDb);
         });
     });
-
-    // Add as global Vue property to allow it to be used by external plugins
-    (Vue as any).database = this;
   }
 
   private async checkRemote(db: PouchDB.Database): Promise<void> {
-    try {
-      await db.info();
-    } catch (e) {
-      this.dbErrors.push({
-        message: 'Remote database unavailable',
-        moduleId: 'all',
-        time: new Date().toString(),
-        content: '',
-        error: e.message,
+    await db.info()
+      .catch((e) => {
+        this.dbErrors.push({
+          message: 'Remote database unavailable',
+          moduleId: 'all',
+          time: new Date().toString(),
+          content: '',
+          error: e.message,
+        });
       });
-    }
   };
 
   private intercept(message: string, moduleId: string, obj: any = null): (e: Error) => never {
@@ -185,5 +161,8 @@ export class BrewBloxDatabase {
   }
 }
 
-const db = new BrewBloxDatabase();
-export default db;
+export default {
+  install(Vue: VueConstructor) {
+    Vue.$database = new BrewbloxDatabase();
+  },
+};
