@@ -13,27 +13,59 @@ Due to limitations in the way Docker is handled on Windows and Mac, a Linux-base
 
 If you're determined to make it work on either Windows or Mac, feel free to contact us for a more detailed explanation.
 
+## Installation
+
+**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at https://brewblox.netlify.com/**
+
+Note: this is tested on Ubuntu, and may or may not work on other distros. Please let us know if there are any issues.
+
+``` bash
+sudo apt update
+sudo apt upgrade -y
+sudo apt install -y build-essential libssl-dev curl git python3-pip
+
+# Install Node Version Manager + Node.js
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
+nvm install --lts
+
+# Install Docker
+curl -sL https://get.docker.com | bash
+
+# Install docker-compose
+pip3 install --user -U docker-compose
+
+# Allow running docker without sudo
+sudo usermod -aG docker $USER
+
+# A reboot is required for the user permissions to take effect
+reboot
+```
+
+After the reboot, run the following commands in the `brewblox-ui` directory:
+
+``` bash
+npm install -g @quasar/cli
+npm ci -d
+docker-compose pull
+```
+
 ## Run
 
 ``` bash
-# install dependencies
-$ npm install -g @quasar/cli
-$ npm install
-$ docker-compose pull
-
-
-# serve with hot reload at localhost:8080/ui/
-$ npm start
+npm start
 ```
+
+The UI will be served with hot reloading at https://localhost:8080/ui
 
 ## Additional dev commands
 
 ```bash
 # Restart backend containers
-$ npm run compose:new
+npm run compose:new
 
-# Build a production version of the software. This is served at localhost:9000
-$ npm run devbuild
+# Build a production version of the software
+# This is served at https://localhost:9001
+npm run devbuild
 ```
 
 ---
