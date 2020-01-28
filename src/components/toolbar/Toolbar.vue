@@ -31,7 +31,7 @@ export default class Toolbar extends Vue {
       </q-item-label>
       <div
         v-if="!!subtitle"
-        class="text-h5 text-italic text-bold no-select q-ml-md subtitle"
+        class="no-select q-ml-md subtitle"
       >
         {{ subtitle }}
       </div>
@@ -45,6 +45,9 @@ export default class Toolbar extends Vue {
 .subtitle
   opacity: 0.1
   position: absolute
-  bottom: -10px
+  bottom: -0.4em
   left: 0
+  font-style: italic
+  font-size: 120%
+  font-weight: bold
 </style>

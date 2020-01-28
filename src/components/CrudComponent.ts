@@ -34,7 +34,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   }
 
   public get displayName(): string {
-    return featureStore.displayName(this.widget.feature);
+    return featureStore.displayName(this.widget.feature) ?? this.widget.feature;
   }
 
   public showDialog(opts: DialogOpts = {}): void {

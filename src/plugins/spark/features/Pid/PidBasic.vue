@@ -7,10 +7,15 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
+import PidMini from './PidMini.vue';
 import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
-@Component
+@Component({
+  components: {
+    PidMini,
+  },
+})
 export default class PidBasic
   extends BlockCrudComponent<PidBlock> {
 
@@ -51,7 +56,11 @@ export default class PidBasic
   <div class="widget-md">
     <slot name="warnings" />
 
-    <div class="widget-body row">
+    <div v-if="true" class="widget-body row justify-center">
+      <PidMini :block="block" />
+    </div>
+
+    <div v-else class="widget-body row">
       <UnitField
         v-if="!!inputBlock"
         :value="inputBlock.data.storedSetting"
