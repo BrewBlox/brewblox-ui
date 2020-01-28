@@ -5,7 +5,7 @@ import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
-import { suggestId, validator } from '@/helpers/functional';
+import { ruleValidator, suggestId } from '@/helpers/functional';
 import { typeName as sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -79,7 +79,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
 
   get dashboardId(): string {
     return this.config.dashboardId
-      ?? suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules));
+      ?? suggestId(this.idGenerator.generate(this.dashboardTitle), ruleValidator(this.dashboardIdRules));
   }
 
   set dashboardId(dashboardId: string) {
@@ -93,7 +93,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   get names(): HermsBlockNames {
     return {
       ...mapValues(this.defaultNames,
-        v => suggestId(maybeSpace(this.prefix, v), validator(blockIdRules(this.serviceId)))),
+        v => suggestId(maybeSpace(this.prefix, v), ruleValidator(blockIdRules(this.serviceId)))),
       ...this.chosenNames,
     };
   }
@@ -110,8 +110,8 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
     return [
       this.serviceId,
       this.dashboardTitle,
-      validator(this.dashboardIdRules)(this.dashboardId),
-      Object.values(this.names).every(validator(this.nameRules)),
+      ruleValidator(this.dashboardIdRules)(this.dashboardId),
+      Object.values(this.names).every(ruleValidator(this.nameRules)),
     ]
       .every(Boolean);
   }

@@ -99,7 +99,7 @@ export default class BlockWizard extends Vue {
       widget: this.widget as PersistentWidget,
       isStoreWidget: false,
       saveWidget: v => { this.widget = v; },
-      block: this.block as Block,
+      block: this.block!,
       isStoreBlock: false,
       saveBlock: v => { this.block = v; },
       closeDialog: this.closeDialog,
@@ -125,11 +125,11 @@ export default class BlockWizard extends Vue {
     }
     this.ensureLocalBlock();
     try {
-      await sparkStore.createBlock([this.serviceId, this.block as Block]);
-      notify.done(`Created ${featureStore.displayName((this.block as Block).type)} Block '${this.blockId}'`);
+      await sparkStore.createBlock([this.serviceId, this.block!]);
+      notify.done(`Created ${featureStore.displayName(this.block!.type)} block '${this.blockId}'`);
       this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
     } catch (e) {
-      notify.error(`Failed to create Block: ${e.toString()}`);
+      notify.error(`Failed to create block: ${e.toString()}`);
     }
     this.close();
   }
@@ -173,8 +173,8 @@ export default class BlockWizard extends Vue {
             <template #append>
               <q-icon name="mdi-information">
                 <q-tooltip>
-                  The name of the Spark Controller Block.
-                  <br>Multiple widgets can display the same Block.
+                  The name of the Spark Controller block.
+                  <br>Multiple widgets can display the same block.
                   <br>Rules:
                   <ul>
                     <li>The name must not be empty.</li>

@@ -27,7 +27,7 @@ export default class ActuatorOffsetFull
         :value="block.data.desiredSetting"
         tag="big"
         title="Target offset"
-        label="Target Offset"
+        label="Target offset"
         type="number"
         class="col-grow"
         @input="v => { block.data.desiredSetting = v; saveBlock(); }"
@@ -35,7 +35,7 @@ export default class ActuatorOffsetFull
       <LabeledField
         :value="block.data.value"
         number
-        label="Current Offset"
+        label="Current offset"
         tag="big"
         class="col-grow"
       />
@@ -45,8 +45,8 @@ export default class ActuatorOffsetFull
       <BlockField
         :value="block.data.targetId"
         :service-id="serviceId"
-        title="Driven Block"
-        label="Driven Block"
+        title="Driven block"
+        label="Driven block"
         class="col-grow"
         @input="v => { block.data.targetId = v; saveBlock(); }"
       />
@@ -54,7 +54,7 @@ export default class ActuatorOffsetFull
         :value="block.data.referenceId"
         :service-id="serviceId"
         title="Reference block"
-        label="Reference Block"
+        label="Reference block"
         class="col-grow"
         @input="v => { block.data.referenceId = v; saveBlock(); }"
       />
@@ -62,7 +62,7 @@ export default class ActuatorOffsetFull
         :value="block.data.referenceSettingOrValue"
         :options="[{label: 'Setting', value: 0}, {label: 'Measured', value: 1}]"
         title="Reference field"
-        label="Reference Field"
+        label="Reference field"
         class="col-grow"
         @input="v => { block.data.referenceSettingOrValue = v; saveBlock(); }"
       />

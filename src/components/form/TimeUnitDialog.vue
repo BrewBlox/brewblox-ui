@@ -4,7 +4,7 @@ import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { durationString, unitDurationString, validator } from '@/helpers/functional';
+import { durationString, ruleValidator, unitDurationString } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 
 @Component
@@ -38,7 +38,7 @@ export default class TimeUnitDialog extends DialogBase {
   }
 
   get valueOk(): boolean {
-    return validator(this.rules)(this.localNumber);
+    return ruleValidator(this.rules)(this.localNumber);
   }
 
   get error(): string | null {

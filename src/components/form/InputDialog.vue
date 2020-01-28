@@ -4,9 +4,9 @@ import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { round } from '@/helpers/functional';
+import { round, ruleValidator } from '@/helpers/functional';
 
-const validator = (v: any): boolean => ['text', 'number'].includes(v);
+const typeValidator = (v: any): boolean => ['text', 'number'].includes(v);
 
 @Component
 export default class InputDialog extends DialogBase {
@@ -15,17 +15,17 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: [String, Number] })
   public readonly value!: string | number;
 
-  @Prop({ type: String, default: 'text', validator })
-  public readonly type!: string;
+  @Prop({ type: String, default: 'text', validator: typeValidator })
+  public readonly type!: 'text' | 'number';
 
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
 
-  @Prop({ type: String, default: 'Value' })
+  @Prop({ type: String, default: '' })
   public readonly label!: string;
 
   @Prop({ type: Array, default: () => [] })
-  public readonly rules!: ((v: any) => true | string)[];
+  public readonly rules!: InputRule[];
 
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
@@ -36,14 +36,12 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: String, default: '170%' })
   public readonly fontSize!: string;
 
-  get error(): boolean {
-    return this.rules
-      .map(f => f(this.local))
-      .some(isString);
+  get valid(): boolean {
+    return ruleValidator(this.rules)(this.local);
   }
 
   save(): void {
-    if (this.error) {
+    if (!this.valid) {
       return;
     }
     const val =
@@ -68,18 +66,14 @@ export default class InputDialog extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"
-        :type="type"
-        :rules="rules"
-        :clearable="clearable"
-        :label="label"
-        :autogrow="autogrow"
+        v-bind="{ type, rules, clearable, label, autogrow }"
         :input-style="{fontSize}"
         autofocus
         step="any"
       />
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn :disable="error" flat label="OK" color="primary" @click="save" />
+        <q-btn :disable="!valid" flat label="OK" color="primary" @click="save" />
       </template>
     </DialogCard>
   </q-dialog>

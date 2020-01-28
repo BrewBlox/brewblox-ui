@@ -17,8 +17,8 @@ export default class DialogToolbar extends Vue {
 </script>
 
 <template>
-  <div class="toolbar__Dialog bg-secondary row q-pa-none">
-    <div class="full-height q-pa-sm q-gutter-x-sm col-grow row text-h6 items-center">
+  <div class="toolbar__Dialog row q-pa-none">
+    <div class="col-grow row text-h6 full-height q-pa-sm q-gutter-x-sm items-center">
       <q-icon v-if="icon" :name="icon" />
       <div class="col-grow">
         <q-item-label :class="{'text-h5': !subtitle}">

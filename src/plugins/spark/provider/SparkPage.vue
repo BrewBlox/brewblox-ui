@@ -402,17 +402,17 @@ export default class SparkPage extends Vue {
         <template #actions>
           <ActionItem
             icon="add"
-            label="New Block"
+            label="New block"
             @click="startDialog('BlockWizardDialog')"
           />
           <ActionItem
             icon="mdi-magnify-plus-outline"
-            label="Discover new OneWire Blocks"
+            label="Discover new OneWire blocks"
             @click="discoverBlocks"
           />
           <ActionItem
             icon="mdi-tag-remove"
-            label="Remove unused Block names"
+            label="Remove unused block names"
             @click="cleanUnusedNames"
           />
           <ActionItem
@@ -437,17 +437,17 @@ export default class SparkPage extends Vue {
           />
           <ActionItem
             icon="mdi-file-export"
-            label="Import/Export Blocks"
+            label="Import/Export blocks"
             @click="startDialog('SparkImportMenu')"
           />
           <ActionItem
             icon="mdi-test-tube"
-            label="Create Mock Blocks"
+            label="Create mock blocks"
             @click="startDialog('CreateMockMenu')"
           />
           <ActionItem
             icon="delete"
-            label="Remove all Blocks"
+            label="Remove all blocks"
             @click="startResetBlocks(service.id)"
           />
         </template>
@@ -481,7 +481,7 @@ export default class SparkPage extends Vue {
             <!-- Selection controls -->
             <q-item class="q-mb-md">
               <q-item-section>
-                <q-input v-model="blockFilter" placeholder="Search Blocks" clearable>
+                <q-input v-model="blockFilter" placeholder="Search blocks" clearable>
                   <template #append>
                     <q-icon name="search" />
                   </template>
@@ -489,7 +489,7 @@ export default class SparkPage extends Vue {
               </q-item-section>
               <q-item-section class="col-auto">
                 <q-btn icon="mdi-sort" flat>
-                  <q-tooltip>Sort Blocks</q-tooltip>
+                  <q-tooltip>Sort blocks</q-tooltip>
                   <q-menu>
                     <q-list>
                       <ActionItem

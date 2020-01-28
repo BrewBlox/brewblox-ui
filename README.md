@@ -1,4 +1,4 @@
-# BrewBlox UI
+# Brewblox UI
 
 > UI representation of the BrewBlox project
 

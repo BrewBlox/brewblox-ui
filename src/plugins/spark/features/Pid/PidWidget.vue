@@ -70,12 +70,12 @@ export default class PidWidget
       <template #warnings>
         <CardWarning v-if="!outputId">
           <template #message>
-            PID has no output Block configured.
+            PID has no output block configured.
           </template>
         </CardWarning>
         <CardWarning v-if="!inputId">
           <template #message>
-            PID has no input Block configured.
+            PID has no input block configured.
           </template>
         </CardWarning>
         <CardWarning v-else-if="!block.data.enabled && mode !== 'Full'">

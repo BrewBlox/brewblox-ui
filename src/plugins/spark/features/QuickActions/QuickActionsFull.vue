@@ -147,7 +147,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
     createDialog({
       component: 'BlockSelectDialog',
       parent: this,
-      title: `Switch target Block '${change.blockId}'`,
+      title: `Switch target block '${change.blockId}'`,
       serviceId: this.serviceId,
       filter: block => {
         return currentBlock === null

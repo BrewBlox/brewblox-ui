@@ -35,8 +35,8 @@ export default class SparkImportMenu extends DialogBase {
 
   confirmImport(values: any): void {
     createDialog({
-      title: 'Reset Blocks',
-      message: 'This will remove all Blocks, and import new ones from file. Are you sure?',
+      title: 'Reset blocks',
+      message: 'This will remove all blocks, and import new ones from file. Are you sure?',
       noBackdropDismiss: true,
       cancel: true,
     })
@@ -49,12 +49,12 @@ export default class SparkImportMenu extends DialogBase {
       this.messages = [];
       this.messages = await sparkStore.serviceImport([this.service.id, values]);
       if (this.messages.length > 0) {
-        notify.warn(`Some Blocks could not be imported on ${this.service.id}`);
+        notify.warn(`Some blocks could not be imported on ${this.service.id}`);
         this.messages
           .forEach(msg => notify.info('Block import error: ' + msg, { shown: false }));
       }
       else {
-        notify.done(`Imported Blocks on ${this.service.id}`);
+        notify.done(`Imported blocks on ${this.service.id}`);
       }
     } catch (e) {
       notify.error(`Failed to import blocks: ${e.toString()}`);
@@ -107,21 +107,21 @@ export default class SparkImportMenu extends DialogBase {
           <q-btn
             :loading="importBusy"
             outline
-            label="Import single Block"
+            label="Import single block"
             class="col-auto full-width"
             @click="startImportSingle"
           />
           <q-btn
             :loading="importBusy"
             outline
-            label="Import Blocks"
+            label="Import blocks"
             class="col-auto full-width"
             @click="startImport"
           />
           <q-btn
             :loading="importBusy"
             outline
-            label="Export Blocks"
+            label="Export blocks"
             class="col-auto full-width"
             @click="exportBlocks"
           />

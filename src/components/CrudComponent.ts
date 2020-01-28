@@ -69,13 +69,11 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     const widgetTitle = this.widget.title;
     createDialog({
       parent: this,
-      title: 'Change Widget name',
+      component: 'InputDialog',
+      title: 'Change widget name',
       message: `Choose a new name for '${widgetTitle}'`,
-      cancel: true,
-      prompt: {
-        model: widgetTitle,
-        type: 'text',
-      },
+      value: widgetTitle,
+      clearable: false,
     })
       .onOk(title => this.saveWidget({ ...this.widget, title }));
   }
