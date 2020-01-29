@@ -69,7 +69,7 @@ export default class QuickStartWizardPicker extends Vue {
             Control blocks
           </q-item-label>
           <p>
-            Control blocks small elements that run on the BrewBlox Spark that are combined into a control system.
+            Control blocks small elements that run on the Brewblox Spark that are combined into a control system.
             Examples of control blocks are setpoints, sensors, actuators and PIDs.
           </p>
           <p>

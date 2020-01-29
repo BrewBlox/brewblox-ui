@@ -139,7 +139,7 @@ export default class WizardDialog extends DialogBase {
             </q-item-section>
             <q-item-section>
               <p>
-                If you have multiple BrewBlox Sparks, you will have a separate service to connect each one.
+                If you have multiple Brewblox Sparks, you will have a separate service to connect each one.
               </p>
               <p>
                 You should add them to the UI here, after you have added them in your docker-compose file.

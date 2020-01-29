@@ -55,7 +55,7 @@ export default class DefaultLayout extends Vue {
     <LayoutHeader @menu="leftDrawerOpen = !leftDrawerOpen">
       <template #title>
         <portal-target name="toolbar-title">
-          BrewBlox
+          Brewblox
         </portal-target>
       </template>
       <template #buttons>
