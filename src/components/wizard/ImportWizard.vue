@@ -4,7 +4,7 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { ruleChecker } from '@/helpers/functional';
+import { ruleErrorFinder } from '@/helpers/functional';
 import { loadFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { dashboardStore, PersistentWidget } from '@/store/dashboards';
@@ -18,7 +18,7 @@ const widgetRules: InputRule[] = [
   v => !!v.config || 'Widget must have config settings',
 ];
 
-const checker = ruleChecker(widgetRules);
+const errorFinder = ruleErrorFinder(widgetRules);
 
 @Component
 export default class ImportWizard extends Vue {
@@ -45,7 +45,7 @@ export default class ImportWizard extends Vue {
   }
 
   get widgetError(): string | null {
-    return checker(this.widget);
+    return errorFinder(this.widget);
   }
 
   get widgetOk(): boolean {

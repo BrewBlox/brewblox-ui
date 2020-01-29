@@ -163,9 +163,10 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
     createDialog({
       parent: this,
       component: 'InputDialog',
-      title: 'Change Block name',
+      title: 'Change block name',
       message: `Choose a new name for '${this.blockId}'`,
       rules: blockIdRules(this.serviceId),
+      clearable: false,
       value: blockId,
     })
       .onOk(async (newId: string) => {
@@ -181,7 +182,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   public startRemoveBlock(): void {
     createDialog({
       parent: this,
-      title: 'Remove Block',
+      title: 'Remove block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,
 

@@ -58,14 +58,14 @@ export default class CreateMockMenu extends DialogBase {
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar :title="serviceId" subtitle="Create Mock Blocks" />
+        <DialogToolbar :title="serviceId" subtitle="Create mock blocks" />
       </template>
 
       <q-card-section>
         <q-item>
           <q-space />
           <q-item-section class="col-auto">
-            <q-btn unelevated color="primary" :loading="busy" label="Create Mock Sensor" @click="createSensor" />
+            <q-btn unelevated color="primary" :loading="busy" label="Create mock sensor" @click="createSensor" />
           </q-item-section>
           <q-space />
         </q-item>

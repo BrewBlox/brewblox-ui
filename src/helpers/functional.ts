@@ -209,11 +209,11 @@ export const isAbsoluteUrl =
   (val: string): boolean =>
     new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
 
-export const validator =
+export const ruleValidator =
   (rules: InputRule[]): ((val: any) => boolean) =>
     val => rules.every(rule => !isString(rule(val)));
 
-export const ruleChecker =
+export const ruleErrorFinder =
   (rules: InputRule[]): ((val: any) => string | null) =>
     val => {
       for (const rule of rules) {

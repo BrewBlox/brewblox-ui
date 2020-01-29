@@ -4,7 +4,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
-import { suggestId, validator } from '@/helpers/functional';
+import { ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
@@ -12,6 +12,7 @@ import { Dashboard, dashboardStore } from '@/store/dashboards';
 export default class DashboardWizard extends Vue {
   idGenerator = new UrlSafeString();
   dashboardIdRules = dashboardIdRules();
+  dashboardIdValidator = ruleValidator(dashboardIdRules());
 
   chosenId: string | null = null;
   dashboardTitle = 'New dashboard';
@@ -23,7 +24,7 @@ export default class DashboardWizard extends Vue {
   get dashboardId(): string {
     return this.chosenId !== null
       ? this.chosenId
-      : suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules));
+      : suggestId(this.idGenerator.generate(this.dashboardTitle), this.dashboardIdValidator);
   }
 
   set dashboardId(id: string) {
@@ -31,7 +32,7 @@ export default class DashboardWizard extends Vue {
   }
 
   get valid(): boolean {
-    return validator(this.dashboardIdRules)(this.dashboardId);
+    return this.dashboardIdValidator(this.dashboardId);
   }
 
   async createDashboard(): Promise<void> {

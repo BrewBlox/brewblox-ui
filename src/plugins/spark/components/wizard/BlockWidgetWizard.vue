@@ -97,7 +97,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
       widget: this.widget!,
       isStoreWidget: false,
       saveWidget: v => { this.widget = v; },
-      block: this.block as Block,
+      block: this.block!,
       isStoreBlock: this.isStoreBlock,
       saveBlock: this.saveBlock,
       closeDialog: this.closeDialog,
@@ -119,8 +119,8 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
 
   async createWidget(): Promise<void> {
     this.ensureItem();
-    const service = this.service as Service;
-    const block = this.block as Block;
+    const service = this.service!;
+    const block = this.block!;
 
     if (!sparkStore.blockIds(service.id).includes(block.id)) {
       await sparkStore.createBlock([service.id, block]);
@@ -156,29 +156,29 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
           <q-btn
             :disable="!startOk"
             unelevated
-            label="Create new Block"
+            label="Create new block"
             color="primary"
             @click="isStoreBlock = false; currentStep = 'create'"
           />
           <q-btn
             :disable="!startOk"
             unelevated
-            label="Use existing Block"
+            label="Use existing block"
             color="primary"
             @click="isStoreBlock = true; currentStep = 'existing'"
           />
         </portal>
       </q-step>
 
-      <q-step name="create" title="Create new Block">
+      <q-step name="create" title="Create new block">
         <q-item>
           <q-item-section>
             <q-input v-model="blockId" :rules="blockIdRules" autofocus label="Block name">
               <template #append>
                 <q-icon name="mdi-information">
                   <q-tooltip>
-                    The name of the Spark Controller Block.
-                    <br>Multiple widgets can display the same Block.
+                    The name of the Spark Controller block.
+                    <br>Multiple widgets can display the same block.
                     <br>Rules:
                     <ul>
                       <li>The name must not be empty.</li>
@@ -199,7 +199,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
           <q-btn
             :disable="!createOk"
             flat
-            label="Configure Block"
+            label="Configure block"
             @click="configureBlock"
           />
           <q-btn
@@ -212,13 +212,13 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
         </portal>
       </q-step>
 
-      <q-step name="existing" title="Use existing Block">
+      <q-step name="existing" title="Use existing block">
         <q-item>
           <q-item-section>
             <q-select
               :value="block"
               :options="blockOpts"
-              :rules="[v => !!v || 'You must select a Block']"
+              :rules="[v => !!v || 'You must select a block']"
               option-label="id"
               option-value="id"
               label="Block"
@@ -241,7 +241,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
           <q-btn
             :disable="!existingOk"
             flat
-            label="Configure Block"
+            label="Configure block"
             @click="configureBlock"
           />
           <q-btn

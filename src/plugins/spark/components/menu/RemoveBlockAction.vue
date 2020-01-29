@@ -9,7 +9,7 @@ import BlockCrudComponent from '../BlockCrudComponent';
 @Component
 export default class RemoveBlockAction extends BlockCrudComponent {
 
-  @Prop({ type: String, default: 'Remove Block' })
+  @Prop({ type: String, default: 'Remove block' })
   readonly label!: string;
 
   @Prop({ type: String, default: 'delete' })

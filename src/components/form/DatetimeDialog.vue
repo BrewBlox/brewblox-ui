@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
-import { validator } from '@/helpers/functional';
+import { ruleValidator } from '@/helpers/functional';
 
 const dateExp = /^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$/;
 
@@ -40,7 +40,7 @@ export default class DatetimeDialog extends DialogBase {
   }
 
   get valid(): boolean {
-    return validator(this.parsedRules)(this.parsed);
+    return ruleValidator(this.parsedRules)(this.parsed);
   }
 
   setStringVal(dateVal: Date): void {

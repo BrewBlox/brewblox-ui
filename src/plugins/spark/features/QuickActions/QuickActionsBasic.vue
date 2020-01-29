@@ -182,7 +182,7 @@ export default class QuickActionsBasic extends CrudComponent {
             {{ step.name }}
           </div>
           <q-item-label caption class="darkened">
-            {{ step.changes.length }} Blocks changed
+            {{ step.changes.length }} blocks changed
           </q-item-label>
           <q-tooltip v-if="step.applicable">
             <div class="column">

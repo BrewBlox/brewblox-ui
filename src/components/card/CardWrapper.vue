@@ -47,7 +47,7 @@ export default class CardWrapper extends Vue {
     <div :class="bodyClass">
       <component
         :is="scrollable ? 'q-scroll-area' : 'div'"
-        :class="['fit', contentClass]"
+        :class="['fit q-pb-md', contentClass]"
         visible
       >
         <slot />
