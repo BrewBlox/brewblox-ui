@@ -53,8 +53,8 @@ export default class SetpointValues extends Vue {
 
   get isDriven(): boolean {
     return !!this.block
-      && sparkStore.drivenChains(this.block.serviceId)
-        .some(chain => chain[0] === (this.block as SetpointSensorPairBlock).id);
+      && sparkStore.drivenBlocks(this.block.serviceId)
+        .includes(this.block.id);
   }
 
   get isBroken(): boolean {

@@ -1,6 +1,6 @@
 # Brewblox UI
 
-> UI representation of the BrewBlox project
+> UI representation of the Brewblox project
 
 ## Requirements
 
@@ -72,21 +72,21 @@ npm run devbuild
 
 # Architecture Concepts
 
-BrewBlox mostly adheres to the [Vue application structure][vue-structure], but defines a set of concepts within this framework.
+Brewblox mostly adheres to the [Vue application structure][vue-structure], but defines a set of concepts within this framework.
 
 ### Dashboard
 
 To ensure flexibility, one of the core display elements in the UI is the dashboard.
 
-A dashboard can display anything that implements the `Widget` component interface. This allows the user to display the most relevant items, regardless of whether they are core BrewBlox components, or added by a third-party plugin.
+A dashboard can display anything that implements the `Widget` component interface. This allows the user to display the most relevant items, regardless of whether they are core Brewblox components, or added by a third-party plugin.
 
 ### Plugin
 
-To allow runtime extension of the UI, users can load plugins. For more information on how Vue plugins work, see the [Vue documentation page](https://vuejs.org/v2/guide/plugins.html). For an example of how to create a BrewBlox plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.
+To allow runtime extension of the UI, users can load plugins. For more information on how Vue plugins work, see the [Vue documentation page](https://vuejs.org/v2/guide/plugins.html). For an example of how to create a Brewblox plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.
 
 ### Provider
 
-Each device or service supported by the BrewBlox UI is implemented as a provider. All interaction with those supported devices or services is encapsulated here.
+Each device or service supported by the Brewblox UI is implemented as a provider. All interaction with those supported devices or services is encapsulated here.
 
 Providers can be registered by third-party plugins.
 If you only want to add independent widgets, you don't need to add a provider.
@@ -115,7 +115,7 @@ To implement functionality, features have to register various Vue components. Th
 
 ## Datastore
 
-Local application state is kept using [VueX][vuex]. Settings that are not session-specific (`Dashboard`, `PersistentWidget`, `Service`) are persisted to the BrewBlox [datastore](https://pouchdb.com/).
+Local application state is kept using [VueX][vuex]. Settings that are not session-specific (`Dashboard`, `PersistentWidget`, `Service`) are persisted to the Brewblox [datastore](https://pouchdb.com/).
 
 The full datastore state is loaded on startup, and all changes are persisted here.
 

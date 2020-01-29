@@ -137,7 +137,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
           />
         </div>
       </LabeledField>
-      <LabeledField label="Should BrewBlox manage glycol temperature?" item-aligned>
+      <LabeledField label="Should Brewblox manage glycol temperature?" item-aligned>
         <div class="q-gutter-lg">
           <q-radio
             v-model="glycolControl"

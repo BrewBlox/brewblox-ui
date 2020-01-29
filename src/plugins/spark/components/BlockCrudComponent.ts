@@ -42,8 +42,8 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   }
 
   public get isDriven(): boolean {
-    return sparkStore.drivenChains(this.serviceId)
-      .some((chain: string[]) => chain[0] === this.block.id);
+    return sparkStore.drivenBlocks(this.serviceId)
+      .includes(this.blockId);
   }
 
   public get constrainers(): string | null {
@@ -130,7 +130,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
     await this.saveConfig({ ...this.widget.config, blockId });
   }
 
-  public showOtherBlock(block: Block, props: any = {}): void {
+  public showOtherBlock(block: Block | null, props: any = {}): void {
     createBlockDialog(block, { props });
   }
 

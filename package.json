@@ -1,7 +1,7 @@
 {
   "name": "brewblox-ui",
   "version": "0.1.0",
-  "description": "UI for the BrewBlox brewing controller",
+  "description": "UI for the Brewblox brewing controller",
   "author": "Elco Jacobs / BrewPi B.V.",
   "repository": "https://github.com/BrewBlox/brewblox-ui",
   "license": "GPL-3.0",
