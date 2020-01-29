@@ -44,8 +44,8 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public get isDriven(): boolean {
-    return sparkStore.drivenChains(this.serviceId)
-      .some((chain: string[]) => chain[0] === this.blockId);
+    return sparkStore.drivenBlocks(this.serviceId)
+      .includes(this.blockId);
   }
 
   public get constrainers(): string | null {

@@ -68,6 +68,11 @@ export class SparkModule extends VuexModule {
       .reduce((acc, id) => mutate(acc, id, calculateDrivenChains(this.allBlockValues[id])), {});
   }
 
+  private get allDrivenBlocks(): Mapped<string[]> {
+    return Object.entries(this.allDrivenChains)
+      .reduce((acc, [id, chains]) => mutate(acc, id, chains.map(c => c[0])), {});
+  }
+
   private get allRelations(): Mapped<RelationEdge[]> {
     return Object.keys(this.services)
       .reduce((acc, id) => mutate(acc, id, calculateRelations(this.allBlockValues[id])), {});
@@ -140,6 +145,10 @@ export class SparkModule extends VuexModule {
 
   public get drivenChains(): (serviceId: string) => string[][] {
     return serviceId => this.allDrivenChains[serviceId];
+  }
+
+  public get drivenBlocks(): (serviceId: string) => string[] {
+    return serviceId => this.allDrivenBlocks[serviceId];
   }
 
   public get relations(): (serviceId: string) => RelationEdge[] {

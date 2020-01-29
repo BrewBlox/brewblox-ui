@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
@@ -46,6 +46,40 @@ export default class PidBasic
     createBlockDialog(this.inputBlock);
   }
 
+  editInput(): void {
+    if (!this.inputBlock) return;
+
+    const id = this.inputBlock.id;
+
+    if (sparkStore.drivenBlocks(this.serviceId).includes(id)) {
+      const driveChain = sparkStore
+        .drivenChains(this.serviceId)
+        .find(chain => chain[0] === this.inputBlock?.id);
+
+      const actual = driveChain !== undefined
+        ? sparkStore.tryBlockById(this.serviceId, driveChain[driveChain.length - 1])
+        : this.inputBlock;
+
+      this.showOtherBlock(actual);
+    }
+    else {
+      createDialog({
+        component: 'UnitDialog',
+        title: 'Edit setting',
+        message: `Edit ${id} setting`,
+        parent: this,
+        value: this.inputBlock.data.storedSetting,
+        label: 'Setting',
+      })
+        .onOk(value => {
+          if (this.inputBlock) {
+            this.inputBlock.data.storedSetting = value;
+            this.saveStoreBlock(this.inputBlock);
+          }
+        });
+    }
+  }
+
   showOutput(): void {
     createBlockDialog(this.outputBlock);
   }
@@ -57,7 +91,7 @@ export default class PidBasic
     <slot name="warnings" />
 
     <div v-if="true" class="widget-body row justify-center">
-      <PidMini :block="block" />
+      <PidMini :block="block" @edit:input="editInput" @edit:output="showOutput" />
     </div>
 
     <div v-else class="widget-body row">

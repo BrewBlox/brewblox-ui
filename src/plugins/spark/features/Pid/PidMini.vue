@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
@@ -31,14 +30,6 @@ export default class PidMini extends Vue {
     return this.block.data.kp.value;
   }
 
-  showInput(): void {
-    createBlockDialog(this.inputBlock);
-  }
-
-  showOutput(): void {
-    createBlockDialog(this.outputBlock);
-  }
-
   fit(v: number): number {
     return Math.min(v, 100);
   }
@@ -47,7 +38,10 @@ export default class PidMini extends Vue {
 
 <template>
   <div class="col-auto row justify-around q-gutter-sm">
-    <div class="col-grow q-py-sm grid-container clickable rounded-borders" @click="showInput">
+    <div
+      class="col-grow q-py-sm grid-container clickable rounded-borders"
+      @click="$emit('edit:input')"
+    >
       <div class="grid-value text-h5 text-purple-3">
         Input
       </div>
@@ -74,7 +68,7 @@ export default class PidMini extends Vue {
     </div>
     <div
       class="col-grow grid-container q-py-sm clickable rounded-borders"
-      @click="showOutput"
+      @click="$emit('edit:output')"
     >
       <div class="grid-value text-h5 text-purple-3">
         Output
@@ -132,6 +126,7 @@ export default class PidMini extends Vue {
       </div>
       <q-slider
         :value="fit(block.data.i)"
+        :max="100"
         readonly
         class="col-grow"
         thumb-path=""
@@ -142,6 +137,7 @@ export default class PidMini extends Vue {
       </div>
       <q-slider
         :value="fit(block.data.d)"
+        :max="100"
         readonly
         class="col-grow"
         thumb-path=""
