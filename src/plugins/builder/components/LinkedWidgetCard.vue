@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
 
 import PartCard from './PartCard';
@@ -21,7 +21,7 @@ export default class LinkedWidgetCard extends PartCard {
   public readonly label!: string;
 
   @Prop({ type: Function })
-  readonly filter!: (widget: PersistentWidget) => boolean;
+  readonly filter!: (widget: Widget) => boolean;
 
   get sparkServices(): Service[] {
     return serviceStore.serviceValues
@@ -53,7 +53,7 @@ export default class LinkedWidgetCard extends PartCard {
       }));
   }
 
-  get actualFilter(): (widget: PersistentWidget) => boolean {
+  get actualFilter(): (widget: Widget) => boolean {
     if (this.filter) {
       return this.filter;
     }

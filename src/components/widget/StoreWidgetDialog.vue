@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 @Component
@@ -17,7 +17,7 @@ export default class StoreWidgetDialog extends DialogBase {
   @Prop({ type: Function, default: () => null })
   public readonly getProps!: () => any;
 
-  get widget(): PersistentWidget {
+  get widget(): Widget {
     return dashboardStore.persistentWidgetById(this.widgetId);
   }
 
@@ -25,7 +25,7 @@ export default class StoreWidgetDialog extends DialogBase {
     return {
       isStoreWidget: true,
       widget: this.widget,
-      saveWidget: dashboardStore.savePersistentWidget,
+      saveWidget: dashboardStore.saveWidget,
       closeDialog: () => this.onDialogHide(),
     };
   }

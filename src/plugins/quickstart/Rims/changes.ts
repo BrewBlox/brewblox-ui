@@ -18,7 +18,7 @@ import {
 import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { maybeSpace, unlinkedActuators } from '../helpers';
@@ -185,10 +185,10 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
     ];
 }
 
-export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): PersistentWidget[] {
+export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Widget[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
 
-  const createWidget = (name: string, type: string): PersistentWidget => ({
+  const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
     dashboard: config.dashboardId,
     id: uid(),

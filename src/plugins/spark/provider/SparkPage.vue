@@ -11,7 +11,7 @@ import { isSystemBlock } from '@/plugins/spark/block-types';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud, PageMode, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
-import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
@@ -43,7 +43,7 @@ export default class SparkPage extends Vue {
   capitalized = capitalized;
   startResetBlocks = startResetBlocks;
 
-  volatileWidgets: { [blockId: string]: PersistentWidget } = {};
+  volatileWidgets: { [blockId: string]: Widget } = {};
   blockFilter = '';
 
   context: WidgetContext = {
@@ -300,7 +300,7 @@ export default class SparkPage extends Vue {
     this.expandedBlocks = {};
   }
 
-  saveWidget(widget: PersistentWidget): void {
+  saveWidget(widget: Widget): void {
     this.volatileWidgets[this.volatileKey(widget.id)] = { ...widget };
     notify.warn('Changes will not be persisted', { logged: false });
   }

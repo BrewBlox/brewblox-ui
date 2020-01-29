@@ -25,7 +25,7 @@ export const changeDashboardId =
     await Promise.all(
       dashboardStore.widgetValues
         .filter(item => item.dashboard === oldId)
-        .map(item => dashboardStore.savePersistentWidget({ ...item, dashboard: newId }))
+        .map(item => dashboardStore.saveWidget({ ...item, dashboard: newId }))
     );
     await dashboardStore.removeDashboard({ ...dashboard });
 

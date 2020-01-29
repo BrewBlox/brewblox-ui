@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import notify from '@/helpers/notify';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetMode } from '@/store/features';
 
 export interface DialogOpts {
@@ -21,7 +21,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   @Prop({ type: Object, required: true })
   public readonly crud!: Crud<ConfigT>;
 
-  public get widget(): PersistentWidget<ConfigT> {
+  public get widget(): Widget<ConfigT> {
     return this.crud.widget;
   }
 
@@ -57,7 +57,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     this.crud.closeDialog();
   }
 
-  public async saveWidget(widget: PersistentWidget<ConfigT> = this.widget): Promise<void> {
+  public async saveWidget(widget: Widget<ConfigT> = this.widget): Promise<void> {
     await this.crud.saveWidget(widget);
   }
 
@@ -97,7 +97,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+        dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
         notify.done(`Copied ${this.widget.title} to ${dashboardStore.dashboardById(dashboard).title}`);
       });
   }
@@ -123,7 +123,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
 
   public startRemoveWidget(): void {
     const deleteItem = async (): Promise<void> => {
-      await dashboardStore.removePersistentWidget(this.widget);
+      await dashboardStore.removeWidget(this.widget);
       this.closeDialog();
     };
 

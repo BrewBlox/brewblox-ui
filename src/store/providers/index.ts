@@ -1,4 +1,3 @@
-import get from 'lodash/get';
 import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
@@ -34,39 +33,39 @@ export class ProviderModule extends VuexModule {
   }
 
   public get providerById(): (id: string) => Provider | null {
-    return id => this.providers[id] || null;
+    return id => this.providers[id] ?? null;
   }
 
   public get displayName(): (id: string) => string {
-    return id => get(this.providers, [id, 'displayName']) || id;
+    return id => this.providers[id]?.displayName ?? id;
   }
 
   public get onAddById(): (id: string) => ServiceFunc {
-    return id => get(this.providers, [id, 'onAdd']) || (async () => { });
+    return id => this.providers[id]?.onAdd ?? (async () => { });
   }
 
   public get onRemoveById(): (id: string) => ServiceFunc {
-    return id => get(this.providers, [id, 'onRemove']) || (async () => { });
+    return id => this.providers[id]?.onRemove ?? (async () => { });
   }
 
   public get onFetchById(): (id: string) => ServiceFunc {
-    return id => get(this.providers, [id, 'onFetch']) || (async () => { });
+    return id => this.providers[id]?.onFetch ?? (async () => { });
   }
 
   public get wizard(): (id: string) => string | undefined {
-    return id => get(this.providers, [id, 'wizard']);
+    return id => this.providers[id]?.wizard;
   }
 
   public get pageById(): (id: string) => string | undefined {
-    return id => get(this.providers, [id, 'page']);
+    return id => this.providers[id]?.page;
   }
 
   public get watcherById(): (id: string) => string | undefined {
-    return id => get(this.providers, [id, 'watcher']);
+    return id => this.providers[id]?.watcher;
   }
 
   public get featuresById(): (id: string) => string[] {
-    return id => get(this.providers, [id, 'features']);
+    return id => this.providers[id]?.features;
   }
 
   @Mutation
@@ -74,9 +73,9 @@ export class ProviderModule extends VuexModule {
     Vue.set(this.providers, provider.id, { ...provider });
   }
 
-  @Action({ rawError, commit: 'commitProvider' })
-  public async createProvider(provider: Provider): Promise<Provider> {
-    return provider;
+  @Action({ rawError })
+  public async createProvider(provider: Provider): Promise<void> {
+    this.commitProvider(provider);
   }
 }
 

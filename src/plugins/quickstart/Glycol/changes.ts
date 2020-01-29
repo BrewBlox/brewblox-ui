@@ -19,7 +19,7 @@ import {
 import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { maybeSpace, unlinkedActuators } from '../helpers';
@@ -289,10 +289,10 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     : blocks.filter(block => !heatingBlocks.includes(block.id));
 }
 
-export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): PersistentWidget[] {
+export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): Widget[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
 
-  const createWidget = (name: string, type: string): PersistentWidget => ({
+  const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
     dashboard: config.dashboardId,
     id: uid(),
@@ -445,7 +445,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
     },
   };
 
-  const profile: PersistentWidget = {
+  const profile: Widget = {
     ...createWidget(config.names.beerProfile, blockTypes.SetpointProfile),
     cols: 6,
     rows: 4,

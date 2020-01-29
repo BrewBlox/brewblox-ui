@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import notify from '@/helpers/notify';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 export interface NavAction {
@@ -41,8 +41,8 @@ export default class WidgetWizardBase<ConfigT = any> extends Vue {
     return featureStore.widgetSize(this.typeId);
   }
 
-  protected async createItem(item: PersistentWidget<ConfigT>): Promise<void> {
-    await dashboardStore.appendPersistentWidget(item)
+  protected async createItem(item: Widget<ConfigT>): Promise<void> {
+    await dashboardStore.appendWidget(item)
       .then(() => notify.done(`Created ${featureStore.displayName(item.feature)} '${item.title}'`))
       .catch(e => notify.error(`Failed to create widget: ${e.toString()}`))
       .finally(this.close);

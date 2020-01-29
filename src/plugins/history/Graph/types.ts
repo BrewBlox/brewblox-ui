@@ -1,4 +1,4 @@
 import { GraphConfig } from '@/plugins/history/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 
-export type HistoryItem = PersistentWidget<GraphConfig>;
+export type HistoryItem = Widget<GraphConfig>;

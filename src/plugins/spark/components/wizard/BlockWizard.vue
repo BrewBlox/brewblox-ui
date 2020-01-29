@@ -10,7 +10,7 @@ import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { providerStore } from '@/store/providers';
 
@@ -21,7 +21,7 @@ export default class BlockWizard extends Vue {
   feature: any = null;
   blockId = '';
   block: Block | null = null;
-  widget: PersistentWidget | null = null;
+  widget: Widget | null = null;
   activeDialog: any = null;
 
   @Prop({ type: String, required: true })
@@ -96,7 +96,7 @@ export default class BlockWizard extends Vue {
   configureBlock(): void {
     this.ensureLocalBlock();
     const crud: BlockCrud = {
-      widget: this.widget as PersistentWidget,
+      widget: this.widget as Widget,
       isStoreWidget: false,
       saveWidget: v => { this.widget = v; },
       block: this.block!,

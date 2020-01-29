@@ -1,4 +1,4 @@
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 
 import { Block } from '../../types';
 
@@ -21,6 +21,6 @@ export interface QuickActionsConfig {
   changeIdMigrated: boolean;
 }
 
-export interface QuickActionsItem extends PersistentWidget {
+export interface QuickActionsItem extends Widget {
   config: QuickActionsConfig;
 }

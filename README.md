@@ -100,22 +100,22 @@ Service configuration is persisted in the datastore.
 
 Plugins can register one or more features. Features define the Vue components required to create and render individual widgets.
 
-### PersistentWidget
+### Widget
 
-Comparable to how `Service` is an instance of `Provider`, `PersistentWidget` is an instance of `Feature`.
-Just as with Services, the configuration for each PersistentWidget is stored in the datastore.
+Comparable to how `Service` is an instance of `Provider`, `Widget` is an instance of `Feature`.
+Just as with Services, the configuration for each Widget is stored in the datastore.
 
 ### Widget, Wizard
 
 To implement functionality, features have to register various Vue components. These components are expected to implement common interfaces, as they will be instantiated by generic components (dashboard for widgets, wizard picker for wizards).
 
 * A feature must implement a `Widget` component to be displayed on a dashboard or in a modal dialog.
-* To allow creation of `PersistentWidget`s, the feature can implement a `Wizard` component.
+* To allow creation of `Widget`s, the feature can implement a `Wizard` component.
   * The wizard is optional: some features are created or discovered automatically.
 
 ## Datastore
 
-Local application state is kept using [VueX][vuex]. Settings that are not session-specific (`Dashboard`, `PersistentWidget`, `Service`) are persisted to the Brewblox [datastore](https://pouchdb.com/).
+Local application state is kept using [VueX][vuex]. Settings that are not session-specific (`Dashboard`, `Widget`, `Service`) are persisted to the Brewblox [datastore](https://pouchdb.com/).
 
 The full datastore state is loaded on startup, and all changes are persisted here.
 

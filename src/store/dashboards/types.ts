@@ -7,7 +7,7 @@ export interface Dashboard {
   _rev?: string;
 }
 
-export interface PersistentWidget<ConfigT = any> {
+export interface Widget<ConfigT = any> {
   id: string;
   title: string;
   cols: number;

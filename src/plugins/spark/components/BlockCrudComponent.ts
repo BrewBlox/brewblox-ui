@@ -153,7 +153,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+        dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
         notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`);
       });
   }

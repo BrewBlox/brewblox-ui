@@ -5,8 +5,8 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 import store from '@/store';
 
 import { Crud, Deleter, Feature, FeatureRole, QuickStart, Watcher } from './types';
-export * from './types';
 
+export * from './types';
 
 const rawError = true;
 

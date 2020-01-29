@@ -405,7 +405,7 @@ export class SparkModule extends VuexModule {
     await this.fetchBlocks(serviceId);
     dashboardStore.widgetValues
       .filter(item => item.config.serviceId === serviceId && item.config.blockId === currentId)
-      .forEach(item => dashboardStore.commitPersistentWidget({ ...item, config: { ...item.config, blockId: newId } }));
+      .forEach(item => dashboardStore.commitWidget({ ...item, config: { ...item.config, blockId: newId } }));
   }
 
   @Action({ rawError })

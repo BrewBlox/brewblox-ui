@@ -1,4 +1,4 @@
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 
 export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
 export type WidgetMode = 'Basic' | 'Full';
@@ -6,9 +6,9 @@ export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';
 
 export interface Crud<ConfigT = any> {
-  widget: PersistentWidget<ConfigT>;
+  widget: Widget<ConfigT>;
   isStoreWidget: boolean;
-  saveWidget(widget: PersistentWidget): unknown | Promise<unknown>;
+  saveWidget(widget: Widget): unknown | Promise<unknown>;
   closeDialog(): void;
 }
 

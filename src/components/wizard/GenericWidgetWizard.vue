@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 
@@ -11,7 +11,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   modalOpen = false;
   localConfig: any | null = null;
 
-  get widget(): PersistentWidget {
+  get widget(): Widget {
     if (this.localConfig === null) {
       this.localConfig = this.emptyConfig();
     }
@@ -26,7 +26,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     };
   }
 
-  set widget(val: PersistentWidget) {
+  set widget(val: Widget) {
     this.localConfig = val.config;
   }
 

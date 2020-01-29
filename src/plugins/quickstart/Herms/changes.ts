@@ -20,7 +20,7 @@ import {
 import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { AnalogConstraint, Block, DigitalConstraint, DigitalState } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { maybeSpace, unlinkedActuators } from '../helpers';
@@ -289,7 +289,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
 }
 
 
-export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): PersistentWidget[] {
+export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Widget[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
   const genericSettings = {
     dashboard: config.dashboardId,
@@ -298,7 +298,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     order: 0,
   };
 
-  const createWidget = (name: string, type: string): PersistentWidget => ({
+  const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
     ...featureStore.widgetSize(type),
     id: uid(),

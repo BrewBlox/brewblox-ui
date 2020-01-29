@@ -152,7 +152,7 @@ export default class LayoutActions extends Vue {
             layoutIds: [layout.id],
           },
         };
-        await dashboardStore.appendPersistentWidget(widget);
+        await dashboardStore.appendWidget(widget);
         notify.done(`Created ${layout.title} widget on ${dashboardStore.dashboardById(dashboard).title}`);
       });
   }

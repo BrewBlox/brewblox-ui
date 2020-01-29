@@ -1,6 +1,6 @@
 import { Link, Unit } from '@/helpers/units';
 import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { Crud, Feature } from '@/store/features';
 import { Service } from '@/store/services';
 
@@ -74,7 +74,7 @@ export interface BlockConfig {
   graphAxes?: GraphValueAxes;
 }
 
-export type DashboardBlock = PersistentWidget<BlockConfig>;
+export type DashboardBlock = Widget<BlockConfig>;
 
 export interface BlockCrud<BlockT extends Block = Block> extends Crud<BlockConfig> {
   block: BlockT;
