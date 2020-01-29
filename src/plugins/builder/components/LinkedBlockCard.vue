@@ -5,6 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
+import { sparkType } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
@@ -32,7 +33,7 @@ export default class LinkedBlockCard extends PartCard {
 
   get sparkServices(): Service[] {
     return serviceStore.serviceValues
-      .filter(svc => svc.type === 'Spark');
+      .filter(svc => svc.type === sparkType);
   }
 
   get linked(): LinkedBlock {

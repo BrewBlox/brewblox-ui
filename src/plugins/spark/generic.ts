@@ -1,6 +1,6 @@
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockConfig } from '@/plugins/spark/types';
-import { Crud, Feature } from '@/store/features';
+import { Crud, WidgetFeature } from '@/store/features';
 
 const deleteBlock =
   (crud: Crud): void => {
@@ -11,7 +11,7 @@ const deleteBlock =
     }
   };
 
-export const genericBlockFeature: Partial<Feature> = {
+export const genericBlockFeature: Partial<WidgetFeature> = {
   wizardComponent: 'BlockWidgetWizard',
   widgetSize: {
     cols: 4,

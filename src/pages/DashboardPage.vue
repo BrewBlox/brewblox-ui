@@ -83,7 +83,7 @@ export default class DashboardPage extends Vue {
             // older items may not have a title
             widget.title = widget.id;
           }
-          const component = featureStore.widget(crud, true);
+          const component = featureStore.widgetComponent(crud, true);
           return {
             id: widget.id,
             component,

@@ -59,10 +59,6 @@ export default class BlockValue extends Vue {
     }
   }
 
-  get displayName(): string {
-    return featureStore.displayName(this.opts.type);
-  }
-
   get changes(): Mapped<ChangeField> {
     return this.spec.changes.reduce(objReducer('key'), {});
   }

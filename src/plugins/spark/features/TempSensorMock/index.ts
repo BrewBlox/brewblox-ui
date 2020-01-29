@@ -2,7 +2,7 @@ import { Unit } from '@/helpers/units';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import { typeName } from './getters';
 import widget from './TempSensorMockWidget.vue';
@@ -34,10 +34,10 @@ const block: BlockSpec = {
   },
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Temp Sensor (Mock)',
+  title: 'Temp Sensor (Mock)',
   role: 'Process',
   widgetComponent: blockWidgetSelector(widget),
   widgetSize: {

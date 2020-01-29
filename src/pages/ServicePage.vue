@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { providerStore } from '@/store/providers';
+import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
 
@@ -17,12 +17,8 @@ export default class ServicePage extends Vue {
   }
 
   get pageComponent(): string | null {
-    try {
-      const service = serviceStore.serviceById(this.serviceId);
-      return providerStore.pageById(service.type) || null;
-    } catch (e) {
-      return null;
-    }
+    const service = serviceStore.serviceById(this.serviceId);
+    return featureStore.services[service.type]?.page ?? null;
   }
 }
 </script>

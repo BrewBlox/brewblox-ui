@@ -1,8 +1,8 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
+import { sparkType } from '@/plugins/spark/getters';
 import { Service, serviceStore } from '@/store/services';
 
 import { QuickActionsConfig } from './types';
@@ -13,12 +13,12 @@ export default class QuickActionsWizard extends WidgetWizardBase<QuickActionsCon
   service: Service | null = null;
 
   get serviceId(): string {
-    return get(this, ['service', 'id'], '');
+    return this.service?.id ?? '';
   }
 
   get serviceOpts(): SelectOption[] {
     return serviceStore.serviceValues
-      .filter(service => service.type === 'Spark')
+      .filter(service => service.type === sparkType)
       .map(service => ({
         label: service.title,
         value: service,
@@ -42,7 +42,7 @@ export default class QuickActionsWizard extends WidgetWizardBase<QuickActionsCon
   }
 
   mounted(): void {
-    this.widgetTitle = this.typeDisplayName;
+    this.widgetTitle = this.featureTitle;
   }
 }
 </script>

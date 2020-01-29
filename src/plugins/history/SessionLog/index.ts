@@ -1,13 +1,13 @@
 import { selector } from '@/helpers/component-ref';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import { historyStore } from '../store';
 import widget from './SessionLogWidget.vue';
 import { SessionLogConfig } from './types';
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   id: 'SessionLog',
-  displayName: 'Session Log',
+  title: 'Session Log',
   widgetComponent: selector(widget),
   widgetSize: {
     cols: 4,

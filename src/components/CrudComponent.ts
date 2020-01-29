@@ -33,8 +33,8 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     return this.crud.isStoreWidget;
   }
 
-  public get displayName(): string {
-    return featureStore.displayName(this.widget.feature) ?? this.widget.feature;
+  public get featureTitle(): string {
+    return featureStore.widgetTitle(this.widget.feature) ?? this.widget.feature;
   }
 
   public showDialog(opts: DialogOpts = {}): void {
@@ -134,7 +134,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
         label: 'Remove widget from this dashboard',
         action: deleteItem,
       },
-      ...featureStore.deleters(this.widget.feature)
+      ...featureStore.widgetDeleters(this.widget.feature)
         .map(del => ({ label: del.description, action: del.action })),
     ].map((opt, idx) => ({ ...opt, value: idx }));
 

@@ -48,14 +48,11 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   }
 
   get widgetComponent(): string {
-    return featureStore.widget(this.crud);
+    return featureStore.widgetComponent(this.crud);
   }
 
   emptyConfig(): any {
-    const feature = featureStore.features[this.featureId];
-    return feature.generateConfig !== undefined
-      ? feature.generateConfig()
-      : {};
+    return featureStore.widgets[this.featureId]?.generateConfig?.() ?? {};
   }
 
   createWidget(): void {
@@ -63,7 +60,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   }
 
   created(): void {
-    this.widgetTitle = this.typeDisplayName;
+    this.widgetTitle = this.featureTitle;
   }
 }
 </script>

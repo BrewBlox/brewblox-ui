@@ -34,7 +34,7 @@ export default class CreateMockMenu extends DialogBase {
     this.busy = true;
     try {
       await sparkStore.createBlock([this.serviceId, block]);
-      notify.done(`Created ${featureStore.displayName(block.type)} '${block.id}'`);
+      notify.done(`Created ${featureStore.widgetTitle(block.type)} '${block.id}'`);
     } catch (e) {
       notify.error(`Failed to create Block: ${e.toString()}`);
     }

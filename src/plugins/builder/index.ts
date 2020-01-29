@@ -1,5 +1,5 @@
-import { autoRegister, ref } from '@/helpers/component-ref';
-import { Feature, featureStore } from '@/store/features';
+import { autoRegister, selector } from '@/helpers/component-ref';
+import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './BuilderWidget.vue';
 import { typeName } from './getters';
@@ -7,10 +7,10 @@ import specs from './specs';
 import { builderStore } from './store';
 import { BuilderConfig } from './types';
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   id: typeName,
-  displayName: 'Brewery Builder',
-  widgetComponent: ref(widget),
+  title: 'Brewery Builder',
+  widgetComponent: selector(widget),
   widgetSize: {
     cols: 8,
     rows: 8,
@@ -23,10 +23,10 @@ const feature: Feature = {
 
 // Allows lookups based on the old type ID
 // DeprecatedWidget will update the widget in the datastore
-const deprecated: Feature = {
+const deprecated: WidgetFeature = {
   id: 'ProcessView',
-  displayName: 'Process View',
-  widgetComponent: 'DeprecatedWidget',
+  title: 'Process View',
+  widgetComponent: () => 'DeprecatedWidget',
   widgetSize: { cols: 0, rows: 0 },
   wizardComponent: null,
 };
@@ -41,7 +41,7 @@ export default {
     Object.values(specs)
       .forEach(builderStore.registerPart);
 
-    featureStore.createFeature(feature);
-    featureStore.createFeature(deprecated);
+    featureStore.registerWidget(feature);
+    featureStore.registerWidget(deprecated);
   },
 };

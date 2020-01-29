@@ -1,4 +1,3 @@
-import get from 'lodash/get';
 import mapKeys from 'lodash/mapKeys';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
@@ -27,7 +26,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
         ...this.initialCrud,
         isStoreBlock: true,
         block: sparkStore.blockById(serviceId, blockId) as BlockT,
-        saveBlock: async (block: BlockT) => sparkStore.saveBlock([serviceId, block]),
+        saveBlock: async (block: BlockT) => sparkStore.saveBlock(block),
       };
   }
 
@@ -54,12 +53,12 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public get hasGraph(): boolean {
-    return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
+    return sparkStore.specs[this.block.type]?.graphTargets !== undefined;
   }
 
   public get renamedTargets(): Mapped<string> {
-    const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
-    return !!targets
+    const targets = sparkStore.specs[this.block.type]?.graphTargets;
+    return targets !== undefined
       ? postfixedDisplayNames(targets, this.block.data)
       : {};
   }
@@ -110,7 +109,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public async refreshBlock(): Promise<void> {
-    await sparkStore.fetchBlock([this.serviceId, this.block])
+    await sparkStore.fetchBlock(this.block)
       .catch(() => { });
   }
 

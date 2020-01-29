@@ -70,57 +70,56 @@ npm run devbuild
 
 ---
 
-# Architecture Concepts
 
-Brewblox mostly adheres to the [Vue application structure][vue-structure], but defines a set of concepts within this framework.
+# Architecture
 
-### Dashboard
+## Directory structure
 
-To ensure flexibility, one of the core display elements in the UI is the dashboard.
+Brewblox uses and extends the [Quasar application structure](https://quasar.dev/quasar-cli/cli-documentation/directory-structure).
 
-A dashboard can display anything that implements the `Widget` component interface. This allows the user to display the most relevant items, regardless of whether they are core Brewblox components, or added by a third-party plugin.
+Notable new directories:
 
-### Plugin
+**src/helpers/** - Stateless utility functions.
 
-To allow runtime extension of the UI, users can load plugins. For more information on how Vue plugins work, see the [Vue documentation page](https://vuejs.org/v2/guide/plugins.html). For an example of how to create a Brewblox plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.
+**src/plugins/** - Application submodules. Plugins behave like [Vue plugins](https://vuejs.org/v2/guide/plugins.html) in that they have an `install(Vue: VueConstructor)` function. <br>
+Plugins may have their own `components/`, `helpers/`, and `store/` subdirectories. <br>
+New plugins should be declared in `src/boot/plugins.ts`.
 
-### Provider
+## Third-party plugins
 
-Each device or service supported by the Brewblox UI is implemented as a provider. All interaction with those supported devices or services is encapsulated here.
+To allow runtime extension of the UI, users can load remote plugins.
+These will be loaded from user-defined URLs, and are otherwise treated as identical to plugins found in `src/plugins/`.
 
-Providers can be registered by third-party plugins.
-If you only want to add independent widgets, you don't need to add a provider.
+For an example of how to create a remote plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.
 
-### Service
-
-Services are instances of Providers. If you have two connected Sparks, you'll be using two separate services as created by the `Spark` provider.
-Service configuration is persisted in the datastore.
-
-### Feature
-
-Plugins can register one or more features. Features define the Vue components required to create and render individual widgets.
-
-### Widget
-
-Comparable to how `Service` is an instance of `Provider`, `Widget` is an instance of `Feature`.
-Just as with Services, the configuration for each Widget is stored in the datastore.
-
-### Widget, Wizard
-
-To implement functionality, features have to register various Vue components. These components are expected to implement common interfaces, as they will be instantiated by generic components (dashboard for widgets, wizard picker for wizards).
-
-* A feature must implement a `Widget` component to be displayed on a dashboard or in a modal dialog.
-* To allow creation of `Widget`s, the feature can implement a `Wizard` component.
-  * The wizard is optional: some features are created or discovered automatically.
+# Data sources
 
 ## Datastore
 
-Local application state is kept using [VueX][vuex]. Settings that are not session-specific (`Dashboard`, `Widget`, `Service`) are persisted to the Brewblox [datastore](https://pouchdb.com/).
+Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Settings that are not session-specific (`Dashboard`, `Widget`, `Service`) are persisted to the CouchDB [datastore](https://pouchdb.com/).
 
-The full datastore state is loaded on startup, and all changes are persisted here.
+The full datastore state is loaded on startup. Two-way synchronization is maintained between the local VueX state, and the remote CouchDB state.
+
+## Eventbus
+
+todo
+
+# Interfaces
+
+There are some generic interfaces used throughout the UI. Plugins can register functionality they provide.
+
+## [Dashboard, Widget](src/store/dashboards/types.ts)
+
+To ensure flexibility, one of the core display elements in the UI is the `Dashboard`. A dashboard is populated with `Widget` elements.
+
+`Widget` data blobs are loaded from the store. The dashboard uses the `widget.feature` property to find the Vue component capable of rendering the data.
+
+This allows the user to display the most relevant items, regardless of whether they are core Brewblox components, or added by a third-party plugin.
+
+## [Service](src/store/services/index.ts)
 
 
 
-[vuex]: https://vuex.vuejs.org/guide/
-[vue-structure]: https://vuex.vuejs.org/guide/structure.html
-[dynamic-vuex]: https://vuex.vuejs.org/guide/modules.html#dynamic-module-registration
+## [Feature](src/store/features/types.ts)
+
+test

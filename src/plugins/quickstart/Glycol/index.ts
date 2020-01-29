@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { QuickStart } from '@/store/features';
+import { QuickStartFeature } from '@/store/features';
 
 import GlycolHardwareTask from './GlycolHardwareTask.vue';
 import GlycolManualTask from './GlycolManualTask.vue';
@@ -12,10 +12,10 @@ ref(GlycolHardwareTask);
 ref(GlycolSettingsTask);
 ref(GlycolManualTask);
 
-const quickStart: QuickStart = {
+const feature: QuickStartFeature = {
   id: 'Glycol',
-  displayName: 'Glycol-cooled fermenter',
+  title: 'Glycol-cooled fermenter',
   wizardComponent: ref(GlycolWizard),
 };
 
-export default quickStart;
+export default feature;

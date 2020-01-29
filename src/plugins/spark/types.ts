@@ -1,7 +1,7 @@
 import { Link, Unit } from '@/helpers/units';
 import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { Widget } from '@/store/dashboards';
-import { Crud, Feature } from '@/store/features';
+import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
 export interface ChangeField {
@@ -38,7 +38,7 @@ export interface BlockSpec {
 }
 
 export interface SparkFeature {
-  feature: Feature;
+  feature: WidgetFeature;
   block?: BlockSpec;
 }
 
@@ -51,9 +51,7 @@ export interface SparkConfig {
   pageMode: PageMode;
 }
 
-export interface Spark extends Service {
-  config: SparkConfig;
-}
+export type SparkService = Service<SparkConfig>;
 
 export interface DataBlock {
   id: string;

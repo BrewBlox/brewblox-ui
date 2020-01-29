@@ -33,17 +33,17 @@ export default class WidgetWizardBase<ConfigT = any> extends Vue {
     return this.featureId;
   }
 
-  protected get typeDisplayName(): string {
-    return featureStore.displayName(this.typeId);
+  protected get featureTitle(): string {
+    return featureStore.widgetTitle(this.typeId);
   }
 
-  protected get defaultWidgetSize(): { cols: number; rows: number } {
+  protected get defaultWidgetSize(): GridSize {
     return featureStore.widgetSize(this.typeId);
   }
 
   protected async createItem(item: Widget<ConfigT>): Promise<void> {
     await dashboardStore.appendWidget(item)
-      .then(() => notify.done(`Created ${featureStore.displayName(item.feature)} '${item.title}'`))
+      .then(() => notify.done(`Created ${featureStore.widgetTitle(item.feature)} '${item.title}'`))
       .catch(e => notify.error(`Failed to create widget: ${e.toString()}`))
       .finally(this.close);
   }

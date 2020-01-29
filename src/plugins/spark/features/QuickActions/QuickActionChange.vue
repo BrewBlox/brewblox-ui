@@ -21,7 +21,7 @@ interface EditableBlockChange {
   blockId: string;
   block: Block | null;
   spec: BlockSpec | null;
-  displayName: string;
+  title: string;
   fields: EditableFieldChange[];
 }
 
@@ -53,7 +53,7 @@ export default class QuickActionChange extends Vue {
       blockId: this.value.blockId,
       block,
       spec,
-      displayName: block ? featureStore.displayName(block.type) : 'Unknown',
+      title: block ? featureStore.widgetTitle(block.type) : 'Unknown',
       fields: spec?.changes.map(cfield => ({
         cfield,
         id: cfield.key,

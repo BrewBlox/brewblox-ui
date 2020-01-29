@@ -12,7 +12,6 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
-import { providerStore } from '@/store/providers';
 
 
 @Component
@@ -50,10 +49,10 @@ export default class BlockWizard extends Vue {
   }
 
   get wizardOptions(): SelectOption[] {
-    return providerStore.featuresById('Spark')
-      .filter(feat => featureStore.wizard(feat) === 'BlockWidgetWizard')
-      .filter(this.filter)
-      .map(id => ({ label: featureStore.displayName(id), value: id }))
+    return featureStore.widgetValues
+      .filter(feat => feat.wizardComponent === 'BlockWidgetWizard')
+      .filter(feat => this.filter(feat.id))
+      .map(feat => ({ label: feat.id, value: feat.title }))
       .sort(objectStringSorter('label'));
   }
 
@@ -126,7 +125,7 @@ export default class BlockWizard extends Vue {
     this.ensureLocalBlock();
     try {
       await sparkStore.createBlock([this.serviceId, this.block!]);
-      notify.done(`Created ${featureStore.displayName(this.block!.type)} block '${this.blockId}'`);
+      notify.done(`Created ${featureStore.widgetTitle(this.block!.type)} block '${this.blockId}'`);
       this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
     } catch (e) {
       notify.error(`Failed to create block: ${e.toString()}`);

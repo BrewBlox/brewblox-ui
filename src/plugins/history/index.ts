@@ -13,10 +13,10 @@ export default {
   install(Vue: VueConstructor) {
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
-    featureStore.createFeature(Graph);
-    featureStore.createFeature(Metrics);
-    featureStore.createFeature(SessionLog);
-    featureStore.createFeature(SessionView);
+    featureStore.registerWidget(Graph);
+    featureStore.registerWidget(Metrics);
+    featureStore.registerWidget(SessionLog);
+    featureStore.registerWidget(SessionView);
 
     Vue.$startup.onStart(() => historyStore.start());
   },

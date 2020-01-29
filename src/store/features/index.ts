@@ -1,10 +1,17 @@
-import get from 'lodash/get';
 import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import store from '@/store';
 
-import { Crud, Deleter, Feature, FeatureRole, QuickStart, Watcher } from './types';
+import {
+  Crud,
+  Deleter,
+  QuickStartFeature,
+  ServiceFeature,
+  WatcherFeature,
+  WidgetFeature,
+  WidgetRole,
+} from './types';
 
 export * from './types';
 
@@ -12,37 +19,55 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'features' })
 export class FeatureModule extends VuexModule {
-  public features: Mapped<Feature> = {};
-  public quickStarts: Mapped<QuickStart> = {};
-  public watchers: Watcher[] = [];
 
-  public get featureIds(): string[] {
-    return Object.keys(this.features);
+  public widgets: Mapped<WidgetFeature> = {};
+  public quickStarts: Mapped<QuickStartFeature> = {};
+  public watchers: Mapped<WatcherFeature> = {};
+  public services: Mapped<ServiceFeature> = {};
+
+  public get widgetIds(): string[] {
+    return Object.keys(this.widgets);
   }
 
-  public get featureValues(): Feature[] {
-    return Object.values(this.features);
+  public get widgetValues(): WidgetFeature[] {
+    return Object.values(this.widgets);
   }
 
   public get quickStartIds(): string[] {
     return Object.keys(this.quickStarts);
   }
 
-  public get quickStartValues(): QuickStart[] {
+  public get quickStartValues(): QuickStartFeature[] {
     return Object.values(this.quickStarts);
   }
 
-  public get displayName(): (id: string) => string {
-    return id => get(this.features, [id, 'displayName']);
+  public get watcherIds(): string[] {
+    return Object.keys(this.watchers);
   }
 
-  public get role(): (id: string) => FeatureRole {
-    return id => get(this.features, [id, 'role']) || 'Other';
+  public get watcherValues(): WatcherFeature[] {
+    return Object.values(this.watchers);
   }
 
-  public get wizard(): (id: string) => string | null {
+  public get serviceIds(): string[] {
+    return Object.keys(this.services);
+  }
+
+  public get serviceValues(): ServiceFeature[] {
+    return Object.values(this.services);
+  }
+
+  public get widgetTitle(): (id: string) => string {
+    return id => this.widgets[id]?.title ?? 'Unknown';
+  }
+
+  public get widgetRole(): (id: string) => WidgetRole {
+    return id => this.widgets[id]?.role ?? 'Other';
+  }
+
+  public get widgetWizard(): (id: string) => string | null {
     return (id: string): string | null => {
-      const feature = this.features[id];
+      const feature = this.widgets[id];
       if (feature === undefined) { return null; };
       return feature.wizardComponent !== undefined
         ? feature.wizardComponent
@@ -50,14 +75,14 @@ export class FeatureModule extends VuexModule {
     };
   }
 
-  public get widget(): (crud: Crud, throwInvalid?: boolean) => string {
+  public get widgetComponent(): (crud: Crud, throwInvalid?: boolean) => string {
     return (crud: Crud, throwInvalid = false) => {
       try {
-        const obj = get(this.features, [crud.widget.feature, 'widgetComponent'], null);
-        if (obj === null) {
+        const selector = this.widgets[crud.widget.feature]?.widgetComponent;
+        if (selector === undefined) {
           throw new Error(`No feature found for '${crud.widget.feature}'`);
         }
-        return typeof obj === 'function' ? obj(crud) : obj;
+        return selector(crud);
       } catch (e) {
         if (throwInvalid) { throw e; }
         return 'InvalidWidget';
@@ -65,45 +90,55 @@ export class FeatureModule extends VuexModule {
     };
   }
 
-  public get widgetSize(): (id: string) => { cols: number; rows: number } {
-    return id => get(this.features, [id, 'widgetSize']);
+  public get widgetSize(): (id: string) => GridSize {
+    return id => this.widgets[id]?.widgetSize;
   }
 
-  public get deleters(): (id: string) => Deleter[] {
-    return id => get(this.features, [id, 'deleters']) || [];
-  }
-
-  @Mutation
-  public commitFeature(feature: Feature): void {
-    Vue.set(this.features, feature.id, feature);
+  public get widgetDeleters(): (id: string) => Deleter[] {
+    return id => this.widgets[id]?.deleters ?? [];
   }
 
   @Mutation
-  public commitQuickStart(quickStart: QuickStart): void {
-    Vue.set(this.quickStarts, quickStart.id, quickStart);
+  public commitWidgetFeature(feature: WidgetFeature): void {
+    Vue.set(this.widgets, feature.id, feature);
   }
 
   @Mutation
-  public commitWatcher(watcher: Watcher): void {
-    this.watchers.push({ ...watcher });
+  public commitQuickStartFeature(feature: QuickStartFeature): void {
+    Vue.set(this.quickStarts, feature.id, feature);
+  }
+
+  @Mutation
+  public commitWatcherFeature(feature: WatcherFeature): void {
+    Vue.set(this.watchers, feature.id, feature);
+  }
+
+  @Mutation
+  public commitServiceFeature(feature: ServiceFeature): void {
+    Vue.set(this.services, feature.id, feature);
   }
 
   @Action({ rawError })
-  public async createFeature(feature: Feature): Promise<void> {
+  public async registerWidget(feature: WidgetFeature): Promise<void> {
     if (feature.wizardComponent === undefined && feature.generateConfig === undefined) {
       throw new Error(`Feature ${feature.id} must define a generateConfig function to use the default wizard`);
     }
-    this.commitFeature(feature);
+    this.commitWidgetFeature(feature);
   }
 
   @Action({ rawError })
-  public async createQuickStart(quickStart: QuickStart): Promise<void> {
-    this.commitQuickStart(quickStart);
+  public async registerQuickStart(feature: QuickStartFeature): Promise<void> {
+    this.commitQuickStartFeature(feature);
   }
 
   @Action({ rawError })
-  public async createWatcher(watcher: Watcher): Promise<void> {
-    this.commitWatcher(watcher);
+  public async registerWatcher(feature: WatcherFeature): Promise<void> {
+    this.commitWatcherFeature(feature);
+  }
+
+  @Action({ rawError })
+  public async registerService(feature: ServiceFeature): Promise<void> {
+    this.commitServiceFeature(feature);
   }
 }
 

@@ -10,9 +10,17 @@ import notify from '@/helpers/notify';
 import { isSystemBlock } from '@/plugins/spark/block-types';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud, PageMode, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
+import {
+  Block,
+  BlockCrud,
+  PageMode,
+  RelationEdge,
+  RelationNode,
+  SparkService,
+  SystemStatus,
+} from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
-import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
+import { featureStore, WidgetContext, WidgetRole } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
 import { isReady } from './getters';
@@ -28,8 +36,8 @@ interface ValidatedWidget {
   key: string;
   component: string;
   crud: BlockCrud;
-  displayName: string;
-  role: FeatureRole;
+  title: string;
+  role: WidgetRole;
   expanded: boolean;
   error?: string;
 }
@@ -52,7 +60,7 @@ export default class SparkPage extends Vue {
     size: 'Content',
   };
 
-  roleOrder: Record<FeatureRole, number> = {
+  roleOrder: Record<WidgetRole, number> = {
     Display: 0,
     Process: 1,
     Control: 2,
@@ -61,7 +69,7 @@ export default class SparkPage extends Vue {
     Other: 5,
   };
 
-  roleIcons: Record<FeatureRole, string> = {
+  roleIcons: Record<WidgetRole, string> = {
     Display: 'mdi-monitor-dashboard',
     Process: 'mdi-thermometer',
     Control: 'mdi-calculator-variant',
@@ -78,8 +86,8 @@ export default class SparkPage extends Vue {
     document.title = `Brewblox | ${newV ?? 'Spark service'}`;
   }
 
-  get service(): Spark {
-    return serviceStore.serviceById(this.serviceId) as Spark;
+  get service(): SparkService {
+    return serviceStore.serviceById(this.serviceId);
   }
 
   get dashboards(): Dashboard[] {
@@ -124,8 +132,8 @@ export default class SparkPage extends Vue {
       unsorted: () => 0,
       name: (a, b) => objectStringSorter('id')(a, b),
       type: (a, b): number => {
-        const left = a.displayName.toLowerCase();
-        const right = b.displayName.toLowerCase();
+        const left = a.title.toLowerCase();
+        const right = b.title.toLowerCase();
         return left.localeCompare(right);
       },
       role: (a, b): number =>
@@ -251,20 +259,20 @@ export default class SparkPage extends Vue {
         id: widget.id,
         key,
         crud,
-        displayName: featureStore.displayName(widget.feature),
-        role: featureStore.role(widget.feature),
-        component: featureStore.widget(crud, true),
-        expanded: this.expandedBlocks[widget.id] || false,
+        title: featureStore.widgetTitle(widget.feature),
+        role: featureStore.widgetRole(widget.feature),
+        component: featureStore.widgetComponent(crud, true),
+        expanded: this.expandedBlocks[widget.id] ?? false,
       };
     } catch (e) {
       return {
         id: widget.id,
         key,
         crud,
-        displayName: 'Invalid Widget',
+        title: 'Invalid Widget',
         role: 'Other',
         component: 'InvalidWidget',
-        expanded: this.expandedBlocks[widget.id] || false,
+        expanded: this.expandedBlocks[widget.id] ?? false,
         error: e.message,
       };
     }
@@ -283,7 +291,7 @@ export default class SparkPage extends Vue {
     return this.validatedItems
       .filter(val => !filter
         || val.id.toLowerCase().match(filter)
-        || val.displayName.toLowerCase().match(filter))
+        || val.title.toLowerCase().match(filter))
       .sort(this.sorter);
   }
 
@@ -306,7 +314,7 @@ export default class SparkPage extends Vue {
   }
 
   async saveBlock(block: Block): Promise<void> {
-    sparkStore.saveBlock([block.serviceId, block]);
+    sparkStore.saveBlock(block);
   }
 
   startDialog(component: string, props: any = null): void {
@@ -322,7 +330,7 @@ export default class SparkPage extends Vue {
 
   get nodes(): RelationNode[] {
     return this.validatedItems
-      .map(v => ({ id: v.id, type: v.displayName }))
+      .map(v => ({ id: v.id, type: v.title }))
       .sort(objectStringSorter('type'));
   }
 
@@ -556,7 +564,7 @@ export default class SparkPage extends Vue {
                   </q-item-section>
                   <q-item-section>
                     <q-item-label caption class="text-italic darkish">
-                      {{ val.displayName }}
+                      {{ val.title }}
                     </q-item-label>
                     <div style="font-size: larger">
                       {{ val.id }}

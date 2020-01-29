@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
@@ -44,7 +43,7 @@ export default class MetricsDisplayDialog extends DialogBase {
   }
 
   get decimals(): number {
-    return get(this.local!.decimals, this.field, DEFAULT_DECIMALS);
+    return this.local!.decimals[this.field] ?? DEFAULT_DECIMALS;
   }
 
   set decimals(val: number) {

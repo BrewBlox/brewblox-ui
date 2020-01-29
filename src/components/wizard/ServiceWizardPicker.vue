@@ -1,11 +1,10 @@
 <script lang="ts">
-import isString from 'lodash/isString';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { objectStringSorter } from '@/helpers/functional';
+import { objectStringSorter, ruleErrorFinder } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { providerStore } from '@/store/providers';
+import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
 @Component
@@ -15,13 +14,18 @@ export default class ServiceWizardPicker extends Vue {
   serviceTypeModel: any = null;
   serviceWizardActive = false;
 
+  mounted(): void {
+    this.reset();
+    this.serviceTypeModel = this.wizardOptions[0];
+  }
+
   get wizardOptions(): SelectOption[] {
-    return providerStore.providerIds
-      .map(id => ({
-        label: providerStore.displayName(id),
-        value: providerStore.wizard(id),
+    return featureStore.serviceValues
+      .filter(feature => feature.wizard !== undefined)
+      .map(feature => ({
+        label: feature.title,
+        value: feature.wizard,
       }))
-      .filter(opt => opt.value)
       .sort(objectStringSorter('label'));
   }
 
@@ -50,22 +54,15 @@ export default class ServiceWizardPicker extends Vue {
   }
 
   next(): void {
-    const errors = this.serviceIdRules
-      .map(rule => rule(this.serviceId))
-      .filter(isString);
+    const err = ruleErrorFinder(this.serviceIdRules)(this.serviceId);
 
-    if (errors.length > 0) {
-      notify.error(errors.join(', '));
+    if (err) {
+      notify.error(err);
       return;
     }
 
     this.serviceTitle = this.serviceTitle || this.serviceId;
     this.serviceWizardActive = true;
-  }
-
-  mounted(): void {
-    this.reset();
-    this.serviceTypeModel = this.wizardOptions[0];
   }
 }
 </script>
@@ -84,7 +81,7 @@ export default class ServiceWizardPicker extends Vue {
 
   <!-- Select a wizard -->
   <ActionCardBody v-else>
-    <q-card-section>
+    <q-card-section @keyup.ctrl.enter="next">
       <q-item>
         <q-item-section>
           <q-select

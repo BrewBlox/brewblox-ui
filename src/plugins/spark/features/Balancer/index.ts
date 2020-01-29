@@ -1,7 +1,7 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './BalancerWidget.vue';
 import { typeName } from './getters';
@@ -16,10 +16,10 @@ const block: BlockSpec = {
   changes: [],
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Balancer',
+  title: 'Balancer',
   role: 'Constraint',
   widgetComponent: blockWidgetSelector(widget),
   widgetSize: {

@@ -3,7 +3,7 @@ import { blockTypes, interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec, DigitalState } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './DigitalActuatorWidget.vue';
 import { typeName } from './getters';
@@ -66,10 +66,10 @@ const block: BlockSpec = {
   },
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Digital Actuator',
+  title: 'Digital Actuator',
   role: 'Output',
   widgetComponent: blockWidgetSelector(widget),
   widgetSize: {

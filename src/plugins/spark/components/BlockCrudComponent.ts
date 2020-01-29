@@ -1,4 +1,3 @@
-import get from 'lodash/get';
 import mapKeys from 'lodash/mapKeys';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
@@ -52,12 +51,12 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   }
 
   public get hasGraph(): boolean {
-    return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
+    return sparkStore.specs[this.block.type]?.graphTargets !== undefined;
   }
 
   public get renamedTargets(): Mapped<string> {
-    const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
-    return !!targets
+    const targets = sparkStore.specs[this.block.type]?.graphTargets;
+    return targets !== undefined
       ? postfixedDisplayNames(targets, this.block.data)
       : {};
   }
@@ -99,20 +98,20 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
 
   public async saveStoreBlock(block: Block | null): Promise<void> {
     if (block !== null) {
-      await sparkStore.saveBlock([block.serviceId, block]);
+      await sparkStore.saveBlock(block);
     }
   }
 
   public async removeBlock(): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.removeBlock([this.serviceId, this.block]);
+      await sparkStore.removeBlock(this.block);
       this.closeDialog();
     }
   }
 
   public async refreshBlock(): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.fetchBlock([this.serviceId, this.block])
+      await sparkStore.fetchBlock(this.block)
         .catch(() => { });
     }
   }

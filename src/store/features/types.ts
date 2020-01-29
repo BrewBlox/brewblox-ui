@@ -1,6 +1,7 @@
 import { Widget } from '@/store/dashboards';
+import { Service } from '@/store/services';
 
-export type FeatureRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
+export type WidgetRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';
@@ -12,40 +13,49 @@ export interface Crud<ConfigT = any> {
   closeDialog(): void;
 }
 
+export interface WidgetContext {
+  mode: WidgetMode;
+  container: WidgetContainer;
+  size: WidgetSize;
+}
+
+type ServiceFunc = (service: Service) => any | Promise<any>;
+
+export interface ServiceFeature {
+  id: string;
+  title: string;
+  onAdd: ServiceFunc;
+  onRemove?: ServiceFunc;
+  onFetch?: ServiceFunc;
+  wizard?: string;
+  page?: string;
+  widgetFeatures: string[];
+}
+
 export interface Deleter {
   description: string;
   action: (crud: Crud) => void;
 }
 
-export type WidgetSelector = (crud: Crud) => string;
-
-export interface Feature {
+export interface WidgetFeature {
   id: string;
-  displayName: string;
-  role?: FeatureRole;
+  title: string;
+  role?: WidgetRole;
   deleters?: Deleter[];
-  widgetSize: {
-    cols: number;
-    rows: number;
-  };
-  widgetComponent: string | WidgetSelector;
+  widgetSize: GridSize;
+  widgetComponent: (crud: Crud) => string;
   wizardComponent?: string | null;
   generateConfig?: () => any;
 }
 
-export interface QuickStart {
+export interface QuickStartFeature {
   id: string;
-  displayName: string;
+  title: string;
   wizardComponent: string;
 }
 
-export interface Watcher {
+export interface WatcherFeature {
+  id: string;
   component: string;
   props: Mapped<any>;
-}
-
-export interface WidgetContext {
-  mode: WidgetMode;
-  container: WidgetContainer;
-  size: WidgetSize;
 }

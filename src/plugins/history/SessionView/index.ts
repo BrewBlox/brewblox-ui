@@ -1,12 +1,12 @@
 import { selector } from '@/helpers/component-ref';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './SessionViewWidget.vue';
 import { SessionViewConfig } from './types';
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   id: 'SessionView',
-  displayName: 'Session View (Deprecated)',
+  title: 'Session View (Deprecated)',
   widgetComponent: selector(widget),
   widgetSize: {
     cols: 4,

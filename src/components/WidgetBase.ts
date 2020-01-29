@@ -46,8 +46,8 @@ export default class WidgetBase<ConfigT = any> extends Vue {
     return this.crud.isStoreWidget;
   }
 
-  public get displayName(): string {
-    return featureStore.displayName(this.widget.feature) ?? this.widget.feature;
+  public get featureTitle(): string {
+    return featureStore.widgetTitle(this.widget.feature) ?? this.widget.feature;
   }
 
   public get inDialog(): boolean {

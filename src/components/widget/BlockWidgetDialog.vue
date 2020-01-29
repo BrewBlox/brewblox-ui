@@ -69,7 +69,7 @@ export default class BlockWidgetDialog extends DialogBase {
   }
 
   get widgetComponent(): string {
-    return featureStore.widget(this.crud);
+    return featureStore.widgetComponent(this.crud);
   }
 
   get widgetProps(): any {

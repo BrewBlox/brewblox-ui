@@ -1,11 +1,11 @@
 <script lang="ts">
-import get from 'lodash/get';
 import isString from 'lodash/isString';
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
+import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockConfig, BlockCrud, DashboardBlock } from '@/plugins/spark/types';
@@ -23,7 +23,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   activeDialog: any = null;
 
   get serviceId(): string {
-    return get(this, ['service', 'id'], '');
+    return this.service?.id ?? '';
   }
 
   get blockIdRules(): InputRule[] {
@@ -41,7 +41,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
 
   get serviceOpts(): SelectOption[] {
     return serviceStore.serviceValues
-      .filter(service => service.type === 'Spark')
+      .filter(service => service.type === sparkType)
       .map(service => ({
         label: service.title,
         value: service,
@@ -87,7 +87,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   async saveBlock(block: Block): Promise<void> {
     this.block = block;
     if (this.isStoreBlock) {
-      await sparkStore.saveBlock([block.serviceId, block]);
+      await sparkStore.saveBlock(block);
     }
   }
 
@@ -123,7 +123,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     const block = this.block!;
 
     if (!sparkStore.blockIds(service.id).includes(block.id)) {
-      await sparkStore.createBlock([service.id, block]);
+      await sparkStore.createBlock(block);
     }
 
     this.createItem(this.widget!);

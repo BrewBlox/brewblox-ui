@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
@@ -60,7 +59,7 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(get(channel, 'driver.id', null), actuatorType);
+    return new Link(channel.driver?.id ?? null, actuatorType);
   }
 
   driverDriven(block: Block): boolean {
@@ -80,20 +79,20 @@ export default class IoArray extends BlockCrudComponent {
     }
     if (currentDriver) {
       currentDriver.data.channel = 0;
-      await sparkStore.saveBlock([this.serviceId, currentDriver]);
+      await sparkStore.saveBlock(currentDriver);
     }
     if (link.id) {
       const newDriver: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id);
       newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
       newDriver.data.channel = channel.id;
-      await sparkStore.saveBlock([this.serviceId, newDriver]);
+      await sparkStore.saveBlock(newDriver);
     }
   }
 
   async saveState(channel: EditableChannel, state: DigitalState): Promise<void> {
     if (channel.driver) {
       channel.driver.data.desiredState = state;
-      await sparkStore.saveBlock([this.serviceId, channel.driver]);
+      await sparkStore.saveBlock(channel.driver);
     }
   }
 

@@ -1,32 +1,35 @@
 <script lang="ts">
-import { Component, Watch } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
-import WatcherBase from '@/components/WatcherBase';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { systemStore } from '@/store/system';
 
-import { SystemStatus } from '../types';
+import { SparkService, SystemStatus } from '../types';
 
 const snoozeDuration = durationMs('1d');
 const updateValidDuration = durationMs('30s');
 
 @Component
-export default class SparkWatcher extends WatcherBase {
+export default class SparkServiceWatcher extends Vue {
   notifiedUpdate = false;
+
+  @Prop({ type: Object, required: true })
+  public readonly service!: SparkService;
 
   get now(): Date {
     return systemStore.now;
   }
 
   get status(): SystemStatus | null {
-    return sparkStore.status(this.serviceId);
+    return sparkStore.status(this.service.id);
   }
 
   get cookieName(): string {
-    return `fw-snooze-${this.serviceId}`;
+    return `fw-snooze-${this.service.id}`;
   }
 
   get snoozeTime(): number {
@@ -38,14 +41,14 @@ export default class SparkWatcher extends WatcherBase {
 
   @Watch('now')
   checkUpdateFresh(): void {
-    const date = sparkStore.lastUpdate(this.serviceId);
+    const date = sparkStore.lastUpdate(this.service.id);
     const fresh = !!date && date.getTime() + updateValidDuration > new Date().getTime();
 
     if (!fresh && date) {
-      sparkStore.invalidateBlocks(this.serviceId);
+      sparkStore.invalidateBlocks(this.service.id);
     }
     if (!fresh || !this.status?.synchronize) {
-      sparkStore.fetchServiceStatus(this.serviceId);
+      sparkStore.fetchServiceStatus(this.service.id);
     }
   }
 
@@ -71,7 +74,7 @@ export default class SparkWatcher extends WatcherBase {
           textColor: 'white',
           handler: () => createDialog({
             component: 'FirmwareUpdateDialog',
-            serviceId: this.serviceId,
+            serviceId: this.service.id,
           }),
         },
         {

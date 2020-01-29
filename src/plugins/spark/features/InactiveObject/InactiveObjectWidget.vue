@@ -10,8 +10,8 @@ import { InactiveObjectBlock } from './types';
 export default class InactiveObjectWidget extends BlockWidgetBase {
   readonly block!: InactiveObjectBlock;
 
-  get actualDisplayName(): string {
-    return featureStore.displayName(this.block.data.actualType);
+  get actualFeatureTitle(): string {
+    return featureStore.widgetTitle(this.block.data.actualType);
   }
 }
 </script>
@@ -23,7 +23,7 @@ export default class InactiveObjectWidget extends BlockWidgetBase {
     </template>
     <CardWarning v-if="!block.data.connected">
       <template #message>
-        This {{ actualDisplayName }} block is disabled.
+        This {{ actualFeatureTitle }} block is disabled.
         <br>To enable it, ensure that it is in an enabled group.
       </template>
     </CardWarning>
