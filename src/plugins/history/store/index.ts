@@ -195,7 +195,7 @@ export class HistoryModule extends VuexModule {
     };
 
     this.commitAllSessions(await sessionApi.fetch());
-    sessionApi.setup(onChange, onDelete);
+    sessionApi.subscribe(onChange, onDelete);
   }
 }
 

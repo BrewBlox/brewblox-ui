@@ -1,28 +1,19 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import PouchDB from 'pouchdb';
-import { VueConstructor } from 'vue';
 
 import { HOST } from '@/helpers/const';
 import notify from '@/helpers/notify';
 
-type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
-
-export interface StoreObject {
-  id: string;
-  _rev?: string;
-}
-
-export interface Module {
-  id: string;
-  onChanged: (obj: any) => void;
-  onDeleted: (id: string) => void;
-}
+import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
 
 const cleanId = (moduleId: string, fullId: string): string =>
   fullId.substring(`${moduleId}__`.length);
 
 const fullId = (moduleId: string, id: string): string =>
   `${moduleId}__${id}`;
+
+const strippedId = (fullId: string): string =>
+  fullId.match(/^(.+)__/)?.[1] ?? '';
 
 const checkInModule = (moduleId: string, fullId: string): boolean =>
   fullId.startsWith(`${moduleId}__`);
@@ -42,96 +33,20 @@ const asNewDocument = (moduleId: string, obj: any): any => {
   return asDocument(moduleId, obj);
 };
 
-export class BrewbloxDatabase {
-  private promisedDb: Promise<PouchDB.Database>;
-  private modules: Module[] = [];
-
-  public constructor() {
-    this.promisedDb = new Promise((resolve) => {
-      const remoteAddress = `${HOST}/datastore/brewblox-ui-store`;
-      const remoteDb: PouchDB.Database = new PouchDB(remoteAddress);
-
-      this.checkRemote(remoteDb)
-        .then(async () => {
-          remoteDb
-            .changes({ live: true, include_docs: true, since: 'now' })
-            .on('change', (evt: ChangeEvent) => {
-              const handler = this.modules.find(m => checkInModule(m.id, evt.id));
-              if (evt.deleted) {
-                handler?.onDeleted(cleanId(handler.id, evt.id));
-              } else {
-                handler?.onChanged(asStoreObject(handler.id, evt.doc));
-              }
-            });
-
-          resolve(remoteDb);
-        });
+const checkRemote = async (db: PouchDB.Database): Promise<void> => {
+  await db.info()
+    .catch((e) => {
+      notify.error(`Remote database unavailable: ${e.message}`, { shown: false });
     });
-  }
+};
 
-  private async checkRemote(db: PouchDB.Database): Promise<void> {
-    await db.info()
-      .catch((e) => {
-        notify.error(`Remote database unavailable: ${e.message}`, { shown: false });
-      });
+const intercept = (message: string, moduleId: string): (e: Error) => never =>
+  (e: Error) => {
+    notify.error(`DB error in ${message}(${moduleId}): ${e.message}`, { shown: false });
+    throw e;
   };
 
-  private intercept(message: string, moduleId: string): (e: Error) => never {
-    return (e: Error) => {
-      notify.error(`DB error in ${message}(${moduleId}): ${e.message}`, { shown: false });
-      throw e;
-    };
-  }
-
-  public registerModule(module: Module): void {
-    if (this.modules.find(m => m.id === module.id)) {
-      throw new Error(`Database module '${module.id}' is already registered`);
-    }
-    this.modules.push({ ...module });
-  }
-
-  public async fetchAll(moduleId: string): Promise<any[]> {
-    const db = await this.promisedDb;
-    const resp = await db.allDocs({ include_docs: true })
-      .catch(this.intercept('Fetch all objects', moduleId));
-    return resp.rows
-      .filter(row => checkInModule(moduleId, row.id))
-      .map(row => asStoreObject(moduleId, row.doc));
-  }
-
-  public async fetchById<T extends StoreObject>(
-    moduleId: string, objId: string
-  ): Promise<T> {
-    const db = await this.promisedDb;
-    const obj = await db.get(fullId(moduleId, objId))
-      .catch(this.intercept(`Fetch '${objId}'`, moduleId));
-    return asStoreObject(moduleId, obj);
-  }
-
-  public async create<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
-    const db = await this.promisedDb;
-    const resp = await db.put(asNewDocument(moduleId, obj))
-      .catch(this.intercept('Create object', moduleId));
-    return { ...obj, _rev: resp.rev };
-  }
-
-  public async persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
-    const db = await this.promisedDb;
-    const resp = await db.put(asDocument(moduleId, obj))
-      .catch(this.intercept('Persist object', moduleId));
-    return { ...obj, _rev: resp.rev };
-  }
-
-  public async remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
-    const db = await this.promisedDb;
-    await db.remove(asDocument(moduleId, obj))
-      .catch(this.intercept('Remove object', moduleId));
-    delete obj._rev;
-    return obj;
-  }
-}
-
-const checkDatastore = (): void => {
+export const checkDatastore = (): void => {
   const addr = `${HOST}/datastore`;
 
   const request = new XMLHttpRequest();
@@ -151,9 +66,81 @@ const checkDatastore = (): void => {
   request.send();
 };
 
-export default {
-  install(Vue: VueConstructor) {
-    Vue.$database = new BrewbloxDatabase();
-    Vue.$startup.onStart(checkDatastore);
-  },
-};
+
+type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
+
+export class BrewbloxDatabaseImpl implements BrewbloxDatabase {
+  private promisedDb: Promise<PouchDB.Database>;
+  private handlers: Mapped<EventHandler> = {}
+
+  public constructor() {
+    this.promisedDb = new Promise((resolve) => {
+      const remoteAddress = `${HOST}/datastore/brewblox-ui-store`;
+      const remoteDb: PouchDB.Database = new PouchDB(remoteAddress);
+
+      checkRemote(remoteDb)
+        .then(() => {
+          remoteDb
+            .changes({ live: true, include_docs: true, since: 'now' })
+            .on('change', (evt: ChangeEvent) => {
+              const moduleId = strippedId(evt.id);
+              evt.deleted
+                ? this.handlers[moduleId]?.onDeleted(cleanId(moduleId, evt.id))
+                : this.handlers[moduleId]?.onChanged(asStoreObject(moduleId, evt.doc));
+            });
+
+          resolve(remoteDb);
+        });
+    });
+  }
+
+  public subscribe(handler: EventHandler): void {
+    if (!handler.id) {
+      throw new Error('Database handler id not set');
+    }
+    if (this.handlers[handler.id] !== undefined) {
+      throw new Error(`Database handler '${module.id}' is already registered`);
+    }
+    this.handlers[handler.id] = Object.freeze(handler);
+  }
+
+  public async fetchAll<T extends StoreObject>(moduleId: string): Promise<T[]> {
+    const db = await this.promisedDb;
+    const resp = await db.allDocs({ include_docs: true })
+      .catch(intercept('Fetch all objects', moduleId));
+    return resp.rows
+      .filter(row => checkInModule(moduleId, row.id))
+      .map(row => asStoreObject(moduleId, row.doc));
+  }
+
+  public async fetchById<T extends StoreObject>(
+    moduleId: string, objId: string
+  ): Promise<T> {
+    const db = await this.promisedDb;
+    const obj = await db.get(fullId(moduleId, objId))
+      .catch(intercept(`Fetch '${objId}'`, moduleId));
+    return asStoreObject(moduleId, obj);
+  }
+
+  public async create<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
+    const db = await this.promisedDb;
+    const resp = await db.put(asNewDocument(moduleId, obj))
+      .catch(intercept('Create object', moduleId));
+    return { ...obj, _rev: resp.rev };
+  }
+
+  public async persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
+    const db = await this.promisedDb;
+    const resp = await db.put(asDocument(moduleId, obj))
+      .catch(intercept('Persist object', moduleId));
+    return { ...obj, _rev: resp.rev };
+  }
+
+  public async remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
+    const db = await this.promisedDb;
+    await db.remove(asDocument(moduleId, obj))
+      .catch(intercept('Remove object', moduleId));
+    delete obj._rev;
+    return obj;
+  }
+}

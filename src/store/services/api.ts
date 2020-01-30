@@ -1,6 +1,6 @@
-import { generate } from '@/helpers/database-api';
+import { createApi } from '@/plugins/database/api';
 import { Service } from '@/store/services';
 
-const api = generate<Service>('services');
+const api = createApi<Service>('services');
 
 export default api;

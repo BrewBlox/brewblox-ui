@@ -94,7 +94,7 @@ For an example of how to create a remote plugin, see the [brewblox-plugin](https
 
 # Data sources
 
-## [Datastore](src/plugins/database.ts)
+## [Datastore](src/plugins/database/types.ts)
 
 Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Settings that are not session-specific (`Dashboard`, `Widget`, `Service`) are persisted to the CouchDB [datastore](https://pouchdb.com/).
 

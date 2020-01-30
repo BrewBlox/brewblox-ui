@@ -203,8 +203,8 @@ export class DashboardModule extends VuexModule {
     this.commitAllDashboards(await dashboardApi.fetch());
     this.commitAllWidgets(await widgetApi.fetch());
 
-    dashboardApi.setup(onDashboardChange, onDashboardDelete);
-    widgetApi.setup(onWidgetChange, onWidgetDelete);
+    dashboardApi.subscribe(onDashboardChange, onDashboardDelete);
+    widgetApi.subscribe(onWidgetChange, onWidgetDelete);
   }
 }
 

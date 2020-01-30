@@ -109,7 +109,7 @@ export class ServiceModule extends VuexModule {
     this.commitAllServices(services);
     await Promise.all(services.map(onStartService));
 
-    api.setup(onChange, onDelete);
+    api.subscribe(onChange, onDelete);
   }
 }
 

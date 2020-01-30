@@ -120,7 +120,7 @@ export class BuilderModule extends VuexModule {
     };
 
     this.commitAllLayouts(await api.fetch());
-    api.setup(onChange, onDelete);
+    api.subscribe(onChange, onDelete);
   }
 }
 
