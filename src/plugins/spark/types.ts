@@ -1,7 +1,7 @@
 import { Link, Unit } from '@/helpers/units';
+import { StoreObject } from '@/plugins/database';
 import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
-import { PersistentWidget } from '@/store/dashboards';
-import { Crud, Feature } from '@/store/features';
+import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
 export interface ChangeField {
@@ -20,12 +20,11 @@ export interface BlockDataPreset {
   generate: BlockDataGenerator;
 }
 
-export interface StoredDataPreset {
+export interface StoredDataPreset extends StoreObject {
   id: string;
   type: string;
   name: string;
   data: Mapped<any>;
-  _rev?: string;
 }
 
 export interface BlockSpec {
@@ -37,11 +36,6 @@ export interface BlockSpec {
   graphTargets?: Mapped<string>;
 }
 
-export interface SparkFeature {
-  feature: Feature;
-  block?: BlockSpec;
-}
-
 export type PageMode = 'Relations' | 'List';
 
 export interface SparkConfig {
@@ -51,9 +45,7 @@ export interface SparkConfig {
   pageMode: PageMode;
 }
 
-export interface Spark extends Service {
-  config: SparkConfig;
-}
+export type SparkService = Service<SparkConfig>;
 
 export interface DataBlock {
   id: string;
@@ -74,12 +66,15 @@ export interface BlockConfig {
   graphAxes?: GraphValueAxes;
 }
 
-export type DashboardBlock = PersistentWidget<BlockConfig>;
-
 export interface BlockCrud<BlockT extends Block = Block> extends Crud<BlockConfig> {
   block: BlockT;
   isStoreBlock: boolean;
   saveBlock: (block: BlockT) => unknown | Promise<unknown>;
+}
+
+export interface SparkFeature {
+  feature: WidgetFeature<BlockConfig>;
+  block?: BlockSpec;
 }
 
 export interface UserUnits {

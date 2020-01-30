@@ -3,12 +3,12 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import notify from '@/helpers/notify';
-import { typeName } from '@/plugins/spark/getters';
+import { sparkType } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import { providerStore } from '@/store/providers';
+import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
-import { Spark } from '../types';
+import { SparkService } from '../types';
 
 @Component
 export default class SparkWizard extends Vue {
@@ -19,10 +19,18 @@ export default class SparkWizard extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceTitle!: string;
 
-  async created(): Promise<void> {
-    const service: Spark = {
+  created(): void {
+    sparkStore.validateService(this.serviceId)
+      .then(ok => ok
+        ? this.createService()
+        : this.cancel());
+  }
+
+  async createService(): Promise<void> {
+    const service: SparkService = {
       id: this.serviceId,
       title: this.serviceTitle,
+      type: sparkType,
       order: serviceStore.serviceIds.length + 1,
       config: {
         groupNames: [],
@@ -30,25 +38,20 @@ export default class SparkWizard extends Vue {
         sorting: 'unsorted',
         pageMode: 'List',
       },
-      type: typeName,
     };
-    await serviceStore.createService(service);
-    notify.done(`Added ${providerStore.displayName(service.type)} '${service.title}'`);
-    this.$emit('close');
+    try {
+      await serviceStore.createService(service);
+      notify.done(`Added ${featureStore.services[service.type]?.title} '${service.title}'`);
+      this.$emit('close');
+    } catch (e) {
+      notify.error(`Failed to create service ${this.serviceId}: ${e}`);
+      this.$emit('back');
+    }
   }
 
   async cancel(): Promise<void> {
     notify.error(`Service with ID '${this.serviceId}' invalid or not found`);
     this.$emit('back');
-  }
-
-  async mounted(): Promise<void> {
-    const ok = await sparkStore.validateService(this.serviceId);
-    if (ok) {
-      this.created();
-    } else {
-      this.cancel();
-    }
   }
 }
 </script>
@@ -60,4 +63,3 @@ export default class SparkWizard extends Vue {
     </q-item>
   </q-card-section>
 </template>
-

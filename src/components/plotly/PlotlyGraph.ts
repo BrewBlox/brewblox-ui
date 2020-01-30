@@ -148,7 +148,7 @@ export default class PlotlyGraph extends Vue {
             format: 'png',
             width: 3000,
             height: 1500,
-            filename: get(this.layout, 'title.text', this.layout.title) || 'graph',
+            filename: get(this.layout, 'title.text', this.layout.title) ?? 'graph',
           }),
       }],
     };

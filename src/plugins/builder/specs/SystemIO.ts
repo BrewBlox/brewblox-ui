@@ -1,5 +1,3 @@
-import get from 'lodash/get';
-
 import { CENTER, DEFAULT_IO_PRESSURE, MAX_IO_PRESSURE, MIN_IO_PRESSURE, RIGHT } from '../getters';
 import { PartSpec, PersistentPart } from '../types';
 
@@ -20,7 +18,7 @@ const spec: PartSpec = {
     { component: 'LiquidSourceCard' },
   ],
   transitions: (part: PersistentPart) => {
-    const enabled = get(part.settings, 'enabled', !!part.settings.pressure);
+    const enabled = part.settings.enabled ?? !!part.settings.pressure;
     const pressure = enabled
       ? part.settings.onPressure ?? DEFAULT_IO_PRESSURE
       : 0;

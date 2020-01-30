@@ -28,7 +28,7 @@ export default class SparkGroupMenu extends DialogBase {
   }
 
   saveBlock(block: Block): void {
-    sparkStore.saveBlock([this.service.id, block]);
+    sparkStore.saveBlock(block);
   }
 
   saveGroupNames(vals: string[] = this.groupNames): void {

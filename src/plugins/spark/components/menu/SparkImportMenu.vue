@@ -77,15 +77,12 @@ export default class SparkImportMenu extends DialogBase {
       this.importBusy = true;
       this.messages = [];
       const id = suggestId(block.id ?? 'imported', this.validateBlockId);
-      await sparkStore.createBlock([
-        this.serviceId,
-        {
-          ...block,
-          id,
-          nid: undefined,
-          serviceId: this.serviceId,
-        },
-      ]);
+      await sparkStore.createBlock({
+        ...block,
+        id,
+        nid: undefined,
+        serviceId: this.serviceId,
+      });
       notify.done(`Imported block '${id}'`);
     } catch (e) {
       notify.error(`Failed to import block: ${e.toString()}`);

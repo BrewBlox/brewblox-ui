@@ -32,7 +32,7 @@ export default class MotorValveWidget
   enable12V(): void {
     if (this.pins) {
       this.pins.data.enableIoSupply12V = true;
-      sparkStore.saveBlock([this.serviceId, this.pins]);
+      sparkStore.saveBlock(this.pins);
     }
   }
 }

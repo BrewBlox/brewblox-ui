@@ -21,6 +21,11 @@ interface XYPosition {
   y: number;
 }
 
+interface GridSize {
+  cols: number;
+  rows: number;
+}
+
 type InputRule = (val: any) => boolean | string;
 
 interface SelectOption {

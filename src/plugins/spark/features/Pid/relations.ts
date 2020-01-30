@@ -1,5 +1,3 @@
-import get from 'lodash/get';
-
 import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
@@ -46,7 +44,7 @@ function relations(block: PidBlock): RelationEdge[] {
   return [
     ...chain,
     ...sparkStore.blockValues(block.serviceId)
-      .filter(block => get(block, 'data.targetId.id') === setpointId)
+      .filter(block => block.data.targetId?.id === setpointId)
       .map(block => ({ source: block.id, target: setpointId, relation: ['target'] })),
   ];
 }
@@ -55,7 +53,7 @@ function nodes(serviceId: string): RelationNode[] {
   return sparkStore.blockValues(serviceId)
     .map(block => ({
       id: block.id,
-      type: featureStore.displayName(block.type),
+      type: featureStore.widgetTitle(block.type),
     }));
 }
 

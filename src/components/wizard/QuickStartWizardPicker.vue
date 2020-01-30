@@ -3,18 +3,18 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import { featureStore } from '@/store/features';
+import { featureStore, QuickStartFeature } from '@/store/features';
 
 @Component
 export default class QuickStartWizardPicker extends Vue {
   searchModel = '';
-  wizardModel: any = null;
+  wizardModel: QuickStartFeature | null = null;
   wizardActive = false;
 
-  get wizardOptions(): { id: string; displayName: string }[] {
+  get wizardOptions(): QuickStartFeature[] {
     return featureStore.quickStartValues
-      .filter(qs => !!qs.wizardComponent)
-      .sort(objectStringSorter('displayName'));
+      .filter(qs => !!qs.component)
+      .sort(objectStringSorter('title'));
   }
 
   setTitle(title: string): void {
@@ -38,7 +38,7 @@ export default class QuickStartWizardPicker extends Vue {
     if (!this.wizardModel) {
       return;
     }
-    this.setTitle(`${this.wizardModel.displayName} wizard`);
+    this.setTitle(`${this.wizardModel.title} wizard`);
     this.wizardActive = true;
   }
 
@@ -52,7 +52,7 @@ export default class QuickStartWizardPicker extends Vue {
 <template>
   <!-- Display selected wizard -->
   <component
-    :is="wizardModel.wizardComponent"
+    :is="wizardModel.component"
     v-if="wizardActive"
     :feature-id="wizardModel.id"
     @title="setTitle"
@@ -104,7 +104,7 @@ export default class QuickStartWizardPicker extends Vue {
             v-model="wizardModel"
             :options="wizardOptions"
             label="Please select a brewing process"
-            option-label="displayName"
+            option-label="title"
             option-value="id"
           />
         </q-item-section>

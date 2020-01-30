@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
@@ -59,18 +59,18 @@ export default class DashboardPage extends Vue {
     return dashboardStore.dashboardValues;
   }
 
-  get allItems(): PersistentWidget[] {
+  get allItems(): Widget[] {
     return dashboardStore.widgetValues;
   }
 
-  get widgets(): PersistentWidget[] {
-    return dashboardStore.persistentWidgetsByDashboardId(this.dashboardId)
+  get widgets(): Widget[] {
+    return dashboardStore.dashboardWidgets(this.dashboardId)
       .sort(objectSorter('order'));
   }
 
   get validatedWidgets(): ValidatedWidget[] {
     return this.widgets
-      .map((widget: PersistentWidget) => {
+      .map((widget: Widget) => {
         const crud: Crud = {
           widget,
           isStoreWidget: true,
@@ -83,7 +83,7 @@ export default class DashboardPage extends Vue {
             // older items may not have a title
             widget.title = widget.id;
           }
-          const component = featureStore.widget(crud, true);
+          const component = featureStore.widgetComponent(crud, true);
           return {
             id: widget.id,
             component,
@@ -107,19 +107,19 @@ export default class DashboardPage extends Vue {
       if (local) {
         local.crud.widget.pinnedPosition = pinnedPosition;
       }
-      await dashboardStore.savePersistentWidget({ ...dashboardStore.persistentWidgetById(id), pinnedPosition });
-      await dashboardStore.updatePersistentWidgetOrder(order);
+      await dashboardStore.saveWidget({ ...dashboardStore.widgetById(id), pinnedPosition });
+      await dashboardStore.updateWidgetOrder(order);
     } catch (e) {
       throw e;
     }
   }
 
   async onChangeSize(id: string, cols: number, rows: number): Promise<void> {
-    await dashboardStore.updatePersistentWidgetSize({ id, cols, rows });
+    await dashboardStore.updateWidgetSize({ id, cols, rows });
   }
 
-  public async saveWidget(widget: PersistentWidget): Promise<void> {
-    await dashboardStore.savePersistentWidget(widget);
+  public async saveWidget(widget: Widget): Promise<void> {
+    await dashboardStore.saveWidget(widget);
   }
 
   onIdChanged(oldId, newId): void {

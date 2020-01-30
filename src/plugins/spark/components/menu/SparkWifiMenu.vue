@@ -43,7 +43,7 @@ export default class SparkWifiMenu extends DialogBase {
   }
 
   async save(): Promise<void> {
-    await sparkStore.saveBlock([this.serviceId, { ...this.block, data: this.values }]);
+    await sparkStore.saveBlock({ ...this.block, data: this.values });
     this.onDialogOk();
   }
 }

@@ -21,7 +21,7 @@ export default class SessionLogDisplay extends PartBase {
 
   get widget(): SessionLogWidget | null {
     return this.isLinked && !this.isBroken
-      ? dashboardStore.persistentWidgetById(this.settings.widgetId)
+      ? dashboardStore.widgetById(this.settings.widgetId)
       : null;
   }
 

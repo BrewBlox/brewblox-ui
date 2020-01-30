@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { QuickStart } from '@/store/features';
+import { QuickStartFeature } from '@/store/features';
 
 import HermsHardwareTask from './HermsHardwareTask.vue';
 import HermsManualTask from './HermsManualTask.vue';
@@ -14,10 +14,10 @@ ref(HermsMutexTask);
 ref(HermsManualTask);
 ref(HermsSettingsTask);
 
-const quickStart: QuickStart = {
+const feature: QuickStartFeature = {
   id: 'Herms',
-  displayName: 'HERMS',
-  wizardComponent: ref(HermsWizard),
+  title: 'HERMS',
+  component: ref(HermsWizard),
 };
 
-export default quickStart;
+export default feature;

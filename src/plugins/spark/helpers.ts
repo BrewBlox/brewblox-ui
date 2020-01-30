@@ -17,7 +17,7 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
-import { Crud, WidgetSelector } from '@/store/features';
+import { Crud, WidgetFeature } from '@/store/features';
 
 import { blockTypes } from './block-types';
 import { BlockConfig, BlockCrud } from './types';
@@ -67,7 +67,7 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('shortDateString', shortDateString);
 };
 
-export const blockWidgetSelector = (component: VueConstructor): WidgetSelector => {
+export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['component'] => {
   const widget = ref(component);
   return (crud: Crud) => {
     const { config }: { config: BlockConfig } = crud.widget;

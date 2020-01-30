@@ -1,5 +1,4 @@
 import escapeRegExp from 'lodash/escapeRegExp';
-import get from 'lodash/get';
 import set from 'lodash/set';
 
 import { sentenceCased } from '@/helpers/functional';
@@ -128,8 +127,7 @@ export const targetBuilder =
           const [measurement, ...keys] = v.split('/');
           const field = keys.join('/');
           const existing = acc.find(t => t.measurement === measurement);
-          if (filterUnknown
-            && !get(knownFields, measurement, [] as string[]).includes(field)) {
+          if (filterUnknown && knownFields[measurement]?.includes(field)) {
             return acc;
           }
           if (existing) {

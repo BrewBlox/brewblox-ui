@@ -53,8 +53,7 @@ export default class SparkWidget extends Vue {
   }
 
   fetchAll(): void {
-    sparkStore.fetchSettings(this.serviceId);
-    sparkStore.fetchBlocks(this.serviceId);
+    sparkStore.fetchAll(this.serviceId);
   }
 }
 </script>

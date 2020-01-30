@@ -1,9 +1,9 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { sparkType } from '@/plugins/spark/getters';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
 
 import PartCard from './PartCard';
@@ -21,15 +21,15 @@ export default class LinkedWidgetCard extends PartCard {
   public readonly label!: string;
 
   @Prop({ type: Function })
-  readonly filter!: (widget: PersistentWidget) => boolean;
+  readonly filter!: (widget: Widget) => boolean;
 
   get sparkServices(): Service[] {
     return serviceStore.serviceValues
-      .filter(svc => svc.type === 'Spark');
+      .filter(svc => svc.type === sparkType);
   }
 
   get linked(): string | null {
-    return get(this.part.settings, this.settingsKey, null);
+    return this.part.settings[this.settingsKey] ?? null;
   }
 
   set linked(val: string | null) {
@@ -53,7 +53,7 @@ export default class LinkedWidgetCard extends PartCard {
       }));
   }
 
-  get actualFilter(): (widget: PersistentWidget) => boolean {
+  get actualFilter(): (widget: Widget) => boolean {
     if (this.filter) {
       return this.filter;
     }

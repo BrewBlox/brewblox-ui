@@ -65,12 +65,12 @@ export default class ProfilePresetDialog extends DialogBase {
       .onOk(async () => {
         this.value.data.start = new Date().getTime() / 1000;
         this.value.data.points = points;
-        await sparkStore.saveBlock([this.value.serviceId, this.value]);
+        await sparkStore.saveBlock(this.value);
         this.onDialogOk();
       })
       .onCancel(async () => {
         this.value.data.points = points;
-        await sparkStore.saveBlock([this.value.serviceId, this.value]);
+        await sparkStore.saveBlock(this.value);
         this.onDialogOk();
       });
   }

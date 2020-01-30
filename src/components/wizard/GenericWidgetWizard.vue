@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 
@@ -11,14 +11,14 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   modalOpen = false;
   localConfig: any | null = null;
 
-  get widget(): PersistentWidget {
+  get widget(): Widget {
     if (this.localConfig === null) {
       this.localConfig = this.emptyConfig();
     }
     return {
       id: this.widgetId,
       title: this.widgetTitle,
-      feature: this.typeId,
+      feature: this.featureId,
       order: 0,
       dashboard: this.dashboardId,
       config: this.localConfig,
@@ -26,7 +26,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     };
   }
 
-  set widget(val: PersistentWidget) {
+  set widget(val: Widget) {
     this.localConfig = val.config;
   }
 
@@ -48,14 +48,11 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   }
 
   get widgetComponent(): string {
-    return featureStore.widget(this.crud);
+    return featureStore.widgetComponent(this.crud);
   }
 
   emptyConfig(): any {
-    const feature = featureStore.features[this.featureId];
-    return feature.generateConfig !== undefined
-      ? feature.generateConfig()
-      : {};
+    return featureStore.widgets[this.featureId]?.generateConfig?.() ?? {};
   }
 
   createWidget(): void {
@@ -63,7 +60,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   }
 
   created(): void {
-    this.widgetTitle = this.typeDisplayName;
+    this.widgetTitle = this.featureTitle;
   }
 }
 </script>

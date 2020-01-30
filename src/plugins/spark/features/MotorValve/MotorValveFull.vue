@@ -62,7 +62,7 @@ export default class MotorValveFull
     if (currentDriver.id) {
       const currentDriverBlock: MotorValveBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
       currentDriverBlock.data.startChannel = 0;
-      await sparkStore.saveBlock([this.serviceId, currentDriverBlock]);
+      await sparkStore.saveBlock(currentDriverBlock);
     }
     this.block.data.startChannel = pinId;
     await this.saveBlock();

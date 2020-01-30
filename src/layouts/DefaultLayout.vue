@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { checkDatastore } from '@/helpers/datastore';
 import { createDialog } from '@/helpers/dialog';
 
 @Component
@@ -13,15 +12,14 @@ export default class DefaultLayout extends Vue {
 
   created(): void {
     this.leftDrawerOpen = !this.$dense;
-    checkDatastore();
   }
 
   get version(): string {
-    return process.env.BLOX_VERSION || 'UNKNOWN';
+    return process.env.BLOX_VERSION ?? 'UNKNOWN';
   }
 
   get buildDate(): string {
-    return process.env.BLOX_DATE || 'UNKNOWN';
+    return process.env.BLOX_DATE ?? 'UNKNOWN';
   }
 
   get devMode() {
@@ -99,9 +97,6 @@ export default class DefaultLayout extends Vue {
         </q-item-section>
       </q-item>
     </q-drawer>
-
-    <Watchers />
-    <ServiceWatchers />
 
     <q-page-container @click.native="stopEditing">
       <router-view />

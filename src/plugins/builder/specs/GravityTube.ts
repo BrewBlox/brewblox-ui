@@ -1,5 +1,3 @@
-import get from 'lodash/get';
-
 import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '../getters';
 import { PartSpec, PersistentPart } from '../types';
 
@@ -19,7 +17,7 @@ const spec: PartSpec = {
     },
   ],
   transitions: (part: PersistentPart) => {
-    const pressure = get(part.settings, 'onPressure', DEFAULT_PUMP_PRESSURE);
+    const pressure = part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE;
     return {
       [LEFT]: [{ outCoords: RIGHT }],
       [RIGHT]: [{ outCoords: LEFT, pressure }],

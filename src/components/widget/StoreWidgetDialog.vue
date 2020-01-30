@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 @Component
@@ -17,15 +17,15 @@ export default class StoreWidgetDialog extends DialogBase {
   @Prop({ type: Function, default: () => null })
   public readonly getProps!: () => any;
 
-  get widget(): PersistentWidget {
-    return dashboardStore.persistentWidgetById(this.widgetId);
+  get widget(): Widget {
+    return dashboardStore.widgetById(this.widgetId);
   }
 
   get crud(): Crud {
     return {
       isStoreWidget: true,
       widget: this.widget,
-      saveWidget: dashboardStore.savePersistentWidget,
+      saveWidget: dashboardStore.saveWidget,
       closeDialog: () => this.onDialogHide(),
     };
   }
@@ -39,11 +39,11 @@ export default class StoreWidgetDialog extends DialogBase {
   }
 
   get widgetComponent(): string {
-    return featureStore.widget(this.crud);
+    return featureStore.widgetComponent(this.crud);
   }
 
   get widgetProps(): any {
-    return this.getProps() || {};
+    return this.getProps() ?? {};
   }
 }
 </script>

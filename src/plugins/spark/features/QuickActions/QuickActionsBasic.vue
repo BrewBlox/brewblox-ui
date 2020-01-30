@@ -120,7 +120,7 @@ export default class QuickActionsBasic extends CrudComponent {
       actualChanges.push([block, actualData]);
     }
     for (const [block, actualData] of actualChanges) {
-      await sparkStore.saveBlock([this.serviceId, { ...block, data: { ...block.data, ...actualData } }]);
+      await sparkStore.saveBlock({ ...block, data: { ...block.data, ...actualData } });
     }
     step.changes = step.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
     this.saveSteps(spliceById(this.steps, step));

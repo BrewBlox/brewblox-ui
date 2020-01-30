@@ -2,15 +2,15 @@ import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
+import { StoreObject } from '@/plugins/database';
 import store from '@/store';
 
 import api from './api';
 
-export interface UIPlugin {
+export interface UIPlugin extends StoreObject {
   id: string;
   title: string;
   url: string;
-  _rev?: string;
 }
 
 export interface UIPluginResult {

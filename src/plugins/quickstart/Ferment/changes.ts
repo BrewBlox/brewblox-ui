@@ -3,8 +3,8 @@ import { uid } from 'quasar';
 import { durationMs } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
-import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
-import { HistoryItem } from '@/plugins/history/Graph/types';
+import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { GraphConfig } from '@/plugins/history/types';
 import {
   ActuatorPwmBlock,
   blockTypes,
@@ -17,10 +17,10 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { maybeSpace, unlinkedActuators } from '../helpers';
@@ -251,7 +251,7 @@ export const defineWidgets = (
   config: FermentConfig,
   opts: FermentOpts,
   layouts: BuilderLayout[]
-): PersistentWidget[] => {
+): Widget[] => {
   const genericSettings = {
     dashboard: config.dashboardId,
     cols: 4,
@@ -262,7 +262,7 @@ export const defineWidgets = (
   const userTemp = sparkStore.units(config.serviceId).Temp;
   const serviceId = config.serviceId;
 
-  const createWidget = (name: string, type: string): PersistentWidget => ({
+  const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
     ...featureStore.widgetSize(type),
     id: uid(),
@@ -275,7 +275,7 @@ export const defineWidgets = (
     },
   });
 
-  const createBuilder = (): BuilderItem => ({
+  const createBuilder = (): Widget<BuilderConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
@@ -286,7 +286,7 @@ export const defineWidgets = (
     },
   });
 
-  const createGraph = (): HistoryItem => ({
+  const createGraph = (): Widget<GraphConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
@@ -329,7 +329,7 @@ export const defineWidgets = (
     },
   });
 
-  const createQuickActions = (): QuickActionsItem => ({
+  const createQuickActions = (): Widget<QuickActionsConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,
@@ -515,7 +515,7 @@ export const defineWidgets = (
     },
   });
 
-  const createProfile = (name: string): PersistentWidget => ({
+  const createProfile = (name: string): Widget => ({
     ...createWidget(name, blockTypes.SetpointProfile),
     cols: 6,
     rows: 4,

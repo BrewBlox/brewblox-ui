@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import parseDuration from 'parse-duration';
 import { uid } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
@@ -74,11 +73,11 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
   }
 
   fieldFreshDuration(field: string): number {
-    return get(this.widgetCfg.freshDuration, field, DEFAULT_FRESH_DURATION);
+    return this.widgetCfg.freshDuration[field] ?? DEFAULT_FRESH_DURATION;
   }
 
   fieldDecimals(field: string): number {
-    return get(this.widgetCfg.decimals, field, DEFAULT_DECIMALS);
+    return this.widgetCfg.decimals[field] ?? DEFAULT_DECIMALS;
   }
 
   get values(): CurrentValue[] {

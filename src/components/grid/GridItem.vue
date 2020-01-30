@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 
 const GRID_SIZE = 100;
 const GAP_SIZE = 20;
@@ -36,7 +36,7 @@ export default class GridItem extends Vue {
   readonly dragOverlay!: Vue;
 
   @Prop({ type: Object, required: true })
-  readonly widget!: PersistentWidget;
+  readonly widget!: Widget;
 
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;

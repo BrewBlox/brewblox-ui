@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
@@ -16,7 +15,7 @@ export default class LiquidSourceCard extends PartCard {
   ];
 
   get pressured(): boolean {
-    return get(this.part.settings, 'enabled', !!this.part.settings.pressure);
+    return this.part.settings.enabled ?? !!this.part.settings.pressure;
   }
 
   set pressured(enabled: boolean) {
@@ -24,7 +23,7 @@ export default class LiquidSourceCard extends PartCard {
   }
 
   get color(): string | null {
-    return get(this.part.settings, ['liquids', 0], null);
+    return this.part.settings.liquids?.[0] ?? null;
   }
 
   set color(val: string | null) {

@@ -1,10 +1,16 @@
 import { VueConstructor } from 'vue';
 
 import { autoRegister } from '@/helpers/component-ref';
-import { featureStore } from '@/store/features';
+import { featureStore, WatcherFeature } from '@/store/features';
 
 import Automation from './Automation';
 import { automationStore } from './store';
+
+const watcher: WatcherFeature = {
+  id: 'AutomationWatcher',
+  component: 'AutomationWatcher',
+  props: {},
+};
 
 export default {
   install(Vue: VueConstructor) {
@@ -13,8 +19,8 @@ export default {
     }
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
-    featureStore.createFeature(Automation.feature);
-    featureStore.createWatcher({ component: 'AutomationWatcher', props: {} });
+    featureStore.registerWidget(Automation.feature);
+    featureStore.registerWatcher(watcher);
 
     Vue.$startup.onStart(() => automationStore.start());
   },

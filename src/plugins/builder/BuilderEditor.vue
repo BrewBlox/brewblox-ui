@@ -1,5 +1,4 @@
 <script lang="ts">
-import pick from 'lodash/pick';
 import { debounce, uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
@@ -340,8 +339,10 @@ export default class BuilderEditor extends Vue {
   }
 
   gridRect(): Rect {
-    return pick(this.grid.getBoundingClientRect(),
-      ['x', 'y', 'left', 'right', 'top', 'bottom']);
+    // Edge (pre-chromium) does not return x/y values
+    // We can infer them from left/top
+    const { left, right, top, bottom } = this.grid.getBoundingClientRect();
+    return { left, right, top, bottom, x: left, y: top };
   }
 
   isClickable(part): boolean {

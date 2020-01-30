@@ -1,27 +1,25 @@
 <script lang="ts">
-import isString from 'lodash/isString';
 import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { objectStringSorter } from '@/helpers/functional';
+import { objectStringSorter, ruleValidator } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
-import { providerStore } from '@/store/providers';
 
 
 @Component
 export default class BlockWizard extends Vue {
   filteredOptions: any[] = [];
-  feature: any = null;
+  wizardModel: SelectOption | null = null;
   blockId = '';
   block: Block | null = null;
-  widget: PersistentWidget | null = null;
+  widget: Widget | null = null;
   activeDialog: any = null;
 
   @Prop({ type: String, required: true })
@@ -46,14 +44,14 @@ export default class BlockWizard extends Vue {
   }
 
   get createReady(): boolean {
-    return !!this.feature && !this.blockIdRules.some(rule => isString(rule(this.blockId)));
+    return !!this.wizardModel && ruleValidator(this.blockIdRules)(this.blockId);
   }
 
   get wizardOptions(): SelectOption[] {
-    return providerStore.featuresById('Spark')
-      .filter(feat => featureStore.wizard(feat) === 'BlockWidgetWizard')
-      .filter(this.filter)
-      .map(id => ({ label: featureStore.displayName(id), value: id }))
+    return featureStore.widgetValues
+      .filter(feat => feat.wizard === 'BlockWidgetWizard')
+      .filter(feat => this.filter(feat.id))
+      .map(feat => ({ label: feat.title, value: feat.id }))
       .sort(objectStringSorter('label'));
   }
 
@@ -71,32 +69,32 @@ export default class BlockWizard extends Vue {
   }
 
   ensureLocalBlock(): void {
-    const typeId = this.feature.value;
+    const featureId = this.wizardModel!.value;
     this.widget = this.widget || {
       id: uid(),
       title: this.blockId,
-      feature: typeId,
+      feature: featureId,
       dashboard: '',
       order: 0,
       config: {
         serviceId: this.serviceId,
         blockId: this.blockId,
       },
-      ...featureStore.widgetSize(typeId),
+      ...featureStore.widgetSize(featureId),
     };
     this.block = this.block || {
       id: this.blockId,
       serviceId: this.serviceId,
-      type: typeId,
+      type: featureId,
       groups: [0],
-      data: sparkStore.specs[typeId].generate(),
+      data: sparkStore.specs[featureId].generate(),
     };
   }
 
   configureBlock(): void {
     this.ensureLocalBlock();
     const crud: BlockCrud = {
-      widget: this.widget as PersistentWidget,
+      widget: this.widget as Widget,
       isStoreWidget: false,
       saveWidget: v => { this.widget = v; },
       block: this.block!,
@@ -125,8 +123,8 @@ export default class BlockWizard extends Vue {
     }
     this.ensureLocalBlock();
     try {
-      await sparkStore.createBlock([this.serviceId, this.block!]);
-      notify.done(`Created ${featureStore.displayName(this.block!.type)} block '${this.blockId}'`);
+      await sparkStore.createBlock(this.block!);
+      notify.done(`Created ${featureStore.widgetTitle(this.block!.type)} block '${this.blockId}'`);
       this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
     } catch (e) {
       notify.error(`Failed to create block: ${e.toString()}`);
@@ -135,8 +133,8 @@ export default class BlockWizard extends Vue {
   }
 
   created(): void {
-    this.feature =
-      this.wizardOptions.find(opt => opt.value === this.initialFeature) || null;
+    this.wizardModel =
+      this.wizardOptions.find(opt => opt.value === this.initialFeature) ?? null;
   }
 }
 </script>
@@ -147,7 +145,7 @@ export default class BlockWizard extends Vue {
       <q-item>
         <q-item-section>
           <q-select
-            v-model="feature"
+            v-model="wizardModel"
             :options="filteredOptions"
             :rules="[v => !!v || 'You must select a block type']"
             :disable="!!initialFeature"

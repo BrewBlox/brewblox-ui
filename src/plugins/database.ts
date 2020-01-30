@@ -1,29 +1,21 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import PouchDB from 'pouchdb';
-import { VueConstructor } from 'vue/types/umd';
+import { VueConstructor } from 'vue';
 
 import { HOST } from '@/helpers/const';
+import notify from '@/helpers/notify';
 
 type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
 
 export interface StoreObject {
   id: string;
   _rev?: string;
-  [key: string]: any;
 }
 
 export interface Module {
-  onDeleted: (id: string) => void;
-  onChanged: (obj: any) => void;
   id: string;
-}
-
-interface DBError {
-  time: string;
-  message: string;
-  moduleId: string;
-  content: string;
-  error: string;
+  onChanged: (obj: any) => void;
+  onDeleted: (id: string) => void;
 }
 
 const cleanId = (moduleId: string, fullId: string): string =>
@@ -52,9 +44,7 @@ const asNewDocument = (moduleId: string, obj: any): any => {
 
 export class BrewbloxDatabase {
   private promisedDb: Promise<PouchDB.Database>;
-
   private modules: Module[] = [];
-  private dbErrors: DBError[] = [];
 
   public constructor() {
     this.promisedDb = new Promise((resolve) => {
@@ -82,35 +72,15 @@ export class BrewbloxDatabase {
   private async checkRemote(db: PouchDB.Database): Promise<void> {
     await db.info()
       .catch((e) => {
-        this.dbErrors.push({
-          message: 'Remote database unavailable',
-          moduleId: 'all',
-          time: new Date().toString(),
-          content: '',
-          error: e.message,
-        });
+        notify.error(`Remote database unavailable: ${e.message}`, { shown: false });
       });
   };
 
-  private intercept(message: string, moduleId: string, obj: any = null): (e: Error) => never {
+  private intercept(message: string, moduleId: string): (e: Error) => never {
     return (e: Error) => {
-      this.dbErrors.push({
-        message,
-        moduleId,
-        time: new Date().toString(),
-        content: JSON.stringify(obj),
-        error: e.message,
-      });
+      notify.error(`DB error in ${message}(${moduleId}): ${e.message}`, { shown: false });
       throw e;
     };
-  }
-
-  public getErrors(clear = false): DBError[] {
-    const retval = [...this.dbErrors];
-    if (clear) {
-      this.dbErrors = [];
-    }
-    return retval;
   }
 
   public registerModule(module: Module): void {
@@ -141,28 +111,49 @@ export class BrewbloxDatabase {
   public async create<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
     const db = await this.promisedDb;
     const resp = await db.put(asNewDocument(moduleId, obj))
-      .catch(this.intercept('Create object', moduleId, obj));
+      .catch(this.intercept('Create object', moduleId));
     return { ...obj, _rev: resp.rev };
   }
 
   public async persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
     const db = await this.promisedDb;
     const resp = await db.put(asDocument(moduleId, obj))
-      .catch(this.intercept('Persist object', moduleId, obj));
+      .catch(this.intercept('Persist object', moduleId));
     return { ...obj, _rev: resp.rev };
   }
 
   public async remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
     const db = await this.promisedDb;
     await db.remove(asDocument(moduleId, obj))
-      .catch(this.intercept('Remove object', moduleId, obj));
+      .catch(this.intercept('Remove object', moduleId));
     delete obj._rev;
     return obj;
   }
 }
 
+const checkDatastore = (): void => {
+  const addr = `${HOST}/datastore`;
+
+  const request = new XMLHttpRequest();
+  request.open('GET', addr, true);
+  request.onerror = () => notify.error({
+    timeout: 0,
+    icon: 'error',
+    message: 'Failed to access the datastore',
+    actions: [
+      {
+        label: 'Reload page',
+        textColor: 'white',
+        handler: () => location.reload(),
+      },
+    ],
+  });
+  request.send();
+};
+
 export default {
   install(Vue: VueConstructor) {
     Vue.$database = new BrewbloxDatabase();
+    Vue.$startup.onStart(checkDatastore);
   },
 };

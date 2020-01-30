@@ -78,7 +78,7 @@ export default class PidShareDialog extends DialogBase {
 
   name(block: Block | null): string {
     return block !== null
-      ? featureStore.displayName(block.type)
+      ? featureStore.widgetTitle(block.type)
       : 'Not set';
   }
 

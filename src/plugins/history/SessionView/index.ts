@@ -1,18 +1,19 @@
-import { selector } from '@/helpers/component-ref';
-import { Feature } from '@/store/features';
+import { ref } from '@/helpers/component-ref';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './SessionViewWidget.vue';
 import { SessionViewConfig } from './types';
 
-const feature: Feature = {
+const feature: WidgetFeature<SessionViewConfig> = {
   id: 'SessionView',
-  displayName: 'Session View (Deprecated)',
-  widgetComponent: selector(widget),
+  title: 'Session View (Deprecated)',
+  component: ref(widget),
+  wizard: false,
   widgetSize: {
     cols: 4,
     rows: 5,
   },
-  generateConfig: (): SessionViewConfig => ({ sessions: [] }),
+  generateConfig: () => ({ sessions: [] }),
 };
 
 export default feature;

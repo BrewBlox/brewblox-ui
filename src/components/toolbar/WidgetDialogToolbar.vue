@@ -29,7 +29,7 @@ export default class WidgetDialogToolbar extends CrudComponent {
 </script>
 
 <template>
-  <DialogToolbar :title="widget.title" :subtitle="displayName">
+  <DialogToolbar :title="widget.title" :subtitle="featureTitle">
     <slot />
     <template #buttons>
       <q-btn v-if="!!mode" :icon="toggleIcon" flat stretch size="md" @click="toggle">
