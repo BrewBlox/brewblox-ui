@@ -67,8 +67,6 @@ export interface BlockConfig {
   graphAxes?: GraphValueAxes;
 }
 
-export type BlockWidget = Widget<BlockConfig>;
-
 export interface BlockCrud<BlockT extends Block = Block> extends Crud<BlockConfig> {
   block: BlockT;
   isStoreBlock: boolean;
