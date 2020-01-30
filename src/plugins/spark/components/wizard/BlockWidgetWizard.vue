@@ -7,7 +7,7 @@ import { objectStringSorter, ruleValidator } from '@/helpers/functional';
 import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockConfig, BlockCrud, DashboardBlock } from '@/plugins/spark/types';
+import { Block, BlockConfig, BlockCrud, BlockWidget } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
 
 @Component
@@ -18,7 +18,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   service: Service | null = null;
   block: Block | null = null;
   isStoreBlock = false;
-  widget: DashboardBlock | null = null;
+  widget: BlockWidget | null = null;
   activeDialog: any = null;
 
   get serviceId(): string {

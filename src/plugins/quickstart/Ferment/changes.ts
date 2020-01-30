@@ -17,7 +17,7 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
@@ -329,7 +329,7 @@ export const defineWidgets = (
     },
   });
 
-  const createQuickActions = (): QuickActionsItem => ({
+  const createQuickActions = (): Widget<QuickActionsConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,

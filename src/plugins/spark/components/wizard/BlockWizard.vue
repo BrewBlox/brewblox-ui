@@ -51,7 +51,7 @@ export default class BlockWizard extends Vue {
     return featureStore.widgetValues
       .filter(feat => feat.wizard === 'BlockWidgetWizard')
       .filter(feat => this.filter(feat.id))
-      .map(feat => ({ label: feat.id, value: feat.title }))
+      .map(feat => ({ label: feat.title, value: feat.id }))
       .sort(objectStringSorter('label'));
   }
 

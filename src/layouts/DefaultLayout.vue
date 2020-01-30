@@ -12,15 +12,14 @@ export default class DefaultLayout extends Vue {
 
   created(): void {
     this.leftDrawerOpen = !this.$dense;
-    // checkDatastore();
   }
 
   get version(): string {
-    return process.env.BLOX_VERSION || 'UNKNOWN';
+    return process.env.BLOX_VERSION ?? 'UNKNOWN';
   }
 
   get buildDate(): string {
-    return process.env.BLOX_DATE || 'UNKNOWN';
+    return process.env.BLOX_DATE ?? 'UNKNOWN';
   }
 
   get devMode() {

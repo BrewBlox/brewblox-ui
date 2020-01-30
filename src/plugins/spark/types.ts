@@ -37,11 +37,6 @@ export interface BlockSpec {
   graphTargets?: Mapped<string>;
 }
 
-export interface SparkFeature {
-  feature: WidgetFeature;
-  block?: BlockSpec;
-}
-
 export type PageMode = 'Relations' | 'List';
 
 export interface SparkConfig {
@@ -72,12 +67,17 @@ export interface BlockConfig {
   graphAxes?: GraphValueAxes;
 }
 
-export type DashboardBlock = Widget<BlockConfig>;
+export type BlockWidget = Widget<BlockConfig>;
 
 export interface BlockCrud<BlockT extends Block = Block> extends Crud<BlockConfig> {
   block: BlockT;
   isStoreBlock: boolean;
   saveBlock: (block: BlockT) => unknown | Promise<unknown>;
+}
+
+export interface SparkFeature {
+  feature: WidgetFeature<BlockConfig>;
+  block?: BlockSpec;
 }
 
 export interface UserUnits {

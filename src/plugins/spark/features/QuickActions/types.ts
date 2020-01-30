@@ -1,5 +1,3 @@
-import { Widget } from '@/store/dashboards';
-
 import { Block } from '../../types';
 
 export interface BlockChange<BlockT extends Block = Block> {
@@ -19,8 +17,4 @@ export interface QuickActionsConfig {
   serviceId: string;
   steps: Step[];
   changeIdMigrated: boolean;
-}
-
-export interface QuickActionsItem extends Widget {
-  config: QuickActionsConfig;
 }

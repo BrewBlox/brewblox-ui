@@ -12,13 +12,15 @@ export default class ServicePage extends Vue {
     return this.$route.params.id;
   }
 
-  get serviceValid(): boolean {
+  get serviceExists(): boolean {
     return serviceStore.serviceExists(this.serviceId);
   }
 
   get pageComponent(): string | null {
     const service = serviceStore.serviceById(this.serviceId);
-    return featureStore.services[service.type]?.page ?? null;
+    return service
+      ? featureStore.services[service.type]?.page ?? null
+      : null;
   }
 }
 </script>
@@ -26,15 +28,15 @@ export default class ServicePage extends Vue {
 <template>
   <component
     :is="pageComponent"
-    v-if="serviceValid && pageComponent"
+    v-if="serviceExists && pageComponent"
     :service-id="serviceId"
   />
-  <q-page v-else padding>
-    <div v-if="serviceValid" class="flex flex-center">
-      Invalid service page: {{ serviceId }}
+  <q-page v-else class="text-h5 darkened">
+    <div v-if="serviceExists" class="absolute-center">
+      Invalid service page for '{{ serviceId }}'
     </div>
-    <p v-else>
-      Service {{ serviceId }} not found.
-    </p>
+    <div v-else class="absolute-center">
+      Service '{{ serviceId }}' not found.
+    </div>
   </q-page>
 </template>

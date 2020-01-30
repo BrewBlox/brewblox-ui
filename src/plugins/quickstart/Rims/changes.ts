@@ -2,8 +2,8 @@ import { uid } from 'quasar';
 
 import { Link, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
-import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
-import { HistoryItem } from '@/plugins/history/Graph/types';
+import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { GraphConfig } from '@/plugins/history/types';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -15,7 +15,7 @@ import {
   PidData,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
@@ -201,7 +201,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
     },
   });
 
-  const builder: BuilderItem = {
+  const builder: Widget<BuilderConfig> = {
     ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
     cols: 5,
     rows: 5,
@@ -212,7 +212,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
     },
   };
 
-  const graph: HistoryItem = {
+  const graph: Widget<GraphConfig> = {
     ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
@@ -252,7 +252,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
     },
   };
 
-  const QuickActions: QuickActionsItem = {
+  const QuickActions: Widget<QuickActionsConfig> = {
     ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 5,
