@@ -184,7 +184,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
       title: 'Remove block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,
-
       persistent: true,
     })
       .onOk(this.removeBlock);

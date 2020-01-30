@@ -122,17 +122,12 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   }
 
   public startRemoveWidget(): void {
-    const removeWidget = async (): Promise<void> => {
-      await dashboardStore.removeWidget(this.widget);
-      this.closeDialog();
-    };
-
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
     const opts = [
       {
         label: 'Remove widget from this dashboard',
-        action: removeWidget,
+        action: () => dashboardStore.removeWidget(this.widget),
       },
       ...featureStore.widgetRemoveActions(this.widget.feature)
         .map(opt => ({ label: opt.description, action: opt.action })),
@@ -152,6 +147,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     })
       .onOk((selected: number[]) => {
         selected.forEach(idx => opts[idx].action(this.crud));
+        this.closeDialog();
       });
   }
 }
