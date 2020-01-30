@@ -172,7 +172,7 @@ export class AutomationModule extends VuexModule {
     this.commitAllProcesses(await processApi.fetch());
     this.commitAllRuntimes(await runtimeApi.fetch());
 
-    processApi.setup(onChange, onDelete);
+    processApi.subscribe(onChange, onDelete);
   }
 }
 

@@ -1,27 +1,24 @@
 import Vue from 'vue';
 
-import { StoreObject } from '@/plugins/database';
+import { deserialize, serialize } from '@/helpers/units/parseObject';
 
-import { deserialize, serialize } from './units/parseObject';
-
-type ChangeCallback<T extends StoreObject> = (doc: T) => void;
-type DeleteCallback = (id: string) => void;
+import { ChangeCb, DeleteCb, StoreObject } from './types';
 
 export interface DatabaseApi<T extends StoreObject> {
-  setup(onChanged: ChangeCallback<T>, onDeleted: DeleteCallback): void;
+  subscribe(onChanged: ChangeCb<T>, onDeleted: DeleteCb): void;
   fetch(): Promise<T[]>;
   fetchById(id: string): Promise<T>;
-  create(val: T): Promise<T>;
-  persist(val: T): Promise<T>;
-  remove(val: T): Promise<T>;
+  create(obj: T): Promise<T>;
+  persist(obj: T): Promise<T>;
+  remove(obj: T): Promise<T>;
 }
 
-export function generate<T extends StoreObject>(moduleId: string, serialized = false): DatabaseApi<T> {
+export function createApi<T extends StoreObject>(moduleId: string, serialized = false): DatabaseApi<T> {
   const hydrate: ((v: any) => any) = serialized ? deserialize : (v => v);
   const dehydrate: ((v: any) => any) = serialized ? serialize : (v => v);
   return {
-    setup(onChanged: ChangeCallback<T>, onDeleted: DeleteCallback): void {
-      Vue.$database.registerModule({
+    subscribe(onChanged: ChangeCb<T>, onDeleted: DeleteCb): void {
+      Vue.$database.subscribe({
         id: moduleId,
         onChanged: v => onChanged(hydrate(v)),
         onDeleted,

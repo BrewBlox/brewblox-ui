@@ -1,4 +1,4 @@
-import { VueConstructor } from 'vue/types/umd';
+import { VueConstructor } from 'vue';
 
 import notify from '@/helpers/notify';
 import { ReconnectingEventSource, sse } from '@/helpers/sse';
@@ -11,6 +11,12 @@ export interface EventMessage {
   data: any;
 }
 
+/**
+ * Backend services can push data over the RabbitMQ eventbus.
+ * Events published to the brewcast.state exchange are forwarded over SSE.
+ *
+ * Plugins can set listeners for messages matching specific key(s).
+ */
 export class BrewbloxEventbus {
   private listeners: Mapped<ListenerFunc> = {};
   private source: ReconnectingEventSource | null = null;

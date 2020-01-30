@@ -517,7 +517,7 @@ export class SparkModule extends VuexModule {
       }
     };
     this.commitAllPresets(await presetsApi.fetch());
-    presetsApi.setup(onChange, onDelete);
+    presetsApi.subscribe(onChange, onDelete);
   }
 }
 
