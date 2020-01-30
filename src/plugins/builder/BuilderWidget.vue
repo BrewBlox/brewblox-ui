@@ -74,13 +74,8 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     return squares(this.layout?.width ?? 10);
   }
 
-  get editorDisabled(): boolean {
-    const { ie, edge } = this.$q.platform.is;
-    return Boolean(this.$dense || ie || edge);
-  }
-
   startEditor(): void {
-    if (!this.editorDisabled) {
+    if (!this.$dense) {
       this.$router.push(`/builder/${this.layout?.id ?? ''}`);
     }
   }
@@ -225,7 +220,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           </template>
         </ActionMenu>
         <template #actions>
-          <ActionItem v-if="!editorDisabled" icon="mdi-tools" label="Edit layout" @click="startEditor" />
+          <ActionItem v-if="!$dense" icon="mdi-tools" label="Edit layout" @click="startEditor" />
         </template>
       </component>
     </template>
