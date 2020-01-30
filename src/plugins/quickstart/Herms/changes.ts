@@ -2,8 +2,8 @@ import { uid } from 'quasar';
 
 import { Link, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
-import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
-import { HistoryItem } from '@/plugins/history/Graph/types';
+import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { GraphConfig } from '@/plugins/history/types';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -311,7 +311,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
     },
   });
 
-  const createBuilder = (): BuilderItem => ({
+  const createBuilder = (): Widget<BuilderConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
     cols: 11,
     rows: 5,
@@ -322,7 +322,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
     },
   });
 
-  const createGraph = (): HistoryItem => ({
+  const createGraph = (): Widget<GraphConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
     cols: 7,
     rows: 5,

@@ -7,11 +7,11 @@ import { createDialog } from '@/helpers/dialog';
 import { loadFile, saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { dashboardStore } from '@/store/dashboards';
+import { dashboardStore, Widget } from '@/store/dashboards';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '../getters';
 import { builderStore } from '../store';
-import { BuilderItem, BuilderLayout, PersistentPart } from '../types';
+import { BuilderConfig, BuilderLayout, PersistentPart } from '../types';
 
 
 @Component
@@ -139,7 +139,7 @@ export default class LayoutActions extends Vue {
     })
       .onOk(async (dashboard: string) => {
         const layout = this.layout!;
-        const widget: BuilderItem = {
+        const widget: Widget<BuilderConfig> = {
           id: uid(),
           title: layout.title,
           order: 0,

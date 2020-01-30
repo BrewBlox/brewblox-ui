@@ -3,8 +3,8 @@ import { uid } from 'quasar';
 import { durationMs } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
-import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
-import { HistoryItem } from '@/plugins/history/Graph/types';
+import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { GraphConfig } from '@/plugins/history/types';
 import {
   ActuatorPwmBlock,
   blockTypes,
@@ -305,7 +305,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     },
   });
 
-  const builder: BuilderItem = {
+  const builder: Widget<BuilderConfig> = {
     ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
@@ -316,7 +316,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     },
   };
 
-  const graph: HistoryItem = {
+  const graph: Widget<GraphConfig> = {
     ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,

@@ -1,5 +1,4 @@
 import { StoreObject } from '@/plugins/database';
-import { Widget } from '@/store/dashboards';
 
 export interface FlowRoute {
   outCoords: string;
@@ -82,10 +81,6 @@ export interface BuilderLayout extends StoreObject {
 export interface BuilderConfig {
   currentLayoutId: string | null;
   layoutIds: string[];
-}
-
-export interface BuilderItem extends Widget {
-  config: BuilderConfig;
 }
 
 export interface Rect {
