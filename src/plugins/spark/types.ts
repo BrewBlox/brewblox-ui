@@ -1,7 +1,6 @@
 import { Link, Unit } from '@/helpers/units';
 import { StoreObject } from '@/plugins/database';
 import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
-import { Widget } from '@/store/dashboards';
 import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
