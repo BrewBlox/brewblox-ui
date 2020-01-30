@@ -63,4 +63,3 @@ export default class SparkWizard extends Vue {
     </q-item>
   </q-card-section>
 </template>
-

@@ -7,17 +7,17 @@ const deleteBlock =
     const { config }: { config: BlockConfig } = crud.widget;
     const block = sparkStore.blocks(config.serviceId)[config.blockId];
     if (block) {
-      sparkStore.removeBlock([config.serviceId, block]);
+      sparkStore.removeBlock(block);
     }
   };
 
-export const genericBlockFeature: Partial<WidgetFeature> = {
-  wizardComponent: 'BlockWidgetWizard',
+export const genericBlockFeature: Pick<WidgetFeature, 'wizard' | 'widgetSize' | 'removeActions'> = {
+  wizard: 'BlockWidgetWizard',
   widgetSize: {
     cols: 4,
     rows: 4,
   },
-  deleters: [
+  removeActions: [
     {
       description: 'Delete block on controller',
       action: deleteBlock,

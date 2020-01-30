@@ -352,11 +352,7 @@ export class SparkModule extends VuexModule {
       this.commitAllBlocks([serviceId, blocks]);
     });
 
-    await this.fetchServiceStatus(serviceId);
-    await Promise.all([
-      this.fetchBlocks(serviceId),
-      this.fetchDiscoveredBlocks(serviceId),
-    ])
+    await this.fetchAll(serviceId)
       .catch(() => { });
   }
 
@@ -470,13 +466,16 @@ export class SparkModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchSettings(serviceId: string): Promise<void> {
+  public async fetchAll(serviceId: string): Promise<void> {
     const status = await this.fetchServiceStatus(serviceId);
     if (status.synchronize) {
       await Promise.all([
+        this.fetchServiceStatus(serviceId),
         this.fetchUnits(serviceId),
         this.fetchUnitAlternatives(serviceId),
         this.fetchCompatibleTypes(serviceId),
+        this.fetchDiscoveredBlocks(serviceId),
+        this.fetchBlocks(serviceId),
       ]);
     }
   }

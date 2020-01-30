@@ -12,11 +12,12 @@ export * from './types';
 
 const rawError = true;
 
-const initService = async (service: Service): Promise<void> => {
-  const feature = featureStore.services[service.type];
-  await feature.onAdd?.(service);
-  await feature.onFetch?.(service);
-};
+const onStartService = (service: Service): Promise<void> =>
+  featureStore.services[service.type]?.onStart?.(service);
+
+const onRemoveService = (service: Service): Promise<void> =>
+  featureStore.services[service.type]?.onRemove?.(service);
+
 
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
@@ -58,22 +59,21 @@ export class ServiceModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async createService(service: Service): Promise<Service> {
+  public async createService(service: Service): Promise<void> {
     const created = await api.create(service);
     this.commitService(created);
-    await initService(created);
-    return created;
+    await onStartService(created);
   }
 
-  @Action({ rawError, commit: 'commitService' })
-  public async saveService(service: Service): Promise<Service> {
-    return await api.persist(service);
+  @Action({ rawError })
+  public async saveService(service: Service): Promise<void> {
+    this.commitService(await api.persist(service));
   }
 
-  @Action({ rawError, commit: 'commitRemoveService' })
-  public async removeService(service: Service): Promise<Service> {
-    await featureStore.services[service.type]?.onRemove?.(service);
-    return await api.remove(service);
+  @Action({ rawError })
+  public async removeService(service: Service): Promise<void> {
+    await onRemoveService(service);
+    this.commitRemoveService(await api.remove(service));
   }
 
   @Action({ rawError })
@@ -91,21 +91,23 @@ export class ServiceModule extends VuexModule {
       const existing = this.serviceById(service.id);
       if (!existing) {
         this.commitService(service);
-        await initService(service);
-      } else if (existing._rev !== service._rev) {
+        await onStartService(service);
+      }
+      else if (existing._rev !== service._rev) {
         this.commitService(service);
       }
     };
-    const onDelete = (id: string): void => {
+    const onDelete = async (id: string): Promise<void> => {
       const existing = this.serviceById(id);
       if (existing) {
+        await onRemoveService(existing);
         this.commitRemoveService(existing);
       }
     };
 
     const services = await api.fetch();
     this.commitAllServices(services);
-    await Promise.all(services.map(initService));
+    await Promise.all(services.map(onStartService));
 
     api.setup(onChange, onDelete);
   }

@@ -64,7 +64,7 @@ export default class DashboardPage extends Vue {
   }
 
   get widgets(): Widget[] {
-    return dashboardStore.persistentWidgetsByDashboardId(this.dashboardId)
+    return dashboardStore.dashboardWidgets(this.dashboardId)
       .sort(objectSorter('order'));
   }
 
@@ -107,7 +107,7 @@ export default class DashboardPage extends Vue {
       if (local) {
         local.crud.widget.pinnedPosition = pinnedPosition;
       }
-      await dashboardStore.saveWidget({ ...dashboardStore.persistentWidgetById(id), pinnedPosition });
+      await dashboardStore.saveWidget({ ...dashboardStore.widgetById(id), pinnedPosition });
       await dashboardStore.updateWidgetOrder(order);
     } catch (e) {
       throw e;

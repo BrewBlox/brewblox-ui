@@ -27,8 +27,8 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'OneWire Temp Sensor',
   role: 'Process',
-  widgetComponent: blockWidgetSelector(widget),
-  wizardComponent: null,
+  component: blockWidgetSelector(widget),
+  wizard: false,
   widgetSize: {
     cols: 4,
     rows: 2,

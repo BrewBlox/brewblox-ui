@@ -23,14 +23,14 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'DS2408 Chip',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,
   },
-  // Discovered objects can't be created or deleted
-  wizardComponent: null,
-  deleters: undefined,
+  // Discovered objects can't be created or removed
+  wizard: false,
+  removeActions: undefined,
 };
 
 export default { feature, block };

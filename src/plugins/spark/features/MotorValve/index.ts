@@ -40,7 +40,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Motor Valve',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

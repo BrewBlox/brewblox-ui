@@ -15,7 +15,7 @@ ref(FermentManualTask);
 const feature: QuickStartFeature = {
   id: 'Ferment',
   title: 'Fermentation Fridge',
-  wizardComponent: ref(FermentWizard),
+  component: ref(FermentWizard),
 };
 
 export default feature;

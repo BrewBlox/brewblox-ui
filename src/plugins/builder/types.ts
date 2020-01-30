@@ -1,3 +1,4 @@
+import { StoreObject } from '@/plugins/database';
 import { Widget } from '@/store/dashboards';
 
 export interface FlowRoute {
@@ -70,13 +71,12 @@ export interface PartSpec {
   interactHandler?: (part: PersistentPart, updater: PartUpdater) => void;
 }
 
-export interface BuilderLayout {
+export interface BuilderLayout extends StoreObject {
   id: string;
   title: string;
   width: number;
   height: number;
   parts: PersistentPart[];
-  _rev?: string;
 }
 
 export interface BuilderConfig {

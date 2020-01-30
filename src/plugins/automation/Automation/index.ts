@@ -1,4 +1,4 @@
-import { selector } from '@/helpers/component-ref';
+import { ref } from '@/helpers/component-ref';
 import { WidgetFeature } from '@/store/features';
 
 import { AutomationConfig } from '../types';
@@ -8,7 +8,8 @@ import widget from './AutomationWidget.vue';
 const feature: WidgetFeature = {
   id: 'Automation',
   title: 'Automation',
-  widgetComponent: selector(widget),
+  component: ref(widget),
+  wizard: true,
   widgetSize: {
     cols: 4,
     rows: 2,

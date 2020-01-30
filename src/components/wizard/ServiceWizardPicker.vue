@@ -72,8 +72,7 @@ export default class ServiceWizardPicker extends Vue {
   <component
     :is="serviceTypeModel.value"
     v-if="serviceWizardActive"
-    :service-id="serviceId"
-    :service-title="serviceTitle"
+    v-bind="{serviceId, serviceTitle}"
     @title="setTitle"
     @back="reset"
     @close="close"

@@ -67,7 +67,7 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('shortDateString', shortDateString);
 };
 
-export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['widgetComponent'] => {
+export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['component'] => {
   const widget = ref(component);
   return (crud: Crud) => {
     const { config }: { config: BlockConfig } = crud.widget;

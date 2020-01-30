@@ -57,7 +57,7 @@ export default class DigitalActuatorForm
     if (currentDriver.id) {
       const currentDriverBlock: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
       currentDriverBlock.data.channel = 0;
-      await sparkStore.saveBlock([this.serviceId, currentDriverBlock]);
+      await sparkStore.saveBlock(currentDriverBlock);
     }
     this.block.data.channel = pinId;
     await this.saveBlock();

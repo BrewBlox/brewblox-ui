@@ -170,7 +170,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'PID',
   role: 'Control',
-  widgetComponent: blockWidgetSelector(PidWidget),
+  component: blockWidgetSelector(PidWidget),
   widgetSize: {
     cols: 4,
     rows: 3,

@@ -40,14 +40,15 @@ export function createOutputActions(): WizardAction[] {
     async (config: QuickStartOutput) => {
       await Promise.all(
         config.changedBlocks
-          .map(block => sparkStore.saveBlock([config.serviceId, block])));
+          .map(block => sparkStore.saveBlock(block))
+      );
     },
 
     // Create blocks
     async (config: QuickStartOutput) => {
       // Create synchronously, to ensure dependencies are created first
       for (const block of config.createdBlocks) {
-        await sparkStore.createBlock([config.serviceId, block]);
+        await sparkStore.createBlock(block);
       }
     },
 

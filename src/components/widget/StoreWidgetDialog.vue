@@ -18,7 +18,7 @@ export default class StoreWidgetDialog extends DialogBase {
   public readonly getProps!: () => any;
 
   get widget(): Widget {
-    return dashboardStore.persistentWidgetById(this.widgetId);
+    return dashboardStore.widgetById(this.widgetId);
   }
 
   get crud(): Crud {
@@ -43,7 +43,7 @@ export default class StoreWidgetDialog extends DialogBase {
   }
 
   get widgetProps(): any {
-    return this.getProps() || {};
+    return this.getProps() ?? {};
   }
 }
 </script>

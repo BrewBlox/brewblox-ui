@@ -18,7 +18,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     return {
       id: this.widgetId,
       title: this.widgetTitle,
-      feature: this.typeId,
+      feature: this.featureId,
       order: 0,
       dashboard: this.dashboardId,
       config: this.localConfig,

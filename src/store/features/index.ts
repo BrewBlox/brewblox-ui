@@ -1,3 +1,4 @@
+import isString from 'lodash/isString';
 import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
@@ -5,11 +6,11 @@ import store from '@/store';
 
 import {
   Crud,
-  Deleter,
   QuickStartFeature,
   ServiceFeature,
   WatcherFeature,
   WidgetFeature,
+  WidgetRemoveAction,
   WidgetRole,
 } from './types';
 
@@ -69,20 +70,24 @@ export class FeatureModule extends VuexModule {
     return (id: string): string | null => {
       const feature = this.widgets[id];
       if (feature === undefined) { return null; };
-      return feature.wizardComponent !== undefined
-        ? feature.wizardComponent
-        : 'GenericWidgetWizard';
+      return isString(feature.wizard)
+        ? feature.wizard
+        : !!feature.wizard
+          ? 'GenericWidgetWizard'
+          : null;
     };
   }
 
   public get widgetComponent(): (crud: Crud, throwInvalid?: boolean) => string {
     return (crud: Crud, throwInvalid = false) => {
       try {
-        const selector = this.widgets[crud.widget.feature]?.widgetComponent;
-        if (selector === undefined) {
+        const feature = this.widgets[crud.widget.feature];
+        if (!feature) {
           throw new Error(`No feature found for '${crud.widget.feature}'`);
         }
-        return selector(crud);
+        return isString(feature.component)
+          ? feature.component
+          : feature.component(crud);
       } catch (e) {
         if (throwInvalid) { throw e; }
         return 'InvalidWidget';
@@ -94,8 +99,8 @@ export class FeatureModule extends VuexModule {
     return id => this.widgets[id]?.widgetSize;
   }
 
-  public get widgetDeleters(): (id: string) => Deleter[] {
-    return id => this.widgets[id]?.deleters ?? [];
+  public get widgetRemoveActions(): (id: string) => WidgetRemoveAction[] {
+    return id => this.widgets[id]?.removeActions ?? [];
   }
 
   @Mutation
@@ -120,7 +125,7 @@ export class FeatureModule extends VuexModule {
 
   @Action({ rawError })
   public async registerWidget(feature: WidgetFeature): Promise<void> {
-    if (feature.wizardComponent === undefined && feature.generateConfig === undefined) {
+    if (feature.wizard === true && feature.generateConfig === undefined) {
       throw new Error(`Feature ${feature.id} must define a generateConfig function to use the default wizard`);
     }
     this.commitWidgetFeature(feature);

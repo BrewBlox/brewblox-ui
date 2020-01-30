@@ -18,7 +18,7 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
   }
 
   removeBlock(): void {
-    sparkStore.removeBlock([this.block.serviceId, this.block]);
+    sparkStore.removeBlock(this.block);
   }
 }
 </script>

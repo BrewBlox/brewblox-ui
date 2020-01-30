@@ -13,7 +13,7 @@ ref(RimsNamingTask);
 const feature: QuickStartFeature = {
   id: 'Rims',
   title: 'RIMS Brew-in-a-Bag',
-  wizardComponent: ref(RimsWizard),
+  component: ref(RimsWizard),
 };
 
 export default feature;

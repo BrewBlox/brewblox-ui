@@ -122,7 +122,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   }
 
   public startRemoveWidget(): void {
-    const deleteItem = async (): Promise<void> => {
+    const removeWidget = async (): Promise<void> => {
       await dashboardStore.removeWidget(this.widget);
       this.closeDialog();
     };
@@ -132,16 +132,17 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     const opts = [
       {
         label: 'Remove widget from this dashboard',
-        action: deleteItem,
+        action: removeWidget,
       },
-      ...featureStore.widgetDeleters(this.widget.feature)
-        .map(del => ({ label: del.description, action: del.action })),
-    ].map((opt, idx) => ({ ...opt, value: idx }));
+      ...featureStore.widgetRemoveActions(this.widget.feature)
+        .map(opt => ({ label: opt.description, action: opt.action })),
+    ]
+      .map((opt, idx) => ({ ...opt, value: idx }));
 
     createDialog({
       parent: this,
-      title: 'Delete widget',
-      message: `How do you want to delete widget ${this.widget.title}?`,
+      title: 'Remove widget',
+      message: `How do you want to remove widget ${this.widget.title}?`,
       options: {
         type: 'checkbox',
         model: [0], // pre-check the default action

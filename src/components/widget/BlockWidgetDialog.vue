@@ -55,7 +55,7 @@ export default class BlockWidgetDialog extends DialogBase {
       widget: this.widget,
       saveWidget: val => { this.localWidget = val; },
       block: this.block!,
-      saveBlock: block => sparkStore.saveBlock([this.serviceId, block]),
+      saveBlock: block => sparkStore.saveBlock(block),
       closeDialog: () => this.onDialogHide(),
     };
   }

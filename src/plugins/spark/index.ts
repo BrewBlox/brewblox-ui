@@ -15,9 +15,9 @@ const deprecated: WidgetFeature[] = [
   {
     id: 'StepView',
     title: 'Step View',
-    widgetComponent: () => 'DeprecatedWidget',
+    component: 'DeprecatedWidget',
+    wizard: false,
     widgetSize: { cols: 0, rows: 0 },
-    wizardComponent: null,
   },
 ];
 
@@ -48,12 +48,10 @@ export default {
     featureStore.registerService({
       id: sparkType,
       title: 'Spark Controller',
-      onAdd: service => sparkStore.addService(service.id),
+      onStart: service => sparkStore.addService(service.id),
       onRemove: service => sparkStore.removeService(service.id),
-      onFetch: service => sparkStore.fetchSettings(service.id),
       wizard: 'SparkWizard',
       page: 'SparkPage',
-      widgetFeatures: Object.keys(features),
     });
 
     Vue.$startup.onStart(() => sparkStore.start());

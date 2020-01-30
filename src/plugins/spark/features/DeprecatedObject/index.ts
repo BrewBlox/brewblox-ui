@@ -9,8 +9,8 @@ const feature: WidgetFeature = {
   id: 'DeprecatedObject',
   title: 'Deprecated Object',
   role: 'Other',
-  widgetComponent: blockWidgetSelector(widget),
-  wizardComponent: null,
+  component: blockWidgetSelector(widget),
+  wizard: false,
   widgetSize: {
     cols: 4,
     rows: 2,

@@ -34,14 +34,14 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Spark 3 Pins',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 4,
   },
   // Spark3Pins is a static system object, and can't be created or deleted
-  wizardComponent: null,
-  deleters: undefined,
+  wizard: false,
+  removeActions: undefined,
 };
 
 export default { feature, block };

@@ -29,16 +29,12 @@ export default class WidgetWizardBase<ConfigT = any> extends Vue {
   @Emit()
   public close(): void { }
 
-  protected get typeId(): string {
-    return this.featureId;
-  }
-
   protected get featureTitle(): string {
-    return featureStore.widgetTitle(this.typeId);
+    return featureStore.widgetTitle(this.featureId);
   }
 
   protected get defaultWidgetSize(): GridSize {
-    return featureStore.widgetSize(this.typeId);
+    return featureStore.widgetSize(this.featureId);
   }
 
   protected async createItem(item: Widget<ConfigT>): Promise<void> {

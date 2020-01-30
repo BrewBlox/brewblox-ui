@@ -21,7 +21,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Balancer',
   role: 'Constraint',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 2,

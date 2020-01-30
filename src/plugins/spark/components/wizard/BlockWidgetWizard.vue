@@ -1,10 +1,9 @@
 <script lang="ts">
-import isString from 'lodash/isString';
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createDialog } from '@/helpers/dialog';
-import { objectStringSorter } from '@/helpers/functional';
+import { objectStringSorter, ruleValidator } from '@/helpers/functional';
 import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -35,7 +34,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
       return [];
     }
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => block.type === this.typeId)
+      .filter(block => block.type === this.featureId)
       .sort(objectStringSorter('id'));
   }
 
@@ -53,8 +52,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   }
 
   get createOk(): boolean {
-    return !!this.service
-      && !this.blockIdRules.some(rule => isString(rule(this.blockId)));
+    return !!this.service && ruleValidator(this.blockIdRules)(this.blockId);
   }
 
   get existingOk(): boolean {
@@ -62,18 +60,18 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   }
 
   ensureItem(): void {
-    this.block = this.block || {
+    this.block = this.block ?? {
       id: this.blockId,
       serviceId: this.serviceId,
-      type: this.typeId,
+      type: this.featureId,
       groups: [0],
-      data: sparkStore.specs[this.typeId].generate(),
+      data: sparkStore.specs[this.featureId].generate(),
     };
     this.blockId = this.block.id; // for when using existing block
-    this.widget = this.widget || {
+    this.widget = this.widget ?? {
       id: this.widgetId,
       title: this.blockId,
-      feature: this.typeId,
+      feature: this.featureId,
       dashboard: this.dashboardId,
       order: 0,
       config: {

@@ -13,7 +13,7 @@ export default class Watchers extends Vue {
 </script>
 
 <template>
-  <div style="height: 0px; width: 0px;">
+  <div style="height: 0; width: 0; overflow: hidden">
     <component
       :is="watcher.component"
       v-for="(watcher, id) in watchers"

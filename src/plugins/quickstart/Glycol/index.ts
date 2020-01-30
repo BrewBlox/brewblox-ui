@@ -15,7 +15,7 @@ ref(GlycolManualTask);
 const feature: QuickStartFeature = {
   id: 'Glycol',
   title: 'Glycol-cooled fermenter',
-  wizardComponent: ref(GlycolWizard),
+  component: ref(GlycolWizard),
 };
 
 export default feature;

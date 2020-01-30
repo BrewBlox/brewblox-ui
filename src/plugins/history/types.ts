@@ -1,5 +1,7 @@
 import { Annotations, Layout } from 'plotly.js';
 
+import { StoreObject } from '@/plugins/database';
+
 export interface QueryParams {
   database?: string;
   start?: string | number;
@@ -105,11 +107,10 @@ export interface SessionGraphNote extends SessionNoteBase {
 
 export type SessionNote = SessionTextNote | SessionGraphNote;
 
-export interface LoggedSession {
+export interface LoggedSession extends StoreObject {
   id: string;
   title: string;
   date: number;
   notes: SessionNote[];
   tags?: string[];
-  _rev?: string;
 }

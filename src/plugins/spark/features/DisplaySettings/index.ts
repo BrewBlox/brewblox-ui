@@ -32,14 +32,14 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Display Settings',
   role: 'Display',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,
   },
-  // DisplaySettings is a static system object, and can't be created or deleted
-  wizardComponent: null,
-  deleters: undefined,
+  // System objects can't be created or deleted
+  wizard: false,
+  removeActions: undefined,
 };
 
 export default { feature, block };

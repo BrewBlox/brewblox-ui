@@ -94,15 +94,17 @@ For an example of how to create a remote plugin, see the [brewblox-plugin](https
 
 # Data sources
 
-## Datastore
+## [Datastore](src/plugins/database.ts)
 
 Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Settings that are not session-specific (`Dashboard`, `Widget`, `Service`) are persisted to the CouchDB [datastore](https://pouchdb.com/).
 
-The full datastore state is loaded on startup. Two-way synchronization is maintained between the local VueX state, and the remote CouchDB state.
+The full datastore state is loaded on startup. After that, two-way synchronization is maintained between VueX (local), and CouchDB (remote).
 
-## Eventbus
+## [Eventbus](src/plugins/eventbus.ts)
 
-todo
+Backend services can continuously push data over the RabbitMQ eventbus. These events are then converted into Server Sent Events (SSE) by the [brewblox-emitter](https://github.com/BrewBlox/brewblox-emitter) service.
+
+The SSE connection is managed centrally, and plugins can subscribe to receive callbacks for events matching an identifier.
 
 # Interfaces
 
@@ -118,8 +120,14 @@ This allows the user to display the most relevant items, regardless of whether t
 
 ## [Service](src/store/services/index.ts)
 
+While widgets are displayed on dashboards, services get their own page.
 
+Other than that, they're very much alike: they have persistent configuration, and are implemented by plugins.
 
 ## [Feature](src/store/features/types.ts)
 
-test
+Widgets and Services by themselves are nothing more than blobs of JSON data. In order for them to be created and rendered, they must be combined with Vue components.
+
+Features are how the UI knows which components can be used to render data. Plugins can use their `install(Vue)` function to register features.
+
+As Features contain functions and references to Vue components, they are not persisted in the datastore.

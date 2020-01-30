@@ -33,7 +33,7 @@ export default class CreateMockMenu extends DialogBase {
   async createBlock(block: Block): Promise<void> {
     this.busy = true;
     try {
-      await sparkStore.createBlock([this.serviceId, block]);
+      await sparkStore.createBlock(block);
       notify.done(`Created ${featureStore.widgetTitle(block.type)} '${block.id}'`);
     } catch (e) {
       notify.error(`Failed to create Block: ${e.toString()}`);

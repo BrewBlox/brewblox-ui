@@ -67,7 +67,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Setpoint Profile',
   role: 'Process',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,

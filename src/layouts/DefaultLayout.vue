@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { checkDatastore } from '@/helpers/datastore';
 import { createDialog } from '@/helpers/dialog';
 
 @Component
@@ -13,7 +12,7 @@ export default class DefaultLayout extends Vue {
 
   created(): void {
     this.leftDrawerOpen = !this.$dense;
-    checkDatastore();
+    // checkDatastore();
   }
 
   get version(): string {
@@ -99,8 +98,6 @@ export default class DefaultLayout extends Vue {
         </q-item-section>
       </q-item>
     </q-drawer>
-
-    <Watchers />
 
     <q-page-container @click.native="stopEditing">
       <router-view />

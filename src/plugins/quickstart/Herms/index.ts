@@ -17,7 +17,7 @@ ref(HermsSettingsTask);
 const feature: QuickStartFeature = {
   id: 'Herms',
   title: 'HERMS',
-  wizardComponent: ref(HermsWizard),
+  component: ref(HermsWizard),
 };
 
 export default feature;

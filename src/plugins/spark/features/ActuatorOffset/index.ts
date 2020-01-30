@@ -60,7 +60,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Setpoint Driver',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,

@@ -45,7 +45,7 @@ export default class WidgetWizardPicker extends Vue {
       .map(feature => ({
         label: feature.title,
         value: feature.id,
-        component: feature.wizardComponent,
+        component: featureStore.widgetWizard(feature.id),
       }))
       .filter(opt => opt.component !== null)
       .sort(objectStringSorter('label'));

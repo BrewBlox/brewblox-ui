@@ -24,9 +24,13 @@ export default class ServicePage extends Vue {
 </script>
 
 <template>
-  <q-page padding>
-    <component :is="pageComponent" v-if="serviceValid && pageComponent" :service-id="serviceId" />
-    <div v-else-if="serviceValid" class="flex flex-center">
+  <component
+    :is="pageComponent"
+    v-if="serviceValid && pageComponent"
+    :service-id="serviceId"
+  />
+  <q-page v-else padding>
+    <div v-if="serviceValid" class="flex flex-center">
       Invalid service page: {{ serviceId }}
     </div>
     <p v-else>

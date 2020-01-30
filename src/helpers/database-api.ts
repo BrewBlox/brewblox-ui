@@ -4,11 +4,11 @@ import { StoreObject } from '@/plugins/database';
 
 import { deserialize, serialize } from './units/parseObject';
 
-type ChangeCallback = (doc: any) => void;
+type ChangeCallback<T extends StoreObject> = (doc: T) => void;
 type DeleteCallback = (id: string) => void;
 
-export interface DatabaseApi<T> {
-  setup(onChanged: ChangeCallback, onDeleted: DeleteCallback): void;
+export interface DatabaseApi<T extends StoreObject> {
+  setup(onChanged: ChangeCallback<T>, onDeleted: DeleteCallback): void;
   fetch(): Promise<T[]>;
   fetchById(id: string): Promise<T>;
   create(val: T): Promise<T>;
@@ -20,7 +20,7 @@ export function generate<T extends StoreObject>(moduleId: string, serialized = f
   const hydrate: ((v: any) => any) = serialized ? deserialize : (v => v);
   const dehydrate: ((v: any) => any) = serialized ? serialize : (v => v);
   return {
-    setup(onChanged: ChangeCallback, onDeleted: DeleteCallback): void {
+    setup(onChanged: ChangeCallback<T>, onDeleted: DeleteCallback): void {
       Vue.$database.registerModule({
         id: moduleId,
         onChanged: v => onChanged(hydrate(v)),

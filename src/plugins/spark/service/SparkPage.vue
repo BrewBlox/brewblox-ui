@@ -381,7 +381,7 @@ export default class SparkPage extends Vue {
 </script>
 
 <template>
-  <div>
+  <q-page padding>
     <portal to="toolbar-title">
       {{ service.title }}
     </portal>
@@ -602,7 +602,7 @@ export default class SparkPage extends Vue {
         </q-scroll-area>
       </div>
     </template>
-  </div>
+  </q-page>
 </template>
 
 <style lang="sass" scoped>

@@ -29,7 +29,7 @@ export default class QuickActionsWizard extends WidgetWizardBase<QuickActionsCon
     this.createItem({
       id: this.widgetId,
       title: this.widgetTitle,
-      feature: this.typeId,
+      feature: this.featureId,
       dashboard: this.dashboardId,
       order: 0,
       config: {

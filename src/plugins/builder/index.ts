@@ -1,4 +1,4 @@
-import { autoRegister, selector } from '@/helpers/component-ref';
+import { autoRegister, ref } from '@/helpers/component-ref';
 import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './BuilderWidget.vue';
@@ -7,15 +7,16 @@ import specs from './specs';
 import { builderStore } from './store';
 import { BuilderConfig } from './types';
 
-const feature: WidgetFeature = {
+const feature: WidgetFeature<BuilderConfig> = {
   id: typeName,
   title: 'Brewery Builder',
-  widgetComponent: selector(widget),
+  component: ref(widget),
+  wizard: true,
   widgetSize: {
     cols: 8,
     rows: 8,
   },
-  generateConfig: (): BuilderConfig => ({
+  generateConfig: () => ({
     currentLayoutId: null,
     layoutIds: [],
   }),
@@ -26,9 +27,9 @@ const feature: WidgetFeature = {
 const deprecated: WidgetFeature = {
   id: 'ProcessView',
   title: 'Process View',
-  widgetComponent: () => 'DeprecatedWidget',
+  component: 'DeprecatedWidget',
   widgetSize: { cols: 0, rows: 0 },
-  wizardComponent: null,
+  wizard: false,
 };
 
 export default {
