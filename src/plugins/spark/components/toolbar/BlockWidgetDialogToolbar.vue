@@ -20,7 +20,7 @@ export default class BlockWidgetDialogToolbar extends BlockCrudComponent {
 </script>
 
 <template>
-  <WidgetDialogToolbar :crud="crud" :mode="mode" @update:mode="updateMode">
+  <WidgetDialogToolbar :crud="crud" :mode="mode" @update:mode="updateMode" @title-click="startChangeBlockId">
     <BlockGraph
       v-if="graphModalOpen"
       :id="`graph-full-toolbar--${widget.id}`"

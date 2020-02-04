@@ -15,7 +15,7 @@ export default class Toolbar extends Vue {
   readonly subtitle!: string;
 
   get readonly(): boolean {
-    return this.$listeners.click === undefined;
+    return this.$listeners['title-click'] === undefined;
   }
 }
 </script>
@@ -26,7 +26,7 @@ export default class Toolbar extends Vue {
     <div class="col no-wrap row ellipsis q-px-xs text-h6 items-center">
       <div
         :class="{pointer: !readonly}"
-        @click="$emit('click')"
+        @click="$emit('title-click')"
       >
         {{ title }}
       </div>

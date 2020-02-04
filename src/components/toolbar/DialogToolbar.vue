@@ -9,11 +9,18 @@ export default class DialogToolbar extends Vue {
 </script>
 
 <template>
-  <Toolbar class="q-pa-none" v-bind="$attrs">
+  <Toolbar class="q-pa-none" v-bind="$attrs" v-on="$listeners">
     <slot />
     <template #buttons>
       <slot name="buttons" />
-      <q-btn v-close-popup flat round dense icon="mdi-close-circle" @click="$emit('close')" />
+      <q-btn v-close-popup flat round dense icon="mdi-close-circle" class="close-button" @click="$emit('close')" />
     </template>
   </Toolbar>
 </template>
+
+<style lang="sass">
+.close-button:hover
+  color: $red-6
+  > .q-focus-helper
+    opacity: 0 !important
+</style>
