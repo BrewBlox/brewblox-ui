@@ -170,7 +170,7 @@ export default class DashboardPage extends Vue {
         <q-btn
           v-if="!$dense"
           unelevated
-          stretch
+          round
           icon="mdi-arrow-all"
           :color="widgetEditable ? 'primary' : ''"
           @click="widgetEditable = !widgetEditable"
@@ -179,7 +179,7 @@ export default class DashboardPage extends Vue {
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu stretch>
+        <ActionMenu round>
           <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
             <q-item clickable @click="toggleDefaultDashboard">

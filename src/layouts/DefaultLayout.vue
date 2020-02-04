@@ -57,7 +57,7 @@ export default class DefaultLayout extends Vue {
         </portal-target>
       </template>
       <template #buttons>
-        <portal-target name="toolbar-buttons" class="full-height row" />
+        <portal-target name="toolbar-buttons" class="full-height row q-gutter-x-sm q-pr-xs" />
       </template>
     </LayoutHeader>
     <LayoutFooter />

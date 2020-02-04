@@ -10,7 +10,7 @@ export default class LayoutHeader extends Vue {
 </script>
 
 <template>
-  <q-header bordered class="bg-dark shadow-4">
+  <q-header class="bg-dark shadow-1">
     <q-bar class="bg-transparent q-px-none">
       <q-btn flat round icon="menu" style="font-size: 80%" @click="$emit('menu')" />
       <div v-if="!$dense" class="col-auto" style="font-weight: 500; font-size: 110%">

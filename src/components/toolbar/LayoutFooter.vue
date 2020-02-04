@@ -36,7 +36,7 @@ export default class LayoutFooter extends Vue {
 </script>
 
 <template>
-  <q-footer bordered class="bg-dark shadow-up-4">
+  <q-footer class="bg-dark shadow-up-1">
     <q-bar class="bg-transparent q-px-none">
       <q-space />
       <q-btn flat stretch icon="mdi-bell" :color="logButtonColor" @click="logButtonColor = ''">

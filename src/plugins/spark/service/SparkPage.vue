@@ -386,27 +386,28 @@ export default class SparkPage extends Vue {
       {{ service.title }}
     </portal>
     <portal to="toolbar-buttons">
-      <q-btn-group flat stretch>
+      <q-btn-group rounded outline class="q-pa-xs">
         <q-btn
-          flat
-          stretch
-          :class="{'selected-mode': pageMode === 'List'}"
+          :unelevated="pageMode === 'List'"
+          :outline="pageMode !== 'List'"
+          color="primary"
           icon="mdi-format-list-checkbox"
           @click="pageMode = 'List'"
         >
           <q-tooltip>Show blocks as list</q-tooltip>
         </q-btn>
         <q-btn
-          flat
-          stretch
-          :class="{'selected-mode': pageMode === 'Relations'}"
+          rounded
+          :unelevated="pageMode === 'Relations'"
+          :outline="pageMode !== 'Relations'"
+          color="primary"
           icon="mdi-vector-line"
           @click="pageMode = 'Relations'"
         >
           <q-tooltip>Show blocks as diagram</q-tooltip>
         </q-btn>
       </q-btn-group>
-      <ActionMenu :disable="!isReady || statusNok" stretch>
+      <ActionMenu :disable="!isReady || statusNok" round size="12px">
         <template #actions>
           <ActionItem
             icon="add"
@@ -619,5 +620,5 @@ export default class SparkPage extends Vue {
 
 
 .selected-mode
-  border-bottom: 2px solid $secondary
+  background-color: $secondary
 </style>
