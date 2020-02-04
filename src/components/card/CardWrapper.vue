@@ -22,7 +22,7 @@ export default class CardWrapper extends Vue {
   }
 
   get cardClass(): string {
-    const listed = [`card__${this.context.container} depth-1`];
+    const listed = [`card__${this.context.container} depth-2`];
     if (this.$dense) {
       listed.push('card__dense');
     }

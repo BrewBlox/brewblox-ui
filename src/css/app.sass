@@ -1,40 +1,53 @@
 @import './quasar.variables.sass'
 @import 'quasar/src/css/index.sass'
 
+$widget-border-radius: 4px
+
 .card
   &__Dialog
     width: 800px
     height: 800px
     max-width: 100vw
     max-height: 100vh
+    border-radius: $widget-border-radius
 
   &__Dashboard
     max-width: 100%
     position: relative
+    border-radius: $widget-border-radius
 
 .toolbar
   &__Dialog
-    height: 50px
-    min-height: 50px
+    height: 40px
+    min-height: 40px
     background-color: $secondary
+    color: white
+    border-radius: $widget-border-radius $widget-border-radius 0 0
+    @extend .q-px-xs
 
   &__Dashboard
     height: 40px
     min-height: 40px
     position: relative
+    color: $deep-purple-3
+    border-radius: $widget-border-radius $widget-border-radius 0 0
+    @extend .q-pa-sm
 
 .content
-  width: 100%
-  min-width: 100%
-  max-width: 100%
-
   &__Dialog
-    height: calc(100% - 50px)
+    height: calc(100% - 40px)
     background-color: $dark
+    border-radius: 0 0 $widget-border-radius $widget-border-radius
 
   &__Dashboard
     height: calc(100% - 40px)
     position: relative
+    border-radius: 0 0 $widget-border-radius $widget-border-radius
+
+.card__dense,
+.card__dense .toolbar__Dialog,
+.card__dense .content__Dialog
+  border-radius: 0 0 0 0
 
 .widget
   &-sm

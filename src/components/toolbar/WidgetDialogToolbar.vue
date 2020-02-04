@@ -32,12 +32,12 @@ export default class WidgetDialogToolbar extends CrudComponent {
   <DialogToolbar :title="widget.title" :subtitle="featureTitle">
     <slot />
     <template #buttons>
-      <q-btn v-if="!!mode" :icon="toggleIcon" flat stretch size="md" @click="toggle">
+      <q-btn v-if="!!mode" :icon="toggleIcon" flat dense round @click="toggle">
         <q-tooltip>
           {{ toggleTooltip }}
         </q-tooltip>
       </q-btn>
-      <ActionMenu stretch size="md">
+      <ActionMenu round dense>
         <template #actions>
           <slot name="actions" />
         </template>

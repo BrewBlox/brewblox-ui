@@ -5,6 +5,9 @@ import { Component, Prop } from 'vue-property-decorator';
 @Component
 export default class Toolbar extends Vue {
 
+  @Prop({ type: String, required: false })
+  public readonly icon!: string;
+
   @Prop({ type: String, required: true })
   readonly title!: string;
 
@@ -18,10 +21,11 @@ export default class Toolbar extends Vue {
 </script>
 
 <template>
-  <div class="row q-px-sm q-pt-xs q-gutter-x-sm text-deep-purple-3">
+  <div class="row no-wrap full-height">
+    <q-icon v-if="icon" :name="icon" />
     <div
       :class="[
-        'col-grow ellipsis no-select q-pa-xs text-h6',
+        'col no-wrap row ellipsis no-select q-pa-xs text-h6 items-center',
         {pointer: !readonly}
       ]"
       @click="$emit('click')"
@@ -29,9 +33,10 @@ export default class Toolbar extends Vue {
       <q-item-label>
         {{ title }}
       </q-item-label>
+      <q-space />
       <div
         v-if="!!subtitle"
-        class="no-select q-ml-md subtitle"
+        class="no-select subtitle q-mx-sm col-shrink ellipsis"
       >
         {{ subtitle }}
       </div>
@@ -43,11 +48,8 @@ export default class Toolbar extends Vue {
 
 <style lang="sass" scoped>
 .subtitle
-  opacity: 0.1
-  position: absolute
-  bottom: -0.4em
-  left: 0
+  opacity: 0.8
   font-style: italic
-  font-size: 120%
-  font-weight: bold
+  font-size: 70%
+  font-weight: 300
 </style>
