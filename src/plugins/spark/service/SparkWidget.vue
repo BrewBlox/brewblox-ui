@@ -68,7 +68,7 @@ export default class SparkWidget extends Vue {
       </DialogToolbar>
       <Toolbar v-else :title="serviceId" subtitle="Device info">
         <template #buttons>
-          <q-btn flat dense icon="refresh" @click="fetchAll" />
+          <q-btn flat dense round icon="refresh" @click="fetchAll" />
         </template>
       </Toolbar>
     </template>

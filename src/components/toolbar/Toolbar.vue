@@ -23,20 +23,17 @@ export default class Toolbar extends Vue {
 <template>
   <div class="row no-wrap full-height">
     <q-icon v-if="icon" :name="icon" />
-    <div
-      :class="[
-        'col no-wrap row ellipsis no-select q-pa-xs text-h6 items-center',
-        {pointer: !readonly}
-      ]"
-      @click="$emit('click')"
-    >
-      <q-item-label>
+    <div class="col no-wrap row ellipsis q-px-xs text-h6 items-center">
+      <div
+        :class="{pointer: !readonly}"
+        @click="$emit('click')"
+      >
         {{ title }}
-      </q-item-label>
+      </div>
       <q-space />
       <div
         v-if="!!subtitle"
-        class="no-select subtitle q-mx-sm col-shrink ellipsis"
+        class="subtitle q-mx-sm col-shrink ellipsis"
       >
         {{ subtitle }}
       </div>
