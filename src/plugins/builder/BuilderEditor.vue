@@ -737,6 +737,7 @@ export default class BuilderEditor extends Vue {
             icon="widgets"
             class="col"
             size="md"
+            rounded
           >
             <q-list bordered>
               <q-list>
@@ -757,10 +758,11 @@ export default class BuilderEditor extends Vue {
           :layout="layout"
           :select-layout="selectLayout"
           :save-parts="saveParts"
-          stretch
+          round
+          size="md"
         />
 
-        <q-btn flat stretch icon="mdi-close-circle" size="md" @click="leaveEditor" />
+        <q-btn flat round icon="mdi-close-circle" size="md" @click="leaveEditor" />
       </template>
     </LayoutHeader>
     <LayoutFooter />

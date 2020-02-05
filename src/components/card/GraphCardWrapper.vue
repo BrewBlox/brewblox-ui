@@ -37,7 +37,7 @@ export default class GraphCardWrapper extends Vue {
       <q-tooltip>{{ collapsed ? 'Show Graph' : 'Hide Graph' }}</q-tooltip>
     </q-btn>
     <div v-if="!collapsed" class="col-5 bg-dark">
-      <div class="graph-container">
+      <div class="graph-container fit">
         <slot name="graph" />
       </div>
     </div>
@@ -70,9 +70,7 @@ export default class GraphCardWrapper extends Vue {
   background-color: rgba(255, 255, 255, 0.2)
 
 .graph-container
-  height: calc(100% - 4px)
-  width: calc(100% - 4px)
   border: 2px solid gray
-  border-radius: 2px
+  border-radius: 4px
 
 </style>

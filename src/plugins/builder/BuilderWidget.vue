@@ -173,7 +173,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
   <CardWrapper no-scroll v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud">
-        <ActionMenu icon="mdi-format-list-bulleted" :dense="!inDialog" :stretch="inDialog">
+        <ActionMenu icon="mdi-format-list-bulleted" dense round>
           <template #menus>
             <q-list>
               <q-select

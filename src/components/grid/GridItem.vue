@@ -273,7 +273,7 @@ export default class GridItem extends Vue {
 </script>
 
 <template>
-  <div ref="container" :style="style" class="grid-item depth-1">
+  <div ref="container" :style="style" class="grid-item">
     <!-- Actual item -->
     <slot />
     <!-- Drag effects -->

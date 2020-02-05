@@ -25,19 +25,28 @@ export default class WidgetDialogToolbar extends CrudComponent {
   public toggle(): void {
     this.$emit('update:mode', this.mode === 'Basic' ? 'Full' : 'Basic');
   }
+
+  public onTitleClick(): void {
+    if (this.$listeners['title-click'] !== undefined) {
+      this.$emit('title-click');
+    }
+    else {
+      this.startChangeWidgetTitle();
+    }
+  }
 }
 </script>
 
 <template>
-  <DialogToolbar :title="widget.title" :subtitle="featureTitle">
+  <DialogToolbar :title="widget.title" :subtitle="featureTitle" @title-click="onTitleClick">
     <slot />
     <template #buttons>
-      <q-btn v-if="!!mode" :icon="toggleIcon" flat stretch size="md" @click="toggle">
+      <q-btn v-if="!!mode" :icon="toggleIcon" flat dense round @click="toggle">
         <q-tooltip>
           {{ toggleTooltip }}
         </q-tooltip>
       </q-btn>
-      <ActionMenu stretch size="md">
+      <ActionMenu round dense>
         <template #actions>
           <slot name="actions" />
         </template>

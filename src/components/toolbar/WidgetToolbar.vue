@@ -26,9 +26,9 @@ export default class WidgetToolbar extends CrudComponent {
     this.$emit('update:mode', this.mode === 'Basic' ? 'Full' : 'Basic');
   }
 
-  public onToolbarClick(): void {
-    if (this.$listeners.click !== undefined) {
-      this.$emit('click');
+  public onTitleClick(): void {
+    if (this.$listeners['title-click'] !== undefined) {
+      this.$emit('title-click');
     }
     else {
       this.startChangeWidgetTitle();
@@ -38,20 +38,20 @@ export default class WidgetToolbar extends CrudComponent {
 </script>
 
 <template>
-  <Toolbar :title="widget.title" :subtitle="featureTitle" @click="onToolbarClick">
+  <Toolbar :title="widget.title" :subtitle="featureTitle" @title-click="onTitleClick">
     <slot />
     <template #buttons>
-      <q-btn v-if="!!mode" flat dense :icon="toggleIcon" @click="toggle">
+      <q-btn v-if="!!mode" flat dense round :icon="toggleIcon" @click="toggle">
         <q-tooltip>
           {{ toggleTooltip }}
         </q-tooltip>
       </q-btn>
-      <q-btn flat icon="mdi-launch" dense @click="showDialog">
+      <q-btn flat icon="mdi-launch" dense round @click="showDialog">
         <q-tooltip>
           Show in dialog
         </q-tooltip>
       </q-btn>
-      <ActionMenu dense>
+      <ActionMenu dense round>
         <template #actions>
           <slot name="actions" />
         </template>
