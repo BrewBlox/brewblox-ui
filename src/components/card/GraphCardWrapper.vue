@@ -20,7 +20,7 @@ export default class GraphCardWrapper extends Vue {
 
 <template>
   <div v-if="show && $q.screen.gt.md" class="row no-wrap justify-center combined-wrapper">
-    <CardWrapper class="col-5 bg-dark" v-bind="$attrs">
+    <CardWrapper class="col-5" v-bind="$attrs">
       <template #toolbar>
         <slot name="toolbar" />
       </template>
@@ -30,7 +30,7 @@ export default class GraphCardWrapper extends Vue {
     <q-btn
       flat
       dense
-      class="col-auto graph-tab show q-py-md q-mr-sm bg-dark"
+      class="col-auto graph-tab show q-py-md q-mr-sm"
       :icon="collapsed ? 'mdi-chart-line' : 'mdi-arrow-collapse-left'"
       @click="collapsed = !collapsed"
     >
@@ -56,6 +56,7 @@ export default class GraphCardWrapper extends Vue {
   max-height: 90vh
   width: 90vw
   min-width: 90vw
+  box-shadow: none
 
 .tab-line
   background-color: $indigo-4
