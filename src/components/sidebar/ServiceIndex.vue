@@ -126,7 +126,7 @@ export default class ServiceIndex extends Vue {
         </q-item-section>
         <template v-if="editing">
           <q-item-section avatar>
-            <q-icon name="mdi-chevron-down" />
+            <q-icon name="mdi-dots-vertical" />
           </q-item-section>
           <q-menu :offset="[-50, 0]">
             <q-list bordered>
