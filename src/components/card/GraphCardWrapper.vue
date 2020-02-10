@@ -26,11 +26,9 @@ export default class GraphCardWrapper extends Vue {
       </template>
       <slot />
     </CardWrapper>
-    <div class="col-auto tab-line self-center z-top" />
     <q-btn
-      flat
       dense
-      class="col-auto graph-tab show q-py-md q-mr-sm"
+      :class="['col-auto graph-tab show',{collapsed}]"
       :icon="collapsed ? 'mdi-chart-line' : 'mdi-arrow-collapse-left'"
       @click="collapsed = !collapsed"
     >
@@ -58,20 +56,18 @@ export default class GraphCardWrapper extends Vue {
   min-width: 90vw
   box-shadow: none
 
-.tab-line
-  background-color: $indigo-4
-  opacity: 0.8
-  width: 2px
-  height: 25%
-
 .graph-tab
-  margin-left: -1px
-  border: 2px solid $indigo-4
-  border-left: 0
-  background-color: rgba(255, 255, 255, 0.2)
+  background-color: $dialog-toolbar-color
+  padding: 30px 2px
+  border-radius: 5px 0 0 5px
+  margin-left: 5px
+
+.graph-tab.collapsed
+  border-radius: 0 5px 5px 0
+  margin-left: 0
 
 .graph-container
-  border: 2px solid gray
   border-radius: 4px
+  border: 1px solid $blue-grey-9
 
 </style>
