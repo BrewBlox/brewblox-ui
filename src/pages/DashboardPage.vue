@@ -151,7 +151,7 @@ export default class DashboardPage extends Vue {
       parent: this,
       component: 'WizardDialog',
       dashboardId: this.dashboardId,
-      initialComponent: 'WidgetWizardPicker',
+      initialWizard: 'WidgetWizardPicker',
     });
   }
 }

@@ -7,21 +7,30 @@ import DialogBase from '@/components/DialogBase';
 export default class WizardDialog extends DialogBase {
   dialogTitle: string | null = null;
   wizardComponent: string | null = null;
+  wizardProps: any = {};
 
   @Prop({ type: String, required: false })
   readonly dashboardId!: string;
 
   @Prop({ type: String, required: false })
-  readonly initialComponent!: string;
+  readonly initialWizard!: string;
+
+  @Prop({ type: Object, default: () => ({}) })
+  public readonly initialProps!: any;
+
+  mounted(): void {
+    this.reset();
+    this.pickWizard(this.initialWizard, this.initialProps);
+  }
 
   reset(): void {
     this.wizardComponent = null;
     this.dialogTitle = 'Wizardry';
   }
 
-  mounted(): void {
-    this.reset();
-    this.wizardComponent = this.initialComponent;
+  pickWizard(component: string, props: any = {}) {
+    this.wizardComponent = component;
+    this.wizardProps = props;
   }
 }
 </script>
@@ -36,6 +45,7 @@ export default class WizardDialog extends DialogBase {
       <component
         :is="wizardComponent"
         v-if="wizardComponent"
+        v-bind="wizardProps"
         @title="v => dialogTitle = v"
         @back="reset"
         @close="onDialogHide"
@@ -43,7 +53,7 @@ export default class WizardDialog extends DialogBase {
 
       <template v-else>
         <q-card-section>
-          <q-item clickable @click="wizardComponent = 'QuickStartWizardPicker'">
+          <q-item clickable @click="pickWizard('QuickStartWizardPicker')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Quick Start
@@ -65,7 +75,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="wizardComponent = 'DashboardWizard'">
+          <q-item clickable @click="pickWizard('DashboardWizard')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Dashboard
@@ -83,7 +93,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="wizardComponent = 'WidgetWizardPicker'">
+          <q-item clickable @click="pickWizard('WidgetWizardPicker')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Widget
@@ -108,7 +118,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="wizardComponent = 'ImportWizard'">
+          <q-item clickable @click="pickWizard('ImportWizard')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Import Widget
@@ -128,22 +138,18 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="wizardComponent = 'ServiceWizardPicker'">
+          <q-item class="darkish text-italic" style="cursor: not-allowed">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
-                New service
+                Services
               </q-item-label>
               <q-item-label caption>
-                Add a service to the UI
+                (No longer a wizard)
               </q-item-label>
             </q-item-section>
             <q-item-section>
-              <p>
-                If you have multiple Brewblox Sparks, you will have a separate service to connect each one.
-              </p>
-              <p>
-                You should add them to the UI here, after you have added them in your docker-compose file.
-              </p>
+              Discovered services automatically appear in the sidebar.
+              Click on them to add them as UI service.
             </q-item-section>
           </q-item>
         </q-card-section>

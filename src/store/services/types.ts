@@ -31,3 +31,22 @@ export interface Service<ConfigT = any> extends StoreObject {
    */
   config: ConfigT;
 }
+
+
+/**
+ * Pending / not yet configured service.
+ * Used for suggesting services to users.
+ * Stubs will be automatically removed whenever a service with the same ID is added.
+ */
+export interface ServiceStub {
+  /**
+   * Unique ID. Must be URL-safe, as it is used in routing.
+   * Typically matches the name of the corresponding backend service.
+   */
+  id: string;
+
+  /**
+   * Foreign key to `ServiceFeature.id`
+   */
+  type: string;
+}

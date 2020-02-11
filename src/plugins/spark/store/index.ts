@@ -4,7 +4,7 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 
 import { mutate, objReducer } from '@/helpers/functional';
 import { deserialize } from '@/helpers/units/parseObject';
-import { EventMessage } from '@/plugins/eventbus';
+import { EventbusMessage } from '@/plugins/eventbus';
 import store from '@/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
@@ -334,7 +334,7 @@ export class SparkModule extends VuexModule {
     if (this.sparkCache[serviceId]) {
       throw new Error(`Service '${serviceId}' already exists`);
     }
-    const empty: SparkServiceState = {
+    const state: SparkServiceState = {
       blocks: {},
       units: {},
       unitAlternatives: {},
@@ -343,22 +343,26 @@ export class SparkModule extends VuexModule {
       status: null,
       lastUpdate: null,
     };
-    this.commitService([serviceId, empty]);
+    this.commitService([serviceId, state]);
 
-    Vue.$eventbus.addListener(serviceId, (msg: EventMessage) => {
-      const blocks: Block[] = msg.data
-        .map(deserialize)
-        .map((block: DataBlock) => asBlock(block, serviceId));
-      this.commitAllBlocks([serviceId, blocks]);
+    Vue.$eventbus.addListener({
+      id: `Spark__${serviceId}`,
+      filter: (key, type) => key === serviceId && type === sparkType,
+      onmessage: (msg: EventbusMessage) => {
+        const blocks: Block[] = msg.data
+          .map(deserialize)
+          .map((block: DataBlock) => asBlock(block, serviceId));
+        this.commitAllBlocks([serviceId, blocks]);
+      },
     });
 
-    await this.fetchAll(serviceId)
+    await this.fetchConfig(serviceId)
       .catch(() => { });
   }
 
   @Action({ rawError })
   public async removeService(serviceId: string): Promise<void> {
-    Vue.$eventbus.removeListener(serviceId);
+    Vue.$eventbus.removeListener(`Spark__${serviceId}`);
     this.commitRemoveService(serviceId);
   }
 
@@ -466,7 +470,7 @@ export class SparkModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchAll(serviceId: string): Promise<void> {
+  public async fetchConfig(serviceId: string): Promise<boolean> {
     const status = await this.fetchServiceStatus(serviceId);
     if (status.synchronize) {
       await Promise.all([
@@ -475,8 +479,16 @@ export class SparkModule extends VuexModule {
         this.fetchUnitAlternatives(serviceId),
         this.fetchCompatibleTypes(serviceId),
         this.fetchDiscoveredBlocks(serviceId),
-        this.fetchBlocks(serviceId),
       ]);
+    }
+    return status.synchronize;
+  }
+
+
+  @Action({ rawError })
+  public async fetchAll(serviceId: string): Promise<void> {
+    if (await this.fetchConfig(serviceId)) {
+      this.fetchBlocks(serviceId);
     }
   }
 

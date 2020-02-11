@@ -39,7 +39,7 @@ export default class DashboardIndex extends Vue {
     createDialog({
       parent: this,
       component: 'WizardDialog',
-      initialComponent: 'DashboardWizard',
+      initialWizard: 'DashboardWizard',
     });
   }
 

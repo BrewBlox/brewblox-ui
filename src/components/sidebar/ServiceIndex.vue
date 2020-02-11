@@ -2,14 +2,22 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
-import notify from '@/helpers/notify';
-import { Service, serviceStore } from '@/store/services';
+import { startChangeServiceTitle, startCreateService, startRemoveService } from '@/helpers/services';
+import { featureStore, ServiceFeature } from '@/store/features';
+import { Service, serviceStore, ServiceStub } from '@/store/services';;
 
+interface ServiceSuggestion {
+  stub: ServiceStub;
+  feature: ServiceFeature;
+}
 
 @Component
 export default class ServiceIndex extends Vue {
+  startChangeServiceTitle = startChangeServiceTitle;
+  startCreateService = startCreateService;
+  startRemoveService = startRemoveService;
+
   dragging = false;
 
   @Prop({ type: Boolean, required: true })
@@ -31,121 +39,105 @@ export default class ServiceIndex extends Vue {
     serviceStore.updateServiceOrder(services.map(service => service.id));
   }
 
-  startWizard(): void {
-    createDialog({
-      parent: this,
-      component: 'WizardDialog',
-      initialComponent: 'ServiceWizardPicker',
-    });
-  }
-
-  removeService(service: Service): void {
-    createDialog({
-      parent: this,
-      title: 'Remove service',
-      message: `Are you sure you want to remove ${service.title}?`,
-      ok: 'Confirm',
-      cancel: 'Cancel',
-    })
-      .onOk(() => serviceStore.removeService(service));
-  }
-
-  changeServiceTitle(service: Service): void {
-    createDialog({
-      parent: this,
-      title: 'Change service Title',
-      message: "Change your service's display name",
-      cancel: true,
-      prompt: {
-        model: service.title,
-        type: 'text',
-      },
-    })
-      .onOk(async newTitle => {
-        const oldTitle = service.title;
-        if (!newTitle || oldTitle === newTitle) {
-          return;
-        }
-
-        await serviceStore.saveService({ ...service, title: newTitle });
-        notify.done(`Renamed service '${oldTitle}' to '${newTitle}'`);
+  get suggestions(): ServiceSuggestion[] {
+    return serviceStore.stubValues
+      .filter(stub => !!featureStore.services[stub.type])
+      .map(stub => {
+        const feature = featureStore.services[stub.type];
+        return { stub, feature };
       });
   }
+
 }
 </script>
 
 <template>
-  <div>
-    <q-item class="q-pb-none">
-      <q-item-section>
-        <q-item-section class="text-bold">
-          Services
+  <draggable
+    v-model="services"
+    :disabled="$dense || !editing"
+    @start="dragging=true"
+    @end="dragging=false"
+  >
+    <template #header>
+      <q-item class="q-pb-none">
+        <q-item-section>
+          <q-item-section class="text-bold">
+            Services
+          </q-item-section>
         </q-item-section>
+        <q-item-section class="col-auto">
+          <q-btn
+            :disable="services.length === 0"
+            :icon="editing ? 'mdi-pencil-off' : 'mdi-pencil'"
+            round
+            flat
+            size="sm"
+            @click="editing = !editing"
+          >
+            <q-tooltip>
+              {{ editing ? 'Stop editing' : 'Edit services' }}
+            </q-tooltip>
+          </q-btn>
+        </q-item-section>
+      </q-item>
+    </template>
+    <q-item
+      v-for="service in services"
+      :key="service.id"
+      :to="editing ? undefined : `/service/${service.id}`"
+      :inset-level="0.2"
+      :class="['q-pb-sm', {hoverable: editing && !dragging, bordered: editing}]"
+      style="min-height: 0px"
+    >
+      <q-item-section :class="['ellipsis', {'text-italic': editing}]">
+        {{ service.title }}
       </q-item-section>
-      <q-item-section class="col-auto">
-        <q-btn
-          icon="add"
-          round
-          flat
-          size="sm"
-          @click="startWizard"
-        />
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-btn
-          :disable="services.length === 0"
-          :icon="editing ? 'mdi-pencil-off' : 'mdi-pencil'"
-          round
-          flat
-          size="sm"
-          @click="editing = !editing"
-        >
-          <q-tooltip>
-            {{ editing ? 'Stop editing' : 'Edit services' }}
-          </q-tooltip>
-        </q-btn>
-      </q-item-section>
+      <template v-if="editing">
+        <q-item-section avatar>
+          <q-icon name="mdi-dots-vertical" />
+        </q-item-section>
+        <q-menu :offset="[-50, 0]">
+          <q-list bordered>
+            <ActionItem
+              icon="edit"
+              label="Change service title"
+              @click="startChangeServiceTitle(service)"
+            />
+            <ActionItem
+              icon="delete"
+              label="Remove service"
+              @click="startRemoveService(service)"
+            />
+          </q-list>
+        </q-menu>
+      </template>
     </q-item>
 
-    <draggable
-      v-model="services"
-      :disabled="$dense || !editing"
-      @start="dragging=true"
-      @end="dragging=false"
-    >
+    <template #footer>
       <q-item
-        v-for="service in services"
-        :key="service.id"
-        :to="editing ? undefined : `/service/${service.id}`"
+        v-for="({stub, feature}) in suggestions"
+        :key="stub.id"
         :inset-level="0.2"
-        :class="{hoverable: editing && !dragging,bordered: editing, 'q-pb-sm': true}"
+        class="q-pb-sm darkish"
         style="min-height: 0px"
+        clickable
+        @click="startCreateService(stub, feature)"
       >
-        <q-item-section :class="{'text-italic': editing, ellipsis: true}">
-          {{ service.title }}
+        <q-item-section class="col-auto">
+          <q-icon name="add" size="xs" />
         </q-item-section>
-        <template v-if="editing">
-          <q-item-section avatar>
-            <q-icon name="mdi-dots-vertical" />
-          </q-item-section>
-          <q-menu :offset="[-50, 0]">
-            <q-list bordered>
-              <ActionItem
-                icon="edit"
-                label="Change service title"
-                @click="changeServiceTitle(service)"
-              />
-              <ActionItem
-                icon="delete"
-                label="Remove service"
-                @click="removeService(service)"
-              />
-            </q-list>
-          </q-menu>
-        </template>
+        <q-item-section class="ellipsis">
+          {{ stub.id }}
+        </q-item-section>
+        <q-item-section class="col-auto text-grey text-italic">
+          Click to add
+        </q-item-section>
+        <q-tooltip>
+          Click to create UI service for {{ feature.title }} '{{ stub.id }}'
+        </q-tooltip>
       </q-item>
-    </draggable>
-  </div>
+    </template>
+  </draggable>
 </template>
 
 <style scoped>

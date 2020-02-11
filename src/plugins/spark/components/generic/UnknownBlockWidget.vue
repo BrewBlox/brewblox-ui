@@ -46,9 +46,8 @@ export default class UnknownBlockWidget extends WidgetBase {
     };
   }
 
-  fetchAll(): void {
-    sparkStore.fetchServiceStatus(this.serviceId);
-    sparkStore.fetchBlocks(this.serviceId);
+  fetch(): void {
+    sparkStore.fetchConfig(this.serviceId);
   }
 }
 
@@ -62,7 +61,7 @@ export default class UnknownBlockWidget extends WidgetBase {
           :disable="!reason.temporary"
           icon="refresh"
           label="Refresh"
-          @click="fetchAll"
+          @click="fetch"
         />
       </template>
     </component>

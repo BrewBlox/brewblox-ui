@@ -6,7 +6,7 @@ import store from '@/store';
 import { featureStore } from '@/store/features';
 
 import api from './api';
-import { Service } from './types';
+import { Service, ServiceStub } from './types';
 
 export * from './types';
 
@@ -22,6 +22,7 @@ const onRemoveService = (service: Service): Promise<void> =>
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
   public services: Mapped<Service> = {};
+  public stubs: Mapped<ServiceStub> = {};
 
   public get serviceIds(): string[] {
     return Object.keys(this.services);
@@ -43,14 +44,27 @@ export class ServiceModule extends VuexModule {
     return id => !!this.services[id];
   }
 
+  public get stubIds(): string[] {
+    return Object.keys(this.stubs);
+  }
+
+  public get stubValues(): ServiceStub[] {
+    return Object.values(this.stubs);
+  }
+
   @Mutation
   public commitService(service: Service): void {
     Vue.set(this.services, service.id, { ...service });
+    Vue.delete(this.stubs, service.id);
   }
 
   @Mutation
   public commitAllServices(services: Service[]): void {
     this.services = services.reduce(objReducer('id'), {});
+    const ids = services.map(svc => svc.id);
+    this.stubs = Object.values(this.stubs)
+      .filter(s => !ids.includes(s.id))
+      .reduce(objReducer('id'), {});
   }
 
   @Mutation
@@ -58,11 +72,27 @@ export class ServiceModule extends VuexModule {
     Vue.delete(this.services, service.id);
   }
 
+  @Mutation
+  public commitStub(stub: ServiceStub): void {
+    Vue.set(this.stubs, stub.id, { ...stub });
+  }
+
+  @Mutation
+  public commitRemoveStub(stub: HasId): void {
+    Vue.delete(this.stubs, stub.id);
+  }
+
   @Action({ rawError })
   public async createService(service: Service): Promise<void> {
     const created = await api.create(service);
     this.commitService(created);
     await onStartService(created);
+  }
+
+  @Action({ rawError })
+  public async appendService(service: Service): Promise<void> {
+    const order = this.serviceValues.length + 1;
+    await this.createService({ ...service, order });
   }
 
   @Action({ rawError })
@@ -83,6 +113,13 @@ export class ServiceModule extends VuexModule {
         const service = await api.persist({ ...this.services[id], order: idx + 1 });
         this.commitService(service);
       }));
+  }
+
+  @Action({ rawError })
+  public async createServiceStub(stub: ServiceStub): Promise<void> {
+    if (!this.services[stub.id]) {
+      this.commitStub(stub);
+    }
   }
 
   @Action({ rawError })
