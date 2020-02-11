@@ -1,17 +1,24 @@
 import isString from 'lodash/isString';
+import VueRouter from 'vue-router';
 
 import { createDialog } from '@/helpers/dialog';
 import notify from '@/helpers/notify';
-import router from '@/router';
-import { ServiceFeature } from '@/store/features';
+import { featureStore } from '@/store/features';
 import { Service, serviceStore, ServiceStub } from '@/store/services';
 
 
-export async function startCreateService(stub: ServiceStub, feature: ServiceFeature): Promise<void> {
+export async function startCreateService(stub: ServiceStub, router: VueRouter): Promise<void> {
+  const feature = featureStore.services[stub.type];
+  if (feature === undefined) {
+    notify.error(`Unknown service type '${stub.type}'`);
+    return;
+  }
   if (serviceStore.serviceIds.includes(stub.id)) {
     notify.error(`Service '${stub.id}' already exists`);
+    return;
   }
-  else if (isString(feature.wizard)) {
+
+  if (isString(feature.wizard)) {
     createDialog({
       component: 'WizardDialog',
       initialWizard: feature.wizard,
@@ -48,7 +55,7 @@ export function startChangeServiceTitle(service: Service): void {
     });
 }
 
-export function startRemoveService(service: Service): void {
+export function startRemoveService(service: Service, router: VueRouter): void {
   createDialog({
     title: 'Remove service',
     message: `Are you sure you want to remove ${service.title}?`,

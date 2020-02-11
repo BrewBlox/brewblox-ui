@@ -285,6 +285,7 @@ export class SparkModule extends VuexModule {
     const service = this.sparkCache[serviceId];
     Vue.set(service, 'blocks', []);
     Vue.set(service, 'lastUpdate', null);
+    serviceStore.updateStatus({ id: serviceId, connection: 'Disconnected' });
   }
 
   @Mutation
@@ -353,10 +354,11 @@ export class SparkModule extends VuexModule {
           .map(deserialize)
           .map((block: DataBlock) => asBlock(block, serviceId));
         this.commitAllBlocks([serviceId, blocks]);
+        serviceStore.updateStatus({ id: serviceId, connection: 'Connected' });
       },
     });
 
-    await this.fetchConfig(serviceId)
+    await this.fetchAll(serviceId)
       .catch(() => { });
   }
 
@@ -430,6 +432,12 @@ export class SparkModule extends VuexModule {
   public async fetchServiceStatus(serviceId: string): Promise<SystemStatus> {
     const status = await api.fetchSystemStatus(serviceId);
     this.commitStatus([serviceId, status]);
+    const connection = status.error
+      ? 'Disconnected'
+      : status.synchronize
+        ? 'Connected'
+        : 'Connecting';
+    serviceStore.updateStatus({ id: serviceId, connection });
     return status;
   }
 
@@ -470,7 +478,7 @@ export class SparkModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchConfig(serviceId: string): Promise<boolean> {
+  public async fetchAll(serviceId: string): Promise<boolean> {
     const status = await this.fetchServiceStatus(serviceId);
     if (status.synchronize) {
       await Promise.all([
@@ -479,17 +487,10 @@ export class SparkModule extends VuexModule {
         this.fetchUnitAlternatives(serviceId),
         this.fetchCompatibleTypes(serviceId),
         this.fetchDiscoveredBlocks(serviceId),
+        this.fetchBlocks(serviceId),
       ]);
     }
     return status.synchronize;
-  }
-
-
-  @Action({ rawError })
-  public async fetchAll(serviceId: string): Promise<void> {
-    if (await this.fetchConfig(serviceId)) {
-      this.fetchBlocks(serviceId);
-    }
   }
 
   @Action({ rawError })

@@ -6,7 +6,7 @@ import store from '@/store';
 import { featureStore } from '@/store/features';
 
 import api from './api';
-import { Service, ServiceStub } from './types';
+import { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
 
@@ -23,6 +23,16 @@ const onRemoveService = (service: Service): Promise<void> =>
 export class ServiceModule extends VuexModule {
   public services: Mapped<Service> = {};
   public stubs: Mapped<ServiceStub> = {};
+  private _statuses: Mapped<ServiceStatus> = {};
+
+  public get statuses(): Mapped<ServiceStatus> {
+    const retv: Mapped<ServiceStatus> = {};
+    Object.values(this.services)
+      .forEach(service => {
+        retv[service.id] = this._statuses[service.id] ?? { id: service.id, connection: 'Unknown' };
+      });
+    return retv;
+  }
 
   public get serviceIds(): string[] {
     return Object.keys(this.services);
@@ -82,6 +92,11 @@ export class ServiceModule extends VuexModule {
     Vue.delete(this.stubs, stub.id);
   }
 
+  @Mutation
+  public commitStatus(status: ServiceStatus): void {
+    Vue.set(this._statuses, status.id, { ...status });
+  }
+
   @Action({ rawError })
   public async createService(service: Service): Promise<void> {
     const created = await api.create(service);
@@ -102,8 +117,8 @@ export class ServiceModule extends VuexModule {
 
   @Action({ rawError })
   public async removeService(service: Service): Promise<void> {
-    await onRemoveService(service);
     this.commitRemoveService(await api.remove(service));
+    await onRemoveService(service);
   }
 
   @Action({ rawError })
@@ -119,6 +134,14 @@ export class ServiceModule extends VuexModule {
   public async createServiceStub(stub: ServiceStub): Promise<void> {
     if (!this.services[stub.id]) {
       this.commitStub(stub);
+    }
+  }
+
+  @Action({ rawError })
+  public async updateStatus(status: ServiceStatus): Promise<void> {
+    const current = this.statuses[status.id];
+    if (status.connection !== current?.connection) {
+      this.commitStatus(status);
     }
   }
 

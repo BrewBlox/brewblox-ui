@@ -42,6 +42,7 @@ export interface ServiceStub {
   /**
    * Unique ID. Must be URL-safe, as it is used in routing.
    * Typically matches the name of the corresponding backend service.
+   * Used to seed the ID of a created Service.
    */
   id: string;
 
@@ -49,4 +50,21 @@ export interface ServiceStub {
    * Foreign key to `ServiceFeature.id`
    */
   type: string;
+}
+
+
+/**
+ * Volatile status info for services.
+ * Used to provide feedback to users on connection state.
+ */
+export interface ServiceStatus {
+  /**
+   * Unique ID. Must match that of existing service.
+   */
+  id: string;
+
+  /**
+   * Current service connection status.
+   */
+  connection: 'Unknown' | 'Disconnected' | 'Connecting' | 'Connected';
 }
