@@ -3,9 +3,11 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { shortDateString } from '@/helpers/functional';
+import { startChangeServiceTitle } from '@/helpers/services';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
+import { Service, serviceStore } from '@/store/services';
 
 import { blockTypes, SysInfoBlock, TicksBlock, WiFiSettingsBlock } from '../block-types';
 import { isReady } from './getters';
@@ -23,8 +25,12 @@ export default class SparkWidget extends Vue {
     return this.context.container === 'Dialog';
   }
 
-  get lastUpdate(): string {
-    return shortDateString(sparkStore.lastUpdate(this.serviceId), 'Unknown');
+  get service(): Service {
+    return serviceStore.serviceById(this.serviceId);
+  }
+
+  get lastBlocks(): string {
+    return shortDateString(sparkStore.lastBlocks(this.serviceId), 'Unknown');
   }
 
   sysBlock<T extends Block>(blockType: string): T {
@@ -55,18 +61,32 @@ export default class SparkWidget extends Vue {
   fetchAll(): void {
     sparkStore.fetchAll(this.serviceId);
   }
+
+  changeTitle(): void {
+    startChangeServiceTitle(this.service);
+  }
 }
 </script>
 
 <template>
   <CardWrapper v-if="ready" v-bind="{context}">
     <template #toolbar>
-      <DialogToolbar v-if="inDialog" :title="serviceId" subtitle="Device info">
+      <DialogToolbar
+        v-if="inDialog"
+        :title="service.title"
+        subtitle="Device info"
+        @title-click="changeTitle"
+      >
         <template #buttons>
           <q-btn flat round icon="refresh" @click="fetchAll" />
         </template>
       </DialogToolbar>
-      <Toolbar v-else :title="serviceId" subtitle="Device info">
+      <Toolbar
+        v-else
+        :title="service.title"
+        subtitle="Device info"
+        @title-click="changeTitle"
+      >
         <template #buttons>
           <q-btn flat dense round icon="refresh" @click="fetchAll" />
         </template>
@@ -87,14 +107,17 @@ export default class SparkWidget extends Vue {
         <LabeledField label="Controller uptime" class="col-lg-5 col-11">
           {{ ticks.data.millisSinceBoot | duration }}
         </LabeledField>
-        <LabeledField label="IP address" class="col-lg-5 col-11">
-          {{ wifi.data.ip }}
+        <LabeledField label="Service ID" class="col-lg-5 col-11">
+          {{ serviceId }}
         </LabeledField>
         <LabeledField label="Controller ID" class="col-lg-5 col-11" tag-style="word-wrap: break-word;">
           {{ sysInfo.data.deviceId }}
         </LabeledField>
+        <LabeledField label="IP address" class="col-lg-5 col-11">
+          {{ wifi.data.ip }}
+        </LabeledField>
         <LabeledField label="Last blocks update" class="col-lg-5 col-11">
-          {{ lastUpdate }}
+          {{ lastBlocks }}
         </LabeledField>
       </div>
     </div>

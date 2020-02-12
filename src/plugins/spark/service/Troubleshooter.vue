@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { sparkStore } from '@/plugins/spark/store';
-import { SystemStatus } from '@/plugins/spark/types';
+import { SparkStatus } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
 
 @Component
@@ -17,8 +17,12 @@ export default class Troubleshooter extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  get status(): SystemStatus | null {
+  get status(): SparkStatus | null {
     return sparkStore.status(this.serviceId);
+  }
+
+  get lastStatus(): string {
+    return sparkStore.lastStatus(this.serviceId)?.toLocaleString() ?? 'Unknown';
   }
 
   get textAvailable(): string {
@@ -58,8 +62,7 @@ export default class Troubleshooter extends Vue {
   }
 
   refresh(): void {
-    sparkStore.fetchServiceStatus(this.serviceId)
-      .catch(() => { });
+    sparkStore.fetchAll(this.serviceId);
   }
 
   iconProps(val: boolean): Mapped<any> {
@@ -98,7 +101,7 @@ export default class Troubleshooter extends Vue {
         tag="big"
         class="col-grow"
       >
-        {{ status.checkedAt.toLocaleString() }}
+        {{ lastStatus }}
       </LabeledField>
 
       <div class="col-break" />

@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
@@ -6,7 +7,7 @@ import store from '@/store';
 import { featureStore } from '@/store/features';
 
 import api from './api';
-import { Service } from './types';
+import { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
 
@@ -22,6 +23,8 @@ const onRemoveService = (service: Service): Promise<void> =>
 @Module({ store, namespaced: true, dynamic: true, name: 'services' })
 export class ServiceModule extends VuexModule {
   public services: Mapped<Service> = {};
+  public stubs: Mapped<ServiceStub> = {};
+  public statuses: Mapped<ServiceStatus> = {};
 
   public get serviceIds(): string[] {
     return Object.keys(this.services);
@@ -43,19 +46,49 @@ export class ServiceModule extends VuexModule {
     return id => !!this.services[id];
   }
 
+  public get stubIds(): string[] {
+    return Object.keys(this.stubs);
+  }
+
+  public get stubValues(): ServiceStub[] {
+    return Object.values(this.stubs);
+  }
+
   @Mutation
   public commitService(service: Service): void {
     Vue.set(this.services, service.id, { ...service });
+    Vue.delete(this.stubs, service.id);
   }
 
   @Mutation
   public commitAllServices(services: Service[]): void {
+    const ids = services.map(svc => svc.id);
     this.services = services.reduce(objReducer('id'), {});
+    this.stubs = Object.values(this.stubs)
+      .filter(s => !ids.includes(s.id))
+      .reduce(objReducer('id'), {});
   }
 
   @Mutation
   public commitRemoveService(service: Service): void {
     Vue.delete(this.services, service.id);
+  }
+
+  @Mutation
+  public commitStub(stub: ServiceStub): void {
+    if (!this.services[stub.id]) {
+      Vue.set(this.stubs, stub.id, { ...stub });
+    }
+  }
+
+  @Mutation
+  public commitRemoveStub(stub: HasId): void {
+    Vue.delete(this.stubs, stub.id);
+  }
+
+  @Mutation
+  public commitStatus(status: ServiceStatus): void {
+    Vue.set(this.statuses, status.id, { ...status });
   }
 
   @Action({ rawError })
@@ -66,14 +99,20 @@ export class ServiceModule extends VuexModule {
   }
 
   @Action({ rawError })
+  public async appendService(service: Service): Promise<void> {
+    const order = this.serviceValues.length + 1;
+    await this.createService({ ...service, order });
+  }
+
+  @Action({ rawError })
   public async saveService(service: Service): Promise<void> {
     this.commitService(await api.persist(service));
   }
 
   @Action({ rawError })
   public async removeService(service: Service): Promise<void> {
-    await onRemoveService(service);
     this.commitRemoveService(await api.remove(service));
+    await onRemoveService(service);
   }
 
   @Action({ rawError })
@@ -83,6 +122,19 @@ export class ServiceModule extends VuexModule {
         const service = await api.persist({ ...this.services[id], order: idx + 1 });
         this.commitService(service);
       }));
+  }
+
+  @Action({ rawError })
+  public async createStub(stub: ServiceStub): Promise<void> {
+    this.commitStub(stub);
+  }
+
+  @Action({ rawError })
+  public async updateStatus(status: ServiceStatus): Promise<void> {
+    const current = this.statuses[status.id];
+    if (!isEqual(current, status)) {
+      this.commitStatus(status);
+    }
   }
 
   @Action({ rawError })

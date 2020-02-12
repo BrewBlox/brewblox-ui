@@ -34,3 +34,7 @@ interface SelectOption {
 }
 
 type Mapped<T> = Record<string, T>;
+
+interface HasId {
+  id: string;
+}

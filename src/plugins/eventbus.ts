@@ -1,11 +1,18 @@
 import { VueConstructor } from 'vue';
 
+import { popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { ReconnectingEventSource, sse } from '@/helpers/sse';
 
-export type ListenerFunc = (msg: EventMessage) => void | Promise<void>;
+export type ListenerFunc = (msg: EventbusMessage) => void | Promise<void>;
 
-export interface EventMessage {
+export interface EventbusListener {
+  id: string;
+  filter: (key: string, type: string) => boolean;
+  onmessage: (msg: EventbusMessage) => unknown;
+}
+
+export interface EventbusMessage {
   key: string;
   type: string;
   data: any;
@@ -18,7 +25,7 @@ export interface EventMessage {
  * Plugins can set listeners for messages matching specific key(s).
  */
 export class BrewbloxEventbus {
-  private listeners: Mapped<ListenerFunc> = {};
+  private listeners: EventbusListener[] = [];
   private source: ReconnectingEventSource | null = null;
   private lastOk = true;
 
@@ -28,8 +35,10 @@ export class BrewbloxEventbus {
 
     this.source.onmessage = (event: MessageEvent) => {
       this.lastOk = true;
-      const msg: EventMessage = JSON.parse(event.data);
-      this.listeners[msg.key]?.(msg);
+      const msg: EventbusMessage = JSON.parse(event.data);
+      this.listeners
+        .filter(lst => lst.filter(msg.key, msg.type))
+        .forEach(lst => lst.onmessage(msg));
     };
 
     this.source.onerror = () => {
@@ -40,17 +49,15 @@ export class BrewbloxEventbus {
     };
   }
 
-  public addListener(key: string, func: ListenerFunc): void {
-    if (this.listeners[key]) {
-      throw new Error(`Listener '${key}' already exists`);
+  public addListener(listener: EventbusListener): void {
+    if (this.listeners.find(lst => lst.id === listener.id)) {
+      throw new Error(`Listener with id '${listener.id}' already exists`);
     }
-    this.listeners[key] = func;
+    this.listeners.push(listener);
   }
 
-  public removeListener(key: string): void {
-    if (this.listeners[key] !== undefined) {
-      delete this.listeners[key];
-    }
+  public removeListener(id: string): void {
+    popById(this.listeners, { id });
   }
 }
 

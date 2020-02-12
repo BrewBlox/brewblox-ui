@@ -89,9 +89,10 @@ export interface CompatibleTypes {
   [key: string]: string[];
 }
 
-export interface SystemStatus {
-  checkedAt: Date;
-  available: boolean;
+/**
+ * As sent/pushed by the devcon-spark service
+ */
+export interface ApiSparkStatus {
   connect: boolean;
   handshake: boolean;
   synchronize: boolean;
@@ -99,7 +100,11 @@ export interface SystemStatus {
   latest: boolean;
   valid: boolean;
   info: string[];
-  error?: any;
+}
+
+export interface SparkStatus extends ApiSparkStatus {
+  serviceId: string;
+  available: boolean;
 }
 
 export interface RelationEdge {

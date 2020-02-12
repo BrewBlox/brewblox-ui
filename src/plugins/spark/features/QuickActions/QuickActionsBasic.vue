@@ -50,7 +50,7 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   get applicableSteps(): Mapped<boolean> {
-    const blockIds = sparkStore.blockIds(this.serviceId);
+    const blockIds = sparkStore.blockIds(this.serviceId) ?? [];
     return this.steps
       .reduce(
         (acc, step) => {
@@ -61,7 +61,7 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   get stepDisplays(): StepDisplay[] {
-    const blockIds = sparkStore.blockIds(this.serviceId);
+    const blockIds = sparkStore.blockIds(this.serviceId) ?? [];
     return this.steps
       .map(step => {
         const applicable = step.changes.every(change => blockIds.includes(change.blockId));

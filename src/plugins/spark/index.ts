@@ -1,10 +1,12 @@
+import { uid } from 'quasar';
 import { VueConstructor } from 'vue';
 
 import { autoRegister } from '@/helpers/component-ref';
 import { featureStore, WidgetFeature } from '@/store/features';
+import { serviceStore } from '@/store/services';
 
 import features from './features';
-import { sparkType } from './getters';
+import { sparkStatusEvent, sparkType } from './getters';
 import { installFilters } from './helpers';
 import { sparkStore } from './store';
 import { BlockSpec } from './types';
@@ -47,13 +49,30 @@ export default {
 
     featureStore.registerService({
       id: sparkType,
-      title: 'Spark Controller',
+      title: 'Spark Service',
+      page: 'SparkPage',
       onStart: service => sparkStore.addService(service.id),
       onRemove: service => sparkStore.removeService(service.id),
-      wizard: 'SparkWizard',
-      page: 'SparkPage',
+      wizard: stub => ({
+        ...stub,
+        title: stub.id,
+        order: 0,
+        config: {
+          groupNames: [],
+          expandedBlocks: {},
+          sorting: 'unsorted',
+          pageMode: 'List',
+        },
+      }),
     });
 
     Vue.$startup.onStart(() => sparkStore.start());
+    Vue.$startup.onStart(() => {
+      Vue.$eventbus.addListener({
+        id: uid(),
+        filter: (_, type) => type === sparkStatusEvent,
+        onmessage: msg => serviceStore.createStub({ id: msg.key, type: sparkType }),
+      });
+    });
   },
 };

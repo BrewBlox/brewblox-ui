@@ -1,5 +1,5 @@
 import { Widget } from '@/store/dashboards';
-import { Service } from '@/store/services';
+import { Service, ServiceStub } from '@/store/services';
 
 export type WidgetRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
 export type WidgetMode = 'Basic' | 'Full';
@@ -95,6 +95,12 @@ export interface ServiceFeature {
   title: string;
 
   /**
+   * (Optional) Name of a globally registered Vue component.
+   * Page is expected to use a q-page as root element.
+   */
+  page?: string;
+
+  /**
    * Will be called when a service of this type is created or loaded.
    */
   onStart?: ServiceHook;
@@ -105,16 +111,13 @@ export interface ServiceFeature {
   onRemove?: ServiceHook;
 
   /**
-   * (Optional) Name of a globally registered Vue component.
-   * If undefined, service can't be created by users.
+   * Wizard implementation.
+   * This can either be the name of a Vue component, or a function.
+   *
+   * If it's a Vue component, it will be wrapped in WizardDialog,
+   * and given the stub as prop.
    */
-  wizard?: string;
-
-  /**
-   * (Optional) Name of a globally registered Vue component.
-   * Page is expected to use a q-page as root element.
-   */
-  page?: string;
+  wizard: string | ((stub: ServiceStub) => Service | PromiseLike<Service>);
 }
 
 /**
