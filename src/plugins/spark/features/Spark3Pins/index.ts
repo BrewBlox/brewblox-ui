@@ -1,7 +1,7 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import { typeName } from './getters';
 import widget from './Spark3PinsWidget.vue';
@@ -29,19 +29,19 @@ const block: BlockSpec = {
   presets: [],
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Spark 3 Pins',
+  title: 'Spark 3 Pins',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 4,
   },
   // Spark3Pins is a static system object, and can't be created or deleted
-  wizardComponent: null,
-  deleters: undefined,
+  wizard: false,
+  removeActions: undefined,
 };
 
 export default { feature, block };

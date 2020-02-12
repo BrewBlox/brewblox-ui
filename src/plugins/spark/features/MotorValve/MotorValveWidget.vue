@@ -32,23 +32,23 @@ export default class MotorValveWidget
   enable12V(): void {
     if (this.pins) {
       this.pins.data.enableIoSupply12V = true;
-      sparkStore.saveBlock([this.serviceId, this.pins]);
+      sparkStore.saveBlock(this.pins);
     }
   }
 }
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass">
-      <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
-      </template>
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
 
+    <component :is="mode" :crud="crud">
       <template #warnings>
         <CardWarning v-if="disabled12V">
           <template #message>

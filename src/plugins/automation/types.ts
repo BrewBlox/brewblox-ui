@@ -1,3 +1,4 @@
+import { StoreObject } from '@/plugins/database';
 
 export interface StepAction<T = any> {
   id: string;
@@ -28,11 +29,10 @@ export interface ProcessStep {
   notes: StepNote[];
 }
 
-export interface Process {
+export interface Process extends StoreObject {
   id: string;
   title: string;
   steps: ProcessStep[];
-  _rev?: string;
 }
 
 export interface RuntimeLog {

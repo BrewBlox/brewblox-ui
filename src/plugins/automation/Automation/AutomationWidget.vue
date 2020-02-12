@@ -222,34 +222,17 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <component :is="toolbarComponent" :crud="crud">
-      <template #actions>
-        <ActionItem icon="settings" label="Editor" @click="startEditor" />
-        <ActionItem icon="add" label="New" @click="make" />
-        <ActionItem icon="delete" label="Clear" @click="clear" />
-      </template>
-    </component>
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud">
+        <template #actions>
+          <ActionItem icon="settings" label="Editor" @click="startEditor" />
+          <ActionItem icon="add" label="New" @click="make" />
+          <ActionItem icon="delete" label="Clear" @click="clear" />
+        </template>
+      </component>
+    </template>
 
-    <!-- <WidgetToolbar :crud="crud">
-      <q-item-section side>
-        <q-btn
-          unelevated
-          color="primary"
-          label="Editor"
-          @click="startEditor"
-        />
-      </q-item-section>
-      <q-item-section side>
-        <q-btn-dropdown flat split icon="settings" @click="showDialog(null)">
-          <q-list bordered>
-            <ActionItem icon="add" label="New" @click="make" />
-            <ActionItem icon="refresh" label="Refresh" @click="fetch" />
-            <WidgetActions :crud="crud" />
-          </q-list>
-        </q-btn-dropdown>
-      </q-item-section>
-    </WidgetToolbar> -->
     <q-card-section v-for="process in processes" :key="process.id">
       <q-item>
         <q-item-section>{{ process.title }}</q-item-section>
@@ -344,5 +327,5 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
         </template>
       </q-item>
     </q-card-section> -->
-  </q-card>
+  </CardWrapper>
 </template>

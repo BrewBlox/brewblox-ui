@@ -16,43 +16,68 @@ export default class TempSensorOneWireWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
-    <q-card :class="cardClass">
+    <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
+
+    <div>
       <CardWarning v-if="!hasValue">
         <template #message>
           OneWire Sensor could not be read.
         </template>
       </CardWarning>
 
-      <q-card-section>
-        <UnitField v-if="hasValue" :value="block.data.value" label="Value" readonly item-aligned tag="big" />
+      <div class="q-ma-md row justify-center">
+        <div v-if="hasValue" class="col-auto row items-center">
+          <q-icon
+            name="mdi-thermometer"
+            size="md"
+            color="green-3"
+            class="col-auto"
+          />
+          <UnitField
+            :value="block.data.value"
+            readonly
+            tag="big"
+            class="col-auto"
+          />
+        </div>
+      </div>
+
+      <!-- <div class="widget-body row">
+        <UnitField
+          v-if="hasValue"
+          :value="block.data.value"
+          label="Value"
+          readonly
+          item-aligned
+          tag="big"
+          class="col-grow"
+        />
 
         <template v-if="mode === 'Full'">
-          <q-item>
-            <q-item-section>
-              <UnitField
-                :value="block.data.offset"
-                title="Offset"
-                label="Offset"
-                @input="v => { block.data.offset = v; saveBlock(); }"
-              />
-            </q-item-section>
-            <q-item-section>
-              <InputField
-                :value="block.data.address"
-                title="Address"
-                label="Address"
-                @input="v => { block.data.address = v; saveBlock(); }"
-              />
-            </q-item-section>
-          </q-item>
+          <div class="col-break" />
+          <UnitField
+            :value="block.data.offset"
+            title="Offset"
+            label="Offset"
+            class="col-grow"
+            @input="v => { block.data.offset = v; saveBlock(); }"
+          />
+          <InputField
+            :value="block.data.address"
+            title="Address"
+            label="Address"
+            class="col-grow"
+            @input="v => { block.data.address = v; saveBlock(); }"
+          />
         </template>
-      </q-card-section>
-    </q-card>
+      </div> -->
+    </div>
   </GraphCardWrapper>
 </template>

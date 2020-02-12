@@ -1,4 +1,3 @@
-import get from 'lodash/get';
 import mapKeys from 'lodash/mapKeys';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
@@ -42,8 +41,8 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   }
 
   public get isDriven(): boolean {
-    return sparkStore.drivenChains(this.serviceId)
-      .some((chain: string[]) => chain[0] === this.block.id);
+    return sparkStore.drivenBlocks(this.serviceId)
+      .includes(this.blockId);
   }
 
   public get constrainers(): string | null {
@@ -52,12 +51,12 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   }
 
   public get hasGraph(): boolean {
-    return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
+    return sparkStore.specs[this.block.type]?.graphTargets !== undefined;
   }
 
   public get renamedTargets(): Mapped<string> {
-    const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
-    return !!targets
+    const targets = sparkStore.specs[this.block.type]?.graphTargets;
+    return targets !== undefined
       ? postfixedDisplayNames(targets, this.block.data)
       : {};
   }
@@ -99,20 +98,20 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
 
   public async saveStoreBlock(block: Block | null): Promise<void> {
     if (block !== null) {
-      await sparkStore.saveBlock([block.serviceId, block]);
+      await sparkStore.saveBlock(block);
     }
   }
 
   public async removeBlock(): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.removeBlock([this.serviceId, this.block]);
+      await sparkStore.removeBlock(this.block);
       this.closeDialog();
     }
   }
 
   public async refreshBlock(): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.fetchBlock([this.serviceId, this.block])
+      await sparkStore.fetchBlock(this.block)
         .catch(() => { });
     }
   }
@@ -130,7 +129,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
     await this.saveConfig({ ...this.widget.config, blockId });
   }
 
-  public showOtherBlock(block: Block, props: any = {}): void {
+  public showOtherBlock(block: Block | null, props: any = {}): void {
     createBlockDialog(block, { props });
   }
 
@@ -153,7 +152,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+        dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
         notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`);
       });
   }
@@ -163,9 +162,10 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
     createDialog({
       parent: this,
       component: 'InputDialog',
-      title: 'Change Block name',
+      title: 'Change block name',
       message: `Choose a new name for '${this.blockId}'`,
       rules: blockIdRules(this.serviceId),
+      clearable: false,
       value: blockId,
     })
       .onOk(async (newId: string) => {
@@ -181,10 +181,9 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   public startRemoveBlock(): void {
     createDialog({
       parent: this,
-      title: 'Remove Block',
+      title: 'Remove block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,
-
       persistent: true,
     })
       .onOk(this.removeBlock);

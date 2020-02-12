@@ -1,5 +1,5 @@
 import { ref } from '@/helpers/component-ref';
-import { QuickStart } from '@/store/features';
+import { QuickStartFeature } from '@/store/features';
 
 import RimsHardwareTask from './RimsHardwareTask.vue';
 import RimsManualTask from './RimsManualTask.vue';
@@ -10,10 +10,10 @@ ref(RimsHardwareTask);
 ref(RimsManualTask);
 ref(RimsNamingTask);
 
-const quickStart: QuickStart = {
+const feature: QuickStartFeature = {
   id: 'Rims',
-  displayName: 'RIMS Brew-in-a-Bag',
-  wizardComponent: ref(RimsWizard),
+  title: 'RIMS Brew-in-a-Bag',
+  component: ref(RimsWizard),
 };
 
-export default quickStart;
+export default feature;

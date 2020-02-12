@@ -170,12 +170,10 @@ export default class RelationsDiagram extends Vue {
 </script>
 
 <template>
-  <div class="row overflow-auto fit">
-    <q-space />
-    <svg ref="svg" class="col-auto">
+  <div class="fit row justify-center scroll">
+    <svg ref="svg">
       <g ref="diagram" />
     </svg>
-    <q-space />
   </div>
 </template>
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
@@ -13,7 +12,7 @@ export default class Kettle extends PartBase {
   }
 
   get filledSquares(): number {
-    const pct = get(this.part.settings, 'fillPct', DEFAULT_FILL_PCT);
+    const pct = this.part.settings.fillPct ?? DEFAULT_FILL_PCT;
     return pct * (this.sizeY / 100);
   }
 

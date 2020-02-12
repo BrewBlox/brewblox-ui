@@ -2,15 +2,15 @@ import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
 import { objReducer } from '@/helpers/functional';
+import { StoreObject } from '@/plugins/database';
 import store from '@/store';
 
 import api from './api';
 
-export interface UIPlugin {
+export interface UIPlugin extends StoreObject {
   id: string;
   title: string;
   url: string;
-  _rev?: string;
 }
 
 export interface UIPluginResult {
@@ -26,7 +26,6 @@ const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'plugins' })
 export class PluginModule extends VuexModule {
-  private setupActions: string[] = [];
   public plugins: Mapped<UIPlugin> = {};
   public results: Mapped<UIPluginResult> = {};
 
@@ -59,11 +58,6 @@ export class PluginModule extends VuexModule {
     Vue.set(this.results, result.id, result);
   }
 
-  @Mutation
-  private commitSetupActions(actions: string[]): void {
-    this.setupActions = [...actions];
-  }
-
   @Action({ rawError })
   public async fetchPlugins(): Promise<UIPlugin[]> {
     const plugins = await api.fetch();
@@ -85,24 +79,6 @@ export class PluginModule extends VuexModule {
   public async removePlugin(plugin: UIPlugin): Promise<void> {
     await api.remove(plugin);
     this.commitRemovePlugin(plugin);
-  }
-
-  @Action({ rawError })
-  public async onSetup(action: string): Promise<void> {
-    this.commitSetupActions([...this.setupActions, action]);
-  }
-
-  @Action({ rawError })
-  public async setup(): Promise<void> {
-    await Promise.all(
-      this.setupActions
-        .map(a => store.dispatch(a)));
-  }
-
-  @Action({ rawError })
-  public async init(): Promise<void> {
-    this.commitSetupActions([]);
-    api.setup(() => { }, () => { });
   }
 }
 

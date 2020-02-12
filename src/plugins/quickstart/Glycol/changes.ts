@@ -3,8 +3,8 @@ import { uid } from 'quasar';
 import { durationMs } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
-import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
-import { HistoryItem } from '@/plugins/history/Graph/types';
+import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { GraphConfig } from '@/plugins/history/types';
 import {
   ActuatorPwmBlock,
   blockTypes,
@@ -16,10 +16,10 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { maybeSpace, unlinkedActuators } from '../helpers';
@@ -289,10 +289,10 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     : blocks.filter(block => !heatingBlocks.includes(block.id));
 }
 
-export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): PersistentWidget[] {
+export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): Widget[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
 
-  const createWidget = (name: string, type: string): PersistentWidget => ({
+  const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
     dashboard: config.dashboardId,
     id: uid(),
@@ -305,7 +305,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
     },
   });
 
-  const builder: BuilderItem = {
+  const builder: Widget<BuilderConfig> = {
     ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
@@ -316,7 +316,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
     },
   };
 
-  const graph: HistoryItem = {
+  const graph: Widget<GraphConfig> = {
     ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
@@ -364,7 +364,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
     });
   }
 
-  const QuickActions: QuickActionsItem = {
+  const QuickActions: Widget<QuickActionsConfig> = {
     ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,
@@ -445,7 +445,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): P
     },
   };
 
-  const profile: PersistentWidget = {
+  const profile: Widget = {
     ...createWidget(config.names.beerProfile, blockTypes.SetpointProfile),
     cols: 6,
     rows: 4,

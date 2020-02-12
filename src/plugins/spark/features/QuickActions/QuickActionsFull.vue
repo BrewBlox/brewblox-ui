@@ -147,7 +147,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
     createDialog({
       component: 'BlockSelectDialog',
       parent: this,
-      title: `Switch target Block '${change.blockId}'`,
+      title: `Switch target block '${change.blockId}'`,
       serviceId: this.serviceId,
       filter: block => {
         return currentBlock === null
@@ -164,11 +164,10 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-lg">
     <slot name="warnings" />
 
-    <q-card-section>
+    <div class="widget-body column">
       <draggable
         :disabled="$dense"
         :value="steps"
@@ -185,7 +184,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
           header-style="font-size: 120%"
           group="steps"
           icon="mdi-format-list-checks"
-          class="step-container q-mr-md q-mb-sm"
+          class="step-container q-mr-md q-mb-sm depth-1"
         >
           <draggable :disabled="$dense" :value="step.changes" @input="v => saveChanges(step, v)">
             <QuickActionChange
@@ -193,12 +192,13 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
               :key="`change--${step.id}--${change.id}`"
               :service-id="serviceId"
               :value="change"
+              class="q-mr-sm q-my-xs"
               @input="saveChange(step, change)"
               @remove="removeChange(step, change)"
               @switch="startSwitchBlock(step, change)"
             />
           </draggable>
-          <div class="row justify-end q-px-md q-mt-md step-actions">
+          <div class="row justify-end q-px-md q-py-sm step-actions">
             <q-btn
               size="sm"
               label="Add Block"
@@ -233,13 +233,13 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       <q-item>
         <q-space />
         <q-item-section class="col-auto">
-          <q-btn round outline icon="add" @click="addStep">
+          <q-btn fab-mini color="secondary" icon="add" @click="addStep">
             <q-tooltip>Add Step</q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>
-    </q-card-section>
-  </q-card>
+    </div>
+  </div>
 </template>
 
 <style scoped>

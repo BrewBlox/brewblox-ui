@@ -16,6 +16,11 @@ export default class SparkUnitMenu extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  created(): void {
+    sparkStore.fetchUnits(this.serviceId);
+    sparkStore.fetchUnitAlternatives(this.serviceId);
+  }
+
   get units(): UserUnits {
     return sparkStore.units(this.serviceId) || {};
   }
@@ -29,24 +34,15 @@ export default class SparkUnitMenu extends DialogBase {
     sparkStore.saveUnits([this.serviceId, vals])
       .catch(e => notify.error(`Failed to change unit: ${e.message}`));
   }
-
-  mounted(): void {
-    sparkStore.fetchAll(this.serviceId);
-  }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ serviceId }}</q-item-label>
-          <q-item-label caption>
-            Unit preferences
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
+    <CardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="serviceId" subtitle="Unit preferences" />
+      </template>
 
       <q-card-section>
         <q-item>
@@ -61,6 +57,6 @@ export default class SparkUnitMenu extends DialogBase {
           </q-item-section>
         </q-item>
       </q-card-section>
-    </q-card>
+    </CardWrapper>
   </q-dialog>
 </template>

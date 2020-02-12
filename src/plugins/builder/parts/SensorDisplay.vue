@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import { Block } from '@/plugins/spark/types';
@@ -23,11 +22,11 @@ export default class SensorDisplay extends PartBase {
   }
 
   get temperature(): number | null {
-    return get(this, 'block.data.value.val', null);
+    return this.block?.data.value?.val ?? null;
   }
 
   get tempUnit(): string {
-    return get(this, 'block.data.value.notation', '');
+    return this.block?.data.value?.val ?? '';
   }
 }
 </script>

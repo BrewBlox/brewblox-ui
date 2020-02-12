@@ -17,7 +17,7 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
-import { Crud, WidgetSelector } from '@/store/features';
+import { Crud, WidgetFeature } from '@/store/features';
 
 import { blockTypes } from './block-types';
 import { BlockConfig, BlockCrud } from './types';
@@ -25,8 +25,8 @@ import { BlockConfig, BlockCrud } from './types';
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
   v => !sparkStore.blockIds(serviceId).includes(v) || 'Name must be unique',
-  v => !!v.match(/^[a-zA-Z]/) || 'Name must start with a letter',
-  v => !!v.match(/^[a-zA-Z0-9 \(\)_\-\|]*$/) || 'Name may only contain letters, numbers, spaces, and ()-_|',
+  v => /^[a-zA-Z]/.test(v) || 'Name must start with a letter',
+  v => /^[a-zA-Z0-9 \(\)_\-\|]*$/.test(v) || 'Name may only contain letters, numbers, spaces, and ()-_|',
   v => v.length < 200 || 'Name must be less than 200 characters',
 ];
 
@@ -67,7 +67,7 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('shortDateString', shortDateString);
 };
 
-export const blockWidgetSelector = (component: VueConstructor): WidgetSelector => {
+export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['component'] => {
   const widget = ref(component);
   return (crud: Crud) => {
     const { config }: { config: BlockConfig } = crud.widget;
@@ -146,16 +146,16 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
         .map(block => [serviceId, block.id, addresses[block.data.address]]);
       await Promise.all(renameArgs.map(sparkStore.renameBlock));
     }
-    notify.done('Removed all Blocks' + (opts.restore ? ', and restored discovered blocks' : ''));
+    notify.done('Removed all blocks' + (opts.restore ? ', and restored discovered blocks' : ''));
   } catch (e) {
-    notify.error(`Failed to remove Blocks: ${e.toString()}`);
+    notify.error(`Failed to remove blocks: ${e.toString()}`);
   }
 };
 
 export const startResetBlocks = (serviceId: string): void => {
   createDialog({
-    title: 'Reset Blocks',
-    message: `This will remove all Blocks on ${serviceId}. Are you sure?`,
+    title: 'Reset blocks',
+    message: `This will remove all blocks on ${serviceId}. Are you sure?`,
     noBackdropDismiss: true,
     cancel: true,
     options: {

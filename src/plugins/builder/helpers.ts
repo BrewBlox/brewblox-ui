@@ -11,10 +11,9 @@ import { builderStore } from './store';
 import { FlowPart, LinkedBlock, PersistentPart, Rect, StatePart, Transitions } from './types';
 
 export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
-  const serviceId = get(part.settings, [key, 'serviceId'], null);
-  const blockId = get(part.settings, [key, 'blockId'], null);
-  return serviceId && blockId
-    ? sparkStore.tryBlockById(serviceId, blockId) as T | null
+  const linked: LinkedBlock = part.settings[key];
+  return linked?.serviceId && linked?.blockId
+    ? sparkStore.tryBlockById(linked.serviceId, linked.blockId) as T | null
     : null;
 }
 

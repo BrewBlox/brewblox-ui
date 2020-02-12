@@ -1,14 +1,15 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import { AutomationConfig } from '../types';
 import widget from './AutomationWidget.vue';
 
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   id: 'Automation',
-  displayName: 'Automation',
-  widgetComponent: ref(widget),
+  title: 'Automation',
+  component: ref(widget),
+  wizard: true,
   widgetSize: {
     cols: 4,
     rows: 2,

@@ -33,8 +33,8 @@ export default class CreateMockMenu extends DialogBase {
   async createBlock(block: Block): Promise<void> {
     this.busy = true;
     try {
-      await sparkStore.createBlock([this.serviceId, block]);
-      notify.done(`Created ${featureStore.displayName(block.type)} '${block.id}'`);
+      await sparkStore.createBlock(block);
+      notify.done(`Created ${featureStore.widgetTitle(block.type)} '${block.id}'`);
     } catch (e) {
       notify.error(`Failed to create Block: ${e.toString()}`);
     }
@@ -56,25 +56,20 @@ export default class CreateMockMenu extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ service.id }}</q-item-label>
-          <q-item-label caption>
-            Create Mock Blocks
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
+    <ActionCardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="serviceId" subtitle="Create mock blocks" />
+      </template>
 
       <q-card-section>
         <q-item>
           <q-space />
           <q-item-section class="col-auto">
-            <q-btn unelevated color="primary" :loading="busy" label="Create Mock Sensor" @click="createSensor" />
+            <q-btn unelevated color="primary" :loading="busy" label="Create mock sensor" @click="createSensor" />
           </q-item-section>
           <q-space />
         </q-item>
       </q-card-section>
-    </q-card>
+    </ActionCardWrapper>
   </q-dialog>
 </template>

@@ -59,10 +59,6 @@ export default class BlockValue extends Vue {
     }
   }
 
-  get displayName(): string {
-    return featureStore.displayName(this.opts.type);
-  }
-
   get changes(): Mapped<ChangeField> {
     return this.spec.changes.reduce(objReducer('key'), {});
   }
@@ -143,7 +139,7 @@ export default class BlockValue extends Vue {
   <q-list :class="{'darkish': !condition.enabled}" dense>
     <q-item>
       <q-item-section class="text-h6 text-italic">
-        Check Block value
+        Check block value
       </q-item-section>
       <q-item-section class="col-auto">
         <q-toggle :value="condition.enabled" @input="saveEnabled">

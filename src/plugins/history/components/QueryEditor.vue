@@ -113,7 +113,7 @@ export default class QueryEditor extends Vue {
         <br>This includes renamed or deleted blocks.
       </q-tooltip>
     </q-input>
-    <div class="col-auto row justify-end q-gutter-x-sm q-mx-sm">
+    <div class="col-auto row justify-end q-gutter-x-sm q-gutter-y-xs q-mx-sm">
       <q-btn flat icon="mdi-collapse-all" @click="tree.collapseAll()">
         <q-tooltip>Collapse all</q-tooltip>
       </q-btn>
@@ -140,7 +140,7 @@ export default class QueryEditor extends Vue {
         node-key="value"
       >
         <template #header-leaf="props">
-          <div class="editable q-py-xs leaf-node-header">
+          <div class="q-pa-xs full-width editable hoverable rounded-borders">
             <slot name="leaf" :node="props.node" />
           </div>
         </template>
@@ -148,13 +148,3 @@ export default class QueryEditor extends Vue {
     </q-item>
   </q-list>
 </template>
-
-<style>
-.leaf-node-header {
-  width: 100%;
-}
-.leaf-node-header:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-}
-</style>

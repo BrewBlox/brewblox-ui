@@ -16,7 +16,7 @@ export function loadFile<T>(onSelected: (val: T) => void): void {
   input.setAttribute('id', 'import-input');
 
   reader.onload = evt => {
-    const str = get(evt, ['target', 'result'], '');
+    const str = get(evt, ['target', 'result']);
     if (str) {
       onSelected(deserialize(JSON.parse(str)));
     }

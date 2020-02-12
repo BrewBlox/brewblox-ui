@@ -5,13 +5,13 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 @Component
 export default class BlockWidgetDialog extends DialogBase {
   id = uid()
-  localWidget: PersistentWidget | null = null;
+  localWidget: Widget | null = null;
 
   @Prop({ type: String, required: true })
   public readonly serviceId!: string;
@@ -33,7 +33,7 @@ export default class BlockWidgetDialog extends DialogBase {
     return this.block ? this.block.type : '';
   }
 
-  get widget(): PersistentWidget {
+  get widget(): Widget {
     return this.localWidget || {
       id: this.id,
       title: this.blockId,
@@ -55,7 +55,7 @@ export default class BlockWidgetDialog extends DialogBase {
       widget: this.widget,
       saveWidget: val => { this.localWidget = val; },
       block: this.block!,
-      saveBlock: block => sparkStore.saveBlock([this.serviceId, block]),
+      saveBlock: block => sparkStore.saveBlock(block),
       closeDialog: () => this.onDialogHide(),
     };
   }
@@ -64,11 +64,12 @@ export default class BlockWidgetDialog extends DialogBase {
     return {
       container: 'Dialog',
       mode: this.mode,
+      size: 'Fixed',
     };
   }
 
   get widgetComponent(): string {
-    return featureStore.widget(this.crud);
+    return featureStore.widgetComponent(this.crud);
   }
 
   get widgetProps(): any {

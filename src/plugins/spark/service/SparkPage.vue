@@ -1,5 +1,4 @@
 <script lang="ts">
-import { clearTimeout, setInterval } from 'timers';
 import { isArray } from 'util';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
@@ -11,9 +10,17 @@ import notify from '@/helpers/notify';
 import { isSystemBlock } from '@/plugins/spark/block-types';
 import { startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud, PageMode, RelationEdge, RelationNode, Spark, SystemStatus } from '@/plugins/spark/types';
-import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
-import { FeatureRole, featureStore, WidgetContext } from '@/store/features';
+import {
+  Block,
+  BlockCrud,
+  PageMode,
+  RelationEdge,
+  RelationNode,
+  SparkService,
+  SparkStatus,
+} from '@/plugins/spark/types';
+import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
+import { featureStore, WidgetContext, WidgetRole } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
 import { isReady } from './getters';
@@ -29,8 +36,8 @@ interface ValidatedWidget {
   key: string;
   component: string;
   crud: BlockCrud;
-  displayName: string;
-  role: FeatureRole;
+  title: string;
+  role: WidgetRole;
   expanded: boolean;
   error?: string;
 }
@@ -44,46 +51,43 @@ export default class SparkPage extends Vue {
   capitalized = capitalized;
   startResetBlocks = startResetBlocks;
 
-  volatileWidgets: { [blockId: string]: PersistentWidget } = {};
-  statusCheckInterval: NodeJS.Timeout | null = null;
+  volatileWidgets: { [blockId: string]: Widget } = {};
   blockFilter = '';
 
   context: WidgetContext = {
     mode: 'Basic',
     container: 'Dashboard',
+    size: 'Content',
+  };
+
+  roleOrder: Record<WidgetRole, number> = {
+    Display: 0,
+    Process: 1,
+    Control: 2,
+    Output: 3,
+    Constraint: 4,
+    Other: 5,
+  };
+
+  roleIcons: Record<WidgetRole, string> = {
+    Display: 'mdi-monitor-dashboard',
+    Process: 'mdi-thermometer',
+    Control: 'mdi-calculator-variant',
+    Output: 'mdi-power-plug',
+    Constraint: 'mdi-lock-outline',
+    Other: 'mdi-cube',
   };
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
-
-  @Watch('statusNok', { immediate: true })
-  autoRecheck(): void {
-    if (this.statusNok && !this.statusCheckInterval) {
-      this.statusCheckInterval = setInterval(
-        () => sparkStore.fetchServiceStatus(this.service.id),
-        5000,
-      );
-    }
-    if (!this.statusNok && this.statusCheckInterval) {
-      sparkStore.fetchAll(this.service.id);
-      sparkStore.createUpdateSource(this.service.id);
-      clearTimeout(this.statusCheckInterval);
-      this.statusCheckInterval = null;
-      this.$forceUpdate();
-    }
-  }
 
   @Watch('service.title', { immediate: true })
   watchTitle(newV: string): void {
     document.title = `Brewblox | ${newV ?? 'Spark service'}`;
   }
 
-  destroyed(): void {
-    this.statusCheckInterval && clearTimeout(this.statusCheckInterval);
-  }
-
-  get service(): Spark {
-    return serviceStore.serviceById(this.serviceId) as Spark;
+  get service(): SparkService {
+    return serviceStore.serviceById(this.serviceId);
   }
 
   get dashboards(): Dashboard[] {
@@ -91,48 +95,27 @@ export default class SparkPage extends Vue {
   }
 
   get isAvailable(): boolean {
-    return sparkStore.serviceAvailable(this.service.id);
+    return sparkStore.serviceAvailable(this.serviceId);
   }
 
   get isReady(): boolean {
-    return this.isAvailable && isReady(this.service.id);
+    return this.isAvailable && isReady(this.serviceId);
   }
 
-  get status(): SystemStatus | null {
-    if (!this.isAvailable) {
-      return null;
-    }
-    return sparkStore.lastStatus(this.service.id);
+  get status(): SparkStatus | null {
+    return this.isAvailable
+      ? sparkStore.status(this.serviceId)
+      : null;
   }
 
   get statusNok(): boolean {
-    return Boolean(this.isAvailable && this.status && !this.status.synchronize);
-  }
-
-  get roleOrder(): Record<FeatureRole, number> {
-    return {
-      Display: 0,
-      Process: 1,
-      Control: 2,
-      Output: 3,
-      Constraint: 4,
-      Other: 5,
-    };
-  }
-
-  get roleIcons(): Record<FeatureRole, string> {
-    return {
-      Display: 'mdi-monitor-dashboard',
-      Process: 'mdi-thermometer',
-      Control: 'mdi-calculator-variant',
-      Output: 'mdi-power-plug',
-      Constraint: 'mdi-lock-outline',
-      Other: 'mdi-cube',
-    };
+    return this.isAvailable
+      && !!this.status
+      && !this.status.synchronize;
   }
 
   get pageMode(): PageMode {
-    return this.service.config.pageMode || 'List';
+    return this.service.config.pageMode ?? 'List';
   }
 
   set pageMode(mode: PageMode) {
@@ -145,8 +128,8 @@ export default class SparkPage extends Vue {
       unsorted: () => 0,
       name: (a, b) => objectStringSorter('id')(a, b),
       type: (a, b): number => {
-        const left = a.displayName.toLowerCase();
-        const right = b.displayName.toLowerCase();
+        const left = a.title.toLowerCase();
+        const right = b.title.toLowerCase();
         return left.localeCompare(right);
       },
       role: (a, b): number =>
@@ -272,20 +255,20 @@ export default class SparkPage extends Vue {
         id: widget.id,
         key,
         crud,
-        displayName: featureStore.displayName(widget.feature),
-        role: featureStore.role(widget.feature),
-        component: featureStore.widget(crud, true),
-        expanded: this.expandedBlocks[widget.id] || false,
+        title: featureStore.widgetTitle(widget.feature),
+        role: featureStore.widgetRole(widget.feature),
+        component: featureStore.widgetComponent(crud, true),
+        expanded: this.expandedBlocks[widget.id] ?? false,
       };
     } catch (e) {
       return {
         id: widget.id,
         key,
         crud,
-        displayName: 'Invalid Widget',
+        title: 'Invalid Widget',
         role: 'Other',
         component: 'InvalidWidget',
-        expanded: this.expandedBlocks[widget.id] || false,
+        expanded: this.expandedBlocks[widget.id] ?? false,
         error: e.message,
       };
     }
@@ -304,7 +287,7 @@ export default class SparkPage extends Vue {
     return this.validatedItems
       .filter(val => !filter
         || val.id.toLowerCase().match(filter)
-        || val.displayName.toLowerCase().match(filter))
+        || val.title.toLowerCase().match(filter))
       .sort(this.sorter);
   }
 
@@ -321,13 +304,13 @@ export default class SparkPage extends Vue {
     this.expandedBlocks = {};
   }
 
-  saveWidget(widget: PersistentWidget): void {
+  saveWidget(widget: Widget): void {
     this.volatileWidgets[this.volatileKey(widget.id)] = { ...widget };
     notify.warn('Changes will not be persisted', { logged: false });
   }
 
   async saveBlock(block: Block): Promise<void> {
-    sparkStore.saveBlock([block.serviceId, block]);
+    sparkStore.saveBlock(block);
   }
 
   startDialog(component: string, props: any = null): void {
@@ -343,7 +326,7 @@ export default class SparkPage extends Vue {
 
   get nodes(): RelationNode[] {
     return this.validatedItems
-      .map(v => ({ id: v.id, type: v.displayName }))
+      .map(v => ({ id: v.id, type: v.title }))
       .sort(objectStringSorter('type'));
   }
 
@@ -394,46 +377,47 @@ export default class SparkPage extends Vue {
 </script>
 
 <template>
-  <div>
+  <q-page padding>
     <portal to="toolbar-title">
       {{ service.title }}
     </portal>
     <portal to="toolbar-buttons">
-      <q-btn-group flat stretch>
+      <q-btn-group rounded outline class="q-pa-xs">
         <q-btn
-          flat
-          stretch
-          :class="{'selected-mode': pageMode === 'List'}"
+          :unelevated="pageMode === 'List'"
+          :outline="pageMode !== 'List'"
+          color="primary"
           icon="mdi-format-list-checkbox"
           @click="pageMode = 'List'"
         >
           <q-tooltip>Show blocks as list</q-tooltip>
         </q-btn>
         <q-btn
-          flat
-          stretch
-          :class="{'selected-mode': pageMode === 'Relations'}"
+          rounded
+          :unelevated="pageMode === 'Relations'"
+          :outline="pageMode !== 'Relations'"
+          color="primary"
           icon="mdi-vector-line"
           @click="pageMode = 'Relations'"
         >
           <q-tooltip>Show blocks as diagram</q-tooltip>
         </q-btn>
       </q-btn-group>
-      <ActionMenu :disable="!isReady || statusNok" stretch>
+      <ActionMenu :disable="!isReady || statusNok" round size="12px">
         <template #actions>
           <ActionItem
             icon="add"
-            label="New Block"
+            label="New block"
             @click="startDialog('BlockWizardDialog')"
           />
           <ActionItem
             icon="mdi-magnify-plus-outline"
-            label="Discover new OneWire Blocks"
+            label="Discover new OneWire blocks"
             @click="discoverBlocks"
           />
           <ActionItem
             icon="mdi-tag-remove"
-            label="Remove unused Block names"
+            label="Remove unused block names"
             @click="cleanUnusedNames"
           />
           <ActionItem
@@ -458,17 +442,17 @@ export default class SparkPage extends Vue {
           />
           <ActionItem
             icon="mdi-file-export"
-            label="Import/Export Blocks"
+            label="Import/Export blocks"
             @click="startDialog('SparkImportMenu')"
           />
           <ActionItem
             icon="mdi-test-tube"
-            label="Create Mock Blocks"
+            label="Create mock blocks"
             @click="startDialog('CreateMockMenu')"
           />
           <ActionItem
             icon="delete"
-            label="Remove all Blocks"
+            label="Remove all blocks"
             @click="startResetBlocks(service.id)"
           />
         </template>
@@ -479,7 +463,7 @@ export default class SparkPage extends Vue {
     <q-list v-if="statusNok">
       <q-item>
         <q-item-section>
-          <Troubleshooter :service-id="service.id" class="bg-dark" />
+          <Troubleshooter :service-id="service.id" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -497,122 +481,125 @@ export default class SparkPage extends Vue {
     <template v-else>
       <!-- Normal display -->
       <div class="row no-wrap justify-start page-height">
-        <q-list class="content-column q-pr-md">
-          <!-- Selection controls -->
-          <q-item class="q-mb-md">
-            <q-item-section>
-              <q-input v-model="blockFilter" placeholder="Search Blocks" clearable>
-                <template #append>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-            </q-item-section>
-            <q-item-section class="col-auto">
-              <q-btn icon="mdi-sort" flat>
-                <q-tooltip>Sort Blocks</q-tooltip>
-                <q-menu>
-                  <q-list>
-                    <ActionItem
-                      v-for="(func, name) in allSorters"
-                      :key="name"
-                      :active="sorting === name"
-                      :label="capitalized(name)"
-                      @click="sorting = name"
-                    />
-                  </q-list>
-                </q-menu>
-              </q-btn>
-            </q-item-section>
-            <q-item-section v-if="!$dense" class="col-auto">
-              <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
-                <q-tooltip>Unselect all</q-tooltip>
-              </q-btn>
-            </q-item-section>
-            <q-item-section v-if="!$dense" class="col-auto">
-              <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
-                <q-tooltip>Select all</q-tooltip>
-              </q-btn>
-            </q-item-section>
-          </q-item>
-          <!-- Service -->
-          <q-item v-if="serviceShown" class="text-white widget-index">
-            <q-item-section v-if="!$dense" side class="q-mx-none q-px-none">
-              <ToggleButton v-model="serviceExpanded" />
-            </q-item-section>
-            <q-item-section>
-              <q-item class="non-selectable" clickable @click="selectService">
-                <q-item-section avatar>
-                  <q-icon name="mdi-information-variant" />
-                  <q-tooltip>Device Info</q-tooltip>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label caption class="text-italic">
-                    Device info
-                  </q-item-label>
-                  <div style="font-size: larger">
-                    {{ serviceId }}
-                  </div>
-                </q-item-section>
-              </q-item>
-            </q-item-section>
-          </q-item>
-          <!-- Blocks -->
-          <q-item
-            v-for="val in filteredItems"
-            :key="val.key"
-            class="non-selectable text-white widget-index"
-          >
-            <q-item-section v-if="!$dense" side class="q-mx-none q-px-none">
-              <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
-            </q-item-section>
-            <q-item-section>
-              <q-item
-                clickable
-                @click="onBlockClick(val)"
-              >
-                <q-item-section avatar>
-                  <q-icon :name="roleIcons[val.role]" />
-                  <q-tooltip>{{ val.role }}</q-tooltip>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label caption class="text-italic darkish">
-                    {{ val.displayName }}
-                  </q-item-label>
-                  <div style="font-size: larger">
-                    {{ val.id }}
-                  </div>
-                </q-item-section>
-              </q-item>
-            </q-item-section>
-          </q-item>
-        </q-list>
+        <q-scroll-area visible class="content-column rounded-borders bg-dark">
+          <q-list class="q-pr-md">
+            <!-- Selection controls -->
+            <q-item class="q-mb-md">
+              <q-item-section>
+                <q-input v-model="blockFilter" placeholder="Search blocks" clearable>
+                  <template #append>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </q-item-section>
+              <q-item-section class="col-auto">
+                <q-btn icon="mdi-sort" flat>
+                  <q-tooltip>Sort blocks</q-tooltip>
+                  <q-menu>
+                    <q-list>
+                      <ActionItem
+                        v-for="(func, name) in allSorters"
+                        :key="name"
+                        :active="sorting === name"
+                        :label="capitalized(name)"
+                        @click="sorting = name"
+                      />
+                    </q-list>
+                  </q-menu>
+                </q-btn>
+              </q-item-section>
+              <q-item-section v-if="!$dense" class="col-auto">
+                <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
+                  <q-tooltip>Unselect all</q-tooltip>
+                </q-btn>
+              </q-item-section>
+              <q-item-section v-if="!$dense" class="col-auto">
+                <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
+                  <q-tooltip>Select all</q-tooltip>
+                </q-btn>
+              </q-item-section>
+            </q-item>
+            <!-- Service -->
+            <q-item v-if="serviceShown" class="text-white widget-index">
+              <q-item-section v-if="!$dense" side class="q-px-sm">
+                <ToggleButton v-model="serviceExpanded" />
+              </q-item-section>
+              <q-item-section>
+                <q-item class="non-selectable" clickable @click="selectService">
+                  <q-item-section avatar>
+                    <q-icon name="mdi-information-variant" />
+                    <q-tooltip>Device Info</q-tooltip>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label caption class="text-italic">
+                      Device info
+                    </q-item-label>
+                    <div style="font-size: larger">
+                      {{ serviceId }}
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </q-item-section>
+            </q-item>
+            <!-- Blocks -->
+            <q-item
+              v-for="val in filteredItems"
+              :key="val.key"
+              class="non-selectable text-white widget-index"
+            >
+              <q-item-section v-if="!$dense" side class="q-px-sm">
+                <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
+              </q-item-section>
+              <q-item-section>
+                <q-item
+                  clickable
+                  @click="onBlockClick(val)"
+                >
+                  <q-item-section avatar>
+                    <q-icon :name="roleIcons[val.role]" />
+                    <q-tooltip>{{ val.role }}</q-tooltip>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label caption class="text-italic darkish">
+                      {{ val.title }}
+                    </q-item-label>
+                    <div style="font-size: larger">
+                      {{ val.id }}
+                    </div>
+                  </q-item-section>
+                </q-item>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-scroll-area>
 
         <!-- Widget List -->
-        <q-list v-if="!$dense" class="content-column q-ml-lg q-pr-lg">
-          <!-- Service -->
-          <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
-            <q-item-section>
-              <SparkWidget v-if="isReady" :service-id="service.id" class="bg-dark" />
-            </q-item-section>
-          </q-item>
-          <!-- Blocks -->
-          <q-item v-for="val in expandedItems" :ref="`widget-${val.key}`" :key="val.key">
-            <q-item-section>
-              <component
-                :is="val.component"
-                :initial-crud="val.crud"
-                :context="context"
-                :error="val.error"
-                class="bg-dark"
-              />
-            </q-item-section>
-          </q-item>
-          <!-- Blank space to always be able to show a widget at the top -->
-          <q-item class="page-height" />
-        </q-list>
+        <q-scroll-area v-if="!$dense" visible class="content-column">
+          <q-list class="q-ml-lg q-pr-none">
+            <!-- Service -->
+            <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
+              <q-item-section>
+                <SparkWidget v-if="isReady" :service-id="service.id" />
+              </q-item-section>
+            </q-item>
+            <!-- Blocks -->
+            <q-item v-for="val in expandedItems" :ref="`widget-${val.key}`" :key="val.key" class="q-pt-none q-pb-md">
+              <q-item-section>
+                <component
+                  :is="val.component"
+                  :initial-crud="val.crud"
+                  :context="context"
+                  :error="val.error"
+                />
+              </q-item-section>
+            </q-item>
+            <!-- Blank space to always be able to show a widget at the top -->
+            <q-item class="page-height" />
+          </q-list>
+        </q-scroll-area>
       </div>
     </template>
-  </div>
+  </q-page>
 </template>
 
 <style lang="sass" scoped>
@@ -626,8 +613,8 @@ export default class SparkPage extends Vue {
   width: 550px
   max-width: 100vw
   height: 100%
-  overflow: auto
+
 
 .selected-mode
-  border-bottom: 2px solid $secondary
+  background-color: $secondary
 </style>

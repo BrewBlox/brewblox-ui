@@ -2,8 +2,8 @@ import { uid } from 'quasar';
 
 import { Link, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
-import { BuilderItem, BuilderLayout } from '@/plugins/builder/types';
-import { HistoryItem } from '@/plugins/history/Graph/types';
+import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { GraphConfig } from '@/plugins/history/types';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -17,10 +17,10 @@ import {
   PidData,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
-import { BlockChange, QuickActionsItem } from '@/plugins/spark/features/QuickActions/types';
+import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { AnalogConstraint, Block, DigitalConstraint, DigitalState } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { maybeSpace, unlinkedActuators } from '../helpers';
@@ -289,7 +289,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
 }
 
 
-export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): PersistentWidget[] {
+export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Widget[] {
   const userTemp = sparkStore.units(config.serviceId).Temp;
   const genericSettings = {
     dashboard: config.dashboardId,
@@ -298,7 +298,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     order: 0,
   };
 
-  const createWidget = (name: string, type: string): PersistentWidget => ({
+  const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
     ...featureStore.widgetSize(type),
     id: uid(),
@@ -311,7 +311,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     },
   });
 
-  const createBuilder = (): BuilderItem => ({
+  const createBuilder = (): Widget<BuilderConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
     cols: 11,
     rows: 5,
@@ -322,7 +322,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     },
   });
 
-  const createGraph = (): HistoryItem => ({
+  const createGraph = (): Widget<GraphConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
     cols: 7,
     rows: 5,
@@ -363,7 +363,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Pe
     },
   });
 
-  const createQuickActions = (): QuickActionsItem => ({
+  const createQuickActions = (): Widget<QuickActionsConfig> => ({
     ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 5,

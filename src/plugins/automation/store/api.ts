@@ -1,6 +1,7 @@
-import { generate } from '@/helpers/database-api';
-import { get, post, sse } from '@/helpers/fetch';
+import { get, post } from '@/helpers/fetch';
 import notify from '@/helpers/notify';
+import { sse } from '@/helpers/sse';
+import { createApi } from '@/plugins/database/api';
 
 import { Process, Runtime } from '../types';
 
@@ -10,7 +11,7 @@ const intercept = (message: string): (e: Error) => never =>
     throw e;
   };
 
-export const processApi = generate<Process>('processes', true);
+export const processApi = createApi<Process>('processes', true);
 
 export const runtimeApi = {
   start: async (process: Process): Promise<Runtime> =>

@@ -10,20 +10,22 @@ import { InactiveObjectBlock } from './types';
 export default class InactiveObjectWidget extends BlockWidgetBase {
   readonly block!: InactiveObjectBlock;
 
-  get actualDisplayName(): string {
-    return featureStore.displayName(this.block.data.actualType);
+  get actualFeatureTitle(): string {
+    return featureStore.widgetTitle(this.block.data.actualType);
   }
 }
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <component :is="toolbarComponent" :crud="crud" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" />
+    </template>
     <CardWarning v-if="!block.data.connected">
       <template #message>
-        This {{ actualDisplayName }} block is disabled.
+        This {{ actualFeatureTitle }} block is disabled.
         <br>To enable it, ensure that it is in an enabled group.
       </template>
     </CardWarning>
-  </q-card>
+  </CardWrapper>
 </template>

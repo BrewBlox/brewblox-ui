@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
@@ -44,7 +43,7 @@ export default class MetricsDisplayDialog extends DialogBase {
   }
 
   get decimals(): number {
-    return get(this.local!.decimals, this.field, DEFAULT_DECIMALS);
+    return this.local!.decimals[this.field] ?? DEFAULT_DECIMALS;
   }
 
   set decimals(val: number) {
@@ -62,7 +61,7 @@ export default class MetricsDisplayDialog extends DialogBase {
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
     <DialogCard v-bind="{title, message, html}">
-      <q-list dense>
+      <div class="column q-gutter-xs">
         <InputField v-model="rename" title="Label" label="Label" />
         <InputField v-model="fresh" title="Warn when older than" label="Warn when older than" />
         <InputField
@@ -73,7 +72,7 @@ export default class MetricsDisplayDialog extends DialogBase {
           title="Number of decimals"
           label="Number of decimals"
         />
-      </q-list>
+      </div>
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

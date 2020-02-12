@@ -1,7 +1,7 @@
 {
   "name": "brewblox-ui",
   "version": "0.1.0",
-  "description": "UI for the BrewBlox brewing controller",
+  "description": "UI for the Brewblox brewing controller",
   "author": "Elco Jacobs / BrewPi B.V.",
   "repository": "https://github.com/BrewBlox/brewblox-ui",
   "license": "GPL-3.0",
@@ -11,7 +11,7 @@
     "spark:sparkey": "npm run spark:reset -- sparkey",
     "spark:spock": "npm run spark:reset -- spock",
     "spark:blocks": "npm run spark:sparkey && npm run spark:spock",
-    "couchdb:docs": "node dev/reset_datastore.js dev/presets services dashboards dashboard-items layouts",
+    "couchdb:docs": "node dev/reset_datastore.js dev/presets services dashboards dashboard-items layouts logged-sessions",
     "history:config": "curl -Sk -X POST https://localhost:9001/history/query/configure",
     "compose:new": "docker-compose down && npm run makecert && docker-compose up -d && npm run compose:setup",
     "compose:setup": "npm run spark:blocks && npm run couchdb:docs && npm run history:config",

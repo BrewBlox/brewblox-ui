@@ -1,5 +1,4 @@
 <script lang="ts">
-import pick from 'lodash/pick';
 import { debounce, uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
@@ -340,8 +339,10 @@ export default class BuilderEditor extends Vue {
   }
 
   gridRect(): Rect {
-    return pick(this.grid.getBoundingClientRect(),
-      ['x', 'y', 'left', 'right', 'top', 'bottom']);
+    // Edge (pre-chromium) does not return x/y values
+    // We can infer them from left/top
+    const { left, right, top, bottom } = this.grid.getBoundingClientRect();
+    return { left, right, top, bottom, x: left, y: top };
   }
 
   isClickable(part): boolean {
@@ -736,6 +737,7 @@ export default class BuilderEditor extends Vue {
             icon="widgets"
             class="col"
             size="md"
+            rounded
           >
             <q-list bordered>
               <q-list>
@@ -756,15 +758,16 @@ export default class BuilderEditor extends Vue {
           :layout="layout"
           :select-layout="selectLayout"
           :save-parts="saveParts"
-          stretch
+          round
+          size="md"
         />
 
-        <q-btn flat stretch icon="mdi-close-circle" size="md" @click="leaveEditor" />
+        <q-btn flat round icon="mdi-close-circle" size="md" @click="leaveEditor" />
       </template>
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="drawerOpen" content-class="bg-dark column" elevated>
+    <q-drawer v-model="drawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="builder" />
 
       <q-scroll-area
@@ -883,18 +886,16 @@ export default class BuilderEditor extends Vue {
       </q-scroll-area>
     </q-drawer>
 
-    <q-dialog v-model="menuDialogOpen" no-backdrop-dismiss @keyup.esc="closeMenu">
-      <BuilderPartMenu
-        v-if="menuDialogOpen"
-        :part="configuredPart"
-        @update:part="savePart"
-        @remove:part="removePart"
-        @dirty="debouncedCalculate"
-        @close="closeMenu"
-      />
-    </q-dialog>
+    <BuilderPartMenu
+      v-if="menuDialogOpen"
+      :part="configuredPart"
+      @update:part="savePart"
+      @remove:part="removePart"
+      @dirty="debouncedCalculate"
+      @close="closeMenu"
+    />
 
-    <q-page-container class="bg-dark-bright">
+    <q-page-container>
       <q-page class="row no-wrap justify-center q-pa-md">
         <div class="col-auto column no-wrap">
           <div
@@ -908,7 +909,7 @@ export default class BuilderEditor extends Vue {
           >
             <svg
               ref="grid"
-              class="grid-base grid-editable"
+              class="fit grid-editable"
               @click="v => clickHandler(v, null)"
               @mouseenter="onGridMove"
               @mousemove="onGridMove"
@@ -1039,7 +1040,7 @@ export default class BuilderEditor extends Vue {
 .resume-message {
   border-radius: 40px;
   border: 2px solid silver;
-  background: $dark_bright;
+  // background: $dark_bright;
 }
 
 .fade-enter-active {

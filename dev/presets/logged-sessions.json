@@ -1,0 +1,39 @@
+{
+  "docs": [
+    {
+      "_id": "3d15296d-0abd-4d45-383c-0bec436ae319",
+      "title": "Teddy",
+      "date": 1579688563640,
+      "notes": [
+        {
+          "id": "66ea94b9-1c2a-6218-6469-a9b353e45e77",
+          "title": "Example note",
+          "type": "Text",
+          "value": "",
+          "col": 12
+        },
+        {
+          "id": "ea8631fd-9bb0-ac9f-6cfb-8bf01e56893c",
+          "title": "Subprocess graph",
+          "type": "Graph",
+          "start": null,
+          "end": null,
+          "config": {
+            "layout": {
+              "annotations": []
+            },
+            "params": {},
+            "targets": [],
+            "renames": {},
+            "axes": {},
+            "colors": {}
+          },
+          "col": 12
+        }
+      ],
+      "tags": [
+        "on: Home Dashboard"
+      ]
+    }
+  ]
+}

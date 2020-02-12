@@ -21,6 +21,11 @@ interface XYPosition {
   y: number;
 }
 
+interface GridSize {
+  cols: number;
+  rows: number;
+}
+
 type InputRule = (val: any) => boolean | string;
 
 interface SelectOption {
@@ -29,3 +34,7 @@ interface SelectOption {
 }
 
 type Mapped<T> = Record<string, T>;
+
+interface HasId {
+  id: string;
+}

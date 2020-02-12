@@ -1,6 +1,6 @@
 import { BuilderLayout } from '@/plugins/builder/types';
 import { Block } from '@/plugins/spark/types';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 
 export interface PinChannel {
   arrayId: string;
@@ -13,7 +13,7 @@ export interface QuickStartOutput {
   dashboardId: string;
   dashboardTitle: string;
   layouts: BuilderLayout[];
-  widgets: PersistentWidget[];
+  widgets: Widget[];
   createdBlocks: Block[];
   changedBlocks: Block[];
   renamedBlocks: {

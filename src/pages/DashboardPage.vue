@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
@@ -20,11 +20,6 @@ interface ValidatedWidget {
 @Component
 export default class DashboardPage extends Vue {
   widgetEditable = false;
-
-  context: WidgetContext = {
-    mode: 'Basic',
-    container: 'Dashboard',
-  }
 
   @Watch('dashboardId')
   onChangeDashboardId(): void {
@@ -44,6 +39,14 @@ export default class DashboardPage extends Vue {
     document.title = `Brewblox | ${newV ?? 'Dashboard'}`;
   }
 
+  get context(): WidgetContext {
+    return {
+      mode: 'Basic',
+      container: 'Dashboard',
+      size: this.$dense ? 'Content' : 'Fixed',
+    };
+  }
+
   get dashboardId(): string {
     return this.$route.params.id;
   }
@@ -56,18 +59,18 @@ export default class DashboardPage extends Vue {
     return dashboardStore.dashboardValues;
   }
 
-  get allItems(): PersistentWidget[] {
+  get allItems(): Widget[] {
     return dashboardStore.widgetValues;
   }
 
-  get widgets(): PersistentWidget[] {
-    return dashboardStore.persistentWidgetsByDashboardId(this.dashboardId)
+  get widgets(): Widget[] {
+    return dashboardStore.dashboardWidgets(this.dashboardId)
       .sort(objectSorter('order'));
   }
 
   get validatedWidgets(): ValidatedWidget[] {
     return this.widgets
-      .map((widget: PersistentWidget) => {
+      .map((widget: Widget) => {
         const crud: Crud = {
           widget,
           isStoreWidget: true,
@@ -80,7 +83,7 @@ export default class DashboardPage extends Vue {
             // older items may not have a title
             widget.title = widget.id;
           }
-          const component = featureStore.widget(crud, true);
+          const component = featureStore.widgetComponent(crud, true);
           return {
             id: widget.id,
             component,
@@ -104,19 +107,19 @@ export default class DashboardPage extends Vue {
       if (local) {
         local.crud.widget.pinnedPosition = pinnedPosition;
       }
-      await dashboardStore.savePersistentWidget({ ...dashboardStore.persistentWidgetById(id), pinnedPosition });
-      await dashboardStore.updatePersistentWidgetOrder(order);
+      await dashboardStore.saveWidget({ ...dashboardStore.widgetById(id), pinnedPosition });
+      await dashboardStore.updateWidgetOrder(order);
     } catch (e) {
       throw e;
     }
   }
 
   async onChangeSize(id: string, cols: number, rows: number): Promise<void> {
-    await dashboardStore.updatePersistentWidgetSize({ id, cols, rows });
+    await dashboardStore.updateWidgetSize({ id, cols, rows });
   }
 
-  public async saveWidget(widget: PersistentWidget): Promise<void> {
-    await dashboardStore.savePersistentWidget(widget);
+  public async saveWidget(widget: Widget): Promise<void> {
+    await dashboardStore.saveWidget(widget);
   }
 
   onIdChanged(oldId, newId): void {
@@ -148,14 +151,14 @@ export default class DashboardPage extends Vue {
       parent: this,
       component: 'WizardDialog',
       dashboardId: this.dashboardId,
-      initialComponent: 'WidgetWizardPicker',
+      initialWizard: 'WidgetWizardPicker',
     });
   }
 }
 </script>
 
 <template>
-  <q-page padding class="bg-dark-bright">
+  <q-page padding>
     <q-inner-loading v-if="!dashboard">
       <q-spinner size="50px" color="primary" />
     </q-inner-loading>
@@ -167,7 +170,7 @@ export default class DashboardPage extends Vue {
         <q-btn
           v-if="!$dense"
           unelevated
-          stretch
+          round
           icon="mdi-arrow-all"
           :color="widgetEditable ? 'primary' : ''"
           @click="widgetEditable = !widgetEditable"
@@ -176,7 +179,7 @@ export default class DashboardPage extends Vue {
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu stretch>
+        <ActionMenu round>
           <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
             <q-item clickable @click="toggleDefaultDashboard">
@@ -193,14 +196,16 @@ export default class DashboardPage extends Vue {
           </template>
         </ActionMenu>
       </portal>
+
       <div v-if="$dense" class="column q-gutter-y-sm">
-        <div v-for="val in validatedWidgets" :key="val.id" class="col full-width">
-          <component
-            :is="val.component"
-            :initial-crud="val.crud"
-            :context="context"
-          />
-        </div>
+        <component
+          :is="val.component"
+          v-for="val in validatedWidgets"
+          :key="val.id"
+          :initial-crud="val.crud"
+          :context="context"
+          class="col full-width"
+        />
       </div>
       <GridContainer
         v-else
@@ -215,7 +220,7 @@ export default class DashboardPage extends Vue {
           :initial-crud="val.crud"
           :context="context"
           :error="val.error"
-          class="bg-dark maximized"
+          class="fit"
         />
       </GridContainer>
     </div>

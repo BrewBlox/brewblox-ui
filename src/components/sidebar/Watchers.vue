@@ -2,22 +2,22 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { featureStore, Watcher } from '@/store/features';
+import { featureStore, WatcherFeature } from '@/store/features';
 
 @Component
 export default class Watchers extends Vue {
-  get watchers(): Watcher[] {
+  get watchers(): Mapped<WatcherFeature> {
     return featureStore.watchers;
   }
 }
 </script>
 
 <template>
-  <div style="height: 0px; width: 0px;">
+  <div style="height: 0; width: 0; overflow: hidden">
     <component
       :is="watcher.component"
-      v-for="(watcher, idx) in watchers"
-      :key="'watcher'+idx"
+      v-for="(watcher, id) in watchers"
+      :key="id"
       v-bind="watcher.props"
     />
   </div>

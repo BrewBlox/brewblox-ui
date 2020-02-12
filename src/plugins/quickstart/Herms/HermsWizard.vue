@@ -16,5 +16,9 @@ export default class HermsWizard extends WidgetWizardBase {
 </script>
 
 <template>
-  <WizardTaskMaster :initial-tasks="initialTasks" @back="back" @close="close" />
+  <WizardTaskMaster
+    :initial-tasks="initialTasks"
+    @back="back"
+    @close="close"
+  />
 </template>

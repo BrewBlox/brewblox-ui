@@ -57,7 +57,7 @@ const spec: PartSpec = {
       })
         .onOk(value => {
           block.data.desiredSetting = value;
-          sparkStore.saveBlock([block.serviceId, block]);
+          sparkStore.saveBlock(block);
         });
     }
   },

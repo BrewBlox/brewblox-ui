@@ -29,7 +29,7 @@ export default class SessionCreateDialog extends DialogBase {
   get graphCfg(): GraphConfig {
     if (this.importGraph) {
       const cfg: GraphConfig = deepCopy(
-        dashboardStore.persistentWidgetById(this.importGraph.value)
+        dashboardStore.widgetById(this.importGraph.value)
           .config);
       return {
         ...cfg,

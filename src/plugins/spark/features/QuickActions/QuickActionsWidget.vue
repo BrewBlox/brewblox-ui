@@ -19,7 +19,7 @@ export default class QuickActionsWidget extends WidgetBase {
 </script>
 
 <template>
-  <component :is="mode" :crud="crud" :class="cardClass" :open-step="openStep">
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #menus>
@@ -29,5 +29,6 @@ export default class QuickActionsWidget extends WidgetBase {
         </template>
       </component>
     </template>
-  </component>
+    <component :is="mode" :crud="crud" :open-step="openStep" />
+  </CardWrapper>
 </template>

@@ -38,10 +38,6 @@ export default class BlockPatch extends ActionBase<BlockPatchOpts> {
     }
   }
 
-  get displayName(): string {
-    return featureStore.displayName(this.opts.type);
-  }
-
   isActive(key: string): boolean {
     return this.opts.data[key] !== undefined;
   }

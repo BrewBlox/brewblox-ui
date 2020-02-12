@@ -1,5 +1,3 @@
-import get from 'lodash/get';
-
 import { typeName } from '@/plugins/spark/features/DigitalActuator/getters';
 import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
 import { sparkStore } from '@/plugins/spark/store';
@@ -35,7 +33,7 @@ const spec: PartSpec = {
       : part.settings.enabled;
 
     const pressure = enabled
-      ? get(part.settings, 'onPressure', DEFAULT_PUMP_PRESSURE)
+      ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
     return {
       [LEFT]: [{ outCoords: RIGHT }],
@@ -48,7 +46,7 @@ const spec: PartSpec = {
       block.data.desiredState = block.data.state === DigitalState.Active
         ? DigitalState.Inactive
         : DigitalState.Active;
-      sparkStore.saveBlock([block.serviceId, block]);
+      sparkStore.saveBlock(block);
     } else {
       part.settings.enabled = !part.settings.enabled;
       updater.updatePart(part);

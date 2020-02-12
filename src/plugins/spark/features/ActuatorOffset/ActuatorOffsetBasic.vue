@@ -12,37 +12,37 @@ export default class ActuatorOffsetBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item class="align-children">
-        <q-item-section>
-          <q-item-label caption>
-            Target offset
-          </q-item-label>
-          <big>{{ block.data.desiredSetting | round }}</big>
-        </q-item-section>
-        <q-item-section>
-          <q-item-label caption>
-            Actual offset
-          </q-item-label>
-          <big>{{ block.data.value | round }}</big>
-        </q-item-section>
-      </q-item>
-
-      <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="analog"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+    <div class="widget-body row">
+      <LabeledField
+        label="Target offset"
+        tag="big"
+        class="col-grow"
+      >
+        {{ block.data.desiredSetting | round }}
+      </LabeledField>
+      <LabeledField
+        label="Actual offset"
+        tag="big"
+        class="col-grow"
+      >
+        {{ block.data.value | round }}
+      </LabeledField>
+      <div class="col-break" />
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
+      <ConstraintsField
+        :value="block.data.constrainedBy"
+        :service-id="serviceId"
+        type="analog"
+        class="col-grow"
+        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+      />
+    </div>
+  </div>
 </template>

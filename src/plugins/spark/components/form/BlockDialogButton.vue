@@ -18,7 +18,7 @@ export default class BlockDialogButton extends Vue {
 
   get block(): Block | null {
     return !!this.blockId
-      ? sparkStore.blocks(this.serviceId)[this.blockId] || null
+      ? sparkStore.tryBlockById(this.serviceId, this.blockId)
       : null;
   }
 

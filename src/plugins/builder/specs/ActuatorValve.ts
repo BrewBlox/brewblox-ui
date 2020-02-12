@@ -33,7 +33,7 @@ const spec: PartSpec = {
       block.data.desiredState = block.data.state === DigitalState.Active
         ? DigitalState.Inactive
         : DigitalState.Active;
-      sparkStore.saveBlock([block.serviceId, block]);
+      sparkStore.saveBlock(block);
     }
   },
 };

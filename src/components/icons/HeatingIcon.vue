@@ -11,7 +11,7 @@ export default class HeatingIcon extends Vue {
 
 <template>
   <q-icon :size="size" class="col static" v-bind="$attrs">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-200 -200 1500 1500">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 1150 1150">
       <g transform="translate(0.000000,511.000000) scale(0.100000,-0.100000)">
         <path
           d="M4239.1,4964.4c-7.7-33.3-17.9-156.3-28.2-276.7

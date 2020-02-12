@@ -41,11 +41,11 @@ export default class WidgetWizardPicker extends Vue {
   }
 
   get wizardOptions(): SelectOption[] {
-    return featureStore.featureIds
-      .map(id => ({
-        label: featureStore.displayName(id),
-        value: id,
-        component: featureStore.wizard(id),
+    return featureStore.widgetValues
+      .map(feature => ({
+        label: feature.title,
+        value: feature.id,
+        component: featureStore.widgetWizard(feature.id),
       }))
       .filter(opt => opt.component !== null)
       .sort(objectStringSorter('label'));
@@ -98,63 +98,61 @@ export default class WidgetWizardPicker extends Vue {
 </script>
 
 <template>
-  <div class="dialog-content">
-    <component
-      :is="feature.component"
-      v-if="wizardActive"
-      :feature-id="feature.value"
-      :dashboard-id="chosenDashboardId"
-      @title="setTitle"
-      @back="reset"
-      @close="close"
-    />
+  <component
+    :is="feature.component"
+    v-if="wizardActive"
+    :feature-id="feature.value"
+    :dashboard-id="chosenDashboardId"
+    @title="setTitle"
+    @back="reset"
+    @close="close"
+  />
 
-    <WizardCard v-else>
-      <q-card-section>
-        <q-item>
-          <q-item-section>
-            <q-select
-              v-model="feature"
-              :options="filteredOptions"
-              :rules="[v => !!v || 'You must select a widget type']"
-              label="Widget Type"
-              use-input
-              autofocus
-              @filter="filterFn"
-            >
-              <template #no-option>
-                <q-item>
-                  <q-item-section class="text-grey">
-                    No results
-                  </q-item-section>
-                </q-item>
-              </template>
-            </q-select>
-          </q-item-section>
-        </q-item>
-        <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
-          <q-option-group
-            v-model="chosenDashboardId"
-            :options="dashboardOptions"
-            label="test"
-          />
-        </LabeledField>
-        <q-select
-          v-else
+  <ActionCardBody v-else>
+    <q-card-section>
+      <q-item>
+        <q-item-section>
+          <q-select
+            v-model="feature"
+            :options="filteredOptions"
+            :rules="[v => !!v || 'You must select a widget type']"
+            label="Widget Type"
+            use-input
+            autofocus
+            @filter="filterFn"
+          >
+            <template #no-option>
+              <q-item>
+                <q-item-section class="text-grey">
+                  No results
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </q-item-section>
+      </q-item>
+      <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
+        <q-option-group
           v-model="chosenDashboardId"
           :options="dashboardOptions"
-          label="Dashboard"
-          map-options
-          emit-value
-          item-aligned
+          label="test"
         />
-      </q-card-section>
+      </LabeledField>
+      <q-select
+        v-else
+        v-model="chosenDashboardId"
+        :options="dashboardOptions"
+        label="Dashboard"
+        map-options
+        emit-value
+        item-aligned
+      />
+    </q-card-section>
 
-      <template #actions>
-        <q-btn unelevated label="Back" @click="back" />
-        <q-space />
-        <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="next" />
-      </template>
-    </WizardCard>
-  </div>
+    <template #actions>
+      <q-btn unelevated label="Back" @click="back" />
+      <q-space />
+      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="next" />
+    </template>
+  </ActionCardBody>
 </template>

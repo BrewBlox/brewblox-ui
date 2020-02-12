@@ -1,16 +1,16 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './DeprecatedObjectWidget.vue';
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: 'DeprecatedObject',
-  displayName: 'Deprecated Object',
+  title: 'Deprecated Object',
   role: 'Other',
-  widgetComponent: blockWidgetSelector(widget),
-  wizardComponent: null,
+  component: blockWidgetSelector(widget),
+  wizard: false,
   widgetSize: {
     cols: 4,
     rows: 2,

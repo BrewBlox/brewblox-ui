@@ -1,16 +1,9 @@
-import pick from 'lodash/pick';
 
-import { del, get, post, put, sse } from '@/helpers/fetch';
+import { del, get, post, put } from '@/helpers/fetch';
 import notify from '@/helpers/notify';
-import { deserialize } from '@/helpers/units/parseObject';
 
-import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
-
-const asDataBlock =
-  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
-
-const asBlock =
-  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
+import { ApiSparkStatus, Block, DataBlock, SparkStatus, UnitAlternatives, UserUnits } from '../types';
+import { asBlock, asDataBlock } from './helpers';
 
 const intercept =
   (message: string): ((e: Error) => never) =>
@@ -99,43 +92,30 @@ export const validateService = async (serviceId: string): Promise<boolean> =>
     .then(retv => retv.status === 'ok')
     .catch(() => false);
 
-export const fetchUpdateSource = async (
-  serviceId: string,
-  onData: (blocks: Block[]) => void,
-  onClose: () => void,
-): Promise<EventSource> => {
-  const source = sse(`/${encodeURIComponent(serviceId)}/sse/objects`);
-  source.onerror = () => {
-    source.close();
-    onClose();
-  };
-  source.onmessage = (event: MessageEvent) =>
-    onData(deserialize(JSON.parse(event.data))
-      .map(((block: DataBlock) => asBlock(block, serviceId))));
+const unknownStatus = (): ApiSparkStatus => ({
+  connect: false,
+  handshake: false,
+  synchronize: false,
+  compatible: true, // no idea - assume yes
+  latest: true, // no idea - assume yes
+  valid: true, // no idea - assume yes
+  info: [],
+});
 
-  return source;
-};
-
-export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> => {
+export const fetchSparkStatus = async (serviceId: string): Promise<SparkStatus> => {
   try {
-    const retv: SystemStatus = await get(`/${encodeURIComponent(serviceId)}/system/status`);
+    const retv: ApiSparkStatus = await get(`/${encodeURIComponent(serviceId)}/system/status`);
     return {
       ...retv,
+      serviceId,
       available: true,
-      checkedAt: new Date(),
     };
   } catch (error) {
+    notify.warn(`Unable to fetch Spark status: ${error}`, { shown: false });
     return {
-      checkedAt: new Date(),
+      ...unknownStatus(),
+      serviceId,
       available: false,
-      connect: false,
-      handshake: false,
-      synchronize: false,
-      compatible: true, // no idea - assume yes
-      latest: true, // no idea - assume yes
-      valid: true, // no idea - assume yes
-      info: [],
-      error,
     };
   }
 };

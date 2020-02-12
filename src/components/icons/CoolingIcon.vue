@@ -10,12 +10,21 @@ export default class CoolingIcon extends Vue {
 
   @Prop({ type: String, default: 'white' })
   public readonly color!: string;
+
+  @Prop({ type: Object, default: () => ({}) })
+  public readonly svgProps!: Mapped<any>;
 }
 </script>
 
 <template>
   <q-icon :size="size" class="col static" v-bind="$attrs">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" fill="none" :stroke="color">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="8 8 35 35"
+      fill="none"
+      :stroke="color"
+      v-bind="svgProps"
+    >
       <line x1="25" y1="10" x2="25" y2="40" />
       <polyline points="20.7,12 25,16.7 29.3,12" />
       <polyline points="29.3,38 25,33.3 20.7,38" />

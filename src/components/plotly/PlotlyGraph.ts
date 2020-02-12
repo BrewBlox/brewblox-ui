@@ -141,11 +141,11 @@ export default class PlotlyGraph extends Vue {
       modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
       modeBarButtonsToAdd: [{
         name: 'toImageLarge',
-        title: 'Download plot as a png',
+        title: 'Download plot as a jpeg',
         icon: Plotly['Icons'].camera,
         click: (el) =>
           Plotly.downloadImage(el, {
-            format: 'png',
+            format: 'jpeg',
             width: 3000,
             height: 1500,
             filename: get(this.layout, 'title.text', this.layout.title) || 'graph',

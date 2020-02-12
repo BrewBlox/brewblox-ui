@@ -6,7 +6,6 @@ import { colors } from 'quasar';
 import { Unit } from './units';
 
 type SortFunc = (a: any, b: any) => number
-interface HasId { id: string };
 
 export const uniqueFilter =
   (val: any, idx: number, coll: any[]): boolean => coll.indexOf(val) === idx;
@@ -209,11 +208,11 @@ export const isAbsoluteUrl =
   (val: string): boolean =>
     new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
 
-export const validator =
+export const ruleValidator =
   (rules: InputRule[]): ((val: any) => boolean) =>
     val => rules.every(rule => !isString(rule(val)));
 
-export const ruleChecker =
+export const ruleErrorFinder =
   (rules: InputRule[]): ((val: any) => string | null) =>
     val => {
       for (const rule of rules) {
@@ -249,4 +248,11 @@ export function spliceById<T extends HasId>
       : arr.splice(idx, 1);
   }
   return arr;
+}
+
+export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
+  const idx = arr.findIndex(v => v.id === obj.id);
+  return idx !== -1
+    ? arr.splice(idx, 1)[0]
+    : undefined;
 }

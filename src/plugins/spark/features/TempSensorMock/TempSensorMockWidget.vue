@@ -13,38 +13,35 @@ export default class TempSensorMockWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
       <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
     </template>
 
-    <q-card :class="cardClass">
+    <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" />
+    </template>
 
-      <q-card-section>
-        <q-item>
-          <q-item-section>
-            <UnitField
-              :value="block.data.value"
-              :readonly="!block.data.connected"
-              title="Value"
-              label="Value"
-              tag="big"
-              class="self-start"
-              @input="v => { block.data.value = v; saveBlock(); }"
-            />
-          </q-item-section>
-          <q-item-section>
-            <LabeledField label="Connected">
-              <q-toggle
-                dense
-                :value="block.data.connected"
-                @input="v => { block.data.connected = v; saveBlock(); }"
-              />
-            </LabeledField>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-    </q-card>
+    <div class="widget-md widget-body row">
+      <UnitField
+        :value="block.data.value"
+        :readonly="!block.data.connected"
+        title="Value"
+        label="Value"
+        tag="big"
+        class="col-grow"
+        @input="v => { block.data.value = v; saveBlock(); }"
+      />
+      <LabeledField
+        label="Connected"
+        class="col-grow"
+      >
+        <q-toggle
+          dense
+          :value="block.data.connected"
+          @input="v => { block.data.connected = v; saveBlock(); }"
+        />
+      </LabeledField>
+    </div>
   </GraphCardWrapper>
 </template>

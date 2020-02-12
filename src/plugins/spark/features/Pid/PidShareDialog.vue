@@ -78,7 +78,7 @@ export default class PidShareDialog extends DialogBase {
 
   name(block: Block | null): string {
     return block !== null
-      ? featureStore.displayName(block.type)
+      ? featureStore.widgetTitle(block.type)
       : 'Not set';
   }
 
@@ -183,48 +183,50 @@ export default class PidShareDialog extends DialogBase {
 
 <template>
   <q-dialog ref="dialog" maximized @hide="onDialogHide">
-    <q-card class="maximized bg-dark-bright column">
-      <DialogToolbar class="col-auto">
-        {{ block.id }}
-        <template #buttons>
-          <q-btn-dropdown stretch auto-close flat label="timespan" icon="mdi-timelapse">
-            <ActionItem
-              v-for="(preset, idx) in presets"
-              :key="idx"
-              :active="activeGraphCfg.params.duration === preset.duration"
-              :label="preset.duration"
-              @click="applyParams(preset)"
-            />
-            <ActionItem label="Custom" @click="chooseDuration" />
-          </q-btn-dropdown>
-        </template>
-      </DialogToolbar>
-      <div ref="viewparent" class="col row full-width bg-dark">
-        <div class="col-3 q-pa-md column q-gutter-y-sm sidebar">
-          <div v-for="d in displays" :key="d.role" class="col">
-            <q-btn
-              :disable="d.block === null"
-              flat
-              icon="mdi-launch"
-              class="float-right z-top"
-              @click="showBlock(d.block)"
-            >
-              <q-tooltip v-if="d.block">
-                Open in dialog
-              </q-tooltip>
-            </q-btn>
-            <div class="text-h6 darkish">
-              {{ d.role }} ({{ d.typeName }})
-            </div>
-            <div v-if="d.block" class="text-italic" style="font-size: 120%">
-              {{ d.block.id }}
-            </div>
+    <CardWrapper no-scroll v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="block.id">
+          <template #buttons>
+            <q-btn-dropdown stretch auto-close flat label="timespan" icon="mdi-timelapse">
+              <ActionItem
+                v-for="(preset, idx) in presets"
+                :key="idx"
+                :active="activeGraphCfg.params.duration === preset.duration"
+                :label="preset.duration"
+                @click="applyParams(preset)"
+              />
+              <ActionItem label="Custom" @click="chooseDuration" />
+            </q-btn-dropdown>
+          </template>
+        </DialogToolbar>
+      </template>
+    </CardWrapper>
+
+    <div class="fit row">
+      <div class="col-3 q-pa-md column q-gutter-y-sm sidebar">
+        <div v-for="d in displays" :key="d.role" class="col">
+          <q-btn
+            :disable="d.block === null"
+            flat
+            icon="mdi-launch"
+            class="float-right z-top"
+            @click="showBlock(d.block)"
+          >
+            <q-tooltip v-if="d.block">
+              Open in dialog
+            </q-tooltip>
+          </q-btn>
+          <div class="text-h6 darkish">
+            {{ d.role }} ({{ d.typeName }})
+          </div>
+          <div v-if="d.block" class="text-italic" style="font-size: 120%">
+            {{ d.block.id }}
           </div>
         </div>
-        <q-separator vertical inset />
-        <HistoryGraph ref="graph" class="col" :graph-id="graphId" :config="activeGraphCfg" />
       </div>
-    </q-card>
+      <q-separator vertical inset />
+      <HistoryGraph ref="graph" class="col" :graph-id="graphId" :config="activeGraphCfg" />
+    </div>
   </q-dialog>
 </template>
 

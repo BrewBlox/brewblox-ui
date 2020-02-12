@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -41,7 +40,7 @@ export default class MetricsEditor extends Vue {
   }
 
   decimals(node: QuasarNode): number {
-    return get(this.config.decimals, node.value, DEFAULT_DECIMALS);
+    return this.config.decimals[node.value] ?? DEFAULT_DECIMALS;
   }
 }
 </script>

@@ -32,8 +32,7 @@ export default class UnknownBlockWidget extends WidgetBase {
   }
 
   get reason(): AbsenceReason {
-    const status = sparkStore.lastStatus(this.serviceId);
-    if (!status || !status.synchronize) {
+    if (!sparkStore.lastBlocks(this.serviceId)) {
       return {
         message: 'Waiting for service...',
         temporary: true,
@@ -45,7 +44,7 @@ export default class UnknownBlockWidget extends WidgetBase {
     };
   }
 
-  fetchAll(): void {
+  fetch(): void {
     sparkStore.fetchAll(this.serviceId);
   }
 }
@@ -53,14 +52,14 @@ export default class UnknownBlockWidget extends WidgetBase {
 </script>
 
 <template>
-  <q-card :class="cardClass">
+  <q-card>
     <component :is="toolbarComponent" :crud="crud">
       <template #actions>
         <ActionItem
           :disable="!reason.temporary"
           icon="refresh"
           label="Refresh"
-          @click="fetchAll"
+          @click="fetch"
         />
       </template>
     </component>

@@ -41,6 +41,12 @@ export default class ConstraintsField extends FieldBase {
     return names.map(k => constraintLabels.get(k) || k);
   }
 
+  get textColor(): string {
+    if (this.limiters.length > 0) { return 'text-pink-4'; }
+    if (this.numConstraints > 0) { return 'text-indigo-4'; }
+    return 'darkish';
+  }
+
   openDialog(): void {
     createDialog({
       component: 'ConstraintsDialog',
@@ -57,21 +63,19 @@ export default class ConstraintsField extends FieldBase {
 </script>
 
 <template>
-  <q-list>
-    <q-item clickable style="padding: 5px 0; min-height: 0" @click="openDialog">
-      <q-tooltip>Edit constraints</q-tooltip>
-      <q-item-section class="col-auto darkish">
+  <q-list class="clickable">
+    <div :class="['q-pa-sm q-gutter-x-sm row', textColor]" @click="openDialog">
+      <q-icon name="mdi-border-outside" class="col-auto" size="sm" />
+      <div class="col-auto">
         <small v-if="limiters.length">
           Limited by:
           <i>{{ limiters.join(', ') }}</i>
         </small>
-        <small v-else-if="numConstraints > 0">{{ numConstraints }} constraint(s), not limited</small>
-        <small v-else>No constraints configured</small>
-      </q-item-section>
-      <q-space />
-      <q-item-section side>
-        <q-icon name="edit" />
-      </q-item-section>
-    </q-item>
+        <small v-else-if="numConstraints > 0">
+          {{ numConstraints }} constraint(s), not limited</small>
+        <small v-else>
+          No constraints configured</small>
+      </div>
+    </div>
   </q-list>
 </template>

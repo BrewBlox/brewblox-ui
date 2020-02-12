@@ -62,7 +62,7 @@ export default class MotorValveFull
     if (currentDriver.id) {
       const currentDriverBlock: MotorValveBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
       currentDriverBlock.data.startChannel = 0;
-      await sparkStore.saveBlock([this.serviceId, currentDriverBlock]);
+      await sparkStore.saveBlock(currentDriverBlock);
     }
     this.block.data.startChannel = pinId;
     await this.saveBlock();
@@ -71,60 +71,60 @@ export default class MotorValveFull
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <BlockField
-            :value="block.data.hwDevice"
-            :service-id="serviceId"
-            title="Target DS2408 Chip"
-            label="Target DS2408 Chip"
-            no-create
-            @input="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <SelectField
-            :value="block.data.startChannel"
-            :options="channelOpts"
-            :readonly="!block.data.hwDevice.id"
-            title="DS2408 Channel"
-            label="DS2408 Channel"
-            @input="claimChannel"
-          />
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <DigitalStateField
-            :value="block.data.desiredState"
-            :pending="block.data.state !== block.data.desiredState"
-            :pending-reason="constrainers"
-            :disable="isDriven"
-            label="State"
-            @input="v => { block.data.desiredState = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="valveStateName" label="Valve State" />
-        </q-item-section>
-      </q-item>
+    <div class="widget-body row">
+      <BlockField
+        :value="block.data.hwDevice"
+        :service-id="serviceId"
+        title="Target DS2408 Chip"
+        label="Target DS2408 Chip"
+        no-create
+        class="col-grow"
+        @input="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
+      />
+      <SelectField
+        :value="block.data.startChannel"
+        :options="channelOpts"
+        :readonly="!block.data.hwDevice.id"
+        title="DS2408 Channel"
+        label="DS2408 Channel"
+        class="col-grow"
+        @input="claimChannel"
+      />
+      <div class="col-break" />
+      <LabeledField
+        label="State"
+        class="col-grow"
+      >
+        <DigitalStateButton
+          :value="block.data.desiredState"
+          :pending="block.data.state !== block.data.desiredState"
+          :pending-reason="constrainers"
+          :disable="isDriven"
+          @input="v => { block.data.desiredState = v; saveBlock(); }"
+        />
+      </LabeledField>
+      <LabeledField
+        :value="valveStateName"
+        label="Valve State"
+        class="col-grow"
+      />
+      <div class="col-break" />
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
+      <ConstraintsField
+        :value="block.data.constrainedBy"
+        :service-id="serviceId"
+        type="digital"
 
-      <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="digital"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+        class="col-grow"
+        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+      />
+    </div>
+  </div>
 </template>

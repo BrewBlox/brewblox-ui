@@ -1,7 +1,7 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './DS2408Widget.vue';
 import { typeName } from './getters';
@@ -18,19 +18,19 @@ const block: BlockSpec = {
   changes: [],
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'DS2408 Chip',
+  title: 'DS2408 Chip',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 3,
   },
-  // Discovered objects can't be created or deleted
-  wizardComponent: null,
-  deleters: undefined,
+  // Discovered objects can't be created or removed
+  wizard: false,
+  removeActions: undefined,
 };
 
 export default { feature, block };

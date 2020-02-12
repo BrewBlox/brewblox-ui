@@ -21,7 +21,7 @@ interface EditableBlockChange {
   blockId: string;
   block: Block | null;
   spec: BlockSpec | null;
-  displayName: string;
+  title: string;
   fields: EditableFieldChange[];
 }
 
@@ -53,7 +53,7 @@ export default class QuickActionChange extends Vue {
       blockId: this.value.blockId,
       block,
       spec,
-      displayName: block ? featureStore.displayName(block.type) : 'Unknown',
+      title: block ? featureStore.widgetTitle(block.type) : 'Unknown',
       fields: spec?.changes.map(cfield => ({
         cfield,
         id: cfield.key,
@@ -105,8 +105,7 @@ export default class QuickActionChange extends Vue {
 <template>
   <q-list
     v-if="editable"
-    class="q-mb-sm q-ml-md"
-    bordered
+    class="q-mb-sm q-ml-md depth-1"
     dense
   >
     <q-item>
@@ -114,13 +113,13 @@ export default class QuickActionChange extends Vue {
         {{ change.blockId }}
       </q-item-section>
       <q-item-section side>
-        <q-btn flat round icon="clear" @click="$emit('remove')">
-          <q-tooltip>Remove Block Change from Step</q-tooltip>
+        <q-btn flat round icon="delete" @click="$emit('remove')">
+          <q-tooltip>Remove block change from step</q-tooltip>
         </q-btn>
       </q-item-section>
       <q-item-section side>
         <q-btn flat round icon="mdi-rename-box" @click="$emit('switch')">
-          <q-tooltip>Switch target Block</q-tooltip>
+          <q-tooltip>Switch target block</q-tooltip>
         </q-btn>
       </q-item-section>
       <q-item-section side>
@@ -192,13 +191,12 @@ export default class QuickActionChange extends Vue {
 
   <q-list
     v-else
-    class="q-mb-sm q-ml-md"
-    bordered
+    class="q-mb-sm q-ml-md depth-1"
     dense
   >
     <q-item>
       <q-item-section
-        :class="{'text-h6': true, grabbable: true, 'text-red': !change.block}"
+        :class="['text-h6 grabbable', {'text-red': !change.block}]"
       >
         {{ change.blockId }}
         <q-tooltip v-if="!change.block">
@@ -212,7 +210,7 @@ export default class QuickActionChange extends Vue {
           icon="mdi-pencil"
           @click="editable = true"
         >
-          <q-tooltip>Edit Block Change</q-tooltip>
+          <q-tooltip>Edit block change</q-tooltip>
         </q-btn>
       </q-item-section>
     </q-item>

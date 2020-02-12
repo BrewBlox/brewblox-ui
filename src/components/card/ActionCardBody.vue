@@ -4,16 +4,16 @@ import { Component } from 'vue-property-decorator';
 
 
 @Component
-export default class WizardCard extends Vue {
+export default class ActionCardBody extends Vue {
 
 }
 </script>
 
 <template>
-  <div class="full-height col column justify-between">
-    <div class="col scroll">
+  <div class="fit column">
+    <q-scroll-area visible class="col">
       <slot />
-    </div>
+    </q-scroll-area>
     <div v-if="$slots.actions" class="col-auto">
       <q-separator />
       <q-card-actions align="right">
@@ -22,9 +22,3 @@ export default class WizardCard extends Vue {
     </div>
   </div>
 </template>
-
-<style scoped>
-.quickstart-card-body {
-  height: calc(100% - 60px) !important;
-}
-</style>

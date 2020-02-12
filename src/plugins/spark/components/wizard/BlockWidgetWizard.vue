@@ -1,14 +1,14 @@
 <script lang="ts">
-import get from 'lodash/get';
-import isString from 'lodash/isString';
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createDialog } from '@/helpers/dialog';
-import { objectStringSorter } from '@/helpers/functional';
+import { objectStringSorter, ruleValidator } from '@/helpers/functional';
+import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockConfig, BlockCrud, DashboardBlock } from '@/plugins/spark/types';
+import { Block, BlockConfig, BlockCrud } from '@/plugins/spark/types';
+import { Widget } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
 
 @Component
@@ -19,11 +19,11 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   service: Service | null = null;
   block: Block | null = null;
   isStoreBlock = false;
-  widget: DashboardBlock | null = null;
+  widget: Widget<BlockConfig> | null = null;
   activeDialog: any = null;
 
   get serviceId(): string {
-    return get(this, ['service', 'id'], '');
+    return this.service?.id ?? '';
   }
 
   get blockIdRules(): InputRule[] {
@@ -35,13 +35,13 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
       return [];
     }
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => block.type === this.typeId)
+      .filter(block => block.type === this.featureId)
       .sort(objectStringSorter('id'));
   }
 
   get serviceOpts(): SelectOption[] {
     return serviceStore.serviceValues
-      .filter(service => service.type === 'Spark')
+      .filter(service => service.type === sparkType)
       .map(service => ({
         label: service.title,
         value: service,
@@ -53,8 +53,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   }
 
   get createOk(): boolean {
-    return !!this.service
-      && !this.blockIdRules.some(rule => isString(rule(this.blockId)));
+    return !!this.service && ruleValidator(this.blockIdRules)(this.blockId);
   }
 
   get existingOk(): boolean {
@@ -62,18 +61,18 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   }
 
   ensureItem(): void {
-    this.block = this.block || {
+    this.block = this.block ?? {
       id: this.blockId,
       serviceId: this.serviceId,
-      type: this.typeId,
+      type: this.featureId,
       groups: [0],
-      data: sparkStore.specs[this.typeId].generate(),
+      data: sparkStore.specs[this.featureId].generate(),
     };
     this.blockId = this.block.id; // for when using existing block
-    this.widget = this.widget || {
+    this.widget = this.widget ?? {
       id: this.widgetId,
       title: this.blockId,
-      feature: this.typeId,
+      feature: this.featureId,
       dashboard: this.dashboardId,
       order: 0,
       config: {
@@ -87,7 +86,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   async saveBlock(block: Block): Promise<void> {
     this.block = block;
     if (this.isStoreBlock) {
-      await sparkStore.saveBlock([block.serviceId, block]);
+      await sparkStore.saveBlock(block);
     }
   }
 
@@ -97,7 +96,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
       widget: this.widget!,
       isStoreWidget: false,
       saveWidget: v => { this.widget = v; },
-      block: this.block as Block,
+      block: this.block!,
       isStoreBlock: this.isStoreBlock,
       saveBlock: this.saveBlock,
       closeDialog: this.closeDialog,
@@ -119,11 +118,11 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
 
   async createWidget(): Promise<void> {
     this.ensureItem();
-    const service = this.service as Service;
-    const block = this.block as Block;
+    const service = this.service!;
+    const block = this.block!;
 
     if (!sparkStore.blockIds(service.id).includes(block.id)) {
-      await sparkStore.createBlock([service.id, block]);
+      await sparkStore.createBlock(block);
     }
 
     this.createItem(this.widget!);
@@ -138,11 +137,11 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
 </script>
 
 <template>
-  <WizardCard>
+  <ActionCardBody>
     <q-stepper
       v-model="currentStep"
       :bordered="false"
-      class="bg-dark-bright no-border"
+      class="no-border"
       vertical
       animated
     >
@@ -156,29 +155,29 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
           <q-btn
             :disable="!startOk"
             unelevated
-            label="Create new Block"
+            label="Create new block"
             color="primary"
             @click="isStoreBlock = false; currentStep = 'create'"
           />
           <q-btn
             :disable="!startOk"
             unelevated
-            label="Use existing Block"
+            label="Use existing block"
             color="primary"
             @click="isStoreBlock = true; currentStep = 'existing'"
           />
         </portal>
       </q-step>
 
-      <q-step name="create" title="Create new Block">
+      <q-step name="create" title="Create new block">
         <q-item>
           <q-item-section>
             <q-input v-model="blockId" :rules="blockIdRules" autofocus label="Block name">
               <template #append>
                 <q-icon name="mdi-information">
                   <q-tooltip>
-                    The name of the Spark Controller Block.
-                    <br>Multiple widgets can display the same Block.
+                    The name of the Spark Controller block.
+                    <br>Multiple widgets can display the same block.
                     <br>Rules:
                     <ul>
                       <li>The name must not be empty.</li>
@@ -199,7 +198,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
           <q-btn
             :disable="!createOk"
             flat
-            label="Configure Block"
+            label="Configure block"
             @click="configureBlock"
           />
           <q-btn
@@ -212,13 +211,13 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
         </portal>
       </q-step>
 
-      <q-step name="existing" title="Use existing Block">
+      <q-step name="existing" title="Use existing block">
         <q-item>
           <q-item-section>
             <q-select
               :value="block"
               :options="blockOpts"
-              :rules="[v => !!v || 'You must select a Block']"
+              :rules="[v => !!v || 'You must select a block']"
               option-label="id"
               option-value="id"
               label="Block"
@@ -241,7 +240,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
           <q-btn
             :disable="!existingOk"
             flat
-            label="Configure Block"
+            label="Configure block"
             @click="configureBlock"
           />
           <q-btn
@@ -258,5 +257,5 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     <template #actions>
       <portal-target name="widget-wizard-nav" class="full-width row justify-end q-gutter-sm" />
     </template>
-  </WizardCard>
+  </ActionCardBody>
 </template>

@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { validator } from '@/helpers/functional';
+import { ruleValidator } from '@/helpers/functional';
 
 
 @Component
@@ -11,7 +11,7 @@ export default class QuickStartPrefixField extends Vue {
     v => /^($|[a-zA-Z])/.test(v) || 'Name must start with a letter',
     v => /^[a-zA-Z0-9 \(\)_\-\|]*$/.test(v) || 'Name may only contain letters, numbers, spaces, and ()-_|',
   ];
-  validator = validator(this.rules);
+  validator = ruleValidator(this.rules);
   local: string | null = null;
 
   @Prop({ type: String, required: true })

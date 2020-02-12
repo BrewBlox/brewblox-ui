@@ -1,4 +1,4 @@
-import { PersistentWidget } from '@/store/dashboards';
+import { StoreObject } from '@/plugins/database';
 
 export interface FlowRoute {
   outCoords: string;
@@ -70,22 +70,17 @@ export interface PartSpec {
   interactHandler?: (part: PersistentPart, updater: PartUpdater) => void;
 }
 
-export interface BuilderLayout {
+export interface BuilderLayout extends StoreObject {
   id: string;
   title: string;
   width: number;
   height: number;
   parts: PersistentPart[];
-  _rev?: string;
 }
 
 export interface BuilderConfig {
   currentLayoutId: string | null;
   layoutIds: string[];
-}
-
-export interface BuilderItem extends PersistentWidget {
-  config: BuilderConfig;
 }
 
 export interface Rect {

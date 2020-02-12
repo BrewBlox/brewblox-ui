@@ -1,19 +1,20 @@
-import { selector } from '@/helpers/component-ref';
-import { Feature } from '@/store/features';
+import { ref } from '@/helpers/component-ref';
+import { WidgetFeature } from '@/store/features';
 
 import { historyStore } from '../store';
 import widget from './SessionLogWidget.vue';
 import { SessionLogConfig } from './types';
 
-const feature: Feature = {
+const feature: WidgetFeature<SessionLogConfig> = {
   id: 'SessionLog',
-  displayName: 'Session Log',
-  widgetComponent: selector(widget),
+  title: 'Session Log',
+  component: ref(widget),
+  wizard: true,
   widgetSize: {
     cols: 4,
     rows: 5,
   },
-  generateConfig: (): SessionLogConfig => {
+  generateConfig: () => {
     const [last] = [...historyStore.sessionValues].sort((a, b) => b.date - a.date);
     return { currentSession: last !== undefined ? last.id : null };
   },

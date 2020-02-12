@@ -4,7 +4,7 @@ import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import { typeName } from './getters';
 import ProfilePresetAction from './ProfilePresetAction.vue';
@@ -62,12 +62,12 @@ const block: BlockSpec = {
 ref(ProfilePresetAction);
 ref(ProfilePresetDialog);
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Setpoint Profile',
+  title: 'Setpoint Profile',
   role: 'Process',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
     rows: 3,

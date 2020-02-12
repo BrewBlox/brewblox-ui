@@ -1,9 +1,10 @@
 import mapKeys from 'lodash/mapKeys';
 import queryString from 'query-string';
 
-import { generate } from '@/helpers/database-api';
-import { get, post, sse } from '@/helpers/fetch';
+import { get, post } from '@/helpers/fetch';
 import { snakeCased } from '@/helpers/functional';
+import { sse } from '@/helpers/sse';
+import { createApi } from '@/plugins/database/api';
 
 import { LoggedSession, QueryParams, QueryResult, QueryTarget } from '../types';
 
@@ -58,4 +59,4 @@ export const historyApi = {
         .catch(() => false),
 };
 
-export const sessionApi = generate<LoggedSession>('logged-sessions');
+export const sessionApi = createApi<LoggedSession>('logged-sessions');

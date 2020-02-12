@@ -90,17 +90,17 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
 </script>
 
 <template>
-  <WizardCard>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
           <q-item-label class="text-subtitle1">
-            Assign Hardware Blocks
+            Assign Hardware blocks
           </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="refresh" @click="discover">
-            <q-tooltip>Discover OneWire Blocks</q-tooltip>
+            <q-tooltip>Discover OneWire blocks</q-tooltip>
           </q-btn>
         </q-item-section>
         <q-item-section class="col-auto">
@@ -174,5 +174,5 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
     </template>
-  </WizardCard>
+  </ActionCardBody>
 </template>

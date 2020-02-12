@@ -1,7 +1,7 @@
-import { generate } from '@/helpers/database-api';
+import { createApi } from '@/plugins/database/api';
 
 import { StoredDataPreset } from '../types';
 
-const api = generate<StoredDataPreset>('spark-presets');
+const api = createApi<StoredDataPreset>('spark-presets');
 
 export default api;

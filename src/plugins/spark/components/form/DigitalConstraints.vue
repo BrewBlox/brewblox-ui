@@ -50,58 +50,59 @@ export default class DigitalConstraints extends ConstraintsBase {
 </script>
 
 <template>
-  <q-list dense>
-    <q-item
+  <div class="column q-gutter-y-sm">
+    <div
       v-for="(editable, idx) in constraints"
       :key="idx"
-      :class="editable.limiting ? 'limiting' : ''"
+      :class="['row q-gutter-x-sm constraint', {limiting: editable.limiting}]"
     >
-      <q-item-section>
-        <SelectField
-          :value="editable.key"
-          :options="constraintOptions"
-          clearable
-          title="Constraint type"
-          label="Constraint"
-          @input="k => { constraints[idx] = createConstraint(k); saveConstraints() }"
-        />
-      </q-item-section>
-      <q-item-section>
-        <BlockField
-          v-if="editable.key === 'mutex'"
-          :service-id="serviceId"
-          :value="editable.value"
-          title="Mutex"
-          label="Mutex"
-          @input="v => { editable.value = v; saveConstraints(); }"
-        />
-        <TimeUnitField
-          v-else
-          :value="editable.value"
-          title="Constraint value"
-          label="Duration"
-          @input="v => { editable.value = v; saveConstraints(); }"
-        />
-      </q-item-section>
-      <q-item-section class="col-1 self-end darkish">
+      <SelectField
+        :value="editable.key"
+        :options="constraintOptions"
+        clearable
+        title="Constraint type"
+        label="Constraint"
+        class="col-grow"
+        @input="k => { constraints[idx] = createConstraint(k); saveConstraints() }"
+      />
+      <BlockField
+        v-if="editable.key === 'mutex'"
+        :service-id="serviceId"
+        :value="editable.value"
+        title="Mutex"
+        label="Mutex"
+        class="col-grow"
+        @input="v => { editable.value = v; saveConstraints(); }"
+      />
+      <TimeUnitField
+        v-else
+        :value="editable.value"
+        title="Constraint value"
+        label="Duration"
+        class="col-grow"
+        @input="v => { editable.value = v; saveConstraints(); }"
+      />
+      <div class="col-auto column justify-center darkish">
         <q-btn icon="delete" flat round @click="removeConstraint(idx); saveConstraints();">
           <q-tooltip>Remove constraint</q-tooltip>
         </q-btn>
-      </q-item-section>
-    </q-item>
-    <q-item class="q-mt-md">
-      <q-item-section />
-      <q-item-section class="col-auto">
-        <q-btn icon="add" round outline @click="addConstraint">
-          <q-tooltip>Add constraint</q-tooltip>
-        </q-btn>
-      </q-item-section>
-    </q-item>
-  </q-list>
+      </div>
+    </div>
+    <div class="col row justify-end">
+      <q-btn icon="add" round outline @click="addConstraint">
+        <q-tooltip>Add constraint</q-tooltip>
+      </q-btn>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-.limiting {
+<style lang="sass" scoped>
+.limiting
   color: orange;
-}
+
+.constraint:nth-child(even) > label
+  background: rgba($green-5, 0.05)
+
+.constraint:nth-child(odd) > label
+  background: rgba($blue-5, 0.05)
 </style>
