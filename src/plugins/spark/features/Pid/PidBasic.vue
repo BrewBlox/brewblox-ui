@@ -87,14 +87,14 @@ export default class PidBasic
 </script>
 
 <template>
-  <div class="widget-md">
+  <div class="widget-md q-mx-auto">
     <slot name="warnings" />
 
-    <div v-if="true" class="widget-body row justify-center">
+    <div class="widget-body row justify-center">
       <PidMini :block="block" @edit:input="editInput" @edit:output="showOutput" />
     </div>
 
-    <div v-else class="widget-body row">
+    <!-- <div class="widget-body row">
       <UnitField
         v-if="!!inputBlock"
         :value="inputBlock.data.storedSetting"
@@ -174,6 +174,6 @@ export default class PidBasic
         number
         class="col min-width-sm"
       />
-    </div>
+    </div> -->
   </div>
 </template>

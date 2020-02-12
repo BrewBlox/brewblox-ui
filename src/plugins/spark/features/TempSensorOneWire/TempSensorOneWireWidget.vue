@@ -25,14 +25,31 @@ export default class TempSensorOneWireWidget
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
 
-    <div class="widget-md">
+    <div>
       <CardWarning v-if="!hasValue">
         <template #message>
           OneWire Sensor could not be read.
         </template>
       </CardWarning>
 
-      <div class="widget-body row">
+      <div class="q-ma-md row justify-center">
+        <div v-if="hasValue" class="col-auto row items-center">
+          <q-icon
+            name="mdi-thermometer"
+            size="md"
+            color="green-3"
+            class="col-auto"
+          />
+          <UnitField
+            :value="block.data.value"
+            readonly
+            tag="big"
+            class="col-auto"
+          />
+        </div>
+      </div>
+
+      <!-- <div class="widget-body row">
         <UnitField
           v-if="hasValue"
           :value="block.data.value"
@@ -60,7 +77,7 @@ export default class TempSensorOneWireWidget
             @input="v => { block.data.address = v; saveBlock(); }"
           />
         </template>
-      </div>
+      </div> -->
     </div>
   </GraphCardWrapper>
 </template>

@@ -16,8 +16,8 @@ export default class DigitalActuatorBasic
     <slot name="warnings">
       <div class="widget-body row">
         <LabeledField
-          label="State"
-          class="col-grow"
+          class="col"
+          tag-class="full-width row justify-center"
         >
           <DigitalStateButton
             :value="block.data.desiredState"
@@ -25,10 +25,13 @@ export default class DigitalActuatorBasic
             :pending-reason="constrainers"
             :disable="isDriven"
             dense
+            class="col-auto"
             @input="v => { block.data.desiredState = v; saveBlock(); }"
           />
         </LabeledField>
+
         <div class="col-break" />
+
         <DrivenIndicator
           :block-id="block.id"
           :service-id="serviceId"

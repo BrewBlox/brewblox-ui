@@ -108,12 +108,14 @@ export const asServiceStatus =
     const id = status.serviceId;
     const [desc, color] = status.synchronize
       ? ['Synchronized', 'green']
-      : status.handshake
+      : (status.compatible && status.connect)
         ? ['Synchronizing', 'yellow']
-        : status.connect
-          ? ['Waiting for handshake', 'yellow']
-          : status.available
-            ? ['Waiting for connection', 'red']
-            : ['Unreachable', 'red'];
+        : status.handshake
+          ? ['Incompatible firmware', 'orange']
+          : status.connect
+            ? ['Waiting for handshake', 'yellow']
+            : status.available
+              ? ['Waiting for connection', 'red']
+              : ['Unreachable', 'red'];
     return { id, color, desc };
   };
