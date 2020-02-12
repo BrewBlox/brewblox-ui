@@ -29,6 +29,8 @@ export default class GridItem extends Vue {
   currentRows: number | null = null;
   current: XYPosition = zeroPos();
 
+  resizePos: XYPosition = zeroPos();
+
   @Ref()
   readonly container!: Vue;
 
@@ -51,8 +53,8 @@ export default class GridItem extends Vue {
     const pinned = pinnedPosition || zeroPos();
 
     return {
-      gridColumnStart: `${this.current.x || pinned.x || 'auto'}`,
-      gridRowStart: `${this.current.y || pinned.y || 'auto'}`,
+      gridColumnStart: `${this.current.x || pinned.x || this.resizePos.x || 'auto'}`,
+      gridRowStart: `${this.current.y || pinned.y || this.resizePos.y || 'auto'}`,
       gridColumnEnd: `span ${this.currentCols || cols}`,
       gridRowEnd: `span ${this.currentRows || rows}`,
     };
@@ -217,6 +219,7 @@ export default class GridItem extends Vue {
   }
 
   startResize(e: MouseEvent | TouchEvent): void {
+    this.resizePos = this.findPos();
     this.resizing = true;
     this.startInteraction(e);
   }
@@ -229,6 +232,7 @@ export default class GridItem extends Vue {
   }
 
   stopResize(): void {
+    this.resizePos = zeroPos();
     this.resizing = false;
     this.updateSize();
     this.stopInteraction();
@@ -248,11 +252,7 @@ export default class GridItem extends Vue {
     this.moveInteraction(args.evt);
   }
 
-  unpin(): void {
-    this.updatePosition(null);
-  }
-
-  pin(): void {
+  findPos(): XYPosition {
     const rects = this.containerSize();
     const firstChildRects = this.containerFirstChildSize();
 
@@ -262,12 +262,18 @@ export default class GridItem extends Vue {
     const parentX = firstChildRects.x;
     const parentY = firstChildRects.y;
 
-    const pos: XYPosition = {
+    return {
       x: ((touchX - parentX) / (GRID_SIZE + GAP_SIZE)) + 1,
       y: ((touchY - parentY) / (GRID_SIZE + GAP_SIZE)) + 1,
     };
+  }
 
-    this.updatePosition(pos);
+  unpin(): void {
+    this.updatePosition(null);
+  }
+
+  pin(): void {
+    this.updatePosition(this.findPos());
   }
 }
 </script>
