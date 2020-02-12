@@ -14,7 +14,7 @@ export default class CardWarning extends Vue {
 
 <template>
   <div
-    class="row no-wrap items-center q-gutter-x-md q-ma-md"
+    class="row no-wrap items-center q-gutter-x-md q-ma-md justify-center"
     style="max-width: 100%"
   >
     <q-icon
@@ -23,7 +23,7 @@ export default class CardWarning extends Vue {
       size="md"
       class="col-auto"
     />
-    <div class="col">
+    <div class="col-shrink">
       <slot name="message" />
     </div>
     <div class="col-auto column q-gutter-y-xs">

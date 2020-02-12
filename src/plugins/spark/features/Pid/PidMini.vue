@@ -37,75 +37,79 @@ export default class PidMini extends Vue {
 </script>
 
 <template>
-  <div class="col-auto row justify-around q-gutter-sm">
+  <div class="col-auto row justify-around q-gutter-sm q-my-none q-pr-sm">
     <div
-      class="col-grow q-py-sm grid-container clickable rounded-borders"
+      class="col-grow row justify-center q-py-sm clickable rounded-borders"
       @click="$emit('edit:input')"
     >
-      <div class="grid-value text-h5 text-purple-3">
-        Input
-      </div>
+      <div class="col-auto grid-container">
+        <div class="grid-value text-h5 text-purple-3">
+          Input
+        </div>
 
-      <q-icon
-        class="grid-icon q-mx-auto"
-        name="mdi-thermometer"
-        size="sm"
-        color="green-3"
-      />
-      <div class="grid-value text-h5">
-        {{ block.data.inputValue | unit }}
-      </div>
+        <q-icon
+          class="grid-icon q-mx-auto"
+          name="mdi-thermometer"
+          size="sm"
+          color="green-3"
+        />
+        <div class="grid-value text-h5">
+          {{ block.data.inputValue | unit }}
+        </div>
 
-      <q-icon
-        class="grid-icon q-mx-auto"
-        name="mdi-unfold-more-horizontal"
-        size="sm"
-        color="amber-4"
-      />
-      <div class="grid-value text-h6 text-amber-4">
-        {{ block.data.inputSetting | unit }}
+        <q-icon
+          class="grid-icon q-mx-auto"
+          name="mdi-unfold-more-horizontal"
+          size="sm"
+          color="amber-4"
+        />
+        <div class="grid-value text-h6 text-amber-4">
+          {{ block.data.inputSetting | unit }}
+        </div>
       </div>
     </div>
     <div
-      class="col-grow grid-container q-py-sm clickable rounded-borders"
+      class="col-grow row justify-center q-py-sm clickable rounded-borders"
       @click="$emit('edit:output')"
     >
-      <div class="grid-value text-h5 text-purple-3">
-        Output
-      </div>
+      <div class="col-auto grid-container">
+        <div class="grid-value text-h5 text-purple-3">
+          Output
+        </div>
 
-      <q-icon
-        v-if="kp === null"
-        class="grid-icon q-mx-auto"
-        name="mdi-calculator-variant"
-        size="sm"
-      />
-      <HeatingIcon
-        v-else-if="kp > 0"
-        class="grid-icon q-mx-auto"
-        color="red"
-        size="sm"
-        :svg-props="{'stroke-width': '2px'}"
-      />
-      <CoolingIcon
-        v-else-if="kp < 0"
-        class="grid-icon q-mx-auto"
-        color="dodgerblue"
-        size="sm"
-        :svg-props="{'stroke-width': '2px'}"
-      />
-      <div class="grid-value text-h5">
-        {{ block.data.outputValue | round }} %
-      </div>
+        <q-icon
+          v-if="kp === null"
+          class="grid-icon q-mx-auto"
+          name="mdi-calculator-variant"
+          size="sm"
+        />
+        <HeatingIcon
+          v-else-if="kp > 0"
+          class="grid-icon q-mx-auto"
+          color="red"
+          size="sm"
+          :svg-props="{'stroke-width': '2px'}"
+        />
+        <CoolingIcon
+          v-else-if="kp < 0"
+          class="grid-icon q-mx-auto"
+          color="dodgerblue"
+          size="sm"
+          :svg-props="{'stroke-width': '2px'}"
+        />
+        <div class="grid-value text-h5">
+          {{ block.data.outputValue | round }} %
+        </div>
 
-      <q-icon
-        class="grid-icon q-mx-auto"
-        name="mdi-unfold-more-horizontal"
-        size="sm"
-        color="amber-4"
-      />
-      <div class="grid-value text-h6 text-amber-4">
-        {{ block.data.outputSetting | round }} %
+        <q-icon
+          class="grid-icon q-mx-auto"
+          name="mdi-unfold-more-horizontal"
+          size="sm"
+          color="amber-4"
+        />
+        <div class="grid-value text-h6 text-amber-4">
+          {{ block.data.outputSetting | round }} %
+        </div>
       </div>
     </div>
 

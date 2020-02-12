@@ -12,8 +12,11 @@ export default class UnitField extends FieldBase {
   @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
   public readonly value!: Unit;
 
-  @Prop({ type: String, default: 'value' })
+  @Prop({ type: String, required: false })
   public readonly label!: string;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly noLabel!: boolean;
 
   @Prop({ type: [String, Object, Array], default: '' })
   public readonly tagClass!: any;
