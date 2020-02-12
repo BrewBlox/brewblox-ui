@@ -17,7 +17,7 @@ import {
   RelationEdge,
   RelationNode,
   SparkService,
-  SystemStatus,
+  SparkStatus,
 } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore, WidgetContext, WidgetRole } from '@/store/features';
@@ -98,15 +98,11 @@ export default class SparkPage extends Vue {
     return sparkStore.serviceAvailable(this.serviceId);
   }
 
-  get lastUpdate(): Date | null {
-    return sparkStore.lastUpdate(this.serviceId);
-  }
-
   get isReady(): boolean {
     return this.isAvailable && isReady(this.serviceId);
   }
 
-  get status(): SystemStatus | null {
+  get status(): SparkStatus | null {
     return this.isAvailable
       ? sparkStore.status(this.serviceId)
       : null;

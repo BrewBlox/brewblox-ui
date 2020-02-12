@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { sparkStore } from '@/plugins/spark/store';
-import { SystemStatus } from '@/plugins/spark/types';
+import { SparkStatus } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
 
 
@@ -19,7 +19,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
     return serviceStore.serviceById(this.serviceId);
   }
 
-  get status(): SystemStatus | null {
+  get status(): SparkStatus | null {
     return sparkStore.status(this.serviceId);
   }
 
@@ -64,7 +64,6 @@ export default class FirmwareUpdateDialog extends DialogBase {
       })
       .finally(() => {
         this.busy = false;
-        sparkStore.fetchServiceStatus(this.serviceId);
       });
   }
 }

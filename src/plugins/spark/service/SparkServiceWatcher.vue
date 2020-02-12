@@ -8,7 +8,7 @@ import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { systemStore } from '@/store/system';
 
-import { SparkService, SystemStatus } from '../types';
+import { SparkService, SparkStatus } from '../types';
 
 const snoozeDuration = durationMs('1d');
 const updateValidDuration = durationMs('30s');
@@ -24,7 +24,7 @@ export default class SparkServiceWatcher extends Vue {
     return systemStore.now;
   }
 
-  get status(): SystemStatus | null {
+  get status(): SparkStatus | null {
     return sparkStore.status(this.service.id);
   }
 
@@ -39,21 +39,32 @@ export default class SparkServiceWatcher extends Vue {
     return Date.parse(this.$q.cookies.get(this.cookieName));
   }
 
-  @Watch('now')
-  checkUpdateFresh(): void {
-    const date = sparkStore.lastUpdate(this.service.id);
-    const fresh = !!date && date.getTime() + updateValidDuration > new Date().getTime();
+  fresh(date: Date | null): boolean {
+    return !!date && date.getTime() + updateValidDuration > new Date().getTime();
+  }
 
-    if (!fresh && date) {
+  @Watch('now')
+  checkBlocksFresh(): void {
+    const blocksDate = sparkStore.lastBlocks(this.service.id);
+    const statusDate = sparkStore.lastStatus(this.service.id);
+    const blocksFresh = this.fresh(blocksDate);
+    const statusFresh = this.fresh(statusDate);
+
+    // The last received set of blocks are stale.
+    // Remove them.
+    if (!blocksFresh && blocksDate) {
       sparkStore.invalidateBlocks(this.service.id);
     }
-    if (!fresh || !this.status?.synchronize) {
-      sparkStore.fetchServiceStatus(this.service.id);
+
+    // The last received status update is stale.
+    // Query the service for an update.
+    if (!statusFresh) {
+      sparkStore.fetchAll(this.service.id);
     }
   }
 
   @Watch('status')
-  handleStatusChange(status: SystemStatus): void {
+  handleStatusChange(status: SparkStatus): void {
     if (this.notifiedUpdate
       || !status
       || !status.connect

@@ -17,12 +17,6 @@ export default class ServiceIndex extends Vue {
   startChangeServiceTitle = startChangeServiceTitle;
   startCreateService = startCreateService;
   startRemoveService = startRemoveService;
-  statusColor: Record<ServiceStatus['connection'], string> = {
-    'Unknown': 'grey',
-    'Disconnected': 'red',
-    'Connecting': 'yellow',
-    'Connected': 'green',
-  }
 
   dragging = false;
 
@@ -58,7 +52,9 @@ export default class ServiceIndex extends Vue {
       });
   }
 
-
+  status(service: Service): ServiceStatus | null {
+    return this.statuses[service.id] ?? null;
+  }
 }
 </script>
 
@@ -122,11 +118,11 @@ export default class ServiceIndex extends Vue {
           </q-list>
         </q-menu>
       </template>
-      <template v-else>
+      <template v-else-if="status(service) !== null">
         <q-item-section class="col-auto q-mr-sm">
-          <q-icon name="mdi-checkbox-blank-circle" :color="statusColor[statuses[service.id].connection]" />
+          <q-icon name="mdi-checkbox-blank-circle" :color="status(service).color" />
           <q-tooltip>
-            {{ statuses[service.id].connection }}
+            {{ status(service).desc }}
           </q-tooltip>
         </q-item-section>
       </template>

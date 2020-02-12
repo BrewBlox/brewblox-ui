@@ -1,9 +1,10 @@
 import pick from 'lodash/pick';
 
 import { Link } from '@/helpers/units';
+import { ServiceStatus } from '@/store/services';
 
 import { constraintLabels } from '../helpers';
-import { Block, ConstraintsObj, DataBlock, Limiters, RelationEdge } from '../types';
+import { Block, ConstraintsObj, DataBlock, Limiters, RelationEdge, SparkStatus } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];
@@ -101,3 +102,18 @@ export const asDataBlock =
 
 export const asBlock =
   (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
+
+export const asServiceStatus =
+  (status: SparkStatus): ServiceStatus => {
+    const id = status.serviceId;
+    const [desc, color] = status.synchronize
+      ? ['Synchronized', 'green']
+      : status.handshake
+        ? ['Synchronizing', 'yellow']
+        : status.connect
+          ? ['Waiting for handshake', 'yellow']
+          : status.available
+            ? ['Waiting for connection', 'red']
+            : ['Unreachable', 'red'];
+    return { id, color, desc };
+  };

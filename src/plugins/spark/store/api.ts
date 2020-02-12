@@ -2,7 +2,7 @@
 import { del, get, post, put } from '@/helpers/fetch';
 import notify from '@/helpers/notify';
 
-import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
+import { ApiSparkStatus, Block, DataBlock, SparkStatus, UnitAlternatives, UserUnits } from '../types';
 import { asBlock, asDataBlock } from './helpers';
 
 const intercept =
@@ -92,26 +92,30 @@ export const validateService = async (serviceId: string): Promise<boolean> =>
     .then(retv => retv.status === 'ok')
     .catch(() => false);
 
-export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> => {
+const unknownStatus = (): ApiSparkStatus => ({
+  connect: false,
+  handshake: false,
+  synchronize: false,
+  compatible: true, // no idea - assume yes
+  latest: true, // no idea - assume yes
+  valid: true, // no idea - assume yes
+  info: [],
+});
+
+export const fetchSparkStatus = async (serviceId: string): Promise<SparkStatus> => {
   try {
-    const retv: SystemStatus = await get(`/${encodeURIComponent(serviceId)}/system/status`);
+    const retv: ApiSparkStatus = await get(`/${encodeURIComponent(serviceId)}/system/status`);
     return {
       ...retv,
+      serviceId,
       available: true,
-      checkedAt: new Date(),
     };
   } catch (error) {
+    notify.warn(`Unable to fetch Spark status: ${error}`, { shown: false });
     return {
-      checkedAt: new Date(),
+      ...unknownStatus(),
+      serviceId,
       available: false,
-      connect: false,
-      handshake: false,
-      synchronize: false,
-      compatible: true, // no idea - assume yes
-      latest: true, // no idea - assume yes
-      valid: true, // no idea - assume yes
-      info: [],
-      error,
     };
   }
 };

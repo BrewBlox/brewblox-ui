@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import Vue from 'vue';
 import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 
@@ -23,16 +24,7 @@ const onRemoveService = (service: Service): Promise<void> =>
 export class ServiceModule extends VuexModule {
   public services: Mapped<Service> = {};
   public stubs: Mapped<ServiceStub> = {};
-  private _statuses: Mapped<ServiceStatus> = {};
-
-  public get statuses(): Mapped<ServiceStatus> {
-    const retv: Mapped<ServiceStatus> = {};
-    Object.values(this.services)
-      .forEach(service => {
-        retv[service.id] = this._statuses[service.id] ?? { id: service.id, connection: 'Unknown' };
-      });
-    return retv;
-  }
+  public statuses: Mapped<ServiceStatus> = {};
 
   public get serviceIds(): string[] {
     return Object.keys(this.services);
@@ -70,8 +62,8 @@ export class ServiceModule extends VuexModule {
 
   @Mutation
   public commitAllServices(services: Service[]): void {
-    this.services = services.reduce(objReducer('id'), {});
     const ids = services.map(svc => svc.id);
+    this.services = services.reduce(objReducer('id'), {});
     this.stubs = Object.values(this.stubs)
       .filter(s => !ids.includes(s.id))
       .reduce(objReducer('id'), {});
@@ -84,7 +76,9 @@ export class ServiceModule extends VuexModule {
 
   @Mutation
   public commitStub(stub: ServiceStub): void {
-    Vue.set(this.stubs, stub.id, { ...stub });
+    if (!this.services[stub.id]) {
+      Vue.set(this.stubs, stub.id, { ...stub });
+    }
   }
 
   @Mutation
@@ -94,7 +88,7 @@ export class ServiceModule extends VuexModule {
 
   @Mutation
   public commitStatus(status: ServiceStatus): void {
-    Vue.set(this._statuses, status.id, { ...status });
+    Vue.set(this.statuses, status.id, { ...status });
   }
 
   @Action({ rawError })
@@ -131,16 +125,14 @@ export class ServiceModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async createServiceStub(stub: ServiceStub): Promise<void> {
-    if (!this.services[stub.id]) {
-      this.commitStub(stub);
-    }
+  public async createStub(stub: ServiceStub): Promise<void> {
+    this.commitStub(stub);
   }
 
   @Action({ rawError })
   public async updateStatus(status: ServiceStatus): Promise<void> {
     const current = this.statuses[status.id];
-    if (status.connection !== current?.connection) {
+    if (!isEqual(current, status)) {
       this.commitStatus(status);
     }
   }

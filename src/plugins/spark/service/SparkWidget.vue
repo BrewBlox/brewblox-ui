@@ -29,8 +29,8 @@ export default class SparkWidget extends Vue {
     return serviceStore.serviceById(this.serviceId);
   }
 
-  get lastUpdate(): string {
-    return shortDateString(sparkStore.lastUpdate(this.serviceId), 'Unknown');
+  get lastBlocks(): string {
+    return shortDateString(sparkStore.lastBlocks(this.serviceId), 'Unknown');
   }
 
   sysBlock<T extends Block>(blockType: string): T {
@@ -117,7 +117,7 @@ export default class SparkWidget extends Vue {
           {{ wifi.data.ip }}
         </LabeledField>
         <LabeledField label="Last blocks update" class="col-lg-5 col-11">
-          {{ lastUpdate }}
+          {{ lastBlocks }}
         </LabeledField>
       </div>
     </div>

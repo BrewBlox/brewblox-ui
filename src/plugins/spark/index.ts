@@ -6,7 +6,7 @@ import { featureStore, WidgetFeature } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
 import features from './features';
-import { sparkType } from './getters';
+import { sparkStatusEvent, sparkType } from './getters';
 import { installFilters } from './helpers';
 import { sparkStore } from './store';
 import { BlockSpec } from './types';
@@ -70,8 +70,8 @@ export default {
     Vue.$startup.onStart(() => {
       Vue.$eventbus.addListener({
         id: uid(),
-        filter: (_, type) => type === sparkType,
-        onmessage: msg => serviceStore.createServiceStub({ id: msg.key, type: msg.type }),
+        filter: (_, type) => type === sparkStatusEvent,
+        onmessage: msg => serviceStore.createStub({ id: msg.key, type: sparkType }),
       });
     });
   },

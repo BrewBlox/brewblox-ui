@@ -64,7 +64,12 @@ export interface ServiceStatus {
   id: string;
 
   /**
-   * Current service connection status.
+   * Status indicator.
    */
-  connection: 'Unknown' | 'Disconnected' | 'Connecting' | 'Connected';
+  color: string;
+
+  /**
+   * Human readable text.
+   */
+  desc: string;
 }
