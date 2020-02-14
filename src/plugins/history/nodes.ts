@@ -127,7 +127,7 @@ export const targetBuilder =
           const [measurement, ...keys] = v.split('/');
           const field = keys.join('/');
           const existing = acc.find(t => t.measurement === measurement);
-          if (filterUnknown && knownFields[measurement]?.includes(field)) {
+          if (filterUnknown && !knownFields[measurement]?.includes(field)) {
             return acc;
           }
           if (existing) {
