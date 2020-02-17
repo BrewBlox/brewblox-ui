@@ -148,9 +148,13 @@ export default class PidMini extends Vue {
       />
 
       <div
+        v-if="!!block.data.boilMinOutput"
         :class="[
           'col-auto self-center text-bold',
-          `text-${block.data.boilModeActive ? 'deep-orange' : 'grey'}`,
+          `text-${block.data.boilModeActive
+            ? 'deep-orange'
+            : 'grey'
+          }`,
         ]"
       >
         boil
