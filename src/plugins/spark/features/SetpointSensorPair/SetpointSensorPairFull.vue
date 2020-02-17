@@ -101,7 +101,7 @@ export default class SetpointSensorPairForm
             round
             icon="mdi-skip-forward"
             class="self-end"
-            @click="block.data.resetFilter = true; saveBlock()"
+            @click.stop="block.data.resetFilter = true; saveBlock()"
           >
             <q-tooltip>Bypass filter now</q-tooltip>
           </q-btn>
