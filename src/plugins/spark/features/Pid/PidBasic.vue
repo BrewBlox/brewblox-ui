@@ -7,15 +7,10 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import PidMini from './PidMini.vue';
 import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';
 
-@Component({
-  components: {
-    PidMini,
-  },
-})
+@Component
 export default class PidBasic
   extends BlockCrudComponent<PidBlock> {
 
@@ -31,6 +26,14 @@ export default class PidBasic
 
   get outputBlock(): Block | null {
     return sparkStore.tryBlockById(this.serviceId, this.block.data.outputId.id);
+  }
+
+  get kp(): number | null {
+    return this.block.data.kp.value;
+  }
+
+  fit(v: number): number {
+    return Math.min(v, 100);
   }
 
   enable(): void {
@@ -91,89 +94,96 @@ export default class PidBasic
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
-      <PidMini :block="block" @edit:input="editInput" @edit:output="showOutput" />
+      <SettingValueField editable class="col-grow" @click="editInput">
+        <template #header>
+          Input
+        </template>
+        <template #valueIcon>
+          <q-icon name="mdi-thermometer" color="green-3" />
+        </template>
+        <template #value>
+          {{ block.data.inputValue | unit }}
+        </template>
+        <template #setting>
+          {{ block.data.inputSetting | unit }}
+        </template>
+      </SettingValueField>
+      <SettingValueField editable class="col-grow" @click="showOutput">
+        <template #header>
+          Output
+        </template>
+        <template #valueIcon>
+          <q-icon
+            v-if="kp === null"
+            name="mdi-calculator-variant"
+          />
+          <HeatingIcon
+            v-else-if="kp > 0"
+            color="red"
+            :svg-props="{'stroke-width': '2px'}"
+          />
+          <CoolingIcon
+            v-else-if="kp < 0"
+            color="dodgerblue"
+            :svg-props="{'stroke-width': '2px'}"
+          />
+        </template>
+        <template #value>
+          {{ block.data.outputValue | round }} %
+        </template>
+        <template #setting>
+          {{ block.data.outputSetting | round }} %
+        </template>
+      </SettingValueField>
+
+      <div class="col-break" />
+
+      <div class="col row no-wrap q-gutter-x-sm q-mr-md">
+        <div class="col-auto self-center text-bold">
+          P
+        </div>
+        <q-slider
+          :value="fit(block.data.p)"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
+
+        <div class="col-auto self-center text-bold">
+          I
+        </div>
+        <q-slider
+          :value="fit(block.data.i)"
+          :max="100"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
+
+        <div class="col-auto self-center text-bold">
+          D
+        </div>
+        <q-slider
+          :value="fit(block.data.d)"
+          :max="100"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
+
+        <div
+          v-if="!!block.data.boilMinOutput"
+          :class="[
+            'col-auto self-center text-bold',
+            `text-${block.data.boilModeActive
+              ? 'deep-orange'
+              : 'grey'
+            }`,
+          ]"
+        >
+          boil
+        </div>
+      </div>
     </div>
-
-    <!-- <div class="widget-body row">
-      <UnitField
-        v-if="!!inputBlock"
-        :value="inputBlock.data.storedSetting"
-        :readonly="inputDriven"
-        :class="{darkened: !inputBlock.data.settingEnabled}"
-        label="Input setting"
-        tag="big"
-        class="col min-width-sm"
-        @input="v => { inputBlock.data.storedSetting = v; saveStoreBlock(inputBlock); }"
-      />
-      <UnitField
-        v-else
-        :value="block.data.inputSetting"
-        label="Input setting"
-        tag="big"
-        readonly
-        class="col min-width-sm"
-      />
-      <UnitField
-        :value="block.data.inputValue"
-        label="Input measured"
-        tag="big"
-        readonly
-        class="col min-width-sm"
-      />
-      <q-btn
-        label="Open"
-        icon="mdi-launch"
-        flat
-        no-caps
-        class="depth-1 col min-width-sm"
-        @click="showInput"
-      />
-
-      <div class="col-break" />
-
-      <LabeledField
-        :value="block.data.outputSetting"
-        number
-        label="Output target"
-        tag="big"
-        class="col min-width-sm"
-      />
-      <LabeledField
-        :value="block.data.outputValue"
-        number
-        label="Output achieved"
-        tag="big"
-        class="col min-width-sm"
-      />
-      <q-btn
-        label="Open"
-        icon="mdi-launch"
-        flat
-        no-caps
-        class="depth-1 col min-width-sm"
-        @click="showOutput"
-      />
-
-      <div class="col-break" />
-
-      <LabeledField
-        :value="block.data.p"
-        label="P"
-        number
-        class="col min-width-sm"
-      />
-      <LabeledField
-        :value="block.data.i"
-        label="I"
-        number
-        class="col min-width-sm"
-      />
-      <LabeledField
-        :value="block.data.d"
-        label="D"
-        number
-        class="col min-width-sm"
-      />
-    </div> -->
   </div>
 </template>

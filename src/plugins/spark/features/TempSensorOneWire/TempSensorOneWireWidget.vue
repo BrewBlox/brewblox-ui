@@ -49,19 +49,10 @@ export default class TempSensorOneWireWidget
         </div>
       </div>
 
-      <!-- <div class="widget-body row">
-        <UnitField
-          v-if="hasValue"
-          :value="block.data.value"
-          label="Value"
-          readonly
-          item-aligned
-          tag="big"
-          class="col-grow"
-        />
+      <template v-if="mode === 'Full'">
+        <q-separator inset />
 
-        <template v-if="mode === 'Full'">
-          <div class="col-break" />
+        <div class="widget-body row">
           <UnitField
             :value="block.data.offset"
             title="Offset"
@@ -76,8 +67,8 @@ export default class TempSensorOneWireWidget
             class="col-grow"
             @input="v => { block.data.address = v; saveBlock(); }"
           />
-        </template>
-      </div> -->
+        </div>
+      </template>
     </div>
   </GraphCardWrapper>
 </template>
