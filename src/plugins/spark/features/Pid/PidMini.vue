@@ -38,82 +38,50 @@ export default class PidMini extends Vue {
 
 <template>
   <div class="col-auto row justify-around q-gutter-sm q-my-none q-pr-sm">
-    <div
-      class="col-grow row justify-center q-py-sm clickable rounded-borders"
-      @click="$emit('edit:input')"
-    >
-      <div class="col-auto grid-container">
-        <div class="grid-value text-h5 text-purple-3">
-          Input
-        </div>
-
-        <q-icon
-          class="grid-icon q-mx-auto"
-          name="mdi-thermometer"
-          size="sm"
-          color="green-3"
-        />
-        <div class="grid-value text-h5">
-          {{ block.data.inputValue | unit }}
-        </div>
-
-        <q-icon
-          class="grid-icon q-mx-auto"
-          name="mdi-unfold-more-horizontal"
-          size="sm"
-          color="amber-4"
-        />
-        <div class="grid-value text-h6 text-amber-4">
-          {{ block.data.inputSetting | unit }}
-        </div>
-      </div>
-    </div>
-    <div
-      class="col-grow row justify-center q-py-sm clickable rounded-borders"
-      @click="$emit('edit:output')"
-    >
-      <div class="col-auto grid-container">
-        <div class="grid-value text-h5 text-purple-3">
-          Output
-        </div>
-
+    <SettingValueField editable class="col-grow" @click="$emit('edit:input')">
+      <template #header>
+        Input
+      </template>
+      <template #valueIcon>
+        <q-icon name="mdi-thermometer" color="green-3" />
+      </template>
+      <template #value>
+        {{ block.data.inputValue | unit }}
+      </template>
+      <template #setting>
+        {{ block.data.inputSetting | unit }}
+      </template>
+    </SettingValueField>
+    <SettingValueField editable class="col-grow" @click="$emit('edit:output')">
+      <template #header>
+        Output
+      </template>
+      <template #valueIcon>
         <q-icon
           v-if="kp === null"
-          class="grid-icon q-mx-auto"
           name="mdi-calculator-variant"
-          size="sm"
         />
         <HeatingIcon
           v-else-if="kp > 0"
-          class="grid-icon q-mx-auto"
           color="red"
-          size="sm"
           :svg-props="{'stroke-width': '2px'}"
         />
         <CoolingIcon
           v-else-if="kp < 0"
-          class="grid-icon q-mx-auto"
           color="dodgerblue"
-          size="sm"
           :svg-props="{'stroke-width': '2px'}"
         />
-        <div class="grid-value text-h5">
-          {{ block.data.outputValue | round }} %
-        </div>
-
-        <q-icon
-          class="grid-icon q-mx-auto"
-          name="mdi-unfold-more-horizontal"
-          size="sm"
-          color="amber-4"
-        />
-        <div class="grid-value text-h6 text-amber-4">
-          {{ block.data.outputSetting | round }} %
-        </div>
-      </div>
-    </div>
+      </template>
+      <template #value>
+        {{ block.data.outputValue | round }} %
+      </template>
+      <template #setting>
+        {{ block.data.outputSetting | round }} %
+      </template>
+    </SettingValueField>
 
     <div class="col-break" />
+
     <div class="col row no-wrap q-gutter-x-sm q-mr-md">
       <div class="col-auto self-center text-bold">
         P
@@ -162,20 +130,3 @@ export default class PidMini extends Vue {
     </div>
   </div>
 </template>
-
-<style lang="sass" scoped>
-.grid-container
-  display: grid
-  grid-template-columns: repeat(3, 50px)
-  grid-row-gap: 5px
-  grid-auto-flow: row
-
-.grid-icon
-  grid-column-end: span 1
-  grid-column-start: 1
-
-.grid-value
-  grid-column-end: span 2
-  grid-column-start: 2
-  align-self: flex-end
-</style>

@@ -21,7 +21,7 @@ export default class SliderDialog extends DialogBase {
   @Prop({ type: Number, default: 1 })
   public readonly step!: number;
 
-  @Prop({ type: String, default: 'Value' })
+  @Prop({ type: String, required: false })
   public readonly label!: string;
 
   @Prop({ type: Boolean, default: true })
@@ -50,7 +50,7 @@ export default class SliderDialog extends DialogBase {
       <q-item>
         <q-item-section class="q-pt-md">
           <q-slider v-model="local" :min="min" :max="max" label-always />
-          <q-item-label caption>
+          <q-item-label v-if="label" caption>
             {{ label }}
           </q-item-label>
         </q-item-section>
