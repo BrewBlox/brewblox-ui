@@ -19,7 +19,7 @@ export default class SettingValueField extends Vue {
 <template>
   <div
     :class="[
-      'row justify-center q-py-sm rounded-borders',
+      'col-auto row justify-center q-py-sm rounded-borders',
       {clickable: editable}
     ]"
     @click="edit"
