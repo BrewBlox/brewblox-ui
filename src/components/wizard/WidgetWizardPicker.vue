@@ -11,9 +11,9 @@ export default class WidgetWizardPicker extends Vue {
   @Prop({ type: String, required: false })
   readonly dashboardId!: string;
 
-  filteredOptions: any[] = [];
   feature: any = null;
   wizardActive = false;
+  filter = '';
 
   localChosenDashboardId = '';
 
@@ -51,21 +51,17 @@ export default class WidgetWizardPicker extends Vue {
       .sort(objectStringSorter('label'));
   }
 
-  get valuesOk(): boolean {
-    return !!this.chosenDashboardId && !!this.feature;
+  get filteredOptions(): SelectOption[] {
+    if (!this.filter) {
+      return this.wizardOptions;
+    }
+    const needle = this.filter.toLowerCase();
+    return this.wizardOptions
+      .filter(opt => opt.label.toLowerCase().match(needle));
   }
 
-  filterFn(val, update): void {
-    if (val === '') {
-      update(() => this.filteredOptions = this.wizardOptions);
-      return;
-    }
-
-    update(() => {
-      const needle = val.toLowerCase();
-      this.filteredOptions = this.wizardOptions
-        .filter(opt => opt.label.toLowerCase().match(needle));
-    });
+  get valuesOk(): boolean {
+    return !!this.chosenDashboardId && !!this.feature;
   }
 
   setTitle(title: string): void {
@@ -75,7 +71,7 @@ export default class WidgetWizardPicker extends Vue {
   reset(): void {
     this.wizardActive = false;
     this.setTitle('Widget wizard');
-    this.filteredOptions = this.wizardOptions;
+    this.filter = '';
   }
 
   back(): void {
@@ -87,6 +83,7 @@ export default class WidgetWizardPicker extends Vue {
   }
 
   next(): void {
+    if (!this.valuesOk) { return; }
     this.wizardActive = true;
     this.setTitle(`${this.feature.label} wizard`);
   }
@@ -109,45 +106,36 @@ export default class WidgetWizardPicker extends Vue {
   />
 
   <ActionCardBody v-else>
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <q-select
-            v-model="feature"
-            :options="filteredOptions"
-            :rules="[v => !!v || 'You must select a widget type']"
-            label="Widget Type"
-            use-input
-            autofocus
-            @filter="filterFn"
-          >
-            <template #no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                  No results
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-        </q-item-section>
-      </q-item>
-      <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
-        <q-option-group
-          v-model="chosenDashboardId"
-          :options="dashboardOptions"
-          label="test"
-        />
-      </LabeledField>
+    <div class="widget-body column">
       <q-select
-        v-else
         v-model="chosenDashboardId"
         :options="dashboardOptions"
         label="Dashboard"
         map-options
         emit-value
-        item-aligned
       />
-    </q-card-section>
+      <q-input
+        v-model="filter"
+        placeholder="Search"
+        clearable
+        autofocus
+      >
+        <template #append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <div
+        v-for="opt in filteredOptions"
+        :key="opt.value"
+        :class="[
+          'col clickable q-pa-sm rounded-borders',
+          {'text-primary': feature === opt}
+        ]"
+        @click="feature !== opt ? feature = opt : next()"
+      >
+        {{ opt.label }}
+      </div>
+    </div>
 
     <template #actions>
       <q-btn unelevated label="Back" @click="back" />
