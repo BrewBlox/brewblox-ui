@@ -49,8 +49,12 @@ export default class GridContainer extends Vue {
               editable: this.editable,
             },
             on: {
-              'size': this.updateItemSize,
-              'position': this.updateItemPosition,
+              size: this.updateItemSize,
+              position: this.updateItemPosition,
+            },
+            nativeOn: {
+              // Ignore double clicks on widgets
+              dblclick: evt => evt.stopPropagation(),
             },
           },
           [slot], // The actual widget
@@ -65,7 +69,15 @@ export default class GridContainer extends Vue {
 
   render(h: CreateElement): VNode {
     return h('div',
-      { class: 'grid-container grid-main-container' },
+      {
+        class: 'grid-container grid-main-container',
+        on: {
+          dblclick: evt => {
+            evt.stopPropagation();
+            this.$emit('dblclick');
+          },
+        },
+      },
       this.renderWidgets(h)
     );
   }

@@ -105,7 +105,7 @@ export default class WidgetWizardPicker extends Vue {
     @close="close"
   />
 
-  <ActionCardBody v-else>
+  <ActionCardBody v-else @keyup.ctrl.enter="next">
     <div class="widget-body column">
       <q-select
         v-model="chosenDashboardId"
@@ -119,6 +119,7 @@ export default class WidgetWizardPicker extends Vue {
         placeholder="Search"
         clearable
         autofocus
+        class="q-mb-md"
       >
         <template #append>
           <q-icon name="search" />
@@ -128,10 +129,11 @@ export default class WidgetWizardPicker extends Vue {
         v-for="opt in filteredOptions"
         :key="opt.value"
         :class="[
-          'col clickable q-pa-sm rounded-borders',
-          {'text-primary': feature === opt}
+          'col clickable q-pa-sm rounded-borders text-h6',
+          feature === opt && 'depth-24',
         ]"
-        @click="feature !== opt ? feature = opt : next()"
+        @click="feature !== opt ? feature = opt : feature = null"
+        @dblclick="feature = opt; next()"
       >
         {{ opt.label }}
       </div>

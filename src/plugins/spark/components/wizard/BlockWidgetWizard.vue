@@ -3,12 +3,13 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createDialog } from '@/helpers/dialog';
-import { objectStringSorter, ruleValidator } from '@/helpers/functional';
+import { objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
 import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockConfig, BlockCrud } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
+import { featureStore } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
 
 @Component
@@ -21,6 +22,12 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   isStoreBlock = false;
   widget: Widget<BlockConfig> | null = null;
   activeDialog: any = null;
+
+  mounted(): void {
+    this.service = this.serviceOpts[0]?.value ?? null;
+    const title = featureStore.widgetTitle(this.featureId);
+    this.blockId = suggestId(title, ruleValidator(this.blockIdRules));
+  }
 
   get serviceId(): string {
     return this.service?.id ?? '';
@@ -126,12 +133,6 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     }
 
     this.createItem(this.widget!);
-  }
-
-  mounted(): void {
-    if (this.serviceOpts.length > 0) {
-      this.service = this.serviceOpts[0].value;
-    }
   }
 }
 </script>
