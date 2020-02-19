@@ -52,10 +52,6 @@ export default class GridContainer extends Vue {
               size: this.updateItemSize,
               position: this.updateItemPosition,
             },
-            nativeOn: {
-              // Ignore double clicks on widgets
-              dblclick: evt => evt.stopPropagation(),
-            },
           },
           [slot], // The actual widget
         ));
@@ -73,8 +69,9 @@ export default class GridContainer extends Vue {
         class: 'grid-container grid-main-container',
         on: {
           dblclick: evt => {
-            evt.stopPropagation();
-            this.$emit('dblclick');
+            if (evt.target === evt.currentTarget) {
+              this.$emit('dblclick');
+            }
           },
         },
       },
