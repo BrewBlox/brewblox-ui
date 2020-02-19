@@ -10,6 +10,10 @@ export default class QuickStartWizardPicker extends Vue {
   model: QuickStartFeature | null = null;
   wizardActive = false;
 
+  mounted(): void {
+    this.reset();
+  }
+
   get wizardOptions(): QuickStartFeature[] {
     return featureStore.quickStartValues
       .filter(qs => !!qs.component)
@@ -39,11 +43,6 @@ export default class QuickStartWizardPicker extends Vue {
     }
     this.setTitle(`${this.model.title} wizard`);
     this.wizardActive = true;
-  }
-
-  mounted(): void {
-    this.reset();
-    this.model = this.wizardOptions[0];
   }
 }
 </script>
