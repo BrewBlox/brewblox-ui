@@ -7,9 +7,12 @@ import { featureStore, QuickStartFeature } from '@/store/features';
 
 @Component
 export default class QuickStartWizardPicker extends Vue {
-  searchModel = '';
-  wizardModel: QuickStartFeature | null = null;
+  model: QuickStartFeature | null = null;
   wizardActive = false;
+
+  mounted(): void {
+    this.reset();
+  }
 
   get wizardOptions(): QuickStartFeature[] {
     return featureStore.quickStartValues
@@ -35,16 +38,11 @@ export default class QuickStartWizardPicker extends Vue {
   }
 
   next(): void {
-    if (!this.wizardModel) {
+    if (!this.model) {
       return;
     }
-    this.setTitle(`${this.wizardModel.title} wizard`);
+    this.setTitle(`${this.model.title} wizard`);
     this.wizardActive = true;
-  }
-
-  mounted(): void {
-    this.reset();
-    this.wizardModel = this.wizardOptions[0];
   }
 }
 </script>
@@ -52,9 +50,9 @@ export default class QuickStartWizardPicker extends Vue {
 <template>
   <!-- Display selected wizard -->
   <component
-    :is="wizardModel.component"
+    :is="model.component"
     v-if="wizardActive"
-    :feature-id="wizardModel.id"
+    :feature-id="model.id"
     @title="setTitle"
     @back="reset"
     @close="close"
@@ -97,24 +95,28 @@ export default class QuickStartWizardPicker extends Vue {
         </q-item-section>
       </q-item>
     </q-card-section>
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <q-select
-            v-model="wizardModel"
-            :options="wizardOptions"
-            label="Please select a brewing process"
-            option-label="title"
-            option-value="id"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+    <div class="q-mx-md q-px-sm q-gutter-sm column">
+      <div class="text-subtitle1">
+        Please select a brewing process
+      </div>
+      <div
+        v-for="opt in wizardOptions"
+        :key="opt.id"
+        :class="[
+          'col clickable q-pa-sm rounded-borders',
+          model === opt && 'depth-24',
+        ]"
+        @click="model !== opt ? model = opt : model = null"
+        @dblclick="model = opt; next()"
+      >
+        {{ opt.title }}
+      </div>
+    </div>
 
     <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
-      <q-btn :disable="!wizardModel" unelevated label="Next" color="primary" @click="next" />
+      <q-btn :disable="!model" unelevated label="Next" color="primary" @click="next" />
     </template>
   </ActionCardBody>
 </template>

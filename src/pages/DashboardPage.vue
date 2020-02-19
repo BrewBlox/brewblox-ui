@@ -212,6 +212,7 @@ export default class DashboardPage extends Vue {
         :editable="widgetEditable"
         @change-positions="onChangePositions"
         @change-size="onChangeSize"
+        @dblclick="showWizard"
       >
         <component
           :is="val.component"
@@ -226,8 +227,3 @@ export default class DashboardPage extends Vue {
     </div>
   </q-page>
 </template>
-
-<style lang="sass" scoped>
-.selected-mode
-  border-bottom: 2px solid $secondary
-</style>
