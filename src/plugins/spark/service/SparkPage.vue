@@ -452,11 +452,6 @@ export default class SparkPage extends Vue {
             @click="startDialog('SparkImportMenu')"
           />
           <ActionItem
-            icon="mdi-test-tube"
-            label="Create mock blocks"
-            @click="startDialog('CreateMockMenu')"
-          />
-          <ActionItem
             icon="delete"
             label="Remove all blocks"
             @click="startResetBlocks(service.id)"
