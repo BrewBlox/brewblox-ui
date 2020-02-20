@@ -175,11 +175,30 @@ export default class BlockWizard extends Vue {
           <q-icon name="search" />
         </template>
       </q-input>
+
+      <template v-if="!initialFeature">
+        <div
+          v-for="opt in filteredOptions"
+          :key="opt.value"
+          :class="[
+            'col clickable q-pa-sm rounded-borders text-h6',
+            selected === opt && 'depth-24',
+          ]"
+          @click="selectOpt(opt)"
+          @dblclick="selectOpt(opt, true)"
+        >
+          {{ opt.label }}
+        </div>
+      </template>
+    </div>
+
+    <template #actions>
       <q-input
         v-model="blockId"
         :rules="blockIdRules"
         label="Block name"
         clearable
+        class="col-12"
       >
         <template #append>
           <q-icon name="mdi-information">
@@ -198,23 +217,6 @@ export default class BlockWizard extends Vue {
           </q-icon>
         </template>
       </q-input>
-      <template v-if="!initialFeature">
-        <div
-          v-for="opt in filteredOptions"
-          :key="opt.value"
-          :class="[
-            'col clickable q-pa-sm rounded-borders text-h6',
-            selected === opt && 'depth-24',
-          ]"
-          @click="selectOpt(opt)"
-          @dblclick="selectOpt(opt, true)"
-        >
-          {{ opt.label }}
-        </div>
-      </template>
-    </div>
-
-    <template #actions>
       <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock" />
       <q-btn
         :disable="!createReady"
