@@ -1,0 +1,193 @@
+<script lang="ts">
+import { Component } from 'vue-property-decorator';
+
+import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
+import { spliceById } from '@/helpers/functional';
+
+import { automationStore } from './store';
+import { AutomationStep, AutomationTemplate } from './types';
+
+interface HasId {
+  id: string;
+}
+
+@Component
+export default class AutomationEditor extends DialogBase {
+  drawerOpen = !this.$dense;
+
+  mounted(): void {
+    if (this.routeId && this.routeId !== automationStore.activeTemplate) {
+      automationStore.commitActive([this.routeId, null]);
+    }
+  }
+
+  leaveEditor(): void {
+    this.$router.back();
+  }
+
+  get routeId(): string | null {
+    return this.$route.params.id ?? null;
+  }
+
+  get templateId(): string | null {
+    return this.routeId
+      ?? automationStore.activeTemplate
+      ?? automationStore.templateIds[0]
+      ?? null;
+  }
+
+  get templates(): AutomationTemplate[] {
+    return automationStore.templateValues;
+  }
+
+  get template(): AutomationTemplate | null {
+    return automationStore.templateById(
+      this.routeId
+      ?? automationStore.activeTemplate
+      ?? automationStore.templateIds[0]
+    );
+  }
+
+  get stepId(): string | null {
+    return automationStore.activeStep
+      ?? this.template?.steps[0]?.id
+      ?? null;
+  }
+
+  get steps(): AutomationStep[] {
+    return this.template?.steps ?? [];
+  }
+
+  get step(): AutomationStep | null {
+    return this.template?.steps.find(s => s.id === this.stepId) ?? null;
+  }
+
+  saveTemplate(template: AutomationTemplate | null = this.template): void {
+    if (template) {
+      automationStore.saveTemplate(template);
+    }
+  }
+
+  saveStep(step: AutomationStep | null = this.step): void {
+    if (this.template !== null && step !== null) {
+      spliceById(this.template.steps, step);
+      this.saveTemplate();
+    }
+  }
+
+  selectActive(template: AutomationTemplate | null, step: AutomationStep | null = null): void {
+    automationStore.commitActive(
+      template === null
+        ? null
+        : [template.id, step?.id ?? null]
+    );
+  }
+
+  startAddTemplate(copy: boolean): void {
+    copy;
+  }
+
+  startRenameTemplate(): void {
+    if (this.template === null) {
+      return;
+    }
+    createDialog({
+      parent: this,
+      title: 'Rename template',
+      message: `Choose a new name for '${this.template.title}'`,
+      cancel: true,
+      prompt: {
+        model: this.template.title,
+        type: 'text',
+      },
+    }).onOk(title => this.template !== null && this.saveTemplate({ ...this.template, title }));
+  }
+
+  startRemoveTemplate(): void {
+    if (this.template === null) {
+      return;
+    }
+    createDialog({
+      parent: this,
+      title: 'Remove template',
+      message: `Are you sure you want to remove '${this.template.title}'`,
+      cancel: true,
+    }).onOk(() => this.template !== null && automationStore.removeTemplate(this.template));
+  }
+}
+</script>
+
+<template>
+  <q-layout
+    view="hHh Lpr fFf"
+  >
+    <LayoutHeader @menu="drawerOpen = !drawerOpen">
+      <template #title>
+        Automation
+      </template>
+      <template #buttons>
+        <div class="row">
+          <q-btn-dropdown
+            :label="template ? ($dense ? '' : template.title) : 'None'"
+            flat
+            no-caps
+            icon="widgets"
+            class="col"
+            size="md"
+            rounded
+          >
+            <q-list bordered>
+              <q-list>
+                <ActionItem
+                  v-for="tmpl in templates"
+                  :key="tmpl.id"
+                  :label="tmpl.title"
+                  :active="template && tmpl.id === template.id"
+                  icon="mdi-view-dashboard-outline"
+                  @click="selectActive(tmpl)"
+                />
+              </q-list>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+
+        <q-btn flat round icon="mdi-close-circle" size="md" @click="leaveEditor" />
+      </template>
+    </LayoutHeader>
+    <LayoutFooter />
+
+    <q-drawer v-model="drawerOpen" content-class="column" elevated>
+      <SidebarNavigator active-section="automation" />
+      <q-scroll-area
+        class="col"
+        :thumb-style="{opacity: 0.5, background: 'silver'}"
+      >
+        <q-item class="q-pb-none">
+          <q-item-section class="text-bold">
+            Steps
+          </q-item-section>
+        </q-item>
+        <ActionItem
+          v-for="step in steps"
+          :key="step.id"
+          :active="stepId === step.id"
+          :label="step.title"
+          :inset-level="0.2"
+          style="min-height: 0px"
+          @click="selectActive(template, step)"
+        />
+      </q-scroll-area>
+    </q-drawer>
+
+    <q-page-container>
+      <q-page>
+        <div v-if="step" class="fit widget-body row no-wrap">
+          <AutomationActionEditor :step="step" @update:step="saveStep" />
+          <AutomationConditionEditor :step="step" @update:step="saveStep" />
+          <AutomationNoteEditor :step="step" @update:step="saveStep" />
+        </div>
+      </q-page>
+    </q-page-container>
+  </q-layout>
+</template>

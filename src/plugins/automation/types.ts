@@ -1,75 +1,138 @@
 import { StoreObject } from '@/plugins/database';
 
-export interface StepAction<T = any> {
-  id: string;
-  type: string;
-  enabled: boolean;
-  opts: T;
+type AutomationStatus = 'Created' | 'Started' | 'Done' | 'Cancelled' | 'Unknown';
+
+/** @nullable */
+type Datum = Date | number | null;
+
+// Conditions
+////////////////
+
+export interface TimeAbsoluteImpl {
+  type: 'TimeAbsolute';
+  time: number | Date;
 }
 
-export interface StepCondition<T = any> {
-  id: string;
-  type: string;
-  enabled: boolean;
-  opts: T;
+export interface TimeElapsedImpl {
+  type: 'TimeElapsed';
+  duration: number;
 }
 
-export interface StepNote {
-  id: string;
-  title: string;
-  message: string;
+export interface BlockValueImpl {
+  type: 'BlockValue';
+  blockId: string;
+  serviceId: string;
+  blockType: string;
+  key: string;
+  operator: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
+  value: any;
 }
 
-export interface ProcessStep {
-  id: string;
-  title: string;
-  enabled: boolean;
-  actions: StepAction[];
-  conditions: StepCondition[];
-  notes: StepNote[];
-}
-
-export interface Process extends StoreObject {
-  id: string;
-  title: string;
-  steps: ProcessStep[];
-}
-
-export interface RuntimeLog {
-  timestamp: number;
-  source: string;
+export interface TaskStatusImpl {
+  type: 'TaskStatus';
   ref: string;
-  message: string;
+  status: AutomationStatus;
 }
 
-export interface RuntimeTask {
+export interface ManualAdvanceImpl {
+  type: 'ManualAdvance';
+  desc: string;
+}
+
+export type ConditionImpl =
+  TimeAbsoluteImpl
+  | TimeElapsedImpl
+  | BlockValueImpl
+  | TaskStatusImpl
+  | ManualAdvanceImpl
+  ;
+
+// Actions
+/////////////
+
+export interface BlockPatchImpl {
+  type: 'BlockPatch';
+  blockId: string;
+  serviceId: string;
+  blockType: string;
+  data: any;
+}
+
+export interface TaskCreateImpl {
+  type: 'TaskCreate';
   ref: string;
   title: string;
   message: string;
-  done: boolean;
 }
 
-export interface RuntimeResult {
+export type ActionImpl =
+  BlockPatchImpl
+  | TaskCreateImpl
+  ;
+
+// Generic
+//////////////
+
+export interface AutomationAction<T extends ActionImpl = ActionImpl> {
   id: string;
   title: string;
-  step: string;
-  start: number | null;
-  end: number | null;
-  logs: RuntimeLog[];
+  enabled: boolean;
+  impl: T;
 }
 
-export interface Runtime {
+export interface AutomationCondition<T extends ConditionImpl = ConditionImpl> {
   id: string;
   title: string;
-  start: number | null;
-  end: number | null;
-  process: Process;
-  tasks: RuntimeTask[];
-  results: RuntimeResult[];
-  conditions?: boolean[];
+  enabled: boolean;
+  impl: T;
 }
 
-export type CompareOperator = 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
+export interface AutomationNote {
+  id: string;
+  title: string;
+  message: string;
+}
+
+export interface AutomationStep {
+  id: string;
+  title: string;
+  enabled: boolean;
+  actions: AutomationAction[];
+  conditions: AutomationCondition[];
+  notes: AutomationNote[];
+}
+
+export interface AutomationStepResult {
+  id: string;
+  title: string;
+  stepId: string;
+  start: Datum;
+  end: Datum;
+  status: AutomationStatus;
+}
+
+export interface AutomationTask extends StoreObject {
+  ref: string;
+  title: string;
+  message: string;
+  status: AutomationStatus;
+  source?: {
+    runtimeId: string;
+    stepId: string;
+  };
+}
+
+export interface AutomationTemplate extends StoreObject {
+  title: string;
+  steps: AutomationStep[];
+}
+
+export interface AutomationProcess extends AutomationTemplate {
+  start: Datum;
+  end: Datum;
+  status: AutomationStatus;
+  results: AutomationStepResult[];
+}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AutomationConfig { }

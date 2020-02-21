@@ -5,27 +5,27 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { spliceById } from '@/helpers/functional';
 
-import { ProcessStep, StepNote } from '../types';
+import { AutomationNote, AutomationStep } from '../types';
 
 
 @Component
 export default class AutomationNoteEditor extends Vue {
 
   @Prop({ type: Object, required: true })
-  public readonly step!: ProcessStep;
+  public readonly step!: AutomationStep;
 
-  saveStep(step: ProcessStep = this.step): void {
+  saveStep(step: AutomationStep = this.step): void {
     this.$emit('update:step', step);
   }
 
-  saveNote(note: StepNote): void {
+  saveNote(note: AutomationNote): void {
     if (this.step) {
       spliceById(this.step.notes, note);
       this.saveStep();
     }
   }
 
-  saveAllNotes(notes: StepNote[]): void {
+  saveAllNotes(notes: AutomationNote[]): void {
     if (this.step) {
       this.step.notes = notes;
       this.saveStep();
@@ -43,7 +43,7 @@ export default class AutomationNoteEditor extends Vue {
     }
   }
 
-  removeNote(note: StepNote): void {
+  removeNote(note: AutomationNote): void {
     if (this.step) {
       spliceById(this.step.notes, note, false);
       this.saveStep();
@@ -63,7 +63,7 @@ export default class AutomationNoteEditor extends Vue {
       <ActionItem label="Remove" icon="delete" @click="removeNote(item)" />
     </template>
     <template #item="{item}">
-      <AutomationNote :note="item" class="col" @update:note="saveNote" />
+      <NoteField :note="item" class="col" @update:note="saveNote" />
     </template>
   </AutomationSectionEditor>
 </template>

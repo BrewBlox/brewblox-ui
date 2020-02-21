@@ -25,13 +25,6 @@ export default class SidebarNavigator extends Vue {
       component: 'WizardDialog',
     });
   }
-
-  showAutomationEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'AutomationEditor',
-    });
-  }
 }
 </script>
 
@@ -72,11 +65,12 @@ export default class SidebarNavigator extends Vue {
         v-if="automationFeatureEnabled"
         icon="mdi-calendar-check"
         label="Automation"
+        to="/automation"
+        :color="activeSection === 'automation' ? 'primary' : ''"
         stack
         flat
-        class="col-auto q-py-sm"
         no-caps
-        @click="showAutomationEditor"
+        class="col-auto q-py-sm"
       />
     </div>
     <q-separator />

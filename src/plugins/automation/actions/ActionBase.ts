@@ -1,18 +1,18 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { StepAction } from '../types';
+import { ActionImpl, AutomationAction } from '../types';
 
 @Component
-export default class ActionBase<T = any> extends Vue {
+export default class ActionBase<T extends ActionImpl = ActionImpl> extends Vue {
   @Prop({ type: Object, required: true })
-  public readonly action!: StepAction<T>;
+  public readonly action!: AutomationAction<T>;
 
-  public saveAction(action: StepAction<T> = this.action): void {
+  public saveAction(action: AutomationAction<T> = this.action): void {
     this.$emit('update:action', action);
   }
 
-  public get opts(): T {
-    return this.action.opts;
+  public get impl(): T {
+    return this.action.impl;
   }
 }

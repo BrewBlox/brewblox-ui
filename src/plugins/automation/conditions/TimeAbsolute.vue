@@ -1,30 +1,19 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
-import { StepCondition } from '../types';
+import { TimeAbsoluteImpl } from '../types';
+import ConditionBase from './ConditionBase';
 
-interface TimeAbsoluteCondition extends StepCondition {
-  opts: {
-    time: number;
-  };
-}
 
 @Component
-export default class TimeAbsolute extends Vue {
-  @Prop({ type: Object, required: true })
-  public readonly condition!: TimeAbsoluteCondition;
-
-  saveCondition(condition: TimeAbsoluteCondition = this.condition): void {
-    this.$emit('update:condition', condition);
-  }
+export default class TimeAbsolute extends ConditionBase<TimeAbsoluteImpl> {
 
   get time(): Date {
-    return new Date(this.condition.opts.time);
+    return new Date(this.impl.time);
   }
 
   set time(val: Date) {
-    this.condition.opts.time = val.getTime();
+    this.impl.time = val.getTime();
     this.saveCondition();
   }
 
@@ -48,8 +37,8 @@ export default class TimeAbsolute extends Vue {
       </q-item-section>
     </q-item>
     <q-item>
-      <q-item-section class="col-auto">
-        <DatetimeField v-model="time" />
+      <q-item-section>
+        <DatetimeField v-model="time" class="q-mr-md" />
       </q-item-section>
     </q-item>
   </q-list>

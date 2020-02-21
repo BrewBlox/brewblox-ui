@@ -1,32 +1,20 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { durationMs, durationString } from '@/helpers/functional';
 
-import { StepCondition } from '../types';
-
-interface TimeElapsedCondition extends StepCondition {
-  opts: {
-    duration: number;
-  };
-}
+import { TimeElapsedImpl } from '../types';
+import ConditionBase from './ConditionBase';
 
 @Component
-export default class TimeElapsed extends Vue {
-  @Prop({ type: Object, required: true })
-  public readonly condition!: TimeElapsedCondition;
-
-  saveCondition(condition: TimeElapsedCondition = this.condition): void {
-    this.$emit('update:condition', condition);
-  }
+export default class TimeElapsed extends ConditionBase<TimeElapsedImpl> {
 
   get duration(): string {
-    return durationString(this.condition.opts.duration);
+    return durationString(this.impl.duration);
   }
 
   set duration(val: string) {
-    this.condition.opts.duration = durationMs(val);
+    this.impl.duration = durationMs(val);
     this.saveCondition();
   }
 
@@ -50,10 +38,12 @@ export default class TimeElapsed extends Vue {
       </q-item-section>
     </q-item>
     <q-item>
-      <q-item-section class="col-auto">
+      <q-item-section>
         <InputField
           v-model="duration"
+          label="Duration"
           title="Duration"
+          class="q-mr-md"
         />
       </q-item-section>
     </q-item>

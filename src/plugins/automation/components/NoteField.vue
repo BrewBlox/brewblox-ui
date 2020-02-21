@@ -4,16 +4,16 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 
-import { StepNote } from '../types';
+import { AutomationNote } from '../types';
 
 
 @Component
-export default class AutomationNote extends Vue {
+export default class NoteField extends Vue {
 
   @Prop({ type: Object, required: true })
-  public readonly note!: StepNote;
+  public readonly note!: AutomationNote;
 
-  saveNote(note: StepNote = this.note): void {
+  saveNote(note: AutomationNote = this.note): void {
     this.$emit('update:note', note);
   }
 
@@ -53,14 +53,14 @@ export default class AutomationNote extends Vue {
 </script>
 
 <template>
-  <q-list>
-    <q-item class="hoverable">
+  <q-list class="q-gutter-y-xs">
+    <q-item class="clickable rounded-borders">
       <q-tooltip>Edit title</q-tooltip>
       <q-item-section class="text-bold" @click="editTitle">
         {{ note.title }}
       </q-item-section>
     </q-item>
-    <q-item class="hoverable">
+    <q-item class="clickable rounded-borders">
       <q-tooltip>Edit message</q-tooltip>
       <q-item-section @click="editMessage">
         {{ note.message || 'Click to edit' }}

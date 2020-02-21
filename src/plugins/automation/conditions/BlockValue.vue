@@ -1,6 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { objReducer } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
@@ -8,53 +7,30 @@ import { parsePostfixed, propertyNameWithoutUnit } from '@/helpers/units/parseOb
 import PostFixed from '@/helpers/units/PostFixed';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, ChangeField } from '@/plugins/spark/types';
-import { featureStore } from '@/store/features';
 
-import { StepCondition } from '../types';
+import { BlockValueImpl } from '../types';
+import ConditionBase from './ConditionBase';
 
-type CompareOperator = 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
+type CompareOperator = BlockValueImpl['operator'];
 
-interface CompareOption extends SelectOption {
+interface OperatorOption extends SelectOption {
   desc: string;
 }
 
-interface BlockValueOpts {
-  block: string;
-  service: string;
-  type: string;
-  key: string;
-  operator: CompareOperator;
-  value: any;
-}
-
-interface BlockValueCondition extends StepCondition {
-  opts: BlockValueOpts;
-}
-
 @Component
-export default class BlockValue extends Vue {
-  @Prop({ type: Object, required: true })
-  public readonly condition!: BlockValueCondition;
-
-  saveCondition(condition: BlockValueCondition = this.condition): void {
-    this.$emit('update:condition', condition);
-  }
-
-  get opts(): BlockValueOpts {
-    return this.condition.opts;
-  }
+export default class BlockValue extends ConditionBase<BlockValueImpl> {
 
   get spec(): BlockSpec {
-    return sparkStore.specs[this.opts.type];
+    return sparkStore.specs[this.impl.blockType];
   }
 
   get link(): Link {
-    return new Link(this.opts.block, this.opts.type);
+    return new Link(this.impl.blockId, this.impl.blockType);
   }
 
   set link(val: Link) {
     if (val.id !== null) {
-      this.opts.block = val.id;
+      this.impl.blockId = val.id;
       this.saveCondition();
     }
   }
@@ -74,7 +50,7 @@ export default class BlockValue extends Vue {
       });
   }
 
-  get compareOpts(): CompareOption[] {
+  get compareOpts(): OperatorOption[] {
     return [
       { label: '<', value: 'lt', desc: 'Less than' },
       { label: '=<', value: 'le', desc: 'Less than or equal to' },
@@ -86,17 +62,17 @@ export default class BlockValue extends Vue {
   }
 
   get prettyCompare(): string {
-    return this.compareOpts.find(op => op.value === this.opts.operator)?.label || '??';
+    return this.compareOpts.find(op => op.value === this.impl.operator)?.label || '??';
   }
 
   get currentChange(): ChangeField {
-    return this.findChange(this.opts.key);
+    return this.findChange(this.impl.key);
   }
 
   get parsed(): { key: string; value: any } {
-    const optValue = this.opts.value ?? this.spec.generate()[this.opts.key];
+    const optValue = this.impl.value ?? this.spec.generate()[this.impl.key];
     const [key, value] =
-      parsePostfixed(this.opts.key, optValue) ?? [this.opts.key, optValue];
+      parsePostfixed(this.impl.key, optValue) ?? [this.impl.key, optValue];
     return { key, value };
   }
 
@@ -112,19 +88,19 @@ export default class BlockValue extends Vue {
   }
 
   saveKey(key: string): void {
-    if (key === this.opts.key) { return; }
-    this.condition.opts.key = key;
-    this.condition.opts.value = this.rawValue(this.findChange(key).generate());
+    if (key === this.impl.key) { return; }
+    this.condition.impl.key = key;
+    this.condition.impl.value = this.rawValue(this.findChange(key).generate());
     this.saveCondition();
   }
 
   saveOperator(operator: CompareOperator): void {
-    this.condition.opts.operator = operator;
+    this.condition.impl.operator = operator;
     this.saveCondition();
   }
 
   saveValue(value: any): void {
-    this.condition.opts.value = this.rawValue(value);
+    this.condition.impl.value = this.rawValue(value);
     this.saveCondition();
   }
 
@@ -136,59 +112,66 @@ export default class BlockValue extends Vue {
 </script>
 
 <template>
-  <q-list :class="{'darkish': !condition.enabled}" dense>
-    <q-item>
-      <q-item-section class="text-h6 text-italic">
-        Check block value
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-toggle :value="condition.enabled" @input="saveEnabled">
-          <q-tooltip>Toggle enabled</q-tooltip>
-        </q-toggle>
-      </q-item-section>
-    </q-item>
-    <q-item>
-      <q-item-section>
-        <BlockField
-          v-model="link"
-          :service-id="opts.service"
-          :clearable="false"
-          class="q-mr-md"
-        />
-      </q-item-section>
-    </q-item>
-    <q-item>
-      <q-item-section>
-        <q-select :value="opts.key" :options="selectOpts" map-options emit-value label="Field" @input="saveKey" />
-      </q-item-section>
-      <div class="col-auto q-ml-md q-mb-sm self-end editable-field">
-        <q-btn :label="prettyCompare" flat>
-          <q-menu>
-            <q-list>
-              <ActionItem
-                v-for="opt in compareOpts"
-                :key="opt.value"
-                :label="opt.label"
-                :tooltip="opt.desc"
-                @click="saveOperator(opt.value)"
-              />
-            </q-list>
-          </q-menu>
-        </q-btn>
+  <div class="column q-px-md q-gutter-y-xs">
+    <AutomationFieldHeader
+      :enabled="condition.enabled"
+      label="Check block value"
+      @update:enabled="saveEnabled"
+    />
+    <BlockField
+      v-model="link"
+      :service-id="impl.serviceId"
+      :clearable="false"
+    />
+    <q-select
+      :value="impl.key"
+      :options="selectOpts"
+      map-options
+      emit-value
+      label="Field"
+      class="q-px-sm"
+      @input="saveKey"
+    />
+    <div class="row justify-between items-baseline q-pl-sm">
+      <!-- <q-btn :label="prettyCompare" flat class="col-auto">
+        <q-menu>
+          <q-list>
+            <ActionItem
+              v-for="opt in compareOpts"
+              :key="opt.value"
+              :label="opt.label"
+              :tooltip="opt.desc"
+              @click="saveOperator(opt.value)"
+            />
+          </q-list>
+        </q-menu>
+      </q-btn> -->
+      <div class="clickable col-auto text-center q-py-sm q-px-md">
+        {{ prettyCompare }}
+        <q-menu anchor="bottom middle" self="top middle">
+          <q-list>
+            <ActionItem
+              v-for="opt in compareOpts"
+              :key="opt.value"
+              :label="opt.label"
+              :tooltip="opt.desc"
+              @click="saveOperator(opt.value)"
+            />
+          </q-list>
+        </q-menu>
       </div>
-      <q-item-section class="col-5">
-        <component
-          :is="currentChange.component"
-          v-bind="currentChange.componentProps"
-          :block-id="opts.block"
-          :service-id="opts.service"
-          :value="parsed.value"
-          :dense="false"
-          editable
-          lazy
-          @input="saveValue"
-        />
-      </q-item-section>
-    </q-item>
-  </q-list>
+      <component
+        :is="currentChange.component"
+        v-bind="currentChange.componentProps"
+        :block-id="impl.blockId"
+        :service-id="impl.serviceId"
+        :value="parsed.value"
+        :dense="false"
+        editable
+        lazy
+        class="col-auto"
+        @input="saveValue"
+      />
+    </div>
+  </div>
 </template>

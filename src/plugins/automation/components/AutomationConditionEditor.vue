@@ -5,29 +5,29 @@ import { Component, Prop } from 'vue-property-decorator';
 import { spliceById } from '@/helpers/functional';
 
 import { conditionComponents } from '../conditions';
-import { ProcessStep, StepCondition } from '../types';
+import { AutomationCondition, AutomationStep } from '../types';
 
 
 @Component
 export default class AutomationConditionEditor extends Vue {
 
   @Prop({ type: Object, required: true })
-  public readonly step!: ProcessStep;
+  public readonly step!: AutomationStep;
 
-  saveStep(step: ProcessStep = this.step): void {
+  saveStep(step: AutomationStep = this.step): void {
     this.$emit('update:step', step);
   }
 
-  conditionComponent(condition: StepCondition): VueConstructor {
-    return conditionComponents[condition.type];
+  conditionComponent(condition: AutomationCondition): VueConstructor {
+    return conditionComponents[condition.impl.type];
   }
 
-  saveCondition(condition: StepCondition): void {
+  saveCondition(condition: AutomationCondition): void {
     spliceById(this.step.conditions, condition);
     this.saveStep();
   }
 
-  saveAllConditions(conditions: StepCondition[]): void {
+  saveAllConditions(conditions: AutomationCondition[]): void {
     this.step.conditions = conditions;
     this.saveStep();
   }
@@ -36,7 +36,7 @@ export default class AutomationConditionEditor extends Vue {
 
   }
 
-  removeCondition(condition: StepCondition): void {
+  removeCondition(condition: AutomationCondition): void {
     spliceById(this.step.conditions, condition, false);
     this.saveStep();
   }

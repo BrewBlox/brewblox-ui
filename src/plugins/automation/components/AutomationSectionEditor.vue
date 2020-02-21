@@ -27,9 +27,35 @@ export default class AutomationSectionEditor extends Vue {
 </script>
 
 <template>
-  <q-card-section class="q-px-sm full-height">
+  <div class="widget-body col column depth-4 rounded-borders">
+    <div class="col-auto row no-wrap items-center">
+      <div class="col-grow text-secondary text-center" style="font-size: 170%">
+        {{ label }}
+      </div>
+      <div class="col-auto">
+        <q-btn icon="add" flat round @click="add">
+          <q-tooltip>New</q-tooltip>
+        </q-btn>
+      </div>
+    </div>
+    <draggable v-model="locals" class="section-container">
+      <div v-for="item in locals" :key="item.id" class="row q-mb-md">
+        <div class="col-auto column">
+          <q-btn flat round icon="mdi-dots-vertical">
+            <q-menu>
+              <q-list bordered>
+                <slot name="actions" :item="item" />
+              </q-list>
+            </q-menu>
+          </q-btn>
+        </div>
+        <slot name="item" :item="item" />
+      </div>
+    </draggable>
+  </div>
+  <!-- <q-card-section class="q-px-sm col depth-4 rounded-borders">
     <q-item class="q-pt-none">
-      <q-item-section class="text-info text-center">
+      <q-item-section class="text-secondary text-center">
         <big>{{ label }}</big>
       </q-item-section>
       <q-btn icon="add" flat style="position: absolute; right: 0" @click="add">
@@ -53,7 +79,7 @@ export default class AutomationSectionEditor extends Vue {
         </div>
       </draggable>
     </q-list>
-  </q-card-section>
+  </q-card-section> -->
 </template>
 
 <style scoped>

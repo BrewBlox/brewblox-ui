@@ -5,29 +5,29 @@ import { Component, Prop } from 'vue-property-decorator';
 import { spliceById } from '@/helpers/functional';
 
 import { actionComponents } from '../actions';
-import { ProcessStep, StepAction } from '../types';
+import { AutomationAction, AutomationStep } from '../types';
 
 
 @Component
 export default class AutomationActionEditor extends Vue {
 
   @Prop({ type: Object, required: true })
-  public readonly step!: ProcessStep;
+  public readonly step!: AutomationStep;
 
-  saveStep(step: ProcessStep = this.step): void {
+  saveStep(step: AutomationStep = this.step): void {
     this.$emit('update:step', step);
   }
 
-  actionComponent(action: StepAction): VueConstructor {
-    return actionComponents[action.type];
+  actionComponent(action: AutomationAction): VueConstructor {
+    return actionComponents[action.impl.type];
   }
 
-  saveAction(action: StepAction): void {
+  saveAction(action: AutomationAction): void {
     spliceById(this.step.actions, action);
     this.saveStep();
   }
 
-  saveAllActions(actions: StepAction[]): void {
+  saveAllActions(actions: AutomationAction[]): void {
     this.step.actions = actions;
     this.saveStep();
   }
@@ -36,7 +36,7 @@ export default class AutomationActionEditor extends Vue {
 
   }
 
-  removeAction(action: StepAction): void {
+  removeAction(action: AutomationAction): void {
     spliceById(this.step.actions, action, false);
     this.saveStep();
   }
@@ -58,7 +58,7 @@ export default class AutomationActionEditor extends Vue {
       <component
         :is="actionComponent(item)"
         :action="item"
-        class="col"
+        :class="['col', {darkish: !item.enabled}]"
         @update:action="saveAction"
       />
     </template>
