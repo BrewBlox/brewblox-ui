@@ -15,6 +15,7 @@ interface HasId {
 @Component
 export default class AutomationEditor extends DialogBase {
   drawerOpen = !this.$dense;
+  dragged: AutomationStep | null = null;
 
   mounted(): void {
     if (this.routeId && this.routeId !== automationStore.activeTemplate) {
@@ -66,6 +67,13 @@ export default class AutomationEditor extends DialogBase {
   saveTemplate(template: AutomationTemplate | null = this.template): void {
     if (template) {
       automationStore.saveTemplate(template);
+    }
+  }
+
+  saveSteps(steps: AutomationStep[]): void {
+    if (this.template !== null) {
+      this.template.steps = steps;
+      this.saveTemplate();
     }
   }
 
@@ -138,16 +146,14 @@ export default class AutomationEditor extends DialogBase {
             rounded
           >
             <q-list bordered>
-              <q-list>
-                <ActionItem
-                  v-for="tmpl in templates"
-                  :key="tmpl.id"
-                  :label="tmpl.title"
-                  :active="template && tmpl.id === template.id"
-                  icon="mdi-view-dashboard-outline"
-                  @click="selectActive(tmpl)"
-                />
-              </q-list>
+              <ActionItem
+                v-for="tmpl in templates"
+                :key="tmpl.id"
+                :label="tmpl.title"
+                :active="template && tmpl.id === template.id"
+                icon="mdi-view-dashboard-outline"
+                @click="selectActive(tmpl)"
+              />
             </q-list>
           </q-btn-dropdown>
         </div>
@@ -168,26 +174,40 @@ export default class AutomationEditor extends DialogBase {
             Steps
           </q-item-section>
         </q-item>
-        <ActionItem
-          v-for="step in steps"
-          :key="step.id"
-          :active="stepId === step.id"
-          :label="step.title"
-          :inset-level="0.2"
-          style="min-height: 0px"
-          @click="selectActive(template, step)"
-        />
+        <draggable
+          :value="steps"
+          @input="saveSteps"
+          @start="evt => dragged=steps[evt.oldIndex]"
+          @end="dragged=null"
+        >
+          <ActionItem
+            v-for="step in steps"
+            :key="step.id"
+            :active="(dragged && dragged.id === step.id) || stepId === step.id"
+            :clickable="!dragged"
+            :label="step.title"
+            :inset-level="0.2"
+            style="min-height: 0px"
+            @click="selectActive(template, step)"
+          />
+        </draggable>
       </q-scroll-area>
     </q-drawer>
 
     <q-page-container>
       <q-page>
-        <div v-if="step" class="fit widget-body row no-wrap">
-          <AutomationActionEditor :step="step" @update:step="saveStep" />
-          <AutomationConditionEditor :step="step" @update:step="saveStep" />
-          <AutomationNoteEditor :step="step" @update:step="saveStep" />
+        <div v-if="step" class="page-height row no-wrap q-pa-md q-gutter-md">
+          <AutomationActionSection :step="step" @update:step="saveStep" />
+          <AutomationConditionSection :step="step" @update:step="saveStep" />
+          <AutomationNoteSection :step="step" @update:step="saveStep" />
         </div>
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
+
+<style lang="sass" scoped>
+.page-height
+  // window - top bar - bottom bar
+  height: calc(100vh - 40px - 30px)
+</style>

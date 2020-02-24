@@ -1,6 +1,6 @@
 import { StoreObject } from '@/plugins/database';
 
-type AutomationStatus = 'Created' | 'Started' | 'Done' | 'Cancelled' | 'Unknown';
+export type AutomationStatus = 'Created' | 'Started' | 'Done' | 'Cancelled' | 'Unknown';
 
 /** @nullable */
 type Datum = Date | number | null;

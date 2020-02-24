@@ -2,6 +2,7 @@
 import Vue, { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { spliceById } from '@/helpers/functional';
 
 import { conditionComponents } from '../conditions';
@@ -9,7 +10,7 @@ import { AutomationCondition, AutomationStep } from '../types';
 
 
 @Component
-export default class AutomationConditionEditor extends Vue {
+export default class AutomationConditionSection extends Vue {
 
   @Prop({ type: Object, required: true })
   public readonly step!: AutomationStep;
@@ -32,6 +33,18 @@ export default class AutomationConditionEditor extends Vue {
     this.saveStep();
   }
 
+  startChangeTitle(condition: AutomationCondition): void {
+    createDialog({
+      parent: this,
+      component: 'InputDialog',
+      title: 'Change condition name',
+      message: `Choose a new name for '${condition.title}'`,
+      clearable: false,
+      value: condition.title,
+    })
+      .onOk(title => this.saveCondition({ ...condition, title }));
+  }
+
   startAddCondition(): void {
 
   }
@@ -44,22 +57,35 @@ export default class AutomationConditionEditor extends Vue {
 </script>
 
 <template>
-  <AutomationSectionEditor
+  <AutomationEditorSection
     :value="step.conditions"
     label="Conditions"
     @input="saveAllConditions"
+    @update="saveCondition"
+    @title-click="item => startChangeTitle(item)"
     @new="startAddCondition"
   >
+    <template #description>
+      The step ends when all conditions are satisfied.
+    </template>
     <template #actions="{item}">
+      <ActionItem label="Rename" icon="mdi-textbox" @click="startChangeTitle(item)" />
       <ActionItem label="Remove" icon="delete" @click="removeCondition(item)" />
     </template>
     <template #item="{item}">
       <component
         :is="conditionComponent(item)"
         :condition="item"
-        class="col"
+        :class="[{darkish: !item.enabled}]"
         @update:condition="saveCondition"
       />
     </template>
-  </AutomationSectionEditor>
+    <template #footer>
+      <div class="q-gutter-y-md column">
+        <div class="clickable q-pa-md rounded-borders text-italic">
+          New condition
+        </div>
+      </div>
+    </template>
+  </AutomationEditorSection>
 </template>

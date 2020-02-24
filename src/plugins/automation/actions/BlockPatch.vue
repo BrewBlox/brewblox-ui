@@ -57,13 +57,7 @@ export default class BlockPatch extends ActionBase<BlockPatchImpl> {
 </script>
 
 <template>
-  <div class="column q-px-md q-gutter-xs">
-    <AutomationFieldHeader
-      :enabled="action.enabled"
-      label="Create Task"
-      @update:enabled="saveEnabled"
-    />
-
+  <div class="column q-gutter-xs">
     <BlockField
       v-model="link"
       :service-id="impl.serviceId"
@@ -94,7 +88,7 @@ export default class BlockPatch extends ActionBase<BlockPatchImpl> {
       <div class="col" :class="{darkened: !isActive(change.key)}">
         {{ change.title }}
       </div>
-      <div v-if="isActive(change.key)" class="col">
+      <div v-if="isActive(change.key)" class="col-grow">
         <component
           :is="change.component"
           v-bind="change.componentProps"

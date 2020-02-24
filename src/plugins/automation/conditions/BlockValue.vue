@@ -52,17 +52,22 @@ export default class BlockValue extends ConditionBase<BlockValueImpl> {
 
   get compareOpts(): OperatorOption[] {
     return [
-      { label: '<', value: 'lt', desc: 'Less than' },
-      { label: '=<', value: 'le', desc: 'Less than or equal to' },
       { label: '==', value: 'eq', desc: 'Equal to' },
       { label: '!=', value: 'ne', desc: 'Not equal to' },
+      { label: '<', value: 'lt', desc: 'Less than' },
+      { label: '=<', value: 'le', desc: 'Less than or equal to' },
       { label: '>=', value: 'ge', desc: 'More than or equal to' },
       { label: '>', value: 'gt', desc: 'More than' },
     ];
   }
 
-  get prettyCompare(): string {
-    return this.compareOpts.find(op => op.value === this.impl.operator)?.label || '??';
+  get operator(): OperatorOption {
+    return this.compareOpts.find(op => op.value === this.impl.operator) || this.compareOpts[0];
+  }
+
+  set operator(opt: OperatorOption) {
+    this.condition.impl.operator = opt.value;
+    this.saveCondition();
   }
 
   get currentChange(): ChangeField {
@@ -94,79 +99,46 @@ export default class BlockValue extends ConditionBase<BlockValueImpl> {
     this.saveCondition();
   }
 
-  saveOperator(operator: CompareOperator): void {
-    this.condition.impl.operator = operator;
-    this.saveCondition();
-  }
-
   saveValue(value: any): void {
     this.condition.impl.value = this.rawValue(value);
-    this.saveCondition();
-  }
-
-  saveEnabled(value: boolean): void {
-    this.condition.enabled = value;
     this.saveCondition();
   }
 }
 </script>
 
 <template>
-  <div class="column q-px-md q-gutter-y-xs">
-    <AutomationFieldHeader
-      :enabled="condition.enabled"
-      label="Check block value"
-      @update:enabled="saveEnabled"
-    />
+  <div class="row q-gutter-xs">
     <BlockField
       v-model="link"
       :service-id="impl.serviceId"
       :clearable="false"
+      class="col-grow"
     />
-    <q-select
+    <SelectField
       :value="impl.key"
       :options="selectOpts"
-      map-options
-      emit-value
       label="Field"
-      class="q-px-sm"
+      class="col-grow"
       @input="saveKey"
     />
-    <div class="row justify-between items-baseline q-pl-sm">
-      <!-- <q-btn :label="prettyCompare" flat class="col-auto">
-        <q-menu>
-          <q-list>
-            <ActionItem
-              v-for="opt in compareOpts"
-              :key="opt.value"
-              :label="opt.label"
-              :tooltip="opt.desc"
-              @click="saveOperator(opt.value)"
-            />
-          </q-list>
-        </q-menu>
-      </q-btn> -->
-      <div class="clickable col-auto text-center q-py-sm q-px-md">
-        {{ prettyCompare }}
-        <q-menu anchor="bottom middle" self="top middle">
-          <q-list>
-            <ActionItem
-              v-for="opt in compareOpts"
-              :key="opt.value"
-              :label="opt.label"
-              :tooltip="opt.desc"
-              @click="saveOperator(opt.value)"
-            />
-          </q-list>
-        </q-menu>
-      </div>
+
+    <div class="col-break" />
+
+    <div class="col-grow row justify-between q-px-sm">
+      <q-select
+        v-model="operator"
+        :options="compareOpts"
+        dense
+        label="Compare"
+        class="col-auto"
+        style="min-width: 100px"
+      />
       <component
         :is="currentChange.component"
         v-bind="currentChange.componentProps"
         :block-id="impl.blockId"
         :service-id="impl.serviceId"
         :value="parsed.value"
-        :dense="false"
         editable
         lazy
         class="col-auto"

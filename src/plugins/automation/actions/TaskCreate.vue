@@ -11,7 +11,7 @@ export default class TaskCreate extends ActionBase<TaskCreateImpl> {
 
   editRef(): void {
     createDialog({
-      component: 'TextAreaDialog',
+      component: 'InputDialog',
       parent: this,
       label: 'Reference ID',
       title: `Set reference ID for '${this.impl.title}'`,
@@ -59,30 +59,21 @@ export default class TaskCreate extends ActionBase<TaskCreateImpl> {
 </script>
 
 <template>
-  <div class="row q-px-md q-gutter-xs">
-    <AutomationFieldHeader
-      :enabled="action.enabled"
-      label="Create Task"
-      class="col-grow"
-      @update:enabled="saveEnabled"
-    />
-
-    <div class="col-break" />
-
+  <div class="row q-gutter-xs">
     <LabeledField
       title="Title"
       label="Title"
       :readonly="false"
-      class="col"
+      class="col-grow"
       @click="editTitle"
     >
       {{ impl.title || 'Click to edit' }}
     </LabeledField>
     <LabeledField
       title="Ref"
-      label="Ref"
+      label="Reference ID"
       :readonly="false"
-      class="col"
+      class="col-grow"
       @click="editRef"
     >
       {{ impl.ref || 'Click to edit' }}

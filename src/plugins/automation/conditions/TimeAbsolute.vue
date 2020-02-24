@@ -25,21 +25,7 @@ export default class TimeAbsolute extends ConditionBase<TimeAbsoluteImpl> {
 </script>
 
 <template>
-  <q-list :class="{'darkish': !condition.enabled}" dense>
-    <q-item>
-      <q-item-section class="text-h6 text-italic">
-        Wait until
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-toggle :value="condition.enabled" @input="saveEnabled">
-          <q-tooltip>Toggle enabled</q-tooltip>
-        </q-toggle>
-      </q-item-section>
-    </q-item>
-    <q-item>
-      <q-item-section>
-        <DatetimeField v-model="time" class="q-mr-md" />
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <div class="column q-gutter-xs">
+    <DatetimeField v-model="time" />
+  </div>
 </template>

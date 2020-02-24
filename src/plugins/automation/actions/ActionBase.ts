@@ -15,4 +15,13 @@ export default class ActionBase<T extends ActionImpl = ActionImpl> extends Vue {
   public get impl(): T {
     return this.action.impl;
   }
+
+  public get enabled(): boolean {
+    return this.action.enabled;
+  }
+
+  public set enabled(val: boolean) {
+    this.action.enabled = val;
+    this.saveAction();
+  }
 }

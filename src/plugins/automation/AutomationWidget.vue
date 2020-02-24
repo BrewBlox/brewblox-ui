@@ -119,6 +119,16 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
               duration: 12345,
             },
           },
+          {
+            id: uid(),
+            enabled: true,
+            title: 'Wait for task task-one',
+            impl: {
+              type: 'TaskStatus',
+              ref: 'task-one',
+              status: 'Done',
+            },
+          },
         ],
         notes: [
           {
@@ -205,7 +215,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
       </component>
     </template>
 
-    <div class="widget-body column">
+    <div class="widget-body column" @dblclick="startEditor">
       <div v-for="template in templates" :key="template.id" class="col">
         {{ template.title }}
       </div>
