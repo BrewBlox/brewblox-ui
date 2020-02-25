@@ -3,11 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 
+import AutomationItemBase from '../components/AutomationItemBase';
 import { TaskCreateImpl } from '../types';
-import ActionBase from './ActionBase';
 
 @Component
-export default class TaskCreate extends ActionBase<TaskCreateImpl> {
+export default class TaskCreate extends AutomationItemBase<TaskCreateImpl> {
 
   editRef(): void {
     createDialog({
@@ -19,7 +19,7 @@ export default class TaskCreate extends ActionBase<TaskCreateImpl> {
     })
       .onOk(ref => {
         this.impl.ref = ref;
-        this.saveAction();
+        this.save();
       });
   }
 
@@ -33,7 +33,7 @@ export default class TaskCreate extends ActionBase<TaskCreateImpl> {
     })
       .onOk(title => {
         this.impl.title = title;
-        this.saveAction();
+        this.save();
       });
   }
 
@@ -47,13 +47,8 @@ export default class TaskCreate extends ActionBase<TaskCreateImpl> {
     })
       .onOk(message => {
         this.impl.message = message;
-        this.saveAction();
+        this.save();
       });
-  }
-
-  saveEnabled(val: boolean): void {
-    this.action.enabled = val;
-    this.saveAction();
   }
 }
 </script>

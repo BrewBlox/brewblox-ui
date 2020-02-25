@@ -1,9 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '../../../helpers/dialog';
+import { createDialog } from '@/helpers/dialog';
+
+import AutomationItemBase from '../components/AutomationItemBase';
 import { AutomationStatus, TaskStatusImpl } from '../types';
-import ConditionBase from './ConditionBase';
 
 const states: AutomationStatus[] = [
   'Created',
@@ -13,7 +14,7 @@ const states: AutomationStatus[] = [
 ];
 
 @Component
-export default class TaskStatus extends ConditionBase<TaskStatusImpl> {
+export default class TaskStatus extends AutomationItemBase<TaskStatusImpl> {
 
   get status(): AutomationStatus {
     return this.impl.status;
@@ -21,7 +22,7 @@ export default class TaskStatus extends ConditionBase<TaskStatusImpl> {
 
   set status(val: AutomationStatus) {
     this.impl.status = val;
-    this.saveCondition();
+    this.save();
   }
 
   get statusOpts(): { label: AutomationStatus; value: AutomationStatus }[] {
@@ -33,12 +34,13 @@ export default class TaskStatus extends ConditionBase<TaskStatusImpl> {
       component: 'InputDialog',
       parent: this,
       label: 'Reference ID',
-      title: 'Task reference ID',
+      title: 'Choose Task reference ID',
+      message: 'This should match the reference ID of a task created in this process.',
       value: this.impl.ref,
     })
       .onOk(ref => {
         this.impl.ref = ref;
-        this.saveCondition();
+        this.save();
       });
   }
 }
@@ -48,7 +50,7 @@ export default class TaskStatus extends ConditionBase<TaskStatusImpl> {
   <div class="row q-gutter-xs">
     <LabeledField
       title="Ref"
-      label="Ref"
+      label="Reference ID"
       :readonly="false"
       class="col-grow"
       @click="editRef"

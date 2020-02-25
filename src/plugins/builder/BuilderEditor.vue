@@ -729,31 +729,6 @@ export default class BuilderEditor extends Vue {
         Brewery Builder
       </template>
       <template #buttons>
-        <div class="row">
-          <q-btn-dropdown
-            :label="layout ? ($dense ? '' : layout.title) : 'None'"
-            flat
-            no-caps
-            icon="widgets"
-            class="col"
-            size="md"
-            rounded
-          >
-            <q-list bordered>
-              <q-list>
-                <ActionItem
-                  v-for="lo in layouts"
-                  :key="lo.id"
-                  :label="lo.title"
-                  :active="layout && lo.id === layout.id"
-                  icon="mdi-view-dashboard-outline"
-                  @click="selectLayout(lo.id)"
-                />
-              </q-list>
-            </q-list>
-          </q-btn-dropdown>
-        </div>
-
         <LayoutActions
           :layout="layout"
           :select-layout="selectLayout"
@@ -762,13 +737,52 @@ export default class BuilderEditor extends Vue {
           size="md"
         />
 
-        <q-btn flat round icon="mdi-close-circle" size="md" @click="leaveEditor" />
+        <q-btn
+          flat
+          round
+          icon="mdi-close-circle"
+          size="md"
+          class="close-button"
+          @click="leaveEditor"
+        />
       </template>
     </LayoutHeader>
     <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="builder" />
+
+      <div class="row">
+        <q-btn-dropdown
+          :label="layout ? ($dense ? '' : layout.title) : 'None'"
+          flat
+          no-caps
+          class="col"
+          align="between"
+        >
+          <q-list bordered>
+            <q-list>
+              <ActionItem
+                v-for="lo in layouts"
+                :key="lo.id"
+                :label="lo.title"
+                :active="layout && lo.id === layout.id"
+                icon="mdi-view-dashboard-outline"
+                @click="selectLayout(lo.id)"
+              />
+            </q-list>
+          </q-list>
+        </q-btn-dropdown>
+        <LayoutActions
+          :layout="layout"
+          :select-layout="selectLayout"
+          :save-parts="saveParts"
+          class="col-auto"
+        />
+      </div>
+      <div class="col-auto">
+        <q-separator />
+      </div>
 
       <q-scroll-area
         v-if="!!layout"
@@ -1022,7 +1036,6 @@ export default class BuilderEditor extends Vue {
 }
 
 .q-page-container {
-  overflow: auto;
   max-height: 100vh;
   max-width: 100vw;
 }
@@ -1040,7 +1053,6 @@ export default class BuilderEditor extends Vue {
 .resume-message {
   border-radius: 40px;
   border: 2px solid silver;
-  // background: $dark_bright;
 }
 
 .fade-enter-active {

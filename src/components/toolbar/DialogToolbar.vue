@@ -25,10 +25,3 @@ export default class DialogToolbar extends Vue {
     </template>
   </Toolbar>
 </template>
-
-<style lang="sass">
-.close-button:hover
-  color: $red-6
-  > .q-focus-helper
-    opacity: 0 !important
-</style>

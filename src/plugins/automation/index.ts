@@ -31,8 +31,8 @@ export default {
 
     if (process.env.BLOX_FEATURE_AUTOMATION) {
       featureStore.registerWidget(widget);
+      featureStore.registerWatcher(watcher);
     }
-    featureStore.registerWatcher(watcher);
 
     Vue.$startup.onStart(() => automationStore.start());
   },

@@ -135,36 +135,55 @@ export default class AutomationEditor extends DialogBase {
         Automation
       </template>
       <template #buttons>
-        <div class="row">
-          <q-btn-dropdown
-            :label="template ? ($dense ? '' : template.title) : 'None'"
-            flat
-            no-caps
-            icon="widgets"
-            class="col"
-            size="md"
-            rounded
-          >
-            <q-list bordered>
-              <ActionItem
-                v-for="tmpl in templates"
-                :key="tmpl.id"
-                :label="tmpl.title"
-                :active="template && tmpl.id === template.id"
-                icon="mdi-view-dashboard-outline"
-                @click="selectActive(tmpl)"
-              />
-            </q-list>
-          </q-btn-dropdown>
-        </div>
-
-        <q-btn flat round icon="mdi-close-circle" size="md" @click="leaveEditor" />
+        <q-btn
+          flat
+          round
+          icon="mdi-close-circle"
+          size="md"
+          class="close-button"
+          @click="leaveEditor"
+        />
       </template>
     </LayoutHeader>
     <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="automation" />
+
+      <div class="row">
+        <q-btn-dropdown
+          :label="template ? ($dense ? '' : template.title) : 'None'"
+          flat
+          no-caps
+          class="col"
+          align="between"
+        >
+          <q-list bordered>
+            <ActionItem
+              v-for="tmpl in templates"
+              :key="tmpl.id"
+              :label="tmpl.title"
+              :active="template && tmpl.id === template.id"
+              icon="mdi-view-dashboard-outline"
+              @click="selectActive(tmpl)"
+            />
+          </q-list>
+        </q-btn-dropdown>
+        <ActionMenu class="col-auto">
+          <template #actions>
+            <ActionItem label="New Template" icon="add" @click="startAddTemplate(false)" />
+            <template v-if="template !== null">
+              <ActionItem icon="file_copy" label="Copy Template" @click="startAddLayout(true)" />
+              <ActionItem icon="edit" label="Rename Template" @click="startRenameTemplate" />
+              <ActionItem icon="delete" label="Remove Template" @click="startRemoveTemplate" />
+            </template>
+          </template>
+        </ActionMenu>
+      </div>
+      <div class="col-auto">
+        <q-separator />
+      </div>
+
       <q-scroll-area
         class="col"
         :thumb-style="{opacity: 0.5, background: 'silver'}"
@@ -205,9 +224,3 @@ export default class AutomationEditor extends DialogBase {
     </q-page-container>
   </q-layout>
 </template>
-
-<style lang="sass" scoped>
-.page-height
-  // window - top bar - bottom bar
-  height: calc(100vh - 40px - 30px)
-</style>

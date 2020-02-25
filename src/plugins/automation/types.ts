@@ -5,6 +5,29 @@ export type AutomationStatus = 'Created' | 'Started' | 'Done' | 'Cancelled' | 'U
 /** @nullable */
 type Datum = Date | number | null;
 
+// Actions
+/////////////
+
+export interface BlockPatchImpl {
+  type: 'BlockPatch';
+  blockId: string;
+  serviceId: string;
+  blockType: string;
+  data: any;
+}
+
+export interface TaskCreateImpl {
+  type: 'TaskCreate';
+  ref: string;
+  title: string;
+  message: string;
+}
+
+export type ActionImpl =
+  BlockPatchImpl
+  | TaskCreateImpl
+  ;
+
 // Conditions
 ////////////////
 
@@ -47,51 +70,35 @@ export type ConditionImpl =
   | ManualAdvanceImpl
   ;
 
-// Actions
-/////////////
+// Notes
+//////////////
 
-export interface BlockPatchImpl {
-  type: 'BlockPatch';
-  blockId: string;
-  serviceId: string;
-  blockType: string;
-  data: any;
-}
-
-export interface TaskCreateImpl {
-  type: 'TaskCreate';
-  ref: string;
-  title: string;
+export interface SimpleNoteImpl {
+  type: 'SimpleNote';
   message: string;
 }
 
-export type ActionImpl =
-  BlockPatchImpl
-  | TaskCreateImpl
+export type NoteImpl =
+  SimpleNoteImpl
   ;
 
 // Generic
 //////////////
 
-export interface AutomationAction<T extends ActionImpl = ActionImpl> {
+export interface AutomationImpl {
+  type: string;
+}
+
+export interface AutomationItem<T extends AutomationImpl = AutomationImpl> {
   id: string;
   title: string;
   enabled: boolean;
   impl: T;
 }
 
-export interface AutomationCondition<T extends ConditionImpl = ConditionImpl> {
-  id: string;
-  title: string;
-  enabled: boolean;
-  impl: T;
-}
-
-export interface AutomationNote {
-  id: string;
-  title: string;
-  message: string;
-}
+export type AutomationAction<T extends ActionImpl = ActionImpl> = AutomationItem<T>;
+export type AutomationCondition<T extends ConditionImpl = ConditionImpl> = AutomationItem<T>;
+export type AutomationNote<T extends NoteImpl = NoteImpl> = AutomationItem<T>;
 
 export interface AutomationStep {
   id: string;

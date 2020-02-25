@@ -8,8 +8,8 @@ import PostFixed from '@/helpers/units/PostFixed';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, ChangeField } from '@/plugins/spark/types';
 
+import AutomationItemBase from '../components/AutomationItemBase';
 import { BlockValueImpl } from '../types';
-import ConditionBase from './ConditionBase';
 
 type CompareOperator = BlockValueImpl['operator'];
 
@@ -18,7 +18,7 @@ interface OperatorOption extends SelectOption {
 }
 
 @Component
-export default class BlockValue extends ConditionBase<BlockValueImpl> {
+export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
   get spec(): BlockSpec {
     return sparkStore.specs[this.impl.blockType];
@@ -31,7 +31,7 @@ export default class BlockValue extends ConditionBase<BlockValueImpl> {
   set link(val: Link) {
     if (val.id !== null) {
       this.impl.blockId = val.id;
-      this.saveCondition();
+      this.save();
     }
   }
 
@@ -66,8 +66,8 @@ export default class BlockValue extends ConditionBase<BlockValueImpl> {
   }
 
   set operator(opt: OperatorOption) {
-    this.condition.impl.operator = opt.value;
-    this.saveCondition();
+    this.item.impl.operator = opt.value;
+    this.save();
   }
 
   get currentChange(): ChangeField {
@@ -94,14 +94,14 @@ export default class BlockValue extends ConditionBase<BlockValueImpl> {
 
   saveKey(key: string): void {
     if (key === this.impl.key) { return; }
-    this.condition.impl.key = key;
-    this.condition.impl.value = this.rawValue(this.findChange(key).generate());
-    this.saveCondition();
+    this.item.impl.key = key;
+    this.item.impl.value = this.rawValue(this.findChange(key).generate());
+    this.save();
   }
 
   saveValue(value: any): void {
-    this.condition.impl.value = this.rawValue(value);
-    this.saveCondition();
+    this.item.impl.value = this.rawValue(value);
+    this.save();
   }
 }
 </script>

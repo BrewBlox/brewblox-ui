@@ -3,11 +3,11 @@ import { Component } from 'vue-property-decorator';
 
 import { durationMs, durationString } from '@/helpers/functional';
 
+import AutomationItemBase from '../components/AutomationItemBase';
 import { TimeElapsedImpl } from '../types';
-import ConditionBase from './ConditionBase';
 
 @Component
-export default class TimeElapsed extends ConditionBase<TimeElapsedImpl> {
+export default class TimeElapsed extends AutomationItemBase<TimeElapsedImpl> {
 
   get duration(): string {
     return durationString(this.impl.duration);
@@ -15,12 +15,12 @@ export default class TimeElapsed extends ConditionBase<TimeElapsedImpl> {
 
   set duration(val: string) {
     this.impl.duration = durationMs(val);
-    this.saveCondition();
+    this.save();
   }
 
   saveEnabled(value: boolean): void {
-    this.condition.enabled = value;
-    this.saveCondition();
+    this.item.enabled = value;
+    this.save();
   }
 }
 </script>

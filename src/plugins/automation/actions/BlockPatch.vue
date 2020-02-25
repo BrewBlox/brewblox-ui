@@ -5,11 +5,11 @@ import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, ChangeField } from '@/plugins/spark/types';
 
+import AutomationItemBase from '../components/AutomationItemBase';
 import { BlockPatchImpl } from '../types';
-import ActionBase from './ActionBase';
 
 @Component
-export default class BlockPatch extends ActionBase<BlockPatchImpl> {
+export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
   get spec(): BlockSpec {
     return sparkStore.specs[this.impl.blockType];
@@ -22,7 +22,7 @@ export default class BlockPatch extends ActionBase<BlockPatchImpl> {
   set link(val: Link) {
     if (val.id !== null) {
       this.impl.blockId = val.id;
-      this.saveAction();
+      this.save();
     }
   }
 
@@ -36,22 +36,17 @@ export default class BlockPatch extends ActionBase<BlockPatchImpl> {
 
   addChange(change: ChangeField): void {
     this.$set(this.impl.data, change.key, change.generate());
-    this.saveAction();
+    this.save();
   }
 
   saveChange(change: ChangeField, value: any): void {
     this.$set(this.impl.data, change.key, value);
-    this.saveAction();
+    this.save();
   }
 
   removeChange(change: ChangeField): void {
     this.$delete(this.impl.data, change.key);
-    this.saveAction();
-  }
-
-  saveEnabled(value: boolean): void {
-    this.action.enabled = value;
-    this.saveAction();
+    this.save();
   }
 }
 </script>

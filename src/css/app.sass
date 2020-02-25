@@ -136,6 +136,16 @@ $widget-border-radius: 4px
   > .q-bar
     height: 30px
 
+.close-button:hover
+  color: $red-6
+  > .q-focus-helper
+    opacity: 0 !important
+
+.page-height
+  // window - top bar - bottom bar
+  height: calc(100vh - 40px - 30px)
+  max-height: calc(100vh - 40px - 30px)
+
 label
   cursor: inherit
 

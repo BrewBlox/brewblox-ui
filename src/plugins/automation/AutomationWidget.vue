@@ -133,15 +133,22 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
         notes: [
           {
             id: uid(),
-            title: 'Important Notification',
-            message: lipsum,
+            title: 'Important Message',
+            enabled: true,
+            impl: {
+              type: 'SimpleNote',
+              message: lipsum,
+            },
           },
           {
             id: uid(),
-            title: 'Important Notification',
-            message: lipsum,
+            title: 'Important Message',
+            enabled: true,
+            impl: {
+              type: 'SimpleNote',
+              message: lipsum,
+            },
           },
-
         ],
       },
       {
@@ -183,8 +190,12 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
         notes: [
           {
             id: uid(),
-            title: 'Important Notification',
-            message: lipsum,
+            title: 'Important Message',
+            enabled: true,
+            impl: {
+              type: 'SimpleNote',
+              message: lipsum,
+            },
           },
         ],
       },
@@ -204,7 +215,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <CardWrapper v-bind="{context}" @dblclick.native="startEditor">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud">
         <template #actions>
@@ -215,7 +226,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
       </component>
     </template>
 
-    <div class="widget-body column" @dblclick="startEditor">
+    <div class="widget-body column">
       <div v-for="template in templates" :key="template.id" class="col">
         {{ template.title }}
       </div>

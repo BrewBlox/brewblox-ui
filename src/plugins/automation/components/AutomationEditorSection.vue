@@ -1,44 +1,87 @@
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog } from '../../../helpers/dialog';
+import { createDialog } from '@/helpers/dialog';
+import { spaceCased } from '@/helpers/functional';
 
+import { actionComponents } from '../actions';
+import { conditionComponents } from '../conditions';
+import { noteComponents } from '../notes';
+import { AutomationItem } from '../types';
+import AutomationItemUnknown from './AutomationItemUnknown.vue';
+
+const allComponents = {
+  ...actionComponents,
+  ...conditionComponents,
+  ...noteComponents,
+};
 
 @Component
 export default class AutomationEditorSection extends Vue {
 
   @Prop({ type: Array, required: true })
-  public readonly value!: HasId[];
+  public readonly value!: AutomationItem[];
+
+  @Prop({ type: String, required: true })
+  public readonly title!: string;
 
   @Prop({ type: String, required: true })
   public readonly label!: string;
 
-  get locals(): HasId[] {
-    return this.value;
-  }
-
-  set locals(vals: HasId[]) {
-    this.$emit('input', vals);
+  renderComponent(item: AutomationItem): VueConstructor {
+    return allComponents[item.impl.type] ?? AutomationItemUnknown;
   }
 
   add(): void {
     this.$emit('new');
   }
 
-  saveItem(item: any): void {
+  save(item: AutomationItem): void {
     this.$emit('update', item);
   }
 
-  toggleEnabled(item: { enabled: boolean }): void {
-    item.enabled = !item.enabled;
-    this.saveItem(item);
+  saveAll(items: AutomationItem[]): void {
+    this.$emit('input', items);
   }
 
-  enabledIcon(item: { enabled: boolean }): string {
+  get locals(): AutomationItem[] {
+    return this.value;
+  }
+
+  set locals(items: AutomationItem[]) {
+    this.saveAll(items);
+  }
+
+  toggleEnabled(item: AutomationItem): void {
+    item.enabled = !item.enabled;
+    this.save(item);
+  }
+
+  enabledIcon(item: AutomationItem): string {
     return item.enabled
       ? 'mdi-checkbox-marked-outline'
       : 'mdi-checkbox-blank-outline';
+  }
+
+  subtitle(item: AutomationItem): string {
+    return spaceCased(item.impl.type);
+  }
+
+  startChangeTitle(item: AutomationItem): void {
+    createDialog({
+      parent: this,
+      component: 'InputDialog',
+      title: `Change ${this.label} name`,
+      message: `Choose a new name for '${item.title}'`,
+      clearable: false,
+      value: item.title,
+    })
+      .onOk(title => this.save({ ...item, title }));
+  }
+
+  removeItem(item: AutomationItem): void {
+    this.saveAll(this.locals.filter(v => v.id !== item.id));
   }
 }
 </script>
@@ -52,7 +95,7 @@ export default class AutomationEditorSection extends Vue {
       <template #header>
         <div class="col-auto q-pl-sm">
           <div class="text-secondary" style="font-size: 170%">
-            {{ label }}
+            {{ title }}
           </div>
           <div class="darkish text-italic">
             <slot name="description" />
@@ -64,12 +107,11 @@ export default class AutomationEditorSection extends Vue {
         <div class="toolbar__Dashboard">
           <Toolbar
             :title="item.title"
-            :subtitle="item.impl ? item.impl.type : null"
-            @title-click="$emit('title-click', item)"
+            :subtitle="subtitle(item)"
+            @title-click="startChangeTitle(item)"
           >
             <template #buttons>
               <q-btn
-                v-if="item.enabled !== undefined"
                 dense
                 flat
                 round
@@ -83,21 +125,29 @@ export default class AutomationEditorSection extends Vue {
               <ActionMenu dense round>
                 <template #actions>
                   <slot name="actions" :item="item" />
+                  <ActionItem label="Rename" icon="edit" @click="startChangeTitle(item)" />
+                  <ActionItem label="Remove" icon="delete" @click="removeItem(item)" />
                 </template>
               </ActionMenu>
             </template>
           </Toolbar>
         </div>
         <div class="q-px-md q-pb-md">
-          <slot name="item" :item="item" />
+          <component
+            :is="renderComponent(item)"
+            :style="{opacity: item.enabled ? 1 : 0.5}"
+            :item="item"
+            @update:item="save"
+          />
         </div>
       </div>
 
       <template #footer>
-        <div>
-          <slot name="footer" />
+        <div class="row justify-end q-pr-md">
+          <q-btn fab-mini color="secondary" icon="add" @click="add">
+            <q-tooltip>Add new {{ label }}</q-tooltip>
+          </q-btn>
         </div>
-      <!--  Todo: add creatable items -->
       </template>
     </draggable>
   </q-scroll-area>

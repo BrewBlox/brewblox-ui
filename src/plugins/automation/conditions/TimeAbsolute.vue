@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import AutomationItemBase from '../components/AutomationItemBase';
 import { TimeAbsoluteImpl } from '../types';
-import ConditionBase from './ConditionBase';
 
 
 @Component
-export default class TimeAbsolute extends ConditionBase<TimeAbsoluteImpl> {
+export default class TimeAbsolute extends AutomationItemBase<TimeAbsoluteImpl> {
 
   get time(): Date {
     return new Date(this.impl.time);
@@ -14,12 +14,12 @@ export default class TimeAbsolute extends ConditionBase<TimeAbsoluteImpl> {
 
   set time(val: Date) {
     this.impl.time = val.getTime();
-    this.saveCondition();
+    this.save();
   }
 
   saveEnabled(value: boolean): void {
-    this.condition.enabled = value;
-    this.saveCondition();
+    this.item.enabled = value;
+    this.save();
   }
 }
 </script>
