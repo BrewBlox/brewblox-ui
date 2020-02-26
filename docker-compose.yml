@@ -72,6 +72,7 @@ services:
   automation:
     image: brewblox/brewblox-automation:develop
     privileged: true
+    init: true
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /automation"
