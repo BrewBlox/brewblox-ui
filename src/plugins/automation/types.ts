@@ -70,18 +70,6 @@ export type ConditionImpl =
   | ManualAdvanceImpl
   ;
 
-// Notes
-//////////////
-
-export interface SimpleNoteImpl {
-  type: 'SimpleNote';
-  message: string;
-}
-
-export type NoteImpl =
-  SimpleNoteImpl
-  ;
-
 // Generic
 //////////////
 
@@ -98,15 +86,19 @@ export interface AutomationItem<T extends AutomationImpl = AutomationImpl> {
 
 export type AutomationAction<T extends ActionImpl = ActionImpl> = AutomationItem<T>;
 export type AutomationCondition<T extends ConditionImpl = ConditionImpl> = AutomationItem<T>;
-export type AutomationNote<T extends NoteImpl = NoteImpl> = AutomationItem<T>;
+
+export interface AutomationTransition {
+  id: string;
+  stepId: string | null;
+  conditions: AutomationCondition[];
+}
 
 export interface AutomationStep {
   id: string;
   title: string;
   enabled: boolean;
   actions: AutomationAction[];
-  conditions: AutomationCondition[];
-  notes: AutomationNote[];
+  transitions: AutomationTransition[];
 }
 
 export interface AutomationStepResult {

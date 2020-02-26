@@ -40,16 +40,20 @@ export default class AutomationActionSection extends Vue {
 
 
 <template>
-  <AutomationEditorSection
-    :value="step.actions"
-    title="Actions"
-    label="action"
-    @input="saveAllActions"
-    @update="saveAction"
-    @new="startAddAction"
-  >
-    <template #description>
-      Actions are executed when the step starts.
-    </template>
-  </AutomationEditorSection>
+  <div>
+    <AutomationEditorSection
+      label="action"
+      :value="step.actions"
+      @input="saveAllActions"
+      @update="saveAction"
+      @new="startAddAction"
+    >
+      <template #header>
+        <AutomationHeader
+          title="Actions"
+          subtitle="Actions are executed when the step starts."
+        />
+      </template>
+    </AutomationEditorSection>
+  </div>
 </template>
