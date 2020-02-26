@@ -7,6 +7,12 @@ import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class SidebarNavigator extends Vue {
+  btnAttrs = {
+    stack: true,
+    flat: true,
+    noCaps: true,
+    class: 'col-grow q-py-sm max-small',
+  }
 
   // Set in quasar.conf
   automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
@@ -26,11 +32,8 @@ export default class SidebarNavigator extends Vue {
     });
   }
 
-  showAutomationEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'AutomationEditor',
-    });
+  btnColor(section: string): string {
+    return this.activeSection === section ? 'primary' : '';
   }
 }
 </script>
@@ -42,43 +45,37 @@ export default class SidebarNavigator extends Vue {
         icon="mdi-view-dashboard"
         label="Dashboards"
         to="/"
-        :color="activeSection === 'dashboards' ? 'primary' : ''"
-        stack
-        flat
-        class="col-auto q-py-sm"
-        no-caps
+        :color="btnColor('dashboards')"
+        v-bind="btnAttrs"
       />
       <q-btn
         v-if="!editorDisabled"
         icon="mdi-tools"
         label="Builder"
         to="/builder"
-        :color="activeSection === 'builder' ? 'primary' : ''"
-        stack
-        flat
-        no-caps
-        class="col-auto q-py-sm"
-      />
-      <q-btn
-        icon="mdi-creation"
-        label="Wizardry"
-        stack
-        flat
-        no-caps
-        class="col-auto q-py-sm"
-        @click="showWizard"
+        :color="btnColor('builder')"
+        v-bind="btnAttrs"
       />
       <q-btn
         v-if="automationFeatureEnabled"
         icon="mdi-calendar-check"
         label="Automation"
-        stack
-        flat
-        class="col-auto q-py-sm"
-        no-caps
-        @click="showAutomationEditor"
+        to="/automation"
+        :color="btnColor('automation')"
+        v-bind="btnAttrs"
+      />
+      <q-btn
+        icon="mdi-creation"
+        label="Wizardry"
+        v-bind="btnAttrs"
+        @click="showWizard"
       />
     </div>
     <q-separator />
   </div>
 </template>
+
+<style lang="sass" scoped>
+.max-small
+  max-width: 34%
+</style>

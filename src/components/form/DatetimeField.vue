@@ -17,7 +17,7 @@ export default class DatetimeField extends FieldBase {
   @Prop({ type: String })
   readonly resetIcon!: string;
 
-  @Prop({ type: String, default: 'date and time' })
+  @Prop({ type: String, default: 'Date and time' })
   public readonly label!: string;
 
   @Prop({ type: String, default: '<not set>' })

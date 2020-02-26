@@ -171,8 +171,8 @@ export default class LayoutActions extends Vue {
         <ActionItem icon="edit" label="Rename Layout" @click="renameLayout" />
         <ActionItem icon="dashboard" label="Show Layout on dashboard" @click="createLayoutWidget" />
         <ActionItem icon="mdi-file-export" label="Export Layout" @click="exportLayout" />
-        <ActionItem icon="delete" label="Delete all parts" @click="clearParts" />
-        <ActionItem icon="delete" label="Delete Layout" @click="removeLayout" />
+        <ActionItem icon="delete" label="Remove all parts" @click="clearParts" />
+        <ActionItem icon="delete" label="Remove Layout" @click="removeLayout" />
       </template>
     </template>
   </ActionMenu>
