@@ -44,6 +44,31 @@ export default class HistoryGraph extends Vue {
     this.refresh();
   }
 
+  @Watch('policies', { immediate: true })
+  publishDownsamplingRate(newVal: Policies, oldVal: Policies): void {
+    if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+      const downsampling = mapValues(newVal, policy =>
+        policy
+          .replace(/autogen/, 'No averaging')
+          .replace(/downsample_/, ''));
+      this.$emit('downsample', downsampling);
+    }
+  }
+
+  mounted(): void {
+    if (!this.sharedSources) {
+      this.addSources();
+    } else {
+      this.$nextTick(this.refresh);
+    }
+  }
+
+  destroyed(): void {
+    if (!this.sharedSources) {
+      this.removeSources();
+    }
+  }
+
   get params(): QueryParams {
     return this.config.params ?? {};
   }
@@ -128,31 +153,6 @@ export default class HistoryGraph extends Vue {
   resetSources(): void {
     this.removeSources();
     this.addSources();
-  }
-
-  mounted(): void {
-    if (!this.sharedSources) {
-      this.addSources();
-    } else {
-      this.$nextTick(this.refresh);
-    }
-  }
-
-  @Watch('policies', { immediate: true })
-  publishDownsamplingRate(newVal: Policies, oldVal: Policies): void {
-    if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
-      const downsampling = mapValues(newVal, policy =>
-        policy
-          .replace(/autogen/, 'No averaging')
-          .replace(/downsample_/, ''));
-      this.$emit('downsample', downsampling);
-    }
-  }
-
-  destroyed(): void {
-    if (!this.sharedSources) {
-      this.removeSources();
-    }
   }
 
   public refresh(): void {

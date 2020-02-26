@@ -1,4 +1,5 @@
 import fromEntries from 'fromentries';
+import isEqual from 'lodash/isEqual';
 import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 import { colors } from 'quasar';
@@ -207,6 +208,10 @@ export const suggestId =
 export const isAbsoluteUrl =
   (val: string): boolean =>
     new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
+
+export const isJsonEqual =
+  (left: any, right: any): boolean =>
+    isEqual(JSON.parse(JSON.stringify(left)), JSON.parse(JSON.stringify(right)));
 
 export const ruleValidator =
   (rules: InputRule[]): ((val: any) => boolean) =>
