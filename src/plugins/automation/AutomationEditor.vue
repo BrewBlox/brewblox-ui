@@ -5,15 +5,17 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { spliceById } from '@/helpers/functional';
 
+import { clear, make } from './helpers';
 import { automationStore } from './store';
 import { AutomationStep, AutomationTemplate } from './types';
-
 interface HasId {
   id: string;
 }
 
 @Component
 export default class AutomationEditor extends DialogBase {
+  make = make;
+  clear = clear;
   drawerOpen = !this.$dense;
   dragged: AutomationStep | null = null;
 
@@ -172,6 +174,8 @@ export default class AutomationEditor extends DialogBase {
         <ActionMenu class="col-auto">
           <template #actions>
             <ActionItem label="New Template" icon="add" @click="startAddTemplate(false)" />
+            <ActionItem label="Make" icon="add" @click="make" />
+            <ActionItem label="Clear" icon="delete" @click="clear" />
             <template v-if="template !== null">
               <ActionItem icon="file_copy" label="Copy Template" @click="startAddLayout(true)" />
               <ActionItem icon="edit" label="Rename Template" @click="startRenameTemplate" />
@@ -206,6 +210,7 @@ export default class AutomationEditor extends DialogBase {
             :clickable="!dragged"
             :label="step.title"
             :inset-level="0.2"
+            class="ellipsis"
             style="min-height: 0px"
             @click="selectActive(template, step)"
           />
@@ -216,9 +221,12 @@ export default class AutomationEditor extends DialogBase {
     <q-page-container>
       <q-page>
         <div v-if="step" class="page-height row no-wrap q-pa-md q-gutter-md">
-          <AutomationActionSection :step="step" @update:step="saveStep" />
-          <AutomationConditionSection :step="step" @update:step="saveStep" />
-          <AutomationNoteSection :step="step" @update:step="saveStep" />
+          <q-scroll-area visible class="col-xl-4 col">
+            <AutomationActions :step="step" @update:step="saveStep" />
+          </q-scroll-area>
+          <q-scroll-area visible class="col-xl-4 col">
+            <AutomationTransitions :template="template" :step="step" @update:step="saveStep" />
+          </q-scroll-area>
         </div>
       </q-page>
     </q-page-container>

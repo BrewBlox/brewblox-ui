@@ -7,24 +7,19 @@ import { spaceCased } from '@/helpers/functional';
 
 import { actionComponents } from '../actions';
 import { conditionComponents } from '../conditions';
-import { noteComponents } from '../notes';
 import { AutomationItem } from '../types';
 import AutomationItemUnknown from './AutomationItemUnknown.vue';
 
 const allComponents = {
   ...actionComponents,
   ...conditionComponents,
-  ...noteComponents,
 };
 
 @Component
-export default class AutomationEditorSection extends Vue {
+export default class AutomationItems extends Vue {
 
   @Prop({ type: Array, required: true })
   public readonly value!: AutomationItem[];
-
-  @Prop({ type: String, required: true })
-  public readonly title!: string;
 
   @Prop({ type: String, required: true })
   public readonly label!: string;
@@ -53,17 +48,6 @@ export default class AutomationEditorSection extends Vue {
     this.saveAll(items);
   }
 
-  toggleEnabled(item: AutomationItem): void {
-    item.enabled = !item.enabled;
-    this.save(item);
-  }
-
-  enabledIcon(item: AutomationItem): string {
-    return item.enabled
-      ? 'mdi-checkbox-marked-outline'
-      : 'mdi-checkbox-blank-outline';
-  }
-
   subtitle(item: AutomationItem): string {
     return spaceCased(item.impl.type);
   }
@@ -87,23 +71,18 @@ export default class AutomationEditorSection extends Vue {
 </script>
 
 <template>
-  <q-scroll-area visible class="col">
+  <div class="q-px-md q-pb-md">
+    <slot name="header" />
     <draggable
       v-model="locals"
-      class="column q-px-md q-pb-md q-gutter-y-md rounded-borders section-container"
+      class="column q-gutter-y-md q-my-none"
     >
-      <template #header>
-        <div class="col-auto q-pl-sm">
-          <div class="text-secondary" style="font-size: 170%">
-            {{ title }}
-          </div>
-          <div class="darkish text-italic">
-            <slot name="description" />
-          </div>
-        </div>
-      </template>
-
-      <div v-for="item in locals" :key="item.id" class="section-item rounded-borders depth-2">
+      <div
+        v-for="item in locals"
+        :key="item.id"
+        class="rounded-borders depth-2"
+        :style="{opacity: item.enabled ? 1 : 0.3}"
+      >
         <div class="toolbar__Dashboard">
           <Toolbar
             :title="item.title"
@@ -111,17 +90,12 @@ export default class AutomationEditorSection extends Vue {
             @title-click="startChangeTitle(item)"
           >
             <template #buttons>
-              <q-btn
+              <EnabledButton
                 dense
-                flat
                 round
-                :icon="enabledIcon(item)"
-                @click="toggleEnabled(item)"
-              >
-                <q-tooltip>
-                  Toggle enabled
-                </q-tooltip>
-              </q-btn>
+                :value="item.enabled"
+                @input="v => {item.enabled = v; save(item);}"
+              />
               <ActionMenu dense round>
                 <template #actions>
                   <slot name="actions" :item="item" />
@@ -135,28 +109,11 @@ export default class AutomationEditorSection extends Vue {
         <div class="q-px-md q-pb-md">
           <component
             :is="renderComponent(item)"
-            :style="{opacity: item.enabled ? 1 : 0.5}"
             :item="item"
             @update:item="save"
           />
         </div>
       </div>
-
-      <template #footer>
-        <div class="row justify-end q-pr-md">
-          <q-btn fab-mini color="secondary" icon="add" @click="add">
-            <q-tooltip>Add new {{ label }}</q-tooltip>
-          </q-btn>
-        </div>
-      </template>
     </draggable>
-  </q-scroll-area>
+  </div>
 </template>
-
-<style lang="sass" scoped>
-.section-container
-  > .section-item:nth-child(odd)
-    border-left: 1px none rgba($grey-5, 0.8)
-  > .section-item:nth-child(even)
-    border-left: 1px none rgba($red-5, 0.8)
-</style>

@@ -93,7 +93,7 @@ export default class ServiceIndex extends Vue {
       :key="service.id"
       :to="editing ? undefined : `/service/${service.id}`"
       :inset-level="0.2"
-      :class="['q-pb-sm', {hoverable: editing && !dragging, bordered: editing}]"
+      :class="['q-pb-sm', {bordered: editing, hoverable: editing && !dragging}]"
       style="min-height: 0px"
     >
       <q-item-section :class="['ellipsis', {'text-italic': editing}]">
