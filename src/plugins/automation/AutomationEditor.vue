@@ -210,6 +210,7 @@ export default class AutomationEditor extends DialogBase {
             :clickable="!dragged"
             :label="step.title"
             :inset-level="0.2"
+            class="ellipsis"
             style="min-height: 0px"
             @click="selectActive(template, step)"
           />
@@ -221,10 +222,10 @@ export default class AutomationEditor extends DialogBase {
       <q-page>
         <div v-if="step" class="page-height row no-wrap q-pa-md q-gutter-md">
           <q-scroll-area visible class="col-xl-4 col">
-            <AutomationActionSection :step="step" @update:step="saveStep" />
+            <AutomationActions :step="step" @update:step="saveStep" />
           </q-scroll-area>
           <q-scroll-area visible class="col-xl-4 col">
-            <AutomationTransitionSection :template="template" :step="step" @update:step="saveStep" />
+            <AutomationTransitions :template="template" :step="step" @update:step="saveStep" />
           </q-scroll-area>
         </div>
       </q-page>

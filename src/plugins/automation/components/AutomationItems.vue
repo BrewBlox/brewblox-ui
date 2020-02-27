@@ -16,7 +16,7 @@ const allComponents = {
 };
 
 @Component
-export default class AutomationEditorSection extends Vue {
+export default class AutomationItems extends Vue {
 
   @Prop({ type: Array, required: true })
   public readonly value!: AutomationItem[];
@@ -48,17 +48,6 @@ export default class AutomationEditorSection extends Vue {
     this.saveAll(items);
   }
 
-  toggleEnabled(item: AutomationItem): void {
-    item.enabled = !item.enabled;
-    this.save(item);
-  }
-
-  enabledIcon(item: AutomationItem): string {
-    return item.enabled
-      ? 'mdi-checkbox-marked-outline'
-      : 'mdi-checkbox-blank-outline';
-  }
-
   subtitle(item: AutomationItem): string {
     return spaceCased(item.impl.type);
   }
@@ -88,7 +77,12 @@ export default class AutomationEditorSection extends Vue {
       v-model="locals"
       class="column q-gutter-y-md q-my-none"
     >
-      <div v-for="item in locals" :key="item.id" class="rounded-borders depth-2">
+      <div
+        v-for="item in locals"
+        :key="item.id"
+        class="rounded-borders depth-2"
+        :style="{opacity: item.enabled ? 1 : 0.3}"
+      >
         <div class="toolbar__Dashboard">
           <Toolbar
             :title="item.title"
@@ -96,17 +90,12 @@ export default class AutomationEditorSection extends Vue {
             @title-click="startChangeTitle(item)"
           >
             <template #buttons>
-              <q-btn
+              <EnabledButton
                 dense
-                flat
                 round
-                :icon="enabledIcon(item)"
-                @click="toggleEnabled(item)"
-              >
-                <q-tooltip>
-                  Toggle enabled
-                </q-tooltip>
-              </q-btn>
+                :value="item.enabled"
+                @input="v => {item.enabled = v; save(item);}"
+              />
               <ActionMenu dense round>
                 <template #actions>
                   <slot name="actions" :item="item" />
@@ -120,17 +109,11 @@ export default class AutomationEditorSection extends Vue {
         <div class="q-px-md q-pb-md">
           <component
             :is="renderComponent(item)"
-            :style="{opacity: item.enabled ? 1 : 0.5}"
             :item="item"
             @update:item="save"
           />
         </div>
       </div>
     </draggable>
-    <!-- <div class="row justify-end q-pa-md">
-      <q-btn fab-mini color="secondary" icon="add" @click="add">
-        <q-tooltip>Add new {{ label }}</q-tooltip>
-      </q-btn>
-    </div> -->
   </div>
 </template>

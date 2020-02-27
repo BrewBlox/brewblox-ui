@@ -8,7 +8,7 @@ import { AutomationAction, AutomationStep } from '../types';
 
 
 @Component
-export default class AutomationActionSection extends Vue {
+export default class AutomationActions extends Vue {
 
   @Prop({ type: Object, required: true })
   public readonly step!: AutomationStep;
@@ -41,7 +41,7 @@ export default class AutomationActionSection extends Vue {
 
 <template>
   <div>
-    <AutomationEditorSection
+    <AutomationItems
       label="action"
       :value="step.actions"
       @input="saveAllActions"
@@ -54,6 +54,6 @@ export default class AutomationActionSection extends Vue {
           subtitle="Actions are executed when the step starts."
         />
       </template>
-    </AutomationEditorSection>
+    </AutomationItems>
   </div>
 </template>

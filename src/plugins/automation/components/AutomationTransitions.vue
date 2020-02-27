@@ -8,7 +8,7 @@ import { AutomationCondition, AutomationStep, AutomationTemplate, AutomationTran
 
 
 @Component
-export default class AutomationTransitionSection extends Vue {
+export default class AutomationTransitions extends Vue {
 
   @Prop({ type: Object, required: true })
   public readonly template!: AutomationTemplate;
@@ -46,26 +46,26 @@ export default class AutomationTransitionSection extends Vue {
   }
 
   startAddCondition(transition: AutomationTransition): void {
-
+    void transition;
   }
 
-  nextStepTitle(trans: AutomationTransition): string {
-    return this.template.steps.find(s => s.id === trans.stepId)?.title ?? 'next step';
-  }
-
-  editNextStep(trans: AutomationTransition): void {
-
+  editNextStep(transition: AutomationTransition): void {
+    void transition;
   }
 }
 </script>
 
 <template>
-  <div class="q-gutter-y-sm q-pr-md">
+  <div class="q-gutter-y-md q-pr-md">
     <AutomationHeader
       title="Transitions"
       subtitle="Go to another step when all conditions are satisfied."
-    />
-    <AutomationConditionSection
+    >
+      <template #actions>
+        <ActionItem label="New transition" />
+      </template>
+    </AutomationHeader>
+    <AutomationConditions
       v-for="trans in step.transitions"
       :key="trans.id"
       :template="template"
@@ -78,6 +78,6 @@ export default class AutomationTransitionSection extends Vue {
         <ActionItem label="Rename" />
         <ActionItem label="Remove up" />
       </template>
-    </AutomationConditionSection>
+    </AutomationConditions>
   </div>
 </template>

@@ -124,12 +124,14 @@ export async function make(): Promise<void> {
         transitions: [
           {
             id: uid(),
-            stepId: stepTwoId,
+            enabled: true,
+            next: stepTwoId,
             conditions: mkConditions(),
           },
           {
             id: uid(),
-            stepId: null,
+            enabled: true,
+            next: true,
             conditions: mkConditions(),
           },
         ],
@@ -157,7 +159,8 @@ export async function make(): Promise<void> {
         transitions: [
           {
             id: uid(),
-            stepId: null,
+            enabled: true,
+            next: true,
             conditions: mkConditions(),
           },
         ],

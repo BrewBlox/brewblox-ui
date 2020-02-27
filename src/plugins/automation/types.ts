@@ -89,7 +89,13 @@ export type AutomationCondition<T extends ConditionImpl = ConditionImpl> = Autom
 
 export interface AutomationTransition {
   id: string;
-  stepId: string | null;
+  /**
+   * true: next step
+   * false: exit process
+   * string: step ID
+   */
+  next: boolean | string;
+  enabled: boolean;
   conditions: AutomationCondition[];
 }
 

@@ -9,7 +9,7 @@ import { AutomationCondition, AutomationTemplate, AutomationTransition } from '.
 
 
 @Component
-export default class AutomationConditionSection extends Vue {
+export default class AutomationConditions extends Vue {
 
   @Prop({ type: Object, required: true })
   public readonly template!: AutomationTemplate;
@@ -18,13 +18,16 @@ export default class AutomationConditionSection extends Vue {
   public readonly transition!: AutomationTransition;
 
   get nextStepTitle(): string {
-    const { stepId } = this.transition;
-    return this.template.steps.find(s => s.id === stepId)?.title ?? 'next step';
+    const { next } = this.transition;
+    if (next === true) { return 'next step'; }
+    if (next === false) { return 'process end'; }
+    return this.template.steps.find(s => s.id === next)?.title ?? 'unknown step';
   }
 
   get nextStepOptions(): SelectOption[] {
     return [
-      { label: '[Next step]', value: null },
+      { label: '[Next step]', value: true },
+      { label: '[Process end]', value: false },
       ...this.template.steps.map(step => ({ label: step.title, value: step.id })),
     ];
   }
@@ -52,17 +55,16 @@ export default class AutomationConditionSection extends Vue {
       component: 'SelectDialog',
       title: 'Select next step',
       message: 'Pick the step that will be started if all conditions in this transition are satisfied.',
-      value: this.transition.stepId,
+      value: this.transition.next,
       selectOptions: this.nextStepOptions,
       selectProps: {
         label: 'Step',
         emitValue: true,
         mapOptions: true,
-        clearable: true,
       },
     })
-      .onOk(id => {
-        this.transition.stepId = id;
+      .onOk(value => {
+        this.transition.next = value;
         this.save();
       });
   }
@@ -70,16 +72,17 @@ export default class AutomationConditionSection extends Vue {
 </script>
 
 <template>
-  <AutomationEditorSection
+  <AutomationItems
     label="condition"
     :value="transition.conditions"
     class="depth-1 rounded-borders"
+    :style="{opacity: transition.enabled ? 1 : 0.3}"
     @input="saveAllConditions"
     @update="saveCondition"
     @new="startAddCondition"
   >
     <template #header>
-      <div class="row items-center ">
+      <div class="row items-center q-py-xs">
         <div class="text-h5 col-grow">
           Go to
           <span
@@ -90,12 +93,19 @@ export default class AutomationConditionSection extends Vue {
           </span>
           if...
         </div>
-        <ActionMenu round class="col-auto">
+        <EnabledButton
+          :value="transition.enabled"
+          round
+          dense
+          class="col-auto"
+          @input="v => {transition.enabled = v; save();}"
+        />
+        <ActionMenu round dense class="col-auto">
           <template #actions>
             <slot name="actions" />
           </template>
         </ActionMenu>
       </div>
     </template>
-  </AutomationEditorSection>
+  </AutomationItems>
 </template>
