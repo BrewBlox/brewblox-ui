@@ -1,25 +1,32 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { constraintLabels } from '../helpers';
-import { AnalogConstraint, ConstraintsObj, DigitalConstraint } from '../types';
+import { constraintLabels } from '../getters';
+import {
+  AnalogConstraint,
+  AnalogConstraintKey,
+  ConstraintsObj,
+  DigitalConstraint,
+  DigitalConstraintKey,
+} from '../types';
 
-export interface EditableConstraint {
-  key: string;
-  value: any;
-  limiting: boolean;
+type AnyConstraintKey = AnalogConstraintKey | DigitalConstraintKey;
+type AnyConstraint = AnalogConstraint | DigitalConstraint;
+
+export interface WrappedConstrained {
+  type: AnyConstraintKey;
+  constraint: AnyConstraint;
 }
 
-const asEditable =
-  (con: AnalogConstraint | DigitalConstraint): EditableConstraint => {
-    const keys = Object.keys(con);
-    const [key] = keys.filter(item => item !== 'limiting');
-    return { key, value: con[key], limiting: con.limiting };
+const wrapConstraint =
+  (constraint: AnyConstraint): WrappedConstrained => {
+    const type = Object.keys(constraint).find(k => k !== 'limiting') as AnyConstraintKey;
+    return { type, constraint };
   };
 
-const asData =
-  (cinfo: EditableConstraint): AnalogConstraint | DigitalConstraint =>
-    ({ [cinfo.key]: cinfo.value, limiting: cinfo.limiting });
+const unwrapConstraint =
+  (wrapped: WrappedConstrained): AnyConstraint =>
+    wrapped.constraint;
 
 @Component
 export default class ConstraintsBase extends Vue {
@@ -29,21 +36,18 @@ export default class ConstraintsBase extends Vue {
   @Prop({ type: String, required: true })
   protected readonly serviceId!: string;
 
-  protected get constraints(): EditableConstraint[] {
+  protected saveConstraints(vals: WrappedConstrained[] = this.constraints): ConstraintsObj {
+    const constraints = vals.map(unwrapConstraint);
+    return { constraints };
+  }
+
+  protected get constraints(): WrappedConstrained[] {
     // Typescript loses the plot here
-    return (this.value.constraints as any).map(asEditable);
+    return (this.value.constraints as AnyConstraint[]).map(wrapConstraint);
   }
 
   protected label(k: string): string {
-    return constraintLabels.get(k) || k;
-  }
-
-  @Emit('input')
-  protected saveConstraints(vals: EditableConstraint[] = this.constraints): ConstraintsObj {
-    const constraints = vals
-      .filter(info => !!info.key)
-      .map(asData);
-    return { ...this.value, constraints };
+    return constraintLabels[k] ?? k;
   }
 
   protected removeConstraint(index: number): void {

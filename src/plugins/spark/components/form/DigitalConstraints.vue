@@ -1,22 +1,68 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { Link, Unit } from '@/helpers/units';
 import { blockTypes } from '@/plugins/spark/block-types';
-import { digitalConstraintLabels } from '@/plugins/spark/helpers';
+import { ConstraintsObjDigital, DigitalConstraint, DigitalConstraintKey } from '@/plugins/spark/types';
 
-import ConstraintsBase, { EditableConstraint } from '../ConstraintsBase';
+interface Wrapped {
+  type: DigitalConstraintKey;
+  constraint: DigitalConstraint;
+}
+
+const emptyTime = (): Unit => new Unit(0, 'seconds');
 
 @Component
-export default class DigitalConstraints extends ConstraintsBase {
-  get constraintOptions(): SelectOption[] {
-    return [...digitalConstraintLabels].map(([k, v]) => ({ label: v, value: k }));
+export default class DigitalConstraints extends Vue {
+  @Prop({ type: Object, default: () => ({ constraints: [] }) })
+  protected readonly value!: ConstraintsObjDigital;
+
+  @Prop({ type: String, required: true })
+  public readonly serviceId!: string;
+
+  get constraints(): Wrapped[] {
+    return this.value.constraints
+      .map(constraint => {
+        const type = Object.keys(constraint).find(k => k != 'remaining') as DigitalConstraintKey;
+        return { type, constraint };
+      });
   }
 
-  createConstraint(key: string, value: any = null): EditableConstraint {
+  save(constraints: Wrapped[] = this.constraints): void {
+    this.$emit('input', { constraints: constraints.map(c => c.constraint) });
+  }
+
+  createDefault(type: DigitalConstraintKey): Wrapped {
+    const opts: Record<DigitalConstraintKey, DigitalConstraint> = {
+      minOff: {
+        remaining: emptyTime(),
+        minOff: emptyTime(),
+      },
+      minOn: {
+        remaining: emptyTime(),
+        minOn: emptyTime(),
+      },
+      mutexed: {
+        remaining: emptyTime(),
+        mutexed: {
+          mutexId: new Link(null, blockTypes.Mutex),
+          hasCustomHoldTime: false,
+          extraHoldTime: emptyTime(),
+          holdTimeRemaining: emptyTime(),
+        },
+      },
+    };
+    return {
+      type,
+      constraint: opts[type],
+    };
+  }
+
+  createConstraint(key: DigitalConstraintKey, value: any = null): EditableConstraint {
     switch (key) {
-      case 'mutex':
+      case 'mutexed':
         return {
           key,
           value: new Link(value, blockTypes.Mutex),
@@ -43,7 +89,7 @@ export default class DigitalConstraints extends ConstraintsBase {
     })
       .onOk(keys => {
         this.constraints.push(...keys.map(this.createConstraint));
-        this.saveConstraints();
+        this.save();
       });
   }
 }
