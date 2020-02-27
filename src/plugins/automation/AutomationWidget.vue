@@ -25,7 +25,6 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
       <component :is="toolbarComponent" :crud="crud">
         <template #actions>
           <ActionItem icon="settings" label="Editor" @click="startEditor" />
-          <ActionItem icon="delete" label="Clear" @click="clear" />
         </template>
       </component>
     </template>
