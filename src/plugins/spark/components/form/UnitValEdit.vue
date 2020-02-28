@@ -33,9 +33,9 @@ export default class UnitValEdit extends ValEditBase {
   <div v-if="editable" class="row no-wrap q-gutter-x-xs">
     <q-input
       :value="field.value"
-      step="any"
       :dense="dense"
-      type="number"
+      inputmode="numeric"
+      pattern="[0-9]*"
       class="col-grow"
       label="Value"
       v-on="inputListeners"

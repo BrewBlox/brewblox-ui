@@ -40,6 +40,15 @@ export default class InputDialog extends DialogBase {
     return ruleValidator(this.rules)(this.local);
   }
 
+  get bound(): any {
+    return this.type === 'number'
+      ? {
+        inputmode: 'numeric',
+        pattern: '[0-9]*',
+      }
+      : {};
+  }
+
   save(): void {
     if (!this.valid) {
       return;
@@ -66,10 +75,9 @@ export default class InputDialog extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"
-        v-bind="{ type, rules, clearable, label, autogrow }"
+        v-bind="{ rules, clearable, label, autogrow, ...bound }"
         :input-style="{fontSize}"
         autofocus
-        step="any"
       />
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

@@ -38,8 +38,8 @@ export default class UnitDialog extends DialogBase {
         :label="label"
         :suffix="value.notation"
         input-style="font-size: 170%"
-        type="number"
-        step="any"
+        inputmode="numeric"
+        pattern="[0-9]*"
         autofocus
         clearable
         item-aligned
