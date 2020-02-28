@@ -11,9 +11,9 @@ import PidWidget from './PidWidget.vue';
 import { PidData } from './types';
 
 
-const block: BlockSpec = {
+const block: BlockSpec<PidData> = {
   id: typeName,
-  generate: (): PidData => ({
+  generate: () => ({
     inputId: new Link(null, interfaceTypes.SetpointSensorPair),
     outputId: new Link(null, interfaceTypes.ActuatorAnalog),
     inputValue: new Unit(0, 'degC'),
@@ -40,7 +40,7 @@ const block: BlockSpec = {
   presets: [
     {
       name: 'Fridge cooling compressor (beer constant)',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(-50, '1/degC'),
         ti: new Unit(6, 'hour'),
         td: new Unit(30, 'min'),
@@ -48,7 +48,7 @@ const block: BlockSpec = {
     },
     {
       name: 'Fridge heating element (beer constant)',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(100, '1/degC'),
         ti: new Unit(6, 'hour'),
         td: new Unit(30, 'min'),
@@ -56,7 +56,7 @@ const block: BlockSpec = {
     },
     {
       name: 'Fridge cooling compressor (fridge constant)',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(-50, '1/degC'),
         ti: new Unit(2, 'hour'),
         td: new Unit(10, 'min'),
@@ -64,7 +64,7 @@ const block: BlockSpec = {
     },
     {
       name: 'Fridge heating element (fridge constant)',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(20, '1/degC'),
         ti: new Unit(2, 'hour'),
         td: new Unit(10, 'min'),
@@ -72,7 +72,7 @@ const block: BlockSpec = {
     },
     {
       name: 'Kettle heating element',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(50, '1/degC'),
         ti: new Unit(10, 'min'),
         td: new Unit(0, 'min'),
@@ -80,7 +80,7 @@ const block: BlockSpec = {
     },
     {
       name: 'HLT setpoint driver',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(1, '1/degC'),
         ti: new Unit(10, 'min'),
         td: new Unit(0, 'min'),
@@ -88,7 +88,7 @@ const block: BlockSpec = {
     },
     {
       name: 'Fridge setpoint driver',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(5, '1/degC'),
         ti: new Unit(2, 'hour'),
         td: new Unit(0, 'min'),
@@ -96,7 +96,7 @@ const block: BlockSpec = {
     },
     {
       name: 'Glycol pump',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(-5, '1/degC'),
         ti: new Unit(2, 'hour'),
         td: new Unit(0, 'min'),
@@ -104,7 +104,7 @@ const block: BlockSpec = {
     },
     {
       name: 'Heating pad',
-      generate: (): Partial<PidData> => ({
+      generate: () => ({
         kp: new Unit(30, '1/degC'),
         ti: new Unit(2, 'hour'),
         td: new Unit(0, 'min'),

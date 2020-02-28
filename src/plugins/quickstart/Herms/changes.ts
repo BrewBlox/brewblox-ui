@@ -1,6 +1,6 @@
 import { uid } from 'quasar';
 
-import { Link, Unit } from '@/helpers/units';
+import { Link, Time, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
@@ -47,7 +47,15 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       limiting: false,
     });
     actuatorConstraints.push(
-      { mutex: new Link(config.names.mutex, blockTypes.Mutex), limiting: false }
+      {
+        mutexed: {
+          mutexId: new Link(config.names.mutex, blockTypes.Mutex),
+          extraHoldTime: new Time(),
+          hasCustomHoldTime: true,
+          holdTimeRemaining: new Time(),
+        },
+        remaining: new Time(),
+      },
     );
   }
 
@@ -65,7 +73,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       serviceId,
       groups,
       data: {
-        differentActuatorWait: new Unit(0, 'second'),
+        differentActuatorWait: new Time(),
+        waitRemaining: new Time(),
       },
     },
   ] as [
@@ -192,7 +201,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       groups,
       data: {
         enabled: true,
-        period: new Unit(2, 'second'),
+        period: new Time(2, 's'),
         actuatorId: new Link(config.names.hltAct),
         drivenActuatorId: new Link(null),
         setting: 0,
@@ -210,7 +219,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       groups,
       data: {
         enabled: true,
-        period: new Unit(2, 'second'),
+        period: new Time(2, 's'),
         actuatorId: new Link(config.names.bkAct),
         drivenActuatorId: new Link(null),
         setting: 0,
@@ -233,8 +242,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         inputId: new Link(config.names.hltSetpoint),
         outputId: new Link(config.names.hltPwm),
         kp: opts.hltKp,
-        ti: new Unit(10, 'min'),
-        td: new Unit(30, 'second'),
+        ti: new Time(10, 'm'),
+        td: new Time(30, 's'),
         boilMinOutput: 25,
       },
     },
@@ -249,8 +258,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         inputId: new Link(config.names.mtSetpoint),
         outputId: new Link(config.names.hltDriver),
         kp: opts.mtKp,
-        ti: new Unit(5, 'min'),
-        td: new Unit(10, 'min'),
+        ti: new Time(5, 'm'),
+        td: new Time(10, 'm'),
       },
     },
     {
@@ -264,8 +273,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         inputId: new Link(config.names.bkSetpoint),
         outputId: new Link(config.names.bkPwm),
         kp: opts.bkKp,
-        ti: new Unit(5, 'min'),
-        td: new Unit(10, 'min'),
+        ti: new Time(5, 'm'),
+        td: new Time(10, 'm'),
         boilMinOutput: 25,
       },
     },

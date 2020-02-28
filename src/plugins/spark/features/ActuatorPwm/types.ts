@@ -1,5 +1,5 @@
 import { Link, Unit } from '@/helpers/units';
-import { Block, ConstraintsObj } from '@/plugins/spark/types';
+import { AnalogConstraintsObj, Block } from '@/plugins/spark/types';
 
 export interface ActuatorPwmData {
   actuatorId: Link;
@@ -12,7 +12,7 @@ export interface ActuatorPwmData {
   value: number;
   enabled: boolean;
 
-  constrainedBy: ConstraintsObj;
+  constrainedBy: AnalogConstraintsObj;
 }
 
 export interface ActuatorPwmBlock extends Block {

@@ -7,9 +7,9 @@ import widget from './ActuatorAnalogMockWidget.vue';
 import { typeName } from './getters';
 import { ActuatorAnalogMockData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<ActuatorAnalogMockData> = {
   id: typeName,
-  generate: (): ActuatorAnalogMockData => ({
+  generate: () => ({
     setting: 0,
     desiredSetting: 0,
     minSetting: 0,

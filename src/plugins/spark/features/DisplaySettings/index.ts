@@ -7,10 +7,10 @@ import widget from './DisplaySettingsWidget.vue';
 import { typeName } from './getters';
 import { DisplaySettingsData, DisplayTempUnit } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<DisplaySettingsData> = {
   id: typeName,
   systemObject: true,
-  generate: (): DisplaySettingsData => ({
+  generate: () => ({
     name: 'Display settings',
     tempUnit: DisplayTempUnit.Celsius,
     widgets: [],

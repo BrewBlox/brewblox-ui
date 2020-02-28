@@ -13,11 +13,9 @@ export interface ChangeField {
   pretty?: (val: any) => string;
 }
 
-export type BlockDataGenerator = () => Mapped<any>;
-
-export interface BlockDataPreset {
+export interface BlockDataPreset<DataT = any> {
   name: string;
-  generate: BlockDataGenerator;
+  generate: () => Partial<DataT>;
 }
 
 export interface StoredDataPreset extends StoreObject {
@@ -27,11 +25,11 @@ export interface StoredDataPreset extends StoreObject {
   data: Mapped<any>;
 }
 
-export interface BlockSpec {
+export interface BlockSpec<DataT = any> {
   id: string;
   systemObject?: boolean;
-  generate: BlockDataGenerator;
-  presets: BlockDataPreset[];
+  generate: () => DataT;
+  presets: BlockDataPreset<DataT>[];
   changes: ChangeField[];
   graphTargets?: Mapped<string>;
 }
@@ -145,7 +143,6 @@ export interface IoPin {
   [key: string]: IoChannel;
 }
 
-export type DigitalConstraintKey = 'minOff' | 'minOn' | 'mutexed';
 export type AnalogConstraintKey = 'min' | 'max' | 'balanced';
 
 export interface MinConstraint {
@@ -172,9 +169,11 @@ export type AnalogConstraint =
   | MaxConstraint
   | BalancedConstraint;
 
-export interface ConstraintsObjAnalog {
+export interface AnalogConstraintsObj {
   constraints: AnalogConstraint[];
 }
+
+export type DigitalConstraintKey = 'minOff' | 'minOn' | 'mutexed';
 
 export interface MinOnConstraint {
   remaining: Unit;
@@ -201,6 +200,6 @@ export type DigitalConstraint =
   | MinOffConstraint
   | MutexedConstraint;
 
-export interface ConstraintsObjDigital {
+export interface DigitalConstraintsObj {
   constraints: DigitalConstraint[];
 }

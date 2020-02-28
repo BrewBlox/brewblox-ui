@@ -64,8 +64,14 @@ export default class Unit extends PostFixed {
 
   public isEqual(other: Unit): boolean {
     return other
-      && this.unit === other.unit
+      && this.notation === other.notation
       && this.roundedValue === other.roundedValue;
+  }
+}
+
+export class Time extends Unit {
+  public constructor(value: number | null = 0, unit: 'ms' | 's' | 'm' | 'h' = 's') {
+    super(value, unit);
   }
 }
 

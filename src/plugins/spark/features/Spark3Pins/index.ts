@@ -7,10 +7,10 @@ import { typeName } from './getters';
 import widget from './Spark3PinsWidget.vue';
 import { Spark3PinsData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<Spark3PinsData> = {
   id: typeName,
   systemObject: true,
-  generate: (): Spark3PinsData => ({
+  generate: () => ({
     pins: [],
     enableIoSupply5V: false,
     enableIoSupply12V: false,

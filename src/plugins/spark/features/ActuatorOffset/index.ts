@@ -9,9 +9,9 @@ import widget from './ActuatorOffsetWidget.vue';
 import { typeName } from './getters';
 import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<ActuatorOffsetData> = {
   id: typeName,
-  generate: (): ActuatorOffsetData => ({
+  generate: () => ({
     targetId: new Link(null, interfaceTypes.SetpointSensorPair),
     drivenTargetId: new Link(null, interfaceTypes.SetpointSensorPair, true),
     referenceId: new Link(null, interfaceTypes.SetpointSensorPair),

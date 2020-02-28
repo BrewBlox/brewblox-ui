@@ -3,9 +3,17 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
-import { constraintLabels } from '@/plugins/spark/helpers';
-import { ConstraintsObj } from '@/plugins/spark/types';
+import { analogConstraintLabels, digitalConstraintLabels } from '@/plugins/spark/getters';
+import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
 
+const constraintLabels = {
+  ...digitalConstraintLabels,
+  ...analogConstraintLabels,
+};
+
+interface AnyConstraintsObj {
+  constraints: (AnalogConstraint | DigitalConstraint)[];
+}
 
 @Component
 export default class ConstraintsField extends FieldBase {
@@ -14,16 +22,16 @@ export default class ConstraintsField extends FieldBase {
   public readonly title!: string;
 
   @Prop({ type: Object, default: () => ({ constraints: [] }) })
-  protected readonly value!: ConstraintsObj;
+  protected readonly value!: AnyConstraintsObj;
 
   @Prop({ type: String, required: true })
   protected readonly serviceId!: string;
 
   @Prop({ type: String, required: true, validator: v => ['analog', 'digital'].includes(v) })
-  public readonly type!: string;
+  public readonly type!: 'analog' | 'digital';
 
   @Emit('input')
-  public change(v: ConstraintsObj): ConstraintsObj {
+  public change(v: AnyConstraintsObj): AnyConstraintsObj {
     return v;
   }
 
@@ -32,13 +40,21 @@ export default class ConstraintsField extends FieldBase {
   }
 
   get limiters(): string[] {
-    const names: string[] = [];
-    for (const constraint of this.value.constraints) {
-      if (constraint.limiting) {
-        names.push(Object.keys(constraint).find(k => k !== 'limiting') || 'Unknown');
-      }
+    if (this.type === 'analog') {
+      return (this.value.constraints as AnalogConstraint[])
+        .filter(c => c.limiting)
+        .map(c => Object.keys(c).find(k => k !== 'limiting') ?? 'Unknown')
+        .map(k => constraintLabels[k] ?? k);
     }
-    return names.map(k => constraintLabels.get(k) || k);
+    else {
+      return (this.value.constraints as DigitalConstraint[])
+        .filter(c => c.remaining.value)
+        .map(c => {
+          const key = Object.keys(c).find(k => k !== 'remaining') ?? 'Unknown';
+          const label = constraintLabels[key] ?? key;
+          return `${label} (${c.remaining})`;
+        });
+    }
   }
 
   get textColor(): string {

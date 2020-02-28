@@ -1,54 +1,85 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
-import { analogConstraintLabels } from '@/plugins/spark/helpers';
+import { blockTypes } from '@/plugins/spark/block-types';
+import { analogConstraintLabels } from '@/plugins/spark/getters';
+import { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj } from '@/plugins/spark/types';
 
-import ConstraintsBase, { EditableConstraint } from '../ConstraintsBase';
+interface Wrapped {
+  type: AnalogConstraintKey;
+  constraint: AnalogConstraint;
+}
 
 @Component
-export default class AnalogConstraints extends ConstraintsBase {
-  get constraintOptions(): SelectOption[] {
-    return [...analogConstraintLabels].map(([k, v]) => ({ label: v, value: k }));
+export default class AnalogConstraints extends Vue {
+
+  @Prop({ type: Object, default: () => ({ constraints: [] }) })
+  protected readonly value!: AnalogConstraintsObj;
+
+  @Prop({ type: String, required: true })
+  public readonly serviceId!: string;
+
+  get constraints(): Wrapped[] {
+    return this.value.constraints
+      .map(constraint => {
+        const type = Object.keys(constraint).find(k => k != 'limiting') as AnalogConstraintKey;
+        return { type, constraint };
+      });
   }
 
-  createConstraint(key: string, value: any = null): EditableConstraint {
-    switch (key) {
-      case 'balanced':
-        return {
-          key,
-          value: {
-            balancerId: new Link(value, interfaceTypes.Balancer),
-            granted: 0,
-            id: 0,
-          },
-          limiting: false,
-        };
-      default:
-        return {
-          key,
-          value: 0,
-          limiting: false,
-        };
-    }
+  save(constraints: Wrapped[] = this.constraints): void {
+    this.$emit('input', { constraints: constraints.map(c => c.constraint) });
   }
 
-  addConstraint(): void {
+  get constraintOpts(): SelectOption[] {
+    return Object.entries(analogConstraintLabels)
+      .map(([k, v]) => ({ value: k, label: v }));
+  }
+
+  createDefault(type: AnalogConstraintKey): Wrapped {
+    const opts: Record<AnalogConstraintKey, AnalogConstraint> = {
+      min: {
+        limiting: false,
+        min: 0,
+      },
+      max: {
+        limiting: false,
+        max: 100,
+      },
+      balanced: {
+        limiting: false,
+        balanced: {
+          balancerId: new Link(null, blockTypes.Balancer),
+          granted: 0,
+          id: 0,
+        },
+      },
+    };
+    return { type, constraint: opts[type] };
+  }
+
+  add(): void {
     createDialog({
       title: 'Add constraint',
       cancel: true,
       options: {
         type: 'checkbox',
         model: [],
-        items: this.constraintOptions,
+        items: this.constraintOpts,
       },
     })
       .onOk(keys => {
-        this.constraints.push(...keys.map(this.createConstraint));
-        this.saveConstraints();
+        this.constraints.push(...keys.map(this.createDefault));
+        this.save();
       });
+  }
+
+  remove(idx: number): void {
+    this.$delete(this.constraints, idx);
+    this.save();
   }
 }
 </script>
@@ -56,45 +87,46 @@ export default class AnalogConstraints extends ConstraintsBase {
 <template>
   <div class="column q-gutter-y-sm">
     <div
-      v-for="(editable, idx) in constraints"
+      v-for="({type, constraint}, idx) in constraints"
       :key="idx"
-      :class="['row q-gutter-x-sm constraint', {limiting: editable.limiting}]"
+      :class="['row q-gutter-x-sm constraint', {limiting: constraint.limiting}]"
     >
-      <SelectField
-        :value="editable.key"
-        :options="constraintOptions"
-        clearable
-        title="Constraint type"
-        label="Constraint"
-        class="col-grow"
-        @input="k => { constraints[idx] = createConstraint(k); saveConstraints() }"
-      />
       <BlockField
-        v-if="editable.key === 'balanced'"
+        v-if="type === 'balanced'"
         :service-id="serviceId"
-        :value="editable.value.balancerId"
+        :value="constraint.balanced.balancerId"
         title="Balancer"
         label="Balancer"
         class="col-grow"
-        @input="v => { editable.value.balancerId = v; saveConstraints() }"
+        @input="v => { constraint.balanced.balancerId = v; save() }"
       />
       <InputField
-        v-else
-        :value="editable.value"
-        title="Constraint value"
-        label="Value"
+        v-if="type === 'min'"
+        :value="constraint.min"
+        title="Minimum value"
+        label="Minimum value"
         type="number"
         class="col-grow"
-        @input="v => { editable.value = v; saveConstraints() }"
+        @input="v => { constraint.min = v; save() }"
       />
+      <InputField
+        v-if="type === 'max'"
+        :value="constraint.max"
+        title="Maximum value"
+        label="Maximum value"
+        type="number"
+        class="col-grow"
+        @input="v => { constraint.max = v; save() }"
+      />
+
       <div class="col-auto column justify-center darkish">
-        <q-btn icon="delete" flat round @click="removeConstraint(idx); saveConstraints();">
+        <q-btn icon="delete" flat round @click="remove(idx)">
           <q-tooltip>Remove constraint</q-tooltip>
         </q-btn>
       </div>
     </div>
     <div class="col row justify-end">
-      <q-btn icon="add" round outline @click="addConstraint">
+      <q-btn icon="add" round outline @click="add">
         <q-tooltip>Add constraint</q-tooltip>
       </q-btn>
     </div>

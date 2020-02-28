@@ -9,9 +9,9 @@ import { typeName } from './getters';
 import widget from './SetpointSensorPairWidget.vue';
 import { FilterChoice, SetpointSensorPairData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<SetpointSensorPairData> = {
   id: typeName,
-  generate: (): SetpointSensorPairData => ({
+  generate: () => ({
     sensorId: new Link(null, interfaceTypes.TempSensor),
     storedSetting: new Unit(null, 'degC'),
     setting: new Unit(null, 'degC'),
