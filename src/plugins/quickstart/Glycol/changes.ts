@@ -86,7 +86,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       serviceId,
       groups,
       data: {
-        differentActuatorWait: new Unit(15, 'm'),
+        differentActuatorWait: new Time(5, 'min'),
         waitRemaining: new Time(),
       },
     },
@@ -107,7 +107,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             {
               mutexed: {
                 mutexId: new Link(config.names.mutex, blockTypes.Mutex),
-                extraHoldTime: new Time(15, 'm'),
+                extraHoldTime: new Time(5, 'min'),
                 hasCustomHoldTime: true,
                 holdTimeRemaining: new Time(),
               },
@@ -137,7 +137,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             {
               mutexed: {
                 mutexId: new Link(config.names.mutex, blockTypes.Mutex),
-                extraHoldTime: new Time(15, 'm'),
+                extraHoldTime: new Time(5, 'min'),
                 hasCustomHoldTime: true,
                 holdTimeRemaining: new Time(),
               },
@@ -155,7 +155,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       groups,
       data: {
         enabled: true,
-        period: new Time(10, 'm'),
+        period: new Time(0, 'min'),
         actuatorId: new Link(config.names.coolAct),
         drivenActuatorId: new Link(null),
         setting: 0,
@@ -189,7 +189,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(-20, '1/degC'),
         ti: new Time(2, 'h'),
-        td: new Time(10, 'm'),
+        td: new Time(0, 'min'),
         enabled: true,
         inputId: new Link(config.names.beerSetpoint),
         outputId: new Link(config.names.coolPwm),
@@ -204,7 +204,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(20, '1/degC'),
         ti: new Time(2, 'h'),
-        td: new Time(10, 'm'),
+        td: new Time(0, 'min'),
         enabled: true,
         inputId: new Link(config.names.beerSetpoint),
         outputId: new Link(config.names.heatPwm),
@@ -261,8 +261,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             state: DigitalState.Inactive,
             constrainedBy: {
               constraints: [
-                { minOff: new Time(5, 'm'), remaining: new Time() },
-                { minOn: new Time(3, 'm'), remaining: new Time() },
+                { minOff: new Time(5, 'min'), remaining: new Time() },
+                { minOn: new Time(3, 'min'), remaining: new Time() },
               ],
             },
           },
@@ -275,7 +275,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           groups,
           data: {
             enabled: true,
-            period: new Time(30, 'm'),
+            period: new Time(0, 'min'),
             actuatorId: new Link(config.names.glycolAct),
             drivenActuatorId: new Link(null),
             setting: 0,
@@ -293,7 +293,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
             kp: new Unit(-20, '1/degC'),
             ti: new Time(2, 'h'),
-            td: new Time(5, 'm'),
+            td: new Time(5, 'min'),
             enabled: true,
             inputId: new Link(config.names.glycolSetpoint),
             outputId: new Link(config.names.glycolPwm),

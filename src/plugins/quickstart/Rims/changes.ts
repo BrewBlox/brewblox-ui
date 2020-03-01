@@ -151,7 +151,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       data: {
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(10, '1/degC'),
-        ti: new Time(5, 'm'),
+        ti: new Time(5, 'min'),
         td: new Time(30, 's'),
         enabled: true,
         inputId: new Link(config.names.kettleSetpoint),
@@ -166,7 +166,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       data: {
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(30, '1/degC'),
-        ti: new Time(2, 'm'),
+        ti: new Time(2, 'min'),
         td: new Time(10, 's'),
         enabled: true,
         inputId: new Link(config.names.tubeSetpoint),
