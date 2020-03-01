@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { createDialog } from '../../../helpers/dialog';
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';

@@ -1,6 +1,6 @@
 import { uid } from 'quasar';
 
-import { Link, Time, Unit } from '@/helpers/units';
+import { Link, Temp, Time, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
@@ -424,7 +424,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: config.names.hltSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: new Unit(70, 'degC'),
+                storedSetting: new Temp(70, 'degC').convert(userTemp),
               },
               confirmed: {
                 storedSetting: true,
@@ -444,7 +444,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: config.names.mtSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: new Unit(66.7, 'degC'),
+                storedSetting: new Temp(66.7, 'degC').convert(userTemp),
               },
               confirmed: {
                 storedSetting: true,
@@ -472,7 +472,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: config.names.bkSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: new Unit(100, 'degC'),
+                storedSetting: new Temp(100, 'degC').convert(userTemp),
               },
               confirmed: {
                 storedSetting: true,

@@ -1,7 +1,7 @@
 import { uid } from 'quasar';
 
 import { durationMs } from '@/helpers/functional';
-import { Link, Time, Unit } from '@/helpers/units';
+import { Link, Temp, Time, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
@@ -429,7 +429,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
               blockId: config.names.beerSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: new Unit(20.0, 'degC'),
+                storedSetting: new Temp(20.0, 'degC').convert(userTemp),
               },
               confirmed: {
                 storedSetting: true,
