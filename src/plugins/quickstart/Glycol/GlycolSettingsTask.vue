@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { convertedTemp, Unit } from '@/helpers/units';
+import { Temp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import WizardTaskBase from '../components/WizardTaskBase';
@@ -36,8 +36,8 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
 
   created(): void {
     const unit = sparkStore.units(this.config.serviceId).Temp;
-    this.beerSetting = convertedTemp(20, unit);
-    this.glycolSetting = convertedTemp(4, unit);
+    this.beerSetting = new Temp(20, 'degC').convert(unit);
+    this.glycolSetting = new Temp(4, 'degC').convert(unit);
   }
 }
 </script>

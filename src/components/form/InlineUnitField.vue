@@ -47,6 +47,7 @@ export default class InlineUnitField extends FieldBase {
 <template>
   <span
     class="clickable q-pa-sm q-ma-xs rounded-borders text-bold"
+    style="line-height: 200%"
     @click="openDialog"
   >
     {{ value | unit }}
