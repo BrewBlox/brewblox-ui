@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { convertedTemp, Unit } from '@/helpers/units';
+import { Temp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import WizardTaskBase from '../components/WizardTaskBase';
@@ -52,7 +52,8 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
   }
 
   created(): void {
-    const defaultTemp = convertedTemp(20, sparkStore.units(this.config.serviceId).Temp);
+    const defaultTemp = new Temp(20, 'degC')
+      .convert(sparkStore.units(this.config.serviceId).Temp);
     this.fridgeSetting = defaultTemp.copy();
     this.beerSetting = defaultTemp.copy();
   }

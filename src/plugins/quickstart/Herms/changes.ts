@@ -1,6 +1,6 @@
 import { uid } from 'quasar';
 
-import { Link, Time, Unit } from '@/helpers/units';
+import { Link, Temp, Time, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
@@ -242,7 +242,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         inputId: new Link(config.names.hltSetpoint),
         outputId: new Link(config.names.hltPwm),
         kp: opts.hltKp,
-        ti: new Time(10, 'm'),
+        ti: new Time(0, 'min'),
         td: new Time(30, 's'),
         boilMinOutput: 25,
       },
@@ -258,8 +258,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         inputId: new Link(config.names.mtSetpoint),
         outputId: new Link(config.names.hltDriver),
         kp: opts.mtKp,
-        ti: new Time(5, 'm'),
-        td: new Time(10, 'm'),
+        ti: new Time(5, 'min'),
+        td: new Time(0, 'min'),
       },
     },
     {
@@ -273,8 +273,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         inputId: new Link(config.names.bkSetpoint),
         outputId: new Link(config.names.bkPwm),
         kp: opts.bkKp,
-        ti: new Time(5, 'm'),
-        td: new Time(10, 'm'),
+        ti: new Time(5, 'min'),
+        td: new Time(0, 'min'),
         boilMinOutput: 25,
       },
     },
@@ -424,7 +424,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: config.names.hltSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: new Unit(70, 'degC'),
+                storedSetting: new Temp(70, 'degC').convert(userTemp),
               },
               confirmed: {
                 storedSetting: true,
@@ -444,7 +444,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: config.names.mtSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: new Unit(66.7, 'degC'),
+                storedSetting: new Temp(66.7, 'degC').convert(userTemp),
               },
               confirmed: {
                 storedSetting: true,
@@ -472,7 +472,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: config.names.bkSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: new Unit(100, 'degC'),
+                storedSetting: new Temp(100, 'degC').convert(userTemp),
               },
               confirmed: {
                 storedSetting: true,

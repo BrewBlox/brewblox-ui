@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { createDialog } from '../../../helpers/dialog';
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
@@ -204,9 +204,9 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           <p class="text-italic">
             Kp will be set to {{ mtKp }}.
             If your mash temperature is
-            <InlineUnitField v-model="mashActual" tag="span" style="font-style: normal" />
+            <InlineUnitField v-model="mashActual" style="font-style: normal" />
             and should be
-            <InlineUnitField v-model="mashTarget" tag="span" style="font-style: normal" />
+            <InlineUnitField v-model="mashTarget" style="font-style: normal" />
             the HLT will be set to
             {{ hltSetting }}.
           </p>
