@@ -36,6 +36,11 @@ export default class TimeUnitField extends FieldBase {
     })
       .onOk(this.change);
   }
+
+  // Can't be placed in parent class
+  get activeSlots(): string[] {
+    return this.fieldSlots.filter(s => !!this.$slots[s]);
+  }
 }
 </script>
 
@@ -44,5 +49,11 @@ export default class TimeUnitField extends FieldBase {
     <slot name="value">
       {{ value | unitDuration }}
     </slot>
+
+    <template v-for="slot in activeSlots">
+      <template :slot="slot">
+        <slot :name="slot" />
+      </template>
+    </template>
   </LabeledField>
 </template>

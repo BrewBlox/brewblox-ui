@@ -4,9 +4,15 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { Link, Time } from '@/helpers/units';
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes, MutexBlock } from '@/plugins/spark/block-types';
 import { digitalConstraintLabels } from '@/plugins/spark/getters';
-import { DigitalConstraint, DigitalConstraintKey, DigitalConstraintsObj } from '@/plugins/spark/types';
+import { sparkStore } from '@/plugins/spark/store';
+import {
+  DigitalConstraint,
+  DigitalConstraintKey,
+  DigitalConstraintsObj,
+  MutexedConstraint,
+} from '@/plugins/spark/types';
 
 interface Wrapped {
   type: DigitalConstraintKey;
@@ -61,6 +67,25 @@ export default class DigitalConstraints extends Vue {
     return { type, constraint: opts[type] };
   }
 
+  isCustom(constraint: MutexedConstraint): boolean {
+    return constraint.mutexed.hasCustomHoldTime;
+  }
+
+  holdTime(constraint: MutexedConstraint): Time {
+    if (this.isCustom(constraint)) {
+      return constraint.mutexed.extraHoldTime;
+    }
+    else if (constraint.mutexed.mutexId.id) {
+      const mutex: MutexBlock = sparkStore.blockById(
+        this.serviceId,
+        constraint.mutexed.mutexId.id);
+      return mutex?.data.differentActuatorWait ?? new Time();
+    }
+    else {
+      return new Time();
+    }
+  }
+
   add(): void {
     createDialog({
       title: 'Add constraint',
@@ -101,15 +126,35 @@ export default class DigitalConstraints extends Vue {
           @input="v => { constraint.mutexed.mutexId = v; save(); }"
         />
         <TimeUnitField
-          :value="constraint.mutexed.extraHoldTime"
+          :value="holdTime(constraint)"
           title="Lockout period"
           label="Lockout period"
           class="col-grow"
+          :tooltip="
+            isCustom(constraint)
+              ? null
+              : 'Using default value from Mutex block.'
+          "
           @input="v => {
             constraint.mutexed.extraHoldTime = v;
             constraint.mutexed.hasCustomHoldTime = true;
-            save(); }"
-        />
+            save();
+          }"
+        >
+          <template #append>
+            <template v-if="isCustom(constraint)">
+              <q-btn
+                flat
+                round
+                icon="mdi-backup-restore"
+                size="sm"
+                @click.stop="constraint.mutexed.hasCustomHoldTime = false; save()"
+              >
+                <q-tooltip>Use default value from Mutex block.</q-tooltip>
+              </q-btn>
+            </template>
+          </template>
+        </TimeUnitField>
       </template>
       <TimeUnitField
         v-if="type === 'minOff'"

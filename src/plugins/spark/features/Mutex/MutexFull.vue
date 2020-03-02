@@ -40,6 +40,12 @@ export default class MutexFull
             a heater can only go active after the cooler has been inactive for 45 minutes.<br>
             We recommend setting the idle time to 1.5x your longest PWM period.
           </p>
+          <p>
+            <b>
+              If you set the lockout period in a Mutex constraint,
+              it will override this setting.
+            </b>
+          </p>
         </q-item-section>
       </q-item>
       <q-item>
