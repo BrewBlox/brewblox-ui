@@ -7,9 +7,9 @@ import widget from './DS2413Widget.vue';
 import { typeName } from './getters';
 import { DS2413Data } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<DS2413Data> = {
   id: typeName,
-  generate: (): DS2413Data => ({
+  generate: () => ({
     address: '',
     connected: false,
     pins: [],

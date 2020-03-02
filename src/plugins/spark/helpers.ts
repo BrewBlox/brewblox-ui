@@ -30,23 +30,6 @@ export const blockIdRules = (serviceId: string): InputRule[] => [
   v => v.length < 200 || 'Name must be less than 200 characters',
 ];
 
-export const digitalConstraintLabels = new Map([
-  ['minOff', 'Minimum OFF time'],
-  ['minOn', 'Minimum ON time'],
-  ['mutex', 'Mutually exclusive'],
-]);
-
-export const analogConstraintLabels = new Map([
-  ['min', 'Minimum'],
-  ['max', 'Maximum'],
-  ['balanced', 'Balanced'],
-]);
-
-export const constraintLabels = new Map([
-  ...digitalConstraintLabels.entries(),
-  ...analogConstraintLabels.entries(),
-]);
-
 export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter(
     'unit',

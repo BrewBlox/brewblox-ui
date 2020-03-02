@@ -7,10 +7,10 @@ import { typeName } from './getters';
 import widget from './Spark2PinsWidget.vue';
 import { Spark2Hardware, Spark2PinsData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<Spark2PinsData> = {
   id: typeName,
   systemObject: true,
-  generate: (): Spark2PinsData => ({
+  generate: () => ({
     pins: [],
     soundAlarm: false,
     hardware: Spark2Hardware.Unknown,

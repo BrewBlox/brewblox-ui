@@ -8,10 +8,11 @@ import { typeName } from './getters';
 import widget from './MutexWidget.vue';
 import { MutexData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<MutexData> = {
   id: typeName,
-  generate: (): MutexData => ({
+  generate: () => ({
     differentActuatorWait: new Unit(0, 'second'),
+    waitRemaining: new Unit(0, 'second'),
   }),
   changes: [],
   presets: [],

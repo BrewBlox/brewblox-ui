@@ -1,7 +1,7 @@
 import { uid } from 'quasar';
 
 import { durationMs } from '@/helpers/functional';
-import { Link, Unit } from '@/helpers/units';
+import { Link, Time, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
@@ -114,7 +114,8 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       serviceId,
       groups,
       data: {
-        differentActuatorWait: new Unit(45, 'minute'),
+        differentActuatorWait: new Time(),
+        waitRemaining: new Time(),
       },
     },
     // Digital Actuator
@@ -131,9 +132,23 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
         state: DigitalState.Inactive,
         constrainedBy: {
           constraints: [
-            { minOff: new Unit(300, 'second'), limiting: false },
-            { minOn: new Unit(180, 'second'), limiting: false },
-            { mutex: new Link(config.names.mutex), limiting: false },
+            {
+              minOff: new Time(5, 'm'),
+              remaining: new Time(),
+            },
+            {
+              minOn: new Time(3, 'm'),
+              remaining: new Time(),
+            },
+            {
+              mutexed: {
+                mutexId: new Link(config.names.mutex, blockTypes.Mutex),
+                extraHoldTime: new Time(45, 'm'),
+                hasCustomHoldTime: true,
+                holdTimeRemaining: new Time(),
+              },
+              remaining: new Time(),
+            },
           ],
         },
       },
@@ -150,7 +165,17 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
         state: DigitalState.Inactive,
         invert: false,
         constrainedBy: {
-          constraints: [{ mutex: new Link(config.names.mutex), limiting: false }],
+          constraints: [
+            {
+              mutexed: {
+                mutexId: new Link(config.names.mutex, blockTypes.Mutex),
+                extraHoldTime: new Time(45, 'm'),
+                hasCustomHoldTime: true,
+                holdTimeRemaining: new Time(),
+              },
+              remaining: new Time(),
+            },
+          ],
         },
       },
     },
@@ -162,7 +187,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       groups,
       data: {
         enabled: true,
-        period: new Unit(30, 'minute'),
+        period: new Time(30, 'm'),
         actuatorId: new Link(config.names.coolAct),
         drivenActuatorId: new Link(null),
         setting: 0,
@@ -178,7 +203,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       groups,
       data: {
         enabled: true,
-        period: new Unit(10, 'second'),
+        period: new Time(10, 's'),
         actuatorId: new Link(config.names.heatAct),
         drivenActuatorId: new Link(null),
         setting: 0,

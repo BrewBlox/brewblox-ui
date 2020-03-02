@@ -13,11 +13,9 @@ export interface ChangeField {
   pretty?: (val: any) => string;
 }
 
-export type BlockDataGenerator = () => Mapped<any>;
-
-export interface BlockDataPreset {
+export interface BlockDataPreset<DataT = any> {
   name: string;
-  generate: BlockDataGenerator;
+  generate: () => Partial<DataT>;
 }
 
 export interface StoredDataPreset extends StoreObject {
@@ -27,11 +25,11 @@ export interface StoredDataPreset extends StoreObject {
   data: Mapped<any>;
 }
 
-export interface BlockSpec {
+export interface BlockSpec<DataT = any> {
   id: string;
   systemObject?: boolean;
-  generate: BlockDataGenerator;
-  presets: BlockDataPreset[];
+  generate: () => DataT;
+  presets: BlockDataPreset<DataT>[];
   changes: ChangeField[];
   graphTargets?: Mapped<string>;
 }
@@ -145,24 +143,63 @@ export interface IoPin {
   [key: string]: IoChannel;
 }
 
-export interface AnalogConstraint {
+export type AnalogConstraintKey = 'min' | 'max' | 'balanced';
+
+export interface MinConstraint {
   limiting: boolean;
-  min?: number;
-  max?: number;
-  balanced?: {
+  min: number;
+}
+
+export interface MaxConstraint {
+  limiting: boolean;
+  max: number;
+}
+
+export interface BalancedConstraint {
+  limiting: boolean;
+  balanced: {
     balancerId: Link;
     granted: number;
     id: number;
   };
 }
 
-export interface DigitalConstraint {
-  limiting: boolean;
-  minOn?: Unit;
-  minOff?: Unit;
-  mutex?: Link; // Mutex
+export type AnalogConstraint =
+  MinConstraint
+  | MaxConstraint
+  | BalancedConstraint;
+
+export interface AnalogConstraintsObj {
+  constraints: AnalogConstraint[];
 }
 
-export interface ConstraintsObj {
-  constraints: AnalogConstraint[] | DigitalConstraint[];
+export type DigitalConstraintKey = 'minOff' | 'minOn' | 'mutexed';
+
+export interface MinOnConstraint {
+  remaining: Unit;
+  minOn: Unit;
+}
+
+export interface MinOffConstraint {
+  remaining: Unit;
+  minOff: Unit;
+}
+
+export interface MutexedConstraint {
+  remaining: Unit;
+  mutexed: {
+    mutexId: Link;
+    extraHoldTime: Unit;
+    hasCustomHoldTime: boolean;
+    holdTimeRemaining: Unit;
+  };
+}
+
+export type DigitalConstraint =
+  MinOnConstraint
+  | MinOffConstraint
+  | MutexedConstraint;
+
+export interface DigitalConstraintsObj {
+  constraints: DigitalConstraint[];
 }

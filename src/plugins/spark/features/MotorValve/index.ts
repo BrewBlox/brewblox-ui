@@ -9,9 +9,9 @@ import { typeName } from './getters';
 import widget from './MotorValveWidget.vue';
 import { MotorValveData, ValveState } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<MotorValveData> = {
   id: typeName,
-  generate: (): MotorValveData => ({
+  generate: () => ({
     hwDevice: new Link(null, interfaceTypes.IoArray),
     startChannel: 0,
     desiredState: DigitalState.Inactive,

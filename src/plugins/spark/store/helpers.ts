@@ -3,8 +3,8 @@ import pick from 'lodash/pick';
 import { Link } from '@/helpers/units';
 import { ServiceStatus } from '@/store/services';
 
-import { constraintLabels } from '../helpers';
-import { Block, ConstraintsObj, DataBlock, Limiters, RelationEdge, SparkStatus } from '../types';
+import { constraintLabels } from '../getters';
+import { AnalogConstraint, Block, DataBlock, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];
@@ -84,14 +84,27 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
   const limited: Limiters = {};
 
   for (const block of blocks) {
-    const obj: ConstraintsObj = block.data.constrainedBy;
-    if (!obj || obj.constraints.length === 0) {
+    if (!block.data.constrainedBy?.constraints.length) {
       continue;
     }
-    limited[block.id] = [...obj.constraints]
-      .filter(c => c.limiting)
-      .map(c => Object.keys(c).find(key => key !== 'limiting') || '??')
-      .map(k => constraintLabels.get(k) as string);
+    const constraints = block.data.constrainedBy.constraints;
+    const isAnalog = constraints[0].limiting !== undefined;
+
+    if (isAnalog) {
+      limited[block.id] = (constraints as AnalogConstraint[])
+        .filter(c => c.limiting)
+        .map(c => Object.keys(c).find(key => key !== 'limiting') ?? '??')
+        .map(k => constraintLabels[k]);
+    }
+    else {
+      limited[block.id] = (constraints as DigitalConstraint[])
+        .filter(c => c.remaining?.value)
+        .map(c => {
+          const key = Object.keys(c).find(key => key !== 'remaining') ?? '??';
+          const label = constraintLabels[key] ?? key;
+          return `${label} (${c.remaining})`;
+        });
+    }
   }
 
   return limited;

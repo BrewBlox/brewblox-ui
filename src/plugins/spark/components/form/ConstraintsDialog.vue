@@ -3,10 +3,12 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { ConstraintsObj } from '@/plugins/spark/types';
+import { AnalogConstraintsObj, DigitalConstraintsObj } from '@/plugins/spark/types';
 
 import AnalogConstraints from './AnalogConstraints.vue';
 import DigitalConstraints from './DigitalConstraints.vue';
+
+type ConstraintsObj = AnalogConstraintsObj | DigitalConstraintsObj;
 
 @Component({
   components: {
