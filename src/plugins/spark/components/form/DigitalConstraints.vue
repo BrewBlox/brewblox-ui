@@ -60,7 +60,7 @@ export default class DigitalConstraints extends Vue {
           mutexId: new Link(null, blockTypes.Mutex),
           hasCustomHoldTime: false,
           extraHoldTime: new Time(),
-          holdTimeRemaining: new Time(),
+          hasLock: false,
         },
       },
     };
@@ -127,8 +127,9 @@ export default class DigitalConstraints extends Vue {
         />
         <TimeUnitField
           :value="holdTime(constraint)"
-          title="Lockout period"
-          label="Lockout period"
+          title="Extra lock time"
+          label="Extra lock time"
+          message="The Mutex will be kept locked for this duration after the actuator turns off."
           class="col-grow"
           :tooltip="
             isCustom(constraint)

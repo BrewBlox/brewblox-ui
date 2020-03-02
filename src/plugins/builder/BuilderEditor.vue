@@ -729,14 +729,6 @@ export default class BuilderEditor extends Vue {
         Brewery Builder
       </template>
       <template #buttons>
-        <LayoutActions
-          :layout="layout"
-          :select-layout="selectLayout"
-          :save-parts="saveParts"
-          round
-          size="md"
-        />
-
         <q-btn
           flat
           round
@@ -791,7 +783,7 @@ export default class BuilderEditor extends Vue {
       >
         <q-item class="q-pb-none">
           <q-item-section class="text-bold">
-            Modes
+            Mouse actions
           </q-item-section>
         </q-item>
 

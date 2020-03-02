@@ -1,17 +1,43 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { Unit } from '@/helpers/units';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { sparkStore } from '@/plugins/spark/store';
+import { MutexedConstraint } from '@/plugins/spark/types';
 
-import { getMutexClients, MutexBlocks } from './getters';
 import { MutexBlock } from './types';
+
+interface MutexClient {
+  id: string;
+  remaining: Unit;
+  limited: boolean;
+  hasLock: boolean;
+}
 
 @Component
 export default class MutexBasic
   extends BlockCrudComponent<MutexBlock> {
 
-  get mutexClients(): MutexBlocks {
-    return getMutexClients(this.serviceId, this.blockId);
+  get mutexClients(): MutexClient[] {
+    return sparkStore.blockValues(this.serviceId)
+      // Does the block have -any- digital constraint?
+      .filter(block => block.data.constrainedBy?.constraints[0]?.remaining)
+      .flatMap(block => {
+        // Cast to MutexedConstraint for typing reasons
+        // We haven't yet checked whether this is actually true
+        const constraints: MutexedConstraint[] = block.data.constrainedBy.constraints;
+        return constraints
+          // Is this a mutexed constraint?
+          // Is this mutexed constraint using this Mutex block?
+          .filter(c => c.mutexed?.mutexId.id === this.blockId)
+          .map(c => ({
+            id: block.id,
+            remaining: c.remaining,
+            limited: !!c.remaining.value,
+            hasLock: c.mutexed.hasLock,
+          }));
+      });
   }
 }
 </script>
@@ -22,46 +48,28 @@ export default class MutexBasic
 
     <div class="widget-body row items-start">
       <LabeledField
-        label="Held by"
-        class="col-grow min-width-sm"
+        label="Clients"
+        class="col-grow"
       >
-        <div v-for="client in mutexClients.active" :key="client">
-          {{ client }}
-        </div>
-        <div v-if="mutexClients.active.length === 0">
-          --
+        <div
+          v-for="{id, remaining, limited, hasLock} in mutexClients"
+          :key="id"
+          :class="[
+            'q-px-sm q-py-xs',
+            limited && 'text-orange',
+            hasLock && 'text-green',
+          ]"
+        >
+          <q-icon v-if="hasLock" name="mdi-lock" />
+          <q-icon v-else name="" />
+          {{ id }}
         </div>
       </LabeledField>
-      <div
-        class="col-grow column min-width-sm"
-      >
-        <LabeledField label="Waiting">
-          <div v-for="client in mutexClients.waiting" :key="client">
-            {{ client }}
-          </div>
-          <div v-if="mutexClients.waiting.length === 0">
-            --
-          </div>
-        </LabeledField>
-        <LabeledField label="Wait time remaining">
-          <div v-if="mutexClients.waiting.length > 0 && block.data.waitRemaining.value">
-            {{ block.data.waitRemaining | unitDuration }}
-          </div>
-          <div v-else>
-            --
-          </div>
-        </LabeledField>
-      </div>
       <LabeledField
-        label="Idle"
-        class="col-grow min-width-sm"
+        label="Lock time remaining"
+        class="col-grow"
       >
-        <div v-for="client in mutexClients.idle" :key="client">
-          {{ client }}
-        </div>
-        <div v-if="mutexClients.idle.length === 0">
-          --
-        </div>
+        {{ block.data.waitRemaining }}
       </LabeledField>
     </div>
   </div>

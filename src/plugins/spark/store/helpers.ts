@@ -88,15 +88,9 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
       continue;
     }
     const constraints = block.data.constrainedBy.constraints;
-    const isAnalog = constraints[0].limiting !== undefined;
+    const isDigital = constraints[0].remaining !== undefined;
 
-    if (isAnalog) {
-      limited[block.id] = (constraints as AnalogConstraint[])
-        .filter(c => c.limiting)
-        .map(c => Object.keys(c).find(key => key !== 'limiting') ?? '??')
-        .map(k => constraintLabels[k]);
-    }
-    else {
+    if (isDigital) {
       limited[block.id] = (constraints as DigitalConstraint[])
         .filter(c => c.remaining?.value)
         .map(c => {
@@ -104,6 +98,12 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
           const label = constraintLabels[key] ?? key;
           return `${label} (${c.remaining})`;
         });
+    }
+    else {
+      limited[block.id] = (constraints as AnalogConstraint[])
+        .filter(c => c.limiting)
+        .map(c => Object.keys(c).find(key => key !== 'limiting') ?? '??')
+        .map(k => constraintLabels[k]);
     }
   }
 
