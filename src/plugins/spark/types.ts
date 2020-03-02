@@ -191,7 +191,7 @@ export interface MutexedConstraint {
     mutexId: Link;
     extraHoldTime: Unit;
     hasCustomHoldTime: boolean;
-    holdTimeRemaining: Unit;
+    hasLock: boolean;
   };
 }
 

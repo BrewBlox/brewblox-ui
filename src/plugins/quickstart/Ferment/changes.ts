@@ -143,9 +143,9 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
             {
               mutexed: {
                 mutexId: new Link(config.names.mutex, blockTypes.Mutex),
-                extraHoldTime: new Time(5, 'min'),
+                extraHoldTime: new Time(45, 'min'),
                 hasCustomHoldTime: true,
-                holdTimeRemaining: new Time(),
+                hasLock: false,
               },
               remaining: new Time(),
             },
@@ -169,9 +169,9 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
             {
               mutexed: {
                 mutexId: new Link(config.names.mutex, blockTypes.Mutex),
-                extraHoldTime: new Time(5, 'min'),
+                extraHoldTime: new Time(20, 'min'),
                 hasCustomHoldTime: true,
-                holdTimeRemaining: new Time(),
+                hasLock: false,
               },
               remaining: new Time(),
             },
@@ -187,7 +187,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       groups,
       data: {
         enabled: true,
-        period: new Time(0, 'min'),
+        period: new Time(30, 'min'),
         actuatorId: new Link(config.names.coolAct),
         drivenActuatorId: new Link(null),
         setting: 0,
