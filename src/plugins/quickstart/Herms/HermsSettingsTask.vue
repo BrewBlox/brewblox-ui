@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
@@ -24,6 +25,16 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
   volumeRules: InputRule[] = [
     v => v !== 0 || 'Volume can\'t be 0',
   ]
+
+  created(): void {
+    if (this.userTemp === 'degF') {
+      this.hltFullPowerDelta = new Unit(3, 'delta_degF');
+      this.bkFullPowerDelta = new Unit(3, 'delta_degF');
+      this.mashTarget = new Unit(155, 'degF');
+      this.mashActual = new Unit(152, 'degF');
+      this.driverMax = new Unit(18, 'delta_degF');
+    }
+  }
 
   get userTemp(): string {
     return sparkStore.units(this.config.serviceId).Temp;
@@ -51,14 +62,13 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
     return new Unit(null, this.userTemp);
   }
 
-  created(): void {
-    if (this.userTemp === 'degF') {
-      this.hltFullPowerDelta = new Unit(3, 'delta_degF');
-      this.bkFullPowerDelta = new Unit(3, 'delta_degF');
-      this.mashTarget = new Unit(155, 'degF');
-      this.mashActual = new Unit(152, 'degF');
-      this.driverMax = new Unit(18, 'delta_degF');
-    }
+  editHLTDelta(): void {
+    createDialog({
+      component: 'UnitDialog',
+      title: 'Full power delta',
+      value: this.hltFullPowerDelta,
+    })
+      .onOk(v => this.hltFullPowerDelta = v);
   }
 
   done(): void {
@@ -108,7 +118,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           </q-item-label>
           <p>
             If the temperature is more than
-            <UnitField v-model="hltFullPowerDelta" title="Full power delta" tag="span" /> too low,
+            <InlineUnitField v-model="hltFullPowerDelta" title="Full power delta" /> too low,
             run at full power (100%).
           </p>
           <p class="text-italic">
@@ -123,7 +133,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           </q-item-label>
           <p>
             If the temperature is more than
-            <UnitField v-model="bkFullPowerDelta" title="Full power delta" tag="span" /> too low,
+            <InlineUnitField v-model="bkFullPowerDelta" title="Full power delta" /> too low,
             run at full power (100%).
           </p>
           <p class="text-italic">
@@ -154,15 +164,32 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           </p>
         </q-item-section>
       </q-item>
-      <q-item class="align-children">
+      <q-item class="items-baseline">
         <q-item-section>
-          <q-input v-model="hltVolume" :rules="volumeRules" type="number" step="any" label="HLT volume" />
+          <q-input
+            v-model="hltVolume"
+            :rules="volumeRules"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            label="HLT volume"
+          />
         </q-item-section>
         <q-item-section>
-          <q-input v-model="mashVolume" :rules="volumeRules" type="number" step="any" label="Mash volume" />
+          <q-input
+            v-model="mashVolume"
+            :rules="volumeRules"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            label="Mash volume"
+          />
         </q-item-section>
         <q-item-section>
-          <q-input v-model.number="driverMax.value" type="number" step="any" label="Limit difference to">
+          <q-input
+            v-model.number="driverMax.value"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            label="Limit difference to"
+          >
             <template #append>
               <small class="self-end q-pb-sm">
                 {{ driverMax.notation }}
@@ -177,9 +204,9 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           <p class="text-italic">
             Kp will be set to {{ mtKp }}.
             If your mash temperature is
-            <UnitField v-model="mashActual" tag="span" />
+            <InlineUnitField v-model="mashActual" style="font-style: normal" />
             and should be
-            <UnitField v-model="mashTarget" tag="span" />
+            <InlineUnitField v-model="mashTarget" style="font-style: normal" />
             the HLT will be set to
             {{ hltSetting }}.
           </p>

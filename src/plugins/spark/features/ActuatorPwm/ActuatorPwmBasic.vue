@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
 import { ActuatorPwmBlock } from './types';
@@ -9,9 +10,30 @@ import { ActuatorPwmBlock } from './types';
 export default class ActuatorPwmBasic
   extends BlockCrudComponent<ActuatorPwmBlock> {
 
+  quickValues = [
+    { label: '0%', value: 0 },
+    { label: '50%', value: 50 },
+    { label: '100%', value: 100 },
+  ]
+
   get isConstrained(): boolean {
     return this.block.data.enabled
       && this.block.data.setting !== this.block.data.desiredSetting;
+  }
+
+
+  editSetting(): void {
+    if (this.isDriven) { return; }
+    createDialog({
+      component: 'SliderDialog',
+      title: 'Desired setting',
+      value: this.block.data.desiredSetting,
+      quickActions: this.quickValues,
+    })
+      .onOk(v => {
+        this.block.data.desiredSetting = v;
+        this.saveBlock();
+      });
   }
 }
 </script>
@@ -21,61 +43,19 @@ export default class ActuatorPwmBasic
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
-      <div
-        :class="[
-          'col-auto q-py-md grid-container rounded-borders',
-          {clickable: !isDriven},
-        ]"
-      >
-        <PwmIcon
-          class="grid-icon q-mx-auto"
-          size="sm"
-        />
-        <div class="grid-value text-h5">
+      <SettingValueField :editable="!isDriven" class="col-auto" @click="editSetting">
+        <template #valueIcon>
+          <PwmIcon />
+        </template>
+        <template #value>
           {{ block.data.value | round }} %
-        </div>
-
-        <q-icon
-          class="grid-icon q-mx-auto"
-          name="mdi-unfold-more-horizontal"
-          size="sm"
-          color="amber-4"
-        />
-        <div :class="['grid-value text-h6 text-amber-4', {'text-orange': isConstrained}]">
-          {{ block.data.setting | round }} %
-        </div>
-      </div>
-
-      <!--
-      <SliderField
-        :value="block.data.setting"
-        :readonly="isDriven"
-        :tag-class="{['text-orange']: isConstrained}"
-        title="Duty Setting"
-        label="Setting"
-        suffix="%"
-        tag="big"
-        class="col-grow"
-        @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-      />
-      <LabeledField
-        :value="block.data.value"
-        label="Duty achieved"
-        number
-        suffix="%"
-        tag="big"
-        class="col-grow"
-      />
-      <LabeledField
-        v-if="isConstrained"
-        label="Unconstrained setting"
-        :value="block.data.desiredSetting"
-        number
-        suffix="%"
-        tag="big"
-        class="col-grow"
-      />
-      -->
+        </template>
+        <template #setting>
+          <div :class="{'text-orange': isConstrained}">
+            {{ block.data.setting | round }} %
+          </div>
+        </template>
+      </SettingValueField>
 
       <div class="col-break" />
 

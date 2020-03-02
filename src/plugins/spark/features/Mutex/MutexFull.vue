@@ -36,9 +36,14 @@ export default class MutexFull
           </p>
           <p>
             The Mutex can also prevent switching between two actuators too quickly.<br>
-            If you set the minimum idle time to 45 minutes,
-            a heater can only go active after the cooler has been inactive for 45 minutes.<br>
-            We recommend setting the idle time to 1.5x your longest PWM period.
+            If you set the extra lock time to 45 minutes,
+            a heater can only turn on after the cooler has been inactive for 45 minutes.
+          </p>
+          <p>
+            <b>
+              If you set the extra lock time in a Mutex constraint,
+              it will override this setting.
+            </b>
           </p>
         </q-item-section>
       </q-item>
@@ -46,8 +51,8 @@ export default class MutexFull
         <q-item-section>
           <TimeUnitField
             :value="block.data.differentActuatorWait"
-            title="Minimum idle time"
-            label="Minimum idle time before switching to a different actuator"
+            title="Extra lock time"
+            label="Extra lock time after an actuator turns off"
             @input="v => { block.data.differentActuatorWait = v; saveBlock(); }"
           />
         </q-item-section>

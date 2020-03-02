@@ -4,7 +4,7 @@ import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { objectStringSorter, ruleValidator } from '@/helpers/functional';
+import { objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -15,9 +15,11 @@ import { featureStore } from '@/store/features';
 
 @Component
 export default class BlockWizard extends Vue {
-  filteredOptions: any[] = [];
-  wizardModel: SelectOption | null = null;
+  selected: SelectOption | null = null;
+  lastGeneratedId = '';
   blockId = '';
+  searchFilter = '';
+
   block: Block | null = null;
   widget: Widget | null = null;
   activeDialog: any = null;
@@ -31,6 +33,11 @@ export default class BlockWizard extends Vue {
   @Prop({ type: Function, default: () => () => true })
   public readonly filter!: (feature: string) => boolean;
 
+  created(): void {
+    this.selected =
+      this.wizardOptions.find(opt => opt.value === this.initialFeature) ?? null;
+  }
+
   @Emit('created')
   public onCreate(block: Block): Block {
     return block;
@@ -43,8 +50,12 @@ export default class BlockWizard extends Vue {
     return blockIdRules(this.serviceId);
   }
 
+  get validator(): ((val: any) => boolean) {
+    return ruleValidator(this.blockIdRules);
+  }
+
   get createReady(): boolean {
-    return !!this.wizardModel && ruleValidator(this.blockIdRules)(this.blockId);
+    return !!this.selected && this.validator(this.blockId);
   }
 
   get wizardOptions(): SelectOption[] {
@@ -55,21 +66,36 @@ export default class BlockWizard extends Vue {
       .sort(objectStringSorter('label'));
   }
 
-  filterFn(val, update): void {
-    if (val === '') {
-      update(() => this.filteredOptions = this.wizardOptions);
-      return;
+  get filteredOptions(): SelectOption[] {
+    if (!this.searchFilter) {
+      return this.wizardOptions;
     }
+    const needle = this.searchFilter.toLowerCase();
+    return this.wizardOptions
+      .filter(opt => opt.label.toLowerCase().match(needle));
+  }
 
-    update(() => {
-      const needle = val.toLowerCase();
-      this.filteredOptions = this.wizardOptions
-        .filter(opt => opt.label.toLowerCase().match(needle));
-    });
+  selectOpt(opt: SelectOption, createNow = false): void {
+    this.block = null;
+    this.widget = null;
+
+    if (this.selected !== opt || createNow) {
+      this.selected = opt;
+      if (!this.blockId || this.blockId === this.lastGeneratedId) {
+        this.blockId = suggestId(opt.label, this.validator);
+        this.lastGeneratedId = this.blockId;
+      }
+      if (createNow) {
+        this.createBlock();
+      }
+    }
+    else {
+      this.selected = null;
+    }
   }
 
   ensureLocalBlock(): void {
-    const featureId = this.wizardModel!.value;
+    const featureId = this.selected!.value;
     this.widget = this.widget || {
       id: uid(),
       title: this.blockId,
@@ -126,70 +152,71 @@ export default class BlockWizard extends Vue {
       await sparkStore.createBlock(this.block!);
       notify.done(`Created ${featureStore.widgetTitle(this.block!.type)} block '${this.blockId}'`);
       this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
-    } catch (e) {
+    }
+    catch (e) {
       notify.error(`Failed to create block: ${e.toString()}`);
     }
     this.close();
-  }
-
-  created(): void {
-    this.wizardModel =
-      this.wizardOptions.find(opt => opt.value === this.initialFeature) ?? null;
   }
 }
 </script>
 
 <template>
   <ActionCardBody @keyup.ctrl.enter="createBlock">
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <q-select
-            v-model="wizardModel"
-            :options="filteredOptions"
-            :rules="[v => !!v || 'You must select a block type']"
-            :disable="!!initialFeature"
-            label="Block Type"
-            use-input
-            autofocus
-            @filter="filterFn"
-            @change="block = null; widget = null;"
-          >
-            <template #no-option>
-              <q-item>
-                <q-item-section class="text-grey">
-                  No results
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <q-input v-model="blockId" :rules="blockIdRules" label="Block name">
-            <template #append>
-              <q-icon name="mdi-information">
-                <q-tooltip>
-                  The name of the Spark Controller block.
-                  <br>Multiple widgets can display the same block.
-                  <br>Rules:
-                  <ul>
-                    <li>The name must not be empty.</li>
-                    <li>The name must be unique.</li>
-                    <li>The name must begin with a letter.</li>
-                    <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
-                    <li>The name must be less than 200 characters.</li>
-                  </ul>
-                </q-tooltip>
-              </q-icon>
-            </template>
-          </q-input>
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+    <div class="widget-body column">
+      <q-input
+        v-model="searchFilter"
+        placeholder="Search"
+        clearable
+        autofocus
+        class="q-mb-md"
+      >
+        <template #append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+
+      <template v-if="!initialFeature">
+        <div
+          v-for="opt in filteredOptions"
+          :key="opt.value"
+          :class="[
+            'col clickable q-pa-sm rounded-borders text-h6',
+            selected === opt && 'depth-24',
+          ]"
+          @click="selectOpt(opt)"
+          @dblclick="selectOpt(opt, true)"
+        >
+          {{ opt.label }}
+        </div>
+      </template>
+    </div>
 
     <template #actions>
+      <q-input
+        v-model="blockId"
+        :rules="blockIdRules"
+        label="Block name"
+        clearable
+        class="col-12"
+      >
+        <template #append>
+          <q-icon name="mdi-information">
+            <q-tooltip>
+              The name of the Spark Controller block.
+              <br>Multiple widgets can display the same block.
+              <br>Rules:
+              <ul>
+                <li>The name must not be empty.</li>
+                <li>The name must be unique.</li>
+                <li>The name must begin with a letter.</li>
+                <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
+                <li>The name must be less than 200 characters.</li>
+              </ul>
+            </q-tooltip>
+          </q-icon>
+        </template>
+      </q-input>
       <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock" />
       <q-btn
         :disable="!createReady"

@@ -1,18 +1,20 @@
 <script lang="ts">
 import { uid } from 'quasar';
 import { CreateElement, VNode } from 'vue';
-import { Component, Ref } from 'vue-property-decorator';
+import { Component, Ref, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, unitDurationString } from '@/helpers/functional';
+import { durationMs, isJsonEqual, unitDurationString } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
+import { deepCopy } from '@/helpers/units/parseObject';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {
+  usedCfg: GraphConfig | null = null;
   downsampling: any = {};
 
   // Separate IDs for graphs in widget and dialog wrapper
@@ -26,7 +28,15 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   @Ref()
   readonly widgetGraph!: HistoryGraph;
 
+  @Watch('config')
+  watchConfig(newV: GraphConfig): void {
+    if (!isJsonEqual(newV, this.usedCfg)) {
+      this.regraph();
+    }
+  }
+
   created(): void {
+    this.usedCfg = deepCopy(this.config);
     this.widgetGraphId = uid();
     this.wrapperGraphId = uid();
   }
@@ -41,7 +51,6 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   saveConfig(config: GraphConfig = this.config): void {
     this.widget.config = config;
     this.saveWidget(this.widget);
-    this.regraph();
   }
 
   get presets(): QueryParams[] {
@@ -49,7 +58,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   }
 
   isActivePreset(preset: QueryParams): boolean {
-    return JSON.stringify(preset) === JSON.stringify(this.config.params);
+    return isJsonEqual(preset, this.config.params);
   }
 
   applyPreset(preset: QueryParams): void {
@@ -74,6 +83,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
 
   async regraph(): Promise<void> {
     await this.$nextTick();
+    this.usedCfg = deepCopy(this.config);
     if (this.widgetGraph !== undefined) {
       this.widgetGraph.resetSources();
     }

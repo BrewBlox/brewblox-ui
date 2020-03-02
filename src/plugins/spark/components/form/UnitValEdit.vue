@@ -30,13 +30,14 @@ export default class UnitValEdit extends ValEditBase {
 </script>
 
 <template>
-  <q-item v-if="editable">
+  <div v-if="editable" class="row no-wrap q-gutter-x-xs">
     <q-input
       :value="field.value"
-      step="any"
       :dense="dense"
-      type="number"
-      class="q-mr-xs"
+      inputmode="numeric"
+      pattern="[0-9]*"
+      class="col-grow"
+      label="Value"
       v-on="inputListeners"
     />
     <q-select
@@ -45,9 +46,10 @@ export default class UnitValEdit extends ValEditBase {
       :display-value="field.notation"
       :dense="dense"
       emit-value
+      class="col-auto"
       @input="v => { field.unit = v; saveField(field); }"
     />
-  </q-item>
+  </div>
   <div v-else>
     {{ field }}
   </div>

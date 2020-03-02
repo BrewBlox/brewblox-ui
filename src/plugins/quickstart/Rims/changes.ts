@@ -1,6 +1,6 @@
 import { uid } from 'quasar';
 
-import { Link, Unit } from '@/helpers/units';
+import { Link, Time, Unit } from '@/helpers/units';
 import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
@@ -133,7 +133,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       groups,
       data: {
         enabled: true,
-        period: new Unit(10, 'second'),
+        period: new Time(10, 's'),
         actuatorId: new Link(config.names.tubeAct),
         drivenActuatorId: new Link(null),
         setting: 0,
@@ -151,8 +151,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       data: {
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(10, '1/degC'),
-        ti: new Unit(5, 'min'),
-        td: new Unit(30, 'second'),
+        ti: new Time(5, 'min'),
+        td: new Time(30, 's'),
         enabled: true,
         inputId: new Link(config.names.kettleSetpoint),
         outputId: new Link(config.names.tubeDriver),
@@ -166,8 +166,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       data: {
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(30, '1/degC'),
-        ti: new Unit(2, 'min'),
-        td: new Unit(10, 'second'),
+        ti: new Time(2, 'min'),
+        td: new Time(10, 's'),
         enabled: true,
         inputId: new Link(config.names.tubeSetpoint),
         outputId: new Link(config.names.tubePwm),

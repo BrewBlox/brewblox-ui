@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Block } from '@/plugins/spark/types';
+import { TempSensorMockBlock, TempSensorOneWireBlock } from '@/plugins/spark/block-types';
 
 import PartBase from '../components/PartBase';
 import { settingsBlock, settingsLink } from '../helpers';
@@ -9,7 +9,7 @@ import { settingsBlock, settingsLink } from '../helpers';
 
 @Component
 export default class SensorDisplay extends PartBase {
-  get block(): Block | null {
+  get block(): TempSensorMockBlock | TempSensorOneWireBlock | null {
     return settingsBlock(this.part, 'sensor');
   }
 
@@ -22,11 +22,11 @@ export default class SensorDisplay extends PartBase {
   }
 
   get temperature(): number | null {
-    return this.block?.data.value?.val ?? null;
+    return this.block?.data.value?.value ?? null;
   }
 
   get tempUnit(): string {
-    return this.block?.data.value?.val ?? '';
+    return this.block?.data.value?.notation ?? '';
   }
 }
 </script>

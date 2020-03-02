@@ -373,6 +373,12 @@ export default class SparkPage extends Vue {
       this.updateExpandedBlock(val.id, true);
     }
   }
+
+  onPageDblClick(evt: Event): void {
+    if (evt.target === evt.currentTarget) {
+      this.startDialog('BlockWizardDialog');
+    }
+  }
 }
 </script>
 
@@ -446,11 +452,6 @@ export default class SparkPage extends Vue {
             @click="startDialog('SparkImportMenu')"
           />
           <ActionItem
-            icon="mdi-test-tube"
-            label="Create mock blocks"
-            @click="startDialog('CreateMockMenu')"
-          />
-          <ActionItem
             icon="delete"
             label="Remove all blocks"
             @click="startResetBlocks(service.id)"
@@ -480,7 +481,7 @@ export default class SparkPage extends Vue {
 
     <template v-else>
       <!-- Normal display -->
-      <div class="row no-wrap justify-start page-height">
+      <div class="row no-wrap justify-start page-height" @dblclick="onPageDblClick">
         <q-scroll-area visible class="content-column rounded-borders bg-dark">
           <q-list class="q-pr-md">
             <!-- Selection controls -->
@@ -594,7 +595,7 @@ export default class SparkPage extends Vue {
               </q-item-section>
             </q-item>
             <!-- Blank space to always be able to show a widget at the top -->
-            <q-item class="page-height" />
+            <q-item class="page-height" @dblclick.native="onPageDblClick" />
           </q-list>
         </q-scroll-area>
       </div>

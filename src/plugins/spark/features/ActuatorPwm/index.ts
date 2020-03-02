@@ -10,9 +10,9 @@ import widget from './ActuatorPwmWidget.vue';
 import { typeName } from './getters';
 import { ActuatorPwmData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<ActuatorPwmData> = {
   id: typeName,
-  generate: (): ActuatorPwmData => ({
+  generate: () => ({
     actuatorId: new Link(null, interfaceTypes.ActuatorDigital),
     drivenActuatorId: new Link(null, interfaceTypes.ActuatorDigital, true),
     period: new Unit(4, 'second'),

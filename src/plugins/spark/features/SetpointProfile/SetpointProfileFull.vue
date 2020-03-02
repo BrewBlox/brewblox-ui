@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, objectSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { Unit } from '@/helpers/units';
+import { Temp, Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
@@ -23,7 +23,6 @@ export default class SetpointProfileFull
   extends BlockCrudComponent<SetpointProfileBlock> {
   durationString = durationString;
   durationMs = durationMs;
-  defaultTempValues = { degC: 20, degF: 68, degK: 293 };
 
   get tempUnit(): string {
     return sparkStore.units(this.block.serviceId).Temp;
@@ -61,7 +60,7 @@ export default class SetpointProfileFull
     return {
       offsetMs: 0,
       absTimeMs: new Date(this.start).getTime(),
-      temperature: new Unit(this.defaultTempValues[this.tempUnit] || 20, this.tempUnit),
+      temperature: new Temp(20, 'degC').convert(this.tempUnit),
     };
   }
 

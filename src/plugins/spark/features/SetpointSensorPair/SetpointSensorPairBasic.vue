@@ -31,59 +31,17 @@ export default class SetpointSensorPairBasic
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
-      <div
-        :class="[
-          'col-auto q-py-md grid-container rounded-borders',
-          {clickable: !isDriven, darkened: !block.data.settingEnabled},
-        ]"
-        @click="editSetting"
-      >
-        <q-icon
-          class="grid-icon q-mx-auto"
-          name="mdi-thermometer"
-          size="sm"
-          color="green-3"
-        />
-        <div class="grid-value text-h5">
+      <SettingValueField :editable="!isDriven" class="col-auto" @click="editSetting">
+        <template #valueIcon>
+          <q-icon name="mdi-thermometer" color="green-3" />
+        </template>
+        <template #value>
           {{ block.data.value | unit }}
-        </div>
-
-        <q-icon
-          class="grid-icon q-mx-auto"
-          name="mdi-unfold-more-horizontal"
-          size="sm"
-          color="amber-4"
-        />
-        <div class="grid-value text-h6 text-amber-4">
+        </template>
+        <template #setting>
           {{ block.data.storedSetting | unit }}
-        </div>
-      </div>
-      <!--
-      <UnitField
-        :class="{darkened: !block.data.settingEnabled}"
-        :value="block.data.storedSetting"
-        :readonly="isDriven"
-        title="Setting"
-        label="Setting"
-        tag="big"
-        class="col-grow"
-        @input="v => {block.data.storedSetting = v; saveBlock()}"
-      />
-      <UnitField
-        :value="block.data.value"
-        label="Sensor"
-        tag="big"
-        readonly
-        class="col-grow"
-      />
-      <UnitField
-        :value="block.data.valueUnfiltered"
-        label="Unfiltered sensor"
-        tag="big"
-        class="col-grow"
-        readonly
-      />
-      -->
+        </template>
+      </SettingValueField>
 
       <div class="col-break" />
 
@@ -95,20 +53,3 @@ export default class SetpointSensorPairBasic
     </div>
   </div>
 </template>
-
-<style lang="sass" scoped>
-.grid-container
-  display: grid
-  grid-template-columns: repeat(3, 50px)
-  grid-row-gap: 5px
-  grid-auto-flow: row
-
-.grid-icon
-  grid-column-end: span 1
-  grid-column-start: 1
-
-.grid-value
-  grid-column-end: span 2
-  grid-column-start: 2
-  align-self: flex-end
-</style>

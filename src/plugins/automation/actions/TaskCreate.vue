@@ -3,30 +3,23 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 
-import ActionBase from './ActionBase';
-
-
-interface TaskCreateOpts {
-  ref: string;
-  title: string;
-  message: string;
-  done: boolean;
-}
+import AutomationItemBase from '../components/AutomationItemBase';
+import { TaskCreateImpl } from '../types';
 
 @Component
-export default class TaskCreate extends ActionBase<TaskCreateOpts> {
+export default class TaskCreate extends AutomationItemBase<TaskCreateImpl> {
 
   editRef(): void {
     createDialog({
-      component: 'TextAreaDialog',
+      component: 'InputDialog',
       parent: this,
       label: 'Reference ID',
-      title: `Set reference ID for '${this.opts.title}'`,
-      value: this.opts.ref,
+      title: `Set reference ID for '${this.impl.title}'`,
+      value: this.impl.ref,
     })
       .onOk(ref => {
-        this.opts.ref = ref;
-        this.saveAction();
+        this.impl.ref = ref;
+        this.save();
       });
   }
 
@@ -36,11 +29,11 @@ export default class TaskCreate extends ActionBase<TaskCreateOpts> {
       parent: this,
       label: 'Title',
       title: 'Edit task title',
-      value: this.opts.title,
+      value: this.impl.title,
     })
       .onOk(title => {
-        this.opts.title = title;
-        this.saveAction();
+        this.impl.title = title;
+        this.save();
       });
   }
 
@@ -49,51 +42,48 @@ export default class TaskCreate extends ActionBase<TaskCreateOpts> {
       component: 'TextAreaDialog',
       parent: this,
       label: 'Message',
-      title: `Edit '${this.opts.title}'`,
-      value: this.opts.message,
+      title: `Edit '${this.impl.title}'`,
+      value: this.impl.message,
     })
       .onOk(message => {
-        this.opts.message = message;
-        this.saveAction();
+        this.impl.message = message;
+        this.save();
       });
-  }
-
-  saveEnabled(val: boolean): void {
-    this.action.enabled = val;
-    this.saveAction();
   }
 }
 </script>
 
 <template>
-  <q-list dense :class="{'darkish': !action.enabled}">
-    <q-item>
-      <q-item-section class="text-h6 text-italic">
-        Create Task
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-toggle :value="action.enabled" @input="saveEnabled">
-          <q-tooltip>Toggle enabled</q-tooltip>
-        </q-toggle>
-      </q-item-section>
-    </q-item>
-    <q-item class="hoverable">
-      <q-tooltip>Edit ref</q-tooltip>
-      <q-item-section class="text-bold" @click="editRef">
-        {{ opts.ref || 'Click to edit' }}
-      </q-item-section>
-    </q-item>
-    <q-item class="hoverable">
-      <q-tooltip>Edit title</q-tooltip>
-      <q-item-section class="text-bold" @click="editTitle">
-        {{ opts.title || 'Click to edit' }}
-      </q-item-section>
-    </q-item>
-    <q-item class="hoverable">
-      <q-tooltip>Edit message</q-tooltip>
-      <q-item-section @click="editMessage">
-        {{ opts.message || 'Click to edit' }}
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <div class="row q-gutter-xs">
+    <LabeledField
+      title="Title"
+      label="Title"
+      :readonly="false"
+      class="col-grow"
+      @click="editTitle"
+    >
+      {{ impl.title || 'Click to edit' }}
+    </LabeledField>
+    <LabeledField
+      title="Ref"
+      label="Reference ID"
+      :readonly="false"
+      class="col-grow"
+      @click="editRef"
+    >
+      {{ impl.ref || 'Click to edit' }}
+    </LabeledField>
+
+    <div class="col-break" />
+
+    <LabeledField
+      title="Message"
+      label="Message"
+      :readonly="false"
+      class="col"
+      @click="editMessage"
+    >
+      {{ impl.message || 'Click to edit' }}
+    </LabeledField>
+  </div>
 </template>

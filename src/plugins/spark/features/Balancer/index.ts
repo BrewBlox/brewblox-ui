@@ -7,9 +7,9 @@ import widget from './BalancerWidget.vue';
 import { typeName } from './getters';
 import { BalancerData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<BalancerData> = {
   id: typeName,
-  generate: (): BalancerData => ({
+  generate: () => ({
     clients: [],
   }),
   presets: [],

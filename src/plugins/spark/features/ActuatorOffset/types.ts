@@ -1,5 +1,5 @@
 import { Link } from '@/helpers/units';
-import { Block, ConstraintsObj } from '@/plugins/spark/types';
+import { AnalogConstraintsObj, Block } from '@/plugins/spark/types';
 
 export enum OffsetSettingOrValue {
   Setting = 0,
@@ -18,7 +18,7 @@ export interface ActuatorOffsetData {
   setting: number;
   value: number;
 
-  constrainedBy: ConstraintsObj;
+  constrainedBy: AnalogConstraintsObj;
 };
 
 export interface ActuatorOffsetBlock extends Block {

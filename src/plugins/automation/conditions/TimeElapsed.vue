@@ -1,61 +1,36 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { durationMs, durationString } from '@/helpers/functional';
 
-import { StepCondition } from '../types';
-
-interface TimeElapsedCondition extends StepCondition {
-  opts: {
-    duration: number;
-  };
-}
+import AutomationItemBase from '../components/AutomationItemBase';
+import { TimeElapsedImpl } from '../types';
 
 @Component
-export default class TimeElapsed extends Vue {
-  @Prop({ type: Object, required: true })
-  public readonly condition!: TimeElapsedCondition;
-
-  saveCondition(condition: TimeElapsedCondition = this.condition): void {
-    this.$emit('update:condition', condition);
-  }
+export default class TimeElapsed extends AutomationItemBase<TimeElapsedImpl> {
 
   get duration(): string {
-    return durationString(this.condition.opts.duration);
+    return durationString(this.impl.duration);
   }
 
   set duration(val: string) {
-    this.condition.opts.duration = durationMs(val);
-    this.saveCondition();
+    this.impl.duration = durationMs(val);
+    this.save();
   }
 
   saveEnabled(value: boolean): void {
-    this.condition.enabled = value;
-    this.saveCondition();
+    this.item.enabled = value;
+    this.save();
   }
 }
 </script>
 
 <template>
-  <q-list :class="{'darkish': !condition.enabled}" dense>
-    <q-item>
-      <q-item-section class="text-h6 text-italic">
-        Wait for
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-toggle :value="condition.enabled" @input="saveEnabled">
-          <q-tooltip>Toggle enabled</q-tooltip>
-        </q-toggle>
-      </q-item-section>
-    </q-item>
-    <q-item>
-      <q-item-section class="col-auto">
-        <InputField
-          v-model="duration"
-          title="Duration"
-        />
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <div class="column q-gutter-xs">
+    <InputField
+      v-model="duration"
+      label="Duration"
+      title="Duration"
+    />
+  </div>
 </template>

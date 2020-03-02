@@ -10,6 +10,10 @@ const router = new VueRouter({
       component: () => import('@/plugins/builder/BuilderEditor.vue'),
     },
     {
+      path: '/automation/:id?',
+      component: () => import('@/plugins/automation/AutomationEditor.vue'),
+    },
+    {
       path: '/',
       component: () => import('@/layouts/DefaultLayout.vue'),
       children: [

@@ -35,6 +35,7 @@ export default class LabeledField extends FieldBase {
       : this.value;
   }
 
+  // Can't be placed in parent class
   get activeSlots(): string[] {
     return this.fieldSlots.filter(s => !!this.$slots[s]);
   }
@@ -66,5 +67,9 @@ export default class LabeledField extends FieldBase {
         <slot :name="slot" />
       </template>
     </template>
+
+    <q-tooltip v-if="tooltip">
+      {{ tooltip }}
+    </q-tooltip>
   </q-field>
 </template>

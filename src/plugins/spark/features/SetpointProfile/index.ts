@@ -12,9 +12,9 @@ import ProfilePresetDialog from './ProfilePresetDialog.vue';
 import widget from './SetpointProfileWidget.vue';
 import { SetpointProfileData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<SetpointProfileData> = {
   id: typeName,
-  generate: (): SetpointProfileData => ({
+  generate: () => ({
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,

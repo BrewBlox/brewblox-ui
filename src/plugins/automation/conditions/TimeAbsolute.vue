@@ -1,56 +1,31 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
-import { StepCondition } from '../types';
+import AutomationItemBase from '../components/AutomationItemBase';
+import { TimeAbsoluteImpl } from '../types';
 
-interface TimeAbsoluteCondition extends StepCondition {
-  opts: {
-    time: number;
-  };
-}
 
 @Component
-export default class TimeAbsolute extends Vue {
-  @Prop({ type: Object, required: true })
-  public readonly condition!: TimeAbsoluteCondition;
-
-  saveCondition(condition: TimeAbsoluteCondition = this.condition): void {
-    this.$emit('update:condition', condition);
-  }
+export default class TimeAbsolute extends AutomationItemBase<TimeAbsoluteImpl> {
 
   get time(): Date {
-    return new Date(this.condition.opts.time);
+    return new Date(this.impl.time);
   }
 
   set time(val: Date) {
-    this.condition.opts.time = val.getTime();
-    this.saveCondition();
+    this.impl.time = val.getTime();
+    this.save();
   }
 
   saveEnabled(value: boolean): void {
-    this.condition.enabled = value;
-    this.saveCondition();
+    this.item.enabled = value;
+    this.save();
   }
 }
 </script>
 
 <template>
-  <q-list :class="{'darkish': !condition.enabled}" dense>
-    <q-item>
-      <q-item-section class="text-h6 text-italic">
-        Wait until
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-toggle :value="condition.enabled" @input="saveEnabled">
-          <q-tooltip>Toggle enabled</q-tooltip>
-        </q-toggle>
-      </q-item-section>
-    </q-item>
-    <q-item>
-      <q-item-section class="col-auto">
-        <DatetimeField v-model="time" />
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <div class="column q-gutter-xs">
+    <DatetimeField v-model="time" />
+  </div>
 </template>

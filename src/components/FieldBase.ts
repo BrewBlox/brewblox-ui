@@ -29,6 +29,9 @@ export default class FieldBase extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly html!: boolean;
 
+  @Prop({ type: String, required: false })
+  public readonly tooltip!: string;
+
   @Prop({ type: Boolean, default: false })
   public readonly readonly!: boolean;
 

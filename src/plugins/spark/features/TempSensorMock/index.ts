@@ -8,9 +8,9 @@ import { typeName } from './getters';
 import widget from './TempSensorMockWidget.vue';
 import { TempSensorMockData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<TempSensorMockData> = {
   id: typeName,
-  generate: (): TempSensorMockData => ({
+  generate: () => ({
     value: new Unit(20, 'degC'),
     connected: true,
   }),

@@ -3,6 +3,7 @@ import { Block } from '@/plugins/spark/types';
 
 export interface MutexData {
   differentActuatorWait: Unit;
+  waitRemaining: Unit;
 }
 
 export interface MutexBlock extends Block {

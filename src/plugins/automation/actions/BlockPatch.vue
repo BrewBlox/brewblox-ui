@@ -4,97 +4,67 @@ import { Component } from 'vue-property-decorator';
 import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, ChangeField } from '@/plugins/spark/types';
-import { featureStore } from '@/store/features';
 
-import { StepAction } from '../types';
-import ActionBase from './ActionBase';
-
-interface BlockPatchOpts {
-  block: string;
-  service: string;
-  type: string;
-  data: Mapped<any>;
-}
-
-interface BlockPatchAction extends StepAction {
-  opts: BlockPatchOpts;
-}
+import AutomationItemBase from '../components/AutomationItemBase';
+import { BlockPatchImpl } from '../types';
 
 @Component
-export default class BlockPatch extends ActionBase<BlockPatchOpts> {
+export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
   get spec(): BlockSpec {
-    return sparkStore.specs[this.opts.type];
+    return sparkStore.specs[this.impl.blockType];
   }
 
   get link(): Link {
-    return new Link(this.opts.block, this.opts.type);
+    return new Link(this.impl.blockId, this.impl.blockType);
   }
 
   set link(val: Link) {
     if (val.id !== null) {
-      this.opts.block = val.id;
-      this.saveAction();
+      this.impl.blockId = val.id;
+      this.save();
     }
   }
 
   isActive(key: string): boolean {
-    return this.opts.data[key] !== undefined;
+    return this.impl.data[key] !== undefined;
   }
 
   fieldData(change: ChangeField): any {
-    return this.opts.data[change.key];
+    return this.impl.data[change.key];
   }
 
   addChange(change: ChangeField): void {
-    this.$set(this.opts.data, change.key, change.generate());
-    this.saveAction();
+    this.$set(this.impl.data, change.key, change.generate());
+    this.save();
   }
 
   saveChange(change: ChangeField, value: any): void {
-    this.$set(this.opts.data, change.key, value);
-    this.saveAction();
+    this.$set(this.impl.data, change.key, value);
+    this.save();
   }
 
   removeChange(change: ChangeField): void {
-    this.$delete(this.opts.data, change.key);
-    this.saveAction();
-  }
-
-  saveEnabled(value: boolean): void {
-    this.action.enabled = value;
-    this.saveAction();
+    this.$delete(this.impl.data, change.key);
+    this.save();
   }
 }
 </script>
 
 <template>
-  <q-list dense :class="{'darkish': !action.enabled}">
-    <q-item>
-      <q-item-section class="text-h6 text-italic">
-        Change Block
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-toggle :value="action.enabled" @input="saveEnabled">
-          <q-tooltip>Toggle enabled</q-tooltip>
-        </q-toggle>
-      </q-item-section>
-    </q-item>
-    <q-item>
-      <q-item-section>
-        <BlockField
-          v-model="link"
-          :service-id="opts.service"
-          :clearable="false"
-          class="q-mr-md"
-        />
-      </q-item-section>
-    </q-item>
-    <q-item
+  <div class="column q-gutter-xs">
+    <BlockField
+      v-model="link"
+      :service-id="impl.serviceId"
+      :clearable="false"
+    />
+
+    <div
       v-for="change in spec.changes"
       :key="change.key"
+      class="row no-wrap items-center"
     >
-      <q-item-section class="col-auto ">
+      <div class="col-auto">
         <template v-if="isActive(change.key)">
           <q-btn dense flat round icon="mdi-checkbox-marked-outline" @click="removeChange(change)">
             <q-tooltip>
@@ -109,22 +79,22 @@ export default class BlockPatch extends ActionBase<BlockPatchOpts> {
             </q-tooltip>
           </q-btn>
         </template>
-      </q-item-section>
-      <q-item-section :class="{darkened: !isActive(change.key)}">
+      </div>
+      <div class="col" :class="{darkened: !isActive(change.key)}">
         {{ change.title }}
-      </q-item-section>
-      <q-item-section v-if="isActive(change.key)">
+      </div>
+      <div v-if="isActive(change.key)" class="col-grow">
         <component
           :is="change.component"
           v-bind="change.componentProps"
-          :block-id="opts.block"
-          :service-id="opts.service"
+          :block-id="impl.blockId"
+          :service-id="impl.serviceId"
           :value="fieldData(change)"
           editable
           lazy
           @input="v => saveChange(change, v)"
         />
-      </q-item-section>
-    </q-item>
-  </q-list>
+      </div>
+    </div>
+  </div>
 </template>

@@ -196,35 +196,6 @@ export default class PidFull
         icon="mdi-cancel"
         class="col-auto"
       />
-
-      <!-- Boil mode settings -->
-      <div class="col-break" />
-      <UnitField
-        :value="block.data.boilPointAdjust"
-        title="Boil point adjustment"
-        label="Boil temperature setting"
-        class="col-grow"
-        @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
-      >
-        <template #value>
-          <span class="darkish">{{ waterBoilTemp.value | round(0) }}</span> +
-          <b>{{ block.data.boilPointAdjust.value | round }}</b>
-        </template>
-      </UnitField>
-      <SliderField
-        :value="block.data.boilMinOutput"
-        :decimals="0"
-        :quick-actions="[
-          { label: '0%', value: 0 },
-          { label: '50%', value: 50 },
-          { label: '100%', value: 100 },
-        ]"
-        title="Minimum output"
-        label="Minimum output when boiling"
-        suffix="%"
-        class="col-grow"
-        @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
-      />
     </div>
 
     <q-separator inset />
@@ -430,6 +401,37 @@ export default class PidFull
           {{ baseOutput + boilAdjustment | round }}
         </LabeledField>
       </div>
+    </div>
+
+    <q-separator inset />
+
+    <div class="widget-body row">
+      <SliderField
+        :value="block.data.boilMinOutput"
+        :decimals="0"
+        :quick-actions="[
+          { label: '0%', value: 0 },
+          { label: '50%', value: 50 },
+          { label: '100%', value: 100 },
+        ]"
+        title="Minimum output"
+        label="Minimum output when boiling"
+        suffix="%"
+        class="col-grow"
+        @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
+      />
+      <UnitField
+        :value="block.data.boilPointAdjust"
+        title="Boil point adjustment"
+        label="Boil temperature setting"
+        class="col-grow"
+        @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
+      >
+        <template #value>
+          <span class="darkish">{{ waterBoilTemp.value | round(0) }}</span> +
+          <b>{{ block.data.boilPointAdjust.value | round }}</b>
+        </template>
+      </UnitField>
     </div>
   </div>
 </template>

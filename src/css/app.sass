@@ -59,7 +59,7 @@ $widget-border-radius: 4px
     max-width: 800px
 
 .widget-body
-  @extend .q-ma-md, .q-gutter-sm
+  @extend .q-pa-md, .q-gutter-sm
 
 .min-width
   &-xs
@@ -135,6 +135,16 @@ $widget-border-radius: 4px
   border-top: 1px solid rgba(255,255,255,0.1) !important
   > .q-bar
     height: 30px
+
+.close-button:hover
+  color: $red-6
+  > .q-focus-helper
+    opacity: 0 !important
+
+.page-height
+  // window - top bar - bottom bar
+  height: calc(100vh - 40px - 30px)
+  max-height: calc(100vh - 40px - 30px)
 
 label
   cursor: inherit

@@ -9,9 +9,11 @@ import widget from './DigitalActuatorWidget.vue';
 import { typeName } from './getters';
 import { DigitalActuatorData } from './types';
 
-const block: BlockSpec = {
+const seconds = (v = 0): Unit => new Unit(v, 'seconds');
+
+const block: BlockSpec<DigitalActuatorData> = {
   id: typeName,
-  generate: (): DigitalActuatorData => ({
+  generate: () => ({
     hwDevice: new Link(null, interfaceTypes.IoArray),
     channel: 0,
     desiredState: DigitalState.Inactive,
@@ -22,24 +24,46 @@ const block: BlockSpec = {
   presets: [
     {
       name: 'Fridge cooler (compressor)',
-      generate: (): Partial<DigitalActuatorData> => ({
+      generate: () => ({
         invert: false,
         constrainedBy: {
           constraints: [
-            { minOff: new Unit(300, 'second'), limiting: false },
-            { minOn: new Unit(180, 'second'), limiting: false },
-            { mutex: new Link(null, blockTypes.Mutex), limiting: false },
+            {
+              minOff: seconds(300),
+              remaining: seconds(),
+            },
+            {
+              minOn: seconds(180),
+              remaining: seconds(),
+            },
+            {
+              mutexed: {
+                mutexId: new Link(null, blockTypes.Mutex),
+                extraHoldTime: seconds(),
+                hasCustomHoldTime: true,
+                hasLock: false,
+              },
+              remaining: seconds(),
+            },
           ],
         },
       }),
     },
     {
       name: 'Fridge heater',
-      generate: (): Partial<DigitalActuatorData> => ({
+      generate: () => ({
         invert: false,
         constrainedBy: {
           constraints: [
-            { mutex: new Link(null, blockTypes.Mutex), limiting: false },
+            {
+              mutexed: {
+                mutexId: new Link(null, blockTypes.Mutex),
+                extraHoldTime: seconds(),
+                hasCustomHoldTime: true,
+                hasLock: false,
+              },
+              remaining: seconds(),
+            },
           ],
         },
       }),

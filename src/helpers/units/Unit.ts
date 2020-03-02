@@ -64,12 +64,73 @@ export default class Unit extends PostFixed {
 
   public isEqual(other: Unit): boolean {
     return other
-      && this.unit === other.unit
+      && this.notation === other.notation
       && this.roundedValue === other.roundedValue;
   }
 }
 
-export const convertedTemp = (degC: number, userTemp: string): Unit => {
-  const defaultTempValues = { degC, degF: (degC * 9 / 5) + 32, degK: degC + 273.15 };
-  return new Unit(defaultTempValues[userTemp] || degC, userTemp);
+export class Time extends Unit {
+  public constructor(value: number | null = 0, unit: 'ms' | 's' | 'min' | 'h' = 's') {
+    super(value, unit);
+  }
+}
+
+const isTempUnit = (unit: string): boolean => {
+  const pretty = prettify(unit);
+  return pretty === prettify('degC')
+    || pretty === prettify('degF')
+    || pretty === prettify('degK');
 };
+
+export class Temp extends Unit {
+  public constructor(value: Unit);
+  public constructor(value: number | null);
+  public constructor(value: number | null);
+  public constructor(value: number | null, unit: 'degC' | 'degF');
+  public constructor(value: number | null, unit: string);
+
+  public constructor(value: number | Unit | null, unit: string = 'degC') {
+    if (value instanceof Unit) {
+      if (!isTempUnit(value.unit)) {
+        throw new Error(`${value} is not a temperature unit`);
+      }
+      super(value.value, value.unit);
+    }
+    else {
+      if (!isTempUnit(unit)) {
+        throw new Error(`${unit} is not a temperature unit`);
+      }
+      super(value, unit);
+    }
+  }
+
+  public convert(unit: string): Temp {
+    if (this.value === null) {
+      return new Temp(null, unit);
+    }
+
+    const v = this.value;
+    const pretty = prettify(unit);
+    const prettyC = prettify('degC');
+    const prettyF = prettify('degF');
+    const prettyK = prettify('degK');
+
+    if (this.notation === prettyC) {
+      if (pretty === prettyC) { return new Temp(this); }
+      if (pretty === prettyF) { return new Temp((v * 9 / 5) + 32, pretty); }
+      if (pretty === prettyK) { return new Temp(v + 273.15, pretty); }
+    }
+    if (this.notation === prettyF) {
+      if (pretty === prettyC) { return new Temp((v - 32) * 5 / 9, pretty); }
+      if (pretty === prettyF) { return new Temp(this); }
+      if (pretty === prettyK) { return new Temp((v - 32) * 5 / 9 + 273.15, pretty); }
+    }
+    if (this.notation === prettyK) {
+      if (pretty === prettyC) { return new Temp(v - 273.15, pretty); }
+      if (pretty === prettyF) { return new Temp((v - 273.15) * 9 / 5 + 32, pretty); }
+      if (pretty === prettyK) { return new Temp(this); }
+    }
+
+    return new Temp(null, unit);
+  }
+}
