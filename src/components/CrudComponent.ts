@@ -87,7 +87,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       style: 'overflow-y: scroll',
       options: {
         type: 'radio',
-        model: undefined,
+        model: '',
         items: dashboardStore.dashboardValues
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
@@ -110,7 +110,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       style: 'overflow-y: scroll',
       options: {
         type: 'radio',
-        model: undefined,
+        model: '',
         items: dashboardStore.dashboardValues
           .filter(dashboard => dashboard.id !== this.widget.dashboard)
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
