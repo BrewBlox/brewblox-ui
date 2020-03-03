@@ -66,51 +66,55 @@ export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['c
   };
 };
 
+const linkedTypes = [
+  blockTypes.DigitalActuator,
+  blockTypes.MotorValve,
+];
+
+const addressedTypes = [
+  blockTypes.TempSensorOneWire,
+  blockTypes.DS2408,
+  blockTypes.DS2413,
+];
+
+export const saveHwInfo = (serviceId: string): void => {
+  const linked: string[] = [];
+  const addressed: string[] = [];
+
+  sparkStore.blockValues(serviceId)
+    .forEach(block => {
+      if (linkedTypes.includes(block.type)) {
+        const { hwDevice, channel } = block.data;
+        if (!hwDevice.id || !channel) { return; }
+        const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
+        const pin = target.data.pins[channel - 1];
+        if (pin !== undefined) {
+          const [name] = Object.keys(pin);
+          linked.push(`${block.id}: ${target.id} ${name}`);
+        }
+      }
+      if (addressedTypes.includes(block.type)) {
+        addressed.push(`${block.id}: ${block.data.address}`);
+      }
+    });
+
+  const lines = [
+    `Service: ${serviceId}`,
+    `Date: ${new Date().toLocaleString()}`,
+    '\n[Actuators]',
+    ...linked,
+    '\n[OneWire addresses]',
+    ...addressed,
+  ];
+  saveFile(lines.join('\n'), `spark-hardware-${serviceId}.txt`, true);
+};
+
 export const resetBlocks = async (serviceId: string, opts: { restore: boolean; download: boolean }): Promise<void> => {
   try {
     const addresses: Mapped<string> = {};
-    const linkedTypes = [
-      blockTypes.DigitalActuator,
-      blockTypes.MotorValve,
-    ];
-    const addressedTypes = [
-      blockTypes.TempSensorOneWire,
-      blockTypes.DS2408,
-      blockTypes.DS2413,
-    ];
 
     if (opts.download) {
-      const linked: string[] = [];
-      const addressed: string[] = [];
-
-      sparkStore.blockValues(serviceId)
-        .forEach(block => {
-          if (linkedTypes.includes(block.type)) {
-            const { hwDevice, channel } = block.data;
-            if (!hwDevice.id || !channel) { return; }
-            const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
-            const pin = target.data.pins[channel];
-            if (pin !== undefined) {
-              const [name] = Object.keys(pin);
-              linked.push(`${block.id}: ${target.id} ${name}`);
-            }
-          }
-
-          if (addressedTypes.includes(block.type)) {
-            addressed.push(`${block.id}: ${block.data.address}`);
-          }
-
-        });
-
-      const lines = [
-        `Service: ${serviceId}`,
-        `Date: ${new Date().toLocaleString()}`,
-        '\n[Actuators]',
-        ...linked,
-        '\n[OneWire addresses]',
-        ...addressed,
-      ];
-      saveFile(lines.join('\n'), `spark-hardware-${serviceId}.txt`, true);
+      saveHwInfo(serviceId);
     }
 
     if (opts.restore) {
