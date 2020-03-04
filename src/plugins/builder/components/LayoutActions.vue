@@ -131,7 +131,7 @@ export default class LayoutActions extends Vue {
       style: 'overflow-y: scroll',
       options: {
         type: 'radio',
-        model: undefined,
+        model: '',
         items: dashboardStore.dashboardValues
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
