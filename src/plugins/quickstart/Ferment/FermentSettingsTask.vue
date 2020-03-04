@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import { Temp, Unit } from '@/helpers/units';
+import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 
 import WizardTaskBase from '../components/WizardTaskBase';
@@ -15,6 +16,13 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
   fridgeSetting = new Unit(20, 'degC');
   beerSetting = new Unit(20, 'degC');
   activeSetpoint: 'beer' | 'fridge' = 'beer';
+
+  created(): void {
+    const defaultTemp = new Temp(20, 'degC')
+      .convert(sparkStore.units(this.config.serviceId).Temp);
+    this.fridgeSetting = defaultTemp.copy();
+    this.beerSetting = defaultTemp.copy();
+  }
 
   get targetOpts(): SelectOption[] {
     return [
@@ -40,7 +48,15 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, opts, layouts);
 
-    this.pushActions(createOutputActions());
+    this.pushActions([
+      ...createOutputActions(),
+      async (config: FermentConfig) => {
+        const coolPid = sparkStore.blockById(config.serviceId, config.names.coolPid);
+        const heatPid = sparkStore.blockById(config.serviceId, config.names.heatPid);
+        tryDisplayBlock(coolPid, { showDialog: false, color: '4e78f5' });
+        tryDisplayBlock(heatPid, { showDialog: false, color: 'ad1c47' });
+      },
+    ]);
     this.updateConfig({
       ...this.config,
       layouts,
@@ -49,13 +65,6 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
       createdBlocks,
     });
     this.next();
-  }
-
-  created(): void {
-    const defaultTemp = new Temp(20, 'degC')
-      .convert(sparkStore.units(this.config.serviceId).Temp);
-    this.fridgeSetting = defaultTemp.copy();
-    this.beerSetting = defaultTemp.copy();
   }
 }
 </script>

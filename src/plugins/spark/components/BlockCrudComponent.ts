@@ -14,7 +14,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockConfig, BlockCrud } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
-import { blockIdRules } from '../helpers';
+import { blockIdRules, canDisplay, tryDisplayBlock } from '../helpers';
 import { Block } from '../types';
 
 
@@ -43,6 +43,10 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   public get isDriven(): boolean {
     return sparkStore.drivenBlocks(this.serviceId)
       .includes(this.blockId);
+  }
+
+  public get canDisplay(): boolean {
+    return this.crud.isStoreBlock && canDisplay(this.block);
   }
 
   public get constrainers(): string | null {
@@ -172,6 +176,10 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
         await this.changeBlockId(newId);
         this.closeDialog();
       });
+  }
+
+  public displayBlock(): void {
+    tryDisplayBlock(this.block);
   }
 
   public exportBlock(): void {

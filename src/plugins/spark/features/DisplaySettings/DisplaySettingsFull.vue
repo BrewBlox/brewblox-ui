@@ -2,40 +2,37 @@
 import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes, interfaceTypes } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/features/DisplaySettings/types';
+import { DisplaySettingsBlock } from '@/plugins/spark/features/DisplaySettings/types';
+import { CompatibleTypes, DisplaySlot } from '@/plugins/spark/types';
+
+import { sparkStore } from '../../store';
 
 @Component
 export default class DisplaySettingsFull
   extends BlockCrudComponent<DisplaySettingsBlock> {
 
-  validDisplayTypes = [
-    blockTypes.TempSensorMock,
-    blockTypes.TempSensorOneWire,
-    blockTypes.SetpointSensorPair,
-    blockTypes.ActuatorPwm,
-    blockTypes.ActuatorAnalogMock,
-    blockTypes.Pid,
+  slotNameRules: InputRule[] = [
+    v => !v || v.length <= 15 || 'Name can only be 15 characters',
+  ];
+  footerRules: InputRule[] = [
+    v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
   ];
 
-  get slots(): any[] {
+  get slots(): (DisplaySlot | null)[] {
     const slots = Array(6);
     this.block.data.widgets
-      .forEach((w) => { slots[w.pos - 1] = w; });
+      .forEach(w => { slots[w.pos - 1] = w; });
     return slots;
   }
 
-  get slotNameRules(): InputRule[] {
-    return [
-      v => !v || v.length <= 15 || 'Name can only be 15 characters',
-    ];
+  get compatible(): CompatibleTypes {
+    return sparkStore.compatibleTypes(this.serviceId);
   }
 
-  get footerRules(): InputRule[] {
-    return [
-      v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
-    ];
+  isCompatible(type: string, intf: string): boolean {
+    return type === intf || !!this.compatible[intf]?.includes(type);
   }
 
   slotLink(slot: DisplaySlot): Link {
@@ -47,13 +44,13 @@ export default class DisplaySettingsFull
   }
 
   slotColor(slot: DisplaySlot): string {
-    return slot && slot.color
+    return slot?.color
       ? `#${slot.color}`
       : '#ff';
   }
 
   slotColorStyle(slot: DisplaySlot): Mapped<string> {
-    const color = `#${slot.color || 'ff'}`;
+    const color = `#${slot?.color || 'ff'}`;
     return {
       color,
       backgroundColor: color,
@@ -61,7 +58,13 @@ export default class DisplaySettingsFull
   }
 
   get linkFilter() {
-    return block => this.validDisplayTypes.includes(block.type);
+    const validDisplayTypes = [
+      ...this.compatible[interfaceTypes.TempSensor],
+      ...this.compatible[interfaceTypes.SetpointSensorPair],
+      ...this.compatible[interfaceTypes.ActuatorAnalog],
+      blockTypes.Pid,
+    ];
+    return block => validDisplayTypes.includes(block.type);
   }
 
   updateSlotLink(idx: number, link: Link): void {
@@ -73,27 +76,26 @@ export default class DisplaySettingsFull
       return;
     }
 
-    const type = link.type || '';
-    const existing = this.slots[idx] || {};
+    const { type } = link;
+    if (!type) { return; }
+
+    const existing = this.slots[idx];
     const obj: DisplaySlot = {
       pos,
-      color: existing.color || '4169E1',
-      name: existing.name || link.id.slice(0, 15),
+      color: existing?.color || '4169E1',
+      name: existing?.name || link.id.slice(0, 15),
     };
 
-    if (['TempSensorInterface', 'TempSensorMock', 'TempSensorOneWire'].includes(type)) {
+    if (this.isCompatible(type, interfaceTypes.TempSensor)) {
       obj.tempSensor = link;
     }
-
-    if (type === 'SetpointSensorPair') {
+    else if (this.isCompatible(type, interfaceTypes.SetpointSensorPair)) {
       obj.setpointSensorPair = link;
     }
-
-    if (['ActuatorAnalogInterface', 'ActuatorPwm', 'ActuatorAnalogMock'].includes(type)) {
+    else if (this.isCompatible(type, interfaceTypes.ActuatorAnalog)) {
       obj.actuatorAnalog = link;
     }
-
-    if (type === 'Pid') {
+    else if (this.isCompatible(type, blockTypes.Pid)) {
       obj.pid = link;
     }
 
@@ -128,7 +130,7 @@ export default class DisplaySettingsFull
       <div class="grid-container">
         <div
           v-for="(slot, idx) in slots"
-          :key="idx"
+          :key="`display-slot-${idx}`"
           :style="`border: 2px solid ${slotColor(slot)}; grid-column-end: span 1`"
           class="q-pa-sm column q-gutter-y-xs"
         >
@@ -146,9 +148,9 @@ export default class DisplaySettingsFull
             <InputField
               :value="slot.name"
               :rules="slotNameRules"
-              label="Slot name"
-              title="Slot name"
-              message="Choose the LCD display name for this block"
+              label="Label text"
+              title="Label text"
+              message="Choose the LCD display label text for this block"
               @input="v => updateSlotName(idx, v)"
             />
             <ColorField
@@ -198,11 +200,10 @@ export default class DisplaySettingsFull
   </div>
 </template>
 
-<style scoped>
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-row-gap: 10px;
-  grid-column-gap: 10px;
-}
+<style scoped lang="sass">
+.grid-container
+  display: grid
+  grid-template-columns: repeat(3, 1fr)
+  grid-row-gap: 10px
+  grid-column-gap: 10px
 </style>
