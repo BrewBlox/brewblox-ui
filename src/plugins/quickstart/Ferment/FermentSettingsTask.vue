@@ -53,12 +53,12 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
       async (config: FermentConfig) => {
         const coolPid = sparkStore.blockById(config.serviceId, config.names.coolPid);
         const heatPid = sparkStore.blockById(config.serviceId, config.names.heatPid);
-        tryDisplayBlock(coolPid, {
+        await tryDisplayBlock(coolPid, {
           showDialog: false,
           color: '4e78f5',
           name: coolPid.id.substring(config.prefix.length).trim(),
         });
-        tryDisplayBlock(heatPid, {
+        await tryDisplayBlock(heatPid, {
           showDialog: false,
           color: 'ad1c47',
           name: heatPid.id.substring(config.prefix.length).trim(),
