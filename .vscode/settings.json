@@ -10,7 +10,6 @@
     "typescript"
   ],
   "editor.formatOnSave": true,
-  "jest.debugMode": true,
   "jest.pathToConfig": "jest.config.js",
   "jestTestExplorer.pathToJest": "./node_modules/.bin/jest",
   "jestTestExplorer.pathToJestConfig": "jest.config.js",
@@ -24,4 +23,5 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
+  "jest.enableInlineErrorMessages": true,
 }

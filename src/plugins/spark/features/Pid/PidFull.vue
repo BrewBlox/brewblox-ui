@@ -320,7 +320,7 @@ export default class PidFull
       <!-- Break -->
 
       <div class="span-2">
-        <LabeledField :tag-class="{darkish: block.data.td.val === 0}" label="Derivative">
+        <LabeledField :tag-class="{darkish: block.data.td.value === 0}" label="Derivative">
           {{ block.data.derivative | unit }}
         </LabeledField>
       </div>

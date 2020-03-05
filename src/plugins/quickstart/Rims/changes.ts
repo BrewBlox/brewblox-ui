@@ -21,7 +21,8 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { maybeSpace, unlinkedActuators } from '../helpers';
+import { unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { DisplayBlock } from '../types';
 import { RimsConfig } from './types';
 
 export function defineChangedBlocks(config: RimsConfig): Block[] {
@@ -202,7 +203,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
   });
 
   const builder: Widget<BuilderConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
+    ...createWidget(withPrefix(config.prefix, 'Process'), 'Builder'),
     cols: 5,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -213,7 +214,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
   };
 
   const graph: Widget<GraphConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
+    ...createWidget(withPrefix(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
     pinnedPosition: { x: 6, y: 1 },
@@ -253,7 +254,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
   };
 
   const QuickActions: Widget<QuickActionsConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
+    ...createWidget(withPrefix(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
@@ -341,3 +342,25 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
     QuickActions,
   ];
 }
+
+export const defineDisplayedBlocks = (config: RimsConfig): DisplayBlock[] => {
+  const { kettlePid, tubePid } = config.names;
+  return [
+    {
+      blockId: kettlePid,
+      opts: {
+        showDialog: false,
+        color: '4e78f5',
+        name: withoutPrefix(config.prefix, kettlePid),
+      },
+    },
+    {
+      blockId: tubePid,
+      opts: {
+        showDialog: false,
+        color: 'ad1c47',
+        name: withoutPrefix(config.prefix, tubePid),
+      },
+    },
+  ];
+};

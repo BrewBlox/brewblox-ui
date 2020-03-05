@@ -22,7 +22,8 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { maybeSpace, unlinkedActuators } from '../helpers';
+import { unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { DisplayBlock } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 
 
@@ -326,7 +327,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   });
 
   const builder: Widget<BuilderConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
+    ...createWidget(withPrefix(config.prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -337,7 +338,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   };
 
   const graph: Widget<GraphConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
+    ...createWidget(withPrefix(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
@@ -385,7 +386,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   }
 
   const QuickActions: Widget<QuickActionsConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
+    ...createWidget(withPrefix(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
@@ -479,3 +480,25 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     profile,
   ];
 }
+
+export const defineDisplayedBlocks = (config: GlycolConfig): DisplayBlock[] => {
+  const { coolPid, heatPid } = config.names;
+  return [
+    {
+      blockId: coolPid,
+      opts: {
+        showDialog: false,
+        color: '4e78f5',
+        name: withoutPrefix(config.prefix, coolPid),
+      },
+    },
+    {
+      blockId: heatPid,
+      opts: {
+        showDialog: false,
+        color: 'ad1c47',
+        name: withoutPrefix(config.prefix, heatPid),
+      },
+    },
+  ];
+};

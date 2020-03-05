@@ -22,7 +22,7 @@ import { Crud, WidgetFeature } from '@/store/features';
 
 import { blockTypes, interfaceTypes } from './block-types';
 import { DisplaySettingsBlock } from './features/DisplaySettings/types';
-import { Block, BlockConfig, BlockCrud, DisplaySlot } from './types';
+import { Block, BlockConfig, BlockCrud, DisplayOpts, DisplaySlot } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -94,15 +94,6 @@ const displayBlock = (serviceId: string | undefined): DisplaySettingsBlock | und
 export const isDisplayed = (block: Block): boolean =>
   !!displayBlock(block.serviceId)?.data.widgets
     .find(w => Object.values(w).find(v => v instanceof Link && v.id === block.id));
-
-export interface DisplayOpts {
-  color: string;
-  name: string;
-  pos?: number;
-  unique: boolean;
-  showNotify: boolean;
-  showDialog: boolean;
-}
 
 export const tryDisplayBlock = async (block: Block, options: Partial<DisplayOpts> = {}): Promise<void> => {
   const display = displayBlock(block?.serviceId);

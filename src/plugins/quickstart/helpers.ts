@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual';
 import { builderStore } from '@/plugins/builder/store';
 import { blockTypes } from '@/plugins/spark/block-types';
 import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
+import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
@@ -74,6 +75,14 @@ export function createOutputActions(): WizardAction[] {
         await dashboardStore.appendWidget(widget);
       }
     },
+
+    // Add blocks to LCD display
+    async (config: QuickStartOutput) => {
+      for (const val of config.displayedBlocks) {
+        const block = sparkStore.blockById(config.serviceId, val.blockId);
+        await tryDisplayBlock(block, val.opts);
+      }
+    },
   ];
 }
 
@@ -93,6 +102,14 @@ export function hasShared<T>(arr: T[]): boolean {
   return combinations(arr.filter(v => v !== null)).some(([v1, v2]) => isEqual(v1, v2));
 }
 
-export function maybeSpace(prefix: string, val: string): string {
-  return !!prefix ? `${prefix} ${val}` : val;
+export function withPrefix(prefix: string, val: string): string {
+  return !!prefix
+    ? `${prefix} ${val}`
+    : val;
+}
+
+export function withoutPrefix(prefix: string, val: string): string {
+  return val.startsWith(prefix)
+    ? val.substring(prefix.length).trim()
+    : val;
 }

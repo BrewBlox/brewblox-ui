@@ -156,6 +156,16 @@ export interface DisplaySlot {
   pid?: Link;
 }
 
+
+export interface DisplayOpts {
+  color: string;
+  name: string;
+  pos?: number;
+  unique: boolean;
+  showNotify: boolean;
+  showDialog: boolean;
+}
+
 export type AnalogConstraintKey = 'min' | 'max' | 'balanced';
 
 export interface MinConstraint {
