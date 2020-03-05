@@ -1,3 +1,5 @@
+import round from 'lodash/round';
+
 import PostFixed from './PostFixed';
 
 export const prettify = (v: string): string =>
@@ -15,23 +17,25 @@ export const prettify = (v: string): string =>
     .replace(/ ?\* ?/gi, '·');
 
 export default class Unit extends PostFixed {
-  private val: number | null;
+  private _val: number | null;
   public unit: string;
   public notation: string;
+  public delta: boolean;
 
   public constructor(value: number | null, unit: string) {
     super();
-    this.val = value;
+    this._val = value;
     this.unit = unit;
+    this.delta = unit.startsWith('delta_');
     this.notation = prettify(this.unit);
   }
 
   public get value(): number | null {
-    return this.val;
+    return this._val;
   }
 
   public set value(v: number | null) {
-    this.val = Number(v);
+    this._val = Number(v);
   }
 
   public get unitNotation(): string {
@@ -58,19 +62,21 @@ export default class Unit extends PostFixed {
     return this.value;
   }
 
-  public copy(val: number | null = this.val): Unit {
+  public copy(val: number | null = this._val): Unit {
     return new Unit(val, this.unit);
   }
 
   public isEqual(other: Unit): boolean {
     return other
       && this.notation === other.notation
-      && this.roundedValue === other.roundedValue;
+      && this.delta === other.delta
+      && (this.value === null) === (other.value === null)
+      && round(this.value ?? 0, 2) === round(other.value ?? 0, 2);
   }
 }
 
 export class Time extends Unit {
-  public constructor(value: number | null = 0, unit: 'ms' | 's' | 'min' | 'h' = 's') {
+  public constructor(value: number | null = 0, unit: 'ms' | 's' | 'min' | 'hour' = 's') {
     super(value, unit);
   }
 }
@@ -86,7 +92,7 @@ export class Temp extends Unit {
   public constructor(value: Unit);
   public constructor(value: number | null);
   public constructor(value: number | null);
-  public constructor(value: number | null, unit: 'degC' | 'degF');
+  public constructor(value: number | null, unit: 'degC' | 'degF' | 'delta_degC' | 'delta_degF');
   public constructor(value: number | null, unit: string);
 
   public constructor(value: number | Unit | null, unit: string = 'degC') {
@@ -110,25 +116,31 @@ export class Temp extends Unit {
     }
 
     const v = this.value;
+
+    // Note that prettify() strips the delta prefix
+    // prettify('degC') === prettify('delta_degC')
     const pretty = prettify(unit);
     const prettyC = prettify('degC');
     const prettyF = prettify('degF');
     const prettyK = prettify('degK');
 
+    const offsetF = unit.startsWith('delta_') ? 0 : 32;
+    const offsetK = unit.startsWith('delta_') ? 0 : 273.15;
+
     if (this.notation === prettyC) {
-      if (pretty === prettyC) { return new Temp(this); }
-      if (pretty === prettyF) { return new Temp((v * 9 / 5) + 32, pretty); }
-      if (pretty === prettyK) { return new Temp(v + 273.15, pretty); }
+      if (pretty === prettyC) { return new Temp(v, unit); }
+      if (pretty === prettyF) { return new Temp((v * 9 / 5) + offsetF, unit); }
+      if (pretty === prettyK) { return new Temp(v + offsetK, unit); }
     }
     if (this.notation === prettyF) {
-      if (pretty === prettyC) { return new Temp((v - 32) * 5 / 9, pretty); }
-      if (pretty === prettyF) { return new Temp(this); }
-      if (pretty === prettyK) { return new Temp((v - 32) * 5 / 9 + 273.15, pretty); }
+      if (pretty === prettyC) { return new Temp((v - offsetF) * 5 / 9, unit); }
+      if (pretty === prettyF) { return new Temp(v, unit); }
+      if (pretty === prettyK) { return new Temp((v - offsetF) * 5 / 9 + offsetK, unit); }
     }
     if (this.notation === prettyK) {
-      if (pretty === prettyC) { return new Temp(v - 273.15, pretty); }
-      if (pretty === prettyF) { return new Temp((v - 273.15) * 9 / 5 + 32, pretty); }
-      if (pretty === prettyK) { return new Temp(this); }
+      if (pretty === prettyC) { return new Temp(v - offsetK, unit); }
+      if (pretty === prettyF) { return new Temp((v - offsetK) * 9 / 5 + offsetF, unit); }
+      if (pretty === prettyK) { return new Temp(v, unit); }
     }
 
     return new Temp(null, unit);

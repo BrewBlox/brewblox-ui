@@ -7,7 +7,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions, hasShared } from '../helpers';
 import { PinChannel } from '../types';
-import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { RimsConfig } from './types';
 
@@ -75,6 +75,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
+    const displayedBlocks = defineDisplayedBlocks(this.config);
 
     this.pushActions(createOutputActions());
     this.updateConfig({
@@ -83,6 +84,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       widgets,
       changedBlocks,
       createdBlocks,
+      displayedBlocks,
     });
     this.next();
   }

@@ -2,38 +2,38 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Unit } from '@/helpers/units';
+import { Temp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';
-import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { HermsConfig, HermsOpts } from './types';
 
 
 @Component
 export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
-  hltFullPowerDelta = new Unit(2, 'delta_degC');
-  bkFullPowerDelta = new Unit(2, 'delta_degC');
+  hltFullPowerDelta = new Temp(2, 'delta_degC');
+  bkFullPowerDelta = new Temp(2, 'delta_degC');
   hltVolume = 25;
   mashVolume = 25;
-  driverMax = new Unit(10, 'delta_degC');
-  mashTarget = new Unit(67, 'degC');
-  mashActual = new Unit(65, 'degC');
+  driverMax = new Temp(10, 'delta_degC');
+  mashTarget = new Temp(67, 'degC');
+  mashActual = new Temp(65, 'degC');
 
   volumeRules: InputRule[] = [
     v => v !== 0 || 'Volume can\'t be 0',
   ]
 
   created(): void {
-    if (this.userTemp === 'degF') {
-      this.hltFullPowerDelta = new Unit(3, 'delta_degF');
-      this.bkFullPowerDelta = new Unit(3, 'delta_degF');
-      this.mashTarget = new Unit(155, 'degF');
-      this.mashActual = new Unit(152, 'degF');
-      this.driverMax = new Unit(18, 'delta_degF');
-    }
+    const deltaTemp = `delta_${this.userTemp}`;
+    this.hltFullPowerDelta = this.hltFullPowerDelta.convert(deltaTemp);
+    this.bkFullPowerDelta = this.bkFullPowerDelta.convert(deltaTemp);
+    this.driverMax = this.driverMax.convert(deltaTemp);
+
+    this.mashTarget = this.mashTarget.convert(this.userTemp);
+    this.mashActual = this.mashActual.convert(this.userTemp);
   }
 
   get userTemp(): string {
@@ -83,6 +83,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
+    const displayedBlocks = defineDisplayedBlocks(this.config);
 
     this.pushActions(createOutputActions());
     this.updateConfig({
@@ -91,6 +92,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
       widgets,
       changedBlocks,
       createdBlocks,
+      displayedBlocks,
     });
     this.next();
   }

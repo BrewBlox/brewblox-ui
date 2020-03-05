@@ -1,20 +1,25 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Temp, Unit } from '@/helpers/units';
+import { Temp } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';
-import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { GlycolConfig, GlycolOpts } from './types';
 
 @Component
 export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
-  beerSetting = new Unit(20, 'degC');
-  glycolSetting = new Unit(4, 'degC');
+  beerSetting = new Temp(20, 'degC');
+  glycolSetting = new Temp(4, 'degC');
 
+  created(): void {
+    const unit = sparkStore.units(this.config.serviceId).Temp;
+    this.beerSetting = this.beerSetting.convert(unit);
+    this.glycolSetting = this.glycolSetting.convert(unit);
+  }
 
   done(): void {
     const opts: GlycolOpts = { beerSetting: this.beerSetting, glycolSetting: this.glycolSetting };
@@ -22,6 +27,7 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
+    const displayedBlocks = defineDisplayedBlocks(this.config);
 
     this.pushActions(createOutputActions());
     this.updateConfig({
@@ -30,14 +36,9 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
       widgets,
       changedBlocks,
       createdBlocks,
+      displayedBlocks,
     });
     this.next();
-  }
-
-  created(): void {
-    const unit = sparkStore.units(this.config.serviceId).Temp;
-    this.beerSetting = new Temp(20, 'degC').convert(unit);
-    this.glycolSetting = new Temp(4, 'degC').convert(unit);
   }
 }
 </script>

@@ -23,7 +23,8 @@ import { AnalogConstraint, Block, DigitalConstraint, DigitalState } from '@/plug
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { maybeSpace, unlinkedActuators } from '../helpers';
+import { unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { DisplayBlock } from '../types';
 import { HermsConfig, HermsOpts } from './types';
 
 export function defineChangedBlocks(config: HermsConfig): Block[] {
@@ -321,7 +322,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
   });
 
   const createBuilder = (): Widget<BuilderConfig> => ({
-    ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
+    ...createWidget(withPrefix(config.prefix, 'Process'), 'Builder'),
     cols: 11,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -332,7 +333,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
   });
 
   const createGraph = (): Widget<GraphConfig> => ({
-    ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
+    ...createWidget(withPrefix(config.prefix, 'Graph'), 'Graph'),
     cols: 7,
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
@@ -373,7 +374,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
   });
 
   const createQuickActions = (): Widget<QuickActionsConfig> => ({
-    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
+    ...createWidget(withPrefix(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
@@ -488,3 +489,33 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
 
   return [createBuilder(), createGraph(), createQuickActions()];
 }
+
+export const defineDisplayedBlocks = (config: HermsConfig): DisplayBlock[] => {
+  const { hltPid, mtPid, bkPid } = config.names;
+  return [
+    {
+      blockId: hltPid,
+      opts: {
+        showDialog: false,
+        color: 'b50000',
+        name: withoutPrefix(config.prefix, hltPid),
+      },
+    },
+    {
+      blockId: mtPid,
+      opts: {
+        showDialog: false,
+        color: '9c4b00',
+        name: withoutPrefix(config.prefix, mtPid),
+      },
+    },
+    {
+      blockId: bkPid,
+      opts: {
+        showDialog: false,
+        color: 'c48600',
+        name: withoutPrefix(config.prefix, bkPid),
+      },
+    },
+  ];
+};

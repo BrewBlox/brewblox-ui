@@ -22,7 +22,8 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { maybeSpace, unlinkedActuators } from '../helpers';
+import { unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { DisplayBlock } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 
 
@@ -188,7 +189,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       data: {
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(-20, '1/degC'),
-        ti: new Time(2, 'h'),
+        ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
         enabled: true,
         inputId: new Link(config.names.beerSetpoint),
@@ -203,7 +204,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       data: {
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(20, '1/degC'),
-        ti: new Time(2, 'h'),
+        ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
         enabled: true,
         inputId: new Link(config.names.beerSetpoint),
@@ -292,7 +293,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           data: {
             ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
             kp: new Unit(-20, '1/degC'),
-            ti: new Time(2, 'h'),
+            ti: new Time(2, 'hour'),
             td: new Time(5, 'min'),
             enabled: true,
             inputId: new Link(config.names.glycolSetpoint),
@@ -326,7 +327,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   });
 
   const builder: Widget<BuilderConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Process'), 'Builder'),
+    ...createWidget(withPrefix(config.prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -337,7 +338,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   };
 
   const graph: Widget<GraphConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Graph'), 'Graph'),
+    ...createWidget(withPrefix(config.prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
@@ -385,7 +386,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   }
 
   const QuickActions: Widget<QuickActionsConfig> = {
-    ...createWidget(maybeSpace(config.prefix, 'Actions'), 'QuickActions'),
+    ...createWidget(withPrefix(config.prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
@@ -479,3 +480,28 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     profile,
   ];
 }
+
+export const defineDisplayedBlocks = (config: GlycolConfig): DisplayBlock[] => {
+  const { coolPid, heatPid } = config.names;
+  const output = [
+    {
+      blockId: coolPid,
+      opts: {
+        showDialog: false,
+        color: '037cd5',
+        name: withoutPrefix(config.prefix, coolPid),
+      },
+    },
+  ];
+  if (config.heated) {
+    output.push({
+      blockId: heatPid,
+      opts: {
+        showDialog: false,
+        color: 'df2b35',
+        name: withoutPrefix(config.prefix, heatPid),
+      },
+    });
+  }
+  return output;
+};
