@@ -76,7 +76,7 @@ export default class Unit extends PostFixed {
 }
 
 export class Time extends Unit {
-  public constructor(value: number | null = 0, unit: 'ms' | 's' | 'min' | 'h' = 's') {
+  public constructor(value: number | null = 0, unit: 'ms' | 's' | 'min' | 'hour' = 's') {
     super(value, unit);
   }
 }

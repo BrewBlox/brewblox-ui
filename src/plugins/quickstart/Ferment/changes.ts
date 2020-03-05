@@ -558,7 +558,7 @@ export const defineDisplayedBlocks = (config: FermentConfig): DisplayBlock[] => 
       blockId: coolPid,
       opts: {
         showDialog: false,
-        color: '4e78f5',
+        color: '037cd5',
         name: withoutPrefix(config.prefix, coolPid),
       },
     },
@@ -566,7 +566,7 @@ export const defineDisplayedBlocks = (config: FermentConfig): DisplayBlock[] => 
       blockId: heatPid,
       opts: {
         showDialog: false,
-        color: 'ad1c47',
+        color: 'df2b35',
         name: withoutPrefix(config.prefix, heatPid),
       },
     },

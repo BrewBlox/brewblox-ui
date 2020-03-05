@@ -189,7 +189,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       data: {
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(-20, '1/degC'),
-        ti: new Time(2, 'h'),
+        ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
         enabled: true,
         inputId: new Link(config.names.beerSetpoint),
@@ -204,7 +204,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       data: {
         ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
         kp: new Unit(20, '1/degC'),
-        ti: new Time(2, 'h'),
+        ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
         enabled: true,
         inputId: new Link(config.names.beerSetpoint),
@@ -293,7 +293,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           data: {
             ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
             kp: new Unit(-20, '1/degC'),
-            ti: new Time(2, 'h'),
+            ti: new Time(2, 'hour'),
             td: new Time(5, 'min'),
             enabled: true,
             inputId: new Link(config.names.glycolSetpoint),
@@ -483,22 +483,25 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
 
 export const defineDisplayedBlocks = (config: GlycolConfig): DisplayBlock[] => {
   const { coolPid, heatPid } = config.names;
-  return [
+  const output = [
     {
       blockId: coolPid,
       opts: {
         showDialog: false,
-        color: '4e78f5',
+        color: '037cd5',
         name: withoutPrefix(config.prefix, coolPid),
       },
     },
-    {
+  ];
+  if (config.heated) {
+    output.push({
       blockId: heatPid,
       opts: {
         showDialog: false,
-        color: 'ad1c47',
+        color: 'df2b35',
         name: withoutPrefix(config.prefix, heatPid),
       },
-    },
-  ];
+    });
+  }
+  return output;
 };

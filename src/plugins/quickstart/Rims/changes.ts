@@ -350,7 +350,7 @@ export const defineDisplayedBlocks = (config: RimsConfig): DisplayBlock[] => {
       blockId: kettlePid,
       opts: {
         showDialog: false,
-        color: '4e78f5',
+        color: 'E1AC00',
         name: withoutPrefix(config.prefix, kettlePid),
       },
     },
@@ -358,7 +358,7 @@ export const defineDisplayedBlocks = (config: RimsConfig): DisplayBlock[] => {
       blockId: tubePid,
       opts: {
         showDialog: false,
-        color: 'ad1c47',
+        color: 'df2b35',
         name: withoutPrefix(config.prefix, tubePid),
       },
     },

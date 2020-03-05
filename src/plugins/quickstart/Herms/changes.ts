@@ -497,7 +497,7 @@ export const defineDisplayedBlocks = (config: HermsConfig): DisplayBlock[] => {
       blockId: hltPid,
       opts: {
         showDialog: false,
-        color: '4e78f5',
+        color: 'b50000',
         name: withoutPrefix(config.prefix, hltPid),
       },
     },
@@ -505,7 +505,7 @@ export const defineDisplayedBlocks = (config: HermsConfig): DisplayBlock[] => {
       blockId: mtPid,
       opts: {
         showDialog: false,
-        color: 'ad1c47',
+        color: '9c4b00',
         name: withoutPrefix(config.prefix, mtPid),
       },
     },
@@ -513,7 +513,7 @@ export const defineDisplayedBlocks = (config: HermsConfig): DisplayBlock[] => {
       blockId: bkPid,
       opts: {
         showDialog: false,
-        color: 'ad1c47',
+        color: 'c48600',
         name: withoutPrefix(config.prefix, bkPid),
       },
     },
