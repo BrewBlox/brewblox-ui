@@ -15,13 +15,22 @@ import { DisplaySettingsBlock } from './types';
 })
 export default class DisplaySettingsWidget
   extends BlockWidgetBase<DisplaySettingsBlock> {
+
+  clearSlots(): void {
+    this.block.data.widgets = [];
+    this.saveBlock();
+  }
 }
 </script>
 
 <template>
   <CardWrapper v-bind="{context}">
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+        <template #actions>
+          <ActionItem icon="clear" label="Clear slots" @click="clearSlots" />
+        </template>
+      </component>
     </template>
 
     <component :is="mode" :crud="crud" />
