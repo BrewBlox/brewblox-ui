@@ -8,7 +8,7 @@ import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { isSystemBlock } from '@/plugins/spark/block-types';
-import { startResetBlocks } from '@/plugins/spark/helpers';
+import { saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   Block,
@@ -50,6 +50,7 @@ interface ValidatedWidget {
 export default class SparkPage extends Vue {
   capitalized = capitalized;
   startResetBlocks = startResetBlocks;
+  saveHwInfo = saveHwInfo;
 
   volatileWidgets: { [blockId: string]: Widget } = {};
   blockFilter = '';
@@ -450,6 +451,11 @@ export default class SparkPage extends Vue {
             icon="mdi-file-export"
             label="Import/Export blocks"
             @click="startDialog('SparkImportMenu')"
+          />
+          <ActionItem
+            icon="mdi-power-plug"
+            label="Export hardware links"
+            @click="saveHwInfo(service.id)"
           />
           <ActionItem
             icon="delete"

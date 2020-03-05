@@ -1,17 +1,4 @@
-import { Link } from '@/helpers/units';
-import { Block } from '@/plugins/spark/types';
-
-export interface DisplaySlot {
-  pos: number;
-  color: string;
-  name: string;
-
-  // Value will be one of these
-  tempSensor?: Link;
-  setpointSensorPair?: Link;
-  actuatorAnalog?: Link;
-  pid?: Link;
-}
+import { Block, DisplaySlot } from '@/plugins/spark/types';
 
 export enum DisplayTempUnit {
   Celsius = 0,

@@ -12,7 +12,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
 import WizardTaskBase from '../components/WizardTaskBase';
-import { maybeSpace } from '../helpers';
+import { withPrefix } from '../helpers';
 import { GlycolBlockNames, GlycolConfig } from './types';
 
 
@@ -92,7 +92,7 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
   get names(): GlycolBlockNames {
     return {
       ...mapValues(this.defaultNames,
-        v => suggestId(maybeSpace(this.prefix, v), ruleValidator(blockIdRules(this.serviceId)))),
+        v => suggestId(withPrefix(this.prefix, v), ruleValidator(blockIdRules(this.serviceId)))),
       ...this.chosenNames,
     };
   }

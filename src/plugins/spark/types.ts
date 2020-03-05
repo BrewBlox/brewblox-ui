@@ -143,6 +143,29 @@ export interface IoPin {
   [key: string]: IoChannel;
 }
 
+
+export interface DisplaySlot {
+  pos: number;
+  color: string;
+  name: string;
+
+  // Value will be one of these
+  tempSensor?: Link;
+  setpointSensorPair?: Link;
+  actuatorAnalog?: Link;
+  pid?: Link;
+}
+
+
+export interface DisplayOpts {
+  color: string;
+  name: string;
+  pos?: number;
+  unique: boolean;
+  showNotify: boolean;
+  showDialog: boolean;
+}
+
 export type AnalogConstraintKey = 'min' | 'max' | 'balanced';
 
 export interface MinConstraint {

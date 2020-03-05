@@ -1,7 +1,8 @@
+import range from 'lodash/range';
 import { VueConstructor } from 'vue';
 
 import { ref } from '@/helpers/component-ref';
-import { createDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import {
   base64ToHex,
   dateString,
@@ -19,8 +20,9 @@ import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Crud, WidgetFeature } from '@/store/features';
 
-import { blockTypes } from './block-types';
-import { BlockConfig, BlockCrud } from './types';
+import { blockTypes, interfaceTypes } from './block-types';
+import { DisplaySettingsBlock } from './features/DisplaySettings/types';
+import { Block, BlockConfig, BlockCrud, DisplayOpts, DisplaySlot } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -66,51 +68,137 @@ export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['c
   };
 };
 
+const isCompatible = (block: Block, intf: string): boolean => {
+  const compatible = sparkStore.compatibleTypes(block.serviceId);
+  return block.type === intf || !!compatible[intf].includes(block.type);
+};
+
+export const canDisplay = (block: Block): boolean => {
+  if (!block) { return false; }
+  const compatible = sparkStore.compatibleTypes(block.serviceId);
+  const { TempSensor, SetpointSensorPair, ActuatorAnalog } = interfaceTypes;
+  return [
+    TempSensor, ...compatible[TempSensor],
+    SetpointSensorPair, ...compatible[SetpointSensorPair],
+    ActuatorAnalog, ...compatible[ActuatorAnalog],
+    blockTypes.Pid,
+  ]
+    .includes(block.type);
+};
+
+const displayBlock = (serviceId: string | undefined): DisplaySettingsBlock | undefined =>
+  serviceId
+    ? sparkStore.blockValues(serviceId).find(v => v.type === blockTypes.DisplaySettings)
+    : undefined;
+
+export const isDisplayed = (block: Block): boolean =>
+  !!displayBlock(block.serviceId)?.data.widgets
+    .find(w => Object.values(w).find(v => v instanceof Link && v.id === block.id));
+
+export const tryDisplayBlock = async (block: Block, options: Partial<DisplayOpts> = {}): Promise<void> => {
+  const display = displayBlock(block?.serviceId);
+  if (!block || !display) { return; }
+
+  const { widgets } = display.data;
+  const takenPos = widgets.map(w => w.pos);
+  const opts: DisplayOpts = {
+    pos: range(1, 7).find(v => !takenPos.includes(v)),
+    color: '4169E1',
+    name: block.id,
+    unique: true,
+    showNotify: true,
+    showDialog: true,
+    ...options,
+  };
+
+  if (!canDisplay(block)) {
+    notify.warn(`Block '${block.id}' can't be shown on the Spark display`, { shown: opts.showNotify });
+  }
+  else if (opts.unique && isDisplayed(block)) {
+    notify.info(`Block '${block.id}' is already shown on the Spark display`, { shown: opts.showNotify });
+  }
+  else if (!opts.pos) {
+    notify.info('Spark display is already full', { shown: opts.showNotify });
+  }
+  else {
+    const link = new Link(block.id, block.type);
+    const slot: DisplaySlot = {
+      pos: opts.pos,
+      color: opts.color,
+      name: opts.name.slice(0, 15),
+    };
+    if (isCompatible(block, interfaceTypes.TempSensor)) {
+      slot.tempSensor = link;
+    }
+    else if (isCompatible(block, interfaceTypes.SetpointSensorPair)) {
+      slot.setpointSensorPair = link;
+    }
+    else if (isCompatible(block, interfaceTypes.ActuatorAnalog)) {
+      slot.actuatorAnalog = link;
+    }
+    else if (isCompatible(block, blockTypes.Pid)) {
+      slot.pid = link;
+    }
+
+    display.data.widgets = [slot, ...display.data.widgets.filter(w => w.pos !== opts.pos)];
+    await sparkStore.saveBlock(display);
+    notify.info(`Added block '${block.id}' to the Spark display`, { shown: opts.showNotify });
+  }
+
+  if (opts.showDialog) {
+    createBlockDialog(display);
+  }
+};
+
+const linkedTypes = [
+  blockTypes.DigitalActuator,
+  blockTypes.MotorValve,
+];
+
+const addressedTypes = [
+  blockTypes.TempSensorOneWire,
+  blockTypes.DS2408,
+  blockTypes.DS2413,
+];
+
+export const saveHwInfo = (serviceId: string): void => {
+  const linked: string[] = [];
+  const addressed: string[] = [];
+
+  sparkStore.blockValues(serviceId)
+    .forEach(block => {
+      if (linkedTypes.includes(block.type)) {
+        const { hwDevice, channel } = block.data;
+        if (!hwDevice.id || !channel) { return; }
+        const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
+        const pin = target.data.pins[channel - 1];
+        if (pin !== undefined) {
+          const [name] = Object.keys(pin);
+          linked.push(`${block.id}: ${target.id} ${name}`);
+        }
+      }
+      if (addressedTypes.includes(block.type)) {
+        addressed.push(`${block.id}: ${block.data.address}`);
+      }
+    });
+
+  const lines = [
+    `Service: ${serviceId}`,
+    `Date: ${new Date().toLocaleString()}`,
+    '\n[Actuators]',
+    ...linked,
+    '\n[OneWire addresses]',
+    ...addressed,
+  ];
+  saveFile(lines.join('\n'), `spark-hardware-${serviceId}.txt`, true);
+};
+
 export const resetBlocks = async (serviceId: string, opts: { restore: boolean; download: boolean }): Promise<void> => {
   try {
     const addresses: Mapped<string> = {};
-    const linkedTypes = [
-      blockTypes.DigitalActuator,
-      blockTypes.MotorValve,
-    ];
-    const addressedTypes = [
-      blockTypes.TempSensorOneWire,
-      blockTypes.DS2408,
-      blockTypes.DS2413,
-    ];
 
     if (opts.download) {
-      const linked: string[] = [];
-      const addressed: string[] = [];
-
-      sparkStore.blockValues(serviceId)
-        .forEach(block => {
-          if (linkedTypes.includes(block.type)) {
-            const { hwDevice, channel } = block.data;
-            if (!hwDevice.id || !channel) { return; }
-            const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
-            const pin = target.data.pins[channel];
-            if (pin !== undefined) {
-              const [name] = Object.keys(pin);
-              linked.push(`${block.id}: ${target.id} ${name}`);
-            }
-          }
-
-          if (addressedTypes.includes(block.type)) {
-            addressed.push(`${block.id}: ${block.data.address}`);
-          }
-
-        });
-
-      const lines = [
-        `Service: ${serviceId}`,
-        `Date: ${new Date().toLocaleString()}`,
-        '\n[Actuators]',
-        ...linked,
-        '\n[OneWire addresses]',
-        ...addressed,
-      ];
-      saveFile(lines.join('\n'), `spark-hardware-${serviceId}.txt`, true);
+      saveHwInfo(serviceId);
     }
 
     if (opts.restore) {

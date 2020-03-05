@@ -28,7 +28,7 @@ export default class GraphCardWrapper extends Vue {
     </CardWrapper>
     <q-btn
       dense
-      :class="['col-auto graph-tab show',{collapsed}]"
+      :class="['col-auto graph-tab show self-center',{collapsed}]"
       :icon="collapsed ? 'mdi-chart-line' : 'mdi-arrow-collapse-left'"
       @click="collapsed = !collapsed"
     >

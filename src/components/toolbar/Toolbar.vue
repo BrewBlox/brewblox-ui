@@ -21,7 +21,7 @@ export default class Toolbar extends Vue {
 </script>
 
 <template>
-  <div class="row no-wrap full-height">
+  <div class="row no-wrap full-height items-center">
     <q-icon v-if="icon" :name="icon" class="col-auto self-center q-px-sm" size="sm" />
     <div class="col no-wrap row ellipsis q-px-xs text-h6 items-center">
       <div

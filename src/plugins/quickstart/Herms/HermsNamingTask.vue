@@ -12,7 +12,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
 import WizardTaskBase from '../components/WizardTaskBase';
-import { maybeSpace } from '../helpers';
+import { withPrefix } from '../helpers';
 import { HermsBlockNames, HermsConfig } from './types';
 
 
@@ -93,7 +93,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   get names(): HermsBlockNames {
     return {
       ...mapValues(this.defaultNames,
-        v => suggestId(maybeSpace(this.prefix, v), ruleValidator(blockIdRules(this.serviceId)))),
+        v => suggestId(withPrefix(this.prefix, v), ruleValidator(blockIdRules(this.serviceId)))),
       ...this.chosenNames,
     };
   }

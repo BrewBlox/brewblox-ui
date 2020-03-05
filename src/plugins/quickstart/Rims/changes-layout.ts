@@ -2,14 +2,14 @@ import { uid } from 'quasar';
 
 import { BuilderLayout } from '@/plugins/builder/types';
 
-import { maybeSpace } from '../helpers';
+import { withPrefix } from '../helpers';
 import { RimsConfig } from './types';
 
 export function defineLayouts(config: RimsConfig): BuilderLayout[] {
   return [
     {
       id: uid(),
-      title: maybeSpace(config.prefix, 'Layout'),
+      title: withPrefix(config.prefix, 'Layout'),
       width: 12,
       height: 12,
       parts: [

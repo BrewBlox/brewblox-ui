@@ -1,20 +1,26 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Temp, Unit } from '@/helpers/units';
+import { Temp } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';
-import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { FermentConfig, FermentOpts } from './types';
 
 @Component
 export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
-  fridgeSetting = new Unit(20, 'degC');
-  beerSetting = new Unit(20, 'degC');
+  fridgeSetting = new Temp(20, 'degC');
+  beerSetting = new Temp(20, 'degC');
   activeSetpoint: 'beer' | 'fridge' = 'beer';
+
+  created(): void {
+    const unit = sparkStore.units(this.config.serviceId).Temp;
+    this.fridgeSetting = this.fridgeSetting.convert(unit);
+    this.beerSetting = this.beerSetting.convert(unit);
+  }
 
   get targetOpts(): SelectOption[] {
     return [
@@ -39,6 +45,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, opts, layouts);
+    const displayedBlocks = defineDisplayedBlocks(this.config);
 
     this.pushActions(createOutputActions());
     this.updateConfig({
@@ -47,15 +54,9 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
       widgets,
       changedBlocks,
       createdBlocks,
+      displayedBlocks,
     });
     this.next();
-  }
-
-  created(): void {
-    const defaultTemp = new Temp(20, 'degC')
-      .convert(sparkStore.units(this.config.serviceId).Temp);
-    this.fridgeSetting = defaultTemp.copy();
-    this.beerSetting = defaultTemp.copy();
   }
 }
 </script>
