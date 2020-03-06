@@ -1,3 +1,5 @@
+import { VueConstructor } from 'vue';
+
 import { StoreObject } from '@/plugins/database';
 
 export type AutomationStatus = 'Created' | 'Started' | 'Done' | 'Cancelled' | 'Unknown';
@@ -137,6 +139,16 @@ export interface AutomationProcess extends AutomationTemplate {
   end: Datum;
   status: AutomationStatus;
   results: AutomationStepResult[];
+}
+
+// UI
+//////////////
+
+export interface AutomationSpec<T extends AutomationImpl = AutomationImpl> {
+  type: T['type'];
+  title: string;
+  generate: () => T;
+  component: VueConstructor;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

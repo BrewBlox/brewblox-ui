@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import AutomationItemBase from '../components/AutomationItemBase';
-import { TimeAbsoluteImpl } from '../types';
+import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
+import { TimeAbsoluteImpl } from '@/plugins/automation/types';
 
 
 @Component

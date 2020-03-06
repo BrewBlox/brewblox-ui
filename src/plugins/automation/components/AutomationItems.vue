@@ -5,15 +5,10 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { spaceCased } from '@/helpers/functional';
 
-import { actionComponents } from '../actions';
-import { conditionComponents } from '../conditions';
+import { allSpecs } from '../impl/specs';
 import { AutomationItem } from '../types';
 import AutomationItemUnknown from './AutomationItemUnknown.vue';
 
-const allComponents = {
-  ...actionComponents,
-  ...conditionComponents,
-};
 
 @Component
 export default class AutomationItems extends Vue {
@@ -25,7 +20,7 @@ export default class AutomationItems extends Vue {
   public readonly label!: string;
 
   renderComponent(item: AutomationItem): VueConstructor {
-    return allComponents[item.impl.type] ?? AutomationItemUnknown;
+    return allSpecs[item.impl.type]?.component ?? AutomationItemUnknown;
   }
 
   add(): void {
@@ -49,7 +44,7 @@ export default class AutomationItems extends Vue {
   }
 
   subtitle(item: AutomationItem): string {
-    return spaceCased(item.impl.type);
+    return allSpecs[item.impl.type]?.title ?? 'Unknown';
   }
 
   startChangeTitle(item: AutomationItem): void {

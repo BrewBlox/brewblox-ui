@@ -2,11 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
+import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
+import { BlockPatchImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, ChangeField } from '@/plugins/spark/types';
-
-import AutomationItemBase from '../components/AutomationItemBase';
-import { BlockPatchImpl } from '../types';
 
 @Component
 export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {

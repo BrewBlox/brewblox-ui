@@ -5,11 +5,10 @@ import { objReducer } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { parsePostfixed, propertyNameWithoutUnit } from '@/helpers/units/parseObject';
 import PostFixed from '@/helpers/units/PostFixed';
+import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
+import { BlockValueImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, ChangeField } from '@/plugins/spark/types';
-
-import AutomationItemBase from '../components/AutomationItemBase';
-import { BlockValueImpl } from '../types';
 
 type CompareOperator = BlockValueImpl['operator'];
 

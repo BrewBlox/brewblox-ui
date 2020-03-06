@@ -2,9 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import { durationMs, durationString } from '@/helpers/functional';
-
-import AutomationItemBase from '../components/AutomationItemBase';
-import { TimeElapsedImpl } from '../types';
+import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
+import { TimeElapsedImpl } from '@/plugins/automation/types';
 
 @Component
 export default class TimeElapsed extends AutomationItemBase<TimeElapsedImpl> {

@@ -2,9 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-
-import AutomationItemBase from '../components/AutomationItemBase';
-import { TaskCreateImpl } from '../types';
+import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
+import { TaskCreateImpl } from '@/plugins/automation/types';
 
 @Component
 export default class TaskCreate extends AutomationItemBase<TaskCreateImpl> {
