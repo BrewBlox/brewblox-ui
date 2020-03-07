@@ -82,7 +82,7 @@ export default class PidFull
 
     <div class="widget-body row">
       <!-- Input row -->
-      <BlockField
+      <LinkField
         :value="block.data.inputId"
         :service-id="serviceId"
         :html="true"
@@ -145,7 +145,7 @@ export default class PidFull
       <!-- Output row -->
       <div class="col-break" />
 
-      <BlockField
+      <LinkField
         :value="block.data.outputId"
         :service-id="serviceId"
         :html="true"

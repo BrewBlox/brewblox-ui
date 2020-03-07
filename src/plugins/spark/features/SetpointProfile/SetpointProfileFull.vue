@@ -215,7 +215,7 @@ export default class SetpointProfileFull
         class="col-grow"
         @input="updateStartTime"
       />
-      <BlockField
+      <LinkField
         :value="block.data.targetId"
         :service-id="serviceId"
         label="Driven Setpoint"

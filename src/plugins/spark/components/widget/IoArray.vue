@@ -136,7 +136,7 @@ export default class IoArray extends BlockCrudComponent {
           Not set
         </div>
       </div>
-      <BlockField
+      <LinkField
         :value="driverLink(channel)"
         :service-id="serviceId"
         title="Driver"

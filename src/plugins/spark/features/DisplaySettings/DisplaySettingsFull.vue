@@ -47,12 +47,12 @@ export default class DisplaySettingsFull
     };
   }
 
-  get linkFilter() {
-    return block =>
-      isCompatible(block.type, blockTypes.Pid)
-      || isCompatible(block.type, interfaceTypes.TempSensor)
-      || isCompatible(block.type, interfaceTypes.SetpointSensorPair)
-      || isCompatible(block.type, interfaceTypes.ActuatorAnalog);
+  get typeFilter() {
+    return type =>
+      isCompatible(type, blockTypes.Pid)
+      || isCompatible(type, interfaceTypes.TempSensor)
+      || isCompatible(type, interfaceTypes.SetpointSensorPair)
+      || isCompatible(type, interfaceTypes.ActuatorAnalog);
   }
 
   updateSlotLink(idx: number, link: Link): void {
@@ -122,12 +122,10 @@ export default class DisplaySettingsFull
           :style="`border: 2px solid ${slotColor(slot)}; grid-column-end: span 1`"
           class="q-pa-sm column q-gutter-y-xs"
         >
-          <BlockField
+          <LinkField
             :value="slotLink(slot)"
-            :filter="linkFilter"
+            :type-filter="typeFilter"
             :service-id="serviceId"
-            no-create
-            no-show
             title="Block"
             label="Block"
             @input="v => updateSlotLink(idx, v)"

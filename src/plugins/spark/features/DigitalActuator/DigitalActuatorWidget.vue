@@ -104,7 +104,7 @@ export default class DigitalActuatorWidget
         <template v-if="mode === 'Full'">
           <div class="col-break" />
 
-          <BlockField
+          <LinkField
             :value="block.data.hwDevice"
             :service-id="serviceId"
             title="Pin Array"

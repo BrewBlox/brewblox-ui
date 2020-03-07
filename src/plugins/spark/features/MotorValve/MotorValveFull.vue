@@ -75,7 +75,7 @@ export default class MotorValveFull
     <slot name="warnings" />
 
     <div class="widget-body row">
-      <BlockField
+      <LinkField
         :value="block.data.hwDevice"
         :service-id="serviceId"
         title="Target DS2408 Chip"

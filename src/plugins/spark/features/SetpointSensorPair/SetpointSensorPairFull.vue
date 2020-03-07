@@ -110,7 +110,7 @@ export default class SetpointSensorPairForm
 
       <div class="col-break" />
 
-      <BlockField
+      <LinkField
         :value="block.data.sensorId"
         :service-id="serviceId"
         title="Sensor Block"

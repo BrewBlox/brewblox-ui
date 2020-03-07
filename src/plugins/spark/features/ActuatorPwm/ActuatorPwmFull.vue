@@ -71,7 +71,7 @@ export default class ActuatorPwmFull
         class="col-grow"
         @input="v => { block.data.period = v; saveBlock(); }"
       />
-      <BlockField
+      <LinkField
         :value="block.data.actuatorId"
         :service-id="serviceId"
         title="target"

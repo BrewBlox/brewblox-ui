@@ -91,7 +91,7 @@ export default class AnalogConstraints extends Vue {
       :key="idx"
       :class="['row q-gutter-x-sm constraint', {limiting: constraint.limiting}]"
     >
-      <BlockField
+      <LinkField
         v-if="type === 'balanced'"
         :service-id="serviceId"
         :value="constraint.balanced.balancerId"
@@ -135,7 +135,7 @@ export default class AnalogConstraints extends Vue {
 
 <style lang="sass" scoped>
 .limiting
-  color: orange;
+  color: orange
 
 .constraint:nth-child(even) > label
   background: rgba($green-5, 0.05)

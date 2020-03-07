@@ -148,7 +148,7 @@ export default class ValveArray extends BlockCrudComponent {
           Not set
         </div>
       </div>
-      <BlockField
+      <LinkField
         :value="driverLink(channel)"
         :service-id="serviceId"
         title="Driver"

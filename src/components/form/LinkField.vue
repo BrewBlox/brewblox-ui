@@ -10,7 +10,7 @@ import FieldBase from '../FieldBase';
 
 
 @Component
-export default class BlockField extends FieldBase {
+export default class LinkField extends FieldBase {
 
   @Prop({ type: Object, required: true, validator: v => v instanceof Link })
   public readonly value!: Link;
@@ -24,20 +24,20 @@ export default class BlockField extends FieldBase {
   @Prop({ type: String, default: 'Block' })
   public readonly label!: string;
 
-  @Prop({ type: Function, default: null })
-  readonly filter!: (block: Block) => boolean;
+  @Prop({ type: Boolean, default: true })
+  public readonly clearable!: boolean;
+
+  @Prop({ type: Function, required: false })
+  readonly typeFilter!: (type: string) => boolean;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly anyService!: string;
 
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
 
   @Prop({ type: Boolean, default: false })
-  public readonly noShow!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly noEdit!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
+  public readonly noConfigure!: boolean;
 
   save(val: Link): void {
     this.$emit('input', val);
@@ -48,9 +48,7 @@ export default class BlockField extends FieldBase {
   }
 
   get linkBlock(): Block | null {
-    return this.value && this.value.id
-      ? sparkStore.tryBlockById(this.serviceId, this.value.id)
-      : null;
+    return sparkStore.tryBlockById(this.serviceId, this.value.id);
   }
 
   editBlock(): void {
@@ -69,12 +67,12 @@ export default class BlockField extends FieldBase {
       title: this.title,
       message: this.message,
       html: this.html,
-      filter: this.filter,
+      typeFilter: this.typeFilter,
       value: this.value,
       serviceId: this.serviceId,
       label: this.label,
       noCreate: this.noCreate,
-      noEdit: this.noEdit,
+      noConfigure: this.noConfigure,
     })
       .onOk(this.save);
   }
@@ -87,7 +85,7 @@ export default class BlockField extends FieldBase {
       {{ displayValue | truncated }}
     </slot>
     <template #append>
-      <q-btn v-if="linkBlock && !noShow" flat round icon="mdi-launch" @click.stop="editBlock">
+      <q-btn v-if="!noConfigure && linkBlock" flat round icon="mdi-launch" @click.stop="editBlock">
         <q-tooltip>Show {{ value.id }}</q-tooltip>
       </q-btn>
     </template>

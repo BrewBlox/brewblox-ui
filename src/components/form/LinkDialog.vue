@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
@@ -7,10 +6,9 @@ import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
+import { isCompatible } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-
-import { isCompatible } from '../../plugins/spark/block-types';
 
 @Component
 export default class LinkDialog extends DialogBase {
@@ -25,8 +23,8 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: String, default: 'Link' })
   public readonly label!: string;
 
-  @Prop({ type: Function })
-  readonly filter!: (link: Link) => boolean;
+  @Prop({ type: Function, required: false })
+  readonly typeFilter!: (type: string) => boolean;
 
   @Prop({ type: Boolean, default: false })
   public readonly clearable!: boolean;
@@ -35,19 +33,22 @@ export default class LinkDialog extends DialogBase {
   public readonly noCreate!: boolean;
 
   @Prop({ type: Boolean, default: false })
-  public readonly noEdit!: boolean;
+  public readonly noConfigure!: boolean;
 
-  get actualFilter(): (link: Link) => boolean {
-    if (this.filter) {
-      return this.filter;
-    }
-    return block => isCompatible(block.type, this.value.type);
+  created(): void {
+    this.link = this.value.copy();
+  }
+
+  get actualFilter(): ((type: string) => boolean) {
+    return this.typeFilter
+      ? this.typeFilter
+      : type => isCompatible(type, this.value.type);
   }
 
   get linkOpts(): Link[] {
     return sparkStore.blockValues(this.serviceId)
+      .filter(block => this.actualFilter(block.type))
       .map(block => new Link(block.id, block.type))
-      .filter(this.actualFilter)
       .sort(objectStringSorter('id'));
   }
 
@@ -70,16 +71,12 @@ export default class LinkDialog extends DialogBase {
       component: 'BlockWizardDialog',
       parent: this,
       serviceId: this.serviceId,
-      filter: feat => isCompatible(feat, this.value.type),
+      filter: this.actualFilter,
     })
       .onOk((block: Block) => {
         // Retain original type
         this.link = new Link(block.id, this.value.type);
       });
-  }
-
-  created(): void {
-    this.link = this.value.copy();
   }
 }
 </script>
@@ -111,7 +108,7 @@ export default class LinkDialog extends DialogBase {
           </q-item>
         </template>
         <template #after>
-          <q-btn v-if="linkBlock && !noEdit" flat round icon="mdi-launch" @click="edit">
+          <q-btn v-if="!noConfigure && linkBlock" flat round icon="mdi-launch" @click="edit">
             <q-tooltip>Edit {{ link.id }}</q-tooltip>
           </q-btn>
           <q-btn v-else disable flat round icon="mdi-launch" />
