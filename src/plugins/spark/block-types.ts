@@ -128,6 +128,45 @@ export const interfaceTypes = {
   IoArray: 'IoArrayInterface',
 };
 
+export const compatibleTypes = {
+  [interfaceTypes.ProcessValue]: [
+    blockTypes.ActuatorAnalogMock,
+    blockTypes.ActuatorPwm,
+    blockTypes.SetpointSensorPair,
+  ],
+  [interfaceTypes.TempSensor]: [
+    blockTypes.TempSensorMock,
+    blockTypes.TempSensorOneWire,
+  ],
+  [interfaceTypes.SetpointSensorPair]: [
+    blockTypes.SetpointSensorPair,
+  ],
+  [interfaceTypes.ActuatorAnalog]: [
+    blockTypes.ActuatorAnalogMock,
+    blockTypes.SetpointDriver,
+    blockTypes.ActuatorPwm,
+  ],
+  [interfaceTypes.ActuatorDigital]: [
+    blockTypes.DigitalActuator,
+    blockTypes.MotorValve,
+  ],
+  [interfaceTypes.Balancer]: [
+    blockTypes.Balancer,
+  ],
+  [interfaceTypes.IoArray]: [
+    blockTypes.DS2408,
+    blockTypes.DS2413,
+    blockTypes.Spark2Pins,
+    blockTypes.Spark3Pins,
+  ],
+};
+
+export const isCompatible = (type: string | null, intf: string | null): boolean => {
+  if (intf === null) { return true; }
+  if (type === null) { return false; }
+  return type === intf || !!compatibleTypes[intf]?.includes(type);
+};
+
 export const isSystemBlock =
   ({ type }: { type: string }): boolean =>
     systemBlockTypes[type] !== undefined;

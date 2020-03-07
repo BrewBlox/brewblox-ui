@@ -9,6 +9,7 @@ import { sparkType } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
+import { isCompatible } from '../../spark/block-types';
 import { settingsLink } from '../helpers';
 import { LinkedBlock } from '../types';
 import PartCard from './PartCard';
@@ -74,22 +75,15 @@ export default class LinkedBlockCard extends PartCard {
     return this.linked.serviceId;
   }
 
-  get compatibleTypes(): string[] {
-    if (!this.sparkServices.length) {
-      return [];
-    }
-    const compatibleTable = sparkStore.compatibleTypes(this.sparkServices[0].id);
-    return [
-      ...this.types,
-      ...this.types.flatMap(type => get(compatibleTable, type, [])),
-    ];
+  get typeFilter(): (type: string | null) => boolean {
+    return type => this.types.some(intf => isCompatible(type, intf));
   }
 
   get actualFilter(): (link: Link) => boolean {
     if (this.filter) {
       return this.filter;
     }
-    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type || '');
+    return block => this.typeFilter(block.type);
   }
 
   createBlock(serviceId: string): void {
@@ -97,7 +91,7 @@ export default class LinkedBlockCard extends PartCard {
       component: 'BlockWizardDialog',
       parent: this,
       serviceId,
-      filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
+      filter: this.typeFilter,
     })
       .onOk(block => {
         this.linked = { serviceId, blockId: block.id };

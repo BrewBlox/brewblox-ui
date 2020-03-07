@@ -10,6 +10,8 @@ import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
+import { isCompatible } from '../../plugins/spark/block-types';
+
 @Component
 export default class LinkDialog extends DialogBase {
   link: Link | null = null
@@ -35,19 +37,11 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: Boolean, default: false })
   public readonly noEdit!: boolean;
 
-  get compatibleTypes(): string[] | null {
-    if (!this.value.type) {
-      return null;
-    }
-    const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
-    return [this.value.type, ...get(compatibleTable, this.value.type, [])];
-  }
-
   get actualFilter(): (link: Link) => boolean {
     if (this.filter) {
       return this.filter;
     }
-    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type || '');
+    return block => isCompatible(block.type, this.value.type);
   }
 
   get linkOpts(): Link[] {
@@ -76,7 +70,7 @@ export default class LinkDialog extends DialogBase {
       component: 'BlockWizardDialog',
       parent: this,
       serviceId: this.serviceId,
-      filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
+      filter: feat => isCompatible(feat, this.value.type),
     })
       .onOk((block: Block) => {
         // Retain original type

@@ -2,7 +2,7 @@
 import { del, get, post, put } from '@/helpers/fetch';
 import notify from '@/helpers/notify';
 
-import { ApiSparkStatus, Block, DataBlock, SparkStatus, UnitAlternatives, UserUnits } from '../types';
+import { ApiSparkStatus, Block, DataBlock, SparkStatus, UserUnits } from '../types';
 import { asBlock, asDataBlock } from './helpers';
 
 const intercept =
@@ -75,7 +75,7 @@ export const persistUnits = async (serviceId: string, units: UserUnits): Promise
   put(`/${encodeURIComponent(serviceId)}/codec/units`, units)
     .catch(intercept(`Failed to persist unit settings on ${serviceId}`));
 
-export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlternatives> =>
+export const fetchCompatibleUnits = async (serviceId: string): Promise<Mapped<string[]>> =>
   get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`)
     .catch(intercept(`Failed to fetch unit alternatives on ${serviceId}`));
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
+import { isCompatible } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 
 import ValEditBase from '../ValEditBase';
@@ -13,17 +13,9 @@ export default class LinkValEdit extends ValEditBase {
   field!: Link;
   filtered: string[] | null = null;
 
-  get compatibleTypes(): string[] | null {
-    if (!this.field.type) {
-      return null;
-    }
-    const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
-    return [this.field.type, ...get(compatibleTable, this.field.type, [])];
-  }
-
   get blockIdOpts(): string[] {
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => !this.compatibleTypes || this.compatibleTypes.includes(block.type))
+      .filter(block => isCompatible(block.type, this.field.type))
       .map(block => block.id);
   }
 

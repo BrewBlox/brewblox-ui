@@ -22,7 +22,7 @@ export default class UnitValEdit extends ValEditBase {
 
   get unitOpts(): { label: string; value: string }[] {
     const vals =
-      Object.values(sparkStore.unitAlternatives(this.serviceId)).find(vals => vals.includes(this.field.unit)) || [];
+      Object.values(sparkStore.compatibleUnits(this.serviceId)).find(vals => vals.includes(this.field.unit)) || [];
 
     return vals.map(v => ({ label: prettify(v), value: v }));
   }

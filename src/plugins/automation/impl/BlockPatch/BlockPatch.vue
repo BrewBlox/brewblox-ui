@@ -5,7 +5,7 @@ import { Link } from '@/helpers/units';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockPatchImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockSpec, ChangeField } from '@/plugins/spark/types';
+import { BlockAddress, BlockSpec, ChangeField } from '@/plugins/spark/types';
 
 @Component
 export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
@@ -14,13 +14,19 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
     return sparkStore.specs[this.impl.blockType];
   }
 
-  get link(): Link {
-    return new Link(this.impl.blockId, this.impl.blockType);
+  get addr(): BlockAddress {
+    return {
+      id: this.impl.blockId,
+      serviceId: this.impl.serviceId,
+      type: this.impl.blockType,
+    };
   }
 
-  set link(val: Link) {
+  set addr(val: BlockAddress) {
     if (val.id !== null) {
       this.impl.blockId = val.id;
+      this.impl.serviceId = val.serviceId;
+      this.impl.blockType = val.type ?? this.impl.blockType;
       this.save();
     }
   }
@@ -52,10 +58,10 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
 <template>
   <div class="column q-gutter-xs">
-    <BlockField
-      v-model="link"
-      :service-id="impl.serviceId"
-      :clearable="false"
+    <BlockAddressField
+      v-model="addr"
+      any-service
+      clearable
     />
 
     <div

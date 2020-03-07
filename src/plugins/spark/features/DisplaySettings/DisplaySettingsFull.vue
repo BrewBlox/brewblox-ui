@@ -2,12 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
-import { blockTypes, interfaceTypes } from '@/plugins/spark/block-types';
+import { blockTypes, interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DisplaySettingsBlock } from '@/plugins/spark/features/DisplaySettings/types';
-import { CompatibleTypes, DisplaySlot } from '@/plugins/spark/types';
-
-import { sparkStore } from '../../store';
+import { DisplaySlot } from '@/plugins/spark/types';
 
 @Component
 export default class DisplaySettingsFull
@@ -25,14 +23,6 @@ export default class DisplaySettingsFull
     this.block.data.widgets
       .forEach(w => { slots[w.pos - 1] = w; });
     return slots;
-  }
-
-  get compatible(): CompatibleTypes {
-    return sparkStore.compatibleTypes(this.serviceId);
-  }
-
-  isCompatible(type: string, intf: string): boolean {
-    return type === intf || !!this.compatible[intf]?.includes(type);
   }
 
   slotLink(slot: DisplaySlot): Link {
@@ -58,13 +48,11 @@ export default class DisplaySettingsFull
   }
 
   get linkFilter() {
-    const validDisplayTypes = [
-      ...this.compatible[interfaceTypes.TempSensor],
-      ...this.compatible[interfaceTypes.SetpointSensorPair],
-      ...this.compatible[interfaceTypes.ActuatorAnalog],
-      blockTypes.Pid,
-    ];
-    return block => validDisplayTypes.includes(block.type);
+    return block =>
+      isCompatible(block.type, blockTypes.Pid)
+      || isCompatible(block.type, interfaceTypes.TempSensor)
+      || isCompatible(block.type, interfaceTypes.SetpointSensorPair)
+      || isCompatible(block.type, interfaceTypes.ActuatorAnalog);
   }
 
   updateSlotLink(idx: number, link: Link): void {
@@ -86,16 +74,16 @@ export default class DisplaySettingsFull
       name: existing?.name || link.id.slice(0, 15),
     };
 
-    if (this.isCompatible(type, interfaceTypes.TempSensor)) {
+    if (isCompatible(type, interfaceTypes.TempSensor)) {
       obj.tempSensor = link;
     }
-    else if (this.isCompatible(type, interfaceTypes.SetpointSensorPair)) {
+    else if (isCompatible(type, interfaceTypes.SetpointSensorPair)) {
       obj.setpointSensorPair = link;
     }
-    else if (this.isCompatible(type, interfaceTypes.ActuatorAnalog)) {
+    else if (isCompatible(type, interfaceTypes.ActuatorAnalog)) {
       obj.actuatorAnalog = link;
     }
-    else if (this.isCompatible(type, blockTypes.Pid)) {
+    else if (isCompatible(type, blockTypes.Pid)) {
       obj.pid = link;
     }
 

@@ -45,6 +45,12 @@ export interface SparkConfig {
 
 export type SparkService = Service<SparkConfig>;
 
+export interface BlockAddress {
+  serviceId: string;
+  id: string | null;
+  type: string | null;
+}
+
 export interface DataBlock {
   id: string;
   nid?: number;
@@ -53,8 +59,10 @@ export interface DataBlock {
   data: any;
 }
 
-export interface Block extends DataBlock {
+export interface Block extends DataBlock, BlockAddress {
   serviceId: string;
+  id: string;
+  type: string;
 }
 
 export interface BlockConfig {
@@ -75,17 +83,9 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
-export interface UserUnits {
-  [key: string]: string;
-}
+export type UserUnitKey = 'Temp' | 'Time' | 'LongTime';
 
-export interface UnitAlternatives {
-  [key: string]: string[];
-}
-
-export interface CompatibleTypes {
-  [key: string]: string[];
-}
+export type UserUnits = Record<UserUnitKey, string>;
 
 /**
  * As sent/pushed by the devcon-spark service
