@@ -2,8 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import Unit, { prettify } from '@/helpers/units/Unit';
-import { sparkStore } from '@/plugins/spark/store';
 
+import { userUnitChoices } from '../../getters';
 import ValEditBase from '../ValEditBase';
 
 @Component
@@ -21,8 +21,9 @@ export default class UnitValEdit extends ValEditBase {
   }
 
   get unitOpts(): { label: string; value: string }[] {
-    const vals =
-      Object.values(sparkStore.compatibleUnits(this.serviceId)).find(vals => vals.includes(this.field.unit)) || [];
+    const vals = Object.values(userUnitChoices)
+      .find(vals => vals.includes(this.field.unit))
+      ?? [];
 
     return vals.map(v => ({ label: prettify(v), value: v }));
   }

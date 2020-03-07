@@ -53,7 +53,7 @@ export default class BlockAddressField extends FieldBase {
   }
 
   openDialog(): void {
-    if (this.readonly) {
+    if (this.readonly || !this.value.serviceId) {
       return;
     }
 

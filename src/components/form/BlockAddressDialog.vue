@@ -21,11 +21,7 @@ const asAddr = (v: Block | BlockAddress): BlockAddress => ({
 export default class BlockAddressDialog extends DialogBase {
   local: BlockAddress | null = null;
 
-  @Prop({
-    type: Object,
-    required: true,
-    validator: v => !!v?.serviceId,
-  })
+  @Prop({ type: Object, required: true })
   public readonly value!: BlockAddress;
 
   @Prop({ type: String, default: 'Block' })
@@ -47,12 +43,14 @@ export default class BlockAddressDialog extends DialogBase {
   public readonly noConfigure!: boolean;
 
   created(): void {
-    this.local = asAddr(this.value);
+    if (this.value.id) {
+      this.local = asAddr(this.value);
+    }
   }
 
   get serviceId(): string {
     const addr = this.local ?? this.value;
-    return addr.serviceId;
+    return addr.serviceId ?? sparkStore.serviceIds[0];
   }
 
   set serviceId(serviceId: string) {
@@ -70,10 +68,9 @@ export default class BlockAddressDialog extends DialogBase {
   }
 
   get actualFilter(): ((type: string) => boolean) {
-    if (this.typeFilter) {
-      return this.typeFilter;
-    }
-    return type => isCompatible(type, this.value.type);
+    return this.typeFilter
+      ? this.typeFilter
+      : type => isCompatible(type, this.value.type);
   }
 
   get tooltip(): string | null {
@@ -144,7 +141,6 @@ export default class BlockAddressDialog extends DialogBase {
         :options="addrOpts"
         :clearable="clearable"
         :label="label"
-        :hint="hint"
         autofocus
         item-aligned
         emit-value
