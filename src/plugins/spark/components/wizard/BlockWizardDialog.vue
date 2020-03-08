@@ -23,7 +23,7 @@ export default class BlockWizardDialog extends DialogBase {
         <DialogToolbar icon="mdi-creation" title="Block wizard" />
       </template>
       <BlockWizard
-        v-bind="{serviceId, initialFeature, filter}"
+        v-bind="{serviceIds, initialFeature, filter}"
         @close="onDialogHide"
         @created="onDialogOk"
       />

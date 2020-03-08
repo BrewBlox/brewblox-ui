@@ -75,12 +75,12 @@ export default class MotorValveFull
     <slot name="warnings" />
 
     <div class="widget-body row">
-      <BlockField
+      <LinkField
         :value="block.data.hwDevice"
         :service-id="serviceId"
+        :creatable="false"
         title="Target DS2408 Chip"
         label="Target DS2408 Chip"
-        no-create
         class="col-grow"
         @input="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
       />

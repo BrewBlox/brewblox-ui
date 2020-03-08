@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { Unit } from '@/helpers/units';
 
 import { blockTypes } from '../spark/block-types';
+import { actionSpecs, conditionSpecs } from './impl/specs';
 import { automationStore } from './store';
 import { AutomationCondition, AutomationStep } from './types';
 
@@ -27,6 +28,12 @@ export async function clear(): Promise<void> {
 
 export async function make(): Promise<void> {
   const mkConditions = (): AutomationCondition[] => ([
+    {
+      id: uid(),
+      enabled: true,
+      title: 'Default block value',
+      impl: conditionSpecs.BlockValue.generate(),
+    },
     {
       id: uid(),
       enabled: true,
@@ -81,6 +88,12 @@ export async function make(): Promise<void> {
         title: 'step-one',
         enabled: true,
         actions: [
+          {
+            id: uid(),
+            title: 'generated block patch',
+            enabled: true,
+            impl: actionSpecs.BlockPatch.generate(),
+          },
           {
             id: uid(),
             title: 'sensor to 5 C',

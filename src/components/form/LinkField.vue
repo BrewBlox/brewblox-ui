@@ -10,7 +10,7 @@ import FieldBase from '../FieldBase';
 
 
 @Component
-export default class BlockField extends FieldBase {
+export default class LinkField extends FieldBase {
 
   @Prop({ type: Object, required: true, validator: v => v instanceof Link })
   public readonly value!: Link;
@@ -18,43 +18,47 @@ export default class BlockField extends FieldBase {
   @Prop({ type: String, required: true })
   public readonly serviceId!: string;
 
-  @Prop({ type: String, default: 'Choose Block' })
+  @Prop({ type: String, default: 'Choose block' })
   public readonly title!: string;
 
   @Prop({ type: String, default: 'Block' })
   public readonly label!: string;
 
-  @Prop({ type: Function, default: null })
-  readonly filter!: (block: Block) => boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly noCreate!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly noShow!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly noEdit!: boolean;
+  @Prop({ type: Array, required: false })
+  readonly compatible!: string[];
 
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  public readonly creatable!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  public readonly configurable!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  public readonly show!: boolean;
 
   save(val: Link): void {
     this.$emit('input', val);
   }
 
   get displayValue(): string {
-    return this.value.id || 'click to assign';
+    return this.value.id ?? 'click to assign';
   }
 
-  get linkBlock(): Block | null {
-    return this.value && this.value.id
-      ? sparkStore.tryBlockById(this.serviceId, this.value.id)
-      : null;
+  get block(): Block | null {
+    return sparkStore.tryBlockById(this.serviceId, this.value.id);
+  }
+
+  get canEdit(): boolean {
+    return this.block !== null
+      && this.configurable
+      && this.show;
   }
 
   editBlock(): void {
-    createBlockDialog(this.linkBlock);
+    createBlockDialog(this.block);
   }
 
   openDialog(): void {
@@ -64,17 +68,17 @@ export default class BlockField extends FieldBase {
 
     createDialog({
       component: 'LinkDialog',
-      parent: this,
-      clearable: this.clearable,
       title: this.title,
       message: this.message,
       html: this.html,
-      filter: this.filter,
       value: this.value,
-      serviceId: this.serviceId,
       label: this.label,
-      noCreate: this.noCreate,
-      noEdit: this.noEdit,
+      serviceId: this.serviceId,
+      compatible: this.compatible,
+      clearable: this.clearable,
+      creatable: this.creatable,
+      configurable: this.configurable,
+      ...this.dialogProps,
     })
       .onOk(this.save);
   }
@@ -87,7 +91,13 @@ export default class BlockField extends FieldBase {
       {{ displayValue | truncated }}
     </slot>
     <template #append>
-      <q-btn v-if="linkBlock && !noShow" flat round icon="mdi-launch" @click.stop="editBlock">
+      <q-btn
+        v-if="canEdit"
+        flat
+        round
+        icon="mdi-launch"
+        @click.stop="editBlock"
+      >
         <q-tooltip>Show {{ value.id }}</q-tooltip>
       </q-btn>
     </template>

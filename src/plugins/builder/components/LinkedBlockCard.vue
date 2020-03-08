@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
@@ -9,6 +8,7 @@ import { sparkType } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
+import { isCompatible } from '../../spark/block-types';
 import { settingsLink } from '../helpers';
 import { LinkedBlock } from '../types';
 import PartCard from './PartCard';
@@ -24,9 +24,6 @@ export default class LinkedBlockCard extends PartCard {
 
   @Prop({ type: String, default: 'Block' })
   public readonly label!: string;
-
-  @Prop({ type: Function })
-  readonly filter!: (link: Link) => boolean;
 
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
@@ -57,8 +54,8 @@ export default class LinkedBlockCard extends PartCard {
     const sorter = objectStringSorter('id');
     return this.sparkServices
       .flatMap(svc => sparkStore.blockValues(svc.id)
+        .filter(block => this.typeFilter(block.type))
         .map(block => new Link(block.id, block.type))
-        .filter(this.actualFilter)
         .sort(sorter)
         .map(link => ({
           label: `[${svc.id}] ${link.id}`,
@@ -74,22 +71,8 @@ export default class LinkedBlockCard extends PartCard {
     return this.linked.serviceId;
   }
 
-  get compatibleTypes(): string[] {
-    if (!this.sparkServices.length) {
-      return [];
-    }
-    const compatibleTable = sparkStore.compatibleTypes(this.sparkServices[0].id);
-    return [
-      ...this.types,
-      ...this.types.flatMap(type => get(compatibleTable, type, [])),
-    ];
-  }
-
-  get actualFilter(): (link: Link) => boolean {
-    if (this.filter) {
-      return this.filter;
-    }
-    return block => !this.compatibleTypes || this.compatibleTypes.includes(block.type || '');
+  get typeFilter(): (type: string | null) => boolean {
+    return type => isCompatible(type, this.types);
   }
 
   createBlock(serviceId: string): void {
@@ -97,7 +80,7 @@ export default class LinkedBlockCard extends PartCard {
       component: 'BlockWizardDialog',
       parent: this,
       serviceId,
-      filter: feat => !this.compatibleTypes || this.compatibleTypes.includes(feat),
+      filter: this.typeFilter,
     })
       .onOk(block => {
         this.linked = { serviceId, blockId: block.id };

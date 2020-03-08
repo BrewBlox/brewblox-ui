@@ -20,9 +20,9 @@ import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
 import { Crud, WidgetFeature } from '@/store/features';
 
-import { blockTypes, interfaceTypes } from './block-types';
+import { blockTypes, interfaceTypes, isCompatible } from './block-types';
 import { DisplaySettingsBlock } from './features/DisplaySettings/types';
-import { Block, BlockConfig, BlockCrud, DisplayOpts, DisplaySlot } from './types';
+import { BlockAddress, BlockConfig, BlockCrud, DisplayOpts, DisplaySlot } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -68,22 +68,15 @@ export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['c
   };
 };
 
-const isCompatible = (block: Block, intf: string): boolean => {
-  const compatible = sparkStore.compatibleTypes(block.serviceId);
-  return block.type === intf || !!compatible[intf].includes(block.type);
-};
-
-export const canDisplay = (block: Block): boolean => {
-  if (!block) { return false; }
-  const compatible = sparkStore.compatibleTypes(block.serviceId);
-  const { TempSensor, SetpointSensorPair, ActuatorAnalog } = interfaceTypes;
+export const canDisplay = (addr: BlockAddress): boolean => {
+  if (!addr) { return false; }
   return [
-    TempSensor, ...compatible[TempSensor],
-    SetpointSensorPair, ...compatible[SetpointSensorPair],
-    ActuatorAnalog, ...compatible[ActuatorAnalog],
+    interfaceTypes.TempSensor,
+    interfaceTypes.SetpointSensorPair,
+    interfaceTypes.ActuatorAnalog,
     blockTypes.Pid,
   ]
-    .includes(block.type);
+    .some(intf => isCompatible(addr.type, intf));
 };
 
 const displayBlock = (serviceId: string | undefined): DisplaySettingsBlock | undefined =>
@@ -91,58 +84,61 @@ const displayBlock = (serviceId: string | undefined): DisplaySettingsBlock | und
     ? sparkStore.blockValues(serviceId).find(v => v.type === blockTypes.DisplaySettings)
     : undefined;
 
-export const isDisplayed = (block: Block): boolean =>
-  !!displayBlock(block.serviceId)?.data.widgets
-    .find(w => Object.values(w).find(v => v instanceof Link && v.id === block.id));
+export const isDisplayed = (addr: BlockAddress): boolean =>
+  addr.id !== null
+  && !!displayBlock(addr.serviceId)?.data.widgets
+    .find(w => Object.values(w).find(v => v instanceof Link && v.id === addr.id));
 
-export const tryDisplayBlock = async (block: Block, options: Partial<DisplayOpts> = {}): Promise<void> => {
-  const display = displayBlock(block?.serviceId);
-  if (!block || !display) { return; }
+export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<DisplayOpts> = {}): Promise<void> => {
+  const display = displayBlock(addr?.serviceId);
+  if (!addr || !addr.id || !addr.type || !display) { return; }
 
   const { widgets } = display.data;
   const takenPos = widgets.map(w => w.pos);
   const opts: DisplayOpts = {
     pos: range(1, 7).find(v => !takenPos.includes(v)),
     color: '4169E1',
-    name: block.id,
+    name: addr.id,
     unique: true,
     showNotify: true,
     showDialog: true,
     ...options,
   };
 
-  if (!canDisplay(block)) {
-    notify.warn(`Block '${block.id}' can't be shown on the Spark display`, { shown: opts.showNotify });
+  if (!canDisplay(addr)) {
+    notify.warn(`Block '${addr.id}' can't be shown on the Spark display`, { shown: opts.showNotify });
   }
-  else if (opts.unique && isDisplayed(block)) {
-    notify.info(`Block '${block.id}' is already shown on the Spark display`, { shown: opts.showNotify });
+  else if (opts.unique && isDisplayed(addr)) {
+    notify.info(`Block '${addr.id}' is already shown on the Spark display`, { shown: opts.showNotify });
   }
   else if (!opts.pos) {
     notify.info('Spark display is already full', { shown: opts.showNotify });
   }
   else {
-    const link = new Link(block.id, block.type);
+    const { id, type } = addr;
+
+    const link = new Link(id, type);
     const slot: DisplaySlot = {
       pos: opts.pos,
       color: opts.color,
       name: opts.name.slice(0, 15),
     };
-    if (isCompatible(block, interfaceTypes.TempSensor)) {
+    if (isCompatible(type, interfaceTypes.TempSensor)) {
       slot.tempSensor = link;
     }
-    else if (isCompatible(block, interfaceTypes.SetpointSensorPair)) {
+    else if (isCompatible(type, interfaceTypes.SetpointSensorPair)) {
       slot.setpointSensorPair = link;
     }
-    else if (isCompatible(block, interfaceTypes.ActuatorAnalog)) {
+    else if (isCompatible(type, interfaceTypes.ActuatorAnalog)) {
       slot.actuatorAnalog = link;
     }
-    else if (isCompatible(block, blockTypes.Pid)) {
+    else if (isCompatible(type, blockTypes.Pid)) {
       slot.pid = link;
     }
 
     display.data.widgets = [slot, ...display.data.widgets.filter(w => w.pos !== opts.pos)];
     await sparkStore.saveBlock(display);
-    notify.info(`Added block '${block.id}' to the Spark display`, { shown: opts.showNotify });
+    notify.info(`Added block '${addr.id}' to the Spark display`, { shown: opts.showNotify });
   }
 
   if (opts.showDialog) {

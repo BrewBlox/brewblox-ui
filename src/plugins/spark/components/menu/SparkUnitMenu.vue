@@ -5,8 +5,9 @@ import DialogBase from '@/components/DialogBase';
 import { spaceCased } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { prettify } from '@/helpers/units';
+import { userUnitChoices } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import { UserUnits } from '@/plugins/spark/types';
+import { UserUnitKey, UserUnits } from '@/plugins/spark/types';
 
 
 @Component
@@ -16,18 +17,13 @@ export default class SparkUnitMenu extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  created(): void {
-    sparkStore.fetchUnits(this.serviceId);
-    sparkStore.fetchUnitAlternatives(this.serviceId);
-  }
-
   get units(): UserUnits {
-    return sparkStore.units(this.serviceId) || {};
+    return sparkStore.units(this.serviceId) ?? {};
   }
 
-  unitAlternativeOptions(name: string): SelectOption[] {
-    return (sparkStore.unitAlternatives(this.serviceId)[name] || [])
-      .map(v => ({ label: prettify(v), value: v }));
+  unitAlternativeOptions(key: UserUnitKey): SelectOption[] {
+    const values = userUnitChoices[key];
+    return values.map(value => ({ value, label: prettify(value) }));
   }
 
   saveUnits(vals: UserUnits = this.units): void {

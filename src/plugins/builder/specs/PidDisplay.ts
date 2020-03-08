@@ -1,4 +1,4 @@
-import { typeName } from '@/plugins/spark/features/Pid/getters';
+import { blockTypes } from '@/plugins/spark/block-types';
 
 import { showLinkedBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
@@ -13,7 +13,7 @@ const spec: PartSpec = {
   transitions: () => ({}),
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'pid', types: [typeName], label: 'PID' },
+    props: { settingsKey: 'pid', types: [blockTypes.Pid], label: 'PID' },
   }],
   size: () => [SIZE_X, SIZE_Y],
   interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'pid'),

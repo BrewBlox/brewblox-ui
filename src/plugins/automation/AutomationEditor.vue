@@ -222,7 +222,7 @@ export default class AutomationEditor extends DialogBase {
       <q-page>
         <div v-if="step" class="page-height row no-wrap q-pa-md q-gutter-md">
           <q-scroll-area visible class="col-xl-4 col">
-            <AutomationActions :step="step" @update:step="saveStep" />
+            <AutomationActions :template="template" :step="step" @update:step="saveStep" />
           </q-scroll-area>
           <q-scroll-area visible class="col-xl-4 col">
             <AutomationTransitions :template="template" :step="step" @update:step="saveStep" />

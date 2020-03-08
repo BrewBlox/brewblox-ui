@@ -117,7 +117,7 @@ export default class DigitalConstraints extends Vue {
       :class="['row q-gutter-x-sm q-gutter-y-xs constraint', {limiting: constraint.remaining.value}]"
     >
       <template v-if="type === 'mutexed'">
-        <BlockField
+        <LinkField
           :service-id="serviceId"
           :value="constraint.mutexed.mutexId"
           title="Mutex"
@@ -190,7 +190,7 @@ export default class DigitalConstraints extends Vue {
 
 <style lang="sass" scoped>
 .limiting
-  text-color: orange;
+  text-color: orange
 
 .constraint:nth-child(even) > label
   background: rgba($green-5, 0.05)

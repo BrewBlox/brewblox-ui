@@ -5,24 +5,30 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
 import { isCompatible } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, BlockAddress } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
+const asAddr = (v: Block | BlockAddress): BlockAddress => ({
+  id: v?.id ?? null,
+  serviceId: v?.serviceId,
+  type: v?.type ?? null,
+});
+
+
 @Component
-export default class LinkDialog extends DialogBase {
-  local: Link | null = null
+export default class BlockAddressDialog extends DialogBase {
+  local: BlockAddress | null = null;
 
-  @Prop({ type: Object })
-  public readonly value!: Link;
+  @Prop({ type: Object, required: true })
+  public readonly value!: BlockAddress;
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
-
-  @Prop({ type: String, default: 'Link' })
+  @Prop({ type: String, default: 'Block' })
   public readonly label!: string;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly anyService!: boolean;
 
   @Prop({ type: Array, required: false })
   readonly compatible!: string[];
@@ -37,17 +43,39 @@ export default class LinkDialog extends DialogBase {
   public readonly configurable!: boolean;
 
   created(): void {
-    this.local = this.value.copy();
+    if (this.value.id) {
+      this.local = asAddr(this.value);
+    }
+  }
+
+  get serviceId(): string {
+    const addr = this.local ?? this.value;
+    return addr.serviceId ?? this.serviceIds[0];
+  }
+
+  set serviceId(serviceId: string) {
+    if (!this.local || this.local.serviceId !== serviceId) {
+      this.local = {
+        id: null,
+        serviceId,
+        type: this.value.type,
+      };
+    }
+  }
+
+  get serviceIds(): string[] {
+    return sparkStore.serviceIds;
   }
 
   get typeFilter(): ((type: string) => boolean) {
-    return type => isCompatible(type, this.compatible ?? this.value.type);
+    const intf = this.compatible ?? this.value.type;
+    return type => isCompatible(type, intf);
   }
 
-  get linkOpts(): Link[] {
+  get addrOpts(): BlockAddress[] {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => this.typeFilter(block.type))
-      .map(block => new Link(block.id, block.type))
+      .map(asAddr)
       .sort(objectStringSorter('id'));
   }
 
@@ -67,30 +95,28 @@ export default class LinkDialog extends DialogBase {
     return this.block !== null || this.clearable;
   }
 
-  update(link: Link | null): void {
-    this.local = link ?? new Link(null, this.value.type);
-  }
-
   configureBlock(): void {
-    createBlockDialog(this.block);
+    createBlockDialog(this.local);
   }
 
   createBlock(): void {
     createDialog({
       component: 'BlockWizardDialog',
-      parent: this,
       serviceId: this.serviceId,
       filter: this.typeFilter,
     })
       .onOk((block: Block) => {
-        // Retain original type
-        this.local = new Link(block.id, this.value.type);
+        this.local = asAddr(block);
       });
   }
 
   save(): void {
     if (this.localOk) {
-      this.onDialogOk(this.local);
+      this.onDialogOk(this.local ?? {
+        id: null,
+        serviceId: this.serviceId,
+        type: this.value.type,
+      });
     }
   }
 }
@@ -105,15 +131,21 @@ export default class LinkDialog extends DialogBase {
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
-        :value="local"
-        :options="linkOpts"
+        v-if="anyService && serviceIds.length > 1"
+        v-model="serviceId"
+        :options="serviceIds"
+        label="Service"
+        item-aligned
+      />
+      <q-select
+        v-model="local"
+        :options="addrOpts"
         :clearable="clearable"
         :label="label"
-        option-label="id"
-        option-value="id"
         autofocus
         item-aligned
-        @input="update"
+        option-label="id"
+        option-value="id"
       >
         <q-tooltip v-if="tooltip">
           {{ tooltip }}
@@ -133,14 +165,14 @@ export default class LinkDialog extends DialogBase {
             icon="mdi-launch"
             @click="configureBlock"
           >
-            <q-tooltip>Edit {{ local.id }}</q-tooltip>
+            <q-tooltip>Show {{ local.id }}</q-tooltip>
           </q-btn>
           <q-btn
             v-else
             flat
             round
-            icon="mdi-launch"
             disable
+            icon="mdi-launch"
           />
 
           <q-btn
@@ -150,7 +182,7 @@ export default class LinkDialog extends DialogBase {
             icon="add"
             @click="createBlock"
           >
-            <q-tooltip>Create new Block</q-tooltip>
+            <q-tooltip>Create new block</q-tooltip>
           </q-btn>
         </template>
       </q-select>

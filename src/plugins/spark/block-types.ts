@@ -1,3 +1,5 @@
+import isArray from 'lodash/isArray';
+
 import { typeName as ActuatorAnalogMock } from '@/plugins/spark/features/ActuatorAnalogMock/getters';
 import { typeName as SetpointDriver } from '@/plugins/spark/features/ActuatorOffset/getters';
 import { typeName as ActuatorPwm } from '@/plugins/spark/features/ActuatorPwm/getters';
@@ -126,6 +128,46 @@ export const interfaceTypes = {
   ActuatorDigital: 'ActuatorDigitalInterface',
   Balancer: 'BalancerInterface',
   IoArray: 'IoArrayInterface',
+};
+
+export const compatibleTypes = {
+  [interfaceTypes.ProcessValue]: [
+    blockTypes.ActuatorAnalogMock,
+    blockTypes.ActuatorPwm,
+    blockTypes.SetpointSensorPair,
+  ],
+  [interfaceTypes.TempSensor]: [
+    blockTypes.TempSensorMock,
+    blockTypes.TempSensorOneWire,
+  ],
+  [interfaceTypes.SetpointSensorPair]: [
+    blockTypes.SetpointSensorPair,
+  ],
+  [interfaceTypes.ActuatorAnalog]: [
+    blockTypes.ActuatorAnalogMock,
+    blockTypes.SetpointDriver,
+    blockTypes.ActuatorPwm,
+  ],
+  [interfaceTypes.ActuatorDigital]: [
+    blockTypes.DigitalActuator,
+    blockTypes.MotorValve,
+  ],
+  [interfaceTypes.Balancer]: [
+    blockTypes.Balancer,
+  ],
+  [interfaceTypes.IoArray]: [
+    blockTypes.DS2408,
+    blockTypes.DS2413,
+    blockTypes.Spark2Pins,
+    blockTypes.Spark3Pins,
+  ],
+};
+
+export const isCompatible = (type: string | null, intf: string | string[] | null): boolean => {
+  if (intf === null) { return true; }
+  if (type === null) { return false; }
+  if (isArray(intf)) { return intf.some(i => isCompatible(type, i)); }
+  return type === intf || !!compatibleTypes[intf]?.includes(type);
 };
 
 export const isSystemBlock =

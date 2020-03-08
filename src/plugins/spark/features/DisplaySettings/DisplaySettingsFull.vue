@@ -2,12 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
-import { blockTypes, interfaceTypes } from '@/plugins/spark/block-types';
+import { blockTypes, interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DisplaySettingsBlock } from '@/plugins/spark/features/DisplaySettings/types';
-import { CompatibleTypes, DisplaySlot } from '@/plugins/spark/types';
-
-import { sparkStore } from '../../store';
+import { DisplaySlot } from '@/plugins/spark/types';
 
 @Component
 export default class DisplaySettingsFull
@@ -19,20 +17,18 @@ export default class DisplaySettingsFull
   footerRules: InputRule[] = [
     v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
   ];
+  validTypes: string[] = [
+    interfaceTypes.TempSensor,
+    interfaceTypes.SetpointSensorPair,
+    interfaceTypes.ActuatorAnalog,
+    blockTypes.Pid,
+  ]
 
   get slots(): (DisplaySlot | null)[] {
     const slots = Array(6);
     this.block.data.widgets
       .forEach(w => { slots[w.pos - 1] = w; });
     return slots;
-  }
-
-  get compatible(): CompatibleTypes {
-    return sparkStore.compatibleTypes(this.serviceId);
-  }
-
-  isCompatible(type: string, intf: string): boolean {
-    return type === intf || !!this.compatible[intf]?.includes(type);
   }
 
   slotLink(slot: DisplaySlot): Link {
@@ -57,16 +53,6 @@ export default class DisplaySettingsFull
     };
   }
 
-  get linkFilter() {
-    const validDisplayTypes = [
-      ...this.compatible[interfaceTypes.TempSensor],
-      ...this.compatible[interfaceTypes.SetpointSensorPair],
-      ...this.compatible[interfaceTypes.ActuatorAnalog],
-      blockTypes.Pid,
-    ];
-    return block => validDisplayTypes.includes(block.type);
-  }
-
   updateSlotLink(idx: number, link: Link): void {
     const pos = idx + 1;
     if (!link.id) {
@@ -86,16 +72,16 @@ export default class DisplaySettingsFull
       name: existing?.name || link.id.slice(0, 15),
     };
 
-    if (this.isCompatible(type, interfaceTypes.TempSensor)) {
+    if (isCompatible(type, interfaceTypes.TempSensor)) {
       obj.tempSensor = link;
     }
-    else if (this.isCompatible(type, interfaceTypes.SetpointSensorPair)) {
+    else if (isCompatible(type, interfaceTypes.SetpointSensorPair)) {
       obj.setpointSensorPair = link;
     }
-    else if (this.isCompatible(type, interfaceTypes.ActuatorAnalog)) {
+    else if (isCompatible(type, interfaceTypes.ActuatorAnalog)) {
       obj.actuatorAnalog = link;
     }
-    else if (this.isCompatible(type, blockTypes.Pid)) {
+    else if (isCompatible(type, blockTypes.Pid)) {
       obj.pid = link;
     }
 
@@ -134,12 +120,11 @@ export default class DisplaySettingsFull
           :style="`border: 2px solid ${slotColor(slot)}; grid-column-end: span 1`"
           class="q-pa-sm column q-gutter-y-xs"
         >
-          <BlockField
+          <LinkField
             :value="slotLink(slot)"
-            :filter="linkFilter"
             :service-id="serviceId"
-            no-create
-            no-show
+            :compatible="validTypes"
+            :show="false"
             title="Block"
             label="Block"
             @input="v => updateSlotLink(idx, v)"

@@ -1,15 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { objReducer } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
 import { parsePostfixed, propertyNameWithoutUnit } from '@/helpers/units/parseObject';
 import PostFixed from '@/helpers/units/PostFixed';
+import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
+import { BlockValueImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockSpec, ChangeField } from '@/plugins/spark/types';
-
-import AutomationItemBase from '../components/AutomationItemBase';
-import { BlockValueImpl } from '../types';
+import { BlockAddress, BlockSpec, ChangeField } from '@/plugins/spark/types';
 
 type CompareOperator = BlockValueImpl['operator'];
 
@@ -20,34 +17,48 @@ interface OperatorOption extends SelectOption {
 @Component
 export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
-  get spec(): BlockSpec {
-    return sparkStore.specs[this.impl.blockType];
+  get spec(): BlockSpec | null {
+    return this.impl.blockType !== null
+      ? sparkStore.specs[this.impl.blockType] ?? null
+      : null;
   }
 
-  get link(): Link {
-    return new Link(this.impl.blockId, this.impl.blockType);
+  get addr(): BlockAddress {
+    return {
+      id: this.impl.blockId,
+      serviceId: this.impl.serviceId,
+      type: this.impl.blockType,
+    };
   }
 
-  set link(val: Link) {
-    if (val.id !== null) {
-      this.impl.blockId = val.id;
-      this.save();
+  set addr(val: BlockAddress) {
+    if (val.type !== this.impl.blockType) {
+      this.impl.key = null;
+      this.impl.value = null;
     }
+    this.impl.blockId = val.id;
+    this.impl.serviceId = val.serviceId;
+    this.impl.blockType = val.type ?? this.impl.blockType;
+    this.save();
   }
 
-  get changes(): Mapped<ChangeField> {
-    return this.spec.changes.reduce(objReducer('key'), {});
+  get validTypes(): string[] {
+    return sparkStore.specValues
+      .filter(spec => spec.changes.length)
+      .map(spec => spec.id);
   }
 
   get selectOpts(): SelectOption[] {
-    return this.spec.changes
-      .map(change => {
-        const generated = change.generate();
-        const value = generated instanceof PostFixed
-          ? generated.serialized(change.key)[0]
-          : change.key;
-        return { label: change.title, value };
-      });
+    return this.spec !== null
+      ? this.spec.changes
+        .map(change => {
+          const generated = change.generate();
+          const value = generated instanceof PostFixed
+            ? generated.serialized(change.key)[0]
+            : change.key;
+          return { label: change.title, value };
+        })
+      : [];
   }
 
   get compareOpts(): OperatorOption[] {
@@ -70,18 +81,24 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     this.save();
   }
 
-  get currentChange(): ChangeField {
+  get currentChange(): ChangeField | null {
     return this.findChange(this.impl.key);
   }
 
-  get parsed(): { key: string; value: any } {
+  get parsed(): { key: string; value: any } | null {
+    if (this.spec === null || this.impl.key === null) {
+      return null;
+    }
     const optValue = this.impl.value ?? this.spec.generate()[this.impl.key];
     const [key, value] =
       parsePostfixed(this.impl.key, optValue) ?? [this.impl.key, optValue];
     return { key, value };
   }
 
-  findChange(key: string): ChangeField {
+  findChange(key: string | null): ChangeField | null {
+    if (this.spec === null || key === null) {
+      return null;
+    }
     const rawKey = propertyNameWithoutUnit(key);
     return this.spec.changes.find(change => change.key === rawKey)!;
   }
@@ -92,11 +109,22 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
       : value;
   }
 
-  saveKey(key: string): void {
-    if (key === this.impl.key) { return; }
-    this.item.impl.key = key;
-    this.item.impl.value = this.rawValue(this.findChange(key).generate());
-    this.save();
+  defaultValue(key: string | null): any {
+    if (this.spec === null || key === null) {
+      return null;
+    }
+    const change = this.findChange(key);
+    return change
+      ? this.rawValue(change.generate())
+      : null;
+  }
+
+  saveKey(key: string | null): void {
+    if (key !== this.impl.key) {
+      this.impl.key = key;
+      this.impl.value = this.defaultValue(key);
+      this.save();
+    }
   }
 
   saveValue(value: any): void {
@@ -108,10 +136,10 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
 <template>
   <div class="row q-gutter-xs">
-    <BlockField
-      v-model="link"
-      :service-id="impl.serviceId"
-      :clearable="false"
+    <BlockAddressField
+      v-model="addr"
+      :compatible="validTypes"
+      any-service
       class="col-grow"
     />
     <SelectField
@@ -124,7 +152,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
     <div class="col-break" />
 
-    <div class="col-grow row justify-between q-px-sm">
+    <div v-if="spec && impl.key" class="col-grow row justify-between q-px-sm">
       <q-select
         v-model="operator"
         :options="compareOpts"
@@ -132,7 +160,9 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
         label="Compare"
         class="col-auto"
         style="min-width: 100px"
-      />
+      >
+        <q-tooltip>{{ operator.desc }}</q-tooltip>
+      </q-select>
       <component
         :is="currentChange.component"
         v-bind="currentChange.componentProps"

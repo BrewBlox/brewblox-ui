@@ -1,3 +1,5 @@
+import { VueConstructor } from 'vue';
+
 import { StoreObject } from '@/plugins/database';
 
 export type AutomationStatus = 'Created' | 'Started' | 'Done' | 'Cancelled' | 'Unknown';
@@ -10,9 +12,9 @@ type Datum = Date | number | null;
 
 export interface BlockPatchImpl {
   type: 'BlockPatch';
-  blockId: string;
   serviceId: string;
-  blockType: string;
+  blockId: string | null;
+  blockType: string | null;
   data: any;
 }
 
@@ -43,10 +45,10 @@ export interface TimeElapsedImpl {
 
 export interface BlockValueImpl {
   type: 'BlockValue';
-  blockId: string;
   serviceId: string;
-  blockType: string;
-  key: string;
+  blockId: string | null;
+  blockType: string | null;
+  key: string | null;
   operator: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
   value: any;
 }
@@ -137,6 +139,16 @@ export interface AutomationProcess extends AutomationTemplate {
   end: Datum;
   status: AutomationStatus;
   results: AutomationStepResult[];
+}
+
+// UI
+//////////////
+
+export interface AutomationSpec<T extends AutomationImpl = AutomationImpl> {
+  type: T['type'];
+  title: string;
+  generate: () => T;
+  component: VueConstructor;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

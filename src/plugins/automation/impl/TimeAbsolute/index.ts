@@ -1,0 +1,14 @@
+import { AutomationSpec, TimeAbsoluteImpl } from '../../types';
+import TimeAbsolute from './TimeAbsolute.vue';
+
+const spec: AutomationSpec<TimeAbsoluteImpl> = {
+  type: 'TimeAbsolute',
+  title: 'Date and time',
+  generate: () => ({
+    type: 'TimeAbsolute',
+    time: new Date(),
+  }),
+  component: TimeAbsolute,
+};
+
+export default spec;
