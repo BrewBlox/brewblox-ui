@@ -70,28 +70,28 @@ export default class BuilderPartMenu extends Vue {
         <DialogToolbar :title="partTitle" @close="close" />
       </template>
 
-      <q-card-section>
-        <q-item>
-          <q-item-section>
-            <svg
-              :width="`${squares(rotatedSize[0]) * displayScale}px`"
-              :height="`${squares(rotatedSize[1] * displayScale)}px`"
-              :viewBox="`0, 0, ${squares(rotatedSize[0])}, ${squares(rotatedSize[1])}`"
-              class="q-mx-auto"
-            >
-              <PartWrapper :part="part" />
-            </svg>
-          </q-item-section>
-        </q-item>
+      <div class="widget-body column q-gutter-y-md">
+        <div class="row justify-center">
+          <svg
+            :width="`${squares(rotatedSize[0]) * displayScale}px`"
+            :height="`${squares(rotatedSize[1] * displayScale)}px`"
+            :viewBox="`0, 0, ${squares(rotatedSize[0])}, ${squares(rotatedSize[1])}`"
+            class="col-auto"
+          >
+            <PartWrapper :part="part" />
+          </svg>
+        </div>
+
         <component
           :is="card.component"
           v-for="(card, idx) in cards"
           :key="idx"
           :part="part"
           v-bind="card.props || {}"
+          class="col-auto"
           v-on="$listeners"
         />
-      </q-card-section>
+      </div>
     </CardWrapper>
   </q-dialog>
 </template>

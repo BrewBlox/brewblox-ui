@@ -153,9 +153,9 @@ export class SparkModule extends VuexModule {
     return serviceId => this.allLimiters[serviceId];
   }
 
-  public get blockById(): (serviceId: string, id: string, type?: string) => Block {
-    return (serviceId: string, id: string, type?: string) => {
-      const block = this.sparkCache[serviceId]?.blocks[id];
+  public get blockById(): <T extends Block>(serviceId: string, id: string, type?: string) => T {
+    return <T extends Block>(serviceId: string, id: string, type?: string) => {
+      const block = this.sparkCache[serviceId]?.blocks[id] as T;
       if (!block) {
         throw new Error(`Block ${id} not found in service ${serviceId}`);
       }
@@ -166,10 +166,10 @@ export class SparkModule extends VuexModule {
     };
   }
 
-  public get tryBlockById(): (serviceId: string | null, id: string | null) => Block | null {
-    return (serviceId, id) =>
+  public get tryBlockById(): <T extends Block>(serviceId: string | null, id: string | null) => T | null {
+    return <T extends Block>(serviceId: string | null, id: string | null) =>
       serviceId && id
-        ? this.sparkCache[serviceId]?.blocks[id] ?? null
+        ? (this.sparkCache[serviceId]?.blocks[id] as T) ?? null
         : null;
   }
 

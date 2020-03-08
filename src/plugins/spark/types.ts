@@ -46,7 +46,7 @@ export interface SparkConfig {
 export type SparkService = Service<SparkConfig>;
 
 export interface BlockAddress {
-  serviceId: string;
+  serviceId: string | null;
   id: string | null;
   type: string | null;
 }

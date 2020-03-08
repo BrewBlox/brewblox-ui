@@ -4,28 +4,31 @@ import { Component } from 'vue-property-decorator';
 import { blockTypes } from '@/plugins/spark/block-types';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { COLD_WATER, HOT_WATER } from '../getters';
-import { settingsBlock, settingsLink } from '../helpers';
+import { settingsAddress } from '../helpers';
 
 
 @Component
 export default class PidDisplay extends PartBase {
   HOT_WATER = HOT_WATER;
   COLD_WATER = COLD_WATER;
+  settingsKey = 'pid';
+
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.settingsKey);
+  }
 
   get block(): PidBlock | null {
-    return settingsBlock(this.part, 'pid');
+    const { serviceId, id } = this.address;
+    return sparkStore.tryBlockById(serviceId, id);
   }
 
   get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, 'pid');
-    return !!link.serviceId && !!link.blockId;
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get outputValue(): number | null {
@@ -47,9 +50,9 @@ export default class PidDisplay extends PartBase {
   }
 
   get target(): Block | null {
-    return this.block === null
-      ? null
-      : sparkStore.tryBlockById(this.block.serviceId, this.block.data.outputId.id);
+    return this.block
+      ? sparkStore.tryBlockById(this.block.serviceId, this.block.data.outputId.id)
+      : null;
   }
 
   get drivingOffset(): boolean {

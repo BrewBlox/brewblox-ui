@@ -12,8 +12,12 @@ const spec: PartSpec = {
   size: () => [1, 1],
   cards: [
     {
-      component: 'LinkedBlockCard',
-      props: { settingsKey: 'actuator', types: [blockTypes.DigitalActuator], label: 'Actuator' },
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey: 'actuator',
+        compatible: [blockTypes.DigitalActuator],
+        label: 'Actuator',
+      },
     },
     {
       component: 'PressureCard',

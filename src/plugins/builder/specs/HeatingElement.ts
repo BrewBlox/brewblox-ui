@@ -11,6 +11,14 @@ const spec: PartSpec = {
   title: 'Heating element',
   cards: [
     {
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey: 'pwm',
+        compatible: [blockTypes.ActuatorPwm],
+        label: 'PWM',
+      },
+    },
+    {
       component: 'SizeCard',
       props: {
         settingsKey: 'sizeX',
@@ -19,10 +27,6 @@ const spec: PartSpec = {
         min: 3,
         max: 10,
       },
-    },
-    {
-      component: 'LinkedBlockCard',
-      props: { settingsKey: 'pwm', types: [blockTypes.ActuatorPwm], label: 'PWM' },
     },
   ],
   size: (part: PersistentPart) => [

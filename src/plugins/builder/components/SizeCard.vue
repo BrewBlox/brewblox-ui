@@ -37,15 +37,12 @@ export default class SizeCard extends PartCard {
 </script>
 
 <template>
-  <q-list>
-    <q-separator />
-    <q-item>
-      <q-item-section>
-        <q-item-label caption>
-          {{ label }}
-        </q-item-label>
-        <q-slider :value="size" :min="min" :max="max" label @change="debouncedSave" />
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <q-item class="q-ma-none q-mt-xs">
+    <q-item-section>
+      <q-item-label caption>
+        {{ label }}
+      </q-item-label>
+      <q-slider :value="size" :min="min" :max="max" label @change="debouncedSave" />
+    </q-item-section>
+  </q-item>
 </template>

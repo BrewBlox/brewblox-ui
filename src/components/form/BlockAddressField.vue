@@ -56,6 +56,12 @@ export default class BlockAddressField extends FieldBase {
       && this.show;
   }
 
+  get broken(): boolean {
+    return this.block === null
+      && this.value.serviceId !== null
+      && this.value.id !== null;
+  }
+
   editBlock(): void {
     createBlockDialog(this.block);
   }
@@ -86,9 +92,10 @@ export default class BlockAddressField extends FieldBase {
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
-    <slot name="value">
-      {{ displayValue | truncated }}
-    </slot>
+    {{ displayValue | truncated }}
+    <q-item-label v-if="broken" caption class="text-negative q-mt-xs">
+      Block {{ value.id }} not found
+    </q-item-label>
     <template #append>
       <q-btn
         v-if="canEdit"
@@ -99,6 +106,11 @@ export default class BlockAddressField extends FieldBase {
       >
         <q-tooltip>Show {{ value.id }}</q-tooltip>
       </q-btn>
+      <q-icon
+        v-if="broken"
+        name="error"
+        color="negative"
+      />
     </template>
   </LabeledField>
 </template>
