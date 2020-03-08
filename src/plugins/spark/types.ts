@@ -45,6 +45,18 @@ export interface SparkConfig {
 
 export type SparkService = Service<SparkConfig>;
 
+/**
+ * There are two approaches to having a serializable reference to a block:
+ * Link, and BlockAddress
+ *
+ * Link is used inside block data, and serializes to `"key<type>": "id"`.
+ * Service ID is not stored.
+ *
+ * BlockAddress includes service ID, and is intended for wider use
+ * where service ID is not obvious, or where all services are equally valid.
+ *
+ * No special serialization rules exist: it is saved as a common JSON object.
+ */
 export interface BlockAddress {
   serviceId: string | null;
   id: string | null;
