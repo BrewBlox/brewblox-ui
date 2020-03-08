@@ -7,6 +7,10 @@
   "license": "GPL-3.0",
   "scripts": {
     "makecert": "bash dev/makecert.sh",
+    "datastore:config": "node dev/datastore_config.js",
+    "datastore:load": "node dev/datastore_load.js",
+    "datastore:save": "node dev/datastore_save.js",
+    "datastore": "npm run datstore:config && npm run datastore:load",
     "spark:reset": "node dev/reset_spark.js dev/presets/spark_blocks.json",
     "spark:sparkey": "npm run spark:reset -- sparkey",
     "spark:spock": "npm run spark:reset -- spock",
@@ -75,6 +79,7 @@
     "@vue/devtools": "^5.3.3",
     "@vue/eslint-config-typescript": "^4.0.0",
     "@vue/test-utils": "^1.0.0-beta.30",
+    "axios": "^0.19.2",
     "babel-plugin-transform-imports": "^1.5.1",
     "eslint": "^5.16.0",
     "eslint-plugin-quasar": "^1.0.0-alpha.18",
