@@ -42,11 +42,10 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     this.save();
   }
 
-  get typeFilter(): (type: string) => boolean {
-    const valid = sparkStore.specValues
+  get validTypes(): string[] {
+    return sparkStore.specValues
       .filter(spec => spec.changes.length)
       .map(spec => spec.id);
-    return type => valid.includes(type);
   }
 
   get selectOpts(): SelectOption[] {
@@ -139,10 +138,9 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
   <div class="row q-gutter-xs">
     <BlockAddressField
       v-model="addr"
-      class="col-grow"
-      :type-filter="typeFilter"
+      :compatible="validTypes"
       any-service
-      clearable
+      class="col-grow"
     />
     <SelectField
       :value="impl.key"
@@ -162,7 +160,9 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
         label="Compare"
         class="col-auto"
         style="min-width: 100px"
-      />
+      >
+        <q-tooltip>{{ operator.desc }}</q-tooltip>
+      </q-select>
       <component
         :is="currentChange.component"
         v-bind="currentChange.componentProps"

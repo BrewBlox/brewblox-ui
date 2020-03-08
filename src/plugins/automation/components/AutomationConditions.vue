@@ -3,9 +3,10 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { spliceById } from '@/helpers/functional';
+import { clamp, spliceById } from '@/helpers/functional';
 
-import { AutomationCondition, AutomationTemplate, AutomationTransition } from '../types';
+import { conditionSpecs } from '../impl/specs';
+import { AutomationCondition, AutomationStep, AutomationTemplate, AutomationTransition } from '../types';
 
 
 @Component
@@ -13,6 +14,9 @@ export default class AutomationConditions extends Vue {
 
   @Prop({ type: Object, required: true })
   public readonly template!: AutomationTemplate;
+
+  @Prop({ type: Object, required: true })
+  public readonly step!: AutomationStep;
 
   @Prop({ type: Object, required: true })
   public readonly transition!: AutomationTransition;
@@ -32,8 +36,24 @@ export default class AutomationConditions extends Vue {
     ];
   }
 
+  saveStep(step: AutomationStep = this.step): void {
+    this.$emit('update:step', step);
+  }
+
   save(transition: AutomationTransition = this.transition): void {
     this.$emit('update:transition', transition);
+  }
+
+  moveTransition(offset: number): void {
+    const idx = this.step.transitions.findIndex(v => v.id === this.transition.id);
+    const newIdx = clamp(idx + offset, 0, this.step.transitions.length - 1);
+    if (idx !== -1 && idx !== newIdx) {
+      const updated = [...this.step.transitions];
+      updated.splice(idx, 1);
+      updated.splice(newIdx, 0, this.transition);
+      this.step.transitions = updated;
+      this.saveStep();
+    }
   }
 
   saveCondition(condition: AutomationCondition): void {
@@ -47,7 +67,19 @@ export default class AutomationConditions extends Vue {
   }
 
   startAddCondition(): void {
+    createDialog({
+      component: 'AutomationCreateDialog',
+      title: 'New condition',
+      specs: Object.values(conditionSpecs),
+    })
+      .onOk((condition: AutomationCondition) => {
+        this.transition.conditions.push(condition);
+        this.save();
+      });
+  }
 
+  removeTransition(): void {
+    this.$emit('remove:transition', this.transition);
   }
 
   editNextStep(): void {
@@ -102,10 +134,17 @@ export default class AutomationConditions extends Vue {
         />
         <ActionMenu round dense class="col-auto">
           <template #actions>
-            <slot name="actions" />
+            <ActionItem label="Move up" icon="mdi-chevron-up" @click="moveTransition(-1)" />
+            <ActionItem label="Move down" icon="mdi-chevron-down" @click="moveTransition(1)" />
+            <ActionItem label="New condition" icon="add" @click="startAddCondition" />
+            <ActionItem label="Remove transition" icon="delete" @click="removeTransition" />
           </template>
         </ActionMenu>
       </div>
+    </template>
+    <template #empty>
+      No conditions are set. <br>
+      This is equivalent to all conditions evaluating true.
     </template>
   </AutomationItems>
 </template>

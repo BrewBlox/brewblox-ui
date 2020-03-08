@@ -1,3 +1,5 @@
+import isArray from 'lodash/isArray';
+
 import { typeName as ActuatorAnalogMock } from '@/plugins/spark/features/ActuatorAnalogMock/getters';
 import { typeName as SetpointDriver } from '@/plugins/spark/features/ActuatorOffset/getters';
 import { typeName as ActuatorPwm } from '@/plugins/spark/features/ActuatorPwm/getters';
@@ -161,9 +163,10 @@ export const compatibleTypes = {
   ],
 };
 
-export const isCompatible = (type: string | null, intf: string | null): boolean => {
+export const isCompatible = (type: string | null, intf: string | string[] | null): boolean => {
   if (intf === null) { return true; }
   if (type === null) { return false; }
+  if (isArray(intf)) { return intf.some(i => isCompatible(type, i)); }
   return type === intf || !!compatibleTypes[intf]?.includes(type);
 };
 

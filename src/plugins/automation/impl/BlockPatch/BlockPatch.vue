@@ -33,11 +33,10 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
     this.save();
   }
 
-  get typeFilter(): (type: string) => boolean {
-    const valid = sparkStore.specValues
+  get validTypes(): string[] {
+    return sparkStore.specValues
       .filter(spec => spec.changes.length)
       .map(spec => spec.id);
-    return type => valid.includes(type);
   }
 
   isActive(key: string): boolean {
@@ -69,9 +68,8 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
   <div class="column q-gutter-xs">
     <BlockAddressField
       v-model="addr"
-      :type-filter="typeFilter"
+      :compatible="validTypes"
       any-service
-      clearable
     />
 
     <template v-if="spec">

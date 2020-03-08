@@ -85,10 +85,10 @@ export default class PidFull
       <LinkField
         :value="block.data.inputId"
         :service-id="serviceId"
-        :html="true"
+        :show="false"
         title="Input"
         label="Input Block"
-        no-show
+        html
         message="
               <p>A PID block drives its output to regulate its input.</p>
               <p>
@@ -148,10 +148,10 @@ export default class PidFull
       <LinkField
         :value="block.data.outputId"
         :service-id="serviceId"
-        :html="true"
+        :show="false"
         title="Output"
         label="Output Block"
-        no-show
+        html
         message="
               <p>The PID sets its output block to the result from the PID calculation.</p>
               <p>

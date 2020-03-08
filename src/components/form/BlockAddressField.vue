@@ -1,5 +1,4 @@
 <script lang="ts">
-import pick from 'lodash/pick';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
@@ -21,20 +20,23 @@ export default class BlockAddressField extends FieldBase {
   @Prop({ type: String, default: 'Block' })
   public readonly label!: string;
 
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Prop({ type: Function, required: false })
-  readonly typeFilter!: (type: string) => boolean;
-
   @Prop({ type: Boolean, default: false })
   public readonly anyService!: string;
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noCreate!: boolean;
+  @Prop({ type: Array, required: false })
+  readonly compatible!: string[];
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noConfigure!: boolean;
+  @Prop({ type: Boolean, default: true })
+  public readonly clearable!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  public readonly creatable!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  public readonly configurable!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  public readonly show!: boolean;
 
   save(val: BlockAddress): void {
     this.$emit('input', val);
@@ -48,29 +50,34 @@ export default class BlockAddressField extends FieldBase {
     return sparkStore.tryBlockById(this.value.serviceId, this.value.id);
   }
 
-  configureBlock(): void {
+  get canEdit(): boolean {
+    return this.block !== null
+      && this.configurable
+      && this.show;
+  }
+
+  editBlock(): void {
     createBlockDialog(this.block);
   }
 
   openDialog(): void {
-    if (this.readonly || !this.value.serviceId) {
+    if (this.readonly) {
       return;
     }
 
     createDialog({
       component: 'BlockAddressDialog',
-      ...pick(this, [
-        'title',
-        'message',
-        'html',
-        'value',
-        'label',
-        'clearable',
-        'typeFilter',
-        'anyService',
-        'noCreate',
-        'noConfigure',
-      ]),
+      title: this.title,
+      message: this.message,
+      html: this.html,
+      value: this.value,
+      label: this.label,
+      anyService: this.anyService,
+      compatible: this.compatible,
+      clearable: this.clearable,
+      creatable: this.creatable,
+      configurable: this.configurable,
+      ...this.dialogProps,
     })
       .onOk(this.save);
   }
@@ -84,11 +91,11 @@ export default class BlockAddressField extends FieldBase {
     </slot>
     <template #append>
       <q-btn
-        v-if="!noConfigure && block"
+        v-if="canEdit"
         flat
         round
         icon="mdi-launch"
-        @click.stop="configureBlock"
+        @click.stop="editBlock"
       >
         <q-tooltip>Show {{ value.id }}</q-tooltip>
       </q-btn>

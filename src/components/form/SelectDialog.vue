@@ -7,7 +7,7 @@ import DialogBase from '@/components/DialogBase';
 export default class SelectDialog extends DialogBase {
   local: any = null;
 
-  @Prop({ type: [String, Number, Array, Object], required: true })
+  @Prop({ required: true })
   public readonly value!: any;
 
   @Prop({ type: Array, required: true })

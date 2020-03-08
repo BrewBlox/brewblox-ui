@@ -17,6 +17,12 @@ export default class DisplaySettingsFull
   footerRules: InputRule[] = [
     v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
   ];
+  validTypes: string[] = [
+    interfaceTypes.TempSensor,
+    interfaceTypes.SetpointSensorPair,
+    interfaceTypes.ActuatorAnalog,
+    blockTypes.Pid,
+  ]
 
   get slots(): (DisplaySlot | null)[] {
     const slots = Array(6);
@@ -45,14 +51,6 @@ export default class DisplaySettingsFull
       color,
       backgroundColor: color,
     };
-  }
-
-  get typeFilter() {
-    return type =>
-      isCompatible(type, blockTypes.Pid)
-      || isCompatible(type, interfaceTypes.TempSensor)
-      || isCompatible(type, interfaceTypes.SetpointSensorPair)
-      || isCompatible(type, interfaceTypes.ActuatorAnalog);
   }
 
   updateSlotLink(idx: number, link: Link): void {
@@ -124,8 +122,9 @@ export default class DisplaySettingsFull
         >
           <LinkField
             :value="slotLink(slot)"
-            :type-filter="typeFilter"
             :service-id="serviceId"
+            :compatible="validTypes"
+            :show="false"
             title="Block"
             label="Block"
             @input="v => updateSlotLink(idx, v)"

@@ -3,7 +3,7 @@ import Vue, { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { spaceCased } from '@/helpers/functional';
+import { clamp } from '@/helpers/functional';
 
 import { allSpecs } from '../impl/specs';
 import { AutomationItem } from '../types';
@@ -33,6 +33,17 @@ export default class AutomationItems extends Vue {
 
   saveAll(items: AutomationItem[]): void {
     this.$emit('input', items);
+  }
+
+  move(item: AutomationItem, offset: number): void {
+    const idx = this.locals.findIndex(v => v.id === item.id);
+    const newIdx = clamp(idx + offset, 0, this.locals.length - 1);
+    if (idx !== -1 && idx !== newIdx) {
+      const updated = [...this.locals];
+      updated.splice(idx, 1);
+      updated.splice(newIdx, 0, item);
+      this.locals = updated;
+    }
   }
 
   get locals(): AutomationItem[] {
@@ -72,6 +83,9 @@ export default class AutomationItems extends Vue {
       v-model="locals"
       class="column q-gutter-y-md q-my-none"
     >
+      <div v-if="locals.length === 0" class="q-px-sm darkish text-italic">
+        <slot name="empty" />
+      </div>
       <div
         v-for="item in locals"
         :key="item.id"
@@ -94,8 +108,10 @@ export default class AutomationItems extends Vue {
               <ActionMenu dense round>
                 <template #actions>
                   <slot name="actions" :item="item" />
-                  <ActionItem label="Rename" icon="edit" @click="startChangeTitle(item)" />
-                  <ActionItem label="Remove" icon="delete" @click="removeItem(item)" />
+                  <ActionItem label="Move up" icon="mdi-chevron-up" @click="move(item, -1)" />
+                  <ActionItem label="Move down" icon="mdi-chevron-down" @click="move(item, 1)" />
+                  <ActionItem :label="`Rename ${label}`" icon="edit" @click="startChangeTitle(item)" />
+                  <ActionItem :label="`Remove ${label}`" icon="delete" @click="removeItem(item)" />
                 </template>
               </ActionMenu>
             </template>
@@ -110,5 +126,10 @@ export default class AutomationItems extends Vue {
         </div>
       </div>
     </draggable>
+    <div class="row justify-end q-pt-md q-pr-sm">
+      <q-btn fab-mini color="secondary" icon="add" @click="add">
+        <q-tooltip>New {{ label }}</q-tooltip>
+      </q-btn>
+    </div>
   </div>
 </template>

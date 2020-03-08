@@ -9,10 +9,11 @@ import { Link } from '@/helpers/units';
 import { isCompatible } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { featureStore } from '@/store/features';
 
 @Component
 export default class LinkDialog extends DialogBase {
-  link: Link | null = null
+  local: Link | null = null
 
   @Prop({ type: Object })
   public readonly value!: Link;
@@ -23,60 +24,74 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: String, default: 'Link' })
   public readonly label!: string;
 
-  @Prop({ type: Function, required: false })
-  readonly typeFilter!: (type: string) => boolean;
+  @Prop({ type: Array, required: false })
+  readonly compatible!: string[];
 
-  @Prop({ type: Boolean, default: false })
+  @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noCreate!: boolean;
+  @Prop({ type: Boolean, default: true })
+  public readonly creatable!: boolean;
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noConfigure!: boolean;
+  @Prop({ type: Boolean, default: true })
+  public readonly configurable!: boolean;
 
   created(): void {
-    this.link = this.value.copy();
+    this.local = this.value.copy();
   }
 
-  get actualFilter(): ((type: string) => boolean) {
-    return this.typeFilter
-      ? this.typeFilter
-      : type => isCompatible(type, this.value.type);
+  get typeFilter(): ((type: string) => boolean) {
+    return type => isCompatible(type, this.compatible ?? this.value.type);
   }
 
   get linkOpts(): Link[] {
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => this.actualFilter(block.type))
+      .filter(block => this.typeFilter(block.type))
       .map(block => new Link(block.id, block.type))
       .sort(objectStringSorter('id'));
   }
 
-  get linkBlock(): Block | null {
-    return this.link && this.link.id
-      ? sparkStore.tryBlockById(this.serviceId, this.link.id)
+  get block(): Block | null {
+    return this.local
+      ? sparkStore.tryBlockById(this.serviceId, this.local.id)
       : null;
   }
 
-  updateLink(link: Link | null): void {
-    this.link = link || new Link(null, this.value.type);
+  get tooltip(): string | null {
+    return this.block
+      ? featureStore.widgetTitle(this.block.type)
+      : null;
   }
 
-  edit(): void {
-    createBlockDialog(this.linkBlock);
+  get localOk(): boolean {
+    return this.block !== null || this.clearable;
   }
 
-  create(): void {
+  update(link: Link | null): void {
+    this.local = link ?? new Link(null, this.value.type);
+  }
+
+  configureBlock(): void {
+    createBlockDialog(this.block);
+  }
+
+  createBlock(): void {
     createDialog({
       component: 'BlockWizardDialog',
       parent: this,
       serviceId: this.serviceId,
-      filter: this.actualFilter,
+      filter: this.typeFilter,
     })
       .onOk((block: Block) => {
         // Retain original type
-        this.link = new Link(block.id, this.value.type);
+        this.local = new Link(block.id, this.value.type);
       });
+  }
+
+  save(): void {
+    if (this.localOk) {
+      this.onDialogOk(this.local);
+    }
   }
 }
 </script>
@@ -86,11 +101,11 @@ export default class LinkDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.enter="(link || clearable) && onDialogOk(link)"
+    @keyup.ctrl.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
-        :value="link"
+        :value="local"
         :options="linkOpts"
         :clearable="clearable"
         :label="label"
@@ -98,8 +113,11 @@ export default class LinkDialog extends DialogBase {
         option-value="id"
         autofocus
         item-aligned
-        @input="updateLink"
+        @input="update"
       >
+        <q-tooltip v-if="tooltip">
+          {{ tooltip }}
+        </q-tooltip>
         <template #no-option>
           <q-item>
             <q-item-section class="text-grey">
@@ -108,23 +126,47 @@ export default class LinkDialog extends DialogBase {
           </q-item>
         </template>
         <template #after>
-          <q-btn v-if="!noConfigure && linkBlock" flat round icon="mdi-launch" @click="edit">
-            <q-tooltip>Edit {{ link.id }}</q-tooltip>
+          <q-btn
+            v-if="configurable && block"
+            flat
+            round
+            icon="mdi-launch"
+            @click="configureBlock"
+          >
+            <q-tooltip>Edit {{ local.id }}</q-tooltip>
           </q-btn>
-          <q-btn v-else disable flat round icon="mdi-launch" />
-          <q-btn v-if="!noCreate" flat round icon="add" @click="create">
+          <q-btn
+            v-else
+            flat
+            round
+            icon="mdi-launch"
+            disable
+          />
+
+          <q-btn
+            v-if="creatable"
+            flat
+            round
+            icon="add"
+            @click="createBlock"
+          >
             <q-tooltip>Create new Block</q-tooltip>
           </q-btn>
         </template>
       </q-select>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
-          :disable="!clearable && !link"
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          :disable="!localOk"
           flat
           label="OK"
           color="primary"
-          @click="onDialogOk(link)"
+          @click="save"
         />
       </template>
     </DialogCard>

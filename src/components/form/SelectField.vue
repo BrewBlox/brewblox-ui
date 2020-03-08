@@ -7,7 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 @Component
 export default class SelectField extends FieldBase {
 
-  @Prop({ type: [String, Number, Array, Object], required: true })
+  @Prop({ type: [String, Number, Array, Object], required: false })
   public readonly value!: any;
 
   @Prop({ type: Array, required: true })

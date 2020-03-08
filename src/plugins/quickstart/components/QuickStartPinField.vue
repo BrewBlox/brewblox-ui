@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes, isCompatible } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { PinChannel } from '../types';
@@ -33,7 +33,7 @@ export default class QuickStartPinField extends Vue {
     return sparkStore.blockValues(this.serviceId)
       .reduce(
         (acc, block) => {
-          if (this.validTypes.includes(block.type)) {
+          if (isCompatible(block.type, this.validTypes)) {
             acc.push(
               ...block.data.pins.map((pin, idx) => {
                 const [pinName] = Object.keys(block.data.pins[idx]);

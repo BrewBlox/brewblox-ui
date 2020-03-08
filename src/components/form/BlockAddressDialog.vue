@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
-import { objectStringSorter, spaceCased } from '@/helpers/functional';
+import { objectStringSorter } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress } from '@/plugins/spark/types';
@@ -27,20 +27,20 @@ export default class BlockAddressDialog extends DialogBase {
   @Prop({ type: String, default: 'Block' })
   public readonly label!: string;
 
-  @Prop({ type: Function, required: false })
-  readonly typeFilter!: (type: string) => boolean;
-
   @Prop({ type: Boolean, default: false })
   public readonly anyService!: boolean;
 
-  @Prop({ type: Boolean, default: false })
+  @Prop({ type: Array, required: false })
+  readonly compatible!: string[];
+
+  @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noCreate!: boolean;
+  @Prop({ type: Boolean, default: true })
+  public readonly creatable!: boolean;
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noConfigure!: boolean;
+  @Prop({ type: Boolean, default: true })
+  public readonly configurable!: boolean;
 
   created(): void {
     if (this.value.id) {
@@ -50,7 +50,7 @@ export default class BlockAddressDialog extends DialogBase {
 
   get serviceId(): string {
     const addr = this.local ?? this.value;
-    return addr.serviceId ?? sparkStore.serviceIds[0];
+    return addr.serviceId ?? this.serviceIds[0];
   }
 
   set serviceId(serviceId: string) {
@@ -67,31 +67,32 @@ export default class BlockAddressDialog extends DialogBase {
     return sparkStore.serviceIds;
   }
 
-  get actualFilter(): ((type: string) => boolean) {
-    return this.typeFilter
-      ? this.typeFilter
-      : type => isCompatible(type, this.value.type);
+  get typeFilter(): ((type: string) => boolean) {
+    const intf = this.compatible ?? this.value.type;
+    return type => isCompatible(type, intf);
   }
 
-  get tooltip(): string | null {
-    const addr = this.local ?? this.value;
-    return addr.type
-      ? featureStore.widgetTitle(addr.type) ?? spaceCased(addr.type)
+  get addrOpts(): BlockAddress[] {
+    return sparkStore.blockValues(this.serviceId)
+      .filter(block => this.typeFilter(block.type))
+      .map(asAddr)
+      .sort(objectStringSorter('id'));
+  }
+
+  get block(): Block | null {
+    return this.local
+      ? sparkStore.tryBlockById(this.serviceId, this.local.id)
       : null;
   }
 
-  get addrOpts(): SelectOption[] {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => this.actualFilter(block.type))
-      .map(block => ({
-        value: asAddr(block),
-        label: block.id,
-      }))
-      .sort(objectStringSorter('label'));
+  get tooltip(): string | null {
+    return this.block
+      ? featureStore.widgetTitle(this.block.type)
+      : null;
   }
 
   get localOk(): boolean {
-    return this.clearable || !!this.local?.id;
+    return this.block !== null || this.clearable;
   }
 
   configureBlock(): void {
@@ -101,9 +102,8 @@ export default class BlockAddressDialog extends DialogBase {
   createBlock(): void {
     createDialog({
       component: 'BlockWizardDialog',
-      parent: this,
       serviceId: this.serviceId,
-      filter: this.actualFilter,
+      filter: this.typeFilter,
     })
       .onOk((block: Block) => {
         this.local = asAddr(block);
@@ -111,12 +111,13 @@ export default class BlockAddressDialog extends DialogBase {
   }
 
   save(): void {
-    if (!this.localOk) { return; }
-    this.onDialogOk(this.local ?? {
-      id: null,
-      serviceId: this.serviceId,
-      type: this.value.type,
-    });
+    if (this.localOk) {
+      this.onDialogOk(this.local ?? {
+        id: null,
+        serviceId: this.serviceId,
+        type: this.value.type,
+      });
+    }
   }
 }
 </script>
@@ -143,8 +144,8 @@ export default class BlockAddressDialog extends DialogBase {
         :label="label"
         autofocus
         item-aligned
-        emit-value
-        map-options
+        option-label="id"
+        option-value="id"
       >
         <q-tooltip v-if="tooltip">
           {{ tooltip }}
@@ -158,7 +159,7 @@ export default class BlockAddressDialog extends DialogBase {
         </template>
         <template #after>
           <q-btn
-            v-if="!noConfigure && local && local.id"
+            v-if="configurable && block"
             flat
             round
             icon="mdi-launch"
@@ -175,7 +176,7 @@ export default class BlockAddressDialog extends DialogBase {
           />
 
           <q-btn
-            v-if="!noCreate"
+            v-if="creatable"
             flat
             round
             icon="add"
