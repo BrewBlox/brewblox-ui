@@ -11,10 +11,10 @@ const spec: PartSpec = {
   title: 'Valve: actuator',
   size: () => [1, 1],
   cards: [{
-    component: 'LinkedBlockCard',
+    component: 'BlockAddressCard',
     props: {
       settingsKey: 'valve',
-      types: [blockTypes.MotorValve, blockTypes.DigitalActuator],
+      compatible: [blockTypes.MotorValve, blockTypes.DigitalActuator],
       label: 'Valve or Actuator',
     },
   }],

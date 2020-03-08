@@ -1,27 +1,27 @@
-import get from 'lodash/get';
-
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, BlockAddress } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
 import { SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
-import { FlowPart, LinkedBlock, PersistentPart, Rect, StatePart, Transitions } from './types';
+import { FlowPart, PersistentPart, Rect, StatePart, Transitions } from './types';
 
-export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
-  const linked: LinkedBlock = part.settings[key];
-  return linked?.serviceId && linked?.blockId
-    ? sparkStore.tryBlockById(linked.serviceId, linked.blockId) as T | null
-    : null;
+export function settingsAddress(part: PersistentPart, key: string): BlockAddress {
+  const obj: any = part.settings[key] ?? {};
+  return {
+    // Older objects use 'blockId' as key
+    id: obj.id ?? obj.blockId ?? null,
+    serviceId: obj.serviceId ?? null,
+    type: obj.type ?? null,
+  };
 }
 
-export function settingsLink(part: PersistentPart, key: string): LinkedBlock {
-  const serviceId = get(part.settings, [key, 'serviceId'], null);
-  const blockId = get(part.settings, [key, 'blockId'], null);
-  return { serviceId, blockId };
-};
+export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
+  const addr = settingsAddress(part, key);
+  return sparkStore.tryBlockById(addr.serviceId, addr.id);
+}
 
 export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPart {
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -148,16 +148,16 @@ export function elbow(dX: number, dY: number, horizontal: boolean): string {
 }
 
 export function showAbsentBlock(part: PersistentPart, key: string): void {
-  const link = settingsLink(part, key);
-  if (!!link.serviceId && !!link.blockId) {
+  const addr = settingsAddress(part, key);
+  if (!!addr.serviceId && !!addr.id) {
     createDialog({
       title: 'Broken Link',
-      message: `Block '${link.blockId}' was not found. Use the editor to change the link.`,
+      message: `Block '${addr.id}' was not found. Use the editor to change the link.`,
     });
   }
 }
 
-export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
+export function showSettingsBlock(part: PersistentPart, key: string): void {
   const block = settingsBlock(part, key);
   block !== null
     ? createBlockDialog(block, { mode: 'Basic' })

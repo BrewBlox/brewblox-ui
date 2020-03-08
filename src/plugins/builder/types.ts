@@ -50,11 +50,6 @@ export interface PartUpdater {
   updatePart: (part: PersistentPart) => void;
 }
 
-export interface LinkedBlock {
-  serviceId: string | null;
-  blockId: string | null;
-}
-
 export interface CardSpec {
   component: string;
   props?: Mapped<any>;

@@ -2,8 +2,8 @@ import { Coordinates } from '@/helpers/coordinates';
 import { blockTypes } from '@/plugins/spark/block-types';
 
 import { CENTER, DOWN, LEFT, RIGHT, UP } from '../getters';
-import { showLinkedBlockDialog } from '../helpers';
-import { PartSpec, PersistentPart } from '../types';
+import { showSettingsBlock } from '../helpers';
+import { PartSpec } from '../types';
 
 
 const RIGHT_RIGHT = new Coordinates(RIGHT).translate([1, 0, 0]).toString();
@@ -12,20 +12,21 @@ const RIGHT_DOWN = new Coordinates(DOWN).translate([1, 0, 0]).toString();
 
 const SIZE_X = 2;
 const SIZE_Y = 1;
+const settingsKey = 'setpoint';
 
 const spec: PartSpec = {
   id: 'SetpointDisplay',
   title: 'Display: setpoint',
   cards: [{
-    component: 'LinkedBlockCard',
+    component: 'BlockAddressCard',
     props: {
-      settingsKey: 'setpoint',
-      types: [blockTypes.SetpointSensorPair],
+      settingsKey,
+      compatible: [blockTypes.SetpointSensorPair],
       label: 'Setpoint',
     },
   }],
   size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'setpoint'),
+  interactHandler: part => showSettingsBlock(part, settingsKey),
   transitions: () => ({
     [UP]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
     [LEFT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],

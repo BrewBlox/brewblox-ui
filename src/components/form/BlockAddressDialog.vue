@@ -12,7 +12,7 @@ import { featureStore } from '@/store/features';
 
 const asAddr = (v: Block | BlockAddress): BlockAddress => ({
   id: v?.id ?? null,
-  serviceId: v?.serviceId,
+  serviceId: v?.serviceId ?? null,
   type: v?.type ?? null,
 });
 
@@ -142,6 +142,8 @@ export default class BlockAddressDialog extends DialogBase {
         :options="addrOpts"
         :clearable="clearable"
         :label="label"
+        :error="local && local.id && !block"
+        error-message="Block not found"
         autofocus
         item-aligned
         option-label="id"

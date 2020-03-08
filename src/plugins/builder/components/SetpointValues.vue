@@ -3,11 +3,12 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { contrastColor } from '@/helpers/functional';
+import { blockTypes } from '@/plugins/spark/block-types';
 import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
 
-import { blockTypes } from '../../spark/block-types';
-import { settingsBlock, settingsLink, squares } from '../helpers';
+import { settingsAddress, squares } from '../helpers';
 import { PersistentPart } from '../types';
 
 @Component
@@ -38,8 +39,18 @@ export default class SetpointValues extends Vue {
       : 'white';
   }
 
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.settingsKey);
+  }
+
   get block(): SetpointSensorPairBlock | null {
-    return settingsBlock(this.part, this.settingsKey);
+    const { serviceId, id } = this.address;
+    return sparkStore.tryBlockById(serviceId, id);
+  }
+
+  get isBroken(): boolean {
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get isUsed(): boolean {
@@ -55,14 +66,6 @@ export default class SetpointValues extends Vue {
     return !!this.block
       && sparkStore.drivenBlocks(this.block.serviceId)
         .includes(this.block.id);
-  }
-
-  get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, this.settingsKey);
-    return !!link.serviceId && !!link.blockId;
   }
 
   get setpointSetting(): number | null {

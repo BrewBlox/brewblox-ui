@@ -12,8 +12,12 @@ const spec: PartSpec = {
   size: () => [1, 1],
   cards: [
     {
-      component: 'LinkedBlockCard',
-      props: { settingsKey: 'pwm', types: [blockTypes.ActuatorPwm], label: 'PWM' },
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey: 'pwm',
+        compatible: [blockTypes.ActuatorPwm],
+        label: 'PWM',
+      },
     },
     {
       component: 'PressureCard',

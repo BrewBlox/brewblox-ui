@@ -2,23 +2,29 @@
 import { Component } from 'vue-property-decorator';
 
 import { TempSensorMockBlock, TempSensorOneWireBlock } from '@/plugins/spark/block-types';
+import { sparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
-import { settingsBlock, settingsLink } from '../helpers';
+import { settingsAddress } from '../helpers';
 
 
 @Component
 export default class SensorDisplay extends PartBase {
+  settingsKey = 'sensor';
+
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.settingsKey);
+  }
+
   get block(): TempSensorMockBlock | TempSensorOneWireBlock | null {
-    return settingsBlock(this.part, 'sensor');
+    const { serviceId, id } = this.address;
+    return sparkStore.tryBlockById(serviceId, id);
   }
 
   get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, 'sensor');
-    return !!link.serviceId && !!link.blockId;
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get temperature(): number | null {

@@ -63,31 +63,25 @@ export default class LinkedWidgetCard extends PartCard {
 </script>
 
 <template>
-  <q-list>
-    <q-separator />
-    <q-item>
-      <q-item-section>
-        <q-select
-          v-model="linked"
-          :options="linkedOpts"
-          :label="label"
-          :error="broken"
-          clearable
-          map-options
-          emit-value
-        >
-          <template #no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-          <template #error>
-            <div>Link broken: widget not found</div>
-          </template>
-        </q-select>
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <q-select
+    v-model="linked"
+    :options="linkedOpts"
+    :label="label"
+    :error="broken"
+    clearable
+    map-options
+    emit-value
+    item-aligned
+  >
+    <template #no-option>
+      <q-item>
+        <q-item-section class="text-grey">
+          No results
+        </q-item-section>
+      </q-item>
+    </template>
+    <template #error>
+      <div>Link broken: widget not found</div>
+    </template>
+  </q-select>
 </template>

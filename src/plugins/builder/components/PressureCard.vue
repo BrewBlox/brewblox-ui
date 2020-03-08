@@ -39,22 +39,19 @@ export default class PressureCard extends PartCard {
 </script>
 
 <template>
-  <q-list>
-    <q-separator />
-    <q-item>
-      <q-item-section>
-        <q-item-label caption>
-          {{ label }}
-        </q-item-label>
-        <q-slider :value="value" :min="min" :max="max" @change="debouncedSave" />
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-btn icon="mdi-backup-restore" flat round size="sm" @click="reset">
-          <q-tooltip>
-            Reset to default
-          </q-tooltip>
-        </q-btn>
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <q-item class="q-ma-none q-mt-xs">
+    <q-item-section>
+      <q-item-label caption>
+        {{ label }}
+      </q-item-label>
+      <q-slider :value="value" :min="min" :max="max" @change="debouncedSave" />
+    </q-item-section>
+    <q-item-section class="col-auto">
+      <q-btn icon="mdi-backup-restore" flat round size="sm" @click="reset">
+        <q-tooltip>
+          Reset to default
+        </q-tooltip>
+      </q-btn>
+    </q-item-section>
+  </q-item>
 </template>

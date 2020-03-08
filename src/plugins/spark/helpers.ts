@@ -79,9 +79,10 @@ export const canDisplay = (addr: BlockAddress): boolean => {
     .some(intf => isCompatible(addr.type, intf));
 };
 
-const displayBlock = (serviceId: string | undefined): DisplaySettingsBlock | undefined =>
+const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBlock | undefined =>
   serviceId
-    ? sparkStore.blockValues(serviceId).find(v => v.type === blockTypes.DisplaySettings)
+    ? sparkStore.blockValues(serviceId)
+      .find(v => v.type === blockTypes.DisplaySettings)
     : undefined;
 
 export const isDisplayed = (addr: BlockAddress): boolean =>

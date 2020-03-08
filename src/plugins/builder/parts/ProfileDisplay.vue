@@ -3,23 +3,29 @@ import { Component } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
 import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
+import { sparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
-import { settingsBlock, settingsLink } from '../helpers';
+import { settingsAddress } from '../helpers';
 
 
 @Component
 export default class ProfileDisplay extends PartBase {
+  settingsKey = 'profile';
+
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.settingsKey);
+  }
+
   get block(): SetpointProfileBlock | null {
-    return settingsBlock(this.part, 'profile');
+    const { serviceId, id } = this.address;
+    return sparkStore.tryBlockById(serviceId, id);
   }
 
   get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, 'profile');
-    return !!link.serviceId && !!link.blockId;
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get points(): Setpoint[] {

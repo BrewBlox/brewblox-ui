@@ -12,7 +12,7 @@ type Datum = Date | number | null;
 
 export interface BlockPatchImpl {
   type: 'BlockPatch';
-  serviceId: string;
+  serviceId: string | null;
   blockId: string | null;
   blockType: string | null;
   data: any;
@@ -45,7 +45,7 @@ export interface TimeElapsedImpl {
 
 export interface BlockValueImpl {
   type: 'BlockValue';
-  serviceId: string;
+  serviceId: string | null;
   blockId: string | null;
   blockType: string | null;
   key: string | null;
