@@ -70,7 +70,7 @@ export default class BuilderPartMenu extends Vue {
         <DialogToolbar :title="partTitle" @close="close" />
       </template>
 
-      <div class="widget-body column q-gutter-y-md">
+      <div class="widget-body column q-gutter-y-lg">
         <div class="row justify-center">
           <svg
             :width="`${squares(rotatedSize[0]) * displayScale}px`"

@@ -29,7 +29,7 @@ export default class ColorCard extends PartCard {
 </script>
 
 <template>
-  <div v-if="true" class="row">
+  <div class="row">
     <ColorField
       v-model="color"
       clearable
