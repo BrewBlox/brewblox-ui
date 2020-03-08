@@ -25,9 +25,6 @@ export default class LinkedBlockCard extends PartCard {
   @Prop({ type: String, default: 'Block' })
   public readonly label!: string;
 
-  @Prop({ type: Function })
-  readonly filter!: (link: Link) => boolean;
-
   @Prop({ type: Boolean, default: false })
   public readonly noCreate!: boolean;
 
@@ -57,8 +54,8 @@ export default class LinkedBlockCard extends PartCard {
     const sorter = objectStringSorter('id');
     return this.sparkServices
       .flatMap(svc => sparkStore.blockValues(svc.id)
+        .filter(block => this.typeFilter(block.type))
         .map(block => new Link(block.id, block.type))
-        .filter(this.actualFilter)
         .sort(sorter)
         .map(link => ({
           label: `[${svc.id}] ${link.id}`,
@@ -75,14 +72,7 @@ export default class LinkedBlockCard extends PartCard {
   }
 
   get typeFilter(): (type: string | null) => boolean {
-    return type => this.types.some(intf => isCompatible(type, intf));
-  }
-
-  get actualFilter(): (link: Link) => boolean {
-    if (this.filter) {
-      return this.filter;
-    }
-    return block => this.typeFilter(block.type);
+    return type => isCompatible(type, this.types);
   }
 
   createBlock(serviceId: string): void {

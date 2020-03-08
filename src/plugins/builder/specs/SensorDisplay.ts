@@ -1,3 +1,5 @@
+import { interfaceTypes } from '@/plugins/spark/block-types';
+
 import { CENTER, DOWN, LEFT, RIGHT, UP } from '../getters';
 import { showLinkedBlockDialog } from '../helpers';
 import { PartSpec } from '../types';
@@ -10,7 +12,7 @@ const spec: PartSpec = {
   title: 'Display: sensor',
   cards: [{
     component: 'LinkedBlockCard',
-    props: { settingsKey: 'sensor', types: ['TempSensorInterface'], label: 'Sensor' },
+    props: { settingsKey: 'sensor', types: [interfaceTypes.TempSensor], label: 'Sensor' },
   }],
   size: () => [SIZE_X, SIZE_Y],
   transitions: () => ({

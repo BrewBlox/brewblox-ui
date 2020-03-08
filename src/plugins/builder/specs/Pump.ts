@@ -1,5 +1,4 @@
-import { typeName } from '@/plugins/spark/features/DigitalActuator/getters';
-import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
+import { blockTypes, DigitalActuatorBlock } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
@@ -14,7 +13,7 @@ const spec: PartSpec = {
   cards: [
     {
       component: 'LinkedBlockCard',
-      props: { settingsKey: 'actuator', types: [typeName], label: 'Actuator' },
+      props: { settingsKey: 'actuator', types: [blockTypes.DigitalActuator], label: 'Actuator' },
     },
     {
       component: 'PressureCard',
