@@ -9,10 +9,10 @@ const services = args.length > 0 ? args : sparks;
 
 async function run() {
   for (let svc of services) {
-    const resp = await axios.get(`${host}/${svc}/export_objects`);
     const fname = `${fileDir}/${svc}.spark.json`;
-    fs.writeFileSync(fname, JSON.stringify(resp.data, undefined, 2));
-    console.log('Blocks saved', fname);
+    const blocks = JSON.parse(fs.readFileSync(fname));
+    await axios.post(`${host}/${svc}/import_objects`, blocks);
+    console.log('Spark blocks loaded', fname);
   }
 };
 

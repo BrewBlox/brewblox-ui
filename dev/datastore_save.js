@@ -1,10 +1,10 @@
 const axios = require('axios');
-const { datastore, databases, fileDir } = require('./utils');
+const { host, databases, fileDir } = require('./utils');
 const fs = require('fs');
 
 async function saveDatastore() {
   for (let db of databases) {
-    const resp = await axios.get(`${datastore}/${db}/_all_docs`, {
+    const resp = await axios.get(`${host}/datastore/${db}/_all_docs`, {
       params: {
         'include_docs': true,
       },
@@ -17,11 +17,11 @@ async function saveDatastore() {
         return persistent;
       });
     const fname = `${fileDir}/${db}.datastore.json`;
-    fs.writeFileSync(fname, JSON.stringify(docs));
-    console.log('Exported', fname);
+    fs.writeFileSync(fname, JSON.stringify(docs, undefined, 2));
+    console.log('Database saved', fname);
   }
 }
 
 saveDatastore()
-  .then(() => console.log('Datastore saved!'))
+  .then(() => console.log('Script done!', __filename))
   .catch(e => console.log(e));

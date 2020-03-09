@@ -21,7 +21,14 @@
         7
       ],
       "type": "SysInfo",
-      "data": {}
+      "data": {
+        "deviceId": "",
+        "version": "",
+        "platform": 0,
+        "protocolVersion": "",
+        "releaseDate": "",
+        "protocolDate": ""
+      }
     },
     {
       "id": "OneWireBus",
@@ -66,6 +73,45 @@
       }
     },
     {
+      "id": "DisplaySettings",
+      "nid": 7,
+      "groups": [
+        7
+      ],
+      "type": "DisplaySettings",
+      "data": {
+        "widgets": [
+          {
+            "pos": 1,
+            "color": "0088aa",
+            "name": "pwm1",
+            "actuatorAnalog<ActuatorAnalogInterface>": "actuator-pwm-1"
+          },
+          {
+            "pos": 2,
+            "color": "00aa88",
+            "name": "pair1",
+            "setpointSensorPair<SetpointSensorPair>": "setpoint-sensor-pair-1"
+          },
+          {
+            "pos": 3,
+            "color": "aa0088",
+            "name": "sensor1",
+            "tempSensor<TempSensorInterface>": "sensor-1"
+          },
+          {
+            "pos": 4,
+            "color": "aa8800",
+            "name": "pid",
+            "pid<Pid>": "pid-1"
+          }
+        ],
+        "name": "test",
+        "tempUnit": 0,
+        "brightness": 0
+      }
+    },
+    {
       "id": "SparkPins",
       "nid": 19,
       "groups": [
@@ -73,43 +119,12 @@
       ],
       "type": "Spark3Pins",
       "data": {
-        "pins": [
-          {
-            "top1": {
-              "config": 0,
-              "state": 0
-            }
-          },
-          {
-            "top2": {
-              "config": 0,
-              "state": 0
-            }
-          },
-          {
-            "top3": {
-              "config": 0,
-              "state": 0
-            }
-          },
-          {
-            "bottom1": {
-              "config": 1,
-              "state": 0
-            }
-          },
-          {
-            "bottom2": {
-              "config": 1,
-              "state": 0
-            }
-          }
-        ],
         "enableIoSupply5V": true,
         "enableIoSupply12V": true,
-        "voltage5": 5.0,
-        "voltage12": 12.0,
-        "soundAlarm": false
+        "pins": [],
+        "soundAlarm": false,
+        "voltage5": 0,
+        "voltage12": 0
       }
     },
     {
@@ -131,8 +146,8 @@
       ],
       "type": "Mutex",
       "data": {
-        "waitRemaining[second]": 0,
-        "differentActuatorWait[second]": 0.01
+        "differentActuatorWait[second]": 0.01,
+        "waitRemaining[second]": 0
       }
     },
     {
@@ -159,8 +174,8 @@
         ],
         "start": 1540376829,
         "enabled": false,
-        "drivenTargetId<SetpointSensorPair,driven>": null,
-        "targetId<SetpointSensorPair>": null
+        "targetId<SetpointSensorPair>": null,
+        "drivenTargetId<SetpointSensorPair,driven>": null
       }
     },
     {
@@ -168,7 +183,10 @@
       "nid": 203,
       "groups": [],
       "type": "TempSensorMock",
-      "data": {}
+      "data": {
+        "connected": false,
+        "value[degC]": 0
+      }
     },
     {
       "id": "sensor-1",
@@ -204,12 +222,14 @@
       "type": "SetpointSensorPair",
       "data": {
         "settingEnabled": true,
-        "storedSetting[degC]": 20,
-        "value[degC]": 0,
-        "sensorId<TempSensorInterface>": "sensor-1",
-        "setting[degC]": 30,
         "filter": 1,
-        "filterThreshold[delta_degC]": 4
+        "resetFilter": false,
+        "filterThreshold[delta_degC]": 4,
+        "sensorId<TempSensorInterface>": "sensor-1",
+        "setting[degC]": 0,
+        "value[degC]": 0,
+        "valueUnfiltered[degC]": 0,
+        "storedSetting[degC]": 20
       }
     },
     {
@@ -221,48 +241,14 @@
       "type": "SetpointSensorPair",
       "data": {
         "settingEnabled": true,
-        "storedSetting[degC]": 20,
-        "value[degC]": 0,
+        "filter": 0,
+        "resetFilter": false,
+        "filterThreshold[delta_degC]": 0,
         "sensorId<TempSensorInterface>": null,
-        "setting[degC]": 0
-      }
-    },
-    {
-      "id": "DisplaySettings",
-      "nid": 7,
-      "groups": [
-        7
-      ],
-      "type": "DisplaySettings",
-      "data": {
-        "widgets": [
-          {
-            "pos": 1,
-            "color": "0088aa",
-            "name": "pwm1",
-            "actuatorAnalog<ActuatorAnalogInterface>": "actuator-pwm-1"
-          },
-          {
-            "pos": 2,
-            "color": "00aa88",
-            "name": "pair1",
-            "setpointSensorPair<SetpointSensorPair>": "setpoint-sensor-pair-1"
-          },
-          {
-            "pos": 3,
-            "color": "aa0088",
-            "name": "sensor1",
-            "tempSensor<TempSensorInterface>": "sensor-1"
-          },
-          {
-            "pos": 4,
-            "color": "aa8800",
-            "name": "pid",
-            "pid<Pid>": "pid-1"
-          }
-        ],
-        "name": "test",
-        "tempUnit": 0
+        "setting[degC]": 0,
+        "value[degC]": 0,
+        "valueUnfiltered[degC]": 0,
+        "storedSetting[degC]": 20
       }
     },
     {
@@ -273,7 +259,6 @@
       ],
       "type": "ActuatorAnalogMock",
       "data": {
-        "setting": 20,
         "minSetting": 10,
         "maxSetting": 30,
         "minValue": 40,
@@ -281,7 +266,9 @@
         "constrainedBy": {
           "constraints": []
         },
-        "value": 0
+        "setting": 0,
+        "value": 0,
+        "desiredSetting": 0
       }
     },
     {
@@ -300,8 +287,8 @@
             },
             {
               "balanced": {
-                "id": 1,
                 "granted": 0,
+                "id": 0,
                 "balancerId<BalancerInterface>": "balancer-1"
               },
               "limiting": false
@@ -311,8 +298,9 @@
         "setting": 0,
         "value": 0,
         "enabled": false,
-        "period[second]": 4,
+        "desiredSetting": 0,
         "drivenActuatorId<ProcessValueInterface,driven>": null,
+        "period[second]": 4,
         "actuatorId<ActuatorDigitalInterface>": "pin-actuator-1"
       }
     },
@@ -328,9 +316,10 @@
         "setting": 0,
         "value": 0,
         "enabled": false,
+        "desiredSetting": 0,
+        "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1",
         "referenceId<ProcessValueInterface>": "setpoint-sensor-pair-1",
-        "drivenTargetId<ProcessValueInterface,driven>": null,
-        "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1"
+        "drivenTargetId<ProcessValueInterface,driven>": null
       }
     },
     {
@@ -348,17 +337,21 @@
         "p": 0,
         "i": 0,
         "d": 0,
+        "integralReset": 0,
+        "boilMinOutput": 0,
+        "boilModeActive": false,
         "derivative[delta_degC / hour]": 0,
-        "inputId<ProcessValueInterface>": "setpoint-sensor-pair-1",
-        "td[second]": 60,
-        "ti[second]": 3600,
-        "error[delta_degC]": 0,
-        "drivenOutputId<ActuatorAnalogInterface,driven>": null,
         "integral[delta_degC * hour]": 0,
-        "kp[1 / degC]": 20,
+        "ti[second]": 3600,
+        "td[second]": 60,
+        "inputId<SetpointSensorPairInterface>": "setpoint-sensor-pair-1",
+        "drivenOutputId<ActuatorAnalogInterface,driven>": null,
         "outputId<ActuatorAnalogInterface>": "actuator-pwm-1",
+        "error[delta_degC]": 0,
+        "boilPointAdjust[delta_degC]": 0,
         "inputValue[degC]": 0,
-        "inputSetting[degC]": 0
+        "inputSetting[degC]": 0,
+        "kp[1 / degC]": 20
       }
     },
     {
@@ -369,7 +362,9 @@
       ],
       "type": "DS2413",
       "data": {
-        "address": "4444444444444444"
+        "address": "4444444444444444",
+        "connected": false,
+        "pins": []
       }
     },
     {
@@ -381,15 +376,18 @@
       "type": "DigitalActuator",
       "data": {
         "channel": 1,
-        "hwDevice<IoArrayInterface,driven>": "SparkPins",
         "constrainedBy": {
           "constraints": [
             {
-              "limiting": false,
+              "remaining[second]": 0,
               "mutex<MutexInterface>": "mutex-1"
             }
           ]
-        }
+        },
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "SparkPins"
       }
     },
     {
@@ -401,15 +399,18 @@
       "type": "DigitalActuator",
       "data": {
         "channel": 2,
-        "hwDevice<IoArrayInterface,driven>": "SparkPins",
         "constrainedBy": {
           "constraints": [
             {
-              "limiting": false,
+              "remaining[second]": 0,
               "mutex<MutexInterface>": "mutex-1"
             }
           ]
-        }
+        },
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "SparkPins"
       }
     },
     {
@@ -419,7 +420,13 @@
         0
       ],
       "type": "DigitalActuator",
-      "data": {}
+      "data": {
+        "channel": 0,
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": null
+      }
     },
     {
       "id": "mock-sensor-1",
@@ -505,6 +512,13 @@
       "keys": [
         "DisplaySettings",
         7
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "SparkPins",
+        19
       ],
       "data": {}
     },

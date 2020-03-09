@@ -1,43 +1,26 @@
 const axios = require('axios');
 const fs = require('fs');
-const path = require('path');
-const { retry } = require('./utils');
+const { host, retry, databases, fileDir } = require('./utils');
 
-// const recreateDatabase = async () => {
-//   try {
-//     await request.delete(`${host}/${database}`);
-//   } catch (e) {
-//     // pass
-//   }
-//   console.log(await retry('create database', async () => {
-//     return await request.put(`${host}/${database}`);
-//   }));
-// };
+const datastore = `${host}/datastore`;
 
-// const resetModule = async (mod) => {
-//   const content = JSON.parse(fs.readFileSync(`${dir}/${mod}.json`, 'utf8'));
-//   content.docs = content.docs
-//     .map(obj => ({ ...obj, _id: `${mod}__${obj._id}` }));
-//   console.log(await retry(`insert ${mod} docs`, async () => {
-//     return await request.post({
-//       uri: `${host}/${database}/_bulk_docs`,
-//       json: content,
-//       timeout: 70000,
-//     });
-//   }));
-// };
+async function run() {
+  await retry('wait for database', async () => {
+    await axios.get(datastore);
+  });
 
-const resetDatastore = async () => {
-  await listFiles();
-  // await recreateDatabase();
-  // await Promise
-  //   .all(modules.map(resetModule));
+  for (let db of databases) {
+    const url = `${datastore}/${db}`;
+    const fname = `${fileDir}/${db}.datastore.json`;
+    const docs = JSON.parse(fs.readFileSync(fname));
+
+    await axios.delete(url).catch(() => { });
+    await axios.put(url);
+    await axios.post(`${url}/_bulk_docs`, { docs });
+    console.log('Database loaded', fname);
+  }
 };
 
-resetDatastore()
-  .then(() => {
-    console.log('Succesfully reset datastore');
-  })
-  .catch((e) => {
-    console.log(e);
-  });
+run()
+  .then(() => console.log('Script done!', __filename))
+  .catch(e => console.log(e));

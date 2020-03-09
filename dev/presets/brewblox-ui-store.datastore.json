@@ -1,1 +1,1996 @@
-[{"_id":"dashboard-items__07f314cb-b33f-4d32-96e7-47c021d738d1","dashboard":"herms","cols":4,"rows":5,"order":3,"title":"HERMS Actions","feature":"QuickActions","config":{"changeIdMigrated":true,"serviceId":"sparkey","steps":[{"name":"Disable all setpoints","id":"b0ad4360-55c6-4ea2-9afc-7e150f1f552a","changes":[{"id":"c7460836-776e-4a6b-9bf5-6d06ec01fb55","blockId":"HERMS HLT Setpoint","data":{"settingEnabled":false},"confirmed":{}},{"id":"8a2f448f-539b-46cc-a514-7097520829de","blockId":"HERMS MT Setpoint","data":{"settingEnabled":false},"confirmed":{}},{"id":"3adedeb4-4e4d-42f4-83e1-33096668583f","blockId":"HERMS BK Setpoint","data":{"settingEnabled":false},"confirmed":{}}]},{"name":"Constant HLT Temp","id":"e76f0db3-40b7-480e-92d3-1d8bdbb74660","changes":[{"id":"374a6dcc-e199-4336-b2f9-94dd490406ab","blockId":"HERMS MT Setpoint","data":{"settingEnabled":false},"confirmed":{}},{"id":"a7a05aeb-ff9a-416a-a83e-03290f9478a4","blockId":"HERMS HLT Setpoint","data":{"settingEnabled":true,"storedSetting[degC]":70},"confirmed":{"storedSetting":true}}]},{"name":"Constant MT Temp","id":"00e1dc70-f31a-46c0-830f-56368f5f8771","changes":[{"id":"4665c4cd-35f5-4457-9dc3-74ef17c03b58","blockId":"HERMS MT Setpoint","data":{"settingEnabled":true,"storedSetting[degC]":66.7},"confirmed":{"storedSetting":true}},{"id":"65f1048d-1176-4a38-86ff-0a783ac3c487","blockId":"HERMS HLT Setpoint Driver","data":{"enabled":true},"confirmed":{}}],"applicable":true,"diffs":[{"blockId":"HERMS MT Setpoint","diffs":[{"key":"Enabled","oldV":"false","newV":"true","changed":true},{"key":"Setting","oldV":"67.00 °C","newV":"66.70 °C","changed":true}]},{"blockId":"HERMS HLT Setpoint Driver","diffs":[{"key":"Enabled","oldV":"false","newV":"true","changed":true}]}],"active":false},{"name":"Constant BK Temp","id":"8342447b-c3c8-4453-a9b1-db69b8c9e1d6","changes":[{"id":"59d3b544-b605-4a36-9323-e721cd05defc","blockId":"HERMS BK Setpoint","data":{"settingEnabled":true,"storedSetting[degC]":100},"confirmed":{"storedSetting":true}}]}]},"pinnedPosition":{"x":8,"y":6}},{"_id":"dashboard-items__1-55d75cbee5631853c77cd22f26e9a81c","title":"Ministry of Silly Walks","order":4,"cols":4,"rows":2,"feature":"Automation","dashboard":"dashboard-home","config":{}},{"_id":"dashboard-items__a0634d76-5499-11e9-8647-d663bd873d93","title":"Gone With the Flow","order":1,"cols":12,"rows":8,"feature":"ProcessView","dashboard":"builder","config":{"currentLayoutId":"0e28d1ad-8e38-4204-b634-c1301aae73ac","layoutIds":["0e28d1ad-8e38-4204-b634-c1301aae73ac","ee021f01-fc29-2e06-c903-0c9288eb1bfe"]}},{"_id":"dashboard-items__a06350b4-5499-11e9-8647-d663bd873d93","title":"item-invalid","order":1,"cols":3,"rows":3,"feature":"SetpointSensorPair","dashboard":"derp","config":{"serviceId":"sparkey","blockId":"BLARGH"}},{"_id":"dashboard-items__a06355e6-5499-11e9-8647-d663bd873d93","title":"item-unknown","order":2,"cols":3,"rows":3,"feature":"UnknownType","dashboard":"derp","config":{"serviceId":"sparkey","blockId":"setpoint-1"}},{"_id":"dashboard-items__a06358fc-5499-11e9-8647-d663bd873d93","title":"item-invalid-unknown","order":3,"cols":3,"rows":3,"feature":"Warbl","dashboard":"derp","config":{"serviceId":"sparkey","blockId":"BLORP"}},{"_id":"dashboard-items__a06358fc-5499-11e9-8647-d663bd873d95","title":"Charles","order":3,"cols":4,"rows":2,"feature":"QuickActions","dashboard":"dashboard-home","config":{"serviceId":"sparkey","steps":[{"id":"b92781c7-3a9f-440d-8df6-bd897b4bfa37","name":"step-10","changes":[{"blockId":"sensor-1","data":{"value[degC]":10}},{"blockId":"setpoint-sensor-pair-1","data":{"storedSetting[degC]":10,"settingEnabled":true}},{"blockId":"actuator-pwm-1","data":{"setting":60}}]},{"id":"6ab89a06-6103-4c59-a34c-f5a173cd3ee4","name":"step-20","changes":[{"blockId":"sensor-1","data":{"value[degC]":20}},{"blockId":"setpoint-sensor-pair-1","data":{"storedSetting[degC]":20,"settingEnabled":true}},{"blockId":"actuator-pwm-1","data":{"setting":60}}]}]}},{"_id":"dashboard-items__a0635bb8-5499-11e9-8647-d663bd873d93","title":"item-service-unknown","order":3,"cols":3,"rows":3,"feature":"SetpointSensorPair","dashboard":"derp","config":{"serviceId":"ZORP","blockId":"BLORP"}},{"_id":"dashboard-items__a0635e1a-5499-11e9-8647-d663bd873d93","title":"item-graph","order":1,"cols":10,"rows":5,"feature":"Graph","dashboard":"metrics","config":{"layout":{},"params":{"duration":"10m"},"targets":[{"measurement":"sparkey","fields":["actuator-pwm-1/setting","actuator-pwm-1/value"]},{"measurement":"spock","fields":[" Combined Influx points"]}],"renames":{"sparkey/actuator-pwm-1/setting":"Actuator setting"}}},{"_id":"dashboard-items__a06362e8-5499-11e9-8647-d663bd873d93","title":"sessions","order":2,"cols":4,"rows":5,"feature":"SessionView","dashboard":"metrics","config":{"sessions":[{"id":"mgKBmi4sv","name":"brew-session","hidden":false,"start":1547723679298,"end":null,"graphCfg":{"layout":{},"params":{"start":1547723679298},"targets":[{"measurement":"sparkey","fields":["actuator-pwm-1/value"]}],"renames":{"sparkey/actuator-pwm-1/value":"PWM value"}}}]}},{"_id":"dashboard-items__a0636842-5499-11e9-8647-d663bd873d93","title":"empty-graph","order":2,"cols":5,"rows":5,"feature":"Graph","dashboard":"metrics","config":{"layout":{},"params":[],"targets":[],"renames":{}}},{"_id":"dashboard-items__a0636b12-5499-11e9-8647-d663bd873d93","title":"pid-1","order":1,"cols":4,"rows":4,"feature":"Pid","dashboard":"dashboard-home","config":{"serviceId":"sparkey","blockId":"pid-1"}},{"_id":"dashboard-items__a0636b12-5499-11e9-8647-d663bd873d94","title":"inspector","order":2,"cols":4,"rows":4,"feature":"Metrics","dashboard":"dashboard-home","config":{"targets":[{"measurement":"sparkey","fields":["actuator-pwm-1/setting","actuator-pwm-1/value"]}],"renames":{"sparkey/actuator-pwm-1/value":"actuator value"},"freshDuration":{},"decimals":{}}},{"_id":"dashboard-items__a259b85c-d808-4a1c-9978-f7a4fc2e1730","dashboard":"herms","cols":7,"rows":5,"order":2,"title":"HERMS Graph","feature":"Graph","config":{"layout":{},"params":{"duration":"10m"},"targets":[{"measurement":"sparkey","fields":["HERMS HLT Sensor/value[degC]","HERMS MT Sensor/value[degC]","HERMS BK Sensor/value[degC]","HERMS HLT Setpoint/setting[degC]","HERMS MT Setpoint/setting[degC]","HERMS BK Setpoint/setting[degC]","HERMS HLT PWM/value","HERMS BK PWM/value"]}],"renames":{"sparkey/HERMS HLT Sensor/value[degC]":"HLT temperature","sparkey/HERMS MT Sensor/value[degC]":"MT temperature","sparkey/HERMS BK Sensor/value[degC]":"BK temperature","sparkey/HERMS HLT Setpoint/setting[degC]":"HLT setting","sparkey/HERMS MT Setpoint/setting[degC]":"MT setting","sparkey/HERMS BK Setpoint/setting[degC]":"BK setting","sparkey/HERMS HLT PWM/value":"HLT PWM value","sparkey/HERMS BK PWM/value":"BK PWM value"},"axes":{"sparkey/HERMS HLT PWM/value":"y2","sparkey/HERMS BK PWM/value":"y2"},"colors":{}},"pinnedPosition":{"x":1,"y":6}},{"_id":"dashboard-items__d9e9f17e-dc6e-467c-a252-d5ac36c1775d","dashboard":"herms","cols":11,"rows":5,"order":1,"title":"HERMS Process","feature":"Builder","config":{"currentLayoutId":"584bb8b2-c1b3-4592-8239-0b35fc07d0aa","layoutIds":["584bb8b2-c1b3-4592-8239-0b35fc07d0aa"]},"pinnedPosition":{"x":1,"y":1}},{"_id":"dashboard-items__dashboard-items__bb7aa0b4-a045-ad38-4887-308967ca8d63","title":"Mr Beancounter","order":5,"cols":4,"rows":5,"feature":"SessionLog","dashboard":"dashboard-home","config":{"currentSession":"3d15296d-0abd-4d45-383c-0bec436ae319"}},{"_id":"dashboards__builder","title":"Brewery Builder Dashboard","order":3},{"_id":"dashboards__dashboard-home","title":"Home Dashboard","order":1},{"_id":"dashboards__derp","title":"Derp Dashboard","order":4},{"_id":"dashboards__herms","title":"HERMS","order":5},{"_id":"dashboards__metrics","title":"Metrics Dashboard","order":2},{"_id":"layouts__0e28d1ad-8e38-4204-b634-c1301aae73ac","title":"Closed system manual valves","width":28,"height":15,"parts":[{"id":"936573cd-cecf-8895-3506-8c8ee9720cc8","rotate":0,"settings":{"color":"#c48600"},"flipped":false,"type":"Kettle","x":20,"y":2},{"id":"ba2d035e-8186-2768-b526-17eedcb5f49a","rotate":0,"settings":{"color":"#9c4b00"},"flipped":false,"type":"Kettle","x":12,"y":2},{"id":"fbefcd71-dd4e-68a5-3092-e827c31d9cb3","rotate":0,"settings":{"color":"#b50000"},"flipped":false,"type":"Kettle","x":4,"y":2},{"id":"32a943c8-40c9-cc00-8339-77191569b2fb","rotate":180,"settings":{},"flipped":false,"type":"Coil","x":5,"y":4},{"id":"c26047fd-ae4c-1d4b-9a53-7fed95fcd142","rotate":0,"settings":{},"flipped":false,"type":"CounterflowChiller","x":7,"y":12},{"id":"0a4a748d-ae33-81f0-a053-d688482da8b7","rotate":0,"settings":{"blockServiceId":"sparkey","blockLink":{"id":"BK PWM","type":"ActuatorPwm","driven":false},"pwm":{"serviceId":"sparkey","blockId":"BK PWM"}},"flipped":false,"type":"HeatingElement","x":19,"y":6},{"id":"fab8ea89-a0ea-3958-1af1-7b6ab00d9ca7","rotate":0,"settings":{"blockServiceId":"sparkey","blockLink":{"id":"HLT PWM","type":"ActuatorPwm","driven":false},"pwm":{"serviceId":"sparkey","blockId":"HLT PWM"}},"flipped":true,"type":"HeatingElement","x":4,"y":6},{"id":"4fc4d5ab-ea54-e111-26a5-a9363482efe6","rotate":0,"settings":{},"flipped":false,"type":"WhirlpoolInlet","x":20,"y":3},{"id":"b94434b5-5aab-0c5b-df81-a4d83b3f6c52","rotate":0,"settings":{},"flipped":false,"type":"WhirlpoolInlet","x":4,"y":3},{"id":"69967fe5-0104-c25f-380e-0276a4dc4d38","rotate":0,"settings":{"sizeX":4},"flipped":true,"type":"FilterBottom","x":12,"y":7},{"id":"2888b8b6-9c95-e3e4-bcd9-cfd7404c802f","rotate":0,"settings":{"setpoint":{"serviceId":"sparkey","blockId":"HLT"}},"flipped":false,"type":"SetpointDisplay","x":5,"y":3},{"id":"a3654a66-878f-7c2d-fa3d-8ce1705e9de5","rotate":0,"settings":{"setpoint":{"serviceId":"sparkey","blockId":"MT"}},"flipped":false,"type":"SetpointDisplay","x":13,"y":4},{"id":"604a7117-47b7-01fb-2390-ef015223ff3f","rotate":0,"settings":{"setpoint":{"serviceId":"sparkey","blockId":"BK"}},"flipped":false,"type":"SetpointDisplay","x":21,"y":4},{"id":"b3462492-89be-123c-d36b-e1a6db40f04a","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":21,"y":0},{"id":"1d90b517-9a44-5809-55ae-cea8a3200466","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":20,"y":0},{"id":"2259f9f4-411c-b835-4ff2-33ac4310c0df","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":19,"y":0},{"id":"f7ef5ae2-8f71-c8ad-e67c-e17a6edaeddb","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":0},{"id":"0047ff30-5605-6c99-b885-50427ca4e312","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":17,"y":0},{"id":"45c591f3-6e8d-b5fc-70f8-57f9584759f9","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":16,"y":0},{"id":"423a1cac-590f-7db9-79e8-aaf1600a6dfc","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":15,"y":0},{"id":"4db1afc4-c51d-5958-9861-0af5a42ee5ba","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":19,"y":10},{"id":"8cffbb9b-422d-51c5-56f8-7d272d00fc8b","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":20,"y":10},{"id":"0e4c3d78-33e5-26b3-e4d0-ad667be155a3","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":4,"y":10},{"id":"35c7c334-aff4-1a27-01ba-9bcd70b1986e","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":22,"y":0},{"id":"8daba794-e363-7368-e3c4-e972b9e038a0","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":21,"y":10},{"id":"96d12320-79a2-9a52-e9a7-962c7c20afd5","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":22,"y":10},{"id":"4193e947-8bbb-4420-928a-6e1e1b1b02de","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":15,"y":10},{"id":"e58779b3-9668-6050-f710-fede5a49c59e","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":15,"y":13},{"id":"dc794842-e4ed-62b5-39b6-e7c8e98bc54f","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":16,"y":13},{"id":"7cf04ad1-b27b-70d6-aeda-aa663404edf8","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":17,"y":13},{"id":"9293fa05-5ca6-629e-e7ba-d160f06943c6","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":19,"y":13},{"id":"f0c35c9b-b524-16e5-921c-f506e4d01c04","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":13},{"id":"6a2c3196-7637-48c4-7c28-ff9c13ba1410","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":20,"y":13},{"id":"497abfb5-61d2-e50d-b478-7d3c2f0a3d43","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":21,"y":13},{"id":"f13b82a5-a263-6a64-11aa-09350f93c119","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":23,"y":13},{"id":"4bd0d1c6-a077-4161-536b-d9ac9cd3a38c","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":22,"y":13},{"id":"7abfc6cf-1e65-d79b-0893-2da67d94c835","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":14,"y":10},{"id":"b72c0a0d-bf95-6653-3b8d-f49f831b5858","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":25,"y":13},{"id":"32ee709f-dc01-81af-e59b-5092c2316bb1","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":12},{"id":"7410eb2f-cccf-ac76-284b-8f1523cfb055","rotate":270,"settings":{"closed":true,"valveid":"D"},"flipped":false,"type":"Valve","x":25,"y":11},{"id":"d0c78390-2b0e-990f-691c-b41492cc6afa","rotate":270,"settings":{},"flipped":false,"type":"TeeTube","x":25,"y":10},{"id":"fe9b223d-3088-4753-f068-707914ff18bf","rotate":270,"settings":{"closed":true,"valveid":"C"},"flipped":false,"type":"Valve","x":25,"y":9},{"id":"56f29a6b-8087-fb7e-e79b-c285010f347a","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":8},{"id":"6d437e95-c0f6-8879-502f-c1a20b64d3d6","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":7},{"id":"dcdea385-bea7-326f-dd51-02f19bbba99c","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":6},{"id":"a0a24c0d-27ad-24d6-bd60-2b85809775d2","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":5},{"id":"740146b6-30e4-6e76-09e7-be82c94f6ee7","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":4},{"id":"5013ec12-51e7-64fa-f4ed-d0f96219f32b","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":3},{"id":"eccfedc1-b180-b97d-fba3-1df3c04704c0","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":2},{"id":"619c281c-fca6-e803-ec41-b897dae9d422","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":25,"y":1},{"id":"6965b637-1cbd-919e-e02d-349dbfa2f03d","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":25,"y":0},{"id":"93560201-3042-dd9d-e924-94312846cdfb","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":0},{"id":"c2864eb9-07eb-84b0-2df5-f2ed2b15fb7f","rotate":270,"settings":{"closed":true,"valveid":"B"},"flipped":false,"type":"Valve","x":24,"y":9},{"id":"154e8dc0-14ce-ecb9-b1e6-c7a77f68d461","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":24,"y":10},{"id":"8e520452-4770-dfbc-8415-897426bd48b6","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":8},{"id":"d01f0c15-0e30-74e8-3dda-2546ac16bc9e","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":7},{"id":"9a6491b7-7387-5251-f11d-bdb251366c92","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":6},{"id":"72cece94-3e67-be82-0f03-4d829d5e2305","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":5},{"id":"b5ae4b4f-34c5-0304-f020-6f659eea7cd4","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":4},{"id":"2c8074eb-2149-a707-ec61-29b6e0fb8bbf","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":3},{"id":"5e2c1741-1ca3-2c30-8660-5727755eceb3","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":2},{"id":"69874dc2-6c5a-84e3-aace-db8a2028cd62","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":24,"y":1},{"id":"53704e23-b61d-32e7-5537-a6df30579241","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":23,"y":1},{"id":"8491802f-4faa-cab5-8395-641efce36119","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":22,"y":1},{"id":"5d817f92-3597-8cb5-8039-3ccc2ffab4df","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":19,"y":3},{"id":"92d8223e-f933-cd38-0bbc-af37048b7417","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":18,"y":3},{"id":"5d4a864d-92a2-b3bb-01f7-98117bdd1372","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":4},{"id":"5a638279-70bc-6fee-08d7-02d89c577cc4","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":5},{"id":"4786fd96-af3d-3e11-0834-b34dfea8ae6d","rotate":180,"settings":{"closed":true,"valveid":"A"},"flipped":false,"type":"Valve","x":19,"y":7},{"id":"ec1f23e8-80c2-8668-09e3-8242b64d0909","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":6},{"id":"2c0d3dd2-4f58-a74d-240f-92af165a4b6d","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":18,"y":7},{"id":"b7627e75-c59c-f0af-dec7-ba2fbb2f031e","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":8},{"id":"835523c4-36be-8bcd-35bc-da995733682e","rotate":270,"settings":{"closed":true,"valveid":"H"},"flipped":false,"type":"Valve","x":18,"y":9},{"id":"afe3be73-f110-1255-0ad1-41db62442da1","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":23,"y":10},{"id":"748d5ee3-fa8b-7ffd-cb21-ec9f36eef613","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":18,"y":10},{"id":"a317ddf9-774f-6b28-8404-25eaf74dfbef","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":17,"y":8},{"id":"424ee65d-3bb6-b815-9ba4-9a59414abece","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":17,"y":10},{"id":"22e17cf1-c00f-1558-81d5-9e4b84edf12f","rotate":180,"settings":{"closed":true,"valveid":"G"},"flipped":false,"type":"Valve","x":16,"y":7},{"id":"47c22477-dc2c-a0c1-8c09-660b709f40db","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":11,"y":3},{"id":"13db87ce-9253-dbb4-fecf-3d9d15628bfd","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":3},{"id":"3f6c33cc-600d-d0ca-9c65-5941ad774f5a","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":9,"y":3},{"id":"93f0bcf6-19a7-77e7-d557-7497c49919f3","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":11,"y":4},{"id":"f583bf6f-ebc1-d246-3e02-92d34c5dc445","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":11,"y":5},{"id":"6e0662e0-9753-9c5a-b7e8-eaa680e4cda7","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":11,"y":6},{"id":"d9ba7894-4b7c-7c02-31d2-96ac15730897","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":11,"y":7},{"id":"fa84999f-032f-a963-7779-1ce7b816cc79","rotate":0,"settings":{},"flipped":false,"type":"ElbowTube","x":11,"y":8},{"id":"313599f8-f37d-983e-90a8-8e57c63ca976","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":16,"y":10},{"id":"bdb00347-2b9f-8ece-ed00-912df34615b9","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":8},{"id":"4721cfad-3d53-b755-2a97-77a2c4e4968d","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":7},{"id":"8c64b44b-80d1-3db2-8f6e-be82e562f1a8","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":6},{"id":"7b5d2afb-a108-3d6f-42d2-273b80be93b0","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":10,"y":5},{"id":"e8262870-9c6a-d49c-03b7-a2b6b7321e4b","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":4},{"id":"c6275762-e251-ce1d-aa98-f37651d86260","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":9,"y":4},{"id":"464e3df7-15a2-dfc2-2556-1613534a314e","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":9,"y":5},{"id":"f3fb8403-ae04-ab89-d1fc-3571b4445d42","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":9,"y":6},{"id":"7bca2dcb-4ee8-bc94-923a-8cb9fb48ee4c","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":9,"y":7},{"id":"11277aa0-a68b-a87c-51ef-b534fad4475f","rotate":270,"settings":{},"flipped":false,"type":"ElbowTube","x":9,"y":8},{"id":"9eb6a159-20f8-1a69-98ef-9ac27b5347bf","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":8,"y":4},{"id":"2d9eaa66-fb48-ed64-1aec-82c29877a0b1","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":8,"y":5},{"id":"24a63480-6157-a4bb-2177-8570c3e7bb8c","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":3,"y":3},{"id":"2bf0c19f-dad7-c5eb-4dfc-671a0492a2a1","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":3,"y":4},{"id":"1e84b5f1-7bba-a7d5-aa32-04c4e1cbbfb6","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":3,"y":5},{"id":"5937fa40-9d76-8c39-e81a-58db422480a2","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":3,"y":6},{"id":"0d5abde6-9570-4bb4-bd5a-7ad4fec2941b","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":3,"y":7},{"id":"0537d667-d36e-5767-9e82-33157ae9da69","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":3,"y":8},{"id":"77bb8a0d-c9e6-c6b8-319c-c14c163fa4af","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":2,"y":7},{"id":"e204ca49-0bd2-51ca-6d35-20e14631d72a","rotate":270,"settings":{"valveid":"P","closed":true},"flipped":false,"type":"Valve","x":3,"y":9},{"id":"5c418f87-bae0-45bb-c652-305e430d7782","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":3,"y":10},{"id":"b6f60596-51de-6832-9719-b3fd165f4960","rotate":90,"settings":{},"flipped":false,"type":"TeeTube","x":2,"y":10},{"id":"6637bdea-74ae-a91c-74a4-6abbb017c200","rotate":270,"settings":{"valveid":"O","closed":true},"flipped":false,"type":"Valve","x":2,"y":11},{"id":"221721ab-f907-7a04-24e5-ff9916b5c6d4","rotate":180,"settings":{"pressure":10,"liquids":["#4AA0EF"]},"flipped":false,"type":"SystemIO","x":27,"y":13},{"id":"c1b9889a-62c2-e144-bbc7-1f674782fd52","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":6,"y":13},{"id":"dbedabba-8596-0714-f9f7-5dd863f5c65d","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":5,"y":13},{"id":"9db7050e-42f4-9558-477f-71e11cfc66ab","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":11,"y":13},{"id":"6ff2020e-8835-6af4-ea95-74ed3881fac0","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":24,"y":13},{"id":"14034ad1-8ca4-1de2-ec83-98760bbd2c8d","rotate":0,"settings":{"closed":true},"flipped":false,"type":"Valve","x":26,"y":13},{"id":"f657b0f4-e845-6ece-5f0c-789e7ceb2c0d","rotate":0,"settings":{"closed":true},"flipped":false,"type":"Valve","x":3,"y":13},{"id":"06799b00-4941-7a5e-4f90-4781860b2029","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":2,"y":13},{"id":"4a1c9520-d41d-0a43-931b-1ed5fe83d2ff","rotate":0,"settings":{"closed":true},"flipped":false,"type":"Valve","x":1,"y":13},{"id":"72b63006-17c1-faac-0bc8-2fc33400012b","rotate":0,"settings":{"pressure":10,"liquids":["#4AA0EF"]},"flipped":false,"type":"SystemIO","x":0,"y":13},{"id":"ade24d1a-19f3-80de-9c36-b35b910996ee","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":4,"y":13},{"id":"e3c58c16-3a75-1183-f966-1d17bce7bb50","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":2,"y":12},{"id":"2b2e92ee-e0a0-1e14-26ff-76a589253bac","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":14,"y":1},{"id":"d43eb6ba-d9ad-1ae1-5025-d3b6666c674d","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":14,"y":0},{"id":"d9c3a613-9f02-a318-2b61-0a8835fe2b76","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":12,"y":13},{"id":"39259a26-c09c-ac0e-d2ec-4be43c07ebe9","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":13,"y":13},{"id":"d8eaf8a3-36d1-dc34-2671-7787904d9b0f","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":14,"y":13},{"id":"45d81456-3f2d-1d8c-18c7-d4cb58f0e654","rotate":270,"settings":{"valveid":"E","closed":true},"flipped":false,"type":"Valve","x":10,"y":9},{"id":"8bbbc5a7-e649-2186-6607-7957fdda610a","rotate":0,"settings":{},"flipped":false,"type":"CrossTube","x":10,"y":10},{"id":"c2e425ae-1bb7-61f3-cf6e-6a4126c74248","rotate":0,"settings":{"valveid":"M","closed":true},"flipped":false,"type":"Valve","x":5,"y":10},{"id":"f7af30ef-860f-4519-9d97-1ed8fd1fee42","rotate":0,"settings":{},"flipped":false,"type":"CrossTube","x":6,"y":10},{"id":"4f075322-0af2-0a51-cbbc-509aec5e744a","rotate":270,"settings":{"closed":true,"valveid":"N"},"flipped":false,"type":"Valve","x":6,"y":9},{"id":"937e9d08-0160-2a30-b26d-560eff8a25df","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":6,"y":8},{"id":"f0d51203-a2f7-1302-1dd6-55b6d86fd8a9","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":6,"y":12},{"id":"2ff080a9-e1fb-b433-b631-3bb7b3c6a8a3","rotate":270,"settings":{"closed":true,"valveid":"K"},"flipped":false,"type":"Valve","x":6,"y":11},{"id":"7a70bd54-0fcf-f107-2bb5-83fd69f6a1d7","rotate":270,"settings":{},"flipped":false,"type":"ElbowTube","x":10,"y":12},{"id":"41b66321-0320-54ff-5c7f-bd1f60ef909e","rotate":270,"settings":{"closed":true,"valveid":"F"},"flipped":false,"type":"Valve","x":10,"y":11},{"id":"cf2c19e5-158e-3ad9-5e02-2415f7d68756","rotate":0,"settings":{"closed":true,"valveid":"L"},"flipped":false,"type":"Valve","x":8,"y":10},{"id":"bfb52e6d-1919-9b4e-d11f-8b31d5e6216e","rotate":0,"settings":{"closed":true,"valveid":"I"},"flipped":false,"type":"Valve","x":11,"y":10},{"id":"9df8a7fa-cd20-730f-9c57-acdcb25c1b9b","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":12,"y":8},{"id":"1a508d28-be85-9410-5348-72cd903b9fad","rotate":270,"settings":{"closed":true,"valveid":"J"},"flipped":false,"type":"Valve","x":12,"y":9},{"id":"2d7edfc2-c47c-f399-b975-2bc79967133c","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":12,"y":10},{"id":"1f590145-dd52-cb12-4acf-b7c59f58804b","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":13,"y":10},{"id":"6c4b5a7e-bf8a-c27c-99e7-d90d2548ae1b","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":7,"y":8},{"id":"5bd86094-4723-890d-13c3-2d6aeda07422","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":8,"y":8},{"id":"69ba08eb-ad7b-65cd-ad64-b4e300acfce7","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":13},{"id":"a6b8e903-ee09-d894-209f-bfea8cd08eb6","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":9,"y":10},{"id":"90562715-3779-dbf9-c5e5-465bbe195e28","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":7,"y":10},{"id":"bff67dbb-7c6e-2dec-995b-7d5fb07bab8f","rotate":0,"settings":{"sensorServiceId":"sparkey","sensorLink":{"id":"CFC-out temp","type":"TempSensorOneWire","driven":false},"sensor":{"serviceId":"sparkey","blockId":"CFC-out temp"}},"flipped":false,"type":"SensorDisplay","x":7,"y":11},{"id":"7c3add61-e98d-0549-020a-f7f3fd2b26df","rotate":90,"settings":{"sensorServiceId":"sparkey","sensorLink":{"id":"CFC-in temp","type":"TempSensorOneWire","driven":false},"sensor":{"serviceId":"sparkey","blockId":"CFC-in temp"}},"flipped":false,"type":"SensorDisplay","x":9,"y":11},{"id":"7b93c5d0-f077-4126-0d81-fed6e0b284e1","rotate":0,"settings":{"closed":true},"flipped":false,"type":"Valve","x":5,"y":12},{"id":"3e2b5afa-b4fb-0b8f-8132-2aa0d2c1f51f","rotate":0,"settings":{},"flipped":false,"type":"SystemIO","x":4,"y":12},{"id":"fb2d1da1-85ea-647d-d2c9-fab2b1bb40a8","rotate":0,"settings":{"sensorServiceId":"sparkey","sensorLink":{"id":"MT temp","type":"TempSensorOneWire","driven":false},"sensor":{"serviceId":"sparkey","blockId":"MT temp"}},"flipped":false,"type":"SensorDisplay","x":16,"y":4},{"id":"0ee33ee7-f2d7-af5a-4b38-17f952b5ccee","rotate":90,"settings":{"closed":true},"flipped":false,"type":"Valve","x":2,"y":8},{"id":"07bff9b9-7ba1-526f-0873-8727f8c33337","rotate":0,"settings":{},"flipped":false,"type":"DipTube","x":4,"y":7},{"id":"f09c5b73-19d0-cc98-ef6e-deb012d90f31","rotate":0,"settings":{},"flipped":false,"type":"StraightInletTube","x":12,"y":3},{"id":"e3024160-15a5-9425-ee85-c320723058b7","rotate":0,"settings":{},"flipped":false,"type":"DipTube","x":20,"y":7},{"id":"9eaed131-99fa-22c5-aa2d-3170c690d64e","rotate":180,"settings":{},"flipped":false,"type":"TeeTube","x":17,"y":7},{"id":"e9ba3428-c50c-74a3-f1fc-e9923f9dc178","rotate":90,"settings":{},"flipped":false,"type":"StraightInletTube","x":14,"y":2},{"id":"bba2283d-b44f-9cdf-7128-a8d4710f5d44","rotate":90,"settings":{},"flipped":false,"type":"StraightInletTube","x":22,"y":2},{"id":"20536d1c-6eda-f2b2-f668-25be74dbd93e","rotate":0,"settings":{"pid":{"serviceId":"sparkey","blockId":"HLT PID"}},"flipped":false,"type":"PidDisplay","x":5,"y":1},{"id":"bdbd0a64-b457-21d5-9d52-14ae663cdf2e","rotate":0,"settings":{"pid":{"serviceId":"sparkey","blockId":"MT PID"}},"flipped":false,"type":"PidDisplay","x":13,"y":1},{"id":"4114cdae-9387-6c65-6418-2b36915eede2","rotate":0,"settings":{"pid":{"serviceId":"sparkey","blockId":"BK PID"}},"flipped":false,"type":"PidDisplay","x":21,"y":1},{"id":"1c642f05-bc31-a72a-c0a8-1dc5fda76451","rotate":0,"settings":{"sensorServiceId":"sparkey","sensorLink":{"id":"MT-in temp","type":"TempSensorOneWire","driven":false},"sensor":{"serviceId":"sparkey","blockId":"MT-in temp"}},"flipped":false,"type":"SensorDisplay","x":10,"y":2},{"id":"c4253a3c-f01a-67ba-dcbe-45863b9c7075","rotate":270,"settings":{"actuator":{"serviceId":"sparkey","blockId":"HLT Pump"},"enabled":false},"flipped":false,"type":"Pump","x":2,"y":9},{"id":"39a622f9-4f7d-8b38-3c29-34fedd2ae478","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":23,"y":0},{"id":"0be62668-4378-3b11-9ef0-fc1a20fafb95","rotate":0,"settings":{"pid":{"serviceId":"sparkey","blockId":"CFC Pump PID"}},"flipped":false,"type":"PidDisplay","x":5,"y":11},{"id":"bb8e9ad0-482a-97a6-c96e-3c40e262e446","rotate":270,"settings":{"actuator":{"serviceId":"sparkey","blockId":"Beer Pump"},"enabled":false},"flipped":false,"type":"Pump","x":17,"y":9}]},{"_id":"layouts__584bb8b2-c1b3-4592-8239-0b35fc07d0aa","title":"HERMS Layout","width":26,"height":11,"parts":[{"id":"d0d52363-8ae2-476f-98c7-0a0649e3c625","rotate":0,"settings":{"color":"#c48600"},"flipped":false,"type":"Kettle","x":20,"y":1},{"id":"16cc717d-97b1-40fe-ae08-f048485bf24d","rotate":0,"settings":{"color":"#9c4b00"},"flipped":false,"type":"Kettle","x":12,"y":1},{"id":"70cc6f67-3196-41d0-8a37-2c3677d6d606","rotate":0,"settings":{"color":"#b50000"},"flipped":false,"type":"Kettle","x":4,"y":1},{"id":"f1c5d88a-a89c-462e-a398-457843aa5903","rotate":180,"settings":{},"flipped":false,"type":"Coil","x":5,"y":4},{"id":"4a4bea26-4648-47d9-93cf-22a730529ce2","rotate":0,"settings":{"blockServiceId":"sparkey","pwm":{"serviceId":"sparkey","blockId":"HERMS BK PWM"},"sizeX":4},"flipped":true,"type":"HeatingElement","x":21,"y":6},{"id":"b101297b-3358-4b3a-abfb-029573d2da9d","rotate":0,"settings":{"blockServiceId":"sparkey","pwm":{"serviceId":"sparkey","blockId":"HERMS HLT PWM"},"sizeX":4},"flipped":false,"type":"HeatingElement","x":3,"y":6},{"id":"374dcfdd-52e1-482a-a156-51e099d6d817","rotate":0,"settings":{},"flipped":false,"type":"WhirlpoolInlet","x":20,"y":2},{"id":"60454902-54ca-4d27-b364-83181c65ddb5","rotate":0,"settings":{},"flipped":false,"type":"WhirlpoolInlet","x":4,"y":2},{"id":"09ac964d-feae-40c9-82f1-0d72b1b28b13","rotate":0,"settings":{"sizeX":4},"flipped":true,"type":"FilterBottom","x":12,"y":6},{"id":"685766b9-ea40-4165-b011-54a16e296ca1","rotate":0,"settings":{"setpoint":{"serviceId":"sparkey","blockId":"HERMS MT Setpoint"}},"flipped":false,"type":"SetpointDisplay","x":13,"y":3},{"id":"a65d59e8-f6d5-4c99-9cd8-6ac4d4aa6145","rotate":0,"settings":{"setpoint":{"serviceId":"sparkey","blockId":"HERMS BK Setpoint"}},"flipped":false,"type":"SetpointDisplay","x":21,"y":3},{"id":"4f4b6f01-3199-47aa-8cdc-628a695adb55","rotate":0,"settings":{"setpoint":{"serviceId":"sparkey","blockId":"HERMS HLT Setpoint"}},"flipped":false,"type":"SetpointDisplay","x":5,"y":3},{"id":"264d5231-afc0-4858-941d-8ffaefc0e906","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":19,"y":2},{"id":"4be3538b-c96a-47fa-9b6e-4af62c00f07a","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":18,"y":2},{"id":"e7cf945b-9de3-4e00-953c-1c0bff0169d8","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":3},{"id":"45e7e4b6-afd2-4b38-b569-0c9d9c431c43","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":4},{"id":"f97cf029-03f9-4b56-84e1-9791948eb639","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":5},{"id":"22b3c889-9800-40c8-8eff-691e4def273f","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":18,"y":6},{"id":"073d447f-d50e-4f86-b5ab-b9c134b520bf","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":11,"y":2},{"id":"e850472d-1892-4fd4-8222-a8e94558b197","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":2},{"id":"0825c88e-2cae-402e-8b56-046a13588dcb","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":9,"y":2},{"id":"5447df98-3129-49ba-b00f-634ad84c4595","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":11,"y":6},{"id":"6356e605-d1a6-4e56-bea4-47ceba810341","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":6},{"id":"78bd0b1e-c356-4080-8066-ca2b66ca6046","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":9,"y":6},{"id":"a2324d89-8565-452d-8712-a2d7dd17bbab","rotate":0,"settings":{},"flipped":false,"type":"DipTube","x":12,"y":2},{"id":"8223a55e-bb44-405e-8bc9-2c4dbd4b1759","rotate":0,"settings":{},"flipped":false,"type":"DipTube","x":20,"y":6},{"id":"8b81ed76-c0e0-4d2e-a1db-d78e0739165a","rotate":180,"settings":{},"flipped":false,"type":"TeeTube","x":17,"y":6},{"id":"7cde1fc0-a694-4abe-a130-04a1c4a5b488","rotate":180,"settings":{"closed":true},"flipped":false,"type":"Valve","x":16,"y":6},{"id":"49c9cdd4-0e8e-45a9-8f8e-f8a6fd9de82b","rotate":180,"settings":{"closed":true},"flipped":false,"type":"Valve","x":19,"y":6},{"id":"5214c090-5644-44d7-b250-24cf2b2a9332","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":2,"y":2},{"id":"7506b500-6260-4873-af96-69d6b1f6d221","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":2,"y":3},{"id":"62250439-3e87-4925-997d-ec4df6c73555","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":2,"y":4},{"id":"5a55ea52-855a-47f9-949e-095dce4759f2","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":2,"y":5},{"id":"08c0fbad-e4e9-4ec0-8a53-979b05b55618","rotate":0,"settings":{},"flipped":true,"type":"DipTube","x":7,"y":6},{"id":"36d85a00-826e-499f-86a7-df1e65c490c2","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":8,"y":6},{"id":"ef97c0a1-7093-490e-85bd-9ea67c10b7f9","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":17,"y":9},{"id":"951b5045-754c-4eab-8968-e5d3fe508172","rotate":270,"settings":{"closed":true},"flipped":false,"type":"Valve","x":18,"y":8},{"id":"d68e7d9b-91cf-450d-b0de-0620b367d908","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":18,"y":7},{"id":"a7bb798f-a2e2-4977-8ba9-82cd490d54a9","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":17,"y":7},{"id":"5ee6765a-504e-4457-a6df-bfb6f169e84a","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":15,"y":9},{"id":"041ab2ee-9b7f-486d-9dd3-19e09f40e97c","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":9,"y":9},{"id":"48c6341b-353e-4dcc-8b3a-43397c799434","rotate":270,"settings":{"enabled":false},"flipped":false,"type":"Pump","x":17,"y":8},{"id":"0946c96e-fd1f-4f36-8ca7-4582116b3975","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":3,"y":9},{"id":"f25e456b-1c15-4762-bb3a-cdfac0f2797b","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":4,"y":9},{"id":"4cafd483-144b-420c-b069-a6d6afd4528c","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":5,"y":9},{"id":"b205f2e1-dec6-4f1a-a3fa-896cea6073dd","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":2,"y":6},{"id":"404f6c1c-3414-4f70-83fe-6ba10e08e651","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":3,"y":2},{"id":"b3b71ef4-da68-4f94-aef2-926d61706ff1","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":13,"y":9},{"id":"d1d6433e-4d11-41de-9e9b-9cc0379dd286","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":11,"y":9},{"id":"de277163-f54d-4b42-bbff-80647601cf64","rotate":90,"settings":{"closed":true},"flipped":false,"type":"Valve","x":13,"y":8},{"id":"40f1c72e-e309-4d42-a06f-a394832bac89","rotate":90,"settings":{"closed":true},"flipped":false,"type":"Valve","x":11,"y":8},{"id":"9063b2dc-edca-447c-864b-c2dd806b25bc","rotate":90,"settings":{"closed":true},"flipped":false,"type":"Valve","x":9,"y":8},{"id":"36844727-311b-424a-8a8c-fd161cdcf966","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":9,"y":7},{"id":"fe21324b-8163-48d8-8bf1-1f3185f4a3ee","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":12,"y":7},{"id":"591e4371-77bf-4d9f-86bc-8b27e567beee","rotate":180,"settings":{"closed":true},"flipped":false,"type":"Valve","x":10,"y":9},{"id":"488e06fb-6e16-45a0-bcd4-c4eff259d8c7","rotate":180,"settings":{"closed":true},"flipped":false,"type":"Valve","x":12,"y":9},{"id":"8e30078e-fb7e-45db-b06b-b669c40a9bc3","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":13,"y":7},{"id":"ef44e686-3f52-4394-88d7-e0f0681a3a8c","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":11,"y":7},{"id":"7473dd67-de3f-45e9-8e47-f6836b48ae92","rotate":0,"settings":{},"flipped":false,"type":"ElbowTube","x":10,"y":7},{"id":"dd71fd1d-5b33-4153-b6fb-576b314aa9b3","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":2,"y":7},{"id":"df4981bd-568e-4749-805e-14fc92d916b3","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":16,"y":9},{"id":"5541b3d3-c8de-4440-a2aa-647e0c4d3b56","rotate":0,"settings":{"closed":true},"flipped":false,"type":"Valve","x":14,"y":9},{"id":"3f6586c0-5e81-4997-9346-b43a27044bb5","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":18,"y":9},{"id":"19fbf770-6da3-4895-9458-fa47f7904a5d","rotate":180,"settings":{"closed":true},"flipped":false,"type":"Valve","x":19,"y":9},{"id":"e3d78951-e8cc-4035-9cba-cac3d63c898c","rotate":180,"settings":{},"flipped":false,"type":"SystemIO","x":20,"y":9},{"id":"fe92138b-5d83-4b13-aa9c-639d13d4c613","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":7,"y":9},{"id":"35423f63-543d-4191-899c-c21f8a8947cb","rotate":270,"settings":{"enabled":false},"flipped":false,"type":"Pump","x":7,"y":8},{"id":"5f5909e3-1949-48b8-8827-13814e07e10c","rotate":180,"settings":{"closed":true},"flipped":false,"type":"Valve","x":8,"y":9},{"id":"6612e1f8-6695-4dd1-9599-1baf08b9e635","rotate":180,"settings":{"closed":true},"flipped":false,"type":"Valve","x":6,"y":9},{"id":"3cbe0710-6c29-4947-a9f6-bd0c9baa58b6","rotate":270,"settings":{},"flipped":false,"type":"ElbowTube","x":8,"y":7},{"id":"aaaa2b1c-2320-4d7c-9003-3011c456863a","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":7,"y":7},{"id":"0a4888b9-aa5c-4943-9177-328bd2706b11","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":11,"y":4},{"id":"5d555f9e-78c7-48eb-a693-7a14b33992eb","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":11,"y":5},{"id":"93114f7b-6ee6-43c9-bfec-d53d44252c27","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":10,"y":5},{"id":"85896ad7-7564-4d1d-aad5-8c558b079231","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":10,"y":4},{"id":"39c8fa9b-6625-4e64-960b-49a3ebeedf88","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":9,"y":4},{"id":"015b527a-c221-49e1-8d8f-c7af004ea11f","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":9,"y":5},{"id":"f121dff6-21d8-426e-9081-961448f20e52","rotate":180,"settings":{},"flipped":false,"type":"StraightTube","x":8,"y":4},{"id":"59eb449e-6eb5-4d8a-a60b-651f3107a3ca","rotate":0,"settings":{},"flipped":false,"type":"StraightTube","x":8,"y":5},{"id":"c1e846cb-8076-4c6e-98d7-7a92c01f2c68","rotate":90,"settings":{},"flipped":false,"type":"StraightTube","x":9,"y":3},{"id":"0d8ef11b-827a-49eb-afd8-08833a616df8","rotate":0,"settings":{"pid":{"serviceId":"sparkey","blockId":"HERMS MT PID"}},"flipped":false,"type":"PidDisplay","x":11,"y":1},{"id":"ec52d61e-db29-441c-aecd-a8d4437c4ab7","rotate":0,"settings":{"pid":{"serviceId":"sparkey","blockId":"HERMS BK PID"}},"flipped":false,"type":"PidDisplay","x":19,"y":1},{"id":"01e1a7a7-dac9-4b2d-8880-d42956368a21","rotate":0,"settings":{"pid":{"serviceId":"sparkey","blockId":"HERMS HLT PID"}},"flipped":false,"type":"PidDisplay","x":3,"y":1},{"id":"de4dbd1a-da8a-45fb-bd11-5177e36f36d0","rotate":0,"settings":{},"flipped":false,"type":"TeeTube","x":2,"y":9},{"id":"a7a7c9c6-cc85-409a-be1c-bb8313c85547","rotate":180,"settings":{"closed":true},"flipped":false,"type":"Valve","x":1,"y":9},{"id":"789632a3-8d04-4fe8-8b6e-fdd0abcd306f","rotate":270,"settings":{"closed":true},"flipped":false,"type":"Valve","x":2,"y":8},{"id":"c0a4edab-fd95-4bdf-b2ae-67416ea52807","rotate":0,"settings":{"pressure":10,"liquids":["#4AA0EF"]},"flipped":false,"type":"SystemIO","x":0,"y":9}]},{"_id":"layouts__ee021f01-fc29-2e06-c903-0c9288eb1bfe","title":"Gone With the Layout","width":20,"height":15,"parts":[{"id":"41693288-1161-ef12-bc7c-75d3b067e2f4","rotate":0,"settings":{},"flipped":false,"x":14,"y":2,"type":"Coil"},{"id":"203f9fc0-0887-d409-2e58-ba4a070dfabe","rotate":0,"settings":{},"flipped":false,"type":"CounterflowChiller","x":13,"y":11},{"id":"b9b9da24-337c-4d66-e234-46d3688d6d1f","rotate":0,"settings":{},"flipped":false,"type":"HeatingElement","x":7,"y":11},{"id":"3271d456-4cfa-57b2-7172-cfe5ba68de0d","rotate":0,"settings":{},"flipped":false,"type":"ImmersionCoil","x":11,"y":14},{"id":"9b308893-554c-e3c8-e4d8-f948a4da7466","rotate":0,"settings":{},"flipped":false,"type":"Lauterhexe","x":13,"y":13},{"id":"bc2c9d81-18bf-425d-4cf4-2a3d621ee9ee","rotate":90,"settings":{},"flipped":false,"type":"WhirlpoolInlet","x":7,"y":14},{"id":"cb0bdf02-5cd0-c29e-ddbf-6537762fbc77","rotate":0,"settings":{"liquids":["#C678DD"]},"flipped":false,"x":11,"y":2,"type":"SystemIO"},{"id":"e0929a70-22cd-f34b-ffe9-7060016a0cf2","rotate":0,"settings":{},"flipped":false,"x":12,"y":2,"type":"StraightTube"},{"id":"0c506a71-af93-44b6-dbe0-c4ab16f7d80b","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":13,"y":2},{"id":"ef649e86-967a-8e81-3139-f7bcc61e462c","rotate":0,"settings":{"liquids":["#4AA0EF"],"pressure":10},"flipped":false,"type":"SystemIO","x":0,"y":2},{"id":"56565652-dba8-b68a-ee0c-66534dfbda20","rotate":0,"settings":{},"flipped":false,"type":"Valve","x":1,"y":2},{"id":"f4b935cd-4ae5-823b-de60-524931bd7a1b","rotate":270,"settings":{},"flipped":false,"x":3,"y":6,"type":"SystemIO"},{"id":"72163643-aea3-24f0-e898-ac100e1fb0ff","rotate":90,"settings":{},"flipped":false,"type":"Valve","x":3,"y":5,"closed":false},{"id":"d42cca9b-1d9c-322c-1456-e2c630bf47d8","rotate":180,"settings":{},"flipped":false,"x":3,"y":4,"type":"TeeTube"},{"id":"e5561b25-0ace-1590-f9b6-524287b2791f","rotate":0,"settings":{},"flipped":false,"type":"ElbowTube","x":2,"y":4},{"id":"2f27d35e-ed31-8869-26a1-883c2942fab4","rotate":90,"settings":{},"flipped":false,"type":"TeeTube","x":2,"y":3},{"id":"8daa8de7-46c1-b3ec-6f6d-d4196dab4d58","rotate":180,"settings":{},"flipped":false,"x":2,"y":2,"type":"TeeTube"},{"id":"124810ca-69aa-81e0-f770-d0adac8e74a0","rotate":270,"settings":{},"flipped":false,"type":"ElbowTube","x":3,"y":3},{"id":"47cf3706-001d-36f0-d079-6ba396c74f57","rotate":0,"settings":{},"flipped":false,"type":"BridgeTube","x":3,"y":2},{"id":"0081f539-a5a1-74dd-5ae3-252c988b46cc","rotate":270,"settings":{},"flipped":false,"x":5,"y":4,"type":"ElbowTube"},{"id":"f07773c1-bfdd-2b67-5fb0-131a4761ff02","rotate":180,"settings":{"liquids":["#DB0023"]},"flipped":false,"type":"SystemIO","x":7,"y":3},{"id":"7a14dfd2-9883-60ab-c6dc-346a1a4a6ced","rotate":180,"settings":{},"flipped":false,"type":"Valve","x":6,"y":3,"closed":false},{"id":"d5294a3c-5c27-5381-9fdb-42e7fd7ea1b3","rotate":90,"settings":{},"flipped":false,"type":"TeeTube","x":5,"y":3},{"id":"73620c5c-917a-f58d-324a-bdf279ba32ab","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":5,"y":2},{"id":"0f61648a-e83b-d4a5-12e8-82da479b74fb","rotate":0,"settings":{"enabled":true},"flipped":false,"x":4,"y":2,"type":"Pump","disabled":false},{"id":"6573658f-087f-277c-f445-faaa18d39556","rotate":0,"settings":{},"flipped":false,"type":"Valve","x":4,"y":4,"closed":true},{"id":"1edc48e0-bb24-23a5-741d-68e996b4f3d9","rotate":90,"settings":{},"flipped":false,"type":"SystemIO","x":3,"y":1},{"id":"c7652ea7-923b-7c76-c032-9bcb0411b9d6","rotate":0,"settings":{},"flipped":false,"x":13,"y":3,"type":"ElbowTube"},{"id":"b850ea97-4d09-66f6-c8eb-3287baee16c3","rotate":90,"settings":{},"flipped":false,"type":"SystemIO","x":13,"y":1},{"id":"e487af86-2886-3dc5-7925-3200a7b7bf03","rotate":180,"settings":{},"flipped":false,"type":"TeeTube","x":11,"y":13},{"id":"34355c2d-5dd0-aa1f-6708-92f085bfd42a","rotate":0,"settings":{},"flipped":false,"type":"CrossTube","x":12,"y":13},{"id":"7ce17e1b-1784-4502-a449-d665479392a3","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":12,"y":12},{"id":"d9cfc2bf-ac59-e765-0fbc-7644d44810f1","rotate":0,"settings":{"enabled":true},"flipped":false,"x":16,"y":12,"type":"Pump","disabled":false},{"id":"44f308d1-1d04-f65e-c89d-e7318ec05786","rotate":270,"settings":{},"flipped":false,"type":"ElbowTube","x":17,"y":12},{"id":"529b1781-1d94-cdd6-40b6-2023739cf67a","rotate":180,"settings":{},"flipped":false,"type":"ElbowTube","x":17,"y":11},{"id":"5b70b4c9-5851-ed39-9358-752fc1186c6a","rotate":0,"settings":{},"flipped":false,"x":16,"y":11,"type":"StraightTube"},{"id":"9fa9e091-2fb1-9732-7683-deb741ce044f","rotate":0,"settings":{},"flipped":false,"type":"ElbowTube","x":12,"y":11},{"id":"1d26dd0b-4876-d624-e80c-d9c2a723303f","rotate":180,"settings":{},"flipped":false,"type":"TeeTube","x":10,"y":13},{"id":"ed6adaf3-3889-04eb-1855-8dc48b78cfd7","rotate":0,"settings":{"closed":true,"actuatorLink":null},"flipped":false,"type":"ActuatorValve","x":9,"y":13},{"id":"6fb9403b-4174-cc32-27b8-355c3071473f","rotate":180,"settings":{},"flipped":false,"type":"DipTube","x":8,"y":13},{"id":"3f3b54c8-7fee-e0f1-4eb7-ed083a313674","rotate":90,"settings":{},"flipped":false,"type":"TeeTube","x":12,"y":10},{"id":"e967b812-63dc-87f6-75c9-9b6d39d3919c","rotate":0,"settings":{},"flipped":false,"type":"CheckValve","x":13,"y":10},{"id":"4c957508-a8c6-f899-360d-ee2e434d2708","rotate":0,"settings":{},"flipped":false,"x":14,"y":10,"type":"StraightTube"},{"id":"26f7c494-bf52-efcf-401c-5e2a2d9b22b5","rotate":180,"settings":{"liquids":["#DB0023"]},"flipped":false,"type":"SystemIO","x":15,"y":10},{"id":"4cfac8d4-e613-faae-4819-2409d597d7e1","rotate":90,"settings":{},"flipped":false,"type":"TeeTube","x":12,"y":9},{"id":"e349cdd1-73f8-4a51-e8ee-bc593707d5c7","rotate":0,"settings":{},"flipped":false,"type":"StraightInletTube","x":13,"y":9},{"id":"11383259-3d68-8143-3737-5cd390f258b8","rotate":90,"settings":{},"flipped":false,"type":"TeeTube","x":12,"y":8},{"id":"35aeca63-e1db-b49a-830c-356fc31a0bdc","rotate":180,"settings":{},"flipped":false,"type":"CheckValve","x":13,"y":8},{"id":"a009f479-2c09-d8e6-6979-e218ee9cb8f4","rotate":180,"settings":{"liquids":["#DB0023"]},"flipped":false,"type":"SystemIO","x":14,"y":8},{"id":"257f8b02-c8cf-eb7d-361e-64353976588c","rotate":90,"settings":{},"flipped":false,"type":"ElbowTube","x":12,"y":7},{"id":"6bbb153e-12dc-7ee5-516d-0cc365da8e26","rotate":0,"settings":{},"flipped":false,"type":"ElbowTube","x":12,"y":6},{"id":"60563139-095a-1ed0-9cd8-ed27de9def6d","rotate":90,"settings":{"liquids":["#4AA0EF"],"pressure":10},"flipped":false,"x":12,"y":5,"type":"SystemIO"},{"id":"4751b204-56b8-f26d-d894-6b845e73e71a","rotate":0,"settings":{"sensorServiceId":"sparkey","sensorLink":{"id":"sensor-1","type":"TempSensorMock","driven":false}},"flipped":false,"type":"SensorDisplay","x":17,"y":9},{"id":"0907e793-bc39-7c63-c22a-6ee15a535aed","rotate":0,"settings":{},"flipped":false,"type":"Coil","x":13,"y":6}]},{"_id":"logged-sessions__3d15296d-0abd-4d45-383c-0bec436ae319","title":"Teddy","date":1579688563640,"notes":[{"id":"66ea94b9-1c2a-6218-6469-a9b353e45e77","title":"Example note","type":"Text","value":"","col":12},{"id":"ea8631fd-9bb0-ac9f-6cfb-8bf01e56893c","title":"Subprocess graph","type":"Graph","start":null,"end":null,"config":{"layout":{"annotations":[]},"params":{},"targets":[],"renames":{},"axes":{},"colors":{}},"col":12}],"tags":["on: Home Dashboard"]},{"_id":"services__sparkey","title":"Spark Controller 'sparkey'","order":1,"type":"Spark","config":{"groupNames":["testey1","testey2"]}},{"_id":"services__spock","title":"Spark Controller 'spock'","order":2,"type":"Spark","config":{}}]
+[
+  {
+    "_id": "dashboard-items__1-55d75cbee5631853c77cd22f26e9a81c",
+    "title": "Ministry of Silly Walks",
+    "order": 4,
+    "cols": 4,
+    "rows": 2,
+    "feature": "Automation",
+    "dashboard": "dashboard-home",
+    "config": {}
+  },
+  {
+    "_id": "dashboard-items__174108b9-e054-42b3-b19b-2eadabac6028",
+    "dashboard": "herms",
+    "cols": 4,
+    "rows": 5,
+    "order": 3,
+    "title": "HERMS Actions",
+    "feature": "QuickActions",
+    "config": {
+      "changeIdMigrated": true,
+      "serviceId": "sparkey",
+      "steps": [
+        {
+          "name": "Disable all setpoints",
+          "id": "16bf062e-2105-4ff0-b81f-c85731b7e14f",
+          "changes": [
+            {
+              "id": "caa78b09-62f4-41ba-b33c-83899d037445",
+              "blockId": "HERMS HLT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "f63767fb-3e99-4403-9e70-88b509c0af59",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "199b53af-9e6d-4bd3-9b63-3167c3f284eb",
+              "blockId": "HERMS BK Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            }
+          ]
+        },
+        {
+          "name": "Constant HLT Temp",
+          "id": "5ecfea94-9cb2-4aa7-95a3-c9a8ee915424",
+          "changes": [
+            {
+              "id": "4aa3a681-28ea-40f6-8145-23febf8da77c",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "5aacdf98-9d4b-494a-bac2-4f82eb5e728d",
+              "blockId": "HERMS HLT Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 70
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "Constant MT Temp",
+          "id": "45ee02d6-a5dc-4885-9d83-a93f612fc54f",
+          "changes": [
+            {
+              "id": "215e1562-c641-43e5-8ceb-90779e4724bc",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 66.7
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            },
+            {
+              "id": "75bb7f56-5ed7-4c56-aeef-3889c946a078",
+              "blockId": "HERMS HLT Setpoint Driver",
+              "data": {
+                "enabled": true
+              },
+              "confirmed": {}
+            }
+          ],
+          "applicable": true,
+          "diffs": [
+            {
+              "blockId": "HERMS MT Setpoint",
+              "diffs": [
+                {
+                  "key": "Enabled",
+                  "oldV": "false",
+                  "newV": "true",
+                  "changed": true
+                },
+                {
+                  "key": "Setting",
+                  "oldV": "67.00 °C",
+                  "newV": "66.70 °C",
+                  "changed": true
+                }
+              ]
+            },
+            {
+              "blockId": "HERMS HLT Setpoint Driver",
+              "diffs": [
+                {
+                  "key": "Enabled",
+                  "oldV": "false",
+                  "newV": "true",
+                  "changed": true
+                }
+              ]
+            }
+          ],
+          "active": false
+        },
+        {
+          "name": "Constant BK Temp",
+          "id": "b46e68ee-4ce9-4bca-9027-7a5d3d261963",
+          "changes": [
+            {
+              "id": "1780d73f-09a5-4bae-b5e7-283c69ae0639",
+              "blockId": "HERMS BK Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 100
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "pinnedPosition": {
+      "x": 8,
+      "y": 6
+    }
+  },
+  {
+    "_id": "dashboard-items__972240e6-e12a-4abd-8c6c-bc850ff5096d",
+    "dashboard": "herms",
+    "cols": 11,
+    "rows": 5,
+    "order": 1,
+    "title": "HERMS Process",
+    "feature": "Builder",
+    "config": {
+      "currentLayoutId": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
+      "layoutIds": [
+        "90ca4326-b3a2-47ca-bec4-2c52281d8772"
+      ]
+    },
+    "pinnedPosition": {
+      "x": 1,
+      "y": 1
+    }
+  },
+  {
+    "_id": "dashboard-items__a0634d76-5499-11e9-8647-d663bd873d93",
+    "title": "Gone With the Flow",
+    "order": 1,
+    "cols": 12,
+    "rows": 8,
+    "feature": "Builder",
+    "dashboard": "builder",
+    "config": {
+      "currentLayoutId": "ee021f01-fc29-2e06-c903-0c9288eb1bfe",
+      "layoutIds": [
+        "0e28d1ad-8e38-4204-b634-c1301aae73ac",
+        "ee021f01-fc29-2e06-c903-0c9288eb1bfe"
+      ]
+    }
+  },
+  {
+    "_id": "dashboard-items__a06350b4-5499-11e9-8647-d663bd873d93",
+    "title": "item-invalid",
+    "order": 1,
+    "cols": 3,
+    "rows": 3,
+    "feature": "SetpointSensorPair",
+    "dashboard": "derp",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "BLARGH"
+    }
+  },
+  {
+    "_id": "dashboard-items__a06355e6-5499-11e9-8647-d663bd873d93",
+    "title": "item-unknown",
+    "order": 2,
+    "cols": 3,
+    "rows": 3,
+    "feature": "UnknownType",
+    "dashboard": "derp",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "setpoint-1"
+    }
+  },
+  {
+    "_id": "dashboard-items__a06358fc-5499-11e9-8647-d663bd873d93",
+    "title": "item-invalid-unknown",
+    "order": 3,
+    "cols": 3,
+    "rows": 3,
+    "feature": "Warbl",
+    "dashboard": "derp",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "BLORP"
+    }
+  },
+  {
+    "_id": "dashboard-items__a06358fc-5499-11e9-8647-d663bd873d95",
+    "title": "Charles",
+    "order": 3,
+    "cols": 4,
+    "rows": 2,
+    "feature": "QuickActions",
+    "dashboard": "dashboard-home",
+    "config": {
+      "serviceId": "sparkey",
+      "steps": [
+        {
+          "id": "b92781c7-3a9f-440d-8df6-bd897b4bfa37",
+          "name": "step-10",
+          "changes": [
+            {
+              "blockId": "sensor-1",
+              "data": {
+                "value[degC]": 10
+              }
+            },
+            {
+              "blockId": "setpoint-sensor-pair-1",
+              "data": {
+                "storedSetting[degC]": 10,
+                "settingEnabled": true
+              }
+            },
+            {
+              "blockId": "actuator-pwm-1",
+              "data": {
+                "setting": 60
+              }
+            }
+          ]
+        },
+        {
+          "id": "6ab89a06-6103-4c59-a34c-f5a173cd3ee4",
+          "name": "step-20",
+          "changes": [
+            {
+              "blockId": "sensor-1",
+              "data": {
+                "value[degC]": 20
+              }
+            },
+            {
+              "blockId": "setpoint-sensor-pair-1",
+              "data": {
+                "storedSetting[degC]": 20,
+                "settingEnabled": true
+              }
+            },
+            {
+              "blockId": "actuator-pwm-1",
+              "data": {
+                "setting": 60
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "_id": "dashboard-items__a0635bb8-5499-11e9-8647-d663bd873d93",
+    "title": "item-service-unknown",
+    "order": 3,
+    "cols": 3,
+    "rows": 3,
+    "feature": "SetpointSensorPair",
+    "dashboard": "derp",
+    "config": {
+      "serviceId": "ZORP",
+      "blockId": "BLORP"
+    }
+  },
+  {
+    "_id": "dashboard-items__a0635e1a-5499-11e9-8647-d663bd873d93",
+    "title": "item-graph",
+    "order": 1,
+    "cols": 10,
+    "rows": 5,
+    "feature": "Graph",
+    "dashboard": "metrics",
+    "config": {
+      "layout": {},
+      "params": {
+        "duration": "10m"
+      },
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "actuator-pwm-1/setting",
+            "actuator-pwm-1/value"
+          ]
+        },
+        {
+          "measurement": "spock",
+          "fields": [
+            " Combined Influx points"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/actuator-pwm-1/setting": "Actuator setting"
+      }
+    }
+  },
+  {
+    "_id": "dashboard-items__a06362e8-5499-11e9-8647-d663bd873d93",
+    "title": "sessions",
+    "order": 2,
+    "cols": 4,
+    "rows": 5,
+    "feature": "SessionView",
+    "dashboard": "metrics",
+    "config": {
+      "sessions": [
+        {
+          "id": "mgKBmi4sv",
+          "name": "brew-session",
+          "hidden": false,
+          "start": 1547723679298,
+          "end": null,
+          "graphCfg": {
+            "layout": {},
+            "params": {
+              "start": 1547723679298
+            },
+            "targets": [
+              {
+                "measurement": "sparkey",
+                "fields": [
+                  "actuator-pwm-1/value"
+                ]
+              }
+            ],
+            "renames": {
+              "sparkey/actuator-pwm-1/value": "PWM value"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "_id": "dashboard-items__a0636842-5499-11e9-8647-d663bd873d93",
+    "title": "empty-graph",
+    "order": 2,
+    "cols": 5,
+    "rows": 5,
+    "feature": "Graph",
+    "dashboard": "metrics",
+    "config": {
+      "layout": {},
+      "params": [],
+      "targets": [],
+      "renames": {}
+    }
+  },
+  {
+    "_id": "dashboard-items__a0636b12-5499-11e9-8647-d663bd873d93",
+    "title": "pid-1",
+    "order": 1,
+    "cols": 4,
+    "rows": 4,
+    "feature": "Pid",
+    "dashboard": "dashboard-home",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "pid-1"
+    }
+  },
+  {
+    "_id": "dashboard-items__a0636b12-5499-11e9-8647-d663bd873d94",
+    "title": "inspector",
+    "order": 2,
+    "cols": 4,
+    "rows": 4,
+    "feature": "Metrics",
+    "dashboard": "dashboard-home",
+    "config": {
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "actuator-pwm-1/setting",
+            "actuator-pwm-1/value"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/actuator-pwm-1/value": "actuator value"
+      },
+      "freshDuration": {},
+      "decimals": {}
+    }
+  },
+  {
+    "_id": "dashboard-items__dashboard-items__bb7aa0b4-a045-ad38-4887-308967ca8d63",
+    "title": "Mr Beancounter",
+    "order": 5,
+    "cols": 4,
+    "rows": 5,
+    "feature": "SessionLog",
+    "dashboard": "dashboard-home",
+    "config": {
+      "currentSession": "3d15296d-0abd-4d45-383c-0bec436ae319"
+    }
+  },
+  {
+    "_id": "dashboard-items__f764bbe2-38ad-4970-998e-11a29eddb69a",
+    "dashboard": "herms",
+    "cols": 7,
+    "rows": 5,
+    "order": 2,
+    "title": "HERMS Graph",
+    "feature": "Graph",
+    "config": {
+      "layout": {},
+      "params": {
+        "duration": "10m"
+      },
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "HERMS HLT Sensor/value[degC]",
+            "HERMS MT Sensor/value[degC]",
+            "HERMS BK Sensor/value[degC]",
+            "HERMS HLT Setpoint/setting[degC]",
+            "HERMS MT Setpoint/setting[degC]",
+            "HERMS BK Setpoint/setting[degC]",
+            "HERMS HLT PWM/value",
+            "HERMS BK PWM/value"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/HERMS HLT Sensor/value[degC]": "HLT temperature",
+        "sparkey/HERMS MT Sensor/value[degC]": "MT temperature",
+        "sparkey/HERMS BK Sensor/value[degC]": "BK temperature",
+        "sparkey/HERMS HLT Setpoint/setting[degC]": "HLT setting",
+        "sparkey/HERMS MT Setpoint/setting[degC]": "MT setting",
+        "sparkey/HERMS BK Setpoint/setting[degC]": "BK setting",
+        "sparkey/HERMS HLT PWM/value": "HLT PWM value",
+        "sparkey/HERMS BK PWM/value": "BK PWM value"
+      },
+      "axes": {
+        "sparkey/HERMS HLT PWM/value": "y2",
+        "sparkey/HERMS BK PWM/value": "y2"
+      },
+      "colors": {}
+    },
+    "pinnedPosition": {
+      "x": 1,
+      "y": 6
+    }
+  },
+  {
+    "_id": "dashboards__builder",
+    "title": "Brewery Builder Dashboard",
+    "order": 3
+  },
+  {
+    "_id": "dashboards__dashboard-home",
+    "title": "Home Dashboard",
+    "order": 1
+  },
+  {
+    "_id": "dashboards__derp",
+    "title": "Derp Dashboard",
+    "order": 4
+  },
+  {
+    "_id": "dashboards__herms",
+    "title": "HERMS",
+    "order": 5
+  },
+  {
+    "_id": "dashboards__metrics",
+    "title": "Metrics Dashboard",
+    "order": 2
+  },
+  {
+    "_id": "layouts__90ca4326-b3a2-47ca-bec4-2c52281d8772",
+    "title": "HERMS Layout",
+    "width": 26,
+    "height": 11,
+    "parts": [
+      {
+        "id": "62ec5274-2564-441c-92d1-7d0e24eafa13",
+        "rotate": 0,
+        "settings": {
+          "color": "#c48600"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 20,
+        "y": 1
+      },
+      {
+        "id": "e91cfce7-3eb3-40b0-ab2c-570694dd74f2",
+        "rotate": 0,
+        "settings": {
+          "color": "#9c4b00"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 12,
+        "y": 1
+      },
+      {
+        "id": "10f5b81f-43f9-4638-b275-3037f4fe1310",
+        "rotate": 0,
+        "settings": {
+          "color": "#b50000"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 4,
+        "y": 1
+      },
+      {
+        "id": "7b7ac06e-ba15-40ac-a34f-d561de00718e",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "Coil",
+        "x": 5,
+        "y": 4
+      },
+      {
+        "id": "14315508-5aca-4a17-bd9e-4af1a3c622d5",
+        "rotate": 0,
+        "settings": {
+          "blockServiceId": "sparkey",
+          "pwm": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK PWM"
+          },
+          "sizeX": 4
+        },
+        "flipped": true,
+        "type": "HeatingElement",
+        "x": 21,
+        "y": 6
+      },
+      {
+        "id": "c34f0524-c0e0-4026-82df-2369086edd50",
+        "rotate": 0,
+        "settings": {
+          "blockServiceId": "sparkey",
+          "pwm": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT PWM"
+          },
+          "sizeX": 4
+        },
+        "flipped": false,
+        "type": "HeatingElement",
+        "x": 3,
+        "y": 6
+      },
+      {
+        "id": "9f4440ec-d94c-490d-b4ba-3dfc02887781",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "WhirlpoolInlet",
+        "x": 20,
+        "y": 2
+      },
+      {
+        "id": "2c17fea4-5ccf-4bc3-aab0-d351a2758389",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "WhirlpoolInlet",
+        "x": 4,
+        "y": 2
+      },
+      {
+        "id": "747c0348-181e-461e-95fb-f06764505e6c",
+        "rotate": 0,
+        "settings": {
+          "sizeX": 4
+        },
+        "flipped": true,
+        "type": "FilterBottom",
+        "x": 12,
+        "y": 6
+      },
+      {
+        "id": "3ec5bd91-4f66-4de5-b86c-5d636a393d68",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS MT Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 13,
+        "y": 3
+      },
+      {
+        "id": "baafe585-d3b4-4f6b-a348-4df635881dbc",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 21,
+        "y": 3
+      },
+      {
+        "id": "e6900363-8d79-4598-bcba-8ba33da17fb1",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 5,
+        "y": 3
+      },
+      {
+        "id": "8d3e1f9f-9d98-44e2-9f15-ff4b123e4448",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 19,
+        "y": 2
+      },
+      {
+        "id": "275f4944-5a26-4021-b49f-1991dcd86641",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 18,
+        "y": 2
+      },
+      {
+        "id": "b39904b2-47a3-4499-967c-16db0fa31bd5",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 3
+      },
+      {
+        "id": "f5d2bd3f-0691-47ad-b9e8-f46f25df6b92",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 4
+      },
+      {
+        "id": "7d79688e-43f9-46f6-b568-c3ff254e30d1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 5
+      },
+      {
+        "id": "b292c7f3-f5ee-429c-a169-8b0a402da186",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 18,
+        "y": 6
+      },
+      {
+        "id": "6bb976e4-7538-45fa-b71c-de0a73cc6b96",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 2
+      },
+      {
+        "id": "c45e28b4-943c-4b22-82eb-7da5462a2b20",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 2
+      },
+      {
+        "id": "70265b7d-ea54-4dbb-82a3-4d5d9377d5f4",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 9,
+        "y": 2
+      },
+      {
+        "id": "178c8eb7-5376-4092-b2be-43b5af48e1e1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 6
+      },
+      {
+        "id": "138106d7-16ec-4f8d-9875-3c8b230d5cc4",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 6
+      },
+      {
+        "id": "2b7655f9-9f47-4c6a-b3b9-10e340e377a9",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 6
+      },
+      {
+        "id": "0c18b785-ac8d-401f-8ac1-9b709d96acfe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "DipTube",
+        "x": 12,
+        "y": 2
+      },
+      {
+        "id": "d3c0d5d2-2e8e-44e0-bce5-347e9a2dcffb",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "DipTube",
+        "x": 20,
+        "y": 6
+      },
+      {
+        "id": "77fc7305-2fd2-45e2-9ab6-6018bb2886b8",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 17,
+        "y": 6
+      },
+      {
+        "id": "60817b6c-8c51-4f70-b354-c8650981aa93",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 16,
+        "y": 6
+      },
+      {
+        "id": "b4c78c4a-0a4a-47d6-8707-76ed6f3aa737",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 19,
+        "y": 6
+      },
+      {
+        "id": "a4005531-adf2-44bd-a6a3-6f14fc87f618",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 2,
+        "y": 2
+      },
+      {
+        "id": "a0976709-28f8-4994-b53c-f40ff48a511c",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 3
+      },
+      {
+        "id": "913c1180-433f-41ee-8cab-037c50ae6ae9",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "id": "765bb6db-68b5-4781-8fb3-bec6b113bd88",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 5
+      },
+      {
+        "id": "d275d3eb-1d0d-446e-b948-ebe924f8923e",
+        "rotate": 0,
+        "settings": {},
+        "flipped": true,
+        "type": "DipTube",
+        "x": 7,
+        "y": 6
+      },
+      {
+        "id": "cab9f977-8a78-4820-ac5c-a115a7f0567f",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 8,
+        "y": 6
+      },
+      {
+        "id": "3b9c669b-2be7-432d-8ff5-28640ae315d3",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 17,
+        "y": 9
+      },
+      {
+        "id": "73f2e1e9-716e-43b9-9ecd-d54f6222c7d4",
+        "rotate": 270,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 18,
+        "y": 8
+      },
+      {
+        "id": "e5125c06-c3ea-418c-abf2-19c8b80c9b9d",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 7
+      },
+      {
+        "id": "7566dce0-6477-49bb-b135-0368d7ba9048",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 17,
+        "y": 7
+      },
+      {
+        "id": "81319166-4826-45f8-a118-3afce9bf830c",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 15,
+        "y": 9
+      },
+      {
+        "id": "7f5f06a0-583e-4af1-90dc-898d39773bfe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 9,
+        "y": 9
+      },
+      {
+        "id": "d6d29d86-2709-44cf-973a-5421dc065de6",
+        "rotate": 270,
+        "settings": {
+          "enabled": false
+        },
+        "flipped": false,
+        "type": "Pump",
+        "x": 17,
+        "y": 8
+      },
+      {
+        "id": "446e97fb-a2cf-4e1e-882e-2745f7a4fcbe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 3,
+        "y": 9
+      },
+      {
+        "id": "653ccaa4-2270-46fc-a7e6-ffe579237721",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 4,
+        "y": 9
+      },
+      {
+        "id": "654c56b9-57f4-4ecb-9133-4d7d0d0da459",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 5,
+        "y": 9
+      },
+      {
+        "id": "9d8c8543-6f04-4394-989a-758da03982f1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 6
+      },
+      {
+        "id": "4eccf98c-44dc-4934-ac7a-cb3bc3927f79",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 3,
+        "y": 2
+      },
+      {
+        "id": "36be6b0a-13c5-413c-8599-627cc9d8ccd4",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 13,
+        "y": 9
+      },
+      {
+        "id": "b984d740-969b-4fca-b77f-2f95e649cd49",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 11,
+        "y": 9
+      },
+      {
+        "id": "b9e2322d-b1d2-4751-aa24-f4d5bda55c7f",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 13,
+        "y": 8
+      },
+      {
+        "id": "4ebceb43-17f4-46e5-bdb1-7a5c9983b110",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 11,
+        "y": 8
+      },
+      {
+        "id": "75d94725-de13-4707-aa02-b68c10c89639",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 9,
+        "y": 8
+      },
+      {
+        "id": "f649f75d-085b-4ae9-be1a-644579a97256",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 7
+      },
+      {
+        "id": "ed58258c-1c7d-43a8-81da-ded2d43c9c59",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 12,
+        "y": 7
+      },
+      {
+        "id": "00cdf60c-f7ec-40b5-8dd4-df1bf06b8bc1",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 10,
+        "y": 9
+      },
+      {
+        "id": "7eddaf65-519f-44ac-b603-64f0955ac8f2",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 12,
+        "y": 9
+      },
+      {
+        "id": "a42c1e54-1302-4322-b0d8-ef9517b95719",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 13,
+        "y": 7
+      },
+      {
+        "id": "061a901c-6bb7-49b0-b091-c4676a04844a",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 11,
+        "y": 7
+      },
+      {
+        "id": "7642ac17-7f8d-4490-99d8-8be94a3e6b36",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 10,
+        "y": 7
+      },
+      {
+        "id": "02f3664d-9ac3-4d7a-806f-e8d03377d852",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 7
+      },
+      {
+        "id": "4c135168-656b-477c-adda-86ee83de6663",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 16,
+        "y": 9
+      },
+      {
+        "id": "b52d4ed8-ca5a-4ed5-abcf-20f11e9b6696",
+        "rotate": 0,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 14,
+        "y": 9
+      },
+      {
+        "id": "a8c61cb6-f3d1-44d0-a05d-fd0cc99c0038",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 18,
+        "y": 9
+      },
+      {
+        "id": "42fd3984-548b-4dc9-bddf-de3d0f58af1e",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 19,
+        "y": 9
+      },
+      {
+        "id": "204d7192-a9cd-43ef-b44c-e1ad4fcdc2cf",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 20,
+        "y": 9
+      },
+      {
+        "id": "5f762ce2-9aa0-4ef4-b075-b093b41a153d",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 7,
+        "y": 9
+      },
+      {
+        "id": "0b8288c1-6e97-42c0-bb80-4bddd707e407",
+        "rotate": 270,
+        "settings": {
+          "enabled": false
+        },
+        "flipped": false,
+        "type": "Pump",
+        "x": 7,
+        "y": 8
+      },
+      {
+        "id": "69a5d0e4-23fd-4cb2-81c0-32e1d991056f",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 8,
+        "y": 9
+      },
+      {
+        "id": "3d337ab1-6006-4e90-85a9-e77697d7f62f",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 6,
+        "y": 9
+      },
+      {
+        "id": "bf1f5f79-70da-4391-bea7-70e304d8fc23",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 8,
+        "y": 7
+      },
+      {
+        "id": "be004759-ba08-4759-850f-6c82fbe24d88",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 7,
+        "y": 7
+      },
+      {
+        "id": "3170fc31-a12b-42e1-91ec-e2d84d601892",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 11,
+        "y": 4
+      },
+      {
+        "id": "aa7225f6-0f64-4bf1-ba86-eaa349dc4a7e",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 5
+      },
+      {
+        "id": "0ee18011-97af-4071-a2db-62142b54a1b0",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 10,
+        "y": 5
+      },
+      {
+        "id": "b9e3cbc4-1f69-4dd4-a93b-a89a9d559945",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 4
+      },
+      {
+        "id": "e1ab9029-579b-4895-96e5-e3ca505acb50",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 9,
+        "y": 4
+      },
+      {
+        "id": "e2256026-1a79-4355-9351-9fab2b143c84",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 9,
+        "y": 5
+      },
+      {
+        "id": "ccd42b29-04f1-4924-9489-4b0a754501ca",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 8,
+        "y": 4
+      },
+      {
+        "id": "9b55897e-cad8-4dec-aa96-3c65d9336bdb",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 8,
+        "y": 5
+      },
+      {
+        "id": "05fa27e1-bab4-4905-8d62-a0d47df1871b",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 3
+      },
+      {
+        "id": "0d1fc393-37c6-464a-bc42-468b8f95836d",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS MT PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 11,
+        "y": 1
+      },
+      {
+        "id": "e8d6bc42-f64f-41b7-ae17-10175638ca61",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 19,
+        "y": 1
+      },
+      {
+        "id": "24121797-0a56-4d28-86f2-1978892f8d25",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 3,
+        "y": 1
+      },
+      {
+        "id": "432d535b-00a8-4837-b623-39f8d7be03e3",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 2,
+        "y": 9
+      },
+      {
+        "id": "82b0f278-5f45-4a7c-80b1-d5dff59432cf",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 1,
+        "y": 9
+      },
+      {
+        "id": "07c5600e-3e32-45c3-a453-23df9d7da538",
+        "rotate": 270,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 2,
+        "y": 8
+      },
+      {
+        "id": "bd304241-8b19-4960-b680-a5ea9f82b82e",
+        "rotate": 0,
+        "settings": {
+          "pressure": 10,
+          "liquids": [
+            "#4AA0EF"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 0,
+        "y": 9
+      }
+    ]
+  },
+  {
+    "_id": "layouts__ee021f01-fc29-2e06-c903-0c9288eb1bfe",
+    "title": "Gone With the Layout",
+    "width": 20,
+    "height": 15,
+    "parts": [
+      {
+        "id": "41693288-1161-ef12-bc7c-75d3b067e2f4",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 14,
+        "y": 2,
+        "type": "Coil"
+      },
+      {
+        "id": "203f9fc0-0887-d409-2e58-ba4a070dfabe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "CounterflowChiller",
+        "x": 13,
+        "y": 11
+      },
+      {
+        "id": "b9b9da24-337c-4d66-e234-46d3688d6d1f",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "HeatingElement",
+        "x": 7,
+        "y": 11
+      },
+      {
+        "id": "3271d456-4cfa-57b2-7172-cfe5ba68de0d",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ImmersionCoil",
+        "x": 11,
+        "y": 14
+      },
+      {
+        "id": "9b308893-554c-e3c8-e4d8-f948a4da7466",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "Lauterhexe",
+        "x": 13,
+        "y": 13
+      },
+      {
+        "id": "bc2c9d81-18bf-425d-4cf4-2a3d621ee9ee",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "WhirlpoolInlet",
+        "x": 7,
+        "y": 14
+      },
+      {
+        "id": "cb0bdf02-5cd0-c29e-ddbf-6537762fbc77",
+        "rotate": 0,
+        "settings": {
+          "liquids": [
+            "#C678DD"
+          ]
+        },
+        "flipped": false,
+        "x": 11,
+        "y": 2,
+        "type": "SystemIO"
+      },
+      {
+        "id": "e0929a70-22cd-f34b-ffe9-7060016a0cf2",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 12,
+        "y": 2,
+        "type": "StraightTube"
+      },
+      {
+        "id": "0c506a71-af93-44b6-dbe0-c4ab16f7d80b",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 13,
+        "y": 2
+      },
+      {
+        "id": "ef649e86-967a-8e81-3139-f7bcc61e462c",
+        "rotate": 0,
+        "settings": {
+          "liquids": [
+            "#4AA0EF"
+          ],
+          "pressure": 10
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 0,
+        "y": 2
+      },
+      {
+        "id": "56565652-dba8-b68a-ee0c-66534dfbda20",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "Valve",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "id": "f4b935cd-4ae5-823b-de60-524931bd7a1b",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "x": 3,
+        "y": 6,
+        "type": "SystemIO"
+      },
+      {
+        "id": "72163643-aea3-24f0-e898-ac100e1fb0ff",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "Valve",
+        "x": 3,
+        "y": 5,
+        "closed": false
+      },
+      {
+        "id": "d42cca9b-1d9c-322c-1456-e2c630bf47d8",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "x": 3,
+        "y": 4,
+        "type": "TeeTube"
+      },
+      {
+        "id": "e5561b25-0ace-1590-f9b6-524287b2791f",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "id": "2f27d35e-ed31-8869-26a1-883c2942fab4",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 2,
+        "y": 3
+      },
+      {
+        "id": "8daa8de7-46c1-b3ec-6f6d-d4196dab4d58",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "x": 2,
+        "y": 2,
+        "type": "TeeTube"
+      },
+      {
+        "id": "124810ca-69aa-81e0-f770-d0adac8e74a0",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 3,
+        "y": 3
+      },
+      {
+        "id": "47cf3706-001d-36f0-d079-6ba396c74f57",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 3,
+        "y": 2
+      },
+      {
+        "id": "0081f539-a5a1-74dd-5ae3-252c988b46cc",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "x": 5,
+        "y": 4,
+        "type": "ElbowTube"
+      },
+      {
+        "id": "f07773c1-bfdd-2b67-5fb0-131a4761ff02",
+        "rotate": 180,
+        "settings": {
+          "liquids": [
+            "#DB0023"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 7,
+        "y": 3
+      },
+      {
+        "id": "7a14dfd2-9883-60ab-c6dc-346a1a4a6ced",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "Valve",
+        "x": 6,
+        "y": 3,
+        "closed": false
+      },
+      {
+        "id": "d5294a3c-5c27-5381-9fdb-42e7fd7ea1b3",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 5,
+        "y": 3
+      },
+      {
+        "id": "73620c5c-917a-f58d-324a-bdf279ba32ab",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 5,
+        "y": 2
+      },
+      {
+        "id": "0f61648a-e83b-d4a5-12e8-82da479b74fb",
+        "rotate": 0,
+        "settings": {
+          "enabled": true
+        },
+        "flipped": false,
+        "x": 4,
+        "y": 2,
+        "type": "Pump",
+        "disabled": false
+      },
+      {
+        "id": "6573658f-087f-277c-f445-faaa18d39556",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "Valve",
+        "x": 4,
+        "y": 4,
+        "closed": true
+      },
+      {
+        "id": "1edc48e0-bb24-23a5-741d-68e996b4f3d9",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 3,
+        "y": 1
+      },
+      {
+        "id": "c7652ea7-923b-7c76-c032-9bcb0411b9d6",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 13,
+        "y": 3,
+        "type": "ElbowTube"
+      },
+      {
+        "id": "b850ea97-4d09-66f6-c8eb-3287baee16c3",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 13,
+        "y": 1
+      },
+      {
+        "id": "e487af86-2886-3dc5-7925-3200a7b7bf03",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 11,
+        "y": 13
+      },
+      {
+        "id": "34355c2d-5dd0-aa1f-6708-92f085bfd42a",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "CrossTube",
+        "x": 12,
+        "y": 13
+      },
+      {
+        "id": "7ce17e1b-1784-4502-a449-d665479392a3",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 12,
+        "y": 12
+      },
+      {
+        "id": "d9cfc2bf-ac59-e765-0fbc-7644d44810f1",
+        "rotate": 0,
+        "settings": {
+          "enabled": true
+        },
+        "flipped": false,
+        "x": 16,
+        "y": 12,
+        "type": "Pump",
+        "disabled": false
+      },
+      {
+        "id": "44f308d1-1d04-f65e-c89d-e7318ec05786",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 17,
+        "y": 12
+      },
+      {
+        "id": "529b1781-1d94-cdd6-40b6-2023739cf67a",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 17,
+        "y": 11
+      },
+      {
+        "id": "5b70b4c9-5851-ed39-9358-752fc1186c6a",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 16,
+        "y": 11,
+        "type": "StraightTube"
+      },
+      {
+        "id": "9fa9e091-2fb1-9732-7683-deb741ce044f",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 12,
+        "y": 11
+      },
+      {
+        "id": "1d26dd0b-4876-d624-e80c-d9c2a723303f",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 10,
+        "y": 13
+      },
+      {
+        "id": "ed6adaf3-3889-04eb-1855-8dc48b78cfd7",
+        "rotate": 0,
+        "settings": {
+          "closed": true,
+          "actuatorLink": null
+        },
+        "flipped": false,
+        "type": "ActuatorValve",
+        "x": 9,
+        "y": 13
+      },
+      {
+        "id": "6fb9403b-4174-cc32-27b8-355c3071473f",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "DipTube",
+        "x": 8,
+        "y": 13
+      },
+      {
+        "id": "3f3b54c8-7fee-e0f1-4eb7-ed083a313674",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 12,
+        "y": 10
+      },
+      {
+        "id": "e967b812-63dc-87f6-75c9-9b6d39d3919c",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "CheckValve",
+        "x": 13,
+        "y": 10
+      },
+      {
+        "id": "4c957508-a8c6-f899-360d-ee2e434d2708",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 14,
+        "y": 10,
+        "type": "StraightTube"
+      },
+      {
+        "id": "26f7c494-bf52-efcf-401c-5e2a2d9b22b5",
+        "rotate": 180,
+        "settings": {
+          "liquids": [
+            "#DB0023"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 15,
+        "y": 10
+      },
+      {
+        "id": "4cfac8d4-e613-faae-4819-2409d597d7e1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 12,
+        "y": 9
+      },
+      {
+        "id": "e349cdd1-73f8-4a51-e8ee-bc593707d5c7",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightInletTube",
+        "x": 13,
+        "y": 9
+      },
+      {
+        "id": "11383259-3d68-8143-3737-5cd390f258b8",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 12,
+        "y": 8
+      },
+      {
+        "id": "35aeca63-e1db-b49a-830c-356fc31a0bdc",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "CheckValve",
+        "x": 13,
+        "y": 8
+      },
+      {
+        "id": "a009f479-2c09-d8e6-6979-e218ee9cb8f4",
+        "rotate": 180,
+        "settings": {
+          "liquids": [
+            "#DB0023"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 14,
+        "y": 8
+      },
+      {
+        "id": "257f8b02-c8cf-eb7d-361e-64353976588c",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 12,
+        "y": 7
+      },
+      {
+        "id": "6bbb153e-12dc-7ee5-516d-0cc365da8e26",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 12,
+        "y": 6
+      },
+      {
+        "id": "60563139-095a-1ed0-9cd8-ed27de9def6d",
+        "rotate": 90,
+        "settings": {
+          "liquids": [
+            "#4AA0EF"
+          ],
+          "pressure": 10
+        },
+        "flipped": false,
+        "x": 12,
+        "y": 5,
+        "type": "SystemIO"
+      },
+      {
+        "id": "4751b204-56b8-f26d-d894-6b845e73e71a",
+        "rotate": 0,
+        "settings": {
+          "sensorServiceId": "sparkey",
+          "sensorLink": {
+            "id": "sensor-1",
+            "type": "TempSensorMock",
+            "driven": false
+          }
+        },
+        "flipped": false,
+        "type": "SensorDisplay",
+        "x": 17,
+        "y": 9
+      },
+      {
+        "id": "0907e793-bc39-7c63-c22a-6ee15a535aed",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "Coil",
+        "x": 13,
+        "y": 6
+      }
+    ]
+  },
+  {
+    "_id": "logged-sessions__3d15296d-0abd-4d45-383c-0bec436ae319",
+    "title": "Teddy",
+    "date": 1579688563640,
+    "notes": [
+      {
+        "id": "66ea94b9-1c2a-6218-6469-a9b353e45e77",
+        "title": "Example note",
+        "type": "Text",
+        "value": "",
+        "col": 12
+      },
+      {
+        "id": "ea8631fd-9bb0-ac9f-6cfb-8bf01e56893c",
+        "title": "Subprocess graph",
+        "type": "Graph",
+        "start": null,
+        "end": null,
+        "config": {
+          "layout": {
+            "annotations": []
+          },
+          "params": {},
+          "targets": [],
+          "renames": {},
+          "axes": {},
+          "colors": {}
+        },
+        "col": 12
+      }
+    ],
+    "tags": [
+      "on: Home Dashboard"
+    ]
+  },
+  {
+    "_id": "services__sparkey",
+    "title": "Spark Controller 'sparkey'",
+    "order": 1,
+    "type": "Spark",
+    "config": {
+      "groupNames": [
+        "testey1",
+        "testey2"
+      ],
+      "expandedBlocks": {
+        "DisplaySettings": true
+      }
+    }
+  },
+  {
+    "_id": "services__spock",
+    "title": "Spark Controller 'spock'",
+    "order": 2,
+    "type": "Spark",
+    "config": {}
+  }
+]
