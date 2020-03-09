@@ -315,7 +315,7 @@ export default class SparkPage extends Vue {
   }
 
   startDialog(component: string, props: any = null): void {
-    const args = props || {
+    const args = props ?? {
       serviceId: this.service.id,
     };
     createDialog({
@@ -620,7 +620,6 @@ export default class SparkPage extends Vue {
   width: 550px
   max-width: 100vw
   height: 100%
-
 
 .selected-mode
   background-color: $secondary
