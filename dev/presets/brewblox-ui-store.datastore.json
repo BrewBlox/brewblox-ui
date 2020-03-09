@@ -1,5 +1,827 @@
 [
   {
+    "_id": "autm-template__9d4888c5-2b9c-4efa-a984-972aeb3703f3",
+    "title": "Test Template",
+    "steps": [
+      {
+        "id": "d020c2a2-4eb0-4ff0-947d-ff637511f570",
+        "title": "step-one",
+        "enabled": true,
+        "actions": [
+          {
+            "id": "c9e527b4-1d45-4da9-b106-d8ddeaf0ec02",
+            "title": "generated block patch",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "data": {}
+            }
+          },
+          {
+            "id": "91d96a27-3ffc-4d9b-948f-bce8d4d82edc",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "23ae8543-10a1-432e-af75-65131df46f51",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "6c6f61d0-d031-4521-bd05-a12a1db31e7f",
+            "enabled": true,
+            "title": "Create task-one",
+            "impl": {
+              "type": "TaskCreate",
+              "ref": "task-one",
+              "title": "Test Task",
+              "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n            Suspendisse iaculis sit amet ligula eget fermentum.\n            Nunc pharetra, sapien eget rutrum suscipit, eros nisi semper ante,\n            at consectetur elit lectus vitae tortor.\n            Duis id ipsum ac elit viverra interdum. Aenean finibus risus ut iaculis porta.\n            Aenean mollis, orci vel egestas aliquam, diam augue imperdiet orci,\n            consectetur vestibulum diam velit in magna.\n            Curabitur pulvinar, metus et lacinia sodales,\n            sem quam finibus risus, a dignissim nisl enim vitae libero.\n            In eget enim ipsum. Cras elementum nisl ac mauris dignissim,\n            quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices."
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "01a5c235-388f-4701-877a-f24138ae622c",
+            "enabled": true,
+            "next": "cf3412e3-568a-4ff8-ad18-fb0f3ec3c005",
+            "conditions": [
+              {
+                "id": "db388ace-f59e-4c14-a55f-ed91914d386a",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "abd822be-b95c-407b-9459-51346759abc9",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "951bd5b9-a460-4418-b5d2-ace05a5d803b",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "4d77f4df-1556-4ba0-8854-b0918ad47c52",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "f4443b6b-9bfe-4dae-b42e-cbf63a90ae56",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          },
+          {
+            "id": "67848ee3-331c-4a04-82bb-d2d2ad6b5e95",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "b082399b-9a8e-44cf-8f37-5ab48115dfee",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "0a2c575d-d0d3-447b-9b6b-022e813b9470",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "2fa2c38c-616b-4a55-96c8-ea07ea42e3f2",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "12369ef4-7e0c-42f0-97f5-958fd8d1d224",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "d2290746-c999-47e9-a561-4a98565f169b",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cf3412e3-568a-4ff8-ad18-fb0f3ec3c005",
+        "title": "step-two",
+        "enabled": true,
+        "actions": [
+          {
+            "id": "77f71ff7-9834-4154-890c-5816a679ba80",
+            "enabled": true,
+            "title": "Set sensor to 5 C",
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "7b513b47-5a6f-40ac-94c5-4a04ee9ec8b7",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "55a13d43-6c0a-4927-a452-973f4e71f7f1",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "9de68f14-9fdf-4a1f-8612-913cbaa7abd8",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "6ba16cc0-3083-40ae-a132-9957d2da1783",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "a1bb0209-9d29-42e3-972b-5ba9cc38a3bb",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "69d7f693-6f85-4318-81af-c71b47d0c845",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "6afb0bd3-dd0a-4d5b-a704-9758b8a5e064",
+        "title": "step-one",
+        "enabled": true,
+        "actions": [
+          {
+            "id": "6011a163-f993-46f1-a815-cce6fe2a9c1b",
+            "title": "generated block patch",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "data": {}
+            }
+          },
+          {
+            "id": "d18d9c7f-fbf7-403f-b40a-f2bbfbe594b1",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "2d7301ee-6f99-4c7e-bf4e-65e1a84d40a2",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "e6c5ce35-ca43-46a0-b4c8-ad37e9c6943e",
+            "enabled": true,
+            "title": "Create task-one",
+            "impl": {
+              "type": "TaskCreate",
+              "ref": "task-one",
+              "title": "Test Task",
+              "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n            Suspendisse iaculis sit amet ligula eget fermentum.\n            Nunc pharetra, sapien eget rutrum suscipit, eros nisi semper ante,\n            at consectetur elit lectus vitae tortor.\n            Duis id ipsum ac elit viverra interdum. Aenean finibus risus ut iaculis porta.\n            Aenean mollis, orci vel egestas aliquam, diam augue imperdiet orci,\n            consectetur vestibulum diam velit in magna.\n            Curabitur pulvinar, metus et lacinia sodales,\n            sem quam finibus risus, a dignissim nisl enim vitae libero.\n            In eget enim ipsum. Cras elementum nisl ac mauris dignissim,\n            quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices."
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "01a0ba9e-06f1-4434-a4ea-981ac2051749",
+            "enabled": true,
+            "next": "1ae0381c-a335-445f-bdc8-0bc0d36ec3fc",
+            "conditions": [
+              {
+                "id": "deddc3f5-58c8-4279-9407-5116176db3c6",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "a817a0f9-8f5a-4201-91e4-ef964822ac5f",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "2be5eb36-e5ad-4897-928a-eb6f245b9ba7",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "0ff9d658-62cc-48db-95cb-eb6f029acd19",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "fe860677-c717-4e31-977e-400efeaa8989",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          },
+          {
+            "id": "3adb3c9b-36df-4413-aa77-af8254910285",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "8efbae08-039e-429f-ba58-679fe09e8dab",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "971f5b45-5430-4637-9df8-96435512b35f",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "3c76d241-dd59-40f7-b7ea-ac089f97780d",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "e4e14b11-6d3f-477f-9fb9-954bcc3678c9",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "96287836-865c-4c83-95eb-38638f8d4f51",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1ae0381c-a335-445f-bdc8-0bc0d36ec3fc",
+        "title": "step-two",
+        "enabled": true,
+        "actions": [
+          {
+            "id": "5033a36a-f4d9-4280-a5a0-55d7f5cecf76",
+            "enabled": true,
+            "title": "Set sensor to 5 C",
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "58ef8dbf-bf87-44e3-bfee-81c366dc2e63",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "3a4b1f60-58eb-49fd-b79b-3b92a178a373",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "440a8ae3-b214-4494-b482-9e7979fa23aa",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "251c2d1b-1b1f-4a42-97b5-80e1c9b1490c",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "4cc88f9e-1444-4d91-9947-42cf2f26872a",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "a5fd58d1-887c-4b10-a95a-f8930cbd367a",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ba901c7a-8c13-4dc2-811b-2e5a8174e378",
+        "title": "step-one",
+        "enabled": true,
+        "actions": [
+          {
+            "id": "a45a37e7-6795-4f97-a05d-7e64f202315b",
+            "title": "generated block patch",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "data": {}
+            }
+          },
+          {
+            "id": "4b591284-77ac-4884-af79-eeb12acb642f",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "b068f697-44d9-48c2-bee0-b22b399c40ef",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "8e9e26a3-75a1-4163-8183-cab2b8364b81",
+            "enabled": true,
+            "title": "Create task-one",
+            "impl": {
+              "type": "TaskCreate",
+              "ref": "task-one",
+              "title": "Test Task",
+              "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n            Suspendisse iaculis sit amet ligula eget fermentum.\n            Nunc pharetra, sapien eget rutrum suscipit, eros nisi semper ante,\n            at consectetur elit lectus vitae tortor.\n            Duis id ipsum ac elit viverra interdum. Aenean finibus risus ut iaculis porta.\n            Aenean mollis, orci vel egestas aliquam, diam augue imperdiet orci,\n            consectetur vestibulum diam velit in magna.\n            Curabitur pulvinar, metus et lacinia sodales,\n            sem quam finibus risus, a dignissim nisl enim vitae libero.\n            In eget enim ipsum. Cras elementum nisl ac mauris dignissim,\n            quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices."
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "befc75ee-8832-4d7d-9898-4e229ba4a810",
+            "enabled": true,
+            "next": "41d88343-dda9-4360-8d9c-c85349e196a2",
+            "conditions": [
+              {
+                "id": "ac9d3407-b004-425b-be09-e9415e5c580b",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "494ee307-27a4-4035-8c24-bf837dda5e18",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "3ed8eb57-f00e-4708-a2f1-b133f9eef6e9",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "47d49dcb-e273-4845-b6ce-de52cf648183",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "b13b4741-8bba-4fb8-ad94-4f2514bc56a9",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          },
+          {
+            "id": "634f00dc-1f5c-4217-b476-a7e830a8a881",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "05a1e179-0719-4803-bc11-a59a24fda0ff",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "339bf5ba-5ecb-4aa5-8b34-851901c99546",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "30114cd8-bd28-41e9-8917-c4fe9a4e990a",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "c61028a0-fd7d-45d6-84eb-ec0a38e8ac7d",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "0eeed7ae-0a95-4012-ba00-3a260ae62be0",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "41d88343-dda9-4360-8d9c-c85349e196a2",
+        "title": "step-two",
+        "enabled": true,
+        "actions": [
+          {
+            "id": "76170d58-2c8e-482e-b6b6-87cc533001d6",
+            "enabled": true,
+            "title": "Set sensor to 5 C",
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "20a13230-dce6-45a1-bff5-8c09f8680f1d",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "d8022f4c-7449-4b62-9015-19d1fd0eea44",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "54586a8f-e891-4225-b6dc-23a16e2d7413",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "210915cf-fdd9-4f3c-861b-08ba992e8269",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "b04021fc-4839-45fd-8d3f-733d30d8aa30",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "5b78983f-bd8d-41a6-af81-128d8189384a",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Done"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "_id": "dashboard-items__1-55d75cbee5631853c77cd22f26e9a81c",
     "title": "Ministry of Silly Walks",
     "order": 4,
