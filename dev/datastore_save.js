@@ -2,7 +2,9 @@ const axios = require('axios');
 const { host, databases, fileDir } = require('./utils');
 const fs = require('fs');
 
-async function saveDatastore() {
+async function run() {
+  await retry('Waiting for datastore', () => axios.get(datastore));
+
   for (let db of databases) {
     const resp = await axios.get(`${host}/datastore/${db}/_all_docs`, {
       params: {
@@ -22,6 +24,6 @@ async function saveDatastore() {
   }
 }
 
-saveDatastore()
+run()
   .then(() => console.log('Script done!', __filename))
   .catch(e => console.log(e));

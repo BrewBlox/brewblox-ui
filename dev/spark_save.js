@@ -12,7 +12,7 @@ async function run() {
     const resp = await axios.get(`${host}/${svc}/export_objects`);
     const fname = `${fileDir}/${svc}.spark.json`;
     fs.writeFileSync(fname, JSON.stringify(resp.data, undefined, 2));
-    console.log('Blocks saved', fname);
+    console.log('Spark blocks saved', fname);
   }
 };
 

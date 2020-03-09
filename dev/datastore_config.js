@@ -4,9 +4,7 @@ const { host, retry } = require('./utils');
 const datastore = `${host}/datastore`;
 
 async function run() {
-  await retry('Waiting for datastore', async () => {
-    await axios.get(datastore);
-  });
+  await retry('Waiting for datastore', () => axios.get(datastore));
 
   // Create system database files
   await axios.put(`${datastore}/_users`).catch(() => { });

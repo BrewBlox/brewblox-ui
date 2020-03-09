@@ -5,9 +5,7 @@ const { host, retry, databases, fileDir } = require('./utils');
 const datastore = `${host}/datastore`;
 
 async function run() {
-  await retry('wait for database', async () => {
-    await axios.get(datastore);
-  });
+  await retry('Waiting for datastore', () => axios.get(datastore));
 
   for (let db of databases) {
     const url = `${datastore}/${db}`;
