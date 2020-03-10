@@ -141,6 +141,11 @@ export interface AutomationProcess extends AutomationTemplate {
   results: AutomationStepResult[];
 }
 
+export interface AutomationEventData {
+  processes: AutomationProcess[];
+  tasks: AutomationTask[];
+}
+
 // UI
 //////////////
 
