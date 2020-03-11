@@ -2,7 +2,15 @@ import { VueConstructor } from 'vue';
 
 import { StoreObject } from '@/plugins/database';
 
-export type AutomationStatus = 'Created' | 'Started' | 'Done' | 'Cancelled' | 'Unknown';
+export type AutomationStatus =
+  'Unknown'
+  | 'Created'
+  | 'Started'
+  | 'Done'
+  | 'Paused'
+  | 'Cancelled'
+  | 'Interrupted'
+  | 'Invalid';
 
 /** @nullable */
 type Datum = Date | number | null;
@@ -12,9 +20,14 @@ type Datum = Date | number | null;
 
 export interface BlockPatchImpl {
   type: 'BlockPatch';
+
+  /** @nullable */
   serviceId: string | null;
+  /** @nullable */
   blockId: string | null;
+  /** @nullable */
   blockType: string | null;
+  /** @nullable */
   data: any;
 }
 
@@ -45,11 +58,17 @@ export interface TimeElapsedImpl {
 
 export interface BlockValueImpl {
   type: 'BlockValue';
-  serviceId: string | null;
-  blockId: string | null;
-  blockType: string | null;
-  key: string | null;
   operator: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
+
+  /** @nullable */
+  serviceId: string | null;
+  /** @nullable */
+  blockId: string | null;
+  /** @nullable */
+  blockType: string | null;
+  /** @nullable */
+  key: string | null;
+  /** @nullable */
   value: any;
 }
 
