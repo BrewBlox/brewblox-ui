@@ -4,16 +4,44 @@ import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-dec
 import { objReducer } from '@/helpers/functional';
 import store from '@/store';
 
-import { AutomationTemplate } from '../types';
+import { AutomationEventData, AutomationProcess, AutomationTask, AutomationTemplate } from '../types';
 import { templateApi } from './api';
 
 const rawError = true;
 
 @Module({ store, namespaced: true, dynamic: true, name: 'automation' })
 export class AutomationModule extends VuexModule {
+  public processes: Mapped<AutomationProcess> = {};
+  public tasks: Mapped<AutomationTask> = {};
+  public lastEvent: Date | null = null;
+
   public templates: Mapped<AutomationTemplate> = {};
   public activeTemplate: string | null = null;
   public activeStep: string | null = null;
+
+  public get processIds(): string[] {
+    return Object.keys(this.processes);
+  }
+
+  public get processValues(): AutomationProcess[] {
+    return Object.values(this.processes);
+  }
+
+  public get processById(): (id: string) => AutomationProcess {
+    return id => this.processes[id] ?? null;
+  }
+
+  public get taskIds(): string[] {
+    return Object.keys(this.tasks);
+  }
+
+  public get taskValues(): AutomationTask[] {
+    return Object.values(this.tasks);
+  }
+
+  public get taskById(): (id: string) => AutomationTask {
+    return id => this.tasks[id] ?? null;
+  }
 
   public get templateIds(): string[] {
     return Object.keys(this.templates);
@@ -25,6 +53,20 @@ export class AutomationModule extends VuexModule {
 
   public get templateById(): (id: string) => AutomationTemplate {
     return id => this.templates[id] ?? null;
+  }
+
+  @Mutation
+  public commitEventData(data: AutomationEventData): void {
+    this.processes = data.processes.reduce(objReducer('id'), {});
+    this.tasks = data.tasks.reduce(objReducer('id'), {});
+    this.lastEvent = new Date();
+  }
+
+  @Mutation
+  public invalidateEventData(): void {
+    this.processes = {};
+    this.tasks = {};
+    this.lastEvent = null;
   }
 
   @Mutation

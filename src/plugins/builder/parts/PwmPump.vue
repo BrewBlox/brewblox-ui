@@ -15,9 +15,11 @@ export default class PwmPump extends PartBase {
   }
 
   get pwmSetting(): number {
-    return this.pwmBlock
-      ? this.pwmBlock.data.setting
-      : 0;
+    return this.pwmBlock?.data.setting ?? 0;
+  }
+
+  get pwmActive(): boolean {
+    return !!this.pwmBlock?.data.enabled && this.pwmSetting > 0;
   }
 
   get liquids(): string[] {
@@ -57,7 +59,7 @@ export default class PwmPump extends PartBase {
         <line x1="7" y1="12.1" x2="-7" y2="-12.1" />
         <!-- eslint-disable vue/attribute-hyphenation -->
         <animateTransform
-          v-if="pwmSetting > 0"
+          v-if="pwmActive"
           :dur="`${duration}s`"
           attributeName="transform"
           attributeType="XML"
