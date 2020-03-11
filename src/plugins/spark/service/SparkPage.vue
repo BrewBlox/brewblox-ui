@@ -389,7 +389,7 @@ export default class SparkPage extends Vue {
       {{ service.title }}
     </portal>
     <portal to="toolbar-buttons">
-      <q-btn-group rounded outline class="q-pa-xs">
+      <q-btn-group rounded outline class="q-pa-xs self-center">
         <q-btn
           :unelevated="pageMode === 'List'"
           :outline="pageMode !== 'List'"
@@ -410,7 +410,7 @@ export default class SparkPage extends Vue {
           <q-tooltip>Show blocks as diagram</q-tooltip>
         </q-btn>
       </q-btn-group>
-      <ActionMenu :disable="!isReady || statusNok" round size="12px">
+      <ActionMenu :disable="!isReady || statusNok" round size="12px" class="self-center">
         <template #actions>
           <ActionItem
             icon="add"
