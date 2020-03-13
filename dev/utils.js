@@ -8,7 +8,8 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function retry(desc, func) {
-  for (i = 0; i < 10; i++) {
+  const start = new Date().getTime();
+  while (new Date().getTime() < start + 5 * 60 * 1000) {
     try {
       return await func();
     } catch (e) {
