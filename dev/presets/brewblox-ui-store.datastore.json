@@ -1,15 +1,14 @@
 [
   {
-    "_id": "autm-template__9d4888c5-2b9c-4efa-a984-972aeb3703f3",
+    "_id": "autm-template__ed9f5358-1557-4657-bbea-900e354782da",
     "title": "Test Template",
     "steps": [
       {
-        "id": "d020c2a2-4eb0-4ff0-947d-ff637511f570",
+        "id": "29108014-f7a6-42eb-a0d8-0c5265c2eb0d",
         "title": "step-one",
-        "enabled": true,
         "actions": [
           {
-            "id": "c9e527b4-1d45-4da9-b106-d8ddeaf0ec02",
+            "id": "a76076cf-9a74-4442-a936-4e6c52d8b65b",
             "title": "generated block patch",
             "enabled": true,
             "impl": {
@@ -21,7 +20,7 @@
             }
           },
           {
-            "id": "91d96a27-3ffc-4d9b-948f-bce8d4d82edc",
+            "id": "c105840c-731c-4ce0-bfa9-71960712fd15",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -35,7 +34,7 @@
             }
           },
           {
-            "id": "23ae8543-10a1-432e-af75-65131df46f51",
+            "id": "8c2e2eef-1d9b-42fb-a284-11a7ac3f5ce4",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -49,7 +48,7 @@
             }
           },
           {
-            "id": "6c6f61d0-d031-4521-bd05-a12a1db31e7f",
+            "id": "e3d7ea07-8128-4935-b833-5f708fd6aaa3",
             "enabled": true,
             "title": "Create task-one",
             "impl": {
@@ -62,12 +61,12 @@
         ],
         "transitions": [
           {
-            "id": "01a5c235-388f-4701-877a-f24138ae622c",
+            "id": "686006b9-dd74-4ea5-90e6-5cf6b48ddb16",
             "enabled": true,
-            "next": "cf3412e3-568a-4ff8-ad18-fb0f3ec3c005",
+            "next": "dcdbb3c2-4614-4b21-8158-babe39a3f96d",
             "conditions": [
               {
-                "id": "db388ace-f59e-4c14-a55f-ed91914d386a",
+                "id": "a3af5693-2eff-4a38-9d17-fd21590fa35a",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -81,7 +80,7 @@
                 }
               },
               {
-                "id": "abd822be-b95c-407b-9459-51346759abc9",
+                "id": "a64d07a7-2db6-4db1-87bb-7761b20b2413",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -95,7 +94,7 @@
                 }
               },
               {
-                "id": "951bd5b9-a460-4418-b5d2-ace05a5d803b",
+                "id": "27c9bf61-a4de-4aa6-8dff-e4d3e27ec888",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -104,33 +103,34 @@
                 }
               },
               {
-                "id": "4d77f4df-1556-4ba0-8854-b0918ad47c52",
+                "id": "29ca25e9-da6e-4ecd-b54b-4a8f8e85c3ba",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "f4443b6b-9bfe-4dae-b42e-cbf63a90ae56",
+                "id": "68463bb4-a86b-4a09-8305-b5f4de957ef7",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]
           },
           {
-            "id": "67848ee3-331c-4a04-82bb-d2d2ad6b5e95",
+            "id": "b7da8f43-f15c-43e3-a81f-e2a7a2134df5",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "b082399b-9a8e-44cf-8f37-5ab48115dfee",
+                "id": "74bc8db6-91a8-47b0-9f91-cf86eebd19a9",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -144,7 +144,7 @@
                 }
               },
               {
-                "id": "0a2c575d-d0d3-447b-9b6b-022e813b9470",
+                "id": "a2584a7c-c413-4355-9123-b9c80f354556",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -158,7 +158,7 @@
                 }
               },
               {
-                "id": "2fa2c38c-616b-4a55-96c8-ea07ea42e3f2",
+                "id": "4c9da415-3c2e-4417-9700-a5bbe098cf72",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -167,22 +167,23 @@
                 }
               },
               {
-                "id": "12369ef4-7e0c-42f0-97f5-958fd8d1d224",
+                "id": "67735d3b-aadf-41b5-b17c-22dd646b3c51",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "d2290746-c999-47e9-a561-4a98565f169b",
+                "id": "397594ce-9404-4404-bce5-1acced57467f",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]
@@ -190,12 +191,11 @@
         ]
       },
       {
-        "id": "cf3412e3-568a-4ff8-ad18-fb0f3ec3c005",
+        "id": "dcdbb3c2-4614-4b21-8158-babe39a3f96d",
         "title": "step-two",
-        "enabled": true,
         "actions": [
           {
-            "id": "77f71ff7-9834-4154-890c-5816a679ba80",
+            "id": "90904828-af68-43cb-a40b-9f096129e02d",
             "enabled": true,
             "title": "Set sensor to 5 C",
             "impl": {
@@ -211,12 +211,12 @@
         ],
         "transitions": [
           {
-            "id": "7b513b47-5a6f-40ac-94c5-4a04ee9ec8b7",
+            "id": "7a362cf4-05d2-45a6-adec-b4dbc8487383",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "55a13d43-6c0a-4927-a452-973f4e71f7f1",
+                "id": "1e35ce65-751e-4908-bcaa-9141b142a5ad",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -230,7 +230,7 @@
                 }
               },
               {
-                "id": "9de68f14-9fdf-4a1f-8612-913cbaa7abd8",
+                "id": "4aa8886c-d5e3-4492-ad9c-2e4cbe2433d9",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -244,7 +244,7 @@
                 }
               },
               {
-                "id": "6ba16cc0-3083-40ae-a132-9957d2da1783",
+                "id": "a81ca62b-3ea4-4a90-be3f-936c30cfa98c",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -253,22 +253,23 @@
                 }
               },
               {
-                "id": "a1bb0209-9d29-42e3-972b-5ba9cc38a3bb",
+                "id": "e88657e8-613a-407e-8258-f6b08ff9c391",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "69d7f693-6f85-4318-81af-c71b47d0c845",
+                "id": "3f939dbe-6b14-4344-821b-ef43c7a74f99",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]
@@ -276,12 +277,11 @@
         ]
       },
       {
-        "id": "6afb0bd3-dd0a-4d5b-a704-9758b8a5e064",
+        "id": "fc968cc7-8c57-4f50-8e4f-ae1295249e21",
         "title": "step-one",
-        "enabled": true,
         "actions": [
           {
-            "id": "6011a163-f993-46f1-a815-cce6fe2a9c1b",
+            "id": "66c3a0f0-9b3e-4113-9978-e25de327f38b",
             "title": "generated block patch",
             "enabled": true,
             "impl": {
@@ -293,7 +293,7 @@
             }
           },
           {
-            "id": "d18d9c7f-fbf7-403f-b40a-f2bbfbe594b1",
+            "id": "2ea21175-ad37-4992-9bba-4b6935bde8d6",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -307,7 +307,7 @@
             }
           },
           {
-            "id": "2d7301ee-6f99-4c7e-bf4e-65e1a84d40a2",
+            "id": "d4177491-33db-448a-833e-b3d1a0659e43",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -321,7 +321,7 @@
             }
           },
           {
-            "id": "e6c5ce35-ca43-46a0-b4c8-ad37e9c6943e",
+            "id": "53c2139f-74e1-49be-bbb3-da38763ab315",
             "enabled": true,
             "title": "Create task-one",
             "impl": {
@@ -334,12 +334,12 @@
         ],
         "transitions": [
           {
-            "id": "01a0ba9e-06f1-4434-a4ea-981ac2051749",
+            "id": "a2e967da-fcd8-4a69-b495-71dfc021ec92",
             "enabled": true,
-            "next": "1ae0381c-a335-445f-bdc8-0bc0d36ec3fc",
+            "next": "9d97a1bf-74c4-43ea-a6f6-96e0a8712432",
             "conditions": [
               {
-                "id": "deddc3f5-58c8-4279-9407-5116176db3c6",
+                "id": "44ccd38b-0928-4b3a-a00e-9804320940f4",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -353,7 +353,7 @@
                 }
               },
               {
-                "id": "a817a0f9-8f5a-4201-91e4-ef964822ac5f",
+                "id": "1232c563-daf3-4f9b-b362-94c2c883040f",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -367,7 +367,7 @@
                 }
               },
               {
-                "id": "2be5eb36-e5ad-4897-928a-eb6f245b9ba7",
+                "id": "c5cb3ec3-e9a8-4f29-8afc-16cf8ab4344c",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -376,33 +376,34 @@
                 }
               },
               {
-                "id": "0ff9d658-62cc-48db-95cb-eb6f029acd19",
+                "id": "f5129455-ee19-4015-b05f-3a043d0bd34e",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "fe860677-c717-4e31-977e-400efeaa8989",
+                "id": "c8736a10-7d20-491d-a28c-342a63a94d7a",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]
           },
           {
-            "id": "3adb3c9b-36df-4413-aa77-af8254910285",
+            "id": "7cab0731-0067-4f5f-83e2-b11f8820a4c4",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "8efbae08-039e-429f-ba58-679fe09e8dab",
+                "id": "af7f55dc-d2e5-4ccc-b8d7-aaf8accd3af2",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -416,7 +417,7 @@
                 }
               },
               {
-                "id": "971f5b45-5430-4637-9df8-96435512b35f",
+                "id": "611564af-e77d-4798-b01e-81d1ad1c4a57",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -430,7 +431,7 @@
                 }
               },
               {
-                "id": "3c76d241-dd59-40f7-b7ea-ac089f97780d",
+                "id": "b1907600-4b17-49cc-9cf5-051309a1ca75",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -439,22 +440,23 @@
                 }
               },
               {
-                "id": "e4e14b11-6d3f-477f-9fb9-954bcc3678c9",
+                "id": "82ebf145-282c-419c-b58b-61b9d8193213",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "96287836-865c-4c83-95eb-38638f8d4f51",
+                "id": "1bc77713-c9ed-46eb-9cb9-c894f7c7f8e6",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]
@@ -462,12 +464,11 @@
         ]
       },
       {
-        "id": "1ae0381c-a335-445f-bdc8-0bc0d36ec3fc",
+        "id": "9d97a1bf-74c4-43ea-a6f6-96e0a8712432",
         "title": "step-two",
-        "enabled": true,
         "actions": [
           {
-            "id": "5033a36a-f4d9-4280-a5a0-55d7f5cecf76",
+            "id": "910e0b09-d635-4df0-bfb3-162e8a00eb54",
             "enabled": true,
             "title": "Set sensor to 5 C",
             "impl": {
@@ -483,12 +484,12 @@
         ],
         "transitions": [
           {
-            "id": "58ef8dbf-bf87-44e3-bfee-81c366dc2e63",
+            "id": "cfa808b9-1789-42f9-84cc-435276b47149",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "3a4b1f60-58eb-49fd-b79b-3b92a178a373",
+                "id": "259a9e4a-7114-49ac-b5dc-27c41037d7e5",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -502,7 +503,7 @@
                 }
               },
               {
-                "id": "440a8ae3-b214-4494-b482-9e7979fa23aa",
+                "id": "4267a145-1692-4801-a149-577a96ab7ab0",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -516,7 +517,7 @@
                 }
               },
               {
-                "id": "251c2d1b-1b1f-4a42-97b5-80e1c9b1490c",
+                "id": "cb1ba6d7-ac27-4a77-9a0a-72cbb19b3a05",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -525,22 +526,23 @@
                 }
               },
               {
-                "id": "4cc88f9e-1444-4d91-9947-42cf2f26872a",
+                "id": "8b99fbc1-6bca-4b79-9183-9d7439238017",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "a5fd58d1-887c-4b10-a95a-f8930cbd367a",
+                "id": "72f3cc39-b2a8-4be8-b418-683115a35b22",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]
@@ -548,12 +550,11 @@
         ]
       },
       {
-        "id": "ba901c7a-8c13-4dc2-811b-2e5a8174e378",
+        "id": "f8cae1c0-4ad4-4b3d-8492-2d03acbed7f8",
         "title": "step-one",
-        "enabled": true,
         "actions": [
           {
-            "id": "a45a37e7-6795-4f97-a05d-7e64f202315b",
+            "id": "dc7e7f50-a86d-42d9-b3e7-8beb3fbac211",
             "title": "generated block patch",
             "enabled": true,
             "impl": {
@@ -565,7 +566,7 @@
             }
           },
           {
-            "id": "4b591284-77ac-4884-af79-eeb12acb642f",
+            "id": "aa7f7d01-6dd7-48d6-9eab-78a1a520810d",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -579,7 +580,7 @@
             }
           },
           {
-            "id": "b068f697-44d9-48c2-bee0-b22b399c40ef",
+            "id": "963857fd-e115-41ac-912c-c0b7aceba8b0",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -593,7 +594,7 @@
             }
           },
           {
-            "id": "8e9e26a3-75a1-4163-8183-cab2b8364b81",
+            "id": "e0906d53-2cef-4842-93f5-76dcd8af4bb5",
             "enabled": true,
             "title": "Create task-one",
             "impl": {
@@ -606,12 +607,12 @@
         ],
         "transitions": [
           {
-            "id": "befc75ee-8832-4d7d-9898-4e229ba4a810",
+            "id": "5e720e8f-3bf4-48c9-a48c-52fe9925b072",
             "enabled": true,
-            "next": "41d88343-dda9-4360-8d9c-c85349e196a2",
+            "next": "0b9572ba-fa0b-4907-b5a9-83fe418af5ab",
             "conditions": [
               {
-                "id": "ac9d3407-b004-425b-be09-e9415e5c580b",
+                "id": "2f88be3f-baa4-4588-82b5-d4d3dcb67c68",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -625,7 +626,7 @@
                 }
               },
               {
-                "id": "494ee307-27a4-4035-8c24-bf837dda5e18",
+                "id": "7a3c2e79-18c8-4e6e-be10-faf6ff43318e",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -639,7 +640,7 @@
                 }
               },
               {
-                "id": "3ed8eb57-f00e-4708-a2f1-b133f9eef6e9",
+                "id": "72518589-6cfa-4fc9-8fa0-2b1a39812fb8",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -648,33 +649,34 @@
                 }
               },
               {
-                "id": "47d49dcb-e273-4845-b6ce-de52cf648183",
+                "id": "36d9c5a5-a50e-4f9f-a767-2d902e48a0e9",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "b13b4741-8bba-4fb8-ad94-4f2514bc56a9",
+                "id": "da2a6bd6-e72c-4cca-8a94-29a33132d3e2",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]
           },
           {
-            "id": "634f00dc-1f5c-4217-b476-a7e830a8a881",
+            "id": "e3daa93e-9424-4f8b-ae48-728bd3aa4b98",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "05a1e179-0719-4803-bc11-a59a24fda0ff",
+                "id": "af67c300-371d-4bd8-8d4e-de2557d9af51",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -688,7 +690,7 @@
                 }
               },
               {
-                "id": "339bf5ba-5ecb-4aa5-8b34-851901c99546",
+                "id": "f4695309-cfdf-4d76-adc1-76d1119a16f3",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -702,7 +704,7 @@
                 }
               },
               {
-                "id": "30114cd8-bd28-41e9-8917-c4fe9a4e990a",
+                "id": "55cde3d5-bc75-415b-95de-e35adbaa0814",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -711,22 +713,23 @@
                 }
               },
               {
-                "id": "c61028a0-fd7d-45d6-84eb-ec0a38e8ac7d",
+                "id": "2fd96f34-5ea5-4c0c-89cc-2f5a83cd787c",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "0eeed7ae-0a95-4012-ba00-3a260ae62be0",
+                "id": "48c13b86-2116-4026-a2ae-d86a5e416c17",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]
@@ -734,12 +737,11 @@
         ]
       },
       {
-        "id": "41d88343-dda9-4360-8d9c-c85349e196a2",
+        "id": "0b9572ba-fa0b-4907-b5a9-83fe418af5ab",
         "title": "step-two",
-        "enabled": true,
         "actions": [
           {
-            "id": "76170d58-2c8e-482e-b6b6-87cc533001d6",
+            "id": "572b6fea-e7ee-448b-add1-a5340ad17d17",
             "enabled": true,
             "title": "Set sensor to 5 C",
             "impl": {
@@ -755,12 +757,12 @@
         ],
         "transitions": [
           {
-            "id": "20a13230-dce6-45a1-bff5-8c09f8680f1d",
+            "id": "7b7fd5f3-5958-4bf6-98a3-990b5f00c5f4",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "d8022f4c-7449-4b62-9015-19d1fd0eea44",
+                "id": "b2ff03a8-e61e-4336-9ad9-9ab1afb3e17b",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -774,7 +776,7 @@
                 }
               },
               {
-                "id": "54586a8f-e891-4225-b6dc-23a16e2d7413",
+                "id": "9c129101-3b31-4232-aa79-2e3af47084f5",
                 "enabled": true,
                 "title": "Check sensor value",
                 "impl": {
@@ -788,7 +790,7 @@
                 }
               },
               {
-                "id": "210915cf-fdd9-4f3c-861b-08ba992e8269",
+                "id": "29152c36-e89a-48f3-aeb4-6c02dfd1503f",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -797,22 +799,23 @@
                 }
               },
               {
-                "id": "b04021fc-4839-45fd-8d3f-733d30d8aa30",
+                "id": "25b53f09-f705-41b0-894b-33cb8244bdf9",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
                   "type": "TimeElapsed",
+                  "start": "Process",
                   "duration": 12345
                 }
               },
               {
-                "id": "5b78983f-bd8d-41a6-af81-128d8189384a",
+                "id": "632a4ea7-30da-4ad3-82cb-17d201faa2a8",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
                   "type": "TaskStatus",
                   "ref": "task-one",
-                  "status": "Done"
+                  "status": "Finished"
                 }
               }
             ]

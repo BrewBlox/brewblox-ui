@@ -134,7 +134,6 @@ export default class AutomationEditor extends DialogBase {
     const step: AutomationStep = {
       id: uid(),
       title: 'New step',
-      enabled: true,
       actions: [],
       transitions: [],
     };

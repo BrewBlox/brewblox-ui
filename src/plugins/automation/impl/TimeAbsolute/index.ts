@@ -6,7 +6,7 @@ const spec: AutomationSpec<TimeAbsoluteImpl> = {
   title: 'Date and time',
   generate: () => ({
     type: 'TimeAbsolute',
-    time: new Date(),
+    time: new Date().getTime(),
   }),
   component: TimeAbsolute,
 };

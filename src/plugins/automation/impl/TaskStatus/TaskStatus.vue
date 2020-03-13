@@ -7,9 +7,9 @@ import { AutomationStatus, TaskStatusImpl } from '@/plugins/automation/types';
 
 const states: AutomationStatus[] = [
   'Created',
-  'Started',
-  'Done',
-  'Cancelled',
+  'Active',
+  'Finished',
+  'Paused',
 ];
 
 @Component
