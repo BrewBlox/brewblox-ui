@@ -63,6 +63,7 @@ export async function make(): Promise<void> {
       title: 'Wait for rel time',
       impl: {
         type: 'TimeElapsed',
+        start: 'Process',
         duration: 12345,
       },
     },
@@ -73,7 +74,7 @@ export async function make(): Promise<void> {
       impl: {
         type: 'TaskStatus',
         ref: 'task-one',
-        status: 'Done',
+        status: 'Finished',
       },
     },
   ]);
@@ -86,7 +87,6 @@ export async function make(): Promise<void> {
       {
         id: stepOneId,
         title: 'step-one',
-        enabled: true,
         actions: [
           {
             id: uid(),
@@ -152,7 +152,6 @@ export async function make(): Promise<void> {
       {
         id: stepTwoId,
         title: 'step-two',
-        enabled: true,
         actions: [
           {
             id: uid(),

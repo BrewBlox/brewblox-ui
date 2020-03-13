@@ -7,6 +7,7 @@ const spec: AutomationSpec<TimeElapsedImpl> = {
   generate: () => ({
     type: 'TimeElapsed',
     duration: 60 * 1000,
+    start: 'Step',
   }),
   component: TimeElapsed,
 };

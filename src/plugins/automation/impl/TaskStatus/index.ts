@@ -7,7 +7,7 @@ const spec: AutomationSpec<TaskStatusImpl> = {
   generate: () => ({
     type: 'TaskStatus',
     ref: '',
-    status: 'Done',
+    status: 'Finished',
   }),
   component: TaskStatus,
 };
