@@ -49,13 +49,19 @@ export default class SidebarNavigator extends Vue {
         v-bind="btnAttrs"
       />
       <q-btn
-        v-if="!editorDisabled"
-        icon="mdi-tools"
-        label="Builder"
-        to="/builder"
-        :color="btnColor('builder')"
+        icon="mdi-pipe"
+        label="Brewery"
+        to="/brewery"
+        :color="btnColor('brewery')"
         v-bind="btnAttrs"
       />
+      <q-btn
+        icon="mdi-creation"
+        label="Wizardry"
+        v-bind="btnAttrs"
+        @click="showWizard"
+      />
+      <div class="col-break" />
       <q-btn
         v-if="automationFeatureEnabled"
         icon="mdi-calendar-check"
@@ -65,10 +71,12 @@ export default class SidebarNavigator extends Vue {
         v-bind="btnAttrs"
       />
       <q-btn
-        icon="mdi-creation"
-        label="Wizardry"
+        v-if="!editorDisabled"
+        icon="mdi-tools"
+        label="Builder"
+        to="/builder"
+        :color="btnColor('builder')"
         v-bind="btnAttrs"
-        @click="showWizard"
       />
     </div>
     <q-separator />

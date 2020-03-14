@@ -116,7 +116,7 @@ module.exports = function (ctx) {
         'TouchPan',
       ],
 
-      plugins: ['Cookies', 'Notify', 'Dialog'],
+      plugins: ['Cookies', 'Notify', 'Dialog', 'LocalStorage'],
 
       config: {
         dark: true,
