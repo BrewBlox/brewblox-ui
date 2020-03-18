@@ -104,12 +104,12 @@ export default class DigitalActuatorWidget
         <template v-if="mode === 'Full'">
           <div class="col-break" />
 
-          <BlockField
+          <LinkField
             :value="block.data.hwDevice"
             :service-id="serviceId"
+            :creatable="false"
             title="Pin Array"
             label="Target Pin Array"
-            no-create
             class="col-grow"
             @input="v => { block.data.hwDevice = v; block.data.channel = 0; saveBlock(); }"
           />

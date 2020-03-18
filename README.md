@@ -63,10 +63,31 @@ The UI will be served with hot reloading at https://localhost:8080/ui
 # Restart backend containers
 npm run compose:new
 
+# Reset widgets
+npm run datastore:load
+
+# Reset Spark blocks
+npm run spark:load
+
 # Build a production version of the software
 # This is served at https://localhost:9001
 npm run devbuild
 ```
+
+## Loading and saving backend data
+
+Every time you run `npm start`, data on the backend is reset to defaults.
+The default data can be found in dev/presets/.
+
+The dev scripts allow for partially applying data, or replacing the defaults.
+
+Some examples:
+* `npm run datastore` only resets widgets
+* `npm run spark` only resets blocks
+* `npm run spark -- sparkey` only resets blocks on Sparkey
+
+You can use `npm run datastore:save` and `npm run spark:save` to replace the defaults.
+The files are indexed in git. Commit them to make the change permanent.
 
 ---
 

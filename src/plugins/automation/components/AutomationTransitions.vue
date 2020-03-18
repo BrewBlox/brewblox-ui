@@ -1,10 +1,11 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { spliceById } from '@/helpers/functional';
 
-import { AutomationCondition, AutomationStep, AutomationTemplate, AutomationTransition } from '../types';
+import { AutomationStep, AutomationTemplate, AutomationTransition } from '../types';
 
 
 @Component
@@ -16,41 +17,33 @@ export default class AutomationTransitions extends Vue {
   @Prop({ type: Object, required: true })
   public readonly step!: AutomationStep;
 
-  saveStep(step: AutomationStep = this.step): void {
+  save(step: AutomationStep = this.step): void {
     this.$emit('update:step', step);
   }
 
-  save(trans: AutomationTransition): void {
+  saveTransition(trans: AutomationTransition): void {
     spliceById(this.step.transitions, trans);
-    this.saveStep();
+    this.save();
   }
 
-  saveAll(transitions: AutomationTransition[]): void {
+  saveAllTransitions(transitions: AutomationTransition[]): void {
     this.step.transitions = transitions;
-    this.saveStep();
+    this.save();
   }
 
-  remove(trans: AutomationTransition): void {
+  startAddTransition(): void {
+    this.step.transitions.push({
+      id: uid(),
+      next: true,
+      enabled: true,
+      conditions: [],
+    });
+    this.save();
+  }
+
+  removeTransition(trans: AutomationTransition): void {
     spliceById(this.step.transitions, trans, false);
-    this.saveStep();
-  }
-
-  saveCondition(transition: AutomationTransition, condition: AutomationCondition): void {
-    spliceById(transition.conditions, condition);
-    this.save(transition);
-  }
-
-  saveAllConditions(transition: AutomationTransition, conditions: AutomationCondition[]): void {
-    transition.conditions = conditions;
-    this.save(transition);
-  }
-
-  startAddCondition(transition: AutomationTransition): void {
-    void transition;
-  }
-
-  editNextStep(transition: AutomationTransition): void {
-    void transition;
+    this.save();
   }
 }
 </script>
@@ -62,22 +55,23 @@ export default class AutomationTransitions extends Vue {
       subtitle="Go to another step when all conditions are satisfied."
     >
       <template #actions>
-        <ActionItem label="New transition" />
+        <ActionItem label="New transition" icon="add" @click="startAddTransition" />
       </template>
     </AutomationHeader>
     <AutomationConditions
       v-for="trans in step.transitions"
       :key="trans.id"
       :template="template"
+      :step="step"
       :transition="trans"
-      @update:transition="save"
-    >
-      <template #actions>
-        <ActionItem label="Priority up" />
-        <ActionItem label="Priority down" />
-        <ActionItem label="Rename" />
-        <ActionItem label="Remove up" />
-      </template>
-    </AutomationConditions>
+      @update:step="save"
+      @update:transition="saveTransition"
+      @remove:transition="removeTransition"
+    />
+    <div class="row justify-end q-pr-sm">
+      <q-btn fab-mini color="info" icon="add" @click="startAddTransition">
+        <q-tooltip>New transition</q-tooltip>
+      </q-btn>
+    </div>
   </div>
 </template>

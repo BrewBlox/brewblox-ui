@@ -1,19 +1,22 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import AutomationItemBase from '../components/AutomationItemBase';
-import { TimeAbsoluteImpl } from '../types';
+import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
+import { TimeAbsoluteImpl } from '@/plugins/automation/types';
 
 
 @Component
 export default class TimeAbsolute extends AutomationItemBase<TimeAbsoluteImpl> {
 
-  get time(): Date {
-    return new Date(this.impl.time);
+  get time(): Date | null {
+    const { time } = this.impl;
+    return time !== null
+      ? new Date(time)
+      : null;
   }
 
-  set time(val: Date) {
-    this.impl.time = val.getTime();
+  set time(val: Date | null) {
+    this.impl.time = val?.getTime() ?? null;
     this.save();
   }
 

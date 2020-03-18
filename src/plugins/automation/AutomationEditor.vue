@@ -1,9 +1,10 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
-import { spliceById } from '@/helpers/functional';
+import { clamp, spliceById } from '@/helpers/functional';
 
 import { clear, make } from './helpers';
 import { automationStore } from './store';
@@ -125,6 +126,55 @@ export default class AutomationEditor extends DialogBase {
       cancel: true,
     }).onOk(() => this.template !== null && automationStore.removeTemplate(this.template));
   }
+
+  startAddStep(): void {
+    if (this.template === null) {
+      return;
+    }
+    const step: AutomationStep = {
+      id: uid(),
+      title: 'New step',
+      actions: [],
+      transitions: [],
+    };
+    this.saveSteps([...this.steps, step]);
+  }
+
+  startRenameStep(step: AutomationStep): void {
+    createDialog({
+      parent: this,
+      title: 'Rename step',
+      message: `Choose a new name for '${step.title}'`,
+      cancel: true,
+      prompt: {
+        model: step.title,
+        type: 'text',
+      },
+    }).onOk(title => {
+      step.title = title;
+      this.saveStep(step);
+    });
+  }
+
+  startRemoveStep(step: AutomationStep): void {
+    createDialog({
+      parent: this,
+      title: 'Remove step',
+      message: `Are you sure you want to remove '${step.title}'`,
+      cancel: true,
+    }).onOk(() => this.saveSteps(this.steps.filter(s => s.id !== step.id)));
+  }
+
+  moveStep(step: AutomationStep, offset: number): void {
+    const idx = this.steps.findIndex(v => v.id === step.id);
+    const newIdx = clamp(idx + offset, 0, this.steps.length - 1);
+    if (idx !== -1 && idx !== newIdx) {
+      const updated = [...this.steps];
+      updated.splice(idx, 1);
+      updated.splice(newIdx, 0, step);
+      this.saveSteps(updated);
+    }
+  }
 }
 </script>
 
@@ -174,8 +224,9 @@ export default class AutomationEditor extends DialogBase {
         <ActionMenu class="col-auto">
           <template #actions>
             <ActionItem label="New Template" icon="add" @click="startAddTemplate(false)" />
+            <ActionItem v-if="template !== null" icon="add" label="New Step" />
             <ActionItem label="Make" icon="add" @click="make" />
-            <ActionItem label="Clear" icon="delete" @click="clear" />
+            <ActionItem label="Clear" icon="clear" @click="clear" />
             <template v-if="template !== null">
               <ActionItem icon="file_copy" label="Copy Template" @click="startAddLayout(true)" />
               <ActionItem icon="edit" label="Rename Template" @click="startRenameTemplate" />
@@ -210,11 +261,34 @@ export default class AutomationEditor extends DialogBase {
             :clickable="!dragged"
             :label="step.title"
             :inset-level="0.2"
-            class="ellipsis"
-            style="min-height: 0px"
+            class="ellipsis q-pa-none"
+            style="min-height: 0"
             @click="selectActive(template, step)"
-          />
+          >
+            <q-item-section class="col-auto" @click.stop="() => {}">
+              <ActionMenu>
+                <template #actions>
+                  <ActionItem label="Move up" icon="mdi-chevron-up" @click="moveStep(step, -1)" />
+                  <ActionItem label="Move down" icon="mdi-chevron-down" @click="moveStep(step, 1)" />
+                  <ActionItem label="Rename" icon="edit" @click="startRenameStep(step)" />
+                  <ActionItem label="Remove" icon="delete" @click="startRemoveStep(step)" />
+                </template>
+              </ActionMenu>
+            </q-item-section>
+          </ActionItem>
         </draggable>
+        <div class="row q-pa-md justify-end">
+          <q-btn
+            flat
+            round
+            dense
+            icon="add"
+            color="secondary"
+            @click="startAddStep"
+          >
+            <q-tooltip>New step</q-tooltip>
+          </q-btn>
+        </div>
       </q-scroll-area>
     </q-drawer>
 
@@ -222,7 +296,7 @@ export default class AutomationEditor extends DialogBase {
       <q-page>
         <div v-if="step" class="page-height row no-wrap q-pa-md q-gutter-md">
           <q-scroll-area visible class="col-xl-4 col">
-            <AutomationActions :step="step" @update:step="saveStep" />
+            <AutomationActions :template="template" :step="step" @update:step="saveStep" />
           </q-scroll-area>
           <q-scroll-area visible class="col-xl-4 col">
             <AutomationTransitions :template="template" :step="step" @update:step="saveStep" />

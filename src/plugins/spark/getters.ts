@@ -1,9 +1,31 @@
-import { AnalogConstraintKey, ChannelConfig, DigitalConstraintKey } from './types';
+import {
+  AnalogConstraintKey,
+  ChannelConfig,
+  DigitalConstraintKey,
+  UserUnitKey,
+} from './types';
 
 export const sparkType = 'Spark';
 export const sparkBlocksEvent = 'Spark.blocks';
 export const sparkStatusEvent = 'Spark.service';
 
+export const userUnitChoices: Record<UserUnitKey, string[]> = {
+  Temp: [
+    'degC',
+    'degF',
+    'degK',
+  ],
+  Time: [
+    'millisecond',
+    'second',
+    'minute',
+    'hour',
+  ],
+  LongTime: [
+    'hour',
+    'day',
+  ],
+};
 
 export const digitalConstraintLabels: Record<DigitalConstraintKey, string> = {
   minOff: 'Minimum OFF time',

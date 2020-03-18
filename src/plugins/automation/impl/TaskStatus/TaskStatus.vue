@@ -2,15 +2,14 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-
-import AutomationItemBase from '../components/AutomationItemBase';
-import { AutomationStatus, TaskStatusImpl } from '../types';
+import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
+import { AutomationStatus, TaskStatusImpl } from '@/plugins/automation/types';
 
 const states: AutomationStatus[] = [
   'Created',
-  'Started',
-  'Done',
-  'Cancelled',
+  'Active',
+  'Finished',
+  'Paused',
 ];
 
 @Component

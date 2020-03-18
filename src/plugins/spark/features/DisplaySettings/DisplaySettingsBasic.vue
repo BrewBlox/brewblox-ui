@@ -64,7 +64,7 @@ export default class DisplaySettingsBasic
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style scoped lang="sass">
 .grid-container
   display: grid
   grid-template-columns: repeat(3, 1fr)

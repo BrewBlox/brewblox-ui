@@ -1,6 +1,5 @@
 import { createDialog } from '@/helpers/dialog';
-import { typeName } from '@/plugins/spark/features/ActuatorPwm/getters';
-import { ActuatorPwmBlock } from '@/plugins/spark/features/ActuatorPwm/types';
+import { ActuatorPwmBlock, blockTypes } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 
 import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '../getters';
@@ -13,8 +12,12 @@ const spec: PartSpec = {
   size: () => [1, 1],
   cards: [
     {
-      component: 'LinkedBlockCard',
-      props: { settingsKey: 'pwm', types: [typeName], label: 'PWM' },
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey: 'pwm',
+        compatible: [blockTypes.ActuatorPwm],
+        label: 'PWM',
+      },
     },
     {
       component: 'PressureCard',

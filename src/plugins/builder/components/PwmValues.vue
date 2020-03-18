@@ -3,8 +3,10 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { ActuatorPwmBlock } from '@/plugins/spark/block-types';
+import { sparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
 
-import { settingsBlock, settingsLink, squares, textTransformation } from '../helpers';
+import { settingsAddress, squares, textTransformation } from '../helpers';
 import { PersistentPart } from '../types';
 
 
@@ -27,16 +29,18 @@ export default class PwmValues extends Vue {
   @Prop({ type: Number, default: 0 })
   public readonly startY!: number;
 
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.settingsKey);
+  }
+
   get block(): ActuatorPwmBlock | null {
-    return settingsBlock(this.part, this.settingsKey);
+    const { serviceId, id } = this.address;
+    return sparkStore.tryBlockById(serviceId, id);
   }
 
   get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, this.settingsKey);
-    return !!link.serviceId && !!link.blockId;
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get pwmValue(): number | null {

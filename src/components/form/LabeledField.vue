@@ -37,7 +37,8 @@ export default class LabeledField extends FieldBase {
 
   // Can't be placed in parent class
   get activeSlots(): string[] {
-    return this.fieldSlots.filter(s => !!this.$slots[s]);
+    return Object.keys(this.$slots)
+      .filter(s => this.fieldSlots.includes(s));
   }
 }
 </script>

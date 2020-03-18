@@ -3,9 +3,11 @@ import { VueConstructor } from 'vue';
 import { autoRegister, ref } from '@/helpers/component-ref';
 import { featureStore, WatcherFeature, WidgetFeature } from '@/store/features';
 
+import { EventbusMessage } from '../eventbus';
 import AutomationWidget from './AutomationWidget.vue';
+import { AutomationEvent } from './getters';
 import { automationStore } from './store';
-import { AutomationConfig } from './types';
+import { AutomationConfig, AutomationEventData } from './types';
 
 const widget: WidgetFeature = {
   id: 'Automation',
@@ -35,5 +37,13 @@ export default {
     }
 
     Vue.$startup.onStart(() => automationStore.start());
+    Vue.$eventbus.addListener({
+      id: 'automation',
+      filter: (_, type) => type === AutomationEvent,
+      onmessage: (msg: EventbusMessage) => {
+        const data: AutomationEventData = msg.data;
+        automationStore.commitEventData(data);
+      },
+    });
   },
 };

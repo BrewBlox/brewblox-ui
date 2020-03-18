@@ -11,8 +11,12 @@ const spec: PartSpec = {
   title: 'Display: PWM',
   transitions: () => ({}),
   cards: [{
-    component: 'LinkedBlockCard',
-    props: { settingsKey: 'pwm', types: [blockTypes.ActuatorPwm], label: 'PWM' },
+    component: 'BlockAddressCard',
+    props: {
+      settingsKey: 'pwm',
+      compatible: [blockTypes.ActuatorPwm],
+      label: 'PWM',
+    },
   }],
   size: () => [SIZE_X, SIZE_Y],
   interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, 'pwm'),

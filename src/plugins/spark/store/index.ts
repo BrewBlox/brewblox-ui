@@ -15,7 +15,6 @@ import {
   ApiSparkStatus,
   Block,
   BlockSpec,
-  CompatibleTypes,
   DataBlock,
   Limiters,
   RelationEdge,
@@ -23,7 +22,6 @@ import {
   SparkService,
   SparkStatus,
   StoredDataPreset,
-  UnitAlternatives,
   UserUnits,
 } from '../types';
 import * as api from './api';
@@ -39,10 +37,8 @@ const defaultGroupNames = [
 
 interface SparkServiceState {
   blocks: Mapped<Block>;
-  units: UserUnits;
-  unitAlternatives: UnitAlternatives;
-  compatibleTypes: Mapped<string[]>;
   discoveredBlocks: string[];
+  units: UserUnits;
   status: SparkStatus | null;
   lastBlocks: Date | null;
   lastStatus: Date | null;
@@ -125,14 +121,6 @@ export class SparkModule extends VuexModule {
     return serviceId => this.sparkCache[serviceId]?.units;
   }
 
-  public get unitAlternatives(): (serviceId: string) => UnitAlternatives {
-    return serviceId => this.sparkCache[serviceId]?.unitAlternatives;
-  }
-
-  public get compatibleTypes(): (serviceId: string) => CompatibleTypes {
-    return serviceId => this.sparkCache[serviceId]?.compatibleTypes;
-  }
-
   public get discoveredBlocks(): (serviceId: string) => string[] {
     return serviceId => this.sparkCache[serviceId]?.discoveredBlocks;
   }
@@ -165,9 +153,9 @@ export class SparkModule extends VuexModule {
     return serviceId => this.allLimiters[serviceId];
   }
 
-  public get blockById(): (serviceId: string, id: string, type?: string) => Block {
-    return (serviceId: string, id: string, type?: string) => {
-      const block = this.sparkCache[serviceId]?.blocks[id];
+  public get blockById(): <T extends Block>(serviceId: string, id: string, type?: string) => T {
+    return <T extends Block>(serviceId: string, id: string, type?: string) => {
+      const block = this.sparkCache[serviceId]?.blocks[id] as T;
       if (!block) {
         throw new Error(`Block ${id} not found in service ${serviceId}`);
       }
@@ -178,12 +166,11 @@ export class SparkModule extends VuexModule {
     };
   }
 
-  public get tryBlockById(): (serviceId: string, id: string | null) => Block | null {
-    return (serviceId: string, id: string | null) => {
-      return id === null
-        ? null
-        : this.sparkCache[serviceId]?.blocks[id] ?? null;
-    };
+  public get tryBlockById(): <T extends Block>(serviceId: string | null, id: string | null) => T | null {
+    return <T extends Block>(serviceId: string | null, id: string | null) =>
+      serviceId && id
+        ? (this.sparkCache[serviceId]?.blocks[id] as T) ?? null
+        : null;
   }
 
   public get blocksByType(): (serviceId: string, type: string) => Block[] {
@@ -299,16 +286,6 @@ export class SparkModule extends VuexModule {
   }
 
   @Mutation
-  public commitUnitAlternatives([serviceId, alts]: [string, UnitAlternatives]): void {
-    Vue.set(this.sparkCache[serviceId], 'unitAlternatives', alts);
-  }
-
-  @Mutation
-  public commitCompatibleTypes([serviceId, types]: [string, CompatibleTypes]): void {
-    Vue.set(this.sparkCache[serviceId], 'compatibleTypes', types);
-  }
-
-  @Mutation
   public commitDiscoveredBlocks([serviceId, ids]: [string, string[]]): void {
     Vue.set(this.sparkCache[serviceId], 'discoveredBlocks', ids);
   }
@@ -413,16 +390,6 @@ export class SparkModule extends VuexModule {
   }
 
   @Action({ rawError })
-  public async fetchUnitAlternatives(serviceId: string): Promise<void> {
-    this.commitUnitAlternatives([serviceId, await api.fetchUnitAlternatives(serviceId)]);
-  }
-
-  @Action({ rawError })
-  public async fetchCompatibleTypes(serviceId: string): Promise<void> {
-    this.commitCompatibleTypes([serviceId, await api.fetchCompatibleTypes(serviceId)]);
-  }
-
-  @Action({ rawError })
   public async fetchDiscoveredBlocks(serviceId: string): Promise<void> {
     const newIds = await api.fetchDiscoveredBlocks(serviceId);
     this.commitDiscoveredBlocks([serviceId, [...this.sparkCache[serviceId].discoveredBlocks, ...newIds]]);
@@ -445,8 +412,6 @@ export class SparkModule extends VuexModule {
     if (status.synchronize) {
       await Promise.all([
         this.fetchUnits(serviceId),
-        this.fetchUnitAlternatives(serviceId),
-        this.fetchCompatibleTypes(serviceId),
         this.fetchDiscoveredBlocks(serviceId),
         this.fetchBlocks(serviceId),
       ]);
@@ -483,10 +448,12 @@ export class SparkModule extends VuexModule {
     }
     const state: SparkServiceState = {
       blocks: {},
-      units: {},
-      unitAlternatives: {},
-      compatibleTypes: {},
       discoveredBlocks: [],
+      units: {
+        Temp: 'degC',
+        Time: 'second',
+        LongTime: 'hour',
+      },
       status: null,
       lastBlocks: null,
       lastStatus: null,

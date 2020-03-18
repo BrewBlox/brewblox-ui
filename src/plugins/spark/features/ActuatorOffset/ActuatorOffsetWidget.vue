@@ -78,7 +78,7 @@ export default class ActuatorOffsetWidget
         <template v-if="mode === 'Full'">
           <div class="col-break" />
 
-          <BlockField
+          <LinkField
             :value="block.data.targetId"
             :service-id="serviceId"
             title="Driven block"
@@ -86,7 +86,7 @@ export default class ActuatorOffsetWidget
             class="col-grow"
             @input="v => { block.data.targetId = v; saveBlock(); }"
           />
-          <BlockField
+          <LinkField
             :value="block.data.referenceId"
             :service-id="serviceId"
             title="Reference block"

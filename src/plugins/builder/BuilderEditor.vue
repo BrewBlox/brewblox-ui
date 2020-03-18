@@ -856,7 +856,7 @@ export default class BuilderEditor extends Vue {
             </q-item-label>
             <q-slider
               :value="layout.width"
-              :min="5"
+              :min="1"
               :max="50"
               label
               label-always
@@ -871,7 +871,7 @@ export default class BuilderEditor extends Vue {
             </q-item-label>
             <q-slider
               :value="layout.height"
-              :min="5"
+              :min="1"
               :max="50"
               label
               label-always

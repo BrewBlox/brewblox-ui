@@ -29,28 +29,27 @@ export default class ColorCard extends PartCard {
 </script>
 
 <template>
-  <q-list>
-    <q-separator />
-    <q-item>
-      <q-item-section class="col-auto">
-        <ColorField
-          v-model="color"
-          clearable
-          title="Liquid color"
-          label="Custom"
-          message="Select the fill color for this part."
-        />
-      </q-item-section>
-      <q-item-section v-for="colorOpt in presetColors" :key="colorOpt">
-        <q-btn
-          :style="`background-color: ${colorOpt}`"
-          :size="color == colorOpt ? 'lg' : 'md'"
-          round
-          icon="format_color_fill"
-          class="q-mx-auto"
-          @click="toggle(colorOpt)"
-        />
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <div class="row">
+    <ColorField
+      v-model="color"
+      clearable
+      title="Liquid color"
+      label="Custom"
+      message="Select the fill color for this part."
+      class="col-auto"
+    />
+    <div class="col-grow row justify-around">
+      <q-btn
+        v-for="colorOpt in presetColors"
+        :key="colorOpt"
+        :style="`background-color: ${colorOpt}`"
+        :size="color == colorOpt ? 'lg' : 'md'"
+        :color="colorOpt"
+        round
+        icon="format_color_fill"
+        class="self-center"
+        @click="toggle(colorOpt)"
+      />
+    </div>
+  </div>
 </template>

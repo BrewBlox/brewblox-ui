@@ -173,13 +173,14 @@ export default class DashboardPage extends Vue {
           round
           icon="mdi-arrow-all"
           :color="widgetEditable ? 'primary' : ''"
+          class="self-center"
           @click="widgetEditable = !widgetEditable"
         >
           <q-tooltip v-if="!widgetEditable">
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu round>
+        <ActionMenu round class="self-center">
           <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
             <q-item clickable @click="toggleDefaultDashboard">

@@ -45,6 +45,24 @@ export interface SparkConfig {
 
 export type SparkService = Service<SparkConfig>;
 
+/**
+ * There are two approaches to having a serializable reference to a block:
+ * Link, and BlockAddress
+ *
+ * Link is used inside block data, and serializes to `"key<type>": "id"`.
+ * Service ID is not stored.
+ *
+ * BlockAddress includes service ID, and is intended for wider use
+ * where service ID is not obvious, or where all services are equally valid.
+ *
+ * No special serialization rules exist: it is saved as a common JSON object.
+ */
+export interface BlockAddress {
+  serviceId: string | null;
+  id: string | null;
+  type: string | null;
+}
+
 export interface DataBlock {
   id: string;
   nid?: number;
@@ -53,8 +71,10 @@ export interface DataBlock {
   data: any;
 }
 
-export interface Block extends DataBlock {
+export interface Block extends DataBlock, BlockAddress {
   serviceId: string;
+  id: string;
+  type: string;
 }
 
 export interface BlockConfig {
@@ -75,17 +95,9 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
-export interface UserUnits {
-  [key: string]: string;
-}
+export type UserUnitKey = 'Temp' | 'Time' | 'LongTime';
 
-export interface UnitAlternatives {
-  [key: string]: string[];
-}
-
-export interface CompatibleTypes {
-  [key: string]: string[];
-}
+export type UserUnits = Record<UserUnitKey, string>;
 
 /**
  * As sent/pushed by the devcon-spark service

@@ -1,0 +1,2821 @@
+[
+  {
+    "_id": "autm-template__ed9f5358-1557-4657-bbea-900e354782da",
+    "title": "Test Template",
+    "steps": [
+      {
+        "id": "29108014-f7a6-42eb-a0d8-0c5265c2eb0d",
+        "title": "step-one",
+        "actions": [
+          {
+            "id": "a76076cf-9a74-4442-a936-4e6c52d8b65b",
+            "title": "generated block patch",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "data": {}
+            }
+          },
+          {
+            "id": "c105840c-731c-4ce0-bfa9-71960712fd15",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "8c2e2eef-1d9b-42fb-a284-11a7ac3f5ce4",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "e3d7ea07-8128-4935-b833-5f708fd6aaa3",
+            "enabled": true,
+            "title": "Create task-one",
+            "impl": {
+              "type": "TaskCreate",
+              "ref": "task-one",
+              "title": "Test Task",
+              "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n            Suspendisse iaculis sit amet ligula eget fermentum.\n            Nunc pharetra, sapien eget rutrum suscipit, eros nisi semper ante,\n            at consectetur elit lectus vitae tortor.\n            Duis id ipsum ac elit viverra interdum. Aenean finibus risus ut iaculis porta.\n            Aenean mollis, orci vel egestas aliquam, diam augue imperdiet orci,\n            consectetur vestibulum diam velit in magna.\n            Curabitur pulvinar, metus et lacinia sodales,\n            sem quam finibus risus, a dignissim nisl enim vitae libero.\n            In eget enim ipsum. Cras elementum nisl ac mauris dignissim,\n            quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices."
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "686006b9-dd74-4ea5-90e6-5cf6b48ddb16",
+            "enabled": true,
+            "next": "dcdbb3c2-4614-4b21-8158-babe39a3f96d",
+            "conditions": [
+              {
+                "id": "a3af5693-2eff-4a38-9d17-fd21590fa35a",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "a64d07a7-2db6-4db1-87bb-7761b20b2413",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "27c9bf61-a4de-4aa6-8dff-e4d3e27ec888",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "29ca25e9-da6e-4ecd-b54b-4a8f8e85c3ba",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "68463bb4-a86b-4a09-8305-b5f4de957ef7",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          },
+          {
+            "id": "b7da8f43-f15c-43e3-a81f-e2a7a2134df5",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "74bc8db6-91a8-47b0-9f91-cf86eebd19a9",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "a2584a7c-c413-4355-9123-b9c80f354556",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "4c9da415-3c2e-4417-9700-a5bbe098cf72",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "67735d3b-aadf-41b5-b17c-22dd646b3c51",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "397594ce-9404-4404-bce5-1acced57467f",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "dcdbb3c2-4614-4b21-8158-babe39a3f96d",
+        "title": "step-two",
+        "actions": [
+          {
+            "id": "90904828-af68-43cb-a40b-9f096129e02d",
+            "enabled": true,
+            "title": "Set sensor to 5 C",
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "7a362cf4-05d2-45a6-adec-b4dbc8487383",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "1e35ce65-751e-4908-bcaa-9141b142a5ad",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "4aa8886c-d5e3-4492-ad9c-2e4cbe2433d9",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "a81ca62b-3ea4-4a90-be3f-936c30cfa98c",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "e88657e8-613a-407e-8258-f6b08ff9c391",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "3f939dbe-6b14-4344-821b-ef43c7a74f99",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "fc968cc7-8c57-4f50-8e4f-ae1295249e21",
+        "title": "step-one",
+        "actions": [
+          {
+            "id": "66c3a0f0-9b3e-4113-9978-e25de327f38b",
+            "title": "generated block patch",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "data": {}
+            }
+          },
+          {
+            "id": "2ea21175-ad37-4992-9bba-4b6935bde8d6",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "d4177491-33db-448a-833e-b3d1a0659e43",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "53c2139f-74e1-49be-bbb3-da38763ab315",
+            "enabled": true,
+            "title": "Create task-one",
+            "impl": {
+              "type": "TaskCreate",
+              "ref": "task-one",
+              "title": "Test Task",
+              "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n            Suspendisse iaculis sit amet ligula eget fermentum.\n            Nunc pharetra, sapien eget rutrum suscipit, eros nisi semper ante,\n            at consectetur elit lectus vitae tortor.\n            Duis id ipsum ac elit viverra interdum. Aenean finibus risus ut iaculis porta.\n            Aenean mollis, orci vel egestas aliquam, diam augue imperdiet orci,\n            consectetur vestibulum diam velit in magna.\n            Curabitur pulvinar, metus et lacinia sodales,\n            sem quam finibus risus, a dignissim nisl enim vitae libero.\n            In eget enim ipsum. Cras elementum nisl ac mauris dignissim,\n            quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices."
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "a2e967da-fcd8-4a69-b495-71dfc021ec92",
+            "enabled": true,
+            "next": "9d97a1bf-74c4-43ea-a6f6-96e0a8712432",
+            "conditions": [
+              {
+                "id": "44ccd38b-0928-4b3a-a00e-9804320940f4",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "1232c563-daf3-4f9b-b362-94c2c883040f",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "c5cb3ec3-e9a8-4f29-8afc-16cf8ab4344c",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "f5129455-ee19-4015-b05f-3a043d0bd34e",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "c8736a10-7d20-491d-a28c-342a63a94d7a",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          },
+          {
+            "id": "7cab0731-0067-4f5f-83e2-b11f8820a4c4",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "af7f55dc-d2e5-4ccc-b8d7-aaf8accd3af2",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "611564af-e77d-4798-b01e-81d1ad1c4a57",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "b1907600-4b17-49cc-9cf5-051309a1ca75",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "82ebf145-282c-419c-b58b-61b9d8193213",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "1bc77713-c9ed-46eb-9cb9-c894f7c7f8e6",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "9d97a1bf-74c4-43ea-a6f6-96e0a8712432",
+        "title": "step-two",
+        "actions": [
+          {
+            "id": "910e0b09-d635-4df0-bfb3-162e8a00eb54",
+            "enabled": true,
+            "title": "Set sensor to 5 C",
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "cfa808b9-1789-42f9-84cc-435276b47149",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "259a9e4a-7114-49ac-b5dc-27c41037d7e5",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "4267a145-1692-4801-a149-577a96ab7ab0",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "cb1ba6d7-ac27-4a77-9a0a-72cbb19b3a05",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "8b99fbc1-6bca-4b79-9183-9d7439238017",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "72f3cc39-b2a8-4be8-b418-683115a35b22",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f8cae1c0-4ad4-4b3d-8492-2d03acbed7f8",
+        "title": "step-one",
+        "actions": [
+          {
+            "id": "dc7e7f50-a86d-42d9-b3e7-8beb3fbac211",
+            "title": "generated block patch",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "data": {}
+            }
+          },
+          {
+            "id": "aa7f7d01-6dd7-48d6-9eab-78a1a520810d",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "963857fd-e115-41ac-912c-c0b7aceba8b0",
+            "title": "sensor to 5 C",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          },
+          {
+            "id": "e0906d53-2cef-4842-93f5-76dcd8af4bb5",
+            "enabled": true,
+            "title": "Create task-one",
+            "impl": {
+              "type": "TaskCreate",
+              "ref": "task-one",
+              "title": "Test Task",
+              "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n            Suspendisse iaculis sit amet ligula eget fermentum.\n            Nunc pharetra, sapien eget rutrum suscipit, eros nisi semper ante,\n            at consectetur elit lectus vitae tortor.\n            Duis id ipsum ac elit viverra interdum. Aenean finibus risus ut iaculis porta.\n            Aenean mollis, orci vel egestas aliquam, diam augue imperdiet orci,\n            consectetur vestibulum diam velit in magna.\n            Curabitur pulvinar, metus et lacinia sodales,\n            sem quam finibus risus, a dignissim nisl enim vitae libero.\n            In eget enim ipsum. Cras elementum nisl ac mauris dignissim,\n            quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices."
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "5e720e8f-3bf4-48c9-a48c-52fe9925b072",
+            "enabled": true,
+            "next": "0b9572ba-fa0b-4907-b5a9-83fe418af5ab",
+            "conditions": [
+              {
+                "id": "2f88be3f-baa4-4588-82b5-d4d3dcb67c68",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "7a3c2e79-18c8-4e6e-be10-faf6ff43318e",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "72518589-6cfa-4fc9-8fa0-2b1a39812fb8",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "36d9c5a5-a50e-4f9f-a767-2d902e48a0e9",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "da2a6bd6-e72c-4cca-8a94-29a33132d3e2",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          },
+          {
+            "id": "e3daa93e-9424-4f8b-ae48-728bd3aa4b98",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "af67c300-371d-4bd8-8d4e-de2557d9af51",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "f4695309-cfdf-4d76-adc1-76d1119a16f3",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "55cde3d5-bc75-415b-95de-e35adbaa0814",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "2fd96f34-5ea5-4c0c-89cc-2f5a83cd787c",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "48c13b86-2116-4026-a2ae-d86a5e416c17",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0b9572ba-fa0b-4907-b5a9-83fe418af5ab",
+        "title": "step-two",
+        "actions": [
+          {
+            "id": "572b6fea-e7ee-448b-add1-a5340ad17d17",
+            "enabled": true,
+            "title": "Set sensor to 5 C",
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "sensor-1",
+              "serviceId": "sparkey",
+              "blockType": "TempSensorMock",
+              "data": {
+                "value[degC]": 5
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "7b7fd5f3-5958-4bf6-98a3-990b5f00c5f4",
+            "enabled": true,
+            "next": true,
+            "conditions": [
+              {
+                "id": "b2ff03a8-e61e-4336-9ad9-9ab1afb3e17b",
+                "enabled": true,
+                "title": "Default block value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": null,
+                  "serviceId": "sparkey",
+                  "blockType": null,
+                  "key": null,
+                  "operator": "eq",
+                  "value": null
+                }
+              },
+              {
+                "id": "9c129101-3b31-4232-aa79-2e3af47084f5",
+                "enabled": true,
+                "title": "Check sensor value",
+                "impl": {
+                  "type": "BlockValue",
+                  "blockId": "sensor-1",
+                  "serviceId": "sparkey",
+                  "blockType": "TempSensorMock",
+                  "key": "value[degC]",
+                  "operator": "ge",
+                  "value": 10
+                }
+              },
+              {
+                "id": "29152c36-e89a-48f3-aeb4-6c02dfd1503f",
+                "enabled": true,
+                "title": "Wait for abs time",
+                "impl": {
+                  "type": "TimeAbsolute",
+                  "time": 1572342354937
+                }
+              },
+              {
+                "id": "25b53f09-f705-41b0-894b-33cb8244bdf9",
+                "enabled": true,
+                "title": "Wait for rel time",
+                "impl": {
+                  "type": "TimeElapsed",
+                  "start": "Process",
+                  "duration": 12345
+                }
+              },
+              {
+                "id": "632a4ea7-30da-4ad3-82cb-17d201faa2a8",
+                "enabled": true,
+                "title": "Wait for task task-one",
+                "impl": {
+                  "type": "TaskStatus",
+                  "ref": "task-one",
+                  "status": "Finished"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": "dashboard-items__1-55d75cbee5631853c77cd22f26e9a81c",
+    "title": "Ministry of Silly Walks",
+    "order": 4,
+    "cols": 4,
+    "rows": 2,
+    "feature": "Automation",
+    "dashboard": "dashboard-home",
+    "config": {}
+  },
+  {
+    "_id": "dashboard-items__174108b9-e054-42b3-b19b-2eadabac6028",
+    "dashboard": "herms",
+    "cols": 4,
+    "rows": 5,
+    "order": 3,
+    "title": "HERMS Actions",
+    "feature": "QuickActions",
+    "config": {
+      "changeIdMigrated": true,
+      "serviceId": "sparkey",
+      "steps": [
+        {
+          "name": "Disable all setpoints",
+          "id": "16bf062e-2105-4ff0-b81f-c85731b7e14f",
+          "changes": [
+            {
+              "id": "caa78b09-62f4-41ba-b33c-83899d037445",
+              "blockId": "HERMS HLT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "f63767fb-3e99-4403-9e70-88b509c0af59",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "199b53af-9e6d-4bd3-9b63-3167c3f284eb",
+              "blockId": "HERMS BK Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            }
+          ]
+        },
+        {
+          "name": "Constant HLT Temp",
+          "id": "5ecfea94-9cb2-4aa7-95a3-c9a8ee915424",
+          "changes": [
+            {
+              "id": "4aa3a681-28ea-40f6-8145-23febf8da77c",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "5aacdf98-9d4b-494a-bac2-4f82eb5e728d",
+              "blockId": "HERMS HLT Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 70
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "Constant MT Temp",
+          "id": "45ee02d6-a5dc-4885-9d83-a93f612fc54f",
+          "changes": [
+            {
+              "id": "215e1562-c641-43e5-8ceb-90779e4724bc",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 66.7
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            },
+            {
+              "id": "75bb7f56-5ed7-4c56-aeef-3889c946a078",
+              "blockId": "HERMS HLT Setpoint Driver",
+              "data": {
+                "enabled": true
+              },
+              "confirmed": {}
+            }
+          ],
+          "applicable": true,
+          "diffs": [
+            {
+              "blockId": "HERMS MT Setpoint",
+              "diffs": [
+                {
+                  "key": "Enabled",
+                  "oldV": "false",
+                  "newV": "true",
+                  "changed": true
+                },
+                {
+                  "key": "Setting",
+                  "oldV": "67.00 °C",
+                  "newV": "66.70 °C",
+                  "changed": true
+                }
+              ]
+            },
+            {
+              "blockId": "HERMS HLT Setpoint Driver",
+              "diffs": [
+                {
+                  "key": "Enabled",
+                  "oldV": "false",
+                  "newV": "true",
+                  "changed": true
+                }
+              ]
+            }
+          ],
+          "active": false
+        },
+        {
+          "name": "Constant BK Temp",
+          "id": "b46e68ee-4ce9-4bca-9027-7a5d3d261963",
+          "changes": [
+            {
+              "id": "1780d73f-09a5-4bae-b5e7-283c69ae0639",
+              "blockId": "HERMS BK Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 100
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "pinnedPosition": {
+      "x": 8,
+      "y": 6
+    }
+  },
+  {
+    "_id": "dashboard-items__972240e6-e12a-4abd-8c6c-bc850ff5096d",
+    "dashboard": "herms",
+    "cols": 11,
+    "rows": 5,
+    "order": 1,
+    "title": "HERMS Process",
+    "feature": "Builder",
+    "config": {
+      "currentLayoutId": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
+      "layoutIds": [
+        "90ca4326-b3a2-47ca-bec4-2c52281d8772"
+      ]
+    },
+    "pinnedPosition": {
+      "x": 1,
+      "y": 1
+    }
+  },
+  {
+    "_id": "dashboard-items__a0634d76-5499-11e9-8647-d663bd873d93",
+    "title": "Gone With the Flow",
+    "order": 1,
+    "cols": 12,
+    "rows": 8,
+    "feature": "Builder",
+    "dashboard": "builder",
+    "config": {
+      "currentLayoutId": "ee021f01-fc29-2e06-c903-0c9288eb1bfe",
+      "layoutIds": [
+        "0e28d1ad-8e38-4204-b634-c1301aae73ac",
+        "ee021f01-fc29-2e06-c903-0c9288eb1bfe"
+      ]
+    }
+  },
+  {
+    "_id": "dashboard-items__a06350b4-5499-11e9-8647-d663bd873d93",
+    "title": "item-invalid",
+    "order": 1,
+    "cols": 3,
+    "rows": 3,
+    "feature": "SetpointSensorPair",
+    "dashboard": "derp",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "BLARGH"
+    }
+  },
+  {
+    "_id": "dashboard-items__a06355e6-5499-11e9-8647-d663bd873d93",
+    "title": "item-unknown",
+    "order": 2,
+    "cols": 3,
+    "rows": 3,
+    "feature": "UnknownType",
+    "dashboard": "derp",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "setpoint-1"
+    }
+  },
+  {
+    "_id": "dashboard-items__a06358fc-5499-11e9-8647-d663bd873d93",
+    "title": "item-invalid-unknown",
+    "order": 3,
+    "cols": 3,
+    "rows": 3,
+    "feature": "Warbl",
+    "dashboard": "derp",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "BLORP"
+    }
+  },
+  {
+    "_id": "dashboard-items__a06358fc-5499-11e9-8647-d663bd873d95",
+    "title": "Charles",
+    "order": 3,
+    "cols": 4,
+    "rows": 2,
+    "feature": "QuickActions",
+    "dashboard": "dashboard-home",
+    "config": {
+      "serviceId": "sparkey",
+      "steps": [
+        {
+          "id": "b92781c7-3a9f-440d-8df6-bd897b4bfa37",
+          "name": "step-10",
+          "changes": [
+            {
+              "blockId": "sensor-1",
+              "data": {
+                "value[degC]": 10
+              }
+            },
+            {
+              "blockId": "setpoint-sensor-pair-1",
+              "data": {
+                "storedSetting[degC]": 10,
+                "settingEnabled": true
+              }
+            },
+            {
+              "blockId": "actuator-pwm-1",
+              "data": {
+                "setting": 60
+              }
+            }
+          ]
+        },
+        {
+          "id": "6ab89a06-6103-4c59-a34c-f5a173cd3ee4",
+          "name": "step-20",
+          "changes": [
+            {
+              "blockId": "sensor-1",
+              "data": {
+                "value[degC]": 20
+              }
+            },
+            {
+              "blockId": "setpoint-sensor-pair-1",
+              "data": {
+                "storedSetting[degC]": 20,
+                "settingEnabled": true
+              }
+            },
+            {
+              "blockId": "actuator-pwm-1",
+              "data": {
+                "setting": 60
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "_id": "dashboard-items__a0635bb8-5499-11e9-8647-d663bd873d93",
+    "title": "item-service-unknown",
+    "order": 3,
+    "cols": 3,
+    "rows": 3,
+    "feature": "SetpointSensorPair",
+    "dashboard": "derp",
+    "config": {
+      "serviceId": "ZORP",
+      "blockId": "BLORP"
+    }
+  },
+  {
+    "_id": "dashboard-items__a0635e1a-5499-11e9-8647-d663bd873d93",
+    "title": "item-graph",
+    "order": 1,
+    "cols": 10,
+    "rows": 5,
+    "feature": "Graph",
+    "dashboard": "metrics",
+    "config": {
+      "layout": {},
+      "params": {
+        "duration": "10m"
+      },
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "actuator-pwm-1/setting",
+            "actuator-pwm-1/value"
+          ]
+        },
+        {
+          "measurement": "spock",
+          "fields": [
+            " Combined Influx points"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/actuator-pwm-1/setting": "Actuator setting"
+      }
+    }
+  },
+  {
+    "_id": "dashboard-items__a06362e8-5499-11e9-8647-d663bd873d93",
+    "title": "sessions",
+    "order": 2,
+    "cols": 4,
+    "rows": 5,
+    "feature": "SessionView",
+    "dashboard": "metrics",
+    "config": {
+      "sessions": [
+        {
+          "id": "mgKBmi4sv",
+          "name": "brew-session",
+          "hidden": false,
+          "start": 1547723679298,
+          "end": null,
+          "graphCfg": {
+            "layout": {},
+            "params": {
+              "start": 1547723679298
+            },
+            "targets": [
+              {
+                "measurement": "sparkey",
+                "fields": [
+                  "actuator-pwm-1/value"
+                ]
+              }
+            ],
+            "renames": {
+              "sparkey/actuator-pwm-1/value": "PWM value"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "_id": "dashboard-items__a0636842-5499-11e9-8647-d663bd873d93",
+    "title": "empty-graph",
+    "order": 2,
+    "cols": 5,
+    "rows": 5,
+    "feature": "Graph",
+    "dashboard": "metrics",
+    "config": {
+      "layout": {},
+      "params": [],
+      "targets": [],
+      "renames": {}
+    }
+  },
+  {
+    "_id": "dashboard-items__a0636b12-5499-11e9-8647-d663bd873d93",
+    "title": "pid-1",
+    "order": 1,
+    "cols": 4,
+    "rows": 4,
+    "feature": "Pid",
+    "dashboard": "dashboard-home",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "pid-1"
+    }
+  },
+  {
+    "_id": "dashboard-items__a0636b12-5499-11e9-8647-d663bd873d94",
+    "title": "inspector",
+    "order": 2,
+    "cols": 4,
+    "rows": 4,
+    "feature": "Metrics",
+    "dashboard": "dashboard-home",
+    "config": {
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "actuator-pwm-1/setting",
+            "actuator-pwm-1/value"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/actuator-pwm-1/value": "actuator value"
+      },
+      "freshDuration": {},
+      "decimals": {}
+    }
+  },
+  {
+    "_id": "dashboard-items__dashboard-items__bb7aa0b4-a045-ad38-4887-308967ca8d63",
+    "title": "Mr Beancounter",
+    "order": 5,
+    "cols": 4,
+    "rows": 5,
+    "feature": "SessionLog",
+    "dashboard": "dashboard-home",
+    "config": {
+      "currentSession": "3d15296d-0abd-4d45-383c-0bec436ae319"
+    }
+  },
+  {
+    "_id": "dashboard-items__f764bbe2-38ad-4970-998e-11a29eddb69a",
+    "dashboard": "herms",
+    "cols": 7,
+    "rows": 5,
+    "order": 2,
+    "title": "HERMS Graph",
+    "feature": "Graph",
+    "config": {
+      "layout": {},
+      "params": {
+        "duration": "10m"
+      },
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "HERMS HLT Sensor/value[degC]",
+            "HERMS MT Sensor/value[degC]",
+            "HERMS BK Sensor/value[degC]",
+            "HERMS HLT Setpoint/setting[degC]",
+            "HERMS MT Setpoint/setting[degC]",
+            "HERMS BK Setpoint/setting[degC]",
+            "HERMS HLT PWM/value",
+            "HERMS BK PWM/value"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/HERMS HLT Sensor/value[degC]": "HLT temperature",
+        "sparkey/HERMS MT Sensor/value[degC]": "MT temperature",
+        "sparkey/HERMS BK Sensor/value[degC]": "BK temperature",
+        "sparkey/HERMS HLT Setpoint/setting[degC]": "HLT setting",
+        "sparkey/HERMS MT Setpoint/setting[degC]": "MT setting",
+        "sparkey/HERMS BK Setpoint/setting[degC]": "BK setting",
+        "sparkey/HERMS HLT PWM/value": "HLT PWM value",
+        "sparkey/HERMS BK PWM/value": "BK PWM value"
+      },
+      "axes": {
+        "sparkey/HERMS HLT PWM/value": "y2",
+        "sparkey/HERMS BK PWM/value": "y2"
+      },
+      "colors": {}
+    },
+    "pinnedPosition": {
+      "x": 1,
+      "y": 6
+    }
+  },
+  {
+    "_id": "dashboards__builder",
+    "title": "Brewery Builder Dashboard",
+    "order": 3
+  },
+  {
+    "_id": "dashboards__dashboard-home",
+    "title": "Home Dashboard",
+    "order": 1
+  },
+  {
+    "_id": "dashboards__derp",
+    "title": "Derp Dashboard",
+    "order": 4
+  },
+  {
+    "_id": "dashboards__herms",
+    "title": "HERMS",
+    "order": 5
+  },
+  {
+    "_id": "dashboards__metrics",
+    "title": "Metrics Dashboard",
+    "order": 2
+  },
+  {
+    "_id": "layouts__90ca4326-b3a2-47ca-bec4-2c52281d8772",
+    "title": "HERMS Layout",
+    "width": 26,
+    "height": 11,
+    "parts": [
+      {
+        "id": "62ec5274-2564-441c-92d1-7d0e24eafa13",
+        "rotate": 0,
+        "settings": {
+          "color": "#c48600"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 20,
+        "y": 1
+      },
+      {
+        "id": "e91cfce7-3eb3-40b0-ab2c-570694dd74f2",
+        "rotate": 0,
+        "settings": {
+          "color": "#9c4b00"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 12,
+        "y": 1
+      },
+      {
+        "id": "10f5b81f-43f9-4638-b275-3037f4fe1310",
+        "rotate": 0,
+        "settings": {
+          "color": "#b50000"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 4,
+        "y": 1
+      },
+      {
+        "id": "7b7ac06e-ba15-40ac-a34f-d561de00718e",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "Coil",
+        "x": 5,
+        "y": 4
+      },
+      {
+        "id": "14315508-5aca-4a17-bd9e-4af1a3c622d5",
+        "rotate": 0,
+        "settings": {
+          "blockServiceId": "sparkey",
+          "pwm": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK PWM"
+          },
+          "sizeX": 4
+        },
+        "flipped": true,
+        "type": "HeatingElement",
+        "x": 21,
+        "y": 6
+      },
+      {
+        "id": "c34f0524-c0e0-4026-82df-2369086edd50",
+        "rotate": 0,
+        "settings": {
+          "blockServiceId": "sparkey",
+          "pwm": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT PWM"
+          },
+          "sizeX": 4
+        },
+        "flipped": false,
+        "type": "HeatingElement",
+        "x": 3,
+        "y": 6
+      },
+      {
+        "id": "9f4440ec-d94c-490d-b4ba-3dfc02887781",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "WhirlpoolInlet",
+        "x": 20,
+        "y": 2
+      },
+      {
+        "id": "2c17fea4-5ccf-4bc3-aab0-d351a2758389",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "WhirlpoolInlet",
+        "x": 4,
+        "y": 2
+      },
+      {
+        "id": "747c0348-181e-461e-95fb-f06764505e6c",
+        "rotate": 0,
+        "settings": {
+          "sizeX": 4
+        },
+        "flipped": true,
+        "type": "FilterBottom",
+        "x": 12,
+        "y": 6
+      },
+      {
+        "id": "3ec5bd91-4f66-4de5-b86c-5d636a393d68",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS MT Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 13,
+        "y": 3
+      },
+      {
+        "id": "baafe585-d3b4-4f6b-a348-4df635881dbc",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 21,
+        "y": 3
+      },
+      {
+        "id": "e6900363-8d79-4598-bcba-8ba33da17fb1",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 5,
+        "y": 3
+      },
+      {
+        "id": "8d3e1f9f-9d98-44e2-9f15-ff4b123e4448",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 19,
+        "y": 2
+      },
+      {
+        "id": "275f4944-5a26-4021-b49f-1991dcd86641",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 18,
+        "y": 2
+      },
+      {
+        "id": "b39904b2-47a3-4499-967c-16db0fa31bd5",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 3
+      },
+      {
+        "id": "f5d2bd3f-0691-47ad-b9e8-f46f25df6b92",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 4
+      },
+      {
+        "id": "7d79688e-43f9-46f6-b568-c3ff254e30d1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 5
+      },
+      {
+        "id": "b292c7f3-f5ee-429c-a169-8b0a402da186",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 18,
+        "y": 6
+      },
+      {
+        "id": "6bb976e4-7538-45fa-b71c-de0a73cc6b96",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 2
+      },
+      {
+        "id": "c45e28b4-943c-4b22-82eb-7da5462a2b20",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 2
+      },
+      {
+        "id": "70265b7d-ea54-4dbb-82a3-4d5d9377d5f4",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 9,
+        "y": 2
+      },
+      {
+        "id": "178c8eb7-5376-4092-b2be-43b5af48e1e1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 6
+      },
+      {
+        "id": "138106d7-16ec-4f8d-9875-3c8b230d5cc4",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 6
+      },
+      {
+        "id": "2b7655f9-9f47-4c6a-b3b9-10e340e377a9",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 6
+      },
+      {
+        "id": "0c18b785-ac8d-401f-8ac1-9b709d96acfe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "DipTube",
+        "x": 12,
+        "y": 2
+      },
+      {
+        "id": "d3c0d5d2-2e8e-44e0-bce5-347e9a2dcffb",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "DipTube",
+        "x": 20,
+        "y": 6
+      },
+      {
+        "id": "77fc7305-2fd2-45e2-9ab6-6018bb2886b8",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 17,
+        "y": 6
+      },
+      {
+        "id": "60817b6c-8c51-4f70-b354-c8650981aa93",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 16,
+        "y": 6
+      },
+      {
+        "id": "b4c78c4a-0a4a-47d6-8707-76ed6f3aa737",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 19,
+        "y": 6
+      },
+      {
+        "id": "a4005531-adf2-44bd-a6a3-6f14fc87f618",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 2,
+        "y": 2
+      },
+      {
+        "id": "a0976709-28f8-4994-b53c-f40ff48a511c",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 3
+      },
+      {
+        "id": "913c1180-433f-41ee-8cab-037c50ae6ae9",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "id": "765bb6db-68b5-4781-8fb3-bec6b113bd88",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 5
+      },
+      {
+        "id": "d275d3eb-1d0d-446e-b948-ebe924f8923e",
+        "rotate": 0,
+        "settings": {},
+        "flipped": true,
+        "type": "DipTube",
+        "x": 7,
+        "y": 6
+      },
+      {
+        "id": "cab9f977-8a78-4820-ac5c-a115a7f0567f",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 8,
+        "y": 6
+      },
+      {
+        "id": "3b9c669b-2be7-432d-8ff5-28640ae315d3",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 17,
+        "y": 9
+      },
+      {
+        "id": "73f2e1e9-716e-43b9-9ecd-d54f6222c7d4",
+        "rotate": 270,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 18,
+        "y": 8
+      },
+      {
+        "id": "e5125c06-c3ea-418c-abf2-19c8b80c9b9d",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 7
+      },
+      {
+        "id": "7566dce0-6477-49bb-b135-0368d7ba9048",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 17,
+        "y": 7
+      },
+      {
+        "id": "81319166-4826-45f8-a118-3afce9bf830c",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 15,
+        "y": 9
+      },
+      {
+        "id": "7f5f06a0-583e-4af1-90dc-898d39773bfe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 9,
+        "y": 9
+      },
+      {
+        "id": "d6d29d86-2709-44cf-973a-5421dc065de6",
+        "rotate": 270,
+        "settings": {
+          "enabled": false
+        },
+        "flipped": false,
+        "type": "Pump",
+        "x": 17,
+        "y": 8
+      },
+      {
+        "id": "446e97fb-a2cf-4e1e-882e-2745f7a4fcbe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 3,
+        "y": 9
+      },
+      {
+        "id": "653ccaa4-2270-46fc-a7e6-ffe579237721",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 4,
+        "y": 9
+      },
+      {
+        "id": "654c56b9-57f4-4ecb-9133-4d7d0d0da459",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 5,
+        "y": 9
+      },
+      {
+        "id": "9d8c8543-6f04-4394-989a-758da03982f1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 6
+      },
+      {
+        "id": "4eccf98c-44dc-4934-ac7a-cb3bc3927f79",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 3,
+        "y": 2
+      },
+      {
+        "id": "36be6b0a-13c5-413c-8599-627cc9d8ccd4",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 13,
+        "y": 9
+      },
+      {
+        "id": "b984d740-969b-4fca-b77f-2f95e649cd49",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 11,
+        "y": 9
+      },
+      {
+        "id": "b9e2322d-b1d2-4751-aa24-f4d5bda55c7f",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 13,
+        "y": 8
+      },
+      {
+        "id": "4ebceb43-17f4-46e5-bdb1-7a5c9983b110",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 11,
+        "y": 8
+      },
+      {
+        "id": "75d94725-de13-4707-aa02-b68c10c89639",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 9,
+        "y": 8
+      },
+      {
+        "id": "f649f75d-085b-4ae9-be1a-644579a97256",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 7
+      },
+      {
+        "id": "ed58258c-1c7d-43a8-81da-ded2d43c9c59",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 12,
+        "y": 7
+      },
+      {
+        "id": "00cdf60c-f7ec-40b5-8dd4-df1bf06b8bc1",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 10,
+        "y": 9
+      },
+      {
+        "id": "7eddaf65-519f-44ac-b603-64f0955ac8f2",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 12,
+        "y": 9
+      },
+      {
+        "id": "a42c1e54-1302-4322-b0d8-ef9517b95719",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 13,
+        "y": 7
+      },
+      {
+        "id": "061a901c-6bb7-49b0-b091-c4676a04844a",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 11,
+        "y": 7
+      },
+      {
+        "id": "7642ac17-7f8d-4490-99d8-8be94a3e6b36",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 10,
+        "y": 7
+      },
+      {
+        "id": "02f3664d-9ac3-4d7a-806f-e8d03377d852",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 7
+      },
+      {
+        "id": "4c135168-656b-477c-adda-86ee83de6663",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 16,
+        "y": 9
+      },
+      {
+        "id": "b52d4ed8-ca5a-4ed5-abcf-20f11e9b6696",
+        "rotate": 0,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 14,
+        "y": 9
+      },
+      {
+        "id": "a8c61cb6-f3d1-44d0-a05d-fd0cc99c0038",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 18,
+        "y": 9
+      },
+      {
+        "id": "42fd3984-548b-4dc9-bddf-de3d0f58af1e",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 19,
+        "y": 9
+      },
+      {
+        "id": "204d7192-a9cd-43ef-b44c-e1ad4fcdc2cf",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 20,
+        "y": 9
+      },
+      {
+        "id": "5f762ce2-9aa0-4ef4-b075-b093b41a153d",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 7,
+        "y": 9
+      },
+      {
+        "id": "0b8288c1-6e97-42c0-bb80-4bddd707e407",
+        "rotate": 270,
+        "settings": {
+          "enabled": false
+        },
+        "flipped": false,
+        "type": "Pump",
+        "x": 7,
+        "y": 8
+      },
+      {
+        "id": "69a5d0e4-23fd-4cb2-81c0-32e1d991056f",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 8,
+        "y": 9
+      },
+      {
+        "id": "3d337ab1-6006-4e90-85a9-e77697d7f62f",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 6,
+        "y": 9
+      },
+      {
+        "id": "bf1f5f79-70da-4391-bea7-70e304d8fc23",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 8,
+        "y": 7
+      },
+      {
+        "id": "be004759-ba08-4759-850f-6c82fbe24d88",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 7,
+        "y": 7
+      },
+      {
+        "id": "3170fc31-a12b-42e1-91ec-e2d84d601892",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 11,
+        "y": 4
+      },
+      {
+        "id": "aa7225f6-0f64-4bf1-ba86-eaa349dc4a7e",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 5
+      },
+      {
+        "id": "0ee18011-97af-4071-a2db-62142b54a1b0",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 10,
+        "y": 5
+      },
+      {
+        "id": "b9e3cbc4-1f69-4dd4-a93b-a89a9d559945",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 4
+      },
+      {
+        "id": "e1ab9029-579b-4895-96e5-e3ca505acb50",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 9,
+        "y": 4
+      },
+      {
+        "id": "e2256026-1a79-4355-9351-9fab2b143c84",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 9,
+        "y": 5
+      },
+      {
+        "id": "ccd42b29-04f1-4924-9489-4b0a754501ca",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 8,
+        "y": 4
+      },
+      {
+        "id": "9b55897e-cad8-4dec-aa96-3c65d9336bdb",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 8,
+        "y": 5
+      },
+      {
+        "id": "05fa27e1-bab4-4905-8d62-a0d47df1871b",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 3
+      },
+      {
+        "id": "0d1fc393-37c6-464a-bc42-468b8f95836d",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS MT PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 11,
+        "y": 1
+      },
+      {
+        "id": "e8d6bc42-f64f-41b7-ae17-10175638ca61",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 19,
+        "y": 1
+      },
+      {
+        "id": "24121797-0a56-4d28-86f2-1978892f8d25",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 3,
+        "y": 1
+      },
+      {
+        "id": "432d535b-00a8-4837-b623-39f8d7be03e3",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 2,
+        "y": 9
+      },
+      {
+        "id": "82b0f278-5f45-4a7c-80b1-d5dff59432cf",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 1,
+        "y": 9
+      },
+      {
+        "id": "07c5600e-3e32-45c3-a453-23df9d7da538",
+        "rotate": 270,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 2,
+        "y": 8
+      },
+      {
+        "id": "bd304241-8b19-4960-b680-a5ea9f82b82e",
+        "rotate": 0,
+        "settings": {
+          "pressure": 10,
+          "liquids": [
+            "#4AA0EF"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 0,
+        "y": 9
+      }
+    ]
+  },
+  {
+    "_id": "layouts__ee021f01-fc29-2e06-c903-0c9288eb1bfe",
+    "title": "Gone With the Layout",
+    "width": 20,
+    "height": 15,
+    "parts": [
+      {
+        "id": "41693288-1161-ef12-bc7c-75d3b067e2f4",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 14,
+        "y": 2,
+        "type": "Coil"
+      },
+      {
+        "id": "203f9fc0-0887-d409-2e58-ba4a070dfabe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "CounterflowChiller",
+        "x": 13,
+        "y": 11
+      },
+      {
+        "id": "b9b9da24-337c-4d66-e234-46d3688d6d1f",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "HeatingElement",
+        "x": 7,
+        "y": 11
+      },
+      {
+        "id": "3271d456-4cfa-57b2-7172-cfe5ba68de0d",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ImmersionCoil",
+        "x": 11,
+        "y": 14
+      },
+      {
+        "id": "9b308893-554c-e3c8-e4d8-f948a4da7466",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "Lauterhexe",
+        "x": 13,
+        "y": 13
+      },
+      {
+        "id": "bc2c9d81-18bf-425d-4cf4-2a3d621ee9ee",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "WhirlpoolInlet",
+        "x": 7,
+        "y": 14
+      },
+      {
+        "id": "cb0bdf02-5cd0-c29e-ddbf-6537762fbc77",
+        "rotate": 0,
+        "settings": {
+          "liquids": [
+            "#C678DD"
+          ]
+        },
+        "flipped": false,
+        "x": 11,
+        "y": 2,
+        "type": "SystemIO"
+      },
+      {
+        "id": "e0929a70-22cd-f34b-ffe9-7060016a0cf2",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 12,
+        "y": 2,
+        "type": "StraightTube"
+      },
+      {
+        "id": "0c506a71-af93-44b6-dbe0-c4ab16f7d80b",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 13,
+        "y": 2
+      },
+      {
+        "id": "ef649e86-967a-8e81-3139-f7bcc61e462c",
+        "rotate": 0,
+        "settings": {
+          "liquids": [
+            "#4AA0EF"
+          ],
+          "pressure": 10
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 0,
+        "y": 2
+      },
+      {
+        "id": "56565652-dba8-b68a-ee0c-66534dfbda20",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "Valve",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "id": "f4b935cd-4ae5-823b-de60-524931bd7a1b",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "x": 3,
+        "y": 6,
+        "type": "SystemIO"
+      },
+      {
+        "id": "72163643-aea3-24f0-e898-ac100e1fb0ff",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "Valve",
+        "x": 3,
+        "y": 5,
+        "closed": false
+      },
+      {
+        "id": "d42cca9b-1d9c-322c-1456-e2c630bf47d8",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "x": 3,
+        "y": 4,
+        "type": "TeeTube"
+      },
+      {
+        "id": "e5561b25-0ace-1590-f9b6-524287b2791f",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "id": "2f27d35e-ed31-8869-26a1-883c2942fab4",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 2,
+        "y": 3
+      },
+      {
+        "id": "8daa8de7-46c1-b3ec-6f6d-d4196dab4d58",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "x": 2,
+        "y": 2,
+        "type": "TeeTube"
+      },
+      {
+        "id": "124810ca-69aa-81e0-f770-d0adac8e74a0",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 3,
+        "y": 3
+      },
+      {
+        "id": "47cf3706-001d-36f0-d079-6ba396c74f57",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 3,
+        "y": 2
+      },
+      {
+        "id": "0081f539-a5a1-74dd-5ae3-252c988b46cc",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "x": 5,
+        "y": 4,
+        "type": "ElbowTube"
+      },
+      {
+        "id": "f07773c1-bfdd-2b67-5fb0-131a4761ff02",
+        "rotate": 180,
+        "settings": {
+          "liquids": [
+            "#DB0023"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 7,
+        "y": 3
+      },
+      {
+        "id": "7a14dfd2-9883-60ab-c6dc-346a1a4a6ced",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "Valve",
+        "x": 6,
+        "y": 3,
+        "closed": false
+      },
+      {
+        "id": "d5294a3c-5c27-5381-9fdb-42e7fd7ea1b3",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 5,
+        "y": 3
+      },
+      {
+        "id": "73620c5c-917a-f58d-324a-bdf279ba32ab",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 5,
+        "y": 2
+      },
+      {
+        "id": "0f61648a-e83b-d4a5-12e8-82da479b74fb",
+        "rotate": 0,
+        "settings": {
+          "enabled": true
+        },
+        "flipped": false,
+        "x": 4,
+        "y": 2,
+        "type": "Pump",
+        "disabled": false
+      },
+      {
+        "id": "6573658f-087f-277c-f445-faaa18d39556",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "Valve",
+        "x": 4,
+        "y": 4,
+        "closed": true
+      },
+      {
+        "id": "1edc48e0-bb24-23a5-741d-68e996b4f3d9",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 3,
+        "y": 1
+      },
+      {
+        "id": "c7652ea7-923b-7c76-c032-9bcb0411b9d6",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 13,
+        "y": 3,
+        "type": "ElbowTube"
+      },
+      {
+        "id": "b850ea97-4d09-66f6-c8eb-3287baee16c3",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 13,
+        "y": 1
+      },
+      {
+        "id": "e487af86-2886-3dc5-7925-3200a7b7bf03",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 11,
+        "y": 13
+      },
+      {
+        "id": "34355c2d-5dd0-aa1f-6708-92f085bfd42a",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "CrossTube",
+        "x": 12,
+        "y": 13
+      },
+      {
+        "id": "7ce17e1b-1784-4502-a449-d665479392a3",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 12,
+        "y": 12
+      },
+      {
+        "id": "d9cfc2bf-ac59-e765-0fbc-7644d44810f1",
+        "rotate": 0,
+        "settings": {
+          "enabled": true
+        },
+        "flipped": false,
+        "x": 16,
+        "y": 12,
+        "type": "Pump",
+        "disabled": false
+      },
+      {
+        "id": "44f308d1-1d04-f65e-c89d-e7318ec05786",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 17,
+        "y": 12
+      },
+      {
+        "id": "529b1781-1d94-cdd6-40b6-2023739cf67a",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 17,
+        "y": 11
+      },
+      {
+        "id": "5b70b4c9-5851-ed39-9358-752fc1186c6a",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 16,
+        "y": 11,
+        "type": "StraightTube"
+      },
+      {
+        "id": "9fa9e091-2fb1-9732-7683-deb741ce044f",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 12,
+        "y": 11
+      },
+      {
+        "id": "1d26dd0b-4876-d624-e80c-d9c2a723303f",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 10,
+        "y": 13
+      },
+      {
+        "id": "ed6adaf3-3889-04eb-1855-8dc48b78cfd7",
+        "rotate": 0,
+        "settings": {
+          "closed": true,
+          "actuatorLink": null
+        },
+        "flipped": false,
+        "type": "ActuatorValve",
+        "x": 9,
+        "y": 13
+      },
+      {
+        "id": "6fb9403b-4174-cc32-27b8-355c3071473f",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "DipTube",
+        "x": 8,
+        "y": 13
+      },
+      {
+        "id": "3f3b54c8-7fee-e0f1-4eb7-ed083a313674",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 12,
+        "y": 10
+      },
+      {
+        "id": "e967b812-63dc-87f6-75c9-9b6d39d3919c",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "CheckValve",
+        "x": 13,
+        "y": 10
+      },
+      {
+        "id": "4c957508-a8c6-f899-360d-ee2e434d2708",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "x": 14,
+        "y": 10,
+        "type": "StraightTube"
+      },
+      {
+        "id": "26f7c494-bf52-efcf-401c-5e2a2d9b22b5",
+        "rotate": 180,
+        "settings": {
+          "liquids": [
+            "#DB0023"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 15,
+        "y": 10
+      },
+      {
+        "id": "4cfac8d4-e613-faae-4819-2409d597d7e1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 12,
+        "y": 9
+      },
+      {
+        "id": "e349cdd1-73f8-4a51-e8ee-bc593707d5c7",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightInletTube",
+        "x": 13,
+        "y": 9
+      },
+      {
+        "id": "11383259-3d68-8143-3737-5cd390f258b8",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 12,
+        "y": 8
+      },
+      {
+        "id": "35aeca63-e1db-b49a-830c-356fc31a0bdc",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "CheckValve",
+        "x": 13,
+        "y": 8
+      },
+      {
+        "id": "a009f479-2c09-d8e6-6979-e218ee9cb8f4",
+        "rotate": 180,
+        "settings": {
+          "liquids": [
+            "#DB0023"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 14,
+        "y": 8
+      },
+      {
+        "id": "257f8b02-c8cf-eb7d-361e-64353976588c",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 12,
+        "y": 7
+      },
+      {
+        "id": "6bbb153e-12dc-7ee5-516d-0cc365da8e26",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 12,
+        "y": 6
+      },
+      {
+        "id": "60563139-095a-1ed0-9cd8-ed27de9def6d",
+        "rotate": 90,
+        "settings": {
+          "liquids": [
+            "#4AA0EF"
+          ],
+          "pressure": 10
+        },
+        "flipped": false,
+        "x": 12,
+        "y": 5,
+        "type": "SystemIO"
+      },
+      {
+        "id": "4751b204-56b8-f26d-d894-6b845e73e71a",
+        "rotate": 0,
+        "settings": {
+          "sensorServiceId": "sparkey",
+          "sensorLink": {
+            "id": "sensor-1",
+            "type": "TempSensorMock",
+            "driven": false
+          }
+        },
+        "flipped": false,
+        "type": "SensorDisplay",
+        "x": 17,
+        "y": 9
+      },
+      {
+        "id": "0907e793-bc39-7c63-c22a-6ee15a535aed",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "Coil",
+        "x": 13,
+        "y": 6
+      }
+    ]
+  },
+  {
+    "_id": "logged-sessions__3d15296d-0abd-4d45-383c-0bec436ae319",
+    "title": "Teddy",
+    "date": 1579688563640,
+    "notes": [
+      {
+        "id": "66ea94b9-1c2a-6218-6469-a9b353e45e77",
+        "title": "Example note",
+        "type": "Text",
+        "value": "",
+        "col": 12
+      },
+      {
+        "id": "ea8631fd-9bb0-ac9f-6cfb-8bf01e56893c",
+        "title": "Subprocess graph",
+        "type": "Graph",
+        "start": null,
+        "end": null,
+        "config": {
+          "layout": {
+            "annotations": []
+          },
+          "params": {},
+          "targets": [],
+          "renames": {},
+          "axes": {},
+          "colors": {}
+        },
+        "col": 12
+      }
+    ],
+    "tags": [
+      "on: Home Dashboard"
+    ]
+  },
+  {
+    "_id": "services__sparkey",
+    "title": "Spark Controller 'sparkey'",
+    "order": 1,
+    "type": "Spark",
+    "config": {
+      "groupNames": [
+        "testey1",
+        "testey2"
+      ],
+      "expandedBlocks": {
+        "DisplaySettings": true
+      }
+    }
+  },
+  {
+    "_id": "services__spock",
+    "title": "Spark Controller 'spock'",
+    "order": 2,
+    "type": "Spark",
+    "config": {}
+  }
+]
