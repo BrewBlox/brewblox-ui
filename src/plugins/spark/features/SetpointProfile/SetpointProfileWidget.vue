@@ -1,12 +1,14 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
+import { isJsonEqual } from '@/helpers/functional';
+import { deepCopy } from '@/helpers/units/parseObject';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { GraphProps, profileGraphProps } from './helpers';
 import SetpointProfileBasic from './SetpointProfileBasic.vue';
 import SetpointProfileFull from './SetpointProfileFull.vue';
-import { SetpointProfileBlock } from './types';
+import { SetpointProfileBlock, SetpointProfileData } from './types';
 
 @Component({
   components: {
@@ -16,19 +18,27 @@ import { SetpointProfileBlock } from './types';
 })
 export default class SetpointProfileWidget
   extends BlockWidgetBase<SetpointProfileBlock> {
+  usedData: SetpointProfileData | null = null;
   revision = 0;
+
+  @Watch('block.data')
+  watchData(newV: SetpointProfileData): void {
+    if (!isJsonEqual(newV, this.usedData)) {
+      this.refresh();
+    }
+  }
+
+  created(): void {
+    this.usedData = deepCopy(this.block.data);
+  }
 
   get graphProps(): GraphProps {
     return profileGraphProps(this.block);
   }
 
   refresh(): void {
+    this.usedData = deepCopy(this.block.data);
     this.revision++;
-  }
-
-  mounted(): void {
-    this.$watch('block.data.targetId.id', this.refresh);
-    this.$watch('block.data.enabled', this.refresh);
   }
 }
 </script>
