@@ -23,16 +23,6 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /history"
 
-  sparksimulator:
-    image: brewblox/firmware-simulator:develop
-    init: true
-    ports:
-      - "7376:7376"
-
-  mdns:
-    image: brewblox/brewblox-mdns:develop
-    network_mode: host
-
   emitter:
     image: brewblox/brewblox-emitter:develop
     labels:
@@ -54,7 +44,7 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
-    command: --name=sparkey --device-host=sparksimulator
+    command: --name=sparkey --simulation --device-id=123456789012345678901234
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
@@ -62,7 +52,7 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /spock"
-    command: --name=spock --simulation
+    command: --name=spock --simulation --device-id=432109876543210987654321
 
   traefik:
     image: traefik:v1.7
