@@ -1,32 +1,26 @@
 #! /usr/bin/env bash
 set -e
 
-mkdir -p dev/traefik
-pushd dev/traefik > /dev/null
+pushd "$(dirname "$(readlink -f "$0")")" > /dev/null
+mkdir -p traefik/
+cd traefik/
 
-if [ ! -f brewblox.cnf ]; then
+if [ ! -f brewblox.key ]; then
 
-  # Chrome > 58 requires a subject alt name for the cert
-  cat /usr/lib/ssl/openssl.cnf > brewblox.cnf
-  printf '\n[SAN]\nsubjectAltName=DNS:localhost' >> brewblox.cnf
+  docker run \
+    -v "$(pwd)/":/certs/ \
+    -e SSL_SUBJECT=localhost \
+    -e SSL_KEY=brewblox.key \
+    -e SSL_CERT=brewblox.crt \
+    -e SSL_EXPIRE=365 \
+    -e SSL_DNS=localhost \
+    -e SILENT=true \
+    paulczar/omgwtfssl
 
-  sudo openssl req \
-    -newkey rsa:2048 \
-    -x509 \
-    -nodes \
-    -keyout brewblox.key \
-    -new \
-    -out brewblox.crt \
-    -subj /CN=localhost \
-    -reqexts SAN \
-    -extensions SAN \
-    -config brewblox.cnf \
-    -sha256 \
-    -days 3650
-
-  sudo chown $USER brewblox.key brewblox.crt brewblox.cnf
+  sudo chown "$USER" brewblox.key brewblox.crt
   sudo chmod 644 brewblox.crt
   sudo chmod 600 brewblox.key
+
 fi
 
 popd > /dev/null
