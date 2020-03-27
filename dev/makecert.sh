@@ -7,15 +7,18 @@ cd traefik/
 
 if [ ! -f brewblox.key ]; then
 
-  docker run \
+  docker run -it --rm \
     -v "$(pwd)/":/certs/ \
-    -e SSL_SUBJECT=localhost \
-    -e SSL_KEY=brewblox.key \
-    -e SSL_CERT=brewblox.crt \
-    -e SSL_EXPIRE=365 \
-    -e SSL_DNS=localhost \
-    -e SILENT=true \
-    paulczar/omgwtfssl
+    paulczar/omgwtfssl \
+    openssl \
+    req \
+    -x509 \
+    -nodes \
+    -days 365 \
+    -newkey rsa:2048 \
+    -subj "/C=NL/ST=./L=./O=Brewblox/OU=./CN=."  \
+    -keyout brewblox.key \
+    -out brewblox.crt
 
   sudo chown "$USER" brewblox.key brewblox.crt
   sudo chmod 644 brewblox.crt
