@@ -7,7 +7,7 @@ cd traefik/
 
 if [ ! -f brewblox.key ]; then
 
-  docker run -it --rm \
+  docker run --rm \
     -v "$(pwd)/":/certs/ \
     paulczar/omgwtfssl \
     openssl \
