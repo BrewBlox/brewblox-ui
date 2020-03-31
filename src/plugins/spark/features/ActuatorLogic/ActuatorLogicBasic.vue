@@ -13,7 +13,7 @@ export default class ActuatorLogicBasic
 
   get firmwareError(): null | ExpressionError {
     const { result, errorPos } = this.block.data;
-    const index = errorPos - 1;
+    const index = Math.max(0, errorPos - 1);
     return nonErrorResults.includes(result)
       ? null
       : {
