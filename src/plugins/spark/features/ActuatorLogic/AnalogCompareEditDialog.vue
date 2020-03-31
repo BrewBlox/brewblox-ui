@@ -1,9 +1,8 @@
 <script lang="ts">
-import isNumber from 'lodash/isNumber';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { Temp } from '@/helpers/units';
+import { Temp, Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 
@@ -40,17 +39,17 @@ export default class AnalogCompareEditDialog extends DialogBase {
     return !!block && isCompatible(block.type, interfaceTypes.SetpointSensorPair);
   }
 
-  get rhs(): Temp | number {
+  get rhs(): Unit | number {
     const cmp = this.local!;
     return this.isTemp
       ? new Temp(cmp.rhs).convert(this.tempUnit)
       : cmp.rhs;
   }
 
-  set rhs(v: Temp | number) {
-    this.local!.rhs = isNumber(v)
-      ? v
-      : new Temp(v).convert('degC').value!;
+  set rhs(v: Unit | number) {
+    this.local!.rhs = v instanceof Unit
+      ? new Temp(v).convert('degC').value ?? 0
+      : v;
   }
 
   save(): void {
