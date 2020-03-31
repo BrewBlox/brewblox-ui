@@ -57,7 +57,7 @@ export interface AnalogCompare {
 export interface ActuatorLogicData {
   enabled: boolean;
   result: EvalResult; // readonly
-  errorPos: number;
+  errorPos: number; // readonly
   targetId: Link;
   digital: DigitalCompare[];
   analog: AnalogCompare[];
@@ -66,4 +66,10 @@ export interface ActuatorLogicData {
 
 export interface ActuatorLogicBlock extends Block {
   data: ActuatorLogicData;
+}
+
+export interface ExpressionError {
+  index: number;
+  message: string;
+  indicator: string;
 }

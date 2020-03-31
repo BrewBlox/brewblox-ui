@@ -2,12 +2,16 @@
 import { debounce } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Link, Temp } from '@/helpers/units';
 import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 
+import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
+import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
+import { analogOpTitles, characterTitles, digitalOpTitles, evalResultTitles, nonErrorResults } from './getters';
 import {
   analogEnd,
   analogIdx,
@@ -17,11 +21,7 @@ import {
   digitalEnd,
   digitalIdx,
   digitalKey,
-  ExpressionError,
   keyCode,
-  prettifyAnalogOp,
-  prettifyClause,
-  prettifyDigitalOp,
   sanitize,
   syntaxCheck,
 } from './helpers';
@@ -32,6 +32,7 @@ import {
   DigitalCompare,
   DigitalCompareOp,
   EvalResult,
+  ExpressionError,
 } from './types';
 
 const validTypes: string[] = [
@@ -39,7 +40,12 @@ const validTypes: string[] = [
   interfaceTypes.ProcessValue,
 ];
 
-@Component
+@Component({
+  components: {
+    AnalogCompareEditDialog,
+    DigitalCompareEditDialog,
+  },
+})
 export default class ActuatorLogicFull
   extends BlockCrudComponent<ActuatorLogicBlock> {
 
@@ -71,15 +77,28 @@ export default class ActuatorLogicFull
       .map((cmp, idx) => ({ key: analogKey(idx), cmp }));
   }
 
-  get clauses(): { clause: string; pretty: string }[] {
+  get characters(): { char: string; pretty: string }[] {
     return '()!&|^'
       .split('')
-      .map(clause => ({ clause, pretty: prettifyClause(clause) }));
+      .map(char => ({ char, pretty: characterTitles[char] ?? char }));
+  }
+
+  get firmwareError(): null | ExpressionError {
+    const { result, errorPos } = this.block.data;
+    const index = errorPos - 1;
+    return nonErrorResults.includes(result)
+      ? null
+      : {
+        index,
+        message: evalResultTitles[result],
+        indicator: '-'.repeat(index) + '^',
+      };
   }
 
   get err(): null | ExpressionError {
     return syntaxCheck(this.block.data.expression)
-      ?? comparisonCheck(this.block.data.expression, this.block);
+      ?? comparisonCheck(this.block.data)
+      ?? this.firmwareError;
   }
 
   chipColor(index: number): string {
@@ -105,16 +124,15 @@ export default class ActuatorLogicFull
       this.block.data.analog.push({
         op: AnalogCompareOp.VALUE_GE,
         id: new Link(block.id, block.type),
-        rhs: 50,
+        rhs: 25,
         result: EvalResult.EMPTY,
       });
     }
     this.saveBlock();
   }
 
-
   prettyDigital(cmp: DigitalCompare): string {
-    return `${cmp.id.toString()} ${prettifyDigitalOp(cmp.op)} ${DigitalState[cmp.rhs]}`;
+    return `${cmp.id.toString()} ${digitalOpTitles[cmp.op]} ${DigitalState[cmp.rhs]}`;
   }
 
   prettyAnalog(cmp: AnalogCompare): string {
@@ -123,15 +141,33 @@ export default class ActuatorLogicFull
       ? new Temp(cmp.rhs).convert(this.tempUnit).toString()
       : `${cmp.rhs}`;
 
-    return `${cmp.id.toString()} ${prettifyAnalogOp(cmp.op)} ${rhs}`;
+    return `${cmp.id.toString()} ${analogOpTitles[cmp.op]} ${rhs}`;
   }
 
   editDigital(key: string, cmp: DigitalCompare): void {
-    console.log(key);
+    createDialog({
+      component: DigitalCompareEditDialog,
+      serviceId: this.serviceId,
+      title: 'Edit comparison',
+      value: cmp,
+    })
+      .onOk(cmp => {
+        this.block.data.analog.splice(digitalIdx(key), 1, cmp);
+        this.saveBlock();
+      });
   }
 
   editAnalog(key: string, cmp: AnalogCompare): void {
-    console.log(key);
+    createDialog({
+      component: AnalogCompareEditDialog,
+      serviceId: this.serviceId,
+      title: 'Edit comparison',
+      value: cmp,
+    })
+      .onOk(cmp => {
+        this.block.data.analog.splice(analogIdx(key), 1, cmp);
+        this.saveBlock();
+      });
   }
 
   removeDigital(key: string): void {
@@ -221,16 +257,17 @@ export default class ActuatorLogicFull
         </div>
       </LabeledField>
 
-      <LabeledField label="Add clause">
+      <LabeledField label="Add character">
         <div class="row wrap q-gutter-xs">
           <q-chip
-            v-for="{clause, pretty} in clauses"
-            :key="`suggestion-${clause}`"
+            v-for="{char, pretty} in characters"
+            :key="`suggestion-${char}`"
             class="hoverable"
             color="blue-grey-8"
-            @click.native="block.data.expression += clause; saveBlock()"
+            @click.native="saveExpression(block.data.expression + char)"
           >
-            {{ pretty }}
+            {{ char }}
+            <q-tooltip>{{ pretty }}</q-tooltip>
           </q-chip>
         </div>
       </LabeledField>
@@ -261,9 +298,7 @@ export default class ActuatorLogicFull
 </template>
 
 <style lang="sass">
-.expression-editor .q-field__native
-  font-family: "Lucida Console", Monaco, monospace
-
+.expression-editor .q-field__native,
 .error-indicator
   font-family: "Lucida Console", Monaco, monospace
 </style>
