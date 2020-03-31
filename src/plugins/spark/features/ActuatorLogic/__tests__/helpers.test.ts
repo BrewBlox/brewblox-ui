@@ -25,6 +25,7 @@ describe('Check symbol syntax', () => {
     expect(syntaxCheck(')(')).toMatchObject({ index: 0 });
     expect(syntaxCheck('(A&a)|(A')).toMatchObject({ index: 7 });
     expect(syntaxCheck('(A&a))')).toMatchObject({ index: 5 });
+    expect(syntaxCheck('(((a))&b)')).toBe(null);
   });
 
   it('should check empty brackets', () => {
