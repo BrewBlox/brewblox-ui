@@ -13,16 +13,13 @@ import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { analogOpTitles, characterTitles, digitalOpTitles, evalResultTitles, nonErrorResults } from './getters';
 import {
-  analogEnd,
   analogIdx,
   analogKey,
-  codeKey,
   comparisonCheck,
-  digitalEnd,
   digitalIdx,
   digitalKey,
-  keyCode,
   sanitize,
+  shiftRemainingComparisons,
   syntaxCheck,
 } from './helpers';
 import {
@@ -67,6 +64,12 @@ export default class ActuatorLogicFull
       .filter(block => isCompatible(block.type, validTypes));
   }
 
+  get characters(): { char: string; pretty: string }[] {
+    return '()!&|^'
+      .split('')
+      .map(char => ({ char, pretty: characterTitles[char] ?? char }));
+  }
+
   get digital(): { key: string; cmp: DigitalCompare }[] {
     return this.block.data.digital
       .map((cmp, idx) => ({ key: digitalKey(idx), cmp }));
@@ -75,12 +78,6 @@ export default class ActuatorLogicFull
   get analog(): { key: string; cmp: AnalogCompare }[] {
     return this.block.data.analog
       .map((cmp, idx) => ({ key: analogKey(idx), cmp }));
-  }
-
-  get characters(): { char: string; pretty: string }[] {
-    return '()!&|^'
-      .split('')
-      .map(char => ({ char, pretty: characterTitles[char] ?? char }));
   }
 
   get firmwareError(): null | ExpressionError {
@@ -171,31 +168,16 @@ export default class ActuatorLogicFull
   }
 
   removeDigital(key: string): void {
-    const code = keyCode(key);
     this.block.data.digital.splice(digitalIdx(key), 1);
-    this.block.data.expression = this.expression
-      .split('')
-      .map(v => v === key ? '?' : v)
-      .map(keyCode)
-      .map(v => code < v && v <= digitalEnd ? v - 1 : v)
-      .map(codeKey)
-      .join('');
+    this.block.data.expression = shiftRemainingComparisons(this.expression, key);
     this.saveBlock();
   }
 
   removeAnalog(key: string): void {
-    const code = keyCode(key);
     this.block.data.analog.splice(analogIdx(key), 1);
-    this.block.data.expression = this.expression
-      .split('')
-      .map(v => v === key ? '?' : v)
-      .map(keyCode)
-      .map(v => code < v && v <= analogEnd ? v - 1 : v)
-      .map(codeKey)
-      .join('');
+    this.block.data.expression = shiftRemainingComparisons(this.expression, key);
     this.saveBlock();
   }
-
 }
 </script>
 

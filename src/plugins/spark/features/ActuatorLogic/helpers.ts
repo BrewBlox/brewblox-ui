@@ -29,6 +29,9 @@ export const isDigital = (s: string): boolean =>
 export const isAnalog = (s: string): boolean =>
   analogStart <= keyCode(s) && keyCode(s) <= analogEnd;
 
+export const isKey = (s: string): boolean =>
+  isDigital(s) || isAnalog(s);
+
 export const sanitize = (expression: string): string =>
   expression.replace(/[^a-zA-Z\(\)\^\|!&]/g, '');
 
@@ -115,9 +118,9 @@ export function syntaxCheck(expression: string): ExpressionError | null {
   return null;
 }
 
-export function comparisonCheck(
-  data: Pick<ActuatorLogicData, 'expression' | 'digital' | 'analog'>
-): ExpressionError | null {
+type ComparisonData = Pick<ActuatorLogicData, 'expression' | 'digital' | 'analog'>;
+
+export function comparisonCheck(data: ComparisonData): ExpressionError | null {
   const numDigital = data.digital.length;
   const numAnalog = data.analog.length;
   for (let idx = 0; idx < data.expression.length; idx++) {
@@ -130,4 +133,32 @@ export function comparisonCheck(
     }
   }
   return null;
+}
+
+/**
+ * Whenever a comparison is removed from data.digital / data.analog,
+ * all other comparisons are shifted down. This changes their comparison ref key.
+ *
+ * This function updates the expression to take this change into account.
+ * All "later" refs are shifted one down. Eg. C -> B.
+ *
+ * All references to the removed key are replaced with the invalid character '?'.
+ *
+ * @param expression Logic operator expression
+ * @param key Removed comparison
+ * @returns the updated expression
+ */
+export function shiftRemainingComparisons(expression: string, key: string): string {
+  if (!isKey(key)) {
+    return expression;
+  }
+  const code = keyCode(key);
+  const end = isDigital(key) ? digitalEnd : analogEnd;
+  return expression
+    .split('')
+    .map(v => v === key ? '?' : v)
+    .map(keyCode)
+    .map(v => code < v && v <= end ? v - 1 : v)
+    .map(codeKey)
+    .join('');
 }
