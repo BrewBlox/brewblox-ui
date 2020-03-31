@@ -220,7 +220,19 @@ export default class ActuatorLogicFull
         type="text"
         class="expression-editor"
         @input="saveExpression"
-      />
+      >
+        <template #append>
+          <q-btn
+            v-if="expression.length"
+            :ripple="false"
+            flat
+            round
+            icon="mdi-backspace"
+            class="hoverless"
+            @click="saveExpression(expression.substring(0, expression.length -1))"
+          />
+        </template>
+      </q-input>
 
       <div v-if="err" class="error-indicator q-pa-md text-negative">
         <div>{{ expression }}</div>
@@ -269,10 +281,32 @@ export default class ActuatorLogicFull
             {{ char }}
             <q-tooltip>{{ pretty }}</q-tooltip>
           </q-chip>
+          <q-chip
+            v-for="{key, cmp} in digital"
+            :key="`digital-add-${key}`"
+            class="hoverable text-bold"
+            color="blue-grey-8"
+            text-color="lime-6"
+            @click.native="saveExpression(block.data.expression + key)"
+          >
+            {{ key }}
+            <q-tooltip>{{ prettyDigital(cmp) }}</q-tooltip>
+          </q-chip>
+          <q-chip
+            v-for="{key, cmp} in analog"
+            :key="`analog-add-${key}`"
+            class="hoverable text-bold"
+            color="blue-grey-8"
+            text-color="orange-6"
+            @click.native="saveExpression(block.data.expression + key)"
+          >
+            {{ key }}
+            <q-tooltip>{{ prettyAnalog(cmp) }}</q-tooltip>
+          </q-chip>
         </div>
       </LabeledField>
 
-      <LabeledField label="Add comparison">
+      <LabeledField label="Create comparison">
         <div class="row wrap q-gutter-xs">
           <q-chip
             v-for="block in validBlocks"
@@ -301,4 +335,7 @@ export default class ActuatorLogicFull
 .expression-editor .q-field__native,
 .error-indicator
   font-family: "Lucida Console", Monaco, monospace
+
+.hoverless > .q-focus-helper
+  opacity: 0 !important
 </style>
