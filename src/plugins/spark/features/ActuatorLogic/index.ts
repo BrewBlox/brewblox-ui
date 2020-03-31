@@ -7,13 +7,14 @@ import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorLogicWidget.vue';
 import { typeName } from './getters';
-import { ActuatorLogicData } from './types';
+import { ActuatorLogicData, EvalResult } from './types';
 
 const block: BlockSpec<ActuatorLogicData> = {
   id: typeName,
   generate: () => ({
     enabled: true,
-    result: false,
+    result: EvalResult.EMPTY,
+    errorPos: 0,
     targetId: new Link(null, interfaceTypes.ActuatorDigital),
     analog: [],
     digital: [],

@@ -33,5 +33,7 @@ describe('Check symbol syntax', () => {
     expect(syntaxCheck('a|!!&A')).toMatchObject({ index: 4 });
     expect(syntaxCheck('A&|A')).toMatchObject({ index: 2 });
     expect(syntaxCheck('(A&A)a')).toMatchObject({ index: 5 });
+    expect(syntaxCheck('(A)!')).toMatchObject({ index: 3 });
+    expect(syntaxCheck('a&')).toMatchObject({ index: 1 });
   });
 });

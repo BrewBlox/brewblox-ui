@@ -52,13 +52,7 @@ export default class ActuatorLogicWidget
             <q-btn text-color="white" flat label="Enable" @click="enable" />
           </template>
         </CardWarning>
-        <BlockEnableToggle
-          v-else
-          :crud="crud"
-          :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
-          ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"
-          :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
-        />
+        <BlockEnableToggle v-else :crud="crud" />
       </template>
     </component>
   </GraphCardWrapper>

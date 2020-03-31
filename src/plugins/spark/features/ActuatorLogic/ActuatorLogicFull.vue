@@ -1,107 +1,85 @@
 <script lang="ts">
+import { debounce } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
-import { Link } from '@/helpers/units';
+import { Link, Temp } from '@/helpers/units';
 import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 
-import { ExpressionError, prettifySingle, syntaxCheck } from './helpers';
-import { ActuatorLogicBlock, AnalogCompare, AnalogCompareOp, DigitalCompare, DigitalCompareOp } from './types';
+import {
+  analogEnd,
+  analogIdx,
+  analogKey,
+  codeKey,
+  comparisonCheck,
+  digitalEnd,
+  digitalIdx,
+  digitalKey,
+  ExpressionError,
+  keyCode,
+  prettifyAnalogOp,
+  prettifyClause,
+  prettifyDigitalOp,
+  sanitize,
+  syntaxCheck,
+} from './helpers';
+import {
+  ActuatorLogicBlock,
+  AnalogCompare,
+  AnalogCompareOp,
+  DigitalCompare,
+  DigitalCompareOp,
+  EvalResult,
+} from './types';
 
-const digitalPrettyOp: Record<DigitalCompareOp, string> = {
-  [DigitalCompareOp.VALUE_IS]: '==',
-  [DigitalCompareOp.VALUE_ISNOT]: '!=',
-  [DigitalCompareOp.DESIRED_IS]: '==',
-  [DigitalCompareOp.DESIRED_ISNOT]: '!=',
-};
-
-const analogPrettyOp: Record<AnalogCompareOp, string> = {
-  [AnalogCompareOp.VALUE_LE]: '<=',
-  [AnalogCompareOp.VALUE_GE]: '>=',
-  [AnalogCompareOp.VALUE_LT]: '<',
-  [AnalogCompareOp.VALUE_GT]: '>',
-  [AnalogCompareOp.SETTING_LE]: '<=',
-  [AnalogCompareOp.SETTING_GE]: '>=',
-  [AnalogCompareOp.SETTING_LT]: '<',
-  [AnalogCompareOp.SETTING_GT]: '>',
-};
+const validTypes: string[] = [
+  interfaceTypes.ActuatorDigital,
+  interfaceTypes.ProcessValue,
+];
 
 @Component
 export default class ActuatorLogicFull
   extends BlockCrudComponent<ActuatorLogicBlock> {
 
-  validTypes: string[] = [
-    interfaceTypes.ActuatorDigital,
-    interfaceTypes.ProcessValue,
-  ]
+  saveExpression = (expr: string) => { void expr; }
+
+  created(): void {
+    this.saveExpression = debounce((expr: string) => {
+      this.block.data.expression = sanitize(expr ?? '');
+      this.saveBlock();
+    }, 200);
+  }
+
+  get tempUnit(): string {
+    return sparkStore.units(this.serviceId).Temp;
+  }
 
   get validBlocks(): Block[] {
     return sparkStore.blockValues(this.serviceId)
-      .filter(block => isCompatible(block.type, this.validTypes));
+      .filter(block => isCompatible(block.type, validTypes));
   }
 
-  compareIndex(s: string): number {
-    return s.toLowerCase().charCodeAt(0) - 96;
+  get digital(): { key: string; cmp: DigitalCompare }[] {
+    return this.block.data.digital
+      .map((cmp, idx) => ({ key: digitalKey(idx), cmp }));
   }
 
-  get digitalCompares(): DigitalCompare[] {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => isCompatible(block.type, interfaceTypes.ActuatorDigital))
-      .map(block => ({
-        op: DigitalCompareOp.VALUE_IS,
-        id: new Link(block.id, block.type),
-        rhs: DigitalState.Active,
-      }));
+  get analog(): { key: string; cmp: AnalogCompare }[] {
+    return this.block.data.analog
+      .map((cmp, idx) => ({ key: analogKey(idx), cmp }));
   }
 
-  get analogCompares(): AnalogCompare[] {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => isCompatible(block.type, interfaceTypes.ProcessValue))
-      .map(block => ({
-        op: AnalogCompareOp.VALUE_GE,
-        id: new Link(block.id, block.type),
-        rhs: 50,
-        threshold: 1,
-      }));
-  }
-
-  get expression(): string[] {
-    return this.block.data.expression.split('');
-  }
-
-  set expression(expr: string[]) {
-    this.block.data.expression = expr.join('');
-    this.saveBlock();
-  }
-
-  prettifyCompare(s: string): string {
-    console.log(s, this.compareIndex(s));
-    if (/[a-z]/.test(s)) {
-      const cmp = this.digitalCompares[this.compareIndex(s)];
-      return cmp
-        ? `${cmp.id?.id} ${digitalPrettyOp[cmp.op]} ${DigitalState[cmp.rhs]}`
-        : s;
-    }
-    else {
-      const cmp = this.analogCompares[this.compareIndex(s)];
-      return cmp
-        ? `${cmp.id?.id} ${analogPrettyOp[cmp.op]} ${cmp.rhs}`
-        : s;
-    }
-  }
-
-  prettify(s: string): string {
-    return prettifySingle(s) ?? this.prettifyCompare(s);
-  }
-
-  get clauses(): string[] {
-    return '()!&|^'.split('');
+  get clauses(): { clause: string; pretty: string }[] {
+    return '()!&|^'
+      .split('')
+      .map(clause => ({ clause, pretty: prettifyClause(clause) }));
   }
 
   get err(): null | ExpressionError {
-    return syntaxCheck(this.block.data.expression);
+    return syntaxCheck(this.block.data.expression)
+      ?? comparisonCheck(this.block.data.expression, this.block);
   }
 
   chipColor(index: number): string {
@@ -109,6 +87,79 @@ export default class ActuatorLogicFull
       ? 'negative'
       : 'blue-grey-8';
   }
+
+  get expression(): string {
+    return this.block.data.expression;
+  }
+
+  addComparison(block: Block): void {
+    if (isCompatible(block.type, interfaceTypes.ActuatorDigital)) {
+      this.block.data.digital.push({
+        op: DigitalCompareOp.VALUE_IS,
+        id: new Link(block.id, block.type),
+        rhs: DigitalState.Active,
+        result: EvalResult.EMPTY,
+      });
+    }
+    if (isCompatible(block.type, interfaceTypes.ProcessValue)) {
+      this.block.data.analog.push({
+        op: AnalogCompareOp.VALUE_GE,
+        id: new Link(block.id, block.type),
+        rhs: 50,
+        result: EvalResult.EMPTY,
+      });
+    }
+    this.saveBlock();
+  }
+
+
+  prettyDigital(cmp: DigitalCompare): string {
+    return `${cmp.id.toString()} ${prettifyDigitalOp(cmp.op)} ${DigitalState[cmp.rhs]}`;
+  }
+
+  prettyAnalog(cmp: AnalogCompare): string {
+    const block = sparkStore.tryBlockById(this.serviceId, cmp.id.id);
+    const rhs = block && isCompatible(block.type, interfaceTypes.SetpointSensorPair)
+      ? new Temp(cmp.rhs).convert(this.tempUnit).toString()
+      : `${cmp.rhs}`;
+
+    return `${cmp.id.toString()} ${prettifyAnalogOp(cmp.op)} ${rhs}`;
+  }
+
+  editDigital(key: string, cmp: DigitalCompare): void {
+    console.log(key);
+  }
+
+  editAnalog(key: string, cmp: AnalogCompare): void {
+    console.log(key);
+  }
+
+  removeDigital(key: string): void {
+    const code = keyCode(key);
+    this.block.data.digital.splice(digitalIdx(key), 1);
+    this.block.data.expression = this.expression
+      .split('')
+      .map(v => v === key ? '?' : v)
+      .map(keyCode)
+      .map(v => code < v && v <= digitalEnd ? v - 1 : v)
+      .map(codeKey)
+      .join('');
+    this.saveBlock();
+  }
+
+  removeAnalog(key: string): void {
+    const code = keyCode(key);
+    this.block.data.analog.splice(analogIdx(key), 1);
+    this.block.data.expression = this.expression
+      .split('')
+      .map(v => v === key ? '?' : v)
+      .map(keyCode)
+      .map(v => code < v && v <= analogEnd ? v - 1 : v)
+      .map(codeKey)
+      .join('');
+    this.saveBlock();
+  }
+
 }
 </script>
 
@@ -123,54 +174,63 @@ export default class ActuatorLogicFull
     </slot>
 
     <div class="widget-body">
-      <LabeledField label="Expression">
+      <q-input
+        :value="expression"
+        label="Expression"
+        title="Expression"
+        item-aligned
+        clearable
+        placeholder="(a|b)&amp;(c^d)&amp;!e"
+        type="text"
+        class="expression-editor"
+        @input="saveExpression"
+      />
+
+      <div v-if="err" class="error-indicator q-pa-md text-negative">
+        <div>{{ expression }}</div>
+        <div>{{ err.indicator }}</div>
+        <div>{{ err.message }}</div>
+      </div>
+
+      <LabeledField label="Active comparisons">
         <div class="row wrap q-gutter-xs">
-          <div v-for="(expr, idx) in expression" :key="`clause-${idx}`">
-            {{ prettify(expr) }}
-          </div>
+          <q-chip
+            v-for="{key, cmp} in digital"
+            :key="`digital-${key}`"
+            removable
+            class="hoverable"
+            color="blue-grey-8"
+            @click.native="editDigital(key, cmp)"
+            @remove="removeDigital(key)"
+          >
+            <b class="text-lime-6 q-mr-sm">{{ key }}</b>
+            {{ prettyDigital(cmp) }}
+          </q-chip>
+          <q-chip
+            v-for="{key, cmp} in analog"
+            :key="`analog-${key}`"
+            removable
+            class="hoverable"
+            color="blue-grey-8"
+            @click.native="editAnalog(key, cmp)"
+            @remove="removeAnalog(key)"
+          >
+            <b class="text-orange-6 q-mr-sm">{{ key }}</b>
+            {{ prettyAnalog(cmp) }}
+          </q-chip>
         </div>
       </LabeledField>
-
-      <q-separator inset />
-
-      <q-select
-        v-model="expression"
-        multiple
-        use-chips
-        stack-label
-        label="Expression editor"
-        item-aligned
-        use-input
-        hide-dropdown-icon
-        new-value-mode="add"
-        :error="err !== null"
-        :error-message="err && err.message"
-      >
-        <template #selected-item="scope">
-          <q-chip
-            removable
-            dense
-            :tabindex="scope.tabindex"
-            :color="chipColor(scope.index)"
-            class="q-ma-xs"
-            @remove="scope.removeAtIndex(scope.index)"
-          >
-            <div class="q-pa-sm">
-              {{ prettify(scope.opt) }}
-            </div>
-          </q-chip>
-        </template>
-      </q-select>
 
       <LabeledField label="Add clause">
         <div class="row wrap q-gutter-xs">
           <q-chip
-            v-for="clause in clauses"
+            v-for="{clause, pretty} in clauses"
             :key="`suggestion-${clause}`"
             class="hoverable"
             color="blue-grey-8"
+            @click.native="block.data.expression += clause; saveBlock()"
           >
-            {{ prettify(clause) }}
+            {{ pretty }}
           </q-chip>
         </div>
       </LabeledField>
@@ -178,15 +238,32 @@ export default class ActuatorLogicFull
       <LabeledField label="Add comparison">
         <div class="row wrap q-gutter-xs">
           <q-chip
-            v-for="{id} in validBlocks"
-            :key="`block-${id}`"
+            v-for="block in validBlocks"
+            :key="`block-${block.id}`"
             class="hoverable"
             color="blue-grey-8"
+            @click.native="addComparison(block)"
           >
-            {{ id }}
+            {{ block.id }}
           </q-chip>
         </div>
       </LabeledField>
+
+      <LinkField
+        :value="block.data.targetId"
+        :service-id="serviceId"
+        title="target"
+        label="Digital Actuator Target"
+        @input="v => { block.data.targetId = v; saveBlock(); }"
+      />
     </div>
   </div>
 </template>
+
+<style lang="sass">
+.expression-editor .q-field__native
+  font-family: "Lucida Console", Monaco, monospace
+
+.error-indicator
+  font-family: "Lucida Console", Monaco, monospace
+</style>
