@@ -35,18 +35,17 @@ export const analogOpTitles: Record<AnalogCompareOp, string> = {
 export const evalResultTitles: Record<EvalResult, string> = {
   [EvalResult.FALSE]: 'Output is OFF',
   [EvalResult.TRUE]: 'Output is ON',
+  [EvalResult.EMPTY]: 'Expression empty: output is OFF',
+  [EvalResult.EMPTY_SUBSTRING]: 'Empty sub-expression',
   [EvalResult.INVALID_DIGITAL_OP]: 'Invalid operator',
   [EvalResult.INVALID_ANALOG_OP]: 'Invalid operator',
   [EvalResult.BLOCK_NOT_FOUND]: 'Block not found',
-  [EvalResult.INVALID_EXPRESSION]: 'Invalid expression',
-  [EvalResult.INVALID_DIG_COMPARE_IDX]: 'Invalid digital comparison',
   [EvalResult.INVALID_ANA_COMPARE_IDX]: 'Invalid analog comparison',
-  [EvalResult.UNEXPECTED_END]: 'Unexpected end of expression',
+  [EvalResult.INVALID_DIG_COMPARE_IDX]: 'Invalid digital comparison',
   [EvalResult.UNEXPECTED_CLOSING_BRACKET]: 'Unexpected closing bracket',
   [EvalResult.MISSING_CLOSING_BRACKET]: 'Missing closing bracket',
   [EvalResult.UNEXPECTED_OPENING_BRACKET]: 'Unexpected opening bracket',
   [EvalResult.UNEXPECTED_CHARACTER]: 'Unexpected character',
-  [EvalResult.EMPTY]: 'Expression empty: output is OFF',
 };
 
 export const nonErrorResults: EvalResult[] = [
