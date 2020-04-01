@@ -20,7 +20,6 @@ import {
   digitalKey,
   prettyAnalog,
   prettyDigital,
-  sanitize,
   shiftRemainingComparisons,
   syntaxCheck,
 } from './helpers';
@@ -52,7 +51,7 @@ export default class ActuatorLogicFull
 
   created(): void {
     this.saveExpression = debounce((expr: string) => {
-      this.block.data.expression = sanitize(expr ?? '');
+      this.block.data.expression = expr ?? '';
       this.saveBlock();
     }, 200);
   }
