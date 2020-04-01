@@ -208,7 +208,12 @@ export interface AnalogConstraintsObj {
   constraints: AnalogConstraint[];
 }
 
-export type DigitalConstraintKey = 'minOff' | 'minOn' | 'mutexed';
+export type DigitalConstraintKey =
+  'mutexed'
+  | 'minOff'
+  | 'minOn'
+  | 'delayedOff'
+  | 'delayedOn';
 
 export interface MinOnConstraint {
   remaining: Unit;
@@ -230,10 +235,22 @@ export interface MutexedConstraint {
   };
 }
 
+export interface DelayedOnConstraint {
+  remaining: Unit;
+  delayedOn: Unit;
+}
+
+export interface DelayedOffConstraint {
+  remaining: Unit;
+  delayedOff: Unit;
+}
+
 export type DigitalConstraint =
-  MinOnConstraint
+  MutexedConstraint
+  | MinOnConstraint
   | MinOffConstraint
-  | MutexedConstraint;
+  | DelayedOnConstraint
+  | DelayedOffConstraint;
 
 export interface DigitalConstraintsObj {
   constraints: DigitalConstraint[];
