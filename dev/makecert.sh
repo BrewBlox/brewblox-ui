@@ -6,24 +6,10 @@ mkdir -p traefik/
 cd traefik/
 
 if [ ! -f brewblox.key ]; then
-
-  docker run --rm \
-    -v "$(pwd)/":/certs/ \
-    paulczar/omgwtfssl \
-    openssl \
-    req \
-    -x509 \
-    -nodes \
-    -days 365 \
-    -newkey rsa:2048 \
-    -subj "/C=NL/ST=./L=./O=Brewblox/OU=./CN=."  \
-    -keyout brewblox.key \
-    -out brewblox.crt
-
+  docker run --rm -v "$(pwd)/":/certs/ brewblox/omgwtfssl:develop
   sudo chown "$USER" brewblox.key brewblox.crt
   sudo chmod 644 brewblox.crt
   sudo chmod 600 brewblox.key
-
 fi
 
 popd > /dev/null
