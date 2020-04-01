@@ -1,8 +1,7 @@
 import { Temp } from '@/helpers/units';
 import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
-import { DigitalState } from '@/plugins/spark/types';
 
-import { analogOpTitles, digitalOpTitles } from './getters';
+import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './getters';
 import { ActuatorLogicData, AnalogCompare, DigitalCompare, ExpressionError } from './types';
 
 export const keyCode = (s: string): number =>
@@ -169,7 +168,7 @@ export function shiftRemainingComparisons(expression: string, key: string): stri
 }
 
 export function prettyDigital(cmp: DigitalCompare): string {
-  return `${cmp.id.toString()} ${digitalOpTitles[cmp.op]} ${DigitalState[cmp.rhs]}`;
+  return `${cmp.id.toString()} ${digitalOpTitles[cmp.op]} ${digitalStateTitles[cmp.rhs]}`;
 }
 
 export function prettyAnalog(cmp: AnalogCompare, blockType: string | null, tempUnit: string): string {

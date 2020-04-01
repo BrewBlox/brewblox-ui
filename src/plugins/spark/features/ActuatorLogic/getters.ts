@@ -1,3 +1,4 @@
+import { DigitalState } from '../../types';
 import { AnalogCompareOp, DigitalCompareOp, EvalResult } from './types';
 
 export const typeName = 'ActuatorLogic';
@@ -11,18 +12,24 @@ export const characterTitles = {
   '!': 'Logical NOT',
 };
 
+export const digitalStateTitles: Record<DigitalState, string> = {
+  [DigitalState.Active]: 'ON',
+  [DigitalState.Inactive]: 'OFF',
+  [DigitalState.Unknown]: 'UNKNOWN',
+};
+
 export const digitalOpTitles: Record<DigitalCompareOp, string> = {
-  [DigitalCompareOp.VALUE_IS]: 'State IS',
-  [DigitalCompareOp.VALUE_ISNOT]: 'State IS NOT',
-  [DigitalCompareOp.DESIRED_IS]: 'Desired IS',
-  [DigitalCompareOp.DESIRED_ISNOT]: 'Desired IS NOT',
+  [DigitalCompareOp.VALUE_IS]: 'Measured state ==',
+  [DigitalCompareOp.VALUE_ISNOT]: 'Measured state !=',
+  [DigitalCompareOp.DESIRED_IS]: 'Desired state ==',
+  [DigitalCompareOp.DESIRED_ISNOT]: 'Desired state !=',
 };
 
 export const analogOpTitles: Record<AnalogCompareOp, string> = {
-  [AnalogCompareOp.VALUE_LE]: '<= Value',
-  [AnalogCompareOp.VALUE_GE]: '>= Value',
-  [AnalogCompareOp.SETTING_LE]: '<= Setting',
-  [AnalogCompareOp.SETTING_GE]: '>= Setting',
+  [AnalogCompareOp.VALUE_LE]: 'Measured value <=',
+  [AnalogCompareOp.VALUE_GE]: 'Measured value >=',
+  [AnalogCompareOp.SETTING_LE]: 'Setting <=',
+  [AnalogCompareOp.SETTING_GE]: 'Setting >=',
 };
 
 export const evalResultTitles: Record<EvalResult, string> = {
