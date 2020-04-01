@@ -21,7 +21,6 @@ export default class ActuatorPwmBasic
       && this.block.data.setting !== this.block.data.desiredSetting;
   }
 
-
   editSetting(): void {
     if (this.isDriven) { return; }
     createDialog({

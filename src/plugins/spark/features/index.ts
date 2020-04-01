@@ -1,6 +1,7 @@
 import { SparkFeature } from '@/plugins/spark/types';
 
 import ActuatorAnalogMock from './ActuatorAnalogMock';
+import ActuatorLogic from './ActuatorLogic';
 import ActuatorOffset from './ActuatorOffset';
 import ActuatorPwm from './ActuatorPwm';
 import Balancer from './Balancer';
@@ -23,6 +24,7 @@ import TempSensorOneWire from './TempSensorOneWire';
 
 const features: { [id: string]: SparkFeature } = {
   ActuatorAnalogMock,
+  ActuatorLogic,
   ActuatorOffset,
   ActuatorPwm,
   Balancer,
