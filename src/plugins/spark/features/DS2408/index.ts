@@ -28,9 +28,8 @@ const feature: WidgetFeature = {
     cols: 4,
     rows: 3,
   },
-  // Discovered objects can't be created or removed
+  // Discovered objects can't be created
   wizard: false,
-  removeActions: undefined,
 };
 
 export default { feature, block };
