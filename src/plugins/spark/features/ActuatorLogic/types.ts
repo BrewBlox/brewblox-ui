@@ -59,6 +59,7 @@ export interface ActuatorLogicData {
   result: EvalResult; // readonly
   errorPos: number; // readonly
   targetId: Link;
+  drivenTargetId: Link; // readonly
   digital: DigitalCompare[];
   analog: AnalogCompare[];
   expression: string; // a-zA-Z&|^!()

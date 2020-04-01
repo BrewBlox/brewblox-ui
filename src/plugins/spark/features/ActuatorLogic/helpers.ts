@@ -1,4 +1,9 @@
-import { ActuatorLogicData, ExpressionError } from './types';
+import { Temp } from '@/helpers/units';
+import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
+import { DigitalState } from '@/plugins/spark/types';
+
+import { analogOpTitles, digitalOpTitles } from './getters';
+import { ActuatorLogicData, AnalogCompare, DigitalCompare, ExpressionError } from './types';
 
 export const keyCode = (s: string): number =>
   s.charCodeAt(0);
@@ -161,4 +166,16 @@ export function shiftRemainingComparisons(expression: string, key: string): stri
     .map(v => code < v && v <= end ? v - 1 : v)
     .map(codeKey)
     .join('');
+}
+
+export function prettyDigital(cmp: DigitalCompare): string {
+  return `${cmp.id.toString()} ${digitalOpTitles[cmp.op]} ${DigitalState[cmp.rhs]}`;
+}
+
+export function prettyAnalog(cmp: AnalogCompare, blockType: string | null, tempUnit: string): string {
+  const rhs = isCompatible(blockType, interfaceTypes.SetpointSensorPair)
+    ? new Temp(cmp.rhs).convert(tempUnit).toString()
+    : `${cmp.rhs}`;
+
+  return `${cmp.id.toString()} ${analogOpTitles[cmp.op]} ${rhs}`;
 }

@@ -3,7 +3,7 @@ import { debounce } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Link, Temp } from '@/helpers/units';
+import { Link } from '@/helpers/units';
 import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { sparkStore } from '@/plugins/spark/store';
@@ -11,13 +11,15 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
-import { analogOpTitles, characterTitles, digitalOpTitles, evalResultTitles, nonErrorResults } from './getters';
+import { characterTitles, evalResultTitles, nonErrorResults } from './getters';
 import {
   analogIdx,
   analogKey,
   comparisonCheck,
   digitalIdx,
   digitalKey,
+  prettyAnalog,
+  prettyDigital,
   sanitize,
   shiftRemainingComparisons,
   syntaxCheck,
@@ -70,14 +72,26 @@ export default class ActuatorLogicFull
       .map(char => ({ char, pretty: characterTitles[char] ?? char }));
   }
 
-  get digital(): { key: string; cmp: DigitalCompare }[] {
+  get digital(): { key: string; cmp: DigitalCompare; pretty: string }[] {
     return this.block.data.digital
-      .map((cmp, idx) => ({ key: digitalKey(idx), cmp }));
+      .map((cmp, idx) => ({
+        cmp,
+        key: digitalKey(idx),
+        pretty: prettyDigital(cmp),
+      }));
   }
 
-  get analog(): { key: string; cmp: AnalogCompare }[] {
+  get analog(): { key: string; cmp: AnalogCompare; pretty: string }[] {
     return this.block.data.analog
-      .map((cmp, idx) => ({ key: analogKey(idx), cmp }));
+      .map((cmp, idx) => ({
+        cmp,
+        key: analogKey(idx),
+        pretty: prettyAnalog(
+          cmp,
+          sparkStore.tryBlockById(this.serviceId, cmp.id.id)?.type ?? null,
+          this.tempUnit,
+        ),
+      }));
   }
 
   get firmwareError(): null | ExpressionError {
@@ -117,7 +131,7 @@ export default class ActuatorLogicFull
         result: EvalResult.EMPTY,
       });
     }
-    if (isCompatible(block.type, interfaceTypes.ProcessValue)) {
+    else if (isCompatible(block.type, interfaceTypes.ProcessValue)) {
       this.block.data.analog.push({
         op: AnalogCompareOp.VALUE_GE,
         id: new Link(block.id, block.type),
@@ -128,19 +142,6 @@ export default class ActuatorLogicFull
     this.saveBlock();
   }
 
-  prettyDigital(cmp: DigitalCompare): string {
-    return `${cmp.id.toString()} ${digitalOpTitles[cmp.op]} ${DigitalState[cmp.rhs]}`;
-  }
-
-  prettyAnalog(cmp: AnalogCompare): string {
-    const block = sparkStore.tryBlockById(this.serviceId, cmp.id.id);
-    const rhs = block && isCompatible(block.type, interfaceTypes.SetpointSensorPair)
-      ? new Temp(cmp.rhs).convert(this.tempUnit).toString()
-      : `${cmp.rhs}`;
-
-    return `${cmp.id.toString()} ${analogOpTitles[cmp.op]} ${rhs}`;
-  }
-
   editDigital(key: string, cmp: DigitalCompare): void {
     createDialog({
       component: DigitalCompareEditDialog,
@@ -149,7 +150,7 @@ export default class ActuatorLogicFull
       value: cmp,
     })
       .onOk(cmp => {
-        this.block.data.analog.splice(digitalIdx(key), 1, cmp);
+        this.block.data.digital.splice(digitalIdx(key), 1, cmp);
         this.saveBlock();
       });
   }
@@ -225,7 +226,7 @@ export default class ActuatorLogicFull
       <LabeledField label="Active comparisons">
         <div class="row wrap q-gutter-xs">
           <q-chip
-            v-for="{key, cmp} in digital"
+            v-for="{key, cmp, pretty} in digital"
             :key="`digital-${key}`"
             removable
             class="hoverable"
@@ -234,10 +235,10 @@ export default class ActuatorLogicFull
             @remove="removeDigital(key)"
           >
             <b class="text-lime-6 q-mr-sm">{{ key }}</b>
-            {{ prettyDigital(cmp) }}
+            {{ pretty }}
           </q-chip>
           <q-chip
-            v-for="{key, cmp} in analog"
+            v-for="{key, cmp, pretty} in analog"
             :key="`analog-${key}`"
             removable
             class="hoverable"
@@ -246,7 +247,7 @@ export default class ActuatorLogicFull
             @remove="removeAnalog(key)"
           >
             <b class="text-orange-6 q-mr-sm">{{ key }}</b>
-            {{ prettyAnalog(cmp) }}
+            {{ pretty }}
           </q-chip>
         </div>
       </LabeledField>
@@ -264,7 +265,7 @@ export default class ActuatorLogicFull
             <q-tooltip>{{ pretty }}</q-tooltip>
           </q-chip>
           <q-chip
-            v-for="{key, cmp} in digital"
+            v-for="{key, cmp, pretty} in digital"
             :key="`digital-add-${key}`"
             class="hoverable text-bold"
             color="blue-grey-8"
@@ -272,10 +273,10 @@ export default class ActuatorLogicFull
             @click.native="saveExpression(block.data.expression + key)"
           >
             {{ key }}
-            <q-tooltip>{{ prettyDigital(cmp) }}</q-tooltip>
+            <q-tooltip>{{ pretty }}</q-tooltip>
           </q-chip>
           <q-chip
-            v-for="{key, cmp} in analog"
+            v-for="{key, cmp, pretty} in analog"
             :key="`analog-add-${key}`"
             class="hoverable text-bold"
             color="blue-grey-8"
@@ -283,7 +284,7 @@ export default class ActuatorLogicFull
             @click.native="saveExpression(block.data.expression + key)"
           >
             {{ key }}
-            <q-tooltip>{{ prettyAnalog(cmp) }}</q-tooltip>
+            <q-tooltip>{{ pretty }}</q-tooltip>
           </q-chip>
         </div>
       </LabeledField>
