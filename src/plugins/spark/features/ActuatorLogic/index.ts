@@ -16,6 +16,7 @@ const block: BlockSpec<ActuatorLogicData> = {
     result: EvalResult.EMPTY,
     errorPos: 0,
     targetId: new Link(null, interfaceTypes.ActuatorDigital),
+    drivenTargetId: new Link(null, interfaceTypes.ActuatorDigital, true),
     analog: [],
     digital: [],
     expression: '',
