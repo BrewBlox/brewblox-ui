@@ -222,8 +222,11 @@ export default class ActuatorLogicFull
         <div>{{ err.message }}</div>
       </div>
 
-      <LabeledField label="Active comparisons">
-        <div class="row wrap q-gutter-xs">
+      <LabeledField
+        label="Active comparisons"
+        tag-class="col-grow"
+      >
+        <div class="row q-gutter-xs col-grow">
           <q-chip
             v-for="{key, cmp, pretty} in digital"
             :key="`digital-${key}`"
