@@ -228,25 +228,65 @@ export default class ActuatorLogicFull
             v-for="{key, cmp, pretty} in digital"
             :key="`digital-${key}`"
             removable
-            class="hoverable"
+            class="hoverable full-width"
             color="blue-grey-8"
             @click.native="editDigital(key, cmp)"
             @remove="removeDigital(key)"
           >
-            <b class="text-lime-6 q-mr-sm">{{ key }}</b>
-            {{ pretty }}
+            <div class="row wrap q-gutter-x-sm col-grow">
+              <div
+                class="text-lime-6 text-bold col-auto"
+                style="width: 1em"
+              >
+                {{ key }}
+              </div>
+              <q-icon
+                name="mdi-checkbox-blank-circle"
+                :color="cmp.result === 1 ? 'positive' : 'negative'"
+                class="col-auto self-center"
+              />
+              <div class="col ellipsis">
+                {{ cmp.id | link }}
+              </div>
+              <div class="col ellipsis-left">
+                {{ pretty }}
+              </div>
+              <q-tooltip>
+                {{ cmp.id | link }} [{{ pretty }}]
+              </q-tooltip>
+            </div>
           </q-chip>
           <q-chip
             v-for="{key, cmp, pretty} in analog"
             :key="`analog-${key}`"
             removable
-            class="hoverable"
+            class="hoverable full-width"
             color="blue-grey-8"
             @click.native="editAnalog(key, cmp)"
             @remove="removeAnalog(key)"
           >
-            <b class="text-orange-6 q-mr-sm">{{ key }}</b>
-            {{ pretty }}
+            <div class="row wrap q-gutter-x-sm col-grow">
+              <div
+                class="text-orange-6 text-bold col-auto"
+                style="width: 1em"
+              >
+                {{ key }}
+              </div>
+              <q-icon
+                name="mdi-checkbox-blank-circle"
+                :color="cmp.result === 1 ? 'positive' : 'negative'"
+                class="col-auto self-center"
+              />
+              <div class="col ellipsis">
+                {{ cmp.id | link }}
+              </div>
+              <div class="col ellipsis-left">
+                {{ pretty }}
+              </div>
+              <q-tooltip>
+                {{ cmp.id | link }} [{{ pretty }}]
+              </q-tooltip>
+            </div>
           </q-chip>
         </div>
       </LabeledField>
@@ -272,7 +312,7 @@ export default class ActuatorLogicFull
             @click.native="saveExpression(block.data.expression + key)"
           >
             {{ key }}
-            <q-tooltip>{{ pretty }}</q-tooltip>
+            <q-tooltip>{{ cmp.id | link }} [{{ pretty }}]</q-tooltip>
           </q-chip>
           <q-chip
             v-for="{key, cmp, pretty} in analog"
@@ -283,12 +323,12 @@ export default class ActuatorLogicFull
             @click.native="saveExpression(block.data.expression + key)"
           >
             {{ key }}
-            <q-tooltip>{{ pretty }}</q-tooltip>
+            <q-tooltip>{{ cmp.id | link }} [{{ pretty }}]</q-tooltip>
           </q-chip>
         </div>
       </LabeledField>
 
-      <LabeledField label="Create comparison">
+      <LabeledField label="Add comparison based on">
         <div class="row wrap q-gutter-xs">
           <q-chip
             v-for="block in validBlocks"

@@ -168,7 +168,7 @@ export function shiftRemainingComparisons(expression: string, key: string): stri
 }
 
 export function prettyDigital(cmp: DigitalCompare): string {
-  return `${cmp.id.toString()} ${digitalOpTitles[cmp.op]} ${digitalStateTitles[cmp.rhs]}`;
+  return `${digitalOpTitles[cmp.op]} ${digitalStateTitles[cmp.rhs]}`;
 }
 
 export function prettyAnalog(cmp: AnalogCompare, blockType: string | null, tempUnit: string): string {
@@ -176,5 +176,5 @@ export function prettyAnalog(cmp: AnalogCompare, blockType: string | null, tempU
     ? new Temp(cmp.rhs).convert(tempUnit).toString()
     : `${cmp.rhs}`;
 
-  return `${cmp.id.toString()} ${analogOpTitles[cmp.op]} ${rhs}`;
+  return `${analogOpTitles[cmp.op]} ${rhs}`;
 }
