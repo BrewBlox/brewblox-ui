@@ -1,6 +1,7 @@
 import isArray from 'lodash/isArray';
 
 import { typeName as ActuatorAnalogMock } from '@/plugins/spark/features/ActuatorAnalogMock/getters';
+import { typeName as ActuatorLogic } from '@/plugins/spark/features/ActuatorLogic/getters';
 import { typeName as SetpointDriver } from '@/plugins/spark/features/ActuatorOffset/getters';
 import { typeName as ActuatorPwm } from '@/plugins/spark/features/ActuatorPwm/getters';
 import { typeName as Balancer } from '@/plugins/spark/features/Balancer/getters';
@@ -9,6 +10,7 @@ import { typeName as DisplaySettings } from '@/plugins/spark/features/DisplaySet
 import { typeName as DS2408 } from '@/plugins/spark/features/DS2408/getters';
 import { typeName as DS2413 } from '@/plugins/spark/features/DS2413/getters';
 import { typeName as InactiveObject } from '@/plugins/spark/features/InactiveObject/getters';
+import { typeName as MockPins } from '@/plugins/spark/features/MockPins/getters';
 import { typeName as MotorValve } from '@/plugins/spark/features/MotorValve/getters';
 import { typeName as Mutex } from '@/plugins/spark/features/Mutex/getters';
 import { typeName as Pid } from '@/plugins/spark/features/Pid/getters';
@@ -22,6 +24,7 @@ import { typeName as TempSensorOneWire } from '@/plugins/spark/features/TempSens
 import { Block } from './types';
 
 export * from '@/plugins/spark/features/ActuatorAnalogMock/types';
+export * from '@/plugins/spark/features/ActuatorLogic/types';
 export * from '@/plugins/spark/features/ActuatorOffset/types';
 export * from '@/plugins/spark/features/ActuatorPwm/types';
 export * from '@/plugins/spark/features/Balancer/types';
@@ -30,6 +33,7 @@ export * from '@/plugins/spark/features/DisplaySettings/types';
 export * from '@/plugins/spark/features/DS2408/types';
 export * from '@/plugins/spark/features/DS2413/types';
 export * from '@/plugins/spark/features/InactiveObject/types';
+export * from '@/plugins/spark/features/MockPins/types';
 export * from '@/plugins/spark/features/MotorValve/types';
 export * from '@/plugins/spark/features/Mutex/types';
 export * from '@/plugins/spark/features/Pid/types';
@@ -101,6 +105,7 @@ export const systemBlockTypes = {
 export const blockTypes = {
   ...systemBlockTypes,
   ActuatorAnalogMock,
+  ActuatorLogic,
   SetpointDriver,
   ActuatorPwm,
   Balancer,
@@ -109,6 +114,7 @@ export const blockTypes = {
   DS2408,
   DS2413,
   InactiveObject,
+  MockPins,
   MotorValve,
   Mutex,
   Pid,
@@ -160,6 +166,7 @@ export const compatibleTypes = {
     blockTypes.DS2413,
     blockTypes.Spark2Pins,
     blockTypes.Spark3Pins,
+    blockTypes.MockPins,
   ],
 };
 
