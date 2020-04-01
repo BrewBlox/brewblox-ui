@@ -200,7 +200,7 @@ export default class ActuatorLogicBasic
             class="hoverable full-width"
             @click.native="editAnalog(key, cmp)"
           >
-            <div class="row wrap q-gutter-x-sm col">
+            <div class="row wrap q-gutter-x-sm col-grow">
               <div
                 class="text-orange-6 text-bold col-auto"
                 style="width: 1em"
