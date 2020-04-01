@@ -28,11 +28,12 @@ const feature: WidgetFeature = {
   title: 'OneWire Temp Sensor',
   role: 'Process',
   component: blockWidgetSelector(widget),
-  wizard: false,
   widgetSize: {
     cols: 4,
     rows: 2,
   },
+  // Discovered objects can't be created
+  wizard: false,
 };
 
 export default { feature, block };
