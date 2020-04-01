@@ -52,7 +52,6 @@ export default class ActuatorLogicWidget
             <q-btn text-color="white" flat label="Enable" @click="enable" />
           </template>
         </CardWarning>
-        <BlockEnableToggle v-else :crud="crud" />
       </template>
     </component>
   </GraphCardWrapper>

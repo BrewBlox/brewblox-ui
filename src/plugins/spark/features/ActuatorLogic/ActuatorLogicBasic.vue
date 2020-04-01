@@ -13,6 +13,8 @@ import {
   comparisonCheck,
   digitalIdx,
   digitalKey,
+  isDigital,
+  isKey,
   prettyAnalog,
   prettyDigital,
   syntaxCheck} from './helpers';
@@ -20,6 +22,7 @@ import {
   ActuatorLogicBlock,
   AnalogCompare,
   DigitalCompare,
+  EvalResult,
   ExpressionError,
 } from './types';
 
@@ -32,9 +35,28 @@ import {
 export default class ActuatorLogicBasic
   extends BlockCrudComponent<ActuatorLogicBlock> {
 
-
   get tempUnit(): string {
     return sparkStore.units(this.serviceId).Temp;
+  }
+
+  keyColor(key: string): string {
+    if (!isKey(key)) { return 'white'; }
+    const arr: { key: string; cmp: AnalogCompare | DigitalCompare }[] =
+      isDigital(key)
+        ? this.digital
+        : this.analog;
+    return arr.find(v => v.key === key)?.cmp.result === EvalResult.TRUE
+      ? 'positive'
+      : 'negative';
+  }
+
+  get expression(): { char: string; color: string }[] {
+    return this.block.data.expression
+      .split('')
+      .map(char => ({
+        char,
+        color: this.keyColor(char),
+      }));
   }
 
   get firmwareError(): null | ExpressionError {
@@ -116,18 +138,29 @@ export default class ActuatorLogicBasic
     <slot name="warnings" />
 
     <div class="widget-body">
-      <div class="row q-pa-sm">
-        <LabeledField label="Expression" class="col-grow">
-          <div class="expression-field">
-            {{ block.data.expression }}
-          </div>
+      <div class="row wrap q-pa-sm">
+        <LabeledField
+          label="Expression"
+          class="col-grow"
+        >
+          <span
+            v-for="({char, color}, idx) in expression"
+            :key="`expression-${idx}`"
+            :class="[`text-${color}`, 'expression-field']"
+          >
+            {{ char }}
+          </span>
         </LabeledField>
-        <LabeledField label="Output" class="col-grow">
+        <LabeledField
+          label="Result"
+          class="col-grow"
+        >
           <div :class="err && 'text-negative'">
             {{ result }}
           </div>
         </LabeledField>
       </div>
+
       <LabeledField label="Active comparisons">
         <div class="row wrap q-gutter-xs">
           <q-chip

@@ -33,9 +33,9 @@ export const analogOpTitles: Record<AnalogCompareOp, string> = {
 };
 
 export const evalResultTitles: Record<EvalResult, string> = {
-  [EvalResult.FALSE]: 'Output is OFF',
-  [EvalResult.TRUE]: 'Output is ON',
-  [EvalResult.EMPTY]: 'Expression empty: output is OFF',
+  [EvalResult.FALSE]: 'Result is OFF',
+  [EvalResult.TRUE]: 'Result is ON',
+  [EvalResult.EMPTY]: 'Expression empty: result is OFF',
   [EvalResult.EMPTY_SUBSTRING]: 'Empty sub-expression',
   [EvalResult.INVALID_DIGITAL_OP]: 'Invalid operator',
   [EvalResult.INVALID_ANALOG_OP]: 'Invalid operator',
