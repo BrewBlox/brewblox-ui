@@ -54,6 +54,14 @@ export default class DigitalConstraints extends Vue {
         remaining: new Time(),
         minOn: new Time(),
       },
+      delayedOff: {
+        remaining: new Time(),
+        delayedOff: new Time(),
+      },
+      delayedOn: {
+        remaining: new Time(),
+        delayedOn: new Time(),
+      },
       mutexed: {
         remaining: new Time(),
         mutexed: {
@@ -172,6 +180,22 @@ export default class DigitalConstraints extends Vue {
         label="Minimum ON new Time"
         class="col-grow"
         @input="v => { constraint.minOn = v; save(); }"
+      />
+      <TimeUnitField
+        v-if="type === 'delayedOff'"
+        :value="constraint.delayedOff"
+        title="Delay OFF"
+        label="Delay OFF"
+        class="col-grow"
+        @input="v => { constraint.delayedOff = v; save(); }"
+      />
+      <TimeUnitField
+        v-if="type === 'delayedOn'"
+        :value="constraint.delayedOn"
+        title="Delay ON"
+        label="Delay ON"
+        class="col-grow"
+        @input="v => { constraint.delayedOn = v; save(); }"
       />
 
       <div class="col-auto column justify-center darkish">
