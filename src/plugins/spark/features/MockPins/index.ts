@@ -1,39 +1,31 @@
-import { Unit } from '@/helpers/units';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import { typeName } from './getters';
-import widget from './TempSensorOneWireWidget.vue';
-import { TempSensorOneWireData } from './types';
+import widget from './MockPinsWidget.vue';
+import { MockPinsData } from './types';
 
-const block: BlockSpec = {
+const block: BlockSpec<MockPinsData> = {
   id: typeName,
-  generate: (): TempSensorOneWireData => ({
-    value: new Unit(null, 'degC'),
-    offset: new Unit(0, 'delta_degC'),
-    address: '',
+  generate: () => ({
+    pins: [],
   }),
-  presets: [],
   changes: [],
-  graphTargets: {
-    value: 'Sensor value',
-  },
+  presets: [],
 };
 
 const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  title: 'OneWire Temp Sensor',
-  role: 'Process',
+  title: 'Mock Pins',
+  role: 'Output',
   component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 4,
   },
-  // Discovered objects can't be created
-  wizard: false,
 };
 
 export default { feature, block };

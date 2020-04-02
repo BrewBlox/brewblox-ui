@@ -31,6 +31,8 @@ export const digitalConstraintLabels: Record<DigitalConstraintKey, string> = {
   minOff: 'Minimum OFF time',
   minOn: 'Minimum ON time',
   mutexed: 'Mutually exclusive',
+  delayedOff: 'Delay OFF',
+  delayedOn: 'Delay ON',
 };
 
 export const analogConstraintLabels: Record<AnalogConstraintKey, string> = {

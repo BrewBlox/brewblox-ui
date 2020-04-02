@@ -53,7 +53,6 @@ export default class TagSelectField extends FieldBase {
       new-value-mode="add-unique"
       @input="save"
       @filter="onInput"
-      @keyup.native.stop.tab="pickSuggestion"
     >
       <template #selected-item="scope">
         <q-chip

@@ -266,7 +266,7 @@ export default class SetpointProfileFull
           flat
           dense
           round
-          class="darkish col-auto"
+          class="darkish col-auto self-center"
           icon="delete"
           @click="removePoint(idx)"
         >

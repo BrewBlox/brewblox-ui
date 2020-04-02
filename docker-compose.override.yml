@@ -14,12 +14,22 @@ services:
       - "traefik.port=80"
       - "traefik.frontend.rule=Path:/, /ui, /ui/{sub:(.*)?}"
 
+  # mdns:
+  #   image: brewblox/brewblox-mdns:develop
+  #   network_mode: host
+
   # automation:
   #   image: node
   #   volumes:
   #     - "../brewblox-automation/:/app/"
   #   working_dir: /app
   #   command: "npm run watch"
+
+  # sparksimulator:
+  #   image: brewblox/firmware-simulator:feature-multiplatform
+  #   init: true
+  #   ports:
+  #     - "7376:7376"
 
   # sparkey:
   #   volumes:

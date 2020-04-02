@@ -12,12 +12,14 @@ const block: BlockSpec<TempSensorMockData> = {
   id: typeName,
   generate: () => ({
     value: new Unit(20, 'degC'),
+    setting: new Unit(20, 'degC'),
+    fluctuations: [],
     connected: true,
   }),
   changes: [
     {
-      key: 'value',
-      title: 'Sensor Value',
+      key: 'setting',
+      title: 'Sensor Setting',
       component: 'UnitValEdit',
       generate: () => new Unit(20, 'degC'),
     },
@@ -42,7 +44,7 @@ const feature: WidgetFeature = {
   component: blockWidgetSelector(widget),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 3,
   },
 };
 

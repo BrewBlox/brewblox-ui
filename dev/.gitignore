@@ -2,4 +2,4 @@ influxdb/
 couchdb/
 dist/*
 !dist/.gitkeep
-traefik/brewblox.*
+traefik/
