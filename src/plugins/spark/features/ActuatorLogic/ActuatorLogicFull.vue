@@ -231,10 +231,13 @@ export default class ActuatorLogicFull
         </template>
       </q-input>
 
-      <div v-if="err" class="error-indicator q-pa-md text-negative">
+      <div
+        class="error-indicator q-pa-md text-negative"
+        :style="{visibility: err ? '' : 'hidden'}"
+      >
         <div>{{ expression }}</div>
-        <div>{{ err.indicator }}</div>
-        <div>{{ err.message }}</div>
+        <div>{{ err ? err.indicator : '---' }}</div>
+        <div>{{ err ? err.message : '---' }}</div>
       </div>
 
       <LabeledField
