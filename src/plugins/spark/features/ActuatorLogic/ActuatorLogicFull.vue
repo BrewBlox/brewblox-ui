@@ -1,5 +1,4 @@
 <script lang="ts">
-import { debounce } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
@@ -46,14 +45,30 @@ const validTypes: string[] = [
 })
 export default class ActuatorLogicFull
   extends BlockCrudComponent<ActuatorLogicBlock> {
+  localExpression: string | null = null;
+  delayedSave: number | null = null;
 
-  saveExpression = (expr: string) => { void expr; }
+  beforeDestroy(): void {
+    if (this.delayedSave !== null) {
+      clearTimeout(this.delayedSave);
+      this.saveLocal();
+    }
+  }
 
-  created(): void {
-    this.saveExpression = debounce((expr: string) => {
-      this.block.data.expression = expr ?? '';
+  saveLocal(): void {
+    if (this.localExpression !== null) {
+      this.block.data.expression = this.localExpression;
       this.saveBlock();
-    }, 200);
+    }
+    this.localExpression = null;
+  }
+
+  saveExpression(expr: string): void {
+    if (this.delayedSave !== null) {
+      clearTimeout(this.delayedSave);
+    }
+    this.localExpression = expr;
+    this.delayedSave = window.setTimeout(this.saveLocal, 1000);
   }
 
   get tempUnit(): string {
@@ -63,6 +78,10 @@ export default class ActuatorLogicFull
   get validBlocks(): Block[] {
     return sparkStore.blockValues(this.serviceId)
       .filter(block => isCompatible(block.type, validTypes));
+  }
+
+  get expression(): string {
+    return this.localExpression ?? this.block.data.expression;
   }
 
   get characters(): { char: string; pretty: string }[] {
@@ -106,19 +125,15 @@ export default class ActuatorLogicFull
   }
 
   get err(): null | ExpressionError {
-    return syntaxCheck(this.block.data.expression)
+    return syntaxCheck(this.expression)
       ?? comparisonCheck(this.block.data)
-      ?? this.firmwareError;
+      ?? (this.localExpression === null ? this.firmwareError : null);
   }
 
   chipColor(index: number): string {
     return index === this.err?.index
       ? 'negative'
       : 'blue-grey-8';
-  }
-
-  get expression(): string {
-    return this.block.data.expression;
   }
 
   addComparison(block: Block): void {
