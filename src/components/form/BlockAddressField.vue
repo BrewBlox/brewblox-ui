@@ -21,7 +21,7 @@ export default class BlockAddressField extends FieldBase {
   public readonly label!: string;
 
   @Prop({ type: Boolean, default: false })
-  public readonly anyService!: string;
+  public readonly anyService!: boolean;
 
   @Prop({ type: Array, required: false })
   readonly compatible!: string[];
