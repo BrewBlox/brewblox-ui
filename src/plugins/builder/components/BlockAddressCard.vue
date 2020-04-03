@@ -39,5 +39,6 @@ export default class BlockAddressCard extends PartCard {
     v-model="address"
     v-bind="{label, compatible, creatable}"
     item-aligned
+    any-service
   />
 </template>
