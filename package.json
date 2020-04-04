@@ -87,7 +87,7 @@
     "fork-ts-checker-webpack-plugin": "^3.1.1",
     "git-describe": "^4.0.4",
     "jest": "^25.1.0",
-    "minimist": "^1.2.2",
+    "minimist": "^1.2.3",
     "node-sass": "^4.13.1",
     "sass-loader": "^8.0.2",
     "ts-loader": "^6.2.1",
