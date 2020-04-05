@@ -1257,6 +1257,20 @@
     }
   },
   {
+    "_id": "dashboard-items__a437050b-52a7-4c50-8051-26ec6addc28a",
+    "title": "Logic Actuator",
+    "feature": "ActuatorLogic",
+    "order": 6,
+    "dashboard": "dashboard-home",
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "Logic Actuator"
+    },
+    "cols": 4,
+    "rows": 3,
+    "pinnedPosition": null
+  },
+  {
     "_id": "dashboard-items__dashboard-items__bb7aa0b4-a045-ad38-4887-308967ca8d63",
     "title": "Mr Beancounter",
     "order": 5,
@@ -2807,7 +2821,10 @@
         "testey2"
       ],
       "expandedBlocks": {
-        "DisplaySettings": true
+        "DisplaySettings": true,
+        "Logic Input 1": true,
+        "Mock Pins": true,
+        "Logic Actuator": true
       }
     }
   },

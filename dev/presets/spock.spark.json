@@ -1,6 +1,17 @@
 {
   "blocks": [
     {
+      "id": "balancer-1",
+      "nid": 200,
+      "groups": [
+        0
+      ],
+      "type": "Balancer",
+      "data": {
+        "clients": []
+      }
+    },
+    {
       "id": "ActiveGroups",
       "nid": 1,
       "groups": [
@@ -128,17 +139,6 @@
       }
     },
     {
-      "id": "balancer-1",
-      "nid": 200,
-      "groups": [
-        0
-      ],
-      "type": "Balancer",
-      "data": {
-        "clients": []
-      }
-    },
-    {
       "id": "mutex-1",
       "nid": 201,
       "groups": [
@@ -185,7 +185,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": false,
-        "value[degC]": 0
+        "fluctuations": [],
+        "setting[degC]": 0,
+        "value[degC]": null
       }
     },
     {
@@ -197,7 +199,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20.89794921875
+        "fluctuations": [],
+        "setting[degC]": 0,
+        "value[degC]": 0
       }
     },
     {
@@ -224,11 +228,11 @@
         "settingEnabled": true,
         "filter": 1,
         "resetFilter": false,
-        "filterThreshold[delta_degC]": 4,
         "sensorId<TempSensorInterface>": "sensor-1",
-        "setting[degC]": 0,
+        "filterThreshold[delta_degC]": 4,
         "value[degC]": 0,
         "valueUnfiltered[degC]": 0,
+        "setting[degC]": 0,
         "storedSetting[degC]": 20
       }
     },
@@ -243,11 +247,11 @@
         "settingEnabled": true,
         "filter": 0,
         "resetFilter": false,
-        "filterThreshold[delta_degC]": 0,
         "sensorId<TempSensorInterface>": null,
-        "setting[degC]": 0,
+        "filterThreshold[delta_degC]": 5,
         "value[degC]": 0,
         "valueUnfiltered[degC]": 0,
+        "setting[degC]": 0,
         "storedSetting[degC]": 20
       }
     },
@@ -263,12 +267,9 @@
         "maxSetting": 30,
         "minValue": 40,
         "maxValue": 60,
-        "constrainedBy": {
-          "constraints": []
-        },
+        "desiredSetting": 10,
         "setting": 0,
-        "value": 0,
-        "desiredSetting": 0
+        "value": 0
       }
     },
     {
@@ -287,8 +288,8 @@
             },
             {
               "balanced": {
+                "id": 1,
                 "granted": 0,
-                "id": 0,
                 "balancerId<BalancerInterface>": "balancer-1"
               },
               "limiting": false
@@ -299,9 +300,9 @@
         "value": 0,
         "enabled": false,
         "desiredSetting": 0,
-        "drivenActuatorId<ProcessValueInterface,driven>": null,
         "period[second]": 4,
-        "actuatorId<ActuatorDigitalInterface>": "pin-actuator-1"
+        "actuatorId<ActuatorDigitalInterface>": "pin-actuator-1",
+        "drivenActuatorId<ProcessValueInterface,driven>": null
       }
     },
     {
@@ -317,8 +318,8 @@
         "value": 0,
         "enabled": false,
         "desiredSetting": 0,
-        "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1",
         "referenceId<ProcessValueInterface>": "setpoint-sensor-pair-1",
+        "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1",
         "drivenTargetId<ProcessValueInterface,driven>": null
       }
     },
@@ -340,18 +341,18 @@
         "integralReset": 0,
         "boilMinOutput": 0,
         "boilModeActive": false,
-        "derivative[delta_degC / hour]": 0,
-        "integral[delta_degC * hour]": 0,
-        "ti[second]": 3600,
-        "td[second]": 60,
-        "inputId<SetpointSensorPairInterface>": "setpoint-sensor-pair-1",
         "drivenOutputId<ActuatorAnalogInterface,driven>": null,
         "outputId<ActuatorAnalogInterface>": "actuator-pwm-1",
+        "kp[1 / degC]": 20,
         "error[delta_degC]": 0,
-        "boilPointAdjust[delta_degC]": 0,
-        "inputValue[degC]": 0,
+        "inputId<SetpointSensorPairInterface>": "setpoint-sensor-pair-1",
+        "integral[delta_degC * hour]": 0,
         "inputSetting[degC]": 0,
-        "kp[1 / degC]": 20
+        "ti[second]": 3600,
+        "boilPointAdjust[delta_degC]": 0,
+        "td[second]": 60,
+        "derivative[delta_degC / hour]": 0,
+        "inputValue[degC]": 0
       }
     },
     {
@@ -379,8 +380,13 @@
         "constrainedBy": {
           "constraints": [
             {
-              "remaining[second]": 0,
-              "mutex<MutexInterface>": "mutex-1"
+              "mutexed": {
+                "hasCustomHoldTime": false,
+                "hasLock": false,
+                "mutexId<MutexInterface>": "mutex-1",
+                "extraHoldTime[second]": 0
+              },
+              "remaining[second]": 0
             }
           ]
         },
@@ -402,8 +408,13 @@
         "constrainedBy": {
           "constraints": [
             {
-              "remaining[second]": 0,
-              "mutex<MutexInterface>": "mutex-1"
+              "mutexed": {
+                "hasCustomHoldTime": false,
+                "hasLock": false,
+                "mutexId<MutexInterface>": "mutex-1",
+                "extraHoldTime[second]": 0
+              },
+              "remaining[second]": 0
             }
           ]
         },
@@ -437,7 +448,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20
+        "fluctuations": [],
+        "setting[degC]": 0,
+        "value[degC]": 0
       }
     },
     {
@@ -449,7 +462,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20
+        "fluctuations": [],
+        "setting[degC]": 0,
+        "value[degC]": 0
       }
     },
     {
@@ -461,7 +476,74 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20
+        "fluctuations": [],
+        "setting[degC]": 0,
+        "value[degC]": 0
+      }
+    },
+    {
+      "id": "New|TempSensorOneWire-1",
+      "nid": 221,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2811111111111111",
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
+      }
+    },
+    {
+      "id": "New|TempSensorOneWire-2",
+      "nid": 222,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2822222222222222",
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
+      }
+    },
+    {
+      "id": "New|TempSensorOneWire-3",
+      "nid": 223,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2833333333333333",
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
+      }
+    },
+    {
+      "id": "New|DS2413-1",
+      "nid": 224,
+      "groups": [
+        0
+      ],
+      "type": "DS2413",
+      "data": {
+        "address": "3a44444444444444",
+        "connected": false,
+        "pins": []
+      }
+    },
+    {
+      "id": "New|DS2408-1",
+      "nid": 225,
+      "groups": [
+        0
+      ],
+      "type": "DS2408",
+      "data": {
+        "address": "2955555555555555",
+        "connected": false,
+        "pins": []
       }
     }
   ],
@@ -652,6 +734,41 @@
       "keys": [
         "mock-sensor-3",
         220
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-1",
+        221
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-2",
+        222
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-3",
+        223
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|DS2413-1",
+        224
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|DS2408-1",
+        225
       ],
       "data": {}
     }
