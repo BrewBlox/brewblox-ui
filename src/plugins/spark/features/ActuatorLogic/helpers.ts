@@ -174,7 +174,7 @@ export function prettyDigital(cmp: DigitalCompare): string {
 export function prettyAnalog(cmp: AnalogCompare, blockType: string | null, tempUnit: string): string {
   const rhs = isCompatible(blockType, interfaceTypes.SetpointSensorPair)
     ? new Temp(cmp.rhs).convert(tempUnit).toString()
-    : `${cmp.rhs}`;
+    : `${cmp.rhs}%`;
 
   return `${analogOpTitles[cmp.op]} ${rhs}`;
 }
