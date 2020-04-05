@@ -2,6 +2,7 @@
 import PouchDB from 'pouchdb';
 
 import { HOST } from '@/helpers/const';
+import fetch from '@/helpers/fetch';
 import notify from '@/helpers/notify';
 
 import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
@@ -47,23 +48,22 @@ const intercept = (message: string, moduleId: string): (e: Error) => never =>
   };
 
 export const checkDatastore = (): void => {
-  const addr = `${HOST}/datastore`;
-
-  const request = new XMLHttpRequest();
-  request.open('GET', addr, true);
-  request.onerror = () => notify.error({
-    timeout: 0,
-    icon: 'error',
-    message: 'Failed to access the datastore',
-    actions: [
-      {
-        label: 'Reload page',
-        textColor: 'white',
-        handler: () => location.reload(),
-      },
-    ],
-  });
-  request.send();
+  fetch('/datastore', {
+    timeout: 2,
+    timeoutErrorMessage: 'Failed to acces the datastore',
+  })
+    .catch(message => notify.error({
+      timeout: 0,
+      icon: 'error',
+      message,
+      actions: [
+        {
+          label: 'Reload page',
+          textColor: 'white',
+          handler: () => location.reload(),
+        },
+      ],
+    }));
 };
 
 
