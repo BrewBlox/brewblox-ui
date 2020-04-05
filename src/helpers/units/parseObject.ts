@@ -73,6 +73,9 @@ export function parsePostfixed(key: string, val: any): [string, PostFixed] | nul
 }
 
 export function deserialize(obj: any): typeof obj {
+  if (obj === undefined || obj === null) {
+    return obj;
+  }
   if (isArray(obj)) {
     return obj.map(deserialize);
   }
@@ -86,6 +89,9 @@ export function deserialize(obj: any): typeof obj {
 }
 
 export function serialize(obj: any): typeof obj {
+  if (obj === undefined || obj === null) {
+    return obj;
+  }
   if (isArray(obj)) {
     return obj.map(serialize);
   }

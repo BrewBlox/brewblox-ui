@@ -1,7 +1,7 @@
 import mapKeys from 'lodash/mapKeys';
 import queryString from 'query-string';
 
-import { get, post } from '@/helpers/fetch';
+import fetch from '@/helpers/fetch';
 import { snakeCased } from '@/helpers/functional';
 import { sse } from '@/helpers/sse';
 import { createApi } from '@/plugins/database/api';
@@ -43,19 +43,21 @@ export const historyApi = {
 
   fetchKnownKeys:
     async (): Promise<Mapped<any>> =>
-      post('/history/query/objects', {}),
+      fetch.post<Mapped<any>>('/history/query/objects', {})
+        .then(resp => resp.data),
 
   fetchValues:
     async (params: QueryParams, target: QueryTarget): Promise<QueryResult> =>
-      post('/history/query/values', {
+      fetch.post<QueryResult>('/history/query/values', {
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
-      }),
+      })
+        .then(resp => resp.data),
 
   validateService:
     async (): Promise<boolean> =>
-      get('/history/_service/status')
-        .then(retv => retv.status === 'ok')
+      fetch.get<{ status: string }>('/history/_service/status')
+        .then(resp => resp.data.status === 'ok')
         .catch(() => false),
 };
 
