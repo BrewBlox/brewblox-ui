@@ -48,14 +48,11 @@ const intercept = (message: string, moduleId: string): (e: Error) => never =>
   };
 
 export const checkDatastore = (): void => {
-  fetch('/datastore', {
-    timeout: 2,
-    timeoutErrorMessage: 'Failed to acces the datastore',
-  })
-    .catch(message => notify.error({
+  fetch('/datastore', { timeout: 2000 })
+    .catch(err => notify.error({
       timeout: 0,
       icon: 'error',
-      message,
+      message: 'Failed to acces the datastore' + err ? ` Error: ${err}` : '',
       actions: [
         {
           label: 'Reload page',
