@@ -52,7 +52,7 @@ export const checkDatastore = (): void => {
     .catch(err => notify.error({
       timeout: 0,
       icon: 'error',
-      message: 'Failed to acces the datastore' + err ? ` Error: ${err}` : '',
+      message: `Failed to access the datastore${err ? `: ${err}` : ''}`,
       actions: [
         {
           label: 'Reload page',
