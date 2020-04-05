@@ -49,18 +49,21 @@ const intercept = (message: string, moduleId: string): (e: Error) => never =>
 
 export const checkDatastore = (): void => {
   fetch('/datastore', { timeout: 2000 })
-    .catch(err => notify.error({
-      timeout: 0,
-      icon: 'error',
-      message: `Failed to access the datastore${err ? `: ${err}` : ''}`,
-      actions: [
-        {
-          label: 'Reload page',
-          textColor: 'white',
-          handler: () => location.reload(),
-        },
-      ],
-    }));
+    .catch(err => {
+      notify.error(`Datastore error: ${err}`, { shown: false });
+      notify.error({
+        timeout: 0,
+        icon: 'error',
+        message: 'Datastore not (yet) available',
+        actions: [
+          {
+            label: 'Reload page',
+            textColor: 'white',
+            handler: () => location.reload(),
+          },
+        ],
+      });
+    });
 };
 
 
