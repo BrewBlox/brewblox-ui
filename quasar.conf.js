@@ -1,17 +1,13 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
-const { gitDescribeSync } = require('git-describe');
 const fs = require('fs');
 const path = require('path');
 const IgnoreNotFoundExportPlugin = require('./build/ignore-not-found');
 
 module.exports = function (ctx) {
-  const gitInfo = gitDescribeSync(__dirname, { match: '[0-9]*' });
-  const gitVersion = `"${gitInfo.semverString}"`;
-  const buildDate = `"${new Date().toString()}"`;
+  const buildDate = `"${new Date().toISOString()}"`;
 
   const sharedEnv = {
-    BLOX_VERSION: gitVersion,
     BLOX_DATE: buildDate,
     BLOX_API_HOST: null,
     API_PORT: null,

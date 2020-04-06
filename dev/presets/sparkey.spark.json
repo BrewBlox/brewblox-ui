@@ -1,6 +1,17 @@
 {
   "blocks": [
     {
+      "id": "Mock Pins",
+      "nid": 241,
+      "groups": [
+        0
+      ],
+      "type": "MockPins",
+      "data": {
+        "pins": []
+      }
+    },
+    {
       "id": "pin-actuator-3",
       "nid": 217,
       "groups": [
@@ -122,8 +133,8 @@
       ],
       "type": "Mutex",
       "data": {
-        "waitRemaining[second]": 0,
-        "differentActuatorWait[second]": 0.01
+        "differentActuatorWait[second]": 0.01,
+        "waitRemaining[second]": 0
       }
     },
     {
@@ -161,7 +172,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": false,
-        "value[degC]": 0
+        "fluctuations": [],
+        "value[degC]": null,
+        "setting[degC]": 0
       }
     },
     {
@@ -173,7 +186,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20.89794921875
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
       }
     },
     {
@@ -185,8 +200,8 @@
       "type": "TempSensorOneWire",
       "data": {
         "address": "deadbeef00000000",
-        "offset[delta_degC]": 9,
-        "value[degC]": 0
+        "value[degC]": 0,
+        "offset[delta_degC]": 9
       }
     },
     {
@@ -200,12 +215,12 @@
         "settingEnabled": true,
         "filter": 1,
         "resetFilter": false,
-        "setting[degC]": 0,
-        "sensorId<TempSensorInterface>": "sensor-1",
+        "filterThreshold[delta_degC]": 4,
         "value[degC]": 0,
         "valueUnfiltered[degC]": 0,
-        "filterThreshold[delta_degC]": 4,
-        "storedSetting[degC]": 20
+        "storedSetting[degC]": 20,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": "sensor-1"
       }
     },
     {
@@ -219,12 +234,12 @@
         "settingEnabled": true,
         "filter": 0,
         "resetFilter": false,
-        "setting[degC]": 0,
-        "sensorId<TempSensorInterface>": null,
+        "filterThreshold[delta_degC]": 5,
         "value[degC]": 0,
         "valueUnfiltered[degC]": 0,
-        "filterThreshold[delta_degC]": 5,
-        "storedSetting[degC]": 20
+        "storedSetting[degC]": 20,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": null
       }
     },
     {
@@ -291,8 +306,8 @@
         "enabled": false,
         "desiredSetting": 0,
         "drivenTargetId<ProcessValueInterface,driven>": null,
-        "referenceId<ProcessValueInterface>": "setpoint-sensor-pair-1",
-        "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1"
+        "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1",
+        "referenceId<ProcessValueInterface>": "setpoint-sensor-pair-1"
       }
     },
     {
@@ -313,18 +328,18 @@
         "integralReset": 0,
         "boilMinOutput": 0,
         "boilModeActive": false,
-        "derivative[delta_degC / hour]": 0,
-        "inputId<SetpointSensorPairInterface>": "setpoint-sensor-pair-1",
-        "error[delta_degC]": 0,
-        "boilPointAdjust[delta_degC]": 0,
-        "kp[1 / degC]": 20,
-        "integral[delta_degC * hour]": 0,
-        "inputSetting[degC]": 0,
         "inputValue[degC]": 0,
+        "inputSetting[degC]": 0,
+        "error[delta_degC]": 0,
+        "kp[1 / degC]": 20,
+        "inputId<SetpointSensorPairInterface>": "setpoint-sensor-pair-1",
         "drivenOutputId<ActuatorAnalogInterface,driven>": null,
+        "derivative[delta_degC / hour]": 0,
+        "boilPointAdjust[delta_degC]": 0,
+        "integral[delta_degC * hour]": 0,
         "td[second]": 60,
-        "ti[second]": 3600,
-        "outputId<ActuatorAnalogInterface>": "actuator-pwm-1"
+        "outputId<ActuatorAnalogInterface>": "actuator-pwm-1",
+        "ti[second]": 3600
       }
     },
     {
@@ -405,7 +420,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
       }
     },
     {
@@ -417,7 +434,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
       }
     },
     {
@@ -429,7 +448,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
       }
     },
     {
@@ -441,7 +462,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
       }
     },
     {
@@ -453,7 +476,9 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "value[degC]": 20
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
       }
     },
     {
@@ -465,8 +490,8 @@
       "type": "TempSensorOneWire",
       "data": {
         "address": "2811111111111111",
-        "offset[delta_degC]": 0,
-        "value[degC]": 0
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
       }
     },
     {
@@ -478,8 +503,8 @@
       "type": "TempSensorOneWire",
       "data": {
         "address": "2822222222222222",
-        "offset[delta_degC]": 0,
-        "value[degC]": 0
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
       }
     },
     {
@@ -491,8 +516,8 @@
       "type": "TempSensorOneWire",
       "data": {
         "address": "2833333333333333",
-        "offset[delta_degC]": 0,
-        "value[degC]": 0
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
       }
     },
     {
@@ -540,8 +565,8 @@
       ],
       "type": "Mutex",
       "data": {
-        "waitRemaining[second]": 0,
-        "differentActuatorWait[second]": 0
+        "differentActuatorWait[second]": 0,
+        "waitRemaining[second]": 0
       }
     },
     {
@@ -555,12 +580,12 @@
         "filter": 1,
         "settingEnabled": false,
         "resetFilter": false,
-        "setting[degC]": 0,
-        "sensorId<TempSensorInterface>": "HERMS HLT Sensor",
+        "filterThreshold[delta_degC]": 5,
         "value[degC]": 0,
         "valueUnfiltered[degC]": 0,
-        "filterThreshold[delta_degC]": 5,
-        "storedSetting[degC]": 70
+        "storedSetting[degC]": 70,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": "HERMS HLT Sensor"
       }
     },
     {
@@ -574,12 +599,12 @@
         "settingEnabled": true,
         "filter": 1,
         "resetFilter": false,
-        "setting[degC]": 0,
-        "sensorId<TempSensorInterface>": "HERMS MT Sensor",
+        "filterThreshold[delta_degC]": 5,
         "value[degC]": 0,
         "valueUnfiltered[degC]": 0,
-        "filterThreshold[delta_degC]": 5,
-        "storedSetting[degC]": 66.699951171875
+        "storedSetting[degC]": 66.699951171875,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": "HERMS MT Sensor"
       }
     },
     {
@@ -593,12 +618,12 @@
         "filter": 1,
         "settingEnabled": false,
         "resetFilter": false,
-        "setting[degC]": 0,
-        "sensorId<TempSensorInterface>": "HERMS BK Sensor",
+        "filterThreshold[delta_degC]": 5,
         "value[degC]": 0,
         "valueUnfiltered[degC]": 0,
-        "filterThreshold[delta_degC]": 5,
-        "storedSetting[degC]": 70
+        "storedSetting[degC]": 70,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": "HERMS BK Sensor"
       }
     },
     {
@@ -623,8 +648,8 @@
         "value": 0,
         "desiredSetting": 0,
         "drivenTargetId<ProcessValueInterface,driven>": null,
-        "referenceId<ProcessValueInterface>": "HERMS MT Setpoint",
-        "targetId<ProcessValueInterface>": "HERMS HLT Setpoint"
+        "targetId<ProcessValueInterface>": "HERMS HLT Setpoint",
+        "referenceId<ProcessValueInterface>": "HERMS MT Setpoint"
       }
     },
     {
@@ -695,8 +720,8 @@
           "constraints": [
             {
               "balanced": {
-                "granted": 50,
                 "id": 1,
+                "granted": 0,
                 "balancerId<BalancerInterface>": "HERMS Balancer"
               },
               "limiting": false
@@ -759,18 +784,18 @@
         "d": 0,
         "integralReset": 0,
         "boilModeActive": false,
-        "derivative[delta_degC / hour]": 0,
-        "inputId<SetpointSensorPairInterface>": "HERMS HLT Setpoint",
-        "error[delta_degC]": 0,
-        "boilPointAdjust[delta_degC]": 0,
-        "kp[1 / degC]": 50,
-        "integral[delta_degC * hour]": 0,
-        "inputSetting[degC]": 0,
         "inputValue[degC]": 0,
+        "inputSetting[degC]": 0,
+        "error[delta_degC]": 0,
+        "kp[1 / degC]": 50,
+        "inputId<SetpointSensorPairInterface>": "HERMS HLT Setpoint",
         "drivenOutputId<ActuatorAnalogInterface,driven>": null,
+        "derivative[delta_degC / hour]": 0,
+        "boilPointAdjust[delta_degC]": 0,
+        "integral[delta_degC * hour]": 0,
         "td[second]": 30,
-        "ti[second]": 600,
-        "outputId<ActuatorAnalogInterface>": "HERMS HLT PWM"
+        "outputId<ActuatorAnalogInterface>": "HERMS HLT PWM",
+        "ti[second]": 600
       }
     },
     {
@@ -791,18 +816,18 @@
         "integralReset": 0,
         "boilMinOutput": 0,
         "boilModeActive": false,
-        "derivative[delta_degC / hour]": 0,
-        "inputId<SetpointSensorPairInterface>": "HERMS MT Setpoint",
-        "error[delta_degC]": 0,
-        "boilPointAdjust[delta_degC]": 0,
-        "kp[1 / degC]": 1,
-        "integral[delta_degC * hour]": 0,
-        "inputSetting[degC]": 0,
         "inputValue[degC]": 0,
+        "inputSetting[degC]": 0,
+        "error[delta_degC]": 0,
+        "kp[1 / degC]": 1,
+        "inputId<SetpointSensorPairInterface>": "HERMS MT Setpoint",
         "drivenOutputId<ActuatorAnalogInterface,driven>": null,
+        "derivative[delta_degC / hour]": 0,
+        "boilPointAdjust[delta_degC]": 0,
+        "integral[delta_degC * hour]": 0,
         "td[second]": 600,
-        "ti[second]": 300,
-        "outputId<ActuatorAnalogInterface>": "HERMS HLT Setpoint Driver"
+        "outputId<ActuatorAnalogInterface>": "HERMS HLT Setpoint Driver",
+        "ti[second]": 300
       }
     },
     {
@@ -823,18 +848,18 @@
         "d": 0,
         "integralReset": 0,
         "boilModeActive": false,
-        "derivative[delta_degC / hour]": 0,
-        "inputId<SetpointSensorPairInterface>": "HERMS BK Setpoint",
-        "error[delta_degC]": 0,
-        "boilPointAdjust[delta_degC]": 0,
-        "kp[1 / degC]": 50,
-        "integral[delta_degC * hour]": 0,
-        "inputSetting[degC]": 0,
         "inputValue[degC]": 0,
+        "inputSetting[degC]": 0,
+        "error[delta_degC]": 0,
+        "kp[1 / degC]": 50,
+        "inputId<SetpointSensorPairInterface>": "HERMS BK Setpoint",
         "drivenOutputId<ActuatorAnalogInterface,driven>": null,
+        "derivative[delta_degC / hour]": 0,
+        "boilPointAdjust[delta_degC]": 0,
+        "integral[delta_degC * hour]": 0,
         "td[second]": 600,
-        "ti[second]": 300,
-        "outputId<ActuatorAnalogInterface>": "HERMS BK PWM"
+        "outputId<ActuatorAnalogInterface>": "HERMS BK PWM",
+        "ti[second]": 300
       }
     },
     {
@@ -886,6 +911,89 @@
         "name": "test",
         "tempUnit": 0,
         "brightness": 0
+      }
+    },
+    {
+      "id": "Logic Input 2",
+      "nid": 243,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 2,
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "Mock Pins"
+      }
+    },
+    {
+      "id": "Logic Output",
+      "nid": 244,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 3,
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "Mock Pins"
+      }
+    },
+    {
+      "id": "Logic Input 1",
+      "nid": 242,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 1,
+        "desiredState": 1,
+        "state": 0,
+        "invert": false,
+        "hwDevice<IoArrayInterface,driven>": "Mock Pins"
+      }
+    },
+    {
+      "id": "Logic Actuator",
+      "nid": 245,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorLogic",
+      "data": {
+        "enabled": true,
+        "expression": "(a|b)&A",
+        "digital": [
+          {
+            "rhs": 1,
+            "op": 0,
+            "result": 0,
+            "id<ActuatorDigitalInterface>": "Logic Input 1"
+          },
+          {
+            "rhs": 1,
+            "op": 0,
+            "result": 0,
+            "id<ActuatorDigitalInterface>": "Logic Input 2"
+          }
+        ],
+        "analog": [
+          {
+            "op": 1,
+            "rhs": 25,
+            "result": 0,
+            "id<ProcessValueInterface>": "actuator-pwm-1"
+          }
+        ],
+        "result": 0,
+        "errorPos": 0,
+        "drivenTargetId<ActuatorDigitalInterface,driven>": null,
+        "targetId<ActuatorDigitalInterface>": "Logic Output"
       }
     }
   ],
@@ -1216,6 +1324,41 @@
       "keys": [
         "HERMS BK PID",
         240
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Mock Pins",
+        241
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Logic Input 1",
+        242
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Logic Input 2",
+        243
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Logic Output",
+        244
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Logic Actuator",
+        245
       ],
       "data": {}
     }

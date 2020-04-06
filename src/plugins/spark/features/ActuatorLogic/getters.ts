@@ -46,6 +46,8 @@ export const evalResultTitles: Record<EvalResult, string> = {
   [EvalResult.MISSING_CLOSING_BRACKET]: 'Missing closing bracket',
   [EvalResult.UNEXPECTED_OPENING_BRACKET]: 'Unexpected opening bracket',
   [EvalResult.UNEXPECTED_CHARACTER]: 'Unexpected character',
+  [EvalResult.UNEXPECTED_COMPARISON]: 'Unexpected comparison',
+  [EvalResult.UNEXPECTED_OPERATOR]: 'Unexpected operator',
 };
 
 export const nonErrorResults: EvalResult[] = [

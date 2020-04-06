@@ -50,7 +50,10 @@ export default class BlockAddressDialog extends DialogBase {
 
   get serviceId(): string {
     const addr = this.local ?? this.value;
-    return addr.serviceId ?? this.serviceIds[0];
+    if (addr.serviceId && this.serviceIds.includes(addr.serviceId)) {
+      return addr.serviceId;
+    }
+    return this.serviceIds[0] ?? '';
   }
 
   set serviceId(serviceId: string) {
@@ -73,7 +76,7 @@ export default class BlockAddressDialog extends DialogBase {
   }
 
   get addrOpts(): BlockAddress[] {
-    return sparkStore.blockValues(this.serviceId)
+    return (sparkStore.blockValues(this.serviceId) ?? [])
       .filter(block => this.typeFilter(block.type))
       .map(asAddr)
       .sort(objectStringSorter('id'));
