@@ -14,10 +14,6 @@ export default class DefaultLayout extends Vue {
     this.leftDrawerOpen = !this.$dense;
   }
 
-  get version(): string {
-    return process.env.BLOX_VERSION ?? 'UNKNOWN';
-  }
-
   get buildDate(): string {
     return process.env.BLOX_DATE ?? 'UNKNOWN';
   }
@@ -81,7 +77,6 @@ export default class DefaultLayout extends Vue {
         <q-item-section class="col-auto">
           <q-btn-dropdown flat text-color="white" icon="mdi-bug-outline">
             <q-list bordered>
-              <LabeledField :value="version" label="Version" item-aligned dense />
               <LabeledField :value="buildDate" label="Build date" item-aligned dense />
               <q-separator inset />
               <ExportErrorsAction />
