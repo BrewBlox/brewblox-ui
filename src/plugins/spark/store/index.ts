@@ -1,6 +1,7 @@
 import fromEntries from 'fromentries';
 import Vue from 'vue';
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+// import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { mutate, objReducer } from '@/helpers/functional';
 import { deserialize } from '@/helpers/units/parseObject';
@@ -28,8 +29,6 @@ import * as api from './api';
 import { asBlock, asServiceStatus, calculateDrivenChains, calculateLimiters, calculateRelations } from './helpers';
 import presetsApi from './presets-api';
 
-const rawError = true;
-
 // Note: we're ignoring the system group (group 8)
 const defaultGroupNames = [
   'Group1', 'Group2', 'Group3', 'Group4', 'Group5', 'Group6', 'Group7',
@@ -44,42 +43,12 @@ interface SparkServiceState {
   lastStatus: Date | null;
 }
 
-@Module({ store, namespaced: true, dynamic: true, name: 'spark' })
+@Module
 export class SparkModule extends VuexModule {
   private sparkCache: Mapped<SparkServiceState> = {};
 
   public specs: Mapped<BlockSpec> = {};
   public presets: Mapped<StoredDataPreset> = {};
-
-  private get allBlockIds(): Mapped<string[]> {
-    return Object.entries(this.sparkCache)
-      .reduce((acc, [k, v]) => mutate(acc, k, Object.keys(v.blocks)), {});
-  }
-
-  private get allBlockValues(): Mapped<Block[]> {
-    return Object.entries(this.sparkCache)
-      .reduce((acc, [k, v]) => mutate(acc, k, Object.values(v.blocks)), {});
-  }
-
-  private get allDrivenChains(): Mapped<string[][]> {
-    return Object.keys(this.sparkCache)
-      .reduce((acc, id) => mutate(acc, id, calculateDrivenChains(this.allBlockValues[id])), {});
-  }
-
-  private get allDrivenBlocks(): Mapped<string[]> {
-    return Object.entries(this.allDrivenChains)
-      .reduce((acc, [id, chains]) => mutate(acc, id, chains.map(c => c[0])), {});
-  }
-
-  private get allRelations(): Mapped<RelationEdge[]> {
-    return Object.keys(this.sparkCache)
-      .reduce((acc, id) => mutate(acc, id, calculateRelations(this.allBlockValues[id])), {});
-  }
-
-  private get allLimiters(): Mapped<Limiters> {
-    return Object.keys(this.sparkCache)
-      .reduce((acc, id) => mutate(acc, id, calculateLimiters(this.allBlockValues[id])), {});
-  }
 
   public get presetIds(): string[] {
     return Object.keys(this.presets);
@@ -105,54 +74,6 @@ export class SparkModule extends VuexModule {
     return serviceId => !!this.sparkCache[serviceId];
   }
 
-  public get blocks(): (serviceId: string) => Mapped<Block> {
-    return serviceId => this.sparkCache[serviceId]?.blocks;
-  }
-
-  public get blockIds(): (serviceId: string) => string[] {
-    return serviceId => this.allBlockIds[serviceId];
-  }
-
-  public get blockValues(): (serviceId: string) => Block[] {
-    return serviceId => this.allBlockValues[serviceId];
-  }
-
-  public get units(): (serviceId: string) => UserUnits {
-    return serviceId => this.sparkCache[serviceId]?.units;
-  }
-
-  public get discoveredBlocks(): (serviceId: string) => string[] {
-    return serviceId => this.sparkCache[serviceId]?.discoveredBlocks;
-  }
-
-  public get status(): (serviceId: string) => SparkStatus | null {
-    return serviceId => this.sparkCache[serviceId]?.status ?? null;
-  }
-
-  public get lastBlocks(): (serviceId: string) => Date | null {
-    return serviceId => this.sparkCache[serviceId]?.lastBlocks ?? null;
-  }
-
-  public get lastStatus(): (serviceId: string) => Date | null {
-    return serviceId => this.sparkCache[serviceId]?.lastStatus ?? null;
-  }
-
-  public get drivenChains(): (serviceId: string) => string[][] {
-    return serviceId => this.allDrivenChains[serviceId];
-  }
-
-  public get drivenBlocks(): (serviceId: string) => string[] {
-    return serviceId => this.allDrivenBlocks[serviceId];
-  }
-
-  public get relations(): (serviceId: string) => RelationEdge[] {
-    return serviceId => this.allRelations[serviceId];
-  }
-
-  public get limiters(): (serviceId: string) => Limiters {
-    return serviceId => this.allLimiters[serviceId];
-  }
-
   public get blockById(): <T extends Block>(serviceId: string, id: string, type?: string) => T {
     return <T extends Block>(serviceId: string, id: string, type?: string) => {
       const block = this.sparkCache[serviceId]?.blocks[id] as T;
@@ -171,59 +92,6 @@ export class SparkModule extends VuexModule {
       serviceId && id
         ? (this.sparkCache[serviceId]?.blocks[id] as T) ?? null
         : null;
-  }
-
-  public get blocksByType(): (serviceId: string, type: string) => Block[] {
-    return (serviceId: string, type: string) =>
-      this.blockValues(serviceId).filter(block => block.type === type);
-  }
-
-  public get sparkServiceById(): (serviceId: string) => SparkService {
-    return (serviceId: string): SparkService => {
-      const service: SparkService = serviceStore.serviceById(serviceId);
-      if (!service) {
-        throw new Error(`Spark service '${serviceId}' not found`);
-      }
-      if (service.type !== sparkType) {
-        throw new Error(`Invalid service: ${service.type} !== ${sparkType}`);
-      }
-      return service;
-    };
-  }
-
-  public get sparkConfigById(): (serviceId: string) => SparkConfig {
-    return serviceId => this.sparkServiceById(serviceId).config;
-  }
-
-  private get allGroupNames(): Mapped<string[]> {
-    return Object.keys(this.sparkCache)
-      .reduce(
-        (acc, key) => {
-          const configNames = this.sparkConfigById(key).groupNames || [];
-          acc[key] = [
-            ...configNames.slice(0, defaultGroupNames.length),
-            ...defaultGroupNames.slice(configNames.length),
-          ];
-          return acc;
-        },
-        {}
-      );
-  }
-
-  public get groupState(): Mapped<[string, boolean][]> {
-    const entries = Object.entries(this.allGroupNames)
-      .map(([serviceId, names]) => {
-        const block: GroupsBlock | undefined =
-          this.blockValues(serviceId)
-            .find(block => block.type === 'Groups');
-        const active = block ? block.data.active : [];
-        return [serviceId, names.map((name, idx) => ([name, active.includes(idx)]))];
-      });
-    return fromEntries(entries);
-  }
-
-  public get groupNames(): (serviceId: string) => string[] {
-    return serviceId => this.allGroupNames[serviceId];
   }
 
   @Mutation
@@ -297,47 +165,47 @@ export class SparkModule extends VuexModule {
     Vue.set(service, 'lastStatus', status.available ? new Date() : null);
   }
 
-  @Action({ rawError })
+  @Action
   public async createPreset(preset: StoredDataPreset): Promise<void> {
     this.commitPreset(await presetsApi.create(preset));
   }
 
-  @Action({ rawError })
+  @Action
   public async savePreset(preset: StoredDataPreset): Promise<void> {
     this.commitPreset(await presetsApi.persist(preset));
   }
 
-  @Action({ rawError })
+  @Action
   public async removePreset(preset: StoredDataPreset): Promise<void> {
     await presetsApi.remove(preset);
     this.commitRemovePreset(preset);
   }
 
-  @Action({ rawError })
+  @Action
   public async fetchBlock(block: Block): Promise<void> {
     const fetched = await api.fetchBlock(block);
     this.commitBlock(fetched);
   }
 
-  @Action({ rawError })
+  @Action
   public async createBlock(block: Block): Promise<void> {
     const created = await api.createBlock(block);
     this.commitBlock(created);
   }
 
-  @Action({ rawError })
+  @Action
   public async saveBlock(block: Block): Promise<void> {
     const persisted = await api.persistBlock(block);
     this.commitBlock(persisted);
   }
 
-  @Action({ rawError })
+  @Action
   public async removeBlock(block: Block): Promise<void> {
     await api.deleteBlock(block);
     this.commitRemoveBlock(block);
   }
 
-  @Action({ rawError })
+  @Action
   public async updateGroupNames([serviceId, names]: [string, string[]]): Promise<void> {
     const existing = this.sparkServiceById(serviceId);
     await serviceStore.saveService({
@@ -349,13 +217,13 @@ export class SparkModule extends VuexModule {
     });
   }
 
-  @Action({ rawError })
+  @Action
   public async fetchBlocks(serviceId: string): Promise<void> {
     const blocks = await api.fetchBlocks(serviceId);
     this.commitAllBlocks([serviceId, blocks]);
   }
 
-  @Action({ rawError })
+  @Action
   public async renameBlock([serviceId, currentId, newId]: [string, string, string]): Promise<void> {
     if (this.blockIds(serviceId).includes(newId)) {
       throw new Error(`Block ${newId} already exists`);
@@ -367,45 +235,45 @@ export class SparkModule extends VuexModule {
       .forEach(item => dashboardStore.commitWidget({ ...item, config: { ...item.config, blockId: newId } }));
   }
 
-  @Action({ rawError })
+  @Action
   public async clearBlocks(serviceId: string): Promise<void> {
     await api.clearBlocks(serviceId);
     await this.fetchBlocks(serviceId);
   }
 
-  @Action({ rawError })
+  @Action
   public async updateStatus(status: SparkStatus): Promise<void> {
     this.commitStatus(status);
     await serviceStore.updateStatus(asServiceStatus(status));
   }
 
-  @Action({ rawError })
+  @Action
   public async fetchUnits(serviceId: string): Promise<void> {
     this.commitUnits([serviceId, await api.fetchUnits(serviceId)]);
   }
 
-  @Action({ rawError })
+  @Action
   public async saveUnits([serviceId, units]: [string, UserUnits]): Promise<void> {
     this.commitUnits([serviceId, await api.persistUnits(serviceId, units)]);
   }
 
-  @Action({ rawError })
+  @Action
   public async fetchDiscoveredBlocks(serviceId: string): Promise<void> {
     const newIds = await api.fetchDiscoveredBlocks(serviceId);
     this.commitDiscoveredBlocks([serviceId, [...this.sparkCache[serviceId].discoveredBlocks, ...newIds]]);
   }
 
-  @Action({ rawError })
+  @Action
   public async clearDiscoveredBlocks(serviceId: string): Promise<void> {
     this.commitDiscoveredBlocks([serviceId, []]);
   }
 
-  @Action({ rawError })
+  @Action
   public async cleanUnusedNames(serviceId: string): Promise<string[]> {
     return await api.cleanUnusedNames(serviceId);
   }
 
-  @Action({ rawError })
+  @Action
   public async fetchAll(serviceId: string): Promise<boolean> {
     const status = await api.fetchSparkStatus(serviceId);
     await this.updateStatus(status);
@@ -419,29 +287,29 @@ export class SparkModule extends VuexModule {
     return status.synchronize;
   }
 
-  @Action({ rawError })
+  @Action
   public async validateService(serviceId: string): Promise<boolean> {
     return await api.validateService(serviceId);
   }
 
-  @Action({ rawError })
+  @Action
   public async flashFirmware(serviceId: string): Promise<any> {
     return await api.flashFirmware(serviceId);
   }
 
-  @Action({ rawError })
+  @Action
   public async serviceExport(serviceId: string): Promise<any> {
     return await api.serviceExport(serviceId);
   }
 
-  @Action({ rawError })
+  @Action
   public async serviceImport([serviceId, exported]: [string, any]): Promise<string[]> {
     const importLog = await api.serviceImport(serviceId, exported);
     await this.fetchBlocks(serviceId);
     return importLog;
   }
 
-  @Action({ rawError })
+  @Action
   public async addService(serviceId: string): Promise<void> {
     if (this.sparkCache[serviceId]) {
       throw new Error(`Service '${serviceId}' already exists`);
@@ -490,14 +358,14 @@ export class SparkModule extends VuexModule {
       .catch(() => { });
   }
 
-  @Action({ rawError })
+  @Action
   public async removeService(serviceId: string): Promise<void> {
     Vue.$eventbus.removeListener(`${sparkBlocksEvent}__${serviceId}`);
     Vue.$eventbus.removeListener(`${sparkStatusEvent}__${serviceId}`);
     this.commitRemoveService(serviceId);
   }
 
-  @Action({ rawError })
+  @Action
   public async start(): Promise<void> {
     const onChange = async (preset: StoredDataPreset): Promise<void> => {
       const existing = this.presets[preset.id];
@@ -516,4 +384,4 @@ export class SparkModule extends VuexModule {
   }
 }
 
-export const sparkStore = getModule(SparkModule);
+export const sparkStore = new SparkModule({ store, name: 'spark' });

@@ -260,3 +260,11 @@ export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
     ? arr.splice(idx, 1)[0]
     : undefined;
 }
+
+export function filterById<T extends HasId>(arr: T[], obj: T, insert = false): T[] {
+  const filtered = arr.filter(v => v.id !== obj.id);
+  if (insert) {
+    filtered.push(obj);
+  }
+  return filtered;
+}

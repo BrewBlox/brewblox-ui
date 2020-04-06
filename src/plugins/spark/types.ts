@@ -117,6 +117,16 @@ export interface SparkStatus extends ApiSparkStatus {
   available: boolean;
 }
 
+export interface SparkStoreEntry {
+  keys: [string, number];
+  data: any;
+}
+
+export interface SparkExported {
+  blocks: DataBlock[];
+  store: SparkStoreEntry[];
+}
+
 export interface RelationEdge {
   source: string;
   target: string;

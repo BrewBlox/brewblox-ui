@@ -1,10 +1,8 @@
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 
-const rawError = true;
-
-@Module({ store, namespaced: true, dynamic: true, name: 'system' })
+@Module
 export class SystemModule extends VuexModule {
   public now: Date = new Date();
 
@@ -13,11 +11,11 @@ export class SystemModule extends VuexModule {
     this.now = new Date();
   }
 
-  @Action({ rawError })
+  @Action
   public async start(): Promise<void> {
     // Every time updateTime() is called, it will trigger a reactive update.
     setInterval(() => this.updateTime(), 10 * 1000);
   }
 }
 
-export const systemStore = getModule(SystemModule);
+export const systemStore = new SystemModule({ store, name: 'system' });
