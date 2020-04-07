@@ -17,7 +17,7 @@ export default class SessionLoadDialog extends DialogBase {
   selected: LoggedSession | null = null;
 
   get sessions(): LoggedSession[] {
-    return historyStore.sessionValues;
+    return historyStore.sessions;
   }
 
   save(): void {

@@ -99,7 +99,7 @@ export default class HistoryGraph extends Vue {
 
   get sources(): GraphSource[] {
     return this.targets
-      .map(target => historyStore.trySourceById(this.sourceId(target)))
+      .map(target => historyStore.sourceById(this.sourceId(target)))
       .filter(source => source !== null && !!source.values) as GraphSource[];
   }
 

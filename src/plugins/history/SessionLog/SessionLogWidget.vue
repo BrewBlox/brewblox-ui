@@ -29,7 +29,7 @@ import { SessionLogConfig } from './types';
 export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
 
   get sessions(): LoggedSession[] {
-    return historyStore.sessionValues;
+    return historyStore.sessions;
   }
 
   get session(): LoggedSession | null {

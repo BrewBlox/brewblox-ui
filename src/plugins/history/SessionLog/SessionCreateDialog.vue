@@ -67,10 +67,7 @@ export default class SessionCreateDialog extends DialogBase {
   }
 
   get sessions(): LoggedSession[] {
-    return [
-      this.example,
-      ...historyStore.sessionValues,
-    ];
+    return [this.example, ...historyStore.sessions];
   }
 
   get knownTags(): string[] {
