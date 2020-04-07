@@ -27,7 +27,8 @@ export default class MotorValveFull
       return {};
     }
     const targetId = this.hwBlock.id;
-    return this.sparkModule.blocks
+    return this.sparkModule
+      .blocks
       .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block.id), {});
   }

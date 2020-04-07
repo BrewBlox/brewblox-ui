@@ -4,9 +4,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { Temp, Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
+import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
-import { interfaceTypes, isCompatible } from '../../block-types';
 import { analogOpTitles } from './getters';
 import { AnalogCompare } from './types';
 

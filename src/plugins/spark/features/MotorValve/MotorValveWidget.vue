@@ -19,9 +19,10 @@ export default class MotorValveWidget
   extends BlockWidgetBase<MotorValveBlock> {
 
   get pins(): Spark3PinsBlock | null {
-    const block = this.sparkModule.blocks
-      .find(block => block.type === blockTypes.Spark3Pins);
-    return block ? block as Spark3PinsBlock : null;
+    return this.sparkModule
+      .blocks
+      .find(block => block.type === blockTypes.Spark3Pins)
+      ?? null;
   }
 
   get disabled12V(): boolean {

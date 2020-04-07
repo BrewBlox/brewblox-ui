@@ -9,12 +9,10 @@ import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { ActuatorOffsetBlock, Block, SetpointSensorPairBlock } from '@/plugins/spark/block-types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { featureStore } from '@/store/features';
 
-import { SparkServiceModule, sparkStore } from '../../store';
-import { Block } from '../../types';
-import { ActuatorOffsetBlock } from '../ActuatorOffset/types';
-import { SetpointSensorPairBlock } from '../SetpointSensorPair/types';
 import { PidBlock } from './types';
 
 interface BlockDisplay {

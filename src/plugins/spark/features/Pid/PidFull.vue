@@ -6,7 +6,6 @@ import { Unit } from '@/helpers/units';
 import { SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
-import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 interface GridOpts {
@@ -19,7 +18,7 @@ export default class PidFull
   extends BlockCrudComponent<PidBlock> {
 
   get inputBlock(): SetpointSensorPairBlock | null {
-    return sparkStore.blockById(this.serviceId, this.block.data.inputId.id);
+    return this.sparkModule.blockById(this.block.data.inputId.id);
   }
 
   get inputDriven(): boolean {
@@ -29,7 +28,7 @@ export default class PidFull
   }
 
   get outputBlock(): Block | null {
-    return sparkStore.blockById(this.serviceId, this.block.data.outputId.id);
+    return this.sparkModule.blockById(this.block.data.outputId.id);
   }
 
   get baseOutput(): number {
