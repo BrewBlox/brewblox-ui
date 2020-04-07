@@ -15,7 +15,7 @@ export default class QuickStartWizardPicker extends Vue {
   }
 
   get wizardOptions(): QuickStartFeature[] {
-    return featureStore.quickStartValues
+    return featureStore.quickStarts
       .filter(qs => !!qs.component)
       .sort(objectStringSorter('title'));
   }

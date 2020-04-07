@@ -36,7 +36,7 @@ const notify = (level: LogLevel, message: QNotifyArgs, opts: Partial<RecordOpts>
   };
 
   if (opts.logged ?? true) {
-    loggingStore.commitEntry({
+    loggingStore.addEntry({
       level,
       time: new Date(),
       message: args.message,

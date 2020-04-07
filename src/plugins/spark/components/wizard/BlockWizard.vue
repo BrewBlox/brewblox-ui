@@ -63,7 +63,7 @@ export default class BlockWizard extends Vue {
   }
 
   get wizardOptions(): SelectOption[] {
-    return featureStore.widgetValues
+    return featureStore.widgets
       .filter(feat => feat.wizard === 'BlockWidgetWizard')
       .filter(feat => this.filter(feat.id))
       .map(feat => ({ label: feat.title, value: feat.id }))

@@ -41,7 +41,7 @@ export default class WidgetWizardPicker extends Vue {
   }
 
   get wizardOptions(): SelectOption[] {
-    return featureStore.widgetValues
+    return featureStore.widgets
       .map(feature => ({
         label: feature.title,
         value: feature.id,

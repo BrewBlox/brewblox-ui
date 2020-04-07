@@ -1,4 +1,4 @@
-import { getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 
@@ -10,15 +10,15 @@ export interface LogEntry {
   message: string;
 }
 
-@Module({ store, namespaced: true, dynamic: true, name: 'logging' })
+@Module
 export class LoggingModule extends VuexModule {
   public entries: LogEntry[] = [];
 
   @Mutation
-  public commitEntry(entry: LogEntry): void {
+  public addEntry(entry: LogEntry): void {
     this.entries.push({ ...entry });
   }
 }
 
 
-export const loggingStore = getModule(LoggingModule);
+export const loggingStore = new LoggingModule({ store, name: 'logging' });
