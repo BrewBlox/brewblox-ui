@@ -30,7 +30,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
   }
 
   get allLayouts(): BuilderLayout[] {
-    return builderStore.layoutValues;
+    return builderStore.layouts;
   }
 
   get layoutIds(): string[] {
@@ -246,5 +246,5 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 </template>
 
 <style lang="sass" scoped>
-@import './grid.sass';
+@import './grid.sass'
 </style>

@@ -103,7 +103,7 @@ export default class BuilderEditor extends Vue {
 
   async mounted(): Promise<void> {
     if (this.routeId) {
-      builderStore.commitLastLayoutId(this.routeId);
+      builderStore.lastLayoutId = this.routeId;
     }
     await this.$nextTick();
     this.setFocus();
@@ -187,7 +187,7 @@ export default class BuilderEditor extends Vue {
   ]
 
   get layouts(): BuilderLayout[] {
-    return builderStore.layoutValues;
+    return builderStore.layouts;
   }
 
   get routeId(): string | null {
@@ -199,7 +199,9 @@ export default class BuilderEditor extends Vue {
   }
 
   get layout(): BuilderLayout | null {
-    return builderStore.layoutById(this.routeId ?? this.lastId ?? builderStore.layoutIds[0]);
+    return builderStore.layoutById(this.routeId ?? this.lastId)
+      ?? builderStore.layouts[0]
+      ?? null;
   }
 
   get parts(): PersistentPart[] {
@@ -246,7 +248,7 @@ export default class BuilderEditor extends Vue {
   }
 
   set currentMode(tool: ActionMode) {
-    builderStore.commitEditorMode(tool.value);
+    builderStore.editorMode = tool.value;
   }
 
   selectLayout(id: string | null): void {

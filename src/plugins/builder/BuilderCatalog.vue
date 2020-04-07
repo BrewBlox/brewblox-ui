@@ -27,7 +27,7 @@ export default class BuilderCatalog extends DialogBase {
 
   get available(): PartDisplay[] {
     const filter = (this.partFilter || '').toLowerCase();
-    return builderStore.specValues
+    return builderStore.specs
       .filter(spec => `${spec.id}|${spec.title}`.toLowerCase().match(filter))
       .sort(objectStringSorter('title'))
       .map(spec => ({
