@@ -55,7 +55,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       title: 'New session',
       preselected: this.config.currentSession,
       widgetTags: [
-        `on: ${dashboardStore.dashboardById(this.widget.dashboard).title}`,
+        `on: ${dashboardStore.dashboardById(this.widget.dashboard)!.title}`,
       ],
     })
       .onOk((session: LoggedSession) => {

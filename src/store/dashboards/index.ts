@@ -1,7 +1,6 @@
-import Vue from 'vue';
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { objReducer } from '@/helpers/functional';
+import { filterById } from '@/helpers/functional';
 import store from '@/store';
 
 import { dashboardApi, widgetApi } from './api';
@@ -9,32 +8,21 @@ import { Dashboard, Widget } from './types';
 
 export * from './types';
 
-const rawError = true;
-
-@Module({ store, namespaced: true, dynamic: true, name: 'dashboards' })
+@Module({ generateMutationSetters: true })
 export class DashboardModule extends VuexModule {
-  public dashboards: Mapped<Dashboard> = {};
-  public widgets: Mapped<Widget> = {};
+  public dashboards: Dashboard[] = [];
+  public widgets: Widget[] = [];
 
   public get dashboardIds(): string[] {
-    return Object.keys(this.dashboards);
-  }
-
-  public get dashboardValues(): Dashboard[] {
-    return Object.values(this.dashboards);
+    return this.dashboards.map(v => v.id);
   }
 
   public get widgetIds(): string[] {
-    return Object.keys(this.widgets);
-  }
-
-  public get widgetValues(): Widget[] {
-    return Object.values(this.widgets);
+    return this.widgets.map(v => v.id);
   }
 
   public get primaryDashboardId(): string | null {
-    const sorted = Object
-      .values(this.dashboards)
+    const sorted = this.dashboards
       .sort((left, right) => {
         if (left.primary && !right.primary) {
           return -1;
@@ -49,71 +37,56 @@ export class DashboardModule extends VuexModule {
       : null;
   }
 
-  public get dashboardById(): (id: string) => Dashboard {
-    return id => this.dashboards[id] ?? null;
+  public dashboardById(id: string): Dashboard | null {
+    return this.dashboards.find(v => v.id === id) ?? null;
   }
 
-  public get widgetById(): (id: string) => Widget {
-    return id => this.widgets[id] ?? null;
+  public dashboardTitle(id: string): string {
+    return this.dashboardById(id)?.title ?? 'Unknown';
   }
 
-  public get dashboardWidgets(): (id: string) => Widget[] {
-    return id => this.widgetValues.filter(widget => widget.dashboard === id);
+  public widgetById(id: string): Widget | null {
+    return this.widgets.find(v => v.id === id) ?? null;
   }
 
-  @Mutation
-  public commitDashboard(dashboard: Dashboard): void {
-    Vue.set(this.dashboards, dashboard.id, { ...dashboard });
-  }
-
-  @Mutation
-  public commitAllDashboards(dashboards: Dashboard[]): void {
-    this.dashboards = dashboards.reduce(objReducer('id'), {});
+  public dashboardWidgets(dashboardId: string): Widget[] {
+    return this.widgets.filter(widget => widget.dashboard === dashboardId);
   }
 
   @Mutation
-  public commitRemoveDashboard(dashboard: Dashboard): void {
-    Vue.delete(this.dashboards, dashboard.id);
+  public setDashboard(dashboard: Dashboard): void {
+    this.dashboards = filterById(this.dashboards, dashboard);
   }
 
   @Mutation
-  public commitWidget(widget: Widget): void {
-    Vue.set(this.widgets, widget.id, { ...widget });
+  public setWidget(widget: Widget): void {
+    this.widgets = filterById(this.widgets, widget);
   }
 
-  @Mutation
-  public commitAllWidgets(widgets: Widget[]): void {
-    this.widgets = widgets.reduce(objReducer('id'), {});
-  }
-
-  @Mutation
-  public commitRemoveWidget(widget: Widget): void {
-    Vue.delete(this.widgets, widget.id);
-  }
-
-  @Action({ rawError })
+  @Action
   public async createDashboard(dashboard: Dashboard): Promise<void> {
-    this.commitDashboard(await dashboardApi.create(dashboard));
+    this.setDashboard(await dashboardApi.create(dashboard));
   }
 
-  @Action({ rawError })
+  @Action
   public async saveDashboard(dashboard: Dashboard): Promise<void> {
-    this.commitDashboard(await dashboardApi.persist(dashboard));
+    this.setDashboard(await dashboardApi.persist(dashboard));
   }
 
-  @Action({ rawError })
+  @Action
   public async updateDashboardOrder(ids: string[]): Promise<void> {
     await Promise.all(
       ids
-        .map(id => this.dashboards[id])
-        .map((dashboard, idx) => this.saveDashboard({ ...dashboard, order: idx + 1 }))
+        .map(id => this.dashboardById(id))
+        .filter(v => v !== null)
+        .map((dashboard, idx) => this.saveDashboard({ ...dashboard!, order: idx + 1 }))
     );
   }
 
-  @Action({ rawError })
+  @Action
   public async updatePrimaryDashboard(newId: string | null): Promise<void> {
     await Promise.all(
-      this.dashboardValues
+      this.dashboards
         .map((dash: Dashboard) => {
           if (dash.id === newId && !dash.primary) {
             return this.saveDashboard({ ...dash, primary: true });
@@ -124,88 +97,89 @@ export class DashboardModule extends VuexModule {
     );
   }
 
-  @Action({ rawError })
+  @Action
   public async removeDashboard(dashboard: Dashboard): Promise<void> {
     this.dashboardWidgets(dashboard.id)
       .forEach(widget => this.removeWidget(widget));
     await dashboardApi.remove(dashboard).catch(() => { });
-    this.commitRemoveDashboard(dashboard);
+    this.dashboards = filterById(this.dashboards, dashboard);
   }
 
-  @Action({ rawError })
+  @Action
   public async createWidget(widget: Widget): Promise<void> {
-    this.commitWidget(await widgetApi.create(widget));
+    this.setWidget(await widgetApi.create(widget));
   }
 
-  @Action({ rawError })
+  @Action
   public async appendWidget(widget: Widget): Promise<void> {
     const order = this.dashboardWidgets(widget.dashboard).length + 1;
-    this.commitWidget(await widgetApi.create({ ...widget, order }));
+    this.setWidget(await widgetApi.create({ ...widget, order }));
   }
 
-  @Action({ rawError })
+  @Action
   public async saveWidget(widget: Widget): Promise<void> {
-    this.commitWidget(await widgetApi.persist(widget));
+    this.setWidget(await widgetApi.persist(widget));
   }
 
-  @Action({ rawError })
+  @Action
   public async updateWidgetOrder(widgetIds: string[]): Promise<void> {
     await Promise.all(
       widgetIds
         .map(id => this.widgetById(id))
-        .map((widget, idx) => this.saveWidget({ ...widget, order: idx + 1 }))
+        .filter(v => v !== null)
+        .map((widget, idx) => this.saveWidget({ ...widget!, order: idx + 1 }))
     );
   }
 
-  @Action({ rawError })
+  @Action
   public async updateWidgetSize({ id, cols, rows }: Pick<Widget, 'id' | 'cols' | 'rows'>): Promise<void> {
-    await this.saveWidget({ ...this.widgetById(id), cols, rows });
+    const widget = this.widgetById(id);
+    if (widget) {
+      await this.saveWidget({ ...widget, cols, rows });
+    }
   }
 
-  @Action({ rawError })
+  @Action
   public async updateWidgetConfig({ id, config }: Pick<Widget, 'id' | 'config'>): Promise<void> {
-    await this.saveWidget({ ...this.widgetById(id), config });
+    const widget = this.widgetById(id);
+    if (widget) {
+      await this.saveWidget({ ...widget, config });
+    }
   }
 
-  @Action({ rawError })
+  @Action
   public async removeWidget(widget: Widget): Promise<void> {
     await widgetApi.remove(widget).catch(() => { });
-    this.commitRemoveWidget(widget);
+    this.widgets = filterById(this.widgets, widget);
   }
 
-  @Action({ rawError })
+  @Action
   public async start(): Promise<void> {
     const onDashboardChange = (dashboard: Dashboard): void => {
       const existing = this.dashboardById(dashboard.id);
       if (!existing || existing._rev !== dashboard._rev) {
-        this.commitDashboard(dashboard);
+        this.setDashboard(dashboard);
       }
     };
     const onDashboardDelete = (id: string): void => {
-      const existing = this.dashboardById(id);
-      if (existing) {
-        this.commitRemoveDashboard(existing);
-      }
+      this.dashboards = filterById(this.dashboards, { id });
     };
     const onWidgetChange = (widget: Widget): void => {
       const existing = this.widgetById(widget.id);
       if (!existing || existing._rev !== widget._rev) {
-        this.commitWidget(widget);
+        this.setWidget(widget);
       }
     };
     const onWidgetDelete = (id: string): void => {
-      const existing = this.widgetById(id);
-      if (existing) {
-        this.commitRemoveWidget(existing);
-      }
+      this.widgets = filterById(this.widgets, { id });
     };
 
-    this.commitAllDashboards(await dashboardApi.fetch());
-    this.commitAllWidgets(await widgetApi.fetch());
+    this.dashboards = await dashboardApi.fetch();
+    this.widgets = await widgetApi.fetch();
 
     dashboardApi.subscribe(onDashboardChange, onDashboardDelete);
     widgetApi.subscribe(onWidgetChange, onWidgetDelete);
   }
 }
 
-export const dashboardStore = getModule(DashboardModule);
+export const dashboardStore = new DashboardModule({ store, name: 'dashboards' });

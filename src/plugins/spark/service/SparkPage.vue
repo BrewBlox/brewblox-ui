@@ -95,7 +95,7 @@ export default class SparkPage extends Vue {
   }
 
   get dashboards(): Dashboard[] {
-    return dashboardStore.dashboardValues;
+    return dashboardStore.dashboards;
   }
 
   get isAvailable(): boolean {

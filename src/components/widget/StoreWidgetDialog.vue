@@ -18,7 +18,7 @@ export default class StoreWidgetDialog extends DialogBase {
   public readonly getProps!: () => any;
 
   get widget(): Widget {
-    return dashboardStore.widgetById(this.widgetId);
+    return dashboardStore.widgetById(this.widgetId)!;
   }
 
   get crud(): Crud {

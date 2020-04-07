@@ -152,7 +152,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
       options: {
         type: 'radio',
         model: '',
-        items: dashboardStore.dashboardValues
+        items: dashboardStore.dashboards
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
@@ -162,7 +162,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
           return;
         }
         dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`);
+        notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
 

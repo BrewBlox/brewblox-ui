@@ -51,16 +51,8 @@ export default class DashboardPage extends Vue {
     return this.$route.params.id;
   }
 
-  get dashboard(): Dashboard {
+  get dashboard(): Dashboard | null {
     return dashboardStore.dashboardById(this.dashboardId);
-  }
-
-  get allDashboards(): Dashboard[] {
-    return dashboardStore.dashboardValues;
-  }
-
-  get allItems(): Widget[] {
-    return dashboardStore.widgetValues;
   }
 
   get widgets(): Widget[] {
@@ -78,11 +70,6 @@ export default class DashboardPage extends Vue {
           closeDialog: () => { },
         };
         try {
-          if (widget.title === undefined) {
-            // ensure backwards compatibility
-            // older items may not have a title
-            widget.title = widget.id;
-          }
           const component = featureStore.widgetComponent(crud, true);
           return {
             id: widget.id,
@@ -107,8 +94,11 @@ export default class DashboardPage extends Vue {
       if (local) {
         local.crud.widget.pinnedPosition = pinnedPosition;
       }
-      await dashboardStore.saveWidget({ ...dashboardStore.widgetById(id), pinnedPosition });
-      await dashboardStore.updateWidgetOrder(order);
+      const widget = dashboardStore.widgetById(id);
+      if (widget) {
+        await dashboardStore.saveWidget({ ...widget, pinnedPosition });
+        await dashboardStore.updateWidgetOrder(order);
+      }
     } catch (e) {
       throw e;
     }
@@ -129,20 +119,24 @@ export default class DashboardPage extends Vue {
   }
 
   changeDashboardId(): void {
+    if (!this.dashboard) { return; }
     const oldId = this.dashboard.id;
     startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
   changeDashboardTitle(): void {
+    if (!this.dashboard) { return; }
     const oldId = this.dashboard.id;
     startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
   toggleDefaultDashboard(): void {
+    if (!this.dashboard) { return; }
     dashboardStore.updatePrimaryDashboard(this.dashboard.primary ? null : this.dashboardId);
   }
 
   removeDashboard(): void {
+    if (!this.dashboard) { return; }
     startRemoveDashboard(this.dashboard);
   }
 

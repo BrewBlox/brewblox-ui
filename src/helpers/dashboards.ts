@@ -20,10 +20,13 @@ export const dashboardIdRules = (): InputRule[] => [
 export const changeDashboardId =
   async (oldId: string, newId: string, onIdChanged: IdChangedCallback): Promise<void> => {
     const dashboard = dashboardStore.dashboardById(oldId);
+    if (!dashboard) {
+      return;
+    }
 
     await dashboardStore.createDashboard({ ...dashboard, id: newId });
     await Promise.all(
-      dashboardStore.widgetValues
+      dashboardStore.widgets
         .filter(item => item.dashboard === oldId)
         .map(item => dashboardStore.saveWidget({ ...item, dashboard: newId }))
     );
