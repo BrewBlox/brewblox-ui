@@ -17,7 +17,7 @@ export const dashboardIdRules = (): InputRule[] => [
   v => v === urlGenerator.generate(v) || 'ID must be URL-safe',
 ];
 
-export const changeDashboardId =
+export const execDashboardIdChange =
   async (oldId: string, newId: string, onIdChanged: IdChangedCallback): Promise<void> => {
     const dashboard = dashboardStore.dashboardById(oldId);
     if (!dashboard) {
@@ -52,7 +52,7 @@ export const startChangeDashboardId =
       .onOk(async (newId: string) => {
         const oldId = dashboard.id;
         if (newId !== oldId) {
-          await changeDashboardId(oldId, newId, onIdChanged);
+          await execDashboardIdChange(oldId, newId, onIdChanged);
         }
       });
   };
@@ -90,7 +90,7 @@ export const startChangeDashboardTitle =
           message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
           cancel: true,
         })
-          .onOk(() => changeDashboardId(oldId, suggestedId, onIdChanged));
+          .onOk(() => execDashboardIdChange(oldId, suggestedId, onIdChanged));
       });
   };
 

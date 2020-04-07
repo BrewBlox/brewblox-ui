@@ -118,13 +118,13 @@ export default class DashboardPage extends Vue {
     }
   }
 
-  changeDashboardId(): void {
+  editDashboardId(): void {
     if (!this.dashboard) { return; }
     const oldId = this.dashboard.id;
     startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  changeDashboardTitle(): void {
+  editDashboardTitle(): void {
     if (!this.dashboard) { return; }
     const oldId = this.dashboard.id;
     startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
@@ -185,8 +185,8 @@ export default class DashboardPage extends Vue {
                 {{ dashboard.primary ? 'Is home page' : 'Make home page' }}
               </q-item-section>
             </q-item>
-            <ActionItem icon="edit" label="Change dashboard ID" @click="changeDashboardId" />
-            <ActionItem icon="edit" label="Change dashboard title" @click="changeDashboardTitle" />
+            <ActionItem icon="edit" label="Change dashboard ID" @click="editDashboardId" />
+            <ActionItem icon="edit" label="Change dashboard title" @click="editDashboardTitle" />
             <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
           </template>
         </ActionMenu>

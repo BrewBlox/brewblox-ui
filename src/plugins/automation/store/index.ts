@@ -60,7 +60,7 @@ export class AutomationModule extends VuexModule {
   }
 
   @Mutation
-  public commitActive(ids: [string, string | null] | null): void {
+  public setActive(ids: [string, string | null] | null): void {
     if (ids) {
       this.activeTemplate = ids[0];
       this.activeStep = ids[1];

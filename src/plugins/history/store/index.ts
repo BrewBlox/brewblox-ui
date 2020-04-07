@@ -44,11 +44,6 @@ export class HistoryModule extends VuexModule {
   }
 
   @Mutation
-  public commitAllFields(fields: Mapped<string[]>): void {
-    this.fields = { ...fields };
-  }
-
-  @Mutation
   public setSession(session: LoggedSession): void {
     this.sessions = filterById(this.sessions, session, true);
   }
@@ -119,7 +114,7 @@ export class HistoryModule extends VuexModule {
 
   @Action
   public async fetchKnownKeys(): Promise<void> {
-    this.commitAllFields(await historyApi.fetchKnownKeys());
+    this.fields = await historyApi.fetchKnownKeys();
   }
 
   @Action
