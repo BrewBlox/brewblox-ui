@@ -56,12 +56,12 @@ export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['c
   const widget = ref(component);
   return (crud: Crud) => {
     const { config }: { config: BlockConfig } = crud.widget;
-    if (!sparkStore.serviceById(config.serviceId)) {
+    if (!sparkStore.moduleById(config.serviceId)) {
       throw new Error(`Spark service '${config.serviceId}' not found`);
     }
     const bCrud = crud as BlockCrud;
     if ((bCrud.isStoreBlock || bCrud.isStoreBlock === undefined)
-      && !sparkStore.serviceById(config.serviceId)?.blockIds.includes(config.blockId)) {
+      && !sparkStore.moduleById(config.serviceId)?.blockIds.includes(config.blockId)) {
       throw new Error(`Block '${config.blockId}' not found in store`);
     }
     return widget;
@@ -193,7 +193,7 @@ export const saveHwInfo = (serviceId: string): void => {
 export const resetBlocks = async (serviceId: string, opts: { restore: boolean; download: boolean }): Promise<void> => {
   try {
     const addresses: Mapped<string> = {};
-    const module = sparkStore.serviceById(serviceId);
+    const module = sparkStore.moduleById(serviceId);
 
     if (!module) {
       throw new Error(`Service '${serviceId}' not found`);

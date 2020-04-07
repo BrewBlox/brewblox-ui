@@ -21,7 +21,7 @@ export default class SparkServiceWatcher extends Vue {
   public readonly service!: SparkService;
 
   get sparkModule(): SparkServiceModule | null {
-    return sparkStore.serviceById(this.service.id);
+    return sparkStore.moduleById(this.service.id);
   }
 
   get now(): Date {

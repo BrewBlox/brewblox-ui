@@ -22,16 +22,6 @@ const feature: WidgetFeature<BuilderConfig> = {
   }),
 };
 
-// Allows lookups based on the old type ID
-// DeprecatedWidget will update the widget in the datastore
-const deprecated: WidgetFeature = {
-  id: 'ProcessView',
-  title: 'Process View',
-  component: 'DeprecatedWidget',
-  widgetSize: { cols: 0, rows: 0 },
-  wizard: false,
-};
-
 export default {
   install() {
     builderStore.setup();
@@ -40,8 +30,6 @@ export default {
     autoRegister(require.context('./parts', true, /[A-Z]\w+\.vue$/));
 
     builderStore.registerParts(Object.values(specs));
-
     featureStore.registerWidget(feature);
-    featureStore.registerWidget(deprecated);
   },
 };

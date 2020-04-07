@@ -29,7 +29,7 @@ export default class ValEditBase extends Vue {
   }
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   public get field(): any {

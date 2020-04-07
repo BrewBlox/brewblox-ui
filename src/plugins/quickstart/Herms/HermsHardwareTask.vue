@@ -50,7 +50,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
   }
 
   discover(): void {
-    sparkStore.serviceById(this.config.serviceId)?.fetchDiscoveredBlocks();
+    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
   }
 
   startBlockWizard(): void {

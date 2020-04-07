@@ -56,7 +56,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   applyParams(params: QueryParams): void {

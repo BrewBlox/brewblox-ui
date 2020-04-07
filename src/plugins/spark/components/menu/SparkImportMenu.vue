@@ -25,7 +25,7 @@ export default class SparkImportMenu extends DialogBase {
   }
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   async exportBlocks(): Promise<void> {

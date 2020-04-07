@@ -55,7 +55,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
   }
 
   discover(): void {
-    sparkStore.serviceById(this.config.serviceId)?.fetchDiscoveredBlocks();
+    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
   }
 
   startBlockWizard(): void {

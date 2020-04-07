@@ -62,7 +62,7 @@ export class ServiceModule extends VuexModule {
 
   @Action
   public async createService(service: Service): Promise<void> {
-    await api.create(service);
+    await api.create(service); // triggers callback
   }
 
   @Action
@@ -73,12 +73,12 @@ export class ServiceModule extends VuexModule {
 
   @Action
   public async saveService(service: Service): Promise<void> {
-    await api.persist(service);
+    await api.persist(service); // triggers callback
   }
 
   @Action
   public async removeService(service: Service): Promise<void> {
-    await api.remove(service);
+    await api.remove(service); // triggers callback
   }
 
   @Action

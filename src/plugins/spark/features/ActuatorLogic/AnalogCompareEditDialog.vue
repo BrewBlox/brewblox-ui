@@ -26,7 +26,7 @@ export default class AnalogCompareEditDialog extends DialogBase {
   }
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   get tempUnit(): string {

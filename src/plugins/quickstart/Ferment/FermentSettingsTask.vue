@@ -17,7 +17,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
   activeSetpoint: 'beer' | 'fridge' = 'beer';
 
   created(): void {
-    const { Temp } = sparkStore.serviceById(this.config.serviceId)!.units;
+    const { Temp } = sparkStore.moduleById(this.config.serviceId)!.units;
     this.fridgeSetting = this.fridgeSetting.convert(Temp);
     this.beerSetting = this.beerSetting.convert(Temp);
   }

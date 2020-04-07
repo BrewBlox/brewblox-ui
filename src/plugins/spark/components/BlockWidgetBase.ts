@@ -20,7 +20,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
     const initial = this.initialCrud as BlockCrud<BlockT>;
     // We want to avoid calling member getters, as this may create circular lookups
     const { serviceId, blockId } = initial.widget.config;
-    const module = sparkStore.serviceById(serviceId)!;
+    const module = sparkStore.moduleById(serviceId)!;
     return initial.block !== undefined
       ? initial
       : {
@@ -36,7 +36,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   public get blockId(): string {

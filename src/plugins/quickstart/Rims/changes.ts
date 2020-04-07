@@ -187,7 +187,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
 }
 
 export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Widget[] {
-  const userTemp = sparkStore.serviceById(config.serviceId)!.units.Temp;
+  const userTemp = sparkStore.moduleById(config.serviceId)!.units.Temp;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),

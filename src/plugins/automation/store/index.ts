@@ -68,17 +68,17 @@ export class AutomationModule extends VuexModule {
 
   @Action
   public async createTemplate(template: AutomationTemplate): Promise<void> {
-    await templateApi.create(template);
+    await templateApi.create(template); // triggers callback
   }
 
   @Action
   public async saveTemplate(template: AutomationTemplate): Promise<void> {
-    await templateApi.persist(template);
+    await templateApi.persist(template); // triggers callback
   }
 
   @Action
   public async removeTemplate(template: AutomationTemplate): Promise<void> {
-    await templateApi.remove(template);
+    await templateApi.remove(template); // triggers callback
   }
 
   @Action

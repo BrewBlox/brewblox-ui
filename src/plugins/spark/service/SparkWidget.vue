@@ -33,7 +33,7 @@ export default class SparkWidget extends Vue {
   }
 
   get sparkModule(): SparkServiceModule | null {
-    return sparkStore.serviceById(this.serviceId);
+    return sparkStore.moduleById(this.serviceId);
   }
 
   get ready(): boolean {

@@ -91,7 +91,7 @@ export default class SparkPage extends Vue {
   }
 
   get sparkModule(): SparkServiceModule | null {
-    return sparkStore.serviceById(this.serviceId);
+    return sparkStore.moduleById(this.serviceId);
   }
 
   get dashboards(): Dashboard[] {

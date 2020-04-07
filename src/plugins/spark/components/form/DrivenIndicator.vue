@@ -15,7 +15,7 @@ export default class DrivenIndicator extends Vue {
   readonly serviceId!: string;
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   get driveChains(): string[][] {

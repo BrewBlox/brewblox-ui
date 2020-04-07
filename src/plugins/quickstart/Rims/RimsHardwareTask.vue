@@ -49,7 +49,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
   }
 
   discover(): void {
-    sparkStore.serviceById(this.config.serviceId)?.fetchDiscoveredBlocks();
+    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
   }
 
   startBlockWizard(): void {

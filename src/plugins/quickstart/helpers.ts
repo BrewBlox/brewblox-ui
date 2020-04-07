@@ -30,7 +30,7 @@ export function createOutputActions(): WizardAction[] {
   return [
     // Rename blocks
     async (config: QuickStartOutput) => {
-      const module = sparkStore.serviceById(config.serviceId)!;
+      const module = sparkStore.moduleById(config.serviceId)!;
       await Promise.all(
         Object.entries(config.renamedBlocks)
           .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)

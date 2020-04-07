@@ -47,7 +47,7 @@ export default class BlockWizard extends Vue {
   public close(): void { }
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   get blockIdRules(): InputRule[] {

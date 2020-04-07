@@ -18,7 +18,7 @@ export default class SparkUnitMenu extends DialogBase {
   readonly serviceId!: string;
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   get units(): UserUnits {

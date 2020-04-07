@@ -311,7 +311,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
 }
 
 export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): Widget[] {
-  const userTemp = sparkStore.serviceById(config.serviceId)!.units.Temp;
+  const userTemp = sparkStore.moduleById(config.serviceId)!.units.Temp;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),

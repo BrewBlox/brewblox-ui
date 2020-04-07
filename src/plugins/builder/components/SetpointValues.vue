@@ -44,7 +44,7 @@ export default class SetpointValues extends Vue {
   }
 
   get sparkModule(): SparkServiceModule | null {
-    return sparkStore.serviceById(this.address.serviceId);
+    return sparkStore.moduleById(this.address.serviceId);
   }
 
   get block(): SetpointSensorPairBlock | null {

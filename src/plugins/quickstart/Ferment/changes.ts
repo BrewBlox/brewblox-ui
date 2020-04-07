@@ -286,7 +286,7 @@ export const defineWidgets = (
   };
 
   const { serviceId } = config;
-  const { Temp } = sparkStore.serviceById(serviceId)!.units;
+  const { Temp } = sparkStore.moduleById(serviceId)!.units;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,

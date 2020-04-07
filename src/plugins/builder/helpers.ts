@@ -171,8 +171,7 @@ export function showDrivingBlockDialog(part: PersistentPart, key: string): void 
     return showAbsentBlock(part, key);
   }
 
-  const driveChain = sparkStore
-    .serviceById(block.serviceId)
+  const driveChain = sparkStore.moduleById(block.serviceId)
     ?.drivenChains
     .find(chain => chain[0] === block.id);
 

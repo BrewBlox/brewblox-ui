@@ -52,17 +52,17 @@ export class BuilderModule extends VuexModule {
 
   @Action
   public async createLayout(layout: BuilderLayout): Promise<void> {
-    await api.create(layout);
+    await api.create(layout); // triggers callback
   }
 
   @Action
   public async saveLayout(layout: BuilderLayout): Promise<void> {
-    await api.persist(layout);
+    await api.persist(layout); // triggers callback
   }
 
   @Action
   public async removeLayout(layout: BuilderLayout): Promise<void> {
-    await api.remove(layout).catch(() => { });
+    await api.remove(layout); // triggers callback
   }
 
   @Action

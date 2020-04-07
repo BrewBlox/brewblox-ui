@@ -42,7 +42,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   }
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   public get isDriven(): boolean {

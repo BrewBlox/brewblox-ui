@@ -18,7 +18,7 @@ export default class UnknownBlockWidget extends WidgetBase {
   }
 
   public get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.serviceId)!;
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   get blockId(): string {

@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { extendById, filterById } from '@/helpers/functional';
@@ -39,7 +38,7 @@ export class HistoryModule extends VuexModule {
   public transform({ id, result }: { id: string; result: QueryResult }): void {
     const source = this.sourceById(id);
     if (source !== null) {
-      Vue.set(this.sources, id, { ...source.transformer(source, result) });
+      this.sources = extendById(this.sources, source.transformer(source, result));
     }
   }
 
@@ -50,17 +49,17 @@ export class HistoryModule extends VuexModule {
 
   @Action
   public async createSession(session: LoggedSession): Promise<void> {
-    await sessionApi.create(session);
+    await sessionApi.create(session); // triggers callback
   }
 
   @Action
   public async saveSession(session: LoggedSession): Promise<void> {
-    await sessionApi.persist(session);
+    await sessionApi.persist(session); // triggers callback
   }
 
   @Action
   public async removeSession(session: LoggedSession): Promise<void> {
-    await sessionApi.remove(session);
+    await sessionApi.remove(session); // triggers callback
   }
 
   @Action

@@ -55,12 +55,12 @@ export class DashboardModule extends VuexModule {
 
   @Action
   public async createDashboard(dashboard: Dashboard): Promise<void> {
-    await dashboardApi.create(dashboard);
+    await dashboardApi.create(dashboard); // triggers callback
   }
 
   @Action
   public async saveDashboard(dashboard: Dashboard): Promise<void> {
-    await dashboardApi.persist(dashboard);
+    await dashboardApi.persist(dashboard);// triggers callback
   }
 
   @Action
@@ -91,23 +91,23 @@ export class DashboardModule extends VuexModule {
   public async removeDashboard(dashboard: Dashboard): Promise<void> {
     this.dashboardWidgets(dashboard.id)
       .forEach(widget => this.removeWidget(widget));
-    await dashboardApi.remove(dashboard).catch(() => { });
+    await dashboardApi.remove(dashboard); // triggers callback
   }
 
   @Action
   public async createWidget(widget: Widget): Promise<void> {
-    await widgetApi.create(widget);
+    await widgetApi.create(widget); // triggers callback
   }
 
   @Action
   public async appendWidget(widget: Widget): Promise<void> {
     const order = this.dashboardWidgets(widget.dashboard).length + 1;
-    await widgetApi.create({ ...widget, order });
+    await this.createWidget({ ...widget, order });
   }
 
   @Action
   public async saveWidget(widget: Widget): Promise<void> {
-    await widgetApi.persist(widget);
+    await widgetApi.persist(widget); // triggers callback
   }
 
   @Action
@@ -138,7 +138,7 @@ export class DashboardModule extends VuexModule {
 
   @Action
   public async removeWidget(widget: Widget): Promise<void> {
-    await widgetApi.remove(widget).catch(() => { });
+    await widgetApi.remove(widget); // triggers callback
   }
 
   @Action

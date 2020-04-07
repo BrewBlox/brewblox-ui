@@ -18,7 +18,7 @@ export default class Troubleshooter extends Vue {
   readonly serviceId!: string;
 
   get sparkModule(): SparkServiceModule | null {
-    return sparkStore.serviceById(this.serviceId);
+    return sparkStore.moduleById(this.serviceId);
   }
 
   get status(): SparkStatus | null {
