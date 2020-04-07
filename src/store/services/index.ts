@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { filterById } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 import { featureStore } from '@/store/features';
 
@@ -37,7 +37,7 @@ export class ServiceModule extends VuexModule {
 
   @Mutation
   public setService(service: Service): void {
-    this.services = filterById(this.services, service, true);
+    this.services = extendById(this.services, service);
     this.stubs = filterById(this.stubs, { id: service.id });
   }
 
@@ -49,22 +49,20 @@ export class ServiceModule extends VuexModule {
   }
 
   @Mutation
-  public setStub(stub: ServiceStub): void {
+  public trySetStub(stub: ServiceStub): void {
     if (!this.serviceById(stub.id)) {
-      this.stubs = filterById(this.stubs, stub, true);
+      this.stubs = extendById(this.stubs, stub);
     }
   }
 
   @Mutation
   public setStatus(status: ServiceStatus): void {
-    this.statuses = filterById(this.statuses, status, true);
+    this.statuses = extendById(this.statuses, status);
   }
 
   @Action
   public async createService(service: Service): Promise<void> {
-    const created = await api.create(service);
-    this.setService(created);
-    await onStartService(created);
+    await api.create(service);
   }
 
   @Action
@@ -75,13 +73,12 @@ export class ServiceModule extends VuexModule {
 
   @Action
   public async saveService(service: Service): Promise<void> {
-    this.setService(await api.persist(service));
+    await api.persist(service);
   }
 
   @Action
   public async removeService(service: Service): Promise<void> {
-    this.services = filterById(this.services, service);
-    await onRemoveService(service);
+    await api.remove(service);
   }
 
   @Action
@@ -94,8 +91,8 @@ export class ServiceModule extends VuexModule {
   }
 
   @Action
-  public async createStub(stub: ServiceStub): Promise<void> {
-    this.setStub(stub);
+  public async ensureStub(stub: ServiceStub): Promise<void> {
+    this.trySetStub(stub);
   }
 
   @Action

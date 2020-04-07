@@ -1,6 +1,6 @@
-import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
+import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { filterById } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
 import { Block, BlockSpec, StoredDataPreset } from '../types';
@@ -48,25 +48,19 @@ export class SparkGlobalModule extends VuexModule {
     return this.specById(type);
   }
 
-  @Mutation
-  public setPreset(preset: StoredDataPreset): void {
-    this.presets = filterById(this.presets, preset, true);
-  }
-
   @Action
   public async createPreset(preset: StoredDataPreset): Promise<void> {
-    this.setPreset(await presetsApi.create(preset));
+    await presetsApi.create(preset);
   }
 
   @Action
   public async savePreset(preset: StoredDataPreset): Promise<void> {
-    this.setPreset(await presetsApi.persist(preset));
+    await presetsApi.persist(preset);
   }
 
   @Action
   public async removePreset(preset: StoredDataPreset): Promise<void> {
     await presetsApi.remove(preset);
-    this.presets = filterById(this.presets, preset);
   }
 
   @Action
@@ -96,8 +90,8 @@ export class SparkGlobalModule extends VuexModule {
 
   @Action
   public async addService(serviceId: string): Promise<void> {
-    if (this.services.find(v => v.id === serviceId)) {
-      throw new Error(`Service '${serviceId}' already exists`);
+    if (this.serviceById(serviceId)) {
+      throw new Error(`Spark service '${serviceId}' already exists`);
     }
 
     const service = new SparkServiceModule(serviceId, { store, name: `spark__${serviceId}` });
@@ -107,8 +101,11 @@ export class SparkGlobalModule extends VuexModule {
 
   @Action
   public async removeService(serviceId: string): Promise<void> {
-    this.services.find(v => v.id === serviceId)?.stop();
-    this.services = filterById(this.services, { id: serviceId });
+    const service = this.serviceById(serviceId);
+    if (service) {
+      await service.stop();
+      this.services = filterById(this.services, service);
+    }
   }
 
   @Action
@@ -116,7 +113,7 @@ export class SparkGlobalModule extends VuexModule {
     const onChange = async (preset: StoredDataPreset): Promise<void> => {
       const existing = this.presets.find(v => v.id === preset.id);
       if (!existing || existing._rev !== preset._rev) {
-        this.setPreset(preset);
+        this.presets = extendById(this.presets, preset);
       }
     };
     const onDelete = (id: string): void => {

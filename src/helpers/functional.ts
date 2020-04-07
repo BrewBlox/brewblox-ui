@@ -261,13 +261,12 @@ export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
     : undefined;
 }
 
-export function filterById<T extends HasId>(arr: T[], obj: HasId): T[];
-export function filterById<T extends HasId>(arr: T[], obj: T, insert: boolean): T[];
+export function filterById<T extends HasId>(arr: T[], obj: HasId): T[] {
+  return arr.filter(v => v.id !== obj.id);
+}
 
-export function filterById<T extends HasId>(arr: T[], obj: T, insert = false): T[] {
-  const filtered = arr.filter(v => v.id !== obj.id);
-  if (insert) {
-    filtered.push(obj);
-  }
-  return filtered;
+export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
+  const updated = arr.filter(v => v.id !== obj.id);
+  updated.push(obj);
+  return updated;
 }

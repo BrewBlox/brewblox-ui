@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { filterById } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
 import { AutomationEventData, AutomationProcess, AutomationTask, AutomationTemplate } from '../types';
@@ -55,11 +55,6 @@ export class AutomationModule extends VuexModule {
   }
 
   @Mutation
-  public setTemplate(template: AutomationTemplate): void {
-    this.templates = filterById(this.templates, template, true);
-  }
-
-  @Mutation
   public setActive(ids: [string, string | null] | null): void {
     if (ids) {
       this.activeTemplate = ids[0];
@@ -72,24 +67,18 @@ export class AutomationModule extends VuexModule {
   }
 
   @Action
-  public async fetchTemplates(): Promise<void> {
-    this.templates = await templateApi.fetch();
-  }
-
-  @Action
   public async createTemplate(template: AutomationTemplate): Promise<void> {
-    this.setTemplate(await templateApi.create(template));
+    await templateApi.create(template);
   }
 
   @Action
   public async saveTemplate(template: AutomationTemplate): Promise<void> {
-    this.setTemplate(await templateApi.persist(template));
+    await templateApi.persist(template);
   }
 
   @Action
   public async removeTemplate(template: AutomationTemplate): Promise<void> {
     await templateApi.remove(template);
-    this.templates = filterById(this.templates, template);
   }
 
   @Action
@@ -97,7 +86,7 @@ export class AutomationModule extends VuexModule {
     const onChange = (template: AutomationTemplate): void => {
       const existing = this.templateById(template.id);
       if (!existing || existing._rev !== template._rev) {
-        this.setTemplate(template);
+        this.templates = extendById(this.templates, template);
       }
     };
     const onDelete = (id: string): void => {

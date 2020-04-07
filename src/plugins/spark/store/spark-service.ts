@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Action, Module, Mutation, RegisterOptions, VuexModule } from 'vuex-class-modules';
 
-import { filterById } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import { deserialize } from '@/helpers/units/parseObject';
 import { EventbusMessage } from '@/plugins/eventbus';
 import {
@@ -26,26 +26,20 @@ import { asBlock, asServiceStatus, calculateDrivenChains, calculateLimiters, cal
 export class SparkServiceModule extends VuexModule {
   public readonly id: string; // serviceId
 
-  public blocks: Block[];
-  public discoveredBlocks: string[];
-  public units: UserUnits;
-  public status: SparkStatus | null;
-  public lastBlocks: Date | null;
-  public lastStatus: Date | null;
+  public blocks: Block[] = [];
+  public discoveredBlocks: string[] = [];
+  public units: UserUnits = {
+    Temp: 'degC',
+    Time: 'second',
+    LongTime: 'hour',
+  };
+  public status: SparkStatus | null = null;
+  public lastBlocks: Date | null = null;
+  public lastStatus: Date | null = null;
 
   public constructor(serviceId: string, options: RegisterOptions) {
     super(options);
     this.id = serviceId;
-    this.blocks = [];
-    this.discoveredBlocks = [];
-    this.units = {
-      Temp: 'degC',
-      Time: 'second',
-      LongTime: 'hour',
-    };
-    this.status = null;
-    this.lastBlocks = null;
-    this.lastStatus = null;
   }
 
   public get blockIds(): string[] {
@@ -74,7 +68,19 @@ export class SparkServiceModule extends VuexModule {
 
   @Mutation
   public setBlock(block: Block): void {
-    this.blocks = filterById(this.blocks, block, true);
+    this.blocks = extendById(this.blocks, block);
+  }
+
+  @Mutation
+  public updateBlocks(blocks: Block[]): void {
+    this.blocks = blocks;
+    this.lastBlocks = new Date();
+  }
+
+  @Mutation
+  public updateStatus(status: SparkStatus): void {
+    this.status = status;
+    this.lastStatus = new Date();
   }
 
   @Mutation
@@ -90,20 +96,17 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async fetchBlock(block: Block): Promise<void> {
-    const fetched = await api.fetchBlock(block);
-    this.setBlock(fetched);
+    this.setBlock(await api.fetchBlock(block));
   }
 
   @Action
   public async createBlock(block: Block): Promise<void> {
-    const created = await api.createBlock(block);
-    this.setBlock(created);
+    this.setBlock(await api.createBlock(block));
   }
 
   @Action
   public async saveBlock(block: Block): Promise<void> {
-    const persisted = await api.persistBlock(block);
-    this.setBlock(persisted);
+    this.setBlock(await api.persistBlock(block));
   }
 
   @Action
@@ -119,26 +122,23 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async renameBlock([currentId, newId]: [string, string]): Promise<void> {
-    if (this.blocks.find(v => v.id === newId)) {
+    if (this.blockById(newId)) {
       throw new Error(`Block ${newId} already exists`);
     }
     await api.renameBlock(this.id, currentId, newId);
     await this.fetchBlocks();
     dashboardStore.widgets
-      .filter(item => item.config.serviceId === this.id && item.config.blockId === currentId)
-      .forEach(item => dashboardStore.saveWidget({ ...item, config: { ...item.config, blockId: newId } }));
+      .filter(({ config }) => config.serviceId === this.id && config.blockId === currentId)
+      .forEach(widget => {
+        widget.config.blockId = newId;
+        dashboardStore.saveWidget(widget);
+      });
   }
 
   @Action
   public async clearBlocks(): Promise<void> {
     await api.clearBlocks(this.id);
     await this.fetchBlocks();
-  }
-
-  @Action
-  public async updateStatus(status: SparkStatus): Promise<void> {
-    this.status = status;
-    await serviceStore.updateStatus(asServiceStatus(status));
   }
 
   @Action
@@ -170,7 +170,7 @@ export class SparkServiceModule extends VuexModule {
   @Action
   public async fetchAll(): Promise<boolean> {
     const status = await api.fetchSparkStatus(this.id);
-    await this.updateStatus(status);
+    this.updateStatus(status);
     if (status.synchronize) {
       await Promise.all([
         this.fetchUnits(),
@@ -205,9 +205,10 @@ export class SparkServiceModule extends VuexModule {
       id: `${sparkBlocksEvent}__${this.id}`,
       filter: (key, type) => key === this.id && type === sparkBlocksEvent,
       onmessage: (msg: EventbusMessage) => {
-        this.blocks = msg.data
+        const blocks = msg.data
           .map(deserialize)
           .map((block: DataBlock) => asBlock(block, this.id));
+        this.updateBlocks(blocks);
       },
     });
 
@@ -216,12 +217,13 @@ export class SparkServiceModule extends VuexModule {
       id: `${sparkStatusEvent}__${this.id}`,
       filter: (key, type) => key === this.id && type === sparkStatusEvent,
       onmessage: (msg: EventbusMessage) => {
-        const status: ApiSparkStatus = msg.data;
-        this.updateStatus({
-          ...status,
+        const status: SparkStatus = {
+          ...msg.data as ApiSparkStatus,
           serviceId: this.id,
           available: true,
-        });
+        };
+        this.updateStatus(status);
+        serviceStore.updateStatus(asServiceStatus(status));
       },
     });
 

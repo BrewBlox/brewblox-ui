@@ -56,7 +56,8 @@ export default class DashboardPage extends Vue {
   }
 
   get widgets(): Widget[] {
-    return dashboardStore.dashboardWidgets(this.dashboardId)
+    // Avoid modifying the store object
+    return [...dashboardStore.dashboardWidgets(this.dashboardId)]
       .sort(objectSorter('order'));
   }
 

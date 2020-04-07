@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { filterById } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
 import {
@@ -44,34 +44,23 @@ export class HistoryModule extends VuexModule {
   }
 
   @Mutation
-  public setSession(session: LoggedSession): void {
-    this.sessions = filterById(this.sessions, session, true);
-  }
-
-  @Mutation
   public setSource(source: HistorySource): void {
-    this.sources = filterById(this.sources, source, true);
-  }
-
-  @Action
-  public async fetchSessions(): Promise<void> {
-    this.sessions = await sessionApi.fetch();
+    this.sources = extendById(this.sources, source);
   }
 
   @Action
   public async createSession(session: LoggedSession): Promise<void> {
-    this.setSession(await sessionApi.create(session));
+    await sessionApi.create(session);
   }
 
   @Action
   public async saveSession(session: LoggedSession): Promise<void> {
-    this.setSession(await sessionApi.persist(session));
+    await sessionApi.persist(session);
   }
 
   @Action
   public async removeSession(session: LoggedSession): Promise<void> {
     await sessionApi.remove(session);
-    this.sessions = filterById(this.sessions, session);
   }
 
   @Action
@@ -132,7 +121,7 @@ export class HistoryModule extends VuexModule {
     const onChange = (session: LoggedSession): void => {
       const existing = this.sessionById(session.id);
       if (!existing || existing._rev !== session._rev) {
-        this.setSession(session);
+        this.sessions = extendById(this.sessions, session);
       }
     };
     const onDelete = (id: string): void => {

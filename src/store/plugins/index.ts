@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { filterById } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import { StoreObject } from '@/plugins/database';
 import store from '@/store';
 
@@ -28,8 +28,8 @@ export class PluginModule extends VuexModule {
 
   @Mutation
   public setPlugin(plugin: UIPlugin): void {
-    this.plugins = filterById(this.plugins, plugin, true);
-    this.results = filterById(this.results, defaultResult(plugin), true);
+    this.plugins = extendById(this.plugins, plugin);
+    this.results = extendById(this.results, defaultResult(plugin));
   }
 
   @Mutation
@@ -40,7 +40,7 @@ export class PluginModule extends VuexModule {
 
   @Mutation
   public setResult(result: UIPluginResult): void {
-    this.results = filterById(this.results, result, true);
+    this.results = extendById(this.results, result);
   }
 
   @Action

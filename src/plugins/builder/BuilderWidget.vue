@@ -39,7 +39,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   get layouts(): BuilderLayout[] {
     return this.layoutIds
-      .map(builderStore.layoutById)
+      .map(id => builderStore.layoutById(id))
       .filter(v => v !== null) as BuilderLayout[];
   }
 

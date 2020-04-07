@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { filterById } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
 import { BuilderLayout, PartSpec } from '../types';
@@ -50,26 +50,19 @@ export class BuilderModule extends VuexModule {
     this.specs = specs;
   }
 
-  @Mutation
-  public setLayout(layout: BuilderLayout): void {
-    this.layouts = filterById(this.layouts, layout, true);
-  }
-
   @Action
   public async createLayout(layout: BuilderLayout): Promise<void> {
-    this.setLayout(await api.create(layout));
+    await api.create(layout);
   }
 
   @Action
   public async saveLayout(layout: BuilderLayout): Promise<void> {
-    this.setLayout(await api.persist(layout));
+    await api.persist(layout);
   }
 
   @Action
   public async removeLayout(layout: BuilderLayout): Promise<void> {
-    await api.remove(layout)
-      .catch(() => { });
-    this.layouts = filterById(this.layouts, layout);
+    await api.remove(layout).catch(() => { });
   }
 
   @Action
@@ -77,7 +70,7 @@ export class BuilderModule extends VuexModule {
     const onChange = async (layout: BuilderLayout): Promise<void> => {
       const existing = this.layoutById(layout.id);
       if (!existing || existing._rev !== layout._rev) {
-        this.setLayout(layout);
+        this.layouts = extendById(this.layouts, layout);
       }
     };
     const onDelete = (id: string): void => {

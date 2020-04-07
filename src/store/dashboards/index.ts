@@ -1,6 +1,6 @@
-import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
+import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { filterById } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
 import { dashboardApi, widgetApi } from './api';
@@ -22,7 +22,7 @@ export class DashboardModule extends VuexModule {
   }
 
   public get primaryDashboardId(): string | null {
-    const sorted = this.dashboards
+    const sorted = [...this.dashboards]
       .sort((left, right) => {
         if (left.primary && !right.primary) {
           return -1;
@@ -53,24 +53,14 @@ export class DashboardModule extends VuexModule {
     return this.widgets.filter(widget => widget.dashboard === dashboardId);
   }
 
-  @Mutation
-  public setDashboard(dashboard: Dashboard): void {
-    this.dashboards = filterById(this.dashboards, dashboard);
-  }
-
-  @Mutation
-  public setWidget(widget: Widget): void {
-    this.widgets = filterById(this.widgets, widget);
-  }
-
   @Action
   public async createDashboard(dashboard: Dashboard): Promise<void> {
-    this.setDashboard(await dashboardApi.create(dashboard));
+    await dashboardApi.create(dashboard);
   }
 
   @Action
   public async saveDashboard(dashboard: Dashboard): Promise<void> {
-    this.setDashboard(await dashboardApi.persist(dashboard));
+    await dashboardApi.persist(dashboard);
   }
 
   @Action
@@ -102,23 +92,22 @@ export class DashboardModule extends VuexModule {
     this.dashboardWidgets(dashboard.id)
       .forEach(widget => this.removeWidget(widget));
     await dashboardApi.remove(dashboard).catch(() => { });
-    this.dashboards = filterById(this.dashboards, dashboard);
   }
 
   @Action
   public async createWidget(widget: Widget): Promise<void> {
-    this.setWidget(await widgetApi.create(widget));
+    await widgetApi.create(widget);
   }
 
   @Action
   public async appendWidget(widget: Widget): Promise<void> {
     const order = this.dashboardWidgets(widget.dashboard).length + 1;
-    this.setWidget(await widgetApi.create({ ...widget, order }));
+    await widgetApi.create({ ...widget, order });
   }
 
   @Action
   public async saveWidget(widget: Widget): Promise<void> {
-    this.setWidget(await widgetApi.persist(widget));
+    await widgetApi.persist(widget);
   }
 
   @Action
@@ -150,7 +139,6 @@ export class DashboardModule extends VuexModule {
   @Action
   public async removeWidget(widget: Widget): Promise<void> {
     await widgetApi.remove(widget).catch(() => { });
-    this.widgets = filterById(this.widgets, widget);
   }
 
   @Action
@@ -158,16 +146,17 @@ export class DashboardModule extends VuexModule {
     const onDashboardChange = (dashboard: Dashboard): void => {
       const existing = this.dashboardById(dashboard.id);
       if (!existing || existing._rev !== dashboard._rev) {
-        this.setDashboard(dashboard);
+        this.dashboards = extendById(this.dashboards, dashboard);
       }
     };
     const onDashboardDelete = (id: string): void => {
       this.dashboards = filterById(this.dashboards, { id });
     };
+
     const onWidgetChange = (widget: Widget): void => {
       const existing = this.widgetById(widget.id);
       if (!existing || existing._rev !== widget._rev) {
-        this.setWidget(widget);
+        this.widgets = extendById(this.widgets, widget);
       }
     };
     const onWidgetDelete = (id: string): void => {

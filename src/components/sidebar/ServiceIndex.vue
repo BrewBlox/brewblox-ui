@@ -32,11 +32,12 @@ export default class ServiceIndex extends Vue {
   }
 
   get services(): Service[] {
+    // Avoid modifying the store object
     return [...serviceStore.services].sort(objectSorter('order'));
   }
 
   set services(services: Service[]) {
-    serviceStore.updateServiceOrder(services.map(service => service.id));
+    serviceStore.updateServiceOrder(services.map(v => v.id));
   }
 
   get suggestions(): ServiceSuggestion[] {

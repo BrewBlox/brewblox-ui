@@ -71,7 +71,7 @@ export default {
       Vue.$eventbus.addListener({
         id: uid(),
         filter: (_, type) => type === sparkStatusEvent,
-        onmessage: msg => serviceStore.createStub({ id: msg.key, type: sparkType }),
+        onmessage: msg => serviceStore.ensureStub({ id: msg.key, type: sparkType }),
       });
     });
   },
