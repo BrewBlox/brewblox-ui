@@ -238,7 +238,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         enabled: true,
         inputId: new Link(config.names.hltSetpoint),
         outputId: new Link(config.names.hltPwm),
@@ -254,7 +254,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         enabled: true,
         inputId: new Link(config.names.mtSetpoint),
         outputId: new Link(config.names.hltDriver),
@@ -269,7 +269,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         enabled: true,
         inputId: new Link(config.names.bkSetpoint),
         outputId: new Link(config.names.bkPwm),

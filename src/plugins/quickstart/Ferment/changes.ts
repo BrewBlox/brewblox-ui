@@ -238,7 +238,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         ...coolPidConfig,
         enabled: true,
         inputId: new Link(activeSetpointId),
@@ -251,7 +251,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         ...heatPidConfig,
         enabled: true,
         inputId: new Link(activeSetpointId),

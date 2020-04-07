@@ -12,7 +12,7 @@ export default class PluginDialog extends DialogBase {
 
   get combos(): [UIPlugin, UIPluginResult][] {
     return pluginStore.plugins
-      .map(plugin => [plugin, pluginStore.results[plugin.id]] as [UIPlugin, UIPluginResult]);
+      .map(plugin => [plugin, pluginStore.results.find(v => v.id === plugin.id)] as [UIPlugin, UIPluginResult]);
   }
 
   async addPlugin(): Promise<void> {

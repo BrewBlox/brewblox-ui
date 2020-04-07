@@ -39,8 +39,7 @@ export default {
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
     autoRegister(require.context('./parts', true, /[A-Z]\w+\.vue$/));
 
-    Object.values(specs)
-      .forEach(builderStore.registerPart);
+    builderStore.registerParts(Object.values(specs));
 
     featureStore.registerWidget(feature);
     featureStore.registerWidget(deprecated);

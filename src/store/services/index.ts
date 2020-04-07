@@ -11,10 +11,10 @@ import { Service, ServiceStatus, ServiceStub } from './types';
 export * from './types';
 
 const onStartService = (service: Service): Promise<void> =>
-  featureStore.services[service.type]?.onStart?.(service);
+  featureStore.serviceById(service.type)?.onStart?.(service);
 
 const onRemoveService = (service: Service): Promise<void> =>
-  featureStore.services[service.type]?.onRemove?.(service);
+  featureStore.serviceById(service.type)?.onRemove?.(service);
 
 
 @Module({ generateMutationSetters: true })
@@ -100,8 +100,7 @@ export class ServiceModule extends VuexModule {
 
   @Action
   public async updateStatus(status: ServiceStatus): Promise<void> {
-    const current = this.statuses[status.id];
-    if (!isEqual(current, status)) {
+    if (!this.statuses.some(v => isEqual(v, status))) {
       this.setStatus(status);
     }
   }

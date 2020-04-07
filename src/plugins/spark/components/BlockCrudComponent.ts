@@ -60,11 +60,11 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   }
 
   public get hasGraph(): boolean {
-    return sparkStore.specs[this.block.type]?.graphTargets !== undefined;
+    return sparkStore.spec(this.block)?.graphTargets !== undefined;
   }
 
   public get renamedTargets(): Mapped<string> {
-    const targets = sparkStore.specs[this.block.type]?.graphTargets;
+    const targets = sparkStore.spec(this.block)?.graphTargets;
     return targets !== undefined
       ? postfixedDisplayNames(targets, this.block.data)
       : {};

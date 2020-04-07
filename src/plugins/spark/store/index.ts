@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { filterById, objReducer } from '@/helpers/functional';
+import { filterById } from '@/helpers/functional';
 import store from '@/store';
 
 import { Block, BlockSpec, StoredDataPreset } from '../types';
@@ -13,8 +13,7 @@ export { SparkServiceModule } from './spark-service';
 export class SparkGlobalModule extends VuexModule {
   public services: SparkServiceModule[] = [];
   public presets: StoredDataPreset[] = [];
-  public specs: Mapped<BlockSpec> = {};
-  public specValues: BlockSpec[] = [];
+  public specs: BlockSpec[] = [];
 
   public get serviceIds(): string[] {
     return this.services.map(v => v.id);
@@ -41,6 +40,14 @@ export class SparkGlobalModule extends VuexModule {
     return this.serviceById(serviceId)?.blocks ?? [];
   }
 
+  public specById(id: string): BlockSpec {
+    return this.specs.find(v => v.id === id)!;
+  }
+
+  public spec({ type }: { type: string }): BlockSpec {
+    return this.specById(type);
+  }
+
   @Mutation
   public setPreset(preset: StoredDataPreset): void {
     this.presets = filterById(this.presets, preset, true);
@@ -64,8 +71,7 @@ export class SparkGlobalModule extends VuexModule {
 
   @Action
   public async registerSpecs(specs: BlockSpec[]): Promise<void> {
-    this.specValues = [...specs];
-    this.specs = specs.reduce(objReducer('id'), {});
+    this.specs = specs;
   }
 
   @Action
@@ -94,9 +100,9 @@ export class SparkGlobalModule extends VuexModule {
       throw new Error(`Service '${serviceId}' already exists`);
     }
 
-    const module = new SparkServiceModule(serviceId, { store, name: `spark__${serviceId}` });
-    this.services.push(module);
-    await module.start();
+    const service = new SparkServiceModule(serviceId, { store, name: `spark__${serviceId}` });
+    this.services = [...this.services, service];
+    await service.start();
   }
 
   @Action

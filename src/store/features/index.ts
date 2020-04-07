@@ -84,6 +84,10 @@ export class FeatureModule extends VuexModule {
     return this.widgetById(id)?.removeActions ?? [];
   }
 
+  public serviceById(id: string): ServiceFeature | null {
+    return this.services.find(v => v.id === id) ?? null;
+  }
+
   @Action
   public async registerWidget(feature: WidgetFeature): Promise<void> {
     if (feature.wizard === true && feature.generateConfig === undefined) {

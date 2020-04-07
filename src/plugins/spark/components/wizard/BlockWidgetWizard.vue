@@ -73,7 +73,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
       serviceId: this.serviceId,
       type: this.featureId,
       groups: [0],
-      data: sparkStore.specs[this.featureId].generate(),
+      data: sparkStore.spec({ type: this.featureId }).generate(),
     };
     this.blockId = this.block.id; // for when using existing block
     this.widget = this.widget ?? {

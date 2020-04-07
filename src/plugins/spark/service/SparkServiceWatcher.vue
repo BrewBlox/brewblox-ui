@@ -20,8 +20,8 @@ export default class SparkServiceWatcher extends Vue {
   @Prop({ type: Object, required: true })
   public readonly service!: SparkService;
 
-  get sparkModule(): SparkServiceModule {
-    return sparkStore.serviceById(this.service.id)!;
+  get sparkModule(): SparkServiceModule | null {
+    return sparkStore.serviceById(this.service.id);
   }
 
   get now(): Date {
@@ -29,7 +29,7 @@ export default class SparkServiceWatcher extends Vue {
   }
 
   get status(): SparkStatus | null {
-    return this.sparkModule.status;
+    return this.sparkModule?.status ?? null;
   }
 
   get cookieName(): string {
@@ -49,6 +49,9 @@ export default class SparkServiceWatcher extends Vue {
 
   @Watch('now')
   checkBlocksFresh(): void {
+    if (!this.sparkModule) {
+      return;
+    }
     const blocksDate = this.sparkModule.lastBlocks;
     const statusDate = this.sparkModule.lastStatus;
     const blocksFresh = this.fresh(blocksDate);

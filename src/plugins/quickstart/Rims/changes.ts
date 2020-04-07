@@ -150,7 +150,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         kp: new Unit(10, '1/degC'),
         ti: new Time(5, 'min'),
         td: new Time(30, 's'),
@@ -165,7 +165,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         kp: new Unit(30, '1/degC'),
         ti: new Time(2, 'min'),
         td: new Time(10, 's'),

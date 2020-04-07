@@ -19,7 +19,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
   get spec(): BlockSpec | null {
     return this.impl.blockType !== null
-      ? sparkStore.specs[this.impl.blockType] ?? null
+      ? sparkStore.specById(this.impl.blockType) ?? null
       : null;
   }
 
@@ -43,7 +43,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
   }
 
   get validTypes(): string[] {
-    return sparkStore.specValues
+    return sparkStore.specs
       .filter(spec => spec.changes.length)
       .map(spec => spec.id);
   }

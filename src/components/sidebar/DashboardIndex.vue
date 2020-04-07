@@ -24,7 +24,7 @@ export default class DashboardIndex extends Vue {
   }
 
   get dashboards(): Dashboard[] {
-    return dashboardStore.dashboards.sort(objectSorter('order'));
+    return [...dashboardStore.dashboards].sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {

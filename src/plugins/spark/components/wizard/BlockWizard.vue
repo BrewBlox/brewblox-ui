@@ -117,7 +117,7 @@ export default class BlockWizard extends Vue {
       serviceId: this.serviceId,
       type: featureId,
       groups: [0],
-      data: sparkStore.specs[featureId].generate(),
+      data: sparkStore.spec({ type: featureId }).generate(),
     };
   }
 

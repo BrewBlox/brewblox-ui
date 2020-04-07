@@ -187,7 +187,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         kp: new Unit(-20, '1/degC'),
         ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
@@ -202,7 +202,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
         kp: new Unit(20, '1/degC'),
         ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
@@ -291,7 +291,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           serviceId,
           groups,
           data: {
-            ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+            ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
             kp: new Unit(-20, '1/degC'),
             ti: new Time(2, 'hour'),
             td: new Time(5, 'min'),

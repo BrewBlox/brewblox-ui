@@ -46,8 +46,8 @@ export class BuilderModule extends VuexModule {
   }
 
   @Mutation
-  public registerPart(spec: PartSpec): void {
-    this.specs = [...this.specs, spec];
+  public registerParts(specs: PartSpec[]): void {
+    this.specs = specs;
   }
 
   @Mutation

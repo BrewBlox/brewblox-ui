@@ -32,7 +32,7 @@ export default class ServiceIndex extends Vue {
   }
 
   get services(): Service[] {
-    return serviceStore.services.sort(objectSorter('order'));
+    return [...serviceStore.services].sort(objectSorter('order'));
   }
 
   set services(services: Service[]) {
@@ -41,11 +41,11 @@ export default class ServiceIndex extends Vue {
 
   get suggestions(): ServiceSuggestion[] {
     return serviceStore.stubs
-      .filter(stub => !!featureStore.services[stub.type])
       .map(stub => {
-        const feature = featureStore.services[stub.type];
+        const feature = featureStore.serviceById(stub.type)!;
         return { stub, feature };
-      });
+      })
+      .filter(({ feature }) => feature !== null);
   }
 
   status(service: Service): ServiceStatus | null {
