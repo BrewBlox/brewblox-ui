@@ -3,8 +3,8 @@ import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { sparkStore } from '@/plugins/spark/store';
 
-import { sparkStore } from '../../store';
 import { BalancerBlock } from './types';
 
 @Component
@@ -13,7 +13,7 @@ export default class BalancerWidget
 
   get clientNames(): Mapped<string> {
     const result = {};
-    sparkStore.blockValues(this.serviceId)
+    sparkStore.serviceBlocks(this.serviceId)
       .forEach((block) => {
         const constraint = get(block, 'data.constrainedBy.constraints', [])
           .find(constraint => get(constraint, 'balanced.balancerId.id') === this.blockId);

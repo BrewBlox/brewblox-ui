@@ -5,7 +5,6 @@ import { spaceCased } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 import { ValveStartId } from '../DS2408/types';
@@ -19,7 +18,7 @@ export default class MotorValveFull
   get hwBlock(): Block | null {
     const blockId = this.block.data.hwDevice.id;
     return !!blockId
-      ? sparkStore.blockById(this.serviceId, blockId)
+      ? this.sparkModule.blockById(blockId)
       : null;
   }
 
@@ -28,7 +27,7 @@ export default class MotorValveFull
       return {};
     }
     const targetId = this.hwBlock.id;
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule.blocks
       .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block.id), {});
   }
@@ -60,9 +59,9 @@ export default class MotorValveFull
     }
     const currentDriver = new Link(this.claimedChannels[pinId] || null, typeName);
     if (currentDriver.id) {
-      const currentDriverBlock: MotorValveBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
+      const currentDriverBlock: MotorValveBlock = this.sparkModule.blockById(currentDriver.id)!;
       currentDriverBlock.data.startChannel = 0;
-      await sparkStore.saveBlock(currentDriverBlock);
+      await this.sparkModule.saveBlock(currentDriverBlock);
     }
     this.block.data.startChannel = pinId;
     await this.saveBlock();

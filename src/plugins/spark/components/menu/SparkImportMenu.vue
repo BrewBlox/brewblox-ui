@@ -8,7 +8,7 @@ import { suggestId } from '@/helpers/functional';
 import { loadFile, saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
 
@@ -24,8 +24,12 @@ export default class SparkImportMenu extends DialogBase {
     return serviceStore.serviceById(this.serviceId);
   }
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.serviceById(this.serviceId)!;
+  }
+
   async exportBlocks(): Promise<void> {
-    const exported = await sparkStore.serviceExport(this.service.id);
+    const exported = await this.sparkModule.serviceExport();
     saveFile(exported, `brewblox-blocks-${this.service.id}.json`);
   }
 
@@ -47,7 +51,7 @@ export default class SparkImportMenu extends DialogBase {
     try {
       this.importBusy = true;
       this.messages = [];
-      this.messages = await sparkStore.serviceImport([this.service.id, values]);
+      this.messages = await this.sparkModule.serviceImport(values);
       if (this.messages.length > 0) {
         notify.warn(`Some blocks could not be imported on ${this.service.id}`);
         this.messages

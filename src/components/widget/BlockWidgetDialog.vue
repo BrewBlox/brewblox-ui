@@ -26,7 +26,7 @@ export default class BlockWidgetDialog extends DialogBase {
   public readonly getProps!: () => any;
 
   get block(): Block | null {
-    return sparkStore.tryBlockById(this.serviceId, this.blockId);
+    return sparkStore.blockById(this.serviceId, this.blockId);
   }
 
   get blockType(): string {

@@ -50,7 +50,7 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   get applicableSteps(): Mapped<boolean> {
-    const blockIds = sparkStore.blockIds(this.serviceId) ?? [];
+    const blockIds = sparkStore.serviceBlocks(this.serviceId).map(v => v.id);
     return this.steps
       .reduce(
         (acc, step) => {
@@ -61,7 +61,7 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   get stepDisplays(): StepDisplay[] {
-    const blockIds = sparkStore.blockIds(this.serviceId) ?? [];
+    const blockIds = sparkStore.serviceBlocks(this.serviceId).map(v => v.id);
     return this.steps
       .map(step => {
         const applicable = step.changes.every(change => blockIds.includes(change.blockId));
@@ -106,7 +106,7 @@ export default class QuickActionsBasic extends CrudComponent {
     const changes = step.changes;
     const actualChanges: [Block, any][] = [];
     for (const change of changes) {
-      const block = sparkStore.blockById(this.serviceId, change.blockId);
+      const block = sparkStore.blockById(this.serviceId, change.blockId)!;
       const spec = sparkStore.specs[block.type];
       const actualData = deepCopy(change.data);
       for (const key in change.data) {
@@ -141,7 +141,7 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   blockDiff(change: BlockChange): BlockDiff {
-    const block = sparkStore.blockById(this.serviceId, change.blockId);
+    const block = sparkStore.blockById(this.serviceId, change.blockId)!;
     const spec = sparkStore.specs[block.type];
     const diffs =
       Object.entries(change.data)

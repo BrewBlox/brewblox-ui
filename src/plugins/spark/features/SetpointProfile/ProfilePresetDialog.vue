@@ -19,7 +19,7 @@ export default class ProfilePresetDialog extends DialogBase {
   public readonly value!: SetpointProfileBlock;
 
   get options(): SelectOption[] {
-    return sparkStore.presetValues
+    return sparkStore.presets
       .filter(preset => preset.type === typeName)
       .map(preset => ({ label: preset.name, value: preset.id }));
   }
@@ -28,7 +28,8 @@ export default class ProfilePresetDialog extends DialogBase {
     if (this.selected === null) {
       return;
     }
-    const preset = sparkStore.presets[this.selected.value];
+    const { value } = this.selected;
+    const preset = sparkStore.presets.find(v => v.id === value)!;
     this.selected = null;
     sparkStore.removePreset(preset);
   }
@@ -37,7 +38,8 @@ export default class ProfilePresetDialog extends DialogBase {
     if (this.selected === null) {
       return;
     }
-    const preset = sparkStore.presets[this.selected.value];
+    const { value } = this.selected;
+    const preset = sparkStore.presets.find(v => v.id === value)!;
     createDialog({
       title: 'Edit profile name',
       cancel: true,
@@ -53,7 +55,8 @@ export default class ProfilePresetDialog extends DialogBase {
     if (this.selected === null) {
       return;
     }
-    const preset = sparkStore.presets[this.selected.value];
+    const { value } = this.selected;
+    const preset = sparkStore.presets.find(v => v.id === value)!;
     const points = deserialize(cloneDeep(preset.data.points));
 
     createDialog({
@@ -79,7 +82,8 @@ export default class ProfilePresetDialog extends DialogBase {
     if (this.selected === null) {
       return;
     }
-    const preset = sparkStore.presets[this.selected.value];
+    const { value } = this.selected;
+    const preset = sparkStore.presets.find(v => v.id === value)!;
     preset.data = {
       points: cloneDeep(serialize(this.value.data.points)),
     };

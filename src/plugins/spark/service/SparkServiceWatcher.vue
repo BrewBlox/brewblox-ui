@@ -5,7 +5,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { systemStore } from '@/store/system';
 
 import { SparkService, SparkStatus } from '../types';
@@ -20,12 +20,16 @@ export default class SparkServiceWatcher extends Vue {
   @Prop({ type: Object, required: true })
   public readonly service!: SparkService;
 
+  get sparkModule(): SparkServiceModule {
+    return sparkStore.serviceById(this.service.id)!;
+  }
+
   get now(): Date {
     return systemStore.now;
   }
 
   get status(): SparkStatus | null {
-    return sparkStore.status(this.service.id);
+    return this.sparkModule.status;
   }
 
   get cookieName(): string {
@@ -45,21 +49,21 @@ export default class SparkServiceWatcher extends Vue {
 
   @Watch('now')
   checkBlocksFresh(): void {
-    const blocksDate = sparkStore.lastBlocks(this.service.id);
-    const statusDate = sparkStore.lastStatus(this.service.id);
+    const blocksDate = this.sparkModule.lastBlocks;
+    const statusDate = this.sparkModule.lastStatus;
     const blocksFresh = this.fresh(blocksDate);
     const statusFresh = this.fresh(statusDate);
 
     // The last received set of blocks are stale.
     // Remove them.
     if (!blocksFresh && blocksDate) {
-      sparkStore.invalidateBlocks(this.service.id);
+      this.sparkModule.invalidateBlocks();
     }
 
     // The last received status update is stale.
     // Query the service for an update.
     if (!statusFresh) {
-      sparkStore.fetchAll(this.service.id);
+      this.sparkModule.fetchAll();
     }
   }
 

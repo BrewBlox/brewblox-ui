@@ -20,7 +20,7 @@ export default class MutexBasic
   extends BlockCrudComponent<MutexBlock> {
 
   get mutexClients(): MutexClient[] {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       // Does the block have -any- digital constraint?
       .filter(block => block.data.constrainedBy?.constraints[0]?.remaining)
       .flatMap(block => {

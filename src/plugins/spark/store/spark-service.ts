@@ -24,7 +24,8 @@ import { asBlock, asServiceStatus, calculateDrivenChains, calculateLimiters, cal
 
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {
-  public readonly serviceId: string;
+  public readonly id: string; // serviceId
+
   public blocks: Block[];
   public discoveredBlocks: string[];
   public units: UserUnits;
@@ -34,7 +35,7 @@ export class SparkServiceModule extends VuexModule {
 
   public constructor(serviceId: string, options: RegisterOptions) {
     super(options);
-    this.serviceId = serviceId;
+    this.id = serviceId;
     this.blocks = [];
     this.discoveredBlocks = [];
     this.units = {
@@ -68,7 +69,7 @@ export class SparkServiceModule extends VuexModule {
   }
 
   public get service(): SparkService {
-    return serviceStore.serviceById(this.serviceId);
+    return serviceStore.serviceById(this.id);
   }
 
   @Mutation
@@ -76,15 +77,15 @@ export class SparkServiceModule extends VuexModule {
     this.blocks = filterById(this.blocks, block, true);
   }
 
-  // @Mutation
-  // public removeBlock(block: Block): void {
-  //   this.blocks = filterById(this.blocks, block, false);
-  // }
-
   @Mutation
   public invalidateBlocks(): void {
     this.blocks = [];
     this.lastBlocks = null;
+  }
+
+  public blockById<T extends Block>(blockId: string | null): T | null {
+    if (!blockId) { return null; }
+    return this.blocks.find(v => v.id === blockId) as T ?? null;
   }
 
   @Action
@@ -113,7 +114,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async fetchBlocks(): Promise<void> {
-    this.blocks = await api.fetchBlocks(this.serviceId);
+    this.blocks = await api.fetchBlocks(this.id);
   }
 
   @Action
@@ -121,19 +122,18 @@ export class SparkServiceModule extends VuexModule {
     if (this.blocks.find(v => v.id === newId)) {
       throw new Error(`Block ${newId} already exists`);
     }
-    await api.renameBlock(this.serviceId, currentId, newId);
+    await api.renameBlock(this.id, currentId, newId);
     await this.fetchBlocks();
     dashboardStore.widgetValues
-      .filter(item => item.config.serviceId === this.serviceId && item.config.blockId === currentId)
+      .filter(item => item.config.serviceId === this.id && item.config.blockId === currentId)
       .forEach(item => dashboardStore.commitWidget({ ...item, config: { ...item.config, blockId: newId } }));
   }
 
   @Action
   public async clearBlocks(): Promise<void> {
-    await api.clearBlocks(this.serviceId);
+    await api.clearBlocks(this.id);
     await this.fetchBlocks();
   }
-
 
   @Action
   public async updateStatus(status: SparkStatus): Promise<void> {
@@ -143,17 +143,17 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async fetchUnits(): Promise<void> {
-    this.units = await api.fetchUnits(this.serviceId);
+    this.units = await api.fetchUnits(this.id);
   }
 
   @Action
   public async saveUnits(units: UserUnits): Promise<void> {
-    this.units = await api.persistUnits(this.serviceId, units);
+    this.units = await api.persistUnits(this.id, units);
   }
 
   @Action
   public async fetchDiscoveredBlocks(): Promise<void> {
-    const discovered = await api.fetchDiscoveredBlocks(this.serviceId);
+    const discovered = await api.fetchDiscoveredBlocks(this.id);
     this.discoveredBlocks = [...this.discoveredBlocks, ...discovered];
   }
 
@@ -164,12 +164,12 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async cleanUnusedNames(): Promise<string[]> {
-    return await api.cleanUnusedNames(this.serviceId);
+    return await api.cleanUnusedNames(this.id);
   }
 
   @Action
   public async fetchAll(): Promise<boolean> {
-    const status = await api.fetchSparkStatus(this.serviceId);
+    const status = await api.fetchSparkStatus(this.id);
     await this.updateStatus(status);
     if (status.synchronize) {
       await Promise.all([
@@ -183,50 +183,54 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async flashFirmware(): Promise<any> {
-    return await api.flashFirmware(this.serviceId);
+    return await api.flashFirmware(this.id);
   }
 
   @Action
   public async serviceExport(): Promise<SparkExported> {
-    return await api.serviceExport(this.serviceId);
+    return await api.serviceExport(this.id);
   }
 
   @Action
   public async serviceImport(exported: SparkExported): Promise<string[]> {
-    const importLog = await api.serviceImport(this.serviceId, exported);
+    const importLog = await api.serviceImport(this.id, exported);
     await this.fetchBlocks();
     return importLog;
   }
 
   @Action
   public async start(): Promise<void> {
-    const serviceId = this.serviceId;
-
     // Listen for block updates
     Vue.$eventbus.addListener({
-      id: `${sparkBlocksEvent}__${serviceId}`,
-      filter: (key, type) => key === serviceId && type === sparkBlocksEvent,
+      id: `${sparkBlocksEvent}__${this.id}`,
+      filter: (key, type) => key === this.id && type === sparkBlocksEvent,
       onmessage: (msg: EventbusMessage) => {
         this.blocks = msg.data
           .map(deserialize)
-          .map((block: DataBlock) => asBlock(block, serviceId));
+          .map((block: DataBlock) => asBlock(block, this.id));
       },
     });
 
     // Listen for status updates
     Vue.$eventbus.addListener({
-      id: `${sparkStatusEvent}__${serviceId}`,
-      filter: (key, type) => key === serviceId && type === sparkStatusEvent,
+      id: `${sparkStatusEvent}__${this.id}`,
+      filter: (key, type) => key === this.id && type === sparkStatusEvent,
       onmessage: (msg: EventbusMessage) => {
         const status: ApiSparkStatus = msg.data;
         this.updateStatus({
           ...status,
-          serviceId,
+          serviceId: this.id,
           available: true,
         });
       },
     });
 
     await this.fetchAll().catch(() => { });
+  }
+
+  @Action
+  public async stop(): Promise<void> {
+    Vue.$eventbus.removeListener(`${sparkBlocksEvent}__${this.id}`);
+    Vue.$eventbus.removeListener(`${sparkStatusEvent}__${this.id}`);
   }
 }

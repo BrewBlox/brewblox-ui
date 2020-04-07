@@ -47,7 +47,7 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
   }
 
   discover(): void {
-    sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
+    sparkStore.serviceById(this.config.serviceId)?.fetchDiscoveredBlocks();
   }
 
   startBlockWizard(): void {

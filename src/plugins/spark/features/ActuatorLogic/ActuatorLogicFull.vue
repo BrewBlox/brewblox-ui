@@ -72,11 +72,11 @@ export default class ActuatorLogicFull
   }
 
   get tempUnit(): string {
-    return sparkStore.units(this.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   get validBlocks(): Block[] {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => isCompatible(block.type, validTypes));
   }
 
@@ -106,7 +106,7 @@ export default class ActuatorLogicFull
         key: analogKey(idx),
         pretty: prettyAnalog(
           cmp,
-          sparkStore.tryBlockById(this.serviceId, cmp.id.id)?.type ?? null,
+          sparkStore.blockById(this.serviceId, cmp.id.id)?.type ?? null,
           this.tempUnit,
         ),
       }));

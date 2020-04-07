@@ -34,7 +34,8 @@ export default class ValveArray extends BlockCrudComponent {
   public readonly nameEnum!: any;
 
   get claimedChannels(): { [channel: number]: string } {
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule
+      .blocks
       .filter(block => block.type === valveType && block.data.hwDevice.id === this.block.id)
       .reduce((acc, block: MotorValveBlock) => mutate(acc, block.data.startChannel, block.id), {});
   }
@@ -76,12 +77,13 @@ export default class ValveArray extends BlockCrudComponent {
   }
 
   driverDriven(block: Block): boolean {
-    return sparkStore.drivenChains(this.serviceId)
+    return this.sparkModule
+      .drivenChains
       .some((chain: string[]) => chain[0] === block.id);
   }
 
   driverLimitedBy(block: Block): string {
-    const limiting: string[] = sparkStore.limiters(this.serviceId)[block.id];
+    const limiting: string[] = this.sparkModule.limiters[block.id];
     return limiting ? limiting.join(', ') : '';
   }
 
@@ -94,7 +96,7 @@ export default class ValveArray extends BlockCrudComponent {
       await sparkStore.saveBlock(channel.driver);
     }
     if (link.id) {
-      const newDriver: MotorValveBlock = sparkStore.blockById(this.serviceId, link.id);
+      const newDriver: MotorValveBlock = this.sparkModule.blockById(link.id)!;
       newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
       newDriver.data.startChannel = channel.id;
       await sparkStore.saveBlock(newDriver);

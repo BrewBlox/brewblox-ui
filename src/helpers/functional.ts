@@ -111,7 +111,7 @@ export const dateString =
   };
 
 export const shortDateString =
-  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
+  (value: number | string | Date | null | undefined, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -260,6 +260,9 @@ export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
     ? arr.splice(idx, 1)[0]
     : undefined;
 }
+
+export function filterById<T extends HasId>(arr: T[], obj: HasId): T[];
+export function filterById<T extends HasId>(arr: T[], obj: T, insert: boolean): T[];
 
 export function filterById<T extends HasId>(arr: T[], obj: T, insert = false): T[] {
   const filtered = arr.filter(v => v.id !== obj.id);

@@ -16,9 +16,9 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
   glycolSetting = new Temp(4, 'degC');
 
   created(): void {
-    const unit = sparkStore.units(this.config.serviceId).Temp;
-    this.beerSetting = this.beerSetting.convert(unit);
-    this.glycolSetting = this.glycolSetting.convert(unit);
+    const { Temp } = sparkStore.serviceById(this.config.serviceId)!.units;
+    this.beerSetting = this.beerSetting.convert(Temp);
+    this.glycolSetting = this.glycolSetting.convert(Temp);
   }
 
   done(): void {

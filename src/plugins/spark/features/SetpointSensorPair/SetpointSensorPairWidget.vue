@@ -22,7 +22,7 @@ export default class SetpointSensorPairWidget
     if (!this.crud.isStoreBlock) {
       return [];
     }
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => block.data.inputId?.id === this.blockId);
   }
 

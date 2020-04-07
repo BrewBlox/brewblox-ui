@@ -29,7 +29,7 @@ export default class DigitalActuatorWidget
       return {};
     }
     const targetId = this.hwBlock.id;
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }
@@ -58,7 +58,7 @@ export default class DigitalActuatorWidget
     }
     const currentDriver = new Link(this.claimedChannels[pinId] || null, typeName);
     if (currentDriver.id) {
-      const currentDriverBlock: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
+      const currentDriverBlock: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, currentDriver.id)!;
       currentDriverBlock.data.channel = 0;
       await sparkStore.saveBlock(currentDriverBlock);
     }

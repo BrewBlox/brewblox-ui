@@ -7,7 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
@@ -45,6 +45,10 @@ export default class BlockWizard extends Vue {
 
   @Emit('close')
   public close(): void { }
+
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.serviceById(this.serviceId)!;
+  }
 
   get blockIdRules(): InputRule[] {
     return blockIdRules(this.serviceId);
@@ -148,10 +152,11 @@ export default class BlockWizard extends Vue {
       return;
     }
     this.ensureLocalBlock();
+    const block = this.block!;
     try {
-      await sparkStore.createBlock(this.block!);
-      notify.done(`Created ${featureStore.widgetTitle(this.block!.type)} block '${this.blockId}'`);
-      this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
+      await this.sparkModule.createBlock(block);
+      notify.done(`Created ${featureStore.widgetTitle(block.type)} block '${this.blockId}'`);
+      this.onCreate(this.sparkModule.blockById(this.blockId)!);
     }
     catch (e) {
       notify.error(`Failed to create block: ${e.toString()}`);

@@ -47,7 +47,7 @@ export default class BlockAddressField extends FieldBase {
   }
 
   get block(): Block | null {
-    return sparkStore.tryBlockById(this.value.serviceId, this.value.id);
+    return sparkStore.blockById(this.value.serviceId, this.value.id);
   }
 
   get canEdit(): boolean {

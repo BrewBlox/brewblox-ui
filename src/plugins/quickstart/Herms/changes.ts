@@ -300,7 +300,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
 
 
 export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Widget[] {
-  const userTemp = sparkStore.units(config.serviceId).Temp;
+  const userTemp = sparkStore.serviceById(config.serviceId)!.units.Temp;
   const genericSettings = {
     dashboard: config.dashboardId,
     cols: 4,

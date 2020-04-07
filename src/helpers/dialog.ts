@@ -18,7 +18,7 @@ export function createBlockDialog(addr: BlockAddress | Block | null, opts: Block
   if (!addr || !addr.id) {
     return;
   }
-  if (opts.verify && !sparkStore.tryBlockById(addr.serviceId, addr.id)) {
+  if (opts.verify && !sparkStore.blockById(addr.serviceId, addr.id)) {
     return;
   }
   const { props, mode } = opts;

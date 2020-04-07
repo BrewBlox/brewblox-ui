@@ -6,7 +6,7 @@ import { spaceCased } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { prettify } from '@/helpers/units';
 import { userUnitChoices } from '@/plugins/spark/getters';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { UserUnitKey, UserUnits } from '@/plugins/spark/types';
 
 
@@ -17,8 +17,12 @@ export default class SparkUnitMenu extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.serviceById(this.serviceId)!;
+  }
+
   get units(): UserUnits {
-    return sparkStore.units(this.serviceId) ?? {};
+    return this.sparkModule.units;
   }
 
   unitAlternativeOptions(key: UserUnitKey): SelectOption[] {
@@ -26,8 +30,8 @@ export default class SparkUnitMenu extends DialogBase {
     return values.map(value => ({ value, label: prettify(value) }));
   }
 
-  saveUnits(vals: UserUnits = this.units): void {
-    sparkStore.saveUnits([this.serviceId, vals])
+  saveUnits(units: UserUnits = this.units): void {
+    this.sparkModule.saveUnits(units)
       .catch(e => notify.error(`Failed to change unit: ${e.message}`));
   }
 }

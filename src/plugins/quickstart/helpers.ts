@@ -12,7 +12,7 @@ import { PinChannel, QuickStartOutput } from './types';
 
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {
   return sparkStore
-    .blockValues(serviceId)
+    .serviceBlocks(serviceId)
     // Find existing drivers
     .filter(
       block =>
@@ -30,10 +30,11 @@ export function createOutputActions(): WizardAction[] {
   return [
     // Rename blocks
     async (config: QuickStartOutput) => {
+      const module = sparkStore.serviceById(config.serviceId)!;
       await Promise.all(
         Object.entries(config.renamedBlocks)
           .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)
-          .map(([currVal, newVal]: [string, string]) => sparkStore.renameBlock([config.serviceId, currVal, newVal]))
+          .map(([currVal, newVal]: [string, string]) => module.renameBlock([currVal, newVal]))
       );
     },
 
@@ -80,7 +81,9 @@ export function createOutputActions(): WizardAction[] {
     async (config: QuickStartOutput) => {
       for (const val of config.displayedBlocks) {
         const block = sparkStore.blockById(config.serviceId, val.blockId);
-        await tryDisplayBlock(block, val.opts);
+        if (block) {
+          await tryDisplayBlock(block, val.opts);
+        }
       }
     },
   ];

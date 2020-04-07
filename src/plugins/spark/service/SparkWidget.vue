@@ -4,13 +4,16 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { shortDateString } from '@/helpers/functional';
 import { startChangeServiceTitle } from '@/helpers/services';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import {
+  Block,
+  blockTypes,
+  SysInfoBlock,
+  TicksBlock,
+  WiFiSettingsBlock,
+} from '@/plugins/spark/block-types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { WidgetContext } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
-
-import { blockTypes, SysInfoBlock, TicksBlock, WiFiSettingsBlock } from '../block-types';
-import { isReady } from './getters';
 
 @Component
 export default class SparkWidget extends Vue {
@@ -29,12 +32,21 @@ export default class SparkWidget extends Vue {
     return serviceStore.serviceById(this.serviceId);
   }
 
+  get sparkModule(): SparkServiceModule | null {
+    return sparkStore.serviceById(this.serviceId);
+  }
+
+  get ready(): boolean {
+    return this.sparkModule !== null
+      && this.sparkModule.lastBlocks !== null;
+  }
+
   get lastBlocks(): string {
-    return shortDateString(sparkStore.lastBlocks(this.serviceId), 'Unknown');
+    return shortDateString(this.sparkModule?.lastBlocks, 'Unknown');
   }
 
   sysBlock<T extends Block>(blockType: string): T {
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule!.blocks
       .find(block => block.type === blockType) as T;
   }
 
@@ -50,16 +62,12 @@ export default class SparkWidget extends Vue {
     return this.sysBlock(blockTypes.WiFiSettings);
   }
 
-  get ready(): boolean {
-    return isReady(this.serviceId);
-  }
-
   get sysDate(): string {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
   }
 
   fetchAll(): void {
-    sparkStore.fetchAll(this.serviceId);
+    this.sparkModule?.fetchAll();
   }
 
   changeTitle(): void {

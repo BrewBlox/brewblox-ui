@@ -10,7 +10,7 @@ import notify from '@/helpers/notify';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockConfig, BlockCrud } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
@@ -19,7 +19,8 @@ import { Block } from '../types';
 
 
 @Component
-export default class BlockCrudComponent<BlockT extends Block = Block> extends CrudComponent<BlockConfig> {
+export default class BlockCrudComponent<BlockT extends Block = Block>
+  extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
   public readonly crud!: BlockCrud<BlockT>;
@@ -40,8 +41,12 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
     return this.block.serviceId;
   }
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.serviceById(this.serviceId)!;
+  }
+
   public get isDriven(): boolean {
-    return sparkStore.drivenBlocks(this.serviceId)
+    return this.sparkModule.drivenBlocks
       .includes(this.blockId);
   }
 
@@ -50,7 +55,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   }
 
   public get constrainers(): string | null {
-    const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
+    const limiting: string[] = this.sparkModule.limiters[this.blockId];
     return limiting ? limiting.join(', ') : null;
   }
 
@@ -115,14 +120,14 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
 
   public async refreshBlock(): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.fetchBlock(this.block)
+      await this.sparkModule.fetchBlock(this.block)
         .catch(() => { });
     }
   }
 
   public async changeBlockId(newId: string): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.renameBlock([this.serviceId, this.blockId, newId])
+      await this.sparkModule.renameBlock([this.blockId, newId])
         .catch(() => { });
     } else {
       await this.saveBlock({ ...this.block, id: newId });

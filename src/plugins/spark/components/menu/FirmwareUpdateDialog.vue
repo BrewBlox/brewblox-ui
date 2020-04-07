@@ -2,9 +2,8 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
-import { Service, serviceStore } from '@/store/services';
 
 
 @Component
@@ -15,12 +14,12 @@ export default class FirmwareUpdateDialog extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  get service(): Service {
-    return serviceStore.serviceById(this.serviceId);
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.serviceById(this.serviceId)!;
   }
 
   get status(): SparkStatus | null {
-    return sparkStore.status(this.serviceId);
+    return this.sparkModule.status;
   }
 
   get updateAvailableText(): string {
@@ -50,13 +49,13 @@ export default class FirmwareUpdateDialog extends DialogBase {
     this.messages = [];
     this.pushMessage('Starting update...');
 
-    sparkStore.flashFirmware(this.serviceId)
+    this.sparkModule
+      .flashFirmware()
       .then(() => {
         this.pushMessage('Update complete!');
       })
       .catch(e => {
         this.pushMessage(`Update failed: ${e.toString()}`);
-        this.pushMessage('This feature is still experimental.');
         this.pushMessage('If retrying the update does not work, please run \'brewblox-ctl flash\'.');
         if (this.status) {
           this.status.info.forEach(this.pushMessage);

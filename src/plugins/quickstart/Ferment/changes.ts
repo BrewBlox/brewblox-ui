@@ -285,8 +285,8 @@ export const defineWidgets = (
     order: 0,
   };
 
-  const userTemp = sparkStore.units(config.serviceId).Temp;
-  const serviceId = config.serviceId;
+  const { serviceId } = config;
+  const { Temp } = sparkStore.serviceById(serviceId)!.units;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
@@ -324,10 +324,10 @@ export const defineWidgets = (
         {
           measurement: config.serviceId,
           fields: [
-            `${config.names.fridgeSensor}/value[${userTemp}]`,
-            `${config.names.beerSensor}/value[${userTemp}]`,
-            `${config.names.fridgeSetpoint}/setting[${userTemp}]`,
-            `${config.names.beerSetpoint}/setting[${userTemp}]`,
+            `${config.names.fridgeSensor}/value[${Temp}]`,
+            `${config.names.beerSensor}/value[${Temp}]`,
+            `${config.names.fridgeSetpoint}/setting[${Temp}]`,
+            `${config.names.beerSetpoint}/setting[${Temp}]`,
             `${config.names.coolPwm}/value`,
             `${config.names.heatPwm}/value`,
             `${config.names.coolAct}/state`,
@@ -336,10 +336,10 @@ export const defineWidgets = (
         },
       ],
       renames: {
-        [`${config.serviceId}/${config.names.fridgeSensor}/value[${userTemp}]`]: 'Fridge temperature',
-        [`${config.serviceId}/${config.names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
-        [`${config.serviceId}/${config.names.fridgeSetpoint}/setting[${userTemp}]`]: 'Fridge setting',
-        [`${config.serviceId}/${config.names.beerSetpoint}/setting[${userTemp}]`]: 'Beer setting',
+        [`${config.serviceId}/${config.names.fridgeSensor}/value[${Temp}]`]: 'Fridge temperature',
+        [`${config.serviceId}/${config.names.beerSensor}/value[${Temp}]`]: 'Beer temperature',
+        [`${config.serviceId}/${config.names.fridgeSetpoint}/setting[${Temp}]`]: 'Fridge setting',
+        [`${config.serviceId}/${config.names.beerSetpoint}/setting[${Temp}]`]: 'Beer setting',
         [`${config.serviceId}/${config.names.coolPwm}/value`]: 'Cool PWM value',
         [`${config.serviceId}/${config.names.heatPwm}/value`]: 'Heat PWM value',
         [`${config.serviceId}/${config.names.coolAct}/state`]: 'Cool Pin state',

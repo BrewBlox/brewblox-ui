@@ -20,7 +20,7 @@ export default class ProfileDisplay extends PartBase {
 
   get block(): SetpointProfileBlock | null {
     const { serviceId, id } = this.address;
-    return sparkStore.tryBlockById(serviceId, id);
+    return sparkStore.blockById(serviceId, id);
   }
 
   get isBroken(): boolean {

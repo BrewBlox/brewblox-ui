@@ -11,7 +11,7 @@ import { defaultPresets } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { featureStore } from '@/store/features';
 
-import { sparkStore } from '../../store';
+import { SparkServiceModule, sparkStore } from '../../store';
 import { Block } from '../../types';
 import { ActuatorOffsetBlock } from '../ActuatorOffset/types';
 import { SetpointSensorPairBlock } from '../SetpointSensorPair/types';
@@ -55,6 +55,10 @@ export default class PidShareDialog extends DialogBase {
     return this.block.serviceId;
   }
 
+  get sparkModule(): SparkServiceModule {
+    return sparkStore.serviceById(this.serviceId)!;
+  }
+
   applyParams(params: QueryParams): void {
     this.params = { ...params };
     this.$nextTick(() => this.graph?.resetSources());
@@ -73,7 +77,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   blockById(id: string | null): Block | null {
-    return id !== null ? sparkStore.tryBlockById(this.serviceId, id) : null;
+    return sparkStore.blockById(this.serviceId, id);
   }
 
   name(block: Block | null): string {
@@ -83,7 +87,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get driveChains(): string[][] {
-    return sparkStore.drivenChains(this.serviceId);
+    return this.sparkModule.drivenChains;
   }
 
   get pidData(): Mapped<any> {

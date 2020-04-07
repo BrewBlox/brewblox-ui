@@ -41,7 +41,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     if (!this.service) {
       return [];
     }
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => block.type === this.featureId)
       .sort(objectStringSorter('id'));
   }
@@ -128,7 +128,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     const service = this.service!;
     const block = this.block!;
 
-    if (!sparkStore.blockIds(service.id).includes(block.id)) {
+    if (!sparkStore.blockById(service.id, block.id)) {
       await sparkStore.createBlock(block);
     }
 

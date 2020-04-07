@@ -24,7 +24,7 @@ export default class SetpointSensorPairForm
     if (!this.isStoreBlock) {
       return [];
     }
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => block.data.inputId?.id === this.blockId);
   }
 }

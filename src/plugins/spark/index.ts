@@ -39,7 +39,7 @@ export default {
       .filter(spec => !!spec.block)
       .map(spec => spec.block) as BlockSpec[];
 
-    sparkStore.commitAllSpecs(specs);
+    sparkStore.registerSpecs(specs);
 
     featureStore.registerWatcher({
       id: 'SparkWatcher',

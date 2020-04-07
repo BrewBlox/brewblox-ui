@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+
 @Component
 export default class ValEditBase extends Vue {
   @Prop({ type: String, required: true })
@@ -24,6 +26,10 @@ export default class ValEditBase extends Vue {
   @Emit('input')
   public saveField(val: any): any {
     return val;
+  }
+
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.serviceById(this.serviceId)!;
   }
 
   public get field(): any {

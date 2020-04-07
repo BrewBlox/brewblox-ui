@@ -35,14 +35,10 @@ export default class QuickActionChange extends Vue {
   @Prop({ type: Object, required: true })
   public readonly value!: BlockChange;
 
-  get specs(): BlockSpec[] {
-    return sparkStore.specValues;
-  }
-
   get change(): EditableBlockChange {
-    const block = sparkStore.tryBlockById(this.serviceId, this.value.blockId);
+    const block = sparkStore.blockById(this.serviceId, this.value.blockId);
     const spec = block !== null
-      ? this.specs.find(s => s.id === block.type) ?? null
+      ? sparkStore.specs[block.type] ?? null
       : null;
 
     const data = this.value.data ?? {};

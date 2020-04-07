@@ -76,7 +76,7 @@ export default class BlockAddressDialog extends DialogBase {
   }
 
   get addrOpts(): BlockAddress[] {
-    return (sparkStore.blockValues(this.serviceId) ?? [])
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => this.typeFilter(block.type))
       .map(asAddr)
       .sort(objectStringSorter('id'));
@@ -84,7 +84,7 @@ export default class BlockAddressDialog extends DialogBase {
 
   get block(): Block | null {
     return this.local
-      ? sparkStore.tryBlockById(this.serviceId, this.local.id)
+      ? sparkStore.blockById(this.serviceId, this.local.id)
       : null;
   }
 

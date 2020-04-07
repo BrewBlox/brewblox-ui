@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 import { blockTypes } from '@/plugins/spark/block-types';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
-import { sparkStore } from '../../store';
 import { Spark3PinsBlock } from '../Spark3Pins/types';
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
@@ -20,7 +19,7 @@ export default class MotorValveWidget
   extends BlockWidgetBase<MotorValveBlock> {
 
   get pins(): Spark3PinsBlock | null {
-    const block = sparkStore.blockValues(this.serviceId)
+    const block = this.sparkModule.blocks
       .find(block => block.type === blockTypes.Spark3Pins);
     return block ? block as Spark3PinsBlock : null;
   }
@@ -32,7 +31,7 @@ export default class MotorValveWidget
   enable12V(): void {
     if (this.pins) {
       this.pins.data.enableIoSupply12V = true;
-      sparkStore.saveBlock(this.pins);
+      this.sparkModule.saveBlock(this.pins);
     }
   }
 }

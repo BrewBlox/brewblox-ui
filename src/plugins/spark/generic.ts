@@ -5,7 +5,7 @@ import { Crud, WidgetFeature } from '@/store/features';
 const removeBlock =
   (crud: Crud<BlockConfig>): void => {
     const { serviceId, blockId } = crud.widget.config;
-    const block = sparkStore.tryBlockById(serviceId, blockId);
+    const block = sparkStore.blockById(serviceId, blockId);
     if (block) {
       sparkStore.removeBlock(block);
     }

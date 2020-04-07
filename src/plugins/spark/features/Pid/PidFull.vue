@@ -19,17 +19,17 @@ export default class PidFull
   extends BlockCrudComponent<PidBlock> {
 
   get inputBlock(): SetpointSensorPairBlock | null {
-    return sparkStore.tryBlockById(this.serviceId, this.block.data.inputId.id);
+    return sparkStore.blockById(this.serviceId, this.block.data.inputId.id);
   }
 
   get inputDriven(): boolean {
     return this.inputBlock !== null
-      && sparkStore.drivenChains(this.serviceId)
+      && this.sparkModule.drivenChains
         .some((chain: string[]) => chain[0] === this.inputBlock!.id);
   }
 
   get outputBlock(): Block | null {
-    return sparkStore.tryBlockById(this.serviceId, this.block.data.outputId.id);
+    return sparkStore.blockById(this.serviceId, this.block.data.outputId.id);
   }
 
   get baseOutput(): number {

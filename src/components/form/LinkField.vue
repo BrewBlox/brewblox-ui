@@ -48,7 +48,7 @@ export default class LinkField extends FieldBase {
   }
 
   get block(): Block | null {
-    return sparkStore.tryBlockById(this.serviceId, this.value.id);
+    return sparkStore.blockById(this.serviceId, this.value.id);
   }
 
   get canEdit(): boolean {
