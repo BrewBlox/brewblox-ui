@@ -1,5 +1,7 @@
 module.exports = {
-  extends: './.babelrc',
+  plugins: [
+    '@babel/plugin-syntax-dynamic-import',
+  ],
   presets: [
     '@quasar/babel-preset-app',
   ],
