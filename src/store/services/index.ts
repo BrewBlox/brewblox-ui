@@ -1,8 +1,7 @@
 import isEqual from 'lodash/isEqual';
-import Vue from 'vue';
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { objReducer } from '@/helpers/functional';
+import { filterById } from '@/helpers/functional';
 import store from '@/store';
 import { featureStore } from '@/store/features';
 
@@ -11,8 +10,6 @@ import { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
 
-const rawError = true;
-
 const onStartService = (service: Service): Promise<void> =>
   featureStore.services[service.type]?.onStart?.(service);
 
@@ -20,149 +17,121 @@ const onRemoveService = (service: Service): Promise<void> =>
   featureStore.services[service.type]?.onRemove?.(service);
 
 
-@Module({ store, namespaced: true, dynamic: true, name: 'services' })
+@Module({ generateMutationSetters: true })
 export class ServiceModule extends VuexModule {
-  public services: Mapped<Service> = {};
-  public stubs: Mapped<ServiceStub> = {};
-  public statuses: Mapped<ServiceStatus> = {};
+  public services: Service[] = [];
+  public stubs: ServiceStub[] = [];
+  public statuses: ServiceStatus[] = [];
 
   public get serviceIds(): string[] {
-    return Object.keys(this.services);
+    return this.services.map(v => v.id);
   }
 
-  public get serviceValues(): Service[] {
-    return Object.values(this.services);
-  }
-
-  public get serviceById(): (id: string) => Service {
-    return id => this.services[id] ?? null;
-  }
-
-  public get typedServices(): (type: string) => Service[] {
-    return type => this.serviceValues.filter(svc => svc.type === type);
-  }
-
-  public get serviceExists(): (id: string) => boolean {
-    return id => !!this.services[id];
+  public serviceById(id: string): Service | null {
+    return this.services.find(v => v.id === id) ?? null;
   }
 
   public get stubIds(): string[] {
-    return Object.keys(this.stubs);
-  }
-
-  public get stubValues(): ServiceStub[] {
-    return Object.values(this.stubs);
+    return this.stubs.map(v => v.id);
   }
 
   @Mutation
-  public commitService(service: Service): void {
-    Vue.set(this.services, service.id, { ...service });
-    Vue.delete(this.stubs, service.id);
+  public setService(service: Service): void {
+    this.services = filterById(this.services, service, true);
+    this.stubs = filterById(this.stubs, { id: service.id });
   }
 
   @Mutation
-  public commitAllServices(services: Service[]): void {
+  public setAllServices(services: Service[]): void {
     const ids = services.map(svc => svc.id);
-    this.services = services.reduce(objReducer('id'), {});
-    this.stubs = Object.values(this.stubs)
-      .filter(s => !ids.includes(s.id))
-      .reduce(objReducer('id'), {});
+    this.services = services;
+    this.stubs = this.stubs.filter(s => !ids.includes(s.id));
   }
 
   @Mutation
-  public commitRemoveService(service: Service): void {
-    Vue.delete(this.services, service.id);
-  }
-
-  @Mutation
-  public commitStub(stub: ServiceStub): void {
-    if (!this.services[stub.id]) {
-      Vue.set(this.stubs, stub.id, { ...stub });
+  public setStub(stub: ServiceStub): void {
+    if (!this.serviceById(stub.id)) {
+      this.stubs = filterById(this.stubs, stub, true);
     }
   }
 
   @Mutation
-  public commitRemoveStub(stub: HasId): void {
-    Vue.delete(this.stubs, stub.id);
+  public setStatus(status: ServiceStatus): void {
+    this.statuses = filterById(this.statuses, status, true);
   }
 
-  @Mutation
-  public commitStatus(status: ServiceStatus): void {
-    Vue.set(this.statuses, status.id, { ...status });
-  }
-
-  @Action({ rawError })
+  @Action
   public async createService(service: Service): Promise<void> {
     const created = await api.create(service);
-    this.commitService(created);
+    this.setService(created);
     await onStartService(created);
   }
 
-  @Action({ rawError })
+  @Action
   public async appendService(service: Service): Promise<void> {
-    const order = this.serviceValues.length + 1;
+    const order = this.services.length + 1;
     await this.createService({ ...service, order });
   }
 
-  @Action({ rawError })
+  @Action
   public async saveService(service: Service): Promise<void> {
-    this.commitService(await api.persist(service));
+    this.setService(await api.persist(service));
   }
 
-  @Action({ rawError })
+  @Action
   public async removeService(service: Service): Promise<void> {
-    this.commitRemoveService(await api.remove(service));
+    this.services = filterById(this.services, service);
     await onRemoveService(service);
   }
 
-  @Action({ rawError })
+  @Action
   public async updateServiceOrder(ids: string[]): Promise<void> {
     await Promise.all(
-      ids.map(async (id, idx) => {
-        const service = await api.persist({ ...this.services[id], order: idx + 1 });
-        this.commitService(service);
-      }));
+      ids
+        .map(id => this.serviceById(id))
+        .filter(v => v !== null)
+        .map((service: Service | null, idx) => this.saveService({ ...service!, order: idx + 1 })));
   }
 
-  @Action({ rawError })
+  @Action
   public async createStub(stub: ServiceStub): Promise<void> {
-    this.commitStub(stub);
+    this.setStub(stub);
   }
 
-  @Action({ rawError })
+  @Action
   public async updateStatus(status: ServiceStatus): Promise<void> {
     const current = this.statuses[status.id];
     if (!isEqual(current, status)) {
-      this.commitStatus(status);
+      this.setStatus(status);
     }
   }
 
-  @Action({ rawError })
+  @Action
   public async start(): Promise<void> {
     const onChange = async (service: Service): Promise<void> => {
       const existing = this.serviceById(service.id);
       if (!existing) {
-        this.commitService(service);
+        this.setService(service);
         await onStartService(service);
       }
       else if (existing._rev !== service._rev) {
-        this.commitService(service);
+        this.setService(service);
       }
     };
     const onDelete = async (id: string): Promise<void> => {
       const existing = this.serviceById(id);
       if (existing) {
         await onRemoveService(existing);
-        this.commitRemoveService(existing);
+        this.services = filterById(this.services, existing);
       }
     };
 
     const services = await api.fetch();
-    this.commitAllServices(services);
+    this.setAllServices(services);
     await Promise.all(services.map(onStartService));
 
     api.subscribe(onChange, onDelete);
   }
 }
 
-export const serviceStore = getModule(ServiceModule);
+export const serviceStore = new ServiceModule({ store, name: 'services' });

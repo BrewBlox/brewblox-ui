@@ -28,8 +28,8 @@ export default class SparkWidget extends Vue {
     return this.context.container === 'Dialog';
   }
 
-  get service(): Service {
-    return serviceStore.serviceById(this.serviceId);
+  get service(): Service | null {
+    return serviceStore.serviceById(this.serviceId)!;
   }
 
   get sparkModule(): SparkServiceModule | null {
@@ -37,12 +37,17 @@ export default class SparkWidget extends Vue {
   }
 
   get ready(): boolean {
-    return this.sparkModule !== null
+    return this.service !== null
+      && this.sparkModule !== null
       && this.sparkModule.lastBlocks !== null;
   }
 
   get lastBlocks(): string {
     return shortDateString(this.sparkModule?.lastBlocks, 'Unknown');
+  }
+
+  get title(): string {
+    return this.service?.title ?? 'Unknown';
   }
 
   sysBlock<T extends Block>(blockType: string): T {
@@ -71,7 +76,9 @@ export default class SparkWidget extends Vue {
   }
 
   changeTitle(): void {
-    startChangeServiceTitle(this.service);
+    if (this.service) {
+      startChangeServiceTitle(this.service);
+    }
   }
 }
 </script>
@@ -81,7 +88,7 @@ export default class SparkWidget extends Vue {
     <template #toolbar>
       <DialogToolbar
         v-if="inDialog"
-        :title="service.title"
+        :title="title"
         subtitle="Device info"
         @title-click="changeTitle"
       >
@@ -91,7 +98,7 @@ export default class SparkWidget extends Vue {
       </DialogToolbar>
       <Toolbar
         v-else
-        :title="service.title"
+        :title="title"
         subtitle="Device info"
         @title-click="changeTitle"
       >

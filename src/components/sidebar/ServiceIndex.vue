@@ -32,19 +32,15 @@ export default class ServiceIndex extends Vue {
   }
 
   get services(): Service[] {
-    return serviceStore.serviceValues.sort(objectSorter('order'));
+    return serviceStore.services.sort(objectSorter('order'));
   }
 
   set services(services: Service[]) {
     serviceStore.updateServiceOrder(services.map(service => service.id));
   }
 
-  get statuses(): Mapped<ServiceStatus> {
-    return serviceStore.statuses;
-  }
-
   get suggestions(): ServiceSuggestion[] {
-    return serviceStore.stubValues
+    return serviceStore.stubs
       .filter(stub => !!featureStore.services[stub.type])
       .map(stub => {
         const feature = featureStore.services[stub.type];
@@ -53,7 +49,7 @@ export default class ServiceIndex extends Vue {
   }
 
   status(service: Service): ServiceStatus | null {
-    return this.statuses[service.id] ?? null;
+    return serviceStore.statuses.find(v => v.id === service.id) ?? null;
   }
 }
 </script>

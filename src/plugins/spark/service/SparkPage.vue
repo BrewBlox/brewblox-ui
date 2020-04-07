@@ -87,7 +87,7 @@ export default class SparkPage extends Vue {
   }
 
   get service(): SparkService {
-    return serviceStore.serviceById(this.serviceId);
+    return serviceStore.serviceById(this.serviceId)!;
   }
 
   get sparkModule(): SparkServiceModule | null {
@@ -99,11 +99,11 @@ export default class SparkPage extends Vue {
   }
 
   get isAvailable(): boolean {
-    return Boolean(this.sparkModule);
+    return Boolean(this.service && this.sparkModule);
   }
 
   get isReady(): boolean {
-    return Boolean(this.sparkModule?.lastBlocks);
+    return this.isAvailable && Boolean(this.sparkModule?.lastBlocks);
   }
 
   get status(): SparkStatus | null {

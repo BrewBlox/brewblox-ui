@@ -35,7 +35,8 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
   }
 
   get services(): Service[] {
-    return serviceStore.typedServices(sparkType);
+    return serviceStore.services
+      .filter(v => v.type === sparkType);
   }
 
   get serviceId(): string {

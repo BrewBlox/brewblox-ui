@@ -24,7 +24,7 @@ export default class LinkedWidgetCard extends PartCard {
   readonly filter!: (widget: Widget) => boolean;
 
   get sparkServices(): Service[] {
-    return serviceStore.serviceValues
+    return serviceStore.services
       .filter(svc => svc.type === sparkType);
   }
 

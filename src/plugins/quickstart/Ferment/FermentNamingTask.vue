@@ -37,7 +37,8 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   }
 
   get services(): Service[] {
-    return serviceStore.typedServices(sparkType);
+    return serviceStore.services
+      .filter(v => v.type === sparkType);
   }
 
   get serviceId(): string {

@@ -21,7 +21,7 @@ export default class SparkImportMenu extends DialogBase {
   readonly serviceId!: string;
 
   get service(): Service {
-    return serviceStore.serviceById(this.serviceId);
+    return serviceStore.serviceById(this.serviceId)!;
   }
 
   public get sparkModule(): SparkServiceModule {

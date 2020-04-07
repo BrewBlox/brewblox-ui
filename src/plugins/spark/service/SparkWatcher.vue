@@ -15,7 +15,7 @@ import SparkServiceWatcher from './SparkServiceWatcher.vue';
 })
 export default class SparkWatcher extends Vue {
   get services(): SparkService[] {
-    return serviceStore.serviceValues
+    return serviceStore.services
       .filter(service => service.type === sparkType);
   }
 }

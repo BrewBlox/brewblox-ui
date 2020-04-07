@@ -1,5 +1,4 @@
 import Vue from 'vue';
-// import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { filterById } from '@/helpers/functional';

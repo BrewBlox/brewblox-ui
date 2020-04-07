@@ -47,7 +47,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
   }
 
   get serviceOpts(): SelectOption[] {
-    return serviceStore.serviceValues
+    return serviceStore.services
       .filter(service => service.type === sparkType)
       .map(service => ({
         label: service.title,

@@ -17,7 +17,7 @@ export default class QuickActionsWizard extends WidgetWizardBase<QuickActionsCon
   }
 
   get serviceOpts(): SelectOption[] {
-    return serviceStore.serviceValues
+    return serviceStore.services
       .filter(service => service.type === sparkType)
       .map(service => ({
         label: service.title,

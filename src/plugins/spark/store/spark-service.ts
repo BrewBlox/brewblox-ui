@@ -69,7 +69,7 @@ export class SparkServiceModule extends VuexModule {
   }
 
   public get service(): SparkService {
-    return serviceStore.serviceById(this.id);
+    return serviceStore.serviceById(this.id)!;
   }
 
   @Mutation

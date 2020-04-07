@@ -40,7 +40,8 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
   }
 
   get services(): Service[] {
-    return serviceStore.typedServices(sparkType);
+    return serviceStore.services
+      .filter(v => v.type === sparkType);
   }
 
   get serviceId(): string {
