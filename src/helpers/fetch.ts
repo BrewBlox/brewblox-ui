@@ -6,26 +6,22 @@ import { deserialize, serialize } from '@/helpers/units/parseObject';
 
 const { transformRequest, transformResponse } = axios.defaults;
 
-function joined(defaults: typeof transformRequest, custom: AxiosTransformer[]): AxiosTransformer[] {
-  if (defaults === undefined) {
-    return custom;
+function asArray(value: typeof transformRequest | typeof transformResponse): AxiosTransformer[] {
+  if (value === undefined) {
+    return [];
   }
-  else if (isArray(defaults)) {
-    return [...defaults, ...custom];
+  else if (isArray(value)) {
+    return [...value];
   }
   else {
-    return [defaults, ...custom];
+    return [value];
   }
 }
 
 const instance = axios.create({
   baseURL: HOST,
-  transformRequest: joined(transformRequest, [
-    data => serialize(data),
-  ]),
-  transformResponse: joined(transformResponse, [
-    data => deserialize(data),
-  ]),
+  transformRequest: [data => serialize(data), ...asArray(transformRequest)],
+  transformResponse: [...asArray(transformResponse), data => deserialize(data)],
 });
 
 export default instance;
