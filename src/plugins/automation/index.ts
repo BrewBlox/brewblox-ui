@@ -42,7 +42,7 @@ export default {
       filter: (_, type) => type === AutomationEvent,
       onmessage: (msg: EventbusMessage) => {
         const data: AutomationEventData = msg.data;
-        automationStore.commitEventData(data);
+        automationStore.setEventData(data);
       },
     });
   },

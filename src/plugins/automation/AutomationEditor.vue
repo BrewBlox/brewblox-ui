@@ -42,7 +42,7 @@ export default class AutomationEditor extends DialogBase {
   }
 
   get templates(): AutomationTemplate[] {
-    return automationStore.templateValues;
+    return automationStore.templates;
   }
 
   get template(): AutomationTemplate | null {
