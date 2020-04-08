@@ -6,7 +6,7 @@ import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { blockTypes } from '@/plugins/spark/block-types';
 import { analogConstraintLabels } from '@/plugins/spark/getters';
-import { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj } from '@/plugins/spark/types';
+import type { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj } from '@/plugins/spark/types';
 
 interface Wrapped {
   type: AnalogConstraintKey;

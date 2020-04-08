@@ -21,8 +21,8 @@ import { typeName as Spark3Pins } from '@/plugins/spark/features/Spark3Pins/gett
 import { typeName as TempSensorMock } from '@/plugins/spark/features/TempSensorMock/getters';
 import { typeName as TempSensorOneWire } from '@/plugins/spark/features/TempSensorOneWire/getters';
 
-import { Block } from './types';
-export { Block } from './types';
+import type { Block } from './types';
+export type { Block } from './types';
 
 export * from '@/plugins/spark/features/ActuatorAnalogMock/types';
 export * from '@/plugins/spark/features/ActuatorLogic/types';

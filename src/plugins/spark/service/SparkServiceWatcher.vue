@@ -8,7 +8,7 @@ import notify from '@/helpers/notify';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { systemStore } from '@/store/system';
 
-import { SparkService, SparkStatus } from '../types';
+import type { SparkService, SparkStatus } from '../types';
 
 const snoozeDuration = durationMs('1d');
 const updateValidDuration = durationMs('30s');

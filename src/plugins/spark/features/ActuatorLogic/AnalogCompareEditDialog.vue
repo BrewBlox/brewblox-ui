@@ -8,7 +8,7 @@ import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
 import { analogOpTitles } from './getters';
-import { AnalogCompare } from './types';
+import type { AnalogCompare } from './types';
 
 
 @Component

@@ -8,7 +8,7 @@ import { objectStringSorter, ruleValidator, suggestId } from '@/helpers/function
 import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud } from '@/plugins/spark/types';
+import type { Block, BlockCrud } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 

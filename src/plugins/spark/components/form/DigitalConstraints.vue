@@ -7,7 +7,7 @@ import { Link, Time } from '@/helpers/units';
 import { blockTypes, MutexBlock } from '@/plugins/spark/block-types';
 import { digitalConstraintLabels } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import {
+import type {
   DigitalConstraint,
   DigitalConstraintKey,
   DigitalConstraintsObj,
