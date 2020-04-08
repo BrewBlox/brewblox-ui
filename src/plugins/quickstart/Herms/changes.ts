@@ -32,7 +32,7 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
 
 export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block[] {
   const groups = [0];
-  const { serviceId, dashboardId, prefix, names } = config;
+  const { serviceId, names } = config;
 
   const pwmConstraints: AnalogConstraint[] = [];
   const actuatorConstraints: DigitalConstraint[] = [];
