@@ -12,7 +12,6 @@ import {
   FilterChoice,
   MutexBlock,
   PidBlock,
-  PidData,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
@@ -22,7 +21,7 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { DisplayBlock } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 
@@ -33,25 +32,25 @@ export function defineChangedBlocks(config: GlycolConfig): Block[] {
 };
 
 export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Block[] {
-  const { serviceId } = config;
+  const { serviceId, names } = config;
   const { beerSetting, glycolSetting } = opts;
   const groups = [0];
 
   const heatingBlocks = [
-    config.names.heatPid,
-    config.names.heatPwm,
-    config.names.heatAct,
+    names.heatPid,
+    names.heatPwm,
+    names.heatAct,
   ];
 
   const blocks = [
     // Setpoint
     {
-      id: config.names.beerSetpoint,
+      id: names.beerSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
-        sensorId: new Link(config.names.beerSensor),
+        sensorId: new Link(names.beerSensor),
         storedSetting: beerSetting,
         settingEnabled: true,
         setting: new Unit(null, 'degC'),
@@ -64,14 +63,14 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     },
     // Profile
     {
-      id: config.names.beerProfile,
+      id: names.beerProfile,
       type: blockTypes.SetpointProfile,
       serviceId,
       groups,
       data: {
         start: new Date().getTime() / 1000,
         enabled: false,
-        targetId: new Link(config.names.beerSetpoint),
+        targetId: new Link(names.beerSetpoint),
         points: [
           { time: 0, temperature: beerSetting },
           { time: durationMs('7d') / 1000, temperature: beerSetting },
@@ -82,7 +81,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     },
     // Mutex
     {
-      id: config.names.mutex,
+      id: names.mutex,
       type: blockTypes.Mutex,
       serviceId,
       groups,
@@ -93,7 +92,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     },
     // Digital Actuators
     {
-      id: config.names.coolAct,
+      id: names.coolAct,
       type: blockTypes.DigitalActuator,
       serviceId,
       groups,
@@ -107,7 +106,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           constraints: [
             {
               mutexed: {
-                mutexId: new Link(config.names.mutex, blockTypes.Mutex),
+                mutexId: new Link(names.mutex, blockTypes.Mutex),
                 extraHoldTime: new Time(15, 'min'),
                 hasCustomHoldTime: true,
                 hasLock: false,
@@ -123,7 +122,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       },
     },
     {
-      id: config.names.heatAct,
+      id: names.heatAct,
       type: blockTypes.DigitalActuator,
       serviceId,
       groups,
@@ -137,7 +136,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           constraints: [
             {
               mutexed: {
-                mutexId: new Link(config.names.mutex, blockTypes.Mutex),
+                mutexId: new Link(names.mutex, blockTypes.Mutex),
                 extraHoldTime: new Time(15, 'min'),
                 hasCustomHoldTime: true,
                 hasLock: false,
@@ -150,14 +149,14 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     },
     // PWM
     {
-      id: config.names.coolPwm,
+      id: names.coolPwm,
       type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
         enabled: true,
         period: new Time(10, 'min'),
-        actuatorId: new Link(config.names.coolAct),
+        actuatorId: new Link(names.coolAct),
         drivenActuatorId: new Link(null),
         setting: 0,
         desiredSetting: 0,
@@ -166,14 +165,14 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       },
     },
     {
-      id: config.names.heatPwm,
+      id: names.heatPwm,
       type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
         enabled: true,
         period: new Time(10, 's'),
-        actuatorId: new Link(config.names.heatAct),
+        actuatorId: new Link(names.heatAct),
         drivenActuatorId: new Link(null),
         setting: 0,
         desiredSetting: 0,
@@ -182,33 +181,33 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       },
     },
     {
-      id: config.names.coolPid,
+      id: names.coolPid,
       type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
+        ...pidDefaults(),
         kp: new Unit(-20, '1/degC'),
         ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
         enabled: true,
-        inputId: new Link(config.names.beerSetpoint),
-        outputId: new Link(config.names.coolPwm),
+        inputId: new Link(names.beerSetpoint),
+        outputId: new Link(names.coolPwm),
       },
     },
     {
-      id: config.names.heatPid,
+      id: names.heatPid,
       type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
+        ...pidDefaults(),
         kp: new Unit(20, '1/degC'),
         ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
         enabled: true,
-        inputId: new Link(config.names.beerSetpoint),
-        outputId: new Link(config.names.heatPwm),
+        inputId: new Link(names.beerSetpoint),
+        outputId: new Link(names.heatPwm),
       },
     },
   ] as [
@@ -232,12 +231,12 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     ] = [
         // Setpoint
         {
-          id: config.names.glycolSetpoint,
+          id: names.glycolSetpoint,
           type: blockTypes.SetpointSensorPair,
           serviceId,
           groups,
           data: {
-            sensorId: new Link(config.names.glycolSensor),
+            sensorId: new Link(names.glycolSensor),
             storedSetting: glycolSetting,
             settingEnabled: true,
             setting: new Unit(null, 'degC'),
@@ -250,7 +249,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         },
         // Digital actuator
         {
-          id: config.names.glycolAct,
+          id: names.glycolAct,
           type: blockTypes.DigitalActuator,
           serviceId,
           groups,
@@ -270,14 +269,14 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         },
         // PWM
         {
-          id: config.names.glycolPwm,
+          id: names.glycolPwm,
           type: blockTypes.ActuatorPwm,
           serviceId,
           groups,
           data: {
             enabled: true,
             period: new Time(30, 'min'),
-            actuatorId: new Link(config.names.glycolAct),
+            actuatorId: new Link(names.glycolAct),
             drivenActuatorId: new Link(null),
             setting: 0,
             desiredSetting: 0,
@@ -286,18 +285,18 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           },
         },
         {
-          id: config.names.glycolPid,
+          id: names.glycolPid,
           type: blockTypes.Pid,
           serviceId,
           groups,
           data: {
-            ...(sparkStore.specById(blockTypes.Pid).generate() as PidData),
+            ...pidDefaults(),
             kp: new Unit(-20, '1/degC'),
             ti: new Time(2, 'hour'),
             td: new Time(5, 'min'),
             enabled: true,
-            inputId: new Link(config.names.glycolSetpoint),
-            outputId: new Link(config.names.glycolPwm),
+            inputId: new Link(names.glycolSetpoint),
+            outputId: new Link(names.glycolPwm),
           },
         },
       ];
@@ -311,23 +310,24 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
 }
 
 export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): Widget[] {
-  const userTemp = sparkStore.moduleById(config.serviceId)!.units.Temp;
+  const { serviceId, dashboardId, names, prefix } = config;
+  const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
-    dashboard: config.dashboardId,
+    dashboard: dashboardId,
     id: uid(),
     title: name,
     feature: type,
     order: 0,
     config: {
       blockId: name,
-      serviceId: config.serviceId,
+      serviceId: serviceId,
     },
   });
 
   const builder: Widget<BuilderConfig> = {
-    ...createWidget(withPrefix(config.prefix, 'Process'), 'Builder'),
+    ...createWidget(withPrefix(prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -338,7 +338,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   };
 
   const graph: Widget<GraphConfig> = {
-    ...createWidget(withPrefix(config.prefix, 'Graph'), 'Graph'),
+    ...createWidget(withPrefix(prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
@@ -347,24 +347,24 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
       params: { duration: '10m' },
       targets: [
         {
-          measurement: config.serviceId,
+          measurement: serviceId,
           fields: [
-            `${config.names.beerSensor}/value[${userTemp}]`,
-            `${config.names.beerSetpoint}/setting[${userTemp}]`,
-            `${config.names.coolPwm}/value`,
-            `${config.names.coolAct}/state`,
+            `${names.beerSensor}/value[${userTemp}]`,
+            `${names.beerSetpoint}/setting[${userTemp}]`,
+            `${names.coolPwm}/value`,
+            `${names.coolAct}/state`,
           ],
         },
       ],
       renames: {
-        [`${config.serviceId}/${config.names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
-        [`${config.serviceId}/${config.names.beerSetpoint}/setting[${userTemp}]`]: 'Beer setting',
-        [`${config.serviceId}/${config.names.coolPwm}/value`]: 'Cool PWM value',
-        [`${config.serviceId}/${config.names.coolAct}/state`]: 'Cool Pin state',
+        [`${serviceId}/${names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
+        [`${serviceId}/${names.beerSetpoint}/setting[${userTemp}]`]: 'Beer setting',
+        [`${serviceId}/${names.coolPwm}/value`]: 'Cool PWM value',
+        [`${serviceId}/${names.coolAct}/state`]: 'Cool Pin state',
       },
       axes: {
-        [`${config.serviceId}/${config.names.coolPwm}/value`]: 'y2',
-        [`${config.serviceId}/${config.names.coolAct}/state`]: 'y2',
+        [`${serviceId}/${names.coolPwm}/value`]: 'y2',
+        [`${serviceId}/${names.coolAct}/state`]: 'y2',
       },
       colors: {},
     },
@@ -372,27 +372,27 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
 
   if (config.heated) {
     graph.config.targets[0].fields.push(
-      `${config.names.heatPwm}/value`,
-      `${config.names.heatAct}/state`,
+      `${names.heatPwm}/value`,
+      `${names.heatAct}/state`,
     );
     Object.assign(graph.config.renames, {
-      [`${config.serviceId}/${config.names.heatPwm}/value`]: 'Heat PWM value',
-      [`${config.serviceId}/${config.names.heatAct}/state`]: 'Heat Pin state',
+      [`${serviceId}/${names.heatPwm}/value`]: 'Heat PWM value',
+      [`${serviceId}/${names.heatAct}/state`]: 'Heat Pin state',
     });
     Object.assign(graph.config.axes, {
-      [`${config.serviceId}/${config.names.heatPwm}/value`]: 'y2',
-      [`${config.serviceId}/${config.names.heatAct}/state`]: 'y2',
+      [`${serviceId}/${names.heatPwm}/value`]: 'y2',
+      [`${serviceId}/${names.heatAct}/state`]: 'y2',
     });
   }
 
   const QuickActions: Widget<QuickActionsConfig> = {
-    ...createWidget(withPrefix(config.prefix, 'Actions'), 'QuickActions'),
+    ...createWidget(withPrefix(prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
     config: {
       changeIdMigrated: true,
-      serviceId: config.serviceId,
+      serviceId: serviceId,
       steps: serialize([
         {
           name: 'Beer temperature control OFF',
@@ -400,13 +400,13 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           changes: [
             {
               id: uid(),
-              blockId: config.names.beerSetpoint,
+              blockId: names.beerSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.beerProfile,
+              blockId: names.beerProfile,
               data: { enabled: false },
               confirmed: {},
             },
@@ -421,13 +421,13 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           changes: [
             {
               id: uid(),
-              blockId: config.names.beerProfile,
+              blockId: names.beerProfile,
               data: { enabled: false },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.beerSetpoint,
+              blockId: names.beerSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: new Temp(20.0, 'degC').convert(userTemp),
@@ -447,13 +447,13 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           changes: [
             {
               id: uid(),
-              blockId: config.names.beerSetpoint,
+              blockId: names.beerSetpoint,
               data: { settingEnabled: true },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.beerProfile,
+              blockId: names.beerProfile,
               data: { enabled: true, start: new Date().getTime() / 1000 },
               confirmed: { start: true },
             },
@@ -467,7 +467,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   };
 
   const profile: Widget = {
-    ...createWidget(config.names.beerProfile, blockTypes.SetpointProfile),
+    ...createWidget(names.beerProfile, blockTypes.SetpointProfile),
     cols: 6,
     rows: 4,
     pinnedPosition: { x: 5, y: 6 },

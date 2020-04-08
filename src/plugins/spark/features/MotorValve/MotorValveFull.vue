@@ -16,10 +16,7 @@ export default class MotorValveFull
   extends BlockCrudComponent<MotorValveBlock> {
 
   get hwBlock(): Block | null {
-    const blockId = this.block.data.hwDevice.id;
-    return !!blockId
-      ? this.sparkModule.blockById(blockId)
-      : null;
+    return this.sparkModule.blockById(this.block.data.hwDevice.id);
   }
 
   get claimedChannels(): { [channel: number]: string } {
@@ -60,7 +57,7 @@ export default class MotorValveFull
     }
     const currentDriver = new Link(this.claimedChannels[pinId] || null, typeName);
     if (currentDriver.id) {
-      const currentDriverBlock: MotorValveBlock = this.sparkModule.blockById(currentDriver.id)!;
+      const currentDriverBlock = this.sparkModule.blockById<MotorValveBlock>(currentDriver.id)!;
       currentDriverBlock.data.startChannel = 0;
       await this.sparkModule.saveBlock(currentDriverBlock);
     }

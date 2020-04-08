@@ -2,7 +2,7 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 
-@Module
+@Module // generateMutationSetters not set
 export class SystemModule extends VuexModule {
   public now: Date = new Date();
 

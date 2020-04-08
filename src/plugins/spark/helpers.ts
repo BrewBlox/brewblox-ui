@@ -26,7 +26,7 @@ import { BlockAddress, BlockConfig, BlockCrud, DisplayOpts, DisplaySlot } from '
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
-  v => !sparkStore.serviceBlocks(serviceId).includes(v) || 'Name must be unique',
+  v => sparkStore.blockById(serviceId, v) === null || 'Name must be unique',
   v => /^[a-zA-Z]/.test(v) || 'Name must start with a letter',
   v => /^[a-zA-Z0-9 \(\)_\-\|]*$/.test(v) || 'Name may only contain letters, numbers, spaces, and ()-_|',
   v => v.length < 200 || 'Name must be less than 200 characters',
@@ -61,7 +61,7 @@ export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['c
     }
     const bCrud = crud as BlockCrud;
     if ((bCrud.isStoreBlock || bCrud.isStoreBlock === undefined)
-      && !sparkStore.moduleById(config.serviceId)?.blockIds.includes(config.blockId)) {
+      && !sparkStore.blockById(config.serviceId, config.blockId)) {
       throw new Error(`Block '${config.blockId}' not found in store`);
     }
     return widget;
@@ -169,9 +169,9 @@ export const saveHwInfo = (serviceId: string): void => {
         if (!hwDevice.id || !channel) { return; }
         const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
         const pin = target?.data.pins[channel - 1];
-        if (pin !== undefined) {
+        if (target && pin !== undefined) {
           const [name] = Object.keys(pin);
-          linked.push(`${block.id}: ${target!.id} ${name}`);
+          linked.push(`${block.id}: ${target.id} ${name}`);
         }
       }
       if (addressedTypes.includes(block.type)) {

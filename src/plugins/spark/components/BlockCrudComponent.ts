@@ -46,7 +46,8 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   }
 
   public get isDriven(): boolean {
-    return this.sparkModule.drivenBlocks
+    return this.sparkModule
+      .drivenBlocks
       .includes(this.blockId);
   }
 
@@ -55,8 +56,10 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   }
 
   public get constrainers(): string | null {
-    const limiting: string[] = this.sparkModule.limiters[this.blockId];
-    return limiting ? limiting.join(', ') : null;
+    return this.sparkModule
+      .limiters[this.blockId]
+      ?.join(', ')
+      || null;
   }
 
   public get hasGraph(): boolean {

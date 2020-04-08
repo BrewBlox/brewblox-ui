@@ -54,8 +54,10 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public get constrainers(): string | null {
-    const limiting: string[] = this.sparkModule.limiters[this.blockId];
-    return limiting ? limiting.join(', ') : null;
+    return this.sparkModule
+      .limiters[this.blockId]
+      ?.join(', ')
+      || null;
   }
 
   public get hasGraph(): boolean {

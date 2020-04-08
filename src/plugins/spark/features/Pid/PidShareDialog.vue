@@ -74,10 +74,6 @@ export default class PidShareDialog extends DialogBase {
       .onOk(unit => this.applyParams({ duration: unitDurationString(unit) }));
   }
 
-  blockById(id: string | null): Block | null {
-    return sparkStore.blockById(this.serviceId, id);
-  }
-
   name(block: Block | null): string {
     return block !== null
       ? featureStore.widgetTitle(block.type)
@@ -93,7 +89,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get input(): SetpointSensorPairBlock | null {
-    return this.blockById(this.block.data.inputId.id);
+    return this.sparkModule.blockById(this.block.data.inputId.id);
   }
 
   get inputData(): Mapped<any> {
@@ -110,7 +106,7 @@ export default class PidShareDialog extends DialogBase {
       return null;
     }
     const chain = this.driveChains.find(chain => chain[0] === this.input!.id);
-    return this.blockById(chain?.[1] ?? null);
+    return this.sparkModule.blockById(chain?.[1] ?? null);
   }
 
   get driverData(): Mapped<any> {
@@ -121,7 +117,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get output(): Block | null {
-    return this.blockById(this.block.data.outputId.id);
+    return this.sparkModule.blockById(this.block.data.outputId.id);
   }
 
   get outputData(): Mapped<any> {
@@ -132,7 +128,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get actuator(): Block | null {
-    return this.blockById(this.output?.data.actuatorId?.id ?? null);
+    return this.sparkModule.blockById(this.output?.data.actuatorId?.id ?? null);
   }
 
   get actuatorData(): Mapped<any> {

@@ -15,12 +15,8 @@ const typeName = blockTypes.DigitalActuator;
 export default class DigitalActuatorWidget
   extends BlockWidgetBase<DigitalActuatorBlock> {
 
-
   get hwBlock(): Block | null {
-    const blockId = this.block.data.hwDevice.id;
-    return !!blockId
-      ? this.sparkModule.blockById(blockId)
-      : null;
+    return this.sparkModule.blockById(this.block.data.hwDevice.id);
   }
 
   get claimedChannels(): { [channel: number]: string } {
@@ -36,7 +32,7 @@ export default class DigitalActuatorWidget
 
   pinOptName(idx: number): string {
     const driver = this.claimedChannels[idx + 1];
-    const [name] = Object.keys((this.hwBlock as Block).data.pins[idx]);
+    const [name] = Object.keys(this.hwBlock!.data.pins[idx]);
     return driver && driver !== this.block.id
       ? `${name} (replace '${driver}')`
       : name;

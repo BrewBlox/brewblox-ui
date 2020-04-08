@@ -52,14 +52,11 @@ export default class SparkImportMenu extends DialogBase {
       this.importBusy = true;
       this.messages = [];
       this.messages = await this.sparkModule.serviceImport(values);
-      if (this.messages.length > 0) {
-        notify.warn(`Some blocks could not be imported on ${this.service.id}`);
-        this.messages
-          .forEach(msg => notify.info('Block import error: ' + msg, { shown: false }));
-      }
-      else {
-        notify.done(`Imported blocks on ${this.service.id}`);
-      }
+      this.messages
+        .forEach(msg => notify.info('Block import error: ' + msg, { shown: false }));
+      notify.done(this.messages.length
+        ? 'Block import completed with warnings. See the notification center for details.'
+        : 'Block import done!');
     } catch (e) {
       notify.error(`Failed to import blocks: ${e.toString()}`);
     }

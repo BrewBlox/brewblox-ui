@@ -68,7 +68,8 @@ export default class SetpointValues extends Vue {
 
   get isDriven(): boolean {
     return !!this.block
-      && this.sparkModule!.drivenBlocks
+      && this.sparkModule!
+        .drivenBlocks
         .includes(this.block.id);
   }
 

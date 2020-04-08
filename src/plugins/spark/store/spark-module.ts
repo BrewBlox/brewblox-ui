@@ -117,7 +117,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async fetchBlocks(): Promise<void> {
-    this.blocks = await api.fetchBlocks(this.id);
+    this.updateBlocks(await api.fetchBlocks(this.id));
   }
 
   @Action

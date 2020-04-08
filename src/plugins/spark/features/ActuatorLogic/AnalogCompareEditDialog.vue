@@ -39,7 +39,7 @@ export default class AnalogCompareEditDialog extends DialogBase {
   }
 
   get isTemp(): boolean {
-    const block = sparkStore.blockById(this.serviceId, this.local!.id.id);
+    const block = this.sparkModule.blockById(this.local!.id.id);
     return !!block && isCompatible(block.type, interfaceTypes.SetpointSensorPair);
   }
 

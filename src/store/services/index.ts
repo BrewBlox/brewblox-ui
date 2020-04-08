@@ -38,7 +38,7 @@ export class ServiceModule extends VuexModule {
   @Mutation
   public setService(service: Service): void {
     this.services = extendById(this.services, service);
-    this.stubs = filterById(this.stubs, { id: service.id });
+    this.stubs = filterById(this.stubs, service); // stubs have the same ID
   }
 
   @Mutation

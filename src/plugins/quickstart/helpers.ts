@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 
 import { builderStore } from '@/plugins/builder/store';
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes, PidData } from '@/plugins/spark/block-types';
 import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
 import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -81,9 +81,7 @@ export function createOutputActions(): WizardAction[] {
     async (config: QuickStartOutput) => {
       for (const val of config.displayedBlocks) {
         const block = sparkStore.blockById(config.serviceId, val.blockId);
-        if (block) {
-          await tryDisplayBlock(block, val.opts);
-        }
+        await tryDisplayBlock(block!, val.opts);
       }
     },
   ];
@@ -115,4 +113,8 @@ export function withoutPrefix(prefix: string, val: string): string {
   return val.startsWith(prefix)
     ? val.substring(prefix.length).trim()
     : val;
+}
+
+export function pidDefaults(): PidData {
+  return sparkStore.specById(blockTypes.Pid).generate();
 }

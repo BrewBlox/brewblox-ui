@@ -14,7 +14,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
-  public get sparkModule(): SparkServiceModule {
+  get sparkModule(): SparkServiceModule {
     return sparkStore.moduleById(this.serviceId)!;
   }
 

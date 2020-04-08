@@ -5,7 +5,6 @@ import { createDialog } from '@/helpers/dialog';
 import { mutate, objectSorter, objectStringSorter } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { blockTypes, DigitalActuatorBlock } from '@/plugins/spark/block-types';
-import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
 import BlockCrudComponent from '../BlockCrudComponent';
@@ -41,9 +40,7 @@ export default class IoArray extends BlockCrudComponent {
         const id = idx + 1;
         const driverId = this.claimedChannels[id];
         const [name] = Object.keys(pin);
-        const driver = !!driverId
-          ? sparkStore.blockById(this.serviceId, driverId)
-          : null;
+        const driver = this.sparkModule.blockById(driverId);
         return { ...pin[name], id, driver, name };
       })
       .sort(objectStringSorter('name'));
@@ -70,8 +67,10 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   driverLimitedBy(block: Block): string {
-    const limiting: string[] = this.sparkModule.limiters[block.id];
-    return limiting ? limiting.join(', ') : '';
+    return this.sparkModule
+      .limiters[block.id]
+      ?.join(', ')
+      ?? '';
   }
 
   async saveDriver(channel: EditableChannel, link: Link): Promise<void> {
@@ -81,20 +80,20 @@ export default class IoArray extends BlockCrudComponent {
     }
     if (currentDriver) {
       currentDriver.data.channel = 0;
-      await sparkStore.saveBlock(currentDriver);
+      await this.sparkModule.saveBlock(currentDriver);
     }
     if (link.id) {
-      const newDriver: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, link.id)!;
+      const newDriver = this.sparkModule.blockById<DigitalActuatorBlock>(link.id)!;
       newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
       newDriver.data.channel = channel.id;
-      await sparkStore.saveBlock(newDriver);
+      await this.sparkModule.saveBlock(newDriver);
     }
   }
 
   async saveState(channel: EditableChannel, state: DigitalState): Promise<void> {
     if (channel.driver) {
       channel.driver.data.desiredState = state;
-      await sparkStore.saveBlock(channel.driver);
+      await this.sparkModule.saveBlock(channel.driver);
     }
   }
 

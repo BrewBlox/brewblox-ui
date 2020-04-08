@@ -99,11 +99,13 @@ export default class SparkPage extends Vue {
   }
 
   get isAvailable(): boolean {
-    return Boolean(this.service && this.sparkModule);
+    return this.service !== null
+      && this.sparkModule !== null;
   }
 
   get isReady(): boolean {
-    return this.isAvailable && Boolean(this.sparkModule?.lastBlocks);
+    return this.isAvailable
+      && this.sparkModule!.lastBlocks !== null;
   }
 
   get status(): SparkStatus | null {
@@ -112,7 +114,7 @@ export default class SparkPage extends Vue {
 
   get statusNok(): boolean {
     return this.isAvailable
-      && !!this.status
+      && this.status !== null
       && !this.status.synchronize;
   }
 
@@ -285,7 +287,7 @@ export default class SparkPage extends Vue {
   }
 
   get filteredItems(): ValidatedWidget[] {
-    const filter = this.blockFilter?.toLowerCase() ?? '';
+    const filter = this.blockFilter?.toLowerCase();
     return this.validatedItems
       .filter(val => !filter
         || val.id.toLowerCase().match(filter)

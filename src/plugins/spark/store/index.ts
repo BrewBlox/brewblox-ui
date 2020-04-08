@@ -31,14 +31,15 @@ export class SparkGlobalModule extends VuexModule {
 
   public blockById<T extends Block>(serviceId: string | null, blockId: string | null): T | null {
     if (!serviceId || !blockId) { return null; }
-    const block = this.moduleById(serviceId)
-      ?.blocks
-      .find(v => v.id === blockId) as T | undefined;
-    return block ?? null;
+    return this.moduleById(serviceId)?.blockById<T>(blockId) ?? null;
   }
 
   public serviceBlocks(serviceId: string | null): Block[] {
     return this.moduleById(serviceId)?.blocks ?? [];
+  }
+
+  public presetById(id: string): StoredDataPreset | null {
+    return this.presets.find(v => v.id === id) ?? null;
   }
 
   public specById(id: string): BlockSpec {

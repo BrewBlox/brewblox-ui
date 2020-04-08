@@ -43,6 +43,18 @@ export class FeatureModule extends VuexModule {
     return this.widgets.find(v => v.id === id) ?? null;
   }
 
+  public quickStartById(id: string): QuickStartFeature | null {
+    return this.quickStarts.find(v => v.id === id) ?? null;
+  }
+
+  public watcherById(id: string): WatcherFeature | null {
+    return this.watchers.find(v => v.id === id) ?? null;
+  }
+
+  public serviceById(id: string): ServiceFeature | null {
+    return this.services.find(v => v.id === id) ?? null;
+  }
+
   public widgetTitle(id: string): string {
     return this.widgetById(id)?.title ?? 'Unknown';
   }
@@ -84,30 +96,38 @@ export class FeatureModule extends VuexModule {
     return this.widgetById(id)?.removeActions ?? [];
   }
 
-  public serviceById(id: string): ServiceFeature | null {
-    return this.services.find(v => v.id === id) ?? null;
-  }
-
   @Action
   public async registerWidget(feature: WidgetFeature): Promise<void> {
     if (feature.wizard === true && feature.generateConfig === undefined) {
-      throw new Error(`Feature ${feature.id} must define a generateConfig function to use the default wizard`);
+      throw new Error(`Widget feature ${feature.id} must define a generateConfig function to use the default wizard`);
+    }
+    if (this.widgetById(feature.id)) {
+      throw new Error(`Widget feature '${feature.id}' already exists`);
     }
     this.widgets = [...this.widgets, feature];
   }
 
   @Action
   public async registerQuickStart(feature: QuickStartFeature): Promise<void> {
+    if (this.quickStartById(feature.id)) {
+      throw new Error(`Widget feature '${feature.id}' already exists`);
+    }
     this.quickStarts = [...this.quickStarts, feature];
   }
 
   @Action
   public async registerWatcher(feature: WatcherFeature): Promise<void> {
+    if (this.watcherById(feature.id)) {
+      throw new Error(`Watcher feature '${feature.id}' already exists`);
+    }
     this.watchers = [...this.watchers, feature];
   }
 
   @Action
   public async registerService(feature: ServiceFeature): Promise<void> {
+    if (this.serviceById(feature.id)) {
+      throw new Error(`Service feature '${feature.id}' already exists`);
+    }
     this.services = [...this.services, feature];
   }
 }

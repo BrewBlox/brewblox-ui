@@ -19,7 +19,8 @@ export default class DrivenIndicator extends Vue {
   }
 
   get driveChains(): string[][] {
-    return this.sparkModule.drivenChains
+    return this.sparkModule
+      .drivenChains
       .filter(chain => chain[0] === this.blockId);
   }
 

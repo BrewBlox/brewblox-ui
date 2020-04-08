@@ -64,7 +64,7 @@ export class PluginModule extends VuexModule {
   public async removePlugin(plugin: UIPlugin): Promise<void> {
     await api.remove(plugin);
     this.plugins = filterById(this.plugins, plugin);
-    this.results = filterById(this.results, plugin);
+    this.results = filterById(this.results, plugin); // results have the same ID
   }
 }
 
