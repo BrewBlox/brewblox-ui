@@ -4,7 +4,6 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { durationString } from '@/helpers/functional';
-import { QuasarNode } from '@/plugins/history/nodes';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/getters';
 import { MetricsConfig } from '../Metrics/types';

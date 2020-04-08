@@ -66,7 +66,8 @@ export const spaceCased =
   (input: string): string =>
     input.replace(/[_-]/, ' ')
       .replace(/([^^])([A-Z][^A-Z])/g, (_, v1, v2) => `${v1} ${v2.toLowerCase()}`)
-      .replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2}`);
+      .replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2}`)
+      .replace(/\s+/g, ' ');
 
 export const snakeCased =
   (input: string): string =>
@@ -86,7 +87,7 @@ export const camelCased =
 
 export const sentenceCased =
   (input: string): string => {
-    const spaced = spaceCased(input).trimLeft();
+    const spaced = spaceCased(input).trim();
     return spaced.substr(0, 1).toUpperCase() + spaced.substr(1, spaced.length);
   };
 

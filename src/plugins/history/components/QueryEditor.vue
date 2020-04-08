@@ -8,7 +8,6 @@ import {
   defaultLabel,
   filteredNodes,
   nodeBuilder,
-  QuasarNode,
   targetBuilder,
   targetSplitter,
 } from '@/plugins/history/nodes';
@@ -66,18 +65,6 @@ export default class QueryEditor extends Vue {
     this.$emit('update:config', config);
   }
 
-  get ticked(): string[] {
-    return targetSplitter(this.config.targets);
-  }
-
-  set ticked(vals: string[]) {
-    this.$set(this.config, 'targets', targetBuilder(vals));
-    vals
-      .filter(key => this.config.renames[key] === undefined)
-      .forEach(key => this.$set(this.config.renames, key, defaultLabel(key)));
-    this.saveConfig();
-  }
-
   get fields(): Mapped<string[]> {
     return historyStore.fields;
   }
@@ -88,6 +75,18 @@ export default class QueryEditor extends Vue {
       handler: this.nodeHandler,
       header: 'leaf',
     });
+  }
+
+  get ticked(): string[] {
+    return targetSplitter(this.config.targets);
+  }
+
+  set ticked(vals: string[]) {
+    this.$set(this.config, 'targets', targetBuilder(vals, this.fields));
+    vals
+      .filter(key => this.config.renames[key] === undefined)
+      .forEach(key => this.$set(this.config.renames, key, defaultLabel(key)));
+    this.saveConfig();
   }
 
   nodeHandler(node: QuasarNode): void {
