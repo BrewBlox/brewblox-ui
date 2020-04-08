@@ -50,7 +50,7 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   get applicableSteps(): Mapped<boolean> {
-    const blockIds = sparkStore.blockIds(this.serviceId) ?? [];
+    const blockIds = sparkStore.serviceBlocks(this.serviceId).map(v => v.id);
     return this.steps
       .reduce(
         (acc, step) => {
@@ -61,7 +61,7 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   get stepDisplays(): StepDisplay[] {
-    const blockIds = sparkStore.blockIds(this.serviceId) ?? [];
+    const blockIds = sparkStore.serviceBlocks(this.serviceId).map(v => v.id);
     return this.steps
       .map(step => {
         const applicable = step.changes.every(change => blockIds.includes(change.blockId));
@@ -78,7 +78,7 @@ export default class QuickActionsBasic extends CrudComponent {
 
   confirmStepChange(block: Block, key: string, value: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      const change = sparkStore.specs[block.type].changes
+      const change = sparkStore.spec(block).changes
         .find(change => change.key === key) as ChangeField;
       if (!change) {
         resolve(value);
@@ -106,8 +106,8 @@ export default class QuickActionsBasic extends CrudComponent {
     const changes = step.changes;
     const actualChanges: [Block, any][] = [];
     for (const change of changes) {
-      const block = sparkStore.blockById(this.serviceId, change.blockId);
-      const spec = sparkStore.specs[block.type];
+      const block = sparkStore.blockById(this.serviceId, change.blockId)!;
+      const spec = sparkStore.spec(block);
       const actualData = deepCopy(change.data);
       for (const key in change.data) {
         if (!spec.changes.some(c => c.key === key)) {
@@ -141,8 +141,8 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   blockDiff(change: BlockChange): BlockDiff {
-    const block = sparkStore.blockById(this.serviceId, change.blockId);
-    const spec = sparkStore.specs[block.type];
+    const block = sparkStore.blockById(this.serviceId, change.blockId)!;
+    const spec = sparkStore.spec(block);
     const diffs =
       Object.entries(change.data)
         .map(([key, val]) => {

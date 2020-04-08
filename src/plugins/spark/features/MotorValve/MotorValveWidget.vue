@@ -1,11 +1,9 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes, Spark3PinsBlock } from '@/plugins/spark/block-types';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
-import { sparkStore } from '../../store';
-import { Spark3PinsBlock } from '../Spark3Pins/types';
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
 import { MotorValveBlock } from './types';
@@ -19,20 +17,23 @@ import { MotorValveBlock } from './types';
 export default class MotorValveWidget
   extends BlockWidgetBase<MotorValveBlock> {
 
-  get pins(): Spark3PinsBlock | null {
-    const block = sparkStore.blockValues(this.serviceId)
-      .find(block => block.type === blockTypes.Spark3Pins);
-    return block ? block as Spark3PinsBlock : null;
+  // Spark 2 pins have no support for toggling 12V
+  get spark3Pins(): Spark3PinsBlock | null {
+    return this.sparkModule
+      .blocks
+      .find(block => block.type === blockTypes.Spark3Pins)
+      ?? null;
   }
 
   get disabled12V(): boolean {
-    return !!this.pins && !this.pins.data.enableIoSupply12V;
+    return this.spark3Pins !== null
+      && !this.spark3Pins.data.enableIoSupply12V;
   }
 
   enable12V(): void {
-    if (this.pins) {
-      this.pins.data.enableIoSupply12V = true;
-      sparkStore.saveBlock(this.pins);
+    if (this.spark3Pins) {
+      this.spark3Pins.data.enableIoSupply12V = true;
+      this.sparkModule.saveBlock(this.spark3Pins);
     }
   }
 }

@@ -8,8 +8,8 @@ import { Service, serviceStore, ServiceStub } from '@/store/services';
 
 
 export async function startCreateService(stub: ServiceStub, router: VueRouter): Promise<void> {
-  const feature = featureStore.services[stub.type];
-  if (feature === undefined) {
+  const feature = featureStore.serviceById(stub.type);
+  if (feature === null) {
     notify.error(`Unknown service type '${stub.type}'`);
     return;
   }

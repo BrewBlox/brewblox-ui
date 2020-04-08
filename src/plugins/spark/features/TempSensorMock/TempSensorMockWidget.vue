@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { Temp, Time } from '@/helpers/units';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
 
 import { Fluctuation, TempSensorMockBlock } from './types';
 
@@ -13,7 +12,7 @@ export default class TempSensorMockWidget
   extends BlockWidgetBase<TempSensorMockBlock> {
 
   get tempUnit(): string {
-    return sparkStore.units(this.block.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   addFluctuation(): void {

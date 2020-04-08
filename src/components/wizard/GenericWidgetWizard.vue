@@ -52,7 +52,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   }
 
   emptyConfig(): any {
-    return featureStore.widgets[this.featureId]?.generateConfig?.() ?? {};
+    return featureStore.widgetById(this.featureId)?.generateConfig?.() ?? {};
   }
 
   createWidget(): void {

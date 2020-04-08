@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
@@ -8,7 +7,6 @@ import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import { sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
 
 import WizardTaskBase from '../components/WizardTaskBase';
@@ -39,7 +37,8 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
   }
 
   get services(): Service[] {
-    return serviceStore.typedServices(sparkType);
+    return serviceStore.services
+      .filter(v => v.type === sparkType);
   }
 
   get serviceId(): string {
@@ -48,13 +47,6 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
 
   set serviceId(serviceId: string) {
     this.updateConfig({ ...this.config, serviceId });
-  }
-
-  get groupError(): string | null {
-    const [name, active] = get(sparkStore.groupState, [this.serviceId, 0], ['Unknown', false]);
-    return active
-      ? null
-      : `Group '${name}' is disabled. Created blocks will be inactive.`;
   }
 
   get prefix(): string {
@@ -153,12 +145,6 @@ export default class FermentNamingTask extends WizardTaskBase<FermentConfig> {
           </q-item-label>
         </q-item-section>
       </q-item>
-
-      <CardWarning v-if="groupError">
-        <template #message>
-          {{ groupError }}
-        </template>
-      </CardWarning>
 
       <!-- Generic settings -->
       <QuickStartServiceField v-model="serviceId" :services="services" />

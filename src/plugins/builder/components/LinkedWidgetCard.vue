@@ -24,7 +24,7 @@ export default class LinkedWidgetCard extends PartCard {
   readonly filter!: (widget: Widget) => boolean;
 
   get sparkServices(): Service[] {
-    return serviceStore.serviceValues
+    return serviceStore.services
       .filter(svc => svc.type === sparkType);
   }
 
@@ -44,11 +44,11 @@ export default class LinkedWidgetCard extends PartCard {
   }
 
   get linkedOpts(): SelectOption[] {
-    return dashboardStore.widgetValues
+    return dashboardStore.widgets
       .filter(this.actualFilter)
       .sort(objectStringSorter('title'))
       .map(widget => ({
-        label: `[${dashboardStore.dashboardById(widget.dashboard).title}] ${widget.title}`,
+        label: `[${dashboardStore.dashboardTitle(widget.dashboard)}] ${widget.title}`,
         value: widget.id,
       }));
   }

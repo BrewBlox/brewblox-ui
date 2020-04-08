@@ -45,7 +45,7 @@ export default class LinkDialog extends DialogBase {
   }
 
   get linkOpts(): Link[] {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => this.typeFilter(block.type))
       .map(block => new Link(block.id, block.type))
       .sort(objectStringSorter('id'));
@@ -53,7 +53,7 @@ export default class LinkDialog extends DialogBase {
 
   get block(): Block | null {
     return this.local
-      ? sparkStore.tryBlockById(this.serviceId, this.local.id)
+      ? sparkStore.blockById(this.serviceId, this.local.id)
       : null;
   }
 

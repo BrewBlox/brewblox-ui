@@ -11,8 +11,8 @@ export default class PluginDialog extends DialogBase {
   changed = false;
 
   get combos(): [UIPlugin, UIPluginResult][] {
-    return pluginStore.pluginValues
-      .map(plugin => [plugin, pluginStore.results[plugin.id]] as [UIPlugin, UIPluginResult]);
+    return pluginStore.plugins
+      .map(plugin => [plugin, pluginStore.results.find(v => v.id === plugin.id)] as [UIPlugin, UIPluginResult]);
   }
 
   async addPlugin(): Promise<void> {
@@ -29,7 +29,7 @@ export default class PluginDialog extends DialogBase {
   async saveUrl(plugin: UIPlugin, url: string): Promise<void> {
     if (plugin.url !== url) {
       await pluginStore.savePlugin({ ...plugin, url });
-      pluginStore.commitResult({ id: plugin.id, loaded: false, error: null });
+      pluginStore.setResult({ id: plugin.id, loaded: false, error: null });
     }
   }
 

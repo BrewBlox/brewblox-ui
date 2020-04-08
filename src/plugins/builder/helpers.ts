@@ -20,7 +20,7 @@ export function settingsAddress(part: PersistentPart, key: string): BlockAddress
 
 export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
   const addr = settingsAddress(part, key);
-  return sparkStore.tryBlockById(addr.serviceId, addr.id);
+  return sparkStore.blockById(addr.serviceId, addr.id);
 }
 
 export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPart {
@@ -171,12 +171,12 @@ export function showDrivingBlockDialog(part: PersistentPart, key: string): void 
     return showAbsentBlock(part, key);
   }
 
-  const driveChain = sparkStore
-    .drivenChains(block.serviceId)
+  const driveChain = sparkStore.moduleById(block.serviceId)
+    ?.drivenChains
     .find(chain => chain[0] === block.id);
 
   const actual = driveChain !== undefined
-    ? sparkStore.tryBlockById(block.serviceId, driveChain[driveChain.length - 1])
+    ? sparkStore.blockById(block.serviceId, driveChain[driveChain.length - 1])
     : block;
 
   if (actual) {

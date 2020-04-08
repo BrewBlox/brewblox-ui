@@ -48,7 +48,9 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     };
   }
 
-  saveConfig(config: GraphConfig = this.config): void {
+  // We override `this.config`
+  // It will not be picked up as default argument to super.saveConfig()
+  async saveConfig(config: GraphConfig = this.config): Promise<void> {
     this.widget.config = config;
     this.saveWidget(this.widget);
   }

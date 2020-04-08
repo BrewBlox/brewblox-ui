@@ -37,7 +37,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
   }
 
   get userTemp(): string {
-    return sparkStore.units(this.config.serviceId).Temp;
+    return sparkStore.moduleById(this.config.serviceId)!.units.Temp;
   }
 
   get hltKp(): Unit {

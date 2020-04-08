@@ -4,9 +4,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { Temp, Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { sparkStore } from '@/plugins/spark/store';
+import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
-import { interfaceTypes, isCompatible } from '../../block-types';
 import { analogOpTitles } from './getters';
 import { AnalogCompare } from './types';
 
@@ -25,8 +25,12 @@ export default class AnalogCompareEditDialog extends DialogBase {
     this.local = deepCopy(this.value);
   }
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   get tempUnit(): string {
-    return sparkStore.units(this.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   get operatorOpts(): SelectOption[] {
@@ -35,7 +39,7 @@ export default class AnalogCompareEditDialog extends DialogBase {
   }
 
   get isTemp(): boolean {
-    const block = sparkStore.tryBlockById(this.serviceId, this.local!.id.id);
+    const block = this.sparkModule.blockById(this.local!.id.id);
     return !!block && isCompatible(block.type, interfaceTypes.SetpointSensorPair);
   }
 

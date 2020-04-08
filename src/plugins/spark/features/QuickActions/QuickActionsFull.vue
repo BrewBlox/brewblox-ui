@@ -113,7 +113,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       component: 'BlockSelectDialog',
       title: 'Choose a Block',
       filter: block => {
-        const spec = sparkStore.specs[block.type];
+        const spec = sparkStore.spec(block);
         return !!spec
           && spec.changes.length > 0
           && step.changes.every(change => change.blockId !== block.id);
@@ -143,7 +143,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   }
 
   startSwitchBlock(step: Step, change: BlockChange): void {
-    const currentBlock = sparkStore.tryBlockById(this.serviceId, change.blockId);
+    const currentBlock = sparkStore.blockById(this.serviceId, change.blockId);
     createDialog({
       component: 'BlockSelectDialog',
       parent: this,

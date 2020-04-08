@@ -41,13 +41,13 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     if (!this.service) {
       return [];
     }
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => block.type === this.featureId)
       .sort(objectStringSorter('id'));
   }
 
   get serviceOpts(): SelectOption[] {
-    return serviceStore.serviceValues
+    return serviceStore.services
       .filter(service => service.type === sparkType)
       .map(service => ({
         label: service.title,
@@ -73,7 +73,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
       serviceId: this.serviceId,
       type: this.featureId,
       groups: [0],
-      data: sparkStore.specs[this.featureId].generate(),
+      data: sparkStore.spec({ type: this.featureId }).generate(),
     };
     this.blockId = this.block.id; // for when using existing block
     this.widget = this.widget ?? {
@@ -128,7 +128,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     const service = this.service!;
     const block = this.block!;
 
-    if (!sparkStore.blockIds(service.id).includes(block.id)) {
+    if (!sparkStore.blockById(service.id, block.id)) {
       await sparkStore.createBlock(block);
     }
 

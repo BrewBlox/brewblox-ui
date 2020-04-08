@@ -5,7 +5,6 @@ import { mutate } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { blockTypes } from '@/plugins/spark/block-types';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 import { DigitalActuatorBlock } from './types';
@@ -16,12 +15,8 @@ const typeName = blockTypes.DigitalActuator;
 export default class DigitalActuatorWidget
   extends BlockWidgetBase<DigitalActuatorBlock> {
 
-
   get hwBlock(): Block | null {
-    const blockId = this.block.data.hwDevice.id;
-    return !!blockId
-      ? sparkStore.blockById(this.serviceId, blockId)
-      : null;
+    return this.sparkModule.blockById(this.block.data.hwDevice.id);
   }
 
   get claimedChannels(): { [channel: number]: string } {
@@ -29,14 +24,15 @@ export default class DigitalActuatorWidget
       return {};
     }
     const targetId = this.hwBlock.id;
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule
+      .blocks
       .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }
 
   pinOptName(idx: number): string {
     const driver = this.claimedChannels[idx + 1];
-    const [name] = Object.keys((this.hwBlock as Block).data.pins[idx]);
+    const [name] = Object.keys(this.hwBlock!.data.pins[idx]);
     return driver && driver !== this.block.id
       ? `${name} (replace '${driver}')`
       : name;
@@ -58,9 +54,9 @@ export default class DigitalActuatorWidget
     }
     const currentDriver = new Link(this.claimedChannels[pinId] || null, typeName);
     if (currentDriver.id) {
-      const currentDriverBlock: DigitalActuatorBlock = sparkStore.blockById(this.serviceId, currentDriver.id);
+      const currentDriverBlock = this.sparkModule.blockById<DigitalActuatorBlock>(currentDriver.id)!;
       currentDriverBlock.data.channel = 0;
-      await sparkStore.saveBlock(currentDriverBlock);
+      await this.sparkModule.saveBlock(currentDriverBlock);
     }
     this.block.data.channel = pinId;
     await this.saveBlock();

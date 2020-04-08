@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 
-import { sparkStore } from '../../store';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { evalResultTitles, nonErrorResults } from './getters';
@@ -36,7 +35,7 @@ export default class ActuatorLogicBasic
   extends BlockCrudComponent<ActuatorLogicBlock> {
 
   get tempUnit(): string {
-    return sparkStore.units(this.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   keyColor(key: string): string {
@@ -99,7 +98,7 @@ export default class ActuatorLogicBasic
         key: analogKey(idx),
         pretty: prettyAnalog(
           cmp,
-          sparkStore.tryBlockById(this.serviceId, cmp.id.id)?.type ?? null,
+          this.sparkModule.blockById(cmp.id.id)?.type ?? null,
           this.tempUnit,
         ),
       }));

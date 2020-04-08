@@ -2,7 +2,7 @@
 import fetch from '@/helpers/fetch';
 import notify from '@/helpers/notify';
 
-import { ApiSparkStatus, Block, DataBlock, SparkStatus, UserUnits } from '../types';
+import { ApiSparkStatus, Block, DataBlock, SparkExported, SparkStatus, UserUnits } from '../types';
 import { asBlock, asDataBlock } from './helpers';
 
 const intercept =
@@ -131,12 +131,12 @@ export const flashFirmware = async (serviceId: string): Promise<any> =>
     .then(resp => resp.data)
     .catch(intercept(`Failed to update firmware on ${serviceId}`));
 
-export const serviceExport = async (serviceId: string): Promise<any> =>
-  fetch.get(`/${encodeURIComponent(serviceId)}/export_objects`)
+export const serviceExport = async (serviceId: string): Promise<SparkExported> =>
+  fetch.get<SparkExported>(`/${encodeURIComponent(serviceId)}/export_objects`)
     .then(resp => resp.data)
     .catch(intercept(`Failed to fetch stored blocks from ${serviceId}`));
 
-export const serviceImport = async (serviceId: string, exported: any): Promise<string[]> =>
+export const serviceImport = async (serviceId: string, exported: SparkExported): Promise<string[]> =>
   fetch.post<string[]>(`/${encodeURIComponent(serviceId)}/import_objects`, exported)
     .then(resp => resp.data)
     .catch(intercept(`Failed to reset stored blocks in ${serviceId}`));

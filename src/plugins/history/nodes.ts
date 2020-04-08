@@ -110,13 +110,7 @@ export const filteredNodes =
 export const targetSplitter =
   (targets: QueryTarget[]): string[] =>
     targets
-      .reduce(
-        (acc: string[], tar: QueryTarget) => {
-          acc.push(...tar.fields.map(f => `${tar.measurement}/${f}`));
-          return acc;
-        },
-        []
-      );
+      .flatMap(tar => tar.fields.map(f => `${tar.measurement}/${f}`));
 
 export const targetBuilder =
   (vals: string[], filterUnknown = true): QueryTarget[] => {

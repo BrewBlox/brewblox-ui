@@ -60,12 +60,12 @@ export default class WidgetBase<ConfigT = any> extends Vue {
       : 'WidgetToolbar';
   }
 
-  public saveWidget(widget: Widget = this.crud.widget): void {
-    this.crud.saveWidget(widget);
+  public async saveWidget(widget: Widget = this.crud.widget): Promise<void> {
+    await this.crud.saveWidget(widget);
   }
 
-  public saveConfig(config: ConfigT = this.config): void {
-    this.saveWidget({ ...this.widget, config });
+  public async saveConfig(config: ConfigT = this.config): Promise<void> {
+    await this.saveWidget({ ...this.widget, config });
   }
 
   public showDialog(args: Mapped<any> = {}): void {

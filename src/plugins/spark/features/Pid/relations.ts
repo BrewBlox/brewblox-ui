@@ -7,7 +7,7 @@ import { featureStore } from '@/store/features';
 import { PidBlock } from './types';
 
 function findLinks(serviceId: string, id: string | null): RelationEdge[] {
-  const block = sparkStore.blocks(serviceId)[id || ''];
+  const block = sparkStore.blockById(serviceId, id);
   if (!id || !block) {
     return [];
   }
@@ -43,14 +43,14 @@ function relations(block: PidBlock): RelationEdge[] {
 
   return [
     ...chain,
-    ...sparkStore.blockValues(block.serviceId)
+    ...sparkStore.serviceBlocks(block.serviceId)
       .filter(block => block.data.targetId?.id === setpointId)
       .map(block => ({ source: block.id, target: setpointId, relation: ['target'] })),
   ];
 }
 
 function nodes(serviceId: string): RelationNode[] {
-  return sparkStore.blockValues(serviceId)
+  return sparkStore.serviceBlocks(serviceId)
     .map(block => ({
       id: block.id,
       type: featureStore.widgetTitle(block.type),

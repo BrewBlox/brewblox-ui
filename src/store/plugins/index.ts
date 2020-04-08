@@ -1,7 +1,6 @@
-import Vue from 'vue';
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { objReducer } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import { StoreObject } from '@/plugins/database';
 import store from '@/store';
 
@@ -22,64 +21,51 @@ export interface UIPluginResult {
 const defaultResult = (plugin: UIPlugin): UIPluginResult =>
   ({ id: plugin.id, loaded: false, error: null });
 
-const rawError = true;
-
-@Module({ store, namespaced: true, dynamic: true, name: 'plugins' })
+@Module({ generateMutationSetters: true })
 export class PluginModule extends VuexModule {
-  public plugins: Mapped<UIPlugin> = {};
-  public results: Mapped<UIPluginResult> = {};
+  public plugins: UIPlugin[] = [];
+  public results: UIPluginResult[] = [];
 
-  public get pluginValues(): UIPlugin[] {
-    return Object.values(this.plugins);
+  @Mutation
+  public setPlugin(plugin: UIPlugin): void {
+    this.plugins = extendById(this.plugins, plugin);
+    this.results = extendById(this.results, defaultResult(plugin));
   }
 
   @Mutation
-  public commitPlugin(plugin: UIPlugin): void {
-    Vue.set(this.plugins, plugin.id, plugin);
-    Vue.set(this.results, plugin.id, defaultResult(plugin));
+  public setAllPlugins(plugins: UIPlugin[]): void {
+    this.plugins = plugins;
+    this.results = plugins.map(defaultResult);
   }
 
   @Mutation
-  public commitAllPlugins(plugins: UIPlugin[]): void {
-    this.plugins = plugins.reduce(objReducer('id'), {});
-    this.results = plugins
-      .map(defaultResult)
-      .reduce(objReducer('id'), {});
+  public setResult(result: UIPluginResult): void {
+    this.results = extendById(this.results, result);
   }
 
-  @Mutation
-  public commitRemovePlugin(plugin: UIPlugin): void {
-    Vue.delete(this.plugins, plugin.id);
-    Vue.delete(this.results, plugin.id);
-  }
-
-  @Mutation
-  public commitResult(result: UIPluginResult): void {
-    Vue.set(this.results, result.id, result);
-  }
-
-  @Action({ rawError })
+  @Action
   public async fetchPlugins(): Promise<UIPlugin[]> {
     const plugins = await api.fetch();
-    this.commitAllPlugins(plugins);
+    this.setAllPlugins(plugins);
     return plugins;
   }
 
-  @Action({ rawError })
+  @Action
   public async createPlugin(plugin: UIPlugin): Promise<void> {
-    this.commitPlugin(await api.create(plugin));
+    this.setPlugin(await api.create(plugin));
   }
 
-  @Action({ rawError })
+  @Action
   public async savePlugin(plugin: UIPlugin): Promise<void> {
-    this.commitPlugin(await api.persist(plugin));
+    this.setPlugin(await api.persist(plugin));
   }
 
-  @Action({ rawError })
+  @Action
   public async removePlugin(plugin: UIPlugin): Promise<void> {
     await api.remove(plugin);
-    this.commitRemovePlugin(plugin);
+    this.plugins = filterById(this.plugins, plugin);
+    this.results = filterById(this.results, plugin); // results have the same ID
   }
 }
 
-export const pluginStore = getModule(PluginModule);
+export const pluginStore = new PluginModule({ store, name: 'plugins' });

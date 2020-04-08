@@ -1,91 +1,61 @@
-import Vue from 'vue';
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { objReducer } from '@/helpers/functional';
+import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
 import { AutomationEventData, AutomationProcess, AutomationTask, AutomationTemplate } from '../types';
 import { templateApi } from './api';
 
-const rawError = true;
-
-@Module({ store, namespaced: true, dynamic: true, name: 'automation' })
+@Module({ generateMutationSetters: true })
 export class AutomationModule extends VuexModule {
-  public processes: Mapped<AutomationProcess> = {};
-  public tasks: Mapped<AutomationTask> = {};
+  public processes: AutomationProcess[] = [];
+  public tasks: AutomationTask[] = [];
   public lastEvent: Date | null = null;
 
-  public templates: Mapped<AutomationTemplate> = {};
+  public templates: AutomationTemplate[] = [];
   public activeTemplate: string | null = null;
   public activeStep: string | null = null;
 
   public get processIds(): string[] {
-    return Object.keys(this.processes);
-  }
-
-  public get processValues(): AutomationProcess[] {
-    return Object.values(this.processes);
-  }
-
-  public get processById(): (id: string) => AutomationProcess {
-    return id => this.processes[id] ?? null;
+    return this.processes.map(v => v.id);
   }
 
   public get taskIds(): string[] {
-    return Object.keys(this.tasks);
-  }
-
-  public get taskValues(): AutomationTask[] {
-    return Object.values(this.tasks);
-  }
-
-  public get taskById(): (id: string) => AutomationTask {
-    return id => this.tasks[id] ?? null;
+    return this.tasks.map(v => v.id);
   }
 
   public get templateIds(): string[] {
-    return Object.keys(this.templates);
+    return this.templates.map(v => v.id);
   }
 
-  public get templateValues(): AutomationTemplate[] {
-    return Object.values(this.templates);
+  public processById(id: string): AutomationProcess | null {
+    return this.processes.find(v => v.id === id) ?? null;
   }
 
-  public get templateById(): (id: string) => AutomationTemplate {
-    return id => this.templates[id] ?? null;
+  public taskById(id: string): AutomationTask | null {
+    return this.tasks.find(v => v.id === id) ?? null;
+  }
+
+  public templateById(id: string): AutomationTemplate | null {
+    return this.templates.find(v => v.id === id) ?? null;
   }
 
   @Mutation
-  public commitEventData(data: AutomationEventData): void {
-    this.processes = data.processes.reduce(objReducer('id'), {});
-    this.tasks = data.tasks.reduce(objReducer('id'), {});
+  public setEventData(data: AutomationEventData): void {
+    this.processes = data.processes;
+    this.tasks = data.tasks;
     this.lastEvent = new Date();
   }
 
   @Mutation
   public invalidateEventData(): void {
-    this.processes = {};
-    this.tasks = {};
+    this.processes = [];
+    this.tasks = [];
     this.lastEvent = null;
   }
 
   @Mutation
-  public commitTemplate(template: AutomationTemplate): void {
-    Vue.set(this.templates, template.id, template);
-  }
-
-  @Mutation
-  public commitRemoveTemplate(template: AutomationTemplate): void {
-    Vue.delete(this.templates, template.id);
-  }
-
-  @Mutation
-  public commitAllTemplates(processes: AutomationTemplate[]): void {
-    this.templates = processes.reduce(objReducer('id'), {});
-  }
-
-  @Mutation
-  public commitActive(ids: [string, string | null] | null): void {
+  public setActive(ids: [string, string | null] | null): void {
     if (ids) {
       this.activeTemplate = ids[0];
       this.activeStep = ids[1];
@@ -96,45 +66,36 @@ export class AutomationModule extends VuexModule {
     }
   }
 
-  @Action({ rawError })
-  public async fetchTemplates(): Promise<void> {
-    this.commitAllTemplates(await templateApi.fetch());
-  }
-
-  @Action({ rawError })
+  @Action
   public async createTemplate(template: AutomationTemplate): Promise<void> {
-    this.commitTemplate(await templateApi.create(template));
+    await templateApi.create(template); // triggers callback
   }
 
-  @Action({ rawError })
+  @Action
   public async saveTemplate(template: AutomationTemplate): Promise<void> {
-    this.commitTemplate(await templateApi.persist(template));
+    await templateApi.persist(template); // triggers callback
   }
 
-  @Action({ rawError })
+  @Action
   public async removeTemplate(template: AutomationTemplate): Promise<void> {
-    await templateApi.remove(template);
-    this.commitRemoveTemplate(template);
+    await templateApi.remove(template); // triggers callback
   }
 
-  @Action({ rawError })
+  @Action
   public async start(): Promise<void> {
     const onChange = (template: AutomationTemplate): void => {
       const existing = this.templateById(template.id);
       if (!existing || existing._rev !== template._rev) {
-        this.commitTemplate(template);
+        this.templates = extendById(this.templates, template);
       }
     };
     const onDelete = (id: string): void => {
-      const existing = this.templateById(id);
-      if (existing) {
-        this.commitRemoveTemplate(existing);
-      }
+      this.templates = filterById(this.templates, { id });
     };
 
-    this.commitAllTemplates(await templateApi.fetch());
+    this.templates = await templateApi.fetch();
     templateApi.subscribe(onChange, onDelete);
   }
 }
 
-export const automationStore = getModule(AutomationModule);
+export const automationStore = new AutomationModule({ store, name: 'automation' });

@@ -88,7 +88,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       options: {
         type: 'radio',
         model: '',
-        items: dashboardStore.dashboardValues
+        items: dashboardStore.dashboards
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
@@ -98,7 +98,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
           return;
         }
         dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        notify.done(`Copied ${this.widget.title} to ${dashboardStore.dashboardById(dashboard).title}`);
+        notify.done(`Copied ${this.widget.title} to ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
 
@@ -111,7 +111,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       options: {
         type: 'radio',
         model: '',
-        items: dashboardStore.dashboardValues
+        items: dashboardStore.dashboards
           .filter(dashboard => dashboard.id !== this.widget.dashboard)
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },

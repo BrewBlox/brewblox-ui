@@ -15,7 +15,8 @@ const feature: WidgetFeature<SessionLogConfig> = {
     rows: 5,
   },
   generateConfig: () => {
-    const [last] = [...historyStore.sessionValues].sort((a, b) => b.date - a.date);
+    // `historyStore.sessions` must be copied before sorting
+    const [last] = [...historyStore.sessions].sort((a, b) => b.date - a.date);
     return { currentSession: last !== undefined ? last.id : null };
   },
 };

@@ -36,12 +36,12 @@ export default class WidgetWizardPicker extends Vue {
   }
 
   get dashboardOptions(): SelectOption[] {
-    return dashboardStore.dashboardValues
+    return dashboardStore.dashboards
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 
   get wizardOptions(): SelectOption[] {
-    return featureStore.widgetValues
+    return featureStore.widgets
       .map(feature => ({
         label: feature.title,
         value: feature.id,

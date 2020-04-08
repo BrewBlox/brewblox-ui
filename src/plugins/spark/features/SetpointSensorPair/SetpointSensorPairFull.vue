@@ -2,7 +2,6 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 import { FilterChoice, SetpointSensorPairBlock } from './types';
@@ -24,7 +23,8 @@ export default class SetpointSensorPairForm
     if (!this.isStoreBlock) {
       return [];
     }
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule
+      .blocks
       .filter(block => block.data.inputId?.id === this.blockId);
   }
 }

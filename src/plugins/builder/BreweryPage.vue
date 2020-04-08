@@ -43,7 +43,7 @@ export default class BuilderPage extends Vue {
   }
 
   get layouts(): BuilderLayout[] {
-    return builderStore.layoutValues;
+    return builderStore.layouts;
   }
 
   get layoutId(): string | null {

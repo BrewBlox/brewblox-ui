@@ -5,7 +5,7 @@ import { Watch } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
 import { Block, BlockConfig, BlockCrud } from '../types';
 
@@ -20,18 +20,23 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
     const initial = this.initialCrud as BlockCrud<BlockT>;
     // We want to avoid calling member getters, as this may create circular lookups
     const { serviceId, blockId } = initial.widget.config;
+    const module = sparkStore.moduleById(serviceId)!;
     return initial.block !== undefined
       ? initial
       : {
         ...this.initialCrud,
         isStoreBlock: true,
-        block: sparkStore.blockById(serviceId, blockId) as BlockT,
-        saveBlock: async (block: BlockT) => sparkStore.saveBlock(block),
+        block: module.blockById<BlockT>(blockId)!,
+        saveBlock: async (block: BlockT) => module.saveBlock(block),
       };
   }
 
   public get serviceId(): string {
     return this.widget.config.serviceId;
+  }
+
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   public get blockId(): string {
@@ -43,21 +48,24 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public get isDriven(): boolean {
-    return sparkStore.drivenBlocks(this.serviceId)
+    return this.sparkModule
+      .drivenBlocks
       .includes(this.blockId);
   }
 
   public get constrainers(): string | null {
-    const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
-    return limiting ? limiting.join(', ') : null;
+    return this.sparkModule
+      .limiters[this.blockId]
+      ?.join(', ')
+      || null;
   }
 
   public get hasGraph(): boolean {
-    return sparkStore.specs[this.block.type]?.graphTargets !== undefined;
+    return sparkStore.spec(this.block)?.graphTargets !== undefined;
   }
 
   public get renamedTargets(): Mapped<string> {
-    const targets = sparkStore.specs[this.block.type]?.graphTargets;
+    const targets = sparkStore.spec(this.block)?.graphTargets;
     return targets !== undefined
       ? postfixedDisplayNames(targets, this.block.data)
       : {};
@@ -109,7 +117,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public async refreshBlock(): Promise<void> {
-    await sparkStore.fetchBlock(this.block)
+    await this.sparkModule.fetchBlock(this.block)
       .catch(() => { });
   }
 
@@ -122,7 +130,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public changeBlockId(newId: string): void {
-    sparkStore.renameBlock([this.serviceId, this.blockId, newId])
+    this.sparkModule.renameBlock([this.blockId, newId])
       .catch(() => { });
   }
 

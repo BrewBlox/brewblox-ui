@@ -84,7 +84,7 @@ export default class DigitalConstraints extends Vue {
       return constraint.mutexed.extraHoldTime;
     }
     else if (constraint.mutexed.mutexId.id) {
-      const mutex: MutexBlock = sparkStore.blockById(
+      const mutex = sparkStore.blockById<MutexBlock>(
         this.serviceId,
         constraint.mutexed.mutexId.id);
       return mutex?.data.differentActuatorWait ?? new Time();

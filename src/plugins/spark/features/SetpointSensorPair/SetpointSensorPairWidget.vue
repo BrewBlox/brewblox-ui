@@ -2,7 +2,6 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
@@ -22,7 +21,8 @@ export default class SetpointSensorPairWidget
     if (!this.crud.isStoreBlock) {
       return [];
     }
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule
+      .blocks
       .filter(block => block.data.inputId?.id === this.blockId);
   }
 

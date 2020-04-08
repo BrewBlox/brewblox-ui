@@ -14,7 +14,6 @@ import {
   MutexBlock,
   OffsetSettingOrValue,
   PidBlock,
-  PidData,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/block-types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
@@ -23,7 +22,7 @@ import { AnalogConstraint, Block, DigitalConstraint, DigitalState } from '@/plug
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { DisplayBlock } from '../types';
 import { HermsConfig, HermsOpts } from './types';
 
@@ -33,7 +32,7 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
 
 export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block[] {
   const groups = [0];
-  const serviceId = config.serviceId;
+  const { serviceId, names } = config;
 
   const pwmConstraints: AnalogConstraint[] = [];
   const actuatorConstraints: DigitalConstraint[] = [];
@@ -41,7 +40,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
   if (config.mutex) {
     pwmConstraints.push({
       balanced: {
-        balancerId: new Link(config.names.balancer, blockTypes.Balancer),
+        balancerId: new Link(names.balancer, blockTypes.Balancer),
         granted: 0,
         id: 0,
       },
@@ -50,7 +49,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
     actuatorConstraints.push(
       {
         mutexed: {
-          mutexId: new Link(config.names.mutex, blockTypes.Mutex),
+          mutexId: new Link(names.mutex, blockTypes.Mutex),
           extraHoldTime: new Time(),
           hasCustomHoldTime: true,
           hasLock: false,
@@ -62,14 +61,14 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
 
   const balancerBlocks = [
     {
-      id: config.names.balancer,
+      id: names.balancer,
       type: blockTypes.Balancer,
       serviceId,
       groups,
       data: { clients: [] },
     },
     {
-      id: config.names.mutex,
+      id: names.mutex,
       type: blockTypes.Mutex,
       serviceId,
       groups,
@@ -86,12 +85,12 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
   const baseBlocks = [
     // Setpoints
     {
-      id: config.names.hltSetpoint,
+      id: names.hltSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
-        sensorId: new Link(config.names.hltSensor),
+        sensorId: new Link(names.hltSensor),
         storedSetting: new Unit(70, 'degC'),
         settingEnabled: false,
         setting: new Unit(null, 'degC'),
@@ -103,12 +102,12 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       },
     },
     {
-      id: config.names.mtSetpoint,
+      id: names.mtSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
-        sensorId: new Link(config.names.mtSensor),
+        sensorId: new Link(names.mtSensor),
         storedSetting: new Unit(67, 'degC'),
         settingEnabled: false,
         setting: new Unit(null, 'degC'),
@@ -120,12 +119,12 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       },
     },
     {
-      id: config.names.bkSetpoint,
+      id: names.bkSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
-        sensorId: new Link(config.names.bkSensor),
+        sensorId: new Link(names.bkSensor),
         storedSetting: new Unit(70, 'degC'),
         settingEnabled: false,
         setting: new Unit(null, 'degC'),
@@ -138,14 +137,14 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
     },
     // Setpoint Driver
     {
-      id: config.names.hltDriver,
+      id: names.hltDriver,
       type: blockTypes.SetpointDriver,
       serviceId,
       groups,
       data: {
-        targetId: new Link(config.names.hltSetpoint),
-        drivenTargetId: new Link(config.names.hltSetpoint),
-        referenceId: new Link(config.names.mtSetpoint),
+        targetId: new Link(names.hltSetpoint),
+        drivenTargetId: new Link(names.hltSetpoint),
+        referenceId: new Link(names.mtSetpoint),
         referenceSettingOrValue: OffsetSettingOrValue.Setting,
         enabled: false,
         desiredSetting: 0,
@@ -163,7 +162,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
     },
     // Digital Actuators
     {
-      id: config.names.hltAct,
+      id: names.hltAct,
       type: blockTypes.DigitalActuator,
       serviceId,
       groups,
@@ -179,7 +178,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       },
     },
     {
-      id: config.names.bkAct,
+      id: names.bkAct,
       type: blockTypes.DigitalActuator,
       serviceId,
       groups,
@@ -196,14 +195,14 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
     },
     // PWM
     {
-      id: config.names.hltPwm,
+      id: names.hltPwm,
       type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
         enabled: true,
         period: new Time(2, 's'),
-        actuatorId: new Link(config.names.hltAct),
+        actuatorId: new Link(names.hltAct),
         drivenActuatorId: new Link(null),
         setting: 0,
         desiredSetting: 0,
@@ -214,14 +213,14 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       },
     },
     {
-      id: config.names.bkPwm,
+      id: names.bkPwm,
       type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
         enabled: true,
         period: new Time(2, 's'),
-        actuatorId: new Link(config.names.bkAct),
+        actuatorId: new Link(names.bkAct),
         drivenActuatorId: new Link(null),
         setting: 0,
         desiredSetting: 0,
@@ -233,15 +232,15 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
     },
     // PID
     {
-      id: config.names.hltPid,
+      id: names.hltPid,
       type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...pidDefaults(),
         enabled: true,
-        inputId: new Link(config.names.hltSetpoint),
-        outputId: new Link(config.names.hltPwm),
+        inputId: new Link(names.hltSetpoint),
+        outputId: new Link(names.hltPwm),
         kp: opts.hltKp,
         ti: new Time(10, 'min'),
         td: new Time(30, 's'),
@@ -249,30 +248,30 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
       },
     },
     {
-      id: config.names.mtPid,
+      id: names.mtPid,
       type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...pidDefaults(),
         enabled: true,
-        inputId: new Link(config.names.mtSetpoint),
-        outputId: new Link(config.names.hltDriver),
+        inputId: new Link(names.mtSetpoint),
+        outputId: new Link(names.hltDriver),
         kp: opts.mtKp,
         ti: new Time(5, 'min'),
         td: new Time(10, 'min'),
       },
     },
     {
-      id: config.names.bkPid,
+      id: names.bkPid,
       type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...pidDefaults(),
         enabled: true,
-        inputId: new Link(config.names.bkSetpoint),
-        outputId: new Link(config.names.bkPwm),
+        inputId: new Link(names.bkSetpoint),
+        outputId: new Link(names.bkPwm),
         kp: opts.bkKp,
         ti: new Time(5, 'min'),
         td: new Time(10, 'min'),
@@ -300,9 +299,10 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
 
 
 export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Widget[] {
-  const userTemp = sparkStore.units(config.serviceId).Temp;
+  const { serviceId, names, dashboardId, prefix } = config;
+  const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
   const genericSettings = {
-    dashboard: config.dashboardId,
+    dashboard: dashboardId,
     cols: 4,
     rows: 4,
     order: 0,
@@ -317,12 +317,12 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
     order: 0,
     config: {
       blockId: name,
-      serviceId: config.serviceId,
+      serviceId: serviceId,
     },
   });
 
   const createBuilder = (): Widget<BuilderConfig> => ({
-    ...createWidget(withPrefix(config.prefix, 'Process'), 'Builder'),
+    ...createWidget(withPrefix(prefix, 'Process'), 'Builder'),
     cols: 11,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -333,7 +333,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
   });
 
   const createGraph = (): Widget<GraphConfig> => ({
-    ...createWidget(withPrefix(config.prefix, 'Graph'), 'Graph'),
+    ...createWidget(withPrefix(prefix, 'Graph'), 'Graph'),
     cols: 7,
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
@@ -342,45 +342,45 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
       params: { duration: '10m' },
       targets: [
         {
-          measurement: config.serviceId,
+          measurement: serviceId,
           fields: [
-            `${config.names.hltSensor}/value[${userTemp}]`,
-            `${config.names.mtSensor}/value[${userTemp}]`,
-            `${config.names.bkSensor}/value[${userTemp}]`,
-            `${config.names.hltSetpoint}/setting[${userTemp}]`,
-            `${config.names.mtSetpoint}/setting[${userTemp}]`,
-            `${config.names.bkSetpoint}/setting[${userTemp}]`,
-            `${config.names.hltPwm}/value`,
-            `${config.names.bkPwm}/value`,
+            `${names.hltSensor}/value[${userTemp}]`,
+            `${names.mtSensor}/value[${userTemp}]`,
+            `${names.bkSensor}/value[${userTemp}]`,
+            `${names.hltSetpoint}/setting[${userTemp}]`,
+            `${names.mtSetpoint}/setting[${userTemp}]`,
+            `${names.bkSetpoint}/setting[${userTemp}]`,
+            `${names.hltPwm}/value`,
+            `${names.bkPwm}/value`,
           ],
         },
       ],
       renames: {
-        [`${config.serviceId}/${config.names.hltSensor}/value[${userTemp}]`]: 'HLT temperature',
-        [`${config.serviceId}/${config.names.mtSensor}/value[${userTemp}]`]: 'MT temperature',
-        [`${config.serviceId}/${config.names.bkSensor}/value[${userTemp}]`]: 'BK temperature',
-        [`${config.serviceId}/${config.names.hltSetpoint}/setting[${userTemp}]`]: 'HLT setting',
-        [`${config.serviceId}/${config.names.mtSetpoint}/setting[${userTemp}]`]: 'MT setting',
-        [`${config.serviceId}/${config.names.bkSetpoint}/setting[${userTemp}]`]: 'BK setting',
-        [`${config.serviceId}/${config.names.hltPwm}/value`]: 'HLT PWM value',
-        [`${config.serviceId}/${config.names.bkPwm}/value`]: 'BK PWM value',
+        [`${serviceId}/${names.hltSensor}/value[${userTemp}]`]: 'HLT temperature',
+        [`${serviceId}/${names.mtSensor}/value[${userTemp}]`]: 'MT temperature',
+        [`${serviceId}/${names.bkSensor}/value[${userTemp}]`]: 'BK temperature',
+        [`${serviceId}/${names.hltSetpoint}/setting[${userTemp}]`]: 'HLT setting',
+        [`${serviceId}/${names.mtSetpoint}/setting[${userTemp}]`]: 'MT setting',
+        [`${serviceId}/${names.bkSetpoint}/setting[${userTemp}]`]: 'BK setting',
+        [`${serviceId}/${names.hltPwm}/value`]: 'HLT PWM value',
+        [`${serviceId}/${names.bkPwm}/value`]: 'BK PWM value',
       },
       axes: {
-        [`${config.serviceId}/${config.names.hltPwm}/value`]: 'y2',
-        [`${config.serviceId}/${config.names.bkPwm}/value`]: 'y2',
+        [`${serviceId}/${names.hltPwm}/value`]: 'y2',
+        [`${serviceId}/${names.bkPwm}/value`]: 'y2',
       },
       colors: {},
     },
   });
 
   const createQuickActions = (): Widget<QuickActionsConfig> => ({
-    ...createWidget(withPrefix(config.prefix, 'Actions'), 'QuickActions'),
+    ...createWidget(withPrefix(prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
     config: {
       changeIdMigrated: true,
-      serviceId: config.serviceId,
+      serviceId: serviceId,
       steps: serialize([
         {
           name: 'Disable all setpoints',
@@ -388,19 +388,19 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
           changes: [
             {
               id: uid(),
-              blockId: config.names.hltSetpoint,
+              blockId: names.hltSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.mtSetpoint,
+              blockId: names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.bkSetpoint,
+              blockId: names.bkSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
@@ -416,13 +416,13 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
           changes: [
             {
               id: uid(),
-              blockId: config.names.mtSetpoint,
+              blockId: names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.hltSetpoint,
+              blockId: names.hltSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: new Temp(70, 'degC').convert(userTemp),
@@ -442,7 +442,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
           changes: [
             {
               id: uid(),
-              blockId: config.names.mtSetpoint,
+              blockId: names.mtSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: new Temp(66.7, 'degC').convert(userTemp),
@@ -453,7 +453,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
             },
             {
               id: uid(),
-              blockId: config.names.hltDriver,
+              blockId: names.hltDriver,
               data: {
                 enabled: true,
               },
@@ -470,7 +470,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
           changes: [
             {
               id: uid(),
-              blockId: config.names.bkSetpoint,
+              blockId: names.bkSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: new Temp(100, 'degC').convert(userTemp),

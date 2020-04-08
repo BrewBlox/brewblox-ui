@@ -38,7 +38,7 @@ export default class SparkWifiMenu extends DialogBase {
   readonly serviceId!: string;
 
   get block(): WiFiSettingsBlock {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .find(block => block.type === blockTypes.WiFiSettings) as WiFiSettingsBlock;
   }
 

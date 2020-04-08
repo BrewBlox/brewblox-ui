@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createBlockDialog } from '@/helpers/dialog';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
 @Component
 export default class DrivenIndicator extends Vue {
@@ -14,8 +14,13 @@ export default class DrivenIndicator extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   get driveChains(): string[][] {
-    return sparkStore.drivenChains(this.serviceId)
+    return this.sparkModule
+      .drivenChains
       .filter(chain => chain[0] === this.blockId);
   }
 
@@ -40,7 +45,7 @@ export default class DrivenIndicator extends Vue {
   }
 
   showDialog(chainIdx: number): void {
-    createBlockDialog(sparkStore.tryBlockById(this.serviceId, this.bossDriver(chainIdx)));
+    createBlockDialog(this.sparkModule.blockById(this.bossDriver(chainIdx)));
   }
 }
 </script>

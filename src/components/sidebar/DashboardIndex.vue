@@ -24,11 +24,12 @@ export default class DashboardIndex extends Vue {
   }
 
   get dashboards(): Dashboard[] {
-    return dashboardStore.dashboardValues.sort(objectSorter('order'));
+    // avoid modifying the store object
+    return [...dashboardStore.dashboards].sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {
-    dashboardStore.updateDashboardOrder(dashboards.map(dashboard => dashboard.id));
+    dashboardStore.updateDashboardOrder(dashboards.map(v => v.id));
   }
 
   toggleDefaultDashboard(dashboard: Dashboard): void {

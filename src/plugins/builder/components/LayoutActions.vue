@@ -132,7 +132,7 @@ export default class LayoutActions extends Vue {
       options: {
         type: 'radio',
         model: '',
-        items: dashboardStore.dashboardValues
+        items: dashboardStore.dashboards
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
@@ -153,7 +153,7 @@ export default class LayoutActions extends Vue {
           },
         };
         await dashboardStore.appendWidget(widget);
-        notify.done(`Created ${layout.title} widget on ${dashboardStore.dashboardById(dashboard).title}`);
+        notify.done(`Created ${layout.title} widget on ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
 

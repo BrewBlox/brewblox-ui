@@ -21,7 +21,7 @@ const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices.`;
 
 export async function clear(): Promise<void> {
-  for (const template of automationStore.templateValues) {
+  for (const template of automationStore.templates) {
     await automationStore.removeTemplate(template);
   }
 }

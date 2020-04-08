@@ -27,7 +27,7 @@ export default class BlockSelectDialog extends DialogBase {
   public readonly clearable!: boolean;
 
   get blockOpts(): Block[] {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(this.filter)
       .sort(objectStringSorter('id'));
   }

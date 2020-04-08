@@ -3,7 +3,6 @@ import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/units';
 import { isCompatible } from '@/plugins/spark/block-types';
-import { sparkStore } from '@/plugins/spark/store';
 
 import ValEditBase from '../ValEditBase';
 
@@ -14,7 +13,8 @@ export default class LinkValEdit extends ValEditBase {
   filtered: string[] | null = null;
 
   get blockIdOpts(): string[] {
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule
+      .blocks
       .filter(block => isCompatible(block.type, this.field.type))
       .map(block => block.id);
   }

@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
 
@@ -17,12 +17,16 @@ export default class Troubleshooter extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  get sparkModule(): SparkServiceModule | null {
+    return sparkStore.moduleById(this.serviceId);
+  }
+
   get status(): SparkStatus | null {
-    return sparkStore.status(this.serviceId);
+    return this.sparkModule?.status ?? null;
   }
 
   get lastStatus(): string {
-    return sparkStore.lastStatus(this.serviceId)?.toLocaleString() ?? 'Unknown';
+    return this.sparkModule?.lastStatus?.toLocaleString() ?? 'Unknown';
   }
 
   get textAvailable(): string {
@@ -62,7 +66,7 @@ export default class Troubleshooter extends Vue {
   }
 
   refresh(): void {
-    sparkStore.fetchAll(this.serviceId);
+    this.sparkModule?.fetchAll();
   }
 
   iconProps(val: boolean): Mapped<any> {

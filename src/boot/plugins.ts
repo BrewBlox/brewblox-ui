@@ -19,19 +19,19 @@ import { systemStore } from '@/store/system';
 const loadRemotePlugin = async (plugin: UIPlugin): Promise<PluginObject<any>> => {
   try {
     const obj = await externalComponent(plugin.url);
-    pluginStore.commitResult({ id: plugin.id, loaded: false, error: null });
+    pluginStore.setResult({ id: plugin.id, loaded: false, error: null });
     return {
       install: (Vue, { store }) => {
         try {
           Vue.use(obj, { store });
-          pluginStore.commitResult({ id: plugin.id, loaded: true, error: null });
+          pluginStore.setResult({ id: plugin.id, loaded: true, error: null });
         } catch (e) {
-          pluginStore.commitResult({ id: plugin.id, loaded: false, error: e.toString() });
+          pluginStore.setResult({ id: plugin.id, loaded: false, error: e.toString() });
         }
       },
     };
   } catch (e) {
-    pluginStore.commitResult({ id: plugin.id, loaded: false, error: e.toString() });
+    pluginStore.setResult({ id: plugin.id, loaded: false, error: e.toString() });
     // return a dummy so we don't have to filter the list before calling Vue.use()
     return { install: () => { } };
   }

@@ -9,12 +9,10 @@ import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { ActuatorOffsetBlock, Block, SetpointSensorPairBlock } from '@/plugins/spark/block-types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { featureStore } from '@/store/features';
 
-import { sparkStore } from '../../store';
-import { Block } from '../../types';
-import { ActuatorOffsetBlock } from '../ActuatorOffset/types';
-import { SetpointSensorPairBlock } from '../SetpointSensorPair/types';
 import { PidBlock } from './types';
 
 interface BlockDisplay {
@@ -55,6 +53,10 @@ export default class PidShareDialog extends DialogBase {
     return this.block.serviceId;
   }
 
+  get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   applyParams(params: QueryParams): void {
     this.params = { ...params };
     this.$nextTick(() => this.graph?.resetSources());
@@ -72,10 +74,6 @@ export default class PidShareDialog extends DialogBase {
       .onOk(unit => this.applyParams({ duration: unitDurationString(unit) }));
   }
 
-  blockById(id: string | null): Block | null {
-    return id !== null ? sparkStore.tryBlockById(this.serviceId, id) : null;
-  }
-
   name(block: Block | null): string {
     return block !== null
       ? featureStore.widgetTitle(block.type)
@@ -83,7 +81,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get driveChains(): string[][] {
-    return sparkStore.drivenChains(this.serviceId);
+    return this.sparkModule.drivenChains;
   }
 
   get pidData(): Mapped<any> {
@@ -91,7 +89,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get input(): SetpointSensorPairBlock | null {
-    return this.blockById(this.block.data.inputId.id);
+    return this.sparkModule.blockById(this.block.data.inputId.id);
   }
 
   get inputData(): Mapped<any> {
@@ -108,7 +106,7 @@ export default class PidShareDialog extends DialogBase {
       return null;
     }
     const chain = this.driveChains.find(chain => chain[0] === this.input!.id);
-    return this.blockById(chain?.[1] ?? null);
+    return this.sparkModule.blockById(chain?.[1] ?? null);
   }
 
   get driverData(): Mapped<any> {
@@ -119,7 +117,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get output(): Block | null {
-    return this.blockById(this.block.data.outputId.id);
+    return this.sparkModule.blockById(this.block.data.outputId.id);
   }
 
   get outputData(): Mapped<any> {
@@ -130,7 +128,7 @@ export default class PidShareDialog extends DialogBase {
   }
 
   get actuator(): Block | null {
-    return this.blockById(this.output?.data.actuatorId?.id ?? null);
+    return this.sparkModule.blockById(this.output?.data.actuatorId?.id ?? null);
   }
 
   get actuatorData(): Mapped<any> {

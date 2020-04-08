@@ -19,7 +19,7 @@ export default class SensorDisplay extends PartBase {
 
   get block(): TempSensorMockBlock | TempSensorOneWireBlock | null {
     const { serviceId, id } = this.address;
-    return sparkStore.tryBlockById(serviceId, id);
+    return sparkStore.blockById(serviceId, id);
   }
 
   get isBroken(): boolean {
