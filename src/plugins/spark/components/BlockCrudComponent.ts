@@ -9,13 +9,12 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { GraphConfig } from '@/plugins/history/types';
+import type { GraphConfig } from '@/plugins/history/types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockConfig, BlockCrud } from '@/plugins/spark/types';
+import type { Block, BlockConfig, BlockCrud } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
 import { blockIdRules, canDisplay, tryDisplayBlock } from '../helpers';
-import { Block } from '../types';
 
 
 @Component

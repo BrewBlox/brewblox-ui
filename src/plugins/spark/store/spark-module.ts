@@ -1,10 +1,11 @@
 import Vue from 'vue';
-import { Action, Module, Mutation, RegisterOptions, VuexModule } from 'vuex-class-modules';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
+import type { RegisterOptions } from 'vuex-class-modules';
 
 import { extendById, filterById } from '@/helpers/functional';
 import { deserialize } from '@/helpers/units/parseObject';
 import { EventbusMessage } from '@/plugins/eventbus';
-import {
+import type {
   ApiSparkStatus,
   Block,
   DataBlock,

@@ -7,7 +7,7 @@ import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress } from '@/plugins/spark/types';
+import type { Block, BlockAddress } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
 const asAddr = (v: Block | BlockAddress): BlockAddress => ({

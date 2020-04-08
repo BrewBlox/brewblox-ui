@@ -5,7 +5,7 @@ import DialogBase from '@/components/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import type { Block } from '@/plugins/spark/types';
 
 @Component
 export default class BlockSelectDialog extends DialogBase {

@@ -5,7 +5,7 @@ import DialogBase from '@/components/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
 
 import { digitalOpTitles } from './getters';
-import { DigitalCompare } from './types';
+import type { DigitalCompare } from './types';
 
 
 @Component

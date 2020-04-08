@@ -3,7 +3,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
-import { Block, BlockSpec, StoredDataPreset } from '../types';
+import type { Block, BlockSpec, StoredDataPreset } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
 import { SparkServiceModule } from './spark-module';
