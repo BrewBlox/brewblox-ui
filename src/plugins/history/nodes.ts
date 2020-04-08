@@ -5,29 +5,8 @@ import { sentenceCased } from '@/helpers/functional';
 import { prettify } from '@/helpers/units';
 import { propertyNameWithUnit } from '@/helpers/units/parseObject';
 
-import { historyStore } from './store';
 import { QueryTarget } from './types';
 
-export interface QuasarNode {
-  label: string;
-  value: any;
-  children?: QuasarNode[];
-
-  icon?: string;
-  iconColor?: string;
-  img?: string;
-  avatar?: string;
-  disabled?: boolean;
-  expandable?: boolean;
-  selectable?: boolean;
-  handler?: (node: QuasarNode) => void;
-  tickable?: boolean;
-  noTick?: boolean;
-  tickStrategy?: string;
-  lazy?: boolean;
-  header?: string;
-  body?: string;
-}
 
 export const defaultLabel = (key: string): string => {
   const [name, postfix] = propertyNameWithUnit(key);
@@ -35,7 +14,7 @@ export const defaultLabel = (key: string): string => {
   const prettyName = sentenceCased(path.pop()!);
   const prettyPath = path.length ? `[${path.join(' ')}] ` : '';
   const prettyUnit = postfix ? prettify(postfix!) : '';
-  return `${prettyPath}${prettyName} ${prettyUnit}`;
+  return `${prettyPath}${prettyName} ${prettyUnit}`.trim();
 };
 
 const nodeRecurser =
@@ -113,15 +92,14 @@ export const targetSplitter =
       .flatMap(tar => tar.fields.map(f => `${tar.measurement}/${f}`));
 
 export const targetBuilder =
-  (vals: string[], filterUnknown = true): QueryTarget[] => {
-    const knownFields = historyStore.fields;
+  (vals: string[], knownFields: Mapped<string[]>): QueryTarget[] => {
     return vals
       .reduce(
         (acc: QueryTarget[], v: string) => {
           const [measurement, ...keys] = v.split('/');
           const field = keys.join('/');
           const existing = acc.find(t => t.measurement === measurement);
-          if (filterUnknown && !knownFields[measurement]?.includes(field)) {
+          if (!knownFields[measurement]?.includes(field)) {
             return acc;
           }
           if (existing) {
