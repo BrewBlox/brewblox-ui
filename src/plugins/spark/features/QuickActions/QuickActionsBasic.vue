@@ -125,8 +125,15 @@ export default class QuickActionsBasic extends CrudComponent {
     this.applying = true;
     this.applyChanges(step)
       .then(() => notify.done(`Applied ${step.name}`))
+      .then(async () => {
+        const uniqueServices = [...new Set(step.changes.map(v => v.serviceId ?? this.defaultServiceId))];
+        // Fetch all blocks from the service to update blocks where input blocks just changed
+        await Promise.all(
+          uniqueServices
+            .map(serviceId => sparkStore.moduleById(serviceId)!.fetchBlocks()));
+      })
       .catch(e => notify.warn(`Failed to apply ${step.name}: ${e.message}`))
-      .finally(() => { this.applying = false; });
+      .finally(() => this.applying = false);
   }
 
   showStepDialog(step: Step): void {
