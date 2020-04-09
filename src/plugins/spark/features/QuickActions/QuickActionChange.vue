@@ -224,7 +224,7 @@ export default class QuickActionChange extends Vue {
           <component
             :is="field.cfield.component"
             v-bind="field.cfield.componentProps"
-            :service-id="serviceId"
+            :service-id="change.serviceId"
             :block-id="change.blockId"
             :value="field.value"
           />
