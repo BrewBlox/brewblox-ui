@@ -1,8 +1,9 @@
-import { Block } from '../../types';
+import { Block } from '@/plugins/spark/types';
 
 export interface BlockChange<BlockT extends Block = Block> {
   id: string;
-  blockId: string;
+  serviceId: string | null;
+  blockId: string | null;
   data: Partial<BlockT['data']>;
   confirmed: { [k in keyof BlockT['data']]?: boolean; };
 }
@@ -14,7 +15,8 @@ export interface Step {
 }
 
 export interface QuickActionsConfig {
-  serviceId: string;
+  serviceId?: string; // deprecated
   steps: Step[];
   changeIdMigrated: boolean;
+  serviceIdMigrated: boolean;
 }

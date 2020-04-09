@@ -2,8 +2,8 @@
 import fetch from '@/helpers/fetch';
 import notify from '@/helpers/notify';
 
+import { asBlock, asDataBlock } from '../helpers';
 import { ApiSparkStatus, Block, DataBlock, SparkExported, SparkStatus, UserUnits } from '../types';
-import { asBlock, asDataBlock } from './helpers';
 
 const intercept =
   (message: string): ((e: Error) => never) =>

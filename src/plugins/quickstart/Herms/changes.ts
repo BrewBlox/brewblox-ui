@@ -379,8 +379,9 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
     rows: 5,
     pinnedPosition: { x: 8, y: 6 },
     config: {
+      serviceId,
       changeIdMigrated: true,
-      serviceId: serviceId,
+      serviceIdMigrated: true,
       steps: serialize([
         {
           name: 'Disable all setpoints',
@@ -416,12 +417,14 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.hltSetpoint,
               data: {
                 settingEnabled: true,
@@ -442,6 +445,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.mtSetpoint,
               data: {
                 settingEnabled: true,
@@ -453,6 +457,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.hltDriver,
               data: {
                 enabled: true,
@@ -470,6 +475,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.bkSetpoint,
               data: {
                 settingEnabled: true,

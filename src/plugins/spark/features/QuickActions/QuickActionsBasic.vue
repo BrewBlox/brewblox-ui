@@ -20,7 +20,9 @@ interface FieldDiff {
 }
 
 interface BlockDiff {
+  id: string;
   blockId: string;
+  serviceId: string;
   diffs: FieldDiff[];
 }
 
@@ -34,7 +36,7 @@ interface StepDisplay extends Step {
 export default class QuickActionsBasic extends CrudComponent {
   applying = false;
 
-  get serviceId(): string {
+  get defaultServiceId(): string {
     return this.widget.config.serviceId;
   }
 
@@ -49,22 +51,15 @@ export default class QuickActionsBasic extends CrudComponent {
     });
   }
 
-  get applicableSteps(): Mapped<boolean> {
-    const blockIds = sparkStore.serviceBlocks(this.serviceId).map(v => v.id);
-    return this.steps
-      .reduce(
-        (acc, step) => {
-          acc[step.id] = step.changes.every(change => blockIds.includes(change.blockId));
-          return acc;
-        },
-        {});
+  blockByChange(change: BlockChange): Block | null {
+    const serviceId = change.serviceId ?? this.defaultServiceId;
+    return sparkStore.blockById(serviceId, change.blockId);
   }
 
   get stepDisplays(): StepDisplay[] {
-    const blockIds = sparkStore.serviceBlocks(this.serviceId).map(v => v.id);
     return this.steps
       .map(step => {
-        const applicable = step.changes.every(change => blockIds.includes(change.blockId));
+        const applicable = step.changes.every(change => this.blockByChange(change));
         const diffs = applicable ? step.changes.map(this.blockDiff) : [];
         const active = applicable && diffs.every(bdiff => bdiff.diffs.every(fdiff => !fdiff.changed));
         return {
@@ -106,7 +101,7 @@ export default class QuickActionsBasic extends CrudComponent {
     const changes = step.changes;
     const actualChanges: [Block, any][] = [];
     for (const change of changes) {
-      const block = sparkStore.blockById(this.serviceId, change.blockId)!;
+      const block = this.blockByChange(change)!;
       const spec = sparkStore.spec(block);
       const actualData = deepCopy(change.data);
       for (const key in change.data) {
@@ -141,24 +136,38 @@ export default class QuickActionsBasic extends CrudComponent {
   }
 
   blockDiff(change: BlockChange): BlockDiff {
-    const block = sparkStore.blockById(this.serviceId, change.blockId)!;
+    const block = this.blockByChange(change);
+    if (!block) {
+      return {
+        id: change.id,
+        serviceId: change.serviceId ?? this.defaultServiceId ?? '???',
+        blockId: change.blockId ?? '???',
+        diffs: [],
+      };
+    }
+
     const spec = sparkStore.spec(block);
     const diffs =
       Object.entries(change.data)
         .map(([key, val]) => {
-          const specChange: any = spec.changes.find(s => s.key === key) || {};
-          const pretty = specChange.pretty || (v => `${v}`);
+          const specChange = spec.changes.find(s => s.key === key);
+          const pretty = specChange?.pretty ?? (v => `${v}`);
           const oldV = pretty(block.data[key]);
           const newV = pretty(val);
           return {
-            key: specChange.title || key,
+            key: specChange?.title ?? key,
             oldV,
             newV,
             changed: oldV !== newV,
           };
         });
 
-    return { blockId: change.blockId, diffs };
+    return {
+      id: change.id,
+      serviceId: change.serviceId ?? this.defaultServiceId,
+      blockId: change.blockId!,
+      diffs,
+    };
   }
 }
 </script>
@@ -191,16 +200,16 @@ export default class QuickActionsBasic extends CrudComponent {
               </div>
               <div
                 v-for="bdiff in step.diffs"
-                :key="`bdiff-${step.id}-${bdiff.blockId}`"
+                :key="`bdiff-${bdiff.id}`"
                 class="row q-gutter-x-sm items-baseline"
               >
                 <div class="col-3 text-italic">
-                  {{ bdiff.blockId }}
+                  [{{ bdiff.serviceId }}] {{ bdiff.blockId }}
                 </div>
                 <div class="col column q-py-sm">
                   <div
                     v-for="fdiff in bdiff.diffs"
-                    :key="`fdiff-${step.id}-${bdiff.blockId}-${fdiff.key}`"
+                    :key="`fdiff-${step.id}-${bdiff.id}-${fdiff.key}`"
                     class="q-gutter-x-xs"
                   >
                     <span>{{ fdiff.key }}:</span>
@@ -224,8 +233,9 @@ export default class QuickActionsBasic extends CrudComponent {
         <q-btn
           flat
           round
-          :disable="!step.applicable"
           icon="mdi-play-circle"
+          :disable="!step.applicable"
+          :loading="applying"
           :color="step.active ? 'positive' : ''"
           class="col-auto q-ml-sm"
           @click="applyStep(step)"
