@@ -20,8 +20,9 @@ import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
 import { sparkBlocksEvent, sparkStatusEvent } from '../getters';
+import { asBlock } from '../helpers';
 import * as api from './api';
-import { asBlock, asServiceStatus, calculateDrivenChains, calculateLimiters, calculateRelations } from './helpers';
+import { asServiceStatus, calculateDrivenChains, calculateLimiters, calculateRelations } from './helpers';
 
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {

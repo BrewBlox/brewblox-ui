@@ -33,6 +33,9 @@ export default class BlockAddressDialog extends DialogBase {
   @Prop({ type: Array, required: false })
   readonly compatible!: string[];
 
+  @Prop({ type: Function, default: () => true })
+  public readonly blockFilter!: (block: Block) => boolean;
+
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
@@ -78,6 +81,7 @@ export default class BlockAddressDialog extends DialogBase {
   get addrOpts(): BlockAddress[] {
     return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => this.typeFilter(block.type))
+      .filter(this.blockFilter)
       .map(asAddr)
       .sort(objectStringSorter('id'));
   }

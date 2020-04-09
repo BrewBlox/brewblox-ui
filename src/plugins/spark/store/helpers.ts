@@ -1,10 +1,8 @@
-import pick from 'lodash/pick';
-
 import { Link } from '@/helpers/units';
 import { ServiceStatus } from '@/store/services';
 
 import { constraintLabels } from '../getters';
-import { AnalogConstraint, Block, DataBlock, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
+import { AnalogConstraint, Block, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];
@@ -109,12 +107,6 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
 
   return limited;
 };
-
-export const asDataBlock =
-  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
-
-export const asBlock =
-  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
 
 export const asServiceStatus =
   (status: SparkStatus): ServiceStatus => {

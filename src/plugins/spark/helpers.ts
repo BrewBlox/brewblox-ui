@@ -1,3 +1,4 @@
+import pick from 'lodash/pick';
 import range from 'lodash/range';
 import { VueConstructor } from 'vue';
 
@@ -22,7 +23,7 @@ import { Crud, WidgetFeature } from '@/store/features';
 
 import { blockTypes, interfaceTypes, isCompatible } from './block-types';
 import { DisplaySettingsBlock } from './features/DisplaySettings/types';
-import { BlockAddress, BlockConfig, BlockCrud, DisplayOpts, DisplaySlot } from './types';
+import { Block, BlockAddress, BlockConfig, BlockCrud, DataBlock, DisplayOpts, DisplaySlot } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -245,3 +246,13 @@ export const startResetBlocks = (serviceId: string): void => {
       download: selected.includes(1),
     }));
 };
+
+
+export const asDataBlock =
+  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
+
+export const asBlock =
+  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
+
+export const asBlockAddress =
+  (block: Block): BlockAddress => pick(block, ['id', 'serviceId', 'type']);

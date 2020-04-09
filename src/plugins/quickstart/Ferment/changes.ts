@@ -362,6 +362,7 @@ export const defineWidgets = (
     pinnedPosition: { x: 1, y: 6 },
     config: {
       changeIdMigrated: true,
+      serviceIdMigrated: true,
       serviceId,
       steps: serialize([
         {
@@ -370,11 +371,13 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.beerSetpoint,
               data: { settingEnabled: true },
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.fridgeSetpoint,
               data: { settingEnabled: true },
             },
@@ -389,16 +392,19 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.tempProfile,
               data: { enabled: false },
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.beerSetpoint,
               data: { settingEnabled: false },
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
@@ -414,6 +420,7 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.fridgeSetpoint,
               data: {
                 settingEnabled: true,
@@ -423,12 +430,14 @@ export const defineWidgets = (
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.beerSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.coolPid,
               data: {
                 inputId: new Link(names.fridgeSetpoint, interfaceTypes.ProcessValue),
@@ -438,6 +447,7 @@ export const defineWidgets = (
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.heatPid,
               data: {
                 inputId: new Link(names.fridgeSetpoint, interfaceTypes.ProcessValue),
@@ -447,6 +457,7 @@ export const defineWidgets = (
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.tempProfile,
               data: { targetId: new Link(names.fridgeSetpoint) },
               confirmed: {},

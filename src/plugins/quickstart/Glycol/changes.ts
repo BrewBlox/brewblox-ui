@@ -391,8 +391,9 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      serviceId,
       changeIdMigrated: true,
-      serviceId: serviceId,
+      serviceIdMigrated: true,
       steps: serialize([
         {
           name: 'Beer temperature control OFF',
@@ -421,12 +422,14 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.beerProfile,
               data: { enabled: false },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.beerSetpoint,
               data: {
                 settingEnabled: true,

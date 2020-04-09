@@ -259,8 +259,9 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
     rows: 5,
     pinnedPosition: { x: 1, y: 6 },
     config: {
+      serviceId,
       changeIdMigrated: true,
-      serviceId: serviceId,
+      serviceIdMigrated: true,
       steps: serialize([
         {
           name: 'Enable pump and heater',
@@ -268,12 +269,14 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.Active },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: true },
               confirmed: {},
@@ -289,12 +292,14 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.Inactive },
               confirmed: {},
@@ -310,6 +315,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.Active },
               confirmed: {},
@@ -324,6 +330,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: false },
               confirmed: {},

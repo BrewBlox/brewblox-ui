@@ -18,7 +18,8 @@ interface EditableFieldChange {
 
 interface EditableBlockChange {
   id: string;
-  blockId: string;
+  blockId: string | null;
+  serviceId: string | null;
   block: Block | null;
   spec: BlockSpec | null;
   title: string;
@@ -29,14 +30,15 @@ interface EditableBlockChange {
 export default class QuickActionChange extends Vue {
   editable = false;
 
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
-
   @Prop({ type: Object, required: true })
   public readonly value!: BlockChange;
 
+  @Prop({ type: String, required: false })
+  public readonly defaultServiceId!: string;
+
   get change(): EditableBlockChange {
-    const block = sparkStore.blockById(this.serviceId, this.value.blockId);
+    const serviceId = this.value.serviceId ?? this.defaultServiceId ?? null;
+    const block = sparkStore.blockById(serviceId, this.value.blockId);
     const spec = block !== null
       ? sparkStore.spec(block) ?? null
       : null;
@@ -47,6 +49,7 @@ export default class QuickActionChange extends Vue {
     return {
       id: this.value.id,
       blockId: this.value.blockId,
+      serviceId: serviceId,
       block,
       spec,
       title: block ? featureStore.widgetTitle(block.type) : 'Unknown',
@@ -107,6 +110,7 @@ export default class QuickActionChange extends Vue {
     <q-item>
       <q-item-section class="text-h6 grabbable">
         {{ change.blockId }}
+        <q-tooltip>{{ change.serviceId }}</q-tooltip>
       </q-item-section>
       <q-item-section side>
         <q-btn flat round icon="delete" @click="$emit('remove')">
@@ -163,7 +167,7 @@ export default class QuickActionChange extends Vue {
           :is="field.cfield.component"
           v-if="field.value !== null"
           v-bind="field.cfield.componentProps"
-          :service-id="serviceId"
+          :service-id="change.serviceId"
           :block-id="change.blockId"
           :value="field.value"
           class="self-end"
@@ -220,7 +224,7 @@ export default class QuickActionChange extends Vue {
           <component
             :is="field.cfield.component"
             v-bind="field.cfield.componentProps"
-            :service-id="serviceId"
+            :service-id="change.serviceId"
             :block-id="change.blockId"
             :value="field.value"
           />
