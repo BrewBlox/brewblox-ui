@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { spliceById } from '@/helpers/functional';
+import { spliceById, uniqueFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
@@ -125,13 +125,12 @@ export default class QuickActionsBasic extends CrudComponent {
     this.applying = true;
     this.applyChanges(step)
       .then(() => notify.done(`Applied ${step.name}`))
-      .then(async () => {
-        const uniqueServices = [...new Set(step.changes.map(v => v.serviceId ?? this.defaultServiceId))];
-        // Fetch all blocks from the service to update blocks where input blocks just changed
-        await Promise.all(
-          uniqueServices
-            .map(serviceId => sparkStore.moduleById(serviceId)!.fetchBlocks()));
-      })
+      .then(() => // Fetch all blocks to show secondary effects
+        Promise.all(
+          step.changes
+            .map(v => v.serviceId ?? this.defaultServiceId)
+            .filter(uniqueFilter)
+            .map(serviceId => sparkStore.moduleById(serviceId)!.fetchBlocks())))
       .catch(e => notify.warn(`Failed to apply ${step.name}: ${e.message}`))
       .finally(() => this.applying = false);
   }

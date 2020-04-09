@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById } from '@/helpers/functional';
+import { extendById, filterById, uniqueFilter } from '@/helpers/functional';
 import store from '@/store';
 
 import {
@@ -19,7 +19,9 @@ export class HistoryModule extends VuexModule {
   public sources: HistorySource[] = [];
 
   public get sessionTags(): string[] {
-    return [...new Set(this.sessions.flatMap(session => session.tags ?? []))];
+    return this.sessions
+      .flatMap(session => session.tags ?? [])
+      .filter(uniqueFilter);
   }
 
   public get measurements(): string[] {
