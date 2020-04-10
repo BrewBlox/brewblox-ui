@@ -138,7 +138,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
               remaining: new Time(),
             },
             {
-              minOn: new Time(3, 'min'),
+              minOn: new Time(2, 'min'),
               remaining: new Time(),
             },
             {
