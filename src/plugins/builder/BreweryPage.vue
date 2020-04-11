@@ -14,11 +14,10 @@ import { BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
 
 
 @Component
-export default class BuilderPage extends Vue {
+export default class BreweryPage extends Vue {
   squares = squares;
 
-  drawerOpen = !this.$dense;
-  // layoutId: string | null = null;
+  localDrawer: boolean | null = null;
 
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
@@ -40,6 +39,18 @@ export default class BuilderPage extends Vue {
   created(): void {
     this.debouncedCalculate = debounce(this.calculate, 200, false);
     this.debouncedCalculate();
+  }
+
+  get drawerOpen(): boolean {
+    return Boolean(
+      this.localDrawer
+      ?? this.$q.localStorage.getItem('drawer')
+      ?? !this.$dense);
+  }
+
+  set drawerOpen(v: boolean) {
+    this.localDrawer = v;
+    this.$q.localStorage.set('drawer', v);
   }
 
   get layouts(): BuilderLayout[] {
