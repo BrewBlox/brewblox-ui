@@ -170,7 +170,7 @@ export default class BuilderPage extends Vue {
           v-for="lay in layouts"
           :key="lay.id"
           :label="lay.title"
-          :active="lay.id === layout.id"
+          :active="lay.id === layoutId"
           class="ellipsis"
           style="min-height: 0"
           :inset-level="0.2"
