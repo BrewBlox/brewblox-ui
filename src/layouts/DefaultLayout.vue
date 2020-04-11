@@ -6,12 +6,20 @@ import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen = true;
+  localDrawer: boolean | null = null;
   dashboardEditing = false;
   serviceEditing = false;
 
-  created(): void {
-    this.leftDrawerOpen = !this.$dense;
+  get drawerOpen(): boolean {
+    return Boolean(
+      this.localDrawer
+      ?? this.$q.localStorage.getItem('drawer')
+      ?? !this.$dense);
+  }
+
+  set drawerOpen(v: boolean) {
+    this.localDrawer = v;
+    this.$q.localStorage.set('drawer', v);
   }
 
   get buildDate(): string {
@@ -46,7 +54,7 @@ export default class DefaultLayout extends Vue {
 
 <template>
   <q-layout view="hHh Lpr fFf">
-    <LayoutHeader @menu="leftDrawerOpen = !leftDrawerOpen">
+    <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
         <portal-target name="toolbar-title">
           Brewblox
@@ -58,7 +66,7 @@ export default class DefaultLayout extends Vue {
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="leftDrawerOpen" content-class="column" elevated>
+    <q-drawer v-model="drawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="dashboards" />
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">

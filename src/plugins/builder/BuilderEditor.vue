@@ -57,7 +57,7 @@ export default class BuilderEditor extends Vue {
   history: string[] = [];
   undoneHistory: string[] = [];
 
-  drawerOpen = !this.$dense;
+  localDrawer: boolean | null = null;
   menuDialogOpen = false;
   focusWarning = true;
 
@@ -185,6 +185,18 @@ export default class BuilderEditor extends Vue {
       use: this.useDelete,
     },
   ]
+
+  get drawerOpen(): boolean {
+    return Boolean(
+      this.localDrawer
+      ?? this.$q.localStorage.getItem('drawer')
+      ?? !this.$dense);
+  }
+
+  set drawerOpen(v: boolean) {
+    this.localDrawer = v;
+    this.$q.localStorage.set('drawer', v);
+  }
 
   get layouts(): BuilderLayout[] {
     return builderStore.layouts;
