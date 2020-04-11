@@ -33,30 +33,6 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
     return deserialize(this.config.steps);
   }
 
-  created(): void {
-    let updated = false;
-    // Change IDs were added after initial release
-    // Check if the migration still has to happen, and then assign any undefined IDs
-    if (!this.config.changeIdMigrated) {
-      this.steps.forEach(step =>
-        step.changes
-          .filter(change => change.id === undefined)
-          .forEach(change => change.id = uid()));
-      this.config.changeIdMigrated = true;
-    }
-    // Service IDs became a key of individual changes
-    if (!this.config.serviceIdMigrated) {
-      this.steps.forEach(step =>
-        step.changes
-          .filter(change => change.serviceId === undefined)
-          .forEach(change => change.serviceId = this.defaultServiceId));
-      this.config.serviceIdMigrated = true;
-    }
-    if (updated) {
-      this.saveSteps();
-    }
-  }
-
   saveSteps(steps: Step[] = this.steps): void {
     this.config.steps = serialize(steps);
     this.saveConfig();
