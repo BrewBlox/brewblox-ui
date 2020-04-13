@@ -3,7 +3,7 @@ import PouchDB from 'pouchdb';
 import { Notify } from 'quasar';
 
 import { HOST } from '@/helpers/const';
-import fetch from '@/helpers/fetch';
+import http from '@/helpers/http';
 import notify from '@/helpers/notify';
 
 import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
@@ -55,7 +55,7 @@ const retryDatastore = async (): Promise<void> => {
     // If it doesn't respond, show a notification with a progress bar
     // The notification resolves the awaited promise after `timeout` ms
     await new Promise(resolve =>
-      fetch('/datastore', { timeout: 2000 })
+      http.get('/datastore', { timeout: 2000 })
         .then(() => location.reload()) // reload page will abort the JS runtime
         .catch(() => Notify.create({
           timeout: 2000,
@@ -69,7 +69,7 @@ const retryDatastore = async (): Promise<void> => {
 };
 
 export const checkDatastore = (): void => {
-  fetch('/datastore', { timeout: 2000 })
+  http.get('/datastore', { timeout: 2000 })
     .catch(err => {
       notify.error(`Datastore error: ${err}`, { shown: false });
       retryDatastore();
