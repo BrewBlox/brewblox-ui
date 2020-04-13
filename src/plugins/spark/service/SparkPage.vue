@@ -363,6 +363,11 @@ export default class SparkPage extends Vue {
     notify.info({ message, icon: 'mdi-tag-remove' });
   }
 
+  async reboot(): Promise<void> {
+    if (!this.sparkModule) { return; }
+    await this.sparkModule.reboot();
+  }
+
   onBlockClick(val: ValidatedWidget): void {
     if (this.$dense) {
       createDialog({
@@ -443,8 +448,13 @@ export default class SparkPage extends Vue {
             @click="startDialog('SparkWifiMenu')"
           />
           <ActionItem
+            icon="mdi-restart"
+            label="Reboot controller"
+            @click="reboot"
+          />
+          <ActionItem
             icon="mdi-temperature-celsius"
-            label="Units"
+            label="Configure used units"
             @click="startDialog('SparkUnitMenu')"
           />
           <ActionItem

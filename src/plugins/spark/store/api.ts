@@ -140,3 +140,8 @@ export const serviceImport = async (serviceId: string, exported: SparkExported):
   fetch.post<string[]>(`/${encodeURIComponent(serviceId)}/import_objects`, exported)
     .then(resp => resp.data)
     .catch(intercept(`Failed to reset stored blocks in ${serviceId}`));
+
+export const reboot = async (serviceId: string): Promise<any> =>
+  fetch.get(`/${encodeURIComponent(serviceId)}/system/reboot`, {})
+    .then(resp => resp.data)
+    .catch(intercept(`Failed to reboot ${serviceId}`));

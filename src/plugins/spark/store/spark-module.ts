@@ -201,6 +201,11 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
+  public async reboot(): Promise<void> {
+    await api.reboot(this.id);
+  }
+
+  @Action
   public async start(): Promise<void> {
     // Listen for block updates
     Vue.$eventbus.addListener({
