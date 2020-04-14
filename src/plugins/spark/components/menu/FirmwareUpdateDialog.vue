@@ -1,7 +1,9 @@
 <script lang="ts">
+import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { sparkUpdateEvent } from '@/plugins/spark/getters';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 
@@ -9,10 +11,23 @@ import { SparkStatus } from '@/plugins/spark/types';
 @Component
 export default class FirmwareUpdateDialog extends DialogBase {
   busy = false;
+  error = '';
   messages: string[] = [];
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
+
+  created(): void {
+    Vue.$eventbus.addListener({
+      id: `${sparkUpdateEvent}__${this.serviceId}`,
+      filter: (key, type) => key === this.serviceId && type === sparkUpdateEvent,
+      onmessage: ({ data }) => data.forEach(v => this.pushMessage(v)),
+    });
+  }
+
+  beforeDestroy(): void {
+    Vue.$eventbus.removeListener(`${sparkUpdateEvent}__${this.serviceId}`);
+  }
 
   get sparkModule(): SparkServiceModule {
     return sparkStore.moduleById(this.serviceId)!;
@@ -31,11 +46,11 @@ export default class FirmwareUpdateDialog extends DialogBase {
   }
 
   get buttonEnabled(): boolean {
-    return !!this.status && this.status.connect;
+    return this.status !== null && this.status.connect;
   }
 
   get buttonColor(): string {
-    return (this.status && this.status.latest)
+    return this.status?.latest
       ? ''
       : 'primary';
   }
@@ -46,24 +61,13 @@ export default class FirmwareUpdateDialog extends DialogBase {
 
   updateFirmware(): void {
     this.busy = true;
+    this.error = '';
     this.messages = [];
-    this.pushMessage('Starting update...');
 
     this.sparkModule
       .flashFirmware()
-      .then(() => {
-        this.pushMessage('Update complete!');
-      })
-      .catch(e => {
-        this.pushMessage(`Update failed: ${e.toString()}`);
-        this.pushMessage('If retrying the update does not work, please run \'brewblox-ctl flash\'.');
-        if (this.status) {
-          this.status.info.forEach(this.pushMessage);
-        }
-      })
-      .finally(() => {
-        this.busy = false;
-      });
+      .catch(e => { this.error = e.message; })
+      .finally(() => { this.busy = false; });
   }
 }
 </script>
@@ -76,20 +80,30 @@ export default class FirmwareUpdateDialog extends DialogBase {
       </template>
 
       <q-card-section>
-        <q-item>
-          <q-item-section>{{ updateAvailableText }}</q-item-section>
-        </q-item>
-        <q-list dense>
-          <q-item v-for="(msg, idx) in messages" :key="idx">
-            <q-item-section>{{ msg }}</q-item-section>
-          </q-item>
-        </q-list>
+        <div v-if="error" class="text-negative q-pa-md">
+          <div>Update failed: {{ error }}</div>
+          If retrying the update does not work, please run 'brewblox-ctl flash'
+        </div>
+
+        <div v-if="messages.length === 0" class="q-pa-md">
+          {{ updateAvailableText }}
+        </div>
+        <template v-else>
+          <div class="text-h6 q-pa-md">
+            Log messages
+          </div>
+          <div class="q-gutter-sm q-px-md monospace">
+            <div v-for="(msg, idx) in messages" :key="`msg-${idx}`">
+              {{ msg }}
+            </div>
+          </div>
+        </template>
       </q-card-section>
 
       <template #actions>
         <q-btn
-          :disable="!buttonEnabled"
-          :loading="busy"
+          :disable="busy || !buttonEnabled"
+          :loading="busy || !buttonEnabled"
           :color="buttonColor"
           unelevated
           label="Flash"
