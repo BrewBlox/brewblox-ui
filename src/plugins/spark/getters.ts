@@ -8,6 +8,7 @@ import {
 export const sparkType = 'Spark';
 export const sparkBlocksEvent = 'Spark.blocks';
 export const sparkStatusEvent = 'Spark.service';
+export const sparkUpdateEvent = 'Spark.update';
 
 export const userUnitChoices: Record<UserUnitKey, string[]> = {
   Temp: [
