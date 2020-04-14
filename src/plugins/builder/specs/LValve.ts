@@ -2,7 +2,7 @@ import { blockTypes } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
-import { CENTER, LEFT, RIGHT, UP } from '../getters';
+import { LEFT, RIGHT, UP } from '../getters';
 import { settingsBlock } from '../helpers';
 import { PartSpec, PartUpdater, PersistentPart, Transitions } from '../types';
 
@@ -25,20 +25,12 @@ const spec: PartSpec = {
       : Boolean(part.settings.closed);
     return closed
       ? {
-        [UP]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-        [LEFT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-        [CENTER]: [
-          { outCoords: UP, friction: 0.5 },
-          { outCoords: LEFT, friction: 0.5 },
-        ],
+        [UP]: [{ outCoords: LEFT }],
+        [LEFT]: [{ outCoords: UP }],
       }
       : {
-        [UP]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-        [RIGHT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-        [CENTER]: [
-          { outCoords: UP, friction: 0.5 },
-          { outCoords: RIGHT, friction: 0.5 },
-        ],
+        [UP]: [{ outCoords: RIGHT }],
+        [RIGHT]: [{ outCoords: UP }],
       };
   },
   interactHandler: (part: PersistentPart, updater: PartUpdater) => {
