@@ -1,6 +1,5 @@
 <script lang="ts">
 import { uid } from 'quasar';
-import { CreateElement, VNode } from 'vue';
 import { Component, Ref, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
@@ -63,8 +62,8 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     return isJsonEqual(preset, this.config.params);
   }
 
-  applyPreset(preset: QueryParams): void {
-    this.config.params = { ...preset };
+  applyParams(params: QueryParams): void {
+    this.config.params = { ...params };
     this.saveConfig();
   }
 
@@ -104,34 +103,6 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     }
   }
 
-  renderControls(h: CreateElement): VNode {
-    return h('q-btn-dropdown',
-      {
-        props: {
-          flat: true,
-          stretch: true,
-          autoClose: true,
-          icon: 'mdi-timelapse',
-        },
-      },
-      [
-        h('q-list',
-          { props: { link: true } },
-          [
-            defaultPresets().map(preset =>
-              h('q-item',
-                {
-                  props: {
-                    clickable: true,
-                    active: this.isActivePreset(preset),
-                  },
-                  on: { click: () => this.applyPreset(preset) },
-                },
-                [h('q-item-section', [preset.duration])])),
-          ]),
-      ]);
-  }
-
   currentGraphId(): string | null {
     if (this.widgetGraph !== undefined) { return this.widgetGraphId; };
     if (this.wrapperGraph !== undefined) { return this.wrapperGraphId; };
@@ -146,7 +117,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       graphId: currentId || uid(),
       config: { ...this.config, layout: { ...this.config.layout, title: this.widget.title } },
       sharedSources: currentId !== null,
-      renderControls: this.renderControls,
+      saveParams: v => this.applyParams(v),
     });
   }
 }
@@ -164,6 +135,8 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         ref="wrapperGraph"
         :graph-id="wrapperGraphId"
         :config="config"
+        use-presets
+        @params="applyParams"
         @downsample="v => downsampling = v"
       />
     </template>
@@ -187,7 +160,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
                 class="col-3"
                 no-caps
                 flat
-                @click="applyPreset(preset)"
+                @click="applyParams(preset)"
               />
               <q-btn label="Custom" class="col-3" flat no-caps @click="chooseDuration" />
             </div>

@@ -51,7 +51,13 @@ export default class TempSensorMockWidget
 <template>
   <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-presets
+        @params="saveGraphParams"
+      />
     </template>
 
     <template #toolbar>
