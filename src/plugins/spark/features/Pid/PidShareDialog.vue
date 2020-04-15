@@ -223,7 +223,14 @@ export default class PidShareDialog extends DialogBase {
         </div>
       </div>
       <q-separator vertical inset />
-      <HistoryGraph ref="graph" class="col" :graph-id="graphId" :config="activeGraphCfg" />
+      <HistoryGraph
+        ref="graph"
+        class="col"
+        :graph-id="graphId"
+        :config="activeGraphCfg"
+        use-presets
+        @params="applyParams"
+      />
     </div>
   </q-dialog>
 </template>

@@ -5,6 +5,7 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import { isJsonEqual } from '@/helpers/functional';
 import { defaultPresets } from '@/plugins/history/getters';
 import { addSource } from '@/plugins/history/sources/graph';
 import { historyStore } from '@/plugins/history/store';
@@ -39,9 +40,19 @@ export default class HistoryGraph extends Vue {
   @Prop({ type: String, default: '' })
   public readonly refreshTrigger!: string;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly usePresets!: boolean;
+
   @Watch('refreshTrigger')
   watchRefresh(): void {
     this.refresh();
+  }
+
+  @Watch('config')
+  watchConfig(newV: GraphConfig, oldV: GraphConfig): void {
+    if (!isJsonEqual(newV, oldV)) {
+      this.resetSources();
+    }
   }
 
   @Watch('policies', { immediate: true })
@@ -91,6 +102,14 @@ export default class HistoryGraph extends Vue {
 
   get presets(): QueryParams[] {
     return defaultPresets();
+  }
+
+  isActivePreset(preset: QueryParams): boolean {
+    return isJsonEqual(preset, this.config.params);
+  }
+
+  applyPreset(preset: QueryParams): void {
+    this.$emit('params', { ...preset });
   }
 
   sourceId(target: QueryTarget): string {
@@ -164,6 +183,27 @@ export default class HistoryGraph extends Vue {
 <template>
   <div class="fit column">
     <div class="col-auto row justify-end z-top">
+      <q-btn-dropdown
+        v-if="usePresets"
+        flat
+        stretch
+        auto-close
+        icon="mdi-timelapse"
+      >
+        <q-list>
+          <q-item
+            v-for="(preset, idx) in presets"
+            :key="`preset-${idx}`"
+            clickable
+            :active="isActivePreset(preset)"
+            @click="applyPreset(preset)"
+          >
+            <q-item-section>
+              {{ preset.duration }}
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
       <slot name="controls" />
     </div>
     <div v-if="error" class="col row justify-center items-center text-h5 q-gutter-x-md">

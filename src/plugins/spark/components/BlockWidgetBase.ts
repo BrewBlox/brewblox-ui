@@ -4,7 +4,7 @@ import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { postfixedDisplayNames } from '@/helpers/units';
-import { GraphConfig } from '@/plugins/history/types';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
 import { Block, BlockConfig, BlockCrud } from '../types';
@@ -96,11 +96,14 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public set graphCfg(config: GraphConfig) {
-    this.saveConfig({
-      ...this.widget.config,
-      queryParams: { ...config.params },
-      graphAxes: { ...config.axes },
-    });
+    this.$set(this.widget.config, 'queryParams', { ...config.params });
+    this.$set(this.widget.config, 'graphAxes', { ...config.axes });
+    this.saveConfig();
+  }
+
+  public saveGraphParams(params: QueryParams): void {
+    this.$set(this.widget.config, 'queryParams', params);
+    this.saveConfig();
   }
 
   public get toolbarComponent(): string {

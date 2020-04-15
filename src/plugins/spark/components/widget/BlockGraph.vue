@@ -79,10 +79,10 @@ export default class BlockGraph extends Vue {
     });
   }
 
-  applyPreset(preset: QueryParams): void {
+  updateParams(params: QueryParams): void {
     this.change({
       ...this.graphCfg,
-      params: { ...preset },
+      params: { ...params },
     });
   }
 
@@ -133,18 +133,14 @@ export default class BlockGraph extends Vue {
 <template>
   <q-dialog v-model="dialogOpen" maximized>
     <q-card v-if="dialogOpen" class="text-white">
-      <HistoryGraph ref="graph" :graph-id="id" :config="graphCfg">
+      <HistoryGraph
+        ref="graph"
+        :graph-id="id"
+        :config="graphCfg"
+        :use-presets="!noDuration"
+        @params="updateParams"
+      >
         <template #controls>
-          <q-btn-dropdown v-if="!noDuration" auto-close flat icon="mdi-timelapse">
-            <ActionItem
-              v-for="(preset, idx) in presets"
-              :key="idx"
-              :active="preset.duration === graphCfg.params.duration"
-              :label="preset.duration"
-              @click="applyPreset(preset)"
-            />
-            <ActionItem label="Custom" @click="chooseDuration" />
-          </q-btn-dropdown>
           <q-btn-dropdown flat icon="settings">
             <ExportGraphAction
               :config="graphCfg"
