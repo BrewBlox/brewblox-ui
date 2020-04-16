@@ -448,6 +448,11 @@ export default class SparkPage extends Vue {
             @click="startDialog('SparkWifiMenu')"
           />
           <ActionItem
+            icon="mdi-checkbox-multiple-marked"
+            label="Groups (deprecated)"
+            @click="startDialog('SparkGroupMenu')"
+          />
+          <ActionItem
             icon="mdi-restart"
             label="Reboot controller"
             @click="reboot"
