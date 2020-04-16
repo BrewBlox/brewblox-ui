@@ -98,6 +98,19 @@ export default class BlockWizard extends Vue {
     }
   }
 
+  async discover(): Promise<void> {
+    await this.sparkModule.clearDiscoveredBlocks();
+    await this.sparkModule.fetchDiscoveredBlocks();
+    await this.$nextTick();
+
+    const discovered = this.sparkModule.discoveredBlocks;
+    const message = discovered.length > 0
+      ? `Discovered ${discovered.join(', ')}.`
+      : 'Discovered no new blocks.';
+
+    notify.info({ message, icon: 'mdi-magnify-plus-outline' });
+  }
+
   ensureLocalBlock(): void {
     const featureId = this.selected!.value;
     this.widget = this.widget || {
@@ -222,6 +235,8 @@ export default class BlockWizard extends Vue {
           </q-icon>
         </template>
       </q-input>
+      <q-btn flat label="Discover blocks" @click="discover" />
+      <q-space />
       <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock" />
       <q-btn
         :disable="!createReady"
