@@ -28,8 +28,7 @@ const feature: WidgetFeature = {
     cols: 4,
     rows: 3,
   },
-  // Discovered objects can't be created
-  wizard: false,
+  wizard: 'BlockDiscoveryWizard',
 };
 
 export default { feature, block };
