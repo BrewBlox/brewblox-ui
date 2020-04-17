@@ -5,9 +5,7 @@ import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
-import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import { Service, serviceStore } from '@/store/services';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { withPrefix } from '../helpers';
@@ -34,17 +32,8 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
     };
   }
 
-  get services(): Service[] {
-    return serviceStore.services
-      .filter(v => v.type === sparkType);
-  }
-
   get serviceId(): string {
-    return this.config.serviceId || this.services[0].id;
-  }
-
-  set serviceId(serviceId: string) {
-    this.updateConfig({ ...this.config, serviceId });
+    return this.config.serviceId;
   }
 
   get prefix(): string {
@@ -94,7 +83,6 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
 
   get valuesOk(): boolean {
     return [
-      this.serviceId,
       this.dashboardTitle,
       ruleValidator(this.dashboardIdRules)(this.dashboardId),
       Object.values(this.names).every(ruleValidator(this.nameRules)),
@@ -118,7 +106,6 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
   taskDone(): void {
     this.updateConfig({
       ...this.config,
-      serviceId: this.serviceId,
       prefix: this.prefix,
       dashboardId: new UrlSafeString().generate(this.dashboardTitle),
       dashboardTitle: this.dashboardTitle,
@@ -145,7 +132,6 @@ export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
       </q-item>
 
       <!-- Generic settings -->
-      <QuickStartServiceField v-model="serviceId" :services="services" />
       <QuickStartNameField
         v-model="dashboardTitle"
         label="Dashboard name"
