@@ -20,6 +20,10 @@ export default class TimeUnitDialog extends DialogBase {
   @Prop({ type: Array, default: () => [] })
   public readonly rules!: InputRule[];
 
+  created(): void {
+    this.local = unitDurationString(this.value);
+  }
+
   findUnit(s: string): string {
     const match = s.match(/^[0-9\.]*([a-z]*)/i);
     return match && match[1]
@@ -60,16 +64,16 @@ export default class TimeUnitDialog extends DialogBase {
     const val = new Unit(this.localNumber, 'ms');
     this.onDialogOk(val);
   }
-
-  created(): void {
-    this.local = unitDurationString(this.value);
-  }
-
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"

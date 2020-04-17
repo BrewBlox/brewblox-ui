@@ -63,7 +63,12 @@ export default class AnalogCompareEditDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <LinkField
         v-model="local.id"
@@ -79,6 +84,7 @@ export default class AnalogCompareEditDialog extends DialogBase {
           emit-value
           label="Operator"
           class="min-width-md col-auto"
+          @keyup.enter.exact.stop
         />
         <UnitField
           v-if="isTemp"

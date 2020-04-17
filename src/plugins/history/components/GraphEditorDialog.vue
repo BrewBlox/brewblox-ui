@@ -59,7 +59,12 @@ export default class GraphEditorDialog extends DialogBase {
 
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <CardWrapper no-scroll v-bind="{context}">
       <template #toolbar>
         <DialogToolbar :title="title" />

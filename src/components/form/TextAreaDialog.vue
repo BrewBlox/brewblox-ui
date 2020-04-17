@@ -30,7 +30,12 @@ export default class TextAreaDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"
@@ -39,6 +44,8 @@ export default class TextAreaDialog extends DialogBase {
         :label="label"
         :autogrow="autogrow"
         autofocus
+        @keyup.enter.exact.stop
+        @keyup.enter.shift.stop
       />
 
       <template #actions>

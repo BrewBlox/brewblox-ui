@@ -28,7 +28,12 @@ export default class SessionLoadDialog extends DialogBase {
 
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <SessionSelectField v-model="selected" :sessions="sessions" label="Select session" />
 

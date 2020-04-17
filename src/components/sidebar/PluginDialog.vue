@@ -44,7 +44,12 @@ export default class PluginDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    class="row"
+    @hide="onDialogHide"
+  >
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
         <DialogToolbar title="UI Plugins" />

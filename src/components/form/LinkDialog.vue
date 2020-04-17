@@ -101,7 +101,7 @@ export default class LinkDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.ctrl.enter="save"
+    @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
@@ -114,6 +114,7 @@ export default class LinkDialog extends DialogBase {
         autofocus
         item-aligned
         @input="update"
+        @keyup.enter.exact.stop
       >
         <q-tooltip v-if="tooltip">
           {{ tooltip }}

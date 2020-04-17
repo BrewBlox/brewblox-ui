@@ -134,7 +134,7 @@ export default class BlockAddressDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.ctrl.enter="save"
+    @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
@@ -143,6 +143,7 @@ export default class BlockAddressDialog extends DialogBase {
         :options="serviceIds"
         label="Service"
         item-aligned
+        @keyup.enter.exact.stop
       />
       <q-select
         v-model="local"
@@ -155,6 +156,7 @@ export default class BlockAddressDialog extends DialogBase {
         item-aligned
         option-label="id"
         option-value="id"
+        @keyup.enter.exact.stop
       >
         <q-tooltip v-if="tooltip">
           {{ tooltip }}

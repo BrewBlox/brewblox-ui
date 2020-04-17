@@ -26,7 +26,12 @@ export default class RelationsDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" maximized no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    maximized
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+  >
     <CardWrapper no-scroll v-bind="{context}">
       <template #toolbar>
         <DialogToolbar :title="title" subtitle="Relations diagram" />
