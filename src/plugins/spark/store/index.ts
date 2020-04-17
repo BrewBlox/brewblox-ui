@@ -3,7 +3,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
-import type { Block, BlockSpec, StoredDataPreset } from '../types';
+import type { Block, BlockAddress, BlockSpec, StoredDataPreset } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
 import { SparkServiceModule } from './spark-module';
@@ -32,6 +32,11 @@ export class SparkGlobalModule extends VuexModule {
   public blockById<T extends Block>(serviceId: string | null, blockId: string | null): T | null {
     if (!serviceId || !blockId) { return null; }
     return this.moduleById(serviceId)?.blockById<T>(blockId) ?? null;
+  }
+
+  public blockByAddress<T extends Block>(addr: BlockAddress | null): T | null {
+    if (!addr || !addr.id || !addr.serviceId) { return null; }
+    return this.moduleById(addr.serviceId)?.blockByAddress<T>(addr) ?? null;
   }
 
   public serviceBlocks(serviceId: string | null): Block[] {

@@ -8,6 +8,7 @@ import { EventbusMessage } from '@/plugins/eventbus';
 import type {
   ApiSparkStatus,
   Block,
+  BlockAddress,
   DataBlock,
   Limiters,
   RelationEdge,
@@ -94,6 +95,11 @@ export class SparkServiceModule extends VuexModule {
   public blockById<T extends Block>(blockId: string | null): T | null {
     if (!blockId) { return null; }
     return this.blocks.find(v => v.id === blockId) as T ?? null;
+  }
+
+  public blockByAddress<T extends Block>(addr: BlockAddress | null): T | null {
+    if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
+    return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
   }
 
   @Action
