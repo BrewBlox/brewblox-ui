@@ -27,7 +27,8 @@ export class ServiceModule extends VuexModule {
     return this.services.map(v => v.id);
   }
 
-  public serviceById(id: string): Service | null {
+  public serviceById(id: string | null): Service | null {
+    if (!id) { return null; }
     return this.services.find(v => v.id === id) ?? null;
   }
 
