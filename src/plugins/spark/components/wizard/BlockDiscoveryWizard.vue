@@ -67,7 +67,6 @@ export default class BlockDiscoveryWizard
       message: `Choose a new name for '${blockId}'`,
       rules: blockIdRules(serviceId),
       clearable: false,
-      autogrow: false,
       value: blockId,
     })
       .onOk(async (newId: string) => {

@@ -16,7 +16,7 @@ type ConstraintsObj = AnalogConstraintsObj | DigitalConstraintsObj;
     digital: DigitalConstraints,
   },
 })
-export default class InputDialog extends DialogBase {
+export default class ConstraintsDialog extends DialogBase {
   local: ConstraintsObj | null = null;
 
   @Prop({ type: Object, default: () => ({ constraints: [] }) })

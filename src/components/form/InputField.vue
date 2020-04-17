@@ -21,6 +21,9 @@ export default class InputField extends FieldBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly autogrow!: boolean;
+
   @Emit('input')
   public change(v: string | number): string | number {
     return v;
@@ -55,6 +58,7 @@ export default class InputField extends FieldBase {
       label: this.label,
       rules: this.rules,
       clearable: this.clearable,
+      autogrow: this.autogrow,
     })
       .onOk(this.change);
   }
