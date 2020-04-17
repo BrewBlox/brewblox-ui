@@ -52,6 +52,7 @@ interface ActionTool extends EditorAction {
 export default class BuilderEditor extends Vue {
   squares = squares;
 
+  layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
@@ -102,9 +103,7 @@ export default class BuilderEditor extends Vue {
   }
 
   async mounted(): Promise<void> {
-    if (this.routeId) {
-      builderStore.lastLayoutId = this.routeId;
-    }
+    this.selectLayout(null);
     await this.$nextTick();
     this.setFocus();
   }
@@ -202,18 +201,8 @@ export default class BuilderEditor extends Vue {
     return builderStore.layouts;
   }
 
-  get routeId(): string | null {
-    return this.$route.params.id ?? null;
-  }
-
-  get lastId(): string | null {
-    return builderStore.lastLayoutId;
-  }
-
   get layout(): BuilderLayout | null {
-    return builderStore.layoutById(this.routeId ?? this.lastId)
-      ?? builderStore.layouts[0]
-      ?? null;
+    return builderStore.layoutById(this.layoutId);
   }
 
   get parts(): PersistentPart[] {
@@ -264,7 +253,15 @@ export default class BuilderEditor extends Vue {
   }
 
   selectLayout(id: string | null): void {
-    this.$router.replace(`/builder/${id ?? ''}`);
+    if (id !== this.$route.params.id) {
+      this.$router.replace(`/builder/${id ?? ''}`);
+    }
+    this.layoutId = id
+      ?? this.$route.params.id
+      ?? builderStore.lastLayoutId
+      ?? builderStore.layouts[0]?.id
+      ?? null;
+    builderStore.lastLayoutId = this.layoutId;
   }
 
   setFocus(): void {
