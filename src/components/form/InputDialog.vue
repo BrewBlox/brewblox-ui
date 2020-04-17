@@ -30,7 +30,7 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  @Prop({ type: Boolean, default: true })
+  @Prop({ type: Boolean, default: false })
   public readonly autogrow!: boolean;
 
   @Prop({ type: String, default: '170%' })

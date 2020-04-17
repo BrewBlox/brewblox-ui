@@ -35,7 +35,8 @@ export default class SliderDialog extends DialogBase {
   }
 
   apply(value: number): void {
-    this.onDialogOk(value);
+    this.local = value;
+    this.save();
   }
 
   created(): void {
@@ -45,7 +46,12 @@ export default class SliderDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-item>
         <q-item-section class="q-pt-md">

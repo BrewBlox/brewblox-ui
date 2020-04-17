@@ -45,7 +45,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
         : "You're using the latest firmware.";
   }
 
-  get buttonEnabled(): boolean {
+  get ready(): boolean {
     return this.status !== null && this.status.connect;
   }
 
@@ -60,6 +60,9 @@ export default class FirmwareUpdateDialog extends DialogBase {
   }
 
   updateFirmware(): void {
+    if (this.busy || !this.ready) {
+      return;
+    }
     this.busy = true;
     this.error = '';
     this.messages = [];
@@ -73,7 +76,12 @@ export default class FirmwareUpdateDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="updateFirmware"
+  >
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
         <DialogToolbar :title="serviceId" subtitle="Firmware update" />
@@ -102,8 +110,8 @@ export default class FirmwareUpdateDialog extends DialogBase {
 
       <template #actions>
         <q-btn
-          :disable="busy || !buttonEnabled"
-          :loading="busy || !buttonEnabled"
+          :disable="busy || !ready"
+          :loading="busy || !ready"
           :color="buttonColor"
           unelevated
           label="Flash"

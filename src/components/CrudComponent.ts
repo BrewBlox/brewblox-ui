@@ -74,7 +74,6 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       message: `Choose a new name for '${widgetTitle}'`,
       value: widgetTitle,
       clearable: false,
-      autogrow: false,
     })
       .onOk(title => this.saveWidget({ ...this.widget, title }));
   }

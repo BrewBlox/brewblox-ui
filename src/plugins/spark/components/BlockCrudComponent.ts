@@ -177,7 +177,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
       message: `Choose a new name for '${this.blockId}'`,
       rules: blockIdRules(this.serviceId),
       clearable: false,
-      autogrow: false,
       value: blockId,
     })
       .onOk(async (newId: string) => {

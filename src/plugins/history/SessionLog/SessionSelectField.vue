@@ -76,6 +76,7 @@ export default class SessionSelectField extends FieldBase {
     hide-selected
     placeholder="Search by name or tag"
     @filter="filterFn"
+    @keyup.enter.exact.stop
   >
     <template #option="{opt, selected, toggleOption}">
       <q-item :active="selected" clickable @click="toggleOption(opt)">
