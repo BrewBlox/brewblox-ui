@@ -71,8 +71,10 @@ export default class DigitalActuatorWidget
         :graph-id="widget.id"
         :config="graphCfg"
         :refresh-trigger="mode"
+        use-range
         use-presets
         @params="saveGraphParams"
+        @layout="saveGraphLayout"
       />
     </template>
 

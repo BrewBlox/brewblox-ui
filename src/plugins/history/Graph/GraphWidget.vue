@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Layout } from 'plotly.js';
 import { uid } from 'quasar';
 import { Component, Ref, Watch } from 'vue-property-decorator';
 
@@ -62,8 +63,13 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     return isJsonEqual(preset, this.config.params);
   }
 
-  applyParams(params: QueryParams): void {
-    this.config.params = { ...params };
+  saveParams(params: QueryParams): void {
+    this.$set(this.config, 'params', params);
+    this.saveConfig();
+  }
+
+  saveLayout(layout: Partial<Layout>): void {
+    this.$set(this.config, 'layout', layout);
     this.saveConfig();
   }
 
@@ -76,31 +82,20 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       value: new Unit(durationMs(current), 'ms'),
       label: 'Duration',
     })
-      .onOk(unit => {
-        this.config.params = { duration: unitDurationString(unit) };
-        this.saveConfig();
-      });
+      .onOk(unit => this.saveParams({ duration: unitDurationString(unit) }));
   }
 
   async regraph(): Promise<void> {
     await this.$nextTick();
     this.usedCfg = deepCopy(this.config);
-    if (this.widgetGraph !== undefined) {
-      this.widgetGraph.resetSources();
-    }
-    if (this.wrapperGraph !== undefined) {
-      this.wrapperGraph.resetSources();
-    }
+    this.widgetGraph?.resetSources();
+    this.wrapperGraph?.resetSources();
   }
 
   async refresh(): Promise<void> {
     await this.$nextTick();
-    if (this.widgetGraph !== undefined) {
-      this.widgetGraph.refresh();
-    }
-    if (this.wrapperGraph !== undefined) {
-      this.wrapperGraph.refresh();
-    }
+    this.widgetGraph?.refresh();
+    this.wrapperGraph?.refresh();
   }
 
   currentGraphId(): string | null {
@@ -117,7 +112,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       graphId: currentId || uid(),
       config: { ...this.config, layout: { ...this.config.layout, title: this.widget.title } },
       sharedSources: currentId !== null,
-      saveParams: v => this.applyParams(v),
+      saveParams: v => this.saveParams(v),
     });
   }
 }
@@ -136,7 +131,9 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         :graph-id="wrapperGraphId"
         :config="config"
         use-presets
-        @params="applyParams"
+        use-range
+        @params="saveParams"
+        @layout="saveLayout"
         @downsample="v => downsampling = v"
       />
     </template>
@@ -150,19 +147,23 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         </template>
         <template #menus>
           <WidgetActions :crud="crud" />
+          <GraphRangeSubmenu
+            :layout="config.layout"
+            :save="v => saveLayout(v)"
+          />
           <ActionSubmenu label="Timespan">
-            <div class="row wrap" style="max-width: 300px">
+            <div class="row wrap" style="max-width: 200px">
               <q-btn
                 v-for="(preset, idx) in presets"
                 :key="idx"
                 :label="preset.duration"
                 :color="isActivePreset(preset) ? 'primary' : 'white'"
-                class="col-3"
+                class="col-6"
                 no-caps
                 flat
-                @click="applyParams(preset)"
+                @click="saveParams(preset)"
               />
-              <q-btn label="Custom" class="col-3" flat no-caps @click="chooseDuration" />
+              <q-btn label="Custom" class="col-6" flat no-caps @click="chooseDuration" />
             </div>
           </ActionSubmenu>
         </template>

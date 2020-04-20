@@ -32,7 +32,9 @@ export default class ActuatorLogicWidget
         :config="graphCfg"
         :refresh-trigger="mode"
         use-presets
+        use-range
         @params="saveGraphParams"
+        @layout="saveGraphLayout"
       />
     </template>
 
