@@ -1,4 +1,5 @@
 import mapKeys from 'lodash/mapKeys';
+import { Layout } from 'plotly.js';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
@@ -77,11 +78,11 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
 
     return {
       // persisted in config
-      params: this.widget.config.queryParams || { duration: '1h' },
-      axes: this.widget.config.graphAxes || {},
-      // constants
+      params: this.widget.config.queryParams ?? { duration: '1h' },
+      axes: this.widget.config.graphAxes ?? {},
       layout: {
-        title: this.widget.title,
+        ...(this.widget.config.graphLayout ?? {}),
+        title: this.widget.title, // always overrides
       },
       targets: [
         {
@@ -98,11 +99,17 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   public set graphCfg(config: GraphConfig) {
     this.$set(this.widget.config, 'queryParams', { ...config.params });
     this.$set(this.widget.config, 'graphAxes', { ...config.axes });
+    this.$set(this.widget.config, 'graphLayout', { ...config.layout });
     this.saveConfig();
   }
 
   public saveGraphParams(params: QueryParams): void {
     this.$set(this.widget.config, 'queryParams', params);
+    this.saveConfig();
+  }
+
+  public saveGraphLayout(layout: Partial<Layout>): void {
+    this.$set(this.widget.config, 'graphLayout', layout);
     this.saveConfig();
   }
 

@@ -43,6 +43,9 @@ export default class HistoryGraph extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly usePresets!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly useRange!: boolean;
+
   @Watch('refreshTrigger')
   watchRefresh(): void {
     this.refresh();
@@ -100,16 +103,24 @@ export default class HistoryGraph extends Vue {
     return this.config.colors ?? {};
   }
 
+  get layout(): Partial<Layout> {
+    return this.config.layout;
+  }
+
+  saveParams(params: QueryParams): void {
+    this.$emit('params', { ...params });
+  }
+
+  saveLayout(layout: Partial<Layout>) {
+    this.$emit('layout', { ...layout });
+  }
+
   get presets(): QueryParams[] {
     return defaultPresets();
   }
 
   isActivePreset(preset: QueryParams): boolean {
     return isJsonEqual(preset, this.config.params);
-  }
-
-  applyPreset(preset: QueryParams): void {
-    this.$emit('params', { ...preset });
   }
 
   sourceId(target: QueryTarget): string {
@@ -137,10 +148,6 @@ export default class HistoryGraph extends Vue {
   get graphData(): PlotData[] {
     return this.sources
       .flatMap(source => Object.values(source.values));
-  }
-
-  get graphLayout(): Partial<Layout> {
-    return this.config.layout;
   }
 
   get policies(): Policies {
@@ -183,27 +190,33 @@ export default class HistoryGraph extends Vue {
 <template>
   <div class="fit column">
     <div class="col-auto row justify-end z-top">
-      <q-btn-dropdown
+      <ActionMenu
+        v-if="useRange"
+        icon="mdi-arrow-expand-vertical"
+      >
+        <template #menus>
+          <GraphRangeSubmenu
+            :layout="layout"
+            :save="v => saveLayout(v)"
+          />
+        </template>
+      </ActionMenu>
+      <ActionMenu
         v-if="usePresets"
-        flat
-        stretch
-        auto-close
         icon="mdi-timelapse"
       >
-        <q-list>
-          <q-item
-            v-for="(preset, idx) in presets"
-            :key="`preset-${idx}`"
-            clickable
-            :active="isActivePreset(preset)"
-            @click="applyPreset(preset)"
-          >
-            <q-item-section>
-              {{ preset.duration }}
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
+        <template #menus>
+          <ActionSubmenu label="Presets">
+            <ActionItem
+              v-for="(preset, idx) in presets"
+              :key="`preset-${idx}`"
+              :active="isActivePreset(preset)"
+              :label="`${preset.duration}`"
+              @click="saveParams(preset)"
+            />
+          </ActionSubmenu>
+        </template>
+      </ActionMenu>
       <slot name="controls" />
     </div>
     <div v-if="error" class="col row justify-center items-center text-h5 q-gutter-x-md">
@@ -216,7 +229,7 @@ export default class HistoryGraph extends Vue {
       <GenericGraph
         ref="display"
         :data="graphData"
-        :layout="graphLayout"
+        :layout="layout"
         :revision="revision"
         v-bind="$attrs"
         v-on="$listeners"

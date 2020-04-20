@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Layout } from 'plotly.js';
 import Vue from 'vue';
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
@@ -32,9 +33,23 @@ export default class BlockGraph extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly noDuration!: boolean;
 
+  @Watch('graphCfg')
+  onCfgChange(newVal): void {
+    // Vue considers configuration "changed" with every block data update
+    // To avoid constantly refreshing sources, we need to do a deep compare
+    if (JSON.stringify(newVal) !== this.configString) {
+      this.configString = JSON.stringify(newVal);
+      this.$nextTick(() => this.graph?.resetSources());
+    }
+  }
+
   @Emit('update:config')
-  change(cfg: GraphConfig = this.graphCfg): GraphConfig {
+  save(cfg: GraphConfig = this.graphCfg): GraphConfig {
     return cfg;
+  }
+
+  created(): void {
+    this.configString = JSON.stringify(this.graphCfg);
   }
 
   get dialogOpen(): boolean {
@@ -70,20 +85,19 @@ export default class BlockGraph extends Vue {
   }
 
   updateKeySide(key: string, isRight: boolean): void {
-    this.change({
-      ...this.graphCfg,
-      axes: {
-        ...this.graphCfg.axes,
-        [key]: isRight ? 'y2' : 'y',
-      },
-    });
+    this.$set(this.graphCfg.axes, key, isRight ? 'y2' : 'y');
+    this.save();
   }
 
-  updateParams(params: QueryParams): void {
-    this.change({
-      ...this.graphCfg,
-      params: { ...params },
-    });
+  saveParams(params: QueryParams): void {
+    this.$set(this.graphCfg, 'params', params);
+    this.save();
+  }
+
+  saveLayout(layout: Partial<Layout>): void {
+    console.log('save layout');
+    this.$set(this.graphCfg, 'layout', layout);
+    this.save();
   }
 
   updateDuration(): void {
@@ -95,7 +109,7 @@ export default class BlockGraph extends Vue {
     })
       .onOk(val => {
         this.graphCfg.params.duration = durationString(val);
-        this.change(this.graphCfg);
+        this.save(this.graphCfg);
       });
   }
 
@@ -108,24 +122,7 @@ export default class BlockGraph extends Vue {
       value: new Unit(durationMs(current), 'ms'),
       label: 'Duration',
     })
-      .onOk(unit => {
-        this.graphCfg.params = { duration: unitDurationString(unit) };
-        this.change(this.graphCfg);
-      });
-  }
-
-  @Watch('graphCfg')
-  onCfgChange(newVal): void {
-    // Vue considers configuration "changed" with every block data update
-    // To avoid constantly refreshing sources, we need to do a deep compare
-    if (JSON.stringify(newVal) !== this.configString) {
-      this.configString = JSON.stringify(newVal);
-      this.$nextTick(() => this.graph?.resetSources());
-    }
-  }
-
-  created(): void {
-    this.configString = JSON.stringify(this.graphCfg);
+      .onOk(unit => this.saveParams({ duration: unitDurationString(unit) }));
   }
 }
 </script>
@@ -138,7 +135,9 @@ export default class BlockGraph extends Vue {
         :graph-id="id"
         :config="graphCfg"
         :use-presets="!noDuration"
-        @params="updateParams"
+        use-range
+        @params="saveParams"
+        @layout="saveLayout"
       >
         <template #controls>
           <q-btn-dropdown flat icon="settings">
@@ -174,9 +173,8 @@ export default class BlockGraph extends Vue {
   </q-dialog>
 </template>
 
-<style scoped lang="scss">
-.mirrored {
-  -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
-}
+<style scoped lang="sass">
+.mirrored
+  -webkit-transform: scaleX(-1)
+  transform: scaleX(-1)
 </style>

@@ -78,11 +78,11 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
 
     return {
       // persisted in config
-      params: this.widget.config.queryParams || { duration: '1h' },
-      axes: this.widget.config.graphAxes || {},
-      // constants
+      params: this.widget.config.queryParams ?? { duration: '1h' },
+      axes: this.widget.config.graphAxes ?? {},
       layout: {
-        title: this.widget.title,
+        ...(this.widget.config.graphLayout ?? {}),
+        title: this.widget.title, // always overrides
       },
       targets: [
         {
@@ -96,11 +96,10 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   }
 
   public set graphCfg(config: GraphConfig) {
-    this.saveConfig({
-      ...this.widget.config,
-      queryParams: { ...config.params },
-      graphAxes: { ...config.axes },
-    });
+    this.$set(this.widget.config, 'queryParams', { ...config.params });
+    this.$set(this.widget.config, 'graphAxes', { ...config.axes });
+    this.$set(this.widget.config, 'graphLayout', { ...config.layout });
+    this.saveConfig();
   }
 
   public async saveBlock(block: BlockT = this.block): Promise<void> {

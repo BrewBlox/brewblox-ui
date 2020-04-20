@@ -9,6 +9,8 @@ import { createDialog } from '@/helpers/dialog';
 import notify from '@/helpers/notify';
 import { GraphAnnotation } from '@/plugins/history/types';
 
+import PlotlyGraph from './PlotlyGraph';
+
 /* eslint-disable @typescript-eslint/camelcase */
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
@@ -55,7 +57,7 @@ const layoutDefaults = (): Partial<Layout> => ({
 
 @Component({
   components: {
-    PlotlyGraph: () => import('./PlotlyGraph'),
+    PlotlyGraph,
   },
 })
 export default class GenericGraph extends Vue {
@@ -170,5 +172,4 @@ export default class GenericGraph extends Vue {
 
 .xy2
   color: green
-
 </style>
