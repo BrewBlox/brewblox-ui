@@ -95,7 +95,6 @@ export default class BlockGraph extends Vue {
   }
 
   saveLayout(layout: Partial<Layout>): void {
-    console.log('save layout');
     this.$set(this.graphCfg, 'layout', layout);
     this.save();
   }
