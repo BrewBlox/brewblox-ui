@@ -7,6 +7,12 @@ import { actionSpecs, conditionSpecs } from './impl/specs';
 import { automationStore } from './store';
 import { AutomationCondition, AutomationStep } from './types';
 
+export function idCopy<T extends HasId>(v: T): T {
+  return {
+    ...v,
+    id: uid(),
+  };
+}
 
 const lipsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             Suspendisse iaculis sit amet ligula eget fermentum.
@@ -34,20 +40,20 @@ export async function make(): Promise<void> {
       title: 'Default block value',
       impl: conditionSpecs.BlockValue.generate(),
     },
-    {
-      id: uid(),
-      enabled: true,
-      title: 'Check sensor value',
-      impl: {
-        type: 'BlockValue',
-        blockId: 'sensor-1',
-        serviceId: 'sparkey',
-        blockType: blockTypes.TempSensorMock,
-        key: 'value[degC]',
-        operator: 'ge',
-        value: 10,
-      },
-    },
+    // {
+    //   id: uid(),
+    //   enabled: true,
+    //   title: 'Check sensor value',
+    //   impl: {
+    //     type: 'BlockValue',
+    //     blockId: 'sensor-1',
+    //     serviceId: 'sparkey',
+    //     blockType: blockTypes.TempSensorMock,
+    //     key: 'value[degC]',
+    //     operator: 'ge',
+    //     value: 10,
+    //   },
+    // },
     {
       id: uid(),
       enabled: true,
@@ -87,6 +93,7 @@ export async function make(): Promise<void> {
       {
         id: stepOneId,
         title: 'step-one',
+        preconditions: mkConditions(),
         actions: [
           {
             id: uid(),
@@ -152,6 +159,7 @@ export async function make(): Promise<void> {
       {
         id: stepTwoId,
         title: 'step-two',
+        preconditions: mkConditions(),
         actions: [
           {
             id: uid(),

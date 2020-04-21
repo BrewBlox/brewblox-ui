@@ -3,8 +3,10 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import { extendById, filterById } from '@/helpers/functional';
 import store from '@/store';
 
+import { AutomationStepJump } from '../shared-types';
 import { AutomationEventData, AutomationProcess, AutomationTask, AutomationTemplate } from '../types';
-import { templateApi } from './api';
+import * as processApi from './process-api';
+import templateApi from './template-api';
 
 @Module({ generateMutationSetters: true })
 export class AutomationModule extends VuexModule {
@@ -28,16 +30,24 @@ export class AutomationModule extends VuexModule {
     return this.templates.map(v => v.id);
   }
 
-  public processById(id: string): AutomationProcess | null {
+  public processById(id: string | null): AutomationProcess | null {
+    if (id === null) { return null; }
     return this.processes.find(v => v.id === id) ?? null;
   }
 
-  public taskById(id: string): AutomationTask | null {
+  public taskById(id: string | null): AutomationTask | null {
+    if (id === null) { return null; }
     return this.tasks.find(v => v.id === id) ?? null;
   }
 
-  public templateById(id: string): AutomationTemplate | null {
+  public templateById(id: string | null): AutomationTemplate | null {
+    if (id === null) { return null; }
     return this.templates.find(v => v.id === id) ?? null;
+  }
+
+  @Mutation
+  public setProcess(proc: AutomationProcess): void {
+    this.processes = extendById(this.processes, proc);
   }
 
   @Mutation
@@ -79,6 +89,22 @@ export class AutomationModule extends VuexModule {
   @Action
   public async removeTemplate(template: AutomationTemplate): Promise<void> {
     await templateApi.remove(template); // triggers callback
+  }
+
+  @Action
+  public async initProcess(template: AutomationTemplate): Promise<void> {
+    this.setProcess(await processApi.init(template));
+  }
+
+  @Action
+  public async jumpProcess(args: AutomationStepJump): Promise<void> {
+    this.setProcess(await processApi.jump(args));
+  }
+
+  @Action
+  public async removeProcess(proc: AutomationProcess): Promise<void> {
+    await processApi.remove(proc);
+    this.processes = filterById(this.processes, proc);
   }
 
   @Action

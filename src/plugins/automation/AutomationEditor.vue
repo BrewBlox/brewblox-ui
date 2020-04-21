@@ -6,39 +6,54 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { clamp, spliceById } from '@/helpers/functional';
 
-import { clear, make } from './helpers';
+import { clear, idCopy, make } from './helpers';
 import { automationStore } from './store';
 import { AutomationStep, AutomationTemplate } from './types';
-interface HasId {
-  id: string;
-}
 
 @Component
 export default class AutomationEditor extends DialogBase {
   make = make;
   clear = clear;
-  drawerOpen = !this.$dense;
+
+  localDrawer: boolean | null = null;
+  templateId: string | null = null;
+
   dragged: AutomationStep | null = null;
+  section: 'Preconditions' | 'Actions' | 'Transitions' = 'Actions';
 
   mounted(): void {
-    if (this.routeId && this.routeId !== automationStore.activeTemplate) {
-      automationStore.setActive([this.routeId, null]);
-    }
+    this.selectActive(null);
   }
 
   leaveEditor(): void {
     this.$router.back();
   }
 
-  get routeId(): string | null {
-    return this.$route.params.id ?? null;
-  }
-
-  get templateId(): string | null {
-    return this.routeId
+  selectActive(id: string | null, stepId: string | null = null): void {
+    if (id != this.$route.params.id) {
+      this.$router.replace(`/automation/${id ?? ''}`);
+    }
+    this.templateId = id
+      ?? this.$route.params.id
       ?? automationStore.activeTemplate
       ?? automationStore.templateIds[0]
       ?? null;
+    automationStore.setActive(
+      this.templateId
+        ? [this.templateId, this.templateId === id ? stepId : null]
+        : null);
+  }
+
+  get drawerOpen(): boolean {
+    return Boolean(
+      this.localDrawer
+      ?? this.$q.localStorage.getItem('drawer')
+      ?? !this.$dense);
+  }
+
+  set drawerOpen(v: boolean) {
+    this.localDrawer = v;
+    this.$q.localStorage.set('drawer', v);
   }
 
   get templates(): AutomationTemplate[] {
@@ -46,11 +61,7 @@ export default class AutomationEditor extends DialogBase {
   }
 
   get template(): AutomationTemplate | null {
-    return automationStore.templateById(
-      this.routeId
-      ?? automationStore.activeTemplate
-      ?? automationStore.templateIds[0]
-    );
+    return automationStore.templateById(this.templateId);
   }
 
   get stepId(): string | null {
@@ -87,16 +98,47 @@ export default class AutomationEditor extends DialogBase {
     }
   }
 
-  selectActive(template: AutomationTemplate | null, step: AutomationStep | null = null): void {
-    automationStore.setActive(
-      template === null
-        ? null
-        : [template.id, step?.id ?? null]
-    );
-  }
-
   startAddTemplate(copy: boolean): void {
-    copy;
+    createDialog({
+      title: 'New template',
+      message: 'Choose a name for your new template',
+      cancel: true,
+      prompt: {
+        model: copy ? (this.template?.title ?? 'New Template') : 'New Template',
+        type: 'text',
+      },
+    }).onOk(async title => {
+      const id = uid();
+      const template: AutomationTemplate = copy && this.template
+        ? {
+          id,
+          title,
+          steps: this.template.steps.map(step => ({
+            id: uid(),
+            title: step.id,
+            preconditions: step.preconditions.map(idCopy),
+            actions: step.actions.map(idCopy),
+            transitions: step.transitions.map(t => ({
+              ...t,
+              id: uid(),
+              conditions: t.conditions.map(idCopy),
+            })),
+          })),
+        }
+        : {
+          id,
+          title,
+          steps: [{
+            id: uid(),
+            title: 'Step one',
+            preconditions: [],
+            actions: [],
+            transitions: [],
+          }],
+        };
+      await automationStore.createTemplate(template);
+      this;
+    });
   }
 
   startRenameTemplate(): void {
@@ -104,7 +146,6 @@ export default class AutomationEditor extends DialogBase {
       return;
     }
     createDialog({
-      parent: this,
       title: 'Rename template',
       message: `Choose a new name for '${this.template.title}'`,
       cancel: true,
@@ -120,7 +161,6 @@ export default class AutomationEditor extends DialogBase {
       return;
     }
     createDialog({
-      parent: this,
       title: 'Remove template',
       message: `Are you sure you want to remove '${this.template.title}'`,
       cancel: true,
@@ -134,6 +174,7 @@ export default class AutomationEditor extends DialogBase {
     const step: AutomationStep = {
       id: uid(),
       title: 'New step',
+      preconditions: [],
       actions: [],
       transitions: [],
     };
@@ -142,7 +183,6 @@ export default class AutomationEditor extends DialogBase {
 
   startRenameStep(step: AutomationStep): void {
     createDialog({
-      parent: this,
       title: 'Rename step',
       message: `Choose a new name for '${step.title}'`,
       cancel: true,
@@ -158,7 +198,6 @@ export default class AutomationEditor extends DialogBase {
 
   startRemoveStep(step: AutomationStep): void {
     createDialog({
-      parent: this,
       title: 'Remove step',
       message: `Are you sure you want to remove '${step.title}'`,
       cancel: true,
@@ -217,7 +256,7 @@ export default class AutomationEditor extends DialogBase {
               :label="tmpl.title"
               :active="template && tmpl.id === template.id"
               icon="mdi-view-dashboard-outline"
-              @click="selectActive(tmpl)"
+              @click="selectActive(tmpl.id)"
             />
           </q-list>
         </q-btn-dropdown>
@@ -263,7 +302,7 @@ export default class AutomationEditor extends DialogBase {
             :inset-level="0.2"
             class="ellipsis q-pa-none"
             style="min-height: 0"
-            @click="selectActive(template, step)"
+            @click="selectActive(template.id, step.id)"
           >
             <q-item-section class="col-auto" @click.stop="() => {}">
               <ActionMenu>
@@ -294,15 +333,42 @@ export default class AutomationEditor extends DialogBase {
 
     <q-page-container>
       <q-page>
-        <div v-if="step" class="page-height row no-wrap q-pa-md q-gutter-md">
-          <q-scroll-area visible class="col-xl-4 col">
-            <AutomationActions :template="template" :step="step" @update:step="saveStep" />
-          </q-scroll-area>
-          <q-scroll-area visible class="col-xl-4 col">
-            <AutomationTransitions :template="template" :step="step" @update:step="saveStep" />
+        <div v-if="step" class="page-height column no-wrap q-pa-md q-gutter-md">
+          <q-tabs v-model="section" :breakpoint="0">
+            <q-tab name="Preconditions" label="Preconditions" />
+            <q-tab name="Actions" label="Actions" />
+            <q-tab name="Transitions" label="Transitions" />
+          </q-tabs>
+          <q-scroll-area visible class="col">
+            <div class="row section-parent q-pl-lg justify-center">
+              <AutomationPreconditions
+                v-if="section === 'Preconditions'"
+                :template="template"
+                :step="step"
+                @update:step="saveStep"
+              />
+              <AutomationActions
+                v-if="section === 'Actions'"
+                :template="template"
+                :step="step"
+                @update:step="saveStep"
+              />
+              <AutomationTransitions
+                v-if="section === 'Transitions'"
+                :template="template"
+                :step="step"
+                @update:step="saveStep"
+              />
+            </div>
           </q-scroll-area>
         </div>
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
+
+<style lang="sass" scoped>
+.section-parent > div
+  width: 600px
+  max-width: 600px
+</style>
