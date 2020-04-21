@@ -174,6 +174,11 @@ export default class Troubleshooter extends Vue {
           Your Spark service is waiting for the controller handshake.
           <br>
           <b>This status is usually temporary</b>
+          <br>
+          <br>
+          If your Spark is showing a blank screen, you may need to flash the bootloader.
+          <br>
+          To do so, run <span class="monospace">brewblox-ctl particle -c flash-bootloader</span>
         </span>
         <!-- not compatible -->
         <span v-else-if="!status.compatible">
