@@ -7,7 +7,7 @@ import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress } from '@/plugins/spark/types';
+import type { Block, BlockAddress } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
 const asAddr = (v: Block | BlockAddress): BlockAddress => ({
@@ -32,6 +32,9 @@ export default class BlockAddressDialog extends DialogBase {
 
   @Prop({ type: Array, required: false })
   readonly compatible!: string[];
+
+  @Prop({ type: Function, default: () => true })
+  public readonly blockFilter!: (block: Block) => boolean;
 
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
@@ -76,15 +79,16 @@ export default class BlockAddressDialog extends DialogBase {
   }
 
   get addrOpts(): BlockAddress[] {
-    return (sparkStore.blockValues(this.serviceId) ?? [])
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => this.typeFilter(block.type))
+      .filter(this.blockFilter)
       .map(asAddr)
       .sort(objectStringSorter('id'));
   }
 
   get block(): Block | null {
     return this.local
-      ? sparkStore.tryBlockById(this.serviceId, this.local.id)
+      ? sparkStore.blockById(this.serviceId, this.local.id)
       : null;
   }
 
@@ -130,7 +134,7 @@ export default class BlockAddressDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.ctrl.enter="save"
+    @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
@@ -139,6 +143,7 @@ export default class BlockAddressDialog extends DialogBase {
         :options="serviceIds"
         label="Service"
         item-aligned
+        @keyup.enter.exact.stop
       />
       <q-select
         v-model="local"
@@ -151,6 +156,7 @@ export default class BlockAddressDialog extends DialogBase {
         item-aligned
         option-label="id"
         option-value="id"
+        @keyup.enter.exact.stop
       >
         <q-tooltip v-if="tooltip">
           {{ tooltip }}

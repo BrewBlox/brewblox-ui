@@ -1,16 +1,30 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
+import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 import { TempSensorOneWireBlock } from './types';
 
-@Component
+@Component({
+  components: {
+    TempSensorSwapDialog,
+  },
+})
 export default class TempSensorOneWireWidget
   extends BlockWidgetBase<TempSensorOneWireBlock> {
 
   get hasValue(): boolean {
     return this.block.data.value.value !== null;
+  }
+
+  startSwap(): void {
+    createDialog({
+      component: TempSensorSwapDialog,
+      serviceId: this.serviceId,
+      leftId: this.blockId,
+    });
   }
 }
 </script>
@@ -18,11 +32,23 @@ export default class TempSensorOneWireWidget
 <template>
   <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-range
+        use-presets
+        @params="saveGraphParams"
+        @layout="saveGraphLayout"
+      />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+        <template #actions>
+          <ActionItem icon="mdi-swap-horizontal" label="Swap OneWire address" @click="startSwap" />
+        </template>
+      </component>
     </template>
 
     <div>

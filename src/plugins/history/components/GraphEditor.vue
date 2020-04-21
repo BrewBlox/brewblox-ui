@@ -3,7 +3,6 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { QuasarNode } from '@/plugins/history/nodes';
 
 import { GraphConfig } from '../types';
 

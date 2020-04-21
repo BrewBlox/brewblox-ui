@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { Temp, Time } from '@/helpers/units';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
 
 import { Fluctuation, TempSensorMockBlock } from './types';
 
@@ -13,7 +12,7 @@ export default class TempSensorMockWidget
   extends BlockWidgetBase<TempSensorMockBlock> {
 
   get tempUnit(): string {
-    return sparkStore.units(this.block.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   addFluctuation(): void {
@@ -52,7 +51,15 @@ export default class TempSensorMockWidget
 <template>
   <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-range
+        use-presets
+        @params="saveGraphParams"
+        @layout="saveGraphLayout"
+      />
     </template>
 
     <template #toolbar>

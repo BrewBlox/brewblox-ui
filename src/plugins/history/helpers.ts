@@ -4,9 +4,9 @@ import { typeName as graphType } from './Graph/getters';
 import { GraphConfig, SharedGraphConfig } from './types';
 
 export const sharedWidgetConfigs = (excluded: string[] = []): SharedGraphConfig[] =>
-  dashboardStore.widgetValues
+  dashboardStore.widgets
     .filter(widget => widget.feature === graphType && !excluded.includes(widget.id))
     .map((widget: Widget<GraphConfig>) => {
-      const { id, title, config } = widget;
-      return { id, title: `[${dashboardStore.dashboardById(widget.dashboard).title}] ${title}`, config };
+      const { id, title, config, dashboard } = widget;
+      return { id, title: `[${dashboardStore.dashboardTitle(dashboard)}] ${title}`, config };
     });

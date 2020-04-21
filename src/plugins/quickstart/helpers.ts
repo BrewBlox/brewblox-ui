@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 
 import { builderStore } from '@/plugins/builder/store';
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes, PidData } from '@/plugins/spark/block-types';
 import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
 import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -12,7 +12,7 @@ import { PinChannel, QuickStartOutput } from './types';
 
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {
   return sparkStore
-    .blockValues(serviceId)
+    .serviceBlocks(serviceId)
     // Find existing drivers
     .filter(
       block =>
@@ -30,10 +30,11 @@ export function createOutputActions(): WizardAction[] {
   return [
     // Rename blocks
     async (config: QuickStartOutput) => {
+      const module = sparkStore.moduleById(config.serviceId)!;
       await Promise.all(
         Object.entries(config.renamedBlocks)
           .filter(([currVal, newVal]: [string, string]) => currVal !== newVal)
-          .map(([currVal, newVal]: [string, string]) => sparkStore.renameBlock([config.serviceId, currVal, newVal]))
+          .map(([currVal, newVal]: [string, string]) => module.renameBlock([currVal, newVal]))
       );
     },
 
@@ -80,7 +81,7 @@ export function createOutputActions(): WizardAction[] {
     async (config: QuickStartOutput) => {
       for (const val of config.displayedBlocks) {
         const block = sparkStore.blockById(config.serviceId, val.blockId);
-        await tryDisplayBlock(block, val.opts);
+        await tryDisplayBlock(block!, val.opts);
       }
     },
   ];
@@ -112,4 +113,8 @@ export function withoutPrefix(prefix: string, val: string): string {
   return val.startsWith(prefix)
     ? val.substring(prefix.length).trim()
     : val;
+}
+
+export function pidDefaults(): PidData {
+  return sparkStore.specById(blockTypes.Pid).generate();
 }

@@ -9,7 +9,7 @@ import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { isSystemBlock } from '@/plugins/spark/block-types';
 import { saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import {
   Block,
   BlockCrud,
@@ -23,7 +23,6 @@ import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore, WidgetContext, WidgetRole } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
-import { isReady } from './getters';
 import Troubleshooter from './Troubleshooter.vue';
 
 interface ModalSettings {
@@ -88,30 +87,34 @@ export default class SparkPage extends Vue {
   }
 
   get service(): SparkService {
-    return serviceStore.serviceById(this.serviceId);
+    return serviceStore.serviceById(this.serviceId)!;
+  }
+
+  get sparkModule(): SparkServiceModule | null {
+    return sparkStore.moduleById(this.serviceId);
   }
 
   get dashboards(): Dashboard[] {
-    return dashboardStore.dashboardValues;
+    return dashboardStore.dashboards;
   }
 
   get isAvailable(): boolean {
-    return sparkStore.serviceAvailable(this.serviceId);
+    return this.service !== null
+      && this.sparkModule !== null;
   }
 
   get isReady(): boolean {
-    return this.isAvailable && isReady(this.serviceId);
+    return this.isAvailable
+      && this.sparkModule!.lastBlocks !== null;
   }
 
   get status(): SparkStatus | null {
-    return this.isAvailable
-      ? sparkStore.status(this.serviceId)
-      : null;
+    return this.sparkModule?.status ?? null;
   }
 
   get statusNok(): boolean {
     return this.isAvailable
-      && !!this.status
+      && this.status !== null
       && !this.status.synchronize;
   }
 
@@ -156,7 +159,7 @@ export default class SparkPage extends Vue {
   }
 
   set expandedBlocks(expanded: { [id: string]: boolean }) {
-    const ids = [...sparkStore.blockIds(this.service.id), '_service'];
+    const ids = [...this.sparkModule!.blockIds, '_service'];
     this.service.config.expandedBlocks = Object.entries(expanded)
       .reduce(
         (acc, [k, v]) => {
@@ -276,15 +279,15 @@ export default class SparkPage extends Vue {
   }
 
   get validatedItems(): ValidatedWidget[] {
-    return [
-      ...sparkStore.blockValues(this.service.id)
-        .filter(block => !isSystemBlock(block))
-        .map(this.validateBlock),
-    ];
+    return this.sparkModule
+      ?.blocks
+      .filter(block => !isSystemBlock(block))
+      .map(this.validateBlock)
+      ?? [];
   }
 
   get filteredItems(): ValidatedWidget[] {
-    const filter = (this.blockFilter || '').toLowerCase();
+    const filter = this.blockFilter?.toLowerCase();
     return this.validatedItems
       .filter(val => !filter
         || val.id.toLowerCase().match(filter)
@@ -297,7 +300,7 @@ export default class SparkPage extends Vue {
   }
 
   expandAll(): void {
-    this.expandedBlocks = [...sparkStore.blockIds(this.service.id), '_service']
+    this.expandedBlocks = [...this.sparkModule!.blockIds, '_service']
       .reduce((acc, id) => mutate(acc, id, true), {});
   }
 
@@ -332,15 +335,16 @@ export default class SparkPage extends Vue {
   }
 
   get edges(): RelationEdge[] {
-    return sparkStore.relations(this.service.id);
+    return this.sparkModule?.relations ?? [];
   }
 
   async discoverBlocks(): Promise<void> {
-    await sparkStore.clearDiscoveredBlocks(this.service.id);
-    await sparkStore.fetchDiscoveredBlocks(this.service.id);
+    if (!this.sparkModule) { return; }
+    await this.sparkModule.clearDiscoveredBlocks();
+    await this.sparkModule.fetchDiscoveredBlocks();
     await this.$nextTick();
 
-    const discovered = sparkStore.discoveredBlocks(this.service.id);
+    const discovered = this.sparkModule.discoveredBlocks;
     const message = discovered.length > 0
       ? `Discovered ${discovered.join(', ')}.`
       : 'Discovered no new blocks.';
@@ -349,13 +353,19 @@ export default class SparkPage extends Vue {
   }
 
   async cleanUnusedNames(): Promise<void> {
-    const names = await sparkStore.cleanUnusedNames(this.service.id);
+    if (!this.sparkModule) { return; }
+    const names = await this.sparkModule.cleanUnusedNames();
 
     const message = names.length > 0
       ? `Cleaned ${names.join(', ')}.`
       : 'No unused names found.';
 
     notify.info({ message, icon: 'mdi-tag-remove' });
+  }
+
+  async reboot(): Promise<void> {
+    if (!this.sparkModule) { return; }
+    await this.sparkModule.reboot();
   }
 
   onBlockClick(val: ValidatedWidget): void {
@@ -439,12 +449,17 @@ export default class SparkPage extends Vue {
           />
           <ActionItem
             icon="mdi-checkbox-multiple-marked"
-            label="Groups"
+            label="Groups (deprecated)"
             @click="startDialog('SparkGroupMenu')"
           />
           <ActionItem
+            icon="mdi-restart"
+            label="Reboot controller"
+            @click="reboot"
+          />
+          <ActionItem
             icon="mdi-temperature-celsius"
-            label="Units"
+            label="Configure used units"
             @click="startDialog('SparkUnitMenu')"
           />
           <ActionItem

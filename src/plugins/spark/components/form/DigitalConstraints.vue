@@ -7,7 +7,7 @@ import { Link, Time } from '@/helpers/units';
 import { blockTypes, MutexBlock } from '@/plugins/spark/block-types';
 import { digitalConstraintLabels } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import {
+import type {
   DigitalConstraint,
   DigitalConstraintKey,
   DigitalConstraintsObj,
@@ -84,7 +84,7 @@ export default class DigitalConstraints extends Vue {
       return constraint.mutexed.extraHoldTime;
     }
     else if (constraint.mutexed.mutexId.id) {
-      const mutex: MutexBlock = sparkStore.blockById(
+      const mutex = sparkStore.blockById<MutexBlock>(
         this.serviceId,
         constraint.mutexed.mutexId.id);
       return mutex?.data.differentActuatorWait ?? new Time();

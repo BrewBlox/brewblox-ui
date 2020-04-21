@@ -30,7 +30,7 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
-  @Prop({ type: Boolean, default: true })
+  @Prop({ type: Boolean, default: false })
   public readonly autogrow!: boolean;
 
   @Prop({ type: String, default: '170%' })
@@ -71,7 +71,12 @@ export default class InputDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"

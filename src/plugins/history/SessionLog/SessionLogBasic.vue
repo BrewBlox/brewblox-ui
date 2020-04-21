@@ -170,13 +170,15 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
                 </span>
               </div>
             </div>
-            <div class="col-auto depth-1">
-              <q-btn v-if="note.start === null" flat stretch label="Start" @click.stop="startGraphNote(note)" />
-              <q-btn v-else-if="note.end === null" flat stretch label="End" @click.stop="stopGraphNote(note)" />
-              <q-btn v-else flat stretch icon="mdi-calendar-clock" @click.stop="editGraphNote(note)">
-                <q-tooltip>Change dates</q-tooltip>
-              </q-btn>
-            </div>
+            <q-btn v-if="note.start === null" flat dense icon="mdi-play" @click.stop="startGraphNote(note)">
+              <q-tooltip>Start</q-tooltip>
+            </q-btn>
+            <q-btn v-else-if="note.end === null" flat dense icon="mdi-stop" @click.stop="stopGraphNote(note)">
+              <q-tooltip>Stop</q-tooltip>
+            </q-btn>
+            <q-btn flat dense icon="mdi-calendar-clock" @click.stop="editGraphNote(note)">
+              <q-tooltip>Edit</q-tooltip>
+            </q-btn>
           </template>
         </div>
       </div>

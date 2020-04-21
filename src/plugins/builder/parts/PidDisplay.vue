@@ -23,7 +23,7 @@ export default class PidDisplay extends PartBase {
 
   get block(): PidBlock | null {
     const { serviceId, id } = this.address;
-    return sparkStore.tryBlockById(serviceId, id);
+    return sparkStore.blockById(serviceId, id);
   }
 
   get isBroken(): boolean {
@@ -51,7 +51,7 @@ export default class PidDisplay extends PartBase {
 
   get target(): Block | null {
     return this.block
-      ? sparkStore.tryBlockById(this.block.serviceId, this.block.data.outputId.id)
+      ? sparkStore.blockById(this.block.serviceId, this.block.data.outputId.id)
       : null;
   }
 

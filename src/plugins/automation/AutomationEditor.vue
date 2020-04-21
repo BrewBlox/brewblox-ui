@@ -22,7 +22,7 @@ export default class AutomationEditor extends DialogBase {
 
   mounted(): void {
     if (this.routeId && this.routeId !== automationStore.activeTemplate) {
-      automationStore.commitActive([this.routeId, null]);
+      automationStore.setActive([this.routeId, null]);
     }
   }
 
@@ -42,7 +42,7 @@ export default class AutomationEditor extends DialogBase {
   }
 
   get templates(): AutomationTemplate[] {
-    return automationStore.templateValues;
+    return automationStore.templates;
   }
 
   get template(): AutomationTemplate | null {
@@ -88,7 +88,7 @@ export default class AutomationEditor extends DialogBase {
   }
 
   selectActive(template: AutomationTemplate | null, step: AutomationStep | null = null): void {
-    automationStore.commitActive(
+    automationStore.setActive(
       template === null
         ? null
         : [template.id, step?.id ?? null]

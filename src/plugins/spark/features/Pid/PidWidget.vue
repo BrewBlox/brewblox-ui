@@ -53,7 +53,15 @@ export default class PidWidget
 <template>
   <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-range
+        use-presets
+        @params="saveGraphParams"
+        @layout="saveGraphLayout"
+      />
     </template>
 
     <template #toolbar>

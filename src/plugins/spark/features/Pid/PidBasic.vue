@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 import { startRelationsDialog } from './relations';
@@ -15,17 +14,18 @@ export default class PidBasic
   extends BlockCrudComponent<PidBlock> {
 
   get inputBlock(): SetpointSensorPairBlock | null {
-    return sparkStore.tryBlockById(this.serviceId, this.block.data.inputId.id);
+    return this.sparkModule.blockById(this.block.data.inputId.id);
   }
 
   get inputDriven(): boolean {
     return this.inputBlock !== null
-      && sparkStore.drivenChains(this.serviceId)
+      && this.sparkModule
+        .drivenChains
         .some((chain: string[]) => chain[0] === this.inputBlock!.id);
   }
 
   get outputBlock(): Block | null {
-    return sparkStore.tryBlockById(this.serviceId, this.block.data.outputId.id);
+    return this.sparkModule.blockById(this.block.data.outputId.id);
   }
 
   get kp(): number | null {
@@ -54,13 +54,13 @@ export default class PidBasic
 
     const id = this.inputBlock.id;
 
-    if (sparkStore.drivenBlocks(this.serviceId).includes(id)) {
-      const driveChain = sparkStore
-        .drivenChains(this.serviceId)
+    if (this.sparkModule.drivenBlocks.includes(id)) {
+      const driveChain = this.sparkModule
+        .drivenChains
         .find(chain => chain[0] === this.inputBlock?.id);
 
       const actual = driveChain !== undefined
-        ? sparkStore.tryBlockById(this.serviceId, driveChain[driveChain.length - 1])
+        ? this.sparkModule.blockById(driveChain[driveChain.length - 1])
         : this.inputBlock;
 
       this.showOtherBlock(actual);

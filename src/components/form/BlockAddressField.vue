@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress } from '@/plugins/spark/types';
+import type { Block, BlockAddress } from '@/plugins/spark/types';
 
 import FieldBase from '../FieldBase';
 
@@ -47,7 +47,7 @@ export default class BlockAddressField extends FieldBase {
   }
 
   get block(): Block | null {
-    return sparkStore.tryBlockById(this.value.serviceId, this.value.id);
+    return sparkStore.blockById(this.value.serviceId, this.value.id);
   }
 
   get canEdit(): boolean {

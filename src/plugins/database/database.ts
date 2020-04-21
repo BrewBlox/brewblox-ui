@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import PouchDB from 'pouchdb';
+import { Notify } from 'quasar';
 
 import { HOST } from '@/helpers/const';
-import fetch from '@/helpers/fetch';
+import http from '@/helpers/http';
 import notify from '@/helpers/notify';
 
 import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
@@ -47,22 +48,31 @@ const intercept = (message: string, moduleId: string): (e: Error) => never =>
     throw e;
   };
 
+const retryDatastore = async (): Promise<void> => {
+  while (true) {
+    // Try to fetch the datastore
+    // If it responds, it is available, and we can reload the page to use it
+    // If it doesn't respond, show a notification with a progress bar
+    // The notification resolves the awaited promise after `timeout` ms
+    await new Promise(resolve =>
+      http.get('/datastore', { timeout: 2000 })
+        .then(() => location.reload()) // reload page will abort the JS runtime
+        .catch(() => Notify.create({
+          timeout: 2000,
+          icon: 'mdi-wifi-off',
+          color: 'info',
+          message: 'Waiting for datastore...',
+          progress: true,
+          onDismiss: () => resolve(), // continue
+        })));
+  }
+};
+
 export const checkDatastore = (): void => {
-  fetch('/datastore', { timeout: 2000 })
+  http.get('/datastore', { timeout: 2000 })
     .catch(err => {
       notify.error(`Datastore error: ${err}`, { shown: false });
-      notify.error({
-        timeout: 0,
-        icon: 'error',
-        message: 'Datastore not (yet) available',
-        actions: [
-          {
-            label: 'Reload page',
-            textColor: 'white',
-            handler: () => location.reload(),
-          },
-        ],
-      });
+      retryDatastore();
     });
 };
 

@@ -1,15 +1,11 @@
 <script lang="ts">
-import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
-import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import { sparkStore } from '@/plugins/spark/store';
-import { Service, serviceStore } from '@/store/services';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { withPrefix } from '../helpers';
@@ -42,23 +38,8 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
     };
   }
 
-  get services(): Service[] {
-    return serviceStore.typedServices(sparkType);
-  }
-
   get serviceId(): string {
-    return this.config.serviceId || this.services[0].id;
-  }
-
-  set serviceId(serviceId: string) {
-    this.updateConfig({ ...this.config, serviceId });
-  }
-
-  get groupError(): string | null {
-    const [name, active] = get(sparkStore.groupState, [this.serviceId, 0], ['Unknown', false]);
-    return active
-      ? null
-      : `Group '${name}' is disabled. Created blocks will be inactive.`;
+    return this.config.serviceId;
   }
 
   get prefix(): string {
@@ -108,7 +89,6 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
 
   get valuesOk(): boolean {
     return [
-      this.serviceId,
       this.dashboardTitle,
       ruleValidator(this.dashboardIdRules)(this.dashboardId),
       Object.values(this.names).every(ruleValidator(this.nameRules)),
@@ -132,7 +112,6 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
   taskDone(): void {
     this.updateConfig({
       ...this.config,
-      serviceId: this.serviceId,
       prefix: this.prefix,
       dashboardId: this.dashboardId,
       dashboardTitle: this.dashboardTitle,
@@ -158,14 +137,7 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
         </q-item-section>
       </q-item>
 
-      <CardWarning v-if="groupError">
-        <template #message>
-          {{ groupError }}
-        </template>
-      </CardWarning>
-
       <!-- Generic settings -->
-      <QuickStartServiceField v-model="serviceId" :services="services" />
       <QuickStartNameField
         v-model="dashboardTitle"
         label="Dashboard name"

@@ -6,6 +6,7 @@ import WidgetWizardBase from '@/components/WidgetWizardBase';
 @Component
 export default class GlycolWizard extends WidgetWizardBase {
   initialTasks = [
+    'QuickStartServiceTask',
     'GlycolNamingTask',
     'GlycolHardwareTask',
     'GlycolSettingsTask',

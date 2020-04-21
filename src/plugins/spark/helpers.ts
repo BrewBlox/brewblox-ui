@@ -1,3 +1,4 @@
+import pick from 'lodash/pick';
 import range from 'lodash/range';
 import { VueConstructor } from 'vue';
 
@@ -22,11 +23,11 @@ import { Crud, WidgetFeature } from '@/store/features';
 
 import { blockTypes, interfaceTypes, isCompatible } from './block-types';
 import { DisplaySettingsBlock } from './features/DisplaySettings/types';
-import { BlockAddress, BlockConfig, BlockCrud, DisplayOpts, DisplaySlot } from './types';
+import { Block, BlockAddress, BlockConfig, BlockCrud, DataBlock, DisplayOpts, DisplaySlot } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
-  v => !sparkStore.blockIds(serviceId).includes(v) || 'Name must be unique',
+  v => sparkStore.blockById(serviceId, v) === null || 'Name must be unique',
   v => /^[a-zA-Z]/.test(v) || 'Name must start with a letter',
   v => /^[a-zA-Z0-9 \(\)_\-\|]*$/.test(v) || 'Name may only contain letters, numbers, spaces, and ()-_|',
   v => v.length < 200 || 'Name must be less than 200 characters',
@@ -56,12 +57,12 @@ export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['c
   const widget = ref(component);
   return (crud: Crud) => {
     const { config }: { config: BlockConfig } = crud.widget;
-    if (!sparkStore.serviceAvailable(config.serviceId)) {
+    if (!sparkStore.moduleById(config.serviceId)) {
       throw new Error(`Spark service '${config.serviceId}' not found`);
     }
     const bCrud = crud as BlockCrud;
     if ((bCrud.isStoreBlock || bCrud.isStoreBlock === undefined)
-      && !sparkStore.blockIds(config.serviceId).includes(config.blockId)) {
+      && !sparkStore.blockById(config.serviceId, config.blockId)) {
       throw new Error(`Block '${config.blockId}' not found in store`);
     }
     return widget;
@@ -81,7 +82,7 @@ export const canDisplay = (addr: BlockAddress): boolean => {
 
 const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBlock | undefined =>
   serviceId
-    ? sparkStore.blockValues(serviceId)
+    ? sparkStore.serviceBlocks(serviceId)
       .find(v => v.type === blockTypes.DisplaySettings)
     : undefined;
 
@@ -162,14 +163,14 @@ export const saveHwInfo = (serviceId: string): void => {
   const linked: string[] = [];
   const addressed: string[] = [];
 
-  sparkStore.blockValues(serviceId)
+  sparkStore.serviceBlocks(serviceId)
     .forEach(block => {
       if (linkedTypes.includes(block.type)) {
         const { hwDevice, channel } = block.data;
         if (!hwDevice.id || !channel) { return; }
         const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
-        const pin = target.data.pins[channel - 1];
-        if (pin !== undefined) {
+        const pin = target?.data.pins[channel - 1];
+        if (target && pin !== undefined) {
           const [name] = Object.keys(pin);
           linked.push(`${block.id}: ${target.id} ${name}`);
         }
@@ -193,26 +194,31 @@ export const saveHwInfo = (serviceId: string): void => {
 export const resetBlocks = async (serviceId: string, opts: { restore: boolean; download: boolean }): Promise<void> => {
   try {
     const addresses: Mapped<string> = {};
+    const module = sparkStore.moduleById(serviceId);
+
+    if (!module) {
+      throw new Error(`Service '${serviceId}' not found`);
+    }
 
     if (opts.download) {
       saveHwInfo(serviceId);
     }
 
     if (opts.restore) {
-      sparkStore.blockValues(serviceId)
+      module.blocks
         .filter(block => addressedTypes.includes(block.type) && !block.id.startsWith('New|'))
         .forEach(block => addresses[block.data.address] = block.id);
     }
 
-    await sparkStore.clearBlocks(serviceId);
-    await sparkStore.fetchDiscoveredBlocks(serviceId);
-    await sparkStore.fetchBlocks(serviceId);
+    await module.clearBlocks();
+    await module.fetchDiscoveredBlocks();
+    await module.fetchBlocks();
 
     if (opts.restore) {
-      const renameArgs: [string, string, string][] = sparkStore.blockValues(serviceId)
+      const renameArgs: [string, string][] = module.blocks
         .filter(block => addressedTypes.includes(block.type) && !!addresses[block.data.address])
-        .map(block => [serviceId, block.id, addresses[block.data.address]]);
-      await Promise.all(renameArgs.map(sparkStore.renameBlock));
+        .map(block => [block.id, addresses[block.data.address]]);
+      await Promise.all(renameArgs.map(module.renameBlock));
     }
     notify.done('Removed all blocks' + (opts.restore ? ', and restored discovered blocks' : ''));
   } catch (e) {
@@ -240,3 +246,13 @@ export const startResetBlocks = (serviceId: string): void => {
       download: selected.includes(1),
     }));
 };
+
+
+export const asDataBlock =
+  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
+
+export const asBlock =
+  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
+
+export const asBlockAddress =
+  (block: Block): BlockAddress => pick(block, ['id', 'serviceId', 'type']);

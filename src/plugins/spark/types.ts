@@ -1,3 +1,5 @@
+import { Layout } from 'plotly.js';
+
 import { Link, Unit } from '@/helpers/units';
 import { StoreObject } from '@/plugins/database';
 import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
@@ -82,6 +84,7 @@ export interface BlockConfig {
   blockId: string;
   queryParams?: QueryParams;
   graphAxes?: GraphValueAxes;
+  graphLayout?: Partial<Layout>;
 }
 
 export interface BlockCrud<BlockT extends Block = Block> extends Crud<BlockConfig> {
@@ -115,6 +118,16 @@ export interface ApiSparkStatus {
 export interface SparkStatus extends ApiSparkStatus {
   serviceId: string;
   available: boolean;
+}
+
+export interface SparkStoreEntry {
+  keys: [string, number];
+  data: any;
+}
+
+export interface SparkExported {
+  blocks: DataBlock[];
+  store: SparkStoreEntry[];
 }
 
 export interface RelationEdge {

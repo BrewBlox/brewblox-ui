@@ -2,6 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { sparkStore } from '@/plugins/spark/store';
 
 @Component
 export default class WizardDialog extends DialogBase {
@@ -17,6 +18,10 @@ export default class WizardDialog extends DialogBase {
 
   @Prop({ type: Object, default: () => ({}) })
   public readonly initialProps!: any;
+
+  get sparkServiceAvailable(): boolean {
+    return sparkStore.modules.length > 0;
+  }
 
   mounted(): void {
     this.reset();
@@ -36,7 +41,12 @@ export default class WizardDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    :maximized="$dense"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+  >
     <CardWrapper :no-scroll="!!wizardComponent" v-bind="{context}">
       <template #toolbar>
         <DialogToolbar icon="mdi-creation" :title="dialogTitle" />
@@ -53,7 +63,7 @@ export default class WizardDialog extends DialogBase {
 
       <template v-else>
         <q-card-section>
-          <q-item clickable @click="pickWizard('QuickStartWizardPicker')">
+          <q-item :disable="!sparkServiceAvailable" clickable @click="pickWizard('QuickStartWizardPicker')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Quick Start
@@ -69,6 +79,9 @@ export default class WizardDialog extends DialogBase {
                 and a new dashboard for quick access to settings and graphs.
               </p>
             </q-item-section>
+            <q-tooltip v-if="!sparkServiceAvailable">
+              An active Spark service is required for Quick start wizards.
+            </q-tooltip>
           </q-item>
         </q-card-section>
 

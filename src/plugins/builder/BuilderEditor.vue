@@ -52,12 +52,13 @@ interface ActionTool extends EditorAction {
 export default class BuilderEditor extends Vue {
   squares = squares;
 
+  layoutId: string | null = null;
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
   undoneHistory: string[] = [];
 
-  drawerOpen = !this.$dense;
+  localDrawer: boolean | null = null;
   menuDialogOpen = false;
   focusWarning = true;
 
@@ -102,9 +103,7 @@ export default class BuilderEditor extends Vue {
   }
 
   async mounted(): Promise<void> {
-    if (this.routeId) {
-      builderStore.commitLastLayoutId(this.routeId);
-    }
+    this.selectLayout(null);
     await this.$nextTick();
     this.setFocus();
   }
@@ -186,20 +185,24 @@ export default class BuilderEditor extends Vue {
     },
   ]
 
+  get drawerOpen(): boolean {
+    return Boolean(
+      this.localDrawer
+      ?? this.$q.localStorage.getItem('drawer')
+      ?? !this.$dense);
+  }
+
+  set drawerOpen(v: boolean) {
+    this.localDrawer = v;
+    this.$q.localStorage.set('drawer', v);
+  }
+
   get layouts(): BuilderLayout[] {
-    return builderStore.layoutValues;
-  }
-
-  get routeId(): string | null {
-    return this.$route.params.id ?? null;
-  }
-
-  get lastId(): string | null {
-    return builderStore.lastLayoutId;
+    return builderStore.layouts;
   }
 
   get layout(): BuilderLayout | null {
-    return builderStore.layoutById(this.routeId ?? this.lastId ?? builderStore.layoutIds[0]);
+    return builderStore.layoutById(this.layoutId);
   }
 
   get parts(): PersistentPart[] {
@@ -246,11 +249,19 @@ export default class BuilderEditor extends Vue {
   }
 
   set currentMode(tool: ActionMode) {
-    builderStore.commitEditorMode(tool.value);
+    builderStore.editorMode = tool.value;
   }
 
   selectLayout(id: string | null): void {
-    this.$router.replace(`/builder/${id ?? ''}`);
+    if (id !== this.$route.params.id) {
+      this.$router.replace(`/builder/${id ?? ''}`);
+    }
+    this.layoutId = id
+      ?? this.$route.params.id
+      ?? builderStore.lastLayoutId
+      ?? builderStore.layouts[0]?.id
+      ?? null;
+    builderStore.lastLayoutId = this.layoutId;
   }
 
   setFocus(): void {

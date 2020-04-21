@@ -3,37 +3,46 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { blockTypes, GroupsBlock } from '@/plugins/spark/block-types';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
-import { Service, serviceStore } from '@/store/services';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
 
 @Component
 export default class SparkGroupMenu extends DialogBase {
 
   @Prop({ type: String, required: true })
-  readonly serviceId!: string;
+  public readonly serviceId!: string;
 
-  get service(): Service {
-    return serviceStore.serviceById(this.serviceId);
+  get sparkModule(): SparkServiceModule | null {
+    return sparkStore.moduleById(this.serviceId);
   }
 
-  get groups(): GroupsBlock | null {
-    return sparkStore.blockValues(this.service.id)
-      .find(block => block.type === blockTypes.Groups) || null;
+  get block(): GroupsBlock | null {
+    return this.sparkModule
+      ?.blocks
+      .find(v => v.type === blockTypes.Groups)
+      ?? null;
   }
 
-  get groupNames(): string[] {
-    return sparkStore.groupNames(this.service.id);
+  get active(): number[] {
+    return this.block?.data.active ?? [];
   }
 
-  saveBlock(block: Block): void {
-    sparkStore.saveBlock(block);
+  set active(v: number[]) {
+    if (!this.block) { return; }
+    this.block.data.active = v;
+    this.saveBlock();
   }
 
-  saveGroupNames(vals: string[] = this.groupNames): void {
-    sparkStore.updateGroupNames([this.service.id, vals])
-      .catch(() => { });
+  saveBlock(block: GroupsBlock | null = this.block) {
+    if (this.sparkModule && block) {
+      this.sparkModule.saveBlock(block);
+    }
+  }
+
+  toggle(idx: number): void {
+    this.active = this.active.includes(idx)
+      ? this.active.filter(v => v !== idx)
+      : [...this.active, idx];
   }
 }
 </script>
@@ -42,33 +51,28 @@ export default class SparkGroupMenu extends DialogBase {
   <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar :title="service.id" subtitle="Group menu" />
+        <DialogToolbar :title="serviceId" subtitle="Group menu" />
       </template>
 
       <div class="widget-body column">
-        <GroupsField
-          :value="groups.data.active"
-          :service-id="service.id"
-          title="Active groups"
-          label="Active groups"
-          item-aligned
-          @input="v => { groups.data.active = v; saveBlock(groups); }"
-        />
+        <CardWarning>
+          <template #message>
+            Spark groups are deprecated, and this functionality will be removed in a later update.
+          </template>
+        </CardWarning>
 
-        <div class="row q-mt-sm">
-          <div
-            v-for="(name, idx) in groupNames"
-            :key="idx"
-            class="col-4 q-pa-xs"
-          >
-            <InputField
-              :value="name"
-              :label="`Group ${idx + 1} name`"
-              title="Group name"
-              @input="v => { groupNames[idx] = v; saveGroupNames(); }"
+        <LabeledField label="Active groups">
+          <q-btn-group outline>
+            <q-btn
+              v-for="v in 7"
+              :key="`group-${v}`"
+              :label="`${v}`"
+              :color="active.includes(v-1) ? 'primary' : ''"
+              outline
+              @click="toggle(v-1)"
             />
-          </div>
-        </div>
+          </q-btn-group>
+        </LabeledField>
       </div>
     </ActionCardWrapper>
   </q-dialog>

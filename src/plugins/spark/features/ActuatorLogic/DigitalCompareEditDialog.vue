@@ -5,7 +5,7 @@ import DialogBase from '@/components/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
 
 import { digitalOpTitles } from './getters';
-import { DigitalCompare } from './types';
+import type { DigitalCompare } from './types';
 
 
 @Component
@@ -38,7 +38,7 @@ export default class DigitalCompareEditDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.ctrl.enter="save"
+    @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <LinkField
@@ -56,6 +56,7 @@ export default class DigitalCompareEditDialog extends DialogBase {
           emit-value
           label="Operator"
           class="min-width-md col-auto"
+          @keyup.enter.exact.stop
         />
         <DigitalStateButton
           v-model="local.rhs"

@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { featureStore } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { Service, serviceStore } from '@/store/services';
 
 
 @Component
@@ -12,14 +12,13 @@ export default class ServicePage extends Vue {
     return this.$route.params.id;
   }
 
-  get serviceExists(): boolean {
-    return serviceStore.serviceExists(this.serviceId);
+  get service(): Service | null {
+    return serviceStore.serviceById(this.serviceId);
   }
 
   get pageComponent(): string | null {
-    const service = serviceStore.serviceById(this.serviceId);
-    return service
-      ? featureStore.services[service.type]?.page ?? null
+    return this.service !== null
+      ? featureStore.serviceById(this.service.type)?.page ?? null
       : null;
   }
 }
@@ -28,11 +27,11 @@ export default class ServicePage extends Vue {
 <template>
   <component
     :is="pageComponent"
-    v-if="serviceExists && pageComponent"
+    v-if="pageComponent !== null"
     :service-id="serviceId"
   />
   <q-page v-else class="text-h5 darkened">
-    <div v-if="serviceExists" class="absolute-center">
+    <div v-if="service !== null" class="absolute-center">
       Invalid service page for '{{ serviceId }}'
     </div>
     <div v-else class="absolute-center">

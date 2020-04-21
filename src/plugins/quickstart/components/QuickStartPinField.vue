@@ -12,6 +12,7 @@ export default class QuickStartPinField extends Vue {
   readonly validTypes = [
     blockTypes.Spark2Pins,
     blockTypes.Spark3Pins,
+    blockTypes.MockPins,
     blockTypes.DS2413,
   ];
 
@@ -30,7 +31,7 @@ export default class QuickStartPinField extends Vue {
   }
 
   get opts(): SelectOption[] {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .reduce(
         (acc, block) => {
           if (isCompatible(block.type, this.validTypes)) {
@@ -52,12 +53,12 @@ export default class QuickStartPinField extends Vue {
       return '';
     }
     const block = sparkStore.blockById(this.serviceId, this.local.arrayId);
-    if ([blockTypes.Spark2Pins, blockTypes.Spark3Pins].includes(block.type)) {
-      return '';
+    if (!block) {
+      return `Block '${this.local.arrayId}' not found`;
     }
-    return block.data.connected
-      ? `${this.local.arrayId} is connected`
-      : `${this.local.arrayId} is not connected`;
+    return (block.data.connected === false)
+      ? `${this.local.arrayId} is not connected`
+      : `${this.local.arrayId} is connected`;
   }
 }
 </script>

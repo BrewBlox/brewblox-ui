@@ -18,7 +18,7 @@ export default class StoreWidgetDialog extends DialogBase {
   public readonly getProps!: () => any;
 
   get widget(): Widget {
-    return dashboardStore.widgetById(this.widgetId);
+    return dashboardStore.widgetById(this.widgetId)!;
   }
 
   get crud(): Crud {
@@ -49,7 +49,13 @@ export default class StoreWidgetDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss class="row" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    :maximized="$dense"
+    no-backdrop-dismiss
+    class="row"
+    @hide="onDialogHide"
+  >
     <component
       :is="widgetComponent"
       v-if="!!widget"

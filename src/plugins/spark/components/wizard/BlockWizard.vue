@@ -7,8 +7,8 @@ import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud } from '@/plugins/spark/types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import type { Block, BlockCrud } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -46,6 +46,10 @@ export default class BlockWizard extends Vue {
   @Emit('close')
   public close(): void { }
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   get blockIdRules(): InputRule[] {
     return blockIdRules(this.serviceId);
   }
@@ -59,7 +63,7 @@ export default class BlockWizard extends Vue {
   }
 
   get wizardOptions(): SelectOption[] {
-    return featureStore.widgetValues
+    return featureStore.widgets
       .filter(feat => feat.wizard === 'BlockWidgetWizard')
       .filter(feat => this.filter(feat.id))
       .map(feat => ({ label: feat.title, value: feat.id }))
@@ -94,6 +98,19 @@ export default class BlockWizard extends Vue {
     }
   }
 
+  async discover(): Promise<void> {
+    await this.sparkModule.clearDiscoveredBlocks();
+    await this.sparkModule.fetchDiscoveredBlocks();
+    await this.$nextTick();
+
+    const discovered = this.sparkModule.discoveredBlocks;
+    const message = discovered.length > 0
+      ? `Discovered ${discovered.join(', ')}.`
+      : 'Discovered no new blocks.';
+
+    notify.info({ message, icon: 'mdi-magnify-plus-outline' });
+  }
+
   ensureLocalBlock(): void {
     const featureId = this.selected!.value;
     this.widget = this.widget || {
@@ -113,7 +130,7 @@ export default class BlockWizard extends Vue {
       serviceId: this.serviceId,
       type: featureId,
       groups: [0],
-      data: sparkStore.specs[featureId].generate(),
+      data: sparkStore.spec({ type: featureId }).generate(),
     };
   }
 
@@ -148,10 +165,11 @@ export default class BlockWizard extends Vue {
       return;
     }
     this.ensureLocalBlock();
+    const block = this.block!;
     try {
-      await sparkStore.createBlock(this.block!);
-      notify.done(`Created ${featureStore.widgetTitle(this.block!.type)} block '${this.blockId}'`);
-      this.onCreate(sparkStore.blockById(this.serviceId, this.blockId));
+      await this.sparkModule.createBlock(block);
+      notify.done(`Created ${featureStore.widgetTitle(block.type)} block '${this.blockId}'`);
+      this.onCreate(this.sparkModule.blockById(this.blockId)!);
     }
     catch (e) {
       notify.error(`Failed to create block: ${e.toString()}`);
@@ -217,6 +235,8 @@ export default class BlockWizard extends Vue {
           </q-icon>
         </template>
       </q-input>
+      <q-btn flat label="Discover blocks" @click="discover" />
+      <q-space />
       <q-btn :disable="!createReady" flat label="Configure" @click="configureBlock" />
       <q-btn
         :disable="!createReady"

@@ -45,7 +45,7 @@ export default class LinkDialog extends DialogBase {
   }
 
   get linkOpts(): Link[] {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => this.typeFilter(block.type))
       .map(block => new Link(block.id, block.type))
       .sort(objectStringSorter('id'));
@@ -53,7 +53,7 @@ export default class LinkDialog extends DialogBase {
 
   get block(): Block | null {
     return this.local
-      ? sparkStore.tryBlockById(this.serviceId, this.local.id)
+      ? sparkStore.blockById(this.serviceId, this.local.id)
       : null;
   }
 
@@ -101,7 +101,7 @@ export default class LinkDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.ctrl.enter="save"
+    @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
@@ -114,6 +114,7 @@ export default class LinkDialog extends DialogBase {
         autofocus
         item-aligned
         @input="update"
+        @keyup.enter.exact.stop
       >
         <q-tooltip v-if="tooltip">
           {{ tooltip }}

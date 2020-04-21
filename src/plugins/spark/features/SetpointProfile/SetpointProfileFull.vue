@@ -7,7 +7,6 @@ import notify from '@/helpers/notify';
 import { Temp, Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { sparkStore } from '@/plugins/spark/store';
 
 import { profileGraphProps } from './helpers';
 import { Setpoint, SetpointProfileBlock } from './types';
@@ -25,7 +24,7 @@ export default class SetpointProfileFull
   durationMs = durationMs;
 
   get tempUnit(): string {
-    return sparkStore.units(this.block.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   get start(): number {

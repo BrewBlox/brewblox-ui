@@ -35,7 +35,7 @@ export default class PwmValues extends Vue {
 
   get block(): ActuatorPwmBlock | null {
     const { serviceId, id } = this.address;
-    return sparkStore.tryBlockById(serviceId, id);
+    return sparkStore.blockById(serviceId, id);
   }
 
   get isBroken(): boolean {

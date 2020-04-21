@@ -23,7 +23,7 @@ import { Block, DigitalState } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { DisplayBlock } from '../types';
 import { FermentConfig, FermentOpts } from './types';
 
@@ -58,10 +58,10 @@ export const defineChangedBlocks = (config: FermentConfig): Block[] => {
 
 export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): Block[] => {
   const groups = [0];
-  const serviceId = config.serviceId;
+  const { serviceId, names } = config;
   const { fridgeSetting, beerSetting, activeSetpoint } = opts;
   const isBeer = activeSetpoint === 'beer';
-  const activeSetpointId = isBeer ? config.names.beerSetpoint : config.names.fridgeSetpoint;
+  const activeSetpointId = isBeer ? names.beerSetpoint : names.fridgeSetpoint;
   const initialSetting = isBeer ? beerSetting : fridgeSetting;
 
   const coolPidConfig: Partial<PidData> = isBeer
@@ -75,12 +75,12 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
   return [
     // setpoint sensor pair
     {
-      id: config.names.fridgeSetpoint,
+      id: names.fridgeSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
-        sensorId: new Link(config.names.fridgeSensor),
+        sensorId: new Link(names.fridgeSensor),
         storedSetting: fridgeSetting,
         settingEnabled: activeSetpoint === 'fridge',
         setting: new Unit(null, 'degC'),
@@ -92,12 +92,12 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       },
     },
     {
-      id: config.names.beerSetpoint,
+      id: names.beerSetpoint,
       type: blockTypes.SetpointSensorPair,
       serviceId,
       groups,
       data: {
-        sensorId: new Link(config.names.beerSensor),
+        sensorId: new Link(names.beerSensor),
         storedSetting: beerSetting,
         settingEnabled: activeSetpoint === 'beer',
         setting: new Unit(null, 'degC'),
@@ -110,7 +110,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
     },
     // Mutex
     {
-      id: config.names.mutex,
+      id: names.mutex,
       type: blockTypes.Mutex,
       serviceId,
       groups,
@@ -121,7 +121,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
     },
     // Digital Actuator
     {
-      id: config.names.coolAct,
+      id: names.coolAct,
       type: blockTypes.DigitalActuator,
       serviceId,
       groups,
@@ -138,12 +138,12 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
               remaining: new Time(),
             },
             {
-              minOn: new Time(3, 'min'),
+              minOn: new Time(2, 'min'),
               remaining: new Time(),
             },
             {
               mutexed: {
-                mutexId: new Link(config.names.mutex, blockTypes.Mutex),
+                mutexId: new Link(names.mutex, blockTypes.Mutex),
                 extraHoldTime: new Time(45, 'min'),
                 hasCustomHoldTime: true,
                 hasLock: false,
@@ -155,7 +155,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       },
     },
     {
-      id: config.names.heatAct,
+      id: names.heatAct,
       type: blockTypes.DigitalActuator,
       serviceId,
       groups,
@@ -169,7 +169,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           constraints: [
             {
               mutexed: {
-                mutexId: new Link(config.names.mutex, blockTypes.Mutex),
+                mutexId: new Link(names.mutex, blockTypes.Mutex),
                 extraHoldTime: new Time(20, 'min'),
                 hasCustomHoldTime: true,
                 hasLock: false,
@@ -182,14 +182,14 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
     },
     // PWM
     {
-      id: config.names.coolPwm,
+      id: names.coolPwm,
       type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
         enabled: true,
         period: new Time(30, 'min'),
-        actuatorId: new Link(config.names.coolAct),
+        actuatorId: new Link(names.coolAct),
         drivenActuatorId: new Link(null),
         setting: 0,
         desiredSetting: 0,
@@ -198,14 +198,14 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       },
     },
     {
-      id: config.names.heatPwm,
+      id: names.heatPwm,
       type: blockTypes.ActuatorPwm,
       serviceId,
       groups,
       data: {
         enabled: true,
         period: new Time(10, 's'),
-        actuatorId: new Link(config.names.heatAct),
+        actuatorId: new Link(names.heatAct),
         drivenActuatorId: new Link(null),
         setting: 0,
         desiredSetting: 0,
@@ -215,7 +215,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
     },
     // Setpoint Profile
     {
-      id: config.names.tempProfile,
+      id: names.tempProfile,
       type: blockTypes.SetpointProfile,
       serviceId,
       groups,
@@ -233,29 +233,29 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
     },
     // PID
     {
-      id: config.names.coolPid,
+      id: names.coolPid,
       type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...pidDefaults(),
         ...coolPidConfig,
         enabled: true,
         inputId: new Link(activeSetpointId),
-        outputId: new Link(config.names.coolPwm),
+        outputId: new Link(names.coolPwm),
       },
     },
     {
-      id: config.names.heatPid,
+      id: names.heatPid,
       type: blockTypes.Pid,
       serviceId,
       groups,
       data: {
-        ...(sparkStore.specs[blockTypes.Pid].generate() as PidData),
+        ...pidDefaults(),
         ...heatPidConfig,
         enabled: true,
         inputId: new Link(activeSetpointId),
-        outputId: new Link(config.names.heatPwm),
+        outputId: new Link(names.heatPwm),
       },
     },
   ] as [
@@ -285,8 +285,8 @@ export const defineWidgets = (
     order: 0,
   };
 
-  const userTemp = sparkStore.units(config.serviceId).Temp;
-  const serviceId = config.serviceId;
+  const { serviceId, names, prefix } = config;
+  const { Temp } = sparkStore.moduleById(serviceId)!.units;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
@@ -302,7 +302,7 @@ export const defineWidgets = (
   });
 
   const createBuilder = (): Widget<BuilderConfig> => ({
-    ...createWidget(withPrefix(config.prefix, 'Process'), 'Builder'),
+    ...createWidget(withPrefix(prefix, 'Process'), 'Builder'),
     cols: 4,
     rows: 5,
     pinnedPosition: { x: 1, y: 1 },
@@ -313,7 +313,7 @@ export const defineWidgets = (
   });
 
   const createGraph = (): Widget<GraphConfig> => ({
-    ...createWidget(withPrefix(config.prefix, 'Graph'), 'Graph'),
+    ...createWidget(withPrefix(prefix, 'Graph'), 'Graph'),
     cols: 6,
     rows: 5,
     pinnedPosition: { x: 5, y: 1 },
@@ -322,46 +322,47 @@ export const defineWidgets = (
       params: { duration: '10m' },
       targets: [
         {
-          measurement: config.serviceId,
+          measurement: serviceId,
           fields: [
-            `${config.names.fridgeSensor}/value[${userTemp}]`,
-            `${config.names.beerSensor}/value[${userTemp}]`,
-            `${config.names.fridgeSetpoint}/setting[${userTemp}]`,
-            `${config.names.beerSetpoint}/setting[${userTemp}]`,
-            `${config.names.coolPwm}/value`,
-            `${config.names.heatPwm}/value`,
-            `${config.names.coolAct}/state`,
-            `${config.names.heatAct}/state`,
+            `${names.fridgeSensor}/value[${Temp}]`,
+            `${names.beerSensor}/value[${Temp}]`,
+            `${names.fridgeSetpoint}/setting[${Temp}]`,
+            `${names.beerSetpoint}/setting[${Temp}]`,
+            `${names.coolPwm}/value`,
+            `${names.heatPwm}/value`,
+            `${names.coolAct}/state`,
+            `${names.heatAct}/state`,
           ],
         },
       ],
       renames: {
-        [`${config.serviceId}/${config.names.fridgeSensor}/value[${userTemp}]`]: 'Fridge temperature',
-        [`${config.serviceId}/${config.names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
-        [`${config.serviceId}/${config.names.fridgeSetpoint}/setting[${userTemp}]`]: 'Fridge setting',
-        [`${config.serviceId}/${config.names.beerSetpoint}/setting[${userTemp}]`]: 'Beer setting',
-        [`${config.serviceId}/${config.names.coolPwm}/value`]: 'Cool PWM value',
-        [`${config.serviceId}/${config.names.heatPwm}/value`]: 'Heat PWM value',
-        [`${config.serviceId}/${config.names.coolAct}/state`]: 'Cool Pin state',
-        [`${config.serviceId}/${config.names.heatAct}/state`]: 'Heat Pin state',
+        [`${serviceId}/${names.fridgeSensor}/value[${Temp}]`]: 'Fridge temperature',
+        [`${serviceId}/${names.beerSensor}/value[${Temp}]`]: 'Beer temperature',
+        [`${serviceId}/${names.fridgeSetpoint}/setting[${Temp}]`]: 'Fridge setting',
+        [`${serviceId}/${names.beerSetpoint}/setting[${Temp}]`]: 'Beer setting',
+        [`${serviceId}/${names.coolPwm}/value`]: 'Cool PWM value',
+        [`${serviceId}/${names.heatPwm}/value`]: 'Heat PWM value',
+        [`${serviceId}/${names.coolAct}/state`]: 'Cool Pin state',
+        [`${serviceId}/${names.heatAct}/state`]: 'Heat Pin state',
       },
       axes: {
-        [`${config.serviceId}/${config.names.coolPwm}/value`]: 'y2',
-        [`${config.serviceId}/${config.names.heatPwm}/value`]: 'y2',
-        [`${config.serviceId}/${config.names.heatAct}/state`]: 'y2',
-        [`${config.serviceId}/${config.names.coolAct}/state`]: 'y2',
+        [`${serviceId}/${names.coolPwm}/value`]: 'y2',
+        [`${serviceId}/${names.heatPwm}/value`]: 'y2',
+        [`${serviceId}/${names.heatAct}/state`]: 'y2',
+        [`${serviceId}/${names.coolAct}/state`]: 'y2',
       },
       colors: {},
     },
   });
 
   const createQuickActions = (): Widget<QuickActionsConfig> => ({
-    ...createWidget(withPrefix(config.prefix, 'Actions'), 'QuickActions'),
+    ...createWidget(withPrefix(prefix, 'Actions'), 'QuickActions'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
     config: {
       changeIdMigrated: true,
+      serviceIdMigrated: true,
       serviceId,
       steps: serialize([
         {
@@ -370,12 +371,14 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
-              blockId: config.names.beerSetpoint,
+              serviceId,
+              blockId: names.beerSetpoint,
               data: { settingEnabled: true },
             },
             {
               id: uid(),
-              blockId: config.names.fridgeSetpoint,
+              serviceId,
+              blockId: names.fridgeSetpoint,
               data: { settingEnabled: true },
             },
           ] as [
@@ -389,17 +392,20 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
-              blockId: config.names.tempProfile,
+              serviceId,
+              blockId: names.tempProfile,
               data: { enabled: false },
             },
             {
               id: uid(),
-              blockId: config.names.beerSetpoint,
+              serviceId,
+              blockId: names.beerSetpoint,
               data: { settingEnabled: false },
             },
             {
               id: uid(),
-              blockId: config.names.fridgeSetpoint,
+              serviceId,
+              blockId: names.fridgeSetpoint,
               data: { settingEnabled: false },
             },
           ] as [
@@ -414,7 +420,8 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
-              blockId: config.names.fridgeSetpoint,
+              serviceId,
+              blockId: names.fridgeSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: opts.fridgeSetting,
@@ -423,32 +430,36 @@ export const defineWidgets = (
             },
             {
               id: uid(),
-              blockId: config.names.beerSetpoint,
+              serviceId,
+              blockId: names.beerSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.coolPid,
+              serviceId,
+              blockId: names.coolPid,
               data: {
-                inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
+                inputId: new Link(names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeCoolConfig,
               },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.heatPid,
+              serviceId,
+              blockId: names.heatPid,
               data: {
-                inputId: new Link(config.names.fridgeSetpoint, interfaceTypes.ProcessValue),
+                inputId: new Link(names.fridgeSetpoint, interfaceTypes.ProcessValue),
                 ...fridgeHeatConfig,
               },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.tempProfile,
-              data: { targetId: new Link(config.names.fridgeSetpoint) },
+              serviceId,
+              blockId: names.tempProfile,
+              data: { targetId: new Link(names.fridgeSetpoint) },
               confirmed: {},
             },
           ] as [
@@ -465,13 +476,13 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
-              blockId: config.names.fridgeSetpoint,
+              blockId: names.fridgeSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.beerSetpoint,
+              blockId: names.beerSetpoint,
               data: {
                 settingEnabled: true,
                 storedSetting: opts.beerSetting,
@@ -480,26 +491,26 @@ export const defineWidgets = (
             },
             {
               id: uid(),
-              blockId: config.names.coolPid,
+              blockId: names.coolPid,
               data: {
-                inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
+                inputId: new Link(names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerCoolConfig,
               },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.heatPid,
+              blockId: names.heatPid,
               data: {
-                inputId: new Link(config.names.beerSetpoint, interfaceTypes.ProcessValue),
+                inputId: new Link(names.beerSetpoint, interfaceTypes.ProcessValue),
                 ...beerHeatConfig,
               },
               confirmed: {},
             },
             {
               id: uid(),
-              blockId: config.names.tempProfile,
-              data: { targetId: new Link(config.names.beerSetpoint) },
+              blockId: names.tempProfile,
+              data: { targetId: new Link(names.beerSetpoint) },
               confirmed: {},
             },
           ] as [
@@ -516,7 +527,7 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
-              blockId: config.names.tempProfile,
+              blockId: names.tempProfile,
               data: { enabled: true, start: 0 },
               confirmed: { start: true },
             },
@@ -530,7 +541,7 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
-              blockId: config.names.tempProfile,
+              blockId: names.tempProfile,
               data: { enabled: false },
             },
           ] as [
@@ -548,7 +559,7 @@ export const defineWidgets = (
     pinnedPosition: { x: 5, y: 6 },
   });
 
-  return [createBuilder(), createGraph(), createQuickActions(), createProfile(config.names.tempProfile)];
+  return [createBuilder(), createGraph(), createQuickActions(), createProfile(names.tempProfile)];
 };
 
 export const defineDisplayedBlocks = (config: FermentConfig): DisplayBlock[] => {

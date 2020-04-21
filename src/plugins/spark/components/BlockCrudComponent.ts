@@ -9,17 +9,17 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
-import { BlockConfig, BlockCrud } from '@/plugins/spark/types';
+import type { GraphConfig } from '@/plugins/history/types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import type { Block, BlockConfig, BlockCrud } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
 import { blockIdRules, canDisplay, tryDisplayBlock } from '../helpers';
-import { Block } from '../types';
 
 
 @Component
-export default class BlockCrudComponent<BlockT extends Block = Block> extends CrudComponent<BlockConfig> {
+export default class BlockCrudComponent<BlockT extends Block = Block>
+  extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
   public readonly crud!: BlockCrud<BlockT>;
@@ -40,8 +40,13 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
     return this.block.serviceId;
   }
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   public get isDriven(): boolean {
-    return sparkStore.drivenBlocks(this.serviceId)
+    return this.sparkModule
+      .drivenBlocks
       .includes(this.blockId);
   }
 
@@ -50,16 +55,18 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   }
 
   public get constrainers(): string | null {
-    const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
-    return limiting ? limiting.join(', ') : null;
+    return this.sparkModule
+      .limiters[this.blockId]
+      ?.join(', ')
+      || null;
   }
 
   public get hasGraph(): boolean {
-    return sparkStore.specs[this.block.type]?.graphTargets !== undefined;
+    return sparkStore.spec(this.block)?.graphTargets !== undefined;
   }
 
   public get renamedTargets(): Mapped<string> {
-    const targets = sparkStore.specs[this.block.type]?.graphTargets;
+    const targets = sparkStore.spec(this.block)?.graphTargets;
     return targets !== undefined
       ? postfixedDisplayNames(targets, this.block.data)
       : {};
@@ -71,11 +78,11 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
 
     return {
       // persisted in config
-      params: this.widget.config.queryParams || { duration: '1h' },
-      axes: this.widget.config.graphAxes || {},
-      // constants
+      params: this.widget.config.queryParams ?? { duration: '1h' },
+      axes: this.widget.config.graphAxes ?? {},
       layout: {
-        title: this.widget.title,
+        ...(this.widget.config.graphLayout ?? {}),
+        title: this.widget.title, // always overrides
       },
       targets: [
         {
@@ -89,11 +96,10 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
   }
 
   public set graphCfg(config: GraphConfig) {
-    this.saveConfig({
-      ...this.widget.config,
-      queryParams: { ...config.params },
-      graphAxes: { ...config.axes },
-    });
+    this.$set(this.widget.config, 'queryParams', { ...config.params });
+    this.$set(this.widget.config, 'graphAxes', { ...config.axes });
+    this.$set(this.widget.config, 'graphLayout', { ...config.layout });
+    this.saveConfig();
   }
 
   public async saveBlock(block: BlockT = this.block): Promise<void> {
@@ -115,14 +121,14 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
 
   public async refreshBlock(): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.fetchBlock(this.block)
+      await this.sparkModule.fetchBlock(this.block)
         .catch(() => { });
     }
   }
 
   public async changeBlockId(newId: string): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.renameBlock([this.serviceId, this.blockId, newId])
+      await this.sparkModule.renameBlock([this.blockId, newId])
         .catch(() => { });
     } else {
       await this.saveBlock({ ...this.block, id: newId });
@@ -147,7 +153,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
       options: {
         type: 'radio',
         model: '',
-        items: dashboardStore.dashboardValues
+        items: dashboardStore.dashboards
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
@@ -157,7 +163,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block> extends Cr
           return;
         }
         dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`);
+        notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
 

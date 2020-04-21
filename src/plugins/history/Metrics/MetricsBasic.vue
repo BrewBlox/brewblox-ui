@@ -68,8 +68,8 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
 
   get sources(): HistorySource[] {
     return this.targets
-      .map(target => historyStore.trySourceById(this.sourceId(target)))
-      .filter(source => source !== null && !!source.values) as HistorySource[];
+      .map(target => historyStore.sourceById(this.sourceId(target)))
+      .filter(source => source && source.values) as HistorySource[];
   }
 
   fieldFreshDuration(field: string): number {

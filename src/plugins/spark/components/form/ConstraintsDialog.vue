@@ -16,7 +16,7 @@ type ConstraintsObj = AnalogConstraintsObj | DigitalConstraintsObj;
     digital: DigitalConstraints,
   },
 })
-export default class InputDialog extends DialogBase {
+export default class ConstraintsDialog extends DialogBase {
   local: ConstraintsObj | null = null;
 
   @Prop({ type: Object, default: () => ({ constraints: [] }) })
@@ -28,18 +28,23 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: String, required: true, validator: v => ['analog', 'digital'].includes(v) })
   public readonly type!: string;
 
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-
   created(): void {
     this.local = deepCopy(this.value);
+  }
+
+  save(): void {
+    this.onDialogOk(this.local);
   }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <component :is="type" v-model="local" :service-id="serviceId" />
       <template #actions>

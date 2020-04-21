@@ -6,7 +6,7 @@ import { featureStore, WatcherFeature } from '@/store/features';
 
 @Component
 export default class Watchers extends Vue {
-  get watchers(): Mapped<WatcherFeature> {
+  get watchers(): WatcherFeature[] {
     return featureStore.watchers;
   }
 }
@@ -16,8 +16,8 @@ export default class Watchers extends Vue {
   <div style="height: 0; width: 0; overflow: hidden">
     <component
       :is="watcher.component"
-      v-for="(watcher, id) in watchers"
-      :key="id"
+      v-for="watcher in watchers"
+      :key="watcher.id"
       v-bind="watcher.props"
     />
   </div>

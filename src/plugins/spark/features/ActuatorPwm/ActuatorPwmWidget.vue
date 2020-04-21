@@ -21,7 +21,15 @@ export default class ActuatorPwmWidget
 <template>
   <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-presets
+        use-range
+        @params="saveGraphParams"
+        @layout="saveGraphLayout"
+      />
     </template>
 
     <template #toolbar>

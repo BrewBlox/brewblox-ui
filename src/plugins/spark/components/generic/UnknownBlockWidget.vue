@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
 interface AbsenceReason {
@@ -15,6 +15,10 @@ export default class UnknownBlockWidget extends WidgetBase {
 
   get serviceId(): string {
     return this.widget.config.serviceId;
+  }
+
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   get blockId(): string {
@@ -32,20 +36,19 @@ export default class UnknownBlockWidget extends WidgetBase {
   }
 
   get reason(): AbsenceReason {
-    if (!sparkStore.lastBlocks(this.serviceId)) {
-      return {
+    return this.sparkModule.lastBlocks
+      ? {
+        message: `Block ${this.blockId} not found on service ${this.serviceId}`,
+        temporary: false,
+      }
+      : {
         message: 'Waiting for service...',
         temporary: true,
       };
-    }
-    return {
-      message: `Block ${this.blockId} not found on service ${this.serviceId}`,
-      temporary: false,
-    };
   }
 
   fetch(): void {
-    sparkStore.fetchAll(this.serviceId);
+    this.sparkModule.fetchAll();
   }
 }
 

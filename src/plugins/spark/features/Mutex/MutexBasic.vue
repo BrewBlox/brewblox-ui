@@ -3,7 +3,6 @@ import { Component } from 'vue-property-decorator';
 
 import { Unit } from '@/helpers/units';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { sparkStore } from '@/plugins/spark/store';
 import { MutexedConstraint } from '@/plugins/spark/types';
 
 import { MutexBlock } from './types';
@@ -20,7 +19,7 @@ export default class MutexBasic
   extends BlockCrudComponent<MutexBlock> {
 
   get mutexClients(): MutexClient[] {
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule.blocks
       // Does the block have -any- digital constraint?
       .filter(block => block.data.constrainedBy?.constraints[0]?.remaining)
       .flatMap(block => {

@@ -6,7 +6,6 @@ import { featureStore } from '@/store/features';
 import Graph from './Graph';
 import Metrics from './Metrics';
 import SessionLog from './SessionLog';
-import SessionView from './SessionView';
 import { historyStore } from './store';
 
 export default {
@@ -16,7 +15,6 @@ export default {
     featureStore.registerWidget(Graph);
     featureStore.registerWidget(Metrics);
     featureStore.registerWidget(SessionLog);
-    featureStore.registerWidget(SessionView);
 
     Vue.$startup.onStart(() => historyStore.start());
   },

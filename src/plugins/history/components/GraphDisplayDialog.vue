@@ -64,7 +64,12 @@ export default class GraphDisplayDialog extends DialogBase {
 
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <div class="column q-gutter-xs">
         <InputField v-model="rename" title="Label" label="Label" />

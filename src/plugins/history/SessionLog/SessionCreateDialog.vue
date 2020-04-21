@@ -67,10 +67,7 @@ export default class SessionCreateDialog extends DialogBase {
   }
 
   get sessions(): LoggedSession[] {
-    return [
-      this.example,
-      ...historyStore.sessionValues,
-    ];
+    return [this.example, ...historyStore.sessions];
   }
 
   get knownTags(): string[] {
@@ -125,7 +122,12 @@ export default class SessionCreateDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard :title="title">
       <q-input
         v-model="sessionTitle"

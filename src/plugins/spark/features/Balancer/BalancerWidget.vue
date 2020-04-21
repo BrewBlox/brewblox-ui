@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
-import { sparkStore } from '../../store';
 import { BalancerBlock } from './types';
 
 @Component
@@ -13,7 +12,8 @@ export default class BalancerWidget
 
   get clientNames(): Mapped<string> {
     const result = {};
-    sparkStore.blockValues(this.serviceId)
+    this.sparkModule
+      .blocks
       .forEach((block) => {
         const constraint = get(block, 'data.constrainedBy.constraints', [])
           .find(constraint => get(constraint, 'balanced.balancerId.id') === this.blockId);

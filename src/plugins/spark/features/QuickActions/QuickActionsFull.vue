@@ -4,10 +4,11 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { spliceById } from '@/helpers/functional';
+import { filterById, spliceById } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
 
 import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, QuickActionsConfig, Step } from './types';
@@ -24,29 +25,17 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   @Prop({ type: String })
   readonly openStep!: string;
 
-  get serviceId(): string {
-    return this.config.serviceId;
+  get defaultServiceId(): string | null {
+    return this.config.serviceId ?? null;
   }
 
   get steps(): Step[] {
     return deserialize(this.config.steps);
   }
 
-  created(): void {
-    // Change IDs were added after initial release
-    // Check if the migration still has to happen, and then assign any undefined IDs
-    if (!this.config.changeIdMigrated) {
-      this.steps.forEach(step => step.changes.forEach(change => change.id = change.id ?? uid()));
-      this.config.changeIdMigrated = true;
-      this.saveSteps();
-    }
-  }
-
   saveSteps(steps: Step[] = this.steps): void {
-    this.saveConfig({
-      ...this.config,
-      steps: serialize(steps),
-    });
+    this.config.steps = serialize(steps);
+    this.saveConfig();
   }
 
   saveStep(step: Step): void {
@@ -105,24 +94,35 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       ok: 'Confirm',
       cancel: 'Cancel',
     })
-      .onOk(() => this.saveSteps(this.steps.filter(s => s.id !== step.id)));
+      .onOk(() => this.saveSteps(filterById(this.steps, step)));
   }
 
   startAddChange(step: Step): void {
     createDialog({
-      component: 'BlockSelectDialog',
+      component: 'BlockAddressDialog',
       title: 'Choose a Block',
-      filter: block => {
-        const spec = sparkStore.specs[block.type];
-        return !!spec
-          && spec.changes.length > 0
-          && step.changes.every(change => change.blockId !== block.id);
+      value: {
+        id: null,
+        serviceId: this.defaultServiceId,
+        type: null,
+      },
+      anyService: true,
+      clearable: false,
+      blockFilter: block => {
+        const spec = sparkStore.spec(block);
+        return !!spec && spec.changes.length > 0;
       },
       parent: this,
-      serviceId: this.serviceId,
     })
-      .onOk(block => {
-        step.changes.push({ id: uid(), blockId: block.id, data: {}, confirmed: {} });
+      .onOk((addr: BlockAddress) => {
+        if (!addr || !addr.id) { return; }
+        step.changes.push({
+          id: uid(),
+          blockId: addr.id,
+          serviceId: addr.serviceId,
+          data: {},
+          confirmed: {},
+        });
         this.saveStep(step);
       });
   }
@@ -143,20 +143,19 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   }
 
   startSwitchBlock(step: Step, change: BlockChange): void {
-    const currentBlock = sparkStore.tryBlockById(this.serviceId, change.blockId);
+    const serviceId = change.serviceId ?? this.defaultServiceId;
+    const currentBlock = sparkStore.blockById(serviceId, change.blockId);
     createDialog({
-      component: 'BlockSelectDialog',
+      component: 'BlockAddressDialog',
       parent: this,
       title: `Switch target block '${change.blockId}'`,
-      serviceId: this.serviceId,
-      filter: block => {
-        return currentBlock === null
-          || block.type === currentBlock.type
-          && step.changes.every(c => c.blockId !== block.id);
-      },
+      value: currentBlock,
+      anyService: true,
+      blockFilter: block => currentBlock === null || block.type === currentBlock.type,
     })
-      .onOk(block => {
-        change.blockId = block.id;
+      .onOk((addr: BlockAddress) => {
+        change.blockId = addr.id;
+        change.serviceId = addr.serviceId;
         this.saveChange(step, change);
       });
   }
@@ -190,7 +189,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
             <QuickActionChange
               v-for="change in step.changes"
               :key="`change--${step.id}--${change.id}`"
-              :service-id="serviceId"
+              :default-service-id="defaultServiceId"
               :value="change"
               class="q-mr-sm q-my-xs"
               @input="saveChange(step, change)"

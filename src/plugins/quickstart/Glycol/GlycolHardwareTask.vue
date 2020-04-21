@@ -42,7 +42,6 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
     return this.glycolControl !== 'No' && hasShared([this.beerSensor, this.glycolSensor]);
   }
 
-
   created(): void {
     this.discover();
 
@@ -56,7 +55,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
   }
 
   discover(): void {
-    sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
+    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
   }
 
   startBlockWizard(): void {

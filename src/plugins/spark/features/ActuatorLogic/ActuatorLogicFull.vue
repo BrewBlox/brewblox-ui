@@ -5,7 +5,6 @@ import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { sparkStore } from '@/plugins/spark/store';
 import { Block, DigitalState } from '@/plugins/spark/types';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
@@ -72,11 +71,11 @@ export default class ActuatorLogicFull
   }
 
   get tempUnit(): string {
-    return sparkStore.units(this.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   get validBlocks(): Block[] {
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule.blocks
       .filter(block => isCompatible(block.type, validTypes));
   }
 
@@ -106,7 +105,7 @@ export default class ActuatorLogicFull
         key: analogKey(idx),
         pretty: prettyAnalog(
           cmp,
-          sparkStore.tryBlockById(this.serviceId, cmp.id.id)?.type ?? null,
+          this.sparkModule.blockById(cmp.id.id)?.type ?? null,
           this.tempUnit,
         ),
       }));

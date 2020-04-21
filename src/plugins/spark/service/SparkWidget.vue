@@ -4,13 +4,16 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { shortDateString } from '@/helpers/functional';
 import { startChangeServiceTitle } from '@/helpers/services';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import {
+  Block,
+  blockTypes,
+  SysInfoBlock,
+  TicksBlock,
+  WiFiSettingsBlock,
+} from '@/plugins/spark/block-types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { WidgetContext } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
-
-import { blockTypes, SysInfoBlock, TicksBlock, WiFiSettingsBlock } from '../block-types';
-import { isReady } from './getters';
 
 @Component
 export default class SparkWidget extends Vue {
@@ -25,16 +28,30 @@ export default class SparkWidget extends Vue {
     return this.context.container === 'Dialog';
   }
 
-  get service(): Service {
-    return serviceStore.serviceById(this.serviceId);
+  get service(): Service | null {
+    return serviceStore.serviceById(this.serviceId)!;
+  }
+
+  get sparkModule(): SparkServiceModule | null {
+    return sparkStore.moduleById(this.serviceId);
+  }
+
+  get ready(): boolean {
+    return this.service !== null
+      && this.sparkModule !== null
+      && this.sparkModule.lastBlocks !== null;
   }
 
   get lastBlocks(): string {
-    return shortDateString(sparkStore.lastBlocks(this.serviceId), 'Unknown');
+    return shortDateString(this.sparkModule?.lastBlocks, 'Unknown');
+  }
+
+  get title(): string {
+    return this.service?.title ?? 'Unknown';
   }
 
   sysBlock<T extends Block>(blockType: string): T {
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule!.blocks
       .find(block => block.type === blockType) as T;
   }
 
@@ -50,20 +67,18 @@ export default class SparkWidget extends Vue {
     return this.sysBlock(blockTypes.WiFiSettings);
   }
 
-  get ready(): boolean {
-    return isReady(this.serviceId);
-  }
-
   get sysDate(): string {
     return new Date(this.ticks.data.secondsSinceEpoch * 1000).toLocaleString();
   }
 
   fetchAll(): void {
-    sparkStore.fetchAll(this.serviceId);
+    this.sparkModule?.fetchAll();
   }
 
   changeTitle(): void {
-    startChangeServiceTitle(this.service);
+    if (this.service) {
+      startChangeServiceTitle(this.service);
+    }
   }
 }
 </script>
@@ -73,7 +88,7 @@ export default class SparkWidget extends Vue {
     <template #toolbar>
       <DialogToolbar
         v-if="inDialog"
-        :title="service.title"
+        :title="title"
         subtitle="Device info"
         @title-click="changeTitle"
       >
@@ -83,7 +98,7 @@ export default class SparkWidget extends Vue {
       </DialogToolbar>
       <Toolbar
         v-else
-        :title="service.title"
+        :title="title"
         subtitle="Device info"
         @title-click="changeTitle"
       >

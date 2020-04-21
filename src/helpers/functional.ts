@@ -66,7 +66,8 @@ export const spaceCased =
   (input: string): string =>
     input.replace(/[_-]/, ' ')
       .replace(/([^^])([A-Z][^A-Z])/g, (_, v1, v2) => `${v1} ${v2.toLowerCase()}`)
-      .replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2}`);
+      .replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2}`)
+      .replace(/\s+/g, ' ');
 
 export const snakeCased =
   (input: string): string =>
@@ -86,7 +87,7 @@ export const camelCased =
 
 export const sentenceCased =
   (input: string): string => {
-    const spaced = spaceCased(input).trimLeft();
+    const spaced = spaceCased(input).trim();
     return spaced.substr(0, 1).toUpperCase() + spaced.substr(1, spaced.length);
   };
 
@@ -111,7 +112,7 @@ export const dateString =
   };
 
 export const shortDateString =
-  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
+  (value: number | string | Date | null | undefined, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -243,8 +244,22 @@ export const mapEntries =
   (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
     fromEntries(Object.entries(obj).map(callback));
 
-export function spliceById<T extends HasId>
-  (arr: T[], obj: T, insert = true): T[] {
+// Overloads for spliceById
+// if insert is false, the stub { id } is sufficient to remove the existing object
+export function spliceById<T extends HasId>(arr: T[], obj: T): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: T, insert: true): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: HasId, insert: false): T[];
+
+/**
+ * Modifies input array by either replacing or removing a member.
+ * Returns the modified array.
+ * If no members match `obj`, `arr` is not modified.
+ *
+ * @param arr object collection
+ * @param obj compared object
+ * @param insert true to replace the object, false to remove
+ */
+export function spliceById<T extends HasId>(arr: T[], obj: T, insert = true): T[] {
   const idx = arr.findIndex(v => v.id === obj.id);
   if (idx !== -1) {
     insert
@@ -254,9 +269,43 @@ export function spliceById<T extends HasId>
   return arr;
 }
 
+/**
+ * Modifies input array by removing the member matching `obj`.
+ * Returns the matched member, or undefined.
+ *
+ * @param arr object collection
+ * @param obj full object or { id } stub to compare against
+ */
 export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
   const idx = arr.findIndex(v => v.id === obj.id);
   return idx !== -1
     ? arr.splice(idx, 1)[0]
     : undefined;
+}
+
+/**
+ * Returns a new array consisting of all members of input array
+ * minus those matching `obj`.
+ * Does not modify input array.
+ *
+ * @param arr object collection
+ * @param obj full object or { id } stub to compare against
+ */
+export function filterById<T extends HasId>(arr: T[], obj: HasId): T[] {
+  return arr.filter(v => v.id !== obj.id);
+}
+
+/**
+ * Returns a new array consisting of all members of input array
+ * minus those matching `obj`, and plus `obj` itself.
+ * Does not modify input array.
+ * If no members match `obj`, `obj` is appended.
+ *
+ * @param arr object collection
+ * @param obj object to be inserted
+ */
+export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
+  const updated = arr.filter(v => v.id !== obj.id);
+  updated.push(obj);
+  return updated;
 }

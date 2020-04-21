@@ -29,7 +29,7 @@ import { SessionLogConfig } from './types';
 export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
 
   get sessions(): LoggedSession[] {
-    return historyStore.sessionValues;
+    return historyStore.sessions;
   }
 
   get session(): LoggedSession | null {
@@ -55,7 +55,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       title: 'New session',
       preselected: this.config.currentSession,
       widgetTags: [
-        `on: ${dashboardStore.dashboardById(this.widget.dashboard).title}`,
+        `on: ${dashboardStore.dashboardTitle(this.widget.dashboard)}`,
       ],
     })
       .onOk((session: LoggedSession) => {

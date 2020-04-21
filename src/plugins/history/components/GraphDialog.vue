@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 
-import { GraphAnnotation, GraphConfig } from '../types';
+import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
 
 @Component
@@ -21,10 +21,10 @@ export default class GraphDialog extends DialogBase {
   public readonly sharedSources!: boolean;
 
   @Prop({ type: Function, required: false })
-  public readonly renderControls!: (h: CreateElement) => VNode;
+  public readonly saveAnnotations!: (a: GraphAnnotation[]) => void;
 
   @Prop({ type: Function, required: false })
-  public readonly saveAnnotations!: (a: GraphAnnotation[]) => void;
+  public readonly saveParams!: (v: QueryParams) => void;
 
   render(h: CreateElement): VNode {
     return h('q-dialog',
@@ -42,16 +42,17 @@ export default class GraphDialog extends DialogBase {
                   graphId: this.graphId,
                   config: this.config,
                   sharedSources: this.sharedSources,
+                  usePresets: this.saveParams !== undefined,
                 },
                 attrs: {
                   annotated: !!this.saveAnnotations,
                 },
                 on: {
                   annotations: this.saveAnnotations ?? (() => { }),
+                  params: this.saveParams ?? (() => { }),
                 },
                 scopedSlots: {
                   controls: () => [
-                    this.renderControls && this.renderControls(h),
                     h('q-btn',
                       {
                         props: { flat: true, stretch: true, icon: 'mdi-close-circle' },

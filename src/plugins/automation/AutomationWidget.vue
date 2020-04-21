@@ -10,7 +10,7 @@ import { AutomationConfig, AutomationTemplate } from './types';
 @Component
 export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   get templates(): AutomationTemplate[] {
-    return automationStore.templateValues;
+    return automationStore.templates;
   }
 
   startEditor(): void {

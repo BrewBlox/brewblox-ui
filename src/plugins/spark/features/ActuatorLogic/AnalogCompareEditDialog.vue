@@ -4,11 +4,11 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { Temp, Unit } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { sparkStore } from '@/plugins/spark/store';
+import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
-import { interfaceTypes, isCompatible } from '../../block-types';
 import { analogOpTitles } from './getters';
-import { AnalogCompare } from './types';
+import type { AnalogCompare } from './types';
 
 
 @Component
@@ -25,8 +25,12 @@ export default class AnalogCompareEditDialog extends DialogBase {
     this.local = deepCopy(this.value);
   }
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   get tempUnit(): string {
-    return sparkStore.units(this.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   get operatorOpts(): SelectOption[] {
@@ -35,7 +39,7 @@ export default class AnalogCompareEditDialog extends DialogBase {
   }
 
   get isTemp(): boolean {
-    const block = sparkStore.tryBlockById(this.serviceId, this.local!.id.id);
+    const block = this.sparkModule.blockById(this.local!.id.id);
     return !!block && isCompatible(block.type, interfaceTypes.SetpointSensorPair);
   }
 
@@ -59,7 +63,12 @@ export default class AnalogCompareEditDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <LinkField
         v-model="local.id"
@@ -75,6 +84,7 @@ export default class AnalogCompareEditDialog extends DialogBase {
           emit-value
           label="Operator"
           class="min-width-md col-auto"
+          @keyup.enter.exact.stop
         />
         <UnitField
           v-if="isTemp"

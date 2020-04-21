@@ -25,7 +25,12 @@ export default class SessionHeaderDialog extends DialogBase {
 
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard :title="title">
       <InputField
         v-model="session.title"
@@ -43,7 +48,10 @@ export default class SessionHeaderDialog extends DialogBase {
         item-aligned
         @input="v => session.date = v.getTime()"
       />
-      <TagSelectField v-model="session.tags" :existing="knownTags" />
+      <TagSelectField
+        v-model="session.tags"
+        :existing="knownTags"
+      />
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />

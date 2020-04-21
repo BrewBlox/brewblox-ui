@@ -5,7 +5,7 @@ import DialogBase from '@/components/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import type { Block } from '@/plugins/spark/types';
 
 @Component
 export default class BlockSelectDialog extends DialogBase {
@@ -27,13 +27,19 @@ export default class BlockSelectDialog extends DialogBase {
   public readonly clearable!: boolean;
 
   get blockOpts(): Block[] {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(this.filter)
       .sort(objectStringSorter('id'));
   }
 
   created(): void {
     this.block = deepCopy(this.value);
+  }
+
+  save(): void {
+    if (this.block || this.clearable) {
+      this.onDialogOk(this.block);
+    }
   }
 }
 </script>
@@ -43,7 +49,7 @@ export default class BlockSelectDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.enter="block && onDialogOk(block)"
+    @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
@@ -55,6 +61,7 @@ export default class BlockSelectDialog extends DialogBase {
         item-aligned
         option-label="id"
         option-value="id"
+        @keyup.enter.exact.stop
       >
         <template #no-option>
           <q-item>
@@ -71,7 +78,7 @@ export default class BlockSelectDialog extends DialogBase {
           color="primary"
           flat
           label="OK"
-          @click="onDialogOk(block)"
+          @click="save"
         />
       </template>
     </DialogCard>
