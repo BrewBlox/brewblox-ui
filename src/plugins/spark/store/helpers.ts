@@ -122,5 +122,10 @@ export const asServiceStatus =
             : status.available
               ? ['Waiting for connection', 'red']
               : ['Unreachable', 'red'];
-    return { id, color, desc };
+    const icon = status.address
+      ? status.address.includes(':')
+        ? 'mdi-access-point-network'
+        : 'mdi-usb'
+      : undefined;
+    return { id, color, desc, icon };
   };
