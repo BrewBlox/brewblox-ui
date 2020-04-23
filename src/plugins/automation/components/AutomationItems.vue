@@ -3,7 +3,7 @@ import Vue, { VueConstructor } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { clamp } from '@/helpers/functional';
+import { clamp, filterById } from '@/helpers/functional';
 
 import { allSpecs } from '../impl/specs';
 import { AutomationItem } from '../types';
@@ -71,7 +71,7 @@ export default class AutomationItems extends Vue {
   }
 
   removeItem(item: AutomationItem): void {
-    this.saveAll(this.locals.filter(v => v.id !== item.id));
+    this.locals = filterById(this.locals, item);
   }
 }
 </script>

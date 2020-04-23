@@ -214,7 +214,6 @@ export interface BlockValueImpl {
 
   /**
    * Compared value.
-   * @nullable
    */
   value: any;
 
