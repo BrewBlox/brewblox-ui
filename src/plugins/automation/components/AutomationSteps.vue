@@ -98,7 +98,7 @@ export default class AutomationSteps extends Vue {
       <div
         v-for="step in locals"
         :key="step.id"
-        :class="['rounded-borders depth-2', step.id === stepId && 'bordered']"
+        :class="['rounded-borders depth-2', step.id === stepId && 'selected-step']"
       >
         <div class="toolbar__Dashboard">
           <Toolbar
@@ -149,3 +149,9 @@ export default class AutomationSteps extends Vue {
     </div>
   </div>
 </template>
+
+<style lang="sass" scoped>
+.selected-step
+  border-left: 2px solid $secondary
+  border-right: 2px solid $secondary
+</style>

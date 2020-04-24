@@ -379,14 +379,14 @@ export interface AutomationTemplate extends StoreObject {
   steps: AutomationStep[];
 }
 
-export type AutomationStepActiveStatus =
+export type AutomationStepActivePhase =
   'Created'             // In progress. Not yet evaluated.
   | 'Preconditions'     // In progress. Checking preconditions.
   | 'Actions'           // In progress. Applying actions.
   | 'Transitions'       // In progress. Checking transitions.
 
-export type AutomationStepStatus =
-  AutomationStepActiveStatus
+export type AutomationStepPhase =
+  AutomationStepActivePhase
   | 'Invalid'           // Configuration missing or invalid.
   | 'Finished'          // End state. Success.
   | 'Cancelled';        // End state. Execution prematurely ended.
@@ -415,13 +415,13 @@ export interface AutomationStepResult {
    * Current status for the relevant step.
    * Will be Invalid if stepId is null.
    */
-  stepStatus: AutomationStepStatus;
+  phase: AutomationStepPhase;
 
   /**
    * Current status for the entire process.
    * The process will only be evaluated if it is Active.
    */
-  processStatus: AutomationStatus;
+  status: AutomationStatus;
 
   /**
    * Optional error message.
@@ -435,7 +435,7 @@ export interface AutomationStepResult {
 export interface AutomationStepJump {
   processId: UUID;
   stepId: UUID;
-  stepStatus?: AutomationStepActiveStatus;
+  phase?: AutomationStepActivePhase;
 }
 
 /**

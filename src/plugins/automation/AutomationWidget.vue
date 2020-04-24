@@ -46,6 +46,13 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     this.$router.push(`/automation/${template.id}`);
   }
 
+  jump(proc: AutomationProcess): void {
+    automationStore.jumpProcess({
+      processId: proc.id,
+      stepId: proc.steps[0].id,
+    });
+  }
+
   removeProcess(proc: AutomationProcess): void {
     automationStore.removeProcess(proc);
   }
@@ -64,14 +71,14 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     if (!step) {
       return 'No associated step';
     }
-    return `Step ${step.title} is in the ${res.stepStatus} phase since ${shortDateString(res.date)}.`;
+    return `Step ${step.title} is in the ${res.phase} phase since ${shortDateString(res.date)}.`;
   }
 
   historyStatus(proc: AutomationProcess, results: AutomationStepResult[]): string {
     const stepTitle = id => proc.steps.find(v => v.id === id)?.title ?? 'Unknown';
     return results
       .reverse()
-      .map(res => `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${res.stepStatus} ${res.error ?? ''}`)
+      .map(res => `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${res.phase} ${res.error ?? ''}`)
       .join('\n');
   }
 }
@@ -100,6 +107,12 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           <div class="col-grow self-center text-bold text-blue-grey-4">
             {{ proc.title }}
           </div>
+          <q-btn
+            flat
+            icon="mdi-fast-forward"
+            class="col-auto"
+            @click="jump(proc)"
+          />
           <q-btn
             flat
             icon="clear"
