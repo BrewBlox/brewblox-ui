@@ -113,6 +113,7 @@ export interface ApiSparkStatus {
   latest: boolean;
   valid: boolean;
   info: string[];
+  address: string | null;
 }
 
 export interface SparkStatus extends ApiSparkStatus {

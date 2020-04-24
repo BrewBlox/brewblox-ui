@@ -72,4 +72,9 @@ export interface ServiceStatus {
    * Human readable text.
    */
   desc: string;
+
+  /**
+   * Optional icon. Must be a valid Quasar icon name.
+   */
+  icon?: string;
 }
