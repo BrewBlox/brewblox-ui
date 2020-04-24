@@ -124,8 +124,8 @@ export const asServiceStatus =
               : ['Unreachable', 'red'];
     const icon = status.address
       ? status.address.includes(':')
-        ? 'mdi-access-point-network'
-        : 'mdi-usb'
+        ? 'mdi-access-point'
+        : 'mdi-usb-port'
       : undefined;
     return { id, color, desc, icon };
   };
