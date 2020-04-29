@@ -6,6 +6,7 @@ import store from '@/store';
 import { AutomationStepJump } from '../shared-types';
 import { AutomationEventData, AutomationProcess, AutomationTask, AutomationTemplate } from '../types';
 import * as processApi from './process-api';
+import * as taskApi from './task-api';
 import templateApi from './template-api';
 
 @Module({ generateMutationSetters: true })
@@ -46,6 +47,11 @@ export class AutomationModule extends VuexModule {
   }
 
   @Mutation
+  public setTask(task: AutomationTask): void {
+    this.tasks = extendById(this.tasks, task);
+  }
+
+  @Mutation
   public setProcess(proc: AutomationProcess): void {
     this.processes = extendById(this.processes, proc);
   }
@@ -65,15 +71,10 @@ export class AutomationModule extends VuexModule {
   }
 
   @Mutation
-  public setActive(ids: [string, string | null] | null): void {
-    if (ids) {
-      this.activeTemplate = ids[0];
-      this.activeStep = ids[1];
-    }
-    else {
-      this.activeTemplate = null;
-      this.activeStep = null;
-    }
+  public setActive(ids: [string | null, string | null] | null): void {
+    const [templateId, stepId] = ids ?? [null, null];
+    this.activeTemplate = templateId;
+    this.activeStep = templateId ? stepId : null;
   }
 
   @Action
@@ -105,6 +106,22 @@ export class AutomationModule extends VuexModule {
   public async removeProcess(proc: AutomationProcess): Promise<void> {
     await processApi.remove(proc);
     this.processes = filterById(this.processes, proc);
+  }
+
+  @Action
+  public async createTask(task: AutomationTask): Promise<void> {
+    this.setTask(await taskApi.create(task));
+  }
+
+  @Action
+  public async saveTask(task: AutomationTask): Promise<void> {
+    this.setTask(await taskApi.persist(task));
+  }
+
+  @Action
+  public async removeTask(task: AutomationTask): Promise<void> {
+    await taskApi.remove(task);
+    this.tasks = filterById(this.tasks, task);
   }
 
   @Action

@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { shortDateString } from '@/helpers/functional';
 
-import { AutomationProcess, AutomationStepResult } from './shared-types';
+import { AutomationProcess, AutomationStatus, AutomationStepResult, AutomationTask } from './shared-types';
 import { automationStore } from './store';
 import { AutomationConfig, AutomationTemplate } from './types';
 
@@ -12,11 +12,22 @@ interface ProcessDisplay {
   proc: AutomationProcess;
   status: string;
   history: string;
+  tasks: AutomationTask[];
   error: string | null;
 }
 
 @Component
 export default class AutomationWidget extends WidgetBase<AutomationConfig> {
+  taskIcons: Record<AutomationTask['status'], string> = {
+    Invalid: 'mdi-clear',
+    Created: '',
+    Active: '',
+    Retrying: '',
+    Paused: '',
+    Finished: '',
+    Cancelled: '',
+  }
+
   get templates(): AutomationTemplate[] {
     return automationStore.templates;
   }
@@ -29,9 +40,14 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           proc,
           status: this.resultStatus(proc, recent[0]),
           history: this.historyStatus(proc, recent),
+          tasks: automationStore.tasks.filter(v => v.processId === proc.id),
           error: null,
         };
       });
+  }
+
+  get tasks(): AutomationTask[] {
+    return automationStore.tasks;
   }
 
   startEditor(): void {
@@ -55,6 +71,14 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
 
   removeProcess(proc: AutomationProcess): void {
     automationStore.removeProcess(proc);
+  }
+
+  changeTaskStatus(task: AutomationTask, status: AutomationStatus): void {
+    automationStore.saveTask({ ...task, status });
+  }
+
+  removeTask(task: AutomationTask): void {
+    automationStore.removeTask(task);
   }
 
   processHistory(proc: AutomationProcess): AutomationStepResult[] {
@@ -99,7 +123,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
         Running processes
       </div>
       <div
-        v-for="{proc, status, history, error} in processes"
+        v-for="{proc, status, history, tasks, error} in processes"
         :key="proc.id"
         class="rounded-borders depth-1 q-pl-sm q-gutter-y-xs column"
       >
@@ -133,6 +157,33 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
         <div v-if="error" class="text-negative q-pr-sm">
           {{ error }}
         </div>
+        <div
+          v-for="task in tasks"
+          :key="task.id"
+          class="row q-mr-sm q-mb-sm"
+        >
+          <div class="col-grow self-center q-pl-sm text-italic">
+            {{ task.title }} ({{ task.ref }}) {{ task.status }}
+          </div>
+          <q-btn
+            v-if="task.status === 'Finished'"
+            flat
+            class="col-auto"
+            icon="mdi-sync"
+            @click="changeTaskStatus(task, 'Active')"
+          >
+            <q-tooltip>Mark task as active</q-tooltip>
+          </q-btn>
+          <q-btn
+            v-else
+            flat
+            class="col-auto"
+            icon="mdi-check"
+            @click="changeTaskStatus(task, 'Finished')"
+          >
+            <q-tooltip>Mark task as finished</q-tooltip>
+          </q-btn>
+        </div>
       </div>
 
       <div class="text-h6 text-secondary">
@@ -161,6 +212,45 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           @click="init(template)"
         >
           <q-tooltip>Start process from template</q-tooltip>
+        </q-btn>
+      </div>
+
+      <div class="text-h6 text-secondary">
+        All tasks
+      </div>
+      <div
+        v-for="task in tasks"
+        :key="task.id"
+        class="rounded-borders depth-1 q-pl-sm row items-center"
+      >
+        <div class="col-grow">
+          {{ task.title }} ({{ task.ref }}) {{ task.status }}
+        </div>
+        <q-btn
+          flat
+          class="col-auto"
+          icon="delete"
+          @click="removeTask(task)"
+        >
+          <q-tooltip>Remove task</q-tooltip>
+        </q-btn>
+        <q-btn
+          v-if="task.status === 'Finished'"
+          flat
+          class="col-auto"
+          icon="mdi-sync"
+          @click="changeTaskStatus(task, 'Active')"
+        >
+          <q-tooltip>Mark task as active</q-tooltip>
+        </q-btn>
+        <q-btn
+          v-else
+          flat
+          class="col-auto"
+          icon="mdi-check"
+          @click="changeTaskStatus(task, 'Finished')"
+        >
+          <q-tooltip>Mark task as finished</q-tooltip>
         </q-btn>
       </div>
     </div>

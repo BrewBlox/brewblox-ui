@@ -10,6 +10,8 @@ import { clear, idCopy, make } from './helpers';
 import { automationStore } from './store';
 import { AutomationStep, AutomationTemplate } from './types';
 
+type Section = 'Steps' | 'Preconditions' | 'Actions' | 'Transitions';
+
 @Component
 export default class AutomationEditor extends DialogBase {
   make = make;
@@ -19,11 +21,7 @@ export default class AutomationEditor extends DialogBase {
   templateId: string | null = null;
 
   dragged: AutomationStep | null = null;
-  section: 'Steps'
-    | 'Preconditions'
-    | 'Actions'
-    | 'Transitions'
-    | 'Processes' = 'Steps';
+  section: Section = 'Steps';
 
   mounted(): void {
     this.selectActive(this.$route.params.id);
@@ -39,13 +37,12 @@ export default class AutomationEditor extends DialogBase {
       ?? automationStore.activeTemplate
       ?? automationStore.templateIds[0]
       ?? null;
+
     if (this.templateId != this.$route.params.id) {
       this.$router.replace(`/automation/${this.templateId ?? ''}`);
     }
-    automationStore.setActive(
-      this.templateId
-        ? [this.templateId, this.templateId === templateId ? stepId : null]
-        : null);
+    const actualStepId = this.templateId === templateId ? stepId : null;
+    automationStore.setActive([this.templateId, actualStepId]);
   }
 
   get drawerOpen(): boolean {
@@ -341,10 +338,6 @@ export default class AutomationEditor extends DialogBase {
                 :template="template"
                 :step="step"
                 @update:step="saveStep"
-              />
-              <AutomationProcesses
-                v-if="section === 'Processes'"
-                :template="template"
               />
             </div>
           </q-scroll-area>

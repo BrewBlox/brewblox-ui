@@ -30,7 +30,7 @@ export const jump = (args: AutomationStepJump): Promise<AutomationProcess> =>
     .then(resp => resp.data)
     .catch(intercept('Failed to jump in process'));
 
-export const remove = ({ id }): Promise<void> =>
-  http.post(`/delete/${id}`)
+export const remove = ({ id, title }): Promise<void> =>
+  http.delete(`/delete/${id}`)
     .then(() => { })
-    .catch(intercept('Failed to remove process'));
+    .catch(intercept(`Failed to remove process '${title}'`));
