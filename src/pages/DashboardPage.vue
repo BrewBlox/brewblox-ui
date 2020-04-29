@@ -70,21 +70,11 @@ export default class DashboardPage extends Vue {
           saveWidget: this.saveWidget,
           closeDialog: () => { },
         };
-        try {
-          const component = featureStore.widgetComponent(crud, true);
-          return {
-            id: widget.id,
-            component,
-            crud,
-          };
-        } catch (e) {
-          return {
-            id: widget.id,
-            component: 'InvalidWidget',
-            crud,
-            error: e.message,
-          };
-        }
+        return {
+          ...featureStore.widgetComponent(crud),
+          id: widget.id,
+          crud,
+        };
       });
   }
 

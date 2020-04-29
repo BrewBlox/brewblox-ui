@@ -4,6 +4,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 import store from '@/store';
 
 import {
+  ComponentResult,
   Crud,
   QuickStartFeature,
   ServiceFeature,
@@ -73,19 +74,17 @@ export class FeatureModule extends VuexModule {
         : null;
   }
 
-  public widgetComponent(crud: Crud, throwInvalid = false): string {
-    try {
-      const feature = this.widgetById(crud.widget.feature);
-      if (!feature) {
-        throw new Error(`No feature found for '${crud.widget.feature}'`);
-      }
-      return isString(feature.component)
-        ? feature.component
-        : feature.component(crud); // can throw
-    } catch (e) {
-      if (throwInvalid) { throw e; }
-      return 'InvalidWidget';
+  public widgetComponent(crud: Crud): ComponentResult {
+    const feature = this.widgetById(crud.widget.feature);
+    if (!feature) {
+      return {
+        component: 'InvalidWidget',
+        error: `No feature found for '${crud.widget.feature}'`,
+      };
     }
+    return isString(feature.component)
+      ? { component: feature.component }
+      : feature.component(crud);
   }
 
   public widgetSize(id: string): GridSize {

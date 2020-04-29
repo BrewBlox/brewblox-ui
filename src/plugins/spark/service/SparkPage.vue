@@ -254,28 +254,18 @@ export default class SparkPage extends Vue {
       saveBlock: this.saveBlock,
       isStoreBlock: true,
     };
-    try {
-      return {
-        id: widget.id,
-        key,
-        crud,
-        title: featureStore.widgetTitle(widget.feature),
-        role: featureStore.widgetRole(widget.feature),
-        component: featureStore.widgetComponent(crud, true),
-        expanded: this.expandedBlocks[widget.id] ?? false,
-      };
-    } catch (e) {
-      return {
-        id: widget.id,
-        key,
-        crud,
-        title: 'Invalid Widget',
-        role: 'Other',
-        component: 'InvalidWidget',
-        expanded: this.expandedBlocks[widget.id] ?? false,
-        error: e.message,
-      };
-    }
+    const { id } = widget;
+    const { component, error } = featureStore.widgetComponent(crud);
+    return {
+      id,
+      key,
+      crud,
+      component,
+      error,
+      title: featureStore.widgetTitle(widget.feature),
+      role: featureStore.widgetRole(widget.feature),
+      expanded: this.expandedBlocks[widget.id] ?? false,
+    };
   }
 
   get validatedItems(): ValidatedWidget[] {
@@ -287,11 +277,13 @@ export default class SparkPage extends Vue {
   }
 
   get filteredItems(): ValidatedWidget[] {
-    const filter = this.blockFilter?.toLowerCase();
+    const filter = RegExp(this.blockFilter, 'i');
     return this.validatedItems
       .filter(val => !filter
-        || val.id.toLowerCase().match(filter)
-        || val.title.toLowerCase().match(filter))
+        || val.id.match(filter)
+        || val.title.match(filter))
+      // Prevent jumps after saving blocks in a loose (eg. type) sort order
+      .sort(this.allSorters.name)
       .sort(this.sorter);
   }
 
@@ -331,6 +323,7 @@ export default class SparkPage extends Vue {
   get nodes(): RelationNode[] {
     return this.validatedItems
       .map(v => ({ id: v.id, type: v.title }))
+      .sort(objectStringSorter('id'))
       .sort(objectStringSorter('type'));
   }
 
@@ -566,7 +559,7 @@ export default class SparkPage extends Vue {
             <!-- Blocks -->
             <q-item
               v-for="val in filteredItems"
-              :key="val.key"
+              :key="`filtered-${val.key}`"
               class="non-selectable text-white widget-index"
             >
               <q-item-section v-if="!$dense" side class="q-px-sm">
@@ -605,7 +598,12 @@ export default class SparkPage extends Vue {
               </q-item-section>
             </q-item>
             <!-- Blocks -->
-            <q-item v-for="val in expandedItems" :ref="`widget-${val.key}`" :key="val.key" class="q-pt-none q-pb-md">
+            <q-item
+              v-for="val in expandedItems"
+              :ref="`widget-${val.key}`"
+              :key="`expanded-${val.key}`"
+              class="q-pt-none q-pb-md"
+            >
               <q-item-section>
                 <component
                   :is="val.component"
