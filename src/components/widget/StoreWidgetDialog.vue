@@ -39,7 +39,7 @@ export default class StoreWidgetDialog extends DialogBase {
   }
 
   get widgetComponent(): string {
-    return featureStore.widgetComponent(this.crud);
+    return featureStore.widgetComponent(this.crud).component;
   }
 
   get widgetProps(): any {

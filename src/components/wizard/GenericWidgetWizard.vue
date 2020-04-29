@@ -48,7 +48,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   }
 
   get widgetComponent(): string {
-    return featureStore.widgetComponent(this.crud);
+    return featureStore.widgetComponent(this.crud).component;
   }
 
   emptyConfig(): any {
