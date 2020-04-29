@@ -64,7 +64,7 @@ export default class AutomationActions extends Vue {
       <template #header>
         <AutomationHeader
           title="Actions"
-          subtitle="Actions are executed when the step starts."
+          subtitle="Change the system."
         >
           <template #actions>
             <ActionItem icon="add" label="New action" @click="startAddAction" />

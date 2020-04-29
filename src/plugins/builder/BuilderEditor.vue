@@ -253,14 +253,16 @@ export default class BuilderEditor extends Vue {
   }
 
   selectLayout(id: string | null): void {
-    if (id !== this.$route.params.id) {
-      this.$router.replace(`/builder/${id ?? ''}`);
-    }
     this.layoutId = id
       ?? this.$route.params.id
       ?? builderStore.lastLayoutId
-      ?? builderStore.layouts[0]?.id
+      ?? builderStore.layoutIds[0]
       ?? null;
+
+    if (this.layoutId != this.$route.params.id) {
+      this.$router.replace(`/builder/${id ?? ''}`);
+    }
+
     builderStore.lastLayoutId = this.layoutId;
   }
 

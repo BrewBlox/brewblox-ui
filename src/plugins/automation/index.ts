@@ -16,7 +16,7 @@ const widget: WidgetFeature = {
   wizard: true,
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 5,
   },
   generateConfig: (): AutomationConfig => ({}),
 };

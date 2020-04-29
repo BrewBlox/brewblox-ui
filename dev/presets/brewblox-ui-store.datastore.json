@@ -1,14 +1,181 @@
 [
   {
-    "_id": "autm-template__ed9f5358-1557-4657-bbea-900e354782da",
+    "_id": "autm-template__ba342aed-d4ab-43aa-8286-1e7fed8f2afe",
+    "title": "ON/OFF",
+    "steps": [
+      {
+        "id": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
+        "title": "ON",
+        "preconditions": [
+          {
+            "id": "061b0d08-0d63-474b-9105-2ce3d86082ce",
+            "title": "Task status",
+            "enabled": true,
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "wait-on",
+              "status": "Finished"
+            }
+          }
+        ],
+        "actions": [
+          {
+            "id": "1336a493-316a-4b5c-9c5b-a7dc9eaeb312",
+            "title": "Block change",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "data": {
+                "desiredState": 1
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "50f30eb0-1269-432d-8e29-4fa93293caf0",
+            "next": true,
+            "enabled": true,
+            "conditions": [
+              {
+                "id": "77eb2f07-e933-407f-b9c2-796377637a69",
+                "title": "Duration",
+                "enabled": true,
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 10000,
+                  "start": "Step"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cd39929f-259e-4b4b-962e-d3b96edd3533",
+        "title": "OFF",
+        "preconditions": [
+          {
+            "id": "1b6bae71-a330-47cb-8ffb-a44e846d8700",
+            "title": "Duration",
+            "enabled": true,
+            "impl": {
+              "type": "TimeElapsed",
+              "duration": 10000,
+              "start": "Step"
+            }
+          },
+          {
+            "id": "774be828-8bba-4072-a510-386ab9463f26",
+            "title": "Block value",
+            "enabled": true,
+            "impl": {
+              "type": "BlockValue",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "key": "desiredState",
+              "operator": "eq",
+              "value": 1
+            }
+          }
+        ],
+        "actions": [
+          {
+            "id": "56eb0910-7b0c-43ea-a809-29599db823d1",
+            "title": "Block change",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "data": {
+                "desiredState": 0
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "2f61eb56-a09c-419a-92dc-eb1348341c80",
+            "next": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
+            "enabled": true,
+            "conditions": [
+              {
+                "id": "484ab57b-888d-4d6f-8648-f31ee873783a",
+                "title": "Duration",
+                "enabled": true,
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 10000,
+                  "start": "Step"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": "autm-template__eaa6154b-a5ec-4cab-a655-31985e2c5a9d",
     "title": "Test Template",
     "steps": [
       {
-        "id": "29108014-f7a6-42eb-a0d8-0c5265c2eb0d",
+        "id": "bdc00a5d-ccfe-4699-8cc2-2cdb73eeb1d1",
         "title": "step-one",
+        "preconditions": [
+          {
+            "id": "8c301a52-e844-44bc-a45c-62ff770cb6df",
+            "enabled": true,
+            "title": "Default block value",
+            "impl": {
+              "type": "BlockValue",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "key": null,
+              "operator": "eq",
+              "value": null
+            }
+          },
+          {
+            "id": "3b36c217-a871-4d93-b6c3-b90e7a159709",
+            "enabled": true,
+            "title": "Wait for abs time",
+            "impl": {
+              "type": "TimeAbsolute",
+              "time": 1572342354937
+            }
+          },
+          {
+            "id": "8c47a07c-f39f-4867-9c3d-3c8087fb054f",
+            "enabled": true,
+            "title": "Wait for rel time",
+            "impl": {
+              "type": "TimeElapsed",
+              "start": "Process",
+              "duration": 12345
+            }
+          },
+          {
+            "id": "2f65584f-7318-46f5-ab9e-e3456074fbf6",
+            "enabled": true,
+            "title": "Wait for task task-one",
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "task-one",
+              "status": "Finished"
+            }
+          }
+        ],
         "actions": [
           {
-            "id": "a76076cf-9a74-4442-a936-4e6c52d8b65b",
+            "id": "2af40a53-cde7-4052-ab29-416278af68e8",
             "title": "generated block patch",
             "enabled": true,
             "impl": {
@@ -20,7 +187,7 @@
             }
           },
           {
-            "id": "c105840c-731c-4ce0-bfa9-71960712fd15",
+            "id": "ecc8c195-cf8c-4d37-8f56-462eedf2e619",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -34,7 +201,7 @@
             }
           },
           {
-            "id": "8c2e2eef-1d9b-42fb-a284-11a7ac3f5ce4",
+            "id": "194e7f6f-8413-4897-adf4-9e839b22b6df",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -48,7 +215,7 @@
             }
           },
           {
-            "id": "e3d7ea07-8128-4935-b833-5f708fd6aaa3",
+            "id": "37d33578-85a1-4176-94d4-6bb2bb078b33",
             "enabled": true,
             "title": "Create task-one",
             "impl": {
@@ -61,12 +228,12 @@
         ],
         "transitions": [
           {
-            "id": "686006b9-dd74-4ea5-90e6-5cf6b48ddb16",
+            "id": "2e8fbb70-eee1-407e-aadb-7252a7d21a33",
             "enabled": true,
-            "next": "dcdbb3c2-4614-4b21-8158-babe39a3f96d",
+            "next": "da527383-13cd-407c-9bfe-29ce76dd736b",
             "conditions": [
               {
-                "id": "a3af5693-2eff-4a38-9d17-fd21590fa35a",
+                "id": "99a03823-c871-488c-a4c8-86e573ccd834",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -80,21 +247,7 @@
                 }
               },
               {
-                "id": "a64d07a7-2db6-4db1-87bb-7761b20b2413",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "27c9bf61-a4de-4aa6-8dff-e4d3e27ec888",
+                "id": "f95a3956-a32b-4658-af0b-c0c51a85da1a",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -103,7 +256,7 @@
                 }
               },
               {
-                "id": "29ca25e9-da6e-4ecd-b54b-4a8f8e85c3ba",
+                "id": "331f0c55-3115-4be6-8503-929bb6160fad",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -113,7 +266,7 @@
                 }
               },
               {
-                "id": "68463bb4-a86b-4a09-8305-b5f4de957ef7",
+                "id": "6f5e02be-0bc1-41be-a5d7-0e480fdc16c0",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -125,12 +278,12 @@
             ]
           },
           {
-            "id": "b7da8f43-f15c-43e3-a81f-e2a7a2134df5",
+            "id": "e3a49b50-ffa6-439a-b246-cdf014c29a9c",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "74bc8db6-91a8-47b0-9f91-cf86eebd19a9",
+                "id": "6e0e1534-6026-41cb-a007-40464818980d",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -144,21 +297,7 @@
                 }
               },
               {
-                "id": "a2584a7c-c413-4355-9123-b9c80f354556",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "4c9da415-3c2e-4417-9700-a5bbe098cf72",
+                "id": "071d085f-84c9-459a-85d8-5ccc3ff10bc9",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -167,7 +306,7 @@
                 }
               },
               {
-                "id": "67735d3b-aadf-41b5-b17c-22dd646b3c51",
+                "id": "e06682c2-fcc2-4c26-83b7-6b7a919d6288",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -177,7 +316,7 @@
                 }
               },
               {
-                "id": "397594ce-9404-4404-bce5-1acced57467f",
+                "id": "4b626068-a10c-447d-bd42-1fcf3f173cd8",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -191,11 +330,56 @@
         ]
       },
       {
-        "id": "dcdbb3c2-4614-4b21-8158-babe39a3f96d",
+        "id": "da527383-13cd-407c-9bfe-29ce76dd736b",
         "title": "step-two",
+        "preconditions": [
+          {
+            "id": "e482857b-fecc-4e2e-96f9-0a01a3944e48",
+            "enabled": true,
+            "title": "Default block value",
+            "impl": {
+              "type": "BlockValue",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "key": null,
+              "operator": "eq",
+              "value": null
+            }
+          },
+          {
+            "id": "8856edd5-2500-4d70-92b1-920776ce1105",
+            "enabled": true,
+            "title": "Wait for abs time",
+            "impl": {
+              "type": "TimeAbsolute",
+              "time": 1572342354937
+            }
+          },
+          {
+            "id": "e3bbd86b-5ed6-48cf-a340-6506d1f4c4af",
+            "enabled": true,
+            "title": "Wait for rel time",
+            "impl": {
+              "type": "TimeElapsed",
+              "start": "Process",
+              "duration": 12345
+            }
+          },
+          {
+            "id": "870ef94d-bbad-42a8-854c-53200a891e98",
+            "enabled": true,
+            "title": "Wait for task task-one",
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "task-one",
+              "status": "Finished"
+            }
+          }
+        ],
         "actions": [
           {
-            "id": "90904828-af68-43cb-a40b-9f096129e02d",
+            "id": "6ad3ab3e-6622-4fe5-8b6e-626e966f2b22",
             "enabled": true,
             "title": "Set sensor to 5 C",
             "impl": {
@@ -211,12 +395,12 @@
         ],
         "transitions": [
           {
-            "id": "7a362cf4-05d2-45a6-adec-b4dbc8487383",
+            "id": "85709948-ce58-411b-a72d-fcd8e24e86d4",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "1e35ce65-751e-4908-bcaa-9141b142a5ad",
+                "id": "10a73817-e6fb-4e70-b51c-a308cbcc40cf",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -230,21 +414,7 @@
                 }
               },
               {
-                "id": "4aa8886c-d5e3-4492-ad9c-2e4cbe2433d9",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "a81ca62b-3ea4-4a90-be3f-936c30cfa98c",
+                "id": "a576b470-276b-4446-9f61-61809cb3133a",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -253,7 +423,7 @@
                 }
               },
               {
-                "id": "e88657e8-613a-407e-8258-f6b08ff9c391",
+                "id": "a9e76cb3-0841-495f-aa3d-fdeb815d3d42",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -263,7 +433,7 @@
                 }
               },
               {
-                "id": "3f939dbe-6b14-4344-821b-ef43c7a74f99",
+                "id": "57ef9362-e9de-4cf9-8d00-f8fcf42ddb12",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -277,11 +447,56 @@
         ]
       },
       {
-        "id": "fc968cc7-8c57-4f50-8e4f-ae1295249e21",
+        "id": "14099a40-39c7-4f4b-9b77-aa89019ee0ed",
         "title": "step-one",
+        "preconditions": [
+          {
+            "id": "83859b80-36ed-45e9-a3d1-6bd40ec942f6",
+            "enabled": true,
+            "title": "Default block value",
+            "impl": {
+              "type": "BlockValue",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "key": null,
+              "operator": "eq",
+              "value": null
+            }
+          },
+          {
+            "id": "ba49304b-255b-42f8-9d43-e3015ad399d6",
+            "enabled": true,
+            "title": "Wait for abs time",
+            "impl": {
+              "type": "TimeAbsolute",
+              "time": 1572342354937
+            }
+          },
+          {
+            "id": "12d950e0-5f09-4610-8a93-c70a570678c8",
+            "enabled": true,
+            "title": "Wait for rel time",
+            "impl": {
+              "type": "TimeElapsed",
+              "start": "Process",
+              "duration": 12345
+            }
+          },
+          {
+            "id": "ddf9168d-b250-40b9-8425-90e2f66b2c66",
+            "enabled": true,
+            "title": "Wait for task task-one",
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "task-one",
+              "status": "Finished"
+            }
+          }
+        ],
         "actions": [
           {
-            "id": "66c3a0f0-9b3e-4113-9978-e25de327f38b",
+            "id": "2358cad7-2823-4e5e-bdaf-491639ed8cc5",
             "title": "generated block patch",
             "enabled": true,
             "impl": {
@@ -293,7 +508,7 @@
             }
           },
           {
-            "id": "2ea21175-ad37-4992-9bba-4b6935bde8d6",
+            "id": "37a78641-f397-40ff-8767-1189360120ee",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -307,7 +522,7 @@
             }
           },
           {
-            "id": "d4177491-33db-448a-833e-b3d1a0659e43",
+            "id": "6e1f76b6-3e4c-4519-99a7-08627e19538d",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -321,7 +536,7 @@
             }
           },
           {
-            "id": "53c2139f-74e1-49be-bbb3-da38763ab315",
+            "id": "c6d043ae-dadd-44ab-b642-ce825c54d891",
             "enabled": true,
             "title": "Create task-one",
             "impl": {
@@ -334,12 +549,12 @@
         ],
         "transitions": [
           {
-            "id": "a2e967da-fcd8-4a69-b495-71dfc021ec92",
+            "id": "bd8d7427-2f03-4933-b040-178eaa221a32",
             "enabled": true,
-            "next": "9d97a1bf-74c4-43ea-a6f6-96e0a8712432",
+            "next": "9ddb249b-ec9b-46ed-94ed-4dfec959cef2",
             "conditions": [
               {
-                "id": "44ccd38b-0928-4b3a-a00e-9804320940f4",
+                "id": "811925cb-7888-4cef-9c03-d6842fb76c9c",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -353,21 +568,7 @@
                 }
               },
               {
-                "id": "1232c563-daf3-4f9b-b362-94c2c883040f",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "c5cb3ec3-e9a8-4f29-8afc-16cf8ab4344c",
+                "id": "aae81a9e-7628-4ede-a60c-8d95a6c2570d",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -376,7 +577,7 @@
                 }
               },
               {
-                "id": "f5129455-ee19-4015-b05f-3a043d0bd34e",
+                "id": "2bbf2125-0b90-4434-a538-04562ce61c9a",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -386,7 +587,7 @@
                 }
               },
               {
-                "id": "c8736a10-7d20-491d-a28c-342a63a94d7a",
+                "id": "9ad51731-a13e-44b2-844c-6c5c013bb8c4",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -398,12 +599,12 @@
             ]
           },
           {
-            "id": "7cab0731-0067-4f5f-83e2-b11f8820a4c4",
+            "id": "8db24523-0278-4509-a18f-b0e07167a512",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "af7f55dc-d2e5-4ccc-b8d7-aaf8accd3af2",
+                "id": "af1adc74-6f53-49b2-8299-19f23ecf198e",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -417,21 +618,7 @@
                 }
               },
               {
-                "id": "611564af-e77d-4798-b01e-81d1ad1c4a57",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "b1907600-4b17-49cc-9cf5-051309a1ca75",
+                "id": "7b9a222f-d88f-4c6d-be69-60a00a4295c4",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -440,7 +627,7 @@
                 }
               },
               {
-                "id": "82ebf145-282c-419c-b58b-61b9d8193213",
+                "id": "9a818604-3f51-4e32-86b1-5b13a5ffd4ef",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -450,7 +637,7 @@
                 }
               },
               {
-                "id": "1bc77713-c9ed-46eb-9cb9-c894f7c7f8e6",
+                "id": "bac92798-0f0f-44ba-8f97-d6f963276dd7",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -464,11 +651,56 @@
         ]
       },
       {
-        "id": "9d97a1bf-74c4-43ea-a6f6-96e0a8712432",
+        "id": "9ddb249b-ec9b-46ed-94ed-4dfec959cef2",
         "title": "step-two",
+        "preconditions": [
+          {
+            "id": "822ac7e1-5b01-450b-982b-fd0cb0e8b2b0",
+            "enabled": true,
+            "title": "Default block value",
+            "impl": {
+              "type": "BlockValue",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "key": null,
+              "operator": "eq",
+              "value": null
+            }
+          },
+          {
+            "id": "ab7731ed-f39f-4c9c-9634-b484ca2259f5",
+            "enabled": true,
+            "title": "Wait for abs time",
+            "impl": {
+              "type": "TimeAbsolute",
+              "time": 1572342354937
+            }
+          },
+          {
+            "id": "867904b8-d250-42fd-9632-5f2e2d2b5119",
+            "enabled": true,
+            "title": "Wait for rel time",
+            "impl": {
+              "type": "TimeElapsed",
+              "start": "Process",
+              "duration": 12345
+            }
+          },
+          {
+            "id": "370ceee6-ba0b-4f90-b80a-4e79a5242e4d",
+            "enabled": true,
+            "title": "Wait for task task-one",
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "task-one",
+              "status": "Finished"
+            }
+          }
+        ],
         "actions": [
           {
-            "id": "910e0b09-d635-4df0-bfb3-162e8a00eb54",
+            "id": "bc96dccc-a97d-49df-8c47-ad4e14d2628d",
             "enabled": true,
             "title": "Set sensor to 5 C",
             "impl": {
@@ -484,12 +716,12 @@
         ],
         "transitions": [
           {
-            "id": "cfa808b9-1789-42f9-84cc-435276b47149",
+            "id": "0adcd10a-37a0-49ef-abec-67f286a733a1",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "259a9e4a-7114-49ac-b5dc-27c41037d7e5",
+                "id": "732026db-c76a-4e8d-b3f1-f35348713253",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -503,21 +735,7 @@
                 }
               },
               {
-                "id": "4267a145-1692-4801-a149-577a96ab7ab0",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "cb1ba6d7-ac27-4a77-9a0a-72cbb19b3a05",
+                "id": "0b8bde18-9f4c-433d-87b3-d5db62e9aa65",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -526,7 +744,7 @@
                 }
               },
               {
-                "id": "8b99fbc1-6bca-4b79-9183-9d7439238017",
+                "id": "5b115897-4418-4aa7-b937-d7cf9260f63a",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -536,7 +754,7 @@
                 }
               },
               {
-                "id": "72f3cc39-b2a8-4be8-b418-683115a35b22",
+                "id": "82bb7569-7276-46cc-b9b2-8580d730d013",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -550,11 +768,56 @@
         ]
       },
       {
-        "id": "f8cae1c0-4ad4-4b3d-8492-2d03acbed7f8",
+        "id": "955bb3fd-dae6-4133-a4b3-a2e4d4d184a3",
         "title": "step-one",
+        "preconditions": [
+          {
+            "id": "5c0b6900-fa52-496a-9b4e-452e2811f71f",
+            "enabled": true,
+            "title": "Default block value",
+            "impl": {
+              "type": "BlockValue",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "key": null,
+              "operator": "eq",
+              "value": null
+            }
+          },
+          {
+            "id": "387dad89-a321-474d-adf2-c6f66031aa38",
+            "enabled": true,
+            "title": "Wait for abs time",
+            "impl": {
+              "type": "TimeAbsolute",
+              "time": 1572342354937
+            }
+          },
+          {
+            "id": "5ebb3ca3-dbe1-4e46-a40f-354151d94dad",
+            "enabled": true,
+            "title": "Wait for rel time",
+            "impl": {
+              "type": "TimeElapsed",
+              "start": "Process",
+              "duration": 12345
+            }
+          },
+          {
+            "id": "89196e0f-5e3f-4658-a009-dffac605249c",
+            "enabled": true,
+            "title": "Wait for task task-one",
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "task-one",
+              "status": "Finished"
+            }
+          }
+        ],
         "actions": [
           {
-            "id": "dc7e7f50-a86d-42d9-b3e7-8beb3fbac211",
+            "id": "06264d01-8c56-498b-b29e-779927ba84b2",
             "title": "generated block patch",
             "enabled": true,
             "impl": {
@@ -566,7 +829,7 @@
             }
           },
           {
-            "id": "aa7f7d01-6dd7-48d6-9eab-78a1a520810d",
+            "id": "5cc3952d-371a-4fd3-963b-7ca5300ab646",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -580,7 +843,7 @@
             }
           },
           {
-            "id": "963857fd-e115-41ac-912c-c0b7aceba8b0",
+            "id": "672160e8-4a94-467c-b8dd-1443c7ffef64",
             "title": "sensor to 5 C",
             "enabled": true,
             "impl": {
@@ -594,7 +857,7 @@
             }
           },
           {
-            "id": "e0906d53-2cef-4842-93f5-76dcd8af4bb5",
+            "id": "f3702f44-a2c9-4117-b074-3bc28e28a396",
             "enabled": true,
             "title": "Create task-one",
             "impl": {
@@ -607,12 +870,12 @@
         ],
         "transitions": [
           {
-            "id": "5e720e8f-3bf4-48c9-a48c-52fe9925b072",
+            "id": "2fcb9aee-85ea-420b-9df4-21c36aec9d24",
             "enabled": true,
-            "next": "0b9572ba-fa0b-4907-b5a9-83fe418af5ab",
+            "next": "85de8920-0fc5-4d18-a937-5e968a7fde5a",
             "conditions": [
               {
-                "id": "2f88be3f-baa4-4588-82b5-d4d3dcb67c68",
+                "id": "df4ac46e-422e-45c9-92f4-96f1ca0aec5f",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -626,21 +889,7 @@
                 }
               },
               {
-                "id": "7a3c2e79-18c8-4e6e-be10-faf6ff43318e",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "72518589-6cfa-4fc9-8fa0-2b1a39812fb8",
+                "id": "cbb59356-6b88-43d6-9f85-57202fdc9081",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -649,7 +898,7 @@
                 }
               },
               {
-                "id": "36d9c5a5-a50e-4f9f-a767-2d902e48a0e9",
+                "id": "1c3c64ca-bf78-4b7c-8bed-b43706694460",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -659,7 +908,7 @@
                 }
               },
               {
-                "id": "da2a6bd6-e72c-4cca-8a94-29a33132d3e2",
+                "id": "62469d0e-e519-4169-b6a0-bf2559b4b67c",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -671,12 +920,12 @@
             ]
           },
           {
-            "id": "e3daa93e-9424-4f8b-ae48-728bd3aa4b98",
+            "id": "e9160a58-7616-4d11-882d-dbffc7fd05df",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "af67c300-371d-4bd8-8d4e-de2557d9af51",
+                "id": "88c8e14c-9b6a-4106-9495-879f5ae2e24b",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -690,21 +939,7 @@
                 }
               },
               {
-                "id": "f4695309-cfdf-4d76-adc1-76d1119a16f3",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "55cde3d5-bc75-415b-95de-e35adbaa0814",
+                "id": "30d69009-6af3-4a7c-8e3d-f732aa951b6f",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -713,7 +948,7 @@
                 }
               },
               {
-                "id": "2fd96f34-5ea5-4c0c-89cc-2f5a83cd787c",
+                "id": "e6a897ac-f0c3-44d2-993a-64b6c3b80abe",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -723,7 +958,7 @@
                 }
               },
               {
-                "id": "48c13b86-2116-4026-a2ae-d86a5e416c17",
+                "id": "62143939-fd87-4118-807f-3f3d4aac55e1",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -737,11 +972,56 @@
         ]
       },
       {
-        "id": "0b9572ba-fa0b-4907-b5a9-83fe418af5ab",
+        "id": "85de8920-0fc5-4d18-a937-5e968a7fde5a",
         "title": "step-two",
+        "preconditions": [
+          {
+            "id": "11653375-8b8c-4692-b770-fafc5061db5c",
+            "enabled": true,
+            "title": "Default block value",
+            "impl": {
+              "type": "BlockValue",
+              "blockId": null,
+              "serviceId": "sparkey",
+              "blockType": null,
+              "key": null,
+              "operator": "eq",
+              "value": null
+            }
+          },
+          {
+            "id": "3c27ad96-b9ef-46cd-8d1a-7b4e9b1777cf",
+            "enabled": true,
+            "title": "Wait for abs time",
+            "impl": {
+              "type": "TimeAbsolute",
+              "time": 1572342354937
+            }
+          },
+          {
+            "id": "1cb27451-ec96-470f-a8b6-cd011b20e440",
+            "enabled": true,
+            "title": "Wait for rel time",
+            "impl": {
+              "type": "TimeElapsed",
+              "start": "Process",
+              "duration": 12345
+            }
+          },
+          {
+            "id": "9a31dd1d-b8c8-4a82-b049-1ab0dd2d9da7",
+            "enabled": true,
+            "title": "Wait for task task-one",
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "task-one",
+              "status": "Finished"
+            }
+          }
+        ],
         "actions": [
           {
-            "id": "572b6fea-e7ee-448b-add1-a5340ad17d17",
+            "id": "d9b7ea91-6052-43f9-b5ce-371590b5cabf",
             "enabled": true,
             "title": "Set sensor to 5 C",
             "impl": {
@@ -757,12 +1037,12 @@
         ],
         "transitions": [
           {
-            "id": "7b7fd5f3-5958-4bf6-98a3-990b5f00c5f4",
+            "id": "481de17e-444b-424e-9e28-55518da39c7c",
             "enabled": true,
             "next": true,
             "conditions": [
               {
-                "id": "b2ff03a8-e61e-4336-9ad9-9ab1afb3e17b",
+                "id": "f73d3f9c-1ccb-4a6b-bf3a-71a7e98d348b",
                 "enabled": true,
                 "title": "Default block value",
                 "impl": {
@@ -776,21 +1056,7 @@
                 }
               },
               {
-                "id": "9c129101-3b31-4232-aa79-2e3af47084f5",
-                "enabled": true,
-                "title": "Check sensor value",
-                "impl": {
-                  "type": "BlockValue",
-                  "blockId": "sensor-1",
-                  "serviceId": "sparkey",
-                  "blockType": "TempSensorMock",
-                  "key": "value[degC]",
-                  "operator": "ge",
-                  "value": 10
-                }
-              },
-              {
-                "id": "29152c36-e89a-48f3-aeb4-6c02dfd1503f",
+                "id": "ec824708-06cb-4e67-b992-cc37d6934b6b",
                 "enabled": true,
                 "title": "Wait for abs time",
                 "impl": {
@@ -799,7 +1065,7 @@
                 }
               },
               {
-                "id": "25b53f09-f705-41b0-894b-33cb8244bdf9",
+                "id": "b97dd3e3-9875-45b1-be99-481e399fedbf",
                 "enabled": true,
                 "title": "Wait for rel time",
                 "impl": {
@@ -809,7 +1075,7 @@
                 }
               },
               {
-                "id": "632a4ea7-30da-4ad3-82cb-17d201faa2a8",
+                "id": "dcc103d7-3600-45e0-b433-5d0afda22a5d",
                 "enabled": true,
                 "title": "Wait for task task-one",
                 "impl": {
@@ -829,7 +1095,7 @@
     "title": "Ministry of Silly Walks",
     "order": 4,
     "cols": 4,
-    "rows": 2,
+    "rows": 5,
     "feature": "Automation",
     "dashboard": "dashboard-home",
     "config": {}
@@ -1075,20 +1341,26 @@
               "blockId": "sensor-1",
               "data": {
                 "value[degC]": 10
-              }
+              },
+              "id": "4ab54887-4065-4563-8fe6-c39213d8dea6",
+              "serviceId": "sparkey"
             },
             {
               "blockId": "setpoint-sensor-pair-1",
               "data": {
                 "storedSetting[degC]": 10,
                 "settingEnabled": true
-              }
+              },
+              "id": "80edc81a-8ee6-4ad7-8c55-ca924def3258",
+              "serviceId": "sparkey"
             },
             {
               "blockId": "actuator-pwm-1",
               "data": {
                 "setting": 60
-              }
+              },
+              "id": "3e791f19-e631-48e0-9bb1-467746c6e87f",
+              "serviceId": "sparkey"
             }
           ]
         },
@@ -1100,24 +1372,32 @@
               "blockId": "sensor-1",
               "data": {
                 "value[degC]": 20
-              }
+              },
+              "id": "8e818970-9d84-43fb-a76c-dbc8d24d9bf9",
+              "serviceId": "sparkey"
             },
             {
               "blockId": "setpoint-sensor-pair-1",
               "data": {
                 "storedSetting[degC]": 20,
                 "settingEnabled": true
-              }
+              },
+              "id": "90f603ac-7d3e-46d6-a784-822e44e68dd9",
+              "serviceId": "sparkey"
             },
             {
               "blockId": "actuator-pwm-1",
               "data": {
                 "setting": 60
-              }
+              },
+              "id": "519ba026-b12f-4c43-8f62-b91ca7186417",
+              "serviceId": "sparkey"
             }
           ]
         }
-      ]
+      ],
+      "serviceIdMigrated": true,
+      "changeIdMigrated": true
     }
   },
   {
@@ -1269,6 +1549,19 @@
     "cols": 4,
     "rows": 3,
     "pinnedPosition": null
+  },
+  {
+    "_id": "dashboard-items__bd5f1830-b9c9-450a-88f9-bc2e548d2376",
+    "title": "Logic Input 1",
+    "feature": "DigitalActuator",
+    "dashboard": "dashboard-home",
+    "order": 7,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "Logic Input 1"
+    },
+    "cols": 4,
+    "rows": 2
   },
   {
     "_id": "dashboard-items__dashboard-items__bb7aa0b4-a045-ad38-4887-308967ca8d63",
