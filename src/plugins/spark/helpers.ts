@@ -53,17 +53,23 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('shortDateString', shortDateString);
 };
 
-export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['component'] => {
+export const blockWidgetSelector = (component: VueConstructor, typeName: string | null): WidgetFeature['component'] => {
   const widget = ref(component);
   return (crud: Crud) => {
     const { config }: { config: BlockConfig } = crud.widget;
-    if (!sparkStore.moduleById(config.serviceId)) {
+    const module = sparkStore.moduleById(config.serviceId);
+    if (module === null) {
       throw new Error(`Spark service '${config.serviceId}' not found`);
     }
     const bCrud = crud as BlockCrud;
-    if ((bCrud.isStoreBlock || bCrud.isStoreBlock === undefined)
-      && !sparkStore.blockById(config.serviceId, config.blockId)) {
-      throw new Error(`Block '${config.blockId}' not found in store`);
+    if (bCrud.isStoreBlock) {
+      const block = module.blockById(config.blockId);
+      if (block === null) {
+        throw new Error(`Block '${config.blockId}' not found in store`);
+      }
+      if (typeName !== null && block.type !== typeName) {
+        throw new Error(`Block type '${block.type}' does not match widget type '${typeName}'`);
+      }
     }
     return widget;
   };

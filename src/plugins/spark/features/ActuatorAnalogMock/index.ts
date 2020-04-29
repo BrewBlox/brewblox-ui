@@ -62,7 +62,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Analog Actuator (Mock)',
   role: 'Output',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 2,

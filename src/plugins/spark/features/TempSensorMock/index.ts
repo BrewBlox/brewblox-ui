@@ -41,7 +41,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Temp Sensor (Mock)',
   role: 'Process',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

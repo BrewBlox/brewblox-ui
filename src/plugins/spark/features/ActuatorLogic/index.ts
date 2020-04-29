@@ -33,7 +33,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Logic Actuator',
   role: 'Control',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

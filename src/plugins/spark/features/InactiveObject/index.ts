@@ -9,7 +9,7 @@ const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
   title: 'Inactive Block',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   wizard: false,
   widgetSize: {
     cols: 4,

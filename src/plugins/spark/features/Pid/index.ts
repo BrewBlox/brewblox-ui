@@ -7,7 +7,7 @@ import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import { typeName } from './getters';
-import PidWidget from './PidWidget.vue';
+import widget from './PidWidget.vue';
 import { PidData } from './types';
 
 
@@ -170,7 +170,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'PID',
   role: 'Control',
-  component: blockWidgetSelector(PidWidget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,
