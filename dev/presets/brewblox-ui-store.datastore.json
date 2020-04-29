@@ -8,17 +8,13 @@
         "title": "ON",
         "preconditions": [
           {
-            "id": "fe600513-c8ca-4f10-9ba1-3dddbd10bab8",
-            "title": "Block value",
+            "id": "061b0d08-0d63-474b-9105-2ce3d86082ce",
+            "title": "Task status",
             "enabled": true,
             "impl": {
-              "type": "BlockValue",
-              "blockId": "Logic Input 1",
-              "serviceId": "sparkey",
-              "blockType": "DigitalActuator",
-              "key": "desiredState",
-              "operator": "eq",
-              "value": 0
+              "type": "TaskStatus",
+              "ref": "wait-on",
+              "status": "Finished"
             }
           }
         ],
@@ -1553,6 +1549,19 @@
     "cols": 4,
     "rows": 3,
     "pinnedPosition": null
+  },
+  {
+    "_id": "dashboard-items__bd5f1830-b9c9-450a-88f9-bc2e548d2376",
+    "title": "Logic Input 1",
+    "feature": "DigitalActuator",
+    "dashboard": "dashboard-home",
+    "order": 7,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "Logic Input 1"
+    },
+    "cols": 4,
+    "rows": 2
   },
   {
     "_id": "dashboard-items__dashboard-items__bb7aa0b4-a045-ad38-4887-308967ca8d63",
