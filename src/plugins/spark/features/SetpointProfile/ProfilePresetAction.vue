@@ -14,7 +14,7 @@ export default class ProfilePresetAction
   @Prop({ type: String, default: 'mdi-file' })
   readonly icon!: string;
 
-  @Prop({ type: String, default: 'Load/Save Profile' })
+  @Prop({ type: String, default: 'Load/Save profile' })
   readonly label!: string;
 
   async showDialog(): Promise<void> {

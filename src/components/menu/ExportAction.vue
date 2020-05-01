@@ -13,14 +13,7 @@ export default class ExportAction extends CrudComponent {
   @Prop({ type: String, default: 'Export widget' })
   readonly label!: string;
 
-  get itemProps(): Mapped<any> {
-    return {
-      ...this.$attrs,
-      ...this.$props,
-    };
-  }
-
-  async showDialog(): Promise<void> {
+  async startExport(): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, dashboard, pinnedPosition, ...exported } = this.widget;
     saveFile(exported, `brewblox-${this.widget.title}-${this.widget.feature}.json`);
@@ -29,5 +22,5 @@ export default class ExportAction extends CrudComponent {
 </script>
 
 <template>
-  <ActionItem v-bind="itemProps" @click="showDialog" />
+  <ActionItem v-bind="{...$attrs, ...$props}" @click="startExport" />
 </template>
