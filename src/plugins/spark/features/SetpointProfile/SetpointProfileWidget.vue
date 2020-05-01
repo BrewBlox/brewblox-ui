@@ -6,6 +6,9 @@ import { deepCopy } from '@/helpers/units/parseObject';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 
 import { GraphProps, profileGraphProps } from './helpers';
+import ProfileExportAction from './ProfileExportAction.vue';
+import ProfileImportAction from './ProfileImportAction.vue';
+import ProfilePresetAction from './ProfilePresetAction.vue';
 import SetpointProfileBasic from './SetpointProfileBasic.vue';
 import SetpointProfileFull from './SetpointProfileFull.vue';
 import { SetpointProfileBlock, SetpointProfileData } from './types';
@@ -14,6 +17,9 @@ import { SetpointProfileBlock, SetpointProfileData } from './types';
   components: {
     Basic: SetpointProfileBasic,
     Full: SetpointProfileFull,
+    ProfileImportAction,
+    ProfilePresetAction,
+    ProfileExportAction,
   },
 })
 export default class SetpointProfileWidget
@@ -58,6 +64,8 @@ export default class SetpointProfileWidget
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ProfilePresetAction :crud="crud" />
+          <ProfileExportAction :crud="crud" />
+          <ProfileImportAction :crud="crud" />
         </template>
       </component>
     </template>
