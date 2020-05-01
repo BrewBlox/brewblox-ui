@@ -45,15 +45,18 @@ export default class LinkValEdit extends ValEditBase {
 <template>
   <q-select
     v-if="editable"
-    :value="field.id"
+    v-model="field.id"
     :options="filteredOpts"
     dense
     clearable
     use-input
-    @input="v => { field.id = v; saveField(field); }"
     @filter="filterFn"
   />
-  <div v-else>
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ displayVal }}
   </div>
 </template>

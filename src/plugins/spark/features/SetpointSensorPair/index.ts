@@ -1,6 +1,7 @@
 import { Link, Unit } from '@/helpers/units';
 import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
@@ -27,6 +28,7 @@ const block: BlockSpec<SetpointSensorPairData> = {
       key: 'storedSetting',
       title: 'Setting',
       component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
       generate: () => new Unit(20, 'degC'),
     },
     {
@@ -39,6 +41,7 @@ const block: BlockSpec<SetpointSensorPairData> = {
       key: 'filterThreshold',
       title: 'Fast step threshold',
       component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
       generate: () => new Unit(2, 'degC'),
     },
     {
