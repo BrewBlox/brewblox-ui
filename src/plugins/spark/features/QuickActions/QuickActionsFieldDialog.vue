@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
-import { BlockAddress } from '@/plugins/spark/types';
+import type { BlockAddress } from '@/plugins/spark/types';
 
 import { EditableFieldChange } from './types';
 
