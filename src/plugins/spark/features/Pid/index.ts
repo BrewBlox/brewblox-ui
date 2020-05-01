@@ -2,6 +2,7 @@ import { unitDurationString } from '@/helpers/functional';
 import { Link, Unit } from '@/helpers/units';
 import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
@@ -116,12 +117,14 @@ const block: BlockSpec<PidData> = {
       key: 'kp',
       title: 'Kp',
       component: 'UnitValEdit',
+      componentProps: { units: ['1/degC', '1/degF', '1/degK'] },
       generate: () => new Unit(0, '1/degC'),
     },
     {
       key: 'ti',
       title: 'Ti',
       component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Time },
       generate: () => new Unit(0, 'second'),
       pretty: unitDurationString,
     },
@@ -129,6 +132,7 @@ const block: BlockSpec<PidData> = {
       key: 'td',
       title: 'Td',
       component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Time },
       generate: () => new Unit(0, 'second'),
       pretty: unitDurationString,
     },

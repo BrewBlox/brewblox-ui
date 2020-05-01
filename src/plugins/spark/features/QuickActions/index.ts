@@ -1,11 +1,8 @@
 import { ref } from '@/helpers/component-ref';
 import { WidgetFeature } from '@/store/features';
 
-import ChangeConfirmDialog from './ChangeConfirmDialog.vue';
 import widget from './QuickActionsWidget.vue';
 import { QuickActionsConfig } from './types';
-
-ref(ChangeConfirmDialog);
 
 const feature: WidgetFeature = {
   id: 'QuickActions',

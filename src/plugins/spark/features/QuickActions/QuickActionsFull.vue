@@ -185,13 +185,17 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
           icon="mdi-format-list-checks"
           class="step-container q-mr-md q-mb-sm depth-1"
         >
-          <draggable :disabled="$dense" :value="step.changes" @input="v => saveChanges(step, v)">
+          <draggable
+            :disabled="$dense"
+            :value="step.changes"
+            @input="v => saveChanges(step, v)"
+          >
             <QuickActionChange
               v-for="change in step.changes"
               :key="`change--${step.id}--${change.id}`"
               :default-service-id="defaultServiceId"
               :value="change"
-              class="q-mr-sm q-my-xs"
+              class="q-mr-sm q-my-sm"
               @input="saveChange(step, change)"
               @remove="removeChange(step, change)"
               @switch="startSwitchBlock(step, change)"

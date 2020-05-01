@@ -2,19 +2,15 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { spliceById } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockSpec, ChangeField } from '@/plugins/spark/types';
+import { Block, BlockSpec } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
-import { BlockChange } from './types';
+import QuickActionsFieldDialog from './QuickActionsFieldDialog.vue';
+import { BlockChange, EditableFieldChange } from './types';
 
-interface EditableFieldChange {
-  id: string;
-  value: any;
-  confirmed: boolean;
-  cfield: ChangeField;
-}
 
 interface EditableBlockChange {
   id: string;
@@ -26,7 +22,11 @@ interface EditableBlockChange {
   fields: EditableFieldChange[];
 }
 
-@Component
+@Component({
+  components: {
+    QuickActionsFieldDialog,
+  },
+})
 export default class QuickActionChange extends Vue {
   editable = false;
 
@@ -98,84 +98,90 @@ export default class QuickActionChange extends Vue {
       : null;
     this.saveField(field);
   }
+
+  editField(field: EditableFieldChange): void {
+    createDialog({
+      component: QuickActionsFieldDialog,
+      field,
+      address: {
+        id: this.change.blockId,
+        serviceId: this.change.serviceId,
+      },
+      title: `${this.change.blockId} ${field.cfield.title}`,
+    })
+      .onOk(field => this.saveField(field));
+  }
 }
 </script>
 
 <template>
-  <q-list
-    v-if="editable"
-    class="q-mb-sm q-ml-md depth-1"
-    dense
-  >
-    <q-item>
-      <q-item-section class="text-h6 grabbable">
+  <div class="depth-1 q-pa-xs q-ml-md q-gutter-sm rounded-borders">
+    <div class="row q-mt-none">
+      <div class="text-h6 text-secondary grabbable col-grow self-center">
         {{ change.blockId }}
-        <q-tooltip>{{ change.serviceId }}</q-tooltip>
-      </q-item-section>
-      <q-item-section side>
-        <q-btn flat round icon="delete" @click="$emit('remove')">
-          <q-tooltip>Remove block change from step</q-tooltip>
-        </q-btn>
-      </q-item-section>
-      <q-item-section side>
-        <q-btn flat round icon="mdi-rename-box" @click="$emit('switch')">
-          <q-tooltip>Switch target block</q-tooltip>
-        </q-btn>
-      </q-item-section>
-      <q-item-section side>
-        <q-btn
-          round
-          flat
-          icon="mdi-pencil-off"
-          @click="editable = false"
-        >
-          <q-tooltip>Stop editing</q-tooltip>
-        </q-btn>
-      </q-item-section>
-    </q-item>
-    <q-item v-for="field in change.fields" :key="field.id">
-      <q-item-section class="col-auto">
-        <q-btn
-          :icon="field.value === null
-            ? 'mdi-checkbox-blank-outline'
-            : 'mdi-checkbox-marked-outline'"
-          flat
-          dense
-          @click="toggleField(field)"
-        >
-          <q-tooltip>Change value when the step is applied.</q-tooltip>
-        </q-btn>
-      </q-item-section>
-      <q-item-section class="col-1">
-        <q-btn
-          v-if="field.value !== null"
-          :class="{darkened: !field.confirmed, 'self-start': true}"
-          icon="mdi-comment-question-outline"
-          flat
-          dense
-          @click="field.confirmed = !field.confirmed; saveField(field)"
-        >
-          <q-tooltip>Edit value in popup when the step is applied.</q-tooltip>
-        </q-btn>
-      </q-item-section>
-      <q-item-section :class="{darkish: field.value === null, 'col-shrink': true}">
+        <q-tooltip>Service: {{ change.serviceId }}</q-tooltip>
+      </div>
+      <ActionMenu dense round>
+        <template #actions>
+          <ActionItem
+            label="Remove block change"
+            icon="delete"
+            @click="$emit('remove')"
+          />
+          <ActionItem
+            label="Switch target block"
+            icon="mdi-rename-box"
+            @click="$emit('switch')"
+          />
+        </template>
+      </ActionMenu>
+    </div>
+    <div
+      v-for="field in change.fields"
+      :key="field.id"
+      class="row q-gutter-x-sm q-ml-none items-center"
+    >
+      <q-btn
+        :icon="field.value === null
+          ? 'mdi-checkbox-blank-outline'
+          : 'mdi-checkbox-marked-outline'"
+        flat
+        dense
+        class="col-auto"
+        @click="toggleField(field)"
+      >
+        <q-tooltip>Change value when the step is applied.</q-tooltip>
+      </q-btn>
+      <q-btn
+        :class="['col-auto', {darkened: !field.confirmed}]"
+        :disable="field.value === null"
+        :icon="field.value === null
+          ? ''
+          : 'mdi-comment-question-outline'"
+        flat
+        dense
+        @click="field.confirmed = !field.confirmed; saveField(field)"
+      >
+        <q-tooltip>Edit value in popup when the step is applied.</q-tooltip>
+      </q-btn>
+      <div class="col-shrink">
         {{ field.cfield.title }}
-      </q-item-section>
-      <q-space />
-      <q-item-section class="col-6">
+      </div>
+      <div
+        v-if="field.value !== null"
+        class="col row justify-end q-pr-md"
+      >
         <component
           :is="field.cfield.component"
-          v-if="field.value !== null"
           v-bind="field.cfield.componentProps"
           :service-id="change.serviceId"
           :block-id="change.blockId"
           :value="field.value"
-          class="self-end"
-          editable
           @input="v => { field.value = v; saveField(field)}"
+          @edit="editField(field)"
         />
-      </q-item-section>
-    </q-item>
+      </div>
+    </div>
     <q-item v-if="unknownValues.length">
       <q-item-section avatar>
         <q-icon name="warning" color="warning" />
@@ -187,66 +193,5 @@ export default class QuickActionChange extends Vue {
         <q-btn flat label="Remove" @click="saveChange()" />
       </q-item-section>
     </q-item>
-  </q-list>
-
-  <q-list
-    v-else
-    class="q-mb-sm q-ml-md depth-1"
-    dense
-  >
-    <q-item>
-      <q-item-section
-        :class="['text-h6 grabbable', {'text-red': !change.block}]"
-      >
-        {{ change.blockId }}
-        <q-tooltip v-if="!change.block">
-          Block not found
-        </q-tooltip>
-      </q-item-section>
-      <q-item-section side>
-        <q-btn
-          flat
-          round
-          icon="mdi-pencil"
-          @click="editable = true"
-        >
-          <q-tooltip>Edit block change</q-tooltip>
-        </q-btn>
-      </q-item-section>
-    </q-item>
-    <template v-for="field in change.fields">
-      <q-item v-if="field.value !== null" :key="`${change.blockId}--${field.id}`">
-        <q-item-section class="col-shrink">
-          {{ field.cfield.title }}
-        </q-item-section>
-        <q-space />
-        <q-item-section class="col-6">
-          <component
-            :is="field.cfield.component"
-            v-bind="field.cfield.componentProps"
-            :service-id="change.serviceId"
-            :block-id="change.blockId"
-            :value="field.value"
-          />
-        </q-item-section>
-      </q-item>
-    </template>
-    <q-item v-if="unknownValues.length">
-      <q-item-section avatar>
-        <q-icon name="warning" color="warning" />
-      </q-item-section>
-      <q-item-section>
-        Unknown fields: {{ unknownValues.map(v => `'${v}'`).join(', ') }}
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-btn flat label="Remove" @click="saveChange()" />
-      </q-item-section>
-    </q-item>
-  </q-list>
+  </div>
 </template>
-
-<style scoped>
-.grabbable {
-  cursor: grab;
-}
-</style>

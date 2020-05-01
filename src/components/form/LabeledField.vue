@@ -46,7 +46,7 @@ export default class LabeledField extends FieldBase {
 <template>
   <q-field
     :label="label"
-    :class="[{pointer: !readonly, 'depth-1': !readonly}, $attrs.class, 'rounded-borders', 'q-px-sm']"
+    :class="[$attrs.class, 'rounded-borders q-px-sm', !readonly && 'depth-1 pointer']"
     v-bind="$attrs"
     borderless
     stack-label
