@@ -114,6 +114,13 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
           </p>
         </q-item-section>
       </q-item>
+      <QuickStartMockCreateField
+        :service-id="config.serviceId"
+        :names="[
+          config.names.fridgeSensor,
+          config.names.beerSensor,
+        ]"
+      />
       <q-item>
         <q-item-section>
           <QuickStartPinField
