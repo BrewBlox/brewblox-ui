@@ -1,3 +1,4 @@
+import { capitalized } from '@/helpers/functional';
 import { Link } from '@/helpers/units';
 import { ServiceStatus } from '@/store/services';
 
@@ -108,24 +109,42 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
   return limited;
 };
 
+const statusDesc = (status: SparkStatus): [string, string] => {
+  if (status.connect) {
+    if (status.synchronize) {
+      return ['synchronized', 'green'];
+    }
+    else if (status.compatible) {
+      return ['synchronizing', 'yellow'];
+    }
+    else if (status.handshake) {
+      return ['incompatible firmware', 'orange'];
+    }
+    else {
+      return ['Waiting for handshake', 'yellow'];
+    }
+  }
+  else if (status.available) {
+    return ['waiting for connection', 'red'];
+  }
+  else {
+    return ['unreachable', 'red'];
+  }
+};
+
+const iconOpts = {
+  simulation: 'mdi-console',
+  wifi: 'mdi-access-point',
+  usb: 'mdi-usb-port',
+  unknown: undefined,
+};
+
 export const asServiceStatus =
   (status: SparkStatus): ServiceStatus => {
     const id = status.serviceId;
-    const [desc, color] = status.synchronize
-      ? ['Synchronized', 'green']
-      : (status.compatible && status.connect)
-        ? ['Synchronizing', 'yellow']
-        : status.handshake
-          ? ['Incompatible firmware', 'orange']
-          : status.connect
-            ? ['Waiting for handshake', 'yellow']
-            : status.available
-              ? ['Waiting for connection', 'red']
-              : ['Unreachable', 'red'];
-    const icon = status.address
-      ? status.address.includes(':')
-        ? 'mdi-access-point'
-        : 'mdi-usb-port'
-      : undefined;
+    const [descText, color] = statusDesc(status);
+    const connection = status.connection ?? 'unknown';
+    const icon = iconOpts[connection];
+    const desc = capitalized(`${connection} (${descText})`);
     return { id, color, desc, icon };
   };
