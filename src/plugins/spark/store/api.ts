@@ -99,6 +99,7 @@ const unknownStatus = (): ApiSparkStatus => ({
   valid: true, // no idea - assume yes
   info: [],
   address: null,
+  connection: null,
 });
 
 export const fetchSparkStatus = async (serviceId: string): Promise<SparkStatus> => {

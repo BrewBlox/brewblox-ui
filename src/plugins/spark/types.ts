@@ -114,6 +114,7 @@ export interface ApiSparkStatus {
   valid: boolean;
   info: string[];
   address: string | null;
+  connection: 'simulation' | 'usb' | 'wifi' | null;
 }
 
 export interface SparkStatus extends ApiSparkStatus {
