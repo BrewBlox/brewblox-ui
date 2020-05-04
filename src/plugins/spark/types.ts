@@ -98,7 +98,7 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
-export type UserUnitKey = 'Temp' | 'Time' | 'LongTime';
+export type UserUnitKey = 'Temp';
 
 export type UserUnits = Record<UserUnitKey, string>;
 
