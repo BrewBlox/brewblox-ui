@@ -18,16 +18,14 @@ export const prettify = (v: string): string =>
 
 export default class Unit extends PostFixed {
   private _val: number | null;
-  public unit: string;
-  public notation: string;
-  public delta: boolean;
+  private _unit: string;
+  private _notation: string;
 
   public constructor(value: number | null, unit: string) {
     super();
     this._val = value;
-    this.unit = unit;
-    this.delta = unit.startsWith('delta_');
-    this.notation = prettify(this.unit);
+    this._unit = unit;
+    this._notation = prettify(unit);
   }
 
   public get value(): number | null {
@@ -35,11 +33,24 @@ export default class Unit extends PostFixed {
   }
 
   public set value(v: number | null) {
-    this._val = Number(v);
+    this._val = v === null ? null : Number(v);
   }
 
-  public get unitNotation(): string {
-    return this.notation;
+  public get unit(): string {
+    return this._unit;
+  }
+
+  public set unit(v: string) {
+    this._unit = v;
+    this._notation = prettify(v);
+  }
+
+  public get notation(): string {
+    return this._notation;
+  }
+
+  public get delta(): boolean {
+    return this.unit.startsWith('delta_');
   }
 
   public get roundedValue(): string {
@@ -55,7 +66,7 @@ export default class Unit extends PostFixed {
   }
 
   public toString(): string {
-    return `${this.roundedValue} ${this.unitNotation}`;
+    return `${this.roundedValue} ${this.notation}`;
   }
 
   public toJSON(): number | null {

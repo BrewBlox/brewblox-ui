@@ -123,6 +123,13 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
           </p>
         </q-item-section>
       </q-item>
+      <QuickStartMockCreateField
+        :service-id="config.serviceId"
+        :names="[
+          config.names.kettleSensor,
+          config.names.tubeSensor,
+        ]"
+      />
       <q-item>
         <q-item-section>
           <QuickStartPinField

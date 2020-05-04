@@ -46,7 +46,7 @@ const block: BlockSpec<ActuatorPwmData> = {
     {
       key: 'period',
       title: 'Period',
-      component: 'UnitValEdit',
+      component: 'TimeUnitValEdit',
       generate: () => new Unit(4, 'second'),
       pretty: unitDurationString,
     },
@@ -74,7 +74,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'PWM',
   role: 'Output',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

@@ -19,7 +19,7 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { Link, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
-import { Crud, WidgetFeature } from '@/store/features';
+import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
 import { blockTypes, interfaceTypes, isCompatible } from './block-types';
 import { DisplaySettingsBlock } from './features/DisplaySettings/types';
@@ -53,32 +53,39 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('shortDateString', shortDateString);
 };
 
-export const blockWidgetSelector = (component: VueConstructor): WidgetFeature['component'] => {
-  const widget = ref(component);
-  return (crud: Crud) => {
-    const { config }: { config: BlockConfig } = crud.widget;
-    if (!sparkStore.moduleById(config.serviceId)) {
-      throw new Error(`Spark service '${config.serviceId}' not found`);
+const errorComponent = (error: string): ComponentResult => ({
+  component: 'InvalidWidget',
+  error,
+});
+
+export const blockWidgetSelector = (ctor: VueConstructor, typeName: string | null): WidgetFeature['component'] => {
+  const component = ref(ctor);
+  return (crud: Crud<BlockConfig> | BlockCrud): ComponentResult => {
+    const { config } = crud.widget;
+    const module = sparkStore.moduleById(config.serviceId);
+    if (module === null) {
+      return errorComponent(`Spark service '${config.serviceId}' not found`);
     }
-    const bCrud = crud as BlockCrud;
-    if ((bCrud.isStoreBlock || bCrud.isStoreBlock === undefined)
-      && !sparkStore.blockById(config.serviceId, config.blockId)) {
-      throw new Error(`Block '${config.blockId}' not found in store`);
+    // If crud is a BlockCrud, block is already set
+    // Otherwise we'll have to check the store
+    const block = (crud as BlockCrud).block ?? module.blockById(config.blockId);
+    if (block === null) {
+      return errorComponent(`Block '${config.blockId}' not found`);
     }
-    return widget;
+    if (typeName !== null && block.type !== typeName) {
+      return errorComponent(`Block type '${block.type}' does not match widget type '${typeName}'`);
+    }
+    return { component };
   };
 };
 
-export const canDisplay = (addr: BlockAddress): boolean => {
-  if (!addr) { return false; }
-  return [
+export const canDisplay = (addr: BlockAddress): boolean =>
+  isCompatible(addr?.type, [
     interfaceTypes.TempSensor,
     interfaceTypes.SetpointSensorPair,
     interfaceTypes.ActuatorAnalog,
     blockTypes.Pid,
-  ]
-    .some(intf => isCompatible(addr.type, intf));
-};
+  ]);
 
 const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBlock | undefined =>
   serviceId

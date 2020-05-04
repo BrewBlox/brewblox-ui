@@ -1,4 +1,5 @@
 <script lang="ts">
+import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
@@ -8,9 +9,10 @@ import notify from '@/helpers/notify';
 import { deepCopy } from '@/helpers/units/parseObject';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, ChangeField } from '@/plugins/spark/types';
+import { Block } from '@/plugins/spark/types';
 
-import { BlockChange, Step } from './types';
+import QuickActionsFieldDialog from './QuickActionsFieldDialog.vue';
+import { BlockChange, EditableFieldChange, Step } from './types';
 
 interface FieldDiff {
   key: string;
@@ -32,7 +34,11 @@ interface StepDisplay extends Step {
   diffs: BlockDiff[];
 }
 
-@Component
+@Component({
+  components: {
+    QuickActionsFieldDialog,
+  },
+})
 export default class QuickActionsBasic extends CrudComponent {
   applying = false;
 
@@ -73,26 +79,32 @@ export default class QuickActionsBasic extends CrudComponent {
 
   confirmStepChange(block: Block, key: string, value: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      const change = sparkStore.spec(block).changes
-        .find(change => change.key === key) as ChangeField;
-      if (!change) {
+      const cfield = sparkStore.spec(block)
+        .changes
+        .find(change => change.key === key);
+      if (!cfield) {
         resolve(value);
+        return;
       }
-      const pretty = change.pretty || (v => `${v}`);
+      const pretty = cfield.pretty ?? (v => `${v}`);
+      const field: EditableFieldChange = {
+        value,
+        cfield,
+        id: uid(), // not relevant
+        confirmed: true, // duh
+      };
+
       createDialog({
-        component: 'ChangeConfirmDialog',
-        title: 'Confirm change',
+        component: QuickActionsFieldDialog,
+        field,
+        address: block,
+        title: `Confirm ${block.id} ${cfield.title}`,
         message: `
-        Please confirm the ${change.title} value in ${block.id}.
+        Please confirm the ${cfield.title} value in ${block.id}.
         Current value is '${pretty(block.data[key])}'.
         `,
-        serviceId: block.serviceId,
-        blockId: block.id,
-        value,
-        fieldComponent: change.component,
-        componentProps: change.componentProps,
       })
-        .onOk((updated) => resolve(updated))
+        .onOk(field => resolve(field.value))
         .onCancel(() => reject());
     });
   }

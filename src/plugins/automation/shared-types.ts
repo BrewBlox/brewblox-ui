@@ -8,8 +8,8 @@
  */
 export type AutomationStatus =
   'Invalid'       // Configuration missing or invalid.
-  | 'Created'     // In progress. May require initialization.
-  | 'Active'      // In progress. Initialization done or not required.
+  | 'Created'     // In progress. Not yet evaluated.
+  | 'Active'      // In progress.
   | 'Retrying'    // In progress. Attempting to automatically recover from error.
   | 'Paused'      // In progress. Execution temporarily halted.
   | 'Finished'    // End state. Success.
@@ -214,7 +214,6 @@ export interface BlockValueImpl {
 
   /**
    * Compared value.
-   * @nullable
    */
   value: any;
 
@@ -344,6 +343,11 @@ export interface AutomationStep {
   title: string;
 
   /**
+   * Preconditions must evaluate true before actions are applied.
+   */
+  preconditions: AutomationCondition[];
+
+  /**
    * Actions are applied in order.
    * If any action fails, all are retried.
    */
@@ -375,6 +379,18 @@ export interface AutomationTemplate extends StoreObject {
   steps: AutomationStep[];
 }
 
+export type AutomationStepActivePhase =
+  'Created'             // In progress. Not yet evaluated.
+  | 'Preconditions'     // In progress. Checking preconditions.
+  | 'Actions'           // In progress. Applying actions.
+  | 'Transitions'       // In progress. Checking transitions.
+
+export type AutomationStepPhase =
+  AutomationStepActivePhase
+  | 'Invalid'           // Configuration missing or invalid.
+  | 'Finished'          // End state. Success.
+  | 'Cancelled';        // End state. Execution prematurely ended.
+
 /**
  * A single result from process execution.
  * These are treated as immutable: if the process advances, a new result is added.
@@ -399,13 +415,27 @@ export interface AutomationStepResult {
    * Current status for the relevant step.
    * Will be Invalid if stepId is null.
    */
-  stepStatus: AutomationStatus;
+  phase: AutomationStepPhase;
 
   /**
    * Current status for the entire process.
    * The process will only be evaluated if it is Active.
    */
-  processStatus: AutomationStatus;
+  status: AutomationStatus;
+
+  /**
+   * Optional error message.
+   */
+  error?: string;
+}
+
+/**
+ * An external instruction for a process to fast-forward to a step.
+ */
+export interface AutomationStepJump {
+  processId: UUID;
+  stepId: UUID;
+  phase?: AutomationStepActivePhase;
 }
 
 /**

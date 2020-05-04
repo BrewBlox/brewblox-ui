@@ -98,7 +98,7 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
-export type UserUnitKey = 'Temp' | 'Time' | 'LongTime';
+export type UserUnitKey = 'Temp';
 
 export type UserUnits = Record<UserUnitKey, string>;
 
@@ -113,6 +113,8 @@ export interface ApiSparkStatus {
   latest: boolean;
   valid: boolean;
   info: string[];
+  address: string | null;
+  connection: 'simulation' | 'usb' | 'wifi' | null;
 }
 
 export interface SparkStatus extends ApiSparkStatus {

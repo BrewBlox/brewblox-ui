@@ -23,7 +23,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'DS2413 Chip',
   role: 'Output',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

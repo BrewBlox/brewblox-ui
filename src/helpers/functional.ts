@@ -171,7 +171,7 @@ export const nanoToMilli =
 
 export const capitalized =
   (s: string): string =>
-    isString(s)
+    isString(s) && s.length > 0
       ? s.charAt(0).toUpperCase() + s.slice(1)
       : s;
 

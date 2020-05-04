@@ -112,6 +112,14 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           </p>
         </q-item-section>
       </q-item>
+      <QuickStartMockCreateField
+        :service-id="config.serviceId"
+        :names="[
+          config.names.hltSensor,
+          config.names.mtSensor,
+          config.names.bkSensor,
+        ]"
+      />
       <q-item>
         <q-item-section>
           <QuickStartPinField

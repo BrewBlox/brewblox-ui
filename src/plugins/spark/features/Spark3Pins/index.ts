@@ -34,7 +34,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Spark 3 Pins',
   role: 'Output',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 4,

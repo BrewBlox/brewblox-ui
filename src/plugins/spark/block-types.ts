@@ -172,8 +172,8 @@ export const compatibleTypes = {
 };
 
 export const isCompatible = (type: string | null, intf: string | string[] | null): boolean => {
-  if (intf === null) { return true; }
-  if (type === null) { return false; }
+  if (!intf) { return true; }
+  if (!type) { return false; }
   if (isArray(intf)) { return intf.some(i => isCompatible(type, i)); }
   return type === intf || !!compatibleTypes[intf]?.includes(type);
 };

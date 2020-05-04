@@ -47,7 +47,7 @@ export default class RelationsDiagram extends Vue {
 
   get drawnNodes(): RelationNode[] {
     return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
-      .map(id => this.nodes.find(node => node.id === id) || { id, type: '???' });
+      .map(id => this.nodes.find(node => node.id === id) ?? { id, type: '???' });
   }
 
   get loneNodes(): RelationNode[] {

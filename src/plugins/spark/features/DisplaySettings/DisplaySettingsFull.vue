@@ -4,8 +4,10 @@ import { Component } from 'vue-property-decorator';
 import { Link } from '@/helpers/units';
 import { blockTypes, interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { DisplaySettingsBlock } from '@/plugins/spark/features/DisplaySettings/types';
+import { DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/features/DisplaySettings/types';
 import { DisplaySlot } from '@/plugins/spark/types';
+
+import { createDialog } from '../../../../helpers/dialog';
 
 @Component
 export default class DisplaySettingsFull
@@ -23,6 +25,10 @@ export default class DisplaySettingsFull
     interfaceTypes.ActuatorAnalog,
     blockTypes.Pid,
   ]
+
+  get tempName(): string {
+    return DisplayTempUnit[this.block.data.tempUnit];
+  }
 
   get slots(): (DisplaySlot | null)[] {
     const slots = Array(6);
@@ -105,6 +111,13 @@ export default class DisplaySettingsFull
       .map(w => (w.pos === pos ? { ...w, color: color.replace('#', '') } : w));
     this.saveBlock();
   }
+
+  showUnitMenu(): void {
+    createDialog({
+      component: 'SparkUnitMenu',
+      serviceId: this.serviceId,
+    });
+  }
 }
 </script>
 
@@ -158,14 +171,13 @@ export default class DisplaySettingsFull
           title="footer text"
           @input="v => {block.data.name = v; saveBlock()}"
         />
-        <SelectField
-          :value="block.data.tempUnit"
-          :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
-          label="Temperature unit"
-          title="Temperature unit"
-          class="col-grow"
-          @input="v => { block.data.tempUnit = v; saveBlock(); }"
-        />
+        <LabeledField
+          label="Display temperature unit"
+          class="col-grow clickable"
+          @click="showUnitMenu"
+        >
+          {{ tempName }}
+        </LabeledField>
         <q-field
           label="Display brightness"
           stack-label

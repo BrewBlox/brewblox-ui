@@ -117,7 +117,10 @@ export default class ServiceIndex extends Vue {
       </template>
       <template v-else-if="status(service) !== null">
         <q-item-section class="col-auto q-mr-sm">
-          <q-icon name="mdi-checkbox-blank-circle" :color="status(service).color" />
+          <q-icon
+            :name="status(service).icon || 'mdi-checkbox-blank-circle'"
+            :color="status(service).color"
+          />
           <q-tooltip>
             {{ status(service).desc }}
           </q-tooltip>

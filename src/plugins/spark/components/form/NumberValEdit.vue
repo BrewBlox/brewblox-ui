@@ -16,7 +16,11 @@ export default class NumberValEdit extends ValEditBase { }
     pattern="[0-9]*"
     dense
   />
-  <div v-else>
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ field }}
   </div>
 </template>

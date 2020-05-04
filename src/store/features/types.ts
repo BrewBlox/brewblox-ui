@@ -25,6 +25,11 @@ export interface WidgetRemoveAction {
   action: (crud: Crud) => void;
 }
 
+export interface ComponentResult {
+  component: string;
+  error?: string;
+}
+
 /**
  * Widgets are the primary dynamic UI component.
  * They are typically rendered as cards on dashboards.
@@ -61,7 +66,7 @@ export interface WidgetFeature<ConfigT = any> {
    * Rendering component for this widget.
    * Should be or return the name of a globally registered Vue component.
    */
-  component: string | ((crud: Crud) => string);
+  component: string | ((crud: Crud) => ComponentResult);
 
   /**
    * Wizard component.

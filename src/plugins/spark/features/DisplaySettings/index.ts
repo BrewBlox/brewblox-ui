@@ -32,7 +32,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Display Settings',
   role: 'Display',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

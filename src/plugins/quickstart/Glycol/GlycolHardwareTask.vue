@@ -122,6 +122,13 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
           </p>
         </q-item-section>
       </q-item>
+      <QuickStartMockCreateField
+        :service-id="config.serviceId"
+        :names="[
+          config.names.beerSensor,
+          config.names.glycolSensor,
+        ]"
+      />
       <LabeledField label="Does your fermenter have a heater?" item-aligned>
         <div class="q-gutter-lg">
           <q-radio

@@ -1,5 +1,6 @@
 import { Unit } from '@/helpers/units';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
@@ -21,6 +22,7 @@ const block: BlockSpec<TempSensorMockData> = {
       key: 'setting',
       title: 'Sensor Setting',
       component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
       generate: () => new Unit(20, 'degC'),
     },
     {
@@ -41,7 +43,7 @@ const feature: WidgetFeature = {
   id: typeName,
   title: 'Temp Sensor (Mock)',
   role: 'Process',
-  component: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

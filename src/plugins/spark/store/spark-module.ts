@@ -31,11 +31,7 @@ export class SparkServiceModule extends VuexModule {
 
   public blocks: Block[] = [];
   public discoveredBlocks: string[] = [];
-  public units: UserUnits = {
-    Temp: 'degC',
-    Time: 'second',
-    LongTime: 'hour',
-  };
+  public units: UserUnits = { Temp: 'degC' };
   public status: SparkStatus | null = null;
   public lastBlocks: Date | null = null;
   public lastStatus: Date | null = null;
@@ -179,6 +175,7 @@ export class SparkServiceModule extends VuexModule {
   public async fetchAll(): Promise<boolean> {
     const status = await api.fetchSparkStatus(this.id);
     this.updateStatus(status);
+    serviceStore.updateStatus(asServiceStatus(status));
     if (status.synchronize) {
       await Promise.all([
         this.fetchUnits(),
