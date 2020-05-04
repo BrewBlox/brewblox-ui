@@ -47,8 +47,7 @@ const block: BlockSpec<ActuatorPwmData> = {
     {
       key: 'period',
       title: 'Period',
-      component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Time },
+      component: 'TimeUnitValEdit',
       generate: () => new Unit(4, 'second'),
       pretty: unitDurationString,
     },

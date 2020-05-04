@@ -123,16 +123,14 @@ const block: BlockSpec<PidData> = {
     {
       key: 'ti',
       title: 'Ti',
-      component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Time },
+      component: 'TimeUnitValEdit',
       generate: () => new Unit(0, 'second'),
       pretty: unitDurationString,
     },
     {
       key: 'td',
       title: 'Td',
-      component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Time },
+      component: 'TimeUnitValEdit',
       generate: () => new Unit(0, 'second'),
       pretty: unitDurationString,
     },

@@ -1,10 +1,9 @@
 <script lang="ts">
 import isString from 'lodash/isString';
-import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { durationString, ruleValidator, unitDurationString } from '@/helpers/functional';
+import { durationMs, durationString, ruleValidator, unitDurationString } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 
 @Component
@@ -38,7 +37,7 @@ export default class TimeUnitDialog extends DialogBase {
   }
 
   get localNumber(): number {
-    return parseDuration(`${this.local}${this.defaultUnit}`);
+    return durationMs(`${this.local}${this.defaultUnit}`);
   }
 
   get valueOk(): boolean {
