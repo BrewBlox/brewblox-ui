@@ -14,17 +14,6 @@ export const userUnitChoices: Record<UserUnitKey, string[]> = {
   Temp: [
     'degC',
     'degF',
-    'degK',
-  ],
-  Time: [
-    'millisecond',
-    'second',
-    'minute',
-    'hour',
-  ],
-  LongTime: [
-    'hour',
-    'day',
   ],
 };
 
