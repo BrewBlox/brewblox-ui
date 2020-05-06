@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, uniqueFilter } from '@/helpers/functional';
+import { extendById, filterById, findById, uniqueFilter } from '@/helpers/functional';
 import store from '@/store';
 
 import {
@@ -29,11 +29,11 @@ export class HistoryModule extends VuexModule {
   }
 
   public sessionById(id: string): LoggedSession | null {
-    return this.sessions.find(v => v.id === id) ?? null;
+    return findById(this.sessions, id);
   }
 
   public sourceById(id: string): HistorySource | null {
-    return this.sources.find(v => v.id === id) ?? null;
+    return findById(this.sources, id);
   }
 
   @Mutation

@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById } from '@/helpers/functional';
+import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 import { featureStore } from '@/store/features';
 
@@ -28,8 +28,7 @@ export class ServiceModule extends VuexModule {
   }
 
   public serviceById(id: string | null): Service | null {
-    if (!id) { return null; }
-    return this.services.find(v => v.id === id) ?? null;
+    return findById(this.services, id);
   }
 
   public get stubIds(): string[] {

@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById } from '@/helpers/functional';
+import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
 import { BuilderLayout, PartSpec } from '../types';
@@ -28,8 +28,7 @@ export class BuilderModule extends VuexModule {
   }
 
   public layoutById(id: string | null): BuilderLayout | null {
-    if (id === null) { return null; }
-    return this.layouts.find(v => v.id === id) ?? null;
+    return findById(this.layouts, id);
   }
 
   public get specIds(): string[] {

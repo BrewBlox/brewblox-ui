@@ -1,6 +1,7 @@
 import isString from 'lodash/isString';
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
+import { findById } from '@/helpers/functional';
 import store from '@/store';
 
 import {
@@ -41,19 +42,19 @@ export class FeatureModule extends VuexModule {
   }
 
   public widgetById(id: string): WidgetFeature | null {
-    return this.widgets.find(v => v.id === id) ?? null;
+    return findById(this.widgets, id);
   }
 
   public quickStartById(id: string): QuickStartFeature | null {
-    return this.quickStarts.find(v => v.id === id) ?? null;
+    return findById(this.quickStarts, id);
   }
 
   public watcherById(id: string): WatcherFeature | null {
-    return this.watchers.find(v => v.id === id) ?? null;
+    return findById(this.watchers, id);
   }
 
   public serviceById(id: string): ServiceFeature | null {
-    return this.services.find(v => v.id === id) ?? null;
+    return findById(this.services, id);
   }
 
   public widgetTitle(id: string): string {

@@ -309,3 +309,19 @@ export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
   updated.push(obj);
   return updated;
 }
+
+/**
+ * Looks for object in array collection.
+ *
+ * @param arr object collection
+ * @param id unique ID of desired object
+ */
+export function findById<T extends HasId>(
+  arr: T[],
+  id: string | null,
+  fallback: T | null = null,
+): typeof fallback {
+  return id != null
+    ? arr.find(v => v.id === id) ?? fallback
+    : fallback;
+}
