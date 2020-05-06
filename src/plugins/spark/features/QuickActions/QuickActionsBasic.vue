@@ -212,7 +212,7 @@ export default class QuickActionsBasic extends CrudComponent {
             {{ step.changes.length }} blocks changed
           </q-item-label>
           <q-tooltip v-if="step.applicable">
-            <div class="column">
+            <div class="column" style="max-width: 400px">
               <div class="col-auto text-italic" style="font-size: 120%">
                 {{ step.active ? 'Step is active' : 'Step changes' }}
               </div>
