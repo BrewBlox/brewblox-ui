@@ -1,7 +1,7 @@
 import { Link, Unit } from '@/helpers/units';
 import { blockTypes, interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec, DigitalState } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
@@ -82,6 +82,13 @@ const block: BlockSpec<DigitalActuatorData> = {
       title: 'Invert',
       component: 'BoolValEdit',
       generate: () => false,
+    },
+    {
+      key: 'constrainedBy',
+      title: 'Constraints',
+      component: 'DigitalConstraintsValEdit',
+      generate: () => ({ constraints: [] }),
+      pretty: prettifyConstraints,
     },
   ],
   graphTargets: {

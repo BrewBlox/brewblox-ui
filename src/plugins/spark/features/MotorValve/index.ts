@@ -1,7 +1,7 @@
 import { Link } from '@/helpers/units';
 import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec, DigitalState } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
@@ -27,6 +27,13 @@ const block: BlockSpec<MotorValveData> = {
       component: 'StateValEdit',
       generate: () => 0,
       pretty: v => DigitalState[v],
+    },
+    {
+      key: 'constrainedBy',
+      title: 'Constraints',
+      component: 'DigitalConstraintsValEdit',
+      generate: () => ({ constraints: [] }),
+      pretty: prettifyConstraints,
     },
   ],
   graphTargets: {

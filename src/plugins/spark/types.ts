@@ -270,3 +270,7 @@ export type DigitalConstraint =
 export interface DigitalConstraintsObj {
   constraints: DigitalConstraint[];
 }
+
+export interface AnyConstraintsObj {
+  constraints: (AnalogConstraint | DigitalConstraint)[];
+}

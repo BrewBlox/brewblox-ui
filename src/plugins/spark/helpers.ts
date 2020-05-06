@@ -23,7 +23,18 @@ import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
 import { blockTypes, interfaceTypes, isCompatible } from './block-types';
 import { DisplaySettingsBlock } from './features/DisplaySettings/types';
-import { Block, BlockAddress, BlockConfig, BlockCrud, DataBlock, DisplayOpts, DisplaySlot } from './types';
+import {
+  AnalogConstraint,
+  AnyConstraintsObj,
+  Block,
+  BlockAddress,
+  BlockConfig,
+  BlockCrud,
+  DataBlock,
+  DigitalConstraint,
+  DisplayOpts,
+  DisplaySlot,
+} from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -263,3 +274,42 @@ export const asBlock =
 
 export const asBlockAddress =
   (block: Block): BlockAddress => pick(block, ['id', 'serviceId', 'type']);
+
+export const prettifyConstraints =
+  (obj: AnyConstraintsObj | undefined): string =>
+    (obj === undefined || obj.constraints.length === 0)
+      ? '<no constraints>'
+      : obj
+        .constraints
+        .map((c: AnalogConstraint | DigitalConstraint) => {
+          // Analog
+          if ('min' in c) {
+            return `Minimum = ${c.min}`;
+          }
+          if ('max' in c) {
+            return `Maximum = ${c.max}`;
+          }
+          if ('balanced' in c) {
+            return `Balanced by ${c.balanced.balancerId.id ?? '<not set>'}`;
+          }
+          // Digital
+          if ('minOff' in c) {
+            return `Minimum OFF = ${unitDurationString(c.minOff)}`;
+          }
+          if ('minOn' in c) {
+            return `Minimum ON = ${unitDurationString(c.minOn)}`;
+          }
+          if ('mutexed' in c) {
+            return `Mutexed by ${c.mutexed.mutexId.id ?? '<not set>'}`;
+          }
+          if ('delayedOn' in c) {
+            return `Delayed ON = ${unitDurationString(c.delayedOn)}`;
+          }
+          if ('delayedOff' in c) {
+            return `Delayed OFF = ${unitDurationString(c.delayedOff)}`;
+          }
+          // Fallback
+          return 'Unknown constraint';
+        })
+        .sort()
+        .join(', ');

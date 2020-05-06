@@ -1,5 +1,5 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
@@ -49,6 +49,13 @@ const block: BlockSpec<ActuatorAnalogMockData> = {
       title: 'Maximum Value',
       component: 'NumberValEdit',
       generate: () => 100,
+    },
+    {
+      key: 'constrainedBy',
+      title: 'Constraints',
+      component: 'AnalogConstraintsValEdit',
+      generate: () => ({ constraints: [] }),
+      pretty: prettifyConstraints,
     },
   ],
   graphTargets: {
