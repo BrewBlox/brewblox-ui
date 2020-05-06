@@ -1,6 +1,6 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById } from '@/helpers/functional';
+import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
 import type { Block, BlockAddress, BlockSpec, StoredDataPreset } from '../types';
@@ -44,11 +44,11 @@ export class SparkGlobalModule extends VuexModule {
   }
 
   public presetById(id: string): StoredDataPreset | null {
-    return this.presets.find(v => v.id === id) ?? null;
+    return findById(this.presets, id);
   }
 
   public specById(id: string): BlockSpec {
-    return this.specs.find(v => v.id === id)!;
+    return findById(this.specs, id)!;
   }
 
   public spec({ type }: { type: string }): BlockSpec {

@@ -2,7 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
-import { shortDateString } from '@/helpers/functional';
+import { createDialog } from '@/helpers/dialog';
+import { findById, shortDateString } from '@/helpers/functional';
 
 import { AutomationProcess, AutomationStatus, AutomationStepResult, AutomationTask } from './shared-types';
 import { automationStore } from './store';
@@ -63,10 +64,12 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   }
 
   jump(proc: AutomationProcess): void {
-    automationStore.jumpProcess({
-      processId: proc.id,
-      stepId: proc.steps[0].id,
-    });
+    const processId = proc.id;
+    createDialog({
+      component: 'AutomationJumpDialog',
+      processId,
+    })
+      .onOk(stepId => automationStore.jumpProcess({ processId, stepId }));
   }
 
   removeProcess(proc: AutomationProcess): void {
@@ -99,7 +102,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   }
 
   historyStatus(proc: AutomationProcess, results: AutomationStepResult[]): string {
-    const stepTitle = id => proc.steps.find(v => v.id === id)?.title ?? 'Unknown';
+    const stepTitle = id => findById(proc.steps, id)?.title ?? 'Unknown';
     return results
       .reverse()
       .map(res => `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${res.phase} ${res.error ?? ''}`)

@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById } from '@/helpers/functional';
+import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
 import { AutomationStepJump } from '../shared-types';
@@ -32,18 +32,15 @@ export class AutomationModule extends VuexModule {
   }
 
   public processById(id: string | null): AutomationProcess | null {
-    if (id === null) { return null; }
-    return this.processes.find(v => v.id === id) ?? null;
+    return findById(this.processes, id);
   }
 
   public taskById(id: string | null): AutomationTask | null {
-    if (id === null) { return null; }
-    return this.tasks.find(v => v.id === id) ?? null;
+    return findById(this.tasks, id);
   }
 
   public templateById(id: string | null): AutomationTemplate | null {
-    if (id === null) { return null; }
-    return this.templates.find(v => v.id === id) ?? null;
+    return findById(this.templates, id);
   }
 
   @Mutation
