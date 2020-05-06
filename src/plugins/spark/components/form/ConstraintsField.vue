@@ -5,7 +5,7 @@ import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
 import { analogConstraintLabels, digitalConstraintLabels } from '@/plugins/spark/getters';
 import { prettifyConstraints } from '@/plugins/spark/helpers';
-import { AnalogConstraint, AnyConstraintsObj, DigitalConstraint } from '@/plugins/spark/types';
+import type { AnalogConstraint, AnyConstraintsObj, DigitalConstraint } from '@/plugins/spark/types';
 
 const constraintLabels = {
   ...digitalConstraintLabels,
