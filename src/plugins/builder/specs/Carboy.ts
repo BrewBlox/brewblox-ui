@@ -1,11 +1,16 @@
 import { blockTypes } from '@/plugins/spark/block-types';
 
 import { showSettingsBlock } from '../helpers';
-import { PartSpec } from '../types';
+import { PartSpec, PersistentPart } from '../types';
 
-const SIZE_X = 2;
-const SIZE_Y = 4;
+export const DEFAULT_SIZE_X = 2;
+export const DEFAULT_SIZE_Y = 4;
 const settingsKey = 'setpoint';
+
+const size = (part: PersistentPart): [number, number] => [
+  part.settings.sizeX || DEFAULT_SIZE_X,
+  part.settings.sizeY || DEFAULT_SIZE_Y,
+];
 
 const spec: PartSpec = {
   id: 'Carboy',
@@ -23,8 +28,28 @@ const spec: PartSpec = {
     {
       component: 'ColorCard',
     },
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: 'sizeX',
+        defaultSize: DEFAULT_SIZE_X,
+        label: 'Width',
+        min: 2,
+        max: 8,
+      },
+    },
+    {
+      component: 'SizeCard',
+      props: {
+        settingsKey: 'sizeY',
+        defaultSize: DEFAULT_SIZE_Y,
+        label: 'Height',
+        min: 2,
+        max: 10,
+      },
+    },
   ],
-  size: () => [SIZE_X, SIZE_Y],
+  size,
   interactHandler: part => showSettingsBlock(part, settingsKey),
 };
 
