@@ -8,7 +8,6 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockSpec } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
-import QuickActionsFieldDialog from './QuickActionsFieldDialog.vue';
 import { BlockChange, EditableFieldChange } from './types';
 
 
@@ -22,11 +21,7 @@ interface EditableBlockChange {
   fields: EditableFieldChange[];
 }
 
-@Component({
-  components: {
-    QuickActionsFieldDialog,
-  },
-})
+@Component
 export default class QuickActionChange extends Vue {
   editable = false;
 
@@ -101,15 +96,16 @@ export default class QuickActionChange extends Vue {
 
   editField(field: EditableFieldChange): void {
     createDialog({
-      component: QuickActionsFieldDialog,
-      field,
+      component: 'ChangeFieldDialog',
+      field: field.cfield,
       address: {
         id: this.change.blockId,
         serviceId: this.change.serviceId,
       },
+      value: field.value,
       title: `${this.change.blockId} ${field.cfield.title}`,
     })
-      .onOk(field => this.saveField(field));
+      .onOk(value => this.saveField({ ...field, value }));
   }
 }
 </script>

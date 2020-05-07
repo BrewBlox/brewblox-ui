@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockPatchImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
@@ -40,26 +41,36 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
   }
 
   isActive(key: string): boolean {
-    return this.impl.data[key] !== undefined;
+    return key in this.impl.data;
   }
 
-  fieldData(change: ChangeField): any {
-    return this.impl.data[change.key];
+  fieldValue(field: ChangeField): any {
+    return this.impl.data[field.key];
   }
 
-  addChange(change: ChangeField): void {
-    this.$set(this.impl.data, change.key, change.generate());
+  addField(field: ChangeField): void {
+    this.$set(this.impl.data, field.key, field.generate());
     this.save();
   }
 
-  saveChange(change: ChangeField, value: any): void {
-    this.$set(this.impl.data, change.key, value);
+  saveField(field: ChangeField, value: any): void {
+    this.$set(this.impl.data, field.key, value);
     this.save();
   }
 
-  removeChange(change: ChangeField): void {
-    this.$delete(this.impl.data, change.key);
+  removeField(field: ChangeField): void {
+    this.$delete(this.impl.data, field.key);
     this.save();
+  }
+
+  editField(field: ChangeField): void {
+    createDialog({
+      component: 'ChangeFieldDialog',
+      field,
+      address: this.addr,
+      title: `${this.addr.id} ${field.title}`,
+    })
+      .onOk(value => this.saveField(field, value));
   }
 }
 </script>
@@ -74,39 +85,50 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
     <template v-if="spec">
       <div
-        v-for="change in spec.changes"
-        :key="change.key"
+        v-for="field in spec.changes"
+        :key="field.key"
         class="row no-wrap items-center"
       >
         <div class="col-auto">
-          <template v-if="isActive(change.key)">
-            <q-btn dense flat round icon="mdi-checkbox-marked-outline" @click="removeChange(change)">
+          <template v-if="isActive(field.key)">
+            <q-btn
+              dense
+              flat
+              round
+              icon="mdi-checkbox-marked-outline"
+              @click="removeField(field)"
+            >
               <q-tooltip>
                 Remove field change from action
               </q-tooltip>
             </q-btn>
           </template>
           <template v-else>
-            <q-btn dense flat round icon="mdi-checkbox-blank-outline" @click="addChange(change)">
+            <q-btn
+              dense
+              flat
+              round
+              icon="mdi-checkbox-blank-outline"
+              @click="addField(field)"
+            >
               <q-tooltip>
                 Add field change to action
               </q-tooltip>
             </q-btn>
           </template>
         </div>
-        <div class="col" :class="{darkened: !isActive(change.key)}">
-          {{ change.title }}
+        <div class="col" :class="{darkened: !isActive(field.key)}">
+          {{ field.title }}
         </div>
-        <div v-if="isActive(change.key)" class="col-grow">
+        <div v-if="isActive(field.key)" class="col-grow">
           <component
-            :is="change.component"
-            v-bind="change.componentProps"
+            :is="field.component"
+            v-bind="field.componentProps"
             :block-id="impl.blockId"
             :service-id="impl.serviceId"
-            :value="fieldData(change)"
-            editable
-            lazy
-            @input="v => saveChange(change, v)"
+            :value="fieldValue(field)"
+            @input="v => saveField(field, v)"
+            @edit="editField(field)"
           />
         </div>
       </div>

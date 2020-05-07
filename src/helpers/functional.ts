@@ -17,8 +17,8 @@ export const objectSorter =
 export const objectStringSorter =
   (key: string): SortFunc =>
     (a: any, b: any) => {
-      const left = a[key].toLowerCase();
-      const right = b[key].toLowerCase();
+      const left = a[key]?.toLowerCase() ?? '';
+      const right = b[key]?.toLowerCase() ?? '';
       return left.localeCompare(right);
     };
 

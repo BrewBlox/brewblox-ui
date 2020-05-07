@@ -11,7 +11,6 @@ import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import QuickActionsFieldDialog from './QuickActionsFieldDialog.vue';
 import { BlockChange, EditableFieldChange, Step } from './types';
 
 interface FieldDiff {
@@ -34,11 +33,7 @@ interface StepDisplay extends Step {
   diffs: BlockDiff[];
 }
 
-@Component({
-  components: {
-    QuickActionsFieldDialog,
-  },
-})
+@Component
 export default class QuickActionsBasic extends CrudComponent {
   applying = false;
 
@@ -95,16 +90,17 @@ export default class QuickActionsBasic extends CrudComponent {
       };
 
       createDialog({
-        component: QuickActionsFieldDialog,
-        field,
+        component: 'ChangeFieldDialog',
+        field: cfield,
         address: block,
+        value: field.value,
         title: `Confirm ${block.id} ${cfield.title}`,
         message: `
         Please confirm the ${cfield.title} value in ${block.id}.
         Current value is '${pretty(block.data[key])}'.
         `,
       })
-        .onOk(field => resolve(field.value))
+        .onOk(value => resolve(value))
         .onCancel(() => reject());
     });
   }
