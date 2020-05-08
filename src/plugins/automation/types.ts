@@ -8,6 +8,7 @@ export interface AutomationSpec<T extends AutomationImpl = AutomationImpl> {
   type: T['type'];
   title: string;
   generate: () => T;
+  pretty: (impl: AutomationImpl) => string;
   component: VueConstructor;
 }
 
