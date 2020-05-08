@@ -1,9 +1,11 @@
 import { uid } from 'quasar';
 
+import { findById } from '@/helpers/functional';
 import { Unit } from '@/helpers/units';
 
 import { blockTypes } from '../spark/block-types';
 import { actionSpecs, conditionSpecs } from './impl/specs';
+import { AutomationTemplate, AutomationTransition } from './shared-types';
 import { automationStore } from './store';
 import { AutomationCondition, AutomationStep } from './types';
 
@@ -198,4 +200,13 @@ export async function make(): Promise<void> {
       ...mkSteps(),
     ],
   });
+}
+
+
+export function nextTitle(template: AutomationTemplate, transition: AutomationTransition): string {
+  return typeof transition.next === 'string'
+    ? findById(template.steps, transition.next)?.title ?? 'Unknown step'
+    : transition.next
+      ? '[Next step]'
+      : '[Process end]';
 }

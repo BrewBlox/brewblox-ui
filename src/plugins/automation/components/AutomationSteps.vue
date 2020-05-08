@@ -6,8 +6,19 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { clamp, filterById, spliceById } from '@/helpers/functional';
 
-import { AutomationStep, AutomationTemplate } from '../shared-types';
+import { nextTitle } from '../helpers';
+import { allSpecs } from '../impl/specs';
+import {
+  AutomationImpl,
+  AutomationStep,
+  AutomationTemplate,
+  AutomationTransition,
+} from '../types';
 
+
+interface HasImpl {
+  impl: AutomationImpl;
+}
 
 @Component
 export default class AutomationSteps extends Vue {
@@ -78,6 +89,14 @@ export default class AutomationSteps extends Vue {
     this.locals = filterById(this.locals, step);
     this.selectStep(null, 'Steps');
   }
+
+  pretty({ impl }: HasImpl): string {
+    return allSpecs[impl.type].pretty(impl);
+  }
+
+  nextStepTitle(transition: AutomationTransition): string {
+    return nextTitle(this.template, transition);
+  }
 }
 </script>
 
@@ -118,26 +137,41 @@ export default class AutomationSteps extends Vue {
           </Toolbar>
         </div>
         <div
-          class="q-px-md q-pb-md q-gutter-x-sm row text-secondary pointer"
+          class="q-px-md q-pb-md q-gutter-y-sm column pointer"
           @click.stop="selectStep(step.id, 'Steps')"
         >
           <div
             class="q-pa-sm rounded-borders clickable"
             @click.stop="selectStep(step.id, 'Preconditions')"
           >
-            {{ step.preconditions.length }} preconditions
+            <div class="text-bold text-secondary">
+              Preconditions
+            </div>
+            <div v-for="v in step.preconditions" :key="v.id">
+              {{ pretty(v) }}
+            </div>
           </div>
           <div
             class="q-pa-sm rounded-borders clickable"
             @click.stop="selectStep(step.id, 'Actions')"
           >
-            {{ step.actions.length }} actions
+            <div class="text-bold text-secondary">
+              Actions
+            </div>
+            <div v-for="v in step.actions" :key="v.id">
+              {{ pretty(v) }}
+            </div>
           </div>
           <div
             class="q-pa-sm rounded-borders clickable"
             @click.stop="selectStep(step.id, 'Transitions')"
           >
-            {{ step.transitions.length }} transitions
+            <div class="text-bold text-secondary">
+              Transitions
+            </div>
+            <div v-for="v in step.transitions" :key="v.id">
+              To step: {{ nextStepTitle(v) }}
+            </div>
           </div>
         </div>
       </div>

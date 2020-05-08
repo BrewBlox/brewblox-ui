@@ -5,6 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { clamp, spliceById } from '@/helpers/functional';
 
+import { nextTitle } from '../helpers';
 import { conditionSpecs } from '../impl/specs';
 import { AutomationCondition, AutomationStep, AutomationTemplate, AutomationTransition } from '../types';
 
@@ -22,10 +23,7 @@ export default class AutomationConditions extends Vue {
   public readonly transition!: AutomationTransition;
 
   get nextStepTitle(): string {
-    const { next } = this.transition;
-    if (next === true) { return 'next step'; }
-    if (next === false) { return 'process end'; }
-    return this.template.steps.find(s => s.id === next)?.title ?? 'unknown step';
+    return nextTitle(this.template, this.transition);
   }
 
   get nextStepOptions(): SelectOption[] {
