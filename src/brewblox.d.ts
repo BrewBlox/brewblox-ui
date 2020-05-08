@@ -39,6 +39,10 @@ interface HasId {
   id: string;
 }
 
+interface HasType {
+  type: string;
+}
+
 interface QuasarNode {
   label: string;
   value: any;

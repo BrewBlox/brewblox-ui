@@ -5,9 +5,15 @@ import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { findById, shortDateString } from '@/helpers/functional';
 
-import { AutomationProcess, AutomationStatus, AutomationStepResult, AutomationTask } from './shared-types';
 import { automationStore } from './store';
-import { AutomationConfig, AutomationTemplate } from './types';
+import {
+  AutomationConfig,
+  AutomationProcess,
+  AutomationStatus,
+  AutomationStepResult,
+  AutomationTask,
+  AutomationTemplate,
+} from './types';
 
 interface ProcessDisplay {
   proc: AutomationProcess;
@@ -63,6 +69,15 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     this.$router.push(`/automation/${template.id}`);
   }
 
+  show(value: AutomationTemplate): void {
+    createDialog({
+      component: 'AutomationInfoDialog',
+      value,
+      title: `Automation process '${value.title}'`,
+      message: 'A running process is not editable.',
+    });
+  }
+
   jump(proc: AutomationProcess): void {
     const processId = proc.id;
     createDialog({
@@ -108,6 +123,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
       .map(res => `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${res.phase} ${res.error ?? ''}`)
       .join('\n');
   }
+
 }
 </script>
 
@@ -136,10 +152,20 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           </div>
           <q-btn
             flat
+            icon="mdi-information-outline"
+            class="col-auto"
+            @click="show(proc)"
+          >
+            <q-tooltip>Show process steps</q-tooltip>
+          </q-btn>
+          <q-btn
+            flat
             icon="mdi-fast-forward"
             class="col-auto"
             @click="jump(proc)"
-          />
+          >
+            <q-tooltip>Jump to step</q-tooltip>
+          </q-btn>
           <q-btn
             flat
             icon="clear"
