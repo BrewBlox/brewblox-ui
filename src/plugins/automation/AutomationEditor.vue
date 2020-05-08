@@ -45,6 +45,10 @@ export default class AutomationEditor extends DialogBase {
     automationStore.setActive([this.templateId, actualStepId]);
   }
 
+  get automationAvailable(): boolean {
+    return automationStore.lastEvent !== null;
+  }
+
   get drawerOpen(): boolean {
     return Boolean(
       this.localDrawer
@@ -305,6 +309,12 @@ export default class AutomationEditor extends DialogBase {
           v-if="step"
           class="page-height column no-wrap q-pa-md q-gutter-md"
         >
+          <CardWarning v-if="!automationAvailable">
+            <template #message>
+              The automation service is not available. <br>
+              This feature is still in preview.
+            </template>
+          </CardWarning>
           <q-tabs v-model="section">
             <q-tab
               name="Steps"

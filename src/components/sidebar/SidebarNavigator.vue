@@ -14,9 +14,6 @@ export default class SidebarNavigator extends Vue {
     class: 'col-grow q-py-sm max-small',
   }
 
-  // Set in quasar.conf
-  automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
-
   @Prop({ type: String, required: false })
   public readonly activeSection!: string;
 
@@ -63,7 +60,7 @@ export default class SidebarNavigator extends Vue {
       />
       <div class="col-break" />
       <q-btn
-        v-if="automationFeatureEnabled"
+        v-if="!editorDisabled"
         icon="mdi-calendar-check"
         label="Automation"
         to="/automation"

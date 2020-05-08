@@ -35,6 +35,10 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     Cancelled: '',
   }
 
+  get automationAvailable(): boolean {
+    return automationStore.lastEvent !== null;
+  }
+
   get templates(): AutomationTemplate[] {
     return automationStore.templates;
   }
@@ -138,6 +142,12 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     </template>
 
     <div class="widget-body column">
+      <CardWarning v-if="!automationAvailable">
+        <template #message>
+          The automation service is not available. <br>
+          This feature is still in preview.
+        </template>
+      </CardWarning>
       <div class="text-h6 text-secondary">
         Running processes
       </div>
@@ -238,6 +248,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           flat
           icon="mdi-play"
           class="col-auto"
+          :disable="!automationAvailable"
           @click="init(template)"
         >
           <q-tooltip>Start process from template</q-tooltip>
