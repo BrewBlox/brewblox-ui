@@ -31,10 +31,8 @@ export default {
   install(Vue: VueConstructor) {
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
-    if (process.env.BLOX_FEATURE_AUTOMATION) {
-      featureStore.registerWidget(widget);
-      featureStore.registerWatcher(watcher);
-    }
+    featureStore.registerWidget(widget);
+    featureStore.registerWatcher(watcher);
 
     Vue.$startup.onStart(() => automationStore.start());
     Vue.$eventbus.addListener({

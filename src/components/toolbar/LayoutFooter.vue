@@ -8,7 +8,6 @@ import { LogEntry, loggingStore } from '@/store/logging';
 
 @Component
 export default class LayoutFooter extends Vue {
-  automationActive = process.env.BLOX_FEATURE_AUTOMATION;
   logButtonColor = '';
 
   @Watch('logEntries')
@@ -40,7 +39,7 @@ export default class LayoutFooter extends Vue {
   <q-footer class="bg-dark shadow-up-1">
     <q-bar class="bg-transparent q-px-none">
       <q-space />
-      <q-btn v-if="automationActive" flat stretch icon="mdi-check-all">
+      <q-btn flat stretch icon="mdi-check-all">
         <q-tooltip>Tasks</q-tooltip>
         <AutomationTaskMenu />
       </q-btn>
