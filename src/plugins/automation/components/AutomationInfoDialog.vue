@@ -1,10 +1,9 @@
 <script lang="ts">
-import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { findById } from '@/helpers/functional';
 
+import { nextTitle } from '../helpers';
 import { allSpecs } from '../impl/specs';
 import {
   AutomationImpl,
@@ -30,34 +29,12 @@ export default class AutomationInfoDialog extends DialogBase {
     return allSpecs[impl.type].pretty(impl);
   }
 
-  nextTitle(transition: AutomationTransition): string {
-    return isString(transition.next)
-      ? findById(this.value.steps, transition.next)?.title ?? 'Unknown step'
-      : transition.next
-        ? '[Next Step]'
-        : '[Process Exit]';
-  }
-
   prettyList(values: HasImpl[]): string {
     return values.map(v => this.pretty(v)).join('\n');
   }
 
-  get templateString(): string {
-    return this.value
-      .steps
-      .map(step => ([
-        '>>> Preconditions',
-        step.preconditions.map(v => this.pretty(v)),
-        '>>> Actions',
-        step.actions.map(v => this.pretty(v)),
-        '>>> Transitions',
-        step.transitions.map(t => ([
-          `>>> >>> ${this.nextTitle(t)}`,
-          t.conditions.map(v => this.pretty(v)),
-        ])),
-      ]))
-      .flat(3)
-      .join('\n');
+  nextStepTitle(transition: AutomationTransition): string {
+    return nextTitle(this.value, transition);
   }
 
   save(): void {
@@ -103,7 +80,7 @@ export default class AutomationInfoDialog extends DialogBase {
               class="step-data"
             >
               <div>
-                To step {{ nextTitle(trans) }} if...
+                To step {{ nextStepTitle(trans) }} if...
               </div>
               <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
               <div class="listed">{{ prettyList(trans.conditions) }}</div>
@@ -111,9 +88,6 @@ export default class AutomationInfoDialog extends DialogBase {
           </div>
         </div>
       </q-expansion-item>
-      <!-- <div style="white-space: pre-line">
-        {{ templateString }}
-      </div> -->
       <template #actions>
         <q-btn
           flat
