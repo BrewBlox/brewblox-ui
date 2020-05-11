@@ -1,4 +1,5 @@
-import { DigitalState } from '../../types';
+import { DigitalState } from '@/plugins/spark/types';
+
 import { AnalogCompareOp, DigitalCompareOp, EvalResult } from './types';
 
 export const typeName = 'ActuatorLogic';

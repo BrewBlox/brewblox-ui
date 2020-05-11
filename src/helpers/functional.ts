@@ -300,14 +300,16 @@ export function filterById<T extends HasId>(arr: T[], obj: HasId): T[] {
  * minus those matching `obj`, and plus `obj` itself.
  * Does not modify input array.
  * If no members match `obj`, `obj` is appended.
+ * If a member matches `obj`, `obj` is inserted at the same index.
  *
  * @param arr object collection
  * @param obj object to be inserted
  */
 export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
-  const updated = arr.filter(v => v.id !== obj.id);
-  updated.push(obj);
-  return updated;
+  const idx = arr.findIndex(v => v.id === obj.id);
+  return idx !== -1
+    ? [...arr.slice(0, idx), obj, ...arr.slice(idx + 1)]
+    : [...arr, obj];
 }
 
 /**

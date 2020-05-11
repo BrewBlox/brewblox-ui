@@ -1,7 +1,7 @@
 import { matchesType } from '@/helpers/functional';
+import { AutomationSpec, BlockPatchImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { AutomationSpec, BlockPatchImpl } from '../../types';
 import BlockPatch from './BlockPatch.vue';
 
 const type = 'BlockPatch';

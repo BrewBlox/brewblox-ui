@@ -20,6 +20,7 @@ export default class BreweryPage extends Vue {
   localDrawer: boolean | null = null;
 
   debouncedCalculate: Function = () => { };
+  debouncedSaveLayout: Function = (layout: BuilderLayout) => { void layout; }
   flowParts: FlowPart[] = [];
 
   @Watch('layout')
@@ -37,6 +38,7 @@ export default class BreweryPage extends Vue {
   }
 
   created(): void {
+    this.debouncedSaveLayout = debounce(builderStore.saveLayout, 200, false);
     this.debouncedCalculate = debounce(this.calculate, 200, false);
     this.debouncedCalculate();
   }
@@ -65,12 +67,23 @@ export default class BreweryPage extends Vue {
     return builderStore.layoutById(this.layoutId ?? builderStore.layoutIds[0]);
   }
 
+  get scale(): number {
+    return this.layout?.scale ?? 1;
+  }
+
+  set scale(v: number) {
+    if (this.layout && v !== this.scale) {
+      this.layout.scale = v;
+      this.debouncedSaveLayout(this.layout);
+    }
+  }
+
   get gridHeight(): number {
-    return squares(this.layout?.height ?? 10);
+    return squares(this.layout?.height ?? 10) * this.scale;
   }
 
   get gridWidth(): number {
-    return squares(this.layout?.width ?? 10);
+    return squares(this.layout?.width ?? 10) * this.scale;
   }
 
   startEditor(): void {
@@ -95,7 +108,7 @@ export default class BreweryPage extends Vue {
 
     // first set local value, to avoid jitters caused by the period between action and vueX refresh
     this.layout.parts = parts.map(asPersistentPart);
-    await builderStore.saveLayout(this.layout);
+    this.debouncedSaveLayout(this.layout);
     this.debouncedCalculate();
   }
 
@@ -167,6 +180,31 @@ export default class BreweryPage extends Vue {
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
       <SidebarNavigator active-section="brewery" />
+
+      <q-field
+        label="Scale"
+        stack-label
+        borderless
+        class="col-grow q-px-md"
+      >
+        <q-slider
+          v-model.lazy="scale"
+          reverse
+          label
+          :min="0.4"
+          :max="4"
+          :step="0.2"
+        />
+        <q-btn
+          flat
+          round
+          size="sm"
+          color="white"
+          icon="mdi-backup-restore"
+          class="self-center q-ml-sm"
+          @click="scale = 1"
+        />
+      </q-field>
 
       <q-scroll-area
         class="col"

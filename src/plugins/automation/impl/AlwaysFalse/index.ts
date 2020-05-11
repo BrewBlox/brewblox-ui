@@ -1,6 +1,6 @@
 import { matchesType } from '@/helpers/functional';
+import { AlwaysFalseImpl, AutomationSpec } from '@/plugins/automation/types';
 
-import { AlwaysFalseImpl, AutomationSpec } from '../../types';
 import AlwaysFalse from './AlwaysFalse.vue';
 
 const type = 'AlwaysFalse';

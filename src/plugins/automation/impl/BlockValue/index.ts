@@ -1,7 +1,7 @@
 import { matchesType } from '@/helpers/functional';
+import { AutomationSpec, BlockValueImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { AutomationSpec, BlockValueImpl } from '../../types';
 import BlockValue from './BlockValue.vue';
 
 const type = 'BlockValue';
