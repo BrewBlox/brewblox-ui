@@ -1,13 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { Link } from '@/helpers/units';
 import { blockTypes, interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/features/DisplaySettings/types';
 import { DisplaySlot } from '@/plugins/spark/types';
-
-import { createDialog } from '../../../../helpers/dialog';
 
 @Component
 export default class DisplaySettingsFull

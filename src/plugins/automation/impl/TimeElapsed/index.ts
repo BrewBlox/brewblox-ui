@@ -1,6 +1,6 @@
 import { durationString, matchesType } from '@/helpers/functional';
+import { AutomationSpec, TimeElapsedImpl } from '@/plugins/automation/types';
 
-import { AutomationSpec, TimeElapsedImpl } from '../../types';
 import TimeElapsed from './TimeElapsed.vue';
 
 const type = 'TimeElapsed';

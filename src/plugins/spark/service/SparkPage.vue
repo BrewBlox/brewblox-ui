@@ -282,8 +282,6 @@ export default class SparkPage extends Vue {
       .filter(val => !filter
         || val.id.match(filter)
         || val.title.match(filter))
-      // Prevent jumps after saving blocks in a loose (eg. type) sort order
-      .sort(this.allSorters.name)
       .sort(this.sorter);
   }
 
@@ -323,7 +321,6 @@ export default class SparkPage extends Vue {
   get nodes(): RelationNode[] {
     return this.validatedItems
       .map(v => ({ id: v.id, type: v.title }))
-      .sort(objectStringSorter('id'))
       .sort(objectStringSorter('type'));
   }
 

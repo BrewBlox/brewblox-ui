@@ -1,6 +1,6 @@
 import { matchesType } from '@/helpers/functional';
+import { AutomationSpec, TaskCreateImpl } from '@/plugins/automation/types';
 
-import { AutomationSpec, TaskCreateImpl } from '../../types';
 import TaskCreate from './TaskCreate.vue';
 
 const type = 'TaskCreate';

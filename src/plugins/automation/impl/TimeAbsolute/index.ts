@@ -1,6 +1,6 @@
 import { matchesType, shortDateString } from '@/helpers/functional';
+import { AutomationSpec, TimeAbsoluteImpl } from '@/plugins/automation/types';
 
-import { AutomationSpec, TimeAbsoluteImpl } from '../../types';
 import TimeAbsolute from './TimeAbsolute.vue';
 
 const type = 'TimeAbsolute';

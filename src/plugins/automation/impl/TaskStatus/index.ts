@@ -1,6 +1,6 @@
 import { matchesType } from '@/helpers/functional';
+import { AutomationSpec, TaskStatusImpl } from '@/plugins/automation/types';
 
-import { AutomationSpec, TaskStatusImpl } from '../../types';
 import TaskStatus from './TaskStatus.vue';
 
 const type = 'TaskStatus';
