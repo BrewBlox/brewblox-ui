@@ -164,10 +164,10 @@ export default class LayoutActions extends Vue {
 <template>
   <ActionMenu v-bind="$attrs">
     <template #actions>
-      <ActionItem label="New Layout" icon="add" @click="startAddLayout(false)" />
+      <ActionItem icon="add" label="New Layout" @click="startAddLayout(false)" />
+      <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
       <template v-if="!!layout">
         <ActionItem icon="file_copy" label="Copy Layout" @click="startAddLayout(true)" />
-        <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
         <ActionItem icon="edit" label="Rename Layout" @click="renameLayout" />
         <ActionItem icon="dashboard" label="Show Layout on dashboard" @click="createLayoutWidget" />
         <ActionItem icon="mdi-file-export" label="Export Layout" @click="exportLayout" />
