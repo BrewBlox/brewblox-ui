@@ -156,6 +156,11 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
+  public async saveAutoConnecting(enabled: boolean): Promise<void> {
+    await api.persistAutoconnecting(this.id, enabled);
+  }
+
+  @Action
   public async fetchDiscoveredBlocks(): Promise<void> {
     const discovered = await api.fetchDiscoveredBlocks(this.id);
     this.discoveredBlocks = [...this.discoveredBlocks, ...discovered];
