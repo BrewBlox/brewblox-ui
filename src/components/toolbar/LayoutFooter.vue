@@ -4,11 +4,11 @@ import { Component, Watch } from 'vue-property-decorator';
 
 import { shortDateString } from '@/helpers/functional';
 import { notifyColors, notifyIcons } from '@/helpers/notify';
+import { automationStore } from '@/plugins/automation/store';
 import { LogEntry, loggingStore } from '@/store/logging';
 
 @Component
 export default class LayoutFooter extends Vue {
-  automationActive = process.env.BLOX_FEATURE_AUTOMATION;
   logButtonColor = '';
 
   @Watch('logEntries')
@@ -16,6 +16,10 @@ export default class LayoutFooter extends Vue {
     if (newV.length > oldV.length) {
       this.logButtonColor = 'primary';
     }
+  }
+
+  get automationAvailable(): boolean {
+    return automationStore.lastEvent !== null;
   }
 
   get logEntries(): LogEntry[] {
@@ -40,7 +44,7 @@ export default class LayoutFooter extends Vue {
   <q-footer class="bg-dark shadow-up-1">
     <q-bar class="bg-transparent q-px-none">
       <q-space />
-      <q-btn v-if="automationActive" flat stretch icon="mdi-check-all">
+      <q-btn v-if="automationAvailable" flat stretch icon="mdi-check-all">
         <q-tooltip>Tasks</q-tooltip>
         <AutomationTaskMenu />
       </q-btn>

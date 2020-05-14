@@ -1,6 +1,6 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById } from '@/helpers/functional';
+import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
 import { dashboardApi, widgetApi } from './api';
@@ -38,7 +38,7 @@ export class DashboardModule extends VuexModule {
   }
 
   public dashboardById(id: string): Dashboard | null {
-    return this.dashboards.find(v => v.id === id) ?? null;
+    return findById(this.dashboards, id);
   }
 
   public dashboardTitle(id: string): string {
@@ -46,7 +46,7 @@ export class DashboardModule extends VuexModule {
   }
 
   public widgetById(id: string): Widget | null {
-    return this.widgets.find(v => v.id === id) ?? null;
+    return findById(this.widgets, id);
   }
 
   public dashboardWidgets(dashboardId: string): Widget[] {

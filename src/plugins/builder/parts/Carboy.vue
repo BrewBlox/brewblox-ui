@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
 import { colorString } from '../helpers';
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../specs/Carboy';
 
 @Component
 export default class Carboy extends PartBase {
@@ -25,6 +26,18 @@ export default class Carboy extends PartBase {
   get color(): string {
     return colorString(this.part.settings.color);
   }
+
+  get scaleX(): number {
+    return this.sizeX / DEFAULT_SIZE_X;
+  }
+
+  get scaleY(): number {
+    return this.sizeY / DEFAULT_SIZE_Y;
+  }
+
+  get valueY(): number {
+    return Math.round(this.sizeY / 4);
+  }
 }
 </script>
 
@@ -39,8 +52,16 @@ export default class Carboy extends PartBase {
       ry="8"
     />
     <g class="outline">
-      <path :d="path" />
-      <SetpointValues :part="part" :start-y="1" :background-color="color" hide-unset />
+      <path
+        :d="path"
+        :transform="`scale(${scaleX} ${scaleY})`"
+      />
+      <SetpointValues
+        :part="part"
+        :start-y="valueY"
+        :background-color="color"
+        hide-unset
+      />
     </g>
   </g>
 </template>

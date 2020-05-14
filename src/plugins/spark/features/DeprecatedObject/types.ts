@@ -1,4 +1,4 @@
-import { Block } from '../../types';
+import { Block } from '@/plugins/spark/types';
 
 
 export interface DeprecatedObjectData {

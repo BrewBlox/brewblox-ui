@@ -1,7 +1,7 @@
 import { Link } from '@/helpers/units';
 import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
@@ -47,6 +47,13 @@ const block: BlockSpec<ActuatorOffsetData> = {
       title: 'Reference',
       component: 'LinkValEdit',
       generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+    },
+    {
+      key: 'constrainedBy',
+      title: 'Constraints',
+      component: 'AnalogConstraintsValEdit',
+      generate: () => ({ constraints: [] }),
+      pretty: prettifyConstraints,
     },
   ],
   graphTargets: {

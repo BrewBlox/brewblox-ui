@@ -3,30 +3,28 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
-import type { BlockAddress } from '@/plugins/spark/types';
-
-import { EditableFieldChange } from './types';
+import type { BlockAddress, ChangeField } from '@/plugins/spark/types';
 
 
 @Component
-export default class QuickActionsFieldDialog extends DialogBase {
+export default class ChangeFieldDialog extends DialogBase {
   local: any = null;
 
   @Prop({ type: Object, required: true })
   public readonly address!: BlockAddress;
 
   @Prop({ type: Object, required: true })
-  public readonly field!: EditableFieldChange;
+  public readonly field!: ChangeField;
+
+  @Prop({ required: true })
+  public readonly value!: any;
 
   created(): void {
-    this.local = deepCopy(this.field.value);
+    this.local = deepCopy(this.value);
   }
 
   save(): void {
-    this.onDialogOk({
-      ...this.field,
-      value: this.local,
-    });
+    this.onDialogOk(this.local);
   }
 }
 </script>
@@ -40,9 +38,9 @@ export default class QuickActionsFieldDialog extends DialogBase {
   >
     <DialogCard v-bind="{title, message, html}">
       <component
-        :is="field.cfield.component"
+        :is="field.component"
         v-model="local"
-        v-bind="field.cfield.componentProps"
+        v-bind="field.componentProps"
         :service-id="address.serviceId"
         :block-id="address.id"
         editable

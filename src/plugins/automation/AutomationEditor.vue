@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
-import { clamp, spliceById } from '@/helpers/functional';
+import { clamp, objectStringSorter, spliceById } from '@/helpers/functional';
 
 import { clear, idCopy, make } from './helpers';
 import { automationStore } from './store';
@@ -45,6 +45,10 @@ export default class AutomationEditor extends DialogBase {
     automationStore.setActive([this.templateId, actualStepId]);
   }
 
+  get automationAvailable(): boolean {
+    return automationStore.lastEvent !== null;
+  }
+
   get drawerOpen(): boolean {
     return Boolean(
       this.localDrawer
@@ -58,7 +62,7 @@ export default class AutomationEditor extends DialogBase {
   }
 
   get templates(): AutomationTemplate[] {
-    return automationStore.templates;
+    return [...automationStore.templates].sort(objectStringSorter('title'));
   }
 
   get template(): AutomationTemplate | null {
@@ -261,8 +265,8 @@ export default class AutomationEditor extends DialogBase {
           </q-item-section>
         </q-item>
         <ActionItem
-          v-for="tmpl in templates"
-          :key="tmpl.id"
+          v-for="(tmpl, idx) in templates"
+          :key="`${tmpl.id}-${idx}`"
           :label="tmpl.title"
           :active="template && tmpl.id === template.id"
           :inset-level="0.2"
@@ -301,7 +305,16 @@ export default class AutomationEditor extends DialogBase {
 
     <q-page-container>
       <q-page>
-        <div v-if="step" class="page-height column no-wrap q-pa-md q-gutter-md">
+        <div
+          v-if="step"
+          class="page-height column no-wrap q-pa-md q-gutter-md"
+        >
+          <CardWarning v-if="!automationAvailable">
+            <template #message>
+              The automation service is not available. <br>
+              This feature is still in preview.
+            </template>
+          </CardWarning>
           <q-tabs v-model="section">
             <q-tab
               name="Steps"

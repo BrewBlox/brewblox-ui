@@ -1,21 +1,27 @@
+import { matchesType } from '@/helpers/functional';
+import { AutomationSpec, BlockValueImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
 
-import { AutomationSpec, BlockValueImpl } from '../../types';
 import BlockValue from './BlockValue.vue';
 
+const type = 'BlockValue';
 const spec: AutomationSpec<BlockValueImpl> = {
-  type: 'BlockValue',
+  type,
   title: 'Block value',
+  component: BlockValue,
   generate: () => ({
-    type: 'BlockValue',
+    type,
     blockId: null,
-    serviceId: sparkStore.serviceIds[0],
+    serviceId: sparkStore.serviceIds[0] ?? null,
     blockType: null,
     key: null,
     operator: 'eq',
     value: null,
   }),
-  component: BlockValue,
+  pretty: impl =>
+    matchesType<BlockValueImpl>(type, impl)
+      ? `Assert '${impl.key}' value in block '${impl.blockId}'`
+      : `Invalid data: type=${impl.type}`,
 };
 
 export default spec;

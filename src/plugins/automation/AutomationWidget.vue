@@ -2,11 +2,18 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
-import { shortDateString } from '@/helpers/functional';
+import { createDialog } from '@/helpers/dialog';
+import { findById, shortDateString } from '@/helpers/functional';
 
-import { AutomationProcess, AutomationStatus, AutomationStepResult, AutomationTask } from './shared-types';
 import { automationStore } from './store';
-import { AutomationConfig, AutomationTemplate } from './types';
+import {
+  AutomationConfig,
+  AutomationProcess,
+  AutomationStatus,
+  AutomationStepResult,
+  AutomationTask,
+  AutomationTemplate,
+} from './types';
 
 interface ProcessDisplay {
   proc: AutomationProcess;
@@ -26,6 +33,10 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     Paused: '',
     Finished: '',
     Cancelled: '',
+  }
+
+  get automationAvailable(): boolean {
+    return automationStore.lastEvent !== null;
   }
 
   get templates(): AutomationTemplate[] {
@@ -62,11 +73,22 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     this.$router.push(`/automation/${template.id}`);
   }
 
-  jump(proc: AutomationProcess): void {
-    automationStore.jumpProcess({
-      processId: proc.id,
-      stepId: proc.steps[0].id,
+  show(value: AutomationTemplate): void {
+    createDialog({
+      component: 'AutomationInfoDialog',
+      value,
+      title: `Automation process '${value.title}'`,
+      message: 'A running process is not editable.',
     });
+  }
+
+  jump(proc: AutomationProcess): void {
+    const processId = proc.id;
+    createDialog({
+      component: 'AutomationJumpDialog',
+      processId,
+    })
+      .onOk(stepId => automationStore.jumpProcess({ processId, stepId }));
   }
 
   removeProcess(proc: AutomationProcess): void {
@@ -99,12 +121,13 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   }
 
   historyStatus(proc: AutomationProcess, results: AutomationStepResult[]): string {
-    const stepTitle = id => proc.steps.find(v => v.id === id)?.title ?? 'Unknown';
+    const stepTitle = id => findById(proc.steps, id)?.title ?? 'Unknown';
     return results
       .reverse()
       .map(res => `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${res.phase} ${res.error ?? ''}`)
       .join('\n');
   }
+
 }
 </script>
 
@@ -119,6 +142,12 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     </template>
 
     <div class="widget-body column">
+      <CardWarning v-if="!automationAvailable">
+        <template #message>
+          The automation service is not available. <br>
+          This feature is still in preview.
+        </template>
+      </CardWarning>
       <div class="text-h6 text-secondary">
         Running processes
       </div>
@@ -133,10 +162,20 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           </div>
           <q-btn
             flat
+            icon="mdi-information-outline"
+            class="col-auto"
+            @click="show(proc)"
+          >
+            <q-tooltip>Show process steps</q-tooltip>
+          </q-btn>
+          <q-btn
+            flat
             icon="mdi-fast-forward"
             class="col-auto"
             @click="jump(proc)"
-          />
+          >
+            <q-tooltip>Jump to step</q-tooltip>
+          </q-btn>
           <q-btn
             flat
             icon="clear"
@@ -209,6 +248,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           flat
           icon="mdi-play"
           class="col-auto"
+          :disable="!automationAvailable"
           @click="init(template)"
         >
           <q-tooltip>Start process from template</q-tooltip>

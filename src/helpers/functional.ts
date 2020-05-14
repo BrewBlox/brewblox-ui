@@ -17,8 +17,8 @@ export const objectSorter =
 export const objectStringSorter =
   (key: string): SortFunc =>
     (a: any, b: any) => {
-      const left = a[key].toLowerCase();
-      const right = b[key].toLowerCase();
+      const left = a[key]?.toLowerCase() ?? '';
+      const right = b[key]?.toLowerCase() ?? '';
       return left.localeCompare(right);
     };
 
@@ -300,12 +300,57 @@ export function filterById<T extends HasId>(arr: T[], obj: HasId): T[] {
  * minus those matching `obj`, and plus `obj` itself.
  * Does not modify input array.
  * If no members match `obj`, `obj` is appended.
+ * If a member matches `obj`, `obj` is inserted at the same index.
  *
  * @param arr object collection
  * @param obj object to be inserted
  */
 export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
-  const updated = arr.filter(v => v.id !== obj.id);
-  updated.push(obj);
-  return updated;
+  const idx = arr.findIndex(v => v.id === obj.id);
+  return idx !== -1
+    ? [...arr.slice(0, idx), obj, ...arr.slice(idx + 1)]
+    : [...arr, obj];
+}
+
+/**
+ * Looks for object in array collection.
+ *
+ * @param arr object collection
+ * @param id unique ID of desired object
+ */
+export function findById<T extends HasId>(
+  arr: T[],
+  id: string | null,
+  fallback: T | null = null,
+): typeof fallback {
+  return id != null
+    ? arr.find(v => v.id === id) ?? fallback
+    : fallback;
+}
+
+/**
+ * Checks if a generic object with a 'type' field matches a TS interface.
+ * Best used when T.type is a constant value.
+ *
+ * The function acts as a type guard:
+ * https://www.typescriptlang.org/docs/handbook/advanced-types.html#instanceof-type-guards
+ *
+ * This is useful for when data is dynamically loaded,
+ * and we want to perform a runtime type check,
+ * while validating the 'type' argument at compile time.
+ *
+ *    interface PancakeIntf {
+ *      type: 'Pancake';
+ *      value: string;
+ *    }
+ *    matchesType<PancakeIntf>('Pancake', {type: 'Pancake', value: 'no'}) >>>> true
+ *    matchesType<PancakeIntf>('Pancake', {type: 'Waffle', value: 'yes'}) >>>> false
+ *    matchesType<PancakeIntf>('Waffle', {type: 'Waffle', value: 'yes'})
+ *    //                        ^^^^^^
+ *    // Argument of type '"Waffle"' is not assignable to parameter of type '"Pancake"'
+ * @param type
+ * @param obj
+ */
+export function matchesType<T extends HasType>(type: T['type'], obj: HasType): obj is T {
+  return obj.type === type;
 }

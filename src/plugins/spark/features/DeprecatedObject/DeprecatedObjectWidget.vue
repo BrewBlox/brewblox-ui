@@ -4,8 +4,8 @@ import { Component } from 'vue-property-decorator';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { sparkStore } from '@/plugins/spark/store';
 import { fetchStoredBlock } from '@/plugins/spark/store/api';
+import { Block } from '@/plugins/spark/types';
 
-import { Block } from '../../types';
 import { DeprecatedObjectBlock } from './types';
 
 @Component

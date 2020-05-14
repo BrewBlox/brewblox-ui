@@ -4,16 +4,13 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
 import { analogConstraintLabels, digitalConstraintLabels } from '@/plugins/spark/getters';
-import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
+import { prettifyConstraints } from '@/plugins/spark/helpers';
+import type { AnalogConstraint, AnyConstraintsObj, DigitalConstraint } from '@/plugins/spark/types';
 
 const constraintLabels = {
   ...digitalConstraintLabels,
   ...analogConstraintLabels,
 };
-
-interface AnyConstraintsObj {
-  constraints: (AnalogConstraint | DigitalConstraint)[];
-}
 
 @Component
 export default class ConstraintsField extends FieldBase {
@@ -63,6 +60,10 @@ export default class ConstraintsField extends FieldBase {
     return 'darkish';
   }
 
+  get displayString(): string {
+    return prettifyConstraints(this.value);
+  }
+
   openDialog(): void {
     createDialog({
       component: 'ConstraintsDialog',
@@ -93,5 +94,8 @@ export default class ConstraintsField extends FieldBase {
           No constraints configured</small>
       </div>
     </div>
+    <q-tooltip v-if="numConstraints > 0">
+      {{ displayString }}
+    </q-tooltip>
   </q-list>
 </template>

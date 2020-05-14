@@ -106,6 +106,7 @@ export type UserUnits = Record<UserUnitKey, string>;
  * As sent/pushed by the devcon-spark service
  */
 export interface ApiSparkStatus {
+  autoconnecting: boolean;
   connect: boolean;
   handshake: boolean;
   synchronize: boolean;
@@ -269,4 +270,8 @@ export type DigitalConstraint =
 
 export interface DigitalConstraintsObj {
   constraints: DigitalConstraint[];
+}
+
+export interface AnyConstraintsObj {
+  constraints: (AnalogConstraint | DigitalConstraint)[];
 }

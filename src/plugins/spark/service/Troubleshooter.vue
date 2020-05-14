@@ -35,6 +35,12 @@ export default class Troubleshooter extends Vue {
       : 'Unable to connect to service';
   }
 
+  get textAutoconnecting(): string {
+    return this.status?.autoconnecting
+      ? 'Service automatically connects to controller'
+      : 'Service does not automatically connect to controller';
+  }
+
   get textConnect(): string {
     return this.status?.connect
       ? 'Service connected to controller'
@@ -65,8 +71,13 @@ export default class Troubleshooter extends Vue {
       : 'Service not synchronized';
   }
 
-  refresh(): void {
-    this.sparkModule?.fetchAll();
+  async refresh(): Promise<void> {
+    await this.sparkModule?.fetchAll();
+  }
+
+  async toggleAutoconnecting(): Promise<void> {
+    await this.sparkModule?.saveAutoConnecting(!this.status?.autoconnecting);
+    await this.refresh();
   }
 
   iconProps(val: boolean): Mapped<any> {
@@ -115,6 +126,21 @@ export default class Troubleshooter extends Vue {
       </div>
 
       <div class="col-break" />
+      <q-icon v-bind="iconProps(status.autoconnecting)" />
+      <div>
+        {{ textAutoconnecting }}
+      </div>
+
+      <div class="col-break" />
+      <div class="row q-gutter-x-sm q-pl-lg">
+        <q-btn
+          flat
+          :label="status.autoconnecting ? 'Pause' : 'Resume'"
+          @click="toggleAutoconnecting"
+        />
+      </div>
+
+      <div class="col-break" />
       <q-icon v-bind="iconProps(status.connect)" />
       <div>
         {{ textConnect }}
@@ -156,6 +182,11 @@ export default class Troubleshooter extends Vue {
             <li>Is the container present in your docker-compose file?</li>
             <li>Is the container running?</li>
           </ul>
+        </span>
+        <!-- not autoconnecting -->
+        <span v-else-if="!status.autoconnecting">
+          Your Spark service is paused, and not automatically connecting to your controller.<br>
+          This status can be toggled manually.
         </span>
         <!-- not connected -->
         <span v-else-if="!status.connect">

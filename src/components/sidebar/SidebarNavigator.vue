@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { automationStore } from '@/plugins/automation/store';
 
 
 @Component
@@ -14,15 +15,16 @@ export default class SidebarNavigator extends Vue {
     class: 'col-grow q-py-sm max-small',
   }
 
-  // Set in quasar.conf
-  automationFeatureEnabled = !!process.env.BLOX_FEATURE_AUTOMATION;
-
   @Prop({ type: String, required: false })
   public readonly activeSection!: string;
 
   get editorDisabled(): boolean {
     const { ie, edge } = this.$q.platform.is;
     return Boolean(ie || edge) || this.$dense;
+  }
+
+  get automationAvailable(): boolean {
+    return automationStore.lastEvent !== null;
   }
 
   showWizard(): void {
@@ -63,7 +65,7 @@ export default class SidebarNavigator extends Vue {
       />
       <div class="col-break" />
       <q-btn
-        v-if="automationFeatureEnabled"
+        v-if="!editorDisabled && automationAvailable"
         icon="mdi-calendar-check"
         label="Automation"
         to="/automation"

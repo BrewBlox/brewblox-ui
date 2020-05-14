@@ -59,6 +59,7 @@ export default class BuilderEditor extends Vue {
   undoneHistory: string[] = [];
 
   localDrawer: boolean | null = null;
+  drawerContent: 'tools' | 'layouts' = 'tools';
   menuDialogOpen = false;
   focusWarning = true;
 
@@ -758,26 +759,10 @@ export default class BuilderEditor extends Vue {
       <SidebarNavigator active-section="builder" />
 
       <div class="row">
-        <q-btn-dropdown
-          :label="layout ? ($dense ? '' : layout.title) : 'None'"
-          flat
-          no-caps
-          class="col"
-          align="between"
-        >
-          <q-list bordered>
-            <q-list>
-              <ActionItem
-                v-for="lo in layouts"
-                :key="lo.id"
-                :label="lo.title"
-                :active="layout && lo.id === layout.id"
-                icon="mdi-view-dashboard-outline"
-                @click="selectLayout(lo.id)"
-              />
-            </q-list>
-          </q-list>
-        </q-btn-dropdown>
+        <q-tabs v-model="drawerContent" active-color="primary" class="col-grow">
+          <q-tab name="tools" label="Tools" />
+          <q-tab name="layouts" label="Layouts" />
+        </q-tabs>
         <LayoutActions
           :layout="layout"
           :select-layout="selectLayout"
@@ -785,123 +770,139 @@ export default class BuilderEditor extends Vue {
           class="col-auto"
         />
       </div>
-      <div class="col-auto">
-        <q-separator />
-      </div>
 
       <q-scroll-area
-        v-if="!!layout"
         class="col"
         :thumb-style="{opacity: 0.5, background: 'silver'}"
       >
-        <q-item class="q-pb-none">
-          <q-item-section class="text-bold">
-            Mouse actions
-          </q-item-section>
-        </q-item>
+        <template v-if="drawerContent === 'tools' && layout !== null">
+          <q-item class="q-pb-none">
+            <q-item-section class="text-bold">
+              Mouse actions
+            </q-item-section>
+          </q-item>
 
-        <ActionItem
-          v-for="mode in modes"
-          :key="'mode-' + mode.value"
-          :active="currentMode.value === mode.value"
-          :icon="mode.icon"
-          :label="mode.label"
-          :inset-level="0.2"
-          style="min-height: 0px"
-          @click="currentMode = mode"
-        />
+          <ActionItem
+            v-for="mode in modes"
+            :key="'mode-' + mode.value"
+            :active="currentMode.value === mode.value"
+            :icon="mode.icon"
+            :label="mode.label"
+            :inset-level="0.2"
+            style="min-height: 0px"
+            @click="currentMode = mode"
+          />
 
-        <q-item class="q-pb-none">
-          <q-item-section class="text-bold">
-            Tools
-          </q-item-section>
-        </q-item>
+          <q-item class="q-pb-none">
+            <q-item-section class="text-bold">
+              Tools
+            </q-item-section>
+          </q-item>
 
-        <ActionItem
-          v-for="tool in tools"
-          :key="'tool-' + tool.value"
-          :icon="tool.icon"
-          :label="tool.label"
-          :inset-level="0.2"
-          style="min-height: 0px"
-          @click="tool.use(findActionParts())"
-        >
-          <q-item-section side class="text-uppercase">
-            {{ tool.shortcut }}
-          </q-item-section>
-        </ActionItem>
+          <ActionItem
+            v-for="tool in tools"
+            :key="'tool-' + tool.value"
+            :icon="tool.icon"
+            :label="tool.label"
+            :inset-level="0.2"
+            style="min-height: 0px"
+            @click="tool.use(findActionParts())"
+          >
+            <q-item-section side class="text-uppercase">
+              {{ tool.shortcut }}
+            </q-item-section>
+          </ActionItem>
 
-        <ActionItem
-          :disable="!history.length"
-          icon="mdi-undo"
-          label="Undo"
-          :inset-level="0.2"
-          style="min-height: 0px"
-          @click="undo"
-        >
-          <q-item-section side class="text-uppercase">
-            ctrl-Z
-          </q-item-section>
-        </ActionItem>
-        <ActionItem
-          :disable="!undoneHistory.length"
-          icon="mdi-redo"
-          label="Redo"
-          :inset-level="0.2"
-          style="min-height: 0px"
-          @click="redo"
-        >
-          <q-item-section side class="text-uppercase">
-            ctrl-Y
-          </q-item-section>
-        </ActionItem>
+          <ActionItem
+            :disable="!history.length"
+            icon="mdi-undo"
+            label="Undo"
+            :inset-level="0.2"
+            style="min-height: 0px"
+            @click="undo"
+          >
+            <q-item-section side class="text-uppercase">
+              ctrl-Z
+            </q-item-section>
+          </ActionItem>
+          <ActionItem
+            :disable="!undoneHistory.length"
+            icon="mdi-redo"
+            label="Redo"
+            :inset-level="0.2"
+            style="min-height: 0px"
+            @click="redo"
+          >
+            <q-item-section side class="text-uppercase">
+              ctrl-Y
+            </q-item-section>
+          </ActionItem>
 
-        <q-item class="q-pb-none">
-          <q-item-section class="text-bold">
-            Editor
-          </q-item-section>
-        </q-item>
+          <q-item class="q-pb-none">
+            <q-item-section class="text-bold">
+              Editor
+            </q-item-section>
+          </q-item>
 
-        <q-item :inset-level="0.2">
-          <q-item-section>
-            <q-item-label caption>
-              Width
-            </q-item-label>
-            <q-slider
-              :value="layout.width"
-              :min="1"
-              :max="50"
-              label
-              label-always
-              @change="v => { layout.width = v; saveLayout() }"
-            />
-          </q-item-section>
-        </q-item>
-        <q-item :inset-level="0.2">
-          <q-item-section>
-            <q-item-label caption>
-              Height
-            </q-item-label>
-            <q-slider
-              :value="layout.height"
-              :min="1"
-              :max="50"
-              label
-              label-always
-              @change="v => { layout.height = v; saveLayout() }"
-            />
-          </q-item-section>
-        </q-item>
+          <q-item :inset-level="0.2">
+            <q-item-section>
+              <q-item-label caption>
+                Width
+              </q-item-label>
+              <q-slider
+                :value="layout.width"
+                :min="1"
+                :max="50"
+                label
+                label-always
+                @change="v => { layout.width = v; saveLayout() }"
+              />
+            </q-item-section>
+          </q-item>
+          <q-item :inset-level="0.2">
+            <q-item-section>
+              <q-item-label caption>
+                Height
+              </q-item-label>
+              <q-slider
+                :value="layout.height"
+                :min="1"
+                :max="50"
+                label
+                label-always
+                @change="v => { layout.height = v; saveLayout() }"
+              />
+            </q-item-section>
+          </q-item>
 
-        <ActionItem
-          :active="focusWarning"
-          :inset-level="0.2"
-          :icon="focusWarning
-            ? 'mdi-checkbox-marked-outline'
-            : 'mdi-checkbox-blank-outline'"
-          label="Dim editor when focus is lost"
-          @click="focusWarning = !focusWarning"
-        />
+          <ActionItem
+            :active="focusWarning"
+            :inset-level="0.2"
+            :icon="focusWarning
+              ? 'mdi-checkbox-marked-outline'
+              : 'mdi-checkbox-blank-outline'"
+            label="Dim editor when focus is lost"
+            @click="focusWarning = !focusWarning"
+          />
+        </template>
+
+        <template v-if="drawerContent === 'layouts'">
+          <ActionItem
+            v-for="lo in layouts"
+            :key="lo.id"
+            :label="lo.title"
+            :active="layout && lo.id === layout.id"
+            icon="mdi-view-dashboard-outline"
+            @click="selectLayout(lo.id)"
+          />
+        </template>
+
+        <template v-if="layouts.length === 0">
+          <div class="darkish q-pa-md">
+            It's empty in here.
+            Create a layout to get started.
+          </div>
+        </template>
       </q-scroll-area>
     </q-drawer>
 

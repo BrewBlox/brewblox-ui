@@ -12,7 +12,6 @@ module.exports = function (ctx) {
     BLOX_API_HOST: null,
     API_PORT: null,
     BLOX_PERFORMANCE: false,
-    BLOX_FEATURE_AUTOMATION: false,
   };
 
   return {
