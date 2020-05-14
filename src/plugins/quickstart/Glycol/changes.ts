@@ -202,7 +202,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       groups,
       data: {
         ...pidDefaults(),
-        kp: new Unit(20, '1/degC'),
+        kp: new Unit(100, '1/degC'),
         ti: new Time(2, 'hour'),
         td: new Time(10, 'min'),
         enabled: true,
