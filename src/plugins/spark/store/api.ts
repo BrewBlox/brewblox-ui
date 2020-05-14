@@ -61,24 +61,19 @@ export const cleanUnusedNames = (serviceId: string): Promise<string[]> =>
     .catch(intercept(`Failed to clean unused block names on ${serviceId}`));
 
 export const fetchUnits = (serviceId: string): Promise<UserUnits> =>
-  http.get<UserUnits>(`/${encodeURIComponent(serviceId)}/codec/units`)
+  http.get<UserUnits>(`/${encodeURIComponent(serviceId)}/settings/units`)
     .then(resp => resp.data)
     .catch(intercept(`Failed to fetch unit settings on ${serviceId}`));
 
 export const persistUnits = (serviceId: string, units: UserUnits): Promise<UserUnits> =>
-  http.put<UserUnits>(`/${encodeURIComponent(serviceId)}/codec/units`, units)
+  http.put<UserUnits>(`/${encodeURIComponent(serviceId)}/settings/units`, units)
     .then(resp => resp.data)
     .catch(intercept(`Failed to persist unit settings on ${serviceId}`));
 
-export const fetchCompatibleUnits = (serviceId: string): Promise<Mapped<string[]>> =>
-  http.get<Mapped<string[]>>(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`)
-    .then(resp => resp.data)
-    .catch(intercept(`Failed to fetch unit alternatives on ${serviceId}`));
-
-export const fetchCompatibleTypes = (serviceId: string): Promise<Mapped<string[]>> =>
-  http.get<Mapped<string[]>>(`/${encodeURIComponent(serviceId)}/codec/compatible_types`)
-    .then(resp => resp.data)
-    .catch(intercept(`Failed to fetch compatible types on ${serviceId}`));
+export const persistAutoconnecting = (serviceId: string, enabled: boolean): Promise<boolean> =>
+  http.put<{ enabled: boolean }>(`/${encodeURIComponent(serviceId)}/settings/autoconnecting`, { enabled })
+    .then(resp => resp.data.enabled)
+    .catch(intercept(`Failed to persist autoconnecting flag on ${serviceId}`));
 
 export const fetchDiscoveredBlocks = (serviceId: string): Promise<string[]> =>
   http.get<string[]>(`/${encodeURIComponent(serviceId)}/discover_objects`)
@@ -91,6 +86,7 @@ export const validateService = (serviceId: string): Promise<boolean> =>
     .catch(() => false);
 
 const unknownStatus = (): ApiSparkStatus => ({
+  autoconnecting: true,
   connect: false,
   handshake: false,
   synchronize: false,
