@@ -195,6 +195,21 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
         </template>
       </component>
     </template>
-    <component :is="mode" :crud="crud" @add="startAddSession" />
+    <component :is="mode" :crud="crud" @add="startAddSession">
+      <template v-if="session === null" #warnings>
+        <div class="widget-body row justify-center">
+          <div class="text-italic text-h6 q-pa-md darkened">
+            Create a session to get started.
+          </div>
+          <q-btn
+            fab-mini
+            color="secondary"
+            icon="add"
+            class="self-center"
+            @click="startAddSession"
+          />
+        </div>
+      </template>
+    </component>
   </CardWrapper>
 </template>

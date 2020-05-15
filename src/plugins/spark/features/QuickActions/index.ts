@@ -1,3 +1,5 @@
+import { uid } from 'quasar';
+
 import { ref } from '@/helpers/component-ref';
 import { WidgetFeature } from '@/store/features';
 
@@ -11,10 +13,16 @@ const feature: WidgetFeature = {
   wizard: true,
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 5,
   },
   generateConfig: (): QuickActionsConfig => ({
-    steps: [],
+    steps: [
+      {
+        id: uid(),
+        name: 'Example step - click to edit',
+        changes: [],
+      },
+    ],
     changeIdMigrated: true,
     serviceIdMigrated: true,
   }),

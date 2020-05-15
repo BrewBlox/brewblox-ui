@@ -38,9 +38,11 @@ export default class AutomationEditor extends DialogBase {
       ?? automationStore.templateIds[0]
       ?? null;
 
-    if (this.templateId != this.$route.params.id) {
-      this.$router.replace(`/automation/${this.templateId ?? ''}`);
-    }
+    const route = this.templateId
+      ? `/automation/${this.templateId}`
+      : '/automation';
+    this.$router.replace(route).catch(() => { });
+
     const actualStepId = this.templateId === templateId ? stepId : null;
     automationStore.setActive([this.templateId, actualStepId]);
   }

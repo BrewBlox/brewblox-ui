@@ -233,7 +233,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
           </div>
         </q-expansion-item>
       </draggable>
-      <q-item>
+      <q-item v-if="steps.length">
         <q-space />
         <q-item-section class="col-auto">
           <q-btn fab-mini color="secondary" icon="add" @click="addStep">

@@ -3,7 +3,8 @@ import { debounce, uid } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
-import { spliceById } from '@/helpers/functional';
+import { createDialog } from '@/helpers/dialog';
+import { spliceById, uniqueFilter } from '@/helpers/functional';
 
 import { calculateNormalizedFlows } from './calculateFlows';
 import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
@@ -47,22 +48,22 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     return builderStore.layoutById(this.config.currentLayoutId);
   }
 
-  isActive(layout: BuilderLayout): boolean {
-    return this.layoutIds.includes(layout.id);
+  startSelectLayout(): void {
+    createDialog({
+      component: 'SelectedLayoutDialog',
+      value: this.config.currentLayoutId,
+    })
+      .onOk(id => {
+        this.config.currentLayoutId = id;
+        this.saveConfig();
+      });
   }
 
-  showLayout(layout: BuilderLayout | null): void {
-    this.saveConfig({
-      ...this.config,
-      currentLayoutId: layout ? layout.id : null,
-    });
-  }
-
-  selectLayout(layout: BuilderLayout, selected: boolean): void {
-    const filtered = this.layoutIds.filter(v => v !== layout.id);
-    this.config.layoutIds = selected
-      ? [layout.id, ...filtered]
-      : filtered;
+  selectLayout(id: string | null): void {
+    if (id) {
+      this.config.layoutIds = [...this.config.layoutIds, id].filter(uniqueFilter);
+    }
+    this.config.currentLayoutId = id;
     this.saveConfig(this.config);
   }
 
@@ -173,61 +174,64 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
   <CardWrapper no-scroll v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud">
-        <ActionMenu icon="mdi-format-list-bulleted" dense round>
-          <template #menus>
-            <q-list>
-              <q-select
-                :value="layout"
-                :options="allLayouts"
-                label="Active layout"
-                item-aligned
-                option-label="title"
-                option-value="id"
-                @input="v => showLayout(v)"
-              >
-                <template #option="scope">
-                  <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
-                    <q-item-section>{{ scope.opt.title }}</q-item-section>
-                    <q-item-section class="col-auto">
-                      <q-btn
-                        v-if="isActive(scope.opt)"
-                        flat
-                        round
-                        icon="mdi-star"
-                        color="amber"
-                        @click.stop="selectLayout(scope.opt, false)"
-                      />
-                      <q-btn
-                        v-else
-                        flat
-                        round
-                        icon="mdi-star-outline"
-                        @click.stop="selectLayout(scope.opt, true)"
-                      />
-                    </q-item-section>
-                  </q-item>
-                </template>
-              </q-select>
-              <ActionItem
-                v-for="v in layouts"
-                :key="v.id"
-                :label="v.title"
-                :active="layout && layout.id === v.id"
-                no-close
-                @click="showLayout(v)"
-              />
-            </q-list>
-          </template>
-        </ActionMenu>
+        <q-btn
+          flat
+          dense
+          round
+          icon="mdi-format-list-bulleted"
+          @click="startSelectLayout"
+        >
+          <q-tooltip>Select layout</q-tooltip>
+        </q-btn>
         <template #actions>
-          <ActionItem v-if="!$dense" icon="mdi-tools" label="Edit layout" @click="startEditor" />
+          <ActionItem
+            v-if="!$dense"
+            icon="mdi-tools"
+            label="Edit layout"
+            @click="startEditor"
+          />
         </template>
       </component>
     </template>
 
     <div class="fit" @dblclick="startEditor">
-      <span v-if="parts.length === 0" class="absolute-center">
-        {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
+      <span
+        v-if="parts.length === 0"
+        class="absolute-center q-gutter-y-sm"
+      >
+        <div class="text-center">
+          {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
+        </div>
+        <div class="row q-gutter-x-sm justify-center">
+          <q-btn
+            v-if="allLayouts.length > 0"
+            fab-mini
+            color="secondary"
+            icon="mdi-format-list-bulleted"
+            @click="startSelectLayout"
+          >
+            <q-tooltip>Select layout</q-tooltip>
+          </q-btn>
+          <LayoutActions
+            fab-mini
+            :flat="false"
+            :layout="layout"
+            :select-layout="selectLayout"
+            :save-parts="saveParts"
+            color="secondary"
+          >
+            <q-tooltip>Actions</q-tooltip>
+          </LayoutActions>
+          <q-btn
+            v-if="layout !== null"
+            fab-mini
+            color="secondary"
+            icon="mdi-tools"
+            @click="startEditor"
+          >
+            <q-tooltip>Edit layout</q-tooltip>
+          </q-btn>
+        </div>
       </span>
       <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
         <g
@@ -238,7 +242,11 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           @click="interact(part)"
           @dblclick.stop="edit(part)"
         >
-          <PartWrapper :part="part" @update:part="savePart" @dirty="debouncedCalculate" />
+          <PartWrapper
+            :part="part"
+            @update:part="savePart"
+            @dirty="debouncedCalculate"
+          />
         </g>
       </svg>
     </div>

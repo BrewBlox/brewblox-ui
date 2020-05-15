@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
+import { createDialog } from '@/helpers/dialog';
 import { deserialize, serialize } from '@/helpers/units/parseObject';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
@@ -56,6 +57,22 @@ export default class QuickActionsWidget extends WidgetBase {
       this.saveSteps();
     }
   }
+
+  addStep(): void {
+    const stepName = 'New Step';
+    createDialog({
+      title: 'Add a Step',
+      cancel: true,
+      prompt: {
+        model: stepName,
+        type: 'text',
+      },
+    })
+      .onOk(name => {
+        this.steps.push({ name, id: uid(), changes: [] });
+        this.saveSteps();
+      });
+  }
 }
 </script>
 
@@ -70,6 +87,21 @@ export default class QuickActionsWidget extends WidgetBase {
         </template>
       </component>
     </template>
-    <component :is="mode" :crud="crud" :open-step="openStep" />
+    <component :is="mode" :crud="crud" :open-step="openStep">
+      <template v-if="config.steps.length === 0" #warnings>
+        <div class="widget-body row justify-center">
+          <div class="text-italic text-h6 q-pa-md darkened">
+            Create a step to get started.
+          </div>
+          <q-btn
+            fab-mini
+            color="secondary"
+            icon="add"
+            class="self-center"
+            @click="addStep"
+          />
+        </div>
+      </template>
+    </component>
   </CardWrapper>
 </template>
