@@ -4,6 +4,8 @@ import { AutomationImpl } from './shared-types';
 export * from './shared-types';
 
 
+export type Section = 'Preconditions' | 'Actions' | 'Transitions';
+
 export interface AutomationSpec<T extends AutomationImpl = AutomationImpl> {
   type: T['type'];
   title: string;
