@@ -6,14 +6,13 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { clamp, objectStringSorter, spliceById } from '@/helpers/functional';
 
-import { clear, idCopy, make } from './helpers';
+import { clear, idCopy } from './helpers';
 import { automationStore } from './store';
 import { AutomationStep, AutomationTemplate, Section } from './types';
 
 
 @Component
 export default class AutomationEditor extends DialogBase {
-  make = make;
   clear = clear;
 
   offset: number = 0;
@@ -283,7 +282,6 @@ export default class AutomationEditor extends DialogBase {
             <ActionMenu class="col-auto">
               <template #actions>
                 <ActionItem label="New Step" icon="add" @click="startAddStep(tmpl)" />
-                <ActionItem label="Make" icon="add" @click="make" />
                 <ActionItem label="Clear" icon="clear" @click="clear" />
                 <ActionItem icon="mdi-play" label="Start Process" @click="initProcess(tmpl)" />
                 <ActionItem icon="file_copy" label="Copy Template" @click="startCopyTemplate(tmpl)" />
