@@ -445,7 +445,10 @@ export interface AutomationStepResult {
   error?: string;
 }
 
-/**Webhook
+/**
+ * An external instruction for a process to fast-forward to a step.
+ */
+export interface AutomationStepJump {
   processId: UUID;
   stepId: UUID;
   phase?: AutomationStepActivePhase;
