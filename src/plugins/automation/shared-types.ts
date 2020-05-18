@@ -1,6 +1,7 @@
 /**
  * The types in this file are relevant to both the automation service and the UI.
  */
+import { Method } from 'axios';
 
 /**
  * Generic status type for Automation types.
@@ -138,11 +139,39 @@ export interface TaskCreateImpl {
 }
 
 /**
+ * Send a HTTP request to an endpoint
+ */
+export interface WebhookImpl {
+  type: 'Webhook';
+
+  /**
+   * Absolute URL to endpoint. May include params.
+   */
+  url: string;
+
+  /**
+   * HTTP method.
+   */
+  method: Method;
+
+  /**
+   * HTTP headers.
+   */
+  headers: Record<string, string>;
+
+  /**
+   * Request body.
+   */
+  body: string;
+}
+
+/**
  * Combining type for all actions.
  */
 export type ActionImpl =
   BlockPatchImpl
   | TaskCreateImpl
+  | WebhookImpl
   ;
 
 ////////////////////////////////////////////////////////////////
@@ -247,18 +276,6 @@ export interface TaskStatusImpl {
 }
 
 /**
- * Enforces a stop in step execution that must be manually overridden.
- */
-export interface AlwaysFalseImpl {
-  type: 'AlwaysFalse';
-
-  /**
-   * Human-readable description.
-   */
-  desc: string;
-}
-
-/**
  * Combining type for all conditions
  */
 export type ConditionImpl =
@@ -266,7 +283,6 @@ export type ConditionImpl =
   | TimeElapsedImpl
   | BlockValueImpl
   | TaskStatusImpl
-  | AlwaysFalseImpl
   ;
 
 ////////////////////////////////////////////////////////////////
@@ -429,10 +445,7 @@ export interface AutomationStepResult {
   error?: string;
 }
 
-/**
- * An external instruction for a process to fast-forward to a step.
- */
-export interface AutomationStepJump {
+/**Webhook
   processId: UUID;
   stepId: UUID;
   phase?: AutomationStepActivePhase;
