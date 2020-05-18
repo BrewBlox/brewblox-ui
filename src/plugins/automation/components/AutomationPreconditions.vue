@@ -48,7 +48,7 @@ export default class AutomationPreconditions extends Vue {
 
 <template>
   <AutomationItems
-    label="condition"
+    label="precondition"
     :value="step.preconditions"
     @input="saveAllConditions"
     @update="saveCondition"
@@ -65,8 +65,8 @@ export default class AutomationPreconditions extends Vue {
       </AutomationHeader>
     </template>
     <template #empty>
-      No conditions are set. <br>
-      This is equivalent to all conditions evaluating true.
+      No preconditions are set. <br>
+      Step actions will be applied immediately.
     </template>
   </AutomationItems>
 </template>

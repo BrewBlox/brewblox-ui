@@ -53,24 +53,22 @@ export default class AutomationActions extends Vue {
 
 
 <template>
-  <div>
-    <AutomationItems
-      label="action"
-      :value="step.actions"
-      @input="saveAllActions"
-      @update="saveAction"
-      @new="startAddAction"
-    >
-      <template #header>
-        <AutomationHeader
-          title="Actions"
-          subtitle="Change the system."
-        >
-          <template #actions>
-            <ActionItem icon="add" label="New action" @click="startAddAction" />
-          </template>
-        </AutomationHeader>
-      </template>
-    </AutomationItems>
-  </div>
+  <AutomationItems
+    label="action"
+    :value="step.actions"
+    @input="saveAllActions"
+    @update="saveAction"
+    @new="startAddAction"
+  >
+    <template #header>
+      <AutomationHeader
+        title="Actions"
+        subtitle="Change the system."
+      >
+        <template #actions>
+          <ActionItem icon="add" label="New action" @click="startAddAction" />
+        </template>
+      </AutomationHeader>
+    </template>
+  </AutomationItems>
 </template>
