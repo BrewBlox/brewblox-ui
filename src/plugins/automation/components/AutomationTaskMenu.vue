@@ -32,6 +32,10 @@ export default class AutomationTaskMenu extends Vue {
       message: 'Hello I am task',
     });
   }
+
+  removeTask(task: AutomationTask): void {
+    automationStore.removeTask(task);
+  }
 }
 </script>
 
@@ -52,6 +56,17 @@ export default class AutomationTaskMenu extends Vue {
             </q-item-label>
             {{ task.title }}
           </div>
+          <q-btn
+            v-if="task.createdBy === 'User'"
+            round
+            outline
+            size="sm"
+            class="self-center"
+            icon="clear"
+            @click="removeTask(task)"
+          >
+            <q-tooltip>Remove task</q-tooltip>
+          </q-btn>
           <q-btn
             v-if="task.status === 'Finished'"
             round
@@ -75,12 +90,17 @@ export default class AutomationTaskMenu extends Vue {
             <q-tooltip>Mark task as finished</q-tooltip>
           </q-btn>
         </div>
-        <div class="row justify-end q-pt-md q-pr-sm">
-          <q-btn fab-mini color="secondary" icon="add" @click="add">
-            <q-tooltip>New task</q-tooltip>
-          </q-btn>
-        </div>
       </div>
     </q-scroll-area>
+    <div class="row justify-end q-pa-sm">
+      <q-btn
+        flat
+        dense
+        color="secondary"
+        icon="add"
+        label="New task"
+        @click="add"
+      />
+    </div>
   </q-menu>
 </template>

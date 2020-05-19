@@ -1,4 +1,4 @@
-import { Block } from '@/plugins/spark/types';
+import { AnalogConstraintsObj, Block } from '@/plugins/spark/types';
 
 export interface ActuatorAnalogMockData {
   setting: number;
@@ -8,6 +8,7 @@ export interface ActuatorAnalogMockData {
   value: number;
   minValue: number;
   maxValue: number;
+  constrainedBy: AnalogConstraintsObj;
 }
 
 export interface ActuatorAnalogMockBlock extends Block {

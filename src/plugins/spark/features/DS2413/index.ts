@@ -14,8 +14,7 @@ const block: BlockSpec<DS2413Data> = {
     connected: false,
     pins: [],
   }),
-  presets: [],
-  changes: [],
+  fields: [],
 };
 
 const feature: WidgetFeature = {

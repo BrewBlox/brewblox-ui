@@ -1,7 +1,8 @@
 import { unitDurationString } from '@/helpers/functional';
-import { Link, Unit } from '@/helpers/units';
+import { Link, Temp, Unit } from '@/helpers/units';
 import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
@@ -16,8 +17,8 @@ const block: BlockSpec<PidData> = {
   generate: () => ({
     inputId: new Link(null, interfaceTypes.SetpointSensorPair),
     outputId: new Link(null, interfaceTypes.ActuatorAnalog),
-    inputValue: new Unit(0, 'degC'),
-    inputSetting: new Unit(0, 'degC'),
+    inputValue: new Temp(0, 'degC'),
+    inputSetting: new Temp(0, 'degC'),
     outputValue: 0,
     outputSetting: 0,
     enabled: false,
@@ -105,18 +106,18 @@ const block: BlockSpec<PidData> = {
     {
       name: 'Heating pad',
       generate: () => ({
-        kp: new Unit(30, '1/degC'),
+        kp: new Unit(100, '1/degC'),
         ti: new Unit(2, 'hour'),
-        td: new Unit(0, 'min'),
+        td: new Unit(10, 'min'),
       }),
     },
   ],
-  changes: [
+  fields: [
     {
       key: 'kp',
       title: 'Kp',
       component: 'UnitValEdit',
-      componentProps: { units: ['1/degC', '1/degF', '1/degK'] },
+      componentProps: { units: userUnitChoices.Temp.map(v => `1/${v}`) },
       generate: () => new Unit(0, '1/degC'),
     },
     {
@@ -151,19 +152,92 @@ const block: BlockSpec<PidData> = {
       component: 'LinkValEdit',
       generate: () => new Link(null, interfaceTypes.ActuatorAnalog),
     },
+    {
+      key: 'inputSetting',
+      title: 'Input target',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
+      generate: () => new Temp(20, 'degC'),
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'inputValue',
+      title: 'Input value',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
+      generate: () => new Temp(20, 'degC'),
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'error',
+      title: 'Error',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
+      generate: () => new Temp(0, 'degC'),
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'derivative',
+      title: 'Derivative of input',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp.map(v => `delta_${v}*second`) },
+      generate: () => new Unit(0, 'delta_degC*second'),
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'integral',
+      title: 'Integral of error',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp.map(v => `delta_${v}/second`) },
+      generate: () => new Unit(0, 'delta_degC/second'),
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'p',
+      title: 'P',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'i',
+      title: 'I',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'd',
+      title: 'D',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'outputSetting',
+      title: 'Output target (P+I+D)',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'outputValue',
+      title: 'Output value',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    inputSetting: 'Input target',
-    inputValue: 'Input value',
-    error: 'Error',
-    derivative: 'Derivative of input',
-    integral: 'Integral of error',
-    p: 'P',
-    i: 'I',
-    d: 'D',
-    outputSetting: 'Output target (P+I+D)',
-    outputValue: 'Output value',
-  },
 };
 
 const feature: WidgetFeature = {

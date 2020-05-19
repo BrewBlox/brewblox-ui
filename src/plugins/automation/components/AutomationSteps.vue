@@ -216,9 +216,14 @@ export default class AutomationSteps extends Vue {
       </div>
     </draggable>
     <div class="row justify-end q-pt-md q-pr-sm">
-      <q-btn fab-mini color="secondary" icon="add" @click="addStep">
-        <q-tooltip>New step</q-tooltip>
-      </q-btn>
+      <q-btn
+        flat
+        dense
+        color="secondary"
+        icon="add"
+        label="New Step"
+        @click="addStep"
+      />
     </div>
   </div>
 </template>

@@ -28,8 +28,10 @@ export interface QueryConfig {
   renames: DisplayNames;
 }
 
+export type GraphAxis = 'y' | 'y2';
+
 export interface GraphValueAxes {
-  [key: string]: 'y' | 'y2';
+  [key: string]: GraphAxis;
 }
 
 export interface LineColors {

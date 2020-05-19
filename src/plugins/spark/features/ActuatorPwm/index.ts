@@ -36,7 +36,7 @@ const block: BlockSpec<ActuatorPwmData> = {
       }),
     },
   ],
-  changes: [
+  fields: [
     {
       key: 'desiredSetting',
       title: 'Duty Setting',
@@ -69,11 +69,23 @@ const block: BlockSpec<ActuatorPwmData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'setting',
+      title: 'Duty Setting',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'value',
+      title: 'Duty Achieved',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    setting: 'Duty Setting',
-    value: 'Duty Achieved',
-  },
 };
 
 const feature: WidgetFeature = {
