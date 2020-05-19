@@ -53,7 +53,6 @@ export default class LayoutActions extends Vue {
       });
   }
 
-
   async importLayout(): Promise<void> {
     loadFile<BuilderLayout>(async layout => {
       const id = uid();
@@ -175,5 +174,6 @@ export default class LayoutActions extends Vue {
         <ActionItem icon="delete" label="Remove Layout" @click="removeLayout" />
       </template>
     </template>
+    <slot />
   </ActionMenu>
 </template>

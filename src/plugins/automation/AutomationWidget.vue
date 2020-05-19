@@ -73,12 +73,15 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     this.$router.push(`/automation/${template.id}`);
   }
 
-  show(value: AutomationTemplate): void {
+  show(value: AutomationTemplate | AutomationProcess): void {
     createDialog({
       component: 'AutomationInfoDialog',
       value,
       title: `Automation process '${value.title}'`,
       message: 'A running process is not editable.',
+      initialStepId: ('results' in value)
+        ? value.results[value.results.length - 1]?.stepId
+        : null,
     });
   }
 
@@ -148,8 +151,12 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           This feature is still in preview.
         </template>
       </CardWarning>
-      <div class="text-h6 text-secondary">
+      <div class="col-grow text-h6 text-secondary">
         Running processes
+        <q-tooltip>
+          A process executes the steps in a template. <br>
+          Closing the UI will not interrupt any processes.
+        </q-tooltip>
       </div>
       <div
         v-for="{proc, status, history, tasks, error} in processes"
@@ -227,6 +234,10 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
 
       <div class="text-h6 text-secondary">
         Available templates
+        <q-tooltip>
+          Templates are the blueprints for processes. <br>
+          You can use the automation editor to create or change templates.
+        </q-tooltip>
       </div>
       <div
         v-for="template in templates"
@@ -251,12 +262,16 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           :disable="!automationAvailable"
           @click="init(template)"
         >
-          <q-tooltip>Start process from template</q-tooltip>
+          <q-tooltip>Create process</q-tooltip>
         </q-btn>
       </div>
 
       <div class="text-h6 text-secondary">
         All tasks
+        <q-tooltip>
+          Tasks are used to coordinate manual actions. <br>
+          Processes can create tasks, and wait for the user to mark them as finished.
+        </q-tooltip>
       </div>
       <div
         v-for="task in tasks"

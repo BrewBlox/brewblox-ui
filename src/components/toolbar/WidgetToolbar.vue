@@ -38,10 +38,21 @@ export default class WidgetToolbar extends CrudComponent {
 </script>
 
 <template>
-  <Toolbar :title="widget.title" :subtitle="featureTitle" @title-click="onTitleClick">
+  <Toolbar
+    :title="widget.title"
+    :subtitle="featureTitle"
+    @title-click="onTitleClick"
+  >
     <slot />
     <template #buttons>
-      <q-btn v-if="!!mode" flat dense round :icon="toggleIcon" @click="toggle">
+      <q-btn
+        v-if="!!mode"
+        flat
+        dense
+        round
+        :icon="toggleIcon"
+        @click="toggle"
+      >
         <q-tooltip>
           {{ toggleTooltip }}
         </q-tooltip>
