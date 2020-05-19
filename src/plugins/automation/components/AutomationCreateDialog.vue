@@ -23,7 +23,7 @@ export default class AutomationCreateDialog extends DialogBase {
       : null;
   }
 
-  save(spec = this.selected): void {
+  save(spec: AutomationSpec | null): void {
     if (spec) {
       const item: AutomationItem = {
         id: uid(),
@@ -42,7 +42,7 @@ export default class AutomationCreateDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.enter="save"
+    @keyup.enter="save(selected)"
   >
     <DialogCard v-bind="{title, message, html}">
       <div
@@ -69,7 +69,7 @@ export default class AutomationCreateDialog extends DialogBase {
           flat
           label="OK"
           color="primary"
-          @click="save"
+          @click="save(selected)"
         />
       </template>
     </DialogCard>

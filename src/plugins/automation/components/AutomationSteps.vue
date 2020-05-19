@@ -1,9 +1,10 @@
 <script lang="ts">
 import { uid } from 'quasar';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { refElement } from '@/helpers/elements';
 import { clamp, filterById, spliceById } from '@/helpers/functional';
 
 import { nextTitle } from '../helpers';
@@ -13,6 +14,7 @@ import {
   AutomationStep,
   AutomationTemplate,
   AutomationTransition,
+  Section,
 } from '../types';
 
 
@@ -29,6 +31,17 @@ export default class AutomationSteps extends Vue {
   @Prop({ type: String, required: false })
   public readonly stepId!: string | null;
 
+  @Prop({ type: String, required: true })
+  public readonly section!: Section;
+
+  @Prop({ type: Number, required: true })
+  public readonly scrollPrompt!: number;
+
+  @Watch('scrollPrompt')
+  promptedScroll(): void {
+    refElement(this.$refs[`step--${this.stepId}`])?.scrollIntoView();
+  }
+
   saveTemplate(template: AutomationTemplate = this.template): void {
     this.$emit('update:template', template);
   }
@@ -38,8 +51,18 @@ export default class AutomationSteps extends Vue {
     this.saveTemplate();
   }
 
-  selectStep(stepId: string | null, section: string): void {
-    this.$emit('select', stepId, section);
+  findOffset(evt: MouseEvent | TouchEvent | null): number {
+    if (evt === null) {
+      return 0;
+    }
+    const touch = (evt instanceof MouseEvent) ? evt : evt.touches[0];
+    const el = touch.target as HTMLElement;
+    const container = el.closest<HTMLElement>('.step-container');
+    return container?.offsetTop ?? 0;
+  }
+
+  selectStep(stepId: string | null, section: Section, evt: MouseEvent | TouchEvent | null): void {
+    this.$emit('select', stepId, section, this.findOffset(evt));
   }
 
   get locals(): AutomationStep[] {
@@ -87,7 +110,7 @@ export default class AutomationSteps extends Vue {
 
   removeStep(step: AutomationStep): void {
     this.locals = filterById(this.locals, step);
-    this.selectStep(null, 'Steps');
+    this.selectStep(null, 'Preconditions', null);
   }
 
   pretty({ impl }: HasImpl): string {
@@ -96,6 +119,15 @@ export default class AutomationSteps extends Vue {
 
   nextStepTitle(transition: AutomationTransition): string {
     return nextTitle(this.template, transition);
+  }
+
+  sectionClass(stepId: string, section: Section): string[] {
+    return [
+      'q-pa-sm rounded-borders clickable',
+      stepId === this.stepId && section === this.section
+        ? ''
+        : 'inactive-section',
+    ];
   }
 }
 </script>
@@ -117,7 +149,12 @@ export default class AutomationSteps extends Vue {
       <div
         v-for="step in locals"
         :key="step.id"
-        :class="['rounded-borders depth-2', step.id === stepId && 'selected-step']"
+        :ref="`step--${step.id}`"
+        :class="[
+          'rounded-borders depth-2 step-container',
+          step.id === stepId ? 'active-step' : 'inactive-step'
+        ]"
+        @click.stop="evt => step.id !== stepId && selectStep(step.id, 'Preconditions', evt)"
       >
         <div class="toolbar__Dashboard">
           <Toolbar
@@ -138,11 +175,11 @@ export default class AutomationSteps extends Vue {
         </div>
         <div
           class="q-px-md q-pb-md q-gutter-y-sm column pointer"
-          @click.stop="selectStep(step.id, 'Steps')"
         >
+          <!-- Preconditions -->
           <div
-            class="q-pa-sm rounded-borders clickable"
-            @click.stop="selectStep(step.id, 'Preconditions')"
+            :class="sectionClass(step.id, 'Preconditions')"
+            @click.stop="evt => selectStep(step.id, 'Preconditions', evt)"
           >
             <div class="text-bold text-secondary">
               Preconditions
@@ -151,9 +188,10 @@ export default class AutomationSteps extends Vue {
               {{ pretty(v) }}
             </div>
           </div>
+          <!-- Actions -->
           <div
-            class="q-pa-sm rounded-borders clickable"
-            @click.stop="selectStep(step.id, 'Actions')"
+            :class="sectionClass(step.id, 'Actions')"
+            @click.stop="evt => selectStep(step.id, 'Actions', evt)"
           >
             <div class="text-bold text-secondary">
               Actions
@@ -162,9 +200,10 @@ export default class AutomationSteps extends Vue {
               {{ pretty(v) }}
             </div>
           </div>
+          <!-- Transitions -->
           <div
-            class="q-pa-sm rounded-borders clickable"
-            @click.stop="selectStep(step.id, 'Transitions')"
+            :class="sectionClass(step.id, 'Transitions')"
+            @click.stop="evt => selectStep(step.id, 'Transitions', evt)"
           >
             <div class="text-bold text-secondary">
               Transitions
@@ -177,15 +216,26 @@ export default class AutomationSteps extends Vue {
       </div>
     </draggable>
     <div class="row justify-end q-pt-md q-pr-sm">
-      <q-btn fab-mini color="secondary" icon="add" @click="addStep">
-        <q-tooltip>New step</q-tooltip>
-      </q-btn>
+      <q-btn
+        flat
+        dense
+        color="secondary"
+        icon="add"
+        label="New Step"
+        @click="addStep"
+      />
     </div>
   </div>
 </template>
 
 <style lang="sass" scoped>
-.selected-step
+.active-step
   border-left: 2px solid $secondary
   border-right: 2px solid $secondary
+.inactive-step
+  opacity: 0.2
+.inactive-section
+  opacity: 0.8
+  > div
+    opacity: 0.4
 </style>

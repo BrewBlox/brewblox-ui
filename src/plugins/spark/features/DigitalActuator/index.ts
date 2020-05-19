@@ -69,13 +69,15 @@ const block: BlockSpec<DigitalActuatorData> = {
       }),
     },
   ],
-  changes: [
+  fields: [
     {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
       generate: () => 0,
       pretty: v => DigitalState[v],
+      graphed: true,
+      graphName: 'Desired state',
     },
     {
       key: 'invert',
@@ -90,11 +92,16 @@ const block: BlockSpec<DigitalActuatorData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'state',
+      title: 'Actual state',
+      component: 'StateValEdit',
+      generate: () => 0,
+      pretty: v => DigitalState[v],
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    state: 'Actual state',
-    desiredState: 'Desired state',
-  },
 };
 
 const feature: WidgetFeature = {

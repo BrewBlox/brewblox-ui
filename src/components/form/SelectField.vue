@@ -37,10 +37,15 @@ export default class SelectField extends FieldBase {
       return text || 'Click to set';
     }
 
-    const selected = this.options
-      .find((opt: any) => opt[this.optionsValue] === this.value)
-      || { [this.optionsLabel]: 'Click to set' };
-    return selected[this.optionsLabel];
+    for (const opt of this.options) {
+      if (opt === this.value) {
+        return opt;
+      }
+      if (opt[this.optionsValue] === this.value) {
+        return opt[this.optionsLabel];
+      }
+    }
+    return 'Click to set';
   }
 
   @Emit('input')

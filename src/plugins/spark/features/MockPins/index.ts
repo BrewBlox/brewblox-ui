@@ -12,8 +12,7 @@ const block: BlockSpec<MockPinsData> = {
   generate: () => ({
     pins: [],
   }),
-  changes: [],
-  presets: [],
+  fields: [],
 };
 
 const feature: WidgetFeature = {

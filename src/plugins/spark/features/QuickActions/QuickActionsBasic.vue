@@ -11,7 +11,7 @@ import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 
-import { BlockChange, EditableFieldChange, Step } from './types';
+import { BlockChange, EditableBlockField, Step } from './types';
 
 interface FieldDiff {
   key: string;
@@ -74,29 +74,29 @@ export default class QuickActionsBasic extends CrudComponent {
 
   confirmStepChange(block: Block, key: string, value: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      const cfield = sparkStore.spec(block)
-        .changes
-        .find(change => change.key === key);
-      if (!cfield) {
+      const specField = sparkStore.spec(block)
+        .fields
+        .find(field => field.key === key && !field.readonly);
+      if (!specField) {
         resolve(value);
         return;
       }
-      const pretty = cfield.pretty ?? (v => `${v}`);
-      const field: EditableFieldChange = {
+      const pretty = specField.pretty ?? (v => `${v}`);
+      const field: EditableBlockField = {
         value,
-        cfield,
+        specField,
         id: uid(), // not relevant
         confirmed: true, // duh
       };
 
       createDialog({
         component: 'ChangeFieldDialog',
-        field: cfield,
+        field: specField,
         address: block,
         value: field.value,
-        title: `Confirm ${block.id} ${cfield.title}`,
+        title: `Confirm ${block.id} ${specField.title}`,
         message: `
-        Please confirm the ${cfield.title} value in ${block.id}.
+        Please confirm the ${specField.title} value in ${block.id}.
         Current value is '${pretty(block.data[key])}'.
         `,
       })
@@ -113,7 +113,7 @@ export default class QuickActionsBasic extends CrudComponent {
       const spec = sparkStore.spec(block);
       const actualData = deepCopy(change.data);
       for (const key in change.data) {
-        if (!spec.changes.some(c => c.key === key)) {
+        if (!spec.fields.some(c => c.key === key)) {
           delete actualData[key];
         }
         if (change.confirmed?.[key]) {
@@ -164,7 +164,7 @@ export default class QuickActionsBasic extends CrudComponent {
     const diffs =
       Object.entries(change.data)
         .map(([key, val]) => {
-          const specChange = spec.changes.find(s => s.key === key);
+          const specChange = spec.fields.find(s => s.key === key);
           const pretty = specChange?.pretty ?? (v => `${v}`);
           const oldV = pretty(block.data[key]);
           const newV = pretty(val);

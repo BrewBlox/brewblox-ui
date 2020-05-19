@@ -16,7 +16,7 @@ const block: BlockSpec<DisplaySettingsData> = {
     widgets: [],
     brightness: 255,
   }),
-  changes: [
+  fields: [
     {
       key: 'name',
       title: 'Footer text',
@@ -24,7 +24,6 @@ const block: BlockSpec<DisplaySettingsData> = {
       generate: () => '',
     },
   ],
-  presets: [],
 };
 
 const feature: WidgetFeature = {

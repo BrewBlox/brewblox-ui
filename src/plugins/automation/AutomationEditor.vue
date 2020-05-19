@@ -6,22 +6,22 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { clamp, objectStringSorter, spliceById } from '@/helpers/functional';
 
-import { clear, idCopy, make } from './helpers';
+import { clear, idCopy } from './helpers';
 import { automationStore } from './store';
-import { AutomationStep, AutomationTemplate } from './types';
+import { AutomationStep, AutomationTemplate, Section } from './types';
 
-type Section = 'Steps' | 'Preconditions' | 'Actions' | 'Transitions';
 
 @Component
 export default class AutomationEditor extends DialogBase {
-  make = make;
   clear = clear;
 
+  offset: number = 0;
+  scrollPrompt: number = 0;
   localDrawer: boolean | null = null;
   templateId: string | null = null;
 
   dragged: AutomationStep | null = null;
-  section: Section = 'Steps';
+  section: Section = 'Preconditions';
 
   mounted(): void {
     this.selectActive(this.$route.params.id);
@@ -230,6 +230,10 @@ export default class AutomationEditor extends DialogBase {
       this.saveSteps(updated);
     }
   }
+
+  scrollToStep(): void {
+    this.scrollPrompt += 1;
+  }
 }
 </script>
 
@@ -280,7 +284,6 @@ export default class AutomationEditor extends DialogBase {
             <ActionMenu class="col-auto">
               <template #actions>
                 <ActionItem label="New Step" icon="add" @click="startAddStep(tmpl)" />
-                <ActionItem label="Make" icon="add" @click="make" />
                 <ActionItem label="Clear" icon="clear" @click="clear" />
                 <ActionItem icon="mdi-play" label="Start Process" @click="initProcess(tmpl)" />
                 <ActionItem icon="file_copy" label="Copy Template" @click="startCopyTemplate(tmpl)" />
@@ -318,10 +321,12 @@ export default class AutomationEditor extends DialogBase {
             </template>
           </CardWarning>
           <q-tabs v-model="section">
-            <q-tab
-              name="Steps"
-              :label="step ? `Step | ${step.title}` : 'Steps'"
-              class="q-mr-lg text-secondary"
+            <q-btn
+              flat
+              color="secondary"
+              class="q-mr-xl self-stretch"
+              :label="step.title"
+              @click="scrollToStep"
             />
             <q-tab name="Preconditions" label="Preconditions" />
             <q-tab name="Actions" label="Actions" />
@@ -330,28 +335,32 @@ export default class AutomationEditor extends DialogBase {
           <q-scroll-area visible class="col">
             <div class="row section-parent q-pl-lg justify-center">
               <AutomationSteps
-                v-if="section === 'Steps'"
                 :template="template"
                 :step-id="stepId"
+                :section="section"
+                :scroll-prompt="scrollPrompt"
                 @update:template="saveTemplate"
-                @select="(v, s) => { selectActive(templateId, v); section = s; }"
+                @select="(v, s, o) => { selectActive(templateId, v); section = s; offset = o; }"
               />
               <AutomationPreconditions
                 v-if="section === 'Preconditions'"
                 :template="template"
                 :step="step"
+                :style="`margin-top: ${offset}px`"
                 @update:step="saveStep"
               />
               <AutomationActions
                 v-if="section === 'Actions'"
                 :template="template"
                 :step="step"
+                :style="`margin-top: ${offset}px`"
                 @update:step="saveStep"
               />
               <AutomationTransitions
                 v-if="section === 'Transitions'"
                 :template="template"
                 :step="step"
+                :style="`margin-top: ${offset}px`"
                 @update:step="saveStep"
               />
             </div>

@@ -18,15 +18,26 @@ const block: BlockSpec<Spark3PinsData> = {
     voltage5: 0,
     voltage12: 0,
   }),
-  changes: [
+  fields: [
     {
       key: 'soundAlarm',
       title: 'Alarm sound',
       component: 'BoolValEdit',
       generate: () => false,
     },
+    {
+      key: 'enableIoSupply5V',
+      title: 'Enable 5V power supply',
+      component: 'BoolValEdit',
+      generate: () => true,
+    },
+    {
+      key: 'enableIoSupply12V',
+      title: 'Enable 12V power supply',
+      component: 'BoolValEdit',
+      generate: () => true,
+    },
   ],
-  presets: [],
 };
 
 const feature: WidgetFeature = {

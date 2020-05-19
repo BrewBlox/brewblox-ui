@@ -12,8 +12,7 @@ const block: BlockSpec<BalancerData> = {
   generate: () => ({
     clients: [],
   }),
-  presets: [],
-  changes: [],
+  fields: [],
 };
 
 const feature: WidgetFeature = {

@@ -1,17 +1,16 @@
-import mapKeys from 'lodash/mapKeys';
 import { Layout } from 'plotly.js';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
-import { postfixedDisplayNames } from '@/helpers/units';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
-import { Block, BlockConfig, BlockCrud } from '../types';
+import { blockGraphCfg } from '../helpers';
+import { Block, BlockConfig, BlockCrud, BlockSpec } from '../types';
 
 @Component
-export default class BlockWidgetBase<BlockT extends Block = Block>
+export default class BlockWidgetBase<BlockT extends Block = Block, DataT = BlockT['data']>
   extends WidgetBase<BlockConfig> {
 
   @Prop({ type: Boolean, default: false })
@@ -61,39 +60,17 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
       || null;
   }
 
-  public get hasGraph(): boolean {
-    return sparkStore.spec(this.block)?.graphTargets !== undefined;
+  public get spec(): BlockSpec<DataT> {
+    return sparkStore.spec(this.block);
   }
 
-  public get renamedTargets(): Mapped<string> {
-    const targets = sparkStore.spec(this.block)?.graphTargets;
-    return targets !== undefined
-      ? postfixedDisplayNames(targets, this.block.data)
-      : {};
+  public get hasGraph(): boolean {
+    return this.crud.isStoreBlock
+      && this.spec.fields.some(f => f.graphed);
   }
 
   public get graphCfg(): GraphConfig {
-    const blockFmt = (val: string): string => [this.blockId, val].join('/');
-    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
-
-    return {
-      // persisted in config
-      params: this.widget.config.queryParams ?? { duration: '1h' },
-      axes: this.widget.config.graphAxes ?? {},
-      layout: {
-        ...(this.widget.config.graphLayout ?? {}),
-        title: this.widget.title, // always overrides
-      },
-      targets: [
-        {
-          measurement: this.serviceId,
-          fields: Object.keys(this.renamedTargets)
-            .map(k => blockFmt(k)),
-        },
-      ],
-      renames: mapKeys(this.renamedTargets, (_, key) => serviceFmt(key)),
-      colors: {},
-    };
+    return blockGraphCfg(this.crud);
   }
 
   public set graphCfg(config: GraphConfig) {

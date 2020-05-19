@@ -23,7 +23,7 @@ const block: BlockSpec<SetpointSensorPairData> = {
     filter: FilterChoice.Filter15s,
     filterThreshold: new Unit(5, 'delta_degC'),
   }),
-  changes: [
+  fields: [
     {
       key: 'storedSetting',
       title: 'Setting',
@@ -50,13 +50,34 @@ const block: BlockSpec<SetpointSensorPairData> = {
       component: 'LinkValEdit',
       generate: () => new Link(null, interfaceTypes.TempSensor),
     },
+    {
+      key: 'setting',
+      title: 'Setting',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
+      generate: () => new Unit(20, 'degC'),
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'value',
+      title: 'Sensor',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
+      generate: () => new Unit(20, 'degC'),
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'valueUnfiltered',
+      title: 'Sensor unfiltered',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
+      generate: () => new Unit(20, 'degC'),
+      readonly: true,
+      graphed: true,
+    },
   ],
-  presets: [],
-  graphTargets: {
-    setting: 'Setting',
-    value: 'Sensor',
-    valueUnfiltered: 'Sensor unfiltered',
-  },
 };
 
 const feature: WidgetFeature = {
