@@ -8,7 +8,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockSpec } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
-import { BlockChange, EditableFieldChange } from './types';
+import { BlockChange, EditableBlockField } from './types';
 
 
 interface EditableBlockChange {
@@ -18,7 +18,7 @@ interface EditableBlockChange {
   block: Block | null;
   spec: BlockSpec | null;
   title: string;
-  fields: EditableFieldChange[];
+  fields: EditableBlockField[];
 }
 
 @Component
@@ -48,12 +48,15 @@ export default class QuickActionChange extends Vue {
       block,
       spec,
       title: block ? featureStore.widgetTitle(block.type) : 'Unknown',
-      fields: spec?.changes.map(cfield => ({
-        cfield,
-        id: cfield.key,
-        value: data[cfield.key] ?? null,
-        confirmed: confirmed[cfield.key] ?? false,
-      })) ?? [],
+      fields: spec?.fields
+        .filter(f => !f.readonly)
+        .map(f => ({
+          id: f.key,
+          specField: f,
+          value: data[f.key] ?? null,
+          confirmed: confirmed[f.key] ?? false,
+        }))
+        ?? [],
     };
   }
 
@@ -62,8 +65,8 @@ export default class QuickActionChange extends Vue {
     if (this.change.spec === null) {
       return [];
     }
-    const fields = this.change.spec.changes;
-    return keys.filter(k => !fields.some(c => c.key === k));
+    const fields = this.change.spec.fields;
+    return keys.filter(k => !fields.some(f => f.key === k && !f.readonly));
   }
 
   saveChange(change: EditableBlockChange = this.change): void {
@@ -82,28 +85,28 @@ export default class QuickActionChange extends Vue {
     this.$emit('input', this.value);
   }
 
-  saveField(field: EditableFieldChange): void {
+  saveField(field: EditableBlockField): void {
     spliceById(this.change.fields, field);
     this.saveChange();
   }
 
-  toggleField(field: EditableFieldChange): void {
+  toggleField(field: EditableBlockField): void {
     field.value = field.value === null
-      ? field.cfield.generate()
+      ? field.specField.generate()
       : null;
     this.saveField(field);
   }
 
-  editField(field: EditableFieldChange): void {
+  editField(field: EditableBlockField): void {
     createDialog({
       component: 'ChangeFieldDialog',
-      field: field.cfield,
+      field: field.specField,
       address: {
         id: this.change.blockId,
         serviceId: this.change.serviceId,
       },
       value: field.value,
-      title: `${this.change.blockId} ${field.cfield.title}`,
+      title: `${this.change.blockId} ${field.specField.title}`,
     })
       .onOk(value => this.saveField({ ...field, value }));
   }
@@ -161,15 +164,15 @@ export default class QuickActionChange extends Vue {
         <q-tooltip>Edit value in popup when the step is applied.</q-tooltip>
       </q-btn>
       <div class="col-shrink">
-        {{ field.cfield.title }}
+        {{ field.specField.title }}
       </div>
       <div
         v-if="field.value !== null"
         class="col row justify-end q-pr-md"
       >
         <component
-          :is="field.cfield.component"
-          v-bind="field.cfield.componentProps"
+          :is="field.specField.component"
+          v-bind="field.specField.componentProps"
           :service-id="change.serviceId"
           :block-id="change.blockId"
           :value="field.value"

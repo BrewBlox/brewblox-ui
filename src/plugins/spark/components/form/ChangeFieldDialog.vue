@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { deepCopy } from '@/helpers/units/parseObject';
-import type { BlockAddress, ChangeField } from '@/plugins/spark/types';
+import type { BlockAddress, BlockField } from '@/plugins/spark/types';
 
 
 @Component
@@ -14,7 +14,7 @@ export default class ChangeFieldDialog extends DialogBase {
   public readonly address!: BlockAddress;
 
   @Prop({ type: Object, required: true })
-  public readonly field!: ChangeField;
+  public readonly field!: BlockField;
 
   @Prop({ required: true })
   public readonly value!: any;

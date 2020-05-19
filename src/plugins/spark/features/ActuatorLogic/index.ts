@@ -21,11 +21,16 @@ const block: BlockSpec<ActuatorLogicData> = {
     digital: [],
     expression: '',
   }),
-  presets: [],
-  changes: [],
-  graphTargets: {
-    result: 'Result',
-  },
+  fields: [
+    {
+      key: 'result',
+      title: 'Result',
+      component: 'NumberValEdit',
+      generate: () => EvalResult.TRUE,
+      readonly: true,
+      graphed: true,
+    },
+  ],
 };
 
 const feature: WidgetFeature = {

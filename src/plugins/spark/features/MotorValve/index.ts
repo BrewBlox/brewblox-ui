@@ -20,13 +20,15 @@ const block: BlockSpec<MotorValveData> = {
     constrainedBy: { constraints: [] },
   }),
   presets: [],
-  changes: [
+  fields: [
     {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
       generate: () => 0,
       pretty: v => DigitalState[v],
+      graphed: true,
+      graphName: 'Desired state',
     },
     {
       key: 'constrainedBy',
@@ -35,11 +37,16 @@ const block: BlockSpec<MotorValveData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'state',
+      title: 'Actual state',
+      component: 'StateValEdit',
+      generate: () => 0,
+      pretty: v => DigitalState[v],
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    state: 'Actual state',
-    desiredState: 'Desired state',
-  },
 };
 
 const feature: WidgetFeature = {

@@ -17,7 +17,7 @@ const block: BlockSpec<TempSensorMockData> = {
     fluctuations: [],
     connected: true,
   }),
-  changes: [
+  fields: [
     {
       key: 'setting',
       title: 'Sensor Setting',
@@ -31,11 +31,16 @@ const block: BlockSpec<TempSensorMockData> = {
       component: 'BoolValEdit',
       generate: () => true,
     },
+    {
+      key: 'value',
+      title: 'Sensor value',
+      component: 'UnitValEdit',
+      componentProps: { units: userUnitChoices.Temp },
+      generate: () => new Unit(20, 'degC'),
+      readonly: true,
+      graphed: true,
+    },
   ],
-  presets: [],
-  graphTargets: {
-    value: 'Sensor value',
-  },
 };
 
 const feature: WidgetFeature = {

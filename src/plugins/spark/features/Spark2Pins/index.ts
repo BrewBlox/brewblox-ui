@@ -15,8 +15,7 @@ const block: BlockSpec<Spark2PinsData> = {
     soundAlarm: false,
     hardware: Spark2Hardware.Unknown,
   }),
-  changes: [],
-  presets: [],
+  fields: [],
 };
 
 const feature: WidgetFeature = {

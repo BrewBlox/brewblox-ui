@@ -22,8 +22,7 @@ const block: BlockSpec<ActuatorOffsetData> = {
     constrainedBy: { constraints: [] },
     enabled: true,
   }),
-  presets: [],
-  changes: [
+  fields: [
     {
       key: 'desiredSetting',
       title: 'Target offset',
@@ -55,11 +54,23 @@ const block: BlockSpec<ActuatorOffsetData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'setting',
+      title: 'Target offset',
+      generate: () => 0,
+      component: 'NumberValEdit',
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'value',
+      title: 'Actual offset',
+      generate: () => 0,
+      component: 'NumberValEdit',
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    setting: 'Target offset',
-    value: 'Actual offset',
-  },
 };
 
 const feature: WidgetFeature = {

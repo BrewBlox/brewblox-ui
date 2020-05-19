@@ -108,10 +108,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       },
       anyService: true,
       clearable: false,
-      blockFilter: block => {
-        const spec = sparkStore.spec(block);
-        return !!spec && spec.changes.length > 0;
-      },
+      blockFilter: block => !!sparkStore.spec(block)?.fields.some(f => !f.readonly),
       parent: this,
     })
       .onOk((addr: BlockAddress) => {

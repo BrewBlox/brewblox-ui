@@ -2,17 +2,21 @@ import { Layout } from 'plotly.js';
 
 import { Link, Unit } from '@/helpers/units';
 import { StoreObject } from '@/plugins/database';
-import { GraphValueAxes, QueryParams } from '@/plugins/history/types';
+import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
-export interface ChangeField {
-  key: string;
+export interface BlockField<DataT = any> {
+  key: string & keyof DataT;
   title: string;
   component: string;
   componentProps?: any;
   generate: () => any;
   pretty?: (val: any) => string;
+  readonly?: boolean;
+  graphed?: boolean;
+  graphAxis?: GraphAxis;
+  graphName?: string;
 }
 
 export interface BlockDataPreset<DataT = any> {
@@ -20,20 +24,18 @@ export interface BlockDataPreset<DataT = any> {
   generate: () => Partial<DataT>;
 }
 
-export interface StoredDataPreset extends StoreObject {
-  id: string;
+export interface StoredDataPreset<DataT = any> extends StoreObject {
   type: string;
   name: string;
-  data: Mapped<any>;
+  data: Partial<DataT>;
 }
 
 export interface BlockSpec<DataT = any> {
   id: string;
   systemObject?: boolean;
   generate: () => DataT;
-  presets: BlockDataPreset<DataT>[];
-  changes: ChangeField[];
-  graphTargets?: Mapped<string>;
+  fields: BlockField<DataT>[];
+  presets?: BlockDataPreset<DataT>[];
 }
 
 export type PageMode = 'Relations' | 'List';
@@ -220,10 +222,6 @@ export type AnalogConstraint =
   | MaxConstraint
   | BalancedConstraint;
 
-export interface AnalogConstraintsObj {
-  constraints: AnalogConstraint[];
-}
-
 export type DigitalConstraintKey =
   'mutexed'
   | 'minOff'
@@ -267,6 +265,10 @@ export type DigitalConstraint =
   | MinOffConstraint
   | DelayedOnConstraint
   | DelayedOffConstraint;
+
+export interface AnalogConstraintsObj {
+  constraints: AnalogConstraint[];
+}
 
 export interface DigitalConstraintsObj {
   constraints: DigitalConstraint[];

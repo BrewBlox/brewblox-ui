@@ -1,4 +1,3 @@
-import mapKeys from 'lodash/mapKeys';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -7,18 +6,17 @@ import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
-import { postfixedDisplayNames } from '@/helpers/units';
 import { deepCopy } from '@/helpers/units/parseObject';
 import type { GraphConfig } from '@/plugins/history/types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import type { Block, BlockConfig, BlockCrud } from '@/plugins/spark/types';
+import type { Block, BlockConfig, BlockCrud, BlockSpec } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
-import { blockIdRules, canDisplay, tryDisplayBlock } from '../helpers';
+import { blockGraphCfg, blockIdRules, canDisplay, tryDisplayBlock } from '../helpers';
 
 
 @Component
-export default class BlockCrudComponent<BlockT extends Block = Block>
+export default class BlockCrudComponent<BlockT extends Block = Block, DataT = BlockT['data']>
   extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
@@ -61,38 +59,17 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
       || null;
   }
 
-  public get hasGraph(): boolean {
-    return sparkStore.spec(this.block)?.graphTargets !== undefined;
+  public get spec(): BlockSpec<DataT> {
+    return sparkStore.spec(this.block);
   }
 
-  public get renamedTargets(): Mapped<string> {
-    const targets = sparkStore.spec(this.block)?.graphTargets;
-    return targets !== undefined
-      ? postfixedDisplayNames(targets, this.block.data)
-      : {};
+  public get hasGraph(): boolean {
+    return this.crud.isStoreBlock
+      && this.spec.fields.some(f => f.graphed);
   }
 
   public get graphCfg(): GraphConfig {
-    const blockFmt = (val: string): string => [this.blockId, val].join('/');
-    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
-
-    return {
-      // persisted in config
-      params: this.widget.config.queryParams ?? { duration: '1h' },
-      axes: this.widget.config.graphAxes ?? {},
-      layout: {
-        ...(this.widget.config.graphLayout ?? {}),
-        title: this.widget.title, // always overrides
-      },
-      targets: [
-        {
-          measurement: this.serviceId,
-          fields: Object.keys(this.renamedTargets).map(k => blockFmt(k)),
-        },
-      ],
-      renames: mapKeys(this.renamedTargets, (_, k) => serviceFmt(k)),
-      colors: {},
-    };
+    return blockGraphCfg(this.crud);
   }
 
   public set graphCfg(config: GraphConfig) {

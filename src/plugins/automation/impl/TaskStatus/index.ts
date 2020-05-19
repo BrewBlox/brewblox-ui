@@ -15,7 +15,7 @@ const spec: AutomationSpec<TaskStatusImpl> = {
   }),
   pretty: impl =>
     matchesType<TaskStatusImpl>(type, impl)
-      ? `Assert that task status is ${impl.status}`
+      ? `Task with ref '${impl.ref}' must be ${impl.status}`
       : `Invalid data: type=${impl.type}`,
 };
 

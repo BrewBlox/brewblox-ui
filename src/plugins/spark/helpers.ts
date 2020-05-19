@@ -1,3 +1,5 @@
+import chain from 'lodash/chain';
+import defaults from 'lodash/defaults';
 import pick from 'lodash/pick';
 import range from 'lodash/range';
 import { VueConstructor } from 'vue';
@@ -17,7 +19,9 @@ import {
 } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
-import { Link, Unit } from '@/helpers/units';
+import { Link, serializedPropertyName, Unit } from '@/helpers/units';
+import { objectUnit } from '@/helpers/units/parseObject';
+import { GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
@@ -313,3 +317,52 @@ export const prettifyConstraints =
         })
         .sort()
         .join(', ');
+
+
+export const blockGraphCfg = <BlockT extends Block = any>(crud: BlockCrud<BlockT>): GraphConfig => {
+  const { queryParams, graphAxes, graphLayout } = defaults(crud.widget.config, {
+    queryParams: { duration: '1h' },
+    graphAxes: {},
+    graphLayout: {},
+  });
+
+  const graphedFields = sparkStore
+    .spec(crud.block)
+    .fields
+    .filter(f => f.graphed);
+
+  const graphedChain = chain(graphedFields)
+    .keyBy('key')
+    .mapKeys(f => {
+      const key = serializedPropertyName(f.key, crud.block.data);
+      return `${crud.block.serviceId}/${crud.block.id}/${key}`;
+    });
+
+  const fieldAxes = graphedChain
+    .mapValues(f => f.graphAxis ?? 'y')
+    .value();
+
+  const renames = graphedChain
+    .mapValues(f => {
+      const name = f.graphName ?? f.title;
+      const unit = objectUnit(crud.block.data[f.key]);
+      return unit ? `${name} [${unit}]` : name;
+    })
+    .value();
+
+  const targets = [{
+    measurement: crud.block.serviceId,
+    fields: graphedFields
+      .map(f => serializedPropertyName(f.key, crud.block.data))
+      .map(k => `${crud.block.id}/${k}`),
+  }];
+
+  return {
+    params: queryParams,
+    axes: defaults(graphAxes, fieldAxes),
+    layout: defaults({ title: crud.widget.title }, graphLayout),
+    targets,
+    renames,
+    colors: {},
+  };
+};

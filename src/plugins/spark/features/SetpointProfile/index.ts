@@ -1,4 +1,3 @@
-import { ref } from '@/helpers/component-ref';
 import { Link } from '@/helpers/units';
 import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
@@ -7,8 +6,6 @@ import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import { typeName } from './getters';
-import ProfilePresetAction from './ProfilePresetAction.vue';
-import ProfilePresetDialog from './ProfilePresetDialog.vue';
 import widget from './SetpointProfileWidget.vue';
 import { SetpointProfileData } from './types';
 
@@ -21,7 +18,7 @@ const block: BlockSpec<SetpointProfileData> = {
     targetId: new Link(null, interfaceTypes.SetpointSensorPair),
     drivenTargetId: new Link(null),
   }),
-  changes: [
+  fields: [
     {
       key: 'enabled',
       title: 'Enabled',
@@ -47,20 +44,7 @@ const block: BlockSpec<SetpointProfileData> = {
       generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
     },
   ],
-  presets: [
-    {
-      name: 'Empty profile',
-      generate: () => ({
-        points: [],
-        enabled: true,
-        start: new Date().getTime() / 1000,
-      }),
-    },
-  ],
 };
-
-ref(ProfilePresetAction);
-ref(ProfilePresetDialog);
 
 const feature: WidgetFeature = {
   ...genericBlockFeature,

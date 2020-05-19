@@ -14,8 +14,7 @@ const block: BlockSpec<MutexData> = {
     differentActuatorWait: new Unit(0, 'second'),
     waitRemaining: new Unit(0, 'second'),
   }),
-  changes: [],
-  presets: [],
+  fields: [],
 };
 
 const feature: WidgetFeature = {
