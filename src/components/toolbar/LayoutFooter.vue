@@ -22,6 +22,10 @@ export default class LayoutFooter extends Vue {
     return automationStore.lastEvent !== null;
   }
 
+  get numTasks(): number {
+    return automationStore.tasks.length;
+  }
+
   get logEntries(): LogEntry[] {
     return loggingStore.entries.slice().reverse();
   }
@@ -42,13 +46,26 @@ export default class LayoutFooter extends Vue {
 
 <template>
   <q-footer class="bg-dark shadow-up-1">
-    <q-bar class="bg-transparent q-px-none">
-      <q-space />
-      <q-btn v-if="automationAvailable" flat stretch icon="mdi-check-all">
-        <q-tooltip>Tasks</q-tooltip>
+    <q-bar class="bg-transparent q-px-none row justify-end">
+      <q-btn
+        v-if="automationAvailable"
+        flat
+        stretch
+        icon="mdi-check-all"
+      >
+        <q-tooltip>Automation tasks</q-tooltip>
         <AutomationTaskMenu />
+        <q-badge class="q-ml-sm">
+          {{ numTasks }}
+        </q-badge>
       </q-btn>
-      <q-btn flat stretch icon="mdi-bell" :color="logButtonColor" @click="logButtonColor = ''">
+      <q-btn
+        flat
+        stretch
+        icon="mdi-bell"
+        :color="logButtonColor"
+        @click="logButtonColor = ''"
+      >
         <q-menu>
           <q-list bordered>
             <q-item v-if="logEntries.length === 0">

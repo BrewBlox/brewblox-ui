@@ -41,7 +41,7 @@ export default class AutomationTaskMenu extends Vue {
 
 <template>
   <q-menu content-class="bordered">
-    <q-scroll-area style="height: 500px; max-height: 60vh; min-width: 250px">
+    <q-scroll-area class="menu-area">
       <div class="q-gutter-sm q-pa-sm">
         <div class="text-h6 text-secondary">
           Automation tasks
@@ -104,3 +104,10 @@ export default class AutomationTaskMenu extends Vue {
     </div>
   </q-menu>
 </template>
+
+<style lang="sass" scoped>
+.menu-area
+  height: 500px
+  max-height: 60vh
+  min-width: 250px
+</style>

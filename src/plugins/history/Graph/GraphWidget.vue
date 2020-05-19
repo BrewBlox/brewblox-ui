@@ -156,21 +156,30 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
               <q-btn
                 v-for="(preset, idx) in presets"
                 :key="idx"
+                flat
+                no-caps
                 :label="preset.duration"
                 :color="isActivePreset(preset) ? 'primary' : 'white'"
                 class="col-6"
-                no-caps
-                flat
                 @click="saveParams(preset)"
               />
-              <q-btn label="Custom" class="col-6" flat no-caps @click="chooseDuration" />
+              <q-btn
+                flat
+                no-caps
+                label="Custom"
+                class="col-6"
+                @click="chooseDuration"
+              />
             </div>
           </ActionSubmenu>
         </template>
       </component>
     </template>
 
-    <div v-if="mode === 'Basic'" class="fit">
+    <div
+      v-if="mode === 'Basic'"
+      class="fit"
+    >
       <q-resize-observer :debounce="200" @resize="refresh" />
       <HistoryGraph
         ref="widgetGraph"
@@ -180,7 +189,11 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       />
     </div>
     <div v-else class="widget-md">
-      <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
+      <GraphEditor
+        :config="config"
+        :downsampling="downsampling"
+        @update:config="saveConfig"
+      />
     </div>
   </GraphCardWrapper>
 </template>

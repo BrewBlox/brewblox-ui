@@ -262,6 +262,7 @@ export default class QuickActionsBasic extends CrudComponent {
           </q-tooltip>
         </q-btn>
       </div>
+      <slot name="below" />
     </div>
   </div>
 </template>

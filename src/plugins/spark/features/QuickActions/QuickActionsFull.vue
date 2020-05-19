@@ -43,22 +43,6 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
     this.saveSteps();
   }
 
-  addStep(): void {
-    const stepName = 'New Step';
-    createDialog({
-      title: 'Add a Step',
-      cancel: true,
-      prompt: {
-        model: stepName,
-        type: 'text',
-      },
-    })
-      .onOk(name => {
-        this.steps.push({ name, id: uid(), changes: [] });
-        this.saveSteps();
-      });
-  }
-
   duplicateStep(step: Step): void {
     this.steps.push({
       id: uid(),
@@ -165,6 +149,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
 
     <div class="widget-body column">
       <draggable
+        v-if="steps.length > 0"
         :disabled="$dense"
         :value="steps"
         @input="saveSteps"
@@ -230,14 +215,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
           </div>
         </q-expansion-item>
       </draggable>
-      <q-item v-if="steps.length">
-        <q-space />
-        <q-item-section class="col-auto">
-          <q-btn fab-mini color="secondary" icon="add" @click="addStep">
-            <q-tooltip>Add Step</q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
+      <slot name="below" />
     </div>
   </div>
 </template>

@@ -25,6 +25,9 @@ export default class AutomationInfoDialog extends DialogBase {
   @Prop({ type: String, required: true })
   public readonly title!: string;
 
+  @Prop({ type: String, required: false })
+  public readonly initialStepId!: string | undefined;
+
   pretty({ impl }: HasImpl): string {
     return allSpecs[impl.type].pretty(impl);
   }
@@ -55,6 +58,7 @@ export default class AutomationInfoDialog extends DialogBase {
         v-for="step in value.steps"
         :key="step.id"
         :label="step.title"
+        :default-opened="step.id === initialStepId"
         header-class="text-secondary"
         header-style="font-size: 120%"
         group="steps"

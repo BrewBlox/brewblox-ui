@@ -33,6 +33,11 @@ export default class MetricsWidget extends WidgetBase {
       </component>
     </template>
 
-    <component :is="mode" :crud="crud" :revision="revision" @mode="v => mode = v" />
+    <component
+      :is="mode"
+      :crud="crud"
+      :revision="revision"
+      @mode="v => mode = v"
+    />
   </CardWrapper>
 </template>

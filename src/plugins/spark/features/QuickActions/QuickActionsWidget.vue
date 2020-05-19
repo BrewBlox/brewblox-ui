@@ -89,18 +89,20 @@ export default class QuickActionsWidget extends WidgetBase {
     </template>
     <component :is="mode" :crud="crud" :open-step="openStep">
       <template v-if="config.steps.length === 0" #warnings>
-        <div class="widget-body row justify-center">
-          <div class="text-italic text-h6 q-pa-md darkened">
-            Create a step to get started.
-          </div>
-          <q-btn
-            fab-mini
-            color="secondary"
-            icon="add"
-            class="self-center"
-            @click="addStep"
-          />
+        <div class="text-italic text-h6 q-pa-md darkened text-center">
+          Create a step to get started.
         </div>
+      </template>
+      <template #below>
+        <q-btn
+          flat
+          dense
+          color="secondary"
+          icon="add"
+          label="New step"
+          class="self-end"
+          @click="addStep"
+        />
       </template>
     </component>
   </CardWrapper>

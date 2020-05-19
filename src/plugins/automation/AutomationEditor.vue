@@ -6,15 +6,13 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { clamp, objectStringSorter, spliceById } from '@/helpers/functional';
 
-import { clear, idCopy } from './helpers';
+import { idCopy } from './helpers';
 import { automationStore } from './store';
 import { AutomationStep, AutomationTemplate, Section } from './types';
 
 
 @Component
 export default class AutomationEditor extends DialogBase {
-  clear = clear;
-
   offset: number = 0;
   scrollPrompt: number = 0;
   localDrawer: boolean | null = null;
@@ -283,12 +281,11 @@ export default class AutomationEditor extends DialogBase {
           <q-item-section class="col-auto" @click.stop>
             <ActionMenu class="col-auto">
               <template #actions>
+                <ActionItem icon="mdi-play" label="Create process" @click="initProcess(tmpl)" />
                 <ActionItem label="New Step" icon="add" @click="startAddStep(tmpl)" />
-                <ActionItem label="Clear" icon="clear" @click="clear" />
-                <ActionItem icon="mdi-play" label="Start Process" @click="initProcess(tmpl)" />
-                <ActionItem icon="file_copy" label="Copy Template" @click="startCopyTemplate(tmpl)" />
-                <ActionItem icon="edit" label="Rename Template" @click="startRenameTemplate(tmpl)" />
-                <ActionItem icon="delete" label="Remove Template" @click="startRemoveTemplate(tmpl)" />
+                <ActionItem icon="file_copy" label="Copy template" @click="startCopyTemplate(tmpl)" />
+                <ActionItem icon="edit" label="Rename template" @click="startRenameTemplate(tmpl)" />
+                <ActionItem icon="delete" label="Remove template" @click="startRemoveTemplate(tmpl)" />
               </template>
             </ActionMenu>
           </q-item-section>
@@ -296,14 +293,12 @@ export default class AutomationEditor extends DialogBase {
         <div class="row q-pa-md justify-end">
           <q-btn
             flat
-            round
             dense
             icon="add"
             color="secondary"
+            label="New template"
             @click="startAddTemplate"
-          >
-            <q-tooltip>New Template</q-tooltip>
-          </q-btn>
+          />
         </div>
       </q-scroll-area>
     </q-drawer>
