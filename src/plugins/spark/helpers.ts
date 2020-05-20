@@ -1,5 +1,6 @@
-import chain from 'lodash/chain';
 import defaults from 'lodash/defaults';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import range from 'lodash/range';
 import { VueConstructor } from 'vue';
@@ -21,7 +22,7 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { Link, serializedPropertyName, Unit } from '@/helpers/units';
 import { objectUnit } from '@/helpers/units/parseObject';
-import { GraphConfig } from '@/plugins/history/types';
+import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
@@ -34,6 +35,7 @@ import {
   BlockAddress,
   BlockConfig,
   BlockCrud,
+  BlockField,
   DataBlock,
   DigitalConstraint,
   DisplayOpts,
@@ -326,29 +328,29 @@ export const blockGraphCfg = <BlockT extends Block = any>(crud: BlockCrud<BlockT
     graphLayout: {},
   });
 
-  const graphedFields = sparkStore
+  const graphedFields: BlockField[] = sparkStore
     .spec(crud.block)
     .fields
     .filter(f => f.graphed);
 
-  const graphedChain = chain(graphedFields)
-    .keyBy('key')
-    .mapKeys(f => {
+  const graphedObj: Mapped<BlockField> = keyBy(
+    graphedFields,
+    f => {
       const key = serializedPropertyName(f.key, crud.block.data);
       return `${crud.block.serviceId}/${crud.block.id}/${key}`;
     });
 
-  const fieldAxes = graphedChain
-    .mapValues(f => f.graphAxis ?? 'y')
-    .value();
+  const fieldAxes: Mapped<GraphAxis> = mapValues(
+    graphedObj,
+    f => f.graphAxis ?? 'y');
 
-  const renames = graphedChain
-    .mapValues(f => {
+  const renames: Mapped<string> = mapValues(
+    graphedObj,
+    f => {
       const name = f.graphName ?? f.title;
       const unit = objectUnit(crud.block.data[f.key]);
       return unit ? `${name} [${unit}]` : name;
-    })
-    .value();
+    });
 
   const targets = [{
     measurement: crud.block.serviceId,
