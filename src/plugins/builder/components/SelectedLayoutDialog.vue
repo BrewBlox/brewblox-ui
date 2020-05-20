@@ -60,8 +60,8 @@ export default class SelectedLayoutDialog extends DialogBase {
             'col clickable q-pa-sm rounded-borders text-h6 row q-gutter-x-sm',
             v.id === local && 'depth-24',
           ]"
-          @click="selectLayout(v)"
-          @dblclick="selectLayout(v, true)"
+          @click="selectLayout(v.id)"
+          @dblclick="selectLayout(v.id, true)"
         >
           {{ v.title }}
         </div>

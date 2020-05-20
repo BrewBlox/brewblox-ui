@@ -11,22 +11,22 @@ export default class ActionMenu extends Vue {
 
   @Prop({ type: Boolean, default: true })
   public readonly flat!: boolean;
-
 }
 </script>
 
 <template>
-  <q-btn v-bind="$attrs" :flat="flat" :icon="icon">
+  <q-btn v-bind="{...$attrs, flat, icon}">
     <q-menu
       content-class="row q-gutter-x-sm bordered"
       anchor="bottom right"
       self="top right"
     >
-      <template v-if="$slots.actions">
-        <ActionSubmenu label="Actions">
-          <slot name="actions" />
-        </ActionSubmenu>
-      </template>
+      <ActionSubmenu
+        v-if="!!$slots.actions"
+        label="Actions"
+      >
+        <slot name="actions" />
+      </ActionSubmenu>
       <slot name="menus" />
     </q-menu>
     <slot />
