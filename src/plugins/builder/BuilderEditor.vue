@@ -260,7 +260,7 @@ export default class BuilderEditor extends Vue {
       ?? builderStore.layoutIds[0]
       ?? null;
 
-    const route = id ? `/builder/${id}` : '/builder';
+    const route = this.layoutId ? `/builder/${this.layoutId}` : '/builder';
     this.$router.replace(route).catch(() => { });
     builderStore.lastLayoutId = this.layoutId;
   }
@@ -725,9 +725,6 @@ export default class BuilderEditor extends Vue {
     args.evt.stopPropagation();
   }
 
-  testey(): void {
-    console.log('testey');
-  }
 }
 </script>LayoutAc
 
@@ -766,12 +763,10 @@ export default class BuilderEditor extends Vue {
           <q-tab name="layouts" label="Layouts" />
         </q-tabs>
         <LayoutActions
-          ref="editor-layout-actions"
           :layout="layout"
           :select-layout="selectLayout"
           :save-parts="saveParts"
           class="col-auto"
-          @click="testey"
         />
       </div>
 

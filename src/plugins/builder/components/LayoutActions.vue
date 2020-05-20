@@ -155,13 +155,12 @@ export default class LayoutActions extends Vue {
         notify.done(`Created ${layout.title} widget on ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
-
 }
 </script>
 
 
 <template>
-  <ActionMenu v-bind="$attrs">
+  <ActionMenu v-bind="{...$attrs}">
     <template #actions>
       <ActionItem icon="add" label="New Layout" @click="startAddLayout(false)" />
       <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
@@ -173,6 +172,9 @@ export default class LayoutActions extends Vue {
         <ActionItem icon="delete" label="Remove all parts" @click="clearParts" />
         <ActionItem icon="delete" label="Remove Layout" @click="removeLayout" />
       </template>
+    </template>
+    <template #menus>
+      <slot name="menus" />
     </template>
     <slot />
   </ActionMenu>
