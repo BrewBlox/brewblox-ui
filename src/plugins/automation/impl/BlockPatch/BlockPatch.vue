@@ -16,6 +16,10 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
       : null;
   }
 
+  get fields(): BlockField[] {
+    return this.spec?.fields.filter(f => !f.readonly) ?? [];
+  }
+
   get addr(): BlockAddress {
     return {
       id: this.impl.blockId,
@@ -85,7 +89,7 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
     <template v-if="spec">
       <div
-        v-for="field in spec.changes"
+        v-for="field in fields"
         :key="field.key"
         class="row no-wrap items-center"
       >
