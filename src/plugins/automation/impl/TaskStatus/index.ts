@@ -12,6 +12,7 @@ const spec: AutomationSpec<TaskStatusImpl> = {
     type,
     ref: '',
     status: 'Finished',
+    resetStatus: null,
   }),
   pretty: impl =>
     matchesType<TaskStatusImpl>(type, impl)
