@@ -169,7 +169,8 @@
             "impl": {
               "type": "TaskStatus",
               "ref": "task-one",
-              "status": "Finished"
+              "status": "Finished",
+              "resetStatus": null
             }
           }
         ],
@@ -215,14 +216,15 @@
             }
           },
           {
-            "id": "37d33578-85a1-4176-94d4-6bb2bb078b33",
+            "id": "b069ea2b-c5b6-4d33-b5f6-db6e884ac1d5",
+            "title": "Create or edit task",
             "enabled": true,
-            "title": "Create task-one",
             "impl": {
-              "type": "TaskCreate",
-              "ref": "task-one",
-              "title": "Test Task",
-              "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n            Suspendisse iaculis sit amet ligula eget fermentum.\n            Nunc pharetra, sapien eget rutrum suscipit, eros nisi semper ante,\n            at consectetur elit lectus vitae tortor.\n            Duis id ipsum ac elit viverra interdum. Aenean finibus risus ut iaculis porta.\n            Aenean mollis, orci vel egestas aliquam, diam augue imperdiet orci,\n            consectetur vestibulum diam velit in magna.\n            Curabitur pulvinar, metus et lacinia sodales,\n            sem quam finibus risus, a dignissim nisl enim vitae libero.\n            In eget enim ipsum. Cras elementum nisl ac mauris dignissim,\n            quis laoreet neque aliquam. Integer lacinia fermentum lectus sit amet ultrices."
+              "type": "TaskEdit",
+              "ref": "",
+              "title": null,
+              "message": null,
+              "status": null
             }
           }
         ],

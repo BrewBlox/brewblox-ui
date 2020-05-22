@@ -115,27 +115,39 @@ export interface BlockPatchImpl {
 }
 
 /**
- * Create a new Task.
+ * Edit or create a Task.
  * Status can be checked later with the TaskStatusImpl condition.
  */
-export interface TaskCreateImpl {
-  type: 'TaskCreate';
+export interface TaskEditImpl {
+  type: 'TaskEdit';
 
   /**
    * User-defined reference key.
    * Not guaranteed to be unique.
+   * All tasks with this ref are edited.
    */
   ref: string;
 
   /**
-   * Human readable title for the created task.
+   * Human readable title.
+   * Default or existing value is used if not set.
+   * @nullable
    */
-  title: string;
+  title: string | null;
 
   /**
-   * Message for the created task.
+   * Human readable message.
+   * Default or existing value is used if not set.
+   * @nullable
    */
-  message: string;
+  message: string | null;
+
+  /**
+   * Task status.
+   * Default or existing value is used if not set.
+   * @nullable
+   */
+  status: AutomationStatus | null;
 }
 
 /**
@@ -170,7 +182,7 @@ export interface WebhookImpl {
  */
 export type ActionImpl =
   BlockPatchImpl
-  | TaskCreateImpl
+  | TaskEditImpl
   | WebhookImpl
   ;
 
@@ -263,11 +275,18 @@ export interface TaskStatusImpl {
 
   /**
    * The user-defined reference key.
-   * Must match those set in TaskCreate.
+   * Must match those set in TaskEdit.
    * If multiple tasks share the same ref key,
    * all must match the given status.
    */
   ref: string;
+
+  /**
+   * Task status to set at the beginning of the step.
+   * If null, task is created if not exists, but not modified otherwise.
+   * @nullable
+   */
+  resetStatus: AutomationStatus | null;
 
   /**
    * Desired status.

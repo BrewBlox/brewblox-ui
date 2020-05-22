@@ -114,7 +114,7 @@ export default class AutomationSteps extends Vue {
   }
 
   pretty({ impl }: HasImpl): string {
-    return allSpecs[impl.type].pretty(impl);
+    return allSpecs[impl.type]?.pretty(impl) ?? 'Unknown';
   }
 
   nextStepTitle(transition: AutomationTransition): string {
