@@ -16,6 +16,11 @@ export default class PidDisplay extends PartBase {
   HOT_WATER = HOT_WATER;
   COLD_WATER = COLD_WATER;
   readonly addressKey = 'pid';
+  readonly scaleKey = 'scale';
+
+  get scale(): number {
+    return this.settings[this.scaleKey] ?? 1;
+  }
 
   get address(): BlockAddress {
     return settingsAddress(this.part, this.addressKey);
@@ -75,7 +80,7 @@ export default class PidDisplay extends PartBase {
 </script>
 
 <template>
-  <g>
+  <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
       :transform="textTransformation([1,1])"
       :width="squares(1)"

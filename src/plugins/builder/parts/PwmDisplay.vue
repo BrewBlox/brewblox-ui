@@ -7,6 +7,11 @@ import { CENTER } from '../getters';
 
 @Component
 export default class PwmDisplay extends PartBase {
+  readonly scaleKey = 'scale';
+
+  get scale(): number {
+    return this.settings[this.scaleKey] ?? 1;
+  }
 
   get color(): string {
     return this.liquidOnCoord(CENTER)[0] ?? '';
@@ -15,5 +20,7 @@ export default class PwmDisplay extends PartBase {
 </script>
 
 <template>
-  <PwmValues :part="part" settings-key="pwm" :color="color" />
+  <g :transform="`scale(${scale} ${scale})`">
+    <PwmValues :part="part" settings-key="pwm" :color="color" />
+  </g>
 </template>
