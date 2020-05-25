@@ -5,7 +5,8 @@ import { PartSpec } from '../types';
 
 const SIZE_X = 3;
 const SIZE_Y = 9;
-const settingsKey = 'setpoint';
+const addressKey = 'setpoint';
+const scaleKey = 'scale';
 
 const spec: PartSpec = {
   id: 'Conical',
@@ -15,14 +16,24 @@ const spec: PartSpec = {
     {
       component: 'BlockAddressCard',
       props: {
-        settingsKey,
+        settingsKey: addressKey,
         compatible: [blockTypes.SetpointSensorPair],
         label: 'Setpoint',
       },
     },
+    {
+      component: 'ScaleCard',
+      props: {
+        settingsKey: scaleKey,
+        defaultSize: [SIZE_X, SIZE_Y],
+      },
+    },
   ],
-  size: () => [SIZE_X, SIZE_Y],
-  interactHandler: part => showSettingsBlock(part, settingsKey),
+  size: ({ settings }) => {
+    const scale = settings[scaleKey] ?? 1;
+    return [SIZE_X * scale, SIZE_Y * scale];
+  },
+  interactHandler: part => showSettingsBlock(part, addressKey),
 };
 
 export default spec;

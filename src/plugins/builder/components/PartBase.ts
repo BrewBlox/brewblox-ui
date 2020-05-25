@@ -71,11 +71,11 @@ export default class PartBase extends Vue {
   }
 
   public liquidOnCoord(coord: string): string[] {
-    return Object.keys(this.flow[this.rotatedCoord(coord)] || {});
+    return Object.keys(this.flow[this.rotatedCoord(coord)] ?? {});
   }
 
   public flowOnCoord(coord: string): number {
-    return Object.values(this.flow[this.rotatedCoord(coord)] || {})
+    return Object.values(this.flow[this.rotatedCoord(coord)] ?? {})
       .reduce((sum, v) => sum + v, 0);
   }
 }

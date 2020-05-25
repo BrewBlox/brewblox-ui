@@ -29,6 +29,9 @@ export default class PwmValues extends Vue {
   @Prop({ type: Number, default: 0 })
   public readonly startY!: number;
 
+  @Prop({ type: String, default: '' })
+  public readonly color!: string;
+
   get address(): BlockAddress {
     return settingsAddress(this.part, this.settingsKey);
   }
@@ -64,9 +67,10 @@ export default class PwmValues extends Vue {
         :height="squares(1)-2"
         :x="squares(startX)+1"
         :y="squares(startY)+1"
+        :stroke="color"
+        stroke-width="2px"
         rx="6"
         ry="6"
-        stroke-width="2px"
       />
     </g>
     <SvgEmbedded

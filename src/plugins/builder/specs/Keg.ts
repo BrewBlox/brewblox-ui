@@ -6,6 +6,7 @@ import { PartSpec } from '../types';
 const SIZE_X = 2;
 const SIZE_Y = 5;
 const settingsKey = 'setpoint';
+const scaleKey = 'scale';
 
 const spec: PartSpec = {
   id: 'Keg',
@@ -21,8 +22,18 @@ const spec: PartSpec = {
         label: 'Setpoint',
       },
     },
+    {
+      component: 'ScaleCard',
+      props: {
+        settingsKey: scaleKey,
+        defaultSize: [SIZE_X, SIZE_Y],
+      },
+    },
   ],
-  size: () => [SIZE_X, SIZE_Y],
+  size: ({ settings }) => {
+    const scale = settings[scaleKey] ?? 1;
+    return [SIZE_X * scale, SIZE_Y * scale];
+  },
   interactHandler: part => showSettingsBlock(part, settingsKey),
 };
 

@@ -1,10 +1,13 @@
+import range from 'lodash/range';
+
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { mutate } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
-import { SQUARE_SIZE } from './getters';
+import { CENTER, SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
 import { FlowPart, PersistentPart, Rect, StatePart, Transitions } from './types';
 
@@ -209,4 +212,20 @@ export function rectContains(rect: Rect, x: number, y: number): boolean {
     && x <= rect.right
     && y >= rect.top
     && y <= rect.bottom;
+}
+
+export function universalTransitions(size: [number, number], enabled: boolean): Transitions {
+  if (!enabled) {
+    return {};
+  }
+  const [sizeX, sizeY] = size;
+  const coords: string[] = [
+    range(sizeX).map(x => [`${x + 0.5},0,0`, `${x + 0.5},${sizeY},0`]),
+    range(sizeY).map(y => [`0,${y + 0.5},0`, `${sizeX},${y + 0.5},0`]),
+  ]
+    .flat(2);
+  return coords
+    .reduce(
+      (acc, coord) => mutate(acc, coord, [{ outCoords: CENTER, internal: true, friction: 0.5 }]),
+      { [CENTER]: coords.map(outCoords => ({ outCoords, friction: 0.5 })) });
 }
