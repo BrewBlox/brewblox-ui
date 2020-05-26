@@ -3,9 +3,9 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { TempSensorOneWireBlock } from '@/plugins/spark/types';
 
 import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
-import { TempSensorOneWireBlock } from './types';
 
 @Component({
   components: {

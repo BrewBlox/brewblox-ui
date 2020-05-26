@@ -1,6 +1,6 @@
 import round from 'lodash/round';
 
-import PostFixed from './PostFixed';
+import { PostFixed } from './PostFixed';
 
 export const prettify = (v: string): string =>
   v.replace(/delta_/g, '')
@@ -16,13 +16,12 @@ export const prettify = (v: string): string =>
     .replace(/ ?\/ ?/gi, '/')
     .replace(/ ?\* ?/gi, '·');
 
-export default class Unit extends PostFixed {
+export class Unit implements PostFixed {
   private _val: number | null;
   private _unit: string;
   private _notation: string;
 
   public constructor(value: number | null, unit: string) {
-    super();
     this._val = value;
     this._unit = unit;
     this._notation = prettify(unit);
@@ -61,7 +60,7 @@ export default class Unit extends PostFixed {
     return `[${this.unit}]`;
   }
 
-  public serialized(key: string): [string, number | null] {
+  public toSerialized(key: string): [string, number | null] {
     return [`${key}${this.postfix}`, this.value];
   }
 

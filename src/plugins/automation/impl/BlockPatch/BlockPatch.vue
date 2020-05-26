@@ -71,6 +71,7 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
     createDialog({
       component: 'ChangeFieldDialog',
       field,
+      value: this.impl.data[field.key],
       address: this.addr,
       title: `${this.addr.id} ${field.title}`,
     })

@@ -6,9 +6,8 @@ import { createDialog } from '@/helpers/dialog';
 import { durationMs } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import type { SparkService, SparkStatus } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
-
-import type { SparkService, SparkStatus } from '../types';
 
 const snoozeDuration = durationMs('1d');
 const updateValidDuration = durationMs('30s');

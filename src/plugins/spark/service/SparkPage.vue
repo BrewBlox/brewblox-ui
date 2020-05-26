@@ -1,5 +1,5 @@
 <script lang="ts">
-import { isArray } from 'util';
+import isArray from 'lodash/isArray';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
@@ -7,8 +7,8 @@ import { Watch } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
+import { systemGroup } from '@/plugins/spark/getters';
 import { saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
-import { isSystemBlock } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
   Block,
@@ -271,7 +271,7 @@ export default class SparkPage extends Vue {
   get validatedItems(): ValidatedWidget[] {
     return this.sparkModule
       ?.blocks
-      .filter(block => !isSystemBlock(block))
+      .filter(block => !block.groups.includes(systemGroup))
       .map(this.validateBlock)
       ?? [];
   }

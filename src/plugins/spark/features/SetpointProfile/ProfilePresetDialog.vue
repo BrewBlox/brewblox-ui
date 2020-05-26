@@ -5,10 +5,9 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
+import { deserialize, serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
-import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
-
-import { SetpointProfileBlock } from './types';
+import { SetpointProfileBlock } from '@/plugins/spark/types';
 
 const typeName: SetpointProfileBlock['type'] = 'SetpointProfile';
 

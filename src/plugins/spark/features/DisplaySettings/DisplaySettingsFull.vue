@@ -3,9 +3,8 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/features/DisplaySettings/types';
 import { isCompatible } from '@/plugins/spark/helpers';
-import { BlockOrIntfType, DisplaySlot } from '@/plugins/spark/types';
+import { BlockOrIntfType, DisplaySettingsBlock, DisplaySettingsTempUnit, DisplaySlot } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 
 @Component
@@ -26,7 +25,7 @@ export default class DisplaySettingsFull
   ]
 
   get tempName(): string {
-    return DisplayTempUnit[this.block.data.tempUnit];
+    return DisplaySettingsTempUnit[this.block.data.tempUnit];
   }
 
   get slots(): (DisplaySlot | null)[] {

@@ -2,10 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { ActuatorPwmBlock } from '@/plugins/spark/types';
 
 import ActuatorPwmBasic from './ActuatorPwmBasic.vue';
 import ActuatorPwmFull from './ActuatorPwmFull.vue';
-import { ActuatorPwmBlock } from './types';
 
 @Component({
   components: {

@@ -6,10 +6,9 @@ import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { spliceById, uniqueFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
+import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
-import { deepCopy } from '@/plugins/spark/units/parseObject';
-import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
 
 import { BlockChange, EditableBlockField, Step } from './types';
 

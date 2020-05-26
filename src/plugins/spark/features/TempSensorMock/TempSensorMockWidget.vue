@@ -3,9 +3,9 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { Fluctuation, TempSensorMockBlock } from '@/plugins/spark/types';
 import { Temp, Time } from '@/plugins/spark/units';
 
-import { Fluctuation, TempSensorMockBlock } from './types';
 
 @Component
 export default class TempSensorMockWidget

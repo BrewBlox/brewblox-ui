@@ -3,9 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockAddress } from '@/plugins/spark/types';
-
-import { TempSensorOneWireBlock } from './types';
+import { BlockAddress, TempSensorOneWireBlock } from '@/plugins/spark/types';
 
 
 @Component

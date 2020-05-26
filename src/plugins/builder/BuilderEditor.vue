@@ -6,7 +6,7 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { Coordinates } from '@/helpers/coordinates';
 import { createDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
-import { deepCopy, deserialize, serialize } from '@/plugins/spark/units/parseObject';
+import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';

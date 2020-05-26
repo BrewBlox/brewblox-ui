@@ -7,10 +7,10 @@ import { createBlockDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import type { GraphConfig } from '@/plugins/history/types';
+import { deepCopy } from '@/plugins/spark/parse-object';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { Block, BlockCrud } from '@/plugins/spark/types';
 import type { BlockConfig, BlockSpec } from '@/plugins/spark/types';
-import { deepCopy } from '@/plugins/spark/units/parseObject';
 import { dashboardStore } from '@/store/dashboards';
 
 import { blockGraphCfg, blockIdRules, canDisplay, tryDisplayBlock } from '../helpers';

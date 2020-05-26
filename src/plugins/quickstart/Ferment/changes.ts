@@ -5,6 +5,7 @@ import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { blockTypes } from '@/plugins/spark/getters';
+import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
@@ -12,13 +13,11 @@ import {
   FilterChoice,
   MutexBlock,
   PidBlock,
-  PidData,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { Block, DigitalState } from '@/plugins/spark/types';
 import { Link, Time, Unit } from '@/plugins/spark/units';
-import { serialize } from '@/plugins/spark/units/parseObject';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -26,6 +25,7 @@ import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../he
 import { DisplayBlock } from '../types';
 import { FermentConfig, FermentOpts } from './types';
 
+type PidData = PidBlock['data'];
 
 const beerCoolConfig: Partial<PidData> = {
   kp: new Unit(-50, '1/degC'),

@@ -2,11 +2,12 @@ import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
 
-import { extendById, filterById } from '@/helpers/functional';
+import { extendById, filterById, typeMatchFilter } from '@/helpers/functional';
 import { EventbusMessage } from '@/plugins/eventbus';
-import { Block } from '@/plugins/spark/types';
+import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   ApiSparkStatus,
+  Block,
   BlockAddress,
   DataBlock,
   Limiters,
@@ -16,7 +17,6 @@ import type {
   SparkStatus,
   UserUnits,
 } from '@/plugins/spark/types';
-import { deserialize } from '@/plugins/spark/units/parseObject';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
@@ -96,6 +96,10 @@ export class SparkServiceModule extends VuexModule {
   public blockByAddress<T extends Block>(addr: BlockAddress | null): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
     return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
+  }
+
+  public blocksByType<T extends Block>(type: T['type']): T[] {
+    return this.blocks.filter(typeMatchFilter<T>(type));
   }
 
   @Action

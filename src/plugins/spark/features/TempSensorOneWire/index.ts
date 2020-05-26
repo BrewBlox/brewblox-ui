@@ -1,12 +1,11 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { Temp } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './TempSensorOneWireWidget.vue';
-import { TempSensorOneWireBlock } from './types';
 
 const typeName = 'TempSensorOneWire';
 

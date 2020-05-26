@@ -4,7 +4,18 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isCompatible } from '@/plugins/spark/helpers';
-import { Block, BlockInterfaceType, DigitalState } from '@/plugins/spark/types';
+import {
+  ActuatorLogicBlock,
+  AnalogCompare,
+  AnalogCompareOp,
+  Block,
+  BlockInterfaceType,
+  DigitalCompare,
+  DigitalCompareOp,
+  DigitalState,
+  EvalResult,
+  ExpressionError,
+} from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
@@ -21,15 +32,6 @@ import {
   shiftRemainingComparisons,
   syntaxCheck,
 } from './helpers';
-import {
-  ActuatorLogicBlock,
-  AnalogCompare,
-  AnalogCompareOp,
-  DigitalCompare,
-  DigitalCompareOp,
-  EvalResult,
-  ExpressionError,
-} from './types';
 
 const validTypes: BlockInterfaceType[] = [
   'ActuatorDigitalInterface',

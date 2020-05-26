@@ -3,8 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import { spaceCased } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { MotorValveBlock, ValveState } from './types';
+import { MotorValveBlock, ValveState } from '@/plugins/spark/types';
 
 @Component
 export default class MotorValveBasic

@@ -3,9 +3,8 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { contrastColor, typeMatchFilter } from '@/helpers/functional';
-import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, PidBlock } from '@/plugins/spark/types';
+import { BlockAddress, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import { settingsAddress, squares } from '../helpers';
 import { PersistentPart } from '../types';

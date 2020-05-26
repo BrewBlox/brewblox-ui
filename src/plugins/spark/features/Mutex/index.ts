@@ -1,11 +1,10 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, MutexBlock } from '@/plugins/spark/types';
 import { Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './MutexWidget.vue';
-import { MutexBlock } from './types';
 
 const typeName = 'Mutex';
 

@@ -1,8 +1,8 @@
 import { isCompatible } from '@/plugins/spark/helpers';
+import { ActuatorLogicBlock, AnalogCompare, DigitalCompare, ExpressionError } from '@/plugins/spark/types';
 import { Temp } from '@/plugins/spark/units';
 
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './getters';
-import { ActuatorLogicData, AnalogCompare, DigitalCompare, ExpressionError } from './types';
 
 export const keyCode = (s: string): number =>
   s.charCodeAt(0);
@@ -122,7 +122,7 @@ export function syntaxCheck(expression: string): ExpressionError | null {
   return null;
 }
 
-type ComparisonData = Pick<ActuatorLogicData, 'expression' | 'digital' | 'analog'>;
+type ComparisonData = Pick<ActuatorLogicBlock['data'], 'expression' | 'digital' | 'analog'>;
 
 export function comparisonCheck(data: ComparisonData): ExpressionError | null {
   const numDigital = data.digital.length;

@@ -2,9 +2,9 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { InactiveObjectBlock } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
-import { InactiveObjectBlock } from './types';
 
 @Component
 export default class InactiveObjectWidget extends BlockWidgetBase {

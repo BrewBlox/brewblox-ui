@@ -2,12 +2,11 @@ import { unitDurationString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { ActuatorPwmBlock, BlockSpec } from '@/plugins/spark/types';
 import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorPwmWidget.vue';
-import { ActuatorPwmBlock } from './types';
 
 const typeName = 'ActuatorPwm';
 

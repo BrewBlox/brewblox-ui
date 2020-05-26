@@ -1,12 +1,11 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { ActuatorOffsetBlock, BlockSpec, OffsetSettingOrValue } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorOffsetWidget.vue';
-import { ActuatorOffsetBlock, OffsetSettingOrValue } from './types';
 
 const typeName = 'ActuatorOffset';
 

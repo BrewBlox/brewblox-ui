@@ -4,10 +4,9 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockValueImpl } from '@/plugins/automation/types';
+import { isPostFixed, parsePostfixed, propertyNameWithoutUnit } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockField, BlockSpec, BlockType } from '@/plugins/spark/types';
-import { parsePostfixed, propertyNameWithoutUnit } from '@/plugins/spark/units/parseObject';
-import PostFixed from '@/plugins/spark/units/PostFixed';
 
 import { OperatorOption, operatorSymbols } from './helpers';
 
@@ -52,8 +51,8 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
         .fields
         .map(field => {
           const generated = field.generate();
-          const value = generated instanceof PostFixed
-            ? generated.serialized(field.key)[0]
+          const value = isPostFixed(generated)
+            ? generated.toSerialized(field.key)[0]
             : field.key;
           return { label: field.title, value };
         })
@@ -93,8 +92,8 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
   }
 
   rawValue(value: any): any {
-    return value instanceof PostFixed
-      ? value.serialized('')[1]
+    return isPostFixed(value)
+      ? value.toSerialized('')[1]
       : value;
   }
 

@@ -35,7 +35,7 @@ export default class QuickStartMockCreateField extends Vue {
   async createMockSensors(): Promise<void> {
     if (!this.sparkModule) { return; }
     const validator = ruleValidator(blockIdRules(this.serviceId));
-    const spec = sparkStore.specById('TempSensorMock');
+    const spec = sparkStore.specById<TempSensorMockBlock>('TempSensorMock');
 
     for (const name of this.names) {
       const block: TempSensorMockBlock = {

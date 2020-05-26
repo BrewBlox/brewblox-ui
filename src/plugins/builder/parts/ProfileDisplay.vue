@@ -2,9 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress } from '@/plugins/spark/types';
+import { BlockAddress, Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { settingsAddress } from '../helpers';

@@ -2,10 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { MutexedConstraint } from '@/plugins/spark/types';
+import { MutexBlock, MutexedConstraint } from '@/plugins/spark/types';
 import { Unit } from '@/plugins/spark/units';
-
-import { MutexBlock } from './types';
 
 interface MutexClient {
   id: string;

@@ -84,11 +84,15 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
   const limited: Limiters = {};
 
   for (const block of blocks) {
-    if (!block.data.constrainedBy?.constraints.length) {
+    if (!('constrainedBy' in block.data)) {
       continue;
     }
-    const constraints = block.data.constrainedBy.constraints;
-    const isDigital = constraints[0].remaining !== undefined;
+    const { constraints } = block.data.constrainedBy;
+    if (!constraints || constraints.length === 0) {
+      continue;
+    }
+
+    const isDigital = 'remaining' in constraints[0];
 
     if (isDigital) {
       limited[block.id] = (constraints as DigitalConstraint[])

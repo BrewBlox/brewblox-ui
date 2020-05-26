@@ -1,6 +1,6 @@
 import { Layout, PlotData } from 'plotly.js';
 
-import { SetpointProfileBlock } from './types';
+import { SetpointProfileBlock } from '@/plugins/spark/types';
 
 export interface GraphProps {
   data: Partial<PlotData>[];

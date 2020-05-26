@@ -1,4 +1,3 @@
-export default abstract class PostFixed {
-  public abstract get postfix(): string;
-  public abstract serialized(key: string): [string, any];
+export interface PostFixed {
+  toSerialized(key: string): [string, any];
 }

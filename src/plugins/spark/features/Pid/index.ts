@@ -2,15 +2,13 @@ import { unitDurationString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, PidBlock } from '@/plugins/spark/types';
 import { Link, Temp, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './PidWidget.vue';
-import { PidBlock } from './types';
 
 const typeName = 'Pid';
-
 
 const block: BlockSpec<PidBlock> = {
   id: typeName,
