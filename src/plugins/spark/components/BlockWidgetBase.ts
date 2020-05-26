@@ -62,7 +62,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block>
   }
 
   public get spec(): BlockSpec<BlockT> {
-    return sparkStore.spec(this.block);
+    return sparkStore.spec(this.block) as BlockSpec<BlockT>;
   }
 
   public get hasGraph(): boolean {

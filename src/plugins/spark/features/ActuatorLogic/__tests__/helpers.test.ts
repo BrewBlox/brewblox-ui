@@ -1,15 +1,14 @@
-import { DigitalState } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
-
-import { comparisonCheck, sanitize, shiftRemainingComparisons, syntaxCheck } from '../helpers';
+import { ActuatorLogicBlock, DigitalState } from '@/plugins/spark/types';
 import {
-  ActuatorLogicData,
   AnalogCompare,
   AnalogCompareOp,
   DigitalCompare,
   DigitalCompareOp,
   EvalResult,
-} from '../types';
+} from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
+
+import { comparisonCheck, sanitize, shiftRemainingComparisons, syntaxCheck } from '../helpers';
 
 describe('Sanitize expression strings', () => {
   it('should remove invalid characters', () => {
@@ -91,7 +90,7 @@ const digital = (): DigitalCompare[] => ([
   },
 ]);
 
-const args = (expression: string): Pick<ActuatorLogicData, 'expression' | 'digital' | 'analog'> => ({
+const args = (expression: string): Pick<ActuatorLogicBlock['data'], 'expression' | 'digital' | 'analog'> => ({
   expression,
   analog: analog(),
   digital: digital(),

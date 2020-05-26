@@ -2,11 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { Block } from '@/plugins/spark/types';
+import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
 import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
-import { SetpointSensorPairBlock } from './types';
 
 @Component({
   components: {

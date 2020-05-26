@@ -64,7 +64,7 @@ export default class SparkWidget extends Vue {
   }
 
   get wifi(): WiFiSettingsBlock {
-    return this.sysBlock('WifiSettings');
+    return this.sysBlock('WiFiSettings');
   }
 
   get sysDate(): string {

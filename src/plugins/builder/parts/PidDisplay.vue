@@ -1,9 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import { sparkStore } from '@/plugins/spark/store';
-import type { Block } from '@/plugins/spark/types';
+import type { Block, PidBlock } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';

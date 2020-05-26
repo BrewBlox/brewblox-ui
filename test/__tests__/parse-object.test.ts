@@ -1,6 +1,5 @@
-import Link from '@/plugins/spark/units/Link';
-import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
-import Unit from '@/plugins/spark/units/Unit';
+import { deserialize, serialize } from '@/plugins/spark/parse-object';
+import { Link, Unit } from '@/plugins/spark/units';
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {
@@ -57,6 +56,7 @@ describe('deserialize', () => {
       },
       25,
       'do not touch',
+      null,
     ];
 
     const output = deserialize(input);
@@ -90,6 +90,7 @@ describe('serialize', () => {
       emptyArray: [],
       deeper: {
         temperatureInUSA: new Unit(60, 'fahrenheit'),
+        nullable: null,
       },
     };
 
@@ -100,6 +101,7 @@ describe('serialize', () => {
       emptyArray: [],
       deeper: {
         'temperatureInUSA[fahrenheit]': 60,
+        nullable: null,
       },
     };
 

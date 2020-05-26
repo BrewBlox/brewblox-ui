@@ -1,10 +1,9 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, DisplaySettingsBlock, DisplaySettingsTempUnit } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DisplaySettingsWidget.vue';
-import { DisplaySettingsBlock, DisplayTempUnit } from './types';
 
 const typeName = 'DisplaySettings';
 
@@ -13,7 +12,7 @@ const block: BlockSpec<DisplaySettingsBlock> = {
   systemObject: true,
   generate: () => ({
     name: 'Display settings',
-    tempUnit: DisplayTempUnit.Celsius,
+    tempUnit: DisplaySettingsTempUnit.Celsius,
     widgets: [],
     brightness: 255,
   }),

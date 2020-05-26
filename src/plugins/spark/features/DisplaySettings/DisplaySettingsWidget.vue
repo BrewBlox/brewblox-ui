@@ -2,10 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { DisplaySettingsBlock } from '@/plugins/spark/types';
 
 import DisplaySettingsBasic from './DisplaySettingsBasic.vue';
 import DisplaySettingsFull from './DisplaySettingsFull.vue';
-import { DisplaySettingsBlock } from './types';
 
 @Component({
   components: {

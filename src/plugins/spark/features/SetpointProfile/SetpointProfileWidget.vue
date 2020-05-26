@@ -3,7 +3,8 @@ import { Component, Watch } from 'vue-property-decorator';
 
 import { isJsonEqual } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { deepCopy } from '@/plugins/spark/units/parseObject';
+import { deepCopy } from '@/plugins/spark/parse-object';
+import { SetpointProfileBlock } from '@/plugins/spark/types';
 
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';
@@ -11,7 +12,8 @@ import ProfileImportAction from './ProfileImportAction.vue';
 import ProfilePresetAction from './ProfilePresetAction.vue';
 import SetpointProfileBasic from './SetpointProfileBasic.vue';
 import SetpointProfileFull from './SetpointProfileFull.vue';
-import { SetpointProfileBlock, SetpointProfileData } from './types';
+
+type SetpointProfileData = SetpointProfileBlock['data'];
 
 @Component({
   components: {

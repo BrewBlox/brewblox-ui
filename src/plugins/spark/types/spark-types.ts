@@ -1,5 +1,4 @@
 import { StoreObject } from '@/plugins/database';
-import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
@@ -22,7 +21,6 @@ export interface SparkConfig {
 }
 
 export type SparkService = Service<SparkConfig>;
-
 
 export interface SparkFeature {
   feature: WidgetFeature<BlockConfig>;
@@ -77,48 +75,4 @@ export interface RelationNode {
 
 export interface Limiters {
   [blockId: string]: string[];
-}
-
-export enum ChannelConfig {
-  Unused = 0,
-  ActiveLow = 1,
-  ActiveHigh = 2,
-  Input = 10,
-  Unknown = 255,
-}
-
-export enum DigitalState {
-  Inactive = 0,
-  Active = 1,
-  Unknown = 2,
-}
-
-export interface IoChannel {
-  config: ChannelConfig;
-  state: DigitalState;
-}
-
-export interface IoPin {
-  [key: string]: IoChannel;
-}
-
-export interface DisplaySlot {
-  pos: number;
-  color: string;
-  name: string;
-
-  // Value will be one of these
-  tempSensor?: Link;
-  setpointSensorPair?: Link;
-  actuatorAnalog?: Link;
-  pid?: Link;
-}
-
-export interface DisplayOpts {
-  color: string;
-  name: string;
-  pos?: number;
-  unique: boolean;
-  showNotify: boolean;
-  showDialog: boolean;
 }

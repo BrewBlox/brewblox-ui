@@ -3,10 +3,8 @@ import { Component } from 'vue-property-decorator';
 
 import { mutate, typeMatchFilter } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { Block } from '@/plugins/spark/types';
+import { Block, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
-
-import { DigitalActuatorBlock } from './types';
 
 @Component
 export default class DigitalActuatorWidget

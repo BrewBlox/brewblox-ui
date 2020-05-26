@@ -40,7 +40,7 @@ export default class SparkWifiMenu extends DialogBase {
 
   get block(): WiFiSettingsBlock {
     return sparkStore.serviceBlocks(this.serviceId)
-      .find(typeMatchFilter<WiFiSettingsBlock>('WifiSettings'))!;
+      .find(typeMatchFilter<WiFiSettingsBlock>('WiFiSettings'))!;
   }
 
   async save(): Promise<void> {

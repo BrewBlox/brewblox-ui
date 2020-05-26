@@ -4,11 +4,8 @@ import { Component } from 'vue-property-decorator';
 import { spaceCased, typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block } from '@/plugins/spark/types';
+import { Block, MotorValveBlock, ValveStartId, ValveState } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
-
-import { ValveStartId } from '../DS2408/types';
-import { MotorValveBlock, ValveState } from './types';
 
 @Component
 export default class MotorValveFull

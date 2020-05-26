@@ -15,7 +15,7 @@ export { SparkServiceModule } from './spark-module';
 export class SparkGlobalModule extends VuexModule {
   public modules: SparkServiceModule[] = [];
   public presets: StoredDataPreset[] = [];
-  public specs: BlockSpec<Block>[] = [];
+  public specs: BlockSpec[] = [];
 
   public get serviceIds(): string[] {
     return this.modules.map(v => v.id);
@@ -49,10 +49,11 @@ export class SparkGlobalModule extends VuexModule {
   }
 
   public specById<T extends Block>(id: T['type']): BlockSpec<T> {
-    return findById<BlockSpec<T>>((this.specs as any), id)!;
+    // We're assuming here that a spec is registered for every descendant interface of Block
+    return findById<any>(this.specs, id) as BlockSpec<T>;
   }
 
-  public spec<T extends Block = Block>({ type }: { type: T['type'] }): BlockSpec<T> {
+  public spec<T extends Block>({ type }: { type: T['type'] }): BlockSpec<T> {
     return this.specById<T>(type);
   }
 

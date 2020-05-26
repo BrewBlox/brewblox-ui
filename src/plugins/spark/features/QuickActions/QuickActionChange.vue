@@ -1,4 +1,5 @@
 <script lang="ts">
+import difference from 'lodash/difference';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -62,12 +63,16 @@ export default class QuickActionChange extends Vue {
   }
 
   get unknownValues(): string[] {
-    const keys = Object.keys(this.value.data ?? {});
-    if (this.change.spec === null) {
+    const { spec } = this.change;
+    if (spec === null) {
       return [];
     }
-    const fields = this.change.spec.fields;
-    return keys.filter(k => !fields.some(f => f.key === k && !f.readonly));
+    const keys = Object.keys(this.value.data ?? {});
+    const validKeys = spec
+      .fields
+      .filter(f => !f.readonly)
+      .map(f => f.key);
+    return difference(keys, validKeys);
   }
 
   saveChange(change: EditableBlockChange = this.change): void {

@@ -1,10 +1,9 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { ActuatorAnalogMockBlock, BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorAnalogMockWidget.vue';
-import { ActuatorAnalogMockBlock } from './types';
 const typeName = 'ActuatorAnalogMock';
 
 const block: BlockSpec<ActuatorAnalogMockBlock> = {

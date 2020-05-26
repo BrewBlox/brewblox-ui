@@ -1,11 +1,10 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalState } from '@/plugins/spark/types';
+import { BlockSpec, DigitalState, MotorValveBlock, ValveState } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './MotorValveWidget.vue';
-import { MotorValveBlock, ValveState } from './types';
 
 const typeName = 'MotorValve';
 

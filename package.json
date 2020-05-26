@@ -24,6 +24,7 @@
     "test": "npm run test:unit",
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ./src ./test",
     "lint:fix": "npm run lint -- --fix",
+    "lint:nowarn": "npm run lint 2>&1 | grep -v '.*MaxListenersExceededWarning'",
     "test:unit": "jest --updateSnapshot",
     "test:unit:coverage": "jest --coverage",
     "test:unit:watch": "jest --watch",

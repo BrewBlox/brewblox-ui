@@ -4,7 +4,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { deepCopy } from '@/plugins/spark/units/parseObject';
+import { deepCopy } from '@/plugins/spark/parse-object';
 
 
 @Component

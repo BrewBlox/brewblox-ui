@@ -3,12 +3,12 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { isCompatible } from '@/plugins/spark/helpers';
+import { deepCopy } from '@/plugins/spark/parse-object';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { AnalogCompare } from '@/plugins/spark/types';
 import { Temp, Unit } from '@/plugins/spark/units';
-import { deepCopy } from '@/plugins/spark/units/parseObject';
 
 import { analogOpTitles } from './getters';
-import type { AnalogCompare } from './types';
 
 
 @Component

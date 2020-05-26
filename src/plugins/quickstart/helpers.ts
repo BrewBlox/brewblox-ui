@@ -2,10 +2,9 @@ import isEqual from 'lodash/isEqual';
 
 import { typeMatchFilter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
-import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
 import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { PidBlock } from '@/plugins/spark/types';
+import { DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { WizardAction } from './components/WizardTaskBase';

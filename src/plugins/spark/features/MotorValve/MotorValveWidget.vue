@@ -2,11 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { Spark3PinsBlock } from '@/plugins/spark/types';
+import { MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
 
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
-import { MotorValveBlock } from './types';
 
 @Component({
   components: {

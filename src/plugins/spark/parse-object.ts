@@ -4,10 +4,8 @@ import isObject from 'lodash/isObject';
 
 import { mapEntries } from '@/helpers/functional';
 
-import { BlockType } from '../types';
-import Link from './Link';
-import PostFixed from './PostFixed';
-import Unit from './Unit';
+import { BlockType } from './types';
+import { Link, PostFixed, Unit } from './units';
 
 // "not brackets",
 // then a left bracket,
@@ -32,18 +30,15 @@ export function objectUnit(val: any): string | null {
     : null;
 }
 
+export function isPostFixed(obj: any): obj is PostFixed {
+  return obj != null && isObject(obj) && 'toSerialized' in obj;
+}
+
 export function serializedPropertyName(key: string, obj: any): string {
   const val = obj[key];
-
-  if (val instanceof Unit) {
-    return `${key}[${val.unit}]`;
-  }
-
-  if (val instanceof Link) {
-    return `${key}${val.postfix}`;
-  }
-
-  return key;
+  return isPostFixed(val)
+    ? val.toSerialized(key)[0]
+    : key;
 }
 
 export function postfixedDisplayNames(displayNames: Mapped<string>, obj: any): Mapped<string> {
@@ -82,10 +77,10 @@ export function deserialize(obj: any): typeof obj {
     return obj.map(deserialize);
   }
   if (isObject(obj)) {
-    return (obj instanceof PostFixed)
+    return isPostFixed(obj)
       ? obj
       : mapEntries(obj, ([key, val]) =>
-        parsePostfixed(key, val) || [key, deserialize(val)]);
+        parsePostfixed(key, val) ?? [key, deserialize(val)]);
   }
   return obj;
 }
@@ -99,8 +94,8 @@ export function serialize(obj: any): typeof obj {
   }
   if (isObject(obj)) {
     return mapEntries(obj, ([key, val]) =>
-      (val instanceof PostFixed)
-        ? val.serialized(key)
+      isPostFixed(val)
+        ? val.toSerialized(key)
         : [key, serialize(val)]);
   }
   return obj;

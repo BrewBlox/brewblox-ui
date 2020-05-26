@@ -5,6 +5,7 @@ import {
   ChannelConfig,
   DigitalConstraintKey,
   SystemBlockType,
+  UserBlockType,
   UserUnitKey,
 } from './types';
 
@@ -12,6 +13,7 @@ export const sparkType = 'Spark';
 export const sparkBlocksEvent = 'Spark.blocks';
 export const sparkStatusEvent = 'Spark.service';
 export const sparkUpdateEvent = 'Spark.update';
+export const systemGroup = 7;
 
 export const userUnitChoices: Record<UserUnitKey, string[]> = {
   Temp: [
@@ -41,22 +43,22 @@ export const constraintLabels = {
 
 export const configName = (val: ChannelConfig): string => ChannelConfig[val];
 
-
-export const systemBlockTypes: Record<string, SystemBlockType> = {
+export const systemBlockTypes: Record<SystemBlockType, SystemBlockType> = {
   SysInfo: 'SysInfo',
   Groups: 'Groups',
   OneWireBus: 'OneWireBus',
   Ticks: 'Ticks',
-  WiFiSettings: 'WifiSettings',
+  WiFiSettings: 'WiFiSettings',
   TouchSettings: 'TouchSettings',
 };
 
-export const blockTypes: Record<string, SystemBlockType | BlockType> = {
+export const blockTypes: Record<UserBlockType, UserBlockType> = {
   ActuatorAnalogMock: 'ActuatorAnalogMock',
   ActuatorLogic: 'ActuatorLogic',
-  SetpointDriver: 'ActuatorOffset',
+  ActuatorOffset: 'ActuatorOffset',
   ActuatorPwm: 'ActuatorPwm',
   Balancer: 'Balancer',
+  DeprecatedObject: 'DeprecatedObject',
   DigitalActuator: 'DigitalActuator',
   DisplaySettings: 'DisplaySettings',
   DS2408: 'DS2408',

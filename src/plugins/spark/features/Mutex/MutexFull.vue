@@ -2,8 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { MutexBlock } from './types';
+import { MutexBlock } from '@/plugins/spark/types';
 
 @Component
 export default class MutexFull

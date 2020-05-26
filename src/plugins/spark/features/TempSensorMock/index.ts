@@ -1,12 +1,11 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, TempSensorMockBlock } from '@/plugins/spark/types';
 import { Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './TempSensorMockWidget.vue';
-import { TempSensorMockBlock } from './types';
 
 const typeName = 'TempSensorMock';
 

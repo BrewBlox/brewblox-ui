@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
+import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
@@ -16,7 +17,6 @@ import {
 } from '@/plugins/spark/types';
 import { DigitalState } from '@/plugins/spark/types';
 import { Link, Time, Unit } from '@/plugins/spark/units';
-import { serialize } from '@/plugins/spark/units/parseObject';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 

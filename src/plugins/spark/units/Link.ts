@@ -1,14 +1,12 @@
-import PostFixed from '@/plugins/spark/units/PostFixed';
-
 import { BlockOrIntfType } from '../types';
+import { PostFixed } from './PostFixed';
 
-export default class Link extends PostFixed {
+export class Link implements PostFixed {
   public id: string | null;
   public type: BlockOrIntfType | null;
   public driven: boolean;
 
   public constructor(id: string | null, type: BlockOrIntfType | null = null, driven = false) {
-    super();
     this.id = id;
     this.type = type;
     this.driven = driven;
@@ -24,7 +22,7 @@ export default class Link extends PostFixed {
       : `<${typeStr}>`;
   }
 
-  public serialized(key: string): [string, string | null] {
+  public toSerialized(key: string): [string, string | null] {
     return [`${key}${this.postfix}`, this.id];
   }
 

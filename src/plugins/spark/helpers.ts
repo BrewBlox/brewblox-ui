@@ -17,18 +17,18 @@ import {
   shortDateString,
   truncate,
   truncateRound,
+  typeMatchFilter,
   unitDurationString,
 } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
+import { objectUnit, serializedPropertyName } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
-import { Link, serializedPropertyName, Unit } from '@/plugins/spark/units';
-import { objectUnit } from '@/plugins/spark/units/parseObject';
+import { Link, Unit } from '@/plugins/spark/units';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
-import { DisplaySettingsBlock } from './features/DisplaySettings/types';
-import { compatibleTypes, systemBlockTypes } from './getters';
+import { compatibleTypes } from './getters';
 import type {
   AnalogConstraint,
   AnyConstraintsObj,
@@ -42,6 +42,7 @@ import type {
   DataBlock,
   DigitalConstraint,
   DisplayOpts,
+  DisplaySettingsBlock,
   DisplaySlot,
 } from './types';
 
@@ -88,7 +89,9 @@ export const blockWidgetSelector = (ctor: VueConstructor, typeName: BlockType | 
     }
     // If crud is a BlockCrud, block is already set
     // Otherwise we'll have to check the store
-    const block = (crud as BlockCrud).block ?? module.blockById(config.blockId);
+    const block = ('block' in crud)
+      ? crud.block
+      : module.blockById(config.blockId);
     if (block === null) {
       return errorComponent(`Block '${config.blockId}' not found`);
     }
@@ -104,12 +107,8 @@ export const isCompatible = (type: string | null, intf: BlockOrIntfType | BlockO
   if (!type) { return false; }
   if (type === intf) { return true; };
   if (isArray(intf)) { return intf.some(i => isCompatible(type, i)); }
-  return !!compatibleTypes[intf]?.includes(type);
+  return Boolean(compatibleTypes[intf]?.includes(type));
 };
-
-export const isSystemBlock =
-  ({ type }: { type: string }): boolean =>
-    systemBlockTypes[type] !== undefined;
 
 export const canDisplay = (addr: BlockAddress): boolean =>
   isCompatible(addr?.type, [
@@ -122,7 +121,7 @@ export const canDisplay = (addr: BlockAddress): boolean =>
 const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBlock | undefined =>
   serviceId
     ? sparkStore.serviceBlocks(serviceId)
-      .find(v => v.type === 'DisplaySettings') as DisplaySettingsBlock
+      .find(typeMatchFilter<DisplaySettingsBlock>('DisplaySettings'))
     : undefined;
 
 export const isDisplayed = (addr: BlockAddress): boolean =>
@@ -187,11 +186,6 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   }
 };
 
-const linkedTypes: BlockType[] = [
-  'DigitalActuator',
-  'MotorValve',
-];
-
 const addressedTypes: BlockType[] = [
   'TempSensorOneWire',
   'DS2408',
@@ -204,17 +198,33 @@ export const saveHwInfo = (serviceId: string): void => {
 
   sparkStore.serviceBlocks(serviceId)
     .forEach(block => {
-      if (linkedTypes.includes(block.type)) {
+      if (block.type === 'MotorValve') {
+        const { hwDevice, startChannel } = block.data;
+        if (hwDevice.id === null || !startChannel) {
+          return;
+        }
+        const target = sparkStore.blockById(serviceId, hwDevice.id);
+        const pin = target?.data.pins[startChannel - 1];
+        if (target && pin !== undefined) {
+          const [name] = Object.keys(pin);
+          linked.push(`${block.id}: ${target.id} ${name}`);
+        }
+      }
+
+      if (block.type === 'DigitalActuator') {
         const { hwDevice, channel } = block.data;
-        if (!hwDevice.id || !channel) { return; }
-        const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
+        if (hwDevice.id === null || !channel) {
+          return;
+        }
+        const target = sparkStore.blockById(serviceId, hwDevice.id);
         const pin = target?.data.pins[channel - 1];
         if (target && pin !== undefined) {
           const [name] = Object.keys(pin);
           linked.push(`${block.id}: ${target.id} ${name}`);
         }
       }
-      if (addressedTypes.includes(block.type)) {
+
+      if ('address' in block.data) {
         addressed.push(`${block.id}: ${block.data.address}`);
       }
     });
@@ -295,7 +305,7 @@ export const asBlock =
     ({
       ...block,
       serviceId,
-      type: block.type as Block['type'],
+      type: block.type as BlockType,
     });
 
 export const asBlockAddress =

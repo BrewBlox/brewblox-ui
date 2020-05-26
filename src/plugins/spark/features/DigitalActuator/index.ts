@@ -1,11 +1,10 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalState } from '@/plugins/spark/types';
+import { BlockSpec, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
 import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DigitalActuatorWidget.vue';
-import { DigitalActuatorBlock } from './types';
 
 const seconds = (v = 0): Unit => new Unit(v, 'seconds');
 const typeName = 'DigitalActuator';

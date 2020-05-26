@@ -1,4 +1,5 @@
 <script lang="ts">
+import difference from 'lodash/difference';
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
@@ -40,8 +41,20 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
   get validTypes(): string[] {
     return sparkStore.specs
-      .filter(spec => spec.fields.find(f => !f.readonly))
+      .filter(spec => spec.fields.some(f => !f.readonly))
       .map(spec => spec.id);
+  }
+
+  get unknownValues(): string[] {
+    if (this.spec === null) {
+      return [];
+    }
+    const keys = Object.keys(this.impl.data);
+    const validKeys = this.spec
+      .fields
+      .filter(f => !f.readonly)
+      .map(f => f.key);
+    return difference(keys, validKeys);
   }
 
   isActive(key: string): boolean {
@@ -71,10 +84,16 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
     createDialog({
       component: 'ChangeFieldDialog',
       field,
+      value: this.impl.data[field.key],
       address: this.addr,
       title: `${this.addr.id} ${field.title}`,
     })
       .onOk(value => this.saveField(field, value));
+  }
+
+  fixUnknown(): void {
+    this.unknownValues.forEach(k => this.$delete(this.impl.data, k));
+    this.save();
   }
 }
 </script>
@@ -136,6 +155,14 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
           />
         </div>
       </div>
+      <CardWarning v-if="unknownValues.length">
+        <template #message>
+          Unknown fields: {{ unknownValues.map(v => `'${v}'`).join(', ') }}
+        </template>
+        <template #actions>
+          <q-btn flat label="Fix now" @click="fixUnknown" />
+        </template>
+      </CardWarning>
     </template>
   </div>
 </template>

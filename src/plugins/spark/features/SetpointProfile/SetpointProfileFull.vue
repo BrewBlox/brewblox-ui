@@ -5,11 +5,11 @@ import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, objectSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { deepCopy } from '@/plugins/spark/parse-object';
+import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
 import { Temp, Unit } from '@/plugins/spark/units';
-import { deepCopy } from '@/plugins/spark/units/parseObject';
 
 import { profileGraphProps } from './helpers';
-import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
   offsetMs: number;
