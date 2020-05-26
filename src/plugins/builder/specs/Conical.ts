@@ -1,4 +1,4 @@
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes } from '@/plugins/spark/getters';
 
 import { showSettingsBlock } from '../helpers';
 import { PartSpec } from '../types';

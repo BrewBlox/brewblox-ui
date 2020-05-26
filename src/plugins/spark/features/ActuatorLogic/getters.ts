@@ -2,8 +2,6 @@ import { DigitalState } from '@/plugins/spark/types';
 
 import { AnalogCompareOp, DigitalCompareOp, EvalResult } from './types';
 
-export const typeName = 'ActuatorLogic';
-
 export const characterTitles = {
   '(': 'Sub-expression start',
   ')': 'Sub-expression end',

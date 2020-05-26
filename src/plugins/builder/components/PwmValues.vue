@@ -2,8 +2,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { ActuatorPwmBlock } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
+import { ActuatorPwmBlock } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 
 import { settingsAddress, squares, textTransformation } from '../helpers';

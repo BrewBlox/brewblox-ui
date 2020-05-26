@@ -3,7 +3,8 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { blockTypes } from '@/plugins/spark/block-types';
+import { typeMatchFilter } from '@/helpers/functional';
+import { GroupsBlock } from '@/plugins/spark/types';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -29,7 +30,7 @@ export default class BlockGroupsAction extends BlockCrudComponent {
 
   openDialog(): void {
     const active: number[] = this.sparkModule.blocks
-      .find(v => v.type === blockTypes.Groups)
+      .find(typeMatchFilter<GroupsBlock>('Groups'))
       ?.data.active
       ?? [];
     createDialog({

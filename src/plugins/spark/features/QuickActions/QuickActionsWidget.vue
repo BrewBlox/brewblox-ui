@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
+import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';

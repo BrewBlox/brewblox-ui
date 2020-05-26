@@ -1,5 +1,6 @@
 import { BuilderLayout } from '@/plugins/builder/types';
-import { Block, DisplayOpts } from '@/plugins/spark/types';
+import { Block } from '@/plugins/spark/types';
+import { DisplayOpts } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 
 export interface PinChannel {

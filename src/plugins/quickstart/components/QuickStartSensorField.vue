@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 
 
@@ -25,7 +25,7 @@ export default class QuickStartSensorField extends Vue {
 
   get opts(): string[] {
     return sparkStore.serviceBlocks(this.serviceId)
-      .filter(block => isCompatible(block.type, interfaceTypes.TempSensor))
+      .filter(block => isCompatible(block.type, 'TempSensorInterface'))
       .map(block => block.id);
   }
 

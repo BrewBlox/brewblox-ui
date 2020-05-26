@@ -6,10 +6,10 @@ import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { spliceById, uniqueFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { deepCopy } from '@/helpers/units/parseObject';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import type { Block } from '@/plugins/spark/types';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
+import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
 
 import { BlockChange, EditableBlockField, Step } from './types';
 

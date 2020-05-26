@@ -1,4 +1,5 @@
 import defaults from 'lodash/defaults';
+import isArray from 'lodash/isArray';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
@@ -20,15 +21,15 @@ import {
 } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
-import { Link, serializedPropertyName, Unit } from '@/helpers/units';
-import { objectUnit } from '@/helpers/units/parseObject';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
+import { Link, serializedPropertyName, Unit } from '@/plugins/spark/units';
+import { objectUnit } from '@/plugins/spark/units/parseObject';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
-import { blockTypes, interfaceTypes, isCompatible } from './block-types';
 import { DisplaySettingsBlock } from './features/DisplaySettings/types';
-import {
+import { compatibleTypes, systemBlockTypes } from './getters';
+import type {
   AnalogConstraint,
   AnyConstraintsObj,
   Block,
@@ -36,6 +37,8 @@ import {
   BlockConfig,
   BlockCrud,
   BlockField,
+  BlockOrIntfType,
+  BlockType,
   DataBlock,
   DigitalConstraint,
   DisplayOpts,
@@ -75,7 +78,7 @@ const errorComponent = (error: string): ComponentResult => ({
   error,
 });
 
-export const blockWidgetSelector = (ctor: VueConstructor, typeName: string | null): WidgetFeature['component'] => {
+export const blockWidgetSelector = (ctor: VueConstructor, typeName: BlockType | null): WidgetFeature['component'] => {
   const component = ref(ctor);
   return (crud: Crud<BlockConfig> | BlockCrud): ComponentResult => {
     const { config } = crud.widget;
@@ -96,18 +99,30 @@ export const blockWidgetSelector = (ctor: VueConstructor, typeName: string | nul
   };
 };
 
+export const isCompatible = (type: string | null, intf: BlockOrIntfType | BlockOrIntfType[] | null): boolean => {
+  if (!intf) { return true; }
+  if (!type) { return false; }
+  if (type === intf) { return true; };
+  if (isArray(intf)) { return intf.some(i => isCompatible(type, i)); }
+  return !!compatibleTypes[intf]?.includes(type);
+};
+
+export const isSystemBlock =
+  ({ type }: { type: string }): boolean =>
+    systemBlockTypes[type] !== undefined;
+
 export const canDisplay = (addr: BlockAddress): boolean =>
   isCompatible(addr?.type, [
-    interfaceTypes.TempSensor,
-    interfaceTypes.SetpointSensorPair,
-    interfaceTypes.ActuatorAnalog,
-    blockTypes.Pid,
+    'TempSensorInterface',
+    'SetpointSensorPairInterface',
+    'ActuatorAnalogInterface',
+    'Pid',
   ]);
 
 const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBlock | undefined =>
   serviceId
     ? sparkStore.serviceBlocks(serviceId)
-      .find(v => v.type === blockTypes.DisplaySettings)
+      .find(v => v.type === 'DisplaySettings') as DisplaySettingsBlock
     : undefined;
 
 export const isDisplayed = (addr: BlockAddress): boolean =>
@@ -143,22 +158,22 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   else {
     const { id, type } = addr;
 
-    const link = new Link(id, type);
+    const link = new Link(id, type as BlockType);
     const slot: DisplaySlot = {
       pos: opts.pos,
       color: opts.color,
       name: opts.name.slice(0, 15),
     };
-    if (isCompatible(type, interfaceTypes.TempSensor)) {
+    if (isCompatible(type, 'TempSensorInterface')) {
       slot.tempSensor = link;
     }
-    else if (isCompatible(type, interfaceTypes.SetpointSensorPair)) {
+    else if (isCompatible(type, 'SetpointSensorPairInterface')) {
       slot.setpointSensorPair = link;
     }
-    else if (isCompatible(type, interfaceTypes.ActuatorAnalog)) {
+    else if (isCompatible(type, 'ActuatorAnalogInterface')) {
       slot.actuatorAnalog = link;
     }
-    else if (isCompatible(type, blockTypes.Pid)) {
+    else if (isCompatible(type, 'Pid')) {
       slot.pid = link;
     }
 
@@ -172,15 +187,15 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   }
 };
 
-const linkedTypes = [
-  blockTypes.DigitalActuator,
-  blockTypes.MotorValve,
+const linkedTypes: BlockType[] = [
+  'DigitalActuator',
+  'MotorValve',
 ];
 
-const addressedTypes = [
-  blockTypes.TempSensorOneWire,
-  blockTypes.DS2408,
-  blockTypes.DS2413,
+const addressedTypes: BlockType[] = [
+  'TempSensorOneWire',
+  'DS2408',
+  'DS2413',
 ];
 
 export const saveHwInfo = (serviceId: string): void => {
@@ -271,15 +286,21 @@ export const startResetBlocks = (serviceId: string): void => {
     }));
 };
 
-
 export const asDataBlock =
-  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
+  (block: Block): DataBlock =>
+    pick(block, ['id', 'nid', 'type', 'groups', 'data']);
 
 export const asBlock =
-  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
+  (block: DataBlock, serviceId: string): Block =>
+    ({
+      ...block,
+      serviceId,
+      type: block.type as Block['type'],
+    });
 
 export const asBlockAddress =
-  (block: Block): BlockAddress => pick(block, ['id', 'serviceId', 'type']);
+  (block: Block): BlockAddress =>
+    pick(block, ['id', 'serviceId', 'type']);
 
 export const prettifyConstraints =
   (obj: AnyConstraintsObj | undefined): string =>

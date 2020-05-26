@@ -1,6 +1,6 @@
-import Link from '@/helpers/units/Link';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
-import Unit from '@/helpers/units/Unit';
+import Link from '@/plugins/spark/units/Link';
+import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
+import Unit from '@/plugins/spark/units/Unit';
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {

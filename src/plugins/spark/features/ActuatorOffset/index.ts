@@ -1,15 +1,16 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorOffsetWidget.vue';
-import { typeName } from './getters';
-import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
+import { ActuatorOffsetBlock, OffsetSettingOrValue } from './types';
 
-const block: BlockSpec<ActuatorOffsetData> = {
+const typeName = 'ActuatorOffset';
+
+const block: BlockSpec<ActuatorOffsetBlock> = {
   id: typeName,
   generate: () => ({
     targetId: new Link(null, interfaceTypes.SetpointSensorPair),

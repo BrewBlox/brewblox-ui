@@ -2,10 +2,10 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { Temp, Unit } from '@/helpers/units';
-import { deepCopy } from '@/helpers/units/parseObject';
-import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { Temp, Unit } from '@/plugins/spark/units';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
 
 import { analogOpTitles } from './getters';
 import type { AnalogCompare } from './types';
@@ -40,7 +40,7 @@ export default class AnalogCompareEditDialog extends DialogBase {
 
   get isTemp(): boolean {
     const block = this.sparkModule.blockById(this.local!.id.id);
-    return !!block && isCompatible(block.type, interfaceTypes.SetpointSensorPair);
+    return !!block && isCompatible(block.type, 'SetpointSensorPairInterface');
   }
 
   get rhs(): Unit | number {

@@ -2,18 +2,19 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { blockTypes, isCompatible } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockType } from '@/plugins/spark/types';
 
 import { PinChannel } from '../types';
 
 @Component
 export default class QuickStartPinField extends Vue {
-  readonly validTypes = [
-    blockTypes.Spark2Pins,
-    blockTypes.Spark3Pins,
-    blockTypes.MockPins,
-    blockTypes.DS2413,
+  readonly validTypes: BlockType[] = [
+    'Spark2Pins',
+    'Spark3Pins',
+    'MockPins',
+    'DS2413',
   ];
 
   @Prop({ type: Object, required: false })
@@ -32,19 +33,12 @@ export default class QuickStartPinField extends Vue {
 
   get opts(): SelectOption[] {
     return sparkStore.serviceBlocks(this.serviceId)
-      .reduce(
-        (acc, block) => {
-          if (isCompatible(block.type, this.validTypes)) {
-            acc.push(
-              ...block.data.pins.map((pin, idx) => {
-                const [pinName] = Object.keys(block.data.pins[idx]);
-                return { pinName, arrayId: block.id, pinId: idx + 1 };
-              })
-            );
-          }
-          return acc;
-        },
-        Array<PinChannel>())
+      .filter(block => isCompatible(block.type, this.validTypes))
+      .flatMap((block): PinChannel[] =>
+        block.data.pins.map((pin, idx) => {
+          const [pinName] = Object.keys(block.data.pins[idx]);
+          return { pinName, arrayId: block.id, pinId: idx + 1 };
+        }))
       .map(channel => ({ label: `${channel.arrayId} ${channel.pinName}`, value: channel }));
   }
 

@@ -1,7 +1,6 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { blockTypes } from '@/plugins/spark/block-types';
 import { sparkType } from '@/plugins/spark/getters';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { Service, serviceStore } from '@/store/services';
@@ -36,7 +35,7 @@ export default class QuickStartServiceTask extends WizardTaskBase<QuickStartOutp
     // Any previous control chain will have included a PID
     return this.sparkModule
       ?.blocks
-      .find(v => v.type === blockTypes.Pid) !== undefined;
+      .find(v => v.type === 'Pid') !== undefined;
   }
 
   get valuesOk(): boolean {

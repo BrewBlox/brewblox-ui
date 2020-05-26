@@ -6,17 +6,18 @@ import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
-import { deepCopy } from '@/helpers/units/parseObject';
 import type { GraphConfig } from '@/plugins/history/types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import type { Block, BlockConfig, BlockCrud, BlockSpec } from '@/plugins/spark/types';
+import type { Block, BlockCrud } from '@/plugins/spark/types';
+import type { BlockConfig, BlockSpec } from '@/plugins/spark/types';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
 import { dashboardStore } from '@/store/dashboards';
 
 import { blockGraphCfg, blockIdRules, canDisplay, tryDisplayBlock } from '../helpers';
 
 
 @Component
-export default class BlockCrudComponent<BlockT extends Block = Block, DataT = BlockT['data']>
+export default class BlockCrudComponent<BlockT extends Block = Block>
   extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
@@ -59,7 +60,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block, DataT = Bl
       || null;
   }
 
-  public get spec(): BlockSpec<DataT> {
+  public get spec(): BlockSpec<BlockT> {
     return sparkStore.spec(this.block);
   }
 

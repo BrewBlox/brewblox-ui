@@ -1,7 +1,8 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { Block, DigitalState } from '@/plugins/spark/types';
+import { Block } from '@/plugins/spark/types';
+import { DigitalState } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { RIGHT } from '../getters';

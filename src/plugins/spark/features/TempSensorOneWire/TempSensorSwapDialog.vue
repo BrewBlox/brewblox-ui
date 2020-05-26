@@ -2,7 +2,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { blockTypes } from '@/plugins/spark/block-types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 
@@ -32,12 +31,12 @@ export default class TempSensorSwapDialog extends DialogBase {
   created(): void {
     this.leftAddr = {
       id: this.leftId ?? null,
-      type: blockTypes.TempSensorOneWire,
+      type: 'TempSensorOneWire',
       serviceId: this.serviceId,
     };
     this.rightAddr = {
       id: this.rightId ?? null,
-      type: blockTypes.TempSensorOneWire,
+      type: 'TempSensorOneWire',
       serviceId: this.serviceId,
     };
   }

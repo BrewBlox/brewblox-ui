@@ -1,4 +1,5 @@
-import { Block, BlockField } from '@/plugins/spark/types';
+import { Block } from '@/plugins/spark/types';
+import { BlockField } from '@/plugins/spark/types';
 
 export interface BlockChange<BlockT extends Block = Block> {
   id: string;

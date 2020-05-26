@@ -4,10 +4,11 @@ import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './BalancerWidget.vue';
-import { typeName } from './getters';
-import { BalancerData } from './types';
+import { BalancerBlock } from './types';
 
-const block: BlockSpec<BalancerData> = {
+const typeName = 'Balancer';
+
+const block: BlockSpec<BalancerBlock> = {
   id: typeName,
   generate: () => ({
     clients: [],

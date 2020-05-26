@@ -1,4 +1,4 @@
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 import { PinChannel, QuickStartOutput } from '../types';
 

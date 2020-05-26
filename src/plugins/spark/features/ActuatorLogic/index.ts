@@ -1,15 +1,16 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorLogicWidget.vue';
-import { typeName } from './getters';
-import { ActuatorLogicData, EvalResult } from './types';
+import { ActuatorLogicBlock, EvalResult } from './types';
 
-const block: BlockSpec<ActuatorLogicData> = {
+const typeName = 'ActuatorLogic';
+
+const block: BlockSpec<ActuatorLogicBlock> = {
   id: typeName,
   generate: () => ({
     enabled: true,

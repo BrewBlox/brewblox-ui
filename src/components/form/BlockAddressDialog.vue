@@ -5,9 +5,9 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
-import { isCompatible } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import type { Block, BlockAddress } from '@/plugins/spark/types';
+import type { Block, BlockAddress, BlockOrIntfType } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
 const asAddr = (v: Block | BlockAddress): BlockAddress => ({
@@ -31,7 +31,7 @@ export default class BlockAddressDialog extends DialogBase {
   public readonly anyService!: boolean;
 
   @Prop({ type: Array, required: false })
-  readonly compatible!: string[];
+  readonly compatible!: BlockOrIntfType[];
 
   @Prop({ type: Function, default: () => true })
   public readonly blockFilter!: (block: Block) => boolean;

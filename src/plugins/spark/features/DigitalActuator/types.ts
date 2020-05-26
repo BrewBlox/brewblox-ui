@@ -1,5 +1,5 @@
-import { Link } from '@/helpers/units';
-import { Block, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
+import { BlockBase, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 export interface DigitalActuatorData {
   hwDevice: Link;
@@ -10,6 +10,7 @@ export interface DigitalActuatorData {
   constrainedBy: DigitalConstraintsObj;
 }
 
-export interface DigitalActuatorBlock extends Block {
+export interface DigitalActuatorBlock extends BlockBase {
+  type: 'DigitalActuator';
   data: DigitalActuatorData;
 }

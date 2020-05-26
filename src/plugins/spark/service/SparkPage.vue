@@ -7,10 +7,10 @@ import { Watch } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { isSystemBlock } from '@/plugins/spark/block-types';
 import { saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
+import { isSystemBlock } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import {
+import type {
   Block,
   BlockCrud,
   PageMode,

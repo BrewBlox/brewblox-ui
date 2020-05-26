@@ -2,8 +2,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { blockTypes, WiFiSettingsBlock } from '@/plugins/spark/block-types';
+import { typeMatchFilter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
+import { WiFiSettingsBlock } from '@/plugins/spark/types';
 
 @Component
 export default class SparkWifiMenu extends DialogBase {
@@ -39,7 +40,7 @@ export default class SparkWifiMenu extends DialogBase {
 
   get block(): WiFiSettingsBlock {
     return sparkStore.serviceBlocks(this.serviceId)
-      .find(block => block.type === blockTypes.WiFiSettings) as WiFiSettingsBlock;
+      .find(typeMatchFilter<WiFiSettingsBlock>('WifiSettings'))!;
   }
 
   async save(): Promise<void> {

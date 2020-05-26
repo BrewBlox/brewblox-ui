@@ -1,5 +1,5 @@
-import { Link, Unit } from '@/helpers/units';
-import { Block } from '@/plugins/spark/types';
+import { BlockBase } from '@/plugins/spark/types';
+import { Link, Unit } from '@/plugins/spark/units';
 
 export interface Setpoint {
   time: number;
@@ -14,6 +14,7 @@ export interface SetpointProfileData {
   drivenTargetId: Link;
 }
 
-export interface SetpointProfileBlock extends Block {
+export interface SetpointProfileBlock extends BlockBase {
+  type: 'SetpointProfile';
   data: SetpointProfileData;
 }

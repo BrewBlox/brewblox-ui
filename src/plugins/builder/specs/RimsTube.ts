@@ -1,5 +1,5 @@
 import { Coordinates } from '@/helpers/coordinates';
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes } from '@/plugins/spark/getters';
 
 import { showDrivingBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart, Transitions } from '../types';

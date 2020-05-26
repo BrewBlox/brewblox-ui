@@ -1,11 +1,12 @@
-import { Unit } from '@/helpers/units';
-import { Block } from '@/plugins/spark/types';
+import { BlockBase } from '@/plugins/spark/types';
+import { Unit } from '@/plugins/spark/units';
 
 export interface MutexData {
   differentActuatorWait: Unit;
   waitRemaining: Unit;
 }
 
-export interface MutexBlock extends Block {
+export interface MutexBlock extends BlockBase {
+  type: 'Mutex';
   data: MutexData;
 }

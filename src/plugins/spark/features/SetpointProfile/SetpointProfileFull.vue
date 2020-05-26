@@ -4,9 +4,9 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, objectSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { Temp, Unit } from '@/helpers/units';
-import { deepCopy } from '@/helpers/units/parseObject';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { Temp, Unit } from '@/plugins/spark/units';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
 
 import { profileGraphProps } from './helpers';
 import { Setpoint, SetpointProfileBlock } from './types';

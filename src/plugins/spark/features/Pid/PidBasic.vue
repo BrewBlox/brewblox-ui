@@ -2,9 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
-import { SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block } from '@/plugins/spark/types';
+import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import { startRelationsDialog } from './relations';
 import { PidBlock } from './types';

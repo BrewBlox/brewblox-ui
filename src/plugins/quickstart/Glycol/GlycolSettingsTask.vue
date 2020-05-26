@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Temp } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
+import { Temp } from '@/plugins/spark/units';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';

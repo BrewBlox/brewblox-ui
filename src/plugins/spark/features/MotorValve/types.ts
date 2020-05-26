@@ -1,5 +1,5 @@
-import { Link } from '@/helpers/units';
-import { Block, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
+import { BlockBase, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 export enum ValveState {
   Unknown = 0,
@@ -20,6 +20,7 @@ export interface MotorValveData {
   constrainedBy: DigitalConstraintsObj;
 }
 
-export interface MotorValveBlock extends Block {
+export interface MotorValveBlock extends BlockBase {
+  type: 'MotorValve';
   data: MotorValveData;
 }

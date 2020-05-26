@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { DigitalActuatorBlock, MotorValveBlock } from '@/plugins/spark/block-types';
+import { DigitalActuatorBlock, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';

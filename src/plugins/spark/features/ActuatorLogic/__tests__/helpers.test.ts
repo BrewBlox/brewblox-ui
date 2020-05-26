@@ -1,5 +1,5 @@
-import { Link } from '@/helpers/units';
 import { DigitalState } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 import { comparisonCheck, sanitize, shiftRemainingComparisons, syntaxCheck } from '../helpers';
 import {

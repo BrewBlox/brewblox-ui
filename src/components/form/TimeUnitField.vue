@@ -3,7 +3,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class TimeUnitField extends FieldBase {

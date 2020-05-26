@@ -4,10 +4,11 @@ import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DisplaySettingsWidget.vue';
-import { typeName } from './getters';
-import { DisplaySettingsData, DisplayTempUnit } from './types';
+import { DisplaySettingsBlock, DisplayTempUnit } from './types';
 
-const block: BlockSpec<DisplaySettingsData> = {
+const typeName = 'DisplaySettings';
+
+const block: BlockSpec<DisplaySettingsBlock> = {
   id: typeName,
   systemObject: true,
   generate: () => ({

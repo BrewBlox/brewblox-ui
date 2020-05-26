@@ -2,7 +2,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 
-import { mapEntries } from '../functional';
+import { mapEntries } from '@/helpers/functional';
+
+import { BlockType } from '../types';
 import Link from './Link';
 import PostFixed from './PostFixed';
 import Unit from './Unit';
@@ -62,7 +64,7 @@ export function parsePostfixed(key: string, val: any): [string, PostFixed] | nul
     const [, name, leftBracket, bracketed, driven] = matched;
     try {
       if (leftBracket === '<') {
-        return [name, new Link(val, bracketed, !!driven)];
+        return [name, new Link(val, bracketed as BlockType, !!driven)];
       }
       else if (leftBracket === '[') {
         return [name, new Unit(val, bracketed)];

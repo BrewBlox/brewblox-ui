@@ -1,5 +1,5 @@
-import { Temp } from '@/helpers/units';
-import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
+import { Temp } from '@/plugins/spark/units';
 
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './getters';
 import { ActuatorLogicData, AnalogCompare, DigitalCompare, ExpressionError } from './types';
@@ -172,7 +172,7 @@ export function prettyDigital(cmp: DigitalCompare): string {
 }
 
 export function prettyAnalog(cmp: AnalogCompare, blockType: string | null, tempUnit: string): string {
-  const rhs = isCompatible(blockType, interfaceTypes.SetpointSensorPair)
+  const rhs = isCompatible(blockType, 'SetpointSensorPairInterface')
     ? new Temp(cmp.rhs).convert(tempUnit).toString()
     : `${cmp.rhs}%`;
 

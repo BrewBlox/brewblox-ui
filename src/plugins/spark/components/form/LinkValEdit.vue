@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Link } from '@/helpers/units';
-import { isCompatible } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
+import { Link } from '@/plugins/spark/units';
 
 import ValEditBase from '../ValEditBase';
 

@@ -32,12 +32,12 @@ export default {
 
     deprecated.forEach(featureStore.registerWidget);
 
-    Object.values(features)
+    features
       .forEach(feature => featureStore.registerWidget(feature.feature));
 
-    const specs = Object.values(features)
-      .filter(spec => !!spec.block)
-      .map(spec => spec.block) as BlockSpec[];
+    const specs = features
+      .filter(f => f.block !== undefined)
+      .map(f => f.block) as BlockSpec[];
 
     sparkStore.registerSpecs(specs);
 

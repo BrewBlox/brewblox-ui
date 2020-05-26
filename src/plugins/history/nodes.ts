@@ -2,8 +2,8 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import set from 'lodash/set';
 
 import { sentenceCased } from '@/helpers/functional';
-import { prettify } from '@/helpers/units';
-import { propertyNameWithUnit } from '@/helpers/units/parseObject';
+import { prettify } from '@/plugins/spark/units';
+import { propertyNameWithUnit } from '@/plugins/spark/units/parseObject';
 
 import { QueryTarget } from './types';
 

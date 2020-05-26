@@ -1,15 +1,16 @@
-import { Unit } from '@/helpers/units';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
+import { Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './TempSensorMockWidget.vue';
-import { TempSensorMockData } from './types';
+import { TempSensorMockBlock } from './types';
 
-const block: BlockSpec<TempSensorMockData> = {
+const typeName = 'TempSensorMock';
+
+const block: BlockSpec<TempSensorMockBlock> = {
   id: typeName,
   generate: () => ({
     value: new Unit(20, 'degC'),

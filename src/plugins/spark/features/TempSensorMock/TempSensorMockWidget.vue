@@ -2,8 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Temp, Time } from '@/helpers/units';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { Temp, Time } from '@/plugins/spark/units';
 
 import { Fluctuation, TempSensorMockBlock } from './types';
 

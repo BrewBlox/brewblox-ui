@@ -1,15 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { mutate } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
-import { blockTypes } from '@/plugins/spark/block-types';
+import { mutate, typeMatchFilter } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { Block } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 import { DigitalActuatorBlock } from './types';
-
-const typeName = blockTypes.DigitalActuator;
 
 @Component
 export default class DigitalActuatorWidget
@@ -26,7 +23,8 @@ export default class DigitalActuatorWidget
     const targetId = this.hwBlock.id;
     return this.sparkModule
       .blocks
-      .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
+      .filter(typeMatchFilter<DigitalActuatorBlock>('DigitalActuator'))
+      .filter(block => block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }
 
@@ -52,7 +50,7 @@ export default class DigitalActuatorWidget
     if (this.block.data.channel === pinId) {
       return;
     }
-    const currentDriver = new Link(this.claimedChannels[pinId] || null, typeName);
+    const currentDriver = new Link(this.claimedChannels[pinId] || null, 'DigitalActuator');
     if (currentDriver.id) {
       const currentDriverBlock = this.sparkModule.blockById<DigitalActuatorBlock>(currentDriver.id)!;
       currentDriverBlock.data.channel = 0;

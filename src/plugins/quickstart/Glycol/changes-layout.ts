@@ -246,10 +246,10 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           id: uid(),
           rotate: 90,
           settings: {
-            pwm: { serviceId: config.serviceId, blockId: config.names.coolPwm },
+            actuator: { serviceId: config.serviceId, blockId: config.names.coolPwm },
           },
           flipped: false,
-          type: 'PwmPump',
+          type: 'Pump',
           x: 5,
           y: 6,
         },

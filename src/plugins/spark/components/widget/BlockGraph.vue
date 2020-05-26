@@ -6,11 +6,11 @@ import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class BlockGraph extends Vue {

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import { deserialize, serialize } from '@/helpers/units/parseObject';
+import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
 
 import { ChangeCb, DeleteCb, StoreObject } from './types';
 

@@ -1,7 +1,7 @@
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
 
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 
 export function createDialog(opts: QDialogOptions & { [prop: string]: any }): DialogChainObject {
@@ -14,7 +14,7 @@ interface BlockDialogOpts {
   verify?: boolean;
 }
 
-export function createBlockDialog(addr: BlockAddress | Block | null, opts: BlockDialogOpts = {}): void {
+export function createBlockDialog(addr: BlockAddress | null, opts: BlockDialogOpts = {}): void {
   if (!addr || !addr.id) {
     return;
   }

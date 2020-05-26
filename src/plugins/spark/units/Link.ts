@@ -1,11 +1,13 @@
-import PostFixed from './PostFixed';
+import PostFixed from '@/plugins/spark/units/PostFixed';
+
+import { BlockOrIntfType } from '../types';
 
 export default class Link extends PostFixed {
   public id: string | null;
-  public type: string | null;
+  public type: BlockOrIntfType | null;
   public driven: boolean;
 
-  public constructor(id: string | null, type: string | null = null, driven = false) {
+  public constructor(id: string | null, type: BlockOrIntfType | null = null, driven = false) {
     super();
     this.id = id;
     this.type = type;

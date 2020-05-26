@@ -3,11 +3,12 @@ import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './MockPinsWidget.vue';
-import { MockPinsData } from './types';
+import { MockPinsBlock } from './types';
 
-const block: BlockSpec<MockPinsData> = {
+const typeName = 'MockPins';
+
+const block: BlockSpec<MockPinsBlock> = {
   id: typeName,
   generate: () => ({
     pins: [],
