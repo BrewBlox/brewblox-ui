@@ -5,6 +5,7 @@ import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { findById, shortDateString } from '@/helpers/functional';
 
+import { settableStates } from './getters';
 import { automationStore } from './store';
 import {
   AutomationConfig,
@@ -25,15 +26,7 @@ interface ProcessDisplay {
 
 @Component
 export default class AutomationWidget extends WidgetBase<AutomationConfig> {
-  taskIcons: Record<AutomationTask['status'], string> = {
-    Invalid: 'mdi-clear',
-    Created: '',
-    Active: '',
-    Retrying: '',
-    Paused: '',
-    Finished: '',
-    Cancelled: '',
-  }
+  settableStates = settableStates;
 
   get automationAvailable(): boolean {
     return automationStore.lastEvent !== null;
@@ -98,8 +91,22 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
     automationStore.removeProcess(proc);
   }
 
+  quickStatusIcon(task: AutomationTask): string {
+    return task.status === 'Finished'
+      ? 'mdi-sync'
+      : 'mdi-check-all';
+  }
+
+  quickStatusValue(task: AutomationTask): AutomationStatus {
+    return task.status === 'Finished'
+      ? 'Active'
+      : 'Finished';
+  }
+
   changeTaskStatus(task: AutomationTask, status: AutomationStatus): void {
-    automationStore.saveTask({ ...task, status });
+    if (status !== task.status) {
+      automationStore.saveTask({ ...task, status });
+    }
   }
 
   removeTask(task: AutomationTask): void {
@@ -211,24 +218,31 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
           <div class="col-grow self-center q-pl-sm text-italic">
             {{ task.title }} ({{ task.ref }}) {{ task.status }}
           </div>
-          <q-btn
-            v-if="task.status === 'Finished'"
+          <q-btn-dropdown
+            split
             flat
             class="col-auto"
-            icon="mdi-sync"
-            @click="changeTaskStatus(task, 'Active')"
+            :icon="quickStatusIcon(task)"
+            @click="changeTaskStatus(task, quickStatusValue(task))"
           >
-            <q-tooltip>Mark task as active</q-tooltip>
-          </q-btn>
-          <q-btn
-            v-else
-            flat
-            class="col-auto"
-            icon="mdi-check"
-            @click="changeTaskStatus(task, 'Finished')"
-          >
-            <q-tooltip>Mark task as finished</q-tooltip>
-          </q-btn>
+            <template #label>
+              <q-tooltip>Mark task as {{ quickStatusValue(task) }}</q-tooltip>
+            </template>
+            <q-list>
+              <q-item>
+                <q-item-section class="fade-4 text-italic">
+                  Mark task as...
+                </q-item-section>
+              </q-item>
+              <ActionItem
+                v-for="state in settableStates"
+                :key="state.status"
+                :label="state.status"
+                :active="task.status === state.status"
+                @click="changeTaskStatus(task, state.status)"
+              />
+            </q-list>
+          </q-btn-dropdown>
         </div>
       </div>
 

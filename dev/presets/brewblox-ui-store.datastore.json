@@ -14,7 +14,8 @@
             "impl": {
               "type": "TaskStatus",
               "ref": "wait-on",
-              "status": "Finished"
+              "status": "Finished",
+              "resetStatus": null
             }
           }
         ],
