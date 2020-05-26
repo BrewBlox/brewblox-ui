@@ -1,4 +1,4 @@
-import { Block, IoPin } from '@/plugins/spark/types';
+import { BlockBase, IoPin } from '@/plugins/spark/types';
 
 export enum Spark3PinId {
   top1 = 1,
@@ -17,6 +17,7 @@ export interface Spark3PinsData {
   voltage12: number;
 }
 
-export interface Spark3PinsBlock extends Block {
+export interface Spark3PinsBlock extends BlockBase {
+  type: 'Spark3Pins';
   data: Spark3PinsData;
 }

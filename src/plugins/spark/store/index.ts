@@ -3,7 +3,8 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
-import type { Block, BlockAddress, BlockSpec, StoredDataPreset } from '../types';
+import { Block } from '../types';
+import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
 import { SparkServiceModule } from './spark-module';
@@ -14,7 +15,7 @@ export { SparkServiceModule } from './spark-module';
 export class SparkGlobalModule extends VuexModule {
   public modules: SparkServiceModule[] = [];
   public presets: StoredDataPreset[] = [];
-  public specs: BlockSpec[] = [];
+  public specs: BlockSpec<Block>[] = [];
 
   public get serviceIds(): string[] {
     return this.modules.map(v => v.id);
@@ -47,12 +48,12 @@ export class SparkGlobalModule extends VuexModule {
     return findById(this.presets, id);
   }
 
-  public specById(id: string): BlockSpec {
-    return findById(this.specs, id)!;
+  public specById<T extends Block>(id: T['type']): BlockSpec<T> {
+    return findById<BlockSpec<T>>((this.specs as any), id)!;
   }
 
-  public spec({ type }: { type: string }): BlockSpec {
-    return this.specById(type);
+  public spec<T extends Block = Block>({ type }: { type: T['type'] }): BlockSpec<T> {
+    return this.specById<T>(type);
   }
 
   @Action

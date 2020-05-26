@@ -1,5 +1,5 @@
-import { Link, Unit } from '@/helpers/units';
-import { Block } from '@/plugins/spark/types';
+import { BlockBase } from '@/plugins/spark/types';
+import { Link, Unit } from '@/plugins/spark/units';
 
 export enum FilterChoice {
   FilterNoFiltering = 0,
@@ -26,6 +26,7 @@ export interface SetpointSensorPairData {
   resetFilter: boolean;
 }
 
-export interface SetpointSensorPairBlock extends Block {
+export interface SetpointSensorPairBlock extends BlockBase {
+  type: 'SetpointSensorPair';
   data: SetpointSensorPairData;
 }

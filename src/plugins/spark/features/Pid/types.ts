@@ -1,5 +1,5 @@
-import { Link, Unit } from '@/helpers/units';
-import { Block } from '@/plugins/spark/types';
+import { BlockBase } from '@/plugins/spark/types';
+import { Link, Unit } from '@/plugins/spark/units';
 
 export interface PidData {
   inputId: Link;
@@ -33,6 +33,7 @@ export interface PidData {
   boilModeActive: boolean;
 }
 
-export interface PidBlock extends Block {
+export interface PidBlock extends BlockBase {
+  type: 'Pid';
   data: PidData;
 }

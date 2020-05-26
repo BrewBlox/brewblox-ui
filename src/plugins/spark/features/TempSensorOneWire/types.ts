@@ -1,5 +1,5 @@
-import { Unit } from '@/helpers/units';
-import { Block } from '@/plugins/spark/types';
+import { BlockBase } from '@/plugins/spark/types';
+import { Unit } from '@/plugins/spark/units';
 
 export interface TempSensorOneWireData {
   value: Unit;
@@ -7,6 +7,7 @@ export interface TempSensorOneWireData {
   address: string;
 }
 
-export interface TempSensorOneWireBlock extends Block {
+export interface TempSensorOneWireBlock extends BlockBase {
+  type: 'TempSensorOneWire';
   data: TempSensorOneWireData;
 }

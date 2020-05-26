@@ -1,22 +1,22 @@
 import { unitDurationString } from '@/helpers/functional';
-import { Link, Temp, Unit } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
+import { Link, Temp, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './PidWidget.vue';
-import { PidData } from './types';
+import { PidBlock } from './types';
+
+const typeName = 'Pid';
 
 
-const block: BlockSpec<PidData> = {
+const block: BlockSpec<PidBlock> = {
   id: typeName,
   generate: () => ({
-    inputId: new Link(null, interfaceTypes.SetpointSensorPair),
-    outputId: new Link(null, interfaceTypes.ActuatorAnalog),
+    inputId: new Link(null, 'SetpointSensorPairInterface'),
+    outputId: new Link(null, 'ActuatorAnalogInterface'),
     inputValue: new Temp(0, 'degC'),
     inputSetting: new Temp(0, 'degC'),
     outputValue: 0,
@@ -32,7 +32,7 @@ const block: BlockSpec<PidData> = {
     error: new Unit(0, 'delta_degC'),
     integral: new Unit(0, 'delta_degC/second'),
     derivative: new Unit(0, 'delta_degC*second'),
-    drivenOutputId: new Link(null, interfaceTypes.ActuatorAnalog),
+    drivenOutputId: new Link(null, 'ActuatorAnalogInterface'),
     integralReset: 0,
     boilPointAdjust: new Unit(0, 'delta_degC'),
     boilMinOutput: 0,
@@ -144,13 +144,13 @@ const block: BlockSpec<PidData> = {
       key: 'inputId',
       title: 'Input',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+      generate: () => new Link(null, 'SetpointSensorPairInterface'),
     },
     {
       key: 'outputId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.ActuatorAnalog),
+      generate: () => new Link(null, 'ActuatorAnalogInterface'),
     },
     {
       key: 'inputSetting',

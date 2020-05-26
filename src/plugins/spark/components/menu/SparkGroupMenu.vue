@@ -2,8 +2,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { blockTypes, GroupsBlock } from '@/plugins/spark/block-types';
+import { typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { GroupsBlock } from '@/plugins/spark/types';
 
 
 @Component
@@ -19,7 +20,7 @@ export default class SparkGroupMenu extends DialogBase {
   get block(): GroupsBlock | null {
     return this.sparkModule
       ?.blocks
-      .find(v => v.type === blockTypes.Groups)
+      .find(typeMatchFilter<GroupsBlock>('Groups'))
       ?? null;
   }
 

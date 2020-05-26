@@ -5,7 +5,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { spliceById } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockSpec } from '@/plugins/spark/types';
+import type { Block } from '@/plugins/spark/types';
+import { BlockSpec } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
 import { BlockChange, EditableBlockField } from './types';

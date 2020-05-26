@@ -3,11 +3,12 @@ import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './Spark3PinsWidget.vue';
-import { Spark3PinsData } from './types';
+import { Spark3PinsBlock } from './types';
 
-const block: BlockSpec<Spark3PinsData> = {
+const typeName = 'Spark3Pins';
+
+const block: BlockSpec<Spark3PinsBlock> = {
   id: typeName,
   systemObject: true,
   generate: () => ({

@@ -5,14 +5,14 @@ import { createDialog } from '@/helpers/dialog';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockPatchImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockField, BlockSpec } from '@/plugins/spark/types';
+import { BlockAddress, BlockField, BlockSpec, BlockType } from '@/plugins/spark/types';
 
 @Component
 export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
   get spec(): BlockSpec | null {
     return this.impl.blockType !== null
-      ? sparkStore.specById(this.impl.blockType)
+      ? sparkStore.specById(this.impl.blockType as BlockType)
       : null;
   }
 

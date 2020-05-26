@@ -1,21 +1,21 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './SetpointProfileWidget.vue';
-import { SetpointProfileData } from './types';
+import { SetpointProfileBlock } from './types';
 
-const block: BlockSpec<SetpointProfileData> = {
+const typeName = 'SetpointProfile';
+
+const block: BlockSpec<SetpointProfileBlock> = {
   id: typeName,
   generate: () => ({
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,
-    targetId: new Link(null, interfaceTypes.SetpointSensorPair),
+    targetId: new Link(null, 'SetpointSensorPairInterface'),
     drivenTargetId: new Link(null),
   }),
   fields: [
@@ -41,7 +41,7 @@ const block: BlockSpec<SetpointProfileData> = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+      generate: () => new Link(null, 'SetpointSensorPairInterface'),
     },
   ],
 };

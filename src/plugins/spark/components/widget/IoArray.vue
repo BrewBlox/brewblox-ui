@@ -3,9 +3,9 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { mutate, objectSorter, objectStringSorter } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
-import { blockTypes, DigitalActuatorBlock } from '@/plugins/spark/block-types';
+import { DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -21,8 +21,6 @@ interface IoArrayBlock extends Block {
   };
 }
 
-const actuatorType = blockTypes.DigitalActuator;
-
 @Component
 export default class IoArray extends BlockCrudComponent {
   readonly block!: IoArrayBlock;
@@ -30,7 +28,8 @@ export default class IoArray extends BlockCrudComponent {
   get claimedChannels(): { [channel: number]: string } {
     return this.sparkModule
       .blocks
-      .filter(block => block.type === actuatorType && block.data.hwDevice.id === this.block.id)
+      .filter(block => block.type === 'DigitalActuator')
+      .filter(block => block.data.hwDevice.id === this.block.id)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }
 
@@ -40,7 +39,7 @@ export default class IoArray extends BlockCrudComponent {
         const id = idx + 1;
         const driverId = this.claimedChannels[id];
         const [name] = Object.keys(pin);
-        const driver = this.sparkModule.blockById(driverId);
+        const driver = this.sparkModule.blockById<DigitalActuatorBlock>(driverId);
         return { ...pin[name], id, driver, name };
       })
       .sort(objectStringSorter('name'));
@@ -57,7 +56,7 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(channel.driver?.id ?? null, actuatorType);
+    return new Link(channel.driver?.id ?? null, 'DigitalActuator');
   }
 
   driverDriven(block: Block): boolean {
@@ -102,11 +101,11 @@ export default class IoArray extends BlockCrudComponent {
       component: 'BlockWizardDialog',
       parent: this,
       serviceId: this.serviceId,
-      initialFeature: actuatorType,
+      initialFeature: 'DigitalActuator',
     })
-      .onOk(block => {
-        if (block.type === actuatorType) {
-          this.saveDriver(channel, new Link(block.id, actuatorType));
+      .onOk((block: Block) => {
+        if (block.type === 'DigitalActuator') {
+          this.saveDriver(channel, new Link(block.id, 'DigitalActuator'));
         }
       });
   }

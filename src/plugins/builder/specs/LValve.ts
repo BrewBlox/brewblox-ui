@@ -1,4 +1,4 @@
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 

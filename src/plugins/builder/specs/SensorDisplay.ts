@@ -1,4 +1,4 @@
-import { interfaceTypes } from '@/plugins/spark/block-types';
+import { interfaceTypes } from '@/plugins/spark/getters';
 
 import { showSettingsBlock, universalTransitions } from '../helpers';
 import { PartSpec } from '../types';

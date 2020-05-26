@@ -1,16 +1,17 @@
 import { unitDurationString } from '@/helpers/functional';
-import { Link, Unit } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
+import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorPwmWidget.vue';
-import { typeName } from './getters';
-import { ActuatorPwmData } from './types';
+import { ActuatorPwmBlock } from './types';
 
-const block: BlockSpec<ActuatorPwmData> = {
+const typeName = 'ActuatorPwm';
+
+const block: BlockSpec<ActuatorPwmBlock> = {
   id: typeName,
   generate: () => ({
     actuatorId: new Link(null, interfaceTypes.ActuatorDigital),

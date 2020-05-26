@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { TempSensorMockBlock, TempSensorOneWireBlock } from '@/plugins/spark/block-types';
 import { sparkStore } from '@/plugins/spark/store';
+import { TempSensorMockBlock, TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';

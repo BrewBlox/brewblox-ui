@@ -5,7 +5,8 @@ import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { Block, BlockConfig } from '@/plugins/spark/types';
+import type { Block } from '@/plugins/spark/types';
+import type { BlockConfig } from '@/plugins/spark/types';
 
 
 @Component

@@ -1,4 +1,4 @@
-import { Block, IoPin } from '@/plugins/spark/types';
+import { BlockBase, IoPin } from '@/plugins/spark/types';
 
 export enum DS2413Id {
   A = 1,
@@ -11,6 +11,7 @@ export interface DS2413Data {
   pins: IoPin[];
 }
 
-export interface DS2413Block extends Block {
+export interface DS2413Block extends BlockBase {
+  type: 'DS2413';
   data: DS2413Data;
 }

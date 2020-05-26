@@ -1,4 +1,4 @@
-import { Block } from '@/plugins/spark/types';
+import { BlockBase } from '@/plugins/spark/types';
 
 export interface BalancedActuator {
   id: number;
@@ -10,6 +10,7 @@ export interface BalancerData {
   clients: BalancedActuator[];
 }
 
-export interface BalancerBlock extends Block {
+export interface BalancerBlock extends BlockBase {
+  type: 'Balancer';
   data: BalancerData;
 }

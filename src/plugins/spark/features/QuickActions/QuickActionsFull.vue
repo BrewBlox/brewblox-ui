@@ -5,10 +5,10 @@ import { Component, Prop } from 'vue-property-decorator';
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { filterById, spliceById } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/units/parseObject';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
+import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
 
 import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, QuickActionsConfig, Step } from './types';

@@ -1,18 +1,18 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec, DigitalState } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './MotorValveWidget.vue';
-import { MotorValveData, ValveState } from './types';
+import { MotorValveBlock, ValveState } from './types';
 
-const block: BlockSpec<MotorValveData> = {
+const typeName = 'MotorValve';
+
+const block: BlockSpec<MotorValveBlock> = {
   id: typeName,
   generate: () => ({
-    hwDevice: new Link(null, interfaceTypes.IoArray),
+    hwDevice: new Link(null, 'IoArrayInterface'),
     startChannel: 0,
     desiredState: DigitalState.Inactive,
     state: DigitalState.Inactive,

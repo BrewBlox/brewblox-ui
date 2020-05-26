@@ -2,9 +2,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
-import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import type { Block } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 import FieldBase from '../FieldBase';
 

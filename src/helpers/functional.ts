@@ -4,7 +4,7 @@ import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 import { colors } from 'quasar';
 
-import { Unit } from './units';
+import { Unit } from '../plugins/spark/units';
 
 type SortFunc = (a: any, b: any) => number
 
@@ -353,4 +353,31 @@ export function findById<T extends HasId>(
  */
 export function matchesType<T extends HasType>(type: T['type'], obj: HasType): obj is T {
   return obj.type === type;
+}
+
+/**
+ * The curried version of `matchesType()`
+ *
+ * Returns a function that can directly be used as type guard in Array.find() or Array.filter().
+ *
+ *    interface Circular = PancakeInterface | FrisbeeInterface;
+ *
+ *    function eat(pancake: PancakeInterface): void {
+ *      // yum
+ *    }
+ *
+ *    const items: Circular[] = [
+ *      { type: 'Pancake' },
+ *      { type: 'Frisbee' }
+ *    ];
+ *
+ *    items
+ *      .filter(typeMatchFilter<PancakeInterface>('Pancake'))
+ *      .forEach(v => eat(v)); // Does not raise a type error
+ *
+ *
+ * @param type
+ */
+export function typeMatchFilter<T extends HasType>(type: T['type']): ((obj: HasType) => obj is T) {
+  return (obj): obj is T => obj.type === type;
 }

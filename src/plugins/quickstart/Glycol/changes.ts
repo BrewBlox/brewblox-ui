@@ -1,23 +1,24 @@
 import { uid } from 'quasar';
 
 import { durationMs } from '@/helpers/functional';
-import { Link, Temp, Time, Unit } from '@/helpers/units';
-import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
+import { blockTypes } from '@/plugins/spark/getters';
+import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
-  blockTypes,
+  Block,
   DigitalActuatorBlock,
   FilterChoice,
   MutexBlock,
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/block-types';
-import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block, DigitalState } from '@/plugins/spark/types';
+} from '@/plugins/spark/types';
+import { DigitalState } from '@/plugins/spark/types';
+import { Link, Temp, Time, Unit } from '@/plugins/spark/units';
+import { serialize } from '@/plugins/spark/units/parseObject';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -42,184 +43,184 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
     names.heatAct,
   ];
 
-  const blocks = [
-    // Setpoint
-    {
-      id: names.beerSetpoint,
-      type: blockTypes.SetpointSensorPair,
-      serviceId,
-      groups,
-      data: {
-        sensorId: new Link(names.beerSensor),
-        storedSetting: beerSetting,
-        settingEnabled: true,
-        setting: new Unit(null, 'degC'),
-        value: new Unit(null, 'degC'),
-        valueUnfiltered: new Unit(null, 'degC'),
-        filter: FilterChoice.Filter15s,
-        filterThreshold: new Unit(5, 'delta_degC'),
-        resetFilter: false,
-      },
-    },
-    // Profile
-    {
-      id: names.beerProfile,
-      type: blockTypes.SetpointProfile,
-      serviceId,
-      groups,
-      data: {
-        start: new Date().getTime() / 1000,
-        enabled: false,
-        targetId: new Link(names.beerSetpoint),
-        points: [
-          { time: 0, temperature: beerSetting },
-          { time: durationMs('7d') / 1000, temperature: beerSetting },
-          { time: durationMs('10d') / 1000, temperature: beerSetting.copy(beerSetting.value! + 3) },
-        ],
-        drivenTargetId: new Link(null),
-      },
-    },
-    // Mutex
-    {
-      id: names.mutex,
-      type: blockTypes.Mutex,
-      serviceId,
-      groups,
-      data: {
-        differentActuatorWait: new Time(5, 'min'),
-        waitRemaining: new Time(),
-      },
-    },
-    // Digital Actuators
-    {
-      id: names.coolAct,
-      type: blockTypes.DigitalActuator,
-      serviceId,
-      groups,
-      data: {
-        hwDevice: new Link(config.coolPin.arrayId),
-        channel: config.coolPin.pinId,
-        invert: false,
-        desiredState: DigitalState.Inactive,
-        state: DigitalState.Inactive,
-        constrainedBy: {
-          constraints: [
-            {
-              mutexed: {
-                mutexId: new Link(names.mutex, blockTypes.Mutex),
-                extraHoldTime: new Time(15, 'min'),
-                hasCustomHoldTime: true,
-                hasLock: false,
-              },
-              remaining: new Time(),
-            },
-            {
-              minOn: new Time(5, 's'),
-              remaining: new Time(),
-            },
-          ],
+  const blocks: [
+    SetpointSensorPairBlock,
+    SetpointProfileBlock,
+    MutexBlock,
+    DigitalActuatorBlock,
+    DigitalActuatorBlock,
+    ActuatorPwmBlock,
+    ActuatorPwmBlock,
+    PidBlock,
+    PidBlock,
+  ] = [
+      // Setpoint
+      {
+        id: names.beerSetpoint,
+        type: 'SetpointSensorPair',
+        serviceId,
+        groups,
+        data: {
+          sensorId: new Link(names.beerSensor),
+          storedSetting: beerSetting,
+          settingEnabled: true,
+          setting: new Unit(null, 'degC'),
+          value: new Unit(null, 'degC'),
+          valueUnfiltered: new Unit(null, 'degC'),
+          filter: FilterChoice.Filter15s,
+          filterThreshold: new Unit(5, 'delta_degC'),
+          resetFilter: false,
         },
       },
-    },
-    {
-      id: names.heatAct,
-      type: blockTypes.DigitalActuator,
-      serviceId,
-      groups,
-      data: {
-        hwDevice: new Link(config.heatPin ? config.heatPin!.arrayId : null),
-        channel: config.heatPin ? config.heatPin!.pinId : 0,
-        invert: false,
-        desiredState: DigitalState.Inactive,
-        state: DigitalState.Inactive,
-        constrainedBy: {
-          constraints: [
-            {
-              mutexed: {
-                mutexId: new Link(names.mutex, blockTypes.Mutex),
-                extraHoldTime: new Time(15, 'min'),
-                hasCustomHoldTime: true,
-                hasLock: false,
-              },
-              remaining: new Time(),
-            },
+      // Profile
+      {
+        id: names.beerProfile,
+        type: 'SetpointProfile',
+        serviceId,
+        groups,
+        data: {
+          start: new Date().getTime() / 1000,
+          enabled: false,
+          targetId: new Link(names.beerSetpoint),
+          points: [
+            { time: 0, temperature: beerSetting },
+            { time: durationMs('7d') / 1000, temperature: beerSetting },
+            { time: durationMs('10d') / 1000, temperature: beerSetting.copy(beerSetting.value! + 3) },
           ],
+          drivenTargetId: new Link(null),
         },
       },
-    },
-    // PWM
-    {
-      id: names.coolPwm,
-      type: blockTypes.ActuatorPwm,
-      serviceId,
-      groups,
-      data: {
-        enabled: true,
-        period: new Time(10, 'min'),
-        actuatorId: new Link(names.coolAct),
-        drivenActuatorId: new Link(null),
-        setting: 0,
-        desiredSetting: 0,
-        value: 0,
-        constrainedBy: { constraints: [] },
+      // Mutex
+      {
+        id: names.mutex,
+        type: 'Mutex',
+        serviceId,
+        groups,
+        data: {
+          differentActuatorWait: new Time(5, 'min'),
+          waitRemaining: new Time(),
+        },
       },
-    },
-    {
-      id: names.heatPwm,
-      type: blockTypes.ActuatorPwm,
-      serviceId,
-      groups,
-      data: {
-        enabled: true,
-        period: new Time(10, 's'),
-        actuatorId: new Link(names.heatAct),
-        drivenActuatorId: new Link(null),
-        setting: 0,
-        desiredSetting: 0,
-        value: 0,
-        constrainedBy: { constraints: [] },
+      // Digital Actuators
+      {
+        id: names.coolAct,
+        type: 'DigitalActuator',
+        serviceId,
+        groups,
+        data: {
+          hwDevice: new Link(config.coolPin.arrayId),
+          channel: config.coolPin.pinId,
+          invert: false,
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
+          constrainedBy: {
+            constraints: [
+              {
+                mutexed: {
+                  mutexId: new Link(names.mutex, 'Mutex'),
+                  extraHoldTime: new Time(15, 'min'),
+                  hasCustomHoldTime: true,
+                  hasLock: false,
+                },
+                remaining: new Time(),
+              },
+              {
+                minOn: new Time(5, 's'),
+                remaining: new Time(),
+              },
+            ],
+          },
+        },
       },
-    },
-    {
-      id: names.coolPid,
-      type: blockTypes.Pid,
-      serviceId,
-      groups,
-      data: {
-        ...pidDefaults(),
-        kp: new Unit(-20, '1/degC'),
-        ti: new Time(2, 'hour'),
-        td: new Time(10, 'min'),
-        enabled: true,
-        inputId: new Link(names.beerSetpoint),
-        outputId: new Link(names.coolPwm),
+      {
+        id: names.heatAct,
+        type: 'DigitalActuator',
+        serviceId,
+        groups,
+        data: {
+          hwDevice: new Link(config.heatPin ? config.heatPin!.arrayId : null),
+          channel: config.heatPin ? config.heatPin!.pinId : 0,
+          invert: false,
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
+          constrainedBy: {
+            constraints: [
+              {
+                mutexed: {
+                  mutexId: new Link(names.mutex, 'Mutex'),
+                  extraHoldTime: new Time(15, 'min'),
+                  hasCustomHoldTime: true,
+                  hasLock: false,
+                },
+                remaining: new Time(),
+              },
+            ],
+          },
+        },
       },
-    },
-    {
-      id: names.heatPid,
-      type: blockTypes.Pid,
-      serviceId,
-      groups,
-      data: {
-        ...pidDefaults(),
-        kp: new Unit(100, '1/degC'),
-        ti: new Time(2, 'hour'),
-        td: new Time(10, 'min'),
-        enabled: true,
-        inputId: new Link(names.beerSetpoint),
-        outputId: new Link(names.heatPwm),
+      // PWM
+      {
+        id: names.coolPwm,
+        type: 'ActuatorPwm',
+        serviceId,
+        groups,
+        data: {
+          enabled: true,
+          period: new Time(10, 'min'),
+          actuatorId: new Link(names.coolAct),
+          drivenActuatorId: new Link(null),
+          setting: 0,
+          desiredSetting: 0,
+          value: 0,
+          constrainedBy: { constraints: [] },
+        },
       },
-    },
-  ] as [
-      SetpointSensorPairBlock,
-      SetpointProfileBlock,
-      MutexBlock,
-      DigitalActuatorBlock,
-      DigitalActuatorBlock,
-      ActuatorPwmBlock,
-      ActuatorPwmBlock,
-      PidBlock,
-      PidBlock,
+      {
+        id: names.heatPwm,
+        type: 'ActuatorPwm',
+        serviceId,
+        groups,
+        data: {
+          enabled: true,
+          period: new Time(10, 's'),
+          actuatorId: new Link(names.heatAct),
+          drivenActuatorId: new Link(null),
+          setting: 0,
+          desiredSetting: 0,
+          value: 0,
+          constrainedBy: { constraints: [] },
+        },
+      },
+      {
+        id: names.coolPid,
+        type: 'Pid',
+        serviceId,
+        groups,
+        data: {
+          ...pidDefaults(),
+          kp: new Unit(-20, '1/degC'),
+          ti: new Time(2, 'hour'),
+          td: new Time(10, 'min'),
+          enabled: true,
+          inputId: new Link(names.beerSetpoint),
+          outputId: new Link(names.coolPwm),
+        },
+      },
+      {
+        id: names.heatPid,
+        type: 'Pid',
+        serviceId,
+        groups,
+        data: {
+          ...pidDefaults(),
+          kp: new Unit(100, '1/degC'),
+          ti: new Time(2, 'hour'),
+          td: new Time(10, 'min'),
+          enabled: true,
+          inputId: new Link(names.beerSetpoint),
+          outputId: new Link(names.heatPwm),
+        },
+      },
     ];
 
   if (config.glycolControl === 'Control') {
@@ -232,7 +233,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         // Setpoint
         {
           id: names.glycolSetpoint,
-          type: blockTypes.SetpointSensorPair,
+          type: 'SetpointSensorPair',
           serviceId,
           groups,
           data: {
@@ -250,7 +251,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         // Digital actuator
         {
           id: names.glycolAct,
-          type: blockTypes.DigitalActuator,
+          type: 'DigitalActuator',
           serviceId,
           groups,
           data: {
@@ -270,7 +271,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         // PWM
         {
           id: names.glycolPwm,
-          type: blockTypes.ActuatorPwm,
+          type: 'ActuatorPwm',
           serviceId,
           groups,
           data: {
@@ -286,7 +287,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         },
         {
           id: names.glycolPid,
-          type: blockTypes.Pid,
+          type: 'Pid',
           serviceId,
           groups,
           data: {

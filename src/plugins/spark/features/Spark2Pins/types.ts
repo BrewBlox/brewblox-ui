@@ -1,4 +1,4 @@
-import { Block, IoPin } from '@/plugins/spark/types';
+import { BlockBase, IoPin } from '@/plugins/spark/types';
 
 export enum Spark2PinId {
   bottom1 = 1,
@@ -19,6 +19,7 @@ export interface Spark2PinsData {
   hardware: Spark2Hardware;
 }
 
-export interface Spark2PinsBlock extends Block {
+export interface Spark2PinsBlock extends BlockBase {
+  type: 'Spark2Pins';
   data: Spark2PinsData;
 }

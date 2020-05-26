@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud } from '@/plugins/spark/types';
+import type { Block, BlockCrud } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
 

@@ -3,11 +3,10 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
 
 import { extendById, filterById } from '@/helpers/functional';
-import { deserialize } from '@/helpers/units/parseObject';
 import { EventbusMessage } from '@/plugins/eventbus';
+import { Block } from '@/plugins/spark/types';
 import type {
   ApiSparkStatus,
-  Block,
   BlockAddress,
   DataBlock,
   Limiters,
@@ -17,6 +16,7 @@ import type {
   SparkStatus,
   UserUnits,
 } from '@/plugins/spark/types';
+import { deserialize } from '@/plugins/spark/units/parseObject';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 

@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
 
 import { defaultLabel } from '../nodes';
 import { GraphConfig } from '../types';

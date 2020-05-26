@@ -1,4 +1,5 @@
 <script lang="ts">
+import cloneDeep from 'lodash/cloneDeep';
 import { Layout } from 'plotly.js';
 import { uid } from 'quasar';
 import { Component, Ref, Watch } from 'vue-property-decorator';
@@ -6,11 +7,10 @@ import { Component, Ref, Watch } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, isJsonEqual, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
-import { deepCopy } from '@/helpers/units/parseObject';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {
@@ -36,7 +36,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   }
 
   created(): void {
-    this.usedCfg = deepCopy(this.config);
+    this.usedCfg = cloneDeep(this.config);
     this.widgetGraphId = uid();
     this.wrapperGraphId = uid();
   }
@@ -87,7 +87,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
 
   async regraph(): Promise<void> {
     await this.$nextTick();
-    this.usedCfg = deepCopy(this.config);
+    this.usedCfg = cloneDeep(this.config);
     this.widgetGraph?.resetSources();
     this.wrapperGraph?.resetSources();
   }

@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { blockTypes, Spark3PinsBlock } from '@/plugins/spark/block-types';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { Spark3PinsBlock } from '@/plugins/spark/types';
 
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
@@ -21,7 +21,7 @@ export default class MotorValveWidget
   get spark3Pins(): Spark3PinsBlock | null {
     return this.sparkModule
       .blocks
-      .find(block => block.type === blockTypes.Spark3Pins)
+      .find((block): block is Spark3PinsBlock => block.type === 'Spark3Pins')
       ?? null;
   }
 

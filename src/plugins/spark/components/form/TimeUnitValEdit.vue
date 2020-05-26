@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
-import Unit from '@/helpers/units/Unit';
+import Unit from '@/plugins/spark/units/Unit';
 
 import ValEditBase from '../ValEditBase';
 

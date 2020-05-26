@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { blockTypes } from '@/plugins/spark/block-types';
 import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress } from '@/plugins/spark/types';
+import type { Block } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { CENTER, COLD_WATER, HOT_WATER } from '../getters';
@@ -62,7 +62,7 @@ export default class PidDisplay extends PartBase {
 
   get drivingOffset(): boolean {
     return this.target !== null
-      && this.target.type === blockTypes.SetpointDriver;
+      && this.target.type === 'ActuatorOffset';
   }
 
   get suffix(): string {

@@ -3,7 +3,7 @@ import { uid } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
 
 import { emptyGraphConfig } from '../getters';
 import { historyStore } from '../store';

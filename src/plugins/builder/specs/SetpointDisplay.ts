@@ -1,4 +1,4 @@
-import { blockTypes } from '@/plugins/spark/block-types';
+import { interfaceTypes } from '@/plugins/spark/getters';
 
 import { showSettingsBlock, universalTransitions } from '../helpers';
 import { PartSpec } from '../types';
@@ -23,7 +23,7 @@ const spec: PartSpec = {
       component: 'BlockAddressCard',
       props: {
         settingsKey,
-        compatible: [blockTypes.SetpointSensorPair],
+        compatible: [interfaceTypes.SetpointSensorPair],
         label: 'Setpoint',
       },
     },

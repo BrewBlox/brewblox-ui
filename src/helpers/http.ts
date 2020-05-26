@@ -3,7 +3,7 @@ import isArray from 'lodash/isArray';
 
 import { HOST } from '@/helpers/const';
 import notify from '@/helpers/notify';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
+import { deserialize, serialize } from '@/plugins/spark/units/parseObject';
 
 const { transformRequest, transformResponse } = axios.defaults;
 

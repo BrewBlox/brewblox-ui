@@ -2,12 +2,12 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { parsePostfixed, propertyNameWithoutUnit } from '@/helpers/units/parseObject';
-import PostFixed from '@/helpers/units/PostFixed';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockValueImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockField, BlockSpec } from '@/plugins/spark/types';
+import { BlockAddress, BlockField, BlockSpec, BlockType } from '@/plugins/spark/types';
+import { parsePostfixed, propertyNameWithoutUnit } from '@/plugins/spark/units/parseObject';
+import PostFixed from '@/plugins/spark/units/PostFixed';
 
 import { OperatorOption, operatorSymbols } from './helpers';
 
@@ -17,7 +17,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
   get spec(): BlockSpec | null {
     return this.impl.blockType !== null
-      ? sparkStore.specById(this.impl.blockType) ?? null
+      ? sparkStore.specById(this.impl.blockType as BlockType) ?? null
       : null;
   }
 

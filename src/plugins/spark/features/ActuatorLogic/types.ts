@@ -1,5 +1,5 @@
-import { Link } from '@/helpers/units';
-import { Block, DigitalState } from '@/plugins/spark/types';
+import { BlockBase, DigitalState } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 export enum DigitalCompareOp {
   VALUE_IS = 0,
@@ -66,7 +66,8 @@ export interface ActuatorLogicData {
   expression: string; // a-zA-Z&|^!()
 }
 
-export interface ActuatorLogicBlock extends Block {
+export interface ActuatorLogicBlock extends BlockBase {
+  type: 'ActuatorLogic';
   data: ActuatorLogicData;
 }
 

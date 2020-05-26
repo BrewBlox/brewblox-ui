@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, BlockType } from '@/plugins/spark/types';
 
 interface AbsenceReason {
   message: string;
@@ -29,7 +29,7 @@ export default class UnknownBlockWidget extends WidgetBase {
     return {
       id: this.blockId,
       serviceId: this.serviceId,
-      type: this.widget.feature,
+      type: this.widget.feature as BlockType, // Lies!
       groups: [],
       data: {},
     };

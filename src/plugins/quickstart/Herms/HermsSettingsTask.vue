@@ -2,8 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Temp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
+import { Temp, Unit } from '@/plugins/spark/units';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';

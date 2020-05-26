@@ -1,10 +1,11 @@
-import { Block } from '@/plugins/spark/types';
+import { BlockBase } from '@/plugins/spark/types';
 
 
 export interface DeprecatedObjectData {
   actualId: number;
 }
 
-export interface DeprecatedObjectBlock extends Block {
+export interface DeprecatedObjectBlock extends BlockBase {
+  type: 'DeprecatedObject';
   data: DeprecatedObjectData;
 }

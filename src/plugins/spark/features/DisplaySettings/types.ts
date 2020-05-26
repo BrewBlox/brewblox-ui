@@ -1,4 +1,4 @@
-import { Block, DisplaySlot } from '@/plugins/spark/types';
+import { BlockBase, DisplaySlot } from '@/plugins/spark/types';
 
 export enum DisplayTempUnit {
   Celsius = 0,
@@ -12,6 +12,7 @@ export interface DisplaySettingsData {
   brightness: number;
 }
 
-export interface DisplaySettingsBlock extends Block {
+export interface DisplaySettingsBlock extends BlockBase {
+  type: 'DisplaySettings';
   data: DisplaySettingsData;
 }

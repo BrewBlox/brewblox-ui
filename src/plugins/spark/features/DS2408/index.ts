@@ -4,10 +4,11 @@ import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DS2408Widget.vue';
-import { typeName } from './getters';
-import { DS2408Data } from './types';
+import { DS2408Block } from './types';
 
-const block: BlockSpec<DS2408Data> = {
+const typeName = 'DS2408';
+
+const block: BlockSpec<DS2408Block> = {
   id: typeName,
   generate: () => ({
     address: '',

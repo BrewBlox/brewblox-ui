@@ -4,7 +4,8 @@ import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { mutate } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress } from '@/plugins/spark/types';
+import { Block } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
 import { CENTER, SQUARE_SIZE } from './getters';

@@ -1,5 +1,5 @@
-import { Unit } from '@/helpers/units';
-import { Block } from '@/plugins/spark/types';
+import { BlockBase } from '@/plugins/spark/types';
+import { Unit } from '@/plugins/spark/units';
 
 export interface Fluctuation {
   amplitude: Unit; // DeltaTemp
@@ -13,6 +13,7 @@ export interface TempSensorMockData {
   fluctuations: Fluctuation[];
 }
 
-export interface TempSensorMockBlock extends Block {
+export interface TempSensorMockBlock extends BlockBase {
+  type: 'TempSensorMock';
   data: TempSensorMockData;
 }

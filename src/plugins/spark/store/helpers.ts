@@ -1,9 +1,10 @@
 import { capitalized } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
+import { Link } from '@/plugins/spark/units';
 import { ServiceStatus } from '@/store/services';
 
 import { constraintLabels } from '../getters';
-import { AnalogConstraint, Block, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
+import { Block } from '../types';
+import { AnalogConstraint, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];

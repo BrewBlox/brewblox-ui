@@ -4,14 +4,14 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { shortDateString } from '@/helpers/functional';
 import { startChangeServiceTitle } from '@/helpers/services';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import {
   Block,
-  blockTypes,
   SysInfoBlock,
+  SystemBlockType,
   TicksBlock,
   WiFiSettingsBlock,
-} from '@/plugins/spark/block-types';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+} from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
 
@@ -50,21 +50,21 @@ export default class SparkWidget extends Vue {
     return this.service?.title ?? 'Unknown';
   }
 
-  sysBlock<T extends Block>(blockType: string): T {
+  sysBlock<T extends Block>(blockType: SystemBlockType): T {
     return this.sparkModule!.blocks
       .find(block => block.type === blockType) as T;
   }
 
   get sysInfo(): SysInfoBlock {
-    return this.sysBlock(blockTypes.SysInfo);
+    return this.sysBlock('SysInfo');
   }
 
   get ticks(): TicksBlock {
-    return this.sysBlock(blockTypes.Ticks);
+    return this.sysBlock('Ticks');
   }
 
   get wifi(): WiFiSettingsBlock {
-    return this.sysBlock(blockTypes.WiFiSettings);
+    return this.sysBlock('WifiSettings');
   }
 
   get sysDate(): string {

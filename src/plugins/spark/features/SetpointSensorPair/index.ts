@@ -1,19 +1,19 @@
-import { Link, Unit } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec } from '@/plugins/spark/types';
+import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './SetpointSensorPairWidget.vue';
-import { FilterChoice, SetpointSensorPairData } from './types';
+import { FilterChoice, SetpointSensorPairBlock } from './types';
 
-const block: BlockSpec<SetpointSensorPairData> = {
+const typeName = 'SetpointSensorPair';
+
+const block: BlockSpec<SetpointSensorPairBlock> = {
   id: typeName,
   generate: () => ({
-    sensorId: new Link(null, interfaceTypes.TempSensor),
+    sensorId: new Link(null, 'TempSensorInterface'),
     storedSetting: new Unit(null, 'degC'),
     setting: new Unit(null, 'degC'),
     value: new Unit(null, 'degC'),
@@ -48,7 +48,7 @@ const block: BlockSpec<SetpointSensorPairData> = {
       key: 'sensorId',
       title: 'Linked Sensor',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.TempSensor),
+      generate: () => new Link(null, 'TempSensorInterface'),
     },
     {
       key: 'setting',

@@ -1,24 +1,24 @@
 import { uid } from 'quasar';
 
-import { Link, Temp, Time, Unit } from '@/helpers/units';
-import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
+import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
   BalancerBlock,
-  blockTypes,
+  Block,
   DigitalActuatorBlock,
   FilterChoice,
   MutexBlock,
   OffsetSettingOrValue,
   PidBlock,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/block-types';
-import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { sparkStore } from '@/plugins/spark/store';
-import { AnalogConstraint, Block, DigitalConstraint, DigitalState } from '@/plugins/spark/types';
+} from '@/plugins/spark/types';
+import { AnalogConstraint, DigitalConstraint, DigitalState } from '@/plugins/spark/types';
+import { Link, Temp, Time, Unit } from '@/plugins/spark/units';
+import { serialize } from '@/plugins/spark/units/parseObject';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -40,7 +40,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
   if (config.mutex) {
     pwmConstraints.push({
       balanced: {
-        balancerId: new Link(names.balancer, blockTypes.Balancer),
+        balancerId: new Link(names.balancer, 'Balancer'),
         granted: 0,
         id: 0,
       },
@@ -49,7 +49,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
     actuatorConstraints.push(
       {
         mutexed: {
-          mutexId: new Link(names.mutex, blockTypes.Mutex),
+          mutexId: new Link(names.mutex, 'Mutex'),
           extraHoldTime: new Time(),
           hasCustomHoldTime: true,
           hasLock: false,
@@ -59,237 +59,237 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
     );
   }
 
-  const balancerBlocks = [
-    {
-      id: names.balancer,
-      type: blockTypes.Balancer,
-      serviceId,
-      groups,
-      data: { clients: [] },
-    },
-    {
-      id: names.mutex,
-      type: blockTypes.Mutex,
-      serviceId,
-      groups,
-      data: {
-        differentActuatorWait: new Time(),
-        waitRemaining: new Time(),
+  const balancerBlocks: [
+    BalancerBlock,
+    MutexBlock,
+  ] = [
+      {
+        id: names.balancer,
+        type: 'Balancer',
+        serviceId,
+        groups,
+        data: { clients: [] },
       },
-    },
-  ] as [
-      BalancerBlock,
-      MutexBlock,
+      {
+        id: names.mutex,
+        type: 'Mutex',
+        serviceId,
+        groups,
+        data: {
+          differentActuatorWait: new Time(),
+          waitRemaining: new Time(),
+        },
+      },
     ];
 
-  const baseBlocks = [
-    // Setpoints
-    {
-      id: names.hltSetpoint,
-      type: blockTypes.SetpointSensorPair,
-      serviceId,
-      groups,
-      data: {
-        sensorId: new Link(names.hltSensor),
-        storedSetting: new Unit(70, 'degC'),
-        settingEnabled: false,
-        setting: new Unit(null, 'degC'),
-        value: new Unit(null, 'degC'),
-        valueUnfiltered: new Unit(null, 'degC'),
-        filter: FilterChoice.Filter15s,
-        filterThreshold: new Unit(5, 'delta_degC'),
-        resetFilter: false,
-      },
-    },
-    {
-      id: names.mtSetpoint,
-      type: blockTypes.SetpointSensorPair,
-      serviceId,
-      groups,
-      data: {
-        sensorId: new Link(names.mtSensor),
-        storedSetting: new Unit(67, 'degC'),
-        settingEnabled: false,
-        setting: new Unit(null, 'degC'),
-        value: new Unit(null, 'degC'),
-        valueUnfiltered: new Unit(null, 'degC'),
-        filter: FilterChoice.Filter15s,
-        filterThreshold: new Unit(5, 'delta_degC'),
-        resetFilter: false,
-      },
-    },
-    {
-      id: names.bkSetpoint,
-      type: blockTypes.SetpointSensorPair,
-      serviceId,
-      groups,
-      data: {
-        sensorId: new Link(names.bkSensor),
-        storedSetting: new Unit(70, 'degC'),
-        settingEnabled: false,
-        setting: new Unit(null, 'degC'),
-        value: new Unit(null, 'degC'),
-        valueUnfiltered: new Unit(null, 'degC'),
-        filter: FilterChoice.Filter15s,
-        filterThreshold: new Unit(5, 'delta_degC'),
-        resetFilter: false,
-      },
-    },
-    // Setpoint Driver
-    {
-      id: names.hltDriver,
-      type: blockTypes.SetpointDriver,
-      serviceId,
-      groups,
-      data: {
-        targetId: new Link(names.hltSetpoint),
-        drivenTargetId: new Link(names.hltSetpoint),
-        referenceId: new Link(names.mtSetpoint),
-        referenceSettingOrValue: OffsetSettingOrValue.Setting,
-        enabled: false,
-        desiredSetting: 0,
-        setting: 0,
-        value: 0,
-        constrainedBy: {
-          constraints: [
-            {
-              max: opts.driverMax.value,
-              limiting: false,
-            },
-          ],
+  const baseBlocks: [
+    SetpointSensorPairBlock,
+    SetpointSensorPairBlock,
+    SetpointSensorPairBlock,
+    ActuatorOffsetBlock,
+    DigitalActuatorBlock,
+    DigitalActuatorBlock,
+    ActuatorPwmBlock,
+    ActuatorPwmBlock,
+    PidBlock,
+    PidBlock,
+    PidBlock,
+  ] = [
+      // Setpoints
+      {
+        id: names.hltSetpoint,
+        type: 'SetpointSensorPair',
+        serviceId,
+        groups,
+        data: {
+          sensorId: new Link(names.hltSensor),
+          storedSetting: new Unit(70, 'degC'),
+          settingEnabled: false,
+          setting: new Unit(null, 'degC'),
+          value: new Unit(null, 'degC'),
+          valueUnfiltered: new Unit(null, 'degC'),
+          filter: FilterChoice.Filter15s,
+          filterThreshold: new Unit(5, 'delta_degC'),
+          resetFilter: false,
         },
       },
-    },
-    // Digital Actuators
-    {
-      id: names.hltAct,
-      type: blockTypes.DigitalActuator,
-      serviceId,
-      groups,
-      data: {
-        hwDevice: new Link(config.hltPin.arrayId),
-        channel: config.hltPin.pinId,
-        desiredState: DigitalState.Inactive,
-        state: DigitalState.Inactive,
-        invert: false,
-        constrainedBy: {
-          constraints: actuatorConstraints,
+      {
+        id: names.mtSetpoint,
+        type: 'SetpointSensorPair',
+        serviceId,
+        groups,
+        data: {
+          sensorId: new Link(names.mtSensor),
+          storedSetting: new Unit(67, 'degC'),
+          settingEnabled: false,
+          setting: new Unit(null, 'degC'),
+          value: new Unit(null, 'degC'),
+          valueUnfiltered: new Unit(null, 'degC'),
+          filter: FilterChoice.Filter15s,
+          filterThreshold: new Unit(5, 'delta_degC'),
+          resetFilter: false,
         },
       },
-    },
-    {
-      id: names.bkAct,
-      type: blockTypes.DigitalActuator,
-      serviceId,
-      groups,
-      data: {
-        hwDevice: new Link(config.bkPin.arrayId),
-        channel: config.bkPin.pinId,
-        desiredState: DigitalState.Inactive,
-        state: DigitalState.Inactive,
-        invert: false,
-        constrainedBy: {
-          constraints: actuatorConstraints,
+      {
+        id: names.bkSetpoint,
+        type: 'SetpointSensorPair',
+        serviceId,
+        groups,
+        data: {
+          sensorId: new Link(names.bkSensor),
+          storedSetting: new Unit(70, 'degC'),
+          settingEnabled: false,
+          setting: new Unit(null, 'degC'),
+          value: new Unit(null, 'degC'),
+          valueUnfiltered: new Unit(null, 'degC'),
+          filter: FilterChoice.Filter15s,
+          filterThreshold: new Unit(5, 'delta_degC'),
+          resetFilter: false,
         },
       },
-    },
-    // PWM
-    {
-      id: names.hltPwm,
-      type: blockTypes.ActuatorPwm,
-      serviceId,
-      groups,
-      data: {
-        enabled: true,
-        period: new Time(2, 's'),
-        actuatorId: new Link(names.hltAct),
-        drivenActuatorId: new Link(null),
-        setting: 0,
-        desiredSetting: 0,
-        value: 0,
-        constrainedBy: {
-          constraints: pwmConstraints,
+      // Setpoint Driver
+      {
+        id: names.hltDriver,
+        type: 'ActuatorOffset',
+        serviceId,
+        groups,
+        data: {
+          targetId: new Link(names.hltSetpoint),
+          drivenTargetId: new Link(names.hltSetpoint),
+          referenceId: new Link(names.mtSetpoint),
+          referenceSettingOrValue: OffsetSettingOrValue.Setting,
+          enabled: false,
+          desiredSetting: 0,
+          setting: 0,
+          value: 0,
+          constrainedBy: {
+            constraints: [
+              {
+                max: opts.driverMax.value!,
+                limiting: false,
+              },
+            ],
+          },
         },
       },
-    },
-    {
-      id: names.bkPwm,
-      type: blockTypes.ActuatorPwm,
-      serviceId,
-      groups,
-      data: {
-        enabled: true,
-        period: new Time(2, 's'),
-        actuatorId: new Link(names.bkAct),
-        drivenActuatorId: new Link(null),
-        setting: 0,
-        desiredSetting: 0,
-        value: 0,
-        constrainedBy: {
-          constraints: pwmConstraints,
+      // Digital Actuators
+      {
+        id: names.hltAct,
+        type: 'DigitalActuator',
+        serviceId,
+        groups,
+        data: {
+          hwDevice: new Link(config.hltPin.arrayId),
+          channel: config.hltPin.pinId,
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
+          invert: false,
+          constrainedBy: {
+            constraints: actuatorConstraints,
+          },
         },
       },
-    },
-    // PID
-    {
-      id: names.hltPid,
-      type: blockTypes.Pid,
-      serviceId,
-      groups,
-      data: {
-        ...pidDefaults(),
-        enabled: true,
-        inputId: new Link(names.hltSetpoint),
-        outputId: new Link(names.hltPwm),
-        kp: opts.hltKp,
-        ti: new Time(10, 'min'),
-        td: new Time(30, 's'),
-        boilMinOutput: 25,
+      {
+        id: names.bkAct,
+        type: 'DigitalActuator',
+        serviceId,
+        groups,
+        data: {
+          hwDevice: new Link(config.bkPin.arrayId),
+          channel: config.bkPin.pinId,
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
+          invert: false,
+          constrainedBy: {
+            constraints: actuatorConstraints,
+          },
+        },
       },
-    },
-    {
-      id: names.mtPid,
-      type: blockTypes.Pid,
-      serviceId,
-      groups,
-      data: {
-        ...pidDefaults(),
-        enabled: true,
-        inputId: new Link(names.mtSetpoint),
-        outputId: new Link(names.hltDriver),
-        kp: opts.mtKp,
-        ti: new Time(5, 'min'),
-        td: new Time(10, 'min'),
+      // PWM
+      {
+        id: names.hltPwm,
+        type: 'ActuatorPwm',
+        serviceId,
+        groups,
+        data: {
+          enabled: true,
+          period: new Time(2, 's'),
+          actuatorId: new Link(names.hltAct),
+          drivenActuatorId: new Link(null),
+          setting: 0,
+          desiredSetting: 0,
+          value: 0,
+          constrainedBy: {
+            constraints: pwmConstraints,
+          },
+        },
       },
-    },
-    {
-      id: names.bkPid,
-      type: blockTypes.Pid,
-      serviceId,
-      groups,
-      data: {
-        ...pidDefaults(),
-        enabled: true,
-        inputId: new Link(names.bkSetpoint),
-        outputId: new Link(names.bkPwm),
-        kp: opts.bkKp,
-        ti: new Time(5, 'min'),
-        td: new Time(10, 'min'),
-        boilMinOutput: 25,
+      {
+        id: names.bkPwm,
+        type: 'ActuatorPwm',
+        serviceId,
+        groups,
+        data: {
+          enabled: true,
+          period: new Time(2, 's'),
+          actuatorId: new Link(names.bkAct),
+          drivenActuatorId: new Link(null),
+          setting: 0,
+          desiredSetting: 0,
+          value: 0,
+          constrainedBy: {
+            constraints: pwmConstraints,
+          },
+        },
       },
-    },
-  ] as [
-      SetpointSensorPairBlock,
-      SetpointSensorPairBlock,
-      SetpointSensorPairBlock,
-      ActuatorOffsetBlock,
-      DigitalActuatorBlock,
-      DigitalActuatorBlock,
-      ActuatorPwmBlock,
-      ActuatorPwmBlock,
-      PidBlock,
-      PidBlock,
-      PidBlock,
+      // PID
+      {
+        id: names.hltPid,
+        type: 'Pid',
+        serviceId,
+        groups,
+        data: {
+          ...pidDefaults(),
+          enabled: true,
+          inputId: new Link(names.hltSetpoint),
+          outputId: new Link(names.hltPwm),
+          kp: opts.hltKp,
+          ti: new Time(10, 'min'),
+          td: new Time(30, 's'),
+          boilMinOutput: 25,
+        },
+      },
+      {
+        id: names.mtPid,
+        type: 'Pid',
+        serviceId,
+        groups,
+        data: {
+          ...pidDefaults(),
+          enabled: true,
+          inputId: new Link(names.mtSetpoint),
+          outputId: new Link(names.hltDriver),
+          kp: opts.mtKp,
+          ti: new Time(5, 'min'),
+          td: new Time(10, 'min'),
+        },
+      },
+      {
+        id: names.bkPid,
+        type: 'Pid',
+        serviceId,
+        groups,
+        data: {
+          ...pidDefaults(),
+          enabled: true,
+          inputId: new Link(names.bkSetpoint),
+          outputId: new Link(names.bkPwm),
+          kp: opts.bkKp,
+          ti: new Time(5, 'min'),
+          td: new Time(10, 'min'),
+          boilMinOutput: 25,
+        },
+      },
     ];
 
   return config.mutex

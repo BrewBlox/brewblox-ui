@@ -4,10 +4,10 @@ import { BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorAnalogMockWidget.vue';
-import { typeName } from './getters';
-import { ActuatorAnalogMockData } from './types';
+import { ActuatorAnalogMockBlock } from './types';
+const typeName = 'ActuatorAnalogMock';
 
-const block: BlockSpec<ActuatorAnalogMockData> = {
+const block: BlockSpec<ActuatorAnalogMockBlock> = {
   id: typeName,
   generate: () => ({
     setting: 0,

@@ -3,16 +3,16 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Link, Time } from '@/helpers/units';
-import { blockTypes, MutexBlock } from '@/plugins/spark/block-types';
 import { digitalConstraintLabels } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
+import { MutexBlock } from '@/plugins/spark/types';
 import type {
   DigitalConstraint,
   DigitalConstraintKey,
   DigitalConstraintsObj,
   MutexedConstraint,
 } from '@/plugins/spark/types';
+import { Link, Time } from '@/plugins/spark/units';
 
 interface Wrapped {
   type: DigitalConstraintKey;
@@ -65,7 +65,7 @@ export default class DigitalConstraints extends Vue {
       mutexed: {
         remaining: new Time(),
         mutexed: {
-          mutexId: new Link(null, blockTypes.Mutex),
+          mutexId: new Link(null, 'MutexInterface'),
           hasCustomHoldTime: false,
           extraHoldTime: new Time(),
           hasLock: false,

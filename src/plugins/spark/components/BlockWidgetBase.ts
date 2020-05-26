@@ -7,10 +7,11 @@ import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
 import { blockGraphCfg } from '../helpers';
-import { Block, BlockConfig, BlockCrud, BlockSpec } from '../types';
+import type { Block, BlockCrud } from '../types';
+import type { BlockConfig, BlockSpec } from '../types';
 
 @Component
-export default class BlockWidgetBase<BlockT extends Block = Block, DataT = BlockT['data']>
+export default class BlockWidgetBase<BlockT extends Block = Block>
   extends WidgetBase<BlockConfig> {
 
   @Prop({ type: Boolean, default: false })
@@ -60,7 +61,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block, DataT = Block
       || null;
   }
 
-  public get spec(): BlockSpec<DataT> {
+  public get spec(): BlockSpec<BlockT> {
     return sparkStore.spec(this.block);
   }
 

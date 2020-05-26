@@ -2,8 +2,8 @@
 import { Component, Watch } from 'vue-property-decorator';
 
 import { isJsonEqual } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/units/parseObject';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
 
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';

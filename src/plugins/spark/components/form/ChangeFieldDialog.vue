@@ -2,8 +2,8 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/units/parseObject';
 import type { BlockAddress, BlockField } from '@/plugins/spark/types';
+import { deepCopy } from '@/plugins/spark/units/parseObject';
 
 
 @Component
