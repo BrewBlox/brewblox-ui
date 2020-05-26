@@ -9,9 +9,7 @@
 * Docker
 * Docker-compose
 
-Due to limitations in the way Docker is handled on Windows and Mac, a Linux-based OS is required for development.
-
-If you're determined to make it work on either Windows or Mac, feel free to contact us for a more detailed explanation.
+Due to limitations in the way Docker is handled on Windows, Linux or Mac are required for development.
 
 ## Installation
 
