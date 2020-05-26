@@ -3,12 +3,14 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { AutomationStatus, AutomationTask } from '../shared-types';
+import { settableStates } from '../getters';
 import { automationStore } from '../store';
+import { AutomationStatus, AutomationTask } from '../types';
 
 
 @Component
 export default class AutomationTaskMenu extends Vue {
+  settableStates = settableStates;
 
   get tasks(): AutomationTask[] {
     return automationStore.tasks;
@@ -19,7 +21,9 @@ export default class AutomationTaskMenu extends Vue {
   }
 
   changeTaskStatus(task: AutomationTask, status: AutomationStatus): void {
-    automationStore.saveTask({ ...task, status });
+    if (status !== task.status) {
+      automationStore.saveTask({ ...task, status });
+    }
   }
 
   add(): void {
@@ -35,6 +39,19 @@ export default class AutomationTaskMenu extends Vue {
 
   removeTask(task: AutomationTask): void {
     automationStore.removeTask(task);
+  }
+
+
+  quickStatusIcon(task: AutomationTask): string {
+    return task.status === 'Finished'
+      ? 'mdi-sync'
+      : 'mdi-check-all';
+  }
+
+  quickStatusValue(task: AutomationTask): AutomationStatus {
+    return task.status === 'Finished'
+      ? 'Active'
+      : 'Finished';
   }
 }
 </script>
@@ -59,7 +76,7 @@ export default class AutomationTaskMenu extends Vue {
           <q-btn
             v-if="task.createdBy === 'User'"
             round
-            outline
+            flat
             size="sm"
             class="self-center"
             icon="clear"
@@ -67,28 +84,31 @@ export default class AutomationTaskMenu extends Vue {
           >
             <q-tooltip>Remove task</q-tooltip>
           </q-btn>
-          <q-btn
-            v-if="task.status === 'Finished'"
-            round
-            outline
-            size="sm"
-            class="self-center"
-            icon="mdi-sync"
-            @click="changeTaskStatus(task, 'Active')"
+          <q-btn-dropdown
+            split
+            flat
+            class="col-auto"
+            :icon="quickStatusIcon(task)"
+            @click="changeTaskStatus(task, quickStatusValue(task))"
           >
-            <q-tooltip>Mark task as active</q-tooltip>
-          </q-btn>
-          <q-btn
-            v-else
-            round
-            outline
-            size="sm"
-            class="self-center"
-            icon="mdi-check"
-            @click="changeTaskStatus(task, 'Finished')"
-          >
-            <q-tooltip>Mark task as finished</q-tooltip>
-          </q-btn>
+            <template #label>
+              <q-tooltip>Mark task as {{ quickStatusValue(task) }}</q-tooltip>
+            </template>
+            <q-list>
+              <q-item>
+                <q-item-section class="fade-4 text-italic">
+                  Mark task as...
+                </q-item-section>
+              </q-item>
+              <ActionItem
+                v-for="state in settableStates"
+                :key="state.status"
+                :label="state.status"
+                :active="task.status === state.status"
+                @click="changeTaskStatus(task, state.status)"
+              />
+            </q-list>
+          </q-btn-dropdown>
         </div>
       </div>
     </q-scroll-area>
