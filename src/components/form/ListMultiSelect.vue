@@ -4,10 +4,10 @@ import { Component, Prop } from 'vue-property-decorator';
 
 
 @Component
-export default class ListSelect extends Vue {
+export default class ListMultiSelect extends Vue {
 
-  @Prop({ type: Object, required: false })
-  public readonly value!: any;
+  @Prop({ type: Array, required: true })
+  public readonly value!: any[];
 
   @Prop({ type: Array, required: true })
   public readonly options!: any[];
@@ -22,20 +22,17 @@ export default class ListSelect extends Vue {
   public readonly dense!: boolean;
 
   matches(val: any): boolean {
-    return this.value !== null
-      && this.value[this.optionValue] === val[this.optionValue];
+    const key = val[this.optionValue];
+    return this.value.some(v => v[this.optionValue] === key);
   }
 
-  selectValue(value: any, save: boolean): void {
-    if (save) {
-      this.$emit('confirm', value);
+  selectValue(val: any): void {
+    const key = val[this.optionValue];
+    const updated = this.value.filter(v => v[this.optionValue] !== key);
+    if (updated.length === this.value.length) {
+      updated.push(val);
     }
-    else if (this.matches(value)) {
-      this.$emit('input', null);
-    }
-    else {
-      this.$emit('input', value);
-    }
+    this.$emit('input', updated);
   }
 }
 </script>
@@ -49,11 +46,15 @@ export default class ListSelect extends Vue {
         'col clickable q-pl-sm rounded-borders text-h6',
         {'q-py-sm': !dense, 'depth-24': matches(opt)}
       ]"
-      @click="selectValue(opt, false)"
-      @dblclick="selectValue(opt, true)"
+      @click="selectValue(opt)"
     >
       <slot name="body" :opt="opt">
-        {{ opt[optionLabel] }}
+        <div class="row q-gutter-x-sm">
+          <ToggleButton :value="matches(opt)" dense />
+          <div class="self-center">
+            {{ opt[optionLabel] }}
+          </div>
+        </div>
       </slot>
     </div>
   </div>

@@ -125,6 +125,7 @@ export default class BlockDiscoveryWizard
         :options="blockOpts"
         option-value="id"
         option-label="id"
+        dense
         @confirm="v => { block = v; createWidget(); }"
       >
         <template #body="{ opt }">
@@ -134,17 +135,17 @@ export default class BlockDiscoveryWizard
             </div>
             <q-btn
               flat
-              icon="mdi-launch"
-              @click.stop="showBlock(opt)"
-            >
-              <q-tooltip>Edit block</q-tooltip>
-            </q-btn>
-            <q-btn
-              flat
               icon="edit"
               @click.stop="startChangeBlockId(opt)"
             >
               <q-tooltip>Rename block</q-tooltip>
+            </q-btn>
+            <q-btn
+              flat
+              icon="mdi-launch"
+              @click.stop="showBlock(opt)"
+            >
+              <q-tooltip>Edit block</q-tooltip>
             </q-btn>
           </div>
         </template>

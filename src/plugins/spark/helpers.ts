@@ -352,7 +352,10 @@ export const prettifyConstraints =
         .join(', ');
 
 
-export const blockGraphCfg = <BlockT extends Block = any>(crud: BlockCrud<BlockT>): GraphConfig => {
+export const blockGraphCfg = <BlockT extends Block = any>(
+  crud: BlockCrud<BlockT>,
+  fieldFilter: ((f: BlockField) => boolean) = (() => true)
+): GraphConfig => {
   const { queryParams, graphAxes, graphLayout } = defaults(crud.widget.config, {
     queryParams: { duration: '1h' },
     graphAxes: {},
@@ -362,7 +365,8 @@ export const blockGraphCfg = <BlockT extends Block = any>(crud: BlockCrud<BlockT
   const graphedFields: BlockField[] = sparkStore
     .spec(crud.block)
     .fields
-    .filter(f => f.graphed);
+    .filter(f => f.graphed)
+    .filter(f => fieldFilter(f));
 
   const graphedObj: Mapped<BlockField> = keyBy(
     graphedFields,
