@@ -120,38 +120,50 @@ export default class BlockDiscoveryWizard
         If a block is not shown below, please ensure it is plugged in, and click Discover.
       </div>
 
-      <div
-        v-for="opt in blockOpts"
-        :key="opt.id"
-        :class="[
-          'row clickable q-pl-sm rounded-borders text-h6',
-          block && block.id === opt.id && 'depth-24'
-        ]"
-        @click="toggleOpt(opt)"
-        @dblclick="block = opt; createWidget()"
+      <ListSelect
+        v-model="block"
+        :options="blockOpts"
+        option-value="id"
+        option-label="id"
+        dense
+        @confirm="v => { block = v; createWidget(); }"
       >
-        <div class="col-grow self-center">
-          {{ opt.id }}
-        </div>
-        <q-btn flat icon="edit" @click.stop="startChangeBlockId(opt)">
-          <q-tooltip>Rename block</q-tooltip>
-        </q-btn>
-      </div>
+        <template #body="{ opt }">
+          <div class="row">
+            <div class="col-grow self-center">
+              {{ opt.id }}
+            </div>
+            <q-btn
+              flat
+              icon="edit"
+              @click.stop="startChangeBlockId(opt)"
+            >
+              <q-tooltip>Rename block</q-tooltip>
+            </q-btn>
+            <q-btn
+              flat
+              icon="mdi-launch"
+              @click.stop="showBlock(opt)"
+            >
+              <q-tooltip>Edit block</q-tooltip>
+            </q-btn>
+          </div>
+        </template>
+      </ListSelect>
     </div>
 
     <template #actions>
+      <q-btn
+        flat
+        label="Back"
+        @click="back"
+      />
+      <q-space />
       <q-btn
         :loading="busy"
         flat
         label="Discover"
         @click="discover"
-      />
-      <q-space />
-      <q-btn
-        :disable="block === null"
-        flat
-        label="Configure block"
-        @click="showBlock(block)"
       />
       <q-btn
         :disable="block === null"

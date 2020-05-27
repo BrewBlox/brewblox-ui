@@ -9,7 +9,7 @@ import { automationStore } from '../store';
 
 @Component
 export default class AutomationJumpDialog extends DialogBase {
-  stepId: string | null = null;
+  local: AutomationStep | null = null;
 
   @Prop({ type: String, required: true })
   public readonly processId!: string;
@@ -31,13 +31,9 @@ export default class AutomationJumpDialog extends DialogBase {
     return this.process?.steps ?? [];
   }
 
-  get localOk(): boolean {
-    return this.stepId !== null;
-  }
-
-  save(): void {
-    if (this.localOk) {
-      this.onDialogOk(this.stepId);
+  save(step: AutomationStep | null): void {
+    if (step) {
+      this.onDialogOk(step.id);
     }
   }
 }
@@ -48,24 +44,19 @@ export default class AutomationJumpDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.enter="save"
+    @keyup.enter="save(local)"
   >
     <DialogCard v-bind="{title, message, html}">
-      <div>
+      <div class="q-mb-md">
         {{ desc }}
       </div>
-      <div
-        v-for="opt in steps"
-        :key="opt.id"
-        :class="[
-          'col clickable q-pa-sm rounded-borders text-h6',
-          stepId === opt.id && 'depth-24',
-        ]"
-        @click="stepId !== opt ? stepId = opt.id : stepId = null"
-        @dblclick="stepId = opt.id; next()"
-      >
-        {{ opt.title }}
-      </div>
+      <ListSelect
+        v-model="local"
+        :options="steps"
+        option-value="id"
+        option-label="title"
+        @confirm="v => save(v)"
+      />
       <template #actions>
         <q-btn
           flat
@@ -74,11 +65,11 @@ export default class AutomationJumpDialog extends DialogBase {
           @click="onDialogCancel"
         />
         <q-btn
-          :disable="!localOk"
+          :disable="!local"
           flat
           label="OK"
           color="primary"
-          @click="save"
+          @click="save(local)"
         />
       </template>
     </DialogCard>
