@@ -99,18 +99,13 @@ export default class QuickStartWizardPicker extends Vue {
       <div class="text-subtitle1">
         Please select a brewing process
       </div>
-      <div
-        v-for="opt in wizardOptions"
-        :key="opt.id"
-        :class="[
-          'col clickable q-pa-sm rounded-borders',
-          model === opt && 'depth-24',
-        ]"
-        @click="model !== opt ? model = opt : model = null"
-        @dblclick="model = opt; next()"
-      >
-        {{ opt.title }}
-      </div>
+      <ListSelect
+        v-model="model"
+        :options="wizardOptions"
+        option-value="id"
+        option-label="title"
+        @confirm="v => { model = v; next(); }"
+      />
     </div>
 
     <template #actions>

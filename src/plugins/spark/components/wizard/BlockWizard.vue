@@ -79,22 +79,17 @@ export default class BlockWizard extends Vue {
       .filter(opt => opt.label.toLowerCase().match(needle));
   }
 
-  selectOpt(opt: SelectOption, createNow = false): void {
+  selectOpt(opt: SelectOption | null): void {
     this.block = null;
     this.widget = null;
 
-    if (this.selected !== opt || createNow) {
-      this.selected = opt;
-      if (!this.blockId || this.blockId === this.lastGeneratedId) {
-        this.blockId = suggestId(opt.label, this.validator);
-        this.lastGeneratedId = this.blockId;
-      }
-      if (createNow) {
-        this.createBlock();
-      }
+    this.selected = opt;
+    if (opt === null) {
+      return;
     }
-    else {
-      this.selected = null;
+    else if (!this.blockId || this.blockId === this.lastGeneratedId) {
+      this.blockId = suggestId(opt.label, this.validator);
+      this.lastGeneratedId = this.blockId;
     }
   }
 
@@ -195,18 +190,14 @@ export default class BlockWizard extends Vue {
       </q-input>
 
       <template v-if="!initialFeature">
-        <div
-          v-for="opt in filteredOptions"
-          :key="opt.value"
-          :class="[
-            'col clickable q-pa-sm rounded-borders text-h6',
-            selected === opt && 'depth-24',
-          ]"
-          @click="selectOpt(opt)"
-          @dblclick="selectOpt(opt, true)"
-        >
-          {{ opt.label }}
-        </div>
+        <ListSelect
+          :value="selected"
+          :options="filteredOptions"
+          option-value="value"
+          option-label="label"
+          @input="selectOpt"
+          @confirm="v => { selectOpt(v); createBlock(); }"
+        />
       </template>
     </div>
 
