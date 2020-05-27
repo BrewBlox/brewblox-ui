@@ -3,8 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { ActuatorPwmBlock } from './types';
+import { ActuatorPwmBlock } from '@/plugins/spark/types';
 
 @Component
 export default class ActuatorPwmBasic

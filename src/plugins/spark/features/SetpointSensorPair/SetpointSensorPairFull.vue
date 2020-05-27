@@ -2,9 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block } from '@/plugins/spark/types';
-
-import { FilterChoice, SetpointSensorPairBlock } from './types';
+import { Block, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 @Component
 export default class SetpointSensorPairForm

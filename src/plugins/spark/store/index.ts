@@ -3,7 +3,8 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
-import type { Block, BlockAddress, BlockSpec, StoredDataPreset } from '../types';
+import { Block } from '../types';
+import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
 import { SparkServiceModule } from './spark-module';
@@ -47,12 +48,13 @@ export class SparkGlobalModule extends VuexModule {
     return findById(this.presets, id);
   }
 
-  public specById(id: string): BlockSpec {
-    return findById(this.specs, id)!;
+  public specById<T extends Block>(id: T['type']): BlockSpec<T> {
+    // We're assuming here that a spec is registered for every descendant interface of Block
+    return findById<any>(this.specs, id) as BlockSpec<T>;
   }
 
-  public spec({ type }: { type: string }): BlockSpec {
-    return this.specById(type);
+  public spec<T extends Block>({ type }: { type: T['type'] }): BlockSpec<T> {
+    return this.specById<T>(type);
   }
 
   @Action

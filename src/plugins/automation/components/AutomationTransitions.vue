@@ -49,10 +49,11 @@ export default class AutomationTransitions extends Vue {
 </script>
 
 <template>
-  <div class="q-gutter-y-md q-pr-md">
+  <div class="q-gutter-y-md q-px-md">
     <AutomationHeader
       title="Transitions"
       subtitle="Go to another step when all conditions are satisfied."
+      class="q-mt-none"
     >
       <template #actions>
         <ActionItem label="New transition" icon="add" @click="startAddTransition" />
@@ -69,9 +70,14 @@ export default class AutomationTransitions extends Vue {
       @remove:transition="removeTransition"
     />
     <div class="row justify-end q-pr-sm">
-      <q-btn fab-mini color="info" icon="add" @click="startAddTransition">
-        <q-tooltip>New transition</q-tooltip>
-      </q-btn>
+      <q-btn
+        flat
+        dense
+        color="secondary"
+        label="New Transition"
+        icon="add"
+        @click="startAddTransition"
+      />
     </div>
   </div>
 </template>

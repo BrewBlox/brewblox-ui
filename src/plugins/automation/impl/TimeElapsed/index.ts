@@ -15,7 +15,7 @@ const spec: AutomationSpec<TimeElapsedImpl> = {
   }),
   pretty: impl =>
     matchesType<TimeElapsedImpl>(type, impl)
-      ? `Wait until ${durationString(impl.duration)} has elapsed`
+      ? `Step must have been active for ${durationString(impl.duration)}`
       : `Invalid data: type=${impl.type}`,
 };
 

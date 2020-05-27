@@ -1,3 +1,7 @@
+import defaults from 'lodash/defaults';
+import isArray from 'lodash/isArray';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import range from 'lodash/range';
 import { VueConstructor } from 'vue';
@@ -13,26 +17,32 @@ import {
   shortDateString,
   truncate,
   truncateRound,
+  typeMatchFilter,
   unitDurationString,
 } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
-import { Link, Unit } from '@/helpers/units';
+import { GraphAxis, GraphConfig } from '@/plugins/history/types';
+import { objectUnit, serializedPropertyName } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
+import { Link, Unit } from '@/plugins/spark/units';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
-import { blockTypes, interfaceTypes, isCompatible } from './block-types';
-import { DisplaySettingsBlock } from './features/DisplaySettings/types';
-import {
+import { compatibleTypes } from './getters';
+import type {
   AnalogConstraint,
   AnyConstraintsObj,
   Block,
   BlockAddress,
   BlockConfig,
   BlockCrud,
+  BlockField,
+  BlockOrIntfType,
+  BlockType,
   DataBlock,
   DigitalConstraint,
   DisplayOpts,
+  DisplaySettingsBlock,
   DisplaySlot,
 } from './types';
 
@@ -69,7 +79,7 @@ const errorComponent = (error: string): ComponentResult => ({
   error,
 });
 
-export const blockWidgetSelector = (ctor: VueConstructor, typeName: string | null): WidgetFeature['component'] => {
+export const blockWidgetSelector = (ctor: VueConstructor, typeName: BlockType | null): WidgetFeature['component'] => {
   const component = ref(ctor);
   return (crud: Crud<BlockConfig> | BlockCrud): ComponentResult => {
     const { config } = crud.widget;
@@ -79,7 +89,9 @@ export const blockWidgetSelector = (ctor: VueConstructor, typeName: string | nul
     }
     // If crud is a BlockCrud, block is already set
     // Otherwise we'll have to check the store
-    const block = (crud as BlockCrud).block ?? module.blockById(config.blockId);
+    const block = ('block' in crud)
+      ? crud.block
+      : module.blockById(config.blockId);
     if (block === null) {
       return errorComponent(`Block '${config.blockId}' not found`);
     }
@@ -90,18 +102,26 @@ export const blockWidgetSelector = (ctor: VueConstructor, typeName: string | nul
   };
 };
 
+export const isCompatible = (type: string | null, intf: BlockOrIntfType | BlockOrIntfType[] | null): boolean => {
+  if (!intf) { return true; }
+  if (!type) { return false; }
+  if (type === intf) { return true; };
+  if (isArray(intf)) { return intf.some(i => isCompatible(type, i)); }
+  return Boolean(compatibleTypes[intf]?.includes(type));
+};
+
 export const canDisplay = (addr: BlockAddress): boolean =>
   isCompatible(addr?.type, [
-    interfaceTypes.TempSensor,
-    interfaceTypes.SetpointSensorPair,
-    interfaceTypes.ActuatorAnalog,
-    blockTypes.Pid,
+    'TempSensorInterface',
+    'SetpointSensorPairInterface',
+    'ActuatorAnalogInterface',
+    'Pid',
   ]);
 
 const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBlock | undefined =>
   serviceId
     ? sparkStore.serviceBlocks(serviceId)
-      .find(v => v.type === blockTypes.DisplaySettings)
+      .find(typeMatchFilter<DisplaySettingsBlock>('DisplaySettings'))
     : undefined;
 
 export const isDisplayed = (addr: BlockAddress): boolean =>
@@ -137,22 +157,22 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   else {
     const { id, type } = addr;
 
-    const link = new Link(id, type);
+    const link = new Link(id, type as BlockType);
     const slot: DisplaySlot = {
       pos: opts.pos,
       color: opts.color,
       name: opts.name.slice(0, 15),
     };
-    if (isCompatible(type, interfaceTypes.TempSensor)) {
+    if (isCompatible(type, 'TempSensorInterface')) {
       slot.tempSensor = link;
     }
-    else if (isCompatible(type, interfaceTypes.SetpointSensorPair)) {
+    else if (isCompatible(type, 'SetpointSensorPairInterface')) {
       slot.setpointSensorPair = link;
     }
-    else if (isCompatible(type, interfaceTypes.ActuatorAnalog)) {
+    else if (isCompatible(type, 'ActuatorAnalogInterface')) {
       slot.actuatorAnalog = link;
     }
-    else if (isCompatible(type, blockTypes.Pid)) {
+    else if (isCompatible(type, 'Pid')) {
       slot.pid = link;
     }
 
@@ -166,15 +186,10 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   }
 };
 
-const linkedTypes = [
-  blockTypes.DigitalActuator,
-  blockTypes.MotorValve,
-];
-
-const addressedTypes = [
-  blockTypes.TempSensorOneWire,
-  blockTypes.DS2408,
-  blockTypes.DS2413,
+const addressedTypes: BlockType[] = [
+  'TempSensorOneWire',
+  'DS2408',
+  'DS2413',
 ];
 
 export const saveHwInfo = (serviceId: string): void => {
@@ -183,17 +198,33 @@ export const saveHwInfo = (serviceId: string): void => {
 
   sparkStore.serviceBlocks(serviceId)
     .forEach(block => {
-      if (linkedTypes.includes(block.type)) {
+      if (block.type === 'MotorValve') {
+        const { hwDevice, startChannel } = block.data;
+        if (hwDevice.id === null || !startChannel) {
+          return;
+        }
+        const target = sparkStore.blockById(serviceId, hwDevice.id);
+        const pin = target?.data.pins[startChannel - 1];
+        if (target && pin !== undefined) {
+          const [name] = Object.keys(pin);
+          linked.push(`${block.id}: ${target.id} ${name}`);
+        }
+      }
+
+      if (block.type === 'DigitalActuator') {
         const { hwDevice, channel } = block.data;
-        if (!hwDevice.id || !channel) { return; }
-        const target = sparkStore.blockById(serviceId, block.data.hwDevice.id);
+        if (hwDevice.id === null || !channel) {
+          return;
+        }
+        const target = sparkStore.blockById(serviceId, hwDevice.id);
         const pin = target?.data.pins[channel - 1];
         if (target && pin !== undefined) {
           const [name] = Object.keys(pin);
           linked.push(`${block.id}: ${target.id} ${name}`);
         }
       }
-      if (addressedTypes.includes(block.type)) {
+
+      if ('address' in block.data) {
         addressed.push(`${block.id}: ${block.data.address}`);
       }
     });
@@ -265,15 +296,21 @@ export const startResetBlocks = (serviceId: string): void => {
     }));
 };
 
-
 export const asDataBlock =
-  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
+  (block: Block): DataBlock =>
+    pick(block, ['id', 'nid', 'type', 'groups', 'data']);
 
 export const asBlock =
-  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
+  (block: DataBlock, serviceId: string): Block =>
+    ({
+      ...block,
+      serviceId,
+      type: block.type as BlockType,
+    });
 
 export const asBlockAddress =
-  (block: Block): BlockAddress => pick(block, ['id', 'serviceId', 'type']);
+  (block: Block): BlockAddress =>
+    pick(block, ['id', 'serviceId', 'type']);
 
 export const prettifyConstraints =
   (obj: AnyConstraintsObj | undefined): string =>
@@ -313,3 +350,56 @@ export const prettifyConstraints =
         })
         .sort()
         .join(', ');
+
+
+export const blockGraphCfg = <BlockT extends Block = any>(
+  crud: BlockCrud<BlockT>,
+  fieldFilter: ((f: BlockField) => boolean) = (() => true)
+): GraphConfig => {
+  const { queryParams, graphAxes, graphLayout } = defaults(crud.widget.config, {
+    queryParams: { duration: '1h' },
+    graphAxes: {},
+    graphLayout: {},
+  });
+
+  const graphedFields: BlockField[] = sparkStore
+    .spec(crud.block)
+    .fields
+    .filter(f => f.graphed)
+    .filter(f => fieldFilter(f));
+
+  const graphedObj: Mapped<BlockField> = keyBy(
+    graphedFields,
+    f => {
+      const key = serializedPropertyName(f.key, crud.block.data);
+      return `${crud.block.serviceId}/${crud.block.id}/${key}`;
+    });
+
+  const fieldAxes: Mapped<GraphAxis> = mapValues(
+    graphedObj,
+    f => f.graphAxis ?? 'y');
+
+  const renames: Mapped<string> = mapValues(
+    graphedObj,
+    f => {
+      const name = f.graphName ?? f.title;
+      const unit = objectUnit(crud.block.data[f.key]);
+      return unit ? `${name} [${unit}]` : name;
+    });
+
+  const targets = [{
+    measurement: crud.block.serviceId,
+    fields: graphedFields
+      .map(f => serializedPropertyName(f.key, crud.block.data))
+      .map(k => `${crud.block.id}/${k}`),
+  }];
+
+  return {
+    params: queryParams,
+    axes: defaults(graphAxes, fieldAxes),
+    layout: defaults({ title: crud.widget.title }, graphLayout),
+    targets,
+    renames,
+    colors: {},
+  };
+};

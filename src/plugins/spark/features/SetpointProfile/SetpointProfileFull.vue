@@ -4,12 +4,12 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, objectSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { Temp, Unit } from '@/helpers/units';
-import { deepCopy } from '@/helpers/units/parseObject';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { deepCopy } from '@/plugins/spark/parse-object';
+import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
+import { Temp, Unit } from '@/plugins/spark/units';
 
 import { profileGraphProps } from './helpers';
-import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
   offsetMs: number;

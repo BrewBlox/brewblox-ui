@@ -2,10 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
 
 import ActuatorAnalogMockBasic from './ActuatorAnalogMockBasic.vue';
 import ActuatorAnalogMockFull from './ActuatorAnalogMockFull.vue';
-import { ActuatorAnalogMockBlock } from './types';
 
 @Component({
   components: {

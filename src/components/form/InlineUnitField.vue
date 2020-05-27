@@ -3,7 +3,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
-import { prettify, Unit } from '@/helpers/units';
+import { prettify, Unit } from '@/plugins/spark/units';
 
 @Component
 export default class InlineUnitField extends FieldBase {

@@ -1,15 +1,15 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { ActuatorLogicBlock, BlockSpec, EvalResult } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorLogicWidget.vue';
-import { typeName } from './getters';
-import { ActuatorLogicData, EvalResult } from './types';
 
-const block: BlockSpec<ActuatorLogicData> = {
+const typeName = 'ActuatorLogic';
+
+const block: BlockSpec<ActuatorLogicBlock> = {
   id: typeName,
   generate: () => ({
     enabled: true,
@@ -21,11 +21,16 @@ const block: BlockSpec<ActuatorLogicData> = {
     digital: [],
     expression: '',
   }),
-  presets: [],
-  changes: [],
-  graphTargets: {
-    result: 'Result',
-  },
+  fields: [
+    {
+      key: 'result',
+      title: 'Result',
+      component: 'NumberValEdit',
+      generate: () => EvalResult.TRUE,
+      readonly: true,
+      graphed: true,
+    },
+  ],
 };
 
 const feature: WidgetFeature = {

@@ -1,8 +1,8 @@
-import { Temp } from '@/helpers/units';
-import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
+import { ActuatorLogicBlock, AnalogCompare, DigitalCompare, ExpressionError } from '@/plugins/spark/types';
+import { Temp } from '@/plugins/spark/units';
 
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './getters';
-import { ActuatorLogicData, AnalogCompare, DigitalCompare, ExpressionError } from './types';
 
 export const keyCode = (s: string): number =>
   s.charCodeAt(0);
@@ -122,7 +122,7 @@ export function syntaxCheck(expression: string): ExpressionError | null {
   return null;
 }
 
-type ComparisonData = Pick<ActuatorLogicData, 'expression' | 'digital' | 'analog'>;
+type ComparisonData = Pick<ActuatorLogicBlock['data'], 'expression' | 'digital' | 'analog'>;
 
 export function comparisonCheck(data: ComparisonData): ExpressionError | null {
   const numDigital = data.digital.length;
@@ -172,7 +172,7 @@ export function prettyDigital(cmp: DigitalCompare): string {
 }
 
 export function prettyAnalog(cmp: AnalogCompare, blockType: string | null, tempUnit: string): string {
-  const rhs = isCompatible(blockType, interfaceTypes.SetpointSensorPair)
+  const rhs = isCompatible(blockType, 'SetpointSensorPairInterface')
     ? new Temp(cmp.rhs).convert(tempUnit).toString()
     : `${cmp.rhs}%`;
 

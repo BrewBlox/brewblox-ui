@@ -3,6 +3,13 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import {
+  ActuatorLogicBlock,
+  AnalogCompare,
+  DigitalCompare,
+  EvalResult,
+  ExpressionError,
+} from '@/plugins/spark/types';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
@@ -16,14 +23,9 @@ import {
   isKey,
   prettyAnalog,
   prettyDigital,
-  syntaxCheck} from './helpers';
-import {
-  ActuatorLogicBlock,
-  AnalogCompare,
-  DigitalCompare,
-  EvalResult,
-  ExpressionError,
-} from './types';
+  syntaxCheck,
+} from './helpers';
+
 
 @Component({
   components: {

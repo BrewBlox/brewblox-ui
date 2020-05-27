@@ -40,7 +40,7 @@ interface HasId {
 }
 
 interface HasType {
-  type: string;
+  type: keyof any & string;
 }
 
 interface QuasarNode {

@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { durationMs, durationString, ruleValidator, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class TimeUnitDialog extends DialogBase {

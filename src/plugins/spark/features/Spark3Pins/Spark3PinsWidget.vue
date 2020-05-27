@@ -2,8 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-
-import { Spark3PinsBlock } from './types';
+import { Spark3PinsBlock } from '@/plugins/spark/types';
 
 @Component
 export default class Spark3PinsWidget

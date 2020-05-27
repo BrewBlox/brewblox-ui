@@ -1,22 +1,22 @@
 import { uid } from 'quasar';
 
-import { Link, Time, Unit } from '@/helpers/units';
-import { serialize } from '@/helpers/units/parseObject';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
+import { serialize } from '@/plugins/spark/parse-object';
+import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
-  blockTypes,
+  Block,
   DigitalActuatorBlock,
   FilterChoice,
   OffsetSettingOrValue,
   PidBlock,
   SetpointSensorPairBlock,
-} from '@/plugins/spark/block-types';
-import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block, DigitalState } from '@/plugins/spark/types';
+} from '@/plugins/spark/types';
+import { DigitalState } from '@/plugins/spark/types';
+import { Link, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -35,154 +35,155 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
   const groups = [0];
   const { serviceId, names } = config;
 
-  return [
-    // setpoints
-    {
-      id: names.kettleSetpoint,
-      type: blockTypes.SetpointSensorPair,
-      serviceId,
-      groups,
-      data: {
-        sensorId: new Link(names.kettleSensor),
-        storedSetting: new Unit(67.7, 'degC'),
-        settingEnabled: false,
-        setting: new Unit(null, 'degC'),
-        value: new Unit(null, 'degC'),
-        valueUnfiltered: new Unit(null, 'degC'),
-        filter: FilterChoice.Filter15s,
-        filterThreshold: new Unit(5, 'delta_degC'),
-        resetFilter: false,
-      },
-    },
-    {
-      id: names.tubeSetpoint,
-      type: blockTypes.SetpointSensorPair,
-      serviceId,
-      groups,
-      data: {
-        sensorId: new Link(names.tubeSensor),
-        storedSetting: new Unit(67.7, 'degC'),
-        settingEnabled: true,
-        setting: new Unit(null, 'degC'),
-        value: new Unit(null, 'degC'),
-        valueUnfiltered: new Unit(null, 'degC'),
-        filter: FilterChoice.Filter15s,
-        filterThreshold: new Unit(5, 'delta_degC'),
-        resetFilter: false,
-      },
-    },
-    // Setpoint Driver
-    {
-      id: names.tubeDriver,
-      type: blockTypes.SetpointDriver,
-      serviceId,
-      groups,
-      data: {
-        targetId: new Link(names.tubeSetpoint),
-        drivenTargetId: new Link(names.tubeSetpoint),
-        referenceId: new Link(names.kettleSetpoint),
-        referenceSettingOrValue: OffsetSettingOrValue.Setting,
-        enabled: true,
-        desiredSetting: 0,
-        setting: 0,
-        value: 0,
-        constrainedBy: {
-          constraints: [
-            {
-              max: 10,
-              limiting: false,
-            },
-          ],
+  const blocks: [
+    SetpointSensorPairBlock,
+    SetpointSensorPairBlock,
+    ActuatorOffsetBlock,
+    DigitalActuatorBlock,
+    DigitalActuatorBlock,
+    ActuatorPwmBlock,
+    PidBlock,
+    PidBlock,
+  ] = [
+      // setpoints
+      {
+        id: names.kettleSetpoint,
+        type: 'SetpointSensorPair',
+        serviceId,
+        groups,
+        data: {
+          sensorId: new Link(names.kettleSensor),
+          storedSetting: new Unit(67.7, 'degC'),
+          settingEnabled: false,
+          setting: new Unit(null, 'degC'),
+          value: new Unit(null, 'degC'),
+          valueUnfiltered: new Unit(null, 'degC'),
+          filter: FilterChoice.Filter15s,
+          filterThreshold: new Unit(5, 'delta_degC'),
+          resetFilter: false,
         },
       },
-    },
-    // Digital Actuators
-    {
-      id: names.tubeAct,
-      type: blockTypes.DigitalActuator,
-      serviceId,
-      groups,
-      data: {
-        hwDevice: new Link(config.tubePin.arrayId),
-        channel: config.tubePin.pinId,
-        invert: false,
-        desiredState: DigitalState.Inactive,
-        state: DigitalState.Inactive,
-        constrainedBy: { constraints: [] },
+      {
+        id: names.tubeSetpoint,
+        type: 'SetpointSensorPair',
+        serviceId,
+        groups,
+        data: {
+          sensorId: new Link(names.tubeSensor),
+          storedSetting: new Unit(67.7, 'degC'),
+          settingEnabled: true,
+          setting: new Unit(null, 'degC'),
+          value: new Unit(null, 'degC'),
+          valueUnfiltered: new Unit(null, 'degC'),
+          filter: FilterChoice.Filter15s,
+          filterThreshold: new Unit(5, 'delta_degC'),
+          resetFilter: false,
+        },
       },
-    },
-    {
-      id: names.pumpAct,
-      type: blockTypes.DigitalActuator,
-      serviceId,
-      groups,
-      data: {
-        hwDevice: new Link(config.pumpPin.arrayId),
-        channel: config.pumpPin.pinId,
-        invert: false,
-        desiredState: DigitalState.Inactive,
-        state: DigitalState.Inactive,
-        constrainedBy: { constraints: [] },
+      // Setpoint Driver
+      {
+        id: names.tubeDriver,
+        type: 'ActuatorOffset',
+        serviceId,
+        groups,
+        data: {
+          targetId: new Link(names.tubeSetpoint),
+          drivenTargetId: new Link(names.tubeSetpoint),
+          referenceId: new Link(names.kettleSetpoint),
+          referenceSettingOrValue: OffsetSettingOrValue.Setting,
+          enabled: true,
+          desiredSetting: 0,
+          setting: 0,
+          value: 0,
+          constrainedBy: {
+            constraints: [
+              {
+                max: 10,
+                limiting: false,
+              },
+            ],
+          },
+        },
       },
-    },
-    // PWM
-    {
-      id: names.tubePwm,
-      type: blockTypes.ActuatorPwm,
-      serviceId,
-      groups,
-      data: {
-        enabled: true,
-        period: new Time(10, 's'),
-        actuatorId: new Link(names.tubeAct),
-        drivenActuatorId: new Link(null),
-        setting: 0,
-        desiredSetting: 0,
-        value: 0,
-        constrainedBy: { constraints: [] },
+      // Digital Actuators
+      {
+        id: names.tubeAct,
+        type: 'DigitalActuator',
+        serviceId,
+        groups,
+        data: {
+          hwDevice: new Link(config.tubePin.arrayId),
+          channel: config.tubePin.pinId,
+          invert: false,
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
+          constrainedBy: { constraints: [] },
+        },
       },
-    },
-    // PID
-    {
-      id: names.kettlePid,
-      type: blockTypes.Pid,
-      serviceId,
-      groups,
-      data: {
-        ...pidDefaults(),
-        kp: new Unit(10, '1/degC'),
-        ti: new Time(5, 'min'),
-        td: new Time(30, 's'),
-        enabled: true,
-        inputId: new Link(names.kettleSetpoint),
-        outputId: new Link(names.tubeDriver),
+      {
+        id: names.pumpAct,
+        type: 'DigitalActuator',
+        serviceId,
+        groups,
+        data: {
+          hwDevice: new Link(config.pumpPin.arrayId),
+          channel: config.pumpPin.pinId,
+          invert: false,
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
+          constrainedBy: { constraints: [] },
+        },
       },
-    },
-    {
-      id: names.tubePid,
-      type: blockTypes.Pid,
-      serviceId,
-      groups,
-      data: {
-        ...pidDefaults(),
-        kp: new Unit(30, '1/degC'),
-        ti: new Time(2, 'min'),
-        td: new Time(10, 's'),
-        enabled: true,
-        inputId: new Link(names.tubeSetpoint),
-        outputId: new Link(names.tubePwm),
+      // PWM
+      {
+        id: names.tubePwm,
+        type: 'ActuatorPwm',
+        serviceId,
+        groups,
+        data: {
+          enabled: true,
+          period: new Time(10, 's'),
+          actuatorId: new Link(names.tubeAct),
+          drivenActuatorId: new Link(null),
+          setting: 0,
+          desiredSetting: 0,
+          value: 0,
+          constrainedBy: { constraints: [] },
+        },
       },
-    },
-  ] as [
-      SetpointSensorPairBlock,
-      SetpointSensorPairBlock,
-      ActuatorOffsetBlock,
-      DigitalActuatorBlock,
-      DigitalActuatorBlock,
-      ActuatorPwmBlock,
-      PidBlock,
-      PidBlock,
+      // PID
+      {
+        id: names.kettlePid,
+        type: 'Pid',
+        serviceId,
+        groups,
+        data: {
+          ...pidDefaults(),
+          kp: new Unit(10, '1/degC'),
+          ti: new Time(5, 'min'),
+          td: new Time(30, 's'),
+          enabled: true,
+          inputId: new Link(names.kettleSetpoint),
+          outputId: new Link(names.tubeDriver),
+        },
+      },
+      {
+        id: names.tubePid,
+        type: 'Pid',
+        serviceId,
+        groups,
+        data: {
+          ...pidDefaults(),
+          kp: new Unit(30, '1/degC'),
+          ti: new Time(2, 'min'),
+          td: new Time(10, 's'),
+          enabled: true,
+          inputId: new Link(names.tubeSetpoint),
+          outputId: new Link(names.tubePwm),
+        },
+      },
     ];
+  return blocks;
 }
 
 export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Widget[] {

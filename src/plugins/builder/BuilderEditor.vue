@@ -6,7 +6,7 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { Coordinates } from '@/helpers/coordinates';
 import { createDialog } from '@/helpers/dialog';
 import { clampRotation } from '@/helpers/functional';
-import { deepCopy, deserialize, serialize } from '@/helpers/units/parseObject';
+import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -219,7 +219,7 @@ export default class BuilderEditor extends Vue {
           settings: {},
           flipped: false,
           ...part,
-          type: deprecatedTypes[part.type] || part.type,
+          type: deprecatedTypes[part.type] ?? part.type,
         };
         const [sizeX, sizeY] = builderStore.spec(actual).size(actual);
         sizes[part.id] = sizeX * sizeY;
@@ -260,10 +260,8 @@ export default class BuilderEditor extends Vue {
       ?? builderStore.layoutIds[0]
       ?? null;
 
-    if (this.layoutId != this.$route.params.id) {
-      this.$router.replace(`/builder/${id ?? ''}`);
-    }
-
+    const route = this.layoutId ? `/builder/${this.layoutId}` : '/builder';
+    this.$router.replace(route).catch(() => { });
     builderStore.lastLayoutId = this.layoutId;
   }
 
@@ -726,8 +724,9 @@ export default class BuilderEditor extends Vue {
     }
     args.evt.stopPropagation();
   }
+
 }
-</script>
+</script>LayoutAc
 
 <template>
   <q-layout

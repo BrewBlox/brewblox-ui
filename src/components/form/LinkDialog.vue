@@ -5,10 +5,10 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
-import { isCompatible } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, BlockOrIntfType } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { featureStore } from '@/store/features';
 
 @Component
@@ -25,7 +25,7 @@ export default class LinkDialog extends DialogBase {
   public readonly label!: string;
 
   @Prop({ type: Array, required: false })
-  readonly compatible!: string[];
+  readonly compatible!: BlockOrIntfType[];
 
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
@@ -40,7 +40,7 @@ export default class LinkDialog extends DialogBase {
     this.local = this.value.copy();
   }
 
-  get typeFilter(): ((type: string) => boolean) {
+  get typeFilter(): ((type: BlockOrIntfType) => boolean) {
     return type => isCompatible(type, this.compatible ?? this.value.type);
   }
 

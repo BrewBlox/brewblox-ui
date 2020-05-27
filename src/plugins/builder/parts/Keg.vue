@@ -6,6 +6,12 @@ import { colorString } from '../helpers';
 
 @Component
 export default class Keg extends PartBase {
+  readonly scaleKey = 'scale';
+
+  get scale(): number {
+    return this.settings[this.scaleKey] ?? 1;
+  }
+
   get color(): string {
     return colorString(this.part.settings.color);
   }
@@ -13,7 +19,7 @@ export default class Keg extends PartBase {
 </script>
 
 <template>
-  <g>
+  <g :transform="`scale(${scale} ${scale})`">
     <rect :fill="color" x="10" y="60" width="80" height="178" />
     <g class="outline">
       <rect x="10" y="237" width="80" height="11" />

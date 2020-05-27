@@ -1,21 +1,20 @@
-import { Unit } from '@/helpers/units';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, MutexBlock } from '@/plugins/spark/types';
+import { Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './MutexWidget.vue';
-import { MutexData } from './types';
 
-const block: BlockSpec<MutexData> = {
+const typeName = 'Mutex';
+
+const block: BlockSpec<MutexBlock> = {
   id: typeName,
   generate: () => ({
     differentActuatorWait: new Unit(0, 'second'),
     waitRemaining: new Unit(0, 'second'),
   }),
-  changes: [],
-  presets: [],
+  fields: [],
 };
 
 const feature: WidgetFeature = {

@@ -2,8 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { DS2408Block, DS2408Id, ValveStartId } from './types';
+import { DS2408Block, DS2408Id, ValveStartId } from '@/plugins/spark/types';
 
 @Component
 export default class DS2408Basic

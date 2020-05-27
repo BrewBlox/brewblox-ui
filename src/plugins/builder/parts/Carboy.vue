@@ -59,6 +59,7 @@ export default class Carboy extends PartBase {
       <SetpointValues
         :part="part"
         :start-y="valueY"
+        :start-x="sizeX / 2 - 1"
         :background-color="color"
         hide-unset
       />

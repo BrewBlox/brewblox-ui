@@ -6,7 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { loadFile, saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/plugins/spark/parse-object';
 import { dashboardStore, Widget } from '@/store/dashboards';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '../getters';
@@ -52,7 +52,6 @@ export default class LayoutActions extends Vue {
         this.selectLayout(id);
       });
   }
-
 
   async importLayout(): Promise<void> {
     loadFile<BuilderLayout>(async layout => {
@@ -156,13 +155,12 @@ export default class LayoutActions extends Vue {
         notify.done(`Created ${layout.title} widget on ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
-
 }
 </script>
 
 
 <template>
-  <ActionMenu v-bind="$attrs">
+  <ActionMenu v-bind="{...$attrs}">
     <template #actions>
       <ActionItem icon="add" label="New Layout" @click="startAddLayout(false)" />
       <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
@@ -175,5 +173,9 @@ export default class LayoutActions extends Vue {
         <ActionItem icon="delete" label="Remove Layout" @click="removeLayout" />
       </template>
     </template>
+    <template #menus>
+      <slot name="menus" />
+    </template>
+    <slot />
   </ActionMenu>
 </template>

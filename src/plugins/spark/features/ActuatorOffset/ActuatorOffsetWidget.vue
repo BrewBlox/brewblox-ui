@@ -2,8 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-
-import { ActuatorOffsetBlock } from './types';
+import { ActuatorOffsetBlock } from '@/plugins/spark/types';
 
 @Component
 export default class ActuatorOffsetWidget

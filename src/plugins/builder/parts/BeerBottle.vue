@@ -6,6 +6,7 @@ import { colorString } from '../helpers';
 
 @Component
 export default class BeerBottle extends PartBase {
+  readonly scaleKey = 'scale';
   readonly paths = {
     edge: `
           M24,34
@@ -38,14 +39,20 @@ export default class BeerBottle extends PartBase {
   get color(): string {
     return colorString(this.part.settings.color);
   }
+
+  get scale(): number {
+    return this.settings[this.scaleKey] ?? 1;
+  }
 }
 </script>
 
 <template>
-  <g transform="translate(5, 24)">
-    <path :d="paths.liquid" :fill="color" :stroke="color" />
-    <g class="outline">
-      <path :d="paths.edge" />
+  <g :transform="`scale(${scale} ${scale})`">
+    <g transform="translate(5, 24)">
+      <path :d="paths.liquid" :fill="color" :stroke="color" />
+      <g class="outline">
+        <path :d="paths.edge" />
+      </g>
     </g>
   </g>
 </template>

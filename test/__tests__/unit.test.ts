@@ -1,4 +1,4 @@
-import { Temp } from '@/helpers/units';
+import { Temp } from '@/plugins/spark/units';
 
 
 describe('Check equality', () => {

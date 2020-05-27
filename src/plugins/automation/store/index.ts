@@ -3,8 +3,13 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
-import { AutomationStepJump } from '../shared-types';
-import { AutomationEventData, AutomationProcess, AutomationTask, AutomationTemplate } from '../types';
+import {
+  AutomationEventData,
+  AutomationProcess,
+  AutomationStepJump,
+  AutomationTask,
+  AutomationTemplate,
+} from '../types';
 import * as processApi from './process-api';
 import * as taskApi from './task-api';
 import templateApi from './template-api';

@@ -5,15 +5,13 @@ import { Component, Prop, Ref } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { durationMs, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { ActuatorOffsetBlock, Block, SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { ActuatorOffsetBlock, Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { Unit } from '@/plugins/spark/units';
 import { featureStore } from '@/store/features';
-
-import { PidBlock } from './types';
 
 interface BlockDisplay {
   role: string;

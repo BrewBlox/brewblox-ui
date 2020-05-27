@@ -1,15 +1,11 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { spaceCased } from '@/helpers/functional';
+import { spaceCased, typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block } from '@/plugins/spark/types';
-
-import { ValveStartId } from '../DS2408/types';
-import { typeName } from './getters';
-import { MotorValveBlock, ValveState } from './types';
+import { Block, MotorValveBlock, ValveStartId, ValveState } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 @Component
 export default class MotorValveFull
@@ -26,7 +22,8 @@ export default class MotorValveFull
     const targetId = this.hwBlock.id;
     return this.sparkModule
       .blocks
-      .filter(block => block.type === typeName && block.data.hwDevice.id === targetId)
+      .filter(typeMatchFilter<MotorValveBlock>('MotorValve'))
+      .filter(block => block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block.id), {});
   }
 
@@ -55,7 +52,7 @@ export default class MotorValveFull
     if (this.block.data.startChannel === pinId) {
       return;
     }
-    const currentDriver = new Link(this.claimedChannels[pinId] || null, typeName);
+    const currentDriver = new Link(this.claimedChannels[pinId] || null, 'MotorValve');
     if (currentDriver.id) {
       const currentDriverBlock = this.sparkModule.blockById<MotorValveBlock>(currentDriver.id)!;
       currentDriverBlock.data.startChannel = 0;

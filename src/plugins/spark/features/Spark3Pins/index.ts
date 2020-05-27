@@ -1,13 +1,12 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, Spark3PinsBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './Spark3PinsWidget.vue';
-import { Spark3PinsData } from './types';
+const typeName = 'Spark3Pins';
 
-const block: BlockSpec<Spark3PinsData> = {
+const block: BlockSpec<Spark3PinsBlock> = {
   id: typeName,
   systemObject: true,
   generate: () => ({
@@ -18,15 +17,26 @@ const block: BlockSpec<Spark3PinsData> = {
     voltage5: 0,
     voltage12: 0,
   }),
-  changes: [
+  fields: [
     {
       key: 'soundAlarm',
       title: 'Alarm sound',
       component: 'BoolValEdit',
       generate: () => false,
     },
+    {
+      key: 'enableIoSupply5V',
+      title: 'Enable 5V power supply',
+      component: 'BoolValEdit',
+      generate: () => true,
+    },
+    {
+      key: 'enableIoSupply12V',
+      title: 'Enable 12V power supply',
+      component: 'BoolValEdit',
+      generate: () => true,
+    },
   ],
-  presets: [],
 };
 
 const feature: WidgetFeature = {

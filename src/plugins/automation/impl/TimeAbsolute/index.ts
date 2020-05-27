@@ -14,7 +14,7 @@ const spec: AutomationSpec<TimeAbsoluteImpl> = {
   }),
   pretty: impl =>
     matchesType<TimeAbsoluteImpl>(type, impl)
-      ? `Wait until ${shortDateString(impl.time)}`
+      ? `Current date/time must be past ${shortDateString(impl.time)}`
       : `Invalid data: type=${impl.type}`,
 };
 

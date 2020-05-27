@@ -1,13 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { blockTypes } from '@/plugins/spark/block-types';
-import { PidBlock } from '@/plugins/spark/features/Pid/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress } from '@/plugins/spark/types';
+import type { Block, PidBlock } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
-import { COLD_WATER, HOT_WATER } from '../getters';
+import { CENTER, COLD_WATER, HOT_WATER } from '../getters';
 import { settingsAddress } from '../helpers';
 
 
@@ -15,10 +14,15 @@ import { settingsAddress } from '../helpers';
 export default class PidDisplay extends PartBase {
   HOT_WATER = HOT_WATER;
   COLD_WATER = COLD_WATER;
-  settingsKey = 'pid';
+  readonly addressKey = 'pid';
+  readonly scaleKey = 'scale';
+
+  get scale(): number {
+    return this.settings[this.scaleKey] ?? 1;
+  }
 
   get address(): BlockAddress {
-    return settingsAddress(this.part, this.settingsKey);
+    return settingsAddress(this.part, this.addressKey);
   }
 
   get block(): PidBlock | null {
@@ -57,7 +61,7 @@ export default class PidDisplay extends PartBase {
 
   get drivingOffset(): boolean {
     return this.target !== null
-      && this.target.type === blockTypes.SetpointDriver;
+      && this.target.type === 'ActuatorOffset';
   }
 
   get suffix(): string {
@@ -67,11 +71,15 @@ export default class PidDisplay extends PartBase {
         ? '°C'
         : '%';
   }
+
+  get color(): string {
+    return this.liquidOnCoord(CENTER)[0] ?? '';
+  }
 }
 </script>
 
 <template>
-  <g>
+  <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
       :transform="textTransformation([1,1])"
       :width="squares(1)"
@@ -99,6 +107,7 @@ export default class PidDisplay extends PartBase {
       <rect
         :width="squares(1)-2"
         :height="squares(1)-2"
+        :stroke="color"
         x="1"
         y="1"
         rx="6"

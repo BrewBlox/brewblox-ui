@@ -1,9 +1,10 @@
 import { capitalized } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
+import { Link } from '@/plugins/spark/units';
 import { ServiceStatus } from '@/store/services';
 
 import { constraintLabels } from '../getters';
-import { AnalogConstraint, Block, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
+import { Block } from '../types';
+import { AnalogConstraint, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   const output: string[][] = [];
@@ -83,11 +84,15 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
   const limited: Limiters = {};
 
   for (const block of blocks) {
-    if (!block.data.constrainedBy?.constraints.length) {
+    if (!('constrainedBy' in block.data)) {
       continue;
     }
-    const constraints = block.data.constrainedBy.constraints;
-    const isDigital = constraints[0].remaining !== undefined;
+    const { constraints } = block.data.constrainedBy;
+    if (!constraints || constraints.length === 0) {
+      continue;
+    }
+
+    const isDigital = 'remaining' in constraints[0];
 
     if (isDigital) {
       limited[block.id] = (constraints as DigitalConstraint[])

@@ -269,10 +269,6 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
         </q-btn>
       </div>
     </div>
-
-    <div v-else class="widget-body row justify-center">
-      <q-btn outline label="New session" @click="addSession" />
-    </div>
   </div>
 </template>
 

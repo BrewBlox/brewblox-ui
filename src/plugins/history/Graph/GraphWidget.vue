@@ -1,4 +1,8 @@
 <script lang="ts">
+import cloneDeep from 'lodash/cloneDeep';
+import isArray from 'lodash/isArray';
+import mergeWith from 'lodash/mergeWith';
+import uniq from 'lodash/uniq';
 import { Layout } from 'plotly.js';
 import { uid } from 'quasar';
 import { Component, Ref, Watch } from 'vue-property-decorator';
@@ -6,11 +10,10 @@ import { Component, Ref, Watch } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, isJsonEqual, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
-import { deepCopy } from '@/helpers/units/parseObject';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
-import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { GraphConfig, QueryParams, QueryTarget } from '@/plugins/history/types';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {
@@ -36,7 +39,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   }
 
   created(): void {
-    this.usedCfg = deepCopy(this.config);
+    this.usedCfg = cloneDeep(this.config);
     this.widgetGraphId = uid();
     this.wrapperGraphId = uid();
   }
@@ -87,7 +90,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
 
   async regraph(): Promise<void> {
     await this.$nextTick();
-    this.usedCfg = deepCopy(this.config);
+    this.usedCfg = cloneDeep(this.config);
     this.widgetGraph?.resetSources();
     this.wrapperGraph?.resetSources();
   }
@@ -108,12 +111,39 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     const currentId = this.currentGraphId();
     createDialog({
       component: 'GraphDialog',
-      parent: this,
       graphId: currentId || uid(),
       config: { ...this.config, layout: { ...this.config.layout, title: this.widget.title } },
       sharedSources: currentId !== null,
       saveParams: v => this.saveParams(v),
     });
+  }
+
+  mergeTargets(a: QueryTarget[], b: QueryTarget[]): QueryTarget[] {
+    return uniq([...a, ...b].map(v => v.measurement))
+      .map(m => {
+        const fields = [...a, ...b]
+          .filter(target => target.measurement === m)
+          .flatMap(target => target.fields);
+        return {
+          measurement: m,
+          fields: uniq(fields),
+        };
+      });
+  }
+
+  startAddBlockGraph(): void {
+    createDialog({
+      component: 'SelectBlockGraphDialog',
+      config: this.config,
+    })
+      .onOk((cfg: GraphConfig) => {
+        const merged = mergeWith(this.config, cfg, (a, b) => {
+          return (isArray(b) && b.length && 'measurement' in b[0])
+            ? this.mergeTargets(a, b)
+            : undefined;
+        });
+        this.saveConfig(merged);
+      });
   }
 }
 </script>
@@ -142,6 +172,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
+          <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
         </template>
@@ -156,21 +187,30 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
               <q-btn
                 v-for="(preset, idx) in presets"
                 :key="idx"
+                flat
+                no-caps
                 :label="preset.duration"
                 :color="isActivePreset(preset) ? 'primary' : 'white'"
                 class="col-6"
-                no-caps
-                flat
                 @click="saveParams(preset)"
               />
-              <q-btn label="Custom" class="col-6" flat no-caps @click="chooseDuration" />
+              <q-btn
+                flat
+                no-caps
+                label="Custom"
+                class="col-6"
+                @click="chooseDuration"
+              />
             </div>
           </ActionSubmenu>
         </template>
       </component>
     </template>
 
-    <div v-if="mode === 'Basic'" class="fit">
+    <div
+      v-if="mode === 'Basic'"
+      class="fit"
+    >
       <q-resize-observer :debounce="200" @resize="refresh" />
       <HistoryGraph
         ref="widgetGraph"
@@ -180,7 +220,11 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       />
     </div>
     <div v-else class="widget-md">
-      <GraphEditor :config="config" :downsampling="downsampling" @update:config="saveConfig" />
+      <GraphEditor
+        :config="config"
+        :downsampling="downsampling"
+        @update:config="saveConfig"
+      />
     </div>
   </GraphCardWrapper>
 </template>

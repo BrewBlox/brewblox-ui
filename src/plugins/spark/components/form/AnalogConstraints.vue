@@ -3,10 +3,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Link } from '@/helpers/units';
-import { blockTypes } from '@/plugins/spark/block-types';
 import { analogConstraintLabels } from '@/plugins/spark/getters';
 import type { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 interface Wrapped {
   type: AnalogConstraintKey;
@@ -52,7 +51,7 @@ export default class AnalogConstraints extends Vue {
       balanced: {
         limiting: false,
         balanced: {
-          balancerId: new Link(null, blockTypes.Balancer),
+          balancerId: new Link(null, 'Balancer'),
           granted: 0,
           id: 0,
         },

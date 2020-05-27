@@ -24,7 +24,6 @@ import PidDisplay from './PidDisplay';
 import ProfileDisplay from './ProfileDisplay';
 import Pump from './Pump';
 import PwmDisplay from './PwmDisplay';
-import PwmPump from './PwmPump';
 import RimsTube from './RimsTube';
 import SensorDisplay from './SensorDisplay';
 import SessionLogDisplay from './SessionLogDisplay';
@@ -63,7 +62,6 @@ const specs: { [key: string]: PartSpec } = {
   ProfileDisplay,
   Pump,
   PwmDisplay,
-  PwmPump,
   RimsTube,
   SensorDisplay,
   SessionLogDisplay,

@@ -178,6 +178,10 @@ label
   &-highlight
     background-color: $hover
 
+@for $d from 1 through 9
+  .fade-#{$d}
+    opacity: 1-$d/10
+
 // automatically apply shadows to depth class
 @for $d from 0 to 24
   .depth-#{$d}

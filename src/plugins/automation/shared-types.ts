@@ -1,6 +1,7 @@
 /**
  * The types in this file are relevant to both the automation service and the UI.
  */
+import { Method } from 'axios';
 
 /**
  * Generic status type for Automation types.
@@ -114,27 +115,66 @@ export interface BlockPatchImpl {
 }
 
 /**
- * Create a new Task.
+ * Edit or create a Task.
  * Status can be checked later with the TaskStatusImpl condition.
  */
-export interface TaskCreateImpl {
-  type: 'TaskCreate';
+export interface TaskEditImpl {
+  type: 'TaskEdit';
 
   /**
    * User-defined reference key.
    * Not guaranteed to be unique.
+   * All tasks with this ref are edited.
    */
   ref: string;
 
   /**
-   * Human readable title for the created task.
+   * Human readable title.
+   * Default or existing value is used if not set.
+   * @nullable
    */
-  title: string;
+  title: string | null;
 
   /**
-   * Message for the created task.
+   * Human readable message.
+   * Default or existing value is used if not set.
+   * @nullable
    */
-  message: string;
+  message: string | null;
+
+  /**
+   * Task status.
+   * Default or existing value is used if not set.
+   * @nullable
+   */
+  status: AutomationStatus | null;
+}
+
+/**
+ * Send a HTTP request to an endpoint
+ */
+export interface WebhookImpl {
+  type: 'Webhook';
+
+  /**
+   * Absolute URL to endpoint. May include params.
+   */
+  url: string;
+
+  /**
+   * HTTP method.
+   */
+  method: Method;
+
+  /**
+   * HTTP headers.
+   */
+  headers: Record<string, string>;
+
+  /**
+   * Request body.
+   */
+  body: string;
 }
 
 /**
@@ -142,7 +182,8 @@ export interface TaskCreateImpl {
  */
 export type ActionImpl =
   BlockPatchImpl
-  | TaskCreateImpl
+  | TaskEditImpl
+  | WebhookImpl
   ;
 
 ////////////////////////////////////////////////////////////////
@@ -234,28 +275,23 @@ export interface TaskStatusImpl {
 
   /**
    * The user-defined reference key.
-   * Must match those set in TaskCreate.
+   * Must match those set in TaskEdit.
    * If multiple tasks share the same ref key,
    * all must match the given status.
    */
   ref: string;
 
   /**
+   * Task status to set at the beginning of the step.
+   * If null, task is created if not exists, but not modified otherwise.
+   * @nullable
+   */
+  resetStatus: AutomationStatus | null;
+
+  /**
    * Desired status.
    */
   status: AutomationStatus;
-}
-
-/**
- * Enforces a stop in step execution that must be manually overridden.
- */
-export interface AlwaysFalseImpl {
-  type: 'AlwaysFalse';
-
-  /**
-   * Human-readable description.
-   */
-  desc: string;
 }
 
 /**
@@ -266,7 +302,6 @@ export type ConditionImpl =
   | TimeElapsedImpl
   | BlockValueImpl
   | TaskStatusImpl
-  | AlwaysFalseImpl
   ;
 
 ////////////////////////////////////////////////////////////////

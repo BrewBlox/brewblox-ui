@@ -2,11 +2,9 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { contrastColor } from '@/helpers/functional';
-import { blockTypes } from '@/plugins/spark/block-types';
-import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
+import { contrastColor, typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockAddress } from '@/plugins/spark/types';
+import { BlockAddress, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import { settingsAddress, squares } from '../helpers';
 import { PersistentPart } from '../types';
@@ -61,9 +59,8 @@ export default class SetpointValues extends Vue {
       && this.block.data.settingEnabled
       && this.sparkModule!
         .blocks
-        .some(block =>
-          block.type === blockTypes.Pid
-          && block.data.inputId.id === this.block!.id);
+        .filter(typeMatchFilter<PidBlock>('Pid'))
+        .some(block => block.data.inputId.id === this.block!.id);
   }
 
   get isDriven(): boolean {

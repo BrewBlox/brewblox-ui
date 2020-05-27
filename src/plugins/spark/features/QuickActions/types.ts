@@ -1,4 +1,5 @@
-import { Block, ChangeField } from '@/plugins/spark/types';
+import { Block } from '@/plugins/spark/types';
+import { BlockField } from '@/plugins/spark/types';
 
 export interface BlockChange<BlockT extends Block = Block> {
   id: string;
@@ -21,9 +22,9 @@ export interface QuickActionsConfig {
   serviceIdMigrated: boolean;
 }
 
-export interface EditableFieldChange {
+export interface EditableBlockField {
   id: string;
   value: any;
   confirmed: boolean;
-  cfield: ChangeField;
+  specField: BlockField;
 }

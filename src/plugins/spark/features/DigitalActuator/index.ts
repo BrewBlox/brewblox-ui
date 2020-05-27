@@ -1,20 +1,18 @@
-import { Link, Unit } from '@/helpers/units';
-import { blockTypes, interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalState } from '@/plugins/spark/types';
+import { BlockSpec, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
+import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DigitalActuatorWidget.vue';
-import { typeName } from './getters';
-import { DigitalActuatorData } from './types';
 
 const seconds = (v = 0): Unit => new Unit(v, 'seconds');
+const typeName = 'DigitalActuator';
 
-const block: BlockSpec<DigitalActuatorData> = {
+const block: BlockSpec<DigitalActuatorBlock> = {
   id: typeName,
   generate: () => ({
-    hwDevice: new Link(null, interfaceTypes.IoArray),
+    hwDevice: new Link(null, 'IoArrayInterface'),
     channel: 0,
     desiredState: DigitalState.Inactive,
     state: DigitalState.Inactive,
@@ -38,7 +36,7 @@ const block: BlockSpec<DigitalActuatorData> = {
             },
             {
               mutexed: {
-                mutexId: new Link(null, blockTypes.Mutex),
+                mutexId: new Link(null, 'MutexInterface'),
                 extraHoldTime: seconds(),
                 hasCustomHoldTime: true,
                 hasLock: false,
@@ -57,7 +55,7 @@ const block: BlockSpec<DigitalActuatorData> = {
           constraints: [
             {
               mutexed: {
-                mutexId: new Link(null, blockTypes.Mutex),
+                mutexId: new Link(null, 'MutexInterface'),
                 extraHoldTime: seconds(),
                 hasCustomHoldTime: true,
                 hasLock: false,
@@ -69,13 +67,15 @@ const block: BlockSpec<DigitalActuatorData> = {
       }),
     },
   ],
-  changes: [
+  fields: [
     {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
       generate: () => 0,
       pretty: v => DigitalState[v],
+      graphed: true,
+      graphName: 'Desired state',
     },
     {
       key: 'invert',
@@ -90,11 +90,16 @@ const block: BlockSpec<DigitalActuatorData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'state',
+      title: 'Actual state',
+      component: 'StateValEdit',
+      generate: () => 0,
+      pretty: v => DigitalState[v],
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    state: 'Actual state',
-    desiredState: 'Desired state',
-  },
 };
 
 const feature: WidgetFeature = {

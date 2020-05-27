@@ -1,25 +1,49 @@
-import { blockTypes } from '@/plugins/spark/block-types';
+import { blockTypes } from '@/plugins/spark/getters';
 
-import { showDrivingBlockDialog } from '../helpers';
-import { PartSpec, PersistentPart } from '../types';
+import { showDrivingBlockDialog, universalTransitions } from '../helpers';
+import { PartSpec } from '../types';
 
 const SIZE_X = 1;
 const SIZE_Y = 1;
+const addressKey = 'pwm';
+const scaleKey = 'scale';
+const flowEnabledKey = 'flowEnabled';
+
+const size: PartSpec['size'] = ({ settings }) => {
+  const scale = settings[scaleKey] ?? 1;
+  return [SIZE_X * scale, SIZE_Y * scale];
+};
 
 const spec: PartSpec = {
   id: 'PwmDisplay',
   title: 'Display: PWM',
-  transitions: () => ({}),
-  cards: [{
-    component: 'BlockAddressCard',
-    props: {
-      settingsKey: 'pwm',
-      compatible: [blockTypes.ActuatorPwm],
-      label: 'PWM',
+  cards: [
+    {
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey: addressKey,
+        compatible: [blockTypes.ActuatorPwm],
+        label: 'PWM',
+      },
     },
-  }],
-  size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, 'pwm'),
+    {
+      component: 'ScaleCard',
+      props: {
+        settingsKey: scaleKey,
+        defaultSize: [SIZE_X, SIZE_Y],
+      },
+    },
+    {
+      component: 'ToggleCard',
+      props: {
+        settingsKey: flowEnabledKey,
+        label: 'Allow liquid to flow through this part',
+      },
+    },
+  ],
+  size,
+  transitions: part => universalTransitions(size(part), part.settings[flowEnabledKey]),
+  interactHandler: part => showDrivingBlockDialog(part, addressKey),
 };
 
 export default spec;

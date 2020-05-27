@@ -2,10 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { DS2408Block } from '@/plugins/spark/types';
 
 import DS2408Basic from './DS2408Basic.vue';
 import DS2408Full from './DS2408Full.vue';
-import { DS2408Block } from './types';
 
 @Component({
   components: {

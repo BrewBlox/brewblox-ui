@@ -122,16 +122,13 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
 
 <template>
   <div class="widget-md">
-    <CardWarning v-if="values.length === 0">
-      <template #message>
-        No metrics selected.
-      </template>
-      <template #actions>
-        <q-btn flat label="Add metrics" @click="$emit('mode', 'Full')" />
-      </template>
-    </CardWarning>
+    <div v-if="values.length === 0">
+      <div class="text-italic text-h6 q-pa-md darkened text-center">
+        Add metrics to get started.
+      </div>
+    </div>
 
-    <div v-else class="column q-ma-md">
+    <div class="widget-body column">
       <LabeledField
         v-for="val in values"
         :key="val.field"
@@ -149,6 +146,20 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
           </q-tooltip>
         </template>
       </LabeledField>
+    </div>
+    <div
+      v-if="values.length === 0"
+      class="column q-px-md"
+    >
+      <q-btn
+        flat
+        dense
+        color="secondary"
+        icon="edit"
+        label="Edit metrics"
+        class="self-end"
+        @click="$emit('mode', 'Full')"
+      />
     </div>
   </div>
 </template>

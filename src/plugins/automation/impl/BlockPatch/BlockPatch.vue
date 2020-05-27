@@ -1,19 +1,24 @@
 <script lang="ts">
+import difference from 'lodash/difference';
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockPatchImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockSpec, ChangeField } from '@/plugins/spark/types';
+import { BlockAddress, BlockField, BlockSpec, BlockType } from '@/plugins/spark/types';
 
 @Component
 export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
   get spec(): BlockSpec | null {
     return this.impl.blockType !== null
-      ? sparkStore.specById(this.impl.blockType)
+      ? sparkStore.specById(this.impl.blockType as BlockType)
       : null;
+  }
+
+  get fields(): BlockField[] {
+    return this.spec?.fields.filter(f => !f.readonly) ?? [];
   }
 
   get addr(): BlockAddress {
@@ -36,41 +41,59 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
   get validTypes(): string[] {
     return sparkStore.specs
-      .filter(spec => spec.changes.length)
+      .filter(spec => spec.fields.some(f => !f.readonly))
       .map(spec => spec.id);
+  }
+
+  get unknownValues(): string[] {
+    if (this.spec === null) {
+      return [];
+    }
+    const keys = Object.keys(this.impl.data);
+    const validKeys = this.spec
+      .fields
+      .filter(f => !f.readonly)
+      .map(f => f.key);
+    return difference(keys, validKeys);
   }
 
   isActive(key: string): boolean {
     return key in this.impl.data;
   }
 
-  fieldValue(field: ChangeField): any {
+  fieldValue(field: BlockField): any {
     return this.impl.data[field.key];
   }
 
-  addField(field: ChangeField): void {
+  addField(field: BlockField): void {
     this.$set(this.impl.data, field.key, field.generate());
     this.save();
   }
 
-  saveField(field: ChangeField, value: any): void {
+  saveField(field: BlockField, value: any): void {
     this.$set(this.impl.data, field.key, value);
     this.save();
   }
 
-  removeField(field: ChangeField): void {
+  removeField(field: BlockField): void {
     this.$delete(this.impl.data, field.key);
     this.save();
   }
 
-  editField(field: ChangeField): void {
+  editField(field: BlockField): void {
     createDialog({
       component: 'ChangeFieldDialog',
       field,
+      value: this.impl.data[field.key],
       address: this.addr,
       title: `${this.addr.id} ${field.title}`,
     })
       .onOk(value => this.saveField(field, value));
+  }
+
+  fixUnknown(): void {
+    this.unknownValues.forEach(k => this.$delete(this.impl.data, k));
+    this.save();
   }
 }
 </script>
@@ -85,7 +108,7 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
     <template v-if="spec">
       <div
-        v-for="field in spec.changes"
+        v-for="field in fields"
         :key="field.key"
         class="row no-wrap items-center"
       >
@@ -132,6 +155,14 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
           />
         </div>
       </div>
+      <CardWarning v-if="unknownValues.length">
+        <template #message>
+          Unknown fields: {{ unknownValues.map(v => `'${v}'`).join(', ') }}
+        </template>
+        <template #actions>
+          <q-btn flat label="Fix now" @click="fixUnknown" />
+        </template>
+      </CardWarning>
     </template>
   </div>
 </template>

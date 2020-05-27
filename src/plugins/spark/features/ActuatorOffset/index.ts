@@ -1,15 +1,15 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { ActuatorOffsetBlock, BlockSpec, OffsetSettingOrValue } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorOffsetWidget.vue';
-import { typeName } from './getters';
-import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
 
-const block: BlockSpec<ActuatorOffsetData> = {
+const typeName = 'ActuatorOffset';
+
+const block: BlockSpec<ActuatorOffsetBlock> = {
   id: typeName,
   generate: () => ({
     targetId: new Link(null, interfaceTypes.SetpointSensorPair),
@@ -22,8 +22,7 @@ const block: BlockSpec<ActuatorOffsetData> = {
     constrainedBy: { constraints: [] },
     enabled: true,
   }),
-  presets: [],
-  changes: [
+  fields: [
     {
       key: 'desiredSetting',
       title: 'Target offset',
@@ -55,11 +54,23 @@ const block: BlockSpec<ActuatorOffsetData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'setting',
+      title: 'Target offset',
+      generate: () => 0,
+      component: 'NumberValEdit',
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'value',
+      title: 'Actual offset',
+      generate: () => 0,
+      component: 'NumberValEdit',
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    setting: 'Target offset',
-    value: 'Actual offset',
-  },
 };
 
 const feature: WidgetFeature = {

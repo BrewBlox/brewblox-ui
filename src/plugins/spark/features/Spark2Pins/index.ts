@@ -1,13 +1,13 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, Spark2Hardware, Spark2PinsBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './Spark2PinsWidget.vue';
-import { Spark2Hardware, Spark2PinsData } from './types';
 
-const block: BlockSpec<Spark2PinsData> = {
+const typeName = 'Spark2Pins';
+
+const block: BlockSpec<Spark2PinsBlock> = {
   id: typeName,
   systemObject: true,
   generate: () => ({
@@ -15,8 +15,7 @@ const block: BlockSpec<Spark2PinsData> = {
     soundAlarm: false,
     hardware: Spark2Hardware.Unknown,
   }),
-  changes: [],
-  presets: [],
+  fields: [],
 };
 
 const feature: WidgetFeature = {

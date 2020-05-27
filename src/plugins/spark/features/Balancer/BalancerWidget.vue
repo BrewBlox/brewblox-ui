@@ -3,8 +3,7 @@ import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-
-import { BalancerBlock } from './types';
+import { BalancerBlock } from '@/plugins/spark/types';
 
 @Component
 export default class BalancerWidget

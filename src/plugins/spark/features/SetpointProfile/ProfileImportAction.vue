@@ -4,8 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { loadFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { SetpointProfileBlock, SetpointProfileData } from './types';
+import { SetpointProfileBlock } from '@/plugins/spark/types';
 
 
 @Component
@@ -19,7 +18,7 @@ export default class ProfileImportAction
   readonly label!: string;
 
   async showDialog(): Promise<void> {
-    loadFile((cfg: Pick<SetpointProfileData, 'points'>) => {
+    loadFile((cfg: Pick<SetpointProfileBlock['data'], 'points'>) => {
       if (cfg.points === undefined) {
         notify.error('Invalid configuration file');
         return;

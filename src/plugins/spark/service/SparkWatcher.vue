@@ -2,10 +2,10 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { sparkType } from '@/plugins/spark/getters';
+import { SparkService } from '@/plugins/spark/types';
 import { serviceStore } from '@/store/services';
 
-import { sparkType } from '../getters';
-import { SparkService } from '../types';
 import SparkServiceWatcher from './SparkServiceWatcher.vue';
 
 @Component({

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import { deserialize, serialize } from '@/helpers/units/parseObject';
+import { deserialize, serialize } from '@/plugins/spark/parse-object';
 
 import { ChangeCb, DeleteCb, StoreObject } from './types';
 
@@ -13,9 +13,9 @@ export interface DatabaseApi<T extends StoreObject> {
   remove(obj: T): Promise<T>;
 }
 
-export function createApi<T extends StoreObject>(moduleId: string, serialized = false): DatabaseApi<T> {
-  const hydrate: ((v: any) => any) = serialized ? deserialize : (v => v);
-  const dehydrate: ((v: any) => any) = serialized ? serialize : (v => v);
+export function createApi<T extends StoreObject>(moduleId: string, parsed = false): DatabaseApi<T> {
+  const hydrate: ((v: any) => any) = parsed ? deserialize : (v => v);
+  const dehydrate: ((v: any) => any) = parsed ? serialize : (v => v);
   return {
     subscribe(onChanged: ChangeCb<T>, onDeleted: DeleteCb): void {
       Vue.$database.subscribe({

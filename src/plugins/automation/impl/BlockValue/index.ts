@@ -3,6 +3,10 @@ import { AutomationSpec, BlockValueImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
 
 import BlockValue from './BlockValue.vue';
+import { operatorSymbols } from './helpers';
+
+const operator = (impl: BlockValueImpl): string =>
+  operatorSymbols.find(op => op.value === impl.operator)?.label ?? '???';
 
 const type = 'BlockValue';
 const spec: AutomationSpec<BlockValueImpl> = {
@@ -20,7 +24,7 @@ const spec: AutomationSpec<BlockValueImpl> = {
   }),
   pretty: impl =>
     matchesType<BlockValueImpl>(type, impl)
-      ? `Assert '${impl.key}' value in block '${impl.blockId}'`
+      ? `${impl.blockId} '${impl.key}' must be ${operator(impl)} ${impl.value}`
       : `Invalid data: type=${impl.type}`,
 };
 

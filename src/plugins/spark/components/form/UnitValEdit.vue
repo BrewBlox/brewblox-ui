@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
-import Unit, { prettify } from '@/helpers/units/Unit';
+import { prettify, Unit } from '@/plugins/spark/units';
 
 import ValEditBase from '../ValEditBase';
 

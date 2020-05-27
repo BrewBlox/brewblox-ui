@@ -1,16 +1,16 @@
 import { unitDurationString } from '@/helpers/functional';
-import { Link, Unit } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
+import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { ActuatorPwmBlock, BlockSpec } from '@/plugins/spark/types';
+import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorPwmWidget.vue';
-import { typeName } from './getters';
-import { ActuatorPwmData } from './types';
 
-const block: BlockSpec<ActuatorPwmData> = {
+const typeName = 'ActuatorPwm';
+
+const block: BlockSpec<ActuatorPwmBlock> = {
   id: typeName,
   generate: () => ({
     actuatorId: new Link(null, interfaceTypes.ActuatorDigital),
@@ -36,7 +36,7 @@ const block: BlockSpec<ActuatorPwmData> = {
       }),
     },
   ],
-  changes: [
+  fields: [
     {
       key: 'desiredSetting',
       title: 'Duty Setting',
@@ -69,11 +69,23 @@ const block: BlockSpec<ActuatorPwmData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'setting',
+      title: 'Duty Setting',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'value',
+      title: 'Duty Achieved',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    setting: 'Duty Setting',
-    value: 'Duty Achieved',
-  },
 };
 
 const feature: WidgetFeature = {

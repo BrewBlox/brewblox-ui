@@ -3,8 +3,8 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { SetpointSensorPairBlock } from '@/plugins/spark/types';
 
-import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairBasic

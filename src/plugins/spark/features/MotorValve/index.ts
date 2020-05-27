@@ -1,18 +1,17 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalState } from '@/plugins/spark/types';
+import { BlockSpec, DigitalState, MotorValveBlock, ValveState } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './MotorValveWidget.vue';
-import { MotorValveData, ValveState } from './types';
 
-const block: BlockSpec<MotorValveData> = {
+const typeName = 'MotorValve';
+
+const block: BlockSpec<MotorValveBlock> = {
   id: typeName,
   generate: () => ({
-    hwDevice: new Link(null, interfaceTypes.IoArray),
+    hwDevice: new Link(null, 'IoArrayInterface'),
     startChannel: 0,
     desiredState: DigitalState.Inactive,
     state: DigitalState.Inactive,
@@ -20,13 +19,15 @@ const block: BlockSpec<MotorValveData> = {
     constrainedBy: { constraints: [] },
   }),
   presets: [],
-  changes: [
+  fields: [
     {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
       generate: () => 0,
       pretty: v => DigitalState[v],
+      graphed: true,
+      graphName: 'Desired state',
     },
     {
       key: 'constrainedBy',
@@ -35,11 +36,16 @@ const block: BlockSpec<MotorValveData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'state',
+      title: 'Actual state',
+      component: 'StateValEdit',
+      generate: () => 0,
+      pretty: v => DigitalState[v],
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    state: 'Actual state',
-    desiredState: 'Desired state',
-  },
 };
 
 const feature: WidgetFeature = {

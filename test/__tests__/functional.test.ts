@@ -5,7 +5,7 @@ import {
   uniqueFilter,
   unitDurationString,
 } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 describe('Array funcs', () => {
   it('should filter and sort arrays', () => {

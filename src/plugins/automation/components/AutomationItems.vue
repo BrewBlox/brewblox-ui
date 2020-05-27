@@ -127,9 +127,14 @@ export default class AutomationItems extends Vue {
       </div>
     </draggable>
     <div class="row justify-end q-pt-md q-pr-sm">
-      <q-btn fab-mini color="secondary" icon="add" @click="add">
-        <q-tooltip>New {{ label }}</q-tooltip>
-      </q-btn>
+      <q-btn
+        :label="`New ${label}`"
+        flat
+        dense
+        color="secondary"
+        icon="add"
+        @click="add"
+      />
     </div>
   </div>
 </template>

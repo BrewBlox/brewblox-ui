@@ -125,18 +125,13 @@ export default class WidgetWizardPicker extends Vue {
           <q-icon name="search" />
         </template>
       </q-input>
-      <div
-        v-for="opt in filteredOptions"
-        :key="opt.value"
-        :class="[
-          'col clickable q-pa-sm rounded-borders text-h6',
-          feature === opt && 'depth-24',
-        ]"
-        @click="feature !== opt ? feature = opt : feature = null"
-        @dblclick="feature = opt; next()"
-      >
-        {{ opt.label }}
-      </div>
+      <ListSelect
+        v-model="feature"
+        :options="filteredOptions"
+        option-value="value"
+        option-label="label"
+        @confirm="v => { feature = v; next(); }"
+      />
     </div>
 
     <template #actions>

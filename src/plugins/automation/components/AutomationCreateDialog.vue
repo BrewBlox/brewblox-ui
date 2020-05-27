@@ -23,7 +23,7 @@ export default class AutomationCreateDialog extends DialogBase {
       : null;
   }
 
-  save(spec = this.selected): void {
+  save(spec: AutomationSpec | null): void {
     if (spec) {
       const item: AutomationItem = {
         id: uid(),
@@ -42,21 +42,16 @@ export default class AutomationCreateDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.enter="save"
+    @keyup.enter="save(selected)"
   >
     <DialogCard v-bind="{title, message, html}">
-      <div
-        v-for="spec in specs"
-        :key="spec.type"
-        :class="[
-          'col clickable q-pa-sm rounded-borders text-h6',
-          selected === spec && 'depth-24',
-        ]"
-        @click="selectSpec(spec, false)"
-        @dblclick="selectSpec(spec, true)"
-      >
-        {{ spec.title }}
-      </div>
+      <ListSelect
+        v-model="selected"
+        :options="specs"
+        option-value="type"
+        option-label="title"
+        @confirm="v => save(v)"
+      />
       <template #actions>
         <q-btn
           flat
@@ -69,7 +64,7 @@ export default class AutomationCreateDialog extends DialogBase {
           flat
           label="OK"
           color="primary"
-          @click="save"
+          @click="save(selected)"
         />
       </template>
     </DialogCard>

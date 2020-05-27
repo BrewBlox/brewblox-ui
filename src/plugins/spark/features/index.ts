@@ -23,7 +23,7 @@ import Spark3Pins from './Spark3Pins';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
-const features: { [id: string]: SparkFeature } = {
+const features: SparkFeature[] = [
   ActuatorAnalogMock,
   ActuatorLogic,
   ActuatorOffset,
@@ -46,6 +46,6 @@ const features: { [id: string]: SparkFeature } = {
   QuickActions,
   TempSensorMock,
   TempSensorOneWire,
-};
+];
 
 export default features;

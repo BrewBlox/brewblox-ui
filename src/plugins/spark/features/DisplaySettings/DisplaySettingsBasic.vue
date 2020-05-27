@@ -2,9 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { DisplaySlot } from '@/plugins/spark/types';
-
-import { DisplaySettingsBlock } from './types';
+import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 
 @Component
 export default class DisplaySettingsBasic

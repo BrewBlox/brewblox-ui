@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { durationMs, durationString } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/plugins/spark/parse-object';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/getters';
 import { MetricsConfig } from '../Metrics/types';

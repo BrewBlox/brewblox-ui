@@ -2,11 +2,9 @@
 import { Component } from 'vue-property-decorator';
 
 import { createBlockDialog } from '@/helpers/dialog';
-import { Unit } from '@/helpers/units';
-import { SetpointSensorPairBlock } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { PidBlock } from '@/plugins/spark/features/Pid/types';
-import { Block } from '@/plugins/spark/types';
+import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { Unit } from '@/plugins/spark/units';
 
 interface GridOpts {
   start?: number;

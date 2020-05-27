@@ -1,25 +1,22 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { parsePostfixed, propertyNameWithoutUnit } from '@/helpers/units/parseObject';
-import PostFixed from '@/helpers/units/PostFixed';
+import { createDialog } from '@/helpers/dialog';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockValueImpl } from '@/plugins/automation/types';
+import { isPostFixed, parsePostfixed, propertyNameWithoutUnit } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockSpec, ChangeField } from '@/plugins/spark/types';
+import { BlockAddress, BlockField, BlockSpec, BlockType } from '@/plugins/spark/types';
 
-type CompareOperator = BlockValueImpl['operator'];
-
-interface OperatorOption extends SelectOption {
-  desc: string;
-}
+import { OperatorOption, operatorSymbols } from './helpers';
 
 @Component
 export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
+  compareOpts = operatorSymbols;
 
   get spec(): BlockSpec | null {
     return this.impl.blockType !== null
-      ? sparkStore.specById(this.impl.blockType) ?? null
+      ? sparkStore.specById(this.impl.blockType as BlockType) ?? null
       : null;
   }
 
@@ -44,36 +41,27 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
   get validTypes(): string[] {
     return sparkStore.specs
-      .filter(spec => spec.changes.length)
+      .filter(spec => spec.fields.find(f => !f.readonly))
       .map(spec => spec.id);
   }
 
   get selectOpts(): SelectOption[] {
     return this.spec !== null
-      ? this.spec.changes
-        .map(change => {
-          const generated = change.generate();
-          const value = generated instanceof PostFixed
-            ? generated.serialized(change.key)[0]
-            : change.key;
-          return { label: change.title, value };
+      ? this.spec
+        .fields
+        .map(field => {
+          const generated = field.generate();
+          const value = isPostFixed(generated)
+            ? generated.toSerialized(field.key)[0]
+            : field.key;
+          return { label: field.title, value };
         })
       : [];
   }
 
-  get compareOpts(): OperatorOption[] {
-    return [
-      { label: '==', value: 'eq', desc: 'Equal to' },
-      { label: '!=', value: 'ne', desc: 'Not equal to' },
-      { label: '<', value: 'lt', desc: 'Less than' },
-      { label: '=<', value: 'le', desc: 'Less than or equal to' },
-      { label: '>=', value: 'ge', desc: 'More than or equal to' },
-      { label: '>', value: 'gt', desc: 'More than' },
-    ];
-  }
-
   get operator(): OperatorOption {
-    return this.compareOpts.find(op => op.value === this.impl.operator) || this.compareOpts[0];
+    return this.compareOpts.find(op => op.value === this.impl.operator)
+      || this.compareOpts[0];
   }
 
   set operator(opt: OperatorOption) {
@@ -81,8 +69,8 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     this.save();
   }
 
-  get currentChange(): ChangeField | null {
-    return this.findChange(this.impl.key);
+  get field(): BlockField | null {
+    return this.findField(this.impl.key);
   }
 
   get parsed(): { key: string; value: any } | null {
@@ -95,17 +83,17 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     return { key, value };
   }
 
-  findChange(key: string | null): ChangeField | null {
+  findField(key: string | null): BlockField | null {
     if (this.spec === null || key === null) {
       return null;
     }
     const rawKey = propertyNameWithoutUnit(key);
-    return this.spec.changes.find(change => change.key === rawKey)!;
+    return this.spec.fields.find(field => field.key === rawKey)!;
   }
 
   rawValue(value: any): any {
-    return value instanceof PostFixed
-      ? value.serialized('')[1]
+    return isPostFixed(value)
+      ? value.toSerialized('')[1]
       : value;
   }
 
@@ -113,7 +101,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     if (this.spec === null || key === null) {
       return null;
     }
-    const change = this.findChange(key);
+    const change = this.findField(key);
     return change
       ? this.rawValue(change.generate())
       : null;
@@ -131,6 +119,20 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     this.item.impl.value = this.rawValue(value);
     this.save();
   }
+
+  editField(): void {
+    if (this.field === null || this.parsed === null) {
+      return;
+    }
+    createDialog({
+      component: 'ChangeFieldDialog',
+      field: this.field,
+      address: this.addr,
+      value: this.parsed.value,
+      title: `${this.addr.id} ${this.field.title}`,
+    })
+      .onOk(value => this.saveValue(value));
+  }
 }
 </script>
 
@@ -142,6 +144,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
       any-service
       class="col-grow"
     />
+    <div class="col-break" />
     <SelectField
       :value="impl.key"
       :options="selectOpts"
@@ -149,30 +152,28 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
       class="col-grow"
       @input="saveKey"
     />
-
-    <div class="col-break" />
-
-    <div v-if="spec && impl.key" class="col-grow row justify-between q-px-sm">
+    <div
+      v-if="spec && impl.key"
+      class="col-grow row q-gutter-x-sm q-px-sm"
+    >
       <q-select
         v-model="operator"
         :options="compareOpts"
         dense
         label="Compare"
-        class="col-auto"
-        style="min-width: 100px"
+        class="col-grow"
       >
         <q-tooltip>{{ operator.desc }}</q-tooltip>
       </q-select>
       <component
-        :is="currentChange.component"
-        v-bind="currentChange.componentProps"
+        :is="field.component"
+        v-bind="field.componentProps"
         :block-id="impl.blockId"
         :service-id="impl.serviceId"
         :value="parsed.value"
-        editable
-        lazy
-        class="col-auto"
+        class="col-grow self-center"
         @input="saveValue"
+        @edit="editField"
       />
     </div>
   </div>

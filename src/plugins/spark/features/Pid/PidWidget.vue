@@ -4,12 +4,12 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { PidBlock } from '@/plugins/spark/types';
 
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
 import PidShareDialog from './PidShareDialog.vue';
 import { startRelationsDialog } from './relations';
-import { PidBlock } from './types';
 
 @Component({
   components: {

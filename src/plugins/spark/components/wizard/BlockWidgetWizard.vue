@@ -7,13 +7,15 @@ import { objectStringSorter, ruleValidator, suggestId } from '@/helpers/function
 import { sparkType } from '@/plugins/spark/getters';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockConfig, BlockCrud } from '@/plugins/spark/types';
+import { Block, BlockConfig, BlockCrud, BlockType } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
 
 @Component
 export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
+  readonly featureId!: BlockType;
+
   currentStep = 'start';
 
   blockId = '';

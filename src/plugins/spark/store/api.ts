@@ -3,7 +3,8 @@ import http, { intercept } from '@/helpers/http';
 import notify from '@/helpers/notify';
 
 import { asBlock, asDataBlock } from '../helpers';
-import { ApiSparkStatus, Block, DataBlock, SparkExported, SparkStatus, UserUnits } from '../types';
+import { Block } from '../types';
+import { ApiSparkStatus, DataBlock, SparkExported, SparkStatus, UserUnits } from '../types';
 
 export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
   http.get<DataBlock[]>(`/${encodeURIComponent(serviceId)}/objects`)

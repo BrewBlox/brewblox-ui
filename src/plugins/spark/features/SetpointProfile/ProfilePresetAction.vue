@@ -3,8 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { SetpointProfileBlock } from './types';
+import { SetpointProfileBlock } from '@/plugins/spark/types';
 
 
 @Component

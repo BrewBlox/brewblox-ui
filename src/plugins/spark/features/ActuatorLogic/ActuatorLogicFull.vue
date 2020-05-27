@@ -2,10 +2,21 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Link } from '@/helpers/units';
-import { interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block, DigitalState } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/helpers';
+import {
+  ActuatorLogicBlock,
+  AnalogCompare,
+  AnalogCompareOp,
+  Block,
+  BlockInterfaceType,
+  DigitalCompare,
+  DigitalCompareOp,
+  DigitalState,
+  EvalResult,
+  ExpressionError,
+} from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
@@ -21,19 +32,10 @@ import {
   shiftRemainingComparisons,
   syntaxCheck,
 } from './helpers';
-import {
-  ActuatorLogicBlock,
-  AnalogCompare,
-  AnalogCompareOp,
-  DigitalCompare,
-  DigitalCompareOp,
-  EvalResult,
-  ExpressionError,
-} from './types';
 
-const validTypes: string[] = [
-  interfaceTypes.ActuatorDigital,
-  interfaceTypes.ProcessValue,
+const validTypes: BlockInterfaceType[] = [
+  'ActuatorDigitalInterface',
+  'ProcessValueInterface',
 ];
 
 @Component({
@@ -136,7 +138,7 @@ export default class ActuatorLogicFull
   }
 
   addComparison(block: Block): void {
-    if (isCompatible(block.type, interfaceTypes.ActuatorDigital)) {
+    if (isCompatible(block.type, 'ActuatorDigitalInterface')) {
       this.block.data.digital.push({
         op: DigitalCompareOp.VALUE_IS,
         id: new Link(block.id, block.type),
@@ -144,7 +146,7 @@ export default class ActuatorLogicFull
         result: EvalResult.EMPTY,
       });
     }
-    else if (isCompatible(block.type, interfaceTypes.ProcessValue)) {
+    else if (isCompatible(block.type, 'ProcessValueInterface')) {
       this.block.data.analog.push({
         op: AnalogCompareOp.VALUE_GE,
         id: new Link(block.id, block.type),

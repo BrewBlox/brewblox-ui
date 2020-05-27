@@ -1,10 +1,10 @@
 import isEqual from 'lodash/isEqual';
 
+import { typeMatchFilter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
-import { blockTypes, PidData } from '@/plugins/spark/block-types';
-import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
 import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
+import { DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { WizardAction } from './components/WizardTaskBase';
@@ -14,15 +14,16 @@ export function unlinkedActuators(serviceId: string, pins: PinChannel[]): Digita
   return sparkStore
     .serviceBlocks(serviceId)
     // Find existing drivers
+    .filter(typeMatchFilter<DigitalActuatorBlock>('DigitalActuator'))
     .filter(
-      block =>
-        block.type === blockTypes.DigitalActuator
-        && pins.some(
-          (pin: PinChannel) => pin.arrayId === block.data.hwDevice.id && pin.pinId === block.data.channel))
+      block => pins
+        .some((pin: PinChannel) =>
+          pin.arrayId === block.data.hwDevice.id
+          && pin.pinId === block.data.channel))
     // Unlink them from pin
-    .map((block: DigitalActuatorBlock) => {
+    .map((block) => {
       block.data.channel = 0;
-      return block;
+      return block as DigitalActuatorBlock;
     });
 }
 
@@ -115,6 +116,6 @@ export function withoutPrefix(prefix: string, val: string): string {
     : val;
 }
 
-export function pidDefaults(): PidData {
-  return sparkStore.specById(blockTypes.Pid).generate();
+export function pidDefaults(): PidBlock['data'] {
+  return sparkStore.specById('Pid').generate();
 }

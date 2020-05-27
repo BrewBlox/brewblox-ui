@@ -24,6 +24,15 @@ export default class TaskStatus extends AutomationItemBase<TaskStatusImpl> {
     this.save();
   }
 
+  get resetStatus(): AutomationStatus | null {
+    return this.impl.resetStatus;
+  }
+
+  set resetStatus(val: AutomationStatus | null) {
+    this.impl.resetStatus = val;
+    this.save();
+  }
+
   get statusOpts(): { label: AutomationStatus; value: AutomationStatus }[] {
     return states.map(v => ({ label: v, value: v }));
   }
@@ -34,7 +43,7 @@ export default class TaskStatus extends AutomationItemBase<TaskStatusImpl> {
       parent: this,
       label: 'Reference ID',
       title: 'Choose Task reference ID',
-      message: 'This should match the reference ID of a task created in this process.',
+      message: 'All tasks with this ID will be checked.',
       value: this.impl.ref,
     })
       .onOk(ref => {
@@ -51,16 +60,29 @@ export default class TaskStatus extends AutomationItemBase<TaskStatusImpl> {
       title="Ref"
       label="Reference ID"
       :readonly="false"
-      class="col-grow"
+      class="col"
       @click="editRef"
     >
       {{ impl.ref || 'Click to edit' }}
     </LabeledField>
     <SelectField
       v-model="status"
-      title="Status"
-      label="Status"
-      class="col-grow"
+      title="Desired status"
+      label="Desired status"
+      class="col"
+      :options="statusOpts"
+    />
+    <SelectField
+      v-model="resetStatus"
+      title="Initial status"
+      label="Initial status"
+      message="
+      Set a value to forcibly reset task status at step start.<br>
+      This is useful when the same step is used multiple times.
+      "
+      html
+      clearable
+      :class="['col', resetStatus === null && 'fade-6']"
       :options="statusOpts"
     />
   </div>

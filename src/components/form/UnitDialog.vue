@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { roundNumber } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class UnitDialog extends DialogBase {

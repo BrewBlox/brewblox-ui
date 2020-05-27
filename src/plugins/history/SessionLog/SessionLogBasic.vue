@@ -183,9 +183,5 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
         </div>
       </div>
     </div>
-
-    <div v-else class="widget-body row justify-center">
-      <q-btn outline label="New session" @click="addSession" />
-    </div>
   </div>
 </template>

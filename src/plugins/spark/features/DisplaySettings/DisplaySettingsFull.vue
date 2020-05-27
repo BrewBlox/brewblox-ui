@@ -2,11 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { Link } from '@/helpers/units';
-import { blockTypes, interfaceTypes, isCompatible } from '@/plugins/spark/block-types';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/features/DisplaySettings/types';
-import { DisplaySlot } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/helpers';
+import { BlockOrIntfType, DisplaySettingsBlock, DisplaySettingsTempUnit, DisplaySlot } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 @Component
 export default class DisplaySettingsFull
@@ -18,15 +17,15 @@ export default class DisplaySettingsFull
   footerRules: InputRule[] = [
     v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
   ];
-  validTypes: string[] = [
-    interfaceTypes.TempSensor,
-    interfaceTypes.SetpointSensorPair,
-    interfaceTypes.ActuatorAnalog,
-    blockTypes.Pid,
+  validTypes: BlockOrIntfType[] = [
+    'TempSensorInterface',
+    'SetpointSensorPairInterface',
+    'ActuatorAnalogInterface',
+    'Pid',
   ]
 
   get tempName(): string {
-    return DisplayTempUnit[this.block.data.tempUnit];
+    return DisplaySettingsTempUnit[this.block.data.tempUnit];
   }
 
   get slots(): (DisplaySlot | null)[] {
@@ -77,16 +76,16 @@ export default class DisplaySettingsFull
       name: existing?.name || link.id.slice(0, 15),
     };
 
-    if (isCompatible(type, interfaceTypes.TempSensor)) {
+    if (isCompatible(type, 'TempSensorInterface')) {
       obj.tempSensor = link;
     }
-    else if (isCompatible(type, interfaceTypes.SetpointSensorPair)) {
+    else if (isCompatible(type, 'SetpointSensorPairInterface')) {
       obj.setpointSensorPair = link;
     }
-    else if (isCompatible(type, interfaceTypes.ActuatorAnalog)) {
+    else if (isCompatible(type, 'ActuatorAnalogInterface')) {
       obj.actuatorAnalog = link;
     }
-    else if (isCompatible(type, blockTypes.Pid)) {
+    else if (isCompatible(type, 'Pid')) {
       obj.pid = link;
     }
 

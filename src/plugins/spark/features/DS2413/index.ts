@@ -1,21 +1,20 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { BlockSpec, DS2413Block } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DS2413Widget.vue';
-import { typeName } from './getters';
-import { DS2413Data } from './types';
 
-const block: BlockSpec<DS2413Data> = {
+const typeName = 'DS2413';
+
+const block: BlockSpec<DS2413Block> = {
   id: typeName,
   generate: () => ({
     address: '',
     connected: false,
     pins: [],
   }),
-  presets: [],
-  changes: [],
+  fields: [],
 };
 
 const feature: WidgetFeature = {

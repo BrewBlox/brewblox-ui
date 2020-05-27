@@ -1,13 +1,12 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
+import { ActuatorAnalogMockBlock, BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorAnalogMockWidget.vue';
-import { typeName } from './getters';
-import { ActuatorAnalogMockData } from './types';
+const typeName = 'ActuatorAnalogMock';
 
-const block: BlockSpec<ActuatorAnalogMockData> = {
+const block: BlockSpec<ActuatorAnalogMockBlock> = {
   id: typeName,
   generate: () => ({
     setting: 0,
@@ -17,14 +16,15 @@ const block: BlockSpec<ActuatorAnalogMockData> = {
     value: 0,
     minValue: 0,
     maxValue: 100,
+    constrainedBy: { constraints: [] },
   }),
-  presets: [],
-  changes: [
+  fields: [
     {
       key: 'desiredSetting',
       title: 'Setting',
       component: 'NumberValEdit',
       generate: () => 0,
+      graphed: true,
     },
     {
       key: 'minSetting',
@@ -57,11 +57,15 @@ const block: BlockSpec<ActuatorAnalogMockData> = {
       generate: () => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
+    {
+      key: 'value',
+      title: 'Measured Value',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    setting: 'Setting',
-    value: 'Value',
-  },
 };
 
 const feature: WidgetFeature = {

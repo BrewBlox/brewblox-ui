@@ -5,8 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { filterById, spliceById } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/units/parseObject';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
+import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 
@@ -41,22 +40,6 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   saveStep(step: Step): void {
     spliceById(this.steps, step);
     this.saveSteps();
-  }
-
-  addStep(): void {
-    const stepName = 'New Step';
-    createDialog({
-      title: 'Add a Step',
-      cancel: true,
-      prompt: {
-        model: stepName,
-        type: 'text',
-      },
-    })
-      .onOk(name => {
-        this.steps.push({ name, id: uid(), changes: [] });
-        this.saveSteps();
-      });
   }
 
   duplicateStep(step: Step): void {
@@ -108,10 +91,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       },
       anyService: true,
       clearable: false,
-      blockFilter: block => {
-        const spec = sparkStore.spec(block);
-        return !!spec && spec.changes.length > 0;
-      },
+      blockFilter: block => !!sparkStore.spec(block)?.fields.some(f => !f.readonly),
       parent: this,
     })
       .onOk((addr: BlockAddress) => {
@@ -168,6 +148,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
 
     <div class="widget-body column">
       <draggable
+        v-if="steps.length > 0"
         :disabled="$dense"
         :value="steps"
         @input="saveSteps"
@@ -233,14 +214,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
           </div>
         </q-expansion-item>
       </draggable>
-      <q-item>
-        <q-space />
-        <q-item-section class="col-auto">
-          <q-btn fab-mini color="secondary" icon="add" @click="addStep">
-            <q-tooltip>Add Step</q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
+      <slot name="below" />
     </div>
   </div>
 </template>
