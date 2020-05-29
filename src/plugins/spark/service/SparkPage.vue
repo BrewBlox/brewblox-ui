@@ -7,12 +7,12 @@ import { Watch } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { systemGroup } from '@/plugins/spark/getters';
 import { saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
   Block,
   BlockCrud,
+  BlockType,
   PageMode,
   RelationEdge,
   RelationNode,
@@ -268,10 +268,14 @@ export default class SparkPage extends Vue {
     };
   }
 
+  get specIds(): BlockType[] {
+    return sparkStore.specs.map(s => s.id);
+  }
+
   get validatedItems(): ValidatedWidget[] {
     return this.sparkModule
       ?.blocks
-      .filter(block => !block.groups.includes(systemGroup))
+      .filter(block => this.specIds.includes(block.type))
       .map(this.validateBlock)
       ?? [];
   }
