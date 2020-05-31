@@ -40,6 +40,7 @@
     "fromentries": "^1.2.0",
     "lodash": "^4.17.15",
     "marked": "^0.7.0",
+    "mqtt": "^4.1.0",
     "parse-duration": "^0.1.2",
     "plotly.js-basic-dist": "^1.53.0",
     "portal-vue": "^1.5.1",

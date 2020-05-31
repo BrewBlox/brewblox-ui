@@ -2,7 +2,11 @@ version: "3.7"
 
 services:
   eventbus:
-    image: rabbitmq:alpine
+    image: brewblox/rabbitmq:develop
+    labels:
+      - "traefik.port=15675"
+      - "traefik.protocol=ws"
+      - "traefik.frontend.rule=PathPrefixStrip: /eventbus"
 
   influx:
     image: influxdb:1.7
@@ -22,12 +26,6 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /history"
-
-  emitter:
-    image: brewblox/brewblox-emitter:develop
-    labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /emitter"
 
   automation:
     image: brewblox/brewblox-automation:develop
@@ -61,7 +59,7 @@ services:
     volumes:
       - ./dev/traefik:/config
       - /var/run/docker.sock:/var/run/docker.sock
-    command: >
+    command: >-
       -c /dev/null
       --docker
       --docker.domain=brewblox.local
