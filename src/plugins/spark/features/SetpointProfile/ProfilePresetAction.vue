@@ -5,8 +5,14 @@ import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { SetpointProfileBlock } from '@/plugins/spark/types';
 
+import ProfilePresetDialog from './ProfilePresetDialog.vue';
 
-@Component
+
+@Component({
+  components: {
+    ProfilePresetDialog,
+  },
+})
 export default class ProfilePresetAction
   extends BlockCrudComponent<SetpointProfileBlock> {
 
@@ -18,7 +24,7 @@ export default class ProfilePresetAction
 
   async showDialog(): Promise<void> {
     createDialog({
-      component: 'ProfilePresetDialog',
+      component: ProfilePresetDialog,
       value: this.block,
       parent: this,
       title: 'Load/Save Profile',
