@@ -13,7 +13,7 @@
     "datastore:save": "node dev/datastore_save.js",
     "datastore": "npm run datastore:config && npm run datastore:load",
     "spark:save": "node dev/spark_save.js",
-    "spark:load": "node dev/spark_load.js sparkey",
+    "spark:load": "node dev/spark_load.js",
     "spark": "npm run spark:load",
     "compose:setup": "npm run datastore && npm run history && npm run spark",
     "compose:new": "docker-compose down && npm run makecert && docker-compose up -d && npm run compose:setup",
