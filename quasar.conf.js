@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
-
+const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
 const IgnoreNotFoundExportPlugin = require('./build/ignore-not-found');
 
-module.exports = function (ctx) {
+module.exports = configure(function (ctx) {
   const buildDate = `"${new Date().toISOString()}"`;
 
   const sharedEnv = {
@@ -17,6 +17,7 @@ module.exports = function (ctx) {
   return {
     preFetch: false,
     supportIE: false,
+    supportTS: true,
 
     sourceFiles: {
       router: 'src/router.ts',
@@ -145,6 +146,7 @@ module.exports = function (ctx) {
       publicPath: '/ui/',
       vueRouterMode: 'history',
 
+      modern: true,
       distDir: 'dist',
       analyze: false,
       gzip: true,
@@ -188,4 +190,4 @@ module.exports = function (ctx) {
       },
     },
   };
-};
+});
