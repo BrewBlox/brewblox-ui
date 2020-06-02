@@ -6,7 +6,7 @@ services:
     labels:
       - "traefik.port=15675"
       - "traefik.protocol=ws"
-      - "traefik.frontend.rule=PathPrefixStrip: /eventbus"
+      - "traefik.frontend.rule=PathPrefix: /eventbus"
 
   influx:
     image: influxdb:1.7
@@ -41,6 +41,8 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
+    volumes:
+      - ./dev/simulator__sparkey:/app/simulator
     command: --name=sparkey --simulation --device-id=123456789012345678901234
 
   spock:
@@ -49,6 +51,8 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /spock"
+    volumes:
+      - ./dev/simulator__spock:/app/simulator
     command: --name=spock --simulation --device-id=432109876543210987654321
 
   traefik:

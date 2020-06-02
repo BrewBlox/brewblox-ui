@@ -17,6 +17,7 @@ module.exports = configure(function (ctx) {
   return {
     preFetch: false,
     supportIE: false,
+    supportTS: true,
 
     sourceFiles: {
       router: 'src/router.ts',

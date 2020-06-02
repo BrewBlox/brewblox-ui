@@ -4,7 +4,7 @@ import { VueConstructor } from 'vue';
 import { popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 
-const stateRouting = 'brewcast/state';
+const stateTopicFilter = 'brewcast/state/#';
 
 export type ListenerFunc = (msg: EventbusMessage) => void | Promise<void>;
 
@@ -28,13 +28,13 @@ export class BrewbloxEventbus {
       protocol: 'mqtts',
       host: window.location.hostname,
       port: Number(process.env.BLOX_API_PORT ?? window.location.port),
-      path: '/eventbus/ws',
+      path: '/eventbus',
       rejectUnauthorized: false,
     };
     const client = mqtt.connect(undefined, opts);
 
     client.on('error', e => notify.error(`mqtt error: ${e}`));
-    client.on('connect', () => client.subscribe(stateRouting));
+    client.on('connect', () => client.subscribe(stateTopicFilter));
     client.on('message', (_, body) => {
       const message: EventbusMessage = JSON.parse(body.toString());
       this.listeners
