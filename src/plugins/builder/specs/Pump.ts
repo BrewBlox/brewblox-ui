@@ -4,7 +4,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { DigitalState } from '@/plugins/spark/types';
 
 import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '../getters';
-import { settingsBlock, showDrivingBlockDialog } from '../helpers';
+import { settingsBlock, showAbsentBlock, showDrivingBlockDialog } from '../helpers';
 import { PartSpec, PartUpdater, PersistentPart } from '../types';
 
 const addressKey = 'actuator';
@@ -59,6 +59,7 @@ const spec: PartSpec = {
     };
   },
   interactHandler: (part: PersistentPart, updater: PartUpdater) => {
+    const hasAddr = !!part.settings[addressKey]?.id;
     const block = settingsBlock(part, addressKey);
     const driven = block === null
       ? false
@@ -67,9 +68,12 @@ const spec: PartSpec = {
         .drivenChains
         .some(v => v[0] === block.id);
 
-    if (block === null) {
+    if (!hasAddr) {
       part.settings.enabled = !part.settings.enabled;
       updater.updatePart(part);
+    }
+    else if (block === null) {
+      showAbsentBlock(part, addressKey);
     }
     else if (driven) {
       showDrivingBlockDialog(part, addressKey);
