@@ -22,6 +22,7 @@ export interface EventbusMessage {
 
 export class BrewbloxEventbus {
   private listeners: EventbusListener[] = [];
+  private startup = false;
 
   public async start(): Promise<void> {
     const opts: mqtt.IClientOptions = {
@@ -34,7 +35,13 @@ export class BrewbloxEventbus {
     const client = mqtt.connect(undefined, opts);
 
     client.on('error', e => notify.error(`mqtt error: ${e}`));
-    client.on('connect', () => client.subscribe(stateTopic + '/#'));
+    client.on('connect', () => {
+      client.subscribe(stateTopic + '/#');
+      if (!this.startup) {
+        client.publish('brewcast/request/state', '{}');
+        this.startup = true;
+      }
+    });
     client.on('message', (_, body) => {
       const message: EventbusMessage = JSON.parse(body.toString());
       this.listeners
