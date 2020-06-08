@@ -166,7 +166,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async fetchDiscoveredBlocks(): Promise<void> {
-    const discovered = await api.fetchDiscoveredBlocks(this.id);
+    const discovered = (await api.fetchDiscoveredBlocks(this.id)).map(v => v.id);
     this.discoveredBlocks = [...this.discoveredBlocks, ...discovered];
   }
 

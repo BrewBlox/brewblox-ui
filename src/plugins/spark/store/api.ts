@@ -76,8 +76,8 @@ export const persistAutoconnecting = (serviceId: string, enabled: boolean): Prom
     .then(resp => resp.data.enabled)
     .catch(intercept(`Failed to persist autoconnecting flag on ${serviceId}`));
 
-export const fetchDiscoveredBlocks = (serviceId: string): Promise<string[]> =>
-  http.get<string[]>(`/${encodeURIComponent(serviceId)}/discover_objects`)
+export const fetchDiscoveredBlocks = (serviceId: string): Promise<HasId[]> =>
+  http.get<HasId[]>(`/${encodeURIComponent(serviceId)}/discover_objects`)
     .then(resp => resp.data)
     .catch(intercept(`Failed to discover objects on ${serviceId}`));
 
