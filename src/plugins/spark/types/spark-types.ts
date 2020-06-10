@@ -35,6 +35,7 @@ export type UserUnits = Record<UserUnitKey, string>;
  * As sent/pushed by the devcon-spark service
  */
 export interface ApiSparkStatus {
+  type: 'Spark';
   autoconnecting: boolean;
   connect: boolean;
   handshake: boolean;

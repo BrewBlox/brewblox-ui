@@ -84,6 +84,11 @@ export interface Block extends BlockAddress {
  */
 export type DataBlock = Omit<Block, 'serviceId'>;
 
+export interface BlockIds {
+  id?: string;
+  nid?: number;
+}
+
 export interface BlockConfig {
   serviceId: string;
   blockId: string;
