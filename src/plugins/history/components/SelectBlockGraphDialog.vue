@@ -9,6 +9,8 @@ import { blockGraphCfg } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockCrud, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
 
+import { GraphConfig } from '../types';
+
 
 @Component
 export default class SelectBlockGraphDialog extends DialogBase {
@@ -93,8 +95,13 @@ export default class SelectBlockGraphDialog extends DialogBase {
       },
     };
     const cfg = blockGraphCfg(crud, v => this.selectedFields.some(f => f.key === v.key));
-    cfg.renames = mapValues(cfg.renames, v => `[${blockId}] ${v}`);
-    this.onDialogOk(cfg);
+    const sanitized: GraphConfig = {
+      ...cfg,
+      layout: {},
+      params: {},
+      renames: mapValues(cfg.renames, v => `[${blockId}] ${v}`),
+    };
+    this.onDialogOk(sanitized);
   }
 }
 </script>
