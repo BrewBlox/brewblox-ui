@@ -296,7 +296,6 @@ export default class SparkPage extends Vue {
     };
     createDialog({
       component,
-      parent: this,
       ...args,
     });
   }
