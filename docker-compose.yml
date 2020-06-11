@@ -9,7 +9,7 @@ services:
       - "traefik.frontend.rule=PathPrefix: /eventbus"
 
   influx:
-    image: influxdb:1.7
+    image: influxdb:1.8
     volumes:
       - ./dev/influxdb/:/var/lib/influxdb/
 
