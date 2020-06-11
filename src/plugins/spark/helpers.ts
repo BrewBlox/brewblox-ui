@@ -403,3 +403,20 @@ export const blockGraphCfg = <BlockT extends Block = any>(
     colors: {},
   };
 };
+
+export const discoverBlocks = async (serviceId: string | null, show = true): Promise<string[]> => {
+  const module = sparkStore.moduleById(serviceId);
+  if (!module) {
+    return [];
+  }
+  const discovered = await module.fetchDiscoveredBlocks();
+  if (show) {
+    notify.info({
+      icon: 'mdi-magnify-plus-outline',
+      message: discovered.length > 0
+        ? `Discovered ${discovered.join(', ')}.`
+        : 'Discovered no new blocks.',
+    });
+  }
+  return discovered;
+};

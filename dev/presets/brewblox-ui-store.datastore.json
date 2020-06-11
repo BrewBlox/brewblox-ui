@@ -3111,18 +3111,7 @@
     "title": "Spark Controller 'sparkey'",
     "order": 1,
     "type": "Spark",
-    "config": {
-      "groupNames": [
-        "testey1",
-        "testey2"
-      ],
-      "expandedBlocks": {
-        "DisplaySettings": true,
-        "Logic Input 1": true,
-        "Mock Pins": true,
-        "Logic Actuator": true
-      }
-    }
+    "config": {}
   },
   {
     "_id": "services__spock",

@@ -57,12 +57,7 @@ export default {
         ...stub,
         title: stub.id,
         order: 0,
-        config: {
-          groupNames: [],
-          expandedBlocks: {},
-          sorting: 'unsorted',
-          pageMode: 'List',
-        },
+        config: {},
       }),
     });
 
