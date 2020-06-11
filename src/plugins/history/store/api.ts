@@ -32,6 +32,7 @@ export const historyApi = {
       sse(`/history/sse/values?${queryString.stringify({
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
+        epoch: 'ms',
       })}`),
 
   subscribeMetrics:
@@ -39,6 +40,7 @@ export const historyApi = {
       sse(`/history/sse/last_values?${queryString.stringify({
         ...snakeCasedObj(params),
         ...snakeCasedObj(target),
+        epoch: 'ms',
       })}`),
 
   fetchKnownKeys:
@@ -51,6 +53,7 @@ export const historyApi = {
       http.post<QueryResult>('/history/query/values', {
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
+        epoch: 'ms',
       })
         .then(resp => resp.data),
 
