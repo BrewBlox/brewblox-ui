@@ -1,3 +1,5 @@
+import { WidgetRole } from '@/store/features';
+
 import {
   AnalogConstraintKey,
   BlockInterfaceType,
@@ -14,6 +16,15 @@ export const sparkBlocksEvent = 'Spark.blocks';
 export const sparkStatusEvent = 'Spark.service';
 export const sparkUpdateEvent = 'Spark.update';
 export const systemGroup = 7;
+
+export const roleIcons: Record<WidgetRole, string> = {
+  Display: 'mdi-monitor-dashboard',
+  Process: 'mdi-thermometer',
+  Control: 'mdi-calculator-variant',
+  Output: 'mdi-power-plug',
+  Constraint: 'mdi-lock-outline',
+  Other: 'mdi-cube',
+};
 
 export const userUnitChoices: Record<UserUnitKey, string[]> = {
   Temp: [

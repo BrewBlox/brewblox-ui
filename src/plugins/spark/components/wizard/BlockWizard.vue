@@ -6,7 +6,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { blockIdRules } from '@/plugins/spark/helpers';
+import { blockIdRules, discoverBlocks } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { Block, BlockCrud } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
@@ -94,16 +94,7 @@ export default class BlockWizard extends Vue {
   }
 
   async discover(): Promise<void> {
-    await this.sparkModule.clearDiscoveredBlocks();
-    await this.sparkModule.fetchDiscoveredBlocks();
-    await this.$nextTick();
-
-    const discovered = this.sparkModule.discoveredBlocks;
-    const message = discovered.length > 0
-      ? `Discovered ${discovered.join(', ')}.`
-      : 'Discovered no new blocks.';
-
-    notify.info({ message, icon: 'mdi-magnify-plus-outline' });
+    await discoverBlocks(this.serviceId);
   }
 
   ensureLocalBlock(): void {
