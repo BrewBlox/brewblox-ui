@@ -49,11 +49,11 @@ export const historyApi = {
         .then(resp => resp.data),
 
   fetchValues:
-    async (params: QueryParams, target: QueryTarget): Promise<QueryResult> =>
+    async (params: QueryParams, target: QueryTarget, epoch: string): Promise<QueryResult> =>
       http.post<QueryResult>('/history/query/values', {
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
-        epoch: 'ms',
+        epoch,
       })
         .then(resp => resp.data),
 

@@ -108,8 +108,8 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action
-  public async fetchValues([params, target]: [QueryParams, QueryTarget]): Promise<QueryResult> {
-    return await historyApi.fetchValues(params, target);
+  public async fetchValues([params, target, epoch]: [QueryParams, QueryTarget, string]): Promise<QueryResult> {
+    return await historyApi.fetchValues(params, target, epoch);
   }
 
   @Action
