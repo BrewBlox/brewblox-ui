@@ -9,12 +9,10 @@ import { historyStore } from '@/plugins/history/store';
 import { GraphConfig, QueryParams, QueryTarget } from '@/plugins/history/types';
 
 const precisionOpts: SelectOption[] = [
-  { label: 'Nanoseconds', value: 'ns' },
-  { label: 'Microseconds', value: 'µ' },
-  { label: 'Milliseconds', value: 'ms' },
-  { label: 'Seconds', value: 's' },
-  { label: 'Minutes', value: 'm' },
-  { label: '[YYYY]-[MM]-[DD]T[hh]:[mm]:[ss]Z', value: 'ISO8601' },
+  { label: 'Nanoseconds since 1-1-1970', value: 'ns' },
+  { label: 'Milliseconds since 1-1-1970', value: 'ms' },
+  { label: 'Seconds since 1-1-1970', value: 's' },
+  { label: 'String (ISO-8601)', value: 'ISO8601' },
 ];
 
 @Component
@@ -57,7 +55,7 @@ export default class ExportGraphAction extends Vue {
       value: precisionOpts.find(v => v.value === 'ms'),
       selectOptions: precisionOpts,
       title: 'Select timestamp formatting',
-      message: 'Numeric values will show time elapsed since epoch (1 jan 1970).',
+      message: 'The first value on every line in the CSV file shows the timestamp.',
       selectProps: {
         label: 'Formatting',
       },
