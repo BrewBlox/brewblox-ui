@@ -14,7 +14,6 @@ const precisionOpts: SelectOption[] = [
   { label: 'Milliseconds', value: 'ms' },
   { label: 'Seconds', value: 's' },
   { label: 'Minutes', value: 'm' },
-  { label: 'Hours', value: 'h' },
   { label: '[YYYY]-[MM]-[DD]T[hh]:[mm]:[ss]Z', value: 'ISO8601' },
 ];
 
