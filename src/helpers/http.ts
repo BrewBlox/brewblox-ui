@@ -1,5 +1,7 @@
 import axios, { AxiosError, AxiosTransformer } from 'axios';
 import isArray from 'lodash/isArray';
+import isObject from 'lodash/isObject';
+import isString from 'lodash/isString';
 
 import { HOST } from '@/helpers/const';
 import notify from '@/helpers/notify';
@@ -27,7 +29,13 @@ const instance = axios.create({
 
 export function intercept(desc: string): ((e: AxiosError) => never) {
   return (e: AxiosError) => {
-    notify.warn(`${desc}: ${e.response?.data ?? e.message}`);
+    const data = e.response?.data;
+    const message = isObject(data)
+      ? JSON.stringify(data)
+      : isString(data)
+        ? data
+        : e.message;
+    notify.warn(`${desc}: ${message}`);
     throw e;
   };
 }

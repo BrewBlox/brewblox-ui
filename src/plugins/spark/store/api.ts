@@ -113,16 +113,16 @@ export const flashFirmware = (serviceId: string): Promise<any> =>
     .catch(intercept(`Failed to update firmware on ${serviceId}`));
 
 export const serviceExport = (serviceId: string): Promise<SparkExported> =>
-  http.get<SparkExported>(`/${encodeURIComponent(serviceId)}/export_objects`)
+  http.post<SparkExported>(`/${encodeURIComponent(serviceId)}/blocks/backup/save`)
     .then(resp => resp.data)
     .catch(intercept(`Failed to fetch stored blocks from ${serviceId}`));
 
 export const serviceImport = (serviceId: string, exported: SparkExported): Promise<string[]> =>
-  http.post<string[]>(`/${encodeURIComponent(serviceId)}/import_objects`, exported)
-    .then(resp => resp.data)
+  http.post<{ messages: string[] }>(`/${encodeURIComponent(serviceId)}/blocks/backup/load`, exported)
+    .then(resp => resp.data.messages)
     .catch(intercept(`Failed to reset stored blocks in ${serviceId}`));
 
 export const reboot = (serviceId: string): Promise<any> =>
-  http.get(`/${encodeURIComponent(serviceId)}/system/reboot`, {})
+  http.post(`/${encodeURIComponent(serviceId)}/system/reboot`, {})
     .then(resp => resp.data)
     .catch(intercept(`Failed to reboot ${serviceId}`));
