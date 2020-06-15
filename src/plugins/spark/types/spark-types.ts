@@ -13,14 +13,13 @@ export interface StoredDataPreset<DataT = any> extends StoreObject {
 
 export type PageMode = 'Relations' | 'List';
 
-export interface SparkConfig {
-  groupNames: string[];
+export interface SparkSessionConfig {
   expandedBlocks: { [id: string]: boolean };
   sorting: string;
   pageMode: PageMode;
 }
 
-export type SparkService = Service<SparkConfig>;
+export type SparkService = Service<{}>;
 
 export interface SparkFeature {
   feature: WidgetFeature<BlockConfig>;
@@ -35,6 +34,7 @@ export type UserUnits = Record<UserUnitKey, string>;
  * As sent/pushed by the devcon-spark service
  */
 export interface ApiSparkStatus {
+  type: 'Spark';
   autoconnecting: boolean;
   connect: boolean;
   handshake: boolean;

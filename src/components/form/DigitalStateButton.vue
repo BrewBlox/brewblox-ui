@@ -68,13 +68,15 @@ export default class DigitalStateButton extends Vue {
 </script>
 
 <template>
+  <!-- TODO: replace @click.native with @click when bug is fixed in quasar -->
+  <!-- https://github.com/quasarframework/quasar/issues/7150 -->
   <q-btn-toggle
     v-if="known"
     v-bind="{value, options, disable, ...$attrs}"
     :class="['shadow-1', $attrs.class]"
     dense
     unelevated
-    @click="toggle"
+    @click.native="toggle"
   >
     <template #off>
       <span class="row">

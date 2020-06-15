@@ -9,7 +9,7 @@ const services = args.length > 0 ? args : sparks;
 
 async function run() {
   for (let svc of services) {
-    const resp = await axios.get(`${host}/${svc}/export_objects`);
+    const resp = await axios.post(`${host}/${svc}/blocks/backup/save`);
     const fname = `${fileDir}/${svc}.spark.json`;
     fs.writeFileSync(fname, JSON.stringify(resp.data, undefined, 2));
     console.log('Spark blocks saved', fname);

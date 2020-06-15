@@ -32,6 +32,7 @@ export const historyApi = {
       sse(`/history/sse/values?${queryString.stringify({
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
+        epoch: 'ms',
       })}`),
 
   subscribeMetrics:
@@ -39,6 +40,7 @@ export const historyApi = {
       sse(`/history/sse/last_values?${queryString.stringify({
         ...snakeCasedObj(params),
         ...snakeCasedObj(target),
+        epoch: 'ms',
       })}`),
 
   fetchKnownKeys:
@@ -47,10 +49,11 @@ export const historyApi = {
         .then(resp => resp.data),
 
   fetchValues:
-    async (params: QueryParams, target: QueryTarget): Promise<QueryResult> =>
+    async (params: QueryParams, target: QueryTarget, epoch: string): Promise<QueryResult> =>
       http.post<QueryResult>('/history/query/values', {
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
+        epoch,
       })
         .then(resp => resp.data),
 

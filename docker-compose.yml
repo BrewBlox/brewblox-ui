@@ -2,10 +2,14 @@ version: "3.7"
 
 services:
   eventbus:
-    image: rabbitmq:alpine
+    image: brewblox/rabbitmq:develop
+    labels:
+      - "traefik.port=15675"
+      - "traefik.protocol=ws"
+      - "traefik.frontend.rule=PathPrefix: /eventbus"
 
   influx:
-    image: influxdb:1.7
+    image: influxdb:1.8
     volumes:
       - ./dev/influxdb/:/var/lib/influxdb/
 
@@ -23,12 +27,6 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /history"
 
-  emitter:
-    image: brewblox/brewblox-emitter:develop
-    labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /emitter"
-
   automation:
     image: brewblox/brewblox-automation:develop
     init: true
@@ -43,6 +41,8 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /sparkey"
+    volumes:
+      - ./dev/simulator__sparkey:/app/simulator
     command: --name=sparkey --simulation --device-id=123456789012345678901234
 
   spock:
@@ -51,6 +51,8 @@ services:
     labels:
       - "traefik.port=5000"
       - "traefik.frontend.rule=PathPrefix: /spock"
+    volumes:
+      - ./dev/simulator__spock:/app/simulator
     command: --name=spock --simulation --device-id=432109876543210987654321
 
   traefik:
@@ -61,7 +63,7 @@ services:
     volumes:
       - ./dev/traefik:/config
       - /var/run/docker.sock:/var/run/docker.sock
-    command: >
+    command: >-
       -c /dev/null
       --docker
       --docker.domain=brewblox.local

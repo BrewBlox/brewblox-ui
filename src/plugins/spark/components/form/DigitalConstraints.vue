@@ -168,16 +168,16 @@ export default class DigitalConstraints extends Vue {
       <TimeUnitField
         v-if="type === 'minOff'"
         :value="constraint.minOff"
-        title="Minimum OFF new Time"
-        label="Minimum OFF new Time"
+        title="Minimum OFF period"
+        label="Minimum OFF period"
         class="col-grow"
         @input="v => { constraint.minOff = v; save(); }"
       />
       <TimeUnitField
         v-if="type === 'minOn'"
         :value="constraint.minOn"
-        title="Minimum ON new Time"
-        label="Minimum ON new Time"
+        title="Minimum ON period"
+        label="Minimum ON period"
         class="col-grow"
         @input="v => { constraint.minOn = v; save(); }"
       />

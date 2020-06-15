@@ -1,8 +1,10 @@
+import mqtt from 'mqtt';
 import { VueConstructor } from 'vue';
 
 import { popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { ReconnectingEventSource, sse } from '@/helpers/sse';
+
+const stateTopic = 'brewcast/state';
 
 export type ListenerFunc = (msg: EventbusMessage) => void | Promise<void>;
 
@@ -18,35 +20,34 @@ export interface EventbusMessage {
   data: any;
 }
 
-/**
- * Backend services can push data over the RabbitMQ eventbus.
- * Events published to the brewcast.state exchange are forwarded over SSE.
- *
- * Plugins can set listeners for messages matching specific key(s).
- */
 export class BrewbloxEventbus {
   private listeners: EventbusListener[] = [];
-  private source: ReconnectingEventSource | null = null;
-  private lastOk = true;
+  private startup = false;
 
   public async start(): Promise<void> {
-    this.source?.close();
-    this.source = sse('/emitter/sse', 3000);
-
-    this.source.onmessage = (event: MessageEvent) => {
-      this.lastOk = true;
-      const msg: EventbusMessage = JSON.parse(event.data);
-      this.listeners
-        .filter(lst => lst.filter(msg.key, msg.type))
-        .forEach(lst => lst.onmessage(msg));
+    const opts: mqtt.IClientOptions = {
+      protocol: 'wss',
+      host: window.location.hostname,
+      port: Number(process.env.BLOX_API_PORT ?? window.location.port),
+      path: '/eventbus',
+      rejectUnauthorized: false,
     };
+    const client = mqtt.connect(undefined, opts);
 
-    this.source.onerror = () => {
-      if (this.lastOk) {
-        notify.warn('Eventbus connection interrupted. Retrying...');
-        this.lastOk = false;
+    client.on('error', e => notify.error(`mqtt error: ${e}`));
+    client.on('connect', () => {
+      client.subscribe(stateTopic + '/#');
+      if (!this.startup) {
+        client.publish('brewcast/request/state', '{}');
+        this.startup = true;
       }
-    };
+    });
+    client.on('message', (_, body) => {
+      const message: EventbusMessage = JSON.parse(body.toString());
+      this.listeners
+        .filter(lst => lst.filter(message.key, message.type))
+        .forEach(lst => lst.onmessage(message));
+    });
   }
 
   public addListener(listener: EventbusListener): void {

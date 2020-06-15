@@ -12,7 +12,7 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
   actual: Block | null = null;
 
   async created(): Promise<void> {
-    this.actual = await fetchStoredBlock(this.serviceId, this.block.data.actualId);
+    this.actual = await fetchStoredBlock(this.serviceId, { nid: this.block.data.actualId });
   }
 
   removeBlock(): void {

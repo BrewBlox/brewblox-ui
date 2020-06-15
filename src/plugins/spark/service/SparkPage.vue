@@ -1,5 +1,6 @@
 <script lang="ts">
 import isArray from 'lodash/isArray';
+import { SessionStorage } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
@@ -7,7 +8,7 @@ import { Watch } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
+import { discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
   Block,
@@ -20,25 +21,17 @@ import type {
   SparkStatus,
 } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
-import { featureStore, WidgetContext, WidgetRole } from '@/store/features';
+import { featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
+import { roleIcons } from '../getters';
+import { blockSorters, defaultSessionConfig, storageKey } from './helpers';
 import Troubleshooter from './Troubleshooter.vue';
+import { ValidatedWidget } from './types';
 
 interface ModalSettings {
   component: string;
   props: any;
-}
-
-interface ValidatedWidget {
-  id: string;
-  key: string;
-  component: string;
-  crud: BlockCrud;
-  title: string;
-  role: WidgetRole;
-  expanded: boolean;
-  error?: string;
 }
 
 @Component({
@@ -50,9 +43,12 @@ export default class SparkPage extends Vue {
   capitalized = capitalized;
   startResetBlocks = startResetBlocks;
   saveHwInfo = saveHwInfo;
+  discoverBlocks = discoverBlocks;
 
+  allSorters = blockSorters();
   volatileWidgets: { [blockId: string]: Widget } = {};
   blockFilter = '';
+  sessionCfg = defaultSessionConfig();
 
   context: WidgetContext = {
     mode: 'Basic',
@@ -60,26 +56,13 @@ export default class SparkPage extends Vue {
     size: 'Content',
   };
 
-  roleOrder: Record<WidgetRole, number> = {
-    Display: 0,
-    Process: 1,
-    Control: 2,
-    Output: 3,
-    Constraint: 4,
-    Other: 5,
-  };
-
-  roleIcons: Record<WidgetRole, string> = {
-    Display: 'mdi-monitor-dashboard',
-    Process: 'mdi-thermometer',
-    Control: 'mdi-calculator-variant',
-    Output: 'mdi-power-plug',
-    Constraint: 'mdi-lock-outline',
-    Other: 'mdi-cube',
-  };
-
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
+
+  @Watch('serviceId', { immediate: true })
+  watchId(): void {
+    this.loadSessionConfig();
+  }
 
   @Watch('service.title', { immediate: true })
   watchTitle(newV: string): void {
@@ -119,60 +102,40 @@ export default class SparkPage extends Vue {
   }
 
   get pageMode(): PageMode {
-    return this.service.config.pageMode ?? 'List';
+    return this.sessionCfg.pageMode ?? 'List';
   }
 
   set pageMode(mode: PageMode) {
-    this.service.config.pageMode = mode;
-    this.saveServiceConfig();
-  }
-
-  get allSorters(): { [id: string]: (a: ValidatedWidget, b: ValidatedWidget) => number } {
-    return {
-      unsorted: () => 0,
-      name: (a, b) => objectStringSorter('id')(a, b),
-      type: (a, b): number => {
-        const left = a.title.toLowerCase();
-        const right = b.title.toLowerCase();
-        return left.localeCompare(right);
-      },
-      role: (a, b): number =>
-        this.roleOrder[a.role] - this.roleOrder[b.role],
-    };
+    this.sessionCfg.pageMode = mode;
+    this.saveSessionConfig();
   }
 
   get sorting(): string {
-    return this.service.config.sorting || 'unsorted';
+    return this.sessionCfg.sorting ?? 'unsorted';
   }
 
   set sorting(val: string) {
-    this.service.config.sorting = val;
-    this.saveServiceConfig();
+    this.sessionCfg.sorting = val;
+    this.saveSessionConfig();
   }
 
   get sorter(): (a: ValidatedWidget, b: ValidatedWidget) => number {
-    return this.allSorters[this.sorting] || (() => 0);
+    return this.allSorters[this.sorting] ?? (() => 0);
   }
 
   get expandedBlocks(): { [id: string]: boolean } {
-    return this.service.config.expandedBlocks || {};
+    return this.sessionCfg.expandedBlocks ?? {};
   }
 
   set expandedBlocks(expanded: { [id: string]: boolean }) {
-    const ids = [...this.sparkModule!.blockIds, '_service'];
-    this.service.config.expandedBlocks = Object.entries(expanded)
-      .reduce(
-        (acc, [k, v]) => {
-          if (ids.includes(k)) { acc[k] = v; };
-          return acc;
-        },
-        {},
-      );
-    this.saveServiceConfig();
+    this.sessionCfg.expandedBlocks =
+      [...this.sparkModule!.blockIds, '_service']
+        .reduce((acc, id) => mutate(acc, id, expanded[id] ?? false), {});
+    this.saveSessionConfig();
   }
 
   get serviceExpanded(): boolean {
-    return this.expandedBlocks['_service'] || false;
+    return this.expandedBlocks['_service'] ?? false;
   }
 
   set serviceExpanded(val: boolean) {
@@ -184,8 +147,22 @@ export default class SparkPage extends Vue {
       !!this.service.id.toLowerCase().match(this.blockFilter.toLowerCase());
   }
 
-  saveServiceConfig(): void {
-    serviceStore.saveService({ ...this.service });
+  loadSessionConfig(): void {
+    try {
+      this.sessionCfg = SessionStorage.getItem(storageKey(this.serviceId)) ?? defaultSessionConfig();
+    }
+    catch (e) {
+      this.sessionCfg = defaultSessionConfig();
+    }
+  }
+
+  saveSessionConfig(): void {
+    try {
+      SessionStorage.set(storageKey(this.serviceId), this.sessionCfg);
+    }
+    catch (e) {
+      // ignore
+    }
   }
 
   scrollTo(id: string): void {
@@ -227,7 +204,7 @@ export default class SparkPage extends Vue {
   validateBlock(block: Block): ValidatedWidget {
     const key = this.volatileKey(block.id);
     const existing = this.volatileWidgets[key];
-    if (!existing || existing.feature !== block.type) {
+    if (existing?.feature !== block.type) {
       this.$set(
         this.volatileWidgets,
         key,
@@ -256,26 +233,28 @@ export default class SparkPage extends Vue {
     };
     const { id } = widget;
     const { component, error } = featureStore.widgetComponent(crud);
+    const role = featureStore.widgetRole(widget.feature);
     return {
       id,
       key,
       crud,
       component,
       error,
+      role,
+      icon: roleIcons[role] ?? '',
       title: featureStore.widgetTitle(widget.feature),
-      role: featureStore.widgetRole(widget.feature),
       expanded: this.expandedBlocks[widget.id] ?? false,
     };
   }
 
-  get specIds(): BlockType[] {
+  get validTypes(): BlockType[] {
     return sparkStore.specs.map(s => s.id);
   }
 
   get validatedItems(): ValidatedWidget[] {
     return this.sparkModule
       ?.blocks
-      .filter(block => this.specIds.includes(block.type))
+      .filter(block => this.validTypes.includes(block.type))
       .map(this.validateBlock)
       ?? [];
   }
@@ -317,7 +296,6 @@ export default class SparkPage extends Vue {
     };
     createDialog({
       component,
-      parent: this,
       ...args,
     });
   }
@@ -332,20 +310,6 @@ export default class SparkPage extends Vue {
     return this.sparkModule?.relations ?? [];
   }
 
-  async discoverBlocks(): Promise<void> {
-    if (!this.sparkModule) { return; }
-    await this.sparkModule.clearDiscoveredBlocks();
-    await this.sparkModule.fetchDiscoveredBlocks();
-    await this.$nextTick();
-
-    const discovered = this.sparkModule.discoveredBlocks;
-    const message = discovered.length > 0
-      ? `Discovered ${discovered.join(', ')}.`
-      : 'Discovered no new blocks.';
-
-    notify.info({ message, icon: 'mdi-magnify-plus-outline' });
-  }
-
   async cleanUnusedNames(): Promise<void> {
     if (!this.sparkModule) { return; }
     const names = await this.sparkModule.cleanUnusedNames();
@@ -357,9 +321,8 @@ export default class SparkPage extends Vue {
     notify.info({ message, icon: 'mdi-tag-remove' });
   }
 
-  async reboot(): Promise<void> {
-    if (!this.sparkModule) { return; }
-    await this.sparkModule.reboot();
+  reboot(): void {
+    this.sparkModule?.reboot();
   }
 
   onBlockClick(val: ValidatedWidget): void {
@@ -424,7 +387,7 @@ export default class SparkPage extends Vue {
           <ActionItem
             icon="mdi-magnify-plus-outline"
             label="Discover new OneWire blocks"
-            @click="discoverBlocks"
+            @click="discoverBlocks(serviceId)"
           />
           <ActionItem
             icon="mdi-tag-remove"
@@ -464,12 +427,12 @@ export default class SparkPage extends Vue {
           <ActionItem
             icon="mdi-power-plug"
             label="Export hardware links"
-            @click="saveHwInfo(service.id)"
+            @click="saveHwInfo(serviceId)"
           />
           <ActionItem
             icon="delete"
             label="Remove all blocks"
-            @click="startResetBlocks(service.id)"
+            @click="startResetBlocks(serviceId)"
           />
         </template>
       </ActionMenu>
@@ -572,7 +535,7 @@ export default class SparkPage extends Vue {
                   @click="onBlockClick(val)"
                 >
                   <q-item-section avatar>
-                    <q-icon :name="roleIcons[val.role]" />
+                    <q-icon :name="val.icon" />
                     <q-tooltip>{{ val.role }}</q-tooltip>
                   </q-item-section>
                   <q-item-section>

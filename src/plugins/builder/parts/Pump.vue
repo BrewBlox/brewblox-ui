@@ -13,13 +13,19 @@ type ActuatorType = DigitalActuatorBlock | ActuatorPwmBlock;
 export default class Pump extends PartBase {
   addressKey = 'actuator';
 
+  get hasAddress(): boolean {
+    return !!this.settings[this.addressKey]?.id;
+  }
+
   get block(): ActuatorType | null {
     return settingsBlock(this.part, this.addressKey);
   }
 
   get enabled(): boolean {
     if (this.block === null) {
-      return false;
+      return this.hasAddress
+        ? false
+        : Boolean(this.settings.enabled);
     }
     else if (this.block.type === 'DigitalActuator') {
       return this.block.data.state === DigitalState.Active;
@@ -114,7 +120,7 @@ export default class Pump extends PartBase {
       <path d="M50,29H29v3.5c0,2.2-1.8,4-4,4s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25" />
     </g>
     <rect fill="green" fill-opacity="0" x="0" y="0" width="50" height="50" />
-    <PowerIcon v-if="block" transform="translate(15,-5)" />
+    <PowerIcon v-if="hasAddress" transform="translate(15,-5)" />
   </g>
 </template>
 

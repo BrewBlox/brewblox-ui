@@ -54,6 +54,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   // We override `this.config`
   // It will not be picked up as default argument to super.saveConfig()
   async saveConfig(config: GraphConfig = this.config): Promise<void> {
+    delete config.layout.title;
     this.widget.config = config;
     this.saveWidget(this.widget);
   }

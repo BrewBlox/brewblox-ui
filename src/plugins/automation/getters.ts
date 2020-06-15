@@ -1,6 +1,6 @@
 import { AutomationTask } from './types';
 
-export const AutomationEvent = 'Automation.active';
+export const AutomationEvent = 'automation.active';
 
 export const settableStates: { status: AutomationTask['status'] }[] = [
   { status: 'Created' },

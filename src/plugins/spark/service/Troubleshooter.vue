@@ -6,6 +6,8 @@ import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
 
+import { createDialog } from '../../../helpers/dialog';
+
 @Component
 export default class Troubleshooter extends Vue {
   context: WidgetContext = {
@@ -88,6 +90,13 @@ export default class Troubleshooter extends Vue {
       class: 'col-auto q-mr-sm',
     };
   }
+
+  startFirmwareUpdate(): void {
+    createDialog({
+      component: 'FirmwareUpdateDialog',
+      serviceId: this.serviceId,
+    });
+  }
 }
 </script>
 
@@ -158,6 +167,17 @@ export default class Troubleshooter extends Vue {
         <div>
           {{ textCompatible }}
         </div>
+
+        <template v-if="!status.compatible">
+          <div class="col-break" />
+          <div class="row q-gutter-x-sm q-pl-lg">
+            <q-btn
+              flat
+              label="Update firmware"
+              @click="startFirmwareUpdate"
+            />
+          </div>
+        </template>
 
         <div class="col-break" />
         <q-icon v-bind="iconProps(status.valid)" />
