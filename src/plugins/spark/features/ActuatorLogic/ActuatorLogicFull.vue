@@ -7,13 +7,9 @@ import { isCompatible } from '@/plugins/spark/helpers';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
-  AnalogCompareOp,
   Block,
   BlockInterfaceType,
   DigitalCompare,
-  DigitalCompareOp,
-  DigitalState,
-  EvalResult,
   ExpressionError,
 } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
@@ -140,18 +136,18 @@ export default class ActuatorLogicFull
   addComparison(block: Block): void {
     if (isCompatible(block.type, 'ActuatorDigitalInterface')) {
       this.block.data.digital.push({
-        op: DigitalCompareOp.VALUE_IS,
+        op: 'VALUE_IS',
         id: new Link(block.id, block.type),
-        rhs: DigitalState.Active,
-        result: EvalResult.EMPTY,
+        rhs: 'Active',
+        result: 'EMPTY',
       });
     }
     else if (isCompatible(block.type, 'ProcessValueInterface')) {
       this.block.data.analog.push({
-        op: AnalogCompareOp.VALUE_GE,
+        op: 'VALUE_GE',
         id: new Link(block.id, block.type),
         rhs: 25,
-        result: EvalResult.EMPTY,
+        result: 'EMPTY',
       });
     }
     this.saveBlock();

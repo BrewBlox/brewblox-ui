@@ -10,7 +10,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 
 import QuickActionChange from './QuickActionChange.vue';
-import { BlockChange, QuickActionsConfig, Step } from './types';
+import { BlockChange, ChangeAction, QuickActionsConfig } from './types';
 
 @Component({
   components: {
@@ -22,40 +22,40 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   editableChanges: Mapped<boolean> = {};
 
   @Prop({ type: String })
-  readonly openStep!: string;
+  readonly activeAction!: string;
 
   get defaultServiceId(): string | null {
     return this.config.serviceId ?? null;
   }
 
-  get steps(): Step[] {
-    return deserialize(this.config.steps);
+  get actions(): ChangeAction[] {
+    return deserialize(this.config.actions ?? this.config.steps);
   }
 
-  saveSteps(steps: Step[] = this.steps): void {
-    this.config.steps = serialize(steps);
+  saveActions(actions: ChangeAction[] = this.actions): void {
+    this.config.actions = serialize(actions);
     this.saveConfig();
   }
 
-  saveStep(step: Step): void {
-    spliceById(this.steps, step);
-    this.saveSteps();
+  saveAction(action: ChangeAction): void {
+    spliceById(this.actions, action);
+    this.saveActions();
   }
 
-  duplicateStep(step: Step): void {
-    this.steps.push({
+  duplicateAction(action: ChangeAction): void {
+    this.actions.push({
       id: uid(),
-      name: `${step.name} (copy)`,
-      changes: step.changes.map(change => ({ ...deepCopy(change), id: uid() })),
+      name: `${action.name} (copy)`,
+      changes: action.changes.map(change => ({ ...deepCopy(change), id: uid() })),
     });
-    this.saveSteps();
+    this.saveActions();
   }
 
-  renameStep(step: Step): void {
-    const stepName = step.name;
+  renameAction(action: ChangeAction): void {
+    const stepName = action.name;
     createDialog({
-      title: 'Change Step name',
-      message: `Choose a new name for '${step.name}'`,
+      title: 'Change ChangeAction name',
+      message: `Choose a new name for '${action.name}'`,
       cancel: true,
       prompt: {
         model: stepName,
@@ -64,29 +64,29 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
     })
       .onOk(newName => {
         if (newName !== stepName) {
-          step.name = newName;
-          this.saveStep(step);
+          action.name = newName;
+          this.saveAction(action);
         }
       });
   }
 
-  startRemoveStep(step: Step): void {
+  startRemoveStep(action: ChangeAction): void {
     createDialog({
-      title: 'Remove Step',
-      message: `Are you sure you want to remove ${step.name}?`,
+      title: 'Remove ChangeAction',
+      message: `Are you sure you want to remove ${action.name}?`,
       ok: 'Confirm',
       cancel: 'Cancel',
     })
-      .onOk(() => this.saveSteps(filterById(this.steps, step)));
+      .onOk(() => this.saveActions(filterById(this.actions, action)));
   }
 
-  startAddChange(step: Step): void {
+  startAddChange(action: ChangeAction): void {
     createDialog({
       component: 'BlockAddressDialog',
       title: 'Choose a Block',
       value: {
         id: null,
-        serviceId: this.defaultServiceId,
+        serviceId: null,
         type: null,
       },
       anyService: true,
@@ -95,48 +95,51 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       parent: this,
     })
       .onOk((addr: BlockAddress) => {
-        if (!addr || !addr.id) { return; }
-        step.changes.push({
-          id: uid(),
-          blockId: addr.id,
-          serviceId: addr.serviceId,
-          data: {},
-          confirmed: {},
-        });
-        this.saveStep(step);
+        if (addr && addr.id && addr.serviceId) {
+          action.changes.push({
+            id: uid(),
+            blockId: addr.id,
+            serviceId: addr.serviceId,
+            data: {},
+            confirmed: {},
+          });
+          this.saveAction(action);
+        }
       });
   }
 
-  saveChanges(step: Step, changes: BlockChange[]): void {
-    step.changes = changes;
-    this.saveStep(step);
+  saveChanges(action: ChangeAction, changes: BlockChange[]): void {
+    action.changes = changes;
+    this.saveAction(action);
   }
 
-  saveChange(step: Step, change: BlockChange): void {
-    spliceById(step.changes, change);
-    this.saveStep(step);
+  saveChange(action: ChangeAction, change: BlockChange): void {
+    spliceById(action.changes, change);
+    this.saveAction(action);
   }
 
-  removeChange(step: Step, change: BlockChange): void {
-    spliceById(step.changes, change, false);
-    this.saveStep(step);
+  removeChange(action: ChangeAction, change: BlockChange): void {
+    spliceById(action.changes, change, false);
+    this.saveAction(action);
   }
 
-  startSwitchBlock(step: Step, change: BlockChange): void {
-    const serviceId = change.serviceId ?? this.defaultServiceId;
-    const currentBlock = sparkStore.blockById(serviceId, change.blockId);
+  startSwitchBlock(action: ChangeAction, change: BlockChange): void {
+    const { serviceId, blockId } = change;
+    const currentBlock = sparkStore.blockById(serviceId, blockId);
     createDialog({
       component: 'BlockAddressDialog',
       parent: this,
-      title: `Switch target block '${change.blockId}'`,
+      title: `Switch target block '${blockId}'`,
       value: currentBlock,
       anyService: true,
       blockFilter: block => currentBlock === null || block.type === currentBlock.type,
     })
       .onOk((addr: BlockAddress) => {
-        change.blockId = addr.id;
-        change.serviceId = addr.serviceId;
-        this.saveChange(step, change);
+        if (addr && addr.id && addr.serviceId) {
+          change.blockId = addr.id;
+          change.serviceId = addr.serviceId;
+          this.saveChange(action, change);
+        }
       });
   }
 }
@@ -148,68 +151,67 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
 
     <div class="widget-body column">
       <draggable
-        v-if="steps.length > 0"
+        v-if="actions.length > 0"
         :disabled="$dense"
-        :value="steps"
-        @input="saveSteps"
+        :value="actions"
+        @input="saveActions"
         @start="draggingStep=true"
         @end="draggingStep=false"
       >
         <q-expansion-item
-          v-for="step in steps"
-          :key="step.id"
-          :label="step.name"
-          :default-opened="openStep === step.id"
+          v-for="action in actions"
+          :key="action.id"
+          :label="action.name"
+          :default-opened="openStep === action.id"
           :disable="draggingStep"
           header-style="font-size: 120%"
-          group="steps"
+          group="actions"
           icon="mdi-format-list-checks"
-          class="step-container q-mr-md q-mb-sm depth-1"
+          class="action-container q-mr-md q-mb-sm depth-1"
         >
           <draggable
             :disabled="$dense"
-            :value="step.changes"
-            @input="v => saveChanges(step, v)"
+            :value="action.changes"
+            @input="v => saveChanges(action, v)"
           >
             <QuickActionChange
-              v-for="change in step.changes"
-              :key="`change--${step.id}--${change.id}`"
-              :default-service-id="defaultServiceId"
+              v-for="change in action.changes"
+              :key="`change--${action.id}--${change.id}`"
               :value="change"
               class="q-mr-sm q-my-sm"
-              @input="saveChange(step, change)"
-              @remove="removeChange(step, change)"
-              @switch="startSwitchBlock(step, change)"
+              @input="saveChange(action, change)"
+              @remove="removeChange(action, change)"
+              @switch="startSwitchBlock(action, change)"
             />
           </draggable>
-          <div class="row justify-end q-px-md q-py-sm step-actions">
+          <div class="row justify-end q-px-md q-py-sm action-actions">
             <q-btn
               size="sm"
               label="Add Block"
               icon="mdi-cube"
               flat
-              @click="startAddChange(step)"
+              @click="startAddChange(action)"
             />
             <q-btn
               size="sm"
               label="Copy"
               icon="file_copy"
               flat
-              @click="duplicateStep(step)"
+              @click="duplicateAction(action)"
             />
             <q-btn
               size="sm"
               label="Rename"
               icon="edit"
               flat
-              @click="renameStep(step)"
+              @click="renameAction(action)"
             />
             <q-btn
               size="sm"
               label="Remove"
               icon="delete"
               flat
-              @click="startRemoveStep(step)"
+              @click="startRemoveStep(action)"
             />
           </div>
         </q-expansion-item>
@@ -220,10 +222,10 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
 </template>
 
 <style scoped>
-.step-container:nth-child(odd) {
+.action-container:nth-child(odd) {
   border-left: 2px solid dodgerblue;
 }
-.step-container:nth-child(even) {
+.action-container:nth-child(even) {
   border-left: 2px solid red;
 }
 </style>

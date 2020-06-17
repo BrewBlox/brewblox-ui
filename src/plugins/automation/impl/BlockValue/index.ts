@@ -11,7 +11,7 @@ const operator = (impl: BlockValueImpl): string =>
 const type = 'BlockValue';
 const spec: AutomationSpec<BlockValueImpl> = {
   type,
-  title: 'Block value',
+  title: 'Block value (Deprecated)',
   component: BlockValue,
   generate: () => ({
     type,
@@ -24,7 +24,7 @@ const spec: AutomationSpec<BlockValueImpl> = {
   }),
   pretty: impl =>
     matchesType<BlockValueImpl>(type, impl)
-      ? `${impl.blockId} '${impl.key}' must be ${operator(impl)} ${impl.value}`
+      ? `${impl.blockId} '${impl.key}' ${operator(impl)} ${impl.value}`
       : `Invalid data: type=${impl.type}`,
 };
 

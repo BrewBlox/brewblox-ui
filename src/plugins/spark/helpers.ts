@@ -420,3 +420,6 @@ export const discoverBlocks = async (serviceId: string | null, show = true): Pro
   }
   return discovered;
 };
+
+export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
+  sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';

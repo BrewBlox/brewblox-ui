@@ -3,13 +3,13 @@ import { BlockField } from '@/plugins/spark/types';
 
 export interface BlockChange<BlockT extends Block = Block> {
   id: string;
-  serviceId: string | null;
-  blockId: string | null;
+  serviceId: string;
+  blockId: string;
   data: Partial<BlockT['data']>;
   confirmed: { [k in keyof BlockT['data']]?: boolean; };
 }
 
-export interface Step {
+export interface ChangeAction {
   id: string;
   name: string;
   changes: BlockChange[];
@@ -17,7 +17,8 @@ export interface Step {
 
 export interface QuickActionsConfig {
   serviceId?: string; // deprecated
-  steps: Step[];
+  steps?: ChangeAction[]; // deprecated
+  actions: ChangeAction[];
   changeIdMigrated: boolean;
   serviceIdMigrated: boolean;
 }

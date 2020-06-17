@@ -11,13 +11,11 @@ import {
   ActuatorPwmBlock,
   Block,
   DigitalActuatorBlock,
-  FilterChoice,
   MutexBlock,
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { DigitalState } from '@/plugins/spark/types';
 import { Link, Temp, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
@@ -67,7 +65,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.Filter15s,
+          filter: 'FILT_15s',
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -111,8 +109,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           hwDevice: new Link(config.coolPin.arrayId),
           channel: config.coolPin.pinId,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: 'Inactive',
+          state: 'Inactive',
           constrainedBy: {
             constraints: [
               {
@@ -141,8 +139,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           hwDevice: new Link(config.heatPin ? config.heatPin!.arrayId : null),
           channel: config.heatPin ? config.heatPin!.pinId : 0,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: 'Inactive',
+          state: 'Inactive',
           constrainedBy: {
             constraints: [
               {
@@ -197,7 +195,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(),
+          ...pidDefaults(serviceId),
           kp: new Unit(-20, '1/degC'),
           ti: new Time(2, 'hour'),
           td: new Time(10, 'min'),
@@ -212,7 +210,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(),
+          ...pidDefaults(serviceId),
           kp: new Unit(100, '1/degC'),
           ti: new Time(2, 'hour'),
           td: new Time(10, 'min'),
@@ -243,7 +241,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             setting: new Unit(null, 'degC'),
             value: new Unit(null, 'degC'),
             valueUnfiltered: new Unit(null, 'degC'),
-            filter: FilterChoice.Filter15s,
+            filter: 'FILT_15s',
             filterThreshold: new Unit(5, 'delta_degC'),
             resetFilter: false,
           },
@@ -258,8 +256,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             hwDevice: new Link(config.glycolPin!.arrayId),
             channel: config.glycolPin!.pinId,
             invert: false,
-            desiredState: DigitalState.Inactive,
-            state: DigitalState.Inactive,
+            desiredState: 'Inactive',
+            state: 'Inactive',
             constrainedBy: {
               constraints: [
                 { minOff: new Time(5, 'min'), remaining: new Time() },
@@ -291,7 +289,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           serviceId,
           groups,
           data: {
-            ...pidDefaults(),
+            ...pidDefaults(config.serviceId),
             kp: new Unit(-20, '1/degC'),
             ti: new Time(2, 'hour'),
             td: new Time(5, 'min'),
@@ -395,7 +393,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
       serviceId,
       changeIdMigrated: true,
       serviceIdMigrated: true,
-      steps: serialize([
+      actions: serialize([
         {
           name: 'Beer temperature control OFF',
           id: uid(),

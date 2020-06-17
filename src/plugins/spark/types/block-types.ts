@@ -114,7 +114,7 @@ export interface BlockField<T extends Block = Block> {
   title: string;
   component: string;
   componentProps?: any;
-  generate: () => any;
+  generate: (serviceId: string | null) => any;
   pretty?: (val: any) => string;
   readonly?: boolean;
   graphed?: boolean;
@@ -125,7 +125,7 @@ export interface BlockField<T extends Block = Block> {
 export interface BlockSpec<T extends Block = Block> {
   id: T['type'];
   systemObject?: boolean;
-  generate: () => T['data'];
+  generate: (serviceId: string | null) => T['data'];
   fields: BlockField<T>[];
   presets?: BlockDataPreset<T>[];
 }

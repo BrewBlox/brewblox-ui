@@ -4,17 +4,23 @@ import { Component } from 'vue-property-decorator';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { Block, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
+const FILTER_NAMES: Record<FilterChoice, string> = {
+  'FILT_NONE': 'No filtering',
+  'FILT_15s': 'Filter 15s',
+  'FILT_45s': 'Filter 45s',
+  'FILT_90s': 'Filter 90s',
+  'FILT_3m': 'Filter 3m',
+  'FILT_10m': 'Filter 10m',
+  'FILT_30m': 'Filter 30m',
+};
+
 @Component
 export default class SetpointSensorPairForm
   extends BlockCrudComponent<SetpointSensorPairBlock> {
 
   get filterOpts(): SelectOption[] {
-    return Object.keys(FilterChoice)
-      .filter(val => !Number.isNaN(Number(val)))
-      .map(value => ({
-        value: Number(value),
-        label: FilterChoice[value].replace('Filter', '').replace('NoFiltering', 'No Filtering'),
-      }));
+    return Object.entries(FILTER_NAMES)
+      .map(([value, label]) => ({ label, value }));
   }
 
   get usedBy(): Block[] {

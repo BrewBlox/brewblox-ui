@@ -39,7 +39,7 @@ export default class SparkUnitMenu extends DialogBase {
   }
 
   get displayTemp(): DisplaySettingsTempUnit {
-    return this.displayBlock?.data.tempUnit ?? DisplaySettingsTempUnit.Celsius;
+    return this.displayBlock?.data.tempUnit ?? 'Celsius';
   }
 
   set displayTemp(v: DisplaySettingsTempUnit) {
@@ -49,11 +49,11 @@ export default class SparkUnitMenu extends DialogBase {
     }
   }
 
-  get serviceTemp(): string {
+  get serviceTemp(): UserUnits['Temp'] {
     return this.units.Temp;
   }
 
-  set serviceTemp(v: string) {
+  set serviceTemp(v: UserUnits['Temp']) {
     this.units.Temp = v;
     this.sparkModule.saveUnits(this.units);
   }
@@ -79,7 +79,7 @@ export default class SparkUnitMenu extends DialogBase {
       />
       <q-select
         v-model="displayTemp"
-        :options="[{ label: 'Celsius', value: 0 }, { label: 'Fahrenheit', value: 1 }]"
+        :options="[{ label: 'Celsius', value: 'Celsius' }, { label: 'Fahrenheit', value: 'Fahrenheit' }]"
         label="Spark Display temperature unit"
         map-options
         emit-value

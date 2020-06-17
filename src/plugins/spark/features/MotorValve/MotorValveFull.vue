@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { spaceCased, typeMatchFilter } from '@/helpers/functional';
+import { typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block, MotorValveBlock, ValveStartId, ValveState } from '@/plugins/spark/types';
+import { Block, MotorValveBlock, ValveStartId } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 
 @Component
@@ -25,10 +25,6 @@ export default class MotorValveFull
       .filter(typeMatchFilter<MotorValveBlock>('MotorValve'))
       .filter(block => block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block.id), {});
-  }
-
-  get valveStateName(): string {
-    return spaceCased(ValveState[this.block.data.valveState]);
   }
 
   driverStr(pinId: number): string {
@@ -101,7 +97,7 @@ export default class MotorValveFull
         />
       </LabeledField>
       <LabeledField
-        :value="valveStateName"
+        :value="block.data.valveState"
         label="Valve State"
         class="col-grow"
       />

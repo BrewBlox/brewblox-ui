@@ -17,45 +17,41 @@ export interface ActuatorAnalogMockBlock extends Block {
   };
 }
 
-export enum DigitalCompareOp {
-  VALUE_IS = 0,
-  VALUE_ISNOT = 1,
-  DESIRED_IS = 10,
-  DESIRED_ISNOT = 11,
-}
+export type DigitalCompareOp =
+  | 'VALUE_IS'
+  | 'VALUE_ISNOT'
+  | 'DESIRED_IS'
+  | 'DESIRED_ISNOT'
 
-export enum AnalogCompareOp {
-  VALUE_LE = 0,
-  VALUE_GE = 1,
-  SETTING_LE = 10,
-  SETTING_GE = 11,
-}
+export type AnalogCompareOp =
+  | 'VALUE_LE'
+  | 'VALUE_GE'
+  | 'SETTING_LE'
+  | 'SETTING_GE'
 
-export enum CombineOp {
-  OR = 0,
-  AND = 1,
-  OR_NOT = 2,
-  AND_NOT = 3,
-  XOR = 4,
-}
+export type CombineOp =
+  | 'OR'
+  | 'AND'
+  | 'OR_NOT'
+  | 'AND_NOT'
+  | 'XOR'
 
-export enum EvalResult {
-  FALSE = 0,
-  TRUE = 1,
-  EMPTY = 2,
-  EMPTY_SUBSTRING = 3,
-  BLOCK_NOT_FOUND = 4,
-  INVALID_DIGITAL_OP = 5,
-  INVALID_ANALOG_OP = 6,
-  INVALID_ANA_COMPARE_IDX = 7,
-  INVALID_DIG_COMPARE_IDX = 8,
-  UNEXPECTED_CLOSING_BRACKET = 9,
-  MISSING_CLOSING_BRACKET = 10,
-  UNEXPECTED_OPENING_BRACKET = 11,
-  UNEXPECTED_CHARACTER = 12,
-  UNEXPECTED_COMPARISON = 13,
-  UNEXPECTED_OPERATOR = 14,
-}
+export type EvalResult =
+  | 'FALSE'
+  | 'TRUE'
+  | 'EMPTY'
+  | 'EMPTY_SUBSTRING'
+  | 'BLOCK_NOT_FOUND'
+  | 'INVALID_DIGITAL_OP'
+  | 'INVALID_ANALOG_OP'
+  | 'INVALID_ANA_COMPARE_IDX'
+  | 'INVALID_DIG_COMPARE_IDX'
+  | 'UNEXPECTED_CLOSING_BRACKET'
+  | 'MISSING_CLOSING_BRACKET'
+  | 'UNEXPECTED_OPENING_BRACKET'
+  | 'UNEXPECTED_CHARACTER'
+  | 'UNEXPECTED_COMPARISON'
+  | 'UNEXPECTED_OPERATOR'
 
 export interface DigitalCompare {
   op: DigitalCompareOp;
@@ -91,10 +87,9 @@ export interface ActuatorLogicBlock extends Block {
   };
 }
 
-export enum OffsetSettingOrValue {
-  Setting = 0,
-  Value = 1,
-}
+export type OffsetSettingOrValue =
+  | 'Setting'
+  | 'Value'
 
 export interface ActuatorOffsetBlock extends Block {
   type: 'ActuatorOffset';
@@ -163,10 +158,10 @@ export interface DigitalActuatorBlock extends Block {
   };
 }
 
-export enum DisplaySettingsTempUnit {
-  Celsius = 0,
-  Fahrenheit = 1,
-}
+export type DisplaySettingsTempUnit =
+  | 'Celsius'
+  | 'Fahrenheit'
+  ;
 
 export interface DisplaySlot {
   pos: number;
@@ -243,15 +238,14 @@ export interface MockPinsBlock extends Block {
   };
 }
 
-export enum ValveState {
-  Unknown = 0,
-  Open = 1,
-  Closed = 2,
-  Opening = 3,
-  Closing = 4,
-  HalfOpenIdle = 5,
-  InitIdle = 6,
-}
+export type ValveState =
+  | 'Unknown'
+  | 'Open'
+  | 'Closed'
+  | 'Opening'
+  | 'Closing'
+  | 'HalfOpenIdle'
+  | 'InitIdle'
 
 export interface MotorValveBlock extends Block {
   type: 'MotorValve';
@@ -324,15 +318,16 @@ export interface SetpointProfileBlock extends Block {
   };
 }
 
-export enum FilterChoice {
-  FilterNoFiltering = 0,
-  Filter15s = 1,
-  Filter45s = 2,
-  Filter90s = 3,
-  Filter3m = 4,
-  Filter10m = 5,
-  Filter30m = 6,
-}
+
+export type FilterChoice =
+  | 'FILT_NONE'
+  | 'FILT_15s'
+  | 'FILT_45s'
+  | 'FILT_90s'
+  | 'FILT_3m'
+  | 'FILT_10m'
+  | 'FILT_30m'
+
 
 export interface SetpointSensorPairBlock extends Block {
   type: 'SetpointSensorPair';
@@ -352,11 +347,10 @@ export interface SetpointSensorPairBlock extends Block {
   };
 }
 
-export enum Spark2Hardware {
-  Unknown = 0,
-  Spark1 = 1,
-  SPark2 = 2,
-}
+export type Spark2Hardware =
+  | 'unknown_hw'
+  | 'Spark1'
+  | 'Spark2'
 
 export interface Spark2PinsBlock extends Block {
   type: 'Spark2Pins';

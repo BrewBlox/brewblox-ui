@@ -1,7 +1,6 @@
 import { createDialog } from '@/helpers/dialog';
 import { blockTypes } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import { DigitalState } from '@/plugins/spark/types';
 
 import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '../getters';
 import { settingsBlock, showAbsentBlock, showDrivingBlockDialog } from '../helpers';
@@ -17,7 +16,7 @@ const calcPressure = (part: PersistentPart): number => {
       : 0;
   }
   if (block.type === 'DigitalActuator') {
-    return block.data.state === DigitalState.Active
+    return block.data.state === 'Active'
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
@@ -79,9 +78,9 @@ const spec: PartSpec = {
       showDrivingBlockDialog(part, addressKey);
     }
     else if (block.type === 'DigitalActuator') {
-      block.data.desiredState = block.data.state === DigitalState.Active
-        ? DigitalState.Inactive
-        : DigitalState.Active;
+      block.data.desiredState = block.data.state === 'Active'
+        ? 'Inactive'
+        : 'Active';
       sparkStore.saveBlock(block);
     }
     else if (block.type === 'ActuatorPwm') {

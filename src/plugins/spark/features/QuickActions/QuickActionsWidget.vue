@@ -8,7 +8,7 @@ import { deserialize, serialize } from '@/plugins/spark/parse-object';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';
-import { Step } from './types';
+import { ChangeAction, QuickActionsConfig } from './types';
 
 @Component({
   components: {
@@ -16,61 +16,58 @@ import { Step } from './types';
     Full: QuickActionsFull,
   },
 })
-export default class QuickActionsWidget extends WidgetBase {
+export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
   @Prop({ type: String, required: false })
-  public readonly openStep!: string;
+  public readonly activeAction!: string;
 
-  get defaultServiceId(): string | null {
-    return this.config.serviceId ?? null;
+  get actions(): ChangeAction[] {
+    return deserialize(this.config.actions ?? this.config.steps ?? []);
   }
 
-  get steps(): Step[] {
-    return deserialize(this.config.steps);
-  }
-
-  saveSteps(steps: Step[] = this.steps): void {
-    this.config.steps = serialize(steps);
+  saveActions(actions: ChangeAction[] = this.actions): void {
+    this.config.actions = serialize(actions);
+    this.config.steps = undefined;
     this.saveConfig();
   }
 
   created(): void {
     let updated = false;
     // Change IDs were added after initial release
-    this.steps.forEach(step =>
-      step.changes
+    this.actions.forEach(action =>
+      action.changes
         .filter(change => change.id === undefined)
         .forEach(change => {
           change.id = uid();
           updated = true;
         }));
     // Service IDs became a key of individual changes
-    this.steps.forEach(step =>
-      step.changes
+    this.actions.forEach(action =>
+      action.changes
         .filter(change => change.serviceId === undefined)
         .forEach(change => {
-          change.serviceId = this.defaultServiceId;
+          change.serviceId = this.config.serviceId!;
           updated = true;
         }));
     if (updated) {
       this.config.serviceIdMigrated = true;
       this.config.changeIdMigrated = true;
-      this.saveSteps();
+      this.saveActions();
     }
   }
 
-  addStep(): void {
-    const stepName = 'New Step';
+  addAction(): void {
     createDialog({
-      title: 'Add a Step',
+      title: 'Add an action',
+      message: 'Actions let you immediately set multiple block fields to predetermined values.',
       cancel: true,
       prompt: {
-        model: stepName,
+        model: 'New action',
         type: 'text',
       },
     })
       .onOk(name => {
-        this.steps.push({ name, id: uid(), changes: [] });
-        this.saveSteps();
+        this.actions.push({ name, id: uid(), changes: [] });
+        this.saveActions();
       });
   }
 }
@@ -87,10 +84,10 @@ export default class QuickActionsWidget extends WidgetBase {
         </template>
       </component>
     </template>
-    <component :is="mode" :crud="crud" :open-step="openStep">
-      <template v-if="config.steps.length === 0" #warnings>
+    <component :is="mode" :crud="crud" :active-action="activeAction">
+      <template v-if="actions.length === 0" #warnings>
         <div class="text-italic text-h6 q-pa-md darkened text-center">
-          Create a step to get started.
+          Create an action to get started.
         </div>
       </template>
       <template #below>
@@ -99,9 +96,9 @@ export default class QuickActionsWidget extends WidgetBase {
           dense
           color="secondary"
           icon="add"
-          label="New step"
+          label="New action"
           class="self-end"
-          @click="addStep"
+          @click="addAction"
         />
       </template>
     </component>

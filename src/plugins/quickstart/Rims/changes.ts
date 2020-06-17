@@ -10,12 +10,9 @@ import {
   ActuatorPwmBlock,
   Block,
   DigitalActuatorBlock,
-  FilterChoice,
-  OffsetSettingOrValue,
   PidBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { DigitalState } from '@/plugins/spark/types';
 import { Link, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
@@ -58,7 +55,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.Filter15s,
+          filter: 'FILT_15s',
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -75,7 +72,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.Filter15s,
+          filter: 'FILT_15s',
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -90,7 +87,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           targetId: new Link(names.tubeSetpoint),
           drivenTargetId: new Link(names.tubeSetpoint),
           referenceId: new Link(names.kettleSetpoint),
-          referenceSettingOrValue: OffsetSettingOrValue.Setting,
+          referenceSettingOrValue: 'Setting',
           enabled: true,
           desiredSetting: 0,
           setting: 0,
@@ -115,8 +112,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           hwDevice: new Link(config.tubePin.arrayId),
           channel: config.tubePin.pinId,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: 'Inactive',
+          state: 'Inactive',
           constrainedBy: { constraints: [] },
         },
       },
@@ -129,8 +126,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           hwDevice: new Link(config.pumpPin.arrayId),
           channel: config.pumpPin.pinId,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: 'Inactive',
+          state: 'Inactive',
           constrainedBy: { constraints: [] },
         },
       },
@@ -158,7 +155,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         serviceId,
         groups,
         data: {
-          ...pidDefaults(),
+          ...pidDefaults(serviceId),
           kp: new Unit(10, '1/degC'),
           ti: new Time(5, 'min'),
           td: new Time(30, 's'),
@@ -173,7 +170,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         serviceId,
         groups,
         data: {
-          ...pidDefaults(),
+          ...pidDefaults(serviceId),
           kp: new Unit(30, '1/degC'),
           ti: new Time(2, 'min'),
           td: new Time(10, 's'),
@@ -263,7 +260,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
       serviceId,
       changeIdMigrated: true,
       serviceIdMigrated: true,
-      steps: serialize([
+      actions: serialize([
         {
           name: 'Enable pump and heater',
           id: uid(),
@@ -272,7 +269,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
               id: uid(),
               serviceId,
               blockId: names.pumpAct,
-              data: { desiredState: DigitalState.Active },
+              data: { desiredState: 'Active' },
               confirmed: {},
             },
             {
@@ -302,7 +299,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
               id: uid(),
               serviceId,
               blockId: names.pumpAct,
-              data: { desiredState: DigitalState.Inactive },
+              data: { desiredState: 'Inactive' },
               confirmed: {},
             },
           ] as [
@@ -318,7 +315,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
               id: uid(),
               serviceId,
               blockId: names.pumpAct,
-              data: { desiredState: DigitalState.Active },
+              data: { desiredState: 'Active' },
               confirmed: {},
             },
           ] as [

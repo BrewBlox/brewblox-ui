@@ -1,6 +1,6 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
+import { BlockSpec, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -14,8 +14,8 @@ const block: BlockSpec<DigitalActuatorBlock> = {
   generate: () => ({
     hwDevice: new Link(null, 'IoArrayInterface'),
     channel: 0,
-    desiredState: DigitalState.Inactive,
-    state: DigitalState.Inactive,
+    desiredState: 'Inactive',
+    state: 'Inactive',
     invert: false,
     constrainedBy: { constraints: [] },
   }),
@@ -72,8 +72,7 @@ const block: BlockSpec<DigitalActuatorBlock> = {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
-      generate: () => 0,
-      pretty: v => DigitalState[v],
+      generate: () => 'Inactive',
       graphed: true,
       graphName: 'Desired state',
     },
@@ -94,8 +93,7 @@ const block: BlockSpec<DigitalActuatorBlock> = {
       key: 'state',
       title: 'Actual state',
       component: 'StateValEdit',
-      generate: () => 0,
-      pretty: v => DigitalState[v],
+      generate: () => 'Inactive',
       readonly: true,
       graphed: true,
     },

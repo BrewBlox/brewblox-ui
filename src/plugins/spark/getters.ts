@@ -4,7 +4,6 @@ import {
   AnalogConstraintKey,
   BlockInterfaceType,
   BlockType,
-  ChannelConfig,
   DigitalConstraintKey,
   SystemBlockType,
   UserBlockType,
@@ -51,8 +50,6 @@ export const constraintLabels = {
   ...digitalConstraintLabels,
   ...analogConstraintLabels,
 };
-
-export const configName = (val: ChannelConfig): string => ChannelConfig[val];
 
 export const systemBlockTypes: Record<SystemBlockType, SystemBlockType> = {
   SysInfo: 'SysInfo',

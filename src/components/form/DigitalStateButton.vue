@@ -6,10 +6,10 @@ import { DigitalState } from '@/plugins/spark/types';
 
 @Component
 export default class DigitalStateButton extends Vue {
-  on = DigitalState.Active;
-  off = DigitalState.Inactive;
+  on: DigitalState = 'Active';
+  off: DigitalState = 'Inactive';
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: String, required: true })
   readonly value!: DigitalState;
 
   @Prop({ type: Boolean, default: false })
@@ -58,10 +58,10 @@ export default class DigitalStateButton extends Vue {
     if (this.disable) {
       return;
     }
-    if (this.value === DigitalState.Inactive) {
-      this.change(DigitalState.Active);
-    } else if (this.value === DigitalState.Active || !this.known) {
-      this.change(DigitalState.Inactive);
+    if (this.value === this.off) {
+      this.change(this.on);
+    } else if (this.value === this.on || !this.known) {
+      this.change(this.off);
     }
   }
 }

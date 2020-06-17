@@ -28,7 +28,9 @@ export interface SparkFeature {
 
 export type UserUnitKey = 'Temp';
 
-export type UserUnits = Record<UserUnitKey, string>;
+export interface UserUnits {
+  Temp: 'degC' | 'degF';
+}
 
 /**
  * As sent/pushed by the devcon-spark service

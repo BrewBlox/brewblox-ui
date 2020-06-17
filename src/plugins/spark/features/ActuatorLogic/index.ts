@@ -1,7 +1,7 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { ActuatorLogicBlock, BlockSpec, EvalResult } from '@/plugins/spark/types';
+import { ActuatorLogicBlock, BlockSpec } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -13,7 +13,7 @@ const block: BlockSpec<ActuatorLogicBlock> = {
   id: typeName,
   generate: () => ({
     enabled: true,
-    result: EvalResult.EMPTY,
+    result: 'EMPTY',
     errorPos: 0,
     targetId: new Link(null, interfaceTypes.ActuatorDigital),
     drivenTargetId: new Link(null, interfaceTypes.ActuatorDigital, true),
@@ -26,7 +26,7 @@ const block: BlockSpec<ActuatorLogicBlock> = {
       key: 'result',
       title: 'Result',
       component: 'NumberValEdit',
-      generate: () => EvalResult.TRUE,
+      generate: () => 'TRUE',
       readonly: true,
       graphed: true,
     },

@@ -1,6 +1,6 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { userUnitChoices } from '@/plugins/spark/getters';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
 import { BlockSpec, TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { Temp } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
@@ -11,18 +11,21 @@ const typeName = 'TempSensorOneWire';
 
 const block: BlockSpec<TempSensorOneWireBlock> = {
   id: typeName,
-  generate: () => ({
-    value: new Temp(null, 'degC'),
-    offset: new Temp(0, 'delta_degC'),
-    address: '',
-  }),
+  generate: serviceId => {
+    const temp = serviceTemp(serviceId);
+    return {
+      value: new Temp(20, 'degC').convert(temp),
+      offset: new Temp(0, `delta_${temp}`),
+      address: '',
+    };
+  },
   fields: [
     {
       key: 'value',
       title: 'Sensor value',
       component: 'UnitValEdit',
       componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Temp(20, 'degC'),
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },
