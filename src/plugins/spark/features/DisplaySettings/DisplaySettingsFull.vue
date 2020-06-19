@@ -170,7 +170,7 @@ export default class DisplaySettingsFull
           class="col-grow clickable"
           @click="showUnitMenu"
         >
-          {{ block.data.tempUnit }}
+          {{ block.data.tempUnit | capitalize }}
         </LabeledField>
         <q-field
           label="Display brightness"

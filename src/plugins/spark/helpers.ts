@@ -1,3 +1,4 @@
+import capitalize from 'lodash/capitalize';
 import defaults from 'lodash/defaults';
 import isArray from 'lodash/isArray';
 import keyBy from 'lodash/keyBy';
@@ -72,6 +73,7 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('unitDuration', unitDurationString);
   Vue.filter('dateString', dateString);
   Vue.filter('shortDateString', shortDateString);
+  Vue.filter('capitalize', capitalize);
 };
 
 const errorComponent = (error: string): ComponentResult => ({

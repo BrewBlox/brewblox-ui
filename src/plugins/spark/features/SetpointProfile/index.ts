@@ -1,3 +1,4 @@
+import { shortDateString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec, SetpointProfileBlock } from '@/plugins/spark/types';
@@ -33,7 +34,7 @@ const block: BlockSpec<SetpointProfileBlock> = {
       pretty: (val: number): string => {
         if (val === 0) { return 'now'; }
         if (!val) { return 'invalid date'; }
-        return new Date(val * 1000).toLocaleString();
+        return shortDateString(val * 1000);
       },
     },
     {

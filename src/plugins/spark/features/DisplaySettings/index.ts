@@ -12,7 +12,7 @@ const block: BlockSpec<DisplaySettingsBlock> = {
   systemObject: true,
   generate: () => ({
     name: 'Display settings',
-    tempUnit: 'Celsius',
+    tempUnit: 'CELSIUS',
     widgets: [],
     brightness: 255,
   }),

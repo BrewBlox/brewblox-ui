@@ -1,6 +1,6 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalActuatorBlock } from '@/plugins/spark/types';
+import { BlockSpec, DigitalActuatorBlock, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
 import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -72,7 +72,7 @@ const block: BlockSpec<DigitalActuatorBlock> = {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
-      generate: () => 'Inactive',
+      generate: (): DigitalState => 'Inactive',
       graphed: true,
       graphName: 'Desired state',
     },
@@ -86,14 +86,14 @@ const block: BlockSpec<DigitalActuatorBlock> = {
       key: 'constrainedBy',
       title: 'Constraints',
       component: 'DigitalConstraintsValEdit',
-      generate: () => ({ constraints: [] }),
+      generate: (): DigitalConstraintsObj => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
     {
       key: 'state',
       title: 'Actual state',
       component: 'StateValEdit',
-      generate: () => 'Inactive',
+      generate: (): DigitalState => 'Inactive',
       readonly: true,
       graphed: true,
     },

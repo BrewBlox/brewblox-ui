@@ -1,7 +1,7 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { ActuatorOffsetBlock, BlockSpec } from '@/plugins/spark/types';
+import { ActuatorOffsetBlock, AnalogConstraintsObj, BlockSpec } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -51,7 +51,7 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
       key: 'constrainedBy',
       title: 'Constraints',
       component: 'AnalogConstraintsValEdit',
-      generate: () => ({ constraints: [] }),
+      generate: (): AnalogConstraintsObj => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
     {

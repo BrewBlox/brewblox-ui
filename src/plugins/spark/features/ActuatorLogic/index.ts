@@ -1,11 +1,12 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { ActuatorLogicBlock, BlockSpec } from '@/plugins/spark/types';
+import { ActuatorLogicBlock, BlockSpec, EvalResult } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorLogicWidget.vue';
+import { nonErrorResults } from './getters';
 
 const typeName = 'ActuatorLogic';
 
@@ -25,8 +26,9 @@ const block: BlockSpec<ActuatorLogicBlock> = {
     {
       key: 'result',
       title: 'Result',
-      component: 'NumberValEdit',
-      generate: () => 'TRUE',
+      component: 'EnumValEdit',
+      componentProps: { options: nonErrorResults },
+      generate: (): EvalResult => 'TRUE',
       readonly: true,
       graphed: true,
     },

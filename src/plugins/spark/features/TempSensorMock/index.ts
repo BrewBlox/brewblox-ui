@@ -1,5 +1,4 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
 import { BlockSpec, TempSensorMockBlock } from '@/plugins/spark/types';
 import { Temp } from '@/plugins/spark/units';
@@ -25,7 +24,6 @@ const block: BlockSpec<TempSensorMockBlock> = {
       key: 'setting',
       title: 'Sensor Setting',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
     },
     {
@@ -38,7 +36,6 @@ const block: BlockSpec<TempSensorMockBlock> = {
       key: 'value',
       title: 'Sensor value',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,

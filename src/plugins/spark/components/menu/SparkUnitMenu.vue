@@ -39,7 +39,7 @@ export default class SparkUnitMenu extends DialogBase {
   }
 
   get displayTemp(): DisplaySettingsTempUnit {
-    return this.displayBlock?.data.tempUnit ?? 'Celsius';
+    return this.displayBlock?.data.tempUnit ?? 'CELSIUS';
   }
 
   set displayTemp(v: DisplaySettingsTempUnit) {
@@ -79,13 +79,19 @@ export default class SparkUnitMenu extends DialogBase {
       />
       <q-select
         v-model="displayTemp"
-        :options="[{ label: 'Celsius', value: 'Celsius' }, { label: 'Fahrenheit', value: 'Fahrenheit' }]"
+        :options="[{ label: 'Celsius', value: 'CELSIUS' }, { label: 'Fahrenheit', value: 'FAHRENHEIT' }]"
         label="Spark Display temperature unit"
         map-options
         emit-value
         @keyup.enter.exact.stop
       />
       <template #actions>
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
         <q-btn
           flat
           label="OK"

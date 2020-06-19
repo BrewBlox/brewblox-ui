@@ -1,7 +1,7 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec, MutexBlock } from '@/plugins/spark/types';
-import { Unit } from '@/plugins/spark/units';
+import { Time } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './MutexWidget.vue';
@@ -11,8 +11,8 @@ const typeName = 'Mutex';
 const block: BlockSpec<MutexBlock> = {
   id: typeName,
   generate: () => ({
-    differentActuatorWait: new Unit(0, 'second'),
-    waitRemaining: new Unit(0, 'second'),
+    differentActuatorWait: new Time(0, 's'),
+    waitRemaining: new Time(0, 's'),
   }),
   fields: [],
 };

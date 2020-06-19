@@ -1,5 +1,4 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
 import { BlockSpec, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { Link, Temp } from '@/plugins/spark/units';
@@ -30,7 +29,6 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'storedSetting',
       title: 'Setting',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
     },
     {
@@ -43,7 +41,6 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'filterThreshold',
       title: 'Fast step threshold',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(5, 'delta_degC').convert(`delta_${serviceTemp(serviceId)}`),
     },
     {
@@ -56,7 +53,6 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'setting',
       title: 'Setting',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
@@ -65,7 +61,6 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'value',
       title: 'Sensor',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
@@ -74,7 +69,6 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'valueUnfiltered',
       title: 'Sensor unfiltered',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,

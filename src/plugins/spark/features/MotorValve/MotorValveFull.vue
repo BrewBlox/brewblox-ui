@@ -4,18 +4,19 @@ import { Component } from 'vue-property-decorator';
 import { typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block, MotorValveBlock, ValveStartId } from '@/plugins/spark/types';
+import { DS2408StartChannels } from '@/plugins/spark/getters';
+import { DS2408Block, MotorValveBlock } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 
 @Component
 export default class MotorValveFull
   extends BlockCrudComponent<MotorValveBlock> {
 
-  get hwBlock(): Block | null {
+  get hwBlock(): DS2408Block | null {
     return this.sparkModule.blockById(this.block.data.hwDevice.id);
   }
 
-  get claimedChannels(): { [channel: number]: string } {
+  get claimedChannels(): { [nid: number]: string } {
     if (!this.hwBlock) {
       return {};
     }
@@ -27,8 +28,8 @@ export default class MotorValveFull
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block.id), {});
   }
 
-  driverStr(pinId: number): string {
-    const driver = this.claimedChannels[pinId];
+  driverStr(pinNid: number): string {
+    const driver = this.claimedChannels[pinNid];
     return driver && driver !== this.block.id
       ? ` (replace '${driver}')`
       : '';
@@ -37,10 +38,11 @@ export default class MotorValveFull
   get channelOpts(): SelectOption[] {
     return [
       { label: 'Not set', value: 0 },
-      ...Object.keys(ValveStartId)
-        .map(Number)
-        .filter(id => !Number.isNaN(id))
-        .map(id => ({ label: `${ValveStartId[id]}${this.driverStr(id)}`, value: id })),
+      ...DS2408StartChannels
+        .map(({ name, nid }) => ({
+          label: `${name}${this.driverStr(nid)}`,
+          value: nid,
+        })),
     ];
   }
 

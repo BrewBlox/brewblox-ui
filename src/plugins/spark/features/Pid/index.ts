@@ -1,6 +1,5 @@
 import { unitDurationString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { userUnitChoices } from '@/plugins/spark/getters';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
 import { BlockSpec, PidBlock } from '@/plugins/spark/types';
 import { Link, Temp, Unit } from '@/plugins/spark/units';
@@ -118,7 +117,6 @@ const block: BlockSpec<PidBlock> = {
       key: 'kp',
       title: 'Kp',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp.map(v => `1/${v}`) },
       generate: serviceId => new Unit(0, `1/${serviceTemp(serviceId)}`),
     },
     {
@@ -157,7 +155,6 @@ const block: BlockSpec<PidBlock> = {
       key: 'inputSetting',
       title: 'Input target',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
@@ -166,7 +163,6 @@ const block: BlockSpec<PidBlock> = {
       key: 'inputValue',
       title: 'Input value',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
@@ -175,7 +171,6 @@ const block: BlockSpec<PidBlock> = {
       key: 'error',
       title: 'Error',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
       generate: serviceId => new Temp(0, `delta_${serviceTemp(serviceId)}`),
       readonly: true,
       graphed: true,
@@ -184,7 +179,6 @@ const block: BlockSpec<PidBlock> = {
       key: 'derivative',
       title: 'Derivative of input',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp.map(v => `delta_${v}*second`) },
       generate: serviceId => new Temp(20, `delta_${serviceTemp(serviceId)}*second`),
       readonly: true,
       graphed: true,
@@ -193,7 +187,6 @@ const block: BlockSpec<PidBlock> = {
       key: 'integral',
       title: 'Integral of error',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp.map(v => `delta_${v}/second`) },
       generate: serviceId => new Temp(20, `delta_${serviceTemp(serviceId)}/second`),
       readonly: true,
       graphed: true,

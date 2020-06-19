@@ -4,6 +4,7 @@ import {
   AnalogConstraintKey,
   BlockInterfaceType,
   BlockType,
+  ChannelMapping,
   DigitalConstraintKey,
   SystemBlockType,
   UserBlockType,
@@ -45,6 +46,11 @@ export const analogConstraintLabels: Record<AnalogConstraintKey, string> = {
   max: 'Maximum',
   balanced: 'Balanced',
 };
+
+export const DS2408StartChannels: ChannelMapping[] = [
+  { id: 'A', nid: 1, name: 'B' },
+  { id: 'E', nid: 5, name: 'A' },
+];
 
 export const constraintLabels = {
   ...digitalConstraintLabels,

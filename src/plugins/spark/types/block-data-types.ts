@@ -159,8 +159,8 @@ export interface DigitalActuatorBlock extends Block {
 }
 
 export type DisplaySettingsTempUnit =
-  | 'Celsius'
-  | 'Fahrenheit'
+  | 'CELSIUS'
+  | 'FAHRENHEIT'
   ;
 
 export interface DisplaySlot {
@@ -187,6 +187,7 @@ export interface DisplaySettingsBlock extends Block {
 
 export interface ChannelMapping {
   id: string;
+  nid: number;
   name: string;
 }
 
