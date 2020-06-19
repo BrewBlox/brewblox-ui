@@ -66,7 +66,7 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
   }
 
   addField(field: BlockField): void {
-    this.$set(this.impl.data, field.key, field.generate());
+    this.$set(this.impl.data, field.key, field.generate(this.impl.serviceId));
     this.save();
   }
 

@@ -1,6 +1,5 @@
 import { blockTypes } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import { DigitalState } from '@/plugins/spark/types';
 
 import { LEFT, RIGHT, UP } from '../getters';
 import { settingsBlock } from '../helpers';
@@ -21,7 +20,7 @@ const spec: PartSpec = {
   transitions: (part: PersistentPart): Transitions => {
     const block = settingsBlock(part, 'valve');
     const closed = block !== null
-      ? Boolean(block.data.state === DigitalState.Active)
+      ? Boolean(block.data.state === 'Active')
       : Boolean(part.settings.closed);
     return closed
       ? {
@@ -36,9 +35,9 @@ const spec: PartSpec = {
   interactHandler: (part: PersistentPart, updater: PartUpdater) => {
     const block = settingsBlock(part, 'valve');
     if (block) {
-      block.data.desiredState = block.data.state === DigitalState.Active
-        ? DigitalState.Inactive
-        : DigitalState.Active;
+      block.data.desiredState = block.data.state === 'Active'
+        ? 'Inactive'
+        : 'Active';
       sparkStore.saveBlock(block);
     }
     else {

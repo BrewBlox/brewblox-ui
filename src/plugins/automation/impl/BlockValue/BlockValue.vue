@@ -41,7 +41,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
   get validTypes(): string[] {
     return sparkStore.specs
-      .filter(spec => spec.fields.find(f => !f.readonly))
+      .filter(spec => spec.fields.length > 0)
       .map(spec => spec.id);
   }
 
@@ -50,7 +50,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
       ? this.spec
         .fields
         .map(field => {
-          const generated = field.generate();
+          const generated = field.generate(this.impl.serviceId);
           const value = isPostFixed(generated)
             ? generated.toSerialized(field.key)[0]
             : field.key;
@@ -77,7 +77,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     if (this.spec === null || this.impl.key === null) {
       return null;
     }
-    const optValue = this.impl.value ?? this.spec.generate()[this.impl.key];
+    const optValue = this.impl.value ?? this.spec.generate(this.impl.serviceId)[this.impl.key];
     const [key, value] =
       parsePostfixed(this.impl.key, optValue) ?? [this.impl.key, optValue];
     return { key, value };
@@ -103,7 +103,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     }
     const change = this.findField(key);
     return change
-      ? this.rawValue(change.generate())
+      ? this.rawValue(change.generate(this.impl.serviceId))
       : null;
   }
 

@@ -1,8 +1,7 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { userUnitChoices } from '@/plugins/spark/getters';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
-import { Link, Unit } from '@/plugins/spark/units';
+import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
+import { BlockSpec, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { Link, Temp } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './SetpointSensorPairWidget.vue';
@@ -11,24 +10,26 @@ const typeName = 'SetpointSensorPair';
 
 const block: BlockSpec<SetpointSensorPairBlock> = {
   id: typeName,
-  generate: () => ({
-    sensorId: new Link(null, 'TempSensorInterface'),
-    storedSetting: new Unit(null, 'degC'),
-    setting: new Unit(null, 'degC'),
-    value: new Unit(null, 'degC'),
-    valueUnfiltered: new Unit(null, 'degC'),
-    resetFilter: false,
-    settingEnabled: true,
-    filter: FilterChoice.Filter15s,
-    filterThreshold: new Unit(5, 'delta_degC'),
-  }),
+  generate: (serviceId: string | null) => {
+    const temp = serviceTemp(serviceId);
+    return {
+      sensorId: new Link(null, 'TempSensorInterface'),
+      storedSetting: new Temp(null, temp),
+      setting: new Temp(null, temp),
+      value: new Temp(null, temp),
+      valueUnfiltered: new Temp(null, temp),
+      resetFilter: false,
+      settingEnabled: true,
+      filter: 'FILT_15s',
+      filterThreshold: new Temp(5, 'delta_degC').convert(`delta_${temp}`),
+    };
+  },
   fields: [
     {
       key: 'storedSetting',
       title: 'Setting',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Unit(20, 'degC'),
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
     },
     {
       key: 'settingEnabled',
@@ -40,8 +41,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'filterThreshold',
       title: 'Fast step threshold',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Unit(2, 'degC'),
+      generate: serviceId => new Temp(5, 'delta_degC').convert(`delta_${serviceTemp(serviceId)}`),
     },
     {
       key: 'sensorId',
@@ -53,8 +53,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'setting',
       title: 'Setting',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Unit(20, 'degC'),
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },
@@ -62,8 +61,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'value',
       title: 'Sensor',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Unit(20, 'degC'),
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },
@@ -71,8 +69,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'valueUnfiltered',
       title: 'Sensor unfiltered',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Unit(20, 'degC'),
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },

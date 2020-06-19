@@ -2,15 +2,17 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { mutate } from '@/helpers/functional';
-import { Block, MotorValveBlock } from '@/plugins/spark/types';
+import { mutate, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
+import { Block, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
 interface EditableChannel extends IoChannel {
-  id: number;
+  id: string;
+  nid: number;
+  name: string;
   driver: MotorValveBlock | null;
 }
 
@@ -24,48 +26,48 @@ interface ValveArrayBlock extends Block {
 export default class ValveArray extends BlockCrudComponent {
   readonly block!: ValveArrayBlock;
 
-  @Prop({ type: Object, required: true })
-  public readonly idEnum!: any;
+  @Prop({ type: Array, default: () => [] })
+  public readonly mapping!: ChannelMapping[];
 
-  @Prop({ type: Object, required: true })
-  public readonly nameEnum!: any;
-
-  get claimedChannels(): { [channel: number]: string } {
+  get claimedChannels(): { [nid: number]: MotorValveBlock } {
     return this.sparkModule
       .blocks
-      .filter(block => block.type === 'MotorValve')
+      .filter(typeMatchFilter<MotorValveBlock>('MotorValve'))
       .filter(block => block.data.hwDevice.id === this.block.id)
-      .reduce((acc, block) => mutate(acc, block.data.startChannel, block.id), {});
+      .reduce((acc, block) => mutate(acc, block.data.startChannel, block), {});
+  }
+
+  mappedName(id: string): string | null {
+    return this.mapping.length
+      ? this.mapping.find(m => m.id === id)?.name ?? null
+      : id;
   }
 
   get channels(): EditableChannel[] {
     return this.block.data.pins
       .reduce(
         (acc: EditableChannel[], pin: IoPin, idx: number) => {
-          const id = idx + 1;
-          if (!this.nameEnum || this.nameEnum[id] !== undefined) {
-            const driverId = this.claimedChannels[id];
-            const driver = this.sparkModule.blockById<MotorValveBlock>(driverId);
-            acc.push({ ...pin[this.idEnum[id]], id, driver });
+          const nid = idx + 1;
+          const [[id, channel]] = Object.entries(pin);
+          const name = this.mappedName(id);
+          if (name) {
+            const driver = this.claimedChannels[nid] ?? null;
+            acc.push({ ...channel, id, nid, name, driver });
           }
           return acc;
         },
         []
       )
-      .reverse();
+      .sort(objectStringSorter('name'));
   }
 
   saveChannels(): void {
     this.block.data.pins = this.channels
       .map(channel => {
-        const { id, state, config } = channel;
-        return { [this.idEnum[id]]: { state, config } };
+        const { state, config, id } = channel;
+        return { [id]: { state, config } };
       });
     this.saveBlock();
-  }
-
-  channelName(channel): string {
-    return this.nameEnum[channel.id];
   }
 
   driverLink(channel: EditableChannel): Link {
@@ -96,7 +98,7 @@ export default class ValveArray extends BlockCrudComponent {
     if (link.id) {
       const newDriver = this.sparkModule.blockById<MotorValveBlock>(link.id)!;
       newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
-      newDriver.data.startChannel = channel.id;
+      newDriver.data.startChannel = channel.nid;
       await this.sparkModule.saveBlock(newDriver);
     }
   }
@@ -128,11 +130,11 @@ export default class ValveArray extends BlockCrudComponent {
   <div class="widget-body column">
     <div
       v-for="channel in channels"
-      :key="channel.id"
+      :key="`channel-${channel.id}`"
       class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
     >
       <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
-        {{ channelName(channel) }}
+        {{ channel.name }}
       </div>
       <div class="col-auto row items-baseline min-width-sm">
         <DigitalStateButton

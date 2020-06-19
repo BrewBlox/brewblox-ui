@@ -28,9 +28,9 @@ interface GridSize {
 
 type InputRule = (val: any) => boolean | string;
 
-interface SelectOption {
+interface SelectOption<T = any> {
   label: string;
-  value: any;
+  value: T;
 }
 
 type Mapped<T> = Record<string, T>;

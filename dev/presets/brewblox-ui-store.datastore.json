@@ -1397,6 +1397,23 @@
               "serviceId": "sparkey"
             }
           ]
+        },
+        {
+          "name": "Actuator state",
+          "id": "39c61856-482b-42a2-abc7-532c58ec8c62",
+          "changes": [
+            {
+              "id": "207e39c2-2a92-4305-8c8b-1250af079af0",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "data": {
+                "desiredState": 0
+              },
+              "confirmed": {
+                "desiredState": false
+              }
+            }
+          ]
         }
       ],
       "serviceIdMigrated": true,

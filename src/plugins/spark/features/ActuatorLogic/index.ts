@@ -6,6 +6,7 @@ import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorLogicWidget.vue';
+import { nonErrorResults } from './getters';
 
 const typeName = 'ActuatorLogic';
 
@@ -13,7 +14,7 @@ const block: BlockSpec<ActuatorLogicBlock> = {
   id: typeName,
   generate: () => ({
     enabled: true,
-    result: EvalResult.EMPTY,
+    result: 'EMPTY',
     errorPos: 0,
     targetId: new Link(null, interfaceTypes.ActuatorDigital),
     drivenTargetId: new Link(null, interfaceTypes.ActuatorDigital, true),
@@ -25,8 +26,9 @@ const block: BlockSpec<ActuatorLogicBlock> = {
     {
       key: 'result',
       title: 'Result',
-      component: 'NumberValEdit',
-      generate: () => EvalResult.TRUE,
+      component: 'EnumValEdit',
+      componentProps: { options: nonErrorResults },
+      generate: (): EvalResult => 'TRUE',
       readonly: true,
       graphed: true,
     },

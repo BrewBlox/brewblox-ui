@@ -4,7 +4,7 @@ import {
   AnalogConstraintKey,
   BlockInterfaceType,
   BlockType,
-  ChannelConfig,
+  ChannelMapping,
   DigitalConstraintKey,
   SystemBlockType,
   UserBlockType,
@@ -47,12 +47,15 @@ export const analogConstraintLabels: Record<AnalogConstraintKey, string> = {
   balanced: 'Balanced',
 };
 
+export const DS2408StartChannels: ChannelMapping[] = [
+  { id: 'A', nid: 1, name: 'B' },
+  { id: 'E', nid: 5, name: 'A' },
+];
+
 export const constraintLabels = {
   ...digitalConstraintLabels,
   ...analogConstraintLabels,
 };
-
-export const configName = (val: ChannelConfig): string => ChannelConfig[val];
 
 export const systemBlockTypes: Record<SystemBlockType, SystemBlockType> = {
   SysInfo: 'SysInfo',

@@ -15,8 +15,8 @@ import { BlockChange, EditableBlockField } from './types';
 
 interface EditableBlockChange {
   id: string;
-  blockId: string | null;
-  serviceId: string | null;
+  blockId: string;
+  serviceId: string;
   block: Block | null;
   spec: BlockSpec | null;
   title: string;
@@ -30,12 +30,9 @@ export default class QuickActionChange extends Vue {
   @Prop({ type: Object, required: true })
   public readonly value!: BlockChange;
 
-  @Prop({ type: String, required: false })
-  public readonly defaultServiceId!: string;
-
   get change(): EditableBlockChange {
-    const serviceId = this.value.serviceId ?? this.defaultServiceId ?? null;
-    const block = sparkStore.blockById(serviceId, this.value.blockId);
+    const { id, blockId, serviceId } = this.value;
+    const block = sparkStore.blockById(serviceId, blockId);
     const spec = block !== null
       ? sparkStore.spec(block) ?? null
       : null;
@@ -44,9 +41,9 @@ export default class QuickActionChange extends Vue {
     const confirmed = this.value.confirmed ?? {};
 
     return {
-      id: this.value.id,
-      blockId: this.value.blockId,
-      serviceId: serviceId,
+      id,
+      blockId,
+      serviceId,
       block,
       spec,
       title: block ? featureStore.widgetTitle(block.type) : 'Unknown',
@@ -98,7 +95,7 @@ export default class QuickActionChange extends Vue {
 
   toggleField(field: EditableBlockField): void {
     field.value = field.value === null
-      ? field.specField.generate()
+      ? field.specField.generate(this.change.serviceId)
       : null;
     this.saveField(field);
   }

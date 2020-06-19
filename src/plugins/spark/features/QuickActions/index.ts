@@ -16,10 +16,10 @@ const feature: WidgetFeature = {
     rows: 5,
   },
   generateConfig: (): QuickActionsConfig => ({
-    steps: [
+    actions: [
       {
         id: uid(),
-        name: 'Example step - click to edit',
+        name: 'Example action - click to edit',
         changes: [],
       },
     ],

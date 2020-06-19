@@ -4,25 +4,24 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { typeMatchFilter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
-import { WiFiSettingsBlock } from '@/plugins/spark/types';
+import { WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
 
 @Component
 export default class SparkWifiMenu extends DialogBase {
-  securityOpts: SelectOption[] = [
-    { label: 'Unsecured', value: 0 },
-    { label: 'WEP', value: 1 },
-    { label: 'WPA', value: 2 },
-    { label: 'WPA2', value: 3 },
-    { label: 'Enterprise WPA', value: 4 },
-    { label: 'Enterprise WPA2', value: 5 },
-    // { label: 'Not set', value: 255 },
+  securityOpts: SelectOption<WifiSecurityType>[] = [
+    { label: 'Unsecured', value: 'WLAN_SEC_UNSEC' },
+    { label: 'WEP', value: 'WLAN_SEC_WEP' },
+    { label: 'WPA', value: 'WLAN_SEC_WPA' },
+    { label: 'WPA2', value: 'WLAN_SEC_WPA2' },
+    { label: 'Enterprise WPA', value: 'WLAN_SEC_WPA_ENTERPRISE' },
+    { label: 'Enterprise WPA2', value: 'WLAN_SEC_WPA2_ENTERPRISE' },
   ];
 
-  cipherOpts: SelectOption[] = [
-    { label: 'Auto', value: 0 },
-    { label: 'AES', value: 1 },
-    { label: 'TKIP', value: 2 },
-    { label: 'AES or TKIP', value: 3 },
+  cipherOpts: SelectOption<WifiCipherType>[] = [
+    { label: 'Auto', value: 'WLAN_CIPHER_NOT_SET' },
+    { label: 'AES', value: 'WLAN_CIPHER_AES' },
+    { label: 'TKIP', value: 'WLAN_CIPHER_TKIP' },
+    { label: 'AES or TKIP', value: 'WLAN_CIPHER_AES_TKIP' },
   ];
 
   isPwd = true;

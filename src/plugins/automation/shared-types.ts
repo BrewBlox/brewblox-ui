@@ -3,6 +3,12 @@
  */
 import { Method } from 'axios';
 
+export interface ReqBlockAddress {
+  serviceId: string;
+  type: string;
+  id: string;
+}
+
 /**
  * Generic status type for Automation types.
  * It is used by multiple types.
@@ -259,11 +265,58 @@ export interface BlockValueImpl {
   value: any;
 
   /**
-   * Comparison approach.
+   * Comparison operator.
    * The left-hand value is current value (block.data[key]).
    * The right-hand value is the condition value.
    */
   operator: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
+}
+
+export interface StaticValueImpl {
+  type: 'Static';
+  value: any;
+}
+
+export interface FieldValueImpl {
+  type: 'Field';
+  address: ReqBlockAddress;
+  key: string;
+  unit: string | null;
+}
+
+export type ValueImpl =
+  StaticValueImpl
+  | FieldValueImpl;
+
+export type ValueTag =
+  'equality'
+  | 'float'
+  | 'enum'
+  ;
+
+export interface ComparisonValue {
+  tags: ValueTag[];
+  impl: ValueImpl;
+
+  /**
+   * Offset / range.
+   * Only used if lhs has the 'float' tag.
+   */
+  modifier: number | null;
+}
+
+export interface ComparisonImpl {
+  type: 'Comparison';
+
+  lhs: ComparisonValue | null;
+
+  rhs: ComparisonValue | null;
+
+  /**
+   * Comparison operator.
+   * `lhs` tags determine which ones are valid.
+   */
+  operator: 'eq' | 'ne' | 'lt' | 'gt' | 'approx' | null;
 }
 
 /**
@@ -301,6 +354,7 @@ export type ConditionImpl =
   TimeAbsoluteImpl
   | TimeElapsedImpl
   | BlockValueImpl
+  | ComparisonImpl
   | TaskStatusImpl
   ;
 

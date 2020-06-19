@@ -116,6 +116,6 @@ export function withoutPrefix(prefix: string, val: string): string {
     : val;
 }
 
-export function pidDefaults(): PidBlock['data'] {
-  return sparkStore.specById('Pid').generate();
+export function pidDefaults(serviceId: string): PidBlock['data'] {
+  return sparkStore.specById('Pid').generate(serviceId);
 }

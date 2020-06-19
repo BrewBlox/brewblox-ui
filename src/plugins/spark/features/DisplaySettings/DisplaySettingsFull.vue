@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isCompatible } from '@/plugins/spark/helpers';
-import { BlockOrIntfType, DisplaySettingsBlock, DisplaySettingsTempUnit, DisplaySlot } from '@/plugins/spark/types';
+import { BlockOrIntfType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 
 @Component
@@ -23,10 +23,6 @@ export default class DisplaySettingsFull
     'ActuatorAnalogInterface',
     'Pid',
   ]
-
-  get tempName(): string {
-    return DisplaySettingsTempUnit[this.block.data.tempUnit];
-  }
 
   get slots(): (DisplaySlot | null)[] {
     const slots = Array(6);
@@ -174,7 +170,7 @@ export default class DisplaySettingsFull
           class="col-grow clickable"
           @click="showUnitMenu"
         >
-          {{ tempName }}
+          {{ block.data.tempUnit | capitalize }}
         </LabeledField>
         <q-field
           label="Display brightness"

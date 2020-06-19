@@ -36,6 +36,20 @@ const block: BlockSpec<Spark3PinsBlock> = {
       component: 'BoolValEdit',
       generate: () => true,
     },
+    {
+      key: 'voltage5',
+      title: 'Measured 5V power supply',
+      component: 'NumberValEdit',
+      generate: () => 5,
+      readonly: true,
+    },
+    {
+      key: 'voltage12',
+      title: 'Measured 12V power supply',
+      component: 'NumberValEdit',
+      generate: () => 12,
+      readonly: true,
+    },
   ],
 };
 
