@@ -1,16 +1,42 @@
 <script lang="ts">
+import isNumber from 'lodash/isNumber';
 import Vue from 'vue';
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { DigitalState } from '@/plugins/spark/types';
+
+const numberValues: Record<number, DigitalState> = {
+  0: 'Inactive',
+  1: 'Active',
+  2: 'Unknown',
+};
 
 @Component
 export default class DigitalStateButton extends Vue {
   on: DigitalState = 'Active';
   off: DigitalState = 'Inactive';
 
-  @Prop({ type: String, required: true })
-  readonly value!: DigitalState;
+  commonOpts = {
+    color: 'grey-9',
+    toggleColor: 'primary',
+    textColor: 'grey',
+    toggleTextColor: 'white',
+  };
+  options = [
+    {
+      ...this.commonOpts,
+      value: this.off,
+      slot: 'off',
+    },
+    {
+      ...this.commonOpts,
+      value: this.on,
+      slot: 'on',
+    },
+  ];
+
+  @Prop({ type: [String, Number], required: true })
+  readonly value!: DigitalState | number;
 
   @Prop({ type: Boolean, default: false })
   public readonly pending!: boolean;
@@ -21,48 +47,27 @@ export default class DigitalStateButton extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly disable!: boolean;
 
-  @Emit('input')
-  change(val: DigitalState): DigitalState {
-    return val;
+  get state(): DigitalState {
+    return isNumber(this.value)
+      ? numberValues[this.value] ?? 'Unknown'
+      : this.value;
   }
 
-  get commonOpts(): Mapped<string> {
-    return {
-      color: 'grey-9',
-      toggleColor: 'primary',
-      textColor: 'grey',
-      toggleTextColor: 'white',
-    };
-  }
-
-  get options(): Mapped<any> {
-    return [
-      {
-        ...this.commonOpts,
-        value: this.off,
-        slot: 'off',
-      },
-      {
-        ...this.commonOpts,
-        value: this.on,
-        slot: 'on',
-      },
-    ];
+  set state(v: DigitalState) {
+    this.$emit('input', v);
   }
 
   get known(): boolean {
-    return !!this.options.find(opt => opt.value === this.value);
+    return [this.on, this.off].includes(this.state);
   }
 
   toggle(): void {
     if (this.disable) {
       return;
     }
-    if (this.value === this.off) {
-      this.change(this.on);
-    } else if (this.value === this.on || !this.known) {
-      this.change(this.off);
-    }
+    this.state = this.state === this.off
+      ? 'Active'
+      : 'Inactive';
   }
 }
 </script>

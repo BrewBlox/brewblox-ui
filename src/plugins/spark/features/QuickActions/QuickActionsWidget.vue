@@ -21,7 +21,7 @@ export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
   public readonly activeAction!: string;
 
   get actions(): ChangeAction[] {
-    return deserialize(this.config.actions ?? this.config.steps ?? []);
+    return deserialize(this.config.actions ?? this.config.steps);
   }
 
   saveActions(actions: ChangeAction[] = this.actions): void {
@@ -31,14 +31,14 @@ export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
   }
 
   created(): void {
-    let updated = false;
+    let dirty = false;
     // Change IDs were added after initial release
     this.actions.forEach(action =>
       action.changes
         .filter(change => change.id === undefined)
         .forEach(change => {
           change.id = uid();
-          updated = true;
+          dirty = true;
         }));
     // Service IDs became a key of individual changes
     this.actions.forEach(action =>
@@ -46,9 +46,12 @@ export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
         .filter(change => change.serviceId === undefined)
         .forEach(change => {
           change.serviceId = this.config.serviceId!;
-          updated = true;
+          dirty = true;
         }));
-    if (updated) {
+    // Config field was renamed to 'actions'
+    dirty = dirty || !!this.config.steps;
+    // Save if dirty
+    if (dirty) {
       this.config.serviceIdMigrated = true;
       this.config.changeIdMigrated = true;
       this.saveActions();

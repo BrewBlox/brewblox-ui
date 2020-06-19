@@ -37,7 +37,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
   applying = false;
 
   get actions(): ChangeAction[] {
-    return deserialize(this.config.actions ?? []);
+    return deserialize(this.config.actions ?? this.config.steps);
   }
 
   saveActions(actions: ChangeAction[] = this.actions): void {

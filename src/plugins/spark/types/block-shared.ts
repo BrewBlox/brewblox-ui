@@ -16,7 +16,7 @@ export interface IoChannel {
 }
 
 export interface IoPin {
-  [key: string]: IoChannel;
+  [id: string]: IoChannel;
 }
 
 export interface DisplayOpts {

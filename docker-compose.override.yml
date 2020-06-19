@@ -31,6 +31,10 @@ services:
   #   ports:
   #     - "7376:7376"
 
+  # history:
+  #   volumes:
+  #     - ../brewblox-history:/app
+
   # sparkey:
   #   volumes:
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark

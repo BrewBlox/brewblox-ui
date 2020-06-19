@@ -185,20 +185,9 @@ export interface DisplaySettingsBlock extends Block {
   };
 }
 
-export enum DS2408Id {
-  A = 1,
-  B = 2,
-  C = 3,
-  D = 4,
-  E = 5,
-  F = 6,
-  G = 7,
-  H = 8,
-}
-
-export enum ValveStartId {
-  B = 1,
-  A = 5,
+export interface ChannelMapping {
+  id: string;
+  name: string;
 }
 
 export interface DS2408Block extends Block {
@@ -208,11 +197,6 @@ export interface DS2408Block extends Block {
     connected: boolean;
     pins: IoPin[];
   };
-}
-
-export enum DS2413Id {
-  A = 1,
-  B = 2,
 }
 
 export interface DS2413Block extends Block {
