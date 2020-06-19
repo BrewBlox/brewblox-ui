@@ -77,7 +77,8 @@ export default class DigitalStateButton extends Vue {
   <!-- https://github.com/quasarframework/quasar/issues/7150 -->
   <q-btn-toggle
     v-if="known"
-    v-bind="{value, options, disable, ...$attrs}"
+    v-bind="{options, disable, ...$attrs}"
+    :value="state"
     :class="['shadow-1', $attrs.class]"
     dense
     unelevated
@@ -86,14 +87,14 @@ export default class DigitalStateButton extends Vue {
     <template #off>
       <span class="row">
         <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
-        <q-spinner v-if="pending && value === off" />
+        <q-spinner v-if="pending && state === off" />
         <span v-else>Off</span>
       </span>
     </template>
     <template #on>
       <span class="row">
         <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
-        <q-spinner v-if="pending && value === on" />
+        <q-spinner v-if="pending && state === on" />
         <span v-else>On</span>
       </span>
     </template>

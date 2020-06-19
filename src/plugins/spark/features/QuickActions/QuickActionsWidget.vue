@@ -18,7 +18,7 @@ import { ChangeAction, QuickActionsConfig } from './types';
 })
 export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
   @Prop({ type: String, required: false })
-  public readonly activeAction!: string;
+  public readonly activeId!: string;
 
   get actions(): ChangeAction[] {
     return deserialize(this.config.actions ?? this.config.steps);
@@ -87,7 +87,7 @@ export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
         </template>
       </component>
     </template>
-    <component :is="mode" :crud="crud" :active-action="activeAction">
+    <component :is="mode" :crud="crud" :active-id="activeId">
       <template v-if="actions.length === 0" #warnings>
         <div class="text-italic text-h6 q-pa-md darkened text-center">
           Create an action to get started.

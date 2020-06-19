@@ -22,7 +22,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   editableChanges: Mapped<boolean> = {};
 
   @Prop({ type: String })
-  readonly activeAction!: string;
+  readonly activeId!: string;
 
   get defaultServiceId(): string | null {
     return this.config.serviceId ?? null;
@@ -162,7 +162,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
           v-for="action in actions"
           :key="action.id"
           :label="action.name"
-          :default-opened="openStep === action.id"
+          :default-opened="activeId === action.id"
           :disable="draggingStep"
           header-style="font-size: 120%"
           group="actions"
