@@ -41,7 +41,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
 
   get validTypes(): string[] {
     return sparkStore.specs
-      .filter(spec => spec.fields.find(f => !f.readonly))
+      .filter(spec => spec.fields.length > 0)
       .map(spec => spec.id);
   }
 
