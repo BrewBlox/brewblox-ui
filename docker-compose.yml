@@ -4,69 +4,64 @@ services:
   eventbus:
     image: brewblox/rabbitmq:develop
     labels:
-      - "traefik.port=15675"
-      - "traefik.protocol=ws"
-      - "traefik.frontend.rule=PathPrefix: /eventbus"
+      - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
   influx:
     image: influxdb:1.8
+    labels:
+      - traefik.enable=false
     volumes:
       - ./dev/influxdb/:/var/lib/influxdb/
 
   datastore:
     image: treehouses/couchdb:2.3.1
     labels:
-      - "traefik.port=5984"
-      - "traefik.frontend.rule=PathPrefixStrip: /datastore"
+      - traefik.http.services.datastore.loadbalancer.server.port=5984
+      - traefik.http.routers.datastore.middlewares=prefix-strip
     volumes:
       - ./dev/couchdb/:/opt/couchdb/data/
 
   history:
     image: brewblox/brewblox-history:develop
-    labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /history"
 
   automation:
     image: brewblox/brewblox-automation:develop
     init: true
-    labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /automation"
 
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
-    labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /sparkey"
     volumes:
       - ./dev/simulator__sparkey:/app/simulator
     command: --name=sparkey --simulation --device-id=123456789012345678901234
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
+    restart: unless-stopped
     privileged: true
-    labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /spock"
     volumes:
       - ./dev/simulator__spock:/app/simulator
     command: --name=spock --simulation --device-id=432109876543210987654321
 
   traefik:
-    image: traefik:v1.7
+    image: traefik:2.2
     ports:
       - "9000:9000"
       - "9001:9001"
+    labels:
+      - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
+      - traefik.http.routers.api.service=api@internal
+      - traefik.http.middlewares.prefix-strip.stripprefixregex.regex=/[^/]+
     volumes:
       - ./dev/traefik:/config
       - /var/run/docker.sock:/var/run/docker.sock
     command: >-
-      -c /dev/null
-      --docker
-      --docker.domain=brewblox.local
-      --entrypoints='name:http Address::9000 Redirect.EntryPoint:https'
-      --entrypoints='name:https Address::9001 TLS:config/brewblox.crt,config/brewblox.key'
-      --defaultentrypoints="http,https"
+      --api.dashboard=true
+      --providers.docker=true
+      --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
+      --providers.file.directory=/config
+      --entrypoints.web.address=:9000
+      --entrypoints.web.http.redirections.entrypoint.to=websecure
+      --entrypoints.websecure.address=:9001
+      --entrypoints.websecure.http.tls=true
