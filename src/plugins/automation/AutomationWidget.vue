@@ -196,7 +196,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
             class="col-auto"
             @click="removeProcess(proc)"
           >
-            <q-tooltip>Exit process</q-tooltip>
+            <q-tooltip>Close and remove process</q-tooltip>
           </q-btn>
         </div>
         <div class="text-italic q-pr-sm">
