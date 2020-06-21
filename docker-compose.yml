@@ -4,43 +4,34 @@ services:
   eventbus:
     image: brewblox/rabbitmq:develop
     labels:
-      - traefik.http.routers.eventbus.rule=PathPrefix(`/eventbus`)
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
   influx:
     image: influxdb:1.8
-    volumes:
-      - ./dev/influxdb/:/var/lib/influxdb/
     labels:
       - traefik.enable=false
+    volumes:
+      - ./dev/influxdb/:/var/lib/influxdb/
 
   datastore:
     image: treehouses/couchdb:2.3.1
     labels:
-      - traefik.http.routers.datastore.rule=PathPrefix(`/datastore`)
-      - traefik.http.routers.datastore.middlewares=strip-datastore
       - traefik.http.services.datastore.loadbalancer.server.port=5984
-      - traefik.http.middlewares.strip-datastore.stripprefix.prefixes=/datastore
+      - traefik.http.routers.datastore.middlewares=prefix-strip
     volumes:
       - ./dev/couchdb/:/opt/couchdb/data/
 
   history:
     image: brewblox/brewblox-history:develop
-    labels:
-      - traefik.http.routers.history.rule=PathPrefix(`/history`)
 
   automation:
     image: brewblox/brewblox-automation:develop
     init: true
-    labels:
-      - traefik.http.routers.automation.rule=PathPrefix(`/automation`)
 
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
-    labels:
-      - traefik.http.routers.sparkey.rule=PathPrefix(`/sparkey`)
     volumes:
       - ./dev/simulator__sparkey:/app/simulator
     command: --name=sparkey --simulation --device-id=123456789012345678901234
@@ -49,8 +40,6 @@ services:
     image: brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
-    labels:
-      - traefik.http.routers.spock.rule=PathPrefix(`/spock`)
     volumes:
       - ./dev/simulator__spock:/app/simulator
     command: --name=spock --simulation --device-id=432109876543210987654321
@@ -60,11 +49,17 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    labels:
+      - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)
+      - traefik.http.routers.api.service=api@internal
+      - traefik.http.middlewares.prefix-strip.stripprefixregex.regex=/[^/]+
     volumes:
       - ./dev/traefik:/config
       - /var/run/docker.sock:/var/run/docker.sock
     command: >-
+      --api.dashboard=true
       --providers.docker=true
+      --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
       --providers.file.directory=/config
       --entrypoints.web.address=:9000
       --entrypoints.web.http.redirections.entrypoint.to=websecure
