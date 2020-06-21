@@ -1,0 +1,6 @@
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /config/brewblox.crt
+        keyFile: /config/brewblox.key

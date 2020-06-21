@@ -4,59 +4,59 @@ services:
   eventbus:
     image: brewblox/rabbitmq:develop
     labels:
-      - "traefik.port=15675"
-      - "traefik.protocol=ws"
-      - "traefik.frontend.rule=PathPrefix: /eventbus"
+      - traefik.http.routers.eventbus.rule=PathPrefix(`/eventbus`)
+      - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
   influx:
     image: influxdb:1.8
     volumes:
       - ./dev/influxdb/:/var/lib/influxdb/
+    labels:
+      - traefik.enable=false
 
   datastore:
     image: treehouses/couchdb:2.3.1
     labels:
-      - "traefik.port=5984"
-      - "traefik.frontend.rule=PathPrefixStrip: /datastore"
+      - traefik.http.routers.datastore.rule=PathPrefix(`/datastore`)
+      - traefik.http.routers.datastore.middlewares=strip-datastore
+      - traefik.http.services.datastore.loadbalancer.server.port=5984
+      - traefik.http.middlewares.strip-datastore.stripprefix.prefixes=/datastore
     volumes:
       - ./dev/couchdb/:/opt/couchdb/data/
 
   history:
     image: brewblox/brewblox-history:develop
     labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /history"
+      - traefik.http.routers.history.rule=PathPrefix(`/history`)
 
   automation:
     image: brewblox/brewblox-automation:develop
     init: true
     labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /automation"
+      - traefik.http.routers.automation.rule=PathPrefix(`/automation`)
 
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
     privileged: true
     labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /sparkey"
+      - traefik.http.routers.sparkey.rule=PathPrefix(`/sparkey`)
     volumes:
       - ./dev/simulator__sparkey:/app/simulator
     command: --name=sparkey --simulation --device-id=123456789012345678901234
 
   spock:
     image: brewblox/brewblox-devcon-spark:develop
+    restart: unless-stopped
     privileged: true
     labels:
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=PathPrefix: /spock"
+      - traefik.http.routers.spock.rule=PathPrefix(`/spock`)
     volumes:
       - ./dev/simulator__spock:/app/simulator
     command: --name=spock --simulation --device-id=432109876543210987654321
 
   traefik:
-    image: traefik:v1.7
+    image: traefik:2.2
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -64,9 +64,9 @@ services:
       - ./dev/traefik:/config
       - /var/run/docker.sock:/var/run/docker.sock
     command: >-
-      -c /dev/null
-      --docker
-      --docker.domain=brewblox.local
-      --entrypoints='name:http Address::9000 Redirect.EntryPoint:https'
-      --entrypoints='name:https Address::9001 TLS:config/brewblox.crt,config/brewblox.key'
-      --defaultentrypoints="http,https"
+      --providers.docker=true
+      --providers.file.directory=/config
+      --entrypoints.web.address=:9000
+      --entrypoints.web.http.redirections.entrypoint.to=websecure
+      --entrypoints.websecure.address=:9001
+      --entrypoints.websecure.http.tls=true
