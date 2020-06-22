@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class SleepingIcon extends Vue {
-  @Prop({ type: String, default: 'lg' })
+  @Prop({ type: String, default: '40px' })
   public readonly size!: string;
 }
 </script>
@@ -15,6 +15,6 @@ export default class SleepingIcon extends Vue {
     name="mdi-sleep"
     color="warning"
     :size="size"
-    class="col static"
+    class="static"
   />
 </template>

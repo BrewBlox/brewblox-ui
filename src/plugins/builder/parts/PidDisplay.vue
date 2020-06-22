@@ -84,19 +84,34 @@ export default class PidDisplay extends PartBase {
       :transform="textTransformation([1,1])"
       :width="squares(1)"
       :height="squares(1)"
+      content-class="column items-center q-pt-xs"
     >
-      <BrokenIcon v-if="isBroken" />
-      <UnlinkedIcon v-else-if="!block" />
-      <SleepingIcon v-else-if="!block.data.enabled" />
+      <BrokenIcon v-if="isBroken" class="col" />
+      <UnlinkedIcon v-else-if="!block" class="col" />
+      <SleepingIcon v-else-if="!block.data.enabled" class="col" />
       <template v-else>
-        <div class="col row items-center">
-          <q-icon v-if="kp === null" name="mdi-calculator-variant" class="col static q-mt-xs" size="20px" />
-          <q-icon v-else-if="drivingOffset" name="mdi-plus-minus" class="col static q-mt-xs" size="20px" />
-          <template v-else>
-            <HeatingIcon v-if="kp > 0" :color="outputValue ? HOT_WATER : 'white'" class="q-py-xs" />
-            <CoolingIcon v-if="kp < 0" :color="outputValue ? COLD_WATER : 'white'" class="q-py-xs" />
-          </template>
-        </div>
+        <q-icon
+          v-if="kp === null"
+          name="mdi-calculator-variant"
+          class="col static"
+          size="25px"
+        />
+        <q-icon
+          v-else-if="drivingOffset"
+          name="mdi-plus-minus"
+          class="col static"
+          size="25px"
+        />
+        <template v-else>
+          <HeatingIcon
+            v-if="kp > 0"
+            :color="outputValue ? HOT_WATER : 'white'"
+          />
+          <CoolingIcon
+            v-if="kp < 0"
+            :color="outputValue ? COLD_WATER : 'white'"
+          />
+        </template>
         <div class="col text-bold">
           {{ outputSetting | truncateRound }}
           <small v-if="!!block">{{ suffix }}</small>

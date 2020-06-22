@@ -72,9 +72,13 @@ export default class ProfileDisplay extends PartBase {
 
 <template>
   <g>
-    <SvgEmbedded :width="squares(2)" :height="squares(1)">
-      <BrokenIcon v-if="isBroken" />
-      <UnlinkedIcon v-else-if="!block" />
+    <SvgEmbedded
+      :width="squares(2)"
+      :height="squares(1)"
+      content-class="column items-center q-pt-xs"
+    >
+      <BrokenIcon v-if="isBroken" class="col" />
+      <UnlinkedIcon v-else-if="!block" class="col" />
       <div v-else class="col column q-ma-xs">
         <small class="col-auto">
           Setpoint Profile

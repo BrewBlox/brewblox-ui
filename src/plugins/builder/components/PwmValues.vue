@@ -79,12 +79,13 @@ export default class PwmValues extends Vue {
       :transform="transform"
       :width="squares(1)"
       :height="squares(1)"
+      content-class="column items-center q-pt-xs"
     >
-      <BrokenIcon v-if="isBroken" />
-      <UnlinkedIcon v-else-if="!block" />
-      <SleepingIcon v-else-if="!block.data.enabled" />
+      <BrokenIcon v-if="isBroken" class="col" />
+      <UnlinkedIcon v-else-if="!block" class="col" />
+      <SleepingIcon v-else-if="!block.data.enabled" class="col" />
       <template v-else>
-        <PwmIcon />
+        <PwmIcon class="col" />
         <div class="col text-bold">
           {{ pwmValue | truncateRound }}
           <small v-if="!!block">%</small>

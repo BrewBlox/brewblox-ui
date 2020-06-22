@@ -49,12 +49,17 @@ export default class SensorDisplay extends PartBase {
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
-    <SvgEmbedded :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
-      <BrokenIcon v-if="isBroken" />
-      <UnlinkedIcon v-else-if="!block" />
+    <SvgEmbedded
+      :transform="textTransformation([1,1])"
+      :width="squares(1)"
+      :height="squares(1)"
+      content-class="column items-center q-pt-xs"
+    >
+      <BrokenIcon v-if="isBroken" class="col" />
+      <UnlinkedIcon v-else-if="!block" class="col" />
       <template v-else>
         <div class="col row q-pt-xs">
-          <q-icon name="mdi-thermometer" size="20px" />
+          <q-icon name="mdi-thermometer" class="static" size="20px" />
           <small>{{ tempUnit }}</small>
         </div>
         <div class="col text-bold text-center">
