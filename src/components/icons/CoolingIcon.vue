@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class CoolingIcon extends Vue {
-  @Prop({ type: String, default: 'md' })
+  @Prop({ type: String, default: '25px' })
   public readonly size!: string;
 
   @Prop({ type: String, default: 'white' })
@@ -17,7 +17,7 @@ export default class CoolingIcon extends Vue {
 </script>
 
 <template>
-  <q-icon :size="size" class="col static" v-bind="$attrs">
+  <q-icon :size="size" class="static" v-bind="$attrs">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="8 8 35 35"

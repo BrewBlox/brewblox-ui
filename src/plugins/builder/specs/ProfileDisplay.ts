@@ -21,7 +21,7 @@ const spec: PartSpec = {
     {
       component: 'BlockAddressCard',
       props: {
-        addressKey,
+        settingsKey: addressKey,
         compatible: [blockTypes.SetpointProfile],
         label: 'Setpoint Profile',
       },
