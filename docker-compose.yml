@@ -59,6 +59,7 @@ services:
     command: >-
       --api.dashboard=true
       --providers.docker=true
+      --providers.docker.constraints="LabelRegex(`com.docker.compose.service`, `.+`)"
       --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
       --providers.file.directory=/config
       --entrypoints.web.address=:9000
