@@ -9,7 +9,7 @@ import notify from '@/helpers/notify';
 import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
 
 const cleanId = (moduleId: string, fullId: string): string =>
-  fullId.substring(`${moduleId}__`.length);
+  fullId.replace(/^(.+)__/, '');
 
 const fullId = (moduleId: string, id: string): string =>
   `${moduleId}__${id}`;
