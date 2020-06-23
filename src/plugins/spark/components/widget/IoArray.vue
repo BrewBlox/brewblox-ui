@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { mutate, objectSorter, objectStringSorter } from '@/helpers/functional';
+import { mutate, objectSorter, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
 import { DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
@@ -28,7 +28,7 @@ export default class IoArray extends BlockCrudComponent {
   get claimedChannels(): { [channel: number]: string } {
     return this.sparkModule
       .blocks
-      .filter(block => block.type === 'DigitalActuator')
+      .filter(typeMatchFilter<DigitalActuatorBlock>('DigitalActuator'))
       .filter(block => block.data.hwDevice.id === this.block.id)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }

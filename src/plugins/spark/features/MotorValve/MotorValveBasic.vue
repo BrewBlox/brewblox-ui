@@ -1,17 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { spaceCased } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { MotorValveBlock, ValveState } from '@/plugins/spark/types';
+import { MotorValveBlock } from '@/plugins/spark/types';
 
 @Component
 export default class MotorValveBasic
   extends BlockCrudComponent<MotorValveBlock> {
-
-  get valveStateName(): string {
-    return spaceCased(ValveState[this.block.data.valveState]);
-  }
 }
 </script>
 
@@ -32,7 +27,7 @@ export default class MotorValveBasic
           />
         </LabeledField>
         <LabeledField
-          :value="valveStateName"
+          :value="block.data.valveState"
           label="Valve State"
           class="col-grow"
         />

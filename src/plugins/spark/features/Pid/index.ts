@@ -1,7 +1,6 @@
 import { unitDurationString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { userUnitChoices } from '@/plugins/spark/getters';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
 import { BlockSpec, PidBlock } from '@/plugins/spark/types';
 import { Link, Temp, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
@@ -12,30 +11,33 @@ const typeName = 'Pid';
 
 const block: BlockSpec<PidBlock> = {
   id: typeName,
-  generate: () => ({
-    inputId: new Link(null, 'SetpointSensorPairInterface'),
-    outputId: new Link(null, 'ActuatorAnalogInterface'),
-    inputValue: new Temp(0, 'degC'),
-    inputSetting: new Temp(0, 'degC'),
-    outputValue: 0,
-    outputSetting: 0,
-    enabled: false,
-    active: true,
-    kp: new Unit(20, '1/degC'),
-    ti: new Unit(2, 'hour'),
-    td: new Unit(0, 'second'),
-    p: 0,
-    i: 0,
-    d: 0,
-    error: new Unit(0, 'delta_degC'),
-    integral: new Unit(0, 'delta_degC/second'),
-    derivative: new Unit(0, 'delta_degC*second'),
-    drivenOutputId: new Link(null, 'ActuatorAnalogInterface'),
-    integralReset: 0,
-    boilPointAdjust: new Unit(0, 'delta_degC'),
-    boilMinOutput: 0,
-    boilModeActive: false,
-  }),
+  generate: (serviceId: string | null) => {
+    const temp = serviceTemp(serviceId);
+    return {
+      inputId: new Link(null, 'SetpointSensorPairInterface'),
+      outputId: new Link(null, 'ActuatorAnalogInterface'),
+      inputValue: new Temp(0, temp),
+      inputSetting: new Temp(0, temp),
+      outputValue: 0,
+      outputSetting: 0,
+      enabled: false,
+      active: true,
+      kp: new Unit(20, `1/${temp}`),
+      ti: new Unit(2, 'hour'),
+      td: new Unit(0, 'second'),
+      p: 0,
+      i: 0,
+      d: 0,
+      error: new Temp(0, `delta_${temp}`),
+      integral: new Unit(0, `delta_${temp}/second`),
+      derivative: new Unit(0, `delta_${temp}*second`),
+      drivenOutputId: new Link(null, 'ActuatorAnalogInterface'),
+      integralReset: 0,
+      boilPointAdjust: new Unit(0, `delta_${temp}`),
+      boilMinOutput: 0,
+      boilModeActive: false,
+    };
+  },
   presets: [
     {
       name: 'Fridge cooling compressor (beer constant)',
@@ -115,8 +117,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'kp',
       title: 'Kp',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp.map(v => `1/${v}`) },
-      generate: () => new Unit(0, '1/degC'),
+      generate: serviceId => new Unit(0, `1/${serviceTemp(serviceId)}`),
     },
     {
       key: 'ti',
@@ -154,8 +155,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'inputSetting',
       title: 'Input target',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Temp(20, 'degC'),
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },
@@ -163,8 +163,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'inputValue',
       title: 'Input value',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Temp(20, 'degC'),
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },
@@ -172,8 +171,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'error',
       title: 'Error',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp },
-      generate: () => new Temp(0, 'degC'),
+      generate: serviceId => new Temp(0, `delta_${serviceTemp(serviceId)}`),
       readonly: true,
       graphed: true,
     },
@@ -181,8 +179,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'derivative',
       title: 'Derivative of input',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp.map(v => `delta_${v}*second`) },
-      generate: () => new Unit(0, 'delta_degC*second'),
+      generate: serviceId => new Temp(20, `delta_${serviceTemp(serviceId)}*second`),
       readonly: true,
       graphed: true,
     },
@@ -190,8 +187,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'integral',
       title: 'Integral of error',
       component: 'UnitValEdit',
-      componentProps: { units: userUnitChoices.Temp.map(v => `delta_${v}/second`) },
-      generate: () => new Unit(0, 'delta_degC/second'),
+      generate: serviceId => new Temp(20, `delta_${serviceTemp(serviceId)}/second`),
       readonly: true,
       graphed: true,
     },

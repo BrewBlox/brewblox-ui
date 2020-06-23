@@ -1,16 +1,42 @@
 <script lang="ts">
+import isNumber from 'lodash/isNumber';
 import Vue from 'vue';
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import { DigitalState } from '@/plugins/spark/types';
 
+const numberValues: Record<number, DigitalState> = {
+  0: 'Inactive',
+  1: 'Active',
+  2: 'Unknown',
+};
+
 @Component
 export default class DigitalStateButton extends Vue {
-  on = DigitalState.Active;
-  off = DigitalState.Inactive;
+  on: DigitalState = 'Active';
+  off: DigitalState = 'Inactive';
 
-  @Prop({ type: Number, required: true })
-  readonly value!: DigitalState;
+  commonOpts = {
+    color: 'grey-9',
+    toggleColor: 'primary',
+    textColor: 'grey',
+    toggleTextColor: 'white',
+  };
+  options = [
+    {
+      ...this.commonOpts,
+      value: this.off,
+      slot: 'off',
+    },
+    {
+      ...this.commonOpts,
+      value: this.on,
+      slot: 'on',
+    },
+  ];
+
+  @Prop({ type: [String, Number], required: true })
+  readonly value!: DigitalState | number;
 
   @Prop({ type: Boolean, default: false })
   public readonly pending!: boolean;
@@ -21,74 +47,52 @@ export default class DigitalStateButton extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly disable!: boolean;
 
-  @Emit('input')
-  change(val: DigitalState): DigitalState {
-    return val;
+  get state(): DigitalState {
+    return isNumber(this.value)
+      ? numberValues[this.value] ?? 'Unknown'
+      : this.value;
   }
 
-  get commonOpts(): Mapped<string> {
-    return {
-      color: 'grey-9',
-      toggleColor: 'primary',
-      textColor: 'grey',
-      toggleTextColor: 'white',
-    };
-  }
-
-  get options(): Mapped<any> {
-    return [
-      {
-        ...this.commonOpts,
-        value: this.off,
-        slot: 'off',
-      },
-      {
-        ...this.commonOpts,
-        value: this.on,
-        slot: 'on',
-      },
-    ];
+  set state(v: DigitalState) {
+    this.$emit('input', v);
   }
 
   get known(): boolean {
-    return !!this.options.find(opt => opt.value === this.value);
+    return [this.on, this.off].includes(this.state);
   }
 
   toggle(): void {
     if (this.disable) {
       return;
     }
-    if (this.value === DigitalState.Inactive) {
-      this.change(DigitalState.Active);
-    } else if (this.value === DigitalState.Active || !this.known) {
-      this.change(DigitalState.Inactive);
-    }
+    this.state = this.state === this.off
+      ? 'Active'
+      : 'Inactive';
   }
 }
 </script>
 
 <template>
-  <!-- TODO: replace @click.native with @click when bug is fixed in quasar -->
-  <!-- https://github.com/quasarframework/quasar/issues/7150 -->
   <q-btn-toggle
     v-if="known"
-    v-bind="{value, options, disable, ...$attrs}"
+    v-bind="{options, disable, ...$attrs}"
+    :value="state"
     :class="['shadow-1', $attrs.class]"
     dense
     unelevated
-    @click.native="toggle"
+    @click="toggle"
   >
     <template #off>
       <span class="row">
         <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
-        <q-spinner v-if="pending && value === off" />
+        <q-spinner v-if="pending && state === off" />
         <span v-else>Off</span>
       </span>
     </template>
     <template #on>
       <span class="row">
         <q-tooltip v-if="pending && pendingReason">State pending: {{ pendingReason }}</q-tooltip>
-        <q-spinner v-if="pending && value === on" />
+        <q-spinner v-if="pending && state === on" />
         <span v-else>On</span>
       </span>
     </template>

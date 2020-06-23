@@ -55,7 +55,7 @@ export default class LayoutFooter extends Vue {
       >
         <q-tooltip>Automation tasks</q-tooltip>
         <AutomationTaskMenu />
-        <q-badge class="q-ml-sm">
+        <q-badge v-if="numTasks > 0" class="q-ml-sm">
           {{ numTasks }}
         </q-badge>
       </q-btn>

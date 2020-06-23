@@ -3,8 +3,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 
-import { AutomationProcess, AutomationStep } from '../shared-types';
 import { automationStore } from '../store';
+import { AutomationProcess, AutomationStep } from '../types';
 
 
 @Component

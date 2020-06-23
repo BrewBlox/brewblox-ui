@@ -24,7 +24,7 @@ const spec: AutomationSpec<BlockValueImpl> = {
   }),
   pretty: impl =>
     matchesType<BlockValueImpl>(type, impl)
-      ? `${impl.blockId} '${impl.key}' must be ${operator(impl)} ${impl.value}`
+      ? `${impl.blockId} '${impl.key}' ${operator(impl)} ${impl.value}`
       : `Invalid data: type=${impl.type}`,
 };
 

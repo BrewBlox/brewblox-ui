@@ -2,7 +2,6 @@
 import { Component, Watch } from 'vue-property-decorator';
 
 import { Block } from '@/plugins/spark/types';
-import { DigitalState } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { RIGHT } from '../getters';
@@ -44,15 +43,15 @@ export default class ActuatorValve extends PartBase {
   }
 
   get closed(): boolean {
-    return !this.block || this.block.data.state !== DigitalState.Active;
+    return !this.block || this.block.data.state !== 'Active';
   }
 
   get valveRotation(): number {
     if (this.block) {
       switch (this.block.data.state) {
-        case DigitalState.Inactive:
+        case 'Inactive':
           return 90;
-        case DigitalState.Active:
+        case 'Active':
           return 0;
         default:
           return 45;

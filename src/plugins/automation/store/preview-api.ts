@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { HOST } from '@/helpers/const';
 import { intercept } from '@/helpers/http';
 
-import { WebhookImpl } from '../shared-types';
+import { WebhookImpl } from '../types';
 
 // We don't need the transformers from the default http instance
 const http = axios.create({

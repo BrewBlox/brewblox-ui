@@ -2,8 +2,8 @@ import { unitDurationString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { ActuatorPwmBlock, BlockSpec } from '@/plugins/spark/types';
-import { Link, Unit } from '@/plugins/spark/units';
+import { ActuatorPwmBlock, AnalogConstraintsObj, BlockSpec } from '@/plugins/spark/types';
+import { Link, Time, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorPwmWidget.vue';
@@ -47,7 +47,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       key: 'period',
       title: 'Period',
       component: 'TimeUnitValEdit',
-      generate: () => new Unit(4, 'second'),
+      generate: () => new Time(4, 's'),
       pretty: unitDurationString,
     },
     {
@@ -66,7 +66,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       key: 'constrainedBy',
       title: 'Constraints',
       component: 'AnalogConstraintsValEdit',
-      generate: () => ({ constraints: [] }),
+      generate: (): AnalogConstraintsObj => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
     {

@@ -1,11 +1,5 @@
-import { ActuatorLogicBlock, DigitalState } from '@/plugins/spark/types';
-import {
-  AnalogCompare,
-  AnalogCompareOp,
-  DigitalCompare,
-  DigitalCompareOp,
-  EvalResult,
-} from '@/plugins/spark/types';
+import { ActuatorLogicBlock } from '@/plugins/spark/types';
+import { AnalogCompare, DigitalCompare } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 
 import { comparisonCheck, sanitize, shiftRemainingComparisons, syntaxCheck } from '../helpers';
@@ -51,42 +45,42 @@ describe('Check symbol syntax', () => {
 
 const analog = (): AnalogCompare[] => ([
   {
-    op: AnalogCompareOp.SETTING_GE,
-    result: EvalResult.EMPTY,
+    op: 'SETTING_GE',
+    result: 'EMPTY',
     id: new Link(null),
     rhs: 20,
   },
   {
-    op: AnalogCompareOp.SETTING_GE,
-    result: EvalResult.EMPTY,
+    op: 'SETTING_GE',
+    result: 'EMPTY',
     id: new Link('analog-1'),
     rhs: 20,
   },
   {
-    op: AnalogCompareOp.SETTING_GE,
-    result: EvalResult.EMPTY,
+    op: 'SETTING_GE',
+    result: 'EMPTY',
     id: new Link('analog-2'),
     rhs: 20,
   },
 ]);
 const digital = (): DigitalCompare[] => ([
   {
-    op: DigitalCompareOp.DESIRED_IS,
-    result: EvalResult.EMPTY,
+    op: 'DESIRED_IS',
+    result: 'EMPTY',
     id: new Link(null),
-    rhs: DigitalState.Active,
+    rhs: 'Active',
   },
   {
-    op: DigitalCompareOp.DESIRED_IS,
-    result: EvalResult.EMPTY,
+    op: 'DESIRED_IS',
+    result: 'EMPTY',
     id: new Link('digital-1'),
-    rhs: DigitalState.Active,
+    rhs: 'Active',
   },
   {
-    op: DigitalCompareOp.DESIRED_IS,
-    result: EvalResult.EMPTY,
+    op: 'DESIRED_IS',
+    result: 'EMPTY',
     id: new Link('digital-2'),
-    rhs: DigitalState.Active,
+    rhs: 'Active',
   },
 ]);
 

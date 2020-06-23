@@ -10,10 +10,12 @@ const spec: AutomationSpec<WebhookImpl> = {
   component: Webhook,
   generate: () => ({
     type,
-    url: 'https://postman-echo.com/get',
+    url: 'http://datastore:5984',
     method: 'GET',
     body: '',
-    headers: {},
+    headers: {
+      'Content-Type': 'application/json',
+    },
   }),
   pretty: impl =>
     matchesType<WebhookImpl>(type, impl)

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 import { prettify, Unit } from '@/plugins/spark/units';
 
@@ -11,9 +11,6 @@ export default class UnitValEdit extends ValEditBase {
   field!: Unit;
   local: number | null = null;
 
-  @Prop({ type: Array, required: true })
-  public readonly units!: string[];
-
   @Watch('local')
   updateField(newV: number | null): void {
     if (newV === null || !Number.isNaN(newV)) {
@@ -23,10 +20,6 @@ export default class UnitValEdit extends ValEditBase {
 
   created(): void {
     this.local = this.field.value;
-  }
-
-  get unitOpts(): SelectOption[] {
-    return this.units.map(v => ({ label: prettify(v), value: v }));
   }
 }
 </script>
@@ -40,14 +33,7 @@ export default class UnitValEdit extends ValEditBase {
       pattern="[0-9]*"
       class="col-grow"
       label="Value"
-    />
-    <q-select
-      v-model="field.unit"
-      :options="unitOpts"
-      :display-value="field.notation"
-      :dense="dense"
-      emit-value
-      class="col-auto"
+      :suffix="field.notation"
     />
   </div>
   <div

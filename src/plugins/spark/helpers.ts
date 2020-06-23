@@ -1,3 +1,4 @@
+import capitalize from 'lodash/capitalize';
 import defaults from 'lodash/defaults';
 import isArray from 'lodash/isArray';
 import keyBy from 'lodash/keyBy';
@@ -72,6 +73,7 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('unitDuration', unitDurationString);
   Vue.filter('dateString', dateString);
   Vue.filter('shortDateString', shortDateString);
+  Vue.filter('capitalize', capitalize);
 };
 
 const errorComponent = (error: string): ComponentResult => ({
@@ -420,3 +422,6 @@ export const discoverBlocks = async (serviceId: string | null, show = true): Pro
   }
   return discovered;
 };
+
+export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
+  sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';

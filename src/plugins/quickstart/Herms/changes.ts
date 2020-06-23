@@ -11,13 +11,11 @@ import {
   BalancerBlock,
   Block,
   DigitalActuatorBlock,
-  FilterChoice,
   MutexBlock,
-  OffsetSettingOrValue,
   PidBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { AnalogConstraint, DigitalConstraint, DigitalState } from '@/plugins/spark/types';
+import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
 import { Link, Temp, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
@@ -108,7 +106,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.Filter15s,
+          filter: 'FILT_15s',
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -125,7 +123,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.Filter15s,
+          filter: 'FILT_15s',
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -142,7 +140,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.Filter15s,
+          filter: 'FILT_15s',
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -157,7 +155,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           targetId: new Link(names.hltSetpoint),
           drivenTargetId: new Link(names.hltSetpoint),
           referenceId: new Link(names.mtSetpoint),
-          referenceSettingOrValue: OffsetSettingOrValue.Setting,
+          referenceSettingOrValue: 'Setting',
           enabled: false,
           desiredSetting: 0,
           setting: 0,
@@ -181,8 +179,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         data: {
           hwDevice: new Link(config.hltPin.arrayId),
           channel: config.hltPin.pinId,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: 'Inactive',
+          state: 'Inactive',
           invert: false,
           constrainedBy: {
             constraints: actuatorConstraints,
@@ -197,8 +195,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         data: {
           hwDevice: new Link(config.bkPin.arrayId),
           channel: config.bkPin.pinId,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: 'Inactive',
+          state: 'Inactive',
           invert: false,
           constrainedBy: {
             constraints: actuatorConstraints,
@@ -249,7 +247,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         serviceId,
         groups,
         data: {
-          ...pidDefaults(),
+          ...pidDefaults(serviceId),
           enabled: true,
           inputId: new Link(names.hltSetpoint),
           outputId: new Link(names.hltPwm),
@@ -265,7 +263,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         serviceId,
         groups,
         data: {
-          ...pidDefaults(),
+          ...pidDefaults(serviceId),
           enabled: true,
           inputId: new Link(names.mtSetpoint),
           outputId: new Link(names.hltDriver),
@@ -280,7 +278,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         serviceId,
         groups,
         data: {
-          ...pidDefaults(),
+          ...pidDefaults(serviceId),
           enabled: true,
           inputId: new Link(names.bkSetpoint),
           outputId: new Link(names.bkPwm),
@@ -382,7 +380,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
       serviceId,
       changeIdMigrated: true,
       serviceIdMigrated: true,
-      steps: serialize([
+      actions: serialize([
         {
           name: 'Disable all setpoints',
           id: uid(),

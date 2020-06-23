@@ -48,9 +48,18 @@ export default class SessionLogDisplay extends PartBase {
     >
       <div class="col row no-wrap items-center q-pa-sm full-width">
         <BrokenIcon v-if="isBroken" />
-        <q-icon v-else name="mdi-text-subject" size="lg" class="col-auto static" />
+        <q-icon
+          v-else
+          name="mdi-text-subject"
+          size="40px"
+          class="col-auto static"
+        />
 
-        <div v-if="sizeX >= 1" class="col text-center ellipsis" style="font-size: 130%">
+        <div
+          v-if="sizeX >= 1"
+          class="col text-center ellipsis"
+          style="font-size: 130%"
+        >
           {{ displayText }}
         </div>
       </div>

@@ -6,7 +6,7 @@ import { createDialog } from '@/helpers/dialog';
 import { spliceById } from '@/helpers/functional';
 
 import { conditionSpecs } from '../impl/specs';
-import { AutomationCondition, AutomationStep, AutomationTemplate } from '../shared-types';
+import { AutomationCondition, AutomationStep, AutomationTemplate } from '../types';
 
 
 @Component

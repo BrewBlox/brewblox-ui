@@ -7,7 +7,6 @@ import {
   ActuatorLogicBlock,
   AnalogCompare,
   DigitalCompare,
-  EvalResult,
   ExpressionError,
 } from '@/plugins/spark/types';
 
@@ -46,7 +45,7 @@ export default class ActuatorLogicBasic
       isDigital(key)
         ? this.digital
         : this.analog;
-    return arr.find(v => v.key === key)?.cmp.result === EvalResult.TRUE
+    return arr.find(v => v.key === key)?.cmp.result === 'TRUE'
       ? 'positive'
       : 'negative';
   }

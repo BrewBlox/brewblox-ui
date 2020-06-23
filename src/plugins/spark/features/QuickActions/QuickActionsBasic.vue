@@ -10,7 +10,7 @@ import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 
-import { BlockChange, EditableBlockField, Step } from './types';
+import { BlockChange, ChangeAction, EditableBlockField, QuickActionsConfig } from './types';
 
 interface FieldDiff {
   key: string;
@@ -26,44 +26,37 @@ interface BlockDiff {
   diffs: FieldDiff[];
 }
 
-interface StepDisplay extends Step {
+interface ActionDisplay extends ChangeAction {
   applicable: boolean;
   active: boolean;
   diffs: BlockDiff[];
 }
 
 @Component
-export default class QuickActionsBasic extends CrudComponent {
+export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig> {
   applying = false;
 
-  get defaultServiceId(): string {
-    return this.widget.config.serviceId;
+  get actions(): ChangeAction[] {
+    return deserialize(this.config.actions ?? this.config.steps);
   }
 
-  get steps(): Step[] {
-    return deserialize(this.widget.config.steps);
-  }
-
-  saveSteps(steps: Step[] = this.steps): void {
-    this.saveConfig({
-      ...this.widget.config,
-      steps: serialize(steps),
-    });
+  saveActions(actions: ChangeAction[] = this.actions): void {
+    this.config.actions = serialize(actions);
+    this.saveConfig();
   }
 
   blockByChange(change: BlockChange): Block | null {
-    const serviceId = change.serviceId ?? this.defaultServiceId;
-    return sparkStore.blockById(serviceId, change.blockId);
+    return sparkStore.blockById(change.serviceId, change.blockId);
   }
 
-  get stepDisplays(): StepDisplay[] {
-    return this.steps
-      .map(step => {
-        const applicable = step.changes.every(change => this.blockByChange(change));
-        const diffs = applicable ? step.changes.map(this.blockDiff) : [];
+  get actionDisplays(): ActionDisplay[] {
+    return this.actions
+      .map(action => {
+        const applicable = action.changes.every(change => this.blockByChange(change));
+        const diffs = applicable ? action.changes.map(this.blockDiff) : [];
         const active = applicable && diffs.every(bdiff => bdiff.diffs.every(fdiff => !fdiff.changed));
         return {
-          ...step,
+          ...action,
           applicable,
           diffs,
           active,
@@ -71,7 +64,7 @@ export default class QuickActionsBasic extends CrudComponent {
       });
   }
 
-  confirmStepChange(block: Block, key: string, value: any): Promise<any> {
+  confirmActionChange(block: Block, key: string, value: any): Promise<any> {
     return new Promise((resolve, reject) => {
       const specField = sparkStore.spec(block)
         .fields
@@ -104,8 +97,8 @@ export default class QuickActionsBasic extends CrudComponent {
     });
   }
 
-  async applyChanges(step: Step): Promise<void> {
-    const changes = step.changes;
+  async applyChanges(action: ChangeAction): Promise<void> {
+    const changes = action.changes;
     const actualChanges: [Block, any][] = [];
     for (const change of changes) {
       const block = this.blockByChange(change)!;
@@ -116,7 +109,7 @@ export default class QuickActionsBasic extends CrudComponent {
           delete actualData[key];
         }
         if (change.confirmed?.[key]) {
-          actualData[key] = await this.confirmStepChange(block, key, actualData[key]);
+          actualData[key] = await this.confirmActionChange(block, key, actualData[key]);
         }
       }
       actualChanges.push([block, actualData]);
@@ -124,27 +117,27 @@ export default class QuickActionsBasic extends CrudComponent {
     for (const [block, actualData] of actualChanges) {
       await sparkStore.saveBlock({ ...block, data: { ...block.data, ...actualData } });
     }
-    step.changes = step.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
-    this.saveSteps(spliceById(this.steps, step));
+    action.changes = action.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
+    this.saveActions(spliceById(this.actions, action));
   }
 
-  applyStep(step: Step): void {
+  applyAction(action: ChangeAction): void {
     this.applying = true;
-    this.applyChanges(step)
-      .then(() => notify.done(`Applied ${step.name}`))
+    this.applyChanges(action)
+      .then(() => notify.done(`Applied ${action.name}`))
       .then(() => // Fetch all blocks to show secondary effects
         Promise.all(
-          step.changes
-            .map(v => v.serviceId ?? this.defaultServiceId)
+          action.changes
+            .map(v => v.serviceId)
             .filter(uniqueFilter)
             .map(serviceId => sparkStore.moduleById(serviceId)!.fetchBlocks())))
-      .catch(e => notify.warn(`Failed to apply ${step.name}: ${e.message}`))
+      .catch(e => notify.warn(`Failed to apply ${action.name}: ${e.message}`))
       .finally(() => this.applying = false);
   }
 
-  showStepDialog(step: Step): void {
+  showActionDialog(action: ChangeAction): void {
     this.showDialog({
-      widgetProps: { openStep: step.id },
+      widgetProps: { active: action.id },
     });
   }
 
@@ -153,7 +146,7 @@ export default class QuickActionsBasic extends CrudComponent {
     if (!block) {
       return {
         id: change.id,
-        serviceId: change.serviceId ?? this.defaultServiceId ?? '???',
+        serviceId: change.serviceId ?? '???',
         blockId: change.blockId ?? '???',
         diffs: [],
       };
@@ -177,7 +170,7 @@ export default class QuickActionsBasic extends CrudComponent {
 
     return {
       id: change.id,
-      serviceId: change.serviceId ?? this.defaultServiceId,
+      serviceId: change.serviceId,
       blockId: change.blockId!,
       diffs,
     };
@@ -191,28 +184,28 @@ export default class QuickActionsBasic extends CrudComponent {
 
     <div class="widget-body column">
       <div
-        v-for="step in stepDisplays"
-        :key="step.id"
+        v-for="action in actionDisplays"
+        :key="action.id"
         class="row"
       >
         <div
           class="col-grow q-py-xs q-px-sm rounded-borders clickable"
           style="min-width: 100px"
-          @click="showStepDialog(step)"
+          @click="showActionDialog(action)"
         >
-          <div :class="step.active ? 'text-positive': ''">
-            {{ step.name }}
+          <div :class="action.active ? 'text-positive': ''">
+            {{ action.name }}
           </div>
           <q-item-label caption class="darkened">
-            {{ step.changes.length }} blocks changed
+            {{ action.changes.length }} blocks changed
           </q-item-label>
-          <q-tooltip v-if="step.applicable">
+          <q-tooltip v-if="action.applicable">
             <div class="column" style="max-width: 400px">
               <div class="col-auto text-italic" style="font-size: 120%">
-                {{ step.active ? 'Step is active' : 'Step changes' }}
+                {{ action.active ? 'No fields will be changed' : 'Changes' }}
               </div>
               <div
-                v-for="bdiff in step.diffs"
+                v-for="bdiff in action.diffs"
                 :key="`bdiff-${bdiff.id}`"
                 class="row q-gutter-x-sm items-baseline"
               >
@@ -222,7 +215,7 @@ export default class QuickActionsBasic extends CrudComponent {
                 <div class="col column q-py-sm">
                   <div
                     v-for="fdiff in bdiff.diffs"
-                    :key="`fdiff-${step.id}-${bdiff.id}-${fdiff.key}`"
+                    :key="`fdiff-${action.id}-${bdiff.id}-${fdiff.key}`"
                     class="q-gutter-x-xs"
                   >
                     <span>{{ fdiff.key }}:</span>
@@ -240,24 +233,21 @@ export default class QuickActionsBasic extends CrudComponent {
             </div>
           </q-tooltip>
           <q-tooltip v-else>
-            Step is not applicable. Do all changed blocks exist?
+            Action can't be applied. Do all changed blocks exist?
           </q-tooltip>
         </div>
         <q-btn
           flat
           round
           icon="mdi-play-circle"
-          :disable="!step.applicable"
+          :disable="!action.applicable"
           :loading="applying"
-          :color="step.active ? 'positive' : ''"
+          :color="action.active ? 'positive' : ''"
           class="col-auto q-ml-sm"
-          @click="applyStep(step)"
+          @click="applyAction(action)"
         >
-          <q-tooltip v-if="step.active">
-            Step is active
-          </q-tooltip>
-          <q-tooltip v-else-if="step.applicable">
-            Apply step
+          <q-tooltip>
+            Apply action <span v-if="action.active">(no fields will be changed)</span>
           </q-tooltip>
         </q-btn>
       </div>

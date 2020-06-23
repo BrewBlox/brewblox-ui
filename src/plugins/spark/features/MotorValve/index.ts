@@ -1,6 +1,6 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalState, MotorValveBlock, ValveState } from '@/plugins/spark/types';
+import { BlockSpec, DigitalConstraintsObj, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -13,9 +13,9 @@ const block: BlockSpec<MotorValveBlock> = {
   generate: () => ({
     hwDevice: new Link(null, 'IoArrayInterface'),
     startChannel: 0,
-    desiredState: DigitalState.Inactive,
-    state: DigitalState.Inactive,
-    valveState: ValveState.InitIdle,
+    desiredState: 'Inactive',
+    state: 'Inactive',
+    valveState: 'InitIdle',
     constrainedBy: { constraints: [] },
   }),
   presets: [],
@@ -24,8 +24,7 @@ const block: BlockSpec<MotorValveBlock> = {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
-      generate: () => 0,
-      pretty: v => DigitalState[v],
+      generate: (): DigitalState => 'Inactive',
       graphed: true,
       graphName: 'Desired state',
     },
@@ -33,15 +32,14 @@ const block: BlockSpec<MotorValveBlock> = {
       key: 'constrainedBy',
       title: 'Constraints',
       component: 'DigitalConstraintsValEdit',
-      generate: () => ({ constraints: [] }),
+      generate: (): DigitalConstraintsObj => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
     {
       key: 'state',
       title: 'Actual state',
       component: 'StateValEdit',
-      generate: () => 0,
-      pretty: v => DigitalState[v],
+      generate: (): DigitalState => 'Inactive',
       readonly: true,
       graphed: true,
     },

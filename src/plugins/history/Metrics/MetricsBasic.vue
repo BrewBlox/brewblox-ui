@@ -50,7 +50,7 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
       params: {},
       freshDuration: {},
       decimals: {},
-      ...this.widget.config,
+      ...this.widget.config as Partial<MetricsConfig>,
     };
   }
 
@@ -122,11 +122,16 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
 
 <template>
   <div class="widget-md">
-    <div v-if="values.length === 0">
+    <div v-if="targets.length === 0">
       <div class="text-italic text-h6 q-pa-md darkened text-center">
         Add metrics to get started.
       </div>
     </div>
+    <CardWarning v-else-if="values.length === 0">
+      <template #message>
+        Waiting for data...
+      </template>
+    </CardWarning>
 
     <div class="widget-body column">
       <LabeledField
