@@ -11,7 +11,7 @@ const operator = (impl: BlockValueImpl): string =>
 const type = 'BlockValue';
 const spec: AutomationSpec<BlockValueImpl> = {
   type,
-  title: 'Block value (Deprecated)',
+  title: 'Block value',
   component: BlockValue,
   generate: () => ({
     type,
