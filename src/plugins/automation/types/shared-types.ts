@@ -354,7 +354,7 @@ export type ConditionImpl =
   TimeAbsoluteImpl
   | TimeElapsedImpl
   | BlockValueImpl
-  | ComparisonImpl
+  // | ComparisonImpl
   | TaskStatusImpl
   ;
 

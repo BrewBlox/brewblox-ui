@@ -3,7 +3,7 @@ import axios from 'axios';
 import { HOST } from '@/helpers/const';
 import { intercept } from '@/helpers/http';
 
-import { AutomationProcess, AutomationStepJump, AutomationTemplate } from '../shared-types';
+import { AutomationProcess, AutomationStepJump, AutomationTemplate } from '../types';
 
 // We don't need the transformers from the default http instance
 const http = axios.create({

@@ -1,7 +1,6 @@
 import { VueConstructor } from 'vue';
 
 import { AutomationImpl } from './shared-types';
-export * from './shared-types';
 
 
 export type Section = 'Preconditions' | 'Actions' | 'Transitions';

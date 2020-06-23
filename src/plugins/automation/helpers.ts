@@ -2,7 +2,7 @@ import { uid } from 'quasar';
 
 import { findById } from '@/helpers/functional';
 
-import { AutomationTemplate, AutomationTransition } from './shared-types';
+import { AutomationTemplate, AutomationTransition } from './types';
 
 export function idCopy<T extends HasId>(v: T): T {
   return {
