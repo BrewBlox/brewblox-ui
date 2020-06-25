@@ -42,7 +42,8 @@ export class BrewbloxEventbus {
         this.startup = true;
       }
     });
-    client.on('message', (_, body) => {
+    client.on('message', (_, body: Buffer) => {
+      if (body.length === 0) { return; }
       const message: EventbusMessage = JSON.parse(body.toString());
       this.listeners
         .filter(lst => lst.filter(message.key, message.type))
