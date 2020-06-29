@@ -20,7 +20,7 @@ export type AutomationStatus =
   | 'Retrying'    // In progress. Attempting to automatically recover from error.
   | 'Paused'      // In progress. Execution temporarily halted.
   | 'Finished'    // End state. Success.
-  | 'Cancelled';  // End state. Execution prematurely ended.
+  | 'Cancelled'   // End state. Execution prematurely ended.
 
 /**
  * Serialized Date value (number in ms, or ISO-8601)
