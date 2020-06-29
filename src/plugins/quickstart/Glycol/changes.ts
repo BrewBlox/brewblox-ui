@@ -11,6 +11,8 @@ import {
   ActuatorPwmBlock,
   Block,
   DigitalActuatorBlock,
+  DigitalState,
+  FilterChoice,
   MutexBlock,
   PidBlock,
   SetpointProfileBlock,
@@ -65,7 +67,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: 'FILT_15s',
+          filter: FilterChoice.FILT_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -109,8 +111,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           hwDevice: new Link(config.coolPin.arrayId),
           channel: config.coolPin.pinId,
           invert: false,
-          desiredState: 'Inactive',
-          state: 'Inactive',
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
           constrainedBy: {
             constraints: [
               {
@@ -139,8 +141,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           hwDevice: new Link(config.heatPin ? config.heatPin!.arrayId : null),
           channel: config.heatPin ? config.heatPin!.pinId : 0,
           invert: false,
-          desiredState: 'Inactive',
-          state: 'Inactive',
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
           constrainedBy: {
             constraints: [
               {
@@ -241,7 +243,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             setting: new Unit(null, 'degC'),
             value: new Unit(null, 'degC'),
             valueUnfiltered: new Unit(null, 'degC'),
-            filter: 'FILT_15s',
+            filter: FilterChoice.FILT_15s,
             filterThreshold: new Unit(5, 'delta_degC'),
             resetFilter: false,
           },
@@ -256,8 +258,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             hwDevice: new Link(config.glycolPin!.arrayId),
             channel: config.glycolPin!.pinId,
             invert: false,
-            desiredState: 'Inactive',
-            state: 'Inactive',
+            desiredState: DigitalState.Inactive,
+            state: DigitalState.Inactive,
             constrainedBy: {
               constraints: [
                 { minOff: new Time(5, 'min'), remaining: new Time() },

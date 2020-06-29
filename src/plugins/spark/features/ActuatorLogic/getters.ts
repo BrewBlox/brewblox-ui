@@ -48,7 +48,7 @@ export const evalResultTitles: Record<EvalResult, string> = {
 };
 
 export const nonErrorResults: EvalResult[] = [
-  'EMPTY',
-  'FALSE',
-  'TRUE',
+  EvalResult.EMPTY,
+  EvalResult.FALSE,
+  EvalResult.TRUE,
 ];

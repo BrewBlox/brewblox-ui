@@ -4,7 +4,7 @@ import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types'
 import { Crud } from '@/store/features';
 
 export type BlockInterfaceType =
-  'ProcessValueInterface'
+  | 'ProcessValueInterface'
   | 'TempSensorInterface'
   | 'SetpointSensorPairInterface'
   | 'ActuatorAnalogInterface'
@@ -14,16 +14,14 @@ export type BlockInterfaceType =
   | 'OneWireDeviceInterface'
   | 'IoArrayInterface'
   | 'DS2408Interface'
-  ;
 
 export type SystemBlockType =
-  'SysInfo'
+  | 'SysInfo'
   | 'Groups'
   | 'OneWireBus'
   | 'Ticks'
   | 'WiFiSettings'
   | 'TouchSettings'
-  ;
 
 export type UserBlockType =
   | 'ActuatorAnalogMock'
@@ -47,7 +45,6 @@ export type UserBlockType =
   | 'Spark3Pins'
   | 'TempSensorMock'
   | 'TempSensorOneWire'
-  ;
 
 export type BlockType = SystemBlockType | UserBlockType;
 export type BlockOrIntfType = BlockType | BlockInterfaceType;

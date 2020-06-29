@@ -10,6 +10,8 @@ import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   DigitalActuatorBlock,
+  DigitalState,
+  FilterChoice,
   MutexBlock,
   PidBlock,
   SetpointProfileBlock,
@@ -95,7 +97,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: 'FILT_15s',
+          filter: FilterChoice.FILT_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -112,7 +114,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: 'FILT_15s',
+          filter: FilterChoice.FILT_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -138,8 +140,8 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           hwDevice: new Link(config.coolPin.arrayId),
           channel: config.coolPin.pinId,
           invert: false,
-          desiredState: 'Inactive',
-          state: 'Inactive',
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
           constrainedBy: {
             constraints: [
               {
@@ -171,8 +173,8 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
         data: {
           hwDevice: new Link(config.heatPin.arrayId),
           channel: config.heatPin.pinId,
-          desiredState: 'Inactive',
-          state: 'Inactive',
+          desiredState: DigitalState.Inactive,
+          state: DigitalState.Inactive,
           invert: false,
           constrainedBy: {
             constraints: [

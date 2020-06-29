@@ -1,6 +1,9 @@
 import { Link, Unit } from '@/plugins/spark/units';
 
-export type AnalogConstraintKey = 'min' | 'max' | 'balanced';
+export type AnalogConstraintKey =
+  | 'min'
+  | 'max'
+  | 'balanced'
 
 export interface MinConstraint {
   limiting: boolean;
@@ -22,16 +25,16 @@ export interface BalancedConstraint {
 }
 
 export type AnalogConstraint =
-  MinConstraint
+  | MinConstraint
   | MaxConstraint
   | BalancedConstraint;
 
 export type DigitalConstraintKey =
-  'mutexed'
+  | 'mutexed'
   | 'minOff'
   | 'minOn'
   | 'delayedOff'
-  | 'delayedOn';
+  | 'delayedOn'
 
 export interface MinOnConstraint {
   remaining: Unit;
@@ -64,7 +67,7 @@ export interface DelayedOffConstraint {
 }
 
 export type DigitalConstraint =
-  MutexedConstraint
+  | MutexedConstraint
   | MinOnConstraint
   | MinOffConstraint
   | DelayedOnConstraint

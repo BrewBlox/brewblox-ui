@@ -14,7 +14,7 @@ const block: BlockSpec<ActuatorLogicBlock> = {
   id: typeName,
   generate: () => ({
     enabled: true,
-    result: 'EMPTY',
+    result: EvalResult.EMPTY,
     errorPos: 0,
     targetId: new Link(null, interfaceTypes.ActuatorDigital),
     drivenTargetId: new Link(null, interfaceTypes.ActuatorDigital, true),
@@ -28,7 +28,7 @@ const block: BlockSpec<ActuatorLogicBlock> = {
       title: 'Result',
       component: 'EnumValEdit',
       componentProps: { options: nonErrorResults },
-      generate: (): EvalResult => 'TRUE',
+      generate: () => EvalResult.EMPTY,
       readonly: true,
       graphed: true,
     },
