@@ -1,5 +1,5 @@
 <script lang="ts">
-import { debounce, uid } from 'quasar';
+import { debounce } from 'quasar';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
@@ -7,8 +7,7 @@ import { spliceById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 
 import { calculateNormalizedFlows } from './calculateFlows';
-import { deprecatedTypes } from './getters';
-import { asPersistentPart, asStatePart, squares } from './helpers';
+import { asPersistentPart, asStatePart, squares, vivifyParts } from './helpers';
 import { builderStore } from './store';
 import { BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
 
@@ -117,27 +116,9 @@ export default class BreweryPage extends Vue {
   }
 
   get parts(): PersistentPart[] {
-    if (!this.layout) {
-      return [];
-    }
-    const sizes: Mapped<number> = {};
-    return this.layout.parts
-      .map(part => {
-        const actual: PersistentPart = {
-          id: uid(),
-          rotate: 0,
-          settings: {},
-          flipped: false,
-          ...part,
-          type: deprecatedTypes[part.type] ?? part.type,
-        };
-        const [sizeX, sizeY] = builderStore.spec(actual).size(actual);
-        sizes[part.id] = sizeX * sizeY;
-        return actual;
-      })
-      // Sort parts to render largest first
-      // This improves clickability of overlapping parts
-      .sort((a, b) => sizes[b.id] - sizes[a.id]);
+    return this.layout !== null
+      ? vivifyParts(this.layout.parts)
+      : [];
   }
 
   get updater(): PartUpdater {
