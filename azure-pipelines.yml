@@ -29,17 +29,14 @@ steps:
   displayName: 'Install Node.js'
 
 - bash: |
-    RELEASE=$(git describe --tags | grep "^[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]$")
     BRANCH=$(echo $(Build.SourceBranch) | grep -oP "^refs/heads/\K.*")
     TAG=$(echo $BRANCH | tr '/' '-' | tr '[:upper:]' '[:lower:]')
-    echo "##vso[task.setvariable variable=RELEASE]$RELEASE"
     echo "##vso[task.setvariable variable=BRANCH]$BRANCH"
     echo "##vso[task.setvariable variable=TAG]$TAG"
   displayName: Export build variables
 
 - bash: |
     npm ci
-    npm run makecert
   displayName: NPM install
 
 - bash: |
@@ -73,23 +70,9 @@ steps:
 - bash: >-
     docker buildx build
     --tag $(DOCKER_REPO):$(TAG)
-    --tag $(DOCKER_REPO):rpi-$(TAG)
     --build-arg service_info="$(git describe) @ $(date)"
     --push
     --platform linux/amd64,linux/arm/v7
     docker
-  displayName: Deploy Docker images with branch tags
-  condition: and(succeeded(), variables['BRANCH'], not(variables['RELEASE']))
-
-- bash: >-
-    docker buildx build
-    --tag $(DOCKER_REPO):newest-tag
-    --tag $(DOCKER_REPO):rpi-newest-tag
-    --tag $(DOCKER_REPO):$(RELEASE)
-    --tag $(DOCKER_REPO):rpi-$(RELEASE)
-    --build-arg service_info="$(git describe) @ $(date)"
-    --push
-    --platform linux/amd64,linux/arm/v7
-    docker
-  displayName: Deploy Docker images with release tags
-  condition: and(succeeded(), variables['RELEASE'])
+  displayName: Build Docker images
+  condition: and(succeeded(), variables['BRANCH'])

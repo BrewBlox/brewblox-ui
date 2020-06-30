@@ -1,4 +1,5 @@
 <script lang="ts">
+import defaults from 'lodash/defaults';
 import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
@@ -12,14 +13,13 @@ export default class MetricsFull extends CrudComponent<MetricsConfig> {
   public readonly inDialog!: boolean;
 
   get config(): MetricsConfig {
-    return {
+    return defaults(this.widget.config, {
       targets: [],
       renames: {},
       params: {},
       freshDuration: {},
       decimals: {},
-      ...this.widget.config,
-    };
+    });
   }
 
 }

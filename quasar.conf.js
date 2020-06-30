@@ -5,7 +5,7 @@ const path = require('path');
 const IgnoreNotFoundExportPlugin = require('./build/ignore-not-found');
 
 module.exports = configure(function (ctx) {
-  const buildDate = `"${new Date().toISOString()}"`;
+  const buildDate = new Date().toISOString();
 
   const sharedEnv = {
     BLOX_DATE: buildDate,
@@ -16,7 +16,6 @@ module.exports = configure(function (ctx) {
 
   return {
     preFetch: false,
-    supportIE: false,
     supportTS: true,
 
     sourceFiles: {
@@ -44,73 +43,8 @@ module.exports = configure(function (ctx) {
     animations: [],
 
     framework: {
-      all: false,
+      importStrategy: 'auto',
       iconSet: 'mdi-v4',
-
-      components: [
-        'QBadge',
-        'QBar',
-        'QBtn',
-        'QBtnDropdown',
-        'QBtnGroup',
-        'QBtnToggle',
-        'QCard',
-        'QCardActions',
-        'QCardSection',
-        'QCheckbox',
-        'QChip',
-        'QColor',
-        'QDate',
-        'QDialog',
-        'QExpansionItem',
-        'QField',
-        'QFooter',
-        'QIcon',
-        'QInnerLoading',
-        'QInput',
-        'QItem',
-        'QItemLabel',
-        'QItemSection',
-        'QLayout',
-        'QDrawer',
-        'QHeader',
-        'QList',
-        'QMenu',
-        'QOptionGroup',
-        'QPage',
-        'QPageContainer',
-        'QRadio',
-        'QResizeObserver',
-        'QScrollArea',
-        'QSelect',
-        'QSeparator',
-        'QSlider',
-        'QSpace',
-        'QSpinner',
-        'QSplitter',
-        'QStep',
-        'QStepper',
-        'QStepperNavigation',
-        'QTab',
-        'QTabPanel',
-        'QTabPanels',
-        'QTabs',
-        'QTime',
-        'QTimeline',
-        'QTimelineEntry',
-        'QToggle',
-        'QToolbar',
-        'QToolbarTitle',
-        'QTooltip',
-        'QTree',
-      ],
-
-      directives: [
-        'Ripple',
-        'ClosePopup',
-        'TouchHold',
-        'TouchPan',
-      ],
 
       plugins: [
         'Cookies',
@@ -152,7 +86,6 @@ module.exports = configure(function (ctx) {
       publicPath: '/ui/',
       vueRouterMode: 'history',
 
-      modern: true,
       distDir: 'dist',
       analyze: false,
       gzip: true,

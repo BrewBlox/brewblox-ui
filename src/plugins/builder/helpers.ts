@@ -1,4 +1,6 @@
+import defaults from 'lodash/defaults';
 import range from 'lodash/range';
+import { uid } from 'quasar';
 
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
@@ -8,7 +10,7 @@ import { Block } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
-import { CENTER, SQUARE_SIZE } from './getters';
+import { CENTER, deprecatedTypes, SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
 import { FlowPart, PersistentPart, Rect, StatePart, Transitions } from './types';
 
@@ -229,4 +231,26 @@ export function universalTransitions(size: [number, number], enabled: boolean): 
     .reduce(
       (acc, coord) => mutate(acc, coord, [{ outCoords: CENTER, internal: true, friction: 0.5 }]),
       { [CENTER]: coords.map(outCoords => ({ outCoords, friction: 0.5 })) });
+}
+
+export function vivifyParts(parts: PersistentPart[]): PersistentPart[] {
+  const sizes: Mapped<number> = {};
+  return parts
+    .map(storePart => {
+      const part: PersistentPart = { ...storePart };
+      defaults(part, {
+        rotate: 0,
+        settings: {},
+        flipped: false,
+      });
+      part.id = part.id ?? uid();
+      part.type = deprecatedTypes[part.type] ?? part.type;
+
+      const [sizeX, sizeY] = builderStore.spec(part).size(part);
+      sizes[part.id] = sizeX * sizeY;
+      return part;
+    })
+    // Sort parts to render largest first
+    // This improves clickability of overlapping parts
+    .sort((a, b) => sizes[b.id] - sizes[a.id]);
 }
