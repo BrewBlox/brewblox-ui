@@ -2,19 +2,21 @@ import round from 'lodash/round';
 
 import { PostFixed } from './PostFixed';
 
-export const prettify = (v: string): string =>
-  v.replace(/delta_/g, '')
-    .replace(/(celsius|degC(elsius)?)/gi, '°C')
-    .replace(/(fahrenheit|degF(ahrenheit)?)/gi, '°F')
-    .replace(/(kelvin|degK(elvin)?)/gi, '°K')
+export const prettify = (unitName: string): string =>
+  unitName
+    .replace(/delta_/g, '')
+    .replace(/(deg)?Celsius/gi, '°C')
+    .replace(/(deg)?Fahrenheit/gi, '°F')
+    .replace(/(deg)?kelvin/gi, '°K')
+    .replace(/\bdeg(\b|[A-Z])/g, '°$1') // deg, degX, degSomething
     .replace(/milliseconds?/gi, 'ms')
     .replace(/seconds?/gi, 's')
     .replace(/minutes?/gi, 'm')
     .replace(/hours?/gi, 'h')
     .replace(/days?/gi, 'd')
-    .replace(/1 ?\/ ?/gi, '/')
-    .replace(/ ?\/ ?/gi, '/')
-    .replace(/ ?\* ?/gi, '·');
+    .replace(/1 ?\/ ?/gi, '/') // 1 / degC
+    .replace(/ ?\/ ?/gi, '/')  // degC / hour
+    .replace(/ ?\* ?/gi, '·');  // degC * hour
 
 export class Unit implements PostFixed {
   private _val: number | null;
