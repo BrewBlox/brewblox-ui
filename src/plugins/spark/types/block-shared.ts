@@ -1,8 +1,8 @@
 export enum ChannelConfig {
-  'Unknown' = 'Unknown',
-  'ActiveLow' = 'ActiveLow',
-  'ActiveHigh' = 'ActiveHigh',
-  'Input' = 'Input',
+  'UNKNOWN' = 'UNKNOWN',
+  'ACTIVE_LOW' = 'ACTIVE_LOW',
+  'ACTIVE_HIGH' = 'ACTIVE_HIGH',
+  'INPUT' = 'INPUT',
 }
 
 export enum DigitalState {

@@ -31,14 +31,6 @@ export enum AnalogCompareOp {
   'SETTING_GE' = 'SETTING_GE',
 }
 
-export enum CombineOp {
-  'OR' = 'OR',
-  'AND' = 'AND',
-  'OR_NOT' = 'OR_NOT',
-  'AND_NOT' = 'AND_NOT',
-  'XOR' = 'XOR',
-}
-
 export enum EvalResult {
   'FALSE' = 'FALSE',
   'TRUE' = 'TRUE',
