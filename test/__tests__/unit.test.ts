@@ -1,5 +1,31 @@
-import { Temp } from '@/plugins/spark/units';
+import { prettify, Temp } from '@/plugins/spark/units';
 
+
+describe('Prettify unit values', () => {
+  it('Should handle unit postfixes', () => {
+    expect(prettify('celsius')).toBe('°C');
+    expect(prettify('degC')).toBe('°C');
+    expect(prettify('degCelsius')).toBe('°C');
+
+    expect(prettify('fahrenheit')).toBe('°F');
+    expect(prettify('degF')).toBe('°F');
+    expect(prettify('degfahrenheit')).toBe('°F');
+
+    expect(prettify('1/degC')).toBe('/°C');
+    expect(prettify('1 / degC')).toBe('/°C');
+    expect(prettify('1/degC')).toBe('/°C');
+    expect(prettify('°C /hour')).toBe('°C/h');
+    expect(prettify('degC * hour')).toBe('°C·h');
+
+    expect(prettify('degP test')).toBe('°P test');
+    expect(prettify('degXYZ')).toBe('°XYZ');
+    expect(prettify('gedegend')).toBe('gedegend');
+    expect(prettify('degend')).toBe('degend');
+    expect(prettify('degEnd')).toBe('°End');
+    expect(prettify('[degC]')).toBe('[°C]');
+    expect(prettify('deg')).toBe('°');
+  });
+});
 
 describe('Check equality', () => {
   it('should compare units using .isEqual()', () => {
