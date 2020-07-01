@@ -90,7 +90,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           targetId: new Link(names.tubeSetpoint),
           drivenTargetId: new Link(names.tubeSetpoint),
           referenceId: new Link(names.kettleSetpoint),
-          referenceSettingOrValue: OffsetSettingOrValue.Setting,
+          referenceSettingOrValue: OffsetSettingOrValue.SETTING,
           enabled: true,
           desiredSetting: 0,
           setting: 0,

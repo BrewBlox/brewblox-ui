@@ -18,6 +18,7 @@ const spec: AutomationSpec<ComparisonImpl> = {
     matchesType<ComparisonImpl>(type, impl)
       ? `${impl.lhs} ${impl.operator} ${impl.rhs}`
       : `Invalid data: type=${impl.type}`,
+  hidden: true,
 };
 
 export default spec;

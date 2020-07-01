@@ -14,6 +14,10 @@ export default class AutomationCreateDialog extends DialogBase {
   @Prop({ type: Array, required: true })
   public readonly specs!: AutomationSpec[];
 
+  get specOpts(): AutomationSpec[] {
+    return this.specs.filter(v => !v.hidden);
+  }
+
   selectSpec(spec: AutomationSpec, save: boolean): void {
     if (save) {
       this.save(spec);
@@ -47,7 +51,7 @@ export default class AutomationCreateDialog extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <ListSelect
         v-model="selected"
-        :options="specs"
+        :options="specOpts"
         option-value="type"
         option-label="title"
         @confirm="v => save(v)"
