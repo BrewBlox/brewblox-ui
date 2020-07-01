@@ -158,7 +158,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           targetId: new Link(names.hltSetpoint),
           drivenTargetId: new Link(names.hltSetpoint),
           referenceId: new Link(names.mtSetpoint),
-          referenceSettingOrValue: OffsetSettingOrValue.Setting,
+          referenceSettingOrValue: OffsetSettingOrValue.SETTING,
           enabled: false,
           desiredSetting: 0,
           setting: 0,

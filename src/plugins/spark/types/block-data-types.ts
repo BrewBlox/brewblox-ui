@@ -92,8 +92,8 @@ export interface ActuatorLogicBlock extends Block {
 }
 
 export enum OffsetSettingOrValue {
-  'Setting' = 'Setting',
-  'Value' = 'Value',
+  'SETTING' = 'SETTING',
+  'VALUE' = 'VALUE',
 }
 
 export interface ActuatorOffsetBlock extends Block {
