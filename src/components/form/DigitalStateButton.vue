@@ -6,15 +6,15 @@ import { Component, Prop } from 'vue-property-decorator';
 import { DigitalState } from '@/plugins/spark/types';
 
 const numberValues: Record<number, DigitalState> = {
-  0: 'Inactive',
-  1: 'Active',
-  2: 'Unknown',
+  0: DigitalState.Inactive,
+  1: DigitalState.Active,
+  2: DigitalState.Unknown,
 };
 
 @Component
 export default class DigitalStateButton extends Vue {
-  on: DigitalState = 'Active';
-  off: DigitalState = 'Inactive';
+  on: DigitalState = DigitalState.Active;
+  off: DigitalState = DigitalState.Inactive;
 
   commonOpts = {
     color: 'grey-9',
@@ -49,7 +49,7 @@ export default class DigitalStateButton extends Vue {
 
   get state(): DigitalState {
     return isNumber(this.value)
-      ? numberValues[this.value] ?? 'Unknown'
+      ? numberValues[this.value] ?? DigitalState.Unknown
       : this.value;
   }
 
@@ -58,7 +58,7 @@ export default class DigitalStateButton extends Vue {
   }
 
   get known(): boolean {
-    return [this.on, this.off].includes(this.state);
+    return this.state in DigitalState;
   }
 
   toggle(): void {
@@ -66,8 +66,8 @@ export default class DigitalStateButton extends Vue {
       return;
     }
     this.state = this.state === this.off
-      ? 'Active'
-      : 'Inactive';
+      ? DigitalState.Active
+      : DigitalState.Inactive;
   }
 }
 </script>

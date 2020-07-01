@@ -13,6 +13,14 @@ const defaultMessage =
 
 @Component
 export default class SparkUnitMenu extends DialogBase {
+  serviceOpts: SelectOption<UserUnits['Temp']>[] = [
+    { label: 'Celsius', value: 'degC' },
+    { label: 'Fahrenheit', value: 'degF' },
+  ]
+  displayOpts: SelectOption<DisplaySettingsTempUnit>[] = [
+    { label: 'Celsius', value: DisplaySettingsTempUnit.CELSIUS },
+    { label: 'Fahrenheit', value: DisplaySettingsTempUnit.FAHRENHEIT },
+  ]
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -39,7 +47,7 @@ export default class SparkUnitMenu extends DialogBase {
   }
 
   get displayTemp(): DisplaySettingsTempUnit {
-    return this.displayBlock?.data.tempUnit ?? 'CELSIUS';
+    return this.displayBlock?.data.tempUnit ?? DisplaySettingsTempUnit.CELSIUS;
   }
 
   set displayTemp(v: DisplaySettingsTempUnit) {
@@ -71,7 +79,7 @@ export default class SparkUnitMenu extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <q-select
         v-model="serviceTemp"
-        :options="[{ label: 'Celsius', value: 'degC' }, { label: 'Fahrenheit', value: 'degF' }]"
+        :options="serviceOpts"
         label="UI temperature unit"
         map-options
         emit-value
@@ -79,7 +87,7 @@ export default class SparkUnitMenu extends DialogBase {
       />
       <q-select
         v-model="displayTemp"
-        :options="[{ label: 'Celsius', value: 'CELSIUS' }, { label: 'Fahrenheit', value: 'FAHRENHEIT' }]"
+        :options="displayOpts"
         label="Spark Display temperature unit"
         map-options
         emit-value

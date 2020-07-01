@@ -17,41 +17,37 @@ export interface ActuatorAnalogMockBlock extends Block {
   };
 }
 
-export type DigitalCompareOp =
-  | 'VALUE_IS'
-  | 'VALUE_ISNOT'
-  | 'DESIRED_IS'
-  | 'DESIRED_ISNOT'
+export enum DigitalCompareOp {
+  'VALUE_IS' = 'VALUE_IS',
+  'VALUE_ISNOT' = 'VALUE_ISNOT',
+  'DESIRED_IS' = 'DESIRED_IS',
+  'DESIRED_ISNOT' = 'DESIRED_ISNOT',
+}
 
-export type AnalogCompareOp =
-  | 'VALUE_LE'
-  | 'VALUE_GE'
-  | 'SETTING_LE'
-  | 'SETTING_GE'
+export enum AnalogCompareOp {
+  'VALUE_LE' = 'VALUE_LE',
+  'VALUE_GE' = 'VALUE_GE',
+  'SETTING_LE' = 'SETTING_LE',
+  'SETTING_GE' = 'SETTING_GE',
+}
 
-export type CombineOp =
-  | 'OR'
-  | 'AND'
-  | 'OR_NOT'
-  | 'AND_NOT'
-  | 'XOR'
-
-export type EvalResult =
-  | 'FALSE'
-  | 'TRUE'
-  | 'EMPTY'
-  | 'EMPTY_SUBSTRING'
-  | 'BLOCK_NOT_FOUND'
-  | 'INVALID_DIGITAL_OP'
-  | 'INVALID_ANALOG_OP'
-  | 'INVALID_ANA_COMPARE_IDX'
-  | 'INVALID_DIG_COMPARE_IDX'
-  | 'UNEXPECTED_CLOSING_BRACKET'
-  | 'MISSING_CLOSING_BRACKET'
-  | 'UNEXPECTED_OPENING_BRACKET'
-  | 'UNEXPECTED_CHARACTER'
-  | 'UNEXPECTED_COMPARISON'
-  | 'UNEXPECTED_OPERATOR'
+export enum EvalResult {
+  'FALSE' = 'FALSE',
+  'TRUE' = 'TRUE',
+  'EMPTY' = 'EMPTY',
+  'EMPTY_SUBSTRING' = 'EMPTY_SUBSTRING',
+  'BLOCK_NOT_FOUND' = 'BLOCK_NOT_FOUND',
+  'INVALID_DIGITAL_OP' = 'INVALID_DIGITAL_OP',
+  'INVALID_ANALOG_OP' = 'INVALID_ANALOG_OP',
+  'INVALID_ANA_COMPARE_IDX' = 'INVALID_ANA_COMPARE_IDX',
+  'INVALID_DIG_COMPARE_IDX' = 'INVALID_DIG_COMPARE_IDX',
+  'UNEXPECTED_CLOSING_BRACKET' = 'UNEXPECTED_CLOSING_BRACKET',
+  'MISSING_CLOSING_BRACKET' = 'MISSING_CLOSING_BRACKET',
+  'UNEXPECTED_OPENING_BRACKET' = 'UNEXPECTED_OPENING_BRACKET',
+  'UNEXPECTED_CHARACTER' = 'UNEXPECTED_CHARACTER',
+  'UNEXPECTED_COMPARISON' = 'UNEXPECTED_COMPARISON',
+  'UNEXPECTED_OPERATOR' = 'UNEXPECTED_OPERATOR',
+}
 
 export interface DigitalCompare {
   op: DigitalCompareOp;
@@ -87,9 +83,10 @@ export interface ActuatorLogicBlock extends Block {
   };
 }
 
-export type OffsetSettingOrValue =
-  | 'Setting'
-  | 'Value'
+export enum OffsetSettingOrValue {
+  'SETTING' = 'SETTING',
+  'VALUE' = 'VALUE',
+}
 
 export interface ActuatorOffsetBlock extends Block {
   type: 'ActuatorOffset';
@@ -158,10 +155,10 @@ export interface DigitalActuatorBlock extends Block {
   };
 }
 
-export type DisplaySettingsTempUnit =
-  | 'CELSIUS'
-  | 'FAHRENHEIT'
-  ;
+export enum DisplaySettingsTempUnit {
+  'CELSIUS' = 'CELSIUS',
+  'FAHRENHEIT' = 'FAHRENHEIT',
+}
 
 export interface DisplaySlot {
   pos: number;
@@ -223,14 +220,15 @@ export interface MockPinsBlock extends Block {
   };
 }
 
-export type ValveState =
-  | 'Unknown'
-  | 'Open'
-  | 'Closed'
-  | 'Opening'
-  | 'Closing'
-  | 'HalfOpenIdle'
-  | 'InitIdle'
+export enum ValveState {
+  'Unknown' = 'Unknown',
+  'Open' = 'Open',
+  'Closed' = 'Closed',
+  'Opening' = 'Opening',
+  'Closing' = 'Closing',
+  'HalfOpenIdle' = 'HalfOpenIdle',
+  'InitIdle' = 'InitIdle',
+}
 
 export interface MotorValveBlock extends Block {
   type: 'MotorValve';
@@ -303,16 +301,15 @@ export interface SetpointProfileBlock extends Block {
   };
 }
 
-
-export type FilterChoice =
-  | 'FILT_NONE'
-  | 'FILT_15s'
-  | 'FILT_45s'
-  | 'FILT_90s'
-  | 'FILT_3m'
-  | 'FILT_10m'
-  | 'FILT_30m'
-
+export enum FilterChoice {
+  'FILT_NONE' = 'FILT_NONE',
+  'FILT_15s' = 'FILT_15s',
+  'FILT_45s' = 'FILT_45s',
+  'FILT_90s' = 'FILT_90s',
+  'FILT_3m' = 'FILT_3m',
+  'FILT_10m' = 'FILT_10m',
+  'FILT_30m' = 'FILT_30m',
+}
 
 export interface SetpointSensorPairBlock extends Block {
   type: 'SetpointSensorPair';
@@ -332,10 +329,11 @@ export interface SetpointSensorPairBlock extends Block {
   };
 }
 
-export type Spark2Hardware =
-  | 'unknown_hw'
-  | 'Spark1'
-  | 'Spark2'
+export enum Spark2Hardware {
+  'unknown_hw' = 'unknown_hw',
+  'Spark1' = 'Spark1',
+  'Spark2' = 'Spark2',
+}
 
 export interface Spark2PinsBlock extends Block {
   type: 'Spark2Pins';

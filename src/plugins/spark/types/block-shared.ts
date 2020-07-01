@@ -1,14 +1,15 @@
-export type ChannelConfig =
-  'Unknown'
-  | 'ActiveLow'
-  | 'ActiveHigh'
-  | 'Input'
+export enum ChannelConfig {
+  'UNKNOWN' = 'UNKNOWN',
+  'ACTIVE_LOW' = 'ACTIVE_LOW',
+  'ACTIVE_HIGH' = 'ACTIVE_HIGH',
+  'INPUT' = 'INPUT',
+}
 
-export type DigitalState =
-  'Unknown'
-  | 'Active'
-  | 'Inactive'
-  ;
+export enum DigitalState {
+  'Unknown' = 'Unknown',
+  'Active' = 'Active',
+  'Inactive' = 'Inactive',
+}
 
 export interface IoChannel {
   config: ChannelConfig;

@@ -1,6 +1,6 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockSpec, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { BlockSpec, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { Link, Temp } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -20,7 +20,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       valueUnfiltered: new Temp(null, temp),
       resetFilter: false,
       settingEnabled: true,
-      filter: 'FILT_15s',
+      filter: FilterChoice.FILT_15s,
       filterThreshold: new Temp(5, 'delta_degC').convert(`delta_${temp}`),
     };
   },

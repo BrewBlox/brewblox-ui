@@ -123,9 +123,7 @@ export class BrewbloxDatabaseImpl implements BrewbloxDatabase {
       .map(row => asStoreObject(moduleId, row.doc));
   }
 
-  public async fetchById<T extends StoreObject>(
-    moduleId: string, objId: string
-  ): Promise<T> {
+  public async fetchById<T extends StoreObject>(moduleId: string, objId: string): Promise<T> {
     const db = await this.promisedDb;
     const obj = await db.get(fullId(moduleId, objId))
       .catch(intercept(`Fetch '${objId}'`, moduleId));
@@ -141,9 +139,24 @@ export class BrewbloxDatabaseImpl implements BrewbloxDatabase {
 
   public async persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
     const db = await this.promisedDb;
-    const resp = await db.put(asDocument(moduleId, obj))
-      .catch(intercept('Persist object', moduleId));
-    return { ...obj, _rev: resp.rev };
+    try {
+      const resp = await db.put(asDocument(moduleId, obj));
+      return { ...obj, _rev: resp.rev };
+    }
+    catch (e) {
+      // Explicitly trigger a change event to reset the saved doc to last known good status
+      this.fetchById(moduleId, obj.id)
+        .then((obj: StoreObject) => {
+          const handler = this.handlers[moduleId];
+          handler?.onDeleted(obj.id);
+          handler?.onChanged(obj);
+        })
+        .catch(() => { });
+      // Make an educated guess how to describe the object
+      const name = obj['title'] || obj['name'] || moduleId;
+      notify.error(`Failed to save ${name}: ${e.message}`);
+      throw e;
+    }
   }
 
   public async remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {

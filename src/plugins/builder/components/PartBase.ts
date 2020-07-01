@@ -1,3 +1,4 @@
+import defaults from 'lodash/defaults';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
@@ -24,11 +25,10 @@ export default class PartBase extends Vue {
   public invalidateFlows(): void { }
 
   public get part(): FlowPart {
-    return {
+    return defaults(this.value, {
       transitions: {},
       flows: {},
-      ...this.value,
-    };
+    });
   }
 
   public get flipped(): boolean {

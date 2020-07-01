@@ -11,8 +11,8 @@ import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
 import { calculateNormalizedFlows } from './calculateFlows';
-import { deprecatedTypes, SQUARE_SIZE } from './getters';
-import { asPersistentPart, asStatePart, rectContains, squares } from './helpers';
+import { SQUARE_SIZE } from './getters';
+import { asPersistentPart, asStatePart, rectContains, squares, vivifyParts } from './helpers';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
 
@@ -207,26 +207,9 @@ export default class BuilderEditor extends Vue {
   }
 
   get parts(): PersistentPart[] {
-    if (!this.layout) {
-      return [];
-    }
-    const sizes: Mapped<number> = {};
-    return this.layout.parts
-      .map(part => {
-        const actual: PersistentPart = {
-          id: uid(),
-          rotate: 0,
-          settings: {},
-          flipped: false,
-          ...part,
-          type: deprecatedTypes[part.type] ?? part.type,
-        };
-        const [sizeX, sizeY] = builderStore.spec(actual).size(actual);
-        sizes[part.id] = sizeX * sizeY;
-        return actual;
-      })
-      // sort parts to render largest first
-      .sort((a, b) => sizes[b.id] - sizes[a.id]);
+    return this.layout !== null
+      ? vivifyParts(this.layout.parts)
+      : [];
   }
 
   get configuredPart(): FlowPart | null {

@@ -7,8 +7,8 @@ import { createDialog } from '@/helpers/dialog';
 import { spliceById, uniqueFilter } from '@/helpers/functional';
 
 import { calculateNormalizedFlows } from './calculateFlows';
-import { defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes } from './getters';
-import { asPersistentPart, asStatePart, squares } from './helpers';
+import { defaultLayoutHeight, defaultLayoutWidth } from './getters';
+import { asPersistentPart, asStatePart, squares, vivifyParts } from './helpers';
 import { builderStore } from './store';
 import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
 
@@ -102,27 +102,9 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
   }
 
   get parts(): PersistentPart[] {
-    if (!this.layout) {
-      return [];
-    }
-    const sizes: Mapped<number> = {};
-    return this.layout.parts
-      .map(part => {
-        const actual: PersistentPart = {
-          id: uid(),
-          rotate: 0,
-          settings: {},
-          flipped: false,
-          ...part,
-          type: deprecatedTypes[part.type] ?? part.type,
-        };
-        const [sizeX, sizeY] = builderStore.spec(actual).size(actual);
-        sizes[part.id] = sizeX * sizeY;
-        return actual;
-      })
-      // Sort parts to render largest first
-      // This improves clickability of overlapping parts
-      .sort((a, b) => sizes[b.id] - sizes[a.id]);
+    return this.layout !== null
+      ? vivifyParts(this.layout.parts)
+      : [];
   }
 
   get updater(): PartUpdater {

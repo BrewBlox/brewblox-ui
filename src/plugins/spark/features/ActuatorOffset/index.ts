@@ -1,7 +1,7 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { ActuatorOffsetBlock, AnalogConstraintsObj, BlockSpec } from '@/plugins/spark/types';
+import { ActuatorOffsetBlock, AnalogConstraintsObj, BlockSpec, OffsetSettingOrValue } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -15,7 +15,7 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
     targetId: new Link(null, interfaceTypes.SetpointSensorPair),
     drivenTargetId: new Link(null, interfaceTypes.SetpointSensorPair, true),
     referenceId: new Link(null, interfaceTypes.SetpointSensorPair),
-    referenceSettingOrValue: 'Setting',
+    referenceSettingOrValue: OffsetSettingOrValue.SETTING,
     desiredSetting: 0,
     setting: 0,
     value: 0,
