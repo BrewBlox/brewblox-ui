@@ -14,3 +14,19 @@ export const previewWebhook = (impl: WebhookImpl): Promise<AxiosResponse> =>
   http.post<AxiosResponse>('/webhook', impl)
     .then(resp => resp.data)
     .catch(intercept('Error in webhook preview'));
+
+export interface SandboxResult {
+  result: any;
+  logs: any[];
+  error?: string;
+}
+
+export const previewSandbox = (args: { body: string }): Promise<SandboxResult> =>
+  http.post<SandboxResult>('/sandbox', args)
+    .then(resp => resp.data)
+    .catch(intercept('Error in sandbox preview'));
+
+export const previewSandboxApi = (): Promise<any> =>
+  http.post('/sandbox-api')
+    .then(resp => resp.data)
+    .catch(intercept('Error in sandbox API preview'));

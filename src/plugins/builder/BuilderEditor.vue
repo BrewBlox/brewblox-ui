@@ -709,7 +709,7 @@ export default class BuilderEditor extends Vue {
   }
 
 }
-</script>LayoutAc
+</script>
 
 <template>
   <q-layout

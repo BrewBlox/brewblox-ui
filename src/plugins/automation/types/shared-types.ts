@@ -218,46 +218,10 @@ export interface BlockValueImpl {
   operator: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
 }
 
-export type ComparisonMiddleware =
-  | 'FloatValue'
-  | 'BlockFieldValue'
-  | 'OffsetValue'
+export interface UserScriptImpl {
+  type: 'UserScript';
 
-export interface ComparisonValue {
-  /**
-   * Only comparisons with the same valueType can be compared.
-   */
-  valueType: string;
-
-  /**
-   * Transcoders for the actual value.
-   */
-  middleware: ComparisonMiddleware[];
-
-  /**
-   * Serialized config or value.
-   */
-  value: any;
-}
-
-export interface ComparisonImpl {
-  type: 'Comparison';
-
-  /**
-   * @nullable
-   */
-  lhs: ComparisonValue | null;
-
-  /**
-   * @nullable
-   */
-  rhs: ComparisonValue | null;
-
-  /**
-   * Comparison operator.
-   * `lhs` tags determine which ones are valid.
-   */
-  operator: 'eq' | 'ne' | 'lt' | 'gt' | 'approx' | null;
+  body: string;
 }
 
 /**
@@ -351,7 +315,7 @@ export type ConditionImpl =
   | TimeAbsoluteImpl
   | TimeElapsedImpl
   | BlockValueImpl
-  | ComparisonImpl
+  | UserScriptImpl
   | TaskStatusImpl
 
 /**
