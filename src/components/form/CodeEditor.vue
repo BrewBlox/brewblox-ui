@@ -34,6 +34,12 @@ export default class CodeEditor extends Vue {
 
     this.local = this.value;
     this.editor.setValue(this.local, 1);
+    this.editor.setOptions({
+      fontSize: '16px',
+      tabSize: 2,
+      wrap: true,
+      useSoftTabs: true,
+    });
 
     this.editor.on('change', () => {
       if (this.editor) {
@@ -52,10 +58,6 @@ export default class CodeEditor extends Vue {
 </script>
 
 <template>
-  <div class="editor-container" />
+  <div style="position: relative" />
 </template>
 
-<style lang="sass" scoped>
-.editor-container
-  position: relative
-</style>

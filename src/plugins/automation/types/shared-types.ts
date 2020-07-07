@@ -46,6 +46,18 @@ export interface StoreObject {
   _rev?: string;
 }
 
+export interface SandboxError {
+  message: string;
+  line: number;
+}
+
+export interface SandboxResult {
+  date: DateTime;
+  returnValue: any;
+  messages: any[];
+  error?: SandboxError;
+}
+
 /**
  * Update block.data with given object.
  */
@@ -141,6 +153,12 @@ export interface WebhookImpl {
   body: string;
 }
 
+// export interface JSApplyImpl {
+//   type: 'JSApply';
+
+//   body: string;
+// }
+
 /**
  * Waits until current time is later than desired.
  * Evaluate: now() > time.
@@ -218,8 +236,8 @@ export interface BlockValueImpl {
   operator: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
 }
 
-export interface UserScriptImpl {
-  type: 'UserScript';
+export interface JSCheckImpl {
+  type: 'JSCheck';
 
   body: string;
 }
@@ -307,6 +325,7 @@ export type ActionImpl =
   | BlockPatchImpl
   | TaskEditImpl
   | WebhookImpl
+// | JSApplyImpl
 
 /**
  * Combining type for all conditions
@@ -315,7 +334,7 @@ export type ConditionImpl =
   | TimeAbsoluteImpl
   | TimeElapsedImpl
   | BlockValueImpl
-  | UserScriptImpl
+  | JSCheckImpl
   | TaskStatusImpl
 
 /**

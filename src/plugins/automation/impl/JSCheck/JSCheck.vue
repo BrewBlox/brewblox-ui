@@ -3,13 +3,13 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
-import { UserScriptImpl } from '@/plugins/automation/types';
+import { JSCheckImpl } from '@/plugins/automation/types';
 
-import UserScriptDialog from './UserScriptDialog.vue';
+import JSCheckDialog from './JSCheckDialog.vue';
 
 
 @Component
-export default class UserScript extends AutomationItemBase<UserScriptImpl> {
+export default class JSCheck extends AutomationItemBase<JSCheckImpl> {
 
   get displayText(): string {
     const lines = this.impl.body.split('\n');
@@ -20,7 +20,7 @@ export default class UserScript extends AutomationItemBase<UserScriptImpl> {
 
   editBody(): void {
     createDialog({
-      component: UserScriptDialog,
+      component: JSCheckDialog,
       title: 'Edit condition',
       value: this.impl.body,
       saveFunc: v => { this.impl.body = v; this.save(); },
