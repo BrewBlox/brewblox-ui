@@ -18,7 +18,7 @@ services:
   #   network_mode: host
 
   # automation:
-  #   image: brewblox/brewblox-automation:local
+  #   image: brewblox/brewblox-automation:develop
   #   volumes:
   #     - "../brewblox-automation:/app"
   #   entrypoint: 'npm run watch'
