@@ -2,22 +2,20 @@
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { previewSandbox } from '@/plugins/automation/store/preview-api';
-import { SandboxResult } from '@/plugins/automation/types';
 
 import JSCheckPreview from './JSCheckPreview.vue';
+import JSCheckSnippets from './JSCheckSnippets.vue';
 
 @Component({
   components: {
     JSCheckPreview,
+    JSCheckSnippets,
   },
 })
 export default class JSCheckDialog extends DialogBase {
-  busy = false;
+  sidebar = 'Snippets'
   local: string = '';
   saved: string = '';
-
-  previewResult: SandboxResult | null = null;
 
   @Ref('editor')
   readonly editorElement!: HTMLDivElement;
@@ -40,6 +38,10 @@ export default class JSCheckDialog extends DialogBase {
     return this.local !== this.saved;
   }
 
+  insertSnippet(code: string): void {
+    this.local += code;
+  }
+
   reset(): void {
     this.local = this.saved;
   }
@@ -50,19 +52,6 @@ export default class JSCheckDialog extends DialogBase {
       this.saveFunc(this.local);
     }
   }
-
-  close(): void {
-    this.hide();
-  }
-
-  preview(): void {
-    this.busy = true;
-    previewSandbox({ body: this.local })
-      .then(resp => { this.previewResult = resp; })
-      .finally(() => {
-        this.busy = false;
-      });
-  }
 }
 </script>
 
@@ -72,12 +61,9 @@ export default class JSCheckDialog extends DialogBase {
     ref="dialog"
     maximized
     no-backdrop-dismiss
-    no-esc-dismiss
     @hide="onDialogHide"
     @keydown.ctrl.83.prevent.stop="save"
     @keydown.ctrl.82.prevent.stop="reset"
-    @keydown.ctrl.enter.prevent.stop="preview"
-    @keydown.esc.stop="close"
   >
     <CardWrapper no-scroll v-bind="{context}">
       <template #toolbar>
@@ -100,22 +86,25 @@ export default class JSCheckDialog extends DialogBase {
           >
             <q-tooltip>Ctrl+S</q-tooltip>
           </q-btn>
-          <q-btn
-            flat
-            label="Preview"
-            class="self-stretch"
-            :loading="busy"
-            @click="preview"
-          >
-            <q-tooltip>Ctrl+Enter</q-tooltip>
-          </q-btn>
+          <div class="q-mx-md" />
         </DialogToolbar>
       </template>
       <div class="fit row no-wrap">
         <CodeEditor v-model="local" class="col" />
         <div class="col-auto column sidebar">
+          <q-tabs v-model="sidebar">
+            <q-tab name="Snippets" label="Snippets" />
+            <q-tab name="Preview" label="Preview" />
+          </q-tabs>
           <q-scroll-area class="col">
-            <JSCheckPreview :result="previewResult" />
+            <JSCheckSnippets
+              v-show="sidebar === 'Snippets'"
+              @insert="insertSnippet"
+            />
+            <JSCheckPreview
+              v-show="sidebar === 'Preview'"
+              :code="local"
+            />
           </q-scroll-area>
         </div>
       </div>

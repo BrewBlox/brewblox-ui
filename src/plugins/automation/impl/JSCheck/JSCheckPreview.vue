@@ -2,22 +2,47 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { previewSandbox } from '@/plugins/automation/store/preview-api';
 import { SandboxResult } from '@/plugins/automation/types';
 
 
 @Component
 export default class JSCheckPreview extends Vue {
+  busy = false;
+  result: SandboxResult | null = null;
 
-  @Prop({ type: Object, required: false })
-  public readonly result!: SandboxResult;
+  @Prop({ type: String, required: true })
+  public readonly code!: string;
+
+  preview(): void {
+    this.busy = true;
+    previewSandbox({ body: this.code })
+      .then(resp => { this.result = resp; })
+      .finally(() => {
+        this.busy = false;
+      });
+  }
 }
 </script>
 
 <template>
   <div class="q-pa-md q-gutter-y-md">
+    <div class="row">
+      <q-btn
+        outline
+        color="primary"
+        label="Try it!"
+        :loading="busy"
+        class="col"
+        @click="preview"
+      >
+        <q-tooltip>Ctrl+Enter</q-tooltip>
+      </q-btn>
+    </div>
+
     <template v-if="result === null">
       <div class="text-italic fade-7">
-        Use the preview function to try your script. <br>
+        Use the Run button to try your script. <br>
         You can console.log() or print() to inspect available data.
       </div>
     </template>
