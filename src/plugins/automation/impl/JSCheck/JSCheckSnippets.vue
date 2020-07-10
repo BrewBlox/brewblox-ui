@@ -1,4 +1,5 @@
 <script lang="ts">
+import isArray from 'lodash/isArray';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
@@ -8,8 +9,22 @@ import { JSSnippetFactory, snippetMakers } from './snippets';
 export default class JSCheckSnippets extends Vue {
   snippetMakers = snippetMakers;
 
+  joined(value: string | string[]): string {
+    return isArray(value)
+      ? value.join('\n')
+      : value;
+  }
+
+  insert(value: string | string[]): void {
+    this.$emit('insert', this.joined(value));
+  }
+
+  append(value: string | string[]): void {
+    this.$emit('append', this.joined(value));
+  }
+
   apply(maker: JSSnippetFactory): void {
-    maker.func(v => this.$emit('insert', v));
+    maker.func(this.insert, this.append);
   }
 }
 </script>

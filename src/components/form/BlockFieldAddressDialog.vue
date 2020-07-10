@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockFieldAddress, BlockOrIntfType, BlockSpec } from '@/plugins/spark/types';
+import { Block, BlockField, BlockFieldAddress, BlockOrIntfType, BlockSpec } from '@/plugins/spark/types';
 
 import { createBlockDialog, createDialog } from '../../helpers/dialog';
 
@@ -66,6 +66,7 @@ export default class BlockFieldAddressDialog extends DialogBase {
       ?.blocks
       .filter(block => this.validTypes.includes(block.type))
       .map(block => block.id)
+      .sort()
       ?? [];
   }
 
@@ -105,13 +106,19 @@ export default class BlockFieldAddressDialog extends DialogBase {
     this.fieldLocal = v;
   }
 
+  get fieldSpec(): BlockField | null {
+    return this.spec && this.fieldId
+      ? this.spec.fields.find(f => f.key === this.fieldId) ?? null
+      : null;
+  }
+
   get local(): BlockFieldAddress | null {
     const [serviceId, id, field] = [
       this.serviceId,
       this.blockId,
       this.fieldId,
     ];
-    if (!field || !this.spec) {
+    if (!field || !this.spec || !this.fieldSpec) {
       return null;
     }
     return {
@@ -119,7 +126,7 @@ export default class BlockFieldAddressDialog extends DialogBase {
       id,
       field,
       type: this.spec.id,
-      postfix: this.spec.generate(serviceId)[field].postfix ?? null,
+      postfix: this.fieldSpec.generate(serviceId).postfix ?? null,
     };
   }
 

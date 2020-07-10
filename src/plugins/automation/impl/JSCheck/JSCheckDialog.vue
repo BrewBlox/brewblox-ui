@@ -47,6 +47,11 @@ export default class JSCheckDialog extends DialogBase {
     this.editor?.insert(code);
   }
 
+  append(code: string): void {
+    const sep = !this.local || this.local.endsWith('\n') ? '' : '\n';
+    this.local = `${this.local}${sep}${code}\n`;
+  }
+
   reset(): void {
     this.local = this.saved;
   }
@@ -141,6 +146,7 @@ export default class JSCheckDialog extends DialogBase {
             <JSCheckSnippets
               v-show="sidebar === 'Snippets'"
               @insert="insert"
+              @append="append"
             />
             <JSCheckPreview
               v-show="sidebar === 'Preview'"

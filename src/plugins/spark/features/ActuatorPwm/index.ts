@@ -42,6 +42,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       title: 'Duty Setting',
       component: 'NumberValEdit',
       generate: () => 0,
+      valueHint: '0-100',
     },
     {
       key: 'period',
@@ -74,6 +75,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       title: 'Duty Setting',
       component: 'NumberValEdit',
       generate: () => 0,
+      valueHint: '0-100',
       readonly: true,
       graphed: true,
     },
@@ -82,6 +84,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       title: 'Duty Achieved',
       component: 'NumberValEdit',
       generate: () => 0,
+      valueHint: '0-100',
       readonly: true,
       graphed: true,
     },

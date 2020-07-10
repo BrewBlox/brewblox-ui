@@ -31,6 +31,7 @@ const block: BlockSpec<SetpointProfileBlock> = {
       component: 'DateValEdit',
       componentProps: { timeScale: 1000 },
       generate: () => new Date().getTime() / 1000,
+      valueHint: 'seconds since 1/1/1970',
       pretty: (val: number): string => {
         if (val === 0) { return 'now'; }
         if (!val) { return 'invalid date'; }

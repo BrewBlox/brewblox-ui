@@ -95,6 +95,7 @@ const block: BlockSpec<DigitalActuatorBlock> = {
       title: 'Actual state',
       component: 'StateValEdit',
       generate: (): DigitalState => DigitalState.Inactive,
+      valueHint: enumHint(DigitalState),
       readonly: true,
       graphed: true,
     },

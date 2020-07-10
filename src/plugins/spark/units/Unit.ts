@@ -87,8 +87,17 @@ export class Unit implements PostFixed {
   }
 }
 
+export type TimeUnitType =
+  | 'ms'
+  | 'millisecond'
+  | 's'
+  | 'second'
+  | 'min'
+  | 'minute'
+  | 'hour'
+
 export class Time extends Unit {
-  public constructor(value: number | null = 0, unit: 'ms' | 's' | 'min' | 'hour' = 's') {
+  public constructor(value: number | null = 0, unit: TimeUnitType = 'second') {
     super(value, unit);
   }
 }

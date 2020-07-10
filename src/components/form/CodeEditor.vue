@@ -23,6 +23,7 @@ export default class CodeEditor extends Vue {
     if (this.editor && newV !== this.local) {
       this.local = newV;
       this.editor.setValue(newV, 1);
+      this.editor.focus();
     }
   }
 
@@ -57,6 +58,7 @@ export default class CodeEditor extends Vue {
 
   insert(code: string): void {
     this.editor?.insert(code);
+    this.editor?.focus();
   }
 }
 </script>
