@@ -85,4 +85,19 @@ export const snippetMakers: JSSnippetFactory[] = [
         });
     },
   },
+
+  {
+    desc: 'Make HTTP request',
+    func(_, append) {
+      const serviceId = sparkStore.serviceIds[0] ?? 'spark-one';
+      append([
+        '// HTTP requests return a Promise. We need to wait for it using then().',
+        '// You can return a value from the then() function.',
+        `return axios.get('http://${serviceId}:5000/${serviceId}/_service/status').then(resp => {`,
+        '  console.log(resp.data);',
+        "  return resp.data.status === 'ok';",
+        '});',
+      ]);
+    },
+  },
 ];
