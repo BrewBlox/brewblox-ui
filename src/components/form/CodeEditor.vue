@@ -54,6 +54,10 @@ export default class CodeEditor extends Vue {
     this.editor?.destroy();
     this.editor?.container.remove();
   }
+
+  insert(code: string): void {
+    this.editor?.insert(code);
+  }
 }
 </script>
 

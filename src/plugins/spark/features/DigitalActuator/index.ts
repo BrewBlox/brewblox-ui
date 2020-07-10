@@ -1,5 +1,5 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec, DigitalActuatorBlock, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
 import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
@@ -73,6 +73,7 @@ const block: BlockSpec<DigitalActuatorBlock> = {
       title: 'State',
       component: 'StateValEdit',
       generate: (): DigitalState => DigitalState.Inactive,
+      valueHint: enumHint(DigitalState),
       graphed: true,
       graphName: 'Desired state',
     },

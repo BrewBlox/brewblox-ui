@@ -14,7 +14,11 @@ export default class JSCheckPreview extends Vue {
   @Prop({ type: String, required: true })
   public readonly code!: string;
 
-  preview(): void {
+  get passed(): boolean {
+    return this.result?.returnValue === true;
+  }
+
+  run(): void {
     this.busy = true;
     previewSandbox({ body: this.code })
       .then(resp => { this.result = resp; })
@@ -34,7 +38,7 @@ export default class JSCheckPreview extends Vue {
         label="Try it!"
         :loading="busy"
         class="col"
-        @click="preview"
+        @click="run"
       >
         <q-tooltip>Ctrl+Enter</q-tooltip>
       </q-btn>
@@ -78,11 +82,28 @@ export default class JSCheckPreview extends Vue {
 
       <div class="col">
         <div class="text-h6">
+          Condition passed?
+        </div>
+        <div class="text-italic fade-7">
+          Is the current result true?
+        </div>
+        <div
+          :class="[
+            passed ? 'text-positive' : 'text-negative',
+            'q-ml-sm q-mt-sm'
+          ]"
+        >
+          {{ passed ? 'Yes' : 'No' }}
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="text-h6">
           Messages
         </div>
         <div class="text-italic fade-7">
           Use console.log() or print() to add a message. <br>
-          You can use this to inspect objects.
+          Calls to API functions are also shown here.
         </div>
         <vue-json-pretty
           v-if="result.messages.length"

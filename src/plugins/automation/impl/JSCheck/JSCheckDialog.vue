@@ -2,6 +2,8 @@
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import CodeEditor from '@/components/form/CodeEditor.vue';
+import { createDialog } from '@/helpers/dialog';
 
 import JSCheckPreview from './JSCheckPreview.vue';
 import JSCheckSnippets from './JSCheckSnippets.vue';
@@ -13,12 +15,15 @@ import JSCheckSnippets from './JSCheckSnippets.vue';
   },
 })
 export default class JSCheckDialog extends DialogBase {
-  sidebar = 'Snippets'
+  sidebar: 'Snippets' | 'Preview' = 'Snippets'
   local: string = '';
   saved: string = '';
 
   @Ref('editor')
-  readonly editorElement!: HTMLDivElement;
+  readonly editor!: CodeEditor;
+
+  @Ref('previewer')
+  readonly previewer!: JSCheckPreview;
 
   @Prop({ type: String, default: 'Editor' })
   public readonly title!: string;
@@ -38,8 +43,8 @@ export default class JSCheckDialog extends DialogBase {
     return this.local !== this.saved;
   }
 
-  insertSnippet(code: string): void {
-    this.local += code;
+  insert(code: string): void {
+    this.editor?.insert(code);
   }
 
   reset(): void {
@@ -52,6 +57,23 @@ export default class JSCheckDialog extends DialogBase {
       this.saveFunc(this.local);
     }
   }
+
+  run(): void {
+    this.sidebar = 'Preview';
+    this.previewer?.run();
+  }
+
+  close(): void {
+    if (this.saved === this.local) {
+      this.onDialogOk();
+      return;
+    }
+    createDialog({
+      component: 'SaveConfirmDialog',
+      saveFunc: () => this.save(),
+    })
+      .onOk(() => this.onDialogOk());
+  }
 }
 </script>
 
@@ -61,13 +83,16 @@ export default class JSCheckDialog extends DialogBase {
     ref="dialog"
     maximized
     no-backdrop-dismiss
+    no-esc-dismiss
     @hide="onDialogHide"
     @keydown.ctrl.83.prevent.stop="save"
     @keydown.ctrl.82.prevent.stop="reset"
+    @keydown.ctrl.enter.prevent.stop="run"
+    @keydown.esc.prevent.stop="close"
   >
     <CardWrapper no-scroll v-bind="{context}">
       <template #toolbar>
-        <DialogToolbar :title="title">
+        <Toolbar :title="title">
           <q-btn
             flat
             label="Reset"
@@ -86,11 +111,27 @@ export default class JSCheckDialog extends DialogBase {
           >
             <q-tooltip>Ctrl+S</q-tooltip>
           </q-btn>
+          <q-btn
+            flat
+            label="Run"
+            class="self-stretch"
+            @click="run"
+          >
+            <q-tooltip>Ctrl+Enter</q-tooltip>
+          </q-btn>
           <div class="q-mx-md" />
-        </DialogToolbar>
+          <q-btn
+            flat
+            round
+            dense
+            icon="mdi-close-circle"
+            class="close-button"
+            @click="close"
+          />
+        </Toolbar>
       </template>
       <div class="fit row no-wrap">
-        <CodeEditor v-model="local" class="col" />
+        <CodeEditor ref="editor" v-model="local" class="col" />
         <div class="col-auto column sidebar">
           <q-tabs v-model="sidebar">
             <q-tab name="Snippets" label="Snippets" />
@@ -99,10 +140,11 @@ export default class JSCheckDialog extends DialogBase {
           <q-scroll-area class="col">
             <JSCheckSnippets
               v-show="sidebar === 'Snippets'"
-              @insert="insertSnippet"
+              @insert="insert"
             />
             <JSCheckPreview
               v-show="sidebar === 'Preview'"
+              ref="previewer"
               :code="local"
             />
           </q-scroll-area>

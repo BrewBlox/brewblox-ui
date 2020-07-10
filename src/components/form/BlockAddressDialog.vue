@@ -21,7 +21,13 @@ const asAddr = (v: Block | BlockAddress): BlockAddress => ({
 export default class BlockAddressDialog extends DialogBase {
   local: BlockAddress | null = null;
 
-  @Prop({ type: Object, required: true })
+  @Prop({
+    type: Object, default: (): BlockAddress => ({
+      serviceId: null,
+      id: null,
+      type: null,
+    }),
+  })
   public readonly value!: BlockAddress;
 
   @Prop({ type: String, default: 'Block' })

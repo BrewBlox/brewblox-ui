@@ -2,39 +2,14 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
-import { BlockAddress, BlockOrIntfType } from '@/plugins/spark/types';
-
-const mkStateSnippet = (address: BlockAddress): string =>
-  [
-    '',
-    `const state = getBlock('${address.serviceId}', '${address.id}').data.state;`,
-    'console.log(state);',
-    "return state === 'Inactive';",
-    '',
-  ].join('\n');
+import { JSSnippetFactory, snippetMakers } from './snippets';
 
 @Component
 export default class JSCheckSnippets extends Vue {
+  snippetMakers = snippetMakers;
 
-  addSnippet(): void {
-    const value: BlockAddress = {
-      serviceId: null,
-      id: null,
-      type: null,
-    };
-    const compatible: BlockOrIntfType[] = [
-      'DigitalActuator',
-    ];
-    createDialog({
-      component: 'BlockAddressDialog',
-      title: 'Select target block',
-      message: 'Pick a block. It\'s name will be autofilled',
-      compatible,
-      value,
-      anyService: true,
-    })
-      .onOk(address => this.$emit('insert', mkStateSnippet(address)));
+  apply(maker: JSSnippetFactory): void {
+    maker.func(v => this.$emit('insert', v));
   }
 }
 </script>
@@ -42,10 +17,12 @@ export default class JSCheckSnippets extends Vue {
 <template>
   <div class="q-pa-md q-gutter-y-sm">
     <div
+      v-for="(mk, idx) in snippetMakers"
+      :key="`snippet-${idx}`"
       class="col clickable q-pa-sm rounded-borders text-h6"
-      @click="addSnippet"
+      @click="apply(mk)"
     >
-      Check state for Digital Actuator
+      {{ mk.desc }}
     </div>
   </div>
 </template>
