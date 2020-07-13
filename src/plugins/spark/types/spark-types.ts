@@ -1,4 +1,5 @@
 import { StoreObject } from '@/plugins/database';
+import { EventbusMessage } from '@/plugins/eventbus';
 import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
@@ -52,6 +53,13 @@ export interface ApiSparkStatus {
 export interface SparkStatus extends ApiSparkStatus {
   serviceId: string;
   available: boolean;
+}
+
+export interface SparkStateMessage extends EventbusMessage {
+  data: {
+    service: ApiSparkStatus | null;
+    blocks: DataBlock[];
+  };
 }
 
 export interface SparkStoreEntry {

@@ -12,8 +12,7 @@ import {
 } from './types';
 
 export const sparkType = 'Spark';
-export const sparkBlocksEvent = 'Spark.blocks';
-export const sparkStatusEvent = 'Spark.service';
+export const sparkStateEvent = 'Spark.state';
 export const sparkUpdateEvent = 'Spark.update';
 export const systemGroup = 7;
 

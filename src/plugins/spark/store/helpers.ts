@@ -3,7 +3,7 @@ import { Link } from '@/plugins/spark/units';
 import { ServiceStatus } from '@/store/services';
 
 import { constraintLabels } from '../getters';
-import { Block } from '../types';
+import { ApiSparkStatus, Block } from '../types';
 import { AnalogConstraint, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
 
 export const calculateDrivenChains = (blocks: Block[]): string[][] => {
@@ -113,6 +113,29 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
 
   return limited;
 };
+
+export const unknownStatus = (): ApiSparkStatus => ({
+  type: 'Spark',
+  autoconnecting: true,
+  connect: false,
+  handshake: false,
+  synchronize: false,
+  compatible: true, // no idea - assume yes
+  latest: true, // no idea - assume yes
+  valid: true, // no idea - assume yes
+  info: [],
+  address: null,
+  connection: null,
+});
+
+export const asSparkStatus = (
+  serviceId: string,
+  status: ApiSparkStatus | null = null,
+): SparkStatus => ({
+  ...(status ?? unknownStatus()),
+  serviceId,
+  available: status !== null,
+});
 
 const statusDesc = (status: SparkStatus): [string, string] => {
   if (status.connect) {

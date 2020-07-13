@@ -3,27 +3,31 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
 
 import { extendById, filterById, typeMatchFilter } from '@/helpers/functional';
-import { EventbusMessage } from '@/plugins/eventbus';
 import { deserialize } from '@/plugins/spark/parse-object';
 import type {
-  ApiSparkStatus,
   Block,
   BlockAddress,
-  DataBlock,
   Limiters,
   RelationEdge,
   SparkExported,
   SparkService,
+  SparkStateMessage,
   SparkStatus,
   UserUnits,
 } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
-import { sparkBlocksEvent, sparkStatusEvent } from '../getters';
+import { sparkStateEvent } from '../getters';
 import { asBlock } from '../helpers';
 import * as api from './api';
-import { asServiceStatus, calculateDrivenChains, calculateLimiters, calculateRelations } from './helpers';
+import {
+  asServiceStatus,
+  asSparkStatus,
+  calculateDrivenChains,
+  calculateLimiters,
+  calculateRelations,
+} from './helpers';
 
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {
@@ -220,39 +224,24 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async start(): Promise<void> {
-    // Listen for block updates
     Vue.$eventbus.addListener({
-      id: `${sparkBlocksEvent}__${this.id}`,
-      filter: (key, type) => key === this.id && type === sparkBlocksEvent,
-      onmessage: (msg: EventbusMessage) => {
-        const blocks = msg.data
-          .map(deserialize)
-          .map((block: DataBlock) => asBlock(block, this.id));
-        this.updateBlocks(blocks);
-      },
-    });
+      id: `${sparkStateEvent}__${this.id}`,
+      filter: (key, type) => key === this.id && type === sparkStateEvent,
+      onmessage: (msg: SparkStateMessage) => {
+        const status = asSparkStatus(this.id, msg.data.service);
+        const blocks = msg.data.blocks
+          .map(v => asBlock(deserialize(v), this.id));
 
-    // Listen for status updates
-    Vue.$eventbus.addListener({
-      id: `${sparkStatusEvent}__${this.id}`,
-      filter: (key, type) => key === this.id && type === sparkStatusEvent,
-      onmessage: (msg: EventbusMessage) => {
-        const status: SparkStatus = {
-          ...msg.data as ApiSparkStatus,
-          serviceId: this.id,
-          available: true,
-        };
+        this.updateBlocks(blocks);
         this.updateStatus(status);
         serviceStore.updateStatus(asServiceStatus(status));
       },
     });
-
     await this.fetchAll().catch(() => { });
   }
 
   @Action
   public async stop(): Promise<void> {
-    Vue.$eventbus.removeListener(`${sparkBlocksEvent}__${this.id}`);
-    Vue.$eventbus.removeListener(`${sparkStatusEvent}__${this.id}`);
+    Vue.$eventbus.removeListener(`${sparkStateEvent}__${this.id}`);
   }
 }
