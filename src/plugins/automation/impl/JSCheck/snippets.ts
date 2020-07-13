@@ -10,8 +10,8 @@ export interface JSSnippetFactory {
   func(insert: ApplyFunc, append: ApplyFunc): void | Promise<void>;
 }
 
-const comment = (v: any, readonly?: boolean): string =>
-  ` /* ${v}${readonly ? ', readonly' : ''} */`;
+const comment = (v: any): string =>
+  ` /* ${v} */`;
 
 const valueHint = (addr: BlockFieldAddress): string => {
   const field = sparkStore
@@ -19,40 +19,46 @@ const valueHint = (addr: BlockFieldAddress): string => {
     .fields
     .find(f => f.key === addr.field)!;
 
-  const { valueHint, readonly, generate } = field;
+  const { valueHint, generate } = field;
 
   // Is custom hint set?
   if (valueHint) {
-    return comment(valueHint, readonly);
+    return comment(valueHint);
   }
 
-  // Infer hint based on value type
+  // Infer hint based on value
   const value = generate(addr.serviceId);
   if (isPostFixed(value)) {
-    return comment(value.constructor.name, readonly);
-  }
-  if (typeof value !== 'object') {
-    return comment(typeof value, readonly);
+    return comment(value.constructor.name);
   }
 
-  // Return raw generated value
-  return comment(JSON.stringify(value), readonly);
+  // Infer hint based on typeof value
+  const valueType = typeof value;
+  switch (valueType) {
+    case 'boolean':
+      return comment('Boolean: true / false');
+    case 'object':
+      return comment(JSON.stringify(value));
+
+    default:
+      return comment(valueType);
+  }
 };
 
 export const snippetMakers: JSSnippetFactory[] = [
   {
     desc: 'Example',
     func(_, append) {
+      const serviceId = sparkStore.serviceIds[0] ?? 'spark-one';
       append([
+        `return getBlockField('${serviceId}', 'SystemTime', 'millisSinceBoot') > 9000;`,
         '//',
-        "// return getField('spark-one', 'Ferment Fridge Sensor', 'value[degC]') > 10;",
-        '//',
-        '// //            <- lines that start with // are comments.',
-        '// return        <- End script and return the value that will be checked.',
-        '// getField(...) <- Built-in function that gets a field in a Spark block.',
-        '//                  You can use the "Get block field" snippet to generate this.',
-        '// > 10          <- Check that the getField() value is greater than 10.',
-        '//                  `return a > b` always returns true or false.',
+        '// //                 <- lines that start with // are comments.',
+        '// return             <- End script and return the value that will be checked.',
+        '// getBlockField(...) <- Built-in function that gets a field in a Spark block.',
+        '//                       You can use the "Get block field" snippet to generate this.',
+        '// > 9000             <- Check that the getField() value is greater than a specific value.',
+        '//                       `return a > b` always returns true or false.',
       ]);
     },
   },
@@ -94,8 +100,9 @@ export const snippetMakers: JSSnippetFactory[] = [
         '// HTTP requests return a Promise. We need to wait for it using then().',
         '// You can return a value from the then() function.',
         `return axios.get('http://${serviceId}:5000/${serviceId}/_service/status').then(resp => {`,
-        '  console.log(resp.data);',
-        "  return resp.data.status === 'ok';",
+        "  console.log('response status', resp.status);",
+        "  console.log('response body', resp.data);",
+        "  return resp.status === 200 && resp.data.status === 'ok';",
         '});',
       ]);
     },
