@@ -427,4 +427,4 @@ export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
   sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';
 
 export const enumHint = (e: Mapped<any>): string =>
-  'Possible values: ' + Object.keys(e).map(v => `'${v}'`).join(', ');
+  'One of: ' + Object.keys(e).map(v => `'${v}'`).join(', ');
