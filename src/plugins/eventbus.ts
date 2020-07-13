@@ -34,13 +34,11 @@ export class BrewbloxEventbus {
     };
     const client = mqtt.connect(undefined, opts);
 
-    client.on('error', e => notify.error(`mqtt error: ${e}`));
+    client.on('error', e => {
+      notify.error(`mqtt error: ${e}`);
+    });
     client.on('connect', () => {
       client.subscribe(stateTopic + '/#');
-      if (!this.startup) {
-        client.publish('brewcast/request/state', '{}');
-        this.startup = true;
-      }
     });
     client.on('message', (_, body: Buffer) => {
       if (body.length === 0) { return; }
