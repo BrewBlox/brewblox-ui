@@ -3,5 +3,5 @@ import draggable from 'vuedraggable';
 
 export default ({ Vue }): void => {
   Vue.component('draggable', draggable);
-  Vue.component('VueJsonPretty', VueJsonPretty);
+  Vue.component('vue-json-pretty', VueJsonPretty);
 };
