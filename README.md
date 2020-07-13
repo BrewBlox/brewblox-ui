@@ -104,12 +104,15 @@ Notable new directories:
 Plugins may have their own `components/`, `helpers/`, and `store/` subdirectories. <br>
 New plugins should be declared in `src/boot/plugins.ts`.
 
-## Third-party plugins
+## Third-party plugins (discontinued)
 
-To allow runtime extension of the UI, users can load remote plugins.
-These will be loaded from user-defined URLs, and are otherwise treated as identical to plugins found in `src/plugins/`.
+~~To allow runtime extension of the UI, users can load remote plugins.~~
+~~These will be loaded from user-defined URLs, and are otherwise treated as identical to plugins found in `src/plugins/`.~~
 
-For an example of how to create a remote plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.
+~~For an example of how to create a remote plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.~~
+
+Third-party plugins are no longer supported.
+Implementation beyond proof-of-concept would require too much effort for a feature with no discernible demand.
 
 # Data sources
 
