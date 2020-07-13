@@ -425,3 +425,6 @@ export const discoverBlocks = async (serviceId: string | null, show = true): Pro
 
 export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
   sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';
+
+export const enumHint = (e: Mapped<any>): string =>
+  'Possible values: ' + Object.keys(e).map(v => `'${v}'`).join(', ');

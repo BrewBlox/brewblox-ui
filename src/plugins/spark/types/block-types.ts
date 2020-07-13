@@ -67,6 +67,11 @@ export interface BlockAddress {
   type: string | null;
 }
 
+export interface BlockFieldAddress extends BlockAddress {
+  field: string | null;
+  postfix: string | null;
+}
+
 export interface Block extends BlockAddress {
   serviceId: string;
   id: string;
@@ -112,6 +117,7 @@ export interface BlockField<T extends Block = Block> {
   component: string;
   componentProps?: any;
   generate: (serviceId: string | null) => any;
+  valueHint?: string;
   pretty?: (val: any) => string;
   readonly?: boolean;
   graphed?: boolean;

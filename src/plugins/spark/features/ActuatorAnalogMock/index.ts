@@ -1,6 +1,6 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { ActuatorAnalogMockBlock, BlockSpec } from '@/plugins/spark/types';
+import { ActuatorAnalogMockBlock, AnalogConstraintsObj, BlockSpec } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorAnalogMockWidget.vue';
@@ -23,6 +23,7 @@ const block: BlockSpec<ActuatorAnalogMockBlock> = {
       key: 'desiredSetting',
       title: 'Setting',
       component: 'NumberValEdit',
+      valueHint: '0-100',
       generate: () => 0,
       graphed: true,
     },
@@ -30,31 +31,35 @@ const block: BlockSpec<ActuatorAnalogMockBlock> = {
       key: 'minSetting',
       title: 'Minimum Setting',
       component: 'NumberValEdit',
+      valueHint: '0-100',
       generate: () => 0,
     },
     {
       key: 'maxSetting',
       title: 'Maximum Setting',
       component: 'NumberValEdit',
+      valueHint: '0-100',
       generate: () => 100,
     },
     {
       key: 'minValue',
       title: 'Minimum Value',
       component: 'NumberValEdit',
+      valueHint: '0-100',
       generate: () => 0,
     },
     {
       key: 'maxValue',
       title: 'Maximum Value',
       component: 'NumberValEdit',
+      valueHint: '0-100',
       generate: () => 100,
     },
     {
       key: 'constrainedBy',
       title: 'Constraints',
       component: 'AnalogConstraintsValEdit',
-      generate: () => ({ constraints: [] }),
+      generate: (): AnalogConstraintsObj => ({ constraints: [] }),
       pretty: prettifyConstraints,
     },
     {
@@ -62,6 +67,7 @@ const block: BlockSpec<ActuatorAnalogMockBlock> = {
       title: 'Measured Value',
       component: 'NumberValEdit',
       generate: () => 0,
+      valueHint: '0-100',
       readonly: true,
       graphed: true,
     },

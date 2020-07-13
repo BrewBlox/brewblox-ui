@@ -1,6 +1,6 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { interfaceTypes } from '@/plugins/spark/getters';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, enumHint } from '@/plugins/spark/helpers';
 import { ActuatorLogicBlock, BlockSpec, EvalResult } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
@@ -29,6 +29,7 @@ const block: BlockSpec<ActuatorLogicBlock> = {
       component: 'EnumValEdit',
       componentProps: { options: nonErrorResults },
       generate: () => EvalResult.EMPTY,
+      valueHint: enumHint(EvalResult),
       readonly: true,
       graphed: true,
     },

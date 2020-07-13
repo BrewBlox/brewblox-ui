@@ -28,6 +28,7 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
       title: 'Target offset',
       component: 'NumberValEdit',
       generate: () => 0,
+      valueHint: 'degC or %, depending on target',
     },
     {
       key: 'enabled',
@@ -57,16 +58,18 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
     {
       key: 'setting',
       title: 'Target offset',
-      generate: () => 0,
       component: 'NumberValEdit',
+      generate: () => 0,
+      valueHint: 'number',
       readonly: true,
       graphed: true,
     },
     {
       key: 'value',
       title: 'Actual offset',
-      generate: () => 0,
       component: 'NumberValEdit',
+      generate: () => 0,
+      valueHint: 'number',
       readonly: true,
       graphed: true,
     },

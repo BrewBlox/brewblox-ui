@@ -1,7 +1,7 @@
 import { ActionImpl, AutomationSpec, ConditionImpl } from '../types';
 import BlockPatch from './BlockPatch';
 import BlockValue from './BlockValue';
-import Comparison from './Comparison';
+import JSCheck from './JSCheck';
 import TaskEdit from './TaskEdit';
 import TaskStatus from './TaskStatus';
 import TimeAbsolute from './TimeAbsolute';
@@ -16,10 +16,10 @@ export const actionSpecs: Record<ActionImpl['type'], AutomationSpec<ActionImpl>>
 
 export const conditionSpecs: Record<ConditionImpl['type'], AutomationSpec<ConditionImpl>> = {
   BlockValue,
-  Comparison,
   TaskStatus,
   TimeAbsolute,
   TimeElapsed,
+  JSCheck,
 };
 
 export const allSpecs: Mapped<AutomationSpec> = {
