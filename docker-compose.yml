@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   eventbus:
-    image: brewblox/rabbitmq:develop
+    image: brewblox/mosquitto:develop
     labels:
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
