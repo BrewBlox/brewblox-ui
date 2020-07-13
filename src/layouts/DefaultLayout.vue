@@ -37,13 +37,6 @@ export default class DefaultLayout extends Vue {
     });
   }
 
-  showPlugins(): void {
-    createDialog({
-      parent: this,
-      component: 'PluginDialog',
-    });
-  }
-
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
@@ -75,13 +68,6 @@ export default class DefaultLayout extends Vue {
       </q-scroll-area>
 
       <q-item class="col-auto">
-        <q-item-section class="col-auto">
-          <q-btn flat text-color="white" icon="mdi-puzzle" @click="showPlugins">
-            <q-tooltip>
-              Plugins
-            </q-tooltip>
-          </q-btn>
-        </q-item-section>
         <q-item-section class="col-auto">
           <q-btn-dropdown flat text-color="white" icon="mdi-bug-outline">
             <q-list bordered>
