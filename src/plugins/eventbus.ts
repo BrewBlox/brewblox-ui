@@ -22,7 +22,6 @@ export interface EventbusMessage {
 
 export class BrewbloxEventbus {
   private listeners: EventbusListener[] = [];
-  private startup = false;
 
   public async start(): Promise<void> {
     const opts: mqtt.IClientOptions = {

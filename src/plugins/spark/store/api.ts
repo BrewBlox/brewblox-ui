@@ -5,6 +5,7 @@ import notify from '@/helpers/notify';
 import { asBlock, asDataBlock } from '../helpers';
 import { Block, BlockIds } from '../types';
 import { ApiSparkStatus, DataBlock, SparkExported, SparkStatus, UserUnits } from '../types';
+import { asSparkStatus } from './helpers';
 
 export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
   http.post<DataBlock[]>(`/${encodeURIComponent(serviceId)}/blocks/all/read`)
@@ -74,36 +75,13 @@ export const persistAutoconnecting = (serviceId: string, enabled: boolean): Prom
     .then(resp => resp.data.enabled)
     .catch(intercept(`Failed to persist autoconnecting flag on ${serviceId}`));
 
-
-const unknownStatus = (): ApiSparkStatus => ({
-  type: 'Spark',
-  autoconnecting: true,
-  connect: false,
-  handshake: false,
-  synchronize: false,
-  compatible: true, // no idea - assume yes
-  latest: true, // no idea - assume yes
-  valid: true, // no idea - assume yes
-  info: [],
-  address: null,
-  connection: null,
-});
-
 export const fetchSparkStatus = async (serviceId: string): Promise<SparkStatus> => {
   try {
     const resp = await http.get<ApiSparkStatus>(`/${encodeURIComponent(serviceId)}/system/status`);
-    return {
-      ...resp.data,
-      serviceId,
-      available: true,
-    };
+    return asSparkStatus(serviceId, resp.data);
   } catch (error) {
     notify.warn(`Unable to fetch Spark status: ${error}`, { shown: false });
-    return {
-      ...unknownStatus(),
-      serviceId,
-      available: false,
-    };
+    return asSparkStatus(serviceId);
   }
 };
 
