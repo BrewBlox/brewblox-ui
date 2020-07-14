@@ -4,11 +4,11 @@ import { durationMs } from '@/helpers/functional';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { blockTypes } from '@/plugins/spark/getters';
 import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
+  BlockType,
   DigitalActuatorBlock,
   DigitalState,
   FilterChoice,
@@ -97,7 +97,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.FILT_15s,
+          filter: FilterChoice.FILTER_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -114,7 +114,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.FILT_15s,
+          filter: FilterChoice.FILTER_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -140,8 +140,8 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           hwDevice: new Link(config.coolPin.arrayId),
           channel: config.coolPin.pinId,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: DigitalState.STATE_INACTIVE,
+          state: DigitalState.STATE_INACTIVE,
           constrainedBy: {
             constraints: [
               {
@@ -173,8 +173,8 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
         data: {
           hwDevice: new Link(config.heatPin.arrayId),
           channel: config.heatPin.pinId,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: DigitalState.STATE_INACTIVE,
+          state: DigitalState.STATE_INACTIVE,
           invert: false,
           constrainedBy: {
             constraints: [
@@ -554,7 +554,7 @@ export const defineWidgets = (
   });
 
   const createProfile = (name: string): Widget => ({
-    ...createWidget(name, blockTypes.SetpointProfile),
+    ...createWidget(name, BlockType.SetpointProfile),
     cols: 6,
     rows: 4,
     pinnedPosition: { x: 5, y: 6 },

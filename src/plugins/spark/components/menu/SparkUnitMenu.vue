@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { DisplaySettingsBlock, DisplaySettingsTempUnit } from '@/plugins/spark/types';
+import { DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
 import { UserUnits } from '@/plugins/spark/types';
 
 const defaultMessage =
@@ -17,9 +17,9 @@ export default class SparkUnitMenu extends DialogBase {
     { label: 'Celsius', value: 'degC' },
     { label: 'Fahrenheit', value: 'degF' },
   ]
-  displayOpts: SelectOption<DisplaySettingsTempUnit>[] = [
-    { label: 'Celsius', value: DisplaySettingsTempUnit.CELSIUS },
-    { label: 'Fahrenheit', value: DisplaySettingsTempUnit.FAHRENHEIT },
+  displayOpts: SelectOption<DisplayTempUnit>[] = [
+    { label: 'Celsius', value: DisplayTempUnit.TEMP_CELSIUS },
+    { label: 'Fahrenheit', value: DisplayTempUnit.TEMP_FAHRENHEIT },
   ]
 
   @Prop({ type: String, required: true })
@@ -46,11 +46,11 @@ export default class SparkUnitMenu extends DialogBase {
       ?? null;
   }
 
-  get displayTemp(): DisplaySettingsTempUnit {
-    return this.displayBlock?.data.tempUnit ?? DisplaySettingsTempUnit.CELSIUS;
+  get displayTemp(): DisplayTempUnit {
+    return this.displayBlock?.data.tempUnit ?? DisplayTempUnit.TEMP_CELSIUS;
   }
 
-  set displayTemp(v: DisplaySettingsTempUnit) {
+  set displayTemp(v: DisplayTempUnit) {
     if (this.displayBlock) {
       this.displayBlock.data.tempUnit = v;
       this.sparkModule.saveBlock(this.displayBlock);

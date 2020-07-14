@@ -1,7 +1,12 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { ActuatorOffsetBlock, AnalogConstraintsObj, BlockSpec, OffsetSettingOrValue } from '@/plugins/spark/types';
+import {
+  ActuatorOffsetBlock,
+  AnalogConstraintsObj,
+  BlockIntfType,
+  BlockSpec,
+  ReferenceKind,
+} from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -12,10 +17,10 @@ const typeName = 'ActuatorOffset';
 const block: BlockSpec<ActuatorOffsetBlock> = {
   id: typeName,
   generate: () => ({
-    targetId: new Link(null, interfaceTypes.SetpointSensorPair),
-    drivenTargetId: new Link(null, interfaceTypes.SetpointSensorPair, true),
-    referenceId: new Link(null, interfaceTypes.SetpointSensorPair),
-    referenceSettingOrValue: OffsetSettingOrValue.SETTING,
+    targetId: new Link(null, BlockIntfType.SetpointSensorPairInterface),
+    drivenTargetId: new Link(null, BlockIntfType.SetpointSensorPairInterface, true),
+    referenceId: new Link(null, BlockIntfType.SetpointSensorPairInterface),
+    referenceSettingOrValue: ReferenceKind.REF_SETTING,
     desiredSetting: 0,
     setting: 0,
     value: 0,
@@ -40,13 +45,13 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+      generate: () => new Link(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'referenceId',
       title: 'Reference',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+      generate: () => new Link(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'constrainedBy',

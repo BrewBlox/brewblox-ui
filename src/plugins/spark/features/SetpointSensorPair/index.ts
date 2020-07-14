@@ -20,7 +20,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       valueUnfiltered: new Temp(null, temp),
       resetFilter: false,
       settingEnabled: true,
-      filter: FilterChoice.FILT_15s,
+      filter: FilterChoice.FILTER_15s,
       filterThreshold: new Temp(5, 'delta_degC').convert(`delta_${temp}`),
     };
   },

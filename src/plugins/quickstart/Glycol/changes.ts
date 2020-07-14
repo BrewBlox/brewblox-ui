@@ -4,12 +4,12 @@ import { durationMs } from '@/helpers/functional';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { blockTypes } from '@/plugins/spark/getters';
 import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   Block,
+  BlockType,
   DigitalActuatorBlock,
   DigitalState,
   FilterChoice,
@@ -67,7 +67,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.FILT_15s,
+          filter: FilterChoice.FILTER_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -111,8 +111,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           hwDevice: new Link(config.coolPin.arrayId),
           channel: config.coolPin.pinId,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: DigitalState.STATE_INACTIVE,
+          state: DigitalState.STATE_INACTIVE,
           constrainedBy: {
             constraints: [
               {
@@ -141,8 +141,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           hwDevice: new Link(config.heatPin ? config.heatPin!.arrayId : null),
           channel: config.heatPin ? config.heatPin!.pinId : 0,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: DigitalState.STATE_INACTIVE,
+          state: DigitalState.STATE_INACTIVE,
           constrainedBy: {
             constraints: [
               {
@@ -243,7 +243,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             setting: new Unit(null, 'degC'),
             value: new Unit(null, 'degC'),
             valueUnfiltered: new Unit(null, 'degC'),
-            filter: FilterChoice.FILT_15s,
+            filter: FilterChoice.FILTER_15s,
             filterThreshold: new Unit(5, 'delta_degC'),
             resetFilter: false,
           },
@@ -258,8 +258,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             hwDevice: new Link(config.glycolPin!.arrayId),
             channel: config.glycolPin!.pinId,
             invert: false,
-            desiredState: DigitalState.Inactive,
-            state: DigitalState.Inactive,
+            desiredState: DigitalState.STATE_INACTIVE,
+            state: DigitalState.STATE_INACTIVE,
             constrainedBy: {
               constraints: [
                 { minOff: new Time(5, 'min'), remaining: new Time() },
@@ -471,7 +471,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   };
 
   const profile: Widget = {
-    ...createWidget(names.beerProfile, blockTypes.SetpointProfile),
+    ...createWidget(names.beerProfile, BlockType.SetpointProfile),
     cols: 6,
     rows: 4,
     pinnedPosition: { x: 5, y: 6 },

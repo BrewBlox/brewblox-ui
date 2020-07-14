@@ -14,8 +14,8 @@ import {
   DigitalState,
   FilterChoice,
   MutexBlock,
-  OffsetSettingOrValue,
   PidBlock,
+  ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
@@ -109,7 +109,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.FILT_15s,
+          filter: FilterChoice.FILTER_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -126,7 +126,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.FILT_15s,
+          filter: FilterChoice.FILTER_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -143,7 +143,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           setting: new Unit(null, 'degC'),
           value: new Unit(null, 'degC'),
           valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.FILT_15s,
+          filter: FilterChoice.FILTER_15s,
           filterThreshold: new Unit(5, 'delta_degC'),
           resetFilter: false,
         },
@@ -158,7 +158,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
           targetId: new Link(names.hltSetpoint),
           drivenTargetId: new Link(names.hltSetpoint),
           referenceId: new Link(names.mtSetpoint),
-          referenceSettingOrValue: OffsetSettingOrValue.SETTING,
+          referenceSettingOrValue: ReferenceKind.REF_SETTING,
           enabled: false,
           desiredSetting: 0,
           setting: 0,
@@ -182,8 +182,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         data: {
           hwDevice: new Link(config.hltPin.arrayId),
           channel: config.hltPin.pinId,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: DigitalState.STATE_INACTIVE,
+          state: DigitalState.STATE_INACTIVE,
           invert: false,
           constrainedBy: {
             constraints: actuatorConstraints,
@@ -198,8 +198,8 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         data: {
           hwDevice: new Link(config.bkPin.arrayId),
           channel: config.bkPin.pinId,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: DigitalState.STATE_INACTIVE,
+          state: DigitalState.STATE_INACTIVE,
           invert: false,
           constrainedBy: {
             constraints: actuatorConstraints,
