@@ -1,13 +1,15 @@
 <script lang="ts">
 import isArray from 'lodash/isArray';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-import { JSSnippetFactory, snippetMakers } from './snippets';
+import { JSSnippetFactory } from '@/plugins/automation/types';
 
 @Component
 export default class JSCheckSnippets extends Vue {
-  snippetMakers = snippetMakers;
+
+  @Prop({ type: Array, required: true })
+  public readonly factories!: JSSnippetFactory[];
 
   joined(value: string | string[]): string {
     return isArray(value)
@@ -32,7 +34,7 @@ export default class JSCheckSnippets extends Vue {
 <template>
   <div class="q-pa-md q-gutter-y-sm">
     <div
-      v-for="(mk, idx) in snippetMakers"
+      v-for="(mk, idx) in factories"
       :key="`snippet-${idx}`"
       class="col clickable q-pa-sm rounded-borders text-h6"
       @click="apply(mk)"

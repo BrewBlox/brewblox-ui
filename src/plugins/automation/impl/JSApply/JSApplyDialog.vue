@@ -5,15 +5,15 @@ import DialogBase from '@/components/DialogBase';
 import CodeEditor from '@/components/form/CodeEditor.vue';
 import { createDialog } from '@/helpers/dialog';
 
-import JSCheckPreview from './JSCheckPreview.vue';
+import JSApplyPreview from './JSApplyPreview.vue';
 import { snippetFactories } from './snippets';
 
 @Component({
   components: {
-    JSCheckPreview,
+    JSApplyPreview,
   },
 })
-export default class JSCheckDialog extends DialogBase {
+export default class JSApplyDialog extends DialogBase {
   factories = snippetFactories;
   sidebar: 'Snippets' | 'Preview' = 'Snippets'
   local: string = '';
@@ -23,7 +23,7 @@ export default class JSCheckDialog extends DialogBase {
   readonly editor!: CodeEditor;
 
   @Ref('previewer')
-  readonly previewer!: JSCheckPreview;
+  readonly previewer!: JSApplyPreview;
 
   @Prop({ type: String, default: 'Editor' })
   public readonly title!: string;
@@ -149,7 +149,7 @@ export default class JSCheckDialog extends DialogBase {
               @insert="insert"
               @append="append"
             />
-            <JSCheckPreview
+            <JSApplyPreview
               v-show="sidebar === 'Preview'"
               ref="previewer"
               :code="local"

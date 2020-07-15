@@ -1,14 +1,8 @@
 import { createDialog } from '@/helpers/dialog';
+import { JSSnippetFactory } from '@/plugins/automation/types';
 import { isPostFixed } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
-
-type ApplyFunc = (v: string | string[]) => void;
-
-export interface JSSnippetFactory {
-  desc: string;
-  func(insert: ApplyFunc, append: ApplyFunc): void | Promise<void>;
-}
 
 const comment = (v: any): string =>
   ` /* ${v} */`;
@@ -45,7 +39,7 @@ const valueHint = (addr: BlockFieldAddress): string => {
   }
 };
 
-export const snippetMakers: JSSnippetFactory[] = [
+export const snippetFactories: JSSnippetFactory[] = [
   {
     desc: 'Example',
     func(_, append) {
