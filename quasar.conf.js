@@ -3,6 +3,7 @@ const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
 const IgnoreNotFoundExportPlugin = require('./build/ignore-not-found');
+const MonacoEditorPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = configure(function (ctx) {
   const buildDate = new Date().toISOString();
@@ -106,6 +107,9 @@ module.exports = configure(function (ctx) {
 
       extendWebpack: config => {
         config.plugins.push(new IgnoreNotFoundExportPlugin());
+        config.plugins.push(new MonacoEditorPlugin({
+          languages: ['javascript', 'css', 'html', 'typescript'],
+        }));
         config.performance.hints = ctx.prod ? 'warning' : false;
 
         if (ctx.prod) {

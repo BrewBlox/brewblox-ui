@@ -2,7 +2,6 @@
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import CodeEditor from '@/components/form/CodeEditor.vue';
 import { createDialog } from '@/helpers/dialog';
 
 import JSApplyPreview from './JSApplyPreview.vue';
@@ -11,6 +10,7 @@ import { snippetFactories } from './snippets';
 @Component({
   components: {
     JSApplyPreview,
+    MonacoEditor: () => import('src/components/editor/MonacoEditor'),
   },
 })
 export default class JSApplyDialog extends DialogBase {
@@ -20,7 +20,7 @@ export default class JSApplyDialog extends DialogBase {
   saved: string = '';
 
   @Ref('editor')
-  readonly editor!: CodeEditor;
+  readonly editor!: any;
 
   @Ref('previewer')
   readonly previewer!: JSApplyPreview;
@@ -136,7 +136,11 @@ export default class JSApplyDialog extends DialogBase {
         </Toolbar>
       </template>
       <div class="fit row no-wrap">
-        <CodeEditor ref="editor" v-model="local" class="col" />
+        <MonacoEditor
+          ref="editor"
+          v-model="local"
+          class="col"
+        />
         <div class="col-auto column sidebar">
           <q-tabs v-model="sidebar">
             <q-tab name="Snippets" label="Snippets" />
