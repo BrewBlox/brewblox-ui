@@ -19,6 +19,7 @@ import { Unit } from '@/plugins/spark/units';
 export default class GraphWidget extends WidgetBase<GraphConfig> {
   usedCfg: GraphConfig | null = null;
   downsampling: any = {};
+  density = false;
 
   // Separate IDs for graphs in widget and dialog wrapper
   // This prevents source create/delete race conditions when switching
@@ -42,6 +43,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     this.usedCfg = cloneDeep(this.config);
     this.widgetGraphId = uid();
     this.wrapperGraphId = uid();
+    this.density = (this.config as any).density;
   }
 
   get config(): GraphConfig {
@@ -146,6 +148,12 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         this.saveConfig(merged);
       });
   }
+
+  toggleDensity(): void {
+    this.density = !this.density;
+    this.$set(this.config, 'density', this.density);
+    this.saveConfig();
+  }
 }
 </script>
 
@@ -161,6 +169,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         ref="wrapperGraph"
         :graph-id="wrapperGraphId"
         :config="config"
+        :density="density"
         use-presets
         use-range
         @params="saveParams"
@@ -176,6 +185,11 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
           <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
+          <ActionItem
+            label="Toggle density mode"
+            :icon="density ?'mdi-checkbox-marked-outline' : 'mdi-checkbox-blank-outline'"
+            @click="toggleDensity"
+          />
         </template>
         <template #menus>
           <WidgetActions :crud="crud" />
@@ -215,6 +229,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       <q-resize-observer :debounce="200" @resize="refresh" />
       <HistoryGraph
         ref="widgetGraph"
+        :density="density"
         :graph-id="widgetGraphId"
         :config="config"
         @downsample="v => downsampling = v"

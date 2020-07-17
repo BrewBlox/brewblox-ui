@@ -19,6 +19,8 @@ import {
   QueryTarget,
 } from '@/plugins/history/types';
 
+import { addDensitySource } from '../sources/density-graph';
+
 interface Policies { [measurement: string]: string }
 
 @Component
@@ -45,6 +47,9 @@ export default class HistoryGraph extends Vue {
 
   @Prop({ type: Boolean, default: false })
   public readonly useRange!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly density!: boolean;
 
   @Watch('refreshTrigger')
   watchRefresh(): void {
@@ -127,7 +132,15 @@ export default class HistoryGraph extends Vue {
     return `${this.graphId}/${target.measurement}`;
   }
 
+  get densityId(): string {
+    return `${this.graphId}/__DENSITY__`;
+  }
+
   get sources(): GraphSource[] {
+    if (this.density) {
+      return [historyStore.sourceById(this.densityId)]
+        .filter(source => source !== null && !!source.values) as GraphSource[];
+    }
     return this.targets
       .map(target => historyStore.sourceById(this.sourceId(target)))
       .filter(source => source !== null && !!source.values) as GraphSource[];
@@ -161,6 +174,10 @@ export default class HistoryGraph extends Vue {
   }
 
   addSources(): void {
+    if (this.density) {
+      addDensitySource(this.densityId, this.params);
+      return;
+    }
     this.targets.forEach(target =>
       addSource(
         this.sourceId(target),
