@@ -10,7 +10,7 @@ const spec: AutomationSpec<JSApplyImpl> = {
   component: JSApply,
   generate: () => ({
     type,
-    body: "console.log('hello world!')",
+    body: "console.log('hello world!');",
   }),
   pretty: impl =>
     matchesType<JSApplyImpl>(type, impl)

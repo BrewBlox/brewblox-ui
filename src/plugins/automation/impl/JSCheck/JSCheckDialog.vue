@@ -3,18 +3,18 @@ import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
+import SandboxSnippets from '@/plugins/automation/sandbox/SandboxSnippets.vue';
 
 import JSCheckPreview from './JSCheckPreview.vue';
-import { snippetFactories } from './snippets';
 
 @Component({
   components: {
     JSCheckPreview,
+    SandboxSnippets,
     MonacoEditor: () => import('src/components/editor/MonacoEditor'),
   },
 })
 export default class JSCheckDialog extends DialogBase {
-  factories = snippetFactories;
   sidebar: 'Snippets' | 'Preview' = 'Snippets'
   local: string = '';
   saved: string = '';
@@ -48,8 +48,7 @@ export default class JSCheckDialog extends DialogBase {
   }
 
   append(code: string): void {
-    const sep = !this.local || this.local.endsWith('\n') ? '' : '\n';
-    this.local = `${this.local}${sep}${code}\n`;
+    this.editor?.append(code);
   }
 
   reset(): void {
@@ -140,6 +139,7 @@ export default class JSCheckDialog extends DialogBase {
           ref="editor"
           v-model="local"
           class="col"
+          @run="run"
         />
         <div class="col-auto column sidebar">
           <q-tabs v-model="sidebar">
@@ -147,9 +147,8 @@ export default class JSCheckDialog extends DialogBase {
             <q-tab name="Preview" label="Preview" />
           </q-tabs>
           <q-scroll-area class="col">
-            <JSSnippets
+            <SandboxSnippets
               v-show="sidebar === 'Snippets'"
-              :factories="factories"
               @insert="insert"
               @append="append"
             />

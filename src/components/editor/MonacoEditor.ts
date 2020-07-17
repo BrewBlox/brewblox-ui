@@ -15,8 +15,7 @@ export default class CodeEditor extends Vue {
   @Watch('value')
   private watchExternalChanges(newV: string): void {
     if (this.editor && newV !== this.editor.getValue()) {
-      this.editor.setValue(newV);
-      this.editor.focus();
+      this.setEditorValue(newV);
     }
   }
 
@@ -33,6 +32,17 @@ export default class CodeEditor extends Vue {
         this.$emit('input', value, ev);
       }
     });
+
+    this.editor.addAction({
+      id: 'run-code',
+      label: 'Run',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+      ],
+      contextMenuGroupId: 'navigation',
+      contextMenuOrder: 1,
+      run: () => { this.$emit('run'); },
+    });
   }
 
   public mounted(): void {
@@ -44,9 +54,19 @@ export default class CodeEditor extends Vue {
     this.editor?.dispose();
   }
 
+  private setEditorValue(text: string): void {
+    this.editor?.setValue(text);
+    this.$nextTick(() => this.editor?.focus());
+  }
+
   public insert(text: string): void {
     this.editor?.trigger('keyboard', 'type', { text });
     this.$nextTick(() => this.editor?.focus());
+  }
+
+  public append(text: string): void {
+    const sep = !this.value || this.value.endsWith('\n') ? '' : '\n';
+    this.setEditorValue(`${this.value}${sep}${text}\n`);
   }
 
   public render(h: CreateElement): VNode {
