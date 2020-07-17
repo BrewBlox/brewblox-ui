@@ -9,8 +9,9 @@ module.exports = configure(function (ctx) {
 
   const sharedEnv = {
     BLOX_DATE: buildDate,
+    BLOX_API_DEV: false,
     BLOX_API_HOST: null,
-    API_PORT: null,
+    BLOX_API_PORT: null,
     BLOX_PERFORMANCE: false,
   };
 
@@ -98,6 +99,9 @@ module.exports = configure(function (ctx) {
       env: ctx.dev
         ? {
           ...sharedEnv,
+          BLOX_API_DEV: true,
+          // Replace these values when using a remote backend
+          BLOX_API_HOST: 'localhost',
           BLOX_API_PORT: 9001,
         }
         : {
