@@ -13,7 +13,7 @@ export const defaultLabel = (key: string): string => {
   const path = name.split('/').slice(1);
   const prettyName = sentenceCased(path.pop()!);
   const prettyPath = path.length ? `[${path.join(' ')}] ` : '';
-  const prettyUnit = postfix ? prettify(postfix!) : '';
+  const prettyUnit = prettify(postfix ?? '');
   return `${prettyPath}${prettyName} ${prettyUnit}`.trim();
 };
 

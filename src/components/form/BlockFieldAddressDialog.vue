@@ -2,10 +2,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockField, BlockFieldAddress, BlockOrIntfType, BlockSpec } from '@/plugins/spark/types';
-
-import { createBlockDialog, createDialog } from '../../helpers/dialog';
 
 
 @Component
@@ -17,7 +16,7 @@ export default class BlockFieldAddressDialog extends DialogBase {
   blockLocal: string | null = null;
   fieldLocal: string | null = null;
 
-  validTypes: string[] = sparkStore
+  defaultTypes: string[] = sparkStore
     .specs
     .filter(v => v.fields.length > 0)
     .map(v => v.id)
@@ -28,7 +27,6 @@ export default class BlockFieldAddressDialog extends DialogBase {
       id: null,
       type: null,
       field: null,
-      postfix: null,
     }),
   })
   public readonly value!: BlockFieldAddress;
@@ -37,10 +35,13 @@ export default class BlockFieldAddressDialog extends DialogBase {
   public readonly services!: string[];
 
   @Prop({ type: Array, required: false })
-  readonly types!: BlockOrIntfType[];
+  readonly compatible!: BlockOrIntfType[];
 
   created(): void {
-    if (this.serviceOpts.length === 1) {
+    this.serviceLocal = this.value.serviceId;
+    this.blockLocal = this.value.id;
+    this.fieldLocal = this.value.field;
+    if (!this.serviceLocal && this.serviceOpts.length === 1) {
       this.serviceLocal = this.serviceOpts[0];
     }
   }
@@ -59,6 +60,10 @@ export default class BlockFieldAddressDialog extends DialogBase {
       this.blockLocal = null;
       this.fieldLocal = null;
     }
+  }
+
+  get validTypes(): BlockOrIntfType[] {
+    return this.compatible ?? this.defaultTypes;
   }
 
   get blockOpts(): string[] {
@@ -126,7 +131,6 @@ export default class BlockFieldAddressDialog extends DialogBase {
       id,
       field,
       type: this.spec.id,
-      postfix: this.fieldSpec.generate(serviceId).postfix ?? null,
     };
   }
 

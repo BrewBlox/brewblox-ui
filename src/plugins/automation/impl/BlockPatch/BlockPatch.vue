@@ -11,16 +11,6 @@ import { BlockAddress, BlockField, BlockSpec, BlockType } from '@/plugins/spark/
 @Component
 export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
-  get spec(): BlockSpec | null {
-    return this.impl.blockType !== null
-      ? sparkStore.specById(this.impl.blockType as BlockType)
-      : null;
-  }
-
-  get fields(): BlockField[] {
-    return this.spec?.fields.filter(f => !f.readonly) ?? [];
-  }
-
   get addr(): BlockAddress {
     return {
       id: this.impl.blockId,
@@ -39,7 +29,15 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
     this.save();
   }
 
-  get validTypes(): string[] {
+  get spec(): BlockSpec | null {
+    return sparkStore.specById(this.addr.type as BlockType) ?? null;
+  }
+
+  get fields(): BlockField[] {
+    return this.spec?.fields.filter(f => !f.readonly) ?? [];
+  }
+
+  get validTypes(): BlockType[] {
     return sparkStore.specs
       .filter(spec => spec.fields.some(f => !f.readonly))
       .map(spec => spec.id);

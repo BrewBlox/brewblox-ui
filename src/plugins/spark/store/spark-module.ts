@@ -19,7 +19,6 @@ import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
 import { sparkStateEvent } from '../getters';
-import { asBlock } from '../helpers';
 import * as api from './api';
 import {
   asServiceStatus,
@@ -228,9 +227,8 @@ export class SparkServiceModule extends VuexModule {
       id: `${sparkStateEvent}__${this.id}`,
       filter: (key, type) => key === this.id && type === sparkStateEvent,
       onmessage: (msg: SparkStateMessage) => {
-        const status = asSparkStatus(this.id, msg.data.service);
-        const blocks = msg.data.blocks
-          .map(v => asBlock(deserialize(v), this.id));
+        const status = asSparkStatus(this.id, msg.data.status);
+        const blocks = msg.data.blocks.map(deserialize);
 
         this.updateBlocks(blocks);
         this.updateStatus(status);

@@ -2,34 +2,32 @@
 import http, { intercept } from '@/helpers/http';
 import notify from '@/helpers/notify';
 
-import { asBlock, asDataBlock } from '../helpers';
-import { Block, BlockIds } from '../types';
-import { ApiSparkStatus, DataBlock, SparkExported, SparkStatus, UserUnits } from '../types';
+import { ApiSparkStatus, Block, BlockIds, SparkExported, SparkStatus, UserUnits } from '../types';
 import { asSparkStatus } from './helpers';
 
 export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
-  http.post<DataBlock[]>(`/${encodeURIComponent(serviceId)}/blocks/all/read`)
-    .then(resp => resp.data.map((block: DataBlock) => asBlock(block, serviceId)))
+  http.post<Block[]>(`/${encodeURIComponent(serviceId)}/blocks/all/read`)
+    .then(resp => resp.data.map((block: Block) => block, serviceId))
     .catch(intercept(`Failed to fetch blocks from ${serviceId}`));
 
 export const fetchBlock = ({ id, serviceId }: Block): Promise<Block> =>
-  http.post<DataBlock>(`/${encodeURIComponent(serviceId)}/blocks/read`, { id })
-    .then(resp => asBlock(resp.data, serviceId))
+  http.post<Block>(`/${encodeURIComponent(serviceId)}/blocks/read`, { id })
+    .then(resp => resp.data)
     .catch(intercept(`Failed to fetch ${id}`));
 
 export const fetchStoredBlock = (serviceId: string, id: BlockIds): Promise<Block> =>
-  http.post<DataBlock>(`/${encodeURIComponent(serviceId)}/blocks/read/stored`, { id })
-    .then(resp => asBlock(resp.data, serviceId))
+  http.post<Block>(`/${encodeURIComponent(serviceId)}/blocks/read/stored`, { id })
+    .then(resp => resp.data)
     .catch(intercept(`Failed to fetch stored block ${id}`));
 
 export const createBlock = (block: Block): Promise<Block> =>
-  http.post<DataBlock>(`/${encodeURIComponent(block.serviceId)}/blocks/create`, asDataBlock(block))
-    .then(resp => asBlock(resp.data, block.serviceId))
+  http.post<Block>(`/${encodeURIComponent(block.serviceId)}/blocks/create`, block)
+    .then(resp => resp.data)
     .catch(intercept(`Failed to create ${block.id}`));
 
 export const persistBlock = (block: Block): Promise<Block> =>
-  http.post<DataBlock>(`/${encodeURIComponent(block.serviceId)}/blocks/write`, asDataBlock(block))
-    .then(resp => asBlock(resp.data, block.serviceId))
+  http.post<Block>(`/${encodeURIComponent(block.serviceId)}/blocks/write`, block)
+    .then(resp => resp.data)
     .catch(intercept(`Failed to persist ${block.id}`));
 
 export const renameBlock = (serviceId: string, existing: string, desired: string): Promise<any> =>
@@ -51,8 +49,8 @@ export const cleanUnusedNames = (serviceId: string): Promise<string[]> =>
     .catch(intercept(`Failed to clean unused block names on ${serviceId}`));
 
 export const fetchDiscoveredBlocks = (serviceId: string): Promise<Block[]> =>
-  http.post<DataBlock[]>(`/${encodeURIComponent(serviceId)}/blocks/discover`)
-    .then(resp => resp.data.map(v => asBlock(v, serviceId)))
+  http.post<Block[]>(`/${encodeURIComponent(serviceId)}/blocks/discover`)
+    .then(resp => resp.data)
     .catch(intercept(`Failed to discover objects on ${serviceId}`));
 
 export const validateService = (serviceId: string): Promise<boolean> =>

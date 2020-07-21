@@ -3,7 +3,7 @@ import { EventbusMessage } from '@/plugins/eventbus';
 import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
-import { BlockConfig, BlockSpec, DataBlock } from './block-types';
+import { Block, BlockConfig, BlockSpec } from './block-types';
 
 
 export interface StoredDataPreset<DataT = any> extends StoreObject {
@@ -57,8 +57,8 @@ export interface SparkStatus extends ApiSparkStatus {
 
 export interface SparkStateMessage extends EventbusMessage {
   data: {
-    service: ApiSparkStatus | null;
-    blocks: DataBlock[];
+    status: ApiSparkStatus | null;
+    blocks: Block[];
   };
 }
 
@@ -68,7 +68,7 @@ export interface SparkStoreEntry {
 }
 
 export interface SparkExported {
-  blocks: DataBlock[];
+  blocks: Block[];
   store: SparkStoreEntry[];
 }
 

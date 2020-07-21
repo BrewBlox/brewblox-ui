@@ -3,7 +3,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
-import { Block } from '../types';
+import { Block, BlockField, BlockFieldAddress } from '../types';
 import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
@@ -55,6 +55,12 @@ export class SparkGlobalModule extends VuexModule {
 
   public spec<T extends Block>({ type }: { type: T['type'] }): BlockSpec<T> {
     return this.specById<T>(type);
+  }
+
+  public fieldSpec<T extends Block>(addr: BlockFieldAddress | null): BlockField<T> | null {
+    return addr && addr.type && addr.field
+      ? this.specById(addr.type as T['type'])?.fields.find(f => f.key === addr.field) ?? null
+      : null;
   }
 
   @Action

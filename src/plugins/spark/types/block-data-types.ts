@@ -189,7 +189,6 @@ export interface DisplaySettingsBlock extends Block {
   };
 }
 
-
 export interface ChannelMapping {
   id: string;
   nid: number;
@@ -218,6 +217,13 @@ export interface InactiveObjectBlock extends Block {
   type: 'InactiveObject';
   data: {
     actualType: string;
+  };
+}
+
+export interface GroupsBlock extends Block {
+  type: 'Groups';
+  data: {
+    active: number[];
   };
 }
 
@@ -256,6 +262,17 @@ export interface MutexBlock extends Block {
   data: {
     differentActuatorWait: Unit;
     waitRemaining: Unit;
+  };
+}
+
+export interface OneWireBusBlock extends Block {
+  type: 'OneWireBus';
+  data: {
+    command: {
+      opcode: number;
+      data: number;
+    };
+    address: string[];
   };
 }
 
@@ -367,6 +384,28 @@ export interface Spark3PinsBlock extends Block {
   };
 }
 
+export const SparkPlatform = Enum(
+  'PLATFORM_UNKNOWN',
+  'PLATFORM_GCC',
+  'PLATFORM_PHOTON',
+  'PLATFORM_P1',
+);
+export type SparkPlatform = Enum<typeof SparkPlatform>;
+
+export interface SysInfoBlock extends Block {
+  type: 'SysInfo';
+  data: {
+    deviceId: string;
+    version: string;
+    platform: SparkPlatform;
+    protocolVersion: string;
+    releaseDate: string;
+    protocolDate: string;
+    command: any; // write-only, for internal use
+    trace: any[]; // for internal use
+  };
+}
+
 export interface Fluctuation {
   amplitude: Unit; // DeltaTemp
   period: Unit; // Time
@@ -388,5 +427,66 @@ export interface TempSensorOneWireBlock extends Block {
     value: Unit;
     offset: Unit;
     address: string;
+  };
+}
+
+export interface TicksBlock extends Block {
+  type: 'Ticks';
+  data: {
+    millisSinceBoot: number;
+    secondsSinceEpoch: number;
+    avgCommunicationTask: number;
+    avgBlocksUpdateTask: number;
+    avgDisplayTask: number;
+    avgSystemTask: number;
+  };
+}
+
+export const TouchCalibrated = Enum(
+  'CALIBRATED_NO',
+  'CALIBRATED_YES',
+  'CALIBRATED_NEW',
+);
+export type TouchCalibrated = Enum<typeof TouchCalibrated>;
+
+export interface TouchSettingsBlock extends Block {
+  type: 'TouchSettings';
+  data: {
+    calibrated: TouchCalibrated;
+    xOffset: number;
+    yOffset: number;
+    xBitsPerPixelX16: number;
+    yBitsPerPixelX16: number;
+  };
+}
+
+export const WifiSecurityType = Enum(
+  'WLAN_SEC_UNSEC',
+  'WLAN_SEC_WEP',
+  'WLAN_SEC_WPA',
+  'WLAN_SEC_WPA2',
+  'WLAN_SEC_WPA_ENTERPRISE',
+  'WLAN_SEC_WPA2_ENTERPRISE',
+  'WLAN_SEC_NOT_SET',
+);
+export type WifiSecurityType = Enum<typeof WifiSecurityType>;
+
+export const WifiCipherType = Enum(
+  'WLAN_CIPHER_NOT_SET',
+  'WLAN_CIPHER_AES',
+  'WLAN_CIPHER_TKIP',
+  'WLAN_CIPHER_AES_TKIP', // OR of AES and TKIP
+);
+export type WifiCipherType = Enum<typeof WifiCipherType>;
+
+export interface WiFiSettingsBlock extends Block {
+  type: 'WiFiSettings';
+  data: {
+    ssid: string; // write-only
+    password: string; // write-only
+    security: WifiSecurityType; // write-only
+    cipher: WifiCipherType; // write-only
+    signal: number;
+    ip: string;
   };
 }

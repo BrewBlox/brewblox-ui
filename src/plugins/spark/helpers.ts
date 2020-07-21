@@ -26,9 +26,9 @@ import {
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
-import { objectUnit, serializedPropertyName } from '@/plugins/spark/parse-object';
+import { objectUnit } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
-import { Link, Unit } from '@/plugins/spark/units';
+import { isMetaClass, Link, prettify, Unit } from '@/plugins/spark/units';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
 import { compatibleTypes } from './getters';
@@ -43,7 +43,6 @@ import {
   BlockIntfType,
   BlockOrIntfType,
   BlockType,
-  DataBlock,
   DigitalActuatorBlock,
   DigitalConstraint,
   DisplayOpts,
@@ -303,18 +302,6 @@ export const startResetBlocks = (serviceId: string): void => {
     }));
 };
 
-export const asDataBlock =
-  (block: Block): DataBlock =>
-    pick(block, ['id', 'nid', 'type', 'groups', 'data']);
-
-export const asBlock =
-  (block: DataBlock, serviceId: string): Block =>
-    ({
-      ...block,
-      serviceId,
-      type: block.type as BlockType,
-    });
-
 export const asBlockAddress =
   (block: Block): BlockAddress =>
     pick(block, ['id', 'serviceId', 'type']);
@@ -358,6 +345,8 @@ export const prettifyConstraints =
         .sort()
         .join(', ');
 
+const postfix = (obj: any): string =>
+  isMetaClass(obj) ? obj.postfix : '';
 
 export const blockGraphCfg = <BlockT extends Block = any>(
   crud: BlockCrud<BlockT>,
@@ -378,8 +367,11 @@ export const blockGraphCfg = <BlockT extends Block = any>(
   const graphedObj: Mapped<BlockField> = keyBy(
     graphedFields,
     f => {
-      const key = serializedPropertyName(f.key, crud.block.data);
-      return `${crud.block.serviceId}/${crud.block.id}/${key}`;
+      return [
+        crud.block.serviceId,
+        crud.block.id,
+        f.key + postfix(crud.block.data[f.key]),
+      ].join('/');
     });
 
   const fieldAxes: Mapped<GraphAxis> = mapValues(
@@ -388,17 +380,12 @@ export const blockGraphCfg = <BlockT extends Block = any>(
 
   const renames: Mapped<string> = mapValues(
     graphedObj,
-    f => {
-      const name = f.graphName ?? f.title;
-      const unit = objectUnit(crud.block.data[f.key]);
-      return unit ? `${name} [${unit}]` : name;
-    });
+    f => `${f.graphName ?? f.title} ${prettify(postfix(crud.block.data[f.key]))}`);
 
   const targets = [{
     measurement: crud.block.serviceId,
     fields: graphedFields
-      .map(f => serializedPropertyName(f.key, crud.block.data))
-      .map(k => `${crud.block.id}/${k}`),
+      .map(f => `${crud.block.id}/${f.key}${postfix(crud.block.data[f.key])}`),
   }];
 
   return {

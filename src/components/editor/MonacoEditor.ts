@@ -24,6 +24,8 @@ export default class CodeEditor extends Vue {
       value: this.value,
       theme: 'vs-dark',
       language: 'javascript',
+      tabSize: 2,
+      insertSpaces: true,
     });
 
     this.editor.onDidChangeModelContent(ev => {

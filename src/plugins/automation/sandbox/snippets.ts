@@ -1,7 +1,7 @@
 import { createDialog } from '@/helpers/dialog';
-import { isPostFixed } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
+import { isMetaClass } from '@/plugins/spark/units';
 
 export type SnippetMode = 'append' | 'insert';
 export type SnippetCallback = (mode: SnippetMode, lines: string[]) => unknown;
@@ -29,7 +29,7 @@ const valueHint = (addr: BlockFieldAddress): string => {
 
   // Infer hint based on value
   const value = generate(addr.serviceId);
-  if (isPostFixed(value)) {
+  if (isMetaClass(value)) {
     return comment(value.constructor.name);
   }
 
@@ -89,7 +89,7 @@ export const generators: SnippetGenerator[] = [
         message: 'Pick a block and field. A function call to get that field will be generated.',
       })
         .onOk((addr: BlockFieldAddress) => {
-          const call = `getBlockField('${addr.serviceId}', '${addr.id}', '${addr.field}${addr.postfix ?? ''}')`;
+          const call = `getBlockField('${addr.serviceId}', '${addr.id}', '${addr.field}')`;
           callback('insert', [call + valueHint(addr)]);
         });
     },
@@ -114,7 +114,7 @@ export const generators: SnippetGenerator[] = [
   },
 
   {
-    desc: 'Make HTTP request',
+    desc: 'Make HTTP request (async)',
     run(callback) {
       const serviceId = sparkStore.serviceIds[0] ?? 'spark-one';
       callback('append', [
@@ -124,6 +124,29 @@ export const generators: SnippetGenerator[] = [
         "console.log('response body', resp.data);",
         "return resp.status === 200 && resp.data.status === 'ok';",
       ]);
+    },
+  },
+
+  {
+    desc: 'Save block (async)',
+    run(callback) {
+      createDialog({
+        component: 'BlockFieldAddressDialog',
+        title: 'Select target field',
+        message: 'Pick a block and field. A function call will be generated.',
+      })
+        .onOk((addr: BlockFieldAddress) => {
+          const block = sparkStore.blockByAddress(addr);
+          const currentValue = JSON.stringify(block!.data[addr.field!]);
+
+          callback('insert', [
+            '',
+            `const block = getBlock('${addr.serviceId}', '${addr.id}');`,
+            `console.log('current value', block.data.${addr.field});`,
+            `block.data.${addr.field} = ${currentValue};${valueHint(addr)}`,
+            'await saveBlock(block);',
+          ]);
+        });
     },
   },
 ];

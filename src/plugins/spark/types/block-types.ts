@@ -87,7 +87,6 @@ export interface BlockAddress {
 
 export interface BlockFieldAddress extends BlockAddress {
   field: string | null;
-  postfix: string | null;
 }
 
 export interface Block extends BlockAddress {
@@ -99,10 +98,19 @@ export interface Block extends BlockAddress {
   data: any;
 }
 
-/**
- * The serialized format of Block
- */
-export type DataBlock = Omit<Block, 'serviceId'>;
+export interface SerializedUnit {
+  __metaclass: 'Unit';
+  value: number | null;
+  unit: string;
+  readonly?: boolean;
+}
+
+export interface SerializedLink {
+  __metaclass: 'Link';
+  id: string | null;
+  type: BlockOrIntfType | null;
+  driven?: boolean;
+}
 
 export interface BlockIds {
   id?: string;
