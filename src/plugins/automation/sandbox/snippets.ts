@@ -1,7 +1,7 @@
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
-import { isMetaClass } from '@/plugins/spark/units';
+import { isJSBloxField } from '@/plugins/spark/units';
 
 export type SnippetMode = 'append' | 'insert';
 export type SnippetCallback = (mode: SnippetMode, lines: string[]) => unknown;
@@ -29,7 +29,7 @@ const valueHint = (addr: BlockFieldAddress): string => {
 
   // Infer hint based on value
   const value = generate(addr.serviceId);
-  if (isMetaClass(value)) {
+  if (isJSBloxField(value)) {
     return comment(value.constructor.name);
   }
 

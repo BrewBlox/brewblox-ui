@@ -26,9 +26,8 @@ import {
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
-import { objectUnit } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
-import { isMetaClass, Link, prettify, Unit } from '@/plugins/spark/units';
+import { Link, prettify, Unit } from '@/plugins/spark/units';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
 import { compatibleTypes } from './getters';
@@ -50,6 +49,7 @@ import {
   DisplaySlot,
   MotorValveBlock,
 } from './types';
+import { isJSBloxField } from './units/BloxField';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -346,7 +346,7 @@ export const prettifyConstraints =
         .join(', ');
 
 const postfix = (obj: any): string =>
-  isMetaClass(obj) ? obj.postfix : '';
+  isJSBloxField(obj) ? obj.postfix : '';
 
 export const blockGraphCfg = <BlockT extends Block = any>(
   crud: BlockCrud<BlockT>,

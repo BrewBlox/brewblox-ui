@@ -1,14 +1,14 @@
 import isObject from 'lodash/isObject';
 
 import { BlockOrIntfType, SerializedLink } from '../types';
-import { MetaClass } from './MetaClass';
+import { JSBloxField } from './BloxField';
 
 export function isSerializedLink(obj: any): obj is SerializedLink {
-  return isObject(obj) && (obj as SerializedLink).__metaclass === 'Link';
+  return isObject(obj) && (obj as SerializedLink).__bloxtype === 'Link';
 }
 
-export class Link implements MetaClass {
-  public readonly metaclass = 'Link';
+export class Link implements JSBloxField {
+  public readonly __bloxtype = 'Link';
   public id: string | null;
   public type: BlockOrIntfType | null;
   public driven: boolean;
@@ -51,7 +51,7 @@ export class Link implements MetaClass {
 
   public toJSON(): SerializedLink {
     return {
-      __metaclass: this.metaclass,
+      __bloxtype: 'Link',
       id: this.id,
       type: this.type,
       driven: this.driven || undefined,

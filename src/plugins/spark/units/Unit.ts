@@ -3,7 +3,7 @@ import round from 'lodash/round';
 import { Enum } from 'typescript-string-enums';
 
 import { SerializedUnit } from '../types';
-import { MetaClass } from './MetaClass';
+import { JSBloxField } from './BloxField';
 
 export const prettify = (unitName: string): string =>
   unitName
@@ -18,11 +18,11 @@ export const prettify = (unitName: string): string =>
     .replace(/ ?\* ?/gi, '·');  // degC * hour
 
 export function isSerializedUnit(obj: any): obj is SerializedUnit {
-  return isObject(obj) && (obj as SerializedUnit).__metaclass === 'Unit';
+  return isObject(obj) && (obj as SerializedUnit).__bloxtype === 'Unit';
 }
 
-export class Unit implements MetaClass {
-  public readonly metaclass = 'Unit';
+export class Unit implements JSBloxField {
+  public readonly __bloxtype = 'Unit';
   private _val: number | null;
   private _unit: string;
   private _notation: string;
@@ -80,7 +80,7 @@ export class Unit implements MetaClass {
 
   public toJSON(): SerializedUnit {
     return {
-      __metaclass: 'Unit',
+      __bloxtype: 'Unit',
       value: this.value,
       unit: this.unit,
     };

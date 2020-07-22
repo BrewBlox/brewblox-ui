@@ -6,7 +6,8 @@ import isObject from 'lodash/isObject';
 import { mapEntries } from '@/helpers/functional';
 
 import { BlockOrIntfType } from './types';
-import { isMetaClass, isSerializedLink, isSerializedUnit, Link, MetaClass, Unit } from './units';
+import { isSerializedLink, isSerializedUnit, Link, Unit } from './units';
+import { isJSBloxField, JSBloxField } from './units/BloxField';
 
 // string start
 // then any characters (captured)
@@ -41,7 +42,7 @@ export function objectUnit(val: any): string | null {
     : null;
 }
 
-export function parsePostfixed(key: string, val: any): [string, MetaClass] | null {
+export function parsePostfixed(key: string, val: any): [string, JSBloxField] | null {
   try {
     if (key.endsWith(']') || key.endsWith('>')) {
       const matched = key.match(postfixExpr);
@@ -65,7 +66,7 @@ export function deserialize(obj: any): typeof obj {
   if (isArray(obj)) {
     return obj.map(deserialize);
   }
-  if (isMetaClass(obj)) {
+  if (isJSBloxField(obj)) {
     return obj;
   }
   if (isSerializedLink(obj)) {
@@ -85,7 +86,7 @@ export function serialize(obj: any): typeof obj {
   if (isArray(obj)) {
     return obj.map(serialize);
   }
-  if (isMetaClass(obj)) {
+  if (isJSBloxField(obj)) {
     return obj.toJSON();
   }
   if (isObject(obj)) {

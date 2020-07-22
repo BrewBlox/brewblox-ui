@@ -1,3 +1,3 @@
 export * from './Link';
 export * from './Unit';
-export * from './MetaClass';
+export * from './BloxField';

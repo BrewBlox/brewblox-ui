@@ -4,6 +4,8 @@ import { Enum } from 'typescript-string-enums';
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { Crud } from '@/store/features';
 
+import { JSONBloxField } from '../units/BloxField';
+
 export const BlockIntfType = Enum(
   'ProcessValueInterface',
   'TempSensorInterface',
@@ -98,15 +100,15 @@ export interface Block extends BlockAddress {
   data: any;
 }
 
-export interface SerializedUnit {
-  __metaclass: 'Unit';
+export interface SerializedUnit extends JSONBloxField {
+  __bloxtype: 'Unit';
   value: number | null;
   unit: string;
   readonly?: boolean;
 }
 
-export interface SerializedLink {
-  __metaclass: 'Link';
+export interface SerializedLink extends JSONBloxField {
+  __bloxtype: 'Link';
   id: string | null;
   type: BlockOrIntfType | null;
   driven?: boolean;
