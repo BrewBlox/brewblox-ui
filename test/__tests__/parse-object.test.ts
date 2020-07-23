@@ -96,7 +96,7 @@ describe('serialize', () => {
 
     const output = {
       temperature: {
-        __typename: 'Unit',
+        __bloxtype: 'Unit',
         value: 21,
         unit: 'celsius',
       },
@@ -105,7 +105,7 @@ describe('serialize', () => {
       emptyArray: [],
       deeper: {
         temperatureInUSA: {
-          __typename: 'Unit',
+          __bloxtype: 'Unit',
           value: 60,
           unit: 'fahrenheit',
         },
@@ -128,7 +128,7 @@ describe('serialize', () => {
       20,
       {
         test: {
-          __typename: 'Unit',
+          __bloxtype: 'Unit',
           value: 23,
           unit: 'celsius',
         },
@@ -148,14 +148,14 @@ describe('serialize', () => {
 
     const output = {
       sensor: {
-        __typename: 'Link',
+        __bloxtype: 'Link',
         id: 'sensor-1',
         type: null,
         driven: undefined,
       },
       deeper: {
         sensor: {
-          __typename: 'Link',
+          __bloxtype: 'Link',
           id: 'sensor-2',
           type: null,
           driven: undefined,
