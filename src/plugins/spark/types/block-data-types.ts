@@ -1,3 +1,5 @@
+import { Enum } from 'typescript-string-enums';
+
 import { Link, Unit } from '../units';
 import { DigitalState, IoPin } from './block-shared';
 import { Block } from './block-types';
@@ -17,48 +19,51 @@ export interface ActuatorAnalogMockBlock extends Block {
   };
 }
 
-export enum DigitalCompareOp {
-  'VALUE_IS' = 'VALUE_IS',
-  'VALUE_ISNOT' = 'VALUE_ISNOT',
-  'DESIRED_IS' = 'DESIRED_IS',
-  'DESIRED_ISNOT' = 'DESIRED_ISNOT',
-}
+export const DigitalCompareOp = Enum(
+  'OP_VALUE_IS',
+  'OP_VALUE_IS_NOT',
+  'OP_DESIRED_IS',
+  'OP_DESIRED_IS_NOT'
+);
+export type DigitalCompareOp = Enum<typeof DigitalCompareOp>;
 
-export enum AnalogCompareOp {
-  'VALUE_LE' = 'VALUE_LE',
-  'VALUE_GE' = 'VALUE_GE',
-  'SETTING_LE' = 'SETTING_LE',
-  'SETTING_GE' = 'SETTING_GE',
-}
+export const AnalogCompareOp = Enum(
+  'OP_VALUE_LE',
+  'OP_VALUE_GE',
+  'OP_SETTING_LE',
+  'OP_SETTING_GE',
+);
+export type AnalogCompareOp = Enum<typeof AnalogCompareOp>;
 
-export enum EvalResult {
-  'FALSE' = 'FALSE',
-  'TRUE' = 'TRUE',
-  'EMPTY' = 'EMPTY',
-  'EMPTY_SUBSTRING' = 'EMPTY_SUBSTRING',
-  'BLOCK_NOT_FOUND' = 'BLOCK_NOT_FOUND',
-  'INVALID_DIGITAL_OP' = 'INVALID_DIGITAL_OP',
-  'INVALID_ANALOG_OP' = 'INVALID_ANALOG_OP',
-  'INVALID_ANA_COMPARE_IDX' = 'INVALID_ANA_COMPARE_IDX',
-  'INVALID_DIG_COMPARE_IDX' = 'INVALID_DIG_COMPARE_IDX',
-  'UNEXPECTED_CLOSING_BRACKET' = 'UNEXPECTED_CLOSING_BRACKET',
-  'MISSING_CLOSING_BRACKET' = 'MISSING_CLOSING_BRACKET',
-  'UNEXPECTED_OPENING_BRACKET' = 'UNEXPECTED_OPENING_BRACKET',
-  'UNEXPECTED_CHARACTER' = 'UNEXPECTED_CHARACTER',
-  'UNEXPECTED_COMPARISON' = 'UNEXPECTED_COMPARISON',
-  'UNEXPECTED_OPERATOR' = 'UNEXPECTED_OPERATOR',
-}
+export const LogicResult = Enum(
+  'RESULT_FALSE',
+  'RESULT_TRUE',
+  'RESULT_EMPTY',
+  'RESULT_EMPTY_SUBSTRING',
+  'RESULT_BLOCK_NOT_FOUND',
+  'RESULT_INVALID_DIGITAL_OP',
+  'RESULT_INVALID_ANALOG_OP',
+  'RESULT_UNDEFINED_DIGITAL_COMPARE',
+  'RESULT_UNDEFINED_ANALOG_COMPARE',
+  'RESULT_UNEXPECTED_OPEN_BRACKET',
+  'RESULT_UNEXPECTED_CLOSE_BRACKET',
+  'RESULT_UNEXPECTED_CHARACTER',
+  'RESULT_UNEXPECTED_COMPARISON',
+  'RESULT_UNEXPECTED_OPERATOR',
+  'RESULT_MISSING_CLOSE_BRACKET',
+);
+export type LogicResult = Enum<typeof LogicResult>;
 
 export interface DigitalCompare {
   op: DigitalCompareOp;
-  result: EvalResult;
+  result: LogicResult;
   id: Link;
   rhs: DigitalState;
 }
 
 export interface AnalogCompare {
   op: AnalogCompareOp;
-  result: EvalResult;
+  result: LogicResult;
   id: Link;
   rhs: number;
 }
@@ -73,7 +78,7 @@ export interface ActuatorLogicBlock extends Block {
   type: 'ActuatorLogic';
   data: {
     enabled: boolean;
-    result: EvalResult; // readonly
+    result: LogicResult; // readonly
     errorPos: number; // readonly
     targetId: Link;
     drivenTargetId: Link; // readonly
@@ -83,17 +88,18 @@ export interface ActuatorLogicBlock extends Block {
   };
 }
 
-export enum OffsetSettingOrValue {
-  'SETTING' = 'SETTING',
-  'VALUE' = 'VALUE',
-}
+export const ReferenceKind = Enum(
+  'REF_SETTING',
+  'REF_VALUE',
+);
+export type ReferenceKind = Enum<typeof ReferenceKind>;
 
 export interface ActuatorOffsetBlock extends Block {
   type: 'ActuatorOffset';
   data: {
     enabled: boolean;
     desiredSetting: number;
-    referenceSettingOrValue: OffsetSettingOrValue;
+    referenceSettingOrValue: ReferenceKind;
 
     targetId: Link;
     drivenTargetId: Link;
@@ -155,10 +161,11 @@ export interface DigitalActuatorBlock extends Block {
   };
 }
 
-export enum DisplaySettingsTempUnit {
-  'CELSIUS' = 'CELSIUS',
-  'FAHRENHEIT' = 'FAHRENHEIT',
-}
+export const DisplayTempUnit = Enum(
+  'TEMP_CELSIUS',
+  'TEMP_FAHRENHEIT',
+);
+export type DisplayTempUnit = Enum<typeof DisplayTempUnit>;
 
 export interface DisplaySlot {
   pos: number;
@@ -176,11 +183,12 @@ export interface DisplaySettingsBlock extends Block {
   type: 'DisplaySettings';
   data: {
     name: string;
-    tempUnit: DisplaySettingsTempUnit;
+    tempUnit: DisplayTempUnit;
     widgets: DisplaySlot[];
     brightness: number;
   };
 }
+
 
 export interface ChannelMapping {
   id: string;
@@ -220,15 +228,16 @@ export interface MockPinsBlock extends Block {
   };
 }
 
-export enum ValveState {
-  'Unknown' = 'Unknown',
-  'Open' = 'Open',
-  'Closed' = 'Closed',
-  'Opening' = 'Opening',
-  'Closing' = 'Closing',
-  'HalfOpenIdle' = 'HalfOpenIdle',
-  'InitIdle' = 'InitIdle',
-}
+export const ValveState = Enum(
+  'VALVE_UNKNOWN',
+  'VALVE_OPEN',
+  'VALVE_CLOSED',
+  'VALVE_OPENING',
+  'VALVE_CLOSING',
+  'VALVE_HALF_OPEN_IDLE',
+  'VALVE_INIT_IDLE',
+);
+export type ValveState = Enum<typeof ValveState>;
 
 export interface MotorValveBlock extends Block {
   type: 'MotorValve';
@@ -301,15 +310,16 @@ export interface SetpointProfileBlock extends Block {
   };
 }
 
-export enum FilterChoice {
-  'FILT_NONE' = 'FILT_NONE',
-  'FILT_15s' = 'FILT_15s',
-  'FILT_45s' = 'FILT_45s',
-  'FILT_90s' = 'FILT_90s',
-  'FILT_3m' = 'FILT_3m',
-  'FILT_10m' = 'FILT_10m',
-  'FILT_30m' = 'FILT_30m',
-}
+export const FilterChoice = Enum(
+  'FILTER_NONE',
+  'FILTER_15s',
+  'FILTER_45s',
+  'FILTER_90s',
+  'FILTER_3m',
+  'FILTER_10m',
+  'FILTER_30m',
+);
+export type FilterChoice = Enum<typeof FilterChoice>;
 
 export interface SetpointSensorPairBlock extends Block {
   type: 'SetpointSensorPair';
@@ -329,11 +339,12 @@ export interface SetpointSensorPairBlock extends Block {
   };
 }
 
-export enum Spark2Hardware {
-  'unknown_hw' = 'unknown_hw',
-  'Spark1' = 'Spark1',
-  'Spark2' = 'Spark2',
-}
+export const Spark2Hardware = Enum(
+  'HW_UNKNOWN',
+  'HW_SPARK1',
+  'HW_SPARK2',
+);
+export type Spark2Hardware = Enum<typeof Spark2Hardware>;
 
 export interface Spark2PinsBlock extends Block {
   type: 'Spark2Pins';

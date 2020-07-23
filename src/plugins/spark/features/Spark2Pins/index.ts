@@ -13,7 +13,7 @@ const block: BlockSpec<Spark2PinsBlock> = {
   generate: () => ({
     pins: [],
     soundAlarm: false,
-    hardware: Spark2Hardware.unknown_hw,
+    hardware: Spark2Hardware.HW_UNKNOWN,
   }),
   fields: [],
 };

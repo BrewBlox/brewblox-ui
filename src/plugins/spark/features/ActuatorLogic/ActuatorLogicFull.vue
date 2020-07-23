@@ -9,18 +9,18 @@ import {
   AnalogCompare,
   AnalogCompareOp,
   Block,
-  BlockInterfaceType,
+  BlockIntfType,
   DigitalCompare,
   DigitalCompareOp,
   DigitalState,
-  EvalResult,
   ExpressionError,
+  LogicResult,
 } from '@/plugins/spark/types';
 import { Link } from '@/plugins/spark/units';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
-import { characterTitles, evalResultTitles, nonErrorResults } from './getters';
+import { characterTitles, logicResultTitles, nonErrorResults } from './getters';
 import {
   analogIdx,
   analogKey,
@@ -33,7 +33,7 @@ import {
   syntaxCheck,
 } from './helpers';
 
-const validTypes: BlockInterfaceType[] = [
+const validTypes: BlockIntfType[] = [
   'ActuatorDigitalInterface',
   'ProcessValueInterface',
 ];
@@ -120,7 +120,7 @@ export default class ActuatorLogicFull
       ? null
       : {
         index,
-        message: evalResultTitles[result],
+        message: logicResultTitles[result],
         indicator: '-'.repeat(index) + '^',
       };
   }
@@ -138,20 +138,20 @@ export default class ActuatorLogicFull
   }
 
   addComparison(block: Block): void {
-    if (isCompatible(block.type, 'ActuatorDigitalInterface')) {
+    if (isCompatible(block.type, BlockIntfType.ActuatorDigitalInterface)) {
       this.block.data.digital.push({
-        op: DigitalCompareOp.VALUE_IS,
+        op: DigitalCompareOp.OP_VALUE_IS,
         id: new Link(block.id, block.type),
-        rhs: DigitalState.Active,
-        result: EvalResult.EMPTY,
+        rhs: DigitalState.STATE_ACTIVE,
+        result: LogicResult.RESULT_EMPTY,
       });
     }
-    else if (isCompatible(block.type, 'ProcessValueInterface')) {
+    else if (isCompatible(block.type, BlockIntfType.ProcessValueInterface)) {
       this.block.data.analog.push({
-        op: AnalogCompareOp.VALUE_GE,
+        op: AnalogCompareOp.OP_VALUE_GE,
         id: new Link(block.id, block.type),
         rhs: 25,
-        result: EvalResult.EMPTY,
+        result: LogicResult.RESULT_EMPTY,
       });
     }
     this.saveBlock();

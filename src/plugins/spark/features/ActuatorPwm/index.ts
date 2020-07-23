@@ -1,8 +1,7 @@
 import { unitDurationString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { ActuatorPwmBlock, AnalogConstraintsObj, BlockSpec } from '@/plugins/spark/types';
+import { ActuatorPwmBlock, AnalogConstraintsObj, BlockIntfType, BlockSpec } from '@/plugins/spark/types';
 import { Link, Time, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
@@ -13,8 +12,8 @@ const typeName = 'ActuatorPwm';
 const block: BlockSpec<ActuatorPwmBlock> = {
   id: typeName,
   generate: () => ({
-    actuatorId: new Link(null, interfaceTypes.ActuatorDigital),
-    drivenActuatorId: new Link(null, interfaceTypes.ActuatorDigital, true),
+    actuatorId: new Link(null, BlockIntfType.ActuatorDigitalInterface),
+    drivenActuatorId: new Link(null, BlockIntfType.ActuatorDigitalInterface, true),
     period: new Unit(4, 'second'),
     desiredSetting: 0,
     setting: 0,
@@ -61,7 +60,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       key: 'actuatorId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.ActuatorDigital),
+      generate: () => new Link(null, BlockIntfType.ActuatorDigitalInterface),
     },
     {
       key: 'constrainedBy',

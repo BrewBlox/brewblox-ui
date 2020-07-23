@@ -2,12 +2,11 @@ import { WidgetRole } from '@/store/features';
 
 import {
   AnalogConstraintKey,
-  BlockInterfaceType,
+  BlockIntfType,
   BlockType,
   ChannelMapping,
   DigitalConstraintKey,
-  SystemBlockType,
-  UserBlockType,
+  FilterChoice,
   UserUnitKey,
 } from './types';
 
@@ -56,50 +55,17 @@ export const constraintLabels = {
   ...analogConstraintLabels,
 };
 
-export const systemBlockTypes: Record<SystemBlockType, SystemBlockType> = {
-  SysInfo: 'SysInfo',
-  Groups: 'Groups',
-  OneWireBus: 'OneWireBus',
-  Ticks: 'Ticks',
-  WiFiSettings: 'WiFiSettings',
-  TouchSettings: 'TouchSettings',
+export const filterLabels: Record<FilterChoice, string> = {
+  'FILTER_NONE': 'No filtering',
+  'FILTER_15s': 'Filter 15s',
+  'FILTER_45s': 'Filter 45s',
+  'FILTER_90s': 'Filter 90s',
+  'FILTER_3m': 'Filter 3m',
+  'FILTER_10m': 'Filter 10m',
+  'FILTER_30m': 'Filter 30m',
 };
 
-export const blockTypes: Record<UserBlockType, UserBlockType> = {
-  ActuatorAnalogMock: 'ActuatorAnalogMock',
-  ActuatorLogic: 'ActuatorLogic',
-  ActuatorOffset: 'ActuatorOffset',
-  ActuatorPwm: 'ActuatorPwm',
-  Balancer: 'Balancer',
-  DeprecatedObject: 'DeprecatedObject',
-  DigitalActuator: 'DigitalActuator',
-  DisplaySettings: 'DisplaySettings',
-  DS2408: 'DS2408',
-  DS2413: 'DS2413',
-  InactiveObject: 'InactiveObject',
-  MockPins: 'MockPins',
-  MotorValve: 'MotorValve',
-  Mutex: 'Mutex',
-  Pid: 'Pid',
-  SetpointProfile: 'SetpointProfile',
-  SetpointSensorPair: 'SetpointSensorPair',
-  Spark2Pins: 'Spark2Pins',
-  Spark3Pins: 'Spark3Pins',
-  TempSensorMock: 'TempSensorMock',
-  TempSensorOneWire: 'TempSensorOneWire',
-};
-
-export const interfaceTypes: Record<string, BlockInterfaceType> = {
-  ProcessValue: 'ProcessValueInterface',
-  TempSensor: 'TempSensorInterface',
-  SetpointSensorPair: 'SetpointSensorPairInterface',
-  ActuatorAnalog: 'ActuatorAnalogInterface',
-  ActuatorDigital: 'ActuatorDigitalInterface',
-  Balancer: 'BalancerInterface',
-  IoArray: 'IoArrayInterface',
-};
-
-export const compatibleTypes: Record<BlockInterfaceType, BlockType[]> = {
+export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
   ProcessValueInterface: [
     'ActuatorAnalogMock',
     'ActuatorPwm',

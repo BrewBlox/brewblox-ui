@@ -2,15 +2,15 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { ActuatorOffsetBlock, OffsetSettingOrValue } from '@/plugins/spark/types';
+import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
 
 @Component
 export default class ActuatorOffsetWidget
   extends BlockWidgetBase<ActuatorOffsetBlock> {
 
-  referenceOpts: SelectOption<OffsetSettingOrValue>[] = [
-    { label: 'Setting', value: OffsetSettingOrValue.SETTING },
-    { label: 'Measured', value: OffsetSettingOrValue.VALUE },
+  referenceOpts: SelectOption<ReferenceKind>[] = [
+    { label: 'Setting', value: ReferenceKind.REF_SETTING },
+    { label: 'Measured', value: ReferenceKind.REF_VALUE },
   ]
 
   enable(): void {

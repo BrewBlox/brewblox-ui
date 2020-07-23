@@ -1,6 +1,6 @@
 import { createDialog } from '@/helpers/dialog';
-import { blockTypes } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockType } from '@/plugins/spark/types';
 
 import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '../getters';
 import { settingsBlock, showAbsentBlock, showDrivingBlockDialog } from '../helpers';
@@ -36,7 +36,7 @@ const spec: PartSpec = {
       component: 'BlockAddressCard',
       props: {
         settingsKey: addressKey,
-        compatible: [blockTypes.DigitalActuator, blockTypes.ActuatorPwm],
+        compatible: [BlockType.DigitalActuator, BlockType.ActuatorPwm],
         label: 'Actuator',
       },
     },

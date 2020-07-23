@@ -5,6 +5,7 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import range from 'lodash/range';
+import { Enum } from 'typescript-string-enums';
 import { VueConstructor } from 'vue';
 
 import { ref } from '@/helpers/component-ref';
@@ -14,6 +15,7 @@ import {
   dateString,
   durationString,
   hexToBase64,
+  matchesType,
   round,
   shortDateString,
   truncate,
@@ -30,7 +32,7 @@ import { Link, Unit } from '@/plugins/spark/units';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
 import { compatibleTypes } from './getters';
-import type {
+import {
   AnalogConstraint,
   AnyConstraintsObj,
   Block,
@@ -38,13 +40,16 @@ import type {
   BlockConfig,
   BlockCrud,
   BlockField,
+  BlockIntfType,
   BlockOrIntfType,
   BlockType,
   DataBlock,
+  DigitalActuatorBlock,
   DigitalConstraint,
   DisplayOpts,
   DisplaySettingsBlock,
   DisplaySlot,
+  MotorValveBlock,
 } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
@@ -114,16 +119,16 @@ export const isCompatible = (type: string | null, intf: BlockOrIntfType | BlockO
 
 export const canDisplay = (addr: BlockAddress): boolean =>
   isCompatible(addr?.type, [
-    'TempSensorInterface',
-    'SetpointSensorPairInterface',
-    'ActuatorAnalogInterface',
-    'Pid',
+    BlockIntfType.TempSensorInterface,
+    BlockIntfType.SetpointSensorPairInterface,
+    BlockIntfType.ActuatorAnalogInterface,
+    BlockType.Pid,
   ]);
 
 const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBlock | undefined =>
   serviceId
     ? sparkStore.serviceBlocks(serviceId)
-      .find(typeMatchFilter<DisplaySettingsBlock>('DisplaySettings'))
+      .find(typeMatchFilter<DisplaySettingsBlock>(BlockType.DisplaySettings))
     : undefined;
 
 export const isDisplayed = (addr: BlockAddress): boolean =>
@@ -165,13 +170,13 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
       color: opts.color,
       name: opts.name.slice(0, 15),
     };
-    if (isCompatible(type, 'TempSensorInterface')) {
+    if (isCompatible(type, BlockIntfType.TempSensorInterface)) {
       slot.tempSensor = link;
     }
-    else if (isCompatible(type, 'SetpointSensorPairInterface')) {
+    else if (isCompatible(type, BlockIntfType.SetpointSensorPairInterface)) {
       slot.setpointSensorPair = link;
     }
-    else if (isCompatible(type, 'ActuatorAnalogInterface')) {
+    else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
       slot.actuatorAnalog = link;
     }
     else if (isCompatible(type, 'Pid')) {
@@ -189,9 +194,9 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
 };
 
 const addressedTypes: BlockType[] = [
-  'TempSensorOneWire',
-  'DS2408',
-  'DS2413',
+  BlockType.TempSensorOneWire,
+  BlockType.DS2408,
+  BlockType.DS2413,
 ];
 
 export const saveHwInfo = (serviceId: string): void => {
@@ -200,7 +205,7 @@ export const saveHwInfo = (serviceId: string): void => {
 
   sparkStore.serviceBlocks(serviceId)
     .forEach(block => {
-      if (block.type === 'MotorValve') {
+      if (matchesType<MotorValveBlock>(BlockType.MotorValve, block)) {
         const { hwDevice, startChannel } = block.data;
         if (hwDevice.id === null || !startChannel) {
           return;
@@ -213,7 +218,7 @@ export const saveHwInfo = (serviceId: string): void => {
         }
       }
 
-      if (block.type === 'DigitalActuator') {
+      if (matchesType<DigitalActuatorBlock>(BlockType.DigitalActuator, block)) {
         const { hwDevice, channel } = block.data;
         if (hwDevice.id === null || !channel) {
           return;
@@ -426,5 +431,5 @@ export const discoverBlocks = async (serviceId: string | null, show = true): Pro
 export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
   sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';
 
-export const enumHint = (e: Mapped<any>): string =>
-  'One of: ' + Object.keys(e).map(v => `'${v}'`).join(', ');
+export const enumHint = (e: Enum<any>): string =>
+  'One of: ' + Enum.values(e).map(v => `'${v}'`).join(', ');

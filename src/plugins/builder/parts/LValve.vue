@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { DigitalActuatorBlock, MotorValveBlock } from '@/plugins/spark/types';
+import { DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { UP } from '../getters';
@@ -28,7 +28,7 @@ export default class LValve extends PartBase {
 
   get closed(): boolean {
     return this.block !== null
-      ? Boolean(this.block.data.state === 'Active')
+      ? Boolean(this.block.data.state === DigitalState.STATE_ACTIVE)
       : Boolean(this.settings.closed);
   }
 

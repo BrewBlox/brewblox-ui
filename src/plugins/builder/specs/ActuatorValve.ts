@@ -1,5 +1,5 @@
-import { blockTypes } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockType } from '@/plugins/spark/types';
 
 import { LEFT, RIGHT } from '../getters';
 import { settingsBlock } from '../helpers';
@@ -13,7 +13,7 @@ const spec: PartSpec = {
     component: 'BlockAddressCard',
     props: {
       settingsKey: 'valve',
-      compatible: [blockTypes.MotorValve, blockTypes.DigitalActuator],
+      compatible: [BlockType.MotorValve, BlockType.DigitalActuator],
       label: 'Valve or Actuator',
     },
   }],

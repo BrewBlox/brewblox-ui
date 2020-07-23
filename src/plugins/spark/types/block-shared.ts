@@ -1,15 +1,20 @@
-export enum ChannelConfig {
-  'UNKNOWN' = 'UNKNOWN',
-  'ACTIVE_LOW' = 'ACTIVE_LOW',
-  'ACTIVE_HIGH' = 'ACTIVE_HIGH',
-  'INPUT' = 'INPUT',
-}
+import { Enum } from 'typescript-string-enums';
 
-export enum DigitalState {
-  'Unknown' = 'Unknown',
-  'Active' = 'Active',
-  'Inactive' = 'Inactive',
-}
+export const ChannelConfig = Enum(
+  'CHANNEL_UNUSED',
+  'CHANNEL_ACTIVE_LOW',
+  'CHANNEL_ACTIVE_HIGH',
+  'CHANNEL_INPUT',
+  'CHANNEL_UNKNOWN',
+);
+export type ChannelConfig = Enum<typeof ChannelConfig>;
+
+export const DigitalState = Enum(
+  'STATE_INACTIVE',
+  'STATE_ACTIVE',
+  'STATE_UNKNOWN',
+);
+export type DigitalState = Enum<typeof DigitalState>;
 
 export interface IoChannel {
   config: ChannelConfig;

@@ -1,53 +1,71 @@
 import { Layout } from 'plotly.js';
+import { Enum } from 'typescript-string-enums';
 
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { Crud } from '@/store/features';
 
-export type BlockInterfaceType =
-  | 'ProcessValueInterface'
-  | 'TempSensorInterface'
-  | 'SetpointSensorPairInterface'
-  | 'ActuatorAnalogInterface'
-  | 'ActuatorDigitalInterface'
-  | 'BalancerInterface'
-  | 'MutexInterface'
-  | 'OneWireDeviceInterface'
-  | 'IoArrayInterface'
-  | 'DS2408Interface'
+export const BlockIntfType = Enum(
+  'ProcessValueInterface',
+  'TempSensorInterface',
+  'SetpointSensorPairInterface',
+  'ActuatorAnalogInterface',
+  'ActuatorDigitalInterface',
+  'BalancerInterface',
+  'MutexInterface',
+  'OneWireDeviceInterface',
+  'IoArrayInterface',
+  'DS2408Interface',
+);
+export type BlockIntfType = Enum<typeof BlockIntfType>;
 
-export type SystemBlockType =
-  | 'SysInfo'
-  | 'Groups'
-  | 'OneWireBus'
-  | 'Ticks'
-  | 'WiFiSettings'
-  | 'TouchSettings'
+export const SystemBlockType = Enum(
+  'SysInfo',
+  'Groups',
+  'OneWireBus',
+  'Ticks',
+  'WiFiSettings',
+  'TouchSettings',
+);
+export type SystemBlockType = Enum<typeof SystemBlockType>;
 
-export type UserBlockType =
-  | 'ActuatorAnalogMock'
-  | 'ActuatorLogic'
-  | 'ActuatorOffset'
-  | 'ActuatorPwm'
-  | 'Balancer'
-  | 'DeprecatedObject'
-  | 'DigitalActuator'
-  | 'DisplaySettings'
-  | 'DS2408'
-  | 'DS2413'
-  | 'InactiveObject'
-  | 'MockPins'
-  | 'MotorValve'
-  | 'Mutex'
-  | 'Pid'
-  | 'SetpointProfile'
-  | 'SetpointSensorPair'
-  | 'Spark2Pins'
-  | 'Spark3Pins'
-  | 'TempSensorMock'
-  | 'TempSensorOneWire'
+export const UserBlockType = Enum(
+  'ActuatorAnalogMock',
+  'ActuatorLogic',
+  'ActuatorOffset',
+  'ActuatorPwm',
+  'Balancer',
+  'DeprecatedObject',
+  'DigitalActuator',
+  'DisplaySettings',
+  'DS2408',
+  'DS2413',
+  'InactiveObject',
+  'MockPins',
+  'MotorValve',
+  'Mutex',
+  'Pid',
+  'SetpointProfile',
+  'SetpointSensorPair',
+  'Spark2Pins',
+  'Spark3Pins',
+  'TempSensorMock',
+  'TempSensorOneWire'
+);
+export type UserBlockType = Enum<typeof UserBlockType>;
 
-export type BlockType = SystemBlockType | UserBlockType;
-export type BlockOrIntfType = BlockType | BlockInterfaceType;
+export const BlockType = Enum(
+  ...Enum.values(SystemBlockType),
+  ...Enum.values(UserBlockType),
+);
+export type BlockType = Enum<typeof BlockType>;
+
+export const BlockOrIntfType = Enum(
+  ...Enum.values(BlockType),
+  ...Enum.values(BlockIntfType),
+);
+export type BlockOrIntfType = Enum<typeof BlockOrIntfType>;
+// export type BlockType = SystemBlockType | UserBlockType;
+// export type BlockOrIntfType = BlockType | BlockIntfType;
 
 /**
  * There are two approaches to having a serializable reference to a block:
