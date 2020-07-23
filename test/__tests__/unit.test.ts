@@ -24,6 +24,10 @@ describe('Prettify unit values', () => {
     expect(prettify('degEnd')).toBe('°End');
     expect(prettify('[degC]')).toBe('[°C]');
     expect(prettify('deg')).toBe('°');
+
+    expect(prettify('millisecond')).toBe('ms');
+    expect(prettify('hours')).toBe('h');
+    expect(prettify('Hour daily')).toBe('h daily');
   });
 });
 

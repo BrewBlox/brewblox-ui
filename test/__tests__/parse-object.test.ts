@@ -95,12 +95,20 @@ describe('serialize', () => {
     };
 
     const output = {
-      'temperature[celsius]': 21,
+      temperature: {
+        __bloxtype: 'Unit',
+        value: 21,
+        unit: 'celsius',
+      },
       leaveThisBe: 666,
       normalArray: [22, 23, 24],
       emptyArray: [],
       deeper: {
-        'temperatureInUSA[fahrenheit]': 60,
+        temperatureInUSA: {
+          __bloxtype: 'Unit',
+          value: 60,
+          unit: 'fahrenheit',
+        },
         nullable: null,
       },
     };
@@ -119,7 +127,11 @@ describe('serialize', () => {
     const output = [
       20,
       {
-        'test[celsius]': 23,
+        test: {
+          __bloxtype: 'Unit',
+          value: 23,
+          unit: 'celsius',
+        },
       },
     ];
 
@@ -135,9 +147,19 @@ describe('serialize', () => {
     };
 
     const output = {
-      'sensor<>': 'sensor-1',
+      sensor: {
+        __bloxtype: 'Link',
+        id: 'sensor-1',
+        type: null,
+        driven: undefined,
+      },
       deeper: {
-        'sensor<>': 'sensor-2',
+        sensor: {
+          __bloxtype: 'Link',
+          id: 'sensor-2',
+          type: null,
+          driven: undefined,
+        },
       },
     };
 

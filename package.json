@@ -35,12 +35,12 @@
   "dependencies": {
     "@quasar/extras": "^1.8.2",
     "axios": "^0.19.2",
-    "brace": "^0.11.1",
     "core-js": "^3.6.5",
     "dagre-d3": "^0.6.4",
     "fromentries": "^1.2.0",
     "lodash": "^4.17.19",
     "marked": "^0.7.0",
+    "monaco-editor": "^0.20.0",
     "mqtt": "^4.1.0",
     "parse-duration": "^0.1.3",
     "plotly.js-basic-dist": "^1.54.6",
@@ -87,6 +87,7 @@
     "fork-ts-checker-webpack-plugin": "^3.1.1",
     "jest": "^25.5.4",
     "minimist": "^1.2.5",
+    "monaco-editor-webpack-plugin": "^1.9.0",
     "node-sass": "^4.14.1",
     "sass-loader": "^8.0.2",
     "svgpath": "^2.3.0",
@@ -102,5 +103,9 @@
   "engines": {
     "node": ">= 12",
     "npm": ">= 6.4.1"
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "not IE > 0"
+  ]
 }

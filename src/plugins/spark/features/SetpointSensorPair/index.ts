@@ -51,7 +51,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
     },
     {
       key: 'setting',
-      title: 'Setting',
+      title: 'Setting (actual)',
       component: 'UnitValEdit',
       generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
       readonly: true,

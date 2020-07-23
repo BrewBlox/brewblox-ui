@@ -1,32 +1,44 @@
+import isObject from 'lodash/isObject';
 import round from 'lodash/round';
+import { Enum } from 'typescript-string-enums';
 
-import { PostFixed } from './PostFixed';
+import { SerializedUnit } from '../types';
+import { JSBloxField } from './BloxField';
 
 export const prettify = (unitName: string): string =>
   unitName
     .replace(/delta_/g, '')
-    .replace(/(deg)?Celsius/gi, '°C')
-    .replace(/(deg)?Fahrenheit/gi, '°F')
-    .replace(/(deg)?kelvin/gi, '°K')
-    .replace(/\bdeg(\b|[A-Z])/g, '°$1') // deg, degX, degSomething
+    .replace(/\b(deg)?(Celsius|Fahrenheit|Kelvin)/gi,
+      (full, deg, unit: string) => `deg${unit.charAt(0).toUpperCase()}`)
+    .replace(/\bdeg(\b|[A-Z])/g, '°$1') // deg, degC, degX, degSomething
     .replace(/milliseconds?/gi, 'ms')
-    .replace(/seconds?/gi, 's')
-    .replace(/minutes?/gi, 'm')
-    .replace(/hours?/gi, 'h')
-    .replace(/days?/gi, 'd')
+    .replace(/(seconds?|minutes?|hours?|days?)/gi, v => v.charAt(0).toLowerCase())
     .replace(/1 ?\/ ?/gi, '/') // 1 / degC
     .replace(/ ?\/ ?/gi, '/')  // degC / hour
     .replace(/ ?\* ?/gi, '·');  // degC * hour
 
-export class Unit implements PostFixed {
+export function isSerializedUnit(obj: any): obj is SerializedUnit {
+  return isObject(obj) && (obj as SerializedUnit).__bloxtype === 'Unit';
+}
+
+export class Unit implements JSBloxField {
+  public readonly __bloxtype = 'Unit';
   private _val: number | null;
   private _unit: string;
   private _notation: string;
 
-  public constructor(value: number | null, unit: string) {
-    this._val = value;
-    this._unit = unit;
-    this._notation = prettify(unit);
+  public constructor(raw: SerializedUnit);
+  public constructor(value: number | null, unit: string);
+  public constructor(value: SerializedUnit | number | null, unit: string = '') {
+    if (isSerializedUnit(value)) {
+      this._val = value.value ?? null;
+      this._unit = value.unit ?? '';
+    }
+    else {
+      this._val = value ?? null;
+      this._unit = unit ?? '';
+    }
+    this._notation = prettify(this._unit);
   }
 
   public get value(): number | null {
@@ -35,6 +47,10 @@ export class Unit implements PostFixed {
 
   public set value(v: number | null) {
     this._val = v === null ? null : Number(v);
+  }
+
+  public get postfix(): string {
+    return `[${this.unit}]`;
   }
 
   public get unit(): string {
@@ -58,24 +74,20 @@ export class Unit implements PostFixed {
     return (this.value === null) ? '--.--' : this.value.toFixed(2);
   }
 
-  public get postfix(): string {
-    return `[${this.unit}]`;
-  }
-
-  public toSerialized(key: string): [string, number | null] {
-    return [`${key}${this.postfix}`, this.value];
-  }
-
   public toString(): string {
     return `${this.roundedValue} ${this.notation}`;
   }
 
-  public toJSON(): number | null {
-    return this.value;
+  public toJSON(): SerializedUnit {
+    return {
+      __bloxtype: 'Unit',
+      value: this.value,
+      unit: this.unit,
+    };
   }
 
-  public copy(val: number | null = this._val): Unit {
-    return new Unit(val, this.unit);
+  public copy(value: number | null = this.value): Unit {
+    return new Unit({ ...this.toJSON(), value });
   }
 
   public isEqual(other: Unit): boolean {
@@ -87,14 +99,16 @@ export class Unit implements PostFixed {
   }
 }
 
-export type TimeUnitType =
-  | 'ms'
-  | 'millisecond'
-  | 's'
-  | 'second'
-  | 'min'
-  | 'minute'
-  | 'hour'
+export const TimeUnitType = Enum(
+  'ms',
+  'millisecond',
+  's',
+  'second',
+  'min',
+  'minute',
+  'hour',
+);
+export type TimeUnitType = Enum<typeof TimeUnitType>;
 
 export class Time extends Unit {
   public constructor(value: number | null = 0, unit: TimeUnitType = 'second') {
@@ -102,12 +116,12 @@ export class Time extends Unit {
   }
 }
 
-const isTempUnit = (unit: string): boolean => {
-  const pretty = prettify(unit);
-  return pretty === prettify('degC')
-    || pretty === prettify('degF')
-    || pretty === prettify('degK');
-};
+const prettyC = prettify('degC');
+const prettyF = prettify('degF');
+const prettyK = prettify('degK');
+
+const isTempUnit = (unit: string): boolean =>
+  [prettyC, prettyF, prettyK].includes(prettify(unit));
 
 export class Temp extends Unit {
   public constructor(value: Unit);
@@ -141,9 +155,6 @@ export class Temp extends Unit {
     // Note that prettify() strips the delta prefix
     // prettify('degC') === prettify('delta_degC')
     const pretty = prettify(unit);
-    const prettyC = prettify('degC');
-    const prettyF = prettify('degF');
-    const prettyK = prettify('degK');
 
     const offsetF = unit.startsWith('delta_') ? 0 : 32;
     const offsetK = unit.startsWith('delta_') ? 0 : 273.15;

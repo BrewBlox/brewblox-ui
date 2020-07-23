@@ -5,16 +5,16 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import SandboxSnippets from '@/plugins/automation/sandbox/SandboxSnippets.vue';
 
-import JSCheckPreview from './JSCheckPreview.vue';
+import JSApplyPreview from './JSApplyPreview.vue';
 
 @Component({
   components: {
-    JSCheckPreview,
+    JSApplyPreview,
     SandboxSnippets,
     MonacoEditor: () => import('src/components/editor/MonacoEditor'),
   },
 })
-export default class JSCheckDialog extends DialogBase {
+export default class JSApplyDialog extends DialogBase {
   sidebar: 'Snippets' | 'Preview' = 'Snippets'
   local: string = '';
   saved: string = '';
@@ -23,7 +23,7 @@ export default class JSCheckDialog extends DialogBase {
   readonly editor!: any;
 
   @Ref('previewer')
-  readonly previewer!: JSCheckPreview;
+  readonly previewer!: JSApplyPreview;
 
   @Prop({ type: String, default: 'Editor' })
   public readonly title!: string;
@@ -152,7 +152,7 @@ export default class JSCheckDialog extends DialogBase {
               @insert="insert"
               @append="append"
             />
-            <JSCheckPreview
+            <JSApplyPreview
               v-show="sidebar === 'Preview'"
               ref="previewer"
               :code="local"
