@@ -96,7 +96,7 @@ describe('serialize', () => {
 
     const output = {
       temperature: {
-        __bloxtype: 'Qty',
+        __bloxtype: 'Quantity',
         value: 21,
         unit: 'celsius',
       },
@@ -105,7 +105,7 @@ describe('serialize', () => {
       emptyArray: [],
       deeper: {
         temperatureInUSA: {
-          __bloxtype: 'Qty',
+          __bloxtype: 'Quantity',
           value: 60,
           unit: 'fahrenheit',
         },
@@ -128,7 +128,7 @@ describe('serialize', () => {
       20,
       {
         test: {
-          __bloxtype: 'Qty',
+          __bloxtype: 'Quantity',
           value: 23,
           unit: 'celsius',
         },
