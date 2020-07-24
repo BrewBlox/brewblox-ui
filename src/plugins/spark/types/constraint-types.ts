@@ -1,4 +1,4 @@
-import { Link, Unit } from '@/plugins/spark/units';
+import { Link, Qty } from '@/plugins/spark/bloxfield';
 
 export type AnalogConstraintKey =
   | 'min'
@@ -37,33 +37,33 @@ export type DigitalConstraintKey =
   | 'delayedOn'
 
 export interface MinOnConstraint {
-  remaining: Unit;
-  minOn: Unit;
+  remaining: Qty;
+  minOn: Qty;
 }
 
 export interface MinOffConstraint {
-  remaining: Unit;
-  minOff: Unit;
+  remaining: Qty;
+  minOff: Qty;
 }
 
 export interface MutexedConstraint {
-  remaining: Unit;
+  remaining: Qty;
   mutexed: {
     mutexId: Link;
-    extraHoldTime: Unit;
+    extraHoldTime: Qty;
     hasCustomHoldTime: boolean;
     hasLock: boolean;
   };
 }
 
 export interface DelayedOnConstraint {
-  remaining: Unit;
-  delayedOn: Unit;
+  remaining: Qty;
+  delayedOn: Qty;
 }
 
 export interface DelayedOffConstraint {
-  remaining: Unit;
-  delayedOff: Unit;
+  remaining: Qty;
+  delayedOff: Qty;
 }
 
 export type DigitalConstraint =

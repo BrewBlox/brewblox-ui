@@ -3,9 +3,9 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { mutate, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
+import { Link } from '@/plugins/spark/bloxfield';
 import { Block, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 

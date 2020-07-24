@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { durationMs } from '@/helpers/functional';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { Link, Qty, Temp, Time } from '@/plugins/spark/bloxfield';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
@@ -18,7 +19,6 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { Link, Temp, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -64,11 +64,11 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           sensorId: new Link(names.beerSensor),
           storedSetting: beerSetting,
           settingEnabled: true,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: new Qty(null, 'degC'),
+          value: new Qty(null, 'degC'),
+          valueUnfiltered: new Qty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: new Qty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -198,7 +198,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: new Unit(-20, '1/degC'),
+          kp: new Qty(-20, '1/degC'),
           ti: new Time(2, 'hour'),
           td: new Time(10, 'min'),
           enabled: true,
@@ -213,7 +213,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: new Unit(100, '1/degC'),
+          kp: new Qty(100, '1/degC'),
           ti: new Time(2, 'hour'),
           td: new Time(10, 'min'),
           enabled: true,
@@ -240,11 +240,11 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             sensorId: new Link(names.glycolSensor),
             storedSetting: glycolSetting,
             settingEnabled: true,
-            setting: new Unit(null, 'degC'),
-            value: new Unit(null, 'degC'),
-            valueUnfiltered: new Unit(null, 'degC'),
+            setting: new Qty(null, 'degC'),
+            value: new Qty(null, 'degC'),
+            valueUnfiltered: new Qty(null, 'degC'),
             filter: FilterChoice.FILTER_15s,
-            filterThreshold: new Unit(5, 'delta_degC'),
+            filterThreshold: new Qty(5, 'delta_degC'),
             resetFilter: false,
           },
         },
@@ -292,7 +292,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           groups,
           data: {
             ...pidDefaults(config.serviceId),
-            kp: new Unit(-20, '1/degC'),
+            kp: new Qty(-20, '1/degC'),
             ti: new Time(2, 'hour'),
             td: new Time(5, 'min'),
             enabled: true,

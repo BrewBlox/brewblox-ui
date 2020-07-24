@@ -1,8 +1,8 @@
-import { unitDurationString } from '@/helpers/functional';
+import { qtyDurationString } from '@/helpers/functional';
+import { Link, Qty, Temp } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockSpec, PidBlock } from '@/plugins/spark/types';
-import { Link, Temp, Unit } from '@/plugins/spark/units';
+import { BlockIntfType, BlockSpec, PidBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './PidWidget.vue';
@@ -14,26 +14,26 @@ const block: BlockSpec<PidBlock> = {
   generate: (serviceId: string | null) => {
     const temp = serviceTemp(serviceId);
     return {
-      inputId: new Link(null, 'SetpointSensorPairInterface'),
-      outputId: new Link(null, 'ActuatorAnalogInterface'),
+      inputId: new Link(null, BlockIntfType.SetpointSensorPairInterface),
+      outputId: new Link(null, BlockIntfType.ActuatorAnalogInterface),
       inputValue: new Temp(0, temp),
       inputSetting: new Temp(0, temp),
       outputValue: 0,
       outputSetting: 0,
       enabled: false,
       active: true,
-      kp: new Unit(20, `1/${temp}`),
-      ti: new Unit(2, 'hour'),
-      td: new Unit(0, 'second'),
+      kp: new Qty(20, `1/${temp}`),
+      ti: new Qty(2, 'hour'),
+      td: new Qty(0, 'second'),
       p: 0,
       i: 0,
       d: 0,
       error: new Temp(0, `delta_${temp}`),
-      integral: new Unit(0, `delta_${temp}/second`),
-      derivative: new Unit(0, `delta_${temp}*second`),
-      drivenOutputId: new Link(null, 'ActuatorAnalogInterface'),
+      integral: new Qty(0, `delta_${temp}*hour`),
+      derivative: new Qty(0, `delta_${temp}/minute`),
+      drivenOutputId: new Link(null, BlockIntfType.ActuatorAnalogInterface),
       integralReset: 0,
-      boilPointAdjust: new Unit(0, `delta_${temp}`),
+      boilPointAdjust: new Qty(0, `delta_${temp}`),
       boilMinOutput: 0,
       boilModeActive: false,
     };
@@ -42,73 +42,73 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge cooling compressor (beer constant)',
       generate: () => ({
-        kp: new Unit(-50, '1/degC'),
-        ti: new Unit(6, 'hour'),
-        td: new Unit(30, 'min'),
+        kp: new Qty(-50, '1/degC'),
+        ti: new Qty(6, 'hour'),
+        td: new Qty(30, 'min'),
       }),
     },
     {
       name: 'Fridge heating element (beer constant)',
       generate: () => ({
-        kp: new Unit(100, '1/degC'),
-        ti: new Unit(6, 'hour'),
-        td: new Unit(30, 'min'),
+        kp: new Qty(100, '1/degC'),
+        ti: new Qty(6, 'hour'),
+        td: new Qty(30, 'min'),
       }),
     },
     {
       name: 'Fridge cooling compressor (fridge constant)',
       generate: () => ({
-        kp: new Unit(-50, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(10, 'min'),
+        kp: new Qty(-50, '1/degC'),
+        ti: new Qty(2, 'hour'),
+        td: new Qty(10, 'min'),
       }),
     },
     {
       name: 'Fridge heating element (fridge constant)',
       generate: () => ({
-        kp: new Unit(20, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(10, 'min'),
+        kp: new Qty(20, '1/degC'),
+        ti: new Qty(2, 'hour'),
+        td: new Qty(10, 'min'),
       }),
     },
     {
       name: 'Kettle heating element',
       generate: () => ({
-        kp: new Unit(50, '1/degC'),
-        ti: new Unit(10, 'min'),
-        td: new Unit(0, 'min'),
+        kp: new Qty(50, '1/degC'),
+        ti: new Qty(10, 'min'),
+        td: new Qty(0, 'min'),
       }),
     },
     {
       name: 'HLT setpoint driver',
       generate: () => ({
-        kp: new Unit(1, '1/degC'),
-        ti: new Unit(10, 'min'),
-        td: new Unit(0, 'min'),
+        kp: new Qty(1, '1/degC'),
+        ti: new Qty(10, 'min'),
+        td: new Qty(0, 'min'),
       }),
     },
     {
       name: 'Fridge setpoint driver',
       generate: () => ({
-        kp: new Unit(5, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(0, 'min'),
+        kp: new Qty(5, '1/degC'),
+        ti: new Qty(2, 'hour'),
+        td: new Qty(0, 'min'),
       }),
     },
     {
       name: 'Glycol pump',
       generate: () => ({
-        kp: new Unit(-5, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(0, 'min'),
+        kp: new Qty(-5, '1/degC'),
+        ti: new Qty(2, 'hour'),
+        td: new Qty(0, 'min'),
       }),
     },
     {
       name: 'Heating pad',
       generate: () => ({
-        kp: new Unit(100, '1/degC'),
-        ti: new Unit(2, 'hour'),
-        td: new Unit(10, 'min'),
+        kp: new Qty(100, '1/degC'),
+        ti: new Qty(2, 'hour'),
+        td: new Qty(10, 'min'),
       }),
     },
   ],
@@ -117,21 +117,21 @@ const block: BlockSpec<PidBlock> = {
       key: 'kp',
       title: 'Kp',
       component: 'UnitValEdit',
-      generate: serviceId => new Unit(0, `1/${serviceTemp(serviceId)}`),
+      generate: serviceId => new Qty(0, `1/${serviceTemp(serviceId)}`),
     },
     {
       key: 'ti',
       title: 'Ti',
       component: 'TimeUnitValEdit',
-      generate: () => new Unit(0, 'second'),
-      pretty: unitDurationString,
+      generate: () => new Qty(0, 'second'),
+      pretty: qtyDurationString,
     },
     {
       key: 'td',
       title: 'Td',
       component: 'TimeUnitValEdit',
-      generate: () => new Unit(0, 'second'),
-      pretty: unitDurationString,
+      generate: () => new Qty(0, 'second'),
+      pretty: qtyDurationString,
     },
     {
       key: 'enabled',
@@ -143,13 +143,13 @@ const block: BlockSpec<PidBlock> = {
       key: 'inputId',
       title: 'Input',
       component: 'LinkValEdit',
-      generate: () => new Link(null, 'SetpointSensorPairInterface'),
+      generate: () => new Link(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'outputId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, 'ActuatorAnalogInterface'),
+      generate: () => new Link(null, BlockIntfType.ActuatorAnalogInterface),
     },
     {
       key: 'inputSetting',
@@ -176,18 +176,18 @@ const block: BlockSpec<PidBlock> = {
       graphed: true,
     },
     {
-      key: 'derivative',
-      title: 'Derivative of input',
+      key: 'integral',
+      title: 'Integral of error',
       component: 'UnitValEdit',
-      generate: serviceId => new Unit(20, `delta_${serviceTemp(serviceId)}*second`),
+      generate: serviceId => new Qty(1, `delta_${serviceTemp(serviceId)}*hour`),
       readonly: true,
       graphed: true,
     },
     {
-      key: 'integral',
-      title: 'Integral of error',
+      key: 'derivative',
+      title: 'Derivative of input',
       component: 'UnitValEdit',
-      generate: serviceId => new Unit(20, `delta_${serviceTemp(serviceId)}/second`),
+      generate: serviceId => new Qty(1, `delta_${serviceTemp(serviceId)}/minute`),
       readonly: true,
       graphed: true,
     },

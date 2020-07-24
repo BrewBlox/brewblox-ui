@@ -2,6 +2,7 @@ import { uid } from 'quasar';
 
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { Link, Qty, Temp, Time } from '@/plugins/spark/bloxfield';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
@@ -19,7 +20,6 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
-import { Link, Temp, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -104,13 +104,13 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         groups,
         data: {
           sensorId: new Link(names.hltSensor),
-          storedSetting: new Unit(70, 'degC'),
+          storedSetting: new Qty(70, 'degC'),
           settingEnabled: false,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: new Qty(null, 'degC'),
+          value: new Qty(null, 'degC'),
+          valueUnfiltered: new Qty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: new Qty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -121,13 +121,13 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         groups,
         data: {
           sensorId: new Link(names.mtSensor),
-          storedSetting: new Unit(67, 'degC'),
+          storedSetting: new Qty(67, 'degC'),
           settingEnabled: false,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: new Qty(null, 'degC'),
+          value: new Qty(null, 'degC'),
+          valueUnfiltered: new Qty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: new Qty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -138,13 +138,13 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         groups,
         data: {
           sensorId: new Link(names.bkSensor),
-          storedSetting: new Unit(70, 'degC'),
+          storedSetting: new Qty(70, 'degC'),
           settingEnabled: false,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: new Qty(null, 'degC'),
+          value: new Qty(null, 'degC'),
+          valueUnfiltered: new Qty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: new Qty(5, 'delta_degC'),
           resetFilter: false,
         },
       },

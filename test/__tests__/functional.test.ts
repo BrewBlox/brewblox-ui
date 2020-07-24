@@ -2,10 +2,10 @@ import {
   durationString,
   objectSorter,
   objectStringSorter,
+  qtyDurationString,
   uniqueFilter,
-  unitDurationString,
 } from '@/helpers/functional';
-import { Unit } from '@/plugins/spark/units';
+import { Qty } from '@/plugins/spark/bloxfield';
 
 describe('Array funcs', () => {
   it('should filter and sort arrays', () => {
@@ -43,15 +43,15 @@ describe('durationString', () => {
   });
 });
 
-describe('unitDurationString', () => {
+describe('qtyDurationString', () => {
   it('should parse Units', () => {
-    expect(unitDurationString(new Unit(10, 's'))).toEqual('10s');
-    expect(unitDurationString(new Unit(80, 'min'))).toEqual('1h 20m');
+    expect(qtyDurationString(new Qty(10, 's'))).toEqual('10s');
+    expect(qtyDurationString(new Qty(80, 'min'))).toEqual('1h 20m');
   });
 
   it('Should handle error cases', () => {
-    expect(unitDurationString(new Unit(10, 'meter'))).toEqual('10ms');
-    expect(unitDurationString(null)).toEqual('---');
-    expect(unitDurationString(new Unit(null, 's'))).toEqual('---');
+    expect(qtyDurationString(new Qty(10, 'meter'))).toEqual('10ms');
+    expect(qtyDurationString(null)).toEqual('---');
+    expect(qtyDurationString(new Qty(null, 's'))).toEqual('---');
   });
 });

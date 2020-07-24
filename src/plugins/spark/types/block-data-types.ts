@@ -1,6 +1,6 @@
 import { Enum } from 'typescript-string-enums';
 
-import { Link, Unit } from '../units';
+import { Link, Qty } from '../bloxfield';
 import { DigitalState, IoPin } from './block-shared';
 import { Block } from './block-types';
 import { AnalogConstraintsObj, DigitalConstraintsObj } from './constraint-types';
@@ -121,7 +121,7 @@ export interface ActuatorPwmBlock extends Block {
     setting: number;
     desiredSetting: number;
 
-    period: Unit;
+    period: Qty;
     value: number;
     enabled: boolean;
 
@@ -260,8 +260,8 @@ export interface MotorValveBlock extends Block {
 export interface MutexBlock extends Block {
   type: 'Mutex';
   data: {
-    differentActuatorWait: Unit;
-    waitRemaining: Unit;
+    differentActuatorWait: Qty;
+    waitRemaining: Qty;
   };
 }
 
@@ -282,30 +282,30 @@ export interface PidBlock extends Block {
     inputId: Link;
     outputId: Link;
 
-    inputValue: Unit;
-    inputSetting: Unit;
+    inputValue: Qty;
+    inputSetting: Qty;
     outputValue: number;
     outputSetting: number;
 
     enabled: boolean;
     active: boolean;
 
-    kp: Unit;
-    ti: Unit;
-    td: Unit;
+    kp: Qty;
+    ti: Qty;
+    td: Qty;
 
     p: number;
     i: number;
     d: number;
 
-    error: Unit;
-    integral: Unit;
-    derivative: Unit;
+    error: Qty;
+    integral: Qty;
+    derivative: Qty;
 
     drivenOutputId: Link;
     integralReset: number;
 
-    boilPointAdjust: Unit;
+    boilPointAdjust: Qty;
     boilMinOutput: number;
     boilModeActive: boolean;
   };
@@ -313,7 +313,7 @@ export interface PidBlock extends Block {
 
 export interface Setpoint {
   time: number;
-  temperature: Unit;
+  temperature: Qty;
 }
 
 export interface SetpointProfileBlock extends Block {
@@ -343,15 +343,15 @@ export interface SetpointSensorPairBlock extends Block {
   data: {
     sensorId: Link;
 
-    value: Unit;
-    valueUnfiltered: Unit;
+    value: Qty;
+    valueUnfiltered: Qty;
 
-    setting: Unit;
-    storedSetting: Unit;
+    setting: Qty;
+    storedSetting: Qty;
     settingEnabled: boolean;
 
     filter: FilterChoice;
-    filterThreshold: Unit;
+    filterThreshold: Qty;
     resetFilter: boolean;
   };
 }
@@ -407,16 +407,16 @@ export interface SysInfoBlock extends Block {
 }
 
 export interface Fluctuation {
-  amplitude: Unit; // DeltaTemp
-  period: Unit; // Time
+  amplitude: Qty; // DeltaTemp
+  period: Qty; // Time
 }
 
 export interface TempSensorMockBlock extends Block {
   type: 'TempSensorMock';
   data: {
-    value: Unit; // readonly Temp
+    value: Qty; // readonly Temp
     connected: boolean;
-    setting: Unit; // Temp
+    setting: Qty; // Temp
     fluctuations: Fluctuation[];
   };
 }
@@ -424,8 +424,8 @@ export interface TempSensorMockBlock extends Block {
 export interface TempSensorOneWireBlock extends Block {
   type: 'TempSensorOneWire';
   data: {
-    value: Unit;
-    offset: Unit;
+    value: Qty;
+    offset: Qty;
     address: string;
   };
 }

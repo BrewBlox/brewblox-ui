@@ -10,6 +10,10 @@ export interface JSBloxField extends JSONBloxField {
   toJSON(): JSONBloxField;
 }
 
+export function isAnyBloxField(obj: any): obj is JSBloxField {
+  return isObject(obj) && '__bloxtype' in obj;
+}
+
 export function isJSONBloxField(obj: any): obj is JSONBloxField {
   return isObject(obj) && '__bloxtype' in obj && !('toJSON' in obj);
 }

@@ -1,5 +1,5 @@
+import { Link, Qty } from '@/plugins/spark/bloxfield';
 import { deserialize, serialize } from '@/plugins/spark/parse-object';
-import { Link, Unit } from '@/plugins/spark/units';
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {
@@ -14,8 +14,8 @@ describe('deserialize', () => {
     const output = deserialize(input);
 
     expect(output.test).toBe('Do not touch');
-    expect(output.something).not.toBeInstanceOf(Unit);
-    expect(output.convert).toBeInstanceOf(Unit);
+    expect(output.something).not.toBeInstanceOf(Qty);
+    expect(output.convert).toBeInstanceOf(Qty);
     expect(output.normal[0]).toBe(21);
   });
 
@@ -33,8 +33,8 @@ describe('deserialize', () => {
     const output = deserialize(input);
 
     expect(output.data.test).toBe('Do not touch');
-    expect(output.data.convert).toBeInstanceOf(Unit);
-    expect(output.data.evenDeeper.convert).toBeInstanceOf(Unit);
+    expect(output.data.convert).toBeInstanceOf(Qty);
+    expect(output.data.evenDeeper.convert).toBeInstanceOf(Qty);
   });
 
   it('Should handle undefined and null properties', () => {
@@ -84,19 +84,19 @@ describe('deserialize', () => {
 describe('serialize', () => {
   it('Converts unit properties for API saving', () => {
     const input = {
-      temperature: new Unit(21, 'celsius'),
+      temperature: new Qty(21, 'celsius'),
       leaveThisBe: 666,
       normalArray: [22, 23, 24],
       emptyArray: [],
       deeper: {
-        temperatureInUSA: new Unit(60, 'fahrenheit'),
+        temperatureInUSA: new Qty(60, 'fahrenheit'),
         nullable: null,
       },
     };
 
     const output = {
       temperature: {
-        __bloxtype: 'Unit',
+        __bloxtype: 'Qty',
         value: 21,
         unit: 'celsius',
       },
@@ -105,7 +105,7 @@ describe('serialize', () => {
       emptyArray: [],
       deeper: {
         temperatureInUSA: {
-          __bloxtype: 'Unit',
+          __bloxtype: 'Qty',
           value: 60,
           unit: 'fahrenheit',
         },
@@ -120,7 +120,7 @@ describe('serialize', () => {
     const input = [
       20,
       {
-        test: new Unit(23, 'celsius'),
+        test: new Qty(23, 'celsius'),
       },
     ];
 
@@ -128,7 +128,7 @@ describe('serialize', () => {
       20,
       {
         test: {
-          __bloxtype: 'Unit',
+          __bloxtype: 'Qty',
           value: 23,
           unit: 'celsius',
         },

@@ -4,7 +4,7 @@ import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 import { colors } from 'quasar';
 
-import { Unit } from '../plugins/spark/units';
+import { Qty } from '../plugins/spark/bloxfield';
 
 type SortFunc = (a: any, b: any) => number
 
@@ -54,8 +54,8 @@ export const durationString =
     return strVal || '0s';
   };
 
-export const unitDurationString =
-  (value: Unit | null): string => {
+export const qtyDurationString =
+  (value: Qty | null): string => {
     if (value === null || value === undefined || value.value === null) {
       return '---';
     }
@@ -185,7 +185,7 @@ export const contrastColor =
   };
 
 export const suggestId =
-  (id: string, validate: (val: string) => boolean, ): string => {
+  (id: string, validate: (val: string) => boolean,): string => {
     if (validate(id)) {
       return id;
     }

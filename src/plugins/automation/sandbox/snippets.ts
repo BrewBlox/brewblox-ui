@@ -1,7 +1,7 @@
 import { createDialog } from '@/helpers/dialog';
+import { isLink, isQuantity } from '@/plugins/spark/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
-import { isJSBloxField } from '@/plugins/spark/units';
 
 export type SnippetMode = 'append' | 'insert';
 export type SnippetCallback = (mode: SnippetMode, lines: string[]) => unknown;
@@ -29,8 +29,13 @@ const valueHint = (addr: BlockFieldAddress): string => {
 
   // Infer hint based on value
   const value = generate(addr.serviceId);
-  if (isJSBloxField(value)) {
-    return comment(value.constructor.name);
+
+  // Check for typed fields
+  if (isQuantity(value)) {
+    return comment(value.unit);
+  }
+  if (isLink(value)) {
+    return comment(value.type);
   }
 
   // Infer hint based on typeof value

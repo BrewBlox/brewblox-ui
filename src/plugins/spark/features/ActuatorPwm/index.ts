@@ -1,8 +1,8 @@
-import { unitDurationString } from '@/helpers/functional';
+import { qtyDurationString } from '@/helpers/functional';
+import { Link, Qty, Time } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { ActuatorPwmBlock, AnalogConstraintsObj, BlockIntfType, BlockSpec } from '@/plugins/spark/types';
-import { Link, Time, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorPwmWidget.vue';
@@ -14,7 +14,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
   generate: () => ({
     actuatorId: new Link(null, BlockIntfType.ActuatorDigitalInterface),
     drivenActuatorId: new Link(null, BlockIntfType.ActuatorDigitalInterface, true),
-    period: new Unit(4, 'second'),
+    period: new Qty(4, 'second'),
     desiredSetting: 0,
     setting: 0,
     value: 0,
@@ -25,13 +25,13 @@ const block: BlockSpec<ActuatorPwmBlock> = {
     {
       name: 'Heater - 4s period',
       generate: () => ({
-        period: new Unit(4, 'second'),
+        period: new Qty(4, 'second'),
       }),
     },
     {
       name: 'Fridge - 30m period',
       generate: () => ({
-        period: new Unit(1800, 'second'),
+        period: new Qty(1800, 'second'),
       }),
     },
   ],
@@ -47,8 +47,8 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       key: 'period',
       title: 'Period',
       component: 'TimeUnitValEdit',
-      generate: () => new Time(4, 's'),
-      pretty: unitDurationString,
+      generate: () => new Time(4, 'second'),
+      pretty: qtyDurationString,
     },
     {
       key: 'enabled',

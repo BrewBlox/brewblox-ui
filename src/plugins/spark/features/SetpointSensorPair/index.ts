@@ -1,7 +1,7 @@
+import { Link, Temp } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
 import { BlockSpec, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
-import { Link, Temp } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './SetpointSensorPairWidget.vue';

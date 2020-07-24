@@ -100,10 +100,10 @@ export default class PidBasic
           <q-icon name="mdi-thermometer" color="green-3" />
         </template>
         <template #value>
-          {{ block.data.inputValue | unit }}
+          {{ block.data.inputValue | qty }}
         </template>
         <template #setting>
-          {{ block.data.inputSetting | unit }}
+          {{ block.data.inputSetting | qty }}
         </template>
       </SettingValueField>
       <SettingValueField editable class="col-grow" @click="showOutput">

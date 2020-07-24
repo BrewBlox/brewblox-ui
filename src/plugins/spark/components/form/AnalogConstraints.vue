@@ -3,9 +3,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { Link } from '@/plugins/spark/bloxfield';
 import { analogConstraintLabels } from '@/plugins/spark/getters';
 import type { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 
 interface Wrapped {
   type: AnalogConstraintKey;

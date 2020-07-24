@@ -1,7 +1,7 @@
+import { Link } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, enumHint } from '@/plugins/spark/helpers';
 import { ActuatorLogicBlock, BlockIntfType, BlockSpec, LogicResult } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorLogicWidget.vue';

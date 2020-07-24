@@ -1,5 +1,5 @@
 import { capitalized } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/units';
+import { Link } from '@/plugins/spark/bloxfield';
 import { ServiceStatus } from '@/store/services';
 
 import { constraintLabels } from '../getters';

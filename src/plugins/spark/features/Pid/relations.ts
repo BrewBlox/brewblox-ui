@@ -1,7 +1,7 @@
 import { createDialog } from '@/helpers/dialog';
+import { Link } from '@/plugins/spark/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import { PidBlock, RelationEdge, RelationNode } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 import { featureStore } from '@/store/features';
 
 function findLinks(serviceId: string, id: string | null): RelationEdge[] {
