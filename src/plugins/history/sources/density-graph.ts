@@ -20,10 +20,11 @@ interface ProcessParams {
   rnb: number;
   rnt: number;
   ds: number;
-  p0: number;
+  ds2: number;
 }
 
 interface SharedParams {
+  heightLowest: number;
   heightDiff: number; // mm between sensors
   countsPerMillivolt: number;
   countsPerMillivoltDiff: number;
@@ -57,33 +58,25 @@ interface SensorMeasurement {
   signal: number[];
 }
 
+interface Correction {
+  offset: number[];
+  gain: number[];
+}
+
 interface ProcessedData {
   time: number[];
-  rawA1: number[];
-  rawA2: number[];
-  A1: number[];
-  A2: number[];
-  pBaro: number[];
-  tempBaro: number[];
-
-  temp1: number[];
-
-  temp2: number[];
-  'pressure1[mBar]': number[];
-  'pressure2[mBar]': number[];
-  'pressure1[mmH20]': number[];
-  'pressure2[mmH20]': number[];
-  'pressureDiff[mBar]': number[];
-  'pressureDiff[mmH20]': number[];
-  density: number[];
-  mmLiquid1: number[];
-  mmLiquid2: number[];
+  'Barometric pressure [mbar]': number[];
+  'Pressure 1 [mmH20]': number[];
+  'Pressure 2 [mmH20]': number[];
+  'Density [kg/L]': (number | null)[];
+  'Volume [L]': number[];
+  'Weight [kg]': number[];
 }
 
 const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
 
 const boundedConcat =
-  (left: number[] = [], right: number[] = [], maxLength: number = MAX_POINTS): number[] => {
+  (left: (number | null)[] = [], right: (number | null)[] = [], maxLength: number = MAX_POINTS): (number | null)[] => {
     const sliced = Math.max((left.length + right.length) - maxLength, 0);
     if (sliced > left.length) {
       return right.slice(sliced - left.length);
@@ -96,13 +89,6 @@ const boundedConcat =
     return [...left, ...right];
   };
 
-const valueName =
-  (source: GraphSource, key: string): string => {
-    const label = source.renames[key] || key;
-    return source.axes[key] === 'y2'
-      ? `<span style="color: #aef">${label}</span>`
-      : `<span>${label}</span>`;
-  };
 
 const densityTarget: QueryTarget = {
   measurement: 'vasi-raw',
@@ -140,27 +126,28 @@ const densityTarget: QueryTarget = {
 
 
 const params1: ProcessParams = {
-  s0: 0.04101136,
-  rpb: 3987.08527,
-  rpt: 3993.25993,
-  rnb: 3993.25993,
-  rnt: 3987.08528,
-  ds: -9.5654e-4,
-  p0: 30.1552305,
+  s0: 0.043024377643356655,
+  ds: 2.075390139308336e-05,
+  rpt: 1.0013830507520656,
+  rnt: 1.0010236648263195,
+  rpb: 0.9986169492479344,
+  rnb: 0.9989763351736805,
+  ds2: -9.553453229527372e-07,
 };
 
 const params2: ProcessParams = {
-  s0: 0.04111799,
-  rpb: 3978.78268,
-  rpt: 3984.15243,
-  rnb: 3984.15243,
-  rnt: 3978.78268,
-  ds: -9.5898e-04,
-  p0: 26.8317991,
+  s0: 0.04301445082035823,
+  ds: 0.00045906562172523204,
+  rpt: 1.0012285643740704,
+  rnb: 0.9990673548797273,
+  rnt: 1.0009326451202727,
+  rpb: 0.9987714356259296,
+  ds2: -2.8441926138146005e-06,
 };
 
 const sharedParams: SharedParams = {
-  heightDiff: 292,
+  heightLowest: 100.0,
+  heightDiff: 287.0,
   countsPerMillivolt: 2 ** 23 / 1350,
   countsPerMillivoltDiff: 32 * 2 ** 23 / 1350,
   calibrationDensity: 998.2,
@@ -178,31 +165,15 @@ const calcTemp = (raw: number[]): number[] => {
 
 const par = (R1: number, R2: number): number => R1 * R2 / (R1 + R2);
 
-const calcOffset = (params: ProcessParams, measured: SensorMeasurement): number[] => {
-  const vp = zip(measured.vpb, measured.vpt).map(([a, b]) => a + b);
-  const vn = zip(measured.vnb, measured.vnt).map(([a, b]) => a + b);
-  const vb = zip(measured.vpb, measured.vnb).map(([a, b]) => (a + b) / 2);
-  const vt = zip(measured.vpt, measured.vnt).map(([a, b]) => (a + b) / 2);
-  const v = zip(vp, vn).map(([a, b]) => (a + b) / 2);
+const calcCorrections = (params: ProcessParams, measured: SensorMeasurement): Correction => {
+  const v = zip(measured.vpb, measured.vpt, measured.vnb, measured.vnt).map(([a, b, c, d]) => (a! + b! + c! + d!) / 2);
 
-  const v0 = 0.25 * par(params.rpb + params.rpt, params.rnb + params.rnt);
-  const gainb = vb.map(vb_ => params.s0 * (1 + params.ds * (vb_ - v0)) / 1000);
-  const gaint = vt.map(vt_ => params.s0 * (1 + params.ds * (vt_ - v0)) / 1000);
+  const v0 = 2000;
+  const sensitivity = v.map(v => params.s0 * (1 + params.ds * (v - v0) + + params.ds2 * (v - v0) ** 2));
+  const offset = v.map(v => v * (params.rpb / (params.rpb + params.rpt) - params.rnb / (params.rnb + params.rnt)));
+  const gain = zip(sensitivity, v).map(([s, v]) => (s!));
 
-  const calcR = (v: number[], gain: number[], r0: number): number[] => zip(v, gain).map(([v, gain]) =>
-    v / v0 * r0 * (1 + gain / 2 * params.p0));
-
-  const rpb = calcR(vb, gainb, params.rpb);
-  const rnb = calcR(vb, gainb, params.rnb);
-  const rpt = calcR(vt, gaint, params.rpt);
-  const rnt = calcR(vt, gaint, params.rnt);
-
-  const i_p = zip(v, rpb, rpt).map(([v, p, t]) => v / (p + t));
-  const i_n = zip(v, rnb, rnt).map(([v, p, t]) => v / (p + t));
-
-  return zip(i_p, i_n, rpb, rpt, rnb, rnt).map(([i_p, i_n, rpb, rpt, rnb, rnt]) =>
-    (i_p * rpb - i_n * rnb + i_n * rnt - i_p * rpt) / 2);
-
+  return { offset, gain };
 };
 
 const processRawA1 = (raw: RawData): SensorMeasurement =>
@@ -224,9 +195,6 @@ const processRawA2 = (raw: RawData): SensorMeasurement =>
   });
 
 
-const calcPressure = (params: ProcessParams, signal: number[]): number[] =>
-  signal.map(v => v / params.s0);
-
 const transformer =
   (source: GraphSource, result: QueryResult): GraphSource => {
     if (!result.values || result.values.length === 0) {
@@ -240,48 +208,36 @@ const transformer =
 
     const measured1 = processRawA1(raw);
     const measured2 = processRawA2(raw);
-    const rawA1 = measured1.signal;
-    const rawA2 = measured2.signal;
-    const offset1 = calcOffset(params1, measured1);
-    const offset2 = calcOffset(params2, measured2);
-    const A1 = offset1; //  zip(rawA1, offset1).map(([v, o]) => v - o);
-    const A2 = zip(rawA2, offset2).map(([v, o]) => v - o);
+    const corr1 = calcCorrections(params1, measured1);
+    const corr2 = calcCorrections(params2, measured2);
+    const pressure1mBar = zip(measured1.signal, corr1.offset, corr1.gain).map(([v, o, g]) => ((v! - o!) / g!));
+    const pressure2mBar = zip(measured2.signal, corr2.offset, corr2.gain).map(([v, o, g]) => ((v! - o!) / g!));
     const pBaro = raw.baro.map(v => v / 100);
-    const temp1 = calcTemp(raw.temp1);
-    const temp2 = calcTemp(raw.temp2);
-    const tempBaro = raw.temp.map(v => v / 10);
-    const pressure1mBar = calcPressure(params1, A1);
-    const pressure2mBar = calcPressure(params2, A2);
-    const pressure1mmH20 = pressure1mBar.map(v => v / sharedParams.barPerMeter);
-    const pressure2mmH20 = pressure2mBar.map(v => v / sharedParams.barPerMeter);
-    const pressureDiffmBar = zip(pressure1mBar, pressure2mBar).map(([v1, v2]) => v1! - v2!);
+    // const tempBaro = raw.temp.map(v => v / 10);
+    const pressure1mmH20 = pressure1mBar.map(v => v! / sharedParams.barPerMeter);
+    const pressure2mmH20 = pressure2mBar.map(v => v! / sharedParams.barPerMeter);
+    // const pressureDiffmBar = zip(pressure1mBar, pressure2mBar).map(([v1, v2]) => v1! - v2!);
     const pressureDiffmmH20 = zip(pressure1mmH20, pressure2mmH20).map(([v1, v2]) => v1! - v2!);
-    const density = pressureDiffmmH20.map(v => v / sharedParams.heightDiff);
-    const mmLiquid1 = zip(pressure1mmH20, density).map(([p, d]) => p! / d!);
-    const mmLiquid2 = zip(pressure2mmH20, density).map(([p, d]) => p! / d!);
+    const density = pressureDiffmmH20.map((v) => {
+      const d = v / sharedParams.heightDiff;
+      return (d > 0.5 && d < 1.5) ? d : null;
+    }); // assume 20C
+    const mmLiquid1 = zip(pressure1mmH20, density).map(([p, d]) => d ? p! / d : p);
+    // const mmLiquid2 = zip(pressure2mmH20, density).map(([p, d]) => d ? p! / d : p);
+    const volume = mmLiquid1.map((v => (sharedParams.heightLowest + v!) / 100 * 3.15 ** 2 * Math.PI));
+    const weight = zip(volume, density).map(([v, d]) => v! * d!);
 
     const processed: ProcessedData = {
       time: raw.time,
-      A1: offset1,
-      A2: offset2,
-      rawA1,
-      rawA2,
-      pBaro,
-      temp1,
-      temp2,
-      tempBaro,
-      'pressure1[mBar]': pressure1mBar,
-      'pressure2[mBar]': pressure2mBar,
-      'pressure1[mmH20]': pressure1mmH20,
-      'pressure2[mmH20]': pressure2mmH20,
-      'pressureDiff[mBar]': pressureDiffmBar,
-      'pressureDiff[mmH20]': pressureDiffmmH20,
-      density,
-      mmLiquid1,
-      mmLiquid2,
+      'Density [kg/L]': density,
+      'Volume [L]': volume,
+      'Weight [kg]': weight,
+      'Pressure 1 [mmH20]': pressure1mmH20,
+      'Pressure 2 [mmH20]': pressure2mmH20,
+      'Barometric pressure [mbar]': pBaro,
     };
 
-    forEach(processed, (newValues: number[], colKey: string) => {
+    forEach(processed, (newValues: (number | null)[], colKey: string) => {
       if (colKey === 'time') {
         return;
       }
@@ -290,8 +246,12 @@ const transformer =
       source.values[key] = {
         type: 'scatter',
         ...existing,
-        name: colKey, //valueName(source, key),
-        yaxis: colKey.startsWith('br') ? 'y2' : 'y', // rough approach
+        yaxis: colKey.startsWith('Density') ? 'y2' : 'y',
+        name: colKey.startsWith('Density')
+          ? `<span style="color: #aef">${colKey}</span>`
+          : `<span>${colKey}</span>`,
+
+        visible: colKey.startsWith('Density') ? true : 'legendonly',
         line: {},
         x: boundedConcat(existing.x, processed.time),
         y: boundedConcat(existing.y, newValues),
