@@ -1,4 +1,3 @@
-import isObject from 'lodash/isObject';
 import round from 'lodash/round';
 import { Enum } from 'typescript-string-enums';
 
@@ -17,17 +16,19 @@ export const prettify = (unitName: string): string =>
     .replace(/ ?\/ ?/gi, '/')  // degC / hour
     .replace(/ ?\* ?/gi, '·');  // degC * hour
 
-export function isJSONQty(obj: any): obj is JSONQuantity {
-  return isObject(obj)
-    && (obj as JSONQuantity).__bloxtype === 'Quantity'
-    && !('toJSON' in obj);
-}
+export const isJSONQuantity =
+  (obj: any): obj is JSONQuantity =>
+    obj != null
+    && typeof obj === 'object'
+    && obj.__bloxtype === 'Quantity'
+    && typeof obj.toJSON === 'undefined';
 
-export function isQuantity(obj: any): obj is Quantity {
-  return isObject(obj)
-    && (obj as Quantity).__bloxtype === 'Quantity'
-    && 'toJSON' in obj;
-}
+export const isQuantity =
+  (obj: any): obj is Quantity =>
+    obj != null
+    && typeof obj === 'object'
+    && obj.__bloxtype === 'Quantity'
+    && typeof obj.toJSON === 'function';
 
 export class Quantity implements JSBloxField, JSONQuantity {
   public readonly __bloxtype = 'Quantity';
@@ -38,7 +39,7 @@ export class Quantity implements JSBloxField, JSONQuantity {
   public constructor(raw: JSONQuantity);
   public constructor(value: number | null, unit: string);
   public constructor(value: JSONQuantity | number | null, unit: string = '') {
-    if (isJSONQty(value)) {
+    if (isJSONQuantity(value)) {
       this._val = value.value ?? null;
       this._unit = value.unit ?? '';
     }
@@ -143,7 +144,7 @@ export class Temp extends Quantity {
   public constructor(value: number | null, unit: string);
 
   public constructor(value: number | JSONQuantity | null, unit: string = 'degC') {
-    if (isJSONQty(value)) {
+    if (isJSONQuantity(value)) {
       if (!isTempUnit(value.unit)) {
         throw new Error(`${value} is not a temperature unit`);
       }

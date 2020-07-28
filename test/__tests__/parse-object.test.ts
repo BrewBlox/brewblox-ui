@@ -1,5 +1,28 @@
-import { Link, Qty } from '@/plugins/spark/bloxfield';
+import { isJSONQuantity, isQuantity, Link, Qty } from '@/plugins/spark/bloxfield';
 import { deserialize, serialize } from '@/plugins/spark/parse-object';
+import { JSONQuantity } from '@/plugins/spark/types';
+
+const wrap = (value: number, unit: string): JSONQuantity => ({
+  __bloxtype: 'Quantity',
+  value,
+  unit,
+});
+
+describe('Type checking', () => {
+  it('Should recognize JSONQuantity', () => {
+    expect(isJSONQuantity(null)).toBe(false);
+    expect(isJSONQuantity(10)).toBe(false);
+    expect(isJSONQuantity(wrap(10, 'degC'))).toBe(true);
+    expect(isJSONQuantity(new Qty(10, 'degC'))).toBe(false);
+  });
+
+  it('Should recognize Quantity', () => {
+    expect(isQuantity(null)).toBe(false);
+    expect(isQuantity(10)).toBe(false);
+    expect(isQuantity(wrap(10, 'degC'))).toBe(false);
+    expect(isQuantity(new Qty(10, 'degC'))).toBe(true);
+  });
+});
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {
