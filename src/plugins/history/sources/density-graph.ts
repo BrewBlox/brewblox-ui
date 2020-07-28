@@ -248,8 +248,8 @@ const transformer =
         ...existing,
         yaxis: colKey.startsWith('Density') ? 'y2' : 'y',
         name: colKey.startsWith('Density')
-          ? `<span style="color: #aef">${colKey}</span>`
-          : `<span>${colKey}</span>`,
+          ? `<span style="color: #aef">${colKey}<br>${newValues[newValues.length - 1]!.toFixed(4)}</span>`
+          : `<span>${colKey}<br>${newValues[newValues.length - 1]!.toFixed(2)}</span>`,
 
         visible: colKey.startsWith('Density') ? true : 'legendonly',
         line: {},
