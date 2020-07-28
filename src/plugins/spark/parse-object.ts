@@ -8,7 +8,7 @@ import { mapEntries } from '@/helpers/functional';
 import {
   isJSBloxField,
   isJSONLink,
-  isJSONQty,
+  isJSONQuantity,
   JSBloxField,
   Link,
   Qty,
@@ -78,7 +78,7 @@ export function deserialize(obj: any): typeof obj {
   if (isJSONLink(obj)) {
     return new Link(obj);
   }
-  if (isJSONQty(obj)) {
+  if (isJSONQuantity(obj)) {
     return new Qty(obj);
   }
   if (isObject(obj)) {
