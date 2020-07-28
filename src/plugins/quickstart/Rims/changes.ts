@@ -2,6 +2,7 @@ import { uid } from 'quasar';
 
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { Link, Qty, Time } from '@/plugins/spark/bloxfield';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
@@ -16,7 +17,6 @@ import {
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { Link, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -53,13 +53,13 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         groups,
         data: {
           sensorId: new Link(names.kettleSensor),
-          storedSetting: new Unit(67.7, 'degC'),
+          storedSetting: new Qty(67.7, 'degC'),
           settingEnabled: false,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: new Qty(null, 'degC'),
+          value: new Qty(null, 'degC'),
+          valueUnfiltered: new Qty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: new Qty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -70,13 +70,13 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         groups,
         data: {
           sensorId: new Link(names.tubeSensor),
-          storedSetting: new Unit(67.7, 'degC'),
+          storedSetting: new Qty(67.7, 'degC'),
           settingEnabled: true,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: new Qty(null, 'degC'),
+          value: new Qty(null, 'degC'),
+          valueUnfiltered: new Qty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: new Qty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -159,7 +159,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: new Unit(10, '1/degC'),
+          kp: new Qty(10, '1/degC'),
           ti: new Time(5, 'min'),
           td: new Time(30, 's'),
           enabled: true,
@@ -174,7 +174,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: new Unit(30, '1/degC'),
+          kp: new Qty(30, '1/degC'),
           ti: new Time(2, 'min'),
           td: new Time(10, 's'),
           enabled: true,

@@ -4,13 +4,13 @@ import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
-import { durationMs, unitDurationString } from '@/helpers/functional';
+import { durationMs, qtyDurationString } from '@/helpers/functional';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { Qty } from '@/plugins/spark/bloxfield';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { ActuatorOffsetBlock, Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
-import { Unit } from '@/plugins/spark/units';
 import { featureStore } from '@/store/features';
 
 interface BlockDisplay {
@@ -66,10 +66,10 @@ export default class PidShareDialog extends DialogBase {
       component: 'TimeUnitDialog',
       parent: this,
       title: 'Custom graph duration',
-      value: new Unit(durationMs(current), 'ms'),
+      value: new Qty(durationMs(current), 'ms'),
       label: 'Duration',
     })
-      .onOk(unit => this.applyParams({ duration: unitDurationString(unit) }));
+      .onOk(unit => this.applyParams({ duration: qtyDurationString(unit) }));
   }
 
   name(block: Block | null): string {

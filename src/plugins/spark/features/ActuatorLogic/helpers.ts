@@ -1,6 +1,6 @@
+import { Temp } from '@/plugins/spark/bloxfield';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { ActuatorLogicBlock, AnalogCompare, DigitalCompare, ExpressionError } from '@/plugins/spark/types';
-import { Temp } from '@/plugins/spark/units';
 
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './getters';
 

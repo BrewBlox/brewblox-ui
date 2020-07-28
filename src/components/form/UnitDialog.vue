@@ -3,14 +3,14 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { roundNumber } from '@/helpers/functional';
-import { Unit } from '@/plugins/spark/units';
+import { Qty } from '@/plugins/spark/bloxfield';
 
 @Component
 export default class UnitDialog extends DialogBase {
   local: number | null = null;
 
-  @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
-  public readonly value!: Unit;
+  @Prop({ type: Object, required: true, validator: v => v instanceof Qty })
+  public readonly value!: Qty;
 
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;

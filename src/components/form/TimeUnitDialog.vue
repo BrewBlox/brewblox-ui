@@ -3,15 +3,15 @@ import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { durationMs, durationString, ruleValidator, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/plugins/spark/units';
+import { durationMs, durationString, qtyDurationString, ruleValidator } from '@/helpers/functional';
+import { Qty } from '@/plugins/spark/bloxfield';
 
 @Component
 export default class TimeUnitDialog extends DialogBase {
   local: string | null = null;
 
-  @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
-  public readonly value!: Unit;
+  @Prop({ type: Object, required: true, validator: v => v instanceof Qty })
+  public readonly value!: Qty;
 
   @Prop({ type: String, default: 'Value' })
   public readonly label!: string;
@@ -20,7 +20,7 @@ export default class TimeUnitDialog extends DialogBase {
   public readonly rules!: InputRule[];
 
   created(): void {
-    this.local = unitDurationString(this.value);
+    this.local = qtyDurationString(this.value);
   }
 
   findUnit(s: string): string {
@@ -32,7 +32,7 @@ export default class TimeUnitDialog extends DialogBase {
 
   get defaultUnit(): string {
     return !this.findUnit(this.local || '')
-      ? this.findUnit(unitDurationString(this.value))
+      ? this.findUnit(qtyDurationString(this.value))
       : '';
   }
 
@@ -60,7 +60,7 @@ export default class TimeUnitDialog extends DialogBase {
 
   save(): void {
     if (!this.valueOk) { return; }
-    const val = new Unit(this.localNumber, 'ms');
+    const val = new Qty(this.localNumber, 'ms');
     this.onDialogOk(val);
   }
 }

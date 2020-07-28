@@ -2,9 +2,9 @@
 import { Component } from 'vue-property-decorator';
 
 import { createBlockDialog } from '@/helpers/dialog';
+import { Qty } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
-import { Unit } from '@/plugins/spark/units';
 
 interface GridOpts {
   start?: number;
@@ -43,10 +43,10 @@ export default class PidFull
       : 0;
   }
 
-  get waterBoilTemp(): Unit {
+  get waterBoilTemp(): Qty {
     return this.block.data.boilPointAdjust.unit === 'delta_degF'
-      ? new Unit(212, 'degF')
-      : new Unit(100, 'degC');
+      ? new Qty(212, 'degF')
+      : new Qty(100, 'degC');
   }
 
   showInput(): void {
@@ -201,7 +201,7 @@ export default class PidFull
     <div class="widget-body items-center grid-container">
       <div class="span-2">
         <LabeledField label="Error">
-          {{ block.data.error | unit }}
+          {{ block.data.error | qty }}
         </LabeledField>
       </div>
 
@@ -242,7 +242,7 @@ export default class PidFull
 
       <div class="span-2">
         <LabeledField label="Integral">
-          {{ block.data.integral | unit }}
+          {{ block.data.integral | qty }}
         </LabeledField>
       </div>
 
@@ -318,7 +318,7 @@ export default class PidFull
 
       <div class="span-2">
         <LabeledField :tag-class="{darkish: block.data.td.value === 0}" label="Derivative">
-          {{ block.data.derivative | unit }}
+          {{ block.data.derivative | qty }}
         </LabeledField>
       </div>
 

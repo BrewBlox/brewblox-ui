@@ -1,12 +1,12 @@
+import { Link, Qty } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec, DigitalActuatorBlock, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
-import { Link, Unit } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DigitalActuatorWidget.vue';
 
-const seconds = (v = 0): Unit => new Unit(v, 'seconds');
+const seconds = (v = 0): Qty => new Qty(v, 'seconds');
 const typeName = 'DigitalActuator';
 
 const block: BlockSpec<DigitalActuatorBlock> = {

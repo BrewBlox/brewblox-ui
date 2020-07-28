@@ -1,4 +1,4 @@
-import { Unit } from '@/plugins/spark/units';
+import { Qty } from '@/plugins/spark/bloxfield';
 
 import { PinChannel, QuickStartOutput } from '../types';
 
@@ -41,6 +41,6 @@ export interface GlycolConfig extends QuickStartOutput {
 }
 
 export interface GlycolOpts {
-  beerSetting: Unit;
-  glycolSetting: Unit;
+  beerSetting: Qty;
+  glycolSetting: Qty;
 }

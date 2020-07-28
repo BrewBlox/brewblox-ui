@@ -1,3 +1,4 @@
+import { Link } from '@/plugins/spark/bloxfield';
 import {
   ActuatorLogicBlock,
   AnalogCompareOp,
@@ -6,7 +7,6 @@ import {
   LogicResult,
 } from '@/plugins/spark/types';
 import { AnalogCompare, DigitalCompare } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 
 import { comparisonCheck, sanitize, shiftRemainingComparisons, syntaxCheck } from '../helpers';
 

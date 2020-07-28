@@ -2,8 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { Qty, Temp } from '@/plugins/spark/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
-import { Temp, Unit } from '@/plugins/spark/units';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';
@@ -40,26 +40,26 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
     return sparkStore.moduleById(this.config.serviceId)!.units.Temp;
   }
 
-  get hltKp(): Unit {
-    return new Unit(100 / (this.hltFullPowerDelta.value || 2), `1/${this.userTemp}`);
+  get hltKp(): Qty {
+    return new Qty(100 / (this.hltFullPowerDelta.value || 2), `1/${this.userTemp}`);
   }
 
-  get bkKp(): Unit {
-    return new Unit(100 / (this.bkFullPowerDelta.value || 2), `1/${this.userTemp}`);
+  get bkKp(): Qty {
+    return new Qty(100 / (this.bkFullPowerDelta.value || 2), `1/${this.userTemp}`);
   }
 
-  get mtKp(): Unit {
-    return new Unit(this.mashVolume / (this.hltVolume || 1), `1/${this.userTemp}`);
+  get mtKp(): Qty {
+    return new Qty(this.mashVolume / (this.hltVolume || 1), `1/${this.userTemp}`);
   }
 
-  get hltSetting(): Unit {
+  get hltSetting(): Qty {
     if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.driverMax.value) {
       const upperLimit = this.mashTarget.value + this.driverMax.value;
       const setting = this.mashTarget.value + (this.mashTarget.value - this.mashActual.value) * this.mtKp.value;
 
-      return new Unit(Math.min(upperLimit, setting), this.userTemp);
+      return new Qty(Math.min(upperLimit, setting), this.userTemp);
     }
-    return new Unit(null, this.userTemp);
+    return new Qty(null, this.userTemp);
   }
 
   editHLTDelta(): void {

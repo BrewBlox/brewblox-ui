@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { Link } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isCompatible } from '@/plugins/spark/helpers';
 import {
@@ -16,7 +17,6 @@ import {
   ExpressionError,
   LogicResult,
 } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';

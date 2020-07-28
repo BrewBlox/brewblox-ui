@@ -3,14 +3,14 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
-import { prettify, Unit } from '@/plugins/spark/units';
+import { prettify, Qty } from '@/plugins/spark/bloxfield';
 
 @Component
 export default class InlineUnitField extends FieldBase {
   prettify = prettify;
 
-  @Prop({ type: Object, required: true, validator: v => v instanceof Unit })
-  public readonly value!: Unit;
+  @Prop({ type: Object, required: true, validator: v => v instanceof Qty })
+  public readonly value!: Qty;
 
   @Prop({ type: String, required: false })
   public readonly label!: string;
@@ -22,7 +22,7 @@ export default class InlineUnitField extends FieldBase {
   public readonly unitTag!: string;
 
   @Emit('input')
-  public change(v: Unit): Unit {
+  public change(v: Qty): Qty {
     return v;
   }
 
@@ -50,6 +50,6 @@ export default class InlineUnitField extends FieldBase {
     style="line-height: 200%"
     @click="openDialog"
   >
-    {{ value | unit }}
+    {{ value | qty }}
   </span>
 </template>

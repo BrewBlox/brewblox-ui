@@ -1,7 +1,7 @@
+import { Temp } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
 import { BlockSpec, TempSensorOneWireBlock } from '@/plugins/spark/types';
-import { Temp } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './TempSensorOneWireWidget.vue';

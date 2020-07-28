@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { durationMs } from '@/helpers/functional';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { Link, Qty, Time } from '@/plugins/spark/bloxfield';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
@@ -18,7 +19,6 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { Block } from '@/plugins/spark/types';
-import { Link, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -29,27 +29,27 @@ import { FermentConfig, FermentOpts } from './types';
 type PidData = PidBlock['data'];
 
 const beerCoolConfig: Partial<PidData> = {
-  kp: new Unit(-50, '1/degC'),
-  ti: new Unit(6, 'hour'),
-  td: new Unit(30, 'min'),
+  kp: new Qty(-50, '1/degC'),
+  ti: new Qty(6, 'hour'),
+  td: new Qty(30, 'min'),
 };
 
 const fridgeCoolConfig: Partial<PidData> = {
-  kp: new Unit(-20, '1/degC'),
-  ti: new Unit(2, 'hour'),
-  td: new Unit(10, 'min'),
+  kp: new Qty(-20, '1/degC'),
+  ti: new Qty(2, 'hour'),
+  td: new Qty(10, 'min'),
 };
 
 const beerHeatConfig: Partial<PidData> = {
-  kp: new Unit(100, '1/degC'),
-  ti: new Unit(6, 'hour'),
-  td: new Unit(30, 'min'),
+  kp: new Qty(100, '1/degC'),
+  ti: new Qty(6, 'hour'),
+  td: new Qty(30, 'min'),
 };
 
 const fridgeHeatConfig: Partial<PidData> = {
-  kp: new Unit(20, '1/degC'),
-  ti: new Unit(2, 'hour'),
-  td: new Unit(10, 'min'),
+  kp: new Qty(20, '1/degC'),
+  ti: new Qty(2, 'hour'),
+  td: new Qty(10, 'min'),
 };
 
 export const defineChangedBlocks = (config: FermentConfig): Block[] => {
@@ -94,11 +94,11 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           sensorId: new Link(names.fridgeSensor),
           storedSetting: fridgeSetting,
           settingEnabled: activeSetpoint === 'fridge',
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: new Qty(null, 'degC'),
+          value: new Qty(null, 'degC'),
+          valueUnfiltered: new Qty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: new Qty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -111,11 +111,11 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           sensorId: new Link(names.beerSensor),
           storedSetting: beerSetting,
           settingEnabled: activeSetpoint === 'beer',
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: new Qty(null, 'degC'),
+          value: new Qty(null, 'degC'),
+          valueUnfiltered: new Qty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: new Qty(5, 'delta_degC'),
           resetFilter: false,
         },
       },

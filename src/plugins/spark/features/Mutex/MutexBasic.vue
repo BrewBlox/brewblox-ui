@@ -1,13 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { Qty } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { MutexBlock, MutexedConstraint } from '@/plugins/spark/types';
-import { Unit } from '@/plugins/spark/units';
 
 interface MutexClient {
   id: string;
-  remaining: Unit;
+  remaining: Qty;
   limited: boolean;
   hasLock: boolean;
 }

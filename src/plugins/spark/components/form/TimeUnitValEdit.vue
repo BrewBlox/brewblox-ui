@@ -1,21 +1,21 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/plugins/spark/units';
+import { durationMs, durationString, qtyDurationString } from '@/helpers/functional';
+import { Qty } from '@/plugins/spark/bloxfield';
 
 import ValEditBase from '../ValEditBase';
 
 @Component
 export default class TimeUnitValEdit extends ValEditBase {
-  field!: Unit;
+  field!: Qty;
   local: string | null = null;
 
   @Prop({ type: Array, required: true })
   public readonly units!: string[];
 
   created(): void {
-    this.local = unitDurationString(this.field);
+    this.local = qtyDurationString(this.field);
   }
 
   findUnit(s: string): string {
@@ -27,7 +27,7 @@ export default class TimeUnitValEdit extends ValEditBase {
 
   get defaultUnit(): string {
     return !this.findUnit(this.local || '')
-      ? this.findUnit(unitDurationString(this.value))
+      ? this.findUnit(qtyDurationString(this.value))
       : '';
   }
 

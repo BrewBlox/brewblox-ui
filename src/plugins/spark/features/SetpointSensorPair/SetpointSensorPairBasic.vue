@@ -36,10 +36,10 @@ export default class SetpointSensorPairBasic
           <q-icon name="mdi-thermometer" color="green-3" />
         </template>
         <template #value>
-          {{ block.data.value | unit }}
+          {{ block.data.value | qty }}
         </template>
         <template #setting>
-          {{ block.data.storedSetting | unit }}
+          {{ block.data.storedSetting | qty }}
         </template>
       </SettingValueField>
 

@@ -16,20 +16,21 @@ import {
   durationString,
   hexToBase64,
   matchesType,
+  qtyDurationString,
   round,
   shortDateString,
   truncate,
   truncateRound,
   typeMatchFilter,
-  unitDurationString,
 } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
+import { Link, prettify, Qty } from '@/plugins/spark/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
-import { Link, prettify, Unit } from '@/plugins/spark/units';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
+import { isJSBloxField } from './bloxfield';
 import { compatibleTypes } from './getters';
 import {
   AnalogConstraint,
@@ -49,7 +50,6 @@ import {
   DisplaySlot,
   MotorValveBlock,
 } from './types';
-import { isJSBloxField } from './units/BloxField';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -61,8 +61,8 @@ export const blockIdRules = (serviceId: string): InputRule[] => [
 
 export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter(
-    'unit',
-    (value: Unit | null) =>
+    'qty',
+    (value: Qty | null) =>
       (value !== null && value !== undefined ? value.toString() : '-'));
   Vue.filter(
     'link',
@@ -74,7 +74,7 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('base64ToHex', base64ToHex);
   Vue.filter('duration', durationString);
   Vue.filter('truncated', truncate);
-  Vue.filter('unitDuration', unitDurationString);
+  Vue.filter('unitDuration', qtyDurationString);
   Vue.filter('dateString', dateString);
   Vue.filter('shortDateString', shortDateString);
   Vue.filter('capitalize', capitalize);
@@ -325,19 +325,19 @@ export const prettifyConstraints =
           }
           // Digital
           if ('minOff' in c) {
-            return `Minimum OFF = ${unitDurationString(c.minOff)}`;
+            return `Minimum OFF = ${qtyDurationString(c.minOff)}`;
           }
           if ('minOn' in c) {
-            return `Minimum ON = ${unitDurationString(c.minOn)}`;
+            return `Minimum ON = ${qtyDurationString(c.minOn)}`;
           }
           if ('mutexed' in c) {
             return `Mutexed by ${c.mutexed.mutexId.id ?? '<not set>'}`;
           }
           if ('delayedOn' in c) {
-            return `Delayed ON = ${unitDurationString(c.delayedOn)}`;
+            return `Delayed ON = ${qtyDurationString(c.delayedOn)}`;
           }
           if ('delayedOff' in c) {
-            return `Delayed OFF = ${unitDurationString(c.delayedOff)}`;
+            return `Delayed OFF = ${qtyDurationString(c.delayedOff)}`;
           }
           // Fallback
           return 'Unknown constraint';

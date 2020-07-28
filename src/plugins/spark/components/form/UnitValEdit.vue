@@ -1,14 +1,14 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { prettify, Unit } from '@/plugins/spark/units';
+import { prettify, Qty } from '@/plugins/spark/bloxfield';
 
 import ValEditBase from '../ValEditBase';
 
 @Component
 export default class UnitValEdit extends ValEditBase {
   prettify = prettify;
-  field!: Unit;
+  field!: Qty;
   local: number | null = null;
 
   @Watch('local')

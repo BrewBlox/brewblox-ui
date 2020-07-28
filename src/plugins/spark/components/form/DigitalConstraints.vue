@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { Link, Time } from '@/plugins/spark/bloxfield';
 import { digitalConstraintLabels } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
 import { MutexBlock } from '@/plugins/spark/types';
@@ -12,7 +13,6 @@ import type {
   DigitalConstraintsObj,
   MutexedConstraint,
 } from '@/plugins/spark/types';
-import { Link, Time } from '@/plugins/spark/units';
 
 interface Wrapped {
   type: DigitalConstraintKey;

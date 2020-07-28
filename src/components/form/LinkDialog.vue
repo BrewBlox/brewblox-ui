@@ -5,10 +5,10 @@ import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
+import { Link } from '@/plugins/spark/bloxfield';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockOrIntfType } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 import { featureStore } from '@/store/features';
 
 @Component

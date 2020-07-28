@@ -1,8 +1,8 @@
 import { shortDateString } from '@/helpers/functional';
+import { Link } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec, SetpointProfileBlock } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './SetpointProfileWidget.vue';

@@ -4,17 +4,17 @@ import { Component } from 'vue-property-decorator';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, objectSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
+import { Qty,Temp } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { deepCopy } from '@/plugins/spark/parse-object';
 import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
-import { Temp, Unit } from '@/plugins/spark/units';
 
 import { profileGraphProps } from './helpers';
 
 interface DisplaySetpoint {
   offsetMs: number;
   absTimeMs: number;
-  temperature: Unit;
+  temperature: Qty;
 }
 
 @Component
@@ -85,7 +85,7 @@ export default class SetpointProfileFull
     notify.warn('Point time must be later than start time', { logged: false });
   }
 
-  intermediateTemp(points: DisplaySetpoint[], dateMs: number): Unit | null {
+  intermediateTemp(points: DisplaySetpoint[], dateMs: number): Qty | null {
     const nextIdx = points.findIndex(point => point.absTimeMs >= dateMs);
     if (nextIdx < 1) { return null; }
 
@@ -181,7 +181,7 @@ export default class SetpointProfileFull
     }
   }
 
-  updatePointTemperature(index: number, value: Unit): void {
+  updatePointTemperature(index: number, value: Qty): void {
     this.changePoint(index, {
       ...this.points[index],
       temperature: value,

@@ -9,11 +9,11 @@ import { Component, Ref, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, isJsonEqual, unitDurationString } from '@/helpers/functional';
+import { durationMs, isJsonEqual, qtyDurationString } from '@/helpers/functional';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams, QueryTarget } from '@/plugins/history/types';
-import { Unit } from '@/plugins/spark/units';
+import { Qty } from '@/plugins/spark/bloxfield';
 
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {
@@ -83,10 +83,10 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
       component: 'TimeUnitDialog',
       parent: this,
       title: 'Custom graph duration',
-      value: new Unit(durationMs(current), 'ms'),
+      value: new Qty(durationMs(current), 'ms'),
       label: 'Duration',
     })
-      .onOk(unit => this.saveParams({ duration: unitDurationString(unit) }));
+      .onOk(qty => this.saveParams({ duration: qtyDurationString(qty) }));
   }
 
   async regraph(): Promise<void> {

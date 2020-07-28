@@ -5,12 +5,12 @@ import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
+import { durationMs, durationString, qtyDurationString } from '@/helpers/functional';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { Unit } from '@/plugins/spark/units';
+import { Qty } from '@/plugins/spark/bloxfield';
 
 @Component
 export default class BlockGraph extends Vue {
@@ -118,10 +118,10 @@ export default class BlockGraph extends Vue {
       component: 'TimeUnitDialog',
       parent: this,
       title: 'Custom graph duration',
-      value: new Unit(durationMs(current), 'ms'),
+      value: new Qty(durationMs(current), 'ms'),
       label: 'Duration',
     })
-      .onOk(unit => this.saveParams({ duration: unitDurationString(unit) }));
+      .onOk(unit => this.saveParams({ duration: qtyDurationString(unit) }));
   }
 }
 </script>

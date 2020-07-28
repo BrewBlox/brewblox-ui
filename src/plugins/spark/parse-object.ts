@@ -5,9 +5,15 @@ import isObject from 'lodash/isObject';
 
 import { mapEntries } from '@/helpers/functional';
 
+import {
+  isJSBloxField,
+  isJSONLink,
+  isJSONQty,
+  JSBloxField,
+  Link,
+  Qty,
+} from './bloxfield';
 import { BlockOrIntfType } from './types';
-import { isSerializedLink, isSerializedUnit, Link, Unit } from './units';
-import { isJSBloxField, JSBloxField } from './units/BloxField';
 
 // string start
 // then any characters (captured)
@@ -37,7 +43,7 @@ export function propertyNameWithUnit(name: string): [string, string | null] {
 }
 
 export function objectUnit(val: any): string | null {
-  return (val instanceof Unit)
+  return (val instanceof Qty)
     ? val.notation
     : null;
 }
@@ -53,7 +59,7 @@ export function parsePostfixed(key: string, val: any): [string, JSBloxField] | n
           return [name, new Link(val, type as BlockOrIntfType, !!driven)];
         }
         else if (leftBracket === '[') {
-          return [name, new Unit(val, bracketed)];
+          return [name, new Qty(val, bracketed)];
         }
       }
     }
@@ -69,11 +75,11 @@ export function deserialize(obj: any): typeof obj {
   if (isJSBloxField(obj)) {
     return obj;
   }
-  if (isSerializedLink(obj)) {
+  if (isJSONLink(obj)) {
     return new Link(obj);
   }
-  if (isSerializedUnit(obj)) {
-    return new Unit(obj);
+  if (isJSONQty(obj)) {
+    return new Qty(obj);
   }
   if (isObject(obj)) {
     return mapEntries(obj,

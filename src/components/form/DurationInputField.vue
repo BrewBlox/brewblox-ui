@@ -3,8 +3,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/plugins/spark/units';
+import { durationMs, durationString, qtyDurationString } from '@/helpers/functional';
+import { Qty } from '@/plugins/spark/bloxfield';
 
 
 @Component
@@ -44,11 +44,11 @@ export default class DurationInputField extends FieldBase {
       message: this.message,
       html: this.html,
       parent: this,
-      value: new Unit(durationMs(this.value), 'ms'),
+      value: new Qty(durationMs(this.value), 'ms'),
       label: this.label,
       rules: this.rules,
     })
-      .onOk(unit => this.change(unitDurationString(unit)));
+      .onOk(unit => this.change(qtyDurationString(unit)));
   }
 }
 </script>

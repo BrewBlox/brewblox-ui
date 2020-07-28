@@ -2,9 +2,9 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { Temp, Time } from '@/plugins/spark/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { Fluctuation, TempSensorMockBlock } from '@/plugins/spark/types';
-import { Temp, Time } from '@/plugins/spark/units';
 
 
 @Component
@@ -77,10 +77,10 @@ export default class TempSensorMockWidget
             <q-icon name="mdi-thermometer" color="green-3" />
           </template>
           <template #value>
-            {{ block.data.value | unit }}
+            {{ block.data.value | qty }}
           </template>
           <template #setting>
-            {{ block.data.setting | unit }}
+            {{ block.data.setting | qty }}
           </template>
         </SettingValueField>
       </div>

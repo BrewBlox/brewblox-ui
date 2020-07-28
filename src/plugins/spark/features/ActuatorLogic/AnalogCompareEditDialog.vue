@@ -2,11 +2,11 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { Qty,Temp } from '@/plugins/spark/bloxfield';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { deepCopy } from '@/plugins/spark/parse-object';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { AnalogCompare } from '@/plugins/spark/types';
-import { Temp, Unit } from '@/plugins/spark/units';
 
 import { analogOpTitles } from './getters';
 
@@ -43,15 +43,15 @@ export default class AnalogCompareEditDialog extends DialogBase {
     return !!block && isCompatible(block.type, 'SetpointSensorPairInterface');
   }
 
-  get rhs(): Unit | number {
+  get rhs(): Qty | number {
     const cmp = this.local!;
     return this.isTemp
       ? new Temp(cmp.rhs).convert(this.tempUnit)
       : cmp.rhs;
   }
 
-  set rhs(v: Unit | number) {
-    this.local!.rhs = v instanceof Unit
+  set rhs(v: Qty | number) {
+    this.local!.rhs = v instanceof Qty
       ? new Temp(v).convert('degC').value ?? 0
       : v;
   }
