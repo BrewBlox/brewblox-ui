@@ -125,6 +125,14 @@ const densityTarget: QueryTarget = {
 };
 
 
+const tempTarget: QueryTarget = {
+  measurement: 'spark-one',
+  fields: [
+    'Wijnvat 1 sensor [degC]',
+  ],
+};
+
+
 const params1: ProcessParams = {
   s0: 0.043024377643356655,
   ds: 2.075390139308336e-05,
@@ -236,6 +244,12 @@ const transformer =
       'Pressure 2 [mmH20]': pressure2mmH20,
       'Barometric pressure [mbar]': pBaro,
     };
+
+    const tempCorrect = (sg: number, t: number): number =>
+      (999.83952 + 16.945176 * t - 7.9870401e-3 * t ** 2
+        - 46.170461e-6 * t ** 3 + 105.56302e-9 * t ** 4 - 280.54253e-12 * t ** 5) /
+      (1 + 16.897850e-3 * t);
+
 
     forEach(processed, (newValues: (number | null)[], colKey: string) => {
       if (colKey === 'time') {
