@@ -143,4 +143,18 @@ export const generators: SnippetGenerator[] = [
       ]);
     },
   },
+
+  {
+    desc: 'Publish history data (MQTT)',
+    run(callback) {
+      callback('append', [
+        "await publishEvent('brewcast/history/my-process', {",
+        "  key: 'my-process',",
+        '  data: { ',
+        "    'value[degC]': 12.6,",
+        '  },',
+        '});',
+      ]);
+    },
+  },
 ];
