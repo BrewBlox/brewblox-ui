@@ -1,6 +1,5 @@
-import { isJSONQuantity, isQuantity, Link, Qty } from '@/plugins/spark/bloxfield';
+import { isJSONQuantity, isQuantity, JSONQuantity, Link, Qty } from '@/plugins/spark/bloxfield';
 import { deserialize, serialize } from '@/plugins/spark/parse-object';
-import { JSONQuantity } from '@/plugins/spark/types';
 
 const wrap = (value: number, unit: string): JSONQuantity => ({
   __bloxtype: 'Quantity',
