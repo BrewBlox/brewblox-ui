@@ -1,14 +1,37 @@
-import { Enum } from 'typescript-string-enums';
-
-import { Link, Qty } from '../bloxfield';
-import { DigitalState, IoPin } from './block-shared';
+import { Link, Quantity } from '../bloxfield';
+import type {
+  AnalogCompareOp,
+  ChannelConfig,
+  DigitalCompareOp,
+  DigitalState,
+  DisplayTempUnit,
+  FilterChoice,
+  LogicResult,
+  ReferenceKind,
+  Spark2Hardware,
+  SparkPlatform,
+  TouchCalibrated,
+  ValveState,
+  WifiCipherType,
+  WifiSecurityType,
+} from './block-data-enums';
 import { Block } from './block-types';
 import { AnalogConstraintsObj, DigitalConstraintsObj } from './constraint-types';
+
+export type Readonly<T> = T;
+
+export interface IoChannel {
+  config: ChannelConfig;
+  state: DigitalState;
+}
+
+export interface IoPin {
+  [id: string]: IoChannel;
+}
 
 export interface ActuatorAnalogMockBlock extends Block {
   type: 'ActuatorAnalogMock';
   data: {
-    setting: number;
     desiredSetting: number;
     minSetting: number;
     maxSetting: number;
@@ -16,156 +39,103 @@ export interface ActuatorAnalogMockBlock extends Block {
     minValue: number;
     maxValue: number;
     constrainedBy: AnalogConstraintsObj;
+
+    setting: Readonly<number>;
   };
 }
 
-export const DigitalCompareOp = Enum(
-  'OP_VALUE_IS',
-  'OP_VALUE_IS_NOT',
-  'OP_DESIRED_IS',
-  'OP_DESIRED_IS_NOT'
-);
-export type DigitalCompareOp = Enum<typeof DigitalCompareOp>;
-
-export const AnalogCompareOp = Enum(
-  'OP_VALUE_LE',
-  'OP_VALUE_GE',
-  'OP_SETTING_LE',
-  'OP_SETTING_GE',
-);
-export type AnalogCompareOp = Enum<typeof AnalogCompareOp>;
-
-export const LogicResult = Enum(
-  'RESULT_FALSE',
-  'RESULT_TRUE',
-  'RESULT_EMPTY',
-  'RESULT_EMPTY_SUBSTRING',
-  'RESULT_BLOCK_NOT_FOUND',
-  'RESULT_INVALID_DIGITAL_OP',
-  'RESULT_INVALID_ANALOG_OP',
-  'RESULT_UNDEFINED_DIGITAL_COMPARE',
-  'RESULT_UNDEFINED_ANALOG_COMPARE',
-  'RESULT_UNEXPECTED_OPEN_BRACKET',
-  'RESULT_UNEXPECTED_CLOSE_BRACKET',
-  'RESULT_UNEXPECTED_CHARACTER',
-  'RESULT_UNEXPECTED_COMPARISON',
-  'RESULT_UNEXPECTED_OPERATOR',
-  'RESULT_MISSING_CLOSE_BRACKET',
-);
-export type LogicResult = Enum<typeof LogicResult>;
-
 export interface DigitalCompare {
   op: DigitalCompareOp;
-  result: LogicResult;
-  id: Link;
+  result: Readonly<LogicResult>;
+  id: Link<'ActuatorDigitalInterface'>;
   rhs: DigitalState;
 }
 
 export interface AnalogCompare {
   op: AnalogCompareOp;
-  result: LogicResult;
-  id: Link;
+  result: Readonly<LogicResult>;
+  id: Link<'ProcessValueInterface'>;
   rhs: number;
-}
-
-export interface ExpressionError {
-  index: number;
-  message: string;
-  indicator: string;
 }
 
 export interface ActuatorLogicBlock extends Block {
   type: 'ActuatorLogic';
   data: {
     enabled: boolean;
-    result: LogicResult; // readonly
-    errorPos: number; // readonly
-    targetId: Link;
-    drivenTargetId: Link; // readonly
+    targetId: Link<'ActuatorDigitalInterface'>;
     digital: DigitalCompare[];
     analog: AnalogCompare[];
     expression: string; // a-zA-Z&|^!()
+
+    result: Readonly<LogicResult>;
+    errorPos: Readonly<number>;
+    drivenTargetId: Readonly<Link<'ActuatorDigitalInterface'>>;
   };
 }
-
-export const ReferenceKind = Enum(
-  'REF_SETTING',
-  'REF_VALUE',
-);
-export type ReferenceKind = Enum<typeof ReferenceKind>;
 
 export interface ActuatorOffsetBlock extends Block {
   type: 'ActuatorOffset';
   data: {
     enabled: boolean;
     desiredSetting: number;
+    targetId: Link<'ProcessValueInterface'>;
+    referenceId: Link<'ProcessValueInterface'>;
     referenceSettingOrValue: ReferenceKind;
-
-    targetId: Link;
-    drivenTargetId: Link;
-    referenceId: Link;
-
-    setting: number;
-    value: number;
-
     constrainedBy: AnalogConstraintsObj;
+
+    setting: Readonly<number>;
+    value: Readonly<number>;
+    drivenTargetId: Readonly<Link<'ProcessValueInterface'>>;
   };
 }
 
 export interface ActuatorPwmBlock extends Block {
   type: 'ActuatorPwm';
   data: {
-    actuatorId: Link;
-    drivenActuatorId: Link;
-
-    setting: number;
-    desiredSetting: number;
-
-    period: Qty;
-    value: number;
     enabled: boolean;
-
+    desiredSetting: number;
+    period: Quantity<'Second'>;
+    actuatorId: Link<'ActuatorDigitalInterface'>;
     constrainedBy: AnalogConstraintsObj;
+
+    setting: Readonly<number>;
+    value: Readonly<number>;
+    drivenActuatorId: Readonly<Link<'ActuatorDigitalInterface'>>;
   };
 }
 
 export interface BalancedActuator {
-  id: number;
-  requested: number;
-  granted: number;
+  id: Readonly<number>;
+  requested: Readonly<number>;
+  granted: Readonly<number>;
 }
 
 export interface BalancerBlock extends Block {
   type: 'Balancer';
   data: {
-    clients: BalancedActuator[];
+    clients: Readonly<BalancedActuator[]>;
   };
 }
 
 export interface DeprecatedObjectBlock extends Block {
   type: 'DeprecatedObject';
   data: {
-    actualId: number;
+    actualId: Readonly<number>;
   };
 }
 
 export interface DigitalActuatorBlock extends Block {
   type: 'DigitalActuator';
   data: {
-    hwDevice: Link;
+    hwDevice: Link<'IoArrayInterface'>;
     channel: number;
     desiredState: DigitalState;
-    state: DigitalState;
     invert: boolean;
     constrainedBy: DigitalConstraintsObj;
+
+    state: Readonly<DigitalState>;
   };
 }
-
-export const DisplayTempUnit = Enum(
-  'TEMP_CELSIUS',
-  'TEMP_FAHRENHEIT',
-);
-export type DisplayTempUnit = Enum<typeof DisplayTempUnit>;
 
 export interface DisplaySlot {
   pos: number;
@@ -173,10 +143,10 @@ export interface DisplaySlot {
   name: string;
 
   // Value will be one of these
-  tempSensor?: Link;
-  setpointSensorPair?: Link;
-  actuatorAnalog?: Link;
-  pid?: Link;
+  tempSensor?: Link<'TempSensorInterface'>;
+  setpointSensorPair?: Link<'SetpointSensorPairInterface'>;
+  actuatorAnalog?: Link<'ActuatorAnalogInterface'>;
+  pid?: Link<'Pid'>;
 }
 
 export interface DisplaySettingsBlock extends Block {
@@ -189,18 +159,12 @@ export interface DisplaySettingsBlock extends Block {
   };
 }
 
-export interface ChannelMapping {
-  id: string;
-  nid: number;
-  name: string;
-}
-
 export interface DS2408Block extends Block {
   type: 'DS2408';
   data: {
     address: string;
-    connected: boolean;
-    pins: IoPin[];
+    pins: Readonly<IoPin[]>;
+    connected: Readonly<boolean>;
   };
 }
 
@@ -208,8 +172,8 @@ export interface DS2413Block extends Block {
   type: 'DS2413';
   data: {
     address: string;
-    connected: boolean;
-    pins: IoPin[];
+    pins: Readonly<IoPin[]>;
+    connected: Readonly<boolean>;
   };
 }
 
@@ -230,90 +194,83 @@ export interface GroupsBlock extends Block {
 export interface MockPinsBlock extends Block {
   type: 'MockPins';
   data: {
-    pins: IoPin[];
+    pins: Readonly<IoPin[]>;
   };
 }
-
-export const ValveState = Enum(
-  'VALVE_UNKNOWN',
-  'VALVE_OPEN',
-  'VALVE_CLOSED',
-  'VALVE_OPENING',
-  'VALVE_CLOSING',
-  'VALVE_HALF_OPEN_IDLE',
-  'VALVE_INIT_IDLE',
-);
-export type ValveState = Enum<typeof ValveState>;
 
 export interface MotorValveBlock extends Block {
   type: 'MotorValve';
   data: {
-    hwDevice: Link;
+    hwDevice: Link<'DS2408Interface'>;
     startChannel: number;
     desiredState: DigitalState;
-    state: DigitalState;
-    valveState: ValveState;
     constrainedBy: DigitalConstraintsObj;
+
+    state: Readonly<DigitalState>;
+    valveState: Readonly<ValveState>;
   };
 }
 
 export interface MutexBlock extends Block {
   type: 'Mutex';
   data: {
-    differentActuatorWait: Qty;
-    waitRemaining: Qty;
+    differentActuatorWait: Quantity<'Second'>;
+    waitRemaining: Readonly<Quantity<'Second'>>;
   };
+}
+
+export interface OneWireBusCommand {
+  opcode: number;
+  data: number;
 }
 
 export interface OneWireBusBlock extends Block {
   type: 'OneWireBus';
   data: {
-    command: {
-      opcode: number;
-      data: number;
-    };
-    address: string[];
+    command: OneWireBusCommand;
+    address: Readonly<string[]>;
   };
 }
 
 export interface PidBlock extends Block {
   type: 'Pid';
   data: {
-    inputId: Link;
-    outputId: Link;
+    inputId: Link<'SetpointSensorPairInterface'>;
+    outputId: Link<'ActuatorAnalogInterface'>;
 
-    inputValue: Qty;
-    inputSetting: Qty;
-    outputValue: number;
-    outputSetting: number;
+    inputValue: Readonly<Quantity<'Temp'>>;
+    inputSetting: Readonly<Quantity<'Temp'>>;
+    outputValue: Readonly<number>;
+    outputSetting: Readonly<number>;
 
     enabled: boolean;
-    active: boolean;
+    active: Readonly<boolean>;
 
-    kp: Qty;
-    ti: Qty;
-    td: Qty;
+    kp: Quantity<'InverseTemp'>;
+    ti: Quantity<'Second'>;
+    td: Quantity<'Second'>;
 
-    p: number;
-    i: number;
-    d: number;
+    p: Readonly<number>;
+    i: Readonly<number>;
+    d: Readonly<number>;
 
-    error: Qty;
-    integral: Qty;
-    derivative: Qty;
+    error: Readonly<Quantity<'DeltaTemp'>>;
+    integral: Readonly<Quantity<'DeltaTempMultHour'>>;
+    derivative: Readonly<Quantity<'DeltaTempPerMinute'>>;
+    derivativeFilter: Readonly<FilterChoice>;
 
-    drivenOutputId: Link;
+    drivenOutputId: Readonly<Link<'ActuatorAnalogInterface'>>;
     integralReset: number;
 
-    boilPointAdjust: Qty;
+    boilPointAdjust: Quantity<'DeltaTemp'>;
     boilMinOutput: number;
-    boilModeActive: boolean;
+    boilModeActive: Readonly<boolean>;
   };
 }
 
 export interface Setpoint {
   time: number;
-  temperature: Qty;
+  temperature: Quantity<'Temp'>;
 }
 
 export interface SetpointProfileBlock extends Block {
@@ -322,132 +279,101 @@ export interface SetpointProfileBlock extends Block {
     start: number;
     points: Setpoint[];
     enabled: boolean;
-    targetId: Link;
-    drivenTargetId: Link;
+    targetId: Link<'SetpointSensorPair'>;
+    drivenTargetId: Readonly<Link<'SetpointSensorPair'>>;
   };
 }
-
-export const FilterChoice = Enum(
-  'FILTER_NONE',
-  'FILTER_15s',
-  'FILTER_45s',
-  'FILTER_90s',
-  'FILTER_3m',
-  'FILTER_10m',
-  'FILTER_30m',
-);
-export type FilterChoice = Enum<typeof FilterChoice>;
 
 export interface SetpointSensorPairBlock extends Block {
   type: 'SetpointSensorPair';
   data: {
-    sensorId: Link;
+    sensorId: Link<'TempSensorInterface'>;
 
-    value: Qty;
-    valueUnfiltered: Qty;
-
-    setting: Qty;
-    storedSetting: Qty;
+    storedSetting: Quantity<'Temp'>;
     settingEnabled: boolean;
 
     filter: FilterChoice;
-    filterThreshold: Qty;
+    filterThreshold: Quantity<'DeltaTemp'>;
     resetFilter: boolean;
+
+    setting: Readonly<Quantity<'Temp'>>;
+    value: Readonly<Quantity<'Temp'>>;
+    valueUnfiltered: Readonly<Quantity<'Temp'>>;
   };
 }
-
-export const Spark2Hardware = Enum(
-  'HW_UNKNOWN',
-  'HW_SPARK1',
-  'HW_SPARK2',
-);
-export type Spark2Hardware = Enum<typeof Spark2Hardware>;
 
 export interface Spark2PinsBlock extends Block {
   type: 'Spark2Pins';
   data: {
-    pins: IoPin[];
     soundAlarm: boolean;
-    hardware: Spark2Hardware;
+    pins: Readonly<IoPin[]>;
+    hardware: Readonly<Spark2Hardware>;
   };
 }
 
 export interface Spark3PinsBlock extends Block {
   type: 'Spark3Pins';
   data: {
-    pins: IoPin[];
     enableIoSupply5V: boolean;
     enableIoSupply12V: boolean;
     soundAlarm: boolean;
-    voltage5: number;
-    voltage12: number;
+    pins: Readonly<IoPin[]>;
+    voltage5: Readonly<number>;
+    voltage12: Readonly<number>;
   };
 }
-
-export const SparkPlatform = Enum(
-  'PLATFORM_UNKNOWN',
-  'PLATFORM_GCC',
-  'PLATFORM_PHOTON',
-  'PLATFORM_P1',
-);
-export type SparkPlatform = Enum<typeof SparkPlatform>;
 
 export interface SysInfoBlock extends Block {
   type: 'SysInfo';
   data: {
-    deviceId: string;
-    version: string;
-    platform: SparkPlatform;
-    protocolVersion: string;
-    releaseDate: string;
-    protocolDate: string;
-    command: any; // write-only, for internal use
-    trace: any[]; // for internal use
+    deviceId: Readonly<string>;
+    version: Readonly<string>;
+    platform: Readonly<SparkPlatform>;
+    protocolVersion: Readonly<string>;
+    releaseDate: Readonly<string>;
+    protocolDate: Readonly<string>;
+
+    // internal use only
+    command: any;
+    trace: Readonly<any[]>;
   };
 }
 
 export interface Fluctuation {
-  amplitude: Qty; // DeltaTemp
-  period: Qty; // Time
+  amplitude: Quantity<'DeltaTemp'>;
+  period: Quantity<'Second'>;
 }
 
 export interface TempSensorMockBlock extends Block {
   type: 'TempSensorMock';
   data: {
-    value: Qty; // readonly Temp
     connected: boolean;
-    setting: Qty; // Temp
+    setting: Quantity<'Temp'>;
     fluctuations: Fluctuation[];
+    value: Readonly<Quantity<'Temp'>>;
   };
 }
 
 export interface TempSensorOneWireBlock extends Block {
   type: 'TempSensorOneWire';
   data: {
-    value: Qty;
-    offset: Qty;
+    offset: Quantity<'DeltaTemp'>;
     address: string;
+    value: Readonly<Quantity<'Temp'>>;
   };
 }
 
 export interface TicksBlock extends Block {
   type: 'Ticks';
   data: {
-    millisSinceBoot: number;
     secondsSinceEpoch: number;
-    avgCommunicationTask: number;
-    avgBlocksUpdateTask: number;
-    avgDisplayTask: number;
-    avgSystemTask: number;
+    millisSinceBoot: Readonly<number>;
+    avgCommunicationTask: Readonly<number>;
+    avgBlocksUpdateTask: Readonly<number>;
+    avgDisplayTask: Readonly<number>;
+    avgSystemTask: Readonly<number>;
   };
 }
-
-export const TouchCalibrated = Enum(
-  'CALIBRATED_NO',
-  'CALIBRATED_YES',
-  'CALIBRATED_NEW',
-);
-export type TouchCalibrated = Enum<typeof TouchCalibrated>;
 
 export interface TouchSettingsBlock extends Block {
   type: 'TouchSettings';
@@ -460,33 +386,16 @@ export interface TouchSettingsBlock extends Block {
   };
 }
 
-export const WifiSecurityType = Enum(
-  'WLAN_SEC_UNSEC',
-  'WLAN_SEC_WEP',
-  'WLAN_SEC_WPA',
-  'WLAN_SEC_WPA2',
-  'WLAN_SEC_WPA_ENTERPRISE',
-  'WLAN_SEC_WPA2_ENTERPRISE',
-  'WLAN_SEC_NOT_SET',
-);
-export type WifiSecurityType = Enum<typeof WifiSecurityType>;
-
-export const WifiCipherType = Enum(
-  'WLAN_CIPHER_NOT_SET',
-  'WLAN_CIPHER_AES',
-  'WLAN_CIPHER_TKIP',
-  'WLAN_CIPHER_AES_TKIP', // OR of AES and TKIP
-);
-export type WifiCipherType = Enum<typeof WifiCipherType>;
-
 export interface WiFiSettingsBlock extends Block {
   type: 'WiFiSettings';
   data: {
-    ssid: string; // write-only
-    password: string; // write-only
-    security: WifiSecurityType; // write-only
-    cipher: WifiCipherType; // write-only
-    signal: number;
-    ip: string;
+    signal: Readonly<number>;
+    ip: Readonly<string>;
+
+    // write-only types
+    ssid: string;
+    password: string;
+    security: WifiSecurityType;
+    cipher: WifiCipherType;
   };
 }

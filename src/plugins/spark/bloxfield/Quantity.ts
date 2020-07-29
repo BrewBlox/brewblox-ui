@@ -1,8 +1,7 @@
 import round from 'lodash/round';
 import { Enum } from 'typescript-string-enums';
 
-import { JSONQuantity } from '../types';
-import { JSBloxField } from './BloxField';
+import { JSBloxField, JSONBloxField } from './BloxField';
 
 export const prettify = (unitName: string): string =>
   unitName
@@ -30,22 +29,46 @@ export const isQuantity =
     && obj.__bloxtype === 'Quantity'
     && typeof obj.toJSON === 'function';
 
-export class Quantity implements JSBloxField, JSONQuantity {
+export type QuantityGroup =
+  | 'Temp'
+  | 'InverseTemp'
+  | 'Second'
+  | 'Minute'
+  | 'Hour'
+  | 'DeltaTemp'
+  | 'DeltaTempPerSecond'
+  | 'DeltaTempPerMinute'
+  | 'DeltaTempPerHour'
+  | 'DeltaTempMultSecond'
+  | 'DeltaTempMultMinute'
+  | 'DeltaTempMultHour'
+
+export interface JSONQuantity extends JSONBloxField {
+  __bloxtype: 'Quantity';
+  value: number | null;
+  unit: string;
+  readonly?: boolean;
+}
+
+export class Quantity<G extends QuantityGroup | null = null> implements JSBloxField, JSONQuantity {
   public readonly __bloxtype = 'Quantity';
   private _val: number | null;
   private _unit: string;
+  private _readonly: boolean;
   private _notation: string;
 
   public constructor(raw: JSONQuantity);
   public constructor(value: number | null, unit: string);
   public constructor(value: JSONQuantity | number | null, unit: string = '') {
-    if (isJSONQuantity(value)) {
+    if (isJSONQuantity(value) || isQuantity(value)) {
       this._val = value.value ?? null;
       this._unit = value.unit ?? '';
+      this._readonly = value.readonly ?? false;
     }
     else {
       this._val = value ?? null;
       this._unit = unit ?? '';
+      this._readonly = false;
     }
     this._notation = prettify(this._unit);
   }
@@ -58,10 +81,6 @@ export class Quantity implements JSBloxField, JSONQuantity {
     this._val = v === null ? null : Number(v);
   }
 
-  public get postfix(): string {
-    return `[${this.unit}]`;
-  }
-
   public get unit(): string {
     return this._unit;
   }
@@ -69,6 +88,14 @@ export class Quantity implements JSBloxField, JSONQuantity {
   public set unit(v: string) {
     this._unit = v;
     this._notation = prettify(v);
+  }
+
+  public get readonly(): boolean {
+    return this._readonly;
+  }
+
+  public get postfix(): string {
+    return `[${this.unit}]`;
   }
 
   public get notation(): string {
@@ -92,6 +119,7 @@ export class Quantity implements JSBloxField, JSONQuantity {
       __bloxtype: 'Quantity',
       value: this.value,
       unit: this.unit,
+      readonly: this.readonly || undefined,
     };
   }
 

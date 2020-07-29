@@ -56,7 +56,7 @@ export const durationString =
 
 export const qtyDurationString =
   (value: Qty | null): string => {
-    if (value === null || value === undefined || value.value === null) {
+    if (value?.value == null) {
       return '---';
     }
     return durationString(`${value.value}${value.notation}`);

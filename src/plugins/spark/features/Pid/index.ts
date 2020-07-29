@@ -2,7 +2,7 @@ import { qtyDurationString } from '@/helpers/functional';
 import { Link, Qty, Temp } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockIntfType, BlockSpec, PidBlock } from '@/plugins/spark/types';
+import { BlockIntfType, BlockSpec, FilterChoice, PidBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './PidWidget.vue';
@@ -31,6 +31,7 @@ const block: BlockSpec<PidBlock> = {
       error: new Temp(0, `delta_${temp}`),
       integral: new Qty(0, `delta_${temp}*hour`),
       derivative: new Qty(0, `delta_${temp}/minute`),
+      derivativeFilter: FilterChoice.FILTER_NONE,
       drivenOutputId: new Link(null, BlockIntfType.ActuatorAnalogInterface),
       integralReset: 0,
       boilPointAdjust: new Qty(0, `delta_${temp}`),

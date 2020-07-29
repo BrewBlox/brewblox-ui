@@ -4,8 +4,6 @@ import { Enum } from 'typescript-string-enums';
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { Crud } from '@/store/features';
 
-import { JSONBloxField } from '../bloxfield';
-
 export const BlockIntfType = Enum(
   'ProcessValueInterface',
   'TempSensorInterface',
@@ -66,15 +64,12 @@ export const BlockOrIntfType = Enum(
   ...Enum.values(BlockIntfType),
 );
 export type BlockOrIntfType = Enum<typeof BlockOrIntfType>;
-// export type BlockType = SystemBlockType | UserBlockType;
-// export type BlockOrIntfType = BlockType | BlockIntfType;
 
 /**
  * There are two approaches to having a serializable reference to a block:
  * Link, and BlockAddress
  *
- * Link is used inside block data, and serializes to `"key<type>": "id"`.
- * Service ID is not stored.
+ * Link is used inside block data, and does not include service ID in its serialized form.
  *
  * BlockAddress includes service ID, and is intended for wider use
  * where service ID is not obvious, or where all services are equally valid.
@@ -98,20 +93,6 @@ export interface Block extends BlockAddress {
   type: BlockType;
   groups: number[];
   data: any;
-}
-
-export interface JSONQuantity extends JSONBloxField {
-  __bloxtype: 'Quantity';
-  value: number | null;
-  unit: string;
-  readonly?: boolean;
-}
-
-export interface JSONLink extends JSONBloxField {
-  __bloxtype: 'Link';
-  id: string | null;
-  type: BlockOrIntfType | null;
-  driven?: boolean;
 }
 
 export interface BlockIds {

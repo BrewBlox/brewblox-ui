@@ -21,7 +21,7 @@ export default class SparkWifiMenu extends DialogBase {
     { label: 'Auto', value: 'WLAN_CIPHER_NOT_SET' },
     { label: 'AES', value: 'WLAN_CIPHER_AES' },
     { label: 'TKIP', value: 'WLAN_CIPHER_TKIP' },
-    { label: 'AES or TKIP', value: 'WLAN_CIPHER_AES_TKIP' },
+    { label: 'AES or TKIP', value: 'WLAN_CIPHER_AES_OR_TKIP' },
   ];
 
   isPwd = true;

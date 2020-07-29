@@ -1,7 +1,7 @@
 import isObject from 'lodash/isObject';
 
-import { BlockOrIntfType, JSONLink } from '../types';
-import { JSBloxField } from './BloxField';
+import { BlockOrIntfType } from '../types';
+import { JSBloxField, JSONBloxField } from './BloxField';
 
 export function isJSONLink(obj: any): obj is JSONLink {
   return isObject(obj)
@@ -15,7 +15,14 @@ export function isLink(obj: any): obj is Link {
     && 'toJSON' in obj;
 }
 
-export class Link implements JSBloxField {
+export interface JSONLink extends JSONBloxField {
+  __bloxtype: 'Link';
+  id: string | null;
+  type: BlockOrIntfType | null;
+  driven?: boolean;
+}
+
+export class Link<T extends BlockOrIntfType | null = null> implements JSBloxField {
   public readonly __bloxtype = 'Link';
   public id: string | null;
   public type: BlockOrIntfType | null;
@@ -26,7 +33,7 @@ export class Link implements JSBloxField {
   public constructor(id: string | null, type: BlockOrIntfType | null);
   public constructor(id: string | null, type: BlockOrIntfType | null, driven: boolean);
   public constructor(link: string | JSONLink | null, type: BlockOrIntfType | null = null, driven = false) {
-    if (isJSONLink(link)) {
+    if (isJSONLink(link) || isLink(link)) {
       this.id = link.id;
       this.type = link.type;
       this.driven = link.driven ?? false;
