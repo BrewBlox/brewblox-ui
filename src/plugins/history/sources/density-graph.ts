@@ -20,7 +20,8 @@ interface ProcessParams {
   rnb: number;
   rnt: number;
   ds: number;
-  ds2: number;
+  dss: number;
+  v0: number;
 }
 
 interface SharedParams {
@@ -28,7 +29,7 @@ interface SharedParams {
   heightDiff: number; // mm between sensors
   countsPerMillivolt: number;
   countsPerMillivoltDiff: number;
-  calibrationDensity: number; // water at 20C in g/L
+  diameter: number;
   barPerMeter: number;
 }
 
@@ -134,32 +135,34 @@ const tempTarget: QueryTarget = {
 
 
 const params1: ProcessParams = {
-  s0: 0.043024377643356655,
-  ds: 2.075390139308336e-05,
-  rpt: 1.0013830507520656,
-  rnt: 1.0010236648263195,
-  rpb: 0.9986169492479344,
-  rnb: 0.9989763351736805,
-  ds2: -9.553453229527372e-07,
+  s0: 0.04201837939975203,
+  rpb: 0.9986215386469219,
+  rpt: 1.001378461353078,
+  rnb: 0.9989809293970966,
+  rnt: 1.0010190706029034,
+  ds: -2.750817701142761e-05,
+  dss: -1.2307603088647225e-06,
+  v0: 2053.22317480223,
 };
 
 const params2: ProcessParams = {
-  s0: 0.04301445082035823,
-  ds: 0.00045906562172523204,
-  rpt: 1.0012285643740704,
-  rnb: 0.9990673548797273,
-  rnt: 1.0009326451202727,
-  rpb: 0.9987714356259296,
-  ds2: -2.8441926138146005e-06,
+  s0: 0.042223883296850485,
+  rpb: 0.9987760602195516,
+  rpt: 1.0012239397804485,
+  rnb: 0.9990719802240943,
+  rnt: 1.0009280197759058,
+  ds: -0.0003220693446672942,
+  dss: -3.101764618106398e-06,
+  v0: 2141.1235810954818,
 };
 
 const sharedParams: SharedParams = {
-  heightLowest: 100.0,
-  heightDiff: 287.0,
+  heightLowest: 99.0,
+  heightDiff: 290.0,
   countsPerMillivolt: 2 ** 23 / 1350,
   countsPerMillivoltDiff: 32 * 2 ** 23 / 1350,
-  calibrationDensity: 998.2,
-  barPerMeter: 0.09806,
+  diameter: 630,
+  barPerMeter: 0.0980665,
 };
 
 const calcTemp = (raw: number[]): number[] => {
@@ -175,11 +178,8 @@ const par = (R1: number, R2: number): number => R1 * R2 / (R1 + R2);
 
 const calcCorrections = (params: ProcessParams, measured: SensorMeasurement): Correction => {
   const v = zip(measured.vpb, measured.vpt, measured.vnb, measured.vnt).map(([a, b, c, d]) => (a! + b! + c! + d!) / 2);
-
-  const v0 = 2000;
-  const sensitivity = v.map(v => params.s0 * (1 + params.ds * (v - v0) + + params.ds2 * (v - v0) ** 2));
-  const offset = v.map(v => v * (params.rpb / (params.rpb + params.rpt) - params.rnb / (params.rnb + params.rnt)));
-  const gain = zip(sensitivity, v).map(([s, v]) => (s!));
+  const gain = v.map(v => params.s0 * (1 + params.ds * (v - params.v0) + + params.dss * (v - params.v0) ** 2));
+  const offset = v.map(v => v * (params.rnt / (params.rnb + params.rnt) - params.rpt / (params.rpb + params.rpt)));
 
   return { offset, gain };
 };
@@ -232,7 +232,7 @@ const transformer =
     }); // assume 20C
     const mmLiquid1 = zip(pressure1mmH20, density).map(([p, d]) => d ? p! / d : p);
     // const mmLiquid2 = zip(pressure2mmH20, density).map(([p, d]) => d ? p! / d : p);
-    const volume = mmLiquid1.map((v => (sharedParams.heightLowest + v!) / 100 * 3.15 ** 2 * Math.PI));
+    const volume = mmLiquid1.map((v => (sharedParams.heightLowest + v!) / 100 * (sharedParams.diameter / 200) ** 2 * Math.PI));
     const weight = zip(volume, density).map(([v, d]) => v! * d!);
 
     const processed: ProcessedData = {
