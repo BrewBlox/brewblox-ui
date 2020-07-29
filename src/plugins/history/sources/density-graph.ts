@@ -66,12 +66,12 @@ interface Correction {
 
 interface ProcessedData {
   time: number[];
-  'Barometric pressure [mbar]': number[];
-  'Pressure 1 [mmH20]': number[];
-  'Pressure 2 [mmH20]': number[];
+  'Barometric pressure [mbar]': (number | null)[];
+  'Pressure 1 [mmH20]': (number | null)[];
+  'Pressure 2 [mmH20]': (number | null)[];
   'Density [kg/L]': (number | null)[];
-  'Volume [L]': number[];
-  'Weight [kg]': number[];
+  'Volume [L]': (number | null)[];
+  'Weight [kg]': (number | null)[];
 }
 
 const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
@@ -218,22 +218,22 @@ const transformer =
     const measured2 = processRawA2(raw);
     const corr1 = calcCorrections(params1, measured1);
     const corr2 = calcCorrections(params2, measured2);
-    const pressure1mBar = zip(measured1.signal, corr1.offset, corr1.gain).map(([v, o, g]) => ((v! - o!) / g!));
-    const pressure2mBar = zip(measured2.signal, corr2.offset, corr2.gain).map(([v, o, g]) => ((v! - o!) / g!));
+    const pressure1mBar = zip(measured1.signal, corr1.offset, corr1.gain).map(([v, o, g]) => v && o && g ? ((v - o) / g) : null);
+    const pressure2mBar = zip(measured2.signal, corr2.offset, corr2.gain).map(([v, o, g]) => v && o && g ? ((v - o) / g) : null);
     const pBaro = raw.baro.map(v => v / 100);
     // const tempBaro = raw.temp.map(v => v / 10);
     const pressure1mmH20 = pressure1mBar.map(v => v! / sharedParams.barPerMeter);
     const pressure2mmH20 = pressure2mBar.map(v => v! / sharedParams.barPerMeter);
     // const pressureDiffmBar = zip(pressure1mBar, pressure2mBar).map(([v1, v2]) => v1! - v2!);
-    const pressureDiffmmH20 = zip(pressure1mmH20, pressure2mmH20).map(([v1, v2]) => v1! - v2!);
+    const pressureDiffmmH20 = zip(pressure1mmH20, pressure2mmH20).map(([v1, v2]) => v1 && v2 ? v1 - v2 : null);
     const density = pressureDiffmmH20.map((v) => {
-      const d = v / sharedParams.heightDiff;
-      return (d > 0.5 && d < 1.5) ? d : null;
+      const d = v ? v / sharedParams.heightDiff : null;
+      return d && (d > 0.5 && d < 1.5) ? d : null;
     }); // assume 20C
-    const mmLiquid1 = zip(pressure1mmH20, density).map(([p, d]) => d ? p! / d : p);
+    const mmLiquid1 = zip(pressure1mmH20, density).map(([p, d]) => d && p ? p / d : p);
     // const mmLiquid2 = zip(pressure2mmH20, density).map(([p, d]) => d ? p! / d : p);
-    const volume = mmLiquid1.map((v => (sharedParams.heightLowest + v!) / 100 * (sharedParams.diameter / 200) ** 2 * Math.PI));
-    const weight = zip(volume, density).map(([v, d]) => v! * d!);
+    const volume = mmLiquid1.map((v => v ? (sharedParams.heightLowest + v) / 100 * (sharedParams.diameter / 200) ** 2 * Math.PI : null));
+    const weight = zip(volume, density).map(([v, d]) => v && d ? v * d : null);
 
     const processed: ProcessedData = {
       time: raw.time,
