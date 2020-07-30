@@ -108,7 +108,7 @@ export default class JSCheckPreview extends Vue {
         <vue-json-pretty
           v-if="result.messages.length"
           :data="result.messages"
-          :deep="1"
+          :deep="2"
           class="q-ml-sm q-mt-sm"
         />
       </div>
