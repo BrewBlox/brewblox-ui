@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { durationMs, durationString, qtyDurationString } from '@/helpers/functional';
 import { Qty } from '@/plugins/spark/bloxfield';
@@ -10,9 +10,6 @@ import ValEditBase from '../ValEditBase';
 export default class TimeUnitValEdit extends ValEditBase {
   field!: Qty;
   local: string | null = null;
-
-  @Prop({ type: Array, required: true })
-  public readonly units!: string[];
 
   created(): void {
     this.local = qtyDurationString(this.field);
