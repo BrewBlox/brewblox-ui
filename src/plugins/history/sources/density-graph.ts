@@ -135,25 +135,25 @@ const tempTarget: QueryTarget = {
 
 
 const params1: ProcessParams = {
-  s0: 0.04201837939975203,
-  rpb: 0.9986215386469219,
-  rpt: 1.001378461353078,
-  rnb: 0.9989809293970966,
-  rnt: 1.0010190706029034,
-  ds: -2.750817701142761e-05,
-  dss: -1.2307603088647225e-06,
-  v0: 2053.22317480223,
+  s0: 0.0409743505474405,
+  rpb: 0.9986376879284127,
+  rpt: 1.0013623120715873,
+  rnb: 0.9989979107970943,
+  rnt: 1.0010020892029057,
+  ds: 0.00019114813137037774,
+  dss: -4.608851558123419e-09,
+  v0: 1953.1262854410127,
 };
 
 const params2: ProcessParams = {
-  s0: 0.042223883296850485,
-  rpb: 0.9987760602195516,
-  rpt: 1.0012239397804485,
-  rnb: 0.9990719802240943,
-  rnt: 1.0009280197759058,
-  ds: -0.0003220693446672942,
-  dss: -3.101764618106398e-06,
-  v0: 2141.1235810954818,
+  s0: 0.03940921052670171,
+  rpb: 0.9987953118733203,
+  rpt: 1.0012046881266796,
+  rnb: 0.9990918364857564,
+  rnt: 1.0009081635142436,
+  ds: 0.0005449449345760765,
+  dss: -5.689631147137911e-09,
+  v0: 1914.4545573757455,
 };
 
 const sharedParams: SharedParams = {
@@ -178,7 +178,7 @@ const par = (R1: number, R2: number): number => R1 * R2 / (R1 + R2);
 
 const calcCorrections = (params: ProcessParams, measured: SensorMeasurement): Correction => {
   const v = zip(measured.vpb, measured.vpt, measured.vnb, measured.vnt).map(([a, b, c, d]) => (a! + b! + c! + d!) / 2);
-  const gain = v.map(v => params.s0 * (1 + params.ds * (v - params.v0) + + params.dss * (v - params.v0) ** 2));
+  const gain = v.map(v => params.s0 * (1 + params.ds * (v - params.v0) + + params.dss * (v - params.v0) ** 3));
   const offset = v.map(v => v * (params.rnt / (params.rnb + params.rnt) - params.rpt / (params.rpb + params.rpt)));
 
   return { offset, gain };
