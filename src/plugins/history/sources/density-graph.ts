@@ -135,35 +135,34 @@ const tempTarget: QueryTarget = {
 
 
 const params1: ProcessParams = {
-  s0: 0.04082600937089037,
-  rpb: 0.9986420577300846,
-  rpt: 1.0013579422699155,
-  rnb: 0.9990012746487579,
-  rnt: 1.0009987253512422,
-  ds: -0.000258778807800184,
-  dss: -8.115133424240923e-09,
-  v0: 1994.2866953893936,
+  s0: 0.04151652848119656,
+  rpb: 0.9986404362950102,
+  rpt: 1.0013595637049897,
+  rnb: 0.999001474850532,
+  rnt: 1.000998525149468,
+  ds: -3.24756256559364e-05,
+  dss: -3.006051901720758e-06,
+  v0: 2092.588426047037,
 
 };
 
 const params2: ProcessParams = {
-  s0: 0.04038736127911254,
-  rpb: 0.9988000850919244,
-  rpt: 1.0011999149080757,
-  rnb: 0.99909495098327,
-  rnt: 1.0009050490167302,
-  ds: -2.9856774006334733e-05,
-  dss: -9.37092392035939e-09,
-  v0: 1980.3819896201073,
-
+  s0: 0.041420307006704,
+  rpb: 0.9987983703356486,
+  rpt: 1.0012016296643513,
+  rnb: 0.9990950527905977,
+  rnt: 1.0009049472094023,
+  ds: -0.00022396756278757755,
+  dss: -4.51913064378461e-06,
+  v0: 2130.411537830525,
 };
 
 const sharedParams: SharedParams = {
-  heightLowest: 99.0,
-  heightDiff: 291.0,
+  heightLowest: 100.0,
+  heightDiff: 287.0,
   countsPerMillivolt: 2 ** 23 / 1350,
   countsPerMillivoltDiff: 32 * 2 ** 23 / 1350,
-  diameter: 630,
+  diameter: 625,
   barPerMeter: 0.0980665,
 };
 
@@ -180,7 +179,7 @@ const par = (R1: number, R2: number): number => R1 * R2 / (R1 + R2);
 
 const calcCorrections = (params: ProcessParams, measured: SensorMeasurement): Correction => {
   const v = zip(measured.vpb, measured.vpt, measured.vnb, measured.vnt).map(([a, b, c, d]) => (a! + b! + c! + d!) / 2);
-  const gain = v.map(v => v / 2000 * params.s0 * (1 + params.ds * (v - params.v0) + params.dss * (v - params.v0) ** 3));
+  const gain = v.map(v => params.s0 * (1 + params.ds * (v - params.v0) + params.dss * (v - params.v0) ** 2));
   const offset = v.map(v => v * (params.rnt / (params.rnb + params.rnt) - params.rpt / (params.rpb + params.rpt)));
 
   return { offset, gain };
@@ -262,10 +261,10 @@ const transformer =
       source.values[key] = {
         type: 'scatter',
         ...existing,
-        yaxis: colKey.startsWith('Density') ? 'y2' : 'y',
+        yaxis: colKey.startsWith('Density') ? 'y' : 'y2',
         name: colKey.startsWith('Density')
-          ? `<span style="color: #aef">${colKey}<br>${(newValues ? newValues[newValues.length - 1] || 0.0 : 0.0).toFixed(4)}</span>`
-          : `<span>${colKey}<br>${(newValues ? newValues[newValues.length - 1] || 0.0 : 0.0).toFixed(2)}</span>`,
+          ? `<span>${colKey}<br>${(newValues ? newValues[newValues.length - 1] || 0.0 : 0.0).toFixed(4)}</span>`
+          : `<span style="color: #aef">${colKey}<br>${(newValues ? newValues[newValues.length - 1] || 0.0 : 0.0).toFixed(2)}</span>`,
 
         visible: colKey.startsWith('Density') ? true : 'legendonly',
         line: {},
