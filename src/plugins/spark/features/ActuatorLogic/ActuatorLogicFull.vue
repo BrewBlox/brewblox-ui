@@ -14,7 +14,6 @@ import {
   DigitalCompare,
   DigitalCompareOp,
   DigitalState,
-  ExpressionError,
   LogicResult,
 } from '@/plugins/spark/types';
 
@@ -32,6 +31,7 @@ import {
   shiftRemainingComparisons,
   syntaxCheck,
 } from './helpers';
+import { ExpressionError } from './types';
 
 const validTypes: BlockIntfType[] = [
   'ActuatorDigitalInterface',

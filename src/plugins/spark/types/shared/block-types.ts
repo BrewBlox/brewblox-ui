@@ -1,6 +1,8 @@
-import { Link, Quantity } from '../bloxfield';
+import { Link, Quantity } from '@/plugins/spark/bloxfield';
+
 import type {
   AnalogCompareOp,
+  BlockType,
   ChannelConfig,
   DigitalCompareOp,
   DigitalState,
@@ -14,9 +16,16 @@ import type {
   ValveState,
   WifiCipherType,
   WifiSecurityType,
-} from './block-data-enums';
-import { Block } from './block-types';
-import { AnalogConstraintsObj, DigitalConstraintsObj } from './constraint-types';
+} from './block-enums';
+
+export interface Block {
+  serviceId: string;
+  id: string;
+  nid?: number;
+  type: BlockType;
+  groups: number[];
+  data: any;
+}
 
 export type Readonly<T> = T;
 
@@ -26,7 +35,80 @@ export interface IoChannel {
 }
 
 export interface IoPin {
-  [id: string]: IoChannel;
+  [pinId: string]: IoChannel;
+}
+
+export interface MinConstraint {
+  limiting: boolean;
+  min: number;
+}
+
+export interface MaxConstraint {
+  limiting: boolean;
+  max: number;
+}
+
+export interface BalancedConstraint {
+  limiting: boolean;
+  balanced: {
+    balancerId: Link;
+    granted: number;
+    id: number;
+  };
+}
+
+export interface MinOnConstraint {
+  remaining: Quantity;
+  minOn: Quantity;
+}
+
+export interface MinOffConstraint {
+  remaining: Quantity;
+  minOff: Quantity;
+}
+
+export interface MutexedConstraint {
+  remaining: Quantity;
+  mutexed: {
+    mutexId: Link;
+    extraHoldTime: Quantity;
+    hasCustomHoldTime: boolean;
+    hasLock: boolean;
+  };
+}
+
+export interface DelayedOnConstraint {
+  remaining: Quantity;
+  delayedOn: Quantity;
+}
+
+export interface DelayedOffConstraint {
+  remaining: Quantity;
+  delayedOff: Quantity;
+}
+
+export type AnalogConstraint =
+  | MinConstraint
+  | MaxConstraint
+  | BalancedConstraint
+
+export type DigitalConstraint =
+  | MutexedConstraint
+  | MinOnConstraint
+  | MinOffConstraint
+  | DelayedOnConstraint
+  | DelayedOffConstraint
+
+export interface AnalogConstraintsObj {
+  constraints: AnalogConstraint[];
+}
+
+export interface DigitalConstraintsObj {
+  constraints: DigitalConstraint[];
+}
+
+export interface AnyConstraintsObj {
+  constraints: (AnalogConstraint | DigitalConstraint)[];
 }
 
 export interface ActuatorAnalogMockBlock extends Block {
@@ -45,17 +127,17 @@ export interface ActuatorAnalogMockBlock extends Block {
 }
 
 export interface DigitalCompare {
-  op: DigitalCompareOp;
-  result: Readonly<LogicResult>;
   id: Link<'ActuatorDigitalInterface'>;
+  op: DigitalCompareOp;
   rhs: DigitalState;
+  result: Readonly<LogicResult>;
 }
 
 export interface AnalogCompare {
-  op: AnalogCompareOp;
-  result: Readonly<LogicResult>;
   id: Link<'ProcessValueInterface'>;
+  op: AnalogCompareOp;
   rhs: number;
+  result: Readonly<LogicResult>;
 }
 
 export interface ActuatorLogicBlock extends Block {

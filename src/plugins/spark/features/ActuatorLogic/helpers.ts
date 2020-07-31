@@ -1,8 +1,9 @@
 import { Temp } from '@/plugins/spark/bloxfield';
 import { isCompatible } from '@/plugins/spark/helpers';
-import { ActuatorLogicBlock, AnalogCompare, DigitalCompare, ExpressionError } from '@/plugins/spark/types';
+import { ActuatorLogicBlock, AnalogCompare, DigitalCompare } from '@/plugins/spark/types';
 
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './getters';
+import { ExpressionError } from './types';
 
 export const keyCode = (s: string): number =>
   s.charCodeAt(0);
