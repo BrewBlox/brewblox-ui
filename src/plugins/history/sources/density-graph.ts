@@ -135,30 +135,32 @@ const tempTarget: QueryTarget = {
 
 
 const params1: ProcessParams = {
-  s0: 0.0409743505474405,
-  rpb: 0.9986376879284127,
-  rpt: 1.0013623120715873,
-  rnb: 0.9989979107970943,
-  rnt: 1.0010020892029057,
-  ds: 0.00019114813137037774,
-  dss: -4.608851558123419e-09,
-  v0: 1953.1262854410127,
+  s0: 0.04082600937089037,
+  rpb: 0.9986420577300846,
+  rpt: 1.0013579422699155,
+  rnb: 0.9990012746487579,
+  rnt: 1.0009987253512422,
+  ds: -0.000258778807800184,
+  dss: -8.115133424240923e-09,
+  v0: 1994.2866953893936,
+
 };
 
 const params2: ProcessParams = {
-  s0: 0.03940921052670171,
-  rpb: 0.9987953118733203,
-  rpt: 1.0012046881266796,
-  rnb: 0.9990918364857564,
-  rnt: 1.0009081635142436,
-  ds: 0.0005449449345760765,
-  dss: -5.689631147137911e-09,
-  v0: 1914.4545573757455,
+  s0: 0.04038736127911254,
+  rpb: 0.9988000850919244,
+  rpt: 1.0011999149080757,
+  rnb: 0.99909495098327,
+  rnt: 1.0009050490167302,
+  ds: -2.9856774006334733e-05,
+  dss: -9.37092392035939e-09,
+  v0: 1980.3819896201073,
+
 };
 
 const sharedParams: SharedParams = {
   heightLowest: 99.0,
-  heightDiff: 290.0,
+  heightDiff: 291.0,
   countsPerMillivolt: 2 ** 23 / 1350,
   countsPerMillivoltDiff: 32 * 2 ** 23 / 1350,
   diameter: 630,
@@ -178,7 +180,7 @@ const par = (R1: number, R2: number): number => R1 * R2 / (R1 + R2);
 
 const calcCorrections = (params: ProcessParams, measured: SensorMeasurement): Correction => {
   const v = zip(measured.vpb, measured.vpt, measured.vnb, measured.vnt).map(([a, b, c, d]) => (a! + b! + c! + d!) / 2);
-  const gain = v.map(v => params.s0 * (1 + params.ds * (v - params.v0) + + params.dss * (v - params.v0) ** 3));
+  const gain = v.map(v => v / 2000 * params.s0 * (1 + params.ds * (v - params.v0) + params.dss * (v - params.v0) ** 3));
   const offset = v.map(v => v * (params.rnt / (params.rnb + params.rnt) - params.rpt / (params.rpb + params.rpt)));
 
   return { offset, gain };
@@ -232,7 +234,7 @@ const transformer =
     }); // assume 20C
     const mmLiquid1 = zip(pressure1mmH20, density).map(([p, d]) => d && p ? p / d : p);
     // const mmLiquid2 = zip(pressure2mmH20, density).map(([p, d]) => d ? p! / d : p);
-    const volume = mmLiquid1.map((v => v ? (sharedParams.heightLowest + v) / 100 * (sharedParams.diameter / 200) ** 2 * Math.PI : null));
+    const volume = mmLiquid1.map((v => v && v > 10 ? (sharedParams.heightLowest + v) / 100 * (sharedParams.diameter / 200) ** 2 * Math.PI : null));
     const weight = zip(volume, density).map(([v, d]) => v && d ? v * d : null);
 
     const processed: ProcessedData = {
