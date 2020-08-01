@@ -56,6 +56,11 @@ module.exports = configure(function (ctx) {
         'SessionStorage',
       ],
 
+      directives: [
+        'ClosePopup',
+        'TouchPan',
+      ],
+
       config: {
         dark: true,
         notify: { message: '', color: 'info' },
