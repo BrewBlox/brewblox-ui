@@ -175,8 +175,9 @@ export interface JSCheckImpl {
 export interface TaskStatusImpl {
   type: 'TaskStatus';
   ref: string;
-  resetStatus: AutomationStatus | null;
   status: AutomationStatus;
+  /** @nullable */
+  resetStatus: AutomationStatus | null;
 }
 
 export interface AutomationTask extends StoreObject {

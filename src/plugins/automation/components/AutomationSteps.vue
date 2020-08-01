@@ -233,9 +233,9 @@ export default class AutomationSteps extends Vue {
   border-left: 2px solid $secondary
   border-right: 2px solid $secondary
 .inactive-step
-  opacity: 0.2
+  opacity: 0.6
 .inactive-section
   opacity: 0.8
   > div
-    opacity: 0.4
+    opacity: 0.5
 </style>
