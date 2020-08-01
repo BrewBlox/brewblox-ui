@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { bloxQty, prettify, Quantity } from '@/helpers/bloxfield';
+import { bloxQty, prettyUnit, Quantity } from '@/helpers/bloxfield';
 
 import ValEditBase from '../ValEditBase';
 
@@ -22,13 +22,13 @@ export default class QuantityValEdit extends ValEditBase {
   }
 
   get notation(): string {
-    return prettify(this.field);
+    return prettyUnit(this.field);
   }
 }
 </script>
 
 <template>
-  <div v-if="editable" class="row no-wrap q-gutter-x-xs">
+  <div v-if="editable" class="row no-wrap">
     <q-input
       v-model.number="local.value"
       :dense="dense"
@@ -37,6 +37,7 @@ export default class QuantityValEdit extends ValEditBase {
       class="col-grow"
       label="Value"
       :suffix="notation"
+      item-aligned
     />
   </div>
   <div

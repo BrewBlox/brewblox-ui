@@ -46,7 +46,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
     {
       key: 'period',
       title: 'Period',
-      component: 'DurationQuantityValEdit',
+      component: 'DurationValEdit',
       generate: () => bloxQty(4, 'second'),
       pretty: durationString,
     },

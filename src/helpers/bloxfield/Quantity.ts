@@ -4,7 +4,7 @@ import round from 'lodash/round';
 
 import { durationMs, isDurationString } from '@/helpers/duration';
 
-import { isBloxField } from './BloxField';
+import { isBloxField, isJSBloxField } from './BloxField';
 import { findGroup, isCompatible } from './groups';
 import { JSBloxField, Quantity } from './types';
 
@@ -17,8 +17,8 @@ export const isQuantity =
 
 export const isJSQuantity =
   (obj: any): obj is JSQuantity =>
-    isQuantity(obj)
-    && 'postfix' in obj;
+    isJSBloxField(obj)
+    && obj.__bloxtype === 'Quantity';
 
 export const prettyUnit = (value: Quantity | string | null | undefined): string => {
   const unit = isQuantity(value) ? value.unit : value;
@@ -50,9 +50,9 @@ export const prettyQty = (q: Quantity): string => {
 };
 
 export const roundedQty =
-  (q: Quantity): Quantity => ({
+  (q: Quantity, precision: number = 2): Quantity => ({
     ...q,
-    value: round(q.value ?? 0, 2),
+    value: round(q.value ?? 0, precision),
   });
 
 const libUnit = (unit: string): string =>
@@ -139,6 +139,13 @@ export class JSQuantity implements JSBloxField, Quantity {
       ? toLibQty(this).to(libUnit(unit)).scalar
       : null;
     return this.copy(value, unit);
+  }
+
+  public round(precision: number = 2): JSQuantity {
+    const value = this.value !== null
+      ? round(this.value, precision)
+      : null;
+    return this.copy(value);
   }
 }
 

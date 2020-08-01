@@ -123,14 +123,14 @@ const block: BlockSpec<PidBlock> = {
     {
       key: 'ti',
       title: 'Ti',
-      component: 'DurationQuantityValEdit',
+      component: 'DurationValEdit',
       generate: () => bloxQty(0, 'second'),
       pretty: durationString,
     },
     {
       key: 'td',
       title: 'Td',
-      component: 'DurationQuantityValEdit',
+      component: 'DurationValEdit',
       generate: () => bloxQty(0, 'second'),
       pretty: durationString,
     },

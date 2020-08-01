@@ -82,7 +82,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
       };
 
       createDialog({
-        component: 'ChangeFieldDialog',
+        component: 'BlockFieldDialog',
         field: specField,
         address: block,
         value: field.value,

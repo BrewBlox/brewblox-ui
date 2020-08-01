@@ -102,7 +102,7 @@ export default class QuickActionChange extends Vue {
 
   editField(field: EditableBlockField): void {
     createDialog({
-      component: 'ChangeFieldDialog',
+      component: 'BlockFieldDialog',
       field: field.specField,
       address: {
         id: this.change.blockId,

@@ -4,6 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { bloxQty } from '@/helpers/bloxfield';
 import { createBlockDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { serviceTemp } from '@/plugins/spark/helpers';
 import { Block, PidBlock, Quantity, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 interface GridOpts {
@@ -44,9 +45,8 @@ export default class PidFull
   }
 
   get waterBoilTemp(): Quantity {
-    return this.block.data.boilPointAdjust.unit === 'delta_degF'
-      ? bloxQty(212, 'degF')
-      : bloxQty(100, 'degC');
+    return bloxQty(100, 'degC')
+      .to(serviceTemp(this.serviceId));
   }
 
   showInput(): void {
@@ -129,7 +129,7 @@ export default class PidFull
         class="col-auto depth-1"
         @click="showInput"
       >
-        <q-tooltip>Edit {{ inputBlock.id }}</q-tooltip>
+        <q-tooltip>Edit {{ inputBlock | link }}</q-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -184,7 +184,7 @@ export default class PidFull
         class="col-auto depth-1"
         @click="showOutput"
       >
-        <q-tooltip>Edit {{ outputBlock.id }}</q-tooltip>
+        <q-tooltip>Edit {{ outputBlock | link }}</q-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -433,24 +433,20 @@ export default class PidFull
   </div>
 </template>
 
-<style scoped>
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(11, 1fr);
-  grid-row-gap: 10px;
-}
+<style lang="sass" scoped>
+.grid-container
+  display: grid
+  grid-template-columns: repeat(11, 1fr)
+  grid-row-gap: 10px
 
-.span-1 {
-  grid-column: span 1;
-}
+.span-1
+  grid-column: span 1
 
-.span-2 {
-  grid-column: span 2;
-  padding-left: 5px;
-  padding-right: 5px;
-}
+.span-2
+  grid-column: span 2
+  padding-left: 5px
+  padding-right: 5px
 
-.calc-line {
-  border-bottom: 2px solid white;
-}
+.calc-line
+  border-bottom: 2px solid white
 </style>

@@ -1,18 +1,15 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
-import { Quantity } from '@/helpers/bloxfield';
+import { isQuantity, Quantity } from '@/helpers/bloxfield';
 import { durationMs, durationString } from '@/helpers/duration';
 
 import ValEditBase from '../ValEditBase';
 
 @Component
-export default class DurationQuantityValEdit extends ValEditBase {
-  field!: Quantity;
+export default class DurationValEdit extends ValEditBase {
+  field!: Quantity | string;
   local: string | null = null;
-
-  @Prop({ type: Array, required: true })
-  public readonly units!: string[];
 
   created(): void {
     this.local = durationString(this.field);
@@ -31,14 +28,19 @@ export default class DurationQuantityValEdit extends ValEditBase {
       : '';
   }
 
-  get localNumber(): number {
+  get localMs(): number {
     return durationMs(`${this.local}${this.defaultUnit}`);
   }
 
   normalize(): void {
-    this.local = durationString(this.localNumber);
-    this.field.value = this.localNumber;
-    this.field.unit = 'ms';
+    this.local = durationString(this.localMs);
+    if (isQuantity(this.field)) {
+      this.field.value = this.localMs;
+      this.field.unit = 'ms';
+    }
+    else {
+      this.field = this.local;
+    }
   }
 }
 </script>
@@ -47,7 +49,7 @@ export default class DurationQuantityValEdit extends ValEditBase {
   <div v-if="editable" class="row no-wrap q-gutter-x-xs">
     <q-input
       v-model="local"
-      label="Value"
+      label="Duration"
       :suffix="defaultUnit"
       autofocus
       item-aligned
