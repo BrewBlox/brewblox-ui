@@ -9,7 +9,9 @@ import { AutomationItem, AutomationSpec } from '../types';
 
 @Component
 export default class AutomationCreateDialog extends DialogBase {
-  selected: AutomationSpec | null = null;
+  local: AutomationSpec | null = null;
+  lastGeneratedName = '';
+  name = '';
 
   @Prop({ type: Array, required: true })
   public readonly specs!: AutomationSpec[];
@@ -18,20 +20,28 @@ export default class AutomationCreateDialog extends DialogBase {
     return this.specs.filter(v => !v.hidden);
   }
 
-  selectSpec(spec: AutomationSpec, save: boolean): void {
-    if (save) {
-      this.save(spec);
+  get selected(): AutomationSpec | null {
+    return this.local;
+  }
+
+  set selected(spec: AutomationSpec | null) {
+    this.local = spec;
+    this.updateName(spec);
+  }
+
+  updateName(spec: AutomationSpec | null) {
+    if (spec && (!this.name || this.lastGeneratedName === this.name)) {
+      this.name = spec.title;
+      this.lastGeneratedName = this.name;
     }
-    this.selected = this.selected?.type !== spec.type
-      ? spec
-      : null;
   }
 
   save(spec: AutomationSpec | null): void {
     if (spec) {
+      this.updateName(spec);
       const item: AutomationItem = {
         id: uid(),
-        title: spec.title,
+        title: this.name,
         enabled: true,
         impl: spec.generate(),
       };
@@ -57,6 +67,13 @@ export default class AutomationCreateDialog extends DialogBase {
         @confirm="v => save(v)"
       />
       <template #actions>
+        <q-input
+          v-model="name"
+          label="Name"
+          clearable
+          item-aligned
+          class="col-12"
+        />
         <q-btn
           flat
           label="Cancel"
