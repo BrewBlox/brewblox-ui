@@ -7,6 +7,7 @@ import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   Block,
   BlockAddress,
+  BlockFieldAddress,
   Limiters,
   RelationEdge,
   SparkExported,
@@ -99,6 +100,12 @@ export class SparkServiceModule extends VuexModule {
   public blockByAddress<T extends Block>(addr: BlockAddress | null): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
     return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
+  }
+
+  public fieldByAddress(addr: BlockFieldAddress | null): any {
+    const block = this.blockByAddress(addr);
+    if (!block || !addr?.field) { return null; }
+    return block.data[addr.field] ?? null;
   }
 
   public blocksByType<T extends Block>(type: T['type']): T[] {

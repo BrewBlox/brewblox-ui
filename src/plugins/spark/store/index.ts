@@ -36,8 +36,13 @@ export class SparkGlobalModule extends VuexModule {
   }
 
   public blockByAddress<T extends Block>(addr: BlockAddress | null): T | null {
-    if (!addr || !addr.id || !addr.serviceId) { return null; }
+    if (!addr) { return null; }
     return this.moduleById(addr.serviceId)?.blockByAddress<T>(addr) ?? null;
+  }
+
+  public fieldByAddress(addr: BlockFieldAddress | null): any {
+    if (!addr) { return null; }
+    return this.moduleById(addr.serviceId)?.fieldByAddress(addr) ?? null;
   }
 
   public serviceBlocks(serviceId: string | null): Block[] {
