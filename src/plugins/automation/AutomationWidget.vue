@@ -29,7 +29,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   settableStates = settableStates;
 
   get automationAvailable(): boolean {
-    return automationStore.lastEvent !== null;
+    return automationStore.available;
   }
 
   get templates(): AutomationTemplate[] {

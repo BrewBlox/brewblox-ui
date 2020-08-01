@@ -24,6 +24,10 @@ export class AutomationModule extends VuexModule {
   public activeTemplate: string | null = null;
   public activeStep: string | null = null;
 
+  public get available(): boolean {
+    return this.lastEvent !== null;
+  }
+
   public get processIds(): string[] {
     return this.processes.map(v => v.id);
   }
