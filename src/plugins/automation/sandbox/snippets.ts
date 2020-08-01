@@ -1,7 +1,7 @@
 import { isLink, isQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
+import { BlockAddress, BlockField, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
 
 export type SnippetMode = 'append' | 'insert';
 export type SnippetCallback = (mode: SnippetMode, lines: string[]) => unknown;
@@ -115,6 +115,7 @@ export const generators: SnippetGenerator[] = [
         component: 'BlockFieldAddressDialog',
         title: 'Select target field',
         message: 'Pick a block and field. A function call will be generated.',
+        fieldFilter: (field: BlockField) => !field.readonly,
       })
         .onOk((addr: BlockFieldAddress) => {
           const value = sparkStore.fieldByAddress(addr);
