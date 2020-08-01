@@ -32,7 +32,7 @@ describe('deserialize', () => {
     const input = {
       test: 'Do not touch',
       something: 1,
-      'convert[degC]': 25,
+      'postfixValue[degC]': 25,
       normal: [21, 22, 23],
       'array[degC]': [21, 22, 23],
     };
@@ -41,8 +41,8 @@ describe('deserialize', () => {
 
     expect(output.test).toBe('Do not touch');
     expect(isQuantity(output.something)).toBe(false);
-    expect(isQuantity(output.to)).toBe(true);
-    expect(isJSQuantity(output.to)).toBe(false);
+    expect(isQuantity(output.postfixValue)).toBe(true);
+    expect(isJSQuantity(output.postfixValue)).toBe(false);
     expect(output.normal[0]).toBe(21);
   });
 
@@ -50,9 +50,9 @@ describe('deserialize', () => {
     const input = {
       data: {
         test: 'Do not touch',
-        'convert[degC]': 25,
+        'postfixValue[degC]': 25,
         evenDeeper: {
-          'convert[degF]': 60,
+          'postfixValue[degF]': 60,
         },
       },
     };
@@ -60,8 +60,8 @@ describe('deserialize', () => {
     const output = deserialize(input);
 
     expect(output.data.test).toBe('Do not touch');
-    expect(isQuantity(output.data.convert)).toBe(true);
-    expect(isQuantity(output.data.evenDeeper.convert)).toBe(true);
+    expect(isQuantity(output.data.postfixValue)).toBe(true);
+    expect(isQuantity(output.data.evenDeeper.postfixValue)).toBe(true);
   });
 
   it('Should handle undefined and null properties', () => {

@@ -25,7 +25,8 @@ describe('prettify unit values', () => {
     expect(prettyUnit('[degC]')).toBe('[°C]');
     expect(prettyUnit('deg')).toBe('°');
 
-    expect(prettyUnit('[millisecond]')).toBe('ms');
+    expect(prettyUnit('millisecond')).toBe('ms');
+    expect(prettyUnit('[millisecond]')).toBe('[ms]');
     expect(prettyUnit('hours')).toBe('h');
     expect(prettyUnit('Hour daily')).toBe('h daily');
   });
