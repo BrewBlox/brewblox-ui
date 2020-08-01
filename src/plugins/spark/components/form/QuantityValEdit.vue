@@ -1,24 +1,25 @@
 <script lang="ts">
+import isFinite from 'lodash/isFinite';
 import { Component, Watch } from 'vue-property-decorator';
 
-import { bloxQty, prettyUnit, Quantity } from '@/helpers/bloxfield';
+import { prettyUnit, Quantity } from '@/helpers/bloxfield';
 
 import ValEditBase from '../ValEditBase';
 
 @Component
 export default class QuantityValEdit extends ValEditBase {
   field!: Quantity;
-  local: Quantity | null = null;
+  local: number | null = null;
 
   @Watch('local')
   updateField(newV: number | null): void {
-    if (newV === null || !Number.isNaN(newV)) {
+    if (newV === null || isFinite(newV)) {
       this.field.value = newV;
     }
   }
 
   created(): void {
-    this.local = bloxQty(this.field);
+    this.local = this.field.value;
   }
 
   get notation(): string {
@@ -30,7 +31,7 @@ export default class QuantityValEdit extends ValEditBase {
 <template>
   <div v-if="editable" class="row no-wrap">
     <q-input
-      v-model.number="local.value"
+      v-model.number="local"
       :dense="dense"
       inputmode="numeric"
       pattern="[0-9]*"

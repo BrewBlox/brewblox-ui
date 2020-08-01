@@ -62,17 +62,18 @@ const toLibQty = (v: Quantity): LibQty =>
   LibQty(v.value ?? 0, libUnit(v.unit)!);
 
 const fromArgs =
-  (value: number | null, unit: string): Quantity => ({
+  (value: number | null, unit: string, readonly: boolean = false): Quantity => ({
     __bloxtype: 'Quantity',
     value,
     unit,
+    readonly,
   });
 
 export function rawQty(value: number | null, unit: string): Quantity;
 export function rawQty(value: Quantity | string): Quantity;
 export function rawQty(value: WrapperValue, unit?: string): Quantity {
   if (isQuantity(value)) {
-    return { ...value };
+    return fromArgs(value.value, value.unit, value.readonly);
   }
   else if (isDurationString(value)) {
     return fromArgs(durationMs(value) / 1000, 's');

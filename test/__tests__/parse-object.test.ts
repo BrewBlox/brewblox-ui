@@ -33,8 +33,8 @@ describe('deserialize', () => {
       test: 'Do not touch',
       something: 1,
       'postfixValue[degC]': 25,
-      normal: [21, 22, 23],
-      'array[degC]': [21, 22, 23],
+      normalArray: [21, 22, 23, 24],
+      'otherV[degC]': 21,
     };
 
     const output = deserialize(input);
@@ -43,7 +43,8 @@ describe('deserialize', () => {
     expect(isQuantity(output.something)).toBe(false);
     expect(isQuantity(output.postfixValue)).toBe(true);
     expect(isJSQuantity(output.postfixValue)).toBe(false);
-    expect(output.normal[0]).toBe(21);
+    expect(output.normalArray[0]).toBe(21);
+    expect(deserialize(output)).toEqual(output);
   });
 
   it('Should recognise deep properties structured as units', () => {
@@ -142,6 +143,7 @@ describe('serialize', () => {
     };
 
     expect(serialize(input)).toEqual(output);
+    expect(serialize(output)).toEqual(output);
   });
 
   it('Handles root arrays correctly', () => {
