@@ -13,7 +13,7 @@ export default class SetpointSensorPairBasic
   editSetting(): void {
     if (this.isDriven) { return; }
     createDialog({
-      component: 'UnitDialog',
+      component: 'QuantityDialog',
       title: 'Setting',
       label: 'Setting',
       value: this.block.data.storedSetting,
@@ -36,10 +36,10 @@ export default class SetpointSensorPairBasic
           <q-icon name="mdi-thermometer" color="green-3" />
         </template>
         <template #value>
-          {{ block.data.value | qty }}
+          {{ block.data.value | quantity }}
         </template>
         <template #setting>
-          {{ block.data.storedSetting | qty }}
+          {{ block.data.storedSetting | quantity }}
         </template>
       </SettingValueField>
 

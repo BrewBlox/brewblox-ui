@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
+import { bloxLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { mutate, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/bloxfield';
 import { Block, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
@@ -71,7 +71,7 @@ export default class ValveArray extends BlockCrudComponent {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(channel.driver?.id ?? null, 'MotorValve');
+    return bloxLink(channel.driver?.id ?? null, 'MotorValve');
   }
 
   driverDriven(block: Block): boolean {
@@ -97,7 +97,7 @@ export default class ValveArray extends BlockCrudComponent {
     }
     if (link.id) {
       const newDriver = this.sparkModule.blockById<MotorValveBlock>(link.id)!;
-      newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
+      newDriver.data.hwDevice = bloxLink(this.blockId, this.block.type);
       newDriver.data.startChannel = channel.nid;
       await this.sparkModule.saveBlock(newDriver);
     }
@@ -119,7 +119,7 @@ export default class ValveArray extends BlockCrudComponent {
     })
       .onOk(block => {
         if (block.type === 'MotorValve') {
-          this.saveDriver(channel, new Link(block.id, block.type));
+          this.saveDriver(channel, bloxLink(block.id, block.type));
         }
       });
   }

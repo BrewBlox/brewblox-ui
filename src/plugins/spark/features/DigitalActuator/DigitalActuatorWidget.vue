@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink } from '@/helpers/bloxfield';
 import { mutate, typeMatchFilter } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { Block, DigitalActuatorBlock } from '@/plugins/spark/types';
 
@@ -48,7 +48,7 @@ export default class DigitalActuatorWidget
     if (this.block.data.channel === pinId) {
       return;
     }
-    const currentDriver = new Link(this.claimedChannels[pinId] || null, 'DigitalActuator');
+    const currentDriver = bloxLink(this.claimedChannels[pinId] || null, 'DigitalActuator');
     if (currentDriver.id) {
       const currentDriverBlock = this.sparkModule.blockById<DigitalActuatorBlock>(currentDriver.id)!;
       currentDriverBlock.data.channel = 0;

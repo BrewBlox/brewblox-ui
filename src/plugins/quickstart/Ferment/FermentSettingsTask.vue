@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Temp } from '@/plugins/spark/bloxfield';
+import { bloxQty } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 
 import WizardTaskBase from '../components/WizardTaskBase';
@@ -12,14 +12,14 @@ import { FermentConfig, FermentOpts } from './types';
 
 @Component
 export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
-  fridgeSetting = new Temp(20, 'degC');
-  beerSetting = new Temp(20, 'degC');
+  fridgeSetting = bloxQty(20, 'degC');
+  beerSetting = bloxQty(20, 'degC');
   activeSetpoint: 'beer' | 'fridge' = 'beer';
 
   created(): void {
     const { Temp } = sparkStore.moduleById(this.config.serviceId)!.units;
-    this.fridgeSetting = this.fridgeSetting.convert(Temp);
-    this.beerSetting = this.beerSetting.convert(Temp);
+    this.fridgeSetting = this.fridgeSetting.to(Temp);
+    this.beerSetting = this.beerSetting.to(Temp);
   }
 
   get targetOpts(): SelectOption[] {
@@ -80,10 +80,10 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
       </q-item>
       <q-item>
         <q-item-section>
-          <UnitField v-model="fridgeSetting" label="Fridge setpoint" title="Fridge setting" />
+          <QuantityField v-model="fridgeSetting" label="Fridge setpoint" title="Fridge setting" />
         </q-item-section>
         <q-item-section>
-          <UnitField v-model="beerSetting" label="Beer setpoint" title="Beer setting" />
+          <QuantityField v-model="beerSetting" label="Beer setpoint" title="Beer setting" />
         </q-item-section>
         <q-item-section class="col-auto">
           <LabeledField label="Active setpoint">

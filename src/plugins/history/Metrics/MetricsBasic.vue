@@ -4,7 +4,7 @@ import { uid } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
-import { durationString } from '@/helpers/functional';
+import { durationString } from '@/helpers/duration';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { historyStore } from '@/plugins/history/store';
 import { DisplayNames, HistorySource, MetricsResult, QueryParams, QueryTarget } from '@/plugins/history/types';

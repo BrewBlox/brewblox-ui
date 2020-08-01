@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { mutate, objectSorter, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/bloxfield';
 import { DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
@@ -56,7 +56,7 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(channel.driver?.id ?? null, 'DigitalActuator');
+    return bloxLink(channel.driver?.id ?? null, 'DigitalActuator');
   }
 
   driverDriven(block: Block): boolean {
@@ -83,7 +83,7 @@ export default class IoArray extends BlockCrudComponent {
     }
     if (link.id) {
       const newDriver = this.sparkModule.blockById<DigitalActuatorBlock>(link.id)!;
-      newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
+      newDriver.data.hwDevice = bloxLink(this.blockId, this.block.type);
       newDriver.data.channel = channel.id;
       await this.sparkModule.saveBlock(newDriver);
     }
@@ -105,7 +105,7 @@ export default class IoArray extends BlockCrudComponent {
     })
       .onOk((block: Block) => {
         if (block.type === 'DigitalActuator') {
-          this.saveDriver(channel, new Link(block.id, 'DigitalActuator'));
+          this.saveDriver(channel, bloxLink(block.id, 'DigitalActuator'));
         }
       });
   }

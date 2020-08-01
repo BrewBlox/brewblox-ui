@@ -1,7 +1,6 @@
-import { Link, Quantity } from '@/plugins/spark/bloxfield';
-
 import type {
   AnalogCompareOp,
+  BlockOrIntfType,
   BlockType,
   ChannelConfig,
   DigitalCompareOp,
@@ -28,6 +27,25 @@ export interface Block {
 }
 
 export type Readonly<T> = T;
+export type Writeonly<T> = T;
+
+export interface BloxField {
+  __bloxtype: string;
+}
+
+export interface Quantity extends BloxField {
+  __bloxtype: 'Quantity';
+  value: number | null;
+  unit: string;
+  readonly?: boolean;
+}
+
+export interface Link extends BloxField {
+  __bloxtype: 'Link';
+  id: string | null;
+  type: BlockOrIntfType | null;
+  driven?: boolean;
+}
 
 export interface IoChannel {
   config: ChannelConfig;
@@ -127,14 +145,14 @@ export interface ActuatorAnalogMockBlock extends Block {
 }
 
 export interface DigitalCompare {
-  id: Link<'ActuatorDigitalInterface'>;
+  id: Link;
   op: DigitalCompareOp;
   rhs: DigitalState;
   result: Readonly<LogicResult>;
 }
 
 export interface AnalogCompare {
-  id: Link<'ProcessValueInterface'>;
+  id: Link;
   op: AnalogCompareOp;
   rhs: number;
   result: Readonly<LogicResult>;
@@ -144,14 +162,14 @@ export interface ActuatorLogicBlock extends Block {
   type: 'ActuatorLogic';
   data: {
     enabled: boolean;
-    targetId: Link<'ActuatorDigitalInterface'>;
+    targetId: Link;
     digital: DigitalCompare[];
     analog: AnalogCompare[];
     expression: string; // a-zA-Z&|^!()
 
     result: Readonly<LogicResult>;
     errorPos: Readonly<number>;
-    drivenTargetId: Readonly<Link<'ActuatorDigitalInterface'>>;
+    drivenTargetId: Readonly<Link>;
   };
 }
 
@@ -160,14 +178,14 @@ export interface ActuatorOffsetBlock extends Block {
   data: {
     enabled: boolean;
     desiredSetting: number;
-    targetId: Link<'ProcessValueInterface'>;
-    referenceId: Link<'ProcessValueInterface'>;
+    targetId: Link;
+    referenceId: Link;
     referenceSettingOrValue: ReferenceKind;
     constrainedBy: AnalogConstraintsObj;
 
     setting: Readonly<number>;
     value: Readonly<number>;
-    drivenTargetId: Readonly<Link<'ProcessValueInterface'>>;
+    drivenTargetId: Readonly<Link>;
   };
 }
 
@@ -176,13 +194,13 @@ export interface ActuatorPwmBlock extends Block {
   data: {
     enabled: boolean;
     desiredSetting: number;
-    period: Quantity<'Second'>;
-    actuatorId: Link<'ActuatorDigitalInterface'>;
+    period: Quantity;
+    actuatorId: Link;
     constrainedBy: AnalogConstraintsObj;
 
     setting: Readonly<number>;
     value: Readonly<number>;
-    drivenActuatorId: Readonly<Link<'ActuatorDigitalInterface'>>;
+    drivenActuatorId: Readonly<Link>;
   };
 }
 
@@ -209,7 +227,7 @@ export interface DeprecatedObjectBlock extends Block {
 export interface DigitalActuatorBlock extends Block {
   type: 'DigitalActuator';
   data: {
-    hwDevice: Link<'IoArrayInterface'>;
+    hwDevice: Link;
     channel: number;
     desiredState: DigitalState;
     invert: boolean;
@@ -225,10 +243,10 @@ export interface DisplaySlot {
   name: string;
 
   // Value will be one of these
-  tempSensor?: Link<'TempSensorInterface'>;
-  setpointSensorPair?: Link<'SetpointSensorPairInterface'>;
-  actuatorAnalog?: Link<'ActuatorAnalogInterface'>;
-  pid?: Link<'Pid'>;
+  tempSensor?: Link;
+  setpointSensorPair?: Link;
+  actuatorAnalog?: Link;
+  pid?: Link;
 }
 
 export interface DisplaySettingsBlock extends Block {
@@ -283,7 +301,7 @@ export interface MockPinsBlock extends Block {
 export interface MotorValveBlock extends Block {
   type: 'MotorValve';
   data: {
-    hwDevice: Link<'DS2408Interface'>;
+    hwDevice: Link;
     startChannel: number;
     desiredState: DigitalState;
     constrainedBy: DigitalConstraintsObj;
@@ -296,8 +314,8 @@ export interface MotorValveBlock extends Block {
 export interface MutexBlock extends Block {
   type: 'Mutex';
   data: {
-    differentActuatorWait: Quantity<'Second'>;
-    waitRemaining: Readonly<Quantity<'Second'>>;
+    differentActuatorWait: Quantity;
+    waitRemaining: Readonly<Quantity>;
   };
 }
 
@@ -317,34 +335,34 @@ export interface OneWireBusBlock extends Block {
 export interface PidBlock extends Block {
   type: 'Pid';
   data: {
-    inputId: Link<'SetpointSensorPairInterface'>;
-    outputId: Link<'ActuatorAnalogInterface'>;
+    inputId: Link;
+    outputId: Link;
 
-    inputValue: Readonly<Quantity<'Temp'>>;
-    inputSetting: Readonly<Quantity<'Temp'>>;
+    inputValue: Readonly<Quantity>;
+    inputSetting: Readonly<Quantity>;
     outputValue: Readonly<number>;
     outputSetting: Readonly<number>;
 
     enabled: boolean;
     active: Readonly<boolean>;
 
-    kp: Quantity<'InverseTemp'>;
-    ti: Quantity<'Second'>;
-    td: Quantity<'Second'>;
+    kp: Quantity;
+    ti: Quantity;
+    td: Quantity;
 
     p: Readonly<number>;
     i: Readonly<number>;
     d: Readonly<number>;
 
-    error: Readonly<Quantity<'DeltaTemp'>>;
-    integral: Readonly<Quantity<'DeltaTempMultHour'>>;
-    derivative: Readonly<Quantity<'DeltaTempPerMinute'>>;
+    error: Readonly<Quantity>;
+    integral: Readonly<Quantity>;
+    derivative: Readonly<Quantity>;
     derivativeFilter: Readonly<FilterChoice>;
 
-    drivenOutputId: Readonly<Link<'ActuatorAnalogInterface'>>;
+    drivenOutputId: Readonly<Link>;
     integralReset: number;
 
-    boilPointAdjust: Quantity<'DeltaTemp'>;
+    boilPointAdjust: Quantity;
     boilMinOutput: number;
     boilModeActive: Readonly<boolean>;
   };
@@ -352,7 +370,7 @@ export interface PidBlock extends Block {
 
 export interface Setpoint {
   time: number;
-  temperature: Quantity<'Temp'>;
+  temperature: Quantity;
 }
 
 export interface SetpointProfileBlock extends Block {
@@ -361,26 +379,26 @@ export interface SetpointProfileBlock extends Block {
     start: number;
     points: Setpoint[];
     enabled: boolean;
-    targetId: Link<'SetpointSensorPair'>;
-    drivenTargetId: Readonly<Link<'SetpointSensorPair'>>;
+    targetId: Link;
+    drivenTargetId: Readonly<Link>;
   };
 }
 
 export interface SetpointSensorPairBlock extends Block {
   type: 'SetpointSensorPair';
   data: {
-    sensorId: Link<'TempSensorInterface'>;
+    sensorId: Link;
 
-    storedSetting: Quantity<'Temp'>;
+    storedSetting: Quantity;
     settingEnabled: boolean;
 
     filter: FilterChoice;
-    filterThreshold: Quantity<'DeltaTemp'>;
+    filterThreshold: Quantity;
     resetFilter: boolean;
 
-    setting: Readonly<Quantity<'Temp'>>;
-    value: Readonly<Quantity<'Temp'>>;
-    valueUnfiltered: Readonly<Quantity<'Temp'>>;
+    setting: Readonly<Quantity>;
+    value: Readonly<Quantity>;
+    valueUnfiltered: Readonly<Quantity>;
   };
 }
 
@@ -416,32 +434,32 @@ export interface SysInfoBlock extends Block {
     protocolDate: Readonly<string>;
 
     // internal use only
-    command: any;
+    command: Writeonly<any>;
     trace: Readonly<any[]>;
   };
 }
 
 export interface Fluctuation {
-  amplitude: Quantity<'DeltaTemp'>;
-  period: Quantity<'Second'>;
+  amplitude: Quantity;
+  period: Quantity;
 }
 
 export interface TempSensorMockBlock extends Block {
   type: 'TempSensorMock';
   data: {
     connected: boolean;
-    setting: Quantity<'Temp'>;
+    setting: Quantity;
     fluctuations: Fluctuation[];
-    value: Readonly<Quantity<'Temp'>>;
+    value: Readonly<Quantity>;
   };
 }
 
 export interface TempSensorOneWireBlock extends Block {
   type: 'TempSensorOneWire';
   data: {
-    offset: Quantity<'DeltaTemp'>;
+    offset: Quantity;
     address: string;
-    value: Readonly<Quantity<'Temp'>>;
+    value: Readonly<Quantity>;
   };
 }
 
@@ -474,10 +492,9 @@ export interface WiFiSettingsBlock extends Block {
     signal: Readonly<number>;
     ip: Readonly<string>;
 
-    // write-only types
-    ssid: string;
-    password: string;
-    security: WifiSecurityType;
-    cipher: WifiCipherType;
+    ssid: Writeonly<string>;
+    password: Writeonly<string>;
+    security: Writeonly<WifiSecurityType>;
+    cipher: Writeonly<WifiCipherType>;
   };
 }

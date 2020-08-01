@@ -3,15 +3,17 @@ import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { durationMs, durationString, qtyDurationString, ruleValidator } from '@/helpers/functional';
-import { Qty } from '@/plugins/spark/bloxfield';
+import { bloxQty, isQuantity } from '@/helpers/bloxfield';
+import { durationMs, durationString } from '@/helpers/duration';
+import { ruleValidator } from '@/helpers/functional';
+import { Quantity } from '@/plugins/spark/types';
 
 @Component
-export default class TimeUnitDialog extends DialogBase {
+export default class DurationQuantityDialog extends DialogBase {
   local: string | null = null;
 
-  @Prop({ type: Object, required: true, validator: v => v instanceof Qty })
-  public readonly value!: Qty;
+  @Prop({ type: Object, required: true, validator: isQuantity })
+  public readonly value!: Quantity;
 
   @Prop({ type: String, default: 'Value' })
   public readonly label!: string;
@@ -20,7 +22,7 @@ export default class TimeUnitDialog extends DialogBase {
   public readonly rules!: InputRule[];
 
   created(): void {
-    this.local = qtyDurationString(this.value);
+    this.local = durationString(this.value);
   }
 
   findUnit(s: string): string {
@@ -32,21 +34,21 @@ export default class TimeUnitDialog extends DialogBase {
 
   get defaultUnit(): string {
     return !this.findUnit(this.local || '')
-      ? this.findUnit(qtyDurationString(this.value))
+      ? this.findUnit(durationString(this.value))
       : '';
   }
 
-  get localNumber(): number {
+  get localMs(): number {
     return durationMs(`${this.local}${this.defaultUnit}`);
   }
 
   get valueOk(): boolean {
-    return ruleValidator(this.rules)(this.localNumber);
+    return ruleValidator(this.rules)(this.localMs);
   }
 
   get error(): string | null {
     for (const rule of this.rules) {
-      const res = rule(this.localNumber);
+      const res = rule(this.localMs);
       if (isString(res)) {
         return res;
       }
@@ -55,13 +57,13 @@ export default class TimeUnitDialog extends DialogBase {
   }
 
   normalize(): void {
-    this.local = durationString(this.localNumber);
+    this.local = durationString(this.localMs);
   }
 
   save(): void {
-    if (!this.valueOk) { return; }
-    const val = new Qty(this.localNumber, 'ms');
-    this.onDialogOk(val);
+    if (this.valueOk) {
+      this.onDialogOk(bloxQty(this.local ?? '0s'));
+    }
   }
 }
 </script>

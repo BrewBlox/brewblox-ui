@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink, JSLink } from '@/helpers/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
 
@@ -16,6 +17,14 @@ export default class ActuatorOffsetWidget
   enable(): void {
     this.block.data.enabled = true;
     this.saveBlock();
+  }
+
+  get target(): JSLink {
+    return bloxLink(this.block.data.targetId);
+  }
+
+  get reference(): JSLink {
+    return bloxLink(this.block.data.referenceId);
   }
 }
 </script>
@@ -39,12 +48,12 @@ export default class ActuatorOffsetWidget
     </template>
 
     <div class="widget-md">
-      <CardWarning v-if="!block.data.targetId.id">
+      <CardWarning v-if="!target.id">
         <template #message>
           Setpoint Driver has no target Setpoint configured.
         </template>
       </CardWarning>
-      <CardWarning v-else-if="!block.data.referenceId.id">
+      <CardWarning v-else-if="!reference.id">
         <template #message>
           Setpoint Driver has no reference Setpoint configured.
         </template>
@@ -53,7 +62,7 @@ export default class ActuatorOffsetWidget
         <template #message>
           <span>
             Setpoint Driver is disabled:
-            <i>{{ block.data.targetId }}</i> will not be changed.
+            <i>{{ target }}</i> will not be changed.
           </span>
         </template>
         <template #actions>
@@ -63,9 +72,9 @@ export default class ActuatorOffsetWidget
       <BlockEnableToggle
         v-else
         :crud="crud"
-        :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
-          ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"
-        :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
+        :text-enabled="`Offset is enabled: ${target} will be offset from the
+          ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${reference}.`"
+        :text-disabled="`Offset is disabled: ${target} will not be changed.`"
       />
 
       <div class="widget-body row">

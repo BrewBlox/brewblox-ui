@@ -1,10 +1,8 @@
 import fromEntries from 'fromentries';
+import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import isString from 'lodash/isString';
-import parseDuration from 'parse-duration';
 import { colors } from 'quasar';
-
-import { Qty } from '../plugins/spark/bloxfield';
 
 type SortFunc = (a: any, b: any) => number
 
@@ -21,46 +19,6 @@ export const objectStringSorter =
       const right = b[key]?.toLowerCase() ?? '';
       return left.localeCompare(right);
     };
-
-export const durationMs =
-  (duration: number | string): number =>
-    isString(duration)
-      ? parseDuration(duration)
-      : duration;
-
-export const durationString =
-  (duration: number | string): string => {
-    const ms = durationMs(duration);
-    const secondsTotal = Number(ms) / 1000;
-    const days = Math.floor(secondsTotal / 86400);
-    const hours = Math.floor((secondsTotal - (days * 86400)) / 3600);
-    const minutes =
-      Math.floor((secondsTotal - (days * 86400) - (hours * 3600)) / 60);
-    const seconds = Math.floor(
-      secondsTotal - (days * 86400) - (hours * 3600) - (minutes * 60));
-    const milliseconds = (secondsTotal < 10) ? Math.floor((secondsTotal - Math.floor(secondsTotal)) * 1000) : 0;
-    const values = [
-      [days, 'd'],
-      [hours, 'h'],
-      [minutes, 'm'],
-      [seconds, 's'],
-      [milliseconds, 'ms'],
-    ];
-
-    const strVal = values
-      .filter(([val]) => !!val)
-      .map(([val, unit]) => `${val}${unit}`)
-      .join(' ');
-    return strVal || '0s';
-  };
-
-export const qtyDurationString =
-  (value: Qty | null): string => {
-    if (value?.value == null) {
-      return '---';
-    }
-    return durationString(`${value.value}${value.notation}`);
-  };
 
 export const spaceCased =
   (input: string): string =>
@@ -380,4 +338,11 @@ export function matchesType<T extends HasType>(type: T['type'], obj: HasType): o
  */
 export function typeMatchFilter<T extends HasType>(type: T['type']): ((obj: HasType) => obj is T) {
   return (obj): obj is T => obj.type === type;
+}
+
+
+export function deepCopy<T>(obj: T): T {
+  return obj
+    ? cloneDeep(obj)
+    : obj;
 }

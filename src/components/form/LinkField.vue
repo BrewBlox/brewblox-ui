@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
+import { isLink, Link } from '@/helpers/bloxfield';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
-import { Link } from '@/plugins/spark/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 
@@ -12,7 +12,7 @@ import FieldBase from '../FieldBase';
 @Component
 export default class LinkField extends FieldBase {
 
-  @Prop({ type: Object, required: true, validator: v => v instanceof Link })
+  @Prop({ type: Object, required: true, validator: v => isLink(v) })
   public readonly value!: Link;
 
   @Prop({ type: String, required: true })

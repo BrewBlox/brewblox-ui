@@ -1,5 +1,5 @@
+import { isLink } from '@/helpers/bloxfield';
 import { capitalized } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/bloxfield';
 import { ServiceStatus } from '@/store/services';
 
 import { constraintLabels } from '../getters';
@@ -14,7 +14,7 @@ export const calculateDrivenChains = (blocks: Block[]): string[][] => {
   for (const block of blocks) {
     Object
       .values(block.data)
-      .filter((obj: any) => obj instanceof Link && obj.driven && obj.id)
+      .filter((obj: any) => isLink(obj) && obj.driven && obj.id)
       .forEach((obj: any) => {
         const existing = drivenBlocks[obj.id] || [];
         drivenBlocks[obj.id] = [...existing, block.id];
@@ -46,7 +46,7 @@ export const calculateRelations = (blocks: Block[]): RelationEdge[] => {
 
   const findRelations =
     (source: string, relation: string[], val: any): RelationEdge[] => {
-      if (val instanceof Link) {
+      if (isLink(val)) {
         if (val.id === null || source === 'DisplaySettings') {
           return linkArray;
         }

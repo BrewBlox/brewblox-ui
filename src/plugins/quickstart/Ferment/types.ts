@@ -1,4 +1,4 @@
-import { Qty } from '@/plugins/spark/bloxfield';
+import { JSQuantity } from '@/helpers/bloxfield';
 
 import { PinChannel, QuickStartOutput } from '../types';
 
@@ -27,7 +27,7 @@ export interface FermentConfig extends QuickStartOutput {
 }
 
 export interface FermentOpts {
-  fridgeSetting: Qty;
-  beerSetting: Qty;
+  fridgeSetting: JSQuantity;
+  beerSetting: JSQuantity;
   activeSetpoint: 'beer' | 'fridge';
 }

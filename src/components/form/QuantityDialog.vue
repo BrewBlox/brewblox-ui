@@ -1,16 +1,17 @@
 <script lang="ts">
+import round from 'lodash/round';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { roundNumber } from '@/helpers/functional';
-import { Qty } from '@/plugins/spark/bloxfield';
+import { bloxQty, isQuantity, prettyUnit } from '@/helpers/bloxfield';
+import { Quantity } from '@/plugins/spark/types';
 
 @Component
-export default class UnitDialog extends DialogBase {
+export default class QuantityDialog extends DialogBase {
   local: number | null = null;
 
-  @Prop({ type: Object, required: true, validator: v => v instanceof Qty })
-  public readonly value!: Qty;
+  @Prop({ type: Object, required: true, validator: isQuantity })
+  public readonly value!: Quantity;
 
   @Prop({ type: Number, default: 2 })
   readonly decimals!: number;
@@ -20,12 +21,16 @@ export default class UnitDialog extends DialogBase {
 
   created(): void {
     this.local = this.value.value !== null
-      ? roundNumber(this.value.value, this.decimals)
+      ? round(this.value.value, this.decimals)
       : null;
   }
 
   save(): void {
-    this.onDialogOk(this.value.copy(this.local));
+    this.onDialogOk(bloxQty(this.value).copy(this.local));
+  }
+
+  get notation(): string {
+    return prettyUnit(this.value);
   }
 }
 </script>
@@ -41,7 +46,7 @@ export default class UnitDialog extends DialogBase {
       <q-input
         v-model.number="local"
         :label="label"
-        :suffix="value.notation"
+        :suffix="notation"
         input-style="font-size: 170%"
         inputmode="numeric"
         pattern="[0-9]*"

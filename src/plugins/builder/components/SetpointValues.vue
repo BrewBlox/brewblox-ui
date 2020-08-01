@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { prettyUnit } from '@/helpers/bloxfield';
 import { contrastColor, typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
@@ -77,15 +78,11 @@ export default class SetpointValues extends Vue {
   }
 
   get setpointValue(): number | null {
-    return this.block
-      ? this.block.data.value.value
-      : null;
+    return this.block?.data.value.value ?? null;
   }
 
   get setpointUnit(): string {
-    return this.block
-      ? this.block.data.storedSetting.notation
-      : '';
+    return prettyUnit(this.block?.data.storedSetting);
   }
 }
 </script>

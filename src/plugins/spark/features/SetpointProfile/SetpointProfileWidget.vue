@@ -1,9 +1,8 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { isJsonEqual } from '@/helpers/functional';
+import { deepCopy, isJsonEqual } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { deepCopy } from '@/plugins/spark/parse-object';
 import { SetpointProfileBlock } from '@/plugins/spark/types';
 
 import { GraphProps, profileGraphProps } from './helpers';

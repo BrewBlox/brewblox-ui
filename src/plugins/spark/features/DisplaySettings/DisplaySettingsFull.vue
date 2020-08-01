@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink, isLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { Link } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { BlockOrIntfType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
@@ -33,10 +33,10 @@ export default class DisplaySettingsFull
 
   slotLink(slot: DisplaySlot): Link {
     if (!slot) {
-      return new Link(null);
+      return bloxLink(null);
     }
     return Object.values(slot)
-      .find(v => v instanceof Link) || new Link(null);
+      .find(v => isLink(v)) ?? bloxLink(null);
   }
 
   slotColor(slot: DisplaySlot): string {

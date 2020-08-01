@@ -1,4 +1,4 @@
-import { Link } from '@/plugins/spark/bloxfield';
+import { bloxLink } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, enumHint } from '@/plugins/spark/helpers';
 import { ActuatorLogicBlock, BlockIntfType, BlockSpec, LogicResult } from '@/plugins/spark/types';
@@ -15,8 +15,8 @@ const block: BlockSpec<ActuatorLogicBlock> = {
     enabled: true,
     result: LogicResult.RESULT_EMPTY,
     errorPos: 0,
-    targetId: new Link(null, BlockIntfType.ActuatorDigitalInterface),
-    drivenTargetId: new Link(null, BlockIntfType.ActuatorDigitalInterface, true),
+    targetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
+    drivenTargetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface, true),
     analog: [],
     digital: [],
     expression: '',

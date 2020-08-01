@@ -47,7 +47,7 @@ export default class ActuatorPwmWidget
           <template #message>
             <span>
               PWM is disabled:
-              <i>{{ block.data.actuatorId }}</i> will not be toggled.
+              <i>{{ block.data.actuatorId | link }}</i> will not be toggled.
             </span>
           </template>
           <template #actions>

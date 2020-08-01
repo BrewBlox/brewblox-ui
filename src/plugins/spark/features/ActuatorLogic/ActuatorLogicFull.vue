@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { Link } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isCompatible } from '@/plugins/spark/helpers';
 import {
@@ -141,7 +141,7 @@ export default class ActuatorLogicFull
     if (isCompatible(block.type, BlockIntfType.ActuatorDigitalInterface)) {
       this.block.data.digital.push({
         op: DigitalCompareOp.OP_VALUE_IS,
-        id: new Link(block.id, block.type),
+        id: bloxLink(block.id, block.type),
         rhs: DigitalState.STATE_ACTIVE,
         result: LogicResult.RESULT_EMPTY,
       });
@@ -149,7 +149,7 @@ export default class ActuatorLogicFull
     else if (isCompatible(block.type, BlockIntfType.ProcessValueInterface)) {
       this.block.data.analog.push({
         op: AnalogCompareOp.OP_VALUE_GE,
-        id: new Link(block.id, block.type),
+        id: bloxLink(block.id, block.type),
         rhs: 25,
         result: LogicResult.RESULT_EMPTY,
       });

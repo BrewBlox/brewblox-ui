@@ -1,5 +1,5 @@
-import { qtyDurationString } from '@/helpers/functional';
-import { Link, Qty, Time } from '@/plugins/spark/bloxfield';
+import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { durationString } from '@/helpers/duration';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import { ActuatorPwmBlock, AnalogConstraintsObj, BlockIntfType, BlockSpec } from '@/plugins/spark/types';
@@ -12,9 +12,9 @@ const typeName = 'ActuatorPwm';
 const block: BlockSpec<ActuatorPwmBlock> = {
   id: typeName,
   generate: () => ({
-    actuatorId: new Link(null, BlockIntfType.ActuatorDigitalInterface),
-    drivenActuatorId: new Link(null, BlockIntfType.ActuatorDigitalInterface, true),
-    period: new Qty(4, 'second'),
+    actuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
+    drivenActuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface, true),
+    period: bloxQty('4s'),
     desiredSetting: 0,
     setting: 0,
     value: 0,
@@ -25,13 +25,13 @@ const block: BlockSpec<ActuatorPwmBlock> = {
     {
       name: 'Heater - 4s period',
       generate: () => ({
-        period: new Qty(4, 'second'),
+        period: bloxQty('4s'),
       }),
     },
     {
       name: 'Fridge - 30m period',
       generate: () => ({
-        period: new Qty(1800, 'second'),
+        period: bloxQty('30m'),
       }),
     },
   ],
@@ -46,9 +46,9 @@ const block: BlockSpec<ActuatorPwmBlock> = {
     {
       key: 'period',
       title: 'Period',
-      component: 'TimeUnitValEdit',
-      generate: () => new Time(4, 'second'),
-      pretty: qtyDurationString,
+      component: 'DurationQuantityValEdit',
+      generate: () => bloxQty(4, 'second'),
+      pretty: durationString,
     },
     {
       key: 'enabled',
@@ -60,7 +60,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       key: 'actuatorId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, BlockIntfType.ActuatorDigitalInterface),
+      generate: () => bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
     },
     {
       key: 'constrainedBy',

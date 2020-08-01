@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { Temp, Time } from '@/plugins/spark/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { Fluctuation, TempSensorMockBlock } from '@/plugins/spark/types';
 
@@ -17,8 +17,8 @@ export default class TempSensorMockWidget
 
   addFluctuation(): void {
     this.block.data.fluctuations.push({
-      amplitude: new Temp(1, 'delta_degC').convert(`delta_${this.tempUnit}`),
-      period: new Time(6, 'hour'),
+      amplitude: bloxQty(1, 'delta_degC').to(`delta_${this.tempUnit}`),
+      period: bloxQty('6h'),
     });
     this.saveBlock();
   }
@@ -35,7 +35,7 @@ export default class TempSensorMockWidget
 
   editSetting(): void {
     createDialog({
-      component: 'UnitDialog',
+      component: 'QuantityDialog',
       title: 'Setting',
       label: 'Setting',
       value: this.block.data.setting,
@@ -77,10 +77,10 @@ export default class TempSensorMockWidget
             <q-icon name="mdi-thermometer" color="green-3" />
           </template>
           <template #value>
-            {{ block.data.value | qty }}
+            {{ block.data.value | quantity }}
           </template>
           <template #setting>
-            {{ block.data.setting | qty }}
+            {{ block.data.setting | quantity }}
           </template>
         </SettingValueField>
       </div>
@@ -112,14 +112,14 @@ export default class TempSensorMockWidget
           :key="`fluct-${idx}`"
           class="row q-gutter-x-sm q-ml-none fluctuation"
         >
-          <UnitField
+          <QuantityField
             :value="fluct.amplitude"
             title="Amplitude"
             label="Amplitude"
             class="col-grow"
             @input="amplitude => updateFluctuation(idx, {...fluct, amplitude})"
           />
-          <TimeUnitField
+          <DurationQuantityField
             :value="fluct.period"
             title="Period"
             label="Period"

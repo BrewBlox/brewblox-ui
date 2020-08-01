@@ -1,4 +1,4 @@
-import { Link } from '@/plugins/spark/bloxfield';
+import { bloxLink } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
 import {
@@ -17,9 +17,9 @@ const typeName = 'ActuatorOffset';
 const block: BlockSpec<ActuatorOffsetBlock> = {
   id: typeName,
   generate: () => ({
-    targetId: new Link(null, BlockIntfType.SetpointSensorPairInterface),
-    drivenTargetId: new Link(null, BlockIntfType.SetpointSensorPairInterface, true),
-    referenceId: new Link(null, BlockIntfType.SetpointSensorPairInterface),
+    targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+    drivenTargetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface, true),
+    referenceId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     referenceSettingOrValue: ReferenceKind.REF_SETTING,
     desiredSetting: 0,
     setting: 0,
@@ -45,13 +45,13 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, BlockIntfType.SetpointSensorPairInterface),
+      generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'referenceId',
       title: 'Reference',
       component: 'LinkValEdit',
-      generate: () => new Link(null, BlockIntfType.SetpointSensorPairInterface),
+      generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'constrainedBy',

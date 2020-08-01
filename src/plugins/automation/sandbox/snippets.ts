@@ -1,5 +1,5 @@
 import { createDialog } from '@/helpers/dialog';
-import { isLink, isQuantity } from '@/plugins/spark/bloxfield';
+import { isLink, isQuantity } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
 
@@ -115,7 +115,7 @@ export const generators: SnippetGenerator[] = [
           const block = sparkStore.blockByAddress(addr);
           const value = block!.data[addr.field!];
           const currentValue = isQuantity(value)
-            ? `qty(${value.value}, '${value.unit}')`
+            ? `bloxQty(${value.value}, '${value.unit}')`
             : JSON.stringify(value);
 
           callback('insert', [

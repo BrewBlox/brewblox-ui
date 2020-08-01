@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxQty } from '@/helpers/bloxfield';
 import { createBlockDialog } from '@/helpers/dialog';
-import { Qty } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { Block, PidBlock, Quantity, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 interface GridOpts {
   start?: number;
@@ -43,10 +43,10 @@ export default class PidFull
       : 0;
   }
 
-  get waterBoilTemp(): Qty {
+  get waterBoilTemp(): Quantity {
     return this.block.data.boilPointAdjust.unit === 'delta_degF'
-      ? new Qty(212, 'degF')
-      : new Qty(100, 'degC');
+      ? bloxQty(212, 'degF')
+      : bloxQty(100, 'degC');
   }
 
   showInput(): void {
@@ -98,7 +98,7 @@ export default class PidFull
         @input="v => { block.data.inputId = v; saveBlock(); }"
       />
       <div class="col-grow">
-        <UnitField
+        <QuantityField
           v-if="!!inputBlock"
           :value="inputBlock.data.storedSetting"
           :readonly="inputDriven"
@@ -107,7 +107,7 @@ export default class PidFull
           tag="b"
           @input="v => { inputBlock.data.storedSetting = v; saveStoreBlock(inputBlock); }"
         />
-        <UnitField
+        <QuantityField
           v-else
           :value="block.data.inputSetting"
           label="Setting"
@@ -115,7 +115,7 @@ export default class PidFull
           readonly
         />
       </div>
-      <UnitField
+      <QuantityField
         :value="block.data.inputValue"
         label="Measured"
         tag="b"
@@ -201,7 +201,7 @@ export default class PidFull
     <div class="widget-body items-center grid-container">
       <div class="span-2">
         <LabeledField label="Error">
-          {{ block.data.error | qty }}
+          {{ block.data.error | quantity }}
         </LabeledField>
       </div>
 
@@ -210,7 +210,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <UnitField
+        <QuantityField
           :value="block.data.kp"
           :html="true"
           title="Proportional gain Kp"
@@ -242,7 +242,7 @@ export default class PidFull
 
       <div class="span-2">
         <LabeledField label="Integral">
-          {{ block.data.integral | qty }}
+          {{ block.data.integral | quantity }}
         </LabeledField>
       </div>
 
@@ -251,7 +251,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
+        <QuantityField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
       </div>
 
       <div class="span-1 self-center text-center">
@@ -259,7 +259,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <TimeUnitField
+        <DurationQuantityField
           :value="block.data.ti"
           :rules="[
             v => v >= 0 || 'Value must be positive',
@@ -318,7 +318,7 @@ export default class PidFull
 
       <div class="span-2">
         <LabeledField :tag-class="{darkish: block.data.td.value === 0}" label="Derivative">
-          {{ block.data.derivative | qty }}
+          {{ block.data.derivative | quantity }}
         </LabeledField>
       </div>
 
@@ -327,7 +327,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <UnitField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
+        <QuantityField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
       </div>
 
       <div class="span-1 self-center text-center">
@@ -335,7 +335,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <TimeUnitField
+        <DurationQuantityField
           :value="block.data.td"
           :rules="[
             v => v >= 0 || 'Value must be positive',
@@ -417,7 +417,7 @@ export default class PidFull
         class="col-grow"
         @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
       />
-      <UnitField
+      <QuantityField
         :value="block.data.boilPointAdjust"
         title="Boil point adjustment"
         label="Boil temperature setting"
@@ -428,7 +428,7 @@ export default class PidFull
           <span class="darkish">{{ waterBoilTemp.value | round(0) }}</span> +
           <b>{{ block.data.boilPointAdjust.value | round }}</b>
         </template>
-      </UnitField>
+      </QuantityField>
     </div>
   </div>
 </template>

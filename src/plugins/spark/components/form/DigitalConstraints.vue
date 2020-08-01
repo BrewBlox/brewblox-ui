@@ -2,11 +2,11 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { Link, Time } from '@/plugins/spark/bloxfield';
 import { digitalConstraintLabels } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import { MutexBlock } from '@/plugins/spark/types';
+import { MutexBlock, Quantity } from '@/plugins/spark/types';
 import type {
   DigitalConstraint,
   DigitalConstraintKey,
@@ -47,27 +47,27 @@ export default class DigitalConstraints extends Vue {
   createDefault(type: DigitalConstraintKey): Wrapped {
     const opts: Record<DigitalConstraintKey, DigitalConstraint> = {
       minOff: {
-        remaining: new Time(),
-        minOff: new Time(),
+        remaining: bloxQty('0s'),
+        minOff: bloxQty('0s'),
       },
       minOn: {
-        remaining: new Time(),
-        minOn: new Time(),
+        remaining: bloxQty('0s'),
+        minOn: bloxQty('0s'),
       },
       delayedOff: {
-        remaining: new Time(),
-        delayedOff: new Time(),
+        remaining: bloxQty('0s'),
+        delayedOff: bloxQty('0s'),
       },
       delayedOn: {
-        remaining: new Time(),
-        delayedOn: new Time(),
+        remaining: bloxQty('0s'),
+        delayedOn: bloxQty('0s'),
       },
       mutexed: {
-        remaining: new Time(),
+        remaining: bloxQty('0s'),
         mutexed: {
-          mutexId: new Link(null, 'MutexInterface'),
+          mutexId: bloxLink(null, 'MutexInterface'),
           hasCustomHoldTime: false,
-          extraHoldTime: new Time(),
+          extraHoldTime: bloxQty('0s'),
           hasLock: false,
         },
       },
@@ -79,7 +79,7 @@ export default class DigitalConstraints extends Vue {
     return constraint.mutexed.hasCustomHoldTime;
   }
 
-  holdTime(constraint: MutexedConstraint): Time {
+  holdTime(constraint: MutexedConstraint): Quantity {
     if (this.isCustom(constraint)) {
       return constraint.mutexed.extraHoldTime;
     }
@@ -87,10 +87,10 @@ export default class DigitalConstraints extends Vue {
       const mutex = sparkStore.blockById<MutexBlock>(
         this.serviceId,
         constraint.mutexed.mutexId.id);
-      return mutex?.data.differentActuatorWait ?? new Time();
+      return mutex?.data.differentActuatorWait ?? bloxQty('0s');
     }
     else {
-      return new Time();
+      return bloxQty('0s');
     }
   }
 
@@ -133,7 +133,7 @@ export default class DigitalConstraints extends Vue {
           class="col-grow"
           @input="v => { constraint.mutexed.mutexId = v; save(); }"
         />
-        <TimeUnitField
+        <DurationQuantityField
           :value="holdTime(constraint)"
           title="Extra lock time"
           label="Extra lock time"
@@ -163,9 +163,9 @@ export default class DigitalConstraints extends Vue {
               </q-btn>
             </template>
           </template>
-        </TimeUnitField>
+        </DurationQuantityField>
       </template>
-      <TimeUnitField
+      <DurationQuantityField
         v-if="type === 'minOff'"
         :value="constraint.minOff"
         title="Minimum OFF period"
@@ -173,7 +173,7 @@ export default class DigitalConstraints extends Vue {
         class="col-grow"
         @input="v => { constraint.minOff = v; save(); }"
       />
-      <TimeUnitField
+      <DurationQuantityField
         v-if="type === 'minOn'"
         :value="constraint.minOn"
         title="Minimum ON period"
@@ -181,7 +181,7 @@ export default class DigitalConstraints extends Vue {
         class="col-grow"
         @input="v => { constraint.minOn = v; save(); }"
       />
-      <TimeUnitField
+      <DurationQuantityField
         v-if="type === 'delayedOff'"
         :value="constraint.delayedOff"
         title="Delay OFF"
@@ -189,7 +189,7 @@ export default class DigitalConstraints extends Vue {
         class="col-grow"
         @input="v => { constraint.delayedOff = v; save(); }"
       />
-      <TimeUnitField
+      <DurationQuantityField
         v-if="type === 'delayedOn'"
         :value="constraint.delayedOn"
         title="Delay ON"

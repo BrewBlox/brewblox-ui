@@ -1,5 +1,5 @@
+import { bloxLink } from '@/helpers/bloxfield';
 import { shortDateString } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec, SetpointProfileBlock } from '@/plugins/spark/types';
@@ -15,8 +15,8 @@ const block: BlockSpec<SetpointProfileBlock> = {
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,
-    targetId: new Link(null, 'SetpointSensorPairInterface'),
-    drivenTargetId: new Link(null),
+    targetId: bloxLink(null, 'SetpointSensorPairInterface'),
+    drivenTargetId: bloxLink(null),
   }),
   fields: [
     {
@@ -42,7 +42,7 @@ const block: BlockSpec<SetpointProfileBlock> = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, 'SetpointSensorPairInterface'),
+      generate: () => bloxLink(null, 'SetpointSensorPairInterface'),
     },
   ],
 };

@@ -65,7 +65,7 @@ export default class PidBasic
     }
     else {
       createDialog({
-        component: 'UnitDialog',
+        component: 'QuantityDialog',
         title: 'Edit setting',
         message: `Edit ${id} setting`,
         parent: this,
@@ -100,10 +100,10 @@ export default class PidBasic
           <q-icon name="mdi-thermometer" color="green-3" />
         </template>
         <template #value>
-          {{ block.data.inputValue | qty }}
+          {{ block.data.inputValue | quantity }}
         </template>
         <template #setting>
-          {{ block.data.inputSetting | qty }}
+          {{ block.data.inputSetting | quantity }}
         </template>
       </SettingValueField>
       <SettingValueField editable class="col-grow" @click="showOutput">

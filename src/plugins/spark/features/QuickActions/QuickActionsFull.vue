@@ -4,8 +4,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { filterById, spliceById } from '@/helpers/functional';
-import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
+import { deepCopy, filterById, spliceById } from '@/helpers/functional';
+import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 
@@ -33,7 +33,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   }
 
   saveActions(actions: ChangeAction[] = this.actions): void {
-    this.config.actions = serialize(actions);
+    this.config.actions = actions;
     this.saveConfig();
   }
 

@@ -8,12 +8,13 @@ import { uid } from 'quasar';
 import { Component, Ref, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
+import { bloxQty, Quantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, isJsonEqual, qtyDurationString } from '@/helpers/functional';
+import { durationString } from '@/helpers/duration';
+import { isJsonEqual } from '@/helpers/functional';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams, QueryTarget } from '@/plugins/history/types';
-import { Qty } from '@/plugins/spark/bloxfield';
 
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {
@@ -80,13 +81,13 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   chooseDuration(): void {
     const current = this.config.params.duration ?? '1h';
     createDialog({
-      component: 'TimeUnitDialog',
+      component: 'DurationQuantityDialog',
       parent: this,
       title: 'Custom graph duration',
-      value: new Qty(durationMs(current), 'ms'),
+      value: bloxQty(current),
       label: 'Duration',
     })
-      .onOk(qty => this.saveParams({ duration: qtyDurationString(qty) }));
+      .onOk((v: Quantity) => this.saveParams({ duration: durationString(v) }));
   }
 
   async regraph(): Promise<void> {

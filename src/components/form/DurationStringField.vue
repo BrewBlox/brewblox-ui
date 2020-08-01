@@ -2,13 +2,13 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
+import { bloxQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, durationString, qtyDurationString } from '@/helpers/functional';
-import { Qty } from '@/plugins/spark/bloxfield';
-
+import { durationString } from '@/helpers/duration';
+import { Quantity } from '@/plugins/spark/types';
 
 @Component
-export default class DurationInputField extends FieldBase {
+export default class DurationStringField extends FieldBase {
 
   @Prop({ type: String })
   public readonly value!: string;
@@ -24,13 +24,7 @@ export default class DurationInputField extends FieldBase {
   }
 
   get displayValue(): string | number {
-    if (this.value === ''
-      || this.value === null
-      || this.value === undefined) {
-      return '<not set>';
-    }
-
-    return durationString(this.value);
+    return durationString(this.value, '<not set>');
   }
 
   openDialog(): void {
@@ -39,16 +33,16 @@ export default class DurationInputField extends FieldBase {
     }
 
     createDialog({
-      component: 'TimeUnitDialog',
+      component: 'DurationQuantityDialog',
       title: this.title,
       message: this.message,
       html: this.html,
       parent: this,
-      value: new Qty(durationMs(this.value), 'ms'),
+      value: bloxQty(this.value),
       label: this.label,
       rules: this.rules,
     })
-      .onOk(unit => this.change(qtyDurationString(unit)));
+      .onOk((q: Quantity) => this.change(durationString(q)));
   }
 }
 </script>

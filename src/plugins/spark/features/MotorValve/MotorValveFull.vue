@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink } from '@/helpers/bloxfield';
 import { typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2408StartChannels } from '@/plugins/spark/getters';
 import { DS2408Block, MotorValveBlock } from '@/plugins/spark/types';
@@ -50,7 +50,7 @@ export default class MotorValveFull
     if (this.block.data.startChannel === pinId) {
       return;
     }
-    const currentDriver = new Link(this.claimedChannels[pinId] || null, 'MotorValve');
+    const currentDriver = bloxLink(this.claimedChannels[pinId] || null, 'MotorValve');
     if (currentDriver.id) {
       const currentDriverBlock = this.sparkModule.blockById<MotorValveBlock>(currentDriver.id)!;
       currentDriverBlock.data.startChannel = 0;

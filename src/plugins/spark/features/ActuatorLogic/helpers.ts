@@ -1,4 +1,4 @@
-import { Temp } from '@/plugins/spark/bloxfield';
+import { bloxQty } from '@/helpers/bloxfield';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { ActuatorLogicBlock, AnalogCompare, DigitalCompare } from '@/plugins/spark/types';
 
@@ -174,7 +174,7 @@ export function prettyDigital(cmp: DigitalCompare): string {
 
 export function prettyAnalog(cmp: AnalogCompare, blockType: string | null, tempUnit: string): string {
   const rhs = isCompatible(blockType, 'SetpointSensorPairInterface')
-    ? new Temp(cmp.rhs).convert(tempUnit).toString()
+    ? bloxQty(cmp.rhs, 'degC').to(tempUnit).toString()
     : `${cmp.rhs}%`;
 
   return `${analogOpTitles[cmp.op]} ${rhs}`;

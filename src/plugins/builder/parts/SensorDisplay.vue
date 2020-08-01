@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { prettyUnit } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import { TempSensorMockBlock, TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -38,7 +39,7 @@ export default class SensorDisplay extends PartBase {
   }
 
   get tempUnit(): string {
-    return this.block?.data.value?.notation ?? '';
+    return prettyUnit(this.block?.data.value);
   }
 
   get color(): string {

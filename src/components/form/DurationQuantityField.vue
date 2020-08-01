@@ -2,20 +2,25 @@
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
+import { isQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { Qty } from '@/plugins/spark/bloxfield';
+import { Quantity } from '@/plugins/spark/types';
 
 @Component
-export default class TimeUnitField extends FieldBase {
+export default class DurationQuantityField extends FieldBase {
 
-  @Prop({ type: Object, required: true, validator: v => v instanceof Qty })
-  public readonly value!: Qty;
+  @Prop({
+    type: Object,
+    required: true,
+    validator: isQuantity,
+  })
+  public readonly value!: Quantity;
 
   @Prop({ type: String, default: 'duration' })
   public readonly label!: string;
 
   @Emit('input')
-  public change(v: Qty): Qty {
+  public change(v: Quantity): Quantity {
     return v;
   }
 
@@ -25,7 +30,7 @@ export default class TimeUnitField extends FieldBase {
     }
 
     createDialog({
-      component: 'TimeUnitDialog',
+      component: 'DurationQuantityDialog',
       title: this.title,
       message: this.message,
       html: this.html,
@@ -47,7 +52,7 @@ export default class TimeUnitField extends FieldBase {
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <slot name="value">
-      {{ value | unitDuration }}
+      {{ value | duration }}
     </slot>
 
     <template v-for="slot in activeSlots">

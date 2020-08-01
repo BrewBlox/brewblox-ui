@@ -8,15 +8,15 @@ import range from 'lodash/range';
 import { Enum } from 'typescript-string-enums';
 import { VueConstructor } from 'vue';
 
+import { bloxLink, bloxQty, isLink, isQuantity, prettyLink, prettyQty, prettyUnit } from '@/helpers/bloxfield';
 import { ref } from '@/helpers/component-ref';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { durationString } from '@/helpers/duration';
 import {
   base64ToHex,
   dateString,
-  durationString,
   hexToBase64,
   matchesType,
-  qtyDurationString,
   round,
   shortDateString,
   truncate,
@@ -26,11 +26,9 @@ import {
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
-import { Link, prettify, Qty } from '@/plugins/spark/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 
-import { isJSBloxField } from './bloxfield';
 import { compatibleTypes } from './getters';
 import {
   AnalogConstraint,
@@ -60,21 +58,15 @@ export const blockIdRules = (serviceId: string): InputRule[] => [
 ];
 
 export const installFilters = (Vue: VueConstructor): void => {
-  Vue.filter(
-    'qty',
-    (value: Qty | null) =>
-      (value !== null && value !== undefined ? value.toString() : '-'));
-  Vue.filter(
-    'link',
-    (value: Link | null) =>
-      (value !== null && value !== undefined ? value.toString() : '-'));
+  Vue.filter('quantity', prettyQty);
+  Vue.filter('prettyUnit', prettyUnit);
+  Vue.filter('duration', (v: any, nullV = '<not set>') => durationString(v, nullV));
+  Vue.filter('link', prettyLink);
   Vue.filter('round', round);
   Vue.filter('truncateRound', truncateRound);
   Vue.filter('hexToBase64', hexToBase64);
   Vue.filter('base64ToHex', base64ToHex);
-  Vue.filter('duration', durationString);
   Vue.filter('truncated', truncate);
-  Vue.filter('unitDuration', qtyDurationString);
   Vue.filter('dateString', dateString);
   Vue.filter('shortDateString', shortDateString);
   Vue.filter('capitalize', capitalize);
@@ -133,7 +125,7 @@ const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBloc
 export const isDisplayed = (addr: BlockAddress): boolean =>
   addr.id !== null
   && !!displayBlock(addr.serviceId)?.data.widgets
-    .find(w => Object.values(w).find(v => v instanceof Link && v.id === addr.id));
+    .find(w => Object.values(w).find(v => isLink(v) && v.id === addr.id));
 
 export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<DisplayOpts> = {}): Promise<void> => {
   const display = displayBlock(addr?.serviceId);
@@ -163,7 +155,7 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   else {
     const { id, type } = addr;
 
-    const link = new Link(id, type as BlockType);
+    const link = bloxLink(id, type as BlockType);
     const slot: DisplaySlot = {
       pos: opts.pos,
       color: opts.color,
@@ -325,19 +317,19 @@ export const prettifyConstraints =
           }
           // Digital
           if ('minOff' in c) {
-            return `Minimum OFF = ${qtyDurationString(c.minOff)}`;
+            return `Minimum OFF = ${durationString(c.minOff)}`;
           }
           if ('minOn' in c) {
-            return `Minimum ON = ${qtyDurationString(c.minOn)}`;
+            return `Minimum ON = ${durationString(c.minOn)}`;
           }
           if ('mutexed' in c) {
             return `Mutexed by ${c.mutexed.mutexId.id ?? '<not set>'}`;
           }
           if ('delayedOn' in c) {
-            return `Delayed ON = ${qtyDurationString(c.delayedOn)}`;
+            return `Delayed ON = ${durationString(c.delayedOn)}`;
           }
           if ('delayedOff' in c) {
-            return `Delayed OFF = ${qtyDurationString(c.delayedOff)}`;
+            return `Delayed OFF = ${durationString(c.delayedOff)}`;
           }
           // Fallback
           return 'Unknown constraint';
@@ -346,7 +338,9 @@ export const prettifyConstraints =
         .join(', ');
 
 const postfix = (obj: any): string =>
-  isJSBloxField(obj) ? obj.postfix : '';
+  isQuantity(obj)
+    ? bloxQty(obj).postfix
+    : '';
 
 export const blockGraphCfg = <BlockT extends Block = any>(
   crud: BlockCrud<BlockT>,
@@ -380,7 +374,7 @@ export const blockGraphCfg = <BlockT extends Block = any>(
 
   const renames: Mapped<string> = mapValues(
     graphedObj,
-    f => `${f.graphName ?? f.title} ${prettify(postfix(crud.block.data[f.key]))}`);
+    f => `${f.graphName ?? f.title} ${prettyUnit(postfix(crud.block.data[f.key]))}`);
 
   const targets = [{
     measurement: crud.block.serviceId,

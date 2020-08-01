@@ -63,7 +63,7 @@ export default class ActuatorPwmFull
 
       <div class="col-break" />
 
-      <TimeUnitField
+      <DurationQuantityField
         :value="block.data.period"
         title="Period"
         label="Period"

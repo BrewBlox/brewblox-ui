@@ -1,4 +1,4 @@
-import { Qty } from '@/plugins/spark/bloxfield';
+import { Quantity } from '@/helpers/bloxfield';
 
 import { PinChannel, QuickStartOutput } from '../types';
 
@@ -36,8 +36,8 @@ export interface HermsConfig extends QuickStartOutput {
 }
 
 export interface HermsOpts {
-  hltKp: Qty;
-  bkKp: Qty;
-  mtKp: Qty;
-  driverMax: Qty;
+  hltKp: Quantity;
+  bkKp: Quantity;
+  mtKp: Quantity;
+  driverMax: Quantity;
 }

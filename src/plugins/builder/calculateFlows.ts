@@ -97,9 +97,9 @@ const mergeFlows = (flows: CalculatedFlows): CalculatedFlows => {
 
       const scale = (unscaledFlows: LiquidFlow, factor: number): LiquidFlow => {
         const entries = Object.entries(unscaledFlows);
-        const qty = entries.length;
-        if (qty && entries.every(([, v]) => v === 0)) {
-          return mapValues(unscaledFlows, () => factor / qty);
+        const bloxQty = entries.length;
+        if (bloxQty && entries.every(([, v]) => v === 0)) {
+          return mapValues(unscaledFlows, () => factor / bloxQty);
         }
         return mapValues(unscaledFlows, v => v * factor);
       };

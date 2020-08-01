@@ -1,15 +1,14 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { prettify, Qty } from '@/plugins/spark/bloxfield';
+import { bloxQty, prettify, Quantity } from '@/helpers/bloxfield';
 
 import ValEditBase from '../ValEditBase';
 
 @Component
-export default class UnitValEdit extends ValEditBase {
-  prettify = prettify;
-  field!: Qty;
-  local: number | null = null;
+export default class QuantityValEdit extends ValEditBase {
+  field!: Quantity;
+  local: Quantity | null = null;
 
   @Watch('local')
   updateField(newV: number | null): void {
@@ -19,7 +18,11 @@ export default class UnitValEdit extends ValEditBase {
   }
 
   created(): void {
-    this.local = this.field.value;
+    this.local = bloxQty(this.field);
+  }
+
+  get notation(): string {
+    return prettify(this.field);
   }
 }
 </script>
@@ -27,13 +30,13 @@ export default class UnitValEdit extends ValEditBase {
 <template>
   <div v-if="editable" class="row no-wrap q-gutter-x-xs">
     <q-input
-      v-model.number="local"
+      v-model.number="local.value"
       :dense="dense"
       inputmode="numeric"
       pattern="[0-9]*"
       class="col-grow"
       label="Value"
-      :suffix="field.notation"
+      :suffix="notation"
     />
   </div>
   <div
@@ -41,6 +44,6 @@ export default class UnitValEdit extends ValEditBase {
     class="clickable q-pa-sm rounded-borders"
     @click="startEdit"
   >
-    {{ field }}
+    {{ field | quantity }}
   </div>
 </template>

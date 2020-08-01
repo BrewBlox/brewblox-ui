@@ -1,4 +1,4 @@
-import { Link } from '@/plugins/spark/bloxfield';
+import { bloxLink } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/helpers';
 import { BlockSpec, DigitalConstraintsObj, DigitalState, MotorValveBlock, ValveState } from '@/plugins/spark/types';
@@ -11,7 +11,7 @@ const typeName = 'MotorValve';
 const block: BlockSpec<MotorValveBlock> = {
   id: typeName,
   generate: () => ({
-    hwDevice: new Link(null, 'IoArrayInterface'),
+    hwDevice: bloxLink(null, 'IoArrayInterface'),
     startChannel: 0,
     desiredState: DigitalState.STATE_INACTIVE,
     state: DigitalState.STATE_INACTIVE,

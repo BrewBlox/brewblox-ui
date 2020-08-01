@@ -5,8 +5,7 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 
 import { Coordinates } from '@/helpers/coordinates';
 import { createDialog } from '@/helpers/dialog';
-import { clampRotation } from '@/helpers/functional';
-import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
+import { clampRotation, deepCopy } from '@/helpers/functional';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -277,7 +276,7 @@ export default class BuilderEditor extends Vue {
     if (saveHistory) {
       const stored = builderStore.layoutById(this.layout.id);
       if (stored) {
-        this.history.push(JSON.stringify(serialize(stored.parts)));
+        this.history.push(JSON.stringify(stored.parts));
         this.undoneHistory = [];
       }
     }
@@ -306,8 +305,8 @@ export default class BuilderEditor extends Vue {
 
       const current = builderStore.layoutById(this.layout.id);
       if (current) {
-        const state = JSON.stringify(serialize(current.parts));
-        const parts = deserialize(JSON.parse(this.history.pop()!));
+        const state = JSON.stringify(current.parts);
+        const parts = JSON.parse(this.history.pop()!);
         await this.saveParts(parts, false);
         this.undoneHistory.push(state);
       }
@@ -320,8 +319,8 @@ export default class BuilderEditor extends Vue {
 
       const current = builderStore.layoutById(this.layout.id);
       if (current) {
-        const state = JSON.stringify(serialize(current.parts));
-        const parts = deserialize(JSON.parse(this.undoneHistory.pop()!));
+        const state = JSON.stringify(current.parts);
+        const parts = JSON.parse(this.undoneHistory.pop()!);
         await this.saveParts(parts, false);
         this.history.push(state);
       }

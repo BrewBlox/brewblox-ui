@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { durationMs, durationString } from '@/helpers/functional';
+import { durationMs, durationString } from '@/helpers/duration';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { TimeElapsedImpl } from '@/plugins/automation/types';
 

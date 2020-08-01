@@ -1,4 +1,4 @@
-import { Time } from '@/plugins/spark/bloxfield';
+import { bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockSpec, MutexBlock } from '@/plugins/spark/types';
@@ -11,8 +11,8 @@ const typeName = 'Mutex';
 const block: BlockSpec<MutexBlock> = {
   id: typeName,
   generate: () => ({
-    differentActuatorWait: new Time(0, 's'),
-    waitRemaining: new Time(0, 's'),
+    differentActuatorWait: bloxQty('0s'),
+    waitRemaining: bloxQty('0s'),
   }),
   fields: [],
 };

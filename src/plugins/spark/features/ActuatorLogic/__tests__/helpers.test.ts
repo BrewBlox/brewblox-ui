@@ -1,4 +1,4 @@
-import { Link } from '@/plugins/spark/bloxfield';
+import { bloxLink } from '@/helpers/bloxfield';
 import {
   ActuatorLogicBlock,
   AnalogCompareOp,
@@ -53,19 +53,19 @@ const analog = (): AnalogCompare[] => ([
   {
     op: AnalogCompareOp.OP_SETTING_GE,
     result: LogicResult.RESULT_EMPTY,
-    id: new Link(null),
+    id: bloxLink(null),
     rhs: 20,
   },
   {
     op: AnalogCompareOp.OP_SETTING_GE,
     result: LogicResult.RESULT_EMPTY,
-    id: new Link('analog-1'),
+    id: bloxLink('analog-1'),
     rhs: 20,
   },
   {
     op: AnalogCompareOp.OP_SETTING_GE,
     result: LogicResult.RESULT_EMPTY,
-    id: new Link('analog-2'),
+    id: bloxLink('analog-2'),
     rhs: 20,
   },
 ]);
@@ -73,19 +73,19 @@ const digital = (): DigitalCompare[] => ([
   {
     op: DigitalCompareOp.OP_DESIRED_IS,
     result: LogicResult.RESULT_EMPTY,
-    id: new Link(null),
+    id: bloxLink(null),
     rhs: DigitalState.STATE_ACTIVE,
   },
   {
     op: DigitalCompareOp.OP_DESIRED_IS,
     result: LogicResult.RESULT_EMPTY,
-    id: new Link('digital-1'),
+    id: bloxLink('digital-1'),
     rhs: DigitalState.STATE_ACTIVE,
   },
   {
     op: DigitalCompareOp.OP_DESIRED_IS,
     result: LogicResult.RESULT_EMPTY,
-    id: new Link('digital-2'),
+    id: bloxLink('digital-2'),
     rhs: DigitalState.STATE_ACTIVE,
   },
 ]);

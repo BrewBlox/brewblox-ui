@@ -2,10 +2,10 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { bloxLink, JSLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/bloxfield';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockOrIntfType } from '@/plugins/spark/types';
@@ -13,7 +13,7 @@ import { featureStore } from '@/store/features';
 
 @Component
 export default class LinkDialog extends DialogBase {
-  local: Link | null = null
+  local: JSLink | null = null
 
   @Prop({ type: Object })
   public readonly value!: Link;
@@ -37,7 +37,7 @@ export default class LinkDialog extends DialogBase {
   public readonly configurable!: boolean;
 
   created(): void {
-    this.local = this.value.copy();
+    this.local = bloxLink(this.value);
   }
 
   get typeFilter(): ((type: BlockOrIntfType) => boolean) {
@@ -47,7 +47,7 @@ export default class LinkDialog extends DialogBase {
   get linkOpts(): Link[] {
     return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => this.typeFilter(block.type))
-      .map(block => new Link(block.id, block.type))
+      .map(block => bloxLink(block.id, block.type))
       .sort(objectStringSorter('id'));
   }
 
@@ -68,7 +68,9 @@ export default class LinkDialog extends DialogBase {
   }
 
   update(link: Link | null): void {
-    this.local = link ?? new Link(null, this.value.type);
+    this.local = link !== null
+      ? bloxLink(link)
+      : bloxLink(null, this.value.type);
   }
 
   configureBlock(): void {
@@ -84,7 +86,7 @@ export default class LinkDialog extends DialogBase {
     })
       .onOk((block: Block) => {
         // Retain original type
-        this.local = new Link(block.id, this.value.type);
+        this.local = bloxLink(block.id, this.value.type);
       });
   }
 

@@ -31,7 +31,7 @@ export default class SetpointSensorPairForm
     <slot name="warnings" />
 
     <div class="widget-body row">
-      <UnitField
+      <QuantityField
         :value="block.data.storedSetting"
         :readonly="isDriven"
         :class="{darkened: !block.data.settingEnabled}"
@@ -41,14 +41,14 @@ export default class SetpointSensorPairForm
         class="col-grow"
         @input="v => { block.data.storedSetting = v; saveBlock(); }"
       />
-      <UnitField
+      <QuantityField
         :value="block.data.value"
         label="Sensor"
         readonly
         tag="big"
         class="col-grow"
       />
-      <UnitField
+      <QuantityField
         :value="block.data.valueUnfiltered"
         label="Unfiltered sensor"
         readonly
@@ -77,7 +77,7 @@ export default class SetpointSensorPairForm
         class="col-grow"
         @input="v => { block.data.filter = v; saveBlock(); }"
       />
-      <UnitField
+      <QuantityField
         :value="block.data.filterThreshold"
         :html="true"
         title="Filter bypass threshold"
@@ -102,7 +102,7 @@ export default class SetpointSensorPairForm
             <q-tooltip>Bypass filter now</q-tooltip>
           </q-btn>
         </template>
-      </UnitField>
+      </QuantityField>
 
       <div class="col-break" />
 

@@ -5,12 +5,13 @@ import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, durationString, qtyDurationString } from '@/helpers/functional';
+import { durationString } from '@/helpers/duration';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { Qty } from '@/plugins/spark/bloxfield';
+
+import { bloxQty } from '../../../../helpers/bloxfield';
 
 @Component
 export default class BlockGraph extends Vue {
@@ -115,13 +116,13 @@ export default class BlockGraph extends Vue {
   chooseDuration(): void {
     const current = this.graphCfg.params.duration ?? '1h';
     createDialog({
-      component: 'TimeUnitDialog',
+      component: 'DurationQuantityDialog',
       parent: this,
       title: 'Custom graph duration',
-      value: new Qty(durationMs(current), 'ms'),
+      value: bloxQty(current),
       label: 'Duration',
     })
-      .onOk(unit => this.saveParams({ duration: qtyDurationString(unit) }));
+      .onOk(unit => this.saveParams({ duration: durationString(unit) }));
   }
 }
 </script>
