@@ -1,27 +1,38 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
-import { isQuantity } from '@/helpers/bloxfield';
+import { bloxQty, isQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
+import { durationString, isDurationString } from '@/helpers/duration';
 import { Quantity } from '@/plugins/spark/types';
 
 @Component
-export default class DurationQuantityField extends FieldBase {
+export default class DurationField extends FieldBase {
 
+  // Duration can be:
+  // - Quantity -> bloxQty(10, 'min')
+  // - duration string -> '10m'
+  // @input events emitted will match type of value
   @Prop({
-    type: Object,
+    type: [Object, String],
     required: true,
-    validator: isQuantity,
+    validator: v => isQuantity(v) || isDurationString(v),
   })
-  public readonly value!: Quantity;
+  public readonly value!: Quantity | string;
 
   @Prop({ type: String, default: 'duration' })
   public readonly label!: string;
 
-  @Emit('input')
-  public change(v: Quantity): Quantity {
-    return v;
+  get isQtyValue(): boolean {
+    return isQuantity(this.value);
+  }
+
+  public save(v: Quantity): void {
+    const matching = this.isQtyValue
+      ? v
+      : durationString(v);
+    this.$emit('input', matching);
   }
 
   openDialog(): void {
@@ -35,11 +46,11 @@ export default class DurationQuantityField extends FieldBase {
       message: this.message,
       html: this.html,
       parent: this,
-      value: this.value,
+      value: bloxQty(this.value),
       label: this.label,
       rules: this.rules,
     })
-      .onOk(this.change);
+      .onOk(this.save);
   }
 
   // Can't be placed in parent class

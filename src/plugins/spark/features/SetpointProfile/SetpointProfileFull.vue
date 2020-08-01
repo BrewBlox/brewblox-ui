@@ -231,7 +231,7 @@ export default class SetpointProfileFull
         :key="idx"
         class="col-12 row q-gutter-xs q-mt-none profile-point"
       >
-        <DurationQuantityField
+        <DurationField
           :value="bloxQty(point.offsetMs, 'ms')"
           title="Offset from start time"
           label="Offset"

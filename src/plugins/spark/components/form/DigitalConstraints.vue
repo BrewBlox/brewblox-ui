@@ -133,7 +133,7 @@ export default class DigitalConstraints extends Vue {
           class="col-grow"
           @input="v => { constraint.mutexed.mutexId = v; save(); }"
         />
-        <DurationQuantityField
+        <DurationField
           :value="holdTime(constraint)"
           title="Extra lock time"
           label="Extra lock time"
@@ -163,9 +163,9 @@ export default class DigitalConstraints extends Vue {
               </q-btn>
             </template>
           </template>
-        </DurationQuantityField>
+        </DurationField>
       </template>
-      <DurationQuantityField
+      <DurationField
         v-if="type === 'minOff'"
         :value="constraint.minOff"
         title="Minimum OFF period"
@@ -173,7 +173,7 @@ export default class DigitalConstraints extends Vue {
         class="col-grow"
         @input="v => { constraint.minOff = v; save(); }"
       />
-      <DurationQuantityField
+      <DurationField
         v-if="type === 'minOn'"
         :value="constraint.minOn"
         title="Minimum ON period"
@@ -181,7 +181,7 @@ export default class DigitalConstraints extends Vue {
         class="col-grow"
         @input="v => { constraint.minOn = v; save(); }"
       />
-      <DurationQuantityField
+      <DurationField
         v-if="type === 'delayedOff'"
         :value="constraint.delayedOff"
         title="Delay OFF"
@@ -189,7 +189,7 @@ export default class DigitalConstraints extends Vue {
         class="col-grow"
         @input="v => { constraint.delayedOff = v; save(); }"
       />
-      <DurationQuantityField
+      <DurationField
         v-if="type === 'delayedOn'"
         :value="constraint.delayedOn"
         title="Delay ON"

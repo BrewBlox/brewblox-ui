@@ -153,7 +153,7 @@ export default class GraphPeriodEditor extends Vue {
         class="col-auto min-width-sm"
         @input="saveStart"
       />
-      <DurationStringField
+      <DurationField
         v-if="shownPeriod.duration"
         :value="config.params.duration"
         title="Duration"

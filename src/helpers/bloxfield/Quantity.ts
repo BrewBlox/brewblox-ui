@@ -69,8 +69,7 @@ const fromArgs =
   });
 
 export function rawQty(value: number | null, unit: string): Quantity;
-export function rawQty(value: string): Quantity;
-export function rawQty(value: Quantity): Quantity;
+export function rawQty(value: Quantity | string): Quantity;
 export function rawQty(value: WrapperValue, unit?: string): Quantity {
   if (isQuantity(value)) {
     return { ...value };
@@ -91,8 +90,7 @@ export class JSQuantity implements JSBloxField, Quantity {
   public readonly: boolean;
 
   public constructor(value: number | null, unit: string);
-  public constructor(value: string); // duration
-  public constructor(value: Quantity);
+  public constructor(value: Quantity | string);
   public constructor(value: WrapperValue, unit?: string) {
     const obj = rawQty(value as any, unit as any);
     this.value = obj.value;
@@ -145,8 +143,7 @@ export class JSQuantity implements JSBloxField, Quantity {
 }
 
 export function bloxQty(value: number | null, unit: string): JSQuantity;
-export function bloxQty(value: string): JSQuantity;
-export function bloxQty(value: Quantity): JSQuantity;
+export function bloxQty(value: Quantity | string): JSQuantity;
 export function bloxQty(value: WrapperValue, unit?: string): JSQuantity {
   // Let the constructor handle invalid combinations of args
   return new JSQuantity(value as any, unit as any);

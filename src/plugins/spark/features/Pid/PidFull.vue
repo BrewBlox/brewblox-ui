@@ -259,7 +259,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <DurationQuantityField
+        <DurationField
           :value="block.data.ti"
           :rules="[
             v => v >= 0 || 'Value must be positive',
@@ -335,7 +335,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <DurationQuantityField
+        <DurationField
           :value="block.data.td"
           :rules="[
             v => v >= 0 || 'Value must be positive',

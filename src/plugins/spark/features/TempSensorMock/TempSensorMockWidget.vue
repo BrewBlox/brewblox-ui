@@ -119,7 +119,7 @@ export default class TempSensorMockWidget
             class="col-grow"
             @input="amplitude => updateFluctuation(idx, {...fluct, amplitude})"
           />
-          <DurationQuantityField
+          <DurationField
             :value="fluct.period"
             title="Period"
             label="Period"

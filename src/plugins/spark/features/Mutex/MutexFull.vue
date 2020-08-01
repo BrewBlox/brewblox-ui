@@ -48,7 +48,7 @@ export default class MutexFull
       </q-item>
       <q-item>
         <q-item-section>
-          <DurationQuantityField
+          <DurationField
             :value="block.data.differentActuatorWait"
             title="Extra lock time"
             label="Extra lock time after an actuator turns off"
