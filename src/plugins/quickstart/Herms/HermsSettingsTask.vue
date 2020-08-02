@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty, Quantity } from '@/helpers/bloxfield';
+import { bloxQty, JSQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
@@ -40,19 +40,19 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
     return sparkStore.moduleById(this.config.serviceId)!.units.Temp;
   }
 
-  get hltKp(): Quantity {
+  get hltKp(): JSQuantity {
     return bloxQty(100 / (this.hltFullPowerDelta.value || 2), `1/${this.userTemp}`);
   }
 
-  get bkKp(): Quantity {
+  get bkKp(): JSQuantity {
     return bloxQty(100 / (this.bkFullPowerDelta.value || 2), `1/${this.userTemp}`);
   }
 
-  get mtKp(): Quantity {
+  get mtKp(): JSQuantity {
     return bloxQty(this.mashVolume / (this.hltVolume || 1), `1/${this.userTemp}`);
   }
 
-  get hltSetting(): Quantity {
+  get hltSetting(): JSQuantity {
     if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.driverMax.value) {
       const upperLimit = this.mashTarget.value + this.driverMax.value;
       const setting = this.mashTarget.value + (this.mashTarget.value - this.mashActual.value) * this.mtKp.value;

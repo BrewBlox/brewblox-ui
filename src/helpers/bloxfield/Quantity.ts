@@ -1,5 +1,6 @@
 import LibQty from 'js-quantities';
-import { isNumber, isString } from 'lodash';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
 import round from 'lodash/round';
 
 import { durationMs, durationString, isDurationString, isDurationUnit } from '@/helpers/duration';

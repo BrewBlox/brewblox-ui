@@ -1,6 +1,6 @@
-import { mapValues } from 'lodash';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
+import mapValues from 'lodash/mapValues';
 
 import {
   BlockOrIntfType,
