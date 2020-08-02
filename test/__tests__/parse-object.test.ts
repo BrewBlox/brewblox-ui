@@ -11,21 +11,6 @@ import {
   serialize,
 } from '@/plugins/spark/parse-object';
 
-describe('Type checking', () => {
-  it('Should recognize Quantity', () => {
-    expect(isQuantity(null)).toBe(false);
-    expect(isQuantity(10)).toBe(false);
-    expect(isQuantity(bloxQty(10, 'degC').toJSON())).toBe(true);
-    expect(isQuantity(bloxQty(10, 'degC'))).toBe(true);
-  });
-
-  it('Should recognize Quantity', () => {
-    expect(isJSQuantity(null)).toBe(false);
-    expect(isJSQuantity(10)).toBe(false);
-    expect(isJSQuantity(bloxQty(10, 'degC').toJSON())).toBe(false);
-    expect(isJSQuantity(bloxQty(10, 'degC'))).toBe(true);
-  });
-});
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {

@@ -9,6 +9,7 @@ import type {
   BlockAddress,
   BlockFieldAddress,
   Limiters,
+  Link,
   RelationEdge,
   SparkExported,
   SparkService,
@@ -100,6 +101,11 @@ export class SparkServiceModule extends VuexModule {
   public blockByAddress<T extends Block>(addr: BlockAddress | null): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
     return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
+  }
+
+  public blockByLink<T extends Block>(link: Link | null): T | null {
+    if (!link || !link.id) { return null; };
+    return this.blockById<T>(link.id);
   }
 
   public fieldByAddress(addr: BlockFieldAddress | null): any {

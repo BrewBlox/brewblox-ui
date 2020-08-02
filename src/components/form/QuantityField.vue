@@ -2,9 +2,8 @@
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
-import { isQuantity } from '@/helpers/bloxfield';
+import { isQuantity, Quantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { Quantity } from '@/plugins/spark/types';
 
 @Component
 export default class QuantityField extends FieldBase {

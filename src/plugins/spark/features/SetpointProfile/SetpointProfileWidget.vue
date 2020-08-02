@@ -3,7 +3,7 @@ import { Component, Watch } from 'vue-property-decorator';
 
 import { deepCopy, isJsonEqual } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { SetpointProfileBlock } from '@/plugins/spark/types';
+import { Link, SetpointProfileBlock } from '@/plugins/spark/types';
 
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';
@@ -37,6 +37,10 @@ export default class SetpointProfileWidget
 
   created(): void {
     this.usedData = deepCopy(this.block.data);
+  }
+
+  get target(): Link {
+    return this.block.data.targetId;
   }
 
   get graphProps(): GraphProps {
@@ -73,27 +77,23 @@ export default class SetpointProfileWidget
 
     <component :is="mode" :crud="crud">
       <template #warnings>
-        <CardWarning v-if="!block.data.targetId.id">
+        <CardWarning v-if="!target.id">
           <template #message>
             Setpoint Profile has no target Setpoint configured.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.enabled">
-          <template #message>
-            <span>
-              Setpoint Profile is disabled:
-              <i>{{ block.data.targetId }}</i> will not be changed.
-            </span>
+        <BlockEnableToggle
+          v-else
+          :hide-enabled="mode === 'Basic'"
+          :crud="crud"
+        >
+          <template #enabled>
+            Setpoint Profile is enabled and driving <i>{{ target | link }}</i>.
           </template>
-          <template #actions>
-            <q-btn
-              text-color="white"
-              flat
-              label="Enable"
-              @click="block.data.enabled = true; saveBlock()"
-            />
+          <template #disabled>
+            Setpoint Profile is disabled and not driving <i>{{ target | link }}</i>.
           </template>
-        </CardWarning>
+        </BlockEnableToggle>
       </template>
 
       <template #graph>

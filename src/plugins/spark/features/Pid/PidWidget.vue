@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxLink, JSLink } from '@/helpers/bloxfield';
+import { Link } from '@/helpers/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { PidBlock } from '@/plugins/spark/types';
 
@@ -18,12 +18,12 @@ import { startRelationsDialog } from './relations';
 export default class PidWidget
   extends BlockWidgetBase<PidBlock> {
 
-  get inputBlock(): JSLink {
-    return bloxLink(this.block.data.inputId);
+  get inputLink(): Link {
+    return this.block.data.inputId;
   }
 
-  get outputBlock(): JSLink {
-    return bloxLink(this.block.data.outputId);
+  get outputLink(): Link {
+    return this.block.data.outputId;
   }
 
   enable(): void {
@@ -61,35 +61,39 @@ export default class PidWidget
 
     <component :is="mode" :crud="crud">
       <template #warnings>
-        <CardWarning v-if="!outputBlock.id">
-          <template #message>
-            PID has no output block configured.
-          </template>
-        </CardWarning>
-        <CardWarning v-if="!inputBlock.id">
+        <CardWarning v-if="!inputLink.id">
           <template #message>
             PID has no input block configured.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.enabled && mode !== 'Full'">
+
+        <CardWarning v-if="!outputLink.id">
           <template #message>
-            <span>
-              PID is disabled:
-              <i>{{ outputBlock }}</i> will not be set.
-            </span>
-          </template>
-          <template #actions>
-            <q-btn text-color="white" flat label="Enable" @click="enable" />
+            PID has no output block configured.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.active">
-          <template #message>
-            <span>
-              PID is inactive:
-              <i>{{ outputBlock }}</i> will not be set.
-            </span>
-          </template>
-        </CardWarning>
+
+        <template v-if="inputLink.id && outputLink.id">
+          <CardWarning v-if="!block.data.active">
+            <template #message>
+              <span>
+                PID is inactive:
+                <i>{{ outputLink | link }}</i> will not be set.
+              </span>
+            </template>
+          </CardWarning>
+          <BlockEnableToggle
+            :hide-enabled="mode === 'Basic'"
+            :crud="crud"
+          >
+            <template #enabled>
+              PID is enabled and driving <i>{{ outputLink | link }}</i>.
+            </template>
+            <template #disabled>
+              PID is disabled and not driving <i>{{ outputLink | link }}</i>.
+            </template>
+          </BlockEnableToggle>
+        </template>
       </template>
     </component>
   </GraphCardWrapper>

@@ -1,4 +1,5 @@
 import { createDialog } from '@/helpers/dialog';
+import { isBlockDriven } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType } from '@/plugins/spark/types';
 
@@ -60,12 +61,7 @@ const spec: PartSpec = {
   interactHandler: (part: PersistentPart, updater: PartUpdater) => {
     const hasAddr = !!part.settings[addressKey]?.id;
     const block = settingsBlock(part, addressKey);
-    const driven = block === null
-      ? false
-      : sparkStore
-        .moduleById(block.serviceId)!
-        .drivenChains
-        .some(v => v[0] === block.id);
+    const driven = isBlockDriven(block);
 
     if (!hasAddr) {
       part.settings.enabled = !part.settings.enabled;

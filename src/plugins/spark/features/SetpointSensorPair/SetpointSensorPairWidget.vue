@@ -29,13 +29,26 @@ export default class SetpointSensorPairWidget
     return this.crud.isStoreBlock && this.usedBy.length === 0;
   }
 
+  get formattedUsers(): string {
+    return this.usedBy.map(v => `'${v.id}'`).join(' and ');
+  }
+
+  get enabledString(): string {
+    if (this.usedBy.length > 0) {
+      return `Setpoint is enabled and used by ${this.formattedUsers}.`;
+    }
+    else {
+      return 'Setpoint is enabled and unused.';
+    }
+  }
+
   get disabledString(): string {
-    if (this.usedBy.length > 1) {
-      return `This setpoint is disabled and therefore ${this.usedBy.map(v => `'${v.id}'`).join(' and ')} are inactive.`;
-    } else if (this.usedBy.length === 1) {
-      return `This setpoint is disabled and therefore '${this.usedBy[0].id}' is inactive.`;
-    } else {
-      return 'This setpoint is disabled and is not used.';
+    if (this.usedBy.length > 0) {
+      const verb = this.usedBy.length > 1 ? 'are' : 'is';
+      return `Setpoint is disabled and therefore ${this.formattedUsers} ${verb} inactive.`;
+    }
+    else {
+      return 'Setpoint is disabled and unused.';
     }
   }
 }
@@ -61,18 +74,18 @@ export default class SetpointSensorPairWidget
 
     <component :is="mode" :crud="crud">
       <template #warnings>
-        <CardWarning v-if="unused">
-          <template #message>
-            This Setpoint is not used as PID input.
-          </template>
-        </CardWarning>
         <BlockEnableToggle
-          v-else
           :crud="crud"
-          :text-disabled="disabledString"
-          text-enabled="Setpoint is enabled."
+          :hide-enabled="mode === 'Basic'"
           data-key="settingEnabled"
-        />
+        >
+          <template #enabled>
+            {{ enabledString }}
+          </template>
+          <template #disabled>
+            {{ disabledString }}
+          </template>
+        </BlockEnableToggle>
       </template>
     </component>
   </GraphCardWrapper>

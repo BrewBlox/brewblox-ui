@@ -65,7 +65,7 @@ export default class MutexBasic
         label="Lock time remaining"
         class="col-grow"
       >
-        {{ block.data.waitRemaining }}
+        {{ block.data.waitRemaining | duration }}
       </LabeledField>
     </div>
   </div>

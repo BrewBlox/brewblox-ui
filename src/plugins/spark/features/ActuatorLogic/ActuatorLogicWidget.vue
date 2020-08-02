@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { ActuatorLogicBlock } from '@/plugins/spark/types';
+import { ActuatorLogicBlock, Link } from '@/plugins/spark/types';
 
 import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
 import ActuatorLogicFull from './ActuatorLogicFull.vue';
@@ -19,6 +19,10 @@ export default class ActuatorLogicWidget
   enable(): void {
     this.block.data.enabled = true;
     this.saveBlock();
+  }
+
+  get target(): Link {
+    return this.block.data.targetId;
   }
 }
 </script>
@@ -44,22 +48,23 @@ export default class ActuatorLogicWidget
 
     <component :is="mode" :crud="crud">
       <template #warnings>
-        <CardWarning v-if="!block.data.targetId.id">
+        <CardWarning v-if="!target.id">
           <template #message>
             Logic Actuator has no target actuator configured.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.enabled">
-          <template #message>
-            <span>
-              Logic Actuator is disabled:
-              <i>{{ block.data.targetId }}</i> will not be changed.
-            </span>
+        <BlockEnableToggle
+          v-else
+          :crud="crud"
+          :hide-enabled="mode === 'Basic'"
+        >
+          <template #enabled>
+            Logic Actuator is enabled and driving <i>{{ target | link }}</i>.
           </template>
-          <template #actions>
-            <q-btn text-color="white" flat label="Enable" @click="enable" />
+          <template #disabled>
+            Logic Actuator is disabled and not driving <i>{{ target | link }}</i>.
           </template>
-        </CardWarning>
+        </BlockEnableToggle>
       </template>
     </component>
   </GraphCardWrapper>

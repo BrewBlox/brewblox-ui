@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxLink, JSLink } from '@/helpers/bloxfield';
+import { Link } from '@/helpers/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
 
@@ -19,12 +19,19 @@ export default class ActuatorOffsetWidget
     this.saveBlock();
   }
 
-  get target(): JSLink {
-    return bloxLink(this.block.data.targetId);
+  get target(): Link {
+    return this.block.data.targetId;
   }
 
-  get reference(): JSLink {
-    return bloxLink(this.block.data.referenceId);
+  get reference(): Link {
+    return this.block.data.referenceId;
+  }
+
+  get refKind(): string {
+    return this.referenceOpts
+      .find(v => v.value === this.block.data.referenceSettingOrValue)
+      ?.label
+      ?? '???';
   }
 }
 </script>
@@ -58,24 +65,18 @@ export default class ActuatorOffsetWidget
           Setpoint Driver has no reference Setpoint configured.
         </template>
       </CardWarning>
-      <CardWarning v-else-if="!block.data.enabled">
-        <template #message>
-          <span>
-            Setpoint Driver is disabled:
-            <i>{{ target }}</i> will not be changed.
-          </span>
-        </template>
-        <template #actions>
-          <q-btn text-color="white" flat label="Enable" @click="enable" />
-        </template>
-      </CardWarning>
       <BlockEnableToggle
-        v-else
         :crud="crud"
-        :text-enabled="`Offset is enabled: ${target} will be offset from the
-          ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${reference}.`"
-        :text-disabled="`Offset is disabled: ${target} will not be changed.`"
-      />
+        :hide-enabled="mode === 'Basic'"
+      >
+        <template #enabled>
+          Driver is enabled and driving <i>{{ target | link }}</i>, based on the
+          {{ refKind }} of <i>{{ reference | link }}</i>.
+        </template>
+        <template #disabled>
+          Driver is disabled and not driving <i>{{ target | link }}</i>.
+        </template>
+      </BlockEnableToggle>
 
       <div class="widget-body row">
         <InputField

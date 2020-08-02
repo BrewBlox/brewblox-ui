@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { bloxQty } from '@/helpers/bloxfield';
 import { createBlockDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { serviceTemp } from '@/plugins/spark/helpers';
+import { isBlockDriven, serviceTemp } from '@/plugins/spark/helpers';
 import { Block, PidBlock, Quantity, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 interface GridOpts {
@@ -17,17 +17,15 @@ export default class PidFull
   extends BlockCrudComponent<PidBlock> {
 
   get inputBlock(): SetpointSensorPairBlock | null {
-    return this.sparkModule.blockById(this.block.data.inputId.id);
+    return this.sparkModule.blockByLink(this.block.data.inputId);
   }
 
   get inputDriven(): boolean {
-    return this.inputBlock !== null
-      && this.sparkModule.drivenChains
-        .some((chain: string[]) => chain[0] === this.inputBlock!.id);
+    return isBlockDriven(this.inputBlock);
   }
 
   get outputBlock(): Block | null {
-    return this.sparkModule.blockById(this.block.data.outputId.id);
+    return this.sparkModule.blockByLink(this.block.data.outputId);
   }
 
   get baseOutput(): number {
@@ -68,14 +66,7 @@ export default class PidFull
 
 <template>
   <div class="widget-lg">
-    <slot name="warnings">
-      <BlockEnableToggle
-        :crud="crud"
-        :text-enabled="`PID is enabled: output ${block.data.outputId} will be set to output of PID.`"
-        :text-disabled="`PID is disabled: output ${block.data.outputId} will not be set.`"
-        class="col"
-      />
-    </slot>
+    <slot name="warnings" />
 
     <div class="widget-body row">
       <!-- Input row -->
@@ -129,7 +120,7 @@ export default class PidFull
         class="col-auto depth-1"
         @click="showInput"
       >
-        <q-tooltip>Edit {{ inputBlock | link }}</q-tooltip>
+        <q-tooltip>Edit {{ inputBlock | block }}</q-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -184,7 +175,7 @@ export default class PidFull
         class="col-auto depth-1"
         @click="showOutput"
       >
-        <q-tooltip>Edit {{ outputBlock | link }}</q-tooltip>
+        <q-tooltip>Edit {{ outputBlock | block }}</q-tooltip>
       </q-btn>
       <q-btn
         v-else

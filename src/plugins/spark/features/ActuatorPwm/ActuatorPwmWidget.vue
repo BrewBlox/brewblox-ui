@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { Link } from '@/helpers/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { ActuatorPwmBlock } from '@/plugins/spark/types';
 
@@ -15,6 +16,10 @@ import ActuatorPwmFull from './ActuatorPwmFull.vue';
 })
 export default class ActuatorPwmWidget
   extends BlockWidgetBase<ActuatorPwmBlock> {
+
+  get outputLink(): Link {
+    return this.block.data.actuatorId;
+  }
 }
 </script>
 
@@ -38,27 +43,22 @@ export default class ActuatorPwmWidget
 
     <component :is="mode" :crud="crud">
       <template #warnings>
-        <CardWarning v-if="!block.data.actuatorId.id">
+        <CardWarning v-if="!outputLink.id">
           <template #message>
             PWM has no target actuator configured.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.enabled">
-          <template #message>
-            <span>
-              PWM is disabled:
-              <i>{{ block.data.actuatorId | link }}</i> will not be toggled.
-            </span>
+        <BlockEnableToggle
+          :hide-enabled="mode === 'Basic'"
+          :crud="crud"
+        >
+          <template #enabled>
+            PWM is enabled and driving <i>{{ outputLink | link }}</i>.
           </template>
-          <template #actions>
-            <q-btn
-              text-color="white"
-              flat
-              label="Enable"
-              @click="block.data.enabled = true; saveBlock();"
-            />
+          <template #disabled>
+            PWM is disabled and not driving <i>{{ outputLink | link }}</i>.
           </template>
-        </CardWarning>
+        </BlockEnableToggle>
       </template>
     </component>
   </GraphCardWrapper>

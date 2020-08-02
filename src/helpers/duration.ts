@@ -6,11 +6,16 @@ import { bloxQty, isQuantity, Quantity } from '@/helpers/bloxfield';
 
 // repeated number + time unit
 // 'm' for minute is allowed here
-export const durationExp = /^(\s*\d*\.?\d+\s*(ms|milliseconds?|s|seconds?|m|mins?|minutes?|h|hours?|d|days?)\s*)*$/;
+const durationExp = /^(\s*\d*\.?\d+\s*(ms|milliseconds?|s|seconds?|m|mins?|minutes?|h|hours?|d|days?)\s*)*$/i;
+const durationUnitExp = /^(ms|milliseconds?|s|seconds?|mins?|minutes?|h|hours?|d|days?)$/i;
 
 export const isDurationString =
   (v: any): v is string =>
     isString(v) && durationExp.test(v);
+
+export const isDurationUnit =
+  (v: any): v is string =>
+    isString(v) && durationUnitExp.test(v);
 
 const defaultNullValue = Symbol();
 
@@ -20,7 +25,7 @@ export const durationMs =
       return 0;
     }
     else if (isQuantity(duration)) {
-      return isDurationString(`${duration.value}${duration.unit}`)
+      return isDurationUnit(duration.unit)
         ? bloxQty(duration).to('ms').value as number
         : 0;
     }

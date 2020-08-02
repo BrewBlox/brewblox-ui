@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { isBlockDriven } from '@/plugins/spark/helpers';
 import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import { startRelationsDialog } from './relations';
@@ -16,10 +17,7 @@ export default class PidBasic
   }
 
   get inputDriven(): boolean {
-    return this.inputBlock !== null
-      && this.sparkModule
-        .drivenChains
-        .some((chain: string[]) => chain[0] === this.inputBlock!.id);
+    return isBlockDriven(this.inputBlock);
   }
 
   get outputBlock(): Block | null {

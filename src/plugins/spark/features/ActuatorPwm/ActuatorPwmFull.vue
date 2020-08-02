@@ -23,13 +23,7 @@ export default class ActuatorPwmFull
 
 <template>
   <div class="widget-md">
-    <slot name="warnings">
-      <BlockEnableToggle
-        :crud="crud"
-        :text-enabled="`PWM is enabled: ${block.data.actuatorId} will be toggled automatically.`"
-        :text-disabled="`PWM is disabled: ${block.data.actuatorId} will not be toggled.`"
-      />
-    </slot>
+    <slot name="warnings" />
 
     <div class="widget-body row">
       <SliderField

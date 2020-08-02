@@ -62,6 +62,7 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('prettyUnit', prettyUnit);
   Vue.filter('duration', (v: any, nullV = '<not set>') => durationString(v, nullV));
   Vue.filter('link', prettyLink);
+  Vue.filter('block', (v: BlockAddress) => v?.id || '<not set>');
   Vue.filter('round', round);
   Vue.filter('truncateRound', truncateRound);
   Vue.filter('hexToBase64', hexToBase64);
@@ -414,3 +415,11 @@ export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
 
 export const enumHint = (e: Enum<any>): string =>
   'One of: ' + Enum.values(e).map(v => `'${v}'`).join(', ');
+
+export const isBlockDriven = (block: Block | null): boolean =>
+  Boolean(
+    block
+    && sparkStore
+      .moduleById(block.serviceId)
+      ?.drivenChains
+      .some((chain: string[]) => chain[0] === block.id));

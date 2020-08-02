@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { bloxLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { mutate, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
+import { isBlockDriven } from '@/plugins/spark/helpers';
 import { Block, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
@@ -75,9 +76,7 @@ export default class ValveArray extends BlockCrudComponent {
   }
 
   driverDriven(block: Block): boolean {
-    return this.sparkModule
-      .drivenChains
-      .some((chain: string[]) => chain[0] === block.id);
+    return isBlockDriven(block);
   }
 
   driverLimitedBy(block: Block): string {

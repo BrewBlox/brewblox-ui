@@ -51,7 +51,7 @@ export const findGroup = (unit?: string): UnitGroup | null =>
     ? groups.find(g => g.test(unit)) ?? null
     : null;
 
-export const isCompatible = (qty1: Quantity, qty2: Quantity): boolean => {
+export const isCompatibleQty = (qty1: Quantity, qty2: Quantity): boolean => {
   const group1 = findGroup(qty1.unit)?.name;
   const group2 = findGroup(qty2.unit)?.name;
   return group1 === group2;

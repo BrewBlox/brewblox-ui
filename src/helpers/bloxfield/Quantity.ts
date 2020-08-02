@@ -2,10 +2,10 @@ import LibQty from 'js-quantities';
 import { isNumber, isString } from 'lodash';
 import round from 'lodash/round';
 
-import { durationMs, isDurationString } from '@/helpers/duration';
+import { durationMs, durationString, isDurationString, isDurationUnit } from '@/helpers/duration';
 
 import { isBloxField, isJSBloxField } from './BloxField';
-import { findGroup, isCompatible } from './groups';
+import { findGroup, isCompatibleQty } from './groups';
 import { JSBloxField, Quantity } from './types';
 
 type WrapperValue = Quantity | number | string | null;
@@ -39,14 +39,16 @@ export const prettyUnit = (value: Quantity | string | null | undefined): string 
 
 
 export const prettyQty = (q: Quantity): string => {
-  if (!q) {
+  if (!isQuantity(q)) {
     return '---';
   }
-  const valueStr = !isNumber(q.value)
-    ? '--.--'
-    : q.value.toFixed(2);
-  const unitStr = prettyUnit(q.unit);
-  return `${valueStr} ${unitStr}`;
+  if (isDurationUnit(q.unit)) {
+    return durationString(q);
+  }
+  const valueStr = isNumber(q.value)
+    ? q.value.toFixed(2)
+    : '--.--';
+  return `${valueStr} ${prettyUnit(q.unit)}`;
 };
 
 export const roundedQty =
@@ -130,7 +132,7 @@ export class JSQuantity implements JSBloxField, Quantity {
 
   public eq(other: Quantity): boolean {
     return isQuantity(other)
-      && isCompatible(this, other)
+      && isCompatibleQty(this, other)
       && (this.value === null) === (other.value === null)
       && toLibQty(roundedQty(this)).eq(toLibQty(roundedQty(other)));
   }

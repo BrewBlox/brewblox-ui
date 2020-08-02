@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, bloxQty, JSLink } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString } from '@/helpers/duration';
 import { deepCopy, objectSorter } from '@/helpers/functional';
@@ -193,14 +193,7 @@ export default class SetpointProfileFull
 
 <template>
   <div class="widget-lg">
-    <slot name="warnings">
-      <BlockEnableToggle
-        v-if="block.data.targetId.id !== null"
-        :crud="crud"
-        :text-enabled="`Profile is enabled and driving ${block.data.targetId}.`"
-        :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
-      />
-    </slot>
+    <slot name="warnings" />
 
     <div class="q-ma-md row q-gutter-xs">
       <DatetimeField

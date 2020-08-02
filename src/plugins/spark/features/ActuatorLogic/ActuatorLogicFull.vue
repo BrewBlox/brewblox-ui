@@ -199,13 +199,7 @@ export default class ActuatorLogicFull
 
 <template>
   <div class="widget-md">
-    <slot name="warnings">
-      <BlockEnableToggle
-        :crud="crud"
-        :text-enabled="`Block is enabled: ${block.data.targetId} will be set.`"
-        :text-disabled="`Block is disabled: ${block.data.targetId} will not be set.`"
-      />
-    </slot>
+    <slot name="warnings" />
 
     <div class="widget-body">
       <q-input
@@ -367,8 +361,8 @@ export default class ActuatorLogicFull
       <LinkField
         :value="block.data.targetId"
         :service-id="serviceId"
-        title="target"
-        label="Digital Actuator Target"
+        title="Digital Actuator target"
+        label="Digital Actuator target"
         @input="v => { block.data.targetId = v; saveBlock(); }"
       />
     </div>
