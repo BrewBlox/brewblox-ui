@@ -1,17 +1,24 @@
 import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalActuatorBlock, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
+import {
+  BlockIntfType,
+  BlockSpec,
+  BlockType,
+  DigitalActuatorBlock,
+  DigitalConstraintsObj,
+  DigitalState,
+} from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DigitalActuatorWidget.vue';
 
-const typeName = 'DigitalActuator';
+const typeName = BlockType.DigitalActuator;
 
 const block: BlockSpec<DigitalActuatorBlock> = {
   id: typeName,
   generate: () => ({
-    hwDevice: bloxLink(null, 'IoArrayInterface'),
+    hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
     channel: 0,
     desiredState: DigitalState.STATE_INACTIVE,
     state: DigitalState.STATE_INACTIVE,
@@ -35,7 +42,7 @@ const block: BlockSpec<DigitalActuatorBlock> = {
             },
             {
               mutexed: {
-                mutexId: bloxLink(null, 'MutexInterface'),
+                mutexId: bloxLink(null, BlockIntfType.MutexInterface),
                 extraHoldTime: bloxQty('0s'),
                 hasCustomHoldTime: true,
                 hasLock: false,
@@ -54,7 +61,7 @@ const block: BlockSpec<DigitalActuatorBlock> = {
           constraints: [
             {
               mutexed: {
-                mutexId: bloxLink(null, 'MutexInterface'),
+                mutexId: bloxLink(null, BlockIntfType.MutexInterface),
                 extraHoldTime: bloxQty('0s'),
                 hasCustomHoldTime: true,
                 hasLock: false,

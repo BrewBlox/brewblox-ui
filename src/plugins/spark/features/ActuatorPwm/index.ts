@@ -2,12 +2,12 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { durationString } from '@/helpers/duration';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { ActuatorPwmBlock, AnalogConstraintsObj, BlockIntfType, BlockSpec } from '@/plugins/spark/types';
+import { ActuatorPwmBlock, AnalogConstraintsObj, BlockIntfType, BlockSpec, BlockType } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorPwmWidget.vue';
 
-const typeName = 'ActuatorPwm';
+const typeName = BlockType.ActuatorPwm;
 
 const block: BlockSpec<ActuatorPwmBlock> = {
   id: typeName,
@@ -47,7 +47,7 @@ const block: BlockSpec<ActuatorPwmBlock> = {
       key: 'period',
       title: 'Period',
       component: 'DurationValEdit',
-      generate: () => bloxQty(4, 'second'),
+      generate: () => bloxQty('4s'),
       pretty: durationString,
     },
     {

@@ -1,12 +1,12 @@
 import { bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockSpec, TempSensorOneWireBlock } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './TempSensorOneWireWidget.vue';
 
-const typeName = 'TempSensorOneWire';
+const typeName = BlockType.TempSensorOneWire;
 
 const block: BlockSpec<TempSensorOneWireBlock> = {
   id: typeName,

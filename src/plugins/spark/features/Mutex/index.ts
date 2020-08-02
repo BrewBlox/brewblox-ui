@@ -1,12 +1,12 @@
 import { bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, MutexBlock } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, MutexBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './MutexWidget.vue';
 
-const typeName = 'Mutex';
+const typeName = BlockType.Mutex;
 
 const block: BlockSpec<MutexBlock> = {
   id: typeName,

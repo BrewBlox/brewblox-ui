@@ -1,4 +1,5 @@
 <script lang="ts">
+import { Enum } from 'typescript-string-enums';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
@@ -6,7 +7,7 @@ import { bloxQty, isQuantity } from '@/helpers/bloxfield';
 import { deepCopy } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { AnalogCompare, Quantity } from '@/plugins/spark/types';
+import { AnalogCompare, AnalogCompareOp, BlockIntfType, Quantity } from '@/plugins/spark/types';
 
 import { analogOpTitles } from './getters';
 
@@ -34,13 +35,13 @@ export default class AnalogCompareEditDialog extends DialogBase {
   }
 
   get operatorOpts(): SelectOption[] {
-    return Object.entries(analogOpTitles)
-      .map(([key, label]) => ({ label, value: Number(key) }));
+    return Enum.values(AnalogCompareOp)
+      .map(value => ({ value, label: analogOpTitles[value] }));
   }
 
   get isTemp(): boolean {
     const block = this.sparkModule.blockById(this.local!.id.id);
-    return !!block && isCompatible(block.type, 'SetpointSensorPairInterface');
+    return !!block && isCompatible(block.type, BlockIntfType.SetpointSensorPairInterface);
   }
 
   get rhs(): Quantity | number {

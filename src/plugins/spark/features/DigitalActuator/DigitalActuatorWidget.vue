@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { bloxLink } from '@/helpers/bloxfield';
 import { mutate, typeMatchFilter } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { Block, DigitalActuatorBlock } from '@/plugins/spark/types';
+import { Block, BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 
 @Component
 export default class DigitalActuatorWidget
@@ -21,7 +21,7 @@ export default class DigitalActuatorWidget
     const targetId = this.hwBlock.id;
     return this.sparkModule
       .blocks
-      .filter(typeMatchFilter<DigitalActuatorBlock>('DigitalActuator'))
+      .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
       .filter(block => block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }

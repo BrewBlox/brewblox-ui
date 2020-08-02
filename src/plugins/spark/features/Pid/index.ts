@@ -2,12 +2,12 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { durationString } from '@/helpers/duration';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockIntfType, BlockSpec, FilterChoice, PidBlock } from '@/plugins/spark/types';
+import { BlockIntfType, BlockSpec, BlockType, FilterChoice, PidBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './PidWidget.vue';
 
-const typeName = 'Pid';
+const typeName = BlockType.Pid;
 
 const block: BlockSpec<PidBlock> = {
   id: typeName,
@@ -23,8 +23,8 @@ const block: BlockSpec<PidBlock> = {
       enabled: false,
       active: true,
       kp: bloxQty(20, `1/${temp}`),
-      ti: bloxQty(2, 'hour'),
-      td: bloxQty(0, 'second'),
+      ti: bloxQty('2h'),
+      td: bloxQty('0s'),
       p: 0,
       i: 0,
       d: 0,
@@ -44,72 +44,72 @@ const block: BlockSpec<PidBlock> = {
       name: 'Fridge cooling compressor (beer constant)',
       generate: () => ({
         kp: bloxQty(-50, '1/degC'),
-        ti: bloxQty(6, 'hour'),
-        td: bloxQty(30, 'min'),
+        ti: bloxQty('6h'),
+        td: bloxQty('30m'),
       }),
     },
     {
       name: 'Fridge heating element (beer constant)',
       generate: () => ({
         kp: bloxQty(100, '1/degC'),
-        ti: bloxQty(6, 'hour'),
-        td: bloxQty(30, 'min'),
+        ti: bloxQty('6h'),
+        td: bloxQty('30m'),
       }),
     },
     {
       name: 'Fridge cooling compressor (fridge constant)',
       generate: () => ({
         kp: bloxQty(-50, '1/degC'),
-        ti: bloxQty(2, 'hour'),
-        td: bloxQty(10, 'min'),
+        ti: bloxQty('2h'),
+        td: bloxQty('10m'),
       }),
     },
     {
       name: 'Fridge heating element (fridge constant)',
       generate: () => ({
         kp: bloxQty(20, '1/degC'),
-        ti: bloxQty(2, 'hour'),
-        td: bloxQty(10, 'min'),
+        ti: bloxQty('2h'),
+        td: bloxQty('10m'),
       }),
     },
     {
       name: 'Kettle heating element',
       generate: () => ({
         kp: bloxQty(50, '1/degC'),
-        ti: bloxQty(10, 'min'),
-        td: bloxQty(0, 'min'),
+        ti: bloxQty('10m'),
+        td: bloxQty('0s'),
       }),
     },
     {
       name: 'HLT setpoint driver',
       generate: () => ({
         kp: bloxQty(1, '1/degC'),
-        ti: bloxQty(10, 'min'),
-        td: bloxQty(0, 'min'),
+        ti: bloxQty('10m'),
+        td: bloxQty('0s'),
       }),
     },
     {
       name: 'Fridge setpoint driver',
       generate: () => ({
         kp: bloxQty(5, '1/degC'),
-        ti: bloxQty(2, 'hour'),
-        td: bloxQty(0, 'min'),
+        ti: bloxQty('2h'),
+        td: bloxQty('0s'),
       }),
     },
     {
       name: 'Glycol pump',
       generate: () => ({
         kp: bloxQty(-5, '1/degC'),
-        ti: bloxQty(2, 'hour'),
-        td: bloxQty(0, 'min'),
+        ti: bloxQty('2h'),
+        td: bloxQty('0s'),
       }),
     },
     {
       name: 'Heating pad',
       generate: () => ({
         kp: bloxQty(100, '1/degC'),
-        ti: bloxQty(2, 'hour'),
-        td: bloxQty(10, 'min'),
+        ti: bloxQty('2h'),
+        td: bloxQty('10m'),
       }),
     },
   ],
@@ -124,14 +124,14 @@ const block: BlockSpec<PidBlock> = {
       key: 'ti',
       title: 'Ti',
       component: 'DurationValEdit',
-      generate: () => bloxQty(0, 'second'),
+      generate: () => bloxQty('0s'),
       pretty: durationString,
     },
     {
       key: 'td',
       title: 'Td',
       component: 'DurationValEdit',
-      generate: () => bloxQty(0, 'second'),
+      generate: () => bloxQty('0s'),
       pretty: durationString,
     },
     {

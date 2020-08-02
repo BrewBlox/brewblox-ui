@@ -1,12 +1,12 @@
 import { bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockSpec, TempSensorMockBlock } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './TempSensorMockWidget.vue';
 
-const typeName = 'TempSensorMock';
+const typeName = BlockType.TempSensorMock;
 
 const block: BlockSpec<TempSensorMockBlock> = {
   id: typeName,

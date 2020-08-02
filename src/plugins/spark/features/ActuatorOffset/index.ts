@@ -6,13 +6,14 @@ import {
   AnalogConstraintsObj,
   BlockIntfType,
   BlockSpec,
+  BlockType,
   ReferenceKind,
 } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorOffsetWidget.vue';
 
-const typeName = 'ActuatorOffset';
+const typeName = BlockType.ActuatorOffset;
 
 const block: BlockSpec<ActuatorOffsetBlock> = {
   id: typeName,

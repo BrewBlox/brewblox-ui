@@ -1,11 +1,11 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BalancerBlock, BlockSpec } from '@/plugins/spark/types';
+import { BalancerBlock, BlockSpec, BlockType } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './BalancerWidget.vue';
 
-const typeName = 'Balancer';
+const typeName = BlockType.Balancer;
 
 const block: BlockSpec<BalancerBlock> = {
   id: typeName,

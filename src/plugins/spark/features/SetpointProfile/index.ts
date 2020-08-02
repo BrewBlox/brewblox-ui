@@ -2,12 +2,12 @@ import { bloxLink } from '@/helpers/bloxfield';
 import { shortDateString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, SetpointProfileBlock } from '@/plugins/spark/types';
+import { BlockIntfType, BlockSpec, BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './SetpointProfileWidget.vue';
 
-const typeName = 'SetpointProfile';
+const typeName = BlockType.SetpointProfile;
 
 const block: BlockSpec<SetpointProfileBlock> = {
   id: typeName,
@@ -15,7 +15,7 @@ const block: BlockSpec<SetpointProfileBlock> = {
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,
-    targetId: bloxLink(null, 'SetpointSensorPairInterface'),
+    targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     drivenTargetId: bloxLink(null),
   }),
   fields: [
@@ -42,7 +42,7 @@ const block: BlockSpec<SetpointProfileBlock> = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => bloxLink(null, 'SetpointSensorPairInterface'),
+      generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     },
   ],
 };

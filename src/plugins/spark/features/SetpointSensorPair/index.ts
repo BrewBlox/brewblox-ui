@@ -1,19 +1,19 @@
 import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockSpec, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { BlockIntfType, BlockSpec, BlockType, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './SetpointSensorPairWidget.vue';
 
-const typeName = 'SetpointSensorPair';
+const typeName = BlockType.SetpointSensorPair;
 
 const block: BlockSpec<SetpointSensorPairBlock> = {
   id: typeName,
   generate: (serviceId: string | null) => {
     const temp = serviceTemp(serviceId);
     return {
-      sensorId: bloxLink(null, 'TempSensorInterface'),
+      sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
       storedSetting: bloxQty(null, temp),
       setting: bloxQty(null, temp),
       value: bloxQty(null, temp),
@@ -47,7 +47,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'sensorId',
       title: 'Linked Sensor',
       component: 'LinkValEdit',
-      generate: () => bloxLink(null, 'TempSensorInterface'),
+      generate: () => bloxLink(null, BlockIntfType.TempSensorInterface),
     },
     {
       key: 'setting',
