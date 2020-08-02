@@ -14,6 +14,7 @@ export default class NumberValEdit extends ValEditBase { }
     v-model.number="field"
     inputmode="numeric"
     pattern="[0-9]*"
+    item-aligned
     dense
   />
   <div

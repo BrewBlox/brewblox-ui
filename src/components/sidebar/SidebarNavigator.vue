@@ -24,7 +24,7 @@ export default class SidebarNavigator extends Vue {
   }
 
   get automationAvailable(): boolean {
-    return automationStore.lastEvent !== null;
+    return automationStore.available;
   }
 
   showWizard(): void {

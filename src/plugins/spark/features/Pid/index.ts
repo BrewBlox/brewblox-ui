@@ -1,39 +1,40 @@
-import { qtyDurationString } from '@/helpers/functional';
-import { Link, Qty, Temp } from '@/plugins/spark/bloxfield';
+import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { durationString } from '@/helpers/duration';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockIntfType, BlockSpec, PidBlock } from '@/plugins/spark/types';
+import { BlockIntfType, BlockSpec, BlockType, FilterChoice, PidBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './PidWidget.vue';
 
-const typeName = 'Pid';
+const typeName = BlockType.Pid;
 
 const block: BlockSpec<PidBlock> = {
   id: typeName,
   generate: (serviceId: string | null) => {
     const temp = serviceTemp(serviceId);
     return {
-      inputId: new Link(null, BlockIntfType.SetpointSensorPairInterface),
-      outputId: new Link(null, BlockIntfType.ActuatorAnalogInterface),
-      inputValue: new Temp(0, temp),
-      inputSetting: new Temp(0, temp),
+      inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+      outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
+      inputValue: bloxQty(0, temp),
+      inputSetting: bloxQty(0, temp),
       outputValue: 0,
       outputSetting: 0,
       enabled: false,
       active: true,
-      kp: new Qty(20, `1/${temp}`),
-      ti: new Qty(2, 'hour'),
-      td: new Qty(0, 'second'),
+      kp: bloxQty(20, `1/${temp}`),
+      ti: bloxQty('2h'),
+      td: bloxQty('0s'),
       p: 0,
       i: 0,
       d: 0,
-      error: new Temp(0, `delta_${temp}`),
-      integral: new Qty(0, `delta_${temp}*hour`),
-      derivative: new Qty(0, `delta_${temp}/minute`),
-      drivenOutputId: new Link(null, BlockIntfType.ActuatorAnalogInterface),
+      error: bloxQty(0, `delta_${temp}`),
+      integral: bloxQty(0, `delta_${temp}*hour`),
+      derivative: bloxQty(0, `delta_${temp}/minute`),
+      derivativeFilter: FilterChoice.FILTER_NONE,
+      drivenOutputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
       integralReset: 0,
-      boilPointAdjust: new Qty(0, `delta_${temp}`),
+      boilPointAdjust: bloxQty(0, `delta_${temp}`),
       boilMinOutput: 0,
       boilModeActive: false,
     };
@@ -42,73 +43,73 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge cooling compressor (beer constant)',
       generate: () => ({
-        kp: new Qty(-50, '1/degC'),
-        ti: new Qty(6, 'hour'),
-        td: new Qty(30, 'min'),
+        kp: bloxQty(-50, '1/degC'),
+        ti: bloxQty('6h'),
+        td: bloxQty('30m'),
       }),
     },
     {
       name: 'Fridge heating element (beer constant)',
       generate: () => ({
-        kp: new Qty(100, '1/degC'),
-        ti: new Qty(6, 'hour'),
-        td: new Qty(30, 'min'),
+        kp: bloxQty(100, '1/degC'),
+        ti: bloxQty('6h'),
+        td: bloxQty('30m'),
       }),
     },
     {
       name: 'Fridge cooling compressor (fridge constant)',
       generate: () => ({
-        kp: new Qty(-50, '1/degC'),
-        ti: new Qty(2, 'hour'),
-        td: new Qty(10, 'min'),
+        kp: bloxQty(-50, '1/degC'),
+        ti: bloxQty('2h'),
+        td: bloxQty('10m'),
       }),
     },
     {
       name: 'Fridge heating element (fridge constant)',
       generate: () => ({
-        kp: new Qty(20, '1/degC'),
-        ti: new Qty(2, 'hour'),
-        td: new Qty(10, 'min'),
+        kp: bloxQty(20, '1/degC'),
+        ti: bloxQty('2h'),
+        td: bloxQty('10m'),
       }),
     },
     {
       name: 'Kettle heating element',
       generate: () => ({
-        kp: new Qty(50, '1/degC'),
-        ti: new Qty(10, 'min'),
-        td: new Qty(0, 'min'),
+        kp: bloxQty(50, '1/degC'),
+        ti: bloxQty('10m'),
+        td: bloxQty('0s'),
       }),
     },
     {
       name: 'HLT setpoint driver',
       generate: () => ({
-        kp: new Qty(1, '1/degC'),
-        ti: new Qty(10, 'min'),
-        td: new Qty(0, 'min'),
+        kp: bloxQty(1, '1/degC'),
+        ti: bloxQty('10m'),
+        td: bloxQty('0s'),
       }),
     },
     {
       name: 'Fridge setpoint driver',
       generate: () => ({
-        kp: new Qty(5, '1/degC'),
-        ti: new Qty(2, 'hour'),
-        td: new Qty(0, 'min'),
+        kp: bloxQty(5, '1/degC'),
+        ti: bloxQty('2h'),
+        td: bloxQty('0s'),
       }),
     },
     {
       name: 'Glycol pump',
       generate: () => ({
-        kp: new Qty(-5, '1/degC'),
-        ti: new Qty(2, 'hour'),
-        td: new Qty(0, 'min'),
+        kp: bloxQty(-5, '1/degC'),
+        ti: bloxQty('2h'),
+        td: bloxQty('0s'),
       }),
     },
     {
       name: 'Heating pad',
       generate: () => ({
-        kp: new Qty(100, '1/degC'),
-        ti: new Qty(2, 'hour'),
-        td: new Qty(10, 'min'),
+        kp: bloxQty(100, '1/degC'),
+        ti: bloxQty('2h'),
+        td: bloxQty('10m'),
       }),
     },
   ],
@@ -116,22 +117,22 @@ const block: BlockSpec<PidBlock> = {
     {
       key: 'kp',
       title: 'Kp',
-      component: 'UnitValEdit',
-      generate: serviceId => new Qty(0, `1/${serviceTemp(serviceId)}`),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(0, `1/${serviceTemp(serviceId)}`),
     },
     {
       key: 'ti',
       title: 'Ti',
-      component: 'TimeUnitValEdit',
-      generate: () => new Qty(0, 'second'),
-      pretty: qtyDurationString,
+      component: 'DurationValEdit',
+      generate: () => bloxQty('0s'),
+      pretty: durationString,
     },
     {
       key: 'td',
       title: 'Td',
-      component: 'TimeUnitValEdit',
-      generate: () => new Qty(0, 'second'),
-      pretty: qtyDurationString,
+      component: 'DurationValEdit',
+      generate: () => bloxQty('0s'),
+      pretty: durationString,
     },
     {
       key: 'enabled',
@@ -143,51 +144,51 @@ const block: BlockSpec<PidBlock> = {
       key: 'inputId',
       title: 'Input',
       component: 'LinkValEdit',
-      generate: () => new Link(null, BlockIntfType.SetpointSensorPairInterface),
+      generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'outputId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, BlockIntfType.ActuatorAnalogInterface),
+      generate: () => bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
     },
     {
       key: 'inputSetting',
       title: 'Input target',
-      component: 'UnitValEdit',
-      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },
     {
       key: 'inputValue',
       title: 'Input value',
-      component: 'UnitValEdit',
-      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },
     {
       key: 'error',
       title: 'Error',
-      component: 'UnitValEdit',
-      generate: serviceId => new Temp(0, `delta_${serviceTemp(serviceId)}`),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(0, `delta_${serviceTemp(serviceId)}`),
       readonly: true,
       graphed: true,
     },
     {
       key: 'integral',
       title: 'Integral of error',
-      component: 'UnitValEdit',
-      generate: serviceId => new Qty(1, `delta_${serviceTemp(serviceId)}*hour`),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(1, `delta_${serviceTemp(serviceId)}*hour`),
       readonly: true,
       graphed: true,
     },
     {
       key: 'derivative',
       title: 'Derivative of input',
-      component: 'UnitValEdit',
-      generate: serviceId => new Qty(1, `delta_${serviceTemp(serviceId)}/minute`),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(1, `delta_${serviceTemp(serviceId)}/minute`),
       readonly: true,
       graphed: true,
     },

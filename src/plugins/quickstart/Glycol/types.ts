@@ -1,4 +1,4 @@
-import { Qty } from '@/plugins/spark/bloxfield';
+import { JSQuantity } from '@/helpers/bloxfield';
 
 import { PinChannel, QuickStartOutput } from '../types';
 
@@ -41,6 +41,6 @@ export interface GlycolConfig extends QuickStartOutput {
 }
 
 export interface GlycolOpts {
-  beerSetting: Qty;
-  glycolSetting: Qty;
+  beerSetting: JSQuantity;
+  glycolSetting: JSQuantity;
 }

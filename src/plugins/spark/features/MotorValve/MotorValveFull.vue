@@ -3,7 +3,6 @@ import { Component } from 'vue-property-decorator';
 
 import { typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
-import { Link } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2408StartChannels } from '@/plugins/spark/getters';
 import { DS2408Block, MotorValveBlock } from '@/plugins/spark/types';
@@ -50,9 +49,9 @@ export default class MotorValveFull
     if (this.block.data.startChannel === pinId) {
       return;
     }
-    const currentDriver = new Link(this.claimedChannels[pinId] || null, 'MotorValve');
-    if (currentDriver.id) {
-      const currentDriverBlock = this.sparkModule.blockById<MotorValveBlock>(currentDriver.id)!;
+    const currentDriverId = this.claimedChannels[pinId] ?? null;
+    if (currentDriverId) {
+      const currentDriverBlock = this.sparkModule.blockById<MotorValveBlock>(currentDriverId)!;
       currentDriverBlock.data.startChannel = 0;
       await this.sparkModule.saveBlock(currentDriverBlock);
     }

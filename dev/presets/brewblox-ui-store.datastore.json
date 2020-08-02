@@ -198,7 +198,7 @@
               "serviceId": "sparkey",
               "blockType": "TempSensorMock",
               "data": {
-                "value[degC]": 5
+                "setting[degC]": 5
               }
             }
           },
@@ -212,7 +212,7 @@
               "serviceId": "sparkey",
               "blockType": "TempSensorMock",
               "data": {
-                "value[degC]": 5
+                "setting[degC]": 5
               }
             }
           },

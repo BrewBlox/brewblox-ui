@@ -58,11 +58,12 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
       return;
     }
     createDialog({
-      component: 'ChangeFieldDialog',
+      component: 'BlockFieldDialog',
       field: this.fieldSpec,
       address: this.addr,
       value: this.impl.value,
       title: `${this.addr.id} ${this.fieldSpec.title}`,
+      comparison: true,
     })
       .onOk(value => this.saveValue(value));
   }
@@ -95,6 +96,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
         :service-id="impl.serviceId"
         :value="impl.value"
         class="col-grow self-center"
+        comparison
         @input="saveValue"
         @edit="editField"
       />

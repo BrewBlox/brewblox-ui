@@ -1,5 +1,5 @@
+import { isLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { Link } from '@/plugins/spark/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import { PidBlock, RelationEdge, RelationNode } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
@@ -11,7 +11,7 @@ function findLinks(serviceId: string, id: string | null): RelationEdge[] {
   }
 
   const links = Object.entries(block.data)
-    .filter(([, v]) => v instanceof Link) as [string, Link][];
+    .filter(([, v]) => isLink(v)) as [string, Link][];
 
   const filtered = links
     .filter(([, link]) => !link.driven && link.id);

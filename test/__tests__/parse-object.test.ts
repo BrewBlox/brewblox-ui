@@ -1,54 +1,44 @@
-import { isJSONQuantity, isQuantity, Link, Qty } from '@/plugins/spark/bloxfield';
-import { deserialize, serialize } from '@/plugins/spark/parse-object';
-import { JSONQuantity } from '@/plugins/spark/types';
+import {
+  bloxQty,
+  isJSLink,
+  isJSQuantity,
+  isLink,
+  isQuantity,
+  JSLink,
+} from '@/helpers/bloxfield';
+import {
+  deserialize,
+  serialize,
+} from '@/plugins/spark/parse-object';
 
-const wrap = (value: number, unit: string): JSONQuantity => ({
-  __bloxtype: 'Quantity',
-  value,
-  unit,
-});
-
-describe('Type checking', () => {
-  it('Should recognize JSONQuantity', () => {
-    expect(isJSONQuantity(null)).toBe(false);
-    expect(isJSONQuantity(10)).toBe(false);
-    expect(isJSONQuantity(wrap(10, 'degC'))).toBe(true);
-    expect(isJSONQuantity(new Qty(10, 'degC'))).toBe(false);
-  });
-
-  it('Should recognize Quantity', () => {
-    expect(isQuantity(null)).toBe(false);
-    expect(isQuantity(10)).toBe(false);
-    expect(isQuantity(wrap(10, 'degC'))).toBe(false);
-    expect(isQuantity(new Qty(10, 'degC'))).toBe(true);
-  });
-});
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {
     const input = {
       test: 'Do not touch',
       something: 1,
-      'convert[celsius]': 25,
-      normal: [21, 22, 23],
-      'array[celsius]': [21, 22, 23],
+      'postfixValue[degC]': 25,
+      normalArray: [21, 22, 23, 24],
+      'otherV[degC]': 21,
     };
 
     const output = deserialize(input);
 
     expect(output.test).toBe('Do not touch');
-    expect(output.something).not.toBeInstanceOf(Qty);
-    expect(output.convert).toBeInstanceOf(Qty);
-    expect(output.normal[0]).toBe(21);
+    expect(isQuantity(output.something)).toBe(false);
+    expect(isQuantity(output.postfixValue)).toBe(true);
+    expect(isJSQuantity(output.postfixValue)).toBe(false);
+    expect(output.normalArray[0]).toBe(21);
+    expect(deserialize(output)).toEqual(output);
   });
 
   it('Should recognise deep properties structured as units', () => {
     const input = {
       data: {
         test: 'Do not touch',
-        'convert[celsius]': 25,
+        'postfixValue[degC]': 25,
         evenDeeper: {
-          'convert[fahrenheit]': 60,
+          'postfixValue[degF]': 60,
         },
       },
     };
@@ -56,8 +46,8 @@ describe('deserialize', () => {
     const output = deserialize(input);
 
     expect(output.data.test).toBe('Do not touch');
-    expect(output.data.convert).toBeInstanceOf(Qty);
-    expect(output.data.evenDeeper.convert).toBeInstanceOf(Qty);
+    expect(isQuantity(output.data.postfixValue)).toBe(true);
+    expect(isQuantity(output.data.evenDeeper.postfixValue)).toBe(true);
   });
 
   it('Should handle undefined and null properties', () => {
@@ -75,7 +65,7 @@ describe('deserialize', () => {
   it('Should handle when input is an array', () => {
     const input = [
       {
-        'convert[celsius]': 25,
+        'convert[degC]': 25,
       },
       25,
       'do not touch',
@@ -99,20 +89,21 @@ describe('deserialize', () => {
     const output = deserialize(input);
 
     expect(output.test).toBe('Do not touch');
-    expect(output.something).not.toBeInstanceOf(Link);
-    expect(output.sensor).toBeInstanceOf(Link);
+    expect(isLink(output.something)).toBe(false);
+    expect(isLink(output.sensor)).toBe(true);
+    expect(isJSLink(output.sensor)).toBe(false);
   });
 });
 
 describe('serialize', () => {
   it('Converts unit properties for API saving', () => {
     const input = {
-      temperature: new Qty(21, 'celsius'),
+      temperature: bloxQty(21, 'degC'),
       leaveThisBe: 666,
       normalArray: [22, 23, 24],
       emptyArray: [],
       deeper: {
-        temperatureInUSA: new Qty(60, 'fahrenheit'),
+        temperatureInUSA: bloxQty(60, 'degF'),
         nullable: null,
       },
     };
@@ -121,7 +112,7 @@ describe('serialize', () => {
       temperature: {
         __bloxtype: 'Quantity',
         value: 21,
-        unit: 'celsius',
+        unit: 'degC',
       },
       leaveThisBe: 666,
       normalArray: [22, 23, 24],
@@ -130,20 +121,21 @@ describe('serialize', () => {
         temperatureInUSA: {
           __bloxtype: 'Quantity',
           value: 60,
-          unit: 'fahrenheit',
+          unit: 'degF',
         },
         nullable: null,
       },
     };
 
     expect(serialize(input)).toEqual(output);
+    expect(serialize(output)).toEqual(output);
   });
 
   it('Handles root arrays correctly', () => {
     const input = [
       20,
       {
-        test: new Qty(23, 'celsius'),
+        test: bloxQty(23, 'degC'),
       },
     ];
 
@@ -153,7 +145,7 @@ describe('serialize', () => {
         test: {
           __bloxtype: 'Quantity',
           value: 23,
-          unit: 'celsius',
+          unit: 'degC',
         },
       },
     ];
@@ -163,9 +155,9 @@ describe('serialize', () => {
 
   it('Converts link properties for API saving', () => {
     const input = {
-      sensor: new Link('sensor-1'),
+      sensor: new JSLink('sensor-1'),
       deeper: {
-        sensor: new Link('sensor-2'),
+        sensor: new JSLink('sensor-2'),
       },
     };
 

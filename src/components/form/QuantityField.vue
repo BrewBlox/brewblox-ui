@@ -2,15 +2,14 @@
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
+import { isQuantity, Quantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { prettify, Qty } from '@/plugins/spark/bloxfield';
 
 @Component
-export default class UnitField extends FieldBase {
-  prettify = prettify;
+export default class QuantityField extends FieldBase {
 
-  @Prop({ type: Object, required: true, validator: v => v instanceof Qty })
-  public readonly value!: Qty;
+  @Prop({ type: Object, required: true, validator: isQuantity })
+  public readonly value!: Quantity;
 
   @Prop({ type: String, required: false })
   public readonly label!: string;
@@ -28,7 +27,7 @@ export default class UnitField extends FieldBase {
   public readonly unitTag!: string;
 
   @Emit('input')
-  public change(v: Qty): Qty {
+  public change(v: Quantity): Quantity {
     return v;
   }
 
@@ -37,7 +36,7 @@ export default class UnitField extends FieldBase {
       return;
     }
     createDialog({
-      component: 'UnitDialog',
+      component: 'QuantityDialog',
       title: this.title,
       message: this.message,
       html: this.html,
@@ -56,7 +55,7 @@ export default class UnitField extends FieldBase {
       {{ value.value | round }}
     </slot>
     <component :is="unitTag" v-if="value.value !== null" class="self-end darkish">
-      {{ value.notation }}
+      {{ value | prettyUnit }}
     </component>
     <template v-if="!!$scopedSlots.append" #append>
       <slot name="append" />

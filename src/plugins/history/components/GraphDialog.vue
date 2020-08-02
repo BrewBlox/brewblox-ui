@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ClosePopup } from 'quasar/src/directives';
+import ClosePopup from 'quasar/src/directives/ClosePopup';
 import { CreateElement, VNode } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 

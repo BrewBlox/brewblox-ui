@@ -1,11 +1,11 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, DS2413Block } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, DS2413Block } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DS2413Widget.vue';
 
-const typeName = 'DS2413';
+const typeName = BlockType.DS2413;
 
 const block: BlockSpec<DS2413Block> = {
   id: typeName,

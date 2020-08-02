@@ -2,10 +2,10 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { bloxLink } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { Link } from '@/plugins/spark/bloxfield';
 import { analogConstraintLabels } from '@/plugins/spark/getters';
-import type { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj } from '@/plugins/spark/types';
+import { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj, BlockType } from '@/plugins/spark/types';
 
 interface Wrapped {
   type: AnalogConstraintKey;
@@ -51,7 +51,7 @@ export default class AnalogConstraints extends Vue {
       balanced: {
         limiting: false,
         balanced: {
-          balancerId: new Link(null, 'Balancer'),
+          balancerId: bloxLink(null, BlockType.Balancer),
           granted: 0,
           id: 0,
         },

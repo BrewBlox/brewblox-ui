@@ -19,7 +19,7 @@ export default class LayoutFooter extends Vue {
   }
 
   get automationAvailable(): boolean {
-    return automationStore.lastEvent !== null;
+    return automationStore.available;
   }
 
   get numTasks(): number {

@@ -46,7 +46,7 @@ export default class AutomationEditor extends DialogBase {
   }
 
   get automationAvailable(): boolean {
-    return automationStore.lastEvent !== null;
+    return automationStore.available;
   }
 
   get drawerOpen(): boolean {

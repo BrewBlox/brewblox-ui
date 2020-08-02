@@ -1,18 +1,24 @@
-import { Link, Qty } from '@/plugins/spark/bloxfield';
+import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalActuatorBlock, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
+import {
+  BlockIntfType,
+  BlockSpec,
+  BlockType,
+  DigitalActuatorBlock,
+  DigitalConstraintsObj,
+  DigitalState,
+} from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DigitalActuatorWidget.vue';
 
-const seconds = (v = 0): Qty => new Qty(v, 'seconds');
-const typeName = 'DigitalActuator';
+const typeName = BlockType.DigitalActuator;
 
 const block: BlockSpec<DigitalActuatorBlock> = {
   id: typeName,
   generate: () => ({
-    hwDevice: new Link(null, 'IoArrayInterface'),
+    hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
     channel: 0,
     desiredState: DigitalState.STATE_INACTIVE,
     state: DigitalState.STATE_INACTIVE,
@@ -27,21 +33,21 @@ const block: BlockSpec<DigitalActuatorBlock> = {
         constrainedBy: {
           constraints: [
             {
-              minOff: seconds(300),
-              remaining: seconds(),
+              minOff: bloxQty('5m'),
+              remaining: bloxQty('0s'),
             },
             {
-              minOn: seconds(180),
-              remaining: seconds(),
+              minOn: bloxQty('3m'),
+              remaining: bloxQty('0s'),
             },
             {
               mutexed: {
-                mutexId: new Link(null, 'MutexInterface'),
-                extraHoldTime: seconds(),
+                mutexId: bloxLink(null, BlockIntfType.MutexInterface),
+                extraHoldTime: bloxQty('0s'),
                 hasCustomHoldTime: true,
                 hasLock: false,
               },
-              remaining: seconds(),
+              remaining: bloxQty('0s'),
             },
           ],
         },
@@ -55,12 +61,12 @@ const block: BlockSpec<DigitalActuatorBlock> = {
           constraints: [
             {
               mutexed: {
-                mutexId: new Link(null, 'MutexInterface'),
-                extraHoldTime: seconds(),
+                mutexId: bloxLink(null, BlockIntfType.MutexInterface),
+                extraHoldTime: bloxQty('0s'),
                 hasCustomHoldTime: true,
                 hasLock: false,
               },
-              remaining: seconds(),
+              remaining: bloxQty('0s'),
             },
           ],
         },

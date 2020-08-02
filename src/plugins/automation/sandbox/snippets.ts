@@ -1,7 +1,7 @@
+import { isLink, isQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { isLink, isQuantity } from '@/plugins/spark/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
+import { BlockAddress, BlockField, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
 
 export type SnippetMode = 'append' | 'insert';
 export type SnippetCallback = (mode: SnippetMode, lines: string[]) => unknown;
@@ -95,8 +95,13 @@ export const generators: SnippetGenerator[] = [
         message: 'Pick a block and field. A function call to get that field will be generated.',
       })
         .onOk((addr: BlockFieldAddress) => {
+          const value = sparkStore.fieldByAddress(addr);
+          const baseCall = `getBlockField('${addr.serviceId}', '${addr.id}', '${addr.field}')`;
+          const call = isQuantity(value)
+            ? `qty(${baseCall})`
+            : baseCall;
           callback('insert', [
-            `getBlockField('${addr.serviceId}', '${addr.id}', '${addr.field}')${valueHint(addr)}`,
+            `${call}${valueHint(addr)}`,
             '',
           ]);
         });
@@ -110,10 +115,10 @@ export const generators: SnippetGenerator[] = [
         component: 'BlockFieldAddressDialog',
         title: 'Select target field',
         message: 'Pick a block and field. A function call will be generated.',
+        fieldFilter: (field: BlockField) => !field.readonly,
       })
         .onOk((addr: BlockFieldAddress) => {
-          const block = sparkStore.blockByAddress(addr);
-          const value = block!.data[addr.field!];
+          const value = sparkStore.fieldByAddress(addr);
           const currentValue = isQuantity(value)
             ? `qty(${value.value}, '${value.unit}')`
             : JSON.stringify(value);

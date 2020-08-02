@@ -1,10 +1,10 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, Spark3PinsBlock } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, Spark3PinsBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './Spark3PinsWidget.vue';
-const typeName = 'Spark3Pins';
+const typeName = BlockType.Spark3Pins;
 
 const block: BlockSpec<Spark3PinsBlock> = {
   id: typeName,

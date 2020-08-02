@@ -2,12 +2,12 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/plugins/spark/parse-object';
+import { deepCopy } from '@/helpers/functional';
 import type { BlockAddress, BlockField } from '@/plugins/spark/types';
 
 
 @Component
-export default class ChangeFieldDialog extends DialogBase {
+export default class BlockFieldDialog extends DialogBase {
   local: any = null;
 
   @Prop({ type: Object, required: true })
@@ -18,6 +18,9 @@ export default class ChangeFieldDialog extends DialogBase {
 
   @Prop({ required: true })
   public readonly value!: any;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly comparison!: boolean;
 
   created(): void {
     this.local = deepCopy(this.value);
@@ -43,6 +46,7 @@ export default class ChangeFieldDialog extends DialogBase {
         v-bind="field.componentProps"
         :service-id="address.serviceId"
         :block-id="address.id"
+        :comparison="comparison"
         editable
       />
       <template #actions>

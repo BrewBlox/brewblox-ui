@@ -1,17 +1,25 @@
-import { Link } from '@/plugins/spark/bloxfield';
+import { bloxLink } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalConstraintsObj, DigitalState, MotorValveBlock, ValveState } from '@/plugins/spark/types';
+import {
+  BlockIntfType,
+  BlockSpec,
+  BlockType,
+  DigitalConstraintsObj,
+  DigitalState,
+  MotorValveBlock,
+  ValveState,
+} from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './MotorValveWidget.vue';
 
-const typeName = 'MotorValve';
+const typeName = BlockType.MotorValve;
 
 const block: BlockSpec<MotorValveBlock> = {
   id: typeName,
   generate: () => ({
-    hwDevice: new Link(null, 'IoArrayInterface'),
+    hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
     startChannel: 0,
     desiredState: DigitalState.STATE_INACTIVE,
     state: DigitalState.STATE_INACTIVE,

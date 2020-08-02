@@ -1,20 +1,20 @@
-import { Temp } from '@/plugins/spark/bloxfield';
+import { bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockSpec, TempSensorOneWireBlock } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './TempSensorOneWireWidget.vue';
 
-const typeName = 'TempSensorOneWire';
+const typeName = BlockType.TempSensorOneWire;
 
 const block: BlockSpec<TempSensorOneWireBlock> = {
   id: typeName,
   generate: serviceId => {
     const temp = serviceTemp(serviceId);
     return {
-      value: new Temp(20, 'degC').convert(temp),
-      offset: new Temp(0, `delta_${temp}`),
+      value: bloxQty(20, 'degC').to(temp),
+      offset: bloxQty(0, `delta_${temp}`),
       address: '',
     };
   },
@@ -22,8 +22,8 @@ const block: BlockSpec<TempSensorOneWireBlock> = {
     {
       key: 'value',
       title: 'Sensor value',
-      component: 'UnitValEdit',
-      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },

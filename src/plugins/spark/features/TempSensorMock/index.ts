@@ -1,20 +1,20 @@
-import { Temp } from '@/plugins/spark/bloxfield';
+import { bloxQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
-import { BlockSpec, TempSensorMockBlock } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './TempSensorMockWidget.vue';
 
-const typeName = 'TempSensorMock';
+const typeName = BlockType.TempSensorMock;
 
 const block: BlockSpec<TempSensorMockBlock> = {
   id: typeName,
   generate: serviceId => {
     const temp = serviceTemp(serviceId);
     return {
-      value: new Temp(20, 'degC').convert(temp),
-      setting: new Temp(20, 'degC').convert(temp),
+      value: bloxQty(20, 'degC').to(temp),
+      setting: bloxQty(20, 'degC').to(temp),
       fluctuations: [],
       connected: true,
     };
@@ -23,8 +23,8 @@ const block: BlockSpec<TempSensorMockBlock> = {
     {
       key: 'setting',
       title: 'Sensor Setting',
-      component: 'UnitValEdit',
-      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
     },
     {
       key: 'connected',
@@ -35,8 +35,8 @@ const block: BlockSpec<TempSensorMockBlock> = {
     {
       key: 'value',
       title: 'Sensor value',
-      component: 'UnitValEdit',
-      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
+      component: 'QuantityValEdit',
+      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
       readonly: true,
       graphed: true,
     },

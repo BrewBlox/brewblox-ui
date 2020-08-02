@@ -1,20 +1,20 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, durationString, objectSorter } from '@/helpers/functional';
+import { durationMs, durationString } from '@/helpers/duration';
+import { deepCopy, objectSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { Qty,Temp } from '@/plugins/spark/bloxfield';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { deepCopy } from '@/plugins/spark/parse-object';
-import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
+import { Quantity, Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
 
 import { profileGraphProps } from './helpers';
 
 interface DisplaySetpoint {
   offsetMs: number;
   absTimeMs: number;
-  temperature: Qty;
+  temperature: Quantity;
 }
 
 @Component
@@ -22,6 +22,7 @@ export default class SetpointProfileFull
   extends BlockCrudComponent<SetpointProfileBlock> {
   durationString = durationString;
   durationMs = durationMs;
+  bloxQty = bloxQty;
 
   get tempUnit(): string {
     return this.sparkModule.units.Temp;
@@ -59,7 +60,7 @@ export default class SetpointProfileFull
     return {
       offsetMs: 0,
       absTimeMs: new Date(this.start).getTime(),
-      temperature: new Temp(20, 'degC').convert(this.tempUnit),
+      temperature: bloxQty(20, 'degC').to(this.tempUnit),
     };
   }
 
@@ -85,7 +86,7 @@ export default class SetpointProfileFull
     notify.warn('Point time must be later than start time', { logged: false });
   }
 
-  intermediateTemp(points: DisplaySetpoint[], dateMs: number): Qty | null {
+  intermediateTemp(points: DisplaySetpoint[], dateMs: number): Quantity | null {
     const nextIdx = points.findIndex(point => point.absTimeMs >= dateMs);
     if (nextIdx < 1) { return null; }
 
@@ -95,7 +96,7 @@ export default class SetpointProfileFull
     const nextVal = next.temperature.value as number;
     const duration = (next.absTimeMs - prev.absTimeMs) || 1;
     const interpolated = prevVal + (dateMs - prev.absTimeMs) * (nextVal - prevVal) / duration;
-    return prev.temperature.copy(interpolated);
+    return bloxQty(prev.temperature).copy(interpolated);
   }
 
   splicePoints(index, ...items: DisplaySetpoint[]): void {
@@ -122,7 +123,7 @@ export default class SetpointProfileFull
       // Check if this change would cause a jump in target setting
       if (current !== null
         && projected !== null
-        && current.roundedValue !== projected.roundedValue) {
+        && !bloxQty(current).eq(projected)) {
 
         const pinned: DisplaySetpoint = {
           offsetMs: now - this.start,
@@ -181,7 +182,7 @@ export default class SetpointProfileFull
     }
   }
 
-  updatePointTemperature(index: number, value: Qty): void {
+  updatePointTemperature(index: number, value: Quantity): void {
     this.changePoint(index, {
       ...this.points[index],
       temperature: value,
@@ -192,14 +193,7 @@ export default class SetpointProfileFull
 
 <template>
   <div class="widget-lg">
-    <slot name="warnings">
-      <BlockEnableToggle
-        v-if="block.data.targetId.id !== null"
-        :crud="crud"
-        :text-enabled="`Profile is enabled and driving ${block.data.targetId}.`"
-        :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
-      />
-    </slot>
+    <slot name="warnings" />
 
     <div class="q-ma-md row q-gutter-xs">
       <DatetimeField
@@ -230,8 +224,8 @@ export default class SetpointProfileFull
         :key="idx"
         class="col-12 row q-gutter-xs q-mt-none profile-point"
       >
-        <DurationInputField
-          :value="durationString(point.offsetMs)"
+        <DurationField
+          :value="bloxQty(point.offsetMs, 'ms')"
           title="Offset from start time"
           label="Offset"
           html
@@ -254,7 +248,7 @@ export default class SetpointProfileFull
           class="col min-width-sm"
           @input="v => updatePointTime(idx, v)"
         />
-        <UnitField
+        <QuantityField
           :value="point.temperature"
           title="Temperature"
           label="Temperature"

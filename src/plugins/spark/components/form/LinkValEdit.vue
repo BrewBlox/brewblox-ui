@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { Link } from '@/plugins/spark/bloxfield';
+import { Link } from '@/helpers/bloxfield';
 import { isCompatible } from '@/plugins/spark/helpers';
 
 import ValEditBase from '../ValEditBase';
@@ -47,9 +47,11 @@ export default class LinkValEdit extends ValEditBase {
     v-if="editable"
     v-model="field.id"
     :options="filteredOpts"
+    label="Block"
     dense
     clearable
     use-input
+    item-aligned
     @filter="filterFn"
   />
   <div

@@ -4,9 +4,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { deepCopy } from '@/helpers/functional';
 import { loadFile, saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
-import { deepCopy } from '@/plugins/spark/parse-object';
 import { dashboardStore, Widget } from '@/store/dashboards';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '../getters';
