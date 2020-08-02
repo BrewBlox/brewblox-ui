@@ -47,7 +47,7 @@ export default class LinkValEdit extends ValEditBase {
     v-if="editable"
     v-model="field.id"
     :options="filteredOpts"
-    label="Link"
+    label="Block"
     dense
     clearable
     use-input

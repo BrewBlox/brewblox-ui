@@ -5,7 +5,7 @@ import { bloxLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { mutate, objectSorter, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
 import { isBlockDriven } from '@/plugins/spark/helpers';
-import { DigitalActuatorBlock } from '@/plugins/spark/types';
+import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 
 import BlockCrudComponent from '../BlockCrudComponent';
@@ -57,7 +57,7 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return bloxLink(channel.driver?.id ?? null, 'DigitalActuator');
+    return bloxLink(channel.driver?.id ?? null, BlockType.DigitalActuator);
   }
 
   driverDriven(block: Block): boolean {
@@ -100,11 +100,11 @@ export default class IoArray extends BlockCrudComponent {
       component: 'BlockWizardDialog',
       parent: this,
       serviceId: this.serviceId,
-      initialFeature: 'DigitalActuator',
+      initialFeature: BlockType.DigitalActuator,
     })
       .onOk((block: Block) => {
-        if (block.type === 'DigitalActuator') {
-          this.saveDriver(channel, bloxLink(block.id, 'DigitalActuator'));
+        if (block.type === BlockType.DigitalActuator) {
+          this.saveDriver(channel, bloxLink(block.id, block.type));
         }
       });
   }

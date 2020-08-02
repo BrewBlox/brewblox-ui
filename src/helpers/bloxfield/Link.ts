@@ -14,10 +14,8 @@ export const isJSLink =
 export const prettyLink = (v: Link): string =>
   v?.id || '<not set>';
 
-export function rawLink(id: string | null, type: BlockOrIntfType | null, driven: boolean): Link;
-export function rawLink(id: string | null, type: BlockOrIntfType | null): Link;
-export function rawLink(id: string | null): Link;
-export function rawLink(raw: Link): Link;
+export function rawLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): Link;
+export function rawLink(other: Link): Link;
 export function rawLink(value: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean): Link {
   return isLink(value)
     ? {
@@ -40,10 +38,8 @@ export class JSLink implements JSBloxField, Link {
   public type: BlockOrIntfType | null;
   public driven: boolean;
 
-  public constructor(id: string | null, type: BlockOrIntfType | null, driven: boolean);
-  public constructor(id: string | null, type: BlockOrIntfType | null);
-  public constructor(id: string | null);
-  public constructor(raw: Link);
+  public constructor(id: string | null, type?: BlockOrIntfType | null, driven?: boolean);
+  public constructor(other: Link);
   public constructor(value: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean) {
     const obj = rawLink(value as any, type as any, driven as any);
     this.id = obj.id;
@@ -82,10 +78,8 @@ export class JSLink implements JSBloxField, Link {
   }
 }
 
-export function bloxLink(id: string | null, type: BlockOrIntfType | null, driven: boolean): JSLink;
-export function bloxLink(id: string | null, type: BlockOrIntfType | null): JSLink;
-export function bloxLink(id: string | null): JSLink;
-export function bloxLink(raw: Link): JSLink;
+export function bloxLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink;
+export function bloxLink(other: Link): JSLink;
 export function bloxLink(value: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink {
-  return new JSLink(value as any, type as any, driven as any);
+  return new JSLink(value as any, type, driven);
 }

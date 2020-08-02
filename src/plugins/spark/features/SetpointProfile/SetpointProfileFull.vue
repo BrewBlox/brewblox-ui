@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxLink, bloxQty, JSLink } from '@/helpers/bloxfield';
+import { bloxQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString } from '@/helpers/duration';
 import { deepCopy, objectSorter } from '@/helpers/functional';

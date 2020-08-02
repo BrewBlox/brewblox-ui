@@ -6,7 +6,7 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { digitalConstraintLabels } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import { MutexBlock, Quantity } from '@/plugins/spark/types';
+import { BlockType, MutexBlock, Quantity } from '@/plugins/spark/types';
 import type {
   DigitalConstraint,
   DigitalConstraintKey,
@@ -65,7 +65,7 @@ export default class DigitalConstraints extends Vue {
       mutexed: {
         remaining: bloxQty('0s'),
         mutexed: {
-          mutexId: bloxLink(null, 'MutexInterface'),
+          mutexId: bloxLink(null, BlockType.Mutex),
           hasCustomHoldTime: false,
           extraHoldTime: bloxQty('0s'),
           hasLock: false,

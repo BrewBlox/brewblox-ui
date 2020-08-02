@@ -29,26 +29,26 @@ type PidData = PidBlock['data'];
 
 const beerCoolConfig: Partial<PidData> = {
   kp: bloxQty(-50, '1/degC'),
-  ti: bloxQty(6, 'hour'),
-  td: bloxQty(30, 'min'),
+  ti: bloxQty('6h'),
+  td: bloxQty('30m'),
 };
 
 const fridgeCoolConfig: Partial<PidData> = {
   kp: bloxQty(-20, '1/degC'),
-  ti: bloxQty(2, 'hour'),
-  td: bloxQty(10, 'min'),
+  ti: bloxQty('2h'),
+  td: bloxQty('10m'),
 };
 
 const beerHeatConfig: Partial<PidData> = {
   kp: bloxQty(100, '1/degC'),
-  ti: bloxQty(6, 'hour'),
-  td: bloxQty(30, 'min'),
+  ti: bloxQty('6h'),
+  td: bloxQty('30m'),
 };
 
 const fridgeHeatConfig: Partial<PidData> = {
   kp: bloxQty(20, '1/degC'),
-  ti: bloxQty(2, 'hour'),
-  td: bloxQty(10, 'min'),
+  ti: bloxQty('2h'),
+  td: bloxQty('10m'),
 };
 
 export const defineChangedBlocks = (config: FermentConfig): Block[] => {
@@ -440,7 +440,7 @@ export const defineWidgets = (
               serviceId,
               blockId: names.coolPid,
               data: {
-                inputId: bloxLink(names.fridgeSetpoint, 'ProcessValueInterface'),
+                inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
                 ...fridgeCoolConfig,
               },
               confirmed: {},
@@ -450,7 +450,7 @@ export const defineWidgets = (
               serviceId,
               blockId: names.heatPid,
               data: {
-                inputId: bloxLink(names.fridgeSetpoint, 'ProcessValueInterface'),
+                inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
                 ...fridgeHeatConfig,
               },
               confirmed: {},
@@ -459,7 +459,9 @@ export const defineWidgets = (
               id: uid(),
               serviceId,
               blockId: names.tempProfile,
-              data: { targetId: bloxLink(names.fridgeSetpoint) },
+              data: {
+                targetId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
+              },
               confirmed: {},
             },
           ] as [

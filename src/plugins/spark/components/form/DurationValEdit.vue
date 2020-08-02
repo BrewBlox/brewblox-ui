@@ -9,27 +9,30 @@ import ValEditBase from '../ValEditBase';
 @Component
 export default class DurationValEdit extends ValEditBase {
   field!: Quantity | string;
-  local: string | null = null;
+  local: string | null = '';
 
   created(): void {
     this.local = durationString(this.field);
   }
 
-  findUnit(s: string): string {
+  findUnit(s: string | null): string {
+    if (!s) { return ''; }
     const match = s.match(/^[0-9\.]*([a-z]*)/i);
     return match && match[1]
       ? match[1]
       : '';
   }
 
-  get defaultUnit(): string {
-    return !this.findUnit(this.local || '')
-      ? this.findUnit(durationString(this.value))
-      : '';
+  get fallbackUnit(): string {
+    return this.findUnit(this.local)
+      ? ''
+      : this.findUnit(durationString(this.value));
   }
 
   get localMs(): number {
-    return durationMs(`${this.local}${this.defaultUnit}`);
+    return this.local
+      ? durationMs(`${this.local}${this.fallbackUnit}`)
+      : 0;
   }
 
   normalize(): void {
@@ -50,9 +53,10 @@ export default class DurationValEdit extends ValEditBase {
     <q-input
       v-model="local"
       label="Duration"
-      :suffix="defaultUnit"
+      :suffix="fallbackUnit"
       autofocus
       item-aligned
+      clearable
       class="col-grow"
       @change="normalize"
     />

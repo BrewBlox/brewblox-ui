@@ -1,6 +1,6 @@
 <script lang="ts">
 import isFinite from 'lodash/isFinite';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { prettyUnit, Quantity } from '@/helpers/bloxfield';
 
@@ -11,10 +11,9 @@ export default class QuantityValEdit extends ValEditBase {
   field!: Quantity;
   local: number | null = null;
 
-  @Watch('local')
-  updateField(newV: number | null): void {
-    if (newV === null || isFinite(newV)) {
-      this.field.value = newV;
+  syncField(): void {
+    if (this.local === null || isFinite(this.local)) {
+      this.field.value = this.local;
     }
   }
 
@@ -39,6 +38,7 @@ export default class QuantityValEdit extends ValEditBase {
       label="Value"
       :suffix="notation"
       item-aligned
+      @change="syncField"
     />
   </div>
   <div
