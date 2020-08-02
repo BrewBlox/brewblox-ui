@@ -57,12 +57,23 @@ export const blockIdRules = (serviceId: string): InputRule[] => [
   v => v.length < 200 || 'Name must be less than 200 characters',
 ];
 
+export const prettyAny = (v: any): string => {
+  if (isQuantity(v)) {
+    return prettyQty(v);
+  }
+  if (isLink(v)) {
+    return prettyLink(v);
+  }
+  return JSON.stringify(v);
+};
+
 export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('quantity', prettyQty);
   Vue.filter('prettyUnit', prettyUnit);
   Vue.filter('duration', (v: any, nullV = '<not set>') => durationString(v, nullV));
   Vue.filter('link', prettyLink);
   Vue.filter('block', (v: BlockAddress) => v?.id || '<not set>');
+  Vue.filter('pretty', prettyAny);
   Vue.filter('round', round);
   Vue.filter('truncateRound', truncateRound);
   Vue.filter('hexToBase64', hexToBase64);
