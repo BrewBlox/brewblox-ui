@@ -77,8 +77,7 @@ export default class PidWidget
           <CardWarning v-if="!block.data.active">
             <template #message>
               <span>
-                PID is inactive:
-                <i>{{ outputLink | link }}</i> will not be set.
+                PID is inactive and not driving <i>{{ outputLink | link }}</i>.
               </span>
             </template>
           </CardWarning>

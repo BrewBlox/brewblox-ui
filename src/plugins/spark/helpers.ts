@@ -171,7 +171,7 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
     else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
       slot.actuatorAnalog = link;
     }
-    else if (isCompatible(type, 'Pid')) {
+    else if (isCompatible(type, BlockType.Pid)) {
       slot.pid = link;
     }
 
@@ -314,7 +314,7 @@ export const prettifyConstraints =
             return `Maximum = ${c.max}`;
           }
           if ('balanced' in c) {
-            return `Balanced by ${c.balanced.balancerId.id ?? '<not set>'}`;
+            return `Balanced by ${prettyLink(c.balanced.balancerId)}`;
           }
           // Digital
           if ('minOff' in c) {
@@ -324,7 +324,7 @@ export const prettifyConstraints =
             return `Minimum ON = ${durationString(c.minOn)}`;
           }
           if ('mutexed' in c) {
-            return `Mutexed by ${c.mutexed.mutexId.id ?? '<not set>'}`;
+            return `Mutexed by ${prettyLink(c.mutexed.mutexId)}`;
           }
           if ('delayedOn' in c) {
             return `Delayed ON = ${durationString(c.delayedOn)}`;

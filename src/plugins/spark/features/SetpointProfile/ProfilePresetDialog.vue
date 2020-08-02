@@ -1,10 +1,10 @@
 <script lang="ts">
-import cloneDeep from 'lodash/cloneDeep';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
+import { deepCopy } from '@/helpers/functional';
 import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { SetpointProfileBlock } from '@/plugins/spark/types';
@@ -57,7 +57,7 @@ export default class ProfilePresetDialog extends DialogBase {
     }
     const { value } = this.selected;
     const preset = sparkStore.presetById(value)!;
-    const points = deserialize(cloneDeep(preset.data.points));
+    const points = deserialize(deepCopy(preset.data.points));
 
     createDialog({
       title: 'Profile start',
@@ -85,7 +85,7 @@ export default class ProfilePresetDialog extends DialogBase {
     const { value } = this.selected;
     const preset = sparkStore.presetById(value)!;
     preset.data = {
-      points: cloneDeep(this.value.data.points),
+      points: deepCopy(this.value.data.points),
     };
     await sparkStore.savePreset(preset);
     this.onDialogOk();
@@ -106,7 +106,7 @@ export default class ProfilePresetDialog extends DialogBase {
           name,
           type: typeName,
           data: {
-            points: cloneDeep(this.value.data.points),
+            points: deepCopy(this.value.data.points),
           },
         });
         this.onDialogOk();

@@ -139,6 +139,9 @@ export class JSQuantity implements JSBloxField, Quantity {
   }
 
   public to(unit: string): JSQuantity {
+    if (unit === this.unit) {
+      return this.copy();
+    }
     const value = this.value !== null
       ? toLibQty(this).to(libUnit(unit)).scalar
       : null;
