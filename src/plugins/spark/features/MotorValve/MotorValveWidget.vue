@@ -1,8 +1,9 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { typeMatchFilter } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
+import { BlockType, MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
 
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
@@ -20,7 +21,7 @@ export default class MotorValveWidget
   get spark3Pins(): Spark3PinsBlock | null {
     return this.sparkModule
       .blocks
-      .find((block): block is Spark3PinsBlock => block.type === 'Spark3Pins')
+      .find(typeMatchFilter<Spark3PinsBlock>(BlockType.Spark3Pins))
       ?? null;
   }
 

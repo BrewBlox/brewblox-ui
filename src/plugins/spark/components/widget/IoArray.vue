@@ -29,7 +29,7 @@ export default class IoArray extends BlockCrudComponent {
   get claimedChannels(): { [channel: number]: string } {
     return this.sparkModule
       .blocks
-      .filter(typeMatchFilter<DigitalActuatorBlock>('DigitalActuator'))
+      .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
       .filter(block => block.data.hwDevice.id === this.block.id)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }

@@ -7,9 +7,9 @@ import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/functional';
 import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
-import { SetpointProfileBlock } from '@/plugins/spark/types';
+import { BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 
-const typeName: SetpointProfileBlock['type'] = 'SetpointProfile';
+const typeName = BlockType.SetpointProfile;
 
 @Component
 export default class ProfilePresetDialog extends DialogBase {

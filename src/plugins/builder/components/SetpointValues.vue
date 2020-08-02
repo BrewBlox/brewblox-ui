@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { prettyUnit } from '@/helpers/bloxfield';
 import { contrastColor, typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { BlockAddress, BlockType, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import { settingsAddress, squares } from '../helpers';
 import { PersistentPart } from '../types';
@@ -60,7 +60,7 @@ export default class SetpointValues extends Vue {
       && this.block.data.settingEnabled
       && this.sparkModule!
         .blocks
-        .filter(typeMatchFilter<PidBlock>('Pid'))
+        .filter(typeMatchFilter<PidBlock>(BlockType.Pid))
         .some(block => block.data.inputId.id === this.block!.id);
   }
 

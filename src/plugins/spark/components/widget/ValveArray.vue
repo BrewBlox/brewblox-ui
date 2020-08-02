@@ -33,7 +33,7 @@ export default class ValveArray extends BlockCrudComponent {
   get claimedChannels(): { [nid: number]: MotorValveBlock } {
     return this.sparkModule
       .blocks
-      .filter(typeMatchFilter<MotorValveBlock>('MotorValve'))
+      .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
       .filter(block => block.data.hwDevice.id === this.block.id)
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block), {});
   }

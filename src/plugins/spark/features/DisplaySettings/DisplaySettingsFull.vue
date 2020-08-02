@@ -5,7 +5,7 @@ import { bloxLink, isLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isCompatible } from '@/plugins/spark/helpers';
-import { BlockOrIntfType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
+import { BlockIntfType, BlockOrIntfType, BlockType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 
 @Component
 export default class DisplaySettingsFull
@@ -18,10 +18,11 @@ export default class DisplaySettingsFull
     v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
   ];
   validTypes: BlockOrIntfType[] = [
-    'TempSensorInterface',
-    'SetpointSensorPairInterface',
-    'ActuatorAnalogInterface',
-    'Pid',
+    BlockIntfType.TempSensorInterface,
+    BlockIntfType.TempSensorInterface,
+    BlockIntfType.SetpointSensorPairInterface,
+    BlockIntfType.ActuatorAnalogInterface,
+    BlockType.Pid,
   ]
 
   get slots(): (DisplaySlot | null)[] {
@@ -72,16 +73,16 @@ export default class DisplaySettingsFull
       name: existing?.name || link.id.slice(0, 15),
     };
 
-    if (isCompatible(type, 'TempSensorInterface')) {
+    if (isCompatible(type, BlockIntfType.TempSensorInterface)) {
       obj.tempSensor = link;
     }
-    else if (isCompatible(type, 'SetpointSensorPairInterface')) {
+    else if (isCompatible(type, BlockIntfType.SetpointSensorPairInterface)) {
       obj.setpointSensorPair = link;
     }
-    else if (isCompatible(type, 'ActuatorAnalogInterface')) {
+    else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
       obj.actuatorAnalog = link;
     }
-    else if (isCompatible(type, 'Pid')) {
+    else if (isCompatible(type, BlockType.Pid)) {
       obj.pid = link;
     }
 
