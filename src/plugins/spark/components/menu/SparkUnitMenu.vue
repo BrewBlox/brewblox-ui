@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
+import { BlockType, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
 import { UserUnits } from '@/plugins/spark/types';
 
 const defaultMessage =
@@ -42,7 +42,7 @@ export default class SparkUnitMenu extends DialogBase {
   get displayBlock(): DisplaySettingsBlock | null {
     return this.sparkModule
       .blocks
-      .find(typeMatchFilter<DisplaySettingsBlock>('DisplaySettings'))
+      .find(typeMatchFilter<DisplaySettingsBlock>(BlockType.DisplaySettings))
       ?? null;
   }
 

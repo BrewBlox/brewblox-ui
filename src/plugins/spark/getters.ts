@@ -67,45 +67,45 @@ export const filterLabels: Record<FilterChoice, string> = {
 
 export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
   ProcessValueInterface: [
-    'ActuatorAnalogMock',
-    'ActuatorPwm',
-    'SetpointSensorPair',
+    BlockType.ActuatorAnalogMock,
+    BlockType.ActuatorPwm,
+    BlockType.SetpointSensorPair,
   ],
   TempSensorInterface: [
-    'TempSensorMock',
-    'TempSensorOneWire',
+    BlockType.TempSensorMock,
+    BlockType.TempSensorOneWire,
   ],
   SetpointSensorPairInterface: [
-    'SetpointSensorPair',
+    BlockType.SetpointSensorPair,
   ],
   ActuatorAnalogInterface: [
-    'ActuatorAnalogMock',
-    'ActuatorOffset',
-    'ActuatorPwm',
+    BlockType.ActuatorAnalogMock,
+    BlockType.ActuatorOffset,
+    BlockType.ActuatorPwm,
   ],
   ActuatorDigitalInterface: [
-    'DigitalActuator',
-    'MotorValve',
+    BlockType.DigitalActuator,
+    BlockType.MotorValve,
   ],
   BalancerInterface: [
-    'Balancer',
+    BlockType.Balancer,
   ],
   MutexInterface: [
-    'Mutex',
+    BlockType.Mutex,
   ],
   OneWireDeviceInterface: [
-    'TempSensorOneWire',
-    'DS2408',
-    'DS2413',
+    BlockType.TempSensorOneWire,
+    BlockType.DS2408,
+    BlockType.DS2413,
   ],
   IoArrayInterface: [
-    'DS2408',
-    'DS2413',
-    'Spark2Pins',
-    'Spark3Pins',
-    'MockPins',
+    BlockType.DS2408,
+    BlockType.DS2413,
+    BlockType.Spark2Pins,
+    BlockType.Spark3Pins,
+    BlockType.MockPins,
   ],
   DS2408Interface: [
-    'DS2408',
+    BlockType.DS2408,
   ],
 };

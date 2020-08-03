@@ -69,7 +69,7 @@ const fromArgs =
     __bloxtype: 'Quantity',
     value,
     unit,
-    readonly,
+    readonly: readonly || undefined,
   });
 
 export function rawQty(value: number | null, unit: string): Quantity;

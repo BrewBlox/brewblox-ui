@@ -5,7 +5,7 @@ import { typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2408StartChannels } from '@/plugins/spark/getters';
-import { DS2408Block, MotorValveBlock } from '@/plugins/spark/types';
+import { BlockType, DS2408Block, MotorValveBlock } from '@/plugins/spark/types';
 
 @Component
 export default class MotorValveFull
@@ -22,7 +22,7 @@ export default class MotorValveFull
     const targetId = this.hwBlock.id;
     return this.sparkModule
       .blocks
-      .filter(typeMatchFilter<MotorValveBlock>('MotorValve'))
+      .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
       .filter(block => block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block.id), {});
   }
