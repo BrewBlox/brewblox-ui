@@ -34,8 +34,8 @@ import {
 import { ExpressionError } from './types';
 
 const validTypes: BlockIntfType[] = [
-  'ActuatorDigitalInterface',
-  'ProcessValueInterface',
+  BlockIntfType.ActuatorDigitalInterface,
+  BlockIntfType.ProcessValueInterface,
 ];
 
 @Component({

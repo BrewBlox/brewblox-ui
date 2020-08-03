@@ -56,15 +56,15 @@ export default class SparkWidget extends Vue {
   }
 
   get sysInfo(): SysInfoBlock {
-    return this.sysBlock('SysInfo');
+    return this.sysBlock(SystemBlockType.SysInfo);
   }
 
   get ticks(): TicksBlock {
-    return this.sysBlock('Ticks');
+    return this.sysBlock(SystemBlockType.Ticks);
   }
 
   get wifi(): WiFiSettingsBlock {
-    return this.sysBlock('WiFiSettings');
+    return this.sysBlock(SystemBlockType.WiFiSettings);
   }
 
   get sysDate(): string {

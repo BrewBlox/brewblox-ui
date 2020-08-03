@@ -2,7 +2,7 @@ import { BlockValueImpl } from '@/plugins/automation/types';
 
 export type CompareOperator = BlockValueImpl['operator'];
 
-export interface OperatorOption extends SelectOption {
+export interface OperatorOption extends SelectOption<CompareOperator> {
   desc: string;
 }
 
