@@ -43,6 +43,8 @@ interface HasType {
   type: keyof any & string;
 }
 
+type Patch<T> = HasId & Partial<T>;
+
 interface QuasarNode {
   label: string;
   value: any;
