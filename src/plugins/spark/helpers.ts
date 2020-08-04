@@ -27,7 +27,7 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
+import { ComponentResult, Crud, featureStore, WidgetFeature } from '@/store/features';
 
 import { compatibleTypes } from './getters';
 import {
@@ -73,6 +73,7 @@ export const installFilters = (Vue: VueConstructor): void => {
   Vue.filter('duration', (v: any, nullV = '<not set>') => durationString(v, nullV));
   Vue.filter('link', prettyLink);
   Vue.filter('block', (v: BlockAddress) => v?.id || '<not set>');
+  Vue.filter('widgetTitle', (type: string) => featureStore.widgetTitle(type));
   Vue.filter('pretty', prettyAny);
   Vue.filter('round', round);
   Vue.filter('truncateRound', truncateRound);
@@ -196,12 +197,6 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   }
 };
 
-const addressedTypes: BlockType[] = [
-  BlockType.TempSensorOneWire,
-  BlockType.DS2408,
-  BlockType.DS2413,
-];
-
 export const saveHwInfo = (serviceId: string): void => {
   const linked: string[] = [];
   const addressed: string[] = [];
@@ -265,7 +260,9 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
 
     if (opts.restore) {
       module.blocks
-        .filter(block => addressedTypes.includes(block.type) && !block.id.startsWith('New|'))
+        .filter(block =>
+          isCompatible(block.type, BlockIntfType.OneWireDeviceInterface)
+          && !block.id.startsWith('New|'))
         .forEach(block => addresses[block.data.address] = block.id);
     }
 
@@ -275,7 +272,9 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
 
     if (opts.restore) {
       const renameArgs: [string, string][] = module.blocks
-        .filter(block => addressedTypes.includes(block.type) && !!addresses[block.data.address])
+        .filter(block =>
+          isCompatible(block.type, BlockIntfType.OneWireDeviceInterface)
+          && !!addresses[block.data.address])
         .map(block => [block.id, addresses[block.data.address]]);
       await Promise.all(renameArgs.map(module.renameBlock));
     }

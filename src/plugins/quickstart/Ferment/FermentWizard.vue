@@ -7,6 +7,7 @@ import WidgetWizardBase from '@/components/WidgetWizardBase';
 export default class FermentWizard extends WidgetWizardBase {
   initialTasks = [
     'QuickStartServiceTask',
+    'QuickStartDiscoveryTask',
     'FermentNamingTask',
     'FermentHardwareTask',
     'FermentSettingsTask',

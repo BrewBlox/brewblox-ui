@@ -7,6 +7,7 @@ import WidgetWizardBase from '@/components/WidgetWizardBase';
 export default class HermsWizard extends WidgetWizardBase {
   initialTasks = [
     'QuickStartServiceTask',
+    'QuickStartDiscoveryTask',
     'HermsNamingTask',
     'HermsHardwareTask',
     'HermsMutexTask',
