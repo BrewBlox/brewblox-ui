@@ -2,6 +2,7 @@ import fromEntries from 'fromentries';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import isString from 'lodash/isString';
+import matches from 'lodash/matches';
 import { colors } from 'quasar';
 
 type SortFunc = (a: any, b: any) => number
@@ -273,16 +274,37 @@ export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
 /**
  * Looks for object in array collection.
  *
- * @param arr object collection
- * @param id unique ID of desired object
+ * @param arr object collection.
+ * @param id unique ID of desired object.
  */
 export function findById<T extends HasId>(
   arr: T[],
   id: string | null,
   fallback: T | null = null,
-): typeof fallback {
+): T | typeof fallback {
   return id != null
     ? arr.find(v => v.id === id) ?? fallback
+    : fallback;
+}
+
+/**
+ * Finds object in `arr` with ID matching `patch`.
+ * Returns a shallow merge of found object and `patch`.
+ *
+ * Returns `fallback` if no match was found in `arr`.
+ * Does not modify `arr`.
+ *
+ * @param arr object collection.
+ * @param patch partial object with required ID.
+ */
+export function patchedById<T extends HasId>(
+  arr: T[],
+  patch: Patch<T>,
+  fallback: T | null = null,
+): T | typeof fallback {
+  const existing = findById(arr, patch.id);
+  return existing && !matches(patch)(existing)
+    ? { ...existing, ...patch }
     : fallback;
 }
 
@@ -339,7 +361,6 @@ export function matchesType<T extends HasType>(type: T['type'], obj: HasType): o
 export function typeMatchFilter<T extends HasType>(type: T['type']): ((obj: HasType) => obj is T) {
   return (obj): obj is T => obj.type === type;
 }
-
 
 export function deepCopy<T>(obj: T): T {
   return obj

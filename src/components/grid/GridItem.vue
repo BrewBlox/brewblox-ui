@@ -1,4 +1,6 @@
 <script lang="ts">
+import clamp from 'lodash/clamp';
+import { debounce } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
@@ -8,13 +10,26 @@ const GRID_SIZE = 100;
 const GAP_SIZE = 20;
 const MIN_COLS = 2;
 const MIN_ROWS = 2;
+const MAX_TICK_DELTA = 5;
 
 const zeroPos = (): XYPosition => ({ x: 0, y: 0 });
+
+const moveCodes: Record<string, XYPosition> = {
+  ArrowUp: { x: 0, y: -1 },
+  w: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 },
+  s: { x: 0, y: 1 },
+  ArrowLeft: { x: -1, y: 0 },
+  a: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 },
+  d: { x: 1, y: 0 },
+};
 
 @Component
 export default class GridItem extends Vue {
   resizing = false;
   moving = false;
+  keying = false;
 
   gridWidth = 0;
   start: XYPosition = zeroPos();
@@ -28,8 +43,11 @@ export default class GridItem extends Vue {
   currentCols: number | null = null;
   currentRows: number | null = null;
   current: XYPosition = zeroPos();
+  lastDelta: XYPosition = zeroPos();
 
   resizePos: XYPosition = zeroPos();
+  updatePosition: ((pos: XYPosition | null) => void) = () => { };
+  updateSize: ((cols: number, rows: number) => void) = () => { };
 
   @Ref()
   readonly container!: Vue;
@@ -42,6 +60,20 @@ export default class GridItem extends Vue {
 
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
+
+  created(): void {
+    this.updatePosition = debounce(
+      (pos: XYPosition | null) => {
+        this.$emit('position', this.id, pos);
+      },
+      500);
+
+    this.updateSize = debounce(
+      (cols: number, rows: number) => {
+        this.$emit('size', this.id, cols, rows);
+      },
+      500);
+  }
 
   // Used by GridContainer
   get id(): string {
@@ -88,6 +120,7 @@ export default class GridItem extends Vue {
     this.currentCols = null;
     this.currentRows = null;
 
+    this.lastDelta = zeroPos();
     this.current = zeroPos();
     this.dragStart = zeroPos();
     this.dragStartParent = zeroPos();
@@ -96,17 +129,6 @@ export default class GridItem extends Vue {
   moveInteraction(e: MouseEvent | TouchEvent): void {
     const delta = this.moveDelta(e);
     this.current = this.gridPosition(delta);
-  }
-
-  updateSize(): void {
-    this.$emit('size',
-      this.id,
-      this.currentCols || this.widget.cols,
-      this.currentRows || this.widget.rows);
-  }
-
-  updatePosition(pos: XYPosition | null): void {
-    this.$emit('position', this.id, pos);
   }
 
   changeSize(): void {
@@ -132,10 +154,18 @@ export default class GridItem extends Vue {
 
   moveDelta(e: MouseEvent | TouchEvent): XYPosition {
     const touch = (e instanceof MouseEvent) ? e : e.touches[0];
-    return {
+    const { x, y } = this.lastDelta;
+    const raw = {
       x: touch.pageX - this.start.x,
       y: touch.pageY - this.start.y,
     };
+    // Clamp to avoid instant screen jumps
+    const newDelta = {
+      x: clamp(raw.x, x - MAX_TICK_DELTA, x + MAX_TICK_DELTA),
+      y: clamp(raw.y, y - MAX_TICK_DELTA, y + MAX_TICK_DELTA),
+    };
+    this.lastDelta = { ...newDelta };
+    return newDelta;
   }
 
   containerParentSize(): DOMRect {
@@ -234,7 +264,12 @@ export default class GridItem extends Vue {
   stopResize(): void {
     this.resizePos = zeroPos();
     this.resizing = false;
-    this.updateSize();
+    const cols = this.currentCols || this.widget.cols;
+    const rows = this.currentRows || this.widget.rows;
+    this.updateSize(cols, rows);
+    // locally cache value to avoid jumps
+    this.$set(this.widget, 'cols', cols);
+    this.$set(this.widget, 'rows', rows);
     this.stopInteraction();
   }
 
@@ -273,13 +308,56 @@ export default class GridItem extends Vue {
   }
 
   pin(): void {
-    this.updatePosition(this.findPos());
+    const pos = this.current.x > 0
+      ? this.current
+      : this.findPos();
+    this.updatePosition(pos);
+  }
+
+  keydown(evt: KeyboardEvent): void {
+    if (this.moving) {
+      return;
+    }
+    if (evt.key === 'Enter') {
+      this.applyKeyMove();
+      return;
+    }
+
+    const delta = moveCodes[evt.key];
+    if (delta) {
+      this.keying = true;
+      evt.stopPropagation();
+      evt.preventDefault();
+
+      if (this.current.x === 0) {
+        this.current = this.widget.pinnedPosition ?? this.findPos();
+      }
+
+      this.current.x += delta.x;
+      this.current.y += delta.y;
+    }
+  }
+
+  applyKeyMove(): void {
+    if (this.keying) {
+      this.keying = false;
+      this.updatePosition({ ...this.current });
+      // Set local cache already to avoid jumps
+      this.$set(this.widget, 'pinnedPosition', { ...this.current });
+      this.current = zeroPos();
+    }
   }
 }
 </script>
 
 <template>
-  <div ref="container" :style="style" class="grid-item">
+  <div
+    ref="container"
+    :style="style"
+    class="grid-item"
+    @keydown="keydown"
+    @focusout="applyKeyMove"
+  >
     <!-- Actual item -->
     <slot />
     <!-- Drag effects -->
@@ -309,6 +387,7 @@ export default class GridItem extends Vue {
           :label="widget.pinnedPosition ? 'Pinned' : 'Pin position'"
           :unelevated="!!widget.pinnedPosition"
           :outline="!widget.pinnedPosition"
+          :disable="keying"
           rounded
           color="secondary"
           @click="widget.pinnedPosition ? unpin() : pin()"
