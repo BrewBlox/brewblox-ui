@@ -3,6 +3,7 @@ import { featureStore } from '@/store/features';
 
 import BrewKettle from './BrewKettle';
 import Ferment from './Ferment';
+import Fridge from './Fridge';
 import Glycol from './Glycol';
 import Herms from './Herms';
 import Rims from './Rims';
@@ -17,6 +18,7 @@ export default {
       Herms,
       Rims,
       BrewKettle,
+      Fridge,
     ]
       .forEach(featureStore.registerQuickStart);
   },

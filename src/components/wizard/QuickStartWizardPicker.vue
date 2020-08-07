@@ -93,7 +93,7 @@ export default class QuickStartWizardPicker extends Vue {
         </q-item-section>
       </q-item>
     </q-card-section>
-    <div class="q-mx-md q-px-sm q-gutter-sm column">
+    <div class="q-mx-md q-mb-md q-px-sm q-gutter-sm column">
       <div class="text-subtitle1">
         Please select a brewing process
       </div>

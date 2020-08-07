@@ -14,7 +14,7 @@ ref(BrewKettleSettingsTask);
 
 const feature: QuickStartFeature = {
   id: 'BrewKettle',
-  title: 'Brew Kettle',
+  title: 'Brew kettle',
   component: ref(BrewKettleWizard),
 };
 

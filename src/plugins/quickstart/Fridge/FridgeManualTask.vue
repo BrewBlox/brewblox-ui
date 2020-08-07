@@ -2,11 +2,11 @@
 import { Component } from 'vue-property-decorator';
 
 import WizardTaskBase from '../components/WizardTaskBase';
-import { FermentConfig } from './types';
+import { FridgeConfig } from './types';
 
 
 @Component
-export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
+export default class FridgeManualTask extends WizardTaskBase<FridgeConfig> {
   mounted(): void {
     this.executePrepared();
   }
@@ -22,27 +22,17 @@ export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
   <ActionCardBody>
     <q-card-section>
       <q-item>
-        <big>About your new fermentation dashboard</big>
+        <big>About your new fridge dashboard</big>
       </q-item>
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
             While the wizard is configuring the Spark and your new dashboard,
             here is a quick explanation of what we set up.
-            <span>
-              Visit our
-              <a
-                href="https://brewblox.netlify.com/user/ferment_guide.html"
-                target="_blank"
-                style="color: white"
-              >documentation page</a> for a more in-depth guide.
-            </span>
           </p>
           <p>
             On the controller we created two PIDs to drive the heater and the cooler.
-            <br>The input to both will either be the
-            <i>Fridge Setpoint</i> or the
-            <i>Beer Setpoint</i>.
+            <br>They both use the <i>Fridge Setpoint</i> as input.
           </p>
           <p>
             We did not put every controller block on your new dashboard.
