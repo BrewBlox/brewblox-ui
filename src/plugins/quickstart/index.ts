@@ -1,6 +1,7 @@
 import { autoRegister } from '@/helpers/component-ref';
 import { featureStore } from '@/store/features';
 
+import BrewKettle from './BrewKettle';
 import Ferment from './Ferment';
 import Glycol from './Glycol';
 import Herms from './Herms';
@@ -15,6 +16,7 @@ export default {
       Glycol,
       Herms,
       Rims,
+      BrewKettle,
     ]
       .forEach(featureStore.registerQuickStart);
   },

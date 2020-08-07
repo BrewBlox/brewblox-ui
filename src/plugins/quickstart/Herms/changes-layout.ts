@@ -53,7 +53,6 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            blockServiceId: config.serviceId,
             pwm: { serviceId: config.serviceId, blockId: config.names.bkPwm },
             sizeX: 4,
           },
@@ -66,7 +65,6 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            blockServiceId: config.serviceId,
             pwm: { serviceId: config.serviceId, blockId: config.names.hltPwm },
             sizeX: 4,
           },

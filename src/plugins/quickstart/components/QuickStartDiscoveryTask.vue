@@ -84,7 +84,7 @@ export default class QuickStartDiscoveryTask extends WizardTaskBase<QuickStartOu
       <q-item class="text-weight-light">
         <q-item-section>
           <q-item-label class="text-subtitle1">
-            Pick a name for discovered blocks
+            Configure discovered blocks
           </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto self-start">
