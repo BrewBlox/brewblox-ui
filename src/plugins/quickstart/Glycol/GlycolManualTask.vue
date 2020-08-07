@@ -29,14 +29,6 @@ export default class GlycolManualTask extends WizardTaskBase<GlycolConfig> {
           <p>
             While the wizard is configuring the Spark and your new dashboard,
             here is a quick explanation of what we set up.
-            <span>
-              Visit our
-              <a
-                href="https://brewblox.netlify.com/user/glycol_guide.html"
-                target="_blank"
-                style="color: white"
-              >documentation page</a> for a more in-depth guide.
-            </span>
           </p>
           <p>
             We did not put every controller block on your new dashboard.

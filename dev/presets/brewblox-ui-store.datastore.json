@@ -2482,7 +2482,6 @@
         "id": "14315508-5aca-4a17-bd9e-4af1a3c622d5",
         "rotate": 0,
         "settings": {
-          "blockServiceId": "sparkey",
           "pwm": {
             "serviceId": "sparkey",
             "blockId": "HERMS BK PWM"
@@ -2498,7 +2497,6 @@
         "id": "c34f0524-c0e0-4026-82df-2369086edd50",
         "rotate": 0,
         "settings": {
-          "blockServiceId": "sparkey",
           "pwm": {
             "serviceId": "sparkey",
             "blockId": "HERMS HLT PWM"

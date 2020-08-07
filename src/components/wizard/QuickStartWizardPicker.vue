@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { objectStringSorter } from '@/helpers/functional';
 import { featureStore, QuickStartFeature } from '@/store/features';
 
 @Component
@@ -16,8 +15,7 @@ export default class QuickStartWizardPicker extends Vue {
 
   get wizardOptions(): QuickStartFeature[] {
     return featureStore.quickStarts
-      .filter(qs => !!qs.component)
-      .sort(objectStringSorter('title'));
+      .filter(qs => !!qs.component);
   }
 
   setTitle(title: string): void {
