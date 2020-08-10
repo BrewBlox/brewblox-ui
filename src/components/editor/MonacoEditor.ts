@@ -1,10 +1,12 @@
 import * as monaco from 'monaco-editor';
+import { debounce } from 'quasar';
 import Vue, { CreateElement, VNode } from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component
 export default class CodeEditor extends Vue {
   private editor: monaco.editor.IStandaloneCodeEditor | null = null;
+  public layout: (() => void) = () => { };
 
   @Prop({ type: String, default: 'Editor' })
   public readonly title!: string;
@@ -47,12 +49,18 @@ export default class CodeEditor extends Vue {
     });
   }
 
+  public created(): void {
+    this.layout = debounce(() => this.editor?.layout(), 100);
+    window.addEventListener('resize', this.layout);
+  }
+
   public mounted(): void {
     // Provides a smoother experience in dialogs
     setTimeout(() => this.initEditor(), 100);
   }
 
   public beforeDestroy(): void {
+    window.removeEventListener('resize', this.layout);
     this.editor?.dispose();
   }
 
