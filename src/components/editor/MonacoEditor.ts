@@ -62,7 +62,15 @@ export default class CodeEditor extends Vue {
   }
 
   public insert(text: string): void {
-    this.editor?.trigger('keyboard', 'type', { text });
+    const range = this.editor?.getSelection();
+    if (!this.editor || !range) {
+      return;
+    }
+    this.editor.executeEdits('MonacoEditor', [{
+      range,
+      text,
+      forceMoveMarkers: true,
+    }]);
     this.$nextTick(() => this.editor?.focus());
   }
 

@@ -1,4 +1,4 @@
-import { isLink, isQuantity } from '@/helpers/bloxfield';
+import { bloxQty, isLink, isQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockField, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
@@ -53,18 +53,37 @@ const valueHint = (addr: BlockFieldAddress): string => {
 
 export const generators: SnippetGenerator[] = [
   {
-    desc: 'Example',
+    desc: 'Comparison example',
     run(callback) {
       const serviceId = sparkStore.serviceIds[0] ?? 'spark-one';
-      callback('append', [
-        `return getBlockField('${serviceId}', 'SystemTime', 'millisSinceBoot') > 9000;`,
-        '//',
-        '// //                 <- lines that start with // are comments.',
-        '// return             <- End script and return the value that will be checked.',
-        '// getBlockField(...) <- Built-in function that gets a field in a Spark block.',
+      callback('insert', [
+        '// return             <- End script and set "result" value (only checked in conditions).',
+        '// getBlockField(...) <- Helper function that finds a field in a Spark block.',
         '//                       You can use the "Get block field" snippet to generate this.',
-        '// > 9000             <- Check that the getField() value is greater than a specific value.',
+        '// > 9000             <- Check that the getBlockField() value is greater than a specific value.',
         '//                       `return a > b` always returns true or false.',
+        '//                       If the field has a unit, you need to use the qty() helper function.',
+        '//',
+        `return getBlockField('${serviceId}', 'SystemTime', 'millisSinceBoot') > 9000;`,
+        '',
+      ]);
+    },
+  },
+
+  {
+    desc: 'Quantity example',
+    run(callback) {
+      const unit = sparkStore.modules[0]?.units.Temp ?? 'degC';
+      const value = bloxQty(20, 'degC').to(unit).round().value;
+      const other = unit === 'degC' ? 'degF' : 'degC';
+      callback('insert', [
+        `const temp = qty(${value}, '${unit}');`,
+        "const duration = qty('5h 2m 38s');",
+        `temp.gt(${value}, '${other}');`,
+        `temp.lt(${value}, '${other}');`,
+        `temp.to('${other}');`,
+        "duration.eq(200, 'min');",
+        '',
       ]);
     },
   },
@@ -136,29 +155,64 @@ export const generators: SnippetGenerator[] = [
   },
 
   {
-    desc: 'Make HTTP request',
+    desc: 'Send HTTP request',
     run(callback) {
       const serviceId = sparkStore.serviceIds[0] ?? 'spark-one';
-      callback('append', [
-        '// HTTP requests are async, and must be awaited',
+      callback('insert', [
         `const resp = await axios.get('http://${serviceId}:5000/${serviceId}/_service/status');`,
         "print('response status', resp.status);",
         "print('response body', resp.data);",
         "return resp.status === 200 && resp.data.status === 'ok';",
+        '',
       ]);
+    },
+  },
+
+  {
+    desc: 'Send Slack notification',
+    run(callback) {
+      const rules = [
+        (v: string) => v?.startsWith('https://hooks.slack.com/services/')
+          || 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX',
+      ];
+      createDialog({
+        component: 'InputDialog',
+        title: 'Webhook URL',
+        message: `
+        To send a Slack notification, a webhook URL is required. <br>
+        For more information, see
+        <a
+          href="https://api.slack.com/messaging/webhooks"
+          target="_blank"
+          style="color: white"
+        >the Slack documentation page.</a>
+        `,
+        html: true,
+        rules,
+        fontSize: '100%',
+      })
+        .onOk((url: string) => {
+          callback('insert', [
+            `await axios.post('${url}', {`,
+            "  text: 'Hello world!',",
+            '});',
+            '',
+          ]);
+        });
     },
   },
 
   {
     desc: 'Publish history data (MQTT)',
     run(callback) {
-      callback('append', [
+      callback('insert', [
         "await publishEvent('brewcast/history/my-process', {",
         "  key: 'my-process',",
         '  data: { ',
         "    'value[degC]': 12.6,",
         '  },',
         '});',
+        '',
       ]);
     },
   },

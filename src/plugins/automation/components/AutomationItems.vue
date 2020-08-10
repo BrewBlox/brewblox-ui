@@ -89,8 +89,10 @@ export default class AutomationItems extends Vue {
       <div
         v-for="item in locals"
         :key="item.id"
-        class="rounded-borders depth-2"
-        :style="{opacity: item.enabled ? 1 : 0.3}"
+        :class="[
+          'rounded-borders depth-2 full-width',
+          !item.enabled && 'fade-7'
+        ]"
       >
         <div class="toolbar__Dashboard">
           <Toolbar
