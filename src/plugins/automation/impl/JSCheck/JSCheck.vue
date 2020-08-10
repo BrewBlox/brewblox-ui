@@ -36,11 +36,12 @@ export default class JSCheck extends AutomationItemBase<JSCheckImpl> {
       label="Code"
       :readonly="false"
       class="col"
+      tag-style="overflow: hidden"
       @click="editBody"
     >
       <!-- No line breaks to allow correctly rendering whitespace -->
       <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-      <div style="white-space: pre-wrap">{{ displayText || 'Click to edit' }}</div>
+      <div style="white-space: pre">{{ displayText || 'Click to edit' }}</div>
     </LabeledField>
   </div>
 </template>
