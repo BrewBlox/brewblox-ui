@@ -327,7 +327,7 @@ export interface OneWireBusCommand {
 export interface OneWireBusBlock extends Block {
   type: 'OneWireBus';
   data: {
-    command: OneWireBusCommand;
+    command: Writeonly<OneWireBusCommand>;
     address: Readonly<string[]>;
   };
 }
