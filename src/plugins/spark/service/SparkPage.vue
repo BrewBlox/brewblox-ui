@@ -341,10 +341,8 @@ export default class SparkPage extends Vue {
     }
   }
 
-  onPageDblClick(evt: Event): void {
-    if (evt.target === evt.currentTarget) {
-      this.startDialog('BlockWizardDialog');
-    }
+  onPageDblClick(): void {
+    this.startDialog('BlockWizardDialog');
   }
 }
 </script>
@@ -447,7 +445,7 @@ export default class SparkPage extends Vue {
     </q-list>
 
     <template v-else-if="pageMode === 'Relations'">
-      <div class="page-height full-width">
+      <div class="page-height full-width" @dblclick="onPageDblClick">
         <RelationsDiagram
           :service-id="service.id"
           :nodes="nodes"
@@ -458,9 +456,15 @@ export default class SparkPage extends Vue {
 
     <template v-else>
       <!-- Normal display -->
-      <div class="row no-wrap justify-start page-height" @dblclick="onPageDblClick">
-        <q-scroll-area visible class="content-column rounded-borders bg-dark">
-          <q-list class="q-pr-md">
+      <div
+        class="row no-wrap justify-start page-height"
+        @dblclick="onPageDblClick"
+      >
+        <q-scroll-area
+          visible
+          class="content-column rounded-borders bg-dark"
+        >
+          <q-list class="q-pr-md" @dblclick.stop.prevent>
             <!-- Selection controls -->
             <q-item class="q-mb-md">
               <q-item-section>
@@ -552,8 +556,12 @@ export default class SparkPage extends Vue {
         </q-scroll-area>
 
         <!-- Widget List -->
-        <q-scroll-area v-if="!$dense" visible class="content-column">
-          <q-list class="q-ml-lg q-pr-none">
+        <q-scroll-area
+          v-if="!$dense"
+          visible
+          class="content-column"
+        >
+          <q-list class="q-ml-lg q-pr-none" @dblclick.stop.prevent>
             <!-- Service -->
             <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
               <q-item-section>
