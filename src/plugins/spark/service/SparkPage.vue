@@ -329,7 +329,6 @@ export default class SparkPage extends Vue {
     if (this.$dense) {
       createDialog({
         component: 'WidgetDialog',
-        parent: this,
         mode: 'Basic',
         getCrud: () => val.crud,
       });

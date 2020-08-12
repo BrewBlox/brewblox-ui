@@ -54,7 +54,6 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
       createDialog({
         component: SessionTextNoteDialog,
         title: note.title,
-        parent: this,
         value: note.value,
         type: 'text',
         label: 'Content',
@@ -65,7 +64,6 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     if (note.type === 'Graph') {
       createDialog({
         component: 'GraphDialog',
-        parent: this,
         graphId: note.id,
         saveAnnotations: v => this.saveAnnotations(note, v),
         config: {
@@ -95,7 +93,6 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
       component: SessionGraphNoteDialog,
       title: note.title,
       message: 'You can choose graph lines in the widget settings.',
-      parent: this,
       value: note,
       label: 'Dates',
     })

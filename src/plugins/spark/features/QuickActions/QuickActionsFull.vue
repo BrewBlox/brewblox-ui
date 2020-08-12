@@ -92,7 +92,6 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       anyService: true,
       clearable: false,
       blockFilter: block => !!sparkStore.spec(block)?.fields.some(f => !f.readonly),
-      parent: this,
     })
       .onOk((addr: BlockAddress) => {
         if (addr && addr.id && addr.serviceId) {
@@ -128,7 +127,6 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
     const currentBlock = sparkStore.blockById(serviceId, blockId);
     createDialog({
       component: 'BlockAddressDialog',
-      parent: this,
       title: `Switch target block '${blockId}'`,
       value: currentBlock,
       anyService: true,

@@ -23,7 +23,6 @@ export default class MetricsEditor extends Vue {
     createDialog({
       component: 'MetricsDisplayDialog',
       title: node.value,
-      parent: this,
       config: this.config,
       field: node.value,
     })

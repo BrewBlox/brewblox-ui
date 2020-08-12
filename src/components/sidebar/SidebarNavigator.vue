@@ -28,7 +28,6 @@ export default class SidebarNavigator extends Vue {
 
   showWizard(): void {
     createDialog({
-      parent: this,
       component: 'WizardDialog',
     });
   }

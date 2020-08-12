@@ -56,7 +56,6 @@ export default class Webhook extends AutomationItemBase<WebhookImpl> {
   editBody(): void {
     createDialog({
       component: 'TextAreaDialog',
-      parent: this,
       label: 'Body',
       title: 'Edit request body',
       autogrow: false,

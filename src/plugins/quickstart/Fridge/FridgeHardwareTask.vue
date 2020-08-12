@@ -46,7 +46,6 @@ export default class FridgeHardwareTask extends WizardTaskBase<FridgeConfig> {
     createDialog({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
-      parent: this,
     });
   }
 

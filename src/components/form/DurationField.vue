@@ -45,7 +45,6 @@ export default class DurationField extends FieldBase {
       title: this.title,
       message: this.message,
       html: this.html,
-      parent: this,
       value: bloxQty(this.value),
       label: this.label,
       rules: this.rules,

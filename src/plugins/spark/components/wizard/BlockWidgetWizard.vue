@@ -112,7 +112,6 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
     };
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
-      parent: this,
       getCrud: () => crud,
       mode: 'Full',
     });

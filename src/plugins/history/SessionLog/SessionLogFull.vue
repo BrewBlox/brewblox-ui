@@ -131,7 +131,6 @@ export default class SessionLogFull extends CrudComponent<SessionLogConfig> {
   editGraph(note: SessionGraphNote): void {
     createDialog({
       component: 'GraphEditorDialog',
-      parent: this,
       title: note.title,
       config: note.config,
       noPeriod: true,

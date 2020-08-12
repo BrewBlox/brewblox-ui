@@ -56,7 +56,6 @@ export default class SliderField extends FieldBase {
       label: this.label,
       message: this.message,
       html: this.html,
-      parent: this,
       value: this.value,
       decimals: this.decimals,
       min: this.min,

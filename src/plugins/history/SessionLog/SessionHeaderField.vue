@@ -28,7 +28,6 @@ export default class SessionHeaderField extends Vue {
   showDialog(): void {
     createDialog({
       component: SessionHeaderDialog,
-      parent: this,
       session: this.session,
       title: 'Edit session',
     })

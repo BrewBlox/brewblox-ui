@@ -62,7 +62,6 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
     createDialog({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
-      parent: this,
     });
   }
 

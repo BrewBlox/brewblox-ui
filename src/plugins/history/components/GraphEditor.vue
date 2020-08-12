@@ -27,7 +27,6 @@ export default class GraphEditor extends Vue {
     createDialog({
       component: 'GraphDisplayDialog',
       title: node.value,
-      parent: this,
       config: this.config,
       field: node.value,
     })

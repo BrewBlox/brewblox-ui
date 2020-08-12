@@ -44,7 +44,6 @@ export default class DatetimeField extends FieldBase {
 
     createDialog({
       component: 'DatetimeDialog',
-      parent: this,
       title: this.title,
       message: this.message,
       html: this.html,
