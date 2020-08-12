@@ -31,7 +31,7 @@ import { ComponentResult, Crud, featureStore, WidgetFeature } from '@/store/feat
 
 import { compatibleTypes } from './getters';
 import {
-  AnalogConstraint,
+  AnyConstraint,
   AnyConstraintsObj,
   Block,
   BlockAddress,
@@ -42,7 +42,6 @@ import {
   BlockOrIntfType,
   BlockType,
   DigitalActuatorBlock,
-  DigitalConstraint,
   DisplayOpts,
   DisplaySettingsBlock,
   DisplaySlot,
@@ -315,7 +314,7 @@ export const prettifyConstraints =
       ? '<no constraints>'
       : obj
         .constraints
-        .map((c: AnalogConstraint | DigitalConstraint) => {
+        .map((c: AnyConstraint) => {
           // Analog
           if ('min' in c) {
             return `Minimum = ${c.min}`;

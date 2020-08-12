@@ -30,7 +30,10 @@ export default class GraphDialog extends DialogBase {
     return h('q-dialog',
       {
         ref: 'dialog',
-        props: { maximized: true },
+        props: {
+          maximized: true,
+          transitionShow: 'fade',
+        },
         on: { hide: this.onDialogHide },
       },
       [

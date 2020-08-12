@@ -40,7 +40,6 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   public showDialog(opts: DialogOpts = {}): void {
     const { widgetProps, mode, listeners } = opts;
     this.activeDialog = createDialog({
-      parent: this,
       component: 'WidgetDialog',
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
       getProps: () => widgetProps,

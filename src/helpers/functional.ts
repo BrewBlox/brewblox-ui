@@ -312,6 +312,8 @@ export function patchedById<T extends HasId>(
  * Checks if a generic object with a 'type' field matches a TS interface.
  * Best used when T.type is a constant value.
  *
+ * @remarks
+ *
  * The function acts as a type guard:
  * https://www.typescriptlang.org/docs/handbook/advanced-types.html#instanceof-type-guards
  *
@@ -319,15 +321,18 @@ export function patchedById<T extends HasId>(
  * and we want to perform a runtime type check,
  * while validating the 'type' argument at compile time.
  *
- *    interface PancakeIntf {
- *      type: 'Pancake';
- *      value: string;
- *    }
- *    matchesType<PancakeIntf>('Pancake', {type: 'Pancake', value: 'no'}) >>>> true
- *    matchesType<PancakeIntf>('Pancake', {type: 'Waffle', value: 'yes'}) >>>> false
- *    matchesType<PancakeIntf>('Waffle', {type: 'Waffle', value: 'yes'})
- *    //                        ^^^^^^
- *    // Argument of type '"Waffle"' is not assignable to parameter of type '"Pancake"'
+ * ```ts
+ * interface PancakeIntf {
+ *   type: 'Pancake';
+ *   value: string;
+ * }
+ * matchesType<PancakeIntf>('Pancake', {type: 'Pancake', value: 'no'}) >>>> true
+ * matchesType<PancakeIntf>('Pancake', {type: 'Waffle', value: 'yes'}) >>>> false
+ * matchesType<PancakeIntf>('Waffle', {type: 'Waffle', value: 'yes'})
+ * //                        ^^^^^^
+ * // Argument of type '"Waffle"' is not assignable to parameter of type '"Pancake"'
+ * ```
+ *
  * @param type
  * @param obj
  */
@@ -340,21 +345,22 @@ export function matchesType<T extends HasType>(type: T['type'], obj: HasType): o
  *
  * Returns a function that can directly be used as type guard in Array.find() or Array.filter().
  *
- *    interface Circular = PancakeInterface | FrisbeeInterface;
+ * ```ts
+ * interface Circular = PancakeInterface | FrisbeeInterface;
  *
- *    function eat(pancake: PancakeInterface): void {
- *      // yum
- *    }
+ * function eat(pancake: PancakeInterface): void {
+ *   // yum
+ * }
  *
- *    const items: Circular[] = [
- *      { type: 'Pancake' },
- *      { type: 'Frisbee' }
- *    ];
+ * const items: Circular[] = [
+ *   { type: 'Pancake' },
+ *   { type: 'Frisbee' }
+ * ];
  *
- *    items
- *      .filter(typeMatchFilter<PancakeInterface>('Pancake'))
- *      .forEach(v => eat(v)); // Does not raise a type error
- *
+ * items
+ *   .filter(typeMatchFilter<PancakeInterface>('Pancake'))
+ *   .forEach(v => eat(v)); // Does not raise a type error
+ * ```
  *
  * @param type
  */
