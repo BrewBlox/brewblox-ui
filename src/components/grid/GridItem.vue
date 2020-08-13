@@ -16,13 +16,9 @@ const zeroPos = (): XYPosition => ({ x: 0, y: 0 });
 
 const moveCodes: Record<string, XYPosition> = {
   ArrowUp: { x: 0, y: -1 },
-  w: { x: 0, y: -1 },
   ArrowDown: { x: 0, y: 1 },
-  s: { x: 0, y: 1 },
   ArrowLeft: { x: -1, y: 0 },
-  a: { x: -1, y: 0 },
   ArrowRight: { x: 1, y: 0 },
-  d: { x: 1, y: 0 },
 };
 
 @Component
