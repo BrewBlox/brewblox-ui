@@ -122,7 +122,10 @@ export default class DigitalConstraints extends Vue {
     <div
       v-for="({type, constraint}, idx) in constraints"
       :key="idx"
-      :class="['row q-gutter-x-sm q-gutter-y-xs constraint', {limiting: constraint.remaining.value}]"
+      :class="[
+        'row q-gutter-x-sm q-gutter-y-xs constraint',
+        { limiting: constraint.remaining.value }
+      ]"
     >
       <template v-if="type === 'mutexed'">
         <LinkField

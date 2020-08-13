@@ -48,7 +48,7 @@ export default class MutexBasic
         class="col-grow"
       >
         <div
-          v-for="{id, remaining, limited, hasLock} in mutexClients"
+          v-for="{id, limited, hasLock} in mutexClients"
           :key="id"
           :class="[
             'q-px-sm q-py-xs',

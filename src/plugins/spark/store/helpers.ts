@@ -1,4 +1,4 @@
-import { isLink } from '@/helpers/bloxfield';
+import { isLink, prettyQty } from '@/helpers/bloxfield';
 import { capitalized } from '@/helpers/functional';
 import { ServiceStatus } from '@/store/services';
 
@@ -100,7 +100,7 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
         .map(c => {
           const key = Object.keys(c).find(key => key !== 'remaining') ?? '??';
           const label = constraintLabels[key] ?? key;
-          return `${label} (${c.remaining})`;
+          return `${label} (${prettyQty(c.remaining)})`;
         });
     }
     else {
