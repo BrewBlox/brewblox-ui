@@ -46,6 +46,10 @@ export default class ActuatorValve extends PartBase {
     return this.block?.data.state !== DigitalState.STATE_ACTIVE;
   }
 
+  get pending(): boolean {
+    return this.block?.data.desiredState !== this.block?.data.state;
+  }
+
   get valveRotation(): number {
     if (this.block) {
       switch (this.block.data.state) {
@@ -75,6 +79,9 @@ export default class ActuatorValve extends PartBase {
   <g>
     <SvgEmbedded v-if="!block" height="15" width="15">
       <UnlinkedIcon size="15px" class="self-end" />
+    </SvgEmbedded>
+    <SvgEmbedded v-else-if="pending" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
+      <q-spinner size="44px" class="col" color="blue-grey-5" />
     </SvgEmbedded>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]" />
