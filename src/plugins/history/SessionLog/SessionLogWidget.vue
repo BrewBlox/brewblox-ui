@@ -51,7 +51,6 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
   startAddSession(): void {
     createDialog({
       component: SessionCreateDialog,
-      parent: this,
       title: 'New session',
       preselected: this.config.currentSession,
       widgetTags: [
@@ -67,7 +66,6 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
   startLoadSession(): void {
     createDialog({
       component: SessionLoadDialog,
-      parent: this,
       title: 'Open existing session',
     })
       .onOk((session: LoggedSession) => {
@@ -147,7 +145,6 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
   showHelp(): void {
     createDialog({
       component: SessionLogHelp,
-      parent: this,
     });
   }
 }

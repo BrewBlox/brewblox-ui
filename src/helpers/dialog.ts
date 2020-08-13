@@ -4,7 +4,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 
-export function createDialog(opts: QDialogOptions & { [prop: string]: any }): DialogChainObject {
+export function createDialog(opts: QDialogOptions): DialogChainObject {
   return Dialog.create(opts);
 }
 

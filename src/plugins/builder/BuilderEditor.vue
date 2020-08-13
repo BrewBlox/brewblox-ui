@@ -545,7 +545,6 @@ export default class BuilderEditor extends Vue {
   useAdd(): void {
     if (!this.floater) {
       createDialog({
-        parent: this,
         component: BuilderCatalog,
       })
         .onOk((part: PersistentPart) => {

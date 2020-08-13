@@ -82,7 +82,6 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     const current = this.config.params.duration ?? '1h';
     createDialog({
       component: 'DurationQuantityDialog',
-      parent: this,
       title: 'Custom graph duration',
       value: bloxQty(current),
       label: 'Duration',

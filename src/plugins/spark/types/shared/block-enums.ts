@@ -77,6 +77,7 @@ export const AnalogConstraintKey = Enum(
   'balanced',
 );
 
+// #region ChannelConfig
 export const ChannelConfig = Enum(
   'CHANNEL_UNUSED',
   'CHANNEL_ACTIVE_LOW',
@@ -84,13 +85,17 @@ export const ChannelConfig = Enum(
   'CHANNEL_INPUT',
   'CHANNEL_UNKNOWN',
 );
+// #endregion ChannelConfig
 
+// #region DigitalState
 export const DigitalState = Enum(
   'STATE_INACTIVE',
   'STATE_ACTIVE',
   'STATE_UNKNOWN',
 );
+// #endregion DigitalState
 
+// #region Logic
 export const DigitalCompareOp = Enum(
   'OP_VALUE_IS',
   'OP_VALUE_IS_NOT',
@@ -122,17 +127,23 @@ export const LogicResult = Enum(
   'RESULT_UNEXPECTED_OPERATOR',
   'RESULT_MISSING_CLOSE_BRACKET',
 );
+// #endregion Logic
 
+// #region ReferenceKind
 export const ReferenceKind = Enum(
   'REF_SETTING',
   'REF_VALUE',
 );
+// #endregion ReferenceKind
 
+// #region DisplayTempUnit
 export const DisplayTempUnit = Enum(
   'TEMP_CELSIUS',
   'TEMP_FAHRENHEIT',
 );
+// #endregion DisplayTempUnit
 
+// #region ValveState
 export const ValveState = Enum(
   'VALVE_UNKNOWN',
   'VALVE_OPEN',
@@ -142,7 +153,9 @@ export const ValveState = Enum(
   'VALVE_HALF_OPEN_IDLE',
   'VALVE_INIT_IDLE',
 );
+// #endregion ValveState
 
+// #region FilterChoice
 export const FilterChoice = Enum(
   'FILTER_NONE',
   'FILTER_15s',
@@ -152,26 +165,34 @@ export const FilterChoice = Enum(
   'FILTER_10m',
   'FILTER_30m',
 );
+// #endregion FilterChoice
 
+// #region Spark2Hardware
 export const Spark2Hardware = Enum(
   'HW_UNKNOWN',
   'HW_SPARK1',
   'HW_SPARK2',
 );
+// #endregion Spark2Hardware
 
+// #region SparkPlatform
 export const SparkPlatform = Enum(
   'PLATFORM_UNKNOWN',
   'PLATFORM_GCC',
   'PLATFORM_PHOTON',
   'PLATFORM_P1',
 );
+// #endregion SparkPlatform
 
+// #region TouchCalibrated
 export const TouchCalibrated = Enum(
   'CALIBRATED_NO',
   'CALIBRATED_YES',
   'CALIBRATED_NEW',
 );
+// #endregion TouchCalibrated
 
+// #region Wifi
 export const WifiSecurityType = Enum(
   'WLAN_SEC_UNSEC',
   'WLAN_SEC_WEP',
@@ -188,7 +209,7 @@ export const WifiCipherType = Enum(
   'WLAN_CIPHER_TKIP',
   'WLAN_CIPHER_AES_OR_TKIP',
 );
-
+// #endregion Wifi
 
 export type BlockIntfType = Enum<typeof BlockIntfType>;
 export type SystemBlockType = Enum<typeof SystemBlockType>;

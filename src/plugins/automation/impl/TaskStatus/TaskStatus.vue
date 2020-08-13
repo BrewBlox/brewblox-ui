@@ -40,7 +40,6 @@ export default class TaskStatus extends AutomationItemBase<TaskStatusImpl> {
   editRef(): void {
     createDialog({
       component: 'InputDialog',
-      parent: this,
       label: 'Reference ID',
       title: 'Choose Task reference ID',
       message: 'All tasks with this ID will be checked.',

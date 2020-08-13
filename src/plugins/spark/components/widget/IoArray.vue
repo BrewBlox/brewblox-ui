@@ -98,7 +98,6 @@ export default class IoArray extends BlockCrudComponent {
   createActuator(channel: EditableChannel): void {
     createDialog({
       component: 'BlockWizardDialog',
-      parent: this,
       serviceId: this.serviceId,
       initialFeature: BlockType.DigitalActuator,
     })

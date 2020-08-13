@@ -103,7 +103,6 @@ export default class BlockGraph extends Vue {
     createDialog({
       component: 'InputDialog',
       title: 'Duration',
-      parent: this,
       value: this.graphCfg.params.duration,
     })
       .onOk(val => {
@@ -116,7 +115,6 @@ export default class BlockGraph extends Vue {
     const current = this.graphCfg.params.duration ?? '1h';
     createDialog({
       component: 'DurationQuantityDialog',
-      parent: this,
       title: 'Custom graph duration',
       value: bloxQty(current),
       label: 'Duration',
@@ -127,7 +125,7 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <q-dialog v-model="dialogOpen" maximized>
+  <q-dialog v-model="dialogOpen" transition-show="fade" maximized>
     <q-card v-if="dialogOpen" class="text-white">
       <HistoryGraph
         ref="graph"

@@ -66,7 +66,6 @@ export default class PidBasic
         component: 'QuantityDialog',
         title: 'Edit setting',
         message: `Edit ${id} setting`,
-        parent: this,
         value: this.inputBlock.data.storedSetting,
         label: 'Setting',
       })

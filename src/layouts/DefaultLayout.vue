@@ -32,7 +32,6 @@ export default class DefaultLayout extends Vue {
 
   showWizard(): void {
     createDialog({
-      parent: this,
       component: 'WizardDialog',
     });
   }

@@ -124,7 +124,6 @@ export default class LayoutActions extends Vue {
     if (!this.layout) { return; }
 
     createDialog({
-      parent: this,
       title: 'Copy widget',
       message: `On which dashboard do you want to create a widget for ${this.layout.title}?`,
       style: 'overflow-y: scroll',

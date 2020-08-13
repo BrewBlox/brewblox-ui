@@ -52,7 +52,7 @@ export const calculateRelations = (blocks: Block[]): RelationEdge[] => {
         }
         return [{
           source: source,
-          target: val.toString(),
+          target: val.id,
           relation: relation,
         }];
       }

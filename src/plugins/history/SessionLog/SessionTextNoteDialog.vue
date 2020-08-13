@@ -30,7 +30,6 @@ export default class SessionTextNoteDialog extends DialogBase {
     createDialog({
       component: 'DatetimeDialog',
       title: 'Pick a date',
-      parent: this,
       value: new Date(),
     })
       .onOk(date => {

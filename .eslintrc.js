@@ -1,10 +1,9 @@
 module.exports = {
   'root': true,
-  // 'parser': 'vue-eslint-parser',
   'parserOptions': {
     'ecmaVersion': 2018,
     'sourceType': 'module',
-    'parser': '@typescript-eslint/parser'
+    'parser': '@typescript-eslint/parser',
   },
   'extends': [
     'plugin:vue/recommended',
@@ -12,7 +11,10 @@ module.exports = {
     '@vue/typescript',
     'plugin:quasar/standard',
   ],
-  'plugins': ['simple-import-sort', 'quasar'],
+  'plugins': [
+    'simple-import-sort',
+    'quasar',
+  ],
   'rules': {
     'quotes': ['error', 'single', { 'avoidEscape': true }],
     'class-methods-use-this': 0,
@@ -30,7 +32,7 @@ module.exports = {
     'no-multiple-empty-lines': 'error',
     'comma-dangle': [
       'error',
-      'always-multiline'
+      'always-multiline',
     ],
     'semi': 'error',
     'max-len': [
@@ -39,8 +41,8 @@ module.exports = {
       2,
       {
         'ignoreUrls': true,
-        'ignoreComments': false
-      }
+        'ignoreComments': false,
+      },
     ],
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/no-explicit-any': 0,
@@ -57,9 +59,9 @@ module.exports = {
       'singleline': 8,
       'multiline': {
         'max': 1,
-        'allowFirstLine': false
+        'allowFirstLine': false,
       },
-    }]
+    }],
   },
   'overrides': [
     {
@@ -72,7 +74,7 @@ module.exports = {
       'files': ['dev/**.js'],
       'rules': {
         'no-console': 'off',
-      }
-    }
-  ]
+      },
+    },
+  ],
 }

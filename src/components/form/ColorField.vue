@@ -54,7 +54,6 @@ export default class ColorField extends FieldBase {
       title: this.title,
       message: this.message,
       html: this.html,
-      parent: this,
       value: this.color,
       clearable: this.clearable,
     })

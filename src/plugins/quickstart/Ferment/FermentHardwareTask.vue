@@ -54,7 +54,6 @@ export default class FermentHardwareTask extends WizardTaskBase<FermentConfig> {
     createDialog({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
-      parent: this,
     });
   }
 

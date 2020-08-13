@@ -63,7 +63,6 @@ export default class QuickStartDiscoveryTask extends WizardTaskBase<QuickStartOu
 
   rename(block: Block): void {
     createDialog({
-      parent: this,
       component: 'InputDialog',
       title: 'Change block name',
       message: `Choose a new name for '${block.id}'`,

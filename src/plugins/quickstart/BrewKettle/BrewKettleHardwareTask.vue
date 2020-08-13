@@ -37,7 +37,6 @@ export default class BrewKettleHardwareTask extends WizardTaskBase<BrewKettleCon
     createDialog({
       component: 'BlockWizardDialog',
       serviceId: this.config.serviceId,
-      parent: this,
     });
   }
 

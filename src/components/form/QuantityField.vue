@@ -40,7 +40,6 @@ export default class QuantityField extends FieldBase {
       title: this.title,
       message: this.message,
       html: this.html,
-      parent: this,
       value: this.value,
       label: this.label,
     })

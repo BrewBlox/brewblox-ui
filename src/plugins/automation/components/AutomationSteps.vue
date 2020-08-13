@@ -98,7 +98,6 @@ export default class AutomationSteps extends Vue {
 
   startChangeTitle(step: AutomationStep): void {
     createDialog({
-      parent: this,
       component: 'InputDialog',
       title: 'Change step name',
       message: `Choose a new name for '${step.title}'`,

@@ -124,7 +124,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   public startMakeWidget(): void {
     const id = uid();
     createDialog({
-      parent: this,
       title: 'Make widget',
       message: `On which dashboard do you want to create a widget for '${this.widget.title}'?`,
       style: 'overflow-y: scroll',
@@ -148,7 +147,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   public startChangeBlockId(): void {
     const blockId = this.blockId;
     createDialog({
-      parent: this,
       component: 'InputDialog',
       title: 'Change block name',
       message: `Choose a new name for '${this.blockId}'`,
@@ -172,7 +170,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
 
   public startRemoveBlock(): void {
     createDialog({
-      parent: this,
       title: 'Remove block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,

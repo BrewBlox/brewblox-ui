@@ -27,8 +27,9 @@ export default class BlockEnableToggle extends BlockCrudComponent {
   <div
     v-if="!(enabled && hideEnabled)"
     class="
-    row no-wrap q-gutter-x-md q-mx-md items-center
-    clickable rounded-borders q-py-sm"
+    row no-wrap items-center
+    q-gutter-x-md q-mx-md q-mt-sm q-py-sm
+    clickable rounded-borders"
     style="max-width: 100%"
     @click="toggleEnabled"
   >

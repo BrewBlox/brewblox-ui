@@ -60,7 +60,6 @@ export default class AutomationItems extends Vue {
 
   startChangeTitle(item: AutomationItem): void {
     createDialog({
-      parent: this,
       component: 'InputDialog',
       title: `Change ${this.label} name`,
       message: `Choose a new name for '${item.title}'`,
