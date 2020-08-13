@@ -42,6 +42,13 @@ interface ActionTool extends EditorAction {
   use: (parts: PersistentPart[]) => void;
 }
 
+const moveKeys: Record<string, XYPosition> = {
+  ArrowUp: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 },
+  ArrowLeft: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 },
+};
+
 @Component({
   components: {
     BuilderCatalog,
@@ -52,6 +59,7 @@ export default class BuilderEditor extends Vue {
   squares = squares;
 
   layoutId: string | null = null;
+  debouncedSaveParts: Function = () => { };
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
@@ -98,6 +106,7 @@ export default class BuilderEditor extends Vue {
   }
 
   created(): void {
+    this.debouncedSaveParts = debounce(this.saveParts, 500);
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
@@ -649,6 +658,18 @@ export default class BuilderEditor extends Vue {
     }
   }
 
+  deltaMove(parts: FlowPart[], delta: XYPosition): void {
+    parts.forEach(part => {
+      part.x += delta.x;
+      part.y += delta.y;
+    });
+    const ids = parts.map(v => v.id);
+    this.debouncedSaveParts([
+      ...this.parts.filter(p => !ids.includes(p.id)),
+      ...parts,
+    ]);
+  }
+
   ////////////////////////////////////////////////////////////////
   // Event handlers
   ////////////////////////////////////////////////////////////////
@@ -679,12 +700,15 @@ export default class BuilderEditor extends Vue {
   }
 
   keyHandler(evt: KeyboardEvent): void {
-    const key = evt.key.toLowerCase();
+    const key = evt.key;
+    const keyDelta = moveKeys[key];
     const tool = this.tools.find(t => t.shortcut === key);
 
-    // Capture escape key
-    if (evt.keyCode === 27) {
+    if (key === 'Escape') {
       this.clear();
+    }
+    else if (keyDelta) {
+      this.deltaMove(this.findActionParts(), keyDelta);
     }
     else if (evt.ctrlKey) {
       if (key === 'z') { this.undo(); };
