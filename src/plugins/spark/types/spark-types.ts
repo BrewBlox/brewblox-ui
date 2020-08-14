@@ -29,26 +29,56 @@ export interface UserUnits {
   Temp: 'degC' | 'degF';
 }
 
+interface ApiFirmwareInfo {
+  firmware_version: string;
+  proto_version: string;
+  firmware_date: string;
+  proto_date: string;
+  device_id: string;
+}
+
+interface ApiDeviceInfo extends ApiFirmwareInfo {
+  system_version: string;
+  platform: string;
+  reset_reason: string;
+}
+
+interface ApiHandshakeInfo {
+  is_compatible_firmware: boolean;
+  is_latest_firmware: boolean;
+  is_valid_device_id: boolean;
+}
+
 /**
  * As sent/pushed by the devcon-spark service
  */
 export interface ApiSparkStatus {
-  type: 'Spark';
-  autoconnecting: boolean;
-  connect: boolean;
-  handshake: boolean;
-  synchronize: boolean;
-  compatible: boolean;
-  latest: boolean;
-  valid: boolean;
-  info: string[];
-  address: string | null;
-  connection: 'simulation' | 'usb' | 'wifi' | null;
+  device_address: string | null;
+  connection_kind: 'simulation' | 'usb' | 'wifi' | null;
+  service_info: ApiFirmwareInfo;
+  device_info: ApiDeviceInfo | null;
+  handshake_info: ApiHandshakeInfo | null;
+  is_autoconnecting: boolean;
+  is_connected: boolean;
+  is_acknowledged: boolean;
+  is_synchronized: boolean;
 }
 
-export interface SparkStatus extends ApiSparkStatus {
+export interface SparkStatus {
   serviceId: string;
-  available: boolean;
+  isServiceReachable: boolean;
+
+  deviceAddress: string | null;
+  connectionKind: 'simulation' | 'usb' | 'wifi' | null;
+
+  isCompatibleFirmware?: boolean;
+  isLatestFirmware?: boolean;
+  isValidDeviceId?: boolean;
+
+  isAutoconnecting?: boolean;
+  isConnected?: boolean;
+  isAcknowledged?: boolean;
+  isSynchronized?: boolean;
 }
 
 export interface SparkStateMessage extends EventbusMessage {

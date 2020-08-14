@@ -2,11 +2,10 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
-
-import { createDialog } from '../../../helpers/dialog';
 
 @Component
 export default class Troubleshooter extends Vue {
@@ -31,46 +30,74 @@ export default class Troubleshooter extends Vue {
     return this.sparkModule?.lastStatus?.toLocaleString() ?? 'Unknown';
   }
 
-  get textAvailable(): string {
-    return this.status?.available
-      ? 'Service running'
-      : 'Unable to connect to service';
+  triStateDesc(
+    value: boolean | null | undefined,
+    trueDesc: string,
+    falseDesc: string,
+    nullDesc: string = 'Service status unknown'
+  ): string {
+    if (value == null) {
+      return nullDesc;
+    }
+    return value
+      ? trueDesc
+      : falseDesc;
   }
 
-  get textAutoconnecting(): string {
-    return this.status?.autoconnecting
-      ? 'Service automatically connects to controller'
-      : 'Service does not automatically connect to controller';
+  get isReachableDesc(): string {
+    return this.triStateDesc(
+      this.status?.isServiceReachable,
+      'Service running',
+      'Unable to connect to service'
+    );
   }
 
-  get textConnect(): string {
-    return this.status?.connect
-      ? 'Service connected to controller'
-      : 'Service not connected to controller';
+  get autoconnectingDesc(): string {
+    return this.triStateDesc(
+      this.status?.isAutoconnecting,
+      'Service automatically connects to controller',
+      'Service does not automatically connect to controller'
+    );
   }
 
-  get textHandshake(): string {
-    return this.status?.handshake
-      ? 'Handshake performed'
-      : 'Handshake not performed';
+  get isConnectedDesc(): string {
+    return this.triStateDesc(
+      this.status?.isConnected,
+      'Service connected to controller',
+      'Service not connected to controller'
+    );
   }
 
-  get textCompatible(): string {
-    return this.status?.compatible
-      ? 'Firmware compatible'
-      : 'Firmware not compatible';
+  get isAcknowledgedDesc(): string {
+    return this.triStateDesc(
+      this.status?.isAcknowledged,
+      'Handshake performed',
+      'Handshake not performed'
+    );
   }
 
-  get textValid(): string {
-    return this.status?.valid
-      ? 'Valid device ID'
-      : 'Invalid device ID';
+  get isCompatibleDesc(): string {
+    return this.triStateDesc(
+      this.status?.isCompatibleFirmware,
+      'Firmware compatible',
+      'Firmware not compatible'
+    );
   }
 
-  get textSynchronize(): string {
-    return this.status?.synchronize
-      ? 'Service synchronized'
-      : 'Service not synchronized';
+  get isValidDesc(): string {
+    return this.triStateDesc(
+      this.status?.isValidDeviceId,
+      'Valid device ID',
+      'Invalid device ID'
+    );
+  }
+
+  get isSynchronizedDesc(): string {
+    return this.triStateDesc(
+      this.status?.isSynchronized,
+      'Service synchronized',
+      'Service not synchronized'
+    );
   }
 
   async refresh(): Promise<void> {
@@ -78,7 +105,7 @@ export default class Troubleshooter extends Vue {
   }
 
   async toggleAutoconnecting(): Promise<void> {
-    await this.sparkModule?.saveAutoConnecting(!this.status?.autoconnecting);
+    await this.sparkModule?.saveAutoConnecting(!this.status?.isAutoconnecting);
     await this.refresh();
   }
 
@@ -129,46 +156,46 @@ export default class Troubleshooter extends Vue {
       </LabeledField>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(status.available)" />
+      <q-icon v-bind="iconProps(status.isServiceReachable)" />
       <div>
-        {{ textAvailable }}
+        {{ isReachableDesc }}
       </div>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(status.autoconnecting)" />
+      <q-icon v-bind="iconProps(status.isAutoconnecting)" />
       <div>
-        {{ textAutoconnecting }}
+        {{ autoconnectingDesc }}
       </div>
 
       <div class="col-break" />
       <div class="row q-gutter-x-sm q-pl-lg">
         <q-btn
           flat
-          :label="status.autoconnecting ? 'Pause' : 'Resume'"
+          :label="status.isAutoconnecting ? 'Pause' : 'Resume'"
           @click="toggleAutoconnecting"
         />
       </div>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(status.connect)" />
+      <q-icon v-bind="iconProps(status.isConnected)" />
       <div>
-        {{ textConnect }}
+        {{ isConnectedDesc }}
       </div>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(status.handshake)" />
+      <q-icon v-bind="iconProps(status.isAcknowledged)" />
       <div>
-        {{ textHandshake }}
+        {{ isAcknowledgedDesc }}
       </div>
 
-      <template v-if="status.handshake">
+      <template v-if="status.isAcknowledged">
         <div class="col-break" />
-        <q-icon v-bind="iconProps(status.compatible)" />
+        <q-icon v-bind="iconProps(status.isCompatibleFirmware)" />
         <div>
-          {{ textCompatible }}
+          {{ isCompatibleDesc }}
         </div>
 
-        <template v-if="!status.compatible">
+        <template v-if="!status.isCompatibleFirmware">
           <div class="col-break" />
           <div class="row q-gutter-x-sm q-pl-lg">
             <q-btn
@@ -180,36 +207,36 @@ export default class Troubleshooter extends Vue {
         </template>
 
         <div class="col-break" />
-        <q-icon v-bind="iconProps(status.valid)" />
+        <q-icon v-bind="iconProps(status.isValidDeviceId)" />
         <div>
-          {{ textValid }}
+          {{ isValidDesc }}
         </div>
       </template>
 
       <div class="col-break" />
-      <q-icon v-bind="iconProps(status.synchronize)" />
+      <q-icon v-bind="iconProps(status.isSynchronized)" />
       <div>
-        {{ textSynchronize }}
+        {{ isSynchronizedDesc }}
       </div>
 
       <div class="col-break" />
       <div class="col">
         <!-- not available -->
-        <span v-if="!status.available">
+        <span v-if="!status.isServiceReachable">
           Your Spark service is offline.
           <ul>
             <li>Is your backend reachable?</li>
-            <li>Is the container present in your docker-compose file?</li>
-            <li>Is the container running?</li>
+            <li>Is the service present in your docker-compose file?</li>
+            <li>Is the service running?</li>
           </ul>
         </span>
         <!-- not autoconnecting -->
-        <span v-else-if="!status.autoconnecting">
+        <span v-else-if="!status.isAutoconnecting">
           Your Spark service is paused, and not automatically connecting to your controller.<br>
           This status can be toggled manually.
         </span>
         <!-- not connected -->
-        <span v-else-if="!status.connect">
+        <span v-else-if="!status.isConnected">
           Your Spark service is online, but not connected to your controller.
           <ul>
             <li>Is your controller turned on?</li>
@@ -221,7 +248,7 @@ export default class Troubleshooter extends Vue {
           </ul>
         </span>
         <!-- awaiting handshake -->
-        <span v-else-if="!status.handshake">
+        <span v-else-if="!status.isAcknowledged">
           Your Spark service is waiting for the controller handshake.
           <br>
           <b>This status is usually temporary</b>
@@ -232,40 +259,27 @@ export default class Troubleshooter extends Vue {
           To do so, run <span class="monospace">brewblox-ctl particle -c flash-bootloader</span>
         </span>
         <!-- not compatible -->
-        <span v-else-if="!status.compatible">
+        <span v-else-if="!status.isCompatibleFirmware">
           Your Spark service is not compatible with the firmware
           <br>
-          <b>Please run brewblox-ctl update</b>
+          <b>Please run <span class="monospace">brewblox-ctl flash</span></b>
         </span>
         <!-- not valid -->
-        <span v-else-if="!status.valid">
+        <span v-else-if="!status.isValidDeviceId">
           The controller device ID doesn't match the service <i>--device-id</i> setting.
           <br>
           <b>Please check your connection settings</b>
         </span>
         <!-- not synchronized -->
-        <span v-else-if="!status.synchronize">
+        <span v-else-if="!status.isSynchronized">
           Your Spark service is connected to your controller, but not yet synchronized.
           <b>This status is usually temporary.</b>
           <ul>
-            <li>Is your datastore container running?</li>
+            <li>Is your datastore service running?</li>
             <li>Are there any error messages in your service container logs?</li>
-            <li>Does your controller have the correct firmware?</li>
           </ul>
         </span>
       </div>
-
-      <template v-if="(status.info || []).length > 0">
-        <div class="col-break" />
-        <div class="col">
-          <b>Service info:</b>
-          <q-list dense>
-            <q-item v-for="(val, idx) in status.info" :key="`info-${idx}`">
-              <q-item-section>{{ val }}</q-item-section>
-            </q-item>
-          </q-list>
-        </div>
-      </template>
     </div>
   </CardWrapper>
 </template>

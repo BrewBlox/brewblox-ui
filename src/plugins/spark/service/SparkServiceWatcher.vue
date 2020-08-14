@@ -73,8 +73,8 @@ export default class SparkServiceWatcher extends Vue {
   handleStatusChange(status: SparkStatus): void {
     if (this.notifiedUpdate
       || !status
-      || !status.connect
-      || status.latest
+      || !status.isConnected
+      || status.isLatestFirmware
       || this.snoozeTime > new Date().getTime() - snoozeDuration
     ) {
       return;

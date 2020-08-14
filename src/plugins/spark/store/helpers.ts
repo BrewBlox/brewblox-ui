@@ -114,45 +114,47 @@ export const calculateLimiters = (blocks: Block[]): Limiters => {
   return limited;
 };
 
-export const unknownStatus = (): ApiSparkStatus => ({
-  type: 'Spark',
-  autoconnecting: true,
-  connect: false,
-  handshake: false,
-  synchronize: false,
-  compatible: true, // no idea - assume yes
-  latest: true, // no idea - assume yes
-  valid: true, // no idea - assume yes
-  info: [],
-  address: null,
-  connection: null,
-});
+export const asSparkStatus = (serviceId: string, status: ApiSparkStatus | null): SparkStatus => {
+  if (!status) {
+    return {
+      serviceId,
+      isServiceReachable: false,
+      deviceAddress: null,
+      connectionKind: null,
+    };
+  }
 
-export const asSparkStatus = (
-  serviceId: string,
-  status: ApiSparkStatus | null = null,
-): SparkStatus => ({
-  ...(status ?? unknownStatus()),
-  serviceId,
-  available: status !== null,
-});
+  return {
+    serviceId,
+    isServiceReachable: true,
+    deviceAddress: status.device_address,
+    connectionKind: status.connection_kind,
+    isCompatibleFirmware: status.handshake_info?.is_compatible_firmware,
+    isLatestFirmware: status.handshake_info?.is_latest_firmware,
+    isValidDeviceId: status.handshake_info?.is_valid_device_id,
+    isAutoconnecting: status.is_autoconnecting,
+    isConnected: status.is_connected,
+    isAcknowledged: status.is_acknowledged,
+    isSynchronized: status.is_synchronized,
+  };
+};
 
 const statusDesc = (status: SparkStatus): [string, string] => {
-  if (status.connect) {
-    if (status.synchronize) {
+  if (status.isConnected) {
+    if (status.isSynchronized) {
       return ['synchronized', 'green'];
     }
-    else if (status.compatible) {
+    else if (status.isCompatibleFirmware) {
       return ['synchronizing', 'yellow'];
     }
-    else if (status.handshake) {
+    else if (status.isAcknowledged) {
       return ['incompatible firmware', 'orange'];
     }
     else {
       return ['Waiting for handshake', 'yellow'];
     }
   }
-  else if (status.available) {
+  else if (status.isServiceReachable) {
     return ['waiting for connection', 'red'];
   }
   else {
@@ -171,8 +173,8 @@ export const asServiceStatus =
   (status: SparkStatus): ServiceStatus => {
     const id = status.serviceId;
     const [descText, color] = statusDesc(status);
-    const connection = status.connection ?? 'unknown';
-    const icon = iconOpts[connection];
-    const desc = capitalized(`${connection} (${descText})`);
+    const connectionKind = status.connectionKind ?? 'unknown';
+    const icon = iconOpts[connectionKind];
+    const desc = capitalized(`${connectionKind} (${descText})`);
     return { id, color, desc, icon };
   };

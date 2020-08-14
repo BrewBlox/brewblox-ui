@@ -202,14 +202,14 @@ export class SparkServiceModule extends VuexModule {
     const status = await api.fetchSparkStatus(this.id);
     this.updateStatus(status);
     serviceStore.updateStatus(asServiceStatus(status));
-    if (status.synchronize) {
+    if (status.isSynchronized) {
       await Promise.all([
         this.fetchUnits(),
         this.fetchDiscoveredBlocks(),
         this.fetchBlocks(),
       ]);
     }
-    return status.synchronize;
+    return !!status.isSynchronized;
   }
 
   @Action
