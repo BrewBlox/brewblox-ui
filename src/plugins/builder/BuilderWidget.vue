@@ -114,14 +114,15 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
   }
 
   isClickable(part): boolean {
-    return !!builderStore.spec(part).interactHandler;
+    return builderStore.spec(part).interactHandler !== undefined;
   }
 
   interact(part: FlowPart): void {
     builderStore.spec(part).interactHandler?.(part, this.updater);
   }
 
-  edit(part: FlowPart): void {
+  dblclickPart(part: FlowPart): void {
+    // Prevent accidentally opening editor when interacting
     if (!this.isClickable(part)) {
       this.startEditor();
     }
@@ -153,7 +154,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 </script>
 
 <template>
-  <CardWrapper no-scroll v-bind="{context}">
+  <CardWrapper no-scroll v-bind="{context}" @dblclick.native.stop="startEditor">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud">
         <q-btn
@@ -176,7 +177,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
       </component>
     </template>
 
-    <div class="fit" @dblclick="startEditor">
+    <div class="fit">
       <span
         v-if="parts.length === 0"
         class="absolute-center q-gutter-y-sm"
@@ -222,7 +223,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ pointer: isClickable(part), [part.type]: true }"
           @click="interact(part)"
-          @dblclick.stop="edit(part)"
+          @dblclick.stop="dblclickPart(part)"
         >
           <PartWrapper
             :part="part"

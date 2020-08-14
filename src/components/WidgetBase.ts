@@ -34,6 +34,10 @@ export default class WidgetBase<ConfigT = any> extends Vue {
     this.activeMode = val;
   }
 
+  public toggleMode(): void {
+    this.activeMode = this.activeMode === 'Basic' ? 'Full' : 'Basic';
+  }
+
   public get widget(): Widget<ConfigT> {
     return this.crud.widget;
   }

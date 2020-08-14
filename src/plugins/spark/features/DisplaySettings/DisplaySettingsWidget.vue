@@ -24,7 +24,10 @@ export default class DisplaySettingsWidget
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <CardWrapper
+    v-bind="{context}"
+    @dblclick.native="toggleMode"
+  >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>

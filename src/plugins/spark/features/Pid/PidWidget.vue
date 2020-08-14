@@ -38,7 +38,11 @@ export default class PidWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog" v-bind="{context}">
+  <GraphCardWrapper
+    :show="inDialog"
+    v-bind="{context}"
+    @dblclick.native="toggleMode"
+  >
     <template #graph>
       <HistoryGraph
         :graph-id="widget.id"

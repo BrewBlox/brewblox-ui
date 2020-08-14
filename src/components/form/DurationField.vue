@@ -14,12 +14,13 @@ export default class DurationField extends FieldBase {
   // - Quantity -> bloxQty(10, 'min')
   // - duration string -> '10m'
   // @input events emitted will match type of value
+  // If input is undefined, type is assumed to be string
   @Prop({
     type: [Object, String],
-    required: true,
+    required: false,
     validator: v => isQuantity(v) || isDurationString(v),
   })
-  public readonly value!: Quantity | string;
+  public readonly value!: Quantity | string | undefined;
 
   @Prop({ type: String, default: 'duration' })
   public readonly label!: string;
@@ -45,7 +46,7 @@ export default class DurationField extends FieldBase {
       title: this.title,
       message: this.message,
       html: this.html,
-      value: bloxQty(this.value),
+      value: bloxQty(this.value ?? ''),
       label: this.label,
       rules: this.rules,
     })
