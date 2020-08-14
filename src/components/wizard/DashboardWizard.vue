@@ -21,6 +21,10 @@ export default class DashboardWizard extends Vue {
     this.$emit('back');
   }
 
+  mounted(): void {
+    this.$emit('title', 'Dashboard wizard');
+  }
+
   get dashboardId(): string {
     return this.chosenId !== null
       ? this.chosenId
@@ -36,6 +40,9 @@ export default class DashboardWizard extends Vue {
   }
 
   async createDashboard(): Promise<void> {
+    if (!this.valid) {
+      return;
+    }
     const dashboard: Dashboard = {
       id: this.dashboardId,
       title: this.dashboardTitle || this.dashboardId,
@@ -45,10 +52,6 @@ export default class DashboardWizard extends Vue {
     await dashboardStore.createDashboard(dashboard);
     notify.done(`Added dashboard ${dashboard.title}`);
     this.$emit('close');
-  }
-
-  mounted(): void {
-    this.$emit('title', 'Dashboard wizard');
   }
 }
 </script>

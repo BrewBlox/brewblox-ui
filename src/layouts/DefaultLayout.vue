@@ -2,8 +2,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
-
 @Component
 export default class DefaultLayout extends Vue {
   localDrawer: boolean | null = null;
@@ -28,12 +26,6 @@ export default class DefaultLayout extends Vue {
 
   get devMode() {
     return process.env.DEV;
-  }
-
-  showWizard(): void {
-    createDialog({
-      component: 'WizardDialog',
-    });
   }
 
   stopEditing(): void {

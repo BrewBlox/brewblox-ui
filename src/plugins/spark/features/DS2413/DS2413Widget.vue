@@ -13,7 +13,7 @@ export default class DS2413Widget
 <template>
   <CardWrapper
     v-bind="{context}"
-    @dblclick.native="toggleMode"
+    @dblclick="toggleMode"
   >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />

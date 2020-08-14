@@ -63,7 +63,7 @@ export default class DigitalActuatorWidget
   <GraphCardWrapper
     :show="inDialog"
     v-bind="{context}"
-    @dblclick.native="toggleMode"
+    @dblclick="toggleMode"
   >
     <template #graph>
       <HistoryGraph

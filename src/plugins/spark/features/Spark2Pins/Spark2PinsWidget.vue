@@ -11,7 +11,10 @@ export default class Spark2PinsWidget
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}" @dblclick.native="toggleMode">
+  <CardWrapper
+    v-bind="{context}"
+    @dblclick="toggleMode"
+  >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" />
     </template>

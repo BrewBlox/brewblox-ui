@@ -11,10 +11,10 @@ export default class WizardDialog extends DialogBase {
   wizardProps: any = {};
 
   @Prop({ type: String, required: false })
-  readonly dashboardId!: string;
+  readonly initialDashboard!: string | undefined;
 
   @Prop({ type: String, required: false })
-  readonly initialWizard!: string;
+  readonly initialWizard!: string | undefined;
 
   @Prop({ type: Object, default: () => ({}) })
   public readonly initialProps!: any;
@@ -25,7 +25,7 @@ export default class WizardDialog extends DialogBase {
 
   mounted(): void {
     this.reset();
-    this.pickWizard(this.initialWizard, this.initialProps);
+    this.pickWizard(this.initialWizard ?? null, this.initialProps);
   }
 
   reset(): void {
@@ -33,7 +33,7 @@ export default class WizardDialog extends DialogBase {
     this.dialogTitle = 'Wizardry';
   }
 
-  pickWizard(component: string, props: any = {}) {
+  pickWizard(component: string | null, props: any = {}) {
     this.wizardComponent = component;
     this.wizardProps = props;
   }
@@ -56,6 +56,7 @@ export default class WizardDialog extends DialogBase {
         :is="wizardComponent"
         v-if="wizardComponent"
         v-bind="wizardProps"
+        :initial-dashboard="initialDashboard"
         @title="v => dialogTitle = v"
         @back="reset"
         @close="onDialogHide"

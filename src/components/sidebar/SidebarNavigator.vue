@@ -26,9 +26,16 @@ export default class SidebarNavigator extends Vue {
     return automationStore.available;
   }
 
+  get currentDashboard(): string | null {
+    return this.$route.path.startsWith('/dashboard')
+      ? this.$route.params.id
+      : null;
+  }
+
   showWizard(): void {
     createDialog({
       component: 'WizardDialog',
+      initialDashboard: this.currentDashboard,
     });
   }
 

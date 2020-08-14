@@ -8,8 +8,9 @@ import { featureStore } from '@/store/features';
 
 @Component
 export default class WidgetWizardPicker extends Vue {
+
   @Prop({ type: String, required: false })
-  readonly dashboardId!: string;
+  readonly initialDashboard!: string;
 
   feature: any = null;
   wizardActive = false;
@@ -17,16 +18,9 @@ export default class WidgetWizardPicker extends Vue {
 
   localChosenDashboardId = '';
 
-  get currentDashboard(): string | null {
-    return this.$route.path.startsWith('/dashboard')
-      ? this.$route.params.id
-      : null;
-  }
-
   get chosenDashboardId(): string {
     return this.localChosenDashboardId
-      || this.dashboardId
-      || this.currentDashboard
+      || this.initialDashboard
       || dashboardStore.primaryDashboardId
       || '';
   }
@@ -137,7 +131,13 @@ export default class WidgetWizardPicker extends Vue {
     <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
-      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="next" />
+      <q-btn
+        :disable="!valuesOk"
+        unelevated
+        label="Next"
+        color="primary"
+        @click="next"
+      />
     </template>
   </ActionCardBody>
 </template>
