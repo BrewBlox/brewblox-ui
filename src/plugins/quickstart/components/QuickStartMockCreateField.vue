@@ -29,7 +29,7 @@ export default class QuickStartMockCreateField extends Vue {
   }
 
   get isSimulation(): boolean {
-    return this.status?.connection === 'simulation';
+    return this.status?.connectionKind === 'simulation';
   }
 
   async createMockSensors(): Promise<void> {

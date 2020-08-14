@@ -98,7 +98,7 @@ export default class SparkPage extends Vue {
   get statusNok(): boolean {
     return this.isAvailable
       && this.status !== null
-      && !this.status.synchronize;
+      && !this.status.isSynchronized;
   }
 
   get pageMode(): PageMode {
