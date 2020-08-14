@@ -165,7 +165,7 @@ export default class BlockWizard extends Vue {
 </script>
 
 <template>
-  <ActionCardBody @keyup.ctrl.enter="createBlock">
+  <ActionCardBody>
     <div class="widget-body column">
       <q-input
         v-model="searchFilter"

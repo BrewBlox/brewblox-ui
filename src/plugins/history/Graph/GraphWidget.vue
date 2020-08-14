@@ -155,6 +155,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     :show="inDialog && mode === 'Full'"
     :no-scroll="mode === 'Basic'"
     v-bind="{context}"
+    @dblclick="toggleMode"
   >
     <template #graph>
       <HistoryGraph
@@ -220,7 +221,10 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         @downsample="v => downsampling = v"
       />
     </div>
-    <div v-else class="widget-md">
+    <div
+      v-if="mode === 'Full'"
+      class="widget-md"
+    >
       <GraphEditor
         :config="config"
         :downsampling="downsampling"

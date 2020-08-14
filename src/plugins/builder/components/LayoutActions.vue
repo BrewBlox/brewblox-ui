@@ -65,8 +65,8 @@ export default class LayoutActions extends Vue {
     if (!this.layout) {
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, ...exported } = this.layout;
+    void { id, _rev };
     saveFile(exported, `brewblox-${this.layout.title}-layout.json`);
   }
 

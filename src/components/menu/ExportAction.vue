@@ -14,8 +14,8 @@ export default class ExportAction extends CrudComponent {
   readonly label!: string;
 
   async startExport(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _rev, dashboard, pinnedPosition, ...exported } = this.widget;
+    void { id, _rev, dashboard, pinnedPosition };
     saveFile(exported, `brewblox-${this.widget.title}-${this.widget.feature}.json`);
   }
 }

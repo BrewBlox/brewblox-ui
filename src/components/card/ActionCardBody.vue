@@ -10,7 +10,7 @@ export default class ActionCardBody extends Vue {
 </script>
 
 <template>
-  <div class="fit column">
+  <div class="fit column" v-on="$listeners">
     <q-scroll-area visible class="col">
       <slot />
     </q-scroll-area>

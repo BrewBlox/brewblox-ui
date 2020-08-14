@@ -60,6 +60,7 @@ export default class SetpointProfileWidget
     :show="inDialog && mode ==='Full'"
     :no-scroll="mode === 'Basic'"
     v-bind="{context}"
+    @dblclick="toggleMode"
   >
     <template #graph>
       <GenericGraph v-bind="graphProps" :revision="revision" />
