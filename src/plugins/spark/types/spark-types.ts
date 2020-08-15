@@ -4,7 +4,7 @@ import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types'
 import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
-import { Block } from './shared';
+import { ApiSparkStatus, Block } from './shared';
 
 export type PageMode =
   | 'Relations'
@@ -27,41 +27,6 @@ export type UserUnitKey = 'Temp';
 
 export interface UserUnits {
   Temp: 'degC' | 'degF';
-}
-
-interface ApiFirmwareInfo {
-  firmware_version: string;
-  proto_version: string;
-  firmware_date: string;
-  proto_date: string;
-  device_id: string;
-}
-
-interface ApiDeviceInfo extends ApiFirmwareInfo {
-  system_version: string;
-  platform: string;
-  reset_reason: string;
-}
-
-interface ApiHandshakeInfo {
-  is_compatible_firmware: boolean;
-  is_latest_firmware: boolean;
-  is_valid_device_id: boolean;
-}
-
-/**
- * As sent/pushed by the devcon-spark service
- */
-export interface ApiSparkStatus {
-  device_address: string | null;
-  connection_kind: 'simulation' | 'usb' | 'wifi' | null;
-  service_info: ApiFirmwareInfo;
-  device_info: ApiDeviceInfo | null;
-  handshake_info: ApiHandshakeInfo | null;
-  is_autoconnecting: boolean;
-  is_connected: boolean;
-  is_acknowledged: boolean;
-  is_synchronized: boolean;
 }
 
 export interface SparkStatus {
