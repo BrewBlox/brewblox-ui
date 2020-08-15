@@ -1,6 +1,7 @@
+import { Block } from './block-types';
 
-// #region ApiSparkStatus
-interface ApiFirmwareInfo {
+// #region SparkFirmwareInfo
+export interface SparkFirmwareInfo {
   firmware_version: string;
   proto_version: string;
   firmware_date: string;
@@ -8,76 +9,47 @@ interface ApiFirmwareInfo {
   device_id: string;
 }
 
-interface ApiServiceInfo extends ApiFirmwareInfo {
+export interface SparkServiceInfo extends SparkFirmwareInfo {
   name: string;
 }
 
-interface ApiDeviceInfo extends ApiFirmwareInfo {
+export interface SparkDeviceInfo extends SparkFirmwareInfo {
   system_version: string;
   platform: string;
   reset_reason: string;
 }
 
-interface ApiHandshakeInfo {
+export interface SparkHandshakeInfo {
   is_compatible_firmware: boolean;
   is_latest_firmware: boolean;
   is_valid_device_id: boolean;
 }
+// #endregion SparkFirmwareInfo
 
+// #region ApiSparkStatus
 export interface ApiSparkStatus {
-
-  /**
-   * Address of currently connected controller.
-   * Can be either a path to a serial tty, or an 'IP:port' network address.
-   */
   device_address: string | null;
-
-  /**
-   * Actual connection type.
-   */
   connection_kind: 'simulation' | 'usb' | 'wifi' | null;
 
-  /**
-   * Static information of the service,
-   * including that of associated firmware binaries.
-   */
-  service_info: ApiServiceInfo;
+  service_info: SparkServiceInfo;
+  device_info: SparkDeviceInfo | null;
+  handshake_info: SparkHandshakeInfo | null;
 
-  /**
-   * Static information of currently connected controller.
-   */
-  device_info: ApiDeviceInfo | null;
-
-  /**
-   * Status flags for current connection.
-   * Firmware compatibility is checked in the handshake.
-   */
-  handshake_info: ApiHandshakeInfo | null;
-
-  /**
-   * Autoconnecting can be disabled for services
-   * where the controller is expected to be unreachable for long periods of time.
-   *
-   * The service will wait for `is_autoconnecting` to be true before it starts discovery.
-   */
   is_autoconnecting: boolean;
-
-  /**
-   * Is the service connected to either a serial device, or an IP address?
-   * Does not guarantee the connected device is a Spark controller,
-   * or that the controller is compatible.
-   */
   is_connected: boolean;
-
-  /**
-   * Has the connected controller sent a handshake message?
-   * Does not guarantee the controller is compatible.
-   */
   is_acknowledged: boolean;
-
-  /**
-   * Service is connected, compatible, and communicating.
-   */
   is_synchronized: boolean;
 }
 // #endregion ApiSparkStatus
+
+// #region SparkStateEvent
+export interface SparkStateEvent {
+  key: string;
+  type: 'Spark.state';
+  ttl: string;
+  data: {
+    status: ApiSparkStatus | null;
+    blocks: Block[];
+  };
+}
+// #endregion SparkStateEvent
