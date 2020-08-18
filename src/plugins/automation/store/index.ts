@@ -1,6 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { extendById, filterById, findById } from '@/helpers/functional';
+import { serialize } from '@/plugins/spark/parse-object';
 import store from '@/store';
 
 import {
@@ -96,7 +97,7 @@ export class AutomationModule extends VuexModule {
 
   @Action
   public async initProcess(template: AutomationTemplate): Promise<void> {
-    this.setProcess(await processApi.init(template));
+    this.setProcess(await processApi.init(serialize(template)));
   }
 
   @Action
