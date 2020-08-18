@@ -6,7 +6,7 @@ import notify from '@/helpers/notify';
 export type WizardAction = (config: any) => Promise<void>;
 
 @Component
-export default class WizardTaskBase<ConfigT> extends Vue {
+export default class QuickStartTaskBase<ConfigT> extends Vue {
   public busyExecuting = false;
 
   @Prop({ type: Object, required: true })

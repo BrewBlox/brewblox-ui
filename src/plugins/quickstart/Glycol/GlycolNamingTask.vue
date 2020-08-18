@@ -7,13 +7,13 @@ import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { withPrefix } from '../helpers';
 import { GlycolBlockNames, GlycolConfig } from './types';
 
 
 @Component
-export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
+export default class GlycolNamingTask extends QuickStartTaskBase<GlycolConfig> {
   chosenNames: Partial<GlycolBlockNames> = {};
   idGenerator = new UrlSafeString();
 

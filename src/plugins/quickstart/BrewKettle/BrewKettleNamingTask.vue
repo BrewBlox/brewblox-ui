@@ -7,13 +7,13 @@ import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { withPrefix } from '../helpers';
 import { BrewKettleBlockNames, BrewKettleConfig } from './types';
 
 
 @Component
-export default class BrewKettleNamingTask extends WizardTaskBase<BrewKettleConfig> {
+export default class BrewKettleNamingTask extends QuickStartTaskBase<BrewKettleConfig> {
   chosenNames: Partial<BrewKettleBlockNames> = {};
   idGenerator = new UrlSafeString();
 

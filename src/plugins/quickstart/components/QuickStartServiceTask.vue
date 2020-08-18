@@ -7,11 +7,11 @@ import { BlockType } from '@/plugins/spark/types';
 import { Service, serviceStore } from '@/store/services';
 
 import { QuickStartOutput } from '../types';
-import WizardTaskBase from './WizardTaskBase';
+import QuickStartTaskBase from './QuickStartTaskBase';
 
 
 @Component
-export default class QuickStartServiceTask extends WizardTaskBase<QuickStartOutput> {
+export default class QuickStartServiceTask extends QuickStartTaskBase<QuickStartOutput> {
   service: Service | null = null;
   handleExisting: 'keep' | 'clear' | null = null;
 

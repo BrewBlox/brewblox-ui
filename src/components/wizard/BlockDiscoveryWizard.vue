@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
@@ -10,11 +10,14 @@ import type { BlockConfig } from '@/plugins/spark/types';
 
 
 @Component
-export default class BlockDiscoveryWizard
-  extends WidgetWizardBase<BlockConfig> {
+export default class BlockDiscoveryWizard extends WidgetWizardBase<BlockConfig> {
+  dashboardId: string | null = null;
   sparkModule: SparkServiceModule | null = null;
   block: Block | null = null;
   busy = false;
+
+  @Prop({ type: String })
+  public readonly activeServiceId!: string | null;
 
   @Watch('sparkModule')
   watchModule(newV: SparkServiceModule, oldV: SparkServiceModule): void {
@@ -24,14 +27,10 @@ export default class BlockDiscoveryWizard
   }
 
   mounted(): void {
-    this.sparkModule = this.moduleOpts[0]?.value ?? null;
-  }
-
-  async discover(): Promise<void> {
-    if (!this.sparkModule) { return; }
-    this.busy = true;
-    await this.sparkModule.fetchDiscoveredBlocks()
-      .finally(() => this.busy = false);
+    this.setDialogTitle(`${this.featureTitle} wizard`);
+    this.sparkModule = sparkStore.moduleById(this.activeServiceId)
+      ?? sparkStore.modules[0]
+      ?? null;
   }
 
   get moduleOpts(): SelectOption[] {
@@ -78,10 +77,17 @@ export default class BlockDiscoveryWizard
       });
   }
 
-  async createWidget(): Promise<void> {
-    if (!this.block) { return; }
+  async discover(): Promise<void> {
+    if (!this.sparkModule) { return; }
+    this.busy = true;
+    await this.sparkModule.fetchDiscoveredBlocks()
+      .finally(() => this.busy = false);
+  }
 
-    this.createItem({
+  async createWidget(): Promise<void> {
+    if (!this.block || !this.dashboardId) { return; }
+
+    this.makeWidget({
       id: this.widgetId,
       title: this.block.id,
       feature: this.featureId,
@@ -100,12 +106,16 @@ export default class BlockDiscoveryWizard
 <template>
   <ActionCardBody>
     <div class="widget-body column">
+      <DashboardSelect
+        v-model="dashboardId"
+        :default-value="activeDashboardId"
+      />
+
       <q-select
         v-if="moduleOpts.length > 1"
         v-model="sparkModule"
         :options="moduleOpts"
         label="Service"
-        item-aligned
         emit-value
         map-options
       />
@@ -115,7 +125,7 @@ export default class BlockDiscoveryWizard
           There are no Spark services available
         </template>
       </CardWarning>
-      <div v-else class="q-pa-sm">
+      <div v-else class="q-pa-sm q-mt-md">
         {{ featureTitle }} blocks are linked to hardware, and must be discovered. <br>
         If a block is not shown below, please ensure it is plugged in, and click Discover.
       </div>
@@ -166,7 +176,7 @@ export default class BlockDiscoveryWizard
         @click="discover"
       />
       <q-btn
-        :disable="block === null"
+        :disable="!block || !dashboardId"
         unelevated
         label="Create widget"
         color="primary"

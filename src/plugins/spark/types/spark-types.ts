@@ -4,7 +4,7 @@ import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types'
 import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
-import { ApiSparkStatus, Block } from './shared';
+import { ApiSparkStatus, Block, BlockOrIntfType } from './shared';
 
 export type PageMode =
   | 'Relations'
@@ -143,7 +143,7 @@ export interface BlockIds {
 export interface BlockAddress {
   serviceId: string | null;
   id: string | null;
-  type: string | null;
+  type: BlockOrIntfType | null;
 }
 
 export interface BlockFieldAddress extends BlockAddress {
@@ -167,7 +167,10 @@ export interface BlockField<T extends Block = Block> {
 export interface BlockSpec<T extends Block = Block> {
   id: T['type'];
   systemObject?: boolean;
+  discovered?: boolean;
   generate: (serviceId: string | null) => T['data'];
   fields: BlockField<T>[];
   presets?: BlockDataPreset<T>[];
 }
+
+export type ComparedBlockType = BlockOrIntfType | BlockOrIntfType[] | null;

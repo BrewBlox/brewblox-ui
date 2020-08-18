@@ -5,7 +5,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { createBlockWizardDialog, createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
@@ -300,6 +300,11 @@ export default class SparkPage extends Vue {
     });
   }
 
+  startCreateBlock(): void {
+    createBlockWizardDialog(this.serviceId)
+      .onOk(block => this.updateExpandedBlock(block.id, true));
+  }
+
   get nodes(): RelationNode[] {
     return this.validatedItems
       .map(v => ({ id: v.id, type: v.title }))
@@ -340,10 +345,6 @@ export default class SparkPage extends Vue {
       this.updateExpandedBlock(val.id, true);
     }
   }
-
-  onPageDblClick(): void {
-    this.startDialog('BlockWizardDialog');
-  }
 }
 </script>
 
@@ -379,7 +380,7 @@ export default class SparkPage extends Vue {
           <ActionItem
             icon="add"
             label="New block"
-            @click="startDialog('BlockWizardDialog')"
+            @click="startCreateBlock"
           />
           <ActionItem
             icon="mdi-magnify-plus-outline"
@@ -445,7 +446,7 @@ export default class SparkPage extends Vue {
     </q-list>
 
     <template v-else-if="pageMode === 'Relations'">
-      <div class="page-height full-width" @dblclick="onPageDblClick">
+      <div class="page-height full-width" @dblclick="startCreateBlock">
         <RelationsDiagram
           :service-id="service.id"
           :nodes="nodes"
@@ -458,7 +459,7 @@ export default class SparkPage extends Vue {
       <!-- Normal display -->
       <div
         class="row no-wrap justify-start page-height"
-        @dblclick="onPageDblClick"
+        @dblclick="startCreateBlock"
       >
         <q-scroll-area
           visible
@@ -585,7 +586,7 @@ export default class SparkPage extends Vue {
               </q-item-section>
             </q-item>
             <!-- Blank space to always be able to show a widget at the top -->
-            <q-item class="page-height" @dblclick.native="onPageDblClick" />
+            <q-item class="page-height" @dblclick.native="startCreateBlock" />
           </q-list>
         </q-scroll-area>
       </div>

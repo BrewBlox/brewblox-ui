@@ -7,13 +7,13 @@ import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { withPrefix } from '../helpers';
 import { RimsBlockNames, RimsConfig } from './types';
 
 
 @Component
-export default class RimsNamingTask extends WizardTaskBase<RimsConfig> {
+export default class RimsNamingTask extends QuickStartTaskBase<RimsConfig> {
   chosenNames: Partial<RimsBlockNames> = {};
   idGenerator = new UrlSafeString();
 

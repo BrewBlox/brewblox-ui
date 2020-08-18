@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockField, BlockFieldAddress, BlockOrIntfType } from '@/plugins/spark/types';
+import { Block, BlockField, BlockFieldAddress, ComparedBlockType } from '@/plugins/spark/types';
 
 import FieldBase from '../FieldBase';
 
@@ -23,8 +23,8 @@ export default class BlockFieldAddressField extends FieldBase {
   @Prop({ type: Array, required: false })
   public readonly services!: string[];
 
-  @Prop({ type: Array, required: false })
-  readonly compatible!: BlockOrIntfType[];
+  @Prop({ type: [String, Array], required: false })
+  readonly compatible!: ComparedBlockType;
 
   @Prop({ type: Function, required: false })
   public readonly blockFilter!: ((block: Block) => boolean);

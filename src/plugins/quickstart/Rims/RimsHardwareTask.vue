@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { createBlockWizardDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions, hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
@@ -13,7 +13,7 @@ import { RimsConfig } from './types';
 
 
 @Component
-export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
+export default class RimsHardwareTask extends QuickStartTaskBase<RimsConfig> {
   tubePin: PinChannel | null = null;
   pumpPin: PinChannel | null = null;
   kettleSensor: string | null = null;
@@ -53,10 +53,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
   }
 
   startBlockWizard(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.config.serviceId,
-    });
+    createBlockWizardDialog(this.config.serviceId);
   }
 
   taskDone(): void {

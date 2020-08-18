@@ -1,7 +1,6 @@
 <script lang="ts">
 import isString from 'lodash/isString';
 import { uid } from 'quasar';
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { ruleErrorFinder } from '@/helpers/functional';
@@ -9,6 +8,8 @@ import { loadFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+
+import WizardBase from '../WizardBase';
 
 const widgetRules: InputRule[] = [
   v => v !== null || 'Widget must have a value',
@@ -21,7 +22,7 @@ const widgetRules: InputRule[] = [
 const errorFinder = ruleErrorFinder(widgetRules);
 
 @Component
-export default class ImportWizard extends Vue {
+export default class ImportWizard extends WizardBase {
   localChosenDashboardId = '';
   widget: Widget | null = null;
 
@@ -81,12 +82,8 @@ export default class ImportWizard extends Vue {
     }
   }
 
-  back(): void {
-    this.$emit('back');
-  }
-
   mounted(): void {
-    this.$emit('title', 'Import wizard');
+    this.setDialogTitle('Import wizard');
   }
 
   startImport(): void {

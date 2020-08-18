@@ -7,7 +7,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
-import { WizardAction } from './components/WizardTaskBase';
+import { WizardAction } from './components/QuickStartTaskBase';
 import { PinChannel, QuickStartOutput } from './types';
 
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {

@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/WidgetWizardBase';
+import WizardBase from '@/components/WizardBase';
 
 @Component
-export default class FermentWizard extends WidgetWizardBase {
+export default class FermentWizard extends WizardBase {
   initialTasks = [
     'QuickStartServiceTask',
     'QuickStartDiscoveryTask',
@@ -17,5 +17,9 @@ export default class FermentWizard extends WidgetWizardBase {
 </script>
 
 <template>
-  <WizardTaskMaster :initial-tasks="initialTasks" @back="back" @close="close" />
+  <WizardTaskMaster
+    :initial-tasks="initialTasks"
+    @back="back"
+    @close="close"
+  />
 </template>

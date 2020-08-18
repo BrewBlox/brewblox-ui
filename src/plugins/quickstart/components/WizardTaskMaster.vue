@@ -1,11 +1,12 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-import { WizardAction } from './WizardTaskBase';
+import WizardBase from '@/components/WizardBase';
+
+import { WizardAction } from './QuickStartTaskBase';
 
 @Component
-export default class WizardTaskMaster extends Vue {
+export default class WizardTaskMaster extends WizardBase {
   config: any = {};
   actions: WizardAction[] = [];
   taskHistory: string[] = [];
@@ -18,12 +19,6 @@ export default class WizardTaskMaster extends Vue {
 
   @Prop({ type: Object, default: () => ({}) })
   readonly initialConfig!: any;
-
-  @Emit()
-  public back(): void { }
-
-  @Emit()
-  public close(): void { }
 
   previousTask(): void {
     if (this.taskHistory.length > 0) {

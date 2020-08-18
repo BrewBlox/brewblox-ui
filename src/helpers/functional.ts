@@ -368,6 +368,10 @@ export function typeMatchFilter<T extends HasType>(type: T['type']): ((obj: HasT
   return (obj): obj is T => obj.type === type;
 }
 
+export function nullFilter<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
+}
+
 export function deepCopy<T>(obj: T): T {
   return obj
     ? cloneDeep(obj)

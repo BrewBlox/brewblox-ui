@@ -16,10 +16,10 @@ import {
 } from '@/plugins/spark/types';
 
 import { QuickStartOutput } from '../types';
-import WizardTaskBase from './WizardTaskBase';
+import QuickStartTaskBase from './QuickStartTaskBase';
 
 @Component
-export default class QuickStartDiscoveryTask extends WizardTaskBase<QuickStartOutput> {
+export default class QuickStartDiscoveryTask extends QuickStartTaskBase<QuickStartOutput> {
 
   get serviceId(): string {
     return this.config.serviceId;

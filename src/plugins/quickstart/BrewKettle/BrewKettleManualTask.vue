@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { BrewKettleConfig } from './types';
 
 
 @Component
-export default class BrewKettleManualTask extends WizardTaskBase<BrewKettleConfig> {
+export default class BrewKettleManualTask extends QuickStartTaskBase<BrewKettleConfig> {
   mounted(): void {
     this.executePrepared();
   }

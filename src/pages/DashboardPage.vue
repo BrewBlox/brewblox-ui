@@ -117,8 +117,8 @@ export default class DashboardPage extends Vue {
   showWizard(): void {
     createDialog({
       component: 'WizardDialog',
-      initialDashboard: this.dashboardId,
       initialWizard: 'WidgetWizardPicker',
+      activeDashboardId: this.dashboardId,
     });
   }
 }

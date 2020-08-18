@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/WidgetWizardBase';
+import WizardBase from '@/components/WizardBase';
 
 @Component
-export default class HermsWizard extends WidgetWizardBase {
+export default class HermsWizard extends WizardBase {
   initialTasks = [
     'QuickStartServiceTask',
     'QuickStartDiscoveryTask',

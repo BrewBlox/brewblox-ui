@@ -1,16 +1,16 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { createBlockWizardDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { PinChannel } from '../types';
 import { BrewKettleConfig } from './types';
 
 
 @Component
-export default class BrewKettleHardwareTask extends WizardTaskBase<BrewKettleConfig> {
+export default class BrewKettleHardwareTask extends QuickStartTaskBase<BrewKettleConfig> {
   kettlePin: PinChannel | null = null;
   kettleSensor: string | null = null;
 
@@ -34,10 +34,7 @@ export default class BrewKettleHardwareTask extends WizardTaskBase<BrewKettleCon
   }
 
   startBlockWizard(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.config.serviceId,
-    });
+    createBlockWizardDialog(this.config.serviceId);
   }
 
   taskDone(): void {

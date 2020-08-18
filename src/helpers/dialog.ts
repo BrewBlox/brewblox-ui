@@ -1,7 +1,7 @@
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
 
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress } from '@/plugins/spark/types';
+import { BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 
 export function createDialog(opts: QDialogOptions): DialogChainObject {
@@ -30,3 +30,21 @@ export function createBlockDialog(addr: BlockAddress | null, opts: BlockDialogOp
     getProps: () => props || {},
   });
 };
+
+export function createBlockWizardDialog(
+  serviceId: string | null,
+  compatible: ComparedBlockType = null
+): DialogChainObject {
+  return createDialog({
+    component: 'WizardDialog',
+    initialWizard: 'BlockWizard',
+    initialProps: {
+      compatible,
+      activeServiceId: serviceId,
+    },
+    // Prevent users from navigating to other wizards
+    // This allows clients to assume that DialogChainObject.onOk()
+    // will be called with a Block argument
+    showMenu: false,
+  });
+}

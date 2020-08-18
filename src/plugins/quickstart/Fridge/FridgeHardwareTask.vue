@@ -1,17 +1,17 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { createBlockWizardDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { FridgeConfig } from './types';
 
 
 @Component
-export default class FridgeHardwareTask extends WizardTaskBase<FridgeConfig> {
+export default class FridgeHardwareTask extends QuickStartTaskBase<FridgeConfig> {
   coolPin: PinChannel | null = null;
   heatPin: PinChannel | null = null;
   fridgeSensor: string | null = null;
@@ -43,10 +43,7 @@ export default class FridgeHardwareTask extends WizardTaskBase<FridgeConfig> {
   }
 
   startBlockWizard(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.config.serviceId,
-    });
+    createBlockWizardDialog(this.config.serviceId);
   }
 
   taskDone(): void {

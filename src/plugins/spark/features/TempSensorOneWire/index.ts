@@ -10,6 +10,7 @@ const typeName = BlockType.TempSensorOneWire;
 
 const block: BlockSpec<TempSensorOneWireBlock> = {
   id: typeName,
+  discovered: true,
   generate: serviceId => {
     const temp = serviceTemp(serviceId);
     return {

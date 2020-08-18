@@ -4,14 +4,14 @@ import { Component } from 'vue-property-decorator';
 import { bloxQty } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { GlycolConfig, GlycolOpts } from './types';
 
 @Component
-export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
+export default class GlycolSettingsTask extends QuickStartTaskBase<GlycolConfig> {
   beerSetting = bloxQty(20, 'degC');
   glycolSetting = bloxQty(4, 'degC');
 
