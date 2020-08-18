@@ -1,6 +1,7 @@
 import { VueConstructor } from 'vue';
 
 import { autoRegister, ref } from '@/helpers/component-ref';
+import { deserialize } from '@/plugins/spark/parse-object';
 import { featureStore, WatcherFeature, WidgetFeature } from '@/store/features';
 
 import { EventbusMessage } from '../eventbus';
@@ -40,7 +41,7 @@ export default {
       filter: (_, type) => type === AutomationEvent,
       onmessage: (msg: EventbusMessage) => {
         const data: AutomationEventData = msg.data;
-        automationStore.setEventData(data);
+        automationStore.setEventData(deserialize(data));
       },
     });
   },
