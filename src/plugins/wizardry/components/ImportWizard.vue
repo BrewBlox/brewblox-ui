@@ -6,10 +6,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import { ruleErrorFinder } from '@/helpers/functional';
 import { loadFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 import { dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
-
-import WizardBase from '../WizardBase';
 
 const widgetRules: InputRule[] = [
   v => v !== null || 'Widget must have a value',

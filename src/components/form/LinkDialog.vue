@@ -3,12 +3,12 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { bloxLink, JSLink, Link } from '@/helpers/bloxfield';
-import { createBlockWizardDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockOrIntfType, ComparedBlockType } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 
 @Component
@@ -78,10 +78,12 @@ export default class LinkDialog extends DialogBase {
   }
 
   createBlock(): void {
-    createBlockWizardDialog(this.serviceId, this.compatible ?? this.value.type)
-      .onOk((block: Block) => {
-        // Retain original type
-        this.local = bloxLink(block.id, this.value.type);
+    createBlockWizard(this.serviceId, this.compatible ?? this.value.type)
+      .onOk(({ block }) => {
+        if (block) {
+          // Retain original type
+          this.local = bloxLink(block.id, this.value.type);
+        }
       });
   }
 

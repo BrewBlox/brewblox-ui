@@ -35,6 +35,7 @@ export default class SidebarNavigator extends Vue {
   showWizard(): void {
     createDialog({
       component: 'WizardDialog',
+      parent: this, // Wizards may require access to router
       activeDashboardId: this.currentDashboard,
     });
   }

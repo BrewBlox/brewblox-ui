@@ -1,7 +1,8 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/WidgetWizardBase';
+import { tryCreateWidget } from '@/plugins/wizardry';
+import WidgetWizardBase from '@/plugins/wizardry/WidgetWizardBase';
 import { Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
@@ -70,9 +71,10 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       ?? {};
   }
 
-  createWidget(): void {
+  async createWidget(): Promise<void> {
     if (this.canCreate) {
-      this.makeWidget(this.widget);
+      const widget = await tryCreateWidget(this.widget);
+      this.done({ widget });
     }
   }
 }

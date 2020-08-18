@@ -5,7 +5,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { createBlockWizardDialog, createDialog } from '@/helpers/dialog';
+import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
@@ -20,6 +20,7 @@ import type {
   SparkService,
   SparkStatus,
 } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
@@ -301,8 +302,12 @@ export default class SparkPage extends Vue {
   }
 
   startCreateBlock(): void {
-    createBlockWizardDialog(this.serviceId)
-      .onOk(block => this.updateExpandedBlock(block.id, true));
+    createBlockWizard(this.serviceId)
+      .onOk(({ block }) => {
+        if (block) {
+          this.updateExpandedBlock(block.id, true);
+        }
+      });
   }
 
   get nodes(): RelationNode[] {

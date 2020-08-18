@@ -2,11 +2,11 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import { bloxLink, Link } from '@/helpers/bloxfield';
-import { createBlockWizardDialog } from '@/helpers/dialog';
 import { mutate, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
 import { isBlockDriven } from '@/plugins/spark/helpers';
 import { Block, BlockType, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -110,9 +110,9 @@ export default class ValveArray extends BlockCrudComponent {
   }
 
   createActuator(channel: EditableChannel): void {
-    createBlockWizardDialog(this.serviceId, BlockType.MotorValve)
-      .onOk(block => {
-        if (block.type === BlockType.MotorValve) {
+    createBlockWizard(this.serviceId, BlockType.MotorValve)
+      .onOk(({ block }) => {
+        if (block && block.type === BlockType.MotorValve) {
           this.saveDriver(channel, bloxLink(block.id, block.type));
         }
       });

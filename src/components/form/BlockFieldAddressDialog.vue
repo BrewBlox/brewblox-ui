@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createBlockDialog, createBlockWizardDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import {
@@ -13,6 +13,7 @@ import {
   BlockSpec,
   ComparedBlockType,
 } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 
 
 @Component
@@ -158,11 +159,13 @@ export default class BlockFieldAddressDialog extends DialogBase {
   }
 
   createBlock(): void {
-    createBlockWizardDialog(this.serviceId, this.validTypes)
-      .onOk((block: Block) => {
-        this.serviceLocal = block.serviceId;
-        this.blockLocal = block.id;
-        this.fieldLocal = null;
+    createBlockWizard(this.serviceId, this.validTypes)
+      .onOk(({ block }) => {
+        if (block) {
+          this.serviceLocal = block.serviceId;
+          this.blockLocal = block.id;
+          this.fieldLocal = null;
+        }
       });
   }
 

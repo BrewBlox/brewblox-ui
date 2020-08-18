@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import WizardBase from '@/components/WizardBase';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 
 import { WizardAction } from './QuickStartTaskBase';
 

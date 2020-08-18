@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createBlockWizardDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
+import { createBlockWizard } from '@/plugins/wizardry';
 
 import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { PinChannel } from '../types';
@@ -34,7 +34,7 @@ export default class BrewKettleHardwareTask extends QuickStartTaskBase<BrewKettl
   }
 
   startBlockWizard(): void {
-    createBlockWizardDialog(this.config.serviceId);
+    createBlockWizard(this.config.serviceId);
   }
 
   taskDone(): void {

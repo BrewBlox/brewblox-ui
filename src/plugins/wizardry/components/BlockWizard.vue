@@ -2,14 +2,14 @@
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
-import WizardBase from '@/components/WizardBase';
 import { createDialog } from '@/helpers/dialog';
 import { nullFilter, objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
-import notify from '@/helpers/notify';
 import { blockIdRules, discoverBlocks, isCompatible } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { Block, BlockCrud, BlockSpec, ComparedBlockType } from '@/plugins/spark/types';
-import { dashboardStore, Widget } from '@/store/dashboards';
+import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
+import WizardBase from '@/plugins/wizardry/WizardBase';
+import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 interface BlockWizardOption extends SelectOption {
@@ -26,7 +26,6 @@ export default class BlockWizard extends WizardBase {
   searchFilter = '';
 
   block: Block | null = null;
-  widget: Widget | null = null;
   activeDialog: any = null;
   discoveryActive = false;
 
@@ -107,7 +106,6 @@ export default class BlockWizard extends WizardBase {
 
   selectOpt(opt: BlockWizardOption | null): void {
     this.block = null;
-    this.widget = null;
 
     this.selected = opt;
     if (opt === null) {
@@ -124,14 +122,20 @@ export default class BlockWizard extends WizardBase {
   }
 
   ensureLocals(serviceId: string): { block: Block; widget: Widget } {
-    if (this.widget?.config.serviceId !== serviceId
-      || this.block?.serviceId !== serviceId) {
-      this.widget = null;
+    if (this.block?.serviceId !== serviceId) {
       this.block = null;
     }
 
     const featureId = this.selected!.value;
-    this.widget = this.widget ?? {
+
+    const block: Block = this.block ?? {
+      id: this.blockId,
+      serviceId,
+      type: featureId,
+      groups: [0],
+      data: sparkStore.spec({ type: featureId }).generate(this.serviceId),
+    };
+    const widget: Widget = {
       id: uid(),
       title: this.blockId,
       feature: featureId,
@@ -143,14 +147,11 @@ export default class BlockWizard extends WizardBase {
       },
       ...featureStore.widgetSize(featureId),
     };
-    this.block = this.block ?? {
-      id: this.blockId,
-      serviceId,
-      type: featureId,
-      groups: [0],
-      data: sparkStore.spec({ type: featureId }).generate(this.serviceId),
-    };
-    return { block: this.block, widget: this.widget };
+
+    this.block = block;
+    this.block.id = this.blockId;
+
+    return { block, widget };
   }
 
   configureBlock(): void {
@@ -162,7 +163,7 @@ export default class BlockWizard extends WizardBase {
       block,
       widget,
       isStoreWidget: false,
-      saveWidget: v => { this.widget = v; },
+      saveWidget: () => { },
       isStoreBlock: false,
       saveBlock: v => { this.block = v; },
       closeDialog: this.closeDialog,
@@ -191,32 +192,18 @@ export default class BlockWizard extends WizardBase {
       return;
     }
     const { block, widget } = this.ensureLocals(this.serviceId);
-    const featureTitle = featureStore.widgetTitle(block.type);
 
-    try {
-      await this.sparkModule.createBlock(block);
-      notify.done(`Created ${featureTitle} block '${block.id}'`);
-    }
-    catch (e) {
-      notify.error(`Failed to create block: ${e.toString()}`);
-      this.close();
-      return;
+    const createdBlock = await tryCreateBlock(block);
+
+    if (!createdBlock) {
+      return this.close();
     }
 
-    try {
-      if (this.dashboardId) {
-        await dashboardStore.appendWidget(widget);
-        notify.done(`Created ${featureTitle} widget '${widget.title}'`);
-      }
-    }
-    catch (e) {
-      notify.error(`Failed to create widget: ${e.toString()}`);
-      this.close();
-      return;
-    }
+    const createdWidget = this.dashboardId
+      ? await tryCreateWidget(widget)
+      : null;
 
-    // All done!
-    this.done(this.sparkModule.blockById(this.blockId));
+    return this.done({ block: createdBlock, widget: createdWidget });
   }
 }
 </script>
@@ -227,6 +214,7 @@ export default class BlockWizard extends WizardBase {
     :feature-id="selected.value"
     :active-dashboard-id="dashboardId"
     :active-service-id="serviceId"
+    optional-widget
     @title="setDialogTitle"
     @back="reset"
     @close="close"

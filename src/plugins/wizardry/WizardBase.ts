@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { WizardOutput } from './types';
+
 
 @Component
 export default class WizardBase extends Vue {
@@ -16,7 +18,7 @@ export default class WizardBase extends Vue {
     this.$emit('close');
   }
 
-  public done(output?: any): void {
+  public done(output: WizardOutput): void {
     this.$emit('done', output);
   }
 

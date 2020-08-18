@@ -1,9 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import WizardBase from '@/plugins/wizardry/WizardBase';
 import { featureStore, QuickStartFeature } from '@/store/features';
-
-import WizardBase from '../WizardBase';
 
 @Component
 export default class QuickStartWizardPicker extends WizardBase {

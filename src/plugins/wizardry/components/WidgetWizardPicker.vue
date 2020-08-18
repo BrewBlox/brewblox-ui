@@ -2,9 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 import { featureStore } from '@/store/features';
-
-import WizardBase from '../WizardBase';
 
 @Component
 export default class WidgetWizardPicker extends WizardBase {

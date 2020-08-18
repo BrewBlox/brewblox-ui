@@ -1,20 +1,20 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
-import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress, BlockConfig, BlockCrud, BlockType } from '@/plugins/spark/types';
+import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
+import WidgetWizardBase from '@/plugins/wizardry/WidgetWizardBase';
 import { Widget } from '@/store/dashboards';
 
 
 type CreateMode = 'new' | 'existing';
 
 @Component
-export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
+export default class BlockWidgetWizard extends WidgetWizardBase {
   readonly featureId!: BlockType;
 
   createMode: CreateMode = 'new';
@@ -169,13 +169,16 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
 
     if (this.createMode === 'new') {
       const { block, widget } = this.ensureLocalBlock(this.serviceId);
-      await sparkStore.createBlock(block);
-      notify.done(`Created ${this.featureTitle} block '${block.id}'`);
-      this.makeWidget(widget);
+      const createdBlock = await tryCreateBlock(block);
+      if (!createdBlock) {
+        return this.close();
+      }
+      const createdWidget = await tryCreateWidget<BlockConfig>(widget);
+      return this.done({ block: createdBlock, widget: createdWidget });
     }
 
     if (this.createMode === 'existing' && this.existingBlock) {
-      this.makeWidget({
+      const widget = await tryCreateWidget<BlockConfig>({
         id: this.widgetId,
         title: this.existingBlock.id,
         feature: this.featureId,
@@ -187,6 +190,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase<BlockConfig> {
         },
         ...this.defaultWidgetSize,
       });
+      return this.done({ widget, block: this.existingBlock });
     }
   }
 }

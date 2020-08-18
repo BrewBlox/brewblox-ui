@@ -5,9 +5,8 @@ import { Component } from 'vue-property-decorator';
 import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
-
-import WizardBase from '../WizardBase';
 
 @Component
 export default class DashboardWizard extends WizardBase {

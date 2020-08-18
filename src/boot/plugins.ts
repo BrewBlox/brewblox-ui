@@ -9,6 +9,7 @@ import history from '@/plugins/history';
 import quickstart from '@/plugins/quickstart';
 import spark from '@/plugins/spark';
 import startup from '@/plugins/startup';
+import wizardry from '@/plugins/wizardry';
 import store from '@/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
@@ -25,6 +26,7 @@ export default async ({ Vue }: { Vue: VueConstructor }): Promise<void> => {
 
   const plugins: PluginObject<any>[] = [
     PortalVue,
+    wizardry,
     automation,
     history,
     spark,

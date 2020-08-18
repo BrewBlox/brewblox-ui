@@ -1,16 +1,16 @@
 <script lang="ts">
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/WidgetWizardBase';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
-import { blockIdRules } from '@/plugins/spark/helpers';
+import { blockIdRules, discoverBlocks } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import type { Block } from '@/plugins/spark/types';
-import type { BlockConfig } from '@/plugins/spark/types';
+import type { Block, BlockConfig } from '@/plugins/spark/types';
+import { tryCreateWidget } from '@/plugins/wizardry';
+import WidgetWizardBase from '@/plugins/wizardry/WidgetWizardBase';
 
 
 @Component
-export default class BlockDiscoveryWizard extends WidgetWizardBase<BlockConfig> {
+export default class BlockDiscoveryWizard extends WidgetWizardBase {
   dashboardId: string | null = null;
   sparkModule: SparkServiceModule | null = null;
   block: Block | null = null;
@@ -18,6 +18,9 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase<BlockConfig> 
 
   @Prop({ type: String })
   public readonly activeServiceId!: string | null;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly optionalWidget!: boolean;
 
   @Watch('sparkModule')
   watchModule(newV: SparkServiceModule, oldV: SparkServiceModule): void {
@@ -78,27 +81,32 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase<BlockConfig> 
   }
 
   async discover(): Promise<void> {
-    if (!this.sparkModule) { return; }
     this.busy = true;
-    await this.sparkModule.fetchDiscoveredBlocks()
+    await discoverBlocks(this.activeServiceId)
       .finally(() => this.busy = false);
   }
 
-  async createWidget(): Promise<void> {
-    if (!this.block || !this.dashboardId) { return; }
+  async finish(): Promise<void> {
+    if (!this.block) { return; }
 
-    this.makeWidget({
-      id: this.widgetId,
-      title: this.block.id,
-      feature: this.featureId,
-      dashboard: this.dashboardId,
-      order: 0,
-      config: {
-        serviceId: this.block.serviceId,
-        blockId: this.block.id,
-      },
-      ...this.defaultWidgetSize,
-    });
+    if (this.dashboardId) {
+      const widget = await tryCreateWidget<BlockConfig>({
+        id: this.widgetId,
+        title: this.block.id,
+        feature: this.featureId,
+        dashboard: this.dashboardId,
+        order: 0,
+        config: {
+          serviceId: this.block.serviceId,
+          blockId: this.block.id,
+        },
+        ...this.defaultWidgetSize,
+      });
+      this.done({ widget, block: this.block });
+    }
+    else if (this.optionalWidget) {
+      this.done({ block: this.block });
+    }
   }
 }
 </script>
@@ -109,6 +117,8 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase<BlockConfig> 
       <DashboardSelect
         v-model="dashboardId"
         :default-value="activeDashboardId"
+        :label="optionalWidget ? 'Dashboard (optional)' : 'Dashboard'"
+        :clearable="optionalWidget"
       />
 
       <q-select
@@ -176,11 +186,20 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase<BlockConfig> 
         @click="discover"
       />
       <q-btn
+        v-if="optionalWidget"
+        :disable="!block"
+        unelevated
+        label="Done"
+        color="primary"
+        @click="finish"
+      />
+      <q-btn
+        v-else
         :disable="!block || !dashboardId"
         unelevated
         label="Create widget"
         color="primary"
-        @click="createWidget"
+        @click="finish"
       />
     </template>
   </ActionCardBody>

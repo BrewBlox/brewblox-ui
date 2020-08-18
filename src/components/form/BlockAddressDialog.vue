@@ -2,11 +2,12 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createBlockDialog, createBlockWizardDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block, BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 
 const asAddr = (v: Block | BlockAddress): BlockAddress => ({
@@ -112,9 +113,11 @@ export default class BlockAddressDialog extends DialogBase {
   }
 
   createBlock(): void {
-    createBlockWizardDialog(this.serviceId, this.compatible ?? this.value.type)
-      .onOk((block: Block) => {
-        this.local = asAddr(block);
+    createBlockWizard(this.serviceId, this.compatible ?? this.value.type)
+      .onOk(({ block }) => {
+        if (block) {
+          this.local = asAddr(block);
+        }
       });
   }
 
