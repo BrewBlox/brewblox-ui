@@ -39,8 +39,8 @@ import {
   BlockCrud,
   BlockField,
   BlockIntfType,
-  BlockOrIntfType,
   BlockType,
+  ComparedBlockType,
   DigitalActuatorBlock,
   DisplayOpts,
   DisplaySettingsBlock,
@@ -112,7 +112,7 @@ export const blockWidgetSelector = (ctor: VueConstructor, typeName: BlockType | 
   };
 };
 
-export const isCompatible = (type: string | null, intf: BlockOrIntfType | BlockOrIntfType[] | null): boolean => {
+export const isCompatible = (type: string | null, intf: ComparedBlockType): boolean => {
   if (!intf) { return true; }
   if (!type) { return false; }
   if (type === intf) { return true; };

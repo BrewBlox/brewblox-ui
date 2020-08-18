@@ -68,11 +68,9 @@ export class FeatureModule extends VuexModule {
   public widgetWizard(id: string): string | null {
     const feature = this.widgetById(id);
     if (feature === null) { return null; };
-    return isString(feature.wizard)
-      ? feature.wizard
-      : !!feature.wizard
-        ? 'GenericWidgetWizard'
-        : null;
+    if (isString(feature.wizard)) { return feature.wizard; };
+    if (feature.wizard === true) { return 'GenericWidgetWizard'; };
+    return null;
   }
 
   public widgetComponent(crud: Crud): ComponentResult {

@@ -3,12 +3,12 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { bloxLink, JSLink, Link } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockOrIntfType } from '@/plugins/spark/types';
+import { Block, BlockOrIntfType, ComparedBlockType } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 
 @Component
@@ -24,8 +24,8 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: String, default: 'Link' })
   public readonly label!: string;
 
-  @Prop({ type: Array, required: false })
-  readonly compatible!: BlockOrIntfType[];
+  @Prop({ type: [String, Array], required: false })
+  readonly compatible!: ComparedBlockType;
 
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
@@ -78,14 +78,12 @@ export default class LinkDialog extends DialogBase {
   }
 
   createBlock(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.serviceId,
-      filter: this.typeFilter,
-    })
-      .onOk((block: Block) => {
-        // Retain original type
-        this.local = bloxLink(block.id, this.value.type);
+    createBlockWizard(this.serviceId, this.compatible ?? this.value.type)
+      .onOk(({ block }) => {
+        if (block) {
+          // Retain original type
+          this.local = bloxLink(block.id, this.value.type);
+        }
       });
   }
 

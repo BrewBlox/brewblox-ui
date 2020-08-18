@@ -1,7 +1,8 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/WidgetWizardBase';
+import { tryCreateWidget } from '@/plugins/wizardry';
+import WidgetWizardBase from '@/plugins/wizardry/WidgetWizardBase';
 import { Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
@@ -10,6 +11,14 @@ import { Crud, featureStore, WidgetContext } from '@/store/features';
 export default class GenericWidgetWizard extends WidgetWizardBase {
   modalOpen = false;
   localConfig: any | null = null;
+  dashboardId: string | null = null;
+
+  @Prop({ type: String, required: false })
+  readonly activeDashboardId!: string;
+
+  created(): void {
+    this.widgetTitle = this.featureTitle;
+  }
 
   get widget(): Widget {
     if (this.localConfig === null) {
@@ -20,7 +29,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       title: this.widgetTitle,
       feature: this.featureId,
       order: 0,
-      dashboard: this.dashboardId,
+      dashboard: this.dashboardId ?? '',
       config: this.localConfig,
       ...this.defaultWidgetSize,
     };
@@ -51,31 +60,45 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     return featureStore.widgetComponent(this.crud).component;
   }
 
+  get canCreate(): boolean {
+    return !!this.dashboardId;
+  }
+
   emptyConfig(): any {
-    return featureStore.widgetById(this.featureId)?.generateConfig?.() ?? {};
+    return featureStore
+      .widgetById(this.featureId)
+      ?.generateConfig?.()
+      ?? {};
   }
 
-  createWidget(): void {
-    this.createItem(this.widget);
-  }
-
-  created(): void {
-    this.widgetTitle = this.featureTitle;
+  async createWidget(): Promise<void> {
+    if (this.canCreate) {
+      const widget = await tryCreateWidget(this.widget);
+      this.done({ widget });
+    }
   }
 }
 </script>
 
 <template>
   <ActionCardBody>
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <q-input v-model="widgetTitle" label="Widget name" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
+    <div class="widget-body column">
+      <DashboardSelect
+        v-model="dashboardId"
+        :default-value="activeDashboardId"
+      />
 
-    <q-dialog v-model="modalOpen" :maximized="$dense" no-backdrop-dismiss>
+      <q-input
+        v-model="widgetTitle"
+        label="Widget name"
+      />
+    </div>
+
+    <q-dialog
+      v-model="modalOpen"
+      :maximized="$dense"
+      no-backdrop-dismiss
+    >
       <component
         :is="widgetComponent"
         :initial-crud="crud"
@@ -87,8 +110,18 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
-      <q-btn unelevated label="Configure" @click="modalOpen = true" />
-      <q-btn unelevated label="Create" color="primary" @click="createWidget" />
+      <q-btn
+        unelevated
+        label="Configure"
+        @click="modalOpen = true"
+      />
+      <q-btn
+        :disable="!canCreate"
+        unelevated
+        label="Create"
+        color="primary"
+        @click="createWidget"
+      />
     </template>
   </ActionCardBody>
 </template>

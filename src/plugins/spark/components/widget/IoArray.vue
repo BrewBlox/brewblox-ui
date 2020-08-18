@@ -2,11 +2,11 @@
 import { Component } from 'vue-property-decorator';
 
 import { bloxLink, Link } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
 import { mutate, objectSorter, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
 import { isBlockDriven } from '@/plugins/spark/helpers';
 import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -23,8 +23,7 @@ interface IoArrayBlock extends Block {
 }
 
 @Component
-export default class IoArray extends BlockCrudComponent {
-  readonly block!: IoArrayBlock;
+export default class IoArray extends BlockCrudComponent<IoArrayBlock> {
 
   get claimedChannels(): { [channel: number]: string } {
     return this.sparkModule
@@ -96,13 +95,9 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   createActuator(channel: EditableChannel): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.serviceId,
-      initialFeature: BlockType.DigitalActuator,
-    })
-      .onOk((block: Block) => {
-        if (block.type === BlockType.DigitalActuator) {
+    createBlockWizard(this.serviceId, BlockType.DigitalActuator)
+      .onOk(({ block }) => {
+        if (block && block.type === BlockType.DigitalActuator) {
           this.saveDriver(channel, bloxLink(block.id, block.type));
         }
       });

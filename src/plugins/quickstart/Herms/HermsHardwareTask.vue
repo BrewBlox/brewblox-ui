@@ -1,17 +1,17 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
+import { createBlockWizard } from '@/plugins/wizardry';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { HermsConfig } from './types';
 
 
 @Component
-export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
+export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
   hltPin: PinChannel | null = null;
   bkPin: PinChannel | null = null;
   hltSensor: string | null = null;
@@ -54,10 +54,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
   }
 
   startBlockWizard(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.config.serviceId,
-    });
+    createBlockWizard(this.config.serviceId);
   }
 
   taskDone(): void {

@@ -4,14 +4,14 @@ import { Component } from 'vue-property-decorator';
 import { bloxQty } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { FermentConfig, FermentOpts } from './types';
 
 @Component
-export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
+export default class FermentSettingsTask extends QuickStartTaskBase<FermentConfig> {
   fridgeSetting = bloxQty(20, 'degC');
   beerSetting = bloxQty(20, 'degC');
   activeSetpoint: 'beer' | 'fridge' = 'beer';

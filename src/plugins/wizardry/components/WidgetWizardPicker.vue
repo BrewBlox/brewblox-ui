@@ -1,37 +1,18 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import { dashboardStore } from '@/store/dashboards';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 import { featureStore } from '@/store/features';
 
 @Component
-export default class WidgetWizardPicker extends Vue {
-
-  @Prop({ type: String, required: false })
-  readonly initialDashboard!: string;
-
+export default class WidgetWizardPicker extends WizardBase {
   feature: any = null;
   wizardActive = false;
   filter = '';
 
-  localChosenDashboardId = '';
-
-  get chosenDashboardId(): string {
-    return this.localChosenDashboardId
-      || this.initialDashboard
-      || dashboardStore.primaryDashboardId
-      || '';
-  }
-
-  set chosenDashboardId(id: string) {
-    this.localChosenDashboardId = id;
-  }
-
-  get dashboardOptions(): SelectOption[] {
-    return dashboardStore.dashboards
-      .map(dash => ({ label: dash.title, value: dash.id }));
+  mounted(): void {
+    this.reset();
   }
 
   get wizardOptions(): SelectOption[] {
@@ -55,35 +36,19 @@ export default class WidgetWizardPicker extends Vue {
   }
 
   get valuesOk(): boolean {
-    return !!this.chosenDashboardId && !!this.feature;
-  }
-
-  setTitle(title: string): void {
-    this.$emit('title', title);
+    return this.feature !== null;
   }
 
   reset(): void {
     this.wizardActive = false;
-    this.setTitle('Widget wizard');
+    this.setDialogTitle('Widget wizard');
     this.filter = '';
-  }
-
-  back(): void {
-    this.$emit('back');
-  }
-
-  close(): void {
-    this.$emit('close');
   }
 
   next(): void {
     if (!this.valuesOk) { return; }
     this.wizardActive = true;
-    this.setTitle(`${this.feature.label} wizard`);
-  }
-
-  mounted(): void {
-    this.reset();
+    this.setDialogTitle(`${this.feature.label} wizard`);
   }
 }
 </script>
@@ -93,21 +58,15 @@ export default class WidgetWizardPicker extends Vue {
     :is="feature.component"
     v-if="wizardActive"
     :feature-id="feature.value"
-    :dashboard-id="chosenDashboardId"
-    @title="setTitle"
+    :active-dashboard-id="activeDashboardId"
+    @title="setDialogTitle"
     @back="reset"
     @close="close"
+    @done="done"
   />
 
   <ActionCardBody v-else @keyup.ctrl.enter="next">
     <div class="widget-body column">
-      <q-select
-        v-model="chosenDashboardId"
-        :options="dashboardOptions"
-        label="Dashboard"
-        map-options
-        emit-value
-      />
       <q-input
         v-model="filter"
         placeholder="Search"

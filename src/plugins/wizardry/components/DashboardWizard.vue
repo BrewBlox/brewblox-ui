@@ -1,15 +1,15 @@
 <script lang="ts">
 import UrlSafeString from 'url-safe-string';
-import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
-export default class DashboardWizard extends Vue {
+export default class DashboardWizard extends WizardBase {
   idGenerator = new UrlSafeString();
   dashboardIdRules = dashboardIdRules();
   dashboardIdValidator = ruleValidator(dashboardIdRules());
@@ -17,12 +17,8 @@ export default class DashboardWizard extends Vue {
   chosenId: string | null = null;
   dashboardTitle = 'New dashboard';
 
-  back(): void {
-    this.$emit('back');
-  }
-
   mounted(): void {
-    this.$emit('title', 'Dashboard wizard');
+    this.setDialogTitle('Dashboard wizard');
   }
 
   get dashboardId(): string {
@@ -51,7 +47,7 @@ export default class DashboardWizard extends Vue {
 
     await dashboardStore.createDashboard(dashboard);
     notify.done(`Added dashboard ${dashboard.title}`);
-    this.$emit('close');
+    this.close();
   }
 }
 </script>

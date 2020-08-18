@@ -5,7 +5,7 @@ import { createDialog } from '@/helpers/dialog';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockValueImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockField, BlockFieldAddress } from '@/plugins/spark/types';
+import { BlockField, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
 
 import { OperatorOption, operatorSymbols } from './helpers';
 
@@ -17,7 +17,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
     return {
       id: this.impl.blockId,
       serviceId: this.impl.serviceId,
-      type: this.impl.blockType,
+      type: this.impl.blockType as BlockType,
       field: this.impl.key,
     };
   }

@@ -5,7 +5,7 @@ import { bloxQty, JSQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
@@ -13,7 +13,7 @@ import { HermsConfig, HermsOpts } from './types';
 
 
 @Component
-export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
+export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
   hltFullPowerDelta = bloxQty(2, 'delta_degC');
   bkFullPowerDelta = bloxQty(2, 'delta_degC');
   hltVolume = 25;

@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { GlycolConfig } from './types';
 
 
 @Component
-export default class GlycolManualTask extends WizardTaskBase<GlycolConfig> {
+export default class GlycolManualTask extends QuickStartTaskBase<GlycolConfig> {
   mounted(): void {
     this.executePrepared();
   }

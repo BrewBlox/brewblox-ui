@@ -1,12 +1,12 @@
 <script lang="ts">
 import isString from 'lodash/isString';
 import { uid } from 'quasar';
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { ruleErrorFinder } from '@/helpers/functional';
 import { loadFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 import { dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -21,7 +21,7 @@ const widgetRules: InputRule[] = [
 const errorFinder = ruleErrorFinder(widgetRules);
 
 @Component
-export default class ImportWizard extends Vue {
+export default class ImportWizard extends WizardBase {
   localChosenDashboardId = '';
   widget: Widget | null = null;
 
@@ -81,12 +81,8 @@ export default class ImportWizard extends Vue {
     }
   }
 
-  back(): void {
-    this.$emit('back');
-  }
-
   mounted(): void {
-    this.$emit('title', 'Import wizard');
+    this.setDialogTitle('Import wizard');
   }
 
   startImport(): void {

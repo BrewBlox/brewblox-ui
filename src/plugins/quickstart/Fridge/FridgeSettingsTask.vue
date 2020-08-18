@@ -4,14 +4,14 @@ import { Component } from 'vue-property-decorator';
 import { bloxQty } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { FridgeConfig, FridgeOpts } from './types';
 
 @Component
-export default class FridgeSettingsTask extends WizardTaskBase<FridgeConfig> {
+export default class FridgeSettingsTask extends QuickStartTaskBase<FridgeConfig> {
   fridgeSetting = bloxQty(20, 'degC');
 
   created(): void {

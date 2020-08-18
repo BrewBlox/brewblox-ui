@@ -33,7 +33,6 @@ export async function startCreateService(stub: ServiceStub, router: VueRouter): 
   }
 }
 
-
 export function startChangeServiceTitle(service: Service): void {
   createDialog({
     title: 'Change service Title',

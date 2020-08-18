@@ -19,7 +19,7 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
     return {
       id: this.impl.blockId,
       serviceId: this.impl.serviceId,
-      type: this.impl.blockType,
+      type: this.impl.blockType as BlockType,
     };
   }
 

@@ -2,10 +2,18 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockField, BlockFieldAddress, BlockOrIntfType, BlockSpec } from '@/plugins/spark/types';
+import {
+  Block,
+  BlockField,
+  BlockFieldAddress,
+  BlockOrIntfType,
+  BlockSpec,
+  ComparedBlockType,
+} from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 
 
 @Component
@@ -30,8 +38,8 @@ export default class BlockFieldAddressDialog extends DialogBase {
   @Prop({ type: Array, required: false })
   public readonly services!: string[];
 
-  @Prop({ type: Array, required: false })
-  readonly compatible!: BlockOrIntfType[];
+  @Prop({ type: [String, Array], required: false })
+  readonly compatible!: ComparedBlockType;
 
   @Prop({ type: Function, default: (() => true) })
   public readonly blockFilter!: ((block: Block) => boolean);
@@ -151,15 +159,13 @@ export default class BlockFieldAddressDialog extends DialogBase {
   }
 
   createBlock(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.serviceId,
-      filter: v => this.validTypes.includes(v),
-    })
-      .onOk((block: Block) => {
-        this.serviceLocal = block.serviceId;
-        this.blockLocal = block.id;
-        this.fieldLocal = null;
+    createBlockWizard(this.serviceId, this.validTypes)
+      .onOk(({ block }) => {
+        if (block) {
+          this.serviceLocal = block.serviceId;
+          this.blockLocal = block.id;
+          this.fieldLocal = null;
+        }
       });
   }
 

@@ -9,6 +9,7 @@ const typeName = BlockType.DS2413;
 
 const block: BlockSpec<DS2413Block> = {
   id: typeName,
+  discovered: true,
   generate: () => ({
     address: '',
     connected: false,

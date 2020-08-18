@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { RimsConfig } from './types';
 
 
 @Component
-export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
+export default class RimsManualTask extends QuickStartTaskBase<RimsConfig> {
   mounted(): void {
     this.executePrepared();
   }

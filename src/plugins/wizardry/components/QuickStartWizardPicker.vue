@@ -1,11 +1,11 @@
 <script lang="ts">
-import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import WizardBase from '@/plugins/wizardry/WizardBase';
 import { featureStore, QuickStartFeature } from '@/store/features';
 
 @Component
-export default class QuickStartWizardPicker extends Vue {
+export default class QuickStartWizardPicker extends WizardBase {
   model: QuickStartFeature | null = null;
   wizardActive = false;
 
@@ -18,28 +18,16 @@ export default class QuickStartWizardPicker extends Vue {
       .filter(qs => !!qs.component);
   }
 
-  setTitle(title: string): void {
-    this.$emit('title', title);
-  }
-
   reset(): void {
     this.wizardActive = false;
-    this.setTitle('Quick start wizard');
-  }
-
-  back(): void {
-    this.$emit('back');
-  }
-
-  close(): void {
-    this.$emit('close');
+    this.setDialogTitle('Quick start wizard');
   }
 
   next(): void {
     if (!this.model) {
       return;
     }
-    this.setTitle(`${this.model.title} wizard`);
+    this.setDialogTitle(`${this.model.title} wizard`);
     this.wizardActive = true;
   }
 }
@@ -51,7 +39,7 @@ export default class QuickStartWizardPicker extends Vue {
     :is="model.component"
     v-if="wizardActive"
     :feature-id="model.id"
-    @title="setTitle"
+    @title="setDialogTitle"
     @back="reset"
     @close="close"
   />
@@ -109,7 +97,13 @@ export default class QuickStartWizardPicker extends Vue {
     <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
-      <q-btn :disable="!model" unelevated label="Next" color="primary" @click="next" />
+      <q-btn
+        :disable="!model"
+        unelevated
+        label="Next"
+        color="primary"
+        @click="next"
+      />
     </template>
   </ActionCardBody>
 </template>

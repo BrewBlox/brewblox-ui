@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/WidgetWizardBase';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 
 @Component
-export default class BrewKettleWizard extends WidgetWizardBase {
+export default class BrewKettleWizard extends WizardBase {
   initialTasks = [
     'QuickStartServiceTask',
     'QuickStartDiscoveryTask',
