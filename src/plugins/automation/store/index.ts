@@ -97,7 +97,7 @@ export class AutomationModule extends VuexModule {
 
   @Action
   public async initProcess(template: AutomationTemplate): Promise<void> {
-    this.setProcess(await processApi.init(serialize(template)));
+    this.setProcess(await processApi.init(template));
   }
 
   @Action
