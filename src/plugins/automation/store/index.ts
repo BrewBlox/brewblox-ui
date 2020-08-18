@@ -1,7 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { extendById, filterById, findById } from '@/helpers/functional';
-import { serialize } from '@/plugins/spark/parse-object';
 import store from '@/store';
 
 import {
