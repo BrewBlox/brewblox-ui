@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { nullFilter, objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
-import { blockIdRules, discoverBlocks, isCompatible } from '@/plugins/spark/helpers';
+import { blockIdRules, isCompatible } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { Block, BlockCrud, BlockSpec, ComparedBlockType } from '@/plugins/spark/types';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
@@ -115,10 +115,6 @@ export default class BlockWizard extends WizardBase {
       this.blockId = suggestId(opt.label, this.validator);
       this.lastGeneratedId = this.blockId;
     }
-  }
-
-  async discover(): Promise<void> {
-    await discoverBlocks(this.serviceId);
   }
 
   ensureLocals(serviceId: string): { block: Block; widget: Widget } {
