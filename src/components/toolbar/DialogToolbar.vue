@@ -4,7 +4,11 @@ import { Component } from 'vue-property-decorator';
 
 @Component
 export default class DialogToolbar extends Vue {
+  dialogDepth = 1;
 
+  created(): void {
+    this.dialogDepth = document.getElementsByClassName('q-dialog').length;
+  }
 }
 </script>
 
@@ -18,7 +22,9 @@ export default class DialogToolbar extends Vue {
         flat
         round
         dense
-        icon="mdi-close-circle"
+        :icon="dialogDepth > 1
+          ? 'mdi-arrow-left-circle'
+          : 'mdi-close-circle'"
         class="close-button"
         @click="$emit('close')"
       />
