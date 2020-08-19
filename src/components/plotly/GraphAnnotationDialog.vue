@@ -25,7 +25,12 @@ export default class GraphAnnotationDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.ctrl.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"

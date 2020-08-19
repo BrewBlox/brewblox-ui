@@ -1,6 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import router from '@/router';
+
 import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { FridgeConfig } from './types';
 
@@ -12,7 +14,7 @@ export default class FridgeManualTask extends QuickStartTaskBase<FridgeConfig> {
   }
 
   done(): void {
-    this.$router.push(`/dashboard/${this.config.dashboardId}`);
+    router.push(`/dashboard/${this.config.dashboardId}`);
     this.finish();
   }
 }
