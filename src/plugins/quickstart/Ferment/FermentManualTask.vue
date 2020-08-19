@@ -1,6 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import router from '@/router';
+
 import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { FermentConfig } from './types';
 
@@ -12,7 +14,7 @@ export default class FermentManualTask extends QuickStartTaskBase<FermentConfig>
   }
 
   done(): void {
-    this.$router.push(`/dashboard/${this.config.dashboardId}`);
+    router.push(`/dashboard/${this.config.dashboardId}`);
     this.finish();
   }
 }

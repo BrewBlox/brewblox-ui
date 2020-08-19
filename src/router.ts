@@ -15,7 +15,7 @@ const router = new VueRouter({
     },
     {
       path: '/automation/:id?',
-      component: () => import('@/plugins/automation/AutomationEditor.vue'),
+      component: () => import('@/plugins/automation/AutomationLayout.vue'),
     },
     {
       path: '/',
