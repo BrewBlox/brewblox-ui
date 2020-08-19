@@ -84,21 +84,21 @@ export default class AnalogCompareEditDialog extends DialogBase {
           map-options
           emit-value
           label="Operator"
-          class="min-width-md col-auto"
+          class="col"
           @keyup.enter.exact.stop
         />
         <QuantityField
           v-if="isTemp"
           v-model="rhs"
           label="Target value"
-          class="col-grow"
+          class="col"
         />
         <InputField
           v-else
           v-model="rhs"
           type="number"
           label="Target value"
-          class="col-grow"
+          class="col"
         />
       </div>
       <template #actions>

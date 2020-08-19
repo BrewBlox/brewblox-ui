@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockField, BlockFieldAddress, ComparedBlockType } from '@/plugins/spark/types';
 
@@ -17,7 +17,7 @@ export default class BlockFieldAddressField extends FieldBase {
   @Prop({ type: String, default: 'Choose field' })
   public readonly title!: string;
 
-  @Prop({ type: String, default: 'Block field' })
+  @Prop({ type: String })
   public readonly label!: string;
 
   @Prop({ type: Array, required: false })
@@ -65,6 +65,10 @@ export default class BlockFieldAddressField extends FieldBase {
       && this.show;
   }
 
+  editBlock(): void {
+    createBlockDialog(this.block);
+  }
+
   openDialog(): void {
     if (this.readonly) {
       return;
@@ -92,13 +96,10 @@ export default class BlockFieldAddressField extends FieldBase {
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <div v-if="fieldSpec" class="q-gutter-y-xs">
       <div>
-        {{ value.serviceId }}
-      </div>
-      <div>
-        {{ value.id }}
-      </div>
-      <div>
         {{ fieldSpec.title }}
+      </div>
+      <div class="fade-4 text-italic">
+        {{ value.id }}
       </div>
     </div>
     <div v-else>
