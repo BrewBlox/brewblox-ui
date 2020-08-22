@@ -117,7 +117,9 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase {
       <DashboardSelect
         v-model="dashboardId"
         :default-value="activeDashboardId"
-        :label="optionalWidget ? 'Dashboard (optional)' : 'Dashboard'"
+        :label="optionalWidget
+          ? 'Show on dashboard (optional)'
+          : 'Dashboard'"
         :clearable="optionalWidget"
       />
 

@@ -228,7 +228,7 @@ export default class BlockWizard extends WizardBase {
 
       <DashboardSelect
         v-model="dashboardId"
-        label="Add to dashboard (optional)"
+        label="Show on dashboard (optional)"
         clearable
       />
 

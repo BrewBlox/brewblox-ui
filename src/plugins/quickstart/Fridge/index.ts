@@ -14,7 +14,7 @@ ref(FridgeManualTask);
 
 const feature: QuickStartFeature = {
   id: 'Fridge',
-  title: 'Beer-less fridge',
+  title: 'Non-fermentation fridge',
   component: ref(FridgeWizard),
 };
 
