@@ -10,7 +10,7 @@ const GRID_SIZE = 100;
 const GAP_SIZE = 20;
 const MIN_COLS = 2;
 const MIN_ROWS = 2;
-const MAX_TICK_DELTA = 5;
+const MAX_TICK_DELTA = 15;
 
 const zeroPos = (): XYPosition => ({ x: 0, y: 0 });
 
