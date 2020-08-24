@@ -6,6 +6,7 @@ import type {
   DigitalCompareOp,
   DigitalState,
   DisplayTempUnit,
+  DS2408ConnectMode,
   FilterChoice,
   LogicResult,
   ReferenceKind,
@@ -295,6 +296,7 @@ export interface DS2408Block extends Block {
     address: string;
     pins: Readonly<IoPin[]>;
     connected: Readonly<boolean>;
+    connectMode: DS2408ConnectMode;
   };
 }
 // #endregion DS2408

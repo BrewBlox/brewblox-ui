@@ -143,6 +143,13 @@ export const DisplayTempUnit = Enum(
 );
 // #endregion DisplayTempUnit
 
+// #region DS2408ConnectMode
+export const DS2408ConnectMode = Enum(
+  'CONNECT_VALVE',
+  'CONNECT_ACTUATOR',
+);
+// #endregion DS2408ConnectMode
+
 // #region ValveState
 export const ValveState = Enum(
   'VALVE_UNKNOWN',
@@ -225,6 +232,7 @@ export type AnalogCompareOp = Enum<typeof AnalogCompareOp>;
 export type LogicResult = Enum<typeof LogicResult>;
 export type ReferenceKind = Enum<typeof ReferenceKind>;
 export type DisplayTempUnit = Enum<typeof DisplayTempUnit>;
+export type DS2408ConnectMode = Enum<typeof DS2408ConnectMode>;
 export type ValveState = Enum<typeof ValveState>;
 export type FilterChoice = Enum<typeof FilterChoice>;
 export type Spark2Hardware = Enum<typeof Spark2Hardware>;
