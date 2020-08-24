@@ -6,6 +6,7 @@ import {
   BlockType,
   ChannelMapping,
   DigitalConstraintKey,
+  DisplayTempUnit,
   FilterChoice,
   UserUnitKey,
 } from './types';
@@ -56,13 +57,18 @@ export const constraintLabels = {
 };
 
 export const filterLabels: Record<FilterChoice, string> = {
-  'FILTER_NONE': 'No filtering',
-  'FILTER_15s': 'Filter 15s',
-  'FILTER_45s': 'Filter 45s',
-  'FILTER_90s': 'Filter 90s',
-  'FILTER_3m': 'Filter 3m',
-  'FILTER_10m': 'Filter 10m',
-  'FILTER_30m': 'Filter 30m',
+  [FilterChoice.FILTER_NONE]: 'No filtering',
+  [FilterChoice.FILTER_15s]: 'Filter 15s',
+  [FilterChoice.FILTER_45s]: 'Filter 45s',
+  [FilterChoice.FILTER_90s]: 'Filter 90s',
+  [FilterChoice.FILTER_3m]: 'Filter 3m',
+  [FilterChoice.FILTER_10m]: 'Filter 10m',
+  [FilterChoice.FILTER_30m]: 'Filter 30m',
+};
+
+export const displayTempLabels: Record<DisplayTempUnit, string> = {
+  [DisplayTempUnit.TEMP_CELSIUS]: 'Celsius',
+  [DisplayTempUnit.TEMP_FAHRENHEIT]: 'Fahrenheit',
 };
 
 export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
