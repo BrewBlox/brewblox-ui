@@ -199,7 +199,8 @@ export default class Troubleshooter extends Vue {
           <div class="col-break" />
           <div class="row q-gutter-x-sm q-pl-lg">
             <q-btn
-              flat
+              unelevated
+              color="primary"
               label="Update firmware"
               @click="startFirmwareUpdate"
             />
@@ -262,7 +263,7 @@ export default class Troubleshooter extends Vue {
         <span v-else-if="!status.isCompatibleFirmware">
           Your Spark service is not compatible with the firmware
           <br>
-          <b>Please run <span class="monospace">brewblox-ctl flash</span></b>
+          <b>Please update your firmware</b>
         </span>
         <!-- not valid -->
         <span v-else-if="!status.isValidDeviceId">
