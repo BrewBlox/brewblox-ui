@@ -2,13 +2,11 @@
 import { Component } from 'vue-property-decorator';
 
 import { isQuantity, Quantity } from '@/helpers/bloxfield';
-import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
   BlockAddress,
-  BlockIntfType,
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
