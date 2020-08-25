@@ -83,7 +83,7 @@ export default class DigitalStateButton extends Vue {
     :class="['shadow-1', $attrs.class]"
     dense
     unelevated
-    @click="toggle"
+    @click.native="toggle"
   >
     <template #off>
       <span class="row">

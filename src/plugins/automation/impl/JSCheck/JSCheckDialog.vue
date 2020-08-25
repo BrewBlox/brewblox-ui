@@ -147,7 +147,6 @@ export default class JSCheckDialog extends DialogBase {
         :limits="[200, Infinity]"
         class="fit"
         after-class="column"
-        @change="relayout"
       >
         <template #before>
           <div class="fit row no-scroll">

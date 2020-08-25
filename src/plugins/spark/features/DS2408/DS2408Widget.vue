@@ -19,8 +19,8 @@ export default class DS2408Widget
   mapping = DS2408StartChannels;
 
   connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
-    { label: 'Valve mode', value: DS2408ConnectMode.CONNECT_VALVE },
-    { label: 'Actuator mode', value: DS2408ConnectMode.CONNECT_ACTUATOR },
+    { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },
+    { label: '8 IO pins', value: DS2408ConnectMode.CONNECT_ACTUATOR },
   ];
 
   get valveMode(): boolean {
@@ -58,6 +58,10 @@ export default class DS2408Widget
           this.block.data.connectMode = mode;
           this.saveBlock();
         });
+    }
+    else {
+      this.block.data.connectMode = mode;
+      this.saveBlock();
     }
   }
 }
