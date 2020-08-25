@@ -1890,6 +1890,21 @@
         "flipped": false
       },
       {
+        "type": "SetpointDriverDisplay",
+        "id": "a6c17910-daaa-4551-ad5c-c07bb3dc1381",
+        "x": 3,
+        "y": 9,
+        "rotate": 0,
+        "settings": {
+          "setpointDriver": {
+            "id": "offset-1",
+            "serviceId": "sparkey",
+            "type": "ActuatorOffset"
+          }
+        },
+        "flipped": false
+      },
+      {
         "id": "cb0bdf02-5cd0-c29e-ddbf-6537762fbc77",
         "rotate": 0,
         "settings": {
