@@ -2,11 +2,13 @@
 import { Component } from 'vue-property-decorator';
 
 import { isQuantity, Quantity } from '@/helpers/bloxfield';
+import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
   BlockAddress,
+  BlockIntfType,
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
@@ -58,17 +60,29 @@ export default class SetpointDriverDisplay extends PartBase {
       : this.refBlock.data.value;
   }
 
-  get unit(): string {
-    if (!this.refBlock) {
+  get refIcon(): string {
+    if (!this.block || !this.refBlock) {
+      return '';
+    }
+    if (this.block.data.referenceSettingOrValue === ReferenceKind.REF_SETTING) {
+      return 'mdi-bullseye-arrow';
+    }
+    return isQuantity(this.refAmount)
+      ? 'mdi-thermometer'
+      : 'mdi-gauge';
+  }
+
+  get actualSetting(): number | null {
+    return this.block?.data.setting ?? null;
+  }
+
+  get actualUnit(): string {
+    if (!this.refBlock || this.actualSetting === null) {
       return '';
     }
     return isQuantity(this.refAmount)
       ? '°C' // Setpoint Driver is never converted to user units
       : '%';
-  }
-
-  get actualSetting(): number | null {
-    return this.block?.data.setting ?? null;
   }
 }
 </script>
@@ -83,6 +97,11 @@ export default class SetpointDriverDisplay extends PartBase {
       <UnlinkedIcon v-else-if="!block" class="col" />
       <div v-else class="col column q-ma-xs">
         <div class="col row q-gutter-x-xs">
+          <q-icon
+            :name="refIcon"
+            size="20px"
+            class="static col-auto"
+          />
           <q-space />
           <div class="col-auto text-bold">
             {{ refAmount | quantity }}
@@ -97,7 +116,7 @@ export default class SetpointDriverDisplay extends PartBase {
           <q-space />
           <div class="col-auto text-bold">
             {{ actualSetting | round(1) }}
-            {{ unit }}
+            {{ actualUnit }}
           </div>
         </div>
       </div>
