@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import { mutate, typeMatchFilter } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { Block, BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
+import { Block, BlockType, DigitalActuatorBlock, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
 
 @Component
 export default class DigitalActuatorWidget
@@ -55,6 +55,11 @@ export default class DigitalActuatorWidget
     }
     this.block.data.channel = pinId;
     await this.saveBlock();
+  }
+
+  filterDS2408(block: Block): boolean {
+    return block.type !== BlockType.DS2408
+      || (block as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
   }
 }
 </script>
@@ -111,6 +116,7 @@ export default class DigitalActuatorWidget
             :value="block.data.hwDevice"
             :service-id="serviceId"
             :creatable="false"
+            :block-filter="filterDS2408"
             title="Pin Array"
             label="Target Pin Array"
             class="col-grow"
