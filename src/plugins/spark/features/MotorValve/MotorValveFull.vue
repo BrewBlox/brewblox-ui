@@ -5,7 +5,7 @@ import { typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2408StartChannels } from '@/plugins/spark/getters';
-import { BlockType, DS2408Block, MotorValveBlock } from '@/plugins/spark/types';
+import { Block, BlockType, DS2408Block, DS2408ConnectMode, MotorValveBlock } from '@/plugins/spark/types';
 
 @Component
 export default class MotorValveFull
@@ -58,6 +58,11 @@ export default class MotorValveFull
     this.block.data.startChannel = pinId;
     await this.saveBlock();
   }
+
+  filterDS2408(block: Block): boolean {
+    return block.type !== BlockType.DS2408
+      || (block as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_VALVE;
+  }
 }
 </script>
 
@@ -70,6 +75,7 @@ export default class MotorValveFull
         :value="block.data.hwDevice"
         :service-id="serviceId"
         :creatable="false"
+        :block-filter="filterDS2408"
         title="Target DS2408 Chip"
         label="Target DS2408 Chip"
         class="col-grow"

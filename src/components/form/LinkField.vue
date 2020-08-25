@@ -27,6 +27,9 @@ export default class LinkField extends FieldBase {
   @Prop({ type: Array, required: false })
   readonly compatible!: string[];
 
+  @Prop({ type: Function })
+  public readonly blockFilter!: ((block: Block) => boolean);
+
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
@@ -75,6 +78,7 @@ export default class LinkField extends FieldBase {
       label: this.label,
       serviceId: this.serviceId,
       compatible: this.compatible,
+      blockFilter: this.blockFilter,
       clearable: this.clearable,
       creatable: this.creatable,
       configurable: this.configurable,

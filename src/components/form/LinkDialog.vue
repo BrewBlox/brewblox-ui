@@ -27,6 +27,9 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: [String, Array], required: false })
   readonly compatible!: ComparedBlockType;
 
+  @Prop({ type: Function, default: (() => true) })
+  public readonly blockFilter!: ((block: Block) => boolean);
+
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
 
@@ -47,6 +50,7 @@ export default class LinkDialog extends DialogBase {
   get linkOpts(): Link[] {
     return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => this.typeFilter(block.type))
+      .filter(this.blockFilter)
       .map(block => bloxLink(block.id, block.type))
       .sort(objectStringSorter('id'));
   }
