@@ -76,7 +76,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
   get createModeOpts(): SelectOption<CreateMode>[] {
     return [
       { label: 'Create new block', value: 'new' },
-      { label: 'Show existing block', value: 'existing' },
+      { label: 'Use existing block', value: 'existing' },
     ];
   }
 

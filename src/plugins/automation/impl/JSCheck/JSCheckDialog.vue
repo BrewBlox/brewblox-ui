@@ -105,7 +105,7 @@ export default class JSCheckDialog extends DialogBase {
         <Toolbar :title="title">
           <q-btn
             flat
-            label="Reset"
+            label="Discard changes"
             class="self-stretch"
             :color="dirty ? 'primary' : ''"
             @click="reset"

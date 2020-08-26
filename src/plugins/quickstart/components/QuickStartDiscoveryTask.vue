@@ -21,6 +21,10 @@ import QuickStartTaskBase from './QuickStartTaskBase';
 @Component
 export default class QuickStartDiscoveryTask extends QuickStartTaskBase<QuickStartOutput> {
 
+  mounted(): void {
+    this.discover();
+  }
+
   get serviceId(): string {
     return this.config.serviceId;
   }
@@ -53,8 +57,11 @@ export default class QuickStartDiscoveryTask extends QuickStartTaskBase<QuickSta
     return '';
   }
 
-  discover(): void {
-    discoverBlocks(this.serviceId);
+  async discover(): Promise<void> {
+    const discovered = await discoverBlocks(this.serviceId);
+    if (discovered.length) {
+      await this.sparkModule?.fetchBlocks();
+    }
   }
 
   show(block: Block): void {

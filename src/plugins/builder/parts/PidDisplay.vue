@@ -1,6 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxQty, prettyUnit } from '@/helpers/bloxfield';
+import { serviceTemp } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -64,11 +66,25 @@ export default class PidDisplay extends PartBase {
       && this.target.type === BlockType.ActuatorOffset;
   }
 
+  get tempUnit(): 'delta_degC' | 'delta_degF' {
+    return this.block !== null
+      && serviceTemp(this.block.serviceId) === 'degF'
+      ? 'delta_degF'
+      : 'delta_degC';
+  }
+
+  get convertedOutputSetting(): number | null {
+    return this.drivingOffset
+      && this.block !== null
+      ? bloxQty(this.outputSetting, 'delta_degC').to(this.tempUnit).value
+      : this.outputSetting;
+  }
+
   get suffix(): string {
     return this.outputSetting === null
       ? ''
       : this.drivingOffset
-        ? '°C'
+        ? prettyUnit(this.tempUnit)
         : '%';
   }
 
@@ -113,7 +129,7 @@ export default class PidDisplay extends PartBase {
           />
         </template>
         <div class="col text-bold">
-          {{ outputSetting | truncateRound }}
+          {{ convertedOutputSetting | truncateRound }}
           <small v-if="!!block">{{ suffix }}</small>
         </div>
       </template>

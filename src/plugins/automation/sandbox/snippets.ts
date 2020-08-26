@@ -77,12 +77,13 @@ export const generators: SnippetGenerator[] = [
       const value = bloxQty(20, 'degC').to(unit).round().value;
       const other = unit === 'degC' ? 'degF' : 'degC';
       callback('insert', [
+        '/* Quantity example */',
         `const temp = qty(${value}, '${unit}');`,
         "const duration = qty('5h 2m 38s');",
-        `temp.gt(${value}, '${other}');`,
-        `temp.lt(${value}, '${other}');`,
-        `temp.to('${other}');`,
-        "duration.eq(200, 'min');",
+        `const convertedTemp = temp.to('${other}');`,
+        `const tempIsMoreThanValue = temp.gt(${value}, '${other}');`,
+        `const tempIsLessThanValue = temp.lt(${value}, '${other}');`,
+        "const durationIsEqualToValue = duration.eq(200, 'min');",
         '',
       ]);
     },
@@ -128,7 +129,7 @@ export const generators: SnippetGenerator[] = [
   },
 
   {
-    desc: 'Save block field',
+    desc: 'Modify block field',
     run(callback) {
       createDialog({
         component: 'BlockFieldAddressDialog',
@@ -143,7 +144,7 @@ export const generators: SnippetGenerator[] = [
             : JSON.stringify(value);
 
           callback('insert', [
-            '',
+            '/* Modify block field */',
             `const block = getBlock('${addr.serviceId}', '${addr.id}');`,
             `print('current value', block.data.${addr.field});`,
             `block.data.${addr.field} = ${currentValue};${valueHint(addr)}`,
@@ -159,6 +160,7 @@ export const generators: SnippetGenerator[] = [
     run(callback) {
       const serviceId = sparkStore.serviceIds[0] ?? 'spark-one';
       callback('insert', [
+        '/* Send HTTP request */',
         `const resp = await axios.get('http://${serviceId}:5000/${serviceId}/_service/status');`,
         "print('response status', resp.status);",
         "print('response body', resp.data);",
@@ -193,6 +195,7 @@ export const generators: SnippetGenerator[] = [
       })
         .onOk((url: string) => {
           callback('insert', [
+            '/* Send Slack notification */',
             `await axios.post('${url}', {`,
             "  text: 'Hello world!',",
             '});',
@@ -205,15 +208,27 @@ export const generators: SnippetGenerator[] = [
   {
     desc: 'Publish history data (MQTT)',
     run(callback) {
-      callback('insert', [
-        "await publishEvent('brewcast/history/my-process', {",
-        "  key: 'my-process',",
-        '  data: { ',
-        "    'value[degC]': 12.6,",
-        '  },',
-        '});',
-        '',
-      ]);
+      createDialog({
+        component: 'InputDialog',
+        title: 'Key',
+        message: 'Data will be published under this name. For most services, the key is the service name',
+        rules: [
+          (v: string) => !!v || 'Key can not be empty',
+          (v: string) => /^\w+$/.test(v ?? '') || 'Key can only include letters, numbers, and _- characters',
+        ],
+      })
+        .onOk((key: string) => {
+          callback('insert', [
+            '/* Publish history data (MQTT) */',
+            `await publishEvent('brewcast/history/${key}', {`,
+            `  key: '${key}',`,
+            '  data: { ',
+            "    'value[degC]': 12.6,",
+            '  },',
+            '});',
+            '',
+          ]);
+        });
     },
   },
 ];

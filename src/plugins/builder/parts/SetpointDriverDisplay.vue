@@ -1,7 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { isQuantity, Quantity } from '@/helpers/bloxfield';
+import { bloxQty, isQuantity, Quantity } from '@/helpers/bloxfield';
+import { serviceTemp } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
@@ -70,17 +71,18 @@ export default class SetpointDriverDisplay extends PartBase {
       : 'mdi-gauge';
   }
 
-  get actualSetting(): number | null {
-    return this.block?.data.setting ?? null;
+  get tempUnit(): 'delta_degC' | 'delta_degF' {
+    return this.block !== null
+      && serviceTemp(this.block.serviceId) === 'degF'
+      ? 'delta_degF'
+      : 'delta_degC';
   }
 
-  get actualUnit(): string {
-    if (!this.refBlock || this.actualSetting === null) {
-      return '';
-    }
+  get actualSetting(): Quantity | number | null {
+    const v = this.block?.data.setting ?? null;
     return isQuantity(this.refAmount)
-      ? '°C' // Setpoint Driver is never converted to user units
-      : '%';
+      ? bloxQty(v, 'delta_degC').to(this.tempUnit)
+      : v;
   }
 }
 </script>
@@ -113,8 +115,7 @@ export default class SetpointDriverDisplay extends PartBase {
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ actualSetting | round(1) }}
-            {{ actualUnit }}
+            {{ actualSetting | quantity }}
           </div>
         </div>
       </div>

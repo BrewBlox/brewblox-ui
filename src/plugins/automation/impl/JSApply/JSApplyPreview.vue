@@ -67,7 +67,7 @@ export default class JSApplyPreview extends Vue {
         </div>
         <div class="text-italic fade-7">
           This is the return value from your code. <br>
-          If you have an async function, you must return its result.
+          It is ignored in automation actions.
         </div>
         <vue-json-pretty
           :data="result.returnValue"
