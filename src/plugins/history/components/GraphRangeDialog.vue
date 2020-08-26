@@ -43,24 +43,24 @@ export default class GraphRangeDialog extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <div class="row q-gutter-sm">
         <q-input
-          v-model="minV"
+          v-model.number="minV"
           label="Lower bound"
           inputmode="numeric"
           pattern="[0-9]*"
           autofocus
           class="col"
           :rules="[
-            v => v < maxV || 'Lower bound must be less than upper bound'
+            v => +v < maxV || 'Lower bound must be less than upper bound'
           ]"
         />
         <q-input
-          v-model="maxV"
+          v-model.number="maxV"
           label="Upper bound"
           inputmode="numeric"
           pattern="[0-9]*"
           class="col"
           :rules="[
-            v => v > minV || 'Upper bound must be more than lower bound'
+            v => +v > minV || 'Upper bound must be more than lower bound'
           ]"
         />
       </div>

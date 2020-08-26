@@ -2,8 +2,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
-
 @Component
 export default class DefaultLayout extends Vue {
   localDrawer: boolean | null = null;
@@ -28,20 +26,6 @@ export default class DefaultLayout extends Vue {
 
   get devMode() {
     return process.env.DEV;
-  }
-
-  showWizard(): void {
-    createDialog({
-      parent: this,
-      component: 'WizardDialog',
-    });
-  }
-
-  showPlugins(): void {
-    createDialog({
-      parent: this,
-      component: 'PluginDialog',
-    });
   }
 
   stopEditing(): void {
@@ -75,13 +59,6 @@ export default class DefaultLayout extends Vue {
       </q-scroll-area>
 
       <q-item class="col-auto">
-        <q-item-section class="col-auto">
-          <q-btn flat text-color="white" icon="mdi-puzzle" @click="showPlugins">
-            <q-tooltip>
-              Plugins
-            </q-tooltip>
-          </q-btn>
-        </q-item-section>
         <q-item-section class="col-auto">
           <q-btn-dropdown flat text-color="white" icon="mdi-bug-outline">
             <q-list bordered>

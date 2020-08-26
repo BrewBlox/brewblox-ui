@@ -26,7 +26,6 @@ export default class ProfilePresetAction
     createDialog({
       component: ProfilePresetDialog,
       value: this.block,
-      parent: this,
       title: 'Load/Save Profile',
     });
   }

@@ -1,21 +1,27 @@
+import { bloxLink } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { interfaceTypes } from '@/plugins/spark/getters';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
-import { ActuatorOffsetBlock, AnalogConstraintsObj, BlockSpec, OffsetSettingOrValue } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import {
+  ActuatorOffsetBlock,
+  AnalogConstraintsObj,
+  BlockIntfType,
+  BlockSpec,
+  BlockType,
+  ReferenceKind,
+} from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorOffsetWidget.vue';
 
-const typeName = 'ActuatorOffset';
+const typeName = BlockType.ActuatorOffset;
 
 const block: BlockSpec<ActuatorOffsetBlock> = {
   id: typeName,
   generate: () => ({
-    targetId: new Link(null, interfaceTypes.SetpointSensorPair),
-    drivenTargetId: new Link(null, interfaceTypes.SetpointSensorPair, true),
-    referenceId: new Link(null, interfaceTypes.SetpointSensorPair),
-    referenceSettingOrValue: OffsetSettingOrValue.SETTING,
+    targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+    drivenTargetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface, true),
+    referenceId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+    referenceSettingOrValue: ReferenceKind.REF_SETTING,
     desiredSetting: 0,
     setting: 0,
     value: 0,
@@ -28,6 +34,7 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
       title: 'Target offset',
       component: 'NumberValEdit',
       generate: () => 0,
+      valueHint: 'degC or %, depending on target',
     },
     {
       key: 'enabled',
@@ -39,13 +46,13 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+      generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'referenceId',
       title: 'Reference',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+      generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'constrainedBy',
@@ -57,16 +64,18 @@ const block: BlockSpec<ActuatorOffsetBlock> = {
     {
       key: 'setting',
       title: 'Target offset',
-      generate: () => 0,
       component: 'NumberValEdit',
+      generate: () => 0,
+      valueHint: 'number',
       readonly: true,
       graphed: true,
     },
     {
       key: 'value',
       title: 'Actual offset',
-      generate: () => 0,
       component: 'NumberValEdit',
+      generate: () => 0,
+      valueHint: 'number',
       readonly: true,
       graphed: true,
     },

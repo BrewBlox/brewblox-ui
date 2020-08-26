@@ -14,11 +14,11 @@ export default class ValEditBase extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly editable!: boolean;
 
-  @Prop({ type: Boolean, default: false })
-  public readonly lazy!: boolean;
-
   @Prop({ type: Boolean, default: true })
   public readonly dense!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly comparison!: boolean;
 
   @Prop({ required: true })
   public readonly value!: any;

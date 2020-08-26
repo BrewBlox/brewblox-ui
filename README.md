@@ -104,12 +104,15 @@ Notable new directories:
 Plugins may have their own `components/`, `helpers/`, and `store/` subdirectories. <br>
 New plugins should be declared in `src/boot/plugins.ts`.
 
-## Third-party plugins
+## Third-party plugins (discontinued)
 
-To allow runtime extension of the UI, users can load remote plugins.
-These will be loaded from user-defined URLs, and are otherwise treated as identical to plugins found in `src/plugins/`.
+~~To allow runtime extension of the UI, users can load remote plugins.~~
+~~These will be loaded from user-defined URLs, and are otherwise treated as identical to plugins found in `src/plugins/`.~~
 
-For an example of how to create a remote plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.
+~~For an example of how to create a remote plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.~~
+
+Third-party plugins are no longer supported.
+Implementation beyond proof-of-concept would require too much effort for a feature with no discernible demand.
 
 # Data sources
 
@@ -121,9 +124,9 @@ The full datastore state is loaded on startup. After that, two-way synchronizati
 
 ## [Eventbus](src/plugins/eventbus.ts)
 
-Backend services can continuously push data over the RabbitMQ eventbus. These events are then converted into Server Sent Events (SSE) by the [brewblox-emitter](https://github.com/BrewBlox/brewblox-emitter) service.
+Backend services intermittently push MQTT state events.
 
-The SSE connection is managed centrally, and plugins can subscribe to receive callbacks for events matching an identifier.
+Plugins can subscribe to receive callbacks for events matching an identifier.
 
 # Interfaces
 
@@ -149,4 +152,4 @@ Widgets and Services by themselves are nothing more than blobs of JSON data. In 
 
 Features are how the UI knows which components can be used to render data. Plugins can use their `install(Vue)` function to register features.
 
-As Features contain functions and references to Vue components, they are not persisted in the datastore.
+As features contain functions and references to Vue components, they are not persisted in the datastore.

@@ -34,6 +34,10 @@ export default class WidgetBase<ConfigT = any> extends Vue {
     this.activeMode = val;
   }
 
+  public toggleMode(): void {
+    this.activeMode = this.activeMode === 'Basic' ? 'Full' : 'Basic';
+  }
+
   public get widget(): Widget<ConfigT> {
     return this.crud.widget;
   }
@@ -71,7 +75,6 @@ export default class WidgetBase<ConfigT = any> extends Vue {
   public showDialog(args: Mapped<any> = {}): void {
     this.activeDialog = createDialog({
       component: 'WidgetDialog',
-      parent: this,
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
       ...args,
     });

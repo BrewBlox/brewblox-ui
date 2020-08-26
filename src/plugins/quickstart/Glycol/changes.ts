@@ -1,15 +1,15 @@
 import { uid } from 'quasar';
 
-import { durationMs } from '@/helpers/functional';
+import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { blockTypes } from '@/plugins/spark/getters';
-import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   Block,
+  BlockType,
   DigitalActuatorBlock,
   DigitalState,
   FilterChoice,
@@ -18,7 +18,6 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { Link, Temp, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -57,76 +56,76 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       // Setpoint
       {
         id: names.beerSetpoint,
-        type: 'SetpointSensorPair',
+        type: BlockType.SetpointSensorPair,
         serviceId,
         groups,
         data: {
-          sensorId: new Link(names.beerSensor),
+          sensorId: bloxLink(names.beerSensor),
           storedSetting: beerSetting,
           settingEnabled: true,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
-          filter: FilterChoice.FILT_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          setting: bloxQty(null, 'degC'),
+          value: bloxQty(null, 'degC'),
+          valueUnfiltered: bloxQty(null, 'degC'),
+          filter: FilterChoice.FILTER_15s,
+          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
       // Profile
       {
         id: names.beerProfile,
-        type: 'SetpointProfile',
+        type: BlockType.SetpointProfile,
         serviceId,
         groups,
         data: {
           start: new Date().getTime() / 1000,
           enabled: false,
-          targetId: new Link(names.beerSetpoint),
+          targetId: bloxLink(names.beerSetpoint),
           points: [
             { time: 0, temperature: beerSetting },
             { time: durationMs('7d') / 1000, temperature: beerSetting },
             { time: durationMs('10d') / 1000, temperature: beerSetting.copy(beerSetting.value! + 3) },
           ],
-          drivenTargetId: new Link(null),
+          drivenTargetId: bloxLink(null),
         },
       },
       // Mutex
       {
         id: names.mutex,
-        type: 'Mutex',
+        type: BlockType.Mutex,
         serviceId,
         groups,
         data: {
-          differentActuatorWait: new Time(5, 'min'),
-          waitRemaining: new Time(),
+          differentActuatorWait: bloxQty('5m'),
+          waitRemaining: bloxQty('0s'),
         },
       },
       // Digital Actuators
       {
         id: names.coolAct,
-        type: 'DigitalActuator',
+        type: BlockType.DigitalActuator,
         serviceId,
         groups,
         data: {
-          hwDevice: new Link(config.coolPin.arrayId),
+          hwDevice: bloxLink(config.coolPin.arrayId),
           channel: config.coolPin.pinId,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: DigitalState.STATE_INACTIVE,
+          state: DigitalState.STATE_INACTIVE,
           constrainedBy: {
             constraints: [
               {
                 mutexed: {
-                  mutexId: new Link(names.mutex, 'Mutex'),
-                  extraHoldTime: new Time(15, 'min'),
+                  mutexId: bloxLink(names.mutex),
+                  extraHoldTime: bloxQty('15m'),
                   hasCustomHoldTime: true,
                   hasLock: false,
                 },
-                remaining: new Time(),
+                remaining: bloxQty('0s'),
               },
               {
-                minOn: new Time(5, 's'),
-                remaining: new Time(),
+                minOn: bloxQty('5s'),
+                remaining: bloxQty('0s'),
               },
             ],
           },
@@ -134,25 +133,25 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       },
       {
         id: names.heatAct,
-        type: 'DigitalActuator',
+        type: BlockType.DigitalActuator,
         serviceId,
         groups,
         data: {
-          hwDevice: new Link(config.heatPin ? config.heatPin!.arrayId : null),
+          hwDevice: bloxLink(config.heatPin ? config.heatPin!.arrayId : null),
           channel: config.heatPin ? config.heatPin!.pinId : 0,
           invert: false,
-          desiredState: DigitalState.Inactive,
-          state: DigitalState.Inactive,
+          desiredState: DigitalState.STATE_INACTIVE,
+          state: DigitalState.STATE_INACTIVE,
           constrainedBy: {
             constraints: [
               {
                 mutexed: {
-                  mutexId: new Link(names.mutex, 'Mutex'),
-                  extraHoldTime: new Time(15, 'min'),
+                  mutexId: bloxLink(names.mutex),
+                  extraHoldTime: bloxQty('15m'),
                   hasCustomHoldTime: true,
                   hasLock: false,
                 },
-                remaining: new Time(),
+                remaining: bloxQty('0s'),
               },
             ],
           },
@@ -161,14 +160,14 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       // PWM
       {
         id: names.coolPwm,
-        type: 'ActuatorPwm',
+        type: BlockType.ActuatorPwm,
         serviceId,
         groups,
         data: {
           enabled: true,
-          period: new Time(10, 'min'),
-          actuatorId: new Link(names.coolAct),
-          drivenActuatorId: new Link(null),
+          period: bloxQty('10m'),
+          actuatorId: bloxLink(names.coolAct),
+          drivenActuatorId: bloxLink(null),
           setting: 0,
           desiredSetting: 0,
           value: 0,
@@ -177,14 +176,14 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       },
       {
         id: names.heatPwm,
-        type: 'ActuatorPwm',
+        type: BlockType.ActuatorPwm,
         serviceId,
         groups,
         data: {
           enabled: true,
-          period: new Time(10, 's'),
-          actuatorId: new Link(names.heatAct),
-          drivenActuatorId: new Link(null),
+          period: bloxQty('10s'),
+          actuatorId: bloxLink(names.heatAct),
+          drivenActuatorId: bloxLink(null),
           setting: 0,
           desiredSetting: 0,
           value: 0,
@@ -193,32 +192,32 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
       },
       {
         id: names.coolPid,
-        type: 'Pid',
+        type: BlockType.Pid,
         serviceId,
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: new Unit(-20, '1/degC'),
-          ti: new Time(2, 'hour'),
-          td: new Time(10, 'min'),
+          kp: bloxQty(-20, '1/degC'),
+          ti: bloxQty('2h'),
+          td: bloxQty('10m'),
           enabled: true,
-          inputId: new Link(names.beerSetpoint),
-          outputId: new Link(names.coolPwm),
+          inputId: bloxLink(names.beerSetpoint),
+          outputId: bloxLink(names.coolPwm),
         },
       },
       {
         id: names.heatPid,
-        type: 'Pid',
+        type: BlockType.Pid,
         serviceId,
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: new Unit(100, '1/degC'),
-          ti: new Time(2, 'hour'),
-          td: new Time(10, 'min'),
+          kp: bloxQty(100, '1/degC'),
+          ti: bloxQty('2h'),
+          td: bloxQty('10m'),
           enabled: true,
-          inputId: new Link(names.beerSetpoint),
-          outputId: new Link(names.heatPwm),
+          inputId: bloxLink(names.beerSetpoint),
+          outputId: bloxLink(names.heatPwm),
         },
       },
     ];
@@ -233,37 +232,37 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         // Setpoint
         {
           id: names.glycolSetpoint,
-          type: 'SetpointSensorPair',
+          type: BlockType.SetpointSensorPair,
           serviceId,
           groups,
           data: {
-            sensorId: new Link(names.glycolSensor),
+            sensorId: bloxLink(names.glycolSensor),
             storedSetting: glycolSetting,
             settingEnabled: true,
-            setting: new Unit(null, 'degC'),
-            value: new Unit(null, 'degC'),
-            valueUnfiltered: new Unit(null, 'degC'),
-            filter: FilterChoice.FILT_15s,
-            filterThreshold: new Unit(5, 'delta_degC'),
+            setting: bloxQty(null, 'degC'),
+            value: bloxQty(null, 'degC'),
+            valueUnfiltered: bloxQty(null, 'degC'),
+            filter: FilterChoice.FILTER_15s,
+            filterThreshold: bloxQty(5, 'delta_degC'),
             resetFilter: false,
           },
         },
         // Digital actuator
         {
           id: names.glycolAct,
-          type: 'DigitalActuator',
+          type: BlockType.DigitalActuator,
           serviceId,
           groups,
           data: {
-            hwDevice: new Link(config.glycolPin!.arrayId),
+            hwDevice: bloxLink(config.glycolPin!.arrayId),
             channel: config.glycolPin!.pinId,
             invert: false,
-            desiredState: DigitalState.Inactive,
-            state: DigitalState.Inactive,
+            desiredState: DigitalState.STATE_INACTIVE,
+            state: DigitalState.STATE_INACTIVE,
             constrainedBy: {
               constraints: [
-                { minOff: new Time(5, 'min'), remaining: new Time() },
-                { minOn: new Time(3, 'min'), remaining: new Time() },
+                { minOff: bloxQty('5m'), remaining: bloxQty('0s') },
+                { minOn: bloxQty('3m'), remaining: bloxQty('0s') },
               ],
             },
           },
@@ -271,14 +270,14 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         // PWM
         {
           id: names.glycolPwm,
-          type: 'ActuatorPwm',
+          type: BlockType.ActuatorPwm,
           serviceId,
           groups,
           data: {
             enabled: true,
-            period: new Time(30, 'min'),
-            actuatorId: new Link(names.glycolAct),
-            drivenActuatorId: new Link(null),
+            period: bloxQty('30m'),
+            actuatorId: bloxLink(names.glycolAct),
+            drivenActuatorId: bloxLink(null),
             setting: 0,
             desiredSetting: 0,
             value: 0,
@@ -287,17 +286,17 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         },
         {
           id: names.glycolPid,
-          type: 'Pid',
+          type: BlockType.Pid,
           serviceId,
           groups,
           data: {
             ...pidDefaults(config.serviceId),
-            kp: new Unit(-20, '1/degC'),
-            ti: new Time(2, 'hour'),
-            td: new Time(5, 'min'),
+            kp: bloxQty(-20, '1/degC'),
+            ti: bloxQty('2h'),
+            td: bloxQty('5m'),
             enabled: true,
-            inputId: new Link(names.glycolSetpoint),
-            outputId: new Link(names.glycolPwm),
+            inputId: bloxLink(names.glycolSetpoint),
+            outputId: bloxLink(names.glycolPwm),
           },
         },
       ];
@@ -395,19 +394,21 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
       serviceId,
       changeIdMigrated: true,
       serviceIdMigrated: true,
-      actions: serialize([
+      actions: [
         {
           name: 'Beer temperature control OFF',
           id: uid(),
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.beerSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.beerProfile,
               data: { enabled: false },
               confirmed: {},
@@ -434,7 +435,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
               blockId: names.beerSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: new Temp(20.0, 'degC').convert(userTemp),
+                storedSetting: bloxQty(20, 'degC').to(userTemp),
               },
               confirmed: {
                 storedSetting: true,
@@ -451,12 +452,14 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.beerSetpoint,
               data: { settingEnabled: true },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.beerProfile,
               data: { enabled: true, start: new Date().getTime() / 1000 },
               confirmed: { start: true },
@@ -466,12 +469,12 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
               BlockChange<SetpointProfileBlock>,
             ],
         },
-      ]),
+      ],
     },
   };
 
   const profile: Widget = {
-    ...createWidget(names.beerProfile, blockTypes.SetpointProfile),
+    ...createWidget(names.beerProfile, BlockType.SetpointProfile),
     cols: 6,
     rows: 4,
     pinnedPosition: { x: 5, y: 6 },

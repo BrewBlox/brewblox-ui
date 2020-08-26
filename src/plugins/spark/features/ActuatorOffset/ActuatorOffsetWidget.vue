@@ -1,27 +1,47 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { Link } from '@/helpers/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { ActuatorOffsetBlock, OffsetSettingOrValue } from '@/plugins/spark/types';
+import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
 
 @Component
 export default class ActuatorOffsetWidget
   extends BlockWidgetBase<ActuatorOffsetBlock> {
 
-  referenceOpts: SelectOption<OffsetSettingOrValue>[] = [
-    { label: 'Setting', value: OffsetSettingOrValue.SETTING },
-    { label: 'Measured', value: OffsetSettingOrValue.VALUE },
+  referenceOpts: SelectOption<ReferenceKind>[] = [
+    { label: 'Setting', value: ReferenceKind.REF_SETTING },
+    { label: 'Measured', value: ReferenceKind.REF_VALUE },
   ]
 
   enable(): void {
     this.block.data.enabled = true;
     this.saveBlock();
   }
+
+  get target(): Link {
+    return this.block.data.targetId;
+  }
+
+  get reference(): Link {
+    return this.block.data.referenceId;
+  }
+
+  get refKind(): string {
+    return this.referenceOpts
+      .find(v => v.value === this.block.data.referenceSettingOrValue)
+      ?.label
+      ?? '???';
+  }
 }
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog" v-bind="{context}">
+  <GraphCardWrapper
+    :show="inDialog"
+    v-bind="{context}"
+    @dblclick="toggleMode"
+  >
     <template #graph>
       <HistoryGraph
         :graph-id="widget.id"
@@ -39,34 +59,28 @@ export default class ActuatorOffsetWidget
     </template>
 
     <div class="widget-md">
-      <CardWarning v-if="!block.data.targetId.id">
+      <CardWarning v-if="!target.id">
         <template #message>
           Setpoint Driver has no target Setpoint configured.
         </template>
       </CardWarning>
-      <CardWarning v-else-if="!block.data.referenceId.id">
+      <CardWarning v-else-if="!reference.id">
         <template #message>
           Setpoint Driver has no reference Setpoint configured.
         </template>
       </CardWarning>
-      <CardWarning v-else-if="!block.data.enabled">
-        <template #message>
-          <span>
-            Setpoint Driver is disabled:
-            <i>{{ block.data.targetId }}</i> will not be changed.
-          </span>
-        </template>
-        <template #actions>
-          <q-btn text-color="white" flat label="Enable" @click="enable" />
-        </template>
-      </CardWarning>
       <BlockEnableToggle
-        v-else
         :crud="crud"
-        :text-enabled="`Offset is enabled: ${block.data.targetId} will be offset from the
-          ${block.data.referenceSettingOrValue == 0 ? 'setting' : 'value'} of ${block.data.referenceId}.`"
-        :text-disabled="`Offset is disabled: ${block.data.targetId} will not be changed.`"
-      />
+        :hide-enabled="mode === 'Basic'"
+      >
+        <template #enabled>
+          Driver is enabled and driving <i>{{ target | link }}</i>, based on the
+          {{ refKind }} of <i>{{ reference | link }}</i>.
+        </template>
+        <template #disabled>
+          Driver is disabled and not driving <i>{{ target | link }}</i>.
+        </template>
+      </BlockEnableToggle>
 
       <div class="widget-body row">
         <InputField

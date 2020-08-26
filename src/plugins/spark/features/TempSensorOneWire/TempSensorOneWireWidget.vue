@@ -30,7 +30,11 @@ export default class TempSensorOneWireWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog" v-bind="{context}">
+  <GraphCardWrapper
+    :show="inDialog"
+    v-bind="{context}"
+    @dblclick="toggleMode"
+  >
     <template #graph>
       <HistoryGraph
         :graph-id="widget.id"
@@ -66,7 +70,7 @@ export default class TempSensorOneWireWidget
             color="green-3"
             class="col-auto"
           />
-          <UnitField
+          <QuantityField
             :value="block.data.value"
             readonly
             tag="big"
@@ -79,7 +83,7 @@ export default class TempSensorOneWireWidget
         <q-separator inset />
 
         <div class="widget-body row">
-          <UnitField
+          <QuantityField
             :value="block.data.offset"
             title="Offset"
             label="Offset"

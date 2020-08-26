@@ -1,23 +1,22 @@
+import { bloxLink } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { interfaceTypes } from '@/plugins/spark/getters';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { ActuatorLogicBlock, BlockSpec, EvalResult } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { blockWidgetSelector, enumHint } from '@/plugins/spark/helpers';
+import { ActuatorLogicBlock, BlockIntfType, BlockSpec, BlockType, LogicResult } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorLogicWidget.vue';
 import { nonErrorResults } from './getters';
 
-const typeName = 'ActuatorLogic';
+const typeName = BlockType.ActuatorLogic;
 
 const block: BlockSpec<ActuatorLogicBlock> = {
   id: typeName,
   generate: () => ({
     enabled: true,
-    result: EvalResult.EMPTY,
+    result: LogicResult.RESULT_EMPTY,
     errorPos: 0,
-    targetId: new Link(null, interfaceTypes.ActuatorDigital),
-    drivenTargetId: new Link(null, interfaceTypes.ActuatorDigital, true),
+    targetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
+    drivenTargetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface, true),
     analog: [],
     digital: [],
     expression: '',
@@ -28,7 +27,8 @@ const block: BlockSpec<ActuatorLogicBlock> = {
       title: 'Result',
       component: 'EnumValEdit',
       componentProps: { options: nonErrorResults },
-      generate: () => EvalResult.EMPTY,
+      generate: () => LogicResult.RESULT_EMPTY,
+      valueHint: enumHint(LogicResult),
       readonly: true,
       graphed: true,
     },

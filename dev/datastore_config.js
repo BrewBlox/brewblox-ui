@@ -1,7 +1,5 @@
 const axios = require('axios');
-const { host, retry } = require('./utils');
-
-const datastore = `${host}/datastore`;
+const { datastore, retry } = require('./utils');
 
 async function run() {
   await retry('Waiting for datastore', () => axios.get(datastore));

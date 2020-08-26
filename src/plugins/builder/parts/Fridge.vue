@@ -11,7 +11,7 @@ export default class Fridge extends PartBase {
   }
 
   get shelfY(): number {
-    return this.part.settings.dividerY || 1;
+    return this.part.settings.shelfY || 1;
   }
 }
 </script>

@@ -1,11 +1,11 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxQty, JSQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
-import { Temp, Unit } from '@/plugins/spark/units';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
@@ -13,14 +13,14 @@ import { HermsConfig, HermsOpts } from './types';
 
 
 @Component
-export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
-  hltFullPowerDelta = new Temp(2, 'delta_degC');
-  bkFullPowerDelta = new Temp(2, 'delta_degC');
+export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
+  hltFullPowerDelta = bloxQty(2, 'delta_degC');
+  bkFullPowerDelta = bloxQty(2, 'delta_degC');
   hltVolume = 25;
   mashVolume = 25;
-  driverMax = new Temp(10, 'delta_degC');
-  mashTarget = new Temp(67, 'degC');
-  mashActual = new Temp(65, 'degC');
+  driverMax = bloxQty(10, 'delta_degC');
+  mashTarget = bloxQty(67, 'degC');
+  mashActual = bloxQty(65, 'degC');
 
   volumeRules: InputRule[] = [
     v => v !== 0 || 'Volume can\'t be 0',
@@ -28,43 +28,43 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
 
   created(): void {
     const deltaTemp = `delta_${this.userTemp}`;
-    this.hltFullPowerDelta = this.hltFullPowerDelta.convert(deltaTemp);
-    this.bkFullPowerDelta = this.bkFullPowerDelta.convert(deltaTemp);
-    this.driverMax = this.driverMax.convert(deltaTemp);
+    this.hltFullPowerDelta = this.hltFullPowerDelta.to(deltaTemp);
+    this.bkFullPowerDelta = this.bkFullPowerDelta.to(deltaTemp);
+    this.driverMax = this.driverMax.to(deltaTemp);
 
-    this.mashTarget = this.mashTarget.convert(this.userTemp);
-    this.mashActual = this.mashActual.convert(this.userTemp);
+    this.mashTarget = this.mashTarget.to(this.userTemp);
+    this.mashActual = this.mashActual.to(this.userTemp);
   }
 
   get userTemp(): string {
     return sparkStore.moduleById(this.config.serviceId)!.units.Temp;
   }
 
-  get hltKp(): Unit {
-    return new Unit(100 / (this.hltFullPowerDelta.value || 2), `1/${this.userTemp}`);
+  get hltKp(): JSQuantity {
+    return bloxQty(100 / (this.hltFullPowerDelta.value || 2), `1/${this.userTemp}`);
   }
 
-  get bkKp(): Unit {
-    return new Unit(100 / (this.bkFullPowerDelta.value || 2), `1/${this.userTemp}`);
+  get bkKp(): JSQuantity {
+    return bloxQty(100 / (this.bkFullPowerDelta.value || 2), `1/${this.userTemp}`);
   }
 
-  get mtKp(): Unit {
-    return new Unit(this.mashVolume / (this.hltVolume || 1), `1/${this.userTemp}`);
+  get mtKp(): JSQuantity {
+    return bloxQty(this.mashVolume / (this.hltVolume || 1), `1/${this.userTemp}`);
   }
 
-  get hltSetting(): Unit {
+  get hltSetting(): JSQuantity {
     if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.driverMax.value) {
       const upperLimit = this.mashTarget.value + this.driverMax.value;
       const setting = this.mashTarget.value + (this.mashTarget.value - this.mashActual.value) * this.mtKp.value;
 
-      return new Unit(Math.min(upperLimit, setting), this.userTemp);
+      return bloxQty(Math.min(upperLimit, setting), this.userTemp);
     }
-    return new Unit(null, this.userTemp);
+    return bloxQty(null, this.userTemp);
   }
 
   editHLTDelta(): void {
     createDialog({
-      component: 'UnitDialog',
+      component: 'QuantityDialog',
       title: 'Full power delta',
       value: this.hltFullPowerDelta,
     })
@@ -120,7 +120,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           </q-item-label>
           <p>
             If the temperature is more than
-            <InlineUnitField v-model="hltFullPowerDelta" title="Full power delta" /> too low,
+            <InlineQuantityField v-model="hltFullPowerDelta" title="Full power delta" /> too low,
             run at full power (100%).
           </p>
           <p class="text-italic">
@@ -135,7 +135,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           </q-item-label>
           <p>
             If the temperature is more than
-            <InlineUnitField v-model="bkFullPowerDelta" title="Full power delta" /> too low,
+            <InlineQuantityField v-model="bkFullPowerDelta" title="Full power delta" /> too low,
             run at full power (100%).
           </p>
           <p class="text-italic">
@@ -194,7 +194,7 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           >
             <template #append>
               <small class="self-end q-pb-sm">
-                {{ driverMax.notation }}
+                {{ driverMax | prettyUnit }}
               </small>
             </template>
           </q-input>
@@ -206,9 +206,9 @@ export default class HermsSettingsTask extends WizardTaskBase<HermsConfig> {
           <p class="text-italic">
             Kp will be set to {{ mtKp }}.
             If your mash temperature is
-            <InlineUnitField v-model="mashActual" style="font-style: normal" />
+            <InlineQuantityField v-model="mashActual" style="font-style: normal" />
             and should be
-            <InlineUnitField v-model="mashTarget" style="font-style: normal" />
+            <InlineQuantityField v-model="mashTarget" style="font-style: normal" />
             the HLT will be set to
             {{ hltSetting }}.
           </p>

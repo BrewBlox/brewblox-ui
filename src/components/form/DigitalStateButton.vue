@@ -1,20 +1,23 @@
 <script lang="ts">
-import isNumber from 'lodash/isNumber';
+import { Enum } from 'typescript-string-enums';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { DigitalState } from '@/plugins/spark/types';
 
-const numberValues: Record<number, DigitalState> = {
-  0: DigitalState.Inactive,
-  1: DigitalState.Active,
-  2: DigitalState.Unknown,
+const alternatives: Record<number | string, DigitalState> = {
+  0: DigitalState.STATE_INACTIVE,
+  1: DigitalState.STATE_ACTIVE,
+  2: DigitalState.STATE_UNKNOWN,
+  Active: DigitalState.STATE_ACTIVE,
+  Inactive: DigitalState.STATE_INACTIVE,
+  Unknown: DigitalState.STATE_UNKNOWN,
 };
 
 @Component
 export default class DigitalStateButton extends Vue {
-  on: DigitalState = DigitalState.Active;
-  off: DigitalState = DigitalState.Inactive;
+  on: DigitalState = DigitalState.STATE_ACTIVE;
+  off: DigitalState = DigitalState.STATE_INACTIVE;
 
   commonOpts = {
     color: 'grey-9',
@@ -48,9 +51,9 @@ export default class DigitalStateButton extends Vue {
   readonly disable!: boolean;
 
   get state(): DigitalState {
-    return isNumber(this.value)
-      ? numberValues[this.value] ?? DigitalState.Unknown
-      : this.value;
+    return Enum.isType(DigitalState, this.value)
+      ? this.value
+      : alternatives[this.value] ?? DigitalState.STATE_UNKNOWN;
   }
 
   set state(v: DigitalState) {
@@ -66,8 +69,8 @@ export default class DigitalStateButton extends Vue {
       return;
     }
     this.state = this.state === this.off
-      ? DigitalState.Active
-      : DigitalState.Inactive;
+      ? DigitalState.STATE_ACTIVE
+      : DigitalState.STATE_INACTIVE;
   }
 }
 </script>
@@ -80,7 +83,7 @@ export default class DigitalStateButton extends Vue {
     :class="['shadow-1', $attrs.class]"
     dense
     unelevated
-    @click="toggle"
+    @click.native="toggle"
   >
     <template #off>
       <span class="row">

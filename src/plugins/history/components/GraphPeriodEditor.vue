@@ -5,7 +5,7 @@ import matches from 'lodash/matches';
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
-import { durationMs, durationString } from '@/helpers/functional';
+import { durationMs, durationString } from '@/helpers/duration';
 
 import { QueryConfig, QueryParams } from '../types';
 
@@ -153,7 +153,7 @@ export default class GraphPeriodEditor extends Vue {
         class="col-auto min-width-sm"
         @input="saveStart"
       />
-      <DurationInputField
+      <DurationField
         v-if="shownPeriod.duration"
         :value="config.params.duration"
         title="Duration"

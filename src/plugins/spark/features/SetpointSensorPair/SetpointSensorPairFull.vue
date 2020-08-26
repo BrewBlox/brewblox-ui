@@ -2,24 +2,16 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { Block, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { filterLabels } from '@/plugins/spark/getters';
+import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
-const FILTER_NAMES: Record<FilterChoice, string> = {
-  'FILT_NONE': 'No filtering',
-  'FILT_15s': 'Filter 15s',
-  'FILT_45s': 'Filter 45s',
-  'FILT_90s': 'Filter 90s',
-  'FILT_3m': 'Filter 3m',
-  'FILT_10m': 'Filter 10m',
-  'FILT_30m': 'Filter 30m',
-};
 
 @Component
 export default class SetpointSensorPairForm
   extends BlockCrudComponent<SetpointSensorPairBlock> {
 
   get filterOpts(): SelectOption[] {
-    return Object.entries(FILTER_NAMES)
+    return Object.entries(filterLabels)
       .map(([value, label]) => ({ label, value }));
   }
 
@@ -39,7 +31,7 @@ export default class SetpointSensorPairForm
     <slot name="warnings" />
 
     <div class="widget-body row">
-      <UnitField
+      <QuantityField
         :value="block.data.storedSetting"
         :readonly="isDriven"
         :class="{darkened: !block.data.settingEnabled}"
@@ -49,14 +41,14 @@ export default class SetpointSensorPairForm
         class="col-grow"
         @input="v => { block.data.storedSetting = v; saveBlock(); }"
       />
-      <UnitField
+      <QuantityField
         :value="block.data.value"
         label="Sensor"
         readonly
         tag="big"
         class="col-grow"
       />
-      <UnitField
+      <QuantityField
         :value="block.data.valueUnfiltered"
         label="Unfiltered sensor"
         readonly
@@ -85,7 +77,7 @@ export default class SetpointSensorPairForm
         class="col-grow"
         @input="v => { block.data.filter = v; saveBlock(); }"
       />
-      <UnitField
+      <QuantityField
         :value="block.data.filterThreshold"
         :html="true"
         title="Filter bypass threshold"
@@ -110,7 +102,7 @@ export default class SetpointSensorPairForm
             <q-tooltip>Bypass filter now</q-tooltip>
           </q-btn>
         </template>
-      </UnitField>
+      </QuantityField>
 
       <div class="col-break" />
 

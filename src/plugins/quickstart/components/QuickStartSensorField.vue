@@ -2,8 +2,10 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import { prettyQty } from '@/helpers/bloxfield';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockIntfType } from '@/plugins/spark/types';
 
 
 @Component
@@ -25,12 +27,13 @@ export default class QuickStartSensorField extends Vue {
 
   get opts(): string[] {
     return sparkStore.serviceBlocks(this.serviceId)
-      .filter(block => isCompatible(block.type, 'TempSensorInterface'))
+      .filter(block => isCompatible(block.type, BlockIntfType.TempSensorInterface))
       .map(block => block.id);
   }
 
   get sensorTemp(): string {
-    return sparkStore.blockById(this.serviceId, this.local)?.data.value.toString() ?? '';
+    const block = sparkStore.blockById(this.serviceId, this.local);
+    return prettyQty(block?.data.value);
   }
 }
 </script>

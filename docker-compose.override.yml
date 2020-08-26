@@ -13,16 +13,11 @@ services:
     labels:
       - traefik.http.routers.ui.rule=PathPrefix(`/ui`) || Path(`/`)
 
-  # mdns:
-  #   image: brewblox/brewblox-mdns:develop
-  #   network_mode: host
-
   # automation:
-  #   image: node
+  #   image: brewblox/brewblox-automation:develop
   #   volumes:
-  #     - "../brewblox-automation/:/app/"
-  #   working_dir: /app
-  #   command: "npm run watch"
+  #     - "../brewblox-automation:/app"
+  #   entrypoint: 'npm run watch'
 
   # sparksimulator:
   #   image: brewblox/firmware-simulator:feature-multiplatform

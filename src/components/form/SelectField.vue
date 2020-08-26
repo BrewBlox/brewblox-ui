@@ -63,7 +63,6 @@ export default class SelectField extends FieldBase {
       title: this.title,
       message: this.message,
       html: this.html,
-      parent: this,
       value: this.value,
       selectOptions: this.options,
       selectProps: {

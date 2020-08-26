@@ -9,10 +9,6 @@ export interface ReqBlockAddress {
   id: string;
 }
 
-/**
- * Generic status type for Automation types.
- * It is used by multiple types.
- */
 export type AutomationStatus =
   | 'Invalid'     // Configuration missing or invalid.
   | 'Created'     // In progress. Not yet evaluated.
@@ -37,13 +33,19 @@ type UUID = string;
  */
 export interface StoreObject {
   id: UUID;
+  _rev?: string; // CouchDB revision ID
+}
 
-  /**
-   * Is defined by the datastore when object is first created.
-   * Objects with a _rev can't be created.
-   * Objects without a _rev can't be saved or removed.
-   */
-  _rev?: string;
+export interface SandboxError {
+  message: string;
+  line: number;
+}
+
+export interface SandboxResult {
+  date: DateTime;
+  returnValue: any;
+  messages: any[];
+  error?: SandboxError;
 }
 
 /**
@@ -53,26 +55,21 @@ export interface BlockPatchImpl {
   type: 'BlockPatch';
 
   /**
-   * Part of the unique identifier for a block.
    * @nullable
    */
   serviceId: string | null;
 
   /**
-   * Part of the unique identifier for a block.
    * @nullable
    */
   blockId: string | null;
 
   /**
-   * Helps rendering and choosing blocks.
-   * Can either be a direct type, or an interface type.
    * @nullable
    */
   blockType: string | null;
 
   /**
-   * Data to be merged into the existing block.data object.
    * @nullable
    */
   data: object;
@@ -84,31 +81,19 @@ export interface BlockPatchImpl {
  */
 export interface TaskEditImpl {
   type: 'TaskEdit';
-
-  /**
-   * User-defined reference key.
-   * Not guaranteed to be unique.
-   * All tasks with this ref are edited.
-   */
   ref: string;
 
   /**
-   * Human readable title.
-   * Default or existing value is used if not set.
    * @nullable
    */
   title: string | null;
 
   /**
-   * Human readable message.
-   * Default or existing value is used if not set.
    * @nullable
    */
   message: string | null;
 
   /**
-   * Task status.
-   * Default or existing value is used if not set.
    * @nullable
    */
   status: AutomationStatus | null;
@@ -119,25 +104,17 @@ export interface TaskEditImpl {
  */
 export interface WebhookImpl {
   type: 'Webhook';
-
-  /**
-   * Absolute URL to endpoint. May include params.
-   */
   url: string;
-
-  /**
-   * HTTP method.
-   */
   method: Method;
-
-  /**
-   * HTTP headers.
-   */
   headers: Record<string, string>;
+  body: string;
+}
 
-  /**
-   * Request body.
-   */
+/**
+ * Evaluate user-defined code
+ */
+export interface JSApplyImpl {
+  type: 'JSApply';
   body: string;
 }
 
@@ -149,7 +126,6 @@ export interface TimeAbsoluteImpl {
   type: 'TimeAbsolute';
 
   /**
-   * Desired time.
    * @nullable
    */
   time: DateTime | null;
@@ -161,16 +137,8 @@ export interface TimeAbsoluteImpl {
  */
 export interface TimeElapsedImpl {
   type: 'TimeElapsed';
-
-  /**
-   * Used start point.
-   */
   start: 'Process' | 'Step';
-
-  /**
-   * In milliseconds.
-   */
-  duration: number;
+  duration: number; // milliseconds
 }
 
 /**
@@ -179,85 +147,25 @@ export interface TimeElapsedImpl {
  */
 export interface BlockValueImpl {
   type: 'BlockValue';
-
-  /**
-   * Part of the unique identifier for a block.
-   * @nullable
-   */
+  /** @nullable */
   serviceId: string | null;
-
-  /**
-   * Part of the unique identifier for a block.
-   * @nullable
-   */
+  /** @nullable */
   blockId: string | null;
-
-  /**
-   * Helps rendering and choosing blocks.
-   * Can either be a direct type, or an interface type.
-   * @nullable
-   */
+  /** @nullable */
   blockType: string | null;
-
-  /**
-   * Key of a top-level object within block.data.
-   * @nullable
-   */
+  /** @nullable */
   key: string | null;
-
-  /**
-   * Compared value.
-   */
   value: any;
-
-  /**
-   * Comparison operator.
-   * The left-hand value is current value (block.data[key]).
-   * The right-hand value is the condition value.
-   */
   operator: 'lt' | 'le' | 'eq' | 'ne' | 'ge' | 'gt';
 }
 
-export type ComparisonMiddleware =
-  | 'FloatValue'
-  | 'BlockFieldValue'
-  | 'OffsetValue'
-
-export interface ComparisonValue {
-  /**
-   * Only comparisons with the same valueType can be compared.
-   */
-  valueType: string;
-
-  /**
-   * Transcoders for the actual value.
-   */
-  middleware: ComparisonMiddleware[];
-
-  /**
-   * Serialized config or value.
-   */
-  value: any;
-}
-
-export interface ComparisonImpl {
-  type: 'Comparison';
-
-  /**
-   * @nullable
-   */
-  lhs: ComparisonValue | null;
-
-  /**
-   * @nullable
-   */
-  rhs: ComparisonValue | null;
-
-  /**
-   * Comparison operator.
-   * `lhs` tags determine which ones are valid.
-   */
-  operator: 'eq' | 'ne' | 'lt' | 'gt' | 'approx' | null;
+/**
+ * Evaluate user-defined code.
+ * Script must return boolean true
+ */
+export interface JSCheckImpl {
+  type: 'JSCheck';
+  body: string;
 }
 
 /**
@@ -266,65 +174,21 @@ export interface ComparisonImpl {
  */
 export interface TaskStatusImpl {
   type: 'TaskStatus';
-
-  /**
-   * The user-defined reference key.
-   * Must match those set in TaskEdit.
-   * If multiple tasks share the same ref key,
-   * all must match the given status.
-   */
   ref: string;
-
-  /**
-   * Task status to set at the beginning of the step.
-   * If null, task is created if not exists, but not modified otherwise.
-   * @nullable
-   */
-  resetStatus: AutomationStatus | null;
-
-  /**
-   * Desired status.
-   */
   status: AutomationStatus;
+  /** @nullable */
+  resetStatus: AutomationStatus | null;
 }
 
 export interface AutomationTask extends StoreObject {
-  /**
-   * User-defined reference ID.
-   * Not required to be unique.
-   */
-  ref: string;
-
-  /**
-   * Human-readable name.
-   */
+  ref: string; // not required to be unique
   title: string;
-
-  /**
-   * Message body.
-   */
   message: string;
-
-  /**
-   * Current status. May be evaluated by TaskStatusImpl
-   */
   status: AutomationStatus;
 
-  /**
-   * Tasks can be created manually, or by a process.
-   * If created by a process, processId and stepId will be set.
-   * This allows multiple processes to re-use the same ref.
-   */
+  // processId/stepId are set if task is created by a process
   createdBy: 'User' | 'Action' | 'Condition';
-
-  /**
-   * Set if automatically created.
-   */
   processId?: UUID;
-
-  /**
-   * Set if automatically created.
-   */
   stepId?: UUID;
 }
 
@@ -336,28 +200,19 @@ export interface AutomationImpl {
   type: string;
 }
 
-/**
- * Combining type for all actions.
- */
 export type ActionImpl =
   | BlockPatchImpl
   | TaskEditImpl
   | WebhookImpl
+  | JSApplyImpl
 
-/**
- * Combining type for all conditions
- */
 export type ConditionImpl =
   | TimeAbsoluteImpl
   | TimeElapsedImpl
   | BlockValueImpl
-  | ComparisonImpl
+  | JSCheckImpl
   | TaskStatusImpl
 
-/**
- * Common fields for all items.
- * impl is any of the action / condition Impl types.
- */
 export interface AutomationItem<T extends AutomationImpl = AutomationImpl> {
   id: string;
   title: string;
@@ -365,14 +220,7 @@ export interface AutomationItem<T extends AutomationImpl = AutomationImpl> {
   impl: T;
 }
 
-/**
- * Narrowed type: item.impl must be any of the ActionImpl types.
- */
 export type AutomationAction<T extends ActionImpl = ActionImpl> = AutomationItem<T>;
-
-/**
- * Narrowed type: item.impl must be any of the ConditionImpl types.
- */
 export type AutomationCondition<T extends ConditionImpl = ConditionImpl> = AutomationItem<T>;
 
 /**
@@ -381,6 +229,8 @@ export type AutomationCondition<T extends ConditionImpl = ConditionImpl> = Autom
  */
 export interface AutomationTransition {
   id: UUID;
+  enabled: boolean;
+  conditions: AutomationCondition[];
 
   /**
    * true: next step
@@ -388,16 +238,6 @@ export interface AutomationTransition {
    * string: step ID
    */
   next: boolean | string;
-
-  /**
-   * A transition must be enabled for it to be evaluated.
-   */
-  enabled: boolean;
-
-  /**
-   * All conditions in a transition must evaluate true.
-   */
-  conditions: AutomationCondition[];
 }
 
 /**
@@ -409,28 +249,9 @@ export interface AutomationTransition {
  */
 export interface AutomationStep {
   id: UUID;
-
-  /**
-   * Human-readable name.
-   */
   title: string;
-
-  /**
-   * Preconditions must evaluate true before actions are applied.
-   */
   preconditions: AutomationCondition[];
-
-  /**
-   * Actions are applied in order.
-   * If any action fails, all are retried.
-   */
   actions: AutomationAction[];
-
-  /**
-   * Transitions are checked in order.
-   * The first transition to evaluate true gets to pick the next step.
-   * If no transitions are set, the process immediates continues to the next step.
-   */
   transitions: AutomationTransition[];
 }
 
@@ -438,17 +259,7 @@ export interface AutomationStep {
  * The static configuration for a process.
  */
 export interface AutomationTemplate extends StoreObject {
-  /**
-   * Human-readable name.
-   */
   title: string;
-
-  /**
-   * Step objects.
-   * The process always starts at the first step.
-   * By default, steps are visited in listed order.
-   * Transitions may override this behavior.
-   */
   steps: AutomationStep[];
 }
 
@@ -471,34 +282,11 @@ export type AutomationStepPhase =
  */
 export interface AutomationStepResult {
   id: UUID;
-
-  /**
-   * The unique ID for the relevant step.
-   * Is null if the result does not apply to any single step.
-   * @nullable
-   */
-  stepId: UUID | null;
-
-  /**
-   * Date when the result was generated.
-   */
   date: DateTime;
-
-  /**
-   * Current status for the relevant step.
-   * Will be Invalid if stepId is null.
-   */
+  /** @nullable */
+  stepId: UUID | null;
   phase: AutomationStepPhase;
-
-  /**
-   * Current status for the entire process.
-   * The process will only be evaluated if it is Active.
-   */
   status: AutomationStatus;
-
-  /**
-   * Optional error message.
-   */
   error?: string;
 }
 
@@ -517,10 +305,6 @@ export interface AutomationStepJump {
  * Further changes to the template will not change a running process.
  */
 export interface AutomationProcess extends AutomationTemplate {
-  /**
-   * All execution results from this process.
-   * The last result is considered current.
-   */
   results: AutomationStepResult[];
 }
 

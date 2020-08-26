@@ -4,6 +4,7 @@ import { Component } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { findById, shortDateString } from '@/helpers/functional';
+import router from '@/router';
 
 import { settableStates } from './getters';
 import { automationStore } from './store';
@@ -29,7 +30,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   settableStates = settableStates;
 
   get automationAvailable(): boolean {
-    return automationStore.lastEvent !== null;
+    return automationStore.available;
   }
 
   get templates(): AutomationTemplate[] {
@@ -55,7 +56,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   }
 
   startEditor(): void {
-    this.$router.push('/automation');
+    router.push('/automation');
   }
 
   init(template: AutomationTemplate): void {
@@ -63,7 +64,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
   }
 
   edit(template: AutomationTemplate): void {
-    this.$router.push(`/automation/${template.id}`);
+    router.push(`/automation/${template.id}`);
   }
 
   show(value: AutomationTemplate | AutomationProcess): void {

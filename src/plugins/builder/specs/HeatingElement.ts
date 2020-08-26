@@ -1,4 +1,4 @@
-import { blockTypes } from '@/plugins/spark/getters';
+import { BlockType } from '@/plugins/spark/types';
 
 import { showDrivingBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
@@ -14,7 +14,7 @@ const spec: PartSpec = {
       component: 'BlockAddressCard',
       props: {
         settingsKey: 'pwm',
-        compatible: [blockTypes.ActuatorPwm],
+        compatible: [BlockType.ActuatorPwm],
         label: 'PWM',
       },
     },

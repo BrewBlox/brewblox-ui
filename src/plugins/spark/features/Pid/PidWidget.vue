@@ -1,32 +1,29 @@
 <script lang="ts">
-import { uid } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { Link } from '@/helpers/bloxfield';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { PidBlock } from '@/plugins/spark/types';
 
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
-import PidShareDialog from './PidShareDialog.vue';
 import { startRelationsDialog } from './relations';
 
 @Component({
   components: {
     Basic: PidBasic,
     Full: PidFull,
-    PidShareDialog,
   },
 })
 export default class PidWidget
   extends BlockWidgetBase<PidBlock> {
 
-  get inputId(): string | null {
-    return this.block.data.inputId.id;
+  get inputLink(): Link {
+    return this.block.data.inputId;
   }
 
-  get outputId(): string | null {
-    return this.block.data.outputId.id;
+  get outputLink(): Link {
+    return this.block.data.outputId;
   }
 
   enable(): void {
@@ -37,21 +34,15 @@ export default class PidWidget
   showRelations(): void {
     startRelationsDialog(this.block);
   }
-
-  showShareDialog(): void {
-    createDialog({
-      component: PidShareDialog,
-      parent: this,
-      graphId: uid(),
-      graphCfg: this.graphCfg,
-      block: this.block,
-    });
-  }
 }
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog" v-bind="{context}">
+  <GraphCardWrapper
+    :show="inDialog"
+    v-bind="{context}"
+    @dblclick="toggleMode"
+  >
     <template #graph>
       <HistoryGraph
         :graph-id="widget.id"
@@ -68,43 +59,44 @@ export default class PidWidget
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
           <ActionItem icon="mdi-vector-line" label="Relations" @click="showRelations" />
-          <!-- TODO(Elco): decide what values should appear in tuning view -->
-          <!-- <ActionItem icon="mdi-cube-scan" label="Tuning view" @click="showShareDialog" /> -->
         </template>
       </component>
     </template>
 
     <component :is="mode" :crud="crud">
       <template #warnings>
-        <CardWarning v-if="!outputId">
-          <template #message>
-            PID has no output block configured.
-          </template>
-        </CardWarning>
-        <CardWarning v-if="!inputId">
+        <CardWarning v-if="!inputLink.id">
           <template #message>
             PID has no input block configured.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.enabled && mode !== 'Full'">
+
+        <CardWarning v-if="!outputLink.id">
           <template #message>
-            <span>
-              PID is disabled:
-              <i>{{ block.data.outputId }}</i> will not be set.
-            </span>
-          </template>
-          <template #actions>
-            <q-btn text-color="white" flat label="Enable" @click="enable" />
+            PID has no output block configured.
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.active">
-          <template #message>
-            <span>
-              PID is inactive:
-              <i>{{ block.data.outputId }}</i> will not be set.
-            </span>
-          </template>
-        </CardWarning>
+
+        <template v-if="inputLink.id && outputLink.id">
+          <CardWarning v-if="block.data.enabled && !block.data.active">
+            <template #message>
+              <span>
+                PID is inactive and not driving <i>{{ outputLink | link }}</i>.
+              </span>
+            </template>
+          </CardWarning>
+          <BlockEnableToggle
+            :hide-enabled="mode === 'Basic'"
+            :crud="crud"
+          >
+            <template #enabled>
+              PID is enabled and driving <i>{{ outputLink | link }}</i>.
+            </template>
+            <template #disabled>
+              PID is disabled and not driving <i>{{ outputLink | link }}</i>.
+            </template>
+          </BlockEnableToggle>
+        </template>
       </template>
     </component>
   </GraphCardWrapper>

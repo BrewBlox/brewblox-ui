@@ -20,11 +20,14 @@ async function retry(desc, func) {
   throw new Error(`Retry attempts exhausted: "${desc}"`);
 };
 
+const host = 'https://localhost:9001';
+const datastore = `${host}/datastore`;
+
 module.exports = {
   sleep,
   retry,
-  host: 'https://localhost:9001',
-  datastore: 'https://localhost:9001/datastore',
+  host,
+  datastore,
   fileDir: path.resolve(__dirname, 'presets'),
   databases: [
     'brewblox-automation',

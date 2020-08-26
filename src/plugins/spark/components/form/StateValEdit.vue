@@ -13,5 +13,7 @@ export default class StateValEdit extends ValEditBase {
 </script>
 
 <template>
-  <DigitalStateButton v-model="field" />
+  <div>
+    <DigitalStateButton v-model="field" />
+  </div>
 </template>

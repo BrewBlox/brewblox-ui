@@ -1,13 +1,13 @@
+import { bloxLink } from '@/helpers/bloxfield';
 import { shortDateString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, SetpointProfileBlock } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { BlockIntfType, BlockSpec, BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './SetpointProfileWidget.vue';
 
-const typeName = 'SetpointProfile';
+const typeName = BlockType.SetpointProfile;
 
 const block: BlockSpec<SetpointProfileBlock> = {
   id: typeName,
@@ -15,8 +15,8 @@ const block: BlockSpec<SetpointProfileBlock> = {
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,
-    targetId: new Link(null, 'SetpointSensorPairInterface'),
-    drivenTargetId: new Link(null),
+    targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+    drivenTargetId: bloxLink(null),
   }),
   fields: [
     {
@@ -31,6 +31,7 @@ const block: BlockSpec<SetpointProfileBlock> = {
       component: 'DateValEdit',
       componentProps: { timeScale: 1000 },
       generate: () => new Date().getTime() / 1000,
+      valueHint: 'seconds since 1/1/1970',
       pretty: (val: number): string => {
         if (val === 0) { return 'now'; }
         if (!val) { return 'invalid date'; }
@@ -41,7 +42,7 @@ const block: BlockSpec<SetpointProfileBlock> = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, 'SetpointSensorPairInterface'),
+      generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
     },
   ],
 };

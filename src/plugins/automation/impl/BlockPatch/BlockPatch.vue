@@ -6,26 +6,20 @@ import { createDialog } from '@/helpers/dialog';
 import AutomationItemBase from '@/plugins/automation/components/AutomationItemBase';
 import { BlockPatchImpl } from '@/plugins/automation/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockField, BlockSpec, BlockType } from '@/plugins/spark/types';
+import { BlockAddress, BlockField, BlockOrIntfType, BlockSpec, BlockType } from '@/plugins/spark/types';
 
 @Component
 export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
-  get spec(): BlockSpec | null {
-    return this.impl.blockType !== null
-      ? sparkStore.specById(this.impl.blockType as BlockType)
-      : null;
-  }
-
-  get fields(): BlockField[] {
-    return this.spec?.fields.filter(f => !f.readonly) ?? [];
-  }
+  validTypes: BlockOrIntfType[] = sparkStore.specs
+    .filter(spec => spec.fields.some(f => !f.readonly))
+    .map(spec => spec.id);
 
   get addr(): BlockAddress {
     return {
       id: this.impl.blockId,
       serviceId: this.impl.serviceId,
-      type: this.impl.blockType,
+      type: this.impl.blockType as BlockType,
     };
   }
 
@@ -39,10 +33,12 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
     this.save();
   }
 
-  get validTypes(): string[] {
-    return sparkStore.specs
-      .filter(spec => spec.fields.some(f => !f.readonly))
-      .map(spec => spec.id);
+  get spec(): BlockSpec | null {
+    return sparkStore.specById(this.addr.type as BlockType) ?? null;
+  }
+
+  get fields(): BlockField[] {
+    return this.spec?.fields.filter(f => !f.readonly) ?? [];
   }
 
   get unknownValues(): string[] {
@@ -82,7 +78,7 @@ export default class BlockPatch extends AutomationItemBase<BlockPatchImpl> {
 
   editField(field: BlockField): void {
     createDialog({
-      component: 'ChangeFieldDialog',
+      component: 'BlockFieldDialog',
       field,
       value: this.impl.data[field.key],
       address: this.addr,

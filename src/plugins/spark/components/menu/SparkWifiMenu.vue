@@ -4,24 +4,24 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { typeMatchFilter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
-import { WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
+import { BlockType, WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
 
 @Component
 export default class SparkWifiMenu extends DialogBase {
   securityOpts: SelectOption<WifiSecurityType>[] = [
-    { label: 'Unsecured', value: 'WLAN_SEC_UNSEC' },
-    { label: 'WEP', value: 'WLAN_SEC_WEP' },
-    { label: 'WPA', value: 'WLAN_SEC_WPA' },
-    { label: 'WPA2', value: 'WLAN_SEC_WPA2' },
-    { label: 'Enterprise WPA', value: 'WLAN_SEC_WPA_ENTERPRISE' },
-    { label: 'Enterprise WPA2', value: 'WLAN_SEC_WPA2_ENTERPRISE' },
+    { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },
+    { label: 'WEP', value: WifiSecurityType.WLAN_SEC_WEP },
+    { label: 'WPA', value: WifiSecurityType.WLAN_SEC_WPA },
+    { label: 'WPA2', value: WifiSecurityType.WLAN_SEC_WPA2 },
+    { label: 'Enterprise WPA', value: WifiSecurityType.WLAN_SEC_WPA_ENTERPRISE },
+    { label: 'Enterprise WPA2', value: WifiSecurityType.WLAN_SEC_WPA2_ENTERPRISE },
   ];
 
   cipherOpts: SelectOption<WifiCipherType>[] = [
-    { label: 'Auto', value: 'WLAN_CIPHER_NOT_SET' },
-    { label: 'AES', value: 'WLAN_CIPHER_AES' },
-    { label: 'TKIP', value: 'WLAN_CIPHER_TKIP' },
-    { label: 'AES or TKIP', value: 'WLAN_CIPHER_AES_TKIP' },
+    { label: 'Auto', value: WifiCipherType.WLAN_CIPHER_NOT_SET },
+    { label: 'AES', value: WifiCipherType.WLAN_CIPHER_AES },
+    { label: 'TKIP', value: WifiCipherType.WLAN_CIPHER_TKIP },
+    { label: 'AES or TKIP', value: WifiCipherType.WLAN_CIPHER_AES_OR_TKIP },
   ];
 
   isPwd = true;
@@ -39,7 +39,7 @@ export default class SparkWifiMenu extends DialogBase {
 
   get block(): WiFiSettingsBlock {
     return sparkStore.serviceBlocks(this.serviceId)
-      .find(typeMatchFilter<WiFiSettingsBlock>('WiFiSettings'))!;
+      .find(typeMatchFilter<WiFiSettingsBlock>(BlockType.WiFiSettings))!;
   }
 
   async save(): Promise<void> {

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ClosePopup } from 'quasar/src/directives';
+import ClosePopup from 'quasar/src/directives/ClosePopup';
 import { CreateElement, VNode } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -30,7 +30,10 @@ export default class GraphDialog extends DialogBase {
     return h('q-dialog',
       {
         ref: 'dialog',
-        props: { maximized: true },
+        props: {
+          maximized: true,
+          transitionShow: 'fade',
+        },
         on: { hide: this.onDialogHide },
       },
       [

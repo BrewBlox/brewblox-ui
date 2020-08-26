@@ -28,6 +28,7 @@ import RimsTube from './RimsTube';
 import SensorDisplay from './SensorDisplay';
 import SessionLogDisplay from './SessionLogDisplay';
 import SetpointDisplay from './SetpointDisplay';
+import SetpointDriverDisplay from './SetpointDriverDisplay';
 import ShiftedSystemIO from './ShiftedSystemIO';
 import StraightInletTube from './StraightInletTube';
 import StraightTube from './StraightTube';
@@ -66,6 +67,7 @@ const specs: { [key: string]: PartSpec } = {
   SensorDisplay,
   SessionLogDisplay,
   SetpointDisplay,
+  SetpointDriverDisplay,
   ShiftedSystemIO,
   StraightInletTube,
   StraightTube,

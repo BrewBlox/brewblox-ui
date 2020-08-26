@@ -13,7 +13,7 @@ export default class BlockActions extends BlockCrudComponent { }
     <ActionItem
       v-if="!crud.isStoreWidget"
       icon="mdi-widgets"
-      label="Make widget"
+      label="Show on dashboard"
       @click="startMakeWidget"
     />
     <ActionItem icon="edit" label="Rename" @click="startChangeBlockId" />

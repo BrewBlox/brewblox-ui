@@ -3,8 +3,8 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { deepCopy } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { deepCopy } from '@/plugins/spark/parse-object';
 import { dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetMode } from '@/store/features';
 
@@ -40,7 +40,6 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   public showDialog(opts: DialogOpts = {}): void {
     const { widgetProps, mode, listeners } = opts;
     this.activeDialog = createDialog({
-      parent: this,
       component: 'WidgetDialog',
       getCrud: () => ({ ...this.crud, closeDialog: this.closeDialog }),
       getProps: () => widgetProps,
@@ -68,7 +67,6 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   public startChangeWidgetTitle(): void {
     const widgetTitle = this.widget.title;
     createDialog({
-      parent: this,
       component: 'InputDialog',
       title: 'Change widget name',
       message: `Choose a new name for '${widgetTitle}'`,
@@ -81,7 +79,6 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   public startCopyWidget(): void {
     const id = uid();
     createDialog({
-      parent: this,
       title: 'Copy widget',
       message: `To which dashboard do you want to copy widget ${this.widget.title}?`,
       style: 'overflow-y: scroll',
@@ -104,7 +101,6 @@ export default class CrudComponent<ConfigT = any> extends Vue {
 
   public startMoveWidget(): void {
     createDialog({
-      parent: this,
       title: 'Move widget',
       message: `To which dashboard do you want to move widget ${this.widget.title}?`,
       style: 'overflow-y: scroll',
@@ -135,7 +131,6 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       .map((opt, idx) => ({ ...opt, value: idx }));
 
     createDialog({
-      parent: this,
       title: 'Remove widget',
       message: `How do you want to remove widget ${this.widget.title}?`,
       options: {

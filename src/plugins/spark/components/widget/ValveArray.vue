@@ -1,11 +1,12 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { bloxLink, Link } from '@/helpers/bloxfield';
 import { mutate, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
-import { Block, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
+import { isBlockDriven } from '@/plugins/spark/helpers';
+import { Block, BlockType, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { createBlockWizard } from '@/plugins/wizardry';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -32,7 +33,7 @@ export default class ValveArray extends BlockCrudComponent {
   get claimedChannels(): { [nid: number]: MotorValveBlock } {
     return this.sparkModule
       .blocks
-      .filter(typeMatchFilter<MotorValveBlock>('MotorValve'))
+      .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
       .filter(block => block.data.hwDevice.id === this.block.id)
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block), {});
   }
@@ -71,13 +72,11 @@ export default class ValveArray extends BlockCrudComponent {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(channel.driver?.id ?? null, 'MotorValve');
+    return bloxLink(channel.driver?.id ?? null, BlockType.MotorValve);
   }
 
   driverDriven(block: Block): boolean {
-    return this.sparkModule
-      .drivenChains
-      .some((chain: string[]) => chain[0] === block.id);
+    return isBlockDriven(block);
   }
 
   driverLimitedBy(block: Block): string {
@@ -97,7 +96,7 @@ export default class ValveArray extends BlockCrudComponent {
     }
     if (link.id) {
       const newDriver = this.sparkModule.blockById<MotorValveBlock>(link.id)!;
-      newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
+      newDriver.data.hwDevice = bloxLink(this.blockId, this.block.type);
       newDriver.data.startChannel = channel.nid;
       await this.sparkModule.saveBlock(newDriver);
     }
@@ -111,15 +110,10 @@ export default class ValveArray extends BlockCrudComponent {
   }
 
   createActuator(channel: EditableChannel): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      parent: this,
-      serviceId: this.serviceId,
-      initialFeature: 'MotorValve',
-    })
-      .onOk(block => {
-        if (block.type === 'MotorValve') {
-          this.saveDriver(channel, new Link(block.id, block.type));
+    createBlockWizard(this.serviceId, BlockType.MotorValve)
+      .onOk(({ block }) => {
+        if (block && block.type === BlockType.MotorValve) {
+          this.saveDriver(channel, bloxLink(block.id, block.type));
         }
       });
   }

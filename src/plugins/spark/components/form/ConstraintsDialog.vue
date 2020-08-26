@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/plugins/spark/parse-object';
+import { deepCopy } from '@/helpers/functional';
 import { AnalogConstraintsObj, DigitalConstraintsObj } from '@/plugins/spark/types';
 
 import AnalogConstraints from './AnalogConstraints.vue';

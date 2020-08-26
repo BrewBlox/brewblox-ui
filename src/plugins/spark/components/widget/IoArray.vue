@@ -1,11 +1,12 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { bloxLink, Link } from '@/helpers/bloxfield';
 import { mutate, objectSorter, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
-import { DigitalActuatorBlock } from '@/plugins/spark/types';
+import { isBlockDriven } from '@/plugins/spark/helpers';
+import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { createBlockWizard } from '@/plugins/wizardry';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
@@ -22,13 +23,12 @@ interface IoArrayBlock extends Block {
 }
 
 @Component
-export default class IoArray extends BlockCrudComponent {
-  readonly block!: IoArrayBlock;
+export default class IoArray extends BlockCrudComponent<IoArrayBlock> {
 
   get claimedChannels(): { [channel: number]: string } {
     return this.sparkModule
       .blocks
-      .filter(typeMatchFilter<DigitalActuatorBlock>('DigitalActuator'))
+      .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
       .filter(block => block.data.hwDevice.id === this.block.id)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }
@@ -56,13 +56,11 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   driverLink(channel: EditableChannel): Link {
-    return new Link(channel.driver?.id ?? null, 'DigitalActuator');
+    return bloxLink(channel.driver?.id ?? null, BlockType.DigitalActuator);
   }
 
   driverDriven(block: Block): boolean {
-    return this.sparkModule
-      .drivenChains
-      .some((chain: string[]) => chain[0] === block.id);
+    return isBlockDriven(block);
   }
 
   driverLimitedBy(block: Block): string {
@@ -83,7 +81,7 @@ export default class IoArray extends BlockCrudComponent {
     }
     if (link.id) {
       const newDriver = this.sparkModule.blockById<DigitalActuatorBlock>(link.id)!;
-      newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
+      newDriver.data.hwDevice = bloxLink(this.blockId, this.block.type);
       newDriver.data.channel = channel.id;
       await this.sparkModule.saveBlock(newDriver);
     }
@@ -97,15 +95,10 @@ export default class IoArray extends BlockCrudComponent {
   }
 
   createActuator(channel: EditableChannel): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      parent: this,
-      serviceId: this.serviceId,
-      initialFeature: 'DigitalActuator',
-    })
-      .onOk((block: Block) => {
-        if (block.type === 'DigitalActuator') {
-          this.saveDriver(channel, new Link(block.id, 'DigitalActuator'));
+    createBlockWizard(this.serviceId, BlockType.DigitalActuator)
+      .onOk(({ block }) => {
+        if (block && block.type === BlockType.DigitalActuator) {
+          this.saveDriver(channel, bloxLink(block.id, block.type));
         }
       });
   }

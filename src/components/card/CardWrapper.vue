@@ -40,7 +40,7 @@ export default class CardWrapper extends Vue {
 </script>
 
 <template>
-  <div :class="cardClass">
+  <div :class="cardClass" v-on="$listeners">
     <div :class="toolbarClass">
       <slot name="toolbar" />
     </div>

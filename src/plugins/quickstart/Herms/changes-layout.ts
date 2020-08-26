@@ -53,7 +53,6 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            blockServiceId: config.serviceId,
             pwm: { serviceId: config.serviceId, blockId: config.names.bkPwm },
             sizeX: 4,
           },
@@ -66,7 +65,6 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            blockServiceId: config.serviceId,
             pwm: { serviceId: config.serviceId, blockId: config.names.hltPwm },
             sizeX: 4,
           },
@@ -744,7 +742,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 0,
-          settings: { pid: { serviceId: config.serviceId, blockId: config.names.mtPid } },
+          settings: {
+            pid: {
+              serviceId: config.serviceId,
+              blockId: config.names.mtPid,
+            },
+          },
           flipped: false,
           type: 'PidDisplay',
           x: 11,
@@ -753,7 +756,12 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 0,
-          settings: { pid: { serviceId: config.serviceId, blockId: config.names.bkPid } },
+          settings: {
+            pid: {
+              serviceId: config.serviceId,
+              blockId: config.names.bkPid,
+            },
+          },
           flipped: false,
           type: 'PidDisplay',
           x: 19,
@@ -762,10 +770,29 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 0,
-          settings: { pid: { serviceId: config.serviceId, blockId: config.names.hltPid } },
+          settings: {
+            pid: {
+              serviceId: config.serviceId,
+              blockId: config.names.hltPid,
+            },
+          },
           flipped: false,
           type: 'PidDisplay',
           x: 3,
+          y: 1,
+        },
+        {
+          id: uid(),
+          rotate: 0,
+          settings: {
+            setpointDriver: {
+              serviceId: config.serviceId,
+              blockId: config.names.hltDriver,
+            },
+          },
+          flipped: false,
+          type: 'SetpointDriverDisplay',
+          x: 8,
           y: 1,
         },
         {

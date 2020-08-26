@@ -1,4 +1,4 @@
-import { Unit } from '@/plugins/spark/units';
+import { JSQuantity } from '@/helpers/bloxfield';
 
 import { PinChannel, QuickStartOutput } from '../types';
 
@@ -36,8 +36,8 @@ export interface HermsConfig extends QuickStartOutput {
 }
 
 export interface HermsOpts {
-  hltKp: Unit;
-  bkKp: Unit;
-  mtKp: Unit;
-  driverMax: Unit;
+  hltKp: JSQuantity;
+  bkKp: JSQuantity;
+  mtKp: JSQuantity;
+  driverMax: JSQuantity;
 }

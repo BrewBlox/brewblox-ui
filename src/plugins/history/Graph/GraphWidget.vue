@@ -8,12 +8,13 @@ import { uid } from 'quasar';
 import { Component, Ref, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
+import { bloxQty, Quantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, isJsonEqual, unitDurationString } from '@/helpers/functional';
+import { durationString } from '@/helpers/duration';
+import { isJsonEqual } from '@/helpers/functional';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams, QueryTarget } from '@/plugins/history/types';
-import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {
@@ -80,13 +81,12 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
   chooseDuration(): void {
     const current = this.config.params.duration ?? '1h';
     createDialog({
-      component: 'TimeUnitDialog',
-      parent: this,
+      component: 'DurationQuantityDialog',
       title: 'Custom graph duration',
-      value: new Unit(durationMs(current), 'ms'),
+      value: bloxQty(current),
       label: 'Duration',
     })
-      .onOk(unit => this.saveParams({ duration: unitDurationString(unit) }));
+      .onOk((v: Quantity) => this.saveParams({ duration: durationString(v) }));
   }
 
   async regraph(): Promise<void> {
@@ -155,6 +155,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     :show="inDialog && mode === 'Full'"
     :no-scroll="mode === 'Basic'"
     v-bind="{context}"
+    @dblclick="toggleMode"
   >
     <template #graph>
       <HistoryGraph
@@ -220,7 +221,10 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
         @downsample="v => downsampling = v"
       />
     </div>
-    <div v-else class="widget-md">
+    <div
+      v-if="mode === 'Full'"
+      class="widget-md"
+    >
       <GraphEditor
         :config="config"
         :downsampling="downsampling"

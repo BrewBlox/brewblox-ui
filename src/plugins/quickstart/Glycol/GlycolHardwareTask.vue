@@ -1,17 +1,17 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
+import { createBlockWizard } from '@/plugins/wizardry';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
 import { GlycolConfig } from './types';
 
 
 @Component
-export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
+export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig> {
   heated = false;
   glycolControl: 'No' | 'Measure' | 'Control' = 'No';
   coolPin: PinChannel | null = null;
@@ -59,11 +59,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
   }
 
   startBlockWizard(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.config.serviceId,
-      parent: this,
-    });
+    createBlockWizard(this.config.serviceId);
   }
 
   taskDone(): void {

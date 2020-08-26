@@ -1,9 +1,12 @@
-import { blockTypes } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
+import { BlockType, DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
 
 import { LEFT, RIGHT } from '../getters';
 import { settingsBlock } from '../helpers';
 import { PartSpec, PersistentPart, Transitions } from '../types';
+
+type BlockT = DigitalActuatorBlock | MotorValveBlock;
+const addressKey = 'valve';
 
 const spec: PartSpec = {
   id: 'ActuatorValve',
@@ -12,14 +15,14 @@ const spec: PartSpec = {
   cards: [{
     component: 'BlockAddressCard',
     props: {
-      settingsKey: 'valve',
-      compatible: [blockTypes.MotorValve, blockTypes.DigitalActuator],
+      settingsKey: addressKey,
+      compatible: [BlockType.MotorValve, BlockType.DigitalActuator],
       label: 'Valve or Actuator',
     },
   }],
   transitions: (part: PersistentPart): Transitions => {
-    const block = settingsBlock(part, 'valve');
-    return block && block.data.state === 'Active'
+    const block = settingsBlock<BlockT>(part, addressKey);
+    return block?.data.state === DigitalState.STATE_ACTIVE
       ? {
         [LEFT]: [{ outCoords: RIGHT }],
         [RIGHT]: [{ outCoords: LEFT }],
@@ -27,11 +30,12 @@ const spec: PartSpec = {
       : {};
   },
   interactHandler: (part: PersistentPart) => {
-    const block = settingsBlock(part, 'valve');
+    const block = settingsBlock<BlockT>(part, addressKey);
     if (block) {
-      block.data.desiredState = block.data.state === 'Active'
-        ? 'Inactive'
-        : 'Active';
+      block.data.desiredState =
+        block.data.state === DigitalState.STATE_ACTIVE
+          ? DigitalState.STATE_INACTIVE
+          : DigitalState.STATE_ACTIVE;
       sparkStore.saveBlock(block);
     }
   },

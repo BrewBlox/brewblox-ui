@@ -1,12 +1,13 @@
 <script lang="ts">
+import { Enum } from 'typescript-string-enums';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { bloxQty, isQuantity } from '@/helpers/bloxfield';
+import { deepCopy } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/helpers';
-import { deepCopy } from '@/plugins/spark/parse-object';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { AnalogCompare } from '@/plugins/spark/types';
-import { Temp, Unit } from '@/plugins/spark/units';
+import { AnalogCompare, AnalogCompareOp, BlockIntfType, Quantity } from '@/plugins/spark/types';
 
 import { analogOpTitles } from './getters';
 
@@ -34,25 +35,25 @@ export default class AnalogCompareEditDialog extends DialogBase {
   }
 
   get operatorOpts(): SelectOption[] {
-    return Object.entries(analogOpTitles)
-      .map(([key, label]) => ({ label, value: Number(key) }));
+    return Enum.values(AnalogCompareOp)
+      .map(value => ({ value, label: analogOpTitles[value] }));
   }
 
   get isTemp(): boolean {
     const block = this.sparkModule.blockById(this.local!.id.id);
-    return !!block && isCompatible(block.type, 'SetpointSensorPairInterface');
+    return !!block && isCompatible(block.type, BlockIntfType.SetpointSensorPairInterface);
   }
 
-  get rhs(): Unit | number {
+  get rhs(): Quantity | number {
     const cmp = this.local!;
     return this.isTemp
-      ? new Temp(cmp.rhs).convert(this.tempUnit)
+      ? bloxQty(cmp.rhs, 'degC').to(this.tempUnit)
       : cmp.rhs;
   }
 
-  set rhs(v: Unit | number) {
-    this.local!.rhs = v instanceof Unit
-      ? new Temp(v).convert('degC').value ?? 0
+  set rhs(v: Quantity | number) {
+    this.local!.rhs = isQuantity(v)
+      ? bloxQty(v).to('degC').value ?? 0
       : v;
   }
 
@@ -83,21 +84,21 @@ export default class AnalogCompareEditDialog extends DialogBase {
           map-options
           emit-value
           label="Operator"
-          class="min-width-md col-auto"
+          class="col"
           @keyup.enter.exact.stop
         />
-        <UnitField
+        <QuantityField
           v-if="isTemp"
           v-model="rhs"
           label="Target value"
-          class="col-grow"
+          class="col"
         />
         <InputField
           v-else
           v-model="rhs"
           type="number"
           label="Target value"
-          class="col-grow"
+          class="col"
         />
       </div>
       <template #actions>

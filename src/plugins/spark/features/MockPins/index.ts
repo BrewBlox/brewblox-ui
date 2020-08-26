@@ -1,11 +1,11 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, MockPinsBlock } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, MockPinsBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './MockPinsWidget.vue';
 
-const typeName = 'MockPins';
+const typeName = BlockType.MockPins;
 
 const block: BlockSpec<MockPinsBlock> = {
   id: typeName,

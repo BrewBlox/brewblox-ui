@@ -3,14 +3,16 @@ const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
 const IgnoreNotFoundExportPlugin = require('./build/ignore-not-found');
+const MonacoEditorPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = configure(function (ctx) {
   const buildDate = new Date().toISOString();
 
   const sharedEnv = {
     BLOX_DATE: buildDate,
+    BLOX_API_DEV: false,
     BLOX_API_HOST: null,
-    API_PORT: null,
+    BLOX_API_PORT: null,
     BLOX_PERFORMANCE: false,
   };
 
@@ -52,6 +54,11 @@ module.exports = configure(function (ctx) {
         'Dialog',
         'LocalStorage',
         'SessionStorage',
+      ],
+
+      directives: [
+        'ClosePopup',
+        'TouchPan',
       ],
 
       config: {
@@ -98,6 +105,9 @@ module.exports = configure(function (ctx) {
       env: ctx.dev
         ? {
           ...sharedEnv,
+          BLOX_API_DEV: true,
+          // Replace these values when using a remote backend
+          BLOX_API_HOST: 'localhost',
           BLOX_API_PORT: 9001,
         }
         : {
@@ -106,6 +116,9 @@ module.exports = configure(function (ctx) {
 
       extendWebpack: config => {
         config.plugins.push(new IgnoreNotFoundExportPlugin());
+        config.plugins.push(new MonacoEditorPlugin({
+          languages: ['javascript', 'css', 'html', 'typescript'],
+        }));
         config.performance.hints = ctx.prod ? 'warning' : false;
 
         if (ctx.prod) {

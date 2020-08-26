@@ -38,10 +38,21 @@ export default class WidgetDialogToolbar extends CrudComponent {
 </script>
 
 <template>
-  <DialogToolbar :title="widget.title" :subtitle="featureTitle" @title-click="onTitleClick">
+  <DialogToolbar
+    :title="widget.title"
+    :subtitle="featureTitle"
+    @title-click="onTitleClick"
+  >
     <slot />
     <template #buttons>
-      <q-btn v-if="!!mode" :icon="toggleIcon" flat dense round @click="toggle">
+      <q-btn
+        v-if="!!mode"
+        :icon="toggleIcon"
+        flat
+        dense
+        round
+        @click="toggle"
+      >
         <q-tooltip>
           {{ toggleTooltip }}
         </q-tooltip>

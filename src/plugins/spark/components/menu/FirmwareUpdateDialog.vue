@@ -38,19 +38,20 @@ export default class FirmwareUpdateDialog extends DialogBase {
   }
 
   get updateAvailableText(): string {
-    return !this.status
+    const latest = this.status?.isLatestFirmware;
+    return latest === undefined
       ? 'Current firmware version is unknown.'
-      : !this.status.latest
-        ? 'A firmware update is available.'
-        : "You're using the latest firmware.";
+      : latest
+        ? "You're using the latest firmware."
+        : 'A firmware update is available.';
   }
 
   get ready(): boolean {
-    return this.status !== null && this.status.connect;
+    return !!this.status?.isConnected;
   }
 
   get buttonColor(): string {
-    return this.status?.latest
+    return this.status?.isLatestFirmware
       ? ''
       : 'primary';
   }

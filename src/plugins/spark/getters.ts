@@ -2,18 +2,17 @@ import { WidgetRole } from '@/store/features';
 
 import {
   AnalogConstraintKey,
-  BlockInterfaceType,
+  BlockIntfType,
   BlockType,
   ChannelMapping,
   DigitalConstraintKey,
-  SystemBlockType,
-  UserBlockType,
+  DisplayTempUnit,
+  FilterChoice,
   UserUnitKey,
 } from './types';
 
 export const sparkType = 'Spark';
-export const sparkBlocksEvent = 'Spark.blocks';
-export const sparkStatusEvent = 'Spark.service';
+export const sparkStateEvent = 'Spark.state';
 export const sparkUpdateEvent = 'Spark.update';
 export const systemGroup = 7;
 
@@ -57,90 +56,62 @@ export const constraintLabels = {
   ...analogConstraintLabels,
 };
 
-export const systemBlockTypes: Record<SystemBlockType, SystemBlockType> = {
-  SysInfo: 'SysInfo',
-  Groups: 'Groups',
-  OneWireBus: 'OneWireBus',
-  Ticks: 'Ticks',
-  WiFiSettings: 'WiFiSettings',
-  TouchSettings: 'TouchSettings',
+export const filterLabels: Record<FilterChoice, string> = {
+  [FilterChoice.FILTER_NONE]: 'No filtering',
+  [FilterChoice.FILTER_15s]: 'Filter 15s',
+  [FilterChoice.FILTER_45s]: 'Filter 45s',
+  [FilterChoice.FILTER_90s]: 'Filter 90s',
+  [FilterChoice.FILTER_3m]: 'Filter 3m',
+  [FilterChoice.FILTER_10m]: 'Filter 10m',
+  [FilterChoice.FILTER_30m]: 'Filter 30m',
 };
 
-export const blockTypes: Record<UserBlockType, UserBlockType> = {
-  ActuatorAnalogMock: 'ActuatorAnalogMock',
-  ActuatorLogic: 'ActuatorLogic',
-  ActuatorOffset: 'ActuatorOffset',
-  ActuatorPwm: 'ActuatorPwm',
-  Balancer: 'Balancer',
-  DeprecatedObject: 'DeprecatedObject',
-  DigitalActuator: 'DigitalActuator',
-  DisplaySettings: 'DisplaySettings',
-  DS2408: 'DS2408',
-  DS2413: 'DS2413',
-  InactiveObject: 'InactiveObject',
-  MockPins: 'MockPins',
-  MotorValve: 'MotorValve',
-  Mutex: 'Mutex',
-  Pid: 'Pid',
-  SetpointProfile: 'SetpointProfile',
-  SetpointSensorPair: 'SetpointSensorPair',
-  Spark2Pins: 'Spark2Pins',
-  Spark3Pins: 'Spark3Pins',
-  TempSensorMock: 'TempSensorMock',
-  TempSensorOneWire: 'TempSensorOneWire',
+export const displayTempLabels: Record<DisplayTempUnit, string> = {
+  [DisplayTempUnit.TEMP_CELSIUS]: 'Celsius',
+  [DisplayTempUnit.TEMP_FAHRENHEIT]: 'Fahrenheit',
 };
 
-export const interfaceTypes: Record<string, BlockInterfaceType> = {
-  ProcessValue: 'ProcessValueInterface',
-  TempSensor: 'TempSensorInterface',
-  SetpointSensorPair: 'SetpointSensorPairInterface',
-  ActuatorAnalog: 'ActuatorAnalogInterface',
-  ActuatorDigital: 'ActuatorDigitalInterface',
-  Balancer: 'BalancerInterface',
-  IoArray: 'IoArrayInterface',
-};
-
-export const compatibleTypes: Record<BlockInterfaceType, BlockType[]> = {
+export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
   ProcessValueInterface: [
-    'ActuatorAnalogMock',
-    'ActuatorPwm',
-    'SetpointSensorPair',
+    BlockType.ActuatorAnalogMock,
+    BlockType.ActuatorPwm,
+    BlockType.SetpointSensorPair,
   ],
   TempSensorInterface: [
-    'TempSensorMock',
-    'TempSensorOneWire',
+    BlockType.TempSensorMock,
+    BlockType.TempSensorOneWire,
   ],
   SetpointSensorPairInterface: [
-    'SetpointSensorPair',
+    BlockType.SetpointSensorPair,
   ],
   ActuatorAnalogInterface: [
-    'ActuatorAnalogMock',
-    'ActuatorOffset',
-    'ActuatorPwm',
+    BlockType.ActuatorAnalogMock,
+    BlockType.ActuatorOffset,
+    BlockType.ActuatorPwm,
   ],
   ActuatorDigitalInterface: [
-    'DigitalActuator',
-    'MotorValve',
+    BlockType.DigitalActuator,
+    BlockType.MotorValve,
   ],
   BalancerInterface: [
-    'Balancer',
+    BlockType.Balancer,
   ],
   MutexInterface: [
-    'Mutex',
+    BlockType.Mutex,
   ],
   OneWireDeviceInterface: [
-    'TempSensorOneWire',
-    'DS2408',
-    'DS2413',
+    BlockType.TempSensorOneWire,
+    BlockType.DS2408,
+    BlockType.DS2413,
   ],
   IoArrayInterface: [
-    'DS2408',
-    'DS2413',
-    'Spark2Pins',
-    'Spark3Pins',
-    'MockPins',
+    BlockType.DS2408,
+    BlockType.DS2413,
+    BlockType.Spark2Pins,
+    BlockType.Spark3Pins,
+    BlockType.MockPins,
   ],
   DS2408Interface: [
-    'DS2408',
+    BlockType.DS2408,
   ],
 };
