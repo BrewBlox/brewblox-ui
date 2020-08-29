@@ -104,6 +104,11 @@ export default class Troubleshooter extends Vue {
     await this.sparkModule?.fetchAll();
   }
 
+  async toggleAutoconnecting(): Promise<void> {
+    await this.sparkModule?.saveAutoConnecting(!this.status?.isAutoconnecting);
+    await this.refresh();
+  }
+
   iconProps(val: boolean): Mapped<any> {
     return {
       name: val ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline',
@@ -161,6 +166,19 @@ export default class Troubleshooter extends Vue {
       <div>
         {{ autoconnectingDesc }}
       </div>
+
+      <template v-if="status.isServiceReachable">
+        <div class="col-break" />
+        <div class="row q-gutter-x-sm q-pl-lg">
+          <q-btn
+            flat
+            :label="status.isAutoconnecting
+              ? 'Pause autoconnect'
+              : 'Resume autoconnect'"
+            @click="toggleAutoconnecting"
+          />
+        </div>
+      </template>
 
       <div class="col-break" />
       <q-icon v-bind="iconProps(status.isConnected)" />
