@@ -148,6 +148,7 @@ export default class GraphPeriodEditor extends Vue {
       <DatetimeField
         v-if="shownPeriod.start"
         :value="config.params.start"
+        emit-number
         title="Start time"
         label="Start date and time"
         class="col-auto min-width-sm"
@@ -164,6 +165,7 @@ export default class GraphPeriodEditor extends Vue {
       <DatetimeField
         v-if="shownPeriod.end"
         :value="config.params.end"
+        emit-number
         title="End time"
         label="End date and time"
         class="col-auto min-width-sm"

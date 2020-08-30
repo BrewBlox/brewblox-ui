@@ -40,6 +40,7 @@ export default class SessionGraphNoteDialog extends DialogBase {
             date => local.end === null
               || date.getTime() < local.end
               || 'Start must be before than end']"
+          emit-number
           title="Start"
           label="Start"
           clear-label="Not started"
@@ -63,6 +64,7 @@ export default class SessionGraphNoteDialog extends DialogBase {
             date => local.start === null
               || date.getTime() > local.start
               || 'End must be after start']"
+          emit-number
           title="End"
           label="End"
           :readonly="local.start === null"

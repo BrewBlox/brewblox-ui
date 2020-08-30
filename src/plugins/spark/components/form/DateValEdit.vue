@@ -33,7 +33,11 @@ export default class DateValEdit extends ValEditBase {
 </script>
 
 <template>
-  <DatetimeField v-if="editable" v-model="scaledField" />
+  <DatetimeField
+    v-if="editable"
+    v-model="scaledField"
+    emit-number
+  />
   <div
     v-else
     class="clickable q-pa-sm rounded-borders"
