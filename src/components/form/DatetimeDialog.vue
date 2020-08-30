@@ -53,7 +53,7 @@ export default class DatetimeDialog extends DialogBase {
   }
 
   save(): void {
-    if (this.valid) {
+    if (this.valid && this.parsed !== null) {
       this.onDialogOk(this.parsed);
     }
   }
