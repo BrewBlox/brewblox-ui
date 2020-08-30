@@ -29,10 +29,10 @@ export default class DatetimeField extends FieldBase {
   @Prop({ type: Boolean, default: false })
   public readonly emitNumber!: boolean;
 
-  public change(v: Date | null): void {
-    const result = v === null || !this.emitNumber
-      ? v
-      : v.getTime();
+  public save(v: Date): void {
+    const result = this.emitNumber
+      ? v.getTime()
+      : v;
     this.$emit('input', result);
   }
 
@@ -57,7 +57,7 @@ export default class DatetimeField extends FieldBase {
       resetIcon: this.resetIcon,
       rules: this.rules,
     })
-      .onOk(this.change);
+      .onOk(v => this.save(v));
   }
 }
 </script>

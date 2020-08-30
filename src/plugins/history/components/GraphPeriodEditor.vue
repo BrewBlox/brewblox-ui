@@ -97,8 +97,8 @@ export default class GraphPeriodEditor extends Vue {
     this.saveSanitized(period);
   }
 
-  saveStart(val: Date): void {
-    this.config.params.start = val.getTime();
+  saveStart(val: number): void {
+    this.config.params.start = val;
     this.saveSanitized();
   }
 
@@ -107,8 +107,8 @@ export default class GraphPeriodEditor extends Vue {
     this.saveSanitized();
   }
 
-  saveEnd(val: Date): void {
-    this.config.params.end = val.getTime();
+  saveEnd(val: number): void {
+    this.config.params.end = val;
     this.saveSanitized();
   }
 }
