@@ -21,6 +21,14 @@ services:
     volumes:
       - ./dev/couchdb/:/opt/couchdb/data/
 
+  redis:
+    image: redis
+    labels:
+      - traefik.enable=false
+    volumes:
+      - ./dev/redis:/data
+    command: --appendonly yes
+
   history:
     image: brewblox/brewblox-history:develop
 

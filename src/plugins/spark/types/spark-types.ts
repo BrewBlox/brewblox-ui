@@ -1,5 +1,5 @@
 import { StoreObject } from '@/plugins/database';
-import { EventbusMessage } from '@/plugins/eventbus';
+import { StateEventMessage } from '@/plugins/eventbus';
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
@@ -46,7 +46,7 @@ export interface SparkStatus {
   isSynchronized?: boolean;
 }
 
-export interface SparkStateMessage extends EventbusMessage {
+export interface SparkStateMessage extends StateEventMessage {
   data: {
     status: ApiSparkStatus | null;
     blocks: Block[];

@@ -4,24 +4,26 @@ import { VueConstructor } from 'vue';
 import { HOSTNAME, PORT } from '@/helpers/const';
 import { popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-const stateTopic = 'brewcast/state';
 
-export type ListenerFunc = (msg: EventbusMessage) => void | Promise<void>;
+const stateTopic = 'brewcast/state';
+const datastoreTopic = 'brewcast/datastore';
+
+export type StateListenerFunc = (msg: StateEventMessage) => void | Promise<void>;
 
 export interface EventbusListener {
   id: string;
   filter: (key: string, type: string) => boolean;
-  onmessage: (msg: EventbusMessage) => unknown;
+  onmessage: (msg: StateEventMessage) => unknown;
 }
 
-export interface EventbusMessage {
+export interface StateEventMessage {
   key: string;
   type: string;
   data: any;
 }
 
 export class BrewbloxEventbus {
-  private listeners: EventbusListener[] = [];
+  private stateListeners: EventbusListener[] = [];
 
   public async start(): Promise<void> {
     const opts: mqtt.IClientOptions = {
@@ -38,25 +40,32 @@ export class BrewbloxEventbus {
     });
     client.on('connect', () => {
       client.subscribe(stateTopic + '/#');
+      client.subscribe(datastoreTopic + '/#');
     });
-    client.on('message', (_, body: Buffer) => {
+    client.on('message', (topic, body: Buffer) => {
       if (body.length === 0) { return; }
-      const message: EventbusMessage = JSON.parse(body.toString());
-      this.listeners
-        .filter(lst => lst.filter(message.key, message.type))
-        .forEach(lst => lst.onmessage(message));
+      else if (topic.startsWith(datastoreTopic)) {
+        const message = JSON.parse(body.toString());
+
+      }
+      else if (topic.startsWith(stateTopic)) {
+        const message: StateEventMessage = JSON.parse(body.toString());
+        this.stateListeners
+          .filter(lst => lst.filter(message.key, message.type))
+          .forEach(lst => lst.onmessage(message));
+      }
     });
   }
 
   public addListener(listener: EventbusListener): void {
-    if (this.listeners.find(lst => lst.id === listener.id)) {
+    if (this.stateListeners.find(lst => lst.id === listener.id)) {
       throw new Error(`Listener with id '${listener.id}' already exists`);
     }
-    this.listeners.push(listener);
+    this.stateListeners.push(listener);
   }
 
   public removeListener(id: string): void {
-    popById(this.listeners, { id });
+    popById(this.stateListeners, { id });
   }
 }
 
