@@ -134,7 +134,7 @@ export class AutomationModule extends VuexModule {
   public async start(): Promise<void> {
     const onChange = (template: AutomationTemplate): void => {
       const existing = this.templateById(template.id);
-      if (!existing || existing._rev !== template._rev) {
+      if (!existing || existing._rev !== template._rev || template._rev === undefined) {
         this.templates = extendById(this.templates, template);
       }
     };

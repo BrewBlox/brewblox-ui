@@ -1,5 +1,6 @@
 export interface StoreObject {
   id: string;
+  namespace?: string;
   _rev?: string;
 }
 
@@ -13,6 +14,13 @@ export interface EventHandler<T = StoreObject> {
 }
 
 export interface BrewbloxDatabase {
+
+  /**
+   * Perform startup functionality.
+   * Is registered as BrewbloxStartup handler.
+   */
+  start(): void;
+
   /**
    * Be notified of external changes to a collection.
    *

@@ -18,7 +18,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
   readonly serviceId!: string;
 
   created(): void {
-    Vue.$eventbus.addListener({
+    Vue.$eventbus.addStateListener({
       id: `${sparkUpdateEvent}__${this.serviceId}`,
       filter: (key, type) => key === this.serviceId && type === sparkUpdateEvent,
       onmessage: ({ data }) => data.forEach(v => this.pushMessage(v)),
@@ -26,7 +26,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
   }
 
   beforeDestroy(): void {
-    Vue.$eventbus.removeListener(`${sparkUpdateEvent}__${this.serviceId}`);
+    Vue.$eventbus.removeStateListener(`${sparkUpdateEvent}__${this.serviceId}`);
   }
 
   get sparkModule(): SparkServiceModule {

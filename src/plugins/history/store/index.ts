@@ -121,7 +121,7 @@ export class HistoryModule extends VuexModule {
   public async start(): Promise<void> {
     const onChange = (session: LoggedSession): void => {
       const existing = this.sessionById(session.id);
-      if (!existing || existing._rev !== session._rev) {
+      if (!existing || existing._rev !== session._rev || session._rev === undefined) {
         this.sessions = extendById(this.sessions, session);
       }
     };

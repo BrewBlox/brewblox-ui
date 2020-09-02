@@ -68,7 +68,7 @@ const retryDatastore = async (): Promise<void> => {
   }
 };
 
-export const checkDatastore = (): void => {
+const checkDatastore = (): void => {
   http.get('/datastore', { timeout: 2000 })
     .catch(err => {
       notify.error(`Datastore error: ${err}`, { shown: false });
@@ -79,7 +79,7 @@ export const checkDatastore = (): void => {
 
 type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
 
-export class BrewbloxDatabaseImpl implements BrewbloxDatabase {
+export class BrewbloxCouchDBDatabase implements BrewbloxDatabase {
   private promisedDb: Promise<PouchDB.Database>;
   private handlers: Mapped<EventHandler> = {}
 
@@ -102,6 +102,10 @@ export class BrewbloxDatabaseImpl implements BrewbloxDatabase {
           resolve(remoteDb);
         });
     });
+  }
+
+  public start(): void {
+    checkDatastore();
   }
 
   public subscribe(handler: EventHandler): void {

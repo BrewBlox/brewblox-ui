@@ -1,28 +1,12 @@
 import { Notify } from 'quasar';
 
-import { HOST } from '@/helpers/const';
 import http from '@/helpers/http';
 import notify from '@/helpers/notify';
 
 import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
 
-
-const cleanId = (moduleId: string, fullId: string): string =>
-  fullId.replace(/^(.+)__/, '');
-
-const fullId = (moduleId: string, id: string): string =>
-  `${moduleId}__${id}`;
-
-const strippedId = (fullId: string): string =>
-  fullId.match(/^(.+)__/)?.[1] ?? '';
-
-const stripObjId = <T extends StoreObject>(moduleId: string, obj: T): T => {
-  return { ...obj, id: cleanId(moduleId, obj.id) };
-};
-
-const catObjId = <T extends StoreObject>(moduleId: string, obj: T): T => {
-  return { ...obj, id: fullId(moduleId, obj.id) };
-};
+const moduleNamespace = (moduleId: string): string =>
+  `brewblox-ui-store:${moduleId}`;
 
 const intercept = (message: string, moduleId: string): (e: Error) => never =>
   (e: Error) => {
@@ -58,50 +42,68 @@ export const checkDatastore = (): void => {
     });
 };
 
-export class BrewbloxRedisImpl implements BrewbloxDatabase {
-  private readonly namespace = 'brewblox-ui-store';
+export class BrewbloxRedisDatabase implements BrewbloxDatabase {
+  // handlers are indexed on fully qualified namespace
   private handlers: Mapped<EventHandler> = {}
 
-  public constructor() {
+  public start(): void {
+    checkDatastore();
+  }
+
+  public onChanged(changed: StoreObject[]): void {
+    changed.forEach(obj =>
+      this.handlers[obj.namespace!]?.onChanged(obj));
+  }
+
+  public onDeleted(deleted: string[]): void {
+    deleted.forEach(key => {
+      // The event uses the fully qualified ID
+      // Separate the namespace from the ID here
+      const idx = key.lastIndexOf(':');
+      const namespace = key.substring(0, idx);
+      const id = key.substring(idx + 1);
+      this.handlers[namespace]?.onDeleted(id);
+    });
   }
 
   public subscribe(handler: EventHandler): void {
     if (!handler.id) {
       throw new Error('Database handler id not set');
     }
-    if (this.handlers[handler.id] !== undefined) {
+    const namespace = moduleNamespace(handler.id);
+    if (this.handlers[namespace] !== undefined) {
       throw new Error(`Database handler '${module.id}' is already registered`);
     }
-    this.handlers[handler.id] = Object.freeze(handler);
+    this.handlers[namespace] = Object.freeze(handler);
   }
 
   public async fetchAll<T extends StoreObject>(moduleId: string): Promise<T[]> {
     return http
       .post<T[]>('/history/datastore/mget', {
-        namespace: this.namespace,
-        filter: `${moduleId}__*`,
+        namespace: moduleNamespace(moduleId),
+        filter: '*',
       })
-      .then(resp => resp.data.map(obj => stripObjId(moduleId, obj)))
+      .then(resp => resp.data)
       .catch(intercept('Fetch all objects', moduleId));
   }
 
   public async fetchById<T extends StoreObject>(moduleId: string, objId: string): Promise<T> {
     return http
       .post<T>('/history/datastore/get', {
-        namespace: this.namespace,
-        key: fullId(moduleId, objId),
+        namespace: moduleNamespace(moduleId),
+        id: objId,
       })
-      .then(resp => stripObjId(moduleId, resp.data))
+      .then(resp => resp.data)
       .catch(intercept(`Fetch '${objId}'`, moduleId));
   }
 
   public async persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
     return http
       .post<T>('/history/datastore/set', {
-        namespace: this.namespace,
-        value: catObjId(moduleId, obj),
+        namespace: moduleNamespace(moduleId),
+        value: obj,
       })
-      .then(resp => stripObjId(moduleId, resp.data))
+      .then(resp => resp.data)
       .catch(intercept(`Persist '${obj.id}'`, moduleId));
   }
 
@@ -110,8 +112,8 @@ export class BrewbloxRedisImpl implements BrewbloxDatabase {
   public async remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
     await http
       .post('/history/datastore/delete', {
-        namespace: this.namespace,
-        key: fullId(moduleId, obj.id),
+        namespace: moduleNamespace(moduleId),
+        id: obj.id,
       })
       .catch(intercept(`Remove '${obj.id}'`, moduleId));
     return obj;

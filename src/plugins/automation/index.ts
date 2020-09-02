@@ -36,7 +36,7 @@ export default {
     featureStore.registerWatcher(watcher);
 
     Vue.$startup.onStart(() => automationStore.start());
-    Vue.$eventbus.addListener({
+    Vue.$eventbus.addStateListener({
       id: 'automation',
       filter: (_, type) => type === AutomationEvent,
       onmessage: (msg: StateEventMessage) => {

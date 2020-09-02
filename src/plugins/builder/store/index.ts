@@ -68,7 +68,7 @@ export class BuilderModule extends VuexModule {
   public async setup(): Promise<void> {
     const onChange = async (layout: BuilderLayout): Promise<void> => {
       const existing = this.layoutById(layout.id);
-      if (!existing || existing._rev !== layout._rev) {
+      if (!existing || existing._rev !== layout._rev || layout._rev === undefined) {
         this.layouts = extendById(this.layouts, layout);
       }
     };

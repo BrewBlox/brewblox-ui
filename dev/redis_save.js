@@ -8,19 +8,16 @@ async function run() {
 
   for (let db of databases) {
     const url = `${host}/history/datastore`;
+    const docs = await axios
+      .post(`${url}/mget`, {
+        namespace: db,
+        filter: '*',
+      })
+      .then(resp => resp.data);
+
     const fname = `${fileDir}/${db}.redis.json`;
-    const docs = JSON.parse(fs.readFileSync(fname));
-
-    await axios.post(`${url}/mdelete`, {
-      namespace: db,
-      filter: '*',
-    });
-
-    await axios.post(`${url}/mset`, {
-      values: docs,
-    });
-
-    console.log('Database loaded', fname);
+    fs.writeFileSync(fname, JSON.stringify(docs, undefined, 2));
+    console.log('Database saved', fname);
   }
 };
 

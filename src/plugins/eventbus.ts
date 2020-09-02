@@ -1,19 +1,26 @@
 import mqtt from 'mqtt';
 import { VueConstructor } from 'vue';
+import Vue from 'vue';
 
 import { HOSTNAME, PORT } from '@/helpers/const';
 import { popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 
+import { StoreObject } from './database';
+import { BrewbloxRedisDatabase } from './database/redis-database';
+
 const stateTopic = 'brewcast/state';
 const datastoreTopic = 'brewcast/datastore';
 
-export type StateListenerFunc = (msg: StateEventMessage) => void | Promise<void>;
-
-export interface EventbusListener {
+export interface StateEventListener {
   id: string;
   filter: (key: string, type: string) => boolean;
   onmessage: (msg: StateEventMessage) => unknown;
+}
+
+export interface StoreEventListener {
+  onChanged: (changed: StoreObject[]) => unknown;
+  onDeleted: (deleted: string[]) => unknown;
 }
 
 export interface StateEventMessage {
@@ -22,8 +29,13 @@ export interface StateEventMessage {
   data: any;
 }
 
+export interface StoreEventMessage {
+  changed?: StoreObject[];
+  deleted?: string[];
+}
+
 export class BrewbloxEventbus {
-  private stateListeners: EventbusListener[] = [];
+  private stateListeners: StateEventListener[] = [];
 
   public async start(): Promise<void> {
     const opts: mqtt.IClientOptions = {
@@ -43,10 +55,17 @@ export class BrewbloxEventbus {
       client.subscribe(datastoreTopic + '/#');
     });
     client.on('message', (topic, body: Buffer) => {
-      if (body.length === 0) { return; }
+      if (body.length === 0) {
+        return;
+      }
       else if (topic.startsWith(datastoreTopic)) {
-        const message = JSON.parse(body.toString());
-
+        const database = Vue.$database;
+        // TODO: remove this check when BLOX_FEATURE_REDIS is gone
+        if (database instanceof BrewbloxRedisDatabase) {
+          const { changed, deleted }: StoreEventMessage = JSON.parse(body.toString());
+          changed && database.onChanged(changed);
+          deleted && database.onDeleted(deleted);
+        }
       }
       else if (topic.startsWith(stateTopic)) {
         const message: StateEventMessage = JSON.parse(body.toString());
@@ -57,14 +76,14 @@ export class BrewbloxEventbus {
     });
   }
 
-  public addListener(listener: EventbusListener): void {
+  public addStateListener(listener: StateEventListener): void {
     if (this.stateListeners.find(lst => lst.id === listener.id)) {
-      throw new Error(`Listener with id '${listener.id}' already exists`);
+      throw new Error(`State listener with id '${listener.id}' already exists`);
     }
     this.stateListeners.push(listener);
   }
 
-  public removeListener(id: string): void {
+  public removeStateListener(id: string): void {
     popById(this.stateListeners, { id });
   }
 }

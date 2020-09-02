@@ -110,7 +110,7 @@ export class ServiceModule extends VuexModule {
         this.setService(service);
         await onStartService(service);
       }
-      else if (existing._rev !== service._rev) {
+      else if (existing._rev !== service._rev || service._rev === undefined) {
         this.setService(service);
       }
     };
