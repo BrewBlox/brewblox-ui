@@ -135,20 +135,14 @@ export class DashboardModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onDashboardChange = (dashboard: Dashboard): void => {
-      const existing = this.dashboardById(dashboard.id);
-      if (!existing || existing._rev !== dashboard._rev || dashboard._rev === undefined) {
-        this.dashboards = extendById(this.dashboards, dashboard);
-      }
+      this.dashboards = extendById(this.dashboards, dashboard);
     };
     const onDashboardDelete = (id: string): void => {
       this.dashboards = filterById(this.dashboards, { id });
     };
 
     const onWidgetChange = (widget: Widget): void => {
-      const existing = this.widgetById(widget.id);
-      if (!existing || existing._rev !== widget._rev || widget._rev === undefined) {
-        this.widgets = extendById(this.widgets, widget);
-      }
+      this.widgets = extendById(this.widgets, widget);
     };
     const onWidgetDelete = (id: string): void => {
       this.widgets = filterById(this.widgets, { id });

@@ -1,17 +1,12 @@
 import { VueConstructor } from 'vue';
 
-import { BrewbloxCouchDBDatabase } from './couchdb-database';
-import { BrewbloxRedisDatabase } from './redis-database';
-
-const redisEnabled = process.env.BLOX_FEATURE_REDIS;
+import { BrewbloxRedisDatabase } from './database';
 
 export * from './types';
 
 export default {
   install(Vue: VueConstructor) {
-    Vue.$database = redisEnabled
-      ? new BrewbloxRedisDatabase()
-      : new BrewbloxCouchDBDatabase();
+    Vue.$database = new BrewbloxRedisDatabase();
     Vue.$startup.onStart(Vue.$database.start);
   },
 };

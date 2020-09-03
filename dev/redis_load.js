@@ -3,11 +3,12 @@ const fs = require('fs');
 const { host, retry, databases, fileDir } = require('./utils');
 const get = require('lodash/get');
 
+const url = `${host}/history/datastore`;
+
 async function run() {
-  await retry('Waiting for datastore', () => axios.get(`${host}/history/ping`));
+  await retry('Waiting for redis', () => axios.get(`${url}/ping`));
 
   for (let db of databases) {
-    const url = `${host}/history/datastore`;
     const fname = `${fileDir}/${db}.redis.json`;
     const docs = JSON.parse(fs.readFileSync(fname));
 

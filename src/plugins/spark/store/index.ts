@@ -131,10 +131,7 @@ export class SparkGlobalModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = async (preset: StoredDataPreset): Promise<void> => {
-      const existing = this.presets.find(v => v.id === preset.id);
-      if (!existing || existing._rev !== preset._rev || preset._rev === undefined) {
-        this.presets = extendById(this.presets, preset);
-      }
+      this.presets = extendById(this.presets, preset);
     };
     const onDelete = (id: string): void => {
       this.presets = filterById(this.presets, { id });

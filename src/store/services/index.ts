@@ -106,12 +106,9 @@ export class ServiceModule extends VuexModule {
   public async start(): Promise<void> {
     const onChange = async (service: Service): Promise<void> => {
       const existing = this.serviceById(service.id);
+      this.setService(service);
       if (!existing) {
-        this.setService(service);
         await onStartService(service);
-      }
-      else if (existing._rev !== service._rev || service._rev === undefined) {
-        this.setService(service);
       }
     };
     const onDelete = async (id: string): Promise<void> => {

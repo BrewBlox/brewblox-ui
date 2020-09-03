@@ -7,7 +7,6 @@ import { popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 
 import { StoreObject } from './database';
-import { BrewbloxRedisDatabase } from './database/redis-database';
 
 const stateTopic = 'brewcast/state';
 const datastoreTopic = 'brewcast/datastore';
@@ -59,13 +58,10 @@ export class BrewbloxEventbus {
         return;
       }
       else if (topic.startsWith(datastoreTopic)) {
+        const { changed, deleted }: StoreEventMessage = JSON.parse(body.toString());
         const database = Vue.$database;
-        // TODO: remove this check when BLOX_FEATURE_REDIS is gone
-        if (database instanceof BrewbloxRedisDatabase) {
-          const { changed, deleted }: StoreEventMessage = JSON.parse(body.toString());
-          changed && database.onChanged(changed);
-          deleted && database.onDeleted(deleted);
-        }
+        changed && database.onChanged(changed);
+        deleted && database.onDeleted(deleted);
       }
       else if (topic.startsWith(stateTopic)) {
         const message: StateEventMessage = JSON.parse(body.toString());

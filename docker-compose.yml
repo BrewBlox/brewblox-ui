@@ -14,7 +14,7 @@ services:
       - ./dev/influxdb/:/var/lib/influxdb/
 
   redis:
-    image: redis
+    image: redis:6.0
     labels:
       - traefik.enable=false
     volumes:
