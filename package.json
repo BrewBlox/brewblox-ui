@@ -73,7 +73,6 @@
     "@types/lodash": "^4.14.159",
     "@types/node": "11.9.5",
     "@types/plotly.js": "^1.50.17",
-    "@types/pouchdb": "^6.4.0",
     "@types/webpack": "^4.41.21",
     "@types/webpack-chain": "^5.2.0",
     "@types/webpack-env": "^1.15.2",
