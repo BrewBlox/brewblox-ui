@@ -133,10 +133,7 @@ export class AutomationModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = (template: AutomationTemplate): void => {
-      const existing = this.templateById(template.id);
-      if (!existing || existing._rev !== template._rev) {
-        this.templates = extendById(this.templates, template);
-      }
+      this.templates = extendById(this.templates, template);
     };
     const onDelete = (id: string): void => {
       this.templates = filterById(this.templates, { id });

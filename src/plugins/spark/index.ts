@@ -63,7 +63,7 @@ export default {
 
     Vue.$startup.onStart(() => sparkStore.start());
     Vue.$startup.onStart(() => {
-      Vue.$eventbus.addListener({
+      Vue.$eventbus.addStateListener({
         id: uid(),
         filter: (_, type) => type === sparkStateEvent,
         onmessage: msg => serviceStore.ensureStub({ id: msg.key, type: sparkType }),

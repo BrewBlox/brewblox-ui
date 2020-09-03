@@ -236,7 +236,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async start(): Promise<void> {
-    Vue.$eventbus.addListener({
+    Vue.$eventbus.addStateListener({
       id: `${sparkStateEvent}__${this.id}`,
       filter: (key, type) => key === this.id && type === sparkStateEvent,
       onmessage: (msg: SparkStateMessage) => {
@@ -253,6 +253,6 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async stop(): Promise<void> {
-    Vue.$eventbus.removeListener(`${sparkStateEvent}__${this.id}`);
+    Vue.$eventbus.removeStateListener(`${sparkStateEvent}__${this.id}`);
   }
 }
