@@ -18,7 +18,7 @@
     "spark:save": "node dev/spark_save.js",
     "spark:load": "node dev/spark_load.js",
     "spark": "npm run spark:load",
-    "compose:setup": "npm run couchdb && npm run redis && npm run history && npm run spark",
+    "compose:setup": "npm run redis && npm run history && npm run spark",
     "compose:new": "npm run makecert && docker-compose up -d --force-recreate && npm run compose:setup",
     "serve": "quasar dev",
     "start": "npm run compose:new && npm run serve",

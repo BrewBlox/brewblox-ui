@@ -79,31 +79,33 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
 
   public async fetchAll<T extends StoreObject>(moduleId: string): Promise<T[]> {
     return http
-      .post<T[]>('/history/datastore/mget', {
+      .post<{ values: T[] }>('/history/datastore/mget', {
         namespace: moduleNamespace(moduleId),
         filter: '*',
       })
-      .then(resp => resp.data)
+      .then(resp => resp.data.values)
       .catch(intercept('Fetch all objects', moduleId));
   }
 
   public async fetchById<T extends StoreObject>(moduleId: string, objId: string): Promise<T> {
     return http
-      .post<T>('/history/datastore/get', {
+      .post<{ value: T }>('/history/datastore/get', {
         namespace: moduleNamespace(moduleId),
         id: objId,
       })
-      .then(resp => resp.data)
+      .then(resp => resp.data.value)
       .catch(intercept(`Fetch '${objId}'`, moduleId));
   }
 
   public async persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
     return http
-      .post<T>('/history/datastore/set', {
-        namespace: moduleNamespace(moduleId),
-        value: obj,
+      .post<{ value: T }>('/history/datastore/set', {
+        value: {
+          ...obj,
+          namespace: moduleNamespace(moduleId),
+        },
       })
-      .then(resp => resp.data)
+      .then(resp => resp.data.value)
       .catch(intercept(`Persist '${obj.id}'`, moduleId));
   }
 

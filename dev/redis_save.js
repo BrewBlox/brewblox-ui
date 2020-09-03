@@ -13,7 +13,7 @@ async function run() {
         namespace: db,
         filter: '*',
       })
-      .then(resp => resp.data);
+      .then(resp => resp.data.values);
 
     const fname = `${fileDir}/${db}.redis.json`;
     fs.writeFileSync(fname, JSON.stringify(docs, undefined, 2));

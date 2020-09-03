@@ -34,6 +34,7 @@ type UUID = string;
 export interface StoreObject {
   id: UUID;
   _rev?: string; // CouchDB revision ID
+  namespace?: string; // Redis namespace
 }
 
 export interface SandboxError {
