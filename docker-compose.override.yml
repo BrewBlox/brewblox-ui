@@ -39,8 +39,10 @@ services:
 
   # sparkey:
   #   volumes:
+  #     - ../brewblox-devcon-spark/binaries:/app/binaries
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark
 
   # spock:
   #   volumes:
+  #     - ../brewblox-devcon-spark/binaries:/app/binaries
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark
