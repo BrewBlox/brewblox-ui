@@ -12,12 +12,12 @@ const block: BlockSpec<TempSensorCombiBlock> = {
   id: typeName,
   generate: serviceId => ({
     sensors: [],
-    combinefunc: SensorCombiFunc.SENSOR_COMBI_FUNC_AVG,
+    combineFunc: SensorCombiFunc.SENSOR_COMBI_FUNC_AVG,
     value: bloxQty(20, 'degC').to(serviceTemp(serviceId)),
   }),
   fields: [
     {
-      key: 'combinefunc',
+      key: 'combineFunc',
       title: 'Sensor combination function',
       component: 'EnumValEdit',
       componentProps: { options: SensorCombiFunc },

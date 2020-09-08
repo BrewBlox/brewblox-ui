@@ -110,19 +110,22 @@ export default class TempSensorCombiWidget
       <template v-if="mode === 'Full'">
         <q-separator inset />
 
-        <div class="widget-body column">
+        <div class="q-ma-md row q-gutter-xs">
           <SelectField
-            :value="block.data.combinefunc"
+            :value="block.data.combineFunc"
             :options="combineFuncOpts"
             title="Select function"
             label="Value calculation"
-            class="col-grow q-mb-sm"
-            @input="v => { block.data.combinefunc = v; saveBlock(); }"
+            class="col-grow"
+            @input="v => { block.data.combineFunc = v; saveBlock(); }"
           />
+
+          <div class="col-break" />
+
           <div
             v-for="(link, idx) in sensors"
             :key="`link-${idx}-${link.id}`"
-            class="row q-gutter-x-sm"
+            class="col-12 row q-gutter-xs q-mt-none "
           >
             <LinkField
               :value="link"
@@ -133,26 +136,35 @@ export default class TempSensorCombiWidget
               class="col-grow"
               @input="v => updateSensor(idx, v)"
             />
-            <LabeledField label="Value" class="min-width-sm">
+            <LabeledField
+              label="Value"
+              class="col-auto min-width-sm"
+            >
               {{ sensorValue(link) }}
             </LabeledField>
             <q-btn
               flat
               dense
+              round
               icon="close"
+              class="col-auto self-center"
               @click="removeSensor(idx)"
+            >
+              <q-tooltip>Remove sensor</q-tooltip>
+            </q-btn>
+          </div>
+          <div class="col-grow column q-mt-sm">
+            <q-btn
+              v-if="sensors.length < 8"
+              flat
+              dense
+              color="secondary"
+              icon="add"
+              label="Add sensor"
+              class="self-end"
+              @click="addSensor"
             />
           </div>
-          <q-btn
-            v-if="sensors.length < 8"
-            flat
-            dense
-            color="secondary"
-            icon="add"
-            label="Add sensor"
-            class="self-end"
-            @click="addSensor"
-          />
         </div>
       </template>
     </div>

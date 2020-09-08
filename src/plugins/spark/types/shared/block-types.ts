@@ -503,7 +503,7 @@ export interface TempSensorCombiBlock extends Block {
   type: 'TempSensorCombi';
   data: {
     value: Readonly<Quantity>;
-    combinefunc: SensorCombiFunc;
+    combineFunc: SensorCombiFunc;
     sensors: Link[];
   };
 }
