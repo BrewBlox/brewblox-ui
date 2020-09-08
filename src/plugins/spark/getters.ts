@@ -8,6 +8,7 @@ import {
   DigitalConstraintKey,
   DisplayTempUnit,
   FilterChoice,
+  SensorCombiFunc,
   UserUnitKey,
 } from './types';
 
@@ -66,6 +67,12 @@ export const filterLabels: Record<FilterChoice, string> = {
   [FilterChoice.FILTER_30m]: 'Filter 30m',
 };
 
+export const combineFuncLabels: Record<SensorCombiFunc, string> = {
+  [SensorCombiFunc.SENSOR_COMBI_FUNC_AVG]: 'Average',
+  [SensorCombiFunc.SENSOR_COMBI_FUNC_MIN]: 'Minimum',
+  [SensorCombiFunc.SENSOR_COMBI_FUNC_MAX]: 'Maximum',
+};
+
 export const displayTempLabels: Record<DisplayTempUnit, string> = {
   [DisplayTempUnit.TEMP_CELSIUS]: 'Celsius',
   [DisplayTempUnit.TEMP_FAHRENHEIT]: 'Fahrenheit',
@@ -78,6 +85,7 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
     BlockType.SetpointSensorPair,
   ],
   TempSensorInterface: [
+    BlockType.TempSensorCombi,
     BlockType.TempSensorMock,
     BlockType.TempSensorOneWire,
   ],
