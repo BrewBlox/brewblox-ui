@@ -17,7 +17,7 @@ services:
   #   image: brewblox/brewblox-automation:develop
   #   volumes:
   #     - "../brewblox-automation:/app"
-  #   entrypoint: 'npm run watch'
+  #   entrypoint: 'npm run dev'
 
   # datastore:
   #   image: treehouses/couchdb:2.3.1
