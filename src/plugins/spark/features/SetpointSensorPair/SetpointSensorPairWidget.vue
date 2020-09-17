@@ -80,7 +80,6 @@ export default class SetpointSensorPairWidget
       <template #warnings>
         <BlockEnableToggle
           :crud="crud"
-          :hide-enabled="mode === 'Basic'"
           data-key="settingEnabled"
         >
           <template #enabled>
