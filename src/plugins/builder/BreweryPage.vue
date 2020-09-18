@@ -1,5 +1,5 @@
 <script lang="ts">
-import { debounce } from 'quasar';
+import { debounce, Notify } from 'quasar';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
@@ -22,9 +22,8 @@ export default class BreweryPage extends Vue {
   debouncedCalculate: Function = () => { };
   debouncedSaveLayout: Function = (layout: BuilderLayout) => { void layout; }
 
-  touchTimeout: NodeJS.Timeout | null = null;
-  progressOpts: any = null;
   touchMax = 10;
+  touchMessage: Function = () => { }
 
   @Watch('layout')
   watchLayout(): void {
@@ -131,7 +130,7 @@ export default class BreweryPage extends Vue {
     };
   }
 
-  isClickable(part): boolean {
+  isClickable(part: FlowPart): boolean {
     return !!builderStore.spec(part).interactHandler;
   }
 
@@ -151,23 +150,32 @@ export default class BreweryPage extends Vue {
   }
 
   handleRepeat(args, part: FlowPart): void {
+    if (!this.isClickable(part)) {
+      return;
+    }
+    if (args.repeatCount === 1) {
+      const title = builderStore.spec(part).title;
+      this.touchMessage({ timeout: 1 }); // Clear previous
+      this.touchMessage = Notify.create({
+        group: false,
+        timeout: 500,
+        message: `Hold to interact with '${title}'`,
+        spinner: true,
+      });
+    }
     if (args.repeatCount < this.touchMax) {
-      this.touchTimeout && clearTimeout(this.touchTimeout);
-      this.touchTimeout = setTimeout(this.stopTouch, 300);
-      this.progressOpts = {
-        value: args.repeatCount,
-        left: args.position.left,
-        top: args.position.top,
-      };
+      this.touchMessage({ timeout: 500 }); // Postpone timeout
     }
     if (args.repeatCount === this.touchMax) {
       this.interact(part);
-      this.stopTouch();
+      this.touchMessage({
+        icon: 'done',
+        color: 'positive',
+        timeout: 100,
+        message: 'Done!',
+        spinner: false,
+      });
     }
-  }
-
-  stopTouch(): void {
-    this.progressOpts = null;
   }
 }
 </script>
@@ -250,28 +258,16 @@ export default class BreweryPage extends Vue {
               :key="part.id"
               :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
               :class="{ pointer: isClickable(part), [part.type]: true }"
+              @click="interact(part)"
             >
               <PartWrapper
-                v-touch-repeat:0:100.mouse="args => handleRepeat(args, part)"
+                v-touch-repeat:100.stop="args => handleRepeat(args, part)"
                 :part="part"
                 @update:part="savePart"
                 @dirty="debouncedCalculate"
               />
             </g>
           </svg>
-          <q-circular-progress
-            v-if="progressOpts !== null"
-            :value="progressOpts.value"
-            :max="touchMax - 1"
-            :style="{
-              position:'fixed',
-              top: `${progressOpts.top - 25}px`,
-              left: `${progressOpts.left - 25}px`,
-            }"
-            size="50px"
-            color="primary"
-            instant-feedback
-          />
         </div>
       </q-page>
     </q-page-container>
