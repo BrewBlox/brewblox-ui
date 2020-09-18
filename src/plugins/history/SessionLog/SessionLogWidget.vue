@@ -153,7 +153,6 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
 <template>
   <CardWrapper
     v-bind="{context}"
-    @dblclick="toggleMode"
   >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
