@@ -209,7 +209,7 @@ export default class BreweryPage extends Vue {
       </q-scroll-area>
     </q-drawer>
 
-    <q-page-container @dblclick="startEditor">
+    <q-page-container>
       <q-page class="row no-wrap justify-center q-pa-md">
         <div class="fit">
           <span v-if="parts.length === 0" class="absolute-center">
@@ -222,7 +222,6 @@ export default class BreweryPage extends Vue {
               :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
               :class="{ pointer: isClickable(part), [part.type]: true }"
               @click="interact(part)"
-              @dblclick.stop="edit(part)"
             >
               <PartWrapper :part="part" @update:part="savePart" @dirty="debouncedCalculate" />
             </g>

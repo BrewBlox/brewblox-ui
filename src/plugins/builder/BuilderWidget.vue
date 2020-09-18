@@ -121,13 +121,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     builderStore.spec(part).interactHandler?.(part, this.updater);
   }
 
-  dblclickPart(part: FlowPart): void {
-    // Prevent accidentally opening editor when interacting
-    if (!this.isClickable(part)) {
-      this.startEditor();
-    }
-  }
-
   async calculate(): Promise<void> {
     await this.$nextTick();
     this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
@@ -154,7 +147,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 </script>
 
 <template>
-  <CardWrapper no-scroll v-bind="{context}" @dblclick.native.stop="startEditor">
+  <CardWrapper no-scroll v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud">
         <q-btn
@@ -223,7 +216,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ pointer: isClickable(part), [part.type]: true }"
           @click="interact(part)"
-          @dblclick.stop="dblclickPart(part)"
         >
           <PartWrapper
             :part="part"

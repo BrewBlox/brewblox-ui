@@ -58,7 +58,6 @@ export default class SetpointSensorPairWidget
   <GraphCardWrapper
     :show="inDialog"
     v-bind="{context}"
-    @dblclick="toggleMode"
   >
     <template #graph>
       <HistoryGraph
