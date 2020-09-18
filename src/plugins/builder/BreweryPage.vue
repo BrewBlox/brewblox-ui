@@ -1,5 +1,5 @@
 <script lang="ts">
-import { debounce } from 'quasar';
+import { debounce, Notify } from 'quasar';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
@@ -18,9 +18,12 @@ export default class BreweryPage extends Vue {
 
   localDrawer: boolean | null = null;
 
+  flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
   debouncedSaveLayout: Function = (layout: BuilderLayout) => { void layout; }
-  flowParts: FlowPart[] = [];
+
+  touchMax = 10;
+  touchMessage: Function = () => { }
 
   @Watch('layout')
   watchLayout(): void {
@@ -127,7 +130,7 @@ export default class BreweryPage extends Vue {
     };
   }
 
-  isClickable(part): boolean {
+  isClickable(part: FlowPart): boolean {
     return !!builderStore.spec(part).interactHandler;
   }
 
@@ -144,6 +147,35 @@ export default class BreweryPage extends Vue {
   async calculate(): Promise<void> {
     await this.$nextTick();
     this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
+  }
+
+  handleRepeat(args, part: FlowPart): void {
+    if (!this.isClickable(part)) {
+      return;
+    }
+    if (args.repeatCount === 1) {
+      const title = builderStore.spec(part).title;
+      this.touchMessage({ timeout: 1 }); // Clear previous
+      this.touchMessage = Notify.create({
+        group: false,
+        timeout: 500,
+        message: `Hold to interact with '${title}'`,
+        spinner: true,
+      });
+    }
+    if (args.repeatCount < this.touchMax) {
+      this.touchMessage({ timeout: 500 }); // Postpone timeout
+    }
+    if (args.repeatCount === this.touchMax) {
+      this.interact(part);
+      this.touchMessage({
+        icon: 'done',
+        color: 'positive',
+        timeout: 100,
+        message: 'Done!',
+        spinner: false,
+      });
+    }
   }
 }
 </script>
@@ -215,7 +247,12 @@ export default class BreweryPage extends Vue {
           <span v-if="parts.length === 0" class="absolute-center">
             {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
           </span>
-          <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
+          <svg
+            ref="grid"
+            :viewBox="gridViewBox"
+            class="fit q-pa-md"
+            @touchstart.prevent
+          >
             <g
               v-for="part in flowParts"
               :key="part.id"
@@ -223,7 +260,12 @@ export default class BreweryPage extends Vue {
               :class="{ pointer: isClickable(part), [part.type]: true }"
               @click="interact(part)"
             >
-              <PartWrapper :part="part" @update:part="savePart" @dirty="debouncedCalculate" />
+              <PartWrapper
+                v-touch-repeat:100.stop="args => handleRepeat(args, part)"
+                :part="part"
+                @update:part="savePart"
+                @dirty="debouncedCalculate"
+              />
             </g>
           </svg>
         </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { debounce, uid } from 'quasar';
+import { debounce, Notify, uid } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
@@ -18,6 +18,9 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
+
+  touchMax = 10;
+  touchMessage: Function = () => { }
 
   @Watch('layout')
   watchLayout(): void {
@@ -113,7 +116,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     };
   }
 
-  isClickable(part): boolean {
+  isClickable(part: FlowPart): boolean {
     return builderStore.spec(part).interactHandler !== undefined;
   }
 
@@ -141,6 +144,35 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
       this.config.currentLayoutId = id;
       this.$delete(this.config, 'parts');
       this.saveConfig(this.config);
+    }
+  }
+
+  handleRepeat(args, part: FlowPart): void {
+    if (!this.isClickable(part)) {
+      return;
+    }
+    if (args.repeatCount === 1) {
+      const title = builderStore.spec(part).title;
+      this.touchMessage({ timeout: 1 }); // Clear previous
+      this.touchMessage = Notify.create({
+        group: false,
+        timeout: 500,
+        message: `Hold to interact with '${title}'`,
+        spinner: true,
+      });
+    }
+    if (args.repeatCount < this.touchMax) {
+      this.touchMessage({ timeout: 500 }); // Postpone timeout
+    }
+    if (args.repeatCount === this.touchMax) {
+      this.interact(part);
+      this.touchMessage({
+        icon: 'done',
+        color: 'positive',
+        timeout: 100,
+        message: 'Done!',
+        spinner: false,
+      });
     }
   }
 }
@@ -209,7 +241,12 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           </q-btn>
         </div>
       </span>
-      <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
+      <svg
+        ref="grid"
+        :viewBox="gridViewBox"
+        class="fit q-pa-md"
+        @touchstart.prevent
+      >
         <g
           v-for="part in flowParts"
           :key="part.id"
@@ -218,6 +255,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           @click="interact(part)"
         >
           <PartWrapper
+            v-touch-repeat:100.stop="args => handleRepeat(args, part)"
             :part="part"
             @update:part="savePart"
             @dirty="debouncedCalculate"
