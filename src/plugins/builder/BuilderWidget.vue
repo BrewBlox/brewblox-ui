@@ -19,6 +19,10 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
 
+  touchTimeout: NodeJS.Timeout | null = null;
+  progressOpts: any = null;
+  touchMax = 10;
+
   @Watch('layout')
   watchLayout(): void {
     this.debouncedCalculate();
@@ -143,6 +147,26 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
       this.saveConfig(this.config);
     }
   }
+
+  handleRepeat(args, part: FlowPart): void {
+    if (args.repeatCount < this.touchMax) {
+      this.touchTimeout && clearTimeout(this.touchTimeout);
+      this.touchTimeout = setTimeout(this.stopTouch, 300);
+      this.progressOpts = {
+        value: args.repeatCount,
+        left: args.position.left,
+        top: args.position.top,
+      };
+    }
+    if (args.repeatCount === this.touchMax) {
+      this.interact(part);
+      this.stopTouch();
+    }
+  }
+
+  stopTouch(): void {
+    this.progressOpts = null;
+  }
 }
 </script>
 
@@ -209,21 +233,39 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           </q-btn>
         </div>
       </span>
-      <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
+      <svg
+        ref="grid"
+        :viewBox="gridViewBox"
+        class="fit q-pa-md"
+        @touchstart.prevent
+      >
         <g
           v-for="part in flowParts"
           :key="part.id"
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ pointer: isClickable(part), [part.type]: true }"
-          @click="interact(part)"
         >
           <PartWrapper
+            v-touch-repeat:0:100.mouse="args => handleRepeat(args, part)"
             :part="part"
             @update:part="savePart"
             @dirty="debouncedCalculate"
           />
         </g>
       </svg>
+      <q-circular-progress
+        v-if="progressOpts !== null"
+        :value="progressOpts.value"
+        :max="touchMax - 1"
+        :style="{
+          position:'fixed',
+          top: `${progressOpts.top - 25}px`,
+          left: `${progressOpts.left - 25}px`,
+        }"
+        size="50px"
+        color="primary"
+        instant-feedback
+      />
     </div>
   </CardWrapper>
 </template>

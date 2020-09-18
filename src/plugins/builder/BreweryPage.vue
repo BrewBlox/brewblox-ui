@@ -18,9 +18,13 @@ export default class BreweryPage extends Vue {
 
   localDrawer: boolean | null = null;
 
+  flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
   debouncedSaveLayout: Function = (layout: BuilderLayout) => { void layout; }
-  flowParts: FlowPart[] = [];
+
+  touchTimeout: NodeJS.Timeout | null = null;
+  progressOpts: any = null;
+  touchMax = 10;
 
   @Watch('layout')
   watchLayout(): void {
@@ -145,6 +149,26 @@ export default class BreweryPage extends Vue {
     await this.$nextTick();
     this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
   }
+
+  handleRepeat(args, part: FlowPart): void {
+    if (args.repeatCount < this.touchMax) {
+      this.touchTimeout && clearTimeout(this.touchTimeout);
+      this.touchTimeout = setTimeout(this.stopTouch, 300);
+      this.progressOpts = {
+        value: args.repeatCount,
+        left: args.position.left,
+        top: args.position.top,
+      };
+    }
+    if (args.repeatCount === this.touchMax) {
+      this.interact(part);
+      this.stopTouch();
+    }
+  }
+
+  stopTouch(): void {
+    this.progressOpts = null;
+  }
 }
 </script>
 
@@ -215,17 +239,39 @@ export default class BreweryPage extends Vue {
           <span v-if="parts.length === 0" class="absolute-center">
             {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
           </span>
-          <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
+          <svg
+            ref="grid"
+            :viewBox="gridViewBox"
+            class="fit q-pa-md"
+            @touchstart.prevent
+          >
             <g
               v-for="part in flowParts"
               :key="part.id"
               :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
               :class="{ pointer: isClickable(part), [part.type]: true }"
-              @click="interact(part)"
             >
-              <PartWrapper :part="part" @update:part="savePart" @dirty="debouncedCalculate" />
+              <PartWrapper
+                v-touch-repeat:0:100.mouse="args => handleRepeat(args, part)"
+                :part="part"
+                @update:part="savePart"
+                @dirty="debouncedCalculate"
+              />
             </g>
           </svg>
+          <q-circular-progress
+            v-if="progressOpts !== null"
+            :value="progressOpts.value"
+            :max="touchMax - 1"
+            :style="{
+              position:'fixed',
+              top: `${progressOpts.top - 25}px`,
+              left: `${progressOpts.left - 25}px`,
+            }"
+            size="50px"
+            color="primary"
+            instant-feedback
+          />
         </div>
       </q-page>
     </q-page-container>
