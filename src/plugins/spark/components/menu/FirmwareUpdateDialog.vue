@@ -91,7 +91,8 @@ export default class FirmwareUpdateDialog extends DialogBase {
       <q-card-section>
         <div v-if="error" class="text-negative q-pa-md">
           <div>Update failed: {{ error }}</div>
-          If retrying the update does not work, please run 'brewblox-ctl flash'
+          Please retry. <br>
+          If the retry fails, run `brewblox-ctl flash`
         </div>
 
         <div v-if="messages.length === 0" class="q-pa-md">
