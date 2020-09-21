@@ -43,9 +43,8 @@ const feature: WidgetFeature = {
   component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 3,
   },
-  wizard: 'BlockDiscoveryWizard',
 };
 
 export default { feature, block };
