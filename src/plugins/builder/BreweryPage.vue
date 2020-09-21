@@ -157,6 +157,7 @@ export default class BreweryPage extends Vue {
       const title = builderStore.spec(part).title;
       this.touchMessage({ timeout: 1 }); // Clear previous
       this.touchMessage = Notify.create({
+        position: 'top',
         group: false,
         timeout: 500,
         message: `Hold to interact with '${title}'`,
@@ -251,13 +252,13 @@ export default class BreweryPage extends Vue {
             ref="grid"
             :viewBox="gridViewBox"
             class="fit q-pa-md"
-            @touchstart.prevent
           >
             <g
               v-for="part in flowParts"
               :key="part.id"
               :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
               :class="{ pointer: isClickable(part), [part.type]: true }"
+              @touchstart.prevent
               @click="interact(part)"
             >
               <PartWrapper

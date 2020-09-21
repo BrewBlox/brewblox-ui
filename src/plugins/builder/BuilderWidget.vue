@@ -155,6 +155,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
       const title = builderStore.spec(part).title;
       this.touchMessage({ timeout: 1 }); // Clear previous
       this.touchMessage = Notify.create({
+        position: 'top',
         group: false,
         timeout: 500,
         message: `Hold to interact with '${title}'`,
@@ -245,7 +246,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
         ref="grid"
         :viewBox="gridViewBox"
         class="fit q-pa-md"
-        @touchstart.prevent
       >
         <g
           v-for="part in flowParts"
@@ -253,6 +253,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ pointer: isClickable(part), [part.type]: true }"
           @click="interact(part)"
+          @touchstart.prevent
         >
           <PartWrapper
             v-touch-repeat:100.stop="args => handleRepeat(args, part)"
