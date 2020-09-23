@@ -124,6 +124,10 @@ export default class Troubleshooter extends Vue {
       serviceId: this.serviceId,
     });
   }
+
+  serviceReboot(): void {
+    this.sparkModule?.serviceReboot();
+  }
 }
 </script>
 
@@ -176,6 +180,11 @@ export default class Troubleshooter extends Vue {
               ? 'Pause autoconnect'
               : 'Resume autoconnect'"
             @click="toggleAutoconnecting"
+          />
+          <q-btn
+            flat
+            label="Reboot service"
+            @click="serviceReboot"
           />
         </div>
       </template>
