@@ -331,8 +331,12 @@ export default class SparkPage extends Vue {
     notify.info({ message, icon: 'mdi-tag-remove' });
   }
 
-  reboot(): void {
-    this.sparkModule?.reboot();
+  controllerReboot(): void {
+    this.sparkModule?.controllerReboot();
+  }
+
+  serviceReboot(): void {
+    this.sparkModule?.serviceReboot();
   }
 
   onBlockClick(val: ValidatedWidget): void {
@@ -414,8 +418,13 @@ export default class SparkPage extends Vue {
           />
           <ActionItem
             icon="mdi-restart"
+            label="Reboot service"
+            @click="serviceReboot"
+          />
+          <ActionItem
+            icon="mdi-restart"
             label="Reboot controller"
-            @click="reboot"
+            @click="controllerReboot"
           />
           <ActionItem
             icon="mdi-temperature-celsius"
