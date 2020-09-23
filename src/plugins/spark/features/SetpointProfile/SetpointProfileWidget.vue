@@ -98,7 +98,13 @@ export default class SetpointProfileWidget
 
       <template #graph>
         <q-resize-observer @resize="refresh" />
-        <GenericGraph v-bind="graphProps" :revision="revision" auto-fit auto-resize />
+        <GenericGraph
+          v-bind="graphProps"
+          :revision="revision"
+          :maximized="inDialog"
+          auto-fit
+          auto-resize
+        />
       </template>
     </component>
   </GraphCardWrapper>
