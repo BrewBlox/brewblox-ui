@@ -8,6 +8,9 @@ import { BlockType, WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '
 
 @Component
 export default class SparkWifiMenu extends DialogBase {
+  WifiCipherType = WifiCipherType;
+  WifiSecurityType = WifiSecurityType;
+
   securityOpts: SelectOption<WifiSecurityType>[] = [
     { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },
     { label: 'WEP', value: WifiSecurityType.WLAN_SEC_WEP },
@@ -25,11 +28,11 @@ export default class SparkWifiMenu extends DialogBase {
   ];
 
   isPwd = true;
-  values = {
+  values: WiFiSettingsBlock['data'] = {
     ssid: '',
     password: '',
-    security: 3,
-    cipher: 0,
+    security: WifiSecurityType.WLAN_SEC_WPA2,
+    cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
     signal: 0,
     ip: '',
   }
@@ -64,20 +67,9 @@ export default class SparkWifiMenu extends DialogBase {
         </q-item>
         <q-item>
           <q-item-section>
-            <q-select
-              v-model="values.security"
-              :options="securityOpts"
-              label="Security"
-              emit-value
-              map-options
-            />
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
             <q-input
               v-model="values.password"
-              :disable="values.security === 0"
+              :disable="values.security === WifiSecurityType.WLAN_SEC_UNSEC"
               :type="isPwd ? 'password' : 'text'"
               label="Password"
             >
@@ -89,6 +81,17 @@ export default class SparkWifiMenu extends DialogBase {
                 />
               </template>
             </q-input>
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <q-select
+              v-model="values.security"
+              :options="securityOpts"
+              label="Security"
+              emit-value
+              map-options
+            />
           </q-item-section>
         </q-item>
         <q-item>
