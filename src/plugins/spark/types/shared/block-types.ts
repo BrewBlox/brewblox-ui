@@ -10,6 +10,7 @@ import type {
   FilterChoice,
   LogicResult,
   ReferenceKind,
+  SensorCombiFunc,
   Spark2Hardware,
   SparkPlatform,
   TouchCalibrated,
@@ -496,6 +497,17 @@ export interface SysInfoBlock extends Block {
   };
 }
 // #endregion SysInfo
+
+// #region TempSensorCombi
+export interface TempSensorCombiBlock extends Block {
+  type: 'TempSensorCombi';
+  data: {
+    value: Readonly<Quantity>;
+    combineFunc: SensorCombiFunc;
+    sensors: Link[];
+  };
+}
+// #endregion TempSensorCombi
 
 // #region TempSensorMock
 export interface Fluctuation {

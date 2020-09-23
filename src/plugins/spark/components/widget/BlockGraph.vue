@@ -163,7 +163,7 @@ export default class BlockGraph extends Vue {
               </q-item>
             </q-expansion-item>
           </q-btn-dropdown>
-          <q-btn v-close-popup flat icon="mdi-close-circle" />
+          <DialogCloseButton />
         </template>
       </HistoryGraph>
     </q-card>

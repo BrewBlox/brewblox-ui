@@ -155,7 +155,6 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     :show="inDialog && mode === 'Full'"
     :no-scroll="mode === 'Basic'"
     v-bind="{context}"
-    @dblclick="toggleMode"
   >
     <template #graph>
       <HistoryGraph

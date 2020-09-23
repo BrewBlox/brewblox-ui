@@ -27,7 +27,6 @@ export default class ActuatorPwmWidget
   <GraphCardWrapper
     :show="inDialog"
     v-bind="{context}"
-    @dblclick="toggleMode"
   >
     <template #graph>
       <HistoryGraph

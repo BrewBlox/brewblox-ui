@@ -65,8 +65,8 @@ export default class LayoutActions extends Vue {
     if (!this.layout) {
       return;
     }
-    const { id, _rev, ...exported } = this.layout;
-    void { id, _rev };
+    const { id, ...exported } = this.layout;
+    void id;
     saveFile(exported, `brewblox-${this.layout.title}-layout.json`);
   }
 

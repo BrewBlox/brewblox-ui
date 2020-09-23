@@ -143,7 +143,7 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}" @dblclick.native="startEditor">
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud">
         <template #actions>

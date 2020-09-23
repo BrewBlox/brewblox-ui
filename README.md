@@ -2,6 +2,18 @@
 
 > UI representation of the Brewblox project
 
+## Pinned versions
+
+The following packages are pinned to specific versions:
+
+**mqtt@4.1.0**
+
+4.2.0 breaks websocket connections in browser environments. 4.2.1 fixes this issue, but [breaks explicit hostnames](https://github.com/mqttjs/MQTT.js/issues/1150).
+
+**vue-router@3.2.0**
+
+Quasar has its own dependency on vue-router@3.2.0. Using multiple versions leads to typing errors.
+
 ## Requirements
 
 * Node.js

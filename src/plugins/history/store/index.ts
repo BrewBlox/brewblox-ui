@@ -120,10 +120,7 @@ export class HistoryModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = (session: LoggedSession): void => {
-      const existing = this.sessionById(session.id);
-      if (!existing || existing._rev !== session._rev) {
-        this.sessions = extendById(this.sessions, session);
-      }
+      this.sessions = extendById(this.sessions, session);
     };
     const onDelete = (id: string): void => {
       this.sessions = filterById(this.sessions, { id });

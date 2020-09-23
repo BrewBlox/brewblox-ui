@@ -49,6 +49,7 @@ export const UserBlockType = Enum(
   'SetpointSensorPair',
   'Spark2Pins',
   'Spark3Pins',
+  'TempSensorCombi',
   'TempSensorMock',
   'TempSensorOneWire'
 );
@@ -174,6 +175,14 @@ export const FilterChoice = Enum(
 );
 // #endregion FilterChoice
 
+// #region SensorCombiFunc
+export const SensorCombiFunc = Enum(
+  'SENSOR_COMBI_FUNC_AVG',
+  'SENSOR_COMBI_FUNC_MIN',
+  'SENSOR_COMBI_FUNC_MAX',
+);
+// #endregion SensorCombiFunc
+
 // #region Spark2Hardware
 export const Spark2Hardware = Enum(
   'HW_UNKNOWN',
@@ -235,6 +244,7 @@ export type DisplayTempUnit = Enum<typeof DisplayTempUnit>;
 export type DS2408ConnectMode = Enum<typeof DS2408ConnectMode>;
 export type ValveState = Enum<typeof ValveState>;
 export type FilterChoice = Enum<typeof FilterChoice>;
+export type SensorCombiFunc = Enum<typeof SensorCombiFunc>;
 export type Spark2Hardware = Enum<typeof Spark2Hardware>;
 export type SparkPlatform = Enum<typeof SparkPlatform>;
 export type TouchCalibrated = Enum<typeof TouchCalibrated>;

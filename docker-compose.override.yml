@@ -17,7 +17,15 @@ services:
   #   image: brewblox/brewblox-automation:develop
   #   volumes:
   #     - "../brewblox-automation:/app"
-  #   entrypoint: 'npm run watch'
+  #   entrypoint: 'npm run dev'
+
+  # datastore:
+  #   image: treehouses/couchdb:2.3.1
+  #   labels:
+  #     - traefik.http.services.datastore.loadbalancer.server.port=5984
+  #     - traefik.http.routers.datastore.middlewares=prefix-strip
+  #   volumes:
+  #     - ./dev/couchdb/:/opt/couchdb/data/
 
   # sparksimulator:
   #   image: brewblox/firmware-simulator:feature-multiplatform
@@ -31,8 +39,10 @@ services:
 
   # sparkey:
   #   volumes:
+  #     - ../brewblox-devcon-spark/binaries:/app/binaries
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark
 
   # spock:
   #   volumes:
+  #     - ../brewblox-devcon-spark/binaries:/app/binaries
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark

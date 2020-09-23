@@ -1,6 +1,6 @@
 export interface StoreObject {
   id: string;
-  _rev?: string;
+  namespace?: string;
 }
 
 export type ChangeCb<T> = (obj: T) => unknown;
@@ -13,6 +13,25 @@ export interface EventHandler<T = StoreObject> {
 }
 
 export interface BrewbloxDatabase {
+
+  /**
+   * Perform startup functionality.
+   * Is registered as BrewbloxStartup handler.
+   */
+  start(): void;
+
+  /**
+   * Hook for external change events.
+   * @param changed Changed objects
+   */
+  onChanged(changed: StoreObject[]): void;
+
+  /**
+   * Hook for external delete events.
+   * @param deleted fully qualified Ids of deleted objects
+   */
+  onDeleted(deleted: string[]): void;
+
   /**
    * Be notified of external changes to a collection.
    *
@@ -39,7 +58,7 @@ export interface BrewbloxDatabase {
    * Save a new document to the store.
    *
    * @param moduleId collection ID.
-   * @param obj document. Its ID should be unique. Its _rev field will be reset.
+   * @param obj document. Its ID should be unique.
    */
   create<T extends StoreObject>(moduleId: string, obj: T): Promise<T>;
 
@@ -48,7 +67,6 @@ export interface BrewbloxDatabase {
    *
    * @param moduleId collection ID.
    * @param obj existing document in the database.
-   * `obj._rev` should match that of the currently stored document.
    */
   persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T>;
 
@@ -57,7 +75,6 @@ export interface BrewbloxDatabase {
    *
    * @param moduleId collection ID.
    * @param obj existing document in the database.
-   * `obj._rev` should match that of the currently stored document.
    */
   remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T>;
 }

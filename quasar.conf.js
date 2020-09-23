@@ -10,7 +10,6 @@ module.exports = configure(function (ctx) {
 
   const sharedEnv = {
     BLOX_DATE: buildDate,
-    BLOX_API_DEV: false,
     BLOX_API_HOST: null,
     BLOX_API_PORT: null,
     BLOX_PERFORMANCE: false,
@@ -54,11 +53,6 @@ module.exports = configure(function (ctx) {
         'Dialog',
         'LocalStorage',
         'SessionStorage',
-      ],
-
-      directives: [
-        'ClosePopup',
-        'TouchPan',
       ],
 
       config: {

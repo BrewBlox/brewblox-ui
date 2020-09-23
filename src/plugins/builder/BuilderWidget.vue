@@ -1,5 +1,5 @@
 <script lang="ts">
-import { debounce, uid } from 'quasar';
+import { debounce, Notify, uid } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
@@ -18,6 +18,9 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
+
+  touchMax = 10;
+  touchMessage: Function = () => { }
 
   @Watch('layout')
   watchLayout(): void {
@@ -113,19 +116,12 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     };
   }
 
-  isClickable(part): boolean {
+  isClickable(part: FlowPart): boolean {
     return builderStore.spec(part).interactHandler !== undefined;
   }
 
   interact(part: FlowPart): void {
     builderStore.spec(part).interactHandler?.(part, this.updater);
-  }
-
-  dblclickPart(part: FlowPart): void {
-    // Prevent accidentally opening editor when interacting
-    if (!this.isClickable(part)) {
-      this.startEditor();
-    }
   }
 
   async calculate(): Promise<void> {
@@ -150,11 +146,41 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
       this.saveConfig(this.config);
     }
   }
+
+  handleRepeat(args, part: FlowPart): void {
+    if (!this.isClickable(part)) {
+      return;
+    }
+    if (args.repeatCount === 1) {
+      const title = builderStore.spec(part).title;
+      this.touchMessage({ timeout: 1 }); // Clear previous
+      this.touchMessage = Notify.create({
+        position: 'top',
+        group: false,
+        timeout: 500,
+        message: `Hold to interact with '${title}'`,
+        spinner: true,
+      });
+    }
+    if (args.repeatCount < this.touchMax) {
+      this.touchMessage({ timeout: 500 }); // Postpone timeout
+    }
+    if (args.repeatCount === this.touchMax) {
+      this.interact(part);
+      this.touchMessage({
+        icon: 'done',
+        color: 'positive',
+        timeout: 100,
+        message: 'Done!',
+        spinner: false,
+      });
+    }
+  }
 }
 </script>
 
 <template>
-  <CardWrapper no-scroll v-bind="{context}" @dblclick.native.stop="startEditor">
+  <CardWrapper no-scroll v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud">
         <q-btn
@@ -216,16 +242,21 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           </q-btn>
         </div>
       </span>
-      <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
+      <svg
+        ref="grid"
+        :viewBox="gridViewBox"
+        class="fit q-pa-md"
+      >
         <g
           v-for="part in flowParts"
           :key="part.id"
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ pointer: isClickable(part), [part.type]: true }"
           @click="interact(part)"
-          @dblclick.stop="dblclickPart(part)"
+          @touchstart.prevent
         >
           <PartWrapper
+            v-touch-repeat:100.stop="args => handleRepeat(args, part)"
             :part="part"
             @update:part="savePart"
             @dirty="debouncedCalculate"

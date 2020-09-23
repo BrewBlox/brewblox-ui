@@ -3,11 +3,15 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { typeMatchFilter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
 
 @Component
 export default class SparkWifiMenu extends DialogBase {
+  WifiCipherType = WifiCipherType;
+  WifiSecurityType = WifiSecurityType;
+
   securityOpts: SelectOption<WifiSecurityType>[] = [
     { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },
     { label: 'WEP', value: WifiSecurityType.WLAN_SEC_WEP },
@@ -24,12 +28,13 @@ export default class SparkWifiMenu extends DialogBase {
     { label: 'AES or TKIP', value: WifiCipherType.WLAN_CIPHER_AES_OR_TKIP },
   ];
 
+  busy = false;
   isPwd = true;
-  values = {
+  values: WiFiSettingsBlock['data'] = {
     ssid: '',
     password: '',
-    security: 3,
-    cipher: 0,
+    security: WifiSecurityType.WLAN_SEC_WPA2,
+    cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
     signal: 0,
     ip: '',
   }
@@ -43,8 +48,11 @@ export default class SparkWifiMenu extends DialogBase {
   }
 
   async save(): Promise<void> {
-    await sparkStore.saveBlock({ ...this.block, data: this.values });
-    this.onDialogOk();
+    this.busy = true;
+    await sparkStore
+      .saveBlock({ ...this.block, data: this.values })
+      .then(() => notify.done('Wifi settings updated!'))
+      .finally(() => this.busy = false);
   }
 }
 </script>
@@ -64,20 +72,9 @@ export default class SparkWifiMenu extends DialogBase {
         </q-item>
         <q-item>
           <q-item-section>
-            <q-select
-              v-model="values.security"
-              :options="securityOpts"
-              label="Security"
-              emit-value
-              map-options
-            />
-          </q-item-section>
-        </q-item>
-        <q-item>
-          <q-item-section>
             <q-input
               v-model="values.password"
-              :disable="values.security === 0"
+              :disable="values.security === WifiSecurityType.WLAN_SEC_UNSEC"
               :type="isPwd ? 'password' : 'text'"
               label="Password"
             >
@@ -94,6 +91,17 @@ export default class SparkWifiMenu extends DialogBase {
         <q-item>
           <q-item-section>
             <q-select
+              v-model="values.security"
+              :options="securityOpts"
+              label="Security"
+              emit-value
+              map-options
+            />
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <q-select
               v-model="values.cipher"
               :options="cipherOpts"
               label="Cipher"
@@ -104,9 +112,19 @@ export default class SparkWifiMenu extends DialogBase {
         </q-item>
       </q-card-section>
       <template #actions>
-        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          @click="onDialogCancel"
+        />
         <q-space />
-        <q-btn unelevated label="Connect" color="primary" @click="save" />
+        <q-btn
+          :loading="busy"
+          unelevated
+          label="Connect"
+          color="primary"
+          @click="save"
+        />
       </template>
     </ActionCardWrapper>
   </q-dialog>

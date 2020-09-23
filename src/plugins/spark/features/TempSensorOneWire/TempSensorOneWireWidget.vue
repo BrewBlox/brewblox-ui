@@ -33,7 +33,6 @@ export default class TempSensorOneWireWidget
   <GraphCardWrapper
     :show="inDialog"
     v-bind="{context}"
-    @dblclick="toggleMode"
   >
     <template #graph>
       <HistoryGraph

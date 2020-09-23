@@ -39,7 +39,7 @@ export const prettyUnit = (value: Quantity | string | null | undefined): string 
 };
 
 
-export const prettyQty = (q: Quantity): string => {
+export const prettyQty = (q: Quantity | null): string => {
   if (!isQuantity(q)) {
     return '---';
   }
