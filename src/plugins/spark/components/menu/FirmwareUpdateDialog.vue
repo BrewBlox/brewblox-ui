@@ -1,4 +1,5 @@
 <script lang="ts">
+import shortid from 'shortid';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -12,21 +13,25 @@ import { SparkStatus } from '@/plugins/spark/types';
 export default class FirmwareUpdateDialog extends DialogBase {
   busy = false;
   error = '';
+  id: string = '';
   messages: string[] = [];
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
   created(): void {
+    this.id = `${sparkUpdateEvent}:${this.serviceId}:${shortid.generate()}`;
     Vue.$eventbus.addStateListener({
-      id: `${sparkUpdateEvent}__${this.serviceId}`,
+      id: this.id,
       filter: (key, type) => key === this.serviceId && type === sparkUpdateEvent,
       onmessage: ({ data }) => data.forEach(v => this.pushMessage(v)),
     });
   }
 
   beforeDestroy(): void {
-    Vue.$eventbus.removeStateListener(`${sparkUpdateEvent}__${this.serviceId}`);
+    if (this.id) {
+      Vue.$eventbus.removeStateListener(this.id);
+    }
   }
 
   get sparkModule(): SparkServiceModule {
