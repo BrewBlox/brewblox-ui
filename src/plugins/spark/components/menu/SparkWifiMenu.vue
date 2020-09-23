@@ -3,6 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { typeMatchFilter } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
 
@@ -27,6 +28,7 @@ export default class SparkWifiMenu extends DialogBase {
     { label: 'AES or TKIP', value: WifiCipherType.WLAN_CIPHER_AES_OR_TKIP },
   ];
 
+  busy = false;
   isPwd = true;
   values: WiFiSettingsBlock['data'] = {
     ssid: '',
@@ -46,8 +48,11 @@ export default class SparkWifiMenu extends DialogBase {
   }
 
   async save(): Promise<void> {
-    await sparkStore.saveBlock({ ...this.block, data: this.values });
-    this.onDialogOk();
+    this.busy = true;
+    await sparkStore
+      .saveBlock({ ...this.block, data: this.values })
+      .then(() => notify.done('Wifi settings updated!'))
+      .finally(() => this.busy = false);
   }
 }
 </script>
@@ -107,9 +112,19 @@ export default class SparkWifiMenu extends DialogBase {
         </q-item>
       </q-card-section>
       <template #actions>
-        <q-btn flat label="Cancel" @click="onDialogCancel" />
+        <q-btn
+          flat
+          label="Cancel"
+          @click="onDialogCancel"
+        />
         <q-space />
-        <q-btn unelevated label="Connect" color="primary" @click="save" />
+        <q-btn
+          :loading="busy"
+          unelevated
+          label="Connect"
+          color="primary"
+          @click="save"
+        />
       </template>
     </ActionCardWrapper>
   </q-dialog>
