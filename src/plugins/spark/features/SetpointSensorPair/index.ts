@@ -14,7 +14,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
     const temp = serviceTemp(serviceId);
     return {
       sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
-      storedSetting: bloxQty(null, temp),
+      storedSetting: bloxQty(20, 'degC').to(temp),
       setting: bloxQty(null, temp),
       value: bloxQty(null, temp),
       valueUnfiltered: bloxQty(null, temp),
