@@ -7,8 +7,7 @@ export const HOSTNAME = process.env.DEV
 
 export const PORT = process.env.DEV
   ? Number(devPort)
-  : Number(window.location.port);
+  : Number(window.location.port) || 443;
 
-export const HOST = process.env.DEV
-  ? `https://${devHostname}:${devPort}`
-  : `https://${window.location.host}`;
+
+export const HOST = `https://${HOSTNAME}:${PORT}`;
