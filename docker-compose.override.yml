@@ -19,14 +19,6 @@ services:
   #     - "../brewblox-automation:/app"
   #   entrypoint: 'npm run dev'
 
-  # datastore:
-  #   image: treehouses/couchdb:2.3.1
-  #   labels:
-  #     - traefik.http.services.datastore.loadbalancer.server.port=5984
-  #     - traefik.http.routers.datastore.middlewares=prefix-strip
-  #   volumes:
-  #     - ./dev/couchdb/:/opt/couchdb/data/
-
   # sparksimulator:
   #   image: brewblox/firmware-simulator:feature-multiplatform
   #   init: true
