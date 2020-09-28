@@ -1,9 +1,10 @@
 import fromEntries from 'fromentries';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
+import isFinite from 'lodash/isFinite';
 import isString from 'lodash/isString';
 import matches from 'lodash/matches';
-import { colors } from 'quasar';
+import { colors, date } from 'quasar';
 
 type SortFunc = (a: any, b: any) => number
 
@@ -80,6 +81,21 @@ export const shortDateString =
       return date.toLocaleTimeString();
     }
     return date.toLocaleDateString();
+  };
+
+export const isoDateString =
+  (val: Date | number | string | undefined): string | undefined => {
+    if (val instanceof Date) {
+      return val.toISOString();
+    }
+    const numV = Number(val);
+    if (isFinite(numV) && date.isValid(numV)) {
+      return new Date(numV).toISOString();
+    }
+    if (isString(val) && date.isValid(val)) {
+      return new Date(val).toISOString();
+    }
+    return undefined;
   };
 
 export const round =

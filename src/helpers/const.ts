@@ -9,6 +9,4 @@ export const PORT = process.env.DEV
   ? Number(devPort)
   : Number(window.location.port);
 
-export const HOST = process.env.DEV
-  ? `https://${devHostname}:${devPort}`
-  : `https://${window.location.host}`;
+export const HOST = `https://${HOSTNAME}:${PORT}`;

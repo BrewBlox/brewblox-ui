@@ -1,10 +1,8 @@
-import isFinite from 'lodash/isFinite';
-import isString from 'lodash/isString';
 import mapKeys from 'lodash/mapKeys';
-import { date } from 'quasar';
 import queryString from 'query-string';
 
-import { snakeCased } from '@/helpers/functional';
+import { HOSTNAME, PORT } from '@/helpers/const';
+import { isoDateString, snakeCased } from '@/helpers/functional';
 import http from '@/helpers/http';
 import { sse } from '@/helpers/sse';
 import { createApi } from '@/plugins/database/api';
@@ -15,30 +13,37 @@ const snakeCasedObj =
   (obj: Mapped<any>): Mapped<any> =>
     mapKeys(obj, (_, key) => snakeCased(key));
 
-const formatTime =
-  (val: Date | number | string | undefined): string | undefined => {
-    if (val instanceof Date) {
-      return val.toISOString();
-    }
-    const numV = Number(val);
-    if (isFinite(numV) && date.isValid(numV)) {
-      return new Date(numV).toISOString();
-    }
-    if (isString(val) && date.isValid(val)) {
-      return new Date(val).toISOString();
-    }
-    return undefined;
-  };
-
 const timeFormatted =
   (params: QueryParams): QueryParams =>
     ({
       ...params,
-      start: formatTime(params.start),
-      end: formatTime(params.end),
+      start: isoDateString(params.start),
+      end: isoDateString(params.end),
     });
 
 export const historyApi = {
+  subscribeValuesWs:
+    async (params: QueryParams, target: QueryTarget): Promise<WebSocket> => {
+      const ws = new WebSocket(`wss://${HOSTNAME}:${PORT}/history/query/stream/values`);
+      ws.onopen = () => ws.send(JSON.stringify({
+        ...snakeCasedObj(timeFormatted(params)),
+        ...snakeCasedObj(target),
+        epoch: 'ms',
+      }));
+      return ws;
+    },
+
+  subscribeMetricsWs:
+    async (params: QueryParams, target: QueryTarget): Promise<WebSocket> => {
+      const ws = new WebSocket(`wss://${HOSTNAME}:${PORT}/history/query/stream/last_values`);
+      ws.onopen = () => ws.send(JSON.stringify({
+        ...snakeCasedObj(params),
+        ...snakeCasedObj(target),
+        epoch: 'ms',
+      }));
+      return ws;
+    },
+
   subscribeValues:
     async (params: QueryParams, target: QueryTarget): Promise<EventSource> =>
       sse(`/history/sse/values?${queryString.stringify({
