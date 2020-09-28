@@ -86,12 +86,12 @@ export class HistoryModule extends VuexModule {
 
   @Action
   public async addValuesSource(source: HistorySource): Promise<HistorySource> {
-    return await this.addSource({ source, factory: historyApi.subscribeValuesWs });
+    return await this.addSource({ source, factory: historyApi.openStreamedValues });
   }
 
   @Action
   public async addMetricsSource(source: HistorySource): Promise<HistorySource> {
-    return await this.addSource({ source, factory: historyApi.subscribeMetricsWs });
+    return await this.addSource({ source, factory: historyApi.openStreamedMetrics });
   }
 
   @Action

@@ -1,10 +1,8 @@
 import mapKeys from 'lodash/mapKeys';
-import queryString from 'query-string';
 
 import { HOSTNAME, PORT } from '@/helpers/const';
 import { isoDateString, snakeCased } from '@/helpers/functional';
 import http from '@/helpers/http';
-import { sse } from '@/helpers/sse';
 import { createApi } from '@/plugins/database/api';
 
 import { LoggedSession, QueryParams, QueryResult, QueryTarget } from '../types';
@@ -22,7 +20,7 @@ const timeFormatted =
     });
 
 export const historyApi = {
-  subscribeValuesWs:
+  openStreamedValues:
     async (params: QueryParams, target: QueryTarget): Promise<WebSocket> => {
       const ws = new WebSocket(`wss://${HOSTNAME}:${PORT}/history/query/stream/values`);
       ws.onopen = () => ws.send(JSON.stringify({
@@ -33,7 +31,7 @@ export const historyApi = {
       return ws;
     },
 
-  subscribeMetricsWs:
+  openStreamedMetrics:
     async (params: QueryParams, target: QueryTarget): Promise<WebSocket> => {
       const ws = new WebSocket(`wss://${HOSTNAME}:${PORT}/history/query/stream/last_values`);
       ws.onopen = () => ws.send(JSON.stringify({
@@ -43,22 +41,6 @@ export const historyApi = {
       }));
       return ws;
     },
-
-  subscribeValues:
-    async (params: QueryParams, target: QueryTarget): Promise<EventSource> =>
-      sse(`/history/sse/values?${queryString.stringify({
-        ...snakeCasedObj(timeFormatted(params)),
-        ...snakeCasedObj(target),
-        epoch: 'ms',
-      })}`),
-
-  subscribeMetrics:
-    async (params: QueryParams, target: QueryTarget): Promise<EventSource> =>
-      sse(`/history/sse/last_values?${queryString.stringify({
-        ...snakeCasedObj(params),
-        ...snakeCasedObj(target),
-        epoch: 'ms',
-      })}`),
 
   fetchKnownKeys:
     async (): Promise<Mapped<any>> =>
