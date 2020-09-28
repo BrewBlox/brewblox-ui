@@ -438,7 +438,7 @@ export default class SparkPage extends Vue {
           />
           <ActionItem
             icon="mdi-power-plug"
-            label="Export hardware links"
+            label="Export sensor and pin names"
             @click="saveHwInfo(serviceId)"
           />
           <ActionItem
