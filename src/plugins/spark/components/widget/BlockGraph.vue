@@ -133,6 +133,7 @@ export default class BlockGraph extends Vue {
         :config="graphCfg"
         :use-presets="!noDuration"
         use-range
+        maximized
         @params="saveParams"
         @layout="saveLayout"
       >

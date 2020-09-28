@@ -210,6 +210,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
 
     <div
       v-if="mode === 'Basic'"
+      v-touch-hold.mouse.stop="showGraphDialog"
       class="fit"
     >
       <q-resize-observer :debounce="200" @resize="refresh" />

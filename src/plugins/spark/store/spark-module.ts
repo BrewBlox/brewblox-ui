@@ -230,8 +230,13 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
-  public async reboot(): Promise<void> {
-    await api.reboot(this.id);
+  public async controllerReboot(): Promise<void> {
+    await api.controllerReboot(this.id);
+  }
+
+  @Action
+  public async serviceReboot(): Promise<void> {
+    await api.serviceReboot(this.id);
   }
 
   @Action

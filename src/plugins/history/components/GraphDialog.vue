@@ -48,6 +48,7 @@ export default class GraphDialog extends DialogBase {
                 },
                 attrs: {
                   annotated: !!this.saveAnnotations,
+                  maximized: true,
                 },
                 on: {
                   annotations: this.saveAnnotations ?? (() => { }),

@@ -98,7 +98,12 @@ export const serviceImport = (serviceId: string, exported: SparkExported): Promi
     .then(resp => resp.data.messages)
     .catch(intercept(`Failed to import blocks in ${serviceId}`));
 
-export const reboot = (serviceId: string): Promise<any> =>
-  http.post(`/${encodeURIComponent(serviceId)}/system/reboot`, {})
+export const serviceReboot = (serviceId: string): Promise<any> =>
+  http.post(`/${encodeURIComponent(serviceId)}/system/reboot/service`, {})
+    .then(resp => resp.data)
+    .catch(intercept(`Failed to reboot ${serviceId}`));
+
+export const controllerReboot = (serviceId: string): Promise<any> =>
+  http.post(`/${encodeURIComponent(serviceId)}/system/reboot/controller`, {})
     .then(resp => resp.data)
     .catch(intercept(`Failed to reboot ${serviceId}`));
