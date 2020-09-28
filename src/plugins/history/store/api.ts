@@ -1,4 +1,7 @@
+import isFinite from 'lodash/isFinite';
+import isString from 'lodash/isString';
 import mapKeys from 'lodash/mapKeys';
+import { date } from 'quasar';
 import queryString from 'query-string';
 
 import { snakeCased } from '@/helpers/functional';
@@ -13,10 +16,19 @@ const snakeCasedObj =
     mapKeys(obj, (_, key) => snakeCased(key));
 
 const formatTime =
-  (val?: string | number): string | undefined =>
-    (Number.isNaN(Number(val))
-      ? val as string
-      : new Date(Number(val)).toUTCString());
+  (val: Date | number | string | undefined): string | undefined => {
+    if (val instanceof Date) {
+      return val.toISOString();
+    }
+    const numV = Number(val);
+    if (isFinite(numV) && date.isValid(numV)) {
+      return new Date(numV).toISOString();
+    }
+    if (isString(val) && date.isValid(val)) {
+      return new Date(val).toISOString();
+    }
+    return undefined;
+  };
 
 const timeFormatted =
   (params: QueryParams): QueryParams =>
