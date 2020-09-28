@@ -293,7 +293,7 @@ export const startResetBlocks = (serviceId: string): void => {
       type: 'checkbox',
       items: [
         { label: 'Remember names of discovered blocks', value: 0 },
-        { label: 'Create text file with actuator/sensor info', value: 1 },
+        { label: 'Export sensor and pin names', value: 1 },
       ],
       model: [0, 1], // pre-check default actions
     },
