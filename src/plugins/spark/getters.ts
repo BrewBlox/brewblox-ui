@@ -9,7 +9,6 @@ import {
   DisplayTempUnit,
   FilterChoice,
   SensorCombiFunc,
-  UserUnitKey,
 } from './types';
 
 export const sparkType = 'Spark';
@@ -24,13 +23,6 @@ export const roleIcons: Record<WidgetRole, string> = {
   Output: 'mdi-power-plug',
   Constraint: 'mdi-lock-outline',
   Other: 'mdi-cube',
-};
-
-export const userUnitChoices: Record<UserUnitKey, string[]> = {
-  Temp: [
-    'degC',
-    'degF',
-  ],
 };
 
 export const digitalConstraintLabels: Record<DigitalConstraintKey, string> = {

@@ -1,8 +1,8 @@
-export * from './shared-types';
+export * from '@/shared-types/automation-types';
 
 import { VueConstructor } from 'vue';
 
-import { AutomationImpl } from './shared-types';
+import { AutomationImpl } from '@/shared-types/automation-types';
 
 export type Section = 'Preconditions' | 'Actions' | 'Transitions';
 

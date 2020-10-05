@@ -1,4 +1,4 @@
-import { Block } from './block-types';
+import { Block } from './spark-block-types';
 
 // #region SparkFirmwareInfo
 export interface SparkFirmwareInfo {
