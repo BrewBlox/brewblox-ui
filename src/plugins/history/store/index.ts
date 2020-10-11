@@ -67,14 +67,14 @@ export class HistoryModule extends VuexModule {
   @Action
   public async addSource(args: {
     source: HistorySource;
-    fetcher: (p: QueryParams, t: QueryTarget) => Promise<EventSource>;
+    factory: (p: QueryParams, t: QueryTarget) => Promise<WebSocket>;
   }): Promise<HistorySource> {
-    const { source, fetcher } = args;
+    const { source, factory } = args;
     const { id, params, target } = source;
 
     this.setSource(source);
 
-    const events = await fetcher(params, target);
+    const events = await factory(params, target);
     events.onmessage = (event: MessageEvent) =>
       this.transform({ id, result: JSON.parse(event.data) });
     events.onerror = () => events.close();
@@ -86,20 +86,18 @@ export class HistoryModule extends VuexModule {
 
   @Action
   public async addValuesSource(source: HistorySource): Promise<HistorySource> {
-    return await this.addSource({ source, fetcher: historyApi.subscribeValues });
+    return await this.addSource({ source, factory: historyApi.openStreamedValues });
   }
 
   @Action
   public async addMetricsSource(source: HistorySource): Promise<HistorySource> {
-    return await this.addSource({ source, fetcher: historyApi.subscribeMetrics });
+    return await this.addSource({ source, factory: historyApi.openStreamedMetrics });
   }
 
   @Action
   public async removeSource(source: HistorySource): Promise<void> {
     this.sources = filterById(this.sources, source);
-    if (source.events) {
-      source.events.close();
-    }
+    source.events?.close();
   }
 
   @Action
@@ -120,10 +118,7 @@ export class HistoryModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = (session: LoggedSession): void => {
-      const existing = this.sessionById(session.id);
-      if (!existing || existing._rev !== session._rev) {
-        this.sessions = extendById(this.sessions, session);
-      }
+      this.sessions = extendById(this.sessions, session);
     };
     const onDelete = (id: string): void => {
       this.sessions = filterById(this.sessions, { id });

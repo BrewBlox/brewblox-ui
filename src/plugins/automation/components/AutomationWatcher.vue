@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
-import { durationMs } from '@/helpers/functional';
+import { durationMs } from '@/helpers/duration';
 import { systemStore } from '@/store/system';
 
 import { automationStore } from '../store';

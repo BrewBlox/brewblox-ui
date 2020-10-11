@@ -1,12 +1,13 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WidgetWizardBase from '@/components/WidgetWizardBase';
+import WizardBase from '@/plugins/wizardry/WizardBase';
 
 @Component
-export default class RimsWizard extends WidgetWizardBase {
+export default class RimsWizard extends WizardBase {
   initialTasks = [
     'QuickStartServiceTask',
+    'QuickStartDiscoveryTask',
     'RimsNamingTask',
     'RimsHardwareTask',
     'RimsManualTask',
@@ -15,5 +16,9 @@ export default class RimsWizard extends WidgetWizardBase {
 </script>
 
 <template>
-  <WizardTaskMaster :initial-tasks="initialTasks" @back="back" @close="close" />
+  <WizardTaskMaster
+    :initial-tasks="initialTasks"
+    @back="back"
+    @close="close"
+  />
 </template>

@@ -4,13 +4,13 @@ import Vue from 'vue';
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import { bloxQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
+import { durationString } from '@/helpers/duration';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class BlockGraph extends Vue {
@@ -103,7 +103,6 @@ export default class BlockGraph extends Vue {
     createDialog({
       component: 'InputDialog',
       title: 'Duration',
-      parent: this,
       value: this.graphCfg.params.duration,
     })
       .onOk(val => {
@@ -115,19 +114,18 @@ export default class BlockGraph extends Vue {
   chooseDuration(): void {
     const current = this.graphCfg.params.duration ?? '1h';
     createDialog({
-      component: 'TimeUnitDialog',
-      parent: this,
+      component: 'DurationQuantityDialog',
       title: 'Custom graph duration',
-      value: new Unit(durationMs(current), 'ms'),
+      value: bloxQty(current),
       label: 'Duration',
     })
-      .onOk(unit => this.saveParams({ duration: unitDurationString(unit) }));
+      .onOk(unit => this.saveParams({ duration: durationString(unit) }));
   }
 }
 </script>
 
 <template>
-  <q-dialog v-model="dialogOpen" maximized>
+  <q-dialog v-model="dialogOpen" transition-show="fade" maximized>
     <q-card v-if="dialogOpen" class="text-white">
       <HistoryGraph
         ref="graph"
@@ -135,6 +133,7 @@ export default class BlockGraph extends Vue {
         :config="graphCfg"
         :use-presets="!noDuration"
         use-range
+        maximized
         @params="saveParams"
         @layout="saveLayout"
       >
@@ -165,7 +164,7 @@ export default class BlockGraph extends Vue {
               </q-item>
             </q-expansion-item>
           </q-btn-dropdown>
-          <q-btn v-close-popup flat icon="mdi-close-circle" />
+          <DialogCloseButton />
         </template>
       </HistoryGraph>
     </q-card>

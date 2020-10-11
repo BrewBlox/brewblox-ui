@@ -1,5 +1,5 @@
 <script lang="ts">
-import { debounce, uid } from 'quasar';
+import { debounce, Notify, uid } from 'quasar';
 import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
@@ -18,6 +18,9 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
 
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
+
+  touchMax = 10;
+  touchMessage: Function = () => { }
 
   @Watch('layout')
   watchLayout(): void {
@@ -113,18 +116,12 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
     };
   }
 
-  isClickable(part): boolean {
-    return !!builderStore.spec(part).interactHandler;
+  isClickable(part: FlowPart): boolean {
+    return builderStore.spec(part).interactHandler !== undefined;
   }
 
   interact(part: FlowPart): void {
     builderStore.spec(part).interactHandler?.(part, this.updater);
-  }
-
-  edit(part: FlowPart): void {
-    if (!this.isClickable(part)) {
-      this.startEditor();
-    }
   }
 
   async calculate(): Promise<void> {
@@ -147,6 +144,36 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
       this.config.currentLayoutId = id;
       this.$delete(this.config, 'parts');
       this.saveConfig(this.config);
+    }
+  }
+
+  handleRepeat(args, part: FlowPart): void {
+    if (!this.isClickable(part)) {
+      return;
+    }
+    if (args.repeatCount === 1) {
+      const title = builderStore.spec(part).title;
+      this.touchMessage({ timeout: 1 }); // Clear previous
+      this.touchMessage = Notify.create({
+        position: 'top',
+        group: false,
+        timeout: 500,
+        message: `Hold to interact with '${title}'`,
+        spinner: true,
+      });
+    }
+    if (args.repeatCount < this.touchMax) {
+      this.touchMessage({ timeout: 500 }); // Postpone timeout
+    }
+    if (args.repeatCount === this.touchMax) {
+      this.interact(part);
+      this.touchMessage({
+        icon: 'done',
+        color: 'positive',
+        timeout: 100,
+        message: 'Done!',
+        spinner: false,
+      });
     }
   }
 }
@@ -176,7 +203,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
       </component>
     </template>
 
-    <div class="fit" @dblclick="startEditor">
+    <div class="fit">
       <span
         v-if="parts.length === 0"
         class="absolute-center q-gutter-y-sm"
@@ -215,16 +242,21 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           </q-btn>
         </div>
       </span>
-      <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
+      <svg
+        ref="grid"
+        :viewBox="gridViewBox"
+        class="fit q-pa-md"
+      >
         <g
           v-for="part in flowParts"
           :key="part.id"
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{ pointer: isClickable(part), [part.type]: true }"
           @click="interact(part)"
-          @dblclick.stop="edit(part)"
+          @touchstart.prevent
         >
           <PartWrapper
+            v-touch-repeat:100.stop="args => handleRepeat(args, part)"
             :part="part"
             @update:part="savePart"
             @dirty="debouncedCalculate"

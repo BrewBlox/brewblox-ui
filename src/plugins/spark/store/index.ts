@@ -36,8 +36,13 @@ export class SparkGlobalModule extends VuexModule {
   }
 
   public blockByAddress<T extends Block>(addr: BlockAddress | null): T | null {
-    if (!addr || !addr.id || !addr.serviceId) { return null; }
+    if (!addr) { return null; }
     return this.moduleById(addr.serviceId)?.blockByAddress<T>(addr) ?? null;
+  }
+
+  public fieldByAddress(addr: BlockFieldAddress | null): any {
+    if (!addr) { return null; }
+    return this.moduleById(addr.serviceId)?.fieldByAddress(addr) ?? null;
   }
 
   public serviceBlocks(serviceId: string | null): Block[] {
@@ -126,10 +131,7 @@ export class SparkGlobalModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = async (preset: StoredDataPreset): Promise<void> => {
-      const existing = this.presets.find(v => v.id === preset.id);
-      if (!existing || existing._rev !== preset._rev) {
-        this.presets = extendById(this.presets, preset);
-      }
+      this.presets = extendById(this.presets, preset);
     };
     const onDelete = (id: string): void => {
       this.presets = filterById(this.presets, { id });

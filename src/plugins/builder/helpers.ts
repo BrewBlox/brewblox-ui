@@ -30,8 +30,8 @@ export function settingsBlock<T extends Block>(part: PersistentPart, key: string
 }
 
 export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPart {
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   const { transitions, size, flows, ...persistent } = part as FlowPart;
+  void { transitions, size, flows };
   return persistent;
 }
 

@@ -1,27 +1,30 @@
 import { createDialog } from '@/helpers/dialog';
+import { isBlockDriven } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockType } from '@/plugins/spark/types';
+import { ActuatorPwmBlock, BlockType, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
 
 import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '../getters';
 import { settingsBlock, showAbsentBlock, showDrivingBlockDialog } from '../helpers';
 import { PartSpec, PartUpdater, PersistentPart } from '../types';
 
+type BlockT = DigitalActuatorBlock | ActuatorPwmBlock;
 const addressKey = 'actuator';
 
+
 const calcPressure = (part: PersistentPart): number => {
-  const block = settingsBlock(part, addressKey);
+  const block = settingsBlock<BlockT>(part, addressKey);
   if (block === null) {
     return part.settings.enabled
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
-  if (block.type === 'DigitalActuator') {
-    return block.data.state === 'Active'
+  if (block.type === BlockType.DigitalActuator) {
+    return block.data.state === DigitalState.STATE_ACTIVE
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
   // PWM Actuator
-  if (block.type === 'ActuatorPwm') {
+  if (block.type === BlockType.ActuatorPwm) {
     return (block.data.setting / 100) * (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE);
   }
   return 0;
@@ -59,13 +62,8 @@ const spec: PartSpec = {
   },
   interactHandler: (part: PersistentPart, updater: PartUpdater) => {
     const hasAddr = !!part.settings[addressKey]?.id;
-    const block = settingsBlock(part, addressKey);
-    const driven = block === null
-      ? false
-      : sparkStore
-        .moduleById(block.serviceId)!
-        .drivenChains
-        .some(v => v[0] === block.id);
+    const block = settingsBlock<BlockT>(part, addressKey);
+    const driven = isBlockDriven(block);
 
     if (!hasAddr) {
       part.settings.enabled = !part.settings.enabled;
@@ -77,13 +75,14 @@ const spec: PartSpec = {
     else if (driven) {
       showDrivingBlockDialog(part, addressKey);
     }
-    else if (block.type === 'DigitalActuator') {
-      block.data.desiredState = block.data.state === 'Active'
-        ? 'Inactive'
-        : 'Active';
+    else if (block.type === BlockType.DigitalActuator) {
+      block.data.desiredState =
+        block.data.state === DigitalState.STATE_ACTIVE
+          ? DigitalState.STATE_INACTIVE
+          : DigitalState.STATE_ACTIVE;
       sparkStore.saveBlock(block);
     }
-    else if (block.type === 'ActuatorPwm') {
+    else if (block.type === BlockType.ActuatorPwm) {
       const limiterWarning = block.data.constrainedBy?.constraints.length
         ? 'The value may be limited by constraints'
         : '';

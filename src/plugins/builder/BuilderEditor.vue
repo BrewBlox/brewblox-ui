@@ -5,8 +5,7 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 
 import { Coordinates } from '@/helpers/coordinates';
 import { createDialog } from '@/helpers/dialog';
-import { clampRotation } from '@/helpers/functional';
-import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
+import { clampRotation, deepCopy } from '@/helpers/functional';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -43,6 +42,13 @@ interface ActionTool extends EditorAction {
   use: (parts: PersistentPart[]) => void;
 }
 
+const moveKeys: Record<string, XYPosition> = {
+  ArrowUp: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 },
+  ArrowLeft: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 },
+};
+
 @Component({
   components: {
     BuilderCatalog,
@@ -53,6 +59,7 @@ export default class BuilderEditor extends Vue {
   squares = squares;
 
   layoutId: string | null = null;
+  debouncedSaveParts: Function = () => { };
   debouncedCalculate: Function = () => { };
   flowParts: FlowPart[] = [];
   history: string[] = [];
@@ -99,6 +106,7 @@ export default class BuilderEditor extends Vue {
   }
 
   created(): void {
+    this.debouncedSaveParts = debounce(this.saveParts, 500);
     this.debouncedCalculate = debounce(this.calculate, 150, false);
     this.debouncedCalculate();
   }
@@ -277,7 +285,7 @@ export default class BuilderEditor extends Vue {
     if (saveHistory) {
       const stored = builderStore.layoutById(this.layout.id);
       if (stored) {
-        this.history.push(JSON.stringify(serialize(stored.parts)));
+        this.history.push(JSON.stringify(stored.parts));
         this.undoneHistory = [];
       }
     }
@@ -306,8 +314,8 @@ export default class BuilderEditor extends Vue {
 
       const current = builderStore.layoutById(this.layout.id);
       if (current) {
-        const state = JSON.stringify(serialize(current.parts));
-        const parts = deserialize(JSON.parse(this.history.pop()!));
+        const state = JSON.stringify(current.parts);
+        const parts = JSON.parse(this.history.pop()!);
         await this.saveParts(parts, false);
         this.undoneHistory.push(state);
       }
@@ -320,8 +328,8 @@ export default class BuilderEditor extends Vue {
 
       const current = builderStore.layoutById(this.layout.id);
       if (current) {
-        const state = JSON.stringify(serialize(current.parts));
-        const parts = deserialize(JSON.parse(this.undoneHistory.pop()!));
+        const state = JSON.stringify(current.parts);
+        const parts = JSON.parse(this.undoneHistory.pop()!);
         await this.saveParts(parts, false);
         this.history.push(state);
       }
@@ -546,7 +554,6 @@ export default class BuilderEditor extends Vue {
   useAdd(): void {
     if (!this.floater) {
       createDialog({
-        parent: this,
         component: BuilderCatalog,
       })
         .onOk((part: PersistentPart) => {
@@ -651,6 +658,18 @@ export default class BuilderEditor extends Vue {
     }
   }
 
+  deltaMove(parts: FlowPart[], delta: XYPosition): void {
+    parts.forEach(part => {
+      part.x += delta.x;
+      part.y += delta.y;
+    });
+    const ids = parts.map(v => v.id);
+    this.debouncedSaveParts([
+      ...this.parts.filter(p => !ids.includes(p.id)),
+      ...parts,
+    ]);
+  }
+
   ////////////////////////////////////////////////////////////////
   // Event handlers
   ////////////////////////////////////////////////////////////////
@@ -681,12 +700,15 @@ export default class BuilderEditor extends Vue {
   }
 
   keyHandler(evt: KeyboardEvent): void {
-    const key = evt.key.toLowerCase();
+    const key = evt.key;
+    const keyDelta = moveKeys[key];
     const tool = this.tools.find(t => t.shortcut === key);
 
-    // Capture escape key
-    if (evt.keyCode === 27) {
+    if (key === 'Escape') {
       this.clear();
+    }
+    else if (keyDelta) {
+      this.deltaMove(this.findActionParts(), keyDelta);
     }
     else if (evt.ctrlKey) {
       if (key === 'z') { this.undo(); };

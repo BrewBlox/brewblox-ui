@@ -1,4 +1,5 @@
 <script lang="ts">
+import shortid from 'shortid';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -12,21 +13,25 @@ import { SparkStatus } from '@/plugins/spark/types';
 export default class FirmwareUpdateDialog extends DialogBase {
   busy = false;
   error = '';
+  id: string = '';
   messages: string[] = [];
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
   created(): void {
-    Vue.$eventbus.addListener({
-      id: `${sparkUpdateEvent}__${this.serviceId}`,
+    this.id = `${sparkUpdateEvent}:${this.serviceId}:${shortid.generate()}`;
+    Vue.$eventbus.addStateListener({
+      id: this.id,
       filter: (key, type) => key === this.serviceId && type === sparkUpdateEvent,
       onmessage: ({ data }) => data.forEach(v => this.pushMessage(v)),
     });
   }
 
   beforeDestroy(): void {
-    Vue.$eventbus.removeListener(`${sparkUpdateEvent}__${this.serviceId}`);
+    if (this.id) {
+      Vue.$eventbus.removeStateListener(this.id);
+    }
   }
 
   get sparkModule(): SparkServiceModule {
@@ -38,19 +43,20 @@ export default class FirmwareUpdateDialog extends DialogBase {
   }
 
   get updateAvailableText(): string {
-    return !this.status
+    const latest = this.status?.isLatestFirmware;
+    return latest === undefined
       ? 'Current firmware version is unknown.'
-      : !this.status.latest
-        ? 'A firmware update is available.'
-        : "You're using the latest firmware.";
+      : latest
+        ? "You're using the latest firmware."
+        : 'A firmware update is available.';
   }
 
   get ready(): boolean {
-    return this.status !== null && this.status.connect;
+    return !!this.status?.isConnected;
   }
 
   get buttonColor(): string {
-    return this.status?.latest
+    return this.status?.isLatestFirmware
       ? ''
       : 'primary';
   }
@@ -90,7 +96,8 @@ export default class FirmwareUpdateDialog extends DialogBase {
       <q-card-section>
         <div v-if="error" class="text-negative q-pa-md">
           <div>Update failed: {{ error }}</div>
-          If retrying the update does not work, please run 'brewblox-ctl flash'
+          Please retry. <br>
+          If the retry fails, run `brewblox-ctl flash`
         </div>
 
         <div v-if="messages.length === 0" class="q-pa-md">

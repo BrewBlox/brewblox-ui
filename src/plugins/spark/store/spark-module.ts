@@ -7,7 +7,9 @@ import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   Block,
   BlockAddress,
+  BlockFieldAddress,
   Limiters,
+  Link,
   RelationEdge,
   SparkExported,
   SparkService,
@@ -101,6 +103,17 @@ export class SparkServiceModule extends VuexModule {
     return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
   }
 
+  public blockByLink<T extends Block>(link: Link | null): T | null {
+    if (!link || !link.id) { return null; };
+    return this.blockById<T>(link.id);
+  }
+
+  public fieldByAddress(addr: BlockFieldAddress | null): any {
+    const block = this.blockByAddress(addr);
+    if (!block || !addr?.field) { return null; }
+    return block.data[addr.field] ?? null;
+  }
+
   public blocksByType<T extends Block>(type: T['type']): T[] {
     return this.blocks.filter(typeMatchFilter<T>(type));
   }
@@ -189,14 +202,14 @@ export class SparkServiceModule extends VuexModule {
     const status = await api.fetchSparkStatus(this.id);
     this.updateStatus(status);
     serviceStore.updateStatus(asServiceStatus(status));
-    if (status.synchronize) {
+    if (status.isSynchronized) {
       await Promise.all([
         this.fetchUnits(),
         this.fetchDiscoveredBlocks(),
         this.fetchBlocks(),
       ]);
     }
-    return status.synchronize;
+    return !!status.isSynchronized;
   }
 
   @Action
@@ -217,13 +230,18 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
-  public async reboot(): Promise<void> {
-    await api.reboot(this.id);
+  public async controllerReboot(): Promise<void> {
+    await api.controllerReboot(this.id);
+  }
+
+  @Action
+  public async serviceReboot(): Promise<void> {
+    await api.serviceReboot(this.id);
   }
 
   @Action
   public async start(): Promise<void> {
-    Vue.$eventbus.addListener({
+    Vue.$eventbus.addStateListener({
       id: `${sparkStateEvent}__${this.id}`,
       filter: (key, type) => key === this.id && type === sparkStateEvent,
       onmessage: (msg: SparkStateMessage) => {
@@ -240,6 +258,6 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async stop(): Promise<void> {
-    Vue.$eventbus.removeListener(`${sparkStateEvent}__${this.id}`);
+    Vue.$eventbus.removeStateListener(`${sparkStateEvent}__${this.id}`);
   }
 }

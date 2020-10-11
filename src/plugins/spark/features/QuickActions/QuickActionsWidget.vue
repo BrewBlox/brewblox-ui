@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
-import { deserialize, serialize } from '@/plugins/spark/parse-object';
+import { deserialize } from '@/plugins/spark/parse-object';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';
@@ -25,7 +25,7 @@ export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
   }
 
   saveActions(actions: ChangeAction[] = this.actions): void {
-    this.config.actions = serialize(actions);
+    this.config.actions = actions;
     this.config.steps = undefined;
     this.saveConfig();
   }
@@ -77,7 +77,9 @@ export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <CardWrapper
+    v-bind="{context}"
+  >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #menus>

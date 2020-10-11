@@ -5,7 +5,7 @@ import matches from 'lodash/matches';
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
-import { durationMs, durationString } from '@/helpers/functional';
+import { durationMs, durationString } from '@/helpers/duration';
 
 import { QueryConfig, QueryParams } from '../types';
 
@@ -97,8 +97,8 @@ export default class GraphPeriodEditor extends Vue {
     this.saveSanitized(period);
   }
 
-  saveStart(val: Date): void {
-    this.config.params.start = val.getTime();
+  saveStart(val: number): void {
+    this.config.params.start = val;
     this.saveSanitized();
   }
 
@@ -107,8 +107,8 @@ export default class GraphPeriodEditor extends Vue {
     this.saveSanitized();
   }
 
-  saveEnd(val: Date): void {
-    this.config.params.end = val.getTime();
+  saveEnd(val: number): void {
+    this.config.params.end = val;
     this.saveSanitized();
   }
 }
@@ -148,12 +148,13 @@ export default class GraphPeriodEditor extends Vue {
       <DatetimeField
         v-if="shownPeriod.start"
         :value="config.params.start"
+        emit-number
         title="Start time"
         label="Start date and time"
         class="col-auto min-width-sm"
         @input="saveStart"
       />
-      <DurationInputField
+      <DurationField
         v-if="shownPeriod.duration"
         :value="config.params.duration"
         title="Duration"
@@ -164,6 +165,7 @@ export default class GraphPeriodEditor extends Vue {
       <DatetimeField
         v-if="shownPeriod.end"
         :value="config.params.end"
+        emit-number
         title="End time"
         label="End date and time"
         class="col-auto min-width-sm"

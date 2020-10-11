@@ -1,10 +1,12 @@
 <script lang="ts">
+import { Enum } from 'typescript-string-enums';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { typeMatchFilter } from '@/helpers/functional';
+import { displayTempLabels } from '@/plugins/spark/getters';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
+import { BlockType, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
 import { UserUnits } from '@/plugins/spark/types';
 
 const defaultMessage =
@@ -17,10 +19,9 @@ export default class SparkUnitMenu extends DialogBase {
     { label: 'Celsius', value: 'degC' },
     { label: 'Fahrenheit', value: 'degF' },
   ]
-  displayOpts: SelectOption<DisplayTempUnit>[] = [
-    { label: 'Celsius', value: DisplayTempUnit.TEMP_CELSIUS },
-    { label: 'Fahrenheit', value: DisplayTempUnit.TEMP_FAHRENHEIT },
-  ]
+  displayOpts: SelectOption<DisplayTempUnit>[] =
+    Enum.values(DisplayTempUnit)
+      .map(value => ({ value, label: displayTempLabels[value] }))
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -42,7 +43,7 @@ export default class SparkUnitMenu extends DialogBase {
   get displayBlock(): DisplaySettingsBlock | null {
     return this.sparkModule
       .blocks
-      .find(typeMatchFilter<DisplaySettingsBlock>('DisplaySettings'))
+      .find(typeMatchFilter<DisplaySettingsBlock>(BlockType.DisplaySettings))
       ?? null;
   }
 

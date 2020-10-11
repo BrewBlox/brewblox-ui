@@ -1,11 +1,11 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
+import { BlockSpec, BlockType, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './DisplaySettingsWidget.vue';
 
-const typeName = 'DisplaySettings';
+const typeName = BlockType.DisplaySettings;
 
 
 const block: BlockSpec<DisplaySettingsBlock> = {

@@ -8,12 +8,13 @@ import range from 'lodash/range';
 import { Enum } from 'typescript-string-enums';
 import { VueConstructor } from 'vue';
 
+import { bloxLink, bloxQty, isLink, isQuantity, prettyLink, prettyQty, prettyUnit } from '@/helpers/bloxfield';
 import { ref } from '@/helpers/component-ref';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { durationString } from '@/helpers/duration';
 import {
   base64ToHex,
   dateString,
-  durationString,
   hexToBase64,
   matchesType,
   round,
@@ -21,18 +22,16 @@ import {
   truncate,
   truncateRound,
   typeMatchFilter,
-  unitDurationString,
 } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { Link, prettify, Unit } from '@/plugins/spark/units';
-import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
+import { ComponentResult, Crud, featureStore, WidgetFeature } from '@/store/features';
 
 import { compatibleTypes } from './getters';
 import {
-  AnalogConstraint,
+  AnyConstraint,
   AnyConstraintsObj,
   Block,
   BlockAddress,
@@ -40,16 +39,14 @@ import {
   BlockCrud,
   BlockField,
   BlockIntfType,
-  BlockOrIntfType,
   BlockType,
+  ComparedBlockType,
   DigitalActuatorBlock,
-  DigitalConstraint,
   DisplayOpts,
   DisplaySettingsBlock,
   DisplaySlot,
   MotorValveBlock,
 } from './types';
-import { isJSBloxField } from './units/BloxField';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
@@ -59,22 +56,29 @@ export const blockIdRules = (serviceId: string): InputRule[] => [
   v => v.length < 200 || 'Name must be less than 200 characters',
 ];
 
+export const prettyAny = (v: any): string => {
+  if (isQuantity(v)) {
+    return prettyQty(v);
+  }
+  if (isLink(v)) {
+    return prettyLink(v);
+  }
+  return JSON.stringify(v);
+};
+
 export const installFilters = (Vue: VueConstructor): void => {
-  Vue.filter(
-    'unit',
-    (value: Unit | null) =>
-      (value !== null && value !== undefined ? value.toString() : '-'));
-  Vue.filter(
-    'link',
-    (value: Link | null) =>
-      (value !== null && value !== undefined ? value.toString() : '-'));
+  Vue.filter('quantity', prettyQty);
+  Vue.filter('prettyUnit', prettyUnit);
+  Vue.filter('duration', (v: any, nullV = '<not set>') => durationString(v, nullV));
+  Vue.filter('link', prettyLink);
+  Vue.filter('block', (v: BlockAddress) => v?.id || '<not set>');
+  Vue.filter('widgetTitle', (type: string) => featureStore.widgetTitle(type));
+  Vue.filter('pretty', prettyAny);
   Vue.filter('round', round);
   Vue.filter('truncateRound', truncateRound);
   Vue.filter('hexToBase64', hexToBase64);
   Vue.filter('base64ToHex', base64ToHex);
-  Vue.filter('duration', durationString);
   Vue.filter('truncated', truncate);
-  Vue.filter('unitDuration', unitDurationString);
   Vue.filter('dateString', dateString);
   Vue.filter('shortDateString', shortDateString);
   Vue.filter('capitalize', capitalize);
@@ -108,7 +112,7 @@ export const blockWidgetSelector = (ctor: VueConstructor, typeName: BlockType | 
   };
 };
 
-export const isCompatible = (type: string | null, intf: BlockOrIntfType | BlockOrIntfType[] | null): boolean => {
+export const isCompatible = (type: string | null, intf: ComparedBlockType): boolean => {
   if (!intf) { return true; }
   if (!type) { return false; }
   if (type === intf) { return true; };
@@ -133,7 +137,7 @@ const displayBlock = (serviceId: string | undefined | null): DisplaySettingsBloc
 export const isDisplayed = (addr: BlockAddress): boolean =>
   addr.id !== null
   && !!displayBlock(addr.serviceId)?.data.widgets
-    .find(w => Object.values(w).find(v => v instanceof Link && v.id === addr.id));
+    .find(w => Object.values(w).find(v => isLink(v) && v.id === addr.id));
 
 export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<DisplayOpts> = {}): Promise<void> => {
   const display = displayBlock(addr?.serviceId);
@@ -163,7 +167,7 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   else {
     const { id, type } = addr;
 
-    const link = new Link(id, type as BlockType);
+    const link = bloxLink(id, type as BlockType);
     const slot: DisplaySlot = {
       pos: opts.pos,
       color: opts.color,
@@ -178,7 +182,7 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
     else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
       slot.actuatorAnalog = link;
     }
-    else if (isCompatible(type, 'Pid')) {
+    else if (isCompatible(type, BlockType.Pid)) {
       slot.pid = link;
     }
 
@@ -191,12 +195,6 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
     createBlockDialog(display);
   }
 };
-
-const addressedTypes: BlockType[] = [
-  BlockType.TempSensorOneWire,
-  BlockType.DS2408,
-  BlockType.DS2413,
-];
 
 export const saveHwInfo = (serviceId: string): void => {
   const linked: string[] = [];
@@ -261,7 +259,9 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
 
     if (opts.restore) {
       module.blocks
-        .filter(block => addressedTypes.includes(block.type) && !block.id.startsWith('New|'))
+        .filter(block =>
+          isCompatible(block.type, BlockIntfType.OneWireDeviceInterface)
+          && !block.id.startsWith('New|'))
         .forEach(block => addresses[block.data.address] = block.id);
     }
 
@@ -271,7 +271,9 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
 
     if (opts.restore) {
       const renameArgs: [string, string][] = module.blocks
-        .filter(block => addressedTypes.includes(block.type) && !!addresses[block.data.address])
+        .filter(block =>
+          isCompatible(block.type, BlockIntfType.OneWireDeviceInterface)
+          && !!addresses[block.data.address])
         .map(block => [block.id, addresses[block.data.address]]);
       await Promise.all(renameArgs.map(module.renameBlock));
     }
@@ -291,7 +293,7 @@ export const startResetBlocks = (serviceId: string): void => {
       type: 'checkbox',
       items: [
         { label: 'Remember names of discovered blocks', value: 0 },
-        { label: 'Create text file with actuator/sensor info', value: 1 },
+        { label: 'Export sensor and pin names', value: 1 },
       ],
       model: [0, 1], // pre-check default actions
     },
@@ -312,7 +314,7 @@ export const prettifyConstraints =
       ? '<no constraints>'
       : obj
         .constraints
-        .map((c: AnalogConstraint | DigitalConstraint) => {
+        .map((c: AnyConstraint) => {
           // Analog
           if ('min' in c) {
             return `Minimum = ${c.min}`;
@@ -321,23 +323,23 @@ export const prettifyConstraints =
             return `Maximum = ${c.max}`;
           }
           if ('balanced' in c) {
-            return `Balanced by ${c.balanced.balancerId.id ?? '<not set>'}`;
+            return `Balanced by ${prettyLink(c.balanced.balancerId)}`;
           }
           // Digital
           if ('minOff' in c) {
-            return `Minimum OFF = ${unitDurationString(c.minOff)}`;
+            return `Minimum OFF = ${durationString(c.minOff)}`;
           }
           if ('minOn' in c) {
-            return `Minimum ON = ${unitDurationString(c.minOn)}`;
+            return `Minimum ON = ${durationString(c.minOn)}`;
           }
           if ('mutexed' in c) {
-            return `Mutexed by ${c.mutexed.mutexId.id ?? '<not set>'}`;
+            return `Mutexed by ${prettyLink(c.mutexed.mutexId)}`;
           }
           if ('delayedOn' in c) {
-            return `Delayed ON = ${unitDurationString(c.delayedOn)}`;
+            return `Delayed ON = ${durationString(c.delayedOn)}`;
           }
           if ('delayedOff' in c) {
-            return `Delayed OFF = ${unitDurationString(c.delayedOff)}`;
+            return `Delayed OFF = ${durationString(c.delayedOff)}`;
           }
           // Fallback
           return 'Unknown constraint';
@@ -346,7 +348,9 @@ export const prettifyConstraints =
         .join(', ');
 
 const postfix = (obj: any): string =>
-  isJSBloxField(obj) ? obj.postfix : '';
+  isQuantity(obj)
+    ? bloxQty(obj).postfix
+    : '';
 
 export const blockGraphCfg = <BlockT extends Block = any>(
   crud: BlockCrud<BlockT>,
@@ -380,7 +384,7 @@ export const blockGraphCfg = <BlockT extends Block = any>(
 
   const renames: Mapped<string> = mapValues(
     graphedObj,
-    f => `${f.graphName ?? f.title} ${prettify(postfix(crud.block.data[f.key]))}`);
+    f => `${f.graphName ?? f.title} ${prettyUnit(postfix(crud.block.data[f.key]))}`);
 
   const targets = [{
     measurement: crud.block.serviceId,
@@ -420,3 +424,11 @@ export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
 
 export const enumHint = (e: Enum<any>): string =>
   'One of: ' + Enum.values(e).map(v => `'${v}'`).join(', ');
+
+export const isBlockDriven = (block: Block | null): boolean =>
+  Boolean(
+    block
+    && sparkStore
+      .moduleById(block.serviceId)
+      ?.drivenChains
+      .some((chain: string[]) => chain[0] === block.id));

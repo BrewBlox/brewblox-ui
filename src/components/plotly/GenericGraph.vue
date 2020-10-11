@@ -72,6 +72,9 @@ export default class GenericGraph extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly annotated!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly maximized!: boolean;
+
   get plotlyLayout(): Partial<Layout> {
     return merge(layoutDefaults(), this.layout);
   }
@@ -80,6 +83,7 @@ export default class GenericGraph extends Vue {
     return {
       displaylogo: false,
       responsive: true,
+      staticPlot: this.$dense && !this.maximized,
     };
   }
 

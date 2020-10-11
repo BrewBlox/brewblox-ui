@@ -13,13 +13,13 @@ services:
     volumes:
       - ./dev/influxdb/:/var/lib/influxdb/
 
-  datastore:
-    image: treehouses/couchdb:2.3.1
+  redis:
+    image: redis:6.0
     labels:
-      - traefik.http.services.datastore.loadbalancer.server.port=5984
-      - traefik.http.routers.datastore.middlewares=prefix-strip
+      - traefik.enable=false
     volumes:
-      - ./dev/couchdb/:/opt/couchdb/data/
+      - ./dev/redis:/data
+    command: --appendonly yes
 
   history:
     image: brewblox/brewblox-history:develop
@@ -74,7 +74,7 @@ services:
     command: >-
       --api.dashboard=true
       --providers.docker=true
-      --providers.docker.constraints="LabelRegex(`com.docker.compose.project`, `brewblox-ui`)"
+      --providers.docker.constraints="Label(`com.docker.compose.project`, `brewblox-ui`)"
       --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
       --providers.file.directory=/config
       --entrypoints.web.address=:9000

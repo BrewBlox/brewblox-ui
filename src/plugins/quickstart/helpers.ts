@@ -4,17 +4,17 @@ import { typeMatchFilter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
 import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
+import { BlockType, DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
-import { WizardAction } from './components/WizardTaskBase';
+import { WizardAction } from './components/QuickStartTaskBase';
 import { PinChannel, QuickStartOutput } from './types';
 
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {
   return sparkStore
     .serviceBlocks(serviceId)
     // Find existing drivers
-    .filter(typeMatchFilter<DigitalActuatorBlock>('DigitalActuator'))
+    .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
     .filter(
       block => pins
         .some((pin: PinChannel) =>
@@ -117,5 +117,5 @@ export function withoutPrefix(prefix: string, val: string): string {
 }
 
 export function pidDefaults(serviceId: string): PidBlock['data'] {
-  return sparkStore.specById('Pid').generate(serviceId);
+  return sparkStore.specById(BlockType.Pid).generate(serviceId);
 }

@@ -1,10 +1,10 @@
 import get from 'lodash/get';
 import { exportFile } from 'quasar';
 
-import { deserialize, serialize } from '@/plugins/spark/parse-object';
+import { deserialize } from '@/plugins/spark/parse-object';
 
 export function saveFile(exported: any, title: string, raw = false): void {
-  const content = raw ? exported : JSON.stringify(serialize(exported));
+  const content = raw ? exported : JSON.stringify(exported);
   exportFile(title, content);
 }
 

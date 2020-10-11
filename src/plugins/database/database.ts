@@ -1,46 +1,12 @@
-/* eslint-disable @typescript-eslint/camelcase */
-import PouchDB from 'pouchdb';
 import { Notify } from 'quasar';
 
-import { HOST } from '@/helpers/const';
 import http from '@/helpers/http';
 import notify from '@/helpers/notify';
 
 import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
 
-const cleanId = (moduleId: string, fullId: string): string =>
-  fullId.replace(/^(.+)__/, '');
-
-const fullId = (moduleId: string, id: string): string =>
-  `${moduleId}__${id}`;
-
-const strippedId = (fullId: string): string =>
-  fullId.match(/^(.+)__/)?.[1] ?? '';
-
-const checkInModule = (moduleId: string, fullId: string): boolean =>
-  fullId.startsWith(`${moduleId}__`);
-
-const asStoreObject = (moduleId: string, doc: any): any => {
-  const { _id, ...obj } = doc;
-  return { ...obj, id: cleanId(moduleId, _id) };
-};
-
-const asDocument = (moduleId: string, obj: any): any => {
-  const { id, ...doc } = obj;
-  return { ...doc, _id: fullId(moduleId, id) };
-};
-
-const asNewDocument = (moduleId: string, obj: any): any => {
-  delete obj._rev;
-  return asDocument(moduleId, obj);
-};
-
-const checkRemote = async (db: PouchDB.Database): Promise<void> => {
-  await db.info()
-    .catch((e) => {
-      notify.error(`Remote database unavailable: ${e.message}`, { shown: false });
-    });
-};
+const moduleNamespace = (moduleId: string): string =>
+  `brewblox-ui-store:${moduleId}`;
 
 const intercept = (message: string, moduleId: string): (e: Error) => never =>
   (e: Error) => {
@@ -55,7 +21,7 @@ const retryDatastore = async (): Promise<void> => {
     // If it doesn't respond, show a notification with a progress bar
     // The notification resolves the awaited promise after `timeout` ms
     await new Promise(resolve =>
-      http.get('/datastore', { timeout: 2000 })
+      http.get('/history/datastore/ping', { timeout: 2000 })
         .then(() => location.reload()) // reload page will abort the JS runtime
         .catch(() => Notify.create({
           timeout: 2000,
@@ -69,38 +35,34 @@ const retryDatastore = async (): Promise<void> => {
 };
 
 export const checkDatastore = (): void => {
-  http.get('/datastore', { timeout: 2000 })
+  http.get('/history/datastore/ping', { timeout: 2000 })
     .catch(err => {
       notify.error(`Datastore error: ${err}`, { shown: false });
       retryDatastore();
     });
 };
 
-
-type ChangeEvent = PouchDB.Core.ChangesResponseChange<{}>;
-
-export class BrewbloxDatabaseImpl implements BrewbloxDatabase {
-  private promisedDb: Promise<PouchDB.Database>;
+export class BrewbloxRedisDatabase implements BrewbloxDatabase {
+  // handlers are indexed on fully qualified namespace
   private handlers: Mapped<EventHandler> = {}
 
-  public constructor() {
-    this.promisedDb = new Promise((resolve) => {
-      const remoteAddress = `${HOST}/datastore/brewblox-ui-store`;
-      const remoteDb: PouchDB.Database = new PouchDB(remoteAddress);
+  public start(): void {
+    checkDatastore();
+  }
 
-      checkRemote(remoteDb)
-        .then(() => {
-          remoteDb
-            .changes({ live: true, include_docs: true, since: 'now' })
-            .on('change', (evt: ChangeEvent) => {
-              const moduleId = strippedId(evt.id);
-              evt.deleted
-                ? this.handlers[moduleId]?.onDeleted(cleanId(moduleId, evt.id))
-                : this.handlers[moduleId]?.onChanged(asStoreObject(moduleId, evt.doc));
-            });
+  public onChanged(changed: StoreObject[]): void {
+    changed.forEach(obj =>
+      this.handlers[obj.namespace!]?.onChanged(obj));
+  }
 
-          resolve(remoteDb);
-        });
+  public onDeleted(deleted: string[]): void {
+    deleted.forEach(key => {
+      // The event uses the fully qualified ID
+      // Separate the namespace from the ID here
+      const idx = key.lastIndexOf(':');
+      const namespace = key.substring(0, idx);
+      const id = key.substring(idx + 1);
+      this.handlers[namespace]?.onDeleted(id);
     });
   }
 
@@ -108,62 +70,54 @@ export class BrewbloxDatabaseImpl implements BrewbloxDatabase {
     if (!handler.id) {
       throw new Error('Database handler id not set');
     }
-    if (this.handlers[handler.id] !== undefined) {
+    const namespace = moduleNamespace(handler.id);
+    if (this.handlers[namespace] !== undefined) {
       throw new Error(`Database handler '${module.id}' is already registered`);
     }
-    this.handlers[handler.id] = Object.freeze(handler);
+    this.handlers[namespace] = Object.freeze(handler);
   }
 
   public async fetchAll<T extends StoreObject>(moduleId: string): Promise<T[]> {
-    const db = await this.promisedDb;
-    const resp = await db.allDocs({ include_docs: true })
+    return http
+      .post<{ values: T[] }>('/history/datastore/mget', {
+        namespace: moduleNamespace(moduleId),
+        filter: '*',
+      })
+      .then(resp => resp.data.values)
       .catch(intercept('Fetch all objects', moduleId));
-    return resp.rows
-      .filter(row => checkInModule(moduleId, row.id))
-      .map(row => asStoreObject(moduleId, row.doc));
   }
 
   public async fetchById<T extends StoreObject>(moduleId: string, objId: string): Promise<T> {
-    const db = await this.promisedDb;
-    const obj = await db.get(fullId(moduleId, objId))
+    return http
+      .post<{ value: T }>('/history/datastore/get', {
+        namespace: moduleNamespace(moduleId),
+        id: objId,
+      })
+      .then(resp => resp.data.value)
       .catch(intercept(`Fetch '${objId}'`, moduleId));
-    return asStoreObject(moduleId, obj);
-  }
-
-  public async create<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
-    const db = await this.promisedDb;
-    const resp = await db.put(asNewDocument(moduleId, obj))
-      .catch(intercept('Create object', moduleId));
-    return { ...obj, _rev: resp.rev };
   }
 
   public async persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
-    const db = await this.promisedDb;
-    try {
-      const resp = await db.put(asDocument(moduleId, obj));
-      return { ...obj, _rev: resp.rev };
-    }
-    catch (e) {
-      // Explicitly trigger a change event to reset the saved doc to last known good status
-      this.fetchById(moduleId, obj.id)
-        .then((obj: StoreObject) => {
-          const handler = this.handlers[moduleId];
-          handler?.onDeleted(obj.id);
-          handler?.onChanged(obj);
-        })
-        .catch(() => { });
-      // Make an educated guess how to describe the object
-      const name = obj['title'] || obj['name'] || moduleId;
-      notify.error(`Failed to save ${name}: ${e.message}`);
-      throw e;
-    }
+    return http
+      .post<{ value: T }>('/history/datastore/set', {
+        value: {
+          ...obj,
+          namespace: moduleNamespace(moduleId),
+        },
+      })
+      .then(resp => resp.data.value)
+      .catch(intercept(`Persist '${obj.id}'`, moduleId));
   }
 
+  public create = this.persist;
+
   public async remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
-    const db = await this.promisedDb;
-    await db.remove(asDocument(moduleId, obj))
-      .catch(intercept('Remove object', moduleId));
-    delete obj._rev;
+    await http
+      .post('/history/datastore/delete', {
+        namespace: moduleNamespace(moduleId),
+        id: obj.id,
+      })
+      .catch(intercept(`Remove '${obj.id}'`, moduleId));
     return obj;
   }
 }

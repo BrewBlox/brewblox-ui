@@ -28,6 +28,7 @@ export default class EnumValEdit extends ValEditBase {
       label="Value"
       v-bind="selectProps"
       class="col-grow"
+      item-aligned
     />
   </div>
   <div

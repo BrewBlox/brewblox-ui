@@ -1,4 +1,5 @@
 <script lang="ts">
+import debounce from 'lodash/debounce';
 import mapValues from 'lodash/mapValues';
 import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
@@ -176,10 +177,14 @@ export default class HistoryGraph extends Vue {
     this.sources.forEach(historyStore.removeSource);
   }
 
-  resetSources(): void {
-    this.removeSources();
-    this.addSources();
-  }
+  resetSources = debounce(
+    () => {
+      this.removeSources();
+      this.addSources();
+    },
+    100,
+    { trailing: true }
+  );
 
   public refresh(): void {
     this.revision += 1;

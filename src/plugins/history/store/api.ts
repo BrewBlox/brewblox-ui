@@ -1,9 +1,8 @@
 import mapKeys from 'lodash/mapKeys';
-import queryString from 'query-string';
 
-import { snakeCased } from '@/helpers/functional';
+import { HOSTNAME, PORT } from '@/helpers/const';
+import { isoDateString, snakeCased } from '@/helpers/functional';
 import http from '@/helpers/http';
-import { sse } from '@/helpers/sse';
 import { createApi } from '@/plugins/database/api';
 
 import { LoggedSession, QueryParams, QueryResult, QueryTarget } from '../types';
@@ -12,36 +11,36 @@ const snakeCasedObj =
   (obj: Mapped<any>): Mapped<any> =>
     mapKeys(obj, (_, key) => snakeCased(key));
 
-const formatTime =
-  (val?: string | number): string | undefined =>
-    (Number.isNaN(Number(val))
-      ? val as string
-      : new Date(Number(val)).toUTCString());
-
 const timeFormatted =
   (params: QueryParams): QueryParams =>
     ({
       ...params,
-      start: formatTime(params.start),
-      end: formatTime(params.end),
+      start: isoDateString(params.start),
+      end: isoDateString(params.end),
     });
 
 export const historyApi = {
-  subscribeValues:
-    async (params: QueryParams, target: QueryTarget): Promise<EventSource> =>
-      sse(`/history/sse/values?${queryString.stringify({
+  openStreamedValues:
+    async (params: QueryParams, target: QueryTarget): Promise<WebSocket> => {
+      const ws = new WebSocket(`wss://${HOSTNAME}:${PORT}/history/query/stream/values`);
+      ws.onopen = () => ws.send(JSON.stringify({
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
         epoch: 'ms',
-      })}`),
+      }));
+      return ws;
+    },
 
-  subscribeMetrics:
-    async (params: QueryParams, target: QueryTarget): Promise<EventSource> =>
-      sse(`/history/sse/last_values?${queryString.stringify({
+  openStreamedMetrics:
+    async (params: QueryParams, target: QueryTarget): Promise<WebSocket> => {
+      const ws = new WebSocket(`wss://${HOSTNAME}:${PORT}/history/query/stream/last_values`);
+      ws.onopen = () => ws.send(JSON.stringify({
         ...snakeCasedObj(params),
         ...snakeCasedObj(target),
         epoch: 'ms',
-      })}`),
+      }));
+      return ws;
+    },
 
   fetchKnownKeys:
     async (): Promise<Mapped<any>> =>

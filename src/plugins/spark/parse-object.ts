@@ -1,13 +1,18 @@
-import { mapValues } from 'lodash';
-import cloneDeep from 'lodash/cloneDeep';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
+import mapValues from 'lodash/mapValues';
 
+import {
+  BlockOrIntfType,
+  isBloxField,
+  isJSBloxField,
+  Link,
+  Quantity,
+  rawLink,
+  rawQty,
+} from '@/helpers/bloxfield';
 import { mapEntries } from '@/helpers/functional';
 
-import { BlockOrIntfType } from './types';
-import { isSerializedLink, isSerializedUnit, Link, Unit } from './units';
-import { isJSBloxField, JSBloxField } from './units/BloxField';
 
 // string start
 // then any characters (captured)
@@ -36,13 +41,7 @@ export function propertyNameWithUnit(name: string): [string, string | null] {
   return [baseName, unit];
 }
 
-export function objectUnit(val: any): string | null {
-  return (val instanceof Unit)
-    ? val.notation
-    : null;
-}
-
-export function parsePostfixed(key: string, val: any): [string, JSBloxField] | null {
+export function parsePostfixed(key: string, val: any): [string, Quantity | Link] | null {
   try {
     if (key.endsWith(']') || key.endsWith('>')) {
       const matched = key.match(postfixExpr);
@@ -50,10 +49,10 @@ export function parsePostfixed(key: string, val: any): [string, JSBloxField] | n
         const [, name, leftBracket, bracketed] = matched;
         if (leftBracket === '<') {
           const [type, driven] = bracketed.split(',');
-          return [name, new Link(val, type as BlockOrIntfType, !!driven)];
+          return [name, rawLink(val, type as BlockOrIntfType, !!driven)];
         }
         else if (leftBracket === '[') {
-          return [name, new Unit(val, bracketed)];
+          return [name, rawQty(val, bracketed)];
         }
       }
     }
@@ -66,14 +65,8 @@ export function deserialize(obj: any): typeof obj {
   if (isArray(obj)) {
     return obj.map(deserialize);
   }
-  if (isJSBloxField(obj)) {
+  if (isBloxField(obj)) {
     return obj;
-  }
-  if (isSerializedLink(obj)) {
-    return new Link(obj);
-  }
-  if (isSerializedUnit(obj)) {
-    return new Unit(obj);
   }
   if (isObject(obj)) {
     return mapEntries(obj,
@@ -93,10 +86,4 @@ export function serialize(obj: any): typeof obj {
     return mapValues(obj, serialize);
   }
   return obj;
-}
-
-export function deepCopy<T>(obj: T): T {
-  return obj
-    ? cloneDeep(obj)
-    : obj;
 }

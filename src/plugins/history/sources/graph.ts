@@ -1,6 +1,8 @@
 import forEach from 'lodash/forEach';
+import last from 'lodash/last';
 import parseDuration from 'parse-duration';
 
+import { round } from '@/helpers/functional';
 import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
@@ -31,11 +33,12 @@ const boundedConcat =
   };
 
 const valueName =
-  (source: GraphSource, key: string): string => {
+  (source: GraphSource, key: string, value: number | undefined): string => {
     const label = source.renames[key] || key;
-    return source.axes[key] === 'y2'
-      ? `<span style="color: #aef">${label}</span>`
-      : `<span>${label}</span>`;
+    const prop = source.axes[key] === 'y2'
+      ? 'style="color: #aef"'
+      : '';
+    return `<span ${prop}>${label}</span><br>${round(value)}`;
   };
 
 const transformer =
@@ -51,16 +54,17 @@ const transformer =
           if (idx === 0) {
             return; // skip time
           }
+          const colValues = resultCols[idx];
           const key = `${result.name}/${col}`;
           const value = source.values[key] || {};
           source.values[key] = {
             type: 'scatter',
             ...value,
-            name: valueName(source, key),
+            name: valueName(source, key, last(colValues)),
             yaxis: source.axes[key] || 'y',
             line: { color: source.colors[key] },
             x: boundedConcat(value.x, time),
-            y: boundedConcat(value.y, resultCols[idx]),
+            y: boundedConcat(value.y, colValues),
           };
         });
 

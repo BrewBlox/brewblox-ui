@@ -2,9 +2,18 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { createBlockDialog } from '@/helpers/dialog';
+import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockField, BlockFieldAddress, BlockOrIntfType, BlockSpec } from '@/plugins/spark/types';
+import {
+  Block,
+  BlockField,
+  BlockFieldAddress,
+  BlockOrIntfType,
+  BlockSpec,
+  ComparedBlockType,
+} from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 
 
 @Component
@@ -15,11 +24,6 @@ export default class BlockFieldAddressDialog extends DialogBase {
   serviceLocal: string | null = null;
   blockLocal: string | null = null;
   fieldLocal: string | null = null;
-
-  defaultTypes: string[] = sparkStore
-    .specs
-    .filter(v => v.fields.length > 0)
-    .map(v => v.id)
 
   @Prop({
     type: Object, default: (): BlockFieldAddress => ({
@@ -34,8 +38,14 @@ export default class BlockFieldAddressDialog extends DialogBase {
   @Prop({ type: Array, required: false })
   public readonly services!: string[];
 
-  @Prop({ type: Array, required: false })
-  readonly compatible!: BlockOrIntfType[];
+  @Prop({ type: [String, Array], required: false })
+  readonly compatible!: ComparedBlockType;
+
+  @Prop({ type: Function, default: (() => true) })
+  public readonly blockFilter!: ((block: Block) => boolean);
+
+  @Prop({ type: Function, default: (() => true) })
+  public readonly fieldFilter!: ((field: BlockField) => boolean);
 
   created(): void {
     this.serviceLocal = this.value.serviceId;
@@ -63,12 +73,17 @@ export default class BlockFieldAddressDialog extends DialogBase {
   }
 
   get validTypes(): BlockOrIntfType[] {
-    return this.compatible ?? this.defaultTypes;
+    return sparkStore
+      .specs
+      .filter(v => isCompatible(v.id, this.compatible ?? null))
+      .filter(v => v.fields.some(f => this.fieldFilter(f)))
+      .map(v => v.id);
   }
 
   get blockOpts(): string[] {
     return sparkStore.moduleById(this.serviceId)
       ?.blocks
+      .filter(block => this.blockFilter(block))
       .filter(block => this.validTypes.includes(block.type))
       .map(block => block.id)
       .sort()
@@ -99,6 +114,7 @@ export default class BlockFieldAddressDialog extends DialogBase {
   get fieldOpts(): SelectOption<string>[] {
     return this.spec
       ?.fields
+      .filter(f => this.fieldFilter(f))
       .map(f => ({ label: f.title, value: f.key }))
       ?? [];
   }
@@ -143,15 +159,13 @@ export default class BlockFieldAddressDialog extends DialogBase {
   }
 
   createBlock(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.serviceId,
-      filter: v => this.validTypes.includes(v),
-    })
-      .onOk((block: Block) => {
-        this.serviceLocal = block.serviceId;
-        this.blockLocal = block.id;
-        this.fieldLocal = null;
+    createBlockWizard(this.serviceId, this.validTypes)
+      .onOk(({ block }) => {
+        if (block) {
+          this.serviceLocal = block.serviceId;
+          this.blockLocal = block.id;
+          this.fieldLocal = null;
+        }
       });
   }
 

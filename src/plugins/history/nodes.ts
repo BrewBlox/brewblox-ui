@@ -1,9 +1,9 @@
 import escapeRegExp from 'lodash/escapeRegExp';
 import set from 'lodash/set';
 
+import { prettyUnit } from '@/helpers/bloxfield';
 import { sentenceCased } from '@/helpers/functional';
 import { propertyNameWithUnit } from '@/plugins/spark/parse-object';
-import { prettify } from '@/plugins/spark/units';
 
 import { QueryTarget } from './types';
 
@@ -11,10 +11,10 @@ import { QueryTarget } from './types';
 export const defaultLabel = (key: string): string => {
   const [name, postfix] = propertyNameWithUnit(key);
   const path = name.split('/').slice(1);
-  const prettyName = sentenceCased(path.pop()!);
-  const prettyPath = path.length ? `[${path.join(' ')}] ` : '';
-  const prettyUnit = prettify(postfix ?? '');
-  return `${prettyPath}${prettyName} ${prettyUnit}`.trim();
+  const nameStr = sentenceCased(path.pop()!);
+  const pathStr = path.length ? `[${path.join(' ')}] ` : '';
+  const unitStr = prettyUnit(postfix);
+  return `${pathStr}${nameStr} ${unitStr}`.trim();
 };
 
 const nodeRecurser =
@@ -23,7 +23,7 @@ const nodeRecurser =
     if (typeof val === 'string') {
       const [name, postfix] = propertyNameWithUnit(key);
       const label = postfix !== null
-        ? `${sentenceCased(name)} ${prettify(postfix)}`
+        ? `${sentenceCased(name)} ${prettyUnit(postfix)}`
         : sentenceCased(name);
       return {
         ...partial,

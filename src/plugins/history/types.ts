@@ -44,7 +44,7 @@ export interface HistorySource {
   params: QueryParams;
   target: QueryTarget;
   renames: DisplayNames;
-  events?: EventSource;
+  events?: WebSocket;
   values?: any;
 }
 

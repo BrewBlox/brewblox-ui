@@ -1,5 +1,4 @@
 <script lang="ts">
-import { ClosePopup } from 'quasar/src/directives';
 import { CreateElement, VNode } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -30,7 +29,10 @@ export default class GraphDialog extends DialogBase {
     return h('q-dialog',
       {
         ref: 'dialog',
-        props: { maximized: true },
+        props: {
+          maximized: true,
+          transitionShow: 'fade',
+        },
         on: { hide: this.onDialogHide },
       },
       [
@@ -46,6 +48,7 @@ export default class GraphDialog extends DialogBase {
                 },
                 attrs: {
                   annotated: !!this.saveAnnotations,
+                  maximized: true,
                 },
                 on: {
                   annotations: this.saveAnnotations ?? (() => { }),
@@ -53,11 +56,7 @@ export default class GraphDialog extends DialogBase {
                 },
                 scopedSlots: {
                   controls: () => [
-                    h('q-btn',
-                      {
-                        props: { flat: true, stretch: true, icon: 'mdi-close-circle' },
-                        directives: [ClosePopup],
-                      }),
+                    h('DialogCloseButton', { props: { stretch: true } }),
                   ],
                 },
               }),

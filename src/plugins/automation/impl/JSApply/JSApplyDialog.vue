@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Prop, Ref } from 'vue-property-decorator';
+import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
@@ -16,6 +16,7 @@ import JSApplyPreview from './JSApplyPreview.vue';
 })
 export default class JSApplyDialog extends DialogBase {
   sidebar: 'Snippets' | 'Preview' = 'Snippets'
+  splitterModel = 400;
   local: string = '';
   saved: string = '';
 
@@ -33,6 +34,11 @@ export default class JSApplyDialog extends DialogBase {
 
   @Prop({ type: Function, required: true })
   public readonly saveFunc!: (value: string) => unknown;
+
+  @Watch('splitterModel')
+  public onSplitterChange() {
+    this.editor?.layout();
+  }
 
   created(): void {
     this.local = this.value;
@@ -99,7 +105,7 @@ export default class JSApplyDialog extends DialogBase {
         <Toolbar :title="title">
           <q-btn
             flat
-            label="Reset"
+            label="Discard changes"
             class="self-stretch"
             :color="dirty ? 'primary' : ''"
             @click="reset"
@@ -134,32 +140,45 @@ export default class JSApplyDialog extends DialogBase {
           />
         </Toolbar>
       </template>
-      <div class="fit row no-wrap">
-        <MonacoEditor
-          ref="editor"
-          v-model="local"
-          class="col"
-          @run="run"
-        />
-        <div class="col-auto column sidebar">
-          <q-tabs v-model="sidebar">
-            <q-tab name="Snippets" label="Snippets" />
-            <q-tab name="Preview" label="Preview" />
-          </q-tabs>
-          <q-scroll-area class="col">
-            <SandboxSnippets
-              v-show="sidebar === 'Snippets'"
-              @insert="insert"
-              @append="append"
+      <q-splitter
+        v-model="splitterModel"
+        reverse
+        unit="px"
+        :limits="[200, Infinity]"
+        class="fit"
+        after-class="column"
+      >
+        <template #before>
+          <div class="fit row no-scroll">
+            <MonacoEditor
+              ref="editor"
+              v-model="local"
+              class="col"
+              @run="run"
             />
-            <JSApplyPreview
-              v-show="sidebar === 'Preview'"
-              ref="previewer"
-              :code="local"
-            />
-          </q-scroll-area>
-        </div>
-      </div>
+          </div>
+        </template>
+        <template #after>
+          <div class="fit column no-scroll">
+            <q-tabs v-model="sidebar">
+              <q-tab name="Snippets" label="Snippets" />
+              <q-tab name="Preview" label="Preview" />
+            </q-tabs>
+            <q-scroll-area class="col">
+              <SandboxSnippets
+                v-show="sidebar === 'Snippets'"
+                @insert="insert"
+                @append="append"
+              />
+              <JSApplyPreview
+                v-show="sidebar === 'Preview'"
+                ref="previewer"
+                :code="local"
+              />
+            </q-scroll-area>
+          </div>
+        </template>
+      </q-splitter>
       <template #actions>
         <q-btn
           flat

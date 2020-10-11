@@ -1,10 +1,10 @@
 import { uid } from 'quasar';
 
-import { durationMs } from '@/helpers/functional';
+import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
@@ -18,7 +18,6 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { Block } from '@/plugins/spark/types';
-import { Link, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -29,27 +28,27 @@ import { FermentConfig, FermentOpts } from './types';
 type PidData = PidBlock['data'];
 
 const beerCoolConfig: Partial<PidData> = {
-  kp: new Unit(-50, '1/degC'),
-  ti: new Unit(6, 'hour'),
-  td: new Unit(30, 'min'),
+  kp: bloxQty(-50, '1/degC'),
+  ti: bloxQty('6h'),
+  td: bloxQty('30m'),
 };
 
 const fridgeCoolConfig: Partial<PidData> = {
-  kp: new Unit(-20, '1/degC'),
-  ti: new Unit(2, 'hour'),
-  td: new Unit(10, 'min'),
+  kp: bloxQty(-20, '1/degC'),
+  ti: bloxQty('2h'),
+  td: bloxQty('10m'),
 };
 
 const beerHeatConfig: Partial<PidData> = {
-  kp: new Unit(100, '1/degC'),
-  ti: new Unit(6, 'hour'),
-  td: new Unit(30, 'min'),
+  kp: bloxQty(100, '1/degC'),
+  ti: bloxQty('6h'),
+  td: bloxQty('30m'),
 };
 
 const fridgeHeatConfig: Partial<PidData> = {
-  kp: new Unit(20, '1/degC'),
-  ti: new Unit(2, 'hour'),
-  td: new Unit(10, 'min'),
+  kp: bloxQty(20, '1/degC'),
+  ti: bloxQty('2h'),
+  td: bloxQty('10m'),
 };
 
 export const defineChangedBlocks = (config: FermentConfig): Block[] => {
@@ -87,57 +86,57 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       // setpoint sensor pair
       {
         id: names.fridgeSetpoint,
-        type: 'SetpointSensorPair',
+        type: BlockType.SetpointSensorPair,
         serviceId,
         groups,
         data: {
-          sensorId: new Link(names.fridgeSensor),
+          sensorId: bloxLink(names.fridgeSensor),
           storedSetting: fridgeSetting,
           settingEnabled: activeSetpoint === 'fridge',
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: bloxQty(null, 'degC'),
+          value: bloxQty(null, 'degC'),
+          valueUnfiltered: bloxQty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
       {
         id: names.beerSetpoint,
-        type: 'SetpointSensorPair',
+        type: BlockType.SetpointSensorPair,
         serviceId,
         groups,
         data: {
-          sensorId: new Link(names.beerSensor),
+          sensorId: bloxLink(names.beerSensor),
           storedSetting: beerSetting,
           settingEnabled: activeSetpoint === 'beer',
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: bloxQty(null, 'degC'),
+          value: bloxQty(null, 'degC'),
+          valueUnfiltered: bloxQty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
       // Mutex
       {
         id: names.mutex,
-        type: 'Mutex',
+        type: BlockType.Mutex,
         serviceId,
         groups,
         data: {
-          differentActuatorWait: new Time(),
-          waitRemaining: new Time(),
+          differentActuatorWait: bloxQty('0s'),
+          waitRemaining: bloxQty('0s'),
         },
       },
       // Digital Actuator
       {
         id: names.coolAct,
-        type: 'DigitalActuator',
+        type: BlockType.DigitalActuator,
         serviceId,
         groups,
         data: {
-          hwDevice: new Link(config.coolPin.arrayId),
+          hwDevice: bloxLink(config.coolPin.arrayId),
           channel: config.coolPin.pinId,
           invert: false,
           desiredState: DigitalState.STATE_INACTIVE,
@@ -145,21 +144,21 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           constrainedBy: {
             constraints: [
               {
-                minOff: new Time(5, 'min'),
-                remaining: new Time(),
+                minOff: bloxQty('5m'),
+                remaining: bloxQty('0s'),
               },
               {
-                minOn: new Time(2, 'min'),
-                remaining: new Time(),
+                minOn: bloxQty('2m'),
+                remaining: bloxQty('0s'),
               },
               {
                 mutexed: {
-                  mutexId: new Link(names.mutex, 'Mutex'),
-                  extraHoldTime: new Time(45, 'min'),
+                  mutexId: bloxLink(names.mutex),
+                  extraHoldTime: bloxQty('45m'),
                   hasCustomHoldTime: true,
                   hasLock: false,
                 },
-                remaining: new Time(),
+                remaining: bloxQty('0s'),
               },
             ],
           },
@@ -167,11 +166,11 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       },
       {
         id: names.heatAct,
-        type: 'DigitalActuator',
+        type: BlockType.DigitalActuator,
         serviceId,
         groups,
         data: {
-          hwDevice: new Link(config.heatPin.arrayId),
+          hwDevice: bloxLink(config.heatPin.arrayId),
           channel: config.heatPin.pinId,
           desiredState: DigitalState.STATE_INACTIVE,
           state: DigitalState.STATE_INACTIVE,
@@ -180,12 +179,12 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
             constraints: [
               {
                 mutexed: {
-                  mutexId: new Link(names.mutex, 'Mutex'),
-                  extraHoldTime: new Time(20, 'min'),
+                  mutexId: bloxLink(names.mutex),
+                  extraHoldTime: bloxQty('20m'),
                   hasCustomHoldTime: true,
                   hasLock: false,
                 },
-                remaining: new Time(),
+                remaining: bloxQty('0s'),
               },
             ],
           },
@@ -194,14 +193,14 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       // PWM
       {
         id: names.coolPwm,
-        type: 'ActuatorPwm',
+        type: BlockType.ActuatorPwm,
         serviceId,
         groups,
         data: {
           enabled: true,
-          period: new Time(30, 'min'),
-          actuatorId: new Link(names.coolAct),
-          drivenActuatorId: new Link(null),
+          period: bloxQty('30m'),
+          actuatorId: bloxLink(names.coolAct),
+          drivenActuatorId: bloxLink(null),
           setting: 0,
           desiredSetting: 0,
           value: 0,
@@ -210,14 +209,14 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       },
       {
         id: names.heatPwm,
-        type: 'ActuatorPwm',
+        type: BlockType.ActuatorPwm,
         serviceId,
         groups,
         data: {
           enabled: true,
-          period: new Time(10, 's'),
-          actuatorId: new Link(names.heatAct),
-          drivenActuatorId: new Link(null),
+          period: bloxQty('10s'),
+          actuatorId: bloxLink(names.heatAct),
+          drivenActuatorId: bloxLink(null),
           setting: 0,
           desiredSetting: 0,
           value: 0,
@@ -227,14 +226,14 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       // Setpoint Profile
       {
         id: names.tempProfile,
-        type: 'SetpointProfile',
+        type: BlockType.SetpointProfile,
         serviceId,
         groups,
         data: {
           start: new Date().getTime() / 1000,
           enabled: false,
-          targetId: new Link(activeSetpointId),
-          drivenTargetId: new Link(null),
+          targetId: bloxLink(activeSetpointId),
+          drivenTargetId: bloxLink(null),
           points: [
             { time: 0, temperature: initialSetting },
             { time: durationMs('7d') / 1000, temperature: initialSetting },
@@ -245,28 +244,28 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
       // PID
       {
         id: names.coolPid,
-        type: 'Pid',
+        type: BlockType.Pid,
         serviceId,
         groups,
         data: {
           ...pidDefaults(serviceId),
           ...coolPidConfig,
           enabled: true,
-          inputId: new Link(activeSetpointId),
-          outputId: new Link(names.coolPwm),
+          inputId: bloxLink(activeSetpointId),
+          outputId: bloxLink(names.coolPwm),
         },
       },
       {
         id: names.heatPid,
-        type: 'Pid',
+        type: BlockType.Pid,
         serviceId,
         groups,
         data: {
           ...pidDefaults(serviceId),
           ...heatPidConfig,
           enabled: true,
-          inputId: new Link(activeSetpointId),
-          outputId: new Link(names.heatPwm),
+          inputId: bloxLink(activeSetpointId),
+          outputId: bloxLink(names.heatPwm),
         },
       },
     ];
@@ -365,7 +364,7 @@ export const defineWidgets = (
       changeIdMigrated: true,
       serviceIdMigrated: true,
       serviceId,
-      actions: serialize([
+      actions: [
         {
           name: 'Enable control',
           id: uid(),
@@ -441,7 +440,7 @@ export const defineWidgets = (
               serviceId,
               blockId: names.coolPid,
               data: {
-                inputId: new Link(names.fridgeSetpoint, 'ProcessValueInterface'),
+                inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
                 ...fridgeCoolConfig,
               },
               confirmed: {},
@@ -451,7 +450,7 @@ export const defineWidgets = (
               serviceId,
               blockId: names.heatPid,
               data: {
-                inputId: new Link(names.fridgeSetpoint, 'ProcessValueInterface'),
+                inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
                 ...fridgeHeatConfig,
               },
               confirmed: {},
@@ -460,7 +459,9 @@ export const defineWidgets = (
               id: uid(),
               serviceId,
               blockId: names.tempProfile,
-              data: { targetId: new Link(names.fridgeSetpoint) },
+              data: {
+                targetId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
+              },
               confirmed: {},
             },
           ] as [
@@ -477,12 +478,14 @@ export const defineWidgets = (
           changes: [
             {
               id: uid(),
+              serviceId,
               blockId: names.fridgeSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.beerSetpoint,
               data: {
                 settingEnabled: true,
@@ -492,26 +495,31 @@ export const defineWidgets = (
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.coolPid,
               data: {
-                inputId: new Link(names.beerSetpoint, 'ProcessValueInterface'),
+                inputId: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
                 ...beerCoolConfig,
               },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.heatPid,
               data: {
-                inputId: new Link(names.beerSetpoint, 'ProcessValueInterface'),
+                inputId: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
                 ...beerHeatConfig,
               },
               confirmed: {},
             },
             {
               id: uid(),
+              serviceId,
               blockId: names.tempProfile,
-              data: { targetId: new Link(names.beerSetpoint) },
+              data: {
+                targetId: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
+              },
               confirmed: {},
             },
           ] as [
@@ -549,7 +557,7 @@ export const defineWidgets = (
               BlockChange<SetpointProfileBlock>,
             ],
         },
-      ]),
+      ],
     },
   });
 

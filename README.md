@@ -2,6 +2,18 @@
 
 > UI representation of the Brewblox project
 
+## Pinned versions
+
+The following packages are pinned to specific versions:
+
+**mqtt@4.1.0**
+
+4.2.0 breaks websocket connections in browser environments. 4.2.1 fixes this issue, but [breaks explicit hostnames](https://github.com/mqttjs/MQTT.js/issues/1150).
+
+**vue-router@3.2.0**
+
+Quasar has its own dependency on vue-router@3.2.0. Using multiple versions leads to typing errors.
+
 ## Requirements
 
 * Node.js
@@ -124,9 +136,9 @@ The full datastore state is loaded on startup. After that, two-way synchronizati
 
 ## [Eventbus](src/plugins/eventbus.ts)
 
-Backend services can continuously push data over the RabbitMQ eventbus. These events are then converted into Server Sent Events (SSE) by the [brewblox-emitter](https://github.com/BrewBlox/brewblox-emitter) service.
+Backend services intermittently push MQTT state events.
 
-The SSE connection is managed centrally, and plugins can subscribe to receive callbacks for events matching an identifier.
+Plugins can subscribe to receive callbacks for events matching an identifier.
 
 # Interfaces
 
@@ -152,4 +164,4 @@ Widgets and Services by themselves are nothing more than blobs of JSON data. In 
 
 Features are how the UI knows which components can be used to render data. Plugins can use their `install(Vue)` function to register features.
 
-As Features contain functions and references to Vue components, they are not persisted in the datastore.
+As features contain functions and references to Vue components, they are not persisted in the datastore.

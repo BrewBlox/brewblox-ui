@@ -55,7 +55,7 @@ export const fetchDiscoveredBlocks = (serviceId: string): Promise<Block[]> =>
 
 export const validateService = (serviceId: string): Promise<boolean> =>
   http.get<ApiSparkStatus>(`/${encodeURIComponent(serviceId)}/system/status`)
-    .then(resp => resp.data.type === 'Spark')
+    .then(resp => resp.data.service_info !== undefined)
     .catch(() => false);
 
 export const fetchUnits = (serviceId: string): Promise<UserUnits> =>
@@ -79,7 +79,7 @@ export const fetchSparkStatus = async (serviceId: string): Promise<SparkStatus> 
     return asSparkStatus(serviceId, resp.data);
   } catch (error) {
     notify.warn(`Unable to fetch Spark status: ${error}`, { shown: false });
-    return asSparkStatus(serviceId);
+    return asSparkStatus(serviceId, null);
   }
 };
 
@@ -98,7 +98,12 @@ export const serviceImport = (serviceId: string, exported: SparkExported): Promi
     .then(resp => resp.data.messages)
     .catch(intercept(`Failed to import blocks in ${serviceId}`));
 
-export const reboot = (serviceId: string): Promise<any> =>
-  http.post(`/${encodeURIComponent(serviceId)}/system/reboot`, {})
+export const serviceReboot = (serviceId: string): Promise<any> =>
+  http.post(`/${encodeURIComponent(serviceId)}/system/reboot/service`, {})
+    .then(resp => resp.data)
+    .catch(intercept(`Failed to reboot ${serviceId}`));
+
+export const controllerReboot = (serviceId: string): Promise<any> =>
+  http.post(`/${encodeURIComponent(serviceId)}/system/reboot/controller`, {})
     .then(resp => resp.data)
     .catch(intercept(`Failed to reboot ${serviceId}`));

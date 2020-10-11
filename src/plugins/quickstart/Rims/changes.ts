@@ -1,14 +1,15 @@
 import { uid } from 'quasar';
 
+import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
   Block,
+  BlockType,
   DigitalActuatorBlock,
   DigitalState,
   FilterChoice,
@@ -16,7 +17,6 @@ import {
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { Link, Time, Unit } from '@/plugins/spark/units';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
@@ -48,48 +48,48 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       // setpoints
       {
         id: names.kettleSetpoint,
-        type: 'SetpointSensorPair',
+        type: BlockType.SetpointSensorPair,
         serviceId,
         groups,
         data: {
-          sensorId: new Link(names.kettleSensor),
-          storedSetting: new Unit(67.7, 'degC'),
+          sensorId: bloxLink(names.kettleSensor),
+          storedSetting: bloxQty(67.7, 'degC'),
           settingEnabled: false,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: bloxQty(null, 'degC'),
+          value: bloxQty(null, 'degC'),
+          valueUnfiltered: bloxQty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
       {
         id: names.tubeSetpoint,
-        type: 'SetpointSensorPair',
+        type: BlockType.SetpointSensorPair,
         serviceId,
         groups,
         data: {
-          sensorId: new Link(names.tubeSensor),
-          storedSetting: new Unit(67.7, 'degC'),
+          sensorId: bloxLink(names.tubeSensor),
+          storedSetting: bloxQty(67.7, 'degC'),
           settingEnabled: true,
-          setting: new Unit(null, 'degC'),
-          value: new Unit(null, 'degC'),
-          valueUnfiltered: new Unit(null, 'degC'),
+          setting: bloxQty(null, 'degC'),
+          value: bloxQty(null, 'degC'),
+          valueUnfiltered: bloxQty(null, 'degC'),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: new Unit(5, 'delta_degC'),
+          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
       // Setpoint Driver
       {
         id: names.tubeDriver,
-        type: 'ActuatorOffset',
+        type: BlockType.ActuatorOffset,
         serviceId,
         groups,
         data: {
-          targetId: new Link(names.tubeSetpoint),
-          drivenTargetId: new Link(names.tubeSetpoint),
-          referenceId: new Link(names.kettleSetpoint),
+          targetId: bloxLink(names.tubeSetpoint),
+          drivenTargetId: bloxLink(names.tubeSetpoint),
+          referenceId: bloxLink(names.kettleSetpoint),
           referenceSettingOrValue: ReferenceKind.REF_SETTING,
           enabled: true,
           desiredSetting: 0,
@@ -108,11 +108,11 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       // Digital Actuators
       {
         id: names.tubeAct,
-        type: 'DigitalActuator',
+        type: BlockType.DigitalActuator,
         serviceId,
         groups,
         data: {
-          hwDevice: new Link(config.tubePin.arrayId),
+          hwDevice: bloxLink(config.tubePin.arrayId),
           channel: config.tubePin.pinId,
           invert: false,
           desiredState: DigitalState.STATE_INACTIVE,
@@ -122,11 +122,11 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       },
       {
         id: names.pumpAct,
-        type: 'DigitalActuator',
+        type: BlockType.DigitalActuator,
         serviceId,
         groups,
         data: {
-          hwDevice: new Link(config.pumpPin.arrayId),
+          hwDevice: bloxLink(config.pumpPin.arrayId),
           channel: config.pumpPin.pinId,
           invert: false,
           desiredState: DigitalState.STATE_INACTIVE,
@@ -137,14 +137,14 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       // PWM
       {
         id: names.tubePwm,
-        type: 'ActuatorPwm',
+        type: BlockType.ActuatorPwm,
         serviceId,
         groups,
         data: {
           enabled: true,
-          period: new Time(10, 's'),
-          actuatorId: new Link(names.tubeAct),
-          drivenActuatorId: new Link(null),
+          period: bloxQty('10s'),
+          actuatorId: bloxLink(names.tubeAct),
+          drivenActuatorId: bloxLink(null),
           setting: 0,
           desiredSetting: 0,
           value: 0,
@@ -154,32 +154,32 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       // PID
       {
         id: names.kettlePid,
-        type: 'Pid',
+        type: BlockType.Pid,
         serviceId,
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: new Unit(10, '1/degC'),
-          ti: new Time(5, 'min'),
-          td: new Time(30, 's'),
+          kp: bloxQty(10, '1/degC'),
+          ti: bloxQty('5m'),
+          td: bloxQty('30s'),
           enabled: true,
-          inputId: new Link(names.kettleSetpoint),
-          outputId: new Link(names.tubeDriver),
+          inputId: bloxLink(names.kettleSetpoint),
+          outputId: bloxLink(names.tubeDriver),
         },
       },
       {
         id: names.tubePid,
-        type: 'Pid',
+        type: BlockType.Pid,
         serviceId,
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: new Unit(30, '1/degC'),
-          ti: new Time(2, 'min'),
-          td: new Time(10, 's'),
+          kp: bloxQty(30, '1/degC'),
+          ti: bloxQty('2m'),
+          td: bloxQty('10s'),
           enabled: true,
-          inputId: new Link(names.tubeSetpoint),
-          outputId: new Link(names.tubePwm),
+          inputId: bloxLink(names.tubeSetpoint),
+          outputId: bloxLink(names.tubePwm),
         },
       },
     ];
@@ -263,7 +263,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
       serviceId,
       changeIdMigrated: true,
       serviceIdMigrated: true,
-      actions: serialize([
+      actions: [
         {
           name: 'Enable pump and heater',
           id: uid(),
@@ -340,7 +340,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
               BlockChange<SetpointSensorPairBlock>,
             ],
         },
-      ]),
+      ],
     },
   };
 

@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockField, BlockFieldAddress } from '@/plugins/spark/types';
+import { Block, BlockField, BlockFieldAddress, ComparedBlockType } from '@/plugins/spark/types';
 
 import FieldBase from '../FieldBase';
 
@@ -17,14 +17,20 @@ export default class BlockFieldAddressField extends FieldBase {
   @Prop({ type: String, default: 'Choose field' })
   public readonly title!: string;
 
-  @Prop({ type: String, default: 'Block field' })
+  @Prop({ type: String })
   public readonly label!: string;
 
   @Prop({ type: Array, required: false })
   public readonly services!: string[];
 
-  @Prop({ type: Array, required: false })
-  public readonly compatible!: string[];
+  @Prop({ type: [String, Array], required: false })
+  readonly compatible!: ComparedBlockType;
+
+  @Prop({ type: Function, required: false })
+  public readonly blockFilter!: ((block: Block) => boolean);
+
+  @Prop({ type: Function, required: false })
+  public readonly fieldFilter!: ((field: BlockField) => boolean);
 
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
@@ -59,6 +65,10 @@ export default class BlockFieldAddressField extends FieldBase {
       && this.show;
   }
 
+  editBlock(): void {
+    createBlockDialog(this.block);
+  }
+
   openDialog(): void {
     if (this.readonly) {
       return;
@@ -73,6 +83,8 @@ export default class BlockFieldAddressField extends FieldBase {
       label: this.label,
       services: this.services,
       compatible: this.compatible,
+      blockFilter: this.blockFilter,
+      fieldFilter: this.fieldFilter,
       ...this.dialogProps,
     })
       .onOk(this.save);
@@ -84,13 +96,10 @@ export default class BlockFieldAddressField extends FieldBase {
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <div v-if="fieldSpec" class="q-gutter-y-xs">
       <div>
-        {{ value.serviceId }}
-      </div>
-      <div>
-        {{ value.id }}
-      </div>
-      <div>
         {{ fieldSpec.title }}
+      </div>
+      <div class="fade-4 text-italic">
+        {{ value.id }}
       </div>
     </div>
     <div v-else>

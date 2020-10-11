@@ -20,6 +20,7 @@ import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
 import Spark2Pins from './Spark2Pins';
 import Spark3Pins from './Spark3Pins';
+import TempSensorCombi from './TempSensorCombi';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
@@ -44,6 +45,7 @@ const features: SparkFeature[] = [
   Spark2Pins,
   Spark3Pins,
   QuickActions,
+  TempSensorCombi,
   TempSensorMock,
   TempSensorOneWire,
 ];

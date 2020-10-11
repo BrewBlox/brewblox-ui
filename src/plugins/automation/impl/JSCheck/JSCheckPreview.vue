@@ -71,7 +71,7 @@ export default class JSCheckPreview extends Vue {
         </div>
         <div class="text-italic fade-7">
           This is the return value from your code. <br>
-          For a condition to pass, it must return true.
+          For an automation condition to pass, the return value must be <i>true</i>.
         </div>
         <vue-json-pretty
           :data="result.returnValue"
@@ -108,7 +108,7 @@ export default class JSCheckPreview extends Vue {
         <vue-json-pretty
           v-if="result.messages.length"
           :data="result.messages"
-          :deep="1"
+          :deep="2"
           class="q-ml-sm q-mt-sm"
         />
       </div>

@@ -1,15 +1,17 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink, isLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { displayTempLabels } from '@/plugins/spark/getters';
 import { isCompatible } from '@/plugins/spark/helpers';
-import { BlockOrIntfType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { BlockIntfType, BlockOrIntfType, BlockType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 
 @Component
 export default class DisplaySettingsFull
   extends BlockCrudComponent<DisplaySettingsBlock> {
+  displayTempLabels = displayTempLabels
 
   slotNameRules: InputRule[] = [
     v => !v || v.length <= 15 || 'Name can only be 15 characters',
@@ -18,10 +20,11 @@ export default class DisplaySettingsFull
     v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
   ];
   validTypes: BlockOrIntfType[] = [
-    'TempSensorInterface',
-    'SetpointSensorPairInterface',
-    'ActuatorAnalogInterface',
-    'Pid',
+    BlockIntfType.TempSensorInterface,
+    BlockIntfType.TempSensorInterface,
+    BlockIntfType.SetpointSensorPairInterface,
+    BlockIntfType.ActuatorAnalogInterface,
+    BlockType.Pid,
   ]
 
   get slots(): (DisplaySlot | null)[] {
@@ -33,10 +36,10 @@ export default class DisplaySettingsFull
 
   slotLink(slot: DisplaySlot): Link {
     if (!slot) {
-      return new Link(null);
+      return bloxLink(null);
     }
     return Object.values(slot)
-      .find(v => v instanceof Link) || new Link(null);
+      .find(v => isLink(v)) ?? bloxLink(null);
   }
 
   slotColor(slot: DisplaySlot): string {
@@ -72,16 +75,16 @@ export default class DisplaySettingsFull
       name: existing?.name || link.id.slice(0, 15),
     };
 
-    if (isCompatible(type, 'TempSensorInterface')) {
+    if (isCompatible(type, BlockIntfType.TempSensorInterface)) {
       obj.tempSensor = link;
     }
-    else if (isCompatible(type, 'SetpointSensorPairInterface')) {
+    else if (isCompatible(type, BlockIntfType.SetpointSensorPairInterface)) {
       obj.setpointSensorPair = link;
     }
-    else if (isCompatible(type, 'ActuatorAnalogInterface')) {
+    else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
       obj.actuatorAnalog = link;
     }
-    else if (isCompatible(type, 'Pid')) {
+    else if (isCompatible(type, BlockType.Pid)) {
       obj.pid = link;
     }
 
@@ -170,7 +173,7 @@ export default class DisplaySettingsFull
           class="col-grow clickable"
           @click="showUnitMenu"
         >
-          {{ block.data.tempUnit | capitalize }}
+          {{ displayTempLabels[block.data.tempUnit] || 'Unknown' }}
         </LabeledField>
         <q-field
           label="Display brightness"

@@ -4,10 +4,10 @@ import { Component, Prop } from 'vue-property-decorator';
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
+import { deepCopy } from '@/helpers/functional';
 import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import type { GraphConfig } from '@/plugins/history/types';
-import { deepCopy } from '@/plugins/spark/parse-object';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { Block, BlockCrud } from '@/plugins/spark/types';
 import type { BlockConfig, BlockSpec } from '@/plugins/spark/types';
@@ -124,7 +124,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   public startMakeWidget(): void {
     const id = uid();
     createDialog({
-      parent: this,
       title: 'Make widget',
       message: `On which dashboard do you want to create a widget for '${this.widget.title}'?`,
       style: 'overflow-y: scroll',
@@ -148,7 +147,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
   public startChangeBlockId(): void {
     const blockId = this.blockId;
     createDialog({
-      parent: this,
       component: 'InputDialog',
       title: 'Change block name',
       message: `Choose a new name for '${this.blockId}'`,
@@ -172,7 +170,6 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
 
   public startRemoveBlock(): void {
     createDialog({
-      parent: this,
       title: 'Remove block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,

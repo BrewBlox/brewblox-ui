@@ -4,9 +4,10 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { spliceById, uniqueFilter } from '@/helpers/functional';
+import { deepCopy, spliceById, uniqueFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
+import { prettyAny } from '@/plugins/spark/helpers';
+import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 
@@ -41,7 +42,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
   }
 
   saveActions(actions: ChangeAction[] = this.actions): void {
-    this.config.actions = serialize(actions);
+    this.config.actions = actions;
     this.saveConfig();
   }
 
@@ -82,7 +83,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
       };
 
       createDialog({
-        component: 'ChangeFieldDialog',
+        component: 'BlockFieldDialog',
         field: specField,
         address: block,
         value: field.value,
@@ -157,7 +158,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
       Object.entries(change.data)
         .map(([key, val]) => {
           const specChange = spec.fields.find(s => s.key === key);
-          const pretty = specChange?.pretty ?? (v => `${v}`);
+          const pretty = specChange?.pretty ?? prettyAny;
           const oldV = pretty(block.data[key]);
           const newV = pretty(val);
           return {

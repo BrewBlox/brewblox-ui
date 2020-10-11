@@ -20,6 +20,7 @@ import type {
   SparkService,
   SparkStatus,
 } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore, WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
@@ -98,7 +99,7 @@ export default class SparkPage extends Vue {
   get statusNok(): boolean {
     return this.isAvailable
       && this.status !== null
-      && !this.status.synchronize;
+      && !this.status.isSynchronized;
   }
 
   get pageMode(): PageMode {
@@ -300,6 +301,15 @@ export default class SparkPage extends Vue {
     });
   }
 
+  startCreateBlock(): void {
+    createBlockWizard(this.serviceId)
+      .onOk(({ block }) => {
+        if (block) {
+          this.updateExpandedBlock(block.id, true);
+        }
+      });
+  }
+
   get nodes(): RelationNode[] {
     return this.validatedItems
       .map(v => ({ id: v.id, type: v.title }))
@@ -321,15 +331,18 @@ export default class SparkPage extends Vue {
     notify.info({ message, icon: 'mdi-tag-remove' });
   }
 
-  reboot(): void {
-    this.sparkModule?.reboot();
+  controllerReboot(): void {
+    this.sparkModule?.controllerReboot();
+  }
+
+  serviceReboot(): void {
+    this.sparkModule?.serviceReboot();
   }
 
   onBlockClick(val: ValidatedWidget): void {
     if (this.$dense) {
       createDialog({
         component: 'WidgetDialog',
-        parent: this,
         mode: 'Basic',
         getCrud: () => val.crud,
       });
@@ -339,12 +352,6 @@ export default class SparkPage extends Vue {
     }
     else {
       this.updateExpandedBlock(val.id, true);
-    }
-  }
-
-  onPageDblClick(evt: Event): void {
-    if (evt.target === evt.currentTarget) {
-      this.startDialog('BlockWizardDialog');
     }
   }
 }
@@ -382,7 +389,7 @@ export default class SparkPage extends Vue {
           <ActionItem
             icon="add"
             label="New block"
-            @click="startDialog('BlockWizardDialog')"
+            @click="startCreateBlock"
           />
           <ActionItem
             icon="mdi-magnify-plus-outline"
@@ -411,8 +418,13 @@ export default class SparkPage extends Vue {
           />
           <ActionItem
             icon="mdi-restart"
+            label="Reboot service"
+            @click="serviceReboot"
+          />
+          <ActionItem
+            icon="mdi-restart"
             label="Reboot controller"
-            @click="reboot"
+            @click="controllerReboot"
           />
           <ActionItem
             icon="mdi-temperature-celsius"
@@ -426,7 +438,7 @@ export default class SparkPage extends Vue {
           />
           <ActionItem
             icon="mdi-power-plug"
-            label="Export hardware links"
+            label="Export sensor and pin names"
             @click="saveHwInfo(serviceId)"
           />
           <ActionItem
@@ -448,7 +460,7 @@ export default class SparkPage extends Vue {
     </q-list>
 
     <template v-else-if="pageMode === 'Relations'">
-      <div class="page-height full-width">
+      <div class="page-height full-width" @dblclick="startCreateBlock">
         <RelationsDiagram
           :service-id="service.id"
           :nodes="nodes"
@@ -459,9 +471,15 @@ export default class SparkPage extends Vue {
 
     <template v-else>
       <!-- Normal display -->
-      <div class="row no-wrap justify-start page-height" @dblclick="onPageDblClick">
-        <q-scroll-area visible class="content-column rounded-borders bg-dark">
-          <q-list class="q-pr-md">
+      <div
+        class="row no-wrap justify-start page-height"
+        @dblclick="startCreateBlock"
+      >
+        <q-scroll-area
+          visible
+          class="content-column rounded-borders bg-dark"
+        >
+          <q-list class="q-pr-md" @dblclick.stop.prevent>
             <!-- Selection controls -->
             <q-item class="q-mb-md">
               <q-item-section>
@@ -553,8 +571,12 @@ export default class SparkPage extends Vue {
         </q-scroll-area>
 
         <!-- Widget List -->
-        <q-scroll-area v-if="!$dense" visible class="content-column">
-          <q-list class="q-ml-lg q-pr-none">
+        <q-scroll-area
+          v-if="!$dense"
+          visible
+          class="content-column"
+        >
+          <q-list class="q-ml-lg q-pr-none" @dblclick.stop.prevent>
             <!-- Service -->
             <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
               <q-item-section>
@@ -578,7 +600,7 @@ export default class SparkPage extends Vue {
               </q-item-section>
             </q-item>
             <!-- Blank space to always be able to show a widget at the top -->
-            <q-item class="page-height" @dblclick.native="onPageDblClick" />
+            <q-item class="page-height" @dblclick.native="startCreateBlock" />
           </q-list>
         </q-scroll-area>
       </div>

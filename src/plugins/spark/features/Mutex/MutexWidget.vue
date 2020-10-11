@@ -19,7 +19,9 @@ export default class MutexWidget
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <CardWrapper
+    v-bind="{context}"
+  >
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>

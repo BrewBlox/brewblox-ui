@@ -7,7 +7,6 @@ import {
   ActuatorLogicBlock,
   AnalogCompare,
   DigitalCompare,
-  ExpressionError,
   LogicResult,
 } from '@/plugins/spark/types';
 
@@ -25,6 +24,7 @@ import {
   prettyDigital,
   syntaxCheck,
 } from './helpers';
+import { ExpressionError } from './types';
 
 
 @Component({

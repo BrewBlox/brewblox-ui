@@ -56,15 +56,15 @@ export default class SparkWidget extends Vue {
   }
 
   get sysInfo(): SysInfoBlock {
-    return this.sysBlock('SysInfo');
+    return this.sysBlock(SystemBlockType.SysInfo);
   }
 
   get ticks(): TicksBlock {
-    return this.sysBlock('Ticks');
+    return this.sysBlock(SystemBlockType.Ticks);
   }
 
   get wifi(): WiFiSettingsBlock {
-    return this.sysBlock('WiFiSettings');
+    return this.sysBlock(SystemBlockType.WiFiSettings);
   }
 
   get sysDate(): string {
@@ -111,7 +111,7 @@ export default class SparkWidget extends Vue {
     <div class="widget-md">
       <div class="widget-body row">
         <LabeledField label="Firmware version" class="col-lg-5 col-11">
-          {{ sysInfo.data.version }}
+          {{ sysInfo.data.version.substring(0, 8) /* We only use first 8 characters of version hash */ }}
         </LabeledField>
         <LabeledField label="Firmware release date" class="col-lg-5 col-11">
           {{ sysInfo.data.releaseDate }}

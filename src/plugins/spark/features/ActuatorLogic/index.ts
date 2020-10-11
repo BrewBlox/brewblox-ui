@@ -1,13 +1,13 @@
+import { bloxLink } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector, enumHint } from '@/plugins/spark/helpers';
-import { ActuatorLogicBlock, BlockIntfType, BlockSpec, LogicResult } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { ActuatorLogicBlock, BlockIntfType, BlockSpec, BlockType, LogicResult } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorLogicWidget.vue';
 import { nonErrorResults } from './getters';
 
-const typeName = 'ActuatorLogic';
+const typeName = BlockType.ActuatorLogic;
 
 const block: BlockSpec<ActuatorLogicBlock> = {
   id: typeName,
@@ -15,8 +15,8 @@ const block: BlockSpec<ActuatorLogicBlock> = {
     enabled: true,
     result: LogicResult.RESULT_EMPTY,
     errorPos: 0,
-    targetId: new Link(null, BlockIntfType.ActuatorDigitalInterface),
-    drivenTargetId: new Link(null, BlockIntfType.ActuatorDigitalInterface, true),
+    targetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
+    drivenTargetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface, true),
     analog: [],
     digital: [],
     expression: '',
