@@ -1,74 +1,92 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { ActuatorPwmBlock } from './types';
+import { ActuatorPwmBlock } from '@/plugins/spark/types';
 
 @Component
-export default class ActuatorPwmBasic extends BlockCrudComponent {
-  readonly block!: ActuatorPwmBlock;
+export default class ActuatorPwmBasic
+  extends BlockCrudComponent<ActuatorPwmBlock> {
+
+  quickValues = [
+    { label: '0%', value: 0 },
+    { label: '50%', value: 50 },
+    { label: '100%', value: 100 },
+  ]
 
   get isConstrained(): boolean {
     return this.block.data.enabled
       && this.block.data.setting !== this.block.data.desiredSetting;
   }
+
+  editSetting(): void {
+    if (this.isDriven) { return; }
+    createDialog({
+      component: 'SliderDialog',
+      title: 'Desired setting',
+      value: this.block.data.desiredSetting,
+      quickActions: this.quickValues,
+    })
+      .onOk(v => {
+        this.block.data.desiredSetting = v;
+        this.saveBlock();
+      });
+  }
 }
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <SliderField
-            :value="block.data.setting"
-            :readonly="isDriven"
-            :tag-class="{['text-orange']: isConstrained}"
-            title="Duty Setting"
-            label="Setting"
-            suffix="%"
-            tag="big"
-            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-          />
-        </q-item-section>
+    <div class="widget-body row justify-center">
+      <SettingValueField :editable="!isDriven" class="col-auto" @click="editSetting">
+        <template #valueIcon>
+          <PwmIcon />
+        </template>
+        <template #value>
+          {{ block.data.value | round }} %
+        </template>
+        <template #setting>
+          <div :class="{'text-orange': isConstrained}">
+            {{ block.data.setting | round }} %
+          </div>
+        </template>
+      </SettingValueField>
 
-        <q-item-section>
-          <LabeledField
-            :value="block.data.value"
-            label="Duty achieved"
-            number
-            suffix="%"
-            tag="big"
-          />
-        </q-item-section>
+      <div class="col-break" />
 
-        <q-item-section>
-          <LabeledField
-            v-if="isConstrained"
-            label="Unconstrained setting"
-            :value="block.data.desiredSetting"
-            number
-            suffix="%"
-            tag="big"
-          />
-        </q-item-section>
-      </q-item>
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
 
-      <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="analog"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+      <ConstraintsField
+        :value="block.data.constrainedBy"
+        :service-id="serviceId"
+        type="analog"
+        class="col-grow"
+        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+      />
+    </div>
+  </div>
 </template>
+
+<style lang="sass" scoped>
+.grid-container
+  display: grid
+  grid-template-columns: repeat(3, 50px)
+  grid-row-gap: 5px
+  grid-auto-flow: row
+
+.grid-icon
+  grid-column-end: span 1
+  grid-column-start: 1
+
+.grid-value
+  grid-column-end: span 2
+  grid-column-start: 2
+  align-self: flex-end
+</style>

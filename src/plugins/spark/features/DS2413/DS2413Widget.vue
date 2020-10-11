@@ -2,33 +2,46 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { DS2413Block } from '@/plugins/spark/types';
 
-import DS2413Basic from './DS2413Basic.vue';
-import DS2413Full from './DS2413Full.vue';
-import { DS2413Block } from './types';
-
-@Component({
-  components: {
-    Basic: DS2413Basic,
-    Full: DS2413Full,
-  },
-})
-export default class DS2413Widget extends BlockWidgetBase {
-  readonly block!: DS2413Block;
+@Component
+export default class DS2413Widget
+  extends BlockWidgetBase<DS2413Block> {
 }
 </script>
 
 <template>
-  <component :is="mode" :crud="crud" :class="cardClass">
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
-    <template #warnings>
+
+    <div class="widget-md">
       <CardWarning v-if="!block.data.connected">
         <template #message>
           DS2413 is not connected
         </template>
       </CardWarning>
-    </template>
-  </component>
+      <IoArray :crud="crud" />
+
+      <template v-if="mode === 'Full'">
+        <q-separator inset />
+
+        <div class="widget-body row">
+          <LabeledField
+            :value="block.data.connected ? 'Yes' : 'No'"
+            label="Connected"
+            class="col-grow"
+          />
+          <InputField
+            :value="block.data.address"
+            title="Address"
+            label="Address"
+            class="col-grow"
+            @input="v => { block.data.address = v; saveBlock(); }"
+          />
+        </div>
+      </template>
+    </div>
+  </CardWrapper>
 </template>

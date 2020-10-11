@@ -4,13 +4,15 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
-import { suggestId, validator } from '@/helpers/functional';
+import { ruleValidator, suggestId } from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
 export default class DashboardWizard extends Vue {
   idGenerator = new UrlSafeString();
   dashboardIdRules = dashboardIdRules();
+  dashboardIdValidator = ruleValidator(dashboardIdRules());
 
   chosenId: string | null = null;
   dashboardTitle = 'New dashboard';
@@ -22,7 +24,7 @@ export default class DashboardWizard extends Vue {
   get dashboardId(): string {
     return this.chosenId !== null
       ? this.chosenId
-      : suggestId(this.idGenerator.generate(this.dashboardTitle), validator(this.dashboardIdRules));
+      : suggestId(this.idGenerator.generate(this.dashboardTitle), this.dashboardIdValidator);
   }
 
   set dashboardId(id: string) {
@@ -30,7 +32,7 @@ export default class DashboardWizard extends Vue {
   }
 
   get valid(): boolean {
-    return validator(this.dashboardIdRules)(this.dashboardId);
+    return this.dashboardIdValidator(this.dashboardId);
   }
 
   async createDashboard(): Promise<void> {
@@ -41,11 +43,7 @@ export default class DashboardWizard extends Vue {
     };
 
     await dashboardStore.createDashboard(dashboard);
-    this.$q.notify({
-      icon: 'mdi-check-all',
-      color: 'positive',
-      message: `Added dashboard ${dashboard.title}`,
-    });
+    notify.done(`Added dashboard ${dashboard.title}`);
     this.$emit('close');
   }
 
@@ -56,7 +54,7 @@ export default class DashboardWizard extends Vue {
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -82,12 +80,10 @@ export default class DashboardWizard extends Vue {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions align="right">
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn :disable="!valid" unelevated label="Create" color="primary" @click="createDashboard" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

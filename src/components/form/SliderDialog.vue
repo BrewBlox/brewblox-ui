@@ -21,7 +21,7 @@ export default class SliderDialog extends DialogBase {
   @Prop({ type: Number, default: 1 })
   public readonly step!: number;
 
-  @Prop({ type: String, default: 'Value' })
+  @Prop({ type: String, required: false })
   public readonly label!: string;
 
   @Prop({ type: Boolean, default: true })
@@ -34,6 +34,11 @@ export default class SliderDialog extends DialogBase {
     this.onDialogOk(this.local);
   }
 
+  apply(value: number): void {
+    this.local = value;
+    this.save();
+  }
+
   created(): void {
     this.local = this.value;
   }
@@ -41,34 +46,31 @@ export default class SliderDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section>
-        <q-item>
-          <q-item-section>
-            <q-slider v-model="local" :min="min" :max="max" label-always />
-            <q-item-label caption>
-              {{ label }}
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item v-if="quickActions.length">
-          <q-item-section v-for="q in quickActions" :key="'quick'+q.value">
-            <q-btn unelevated :label="q.label" @click="local = q.value" />
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-      <q-card-actions align="right">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
+    <DialogCard v-bind="{title, message, html}">
+      <q-item>
+        <q-item-section class="q-pt-md">
+          <q-slider v-model="local" :min="min" :max="max" label-always />
+          <q-item-label v-if="label" caption>
+            {{ label }}
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-item v-if="quickActions.length">
+        <q-item-section v-for="q in quickActions" :key="'quick'+q.value">
+          <q-btn unelevated :label="q.label" @click="apply(q.value)" />
+        </q-item-section>
+      </q-item>
+
+      <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

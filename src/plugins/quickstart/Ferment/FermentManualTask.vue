@@ -19,7 +19,7 @@ export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <big>About your new fermentation dashboard</big>
@@ -61,10 +61,7 @@ export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
-      <q-space />
+    <template #actions>
       <q-btn
         :loading="busyExecuting"
         unelevated
@@ -76,6 +73,6 @@ export default class FermentManualTask extends WizardTaskBase<FermentConfig> {
           Creating everything...
         </q-tooltip>
       </q-btn>
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

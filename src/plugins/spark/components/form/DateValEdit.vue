@@ -1,13 +1,22 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
+import { shortDateString } from '@/helpers/functional';
+
 import ValEditBase from '../ValEditBase';
 
 
 @Component
 export default class DateValEdit extends ValEditBase {
+
   @Prop({ type: Number, default: 1 })
   readonly timeScale!: number;
+
+  created(): void {
+    if (this.field === 0) {
+      this.scaledField = new Date().getTime();
+    }
+  }
 
   get scaledField(): number {
     return this.field * this.timeScale;
@@ -18,17 +27,18 @@ export default class DateValEdit extends ValEditBase {
   }
 
   get displayVal(): string {
-    return new Date(this.scaledField).toLocaleString();
-  }
-
-  created(): void {
-    if (this.field === 0) {
-      this.scaledField = new Date().getTime();
-    }
+    return shortDateString(this.scaledField);
   }
 }
 </script>
 
 <template>
-  <DatetimeField v-model="scaledField" :readonly="!editable" title="Start time" />
+  <DatetimeField v-if="editable" v-model="scaledField" />
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
+    {{ displayVal }}
+  </div>
 </template>

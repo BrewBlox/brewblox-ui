@@ -12,17 +12,21 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
   @Prop({ type: String, required: false })
   public readonly mode!: WidgetMode | null;
 
-  updateMode(val: WidgetMode): void {
+  get localMode(): WidgetMode | null {
+    return this.mode;
+  }
+
+  set localMode(val: WidgetMode | null) {
     this.$emit('update:mode', val);
   }
 }
 </script>
 
 <template>
-  <WidgetToolbar :crud="crud" :mode="mode" @update:mode="updateMode">
+  <WidgetToolbar :crud="crud" :mode.sync="localMode" @title-click="startChangeBlockId">
     <BlockGraph
       v-if="graphModalOpen"
-      :id="widget.id"
+      :id="`graph-full--${widget.id}`"
       v-model="graphModalOpen"
       :config.sync="graphCfg"
     />
@@ -31,19 +35,15 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
       <ActionItem
         v-if="hasGraph"
         icon="mdi-chart-line"
-        label="Show graph"
+        label="Graph"
         @click="graphModalOpen = true"
       />
       <slot name="actions" />
-      <ActionItem icon="refresh" label="Refresh" @click="refreshBlock" />
+    </template>
+
+    <template #menus>
       <WidgetActions :crud="crud" no-rename />
       <BlockActions :crud="crud" />
     </template>
   </WidgetToolbar>
 </template>
-
-<style scoped>
-.dense {
-  padding: 0px;
-}
-</style>

@@ -1,22 +1,50 @@
-import { typeName } from '@/plugins/spark/features/Pid/getters';
+import { BlockType } from '@/plugins/spark/types';
 
-import { showLinkedBlockDialog } from '../helpers';
-import { PartSpec, PersistentPart } from '../types';
+import { showSettingsBlock, universalTransitions } from '../helpers';
+import { PartSpec } from '../types';
 
 
 const SIZE_X = 1;
 const SIZE_Y = 1;
+const addressKey = 'pid';
+const scaleKey = 'scale';
+const flowEnabledKey = 'flowEnabled';
+
+const size: PartSpec['size'] = ({ settings }) => {
+  const scale = settings[scaleKey] ?? 1;
+  return [SIZE_X * scale, SIZE_Y * scale];
+};
 
 const spec: PartSpec = {
   id: 'PidDisplay',
   title: 'Display: PID',
-  transitions: () => ({}),
-  cards: [{
-    component: 'LinkedBlockCard',
-    props: { settingsKey: 'pid', types: [typeName], label: 'PID' },
-  }],
-  size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'pid'),
+  cards: [
+    {
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey: addressKey,
+        compatible: [BlockType.Pid],
+        label: 'PID',
+      },
+    },
+    {
+      component: 'ScaleCard',
+      props: {
+        settingsKey: scaleKey,
+        defaultSize: [SIZE_X, SIZE_Y],
+      },
+    },
+    {
+      component: 'ToggleCard',
+      props: {
+        settingsKey: flowEnabledKey,
+        label: 'Allow liquid to flow through this part',
+      },
+    },
+  ],
+  size,
+  transitions: part => universalTransitions(size(part), part.settings[flowEnabledKey]),
+  interactHandler: part => showSettingsBlock(part, addressKey),
 };
 
 export default spec;

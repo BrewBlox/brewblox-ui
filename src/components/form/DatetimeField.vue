@@ -17,7 +17,7 @@ export default class DatetimeField extends FieldBase {
   @Prop({ type: String })
   readonly resetIcon!: string;
 
-  @Prop({ type: String, default: 'date and time' })
+  @Prop({ type: String, default: 'Date and time' })
   public readonly label!: string;
 
   @Prop({ type: String, default: '<not set>' })
@@ -44,10 +44,10 @@ export default class DatetimeField extends FieldBase {
 
     createDialog({
       component: 'DatetimeDialog',
+      parent: this,
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
-      parent: this,
+      html: this.html,
       value: new Date(this.value || (this.defaultNow ? new Date().getTime() : 0)),
       label: this.label,
       resetIcon: this.resetIcon,
@@ -59,19 +59,9 @@ export default class DatetimeField extends FieldBase {
 </script>
 
 <template>
-  <q-field
-    :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    v-bind="$attrs"
-    stack-label
-    @click.native="openDialog"
-  >
-    <template #control>
-      <component :is="tag" class="q-mt-sm">
-        <slot name="value">
-          {{ displayValue }}
-        </slot>
-      </component>
-    </template>
-  </q-field>
+  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
+  </LabeledField>
 </template>

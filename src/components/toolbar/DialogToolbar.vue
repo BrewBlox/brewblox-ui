@@ -3,14 +3,25 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 @Component
-export default class DialogToolbar extends Vue { }
+export default class DialogToolbar extends Vue {
+
+}
 </script>
 
 <template>
-  <q-bar class="bg-secondary text-white q-pr-none full-width" style="height: 50px; min-height: 50px">
+  <Toolbar class="q-pa-none" v-bind="$attrs" v-on="$listeners">
     <slot />
-    <q-space />
-    <slot name="buttons" />
-    <q-btn v-close-popup flat icon="mdi-close-circle" size="md" @click="$emit('close')" />
-  </q-bar>
+    <template #buttons>
+      <slot name="buttons" />
+      <q-btn
+        v-close-popup
+        flat
+        round
+        dense
+        icon="mdi-close-circle"
+        class="close-button"
+        @click="$emit('close')"
+      />
+    </template>
+  </Toolbar>
 </template>

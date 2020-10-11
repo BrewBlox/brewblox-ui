@@ -13,7 +13,7 @@ export default class GenericBlockWidget extends BlockWidgetBase { }
       <div class="ellipsis">
         {{ widget.id }}
       </div>
-      <span slot="right" class="vertical-middle on-left">{{ displayName }}</span>
+      <span slot="right" class="vertical-middle on-left">{{ featureTitle }}</span>
       <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock" />
     </q-card-title>
     <q-card-separator />

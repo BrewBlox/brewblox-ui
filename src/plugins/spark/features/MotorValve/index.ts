@@ -1,46 +1,59 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalState } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/helpers';
+import { BlockSpec, DigitalConstraintsObj, DigitalState, MotorValveBlock, ValveState } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
+import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './MotorValveWidget.vue';
-import { MotorValveData, ValveState } from './types';
 
-const block: BlockSpec = {
+const typeName = 'MotorValve';
+
+const block: BlockSpec<MotorValveBlock> = {
   id: typeName,
-  generate: (): MotorValveData => ({
-    hwDevice: new Link(null, interfaceTypes.IoArray),
+  generate: () => ({
+    hwDevice: new Link(null, 'IoArrayInterface'),
     startChannel: 0,
-    desiredState: DigitalState.Inactive,
-    state: DigitalState.Inactive,
-    valveState: ValveState.InitIdle,
+    desiredState: DigitalState.STATE_INACTIVE,
+    state: DigitalState.STATE_INACTIVE,
+    valveState: ValveState.VALVE_INIT_IDLE,
     constrainedBy: { constraints: [] },
   }),
   presets: [],
-  changes: [
+  fields: [
     {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
-      generate: () => 0,
-      pretty: v => DigitalState[v],
+      generate: () => DigitalState.STATE_INACTIVE,
+      valueHint: enumHint(DigitalState),
+      graphed: true,
+      graphName: 'Desired state',
+    },
+    {
+      key: 'constrainedBy',
+      title: 'Constraints',
+      component: 'DigitalConstraintsValEdit',
+      generate: (): DigitalConstraintsObj => ({ constraints: [] }),
+      pretty: prettifyConstraints,
+    },
+    {
+      key: 'state',
+      title: 'Actual state',
+      component: 'StateValEdit',
+      generate: () => DigitalState.STATE_INACTIVE,
+      valueHint: enumHint(DigitalState),
+      readonly: true,
+      graphed: true,
     },
   ],
-  graphTargets: {
-    state: 'Actual state',
-    desiredState: 'Desired state',
-  },
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Motor Valve',
+  title: 'Motor Valve',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 2,

@@ -1,14 +1,11 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
 import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
-import { SetpointSensorPairBlock } from './types';
 
 @Component({
   components: {
@@ -16,15 +13,16 @@ import { SetpointSensorPairBlock } from './types';
     Full: SetpointSensorPairFull,
   },
 })
-export default class SetpointSensorPairWidget extends BlockWidgetBase {
-  readonly block!: SetpointSensorPairBlock;
+export default class SetpointSensorPairWidget
+  extends BlockWidgetBase<SetpointSensorPairBlock> {
 
   get usedBy(): Block[] {
     if (!this.crud.isStoreBlock) {
       return [];
     }
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => get(block, 'data.inputId.id') === this.blockId);
+    return this.sparkModule
+      .blocks
+      .filter(block => block.data.inputId?.id === this.blockId);
   }
 
   get unused(): boolean {
@@ -44,16 +42,24 @@ export default class SetpointSensorPairWidget extends BlockWidgetBase {
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-presets
+        use-range
+        @params="saveGraphParams"
+        @layout="saveGraphLayout"
+      />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass">
-      <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
-      </template>
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
 
+    <component :is="mode" :crud="crud">
       <template #warnings>
         <CardWarning v-if="unused">
           <template #message>
@@ -66,7 +72,6 @@ export default class SetpointSensorPairWidget extends BlockWidgetBase {
           :text-disabled="disabledString"
           text-enabled="Setpoint is enabled."
           data-key="settingEnabled"
-          class="full-width bordered"
         />
       </template>
     </component>

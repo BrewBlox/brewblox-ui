@@ -2,21 +2,21 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { SetpointProfileBlock } from './types';
+import { SetpointProfileBlock } from '@/plugins/spark/types';
 
 @Component
-export default class SetpointProfileBasic extends BlockCrudComponent {
-  readonly block!: SetpointProfileBlock;
+export default class SetpointProfileBasic
+  extends BlockCrudComponent<SetpointProfileBlock> {
 }
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
-    <slot name="warnings" />
-    <div class="col">
+  <div class="fit column">
+    <div class="col-auto">
+      <slot name="warnings" />
+    </div>
+    <div class="col full-width">
       <slot name="graph" />
     </div>
-  </q-card>
+  </div>
 </template>

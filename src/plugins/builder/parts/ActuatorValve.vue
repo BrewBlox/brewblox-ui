@@ -14,14 +14,6 @@ const paths = {
     'M39.4,21C37.2,13,29,8.3,21,10.5c-5.1,1.4-9.1,5.4-10.5,10.5H39.4z',
     'M10.5,29C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29H10.5z',
   ],
-  powerIcon: `
-        M27.7,9.5c-0.7,1.1-1.4,2.2-2.3,3.2c-0.4,0.5-0.8,1-1.2,1.5
-        s-0.9,1-1.3,1.4L22.3,14c1.8-0.1,3.6-0.1,5.5,0l2.4,0.1l-1.7,1.5
-        c-0.5,0.4-1,0.9-1.4,1.3s-1,0.8-1.5,1.2c-1,0.8-2.1,1.6-3.2,2.3
-        c0.7-1.1,1.5-2.2,2.3-3.2c0.4-0.5,0.8-1,1.2-1.5
-        c0.4-0.5,0.9-1,1.3-1.4l0.7,1.6c-1.8,0.1-3.6,0.1-5.5,0l-2.3-0.1
-        l1.7-1.5c0.5-0.4,1-0.9,1.5-1.3c0.5-0.4,1-0.8,1.5-1.3
-        C25.6,10.9,26.6,10.2,27.7,9.5z`,
   openLiquid: [
     'm0,25h50',
   ],
@@ -65,18 +57,8 @@ export default class ActuatorValve extends PartBase {
     <g key="valve-inner" :transform="`rotate(${valveRotation}, 25, 25)`" class="fill outline inner">
       <path :d="paths.innerValve[0]" />
       <path :d="paths.innerValve[1]" />
-      <g class="power-icon">
-        <path :d="paths.powerIcon" />
-      </g>
+      <PowerIcon color="black" />
     </g>
     <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.arrows" />
   </g>
 </template>
-
-<style lang="stylus" scoped>
-/deep/ .power-icon path {
-  stroke-width: 1px;
-  stroke: black;
-  fill: black;
-}
-</style>

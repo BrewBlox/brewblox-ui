@@ -3,7 +3,7 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class TimeUnitField extends FieldBase {
@@ -28,30 +28,32 @@ export default class TimeUnitField extends FieldBase {
       component: 'TimeUnitDialog',
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       parent: this,
       value: this.value,
       label: this.label,
+      rules: this.rules,
     })
       .onOk(this.change);
+  }
+
+  // Can't be placed in parent class
+  get activeSlots(): string[] {
+    return this.fieldSlots.filter(s => !!this.$slots[s]);
   }
 }
 </script>
 
 <template>
-  <q-field
-    :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    v-bind="$attrs"
-    stack-label
-    @click.native="openDialog"
-  >
-    <template #control>
-      <component :is="tag" class="q-mt-sm">
-        <slot name="value">
-          {{ value | unitDuration }}
-        </slot>
-      </component>
+  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+    <slot name="value">
+      {{ value | unitDuration }}
+    </slot>
+
+    <template v-for="slot in activeSlots">
+      <template :slot="slot">
+        <slot :name="slot" />
+      </template>
     </template>
-  </q-field>
+  </LabeledField>
 </template>

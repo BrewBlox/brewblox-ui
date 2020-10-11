@@ -1,10 +1,12 @@
-import { blockTypes } from '@/plugins/spark/block-types';
+import { BlockType } from '@/plugins/spark/types';
 
-import { showLinkedBlockDialog } from '../helpers';
-import { PartSpec, PersistentPart } from '../types';
+import { showSettingsBlock } from '../helpers';
+import { PartSpec } from '../types';
 
 const SIZE_X = 3;
 const SIZE_Y = 9;
+const addressKey = 'setpoint';
+const scaleKey = 'scale';
 
 const spec: PartSpec = {
   id: 'Conical',
@@ -12,16 +14,26 @@ const spec: PartSpec = {
   transitions: () => ({}),
   cards: [
     {
-      component: 'LinkedBlockCard',
+      component: 'BlockAddressCard',
       props: {
-        settingsKey: 'setpoint',
-        types: [blockTypes.SetpointSensorPair],
+        settingsKey: addressKey,
+        compatible: [BlockType.SetpointSensorPair],
         label: 'Setpoint',
       },
     },
+    {
+      component: 'ScaleCard',
+      props: {
+        settingsKey: scaleKey,
+        defaultSize: [SIZE_X, SIZE_Y],
+      },
+    },
   ],
-  size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'setpoint'),
+  size: ({ settings }) => {
+    const scale = settings[scaleKey] ?? 1;
+    return [SIZE_X * scale, SIZE_Y * scale];
+  },
+  interactHandler: part => showSettingsBlock(part, addressKey),
 };
 
 export default spec;

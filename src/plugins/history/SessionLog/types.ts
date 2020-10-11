@@ -1,7 +1,7 @@
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 
 export interface SessionLogConfig {
   currentSession: string | null;
 }
 
-export type SessionLogWidget = PersistentWidget<SessionLogConfig>;
+export type SessionLogWidget = Widget<SessionLogConfig>;

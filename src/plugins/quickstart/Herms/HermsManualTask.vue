@@ -19,7 +19,7 @@ export default class HermsManualTask extends WizardTaskBase<HermsConfig> {
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <big>About your new HERMS dashboard</big>
@@ -54,10 +54,7 @@ export default class HermsManualTask extends WizardTaskBase<HermsConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
-      <q-space />
+    <template #actions>
       <q-btn
         :loading="busyExecuting"
         unelevated
@@ -69,6 +66,6 @@ export default class HermsManualTask extends WizardTaskBase<HermsConfig> {
           Creating everything...
         </q-tooltip>
       </q-btn>
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

@@ -1,18 +1,47 @@
-import { autoRegister } from '@/helpers/component-ref';
-import { featureStore } from '@/store/features';
-import { pluginStore } from '@/store/plugins';
+import { VueConstructor } from 'vue';
 
-import Automation from './Automation';
+import { autoRegister, ref } from '@/helpers/component-ref';
+import { featureStore, WatcherFeature, WidgetFeature } from '@/store/features';
+
+import { EventbusMessage } from '../eventbus';
+import AutomationWidget from './AutomationWidget.vue';
+import { AutomationEvent } from './getters';
+import { automationStore } from './store';
+import { AutomationConfig, AutomationEventData } from './types';
+
+const widget: WidgetFeature = {
+  id: 'Automation',
+  title: 'Automation',
+  component: ref(AutomationWidget),
+  wizard: true,
+  widgetSize: {
+    cols: 4,
+    rows: 5,
+  },
+  generateConfig: (): AutomationConfig => ({}),
+};
+
+const watcher: WatcherFeature = {
+  id: 'AutomationWatcher',
+  component: 'AutomationWatcher',
+  props: {},
+};
 
 export default {
-  install() {
-    if (process.env.VUE_APP_AUTOMATION_FEATURE !== 'true') {
-      return;
-    }
+  install(Vue: VueConstructor) {
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
 
-    featureStore.createFeature(Automation.feature);
-    featureStore.createWatcher({ component: 'AutomationWatcher', props: {} });
-    pluginStore.onSetup('automation/setup');
+    featureStore.registerWidget(widget);
+    featureStore.registerWatcher(watcher);
+
+    Vue.$startup.onStart(() => automationStore.start());
+    Vue.$eventbus.addListener({
+      id: 'automation',
+      filter: (_, type) => type === AutomationEvent,
+      onmessage: (msg: EventbusMessage) => {
+        const data: AutomationEventData = msg.data;
+        automationStore.setEventData(data);
+      },
+    });
   },
 };

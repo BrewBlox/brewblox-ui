@@ -1,0 +1,1366 @@
+{
+  "blocks": [
+    {
+      "id": "Mock Pins",
+      "nid": 241,
+      "groups": [
+        0
+      ],
+      "type": "MockPins",
+      "data": {
+        "pins": []
+      }
+    },
+    {
+      "id": "pin-actuator-3",
+      "nid": 217,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 0,
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": null
+      }
+    },
+    {
+      "id": "ActiveGroups",
+      "nid": 1,
+      "groups": [
+        7
+      ],
+      "type": "Groups",
+      "data": {
+        "active": [
+          0,
+          7
+        ]
+      }
+    },
+    {
+      "id": "SystemInfo",
+      "nid": 2,
+      "groups": [
+        7
+      ],
+      "type": "SysInfo",
+      "data": {
+        "deviceId": "",
+        "version": "",
+        "platform": 0,
+        "protocolVersion": "",
+        "releaseDate": "",
+        "protocolDate": ""
+      }
+    },
+    {
+      "id": "OneWireBus",
+      "nid": 4,
+      "groups": [
+        7
+      ],
+      "type": "OneWireBus",
+      "data": {
+        "address": []
+      }
+    },
+    {
+      "id": "WiFiSettings",
+      "nid": 5,
+      "groups": [
+        7
+      ],
+      "type": "WiFiSettings",
+      "data": {
+        "ssid": "",
+        "password": "",
+        "security": 0,
+        "cipher": 0,
+        "signal": 0,
+        "ip": ""
+      }
+    },
+    {
+      "id": "TouchSettings",
+      "nid": 6,
+      "groups": [
+        7
+      ],
+      "type": "TouchSettings",
+      "data": {
+        "calibrated": 1,
+        "xBitsPerPixelX16": 64,
+        "yBitsPerPixelX16": 64,
+        "xOffset": 0,
+        "yOffset": 0
+      }
+    },
+    {
+      "id": "SparkPins",
+      "nid": 19,
+      "groups": [
+        7
+      ],
+      "type": "Spark3Pins",
+      "data": {
+        "enableIoSupply5V": true,
+        "enableIoSupply12V": true,
+        "pins": [],
+        "soundAlarm": false,
+        "voltage5": 0,
+        "voltage12": 0
+      }
+    },
+    {
+      "id": "balancer-1",
+      "nid": 200,
+      "groups": [
+        0
+      ],
+      "type": "Balancer",
+      "data": {
+        "clients": []
+      }
+    },
+    {
+      "id": "mutex-1",
+      "nid": 201,
+      "groups": [
+        0
+      ],
+      "type": "Mutex",
+      "data": {
+        "differentActuatorWait[second]": 0.01,
+        "waitRemaining[second]": 0
+      }
+    },
+    {
+      "id": "profile-1",
+      "nid": 202,
+      "groups": [
+        0
+      ],
+      "type": "SetpointProfile",
+      "data": {
+        "points": [
+          {
+            "time": 10,
+            "temperature[degC]": 0
+          },
+          {
+            "time": 20,
+            "temperature[degC]": 50
+          },
+          {
+            "time": 30000,
+            "temperature[degC]": 100
+          }
+        ],
+        "start": 1540376829,
+        "enabled": false,
+        "drivenTargetId<SetpointSensorPair,driven>": null,
+        "targetId<SetpointSensorPair>": null
+      }
+    },
+    {
+      "id": "sensor-inactive",
+      "nid": 203,
+      "groups": [],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": false,
+        "fluctuations": [],
+        "value[degC]": null,
+        "setting[degC]": 0
+      }
+    },
+    {
+      "id": "sensor-1",
+      "nid": 204,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
+      }
+    },
+    {
+      "id": "sensor-onewire-1",
+      "nid": 205,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "deadbeef00000000",
+        "value[degC]": 0,
+        "offset[delta_degC]": 9
+      }
+    },
+    {
+      "id": "setpoint-sensor-pair-1",
+      "nid": 206,
+      "groups": [
+        0
+      ],
+      "type": "SetpointSensorPair",
+      "data": {
+        "settingEnabled": true,
+        "filter": 1,
+        "resetFilter": false,
+        "filterThreshold[delta_degC]": 4,
+        "value[degC]": 0,
+        "valueUnfiltered[degC]": 0,
+        "storedSetting[degC]": 20,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": "sensor-1"
+      }
+    },
+    {
+      "id": "setpoint-sensor-pair-2",
+      "nid": 207,
+      "groups": [
+        0
+      ],
+      "type": "SetpointSensorPair",
+      "data": {
+        "settingEnabled": true,
+        "filter": 0,
+        "resetFilter": false,
+        "filterThreshold[delta_degC]": 5,
+        "value[degC]": 0,
+        "valueUnfiltered[degC]": 0,
+        "storedSetting[degC]": 20,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": null
+      }
+    },
+    {
+      "id": "actuator-1",
+      "nid": 208,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorAnalogMock",
+      "data": {
+        "minSetting": 10,
+        "maxSetting": 30,
+        "minValue": 40,
+        "maxValue": 60,
+        "desiredSetting": 10,
+        "setting": 0,
+        "value": 0
+      }
+    },
+    {
+      "id": "actuator-pwm-1",
+      "nid": 209,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorPwm",
+      "data": {
+        "constrainedBy": {
+          "constraints": [
+            {
+              "max": 50,
+              "limiting": false
+            },
+            {
+              "balanced": {
+                "id": 1,
+                "granted": 0,
+                "balancerId<BalancerInterface>": "balancer-1"
+              },
+              "limiting": false
+            }
+          ]
+        },
+        "setting": 0,
+        "value": 0,
+        "enabled": false,
+        "desiredSetting": 0,
+        "actuatorId<ActuatorDigitalInterface>": "pin-actuator-1",
+        "drivenActuatorId<ProcessValueInterface,driven>": null,
+        "period[second]": 4
+      }
+    },
+    {
+      "id": "offset-1",
+      "nid": 211,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorOffset",
+      "data": {
+        "referenceSettingOrValue": 0,
+        "setting": 0,
+        "value": 0,
+        "enabled": false,
+        "desiredSetting": 0,
+        "drivenTargetId<ProcessValueInterface,driven>": null,
+        "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1",
+        "referenceId<ProcessValueInterface>": "setpoint-sensor-pair-1"
+      }
+    },
+    {
+      "id": "pid-1",
+      "nid": 212,
+      "groups": [
+        0
+      ],
+      "type": "Pid",
+      "data": {
+        "enabled": true,
+        "outputValue": 0,
+        "outputSetting": 0,
+        "active": false,
+        "p": 0,
+        "i": 0,
+        "d": 0,
+        "integralReset": 0,
+        "boilMinOutput": 0,
+        "boilModeActive": false,
+        "inputValue[degC]": 0,
+        "inputSetting[degC]": 0,
+        "error[delta_degC]": 0,
+        "kp[1 / degC]": 20,
+        "inputId<SetpointSensorPairInterface>": "setpoint-sensor-pair-1",
+        "drivenOutputId<ActuatorAnalogInterface,driven>": null,
+        "derivative[delta_degC / hour]": 0,
+        "boilPointAdjust[delta_degC]": 0,
+        "integral[delta_degC * hour]": 0,
+        "td[second]": 60,
+        "outputId<ActuatorAnalogInterface>": "actuator-pwm-1",
+        "ti[second]": 3600
+      }
+    },
+    {
+      "id": "ds2413-hw-1",
+      "nid": 213,
+      "groups": [
+        0
+      ],
+      "type": "DS2413",
+      "data": {
+        "address": "4444444444444444",
+        "connected": false,
+        "pins": []
+      }
+    },
+    {
+      "id": "pin-actuator-1",
+      "nid": 215,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 1,
+        "constrainedBy": {
+          "constraints": [
+            {
+              "mutexed": {
+                "hasCustomHoldTime": false,
+                "hasLock": false,
+                "extraHoldTime[second]": 0,
+                "mutexId<MutexInterface>": "mutex-1"
+              },
+              "remaining[second]": 0
+            }
+          ]
+        },
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "SparkPins"
+      }
+    },
+    {
+      "id": "pin-actuator-2",
+      "nid": 216,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 2,
+        "constrainedBy": {
+          "constraints": [
+            {
+              "mutexed": {
+                "hasCustomHoldTime": false,
+                "hasLock": false,
+                "extraHoldTime[second]": 0,
+                "mutexId<MutexInterface>": "mutex-1"
+              },
+              "remaining[second]": 0
+            }
+          ]
+        },
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "SparkPins"
+      }
+    },
+    {
+      "id": "HERMS HLT Sensor",
+      "nid": 218,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
+      }
+    },
+    {
+      "id": "HERMS BK Sensor",
+      "nid": 219,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
+      }
+    },
+    {
+      "id": "HERMS MT Sensor",
+      "nid": 220,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
+      }
+    },
+    {
+      "id": "Temp Sensor (Mock)",
+      "nid": 221,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
+      }
+    },
+    {
+      "id": "Temp Sensor (Mock)-2",
+      "nid": 222,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "fluctuations": [],
+        "value[degC]": 0,
+        "setting[degC]": 0
+      }
+    },
+    {
+      "id": "New|TempSensorOneWire-1",
+      "nid": 223,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2811111111111111",
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
+      }
+    },
+    {
+      "id": "New|TempSensorOneWire-2",
+      "nid": 224,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2822222222222222",
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
+      }
+    },
+    {
+      "id": "New|TempSensorOneWire-3",
+      "nid": 225,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2833333333333333",
+        "value[degC]": 0,
+        "offset[delta_degC]": 0
+      }
+    },
+    {
+      "id": "New|DS2413-1",
+      "nid": 226,
+      "groups": [
+        0
+      ],
+      "type": "DS2413",
+      "data": {
+        "address": "3a44444444444444",
+        "connected": false,
+        "pins": []
+      }
+    },
+    {
+      "id": "New|DS2408-1",
+      "nid": 227,
+      "groups": [
+        0
+      ],
+      "type": "DS2408",
+      "data": {
+        "address": "2955555555555555",
+        "connected": false,
+        "pins": []
+      }
+    },
+    {
+      "id": "HERMS Balancer",
+      "nid": 228,
+      "groups": [
+        0
+      ],
+      "type": "Balancer",
+      "data": {
+        "clients": []
+      }
+    },
+    {
+      "id": "HERMS Mutex",
+      "nid": 229,
+      "groups": [
+        0
+      ],
+      "type": "Mutex",
+      "data": {
+        "differentActuatorWait[second]": 0,
+        "waitRemaining[second]": 0
+      }
+    },
+    {
+      "id": "HERMS HLT Setpoint",
+      "nid": 230,
+      "groups": [
+        0
+      ],
+      "type": "SetpointSensorPair",
+      "data": {
+        "filter": 1,
+        "settingEnabled": false,
+        "resetFilter": false,
+        "filterThreshold[delta_degC]": 5,
+        "value[degC]": 0,
+        "valueUnfiltered[degC]": 0,
+        "storedSetting[degC]": 70,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": "HERMS HLT Sensor"
+      }
+    },
+    {
+      "id": "HERMS MT Setpoint",
+      "nid": 231,
+      "groups": [
+        0
+      ],
+      "type": "SetpointSensorPair",
+      "data": {
+        "settingEnabled": true,
+        "filter": 1,
+        "resetFilter": false,
+        "filterThreshold[delta_degC]": 5,
+        "value[degC]": 0,
+        "valueUnfiltered[degC]": 0,
+        "storedSetting[degC]": 66.699951171875,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": "HERMS MT Sensor"
+      }
+    },
+    {
+      "id": "HERMS BK Setpoint",
+      "nid": 232,
+      "groups": [
+        0
+      ],
+      "type": "SetpointSensorPair",
+      "data": {
+        "filter": 1,
+        "settingEnabled": false,
+        "resetFilter": false,
+        "filterThreshold[delta_degC]": 5,
+        "value[degC]": 0,
+        "valueUnfiltered[degC]": 0,
+        "storedSetting[degC]": 70,
+        "setting[degC]": 0,
+        "sensorId<TempSensorInterface>": "HERMS BK Sensor"
+      }
+    },
+    {
+      "id": "HERMS HLT Setpoint Driver",
+      "nid": 233,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorOffset",
+      "data": {
+        "constrainedBy": {
+          "constraints": [
+            {
+              "max": 10,
+              "limiting": false
+            }
+          ]
+        },
+        "enabled": true,
+        "referenceSettingOrValue": 0,
+        "setting": 0,
+        "value": 0,
+        "desiredSetting": 0,
+        "drivenTargetId<ProcessValueInterface,driven>": null,
+        "targetId<ProcessValueInterface>": "HERMS HLT Setpoint",
+        "referenceId<ProcessValueInterface>": "HERMS MT Setpoint"
+      }
+    },
+    {
+      "id": "HERMS HLT Actuator",
+      "nid": 234,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 4,
+        "constrainedBy": {
+          "constraints": [
+            {
+              "mutexed": {
+                "hasCustomHoldTime": true,
+                "hasLock": false,
+                "extraHoldTime[second]": 0,
+                "mutexId<MutexInterface>": "HERMS Mutex"
+              },
+              "remaining[second]": 0
+            }
+          ]
+        },
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "SparkPins"
+      }
+    },
+    {
+      "id": "HERMS BK Actuator",
+      "nid": 235,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 5,
+        "constrainedBy": {
+          "constraints": [
+            {
+              "mutexed": {
+                "hasCustomHoldTime": true,
+                "hasLock": false,
+                "extraHoldTime[second]": 0,
+                "mutexId<MutexInterface>": "HERMS Mutex"
+              },
+              "remaining[second]": 0
+            }
+          ]
+        },
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "SparkPins"
+      }
+    },
+    {
+      "id": "HERMS HLT PWM",
+      "nid": 236,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorPwm",
+      "data": {
+        "constrainedBy": {
+          "constraints": [
+            {
+              "balanced": {
+                "id": 1,
+                "granted": 0,
+                "balancerId<BalancerInterface>": "HERMS Balancer"
+              },
+              "limiting": false
+            }
+          ]
+        },
+        "enabled": true,
+        "setting": 0,
+        "value": 0,
+        "desiredSetting": 0,
+        "actuatorId<ActuatorDigitalInterface>": "HERMS HLT Actuator",
+        "drivenActuatorId<ProcessValueInterface,driven>": null,
+        "period[second]": 2
+      }
+    },
+    {
+      "id": "HERMS BK PWM",
+      "nid": 237,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorPwm",
+      "data": {
+        "constrainedBy": {
+          "constraints": [
+            {
+              "balanced": {
+                "id": 2,
+                "granted": 0,
+                "balancerId<BalancerInterface>": "HERMS Balancer"
+              },
+              "limiting": false
+            }
+          ]
+        },
+        "enabled": true,
+        "setting": 0,
+        "value": 0,
+        "desiredSetting": 0,
+        "actuatorId<ActuatorDigitalInterface>": "HERMS BK Actuator",
+        "drivenActuatorId<ProcessValueInterface,driven>": null,
+        "period[second]": 2
+      }
+    },
+    {
+      "id": "HERMS HLT PID",
+      "nid": 238,
+      "groups": [
+        0
+      ],
+      "type": "Pid",
+      "data": {
+        "enabled": true,
+        "boilMinOutput": 25,
+        "outputValue": 0,
+        "outputSetting": 0,
+        "active": false,
+        "p": 0,
+        "i": 0,
+        "d": 0,
+        "integralReset": 0,
+        "boilModeActive": false,
+        "inputValue[degC]": 0,
+        "inputSetting[degC]": 0,
+        "error[delta_degC]": 0,
+        "kp[1 / degC]": 50,
+        "inputId<SetpointSensorPairInterface>": "HERMS HLT Setpoint",
+        "drivenOutputId<ActuatorAnalogInterface,driven>": null,
+        "derivative[delta_degC / hour]": 0,
+        "boilPointAdjust[delta_degC]": 0,
+        "integral[delta_degC * hour]": 0,
+        "td[second]": 30,
+        "outputId<ActuatorAnalogInterface>": "HERMS HLT PWM",
+        "ti[second]": 600
+      }
+    },
+    {
+      "id": "HERMS MT PID",
+      "nid": 239,
+      "groups": [
+        0
+      ],
+      "type": "Pid",
+      "data": {
+        "enabled": true,
+        "outputValue": 0,
+        "outputSetting": 0,
+        "active": false,
+        "p": 0,
+        "i": 0,
+        "d": 0,
+        "integralReset": 0,
+        "boilMinOutput": 0,
+        "boilModeActive": false,
+        "inputValue[degC]": 0,
+        "inputSetting[degC]": 0,
+        "error[delta_degC]": 0,
+        "kp[1 / degC]": 1,
+        "inputId<SetpointSensorPairInterface>": "HERMS MT Setpoint",
+        "drivenOutputId<ActuatorAnalogInterface,driven>": null,
+        "derivative[delta_degC / hour]": 0,
+        "boilPointAdjust[delta_degC]": 0,
+        "integral[delta_degC * hour]": 0,
+        "td[second]": 600,
+        "outputId<ActuatorAnalogInterface>": "HERMS HLT Setpoint Driver",
+        "ti[second]": 300
+      }
+    },
+    {
+      "id": "HERMS BK PID",
+      "nid": 240,
+      "groups": [
+        0
+      ],
+      "type": "Pid",
+      "data": {
+        "enabled": true,
+        "boilMinOutput": 25,
+        "outputValue": 0,
+        "outputSetting": 0,
+        "active": false,
+        "p": 0,
+        "i": 0,
+        "d": 0,
+        "integralReset": 0,
+        "boilModeActive": false,
+        "inputValue[degC]": 0,
+        "inputSetting[degC]": 0,
+        "error[delta_degC]": 0,
+        "kp[1 / degC]": 50,
+        "inputId<SetpointSensorPairInterface>": "HERMS BK Setpoint",
+        "drivenOutputId<ActuatorAnalogInterface,driven>": null,
+        "derivative[delta_degC / hour]": 0,
+        "boilPointAdjust[delta_degC]": 0,
+        "integral[delta_degC * hour]": 0,
+        "td[second]": 600,
+        "outputId<ActuatorAnalogInterface>": "HERMS BK PWM",
+        "ti[second]": 300
+      }
+    },
+    {
+      "id": "DisplaySettings",
+      "nid": 7,
+      "groups": [
+        7
+      ],
+      "type": "DisplaySettings",
+      "data": {
+        "widgets": [
+          {
+            "pos": 6,
+            "color": "9c4b00",
+            "name": "MT PID",
+            "pid<Pid>": "HERMS MT PID"
+          },
+          {
+            "pos": 5,
+            "color": "b50000",
+            "name": "HLT PID",
+            "pid<Pid>": "HERMS HLT PID"
+          },
+          {
+            "pos": 1,
+            "color": "0088aa",
+            "name": "pwm1",
+            "actuatorAnalog<ActuatorAnalogInterface>": "actuator-pwm-1"
+          },
+          {
+            "pos": 2,
+            "color": "00aa88",
+            "name": "pair1",
+            "setpointSensorPair<SetpointSensorPair>": "setpoint-sensor-pair-1"
+          },
+          {
+            "pos": 3,
+            "color": "aa0088",
+            "name": "sensor1",
+            "tempSensor<TempSensorInterface>": "sensor-1"
+          },
+          {
+            "pos": 4,
+            "color": "aa8800",
+            "name": "pid",
+            "pid<Pid>": "pid-1"
+          }
+        ],
+        "name": "test",
+        "tempUnit": 0,
+        "brightness": 0
+      }
+    },
+    {
+      "id": "Logic Input 2",
+      "nid": 243,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 2,
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "Mock Pins"
+      }
+    },
+    {
+      "id": "Logic Output",
+      "nid": 244,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 3,
+        "state": 0,
+        "invert": false,
+        "desiredState": 0,
+        "hwDevice<IoArrayInterface,driven>": "Mock Pins"
+      }
+    },
+    {
+      "id": "Logic Input 1",
+      "nid": 242,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "channel": 1,
+        "desiredState": 1,
+        "state": 0,
+        "invert": false,
+        "hwDevice<IoArrayInterface,driven>": "Mock Pins"
+      }
+    },
+    {
+      "id": "Logic Actuator",
+      "nid": 245,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorLogic",
+      "data": {
+        "enabled": true,
+        "expression": "(a|b)&A",
+        "digital": [
+          {
+            "rhs": 1,
+            "op": 0,
+            "result": 0,
+            "id<ActuatorDigitalInterface>": "Logic Input 1"
+          },
+          {
+            "rhs": 1,
+            "op": 0,
+            "result": 0,
+            "id<ActuatorDigitalInterface>": "Logic Input 2"
+          }
+        ],
+        "analog": [
+          {
+            "op": 1,
+            "rhs": 25,
+            "result": 0,
+            "id<ProcessValueInterface>": "actuator-pwm-1"
+          }
+        ],
+        "result": 0,
+        "errorPos": 0,
+        "drivenTargetId<ActuatorDigitalInterface,driven>": null,
+        "targetId<ActuatorDigitalInterface>": "Logic Output"
+      }
+    }
+  ],
+  "store": [
+    {
+      "keys": [
+        "ActiveGroups",
+        1
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "SystemInfo",
+        2
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "SystemTime",
+        3
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "OneWireBus",
+        4
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "WiFiSettings",
+        5
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "TouchSettings",
+        6
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "DisplaySettings",
+        7
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "SparkPins",
+        19
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "balancer-1",
+        200
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "mutex-1",
+        201
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "profile-1",
+        202
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "sensor-inactive",
+        203
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "sensor-1",
+        204
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "sensor-onewire-1",
+        205
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "setpoint-sensor-pair-1",
+        206
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "setpoint-sensor-pair-2",
+        207
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "actuator-1",
+        208
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "actuator-pwm-1",
+        209
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "offset-1",
+        211
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "pid-1",
+        212
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "ds2413-hw-1",
+        213
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "pin-actuator-1",
+        215
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "pin-actuator-2",
+        216
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "pin-actuator-3",
+        217
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Temp Sensor (Mock)",
+        221
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Temp Sensor (Mock)-2",
+        222
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-1",
+        223
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-2",
+        224
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-3",
+        225
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|DS2413-1",
+        226
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|DS2408-1",
+        227
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS HLT Sensor",
+        218
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS BK Sensor",
+        219
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS MT Sensor",
+        220
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS Balancer",
+        228
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS Mutex",
+        229
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS HLT Setpoint",
+        230
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS MT Setpoint",
+        231
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS BK Setpoint",
+        232
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS HLT Setpoint Driver",
+        233
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS HLT Actuator",
+        234
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS BK Actuator",
+        235
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS HLT PWM",
+        236
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS BK PWM",
+        237
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS HLT PID",
+        238
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS MT PID",
+        239
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "HERMS BK PID",
+        240
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Mock Pins",
+        241
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Logic Input 1",
+        242
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Logic Input 2",
+        243
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Logic Output",
+        244
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "Logic Actuator",
+        245
+      ],
+      "data": {}
+    }
+  ]
+}

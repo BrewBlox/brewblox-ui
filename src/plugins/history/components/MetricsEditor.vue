@@ -1,11 +1,9 @@
 <script lang="ts">
-import get from 'lodash/get';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { durationString } from '@/helpers/functional';
-import { QuasarNode } from '@/plugins/history/nodes';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/getters';
 import { MetricsConfig } from '../Metrics/types';
@@ -37,11 +35,11 @@ export default class MetricsEditor extends Vue {
   }
 
   freshDuration(node: QuasarNode): string {
-    return durationString(this.config.freshDuration[node.value] || DEFAULT_FRESH_DURATION);
+    return durationString(this.config.freshDuration[node.value] ?? DEFAULT_FRESH_DURATION);
   }
 
   decimals(node: QuasarNode): number {
-    return get(this.config.decimals, node.value, DEFAULT_DECIMALS);
+    return this.config.decimals[node.value] ?? DEFAULT_DECIMALS;
   }
 }
 </script>

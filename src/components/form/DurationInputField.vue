@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 
 @Component
@@ -42,7 +42,7 @@ export default class DurationInputField extends FieldBase {
       component: 'TimeUnitDialog',
       title: this.title,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       parent: this,
       value: new Unit(durationMs(this.value), 'ms'),
       label: this.label,
@@ -54,18 +54,9 @@ export default class DurationInputField extends FieldBase {
 </script>
 
 <template>
-  <q-field
-    :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    stack-label
-    @click.native="openDialog"
-  >
-    <template #control>
-      <component :is="tag" class="q-mt-sm">
-        <slot name="value">
-          {{ displayValue }}
-        </slot>
-      </component>
-    </template>
-  </q-field>
+  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
+  </LabeledField>
 </template>

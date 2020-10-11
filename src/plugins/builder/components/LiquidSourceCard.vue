@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
@@ -16,7 +15,7 @@ export default class LiquidSourceCard extends PartCard {
   ];
 
   get pressured(): boolean {
-    return get(this.part.settings, 'enabled', !!this.part.settings.pressure);
+    return this.part.settings.enabled ?? !!this.part.settings.pressure;
   }
 
   set pressured(enabled: boolean) {
@@ -24,7 +23,7 @@ export default class LiquidSourceCard extends PartCard {
   }
 
   get color(): string | null {
-    return get(this.part.settings, ['liquids', 0], null);
+    return this.part.settings.liquids?.[0] ?? null;
   }
 
   set color(val: string | null) {
@@ -39,33 +38,32 @@ export default class LiquidSourceCard extends PartCard {
 </script>
 
 <template>
-  <q-list>
-    <q-separator />
-    <q-item>
-      <q-item-section>
-        <LabeledField label="Enabled">
-          <q-toggle v-model="pressured" dense />
-        </LabeledField>
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <ColorField
-          v-model="color"
-          clearable
-          title="Liquid color"
-          label="Color"
-          message="Choose a fill color for this source."
-        />
-      </q-item-section>
-      <q-item-section v-for="colorOpt in presetColors" :key="colorOpt">
-        <q-btn
-          :style="`background-color: ${colorOpt}`"
-          :size="color == colorOpt ? 'lg' : 'md'"
-          round
-          icon="format_color_fill"
-          class="q-mx-auto"
-          @click="toggle(colorOpt)"
-        />
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <div class="row">
+    <LabeledField
+      label="Enabled"
+      class="col-auto min-width-sm"
+    >
+      <q-toggle v-model="pressured" dense />
+    </LabeledField>
+    <ColorField
+      v-model="color"
+      clearable
+      title="Liquid color"
+      label="Color"
+      message="Choose a fill color for this source."
+      class="col-auto"
+    />
+    <div class="col-grow row justify-around">
+      <q-btn
+        v-for="colorOpt in presetColors"
+        :key="colorOpt"
+        :style="`background-color: ${colorOpt}`"
+        :size="color == colorOpt ? 'lg' : 'md'"
+        round
+        icon="format_color_fill"
+        class="self-center"
+        @click="toggle(colorOpt)"
+      />
+    </div>
+  </div>
 </template>

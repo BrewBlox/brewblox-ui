@@ -1,36 +1,33 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { BlockSpec, DS2413Block } from '@/plugins/spark/types';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './DS2413Widget.vue';
-import { typeName } from './getters';
-import { DS2413Data } from './types';
 
-const block: BlockSpec = {
+const typeName = 'DS2413';
+
+const block: BlockSpec<DS2413Block> = {
   id: typeName,
-  generate: (): DS2413Data => ({
+  generate: () => ({
     address: '',
     connected: false,
     pins: [],
   }),
-  presets: [],
-  changes: [],
+  fields: [],
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'DS2413 Chip',
+  title: 'DS2413 Chip',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 3,
   },
-  // Discovered objects can't be created or deleted
-  wizardComponent: null,
-  deleters: undefined,
+  wizard: 'BlockDiscoveryWizard',
 };
 
 export default { feature, block };

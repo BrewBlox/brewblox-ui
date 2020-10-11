@@ -1,3 +1,5 @@
+import { Notify } from 'quasar';
+
 import { DEFAULT_FRICTION } from './getters';
 import { FlowPart, FlowRoute, PathFriction } from './types';
 
@@ -18,6 +20,10 @@ export class FlowSegment {
   public friction(input: PathFriction): PathFriction {
     const equivalentFriction =
       (toTransform: PathFriction[], splitInput: PathFriction): { total: PathFriction; split: number[] } => {
+
+        const basePressure = splitInput.pressureDiff ? 0 : 0.01;
+        splitInput.pressureDiff += basePressure; // zero input pressure throws off calculation.
+
         // Apply Millman’s Theorem Equation to calculate node pressure on the split
         const allPaths = [splitInput, ...toTransform.map(entry => ({
           pressureDiff: -entry.pressureDiff,
@@ -30,7 +36,7 @@ export class FlowSegment {
         let equivalentSplitFrictions = toTransform.map(v => v.friction);
         let totalPressureDiff = input.pressureDiff;
 
-        if (input.pressureDiff !== 0) {
+        if (input.pressureDiff !== 0 || allPaths.some(v => v.pressureDiff !== 0)) {
           // convert pressure difference + friction on each split to only an equivalent (possibly negative) friction
           equivalentSplitFrictions = toTransform.map((entry): number =>
             nodePressure * entry.friction / (nodePressure + entry.pressureDiff));
@@ -38,7 +44,6 @@ export class FlowSegment {
         else {
           totalPressureDiff = nodePressure;
         }
-
         const eqInv = equivalentSplitFrictions.map(v => 1 / v);
         const eqFriction = 1 / eqInv.reduce((acc, entry) => acc + entry, 0);
         return {
@@ -51,17 +56,19 @@ export class FlowSegment {
 
     if (this.next) {
       // add next before processing split (can be moved to front because all parts are in series)
-      series.friction += this.next.inRoute.friction !== undefined ? this.next.inRoute.friction : DEFAULT_FRICTION;
-      series.pressureDiff += this.next.inRoute.pressure || 0;
+      series.friction += this.next.inRoute.friction ?? DEFAULT_FRICTION;
+      series.pressureDiff += this.next.inRoute.pressure ?? 0;
       series = this.next.friction(series);
     }
+
 
     if (this.splits.length > 1) {
       // splitting. Convert the combined paths into an equivalent series friction
       const splitPF = this.splits.map(split => split.friction({
-        pressureDiff: split.inRoute.pressure || 0,
-        friction: split.inRoute.friction !== undefined ? split.inRoute.friction : DEFAULT_FRICTION,
+        pressureDiff: split.inRoute.pressure ?? 0,
+        friction: split.inRoute.friction ?? DEFAULT_FRICTION,
       }));
+
       const splitFriction = equivalentFriction(splitPF, series);
       series = splitFriction.total;
       this.splitDivide = splitFriction.split;
@@ -156,12 +163,13 @@ const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSeg
         }
       }
       if (unTouchedSplits.length !== 0) {
-        throw (`Calculating current flow path is not supported.
-        Cannot merge friction and pressures of a multi-sink split.`);
+        Notify.create({
+          icon: 'warning',
+          color: 'warning',
+          message: 'The flows split and rejoin in too many places. Some flows might be incorrect.',
+        });
       }
-      else {
-        return { splits: combinedSplits, end: end };
-      }
+      return { splits: combinedSplits, end: end };
     }
     if (walker.next) {
       walker = walker.next;

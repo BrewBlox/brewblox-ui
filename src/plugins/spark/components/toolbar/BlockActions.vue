@@ -8,22 +8,18 @@ export default class BlockActions extends BlockCrudComponent { }
 </script>
 
 <template>
-  <q-expansion-item label="Block Actions">
-    <q-list>
-      <slot name="block-actions" />
-      <ActionItem icon="mdi-widgets" label="Make widget" @click="startMakeWidget" />
-      <ActionItem icon="edit" label="Rename Block" @click="startChangeBlockId" />
-      <ActionItem
-        v-if="isStoreWidget"
-        icon="mdi-cube"
-        label="Choose Block"
-        @click="startSwitchBlock"
-      />
-      <ActionItem icon="mdi-information" label="Block Info" @click="startBlockInfo" />
-      <CloneBlockAction :crud="crud" />
-      <BlockGroupsAction :crud="crud" />
-      <BlockPresetsAction :crud="crud" />
-      <RemoveBlockAction :crud="crud" />
-    </q-list>
-  </q-expansion-item>
+  <ActionSubmenu label="Block">
+    <slot name="block-actions" />
+    <ActionItem
+      v-if="!crud.isStoreWidget"
+      icon="mdi-widgets"
+      label="Make widget"
+      @click="startMakeWidget"
+    />
+    <ActionItem icon="edit" label="Rename" @click="startChangeBlockId" />
+    <ActionItem v-if="canDisplay" icon="mdi-monitor" label="Add to Spark display" @click="displayBlock" />
+    <BlockGroupsAction v-if="crud.isStoreBlock" :crud="crud" />
+    <ActionItem icon="mdi-file-export" label="Export" @click="exportBlock" />
+    <RemoveBlockAction v-if="!crud.isStoreWidget" :crud="crud" />
+  </ActionSubmenu>
 </template>

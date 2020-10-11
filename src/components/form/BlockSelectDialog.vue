@@ -3,9 +3,9 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { objectStringSorter } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import type { Block } from '@/plugins/spark/types';
 
 @Component
 export default class BlockSelectDialog extends DialogBase {
@@ -27,13 +27,19 @@ export default class BlockSelectDialog extends DialogBase {
   public readonly clearable!: boolean;
 
   get blockOpts(): Block[] {
-    return sparkStore.blockValues(this.serviceId)
+    return sparkStore.serviceBlocks(this.serviceId)
       .filter(this.filter)
       .sort(objectStringSorter('id'));
   }
 
   created(): void {
     this.block = deepCopy(this.value);
+  }
+
+  save(): void {
+    if (this.block || this.clearable) {
+      this.onDialogOk(this.block);
+    }
   }
 }
 </script>
@@ -43,45 +49,38 @@ export default class BlockSelectDialog extends DialogBase {
     ref="dialog"
     no-backdrop-dismiss
     @hide="onDialogHide"
-    @keyup.enter="block && onDialogOk(block)"
+    @keyup.enter="save"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-select
-          v-model="block"
-          :options="blockOpts"
-          :clearable="clearable"
-          :label="label"
-          autofocus
-          option-label="id"
-          option-value="id"
-        >
-          <template #no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-      </q-card-section>
-      <q-card-actions align="right">
+    <DialogCard v-bind="{title, message, html}">
+      <q-select
+        v-model="block"
+        :options="blockOpts"
+        :clearable="clearable"
+        :label="label"
+        autofocus
+        item-aligned
+        option-label="id"
+        option-value="id"
+        @keyup.enter.exact.stop
+      >
+        <template #no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+      <template #actions>
         <q-btn color="primary" flat label="Cancel" @click="onDialogCancel" />
         <q-btn
           :disable="!clearable && !block"
           color="primary"
           flat
           label="OK"
-          @click="onDialogOk(block)"
+          @click="save"
         />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

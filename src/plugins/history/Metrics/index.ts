@@ -1,14 +1,15 @@
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './MetricsWidget.vue';
 import { MetricsConfig } from './types';
 
-const feature: Feature = {
+const feature: WidgetFeature<MetricsConfig> = {
   id: 'Metrics',
-  displayName: 'Metrics',
-  widgetComponent: ref(widget),
-  generateConfig: (): MetricsConfig => ({
+  title: 'Metrics',
+  component: ref(widget),
+  wizard: true,
+  generateConfig: () => ({
     targets: [],
     renames: {},
     params: {},

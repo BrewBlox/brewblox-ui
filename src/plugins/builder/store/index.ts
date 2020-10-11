@@ -1,127 +1,84 @@
-import Vue from 'vue';
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { objReducer } from '@/helpers/functional';
+import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
 import { BuilderLayout, PartSpec } from '../types';
 import api from './api';
 
-const fallbackSpec: PartSpec = {
+const fallbackSpec = (): PartSpec => ({
   id: '',
   title: 'Unknown Part',
   component: 'UnknownPart',
   cards: [],
   size: () => [1, 1],
   transitions: () => ({}),
-};
+});
 
-const rawError = true;
-
-@Module({ store, namespaced: true, dynamic: true, name: 'builder' })
+@Module({ generateMutationSetters: true })
 export class BuilderModule extends VuexModule {
-  private specs: Mapped<PartSpec> = {};
+  public specs: PartSpec[] = [];
 
-  public editorActive = false;
   public editorMode = '';
-  public layouts: Mapped<BuilderLayout> = {};
+  public lastLayoutId: string | null = null;
+  public layouts: BuilderLayout[] = [];
 
   public get layoutIds(): string[] {
-    return Object.keys(this.layouts);
+    return this.layouts.map(v => v.id);
   }
 
-  public get layoutValues(): BuilderLayout[] {
-    return Object.values(this.layouts);
-  }
-
-  public get layoutById(): (id: string) => BuilderLayout {
-    return id => this.layouts[id] || null;
+  public layoutById(id: string | null): BuilderLayout | null {
+    return findById(this.layouts, id);
   }
 
   public get specIds(): string[] {
-    return Object.keys(this.specs);
+    return this.specs.map(v => v.id);
   }
 
-  public get specValues(): PartSpec[] {
-    return Object.values(this.specs);
+  public spec({ type }: { type: string }): PartSpec {
+    return this.specs.find(v => v.id === type) ?? fallbackSpec();
   }
 
-  public get spec(): ({ type }: { type: string }) => PartSpec {
-    return ({ type }) => this.specs[type] || fallbackSpec;
-  }
-
-  public get component(): ({ type }: { type: string }) => string {
-    return ({ type }) => {
-      const spec = this.spec({ type });
-      return spec.component || spec.id;
-    };
+  public component({ type }: { type: string }): string {
+    const spec = this.spec({ type });
+    return spec.component || spec.id;
   }
 
   @Mutation
-  public registerPart(spec: PartSpec): void {
-    Vue.set(this.specs, spec.id, { ...spec });
+  public registerParts(specs: PartSpec[]): void {
+    this.specs = specs;
   }
 
-  @Mutation
-  public commitEditorActive(active: boolean): void {
-    this.editorActive = active;
-  }
-
-  @Mutation
-  public commitEditorMode(tool: string): void {
-    this.editorMode = tool;
-  }
-
-  @Mutation
-  public commitLayout(layout: BuilderLayout): void {
-    Vue.set(this.layouts, layout.id, { ...layout });
-  }
-
-  @Mutation
-  public commitAllLayouts(layouts: BuilderLayout[]): void {
-    this.layouts = layouts.reduce(objReducer('id'), {});
-  }
-
-  @Mutation
-  public commitRemoveLayout(layout: BuilderLayout): void {
-    Vue.delete(this.layouts, layout.id);
-  }
-
-  @Action({ rawError })
+  @Action
   public async createLayout(layout: BuilderLayout): Promise<void> {
-    this.commitLayout(await api.create(layout));
+    await api.create(layout); // triggers callback
   }
 
-  @Action({ rawError })
+  @Action
   public async saveLayout(layout: BuilderLayout): Promise<void> {
-    this.commitLayout(await api.persist(layout));
+    await api.persist(layout); // triggers callback
   }
 
-  @Action({ rawError })
+  @Action
   public async removeLayout(layout: BuilderLayout): Promise<void> {
-    await api.remove(layout)
-      .catch(() => { });
-    this.commitRemoveLayout(layout);
+    await api.remove(layout); // triggers callback
   }
 
-  @Action({ rawError })
+  @Action
   public async setup(): Promise<void> {
     const onChange = async (layout: BuilderLayout): Promise<void> => {
       const existing = this.layoutById(layout.id);
       if (!existing || existing._rev !== layout._rev) {
-        this.commitLayout(layout);
+        this.layouts = extendById(this.layouts, layout);
       }
     };
     const onDelete = (id: string): void => {
-      const existing = this.layoutById(id);
-      if (existing) {
-        this.removeLayout(existing);
-      }
+      this.layouts = filterById(this.layouts, { id });
     };
 
-    this.commitAllLayouts(await api.fetch());
-    api.setup(onChange, onDelete);
+    this.layouts = await api.fetch();
+    api.subscribe(onChange, onDelete);
   }
 }
 
-export const builderStore = getModule(BuilderModule);
+export const builderStore = new BuilderModule({ store, name: 'builder' });

@@ -42,7 +42,6 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
     return this.glycolControl !== 'No' && hasShared([this.beerSensor, this.glycolSensor]);
   }
 
-
   created(): void {
     this.discover();
 
@@ -56,7 +55,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
   }
 
   discover(): void {
-    sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
+    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
   }
 
   startBlockWizard(): void {
@@ -92,17 +91,17 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
           <q-item-label class="text-subtitle1">
-            Assign Hardware Blocks
+            Assign Hardware blocks
           </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="refresh" @click="discover">
-            <q-tooltip>Discover OneWire Blocks</q-tooltip>
+            <q-tooltip>Discover OneWire blocks</q-tooltip>
           </q-btn>
         </q-item-section>
         <q-item-section class="col-auto">
@@ -114,7 +113,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
-            Select which hardware should be used for each function.<br />
+            Select which hardware should be used for each function.<br>
             You can unplug or heat sensors to identify them.
             The current value will be shown under each dropdown menu.
           </p>
@@ -123,6 +122,13 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
           </p>
         </q-item-section>
       </q-item>
+      <QuickStartMockCreateField
+        :service-id="config.serviceId"
+        :names="[
+          config.names.beerSensor,
+          config.names.glycolSensor,
+        ]"
+      />
       <LabeledField label="Does your fermenter have a heater?" item-aligned>
         <div class="q-gutter-lg">
           <q-radio
@@ -137,7 +143,7 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
           />
         </div>
       </LabeledField>
-      <LabeledField label="Should BrewBlox manage glycol temperature?" item-aligned>
+      <LabeledField label="Should Brewblox manage glycol temperature?" item-aligned>
         <div class="q-gutter-lg">
           <q-radio
             v-model="glycolControl"
@@ -217,12 +223,10 @@ export default class GlycolHardwareTask extends WizardTaskBase<GlycolConfig> {
       </CardWarning>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

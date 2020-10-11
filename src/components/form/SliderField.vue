@@ -55,7 +55,7 @@ export default class SliderField extends FieldBase {
       title: this.title,
       label: this.label,
       message: this.message,
-      messageHtml: this.messageHtml,
+      html: this.html,
       parent: this,
       value: this.value,
       decimals: this.decimals,
@@ -70,21 +70,9 @@ export default class SliderField extends FieldBase {
 </script>
 
 <template>
-  <q-field
-    :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    :borderless="readonly"
-    stack-label
-    v-bind="$attrs"
-    @click.native="openDialog"
-  >
-    <template #control>
-      <component :is="tag" :class="['q-mt-sm', tagClass]">
-        <slot name="value">
-          {{ displayValue }}
-          <small v-if="!!suffix" class="q-ml-xs darkish">{{ suffix }}</small>
-        </slot>
-      </component>
-    </template>
-  </q-field>
+  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+    <slot name="value">
+      {{ displayValue }}
+    </slot>
+  </LabeledField>
 </template>

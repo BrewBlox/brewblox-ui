@@ -242,7 +242,7 @@ export const addFlowForPath = (
   inFlow[path.inRoute.outCoords] = mapValues(flows, v => -v);
 
   // add flow for outgoing flow
-  if (path.next) {
+  if (path.next && path.splits.length === 0) {
     outFlow[path.next.inRoute.outCoords] = flows;
   }
 
@@ -256,14 +256,16 @@ export const addFlowForPath = (
       });
   }
 
+  const newFlows = {
+    ...inFlow,
+    ...outFlow,
+    ...splitFlow,
+  };
+
   parts = additionalFlow(
     path.root,
     parts,
-    {
-      ...inFlow,
-      ...outFlow,
-      ...splitFlow,
-    }
+    newFlows
   );
 
   // continue path

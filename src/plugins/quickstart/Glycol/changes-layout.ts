@@ -2,7 +2,7 @@ import { uid } from 'quasar';
 
 import { BuilderLayout, PersistentPart } from '@/plugins/builder/types';
 
-import { maybeSpace } from '../helpers';
+import { withPrefix } from '../helpers';
 import { GlycolConfig } from './types';
 
 
@@ -64,9 +64,9 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
   return [
     {
       id: uid(),
-      title: maybeSpace(config.prefix, 'Layout'),
-      width: 20,
-      height: 15,
+      title: withPrefix(config.prefix, 'Layout'),
+      width: 9,
+      height: 11,
       parts: [
         ...heatingParts,
         ...glycolParts,
@@ -246,10 +246,10 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           id: uid(),
           rotate: 90,
           settings: {
-            pwm: { serviceId: config.serviceId, blockId: config.names.coolPwm },
+            actuator: { serviceId: config.serviceId, blockId: config.names.coolPwm },
           },
           flipped: false,
-          type: 'PwmPump',
+          type: 'Pump',
           x: 5,
           y: 6,
         },

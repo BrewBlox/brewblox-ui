@@ -2,16 +2,12 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { blockTypes } from '@/plugins/spark/block-types';
+import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 
 
 @Component
 export default class QuickStartSensorField extends Vue {
-  readonly validTypes = [
-    blockTypes.TempSensorOneWire,
-    blockTypes.TempSensorMock,
-  ];
 
   @Prop({ type: String, required: false })
   public readonly value!: string;
@@ -28,15 +24,13 @@ export default class QuickStartSensorField extends Vue {
   }
 
   get opts(): string[] {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => this.validTypes.includes(block.type))
+    return sparkStore.serviceBlocks(this.serviceId)
+      .filter(block => isCompatible(block.type, 'TempSensorInterface'))
       .map(block => block.id);
   }
 
   get sensorTemp(): string {
-    return !!this.local
-      ? sparkStore.blockById(this.serviceId, this.local).data.value.toString()
-      : '';
+    return sparkStore.blockById(this.serviceId, this.local)?.data.value.toString() ?? '';
   }
 }
 </script>

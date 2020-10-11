@@ -4,9 +4,7 @@ import { Component } from 'vue-property-decorator';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { sparkStore } from '@/plugins/spark/store';
 import { fetchStoredBlock } from '@/plugins/spark/store/api';
-
-import { Block } from '../../types';
-import { DeprecatedObjectBlock } from './types';
+import { Block, DeprecatedObjectBlock } from '@/plugins/spark/types';
 
 @Component
 export default class DeprecatedObjectWidget extends BlockWidgetBase {
@@ -14,39 +12,39 @@ export default class DeprecatedObjectWidget extends BlockWidgetBase {
   actual: Block | null = null;
 
   async created(): Promise<void> {
-    this.actual = await fetchStoredBlock(this.serviceId, this.block.data.actualId);
+    this.actual = await fetchStoredBlock(this.serviceId, { nid: this.block.data.actualId });
   }
 
   removeBlock(): void {
-    sparkStore.removeBlock([this.block.serviceId, this.block]);
+    sparkStore.removeBlock(this.block);
   }
 }
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <DialogToolbar v-if="inDialog">
-      <q-item-section>
-        <q-item-label>{{ widget.title }}</q-item-label>
-        <q-item-label caption>
-          {{ displayName }}
-        </q-item-label>
-      </q-item-section>
-    </DialogToolbar>
-    <WidgetToolbar v-else :crud="crud" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <DialogToolbar v-if="inDialog" :title="widget.title" :subtitle="featureTitle" />
+      <WidgetToolbar v-else :crud="crud" readonly />
+    </template>
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <LabeledField :value="actual ? actual.id : 'Unknown'" label="ID" />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="actual ? actual.type : 'Unknown'" label="Type" />
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn icon="delete" flat @click="removeBlock" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+    <div class="widget-md widget-body">
+      <LabeledField
+        :value="actual ? actual.id : 'Unknown'"
+        label="ID"
+        class="col-grow"
+      />
+      <LabeledField
+        :value="actual ? actual.type : 'Unknown'"
+        label="Type"
+        class="col-grow"
+      />
+      <q-btn
+        icon="delete"
+        flat
+        class="col-grow"
+        @click="removeBlock"
+      />
+    </div>
+  </CardWrapper>
 </template>

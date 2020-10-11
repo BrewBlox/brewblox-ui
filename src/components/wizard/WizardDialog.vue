@@ -2,48 +2,68 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { sparkStore } from '@/plugins/spark/store';
 
 @Component
 export default class WizardDialog extends DialogBase {
   dialogTitle: string | null = null;
   wizardComponent: string | null = null;
+  wizardProps: any = {};
 
   @Prop({ type: String, required: false })
   readonly dashboardId!: string;
 
   @Prop({ type: String, required: false })
-  readonly initialComponent!: string;
+  readonly initialWizard!: string;
+
+  @Prop({ type: Object, default: () => ({}) })
+  public readonly initialProps!: any;
+
+  get sparkServiceAvailable(): boolean {
+    return sparkStore.modules.length > 0;
+  }
+
+  mounted(): void {
+    this.reset();
+    this.pickWizard(this.initialWizard, this.initialProps);
+  }
 
   reset(): void {
     this.wizardComponent = null;
     this.dialogTitle = 'Wizardry';
   }
 
-  mounted(): void {
-    this.reset();
-    this.wizardComponent = this.initialComponent;
+  pickWizard(component: string, props: any = {}) {
+    this.wizardComponent = component;
+    this.wizardProps = props;
   }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-icon name="mdi-creation" class="q-mx-sm" />
-        {{ dialogTitle }}
-      </DialogToolbar>
+  <q-dialog
+    ref="dialog"
+    :maximized="$dense"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+  >
+    <CardWrapper :no-scroll="!!wizardComponent" v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar icon="mdi-creation" :title="dialogTitle" />
+      </template>
+
       <component
         :is="wizardComponent"
         v-if="wizardComponent"
+        v-bind="wizardProps"
         @title="v => dialogTitle = v"
         @back="reset"
         @close="onDialogHide"
       />
 
-      <q-scroll-area v-else style="height: 80vh;">
+      <template v-else>
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'QuickStartWizardPicker'">
+          <q-item :disable="!sparkServiceAvailable" clickable @click="pickWizard('QuickStartWizardPicker')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Quick Start
@@ -59,13 +79,16 @@ export default class WizardDialog extends DialogBase {
                 and a new dashboard for quick access to settings and graphs.
               </p>
             </q-item-section>
+            <q-tooltip v-if="!sparkServiceAvailable">
+              An active Spark service is required for Quick start wizards.
+            </q-tooltip>
           </q-item>
         </q-card-section>
 
         <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'DashboardWizard'">
+          <q-item clickable @click="pickWizard('DashboardWizard')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Dashboard
@@ -83,7 +106,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'WidgetWizardPicker'">
+          <q-item clickable @click="pickWizard('WidgetWizardPicker')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Widget
@@ -108,7 +131,7 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'ImportWizard'">
+          <q-item clickable @click="pickWizard('ImportWizard')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Import Widget
@@ -128,26 +151,22 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item link clickable @click="wizardComponent = 'ServiceWizardPicker'">
+          <q-item class="darkish text-italic" style="cursor: not-allowed">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
-                New service
+                Services
               </q-item-label>
               <q-item-label caption>
-                Add a service to the UI
+                (No longer a wizard)
               </q-item-label>
             </q-item-section>
             <q-item-section>
-              <p>
-                If you have multiple BrewBlox Sparks, you will have a separate service to connect each one.
-              </p>
-              <p>
-                You should add them to the UI here, after you have added them in your docker-compose file.
-              </p>
+              Discovered services automatically appear in the sidebar.
+              Click on them to add them as UI service.
             </q-item-section>
           </q-item>
         </q-card-section>
-      </q-scroll-area>
-    </q-card>
+      </template>
+    </CardWrapper>
   </q-dialog>
 </template>

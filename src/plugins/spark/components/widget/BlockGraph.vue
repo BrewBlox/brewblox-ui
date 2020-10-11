@@ -1,15 +1,16 @@
 <script lang="ts">
+import { Layout } from 'plotly.js';
 import Vue from 'vue';
 import { Component, Emit, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class BlockGraph extends Vue {
@@ -32,9 +33,23 @@ export default class BlockGraph extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly noDuration!: boolean;
 
+  @Watch('graphCfg')
+  onCfgChange(newVal): void {
+    // Vue considers configuration "changed" with every block data update
+    // To avoid constantly refreshing sources, we need to do a deep compare
+    if (JSON.stringify(newVal) !== this.configString) {
+      this.configString = JSON.stringify(newVal);
+      this.$nextTick(() => this.graph?.resetSources());
+    }
+  }
+
   @Emit('update:config')
-  change(cfg: GraphConfig = this.graphCfg): GraphConfig {
+  save(cfg: GraphConfig = this.graphCfg): GraphConfig {
     return cfg;
+  }
+
+  created(): void {
+    this.configString = JSON.stringify(this.graphCfg);
   }
 
   get dialogOpen(): boolean {
@@ -70,20 +85,18 @@ export default class BlockGraph extends Vue {
   }
 
   updateKeySide(key: string, isRight: boolean): void {
-    this.change({
-      ...this.graphCfg,
-      axes: {
-        ...this.graphCfg.axes,
-        [key]: isRight ? 'y2' : 'y',
-      },
-    });
+    this.$set(this.graphCfg.axes, key, isRight ? 'y2' : 'y');
+    this.save();
   }
 
-  applyPreset(preset: QueryParams): void {
-    this.change({
-      ...this.graphCfg,
-      params: { ...preset },
-    });
+  saveParams(params: QueryParams): void {
+    this.$set(this.graphCfg, 'params', params);
+    this.save();
+  }
+
+  saveLayout(layout: Partial<Layout>): void {
+    this.$set(this.graphCfg, 'layout', layout);
+    this.save();
   }
 
   updateDuration(): void {
@@ -95,7 +108,7 @@ export default class BlockGraph extends Vue {
     })
       .onOk(val => {
         this.graphCfg.params.duration = durationString(val);
-        this.change(this.graphCfg);
+        this.save(this.graphCfg);
       });
   }
 
@@ -108,49 +121,30 @@ export default class BlockGraph extends Vue {
       value: new Unit(durationMs(current), 'ms'),
       label: 'Duration',
     })
-      .onOk(unit => {
-        this.graphCfg.params = { duration: unitDurationString(unit) };
-        this.change(this.graphCfg);
-      });
-  }
-
-  @Watch('graphCfg')
-  onCfgChange(newVal): void {
-    // Vue considers configuration "changed" with every block data update
-    // To avoid constantly refreshing sources, we need to do a deep compare
-    if (JSON.stringify(newVal) !== this.configString) {
-      this.configString = JSON.stringify(newVal);
-      this.$nextTick(() => this.graph && this.graph.resetSources());
-    }
-  }
-
-  created(): void {
-    this.configString = JSON.stringify(this.graphCfg);
+      .onOk(unit => this.saveParams({ duration: unitDurationString(unit) }));
   }
 }
 </script>
 
 <template>
   <q-dialog v-model="dialogOpen" maximized>
-    <q-card v-if="dialogOpen" class="text-white bg-dark-bright">
-      <HistoryGraph ref="graph" :graph-id="id" :config="graphCfg">
+    <q-card v-if="dialogOpen" class="text-white">
+      <HistoryGraph
+        ref="graph"
+        :graph-id="id"
+        :config="graphCfg"
+        :use-presets="!noDuration"
+        use-range
+        @params="saveParams"
+        @layout="saveLayout"
+      >
         <template #controls>
-          <q-btn-dropdown v-if="!noDuration" auto-close flat label="timespan" icon="mdi-timelapse">
-            <ActionItem
-              v-for="(preset, idx) in presets"
-              :key="idx"
-              :active="preset.duration === graphCfg.params.duration"
-              :label="preset.duration"
-              @click="applyPreset(preset)"
-            />
-            <ActionItem label="Custom" @click="chooseDuration" />
-          </q-btn-dropdown>
-          <q-btn-dropdown flat label="settings" icon="settings">
+          <q-btn-dropdown flat icon="settings">
             <ExportGraphAction
               :config="graphCfg"
               :header="graphCfg.layout.title"
             />
-            <q-item link clickable @click="updateDuration">
+            <q-item clickable @click="updateDuration">
               <q-item-section>Duration</q-item-section>
               <q-item-section class="col-auto">
                 {{ durationString(graphCfg.params.duration) }}
@@ -160,7 +154,7 @@ export default class BlockGraph extends Vue {
               <q-item
                 v-for="[key, renamed] in targetKeys"
                 :key="key"
-                link
+                :inset-level="0.2"
                 clickable
                 @click="updateKeySide(key, !isRightAxis(key))"
               >
@@ -171,16 +165,15 @@ export default class BlockGraph extends Vue {
               </q-item>
             </q-expansion-item>
           </q-btn-dropdown>
-          <q-btn v-close-popup flat label="close" />
+          <q-btn v-close-popup flat icon="mdi-close-circle" />
         </template>
       </HistoryGraph>
     </q-card>
   </q-dialog>
 </template>
 
-<style scoped lang="stylus">
-.mirrored {
-  -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
-}
+<style scoped lang="sass">
+.mirrored
+  -webkit-transform: scaleX(-1)
+  transform: scaleX(-1)
 </style>

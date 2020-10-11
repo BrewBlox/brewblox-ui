@@ -1,29 +1,29 @@
-import get from 'lodash/get';
-import mapKeys from 'lodash/mapKeys';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { showBlockDialog } from '@/helpers/dialog';
-import { postfixedDisplayNames } from '@/helpers/units';
-import { deepCopy } from '@/helpers/units/parseObject';
-import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
-import { BlockConfig, BlockCrud } from '@/plugins/spark/types';
+import { createBlockDialog } from '@/helpers/dialog';
+import { saveFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
+import type { GraphConfig } from '@/plugins/history/types';
+import { deepCopy } from '@/plugins/spark/parse-object';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import type { Block, BlockCrud } from '@/plugins/spark/types';
+import type { BlockConfig, BlockSpec } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
-import { blockIdRules } from '../helpers';
-import { Block } from '../types';
+import { blockGraphCfg, blockIdRules, canDisplay, tryDisplayBlock } from '../helpers';
 
 
 @Component
-export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
+export default class BlockCrudComponent<BlockT extends Block = Block>
+  extends CrudComponent<BlockConfig> {
 
   @Prop({ type: Object, required: true })
-  public readonly crud!: BlockCrud;
+  public readonly crud!: BlockCrud<BlockT>;
 
-  public get block(): Block {
+  public get block(): BlockT {
     return this.crud.block;
   }
 
@@ -39,79 +39,74 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
     return this.block.serviceId;
   }
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   public get isDriven(): boolean {
-    return sparkStore.drivenChains(this.serviceId)
-      .some((chain: string[]) => chain[0] === this.block.id);
+    return this.sparkModule
+      .drivenBlocks
+      .includes(this.blockId);
+  }
+
+  public get canDisplay(): boolean {
+    return this.crud.isStoreBlock && canDisplay(this.block);
   }
 
   public get constrainers(): string | null {
-    const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
-    return limiting ? limiting.join(', ') : null;
+    return this.sparkModule
+      .limiters[this.blockId]
+      ?.join(', ')
+      || null;
+  }
+
+  public get spec(): BlockSpec<BlockT> {
+    return sparkStore.spec(this.block);
   }
 
   public get hasGraph(): boolean {
-    return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
-  }
-
-  public get renamedTargets(): Mapped<string> {
-    const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
-    return !!targets
-      ? postfixedDisplayNames(targets, this.block.data)
-      : {};
+    return this.crud.isStoreBlock
+      && this.spec.fields.some(f => f.graphed);
   }
 
   public get graphCfg(): GraphConfig {
-    const blockFmt = (val: string): string => [this.blockId, val].join('/');
-    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
-
-    return {
-      // persisted in config
-      params: this.widget.config.queryParams || { duration: '1h' },
-      axes: this.widget.config.graphAxes || {},
-      // constants
-      layout: {
-        title: this.widget.title,
-      },
-      targets: [
-        {
-          measurement: this.serviceId,
-          fields: Object.keys(this.renamedTargets).map(k => blockFmt(k)),
-        },
-      ],
-      renames: mapKeys(this.renamedTargets, (_, k) => serviceFmt(k)),
-      colors: {},
-    };
+    return blockGraphCfg(this.crud);
   }
 
   public set graphCfg(config: GraphConfig) {
-    this.saveConfig({
-      ...this.widget.config,
-      queryParams: { ...config.params },
-      graphAxes: { ...config.axes },
-    });
+    this.$set(this.widget.config, 'queryParams', { ...config.params });
+    this.$set(this.widget.config, 'graphAxes', { ...config.axes });
+    this.$set(this.widget.config, 'graphLayout', { ...config.layout });
+    this.saveConfig();
   }
 
-  public async saveBlock(block: Block = this.block): Promise<void> {
+  public async saveBlock(block: BlockT = this.block): Promise<void> {
     await this.crud.saveBlock(block);
+  }
+
+  public async saveStoreBlock(block: Block | null): Promise<void> {
+    if (block !== null) {
+      await sparkStore.saveBlock(block);
+    }
   }
 
   public async removeBlock(): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.removeBlock([this.serviceId, this.block]);
+      await sparkStore.removeBlock(this.block);
       this.closeDialog();
     }
   }
 
   public async refreshBlock(): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.fetchBlock([this.serviceId, this.block])
+      await this.sparkModule.fetchBlock(this.block)
         .catch(() => { });
     }
   }
 
   public async changeBlockId(newId: string): Promise<void> {
     if (this.isStoreBlock) {
-      await sparkStore.renameBlock([this.serviceId, this.blockId, newId])
+      await this.sparkModule.renameBlock([this.blockId, newId])
         .catch(() => { });
     } else {
       await this.saveBlock({ ...this.block, id: newId });
@@ -122,8 +117,8 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
     await this.saveConfig({ ...this.widget.config, blockId });
   }
 
-  public showOtherBlock(block: Block, props: any = {}): void {
-    showBlockDialog(block, { props });
+  public showOtherBlock(block: Block | null, props: any = {}): void {
+    createBlockDialog(block, { props });
   }
 
   public startMakeWidget(): void {
@@ -132,10 +127,11 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
       parent: this,
       title: 'Make widget',
       message: `On which dashboard do you want to create a widget for '${this.widget.title}'?`,
+      style: 'overflow-y: scroll',
       options: {
         type: 'radio',
-        model: undefined,
-        items: dashboardStore.dashboardValues
+        model: '',
+        items: dashboardStore.dashboards
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
@@ -144,12 +140,8 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Created ${this.widget.title} on ${dashboardStore.dashboardById(dashboard).title}`,
-        });
+        dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+        notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
 
@@ -158,9 +150,10 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
     createDialog({
       parent: this,
       component: 'InputDialog',
-      title: 'Change Block name',
+      title: 'Change block name',
       message: `Choose a new name for '${this.blockId}'`,
       rules: blockIdRules(this.serviceId),
+      clearable: false,
       value: blockId,
     })
       .onOk(async (newId: string) => {
@@ -169,33 +162,20 @@ export default class BlockCrudComponent extends CrudComponent<BlockConfig> {
       });
   }
 
-  public startSwitchBlock(): void {
-    createDialog({
-      parent: this,
-      component: 'BlockSelectDialog',
-      title: 'Choose a Block',
-      message: 'You can change the Block that will be displayed by this widget',
-      filter: block => block.type === this.block.type,
-      serviceId: this.block.serviceId,
-    })
-      .onOk(block => this.switchBlock(block.id));
+  public displayBlock(): void {
+    tryDisplayBlock(this.block);
   }
 
-  public startBlockInfo(): void {
-    createDialog({
-      parent: this,
-      component: 'BlockInfoDialog',
-      block: this.block,
-    });
+  public exportBlock(): void {
+    saveFile(this.block, `${this.block.id}.json`);
   }
 
   public startRemoveBlock(): void {
     createDialog({
       parent: this,
-      title: 'Remove Block',
+      title: 'Remove block',
       message: `Are you sure you want to remove ${this.block.id}?`,
       cancel: true,
-
       persistent: true,
     })
       .onOk(this.removeBlock);

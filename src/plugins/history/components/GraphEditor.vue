@@ -3,7 +3,6 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { QuasarNode } from '@/plugins/history/nodes';
 
 import { GraphConfig } from '../types';
 
@@ -49,13 +48,12 @@ export default class GraphEditor extends Vue {
       <template #leaf="{node}">
         <div @click="editLeaf(node)">
           {{ node.label }}
-          <q-tooltip>
+          <q-tooltip class="q-gutter-y-sm">
             <i>Click to edit</i>
             <LabeledField
               :value="config.renames[node.value] || node.label"
               label="Label"
               dense
-              class="q-mt-sm"
             />
             <ColorField
               :value="config.colors[node.value] || ''"
@@ -63,13 +61,11 @@ export default class GraphEditor extends Vue {
               null-text="automatic"
               readonly
               dense
-              class="q-mt-sm"
             />
             <LabeledField
               :value="config.axes[node.value] === 'y2' ? 'Y2' : 'Y1'"
               label="Axis"
               dense
-              class="q-mt-sm"
             />
           </q-tooltip>
         </div>

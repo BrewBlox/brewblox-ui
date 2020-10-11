@@ -2,7 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetWizardBase from '@/components/WidgetWizardBase';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 
@@ -11,14 +11,14 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   modalOpen = false;
   localConfig: any | null = null;
 
-  get widget(): PersistentWidget {
+  get widget(): Widget {
     if (this.localConfig === null) {
       this.localConfig = this.emptyConfig();
     }
     return {
       id: this.widgetId,
       title: this.widgetTitle,
-      feature: this.typeId,
+      feature: this.featureId,
       order: 0,
       dashboard: this.dashboardId,
       config: this.localConfig,
@@ -26,7 +26,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     };
   }
 
-  set widget(val: PersistentWidget) {
+  set widget(val: Widget) {
     this.localConfig = val.config;
   }
 
@@ -43,18 +43,16 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     return {
       container: 'Dialog',
       mode: 'Full',
+      size: 'Fixed',
     };
   }
 
   get widgetComponent(): string {
-    return featureStore.widget(this.crud);
+    return featureStore.widgetComponent(this.crud).component;
   }
 
   emptyConfig(): any {
-    const feature = featureStore.features[this.featureId];
-    return feature.generateConfig !== undefined
-      ? feature.generateConfig()
-      : {};
+    return featureStore.widgetById(this.featureId)?.generateConfig?.() ?? {};
   }
 
   createWidget(): void {
@@ -62,13 +60,13 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
   }
 
   created(): void {
-    this.widgetTitle = this.typeDisplayName;
+    this.widgetTitle = this.featureTitle;
   }
 }
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -77,7 +75,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       </q-item>
     </q-card-section>
 
-    <q-dialog v-model="modalOpen" no-backdrop-dismiss class="row">
+    <q-dialog v-model="modalOpen" :maximized="$dense" no-backdrop-dismiss>
       <component
         :is="widgetComponent"
         :initial-crud="crud"
@@ -86,11 +84,11 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       />
     </q-dialog>
 
-    <q-card-actions align="right">
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn unelevated label="Configure" @click="modalOpen = true" />
       <q-btn unelevated label="Create" color="primary" @click="createWidget" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

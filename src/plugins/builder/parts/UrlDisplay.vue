@@ -25,22 +25,17 @@ export default class UrlDisplay extends PartBase {
         y="1"
         rx="6"
         ry="6"
-        stroke="none"
+        stroke="white"
       />
-      <g>
-        <foreignObject
-          :transform="textTransformation([sizeX, sizeY], false)"
-          :width="squares(sizeX)"
-          :height="squares(sizeY)"
-        >
-          <div
-            class="text-white text-bold text-center text-h6 q-mt-xs"
-            style="max-width: 100%; text-decoration: underline"
-          >
-            {{ titleText }}
-          </div>
-        </foreignObject>
-      </g>
     </g>
+    <SvgEmbedded
+      :transform="textTransformation([sizeX, sizeY], false)"
+      :width="squares(sizeX)"
+      :height="squares(sizeY)"
+    >
+      <div class="text-bold text-center q-mt-sm grid-label" style="text-decoration: underline; font-size: 130%">
+        {{ titleText }}
+      </div>
+    </SvgEmbedded>
   </g>
 </template>

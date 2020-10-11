@@ -25,6 +25,7 @@ export default class WidgetDialog extends DialogBase {
     return {
       mode: this.mode,
       container: 'Dialog',
+      size: 'Fixed',
     };
   }
 
@@ -37,13 +38,13 @@ export default class WidgetDialog extends DialogBase {
   }
 
   get widgetComponent(): string {
-    return featureStore.widget(this.crud);
+    return featureStore.widgetComponent(this.crud).component;
   }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss class="row" @hide="onDialogHide">
+  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
     <component
       :is="widgetComponent"
       :initial-crud="crud"

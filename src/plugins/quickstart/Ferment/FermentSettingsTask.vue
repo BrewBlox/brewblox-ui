@@ -1,20 +1,26 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { convertedTemp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
+import { Temp } from '@/plugins/spark/units';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';
-import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { FermentConfig, FermentOpts } from './types';
 
 @Component
 export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
-  fridgeSetting = new Unit(20, 'degC');
-  beerSetting = new Unit(20, 'degC');
+  fridgeSetting = new Temp(20, 'degC');
+  beerSetting = new Temp(20, 'degC');
   activeSetpoint: 'beer' | 'fridge' = 'beer';
+
+  created(): void {
+    const { Temp } = sparkStore.moduleById(this.config.serviceId)!.units;
+    this.fridgeSetting = this.fridgeSetting.convert(Temp);
+    this.beerSetting = this.beerSetting.convert(Temp);
+  }
 
   get targetOpts(): SelectOption[] {
     return [
@@ -39,6 +45,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, opts, layouts);
+    const displayedBlocks = defineDisplayedBlocks(this.config);
 
     this.pushActions(createOutputActions());
     this.updateConfig({
@@ -47,20 +54,15 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
       widgets,
       changedBlocks,
       createdBlocks,
+      displayedBlocks,
     });
     this.next();
-  }
-
-  created(): void {
-    const defaultTemp = convertedTemp(20, sparkStore.units(this.config.serviceId).Temp);
-    this.fridgeSetting = defaultTemp.copy();
-    this.beerSetting = defaultTemp.copy();
   }
 }
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -71,7 +73,7 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
           <p>
             To change which temperature is actively controlled,
             you will change which setpoint is used as input by the PIDs.
-            The quick actions on your dashboard will help you switch and reconfigure the PIDs.<br />
+            The quick actions on your dashboard will help you switch and reconfigure the PIDs.<br>
           </p>
           <p>You can set the initial values now.</p>
         </q-item-section>
@@ -97,12 +99,10 @@ export default class FermentSettingsTask extends WizardTaskBase<FermentConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn unelevated label="Done" color="primary" @click="done" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

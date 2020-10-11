@@ -2,9 +2,11 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { ActuatorPwmBlock } from '@/plugins/spark/block-types';
+import { sparkStore } from '@/plugins/spark/store';
+import { ActuatorPwmBlock } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
 
-import { settingsBlock, settingsLink, squares, textTransformation } from '../helpers';
+import { settingsAddress, squares, textTransformation } from '../helpers';
 import { PersistentPart } from '../types';
 
 
@@ -27,16 +29,21 @@ export default class PwmValues extends Vue {
   @Prop({ type: Number, default: 0 })
   public readonly startY!: number;
 
+  @Prop({ type: String, default: '' })
+  public readonly color!: string;
+
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.settingsKey);
+  }
+
   get block(): ActuatorPwmBlock | null {
-    return settingsBlock(this.part, this.settingsKey);
+    const { serviceId, id } = this.address;
+    return sparkStore.blockById(serviceId, id);
   }
 
   get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, this.settingsKey);
-    return !!link.serviceId && !!link.blockId;
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get pwmValue(): number | null {
@@ -53,33 +60,37 @@ export default class PwmValues extends Vue {
 
 <template>
   <g>
-    <foreignObject
+    <g class="outline">
+      <rect
+        v-if="!noBorder"
+        :width="squares(1)-2"
+        :height="squares(1)-2"
+        :x="squares(startX)+1"
+        :y="squares(startY)+1"
+        :stroke="color"
+        stroke-width="2px"
+        rx="6"
+        ry="6"
+      />
+    </g>
+    <SvgEmbedded
       :x="squares(startX)"
       :y="squares(startY)"
       :transform="transform"
       :width="squares(1)"
       :height="squares(1)"
+      content-class="column items-center q-pt-xs"
     >
-      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="block && !block.data.enabled" name="mdi-sleep" size="lg" class="maximized" color="warning" />
-      <div v-else class="text-white text-bold text-center">
-        <q-icon name="mdi-gauge" class="q-mr-xs" />
-        <q-icon v-if="!block" name="mdi-link-variant-off" />
-        <small v-else>%</small>
-        <br />
-        {{ pwmValue | truncateRound }}
-      </div>
-    </foreignObject>
-    <rect
-      v-if="!noBorder"
-      class="outline"
-      :width="squares(1)-2"
-      :height="squares(1)-2"
-      :x="squares(startX)+1"
-      :y="squares(startY)+1"
-      rx="6"
-      ry="6"
-      stroke-width="2px"
-    />
+      <BrokenIcon v-if="isBroken" class="col" />
+      <UnlinkedIcon v-else-if="!block" class="col" />
+      <SleepingIcon v-else-if="!block.data.enabled" class="col" />
+      <template v-else>
+        <PwmIcon class="col" />
+        <div class="col text-bold">
+          {{ pwmValue | truncateRound }}
+          <small v-if="!!block">%</small>
+        </div>
+      </template>
+    </SvgEmbedded>
   </g>
 </template>

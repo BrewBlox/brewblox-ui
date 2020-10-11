@@ -2,7 +2,7 @@
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 
 const GRID_SIZE = 100;
 const GAP_SIZE = 20;
@@ -29,6 +29,8 @@ export default class GridItem extends Vue {
   currentRows: number | null = null;
   current: XYPosition = zeroPos();
 
+  resizePos: XYPosition = zeroPos();
+
   @Ref()
   readonly container!: Vue;
 
@@ -36,7 +38,7 @@ export default class GridItem extends Vue {
   readonly dragOverlay!: Vue;
 
   @Prop({ type: Object, required: true })
-  readonly widget!: PersistentWidget;
+  readonly widget!: Widget;
 
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
@@ -51,8 +53,8 @@ export default class GridItem extends Vue {
     const pinned = pinnedPosition || zeroPos();
 
     return {
-      gridColumnStart: `${this.current.x || pinned.x || 'auto'}`,
-      gridRowStart: `${this.current.y || pinned.y || 'auto'}`,
+      gridColumnStart: `${this.current.x || pinned.x || this.resizePos.x || 'auto'}`,
+      gridRowStart: `${this.current.y || pinned.y || this.resizePos.y || 'auto'}`,
       gridColumnEnd: `span ${this.currentCols || cols}`,
       gridRowEnd: `span ${this.currentRows || rows}`,
     };
@@ -217,6 +219,7 @@ export default class GridItem extends Vue {
   }
 
   startResize(e: MouseEvent | TouchEvent): void {
+    this.resizePos = this.findPos();
     this.resizing = true;
     this.startInteraction(e);
   }
@@ -229,6 +232,7 @@ export default class GridItem extends Vue {
   }
 
   stopResize(): void {
+    this.resizePos = zeroPos();
     this.resizing = false;
     this.updateSize();
     this.stopInteraction();
@@ -248,11 +252,7 @@ export default class GridItem extends Vue {
     this.moveInteraction(args.evt);
   }
 
-  unpin(): void {
-    this.updatePosition(null);
-  }
-
-  pin(): void {
+  findPos(): XYPosition {
     const rects = this.containerSize();
     const firstChildRects = this.containerFirstChildSize();
 
@@ -262,12 +262,18 @@ export default class GridItem extends Vue {
     const parentX = firstChildRects.x;
     const parentY = firstChildRects.y;
 
-    const pos: XYPosition = {
+    return {
       x: ((touchX - parentX) / (GRID_SIZE + GAP_SIZE)) + 1,
       y: ((touchY - parentY) / (GRID_SIZE + GAP_SIZE)) + 1,
     };
+  }
 
-    this.updatePosition(pos);
+  unpin(): void {
+    this.updatePosition(null);
+  }
+
+  pin(): void {
+    this.updatePosition(this.findPos());
   }
 }
 </script>
@@ -284,7 +290,7 @@ export default class GridItem extends Vue {
       class="grid-item-drag-overlay"
     />
     <!-- Item resize button -->
-    <button v-if="!editable" v-touch-pan.mouse="resizePanHandler" class="grid-item-resize-handle">
+    <button v-if="editable" v-touch-pan.mouse="resizePanHandler" class="grid-item-resize-handle">
       <q-icon name="mdi-resize-bottom-right" size="30px" />
     </button>
     <!-- Item drag button -->
@@ -293,77 +299,67 @@ export default class GridItem extends Vue {
       v-touch-pan.mouse="movePanHandler"
       class="grid-item-move-handle grid-item-movable"
     >
-      <div class="row">
-        <div class="column">
-          <q-icon name="mdi-gesture-swipe-horizontal" size="50px" class="shadowed" />
-          <p class="shadowed">
-            drag
-          </p>
+      <div class="column q-gutter-sm items-center">
+        <q-icon name="mdi-gesture-swipe-horizontal" size="50px" />
+        <div>
+          Drag to reposition
         </div>
         <q-btn
-          :icon="widget.pinnedPosition ? 'mdi-pin-off' : 'mdi-pin'"
-          fab
-          color="primary"
-          @click="() => (widget.pinnedPosition ? unpin : pin)()"
+          :icon="widget.pinnedPosition ? 'mdi-pin' : undefined"
+          :label="widget.pinnedPosition ? 'Pinned' : 'Pin position'"
+          :unelevated="!!widget.pinnedPosition"
+          :outline="!widget.pinnedPosition"
+          rounded
+          color="secondary"
+          @click="widget.pinnedPosition ? unpin() : pin()"
         />
       </div>
     </button>
   </div>
 </template>
 
-<style lang="stylus" scoped>
-@import '../../styles/quasar.styl';
+<style lang="sass" scoped>
+.grid-item
+  position: relative
 
-.grid-item {
-  position: relative;
-}
+.grid-item-resize-handle
+  border: 0
+  width: 34px
+  height: 34px
+  position: absolute
+  padding: 0
+  display: flex
+  align-items: center
+  justify-content: center
+  color: #fff
+  outline: none
+  z-index: 3
+  bottom: 0
+  cursor: nwse-resize
+  right: 0
+  background: transparent
 
-.grid-item-resize-handle {
-  border: 0;
-  width: 34px;
-  height: 34px;
-  background: transparent;
-  position: absolute;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  outline: none;
-  z-index: 3;
-  bottom: 0;
-  cursor: nwse-resize;
-  right: 0;
-}
+.grid-item-move-handle
+  left: 0
+  top: 0
+  position: absolute
+  background: rgba(0, 0, 0, 0.6)
+  color: #fff
+  display: flex
+  align-items: center
+  justify-content: center
+  border: 0
+  width: 100%
+  height: 100%
+  z-index: 1
 
-.grid-item-move-handle {
-  left: 0;
-  top: 0;
-  position: absolute;
-  background: transparent;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
+.grid-item-movable
+  cursor: move
 
-.grid-item-movable {
-  cursor: move;
-}
-
-.grid-item-drag-overlay {
-  background: rgba(255, 255, 255, 0.2);
-  top: 0;
-  bottom: 0;
-  position: absolute;
-  z-index: 1;
-}
-
-.shadowed {
-  text-shadow: 0px 2px 0px $dark, 0px -2px 0px $dark, 2px 0px 0px $dark, -2px 0px 0px $dark;
-}
+.grid-item-drag-overlay
+  background: rgba(255, 255, 255, 0.2)
+  top: 0
+  bottom: 0
+  position: absolute
+  z-index: 1
 </style>

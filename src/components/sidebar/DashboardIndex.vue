@@ -24,11 +24,12 @@ export default class DashboardIndex extends Vue {
   }
 
   get dashboards(): Dashboard[] {
-    return dashboardStore.dashboardValues.sort(objectSorter('order'));
+    // avoid modifying the store object
+    return [...dashboardStore.dashboards].sort(objectSorter('order'));
   }
 
   set dashboards(dashboards: Dashboard[]) {
-    dashboardStore.updateDashboardOrder(dashboards.map(dashboard => dashboard.id));
+    dashboardStore.updateDashboardOrder(dashboards.map(v => v.id));
   }
 
   toggleDefaultDashboard(dashboard: Dashboard): void {
@@ -39,7 +40,7 @@ export default class DashboardIndex extends Vue {
     createDialog({
       parent: this,
       component: 'WizardDialog',
-      initialComponent: 'DashboardWizard',
+      initialWizard: 'DashboardWizard',
     });
   }
 
@@ -100,7 +101,7 @@ export default class DashboardIndex extends Vue {
 
     <draggable
       v-model="dashboards"
-      :disabled="!editing"
+      :disabled="$dense || !editing"
       @start="dragging=true"
       @end="dragging=false"
     >
@@ -122,7 +123,6 @@ export default class DashboardIndex extends Vue {
           <q-menu :offset="[-50, 0]">
             <q-list bordered>
               <q-item
-                link
                 clickable
                 @click="toggleDefaultDashboard(dashboard)"
               >
@@ -132,7 +132,9 @@ export default class DashboardIndex extends Vue {
                     name="home"
                   />
                 </q-item-section>
-                <q-item-section>Toggle default dashboard</q-item-section>
+                <q-item-section>
+                  {{ dashboard.primary ? 'Is home page' : 'Make home page' }}
+                </q-item-section>
               </q-item>
               <ActionItem
                 icon="edit"

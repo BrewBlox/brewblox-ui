@@ -1,6 +1,6 @@
-import { blockTypes } from '@/plugins/spark/block-types';
+import { BlockType } from '@/plugins/spark/types';
 
-import { showLinkedBlockDialog } from '../helpers';
+import { showDrivingBlockDialog } from '../helpers';
 import { PartSpec, PersistentPart } from '../types';
 
 const DEFAULT_SIZE_X = 5;
@@ -11,6 +11,14 @@ const spec: PartSpec = {
   title: 'Heating element',
   cards: [
     {
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey: 'pwm',
+        compatible: [BlockType.ActuatorPwm],
+        label: 'PWM',
+      },
+    },
+    {
       component: 'SizeCard',
       props: {
         settingsKey: 'sizeX',
@@ -20,17 +28,13 @@ const spec: PartSpec = {
         max: 10,
       },
     },
-    {
-      component: 'LinkedBlockCard',
-      props: { settingsKey: 'pwm', types: [blockTypes.ActuatorPwm], label: 'PWM' },
-    },
   ],
   size: (part: PersistentPart) => [
     part.settings.sizeX || DEFAULT_SIZE_X,
     SIZE_Y,
   ],
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'pwm'),
+  interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, 'pwm'),
 };
 
 export default spec;

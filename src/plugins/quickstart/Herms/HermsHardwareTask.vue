@@ -50,7 +50,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
   }
 
   discover(): void {
-    sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
+    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
   }
 
   startBlockWizard(): void {
@@ -81,17 +81,17 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
           <q-item-label class="text-subtitle1">
-            Assign Hardware Blocks
+            Assign Hardware blocks
           </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="refresh" @click="discover">
-            <q-tooltip>Discover OneWire Blocks</q-tooltip>
+            <q-tooltip>Discover OneWire blocks</q-tooltip>
           </q-btn>
         </q-item-section>
         <q-item-section class="col-auto">
@@ -103,7 +103,7 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
-            Select which hardware should be used for each function.<br />
+            Select which hardware should be used for each function.<br>
             You can unplug or heat sensors to identify them.
             The current value will be shown under each dropdown menu.
           </p>
@@ -112,6 +112,14 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
           </p>
         </q-item-section>
       </q-item>
+      <QuickStartMockCreateField
+        :service-id="config.serviceId"
+        :names="[
+          config.names.hltSensor,
+          config.names.mtSensor,
+          config.names.bkSensor,
+        ]"
+      />
       <q-item>
         <q-item-section>
           <QuickStartPinField
@@ -171,12 +179,10 @@ export default class HermsHardwareTask extends WizardTaskBase<HermsConfig> {
       </CardWarning>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

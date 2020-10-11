@@ -2,10 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { ActuatorPwmBlock } from '@/plugins/spark/types';
 
 import ActuatorPwmBasic from './ActuatorPwmBasic.vue';
 import ActuatorPwmFull from './ActuatorPwmFull.vue';
-import { ActuatorPwmBlock } from './types';
 
 @Component({
   components: {
@@ -13,22 +13,30 @@ import { ActuatorPwmBlock } from './types';
     Full: ActuatorPwmFull,
   },
 })
-export default class ActuatorPwmWidget extends BlockWidgetBase {
-  readonly block!: ActuatorPwmBlock;
+export default class ActuatorPwmWidget
+  extends BlockWidgetBase<ActuatorPwmBlock> {
 }
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-presets
+        use-range
+        @params="saveGraphParams"
+        @layout="saveGraphLayout"
+      />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass">
-      <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
-      </template>
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
 
+    <component :is="mode" :crud="crud">
       <template #warnings>
         <CardWarning v-if="!block.data.actuatorId.id">
           <template #message>

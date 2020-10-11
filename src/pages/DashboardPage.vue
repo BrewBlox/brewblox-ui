@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { Dashboard, dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
@@ -21,79 +21,61 @@ interface ValidatedWidget {
 export default class DashboardPage extends Vue {
   widgetEditable = false;
 
-  context: WidgetContext = {
-    mode: 'Basic',
-    container: 'Dashboard',
-  }
-
   @Watch('dashboardId')
   onChangeDashboardId(): void {
     this.widgetEditable = false;
   }
 
-  @Watch('dashboard')
-  onChangeDashboard(newDash, oldDash): void {
-    if (oldDash && !newDash) {
+  @Watch('dashboard', { immediate: true })
+  onChangeDashboard(newV: Dashboard, oldV: Dashboard): void {
+    if (!newV && oldV) {
       // Dashboard was removed
       this.$router.replace('/');
     }
+  }
+
+  @Watch('dashboard.title', { immediate: true })
+  watchTitle(newV: string): void {
+    document.title = `Brewblox | ${newV ?? 'Dashboard'}`;
+  }
+
+  get context(): WidgetContext {
+    return {
+      mode: 'Basic',
+      container: 'Dashboard',
+      size: this.$dense ? 'Content' : 'Fixed',
+    };
   }
 
   get dashboardId(): string {
     return this.$route.params.id;
   }
 
-  get dashboard(): Dashboard {
+  get dashboard(): Dashboard | null {
     return dashboardStore.dashboardById(this.dashboardId);
   }
 
-  get allDashboards(): Dashboard[] {
-    return dashboardStore.dashboardValues;
-  }
-
-  get allItems(): PersistentWidget[] {
-    return dashboardStore.widgetValues;
-  }
-
-  get widgets(): PersistentWidget[] {
-    return dashboardStore.persistentWidgetsByDashboardId(this.dashboardId)
+  get widgets(): Widget[] {
+    // Avoid modifying the store object
+    return [...dashboardStore.dashboardWidgets(this.dashboardId)]
       .sort(objectSorter('order'));
   }
 
   get validatedWidgets(): ValidatedWidget[] {
     return this.widgets
-      .map((widget: PersistentWidget) => {
+      .map((widget: Widget) => {
         const crud: Crud = {
           widget,
           isStoreWidget: true,
           saveWidget: this.saveWidget,
           closeDialog: () => { },
         };
-        try {
-          if (widget.title === undefined) {
-            // ensure backwards compatibility
-            // older items may not have a title
-            widget.title = widget.id;
-          }
-          const component = featureStore.widget(crud, true);
-          return {
-            id: widget.id,
-            component,
-            crud,
-          };
-        } catch (e) {
-          return {
-            id: widget.id,
-            component: 'InvalidWidget',
-            crud,
-            error: e.message,
-          };
-        }
+        return {
+          ...featureStore.widgetComponent(crud),
+          id: widget.id,
+          crud,
+        };
       });
-  }
-
-  get isMobile(): boolean {
-    return this.$q.platform.is.mobile;
   }
 
   async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
@@ -103,19 +85,22 @@ export default class DashboardPage extends Vue {
       if (local) {
         local.crud.widget.pinnedPosition = pinnedPosition;
       }
-      await dashboardStore.savePersistentWidget({ ...dashboardStore.persistentWidgetById(id), pinnedPosition });
-      await dashboardStore.updatePersistentWidgetOrder(order);
+      const widget = dashboardStore.widgetById(id);
+      if (widget) {
+        await dashboardStore.saveWidget({ ...widget, pinnedPosition });
+        await dashboardStore.updateWidgetOrder(order);
+      }
     } catch (e) {
       throw e;
     }
   }
 
   async onChangeSize(id: string, cols: number, rows: number): Promise<void> {
-    await dashboardStore.updatePersistentWidgetSize({ id, cols, rows });
+    await dashboardStore.updateWidgetSize({ id, cols, rows });
   }
 
-  public async saveWidget(widget: PersistentWidget): Promise<void> {
-    await dashboardStore.savePersistentWidget(widget);
+  public async saveWidget(widget: Widget): Promise<void> {
+    await dashboardStore.saveWidget(widget);
   }
 
   onIdChanged(oldId, newId): void {
@@ -124,21 +109,25 @@ export default class DashboardPage extends Vue {
     }
   }
 
-  changeDashboardId(): void {
+  editDashboardId(): void {
+    if (!this.dashboard) { return; }
     const oldId = this.dashboard.id;
     startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
-  changeDashboardTitle(): void {
+  editDashboardTitle(): void {
+    if (!this.dashboard) { return; }
     const oldId = this.dashboard.id;
     startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
   }
 
   toggleDefaultDashboard(): void {
+    if (!this.dashboard) { return; }
     dashboardStore.updatePrimaryDashboard(this.dashboard.primary ? null : this.dashboardId);
   }
 
   removeDashboard(): void {
+    if (!this.dashboard) { return; }
     startRemoveDashboard(this.dashboard);
   }
 
@@ -147,7 +136,7 @@ export default class DashboardPage extends Vue {
       parent: this,
       component: 'WizardDialog',
       dashboardId: this.dashboardId,
-      initialComponent: 'WidgetWizardPicker',
+      initialWizard: 'WidgetWizardPicker',
     });
   }
 }
@@ -163,48 +152,53 @@ export default class DashboardPage extends Vue {
         {{ dashboard.title }}
       </portal>
       <portal to="toolbar-buttons">
-        <q-btn-toggle
-          v-model="widgetEditable"
-          class="q-mr-md"
-          flat
-          dense
-          :options="[
-            {icon:'mdi-arrow-all', value: true},
-            {icon:'mdi-lock', value: false},
-          ]"
-        />
-        <q-btn-dropdown color="primary" label="actions">
-          <q-list>
+        <q-btn
+          v-if="!$dense"
+          unelevated
+          round
+          icon="mdi-arrow-all"
+          :color="widgetEditable ? 'primary' : ''"
+          class="self-center"
+          @click="widgetEditable = !widgetEditable"
+        >
+          <q-tooltip v-if="!widgetEditable">
+            Rearrange widgets
+          </q-tooltip>
+        </q-btn>
+        <ActionMenu round class="self-center">
+          <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
-            <q-item link clickable @click="toggleDefaultDashboard">
+            <q-item clickable @click="toggleDefaultDashboard">
               <q-item-section avatar>
                 <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
               </q-item-section>
-              <q-item-section>Toggle default dashboard</q-item-section>
+              <q-item-section>
+                {{ dashboard.primary ? 'Is home page' : 'Make home page' }}
+              </q-item-section>
             </q-item>
-            <ActionItem icon="edit" label="Change dashboard ID" @click="changeDashboardId" />
-            <ActionItem icon="edit" label="Change dashboard Title" @click="changeDashboardTitle" />
+            <ActionItem icon="edit" label="Change dashboard ID" @click="editDashboardId" />
+            <ActionItem icon="edit" label="Change dashboard title" @click="editDashboardTitle" />
             <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
-          </q-list>
-        </q-btn-dropdown>
+          </template>
+        </ActionMenu>
       </portal>
-      <q-list v-if="isMobile" no-border>
-        <q-item v-for="val in validatedWidgets" :key="val.id">
-          <q-item-section>
-            <component
-              :is="val.component"
-              :initial-crud="val.crud"
-              :context="context"
-              class="dashboard-widget"
-            />
-          </q-item-section>
-        </q-item>
-      </q-list>
+
+      <div v-if="$dense" class="column q-gutter-y-sm">
+        <component
+          :is="val.component"
+          v-for="val in validatedWidgets"
+          :key="val.id"
+          :initial-crud="val.crud"
+          :context="context"
+          class="col full-width"
+        />
+      </div>
       <GridContainer
         v-else
         :editable="widgetEditable"
         @change-positions="onChangePositions"
         @change-size="onChangeSize"
+        @dblclick="showWizard"
       >
         <component
           :is="val.component"
@@ -213,14 +207,9 @@ export default class DashboardPage extends Vue {
           :initial-crud="val.crud"
           :context="context"
           :error="val.error"
-          class="bg-dark maximized"
+          class="fit"
         />
       </GridContainer>
     </div>
   </q-page>
 </template>
-
-<style lang="stylus" scoped>
-@import '../styles/quasar.variables.styl';
-@import '../styles/quasar.styl';
-</style>

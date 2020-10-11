@@ -1,25 +1,30 @@
-import { Unit } from '@/helpers/units';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
+import { BlockSpec, TempSensorMockBlock } from '@/plugins/spark/types';
+import { Temp } from '@/plugins/spark/units';
+import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './TempSensorMockWidget.vue';
-import { TempSensorMockData } from './types';
 
-const block: BlockSpec = {
+const typeName = 'TempSensorMock';
+
+const block: BlockSpec<TempSensorMockBlock> = {
   id: typeName,
-  generate: (): TempSensorMockData => ({
-    value: new Unit(20, 'degC'),
-    connected: true,
-  }),
-  changes: [
+  generate: serviceId => {
+    const temp = serviceTemp(serviceId);
+    return {
+      value: new Temp(20, 'degC').convert(temp),
+      setting: new Temp(20, 'degC').convert(temp),
+      fluctuations: [],
+      connected: true,
+    };
+  },
+  fields: [
     {
-      key: 'value',
-      title: 'Sensor Value',
+      key: 'setting',
+      title: 'Sensor Setting',
       component: 'UnitValEdit',
-      generate: () => new Unit(20, 'degC'),
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
     },
     {
       key: 'connected',
@@ -27,22 +32,26 @@ const block: BlockSpec = {
       component: 'BoolValEdit',
       generate: () => true,
     },
+    {
+      key: 'value',
+      title: 'Sensor value',
+      component: 'UnitValEdit',
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
+      readonly: true,
+      graphed: true,
+    },
   ],
-  presets: [],
-  graphTargets: {
-    value: 'Sensor value',
-  },
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Temp Sensor (Mock)',
+  title: 'Temp Sensor (Mock)',
   role: 'Process',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 3,
   },
 };
 

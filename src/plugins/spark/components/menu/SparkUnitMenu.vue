@@ -2,68 +2,111 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { spaceCased } from '@/helpers/functional';
-import { prettify } from '@/helpers/units';
-import { sparkStore } from '@/plugins/spark/store';
+import { typeMatchFilter } from '@/helpers/functional';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
 import { UserUnits } from '@/plugins/spark/types';
 
+const defaultMessage =
+  `When changing the UI temperature unit, you will need to update existing graphs.
+  The old name will disappear after 24h.`;
 
 @Component
 export default class SparkUnitMenu extends DialogBase {
-  spaceCased = spaceCased;
+  serviceOpts: SelectOption<UserUnits['Temp']>[] = [
+    { label: 'Celsius', value: 'degC' },
+    { label: 'Fahrenheit', value: 'degF' },
+  ]
+  displayOpts: SelectOption<DisplayTempUnit>[] = [
+    { label: 'Celsius', value: DisplayTempUnit.TEMP_CELSIUS },
+    { label: 'Fahrenheit', value: DisplayTempUnit.TEMP_FAHRENHEIT },
+  ]
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  @Prop({ type: String, default: 'Spark units' })
+  public readonly title!: string;
+
+  @Prop({ type: String, default: defaultMessage })
+  public readonly message!: string;
+
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   get units(): UserUnits {
-    return sparkStore.units(this.serviceId) || {};
+    return this.sparkModule.units;
   }
 
-  unitAlternativeOptions(name: string): SelectOption[] {
-    return (sparkStore.unitAlternatives(this.serviceId)[name] || [])
-      .map(v => ({ label: prettify(v), value: v }));
+  get displayBlock(): DisplaySettingsBlock | null {
+    return this.sparkModule
+      .blocks
+      .find(typeMatchFilter<DisplaySettingsBlock>('DisplaySettings'))
+      ?? null;
   }
 
-  saveUnits(vals: UserUnits = this.units): void {
-    sparkStore.saveUnits([this.serviceId, vals])
-      .catch(reason => this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to change unit: ${reason}`,
-      }));
+  get displayTemp(): DisplayTempUnit {
+    return this.displayBlock?.data.tempUnit ?? DisplayTempUnit.TEMP_CELSIUS;
   }
 
-  mounted(): void {
-    sparkStore.fetchAll(this.serviceId);
+  set displayTemp(v: DisplayTempUnit) {
+    if (this.displayBlock) {
+      this.displayBlock.data.tempUnit = v;
+      this.sparkModule.saveBlock(this.displayBlock);
+    }
   }
+
+  get serviceTemp(): UserUnits['Temp'] {
+    return this.units.Temp;
+  }
+
+  set serviceTemp(v: UserUnits['Temp']) {
+    this.units.Temp = v;
+    this.sparkModule.saveUnits(this.units);
+  }
+
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="widget-modal">
-      <DialogToolbar>
-        <q-item-section>
-          <q-item-label>{{ serviceId }}</q-item-label>
-          <q-item-label caption>
-            Unit preferences
-          </q-item-label>
-        </q-item-section>
-      </DialogToolbar>
-
-      <q-card-section>
-        <q-item>
-          <q-item-section v-for="(val, name) in units" :key="name">
-            <SelectField
-              :value="val"
-              :options="unitAlternativeOptions(name)"
-              :title="`Preferred ${spaceCased(name)} unit`"
-              :label="`${spaceCased(name)} unit`"
-              @input="v => { units[name] = v; saveUnits(); }"
-            />
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-    </q-card>
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="onDialogOk"
+  >
+    <DialogCard v-bind="{title, message, html}">
+      <q-select
+        v-model="serviceTemp"
+        :options="serviceOpts"
+        label="UI temperature unit"
+        map-options
+        emit-value
+        @keyup.enter.exact.stop
+      />
+      <q-select
+        v-model="displayTemp"
+        :options="displayOpts"
+        label="Spark Display temperature unit"
+        map-options
+        emit-value
+        @keyup.enter.exact.stop
+      />
+      <template #actions>
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          flat
+          label="OK"
+          color="primary"
+          @click="onDialogOk"
+        />
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

@@ -1,5 +1,4 @@
 <script lang="ts">
-import get from 'lodash/get';
 import parseDuration from 'parse-duration';
 import { uid } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
@@ -40,6 +39,10 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
     this.resetSources();
   }
 
+  destroyed(): void {
+    this.removeSources();
+  }
+
   get widgetCfg(): MetricsConfig {
     return {
       targets: [],
@@ -47,7 +50,7 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
       params: {},
       freshDuration: {},
       decimals: {},
-      ...this.widget.config,
+      ...this.widget.config as Partial<MetricsConfig>,
     };
   }
 
@@ -65,16 +68,16 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
 
   get sources(): HistorySource[] {
     return this.targets
-      .map(target => historyStore.trySourceById(this.sourceId(target)))
-      .filter(source => source !== null && !!source.values) as HistorySource[];
+      .map(target => historyStore.sourceById(this.sourceId(target)))
+      .filter(source => source && source.values) as HistorySource[];
   }
 
   fieldFreshDuration(field: string): number {
-    return get(this.widgetCfg.freshDuration, field, DEFAULT_FRESH_DURATION);
+    return this.widgetCfg.freshDuration[field] ?? DEFAULT_FRESH_DURATION;
   }
 
   fieldDecimals(field: string): number {
-    return get(this.widgetCfg.decimals, field, DEFAULT_DECIMALS);
+    return this.widgetCfg.decimals[field] ?? DEFAULT_DECIMALS;
   }
 
   get values(): CurrentValue[] {
@@ -114,49 +117,54 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
     this.removeSources();
     this.addSources();
   }
-
-  destroyed(): void {
-    this.removeSources();
-  }
 }
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
-    <slot name="warnings" />
+  <div class="widget-md">
+    <div v-if="targets.length === 0">
+      <div class="text-italic text-h6 q-pa-md darkened text-center">
+        Add metrics to get started.
+      </div>
+    </div>
+    <CardWarning v-else-if="values.length === 0">
+      <template #message>
+        Waiting for data...
+      </template>
+    </CardWarning>
 
-    <q-card-section>
-      <q-list>
-        <q-item v-if="values.length === 0">
-          <q-item-section avatar>
-            <q-icon name="warning" />
-          </q-item-section>
-          <q-item-section>No metrics selected.</q-item-section>
-          <q-item-section side>
-            <q-btn flat text-color="white" label="Add metrics" @click="modalOpen = true" />
-          </q-item-section>
-        </q-item>
-        <LabeledField
-          v-for="val in values"
-          :key="val.field"
-          :label="val.name"
-          item-aligned
-          class="q-py-none"
-        >
-          <big :class="{darkened: val.stale}">
-            {{ val.value | round(fieldDecimals(val.field)) }}
-          </big>
-          <template v-if="val.stale" #after>
-            <q-icon name="warning" size="24px" />
-            <q-tooltip>
-              {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
-              <br />
-              Last update: {{ new Date(val.time).toLocaleString() }}.
-            </q-tooltip>
-          </template>
-        </LabeledField>
-      </q-list>
-    </q-card-section>
-  </q-card>
+    <div class="widget-body column">
+      <LabeledField
+        v-for="val in values"
+        :key="val.field"
+        :label="val.name"
+      >
+        <big :class="{darkened: val.stale}">
+          {{ val.value | round(fieldDecimals(val.field)) }}
+        </big>
+        <template v-if="val.stale" #after>
+          <q-icon name="warning" size="24px" />
+          <q-tooltip>
+            {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
+            <br>
+            Last update: {{ new Date(val.time).toLocaleString() }}.
+          </q-tooltip>
+        </template>
+      </LabeledField>
+    </div>
+    <div
+      v-if="values.length === 0"
+      class="column q-px-md"
+    >
+      <q-btn
+        flat
+        dense
+        color="secondary"
+        icon="edit"
+        label="Edit metrics"
+        class="self-end"
+        @click="$emit('mode', 'Full')"
+      />
+    </div>
+  </div>
 </template>

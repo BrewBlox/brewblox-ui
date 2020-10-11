@@ -1,18 +1,18 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { mutate } from '@/helpers/functional';
-import { Link } from '@/helpers/units';
-import { blockTypes, MotorValveBlock } from '@/plugins/spark/block-types';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
+import { mutate, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
+import { Block, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
+import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 
 import BlockCrudComponent from '../BlockCrudComponent';
 
 interface EditableChannel extends IoChannel {
-  id: number;
+  id: string;
+  nid: number;
+  name: string;
   driver: MotorValveBlock | null;
 }
 
@@ -22,68 +22,69 @@ interface ValveArrayBlock extends Block {
   };
 }
 
-const valveType = blockTypes.MotorValve;
-
 @Component
 export default class ValveArray extends BlockCrudComponent {
   readonly block!: ValveArrayBlock;
 
-  @Prop({ type: Object, required: true })
-  public readonly idEnum!: any;
+  @Prop({ type: Array, default: () => [] })
+  public readonly mapping!: ChannelMapping[];
 
-  @Prop({ type: Object, required: true })
-  public readonly nameEnum!: any;
+  get claimedChannels(): { [nid: number]: MotorValveBlock } {
+    return this.sparkModule
+      .blocks
+      .filter(typeMatchFilter<MotorValveBlock>('MotorValve'))
+      .filter(block => block.data.hwDevice.id === this.block.id)
+      .reduce((acc, block) => mutate(acc, block.data.startChannel, block), {});
+  }
 
-  get claimedChannels(): { [channel: number]: string } {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => block.type === valveType && block.data.hwDevice.id === this.block.id)
-      .reduce((acc, block: MotorValveBlock) => mutate(acc, block.data.startChannel, block.id), {});
+  mappedName(id: string): string | null {
+    return this.mapping.length
+      ? this.mapping.find(m => m.id === id)?.name ?? null
+      : id;
   }
 
   get channels(): EditableChannel[] {
     return this.block.data.pins
       .reduce(
         (acc: EditableChannel[], pin: IoPin, idx: number) => {
-          const id = idx + 1;
-          if (!this.nameEnum || this.nameEnum[id] !== undefined) {
-            const driverId = this.claimedChannels[id];
-            const driver = !!driverId
-              ? sparkStore.blockById(this.serviceId, driverId)
-              : null;
-            acc.push({ ...pin[this.idEnum[id]], id, driver });
+          const nid = idx + 1;
+          const [[id, channel]] = Object.entries(pin);
+          const name = this.mappedName(id);
+          if (name) {
+            const driver = this.claimedChannels[nid] ?? null;
+            acc.push({ ...channel, id, nid, name, driver });
           }
           return acc;
         },
         []
       )
-      .reverse();
+      .sort(objectStringSorter('name'));
   }
 
   saveChannels(): void {
     this.block.data.pins = this.channels
       .map(channel => {
-        const { id, state, config } = channel;
-        return { [this.idEnum[id]]: { state, config } };
+        const { state, config, id } = channel;
+        return { [id]: { state, config } };
       });
     this.saveBlock();
   }
 
-  channelName(channel): string {
-    return this.nameEnum[channel.id];
-  }
-
   driverLink(channel: EditableChannel): Link {
-    return new Link(get(channel, 'driver.id', null), valveType);
+    return new Link(channel.driver?.id ?? null, 'MotorValve');
   }
 
   driverDriven(block: Block): boolean {
-    return sparkStore.drivenChains(this.serviceId)
+    return this.sparkModule
+      .drivenChains
       .some((chain: string[]) => chain[0] === block.id);
   }
 
   driverLimitedBy(block: Block): string {
-    const limiting: string[] = sparkStore.limiters(this.serviceId)[block.id];
-    return limiting ? limiting.join(', ') : '';
+    return this.sparkModule
+      .limiters[block.id]
+      ?.join(', ')
+      ?? '';
   }
 
   async saveDriver(channel: EditableChannel, link: Link): Promise<void> {
@@ -92,20 +93,20 @@ export default class ValveArray extends BlockCrudComponent {
     }
     if (channel.driver) {
       channel.driver.data.startChannel = 0;
-      await sparkStore.saveBlock([this.serviceId, channel.driver]);
+      await this.sparkModule.saveBlock(channel.driver);
     }
     if (link.id) {
-      const newDriver: MotorValveBlock = sparkStore.blockById(this.serviceId, link.id);
-      newDriver.data.hwDevice.id = this.blockId;
-      newDriver.data.startChannel = channel.id;
-      await sparkStore.saveBlock([this.serviceId, newDriver]);
+      const newDriver = this.sparkModule.blockById<MotorValveBlock>(link.id)!;
+      newDriver.data.hwDevice = new Link(this.blockId, this.block.type);
+      newDriver.data.startChannel = channel.nid;
+      await this.sparkModule.saveBlock(newDriver);
     }
   }
 
   async saveState(channel: EditableChannel, state: DigitalState): Promise<void> {
     if (channel.driver) {
       channel.driver.data.desiredState = state;
-      await sparkStore.saveBlock([this.serviceId, channel.driver]);
+      await this.sparkModule.saveBlock(channel.driver);
     }
   }
 
@@ -114,11 +115,11 @@ export default class ValveArray extends BlockCrudComponent {
       component: 'BlockWizardDialog',
       parent: this,
       serviceId: this.serviceId,
-      initialFeature: valveType,
+      initialFeature: 'MotorValve',
     })
       .onOk(block => {
-        if (block.type === valveType) {
-          this.saveDriver(channel, new Link(block.id, valveType));
+        if (block.type === 'MotorValve') {
+          this.saveDriver(channel, new Link(block.id, block.type));
         }
       });
   }
@@ -126,46 +127,38 @@ export default class ValveArray extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card-section>
-    <q-item v-for="channel in channels" :key="channel.id">
-      <q-item-section>{{ channelName(channel) }}</q-item-section>
-      <q-item-section>
-        <DigitalStateField
+  <div class="widget-body column">
+    <div
+      v-for="channel in channels"
+      :key="`channel-${channel.id}`"
+      class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
+    >
+      <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
+        {{ channel.name }}
+      </div>
+      <div class="col-auto row items-baseline min-width-sm">
+        <DigitalStateButton
           v-if="channel.driver"
           :disable="driverDriven(channel.driver)"
           :value="channel.driver.data.desiredState"
           :pending="channel.driver.data.state !== channel.driver.data.desiredState"
           :pending-reason="driverLimitedBy(channel.driver)"
+          class="col-auto self-center"
           @input="v => saveState(channel, v)"
         />
-        <div v-else>
-          ---
+        <div v-else class="darkened text-italic q-pa-sm">
+          Not set
         </div>
-      </q-item-section>
-      <q-item-section>
-        <BlockField
-          :value="driverLink(channel)"
-          :service-id="serviceId"
-          title="Driver"
-          label="Driver"
-          no-show
-          dense
-          @input="link => saveDriver(channel, link)"
-        />
-      </q-item-section>
-      <q-item-section side>
-        <BlockDialogButton
-          v-if="channel.driver"
-          :block-id="channel.driver.id"
-          :service-id="serviceId"
-          flat
-        >
-          <q-tooltip>Configure valve</q-tooltip>
-        </BlockDialogButton>
-        <q-btn v-else flat icon="add" @click="createActuator(channel)">
-          <q-tooltip>Create new valve</q-tooltip>
-        </q-btn>
-      </q-item-section>
-    </q-item>
-  </q-card-section>
+      </div>
+      <LinkField
+        :value="driverLink(channel)"
+        :service-id="serviceId"
+        title="Driver"
+        label="Driver"
+        dense
+        class="col-grow"
+        @input="link => saveDriver(channel, link)"
+      />
+    </div>
+  </div>
 </template>

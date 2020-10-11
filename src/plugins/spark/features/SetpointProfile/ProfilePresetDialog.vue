@@ -5,11 +5,11 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
-import { deserialize, serialize } from '@/helpers/units/parseObject';
+import { deserialize, serialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
+import { SetpointProfileBlock } from '@/plugins/spark/types';
 
-import { typeName } from './getters';
-import { SetpointProfileBlock } from './types';
+const typeName: SetpointProfileBlock['type'] = 'SetpointProfile';
 
 @Component
 export default class ProfilePresetDialog extends DialogBase {
@@ -19,7 +19,7 @@ export default class ProfilePresetDialog extends DialogBase {
   public readonly value!: SetpointProfileBlock;
 
   get options(): SelectOption[] {
-    return sparkStore.presetValues
+    return sparkStore.presets
       .filter(preset => preset.type === typeName)
       .map(preset => ({ label: preset.name, value: preset.id }));
   }
@@ -28,7 +28,8 @@ export default class ProfilePresetDialog extends DialogBase {
     if (this.selected === null) {
       return;
     }
-    const preset = sparkStore.presets[this.selected.value];
+    const { value } = this.selected;
+    const preset = sparkStore.presetById(value)!;
     this.selected = null;
     sparkStore.removePreset(preset);
   }
@@ -37,7 +38,8 @@ export default class ProfilePresetDialog extends DialogBase {
     if (this.selected === null) {
       return;
     }
-    const preset = sparkStore.presets[this.selected.value];
+    const { value } = this.selected;
+    const preset = sparkStore.presetById(value)!;
     createDialog({
       title: 'Edit profile name',
       cancel: true,
@@ -53,7 +55,8 @@ export default class ProfilePresetDialog extends DialogBase {
     if (this.selected === null) {
       return;
     }
-    const preset = sparkStore.presets[this.selected.value];
+    const { value } = this.selected;
+    const preset = sparkStore.presetById(value)!;
     const points = deserialize(cloneDeep(preset.data.points));
 
     createDialog({
@@ -65,12 +68,12 @@ export default class ProfilePresetDialog extends DialogBase {
       .onOk(async () => {
         this.value.data.start = new Date().getTime() / 1000;
         this.value.data.points = points;
-        await sparkStore.saveBlock([this.value.serviceId, this.value]);
+        await sparkStore.saveBlock(this.value);
         this.onDialogOk();
       })
       .onCancel(async () => {
         this.value.data.points = points;
-        await sparkStore.saveBlock([this.value.serviceId, this.value]);
+        await sparkStore.saveBlock(this.value);
         this.onDialogOk();
       });
   }
@@ -79,7 +82,8 @@ export default class ProfilePresetDialog extends DialogBase {
     if (this.selected === null) {
       return;
     }
-    const preset = sparkStore.presets[this.selected.value];
+    const { value } = this.selected;
+    const preset = sparkStore.presetById(value)!;
     preset.data = {
       points: cloneDeep(serialize(this.value.data.points)),
     };
@@ -117,49 +121,38 @@ export default class ProfilePresetDialog extends DialogBase {
     no-backdrop-dismiss
     @hide="onDialogHide"
   >
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-item>
-          <q-item-section>
-            <q-select
-              v-model="selected"
-              :options="options"
-              label="Profiles"
-              autofocus
-            >
-              <template #no-option>
-                <q-item>
-                  <q-item-section class="text-grey">
-                    No results
-                  </q-item-section>
-                </q-item>
-              </template>
-              <template v-if="!!selected" #after>
-                <q-btn flat round icon="edit" @click="editSelected">
-                  <q-tooltip>Rename profile</q-tooltip>
-                </q-btn>
-                <q-btn flat round icon="delete" @click="removeSelected">
-                  <q-tooltip>Remove profile</q-tooltip>
-                </q-btn>
-              </template>
-            </q-select>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-      <q-card-actions align="right">
+    <DialogCard v-bind="{title, message, html}">
+      <q-select
+        v-model="selected"
+        :options="options"
+        label="Profiles"
+        autofocus
+        item-aligned
+      >
+        <template #no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+        <template v-if="!!selected" #after>
+          <q-btn flat round icon="edit" @click="editSelected">
+            <q-tooltip>Rename profile</q-tooltip>
+          </q-btn>
+          <q-btn flat round icon="delete" @click="removeSelected">
+            <q-tooltip>Remove profile</q-tooltip>
+          </q-btn>
+        </template>
+      </q-select>
+
+      <template #actions>
         <q-btn flat label="Cancel" @click="onDialogCancel" />
         <q-space />
         <q-btn :disable="!selected" color="primary" flat label="load" @click="loadSelected" />
         <q-btn :disable="!selected" color="primary" flat label="save" @click="saveSelected" />
         <q-btn color="primary" flat label="New" @click="createPreset" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

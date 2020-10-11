@@ -3,13 +3,13 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, objectSorter } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
-import { deepCopy } from '@/helpers/units/parseObject';
+import notify from '@/helpers/notify';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { sparkStore } from '@/plugins/spark/store';
+import { deepCopy } from '@/plugins/spark/parse-object';
+import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
+import { Temp, Unit } from '@/plugins/spark/units';
 
 import { profileGraphProps } from './helpers';
-import { Setpoint, SetpointProfileBlock } from './types';
 
 interface DisplaySetpoint {
   offsetMs: number;
@@ -18,15 +18,13 @@ interface DisplaySetpoint {
 }
 
 @Component
-export default class SetpointProfileFull extends BlockCrudComponent {
+export default class SetpointProfileFull
+  extends BlockCrudComponent<SetpointProfileBlock> {
   durationString = durationString;
   durationMs = durationMs;
-  defaultTempValues = { degC: 20, degF: 68, degK: 293 };
-
-  readonly block!: SetpointProfileBlock;
 
   get tempUnit(): string {
-    return sparkStore.units(this.block.serviceId).Temp;
+    return this.sparkModule.units.Temp;
   }
 
   get start(): number {
@@ -61,7 +59,7 @@ export default class SetpointProfileFull extends BlockCrudComponent {
     return {
       offsetMs: 0,
       absTimeMs: new Date(this.start).getTime(),
-      temperature: new Unit(this.defaultTempValues[this.tempUnit] || 20, this.tempUnit),
+      temperature: new Temp(20, 'degC').convert(this.tempUnit),
     };
   }
 
@@ -84,11 +82,7 @@ export default class SetpointProfileFull extends BlockCrudComponent {
   }
 
   notifyInvalidTime(): void {
-    this.$q.notify({
-      icon: 'error',
-      color: 'negative',
-      message: 'Point time must be later than start time',
-    });
+    notify.warn('Point time must be later than start time', { logged: false });
   }
 
   intermediateTemp(points: DisplaySetpoint[], dateMs: number): Unit | null {
@@ -197,8 +191,7 @@ export default class SetpointProfileFull extends BlockCrudComponent {
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-lg">
     <slot name="warnings">
       <BlockEnableToggle
         v-if="block.data.targetId.id !== null"
@@ -207,94 +200,95 @@ export default class SetpointProfileFull extends BlockCrudComponent {
         :text-disabled="`Profile is disabled: ${block.data.targetId} will not be changed.`"
       />
     </slot>
-    <q-card-section>
-      <q-separator v-if="block.data.targetId.id !== null" />
-      <q-item class="q-py-md">
-        <q-item-section class="self-end">
-          <DatetimeField
-            :value="start"
-            label="Start time"
-            title="Start time"
-            message-html="This will shift all points.
-              <br>Offset time will remain the same, absolute time values will change.
-              <br>The offset for the first point is always 0s."
-            @input="updateStartTime"
-          />
-        </q-item-section>
-        <q-item-section class="self-end">
-          <BlockField
-            :value="block.data.targetId"
-            :service-id="serviceId"
-            label="Driven Setpoint"
-            title="Driven Setpoint/Sensor pair"
-            @input="v => { block.data.targetId = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-      <q-separator />
 
+    <div class="q-ma-md row q-gutter-xs">
+      <DatetimeField
+        :value="start"
+        label="Start time"
+        title="Start time"
+        html
+        message="
+          This will shift all points.
+          <br>Offset time will remain the same, absolute time values will change.
+          <br>The offset for the first point is always 0s."
+        class="col-grow"
+        @input="updateStartTime"
+      />
+      <LinkField
+        :value="block.data.targetId"
+        :service-id="serviceId"
+        label="Driven Setpoint"
+        title="Driven Setpoint/Sensor pair"
+        class="col-grow"
+        @input="v => { block.data.targetId = v; saveBlock(); }"
+      />
 
-      <div class="q-mx-sm q-mt-md">
-        <div
-          v-for="(point, idx) in points"
-          :key="idx"
-          class="grid-container"
-        >
-          <div style="grid-column-end: span 2" class="self-end">
-            <DurationInputField
-              :value="durationString(point.offsetMs)"
-              title="Offset from start time"
-              label="Offset"
-              message-html="
+      <div class="col-break" />
+
+      <div
+        v-for="(point, idx) in points"
+        :key="idx"
+        class="col-12 row q-gutter-xs q-mt-none profile-point"
+      >
+        <DurationInputField
+          :value="durationString(point.offsetMs)"
+          title="Offset from start time"
+          label="Offset"
+          html
+          message="
             This will change the point offset.
-              <br>The absolute point time will be changed to start time + offset.
-              <br>Changing point offset may change point order.
-            "
-              @input="v => updatePointOffset(idx, durationMs(v))"
-            />
-          </div>
-          <div style="grid-column-end: span 4" class="self-end">
-            <DatetimeField
-              :value="point.absTimeMs"
-              title="Time"
-              label="Time"
-              message-html="
-              This will change the absolute point time.
-              <br>Changing point time may change point order.
-              <br>Point offset is changed to point time - start time.
-              "
-              @input="v => updatePointTime(idx, v)"
-            />
-          </div>
-          <div style="grid-column-end: span 3" class="self-end">
-            <UnitField
-              :value="point.temperature"
-              title="Temperature"
-              label="Temperature"
-              @input="v => updatePointTemperature(idx, v)"
-            />
-          </div>
-          <div style="grid-column-end: / span 1" class="column justify-end self-end">
-            <q-btn flat dense class="darkish col-auto" icon="delete" @click="removePoint(idx)">
-              <q-tooltip>Remove point</q-tooltip>
-            </q-btn>
-          </div>
-        </div>
-        <div class="row justify-end q-mt-md">
-          <q-btn round outline icon="add" @click="addPoint">
-            <q-tooltip>Add point</q-tooltip>
-          </q-btn>
-        </div>
+            <br>The absolute point time will be changed to start time + offset.
+            <br>Changing point offset may change point order."
+          class="col min-width-sm"
+          @input="v => updatePointOffset(idx, durationMs(v))"
+        />
+        <DatetimeField
+          :value="point.absTimeMs"
+          title="Time"
+          label="Time"
+          html
+          message="
+            This will change the absolute point time.
+            <br>Changing point time may change point order.
+            <br>Point offset is changed to point time - start time."
+          class="col min-width-sm"
+          @input="v => updatePointTime(idx, v)"
+        />
+        <UnitField
+          :value="point.temperature"
+          title="Temperature"
+          label="Temperature"
+          class="col min-width-sm"
+          @input="v => updatePointTemperature(idx, v)"
+        />
+        <q-btn
+          flat
+          dense
+          round
+          class="darkish col-auto self-center"
+          icon="delete"
+          @click="removePoint(idx)"
+        >
+          <q-tooltip>Remove point</q-tooltip>
+        </q-btn>
       </div>
-    </q-card-section>
-  </q-card>
+
+      <div class="col-break" />
+
+      <div class="col row justify-end q-mt-sm">
+        <q-btn fab-mini icon="add" color="indigo-4" @click="addPoint">
+          <q-tooltip>Add point</q-tooltip>
+        </q-btn>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  grid-row-gap: 10px;
-  grid-column-gap: 5px;
-}
+
+<style lang="sass" scoped>
+.profile-point:nth-child(even) > label
+  background: rgba($green-5, 0.05)
+
+.profile-point:nth-child(odd) > label
+  background: rgba($blue-5, 0.05)
 </style>

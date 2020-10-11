@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/plugins/spark/parse-object';
 
 import { defaultLabel } from '../nodes';
 import { GraphConfig } from '../types';
@@ -33,11 +33,11 @@ export default class GraphDisplayDialog extends DialogBase {
   }
 
   get rename(): string {
-    return this.local!.renames[this.field] || defaultLabel(this.field);
+    return this.local!.renames[this.field] ?? defaultLabel(this.field);
   }
 
   set rename(val: string) {
-    this.$set(this.local!.renames, this.field, val || defaultLabel(this.field));
+    this.$set(this.local!.renames, this.field, val ?? defaultLabel(this.field));
   }
 
   get axis(): GraphConfig['axes'][''] {
@@ -64,38 +64,36 @@ export default class GraphDisplayDialog extends DialogBase {
 
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title ellipsis">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-list dense>
-          <InputField v-model="rename" title="Label" label="Label" />
-          <ColorField
-            v-model="color"
-            title="Line color"
-            label="Line color"
-            null-text="automatic"
-            clearable
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
+    <DialogCard v-bind="{title, message, html}">
+      <div class="column q-gutter-xs">
+        <InputField v-model="rename" title="Label" label="Label" />
+        <ColorField
+          v-model="color"
+          title="Line color"
+          label="Line color"
+          null-text="automatic"
+          clearable
+        />
+        <LabeledField label="Y-axis" class="depth-1">
+          <q-btn-toggle
+            v-model="axis"
+            :options="axisOpts"
+            flat
+            class="depth-1"
           />
-          <LabeledField label="Y-axis">
-            <q-btn-toggle
-              v-model="axis"
-              :options="axisOpts"
-              flat
-            />
-          </LabeledField>
-        </q-list>
-      </q-card-section>
-      <q-card-actions align="right">
+        </LabeledField>
+      </div>
+
+      <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

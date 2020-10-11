@@ -2,65 +2,28 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
+import { durationMs } from '@/helpers/functional';
+import { systemStore } from '@/store/system';
+
 import { automationStore } from '../store';
 
+const validDuration = durationMs('60s');
 
 @Component
 export default class AutomationWatcher extends Vue {
-  dismissFunc: Function | null = null;
 
-  @Watch('lastUpdate')
-  async lastUpdateWatcher(newV: number): Promise<void> {
-    // Update received from source -> dismiss prompt if any
-    if (newV > 0) {
-      this.tryDismiss();
-      return;
+  get now(): Date {
+    return systemStore.now;
+  }
+
+  @Watch('now')
+  checkEventDataFresh(): void {
+    const last = automationStore.lastEvent;
+    const stale = last && last.getTime() + validDuration < new Date().getTime();
+
+    if (stale) {
+      automationStore.invalidateEventData();
     }
-
-    // Already showing notification -> wait for user action
-    if (!!this.dismissFunc) {
-      return;
-    }
-
-    // Show prompt to user
-    this.dismissFunc = this.$q.notify({
-      timeout: 0,
-      color: 'warning',
-      icon: 'warning',
-      message: 'Lost connection to the Automation service',
-      actions: [
-        {
-          label: 'Retry',
-          textColor: 'white',
-          handler: () => {
-            this.dismissFunc = null;
-            automationStore.subscribe();
-          },
-        },
-      ],
-    });
-
-    // Maybe it's only a hiccup -> schedule a retry
-    setTimeout(() => { this.lastUpdate > 0 || automationStore.subscribe(); }, 3000);
-  }
-
-  get source(): EventSource | null {
-    return automationStore.source;
-  }
-
-  get lastUpdate(): number {
-    return automationStore.lastUpdate;
-  }
-
-  tryDismiss(): void {
-    if (this.dismissFunc) {
-      this.dismissFunc();
-      this.dismissFunc = null;
-    }
-  }
-
-  created(): void {
-    automationStore.subscribe();
   }
 
   render(): null {

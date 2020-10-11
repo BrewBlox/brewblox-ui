@@ -19,7 +19,7 @@ export default class MetricsWidget extends WidgetBase {
 </script>
 
 <template>
-  <component :is="mode" :crud="crud" :class="cardClass" :revision="revision">
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
@@ -29,9 +29,15 @@ export default class MetricsWidget extends WidgetBase {
             label="Refresh"
             @click="revision++"
           />
-          <WidgetActions :crud="crud" />
         </template>
       </component>
     </template>
-  </component>
+
+    <component
+      :is="mode"
+      :crud="crud"
+      :revision="revision"
+      @mode="v => mode = v"
+    />
+  </CardWrapper>
 </template>

@@ -1,27 +1,24 @@
-import { ref } from '@/helpers/component-ref';
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
+import { shortDateString } from '@/helpers/functional';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { BlockSpec, SetpointProfileBlock } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
+import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
-import ProfilePresetAction from './ProfilePresetAction.vue';
-import ProfilePresetDialog from './ProfilePresetDialog.vue';
 import widget from './SetpointProfileWidget.vue';
-import { SetpointProfileData } from './types';
 
-const block: BlockSpec = {
+const typeName = 'SetpointProfile';
+
+const block: BlockSpec<SetpointProfileBlock> = {
   id: typeName,
-  generate: (): SetpointProfileData => ({
+  generate: () => ({
     start: new Date().getTime() / 1000,
     points: [],
     enabled: false,
-    targetId: new Link(null, interfaceTypes.SetpointSensorPair),
+    targetId: new Link(null, 'SetpointSensorPairInterface'),
     drivenTargetId: new Link(null),
   }),
-  changes: [
+  fields: [
     {
       key: 'enabled',
       title: 'Enabled',
@@ -34,40 +31,28 @@ const block: BlockSpec = {
       component: 'DateValEdit',
       componentProps: { timeScale: 1000 },
       generate: () => new Date().getTime() / 1000,
+      valueHint: 'seconds since 1/1/1970',
       pretty: (val: number): string => {
         if (val === 0) { return 'now'; }
         if (!val) { return 'invalid date'; }
-        return new Date(val * 1000).toLocaleString();
+        return shortDateString(val * 1000);
       },
     },
     {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
-    },
-  ],
-  presets: [
-    {
-      name: 'Empty profile',
-      generate: () => ({
-        points: [],
-        enabled: true,
-        start: new Date().getTime() / 1000,
-      }),
+      generate: () => new Link(null, 'SetpointSensorPairInterface'),
     },
   ],
 };
 
-ref(ProfilePresetAction);
-ref(ProfilePresetDialog);
-
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Setpoint Profile',
+  title: 'Setpoint Profile',
   role: 'Process',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

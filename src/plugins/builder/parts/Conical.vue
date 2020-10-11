@@ -4,11 +4,17 @@ import { Component } from 'vue-property-decorator';
 import PartBase from '../components/PartBase';
 
 @Component
-export default class Conical extends PartBase { }
+export default class Conical extends PartBase {
+  readonly scaleKey = 'scale';
+
+  get scale(): number {
+    return this.settings[this.scaleKey] ?? 1;
+  }
+}
 </script>
 
 <template>
-  <g>
+  <g :transform="`scale(${scale} ${scale})`">
     <g class="outline">
       <!-- Body -->
       <rect x="67.5" y="20.6" width="15" height="12.4" />

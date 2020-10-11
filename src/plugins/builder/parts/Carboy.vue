@@ -1,12 +1,12 @@
 <script lang="ts">
+import svgpath from 'svgpath';
 import { Component } from 'vue-property-decorator';
 
 import PartBase from '../components/PartBase';
 import { colorString } from '../helpers';
+import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../specs/Carboy';
 
-@Component
-export default class Carboy extends PartBase {
-  readonly path = `
+const basePath = `
     M89.2,199
     H10.8
     c-5.4,0-9.8-4.4-9.8-9.9
@@ -22,8 +22,32 @@ export default class Carboy extends PartBase {
     C99,194.6,94.6,199,89.2,199
     z`;
 
+@Component
+export default class Carboy extends PartBase {
+
   get color(): string {
     return colorString(this.part.settings.color);
+  }
+
+  get scaleX(): number {
+    return this.sizeX / DEFAULT_SIZE_X;
+  }
+
+  get scaleY(): number {
+    return this.sizeY / DEFAULT_SIZE_Y;
+  }
+
+  get valueY(): number {
+    return Math.round(this.sizeY / 4);
+  }
+
+  get path(): string {
+    return this.scaleX === 1 && this.scaleY === 1
+      ? basePath
+      : svgpath(basePath)
+        .transform(`scale(${this.scaleX} ${this.scaleY})`)
+        .round(1)
+        .toString();
   }
 }
 </script>
@@ -39,8 +63,16 @@ export default class Carboy extends PartBase {
       ry="8"
     />
     <g class="outline">
-      <path :d="path" />
-      <SetpointValues :part="part" :start-y="1" :background-color="color" hide-unset />
+      <path
+        :d="path"
+      />
+      <SetpointValues
+        :part="part"
+        :start-y="valueY"
+        :start-x="sizeX / 2 - 1"
+        :background-color="color"
+        hide-unset
+      />
     </g>
   </g>
 </template>

@@ -7,7 +7,7 @@ import DialogBase from '@/components/DialogBase';
 export default class SelectDialog extends DialogBase {
   local: any = null;
 
-  @Prop({ type: [String, Number, Array, Object], required: true })
+  @Prop({ required: true })
   public readonly value!: any;
 
   @Prop({ type: Array, required: true })
@@ -19,40 +19,48 @@ export default class SelectDialog extends DialogBase {
   created(): void {
     this.local = this.value;
   }
+
+  save(): void {
+    if (this.local !== null || this.selectProps.clearable) {
+      this.onDialogOk(this.local);
+    }
+  }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="onDialogOk(local)">
-    <q-card class="q-dialog-plugin q-dialog-plugin--dark">
-      <q-card-section class="q-dialog__title">
-        {{ title }}
-      </q-card-section>
-      <q-card-section v-if="message" class="q-dialog__message scroll">
-        {{ message }}
-      </q-card-section>
-      <q-card-section v-if="messageHtml" class="q-dialog__message scroll" v-html="messageHtml" />
-      <q-card-section class="scroll">
-        <q-select v-model="local" :options="selectOptions" v-bind="selectProps">
-          <template #no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-      </q-card-section>
-      <q-card-actions align="right">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
+    <DialogCard v-bind="{title, message, html}">
+      <q-select
+        v-model="local"
+        :options="selectOptions"
+        v-bind="selectProps"
+        item-aligned
+        @keyup.enter.exact.stop
+      >
+        <template #no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+      <template #actions>
         <q-btn color="primary" flat label="Cancel" @click="onDialogCancel" />
         <q-btn
           :disable="!selectProps.clearable && local === null"
           color="primary"
           flat
           label="OK"
-          @click="onDialogOk(local)"
+          @click="save"
         />
-      </q-card-actions>
-    </q-card>
+      </template>
+    </DialogCard>
   </q-dialog>
 </template>

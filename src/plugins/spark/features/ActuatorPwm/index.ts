@@ -1,20 +1,19 @@
 import { unitDurationString } from '@/helpers/functional';
-import { Link, Unit } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
+import { ActuatorPwmBlock, AnalogConstraintsObj, BlockIntfType, BlockSpec } from '@/plugins/spark/types';
+import { Link, Time, Unit } from '@/plugins/spark/units';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorPwmWidget.vue';
-import { typeName } from './getters';
-import { ActuatorPwmData } from './types';
 
-const block: BlockSpec = {
+const typeName = 'ActuatorPwm';
+
+const block: BlockSpec<ActuatorPwmBlock> = {
   id: typeName,
-  generate: (): ActuatorPwmData => ({
-    actuatorId: new Link(null, interfaceTypes.ActuatorDigital),
-    drivenActuatorId: new Link(null, interfaceTypes.ActuatorDigital, true),
+  generate: () => ({
+    actuatorId: new Link(null, BlockIntfType.ActuatorDigitalInterface),
+    drivenActuatorId: new Link(null, BlockIntfType.ActuatorDigitalInterface, true),
     period: new Unit(4, 'second'),
     desiredSetting: 0,
     setting: 0,
@@ -36,18 +35,19 @@ const block: BlockSpec = {
       }),
     },
   ],
-  changes: [
+  fields: [
     {
       key: 'desiredSetting',
       title: 'Duty Setting',
       component: 'NumberValEdit',
       generate: () => 0,
+      valueHint: '0-100',
     },
     {
       key: 'period',
       title: 'Period',
-      component: 'UnitValEdit',
-      generate: () => new Unit(4, 'second'),
+      component: 'TimeUnitValEdit',
+      generate: () => new Time(4, 's'),
       pretty: unitDurationString,
     },
     {
@@ -60,21 +60,42 @@ const block: BlockSpec = {
       key: 'actuatorId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.ActuatorDigital),
+      generate: () => new Link(null, BlockIntfType.ActuatorDigitalInterface),
+    },
+    {
+      key: 'constrainedBy',
+      title: 'Constraints',
+      component: 'AnalogConstraintsValEdit',
+      generate: (): AnalogConstraintsObj => ({ constraints: [] }),
+      pretty: prettifyConstraints,
+    },
+    {
+      key: 'setting',
+      title: 'Duty Setting',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      valueHint: '0-100',
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'value',
+      title: 'Duty Achieved',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      valueHint: '0-100',
+      readonly: true,
+      graphed: true,
     },
   ],
-  graphTargets: {
-    setting: 'Duty Setting',
-    value: 'Duty Achieved',
-  },
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'PWM',
+  title: 'PWM',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

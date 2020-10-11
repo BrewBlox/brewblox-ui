@@ -1,39 +1,37 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { sparkStore } from '@/plugins/spark/store';
+import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import { startRelationsDialog } from './relations';
-import { PidBlock } from './types';
 
 @Component
-export default class PidBasic extends BlockCrudComponent {
-  readonly block!: PidBlock;
-  inputFormOpen = false;
-  relationsOpen = false;
+export default class PidBasic
+  extends BlockCrudComponent<PidBlock> {
 
-  get inputId(): string | null {
-    return this.block.data.inputId.id;
+  get inputBlock(): SetpointSensorPairBlock | null {
+    return this.sparkModule.blockById(this.block.data.inputId.id);
   }
 
-  get outputId(): string | null {
-    return this.block.data.outputId.id;
+  get inputDriven(): boolean {
+    return this.inputBlock !== null
+      && this.sparkModule
+        .drivenChains
+        .some((chain: string[]) => chain[0] === this.inputBlock!.id);
   }
 
-  get hasInputBlock(): boolean {
-    return !!this.inputId
-      && sparkStore
-        .blockIds(this.serviceId)
-        .includes(this.inputId);
+  get outputBlock(): Block | null {
+    return this.sparkModule.blockById(this.block.data.outputId.id);
   }
 
-  get hasOutputBlock(): boolean {
-    return !!this.outputId
-      && sparkStore
-        .blockIds(this.serviceId)
-        .includes(this.outputId);
+  get kp(): number | null {
+    return this.block.data.kp.value;
+  }
+
+  fit(v: number): number {
+    return Math.min(v, 100);
   }
 
   enable(): void {
@@ -46,87 +44,144 @@ export default class PidBasic extends BlockCrudComponent {
   }
 
   showInput(): void {
-    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.inputId));
+    createBlockDialog(this.inputBlock);
+  }
+
+  editInput(): void {
+    if (!this.inputBlock) return;
+
+    const id = this.inputBlock.id;
+
+    if (this.sparkModule.drivenBlocks.includes(id)) {
+      const driveChain = this.sparkModule
+        .drivenChains
+        .find(chain => chain[0] === this.inputBlock?.id);
+
+      const actual = driveChain !== undefined
+        ? this.sparkModule.blockById(driveChain[driveChain.length - 1])
+        : this.inputBlock;
+
+      this.showOtherBlock(actual);
+    }
+    else {
+      createDialog({
+        component: 'UnitDialog',
+        title: 'Edit setting',
+        message: `Edit ${id} setting`,
+        parent: this,
+        value: this.inputBlock.data.storedSetting,
+        label: 'Setting',
+      })
+        .onOk(value => {
+          if (this.inputBlock) {
+            this.inputBlock.data.storedSetting = value;
+            this.saveStoreBlock(this.inputBlock);
+          }
+        });
+    }
   }
 
   showOutput(): void {
-    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.outputId));
+    createBlockDialog(this.outputBlock);
   }
 }
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md q-mx-auto">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item :clickable="hasInputBlock" @click="showInput">
-        <q-tooltip v-if="hasInputBlock">
-          Edit {{ inputId }}
-        </q-tooltip>
-        <q-item-section side class="col-3">
-          <div class="text-weight-light text-subtitle2 q-mb-xs">
-            Input
-          </div>
-        </q-item-section>
-        <q-item-section>
-          <UnitField :value="block.data.inputSetting" label="Target" tag="big" readonly />
-        </q-item-section>
-        <q-item-section>
-          <UnitField :value="block.data.inputValue" label="Measured" tag="big" readonly />
-        </q-item-section>
-        <q-item-section side>
-          <q-icon :name="hasInputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
-        </q-item-section>
-      </q-item>
+    <div class="widget-body row justify-center">
+      <SettingValueField editable class="col-grow" @click="editInput">
+        <template #header>
+          Input
+        </template>
+        <template #valueIcon>
+          <q-icon name="mdi-thermometer" color="green-3" />
+        </template>
+        <template #value>
+          {{ block.data.inputValue | unit }}
+        </template>
+        <template #setting>
+          {{ block.data.inputSetting | unit }}
+        </template>
+      </SettingValueField>
+      <SettingValueField editable class="col-grow" @click="showOutput">
+        <template #header>
+          Output
+        </template>
+        <template #valueIcon>
+          <q-icon
+            v-if="kp === null"
+            name="mdi-calculator-variant"
+          />
+          <HeatingIcon
+            v-else-if="kp > 0"
+            color="red"
+            :svg-props="{'stroke-width': '2px'}"
+          />
+          <CoolingIcon
+            v-else-if="kp < 0"
+            color="dodgerblue"
+            :svg-props="{'stroke-width': '2px'}"
+          />
+        </template>
+        <template #value>
+          {{ block.data.outputValue | round }} %
+        </template>
+        <template #setting>
+          {{ block.data.outputSetting | round }} %
+        </template>
+      </SettingValueField>
 
-      <q-separator inset />
+      <div class="col-break" />
 
-      <q-item :clickable="hasOutputBlock" @click="showOutput">
-        <q-tooltip v-if="hasOutputBlock">
-          Edit {{ outputId }}
-        </q-tooltip>
-        <q-item-section side class="col-3">
-          <div class="text-weight-light text-subtitle2 q-mb-xs">
-            Output
-          </div>
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.outputSetting" number label="Target" tag="big" />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.outputValue" number label="Measured" tag="big" />
-        </q-item-section>
-        <q-item-section side>
-          <q-icon :name="hasOutputBlock ? 'mdi-pencil' : 'mdi-pencil-off'" />
-        </q-item-section>
-      </q-item>
+      <div class="col row no-wrap q-gutter-x-sm q-mr-md">
+        <div class="col-auto self-center text-bold">
+          P
+        </div>
+        <q-slider
+          :value="fit(block.data.p)"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
 
-      <q-separator inset />
+        <div class="col-auto self-center text-bold">
+          I
+        </div>
+        <q-slider
+          :value="fit(block.data.i)"
+          :max="100"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
 
-      <q-item>
-        <q-item-section side class="col-3">
-          <div class="text-weight-light text-subtitle2 q-my-xs">
-            Result
-          </div>
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.p" label="P" number />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.i" label="I" number />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.d" label="D" number />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+        <div class="col-auto self-center text-bold">
+          D
+        </div>
+        <q-slider
+          :value="fit(block.data.d)"
+          :max="100"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
+
+        <div
+          v-if="!!block.data.boilMinOutput"
+          :class="[
+            'col-auto self-center text-bold',
+            `text-${block.data.boilModeActive
+              ? 'deep-orange'
+              : 'grey'
+            }`,
+          ]"
+        >
+          boil
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
-
-<style lang="stylus" scoped>
-.q-card__section .q-separator {
-  opacity: 0.2;
-}
-</style>

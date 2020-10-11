@@ -1,7 +1,6 @@
 import forEach from 'lodash/forEach';
 import parseDuration from 'parse-duration';
 
-import { nanoToMilli } from '@/helpers/functional';
 import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
@@ -43,7 +42,7 @@ const transformer =
   (source: GraphSource, result: QueryResult): GraphSource => {
     if (result.values && result.values.length > 0) {
       const resultCols = transpose(result.values);
-      const time = resultCols[0].map(nanoToMilli);
+      const time = resultCols[0];
       source.usedPolicy = result.policy;
 
       result

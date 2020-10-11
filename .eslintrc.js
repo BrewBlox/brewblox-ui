@@ -1,6 +1,6 @@
 module.exports = {
   'root': true,
-  'parser': 'vue-eslint-parser',
+  // 'parser': 'vue-eslint-parser',
   'parserOptions': {
     'ecmaVersion': 2018,
     'sourceType': 'module',
@@ -9,9 +9,10 @@ module.exports = {
   'extends': [
     'plugin:vue/recommended',
     'plugin:@typescript-eslint/recommended',
-    '@vue/typescript'
+    '@vue/typescript',
+    'plugin:quasar/standard',
   ],
-  'plugins': ['simple-import-sort'],
+  'plugins': ['simple-import-sort', 'quasar'],
   'rules': {
     'quotes': ['error', 'single', { 'avoidEscape': true }],
     'class-methods-use-this': 0,
@@ -27,29 +28,6 @@ module.exports = {
     'no-param-reassign': 0,
     'no-console': 'warn',
     'no-multiple-empty-lines': 'error',
-    'vue/max-attributes-per-line': ['warn', {
-      'order': [
-        'DEFINITION',
-        'LIST_RENDERING',
-        'CONDITIONALS',
-        'RENDER_MODIFIERS',
-        'GLOBAL',
-        'UNIQUE',
-        'TWO_WAY_BINDING',
-        'OTHER_DIRECTIVES',
-        'OTHER_ATTR',
-        'EVENTS',
-        'CONTENT'
-      ]
-    }],
-    "vue/max-attributes-per-line": ["warn", {
-      "singleline": 8,
-      "multiline": {
-        "max": 1,
-        "allowFirstLine": false
-      }
-    }],
-    'vue/html-self-closing': 0,
     'comma-dangle': [
       'error',
       'always-multiline'
@@ -67,15 +45,34 @@ module.exports = {
     '@typescript-eslint/indent': 0,
     '@typescript-eslint/no-explicit-any': 0,
     '@typescript-eslint/no-non-null-assertion': 0,
+    '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/explicit-function-return-type': ['warn', {
       allowExpressions: true,
       allowTypedFunctionExpressions: true,
       allowHigherOrderFunctions: true,
     }],
-    // temporary disabled because of incompatibility issues between vue-eslint-plugin and eslint 6:
-    // see https://github.com/vuejs/eslint-plugin-vue/issues/944
-    'vue-require-component-is': 0,
-    '@typescript-eslint/no-empty-function': 0,
-    'vue/no-v-html': 0
-  }
+    'quasar/check-valid-props': 'warn',
+    'vue/no-v-html': 0,
+    'vue/max-attributes-per-line': ['warn', {
+      'singleline': 8,
+      'multiline': {
+        'max': 1,
+        'allowFirstLine': false
+      },
+    }]
+  },
+  'overrides': [
+    {
+      'files': ['*.js'],
+      'rules': {
+        '@typescript-eslint/no-var-requires': 'off',
+      }
+    },
+    {
+      'files': ['dev/**.js'],
+      'rules': {
+        'no-console': 'off',
+      }
+    }
+  ]
 }

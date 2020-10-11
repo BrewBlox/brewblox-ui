@@ -49,8 +49,8 @@ export default class GridContainer extends Vue {
               editable: this.editable,
             },
             on: {
-              'size': this.updateItemSize,
-              'position': this.updateItemPosition,
+              size: this.updateItemSize,
+              position: this.updateItemPosition,
             },
           },
           [slot], // The actual widget
@@ -65,7 +65,16 @@ export default class GridContainer extends Vue {
 
   render(h: CreateElement): VNode {
     return h('div',
-      { class: 'grid-container grid-main-container' },
+      {
+        class: 'grid-container grid-main-container',
+        on: {
+          dblclick: evt => {
+            if (evt.target === evt.currentTarget) {
+              this.$emit('dblclick');
+            }
+          },
+        },
+      },
       this.renderWidgets(h)
     );
   }
@@ -86,6 +95,8 @@ export default class GridContainer extends Vue {
   grid-auto-columns: 100px;
   grid-auto-rows: 100px;
   justify-content: center;
+  padding-bottom: 50%;
+  min-height: 100%;
 }
 
 .grid-container-overlay {

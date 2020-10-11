@@ -1,9 +1,10 @@
 import mapKeys from 'lodash/mapKeys';
 import queryString from 'query-string';
 
-import { generate } from '@/helpers/database-api';
-import { get, post, sse } from '@/helpers/fetch';
 import { snakeCased } from '@/helpers/functional';
+import http from '@/helpers/http';
+import { sse } from '@/helpers/sse';
+import { createApi } from '@/plugins/database/api';
 
 import { LoggedSession, QueryParams, QueryResult, QueryTarget } from '../types';
 
@@ -31,6 +32,7 @@ export const historyApi = {
       sse(`/history/sse/values?${queryString.stringify({
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
+        epoch: 'ms',
       })}`),
 
   subscribeMetrics:
@@ -38,24 +40,28 @@ export const historyApi = {
       sse(`/history/sse/last_values?${queryString.stringify({
         ...snakeCasedObj(params),
         ...snakeCasedObj(target),
+        epoch: 'ms',
       })}`),
 
   fetchKnownKeys:
     async (): Promise<Mapped<any>> =>
-      post('/history/query/objects', {}),
+      http.post<Mapped<any>>('/history/query/objects', {})
+        .then(resp => resp.data),
 
   fetchValues:
-    async (params: QueryParams, target: QueryTarget): Promise<QueryResult> =>
-      post('/history/query/values', {
+    async (params: QueryParams, target: QueryTarget, epoch: string): Promise<QueryResult> =>
+      http.post<QueryResult>('/history/query/values', {
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
-      }),
+        epoch,
+      })
+        .then(resp => resp.data),
 
   validateService:
     async (): Promise<boolean> =>
-      get('/history/_service/status')
-        .then(retv => retv.status === 'ok')
+      http.get<{ status: string }>('/history/_service/status')
+        .then(resp => resp.data.status === 'ok')
         .catch(() => false),
 };
 
-export const sessionApi = generate<LoggedSession>('logged-sessions');
+export const sessionApi = createApi<LoggedSession>('logged-sessions');

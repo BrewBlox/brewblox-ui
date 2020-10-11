@@ -1,20 +1,25 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { convertedTemp, Unit } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
+import { Temp } from '@/plugins/spark/units';
 
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions } from '../helpers';
-import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { GlycolConfig, GlycolOpts } from './types';
 
 @Component
 export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
-  beerSetting = new Unit(20, 'degC');
-  glycolSetting = new Unit(4, 'degC');
+  beerSetting = new Temp(20, 'degC');
+  glycolSetting = new Temp(4, 'degC');
 
+  created(): void {
+    const { Temp } = sparkStore.moduleById(this.config.serviceId)!.units;
+    this.beerSetting = this.beerSetting.convert(Temp);
+    this.glycolSetting = this.glycolSetting.convert(Temp);
+  }
 
   done(): void {
     const opts: GlycolOpts = { beerSetting: this.beerSetting, glycolSetting: this.glycolSetting };
@@ -22,6 +27,7 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
+    const displayedBlocks = defineDisplayedBlocks(this.config);
 
     this.pushActions(createOutputActions());
     this.updateConfig({
@@ -30,20 +36,15 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
       widgets,
       changedBlocks,
       createdBlocks,
+      displayedBlocks,
     });
     this.next();
-  }
-
-  created(): void {
-    const unit = sparkStore.units(this.config.serviceId).Temp;
-    this.beerSetting = convertedTemp(20, unit);
-    this.glycolSetting = convertedTemp(4, unit);
   }
 }
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -78,12 +79,10 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn unelevated label="Done" color="primary" @click="done" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

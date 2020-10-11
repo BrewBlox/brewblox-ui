@@ -1,28 +1,33 @@
-import get from 'lodash/get';
+import defaults from 'lodash/defaults';
+import range from 'lodash/range';
+import { uid } from 'quasar';
 
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
-import { createDialog, showBlockDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { mutate } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
 import { dashboardStore } from '@/store/dashboards';
 
-import { SQUARE_SIZE } from './getters';
+import { CENTER, deprecatedTypes, SQUARE_SIZE } from './getters';
 import { builderStore } from './store';
-import { FlowPart, LinkedBlock, PersistentPart, Rect, StatePart, Transitions } from './types';
+import { FlowPart, PersistentPart, Rect, StatePart, Transitions } from './types';
 
-export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
-  const serviceId = get(part.settings, [key, 'serviceId'], null);
-  const blockId = get(part.settings, [key, 'blockId'], null);
-  return serviceId && blockId
-    ? sparkStore.tryBlockById(serviceId, blockId) as T | null
-    : null;
+export function settingsAddress(part: PersistentPart, key: string): BlockAddress {
+  const obj: any = part.settings[key] ?? {};
+  return {
+    // Older objects use 'blockId' as key
+    id: obj.id ?? obj.blockId ?? null,
+    serviceId: obj.serviceId ?? null,
+    type: obj.type ?? null,
+  };
 }
 
-export function settingsLink(part: PersistentPart, key: string): LinkedBlock {
-  const serviceId = get(part.settings, [key, 'serviceId'], null);
-  const blockId = get(part.settings, [key, 'blockId'], null);
-  return { serviceId, blockId };
-};
+export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
+  const addr = settingsAddress(part, key);
+  return sparkStore.blockById(addr.serviceId, addr.id);
+}
 
 export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPart {
   /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -148,19 +153,40 @@ export function elbow(dX: number, dY: number, horizontal: boolean): string {
   return `c${dx1},${dy1} ${dx2},${dy2} ${dX},${dY}`;
 }
 
-export function showLinkedBlockDialog(part: PersistentPart, key: string): void {
-  const block = settingsBlock(part, key);
-  if (block) {
-    showBlockDialog(block, { mode: 'Basic' });
+export function showAbsentBlock(part: PersistentPart, key: string): void {
+  const addr = settingsAddress(part, key);
+  if (!!addr.serviceId && !!addr.id) {
+    createDialog({
+      title: 'Broken Link',
+      message: `Block '${addr.id}' was not found. Use the editor to change the link.`,
+    });
   }
-  else {
-    const link = settingsLink(part, key);
-    if (!!link.serviceId && !!link.blockId) {
-      createDialog({
-        title: 'Broken Link',
-        message: `Block '${link.blockId}' was not found. Use the editor to change the link.`,
-      });
-    }
+}
+
+export function showSettingsBlock(part: PersistentPart, key: string): void {
+  const block = settingsBlock(part, key);
+  block !== null
+    ? createBlockDialog(block, { mode: 'Basic' })
+    : showAbsentBlock(part, key);
+}
+
+export function showDrivingBlockDialog(part: PersistentPart, key: string): void {
+  const block = settingsBlock(part, key);
+
+  if (!block) {
+    return showAbsentBlock(part, key);
+  }
+
+  const driveChain = sparkStore.moduleById(block.serviceId)
+    ?.drivenChains
+    .find(chain => chain[0] === block.id);
+
+  const actual = driveChain !== undefined
+    ? sparkStore.blockById(block.serviceId, driveChain[driveChain.length - 1])
+    : block;
+
+  if (actual) {
+    createBlockDialog(actual, { mode: 'Basic' });
   }
 }
 
@@ -189,4 +215,42 @@ export function rectContains(rect: Rect, x: number, y: number): boolean {
     && x <= rect.right
     && y >= rect.top
     && y <= rect.bottom;
+}
+
+export function universalTransitions(size: [number, number], enabled: boolean): Transitions {
+  if (!enabled) {
+    return {};
+  }
+  const [sizeX, sizeY] = size;
+  const coords: string[] = [
+    range(sizeX).map(x => [`${x + 0.5},0,0`, `${x + 0.5},${sizeY},0`]),
+    range(sizeY).map(y => [`0,${y + 0.5},0`, `${sizeX},${y + 0.5},0`]),
+  ]
+    .flat(2);
+  return coords
+    .reduce(
+      (acc, coord) => mutate(acc, coord, [{ outCoords: CENTER, internal: true, friction: 0.5 }]),
+      { [CENTER]: coords.map(outCoords => ({ outCoords, friction: 0.5 })) });
+}
+
+export function vivifyParts(parts: PersistentPart[]): PersistentPart[] {
+  const sizes: Mapped<number> = {};
+  return parts
+    .map(storePart => {
+      const part: PersistentPart = { ...storePart };
+      defaults(part, {
+        rotate: 0,
+        settings: {},
+        flipped: false,
+      });
+      part.id = part.id ?? uid();
+      part.type = deprecatedTypes[part.type] ?? part.type;
+
+      const [sizeX, sizeY] = builderStore.spec(part).size(part);
+      sizes[part.id] = sizeX * sizeY;
+      return part;
+    })
+    // Sort parts to render largest first
+    // This improves clickability of overlapping parts
+    .sort((a, b) => sizes[b.id] - sizes[a.id]);
 }

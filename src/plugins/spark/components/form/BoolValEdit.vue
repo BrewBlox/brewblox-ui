@@ -9,5 +9,5 @@ export default class BoolValEdit extends ValEditBase { }
 </script>
 
 <template>
-  <q-toggle v-model="field" :disable="!editable" />
+  <q-toggle v-model="field" />
 </template>

@@ -18,7 +18,7 @@ export default class HermsMutexTask extends WizardTaskBase<HermsConfig> {
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -44,12 +44,10 @@ export default class HermsMutexTask extends WizardTaskBase<HermsConfig> {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn unelevated label="Next" color="primary" @click="done" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

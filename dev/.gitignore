@@ -2,4 +2,5 @@ influxdb/
 couchdb/
 dist/*
 !dist/.gitkeep
-traefik/brewblox.*
+traefik/brewblox.crt
+traefik/brewblox.key
