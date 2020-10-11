@@ -1,5 +1,7 @@
 import Vue from 'vue';
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
+
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
 @Component
 export default class ValEditBase extends Vue {
@@ -21,9 +23,16 @@ export default class ValEditBase extends Vue {
   @Prop({ required: true })
   public readonly value!: any;
 
-  @Emit('input')
-  public saveField(val: any): any {
-    return val;
+  public saveField(val: any): void {
+    this.$emit('input', val);
+  }
+
+  public startEdit(): void {
+    this.$emit('edit');
+  }
+
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   public get field(): any {

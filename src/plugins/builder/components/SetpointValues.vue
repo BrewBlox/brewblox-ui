@@ -2,17 +2,16 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { contrastColor } from '@/helpers/functional';
-import { SetpointSensorPairBlock } from '@/plugins/spark/features/SetpointSensorPair/types';
-import { sparkStore } from '@/plugins/spark/store';
+import { contrastColor, typeMatchFilter } from '@/helpers/functional';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { BlockAddress, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
-import { blockTypes } from '../../spark/block-types';
-import { SQUARE_SIZE } from '../getters';
-import { settingsBlock, settingsLink } from '../helpers';
+import { settingsAddress, squares } from '../helpers';
 import { PersistentPart } from '../types';
 
 @Component
 export default class SetpointValues extends Vue {
+  squares = squares;
 
   @Prop({ type: Object, required: true })
   public readonly part!: PersistentPart;
@@ -38,31 +37,37 @@ export default class SetpointValues extends Vue {
       : 'white';
   }
 
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.settingsKey);
+  }
+
+  get sparkModule(): SparkServiceModule | null {
+    return sparkStore.moduleById(this.address.serviceId);
+  }
+
   get block(): SetpointSensorPairBlock | null {
-    return settingsBlock(this.part, this.settingsKey);
+    return this.sparkModule?.blockById(this.address.id) ?? null;
+  }
+
+  get isBroken(): boolean {
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get isUsed(): boolean {
     return !!this.block
       && this.block.data.settingEnabled
-      && sparkStore.blockValues(this.block.serviceId)
-        .some(block =>
-          block.type === blockTypes.Pid
-          && block.data.inputId.id === (this.block as SetpointSensorPairBlock).id);
+      && this.sparkModule!
+        .blocks
+        .filter(typeMatchFilter<PidBlock>('Pid'))
+        .some(block => block.data.inputId.id === this.block!.id);
   }
 
   get isDriven(): boolean {
     return !!this.block
-      && sparkStore.drivenChains(this.block.serviceId)
-        .some(chain => chain[0] === (this.block as SetpointSensorPairBlock).id);
-  }
-
-  get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, this.settingsKey);
-    return !!link.serviceId && !!link.blockId;
+      && this.sparkModule!
+        .drivenBlocks
+        .includes(this.block.id);
   }
 
   get setpointSetting(): number | null {
@@ -82,27 +87,40 @@ export default class SetpointValues extends Vue {
       ? this.block.data.storedSetting.notation
       : '';
   }
-
-  public squares(val: number): number {
-    return SQUARE_SIZE * val;
-  }
 }
 </script>
 
 <template>
   <g v-if="block || !hideUnset" :transform="`translate(${squares(startX)}, ${squares(startY)})`">
-    <foreignObject :width="squares(2)" :height="squares(1)">
-      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
-      <div v-else :class="[`text-${textColor}`, 'text-bold', 'q-ml-md', 'q-mt-xs']">
-        <q-icon name="mdi-thermometer" class="q-mr-sm" />
-        {{ setpointValue | round(1) }}
-        <small>{{ setpointUnit }}</small>
-        <br />
-        <q-icon :name="isDriven ? 'mdi-swap-vertical-bold' : 'mdi-bullseye-arrow'" class="q-mr-sm" />
-        {{ setpointSetting | round(1) }}
-        <small>{{ setpointUnit }}</small>
+    <SvgEmbedded :width="squares(2)" :height="squares(1)">
+      <BrokenIcon v-if="isBroken" />
+      <UnlinkedIcon v-else-if="!block" />
+      <div v-else class="col column q-ma-xs">
+        <div class="col row q-gutter-x-xs">
+          <q-icon
+            name="mdi-thermometer"
+            size="20px"
+            class="static col-auto"
+          />
+          <q-space />
+          <div class="col-auto text-bold">
+            {{ setpointValue | round(1) }}
+            <small>{{ setpointUnit }}</small>
+          </div>
+        </div>
+        <div class="col row q-gutter-x-xs">
+          <q-icon
+            :name="isDriven ? 'mdi-swap-vertical-bold' : 'mdi-bullseye-arrow'"
+            size="20px"
+            class="static col-auto"
+          />
+          <q-space />
+          <div class="col-auto text-bold">
+            {{ setpointSetting | round(1) }}
+            <small>{{ setpointUnit }}</small>
+          </div>
+        </div>
       </div>
-    </foreignObject>
+    </SvgEmbedded>
   </g>
 </template>

@@ -2,8 +2,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { providerStore } from '@/store/providers';
-import { serviceStore } from '@/store/services';
+import { featureStore } from '@/store/features';
+import { Service, serviceStore } from '@/store/services';
 
 
 @Component
@@ -12,29 +12,30 @@ export default class ServicePage extends Vue {
     return this.$route.params.id;
   }
 
-  get serviceValid(): boolean {
-    return serviceStore.serviceExists(this.serviceId);
+  get service(): Service | null {
+    return serviceStore.serviceById(this.serviceId);
   }
 
   get pageComponent(): string | null {
-    try {
-      const service = serviceStore.serviceById(this.serviceId);
-      return providerStore.pageById(service.type) || null;
-    } catch (e) {
-      return null;
-    }
+    return this.service !== null
+      ? featureStore.serviceById(this.service.type)?.page ?? null
+      : null;
   }
 }
 </script>
 
 <template>
-  <q-page padding>
-    <component :is="pageComponent" v-if="serviceValid && pageComponent" :service-id="serviceId" />
-    <div v-else-if="serviceValid" class="flex flex-center">
-      Invalid service page: {{ serviceId }}
+  <component
+    :is="pageComponent"
+    v-if="pageComponent !== null"
+    :service-id="serviceId"
+  />
+  <q-page v-else class="text-h5 darkened">
+    <div v-if="service !== null" class="absolute-center">
+      Invalid service page for '{{ serviceId }}'
     </div>
-    <p v-else>
-      Service {{ serviceId }} not found.
-    </p>
+    <div v-else class="absolute-center">
+      Service '{{ serviceId }}' not found.
+    </div>
   </q-page>
 </template>

@@ -25,37 +25,53 @@ export default class WidgetToolbar extends CrudComponent {
   public toggle(): void {
     this.$emit('update:mode', this.mode === 'Basic' ? 'Full' : 'Basic');
   }
+
+  public onTitleClick(): void {
+    if (this.$listeners['title-click'] !== undefined) {
+      this.$emit('title-click');
+    }
+    else {
+      this.startChangeWidgetTitle();
+    }
+  }
 }
 </script>
 
 <template>
-  <Toolbar :title="widget.title" :subtitle="displayName">
+  <Toolbar
+    :title="widget.title"
+    :subtitle="featureTitle"
+    @title-click="onTitleClick"
+  >
     <slot />
-    <q-item-section side>
-    </q-item-section>
     <template #buttons>
-      <slot name="buttons">
-        <q-btn v-if="!!mode" flat :icon="toggleIcon" @click="toggle">
-          <q-tooltip>
-            {{ toggleTooltip }}
-          </q-tooltip>
-        </q-btn>
-        <q-btn flat icon="mdi-launch" color="white" @click="showDialog">
-          <q-tooltip>
-            Show in dialog
-          </q-tooltip>
-        </q-btn>
-        <ActionMenu>
-          <template #actions>
-            <slot name="actions" />
-          </template>
-          <template #menus>
-            <slot name="menus">
-              <WidgetActions :crud="crud" />
-            </slot>
-          </template>
-        </ActionMenu>
-      </slot>
+      <q-btn
+        v-if="!!mode"
+        flat
+        dense
+        round
+        :icon="toggleIcon"
+        @click="toggle"
+      >
+        <q-tooltip>
+          {{ toggleTooltip }}
+        </q-tooltip>
+      </q-btn>
+      <q-btn flat icon="mdi-launch" dense round @click="showDialog">
+        <q-tooltip>
+          Show in dialog
+        </q-tooltip>
+      </q-btn>
+      <ActionMenu dense round>
+        <template #actions>
+          <slot name="actions" />
+        </template>
+        <template #menus>
+          <slot name="menus">
+            <WidgetActions :crud="crud" />
+          </slot>
+        </template>
+      </ActionMenu>
     </template>
   </Toolbar>
 </template>

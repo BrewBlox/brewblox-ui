@@ -1,4 +1,5 @@
 <script lang="ts">
+import defaults from 'lodash/defaults';
 import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
@@ -12,35 +13,18 @@ export default class MetricsFull extends CrudComponent<MetricsConfig> {
   public readonly inDialog!: boolean;
 
   get config(): MetricsConfig {
-    return {
+    return defaults(this.widget.config, {
       targets: [],
       renames: {},
       params: {},
       freshDuration: {},
       decimals: {},
-      ...this.widget.config,
-    };
+    });
   }
 
 }
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
-    <slot name="warnings" />
-
-    <div :class="{'col-grow': true, 'scroll-parent': inDialog}">
-      <component :is="inDialog ? 'q-scroll-area' : 'div'">
-        <MetricsEditor :config="config" @update:config="saveConfig" />
-      </component>
-    </div>
-  </q-card>
+  <MetricsEditor :config="config" class="widget-md" @update:config="saveConfig" />
 </template>
-
-<style scoped>
-.scroll-parent {
-  height: 500px;
-  max-height: 60vh;
-}
-</style>

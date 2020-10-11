@@ -3,9 +3,14 @@ import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
-import { constraintLabels } from '@/plugins/spark/helpers';
-import { ConstraintsObj } from '@/plugins/spark/types';
+import { analogConstraintLabels, digitalConstraintLabels } from '@/plugins/spark/getters';
+import { prettifyConstraints } from '@/plugins/spark/helpers';
+import type { AnalogConstraint, AnyConstraintsObj, DigitalConstraint } from '@/plugins/spark/types';
 
+const constraintLabels = {
+  ...digitalConstraintLabels,
+  ...analogConstraintLabels,
+};
 
 @Component
 export default class ConstraintsField extends FieldBase {
@@ -14,16 +19,16 @@ export default class ConstraintsField extends FieldBase {
   public readonly title!: string;
 
   @Prop({ type: Object, default: () => ({ constraints: [] }) })
-  protected readonly value!: ConstraintsObj;
+  protected readonly value!: AnyConstraintsObj;
 
   @Prop({ type: String, required: true })
   protected readonly serviceId!: string;
 
   @Prop({ type: String, required: true, validator: v => ['analog', 'digital'].includes(v) })
-  public readonly type!: string;
+  public readonly type!: 'analog' | 'digital';
 
   @Emit('input')
-  public change(v: ConstraintsObj): ConstraintsObj {
+  public change(v: AnyConstraintsObj): AnyConstraintsObj {
     return v;
   }
 
@@ -32,13 +37,31 @@ export default class ConstraintsField extends FieldBase {
   }
 
   get limiters(): string[] {
-    const names: string[] = [];
-    for (const constraint of this.value.constraints) {
-      if (constraint.limiting) {
-        names.push(Object.keys(constraint).find(k => k !== 'limiting') || 'Unknown');
-      }
+    if (this.type === 'analog') {
+      return (this.value.constraints as AnalogConstraint[])
+        .filter(c => c.limiting)
+        .map(c => Object.keys(c).find(k => k !== 'limiting') ?? 'Unknown')
+        .map(k => constraintLabels[k] ?? k);
     }
-    return names.map(k => constraintLabels.get(k) || k);
+    else {
+      return (this.value.constraints as DigitalConstraint[])
+        .filter(c => c.remaining.value)
+        .map(c => {
+          const key = Object.keys(c).find(k => k !== 'remaining') ?? 'Unknown';
+          const label = constraintLabels[key] ?? key;
+          return `${label} (${c.remaining})`;
+        });
+    }
+  }
+
+  get textColor(): string {
+    if (this.limiters.length > 0) { return 'text-pink-4'; }
+    if (this.numConstraints > 0) { return 'text-indigo-4'; }
+    return 'darkish';
+  }
+
+  get displayString(): string {
+    return prettifyConstraints(this.value);
   }
 
   openDialog(): void {
@@ -57,21 +80,22 @@ export default class ConstraintsField extends FieldBase {
 </script>
 
 <template>
-  <q-list>
-    <q-item clickable style="padding: 5px 0; min-height: 0" @click="openDialog">
-      <q-tooltip>Edit constraints</q-tooltip>
-      <q-item-section class="col-auto darkish">
+  <q-list class="clickable">
+    <div :class="['q-pa-sm q-gutter-x-sm row', textColor]" @click="openDialog">
+      <q-icon name="mdi-border-outside" class="col-auto" size="sm" />
+      <div class="col-auto">
         <small v-if="limiters.length">
           Limited by:
           <i>{{ limiters.join(', ') }}</i>
         </small>
-        <small v-else-if="numConstraints > 0">{{ numConstraints }} constraint(s), not limited</small>
-        <small v-else>No constraints configured</small>
-      </q-item-section>
-      <q-space />
-      <q-item-section side>
-        <q-icon name="edit" />
-      </q-item-section>
-    </q-item>
+        <small v-else-if="numConstraints > 0">
+          {{ numConstraints }} constraint(s), not limited</small>
+        <small v-else>
+          No constraints configured</small>
+      </div>
+    </div>
+    <q-tooltip v-if="numConstraints > 0">
+      {{ displayString }}
+    </q-tooltip>
   </q-list>
 </template>

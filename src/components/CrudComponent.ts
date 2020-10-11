@@ -3,8 +3,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { deepCopy } from '@/helpers/units/parseObject';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import notify from '@/helpers/notify';
+import { deepCopy } from '@/plugins/spark/parse-object';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetMode } from '@/store/features';
 
 export interface DialogOpts {
@@ -20,7 +21,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   @Prop({ type: Object, required: true })
   public readonly crud!: Crud<ConfigT>;
 
-  public get widget(): PersistentWidget<ConfigT> {
+  public get widget(): Widget<ConfigT> {
     return this.crud.widget;
   }
 
@@ -32,8 +33,8 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     return this.crud.isStoreWidget;
   }
 
-  public get displayName(): string {
-    return featureStore.displayName(this.widget.feature);
+  public get featureTitle(): string {
+    return featureStore.widgetTitle(this.widget.feature) ?? this.widget.feature;
   }
 
   public showDialog(opts: DialogOpts = {}): void {
@@ -56,7 +57,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     this.crud.closeDialog();
   }
 
-  public async saveWidget(widget: PersistentWidget<ConfigT> = this.widget): Promise<void> {
+  public async saveWidget(widget: Widget<ConfigT> = this.widget): Promise<void> {
     await this.crud.saveWidget(widget);
   }
 
@@ -68,13 +69,11 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     const widgetTitle = this.widget.title;
     createDialog({
       parent: this,
-      title: 'Change Widget name',
+      component: 'InputDialog',
+      title: 'Change widget name',
       message: `Choose a new name for '${widgetTitle}'`,
-      cancel: true,
-      prompt: {
-        model: widgetTitle,
-        type: 'text',
-      },
+      value: widgetTitle,
+      clearable: false,
     })
       .onOk(title => this.saveWidget({ ...this.widget, title }));
   }
@@ -88,8 +87,8 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       style: 'overflow-y: scroll',
       options: {
         type: 'radio',
-        model: undefined,
-        items: dashboardStore.dashboardValues
+        model: '',
+        items: dashboardStore.dashboards
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
       cancel: true,
@@ -98,12 +97,8 @@ export default class CrudComponent<ConfigT = any> extends Vue {
         if (!dashboard) {
           return;
         }
-        dashboardStore.appendPersistentWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'file_copy',
-          message: `Copied ${this.widget.title} to ${dashboardStore.dashboardById(dashboard).title}`,
-        });
+        dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+        notify.done(`Copied ${this.widget.title} to ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
 
@@ -115,8 +110,8 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       style: 'overflow-y: scroll',
       options: {
         type: 'radio',
-        model: undefined,
-        items: dashboardStore.dashboardValues
+        model: '',
+        items: dashboardStore.dashboards
           .filter(dashboard => dashboard.id !== this.widget.dashboard)
           .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
       },
@@ -127,26 +122,22 @@ export default class CrudComponent<ConfigT = any> extends Vue {
   }
 
   public startRemoveWidget(): void {
-    const deleteItem = async (): Promise<void> => {
-      await dashboardStore.removePersistentWidget(this.widget);
-      this.closeDialog();
-    };
-
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
     const opts = [
       {
         label: 'Remove widget from this dashboard',
-        action: deleteItem,
+        action: () => dashboardStore.removeWidget(this.widget),
       },
-      ...featureStore.deleters(this.widget.feature)
-        .map(del => ({ label: del.description, action: del.action })),
-    ].map((opt, idx) => ({ ...opt, value: idx }));
+      ...featureStore.widgetRemoveActions(this.widget.feature)
+        .map(opt => ({ label: opt.description, action: opt.action })),
+    ]
+      .map((opt, idx) => ({ ...opt, value: idx }));
 
     createDialog({
       parent: this,
-      title: 'Delete widget',
-      message: `How do you want to delete widget ${this.widget.title}?`,
+      title: 'Remove widget',
+      message: `How do you want to remove widget ${this.widget.title}?`,
       options: {
         type: 'checkbox',
         model: [0], // pre-check the default action
@@ -156,6 +147,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     })
       .onOk((selected: number[]) => {
         selected.forEach(idx => opts[idx].action(this.crud));
+        this.closeDialog();
       });
   }
 }

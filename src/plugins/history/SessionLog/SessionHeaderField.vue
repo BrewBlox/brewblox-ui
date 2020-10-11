@@ -38,7 +38,10 @@ export default class SessionHeaderField extends Vue {
 </script>
 
 <template>
-  <div class="row text-grey-2 q-px-md q-my-xs items-baseline hoverable" @click="showDialog">
+  <div
+    class="row text-grey-2 q-pa-sm items-baseline clickable rounded-borders"
+    @click="showDialog"
+  >
     <q-tooltip
       v-if="tags.length > 0"
       content-style="background: transparent"
@@ -49,7 +52,6 @@ export default class SessionHeaderField extends Vue {
         <q-badge
           v-for="tag in tags"
           :key="`tag--${tag}`"
-          dense
           color="blue-grey-7"
         >
           <small>{{ tag }}</small>

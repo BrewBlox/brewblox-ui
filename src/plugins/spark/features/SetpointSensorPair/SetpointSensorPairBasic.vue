@@ -1,52 +1,55 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { SetpointSensorPairBlock } from '@/plugins/spark/types';
 
-import { SetpointSensorPairBlock } from './types';
 
 @Component
 export default class SetpointSensorPairBasic
   extends BlockCrudComponent<SetpointSensorPairBlock> {
+
+  editSetting(): void {
+    if (this.isDriven) { return; }
+    createDialog({
+      component: 'UnitDialog',
+      title: 'Setting',
+      label: 'Setting',
+      value: this.block.data.storedSetting,
+    })
+      .onOk(v => {
+        this.block.data.storedSetting = v;
+        this.saveBlock();
+      });
+  }
 }
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md q-mx-auto">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <UnitField
-            :class="{darkened: !block.data.settingEnabled}"
-            :value="block.data.storedSetting"
-            :readonly="isDriven"
-            title="Setting"
-            label="Setting"
-            tag="big"
-            class="self-start"
-            @input="v => {block.data.storedSetting = v; saveBlock()}"
-          />
-        </q-item-section>
-        <q-item-section>
-          <UnitField :value="block.data.value" label="Sensor" tag="big" readonly />
-        </q-item-section>
-        <q-item-section>
-          <UnitField
-            :value="block.data.valueUnfiltered"
-            label="Unfiltered sensor"
-            tag="big"
-            readonly
-          />
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+    <div class="widget-body row justify-center">
+      <SettingValueField :editable="!isDriven" class="col-auto" @click="editSetting">
+        <template #valueIcon>
+          <q-icon name="mdi-thermometer" color="green-3" />
+        </template>
+        <template #value>
+          {{ block.data.value | unit }}
+        </template>
+        <template #setting>
+          {{ block.data.storedSetting | unit }}
+        </template>
+      </SettingValueField>
+
+      <div class="col-break" />
+
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
+    </div>
+  </div>
 </template>

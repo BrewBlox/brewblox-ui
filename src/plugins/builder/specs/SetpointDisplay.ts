@@ -1,47 +1,50 @@
-import { Coordinates } from '@/helpers/coordinates';
-import { blockTypes } from '@/plugins/spark/block-types';
+import { BlockIntfType } from '@/plugins/spark/types';
 
-import { CENTER, DOWN, LEFT, RIGHT, UP } from '../getters';
-import { showLinkedBlockDialog } from '../helpers';
-import { PartSpec, PersistentPart } from '../types';
+import { showSettingsBlock, universalTransitions } from '../helpers';
+import { PartSpec } from '../types';
 
-
-const RIGHT_RIGHT = new Coordinates(RIGHT).translate([1, 0, 0]).toString();
-const RIGHT_UP = new Coordinates(UP).translate([1, 0, 0]).toString();
-const RIGHT_DOWN = new Coordinates(DOWN).translate([1, 0, 0]).toString();
 
 const SIZE_X = 2;
 const SIZE_Y = 1;
+const settingsKey = 'setpoint';
+const scaleKey = 'scale';
+const flowEnabledKey = 'flowEnabled';
+
+const size: PartSpec['size'] = ({ settings }) => {
+  const scale = settings[scaleKey] ?? 1;
+  return [SIZE_X * scale, SIZE_Y * scale];
+};
 
 const spec: PartSpec = {
   id: 'SetpointDisplay',
   title: 'Display: setpoint',
-  cards: [{
-    component: 'LinkedBlockCard',
-    props: {
-      settingsKey: 'setpoint',
-      types: [blockTypes.SetpointSensorPair],
-      label: 'Setpoint',
+  cards: [
+    {
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey,
+        compatible: [BlockIntfType.SetpointSensorPairInterface],
+        label: 'Setpoint',
+      },
     },
-  }],
-  size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'setpoint'),
-  transitions: () => ({
-    [UP]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-    [LEFT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-    [DOWN]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-    [RIGHT_RIGHT]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-    [RIGHT_UP]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-    [RIGHT_DOWN]: [{ outCoords: CENTER, internal: true, friction: 0.5 }],
-    [CENTER]: [
-      { outCoords: UP, friction: 0.5 },
-      { outCoords: LEFT, friction: 0.5 },
-      { outCoords: DOWN, friction: 0.5 },
-      { outCoords: RIGHT_RIGHT, friction: 0.5 },
-      { outCoords: RIGHT_UP, friction: 0.5 },
-      { outCoords: RIGHT_DOWN, friction: 0.5 },
-    ],
-  }),
+    {
+      component: 'ScaleCard',
+      props: {
+        settingsKey: scaleKey,
+        defaultSize: [SIZE_X, SIZE_Y],
+      },
+    },
+    {
+      component: 'ToggleCard',
+      props: {
+        settingsKey: flowEnabledKey,
+        label: 'Allow liquid to flow through this part',
+      },
+    },
+  ],
+  size,
+  transitions: part => universalTransitions(size(part), part.settings[flowEnabledKey]),
+  interactHandler: part => showSettingsBlock(part, settingsKey),
 };
 
 export default spec;

@@ -2,8 +2,8 @@
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { Block, BlockType } from '@/plugins/spark/types';
 
 interface AbsenceReason {
   message: string;
@@ -17,6 +17,10 @@ export default class UnknownBlockWidget extends WidgetBase {
     return this.widget.config.serviceId;
   }
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   get blockId(): string {
     return this.widget.config.blockId;
   }
@@ -25,42 +29,40 @@ export default class UnknownBlockWidget extends WidgetBase {
     return {
       id: this.blockId,
       serviceId: this.serviceId,
-      type: this.widget.feature,
+      type: this.widget.feature as BlockType, // Lies!
       groups: [],
       data: {},
     };
   }
 
   get reason(): AbsenceReason {
-    const status = sparkStore.lastStatus(this.serviceId);
-    if (!status || !status.synchronize) {
-      return {
+    return this.sparkModule.lastBlocks
+      ? {
+        message: `Block ${this.blockId} not found on service ${this.serviceId}`,
+        temporary: false,
+      }
+      : {
         message: 'Waiting for service...',
         temporary: true,
       };
-    }
-    return {
-      message: `Block ${this.blockId} not found on service ${this.serviceId}`,
-      temporary: false,
-    };
   }
 
-  fetchAll(): void {
-    sparkStore.fetchAll(this.serviceId);
+  fetch(): void {
+    this.sparkModule.fetchAll();
   }
 }
 
 </script>
 
 <template>
-  <q-card :class="cardClass">
+  <q-card>
     <component :is="toolbarComponent" :crud="crud">
       <template #actions>
         <ActionItem
           :disable="!reason.temporary"
           icon="refresh"
           label="Refresh"
-          @click="fetchAll"
+          @click="fetch"
         />
       </template>
     </component>

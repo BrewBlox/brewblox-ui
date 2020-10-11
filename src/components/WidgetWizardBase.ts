@@ -2,7 +2,8 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import notify from '@/helpers/notify';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 export interface NavAction {
@@ -28,30 +29,18 @@ export default class WidgetWizardBase<ConfigT = any> extends Vue {
   @Emit()
   public close(): void { }
 
-  protected get typeId(): string {
-    return this.featureId;
+  protected get featureTitle(): string {
+    return featureStore.widgetTitle(this.featureId);
   }
 
-  protected get typeDisplayName(): string {
-    return featureStore.displayName(this.typeId);
+  protected get defaultWidgetSize(): GridSize {
+    return featureStore.widgetSize(this.featureId);
   }
 
-  protected get defaultWidgetSize(): { cols: number; rows: number } {
-    return featureStore.widgetSize(this.typeId);
-  }
-
-  protected async createItem(item: PersistentWidget<ConfigT>): Promise<void> {
-    await dashboardStore.appendPersistentWidget(item)
-      .then(() => this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName(item.feature)} '${item.title}'`,
-      }))
-      .catch(e => this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create widget: ${e.toString()}`,
-      }))
+  protected async createItem(item: Widget<ConfigT>): Promise<void> {
+    await dashboardStore.appendWidget(item)
+      .then(() => notify.done(`Created ${featureStore.widgetTitle(item.feature)} '${item.title}'`))
+      .catch(e => notify.error(`Failed to create widget: ${e.toString()}`))
       .finally(this.close);
   }
 }

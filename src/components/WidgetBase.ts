@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { PersistentWidget } from '@/store/dashboards';
+import { Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext, WidgetMode } from '@/store/features';
 
 export interface WidgetProps {
@@ -27,14 +27,14 @@ export default class WidgetBase<ConfigT = any> extends Vue {
   }
 
   public get mode(): WidgetMode {
-    return this.activeMode || this.context.mode;
+    return this.activeMode ?? this.context.mode;
   }
 
   public set mode(val: WidgetMode) {
     this.activeMode = val;
   }
 
-  public get widget(): PersistentWidget<ConfigT> {
+  public get widget(): Widget<ConfigT> {
     return this.crud.widget;
   }
 
@@ -46,8 +46,8 @@ export default class WidgetBase<ConfigT = any> extends Vue {
     return this.crud.isStoreWidget;
   }
 
-  public get displayName(): string {
-    return featureStore.displayName(this.widget.feature);
+  public get featureTitle(): string {
+    return featureStore.widgetTitle(this.widget.feature) ?? this.widget.feature;
   }
 
   public get inDialog(): boolean {
@@ -60,18 +60,12 @@ export default class WidgetBase<ConfigT = any> extends Vue {
       : 'WidgetToolbar';
   }
 
-  public get cardClass(): string[] {
-    return this.inDialog
-      ? ['widget-modal', 'overflow-auto']
-      : ['widget-dashboard', 'overflow-auto', 'scroll'];
+  public async saveWidget(widget: Widget = this.crud.widget): Promise<void> {
+    await this.crud.saveWidget(widget);
   }
 
-  public saveWidget(widget: PersistentWidget = this.crud.widget): void {
-    this.crud.saveWidget(widget);
-  }
-
-  public saveConfig(config: ConfigT = this.widget.config): void {
-    this.saveWidget({ ...this.widget, config });
+  public async saveConfig(config: ConfigT = this.config): Promise<void> {
+    await this.saveWidget({ ...this.widget, config });
   }
 
   public showDialog(args: Mapped<any> = {}): void {

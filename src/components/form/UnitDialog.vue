@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { roundNumber } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class UnitDialog extends DialogBase {
@@ -31,15 +31,20 @@ export default class UnitDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model.number="local"
         :label="label"
         :suffix="value.notation"
         input-style="font-size: 170%"
-        type="number"
-        step="any"
+        inputmode="numeric"
+        pattern="[0-9]*"
         autofocus
         clearable
         item-aligned

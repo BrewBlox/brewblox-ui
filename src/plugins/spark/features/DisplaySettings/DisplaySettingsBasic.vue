@@ -2,24 +2,21 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { DisplaySettingsBlock, DisplaySlot } from './types';
+import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 
 @Component
 export default class DisplaySettingsBasic
   extends BlockCrudComponent<DisplaySettingsBlock> {
 
-  get slots(): DisplaySlot[] {
-    const slots = Array<DisplaySlot>(6);
-    this.block.data.widgets
-      .forEach(w => slots[w.pos - 1] = w);
-    return slots;
-  }
+  footerRules: InputRule[] = [
+    v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
+  ];
 
-  get footerRules(): InputRule[] {
-    return [
-      v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
-    ];
+  get slots(): (DisplaySlot | null)[] {
+    const slots = Array(6).fill(null);
+    this.block.data.widgets
+      .forEach(w => { slots[w.pos - 1] = w; });
+    return slots;
   }
 
   slotStyle(slot: DisplaySlot): Mapped<string> {
@@ -34,12 +31,11 @@ export default class DisplaySettingsBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="q-pa-lg widget-lg">
     <slot name="warnings" />
 
-    <q-card-section class="q-pa-lg">
-      <div class="grid-container q-mt-sm">
+    <div class="q-gutter-y-sm">
+      <div class="grid-container">
         <div
           v-for="(slot, idx) in slots"
           :key="idx"
@@ -62,15 +58,14 @@ export default class DisplaySettingsBasic
         title="footer text"
         @input="v => { block.data.name = v; saveBlock(); }"
       />
-    </q-card-section>
-  </q-card>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-row-gap: 10px;
-  grid-column-gap: 10px;
-}
+<style scoped lang="sass">
+.grid-container
+  display: grid
+  grid-template-columns: repeat(3, 1fr)
+  grid-row-gap: 10px
+  grid-column-gap: 10px
 </style>

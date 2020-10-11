@@ -1,40 +1,81 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { DigitalActuatorBlock } from '@/plugins/spark/features/DigitalActuator/types';
-import { DigitalState } from '@/plugins/spark/types';
+import { ActuatorPwmBlock, BlockType, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '../getters';
 import { settingsBlock } from '../helpers';
 
+type ActuatorType = DigitalActuatorBlock | ActuatorPwmBlock;
+
 @Component
 export default class Pump extends PartBase {
-  get actuatorBlock(): DigitalActuatorBlock | null {
-    return settingsBlock(this.part, 'actuator');
+  addressKey = 'actuator';
+
+  get hasAddress(): boolean {
+    return !!this.settings[this.addressKey]?.id;
+  }
+
+  get block(): ActuatorType | null {
+    return settingsBlock(this.part, this.addressKey);
   }
 
   get enabled(): boolean {
-    return !!this.actuatorBlock
-      ? Boolean(this.actuatorBlock.data.state === DigitalState.Active)
-      : Boolean(this.settings.enabled);
+    if (this.block === null) {
+      return this.hasAddress
+        ? false
+        : Boolean(this.settings.enabled);
+    }
+    else if (this.block.type === BlockType.DigitalActuator) {
+      return this.block.data.state === DigitalState.STATE_ACTIVE;
+    }
+    else if (this.block.type === BlockType.ActuatorPwm) {
+      return this.block.data.setting > 0;
+    }
+    else {
+      return false;
+    }
   }
 
   get liquids(): string[] {
     return this.liquidOnCoord(LEFT);
   }
 
-  get duration(): number {
-    const calculated = 60 / (this.settings.onPressure || DEFAULT_PUMP_PRESSURE);
-    return Math.max(calculated, 0.5); // Max out animation speed at 120 pressure
+  get pwmSetting(): number {
+    return this.block?.type == BlockType.ActuatorPwm
+      ? this.block.data.setting
+      : 100;
   }
 
-  @Watch('actuatorBlock')
+  get duration(): number {
+    const pressure = ((this.settings.onPressure ?? DEFAULT_PUMP_PRESSURE) / 100 * this.pwmSetting) || 0.01;
+    const animationDuration = 60 / pressure;
+    return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
+  }
+
+  @Watch('block')
   triggerUpdate(block, prevBlock): void {
     if (block === null
       || prevBlock === null
-      || block.data.state !== prevBlock.data.state) {
+      || block.data.state !== prevBlock.data.state // digital
+      || block.data.setting !== prevBlock.data.setting // PWM
+    ) {
       this.invalidateFlows();
+    }
+  }
+
+  created(): void {
+    // Migrate key from PWMPump part
+    if (this.part.settings.pwm !== undefined) {
+      this.savePart({
+        ...this.part,
+        settings: {
+          ...this.part.settings,
+          actuator: this.part.settings.pwm,
+          pwm: undefined,
+        },
+      });
     }
   }
 }
@@ -79,11 +120,11 @@ export default class Pump extends PartBase {
       <path d="M50,29H29v3.5c0,2.2-1.8,4-4,4s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25" />
     </g>
     <rect fill="green" fill-opacity="0" x="0" y="0" width="50" height="50" />
-    <PowerIcon v-if="actuatorBlock" transform="translate(15,-5)" />
+    <PowerIcon v-if="hasAddress" transform="translate(15,-5)" />
   </g>
 </template>
 
-<style lang="stylus" scoped>
+<style lang="scss" scoped>
 /deep/ .ballLiquid path {
   stroke-width: 15px !important;
 }

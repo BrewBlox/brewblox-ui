@@ -12,7 +12,7 @@ export const DEFAULT_PUMP_PRESSURE = 30;
 export const MIN_PUMP_PRESSURE = 5;
 export const MAX_PUMP_PRESSURE = 100;
 export const DEFAULT_IO_PRESSURE = 30;
-export const MIN_IO_PRESSURE = 5;
+export const MIN_IO_PRESSURE = 0;
 export const MAX_IO_PRESSURE = 100;
 export const COLD_WATER = '#4AA0EF';
 export const HOT_WATER = '#DB0023';
@@ -31,4 +31,5 @@ export const deprecatedTypes = {
   SmallKettle: 'Kettle',
   LargeKettle: 'Kettle',
   TallFridge: 'Fridge',
+  PwmPump: 'Pump',
 };

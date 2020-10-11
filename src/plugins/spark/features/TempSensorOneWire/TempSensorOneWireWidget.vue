@@ -1,61 +1,100 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { TempSensorOneWireBlock } from '@/plugins/spark/types';
 
-import { TempSensorOneWireBlock } from './types';
+import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 
-@Component
+@Component({
+  components: {
+    TempSensorSwapDialog,
+  },
+})
 export default class TempSensorOneWireWidget
   extends BlockWidgetBase<TempSensorOneWireBlock> {
 
-  get cardStyle(): Mapped<string> {
-    return this.inDialog
-      ? { minHeight: '40vh' }
-      : {};
+  get hasValue(): boolean {
+    return this.block.data.value.value !== null;
+  }
+
+  startSwap(): void {
+    createDialog({
+      component: TempSensorSwapDialog,
+      serviceId: this.serviceId,
+      leftId: this.blockId,
+    });
   }
 }
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-range
+        use-presets
+        @params="saveGraphParams"
+        @layout="saveGraphLayout"
+      />
     </template>
 
-    <q-card :class="cardClass" :style="cardStyle">
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
-
-      <q-card-section>
-        <CardWarning v-if="block.data.value.val === null">
-          <template #message>
-            OneWire Sensor could not be read.
-          </template>
-        </CardWarning>
-        <UnitField v-else :value="block.data.value" label="Value" readonly item-aligned tag="big" />
-
-
-        <template v-if="mode === 'Full'">
-          <q-item>
-            <q-item-section>
-              <UnitField
-                :value="block.data.offset"
-                title="Offset"
-                label="Offset"
-                @input="v => { block.data.offset = v; saveBlock(); }"
-              />
-            </q-item-section>
-            <q-item-section>
-              <InputField
-                :value="block.data.address"
-                title="Address"
-                label="Address"
-                @input="v => { block.data.address = v; saveBlock(); }"
-              />
-            </q-item-section>
-          </q-item>
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+        <template #actions>
+          <ActionItem icon="mdi-swap-horizontal" label="Swap OneWire address" @click="startSwap" />
         </template>
-      </q-card-section>
-    </q-card>
+      </component>
+    </template>
+
+    <div>
+      <CardWarning v-if="!hasValue">
+        <template #message>
+          OneWire Sensor could not be read.
+        </template>
+      </CardWarning>
+
+      <div class="q-ma-md row justify-center">
+        <div v-if="hasValue" class="col-auto row items-center">
+          <q-icon
+            name="mdi-thermometer"
+            size="md"
+            color="green-3"
+            class="col-auto"
+          />
+          <UnitField
+            :value="block.data.value"
+            readonly
+            tag="big"
+            class="col-auto"
+          />
+        </div>
+      </div>
+
+      <template v-if="mode === 'Full'">
+        <q-separator inset />
+
+        <div class="widget-body row">
+          <UnitField
+            :value="block.data.offset"
+            title="Offset"
+            label="Offset"
+            class="col-grow"
+            @input="v => { block.data.offset = v; saveBlock(); }"
+          />
+          <InputField
+            :value="block.data.address"
+            title="Address"
+            label="Address"
+            class="col-grow"
+            @input="v => { block.data.address = v; saveBlock(); }"
+          />
+        </div>
+      </template>
+    </div>
   </GraphCardWrapper>
 </template>

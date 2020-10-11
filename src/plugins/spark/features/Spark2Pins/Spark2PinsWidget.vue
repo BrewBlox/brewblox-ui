@@ -2,8 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-
-import { Spark2PinsBlock } from './types';
+import { Spark2PinsBlock } from '@/plugins/spark/types';
 
 @Component
 export default class Spark2PinsWidget
@@ -12,8 +11,12 @@ export default class Spark2PinsWidget
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <component :is="toolbarComponent" :crud="crud" />
-    <IoArray :crud="crud" />
-  </q-card>
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" />
+    </template>
+    <div class="widget-md">
+      <IoArray :crud="crud" />
+    </div>
+  </CardWrapper>
 </template>

@@ -1,38 +1,46 @@
-import { Unit } from '@/helpers/units';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
+import { BlockSpec, TempSensorOneWireBlock } from '@/plugins/spark/types';
+import { Temp } from '@/plugins/spark/units';
+import { WidgetFeature } from '@/store/features';
 
-import { typeName } from './getters';
 import widget from './TempSensorOneWireWidget.vue';
-import { TempSensorOneWireData } from './types';
 
-const block: BlockSpec = {
+const typeName = 'TempSensorOneWire';
+
+const block: BlockSpec<TempSensorOneWireBlock> = {
   id: typeName,
-  generate: (): TempSensorOneWireData => ({
-    value: new Unit(null, 'degC'),
-    offset: new Unit(0, 'delta_degC'),
-    address: '',
-  }),
-  presets: [],
-  changes: [],
-  graphTargets: {
-    value: 'Sensor value',
+  generate: serviceId => {
+    const temp = serviceTemp(serviceId);
+    return {
+      value: new Temp(20, 'degC').convert(temp),
+      offset: new Temp(0, `delta_${temp}`),
+      address: '',
+    };
   },
+  fields: [
+    {
+      key: 'value',
+      title: 'Sensor value',
+      component: 'UnitValEdit',
+      generate: serviceId => new Temp(20, 'degC').convert(serviceTemp(serviceId)),
+      readonly: true,
+      graphed: true,
+    },
+  ],
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'OneWire Temp Sensor',
+  title: 'OneWire Temp Sensor',
   role: 'Process',
-  widgetComponent: blockWidgetSelector(widget),
-  wizardComponent: null,
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 2,
   },
+  wizard: 'BlockDiscoveryWizard',
 };
 
 export default { feature, block };

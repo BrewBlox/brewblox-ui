@@ -1,11 +1,10 @@
 <script lang="ts">
 import isString from 'lodash/isString';
-import parseDuration from 'parse-duration';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { durationString, unitDurationString, validator } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { durationMs, durationString, ruleValidator, unitDurationString } from '@/helpers/functional';
+import { Unit } from '@/plugins/spark/units';
 
 @Component
 export default class TimeUnitDialog extends DialogBase {
@@ -19,6 +18,10 @@ export default class TimeUnitDialog extends DialogBase {
 
   @Prop({ type: Array, default: () => [] })
   public readonly rules!: InputRule[];
+
+  created(): void {
+    this.local = unitDurationString(this.value);
+  }
 
   findUnit(s: string): string {
     const match = s.match(/^[0-9\.]*([a-z]*)/i);
@@ -34,11 +37,11 @@ export default class TimeUnitDialog extends DialogBase {
   }
 
   get localNumber(): number {
-    return parseDuration(`${this.local}${this.defaultUnit}`);
+    return durationMs(`${this.local}${this.defaultUnit}`);
   }
 
   get valueOk(): boolean {
-    return validator(this.rules)(this.localNumber);
+    return ruleValidator(this.rules)(this.localNumber);
   }
 
   get error(): string | null {
@@ -60,16 +63,16 @@ export default class TimeUnitDialog extends DialogBase {
     const val = new Unit(this.localNumber, 'ms');
     this.onDialogOk(val);
   }
-
-  created(): void {
-    this.local = unitDurationString(this.value);
-  }
-
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"

@@ -1,24 +1,16 @@
-declare module '*.vue' {
-  import Vue from 'vue';
-  export default Vue;
-}
+import Vue from 'vue';
 
-declare module '*.json' {
-  const value: any;
-  export default value;
-}
+import { BrewbloxDatabase } from './plugins/database';
+import { BrewbloxEventbus } from './plugins/eventbus';
+import { BrewbloxStartup } from './plugins/startup';
 
-declare module 'portal-vue';
-declare module 'vuedraggable';
-declare module 'url-safe-string';
-declare module 'parse-duration';
-
-declare module '*.svg';
-
-declare module 'worker-loader!*' {
-  class WebpackWorker extends Worker {
-    public constructor();
+declare module 'vue/types/vue' {
+  interface Vue {
+    $dense: boolean;
   }
-
-  export default WebpackWorker;
+  interface VueConstructor {
+    $database: BrewbloxDatabase;
+    $eventbus: BrewbloxEventbus;
+    $startup: BrewbloxStartup;
+  }
 }

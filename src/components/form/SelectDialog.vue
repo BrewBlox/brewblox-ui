@@ -7,7 +7,7 @@ import DialogBase from '@/components/DialogBase';
 export default class SelectDialog extends DialogBase {
   local: any = null;
 
-  @Prop({ type: [String, Number, Array, Object], required: true })
+  @Prop({ required: true })
   public readonly value!: any;
 
   @Prop({ type: Array, required: true })
@@ -19,13 +19,30 @@ export default class SelectDialog extends DialogBase {
   created(): void {
     this.local = this.value;
   }
+
+  save(): void {
+    if (this.local !== null || this.selectProps.clearable) {
+      this.onDialogOk(this.local);
+    }
+  }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="onDialogOk(local)">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
-      <q-select v-model="local" :options="selectOptions" v-bind="selectProps" item-aligned>
+      <q-select
+        v-model="local"
+        :options="selectOptions"
+        v-bind="selectProps"
+        item-aligned
+        @keyup.enter.exact.stop
+      >
         <template #no-option>
           <q-item>
             <q-item-section class="text-grey">
@@ -41,7 +58,7 @@ export default class SelectDialog extends DialogBase {
           color="primary"
           flat
           label="OK"
-          @click="onDialogOk(local)"
+          @click="save"
         />
       </template>
     </DialogCard>

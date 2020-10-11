@@ -17,13 +17,21 @@ export default class BlockWizardDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide">
-    <BlockWizard
-      :service-id="serviceId"
-      :initial-feature="initialFeature"
-      :filter="filter"
-      @close="onDialogHide"
-      @created="onDialogOk"
-    />
+  <q-dialog
+    ref="dialog"
+    :maximized="$dense"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+  >
+    <CardWrapper no-scroll v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar icon="mdi-creation" title="Block wizard" />
+      </template>
+      <BlockWizard
+        v-bind="{serviceId, initialFeature, filter}"
+        @close="onDialogHide"
+        @created="onDialogOk"
+      />
+    </CardWrapper>
   </q-dialog>
 </template>

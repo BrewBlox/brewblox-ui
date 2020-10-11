@@ -13,18 +13,21 @@ export default class CardWarning extends Vue {
 </script>
 
 <template>
-  <q-card-section class="q-mx-auto">
-    <q-item>
-      <q-item-section avatar>
-        <q-icon :name="icon" :color="color" />
-      </q-item-section>
-      <q-item-section>
-        <slot name="message" />
-      </q-item-section>
-      <q-item-section side>
-        <slot name="actions" />
-      </q-item-section>
-    </q-item>
-    <slot />
-  </q-card-section>
+  <div
+    class="row no-wrap items-center q-gutter-x-md q-ma-md justify-center"
+    style="max-width: 100%"
+  >
+    <q-icon
+      :name="icon"
+      :color="color"
+      size="md"
+      class="col-auto"
+    />
+    <div class="col-shrink">
+      <slot name="message" />
+    </div>
+    <div class="col-auto column q-gutter-y-xs">
+      <slot name="actions" />
+    </div>
+  </div>
 </template>

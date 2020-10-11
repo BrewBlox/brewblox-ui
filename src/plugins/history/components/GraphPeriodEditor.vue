@@ -115,44 +115,42 @@ export default class GraphPeriodEditor extends Vue {
 </script>
 
 <template>
-  <div class="row wrap q-mx-sm q-pb-md" style="border-bottom: 1px solid grey">
-    <q-item class="col-auto self-start">
-      <q-item-section class="col-auto">
-        <q-select
-          :value="shownPeriod"
-          :options="periodOptions"
-          emit-value
-          map-options
-          label="Time period"
-          @input="saveShownPeriod"
-        >
-          <template #append>
-            <q-icon name="mdi-chart-timeline" size="sm">
-              <q-tooltip>
-                <i>To improve performance, the history service automatically selects an averaging period.</i> <br />
-                <i>One point is returned per period, with the average value of all points in that period.</i> <br />
-                <div class="row q-mt-sm ">
-                  <LabeledField
-                    v-for="(rate, meas) in downsampling"
-                    :key="meas"
-                    :value="rate"
-                    :label="meas"
-                    item-aligned
-                    class="col"
-                  />
-                </div>
-              </q-tooltip>
-            </q-icon>
-          </template>
-        </q-select>
-      </q-item-section>
-    </q-item>
-    <q-item class="col-auto column justify-around">
+  <div class="widget-body row">
+    <q-select
+      :value="shownPeriod"
+      :options="periodOptions"
+      emit-value
+      map-options
+      label="Time period"
+      class="col-auto"
+      @input="saveShownPeriod"
+    >
+      <template #append>
+        <q-icon name="mdi-chart-timeline" size="sm">
+          <q-tooltip>
+            <i>To improve performance, the history service automatically selects an averaging period.</i> <br>
+            <i>One point is returned per period, with the average value of all points in that period.</i> <br>
+            <div class="row q-mt-sm">
+              <LabeledField
+                v-for="(rate, meas) in downsampling"
+                :key="meas"
+                :value="rate"
+                :label="meas"
+                item-aligned
+                class="col"
+              />
+            </div>
+          </q-tooltip>
+        </q-icon>
+      </template>
+    </q-select>
+    <div class="col-auto row q-gutter-x-sm q-ml-none">
       <DatetimeField
         v-if="shownPeriod.start"
         :value="config.params.start"
         title="Start time"
         label="Start date and time"
+        class="col-auto min-width-sm"
         @input="saveStart"
       />
       <DurationInputField
@@ -160,6 +158,7 @@ export default class GraphPeriodEditor extends Vue {
         :value="config.params.duration"
         title="Duration"
         label="Duration"
+        class="col-auto min-width-sm"
         @input="saveDuration"
       />
       <DatetimeField
@@ -167,11 +166,16 @@ export default class GraphPeriodEditor extends Vue {
         :value="config.params.end"
         title="End time"
         label="End date and time"
+        class="col-auto min-width-sm"
         @input="saveEnd"
       />
-      <div v-if="isLive" class="q-pr-sm text-italic col-auto">
+      <LabeledField
+        v-if="isLive"
+        label="End time"
+        class="col-auto text-italic"
+      >
         Graph is live
-      </div>
-    </q-item>
+      </LabeledField>
+    </div>
   </div>
 </template>

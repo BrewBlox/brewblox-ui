@@ -2,12 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
 import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
-import { SetpointSensorPairBlock } from './types';
 
 @Component({
   components: {
@@ -22,7 +20,8 @@ export default class SetpointSensorPairWidget
     if (!this.crud.isStoreBlock) {
       return [];
     }
-    return sparkStore.blockValues(this.serviceId)
+    return this.sparkModule
+      .blocks
       .filter(block => block.data.inputId?.id === this.blockId);
   }
 
@@ -43,16 +42,24 @@ export default class SetpointSensorPairWidget
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog">
+  <GraphCardWrapper :show="inDialog" v-bind="{context}">
     <template #graph>
-      <HistoryGraph :graph-id="widget.id" :config="graphCfg" :refresh-trigger="mode" />
+      <HistoryGraph
+        :graph-id="widget.id"
+        :config="graphCfg"
+        :refresh-trigger="mode"
+        use-presets
+        use-range
+        @params="saveGraphParams"
+        @layout="saveGraphLayout"
+      />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass">
-      <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
-      </template>
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+    </template>
 
+    <component :is="mode" :crud="crud">
       <template #warnings>
         <CardWarning v-if="unused">
           <template #message>
@@ -65,7 +72,6 @@ export default class SetpointSensorPairWidget
           :text-disabled="disabledString"
           text-enabled="Setpoint is enabled."
           data-key="settingEnabled"
-          class="full-width bordered"
         />
       </template>
     </component>

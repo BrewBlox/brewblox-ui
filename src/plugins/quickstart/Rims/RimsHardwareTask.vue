@@ -7,7 +7,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import WizardTaskBase from '../components/WizardTaskBase';
 import { createOutputActions, hasShared } from '../helpers';
 import { PinChannel } from '../types';
-import { defineChangedBlocks, defineCreatedBlocks, defineWidgets } from './changes';
+import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { RimsConfig } from './types';
 
@@ -49,7 +49,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
   }
 
   discover(): void {
-    sparkStore.fetchDiscoveredBlocks(this.config.serviceId);
+    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
   }
 
   startBlockWizard(): void {
@@ -75,6 +75,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
     const widgets = defineWidgets(this.config, layouts);
+    const displayedBlocks = defineDisplayedBlocks(this.config);
 
     this.pushActions(createOutputActions());
     this.updateConfig({
@@ -83,6 +84,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       widgets,
       changedBlocks,
       createdBlocks,
+      displayedBlocks,
     });
     this.next();
   }
@@ -90,17 +92,17 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
           <q-item-label class="text-subtitle1">
-            Assign Hardware Blocks
+            Assign Hardware blocks
           </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn flat round icon="refresh" @click="discover">
-            <q-tooltip>Discover OneWire Blocks</q-tooltip>
+            <q-tooltip>Discover OneWire blocks</q-tooltip>
           </q-btn>
         </q-item-section>
         <q-item-section class="col-auto">
@@ -112,7 +114,7 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       <q-item class="text-weight-light">
         <q-item-section>
           <p>
-            Select which hardware should be used for each function.<br />
+            Select which hardware should be used for each function.<br>
             You can unplug or heat sensors to identify them.
             The current value will be shown under each dropdown menu.
           </p>
@@ -121,6 +123,13 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
           </p>
         </q-item-section>
       </q-item>
+      <QuickStartMockCreateField
+        :service-id="config.serviceId"
+        :names="[
+          config.names.kettleSensor,
+          config.names.tubeSensor,
+        ]"
+      />
       <q-item>
         <q-item-section>
           <QuickStartPinField
@@ -169,12 +178,10 @@ export default class RimsHardwareTask extends WizardTaskBase<RimsConfig> {
       </CardWarning>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions>
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

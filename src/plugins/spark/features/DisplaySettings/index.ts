@@ -1,22 +1,23 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { BlockSpec, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './DisplaySettingsWidget.vue';
-import { typeName } from './getters';
-import { DisplaySettingsData, DisplayTempUnit } from './types';
 
-const block: BlockSpec = {
+const typeName = 'DisplaySettings';
+
+
+const block: BlockSpec<DisplaySettingsBlock> = {
   id: typeName,
   systemObject: true,
-  generate: (): DisplaySettingsData => ({
+  generate: () => ({
     name: 'Display settings',
-    tempUnit: DisplayTempUnit.Celsius,
+    tempUnit: DisplayTempUnit.TEMP_CELSIUS,
     widgets: [],
     brightness: 255,
   }),
-  changes: [
+  fields: [
     {
       key: 'name',
       title: 'Footer text',
@@ -24,22 +25,21 @@ const block: BlockSpec = {
       generate: () => '',
     },
   ],
-  presets: [],
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Display Settings',
+  title: 'Display Settings',
   role: 'Display',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 3,
   },
-  // DisplaySettings is a static system object, and can't be created or deleted
-  wizardComponent: null,
-  deleters: undefined,
+  // System objects can't be created or deleted
+  wizard: false,
+  removeActions: undefined,
 };
 
 export default { feature, block };

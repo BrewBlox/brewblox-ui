@@ -1,9 +1,9 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { objectStringSorter } from '@/helpers/functional';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { sparkType } from '@/plugins/spark/getters';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
 
 import PartCard from './PartCard';
@@ -21,15 +21,15 @@ export default class LinkedWidgetCard extends PartCard {
   public readonly label!: string;
 
   @Prop({ type: Function })
-  readonly filter!: (widget: PersistentWidget) => boolean;
+  readonly filter!: (widget: Widget) => boolean;
 
   get sparkServices(): Service[] {
-    return serviceStore.serviceValues
-      .filter(svc => svc.type === 'Spark');
+    return serviceStore.services
+      .filter(svc => svc.type === sparkType);
   }
 
   get linked(): string | null {
-    return get(this.part.settings, this.settingsKey, null);
+    return this.part.settings[this.settingsKey] ?? null;
   }
 
   set linked(val: string | null) {
@@ -44,16 +44,16 @@ export default class LinkedWidgetCard extends PartCard {
   }
 
   get linkedOpts(): SelectOption[] {
-    return dashboardStore.widgetValues
+    return dashboardStore.widgets
       .filter(this.actualFilter)
       .sort(objectStringSorter('title'))
       .map(widget => ({
-        label: `[${dashboardStore.dashboardById(widget.dashboard).title}] ${widget.title}`,
+        label: `[${dashboardStore.dashboardTitle(widget.dashboard)}] ${widget.title}`,
         value: widget.id,
       }));
   }
 
-  get actualFilter(): (widget: PersistentWidget) => boolean {
+  get actualFilter(): (widget: Widget) => boolean {
     if (this.filter) {
       return this.filter;
     }
@@ -63,31 +63,25 @@ export default class LinkedWidgetCard extends PartCard {
 </script>
 
 <template>
-  <q-list>
-    <q-separator />
-    <q-item>
-      <q-item-section>
-        <q-select
-          v-model="linked"
-          :options="linkedOpts"
-          :label="label"
-          :error="broken"
-          clearable
-          map-options
-          emit-value
-        >
-          <template #no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-          <template #error>
-            <div>Link broken: widget not found</div>
-          </template>
-        </q-select>
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <q-select
+    v-model="linked"
+    :options="linkedOpts"
+    :label="label"
+    :error="broken"
+    clearable
+    map-options
+    emit-value
+    item-aligned
+  >
+    <template #no-option>
+      <q-item>
+        <q-item-section class="text-grey">
+          No results
+        </q-item-section>
+      </q-item>
+    </template>
+    <template #error>
+      <div>Link broken: widget not found</div>
+    </template>
+  </q-select>
 </template>

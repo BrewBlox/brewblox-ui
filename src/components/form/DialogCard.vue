@@ -20,7 +20,7 @@ export default class DialogCard extends Vue {
 </script>
 
 <template>
-  <q-card class="q-dialog-plugin q-dialog-plugin--dark">
+  <q-card class="q-dialog-plugin q-dialog-plugin--dark overflow-auto">
     <q-card-section class="q-dialog__title">
       {{ title }}
     </q-card-section>
@@ -36,7 +36,7 @@ export default class DialogCard extends Vue {
       {{ message }}
     </q-card-section>
     <slot name="body">
-      <q-card-section class="scroll">
+      <q-card-section class="scroll q-gutter-xs">
         <slot />
       </q-card-section>
     </slot>

@@ -12,14 +12,18 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
   @Prop({ type: String, required: false })
   public readonly mode!: WidgetMode | null;
 
-  updateMode(val: WidgetMode): void {
+  get localMode(): WidgetMode | null {
+    return this.mode;
+  }
+
+  set localMode(val: WidgetMode | null) {
     this.$emit('update:mode', val);
   }
 }
 </script>
 
 <template>
-  <WidgetToolbar :crud="crud" :mode="mode" @update:mode="updateMode">
+  <WidgetToolbar :crud="crud" :mode.sync="localMode" @title-click="startChangeBlockId">
     <BlockGraph
       v-if="graphModalOpen"
       :id="`graph-full--${widget.id}`"
@@ -43,9 +47,3 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
     </template>
   </WidgetToolbar>
 </template>
-
-<style scoped>
-.dense {
-  padding: 0px;
-}
-</style>

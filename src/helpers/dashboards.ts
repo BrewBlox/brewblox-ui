@@ -1,8 +1,8 @@
 import isString from 'lodash/isString';
-import { Notify } from 'quasar';
 import UrlSafeString from 'url-safe-string';
 
 import { createDialog } from '@/helpers/dialog';
+import notify from '@/helpers/notify';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { suggestId } from './functional';
@@ -17,15 +17,18 @@ export const dashboardIdRules = (): InputRule[] => [
   v => v === urlGenerator.generate(v) || 'ID must be URL-safe',
 ];
 
-export const changeDashboardId =
+export const execDashboardIdChange =
   async (oldId: string, newId: string, onIdChanged: IdChangedCallback): Promise<void> => {
     const dashboard = dashboardStore.dashboardById(oldId);
+    if (!dashboard) {
+      return;
+    }
 
     await dashboardStore.createDashboard({ ...dashboard, id: newId });
     await Promise.all(
-      dashboardStore.widgetValues
+      dashboardStore.widgets
         .filter(item => item.dashboard === oldId)
-        .map(item => dashboardStore.savePersistentWidget({ ...item, dashboard: newId }))
+        .map(item => dashboardStore.saveWidget({ ...item, dashboard: newId }))
     );
     await dashboardStore.removeDashboard({ ...dashboard });
 
@@ -33,12 +36,7 @@ export const changeDashboardId =
       await dashboardStore.updatePrimaryDashboard(newId);
     }
 
-    Notify.create({
-      color: 'positive',
-      icon: 'edit',
-      message: `Changed dashboard ID '${oldId}' to '${newId}'`,
-    });
-
+    notify.done(`Changed dashboard ID '${oldId}' to '${newId}'`);
     onIdChanged(newId);
   };
 
@@ -54,7 +52,7 @@ export const startChangeDashboardId =
       .onOk(async (newId: string) => {
         const oldId = dashboard.id;
         if (newId !== oldId) {
-          await changeDashboardId(oldId, newId, onIdChanged);
+          await execDashboardIdChange(oldId, newId, onIdChanged);
         }
       });
   };
@@ -78,11 +76,7 @@ export const startChangeDashboardTitle =
         }
 
         await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
-        Notify.create({
-          color: 'positive',
-          icon: 'edit',
-          message: `Renamed dashboard '${oldTitle}' to '${newTitle}'`,
-        });
+        notify.done(`Renamed dashboard '${oldTitle}' to '${newTitle}'`);
 
         const defaultId = urlGenerator.generate(newTitle);
         if (oldId == defaultId) {
@@ -96,7 +90,7 @@ export const startChangeDashboardTitle =
           message: `Do you want to change the dashboard ID from '${oldId}' to '${suggestedId}'?`,
           cancel: true,
         })
-          .onOk(() => changeDashboardId(oldId, suggestedId, onIdChanged));
+          .onOk(() => execDashboardIdChange(oldId, suggestedId, onIdChanged));
       });
   };
 

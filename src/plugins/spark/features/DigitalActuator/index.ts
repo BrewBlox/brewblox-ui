@@ -1,57 +1,81 @@
-import { Link, Unit } from '@/helpers/units';
-import { blockTypes, interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec, DigitalState } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/helpers';
+import { BlockSpec, DigitalActuatorBlock, DigitalConstraintsObj, DigitalState } from '@/plugins/spark/types';
+import { Link, Unit } from '@/plugins/spark/units';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './DigitalActuatorWidget.vue';
-import { typeName } from './getters';
-import { DigitalActuatorData } from './types';
 
-const block: BlockSpec = {
+const seconds = (v = 0): Unit => new Unit(v, 'seconds');
+const typeName = 'DigitalActuator';
+
+const block: BlockSpec<DigitalActuatorBlock> = {
   id: typeName,
-  generate: (): DigitalActuatorData => ({
-    hwDevice: new Link(null, interfaceTypes.IoArray),
+  generate: () => ({
+    hwDevice: new Link(null, 'IoArrayInterface'),
     channel: 0,
-    desiredState: DigitalState.Inactive,
-    state: DigitalState.Inactive,
+    desiredState: DigitalState.STATE_INACTIVE,
+    state: DigitalState.STATE_INACTIVE,
     invert: false,
     constrainedBy: { constraints: [] },
   }),
   presets: [
     {
       name: 'Fridge cooler (compressor)',
-      generate: (): Partial<DigitalActuatorData> => ({
+      generate: () => ({
         invert: false,
         constrainedBy: {
           constraints: [
-            { minOff: new Unit(300, 'second'), limiting: false },
-            { minOn: new Unit(180, 'second'), limiting: false },
-            { mutex: new Link(null, blockTypes.Mutex), limiting: false },
+            {
+              minOff: seconds(300),
+              remaining: seconds(),
+            },
+            {
+              minOn: seconds(180),
+              remaining: seconds(),
+            },
+            {
+              mutexed: {
+                mutexId: new Link(null, 'MutexInterface'),
+                extraHoldTime: seconds(),
+                hasCustomHoldTime: true,
+                hasLock: false,
+              },
+              remaining: seconds(),
+            },
           ],
         },
       }),
     },
     {
       name: 'Fridge heater',
-      generate: (): Partial<DigitalActuatorData> => ({
+      generate: () => ({
         invert: false,
         constrainedBy: {
           constraints: [
-            { mutex: new Link(null, blockTypes.Mutex), limiting: false },
+            {
+              mutexed: {
+                mutexId: new Link(null, 'MutexInterface'),
+                extraHoldTime: seconds(),
+                hasCustomHoldTime: true,
+                hasLock: false,
+              },
+              remaining: seconds(),
+            },
           ],
         },
       }),
     },
   ],
-  changes: [
+  fields: [
     {
       key: 'desiredState',
       title: 'State',
       component: 'StateValEdit',
-      generate: () => 0,
-      pretty: v => DigitalState[v],
+      generate: (): DigitalState => DigitalState.STATE_INACTIVE,
+      valueHint: enumHint(DigitalState),
+      graphed: true,
+      graphName: 'Desired state',
     },
     {
       key: 'invert',
@@ -59,19 +83,31 @@ const block: BlockSpec = {
       component: 'BoolValEdit',
       generate: () => false,
     },
+    {
+      key: 'constrainedBy',
+      title: 'Constraints',
+      component: 'DigitalConstraintsValEdit',
+      generate: (): DigitalConstraintsObj => ({ constraints: [] }),
+      pretty: prettifyConstraints,
+    },
+    {
+      key: 'state',
+      title: 'Actual state',
+      component: 'StateValEdit',
+      generate: (): DigitalState => DigitalState.STATE_INACTIVE,
+      valueHint: enumHint(DigitalState),
+      readonly: true,
+      graphed: true,
+    },
   ],
-  graphTargets: {
-    state: 'Actual state',
-    desiredState: 'Desired state',
-  },
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Digital Actuator',
+  title: 'Digital Actuator',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 2,

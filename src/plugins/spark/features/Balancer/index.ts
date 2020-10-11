@@ -1,27 +1,26 @@
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { BalancerBlock, BlockSpec } from '@/plugins/spark/types';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './BalancerWidget.vue';
-import { typeName } from './getters';
-import { BalancerData } from './types';
 
-const block: BlockSpec = {
+const typeName = 'Balancer';
+
+const block: BlockSpec<BalancerBlock> = {
   id: typeName,
-  generate: (): BalancerData => ({
+  generate: () => ({
     clients: [],
   }),
-  presets: [],
-  changes: [],
+  fields: [],
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Balancer',
+  title: 'Balancer',
   role: 'Constraint',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 2,

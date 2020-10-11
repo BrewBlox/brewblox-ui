@@ -1,3 +1,4 @@
+import defaults from 'lodash/defaults';
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
@@ -24,11 +25,10 @@ export default class PartBase extends Vue {
   public invalidateFlows(): void { }
 
   public get part(): FlowPart {
-    return {
+    return defaults(this.value, {
       transitions: {},
       flows: {},
-      ...this.value,
-    };
+    });
   }
 
   public get flipped(): boolean {
@@ -71,11 +71,11 @@ export default class PartBase extends Vue {
   }
 
   public liquidOnCoord(coord: string): string[] {
-    return Object.keys(this.flow[this.rotatedCoord(coord)] || {});
+    return Object.keys(this.flow[this.rotatedCoord(coord)] ?? {});
   }
 
   public flowOnCoord(coord: string): number {
-    return Object.values(this.flow[this.rotatedCoord(coord)] || {})
+    return Object.values(this.flow[this.rotatedCoord(coord)] ?? {})
       .reduce((sum, v) => sum + v, 0);
   }
 }

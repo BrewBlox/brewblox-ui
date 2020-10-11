@@ -7,11 +7,6 @@ import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
 @Component
 export default class RelationsDialog extends DialogBase {
-  // Start with a ballpark approximation
-  contentStyle = {
-    width: `${window.innerWidth}px`,
-    height: `${window.innerHeight - 50}px`,
-  }
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
@@ -27,29 +22,23 @@ export default class RelationsDialog extends DialogBase {
 
   @Prop({ type: Boolean, default: false })
   public readonly hideUnrelated!: boolean;
-
-  onResize({ width, height }): void {
-    this.contentStyle = {
-      width: `${width}px`,
-      height: `${height}px`,
-    };
-  }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" maximized no-backdrop-dismiss @hide="onDialogHide">
-    <q-card class="maximized bg-dark-bright column">
-      <DialogToolbar>
-        {{ title }}
-      </DialogToolbar>
-      <div class="col" style="width: 100%">
-        <q-resize-observer @resize="onResize" />
-        <RelationsDiagram
-          :content-style="contentStyle"
-          v-bind="$props"
-        />
+  <q-dialog
+    ref="dialog"
+    maximized
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+  >
+    <CardWrapper no-scroll v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="title" subtitle="Relations diagram" />
+      </template>
+      <div class="fit bg-dark">
+        <RelationsDiagram v-bind="$props" />
       </div>
-    </q-card>
+    </CardWrapper>
   </q-dialog>
 </template>

@@ -3,9 +3,7 @@ import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-
-import { sparkStore } from '../../store';
-import { BalancerBlock } from './types';
+import { BalancerBlock } from '@/plugins/spark/types';
 
 @Component
 export default class BalancerWidget
@@ -13,7 +11,8 @@ export default class BalancerWidget
 
   get clientNames(): Mapped<string> {
     const result = {};
-    sparkStore.blockValues(this.serviceId)
+    this.sparkModule
+      .blocks
       .forEach((block) => {
         const constraint = get(block, 'data.constrainedBy.constraints', [])
           .find(constraint => get(constraint, 'balanced.balancerId.id') === this.blockId);
@@ -31,24 +30,39 @@ export default class BalancerWidget
 </script>
 
 <template>
-  <q-card :class="cardClass">
-    <component :is="toolbarComponent" :crud="crud" />
+  <CardWrapper v-bind="{context}">
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" />
+    </template>
 
-    <q-card-section>
-      <q-item dense style="opacity: 0.5">
-        <q-item-section>Client</q-item-section>
-        <q-item-section>Granted</q-item-section>
-        <q-item-section>Requested</q-item-section>
-      </q-item>
-      <q-list dense>
-        <q-item v-for="client in block.data.clients" :key="client.id.id">
-          <q-item-section>
-            <i>{{ clientName(client.id) }}</i>
-          </q-item-section>
-          <q-item-section>{{ client.granted | round }}</q-item-section>
-          <q-item-section>{{ client.requested | round }}</q-item-section>
-        </q-item>
-      </q-list>
-    </q-card-section>
-  </q-card>
+    <div class="widget-md column q-ma-md q-gutter-y-sm">
+      <div class="col-auto row q-gutter-x-sm darkened">
+        <div class="col">
+          Client
+        </div>
+        <div class="col">
+          Granted
+        </div>
+        <div class="col">
+          Requested
+        </div>
+      </div>
+
+      <div
+        v-for="client in block.data.clients"
+        :key="client.id.id"
+        class="col-auto row q-gutter-x-sm"
+      >
+        <div class="col text-italic">
+          {{ clientName(client.id) }}
+        </div>
+        <div class="col">
+          {{ client.granted | round }}
+        </div>
+        <div class="col">
+          {{ client.requested | round }}
+        </div>
+      </div>
+    </div>
+  </CardWrapper>
 </template>

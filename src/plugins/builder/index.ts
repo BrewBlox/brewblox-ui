@@ -1,37 +1,25 @@
 import { autoRegister, ref } from '@/helpers/component-ref';
-import { Feature, featureStore } from '@/store/features';
+import { featureStore, WidgetFeature } from '@/store/features';
 
-import BuilderEditor from './BuilderEditor.vue';
 import widget from './BuilderWidget.vue';
 import { typeName } from './getters';
 import specs from './specs';
 import { builderStore } from './store';
 import { BuilderConfig } from './types';
 
-ref(BuilderEditor);
-
-const feature: Feature = {
+const feature: WidgetFeature<BuilderConfig> = {
   id: typeName,
-  displayName: 'Brewery Builder',
-  widgetComponent: ref(widget),
+  title: 'Brewery Builder',
+  component: ref(widget),
+  wizard: true,
   widgetSize: {
     cols: 8,
     rows: 8,
   },
-  generateConfig: (): BuilderConfig => ({
+  generateConfig: () => ({
     currentLayoutId: null,
     layoutIds: [],
   }),
-};
-
-// Allows lookups based on the old type ID
-// DeprecatedWidget will update the widget in the datastore
-const deprecated: Feature = {
-  id: 'ProcessView',
-  displayName: 'Process View',
-  widgetComponent: 'DeprecatedWidget',
-  widgetSize: { cols: 0, rows: 0 },
-  wizardComponent: null,
 };
 
 export default {
@@ -41,10 +29,7 @@ export default {
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
     autoRegister(require.context('./parts', true, /[A-Z]\w+\.vue$/));
 
-    Object.values(specs)
-      .forEach(builderStore.registerPart);
-
-    featureStore.createFeature(feature);
-    featureStore.createFeature(deprecated);
+    builderStore.registerParts(Object.values(specs));
+    featureStore.registerWidget(feature);
   },
 };

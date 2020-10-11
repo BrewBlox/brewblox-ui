@@ -1,34 +1,39 @@
-import { Link } from '@/helpers/units';
-import { interfaceTypes } from '@/plugins/spark/block-types';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
-import { BlockSpec } from '@/plugins/spark/types';
-import { Feature } from '@/store/features';
+import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/helpers';
+import {
+  ActuatorOffsetBlock,
+  AnalogConstraintsObj,
+  BlockIntfType,
+  BlockSpec,
+  ReferenceKind,
+} from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
+import { WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorOffsetWidget.vue';
-import { typeName } from './getters';
-import { ActuatorOffsetData, OffsetSettingOrValue } from './types';
 
-const block: BlockSpec = {
+const typeName = 'ActuatorOffset';
+
+const block: BlockSpec<ActuatorOffsetBlock> = {
   id: typeName,
-  generate: (): ActuatorOffsetData => ({
-    targetId: new Link(null, interfaceTypes.SetpointSensorPair),
-    drivenTargetId: new Link(null, interfaceTypes.SetpointSensorPair, true),
-    referenceId: new Link(null, interfaceTypes.SetpointSensorPair),
-    referenceSettingOrValue: OffsetSettingOrValue.Setting,
+  generate: () => ({
+    targetId: new Link(null, BlockIntfType.SetpointSensorPairInterface),
+    drivenTargetId: new Link(null, BlockIntfType.SetpointSensorPairInterface, true),
+    referenceId: new Link(null, BlockIntfType.SetpointSensorPairInterface),
+    referenceSettingOrValue: ReferenceKind.REF_SETTING,
     desiredSetting: 0,
     setting: 0,
     value: 0,
     constrainedBy: { constraints: [] },
     enabled: true,
   }),
-  presets: [],
-  changes: [
+  fields: [
     {
       key: 'desiredSetting',
       title: 'Target offset',
       component: 'NumberValEdit',
       generate: () => 0,
+      valueHint: 'degC or %, depending on target',
     },
     {
       key: 'enabled',
@@ -40,27 +45,48 @@ const block: BlockSpec = {
       key: 'targetId',
       title: 'Target',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+      generate: () => new Link(null, BlockIntfType.SetpointSensorPairInterface),
     },
     {
       key: 'referenceId',
       title: 'Reference',
       component: 'LinkValEdit',
-      generate: () => new Link(null, interfaceTypes.SetpointSensorPair),
+      generate: () => new Link(null, BlockIntfType.SetpointSensorPairInterface),
+    },
+    {
+      key: 'constrainedBy',
+      title: 'Constraints',
+      component: 'AnalogConstraintsValEdit',
+      generate: (): AnalogConstraintsObj => ({ constraints: [] }),
+      pretty: prettifyConstraints,
+    },
+    {
+      key: 'setting',
+      title: 'Target offset',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      valueHint: 'number',
+      readonly: true,
+      graphed: true,
+    },
+    {
+      key: 'value',
+      title: 'Actual offset',
+      component: 'NumberValEdit',
+      generate: () => 0,
+      valueHint: 'number',
+      readonly: true,
+      graphed: true,
     },
   ],
-  graphTargets: {
-    setting: 'Target offset',
-    value: 'Actual offset',
-  },
 };
 
-const feature: Feature = {
+const feature: WidgetFeature = {
   ...genericBlockFeature,
   id: typeName,
-  displayName: 'Setpoint Driver',
+  title: 'Setpoint Driver',
   role: 'Output',
-  widgetComponent: blockWidgetSelector(widget),
+  component: blockWidgetSelector(widget, typeName),
   widgetSize: {
     cols: 4,
     rows: 3,

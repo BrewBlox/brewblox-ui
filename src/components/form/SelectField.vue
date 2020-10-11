@@ -7,7 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 @Component
 export default class SelectField extends FieldBase {
 
-  @Prop({ type: [String, Number, Array, Object], required: true })
+  @Prop({ type: [String, Number, Array, Object], required: false })
   public readonly value!: any;
 
   @Prop({ type: Array, required: true })
@@ -37,10 +37,15 @@ export default class SelectField extends FieldBase {
       return text || 'Click to set';
     }
 
-    const selected = this.options
-      .find((opt: any) => opt[this.optionsValue] === this.value)
-      || { [this.optionsLabel]: 'Click to set' };
-    return selected[this.optionsLabel];
+    for (const opt of this.options) {
+      if (opt === this.value) {
+        return opt;
+      }
+      if (opt[this.optionsValue] === this.value) {
+        return opt[this.optionsLabel];
+      }
+    }
+    return 'Click to set';
   }
 
   @Emit('input')

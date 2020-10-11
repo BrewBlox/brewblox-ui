@@ -1,14 +1,18 @@
 <script lang="ts">
 import merge from 'lodash/merge';
-import { Config, Layout, PlotData } from 'plotly.js';
+import { ClickAnnotationEvent, Config, Layout, PlotData, PlotMouseEvent } from 'plotly.js';
 import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-// Vue.component('PlotlyGraph', () => import('./PlotlyGraph'));
+import { createDialog } from '@/helpers/dialog';
+import notify from '@/helpers/notify';
+import { GraphAnnotation } from '@/plugins/history/types';
+
+import PlotlyGraph from './PlotlyGraph';
 
 /* eslint-disable @typescript-eslint/camelcase */
-const layoutDefaults: () => Partial<Layout> = () => ({
+const layoutDefaults = (): Partial<Layout> => ({
   title: '',
   font: {
     color: '#fff',
@@ -45,14 +49,15 @@ const layoutDefaults: () => Partial<Layout> = () => ({
       color: '#aef',
     },
   },
-  paper_bgcolor: '#282c34',
-  plot_bgcolor: '#282c34',
+  paper_bgcolor: 'transparent',
+  plot_bgcolor: 'transparent',
+  hovermode: 'closest',
 });
 /* eslint-enable */
 
 @Component({
   components: {
-    PlotlyGraph: () => import('./PlotlyGraph'),
+    PlotlyGraph,
   },
 })
 export default class GenericGraph extends Vue {
@@ -64,20 +69,8 @@ export default class GenericGraph extends Vue {
   @Prop({ type: Object, required: true })
   readonly layout!: Partial<Layout>;
 
-  @Prop({ type: Number, default: 0 })
-  readonly revision!: number;
-
-  @Prop({ type: String })
-  public readonly width!: string;
-
-  @Prop({ type: String })
-  public readonly height!: string;
-
-  @Prop({ type: Boolean })
-  public readonly autoFit!: boolean;
-
-  @Prop({ type: Boolean })
-  public readonly autoResize!: string;
+  @Prop({ type: Boolean, default: false })
+  public readonly annotated!: boolean;
 
   get plotlyLayout(): Partial<Layout> {
     return merge(layoutDefaults(), this.layout);
@@ -96,12 +89,57 @@ export default class GenericGraph extends Vue {
       && this.plotlyConfig !== undefined;
   }
 
+  get annotations(): GraphAnnotation[] {
+    return this.layout.annotations ?? [];
+  }
+
   displayError(msg: string): void {
-    this.$q.notify({
-      icon: 'warning',
-      color: 'warning',
-      message: `Failed to render graph: ${msg}`,
-    });
+    notify.warn(`Failed to render graph: ${msg}`);
+  }
+
+  onGraphClick(evt: PlotMouseEvent): void {
+    if (!this.annotated || !evt.points.length) { return; }
+
+    const point = evt.points[0];
+    createDialog({
+      title: 'Add annotation',
+      cancel: true,
+      prompt: {
+        model: 'New annotation',
+        type: 'text',
+      },
+    })
+      .onOk((text: string) => {
+        this.annotations.push({
+          x: point.x as string,
+          y: parseFloat((point.y as number).toPrecision(4)),
+          xref: 'x',
+          yref: point.data.yaxis as 'y',
+          text,
+          visible: true,
+          arrowhead: 7,
+          arrowcolor: 'white',
+          captureevents: true,
+        });
+        this.$emit('annotations', this.annotations);
+      });
+  }
+
+  onAnnotationClick(evt: ClickAnnotationEvent): void {
+    if (!this.annotated || this.annotations.length < evt.index) { return; }
+
+    const annotation = this.annotations[evt.index];
+    createDialog({
+      component: 'GraphAnnotationDialog',
+      title: 'Edit annotation',
+      value: annotation.text,
+    })
+      .onOk(({ text, remove }: { text: string; remove: boolean }) => {
+        remove
+          ? this.annotations.splice(evt.index, 1)
+          : this.annotations.splice(evt.index, 1, { ...annotation, text });
+        this.$emit('annotations', this.annotations);
+      });
   }
 }
 </script>
@@ -113,32 +151,25 @@ export default class GenericGraph extends Vue {
     :data="data"
     :layout="plotlyLayout"
     :config="plotlyConfig"
-    :revision="revision"
-    :height="height"
-    :width="width"
-    :auto-fit="autoFit"
-    :auto-resize="autoResize"
-    class="maximized"
+    class="fit"
+    v-bind="$attrs"
     @error="displayError"
-    v-on="$listeners"
+    @plotly_click="onGraphClick"
+    @plotly_clickannotation="onAnnotationClick"
   />
 </template>
 
-<style lang="stylus">
-.js-plotly-plot .plotly .modebar {
-  left: 0px;
-  background: transparent;
-}
+<style lang="sass">
+.plotly
+  .modebar
+    left: 0px
+  .modebar-group
+    background: transparent !important
+  .modebar-btn path
+    fill: rgba(255, 255, 255, 0.6)
+  .modebar-btn.active path, .modebar-btn:hover path
+    fill: rgba(255, 255, 255, 1)
 
-.js-plotly-plot .plotly .modebar-btn path {
-  fill: rgba(255, 255, 255, 0.6);
-}
-
-.js-plotly-plot .plotly .modebar-btn.active path, .js-plotly-plot .plotly .modebar-btn:hover path {
-  fill: rgba(255, 255, 255, 1);
-}
-
-/deep/ .xy2 {
-  color: green;
-}
+.xy2
+  color: green
 </style>

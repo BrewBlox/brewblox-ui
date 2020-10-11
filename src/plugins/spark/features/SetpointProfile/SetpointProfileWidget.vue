@@ -1,71 +1,78 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
+import { isJsonEqual } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { deepCopy } from '@/plugins/spark/parse-object';
+import { SetpointProfileBlock } from '@/plugins/spark/types';
 
 import { GraphProps, profileGraphProps } from './helpers';
+import ProfileExportAction from './ProfileExportAction.vue';
+import ProfileImportAction from './ProfileImportAction.vue';
+import ProfilePresetAction from './ProfilePresetAction.vue';
 import SetpointProfileBasic from './SetpointProfileBasic.vue';
 import SetpointProfileFull from './SetpointProfileFull.vue';
-import { SetpointProfileBlock } from './types';
+
+type SetpointProfileData = SetpointProfileBlock['data'];
 
 @Component({
   components: {
     Basic: SetpointProfileBasic,
     Full: SetpointProfileFull,
+    ProfileImportAction,
+    ProfilePresetAction,
+    ProfileExportAction,
   },
 })
 export default class SetpointProfileWidget
   extends BlockWidgetBase<SetpointProfileBlock> {
+  usedData: SetpointProfileData | null = null;
   revision = 0;
 
-  get cardClass(): string[] {
-    if (this.inDialog) {
-      return this.mode === 'Full'
-        ? ['widget-modal']
-        : ['widget-modal', 'col', 'column'];
-    }
-    else {
-      return this.mode === 'Full'
-        ? ['widget-dashboard', 'overflow-auto', 'scroll']
-        : ['widget-dashboard', 'overflow-unset', 'col', 'column'];
+  @Watch('block.data')
+  watchData(newV: SetpointProfileData): void {
+    if (!isJsonEqual(newV, this.usedData)) {
+      this.refresh();
     }
   }
 
-  get cardStyle(): Mapped<string> {
-    return this.inDialog && this.mode === 'Basic'
-      ? { height: '60vh' }
-      : {};
+  created(): void {
+    this.usedData = deepCopy(this.block.data);
   }
 
   get graphProps(): GraphProps {
     return profileGraphProps(this.block);
   }
 
-  mounted(): void {
-    const updateGraph = (): any => this.revision++;
-    this.$watch('block.data.targetId.id', updateGraph);
-    this.$watch('block.data.enabled', updateGraph);
-    this.$watch('widget.cols', updateGraph);
-    this.$watch('widget.rows', updateGraph);
+  refresh(): void {
+    this.usedData = deepCopy(this.block.data);
+    this.revision++;
   }
 }
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog && mode ==='Full'">
+  <GraphCardWrapper
+    show-initial
+    :show="inDialog && mode ==='Full'"
+    :no-scroll="mode === 'Basic'"
+    v-bind="{context}"
+  >
     <template #graph>
       <GenericGraph v-bind="graphProps" :revision="revision" />
     </template>
 
-    <component :is="mode" :crud="crud" :class="cardClass" :style="cardStyle">
-      <template #toolbar>
-        <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
-          <template #actions>
-            <ProfilePresetAction :crud="crud" />
-          </template>
-        </component>
-      </template>
+    <template #toolbar>
+      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+        <template #actions>
+          <ProfilePresetAction :crud="crud" />
+          <ProfileExportAction :crud="crud" />
+          <ProfileImportAction :crud="crud" />
+        </template>
+      </component>
+    </template>
 
+    <component :is="mode" :crud="crud">
       <template #warnings>
         <CardWarning v-if="!block.data.targetId.id">
           <template #message>
@@ -91,6 +98,7 @@ export default class SetpointProfileWidget
       </template>
 
       <template #graph>
+        <q-resize-observer @resize="refresh" />
         <GenericGraph v-bind="graphProps" :revision="revision" auto-fit auto-resize />
       </template>
     </component>

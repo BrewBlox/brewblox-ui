@@ -6,17 +6,18 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
-import { sparkStore } from '@/plugins/spark/store';
+import { createBlockDialog } from '@/helpers/dialog';
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
 
 const LABEL_HEIGHT = 50;
 const LABEL_WIDTH = 150;
 const INVERTED = [
-  'input',
-  'reference',
-  'sensor',
+  'input', // PID
+  'reference', // Setpoint Driver
+  'sensor', // Setpoint
+  'analog', // Logic Actuator
+  'digital', // Logic Actuator
 ];
 
 @Component
@@ -44,12 +45,9 @@ export default class RelationsDiagram extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly hideUnrelated!: boolean;
 
-  @Prop({ type: Object, required: true })
-  public readonly contentStyle!: Mapped<string>;
-
   get drawnNodes(): RelationNode[] {
     return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
-      .map(id => this.nodes.find(node => node.id === id) || { id, type: '???' });
+      .map(id => this.nodes.find(node => node.id === id) ?? { id, type: '???' });
   }
 
   get loneNodes(): RelationNode[] {
@@ -167,18 +165,21 @@ export default class RelationsDiagram extends Vue {
   }
 
   openSettings(id: string): void {
-    showBlockDialog(sparkStore.blocks(this.serviceId)[id], { mode: 'Basic' });
+    const addr = {
+      id,
+      serviceId: this.serviceId,
+      type: null,
+    };
+    createBlockDialog(addr, { mode: 'Basic' });
   }
 }
 </script>
 
 <template>
-  <div class="row overflow-auto" :style="contentStyle">
-    <q-space />
-    <svg ref="svg" class="col-auto">
+  <div class="fit row scroll">
+    <svg ref="svg" class="fit">
       <g ref="diagram" />
     </svg>
-    <q-space />
   </div>
 </template>
 

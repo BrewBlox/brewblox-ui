@@ -22,7 +22,6 @@ export default class TagSelectField extends FieldBase {
     this.$emit('input', tags);
   }
 
-
   onInput(val, update): void {
     if (val === '') {
       update(() => this.suggestions = []);
@@ -53,7 +52,7 @@ export default class TagSelectField extends FieldBase {
       new-value-mode="add-unique"
       @input="save"
       @filter="onInput"
-      @keyup.native.stop.tab="pickSuggestion"
+      @keyup.enter.stop
     >
       <template #selected-item="scope">
         <q-chip

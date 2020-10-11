@@ -9,6 +9,9 @@ export default class PressureCard extends PartCard {
   @Prop({ type: String, required: true })
   public readonly settingsKey!: string;
 
+  @Prop({ type: String, default: 'Pressure' })
+  public readonly label!: string;
+
   @Prop({ type: Number, required: true })
   public readonly defaultValue!: number;
 
@@ -19,11 +22,11 @@ export default class PressureCard extends PartCard {
   public readonly max!: number;
 
   get value(): number {
-    return this.part.settings[this.settingsKey] || this.defaultValue;
+    return this.part.settings[this.settingsKey] ?? this.defaultValue;
   }
 
   save(val: number): void {
-    const pressure = val || this.defaultValue;
+    const pressure = val ?? this.defaultValue;
     this.savePartSettings({ ...this.part.settings, [this.settingsKey]: pressure });
   }
 
@@ -36,22 +39,19 @@ export default class PressureCard extends PartCard {
 </script>
 
 <template>
-  <q-list>
-    <q-separator />
-    <q-item>
-      <q-item-section>
-        <q-item-label caption>
-          Pressure
-        </q-item-label>
-        <q-slider :value="value" :min="min" :max="max" @change="debouncedSave" />
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-btn icon="mdi-backup-restore" flat round size="sm" @click="reset">
-          <q-tooltip>
-            Reset to default
-          </q-tooltip>
-        </q-btn>
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <q-item class="q-ma-none q-mt-xs">
+    <q-item-section>
+      <q-item-label caption>
+        {{ label }}
+      </q-item-label>
+      <q-slider :value="value" :min="min" :max="max" @change="debouncedSave" />
+    </q-item-section>
+    <q-item-section class="col-auto">
+      <q-btn icon="mdi-backup-restore" flat round size="sm" @click="reset">
+        <q-tooltip>
+          Reset to default
+        </q-tooltip>
+      </q-btn>
+    </q-item-section>
+  </q-item>
 </template>

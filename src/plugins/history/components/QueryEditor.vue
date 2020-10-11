@@ -6,9 +6,8 @@ import { Watch } from 'vue-property-decorator';
 
 import {
   defaultLabel,
-  expandedNodes,
+  filteredNodes,
   nodeBuilder,
-  QuasarNode,
   targetBuilder,
   targetSplitter,
 } from '@/plugins/history/nodes';
@@ -30,7 +29,7 @@ export default class QueryEditor extends Vue {
   @Watch('selectFilter')
   updateExpanded(filter: string): void {
     if (filter) {
-      this.expandedKeys = expandedNodes(this.nodes, filter);
+      this.expandedKeys = filteredNodes(this.nodes, filter);
     }
   }
 
@@ -66,18 +65,6 @@ export default class QueryEditor extends Vue {
     this.$emit('update:config', config);
   }
 
-  get ticked(): string[] {
-    return targetSplitter(this.config.targets);
-  }
-
-  set ticked(vals: string[]) {
-    this.$set(this.config, 'targets', targetBuilder(vals));
-    vals
-      .filter(key => this.config.renames[key] === undefined)
-      .forEach(key => this.$set(this.config.renames, key, defaultLabel(key)));
-    this.saveConfig();
-  }
-
   get fields(): Mapped<string[]> {
     return historyStore.fields;
   }
@@ -88,6 +75,18 @@ export default class QueryEditor extends Vue {
       handler: this.nodeHandler,
       header: 'leaf',
     });
+  }
+
+  get ticked(): string[] {
+    return targetSplitter(this.config.targets);
+  }
+
+  set ticked(vals: string[]) {
+    this.$set(this.config, 'targets', targetBuilder(vals, this.fields));
+    vals
+      .filter(key => this.config.renames[key] === undefined)
+      .forEach(key => this.$set(this.config.renames, key, defaultLabel(key)));
+    this.saveConfig();
   }
 
   nodeHandler(node: QuasarNode): void {
@@ -104,63 +103,47 @@ export default class QueryEditor extends Vue {
 
 <template>
   <q-list>
-    <q-item class="q-mx-sm">
-      <q-item-section>
-        <q-input v-model="selectFilter" placeholder="Search" clearable>
-          <template #append>
-            <q-icon name="search" />
-          </template>
-          <template #after>
-            <div class="col-auto row">
-              <q-btn flat class="q-px-sm" icon="mdi-collapse-all" @click="tree.collapseAll()">
-                <q-tooltip>Collapse all</q-tooltip>
-              </q-btn>
-              <q-btn flat class="q-px-sm" icon="mdi-expand-all" @click="tree.expandAll()">
-                <q-tooltip>Expand all</q-tooltip>
-              </q-btn>
-              <q-btn flat class="q-px-sm" icon="mdi-checkbox-multiple-marked-outline" @click="expandTicked">
-                <q-tooltip>Expand selected fields</q-tooltip>
-              </q-btn>
-              <q-btn flat class="q-px-sm" icon="clear" @click="ticked = []">
-                <q-tooltip>Unselect all</q-tooltip>
-              </q-btn>
-            </div>
-          </template>
-          <q-tooltip>
-            Only fields that have been updated the last 24 hours are shown.
-            <br />This includes renamed or deleted blocks.
-          </q-tooltip>
-        </q-input>
-      </q-item-section>
-    </q-item>
+    <q-input v-model="selectFilter" placeholder="Search" clearable item-aligned class="q-mx-sm">
+      <template #append>
+        <q-icon name="search" />
+      </template>
+      <q-tooltip>
+        Only fields that have been updated the last 24 hours are shown.
+        <br>This includes renamed or deleted blocks.
+      </q-tooltip>
+    </q-input>
+    <div class="col-auto row justify-end q-gutter-x-sm q-gutter-y-xs q-mx-sm">
+      <q-btn flat icon="mdi-collapse-all" @click="tree.collapseAll()">
+        <q-tooltip>Collapse all</q-tooltip>
+      </q-btn>
+      <q-btn flat icon="mdi-expand-all" @click="tree.expandAll()">
+        <q-tooltip>Expand all</q-tooltip>
+      </q-btn>
+      <q-btn flat icon="mdi-checkbox-multiple-marked-outline" @click="expandTicked">
+        <q-tooltip>Expand selected fields</q-tooltip>
+      </q-btn>
+      <q-btn flat icon="clear" @click="ticked = []">
+        <q-tooltip>Unselect all</q-tooltip>
+      </q-btn>
+    </div>
 
     <q-item class="column">
       <q-tree
         ref="tree"
         :nodes="nodes"
         :ticked.sync="ticked"
-        :filter="selectFilter"
         :expanded.sync="expandedKeys"
+        :filter="selectFilter"
         :filter-method="nodeFilter"
-        tick-strategy="leaf-filtered"
+        tick-strategy="leaf"
         node-key="value"
       >
-        <template #header-leaf="{node}">
-          <div class="editable q-py-xs leaf-node-header">
-            <slot name="leaf" :node="node" />
+        <template #header-leaf="props">
+          <div class="q-pa-xs full-width editable hoverable rounded-borders">
+            <slot name="leaf" :node="props.node" />
           </div>
         </template>
       </q-tree>
     </q-item>
   </q-list>
 </template>
-
-<style>
-.leaf-node-header {
-  width: 100%;
-}
-.leaf-node-header:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-}
-</style>

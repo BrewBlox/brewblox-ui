@@ -1,17 +1,18 @@
-import get from 'lodash/get';
-import mapKeys from 'lodash/mapKeys';
+import { Layout } from 'plotly.js';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
-import { postfixedDisplayNames } from '@/helpers/units';
-import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
-import { Block, BlockCrud } from '../types';
+import { blockGraphCfg } from '../helpers';
+import type { Block, BlockCrud } from '../types';
+import type { BlockConfig, BlockSpec } from '../types';
 
 @Component
-export default class BlockWidgetBase<BlockT extends Block = Block> extends WidgetBase {
+export default class BlockWidgetBase<BlockT extends Block = Block>
+  extends WidgetBase<BlockConfig> {
 
   @Prop({ type: Boolean, default: false })
   public readonly volatileBlock!: boolean;
@@ -20,18 +21,23 @@ export default class BlockWidgetBase<BlockT extends Block = Block> extends Widge
     const initial = this.initialCrud as BlockCrud<BlockT>;
     // We want to avoid calling member getters, as this may create circular lookups
     const { serviceId, blockId } = initial.widget.config;
+    const module = sparkStore.moduleById(serviceId)!;
     return initial.block !== undefined
       ? initial
       : {
         ...this.initialCrud,
         isStoreBlock: true,
-        block: sparkStore.blockById(serviceId, blockId) as BlockT,
-        saveBlock: async (block: BlockT) => sparkStore.saveBlock([serviceId, block]),
+        block: module.blockById<BlockT>(blockId)!,
+        saveBlock: async (block: BlockT) => module.saveBlock(block),
       };
   }
 
   public get serviceId(): string {
     return this.widget.config.serviceId;
+  }
+
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
   }
 
   public get blockId(): string {
@@ -43,56 +49,46 @@ export default class BlockWidgetBase<BlockT extends Block = Block> extends Widge
   }
 
   public get isDriven(): boolean {
-    return sparkStore.drivenChains(this.serviceId)
-      .some((chain: string[]) => chain[0] === this.blockId);
+    return this.sparkModule
+      .drivenBlocks
+      .includes(this.blockId);
   }
 
   public get constrainers(): string | null {
-    const limiting: string[] = sparkStore.limiters(this.serviceId)[this.blockId];
-    return limiting ? limiting.join(', ') : null;
+    return this.sparkModule
+      .limiters[this.blockId]
+      ?.join(', ')
+      || null;
+  }
+
+  public get spec(): BlockSpec<BlockT> {
+    return sparkStore.spec(this.block) as BlockSpec<BlockT>;
   }
 
   public get hasGraph(): boolean {
-    return !!get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
-  }
-
-  public get renamedTargets(): Mapped<string> {
-    const targets = get(sparkStore.specs, [this.block.type, 'graphTargets'], null);
-    return !!targets
-      ? postfixedDisplayNames(targets, this.block.data)
-      : {};
+    return this.crud.isStoreBlock
+      && this.spec.fields.some(f => f.graphed);
   }
 
   public get graphCfg(): GraphConfig {
-    const blockFmt = (val: string): string => [this.blockId, val].join('/');
-    const serviceFmt = (val: string): string => [this.serviceId, this.blockId, val].join('/');
-
-    return {
-      // persisted in config
-      params: this.widget.config.queryParams || { duration: '1h' },
-      axes: this.widget.config.graphAxes || {},
-      // constants
-      layout: {
-        title: this.widget.title,
-      },
-      targets: [
-        {
-          measurement: this.serviceId,
-          fields: Object.keys(this.renamedTargets)
-            .map(k => blockFmt(k)),
-        },
-      ],
-      renames: mapKeys(this.renamedTargets, (_, key) => serviceFmt(key)),
-      colors: {},
-    };
+    return blockGraphCfg(this.crud);
   }
 
   public set graphCfg(config: GraphConfig) {
-    this.saveConfig({
-      ...this.widget.config,
-      queryParams: { ...config.params },
-      graphAxes: { ...config.axes },
-    });
+    this.$set(this.widget.config, 'queryParams', { ...config.params });
+    this.$set(this.widget.config, 'graphAxes', { ...config.axes });
+    this.$set(this.widget.config, 'graphLayout', { ...config.layout });
+    this.saveConfig();
+  }
+
+  public saveGraphParams(params: QueryParams): void {
+    this.$set(this.widget.config, 'queryParams', params);
+    this.saveConfig();
+  }
+
+  public saveGraphLayout(layout: Partial<Layout>): void {
+    this.$set(this.widget.config, 'graphLayout', layout);
+    this.saveConfig();
   }
 
   public get toolbarComponent(): string {
@@ -109,7 +105,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block> extends Widge
   }
 
   public async refreshBlock(): Promise<void> {
-    await sparkStore.fetchBlock([this.serviceId, this.block])
+    await this.sparkModule.fetchBlock(this.block)
       .catch(() => { });
   }
 
@@ -122,7 +118,7 @@ export default class BlockWidgetBase<BlockT extends Block = Block> extends Widge
   }
 
   public changeBlockId(newId: string): void {
-    sparkStore.renameBlock([this.serviceId, this.blockId, newId])
+    this.sparkModule.renameBlock([this.blockId, newId])
       .catch(() => { });
   }
 

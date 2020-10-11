@@ -35,8 +35,10 @@ export default class LabeledField extends FieldBase {
       : this.value;
   }
 
+  // Can't be placed in parent class
   get activeSlots(): string[] {
-    return this.fieldSlots.filter(s => !!this.$slots[s]);
+    return Object.keys(this.$slots)
+      .filter(s => this.fieldSlots.includes(s));
   }
 }
 </script>
@@ -44,15 +46,15 @@ export default class LabeledField extends FieldBase {
 <template>
   <q-field
     :label="label"
-    :class="[{pointer: !readonly}, $attrs.class]"
-    :borderless="readonly"
+    :class="[$attrs.class, 'rounded-borders q-px-sm', !readonly && 'depth-1 pointer']"
     v-bind="$attrs"
+    borderless
     stack-label
     @click.native="$emit('click')"
   >
     <template #control>
       <slot name="control">
-        <component :is="tag" :class="['q-mt-sm', tagClass]">
+        <component :is="tag" :class="['q-mt-sm', tagClass]" :style="tagStyle">
           <slot>
             {{ displayValue }}
           </slot>
@@ -66,5 +68,9 @@ export default class LabeledField extends FieldBase {
         <slot :name="slot" />
       </template>
     </template>
+
+    <q-tooltip v-if="tooltip">
+      {{ tooltip }}
+    </q-tooltip>
   </q-field>
 </template>

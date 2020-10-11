@@ -1,77 +1,240 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { debounce, uid } from 'quasar';
+import { Component, Watch } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
+import { spliceById, uniqueFilter } from '@/helpers/functional';
 
-import BuilderBasic from './BuilderBasic.vue';
-import BuilderFull from './BuilderFull.vue';
-import { SQUARE_SIZE } from './getters';
+import { calculateNormalizedFlows } from './calculateFlows';
+import { defaultLayoutHeight, defaultLayoutWidth } from './getters';
+import { asPersistentPart, asStatePart, squares, vivifyParts } from './helpers';
 import { builderStore } from './store';
-import { BuilderConfig, BuilderLayout } from './types';
+import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
 
-@Component({
-  components: {
-    Basic: BuilderBasic,
-    Full: BuilderFull,
-  },
-})
-export default class BuilderWidget extends WidgetBase {
-  startEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'BuilderEditor',
-      initialLayout: this.widget.config.currentLayoutId,
-    });
+@Component
+export default class BuilderWidget extends WidgetBase<BuilderConfig> {
+  squares = squares;
+
+  flowParts: FlowPart[] = [];
+  debouncedCalculate: Function = () => { };
+
+  @Watch('layout')
+  watchLayout(): void {
+    this.debouncedCalculate();
   }
 
-  get widgetConfig(): BuilderConfig {
-    return this.widget.config;
+  created(): void {
+    this.migrate();
+    this.debouncedCalculate = debounce(this.calculate, 200, false);
+    this.debouncedCalculate();
+  }
+
+  get allLayouts(): BuilderLayout[] {
+    return builderStore.layouts;
+  }
+
+  get layoutIds(): string[] {
+    return this.config.layoutIds ?? [];
+  }
+
+  get layouts(): BuilderLayout[] {
+    return this.layoutIds
+      .map(id => builderStore.layoutById(id))
+      .filter(v => v !== null) as BuilderLayout[];
   }
 
   get layout(): BuilderLayout | null {
-    return builderStore.layoutById(
-      this.widget.config.currentLayoutId || '');
+    return builderStore.layoutById(this.config.currentLayoutId);
   }
 
-  get builderCardClass(): string[] {
-    return this.inDialog
-      ? ['widget-modal', 'column']
-      : ['widget-dashboard', 'column', 'overflow-unset'];
+  startSelectLayout(): void {
+    createDialog({
+      component: 'SelectedLayoutDialog',
+      value: this.config.currentLayoutId,
+    })
+      .onOk(id => {
+        this.config.currentLayoutId = id;
+        this.saveConfig();
+      });
   }
 
-  get builderCardStyle(): Mapped<string> {
-    if (this.inDialog && this.mode === 'Basic') {
-      const width = this.layout
-        ? this.layout.width * SQUARE_SIZE
-        : 500;
-      const height = this.layout
-        ? this.layout.height * SQUARE_SIZE
-        : 500;
-      const pickerSpace = this.widgetConfig.layoutIds.length > 1
-        ? 50
-        : 0;
-      const toolbarSpace = 50;
-      return {
-        height: `${height + toolbarSpace + pickerSpace}px`, // not an exact science
-        maxHeight: '90vh',
-        width: `${width}px`,
-        maxWidth: '95vw',
-      };
+  selectLayout(id: string | null): void {
+    if (id) {
+      this.config.layoutIds = [...this.config.layoutIds, id].filter(uniqueFilter);
     }
-    return {};
+    this.config.currentLayoutId = id;
+    this.saveConfig(this.config);
+  }
+
+  get gridHeight(): number {
+    return squares(this.layout?.height ?? 10);
+  }
+
+  get gridWidth(): number {
+    return squares(this.layout?.width ?? 10);
+  }
+
+  startEditor(): void {
+    if (!this.$dense) {
+      this.$router.push(`/builder/${this.layout?.id ?? ''}`);
+    }
+  }
+
+  get gridViewBox(): string {
+    return [0, 0, this.gridWidth, this.gridHeight]
+      .join(' ');
+  }
+
+  async saveParts(parts: PersistentPart[]): Promise<void> {
+    if (!this.layout) {
+      return;
+    }
+
+    // first set local value, to avoid jitters caused by the period between action and vueX refresh
+    this.layout.parts = parts.map(asPersistentPart);
+    await builderStore.saveLayout(this.layout);
+    this.debouncedCalculate();
+  }
+
+  async savePart(part: PersistentPart): Promise<void> {
+    await this.saveParts(spliceById(this.parts, part));
+  }
+
+  get parts(): PersistentPart[] {
+    return this.layout !== null
+      ? vivifyParts(this.layout.parts)
+      : [];
+  }
+
+  get updater(): PartUpdater {
+    return {
+      updatePart: this.savePart,
+    };
+  }
+
+  isClickable(part): boolean {
+    return !!builderStore.spec(part).interactHandler;
+  }
+
+  interact(part: FlowPart): void {
+    builderStore.spec(part).interactHandler?.(part, this.updater);
+  }
+
+  edit(part: FlowPart): void {
+    if (!this.isClickable(part)) {
+      this.startEditor();
+    }
+  }
+
+  async calculate(): Promise<void> {
+    await this.$nextTick();
+    this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
+  }
+
+  async migrate(): Promise<void> {
+    const oldParts: PersistentPart[] = (this.config as any).parts;
+    if (oldParts) {
+      const id = uid();
+      await builderStore.createLayout({
+        id,
+        title: `${this.widget.title} layout`,
+        width: defaultLayoutWidth,
+        height: defaultLayoutHeight,
+        parts: oldParts,
+      });
+      this.config.layoutIds.push(id);
+      this.config.currentLayoutId = id;
+      this.$delete(this.config, 'parts');
+      this.saveConfig(this.config);
+    }
   }
 }
 </script>
 
 <template>
-  <component :is="mode" :crud="crud" :class="builderCardClass" :style="builderCardStyle">
+  <CardWrapper no-scroll v-bind="{context}">
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <component :is="toolbarComponent" :crud="crud">
+        <q-btn
+          flat
+          dense
+          round
+          icon="mdi-format-list-bulleted"
+          @click="startSelectLayout"
+        >
+          <q-tooltip>Select layout</q-tooltip>
+        </q-btn>
         <template #actions>
-          <ActionItem icon="mdi-pipe" label="Builder Editor" @click="startEditor" />
+          <ActionItem
+            v-if="!$dense"
+            icon="mdi-tools"
+            label="Edit layout"
+            @click="startEditor"
+          />
         </template>
       </component>
     </template>
-  </component>
+
+    <div class="fit" @dblclick="startEditor">
+      <span
+        v-if="parts.length === 0"
+        class="absolute-center q-gutter-y-sm"
+      >
+        <div class="text-center">
+          {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
+        </div>
+        <div class="row q-gutter-x-sm justify-center">
+          <q-btn
+            v-if="allLayouts.length > 0"
+            fab-mini
+            color="secondary"
+            icon="mdi-format-list-bulleted"
+            @click="startSelectLayout"
+          >
+            <q-tooltip>Select layout</q-tooltip>
+          </q-btn>
+          <LayoutActions
+            fab-mini
+            :flat="false"
+            :layout="layout"
+            :select-layout="selectLayout"
+            :save-parts="saveParts"
+            color="secondary"
+          >
+            <q-tooltip>Actions</q-tooltip>
+          </LayoutActions>
+          <q-btn
+            v-if="layout !== null"
+            fab-mini
+            color="secondary"
+            icon="mdi-tools"
+            @click="startEditor"
+          >
+            <q-tooltip>Edit layout</q-tooltip>
+          </q-btn>
+        </div>
+      </span>
+      <svg ref="grid" :viewBox="gridViewBox" class="fit q-pa-md">
+        <g
+          v-for="part in flowParts"
+          :key="part.id"
+          :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+          :class="{ pointer: isClickable(part), [part.type]: true }"
+          @click="interact(part)"
+          @dblclick.stop="edit(part)"
+        >
+          <PartWrapper
+            :part="part"
+            @update:part="savePart"
+            @dirty="debouncedCalculate"
+          />
+        </g>
+      </svg>
+    </div>
+  </CardWrapper>
 </template>
+
+<style lang="sass" scoped>
+@import './grid.sass'
+</style>

@@ -2,24 +2,29 @@
 import { Component } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
-import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/features/SetpointProfile/types';
+import { sparkStore } from '@/plugins/spark/store';
+import { BlockAddress, Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
-import { settingsBlock, settingsLink } from '../helpers';
+import { settingsAddress } from '../helpers';
 
 
 @Component
 export default class ProfileDisplay extends PartBase {
+  settingsKey = 'profile';
+
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.settingsKey);
+  }
+
   get block(): SetpointProfileBlock | null {
-    return settingsBlock(this.part, 'profile');
+    const { serviceId, id } = this.address;
+    return sparkStore.blockById(serviceId, id);
   }
 
   get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, 'profile');
-    return !!link.serviceId && !!link.blockId;
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get points(): Setpoint[] {
@@ -67,25 +72,30 @@ export default class ProfileDisplay extends PartBase {
 
 <template>
   <g>
-    <foreignObject :width="squares(2)" :height="squares(1)">
-      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
-      <div v-else :class="['text-white', 'text-bold', 'q-ml-sm', 'q-mt-xs']">
-        <small>Setpoint Profile</small>
-        <q-space />
-        <div class="row q-ml-xs">
-          <div class="col-auto q-mr-xs no-wrap">
+    <SvgEmbedded
+      :width="squares(2)"
+      :height="squares(1)"
+      content-class="column items-center q-pt-xs"
+    >
+      <BrokenIcon v-if="isBroken" class="col" />
+      <UnlinkedIcon v-else-if="!block" class="col" />
+      <div v-else class="col column q-ma-xs">
+        <small class="col-auto">
+          Setpoint Profile
+        </small>
+        <div class="col row">
+          <div class="col">
             {{ currentValue | round(0) }}
           </div>
-          <div class="col-auto q-mr-xs">
-            <q-icon name="mdi-arrow-right-bold" />
+          <div class="col">
+            <q-icon name="mdi-arrow-right-bold" size="20px" class="static" />
           </div>
-          <div class="col-auto">
+          <div class="col">
             {{ nextValue | round(0) }}
           </div>
         </div>
       </div>
-    </foreignObject>
+    </SvgEmbedded>
     <g class="outline">
       <rect
         :width="squares(sizeX)-2"

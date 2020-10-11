@@ -2,8 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-
-import { ActuatorAnalogMockBlock } from './types';
+import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
 
 @Component
 export default class ActuatorAnalogMockBasic
@@ -12,40 +11,40 @@ export default class ActuatorAnalogMockBasic
 </script>
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-md">
     <slot name="warnings" />
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
-          <SliderField
-            :value="block.data.setting"
-            :readonly="isDriven"
-            title="Analog actuator Setting"
-            label="Setting"
-            tag="big"
-            class="self-start"
-            :tag-class="{'text-orange': block.data.setting !== block.data.desiredSetting}"
-            @input="v => { block.data.desiredSetting = v; saveBlock(); }"
-          />
-        </q-item-section>
-        <q-item-section>
-          <LabeledField :value="block.data.value" type="number" tag="big" />
-        </q-item-section>
-      </q-item>
-
-      <q-item>
-        <q-item-section>
-          <DrivenIndicator :block-id="block.id" :service-id="serviceId" />
-          <ConstraintsField
-            :value="block.data.constrainedBy"
-            :service-id="serviceId"
-            type="analog"
-            @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-          />
-        </q-item-section>
-      </q-item>
-    </q-card-section>
-  </q-card>
+    <div class="widget-body row">
+      <SliderField
+        :value="block.data.setting"
+        :readonly="isDriven"
+        title="Analog actuator Setting"
+        label="Setting"
+        tag="big"
+        class="col-grow"
+        :tag-class="{'text-orange': block.data.setting !== block.data.desiredSetting}"
+        @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+      />
+      <LabeledField
+        :value="block.data.value"
+        label="Value"
+        type="number"
+        tag="big"
+        class="col-grow"
+      />
+      <div class="col-break" />
+      <DrivenIndicator
+        :block-id="block.id"
+        :service-id="serviceId"
+        class="col-grow"
+      />
+      <ConstraintsField
+        :value="block.data.constrainedBy"
+        :service-id="serviceId"
+        type="analog"
+        class="col-grow"
+        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+      />
+    </div>
+  </div>
 </template>

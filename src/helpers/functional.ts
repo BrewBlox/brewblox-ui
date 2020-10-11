@@ -1,12 +1,12 @@
 import fromEntries from 'fromentries';
+import isEqual from 'lodash/isEqual';
 import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 import { colors } from 'quasar';
 
-import { Unit } from './units';
+import { Unit } from '../plugins/spark/units';
 
 type SortFunc = (a: any, b: any) => number
-interface HasId { id: string };
 
 export const uniqueFilter =
   (val: any, idx: number, coll: any[]): boolean => coll.indexOf(val) === idx;
@@ -17,8 +17,8 @@ export const objectSorter =
 export const objectStringSorter =
   (key: string): SortFunc =>
     (a: any, b: any) => {
-      const left = a[key].toLowerCase();
-      const right = b[key].toLowerCase();
+      const left = a[key]?.toLowerCase() ?? '';
+      const right = b[key]?.toLowerCase() ?? '';
       return left.localeCompare(right);
     };
 
@@ -66,7 +66,8 @@ export const spaceCased =
   (input: string): string =>
     input.replace(/[_-]/, ' ')
       .replace(/([^^])([A-Z][^A-Z])/g, (_, v1, v2) => `${v1} ${v2.toLowerCase()}`)
-      .replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2}`);
+      .replace(/([^^])([A-Z]+)/g, (_, v1, v2) => `${v1} ${v2}`)
+      .replace(/\s+/g, ' ');
 
 export const snakeCased =
   (input: string): string =>
@@ -86,7 +87,7 @@ export const camelCased =
 
 export const sentenceCased =
   (input: string): string => {
-    const spaced = spaceCased(input).trimLeft();
+    const spaced = spaceCased(input).trim();
     return spaced.substr(0, 1).toUpperCase() + spaced.substr(1, spaced.length);
   };
 
@@ -111,7 +112,7 @@ export const dateString =
   };
 
 export const shortDateString =
-  (value: number | string | Date | null, nullLabel = '<not set>'): string => {
+  (value: number | string | Date | null | undefined, nullLabel = '<not set>'): string => {
     if (value === null || value === undefined) {
       return nullLabel;
     }
@@ -170,7 +171,7 @@ export const nanoToMilli =
 
 export const capitalized =
   (s: string): string =>
-    isString(s)
+    isString(s) && s.length > 0
       ? s.charAt(0).toUpperCase() + s.slice(1)
       : s;
 
@@ -209,11 +210,15 @@ export const isAbsoluteUrl =
   (val: string): boolean =>
     new RegExp('^(?:[a-z]+:)?//', 'i').test(val);
 
-export const validator =
+export const isJsonEqual =
+  (left: any, right: any): boolean =>
+    isEqual(JSON.parse(JSON.stringify(left)), JSON.parse(JSON.stringify(right)));
+
+export const ruleValidator =
   (rules: InputRule[]): ((val: any) => boolean) =>
     val => rules.every(rule => !isString(rule(val)));
 
-export const ruleChecker =
+export const ruleErrorFinder =
   (rules: InputRule[]): ((val: any) => string | null) =>
     val => {
       for (const rule of rules) {
@@ -235,13 +240,26 @@ export const objReducer =
   (key: string) =>
     (acc: Mapped<any>, obj: any) => mutate(acc, obj[key], obj);
 
-
 export const mapEntries =
   (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
     fromEntries(Object.entries(obj).map(callback));
 
-export function spliceById<T extends HasId>
-  (arr: T[], obj: T, insert = true): T[] {
+// Overloads for spliceById
+// if insert is false, the stub { id } is sufficient to remove the existing object
+export function spliceById<T extends HasId>(arr: T[], obj: T): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: T, insert: true): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: HasId, insert: false): T[];
+
+/**
+ * Modifies input array by either replacing or removing a member.
+ * Returns the modified array.
+ * If no members match `obj`, `arr` is not modified.
+ *
+ * @param arr object collection
+ * @param obj compared object
+ * @param insert true to replace the object, false to remove
+ */
+export function spliceById<T extends HasId>(arr: T[], obj: T, insert = true): T[] {
   const idx = arr.findIndex(v => v.id === obj.id);
   if (idx !== -1) {
     insert
@@ -249,4 +267,117 @@ export function spliceById<T extends HasId>
       : arr.splice(idx, 1);
   }
   return arr;
+}
+
+/**
+ * Modifies input array by removing the member matching `obj`.
+ * Returns the matched member, or undefined.
+ *
+ * @param arr object collection
+ * @param obj full object or { id } stub to compare against
+ */
+export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
+  const idx = arr.findIndex(v => v.id === obj.id);
+  return idx !== -1
+    ? arr.splice(idx, 1)[0]
+    : undefined;
+}
+
+/**
+ * Returns a new array consisting of all members of input array
+ * minus those matching `obj`.
+ * Does not modify input array.
+ *
+ * @param arr object collection
+ * @param obj full object or { id } stub to compare against
+ */
+export function filterById<T extends HasId>(arr: T[], obj: HasId): T[] {
+  return arr.filter(v => v.id !== obj.id);
+}
+
+/**
+ * Returns a new array consisting of all members of input array
+ * minus those matching `obj`, and plus `obj` itself.
+ * Does not modify input array.
+ * If no members match `obj`, `obj` is appended.
+ * If a member matches `obj`, `obj` is inserted at the same index.
+ *
+ * @param arr object collection
+ * @param obj object to be inserted
+ */
+export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
+  const idx = arr.findIndex(v => v.id === obj.id);
+  return idx !== -1
+    ? [...arr.slice(0, idx), obj, ...arr.slice(idx + 1)]
+    : [...arr, obj];
+}
+
+/**
+ * Looks for object in array collection.
+ *
+ * @param arr object collection
+ * @param id unique ID of desired object
+ */
+export function findById<T extends HasId>(
+  arr: T[],
+  id: string | null,
+  fallback: T | null = null,
+): typeof fallback {
+  return id != null
+    ? arr.find(v => v.id === id) ?? fallback
+    : fallback;
+}
+
+/**
+ * Checks if a generic object with a 'type' field matches a TS interface.
+ * Best used when T.type is a constant value.
+ *
+ * The function acts as a type guard:
+ * https://www.typescriptlang.org/docs/handbook/advanced-types.html#instanceof-type-guards
+ *
+ * This is useful for when data is dynamically loaded,
+ * and we want to perform a runtime type check,
+ * while validating the 'type' argument at compile time.
+ *
+ *    interface PancakeIntf {
+ *      type: 'Pancake';
+ *      value: string;
+ *    }
+ *    matchesType<PancakeIntf>('Pancake', {type: 'Pancake', value: 'no'}) >>>> true
+ *    matchesType<PancakeIntf>('Pancake', {type: 'Waffle', value: 'yes'}) >>>> false
+ *    matchesType<PancakeIntf>('Waffle', {type: 'Waffle', value: 'yes'})
+ *    //                        ^^^^^^
+ *    // Argument of type '"Waffle"' is not assignable to parameter of type '"Pancake"'
+ * @param type
+ * @param obj
+ */
+export function matchesType<T extends HasType>(type: T['type'], obj: HasType): obj is T {
+  return obj.type === type;
+}
+
+/**
+ * The curried version of `matchesType()`
+ *
+ * Returns a function that can directly be used as type guard in Array.find() or Array.filter().
+ *
+ *    interface Circular = PancakeInterface | FrisbeeInterface;
+ *
+ *    function eat(pancake: PancakeInterface): void {
+ *      // yum
+ *    }
+ *
+ *    const items: Circular[] = [
+ *      { type: 'Pancake' },
+ *      { type: 'Frisbee' }
+ *    ];
+ *
+ *    items
+ *      .filter(typeMatchFilter<PancakeInterface>('Pancake'))
+ *      .forEach(v => eat(v)); // Does not raise a type error
+ *
+ *
+ * @param type
+ */
+export function typeMatchFilter<T extends HasType>(type: T['type']): ((obj: HasType) => obj is T) {
+  return (obj): obj is T => obj.type === type;
 }

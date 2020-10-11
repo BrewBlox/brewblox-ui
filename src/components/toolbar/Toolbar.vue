@@ -4,29 +4,49 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class Toolbar extends Vue {
+
+  @Prop({ type: String, required: false })
+  public readonly icon!: string;
+
   @Prop({ type: String, required: true })
   readonly title!: string;
 
-  @Prop({ type: String, default: '' })
+  @Prop({ type: String, required: false })
   readonly subtitle!: string;
+
+  get readonly(): boolean {
+    return this.$listeners['title-click'] === undefined;
+  }
 }
 </script>
 
 <template>
-  <q-card-section class="q-pa-xs" style="max-width: 100%">
-    <q-item>
-      <q-item-section>
-        <q-item-label class="ellipsis text-h6">
-          {{ title }}
-        </q-item-label>
-        <q-item-label caption class="ellipsis">
-          {{ subtitle }}
-        </q-item-label>
-      </q-item-section>
-      <slot />
+  <div class="row no-wrap full-height items-center">
+    <q-icon v-if="icon" :name="icon" class="col-auto self-center q-px-sm" size="sm" />
+    <div class="col no-wrap row ellipsis q-px-xs text-h6 items-center">
+      <div
+        :class="{pointer: !readonly}"
+        @click="$emit('title-click')"
+      >
+        {{ title }}
+      </div>
       <q-space />
-      <slot name="buttons" />
-    </q-item>
-    <q-separator inset />
-  </q-card-section>
+      <div
+        v-if="!!subtitle"
+        class="subtitle q-mx-sm col-shrink ellipsis"
+      >
+        {{ subtitle }}
+      </div>
+    </div>
+    <slot />
+    <slot name="buttons" />
+  </div>
 </template>
+
+<style lang="sass" scoped>
+.subtitle
+  opacity: 0.8
+  font-style: italic
+  font-size: 70%
+  font-weight: 300
+</style>

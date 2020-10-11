@@ -1,4 +1,3 @@
-import { nanoToMilli } from '@/helpers/functional';
 import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
@@ -12,13 +11,10 @@ import {
 const metricsTransformer =
   (source: HistorySource, result: MetricsResult[]): HistorySource => ({
     ...source,
-    values: result.map(res => {
-      return {
-        ...res,
-        field: `${source.target.measurement}/${res.field}`,
-        time: res.time ? nanoToMilli(res.time) : null,
-      };
-    }),
+    values: result.map(res => ({
+      ...res,
+      field: `${source.target.measurement}/${res.field}`,
+    })),
   });
 
 

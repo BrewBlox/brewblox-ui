@@ -1,9 +1,8 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import { Link } from '@/helpers/units';
-import { sparkStore } from '@/plugins/spark/store';
+import { isCompatible } from '@/plugins/spark/helpers';
+import { Link } from '@/plugins/spark/units';
 
 import ValEditBase from '../ValEditBase';
 
@@ -13,17 +12,10 @@ export default class LinkValEdit extends ValEditBase {
   field!: Link;
   filtered: string[] | null = null;
 
-  get compatibleTypes(): string[] | null {
-    if (!this.field.type) {
-      return null;
-    }
-    const compatibleTable = sparkStore.compatibleTypes(this.serviceId);
-    return [this.field.type, ...get(compatibleTable, this.field.type, [])];
-  }
-
   get blockIdOpts(): string[] {
-    return sparkStore.blockValues(this.serviceId)
-      .filter(block => !this.compatibleTypes || this.compatibleTypes.includes(block.type))
+    return this.sparkModule
+      .blocks
+      .filter(block => isCompatible(block.type, this.field.type))
       .map(block => block.id);
   }
 
@@ -53,16 +45,18 @@ export default class LinkValEdit extends ValEditBase {
 <template>
   <q-select
     v-if="editable"
-    :value="field.id"
+    v-model="field.id"
     :options="filteredOpts"
     dense
     clearable
     use-input
-    item-aligned
-    @input="v => { field.id = v; saveField(field); }"
     @filter="filterFn"
   />
-  <div v-else>
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ displayVal }}
   </div>
 </template>

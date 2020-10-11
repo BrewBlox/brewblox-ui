@@ -29,7 +29,7 @@ import { SessionLogConfig } from './types';
 export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
 
   get sessions(): LoggedSession[] {
-    return historyStore.sessionValues;
+    return historyStore.sessions;
   }
 
   get session(): LoggedSession | null {
@@ -55,7 +55,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       title: 'New session',
       preselected: this.config.currentSession,
       widgetTags: [
-        `on: ${dashboardStore.dashboardById(this.widget.dashboard).title}`,
+        `on: ${dashboardStore.dashboardTitle(this.widget.dashboard)}`,
       ],
     })
       .onOk((session: LoggedSession) => {
@@ -87,24 +87,31 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
       : '??';
   }
 
+  *sessionLines() {
+    yield '';
+    for (const note of this.notes) {
+      yield note.title;
+      yield '-'.repeat(note.title.length);
+      if (note.type === 'Text') {
+        yield note.value;
+      }
+      if (note.type === 'Graph') {
+        yield `${this.renderDate(note.start)} - ${this.renderDate(note.end)}`;
+        yield '';
+        for (const annotation of note.config.layout?.annotations ?? []) {
+          yield `${annotation.x} :: ${annotation.text}`;
+          yield '';
+        }
+      }
+      yield '';
+    }
+  }
+
   exportSession(): void {
     if (this.session === null) { return; }
     const session = this.session!;
     const name = `${this.widget.title} ${session.title} ${this.renderDate(session.date)}`;
-    const lines: string[] = [
-      name,
-      '',
-      ...this.notes.map(note => {
-        const title = `${note.title}\n${'-'.repeat(note.title.length)}`;
-        if (note.type === 'Text') {
-          return `${title}\n${note.value}\n`;
-        }
-        if (note.type === 'Graph') {
-          return `${title}\n${this.renderDate(note.start)} - ${this.renderDate(note.end)}`;
-        }
-        return title;
-      }),
-    ];
+    const lines: string[] = [name, ...this.sessionLines()];
     saveFile(marked(lines.join('\n')), `${name}.html`, true);
   }
 
@@ -147,12 +154,7 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
 </script>
 
 <template>
-  <component
-    :is="mode"
-    :crud="crud"
-    :class="cardClass"
-    @add="startAddSession"
-  >
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
@@ -193,5 +195,32 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
         </template>
       </component>
     </template>
-  </component>
+    <component :is="mode" :crud="crud" @add="startAddSession">
+      <template v-if="session === null" #warnings>
+        <div class="column">
+          <div class="text-italic text-h6 q-pa-md darkened text-center">
+            Open or create a session to get started.
+          </div>
+          <div class="column q-pa-md items-end">
+            <q-btn
+              flat
+              dense
+              color="secondary"
+              icon="mdi-file-document-edit"
+              label="Open session"
+              @click="startLoadSession"
+            />
+            <q-btn
+              flat
+              dense
+              color="secondary"
+              icon="add"
+              label="New session"
+              @click="startAddSession"
+            />
+          </div>
+        </div>
+      </template>
+    </component>
+  </CardWrapper>
 </template>

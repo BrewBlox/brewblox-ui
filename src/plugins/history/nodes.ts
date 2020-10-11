@@ -1,42 +1,20 @@
-import get from 'lodash/get';
+import escapeRegExp from 'lodash/escapeRegExp';
 import set from 'lodash/set';
-import { } from 'quasar';
 
 import { sentenceCased } from '@/helpers/functional';
-import { prettify } from '@/helpers/units';
-import { propertyNameWithUnit } from '@/helpers/units/parseObject';
+import { propertyNameWithUnit } from '@/plugins/spark/parse-object';
+import { prettify } from '@/plugins/spark/units';
 
-import { historyStore } from './store';
 import { QueryTarget } from './types';
 
-export interface QuasarNode {
-  label: string;
-  value: any;
-  children?: QuasarNode[];
-
-  icon?: string;
-  iconColor?: string;
-  img?: string;
-  avatar?: string;
-  disabled?: boolean;
-  expandable?: boolean;
-  selectable?: boolean;
-  handler?: (node: QuasarNode) => void;
-  tickable?: boolean;
-  noTick?: boolean;
-  tickStrategy?: string;
-  lazy?: boolean;
-  header?: string;
-  body?: string;
-}
 
 export const defaultLabel = (key: string): string => {
   const [name, postfix] = propertyNameWithUnit(key);
   const path = name.split('/').slice(1);
   const prettyName = sentenceCased(path.pop()!);
   const prettyPath = path.length ? `[${path.join(' ')}] ` : '';
-  const prettyUnit = postfix ? prettify(postfix!) : '';
-  return `${prettyPath}${prettyName} ${prettyUnit}`;
+  const prettyUnit = prettify(postfix ?? '');
+  return `${prettyPath}${prettyName} ${prettyUnit}`.trim();
 };
 
 const nodeRecurser =
@@ -90,19 +68,19 @@ export const nodeBuilder =
       .map(([k, v]) => nodeRecurser([], k, v, partial));
   };
 
-export const expandedNodes =
+export const filteredNodes =
   (nodes: QuasarNode[], filter: string): string[] => {
-    const lowerFilter = filter.toLowerCase();
-    const compare = (node: QuasarNode): boolean => !!node.label.toLowerCase().match(lowerFilter);
+    const exp = new RegExp(escapeRegExp(filter), 'i');
+
+    const compare = (node: QuasarNode): boolean =>
+      exp.test(node.label) || exp.test(node.value);
 
     const checkNode = (node: QuasarNode): string[] => {
-      const vals = node.children
-        ? node.children.flatMap(n => checkNode(n))
-        : [];
-      if (node.children && node.children.some(compare)) {
-        vals.push(node.value);
+      const selected = (node.children ?? []).flatMap(checkNode);
+      if (selected.length > 0 || compare(node)) {
+        selected.push(node.value);
       }
-      return vals;
+      return selected;
     };
 
     return nodes.flatMap(n => checkNode(n));
@@ -111,25 +89,17 @@ export const expandedNodes =
 export const targetSplitter =
   (targets: QueryTarget[]): string[] =>
     targets
-      .reduce(
-        (acc: string[], tar: QueryTarget) => {
-          acc.push(...tar.fields.map(f => `${tar.measurement}/${f}`));
-          return acc;
-        },
-        []
-      );
+      .flatMap(tar => tar.fields.map(f => `${tar.measurement}/${f}`));
 
 export const targetBuilder =
-  (vals: string[], filterUnknown = true): QueryTarget[] => {
-    const knownFields = historyStore.fields;
+  (vals: string[], knownFields: Mapped<string[]>): QueryTarget[] => {
     return vals
       .reduce(
         (acc: QueryTarget[], v: string) => {
           const [measurement, ...keys] = v.split('/');
           const field = keys.join('/');
           const existing = acc.find(t => t.measurement === measurement);
-          if (filterUnknown
-            && !get(knownFields, measurement, [] as string[]).includes(field)) {
+          if (!knownFields[measurement]?.includes(field)) {
             return acc;
           }
           if (existing) {

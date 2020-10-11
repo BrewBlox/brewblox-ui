@@ -6,6 +6,7 @@ import WidgetWizardBase from '@/components/WidgetWizardBase';
 @Component
 export default class RimsWizard extends WidgetWizardBase {
   initialTasks = [
+    'QuickStartServiceTask',
     'RimsNamingTask',
     'RimsHardwareTask',
     'RimsManualTask',

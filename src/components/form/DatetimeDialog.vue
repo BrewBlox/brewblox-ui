@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
-import { validator } from '@/helpers/functional';
+import { ruleValidator } from '@/helpers/functional';
 
 const dateExp = /^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$/;
 
@@ -25,6 +25,10 @@ export default class DatetimeDialog extends DialogBase {
   @Prop({ type: Array, default: () => [] })
   public readonly rules!: InputRule[];
 
+  created(): void {
+    this.setStringVal(this.value);
+  }
+
   get parsed(): Date | null {
     const combined = `${this.dateString} ${this.timeString}`;
     return dateExp.test(combined) && qdate.isValid(combined)
@@ -40,7 +44,7 @@ export default class DatetimeDialog extends DialogBase {
   }
 
   get valid(): boolean {
-    return validator(this.parsedRules)(this.parsed);
+    return ruleValidator(this.parsedRules)(this.parsed);
   }
 
   setStringVal(dateVal: Date): void {
@@ -67,15 +71,16 @@ export default class DatetimeDialog extends DialogBase {
     })
       .onOk(this.setStringVal);
   }
-
-  created(): void {
-    this.setStringVal(this.value);
-  }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-item>
         <q-item-section>

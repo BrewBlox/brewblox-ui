@@ -1,21 +1,31 @@
+import { uid } from 'quasar';
+
 import { ref } from '@/helpers/component-ref';
-import { Feature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 
-import ChangeConfirmDialog from './ChangeConfirmDialog.vue';
 import widget from './QuickActionsWidget.vue';
-import wizard from './QuickActionsWizard.vue';
+import { QuickActionsConfig } from './types';
 
-ref(ChangeConfirmDialog);
-
-const feature: Feature = {
+const feature: WidgetFeature = {
   id: 'QuickActions',
-  displayName: 'Quick Actions',
-  widgetComponent: ref(widget),
-  wizardComponent: ref(wizard),
+  title: 'Quick Actions',
+  component: ref(widget),
+  wizard: true,
   widgetSize: {
     cols: 4,
-    rows: 2,
+    rows: 5,
   },
+  generateConfig: (): QuickActionsConfig => ({
+    actions: [
+      {
+        id: uid(),
+        name: 'Example action - click to edit',
+        changes: [],
+      },
+    ],
+    changeIdMigrated: true,
+    serviceIdMigrated: true,
+  }),
 };
 
 export default { feature };

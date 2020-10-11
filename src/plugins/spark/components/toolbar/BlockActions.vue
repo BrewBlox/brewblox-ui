@@ -17,7 +17,8 @@ export default class BlockActions extends BlockCrudComponent { }
       @click="startMakeWidget"
     />
     <ActionItem icon="edit" label="Rename" @click="startChangeBlockId" />
-    <BlockGroupsAction v-if="!crud.isStoreWidget" :crud="crud" />
+    <ActionItem v-if="canDisplay" icon="mdi-monitor" label="Add to Spark display" @click="displayBlock" />
+    <BlockGroupsAction v-if="crud.isStoreBlock" :crud="crud" />
     <ActionItem icon="mdi-file-export" label="Export" @click="exportBlock" />
     <RemoveBlockAction v-if="!crud.isStoreWidget" :crud="crud" />
   </ActionSubmenu>

@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import notify from '@/helpers/notify';
+
 export type WizardAction = (config: any) => Promise<void>;
 
 @Component
@@ -61,17 +63,9 @@ export default class WizardTaskBase<ConfigT> extends Vue {
       for (const func of this.actions) {
         await func(this.config);
       }
-      this.$q.notify({
-        color: 'positive',
-        icon: 'mdi-check-all',
-        message: 'Done!',
-      });
+      notify.done('Wizard done!');
     } catch (e) {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'error',
-        message: `Failed to execute actions: ${e.message}`,
-      });
+      notify.error(`Failed to execute actions: ${e.message}`);
     }
     this.busyExecuting = false;
   }

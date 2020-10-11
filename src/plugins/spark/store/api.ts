@@ -1,157 +1,104 @@
-import pick from 'lodash/pick';
-import { Notify } from 'quasar';
 
-import { del, get, post, put, sse } from '@/helpers/fetch';
-import { deserialize } from '@/helpers/units/parseObject';
+import http, { intercept } from '@/helpers/http';
+import notify from '@/helpers/notify';
 
-import { Block, DataBlock, SystemStatus, UnitAlternatives, UserUnits } from '../types';
+import { ApiSparkStatus, Block, BlockIds, SparkExported, SparkStatus, UserUnits } from '../types';
+import { asSparkStatus } from './helpers';
 
-const asDataBlock =
-  (block: Block): DataBlock => pick(block, ['id', 'nid', 'type', 'groups', 'data']);
-
-const asBlock =
-  (block: DataBlock, serviceId: string): Block => ({ ...block, serviceId });
-
-const intercept =
-  (message: string): ((e: Error) => never) =>
-    (e: Error) => {
-      Notify.create({
-        color: 'warning',
-        icon: 'warning',
-        message: `${message}: ${e.message}`,
-      });
-      throw e;
-    };
-
-export const fetchBlocks = async (serviceId: string): Promise<Block[]> =>
-  get(`/${encodeURIComponent(serviceId)}/objects`)
-    .then(blocks => blocks.map((block: DataBlock) => asBlock(block, serviceId)))
+export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
+  http.post<Block[]>(`/${encodeURIComponent(serviceId)}/blocks/all/read`)
+    .then(resp => resp.data.map((block: Block) => block, serviceId))
     .catch(intercept(`Failed to fetch blocks from ${serviceId}`));
 
-export const fetchBlock = async (block: Block): Promise<Block> =>
-  get(`/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`)
-    .then(fetched => asBlock(fetched, block.serviceId))
-    .catch(intercept(`Failed to fetch ${block.id}`));
+export const fetchBlock = ({ id, serviceId }: Block): Promise<Block> =>
+  http.post<Block>(`/${encodeURIComponent(serviceId)}/blocks/read`, { id })
+    .then(resp => resp.data)
+    .catch(intercept(`Failed to fetch ${id}`));
 
-export const fetchStoredBlock = async (serviceId: string, id: string | number): Promise<Block> =>
-  get(`/${encodeURIComponent(serviceId)}/stored_objects/${encodeURIComponent(id)}`)
-    .then(fetched => asBlock(fetched, serviceId))
+export const fetchStoredBlock = (serviceId: string, id: BlockIds): Promise<Block> =>
+  http.post<Block>(`/${encodeURIComponent(serviceId)}/blocks/read/stored`, { id })
+    .then(resp => resp.data)
     .catch(intercept(`Failed to fetch stored block ${id}`));
 
-export const createBlock = async (block: Block): Promise<Block> =>
-  post(
-    `/${encodeURIComponent(block.serviceId)}/objects`,
-    asDataBlock(block),
-  )
-    .then(savedBlock => asBlock(savedBlock, block.serviceId))
+export const createBlock = (block: Block): Promise<Block> =>
+  http.post<Block>(`/${encodeURIComponent(block.serviceId)}/blocks/create`, block)
+    .then(resp => resp.data)
     .catch(intercept(`Failed to create ${block.id}`));
 
-export const persistBlock = async (block: Block): Promise<Block> =>
-  put(
-    `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,
-    asDataBlock(block),
-  )
-    .then(savedBlock => asBlock(savedBlock, block.serviceId))
+export const persistBlock = (block: Block): Promise<Block> =>
+  http.post<Block>(`/${encodeURIComponent(block.serviceId)}/blocks/write`, block)
+    .then(resp => resp.data)
     .catch(intercept(`Failed to persist ${block.id}`));
 
-export const renameBlock =
-  async (serviceId: string, currentId: string, newId: string): Promise<any> =>
-    put(
-      `/${encodeURIComponent(serviceId)}/aliases/${encodeURIComponent(currentId)}`,
-      { id: newId },
-    )
-      .catch(intercept(`Failed to rename ${currentId}`));
+export const renameBlock = (serviceId: string, existing: string, desired: string): Promise<any> =>
+  http.post(`/${encodeURIComponent(serviceId)}/blocks/rename`, { existing, desired })
+    .catch(intercept(`Failed to rename ${existing}`));
 
-export const deleteBlock = async (block: Block): Promise<string> =>
-  del(
-    `/${encodeURIComponent(block.serviceId)}/objects/${encodeURIComponent(block.id)}`,
-    asDataBlock(block),
-  )
-    .then(response => response.id)
-    .catch(intercept(`Failed to delete ${block.id}`));
+export const deleteBlock = ({ serviceId, id }: Block): Promise<string> =>
+  http.post<BlockIds>(`/${encodeURIComponent(serviceId)}/blocks/delete`, { id })
+    .then(resp => resp.data.id!)
+    .catch(intercept(`Failed to delete ${id}`));
 
-export const clearBlocks = async (serviceId: string): Promise<any> =>
-  del(`/${encodeURIComponent(serviceId)}/objects`, {})
+export const clearBlocks = (serviceId: string): Promise<any> =>
+  http.post(`/${encodeURIComponent(serviceId)}/blocks/all/delete`)
     .catch(intercept(`Failed to clear blocks on ${serviceId}`));
 
-export const cleanUnusedNames = async (serviceId: string): Promise<string[]> =>
-  del(`/${encodeURIComponent(serviceId)}/unused_names`, {})
+export const cleanUnusedNames = (serviceId: string): Promise<string[]> =>
+  http.post<BlockIds[]>(`/${encodeURIComponent(serviceId)}/blocks/cleanup`)
+    .then(resp => resp.data.map(v => v.id!))
     .catch(intercept(`Failed to clean unused block names on ${serviceId}`));
 
-export const fetchUnits = async (serviceId: string): Promise<UserUnits> =>
-  get(`/${encodeURIComponent(serviceId)}/codec/units`)
-    .catch(intercept(`Failed to fetch unit settings on ${serviceId}`));
-
-export const persistUnits = async (serviceId: string, units: UserUnits): Promise<UserUnits> =>
-  put(`/${encodeURIComponent(serviceId)}/codec/units`, units)
-    .catch(intercept(`Failed to persist unit settings on ${serviceId}`));
-
-export const fetchUnitAlternatives = async (serviceId: string): Promise<UnitAlternatives> =>
-  get(`/${encodeURIComponent(serviceId)}/codec/unit_alternatives`)
-    .catch(intercept(`Failed to fetch unit alternatives on ${serviceId}`));
-
-export const fetchCompatibleTypes = async (serviceId: string): Promise<Mapped<string[]>> =>
-  get(`/${encodeURIComponent(serviceId)}/codec/compatible_types`)
-    .catch(intercept(`Failed to fetch compatible types on ${serviceId}`));
-
-export const fetchDiscoveredBlocks = async (serviceId: string): Promise<string[]> =>
-  get(`/${encodeURIComponent(serviceId)}/discover_objects`)
+export const fetchDiscoveredBlocks = (serviceId: string): Promise<Block[]> =>
+  http.post<Block[]>(`/${encodeURIComponent(serviceId)}/blocks/discover`)
+    .then(resp => resp.data)
     .catch(intercept(`Failed to discover objects on ${serviceId}`));
 
-export const validateService = async (serviceId: string): Promise<boolean> =>
-  get(`/${encodeURIComponent(serviceId)}/_service/status`)
-    .then(retv => retv.status === 'ok')
+export const validateService = (serviceId: string): Promise<boolean> =>
+  http.get<ApiSparkStatus>(`/${encodeURIComponent(serviceId)}/system/status`)
+    .then(resp => resp.data.type === 'Spark')
     .catch(() => false);
 
-export const fetchUpdateSource = async (
-  serviceId: string,
-  onData: (blocks: Block[]) => void,
-  onClose: () => void,
-): Promise<EventSource> => {
-  const source = sse(`/${encodeURIComponent(serviceId)}/sse/objects`);
-  source.onerror = () => {
-    source.close();
-    onClose();
-  };
-  source.onmessage = (event: MessageEvent) =>
-    onData(deserialize(JSON.parse(event.data))
-      .map(((block: DataBlock) => asBlock(block, serviceId))));
+export const fetchUnits = (serviceId: string): Promise<UserUnits> =>
+  http.get<UserUnits>(`/${encodeURIComponent(serviceId)}/settings/units`)
+    .then(resp => resp.data)
+    .catch(intercept(`Failed to fetch unit settings on ${serviceId}`));
 
-  return source;
-};
+export const persistUnits = (serviceId: string, units: UserUnits): Promise<UserUnits> =>
+  http.put<UserUnits>(`/${encodeURIComponent(serviceId)}/settings/units`, units)
+    .then(resp => resp.data)
+    .catch(intercept(`Failed to persist unit settings on ${serviceId}`));
 
-export const fetchSystemStatus = async (serviceId: string): Promise<SystemStatus> => {
+export const persistAutoconnecting = (serviceId: string, enabled: boolean): Promise<boolean> =>
+  http.put<{ enabled: boolean }>(`/${encodeURIComponent(serviceId)}/settings/autoconnecting`, { enabled })
+    .then(resp => resp.data.enabled)
+    .catch(intercept(`Failed to persist autoconnecting flag on ${serviceId}`));
+
+export const fetchSparkStatus = async (serviceId: string): Promise<SparkStatus> => {
   try {
-    const retv: SystemStatus = await get(`/${encodeURIComponent(serviceId)}/system/status`);
-    return {
-      ...retv,
-      available: true,
-      checkedAt: new Date(),
-    };
+    const resp = await http.get<ApiSparkStatus>(`/${encodeURIComponent(serviceId)}/system/status`);
+    return asSparkStatus(serviceId, resp.data);
   } catch (error) {
-    return {
-      checkedAt: new Date(),
-      available: false,
-      connect: false,
-      handshake: false,
-      synchronize: false,
-      compatible: true, // no idea - assume yes
-      latest: true, // no idea - assume yes
-      valid: true, // no idea - assume yes
-      info: [],
-      error,
-    };
+    notify.warn(`Unable to fetch Spark status: ${error}`, { shown: false });
+    return asSparkStatus(serviceId);
   }
 };
 
-export const flashFirmware = async (serviceId: string): Promise<any> =>
-  post(`/${encodeURIComponent(serviceId)}/system/flash`, {})
+export const flashFirmware = (serviceId: string): Promise<any> =>
+  http.post(`/${encodeURIComponent(serviceId)}/system/flash`, {})
+    .then(resp => resp.data)
     .catch(intercept(`Failed to update firmware on ${serviceId}`));
 
-export const serviceExport = async (serviceId: string): Promise<any> =>
-  get(`/${encodeURIComponent(serviceId)}/export_objects`)
-    .catch(intercept(`Failed to fetch stored blocks from ${serviceId}`));
+export const serviceExport = (serviceId: string): Promise<SparkExported> =>
+  http.post<SparkExported>(`/${encodeURIComponent(serviceId)}/blocks/backup/save`)
+    .then(resp => resp.data)
+    .catch(intercept(`Failed to fetch export blocks from ${serviceId}`));
 
-export const serviceImport = async (serviceId: string, exported: any): Promise<string[]> =>
-  post(`/${encodeURIComponent(serviceId)}/import_objects`, exported)
-    .catch(intercept(`Failed to reset stored blocks in ${serviceId}`));
+export const serviceImport = (serviceId: string, exported: SparkExported): Promise<string[]> =>
+  http.post<{ messages: string[] }>(`/${encodeURIComponent(serviceId)}/blocks/backup/load`, exported)
+    .then(resp => resp.data.messages)
+    .catch(intercept(`Failed to import blocks in ${serviceId}`));
+
+export const reboot = (serviceId: string): Promise<any> =>
+  http.post(`/${encodeURIComponent(serviceId)}/system/reboot`, {})
+    .then(resp => resp.data)
+    .catch(intercept(`Failed to reboot ${serviceId}`));

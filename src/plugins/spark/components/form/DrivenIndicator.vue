@@ -2,8 +2,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { showBlockDialog } from '@/helpers/dialog';
-import { sparkStore } from '@/plugins/spark/store';
+import { createBlockDialog } from '@/helpers/dialog';
+import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 
 @Component
 export default class DrivenIndicator extends Vue {
@@ -14,8 +14,13 @@ export default class DrivenIndicator extends Vue {
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
+  public get sparkModule(): SparkServiceModule {
+    return sparkStore.moduleById(this.serviceId)!;
+  }
+
   get driveChains(): string[][] {
-    return sparkStore.drivenChains(this.serviceId)
+    return this.sparkModule
+      .drivenChains
       .filter(chain => chain[0] === this.blockId);
   }
 
@@ -40,38 +45,29 @@ export default class DrivenIndicator extends Vue {
   }
 
   showDialog(chainIdx: number): void {
-    showBlockDialog(sparkStore.tryBlockById(this.serviceId, this.bossDriver(chainIdx)));
+    createBlockDialog(this.sparkModule.blockById(this.bossDriver(chainIdx)));
   }
 }
 </script>
 
 <template>
-  <q-list no-border>
-    <q-item
+  <q-list :class="[{clickable: isDriven}]" class="rounded-borders">
+    <div
       v-for="(chain, chainIdx) in textChains"
       :key="chainIdx"
-      clickable
-      style="padding: 5px 0; min-height: 0"
+      class="col-auto q-pa-sm q-gutter-x-sm text-indigo-4 row"
       @click="showDialog(chainIdx)"
     >
       <q-tooltip>Edit {{ bossDriver(chainIdx) }}</q-tooltip>
-      <q-item-section class="q-mr-md">
+      <q-icon name="mdi-fast-forward-outline" class="col-auto" size="sm" />
+      <div class="col-auto">
         <div v-for="text in chain" :key="text">
           <small class="darkish" v-html="text" />
         </div>
-      </q-item-section>
-      <q-item-section side>
-        <q-icon name="mdi-pencil" />
-      </q-item-section>
-    </q-item>
-    <!-- Display message if not driven -->
-    <q-item v-if="!isDriven" style="padding: 5px 0; min-height: 0;">
-      <q-item-section>
-        <small class="darkish">Not driven</small>
-      </q-item-section>
-      <q-item-section side>
-        <q-icon name="mdi-pencil-off" />
-      </q-item-section>
-    </q-item>
+      </div>
+    </div>
+    <div v-if="!isDriven" class="col-auto q-pa-sm darkish text-italic">
+      <small>Not driven</small>
+    </div>
   </q-list>
 </template>

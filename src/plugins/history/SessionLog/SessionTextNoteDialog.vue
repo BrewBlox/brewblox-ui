@@ -70,7 +70,12 @@ export default class SessionTextNoteDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         ref="editor"
@@ -80,6 +85,8 @@ export default class SessionTextNoteDialog extends DialogBase {
         autogrow
         autofocus
         item-aligned
+        @keyup.enter.exact.stop
+        @keyup.enter.shift.stop
       />
       <template #actions>
         <q-btn flat label="Insert date" color="primary" @click="insertDate" />

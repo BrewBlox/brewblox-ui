@@ -6,7 +6,7 @@ import { createDialog } from '@/helpers/dialog';
 import { shortDateString, spliceById } from '@/helpers/functional';
 
 import { historyStore } from '../store';
-import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
+import { GraphAnnotation, LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
 import SessionHeaderField from './SessionHeaderField.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
@@ -44,6 +44,11 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
     this.saveSession();
   }
 
+  saveAnnotations(note: SessionGraphNote, annotations: GraphAnnotation[]): void {
+    note.config.layout.annotations = annotations;
+    this.saveNote(note);
+  }
+
   openNote(note: SessionNote): void {
     if (note.type === 'Text') {
       createDialog({
@@ -62,6 +67,7 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
         component: 'GraphDialog',
         parent: this,
         graphId: note.id,
+        saveAnnotations: v => this.saveAnnotations(note, v),
         config: {
           ...note.config,
           params: {
@@ -111,25 +117,31 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
 
 
 <template>
-  <q-card v-bind="$attrs">
-    <slot name="toolbar" />
+  <div class="widget-lg">
     <slot name="warnings" />
-    <slot name="graph" />
 
-    <q-card-section v-if="session !== null">
-      <SessionHeaderField :session="session" @update:session="saveSession" />
-      <div class="row">
-        <q-item
-          v-for="note in notes"
-          :key="note.id"
-          clickable
-          :class="[`col-${note.col}`, 'align-children', 'self-start']"
+    <div v-if="session !== null" class="row q-ma-md">
+      <SessionHeaderField
+        :session="session"
+        class="col q-mb-sm"
+        @update:session="saveSession"
+      />
+
+      <div class="col-break" />
+
+      <div
+        v-for="note in notes"
+        :key="note.id"
+        :class="[`col-${note.col}`, 'q-pa-xs']"
+      >
+        <div
+          class="row q-pa-sm q-gutter-x-xs clickable rounded-borders"
           @click="openNote(note)"
         >
           <!-- Text note -->
           <template v-if="note.type === 'Text'">
-            <q-item-section>
-              <q-item-label caption class="text-info">
+            <div class="col column ellipsis" style="max-width: 100%;">
+              <q-item-label caption class="text-secondary">
                 <q-icon name="mdi-text-subject" />
                 {{ note.title }}
               </q-item-label>
@@ -139,16 +151,16 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
               <div v-else class="text-grey text-italic">
                 Click to set
               </div>
-            </q-item-section>
+            </div>
           </template>
-          <!-- Graph note -->
+
           <template v-if="note.type === 'Graph'">
-            <q-item-section>
-              <q-item-label caption class="text-info">
+            <div class="col-grow">
+              <q-item-label caption class="text-secondary">
                 <q-icon name="mdi-chart-line" />
                 {{ note.title }}
               </q-item-label>
-              <div class="row wrap">
+              <div class="col-grow row wrap">
                 <span :class="{'text-grey': note.start === null}">
                   {{ shortDateString(note.start, 'Not started') }}
                 </span>
@@ -157,21 +169,19 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
                   {{ shortDateString(note.end, 'In progress') }}
                 </span>
               </div>
-            </q-item-section>
-            <q-btn v-if="note.start === null" flat stretch label="Start" @click.stop="startGraphNote(note)" />
-            <q-btn v-else-if="note.end === null" flat stretch label="End" @click.stop="stopGraphNote(note)" />
-            <q-btn v-else flat stretch icon="mdi-calendar-clock" @click.stop="editGraphNote(note)">
-              <q-tooltip>Change dates</q-tooltip>
+            </div>
+            <q-btn v-if="note.start === null" flat dense icon="mdi-play" @click.stop="startGraphNote(note)">
+              <q-tooltip>Start</q-tooltip>
+            </q-btn>
+            <q-btn v-else-if="note.end === null" flat dense icon="mdi-stop" @click.stop="stopGraphNote(note)">
+              <q-tooltip>Stop</q-tooltip>
+            </q-btn>
+            <q-btn flat dense icon="mdi-calendar-clock" @click.stop="editGraphNote(note)">
+              <q-tooltip>Edit</q-tooltip>
             </q-btn>
           </template>
-        </q-item>
+        </div>
       </div>
-    </q-card-section>
-
-    <q-card-section v-else class="column justify-end" style="height: 40%">
-      <div class="col-auto row justify-center">
-        <q-btn outline label="New session" @click="addSession" />
-      </div>
-    </q-card-section>
-  </q-card>
+    </div>
+  </div>
 </template>

@@ -76,6 +76,7 @@ export default class SessionSelectField extends FieldBase {
     hide-selected
     placeholder="Search by name or tag"
     @filter="filterFn"
+    @keyup.enter.exact.stop
   >
     <template #option="{opt, selected, toggleOption}">
       <q-item :active="selected" clickable @click="toggleOption(opt)">
@@ -86,7 +87,6 @@ export default class SessionSelectField extends FieldBase {
               <q-badge
                 v-for="tag in opt.session.tags"
                 :key="`tag-${opt.value}-${tag}`"
-                dense
                 color="blue-grey-8"
               >
                 <small>{{ tag }}</small>

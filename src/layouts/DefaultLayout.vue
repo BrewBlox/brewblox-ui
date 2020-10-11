@@ -2,29 +2,32 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import buildEnv from '@/build-env.json';
-import { checkDatastore } from '@/helpers/datastore';
 import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class DefaultLayout extends Vue {
-  leftDrawerOpen = true;
+  localDrawer: boolean | null = null;
   dashboardEditing = false;
   serviceEditing = false;
 
-  created(): void {
-    checkDatastore();
+  get drawerOpen(): boolean {
+    return Boolean(
+      this.localDrawer
+      ?? this.$q.localStorage.getItem('drawer')
+      ?? !this.$dense);
   }
 
-  // env flag
-  automationFeatureEnabled = process.env.VUE_APP_AUTOMATION_FEATURE === 'true';
-
-  get version(): string {
-    return buildEnv.version || 'UNKNOWN';
+  set drawerOpen(v: boolean) {
+    this.localDrawer = v;
+    this.$q.localStorage.set('drawer', v);
   }
 
   get buildDate(): string {
-    return buildEnv.date || 'UNKNOWN';
+    return process.env.BLOX_DATE ?? 'UNKNOWN';
+  }
+
+  get devMode() {
+    return process.env.DEV;
   }
 
   showWizard(): void {
@@ -34,95 +37,55 @@ export default class DefaultLayout extends Vue {
     });
   }
 
-  showPlugins(): void {
-    createDialog({
-      parent: this,
-      component: 'PluginDialog',
-    });
-  }
-
-  showBuilderEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'BuilderEditor',
-    });
-  }
-
-  showAutomationEditor(): void {
-    createDialog({
-      parent: this,
-      component: 'AutomationEditor',
-    });
-  }
-
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
   }
+
 }
 </script>
 
 <template>
-  <q-layout view="lHh Lpr lFf" class="bg-dark-bright">
-    <q-header class="glossy bg-dark">
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
-        <q-toolbar-title>
-          <portal-target name="toolbar-title">
-            BrewBlox
-          </portal-target>
-        </q-toolbar-title>
-        <portal-target name="toolbar-buttons" class="toolbar-buttons" />
-      </q-toolbar>
-    </q-header>
+  <q-layout view="hHh Lpr fFf">
+    <LayoutHeader @menu="drawerOpen = !drawerOpen">
+      <template #title>
+        <portal-target name="toolbar-title">
+          Brewblox
+        </portal-target>
+      </template>
+      <template #buttons>
+        <portal-target name="toolbar-buttons" class="full-height row q-gutter-x-sm q-pr-xs" />
+      </template>
+    </LayoutHeader>
+    <LayoutFooter />
 
-    <q-drawer v-model="leftDrawerOpen" content-class="bg-dark" elevated>
-      <q-item exact to="/">
-        <q-item-section avatar>
-          <q-icon name="mdi-home" />
-        </q-item-section>
-        <q-item-section>BrewBlox</q-item-section>
-      </q-item>
-      <q-separator />
+    <q-drawer v-model="drawerOpen" content-class="column" elevated>
+      <SidebarNavigator active-section="dashboards" />
 
-      <q-scroll-area
-        :style="{height: 'calc(100% - 100px)'}"
-        :thumb-style="{opacity: 0.5, background: 'silver'}"
-      >
+      <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
         <DashboardIndex v-model="dashboardEditing" />
         <ServiceIndex v-model="serviceEditing" />
-
-        <q-separator class="q-mt-sm" />
-        <ActionItem icon="mdi-creation" label="Wizardry" @click="showWizard" />
-        <ActionItem icon="mdi-pipe" label="Brewery Builder" @click="showBuilderEditor" />
-        <template v-if="automationFeatureEnabled">
-          <ActionItem icon="mdi-calendar-check" label="Automation" @click="showAutomationEditor" />
-        </template>
       </q-scroll-area>
 
-      <q-item class="bottomed">
-        <q-item-section class="col-auto">
-          <q-btn flat text-color="white" icon="mdi-puzzle" @click="showPlugins">
-            <q-tooltip>
-              Plugins
-            </q-tooltip>
-          </q-btn>
-        </q-item-section>
+      <q-item class="col-auto">
         <q-item-section class="col-auto">
           <q-btn-dropdown flat text-color="white" icon="mdi-bug-outline">
             <q-list bordered>
-              <LabeledField :value="version" label="Version" item-aligned dense />
               <LabeledField :value="buildDate" label="Build date" item-aligned dense />
               <q-separator inset />
               <ExportErrorsAction />
             </q-list>
           </q-btn-dropdown>
         </q-item-section>
+        <q-item-section v-if="devMode" class="col-auto">
+          <q-btn flat text-color="white" icon="mdi-format-paint" to="/styles">
+            <q-tooltip>
+              Theming
+            </q-tooltip>
+          </q-btn>
+        </q-item-section>
       </q-item>
     </q-drawer>
-
-    <Watchers />
-    <ServiceWatchers />
 
     <q-page-container @click.native="stopEditing">
       <router-view />
@@ -130,12 +93,7 @@ export default class DefaultLayout extends Vue {
   </q-layout>
 </template>
 
-<style scoped>
-.bottomed {
-  bottom: 0;
-  position: absolute;
-}
-.q-layout {
-  overflow-x: auto;
-}
+<style lang="sass">
+.q-layout
+  overflow-x: auto
 </style>

@@ -1,25 +1,49 @@
-import { blockTypes } from '@/plugins/spark/block-types';
+import { BlockType } from '@/plugins/spark/types';
 
-import { showLinkedBlockDialog } from '../helpers';
-import { PartSpec, PersistentPart } from '../types';
+import { showSettingsBlock, universalTransitions } from '../helpers';
+import { PartSpec } from '../types';
 
 const SIZE_X = 2;
 const SIZE_Y = 1;
+const addressKey = 'profile';
+const scaleKey = 'scale';
+const flowEnabledKey = 'flowEnabled';
+
+const size: PartSpec['size'] = ({ settings }) => {
+  const scale = settings[scaleKey] ?? 1;
+  return [SIZE_X * scale, SIZE_Y * scale];
+};
 
 const spec: PartSpec = {
   id: 'ProfileDisplay',
   title: 'Display: setpoint profile',
-  transitions: () => ({}),
-  cards: [{
-    component: 'LinkedBlockCard',
-    props: {
-      settingsKey: 'profile',
-      types: [blockTypes.SetpointProfile],
-      label: 'Setpoint Profile',
+  cards: [
+    {
+      component: 'BlockAddressCard',
+      props: {
+        settingsKey: addressKey,
+        compatible: [BlockType.SetpointProfile],
+        label: 'Setpoint Profile',
+      },
     },
-  }],
-  size: () => [SIZE_X, SIZE_Y],
-  interactHandler: (part: PersistentPart) => showLinkedBlockDialog(part, 'profile'),
+    {
+      component: 'ScaleCard',
+      props: {
+        settingsKey: scaleKey,
+        defaultSize: [SIZE_X, SIZE_Y],
+      },
+    },
+    {
+      component: 'ToggleCard',
+      props: {
+        settingsKey: flowEnabledKey,
+        label: 'Allow liquid to flow through this part',
+      },
+    },
+  ],
+  size,
+  transitions: part => universalTransitions(size(part), part.settings[flowEnabledKey]),
+  interactHandler: part => showSettingsBlock(part, addressKey),
 };
 
 export default spec;

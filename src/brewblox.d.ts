@@ -21,11 +21,45 @@ interface XYPosition {
   y: number;
 }
 
+interface GridSize {
+  cols: number;
+  rows: number;
+}
+
 type InputRule = (val: any) => boolean | string;
 
-interface SelectOption {
+interface SelectOption<T = any> {
   label: string;
-  value: any;
+  value: T;
 }
 
 type Mapped<T> = Record<string, T>;
+
+interface HasId {
+  id: string;
+}
+
+interface HasType {
+  type: keyof any & string;
+}
+
+interface QuasarNode {
+  label: string;
+  value: any;
+  children?: QuasarNode[];
+
+  icon?: string;
+  iconColor?: string;
+  img?: string;
+  avatar?: string;
+  disabled?: boolean;
+  expandable?: boolean;
+  selectable?: boolean;
+  handler?: (node: QuasarNode) => void;
+  tickable?: boolean;
+  noTick?: boolean;
+  tickStrategy?: string;
+  lazy?: boolean;
+  header?: string;
+  body?: string;
+}

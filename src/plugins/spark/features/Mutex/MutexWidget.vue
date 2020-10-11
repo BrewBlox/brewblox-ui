@@ -2,10 +2,10 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { MutexBlock } from '@/plugins/spark/types';
 
 import MutexBasic from './MutexBasic.vue';
 import MutexFull from './MutexFull.vue';
-import { MutexBlock } from './types';
 
 @Component({
   components: {
@@ -19,9 +19,11 @@ export default class MutexWidget
 </script>
 
 <template>
-  <component :is="mode" :crud="crud" :class="cardClass">
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
-  </component>
+
+    <component :is="mode" :crud="crud" />
+  </CardWrapper>
 </template>

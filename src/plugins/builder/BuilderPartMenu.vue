@@ -3,16 +3,30 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { clampRotation } from '@/helpers/functional';
+import { WidgetContext } from '@/store/features';
 
-import { SQUARE_SIZE } from './getters';
+import { squares } from './helpers';
 import { builderStore } from './store';
 import { CardSpec, FlowPart, PartSpec } from './types';
 
 @Component
 export default class BuilderPartMenu extends Vue {
+  squares = squares;
 
   @Prop({ type: Object, required: true })
   readonly part!: FlowPart;
+
+  close(): void {
+    this.$emit('close');
+  }
+
+  get context(): WidgetContext {
+    return {
+      container: 'Dialog',
+      size: 'Fixed',
+      mode: 'Basic',
+    };
+  }
 
   get spec(): PartSpec {
     return builderStore.spec(this.part);
@@ -46,40 +60,38 @@ export default class BuilderPartMenu extends Vue {
     }
     return 2;
   }
-
-  squares(val: number): number {
-    return SQUARE_SIZE * val;
-  }
 }
 </script>
 
 <template>
-  <q-card class="widget-modal">
-    <DialogToolbar @close="$emit('close')">
-      {{ partTitle }}
-    </DialogToolbar>
+  <q-dialog :value="true" no-backdrop-dismiss @input="close" @keyup.esc="close">
+    <CardWrapper v-bind="{context}">
+      <template #toolbar>
+        <DialogToolbar :title="partTitle" @close="close" />
+      </template>
 
-    <q-card-section>
-      <q-item>
-        <q-item-section>
+      <div class="widget-body column q-gutter-y-lg">
+        <div class="row justify-center">
           <svg
             :width="`${squares(rotatedSize[0]) * displayScale}px`"
             :height="`${squares(rotatedSize[1] * displayScale)}px`"
             :viewBox="`0, 0, ${squares(rotatedSize[0])}, ${squares(rotatedSize[1])}`"
-            class="q-mx-auto"
+            class="col-auto"
           >
             <PartWrapper :part="part" />
           </svg>
-        </q-item-section>
-      </q-item>
-      <component
-        :is="card.component"
-        v-for="(card, idx) in cards"
-        :key="idx"
-        :part="part"
-        v-bind="card.props || {}"
-        v-on="$listeners"
-      />
-    </q-card-section>
-  </q-card>
+        </div>
+
+        <component
+          :is="card.component"
+          v-for="(card, idx) in cards"
+          :key="idx"
+          :part="part"
+          v-bind="card.props || {}"
+          class="col-auto"
+          v-on="$listeners"
+        />
+      </div>
+    </CardWrapper>
+  </q-dialog>
 </template>

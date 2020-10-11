@@ -1,133 +1,133 @@
-import Vue from 'vue';
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import isEqual from 'lodash/isEqual';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { objReducer } from '@/helpers/functional';
+import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
-import { providerStore } from '@/store/providers';
+import { featureStore } from '@/store/features';
 
 import api from './api';
+import { Service, ServiceStatus, ServiceStub } from './types';
 
-export interface Service {
-  id: string;
-  title: string;
-  order: number;
-  type: string;
-  config: Mapped<any>;
-  _rev?: string;
-}
+export * from './types';
 
-const rawError = true;
+const onStartService = (service: Service): Promise<void> =>
+  featureStore.serviceById(service.type)?.onStart?.(service);
 
-const initService = async (service: Service): Promise<void> => {
-  await providerStore.onAddById(service.type)(service);
-  await providerStore.onFetchById(service.type)(service);
-};
+const onRemoveService = (service: Service): Promise<void> =>
+  featureStore.serviceById(service.type)?.onRemove?.(service);
 
-@Module({ store, namespaced: true, dynamic: true, name: 'services' })
+
+@Module({ generateMutationSetters: true })
 export class ServiceModule extends VuexModule {
-  public replicating = false;
-  public services: Mapped<Service> = {};
+  public services: Service[] = [];
+  public stubs: ServiceStub[] = [];
+  public statuses: ServiceStatus[] = [];
 
   public get serviceIds(): string[] {
-    return Object.keys(this.services);
+    return this.services.map(v => v.id);
   }
 
-  public get serviceValues(): Service[] {
-    return Object.values(this.services);
+  public serviceById(id: string | null): Service | null {
+    return findById(this.services, id);
   }
 
-  public get serviceById(): (id: string, type?: string) => Service {
-    return (id: string, type?: string) => {
-      const service = this.services[id];
-      if (!service) {
-        throw new Error(`Service ${id} not found`);
-      }
-      if (service && type && service.type !== type) {
-        throw new Error(`Invalid service: ${service.type} !== ${type}`);
-      }
-      return service;
-    };
-  }
-
-  public get typedServices(): (type: string) => Service[] {
-    return type => this.serviceValues.filter(svc => svc.type === type);
-  }
-
-  public get tryServiceById(): (id: string) => Service | null {
-    return id => this.services[id] || null;
-  }
-
-  public get serviceExists(): (id: string) => boolean {
-    return id => !!this.services[id];
+  public get stubIds(): string[] {
+    return this.stubs.map(v => v.id);
   }
 
   @Mutation
-  public commitService(service: Service): void {
-    Vue.set(this.services, service.id, { ...service });
+  public setService(service: Service): void {
+    this.services = extendById(this.services, service);
+    this.stubs = filterById(this.stubs, service); // stubs have the same ID
   }
 
   @Mutation
-  public commitAllServices(services: Service[]): void {
-    this.services = services.reduce(objReducer('id'), {});
+  public setAllServices(services: Service[]): void {
+    const ids = services.map(svc => svc.id);
+    this.services = services;
+    this.stubs = this.stubs.filter(s => !ids.includes(s.id));
   }
 
   @Mutation
-  public commitRemoveService(service: Service): void {
-    Vue.delete(this.services, service.id);
+  public trySetStub(stub: ServiceStub): void {
+    if (!this.serviceById(stub.id)) {
+      this.stubs = extendById(this.stubs, stub);
+    }
   }
 
-  @Action({ rawError })
-  public async createService(service: Service): Promise<Service> {
-    const created = await api.create(service);
-    this.commitService(created);
-    await initService(created);
-    return created;
+  @Mutation
+  public setStatus(status: ServiceStatus): void {
+    this.statuses = extendById(this.statuses, status);
   }
 
-  @Action({ rawError, commit: 'commitService' })
-  public async saveService(service: Service): Promise<Service> {
-    return await api.persist(service);
+  @Action
+  public async createService(service: Service): Promise<void> {
+    await api.create(service); // triggers callback
   }
 
-  @Action({ rawError, commit: 'commitRemoveService' })
-  public async removeService(service: Service): Promise<Service> {
-    await providerStore.onRemoveById(service.type)(service);
-    return await api.remove(service);
+  @Action
+  public async appendService(service: Service): Promise<void> {
+    const order = this.services.length + 1;
+    await this.createService({ ...service, order });
   }
 
-  @Action({ rawError })
+  @Action
+  public async saveService(service: Service): Promise<void> {
+    await api.persist(service); // triggers callback
+  }
+
+  @Action
+  public async removeService(service: Service): Promise<void> {
+    await api.remove(service); // triggers callback
+  }
+
+  @Action
   public async updateServiceOrder(ids: string[]): Promise<void> {
     await Promise.all(
-      ids.map(async (id, idx) => {
-        const service = await api.persist({ ...this.services[id], order: idx + 1 });
-        this.commitService(service);
-      }));
+      ids
+        .map(id => this.serviceById(id))
+        .filter(v => v !== null)
+        .map((service: Service | null, idx) => this.saveService({ ...service!, order: idx + 1 })));
   }
 
-  @Action({ rawError })
-  public async setup(): Promise<void> {
+  @Action
+  public async ensureStub(stub: ServiceStub): Promise<void> {
+    this.trySetStub(stub);
+  }
+
+  @Action
+  public async updateStatus(status: ServiceStatus): Promise<void> {
+    if (!this.statuses.some(v => isEqual(v, status))) {
+      this.setStatus(status);
+    }
+  }
+
+  @Action
+  public async start(): Promise<void> {
     const onChange = async (service: Service): Promise<void> => {
-      const existing = this.tryServiceById(service.id);
+      const existing = this.serviceById(service.id);
       if (!existing) {
-        this.commitService(service);
-        await initService(service);
-      } else if (existing._rev !== service._rev) {
-        this.commitService(service);
+        this.setService(service);
+        await onStartService(service);
+      }
+      else if (existing._rev !== service._rev) {
+        this.setService(service);
       }
     };
-    const onDelete = (id: string): void => {
-      const existing = this.tryServiceById(id);
+    const onDelete = async (id: string): Promise<void> => {
+      const existing = this.serviceById(id);
       if (existing) {
-        this.removeService(existing);
+        await onRemoveService(existing);
+        this.services = filterById(this.services, existing);
       }
     };
 
     const services = await api.fetch();
-    this.commitAllServices(services);
-    await Promise.all(services.map(initService));
+    this.setAllServices(services);
+    await Promise.all(services.map(onStartService));
 
-    api.setup(onChange, onDelete);
+    api.subscribe(onChange, onDelete);
   }
 }
 
-export const serviceStore = getModule(ServiceModule);
+export const serviceStore = new ServiceModule({ store, name: 'services' });

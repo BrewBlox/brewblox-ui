@@ -13,7 +13,10 @@ export default class ActionSubmenu extends Vue {
 
 <template>
   <div class="col-auto column no-wrap">
-    <div class="col-auto q-py-sm q-px-md text-italic text-grey-5" style="font-size: 120%">
+    <div
+      class="col-auto q-py-sm q-px-md text-italic text-grey-5"
+      style="font-size: 120%"
+    >
       {{ label }}
     </div>
     <slot />

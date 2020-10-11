@@ -4,7 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString, unitDurationString } from '@/helpers/functional';
-import { Unit } from '@/helpers/units';
+import { Unit } from '@/plugins/spark/units';
 
 
 @Component

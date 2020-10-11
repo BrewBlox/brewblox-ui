@@ -1,26 +1,31 @@
-import { PersistentWidget } from '@/store/dashboards';
-
-import { Block } from '../../types';
+import { Block } from '@/plugins/spark/types';
+import { BlockField } from '@/plugins/spark/types';
 
 export interface BlockChange<BlockT extends Block = Block> {
   id: string;
+  serviceId: string;
   blockId: string;
   data: Partial<BlockT['data']>;
   confirmed: { [k in keyof BlockT['data']]?: boolean; };
 }
 
-export interface Step {
+export interface ChangeAction {
   id: string;
   name: string;
   changes: BlockChange[];
 }
 
 export interface QuickActionsConfig {
-  serviceId: string;
-  steps: Step[];
+  serviceId?: string; // deprecated
+  steps?: ChangeAction[]; // deprecated
+  actions: ChangeAction[];
   changeIdMigrated: boolean;
+  serviceIdMigrated: boolean;
 }
 
-export interface QuickActionsItem extends PersistentWidget {
-  config: QuickActionsConfig;
+export interface EditableBlockField {
+  id: string;
+  value: any;
+  confirmed: boolean;
+  specField: BlockField;
 }

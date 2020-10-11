@@ -1,58 +1,82 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component } from 'vue-property-decorator';
 
-import { Block } from '@/plugins/spark/types';
+import { sparkStore } from '@/plugins/spark/store';
+import { TempSensorMockBlock, TempSensorOneWireBlock } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
-import { settingsBlock, settingsLink } from '../helpers';
+import { CENTER } from '../getters';
+import { settingsAddress } from '../helpers';
 
 
 @Component
 export default class SensorDisplay extends PartBase {
-  get block(): Block | null {
-    return settingsBlock(this.part, 'sensor');
+  readonly addressKey = 'sensor';
+  readonly scaleKey = 'scale';
+
+  get scale(): number {
+    return this.settings[this.scaleKey] ?? 1;
+  }
+
+  get address(): BlockAddress {
+    return settingsAddress(this.part, this.addressKey);
+  }
+
+  get block(): TempSensorMockBlock | TempSensorOneWireBlock | null {
+    const { serviceId, id } = this.address;
+    return sparkStore.blockById(serviceId, id);
   }
 
   get isBroken(): boolean {
-    if (this.block) {
-      return false;
-    }
-    const link = settingsLink(this.part, 'sensor');
-    return !!link.serviceId && !!link.blockId;
+    return this.block == null
+      && this.address.id !== null;
   }
 
   get temperature(): number | null {
-    return get(this, 'block.data.value.val', null);
+    return this.block?.data.value?.value ?? null;
   }
 
   get tempUnit(): string {
-    return get(this, 'block.data.value.notation', '');
+    return this.block?.data.value?.notation ?? '';
+  }
+
+  get color(): string {
+    return this.liquidOnCoord(CENTER)[0] ?? '';
   }
 }
 </script>
 
 <template>
-  <g>
-    <foreignObject :transform="textTransformation([1,1])" :width="squares(1)" :height="squares(1)">
-      <q-icon v-if="isBroken" name="mdi-alert-circle-outline" color="negative" size="lg" class="maximized" />
-      <q-icon v-else-if="!block" name="mdi-link-variant-off" color="warning" size="md" class="maximized" />
-      <div v-else class="text-white text-bold text-center">
-        <q-icon name="mdi-thermometer" />
-        <small>{{ tempUnit }}</small>
-        <br />
-        {{ temperature | round(1) }}
-      </div>
-    </foreignObject>
+  <g :transform="`scale(${scale} ${scale})`">
+    <SvgEmbedded
+      :transform="textTransformation([1,1])"
+      :width="squares(1)"
+      :height="squares(1)"
+      content-class="column items-center q-pt-xs"
+    >
+      <BrokenIcon v-if="isBroken" class="col" />
+      <UnlinkedIcon v-else-if="!block" class="col" />
+      <template v-else>
+        <div class="col row q-pt-xs">
+          <q-icon name="mdi-thermometer" class="static" size="20px" />
+          <small>{{ tempUnit }}</small>
+        </div>
+        <div class="col text-bold text-center">
+          {{ temperature | round(1) }}
+        </div>
+      </template>
+    </SvgEmbedded>
     <g class="outline">
       <rect
         :width="squares(1)-2"
         :height="squares(1)-2"
+        :stroke="color"
+        stroke-width="2px"
         x="1"
         y="1"
         rx="6"
         ry="6"
-        stroke-width="2px"
       />
     </g>
   </g>

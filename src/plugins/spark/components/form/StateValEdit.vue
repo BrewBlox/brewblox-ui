@@ -13,8 +13,7 @@ export default class StateValEdit extends ValEditBase {
 </script>
 
 <template>
-  <DigitalStateField v-if="editable" v-model="field" />
-  <div v-else>
-    {{ fieldString }}
+  <div>
+    <DigitalStateButton v-model="field" />
   </div>
 </template>

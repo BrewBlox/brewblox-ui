@@ -19,38 +19,32 @@ export default class PlacementCard extends PartCard {
 </script>
 
 <template>
-  <q-list>
-    <q-separator />
-    <q-item>
-      <q-item-section>
-        <q-btn
-          color="primary"
-          icon="mdi-rotate-left-variant"
-          no-wrap
-          label="rotate"
-          @click="rotate(-90)"
-        />
-      </q-item-section>
-      <q-item-section>
-        <q-btn
-          color="primary"
-          icon="mdi-rotate-right-variant"
-          no-wrap
-          label="rotate"
-          @click="rotate(90)"
-        />
-      </q-item-section>
-      <q-item-section>
-        <q-btn
-          :label="part.flipped ? 'unflip' : 'flip'"
-          color="primary"
-          icon="mdi-swap-horizontal-bold"
-          @click="flip"
-        />
-      </q-item-section>
-      <q-item-section>
-        <q-btn color="primary" icon="delete" label="delete" @click="removePart" />
-      </q-item-section>
-    </q-item>
-  </q-list>
+  <div class="row justify-between">
+    <q-btn
+      outline
+      icon="mdi-rotate-left-variant"
+      no-wrap
+      label="rotate"
+      @click="rotate(-90)"
+    />
+    <q-btn
+      outline
+      icon="mdi-rotate-right-variant"
+      no-wrap
+      label="rotate"
+      @click="rotate(90)"
+    />
+    <q-btn
+      outline
+      :label="part.flipped ? 'unflip' : 'flip'"
+      icon="mdi-swap-horizontal-bold"
+      @click="flip"
+    />
+    <q-btn
+      outline
+      icon="delete"
+      label="delete"
+      @click="removePart"
+    />
+  </div>
 </template>

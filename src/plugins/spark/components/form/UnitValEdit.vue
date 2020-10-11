@@ -1,54 +1,46 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
-import Unit, { prettify } from '@/helpers/units/Unit';
-import { sparkStore } from '@/plugins/spark/store';
+import { prettify, Unit } from '@/plugins/spark/units';
 
 import ValEditBase from '../ValEditBase';
 
 @Component
 export default class UnitValEdit extends ValEditBase {
   prettify = prettify;
-
   field!: Unit;
+  local: number | null = null;
 
-  get inputListeners(): Mapped<Function> {
-    const func = (v: number | null): void => {
-      this.field.value = (v === null || Number.isNaN(v)) ? null : v;
-      this.saveField(this.field);
-    };
-    return this.lazy ? { change: func } : { input: func };
+  @Watch('local')
+  updateField(newV: number | null): void {
+    if (newV === null || !Number.isNaN(newV)) {
+      this.field.value = newV;
+    }
   }
 
-  get unitOpts(): { label: string; value: string }[] {
-    const vals =
-      Object.values(sparkStore.unitAlternatives(this.serviceId)).find(vals => vals.includes(this.field.unit)) || [];
-
-    return vals.map(v => ({ label: prettify(v), value: v }));
+  created(): void {
+    this.local = this.field.value;
   }
 }
 </script>
 
 <template>
-  <q-item v-if="editable">
+  <div v-if="editable" class="row no-wrap q-gutter-x-xs">
     <q-input
-      :value="field.value"
-      step="any"
+      v-model.number="local"
       :dense="dense"
-      type="number"
-      class="q-mr-xs"
-      v-on="inputListeners"
+      inputmode="numeric"
+      pattern="[0-9]*"
+      class="col-grow"
+      label="Value"
+      :suffix="field.notation"
     />
-    <q-select
-      :value="field.unit"
-      :options="unitOpts"
-      :display-value="field.notation"
-      :dense="dense"
-      emit-value
-      @input="v => { field.unit = v; saveField(field); }"
-    />
-  </q-item>
-  <div v-else>
+  </div>
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ field }}
   </div>
 </template>

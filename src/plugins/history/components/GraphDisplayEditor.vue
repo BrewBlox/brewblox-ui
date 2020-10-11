@@ -52,11 +52,11 @@ export default class GraphDisplayEditor extends Vue {
   }
 
   fieldRename(field): string {
-    return this.config.renames[field] || defaultLabel(field);
+    return this.config.renames[field] ?? defaultLabel(field);
   }
 
   saveRename(field: string, label: string | null): void {
-    this.config.renames[field] = label || defaultLabel(field);
+    this.config.renames[field] = label ?? defaultLabel(field);
     this.saveConfig();
   }
 }
@@ -64,18 +64,17 @@ export default class GraphDisplayEditor extends Vue {
 
 <template>
   <q-list>
-    <!-- <q-item>
-      <q-item-section>Metric</q-item-section>
-      <q-item-section>Display settings</q-item-section>
-    </q-item>
-    <q-separator inset /> -->
-
-
-    <!-- <GraphPeriodEditor :config="config" @update:config="saveConfig" /> -->
-
-    <div v-for="field in selected" :key="field" class="align-children row wrap q-pa-sm">
+    <div
+      v-for="field in selected"
+      :key="field"
+      class="align-children row wrap q-pa-sm"
+    >
       <q-item-section class="col-5">
-        <InputField :value="fieldRename(field)" title="Legend" @input="v => saveRename(field, v)" />
+        <InputField
+          :value="fieldRename(field)"
+          title="Legend"
+          @input="v => saveRename(field, v)"
+        />
       </q-item-section>
       <q-space />
       <q-item-section class="col-grow">

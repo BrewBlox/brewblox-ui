@@ -16,6 +16,6 @@ export default {
       Herms,
       Rims,
     ]
-      .forEach(featureStore.createQuickStart);
+      .forEach(featureStore.registerQuickStart);
   },
 };

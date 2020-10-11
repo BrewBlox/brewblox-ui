@@ -9,8 +9,18 @@ export default class NumberValEdit extends ValEditBase { }
 </script>
 
 <template>
-  <q-input v-if="editable" v-model.number="field" type="number" step="any" dense />
-  <div v-else>
+  <q-input
+    v-if="editable"
+    v-model.number="field"
+    inputmode="numeric"
+    pattern="[0-9]*"
+    dense
+  />
+  <div
+    v-else
+    class="clickable q-pa-sm rounded-borders"
+    @click="startEdit"
+  >
     {{ field }}
   </div>
 </template>

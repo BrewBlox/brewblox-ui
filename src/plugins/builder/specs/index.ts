@@ -19,11 +19,11 @@ import ImmersionCoil from './ImmersionCoil';
 import Keg from './Keg';
 import Kettle from './Kettle';
 import Lauterhexe from './Lauterhexe';
+import LValve from './LValve';
 import PidDisplay from './PidDisplay';
 import ProfileDisplay from './ProfileDisplay';
 import Pump from './Pump';
 import PwmDisplay from './PwmDisplay';
-import PwmPump from './PwmPump';
 import RimsTube from './RimsTube';
 import SensorDisplay from './SensorDisplay';
 import SessionLogDisplay from './SessionLogDisplay';
@@ -57,11 +57,11 @@ const specs: { [key: string]: PartSpec } = {
   Keg,
   Kettle,
   Lauterhexe,
+  LValve,
   PidDisplay,
   ProfileDisplay,
   Pump,
   PwmDisplay,
-  PwmPump,
   RimsTube,
   SensorDisplay,
   SessionLogDisplay,

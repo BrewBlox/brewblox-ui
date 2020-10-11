@@ -1,10 +1,9 @@
 <script lang="ts">
-import get from 'lodash/get';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { durationMs, durationString } from '@/helpers/functional';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/plugins/spark/parse-object';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/getters';
 import { MetricsConfig } from '../Metrics/types';
@@ -26,25 +25,25 @@ export default class MetricsDisplayDialog extends DialogBase {
   }
 
   get rename(): string {
-    return this.local!.renames[this.field] || defaultLabel(this.field);
+    return this.local!.renames[this.field] ?? defaultLabel(this.field);
   }
 
   set rename(val: string) {
-    this.$set(this.local!.renames, this.field, val || defaultLabel(this.field));
+    this.$set(this.local!.renames, this.field, val ?? defaultLabel(this.field));
   }
 
   get fresh(): string {
     return durationString(
-      this.local!.freshDuration[this.field] || DEFAULT_FRESH_DURATION);
+      this.local!.freshDuration[this.field] ?? DEFAULT_FRESH_DURATION);
   }
 
   set fresh(val: string) {
-    const ms = durationMs(val) || DEFAULT_FRESH_DURATION;
+    const ms = durationMs(val) ?? DEFAULT_FRESH_DURATION;
     this.$set(this.local!.freshDuration, this.field, ms);
   }
 
   get decimals(): number {
-    return get(this.local!.decimals, this.field, DEFAULT_DECIMALS);
+    return this.local!.decimals[this.field] ?? DEFAULT_DECIMALS;
   }
 
   set decimals(val: number) {
@@ -60,9 +59,14 @@ export default class MetricsDisplayDialog extends DialogBase {
 
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard v-bind="{title, message, html}">
-      <q-list dense>
+      <div class="column q-gutter-xs">
         <InputField v-model="rename" title="Label" label="Label" />
         <InputField v-model="fresh" title="Warn when older than" label="Warn when older than" />
         <InputField
@@ -73,7 +77,7 @@ export default class MetricsDisplayDialog extends DialogBase {
           title="Number of decimals"
           label="Number of decimals"
         />
-      </q-list>
+      </div>
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

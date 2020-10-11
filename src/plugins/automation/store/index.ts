@@ -1,179 +1,146 @@
-import Vue from 'vue';
-import { Action, getModule, Module, Mutation, VuexModule } from 'vuex-module-decorators';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { objReducer } from '@/helpers/functional';
-import { deserialize } from '@/helpers/units/parseObject';
+import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 
-import { Process, Runtime } from '../types';
-import { processApi, runtimeApi } from './api';
+import {
+  AutomationEventData,
+  AutomationProcess,
+  AutomationStepJump,
+  AutomationTask,
+  AutomationTemplate,
+} from '../types';
+import * as processApi from './process-api';
+import * as taskApi from './task-api';
+import templateApi from './template-api';
 
-const rawError = true;
-
-@Module({ store, namespaced: true, dynamic: true, name: 'automation' })
+@Module({ generateMutationSetters: true })
 export class AutomationModule extends VuexModule {
-  public processes: Mapped<Process> = {};
-  public runtimes: Mapped<Runtime> = {};
+  public processes: AutomationProcess[] = [];
+  public tasks: AutomationTask[] = [];
+  public lastEvent: Date | null = null;
 
-  public source: EventSource | null = null;
-  public lastUpdate = 0;
+  public templates: AutomationTemplate[] = [];
+  public activeTemplate: string | null = null;
+  public activeStep: string | null = null;
 
   public get processIds(): string[] {
-    return Object.keys(this.processes);
+    return this.processes.map(v => v.id);
   }
 
-  public get processValues(): Process[] {
-    return Object.values(this.processes);
+  public get taskIds(): string[] {
+    return this.tasks.map(v => v.id);
   }
 
-  public get processById(): (id: string) => Process {
-    return id => this.processes[id] || null;
+  public get templateIds(): string[] {
+    return this.templates.map(v => v.id);
   }
 
-  public get runtimeIds(): string[] {
-    return Object.keys(this.runtimes);
+  public processById(id: string | null): AutomationProcess | null {
+    return findById(this.processes, id);
   }
 
-  public get runtimeValues(): Runtime[] {
-    return Object.values(this.runtimes);
+  public taskById(id: string | null): AutomationTask | null {
+    return findById(this.tasks, id);
   }
 
-  public get runtimeById(): (id: string) => Runtime {
-    return id => this.runtimes[id] || null;
-  }
-
-  @Mutation
-  public commitProcess(process: Process): void {
-    Vue.set(this.processes, process.id, process);
+  public templateById(id: string | null): AutomationTemplate | null {
+    return findById(this.templates, id);
   }
 
   @Mutation
-  public commitRemoveProcess(process: Process): void {
-    Vue.delete(this.processes, process.id);
+  public setTask(task: AutomationTask): void {
+    this.tasks = extendById(this.tasks, task);
   }
 
   @Mutation
-  public commitAllProcesses(processes: Process[]): void {
-    this.processes = processes.reduce(objReducer('id'), {});
+  public setProcess(proc: AutomationProcess): void {
+    this.processes = extendById(this.processes, proc);
   }
 
   @Mutation
-  public commitRuntime(runtime: Runtime): void {
-    Vue.set(this.runtimes, runtime.id, runtime);
+  public setEventData(data: AutomationEventData): void {
+    this.processes = data.processes;
+    this.tasks = data.tasks;
+    this.lastEvent = new Date();
   }
 
   @Mutation
-  public commitRemoveRuntime(runtime: Process | Runtime): void {
-    Vue.delete(this.runtimes, runtime.id);
+  public invalidateEventData(): void {
+    this.processes = [];
+    this.tasks = [];
+    this.lastEvent = null;
   }
 
   @Mutation
-  public commitAllRuntimes(runtimes: Runtime[]): void {
-    this.runtimes = runtimes.reduce(objReducer('id'), {});
+  public setActive(ids: [string | null, string | null] | null): void {
+    const [templateId, stepId] = ids ?? [null, null];
+    this.activeTemplate = templateId;
+    this.activeStep = templateId ? stepId : null;
   }
 
-  @Mutation
-  public commitSource(source: EventSource | null): void {
-    this.source = source;
-    if (source === null) {
-      this.lastUpdate = this.lastUpdate <= 0 ? this.lastUpdate - 1 : 0;
-    }
+  @Action
+  public async createTemplate(template: AutomationTemplate): Promise<void> {
+    await templateApi.create(template); // triggers callback
   }
 
-  @Mutation
-  public commitLastUpdate(): void {
-    this.lastUpdate = new Date().getTime();
+  @Action
+  public async saveTemplate(template: AutomationTemplate): Promise<void> {
+    await templateApi.persist(template); // triggers callback
   }
 
-  @Action({ rawError })
-  public async fetchProcesses(): Promise<void> {
-    this.commitAllProcesses(await processApi.fetch());
+  @Action
+  public async removeTemplate(template: AutomationTemplate): Promise<void> {
+    await templateApi.remove(template); // triggers callback
   }
 
-  @Action({ rawError })
-  public async createProcess(process: Process): Promise<void> {
-    this.commitProcess(await processApi.create(process));
+  @Action
+  public async initProcess(template: AutomationTemplate): Promise<void> {
+    this.setProcess(await processApi.init(template));
   }
 
-  @Action({ rawError })
-  public async saveProcess(process: Process): Promise<void> {
-    this.commitProcess(await processApi.persist(process));
+  @Action
+  public async jumpProcess(args: AutomationStepJump): Promise<void> {
+    this.setProcess(await processApi.jump(args));
   }
 
-  @Action({ rawError })
-  public async removeProcess(process: Process): Promise<void> {
-    await processApi.remove(process);
-    this.commitRemoveProcess(process);
+  @Action
+  public async removeProcess(proc: AutomationProcess): Promise<void> {
+    await processApi.remove(proc);
+    this.processes = filterById(this.processes, proc);
   }
 
-  @Action({ rawError })
-  public async subscribe(): Promise<void> {
-    try {
-      const source = await runtimeApi.subscribe();
-
-      source.onmessage = (event: MessageEvent) => {
-        const runtimes: Runtime[] = deserialize(JSON.parse(event.data));
-        this.commitAllRuntimes(runtimes);
-        this.commitLastUpdate();
-      };
-
-      source.onerror = () => {
-        source.close();
-        this.commitSource(null);
-      };
-
-      this.commitSource(source);
-    } catch (e) {
-      this.commitSource(null);
-    }
+  @Action
+  public async createTask(task: AutomationTask): Promise<void> {
+    this.setTask(await taskApi.create(task));
   }
 
-  @Action({ rawError })
-  public async fetchRuntimes(): Promise<void> {
-    this.commitAllRuntimes(await runtimeApi.fetch());
+  @Action
+  public async saveTask(task: AutomationTask): Promise<void> {
+    this.setTask(await taskApi.persist(task));
   }
 
-  @Action({ rawError })
-  public async startRuntime(process: Process): Promise<void> {
-    this.commitRuntime(await runtimeApi.start(process));
+  @Action
+  public async removeTask(task: AutomationTask): Promise<void> {
+    await taskApi.remove(task);
+    this.tasks = filterById(this.tasks, task);
   }
 
-  @Action({ rawError })
-  public async stopRuntime(runtime: Runtime): Promise<void> {
-    this.commitRuntime(await runtimeApi.stop(runtime));
-  }
-
-  @Action({ rawError })
-  public async advanceRuntime(runtime: Runtime): Promise<void> {
-    this.commitRuntime(await runtimeApi.advance(runtime));
-  }
-
-  @Action({ rawError })
-  public async exitRuntime(runtime: Runtime): Promise<void> {
-    await runtimeApi.exit(runtime);
-    this.commitRemoveRuntime(runtime);
-  }
-
-  @Action({ rawError })
-  public async setup(): Promise<void> {
-    const onChange = (process: Process): void => {
-      const existing = this.processById(process.id);
-      if (!existing || existing._rev !== process._rev) {
-        this.commitProcess(process);
+  @Action
+  public async start(): Promise<void> {
+    const onChange = (template: AutomationTemplate): void => {
+      const existing = this.templateById(template.id);
+      if (!existing || existing._rev !== template._rev) {
+        this.templates = extendById(this.templates, template);
       }
     };
     const onDelete = (id: string): void => {
-      const existing = this.processById(id);
-      if (existing) {
-        this.commitRemoveProcess(existing);
-      }
+      this.templates = filterById(this.templates, { id });
     };
 
-    this.commitAllProcesses(await processApi.fetch());
-    this.commitAllRuntimes(await runtimeApi.fetch());
-
-    processApi.setup(onChange, onDelete);
+    this.templates = await templateApi.fetch();
+    templateApi.subscribe(onChange, onDelete);
   }
 }
 
-export const automationStore = getModule(AutomationModule);
+export const automationStore = new AutomationModule({ store, name: 'automation' });

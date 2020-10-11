@@ -1,15 +1,11 @@
-import get from 'lodash/get';
-
 import { createDialog } from '@/helpers/dialog';
-import { Link } from '@/helpers/units';
 import { sparkStore } from '@/plugins/spark/store';
-import { RelationEdge, RelationNode } from '@/plugins/spark/types';
+import { PidBlock, RelationEdge, RelationNode } from '@/plugins/spark/types';
+import { Link } from '@/plugins/spark/units';
 import { featureStore } from '@/store/features';
 
-import { PidBlock } from './types';
-
 function findLinks(serviceId: string, id: string | null): RelationEdge[] {
-  const block = sparkStore.blocks(serviceId)[id || ''];
+  const block = sparkStore.blockById(serviceId, id);
   if (!id || !block) {
     return [];
   }
@@ -45,17 +41,17 @@ function relations(block: PidBlock): RelationEdge[] {
 
   return [
     ...chain,
-    ...sparkStore.blockValues(block.serviceId)
-      .filter(block => get(block, 'data.targetId.id') === setpointId)
+    ...sparkStore.serviceBlocks(block.serviceId)
+      .filter(block => block.data.targetId?.id === setpointId)
       .map(block => ({ source: block.id, target: setpointId, relation: ['target'] })),
   ];
 }
 
 function nodes(serviceId: string): RelationNode[] {
-  return sparkStore.blockValues(serviceId)
+  return sparkStore.serviceBlocks(serviceId)
     .map(block => ({
       id: block.id,
-      type: featureStore.displayName(block.type),
+      type: featureStore.widgetTitle(block.type),
     }));
 }
 

@@ -4,25 +4,26 @@ import { uid } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { showImportDialog } from '@/helpers/dialog';
-import { ruleChecker } from '@/helpers/functional';
-import { dashboardStore, PersistentWidget } from '@/store/dashboards';
+import { ruleErrorFinder } from '@/helpers/functional';
+import { loadFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
+import { dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 const widgetRules: InputRule[] = [
   v => v !== null || 'Widget must have a value',
   v => isString(v.title) || 'Widget must have a title',
   v => isString(v.feature) || 'Widget must have a type',
-  v => featureStore.featureIds.includes(v.feature) || 'Widget type is unknown',
+  v => featureStore.widgetIds.includes(v.feature) || 'Widget type is unknown',
   v => !!v.config || 'Widget must have config settings',
 ];
 
-const checker = ruleChecker(widgetRules);
+const errorFinder = ruleErrorFinder(widgetRules);
 
 @Component
 export default class ImportWizard extends Vue {
   localChosenDashboardId = '';
-  widget: PersistentWidget | null = null;
+  widget: Widget | null = null;
 
   @Prop({ type: String, default: '' })
   readonly dashboardId!: string;
@@ -39,12 +40,12 @@ export default class ImportWizard extends Vue {
   }
 
   get dashboardOptions(): SelectOption[] {
-    return dashboardStore.dashboardValues
+    return dashboardStore.dashboards
       .map(dash => ({ label: dash.title, value: dash.id }));
   }
 
   get widgetError(): string | null {
-    return checker(this.widget);
+    return errorFinder(this.widget);
   }
 
   get widgetOk(): boolean {
@@ -58,8 +59,7 @@ export default class ImportWizard extends Vue {
     if (!this.widgetOk) {
       return '<invalid config>';
     }
-    const typeName = featureStore.displayName(this.widget.feature) ?? 'Unknown';
-    return `[${typeName}] ${this.widget.title}`;
+    return `[${featureStore.widgetTitle(this.widget.feature)}] ${this.widget.title}`;
   }
 
   get valuesOk(): boolean {
@@ -69,23 +69,15 @@ export default class ImportWizard extends Vue {
   async createWidget(): Promise<void> {
     if (this.widget === null) { return; }
     try {
-      await dashboardStore.appendPersistentWidget({
+      await dashboardStore.appendWidget({
         ...this.widget,
         id: uid(),
         dashboard: this.chosenDashboardId,
       });
-      this.$q.notify({
-        icon: 'mdi-check-all',
-        color: 'positive',
-        message: `Created ${featureStore.displayName(this.widget.feature)} '${this.widget.title}'`,
-      });
+      notify.done(`Created ${featureStore.widgetTitle(this.widget.feature)} '${this.widget.title}'`);
       this.$emit('close');
     } catch (e) {
-      this.$q.notify({
-        icon: 'error',
-        color: 'negative',
-        message: `Failed to create widget: ${e.toString()}`,
-      });
+      notify.error(`Failed to create widget: ${e.toString()}`);
     }
   }
 
@@ -98,13 +90,13 @@ export default class ImportWizard extends Vue {
   }
 
   startImport(): void {
-    showImportDialog<PersistentWidget>(v => this.widget = v);
+    loadFile<Widget>(v => this.widget = v);
   }
 }
 </script>
 
 <template>
-  <div>
+  <ActionCardBody>
     <q-card-section>
       <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
         <q-option-group
@@ -138,11 +130,10 @@ export default class ImportWizard extends Vue {
       </q-item>
     </q-card-section>
 
-    <q-separator />
-
-    <q-card-actions class="row justify-between">
+    <template #actions>
       <q-btn unelevated label="Back" @click="back" />
+      <q-space />
       <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="createWidget" />
-    </q-card-actions>
-  </div>
+    </template>
+  </ActionCardBody>
 </template>

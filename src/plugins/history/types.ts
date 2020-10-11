@@ -1,4 +1,6 @@
-import { Layout } from 'plotly.js';
+import { Annotations, Layout } from 'plotly.js';
+
+import { StoreObject } from '@/plugins/database';
 
 export interface QueryParams {
   database?: string;
@@ -26,8 +28,10 @@ export interface QueryConfig {
   renames: DisplayNames;
 }
 
+export type GraphAxis = 'y' | 'y2';
+
 export interface GraphValueAxes {
-  [key: string]: 'y' | 'y2';
+  [key: string]: GraphAxis;
 }
 
 export interface LineColors {
@@ -71,6 +75,8 @@ export interface MetricsSource extends HistorySource {
   transformer: (source: MetricsSource, result: MetricsResult[]) => HistorySource;
 }
 
+export type GraphAnnotation = Partial<Annotations>;
+
 export interface GraphConfig extends QueryConfig {
   layout: Partial<Layout>;
   axes: GraphValueAxes;
@@ -103,11 +109,10 @@ export interface SessionGraphNote extends SessionNoteBase {
 
 export type SessionNote = SessionTextNote | SessionGraphNote;
 
-export interface LoggedSession {
+export interface LoggedSession extends StoreObject {
   id: string;
   title: string;
   date: number;
   notes: SessionNote[];
   tags?: string[];
-  _rev?: string;
 }

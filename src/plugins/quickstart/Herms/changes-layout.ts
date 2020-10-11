@@ -2,16 +2,16 @@ import { uid } from 'quasar';
 
 import { BuilderLayout } from '@/plugins/builder/types';
 
-import { maybeSpace } from '../helpers';
+import { withPrefix } from '../helpers';
 import { HermsConfig } from './types';
 
 export function defineLayouts(config: HermsConfig): BuilderLayout[] {
   return [
     {
       id: uid(),
-      title: maybeSpace(config.prefix, 'Layout'),
-      width: 28,
-      height: 15,
+      title: withPrefix(config.prefix, 'Layout'),
+      width: 26,
+      height: 11,
       parts: [
         {
           id: uid(),

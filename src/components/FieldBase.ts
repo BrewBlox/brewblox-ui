@@ -29,6 +29,9 @@ export default class FieldBase extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly html!: boolean;
 
+  @Prop({ type: String, required: false })
+  public readonly tooltip!: string;
+
   @Prop({ type: Boolean, default: false })
   public readonly readonly!: boolean;
 
@@ -40,6 +43,9 @@ export default class FieldBase extends Vue {
 
   @Prop({ type: [Array, Object, String], default: '' })
   public readonly tagClass!: string[] | Mapped<string> | string;
+
+  @Prop({ type: [Array, Object, String], default: '' })
+  public readonly tagStyle!: string[] | Mapped<string> | string;
 
   @Prop({ type: Array, default: () => [] })
   public readonly rules!: InputRule[];

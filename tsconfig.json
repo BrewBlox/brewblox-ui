@@ -1,26 +1,43 @@
 {
+  "extends": "@quasar/app/tsconfig-preset",
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
     "importHelpers": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "node",
     "experimentalDecorators": true,
-    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
-    "noUnusedLocals": false,
-    "sourceMap": true,
-    "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ],
+      // Required for quasar-generated entrypoint script
+      "boot/*": [
+        "src/boot/*"
+      ],
     },
-    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ],
+    "types": [
+      "quasar",
+      "jest",
+      "webpack-env"
+    ]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.tsx"],
-  "exclude": [".vscode/**", "node_modules/**"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "test/**/*.ts",
+    "test/**/*.vue",
+  ],
+  "exclude": [
+    "/dist",
+    ".quasar",
+    ".vscode",
+    "node_modules"
+  ]
 }

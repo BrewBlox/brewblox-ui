@@ -49,7 +49,7 @@ export default class RimsTube extends PartBase {
   </g>
 </template>
 
-<style lang="stylus" scoped>
+<style lang="scss" scoped>
 /deep/ .contentLiquid path {
   stroke-width: 30 !important;
   stroke-linecap: butt;

@@ -3,11 +3,11 @@ import { uid } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/units/parseObject';
+import { deepCopy } from '@/plugins/spark/parse-object';
 
 import { emptyGraphConfig } from '../getters';
 import { historyStore } from '../store';
-import { LoggedSession, SessionNote } from '../types';
+import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
 
 
@@ -67,10 +67,7 @@ export default class SessionCreateDialog extends DialogBase {
   }
 
   get sessions(): LoggedSession[] {
-    return [
-      this.example,
-      ...historyStore.sessionValues,
-    ];
+    return [this.example, ...historyStore.sessions];
   }
 
   get knownTags(): string[] {
@@ -102,6 +99,7 @@ export default class SessionCreateDialog extends DialogBase {
           return { ...copy, value: '' };
         }
         if (note.type === 'Graph') {
+          (copy as SessionGraphNote).config.layout.annotations = [];
           return { ...copy, start: null, end: null };
         }
         return copy;
@@ -124,7 +122,12 @@ export default class SessionCreateDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" no-backdrop-dismiss @hide="onDialogHide" @keyup.ctrl.enter="save">
+  <q-dialog
+    ref="dialog"
+    no-backdrop-dismiss
+    @hide="onDialogHide"
+    @keyup.enter="save"
+  >
     <DialogCard :title="title">
       <q-input
         v-model="sessionTitle"
