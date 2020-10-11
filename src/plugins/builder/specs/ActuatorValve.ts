@@ -1,7 +1,6 @@
 import { Notify } from 'quasar';
 
-import { fetchJson } from '@/helpers/fetch';
-import { serialize } from '@/helpers/units/parseObject';
+import axios from 'axios';
 
 import { LEFT, RIGHT } from '../getters';
 import { PartSpec, PartUpdater, PersistentPart, Transitions } from '../types';
@@ -40,22 +39,10 @@ const spec: PartSpec = {
       const message = part.settings.valveid + (part.settings.closed ? '1' : '0');
       console.log(message);
 
-      const post =
-        async (data: any, method = 'POST'): Promise<any> =>
-          fetchJson(
-            'https://localhost:9001/valves/write',
-            {
-              method,
-              body: JSON.stringify(serialize(data)),
-              headers: new Headers({
-                'Content-Type': 'application/json',
-              }),
-            },
-          );
-
-      post(
+      axios.post(
+        'https://192.168.1.106:9001/valves/write',
         {
-          message,
+          "message": message
         },
       ).catch(intercept(`Failed to write valves: ${0}`));
 
