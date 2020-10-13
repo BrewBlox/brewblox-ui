@@ -47,6 +47,13 @@ export default class ActuatorPwmBasic
   }
 
   get pwmSetting(): number | null {
+    const v = this.block.data.setting;
+    return v
+      ? roundNumber(v, 1)
+      : v;
+  }
+
+  get pwmDesired(): number | null {
     const v = this.block.data.desiredSetting;
     return v
       ? roundNumber(v, 1)
@@ -61,6 +68,7 @@ export default class ActuatorPwmBasic
 
     <div class="widget-body row justify-center">
       <div class="col-break q-mt-md" />
+
       <div class="fade-4" style="width: 6ch">
         Value
       </div>
@@ -72,7 +80,9 @@ export default class ActuatorPwmBasic
         class="col-grow fade-3"
         color="positive"
       />
+
       <div class="col-break" />
+
       <div class="fade-4" style="width: 6ch">
         Setting
       </div>
@@ -80,12 +90,28 @@ export default class ActuatorPwmBasic
         :value="pwmSetting"
         dense
         label
+        readonly
+        color="secondary"
+        class="col-grow fade-3"
+      />
+
+      <div class="col-break" />
+
+      <div class="fade-4" style="width: 6ch">
+        Desired
+      </div>
+      <q-slider
+        :value="pwmDesired"
+        dense
+        label
         :readonly="isDriven"
         :color="isConstrained ? 'pink-4' : 'primary'"
         :class="['col-grow', isDriven && 'fade-4']"
         @change="updateSetting"
       />
+
       <div class="col-break" />
+
       <div
         v-if="!isDriven"
         class="col-grow row justify-between q-gutter-sm"
