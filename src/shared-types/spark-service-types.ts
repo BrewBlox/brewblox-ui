@@ -39,6 +39,7 @@ export interface ApiSparkStatus {
   is_connected: boolean;
   is_acknowledged: boolean;
   is_synchronized: boolean;
+  is_updating: boolean;
 }
 // #endregion ApiSparkStatus
 
