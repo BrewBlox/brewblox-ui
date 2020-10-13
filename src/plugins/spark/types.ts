@@ -49,6 +49,7 @@ export interface SparkStatus {
   isConnected?: boolean;
   isAcknowledged?: boolean;
   isSynchronized?: boolean;
+  isUpdating?: boolean;
 }
 
 export interface SparkStateMessage extends StateEventMessage {

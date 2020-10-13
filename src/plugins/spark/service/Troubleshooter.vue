@@ -159,6 +159,18 @@ export default class Troubleshooter extends Vue {
         {{ lastStatus }}
       </LabeledField>
 
+      <template v-if="status.isUpdating">
+        <div class="col-break" />
+        <q-icon
+          v-bind="iconProps(status.isUpdating)"
+          color="secondary"
+          name="mdi-progress-download"
+        />
+        <div>
+          Update is in progress
+        </div>
+      </template>
+
       <div class="col-break" />
       <q-icon v-bind="iconProps(status.isServiceReachable)" />
       <div>
