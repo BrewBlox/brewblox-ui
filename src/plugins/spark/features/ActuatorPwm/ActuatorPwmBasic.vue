@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { roundNumber } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { ActuatorPwmBlock } from '@/plugins/spark/types';
 
@@ -11,13 +12,20 @@ export default class ActuatorPwmBasic
 
   quickValues = [
     { label: '0%', value: 0 },
+    { label: '25%', value: 25 },
     { label: '50%', value: 50 },
+    { label: '75%', value: 75 },
     { label: '100%', value: 100 },
   ]
 
   get isConstrained(): boolean {
     return this.block.data.enabled
       && this.block.data.setting !== this.block.data.desiredSetting;
+  }
+
+  updateSetting(value: number): void {
+    this.block.data.desiredSetting = value;
+    this.saveBlock();
   }
 
   editSetting(): void {
@@ -28,10 +36,21 @@ export default class ActuatorPwmBasic
       value: this.block.data.desiredSetting,
       quickActions: this.quickValues,
     })
-      .onOk(v => {
-        this.block.data.desiredSetting = v;
-        this.saveBlock();
-      });
+      .onOk(this.updateSetting);
+  }
+
+  get pwmValue(): number | null {
+    const v = this.block.data.value;
+    return v
+      ? roundNumber(v, 1)
+      : v;
+  }
+
+  get pwmSetting(): number | null {
+    const v = this.block.data.desiredSetting;
+    return v
+      ? roundNumber(v, 1)
+      : v;
   }
 }
 </script>
@@ -41,19 +60,48 @@ export default class ActuatorPwmBasic
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
-      <SettingValueField :editable="!isDriven" class="col-auto" @click="editSetting">
-        <template #valueIcon>
-          <PwmIcon />
-        </template>
-        <template #value>
-          {{ block.data.value | round }} %
-        </template>
-        <template #setting>
-          <div :class="{'text-orange': isConstrained}">
-            {{ block.data.setting | round }} %
-          </div>
-        </template>
-      </SettingValueField>
+      <div class="col-break q-mt-md" />
+      <div class="fade-4" style="width: 6ch">
+        Value
+      </div>
+      <q-slider
+        :value="pwmValue"
+        dense
+        label
+        readonly
+        class="col-grow fade-3"
+        color="positive"
+      />
+      <div class="col-break" />
+      <div class="fade-4" style="width: 6ch">
+        Setting
+      </div>
+      <q-slider
+        :value="pwmSetting"
+        dense
+        label
+        :readonly="isDriven"
+        :color="isConstrained ? 'pink-4' : 'primary'"
+        :class="['col-grow', isDriven && 'fade-4']"
+        @change="updateSetting"
+      />
+      <div class="col-break" />
+      <div
+        v-if="!isDriven"
+        class="col-grow row justify-between q-gutter-sm"
+      >
+        <div
+          v-for="q in quickValues"
+          :key="'quick'+q.value"
+          class="col-auto"
+        >
+          <q-btn
+            :label="q.label"
+            unelevated
+            @click="updateSetting(q.value)"
+          />
+        </div>
+      </div>
 
       <div class="col-break" />
 
@@ -73,20 +121,3 @@ export default class ActuatorPwmBasic
     </div>
   </div>
 </template>
-
-<style lang="sass" scoped>
-.grid-container
-  display: grid
-  grid-template-columns: repeat(3, 50px)
-  grid-row-gap: 5px
-  grid-auto-flow: row
-
-.grid-icon
-  grid-column-end: span 1
-  grid-column-start: 1
-
-.grid-value
-  grid-column-end: span 2
-  grid-column-start: 2
-  align-self: flex-end
-</style>
