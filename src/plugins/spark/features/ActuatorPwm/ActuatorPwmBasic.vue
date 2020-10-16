@@ -88,7 +88,7 @@ export default class ActuatorPwmBasic
       <div v-else class="text-indigo-4 text-center">
         Externally driven
       </div>
-      <div class="q-pt-xl" style="width: 90%; margin-left: 5%; position: relative">
+      <div class="q-pt-xl q-pb-lg" style="width: 90%; margin-left: 5%; position: relative">
         <q-slider
           :value="pwmValue"
           dense
@@ -121,15 +121,15 @@ export default class ActuatorPwmBasic
         />
       </div>
 
-      <div class="q-mt-lg full-width row justify-around">
+      <div class="full-width row justify-around">
         <div class="text-primary">
-          Setting
+          Desired %
         </div>
         <div class="text-pink-4">
-          Limited
+          Limited %
         </div>
         <div class="text-secondary">
-          Achieved
+          Achieved %
         </div>
       </div>
 
