@@ -42,21 +42,21 @@ export default class ActuatorPwmBasic
   get pwmValue(): number | null {
     const v = this.block.data.value;
     return v
-      ? roundNumber(v, 1)
+      ? roundNumber(v, 0)
       : v;
   }
 
   get pwmSetting(): number | null {
     const v = this.block.data.setting;
     return v
-      ? roundNumber(v, 1)
+      ? roundNumber(v, 0)
       : v;
   }
 
   get pwmDesired(): number | null {
     const v = this.block.data.desiredSetting;
     return v
-      ? roundNumber(v, 1)
+      ? roundNumber(v, 0)
       : v;
   }
 }
@@ -66,84 +66,90 @@ export default class ActuatorPwmBasic
   <div class="widget-md">
     <slot name="warnings" />
 
-    <div class="widget-body row justify-center">
-      <div class="col-break q-mt-md" />
-
-      <div class="fade-4" style="width: 6ch">
-        Value
-      </div>
-      <q-slider
-        :value="pwmValue"
-        dense
-        label
-        readonly
-        class="col-grow fade-3"
-        color="positive"
-      />
-
-      <div class="col-break" />
-
-      <div class="fade-4" style="width: 6ch">
-        Setting
-      </div>
-      <q-slider
-        :value="pwmSetting"
-        dense
-        label
-        readonly
-        color="secondary"
-        class="col-grow fade-3"
-      />
-
-      <div class="col-break" />
-
-      <div class="fade-4" style="width: 6ch">
-        Desired
-      </div>
-      <q-slider
-        :value="pwmDesired"
-        dense
-        label
-        :readonly="isDriven"
-        :color="isConstrained ? 'pink-4' : 'primary'"
-        :class="['col-grow', isDriven && 'fade-4']"
-        @change="updateSetting"
-      />
-
-      <div class="col-break" />
-
+    <div class="widget-body">
       <div
         v-if="!isDriven"
-        class="col-grow row justify-between q-gutter-sm"
+        class="row justify-around full-width"
       >
         <div
           v-for="q in quickValues"
           :key="'quick'+q.value"
-          class="col-auto"
+          class="col-auto blue-3"
         >
           <q-btn
             :label="q.label"
             unelevated
+            :disabled="isDriven"
+            color="grey-11"
             @click="updateSetting(q.value)"
           />
         </div>
       </div>
+      <div v-else class="text-indigo-4 text-center">
+        Externally driven
+      </div>
+      <div class="q-pt-xl" style="width: 90%; margin-left: 5%; position: relative">
+        <q-slider
+          :value="pwmValue"
+          dense
+          label
+          readonly
+          label-always
+          color="secondary"
+          style="position: absolute; width: 100%;"
+          @change="updateSetting"
+        />
+        <q-slider
+          :value="pwmSetting"
+          dense
+          label
+          readonly
+          label-always
+          color="pink-4"
+          style="position: absolute; width: 100%;"
+          @change="updateSetting"
+        />
+        <q-slider
+          :value="pwmDesired"
+          dense
+          label
+          label-always
+          :readonly="isDriven"
+          color="primary"
+          style="position: absolute; width: 100%;"
+          @change="updateSetting"
+        />
+      </div>
 
-      <div class="col-break" />
+      <div class="q-mt-lg full-width row justify-around">
+        <div class="text-primary">
+          Setting
+        </div>
+        <div class="text-pink-4">
+          Limited
+        </div>
+        <div class="text-secondary">
+          Achieved
+        </div>
+      </div>
 
-      <DrivenIndicator
-        :block-id="block.id"
-        :service-id="serviceId"
-        class="col-grow"
-      />
 
-      <ConstraintsField
-        :value="block.data.constrainedBy"
-        :service-id="serviceId"
-        type="analog"
-        class="col-grow"
-        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
-      />
+      <div class="q-mt-lg full-width row">
+        <DrivenIndicator
+          :block-id="
+            block.id"
+          :service-id="serviceId"
+          class="col-grow"
+        />
+
+        <ConstraintsField
+          :value="block.data.constrainedBy"
+          :service-id="serviceId"
+          type="analog"
+          class="col-grow"
+          @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+        />
+      </div>
     </div>
   </div>
 </template>
