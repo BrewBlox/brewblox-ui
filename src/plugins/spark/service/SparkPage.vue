@@ -99,7 +99,7 @@ export default class SparkPage extends Vue {
   get statusNok(): boolean {
     return this.isAvailable
       && this.status !== null
-      && !this.status.isSynchronized;
+      && (!this.status.isSynchronized || !!this.status.isUpdating);
   }
 
   get pageMode(): PageMode {
@@ -402,7 +402,7 @@ export default class SparkPage extends Vue {
             @click="cleanUnusedNames"
           />
           <ActionItem
-            icon="mdi-download-network"
+            icon="mdi-progress-download"
             label="Update firmware"
             @click="startDialog('FirmwareUpdateDialog')"
           />

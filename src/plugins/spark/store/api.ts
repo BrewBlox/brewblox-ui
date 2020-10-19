@@ -75,7 +75,9 @@ export const persistAutoconnecting = (serviceId: string, enabled: boolean): Prom
 
 export const fetchSparkStatus = async (serviceId: string): Promise<SparkStatus> => {
   try {
-    const resp = await http.get<ApiSparkStatus>(`/${encodeURIComponent(serviceId)}/system/status`);
+    const resp = await http.get<ApiSparkStatus>(
+      `/${encodeURIComponent(serviceId)}/system/status`,
+      { timeout: 5 * 1000 });
     return asSparkStatus(serviceId, resp.data);
   } catch (error) {
     notify.warn(`Unable to fetch Spark status: ${error}`, { shown: false });

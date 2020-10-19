@@ -99,7 +99,7 @@ export const isoDateString =
   };
 
 export const round =
-  (value: any, digits = 2): string | number => {
+  (value: any, digits = 2): string => {
     if (value === null || value === undefined) {
       return '--.--';
     }

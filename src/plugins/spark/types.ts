@@ -1,10 +1,17 @@
+export * from '@/shared-types/spark-block-enums';
+export * from '@/shared-types/spark-block-types';
+export * from '@/shared-types/spark-service-types';
+
+import { Layout } from 'plotly.js';
+
 import { StoreObject } from '@/plugins/database';
 import { StateEventMessage } from '@/plugins/eventbus';
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
+import { BlockOrIntfType } from '@/shared-types/spark-block-enums';
+import { Block } from '@/shared-types/spark-block-types';
+import { ApiSparkStatus } from '@/shared-types/spark-service-types';
 import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
-
-import { ApiSparkStatus, Block, BlockOrIntfType } from './shared';
 
 export type PageMode =
   | 'Relations'
@@ -22,8 +29,6 @@ export interface SparkFeature {
   feature: WidgetFeature<BlockConfig>;
   block?: BlockSpec;
 }
-
-export type UserUnitKey = 'Temp';
 
 export interface UserUnits {
   Temp: 'degC' | 'degF';
@@ -44,6 +49,7 @@ export interface SparkStatus {
   isConnected?: boolean;
   isAcknowledged?: boolean;
   isSynchronized?: boolean;
+  isUpdating?: boolean;
 }
 
 export interface SparkStateMessage extends StateEventMessage {
@@ -77,9 +83,6 @@ export interface RelationNode {
 export interface Limiters {
   [blockId: string]: string[];
 }
-
-import { Layout } from 'plotly.js';
-
 
 export interface StoredDataPreset<DataT = any> extends StoreObject {
   type: string;

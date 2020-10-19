@@ -1,13 +1,19 @@
-/**
- * The types in this file are relevant to both the automation service and the UI.
- */
-import { Method } from 'axios';
-
 export interface ReqBlockAddress {
   serviceId: string;
   type: string;
   id: string;
 }
+
+export type Method =
+  | 'get' | 'GET'
+  | 'delete' | 'DELETE'
+  | 'head' | 'HEAD'
+  | 'options' | 'OPTIONS'
+  | 'post' | 'POST'
+  | 'put' | 'PUT'
+  | 'patch' | 'PATCH'
+  | 'link' | 'LINK'
+  | 'unlink' | 'UNLINK'
 
 export type AutomationStatus =
   | 'Invalid'     // Configuration missing or invalid.
@@ -21,12 +27,12 @@ export type AutomationStatus =
 /**
  * Serialized Date value (number in ms, or ISO-8601)
  */
-type DateTime = number | string;
+export type DateTime = number | string;
 
 /**
  * @pattern ^[0-9a-fA-F\-]{36}$
  */
-type UUID = string;
+export type UUID = string;
 
 /**
  * Required fields for an object to be stored in the datastore.

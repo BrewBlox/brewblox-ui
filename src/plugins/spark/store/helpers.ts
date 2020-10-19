@@ -136,6 +136,7 @@ export const asSparkStatus = (serviceId: string, status: ApiSparkStatus | null):
     isConnected: status.is_connected,
     isAcknowledged: status.is_acknowledged,
     isSynchronized: status.is_synchronized,
+    isUpdating: status.is_updating,
   };
 };
 

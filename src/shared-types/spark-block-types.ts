@@ -17,7 +17,7 @@ import type {
   ValveState,
   WifiCipherType,
   WifiSecurityType,
-} from './block-enums';
+} from './spark-block-enums';
 
 // #region Block
 export interface Block {
