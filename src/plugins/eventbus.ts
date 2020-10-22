@@ -2,7 +2,7 @@ import mqtt from 'mqtt';
 import { VueConstructor } from 'vue';
 import Vue from 'vue';
 
-import { HOSTNAME, PORT } from '@/helpers/const';
+import { HOSTNAME, PORT, WS_PROTOCOL } from '@/helpers/const';
 import { popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 
@@ -38,7 +38,7 @@ export class BrewbloxEventbus {
 
   public async start(): Promise<void> {
     const opts: mqtt.IClientOptions = {
-      protocol: 'wss',
+      protocol: WS_PROTOCOL,
       host: HOSTNAME,
       port: PORT,
       path: '/eventbus',

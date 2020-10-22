@@ -96,6 +96,12 @@ module.exports = configure(function (ctx) {
         ? 'cheap-module-eval-source-map'
         : undefined,
 
+      supportTS: {
+        tsCheckerConfig: {
+          eslint: true,
+        },
+      },
+
       env: ctx.dev
         ? {
           ...sharedEnv,
