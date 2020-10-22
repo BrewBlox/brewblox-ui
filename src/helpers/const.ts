@@ -9,5 +9,8 @@ export const PORT = process.env.DEV
   ? Number(devPort)
   : Number(window.location.port) || 443;
 
+export const PROTOCOL = window.location.protocol.replace(':', '');
+export const WS_PROTOCOL = PROTOCOL.replace('http', 'ws') as 'ws' | 'wss';
 
-export const HOST = `https://${HOSTNAME}:${PORT}`;
+export const HOST = `${PROTOCOL}://${HOSTNAME}:${PORT}`;
+export const WS_HOST = `${WS_PROTOCOL}://${HOSTNAME}:${PORT}`;

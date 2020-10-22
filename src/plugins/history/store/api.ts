@@ -1,6 +1,6 @@
 import mapKeys from 'lodash/mapKeys';
 
-import { HOSTNAME, PORT } from '@/helpers/const';
+import { WS_HOST } from '@/helpers/const';
 import { isoDateString, snakeCased } from '@/helpers/functional';
 import http from '@/helpers/http';
 import { createApi } from '@/plugins/database/api';
@@ -22,7 +22,7 @@ const timeFormatted =
 export const historyApi = {
   openStreamedValues:
     async (params: QueryParams, target: QueryTarget): Promise<WebSocket> => {
-      const ws = new WebSocket(`wss://${HOSTNAME}:${PORT}/history/query/stream/values`);
+      const ws = new WebSocket(`${WS_HOST}/history/query/stream/values`);
       ws.onopen = () => ws.send(JSON.stringify({
         ...snakeCasedObj(timeFormatted(params)),
         ...snakeCasedObj(target),
@@ -33,7 +33,7 @@ export const historyApi = {
 
   openStreamedMetrics:
     async (params: QueryParams, target: QueryTarget): Promise<WebSocket> => {
-      const ws = new WebSocket(`wss://${HOSTNAME}:${PORT}/history/query/stream/last_values`);
+      const ws = new WebSocket(`${WS_HOST}/history/query/stream/last_values`);
       ws.onopen = () => ws.send(JSON.stringify({
         ...snakeCasedObj(params),
         ...snakeCasedObj(target),
