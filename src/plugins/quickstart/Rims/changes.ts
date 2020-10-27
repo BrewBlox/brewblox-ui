@@ -251,6 +251,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
         [`${serviceId}/${names.pumpAct}/state`]: 'y2',
       },
       colors: {},
+      precision: {},
     },
   };
 

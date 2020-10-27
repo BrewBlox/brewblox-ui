@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');

@@ -371,6 +371,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
         [`${serviceId}/${names.bkPwm}/value`]: 'y2',
       },
       colors: {},
+      precision: {},
     },
   });
 
