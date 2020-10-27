@@ -10,7 +10,7 @@ export const HOSTNAME = process.env.DEV
 
 export const PORT = process.env.DEV
   ? Number(devPort)
-  : Number(window.location.port) || PROTOCOL === 'https' ? 443 : 80;
+  : Number(window.location.port) || (PROTOCOL === 'https' ? 443 : 80);
 
 export const HOST = `${PROTOCOL}://${HOSTNAME}:${PORT}`;
 export const WS_HOST = `${WS_PROTOCOL}://${HOSTNAME}:${PORT}`;
