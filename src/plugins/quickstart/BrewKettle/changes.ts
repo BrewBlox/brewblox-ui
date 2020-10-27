@@ -170,6 +170,7 @@ export function defineWidgets(config: BrewKettleConfig, layouts: BuilderLayout[]
         [`${serviceId}/${names.kettlePwm}/value`]: 'y2',
       },
       colors: {},
+      precision: {},
     },
   });
 

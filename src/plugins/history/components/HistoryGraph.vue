@@ -15,6 +15,7 @@ import {
   GraphConfig,
   GraphSource,
   GraphValueAxes,
+  LabelPrecision,
   LineColors,
   QueryParams,
   QueryTarget,
@@ -104,6 +105,10 @@ export default class HistoryGraph extends Vue {
     return this.config.colors ?? {};
   }
 
+  get precision(): LabelPrecision {
+    return this.config.precision ?? {};
+  }
+
   get layout(): Partial<Layout> {
     return this.config.layout;
   }
@@ -131,7 +136,7 @@ export default class HistoryGraph extends Vue {
   get sources(): GraphSource[] {
     return this.targets
       .map(target => historyStore.sourceById(this.sourceId(target)))
-      .filter(source => source !== null && !!source.values) as GraphSource[];
+      .filter((source): source is GraphSource => source != null);
   }
 
   get error(): string | null {
@@ -146,7 +151,7 @@ export default class HistoryGraph extends Vue {
     return null;
   }
 
-  get graphData(): PlotData[] {
+  get graphData(): Partial<PlotData>[] {
     return this.sources
       .flatMap(source => Object.values(source.values));
   }
@@ -169,6 +174,7 @@ export default class HistoryGraph extends Vue {
         this.renames,
         this.axes,
         this.colors,
+        this.precision,
         target,
       ));
   }

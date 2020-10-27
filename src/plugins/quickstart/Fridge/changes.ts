@@ -297,6 +297,7 @@ export const defineWidgets = (
         [`${serviceId}/${names.coolAct}/state`]: 'y2',
       },
       colors: {},
+      precision: {},
     },
   });
 
