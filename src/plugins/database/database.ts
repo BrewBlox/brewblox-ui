@@ -1,18 +1,21 @@
+import { AxiosError } from 'axios';
 import { Notify } from 'quasar';
 
-import http from '@/helpers/http';
+import http, { parseHttpError } from '@/helpers/http';
 import notify from '@/helpers/notify';
 
 import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
 
+
 const moduleNamespace = (moduleId: string): string =>
   `brewblox-ui-store:${moduleId}`;
 
-const intercept = (message: string, moduleId: string): (e: Error) => never =>
-  (e: Error) => {
-    notify.error(`DB error in ${message}(${moduleId}): ${e.message}`, { shown: false });
+function intercept(message: string, moduleId: string): ((e: AxiosError) => never) {
+  return (e: AxiosError) => {
+    notify.error(`DB error in ${message}(${moduleId}): ${parseHttpError(e)}`, { shown: false });
     throw e;
   };
+}
 
 async function retryDatastore(): Promise<void> {
   while (true) {

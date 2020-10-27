@@ -1,3 +1,5 @@
+import { VueConstructor } from 'vue';
+
 import { autoRegister, ref } from '@/helpers/component-ref';
 import { featureStore, WidgetFeature } from '@/store/features';
 
@@ -23,8 +25,8 @@ const feature: WidgetFeature<BuilderConfig> = {
 };
 
 export default {
-  install() {
-    builderStore.setup();
+  install(Vue: VueConstructor) {
+    Vue.$startup.onStart(() => builderStore.start());
 
     autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
     autoRegister(require.context('./parts', true, /[A-Z]\w+\.vue$/));
