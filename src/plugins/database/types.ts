@@ -16,9 +16,9 @@ export interface BrewbloxDatabase {
 
   /**
    * Perform startup functionality.
-   * Is registered as BrewbloxStartup handler.
+   * Is called by the App component during create
    */
-  start(): void;
+  start(): Awaitable<void>;
 
   /**
    * Hook for external change events.
