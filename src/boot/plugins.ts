@@ -36,12 +36,9 @@ export default async ({ Vue }: { Vue: VueConstructor }): Promise<void> => {
     misc,
   ];
 
-  try {
-    Vue.$startup.onStart(() => systemStore.start());
-    Vue.$startup.onStart(() => serviceStore.start());
-    Vue.$startup.onStart(() => dashboardStore.start());
-  }
-  catch (e) { }
+  Vue.$startup.onStart(() => systemStore.start());
+  Vue.$startup.onStart(() => serviceStore.start());
+  Vue.$startup.onStart(() => dashboardStore.start());
 
   plugins.forEach(plugin => Vue.use(plugin, { store }));
 };
