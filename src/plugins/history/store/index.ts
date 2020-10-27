@@ -27,11 +27,13 @@ const buildQuery =
       database: params.database,
       start: isoDateString(params.start),
       end: isoDateString(params.end),
+      duration: params.duration,
       limit: params.limit,
       order_by: params.orderBy,
       policy: params.policy,
       approx_points: params.approxPoints,
-      ...target,
+      measurement: target.measurement,
+      fields: target.fields,
       epoch,
     });
 
