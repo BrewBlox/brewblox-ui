@@ -1,23 +1,21 @@
 const axios = require('axios');
 const fs = require('fs');
-const { host, retry, databases, fileDir } = require('./utils');
+const { datastore, retry, databases, fileDir } = require('./utils');
 const get = require('lodash/get');
 
-const url = `${host}/history/datastore`;
-
 async function run() {
-  await retry('Waiting for redis', () => axios.get(`${url}/ping`));
+  await retry('Waiting for redis', () => axios.get(`${datastore}/ping`));
 
   for (let db of databases) {
     const fname = `${fileDir}/${db}.redis.json`;
     const docs = JSON.parse(fs.readFileSync(fname));
 
-    await axios.post(`${url}/mdelete`, {
+    await axios.post(`${datastore}/mdelete`, {
       namespace: db,
       filter: '*',
     });
 
-    await axios.post(`${url}/mset`, {
+    await axios.post(`${datastore}/mset`, {
       values: docs,
     });
 
