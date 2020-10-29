@@ -21,13 +21,13 @@ async function retry(desc, func) {
 };
 
 const host = 'https://localhost:9001';
-const datastore = `${host}/datastore`;
 
 module.exports = {
   sleep,
   retry,
   host,
-  datastore,
+  history: `${host}/history/history`,
+  datastore: `${host}/history/datastore`,
   fileDir: path.resolve(__dirname, 'presets'),
   databases: [
     'brewblox-automation',

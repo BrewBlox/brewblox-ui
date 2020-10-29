@@ -1,15 +1,14 @@
 const axios = require('axios');
 const fs = require('fs');
-const { host, retry, databases, fileDir } = require('./utils');
+const { datastore, retry, databases, fileDir } = require('./utils');
 const get = require('lodash/get');
 
 async function run() {
-  await retry('Waiting for datastore', () => axios.get(`${host}/history/ping`));
+  await retry('Waiting for datastore', () => axios.get(`${datastore}/ping`));
 
   for (let db of databases) {
-    const url = `${host}/history/datastore`;
     const docs = await axios
-      .post(`${url}/mget`, {
+      .post(`${datastore}/mget`, {
         namespace: db,
         filter: '*',
       })

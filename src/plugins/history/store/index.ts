@@ -157,11 +157,6 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action
-  public async validateService(): Promise<boolean> {
-    return await historyApi.validateService();
-  }
-
-  @Action
   public async start(): Promise<void> {
     const onChange = (session: LoggedSession): void => {
       this.sessions = extendById(this.sessions, session);
