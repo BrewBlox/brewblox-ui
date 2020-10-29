@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
@@ -95,6 +94,12 @@ module.exports = configure(function (ctx) {
       devtool: ctx.dev
         ? 'cheap-module-eval-source-map'
         : undefined,
+
+      supportTS: {
+        tsCheckerConfig: {
+          eslint: true,
+        },
+      },
 
       env: ctx.dev
         ? {

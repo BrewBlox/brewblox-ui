@@ -3,6 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import isFinite from 'lodash/isFinite';
 import isString from 'lodash/isString';
+import mapKeys from 'lodash/mapKeys';
 import matches from 'lodash/matches';
 import { colors, date } from 'quasar';
 
@@ -34,6 +35,10 @@ export const snakeCased =
     input.replace(/[ -]/, '_')
       .replace(/\.?([A-Z]+)/g, (_, v: string) => `_${v}`)
       .toLowerCase();
+
+export const snakeCasedObj =
+  (obj: Mapped<any>): Mapped<any> =>
+    mapKeys(obj, (_, key) => snakeCased(key));
 
 export const kebabCased =
   (input: string): string =>

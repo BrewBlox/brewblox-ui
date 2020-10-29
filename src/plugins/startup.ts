@@ -14,7 +14,7 @@ import { VueConstructor } from 'vue';
 export class BrewbloxStartup {
   private startFuncs: Function[] = [];
 
-  public onStart(func: Function): void {
+  public onStart(func: (() => Awaitable<unknown>)): void {
     this.startFuncs.push(func);
   }
 

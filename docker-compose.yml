@@ -63,6 +63,6 @@ services:
       --providers.docker.defaultrule="PathPrefix(`/{{ index .Labels \"com.docker.compose.service\" }}`)"
       --providers.file.directory=/config
       --entrypoints.web.address=:9000
-      --entrypoints.web.http.redirections.entrypoint.to=websecure
       --entrypoints.websecure.address=:9001
       --entrypoints.websecure.http.tls=true
+    # --entrypoints.web.http.redirections.entrypoint.to=websecure

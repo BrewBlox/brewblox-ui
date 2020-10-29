@@ -7,15 +7,18 @@ import notify from '@/helpers/notify';
 
 const instance = axios.create({ baseURL: HOST });
 
+export function parseHttpError(e: AxiosError): string {
+  const data = e.response?.data;
+  return isObject(data)
+    ? JSON.stringify(data)
+    : isString(data)
+      ? data
+      : e.message;
+}
+
 export function intercept(desc: string): ((e: AxiosError) => never) {
   return (e: AxiosError) => {
-    const data = e.response?.data;
-    const message = isObject(data)
-      ? JSON.stringify(data)
-      : isString(data)
-        ? data
-        : e.message;
-    notify.warn(`${desc}: ${message}`);
+    notify.warn(`${desc}: ${parseHttpError(e)}`);
     throw e;
   };
 }

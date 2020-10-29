@@ -1,9 +1,9 @@
 const axios = require('axios');
-const { host, retry } = require('./utils');
+const { history, retry } = require('./utils');
 
 async function run() {
-  await retry('Waiting for history service', () => axios.get(`${host}/history/ping`));
-  await axios.post(`${host}/history/query/configure`);
+  await retry('Waiting for history service', () => axios.get(`${history}/ping`));
+  await axios.post(`${history}/configure`);
 }
 
 run()

@@ -11,7 +11,6 @@ import { GraphAnnotation } from '@/plugins/history/types';
 
 import PlotlyGraph from './PlotlyGraph';
 
-/* eslint-disable @typescript-eslint/camelcase */
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
   font: {
@@ -53,7 +52,6 @@ const layoutDefaults = (): Partial<Layout> => ({
   plot_bgcolor: 'transparent',
   hovermode: 'closest',
 });
-/* eslint-enable */
 
 @Component({
   components: {

@@ -56,6 +56,14 @@ export default class GraphDisplayDialog extends DialogBase {
     this.$set(this.local!.colors, this.field, val);
   }
 
+  get precision(): number {
+    return this.local!.precision[this.field] ?? 2;
+  }
+
+  set precision(val: number) {
+    this.$set(this.local!.precision, this.field, val);
+  }
+
   save(): void {
     this.onDialogOk(this.local);
   }
@@ -72,7 +80,19 @@ export default class GraphDisplayDialog extends DialogBase {
   >
     <DialogCard v-bind="{title, message, html}">
       <div class="column q-gutter-xs">
-        <InputField v-model="rename" title="Label" label="Label" />
+        <InputField
+          v-model="rename"
+          title="Label"
+          label="Label"
+        />
+        <InputField
+          v-model="precision"
+          :decimals="0"
+          :rules="[v => v >= 0 || 'Must be 0 or more']"
+          type="number"
+          title="Decimals in label"
+          label="Decimals in label"
+        />
         <ColorField
           v-model="color"
           title="Line color"

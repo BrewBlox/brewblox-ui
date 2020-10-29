@@ -1,53 +1,61 @@
+import { AxiosError } from 'axios';
 import { Notify } from 'quasar';
 
-import http from '@/helpers/http';
+import http, { parseHttpError } from '@/helpers/http';
 import notify from '@/helpers/notify';
 
 import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
 
+
 const moduleNamespace = (moduleId: string): string =>
   `brewblox-ui-store:${moduleId}`;
 
-const intercept = (message: string, moduleId: string): (e: Error) => never =>
-  (e: Error) => {
-    notify.error(`DB error in ${message}(${moduleId}): ${e.message}`, { shown: false });
+function intercept(message: string, moduleId: string): ((e: AxiosError) => never) {
+  return (e: AxiosError) => {
+    notify.error(`DB error in ${message}(${moduleId}): ${parseHttpError(e)}`, { shown: false });
     throw e;
   };
+}
 
-const retryDatastore = async (): Promise<void> => {
+async function retryDatastore(): Promise<void> {
   while (true) {
-    // Try to fetch the datastore
-    // If it responds, it is available, and we can reload the page to use it
-    // If it doesn't respond, show a notification with a progress bar
-    // The notification resolves the awaited promise after `timeout` ms
-    await new Promise(resolve =>
-      http.get('/history/datastore/ping', { timeout: 2000 })
-        .then(() => location.reload()) // reload page will abort the JS runtime
-        .catch(() => Notify.create({
+    try {
+      await http.get('/history/datastore/ping', { timeout: 2000 });
+      notify.done('Datastore connected');
+      break;
+    }
+    catch (e) {
+      // show a notification with a progress bar
+      // The notification resolves the promise after `timeout` ms
+      await new Promise((resolve) =>
+        Notify.create({
           timeout: 2000,
           icon: 'mdi-wifi-off',
           color: 'info',
           message: 'Waiting for datastore...',
           progress: true,
-          onDismiss: () => resolve(), // continue
-        })));
+          onDismiss: () => resolve(),
+        }));
+    }
   }
-};
+}
 
-export const checkDatastore = (): void => {
-  http.get('/history/datastore/ping', { timeout: 2000 })
-    .catch(err => {
-      notify.error(`Datastore error: ${err}`, { shown: false });
-      retryDatastore();
-    });
-};
+async function checkDatastore(): Promise<void> {
+  try {
+    await http.get('/history/datastore/ping', { timeout: 2000 });
+  }
+  catch (e) {
+    notify.error(`Datastore error: ${e}`, { shown: false });
+    await retryDatastore();
+  }
+}
 
 export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   // handlers are indexed on fully qualified namespace
   private handlers: Mapped<EventHandler> = {}
 
-  public start(): void {
-    checkDatastore();
+  public async start(): Promise<void> {
+    await checkDatastore();
   }
 
   public onChanged(changed: StoreObject[]): void {

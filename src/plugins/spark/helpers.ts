@@ -399,6 +399,7 @@ export const blockGraphCfg = <BlockT extends Block = any>(
     targets,
     renames,
     colors: {},
+    precision: {},
   };
 };
 

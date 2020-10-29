@@ -367,6 +367,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
         [`${serviceId}/${names.coolAct}/state`]: 'y2',
       },
       colors: {},
+      precision: {},
     },
   };
 
