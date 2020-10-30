@@ -1,5 +1,5 @@
 <script lang="ts">
-import { QTree } from 'quasar';
+import { QTree, throttle } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
@@ -19,6 +19,10 @@ import { QueryConfig } from '@/plugins/history/types';
 export default class QueryEditor extends Vue {
   selectFilter: string | null = null;
   expandedKeys: string[] = [];
+  showStale: boolean = false;
+
+  limFetchFresh: Function = () => { };
+  limFetchAll: Function = () => { };
 
   @Ref()
   readonly tree!: QTree;
@@ -33,8 +37,17 @@ export default class QueryEditor extends Vue {
     }
   }
 
+  @Watch('showStale')
+  autoFetch(value: boolean): void {
+    value
+      ? this.limFetchAll()
+      : this.limFetchFresh();
+  }
+
   created(): void {
-    historyStore.fetchKnownKeys();
+    this.limFetchFresh = throttle(historyStore.fetchFreshFields, 10000);
+    this.limFetchAll = throttle(historyStore.fetchAllFields, 10000);
+    this.limFetchFresh();
   }
 
   mounted(): void {
@@ -66,7 +79,9 @@ export default class QueryEditor extends Vue {
   }
 
   get fields(): Mapped<string[]> {
-    return historyStore.fields;
+    return this.showStale
+      ? historyStore.allFields
+      : historyStore.freshFields;
   }
 
   get nodes(): QuasarNode[] {
@@ -107,10 +122,6 @@ export default class QueryEditor extends Vue {
       <template #append>
         <q-icon name="search" />
       </template>
-      <q-tooltip>
-        Only fields that have been updated the last 24 hours are shown.
-        <br>This includes renamed or deleted blocks.
-      </q-tooltip>
     </q-input>
     <div class="col-auto row justify-end q-gutter-x-sm q-gutter-y-xs q-mx-sm">
       <q-btn flat icon="mdi-collapse-all" @click="tree.collapseAll()">
@@ -126,6 +137,16 @@ export default class QueryEditor extends Vue {
         <q-tooltip>Unselect all</q-tooltip>
       </q-btn>
     </div>
+    <ToggleButton
+      v-model="showStale"
+      label="Include old fields"
+      class="q-mx-sm"
+    >
+      <q-tooltip>
+        By default, deleted or renamed fields are removed from the list after 24h.
+        <br>Enable this option to show all fields known to the database.
+      </q-tooltip>
+    </ToggleButton>
 
     <q-item class="column">
       <q-tree

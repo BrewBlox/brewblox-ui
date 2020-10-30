@@ -40,7 +40,8 @@ const buildQuery =
 @Module({ generateMutationSetters: true })
 export class HistoryModule extends VuexModule {
   public sessions: LoggedSession[] = [];
-  public fields: Mapped<string[]> = {};
+  public freshFields: Mapped<string[]> = {};
+  public allFields: Mapped<string[]> = {};
   public sources: HistorySource[] = [];
 
   private streamConnected: boolean = false;
@@ -94,10 +95,6 @@ export class HistoryModule extends VuexModule {
       .filter(uniqueFilter);
   }
 
-  public get measurements(): string[] {
-    return Object.keys(this.fields);
-  }
-
   public sessionById(id: string): LoggedSession | null {
     return findById(this.sessions, id);
   }
@@ -147,8 +144,13 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action
-  public async fetchKnownKeys(): Promise<void> {
-    this.fields = await historyApi.fetchKnownKeys();
+  public async fetchFreshFields(): Promise<void> {
+    this.freshFields = await historyApi.fetchFields(false);
+  }
+
+  @Action
+  public async fetchAllFields(): Promise<void> {
+    this.allFields = await historyApi.fetchFields(true);
   }
 
   @Action
