@@ -32,7 +32,6 @@ export async function tryCreateBlock(block: Block): Promise<Block | null> {
   }
 }
 
-
 export function createBlockWizard(
   serviceId: string | null,
   compatible: ComparedBlockType = null
@@ -43,6 +42,19 @@ export function createBlockWizard(
     initialProps: {
       compatible,
       activeServiceId: serviceId,
+    },
+    // Prevent users from navigating to other wizards
+    // This preserves initialProps
+    showMenu: false,
+  });
+}
+
+export function createWidgetWizard(featureId: string): WizardDialogResult {
+  return createDialog({
+    component: 'WizardDialog',
+    initialWizard: featureStore.widgetWizard(featureId),
+    initialProps: {
+      featureId,
     },
     // Prevent users from navigating to other wizards
     // This preserves initialProps

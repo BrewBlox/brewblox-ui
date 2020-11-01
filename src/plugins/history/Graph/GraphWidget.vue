@@ -1,8 +1,5 @@
 <script lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
-import isArray from 'lodash/isArray';
-import mergeWith from 'lodash/mergeWith';
-import uniq from 'lodash/uniq';
 import { Layout } from 'plotly.js';
 import { uid } from 'quasar';
 import { Component, Ref, Watch } from 'vue-property-decorator';
@@ -14,7 +11,9 @@ import { durationString } from '@/helpers/duration';
 import { isJsonEqual } from '@/helpers/functional';
 import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
-import { GraphConfig, QueryParams, QueryTarget } from '@/plugins/history/types';
+import { GraphConfig, QueryParams } from '@/plugins/history/types';
+
+import { addBlockGraph } from './helpers';
 
 @Component
 export default class GraphWidget extends WidgetBase<GraphConfig> {
@@ -119,32 +118,8 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     });
   }
 
-  mergeTargets(a: QueryTarget[], b: QueryTarget[]): QueryTarget[] {
-    return uniq([...a, ...b].map(v => v.measurement))
-      .map(m => {
-        const fields = [...a, ...b]
-          .filter(target => target.measurement === m)
-          .flatMap(target => target.fields);
-        return {
-          measurement: m,
-          fields: uniq(fields),
-        };
-      });
-  }
-
   startAddBlockGraph(): void {
-    createDialog({
-      component: 'SelectBlockGraphDialog',
-      config: this.config,
-    })
-      .onOk((cfg: GraphConfig) => {
-        const merged = mergeWith(this.config, cfg, (a, b) => {
-          return (isArray(b) && b.length && 'measurement' in b[0])
-            ? this.mergeTargets(a, b)
-            : undefined;
-        });
-        this.saveConfig(merged);
-      });
+    addBlockGraph(this.widget.id, null);
   }
 }
 </script>
