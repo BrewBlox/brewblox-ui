@@ -138,6 +138,10 @@ export default class HermsNamingTask extends QuickStartTaskBase<HermsConfig> {
       </q-item>
 
       <!-- Generic settings -->
+      <QuickStartPrefixField
+        v-model="prefix"
+        @clear="clearKey('prefix')"
+      />
       <QuickStartNameField
         v-model="dashboardTitle"
         label="Dashboard name"
@@ -147,24 +151,20 @@ export default class HermsNamingTask extends QuickStartTaskBase<HermsConfig> {
           The name for the new dashboard.
         </template>
       </QuickStartNameField>
-      <QuickStartPrefixField
-        v-model="prefix"
-        @clear="clearKey('prefix')"
-      />
+      <QuickStartNameField
+        v-model="dashboardId"
+        label="Unique dashboard ID"
+        :rules="dashboardIdRules"
+        @clear="clearKey('dashboardId')"
+      >
+        <template #help>
+          The unique identifier for your dashboard.
+          <br> By default, this is an URL-safe version of the dashboard title.
+        </template>
+      </QuickStartNameField>
 
       <!-- Block names -->
-      <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
-        <QuickStartNameField
-          v-model="dashboardId"
-          label="Dashboard ID"
-          :rules="dashboardIdRules"
-          @clear="clearKey('dashboardId')"
-        >
-          <template #help>
-            The unique identifier for your dashboard.
-            <br> By default, this is an URL-safe version of the dashboard title.
-          </template>
-        </QuickStartNameField>
+      <q-expansion-item label="Block names (click to expand)" icon="mdi-tag-multiple" dense>
         <QuickStartNameField
           v-for="(nVal, nKey) in names"
           :key="nKey"
