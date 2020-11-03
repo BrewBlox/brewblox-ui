@@ -56,7 +56,7 @@ export default class DisplaySettingsFull
     };
   }
 
-  updateSlotLink(idx: number, link: Link): void {
+  async updateSlotLink(idx: number, link: Link): Promise<void> {
     const pos = idx + 1;
     if (!link.id) {
       this.block.data.widgets = this.block.data.widgets
@@ -71,9 +71,22 @@ export default class DisplaySettingsFull
     const existing = this.slots[idx];
     const obj: DisplaySlot = {
       pos,
-      color: existing?.color || '4169E1',
       name: existing?.name || link.id.slice(0, 15),
+      color: existing?.color || '4169E1',
     };
+
+    obj.name = await new Promise(resolve => {
+      createDialog({
+        component: 'InputDialog',
+        title: 'Choose label text',
+        label: `Label for block '${link.id}'`,
+        rules: this.slotNameRules,
+        value: obj.name,
+      })
+        .onOk(v => resolve(v))
+        .onCancel(() => resolve(obj.name))
+        .onDismiss(() => resolve(obj.name));
+    });
 
     if (isCompatible(type, BlockIntfType.TempSensorInterface)) {
       obj.tempSensor = link;
