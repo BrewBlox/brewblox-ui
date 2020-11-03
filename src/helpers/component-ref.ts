@@ -6,26 +6,31 @@ export const ref =
     return component.name;
   };
 
-export const selector =
-  (component: VueConstructor): (() => string) => {
-    Vue.component(component.name, component);
-    return () => component.name;
-  };
-
 // Globally register all vue components in the RequireContext
 export const autoRegister =
-  (context: __WebpackModuleApi.RequireContext): string[] =>
+  (context: __WebpackModuleApi.RequireContext): void =>
     context
       .keys()
-      .reduce(
-        (acc: string[], fileName: string) => {
-          const match = fileName.match(/(\w*).\w+$/);
+      .forEach(
+        (fileName: string) => {
+          const match = fileName.match(/([\w\-]+)\.vue$/);
           if (match) {
             const componentConfig = context(fileName);
             Vue.component(match[1], componentConfig.default || componentConfig);
-            acc.push(match[1].toString());
+          }
+        });
+
+export const autoComponents =
+  (context: __WebpackModuleApi.RequireContext): { [name: string]: VueConstructor } =>
+    context
+      .keys()
+      .reduce(
+        (acc: Mapped<VueConstructor>, fileName: string) => {
+          const match = fileName.match(/([\w\-]+)\.vue$/);
+          if (match) {
+            const componentConfig = context(fileName);
+            acc[match[1]] = componentConfig.default || componentConfig;
           }
           return acc;
         },
-        [],
-      );
+        {});

@@ -28,8 +28,7 @@ export default {
   install(Vue: VueConstructor) {
     Vue.$startup.onStart(() => builderStore.start());
 
-    autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
-    autoRegister(require.context('./parts', true, /[A-Z]\w+\.vue$/));
+    autoRegister(require.context('./components', true));
 
     builderStore.registerParts(Object.values(specs));
     featureStore.registerWidget(feature);
