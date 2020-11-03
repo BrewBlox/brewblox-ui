@@ -10,9 +10,9 @@ export const historyApi = {
     (): WebSocket =>
       new WebSocket(`${WS_HOST}/history/history/stream`),
 
-  fetchKnownKeys:
-    async (): Promise<Mapped<any>> =>
-      http.post<Mapped<any>>('/history/history/objects', {})
+  fetchFields:
+    async (includeStale: boolean): Promise<Mapped<any>> =>
+      http.post<Mapped<any>>('/history/history/fields', { include_stale: includeStale })
         .then(resp => resp.data),
 
   fetchValues:

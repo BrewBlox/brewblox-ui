@@ -11,7 +11,6 @@ import JSCheckPreview from './JSCheckPreview.vue';
   components: {
     JSCheckPreview,
     SandboxSnippets,
-    MonacoEditor: () => import('src/components/editor/MonacoEditor'),
   },
 })
 export default class JSCheckDialog extends DialogBase {

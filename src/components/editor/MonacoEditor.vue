@@ -1,10 +1,11 @@
+<script lang="ts">
 import * as monaco from 'monaco-editor';
 import { debounce } from 'quasar';
-import Vue, { CreateElement, VNode } from 'vue';
+import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component
-export default class CodeEditor extends Vue {
+export default class MonacoEditor extends Vue {
   private editor: monaco.editor.IStandaloneCodeEditor | null = null;
   public layout: (() => void) = () => { };
 
@@ -86,8 +87,10 @@ export default class CodeEditor extends Vue {
     const sep = !this.value || this.value.endsWith('\n') ? '' : '\n';
     this.setEditorValue(`${this.value}${sep}${text}\n`);
   }
-
-  public render(h: CreateElement): VNode {
-    return h('div');
-  }
 }
+
+</script>
+
+<template>
+  <div />
+</template>

@@ -5,11 +5,13 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Coordinates, rotatedSize } from '@/helpers/coordinates';
 
 import { squares } from '../helpers';
+import parts from '../parts';
 import { builderStore } from '../store';
 import { FlowPart } from '../types';
 
-
-@Component
+@Component({
+  components: { ...parts },
+})
 export default class PartWrapper extends Vue {
   squares = squares
 
@@ -76,30 +78,30 @@ export default class PartWrapper extends Vue {
 /* not scoped */
 
 .BuilderPart
-  stroke-width: 2px;
-  stroke-linecap: round;
-  fill: none;
+  stroke-width: 2px
+  stroke-linecap: round
+  fill: none
 
   .fill
-    fill: #fff;
+    fill: #fff
 
   .outline
-    stroke: #fff;
+    stroke: #fff
 
   .text
-    stroke-width: 1px;
-    stroke: #fff;
+    stroke-width: 1px
+    stroke: #fff
 
   .liquid
-    stroke-width: 7px;
+    stroke-width: 7px
 
 .showhover:hover
-  fill: silver;
-  fill-opacity: 0.5;
-  opacity: 0.5;
+  fill: silver
+  fill-opacity: 0.5
+  opacity: 0.5
 
 .selected
-  fill: dodgerblue;
-  fill-opacity: 0.5;
-  opacity: 0.5;
+  fill: dodgerblue
+  fill-opacity: 0.5
+  opacity: 0.5
 </style>

@@ -7,7 +7,8 @@ import DialogBase from '@/components/DialogBase';
 import { createBlockDialog } from '@/helpers/dialog';
 import { blockGraphCfg } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockCrud, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
+import { Block, BlockAddress, BlockCrud, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
+import { serviceStore } from '@/store/services';
 
 import { GraphConfig } from '../types';
 
@@ -21,8 +22,15 @@ export default class SelectBlockGraphDialog extends DialogBase {
   @Prop({ type: String, default: 'Add block to graph' })
   public readonly title!: string;
 
+  @Prop({ type: Object, required: false })
+  public readonly address!: BlockAddress;
+
   created(): void {
-    this.service = this.services[0] ?? null;
+    this.block = sparkStore.blockByAddress(this.address);
+    this.service =
+      serviceStore.serviceById(this.address?.serviceId)
+      ?? this.services[0]
+      ?? null;
   }
 
   get services(): SparkService[] {
