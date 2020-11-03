@@ -132,10 +132,6 @@ export default class RimsNamingTask extends QuickStartTaskBase<RimsConfig> {
       </q-item>
 
       <!-- Generic settings -->
-      <QuickStartPrefixField
-        v-model="prefix"
-        @clear="clearKey('prefix')"
-      />
       <QuickStartNameField
         v-model="dashboardTitle"
         label="Dashboard name"
@@ -156,6 +152,10 @@ export default class RimsNamingTask extends QuickStartTaskBase<RimsConfig> {
           <br> By default, this is an URL-safe version of the dashboard title.
         </template>
       </QuickStartNameField>
+      <QuickStartPrefixField
+        v-model="prefix"
+        @clear="clearKey('prefix')"
+      />
 
       <!-- Block names -->
       <q-expansion-item label="Block names (click to expand)" icon="mdi-tag-multiple" dense>
