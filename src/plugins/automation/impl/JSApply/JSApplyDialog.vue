@@ -11,7 +11,6 @@ import JSApplyPreview from './JSApplyPreview.vue';
   components: {
     JSApplyPreview,
     SandboxSnippets,
-    MonacoEditor: () => import('src/components/editor/MonacoEditor'),
   },
 })
 export default class JSApplyDialog extends DialogBase {

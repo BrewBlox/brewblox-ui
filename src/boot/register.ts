@@ -1,5 +1,5 @@
 import { autoRegister } from '@/helpers/component-ref';
 
 export default (): void => {
-  autoRegister(require.context('../components', true, /[A-Z]\w+\.vue$/));
+  autoRegister(require.context('../components', true));
 };

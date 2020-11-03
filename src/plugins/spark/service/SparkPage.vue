@@ -9,6 +9,7 @@ import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
+import SparkWidgetDialog from '@/plugins/spark/service/SparkWidgetDialog.vue';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
   Block,
@@ -38,6 +39,7 @@ interface ModalSettings {
 @Component({
   components: {
     Troubleshooter,
+    SparkWidgetDialog,
   },
 })
 export default class SparkPage extends Vue {
@@ -177,7 +179,7 @@ export default class SparkPage extends Vue {
   selectService(): void {
     if (this.$dense && this.isReady) {
       createDialog({
-        component: 'SparkWidgetDialog',
+        component: SparkWidgetDialog,
         serviceId: this.serviceId,
       });
     }
