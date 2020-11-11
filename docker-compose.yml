@@ -28,6 +28,11 @@ services:
     image: brewblox/brewblox-automation:develop
     init: true
 
+  nodered:
+    image: brewblox/node-red:develop
+    volumes:
+      - ./dev/nodered:/data
+
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
     restart: unless-stopped
