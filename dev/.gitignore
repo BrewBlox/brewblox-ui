@@ -1,8 +1,0 @@
-influxdb/
-couchdb/
-redis/
-nodered/
-dist/*
-!dist/.gitkeep
-traefik/brewblox.crt
-traefik/brewblox.key
