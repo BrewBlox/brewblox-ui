@@ -12,33 +12,27 @@ services:
       - ./docker/conf/default.conf:/etc/nginx/conf.d/default.conf
     labels:
       - traefik.http.routers.ui.rule=PathPrefix(`/ui`) || Path(`/`)
-  #
   # nodered:
   #   volumes:
   #     - ./dev/nodered:/data
   #     - ../node-red-contrib-brewblox:/node-red-contrib-brewblox
-  #
   # automation:
   #   image: brewblox/brewblox-automation:develop
   #   volumes:
   #     - "../brewblox-automation:/app"
   #   entrypoint: 'npm run dev'
-  #
   # sparksimulator:
   #   image: brewblox/firmware-simulator:feature-multiplatform
   #   init: true
   #   ports:
   #     - "7376:7376"
-  #
   # history:
   #   volumes:
   #     - ../brewblox-history:/app
-  #
   # sparkey:
   #   volumes:
   #     - ../brewblox-devcon-spark/binaries:/app/binaries
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark
-  #
   # spock:
   #   volumes:
   #     - ../brewblox-devcon-spark/binaries:/app/binaries
