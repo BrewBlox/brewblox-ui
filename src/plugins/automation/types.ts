@@ -2,7 +2,7 @@ export * from '@/shared-types/automation-types';
 
 import { VueConstructor } from 'vue';
 
-import { AutomationImpl } from '@/shared-types/automation-types';
+import { AutomationImpl } from '@/shared-types';
 
 export type Section = 'Preconditions' | 'Actions' | 'Transitions';
 

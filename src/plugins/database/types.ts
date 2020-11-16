@@ -1,7 +1,4 @@
-export interface StoreObject {
-  id: string;
-  namespace?: string;
-}
+import { StoreObject } from '@/shared-types';
 
 export type ChangeCb<T> = (obj: T) => unknown;
 export type DeleteCb = (id: string) => unknown;

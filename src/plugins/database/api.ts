@@ -1,8 +1,9 @@
 import Vue from 'vue';
 
 import { deserialize } from '@/plugins/spark/parse-object';
+import { StoreObject } from '@/shared-types';
 
-import { ChangeCb, DeleteCb, StoreObject } from './types';
+import { ChangeCb, DeleteCb } from './types';
 
 export interface DatabaseApi<T extends StoreObject> {
   subscribe(onChanged: ChangeCb<T>, onDeleted: DeleteCb): void;

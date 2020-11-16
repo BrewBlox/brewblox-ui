@@ -7,7 +7,7 @@ import DialogBase from '@/components/DialogBase';
 import { sparkUpdateEvent } from '@/plugins/spark/getters';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
-
+import { SparkUpdateEvent } from '@/shared-types';
 
 @Component
 export default class FirmwareUpdateDialog extends DialogBase {
@@ -24,7 +24,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
     Vue.$eventbus.addStateListener({
       id: this.id,
       filter: (key, type) => key === this.serviceId && type === sparkUpdateEvent,
-      onmessage: ({ data }) => data.forEach(v => this.pushMessage(v)),
+      onmessage: (msg: SparkUpdateEvent) => msg.data.forEach(v => this.pushMessage(v)),
     });
   }
 

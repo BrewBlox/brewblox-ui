@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
 
-import { extendById, filterById, typeMatchFilter } from '@/helpers/functional';
+import { extendById, typeMatchFilter } from '@/helpers/functional';
 import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   Block,
@@ -13,14 +13,14 @@ import type {
   RelationEdge,
   SparkExported,
   SparkService,
-  SparkStateMessage,
   SparkStatus,
   UserUnits,
 } from '@/plugins/spark/types';
+import { SparkPatchEvent, SparkStateEvent } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
-import { sparkStateEvent } from '../getters';
+import { sparkPatchEvent, sparkStateEvent } from '../getters';
 import * as api from './api';
 import {
   asServiceStatus,
@@ -82,6 +82,18 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Mutation
+  public patchBlocks({ changed, deleted }: SparkPatchEvent['data']): void {
+    const affected = [
+      ...changed.map(block => block.id),
+      ...deleted,
+    ];
+    this.blocks = [
+      ...this.blocks.filter(v => !affected.includes(v.id)),
+      ...changed,
+    ];
+  }
+
+  @Mutation
   public updateStatus(status: SparkStatus): void {
     this.status = status;
     this.lastStatus = new Date();
@@ -125,18 +137,17 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async createBlock(block: Block): Promise<void> {
-    this.setBlock(await api.createBlock(block));
+    await api.createBlock(block); // triggers patch event
   }
 
   @Action
   public async saveBlock(block: Block): Promise<void> {
-    this.setBlock(await api.persistBlock(block));
+    await api.persistBlock(block); // triggers patch event
   }
 
   @Action
   public async removeBlock(block: Block): Promise<void> {
-    await api.deleteBlock(block);
-    this.blocks = filterById(this.blocks, block);
+    await api.deleteBlock(block); // triggers patch event
   }
 
   @Action
@@ -244,7 +255,7 @@ export class SparkServiceModule extends VuexModule {
     Vue.$eventbus.addStateListener({
       id: `${sparkStateEvent}__${this.id}`,
       filter: (key, type) => key === this.id && type === sparkStateEvent,
-      onmessage: (msg: SparkStateMessage) => {
+      onmessage: (msg: SparkStateEvent) => {
         const status = asSparkStatus(this.id, msg.data.status);
         const blocks = msg.data.blocks.map(deserialize);
 
@@ -253,11 +264,21 @@ export class SparkServiceModule extends VuexModule {
         serviceStore.updateStatus(asServiceStatus(status));
       },
     });
+    Vue.$eventbus.addStateListener({
+      id: `${sparkPatchEvent}__${this.id}`,
+      filter: (key, type) => key === this.id && type === sparkPatchEvent,
+      onmessage: (msg: SparkPatchEvent) => {
+        const changed = msg.data.changed.map(deserialize);
+        const { deleted } = msg.data;
+        this.patchBlocks({ changed, deleted });
+      },
+    });
     await this.fetchAll().catch(() => { });
   }
 
   @Action
   public async stop(): Promise<void> {
     Vue.$eventbus.removeStateListener(`${sparkStateEvent}__${this.id}`);
+    Vue.$eventbus.removeStateListener(`${sparkPatchEvent}__${this.id}`);
   }
 }
