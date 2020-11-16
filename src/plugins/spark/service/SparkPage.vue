@@ -28,6 +28,7 @@ import { serviceStore } from '@/store/services';
 
 import { roleIcons } from '../getters';
 import { blockSorters, defaultSessionConfig, storageKey } from './helpers';
+import SparkWidget from './SparkWidget.vue';
 import Troubleshooter from './Troubleshooter.vue';
 import { ValidatedWidget } from './types';
 
@@ -38,8 +39,9 @@ interface ModalSettings {
 
 @Component({
   components: {
-    Troubleshooter,
+    SparkWidget,
     SparkWidgetDialog,
+    Troubleshooter,
   },
 })
 export default class SparkPage extends Vue {
