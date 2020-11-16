@@ -1,6 +1,6 @@
 import { Annotations, Layout } from 'plotly.js';
 
-import { StoreObject } from '@/plugins/database';
+import { StoreObject } from '@/shared-types';
 
 export interface QueryParams {
   database?: string;

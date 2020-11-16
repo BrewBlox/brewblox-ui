@@ -1,3 +1,5 @@
+import { StateEvent, StoreObject, UUID } from './generic-types';
+
 export interface ReqBlockAddress {
   serviceId: string;
   type: string;
@@ -28,19 +30,6 @@ export type AutomationStatus =
  * Serialized Date value (number in ms, or ISO-8601)
  */
 export type DateTime = number | string;
-
-/**
- * @pattern ^[0-9a-fA-F\-]{36}$
- */
-export type UUID = string;
-
-/**
- * Required fields for an object to be stored in the datastore.
- */
-export interface StoreObject {
-  id: UUID;
-  namespace?: string; // Redis namespace
-}
 
 export interface SandboxError {
   message: string;
@@ -320,4 +309,9 @@ export interface AutomationProcess extends AutomationTemplate {
 export interface AutomationEventData {
   processes: AutomationProcess[];
   tasks: AutomationTask[];
+}
+
+export interface AutomationEvent extends StateEvent {
+  type: 'automation.active';
+  data: AutomationEventData;
 }

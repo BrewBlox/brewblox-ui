@@ -3,8 +3,9 @@ import { Notify } from 'quasar';
 
 import http, { parseHttpError } from '@/helpers/http';
 import notify from '@/helpers/notify';
+import { StoreObject } from '@/shared-types';
 
-import { BrewbloxDatabase, EventHandler, StoreObject } from './types';
+import { BrewbloxDatabase, EventHandler } from './types';
 
 
 const moduleNamespace = (moduleId: string): string =>

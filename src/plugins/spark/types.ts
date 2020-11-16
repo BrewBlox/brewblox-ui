@@ -4,12 +4,8 @@ export * from '@/shared-types/spark-service-types';
 
 import { Layout } from 'plotly.js';
 
-import { StoreObject } from '@/plugins/database';
-import { StateEventMessage } from '@/plugins/eventbus';
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
-import { BlockOrIntfType } from '@/shared-types/spark-block-enums';
-import { Block } from '@/shared-types/spark-block-types';
-import { ApiSparkStatus } from '@/shared-types/spark-service-types';
+import { Block, BlockOrIntfType, StoreObject } from '@/shared-types';
 import { Crud, WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
@@ -50,13 +46,6 @@ export interface SparkStatus {
   isAcknowledged?: boolean;
   isSynchronized?: boolean;
   isUpdating?: boolean;
-}
-
-export interface SparkStateMessage extends StateEventMessage {
-  data: {
-    status: ApiSparkStatus | null;
-    blocks: Block[];
-  };
 }
 
 export interface SparkStoreEntry {

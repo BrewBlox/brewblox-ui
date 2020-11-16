@@ -5,16 +5,15 @@ import Vue from 'vue';
 import { HOSTNAME, PORT, WS_PROTOCOL } from '@/helpers/const';
 import { popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-
-import { StoreObject } from './database';
+import { DatastoreEvent, StateEvent, StoreObject } from '@/shared-types';
 
 const stateTopic = 'brewcast/state';
 const datastoreTopic = 'brewcast/datastore';
 
-export interface StateEventListener {
+export interface StateEventListener<T extends StateEvent> {
   id: string;
   filter: (key: string, type: string) => boolean;
-  onmessage: (msg: StateEventMessage) => unknown;
+  onmessage: (msg: T) => unknown;
 }
 
 export interface StoreEventListener {
@@ -22,19 +21,8 @@ export interface StoreEventListener {
   onDeleted: (deleted: string[]) => unknown;
 }
 
-export interface StateEventMessage {
-  key: string;
-  type: string;
-  data: any;
-}
-
-export interface StoreEventMessage {
-  changed?: StoreObject[];
-  deleted?: string[];
-}
-
 export class BrewbloxEventbus {
-  private stateListeners: StateEventListener[] = [];
+  private stateListeners: StateEventListener<StateEvent>[] = [];
 
   public async start(): Promise<void> {
     const opts: mqtt.IClientOptions = {
@@ -58,13 +46,13 @@ export class BrewbloxEventbus {
         return;
       }
       else if (topic.startsWith(datastoreTopic)) {
-        const { changed, deleted }: StoreEventMessage = JSON.parse(body.toString());
+        const { changed, deleted }: DatastoreEvent = JSON.parse(body.toString());
         const database = Vue.$database;
         changed && database.onChanged(changed);
         deleted && database.onDeleted(deleted);
       }
       else if (topic.startsWith(stateTopic)) {
-        const message: StateEventMessage = JSON.parse(body.toString());
+        const message: StateEvent = JSON.parse(body.toString());
         this.stateListeners
           .filter(lst => lst.filter(message.key, message.type))
           .forEach(lst => lst.onmessage(message));
@@ -72,11 +60,11 @@ export class BrewbloxEventbus {
     });
   }
 
-  public addStateListener(listener: StateEventListener): void {
+  public addStateListener<T extends StateEvent>(listener: StateEventListener<T>): void {
     if (this.stateListeners.find(lst => lst.id === listener.id)) {
       throw new Error(`State listener with id '${listener.id}' already exists`);
     }
-    this.stateListeners.push(listener);
+    this.stateListeners.push(listener as StateEventListener<StateEvent>);
   }
 
   public removeStateListener(id: string): void {
