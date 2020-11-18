@@ -16,6 +16,7 @@ import MotorValve from './MotorValve';
 import Mutex from './Mutex';
 import Pid from './Pid';
 import QuickActions from './QuickActions';
+import QuickValues from './QuickValues';
 import SetpointProfile from './SetpointProfile';
 import SetpointSensorPair from './SetpointSensorPair';
 import Spark2Pins from './Spark2Pins';
@@ -45,6 +46,7 @@ const features: SparkFeature[] = [
   Spark2Pins,
   Spark3Pins,
   QuickActions,
+  QuickValues,
   TempSensorCombi,
   TempSensorMock,
   TempSensorOneWire,
