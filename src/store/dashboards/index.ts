@@ -115,7 +115,6 @@ export class DashboardModule extends VuexModule {
     const applied = updated
       .map(change => patchedById(this.widgets, change))
       .filter((v): v is Widget => v !== null);
-    // const applied = mergePatches(this.widgets, updated);
     await Promise.all(applied.map(v => this.saveWidget(v)));
   }
 

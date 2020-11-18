@@ -56,12 +56,8 @@ describe('HasId array manipulation', () => {
       .toBeNull();
     expect(patchedById(arr, { id: 'absent' }, empty()))
       .toMatchObject({ id: '' });
-    expect(patchedById(arr, { id: 'id-3' }))
-      .toBeNull();
-    expect(patchedById(arr, { id: 'id-1', v1: 'one' }))
-      .toBeNull();
     expect(patchedById(arr, { id: 'id-1', v1: 'one' }, empty()))
-      .toMatchObject({ id: '' });
+      .toMatchObject({ id: 'id-1' });
     expect(patchedById(arr, { id: 'id-2', v1: 'one' }))
       .toMatchObject({ ...arr[1], v1: 'one' });
     expect(patchedById(arr, { id: 'id-dup', nesting: { nested: -1 } }))

@@ -4,7 +4,6 @@ import isEqual from 'lodash/isEqual';
 import isFinite from 'lodash/isFinite';
 import isString from 'lodash/isString';
 import mapKeys from 'lodash/mapKeys';
-import matches from 'lodash/matches';
 import { colors, date } from 'quasar';
 
 type SortFunc = (a: any, b: any) => number
@@ -324,7 +323,7 @@ export function patchedById<T extends HasId>(
   fallback: T | null = null,
 ): T | typeof fallback {
   const existing = findById(arr, patch.id);
-  return existing && !matches(patch)(existing)
+  return existing
     ? { ...existing, ...patch }
     : fallback;
 }
