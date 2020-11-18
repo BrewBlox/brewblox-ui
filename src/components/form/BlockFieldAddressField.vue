@@ -102,6 +102,9 @@ export default class BlockFieldAddressField extends FieldBase {
         {{ value.id }}
       </div>
     </div>
+    <div v-else-if="readonly">
+      No field selected
+    </div>
     <div v-else>
       Click to assign
     </div>

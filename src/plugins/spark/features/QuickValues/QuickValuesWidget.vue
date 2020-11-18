@@ -5,6 +5,7 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { isQuantity, prettyQty, Quantity } from '@/helpers/bloxfield';
+import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockField } from '@/plugins/spark/types';
 
@@ -57,9 +58,14 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
 
   addValue(value: string, done: ((v?: number) => void)): void {
     const parsed = Number(value);
-    Number.isFinite(parsed)
-      ? done(parsed)
-      : done();
+
+    if (Number.isFinite(parsed)) {
+      done(parsed);
+    }
+    else {
+      notify.warn(`Input value is not a number: '${value}'`);
+      done();
+    }
   }
 
   addSliderValue(value: string, done: ((v?: number[]) => void)): void {
@@ -73,6 +79,7 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
       done(parsed);
     }
     else {
+      notify.warn(`Invalid slider arguments: '${value}'`);
       done();
     }
   }
@@ -81,14 +88,14 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
 
 
 <template>
-  <CardWrapper v-bind="{context}" no-scroll>
+  <CardWrapper v-bind="{context}">
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
 
     <div
       v-if="mode === 'Basic'"
-      class="widget-body row q-gutter-y-sm justify-center"
+      class="widget-body row justify-center"
     >
       <BlockFieldAddressField
         :value="config.addr"

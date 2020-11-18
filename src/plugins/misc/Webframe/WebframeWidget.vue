@@ -29,7 +29,7 @@ export default class WebframeWidget extends WidgetBase<WebframeConfig> {
 
     <div
       v-if="mode === 'Full'"
-      class="widget-body row"
+      class="q-pa-md row"
     >
       <InputField
         :value="config.url"
