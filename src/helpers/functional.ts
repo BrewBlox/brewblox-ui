@@ -125,9 +125,13 @@ export const truncateRound =
     return v.toFixed(2);
   };
 
-export const roundNumber =
-  (value: number, digits = 2): number =>
-    Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits));
+export function roundNumber(value: number, digits?: number): number;
+export function roundNumber(value: number | null, digits?: number): number | null;
+export function roundNumber(value: number | null, digits = 2): number | null {
+  return value != null
+    ? Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits))
+    : null;
+}
 
 export const truncate =
   (value: string): string => {

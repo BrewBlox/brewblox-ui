@@ -5,6 +5,7 @@ import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { isQuantity, prettyQty, Quantity } from '@/helpers/bloxfield';
+import { roundNumber } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockField } from '@/plugins/spark/types';
@@ -21,7 +22,7 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
 
   get numValue(): number | null {
     const v = this.fieldValue;
-    return isQuantity(v) ? v.value : v;
+    return roundNumber(isQuantity(v) ? v.value : v);
   }
 
   blockFilter(block: Block): boolean {
