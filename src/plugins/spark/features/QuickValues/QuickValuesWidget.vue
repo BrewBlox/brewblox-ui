@@ -56,7 +56,6 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
   debouncedSave = debounce(this.save, 300, true);
 
   addValue(value: string, done: ((v?: number) => void)): void {
-    console.log(value);
     const parsed = Number(value);
     Number.isFinite(parsed)
       ? done(parsed)
@@ -64,7 +63,6 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
   }
 
   addSliderValue(value: string, done: ((v?: number[]) => void)): void {
-    console.log(value);
     const parsed = value
       .split(',')
       .map(Number);
@@ -94,11 +92,19 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
     >
       <BlockFieldAddressField
         :value="config.addr"
-        class="col-grow"
+        class="col-auto q-mt-none"
         readonly
+        :show="false"
         @input="v => { config.addr = v; saveConfig(); }"
       />
+      <LabeledField
+        v-if="fieldValue !== null"
+        class="text-h5 q-mt-none"
+      >
+        {{ fieldValue | pretty }}
+      </LabeledField>
 
+      <q-separator inset />
       <div class="col-break" />
 
       <q-btn
@@ -130,6 +136,8 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
     >
       <BlockFieldAddressField
         :value="config.addr"
+        :block-filter="blockFilter"
+        :field-filter="fieldFilter"
         class="col-grow"
         @input="v => { config.addr = v; saveConfig(); }"
       />
