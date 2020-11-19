@@ -19,11 +19,11 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
   debug = false;
 
   // initialize to undefined so they are not reactive
-  renderContext: CanvasRenderingContext2D | null = null;
-  ws: WebSocket | null = null;
-  buf: ArrayBuffer | null = null;
-  buf8: Uint8ClampedArray | null = null;
-  data: Uint32Array | null = null;
+  renderContext: CanvasRenderingContext2D | undefined = undefined;
+  ws: WebSocket | undefined = undefined;
+  buf: ArrayBuffer | undefined = undefined;
+  buf8: Uint8ClampedArray | undefined = undefined;
+  data: Uint32Array | undefined = undefined;
   rerender = true;
   handle: number | undefined = undefined;
 
@@ -99,10 +99,9 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
 
   mounted(): void {
     this.$nextTick(() => {
-      this.renderContext = this.canvas.getContext('2d');
+      this.renderContext = this.canvas.getContext('2d')!;
 
-      const ctx = this.renderContext;
-      if (ctx != null) {
+      if (this.renderContext != null) {
         this.buf = new ArrayBuffer(this.width * this.height * 4);
         this.buf8 = new Uint8ClampedArray(this.buf);
         this.data = new Uint32Array(this.buf);
@@ -122,7 +121,7 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
   beforeDestroy(): void {
     this.preventReconnection = true;
     this.closeSocket();
-    this.renderContext = null;
+    this.renderContext = undefined;
     window.clearInterval(this.handle);
     this.handle = undefined;
   }
@@ -130,7 +129,7 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
   closeSocket(): void {
     if (this.ws) {
       this.ws.close();
-      this.ws = null;
+      this.ws = undefined;
       this.connecting = false;
       this.connected = false;
     }
@@ -172,7 +171,7 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
 
   touchscreen(evt): void {
     const { x, y } = this.getMousePos(evt);
-    if (this.connected && this.ws !== null) {
+    if (this.connected && this.ws != null) {
       this.log(`sending touch ${x},${y},${this.pressed}`);
       const buf = new ArrayBuffer(5);
       const view = new DataView(buf);
@@ -244,7 +243,7 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
 
   handleScreenUpdate(buffer: DataView, length: number): void {
     let index = 0;
-    while (index < length && this.data !== null) {
+    while (index < length && this.data != null) {
       const addr = buffer.getUint32(index, true);
       const color = buffer.getUint32(index + 4, true);
 
