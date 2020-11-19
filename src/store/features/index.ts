@@ -41,27 +41,27 @@ export class FeatureModule extends VuexModule {
     return this.services.map(v => v.id);
   }
 
-  public widgetById(id: string): WidgetFeature | null {
+  public widgetById(id: string | null): WidgetFeature | null {
     return findById(this.widgets, id);
   }
 
-  public quickStartById(id: string): QuickStartFeature | null {
+  public quickStartById(id: string | null): QuickStartFeature | null {
     return findById(this.quickStarts, id);
   }
 
-  public watcherById(id: string): WatcherFeature | null {
+  public watcherById(id: string | null): WatcherFeature | null {
     return findById(this.watchers, id);
   }
 
-  public serviceById(id: string): ServiceFeature | null {
+  public serviceById(id: string | null): ServiceFeature | null {
     return findById(this.services, id);
   }
 
-  public widgetTitle(id: string): string {
+  public widgetTitle(id: string | null): string {
     return this.widgetById(id)?.title ?? 'Unknown';
   }
 
-  public widgetRole(id: string): WidgetRole {
+  public widgetRole(id: string | null): WidgetRole {
     return this.widgetById(id)?.role ?? 'Other';
   }
 
