@@ -16,7 +16,7 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
   connecting = false;
   preventReconnection = true;
 
-  debug = true;
+  debug = false;
 
   // initialize to undefined so they are not reactive
   renderContext: CanvasRenderingContext2D | null = null;
