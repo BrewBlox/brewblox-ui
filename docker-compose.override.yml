@@ -30,6 +30,12 @@ services:
   #   volumes:
   #     - ../brewblox-history:/app
   # sparkey:
+  #   ports:
+  #     - "5678:5678"
+  #   environment:
+  #     - ENABLE_DEBUGGER=1
+  #   labels:
+  #     - traefik.http.services.sparkey.loadbalancer.server.port=5000
   #   volumes:
   #     - ../brewblox-devcon-spark/binaries:/app/binaries
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark
