@@ -71,18 +71,31 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
 
   addSliderValue(value: string, done: ((v?: number[]) => void)): void {
     const parsed = value
-      .split(',')
+      .split(/[,:]/)
       .map(Number);
 
-    if (!parsed.some(v => !Number.isFinite(v))
-      && parsed.length >= 1
-      && parsed.length <= 3) {
-      done(parsed);
+    let [min, max, step] = parsed;
+
+    if (max === undefined) {
+      max = min;
+      min = 0;
     }
-    else {
-      notify.warn(`Invalid slider arguments: '${value}'`);
-      done();
+
+    if (step === undefined) {
+      step = 1;
     }
+
+    if (parsed.length > 3) {
+      notify.warn(`Too many values: '${value}'`);
+      return done();
+    }
+
+    if ([min, max, step].some(v => !Number.isFinite(v))) {
+      notify.warn(`Unable to parse: '${value}'`);
+      return done();
+    }
+
+    done([min, max, step]);
   }
 }
 </script>
@@ -98,21 +111,23 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
       v-if="mode === 'Basic'"
       class="widget-body row justify-center"
     >
-      <BlockFieldAddressField
-        :value="config.addr"
-        class="col-auto q-mt-none"
-        readonly
-        :show="false"
-        @input="v => { config.addr = v; saveConfig(); }"
-      />
-      <LabeledField
-        v-if="fieldValue !== null"
-        class="text-h5 q-mt-none"
-      >
-        {{ fieldValue | pretty }}
-      </LabeledField>
+      <template v-if="widget.rows > 2 && widget.cols > 2">
+        <BlockFieldAddressField
+          :value="config.addr"
+          :block-filter="blockFilter"
+          :field-filter="fieldFilter"
+          class="col-grow fade-2"
+          show-value
 
-      <q-separator inset />
+          @input="v => { config.addr = v; saveConfig(); }"
+        />
+      </template>
+      <template v-else>
+        <div class="text-h6 text-secondary">
+          {{ fieldValue | pretty }}
+        </div>
+      </template>
+
       <div class="col-break" />
 
       <q-btn
@@ -125,17 +140,35 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
         @click="() => debouncedSave(v)"
       />
 
-      <q-slider
-        v-for="(v, idx) in config.sliders"
-        :key="`slider-${idx}_${v}`"
-        :value="numValue"
-        :min="Math.min(v.length > 1 ? v[0] : 0, numValue)"
-        :max="Math.max(v.length > 1 ? v[1] : v[0], numValue)"
-        :step="v.length > 2 ? v[2] : 1"
-        label-always
-        class="col-11 q-mt-xl q-mr-xs"
-        @change="debouncedSave"
-      />
+      <div class="col-break q-my-md" />
+
+      <div
+        v-for="([min, max, step], idx) in config.sliders"
+        :key="`slider-${idx}_${min}_${max}_${step}`"
+        class="col-11 q-mr-xs row q-gutter-x-sm"
+      >
+        <div
+          class="col-auto self-center fade-3"
+          style="min-width: 15pt"
+        >
+          {{ min }}
+        </div>
+        <q-slider
+          :value="numValue"
+          :min="Math.min(min, numValue)"
+          :max="Math.max(max, numValue)"
+          :step="step"
+          label-always
+          class="col-grow"
+          @change="debouncedSave"
+        />
+        <div
+          class="col-auto self-center fade-3"
+          style="min-width: 15pt"
+        >
+          {{ max }}
+        </div>
+      </div>
     </div>
 
     <div
@@ -147,11 +180,12 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
         :block-filter="blockFilter"
         :field-filter="fieldFilter"
         class="col-grow"
+        show-value
         @input="v => { config.addr = v; saveConfig(); }"
       />
       <q-select
         :value="config.values"
-        label="Values"
+        label="Preset values"
         use-chips
         use-input
         multiple
@@ -166,7 +200,7 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
       </q-select>
       <q-select
         :value="config.sliders"
-        label="Sliders"
+        label="Preset sliders"
         use-chips
         use-input
         multiple
@@ -175,15 +209,25 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
         @new-value="addSliderValue"
         @input="v => { config.sliders = v; saveConfig(); }"
       >
+        <template v-slot:selected-item="scope">
+          <q-chip
+            removable
+            dense
+            :tabindex="scope.tabindex"
+            color="secondary"
+            text-color="white"
+            @remove="scope.removeAtIndex(scope.index)"
+          >
+            {{ scope.opt.join(':') }}
+          </q-chip>
+        </template>
         <q-tooltip>
-          Add a new value, and press ENTER. <br>
-          <br>
-          Syntax options: <br>
-          <i>max</i><br>
-          <i>min, max</i><br>
-          <i>min, max, step</i><br>
-          <br>
-          Example: 0,100,2
+          Add a new value, and press ENTER.
+          <ul>
+            <li><i>max</i></li>
+            <li><i>min:max</i></li>
+            <li><i>min:max:step</i></li>
+          </ul>
         </q-tooltip>
       </q-select>
     </div>
