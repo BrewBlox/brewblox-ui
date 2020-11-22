@@ -4,7 +4,7 @@ import { Widget } from '@/store/dashboards';
 export interface QuickValuesConfig {
   addr: BlockFieldAddress;
   values: number[];
-  sliders: number[][];
+  sliders: number[][]; // min, max, step
 }
 
 export type QuickValuesWidget = Widget<QuickValuesConfig>;
