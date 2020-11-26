@@ -28,10 +28,10 @@ services:
     image: brewblox/brewblox-automation:develop
     init: true
 
-  nodered:
+  node-red:
     image: brewblox/node-red:develop
     volumes:
-      - ./dev/nodered:/data
+      - ./dev/node-red:/data
 
   sparkey:
     image: brewblox/brewblox-devcon-spark:develop
