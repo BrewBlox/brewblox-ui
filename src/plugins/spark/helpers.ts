@@ -27,6 +27,7 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
+import { SparkStateEvent } from '@/shared-types';
 import { ComponentResult, Crud, featureStore, WidgetFeature } from '@/store/features';
 
 import { compatibleTypes } from './getters';
@@ -433,3 +434,6 @@ export const isBlockDriven = (block: Block | null): boolean =>
       .moduleById(block.serviceId)
       ?.drivenChains
       .some((chain: string[]) => chain[0] === block.id));
+
+export const isSparkState = (data: any): data is SparkStateEvent =>
+  (data as SparkStateEvent).type === 'Spark.state';

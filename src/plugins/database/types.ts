@@ -18,18 +18,6 @@ export interface BrewbloxDatabase {
   start(): Awaitable<void>;
 
   /**
-   * Hook for external change events.
-   * @param changed Changed objects
-   */
-  onChanged(changed: StoreObject[]): void;
-
-  /**
-   * Hook for external delete events.
-   * @param deleted fully qualified Ids of deleted objects
-   */
-  onDeleted(deleted: string[]): void;
-
-  /**
    * Be notified of external changes to a collection.
    *
    * @param handler Object containing callbacks

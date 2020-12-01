@@ -1,12 +1,18 @@
 import { AxiosError } from 'axios';
+import isObjectLike from 'lodash/isObjectLike';
 import { Notify } from 'quasar';
+import Vue from 'vue';
 
+import { STORE_TOPIC } from '@/helpers/const';
 import http, { parseHttpError } from '@/helpers/http';
 import notify from '@/helpers/notify';
-import { StoreObject } from '@/shared-types';
+import { DatastoreEvent, StoreObject } from '@/shared-types';
 
 import { BrewbloxDatabase, EventHandler } from './types';
 
+const isStoreEvent = (data: unknown): data is DatastoreEvent =>
+  isObjectLike(data)
+  && ('changed' in (data as any) || 'deleted' in (data as any));
 
 const moduleNamespace = (moduleId: string): string =>
   `brewblox-ui-store:${moduleId}`;
@@ -56,15 +62,22 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   private handlers: Mapped<EventHandler> = {}
 
   public async start(): Promise<void> {
+    Vue.$eventbus.subscribe(STORE_TOPIC + '/#');
+    Vue.$eventbus.addListener(STORE_TOPIC + '/#', (_, data) => {
+      if (isStoreEvent(data)) {
+        data.changed && this.onChanged(data.changed);
+        data.deleted && this.onDeleted(data.deleted);
+      }
+    });
     await checkDatastore();
   }
 
-  public onChanged(changed: StoreObject[]): void {
+  private onChanged(changed: StoreObject[]): void {
     changed.forEach(obj =>
       this.handlers[obj.namespace!]?.onChanged(obj));
   }
 
-  public onDeleted(deleted: string[]): void {
+  private onDeleted(deleted: string[]): void {
     deleted.forEach(key => {
       // The event uses the fully qualified ID
       // Separate the namespace from the ID here
