@@ -4,7 +4,6 @@ import isEqual from 'lodash/isEqual';
 import isFinite from 'lodash/isFinite';
 import isString from 'lodash/isString';
 import mapKeys from 'lodash/mapKeys';
-import matches from 'lodash/matches';
 import { colors, date } from 'quasar';
 
 type SortFunc = (a: any, b: any) => number
@@ -103,6 +102,17 @@ export const isoDateString =
     return undefined;
   };
 
+export const mqttTopicExp =
+  (topicFilter: string): RegExp =>
+    new RegExp(
+      topicFilter
+        .split('/')
+        .map(s => s
+          .replace('+', '[a-zA-Z0-9 _.-]*')
+          .replace('#', '?($|[a-zA-Z0-9 \/_.-]*)'))
+        .join('\\/')
+      + '$');
+
 export const round =
   (value: any, digits = 2): string => {
     if (value === null || value === undefined) {
@@ -126,9 +136,13 @@ export const truncateRound =
     return v.toFixed(2);
   };
 
-export const roundNumber =
-  (value: number, digits = 2): number =>
-    Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits));
+export function roundNumber(value: number, digits?: number): number;
+export function roundNumber(value: number | null, digits?: number): number | null;
+export function roundNumber(value: number | null, digits = 2): number | null {
+  return value != null
+    ? Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits))
+    : null;
+}
 
 export const truncate =
   (value: string): string => {
@@ -324,7 +338,7 @@ export function patchedById<T extends HasId>(
   fallback: T | null = null,
 ): T | typeof fallback {
   const existing = findById(arr, patch.id);
-  return existing && !matches(patch)(existing)
+  return existing
     ? { ...existing, ...patch }
     : fallback;
 }

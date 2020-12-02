@@ -1,5 +1,6 @@
 import {
   findById,
+  mqttTopicExp,
   objectSorter,
   objectStringSorter,
   patchedById,
@@ -56,15 +57,39 @@ describe('HasId array manipulation', () => {
       .toBeNull();
     expect(patchedById(arr, { id: 'absent' }, empty()))
       .toMatchObject({ id: '' });
-    expect(patchedById(arr, { id: 'id-3' }))
-      .toBeNull();
-    expect(patchedById(arr, { id: 'id-1', v1: 'one' }))
-      .toBeNull();
     expect(patchedById(arr, { id: 'id-1', v1: 'one' }, empty()))
-      .toMatchObject({ id: '' });
+      .toMatchObject({ id: 'id-1' });
     expect(patchedById(arr, { id: 'id-2', v1: 'one' }))
       .toMatchObject({ ...arr[1], v1: 'one' });
     expect(patchedById(arr, { id: 'id-dup', nesting: { nested: -1 } }))
       .toMatchObject({ id: 'id-dup', v1: 'dup1', nesting: { nested: -1 } });
+  });
+});
+
+
+describe('MQTT helpers', () => {
+  it('mqttTopicExp()', () => {
+    let exp = mqttTopicExp('base/test');
+    expect(exp.test('base/test')).toBe(true);
+    expect(exp.test('base/test/other')).toBe(false);
+
+    exp = mqttTopicExp('base/test/+');
+    expect(exp.test('base/test')).toBe(false);
+    expect(exp.test('base/test/other')).toBe(true);
+    expect(exp.test('base/test/something/else')).toBe(false);
+
+    exp = mqttTopicExp('base/test/#');
+    expect(exp.test('base/test')).toBe(true);
+    expect(exp.test('base/test/other')).toBe(true);
+    expect(exp.test('base/test/something/else')).toBe(true);
+
+    exp = mqttTopicExp('base/test/#/end');
+    expect(exp.test('base/test')).toBe(false);
+    expect(exp.test('base/test/other')).toBe(false);
+    expect(exp.test('base/test/something/else/end')).toBe(true);
+    expect(exp.test('base/test/end')).toBe(true);
+
+    exp = mqttTopicExp('base/+/middle/+/end');
+    expect(exp.test('base/dash-dash/middle/second/end')).toBe(true);
   });
 });

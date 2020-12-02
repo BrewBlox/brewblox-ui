@@ -311,7 +311,7 @@ export default class GridItem extends Vue {
   }
 
   keydown(evt: KeyboardEvent): void {
-    if (this.moving) {
+    if (!this.editable || this.moving) {
       return;
     }
     if (evt.key === 'Enter') {

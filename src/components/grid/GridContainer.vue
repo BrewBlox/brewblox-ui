@@ -73,6 +73,7 @@ export default class GridContainer extends Vue {
     return h('div',
       {
         class: 'grid-container grid-main-container',
+        style: { minHeight: this.editable ? '3000px' : '0' },
         on: {
           dblclick: evt => {
             if (evt.target === evt.currentTarget) {
@@ -101,8 +102,6 @@ export default class GridContainer extends Vue {
   grid-auto-columns: 100px;
   grid-auto-rows: 100px;
   justify-content: center;
-  padding-bottom: 50%;
-  min-height: 100%;
 }
 
 .grid-container-overlay {

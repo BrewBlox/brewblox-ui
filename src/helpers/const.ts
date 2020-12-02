@@ -14,3 +14,7 @@ export const PORT = process.env.DEV
 
 export const HOST = `${PROTOCOL}://${HOSTNAME}:${PORT}`;
 export const WS_HOST = `${WS_PROTOCOL}://${HOSTNAME}:${PORT}`;
+
+export const STATE_TOPIC = 'brewcast/state';
+export const STORE_TOPIC = 'brewcast/datastore';
+export const DEVICE_TOPIC = 'brewcast/device';

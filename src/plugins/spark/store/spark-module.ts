@@ -2,7 +2,8 @@ import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
 
-import { extendById, filterById, typeMatchFilter } from '@/helpers/functional';
+import { STATE_TOPIC } from '@/helpers/const';
+import { extendById, typeMatchFilter } from '@/helpers/functional';
 import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   Block,
@@ -13,14 +14,13 @@ import type {
   RelationEdge,
   SparkExported,
   SparkService,
-  SparkStateMessage,
   SparkStatus,
   UserUnits,
 } from '@/plugins/spark/types';
+import { SparkPatchEvent, SparkStateEvent } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
-import { sparkStateEvent } from '../getters';
 import * as api from './api';
 import {
   asServiceStatus,
@@ -32,6 +32,9 @@ import {
 
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {
+  private patchListenerId: string = '';
+  private stateListenerId: string = '';
+
   public readonly id: string; // serviceId
 
   public blocks: Block[] = [];
@@ -82,6 +85,18 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Mutation
+  public patchBlocks({ changed, deleted }: SparkPatchEvent['data']): void {
+    const affected = [
+      ...changed.map(block => block.id),
+      ...deleted,
+    ];
+    this.blocks = [
+      ...this.blocks.filter(v => !affected.includes(v.id)),
+      ...changed,
+    ];
+  }
+
+  @Mutation
   public updateStatus(status: SparkStatus): void {
     this.status = status;
     this.lastStatus = new Date();
@@ -125,18 +140,17 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async createBlock(block: Block): Promise<void> {
-    this.setBlock(await api.createBlock(block));
+    await api.createBlock(block); // triggers patch event
   }
 
   @Action
   public async saveBlock(block: Block): Promise<void> {
-    this.setBlock(await api.persistBlock(block));
+    await api.persistBlock(block); // triggers patch event
   }
 
   @Action
   public async removeBlock(block: Block): Promise<void> {
-    await api.deleteBlock(block);
-    this.blocks = filterById(this.blocks, block);
+    await api.deleteBlock(block); // triggers patch event
   }
 
   @Action
@@ -241,23 +255,34 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async start(): Promise<void> {
-    Vue.$eventbus.addStateListener({
-      id: `${sparkStateEvent}__${this.id}`,
-      filter: (key, type) => key === this.id && type === sparkStateEvent,
-      onmessage: (msg: SparkStateMessage) => {
-        const status = asSparkStatus(this.id, msg.data.status);
-        const blocks = msg.data.blocks.map(deserialize);
+    this.stateListenerId = Vue.$eventbus.addListener(
+      `${STATE_TOPIC}/${this.id}`,
+      (_, evt: SparkStateEvent) => {
+        if (evt.type === 'Spark.state') {
+          const status = asSparkStatus(this.id, evt.data.status);
+          const blocks = evt.data.blocks.map(deserialize);
 
-        this.updateBlocks(blocks);
-        this.updateStatus(status);
-        serviceStore.updateStatus(asServiceStatus(status));
-      },
-    });
+          this.updateBlocks(blocks);
+          this.updateStatus(status);
+          serviceStore.updateStatus(asServiceStatus(status));
+        }
+      });
+    this.patchListenerId = Vue.$eventbus.addListener(
+      `${STATE_TOPIC}/${this.id}/patch`,
+      (_, evt: SparkPatchEvent) => {
+        if (evt.type === 'Spark.patch') {
+          const changed = evt.data.changed.map(deserialize);
+          const { deleted } = evt.data;
+          this.patchBlocks({ changed, deleted });
+        }
+      });
+
     await this.fetchAll().catch(() => { });
   }
 
   @Action
   public async stop(): Promise<void> {
-    Vue.$eventbus.removeStateListener(`${sparkStateEvent}__${this.id}`);
+    Vue.$eventbus.removeListener(this.stateListenerId);
+    Vue.$eventbus.removeListener(this.patchListenerId);
   }
 }

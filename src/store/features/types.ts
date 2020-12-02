@@ -82,6 +82,11 @@ export interface WidgetFeature<ConfigT = any> {
    * Required if `WidgetFeature.wizard` === true.
    */
   generateConfig?: () => ConfigT;
+
+  /**
+   * Wizard should only be shown if experimental features are enabled.
+   */
+  experimental?: boolean;
 }
 
 /**

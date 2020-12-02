@@ -51,7 +51,7 @@ export const UserBlockType = Enum(
   'Spark3Pins',
   'TempSensorCombi',
   'TempSensorMock',
-  'TempSensorOneWire'
+  'TempSensorOneWire',
 );
 
 export const BlockType = Enum(
@@ -101,7 +101,7 @@ export const DigitalCompareOp = Enum(
   'OP_VALUE_IS',
   'OP_VALUE_IS_NOT',
   'OP_DESIRED_IS',
-  'OP_DESIRED_IS_NOT'
+  'OP_DESIRED_IS_NOT',
 );
 
 export const AnalogCompareOp = Enum(

@@ -1,14 +1,13 @@
 import { VueConstructor } from 'vue';
 
 import { autoRegister, ref } from '@/helpers/component-ref';
+import { STATE_TOPIC } from '@/helpers/const';
 import { deserialize } from '@/plugins/spark/parse-object';
 import { featureStore, WatcherFeature, WidgetFeature } from '@/store/features';
 
-import { StateEventMessage } from '../eventbus';
 import AutomationWidget from './AutomationWidget.vue';
-import { AutomationEvent } from './getters';
 import { automationStore } from './store';
-import { AutomationConfig, AutomationEventData } from './types';
+import { AutomationConfig, AutomationEvent } from './types';
 
 const widget: WidgetFeature = {
   id: 'Automation',
@@ -35,14 +34,15 @@ export default {
     featureStore.registerWidget(widget);
     featureStore.registerWatcher(watcher);
 
+    Vue.$eventbus.subscribe(STATE_TOPIC + '/#');
+    Vue.$eventbus.addListener(
+      STATE_TOPIC + '/automation',
+      (_, evt: AutomationEvent) => {
+        if (evt.type === 'automation.active') {
+          automationStore.setEventData(deserialize(evt.data));
+        }
+      });
+
     Vue.$startup.onStart(() => automationStore.start());
-    Vue.$eventbus.addStateListener({
-      id: 'automation',
-      filter: (_, type) => type === AutomationEvent,
-      onmessage: (msg: StateEventMessage) => {
-        const data: AutomationEventData = msg.data;
-        automationStore.setEventData(deserialize(data));
-      },
-    });
   },
 };

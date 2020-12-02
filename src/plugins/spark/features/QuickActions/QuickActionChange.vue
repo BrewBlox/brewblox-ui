@@ -30,11 +30,15 @@ export default class QuickActionChange extends Vue {
   @Prop({ type: Object, required: true })
   public readonly value!: BlockChange;
 
+  get block(): Block | null {
+    const { blockId, serviceId } = this.value;
+    return sparkStore.blockById(serviceId, blockId);
+  }
+
   get change(): EditableBlockChange {
     const { id, blockId, serviceId } = this.value;
-    const block = sparkStore.blockById(serviceId, blockId);
-    const spec = block !== null
-      ? sparkStore.spec(block) ?? null
+    const spec = this.block !== null
+      ? sparkStore.spec(this.block) ?? null
       : null;
 
     const data = this.value.data ?? {};
@@ -44,9 +48,9 @@ export default class QuickActionChange extends Vue {
       id,
       blockId,
       serviceId,
-      block,
       spec,
-      title: block ? featureStore.widgetTitle(block.type) : 'Unknown',
+      block: this.block,
+      title: featureStore.widgetTitle(this.block?.type ?? null),
       fields: spec?.fields
         .filter(f => !f.readonly)
         .map(f => ({
@@ -193,6 +197,14 @@ export default class QuickActionChange extends Vue {
       </q-item-section>
       <q-item-section class="col-auto">
         <q-btn flat label="Remove" @click="saveChange()" />
+      </q-item-section>
+    </q-item>
+    <q-item v-if="!block">
+      <q-item-section avatar>
+        <q-icon name="warning" color="warning" />
+      </q-item-section>
+      <q-item-section>
+        Block not found
       </q-item-section>
     </q-item>
   </div>

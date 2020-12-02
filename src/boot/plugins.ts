@@ -4,6 +4,7 @@ import { PluginObject, VueConstructor } from 'vue';
 import automation from '@/plugins/automation';
 import builder from '@/plugins/builder';
 import database from '@/plugins/database';
+import eventControl from '@/plugins/event-control';
 import eventbus from '@/plugins/eventbus';
 import history from '@/plugins/history';
 import misc from '@/plugins/misc';
@@ -32,6 +33,7 @@ export default async ({ Vue }: { Vue: VueConstructor }): Promise<void> => {
     history,
     spark,
     builder,
+    eventControl,
     quickstart,
     misc,
   ];

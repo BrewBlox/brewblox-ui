@@ -1,40 +1,24 @@
 import mqtt from 'mqtt';
+import shortid from 'shortid';
 import { VueConstructor } from 'vue';
-import Vue from 'vue';
 
 import { HOSTNAME, PORT, WS_PROTOCOL } from '@/helpers/const';
-import { popById } from '@/helpers/functional';
+import { mqttTopicExp, popById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 
-import { StoreObject } from './database';
+export type EventCallback = (topic: string, evt: any) => unknown;
 
-const stateTopic = 'brewcast/state';
-const datastoreTopic = 'brewcast/datastore';
-
-export interface StateEventListener {
+export interface EventListener {
   id: string;
-  filter: (key: string, type: string) => boolean;
-  onmessage: (msg: StateEventMessage) => unknown;
-}
-
-export interface StoreEventListener {
-  onChanged: (changed: StoreObject[]) => unknown;
-  onDeleted: (deleted: string[]) => unknown;
-}
-
-export interface StateEventMessage {
-  key: string;
-  type: string;
-  data: any;
-}
-
-export interface StoreEventMessage {
-  changed?: StoreObject[];
-  deleted?: string[];
+  topic: string;
+  exp: RegExp;
+  callback: EventCallback;
 }
 
 export class BrewbloxEventbus {
-  private stateListeners: StateEventListener[] = [];
+  private client: mqtt.MqttClient | null = null;
+  private topics: Set<string> = new Set();
+  private listeners: EventListener[] = [];
 
   public async start(): Promise<void> {
     const opts: mqtt.IClientOptions = {
@@ -45,42 +29,45 @@ export class BrewbloxEventbus {
       rejectUnauthorized: false,
     };
     const client = mqtt.connect(undefined, opts);
+    this.client = client;
 
     client.on('error', e => {
       notify.error(`mqtt error: ${e}`);
     });
     client.on('connect', () => {
-      client.subscribe(stateTopic + '/#');
-      client.subscribe(datastoreTopic + '/#');
+      this.topics.forEach(topic => client.subscribe(topic));
     });
     client.on('message', (topic, body: Buffer) => {
       if (body.length === 0) {
         return;
       }
-      else if (topic.startsWith(datastoreTopic)) {
-        const { changed, deleted }: StoreEventMessage = JSON.parse(body.toString());
-        const database = Vue.$database;
-        changed && database.onChanged(changed);
-        deleted && database.onDeleted(deleted);
-      }
-      else if (topic.startsWith(stateTopic)) {
-        const message: StateEventMessage = JSON.parse(body.toString());
-        this.stateListeners
-          .filter(lst => lst.filter(message.key, message.type))
-          .forEach(lst => lst.onmessage(message));
-      }
+      const data = JSON.parse(body.toString());
+      this.listeners
+        .filter(listener => listener.exp.test(topic))
+        .forEach(listener => listener.callback(topic, data));
     });
   }
 
-  public addStateListener(listener: StateEventListener): void {
-    if (this.stateListeners.find(lst => lst.id === listener.id)) {
-      throw new Error(`State listener with id '${listener.id}' already exists`);
+  public subscribe(topic: string): void {
+    if (this.client?.connected && !this.topics.has(topic)) {
+      this.client.subscribe(topic);
     }
-    this.stateListeners.push(listener);
+    this.topics.add(topic);
   }
 
-  public removeStateListener(id: string): void {
-    popById(this.stateListeners, { id });
+  public addListener(topic: string, callback: EventCallback): string {
+    const id = shortid.generate();
+    const exp = mqttTopicExp(topic);
+    this.listeners.push({ id, topic, exp, callback });
+    return id;
+  }
+
+  public removeListener(id: string): void {
+    popById(this.listeners, { id });
+  }
+
+  public publish(topic: string, payload: Record<keyof any, any>): void {
+    this.client?.publish(topic, JSON.stringify(payload));
   }
 }
 

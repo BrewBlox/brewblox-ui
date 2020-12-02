@@ -1,37 +1,35 @@
 <script lang="ts">
-import shortid from 'shortid';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { sparkUpdateEvent } from '@/plugins/spark/getters';
+import { STATE_TOPIC } from '@/helpers/const';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
-
+import { SparkUpdateEvent } from '@/shared-types';
 
 @Component
 export default class FirmwareUpdateDialog extends DialogBase {
   busy = false;
   error = '';
-  id: string = '';
+  listenerId: string = '';
   messages: string[] = [];
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
   created(): void {
-    this.id = `${sparkUpdateEvent}:${this.serviceId}:${shortid.generate()}`;
-    Vue.$eventbus.addStateListener({
-      id: this.id,
-      filter: (key, type) => key === this.serviceId && type === sparkUpdateEvent,
-      onmessage: ({ data }) => data.forEach(v => this.pushMessage(v)),
-    });
+    this.listenerId = Vue.$eventbus.addListener(
+      `${STATE_TOPIC}/${this.serviceId}/update`,
+      (_, evt: SparkUpdateEvent) => {
+        if (evt.type === 'Spark.update') {
+          evt.data.forEach(v => this.pushMessage(v));
+        }
+      });
   }
 
   beforeDestroy(): void {
-    if (this.id) {
-      Vue.$eventbus.removeStateListener(this.id);
-    }
+    Vue.$eventbus.removeListener(this.listenerId);
   }
 
   get sparkModule(): SparkServiceModule {

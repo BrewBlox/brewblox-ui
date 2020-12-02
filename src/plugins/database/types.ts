@@ -1,7 +1,4 @@
-export interface StoreObject {
-  id: string;
-  namespace?: string;
-}
+import { StoreObject } from '@/shared-types';
 
 export type ChangeCb<T> = (obj: T) => unknown;
 export type DeleteCb = (id: string) => unknown;
@@ -19,18 +16,6 @@ export interface BrewbloxDatabase {
    * Is called by the App component during create
    */
   start(): Awaitable<void>;
-
-  /**
-   * Hook for external change events.
-   * @param changed Changed objects
-   */
-  onChanged(changed: StoreObject[]): void;
-
-  /**
-   * Hook for external delete events.
-   * @param deleted fully qualified Ids of deleted objects
-   */
-  onDeleted(deleted: string[]): void;
 
   /**
    * Be notified of external changes to a collection.

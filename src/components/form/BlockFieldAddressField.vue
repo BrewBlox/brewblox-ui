@@ -17,7 +17,7 @@ export default class BlockFieldAddressField extends FieldBase {
   @Prop({ type: String, default: 'Choose field' })
   public readonly title!: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: 'Field' })
   public readonly label!: string;
 
   @Prop({ type: Array, required: false })
@@ -41,6 +41,9 @@ export default class BlockFieldAddressField extends FieldBase {
   @Prop({ type: Boolean, default: true })
   public readonly show!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly showValue!: boolean;
+
   save(val: BlockFieldAddress): void {
     this.$emit('input', val);
   }
@@ -51,6 +54,10 @@ export default class BlockFieldAddressField extends FieldBase {
 
   get block(): Block | null {
     return sparkStore.blockByAddress(this.value);
+  }
+
+  get fieldValue(): any {
+    return sparkStore.fieldByAddress(this.value);
   }
 
   get broken(): boolean {
@@ -89,18 +96,30 @@ export default class BlockFieldAddressField extends FieldBase {
     })
       .onOk(this.save);
   }
+
+  // Can't be placed in parent class
+  get activeSlots(): string[] {
+    return Object.keys(this.$slots)
+      .filter(s => this.fieldSlots.includes(s));
+  }
 }
 </script>
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <div v-if="fieldSpec" class="q-gutter-y-xs">
-      <div>
-        {{ fieldSpec.title }}
-      </div>
-      <div class="fade-4 text-italic">
-        {{ value.id }}
-      </div>
+      <span>
+        {{ value.id }} &raquo; {{ fieldSpec.title }}
+      </span>
+      <span
+        v-if="showValue"
+        class="text-secondary"
+      >
+        &raquo; {{ fieldValue | pretty }}
+      </span>
+    </div>
+    <div v-else-if="readonly">
+      No field selected
     </div>
     <div v-else>
       Click to assign
@@ -123,6 +142,12 @@ export default class BlockFieldAddressField extends FieldBase {
         name="error"
         color="negative"
       />
+    </template>
+
+    <template v-for="slot in activeSlots">
+      <template :slot="slot">
+        <slot :name="slot" />
+      </template>
     </template>
   </LabeledField>
 </template>

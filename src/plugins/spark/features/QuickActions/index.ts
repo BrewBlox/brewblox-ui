@@ -6,7 +6,7 @@ import { WidgetFeature } from '@/store/features';
 import widget from './QuickActionsWidget.vue';
 import { QuickActionsConfig } from './types';
 
-const feature: WidgetFeature = {
+const feature: WidgetFeature<QuickActionsConfig> = {
   id: 'QuickActions',
   title: 'Quick Actions',
   component: ref(widget),
@@ -15,7 +15,7 @@ const feature: WidgetFeature = {
     cols: 4,
     rows: 5,
   },
-  generateConfig: (): QuickActionsConfig => ({
+  generateConfig: () => ({
     actions: [
       {
         id: uid(),

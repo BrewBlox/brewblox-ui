@@ -161,7 +161,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
           ...pidDefaults(serviceId),
           kp: bloxQty(10, '1/degC'),
           ti: bloxQty('5m'),
-          td: bloxQty('30s'),
+          td: bloxQty('10s'),
           enabled: true,
           inputId: bloxLink(names.kettleSetpoint),
           outputId: bloxLink(names.tubeDriver),

@@ -32,7 +32,7 @@ export default class SizeCard extends PartCard {
     this.savePartSettings({ ...this.part.settings, [this.settingsKey]: size });
   }
 
-  debouncedSave = debounce(this.save, 50, true)
+  debouncedSave = debounce(this.save, 50, true);
 }
 </script>
 

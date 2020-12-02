@@ -1,51 +1,1388 @@
 [
   {
-    "id": "sparkey",
-    "namespace": "brewblox-ui-store:services",
-    "type": "Spark",
-    "order": 1,
-    "config": {},
-    "title": "Spark Controller 'sparkey'"
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "aa8d6d3e-9b7d-4ee6-92a8-a0aecef8a7bb",
+    "rows": 3,
+    "config": {
+      "serviceId": null
+    },
+    "feature": "SparkDisplay",
+    "title": "Spark Sim Display",
+    "cols": 4,
+    "order": 9,
+    "dashboard": "dashboard-home"
   },
   {
-    "id": "3d15296d-0abd-4d45-383c-0bec436ae319",
-    "namespace": "brewblox-ui-store:logged-sessions",
-    "tags": [
-      "on: Home Dashboard"
-    ],
-    "notes": [
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "a437050b-52a7-4c50-8051-26ec6addc28a",
+    "rows": 3,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "Logic Actuator"
+    },
+    "feature": "ActuatorLogic",
+    "title": "Logic Actuator",
+    "cols": 4,
+    "order": 6,
+    "dashboard": "dashboard-home",
+    "pinnedPosition": null
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "174108b9-e054-42b3-b19b-2eadabac6028",
+    "rows": 5,
+    "config": {
+      "changeIdMigrated": true,
+      "serviceId": "sparkey",
+      "steps": [
+        {
+          "name": "Disable all setpoints",
+          "id": "16bf062e-2105-4ff0-b81f-c85731b7e14f",
+          "changes": [
+            {
+              "id": "caa78b09-62f4-41ba-b33c-83899d037445",
+              "blockId": "HERMS HLT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "f63767fb-3e99-4403-9e70-88b509c0af59",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "199b53af-9e6d-4bd3-9b63-3167c3f284eb",
+              "blockId": "HERMS BK Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            }
+          ]
+        },
+        {
+          "name": "Constant HLT Temp",
+          "id": "5ecfea94-9cb2-4aa7-95a3-c9a8ee915424",
+          "changes": [
+            {
+              "id": "4aa3a681-28ea-40f6-8145-23febf8da77c",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": false
+              },
+              "confirmed": {}
+            },
+            {
+              "id": "5aacdf98-9d4b-494a-bac2-4f82eb5e728d",
+              "blockId": "HERMS HLT Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 70
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "Constant MT Temp",
+          "id": "45ee02d6-a5dc-4885-9d83-a93f612fc54f",
+          "changes": [
+            {
+              "id": "215e1562-c641-43e5-8ceb-90779e4724bc",
+              "blockId": "HERMS MT Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 66.7
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            },
+            {
+              "id": "75bb7f56-5ed7-4c56-aeef-3889c946a078",
+              "blockId": "HERMS HLT Setpoint Driver",
+              "data": {
+                "enabled": true
+              },
+              "confirmed": {}
+            }
+          ],
+          "applicable": true,
+          "diffs": [
+            {
+              "blockId": "HERMS MT Setpoint",
+              "diffs": [
+                {
+                  "key": "Enabled",
+                  "oldV": "false",
+                  "newV": "true",
+                  "changed": true
+                },
+                {
+                  "key": "Setting",
+                  "oldV": "67.00 °C",
+                  "newV": "66.70 °C",
+                  "changed": true
+                }
+              ]
+            },
+            {
+              "blockId": "HERMS HLT Setpoint Driver",
+              "diffs": [
+                {
+                  "key": "Enabled",
+                  "oldV": "false",
+                  "newV": "true",
+                  "changed": true
+                }
+              ]
+            }
+          ],
+          "active": false
+        },
+        {
+          "name": "Constant BK Temp",
+          "id": "b46e68ee-4ce9-4bca-9027-7a5d3d261963",
+          "changes": [
+            {
+              "id": "1780d73f-09a5-4bae-b5e7-283c69ae0639",
+              "blockId": "HERMS BK Setpoint",
+              "data": {
+                "settingEnabled": true,
+                "storedSetting[degC]": 100
+              },
+              "confirmed": {
+                "storedSetting": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "feature": "QuickActions",
+    "title": "HERMS Actions",
+    "cols": 4,
+    "order": 3,
+    "dashboard": "herms",
+    "pinnedPosition": {
+      "x": 8,
+      "y": 6
+    }
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "93c393d1-3a4b-41cd-ba3a-e9ba9d1aa2c0",
+    "rows": 4,
+    "config": {
+      "addr": {
+        "serviceId": "sparkey",
+        "id": "setpoint-sensor-pair-1",
+        "field": "storedSetting",
+        "type": "SetpointSensorPair"
+      },
+      "values": [
+        0,
+        10,
+        50
+      ],
+      "sliders": [
+        [
+          0,
+          100,
+          1
+        ],
+        [
+          0,
+          50,
+          1
+        ],
+        [
+          10,
+          90,
+          1
+        ]
+      ]
+    },
+    "feature": "QuickValues",
+    "title": "Quick Values",
+    "cols": 4,
+    "order": 7,
+    "dashboard": "dashboard-home"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "a06355e6-5499-11e9-8647-d663bd873d93",
+    "rows": 3,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "setpoint-1"
+    },
+    "feature": "UnknownType",
+    "title": "item-unknown",
+    "cols": 3,
+    "order": 2,
+    "dashboard": "derp"
+  },
+  {
+    "namespace": "brewblox-ui-store:services",
+    "id": "sparkey",
+    "title": "Spark Controller 'sparkey'",
+    "config": {},
+    "order": 1,
+    "type": "Spark"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "1-55d75cbee5631853c77cd22f26e9a81c",
+    "rows": 5,
+    "config": {},
+    "feature": "Automation",
+    "title": "Ministry of Silly Walks",
+    "cols": 4,
+    "order": 4,
+    "dashboard": "dashboard-home"
+  },
+  {
+    "namespace": "brewblox-ui-store:autm-template",
+    "id": "ba342aed-d4ab-43aa-8286-1e7fed8f2afe",
+    "title": "ON/OFF",
+    "steps": [
       {
-        "id": "66ea94b9-1c2a-6218-6469-a9b353e45e77",
-        "title": "Example note",
-        "type": "Text",
-        "value": "",
-        "col": 12
+        "id": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
+        "title": "ON",
+        "preconditions": [
+          {
+            "id": "061b0d08-0d63-474b-9105-2ce3d86082ce",
+            "title": "Task status",
+            "enabled": true,
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "wait-on",
+              "status": "Finished",
+              "resetStatus": null
+            }
+          }
+        ],
+        "actions": [
+          {
+            "id": "1336a493-316a-4b5c-9c5b-a7dc9eaeb312",
+            "title": "Block change",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "data": {
+                "desiredState": 1
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "50f30eb0-1269-432d-8e29-4fa93293caf0",
+            "next": true,
+            "enabled": true,
+            "conditions": [
+              {
+                "id": "77eb2f07-e933-407f-b9c2-796377637a69",
+                "title": "Duration",
+                "enabled": true,
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 10000,
+                  "start": "Step"
+                }
+              }
+            ]
+          }
+        ]
       },
       {
-        "id": "ea8631fd-9bb0-ac9f-6cfb-8bf01e56893c",
-        "title": "Subprocess graph",
-        "type": "Graph",
-        "start": null,
-        "end": null,
-        "config": {
-          "layout": {
-            "annotations": []
+        "id": "cd39929f-259e-4b4b-962e-d3b96edd3533",
+        "title": "OFF",
+        "preconditions": [
+          {
+            "id": "1b6bae71-a330-47cb-8ffb-a44e846d8700",
+            "title": "Duration",
+            "enabled": true,
+            "impl": {
+              "type": "TimeElapsed",
+              "duration": 10000,
+              "start": "Step"
+            }
           },
-          "params": {},
-          "targets": [],
-          "renames": {},
-          "axes": {},
-          "colors": {}
-        },
-        "col": 12
+          {
+            "id": "774be828-8bba-4072-a510-386ab9463f26",
+            "title": "Block value",
+            "enabled": true,
+            "impl": {
+              "type": "BlockValue",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "key": "desiredState",
+              "operator": "eq",
+              "value": 1
+            }
+          }
+        ],
+        "actions": [
+          {
+            "id": "56eb0910-7b0c-43ea-a809-29599db823d1",
+            "title": "Block change",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "data": {
+                "desiredState": 0
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "2f61eb56-a09c-419a-92dc-eb1348341c80",
+            "next": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
+            "enabled": true,
+            "conditions": [
+              {
+                "id": "484ab57b-888d-4d6f-8648-f31ee873783a",
+                "title": "Duration",
+                "enabled": true,
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 10000,
+                  "start": "Step"
+                }
+              }
+            ]
+          }
+        ]
       }
-    ],
-    "date": 1579688563640,
-    "title": "Teddy"
+    ]
   },
   {
-    "id": "eaa6154b-a5ec-4cab-a655-31985e2c5a9d",
+    "namespace": "brewblox-ui-store:dashboards",
+    "id": "derp",
+    "title": "Derp Dashboard",
+    "order": 4
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "a06362e8-5499-11e9-8647-d663bd873d93",
+    "rows": 5,
+    "config": {
+      "sessions": [
+        {
+          "id": "mgKBmi4sv",
+          "name": "brew-session",
+          "hidden": false,
+          "start": 1547723679298,
+          "end": null,
+          "graphCfg": {
+            "layout": {},
+            "params": {
+              "start": 1547723679298
+            },
+            "targets": [
+              {
+                "measurement": "sparkey",
+                "fields": [
+                  "actuator-pwm-1/value"
+                ]
+              }
+            ],
+            "renames": {
+              "sparkey/actuator-pwm-1/value": "PWM value"
+            }
+          }
+        }
+      ]
+    },
+    "feature": "SessionView",
+    "title": "sessions",
+    "cols": 4,
+    "order": 2,
+    "dashboard": "metrics"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "a0636842-5499-11e9-8647-d663bd873d93",
+    "rows": 5,
+    "config": {
+      "layout": {},
+      "params": [],
+      "targets": [],
+      "renames": {}
+    },
+    "feature": "Graph",
+    "title": "empty-graph",
+    "cols": 5,
+    "order": 2,
+    "dashboard": "metrics"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboards",
+    "id": "builder",
+    "title": "Brewery Builder Dashboard",
+    "order": 3
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "117a2504-85b7-43c4-a48d-37bf5d6821cd",
+    "rows": 2,
+    "config": {
+      "session": null
+    },
+    "feature": "Stopwatch",
+    "title": "Stopwatch",
+    "cols": 4,
+    "order": 9,
+    "dashboard": "dashboard-home"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "a0635bb8-5499-11e9-8647-d663bd873d93",
+    "rows": 3,
+    "config": {
+      "serviceId": "ZORP",
+      "blockId": "BLORP"
+    },
+    "feature": "SetpointSensorPair",
+    "title": "item-service-unknown",
+    "cols": 3,
+    "order": 3,
+    "dashboard": "derp"
+  },
+  {
+    "namespace": "brewblox-ui-store:layouts",
+    "id": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
+    "title": "HERMS Layout",
+    "parts": [
+      {
+        "id": "62ec5274-2564-441c-92d1-7d0e24eafa13",
+        "rotate": 0,
+        "settings": {
+          "color": "#c48600"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 20,
+        "y": 1
+      },
+      {
+        "id": "e91cfce7-3eb3-40b0-ab2c-570694dd74f2",
+        "rotate": 0,
+        "settings": {
+          "color": "#9c4b00"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 12,
+        "y": 1
+      },
+      {
+        "id": "10f5b81f-43f9-4638-b275-3037f4fe1310",
+        "rotate": 0,
+        "settings": {
+          "color": "#b50000"
+        },
+        "flipped": false,
+        "type": "Kettle",
+        "x": 4,
+        "y": 1
+      },
+      {
+        "id": "7b7ac06e-ba15-40ac-a34f-d561de00718e",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "Coil",
+        "x": 5,
+        "y": 4
+      },
+      {
+        "id": "14315508-5aca-4a17-bd9e-4af1a3c622d5",
+        "rotate": 0,
+        "settings": {
+          "pwm": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK PWM"
+          },
+          "sizeX": 4
+        },
+        "flipped": true,
+        "type": "HeatingElement",
+        "x": 21,
+        "y": 6
+      },
+      {
+        "id": "c34f0524-c0e0-4026-82df-2369086edd50",
+        "rotate": 0,
+        "settings": {
+          "pwm": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT PWM"
+          },
+          "sizeX": 4
+        },
+        "flipped": false,
+        "type": "HeatingElement",
+        "x": 3,
+        "y": 6
+      },
+      {
+        "id": "9f4440ec-d94c-490d-b4ba-3dfc02887781",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "WhirlpoolInlet",
+        "x": 20,
+        "y": 2
+      },
+      {
+        "id": "2c17fea4-5ccf-4bc3-aab0-d351a2758389",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "WhirlpoolInlet",
+        "x": 4,
+        "y": 2
+      },
+      {
+        "id": "747c0348-181e-461e-95fb-f06764505e6c",
+        "rotate": 0,
+        "settings": {
+          "sizeX": 4
+        },
+        "flipped": true,
+        "type": "FilterBottom",
+        "x": 12,
+        "y": 6
+      },
+      {
+        "id": "3ec5bd91-4f66-4de5-b86c-5d636a393d68",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS MT Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 13,
+        "y": 3
+      },
+      {
+        "id": "baafe585-d3b4-4f6b-a348-4df635881dbc",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 21,
+        "y": 3
+      },
+      {
+        "id": "e6900363-8d79-4598-bcba-8ba33da17fb1",
+        "rotate": 0,
+        "settings": {
+          "setpoint": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT Setpoint"
+          }
+        },
+        "flipped": false,
+        "type": "SetpointDisplay",
+        "x": 5,
+        "y": 3
+      },
+      {
+        "id": "8d3e1f9f-9d98-44e2-9f15-ff4b123e4448",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 19,
+        "y": 2
+      },
+      {
+        "id": "275f4944-5a26-4021-b49f-1991dcd86641",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 18,
+        "y": 2
+      },
+      {
+        "id": "b39904b2-47a3-4499-967c-16db0fa31bd5",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 3
+      },
+      {
+        "id": "f5d2bd3f-0691-47ad-b9e8-f46f25df6b92",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 4
+      },
+      {
+        "id": "7d79688e-43f9-46f6-b568-c3ff254e30d1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 5
+      },
+      {
+        "id": "b292c7f3-f5ee-429c-a169-8b0a402da186",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 18,
+        "y": 6
+      },
+      {
+        "id": "6bb976e4-7538-45fa-b71c-de0a73cc6b96",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 2
+      },
+      {
+        "id": "c45e28b4-943c-4b22-82eb-7da5462a2b20",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 2
+      },
+      {
+        "id": "70265b7d-ea54-4dbb-82a3-4d5d9377d5f4",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 9,
+        "y": 2
+      },
+      {
+        "id": "178c8eb7-5376-4092-b2be-43b5af48e1e1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 6
+      },
+      {
+        "id": "138106d7-16ec-4f8d-9875-3c8b230d5cc4",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 6
+      },
+      {
+        "id": "2b7655f9-9f47-4c6a-b3b9-10e340e377a9",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 6
+      },
+      {
+        "id": "0c18b785-ac8d-401f-8ac1-9b709d96acfe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "DipTube",
+        "x": 12,
+        "y": 2
+      },
+      {
+        "id": "d3c0d5d2-2e8e-44e0-bce5-347e9a2dcffb",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "DipTube",
+        "x": 20,
+        "y": 6
+      },
+      {
+        "id": "77fc7305-2fd2-45e2-9ab6-6018bb2886b8",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 17,
+        "y": 6
+      },
+      {
+        "id": "60817b6c-8c51-4f70-b354-c8650981aa93",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 16,
+        "y": 6
+      },
+      {
+        "id": "b4c78c4a-0a4a-47d6-8707-76ed6f3aa737",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 19,
+        "y": 6
+      },
+      {
+        "id": "a4005531-adf2-44bd-a6a3-6f14fc87f618",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 2,
+        "y": 2
+      },
+      {
+        "id": "a0976709-28f8-4994-b53c-f40ff48a511c",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 3
+      },
+      {
+        "id": "913c1180-433f-41ee-8cab-037c50ae6ae9",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "id": "765bb6db-68b5-4781-8fb3-bec6b113bd88",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 5
+      },
+      {
+        "id": "d275d3eb-1d0d-446e-b948-ebe924f8923e",
+        "rotate": 0,
+        "settings": {},
+        "flipped": true,
+        "type": "DipTube",
+        "x": 7,
+        "y": 6
+      },
+      {
+        "id": "cab9f977-8a78-4820-ac5c-a115a7f0567f",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 8,
+        "y": 6
+      },
+      {
+        "id": "3b9c669b-2be7-432d-8ff5-28640ae315d3",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 17,
+        "y": 9
+      },
+      {
+        "id": "73f2e1e9-716e-43b9-9ecd-d54f6222c7d4",
+        "rotate": 270,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 18,
+        "y": 8
+      },
+      {
+        "id": "e5125c06-c3ea-418c-abf2-19c8b80c9b9d",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 18,
+        "y": 7
+      },
+      {
+        "id": "7566dce0-6477-49bb-b135-0368d7ba9048",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 17,
+        "y": 7
+      },
+      {
+        "id": "81319166-4826-45f8-a118-3afce9bf830c",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 15,
+        "y": 9
+      },
+      {
+        "id": "7f5f06a0-583e-4af1-90dc-898d39773bfe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 9,
+        "y": 9
+      },
+      {
+        "id": "d6d29d86-2709-44cf-973a-5421dc065de6",
+        "rotate": 270,
+        "settings": {
+          "enabled": false
+        },
+        "flipped": false,
+        "type": "Pump",
+        "x": 17,
+        "y": 8
+      },
+      {
+        "id": "446e97fb-a2cf-4e1e-882e-2745f7a4fcbe",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 3,
+        "y": 9
+      },
+      {
+        "id": "653ccaa4-2270-46fc-a7e6-ffe579237721",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 4,
+        "y": 9
+      },
+      {
+        "id": "654c56b9-57f4-4ecb-9133-4d7d0d0da459",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 5,
+        "y": 9
+      },
+      {
+        "id": "9d8c8543-6f04-4394-989a-758da03982f1",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 6
+      },
+      {
+        "id": "4eccf98c-44dc-4934-ac7a-cb3bc3927f79",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 3,
+        "y": 2
+      },
+      {
+        "id": "36be6b0a-13c5-413c-8599-627cc9d8ccd4",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 13,
+        "y": 9
+      },
+      {
+        "id": "b984d740-969b-4fca-b77f-2f95e649cd49",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 11,
+        "y": 9
+      },
+      {
+        "id": "b9e2322d-b1d2-4751-aa24-f4d5bda55c7f",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 13,
+        "y": 8
+      },
+      {
+        "id": "4ebceb43-17f4-46e5-bdb1-7a5c9983b110",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 11,
+        "y": 8
+      },
+      {
+        "id": "75d94725-de13-4707-aa02-b68c10c89639",
+        "rotate": 90,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 9,
+        "y": 8
+      },
+      {
+        "id": "f649f75d-085b-4ae9-be1a-644579a97256",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 7
+      },
+      {
+        "id": "ed58258c-1c7d-43a8-81da-ded2d43c9c59",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 12,
+        "y": 7
+      },
+      {
+        "id": "00cdf60c-f7ec-40b5-8dd4-df1bf06b8bc1",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 10,
+        "y": 9
+      },
+      {
+        "id": "7eddaf65-519f-44ac-b603-64f0955ac8f2",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 12,
+        "y": 9
+      },
+      {
+        "id": "a42c1e54-1302-4322-b0d8-ef9517b95719",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 13,
+        "y": 7
+      },
+      {
+        "id": "061a901c-6bb7-49b0-b091-c4676a04844a",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 11,
+        "y": 7
+      },
+      {
+        "id": "7642ac17-7f8d-4490-99d8-8be94a3e6b36",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 10,
+        "y": 7
+      },
+      {
+        "id": "02f3664d-9ac3-4d7a-806f-e8d03377d852",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 2,
+        "y": 7
+      },
+      {
+        "id": "4c135168-656b-477c-adda-86ee83de6663",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 16,
+        "y": 9
+      },
+      {
+        "id": "b52d4ed8-ca5a-4ed5-abcf-20f11e9b6696",
+        "rotate": 0,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 14,
+        "y": 9
+      },
+      {
+        "id": "a8c61cb6-f3d1-44d0-a05d-fd0cc99c0038",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 18,
+        "y": 9
+      },
+      {
+        "id": "42fd3984-548b-4dc9-bddf-de3d0f58af1e",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 19,
+        "y": 9
+      },
+      {
+        "id": "204d7192-a9cd-43ef-b44c-e1ad4fcdc2cf",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 20,
+        "y": 9
+      },
+      {
+        "id": "5f762ce2-9aa0-4ef4-b075-b093b41a153d",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 7,
+        "y": 9
+      },
+      {
+        "id": "0b8288c1-6e97-42c0-bb80-4bddd707e407",
+        "rotate": 270,
+        "settings": {
+          "enabled": false
+        },
+        "flipped": false,
+        "type": "Pump",
+        "x": 7,
+        "y": 8
+      },
+      {
+        "id": "69a5d0e4-23fd-4cb2-81c0-32e1d991056f",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 8,
+        "y": 9
+      },
+      {
+        "id": "3d337ab1-6006-4e90-85a9-e77697d7f62f",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 6,
+        "y": 9
+      },
+      {
+        "id": "bf1f5f79-70da-4391-bea7-70e304d8fc23",
+        "rotate": 270,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 8,
+        "y": 7
+      },
+      {
+        "id": "be004759-ba08-4759-850f-6c82fbe24d88",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 7,
+        "y": 7
+      },
+      {
+        "id": "3170fc31-a12b-42e1-91ec-e2d84d601892",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 11,
+        "y": 4
+      },
+      {
+        "id": "aa7225f6-0f64-4bf1-ba86-eaa349dc4a7e",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 11,
+        "y": 5
+      },
+      {
+        "id": "0ee18011-97af-4071-a2db-62142b54a1b0",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "ElbowTube",
+        "x": 10,
+        "y": 5
+      },
+      {
+        "id": "b9e3cbc4-1f69-4dd4-a93b-a89a9d559945",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 10,
+        "y": 4
+      },
+      {
+        "id": "e1ab9029-579b-4895-96e5-e3ca505acb50",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 9,
+        "y": 4
+      },
+      {
+        "id": "e2256026-1a79-4355-9351-9fab2b143c84",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "BridgeTube",
+        "x": 9,
+        "y": 5
+      },
+      {
+        "id": "ccd42b29-04f1-4924-9489-4b0a754501ca",
+        "rotate": 180,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 8,
+        "y": 4
+      },
+      {
+        "id": "9b55897e-cad8-4dec-aa96-3c65d9336bdb",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 8,
+        "y": 5
+      },
+      {
+        "id": "05fa27e1-bab4-4905-8d62-a0d47df1871b",
+        "rotate": 90,
+        "settings": {},
+        "flipped": false,
+        "type": "StraightTube",
+        "x": 9,
+        "y": 3
+      },
+      {
+        "id": "0d1fc393-37c6-464a-bc42-468b8f95836d",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS MT PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 11,
+        "y": 1
+      },
+      {
+        "id": "e8d6bc42-f64f-41b7-ae17-10175638ca61",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS BK PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 19,
+        "y": 1
+      },
+      {
+        "id": "24121797-0a56-4d28-86f2-1978892f8d25",
+        "rotate": 0,
+        "settings": {
+          "pid": {
+            "serviceId": "sparkey",
+            "blockId": "HERMS HLT PID"
+          }
+        },
+        "flipped": false,
+        "type": "PidDisplay",
+        "x": 3,
+        "y": 1
+      },
+      {
+        "id": "432d535b-00a8-4837-b623-39f8d7be03e3",
+        "rotate": 0,
+        "settings": {},
+        "flipped": false,
+        "type": "TeeTube",
+        "x": 2,
+        "y": 9
+      },
+      {
+        "id": "82b0f278-5f45-4a7c-80b1-d5dff59432cf",
+        "rotate": 180,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 1,
+        "y": 9
+      },
+      {
+        "id": "07c5600e-3e32-45c3-a453-23df9d7da538",
+        "rotate": 270,
+        "settings": {
+          "closed": true
+        },
+        "flipped": false,
+        "type": "Valve",
+        "x": 2,
+        "y": 8
+      },
+      {
+        "id": "bd304241-8b19-4960-b680-a5ea9f82b82e",
+        "rotate": 0,
+        "settings": {
+          "pressure": 10,
+          "liquids": [
+            "#4AA0EF"
+          ]
+        },
+        "flipped": false,
+        "type": "SystemIO",
+        "x": 0,
+        "y": 9
+      }
+    ],
+    "height": 11,
+    "width": 26
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "972240e6-e12a-4abd-8c6c-bc850ff5096d",
+    "rows": 5,
+    "config": {
+      "currentLayoutId": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
+      "layoutIds": [
+        "90ca4326-b3a2-47ca-bec4-2c52281d8772"
+      ]
+    },
+    "feature": "Builder",
+    "title": "HERMS Process",
+    "cols": 11,
+    "order": 1,
+    "dashboard": "herms",
+    "pinnedPosition": {
+      "x": 1,
+      "y": 1
+    }
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "bd5f1830-b9c9-450a-88f9-bc2e548d2376",
+    "rows": 2,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "Logic Input 1"
+    },
+    "feature": "DigitalActuator",
+    "title": "Logic Input 1",
+    "cols": 4,
+    "order": 7,
+    "dashboard": "dashboard-home"
+  },
+  {
     "namespace": "brewblox-ui-store:autm-template",
+    "id": "eaa6154b-a5ec-4cab-a655-31985e2c5a9d",
+    "title": "Test Template",
     "steps": [
       {
         "id": "bdc00a5d-ccfe-4699-8cc2-2cdb73eeb1d1",
@@ -1012,967 +2349,32 @@
           }
         ]
       }
-    ],
-    "title": "Test Template"
+    ]
   },
   {
-    "id": "a0636b12-5499-11e9-8647-d663bd873d93",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "dashboard-home",
-    "order": 1,
-    "cols": 4,
-    "title": "pid-1",
-    "rows": 4,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "pid-1"
-    },
-    "feature": "Pid"
-  },
-  {
-    "id": "a06350b4-5499-11e9-8647-d663bd873d93",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "derp",
-    "order": 1,
-    "cols": 3,
-    "title": "item-invalid",
-    "rows": 3,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "BLARGH"
-    },
-    "feature": "SetpointSensorPair"
-  },
-  {
-    "id": "bd5f1830-b9c9-450a-88f9-bc2e548d2376",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "dashboard-home",
-    "order": 7,
-    "cols": 4,
-    "title": "Logic Input 1",
-    "rows": 2,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "Logic Input 1"
-    },
-    "feature": "DigitalActuator"
-  },
-  {
-    "id": "a06355e6-5499-11e9-8647-d663bd873d93",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "derp",
+    "namespace": "brewblox-ui-store:services",
+    "id": "spock",
+    "title": "Spark Controller 'spock'",
+    "config": {},
     "order": 2,
-    "cols": 3,
-    "title": "item-unknown",
-    "rows": 3,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "setpoint-1"
-    },
-    "feature": "UnknownType"
+    "type": "Spark"
   },
   {
-    "id": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
-    "namespace": "brewblox-ui-store:layouts",
-    "width": 26,
-    "height": 11,
-    "parts": [
-      {
-        "id": "62ec5274-2564-441c-92d1-7d0e24eafa13",
-        "rotate": 0,
-        "settings": {
-          "color": "#c48600"
-        },
-        "flipped": false,
-        "type": "Kettle",
-        "x": 20,
-        "y": 1
-      },
-      {
-        "id": "e91cfce7-3eb3-40b0-ab2c-570694dd74f2",
-        "rotate": 0,
-        "settings": {
-          "color": "#9c4b00"
-        },
-        "flipped": false,
-        "type": "Kettle",
-        "x": 12,
-        "y": 1
-      },
-      {
-        "id": "10f5b81f-43f9-4638-b275-3037f4fe1310",
-        "rotate": 0,
-        "settings": {
-          "color": "#b50000"
-        },
-        "flipped": false,
-        "type": "Kettle",
-        "x": 4,
-        "y": 1
-      },
-      {
-        "id": "7b7ac06e-ba15-40ac-a34f-d561de00718e",
-        "rotate": 180,
-        "settings": {},
-        "flipped": false,
-        "type": "Coil",
-        "x": 5,
-        "y": 4
-      },
-      {
-        "id": "14315508-5aca-4a17-bd9e-4af1a3c622d5",
-        "rotate": 0,
-        "settings": {
-          "pwm": {
-            "serviceId": "sparkey",
-            "blockId": "HERMS BK PWM"
-          },
-          "sizeX": 4
-        },
-        "flipped": true,
-        "type": "HeatingElement",
-        "x": 21,
-        "y": 6
-      },
-      {
-        "id": "c34f0524-c0e0-4026-82df-2369086edd50",
-        "rotate": 0,
-        "settings": {
-          "pwm": {
-            "serviceId": "sparkey",
-            "blockId": "HERMS HLT PWM"
-          },
-          "sizeX": 4
-        },
-        "flipped": false,
-        "type": "HeatingElement",
-        "x": 3,
-        "y": 6
-      },
-      {
-        "id": "9f4440ec-d94c-490d-b4ba-3dfc02887781",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "WhirlpoolInlet",
-        "x": 20,
-        "y": 2
-      },
-      {
-        "id": "2c17fea4-5ccf-4bc3-aab0-d351a2758389",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "WhirlpoolInlet",
-        "x": 4,
-        "y": 2
-      },
-      {
-        "id": "747c0348-181e-461e-95fb-f06764505e6c",
-        "rotate": 0,
-        "settings": {
-          "sizeX": 4
-        },
-        "flipped": true,
-        "type": "FilterBottom",
-        "x": 12,
-        "y": 6
-      },
-      {
-        "id": "3ec5bd91-4f66-4de5-b86c-5d636a393d68",
-        "rotate": 0,
-        "settings": {
-          "setpoint": {
-            "serviceId": "sparkey",
-            "blockId": "HERMS MT Setpoint"
-          }
-        },
-        "flipped": false,
-        "type": "SetpointDisplay",
-        "x": 13,
-        "y": 3
-      },
-      {
-        "id": "baafe585-d3b4-4f6b-a348-4df635881dbc",
-        "rotate": 0,
-        "settings": {
-          "setpoint": {
-            "serviceId": "sparkey",
-            "blockId": "HERMS BK Setpoint"
-          }
-        },
-        "flipped": false,
-        "type": "SetpointDisplay",
-        "x": 21,
-        "y": 3
-      },
-      {
-        "id": "e6900363-8d79-4598-bcba-8ba33da17fb1",
-        "rotate": 0,
-        "settings": {
-          "setpoint": {
-            "serviceId": "sparkey",
-            "blockId": "HERMS HLT Setpoint"
-          }
-        },
-        "flipped": false,
-        "type": "SetpointDisplay",
-        "x": 5,
-        "y": 3
-      },
-      {
-        "id": "8d3e1f9f-9d98-44e2-9f15-ff4b123e4448",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 19,
-        "y": 2
-      },
-      {
-        "id": "275f4944-5a26-4021-b49f-1991dcd86641",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 18,
-        "y": 2
-      },
-      {
-        "id": "b39904b2-47a3-4499-967c-16db0fa31bd5",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 18,
-        "y": 3
-      },
-      {
-        "id": "f5d2bd3f-0691-47ad-b9e8-f46f25df6b92",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 18,
-        "y": 4
-      },
-      {
-        "id": "7d79688e-43f9-46f6-b568-c3ff254e30d1",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 18,
-        "y": 5
-      },
-      {
-        "id": "b292c7f3-f5ee-429c-a169-8b0a402da186",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "BridgeTube",
-        "x": 18,
-        "y": 6
-      },
-      {
-        "id": "6bb976e4-7538-45fa-b71c-de0a73cc6b96",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 11,
-        "y": 2
-      },
-      {
-        "id": "c45e28b4-943c-4b22-82eb-7da5462a2b20",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 10,
-        "y": 2
-      },
-      {
-        "id": "70265b7d-ea54-4dbb-82a3-4d5d9377d5f4",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 9,
-        "y": 2
-      },
-      {
-        "id": "178c8eb7-5376-4092-b2be-43b5af48e1e1",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 11,
-        "y": 6
-      },
-      {
-        "id": "138106d7-16ec-4f8d-9875-3c8b230d5cc4",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 10,
-        "y": 6
-      },
-      {
-        "id": "2b7655f9-9f47-4c6a-b3b9-10e340e377a9",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 9,
-        "y": 6
-      },
-      {
-        "id": "0c18b785-ac8d-401f-8ac1-9b709d96acfe",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "DipTube",
-        "x": 12,
-        "y": 2
-      },
-      {
-        "id": "d3c0d5d2-2e8e-44e0-bce5-347e9a2dcffb",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "DipTube",
-        "x": 20,
-        "y": 6
-      },
-      {
-        "id": "77fc7305-2fd2-45e2-9ab6-6018bb2886b8",
-        "rotate": 180,
-        "settings": {},
-        "flipped": false,
-        "type": "TeeTube",
-        "x": 17,
-        "y": 6
-      },
-      {
-        "id": "60817b6c-8c51-4f70-b354-c8650981aa93",
-        "rotate": 180,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 16,
-        "y": 6
-      },
-      {
-        "id": "b4c78c4a-0a4a-47d6-8707-76ed6f3aa737",
-        "rotate": 180,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 19,
-        "y": 6
-      },
-      {
-        "id": "a4005531-adf2-44bd-a6a3-6f14fc87f618",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 2,
-        "y": 2
-      },
-      {
-        "id": "a0976709-28f8-4994-b53c-f40ff48a511c",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 2,
-        "y": 3
-      },
-      {
-        "id": "913c1180-433f-41ee-8cab-037c50ae6ae9",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 2,
-        "y": 4
-      },
-      {
-        "id": "765bb6db-68b5-4781-8fb3-bec6b113bd88",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 2,
-        "y": 5
-      },
-      {
-        "id": "d275d3eb-1d0d-446e-b948-ebe924f8923e",
-        "rotate": 0,
-        "settings": {},
-        "flipped": true,
-        "type": "DipTube",
-        "x": 7,
-        "y": 6
-      },
-      {
-        "id": "cab9f977-8a78-4820-ac5c-a115a7f0567f",
-        "rotate": 180,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 8,
-        "y": 6
-      },
-      {
-        "id": "3b9c669b-2be7-432d-8ff5-28640ae315d3",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "TeeTube",
-        "x": 17,
-        "y": 9
-      },
-      {
-        "id": "73f2e1e9-716e-43b9-9ecd-d54f6222c7d4",
-        "rotate": 270,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 18,
-        "y": 8
-      },
-      {
-        "id": "e5125c06-c3ea-418c-abf2-19c8b80c9b9d",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 18,
-        "y": 7
-      },
-      {
-        "id": "7566dce0-6477-49bb-b135-0368d7ba9048",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 17,
-        "y": 7
-      },
-      {
-        "id": "81319166-4826-45f8-a118-3afce9bf830c",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 15,
-        "y": 9
-      },
-      {
-        "id": "7f5f06a0-583e-4af1-90dc-898d39773bfe",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "TeeTube",
-        "x": 9,
-        "y": 9
-      },
-      {
-        "id": "d6d29d86-2709-44cf-973a-5421dc065de6",
-        "rotate": 270,
-        "settings": {
-          "enabled": false
-        },
-        "flipped": false,
-        "type": "Pump",
-        "x": 17,
-        "y": 8
-      },
-      {
-        "id": "446e97fb-a2cf-4e1e-882e-2745f7a4fcbe",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 3,
-        "y": 9
-      },
-      {
-        "id": "653ccaa4-2270-46fc-a7e6-ffe579237721",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 4,
-        "y": 9
-      },
-      {
-        "id": "654c56b9-57f4-4ecb-9133-4d7d0d0da459",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 5,
-        "y": 9
-      },
-      {
-        "id": "9d8c8543-6f04-4394-989a-758da03982f1",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 2,
-        "y": 6
-      },
-      {
-        "id": "4eccf98c-44dc-4934-ac7a-cb3bc3927f79",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 3,
-        "y": 2
-      },
-      {
-        "id": "36be6b0a-13c5-413c-8599-627cc9d8ccd4",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "TeeTube",
-        "x": 13,
-        "y": 9
-      },
-      {
-        "id": "b984d740-969b-4fca-b77f-2f95e649cd49",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "TeeTube",
-        "x": 11,
-        "y": 9
-      },
-      {
-        "id": "b9e2322d-b1d2-4751-aa24-f4d5bda55c7f",
-        "rotate": 90,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 13,
-        "y": 8
-      },
-      {
-        "id": "4ebceb43-17f4-46e5-bdb1-7a5c9983b110",
-        "rotate": 90,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 11,
-        "y": 8
-      },
-      {
-        "id": "75d94725-de13-4707-aa02-b68c10c89639",
-        "rotate": 90,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 9,
-        "y": 8
-      },
-      {
-        "id": "f649f75d-085b-4ae9-be1a-644579a97256",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 9,
-        "y": 7
-      },
-      {
-        "id": "ed58258c-1c7d-43a8-81da-ded2d43c9c59",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 12,
-        "y": 7
-      },
-      {
-        "id": "00cdf60c-f7ec-40b5-8dd4-df1bf06b8bc1",
-        "rotate": 180,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 10,
-        "y": 9
-      },
-      {
-        "id": "7eddaf65-519f-44ac-b603-64f0955ac8f2",
-        "rotate": 180,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 12,
-        "y": 9
-      },
-      {
-        "id": "a42c1e54-1302-4322-b0d8-ef9517b95719",
-        "rotate": 180,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 13,
-        "y": 7
-      },
-      {
-        "id": "061a901c-6bb7-49b0-b091-c4676a04844a",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "BridgeTube",
-        "x": 11,
-        "y": 7
-      },
-      {
-        "id": "7642ac17-7f8d-4490-99d8-8be94a3e6b36",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 10,
-        "y": 7
-      },
-      {
-        "id": "02f3664d-9ac3-4d7a-806f-e8d03377d852",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 2,
-        "y": 7
-      },
-      {
-        "id": "4c135168-656b-477c-adda-86ee83de6663",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 16,
-        "y": 9
-      },
-      {
-        "id": "b52d4ed8-ca5a-4ed5-abcf-20f11e9b6696",
-        "rotate": 0,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 14,
-        "y": 9
-      },
-      {
-        "id": "a8c61cb6-f3d1-44d0-a05d-fd0cc99c0038",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "TeeTube",
-        "x": 18,
-        "y": 9
-      },
-      {
-        "id": "42fd3984-548b-4dc9-bddf-de3d0f58af1e",
-        "rotate": 180,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 19,
-        "y": 9
-      },
-      {
-        "id": "204d7192-a9cd-43ef-b44c-e1ad4fcdc2cf",
-        "rotate": 180,
-        "settings": {},
-        "flipped": false,
-        "type": "SystemIO",
-        "x": 20,
-        "y": 9
-      },
-      {
-        "id": "5f762ce2-9aa0-4ef4-b075-b093b41a153d",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "TeeTube",
-        "x": 7,
-        "y": 9
-      },
-      {
-        "id": "0b8288c1-6e97-42c0-bb80-4bddd707e407",
-        "rotate": 270,
-        "settings": {
-          "enabled": false
-        },
-        "flipped": false,
-        "type": "Pump",
-        "x": 7,
-        "y": 8
-      },
-      {
-        "id": "69a5d0e4-23fd-4cb2-81c0-32e1d991056f",
-        "rotate": 180,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 8,
-        "y": 9
-      },
-      {
-        "id": "3d337ab1-6006-4e90-85a9-e77697d7f62f",
-        "rotate": 180,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 6,
-        "y": 9
-      },
-      {
-        "id": "bf1f5f79-70da-4391-bea7-70e304d8fc23",
-        "rotate": 270,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 8,
-        "y": 7
-      },
-      {
-        "id": "be004759-ba08-4759-850f-6c82fbe24d88",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 7,
-        "y": 7
-      },
-      {
-        "id": "3170fc31-a12b-42e1-91ec-e2d84d601892",
-        "rotate": 180,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 11,
-        "y": 4
-      },
-      {
-        "id": "aa7225f6-0f64-4bf1-ba86-eaa349dc4a7e",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 11,
-        "y": 5
-      },
-      {
-        "id": "0ee18011-97af-4071-a2db-62142b54a1b0",
-        "rotate": 180,
-        "settings": {},
-        "flipped": false,
-        "type": "ElbowTube",
-        "x": 10,
-        "y": 5
-      },
-      {
-        "id": "b9e3cbc4-1f69-4dd4-a93b-a89a9d559945",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 10,
-        "y": 4
-      },
-      {
-        "id": "e1ab9029-579b-4895-96e5-e3ca505acb50",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "BridgeTube",
-        "x": 9,
-        "y": 4
-      },
-      {
-        "id": "e2256026-1a79-4355-9351-9fab2b143c84",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "BridgeTube",
-        "x": 9,
-        "y": 5
-      },
-      {
-        "id": "ccd42b29-04f1-4924-9489-4b0a754501ca",
-        "rotate": 180,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 8,
-        "y": 4
-      },
-      {
-        "id": "9b55897e-cad8-4dec-aa96-3c65d9336bdb",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 8,
-        "y": 5
-      },
-      {
-        "id": "05fa27e1-bab4-4905-8d62-a0d47df1871b",
-        "rotate": 90,
-        "settings": {},
-        "flipped": false,
-        "type": "StraightTube",
-        "x": 9,
-        "y": 3
-      },
-      {
-        "id": "0d1fc393-37c6-464a-bc42-468b8f95836d",
-        "rotate": 0,
-        "settings": {
-          "pid": {
-            "serviceId": "sparkey",
-            "blockId": "HERMS MT PID"
-          }
-        },
-        "flipped": false,
-        "type": "PidDisplay",
-        "x": 11,
-        "y": 1
-      },
-      {
-        "id": "e8d6bc42-f64f-41b7-ae17-10175638ca61",
-        "rotate": 0,
-        "settings": {
-          "pid": {
-            "serviceId": "sparkey",
-            "blockId": "HERMS BK PID"
-          }
-        },
-        "flipped": false,
-        "type": "PidDisplay",
-        "x": 19,
-        "y": 1
-      },
-      {
-        "id": "24121797-0a56-4d28-86f2-1978892f8d25",
-        "rotate": 0,
-        "settings": {
-          "pid": {
-            "serviceId": "sparkey",
-            "blockId": "HERMS HLT PID"
-          }
-        },
-        "flipped": false,
-        "type": "PidDisplay",
-        "x": 3,
-        "y": 1
-      },
-      {
-        "id": "432d535b-00a8-4837-b623-39f8d7be03e3",
-        "rotate": 0,
-        "settings": {},
-        "flipped": false,
-        "type": "TeeTube",
-        "x": 2,
-        "y": 9
-      },
-      {
-        "id": "82b0f278-5f45-4a7c-80b1-d5dff59432cf",
-        "rotate": 180,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 1,
-        "y": 9
-      },
-      {
-        "id": "07c5600e-3e32-45c3-a453-23df9d7da538",
-        "rotate": 270,
-        "settings": {
-          "closed": true
-        },
-        "flipped": false,
-        "type": "Valve",
-        "x": 2,
-        "y": 8
-      },
-      {
-        "id": "bd304241-8b19-4960-b680-a5ea9f82b82e",
-        "rotate": 0,
-        "settings": {
-          "pressure": 10,
-          "liquids": [
-            "#4AA0EF"
-          ]
-        },
-        "flipped": false,
-        "type": "SystemIO",
-        "x": 0,
-        "y": 9
-      }
-    ],
-    "title": "HERMS Layout"
-  },
-  {
-    "id": "a0636842-5499-11e9-8647-d663bd873d93",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "metrics",
-    "order": 2,
-    "cols": 5,
-    "title": "empty-graph",
+    "namespace": "brewblox-ui-store:dashboard-items__dashboard-items",
+    "id": "bb7aa0b4-a045-ad38-4887-308967ca8d63",
     "rows": 5,
     "config": {
-      "layout": {},
-      "params": [],
-      "targets": [],
-      "renames": {}
+      "currentSession": "3d15296d-0abd-4d45-383c-0bec436ae319"
     },
-    "feature": "Graph"
+    "feature": "SessionLog",
+    "title": "Mr Beancounter",
+    "cols": 4,
+    "order": 5,
+    "dashboard": "dashboard-home"
   },
   {
-    "id": "a0634d76-5499-11e9-8647-d663bd873d93",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "builder",
-    "order": 1,
-    "cols": 12,
-    "title": "Gone With the Flow",
+    "id": "a0634d76-5499-11e9-8647-d663bd873d93",
     "rows": 8,
     "config": {
       "currentLayoutId": "68426d4c-edb9-4616-b13c-c6dbabbec725",
@@ -1981,277 +2383,16 @@
         "ee021f01-fc29-2e06-c903-0c9288eb1bfe"
       ]
     },
-    "feature": "Builder"
+    "feature": "Builder",
+    "title": "Gone With the Flow",
+    "cols": 12,
+    "order": 1,
+    "dashboard": "builder"
   },
   {
-    "id": "a0635bb8-5499-11e9-8647-d663bd873d93",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "derp",
-    "order": 3,
-    "cols": 3,
-    "title": "item-service-unknown",
-    "rows": 3,
-    "config": {
-      "serviceId": "ZORP",
-      "blockId": "BLORP"
-    },
-    "feature": "SetpointSensorPair"
-  },
-  {
-    "id": "a0636b12-5499-11e9-8647-d663bd873d94",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "dashboard-home",
-    "order": 2,
-    "cols": 4,
-    "title": "inspector",
-    "rows": 4,
-    "config": {
-      "targets": [
-        {
-          "measurement": "sparkey",
-          "fields": [
-            "actuator-pwm-1/setting",
-            "actuator-pwm-1/value"
-          ]
-        }
-      ],
-      "renames": {
-        "sparkey/actuator-pwm-1/value": "actuator value"
-      },
-      "freshDuration": {},
-      "decimals": {}
-    },
-    "feature": "Metrics"
-  },
-  {
-    "id": "spock",
-    "namespace": "brewblox-ui-store:services",
-    "type": "Spark",
-    "order": 2,
-    "config": {},
-    "title": "Spark Controller 'spock'"
-  },
-  {
-    "id": "f764bbe2-38ad-4970-998e-11a29eddb69a",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "herms",
-    "pinnedPosition": {
-      "x": 1,
-      "y": 6
-    },
-    "order": 2,
-    "cols": 7,
-    "title": "HERMS Graph",
-    "rows": 5,
-    "config": {
-      "layout": {},
-      "params": {
-        "duration": "10m"
-      },
-      "targets": [
-        {
-          "measurement": "sparkey",
-          "fields": [
-            "HERMS HLT Sensor/value[degC]",
-            "HERMS MT Sensor/value[degC]",
-            "HERMS BK Sensor/value[degC]",
-            "HERMS HLT Setpoint/setting[degC]",
-            "HERMS MT Setpoint/setting[degC]",
-            "HERMS BK Setpoint/setting[degC]",
-            "HERMS HLT PWM/value",
-            "HERMS BK PWM/value"
-          ]
-        }
-      ],
-      "renames": {
-        "sparkey/HERMS HLT Sensor/value[degC]": "HLT temperature",
-        "sparkey/HERMS MT Sensor/value[degC]": "MT temperature",
-        "sparkey/HERMS BK Sensor/value[degC]": "BK temperature",
-        "sparkey/HERMS HLT Setpoint/setting[degC]": "HLT setting",
-        "sparkey/HERMS MT Setpoint/setting[degC]": "MT setting",
-        "sparkey/HERMS BK Setpoint/setting[degC]": "BK setting",
-        "sparkey/HERMS HLT PWM/value": "HLT PWM value",
-        "sparkey/HERMS BK PWM/value": "BK PWM value"
-      },
-      "axes": {
-        "sparkey/HERMS HLT PWM/value": "y2",
-        "sparkey/HERMS BK PWM/value": "y2"
-      },
-      "colors": {}
-    },
-    "feature": "Graph"
-  },
-  {
-    "id": "174108b9-e054-42b3-b19b-2eadabac6028",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "herms",
-    "pinnedPosition": {
-      "x": 8,
-      "y": 6
-    },
-    "order": 3,
-    "cols": 4,
-    "title": "HERMS Actions",
-    "rows": 5,
-    "config": {
-      "changeIdMigrated": true,
-      "serviceId": "sparkey",
-      "steps": [
-        {
-          "name": "Disable all setpoints",
-          "id": "16bf062e-2105-4ff0-b81f-c85731b7e14f",
-          "changes": [
-            {
-              "id": "caa78b09-62f4-41ba-b33c-83899d037445",
-              "blockId": "HERMS HLT Setpoint",
-              "data": {
-                "settingEnabled": false
-              },
-              "confirmed": {}
-            },
-            {
-              "id": "f63767fb-3e99-4403-9e70-88b509c0af59",
-              "blockId": "HERMS MT Setpoint",
-              "data": {
-                "settingEnabled": false
-              },
-              "confirmed": {}
-            },
-            {
-              "id": "199b53af-9e6d-4bd3-9b63-3167c3f284eb",
-              "blockId": "HERMS BK Setpoint",
-              "data": {
-                "settingEnabled": false
-              },
-              "confirmed": {}
-            }
-          ]
-        },
-        {
-          "name": "Constant HLT Temp",
-          "id": "5ecfea94-9cb2-4aa7-95a3-c9a8ee915424",
-          "changes": [
-            {
-              "id": "4aa3a681-28ea-40f6-8145-23febf8da77c",
-              "blockId": "HERMS MT Setpoint",
-              "data": {
-                "settingEnabled": false
-              },
-              "confirmed": {}
-            },
-            {
-              "id": "5aacdf98-9d4b-494a-bac2-4f82eb5e728d",
-              "blockId": "HERMS HLT Setpoint",
-              "data": {
-                "settingEnabled": true,
-                "storedSetting[degC]": 70
-              },
-              "confirmed": {
-                "storedSetting": true
-              }
-            }
-          ]
-        },
-        {
-          "name": "Constant MT Temp",
-          "id": "45ee02d6-a5dc-4885-9d83-a93f612fc54f",
-          "changes": [
-            {
-              "id": "215e1562-c641-43e5-8ceb-90779e4724bc",
-              "blockId": "HERMS MT Setpoint",
-              "data": {
-                "settingEnabled": true,
-                "storedSetting[degC]": 66.7
-              },
-              "confirmed": {
-                "storedSetting": true
-              }
-            },
-            {
-              "id": "75bb7f56-5ed7-4c56-aeef-3889c946a078",
-              "blockId": "HERMS HLT Setpoint Driver",
-              "data": {
-                "enabled": true
-              },
-              "confirmed": {}
-            }
-          ],
-          "applicable": true,
-          "diffs": [
-            {
-              "blockId": "HERMS MT Setpoint",
-              "diffs": [
-                {
-                  "key": "Enabled",
-                  "oldV": "false",
-                  "newV": "true",
-                  "changed": true
-                },
-                {
-                  "key": "Setting",
-                  "oldV": "67.00 °C",
-                  "newV": "66.70 °C",
-                  "changed": true
-                }
-              ]
-            },
-            {
-              "blockId": "HERMS HLT Setpoint Driver",
-              "diffs": [
-                {
-                  "key": "Enabled",
-                  "oldV": "false",
-                  "newV": "true",
-                  "changed": true
-                }
-              ]
-            }
-          ],
-          "active": false
-        },
-        {
-          "name": "Constant BK Temp",
-          "id": "b46e68ee-4ce9-4bca-9027-7a5d3d261963",
-          "changes": [
-            {
-              "id": "1780d73f-09a5-4bae-b5e7-283c69ae0639",
-              "blockId": "HERMS BK Setpoint",
-              "data": {
-                "settingEnabled": true,
-                "storedSetting[degC]": 100
-              },
-              "confirmed": {
-                "storedSetting": true
-              }
-            }
-          ]
-        }
-      ]
-    },
-    "feature": "QuickActions"
-  },
-  {
-    "id": "metrics",
-    "namespace": "brewblox-ui-store:dashboards",
-    "order": 2,
-    "title": "Metrics Dashboard"
-  },
-  {
-    "id": "1-55d75cbee5631853c77cd22f26e9a81c",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "dashboard-home",
-    "order": 4,
-    "cols": 4,
-    "title": "Ministry of Silly Walks",
-    "rows": 5,
-    "config": {},
-    "feature": "Automation"
-  },
-  {
-    "id": "68426d4c-edb9-4616-b13c-c6dbabbec725",
     "namespace": "brewblox-ui-store:layouts",
-    "width": 20,
-    "height": 15,
+    "id": "68426d4c-edb9-4616-b13c-c6dbabbec725",
+    "title": "Gone With the Layout",
     "parts": [
       {
         "type": "Conical",
@@ -3006,177 +3147,12 @@
         "flipped": false
       }
     ],
-    "title": "Gone With the Layout"
+    "height": 15,
+    "width": 20
   },
   {
-    "id": "a06362e8-5499-11e9-8647-d663bd873d93",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "metrics",
-    "order": 2,
-    "cols": 4,
-    "title": "sessions",
-    "rows": 5,
-    "config": {
-      "sessions": [
-        {
-          "id": "mgKBmi4sv",
-          "name": "brew-session",
-          "hidden": false,
-          "start": 1547723679298,
-          "end": null,
-          "graphCfg": {
-            "layout": {},
-            "params": {
-              "start": 1547723679298
-            },
-            "targets": [
-              {
-                "measurement": "sparkey",
-                "fields": [
-                  "actuator-pwm-1/value"
-                ]
-              }
-            ],
-            "renames": {
-              "sparkey/actuator-pwm-1/value": "PWM value"
-            }
-          }
-        }
-      ]
-    },
-    "feature": "SessionView"
-  },
-  {
-    "id": "ba342aed-d4ab-43aa-8286-1e7fed8f2afe",
-    "namespace": "brewblox-ui-store:autm-template",
-    "steps": [
-      {
-        "id": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
-        "title": "ON",
-        "preconditions": [
-          {
-            "id": "061b0d08-0d63-474b-9105-2ce3d86082ce",
-            "title": "Task status",
-            "enabled": true,
-            "impl": {
-              "type": "TaskStatus",
-              "ref": "wait-on",
-              "status": "Finished",
-              "resetStatus": null
-            }
-          }
-        ],
-        "actions": [
-          {
-            "id": "1336a493-316a-4b5c-9c5b-a7dc9eaeb312",
-            "title": "Block change",
-            "enabled": true,
-            "impl": {
-              "type": "BlockPatch",
-              "blockId": "Logic Input 1",
-              "serviceId": "sparkey",
-              "blockType": "DigitalActuator",
-              "data": {
-                "desiredState": 1
-              }
-            }
-          }
-        ],
-        "transitions": [
-          {
-            "id": "50f30eb0-1269-432d-8e29-4fa93293caf0",
-            "next": true,
-            "enabled": true,
-            "conditions": [
-              {
-                "id": "77eb2f07-e933-407f-b9c2-796377637a69",
-                "title": "Duration",
-                "enabled": true,
-                "impl": {
-                  "type": "TimeElapsed",
-                  "duration": 10000,
-                  "start": "Step"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "cd39929f-259e-4b4b-962e-d3b96edd3533",
-        "title": "OFF",
-        "preconditions": [
-          {
-            "id": "1b6bae71-a330-47cb-8ffb-a44e846d8700",
-            "title": "Duration",
-            "enabled": true,
-            "impl": {
-              "type": "TimeElapsed",
-              "duration": 10000,
-              "start": "Step"
-            }
-          },
-          {
-            "id": "774be828-8bba-4072-a510-386ab9463f26",
-            "title": "Block value",
-            "enabled": true,
-            "impl": {
-              "type": "BlockValue",
-              "blockId": "Logic Input 1",
-              "serviceId": "sparkey",
-              "blockType": "DigitalActuator",
-              "key": "desiredState",
-              "operator": "eq",
-              "value": 1
-            }
-          }
-        ],
-        "actions": [
-          {
-            "id": "56eb0910-7b0c-43ea-a809-29599db823d1",
-            "title": "Block change",
-            "enabled": true,
-            "impl": {
-              "type": "BlockPatch",
-              "blockId": "Logic Input 1",
-              "serviceId": "sparkey",
-              "blockType": "DigitalActuator",
-              "data": {
-                "desiredState": 0
-              }
-            }
-          }
-        ],
-        "transitions": [
-          {
-            "id": "2f61eb56-a09c-419a-92dc-eb1348341c80",
-            "next": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
-            "enabled": true,
-            "conditions": [
-              {
-                "id": "484ab57b-888d-4d6f-8648-f31ee873783a",
-                "title": "Duration",
-                "enabled": true,
-                "impl": {
-                  "type": "TimeElapsed",
-                  "duration": 10000,
-                  "start": "Step"
-                }
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "title": "ON/OFF"
-  },
-  {
-    "id": "a0635e1a-5499-11e9-8647-d663bd873d93",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "metrics",
-    "order": 1,
-    "cols": 10,
-    "title": "item-graph",
+    "id": "f764bbe2-38ad-4970-998e-11a29eddb69a",
     "rows": 5,
     "config": {
       "layout": {},
@@ -3187,49 +3163,128 @@
         {
           "measurement": "sparkey",
           "fields": [
-            "actuator-pwm-1/setting",
-            "actuator-pwm-1/value"
-          ]
-        },
-        {
-          "measurement": "spock",
-          "fields": [
-            " Combined Influx points"
+            "HERMS HLT Sensor/value[degC]",
+            "HERMS MT Sensor/value[degC]",
+            "HERMS BK Sensor/value[degC]",
+            "HERMS HLT Setpoint/setting[degC]",
+            "HERMS MT Setpoint/setting[degC]",
+            "HERMS BK Setpoint/setting[degC]",
+            "HERMS HLT PWM/value",
+            "HERMS BK PWM/value"
           ]
         }
       ],
       "renames": {
-        "sparkey/actuator-pwm-1/setting": "Actuator setting"
-      }
+        "sparkey/HERMS HLT Sensor/value[degC]": "HLT temperature",
+        "sparkey/HERMS MT Sensor/value[degC]": "MT temperature",
+        "sparkey/HERMS BK Sensor/value[degC]": "BK temperature",
+        "sparkey/HERMS HLT Setpoint/setting[degC]": "HLT setting",
+        "sparkey/HERMS MT Setpoint/setting[degC]": "MT setting",
+        "sparkey/HERMS BK Setpoint/setting[degC]": "BK setting",
+        "sparkey/HERMS HLT PWM/value": "HLT PWM value",
+        "sparkey/HERMS BK PWM/value": "BK PWM value"
+      },
+      "axes": {
+        "sparkey/HERMS HLT PWM/value": "y2",
+        "sparkey/HERMS BK PWM/value": "y2"
+      },
+      "colors": {}
     },
-    "feature": "Graph"
+    "feature": "Graph",
+    "title": "HERMS Graph",
+    "cols": 7,
+    "order": 2,
+    "dashboard": "herms",
+    "pinnedPosition": {
+      "x": 1,
+      "y": 6
+    }
   },
   {
-    "id": "bb7aa0b4-a045-ad38-4887-308967ca8d63",
-    "namespace": "brewblox-ui-store:dashboard-items__dashboard-items",
-    "dashboard": "dashboard-home",
-    "order": 5,
-    "cols": 4,
-    "title": "Mr Beancounter",
-    "rows": 5,
-    "config": {
-      "currentSession": "3d15296d-0abd-4d45-383c-0bec436ae319"
-    },
-    "feature": "SessionLog"
-  },
-  {
-    "id": "derp",
-    "namespace": "brewblox-ui-store:dashboards",
-    "order": 4,
-    "title": "Derp Dashboard"
-  },
-  {
-    "id": "a06358fc-5499-11e9-8647-d663bd873d95",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "dashboard-home",
+    "id": "a06358fc-5499-11e9-8647-d663bd873d93",
+    "rows": 3,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "BLORP"
+    },
+    "feature": "Warbl",
+    "title": "item-invalid-unknown",
+    "cols": 3,
     "order": 3,
+    "dashboard": "derp"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboards",
+    "id": "dashboard-home",
+    "title": "Home Dashboard",
+    "order": 1
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboards",
+    "id": "metrics",
+    "title": "Metrics Dashboard",
+    "order": 2
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "a0636b12-5499-11e9-8647-d663bd873d93",
+    "rows": 4,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "pid-1"
+    },
+    "feature": "Pid",
+    "title": "pid-1",
     "cols": 4,
-    "title": "Charles",
+    "order": 1,
+    "dashboard": "dashboard-home"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboards",
+    "id": "herms",
+    "title": "HERMS",
+    "order": 5
+  },
+  {
+    "namespace": "brewblox-ui-store:logged-sessions",
+    "id": "3d15296d-0abd-4d45-383c-0bec436ae319",
+    "tags": [
+      "on: Home Dashboard"
+    ],
+    "date": 1579688563640,
+    "notes": [
+      {
+        "id": "66ea94b9-1c2a-6218-6469-a9b353e45e77",
+        "title": "Example note",
+        "type": "Text",
+        "value": "",
+        "col": 12
+      },
+      {
+        "id": "ea8631fd-9bb0-ac9f-6cfb-8bf01e56893c",
+        "title": "Subprocess graph",
+        "type": "Graph",
+        "start": null,
+        "end": null,
+        "config": {
+          "layout": {
+            "annotations": []
+          },
+          "params": {},
+          "targets": [],
+          "renames": {},
+          "axes": {},
+          "colors": {}
+        },
+        "col": 12
+      }
+    ],
+    "title": "Teddy"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "a06358fc-5499-11e9-8647-d663bd873d95",
     "rows": 2,
     "config": {
       "serviceId": "sparkey",
@@ -3333,73 +3388,84 @@
         }
       ]
     },
-    "feature": "QuickActions"
-  },
-  {
-    "id": "builder",
-    "namespace": "brewblox-ui-store:dashboards",
-    "order": 3,
-    "title": "Brewery Builder Dashboard"
-  },
-  {
-    "id": "a437050b-52a7-4c50-8051-26ec6addc28a",
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "dashboard-home",
-    "pinnedPosition": null,
-    "order": 6,
+    "feature": "QuickActions",
+    "title": "Charles",
     "cols": 4,
-    "title": "Logic Actuator",
-    "rows": 3,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "Logic Actuator"
-    },
-    "feature": "ActuatorLogic"
+    "order": 3,
+    "dashboard": "dashboard-home"
   },
   {
-    "id": "972240e6-e12a-4abd-8c6c-bc850ff5096d",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "herms",
-    "pinnedPosition": {
-      "x": 1,
-      "y": 1
-    },
-    "order": 1,
-    "cols": 11,
-    "title": "HERMS Process",
+    "id": "a0635e1a-5499-11e9-8647-d663bd873d93",
     "rows": 5,
     "config": {
-      "currentLayoutId": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
-      "layoutIds": [
-        "90ca4326-b3a2-47ca-bec4-2c52281d8772"
-      ]
+      "layout": {},
+      "params": {
+        "duration": "10m"
+      },
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "actuator-pwm-1/setting",
+            "actuator-pwm-1/value"
+          ]
+        },
+        {
+          "measurement": "spock",
+          "fields": [
+            " Combined Influx points"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/actuator-pwm-1/setting": "Actuator setting"
+      }
     },
-    "feature": "Builder"
+    "feature": "Graph",
+    "title": "item-graph",
+    "cols": 10,
+    "order": 1,
+    "dashboard": "metrics"
   },
   {
-    "id": "herms",
-    "namespace": "brewblox-ui-store:dashboards",
-    "order": 5,
-    "title": "HERMS"
-  },
-  {
-    "id": "a06358fc-5499-11e9-8647-d663bd873d93",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "dashboard": "derp",
-    "order": 3,
-    "cols": 3,
-    "title": "item-invalid-unknown",
+    "id": "a0636b12-5499-11e9-8647-d663bd873d94",
+    "rows": 4,
+    "config": {
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "actuator-pwm-1/setting",
+            "actuator-pwm-1/value"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/actuator-pwm-1/value": "actuator value"
+      },
+      "freshDuration": {},
+      "decimals": {}
+    },
+    "feature": "Metrics",
+    "title": "inspector",
+    "cols": 4,
+    "order": 2,
+    "dashboard": "dashboard-home"
+  },
+  {
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "a06350b4-5499-11e9-8647-d663bd873d93",
     "rows": 3,
     "config": {
       "serviceId": "sparkey",
-      "blockId": "BLORP"
+      "blockId": "BLARGH"
     },
-    "feature": "Warbl"
-  },
-  {
-    "id": "dashboard-home",
-    "namespace": "brewblox-ui-store:dashboards",
+    "feature": "SetpointSensorPair",
+    "title": "item-invalid",
+    "cols": 3,
     "order": 1,
-    "title": "Home Dashboard"
+    "dashboard": "derp"
   }
 ]
