@@ -12,9 +12,6 @@ import {
 } from './types';
 
 export const sparkType = 'Spark';
-export const sparkStateEvent = 'Spark.state';
-export const sparkUpdateEvent = 'Spark.update';
-export const sparkPatchEvent = 'Spark.patch';
 export const systemGroup = 7;
 
 export const roleIcons: Record<WidgetRole, string> = {

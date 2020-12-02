@@ -102,6 +102,17 @@ export const isoDateString =
     return undefined;
   };
 
+export const mqttTopicExp =
+  (topicFilter: string): RegExp =>
+    new RegExp(
+      topicFilter
+        .split('/')
+        .map(s => s
+          .replace('+', '[a-zA-Z0-9 _.-]*')
+          .replace('#', '?($|[a-zA-Z0-9 \/_.-]*)'))
+        .join('\\/')
+      + '$');
+
 export const round =
   (value: any, digits = 2): string => {
     if (value === null || value === undefined) {

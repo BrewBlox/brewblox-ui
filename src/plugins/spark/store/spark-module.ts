@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
 
+import { STATE_TOPIC } from '@/helpers/const';
 import { extendById, typeMatchFilter } from '@/helpers/functional';
 import { deserialize } from '@/plugins/spark/parse-object';
 import type {
@@ -20,7 +21,6 @@ import { SparkPatchEvent, SparkStateEvent } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
-import { sparkPatchEvent, sparkStateEvent } from '../getters';
 import * as api from './api';
 import {
   asServiceStatus,
@@ -32,6 +32,9 @@ import {
 
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {
+  private patchListenerId: string = '';
+  private stateListenerId: string = '';
+
   public readonly id: string; // serviceId
 
   public blocks: Block[] = [];
@@ -252,33 +255,34 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async start(): Promise<void> {
-    Vue.$eventbus.addStateListener({
-      id: `${sparkStateEvent}__${this.id}`,
-      filter: (key, type) => key === this.id && type === sparkStateEvent,
-      onmessage: (msg: SparkStateEvent) => {
-        const status = asSparkStatus(this.id, msg.data.status);
-        const blocks = msg.data.blocks.map(deserialize);
+    this.stateListenerId = Vue.$eventbus.addListener(
+      `${STATE_TOPIC}/${this.id}`,
+      (_, evt: SparkStateEvent) => {
+        if (evt.type === 'Spark.state') {
+          const status = asSparkStatus(this.id, evt.data.status);
+          const blocks = evt.data.blocks.map(deserialize);
 
-        this.updateBlocks(blocks);
-        this.updateStatus(status);
-        serviceStore.updateStatus(asServiceStatus(status));
-      },
-    });
-    Vue.$eventbus.addStateListener({
-      id: `${sparkPatchEvent}__${this.id}`,
-      filter: (key, type) => key === this.id && type === sparkPatchEvent,
-      onmessage: (msg: SparkPatchEvent) => {
-        const changed = msg.data.changed.map(deserialize);
-        const { deleted } = msg.data;
-        this.patchBlocks({ changed, deleted });
-      },
-    });
+          this.updateBlocks(blocks);
+          this.updateStatus(status);
+          serviceStore.updateStatus(asServiceStatus(status));
+        }
+      });
+    this.patchListenerId = Vue.$eventbus.addListener(
+      `${STATE_TOPIC}/${this.id}/patch`,
+      (_, evt: SparkPatchEvent) => {
+        if (evt.type === 'Spark.patch') {
+          const changed = evt.data.changed.map(deserialize);
+          const { deleted } = evt.data;
+          this.patchBlocks({ changed, deleted });
+        }
+      });
+
     await this.fetchAll().catch(() => { });
   }
 
   @Action
   public async stop(): Promise<void> {
-    Vue.$eventbus.removeStateListener(`${sparkStateEvent}__${this.id}`);
-    Vue.$eventbus.removeStateListener(`${sparkPatchEvent}__${this.id}`);
+    Vue.$eventbus.removeListener(this.stateListenerId);
+    Vue.$eventbus.removeListener(this.patchListenerId);
   }
 }
