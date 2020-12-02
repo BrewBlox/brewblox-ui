@@ -11,9 +11,9 @@ export interface EventControlDevice {
   title?: string;
   desc?: string;
   fields: string[];
-  editable?: boolean;
 
-  // shared
+  // generic
+  editable?: boolean | Mapped<boolean>;
   valueName?: string | Mapped<string>;
   valueType?: EventControlValueType | Mapped<EventControlValueType>;
 

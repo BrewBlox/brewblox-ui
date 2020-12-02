@@ -10,6 +10,7 @@ export interface StateValue {
   id: string;
 
   key: string;
+  editable: boolean;
   value: string | number | null;
 
   label: string;

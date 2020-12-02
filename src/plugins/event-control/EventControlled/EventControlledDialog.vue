@@ -59,6 +59,7 @@ export default class EventControlledDialog extends DialogBase {
                   :key="choice"
                   :label="choice"
                   :color="v.value === choice ? 'primary' : ''"
+                  :disable="!v.editable"
                   outline
                   @click="$set(v, 'value', choice)"
                 />
@@ -71,6 +72,7 @@ export default class EventControlledDialog extends DialogBase {
               :value="v.value"
               inputmode="numeric"
               pattern="[0-9]*"
+              :readonly="!v.editable"
               @input="newV => $set(v, 'value', parseFloat(newV))"
             />
           </template>
@@ -78,6 +80,7 @@ export default class EventControlledDialog extends DialogBase {
             <q-input
               :label="v.label"
               :value="v.value"
+              :readonly="!v.editable"
               @input="newV => $set(v, 'value', newV)"
             />
           </template>

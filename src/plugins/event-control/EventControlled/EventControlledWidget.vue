@@ -50,7 +50,9 @@ export default class EventControlledWidget extends WidgetBase<EventControlledCon
   }
 
   get editable(): boolean {
-    return this.device?.editable ?? false;
+    if (!this.device?.editable) { return false; }
+    if (this.device.editable === true) { return true; }
+    return Object.values(this.device.editable).includes(true);
   }
 
   get deviceState(): EventControlDeviceState | null {
@@ -69,6 +71,7 @@ export default class EventControlledWidget extends WidgetBase<EventControlledCon
           id: shortid.generate(),
           key,
           value,
+          editable: optSetting(key, device.editable) ?? false,
           label: optSetting(key, device.valueName) ?? key,
           type: optSetting(key, device.valueType) ?? inferredType,
           unit: optSetting(key, device.unit) ?? '',
