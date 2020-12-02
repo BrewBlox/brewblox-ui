@@ -16,6 +16,7 @@ const feature: WidgetFeature<EventControlledConfig> = {
   generateConfig: () => ({
     deviceId: '',
   }),
+  experimental: true,
 };
 
 export default feature;

@@ -4,6 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { objectStringSorter } from '@/helpers/functional';
 import WizardBase from '@/plugins/wizardry/WizardBase';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 @Component
 export default class WidgetWizardPicker extends WizardBase {
@@ -15,12 +16,18 @@ export default class WidgetWizardPicker extends WizardBase {
     this.reset();
   }
 
+  get experimental(): boolean {
+    return systemStore.experimental;
+  }
+
   get wizardOptions(): SelectOption[] {
     return featureStore.widgets
+      .filter(feature => this.experimental || !feature.experimental)
       .map(feature => ({
         label: feature.title,
         value: feature.id,
         component: featureStore.widgetWizard(feature.id),
+        badge: feature.experimental ? 'experimental' : null,
       }))
       .filter(opt => opt.component !== null)
       .sort(objectStringSorter('label'));

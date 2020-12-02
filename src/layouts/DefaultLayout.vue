@@ -2,6 +2,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { systemStore } from '@/store/system';
+
 @Component
 export default class DefaultLayout extends Vue {
   localDrawer: boolean | null = null;
@@ -28,11 +30,18 @@ export default class DefaultLayout extends Vue {
     return process.env.DEV;
   }
 
+  get experimental(): boolean {
+    return systemStore.experimental;
+  }
+
+  set experimental(value: boolean) {
+    systemStore.setExperimental(value);
+  }
+
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
   }
-
 }
 </script>
 
@@ -65,6 +74,12 @@ export default class DefaultLayout extends Vue {
               <LabeledField :value="buildDate" label="Build date" item-aligned dense />
               <q-separator inset />
               <ExportErrorsAction />
+              <ActionItem
+                :active="experimental"
+                label="Toggle experimental features"
+                icon="mdi-test-tube"
+                @click="experimental = !experimental"
+              />
             </q-list>
           </q-btn-dropdown>
         </q-item-section>
