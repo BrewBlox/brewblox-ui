@@ -69,19 +69,22 @@ export default class DefaultLayout extends Vue {
 
       <q-item class="col-auto">
         <q-item-section class="col-auto">
-          <q-btn-dropdown flat text-color="white" icon="mdi-bug-outline">
-            <q-list bordered>
-              <LabeledField :value="buildDate" label="Build date" item-aligned dense />
-              <q-separator inset />
-              <ExportErrorsAction />
-              <ActionItem
-                :active="experimental"
-                label="Toggle experimental features"
-                icon="mdi-test-tube"
-                @click="experimental = !experimental"
-              />
-            </q-list>
-          </q-btn-dropdown>
+          <ActionMenu icon="mdi-bug-outline">
+            <template #menus>
+              <ActionSubmenu label="Debugging">
+                <ExportErrorsAction />
+                <ActionItem
+                  :active="experimental"
+                  label="Enable experiments"
+                  icon="mdi-test-tube"
+                  style="min-width: 200px"
+                  @click="experimental = !experimental"
+                />
+                <q-separator inset />
+                <LabeledField :value="buildDate" label="Build date" item-aligned dense />
+              </ActionSubmenu>
+            </template>
+          </ActionMenu>
         </q-item-section>
         <q-item-section v-if="devMode" class="col-auto">
           <q-btn flat text-color="white" icon="mdi-format-paint" to="/styles">
