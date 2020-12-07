@@ -4,6 +4,7 @@ import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import {
   defaultLabel,
   filteredNodes,
@@ -52,6 +53,15 @@ export default class QueryEditor extends Vue {
 
   mounted(): void {
     this.expandTicked();
+  }
+
+
+  showSearchKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.selectFilter,
+    })
+      .onOk(v => this.selectFilter = v);
   }
 
   expandTicked(): void {
@@ -118,8 +128,15 @@ export default class QueryEditor extends Vue {
 
 <template>
   <q-list>
-    <q-input v-model="selectFilter" placeholder="Search" clearable item-aligned class="q-mx-sm">
+    <q-input
+      v-model="selectFilter"
+      placeholder="Search"
+      clearable
+      item-aligned
+      class="q-mx-sm"
+    >
       <template #append>
+        <KeyboardButton @click="showSearchKeyboard" />
         <q-icon name="search" />
       </template>
     </q-input>

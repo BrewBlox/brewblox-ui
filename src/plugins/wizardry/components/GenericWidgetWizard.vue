@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { tryCreateWidget } from '@/plugins/wizardry';
 import WidgetWizardBase from '@/plugins/wizardry/WidgetWizardBase';
 import { Widget } from '@/store/dashboards';
@@ -71,6 +72,14 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       ?? {};
   }
 
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.widgetTitle,
+    })
+      .onOk(v => this.widgetTitle = v);
+  }
+
   async createWidget(): Promise<void> {
     if (this.canCreate) {
       const widget = await tryCreateWidget(this.widget);
@@ -91,7 +100,11 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       <q-input
         v-model="widgetTitle"
         label="Widget name"
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
     </div>
 
     <q-dialog

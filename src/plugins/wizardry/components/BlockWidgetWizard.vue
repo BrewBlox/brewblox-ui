@@ -98,6 +98,15 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
         && this.existingBlock !== null);
   }
 
+  showIdKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.localBlockId,
+      rules: this.blockIdRules,
+    })
+      .onOk(v => this.localBlockId = v);
+  }
+
   ensureLocalBlock(serviceId: string): { block: Block; widget: Widget } {
     const blockId = this.localBlockId;
 
@@ -226,6 +235,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
           label="Block name"
         >
           <template #append>
+            <KeyboardButton @click="showIdKeyboard" />
             <q-icon name="mdi-information">
               <q-tooltip>
                 The name of the Spark Controller block.

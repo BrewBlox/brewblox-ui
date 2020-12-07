@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { bloxQty, isQuantity } from '@/helpers/bloxfield';
+import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString } from '@/helpers/duration';
 import { ruleValidator } from '@/helpers/functional';
 import { Quantity } from '@/plugins/spark/types';
@@ -60,6 +61,19 @@ export default class DurationQuantityDialog extends DialogBase {
     this.local = durationString(this.localMs);
   }
 
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      type: 'duration',
+      value: this.local,
+      rules: this.rules.map(f => strV => f(durationMs(strV))),
+    })
+      .onOk((v: string) => {
+        this.local = v;
+        this.normalize();
+      });
+  }
+
   save(): void {
     if (this.valueOk) {
       this.onDialogOk(bloxQty(this.local ?? '0s'));
@@ -85,7 +99,11 @@ export default class DurationQuantityDialog extends DialogBase {
         autofocus
         item-aligned
         @change="normalize"
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn :disable="!valueOk" flat label="OK" color="primary" @click="save" />

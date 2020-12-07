@@ -60,15 +60,12 @@ export const startChangeDashboardId =
 export const startChangeDashboardTitle =
   (dashboard: Dashboard, onIdChanged: IdChangedCallback = (() => { })): void => {
     createDialog({
+      component: 'InputDialog',
       title: 'Change dashboard Title',
       message: "Change your dashboard's display name",
-      cancel: true,
-      prompt: {
-        model: dashboard.title,
-        type: 'text',
-      },
+      value: dashboard.title,
     })
-      .onOk(async newTitle => {
+      .onOk(async (newTitle: string) => {
         const oldId = dashboard.id;
         const oldTitle = dashboard.title;
         if (!newTitle || oldTitle === newTitle) {

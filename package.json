@@ -48,6 +48,7 @@
     "quasar": "^1.14.5",
     "query-string": "^6.13.7",
     "shortid": "^2.2.16",
+    "simple-keyboard": "^2.32.54",
     "svg-path-properties": "^0.4.11",
     "typescript-string-enums": "^1.0.0",
     "url-safe-string": "^1.1.0",

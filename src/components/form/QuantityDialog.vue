@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { bloxQty, isQuantity, prettyUnit } from '@/helpers/bloxfield';
+import { createDialog } from '@/helpers/dialog';
 import { Quantity } from '@/plugins/spark/types';
 
 @Component
@@ -32,6 +33,16 @@ export default class QuantityDialog extends DialogBase {
   get notation(): string {
     return prettyUnit(this.value);
   }
+
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      type: 'number',
+      value: this.local,
+      suffix: this.notation,
+    })
+      .onOk(v => this.local = v);
+  }
 }
 </script>
 
@@ -53,7 +64,11 @@ export default class QuantityDialog extends DialogBase {
         autofocus
         clearable
         item-aligned
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />

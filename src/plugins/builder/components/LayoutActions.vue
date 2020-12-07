@@ -32,13 +32,10 @@ export default class LayoutActions extends Vue {
 
   startAddLayout(copy: boolean): void {
     createDialog({
+      component: 'InputDialog',
       title: 'Add Layout',
       message: 'Create a new Brewery Builder layout',
-      cancel: true,
-      prompt: {
-        model: 'Brewery Layout',
-        type: 'text',
-      },
+      value: 'Brewery Layout',
     })
       .onOk(async title => {
         const id = uid();
@@ -75,13 +72,10 @@ export default class LayoutActions extends Vue {
       return;
     }
     createDialog({
+      component: 'InputDialog',
       title: 'Change Layout title',
       message: `Choose a new name for ${this.layout.title}`,
-      cancel: true,
-      prompt: {
-        model: this.layout.title,
-        type: 'text',
-      },
+      value: this.layout.title,
     })
       .onOk(async title => {
         if (this.layout) {

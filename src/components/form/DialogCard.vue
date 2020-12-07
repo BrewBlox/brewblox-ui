@@ -5,7 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component
 export default class DialogCard extends Vue {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   public readonly title!: string;
 
   @Prop({ type: String, default: '' })
@@ -21,7 +21,7 @@ export default class DialogCard extends Vue {
 
 <template>
   <q-card class="q-dialog-plugin q-dialog-plugin--dark overflow-auto">
-    <q-card-section class="q-dialog__title">
+    <q-card-section v-if="title" class="q-dialog__title">
       {{ title }}
     </q-card-section>
     <template v-if="$slots.message">

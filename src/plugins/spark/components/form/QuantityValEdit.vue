@@ -3,6 +3,7 @@ import isFinite from 'lodash/isFinite';
 import { Component } from 'vue-property-decorator';
 
 import { prettyUnit, Quantity } from '@/helpers/bloxfield';
+import { createDialog } from '@/helpers/dialog';
 
 import ValEditBase from '../ValEditBase';
 
@@ -24,6 +25,19 @@ export default class QuantityValEdit extends ValEditBase {
   get notation(): string {
     return prettyUnit(this.field);
   }
+
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.local,
+      type: 'number',
+      suffix: this.notation,
+    })
+      .onOk(v => {
+        this.local = v;
+        this.syncField();
+      });
+  }
 }
 </script>
 
@@ -39,7 +53,11 @@ export default class QuantityValEdit extends ValEditBase {
       :suffix="notation"
       item-aligned
       @change="syncField"
-    />
+    >
+      <template #append>
+        <KeyboardButton @click="showKeyboard" />
+      </template>
+    </q-input>
   </div>
   <div
     v-else

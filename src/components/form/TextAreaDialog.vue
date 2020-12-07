@@ -2,6 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class TextAreaDialog extends DialogBase {
@@ -26,6 +27,15 @@ export default class TextAreaDialog extends DialogBase {
   created(): void {
     this.local = this.value;
   }
+
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.local,
+      rules: this.rules,
+    })
+      .onOk(v => this.local = v);
+  }
 }
 </script>
 
@@ -46,7 +56,11 @@ export default class TextAreaDialog extends DialogBase {
         autofocus
         @keyup.enter.exact.stop
         @keyup.enter.shift.stop
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
