@@ -178,6 +178,14 @@ export default class SparkPage extends Vue {
     }
   }
 
+  showSearchKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.blockFilter,
+    })
+      .onOk((v: string) => this.blockFilter = v);
+  }
+
   selectService(): void {
     if (this.$dense && this.isReady) {
       createDialog({
@@ -489,6 +497,7 @@ export default class SparkPage extends Vue {
               <q-item-section>
                 <q-input v-model="blockFilter" placeholder="Search blocks" clearable>
                   <template #append>
+                    <KeyboardButton @click="showSearchKeyboard" />
                     <q-icon name="search" />
                   </template>
                 </q-input>

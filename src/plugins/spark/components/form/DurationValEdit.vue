@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import { isQuantity, Quantity } from '@/helpers/bloxfield';
+import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString } from '@/helpers/duration';
 
 import ValEditBase from '../ValEditBase';
@@ -45,6 +46,18 @@ export default class DurationValEdit extends ValEditBase {
       this.field = this.local;
     }
   }
+
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.local,
+      type: 'duration',
+    })
+      .onOk(v => {
+        this.local = v;
+        this.normalize();
+      });
+  }
 }
 </script>
 
@@ -59,7 +72,11 @@ export default class DurationValEdit extends ValEditBase {
       clearable
       class="col-grow"
       @change="normalize"
-    />
+    >
+      <template #append>
+        <KeyboardButton @click="showKeyboard" />
+      </template>
+    </q-input>
   </div>
   <div
     v-else

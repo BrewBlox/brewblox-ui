@@ -41,12 +41,9 @@ export default class ProfilePresetDialog extends DialogBase {
     const { value } = this.selected;
     const preset = sparkStore.presetById(value)!;
     createDialog({
+      component: 'InputDialog',
       title: 'Edit profile name',
-      cancel: true,
-      prompt: {
-        model: preset.name,
-        type: 'text',
-      },
+      value: preset.name,
     })
       .onOk(name => sparkStore.savePreset({ ...preset, name }));
   }
@@ -93,12 +90,9 @@ export default class ProfilePresetDialog extends DialogBase {
 
   createPreset(): void {
     createDialog({
+      component: 'InputDialog',
       title: 'Save as new profile',
-      cancel: true,
-      prompt: {
-        model: `${this.value.id} profile`,
-        type: 'text',
-      },
+      value: `${this.value.id} profile`,
     })
       .onOk(async name => {
         await sparkStore.createPreset({

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import WizardBase from '@/plugins/wizardry/WizardBase';
 import { featureStore } from '@/store/features';
@@ -46,6 +47,14 @@ export default class WidgetWizardPicker extends WizardBase {
     return this.feature !== null;
   }
 
+  showSearchKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.filter,
+    })
+      .onOk((v: string) => this.filter = v);
+  }
+
   reset(): void {
     this.wizardActive = false;
     this.setDialogTitle('Widget wizard');
@@ -82,6 +91,7 @@ export default class WidgetWizardPicker extends WizardBase {
         class="q-mb-md"
       >
         <template #append>
+          <KeyboardButton @click="showSearchKeyboard" />
           <q-icon name="search" />
         </template>
       </q-input>

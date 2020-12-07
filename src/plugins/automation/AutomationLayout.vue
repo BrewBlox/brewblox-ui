@@ -102,70 +102,64 @@ export default class AutomationPage extends Vue {
 
   startAddTemplate(): void {
     createDialog({
+      component: 'InputDialog',
       title: 'New template',
       message: 'Choose a name for your new template',
-      cancel: true,
-      prompt: {
-        model: 'New Template',
-        type: 'text',
-      },
-    }).onOk(async title => {
-      const created: AutomationTemplate = {
-        id: uid(),
-        title,
-        steps: [{
+      value: 'New Template',
+    })
+      .onOk(async title => {
+        const created: AutomationTemplate = {
           id: uid(),
-          title: 'Step one',
-          preconditions: [],
-          actions: [],
-          transitions: [],
-        }],
-      };
-      await automationStore.createTemplate(created);
-      this.updateActive(created.id, null);
-    });
+          title,
+          steps: [{
+            id: uid(),
+            title: 'Step one',
+            preconditions: [],
+            actions: [],
+            transitions: [],
+          }],
+        };
+        await automationStore.createTemplate(created);
+        this.updateActive(created.id, null);
+      });
   }
 
   startCopyTemplate(template: AutomationTemplate): void {
     createDialog({
+      component: 'InputDialog',
       title: 'Copy template',
       message: 'Choose a name for your new template',
-      cancel: true,
-      prompt: {
-        model: template.title,
-        type: 'text',
-      },
-    }).onOk(async title => {
-      const created: AutomationTemplate = {
-        id: uid(),
-        title,
-        steps: template.steps.map(step => ({
+      value: template.title,
+    })
+      .onOk(async title => {
+        const created: AutomationTemplate = {
           id: uid(),
-          title: step.id,
-          preconditions: step.preconditions.map(idCopy),
-          actions: step.actions.map(idCopy),
-          transitions: step.transitions.map(t => ({
-            ...t,
+          title,
+          steps: template.steps.map(step => ({
             id: uid(),
-            conditions: t.conditions.map(idCopy),
+            title: step.id,
+            preconditions: step.preconditions.map(idCopy),
+            actions: step.actions.map(idCopy),
+            transitions: step.transitions.map(t => ({
+              ...t,
+              id: uid(),
+              conditions: t.conditions.map(idCopy),
+            })),
           })),
-        })),
-      };
-      await automationStore.createTemplate(created);
-      this.updateActive(created.id, null);
-    });
+        };
+        await automationStore.createTemplate(created);
+        this.updateActive(created.id, null);
+      });
   }
 
   startRenameTemplate(template: AutomationTemplate): void {
     createDialog({
+      component: 'InputDialog',
       title: 'Rename template',
       message: `Choose a new name for '${template.title}'`,
-      cancel: true,
-      prompt: {
-        model: template.title,
-        type: 'text',
-      },
-    }).onOk(title => this.saveTemplate({ ...template, title }));
+      value: template.title,
+    })
+      .onOk(title => this.saveTemplate({ ...template, title }));
   }
 
   startRemoveTemplate(template: AutomationTemplate): void {

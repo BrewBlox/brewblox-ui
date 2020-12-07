@@ -2,6 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class GraphAnnotationDialog extends DialogBase {
@@ -21,6 +22,14 @@ export default class GraphAnnotationDialog extends DialogBase {
   created(): void {
     this.local = this.value;
   }
+
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.local,
+    })
+      .onOk((v: string) => this.local = v);
+  }
 }
 </script>
 
@@ -37,7 +46,11 @@ export default class GraphAnnotationDialog extends DialogBase {
         label="Title"
         autofocus
         item-aligned
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
       <template #actions>
         <q-btn flat label="Remove" color="primary" @click="remove" />
         <q-space />

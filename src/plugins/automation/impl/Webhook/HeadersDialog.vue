@@ -4,6 +4,7 @@ import toPairs from 'lodash/toPairs';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 
 @Component
 export default class HeadersDialog extends DialogBase {
@@ -27,6 +28,15 @@ export default class HeadersDialog extends DialogBase {
       .map(items => items.join(': '))
       .join('\n');
   }
+
+
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.local,
+    })
+      .onOk(v => this.local = v);
+  }
 }
 </script>
 
@@ -40,13 +50,17 @@ export default class HeadersDialog extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"
-        type="textarea"
         :label="label"
-        autofocus
         :autogrow="false"
+        type="textarea"
+        autofocus
         @keyup.enter.exact.stop
         @keyup.enter.shift.stop
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
       <div class="q-px-sm">
         <small class="fade-5">
           Request headers are key/value pairs, separated using a ':' character.

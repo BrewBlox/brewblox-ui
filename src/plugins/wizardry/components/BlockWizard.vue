@@ -104,6 +104,23 @@ export default class BlockWizard extends WizardBase {
       .filter(opt => opt.label.toLowerCase().match(needle));
   }
 
+  showSearchKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.searchFilter,
+    })
+      .onOk(v => this.searchFilter = v);
+  }
+
+  showNameKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.blockId,
+      rules: this.blockIdRules,
+    })
+      .onOk(v => this.blockId = v);
+  }
+
   selectOpt(opt: BlockWizardOption | null): void {
     this.block = null;
 
@@ -240,6 +257,7 @@ export default class BlockWizard extends WizardBase {
         class="q-mb-md"
       >
         <template #append>
+          <KeyboardButton @click="showSearchKeyboard" />
           <q-icon name="search" />
         </template>
       </q-input>
@@ -264,6 +282,7 @@ export default class BlockWizard extends WizardBase {
         class="col-12"
       >
         <template #append>
+          <KeyboardButton @click="showNameKeyboard" />
           <q-icon name="mdi-information">
             <q-tooltip>
               The name of the Spark Controller block.
