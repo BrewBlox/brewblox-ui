@@ -11,6 +11,9 @@ export default class ActionMenu extends Vue {
 
   @Prop({ type: Boolean, default: true })
   public readonly flat!: boolean;
+
+  @Prop({ type: String, default: 'Actions' })
+  public readonly label!: string;
 }
 </script>
 
@@ -23,7 +26,7 @@ export default class ActionMenu extends Vue {
     >
       <ActionSubmenu
         v-if="!!$slots.actions"
-        label="Actions"
+        :label="label"
       >
         <slot name="actions" />
       </ActionSubmenu>

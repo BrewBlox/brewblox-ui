@@ -18,7 +18,7 @@ export default class WidgetWizardPicker extends WizardBase {
   }
 
   get experimental(): boolean {
-    return systemStore.experimental;
+    return systemStore.config.experimental;
   }
 
   get wizardOptions(): SelectOption[] {

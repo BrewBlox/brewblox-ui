@@ -1,8 +1,11 @@
 <script lang="ts">
+import KeyboardLayouts from 'simple-keyboard-layouts';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { systemStore } from '@/store/system';
+;
 
 @Component
 export default class DefaultLayout extends Vue {
@@ -31,16 +34,29 @@ export default class DefaultLayout extends Vue {
   }
 
   get experimental(): boolean {
-    return systemStore.experimental;
+    return systemStore.config.experimental;
   }
 
-  set experimental(value: boolean) {
-    systemStore.setExperimental(value);
+  set experimental(experimental: boolean) {
+    systemStore.saveConfig({ experimental });
   }
 
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
+  }
+
+  startChangeKeyboardLayout(): void {
+    createDialog({
+      component: 'SelectDialog',
+      selectOptions: Object.keys(new KeyboardLayouts().layouts),
+      value: systemStore.config.keyboardLayout,
+      title: 'Select layout for virtual keyboard',
+      selectProps: {
+        label: 'Layout',
+      },
+    })
+      .onOk(keyboardLayout => systemStore.saveConfig({ keyboardLayout }));
   }
 }
 </script>
@@ -67,33 +83,41 @@ export default class DefaultLayout extends Vue {
         <ServiceIndex v-model="serviceEditing" />
       </q-scroll-area>
 
-      <q-item class="col-auto">
-        <q-item-section class="col-auto">
-          <ActionMenu icon="mdi-bug-outline">
-            <template #menus>
-              <ActionSubmenu label="Debugging">
-                <ExportErrorsAction />
-                <ActionItem
-                  :active="experimental"
-                  label="Enable experiments"
-                  icon="mdi-test-tube"
-                  style="min-width: 200px"
-                  @click="experimental = !experimental"
-                />
-                <q-separator inset />
-                <LabeledField :value="buildDate" label="Build date" item-aligned dense />
-              </ActionSubmenu>
-            </template>
-          </ActionMenu>
-        </q-item-section>
-        <q-item-section v-if="devMode" class="col-auto">
-          <q-btn flat text-color="white" icon="mdi-format-paint" to="/styles">
-            <q-tooltip>
-              Theming
-            </q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
+      <div class="col-auto row q-gutter-sm q-pa-sm">
+        <ActionMenu icon="mdi-bug-outline" label="Debugging">
+          <template #actions>
+            <ExportErrorsAction />
+            <q-separator inset />
+            <LabeledField
+              :value="buildDate"
+              label="Build date"
+              item-aligned
+              dense
+            />
+          </template>
+        </ActionMenu>
+        <ActionMenu icon="settings" label="Settings">
+          <template #actions>
+            <ActionItem
+              :active="experimental"
+              label="Enable experiments"
+              icon="mdi-test-tube"
+              style="min-width: 200px"
+              @click="experimental = !experimental"
+            />
+            <ActionItem
+              label="Set keyboard layout"
+              icon="mdi-keyboard"
+              @click="startChangeKeyboardLayout"
+            />
+          </template>
+        </ActionMenu>
+        <q-btn flat icon="mdi-format-paint" to="/styles">
+          <q-tooltip>
+            Theming
+          </q-tooltip>
+        </q-btn>
+      </div>
     </q-drawer>
 
     <q-page-container @click.native="stopEditing">

@@ -396,7 +396,13 @@ export default class SparkPage extends Vue {
           <q-tooltip>Show blocks as diagram</q-tooltip>
         </q-btn>
       </q-btn-group>
-      <ActionMenu :disable="!isReady || statusNok" round size="12px" class="self-center">
+      <ActionMenu
+        :disable="!isReady || statusNok"
+        round
+        size="12px"
+        class="self-center"
+        label="Spark actions"
+      >
         <template #actions>
           <ActionItem
             icon="add"

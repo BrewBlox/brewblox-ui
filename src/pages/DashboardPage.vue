@@ -147,7 +147,7 @@ export default class DashboardPage extends Vue {
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center">
+        <ActionMenu round class="self-center" label="Dashboard actions">
           <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
             <q-item clickable @click="toggleDefaultDashboard">

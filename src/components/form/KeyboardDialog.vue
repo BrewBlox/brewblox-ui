@@ -2,11 +2,13 @@
 import 'simple-keyboard/build/css/index.css';
 
 import Keyboard from 'simple-keyboard';
+import KeyboardLayouts from 'simple-keyboard-layouts';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { isDurationString } from '@/helpers/duration';
 import { ruleValidator } from '@/helpers/functional';
+import { systemStore } from '@/store/system';
 
 type BoardType = 'text' | 'number' | 'duration';
 
@@ -19,7 +21,7 @@ const typeValidator = (v: BoardType): boolean =>
     .includes(v);
 
 const customLayouts = {
-  // text uses default layout
+  // text layout is fetched from system store
   number: {
     default: ['- {bksp}', '1 2 3', '4 5 6', '7 8 9', '0 .'],
   },
@@ -73,13 +75,25 @@ export default class KeyboardDialog extends DialogBase {
     return ruleValidator(this.localRules)(this.local);
   }
 
+  findLayout(): any {
+    const custom = customLayouts[this.type];
+    if (custom) {
+      return custom;
+    }
+
+    const layouts = new KeyboardLayouts();
+    const layoutName = systemStore.config.keyboardLayout;
+    return layouts.get(layoutName);
+  }
+
   async mounted(): Promise<void> {
     await this.$nextTick();
+
     this.keyboard = new Keyboard({
       onChange: this.onChange,
       onKeyPress: this.onKeyPress,
       theme: 'hg-theme-default keyboard-theme-brewblox',
-      layout: customLayouts[this.type],
+      layout: this.findLayout(),
       newLineOnEnter: true,
       display: {
         '{bksp}': '⌫',
