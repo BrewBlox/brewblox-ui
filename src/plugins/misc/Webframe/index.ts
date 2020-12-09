@@ -15,6 +15,7 @@ const feature: WidgetFeature<WebframeConfig> = {
   },
   generateConfig: () => ({
     url: '',
+    scale: 1,
   }),
 };
 
