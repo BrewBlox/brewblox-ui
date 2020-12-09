@@ -37,6 +37,9 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: String, default: '170%' })
   public readonly fontSize!: string;
 
+  @Prop({ type: String, required: false })
+  public readonly suffix!: string;
+
   get valid(): boolean {
     return ruleValidator(this.rules)(this.local);
   }
@@ -91,7 +94,7 @@ export default class InputDialog extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"
-        v-bind="{ rules, clearable, label, autogrow, ...bound }"
+        v-bind="{ rules, clearable, label, autogrow, suffix, ...bound }"
         :input-style="{fontSize}"
         autofocus
       >

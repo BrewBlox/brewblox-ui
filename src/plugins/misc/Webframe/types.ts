@@ -1,6 +1,7 @@
 import { Widget } from '@/store/dashboards';
 
 export interface WebframeConfig {
+  scale: number;
   url: string;
 }
 
