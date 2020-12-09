@@ -9,7 +9,7 @@ import { SystemConfig } from './types';
 
 export * from './types';
 
-const DB_MODULE_ID = 'ui-system-config';
+const DB_MODULE_ID = 'system-config';
 const DB_OBJ_ID = 'default';
 
 const defaultSettings = (): SystemConfig => ({
