@@ -23,7 +23,7 @@ export class BrewbloxEventbus {
   public async start(): Promise<void> {
     const opts: mqtt.IClientOptions = {
       protocol: WS_PROTOCOL,
-      host: HOSTNAME,
+      hostname: HOSTNAME,
       port: PORT,
       path: '/eventbus',
       rejectUnauthorized: false,
