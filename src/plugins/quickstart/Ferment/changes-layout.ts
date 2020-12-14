@@ -92,7 +92,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           flipped: false,
           settings: {
             text: 'User manual',
-            url: 'https://brewblox.netlify.com/user/ferment_guide.html#ferment-fridge-process-view',
+            url: 'https://brewblox.netlify.app/user/ferment_guide.html#ferment-fridge-process-view',
             sizeX: 4,
             sizeY: 1,
           },

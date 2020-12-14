@@ -21,7 +21,7 @@ Due to limitations in the way Docker is handled on Windows, Linux or Mac are req
 
 ## Installation
 
-**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at https://brewblox.netlify.com/**
+**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at https://brewblox.netlify.app/**
 
 Note: this is tested on Ubuntu, and may or may not work on other distros. Please let us know if there are any issues.
 
@@ -31,7 +31,7 @@ sudo apt upgrade -y
 sudo apt install -y build-essential libssl-dev curl git python3-pip
 
 # Install Node Version Manager + Node.js
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 nvm install --lts
 
 # Install Docker
