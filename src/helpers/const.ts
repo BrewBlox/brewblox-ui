@@ -18,3 +18,6 @@ export const WS_HOST = `${WS_PROTOCOL}://${HOSTNAME}:${PORT}`;
 export const STATE_TOPIC = 'brewcast/state';
 export const STORE_TOPIC = 'brewcast/datastore';
 export const DEVICE_TOPIC = 'brewcast/device';
+
+export const IS_IOS = /iPad|iPhone|iPod/.test(navigator.platform)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
