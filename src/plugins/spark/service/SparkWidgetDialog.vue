@@ -4,8 +4,13 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { WidgetContext } from '@/store/features';
 
+import SparkWidget from './SparkWidget.vue';
 
-@Component
+@Component({
+  components: {
+    SparkWidget,
+  },
+})
 export default class SparkWidgetDialog extends DialogBase {
 
   @Prop({ type: String, required: true })

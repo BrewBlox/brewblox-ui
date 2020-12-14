@@ -9,7 +9,6 @@ import { createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
-import SparkWidgetDialog from '@/plugins/spark/service/SparkWidgetDialog.vue';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
   Block,
@@ -29,6 +28,7 @@ import { serviceStore } from '@/store/services';
 import { roleIcons } from '../getters';
 import { blockSorters, defaultSessionConfig, storageKey } from './helpers';
 import SparkWidget from './SparkWidget.vue';
+import SparkWidgetDialog from './SparkWidgetDialog.vue';
 import Troubleshooter from './Troubleshooter.vue';
 import { ValidatedWidget } from './types';
 
