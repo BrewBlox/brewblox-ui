@@ -1,4 +1,5 @@
 <script lang="ts">
+import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
 import { bloxQty, prettyUnit } from '@/helpers/bloxfield';
@@ -14,10 +15,16 @@ import { settingsAddress } from '../helpers';
 
 @Component
 export default class PidDisplay extends PartBase {
+  icons: Mapped<string> = {};
   HOT_WATER = HOT_WATER;
   COLD_WATER = COLD_WATER;
   readonly addressKey = 'pid';
   readonly scaleKey = 'scale';
+
+  created(): void {
+    this.icons.mdiCalculatorVariant = mdiCalculatorVariant;
+    this.icons.mdiPlusMinus = mdiPlusMinus;
+  }
 
   get scale(): number {
     return this.settings[this.scaleKey] ?? 1;
@@ -108,14 +115,14 @@ export default class PidDisplay extends PartBase {
       <template v-else>
         <q-icon
           v-if="kp === null"
-          name="mdi-calculator-variant"
-          class="col static"
+          :name="icons.mdiCalculatorVariant"
+          class="col-auto static"
           size="25px"
         />
         <q-icon
           v-else-if="drivingOffset"
-          name="mdi-plus-minus"
-          class="col static"
+          :name="icons.mdiPlusMinus"
+          class="col-auto static"
           size="25px"
         />
         <template v-else>

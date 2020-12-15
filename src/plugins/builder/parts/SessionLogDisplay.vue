@@ -1,4 +1,5 @@
 <script lang="ts">
+import { mdiTextSubject } from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
 import { SessionLogWidget } from '@/plugins/history/SessionLog/types';
@@ -10,6 +11,12 @@ import PartBase from '../components/PartBase';
 
 @Component
 export default class SessionLogDisplay extends PartBase {
+  icons: Mapped<string> = {};
+
+  created(): void {
+    this.icons.mdiTextSubject = mdiTextSubject;
+  }
+
   get isLinked(): boolean {
     return !!this.settings.widgetId;
   }
@@ -50,7 +57,7 @@ export default class SessionLogDisplay extends PartBase {
         <BrokenIcon v-if="isBroken" />
         <q-icon
           v-else
-          name="mdi-text-subject"
+          :name="icons.mdiTextSubject"
           size="40px"
           class="col-auto static"
         />

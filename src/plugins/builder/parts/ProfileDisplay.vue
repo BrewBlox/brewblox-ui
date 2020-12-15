@@ -1,4 +1,5 @@
 <script lang="ts">
+import { mdiArrowRightBold } from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
@@ -11,7 +12,12 @@ import { settingsAddress } from '../helpers';
 
 @Component
 export default class ProfileDisplay extends PartBase {
+  icons: Mapped<string> = {};
   settingsKey = 'profile';
+
+  created(): void {
+    this.icons.mdiArrowRightBold = mdiArrowRightBold;
+  }
 
   get address(): BlockAddress {
     return settingsAddress(this.part, this.settingsKey);
@@ -88,7 +94,11 @@ export default class ProfileDisplay extends PartBase {
             {{ currentValue | round(0) }}
           </div>
           <div class="col">
-            <q-icon name="mdi-arrow-right-bold" size="20px" class="static" />
+            <q-icon
+              :name="icons.mdiArrowRightBold"
+              size="20px"
+              class="static"
+            />
           </div>
           <div class="col">
             {{ nextValue | round(0) }}
