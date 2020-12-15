@@ -67,6 +67,7 @@ const transformer =
           source.values[key] = {
             ...value,
             type: 'scatter',
+            mode: 'lines',
             name: valueName(source, key, last(colValues)),
             yaxis: source.axes[key] ?? 'y',
             line: { color: source.colors[key] },

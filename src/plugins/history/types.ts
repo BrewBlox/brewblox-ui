@@ -83,6 +83,7 @@ export interface QueryResult {
 
 export interface GraphFieldResult {
   type: 'scatter';
+  mode: 'lines';
   name: string;
   yaxis: GraphAxis;
   line: { color: string };
