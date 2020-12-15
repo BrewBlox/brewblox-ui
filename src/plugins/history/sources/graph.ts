@@ -63,16 +63,15 @@ const transformer =
           }
           const colValues = resultCols[idx];
           const key = `${result.name}/${col}`;
-          const value = source.values[key] ?? {};
+          const existing = source.values[key];
           source.values[key] = {
-            ...value,
             type: 'scatter',
             mode: 'lines',
             name: valueName(source, key, last(colValues)),
             yaxis: source.axes[key] ?? 'y',
             line: { color: source.colors[key] },
-            x: boundedConcat(value.x, time),
-            y: boundedConcat(value.y, colValues),
+            x: boundedConcat(existing?.x, time),
+            y: boundedConcat(existing?.y, colValues),
           };
         });
 
