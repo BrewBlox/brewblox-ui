@@ -34,7 +34,7 @@ async function retryDatastore(): Promise<void> {
     catch (e) {
       // show a notification with a progress bar
       // The notification resolves the promise after `timeout` ms
-      await new Promise((resolve) =>
+      await new Promise<void>((resolve) =>
         Notify.create({
           timeout: 2000,
           icon: 'mdi-wifi-off',
@@ -61,7 +61,7 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   // handlers are indexed on fully qualified namespace
   private handlers: Mapped<EventHandler> = {}
 
-  public async start(): Promise<void> {
+  public async connect(): Promise<void> {
     Vue.$eventbus.subscribe(STORE_TOPIC + '/#');
     Vue.$eventbus.addListener(STORE_TOPIC + '/#', (_, data) => {
       if (isStoreEvent(data)) {

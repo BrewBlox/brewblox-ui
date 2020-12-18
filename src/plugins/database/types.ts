@@ -12,10 +12,10 @@ export interface EventHandler<T = StoreObject> {
 export interface BrewbloxDatabase {
 
   /**
-   * Perform startup functionality.
-   * Is called by the App component during create
+   * Connect to actual database.
+   * Is called by App.vue during create
    */
-  start(): Awaitable<void>;
+  connect(): Awaitable<void>;
 
   /**
    * Be notified of external changes to a collection.
