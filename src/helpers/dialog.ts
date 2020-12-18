@@ -1,11 +1,19 @@
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
+import Vue from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 
+export function getNumDialogs(): number {
+  return document.getElementsByClassName('q-dialog').length;
+}
+
 export function createDialog(opts: QDialogOptions): DialogChainObject {
-  return Dialog.create(opts);
+  return Dialog.create({
+    ...opts,
+    parent: Vue.$app, // This enables use of $router inside dialog components
+  });
 }
 
 interface BlockDialogOpts {

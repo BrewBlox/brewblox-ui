@@ -38,4 +38,13 @@ const router = new VueRouter({
   base: '/ui/',
 });
 
+// Strip query on fresh page loads
+// We currently only have support in-page query strings
+// If we ever add actual query args, we'll want to extract them here
+router.beforeResolve((to, from, next) => {
+  from.fullPath === '/' && to.fullPath.includes('?')
+    ? next({ path: to.path, query: {} })
+    : next();
+});
+
 export default router;

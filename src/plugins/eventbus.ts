@@ -20,7 +20,7 @@ export class BrewbloxEventbus {
   private topics: Set<string> = new Set();
   private listeners: EventListener[] = [];
 
-  public async start(): Promise<void> {
+  public async connect(): Promise<void> {
     const opts: mqtt.IClientOptions = {
       protocol: WS_PROTOCOL,
       hostname: HOSTNAME,

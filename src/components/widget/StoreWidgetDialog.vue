@@ -52,7 +52,7 @@ export default class StoreWidgetDialog extends DialogBase {
   <q-dialog
     ref="dialog"
     :maximized="$dense"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     class="row"
     @hide="onDialogHide"
   >

@@ -91,7 +91,7 @@ export default class JSCheckDialog extends DialogBase {
   <q-dialog
     ref="dialog"
     maximized
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     no-esc-dismiss
     @hide="onDialogHide"
     @keydown.ctrl.83.prevent.stop="save"

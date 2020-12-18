@@ -1,10 +1,5 @@
 const path = require('path');
 
-console.log(
-  'Disabling NODE_TLS_REJECT_UNAUTHORIZED to allow using the self-signed certificate.',
-  'You can ignore the warning.');
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function retry(desc, func) {
@@ -20,7 +15,7 @@ async function retry(desc, func) {
   throw new Error(`Retry attempts exhausted: "${desc}"`);
 };
 
-const host = 'https://localhost:9001';
+const host = 'http://localhost:9000';
 
 module.exports = {
   sleep,

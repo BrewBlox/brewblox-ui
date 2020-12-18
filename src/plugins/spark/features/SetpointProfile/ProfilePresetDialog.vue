@@ -112,7 +112,7 @@ export default class ProfilePresetDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
   >
     <DialogCard v-bind="{title, message, html}">

@@ -5,7 +5,7 @@ export const PROTOCOL = window.location.protocol.replace(':', '');
 export const WS_PROTOCOL = PROTOCOL.replace('http', 'ws') as 'ws' | 'wss';
 
 export const HOSTNAME = process.env.DEV
-  ? devHostname
+  ? devHostname || window.location.hostname
   : window.location.hostname;
 
 export const PORT = process.env.DEV
