@@ -6,6 +6,8 @@ import { Component } from 'vue-property-decorator';
 export default class App extends Vue {
 
   async created(): Promise<void> {
+    Vue.$app = this;
+
     /**
      * Order of startup is important here.
      * We first ensure that the database is working.

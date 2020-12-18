@@ -105,7 +105,7 @@ module.exports = configure(function (ctx) {
           ...sharedEnv,
           BLOX_API_DEV: true,
           // Replace these values when using a remote backend
-          BLOX_API_HOST: 'localhost',
+          BLOX_API_HOST: '',
           BLOX_API_PORT: 9001,
         }
         : {

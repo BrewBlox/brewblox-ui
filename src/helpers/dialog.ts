@@ -1,11 +1,28 @@
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
+import Vue from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
+import router from '@/router';
 import { WidgetMode } from '@/store/features';
 
+export function getNumDialogs(): number {
+  return document.getElementsByClassName('q-dialog').length;
+}
+
 export function createDialog(opts: QDialogOptions): DialogChainObject {
-  return Dialog.create(opts);
+  const query = router.currentRoute.query ?? {};
+  if (!query.dialog) {
+    router.push({ query: { ...query, dialog: 'true' } }).catch(() => { });
+  }
+
+  return Dialog
+    .create({ ...opts, parent: Vue.$app })
+    .onDismiss(() => {
+      if (router.currentRoute.query?.dialog && !getNumDialogs()) {
+        router.back();
+      }
+    });
 }
 
 interface BlockDialogOpts {

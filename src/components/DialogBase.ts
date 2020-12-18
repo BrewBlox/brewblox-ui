@@ -3,9 +3,9 @@ import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import { WidgetContext } from '@/store/features';
 
-
 @Component
 export default class DialogBase extends Vue {
+
   @Ref()
   public readonly dialog!: any;
 
