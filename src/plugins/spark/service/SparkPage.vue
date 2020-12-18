@@ -5,7 +5,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
@@ -353,11 +353,7 @@ export default class SparkPage extends Vue {
 
   onBlockClick(val: ValidatedWidget): void {
     if (this.$dense) {
-      createDialog({
-        component: 'WidgetDialog',
-        mode: 'Basic',
-        getCrud: () => val.crud,
-      });
+      createBlockDialog(val.crud.block, { mode: 'Basic' });
     }
     else if (val.expanded) {
       this.scrollTo(val.id);
