@@ -110,7 +110,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     <q-dialog
       v-model="modalOpen"
       :maximized="$dense"
-      no-backdrop-dismiss
+      v-bind="dialogProps"
     >
       <component
         :is="widgetComponent"

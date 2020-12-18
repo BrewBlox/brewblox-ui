@@ -71,7 +71,7 @@ export default class WizardDialog extends DialogBase {
   <q-dialog
     ref="dialog"
     :maximized="$dense"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
   >
     <CardWrapper :no-scroll="!!activeWizard" v-bind="{context}">

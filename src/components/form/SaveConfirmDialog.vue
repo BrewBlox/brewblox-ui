@@ -28,7 +28,7 @@ export default class SaveConfirmDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     no-esc-dismiss
     @hide="onDialogHide"
   >

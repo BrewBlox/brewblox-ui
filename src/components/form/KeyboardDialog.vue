@@ -166,7 +166,7 @@ export default class KeyboardDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     transition-show="fade"
     :class="`keyboard-dialog--${type}`"
     @hide="onDialogHide"

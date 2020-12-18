@@ -3,7 +3,6 @@ import Vue from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
-import router from '@/router';
 import { WidgetMode } from '@/store/features';
 
 export function getNumDialogs(): number {
@@ -11,18 +10,10 @@ export function getNumDialogs(): number {
 }
 
 export function createDialog(opts: QDialogOptions): DialogChainObject {
-  const query = router.currentRoute.query ?? {};
-  if (!query.dialog) {
-    router.push({ query: { ...query, dialog: 'true' } }).catch(() => { });
-  }
-
-  return Dialog
-    .create({ ...opts, parent: Vue.$app })
-    .onDismiss(() => {
-      if (router.currentRoute.query?.dialog && !getNumDialogs()) {
-        router.back();
-      }
-    });
+  return Dialog.create({
+    ...opts,
+    parent: Vue.$app, // This enables use of $router inside dialog components
+  });
 }
 
 interface BlockDialogOpts {
