@@ -107,7 +107,7 @@ export default class BuilderEditor extends Vue {
 
   created(): void {
     this.debouncedSaveParts = debounce(this.saveParts, 500);
-    this.debouncedCalculate = debounce(this.calculate, 150, false);
+    this.debouncedCalculate = debounce(this.calculate, 150, true);
     this.debouncedCalculate();
   }
 
