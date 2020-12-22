@@ -100,8 +100,8 @@ module.exports = configure(function (ctx) {
           BLOX_PERFORMANCE: false,
           // Replace these values when using a remote backend
           // Host/port are also defined in dev/utils.js
-          BLOX_API_HOST: undefined,
-          BLOX_API_PORT: 9001,
+          BLOX_API_HOST: 'localhost',
+          BLOX_API_PORT: 8443,
         }
         : {
           BLOX_DATE: buildDate,

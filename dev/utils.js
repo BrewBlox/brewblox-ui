@@ -15,7 +15,7 @@ async function retry(desc, func) {
   throw new Error(`Retry attempts exhausted: "${desc}"`);
 };
 
-const host = 'http://localhost:9000';
+const host = 'https://localhost:8443';
 
 module.exports = {
   sleep,

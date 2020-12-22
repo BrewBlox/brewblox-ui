@@ -159,7 +159,7 @@ const params2: ProcessParams = {
 
 const sharedParams: SharedParams = {
   heightLowest: 100.0,
-  heightDiff: 287.0,
+  heightDiff: 300.0,
   countsPerMillivolt: 2 ** 23 / 1350,
   countsPerMillivoltDiff: 32 * 2 ** 23 / 1350,
   diameter: 625,
@@ -259,15 +259,15 @@ const transformer =
       const key = `${result.name}/${colKey}`;
       const existing = source.values[key] ?? {};
       source.values[key] = {
-        type: 'scatter',
         ...existing,
+        type: 'scatter',
         yaxis: colKey.startsWith('Density') ? 'y' : 'y2',
         name: colKey.startsWith('Density')
           ? `<span>${colKey}<br>${(newValues ? newValues[newValues.length - 1] || 0.0 : 0.0).toFixed(4)}</span>`
           : `<span style="color: #aef">${colKey}<br>${(newValues ? newValues[newValues.length - 1] || 0.0 : 0.0).toFixed(2)}</span>`,
 
         visible: colKey.startsWith('Density') ? true : 'legendonly',
-        line: {},
+        // line: {},
         x: boundedConcat(existing.x, processed.time),
         y: boundedConcat(existing.y, newValues),
       };
@@ -291,17 +291,24 @@ const transformer =
     return source;
   };
 
+export const addDensitySource =
+  async (
+    id: string,
+    params: QueryParams,
 
-export async function addDensitySource(id: string, params: QueryParams): Promise<void> {
+  ): Promise<void> => {
+
   const source: GraphSource = {
     id,
     params,
     renames: {},
     axes: {},
     colors: {},
+      precision: {},
     transformer,
+      command: 'values',
     target: densityTarget,
     values: {},
   };
-  await historyStore.addValuesSource(source);
-}
+    await historyStore.addSource(source);
+  };
