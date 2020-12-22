@@ -6,7 +6,7 @@ import { ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { blockIdRules } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { TempSensorMockBlock } from '@/plugins/spark/types';
+import { BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
 import { SparkStatus } from '@/plugins/spark/types';
 
 
@@ -29,20 +29,20 @@ export default class QuickStartMockCreateField extends Vue {
   }
 
   get isSimulation(): boolean {
-    return this.status?.connection === 'simulation';
+    return this.status?.connectionKind === 'simulation';
   }
 
   async createMockSensors(): Promise<void> {
     if (!this.sparkModule) { return; }
     const validator = ruleValidator(blockIdRules(this.serviceId));
-    const spec = sparkStore.specById<TempSensorMockBlock>('TempSensorMock');
+    const spec = sparkStore.specById<TempSensorMockBlock>(BlockType.TempSensorMock);
 
     for (const name of this.names) {
       const block: TempSensorMockBlock = {
         id: suggestId(name, validator),
         serviceId: this.serviceId,
         groups: [0],
-        type: 'TempSensorMock',
+        type: BlockType.TempSensorMock,
         data: spec.generate(this.serviceId),
       };
       await this.sparkModule.createBlock(block);

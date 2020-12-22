@@ -1,8 +1,11 @@
 <script lang="ts">
+import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
+import { bloxQty, prettyUnit } from '@/helpers/bloxfield';
+import { serviceTemp } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import type { Block, PidBlock } from '@/plugins/spark/types';
+import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
@@ -12,10 +15,16 @@ import { settingsAddress } from '../helpers';
 
 @Component
 export default class PidDisplay extends PartBase {
+  icons: Mapped<string> = {};
   HOT_WATER = HOT_WATER;
   COLD_WATER = COLD_WATER;
   readonly addressKey = 'pid';
   readonly scaleKey = 'scale';
+
+  created(): void {
+    this.icons.mdiCalculatorVariant = mdiCalculatorVariant;
+    this.icons.mdiPlusMinus = mdiPlusMinus;
+  }
 
   get scale(): number {
     return this.settings[this.scaleKey] ?? 1;
@@ -61,14 +70,28 @@ export default class PidDisplay extends PartBase {
 
   get drivingOffset(): boolean {
     return this.target !== null
-      && this.target.type === 'ActuatorOffset';
+      && this.target.type === BlockType.ActuatorOffset;
+  }
+
+  get tempUnit(): 'delta_degC' | 'delta_degF' {
+    return this.block !== null
+      && serviceTemp(this.block.serviceId) === 'degF'
+      ? 'delta_degF'
+      : 'delta_degC';
+  }
+
+  get convertedOutputSetting(): number | null {
+    return this.drivingOffset
+      && this.block !== null
+      ? bloxQty(this.outputSetting, 'delta_degC').to(this.tempUnit).value
+      : this.outputSetting;
   }
 
   get suffix(): string {
     return this.outputSetting === null
       ? ''
       : this.drivingOffset
-        ? '°C'
+        ? prettyUnit(this.tempUnit)
         : '%';
   }
 
@@ -92,14 +115,14 @@ export default class PidDisplay extends PartBase {
       <template v-else>
         <q-icon
           v-if="kp === null"
-          name="mdi-calculator-variant"
-          class="col static"
+          :name="icons.mdiCalculatorVariant"
+          class="col-auto static"
           size="25px"
         />
         <q-icon
           v-else-if="drivingOffset"
-          name="mdi-plus-minus"
-          class="col static"
+          :name="icons.mdiPlusMinus"
+          class="col-auto static"
           size="25px"
         />
         <template v-else>
@@ -113,7 +136,7 @@ export default class PidDisplay extends PartBase {
           />
         </template>
         <div class="col text-bold">
-          {{ outputSetting | truncateRound }}
+          {{ convertedOutputSetting | truncateRound }}
           <small v-if="!!block">{{ suffix }}</small>
         </div>
       </template>

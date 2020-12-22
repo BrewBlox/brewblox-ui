@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
-import { durationMs } from '@/helpers/functional';
+import { durationMs } from '@/helpers/duration';
 import notify from '@/helpers/notify';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { SparkService, SparkStatus } from '@/plugins/spark/types';
@@ -73,8 +73,8 @@ export default class SparkServiceWatcher extends Vue {
   handleStatusChange(status: SparkStatus): void {
     if (this.notifiedUpdate
       || !status
-      || !status.connect
-      || status.latest
+      || !status.isConnected
+      || status.isLatestFirmware
       || this.snoozeTime > new Date().getTime() - snoozeDuration
     ) {
       return;

@@ -9,7 +9,7 @@ import {
 } from '@/plugins/history/types';
 
 const metricsTransformer =
-  (source: HistorySource, result: MetricsResult[]): HistorySource => ({
+  (source: HistorySource, result: MetricsResult[]): MetricsSource => ({
     ...source,
     values: result.map(res => ({
       ...res,
@@ -36,9 +36,10 @@ export const addSource =
       id,
       params,
       renames,
+      command: 'last_values',
       transformer: metricsTransformer,
       target: filteredTarget,
       values: [],
     };
-    await historyStore.addMetricsSource(source);
+    await historyStore.addSource(source);
   };

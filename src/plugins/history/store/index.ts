@@ -1,9 +1,17 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById, uniqueFilter } from '@/helpers/functional';
+import {
+  extendById,
+  filterById,
+  findById,
+  isoDateString,
+  uniqueFilter,
+} from '@/helpers/functional';
+import notify from '@/helpers/notify';
 import store from '@/store';
 
 import {
+  ApiQuery,
   HistorySource,
   LoggedSession,
   QueryParams,
@@ -12,20 +20,79 @@ import {
 } from '../types';
 import { historyApi, sessionApi } from './api';
 
+
+const buildQuery =
+  (params: QueryParams, target: QueryTarget, epoch: string = 'ms'): ApiQuery =>
+    ({
+      database: params.database,
+      start: isoDateString(params.start),
+      end: isoDateString(params.end),
+      duration: params.duration,
+      limit: params.limit,
+      order_by: params.orderBy,
+      policy: params.policy,
+      approx_points: params.approxPoints,
+      measurement: target.measurement,
+      fields: target.fields,
+      epoch,
+    });
+
 @Module({ generateMutationSetters: true })
 export class HistoryModule extends VuexModule {
   public sessions: LoggedSession[] = [];
-  public fields: Mapped<string[]> = {};
+  public freshFields: Mapped<string[]> = {};
+  public allFields: Mapped<string[]> = {};
   public sources: HistorySource[] = [];
+
+  private streamConnected: boolean = false;
+  private stream: WebSocket | null = null;
+
+  private startQuery(src: HistorySource): void {
+    if (this.stream?.readyState === WebSocket.OPEN) {
+      this.stream.send(JSON.stringify({
+        id: src.id,
+        command: src.command,
+        query: buildQuery(src.params, src.target),
+      }));
+    }
+  }
+
+  private endQuery(src: HistorySource): void {
+    this.stream?.send(JSON.stringify({
+      id: src.id,
+      command: 'stop',
+    }));
+  }
+
+  private connect(): void {
+    this.stream = historyApi.openStream();
+    this.stream.onopen = () => {
+      this.streamConnected = true;
+      this.sources.forEach(src => this.startQuery(src));
+    };
+    this.stream.onmessage = (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      data.error
+        ? notify.error(`History error: ${event.data}`)
+        : this.transform(data);
+    };
+    this.stream.onclose = () => {
+      setTimeout(() => this.connect(), 2000);
+    };
+    this.stream.onerror = () => {
+      if (this.streamConnected) {
+        notify.error('History connection closed. Retrying...');
+        this.streamConnected = false;
+      }
+      this.stream?.close();
+      this.stream = null;
+    };
+  }
 
   public get sessionTags(): string[] {
     return this.sessions
       .flatMap(session => session.tags ?? [])
       .filter(uniqueFilter);
-  }
-
-  public get measurements(): string[] {
-    return Object.keys(this.fields);
   }
 
   public sessionById(id: string): LoggedSession | null {
@@ -37,10 +104,10 @@ export class HistoryModule extends VuexModule {
   }
 
   @Mutation
-  public transform({ id, result }: { id: string; result: QueryResult }): void {
+  public transform({ id, data }: { id: string; data: QueryResult }): void {
     const source = this.sourceById(id);
     if (source !== null) {
-      this.sources = extendById(this.sources, source.transformer(source, result));
+      this.sources = extendById(this.sources, source.transformer(source, data));
     }
   }
 
@@ -65,65 +132,36 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action
-  public async addSource(args: {
-    source: HistorySource;
-    fetcher: (p: QueryParams, t: QueryTarget) => Promise<EventSource>;
-  }): Promise<HistorySource> {
-    const { source, fetcher } = args;
-    const { id, params, target } = source;
-
+  public async addSource(source: HistorySource): Promise<void> {
     this.setSource(source);
-
-    const events = await fetcher(params, target);
-    events.onmessage = (event: MessageEvent) =>
-      this.transform({ id, result: JSON.parse(event.data) });
-    events.onerror = () => events.close();
-
-    const updated = { ...this.sourceById(id)!, id, events };
-    this.setSource(updated);
-    return updated;
-  }
-
-  @Action
-  public async addValuesSource(source: HistorySource): Promise<HistorySource> {
-    return await this.addSource({ source, fetcher: historyApi.subscribeValues });
-  }
-
-  @Action
-  public async addMetricsSource(source: HistorySource): Promise<HistorySource> {
-    return await this.addSource({ source, fetcher: historyApi.subscribeMetrics });
+    this.startQuery(source);
   }
 
   @Action
   public async removeSource(source: HistorySource): Promise<void> {
+    this.endQuery(source);
     this.sources = filterById(this.sources, source);
-    if (source.events) {
-      source.events.close();
-    }
   }
 
   @Action
-  public async fetchKnownKeys(): Promise<void> {
-    this.fields = await historyApi.fetchKnownKeys();
+  public async fetchFreshFields(): Promise<void> {
+    this.freshFields = await historyApi.fetchFields(false);
+  }
+
+  @Action
+  public async fetchAllFields(): Promise<void> {
+    this.allFields = await historyApi.fetchFields(true);
   }
 
   @Action
   public async fetchValues([params, target, epoch]: [QueryParams, QueryTarget, string]): Promise<QueryResult> {
-    return await historyApi.fetchValues(params, target, epoch);
-  }
-
-  @Action
-  public async validateService(): Promise<boolean> {
-    return await historyApi.validateService();
+    return await historyApi.fetchValues(buildQuery(params, target, epoch));
   }
 
   @Action
   public async start(): Promise<void> {
     const onChange = (session: LoggedSession): void => {
-      const existing = this.sessionById(session.id);
-      if (!existing || existing._rev !== session._rev) {
-        this.sessions = extendById(this.sessions, session);
-      }
+      this.sessions = extendById(this.sessions, session);
     };
     const onDelete = (id: string): void => {
       this.sessions = filterById(this.sessions, { id });
@@ -131,6 +169,8 @@ export class HistoryModule extends VuexModule {
 
     this.sessions = await sessionApi.fetch();
     sessionApi.subscribe(onChange, onDelete);
+
+    this.connect();
   }
 }
 

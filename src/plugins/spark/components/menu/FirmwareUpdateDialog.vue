@@ -3,30 +3,33 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { sparkUpdateEvent } from '@/plugins/spark/getters';
+import { STATE_TOPIC } from '@/helpers/const';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
-
+import { SparkUpdateEvent } from '@/shared-types';
 
 @Component
 export default class FirmwareUpdateDialog extends DialogBase {
   busy = false;
   error = '';
+  listenerId: string = '';
   messages: string[] = [];
 
   @Prop({ type: String, required: true })
   readonly serviceId!: string;
 
   created(): void {
-    Vue.$eventbus.addListener({
-      id: `${sparkUpdateEvent}__${this.serviceId}`,
-      filter: (key, type) => key === this.serviceId && type === sparkUpdateEvent,
-      onmessage: ({ data }) => data.forEach(v => this.pushMessage(v)),
-    });
+    this.listenerId = Vue.$eventbus.addListener(
+      `${STATE_TOPIC}/${this.serviceId}/update`,
+      (_, evt: SparkUpdateEvent) => {
+        if (evt.type === 'Spark.update') {
+          evt.data.forEach(v => this.pushMessage(v));
+        }
+      });
   }
 
   beforeDestroy(): void {
-    Vue.$eventbus.removeListener(`${sparkUpdateEvent}__${this.serviceId}`);
+    Vue.$eventbus.removeListener(this.listenerId);
   }
 
   get sparkModule(): SparkServiceModule {
@@ -38,19 +41,20 @@ export default class FirmwareUpdateDialog extends DialogBase {
   }
 
   get updateAvailableText(): string {
-    return !this.status
+    const latest = this.status?.isLatestFirmware;
+    return latest === undefined
       ? 'Current firmware version is unknown.'
-      : !this.status.latest
-        ? 'A firmware update is available.'
-        : "You're using the latest firmware.";
+      : latest
+        ? "You're using the latest firmware."
+        : 'A firmware update is available.';
   }
 
   get ready(): boolean {
-    return this.status !== null && this.status.connect;
+    return !!this.status?.isConnected;
   }
 
   get buttonColor(): string {
-    return this.status?.latest
+    return this.status?.isLatestFirmware
       ? ''
       : 'primary';
   }
@@ -78,7 +82,7 @@ export default class FirmwareUpdateDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="updateFirmware"
   >
@@ -90,7 +94,8 @@ export default class FirmwareUpdateDialog extends DialogBase {
       <q-card-section>
         <div v-if="error" class="text-negative q-pa-md">
           <div>Update failed: {{ error }}</div>
-          If retrying the update does not work, please run 'brewblox-ctl flash'
+          Please retry. <br>
+          If the retry fails, run `brewblox-ctl flash`
         </div>
 
         <div v-if="messages.length === 0" class="q-pa-md">

@@ -1,11 +1,11 @@
 import {
-  durationString,
+  findById,
+  mqttTopicExp,
   objectSorter,
   objectStringSorter,
+  patchedById,
   uniqueFilter,
-  unitDurationString,
 } from '@/helpers/functional';
-import { Unit } from '@/plugins/spark/units';
 
 describe('Array funcs', () => {
   it('should filter and sort arrays', () => {
@@ -23,35 +23,73 @@ describe('Array funcs', () => {
   });
 });
 
-describe('durationString', () => {
-  it('should parse strings', () => {
-    expect(durationString('10s')).toEqual('10s');
-    expect(durationString('80m')).toEqual('1h 20m');
+interface TestObj extends HasId {
+  v1: string;
+  nesting: {
+    nested: number;
+    other?: number;
+  };
+}
+
+describe('HasId array manipulation', () => {
+  const mkArr = (): TestObj[] => ([
+    { id: 'id-1', v1: 'one', nesting: { nested: 1 } },
+    { id: 'id-2', v1: 'two', nesting: { nested: 2 } },
+    { id: 'id-3', v1: 'three', nesting: { nested: 3 } },
+    { id: 'id-dup', v1: 'dup1', nesting: { nested: 0 } },
+    { id: 'id-dup', v1: 'dup2', nesting: { nested: 0 } },
+  ]);
+  const empty = (): TestObj => ({ id: '', v1: '', nesting: { nested: 0 } });
+
+  it('findById()', () => {
+    const arr = mkArr();
+
+    expect(findById(arr, 'nope')).toBeNull();
+    expect(findById(arr, 'nope', empty()))
+      .toMatchObject({ id: '' });
+    expect(findById(arr, 'id-2')).toMatchObject(arr[1]);
+    expect(findById(arr, 'id-dup')).toMatchObject({ v1: 'dup1' });
   });
 
-  it('should parse numbers', () => {
-    expect(durationString(10000)).toEqual('10s');
-    expect(durationString(0)).toEqual('0s');
-    expect(durationString(10)).toEqual('10ms');
-    expect(durationString(897866554)).toEqual('10d 9h 24m 26s');
-  });
-
-  it('Should handle error cases', () => {
-    expect(durationString('10x')).toEqual('10ms');
-    expect(durationString(null as any)).toEqual('0s');
-    expect(durationString([] as any)).toEqual('0s');
+  it('patchedById()', () => {
+    const arr = mkArr();
+    expect(patchedById(arr, { id: 'absent' }))
+      .toBeNull();
+    expect(patchedById(arr, { id: 'absent' }, empty()))
+      .toMatchObject({ id: '' });
+    expect(patchedById(arr, { id: 'id-1', v1: 'one' }, empty()))
+      .toMatchObject({ id: 'id-1' });
+    expect(patchedById(arr, { id: 'id-2', v1: 'one' }))
+      .toMatchObject({ ...arr[1], v1: 'one' });
+    expect(patchedById(arr, { id: 'id-dup', nesting: { nested: -1 } }))
+      .toMatchObject({ id: 'id-dup', v1: 'dup1', nesting: { nested: -1 } });
   });
 });
 
-describe('unitDurationString', () => {
-  it('should parse Units', () => {
-    expect(unitDurationString(new Unit(10, 's'))).toEqual('10s');
-    expect(unitDurationString(new Unit(80, 'min'))).toEqual('1h 20m');
-  });
 
-  it('Should handle error cases', () => {
-    expect(unitDurationString(new Unit(10, 'meter'))).toEqual('10ms');
-    expect(unitDurationString(null)).toEqual('---');
-    expect(unitDurationString(new Unit(null, 's'))).toEqual('---');
+describe('MQTT helpers', () => {
+  it('mqttTopicExp()', () => {
+    let exp = mqttTopicExp('base/test');
+    expect(exp.test('base/test')).toBe(true);
+    expect(exp.test('base/test/other')).toBe(false);
+
+    exp = mqttTopicExp('base/test/+');
+    expect(exp.test('base/test')).toBe(false);
+    expect(exp.test('base/test/other')).toBe(true);
+    expect(exp.test('base/test/something/else')).toBe(false);
+
+    exp = mqttTopicExp('base/test/#');
+    expect(exp.test('base/test')).toBe(true);
+    expect(exp.test('base/test/other')).toBe(true);
+    expect(exp.test('base/test/something/else')).toBe(true);
+
+    exp = mqttTopicExp('base/test/#/end');
+    expect(exp.test('base/test')).toBe(false);
+    expect(exp.test('base/test/other')).toBe(false);
+    expect(exp.test('base/test/something/else/end')).toBe(true);
+    expect(exp.test('base/test/end')).toBe(true);
+
+    exp = mqttTopicExp('base/+/middle/+/end');
+    expect(exp.test('base/dash-dash/middle/second/end')).toBe(true);
   });
 });

@@ -1,10 +1,10 @@
 import fromEntries from 'fromentries';
+import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
+import isFinite from 'lodash/isFinite';
 import isString from 'lodash/isString';
-import parseDuration from 'parse-duration';
-import { colors } from 'quasar';
-
-import { Unit } from '../plugins/spark/units';
+import mapKeys from 'lodash/mapKeys';
+import { colors, date } from 'quasar';
 
 type SortFunc = (a: any, b: any) => number
 
@@ -22,46 +22,6 @@ export const objectStringSorter =
       return left.localeCompare(right);
     };
 
-export const durationMs =
-  (duration: number | string): number =>
-    isString(duration)
-      ? parseDuration(duration)
-      : duration;
-
-export const durationString =
-  (duration: number | string): string => {
-    const ms = durationMs(duration);
-    const secondsTotal = Number(ms) / 1000;
-    const days = Math.floor(secondsTotal / 86400);
-    const hours = Math.floor((secondsTotal - (days * 86400)) / 3600);
-    const minutes =
-      Math.floor((secondsTotal - (days * 86400) - (hours * 3600)) / 60);
-    const seconds = Math.floor(
-      secondsTotal - (days * 86400) - (hours * 3600) - (minutes * 60));
-    const milliseconds = (secondsTotal < 10) ? Math.floor((secondsTotal - Math.floor(secondsTotal)) * 1000) : 0;
-    const values = [
-      [days, 'd'],
-      [hours, 'h'],
-      [minutes, 'm'],
-      [seconds, 's'],
-      [milliseconds, 'ms'],
-    ];
-
-    const strVal = values
-      .filter(([val]) => !!val)
-      .map(([val, unit]) => `${val}${unit}`)
-      .join(' ');
-    return strVal || '0s';
-  };
-
-export const unitDurationString =
-  (value: Unit | null): string => {
-    if (value === null || value === undefined || value.value === null) {
-      return '---';
-    }
-    return durationString(`${value.value}${value.notation}`);
-  };
-
 export const spaceCased =
   (input: string): string =>
     input.replace(/[_-]/, ' ')
@@ -74,6 +34,10 @@ export const snakeCased =
     input.replace(/[ -]/, '_')
       .replace(/\.?([A-Z]+)/g, (_, v: string) => `_${v}`)
       .toLowerCase();
+
+export const snakeCasedObj =
+  (obj: Mapped<any>): Mapped<any> =>
+    mapKeys(obj, (_, key) => snakeCased(key));
 
 export const kebabCased =
   (input: string): string =>
@@ -123,8 +87,34 @@ export const shortDateString =
     return date.toLocaleDateString();
   };
 
+export const isoDateString =
+  (val: Date | number | string | undefined): string | undefined => {
+    if (val instanceof Date) {
+      return val.toISOString();
+    }
+    const numV = Number(val);
+    if (isFinite(numV) && date.isValid(numV)) {
+      return new Date(numV).toISOString();
+    }
+    if (isString(val) && date.isValid(val)) {
+      return new Date(val).toISOString();
+    }
+    return undefined;
+  };
+
+export const mqttTopicExp =
+  (topicFilter: string): RegExp =>
+    new RegExp(
+      topicFilter
+        .split('/')
+        .map(s => s
+          .replace('+', '[a-zA-Z0-9 _.-]*')
+          .replace('#', '?($|[a-zA-Z0-9 \/_.-]*)'))
+        .join('\\/')
+      + '$');
+
 export const round =
-  (value: any, digits = 2): string | number => {
+  (value: any, digits = 2): string => {
     if (value === null || value === undefined) {
       return '--.--';
     }
@@ -146,9 +136,13 @@ export const truncateRound =
     return v.toFixed(2);
   };
 
-export const roundNumber =
-  (value: number, digits = 2): number =>
-    Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits));
+export function roundNumber(value: number, digits?: number): number;
+export function roundNumber(value: number | null, digits?: number): number | null;
+export function roundNumber(value: number | null, digits = 2): number | null {
+  return value != null
+    ? Number((Math.round(Number(value + 'e' + digits)) + 'e-' + digits))
+    : null;
+}
 
 export const truncate =
   (value: string): string => {
@@ -185,7 +179,7 @@ export const contrastColor =
   };
 
 export const suggestId =
-  (id: string, validate: (val: string) => boolean, ): string => {
+  (id: string, validate: (val: string) => boolean,): string => {
     if (validate(id)) {
       return id;
     }
@@ -315,22 +309,45 @@ export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
 /**
  * Looks for object in array collection.
  *
- * @param arr object collection
- * @param id unique ID of desired object
+ * @param arr object collection.
+ * @param id unique ID of desired object.
  */
 export function findById<T extends HasId>(
   arr: T[],
   id: string | null,
   fallback: T | null = null,
-): typeof fallback {
+): T | typeof fallback {
   return id != null
     ? arr.find(v => v.id === id) ?? fallback
     : fallback;
 }
 
 /**
+ * Finds object in `arr` with ID matching `patch`.
+ * Returns a shallow merge of found object and `patch`.
+ *
+ * Returns `fallback` if no match was found in `arr`.
+ * Does not modify `arr`.
+ *
+ * @param arr object collection.
+ * @param patch partial object with required ID.
+ */
+export function patchedById<T extends HasId>(
+  arr: T[],
+  patch: Patch<T>,
+  fallback: T | null = null,
+): T | typeof fallback {
+  const existing = findById(arr, patch.id);
+  return existing
+    ? { ...existing, ...patch }
+    : fallback;
+}
+
+/**
  * Checks if a generic object with a 'type' field matches a TS interface.
  * Best used when T.type is a constant value.
+ *
+ * @remarks
  *
  * The function acts as a type guard:
  * https://www.typescriptlang.org/docs/handbook/advanced-types.html#instanceof-type-guards
@@ -339,15 +356,18 @@ export function findById<T extends HasId>(
  * and we want to perform a runtime type check,
  * while validating the 'type' argument at compile time.
  *
- *    interface PancakeIntf {
- *      type: 'Pancake';
- *      value: string;
- *    }
- *    matchesType<PancakeIntf>('Pancake', {type: 'Pancake', value: 'no'}) >>>> true
- *    matchesType<PancakeIntf>('Pancake', {type: 'Waffle', value: 'yes'}) >>>> false
- *    matchesType<PancakeIntf>('Waffle', {type: 'Waffle', value: 'yes'})
- *    //                        ^^^^^^
- *    // Argument of type '"Waffle"' is not assignable to parameter of type '"Pancake"'
+ * ```ts
+ * interface PancakeIntf {
+ *   type: 'Pancake';
+ *   value: string;
+ * }
+ * matchesType<PancakeIntf>('Pancake', {type: 'Pancake', value: 'no'}) >>>> true
+ * matchesType<PancakeIntf>('Pancake', {type: 'Waffle', value: 'yes'}) >>>> false
+ * matchesType<PancakeIntf>('Waffle', {type: 'Waffle', value: 'yes'})
+ * //                        ^^^^^^
+ * // Argument of type '"Waffle"' is not assignable to parameter of type '"Pancake"'
+ * ```
+ *
  * @param type
  * @param obj
  */
@@ -360,24 +380,35 @@ export function matchesType<T extends HasType>(type: T['type'], obj: HasType): o
  *
  * Returns a function that can directly be used as type guard in Array.find() or Array.filter().
  *
- *    interface Circular = PancakeInterface | FrisbeeInterface;
+ * ```ts
+ * interface Circular = PancakeInterface | FrisbeeInterface;
  *
- *    function eat(pancake: PancakeInterface): void {
- *      // yum
- *    }
+ * function eat(pancake: PancakeInterface): void {
+ *   // yum
+ * }
  *
- *    const items: Circular[] = [
- *      { type: 'Pancake' },
- *      { type: 'Frisbee' }
- *    ];
+ * const items: Circular[] = [
+ *   { type: 'Pancake' },
+ *   { type: 'Frisbee' }
+ * ];
  *
- *    items
- *      .filter(typeMatchFilter<PancakeInterface>('Pancake'))
- *      .forEach(v => eat(v)); // Does not raise a type error
- *
+ * items
+ *   .filter(typeMatchFilter<PancakeInterface>('Pancake'))
+ *   .forEach(v => eat(v)); // Does not raise a type error
+ * ```
  *
  * @param type
  */
 export function typeMatchFilter<T extends HasType>(type: T['type']): ((obj: HasType) => obj is T) {
   return (obj): obj is T => obj.type === type;
+}
+
+export function nullFilter<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
+}
+
+export function deepCopy<T>(obj: T): T {
+  return obj
+    ? cloneDeep(obj)
+    : obj;
 }

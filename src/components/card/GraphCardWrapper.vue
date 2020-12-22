@@ -19,7 +19,11 @@ export default class GraphCardWrapper extends Vue {
 </script>
 
 <template>
-  <div v-if="show && $q.screen.gt.md" class="row no-wrap justify-center combined-wrapper">
+  <div
+    v-if="show && $q.screen.gt.md"
+    class="row no-wrap justify-center combined-wrapper"
+    v-on="$listeners"
+  >
     <CardWrapper class="col-5" v-bind="$attrs">
       <template #toolbar>
         <slot name="toolbar" />
@@ -40,7 +44,11 @@ export default class GraphCardWrapper extends Vue {
       </div>
     </div>
   </div>
-  <CardWrapper v-else v-bind="$attrs">
+  <CardWrapper
+    v-else
+    v-bind="$attrs"
+    v-on="$listeners"
+  >
     <template #toolbar>
       <slot name="toolbar" />
     </template>
@@ -69,5 +77,4 @@ export default class GraphCardWrapper extends Vue {
 .graph-container
   border-radius: 4px
   border: 1px solid $blue-grey-9
-
 </style>

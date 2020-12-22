@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { Block } from '@/plugins/spark/types';
+import { DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { RIGHT } from '../getters';
@@ -30,7 +30,7 @@ const paths = {
 export default class ActuatorValve extends PartBase {
   readonly paths = paths;
 
-  get block(): Block | null {
+  get block(): DigitalActuatorBlock | MotorValveBlock | null {
     return settingsBlock(this.part, 'valve');
   }
 
@@ -43,15 +43,19 @@ export default class ActuatorValve extends PartBase {
   }
 
   get closed(): boolean {
-    return !this.block || this.block.data.state !== 'Active';
+    return this.block?.data.state !== DigitalState.STATE_ACTIVE;
+  }
+
+  get pending(): boolean {
+    return this.block?.data.desiredState !== this.block?.data.state;
   }
 
   get valveRotation(): number {
     if (this.block) {
       switch (this.block.data.state) {
-        case 'Inactive':
+        case DigitalState.STATE_INACTIVE:
           return 90;
-        case 'Active':
+        case DigitalState.STATE_ACTIVE:
           return 0;
         default:
           return 45;
@@ -75,6 +79,9 @@ export default class ActuatorValve extends PartBase {
   <g>
     <SvgEmbedded v-if="!block" height="15" width="15">
       <UnlinkedIcon size="15px" class="self-end" />
+    </SvgEmbedded>
+    <SvgEmbedded v-else-if="pending" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
+      <q-spinner size="44px" class="col" color="blue-grey-5" />
     </SvgEmbedded>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]" />

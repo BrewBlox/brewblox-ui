@@ -2,18 +2,18 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
+import { bloxLink, JSLink, Link } from '@/helpers/bloxfield';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockOrIntfType } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { Block, BlockOrIntfType, ComparedBlockType } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 
 @Component
 export default class LinkDialog extends DialogBase {
-  local: Link | null = null
+  local: JSLink | null = null
 
   @Prop({ type: Object })
   public readonly value!: Link;
@@ -24,8 +24,11 @@ export default class LinkDialog extends DialogBase {
   @Prop({ type: String, default: 'Link' })
   public readonly label!: string;
 
-  @Prop({ type: Array, required: false })
-  readonly compatible!: BlockOrIntfType[];
+  @Prop({ type: [String, Array], required: false })
+  readonly compatible!: ComparedBlockType;
+
+  @Prop({ type: Function, default: (() => true) })
+  public readonly blockFilter!: ((block: Block) => boolean);
 
   @Prop({ type: Boolean, default: true })
   public readonly clearable!: boolean;
@@ -37,7 +40,7 @@ export default class LinkDialog extends DialogBase {
   public readonly configurable!: boolean;
 
   created(): void {
-    this.local = this.value.copy();
+    this.local = bloxLink(this.value);
   }
 
   get typeFilter(): ((type: BlockOrIntfType) => boolean) {
@@ -47,7 +50,8 @@ export default class LinkDialog extends DialogBase {
   get linkOpts(): Link[] {
     return sparkStore.serviceBlocks(this.serviceId)
       .filter(block => this.typeFilter(block.type))
-      .map(block => new Link(block.id, block.type))
+      .filter(this.blockFilter)
+      .map(block => bloxLink(block.id, block.type))
       .sort(objectStringSorter('id'));
   }
 
@@ -68,7 +72,9 @@ export default class LinkDialog extends DialogBase {
   }
 
   update(link: Link | null): void {
-    this.local = link ?? new Link(null, this.value.type);
+    this.local = link !== null
+      ? bloxLink(link)
+      : bloxLink(null, this.value.type);
   }
 
   configureBlock(): void {
@@ -76,15 +82,12 @@ export default class LinkDialog extends DialogBase {
   }
 
   createBlock(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      parent: this,
-      serviceId: this.serviceId,
-      filter: this.typeFilter,
-    })
-      .onOk((block: Block) => {
-        // Retain original type
-        this.local = new Link(block.id, this.value.type);
+    createBlockWizard(this.serviceId, this.compatible ?? this.value.type)
+      .onOk(({ block }) => {
+        if (block) {
+          // Retain original type
+          this.local = bloxLink(block.id, this.value.type);
+        }
       });
   }
 
@@ -99,7 +102,7 @@ export default class LinkDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

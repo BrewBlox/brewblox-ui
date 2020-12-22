@@ -5,8 +5,7 @@ import { typeMatchFilter } from '@/helpers/functional';
 import { mutate } from '@/helpers/functional';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { DS2408StartChannels } from '@/plugins/spark/getters';
-import { DS2408Block, MotorValveBlock } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { Block, BlockType, DS2408Block, DS2408ConnectMode, MotorValveBlock } from '@/plugins/spark/types';
 
 @Component
 export default class MotorValveFull
@@ -23,7 +22,7 @@ export default class MotorValveFull
     const targetId = this.hwBlock.id;
     return this.sparkModule
       .blocks
-      .filter(typeMatchFilter<MotorValveBlock>('MotorValve'))
+      .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
       .filter(block => block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.startChannel, block.id), {});
   }
@@ -50,14 +49,19 @@ export default class MotorValveFull
     if (this.block.data.startChannel === pinId) {
       return;
     }
-    const currentDriver = new Link(this.claimedChannels[pinId] || null, 'MotorValve');
-    if (currentDriver.id) {
-      const currentDriverBlock = this.sparkModule.blockById<MotorValveBlock>(currentDriver.id)!;
+    const currentDriverId = this.claimedChannels[pinId] ?? null;
+    if (currentDriverId) {
+      const currentDriverBlock = this.sparkModule.blockById<MotorValveBlock>(currentDriverId)!;
       currentDriverBlock.data.startChannel = 0;
       await this.sparkModule.saveBlock(currentDriverBlock);
     }
     this.block.data.startChannel = pinId;
     await this.saveBlock();
+  }
+
+  filterDS2408(block: Block): boolean {
+    return block.type !== BlockType.DS2408
+      || (block as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_VALVE;
   }
 }
 </script>
@@ -71,6 +75,7 @@ export default class MotorValveFull
         :value="block.data.hwDevice"
         :service-id="serviceId"
         :creatable="false"
+        :block-filter="filterDS2408"
         title="Target DS2408 Chip"
         label="Target DS2408 Chip"
         class="col-grow"

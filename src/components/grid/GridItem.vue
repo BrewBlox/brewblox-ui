@@ -1,4 +1,6 @@
 <script lang="ts">
+import clamp from 'lodash/clamp';
+import { debounce } from 'quasar';
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
 
@@ -8,16 +10,25 @@ const GRID_SIZE = 100;
 const GAP_SIZE = 20;
 const MIN_COLS = 2;
 const MIN_ROWS = 2;
+const MAX_TICK_DELTA = 15;
 
 const zeroPos = (): XYPosition => ({ x: 0, y: 0 });
+
+const moveCodes: Record<string, XYPosition> = {
+  ArrowUp: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 },
+  ArrowLeft: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 },
+};
 
 @Component
 export default class GridItem extends Vue {
   resizing = false;
   moving = false;
+  keying = false;
 
   gridWidth = 0;
-  start: XYPosition = zeroPos();
+  touchStart: XYPosition = zeroPos();
   dragWidth = 0;
   dragHeight = 0;
   dragStartWidth = 0;
@@ -28,8 +39,10 @@ export default class GridItem extends Vue {
   currentCols: number | null = null;
   currentRows: number | null = null;
   current: XYPosition = zeroPos();
+  lastDelta: XYPosition = zeroPos();
 
   resizePos: XYPosition = zeroPos();
+  debouncedEmit = debounce(this.$emit, 500);
 
   @Ref()
   readonly container!: Vue;
@@ -67,8 +80,26 @@ export default class GridItem extends Vue {
     };
   }
 
-  startInteraction(e: MouseEvent | TouchEvent): void {
-    this.setMouseStartPosition(e);
+  updatePosition(pos: XYPosition | null): void {
+    // Set local cache to avoid jumps
+    this.$set(this.widget, 'pinnedPosition', pos);
+    this.debouncedEmit('position', this.id, pos);
+  }
+
+  updateSize(cols: number, rows: number): void {
+    // Set local cache to avoid jumps
+    this.$set(this.widget, 'cols', cols);
+    this.$set(this.widget, 'rows', rows);
+    this.debouncedEmit('size', this.id, cols, rows);
+  }
+
+  onInteractionStart(e: MouseEvent | TouchEvent): void {
+    const touch = (e instanceof MouseEvent) ? e : e.touches[0];
+
+    this.touchStart = {
+      x: touch.pageX,
+      y: touch.pageY,
+    };
 
     // set initial values of item
     const { width, height } = this.containerSize();
@@ -83,30 +114,17 @@ export default class GridItem extends Vue {
     this.dragStartHeight = height;
   }
 
-  stopInteraction(): void {
+  onInteractionEnd(): void {
+    this.touchStart = zeroPos();
+
     // reset values of item
     this.currentCols = null;
     this.currentRows = null;
 
+    this.lastDelta = zeroPos();
     this.current = zeroPos();
     this.dragStart = zeroPos();
     this.dragStartParent = zeroPos();
-  }
-
-  moveInteraction(e: MouseEvent | TouchEvent): void {
-    const delta = this.moveDelta(e);
-    this.current = this.gridPosition(delta);
-  }
-
-  updateSize(): void {
-    this.$emit('size',
-      this.id,
-      this.currentCols || this.widget.cols,
-      this.currentRows || this.widget.rows);
-  }
-
-  updatePosition(pos: XYPosition | null): void {
-    this.$emit('position', this.id, pos);
   }
 
   changeSize(): void {
@@ -122,20 +140,20 @@ export default class GridItem extends Vue {
     }
   }
 
-  setMouseStartPosition(e: MouseEvent | TouchEvent): void {
+  calcMoveDelta(e: MouseEvent | TouchEvent): XYPosition {
     const touch = (e instanceof MouseEvent) ? e : e.touches[0];
-    this.start = {
-      x: touch.pageX,
-      y: touch.pageY,
+    const { x, y } = this.lastDelta;
+    const raw = {
+      x: touch.pageX - this.touchStart.x,
+      y: touch.pageY - this.touchStart.y,
     };
-  }
-
-  moveDelta(e: MouseEvent | TouchEvent): XYPosition {
-    const touch = (e instanceof MouseEvent) ? e : e.touches[0];
-    return {
-      x: touch.pageX - this.start.x,
-      y: touch.pageY - this.start.y,
+    // Clamp to avoid instant screen jumps
+    const newDelta = {
+      x: clamp(raw.x, x - MAX_TICK_DELTA, x + MAX_TICK_DELTA),
+      y: clamp(raw.y, y - MAX_TICK_DELTA, y + MAX_TICK_DELTA),
     };
+    this.lastDelta = { ...newDelta };
+    return newDelta;
   }
 
   containerParentSize(): DOMRect {
@@ -146,7 +164,6 @@ export default class GridItem extends Vue {
     ) {
       return this.container.parentNode.getBoundingClientRect() as DOMRect;
     }
-
     throw new Error('Container parent is not a valid Element');
   }
 
@@ -159,7 +176,6 @@ export default class GridItem extends Vue {
     ) {
       return this.container.parentNode.firstChild.getBoundingClientRect() as DOMRect;
     }
-
     throw new Error('Container parent is not a valid Element');
   }
 
@@ -170,7 +186,7 @@ export default class GridItem extends Vue {
     throw new Error('Container is not a valid Element');
   }
 
-  gridPosition(delta: XYPosition = zeroPos()): XYPosition {
+  findDragGridPosition(delta: XYPosition = zeroPos()): XYPosition {
     if (!this.dragStart.x || !this.dragStart.y || !this.dragStartParent.x || !this.dragStartParent.y) {
       throw new Error('No starting drag positions known');
     }
@@ -185,74 +201,7 @@ export default class GridItem extends Vue {
     };
   }
 
-  startDrag(e: MouseEvent | TouchEvent): void {
-    this.moving = true;
-    this.startInteraction(e);
-
-    const rects = this.containerSize();
-    const firstChildRects = this.containerFirstChildSize();
-
-    this.dragStart = { x: rects.x, y: rects.y };
-    this.dragStartParent = { x: firstChildRects.x, y: firstChildRects.y };
-
-    this.current = this.gridPosition();
-  }
-
-  stopDrag(): void {
-    this.moving = false;
-    this.updatePosition({ ...this.current });
-    this.stopInteraction();
-  }
-
-  resizePanHandler(args: PanArguments): void {
-    if (args.isFirst) {
-      this.startResize(args.evt);
-      return;
-    }
-
-    if (args.isFinal) {
-      this.stopResize();
-      return;
-    }
-
-    this.onResizeMove(args.evt);
-  }
-
-  startResize(e: MouseEvent | TouchEvent): void {
-    this.resizePos = this.findPos();
-    this.resizing = true;
-    this.startInteraction(e);
-  }
-
-  onResizeMove(e: MouseEvent | TouchEvent): void {
-    const delta = this.moveDelta(e);
-    this.dragWidth = this.dragStartWidth + delta.x;
-    this.dragHeight = this.dragStartHeight + delta.y;
-    this.changeSize();
-  }
-
-  stopResize(): void {
-    this.resizePos = zeroPos();
-    this.resizing = false;
-    this.updateSize();
-    this.stopInteraction();
-  }
-
-  movePanHandler(args: PanArguments): void {
-    if (args.isFirst) {
-      this.startDrag(args.evt);
-      return;
-    }
-
-    if (args.isFinal) {
-      this.stopDrag();
-      return;
-    }
-
-    this.moveInteraction(args.evt);
-  }
-
-  findPos(): XYPosition {
+  findAutomaticGridPosition(): XYPosition {
     const rects = this.containerSize();
     const firstChildRects = this.containerFirstChildSize();
 
@@ -268,18 +217,129 @@ export default class GridItem extends Vue {
     };
   }
 
+  onDragStart(e: MouseEvent | TouchEvent): void {
+    this.moving = true;
+    this.onInteractionStart(e);
+
+    const rects = this.containerSize();
+    const firstChildRects = this.containerFirstChildSize();
+
+    this.dragStart = { x: rects.x, y: rects.y };
+    this.dragStartParent = { x: firstChildRects.x, y: firstChildRects.y };
+
+    this.current = this.findDragGridPosition();
+  }
+
+  onDragStop(): void {
+    this.moving = false;
+    this.updatePosition({ ...this.current });
+    this.onInteractionEnd();
+  }
+
+  onDragMove(e: MouseEvent | TouchEvent): void {
+    const delta = this.calcMoveDelta(e);
+    this.current = this.findDragGridPosition(delta);
+  }
+
+  movePanHandler(args: PanArguments): void {
+    if (args.isFirst) {
+      this.onDragStart(args.evt);
+    }
+    else if (args.isFinal) {
+      this.onDragStop();
+    }
+    else {
+      this.onDragMove(args.evt);
+    }
+  }
+
+  onResizeStart(e: MouseEvent | TouchEvent): void {
+    this.resizePos = this.findAutomaticGridPosition();
+    this.resizing = true;
+    this.onInteractionStart(e);
+  }
+
+  onResizeStop(): void {
+    this.resizePos = zeroPos();
+    this.resizing = false;
+    const cols = this.currentCols || this.widget.cols;
+    const rows = this.currentRows || this.widget.rows;
+    this.updateSize(cols, rows);
+    this.onInteractionEnd();
+  }
+
+  onResizeMove(e: MouseEvent | TouchEvent): void {
+    const delta = this.calcMoveDelta(e);
+    this.dragWidth = this.dragStartWidth + delta.x;
+    this.dragHeight = this.dragStartHeight + delta.y;
+    this.changeSize();
+  }
+
+  resizePanHandler(args: PanArguments): void {
+    if (args.isFirst) {
+      this.onResizeStart(args.evt);
+    }
+    else if (args.isFinal) {
+      this.onResizeStop();
+    }
+    else {
+      this.onResizeMove(args.evt);
+    }
+  }
+
   unpin(): void {
     this.updatePosition(null);
   }
 
   pin(): void {
-    this.updatePosition(this.findPos());
+    const pos = this.current.x > 0
+      ? this.current
+      : this.findAutomaticGridPosition();
+    this.updatePosition(pos);
+  }
+
+  keydown(evt: KeyboardEvent): void {
+    if (!this.editable || this.moving) {
+      return;
+    }
+    if (evt.key === 'Enter') {
+      this.applyKeyMove();
+      return;
+    }
+
+    const delta = moveCodes[evt.key];
+    if (delta) {
+      this.keying = true;
+      evt.stopPropagation();
+      evt.preventDefault();
+
+      if (this.current.x === 0) {
+        this.current = this.widget.pinnedPosition ?? this.findAutomaticGridPosition();
+      }
+
+      this.current.x += delta.x;
+      this.current.y += delta.y;
+    }
+  }
+
+  applyKeyMove(): void {
+    if (this.keying) {
+      this.keying = false;
+      this.updatePosition({ ...this.current });
+      this.current = zeroPos();
+    }
   }
 }
 </script>
 
 <template>
-  <div ref="container" :style="style" class="grid-item">
+  <div
+    ref="container"
+    :style="style"
+    class="grid-item"
+    @keydown="keydown"
+    @focusout="applyKeyMove"
+  >
     <!-- Actual item -->
     <slot />
     <!-- Drag effects -->
@@ -290,7 +350,11 @@ export default class GridItem extends Vue {
       class="grid-item-drag-overlay"
     />
     <!-- Item resize button -->
-    <button v-if="editable" v-touch-pan.mouse="resizePanHandler" class="grid-item-resize-handle">
+    <button
+      v-if="editable"
+      v-touch-pan.mouse="resizePanHandler"
+      class="grid-item-resize-handle"
+    >
       <q-icon name="mdi-resize-bottom-right" size="30px" />
     </button>
     <!-- Item drag button -->
@@ -309,6 +373,7 @@ export default class GridItem extends Vue {
           :label="widget.pinnedPosition ? 'Pinned' : 'Pin position'"
           :unelevated="!!widget.pinnedPosition"
           :outline="!widget.pinnedPosition"
+          :disable="keying"
           rounded
           color="secondary"
           @click="widget.pinnedPosition ? unpin() : pin()"

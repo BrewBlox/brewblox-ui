@@ -2,12 +2,11 @@
 import { Component } from 'vue-property-decorator';
 
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { MutexBlock, MutexedConstraint } from '@/plugins/spark/types';
-import { Unit } from '@/plugins/spark/units';
+import { MutexBlock, MutexedConstraint, Quantity } from '@/plugins/spark/types';
 
 interface MutexClient {
   id: string;
-  remaining: Unit;
+  remaining: Quantity;
   limited: boolean;
   hasLock: boolean;
 }
@@ -49,7 +48,7 @@ export default class MutexBasic
         class="col-grow"
       >
         <div
-          v-for="{id, remaining, limited, hasLock} in mutexClients"
+          v-for="{id, limited, hasLock} in mutexClients"
           :key="id"
           :class="[
             'q-px-sm q-py-xs',
@@ -66,7 +65,7 @@ export default class MutexBasic
         label="Lock time remaining"
         class="col-grow"
       >
-        {{ block.data.waitRemaining }}
+        {{ block.data.waitRemaining | duration }}
       </LabeledField>
     </div>
   </div>

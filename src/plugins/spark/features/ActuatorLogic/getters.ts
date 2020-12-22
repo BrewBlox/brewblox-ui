@@ -1,4 +1,4 @@
-import { AnalogCompareOp, DigitalCompareOp, DigitalState, EvalResult } from '@/plugins/spark/types';
+import { AnalogCompareOp, DigitalCompareOp, DigitalState, LogicResult } from '@/plugins/spark/types';
 
 export const characterTitles = {
   '(': 'Sub-expression start',
@@ -10,45 +10,45 @@ export const characterTitles = {
 };
 
 export const digitalStateTitles: Record<DigitalState, string> = {
-  'Active': 'ON',
-  'Inactive': 'OFF',
-  'Unknown': 'UNKNOWN',
+  [DigitalState.STATE_ACTIVE]: 'ON',
+  [DigitalState.STATE_INACTIVE]: 'OFF',
+  [DigitalState.STATE_UNKNOWN]: 'UNKNOWN',
 };
 
 export const digitalOpTitles: Record<DigitalCompareOp, string> = {
-  'VALUE_IS': 'Measured state ==',
-  'VALUE_ISNOT': 'Measured state !=',
-  'DESIRED_IS': 'Desired state ==',
-  'DESIRED_ISNOT': 'Desired state !=',
+  [DigitalCompareOp.OP_VALUE_IS]: 'Measured state ==',
+  [DigitalCompareOp.OP_VALUE_IS_NOT]: 'Measured state !=',
+  [DigitalCompareOp.OP_DESIRED_IS]: 'Desired state ==',
+  [DigitalCompareOp.OP_DESIRED_IS_NOT]: 'Desired state !=',
 };
 
 export const analogOpTitles: Record<AnalogCompareOp, string> = {
-  'VALUE_LE': 'Measured value <=',
-  'VALUE_GE': 'Measured value >=',
-  'SETTING_LE': 'Setting <=',
-  'SETTING_GE': 'Setting >=',
+  [AnalogCompareOp.OP_VALUE_LE]: 'Measured value <=',
+  [AnalogCompareOp.OP_VALUE_GE]: 'Measured value >=',
+  [AnalogCompareOp.OP_SETTING_LE]: 'Setting <=',
+  [AnalogCompareOp.OP_SETTING_GE]: 'Setting >=',
 };
 
-export const evalResultTitles: Record<EvalResult, string> = {
-  'FALSE': 'Result is OFF',
-  'TRUE': 'Result is ON',
-  'EMPTY': 'Expression empty: result is OFF',
-  'EMPTY_SUBSTRING': 'Empty sub-expression',
-  'INVALID_DIGITAL_OP': 'Invalid operator',
-  'INVALID_ANALOG_OP': 'Invalid operator',
-  'BLOCK_NOT_FOUND': 'Block not found',
-  'INVALID_ANA_COMPARE_IDX': 'Invalid analog comparison',
-  'INVALID_DIG_COMPARE_IDX': 'Invalid digital comparison',
-  'UNEXPECTED_CLOSING_BRACKET': 'Unexpected closing bracket',
-  'MISSING_CLOSING_BRACKET': 'Missing closing bracket',
-  'UNEXPECTED_OPENING_BRACKET': 'Unexpected opening bracket',
-  'UNEXPECTED_CHARACTER': 'Unexpected character',
-  'UNEXPECTED_COMPARISON': 'Unexpected comparison',
-  'UNEXPECTED_OPERATOR': 'Unexpected operator',
+export const logicResultTitles: Record<LogicResult, string> = {
+  [LogicResult.RESULT_FALSE]: 'Result is OFF',
+  [LogicResult.RESULT_TRUE]: 'Result is ON',
+  [LogicResult.RESULT_EMPTY]: 'Expression empty: result is OFF',
+  [LogicResult.RESULT_EMPTY_SUBSTRING]: 'Empty sub-expression',
+  [LogicResult.RESULT_BLOCK_NOT_FOUND]: 'Block not found',
+  [LogicResult.RESULT_INVALID_DIGITAL_OP]: 'Invalid operator',
+  [LogicResult.RESULT_INVALID_ANALOG_OP]: 'Invalid operator',
+  [LogicResult.RESULT_UNDEFINED_ANALOG_COMPARE]: 'Invalid analog comparison',
+  [LogicResult.RESULT_UNDEFINED_DIGITAL_COMPARE]: 'Invalid digital comparison',
+  [LogicResult.RESULT_UNEXPECTED_OPEN_BRACKET]: 'Unexpected opening bracket',
+  [LogicResult.RESULT_UNEXPECTED_CLOSE_BRACKET]: 'Unexpected closing bracket',
+  [LogicResult.RESULT_UNEXPECTED_CHARACTER]: 'Unexpected character',
+  [LogicResult.RESULT_UNEXPECTED_COMPARISON]: 'Unexpected comparison',
+  [LogicResult.RESULT_UNEXPECTED_OPERATOR]: 'Unexpected operator',
+  [LogicResult.RESULT_MISSING_CLOSE_BRACKET]: 'Missing closing bracket',
 };
 
-export const nonErrorResults: EvalResult[] = [
-  EvalResult.EMPTY,
-  EvalResult.FALSE,
-  EvalResult.TRUE,
+export const nonErrorResults: LogicResult[] = [
+  LogicResult.RESULT_EMPTY,
+  LogicResult.RESULT_FALSE,
+  LogicResult.RESULT_TRUE,
 ];

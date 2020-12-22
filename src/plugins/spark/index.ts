@@ -1,13 +1,15 @@
-import { uid } from 'quasar';
 import { VueConstructor } from 'vue';
 
-import { autoRegister } from '@/helpers/component-ref';
+import { autoRegister, ref } from '@/helpers/component-ref';
+import { STATE_TOPIC } from '@/helpers/const';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { serviceStore } from '@/store/services';
 
 import features from './features';
-import { sparkStatusEvent, sparkType } from './getters';
-import { installFilters } from './helpers';
+import { sparkType } from './getters';
+import { installFilters, isSparkState } from './helpers';
+import SparkPage from './service/SparkPage.vue';
+import SparkWatcher from './service/SparkWatcher.vue';
 import { sparkStore } from './store';
 import { BlockSpec } from './types';
 
@@ -27,8 +29,7 @@ export default {
   install(Vue: VueConstructor) {
     installFilters(Vue);
 
-    autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
-    autoRegister(require.context('./service', true, /[A-Z]\w+\.vue$/));
+    autoRegister(require.context('./components', true));
 
     deprecated.forEach(featureStore.registerWidget);
 
@@ -43,14 +44,14 @@ export default {
 
     featureStore.registerWatcher({
       id: 'SparkWatcher',
-      component: 'SparkWatcher',
+      component: ref(SparkWatcher),
       props: {},
     });
 
     featureStore.registerService({
       id: sparkType,
       title: 'Spark Service',
-      page: 'SparkPage',
+      page: ref(SparkPage),
       onStart: service => sparkStore.addService(service.id),
       onRemove: service => sparkStore.removeService(service.id),
       wizard: stub => ({
@@ -61,13 +62,13 @@ export default {
       }),
     });
 
-    Vue.$startup.onStart(() => sparkStore.start());
-    Vue.$startup.onStart(() => {
-      Vue.$eventbus.addListener({
-        id: uid(),
-        filter: (_, type) => type === sparkStatusEvent,
-        onmessage: msg => serviceStore.ensureStub({ id: msg.key, type: sparkType }),
-      });
+    Vue.$eventbus.subscribe(STATE_TOPIC + '/#');
+    Vue.$eventbus.addListener(STATE_TOPIC + '/#', (_, data) => {
+      if (isSparkState(data)) {
+        serviceStore.ensureStub({ id: data.key, type: sparkType });
+      }
     });
+
+    Vue.$startup.onStart(() => sparkStore.start());
   },
 };

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { select as d3Select } from 'd3-selection';
 import { graphlib, render as dagreRender } from 'dagre-d3';
+import isFinite from 'lodash/isFinite';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
@@ -9,7 +10,7 @@ import { Watch } from 'vue-property-decorator';
 import { createBlockDialog } from '@/helpers/dialog';
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
-
+const LONE_NODE_ROWS = 6;
 const LABEL_HEIGHT = 50;
 const LABEL_WIDTH = 150;
 const INVERTED = [
@@ -109,10 +110,11 @@ export default class RelationsDiagram extends Vue {
 
     if (!this.hideUnrelated) {
       const invisible = 'fill: transparent; stroke: none;';
-      const stackHeight = 6;
 
+      // Add an invisible edge between lone nodes to force vertical ordering
+      // Skip an edge every few nodes to create a new column
       this.loneNodes.forEach((node, idx) => {
-        if (idx % stackHeight === 0) { return; }
+        if (idx % LONE_NODE_ROWS === 0) { return; }
         obj.setEdge(this.loneNodes[idx - 1].id, node.id, {
           label: '',
           labelStyle: invisible,
@@ -124,6 +126,10 @@ export default class RelationsDiagram extends Vue {
 
     this.graphObj = obj;
     return true;
+  }
+
+  finite(v: number): number {
+    return isFinite(v) ? v : 0;
   }
 
   draw(): void {
@@ -140,12 +146,15 @@ export default class RelationsDiagram extends Vue {
     }
 
     const outGraph = this.graphObj.graph();
+    const finiteWidth = this.finite(outGraph.width);
+    const finiteHeight = this.finite(outGraph.height);
+
     this.svg.setAttribute('style', [
-      `min-width: ${outGraph.width}px;`,
-      `min-height: ${outGraph.height}px;`,
-    ].join(' '));
-    this.svg.setAttribute('height', outGraph.height);
-    this.svg.setAttribute('width', outGraph.width);
+      `min-width: ${finiteWidth}px`,
+      `min-height: ${finiteHeight}px`,
+    ].join('; '));
+    this.svg.setAttribute('width', `${finiteWidth}`);
+    this.svg.setAttribute('height', `${finiteHeight}`);
 
     this.$nextTick(() => {
       this.svg.querySelectorAll('foreignObject')

@@ -2,6 +2,7 @@
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
+import { prettyQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { analogConstraintLabels, digitalConstraintLabels } from '@/plugins/spark/getters';
 import { prettifyConstraints } from '@/plugins/spark/helpers';
@@ -49,7 +50,7 @@ export default class ConstraintsField extends FieldBase {
         .map(c => {
           const key = Object.keys(c).find(k => k !== 'remaining') ?? 'Unknown';
           const label = constraintLabels[key] ?? key;
-          return `${label} (${c.remaining})`;
+          return `${label} (${prettyQty(c.remaining)})`;
         });
     }
   }

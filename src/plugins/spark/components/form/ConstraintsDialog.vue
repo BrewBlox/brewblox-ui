@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/plugins/spark/parse-object';
+import { deepCopy } from '@/helpers/functional';
 import { AnalogConstraintsObj, DigitalConstraintsObj } from '@/plugins/spark/types';
 
 import AnalogConstraints from './AnalogConstraints.vue';
@@ -41,7 +41,7 @@ export default class ConstraintsDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

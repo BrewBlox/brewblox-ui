@@ -4,10 +4,10 @@ import { uid } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
-import { durationString } from '@/helpers/functional';
+import { durationString } from '@/helpers/duration';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { historyStore } from '@/plugins/history/store';
-import { DisplayNames, HistorySource, MetricsResult, QueryParams, QueryTarget } from '@/plugins/history/types';
+import { DisplayNames, MetricsResult, MetricsSource, QueryParams, QueryTarget } from '@/plugins/history/types';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './getters';
 import { MetricsConfig } from './types';
@@ -66,10 +66,10 @@ export default class MetricsBasic extends CrudComponent<MetricsConfig> {
     return this.widgetCfg.params;
   }
 
-  get sources(): HistorySource[] {
+  get sources(): MetricsSource[] {
     return this.targets
       .map(target => historyStore.sourceById(this.sourceId(target)))
-      .filter(source => source && source.values) as HistorySource[];
+      .filter((source): source is MetricsSource => source != null);
   }
 
   fieldFreshDuration(field: string): number {

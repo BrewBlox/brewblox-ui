@@ -2,9 +2,15 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { getNumDialogs } from '@/helpers/dialog';
+
 @Component
 export default class DialogToolbar extends Vue {
+  numDialogs = 1;
 
+  created(): void {
+    this.numDialogs = getNumDialogs();
+  }
 }
 </script>
 
@@ -18,7 +24,9 @@ export default class DialogToolbar extends Vue {
         flat
         round
         dense
-        icon="mdi-close-circle"
+        :icon="numDialogs > 1
+          ? 'mdi-arrow-left-circle'
+          : 'mdi-close-circle'"
         class="close-button"
         @click="$emit('close')"
       />

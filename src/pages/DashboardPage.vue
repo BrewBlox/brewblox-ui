@@ -78,25 +78,8 @@ export default class DashboardPage extends Vue {
       });
   }
 
-  async onChangePositions(id: string, pinnedPosition: XYPosition | null, order: string[]): Promise<void> {
-    try {
-      // Make a local change to the validated item, to avoid it jumping during the store round trip
-      const local = this.validatedWidgets.find(valItem => valItem.id === id);
-      if (local) {
-        local.crud.widget.pinnedPosition = pinnedPosition;
-      }
-      const widget = dashboardStore.widgetById(id);
-      if (widget) {
-        await dashboardStore.saveWidget({ ...widget, pinnedPosition });
-        await dashboardStore.updateWidgetOrder(order);
-      }
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  async onChangeSize(id: string, cols: number, rows: number): Promise<void> {
-    await dashboardStore.updateWidgetSize({ id, cols, rows });
+  async patchWidgets(updated: Patch<Widget>[]): Promise<void> {
+    await dashboardStore.patchWidgets(updated);
   }
 
   public async saveWidget(widget: Widget): Promise<void> {
@@ -133,10 +116,9 @@ export default class DashboardPage extends Vue {
 
   showWizard(): void {
     createDialog({
-      parent: this,
       component: 'WizardDialog',
-      dashboardId: this.dashboardId,
       initialWizard: 'WidgetWizardPicker',
+      activeDashboardId: this.dashboardId,
     });
   }
 }
@@ -165,7 +147,7 @@ export default class DashboardPage extends Vue {
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center">
+        <ActionMenu round class="self-center" label="Dashboard actions">
           <template #actions>
             <ActionItem icon="add" label="New Widget" @click="showWizard" />
             <q-item clickable @click="toggleDefaultDashboard">
@@ -196,8 +178,7 @@ export default class DashboardPage extends Vue {
       <GridContainer
         v-else
         :editable="widgetEditable"
-        @change-positions="onChangePositions"
-        @change-size="onChangeSize"
+        @patch:widgets="patchWidgets"
         @dblclick="showWizard"
       >
         <component

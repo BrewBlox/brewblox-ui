@@ -1,4 +1,4 @@
-import { blockTypes } from '@/plugins/spark/getters';
+import { BlockType } from '@/plugins/spark/types';
 
 import { showSettingsBlock } from '../helpers';
 import { PartSpec } from '../types';
@@ -18,7 +18,7 @@ const spec: PartSpec = {
       component: 'BlockAddressCard',
       props: {
         settingsKey,
-        compatible: [blockTypes.SetpointSensorPair],
+        compatible: [BlockType.SetpointSensorPair],
         label: 'Setpoint',
       },
     },

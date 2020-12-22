@@ -7,13 +7,13 @@ import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { withPrefix } from '../helpers';
 import { HermsBlockNames, HermsConfig } from './types';
 
 
 @Component
-export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
+export default class HermsNamingTask extends QuickStartTaskBase<HermsConfig> {
   chosenNames: Partial<HermsBlockNames> = {};
   idGenerator = new UrlSafeString();
 
@@ -147,24 +147,24 @@ export default class HermsNamingTask extends WizardTaskBase<HermsConfig> {
           The name for the new dashboard.
         </template>
       </QuickStartNameField>
+      <QuickStartNameField
+        v-model="dashboardId"
+        label="Unique dashboard ID"
+        :rules="dashboardIdRules"
+        @clear="clearKey('dashboardId')"
+      >
+        <template #help>
+          The unique identifier for your dashboard.
+          <br> By default, this is an URL-safe version of the dashboard title.
+        </template>
+      </QuickStartNameField>
       <QuickStartPrefixField
         v-model="prefix"
         @clear="clearKey('prefix')"
       />
 
       <!-- Block names -->
-      <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
-        <QuickStartNameField
-          v-model="dashboardId"
-          label="Dashboard ID"
-          :rules="dashboardIdRules"
-          @clear="clearKey('dashboardId')"
-        >
-          <template #help>
-            The unique identifier for your dashboard.
-            <br> By default, this is an URL-safe version of the dashboard title.
-          </template>
-        </QuickStartNameField>
+      <q-expansion-item label="Block names (click to expand)" icon="mdi-tag-multiple" dense>
         <QuickStartNameField
           v-for="(nVal, nKey) in names"
           :key="nKey"

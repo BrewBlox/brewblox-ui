@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 
 import { SQUARE_SIZE } from './getters';
@@ -51,6 +52,15 @@ export default class BuilderCatalog extends DialogBase {
   selectPart(display: PartDisplay): void {
     this.onDialogOk({ ...display.part, ...this.partial });
   }
+
+
+  showSearchKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.partFilter,
+    })
+      .onOk((v: string) => this.partFilter = v);
+  }
 }
 </script>
 
@@ -66,6 +76,7 @@ export default class BuilderCatalog extends DialogBase {
           <q-item-section>
             <q-input v-model="partFilter" placeholder="Search Parts" clearable autofocus>
               <template #append>
+                <KeyboardButton @click="showSearchKeyboard" />
                 <q-icon name="search" />
               </template>
             </q-input>

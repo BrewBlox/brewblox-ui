@@ -3,6 +3,7 @@ import Vue, { CreateElement, VNode } from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { WidgetProps } from '@/components/WidgetBase';
+import { Widget } from '@/store/dashboards';
 
 import GridItem from './GridItem.vue';
 
@@ -14,16 +15,21 @@ export default class GridContainer extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
 
-  updateItemPosition(id: string, pos: XYPosition | null): void {
-    const newItemsOrder = this.$children
+  updateItemPosition(updatedId: string, pos: XYPosition | null): void {
+    const updated: Partial<Widget>[] = this.$children
       .map(item => [item, item.$el.getBoundingClientRect()] as [GridItem, DOMRect])
       .sort(([, rectA], [, rectB]) => (rectA.y - rectB.y) || (rectA.x - rectB.x))
-      .map(([item]) => item.id);
-    this.$emit('change-positions', id, pos, newItemsOrder);
+      .map(([{ id }], idx) =>
+        id === updatedId
+          ? { id, order: idx + 1, pinnedPosition: pos }
+          : { id, order: idx + 1 }
+      );
+    this.$emit('patch:widgets', updated);
   }
 
   updateItemSize(id: string, cols: number, rows: number): void {
-    this.$emit('change-size', id, cols, rows);
+    const updated: Partial<Widget>[] = [{ id, cols, rows }];
+    this.$emit('patch:widgets', updated);
   }
 
   slotProps(slot: VNode): WidgetProps {
@@ -67,6 +73,7 @@ export default class GridContainer extends Vue {
     return h('div',
       {
         class: 'grid-container grid-main-container',
+        style: { minHeight: this.editable ? '3000px' : '0' },
         on: {
           dblclick: evt => {
             if (evt.target === evt.currentTarget) {
@@ -95,8 +102,6 @@ export default class GridContainer extends Vue {
   grid-auto-columns: 100px;
   grid-auto-rows: 100px;
   justify-content: center;
-  padding-bottom: 50%;
-  min-height: 100%;
 }
 
 .grid-container-overlay {

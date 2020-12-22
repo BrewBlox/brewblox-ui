@@ -1,108 +1,89 @@
-import cloneDeep from 'lodash/cloneDeep';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
+import mapValues from 'lodash/mapValues';
 
+import {
+  BlockOrIntfType,
+  isBloxField,
+  isJSBloxField,
+  Link,
+  Quantity,
+  rawLink,
+  rawQty,
+} from '@/helpers/bloxfield';
 import { mapEntries } from '@/helpers/functional';
 
-import { BlockType } from './types';
-import { Link, PostFixed, Unit } from './units';
 
-// "not brackets",
-// then a left bracket,
-// then more "not brackets, not comma",
-// then optional comma + "not brackets"
-// then right bracket
-const unitExp = /^([^[<]+)([[<])([^\]>,]*),?([^\]>]*)[\]>]$/;
+// string start
+// then any characters (captured)
+// then a left bracket (captured)
+// then any characters (captured)
+// then a right bracket
+// string end
+// Example values:
+//   'field<SetpointSensorPair,driven>'
+//   'field2[degC]'
+//   'field_underscored[1 / degC]'
+const postfixExpr = /^(.*)([\[<])(.*)[\]>]$/;
 
 export function propertyNameWithoutUnit(name: string): string {
-  const matched = name.match(unitExp);
+  const matched = name.match(postfixExpr);
   return matched ? matched[1] : name;
 }
 
 export function propertyNameWithUnit(name: string): [string, string | null] {
-  const matched = name.match(unitExp);
-  return matched ? [matched[1], matched[3]] : [name, null];
-}
-
-export function objectUnit(val: any): string | null {
-  return (val instanceof Unit)
-    ? val.notation
-    : null;
-}
-
-export function isPostFixed(obj: any): obj is PostFixed {
-  return obj != null && isObject(obj) && 'toSerialized' in obj;
-}
-
-export function serializedPropertyName(key: string, obj: any): string {
-  const val = obj[key];
-  return isPostFixed(val)
-    ? val.toSerialized(key)[0]
-    : key;
-}
-
-export function postfixedDisplayNames(displayNames: Mapped<string>, obj: any): Mapped<string> {
-  const retv: Mapped<string> = {};
-
-  for (const key in displayNames) {
-    const serializedKey = serializedPropertyName(key, obj);
-    const unit = objectUnit(obj[key]);
-    const name = displayNames[key];
-    retv[serializedKey] = unit ? `${name} [${unit}]` : name;
+  const matched = name.match(postfixExpr);
+  if (!matched) {
+    return [name, null];
   }
-  return retv;
+  const baseName = matched[1];
+  const unit = matched[3].split(',')[0];
+  return [baseName, unit];
 }
 
-export function parsePostfixed(key: string, val: any): [string, PostFixed] | null {
-  const matched = key.match(unitExp);
-  if (matched) {
-    const [, name, leftBracket, bracketed, driven] = matched;
-    try {
-      if (leftBracket === '<') {
-        return [name, new Link(val, bracketed as BlockType, !!driven)];
+export function parsePostfixed(key: string, val: any): [string, Quantity | Link] | null {
+  try {
+    if (key.endsWith(']') || key.endsWith('>')) {
+      const matched = key.match(postfixExpr);
+      if (matched) {
+        const [, name, leftBracket, bracketed] = matched;
+        if (leftBracket === '<') {
+          const [type, driven] = bracketed.split(',');
+          return [name, rawLink(val, type as BlockOrIntfType, !!driven)];
+        }
+        else if (leftBracket === '[') {
+          return [name, rawQty(val, bracketed)];
+        }
       }
-      else if (leftBracket === '[') {
-        return [name, new Unit(val, bracketed)];
-      }
-    } catch (e) { }
+    }
   }
+  catch (e) { }
   return null;
 }
 
 export function deserialize(obj: any): typeof obj {
-  if (obj === undefined || obj === null) {
-    return obj;
-  }
   if (isArray(obj)) {
     return obj.map(deserialize);
   }
+  if (isBloxField(obj)) {
+    return obj;
+  }
   if (isObject(obj)) {
-    return isPostFixed(obj)
-      ? obj
-      : mapEntries(obj, ([key, val]) =>
-        parsePostfixed(key, val) ?? [key, deserialize(val)]);
+    return mapEntries(obj,
+      ([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]);
   }
   return obj;
 }
 
 export function serialize(obj: any): typeof obj {
-  if (obj === undefined || obj === null) {
-    return obj;
-  }
   if (isArray(obj)) {
     return obj.map(serialize);
   }
+  if (isJSBloxField(obj)) {
+    return obj.toJSON();
+  }
   if (isObject(obj)) {
-    return mapEntries(obj, ([key, val]) =>
-      isPostFixed(val)
-        ? val.toSerialized(key)
-        : [key, serialize(val)]);
+    return mapValues(obj, serialize);
   }
   return obj;
-}
-
-export function deepCopy<T>(obj: T): T {
-  return obj
-    ? cloneDeep(obj)
-    : obj;
 }

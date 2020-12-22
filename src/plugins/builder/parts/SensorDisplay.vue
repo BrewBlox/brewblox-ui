@@ -1,6 +1,8 @@
 <script lang="ts">
+import { mdiThermometer } from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
+import { prettyUnit } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import { TempSensorMockBlock, TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -12,8 +14,13 @@ import { settingsAddress } from '../helpers';
 
 @Component
 export default class SensorDisplay extends PartBase {
+  icons: Mapped<string> = {};
   readonly addressKey = 'sensor';
   readonly scaleKey = 'scale';
+
+  created(): void {
+    this.icons.mdiThermometer = mdiThermometer;
+  }
 
   get scale(): number {
     return this.settings[this.scaleKey] ?? 1;
@@ -38,7 +45,7 @@ export default class SensorDisplay extends PartBase {
   }
 
   get tempUnit(): string {
-    return this.block?.data.value?.notation ?? '';
+    return prettyUnit(this.block?.data.value);
   }
 
   get color(): string {
@@ -59,7 +66,11 @@ export default class SensorDisplay extends PartBase {
       <UnlinkedIcon v-else-if="!block" class="col" />
       <template v-else>
         <div class="col row q-pt-xs">
-          <q-icon name="mdi-thermometer" class="static" size="20px" />
+          <q-icon
+            :name="icons.mdiThermometer"
+            class="static"
+            size="20px"
+          />
           <small>{{ tempUnit }}</small>
         </div>
         <div class="col text-bold text-center">

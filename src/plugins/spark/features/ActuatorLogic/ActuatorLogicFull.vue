@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isCompatible } from '@/plugins/spark/helpers';
@@ -9,18 +10,16 @@ import {
   AnalogCompare,
   AnalogCompareOp,
   Block,
-  BlockInterfaceType,
+  BlockIntfType,
   DigitalCompare,
   DigitalCompareOp,
   DigitalState,
-  EvalResult,
-  ExpressionError,
+  LogicResult,
 } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
-import { characterTitles, evalResultTitles, nonErrorResults } from './getters';
+import { characterTitles, logicResultTitles, nonErrorResults } from './getters';
 import {
   analogIdx,
   analogKey,
@@ -32,10 +31,11 @@ import {
   shiftRemainingComparisons,
   syntaxCheck,
 } from './helpers';
+import { ExpressionError } from './types';
 
-const validTypes: BlockInterfaceType[] = [
-  'ActuatorDigitalInterface',
-  'ProcessValueInterface',
+const validTypes: BlockIntfType[] = [
+  BlockIntfType.ActuatorDigitalInterface,
+  BlockIntfType.ProcessValueInterface,
 ];
 
 @Component({
@@ -120,7 +120,7 @@ export default class ActuatorLogicFull
       ? null
       : {
         index,
-        message: evalResultTitles[result],
+        message: logicResultTitles[result],
         indicator: '-'.repeat(index) + '^',
       };
   }
@@ -138,20 +138,20 @@ export default class ActuatorLogicFull
   }
 
   addComparison(block: Block): void {
-    if (isCompatible(block.type, 'ActuatorDigitalInterface')) {
+    if (isCompatible(block.type, BlockIntfType.ActuatorDigitalInterface)) {
       this.block.data.digital.push({
-        op: DigitalCompareOp.VALUE_IS,
-        id: new Link(block.id, block.type),
-        rhs: DigitalState.Active,
-        result: EvalResult.EMPTY,
+        op: DigitalCompareOp.OP_VALUE_IS,
+        id: bloxLink(block.id, block.type),
+        rhs: DigitalState.STATE_ACTIVE,
+        result: LogicResult.RESULT_EMPTY,
       });
     }
-    else if (isCompatible(block.type, 'ProcessValueInterface')) {
+    else if (isCompatible(block.type, BlockIntfType.ProcessValueInterface)) {
       this.block.data.analog.push({
-        op: AnalogCompareOp.VALUE_GE,
-        id: new Link(block.id, block.type),
+        op: AnalogCompareOp.OP_VALUE_GE,
+        id: bloxLink(block.id, block.type),
         rhs: 25,
-        result: EvalResult.EMPTY,
+        result: LogicResult.RESULT_EMPTY,
       });
     }
     this.saveBlock();
@@ -199,13 +199,7 @@ export default class ActuatorLogicFull
 
 <template>
   <div class="widget-md">
-    <slot name="warnings">
-      <BlockEnableToggle
-        :crud="crud"
-        :text-enabled="`Block is enabled: ${block.data.targetId} will be set.`"
-        :text-disabled="`Block is disabled: ${block.data.targetId} will not be set.`"
-      />
-    </slot>
+    <slot name="warnings" />
 
     <div class="widget-body">
       <q-input
@@ -367,8 +361,8 @@ export default class ActuatorLogicFull
       <LinkField
         :value="block.data.targetId"
         :service-id="serviceId"
-        title="target"
-        label="Digital Actuator Target"
+        title="Digital Actuator target"
+        label="Digital Actuator target"
         @input="v => { block.data.targetId = v; saveBlock(); }"
       />
     </div>

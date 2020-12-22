@@ -11,10 +11,10 @@ import { PinChannel } from '../types';
 @Component
 export default class QuickStartPinField extends Vue {
   readonly validTypes: BlockType[] = [
-    'Spark2Pins',
-    'Spark3Pins',
-    'MockPins',
-    'DS2413',
+    BlockType.Spark2Pins,
+    BlockType.Spark3Pins,
+    BlockType.MockPins,
+    BlockType.DS2413,
   ];
 
   @Prop({ type: Object, required: false })

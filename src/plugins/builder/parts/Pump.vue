@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component, Watch } from 'vue-property-decorator';
 
-import { ActuatorPwmBlock, DigitalActuatorBlock } from '@/plugins/spark/types';
+import { ActuatorPwmBlock, BlockType, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
 
 import PartBase from '../components/PartBase';
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '../getters';
@@ -27,10 +27,10 @@ export default class Pump extends PartBase {
         ? false
         : Boolean(this.settings.enabled);
     }
-    else if (this.block.type === 'DigitalActuator') {
-      return this.block.data.state === 'Active';
+    else if (this.block.type === BlockType.DigitalActuator) {
+      return this.block.data.state === DigitalState.STATE_ACTIVE;
     }
-    else if (this.block.type === 'ActuatorPwm') {
+    else if (this.block.type === BlockType.ActuatorPwm) {
       return this.block.data.setting > 0;
     }
     else {
@@ -43,7 +43,7 @@ export default class Pump extends PartBase {
   }
 
   get pwmSetting(): number {
-    return this.block?.type == 'ActuatorPwm'
+    return this.block?.type == BlockType.ActuatorPwm
       ? this.block.data.setting
       : 100;
   }

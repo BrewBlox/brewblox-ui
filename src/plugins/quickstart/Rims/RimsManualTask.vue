@@ -1,18 +1,20 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import router from '@/router';
+
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { RimsConfig } from './types';
 
 
 @Component
-export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
+export default class RimsManualTask extends QuickStartTaskBase<RimsConfig> {
   mounted(): void {
     this.executePrepared();
   }
 
   done(): void {
-    this.$router.push(`/dashboard/${this.config.dashboardId}`);
+    router.push(`/dashboard/${this.config.dashboardId}`);
     this.finish();
   }
 }
@@ -29,14 +31,6 @@ export default class RimsManualTask extends WizardTaskBase<RimsConfig> {
           <p>
             While the wizard is configuring the Spark and your new dashboard,
             here is a quick explanation of what we set up.
-            <!-- <span>
-              Visit our
-              <a
-                href="https://brewblox.netlify.com/user/rims_guide.html"
-                target="_blank"
-                style="color: white"
-              >documentation page</a> for a more in-depth guide.
-            </span> -->
           </p>
           <p>
             On the controller we created two PIDs to dynamically control the tube heater element.

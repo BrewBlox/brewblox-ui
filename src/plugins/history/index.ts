@@ -10,7 +10,7 @@ import { historyStore } from './store';
 
 export default {
   install(Vue: VueConstructor) {
-    autoRegister(require.context('./components', true, /[A-Z]\w+\.vue$/));
+    autoRegister(require.context('./components', true));
 
     featureStore.registerWidget(Graph);
     featureStore.registerWidget(Metrics);

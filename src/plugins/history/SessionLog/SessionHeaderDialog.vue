@@ -27,7 +27,7 @@ export default class SessionHeaderDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
@@ -40,13 +40,13 @@ export default class SessionHeaderDialog extends DialogBase {
         item-aligned
       />
       <DatetimeField
-        :value="session.date"
+        v-model="session.date"
         label="Session date"
         title="Session date"
+        emit-number
         default-now
         dense
         item-aligned
-        @input="v => session.date = v.getTime()"
       />
       <TagSelectField
         v-model="session.tags"

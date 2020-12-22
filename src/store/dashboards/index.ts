@@ -1,6 +1,6 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById } from '@/helpers/functional';
+import { extendById, filterById, findById, patchedById } from '@/helpers/functional';
 import store from '@/store';
 
 import { dashboardApi, widgetApi } from './api';
@@ -111,21 +111,11 @@ export class DashboardModule extends VuexModule {
   }
 
   @Action
-  public async updateWidgetOrder(widgetIds: string[]): Promise<void> {
-    await Promise.all(
-      widgetIds
-        .map(id => this.widgetById(id))
-        .filter(v => v !== null)
-        .map((widget, idx) => this.saveWidget({ ...widget!, order: idx + 1 }))
-    );
-  }
-
-  @Action
-  public async updateWidgetSize({ id, cols, rows }: Pick<Widget, 'id' | 'cols' | 'rows'>): Promise<void> {
-    const widget = this.widgetById(id);
-    if (widget) {
-      await this.saveWidget({ ...widget, cols, rows });
-    }
+  public async patchWidgets(updated: Patch<Widget>[]): Promise<void> {
+    const applied = updated
+      .map(change => patchedById(this.widgets, change))
+      .filter((v): v is Widget => v !== null);
+    await Promise.all(applied.map(v => this.saveWidget(v)));
   }
 
   @Action
@@ -144,20 +134,14 @@ export class DashboardModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onDashboardChange = (dashboard: Dashboard): void => {
-      const existing = this.dashboardById(dashboard.id);
-      if (!existing || existing._rev !== dashboard._rev) {
-        this.dashboards = extendById(this.dashboards, dashboard);
-      }
+      this.dashboards = extendById(this.dashboards, dashboard);
     };
     const onDashboardDelete = (id: string): void => {
       this.dashboards = filterById(this.dashboards, { id });
     };
 
     const onWidgetChange = (widget: Widget): void => {
-      const existing = this.widgetById(widget.id);
-      if (!existing || existing._rev !== widget._rev) {
-        this.widgets = extendById(this.widgets, widget);
-      }
+      this.widgets = extendById(this.widgets, widget);
     };
     const onWidgetDelete = (id: string): void => {
       this.widgets = filterById(this.widgets, { id });

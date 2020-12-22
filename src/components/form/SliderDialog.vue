@@ -48,7 +48,7 @@ export default class SliderDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
@@ -56,9 +56,6 @@ export default class SliderDialog extends DialogBase {
       <q-item>
         <q-item-section class="q-pt-md">
           <q-slider v-model="local" :min="min" :max="max" label-always />
-          <q-item-label v-if="label" caption>
-            {{ label }}
-          </q-item-label>
         </q-item-section>
       </q-item>
       <q-item v-if="quickActions.length">

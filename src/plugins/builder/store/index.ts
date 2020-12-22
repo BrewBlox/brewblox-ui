@@ -65,12 +65,9 @@ export class BuilderModule extends VuexModule {
   }
 
   @Action
-  public async setup(): Promise<void> {
+  public async start(): Promise<void> {
     const onChange = async (layout: BuilderLayout): Promise<void> => {
-      const existing = this.layoutById(layout.id);
-      if (!existing || existing._rev !== layout._rev) {
-        this.layouts = extendById(this.layouts, layout);
-      }
+      this.layouts = extendById(this.layouts, layout);
     };
     const onDelete = (id: string): void => {
       this.layouts = filterById(this.layouts, { id });

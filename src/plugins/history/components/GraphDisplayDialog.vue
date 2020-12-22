@@ -2,7 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/plugins/spark/parse-object';
+import { deepCopy } from '@/helpers/functional';
 
 import { defaultLabel } from '../nodes';
 import { GraphConfig } from '../types';
@@ -56,6 +56,14 @@ export default class GraphDisplayDialog extends DialogBase {
     this.$set(this.local!.colors, this.field, val);
   }
 
+  get precision(): number {
+    return this.local!.precision[this.field] ?? 2;
+  }
+
+  set precision(val: number) {
+    this.$set(this.local!.precision, this.field, val);
+  }
+
   save(): void {
     this.onDialogOk(this.local);
   }
@@ -66,13 +74,25 @@ export default class GraphDisplayDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <div class="column q-gutter-xs">
-        <InputField v-model="rename" title="Label" label="Label" />
+        <InputField
+          v-model="rename"
+          title="Label"
+          label="Label"
+        />
+        <InputField
+          v-model="precision"
+          :decimals="0"
+          :rules="[v => v >= 0 || 'Must be 0 or more']"
+          type="number"
+          title="Decimals in label"
+          label="Decimals in label"
+        />
         <ColorField
           v-model="color"
           title="Line color"

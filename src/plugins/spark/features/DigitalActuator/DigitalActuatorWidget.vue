@@ -3,8 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import { mutate, typeMatchFilter } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { Block, DigitalActuatorBlock } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { Block, BlockType, DigitalActuatorBlock, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
 
 @Component
 export default class DigitalActuatorWidget
@@ -21,7 +20,7 @@ export default class DigitalActuatorWidget
     const targetId = this.hwBlock.id;
     return this.sparkModule
       .blocks
-      .filter(typeMatchFilter<DigitalActuatorBlock>('DigitalActuator'))
+      .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
       .filter(block => block.data.hwDevice.id === targetId)
       .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
   }
@@ -48,20 +47,28 @@ export default class DigitalActuatorWidget
     if (this.block.data.channel === pinId) {
       return;
     }
-    const currentDriver = new Link(this.claimedChannels[pinId] || null, 'DigitalActuator');
-    if (currentDriver.id) {
-      const currentDriverBlock = this.sparkModule.blockById<DigitalActuatorBlock>(currentDriver.id)!;
+    const currentDriverId = this.claimedChannels[pinId] ?? null;
+    if (currentDriverId) {
+      const currentDriverBlock = this.sparkModule.blockById<DigitalActuatorBlock>(currentDriverId)!;
       currentDriverBlock.data.channel = 0;
       await this.sparkModule.saveBlock(currentDriverBlock);
     }
     this.block.data.channel = pinId;
     await this.saveBlock();
   }
+
+  filterDS2408(block: Block): boolean {
+    return block.type !== BlockType.DS2408
+      || (block as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
+  }
 }
 </script>
 
 <template>
-  <GraphCardWrapper :show="inDialog" v-bind="{context}">
+  <GraphCardWrapper
+    :show="inDialog"
+    v-bind="{context}"
+  >
     <template #graph>
       <HistoryGraph
         :graph-id="widget.id"
@@ -108,6 +115,7 @@ export default class DigitalActuatorWidget
             :value="block.data.hwDevice"
             :service-id="serviceId"
             :creatable="false"
+            :block-filter="filterDS2408"
             title="Pin Array"
             label="Target Pin Array"
             class="col-grow"

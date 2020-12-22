@@ -1,9 +1,10 @@
 <script lang="ts">
+import { Enum } from 'typescript-string-enums';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/plugins/spark/parse-object';
-import { DigitalCompare } from '@/plugins/spark/types';
+import { deepCopy } from '@/helpers/functional';
+import { DigitalCompare, DigitalCompareOp } from '@/plugins/spark/types';
 
 import { digitalOpTitles } from './getters';
 
@@ -23,8 +24,8 @@ export default class DigitalCompareEditDialog extends DialogBase {
   }
 
   get operatorOpts(): SelectOption[] {
-    return Object.entries(digitalOpTitles)
-      .map(([key, label]) => ({ label, value: Number(key) }));
+    return Enum.values(DigitalCompareOp)
+      .map(value => ({ value, label: digitalOpTitles[value] }));
   }
 
   save(): void {
@@ -36,7 +37,7 @@ export default class DigitalCompareEditDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

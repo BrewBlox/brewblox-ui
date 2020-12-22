@@ -4,8 +4,8 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { createDialog } from '@/helpers/dialog';
-import { filterById, spliceById } from '@/helpers/functional';
-import { deepCopy, deserialize, serialize } from '@/plugins/spark/parse-object';
+import { deepCopy, filterById, spliceById } from '@/helpers/functional';
+import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 
@@ -33,7 +33,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   }
 
   saveActions(actions: ChangeAction[] = this.actions): void {
-    this.config.actions = serialize(actions);
+    this.config.actions = actions;
     this.saveConfig();
   }
 
@@ -54,13 +54,10 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   renameAction(action: ChangeAction): void {
     const stepName = action.name;
     createDialog({
+      component: 'InputDialog',
       title: 'Change ChangeAction name',
       message: `Choose a new name for '${action.name}'`,
-      cancel: true,
-      prompt: {
-        model: stepName,
-        type: 'text',
-      },
+      value: stepName,
     })
       .onOk(newName => {
         if (newName !== stepName) {
@@ -92,7 +89,6 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
       anyService: true,
       clearable: false,
       blockFilter: block => !!sparkStore.spec(block)?.fields.some(f => !f.readonly),
-      parent: this,
     })
       .onOk((addr: BlockAddress) => {
         if (addr && addr.id && addr.serviceId) {
@@ -128,7 +124,6 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
     const currentBlock = sparkStore.blockById(serviceId, blockId);
     createDialog({
       component: 'BlockAddressDialog',
-      parent: this,
       title: `Switch target block '${blockId}'`,
       value: currentBlock,
       anyService: true,

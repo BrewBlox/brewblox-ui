@@ -4,8 +4,13 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { WidgetContext } from '@/store/features';
 
+import SparkWidget from './SparkWidget.vue';
 
-@Component
+@Component({
+  components: {
+    SparkWidget,
+  },
+})
 export default class SparkWidgetDialog extends DialogBase {
 
   @Prop({ type: String, required: true })
@@ -25,7 +30,7 @@ export default class SparkWidgetDialog extends DialogBase {
   <q-dialog
     ref="dialog"
     :maximized="$dense"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
   >
     <SparkWidget :service-id="serviceId" :context="context" />

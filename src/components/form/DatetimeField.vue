@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 import FieldBase from '@/components/FieldBase';
 import { createDialog } from '@/helpers/dialog';
@@ -26,9 +26,14 @@ export default class DatetimeField extends FieldBase {
   @Prop({ type: Boolean, default: false })
   public readonly defaultNow!: boolean;
 
-  @Emit('input')
-  public change(v: Date | null): Date | null {
-    return v;
+  @Prop({ type: Boolean, default: false })
+  public readonly emitNumber!: boolean;
+
+  public save(v: Date): void {
+    const result = this.emitNumber
+      ? v.getTime()
+      : v;
+    this.$emit('input', result);
   }
 
   get displayValue(): string {
@@ -44,7 +49,6 @@ export default class DatetimeField extends FieldBase {
 
     createDialog({
       component: 'DatetimeDialog',
-      parent: this,
       title: this.title,
       message: this.message,
       html: this.html,
@@ -53,7 +57,7 @@ export default class DatetimeField extends FieldBase {
       resetIcon: this.resetIcon,
       rules: this.rules,
     })
-      .onOk(this.change);
+      .onOk(v => this.save(v));
   }
 }
 </script>

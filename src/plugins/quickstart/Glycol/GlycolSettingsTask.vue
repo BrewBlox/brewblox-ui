@@ -1,24 +1,24 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxQty } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
-import { Temp } from '@/plugins/spark/units';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { GlycolConfig, GlycolOpts } from './types';
 
 @Component
-export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
-  beerSetting = new Temp(20, 'degC');
-  glycolSetting = new Temp(4, 'degC');
+export default class GlycolSettingsTask extends QuickStartTaskBase<GlycolConfig> {
+  beerSetting = bloxQty(20, 'degC');
+  glycolSetting = bloxQty(4, 'degC');
 
   created(): void {
     const { Temp } = sparkStore.moduleById(this.config.serviceId)!.units;
-    this.beerSetting = this.beerSetting.convert(Temp);
-    this.glycolSetting = this.glycolSetting.convert(Temp);
+    this.beerSetting = this.beerSetting.to(Temp);
+    this.glycolSetting = this.glycolSetting.to(Temp);
   }
 
   done(): void {
@@ -62,14 +62,14 @@ export default class GlycolSettingsTask extends WizardTaskBase<GlycolConfig> {
       </q-item>
       <q-item>
         <q-item-section>
-          <UnitField
+          <QuantityField
             v-model="beerSetting"
             title="Beer setting"
             label="Beer setpoint"
           />
         </q-item-section>
         <q-item-section>
-          <UnitField
+          <QuantityField
             v-if="config.glycolControl==='Control'"
             v-model="glycolSetting"
             title="Glycol setting"

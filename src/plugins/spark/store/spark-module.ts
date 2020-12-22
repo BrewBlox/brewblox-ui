@@ -2,31 +2,39 @@ import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
 
-import { extendById, filterById, typeMatchFilter } from '@/helpers/functional';
-import { EventbusMessage } from '@/plugins/eventbus';
+import { STATE_TOPIC } from '@/helpers/const';
+import { extendById, typeMatchFilter } from '@/helpers/functional';
 import { deserialize } from '@/plugins/spark/parse-object';
 import type {
-  ApiSparkStatus,
   Block,
   BlockAddress,
-  DataBlock,
+  BlockFieldAddress,
   Limiters,
+  Link,
   RelationEdge,
   SparkExported,
   SparkService,
   SparkStatus,
   UserUnits,
 } from '@/plugins/spark/types';
+import { SparkPatchEvent, SparkStateEvent } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
-import { sparkBlocksEvent, sparkStatusEvent } from '../getters';
-import { asBlock } from '../helpers';
 import * as api from './api';
-import { asServiceStatus, calculateDrivenChains, calculateLimiters, calculateRelations } from './helpers';
+import {
+  asServiceStatus,
+  asSparkStatus,
+  calculateDrivenChains,
+  calculateLimiters,
+  calculateRelations,
+} from './helpers';
 
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {
+  private patchListenerId: string = '';
+  private stateListenerId: string = '';
+
   public readonly id: string; // serviceId
 
   public blocks: Block[] = [];
@@ -77,6 +85,18 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Mutation
+  public patchBlocks({ changed, deleted }: SparkPatchEvent['data']): void {
+    const affected = [
+      ...changed.map(block => block.id),
+      ...deleted,
+    ];
+    this.blocks = [
+      ...this.blocks.filter(v => !affected.includes(v.id)),
+      ...changed,
+    ];
+  }
+
+  @Mutation
   public updateStatus(status: SparkStatus): void {
     this.status = status;
     this.lastStatus = new Date();
@@ -98,6 +118,17 @@ export class SparkServiceModule extends VuexModule {
     return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
   }
 
+  public blockByLink<T extends Block>(link: Link | null): T | null {
+    if (!link || !link.id) { return null; };
+    return this.blockById<T>(link.id);
+  }
+
+  public fieldByAddress(addr: BlockFieldAddress | null): any {
+    const block = this.blockByAddress(addr);
+    if (!block || !addr?.field) { return null; }
+    return block.data[addr.field] ?? null;
+  }
+
   public blocksByType<T extends Block>(type: T['type']): T[] {
     return this.blocks.filter(typeMatchFilter<T>(type));
   }
@@ -109,18 +140,17 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async createBlock(block: Block): Promise<void> {
-    this.setBlock(await api.createBlock(block));
+    await api.createBlock(block); // triggers patch event
   }
 
   @Action
   public async saveBlock(block: Block): Promise<void> {
-    this.setBlock(await api.persistBlock(block));
+    await api.persistBlock(block); // triggers patch event
   }
 
   @Action
   public async removeBlock(block: Block): Promise<void> {
-    await api.deleteBlock(block);
-    this.blocks = filterById(this.blocks, block);
+    await api.deleteBlock(block); // triggers patch event
   }
 
   @Action
@@ -186,14 +216,14 @@ export class SparkServiceModule extends VuexModule {
     const status = await api.fetchSparkStatus(this.id);
     this.updateStatus(status);
     serviceStore.updateStatus(asServiceStatus(status));
-    if (status.synchronize) {
+    if (status.isSynchronized) {
       await Promise.all([
         this.fetchUnits(),
         this.fetchDiscoveredBlocks(),
         this.fetchBlocks(),
       ]);
     }
-    return status.synchronize;
+    return !!status.isSynchronized;
   }
 
   @Action
@@ -214,45 +244,45 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
-  public async reboot(): Promise<void> {
-    await api.reboot(this.id);
+  public async controllerReboot(): Promise<void> {
+    await api.controllerReboot(this.id);
+  }
+
+  @Action
+  public async serviceReboot(): Promise<void> {
+    await api.serviceReboot(this.id);
   }
 
   @Action
   public async start(): Promise<void> {
-    // Listen for block updates
-    Vue.$eventbus.addListener({
-      id: `${sparkBlocksEvent}__${this.id}`,
-      filter: (key, type) => key === this.id && type === sparkBlocksEvent,
-      onmessage: (msg: EventbusMessage) => {
-        const blocks = msg.data
-          .map(deserialize)
-          .map((block: DataBlock) => asBlock(block, this.id));
-        this.updateBlocks(blocks);
-      },
-    });
+    this.stateListenerId = Vue.$eventbus.addListener(
+      `${STATE_TOPIC}/${this.id}`,
+      (_, evt: SparkStateEvent) => {
+        if (evt.type === 'Spark.state') {
+          const status = asSparkStatus(this.id, evt.data.status);
+          const blocks = evt.data.blocks.map(deserialize);
 
-    // Listen for status updates
-    Vue.$eventbus.addListener({
-      id: `${sparkStatusEvent}__${this.id}`,
-      filter: (key, type) => key === this.id && type === sparkStatusEvent,
-      onmessage: (msg: EventbusMessage) => {
-        const status: SparkStatus = {
-          ...msg.data as ApiSparkStatus,
-          serviceId: this.id,
-          available: true,
-        };
-        this.updateStatus(status);
-        serviceStore.updateStatus(asServiceStatus(status));
-      },
-    });
+          this.updateBlocks(blocks);
+          this.updateStatus(status);
+          serviceStore.updateStatus(asServiceStatus(status));
+        }
+      });
+    this.patchListenerId = Vue.$eventbus.addListener(
+      `${STATE_TOPIC}/${this.id}/patch`,
+      (_, evt: SparkPatchEvent) => {
+        if (evt.type === 'Spark.patch') {
+          const changed = evt.data.changed.map(deserialize);
+          const { deleted } = evt.data;
+          this.patchBlocks({ changed, deleted });
+        }
+      });
 
     await this.fetchAll().catch(() => { });
   }
 
   @Action
   public async stop(): Promise<void> {
-    Vue.$eventbus.removeListener(`${sparkBlocksEvent}__${this.id}`);
-    Vue.$eventbus.removeListener(`${sparkStatusEvent}__${this.id}`);
+    Vue.$eventbus.removeListener(this.stateListenerId);
+    Vue.$eventbus.removeListener(this.patchListenerId);
   }
 }

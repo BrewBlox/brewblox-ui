@@ -1,18 +1,20 @@
 import forEach from 'lodash/forEach';
+import last from 'lodash/last';
 import parseDuration from 'parse-duration';
 
+import { round } from '@/helpers/functional';
+import { DEFAULT_PRECISION, MAX_POINTS } from '@/plugins/history/getters';
 import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
   GraphSource,
   GraphValueAxes,
+  LabelPrecision,
   LineColors,
   QueryParams,
   QueryResult,
   QueryTarget,
 } from '@/plugins/history/types';
-
-const MAX_POINTS = 5000;
 
 const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
 
@@ -31,11 +33,13 @@ const boundedConcat =
   };
 
 const valueName =
-  (source: GraphSource, key: string): string => {
+  (source: GraphSource, key: string, value: number | undefined): string => {
     const label = source.renames[key] || key;
-    return source.axes[key] === 'y2'
-      ? `<span style="color: #aef">${label}</span>`
-      : `<span>${label}</span>`;
+    const precision = source.precision[key] ?? DEFAULT_PRECISION;
+    const prop = source.axes[key] === 'y2'
+      ? 'style="color: #aef"'
+      : '';
+    return `<span ${prop}>${label}</span><br>${round(value, precision)}`;
   };
 
 const transformer =
@@ -45,22 +49,29 @@ const transformer =
       const time = resultCols[0];
       source.usedPolicy = result.policy;
 
+      // After connection interrupts, the data source may have been restarted
+      // Remove earlier values if the service signals it's sending the initial batch
+      if (result.initial) {
+        source.values = {};
+      }
+
       result
         .columns
         .forEach((col: string, idx: number) => {
           if (idx === 0) {
             return; // skip time
           }
+          const colValues = resultCols[idx];
           const key = `${result.name}/${col}`;
-          const value = source.values[key] || {};
+          const existing = source.values[key];
           source.values[key] = {
             type: 'scatter',
-            ...value,
-            name: valueName(source, key),
-            yaxis: source.axes[key] || 'y',
+            mode: 'lines',
+            name: valueName(source, key, last(colValues)),
+            yaxis: source.axes[key] ?? 'y',
             line: { color: source.colors[key] },
-            x: boundedConcat(value.x, time),
-            y: boundedConcat(value.y, resultCols[idx]),
+            x: boundedConcat(existing?.x, time),
+            y: boundedConcat(existing?.y, colValues),
           };
         });
 
@@ -90,6 +101,7 @@ export const addSource =
     renames: DisplayNames,
     axes: GraphValueAxes,
     colors: LineColors,
+    precision: LabelPrecision,
     target: QueryTarget,
   ): Promise<void> => {
     const filteredTarget = {
@@ -105,9 +117,11 @@ export const addSource =
       renames,
       axes,
       colors,
+      precision,
       transformer,
+      command: 'values',
       target: filteredTarget,
       values: {},
     };
-    await historyStore.addValuesSource(source);
+    await historyStore.addSource(source);
   };

@@ -54,6 +54,11 @@ export default class ListSelect extends Vue {
     >
       <slot name="body" :opt="opt">
         {{ opt[optionLabel] }}
+        <template v-if="opt.badge">
+          <q-badge class="q-ml-sm" color="info">
+            {{ opt.badge }}
+          </q-badge>
+        </template>
       </slot>
     </div>
   </div>

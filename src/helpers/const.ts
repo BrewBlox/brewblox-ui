@@ -1,15 +1,23 @@
 const devHostname = process.env.BLOX_API_HOST;
-const devUsed = process.env.BLOX_API_DEV;
 const devPort = process.env.BLOX_API_PORT;
 
-export const HOSTNAME = devUsed
-  ? devHostname
+export const PROTOCOL = window.location.protocol.replace(':', '');
+export const WS_PROTOCOL = PROTOCOL.replace('http', 'ws') as 'ws' | 'wss';
+
+export const HOSTNAME = process.env.DEV
+  ? devHostname || window.location.hostname
   : window.location.hostname;
 
-export const PORT = devUsed
+export const PORT = process.env.DEV
   ? Number(devPort)
-  : Number(window.location.port);
+  : Number(window.location.port) || (PROTOCOL === 'https' ? 443 : 80);
 
-export const HOST = devUsed
-  ? `https://${devHostname}:${devPort}`
-  : `https://${window.location.host}`;
+export const HOST = `${PROTOCOL}://${HOSTNAME}:${PORT}`;
+export const WS_HOST = `${WS_PROTOCOL}://${HOSTNAME}:${PORT}`;
+
+export const STATE_TOPIC = 'brewcast/state';
+export const STORE_TOPIC = 'brewcast/datastore';
+export const DEVICE_TOPIC = 'brewcast/device';
+
+export const IS_IOS = /iPad|iPhone|iPod/.test(navigator.platform)
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

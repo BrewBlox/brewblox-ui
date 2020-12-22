@@ -15,7 +15,7 @@ const router = new VueRouter({
     },
     {
       path: '/automation/:id?',
-      component: () => import('@/plugins/automation/AutomationEditor.vue'),
+      component: () => import('@/plugins/automation/AutomationLayout.vue'),
     },
     {
       path: '/',
@@ -26,7 +26,6 @@ const router = new VueRouter({
         // dynamic pages
         { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },
         { path: '/service/:id', component: () => import('@/pages/ServicePage.vue') },
-        { path: '/service/:id/display', component: () => import('@/pages/RemoteDisplay.vue') },
       ],
     },
 
@@ -37,6 +36,15 @@ const router = new VueRouter({
   ],
   mode: 'history',
   base: '/ui/',
+});
+
+// Strip query on fresh page loads
+// We currently only have support in-page query strings
+// If we ever add actual query args, we'll want to extract them here
+router.beforeResolve((to, from, next) => {
+  from.fullPath === '/' && to.fullPath.includes('?')
+    ? next({ path: to.path, query: {} })
+    : next();
 });
 
 export default router;

@@ -4,9 +4,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
+import { deepCopy } from '@/helpers/functional';
 import { loadFile, saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
-import { deepCopy } from '@/plugins/spark/parse-object';
 import { dashboardStore, Widget } from '@/store/dashboards';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '../getters';
@@ -32,13 +32,10 @@ export default class LayoutActions extends Vue {
 
   startAddLayout(copy: boolean): void {
     createDialog({
+      component: 'InputDialog',
       title: 'Add Layout',
       message: 'Create a new Brewery Builder layout',
-      cancel: true,
-      prompt: {
-        model: 'Brewery Layout',
-        type: 'text',
-      },
+      value: 'Brewery Layout',
     })
       .onOk(async title => {
         const id = uid();
@@ -65,8 +62,8 @@ export default class LayoutActions extends Vue {
     if (!this.layout) {
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, _rev, ...exported } = this.layout;
+    const { id, ...exported } = this.layout;
+    void id;
     saveFile(exported, `brewblox-${this.layout.title}-layout.json`);
   }
 
@@ -75,13 +72,10 @@ export default class LayoutActions extends Vue {
       return;
     }
     createDialog({
+      component: 'InputDialog',
       title: 'Change Layout title',
       message: `Choose a new name for ${this.layout.title}`,
-      cancel: true,
-      prompt: {
-        model: this.layout.title,
-        type: 'text',
-      },
+      value: this.layout.title,
     })
       .onOk(async title => {
         if (this.layout) {
@@ -124,7 +118,6 @@ export default class LayoutActions extends Vue {
     if (!this.layout) { return; }
 
     createDialog({
-      parent: this,
       title: 'Copy widget',
       message: `On which dashboard do you want to create a widget for ${this.layout.title}?`,
       style: 'overflow-y: scroll',

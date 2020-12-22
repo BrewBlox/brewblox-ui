@@ -1,15 +1,17 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { bloxLink, isLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { displayTempLabels } from '@/plugins/spark/getters';
 import { isCompatible } from '@/plugins/spark/helpers';
-import { BlockOrIntfType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
+import { BlockIntfType, BlockOrIntfType, BlockType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 
 @Component
 export default class DisplaySettingsFull
   extends BlockCrudComponent<DisplaySettingsBlock> {
+  displayTempLabels = displayTempLabels
 
   slotNameRules: InputRule[] = [
     v => !v || v.length <= 15 || 'Name can only be 15 characters',
@@ -18,10 +20,11 @@ export default class DisplaySettingsFull
     v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
   ];
   validTypes: BlockOrIntfType[] = [
-    'TempSensorInterface',
-    'SetpointSensorPairInterface',
-    'ActuatorAnalogInterface',
-    'Pid',
+    BlockIntfType.TempSensorInterface,
+    BlockIntfType.TempSensorInterface,
+    BlockIntfType.SetpointSensorPairInterface,
+    BlockIntfType.ActuatorAnalogInterface,
+    BlockType.Pid,
   ]
 
   get slots(): (DisplaySlot | null)[] {
@@ -33,10 +36,10 @@ export default class DisplaySettingsFull
 
   slotLink(slot: DisplaySlot): Link {
     if (!slot) {
-      return new Link(null);
+      return bloxLink(null);
     }
     return Object.values(slot)
-      .find(v => v instanceof Link) || new Link(null);
+      .find(v => isLink(v)) ?? bloxLink(null);
   }
 
   slotColor(slot: DisplaySlot): string {
@@ -53,7 +56,7 @@ export default class DisplaySettingsFull
     };
   }
 
-  updateSlotLink(idx: number, link: Link): void {
+  async updateSlotLink(idx: number, link: Link): Promise<void> {
     const pos = idx + 1;
     if (!link.id) {
       this.block.data.widgets = this.block.data.widgets
@@ -68,20 +71,33 @@ export default class DisplaySettingsFull
     const existing = this.slots[idx];
     const obj: DisplaySlot = {
       pos,
-      color: existing?.color || '4169E1',
       name: existing?.name || link.id.slice(0, 15),
+      color: existing?.color || '4169E1',
     };
 
-    if (isCompatible(type, 'TempSensorInterface')) {
+    obj.name = await new Promise(resolve => {
+      createDialog({
+        component: 'InputDialog',
+        title: 'Choose label text',
+        label: `Label for block '${link.id}'`,
+        rules: this.slotNameRules,
+        value: obj.name,
+      })
+        .onOk(v => resolve(v))
+        .onCancel(() => resolve(obj.name))
+        .onDismiss(() => resolve(obj.name));
+    });
+
+    if (isCompatible(type, BlockIntfType.TempSensorInterface)) {
       obj.tempSensor = link;
     }
-    else if (isCompatible(type, 'SetpointSensorPairInterface')) {
+    else if (isCompatible(type, BlockIntfType.SetpointSensorPairInterface)) {
       obj.setpointSensorPair = link;
     }
-    else if (isCompatible(type, 'ActuatorAnalogInterface')) {
+    else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
       obj.actuatorAnalog = link;
     }
-    else if (isCompatible(type, 'Pid')) {
+    else if (isCompatible(type, BlockType.Pid)) {
       obj.pid = link;
     }
 
@@ -170,7 +186,7 @@ export default class DisplaySettingsFull
           class="col-grow clickable"
           @click="showUnitMenu"
         >
-          {{ block.data.tempUnit | capitalize }}
+          {{ displayTempLabels[block.data.tempUnit] || 'Unknown' }}
         </LabeledField>
         <q-field
           label="Display brightness"

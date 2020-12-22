@@ -6,12 +6,19 @@ import { Component, Prop } from 'vue-property-decorator';
 export default class HeatingIcon extends Vue {
   @Prop({ type: String, default: '25px' })
   public readonly size!: string;
+
+  @Prop({ type: String, default: 'white' })
+  public readonly color!: string;
 }
 </script>
 
 <template>
   <q-icon :size="size" class="static" v-bind="$attrs">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 1150 1150">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="-50 -50 1150 1150"
+      :fill="color"
+    >
       <g transform="translate(0.000000,511.000000) scale(0.100000,-0.100000)">
         <path
           d="M4239.1,4964.4c-7.7-33.3-17.9-156.3-28.2-276.7

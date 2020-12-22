@@ -1,5 +1,8 @@
 import { GraphConfig, QueryParams } from './types';
 
+export const MAX_POINTS = 5000;
+export const DEFAULT_PRECISION = 2;
+
 export const defaultPresets = (): QueryParams[] => [
   { duration: '10m' },
   { duration: '1h' },
@@ -17,4 +20,5 @@ export const emptyGraphConfig = (): GraphConfig => ({
   renames: {},
   axes: {},
   colors: {},
+  precision: {},
 });

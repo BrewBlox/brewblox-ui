@@ -11,7 +11,6 @@ import { GraphAnnotation } from '@/plugins/history/types';
 
 import PlotlyGraph from './PlotlyGraph';
 
-/* eslint-disable @typescript-eslint/camelcase */
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
   font: {
@@ -53,7 +52,6 @@ const layoutDefaults = (): Partial<Layout> => ({
   plot_bgcolor: 'transparent',
   hovermode: 'closest',
 });
-/* eslint-enable */
 
 @Component({
   components: {
@@ -72,6 +70,9 @@ export default class GenericGraph extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly annotated!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly maximized!: boolean;
+
   get plotlyLayout(): Partial<Layout> {
     return merge(layoutDefaults(), this.layout);
   }
@@ -80,6 +81,7 @@ export default class GenericGraph extends Vue {
     return {
       displaylogo: false,
       responsive: true,
+      staticPlot: this.$dense && !this.maximized,
     };
   }
 
@@ -102,12 +104,9 @@ export default class GenericGraph extends Vue {
 
     const point = evt.points[0];
     createDialog({
+      component: 'InputDialog',
       title: 'Add annotation',
-      cancel: true,
-      prompt: {
-        model: 'New annotation',
-        type: 'text',
-      },
+      value: 'New annotation',
     })
       .onOk((text: string) => {
         this.annotations.push({

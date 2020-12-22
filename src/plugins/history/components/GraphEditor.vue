@@ -4,11 +4,12 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 
+import { DEFAULT_PRECISION } from '../getters';
 import { GraphConfig } from '../types';
-
 
 @Component
 export default class GraphEditor extends Vue {
+  DEFAULT_PRECISION = DEFAULT_PRECISION;
 
   @Prop({ type: Object, default: () => ({}) })
   readonly downsampling!: Mapped<string>;
@@ -27,7 +28,6 @@ export default class GraphEditor extends Vue {
     createDialog({
       component: 'GraphDisplayDialog',
       title: node.value,
-      parent: this,
       config: this.config,
       field: node.value,
     })
@@ -53,6 +53,11 @@ export default class GraphEditor extends Vue {
             <LabeledField
               :value="config.renames[node.value] || node.label"
               label="Label"
+              dense
+            />
+            <LabeledField
+              :value="config.precision[node.value] || DEFAULT_PRECISION"
+              label="Decimals in label"
               dense
             />
             <ColorField

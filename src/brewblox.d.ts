@@ -35,6 +35,8 @@ interface SelectOption<T = any> {
 
 type Mapped<T> = Record<string, T>;
 
+type Awaitable<T> = T | PromiseLike<T>;
+
 interface HasId {
   id: string;
 }
@@ -42,6 +44,8 @@ interface HasId {
 interface HasType {
   type: keyof any & string;
 }
+
+type Patch<T> = HasId & Partial<T>;
 
 interface QuasarNode {
   label: string;

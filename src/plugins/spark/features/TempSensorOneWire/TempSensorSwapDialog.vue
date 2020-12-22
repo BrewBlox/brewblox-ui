@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, TempSensorOneWireBlock } from '@/plugins/spark/types';
+import { BlockAddress, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
 
 
 @Component
@@ -29,12 +29,12 @@ export default class TempSensorSwapDialog extends DialogBase {
   created(): void {
     this.leftAddr = {
       id: this.leftId ?? null,
-      type: 'TempSensorOneWire',
+      type: BlockType.TempSensorOneWire,
       serviceId: this.serviceId,
     };
     this.rightAddr = {
       id: this.rightId ?? null,
-      type: 'TempSensorOneWire',
+      type: BlockType.TempSensorOneWire,
       serviceId: this.serviceId,
     };
   }
@@ -74,20 +74,20 @@ export default class TempSensorSwapDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <BlockAddressField
         v-model="leftAddr"
-        label="Left sensor"
-        title="Choose left sensor"
+        label="Sensor A"
+        title="Choose sensor A"
       />
       <BlockAddressField
         v-model="rightAddr"
-        label="Right sensor"
-        title="Choose right sensor"
+        label="Sensor B"
+        title="Choose sensor B"
       />
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

@@ -7,12 +7,12 @@ import {
   ActuatorLogicBlock,
   AnalogCompare,
   DigitalCompare,
-  ExpressionError,
+  LogicResult,
 } from '@/plugins/spark/types';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
-import { evalResultTitles, nonErrorResults } from './getters';
+import { logicResultTitles, nonErrorResults } from './getters';
 import {
   analogIdx, analogKey,
   comparisonCheck,
@@ -24,6 +24,7 @@ import {
   prettyDigital,
   syntaxCheck,
 } from './helpers';
+import { ExpressionError } from './types';
 
 
 @Component({
@@ -45,7 +46,7 @@ export default class ActuatorLogicBasic
       isDigital(key)
         ? this.digital
         : this.analog;
-    return arr.find(v => v.key === key)?.cmp.result === 'TRUE'
+    return arr.find(v => v.key === key)?.cmp.result === LogicResult.RESULT_TRUE
       ? 'positive'
       : 'negative';
   }
@@ -66,7 +67,7 @@ export default class ActuatorLogicBasic
       ? null
       : {
         index,
-        message: evalResultTitles[result],
+        message: logicResultTitles[result],
         indicator: '-'.repeat(index) + '^',
       };
   }
@@ -80,7 +81,7 @@ export default class ActuatorLogicBasic
   get result(): string {
     return this.err
       ? `Error: ${this.err.message}`
-      : evalResultTitles[this.block.data.result];
+      : logicResultTitles[this.block.data.result];
   }
 
   get digital(): { key: string; cmp: DigitalCompare; pretty: string }[] {

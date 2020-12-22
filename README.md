@@ -2,6 +2,14 @@
 
 > UI representation of the Brewblox project
 
+## Pinned versions
+
+The following packages are pinned to specific versions:
+
+**vue-router@3.2.0**
+
+Quasar has its own dependency on vue-router@3.2.0. Using multiple versions leads to typing errors.
+
 ## Requirements
 
 * Node.js
@@ -13,7 +21,7 @@ Due to limitations in the way Docker is handled on Windows, Linux or Mac are req
 
 ## Installation
 
-**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at https://brewblox.netlify.com/**
+**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at https://brewblox.netlify.app/**
 
 Note: this is tested on Ubuntu, and may or may not work on other distros. Please let us know if there are any issues.
 
@@ -23,7 +31,7 @@ sudo apt upgrade -y
 sudo apt install -y build-essential libssl-dev curl git python3-pip
 
 # Install Node Version Manager + Node.js
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 nvm install --lts
 
 # Install Docker
@@ -104,12 +112,15 @@ Notable new directories:
 Plugins may have their own `components/`, `helpers/`, and `store/` subdirectories. <br>
 New plugins should be declared in `src/boot/plugins.ts`.
 
-## Third-party plugins
+## Third-party plugins (discontinued)
 
-To allow runtime extension of the UI, users can load remote plugins.
-These will be loaded from user-defined URLs, and are otherwise treated as identical to plugins found in `src/plugins/`.
+~~To allow runtime extension of the UI, users can load remote plugins.~~
+~~These will be loaded from user-defined URLs, and are otherwise treated as identical to plugins found in `src/plugins/`.~~
 
-For an example of how to create a remote plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.
+~~For an example of how to create a remote plugin, see the [brewblox-plugin](https://github.com/BrewBlox/brewblox-plugin) repository.~~
+
+Third-party plugins are no longer supported.
+Implementation beyond proof-of-concept would require too much effort for a feature with no discernible demand.
 
 # Data sources
 
@@ -121,9 +132,9 @@ The full datastore state is loaded on startup. After that, two-way synchronizati
 
 ## [Eventbus](src/plugins/eventbus.ts)
 
-Backend services can continuously push data over the RabbitMQ eventbus. These events are then converted into Server Sent Events (SSE) by the [brewblox-emitter](https://github.com/BrewBlox/brewblox-emitter) service.
+Backend services intermittently push MQTT state events.
 
-The SSE connection is managed centrally, and plugins can subscribe to receive callbacks for events matching an identifier.
+Plugins can subscribe to receive callbacks for events matching an identifier.
 
 # Interfaces
 
@@ -149,4 +160,4 @@ Widgets and Services by themselves are nothing more than blobs of JSON data. In 
 
 Features are how the UI knows which components can be used to render data. Plugins can use their `install(Vue)` function to register features.
 
-As Features contain functions and references to Vue components, they are not persisted in the datastore.
+As features contain functions and references to Vue components, they are not persisted in the datastore.

@@ -1,15 +1,15 @@
 <script lang="ts">
-import cloneDeep from 'lodash/cloneDeep';
 import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { createDialog } from '@/helpers/dialog';
-import { deserialize, serialize } from '@/plugins/spark/parse-object';
+import { deepCopy } from '@/helpers/functional';
+import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
-import { SetpointProfileBlock } from '@/plugins/spark/types';
+import { BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 
-const typeName: SetpointProfileBlock['type'] = 'SetpointProfile';
+const typeName = BlockType.SetpointProfile;
 
 @Component
 export default class ProfilePresetDialog extends DialogBase {
@@ -41,12 +41,9 @@ export default class ProfilePresetDialog extends DialogBase {
     const { value } = this.selected;
     const preset = sparkStore.presetById(value)!;
     createDialog({
+      component: 'InputDialog',
       title: 'Edit profile name',
-      cancel: true,
-      prompt: {
-        model: preset.name,
-        type: 'text',
-      },
+      value: preset.name,
     })
       .onOk(name => sparkStore.savePreset({ ...preset, name }));
   }
@@ -57,7 +54,7 @@ export default class ProfilePresetDialog extends DialogBase {
     }
     const { value } = this.selected;
     const preset = sparkStore.presetById(value)!;
-    const points = deserialize(cloneDeep(preset.data.points));
+    const points = deserialize(deepCopy(preset.data.points));
 
     createDialog({
       title: 'Profile start',
@@ -85,7 +82,7 @@ export default class ProfilePresetDialog extends DialogBase {
     const { value } = this.selected;
     const preset = sparkStore.presetById(value)!;
     preset.data = {
-      points: cloneDeep(serialize(this.value.data.points)),
+      points: deepCopy(this.value.data.points),
     };
     await sparkStore.savePreset(preset);
     this.onDialogOk();
@@ -93,12 +90,9 @@ export default class ProfilePresetDialog extends DialogBase {
 
   createPreset(): void {
     createDialog({
+      component: 'InputDialog',
       title: 'Save as new profile',
-      cancel: true,
-      prompt: {
-        model: `${this.value.id} profile`,
-        type: 'text',
-      },
+      value: `${this.value.id} profile`,
     })
       .onOk(async name => {
         await sparkStore.createPreset({
@@ -106,7 +100,7 @@ export default class ProfilePresetDialog extends DialogBase {
           name,
           type: typeName,
           data: {
-            points: cloneDeep(serialize(this.value.data.points)),
+            points: deepCopy(this.value.data.points),
           },
         });
         this.onDialogOk();
@@ -118,7 +112,7 @@ export default class ProfilePresetDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
   >
     <DialogCard v-bind="{title, message, html}">

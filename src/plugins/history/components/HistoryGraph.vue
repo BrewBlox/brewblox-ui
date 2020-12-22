@@ -1,4 +1,5 @@
 <script lang="ts">
+import debounce from 'lodash/debounce';
 import mapValues from 'lodash/mapValues';
 import { Layout, PlotData } from 'plotly.js';
 import Vue from 'vue';
@@ -14,6 +15,7 @@ import {
   GraphConfig,
   GraphSource,
   GraphValueAxes,
+  LabelPrecision,
   LineColors,
   QueryParams,
   QueryTarget,
@@ -108,6 +110,10 @@ export default class HistoryGraph extends Vue {
     return this.config.colors ?? {};
   }
 
+  get precision(): LabelPrecision {
+    return this.config.precision ?? {};
+  }
+
   get layout(): Partial<Layout> {
     return this.config.layout;
   }
@@ -143,7 +149,7 @@ export default class HistoryGraph extends Vue {
     }
     return this.targets
       .map(target => historyStore.sourceById(this.sourceId(target)))
-      .filter(source => source !== null && !!source.values) as GraphSource[];
+      .filter((source): source is GraphSource => source != null);
   }
 
   get error(): string | null {
@@ -158,7 +164,7 @@ export default class HistoryGraph extends Vue {
     return null;
   }
 
-  get graphData(): PlotData[] {
+  get graphData(): Partial<PlotData>[] {
     return this.sources
       .flatMap(source => Object.values(source.values));
   }
@@ -185,6 +191,7 @@ export default class HistoryGraph extends Vue {
         this.renames,
         this.axes,
         this.colors,
+        this.precision,
         target,
       ));
   }
@@ -193,10 +200,14 @@ export default class HistoryGraph extends Vue {
     this.sources.forEach(historyStore.removeSource);
   }
 
-  resetSources(): void {
-    this.removeSources();
-    this.addSources();
-  }
+  resetSources = debounce(
+    () => {
+      this.removeSources();
+      this.addSources();
+    },
+    100,
+    { trailing: true }
+  );
 
   public refresh(): void {
     this.revision += 1;

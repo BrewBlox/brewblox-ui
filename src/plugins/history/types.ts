@@ -1,6 +1,6 @@
 import { Annotations, Layout } from 'plotly.js';
 
-import { StoreObject } from '@/plugins/database';
+import { StoreObject } from '@/shared-types';
 
 export interface QueryParams {
   database?: string;
@@ -16,6 +16,25 @@ export interface QueryParams {
 export interface QueryTarget {
   measurement: string;
   fields: string[];
+}
+
+export interface ApiQuery {
+  // QueryParams
+  database?: string;
+  start?: string | number;
+  duration?: string;
+  end?: string | number;
+  limit?: number;
+  order_by?: string;
+  policy?: string;
+  approx_points?: number;
+
+  // QueryTarget
+  measurement: string;
+  fields: string[];
+
+  // new
+  epoch: string;
 }
 
 export interface DisplayNames {
@@ -38,14 +57,17 @@ export interface LineColors {
   [key: string]: string;
 }
 
+export interface LabelPrecision {
+  [key: string]: number;
+}
+
 export interface HistorySource {
   id: string;
+  command: 'values' | 'last_values';
   transformer: (source: any, result: any) => HistorySource;
   params: QueryParams;
   target: QueryTarget;
   renames: DisplayNames;
-  events?: EventSource;
-  values?: any;
 }
 
 export type Slice = number[];
@@ -56,13 +78,26 @@ export interface QueryResult {
   values: Slice[];
   database: string;
   policy: string;
+  initial?: boolean;
+}
+
+export interface GraphFieldResult {
+  type: 'scatter';
+  mode: 'lines';
+  name: string;
+  yaxis: GraphAxis;
+  line: { color: string };
+  x: number[];
+  y: number[];
 }
 
 export interface GraphSource extends HistorySource {
   transformer: (source: GraphSource, result: QueryResult) => HistorySource;
   axes: GraphValueAxes;
   colors: LineColors;
+  precision: LabelPrecision;
   usedPolicy?: string;
+  values: Mapped<GraphFieldResult>;
 }
 
 export interface MetricsResult {
@@ -73,6 +108,7 @@ export interface MetricsResult {
 
 export interface MetricsSource extends HistorySource {
   transformer: (source: MetricsSource, result: MetricsResult[]) => HistorySource;
+  values: MetricsResult[];
 }
 
 export type GraphAnnotation = Partial<Annotations>;
@@ -81,6 +117,7 @@ export interface GraphConfig extends QueryConfig {
   layout: Partial<Layout>;
   axes: GraphValueAxes;
   colors: LineColors;
+  precision: LabelPrecision;
 }
 
 export interface SharedGraphConfig {

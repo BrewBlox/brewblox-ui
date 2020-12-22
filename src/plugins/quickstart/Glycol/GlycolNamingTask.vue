@@ -7,13 +7,13 @@ import { dashboardIdRules } from '@/helpers/dashboards';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import { blockIdRules } from '@/plugins/spark/helpers';
 
-import WizardTaskBase from '../components/WizardTaskBase';
+import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { withPrefix } from '../helpers';
 import { GlycolBlockNames, GlycolConfig } from './types';
 
 
 @Component
-export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
+export default class GlycolNamingTask extends QuickStartTaskBase<GlycolConfig> {
   chosenNames: Partial<GlycolBlockNames> = {};
   idGenerator = new UrlSafeString();
 
@@ -146,24 +146,24 @@ export default class GlycolNamingTask extends WizardTaskBase<GlycolConfig> {
           The name for the new dashboard.
         </template>
       </QuickStartNameField>
+      <QuickStartNameField
+        v-model="dashboardId"
+        label="Unique dashboard ID"
+        :rules="dashboardIdRules"
+        @clear="clearKey('dashboardId')"
+      >
+        <template #help>
+          The unique identifier for your dashboard.
+          <br> By default, this is an URL-safe version of the dashboard title.
+        </template>
+      </QuickStartNameField>
       <QuickStartPrefixField
         v-model="prefix"
         @clear="clearKey('prefix')"
       />
 
       <!-- Block names -->
-      <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
-        <QuickStartNameField
-          v-model="dashboardId"
-          label="Dashboard ID"
-          :rules="dashboardIdRules"
-          @clear="clearKey('dashboardId')"
-        >
-          <template #help>
-            The unique identifier for your dashboard.
-            <br> By default, this is an URL-safe version of the dashboard title.
-          </template>
-        </QuickStartNameField>
+      <q-expansion-item label="Block names (click to expand)" icon="mdi-tag-multiple" dense>
         <QuickStartNameField
           v-for="(nVal, nKey) in names"
           :key="nKey"

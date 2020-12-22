@@ -16,8 +16,8 @@ export default class AnalogConstraintsValEdit extends ValEditBase {
 
 <template>
   <div v-if="editable">
-    <div class="text-warning q-mb-sm">
-      Values will replace all existing constraints on '{{ blockId }}'.
+    <div v-if="!comparison" class="text-warning q-mb-sm">
+      Values will replace all existing constraints on <i>{{ blockId }}</i>.
     </div>
     <AnalogConstraints
       v-model="field"

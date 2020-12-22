@@ -29,7 +29,8 @@ export default class RelationsDialog extends DialogBase {
   <q-dialog
     ref="dialog"
     maximized
-    no-backdrop-dismiss
+    v-bind="dialogProps"
+    transition-show="fade"
     @hide="onDialogHide"
   >
     <CardWrapper no-scroll v-bind="{context}">

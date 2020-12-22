@@ -2,12 +2,12 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
 import { createBlockDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import type { Block, BlockAddress, BlockOrIntfType } from '@/plugins/spark/types';
+import type { Block, BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 
 const asAddr = (v: Block | BlockAddress): BlockAddress => ({
@@ -21,7 +21,13 @@ const asAddr = (v: Block | BlockAddress): BlockAddress => ({
 export default class BlockAddressDialog extends DialogBase {
   local: BlockAddress | null = null;
 
-  @Prop({ type: Object, required: true })
+  @Prop({
+    type: Object, default: (): BlockAddress => ({
+      serviceId: null,
+      id: null,
+      type: null,
+    }),
+  })
   public readonly value!: BlockAddress;
 
   @Prop({ type: String, default: 'Block' })
@@ -30,8 +36,8 @@ export default class BlockAddressDialog extends DialogBase {
   @Prop({ type: Boolean, default: false })
   public readonly anyService!: boolean;
 
-  @Prop({ type: Array, required: false })
-  readonly compatible!: BlockOrIntfType[];
+  @Prop({ type: [String, Array], required: false })
+  readonly compatible!: ComparedBlockType;
 
   @Prop({ type: Function, default: () => true })
   public readonly blockFilter!: (block: Block) => boolean;
@@ -107,13 +113,11 @@ export default class BlockAddressDialog extends DialogBase {
   }
 
   createBlock(): void {
-    createDialog({
-      component: 'BlockWizardDialog',
-      serviceId: this.serviceId,
-      filter: this.typeFilter,
-    })
-      .onOk((block: Block) => {
-        this.local = asAddr(block);
+    createBlockWizard(this.serviceId, this.compatible ?? this.value.type)
+      .onOk(({ block }) => {
+        if (block) {
+          this.local = asAddr(block);
+        }
       });
   }
 
@@ -132,7 +136,7 @@ export default class BlockAddressDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

@@ -1,4 +1,4 @@
-import { StoreObject } from '@/plugins/database';
+import { StoreObject } from '@/shared-types';
 
 /**
  * Persistent data for dashboard objects.

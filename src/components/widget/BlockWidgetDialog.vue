@@ -79,7 +79,14 @@ export default class BlockWidgetDialog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss class="row" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    :maximized="$dense"
+    transition-show="fade"
+    class="row"
+    v-bind="$attrs"
+    @hide="onDialogHide"
+  >
     <component
       :is="widgetComponent"
       v-if="!!block"

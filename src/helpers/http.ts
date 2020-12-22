@@ -1,41 +1,24 @@
-import axios, { AxiosError, AxiosTransformer } from 'axios';
-import isArray from 'lodash/isArray';
+import axios, { AxiosError } from 'axios';
 import isObject from 'lodash/isObject';
 import isString from 'lodash/isString';
 
 import { HOST } from '@/helpers/const';
 import notify from '@/helpers/notify';
-import { deserialize, serialize } from '@/plugins/spark/parse-object';
 
-const { transformRequest, transformResponse } = axios.defaults;
+const instance = axios.create({ baseURL: HOST });
 
-function asArray(value: typeof transformRequest | typeof transformResponse): AxiosTransformer[] {
-  if (value === undefined) {
-    return [];
-  }
-  else if (isArray(value)) {
-    return [...value];
-  }
-  else {
-    return [value];
-  }
+export function parseHttpError(e: AxiosError): string {
+  const data = e.response?.data;
+  return isObject(data)
+    ? JSON.stringify(data)
+    : isString(data)
+      ? data
+      : e.message;
 }
-
-const instance = axios.create({
-  baseURL: HOST,
-  transformRequest: [data => serialize(data), ...asArray(transformRequest)],
-  transformResponse: [...asArray(transformResponse), data => deserialize(data)],
-});
 
 export function intercept(desc: string): ((e: AxiosError) => never) {
   return (e: AxiosError) => {
-    const data = e.response?.data;
-    const message = isObject(data)
-      ? JSON.stringify(data)
-      : isString(data)
-        ? data
-        : e.message;
-    notify.warn(`${desc}: ${message}`);
+    notify.warn(`${desc}: ${parseHttpError(e)}`);
     throw e;
   };
 }

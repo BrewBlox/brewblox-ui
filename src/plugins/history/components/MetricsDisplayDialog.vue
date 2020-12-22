@@ -2,8 +2,8 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { durationMs, durationString } from '@/helpers/functional';
-import { deepCopy } from '@/plugins/spark/parse-object';
+import { durationMs, durationString } from '@/helpers/duration';
+import { deepCopy } from '@/helpers/functional';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/getters';
 import { MetricsConfig } from '../Metrics/types';
@@ -61,7 +61,7 @@ export default class MetricsDisplayDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >

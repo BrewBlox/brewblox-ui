@@ -1,6 +1,12 @@
-import { ActuatorLogicBlock, AnalogCompareOp, DigitalCompareOp, DigitalState, EvalResult } from '@/plugins/spark/types';
+import { bloxLink } from '@/helpers/bloxfield';
+import {
+  ActuatorLogicBlock,
+  AnalogCompareOp,
+  DigitalCompareOp,
+  DigitalState,
+  LogicResult,
+} from '@/plugins/spark/types';
 import { AnalogCompare, DigitalCompare } from '@/plugins/spark/types';
-import { Link } from '@/plugins/spark/units';
 
 import { comparisonCheck, sanitize, shiftRemainingComparisons, syntaxCheck } from '../helpers';
 
@@ -45,42 +51,42 @@ describe('Check symbol syntax', () => {
 
 const analog = (): AnalogCompare[] => ([
   {
-    op: AnalogCompareOp.SETTING_GE,
-    result: EvalResult.EMPTY,
-    id: new Link(null),
+    op: AnalogCompareOp.OP_SETTING_GE,
+    result: LogicResult.RESULT_EMPTY,
+    id: bloxLink(null),
     rhs: 20,
   },
   {
-    op: AnalogCompareOp.SETTING_GE,
-    result: EvalResult.EMPTY,
-    id: new Link('analog-1'),
+    op: AnalogCompareOp.OP_SETTING_GE,
+    result: LogicResult.RESULT_EMPTY,
+    id: bloxLink('analog-1'),
     rhs: 20,
   },
   {
-    op: AnalogCompareOp.SETTING_GE,
-    result: EvalResult.EMPTY,
-    id: new Link('analog-2'),
+    op: AnalogCompareOp.OP_SETTING_GE,
+    result: LogicResult.RESULT_EMPTY,
+    id: bloxLink('analog-2'),
     rhs: 20,
   },
 ]);
 const digital = (): DigitalCompare[] => ([
   {
-    op: DigitalCompareOp.DESIRED_IS,
-    result: EvalResult.EMPTY,
-    id: new Link(null),
-    rhs: DigitalState.Active,
+    op: DigitalCompareOp.OP_DESIRED_IS,
+    result: LogicResult.RESULT_EMPTY,
+    id: bloxLink(null),
+    rhs: DigitalState.STATE_ACTIVE,
   },
   {
-    op: DigitalCompareOp.DESIRED_IS,
-    result: EvalResult.EMPTY,
-    id: new Link('digital-1'),
-    rhs: DigitalState.Active,
+    op: DigitalCompareOp.OP_DESIRED_IS,
+    result: LogicResult.RESULT_EMPTY,
+    id: bloxLink('digital-1'),
+    rhs: DigitalState.STATE_ACTIVE,
   },
   {
-    op: DigitalCompareOp.DESIRED_IS,
-    result: EvalResult.EMPTY,
-    id: new Link('digital-2'),
-    rhs: DigitalState.Active,
+    op: DigitalCompareOp.OP_DESIRED_IS,
+    result: LogicResult.RESULT_EMPTY,
+    id: bloxLink('digital-2'),
+    rhs: DigitalState.STATE_ACTIVE,
   },
 ]);
 
