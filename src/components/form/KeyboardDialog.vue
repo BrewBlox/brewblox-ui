@@ -191,10 +191,9 @@ export default class KeyboardDialog extends DialogBase {
             class="cursor-pointer"
             @click="pwdActive = !pwdActive"
           />
-        </template>
-        <template #after>
           <q-icon
-            class="pointer self-end q-mb-xs"
+            v-if="local"
+            class="pointer self-end q-mb-sm fade-3"
             name="mdi-close-circle"
             size="sm"
             @click="clearInput"
