@@ -18,7 +18,7 @@ export default class ServicePage extends Vue {
 
   get pageComponent(): string | null {
     return this.service !== null
-      ? featureStore.serviceById(this.service.type)?.page ?? null
+      ? featureStore.serviceById(this.service.type)?.pageComponent ?? null
       : null;
   }
 }

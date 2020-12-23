@@ -8,7 +8,6 @@ import { Watch } from 'vue-property-decorator';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
   Block,
@@ -46,9 +45,6 @@ interface ModalSettings {
 })
 export default class SparkPage extends Vue {
   capitalized = capitalized;
-  startResetBlocks = startResetBlocks;
-  saveHwInfo = saveHwInfo;
-  discoverBlocks = discoverBlocks;
 
   allSorters = blockSorters();
   volatileWidgets: { [blockId: string]: Widget } = {};
@@ -332,17 +328,6 @@ export default class SparkPage extends Vue {
     return this.sparkModule?.relations ?? [];
   }
 
-  async cleanUnusedNames(): Promise<void> {
-    if (!this.sparkModule) { return; }
-    const names = await this.sparkModule.cleanUnusedNames();
-
-    const message = names.length > 0
-      ? `Cleaned ${names.join(', ')}.`
-      : 'No unused names found.';
-
-    notify.info({ message, icon: 'mdi-tag-remove' });
-  }
-
   controllerReboot(): void {
     this.sparkModule?.controllerReboot();
   }
@@ -397,69 +382,9 @@ export default class SparkPage extends Vue {
         round
         size="12px"
         class="self-center"
-        label="Spark actions"
       >
-        <template #actions>
-          <ActionItem
-            icon="add"
-            label="New block"
-            @click="startCreateBlock"
-          />
-          <ActionItem
-            icon="mdi-magnify-plus-outline"
-            label="Discover new OneWire blocks"
-            @click="discoverBlocks(serviceId)"
-          />
-          <ActionItem
-            icon="mdi-tag-remove"
-            label="Remove unused block names"
-            @click="cleanUnusedNames"
-          />
-          <ActionItem
-            icon="mdi-progress-download"
-            label="Update firmware"
-            @click="startDialog('FirmwareUpdateDialog')"
-          />
-          <ActionItem
-            icon="wifi"
-            label="Configure Wifi"
-            @click="startDialog('SparkWifiMenu')"
-          />
-          <ActionItem
-            icon="mdi-checkbox-multiple-marked"
-            label="Groups (deprecated)"
-            @click="startDialog('SparkGroupMenu')"
-          />
-          <ActionItem
-            icon="mdi-restart"
-            label="Reboot service"
-            @click="serviceReboot"
-          />
-          <ActionItem
-            icon="mdi-restart"
-            label="Reboot controller"
-            @click="controllerReboot"
-          />
-          <ActionItem
-            icon="mdi-temperature-celsius"
-            label="Configure used units"
-            @click="startDialog('SparkUnitMenu')"
-          />
-          <ActionItem
-            icon="mdi-file-export"
-            label="Import/Export blocks"
-            @click="startDialog('SparkImportMenu')"
-          />
-          <ActionItem
-            icon="mdi-power-plug"
-            label="Export sensor and pin names"
-            @click="saveHwInfo(serviceId)"
-          />
-          <ActionItem
-            icon="delete"
-            label="Remove all blocks"
-            @click="startResetBlocks(serviceId)"
-          />
+        <template #menus>
+          <SparkActions :service-id="serviceId" />
         </template>
       </ActionMenu>
     </portal>

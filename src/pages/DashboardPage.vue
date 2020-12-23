@@ -7,7 +7,6 @@ import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
-import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
 import { createDialog } from '../helpers/dialog';
 
 interface ValidatedWidget {
@@ -86,34 +85,6 @@ export default class DashboardPage extends Vue {
     await dashboardStore.saveWidget(widget);
   }
 
-  onIdChanged(oldId, newId): void {
-    if (newId && this.$route.path === `/dashboard/${oldId}`) {
-      this.$router.replace(`/dashboard/${newId}`);
-    }
-  }
-
-  editDashboardId(): void {
-    if (!this.dashboard) { return; }
-    const oldId = this.dashboard.id;
-    startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
-  }
-
-  editDashboardTitle(): void {
-    if (!this.dashboard) { return; }
-    const oldId = this.dashboard.id;
-    startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
-  }
-
-  toggleDefaultDashboard(): void {
-    if (!this.dashboard) { return; }
-    dashboardStore.updatePrimaryDashboard(this.dashboard.primary ? null : this.dashboardId);
-  }
-
-  removeDashboard(): void {
-    if (!this.dashboard) { return; }
-    startRemoveDashboard(this.dashboard);
-  }
-
   showWizard(): void {
     createDialog({
       component: 'WizardDialog',
@@ -148,19 +119,8 @@ export default class DashboardPage extends Vue {
           </q-tooltip>
         </q-btn>
         <ActionMenu round class="self-center" label="Dashboard actions">
-          <template #actions>
-            <ActionItem icon="add" label="New Widget" @click="showWizard" />
-            <q-item clickable @click="toggleDefaultDashboard">
-              <q-item-section avatar>
-                <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
-              </q-item-section>
-              <q-item-section>
-                {{ dashboard.primary ? 'Is home page' : 'Make home page' }}
-              </q-item-section>
-            </q-item>
-            <ActionItem icon="edit" label="Change dashboard ID" @click="editDashboardId" />
-            <ActionItem icon="edit" label="Change dashboard title" @click="editDashboardTitle" />
-            <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
+          <template #menus>
+            <DashboardActions :dashboard-id="dashboardId" />
           </template>
         </ActionMenu>
       </portal>

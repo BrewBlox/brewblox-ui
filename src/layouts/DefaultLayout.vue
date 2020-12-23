@@ -1,11 +1,6 @@
 <script lang="ts">
-import KeyboardLayouts from 'simple-keyboard-layouts';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-
-import { createDialog } from '@/helpers/dialog';
-import { systemStore } from '@/store/system';
-;
 
 @Component
 export default class DefaultLayout extends Vue {
@@ -25,20 +20,8 @@ export default class DefaultLayout extends Vue {
     this.$q.localStorage.set('drawer', v);
   }
 
-  get buildDate(): string {
-    return process.env.BLOX_DATE ?? 'UNKNOWN';
-  }
-
   get devMode() {
     return process.env.DEV;
-  }
-
-  get experimental(): boolean {
-    return systemStore.config.experimental;
-  }
-
-  set experimental(experimental: boolean) {
-    systemStore.saveConfig({ experimental });
   }
 
   stopEditing(): void {
@@ -46,17 +29,8 @@ export default class DefaultLayout extends Vue {
     this.serviceEditing = false;
   }
 
-  startChangeKeyboardLayout(): void {
-    createDialog({
-      component: 'SelectDialog',
-      selectOptions: Object.keys(new KeyboardLayouts().layouts),
-      value: systemStore.config.keyboardLayout,
-      title: 'Select layout for virtual keyboard',
-      selectProps: {
-        label: 'Layout',
-      },
-    })
-      .onOk(keyboardLayout => systemStore.saveConfig({ keyboardLayout }));
+  routeActive(route: string): boolean {
+    return !!this.$route.path.match(route);
   }
 }
 </script>
@@ -84,35 +58,23 @@ export default class DefaultLayout extends Vue {
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
-        <ActionMenu icon="mdi-bug-outline" label="Debugging">
-          <template #actions>
-            <ExportErrorsAction />
-            <q-separator inset />
-            <LabeledField
-              :value="buildDate"
-              label="Build date"
-              item-aligned
-              dense
-            />
-          </template>
-        </ActionMenu>
-        <ActionMenu icon="settings" label="Settings">
-          <template #actions>
-            <ActionItem
-              :active="experimental"
-              label="Enable experiments"
-              icon="mdi-test-tube"
-              style="min-width: 200px"
-              @click="experimental = !experimental"
-            />
-            <ActionItem
-              label="Set keyboard layout"
-              icon="mdi-keyboard"
-              @click="startChangeKeyboardLayout"
-            />
-          </template>
-        </ActionMenu>
-        <q-btn flat icon="mdi-format-paint" to="/styles">
+        <q-btn
+          icon="settings"
+          flat
+          to="/config"
+          :color="routeActive('/config') ? 'primary' : ''"
+        >
+          <q-tooltip>
+            Settings
+          </q-tooltip>
+        </q-btn>
+        <q-btn
+          v-if="devMode"
+          flat
+          icon="mdi-format-paint"
+          to="/styles"
+          :color="routeActive('/styles') ? 'primary' : ''"
+        >
           <q-tooltip>
             Theming
           </q-tooltip>

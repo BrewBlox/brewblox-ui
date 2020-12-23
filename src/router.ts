@@ -22,7 +22,8 @@ const router = new VueRouter({
       component: () => import('@/layouts/DefaultLayout.vue'),
       children: [
         { path: '', component: () => import('@/pages/IndexPage.vue') },
-        { path: 'styles', component: () => import('@/pages/StyleGuide.vue') },
+        { path: '/config', component: () => import('@/pages/ConfigPage.vue') },
+        { path: '/styles', component: () => import('@/pages/StylesPage.vue') },
         // dynamic pages
         { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },
         { path: '/service/:id', component: () => import('@/pages/ServicePage.vue') },

@@ -108,7 +108,13 @@ export interface ServiceFeature {
    * (Optional) Name of a globally registered Vue component.
    * Page is expected to use a q-page as root element.
    */
-  page?: string;
+  pageComponent?: string;
+
+  /**
+   * (Optional) Name of a globally registered Vue component.
+   * configComponent will be mounted in the config page
+   */
+  configComponent?: string;
 
   /**
    * Will be called when a service of this type is created or loaded.
