@@ -406,6 +406,7 @@ export default class SparkPage extends Vue {
     <div
       v-else-if="pageMode === 'Relations'"
       class="fit"
+      style="overflow: auto"
       @dblclick="startCreateBlock"
     >
       <RelationsDiagram

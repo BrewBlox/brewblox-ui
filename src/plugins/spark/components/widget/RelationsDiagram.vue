@@ -24,6 +24,9 @@ const INVERTED = [
 @Component
 export default class RelationsDiagram extends Vue {
   graphObj: any = null;
+  autoscale: boolean = false;
+  finiteWidth: number = 0;
+  finiteHeight: number = 0;
 
   @Ref()
   readonly svg!: SVGGraphicsElement;
@@ -46,6 +49,16 @@ export default class RelationsDiagram extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly hideUnrelated!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly centered!: boolean;
+
+  @Watch('edges', { immediate: true })
+  display(newV: RelationEdge[], oldV: RelationEdge[] | null): void {
+    if (newV && JSON.stringify(newV) !== JSON.stringify(oldV)) {
+      setTimeout(() => this.calc() && setTimeout(() => this.draw(), 100), 100);
+    }
+  }
+
   get drawnNodes(): RelationNode[] {
     return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
       .map(id => this.nodes.find(node => node.id === id) ?? { id, type: '???' });
@@ -55,11 +68,12 @@ export default class RelationsDiagram extends Vue {
     return this.nodes.filter(node => !this.drawnNodes.find(n => n.id === node.id));
   }
 
-  @Watch('edges', { immediate: true })
-  display(newV: RelationEdge[], oldV: RelationEdge[] | null): void {
-    if (newV && JSON.stringify(newV) !== JSON.stringify(oldV)) {
-      setTimeout(() => this.calc() && setTimeout(() => this.draw(), 100), 100);
-    }
+  get svgProps(): Mapped<any> {
+    return {
+      viewBox: [0, 0, this.finiteWidth, this.finiteHeight].join(' '),
+      width: this.autoscale ? '100%' : `${this.finiteWidth}px`,
+      height: this.autoscale ? '100%' : `${this.finiteHeight}px`,
+    };
   }
 
   calc(): boolean {
@@ -146,15 +160,8 @@ export default class RelationsDiagram extends Vue {
     }
 
     const outGraph = this.graphObj.graph();
-    const finiteWidth = this.finite(outGraph.width);
-    const finiteHeight = this.finite(outGraph.height);
-
-    this.svg.setAttribute('style', [
-      `min-width: ${finiteWidth}px`,
-      `min-height: ${finiteHeight}px`,
-    ].join('; '));
-    this.svg.setAttribute('width', `${finiteWidth}`);
-    this.svg.setAttribute('height', `${finiteHeight}`);
+    this.finiteWidth = this.finite(outGraph.width);
+    this.finiteHeight = this.finite(outGraph.height);
 
     this.$nextTick(() => {
       this.svg.querySelectorAll('foreignObject')
@@ -185,10 +192,17 @@ export default class RelationsDiagram extends Vue {
 </script>
 
 <template>
-  <div class="fit row scroll">
-    <svg ref="svg" class="fit">
+  <div :class="['fit', centered && 'flex flex-center']">
+    <svg ref="svg" v-bind="svgProps">
       <g ref="diagram" />
     </svg>
+    <q-btn
+      fab-mini
+      class="absolute-bottom-right q-ma-lg z-top"
+      color="secondary"
+      :icon="autoscale ? 'mdi-arrow-expand-all' : 'mdi-arrow-collapse-all'"
+      @click="autoscale = !autoscale"
+    />
   </div>
 </template>
 

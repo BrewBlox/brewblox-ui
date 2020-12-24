@@ -6,8 +6,6 @@ import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isBlockDriven } from '@/plugins/spark/helpers';
 import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
-import { startRelationsDialog } from './relations';
-
 @Component
 export default class PidBasic
   extends BlockCrudComponent<PidBlock> {
@@ -35,10 +33,6 @@ export default class PidBasic
   enable(): void {
     this.block.data.enabled = true;
     this.saveBlock();
-  }
-
-  showRelations(): void {
-    startRelationsDialog(this.block);
   }
 
   showInput(): void {
