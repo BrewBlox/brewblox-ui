@@ -57,7 +57,11 @@ export default class PidWidget
     <template #toolbar>
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
         <template #actions>
-          <ActionItem icon="mdi-vector-line" label="Relations" @click="showRelations" />
+          <ActionItem
+            icon="mdi-vector-line"
+            label="Relations"
+            @click="showRelations"
+          />
         </template>
       </component>
     </template>

@@ -421,6 +421,18 @@ export const discoverBlocks = async (serviceId: string | null, show = true): Pro
   return discovered;
 };
 
+export async function cleanUnusedNames(serviceId: string | null): Promise<void> {
+  const module = sparkStore.moduleById(serviceId);
+  if (!module) { return; }
+  const names = await module.cleanUnusedNames();
+
+  const message = names.length > 0
+    ? `Cleaned ${names.join(', ')}.`
+    : 'No unused names found.';
+
+  notify.info({ message, icon: 'mdi-tag-remove' });
+}
+
 export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
   sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';
 

@@ -15,6 +15,8 @@ const DB_OBJ_ID = 'default';
 const defaultSettings = (): SystemConfig => ({
   keyboardLayout: 'english',
   experimental: false,
+  showSidebarLayouts: true,
+  homePage: null,
 });
 
 const persistConfig = async (settings: SystemConfig): Promise<SystemConfig> =>

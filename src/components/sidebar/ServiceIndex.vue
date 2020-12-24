@@ -72,14 +72,15 @@ export default class ServiceIndex extends Vue {
         <q-item-section class="col-auto">
           <q-btn
             :disable="services.length === 0"
-            :icon="editing ? 'mdi-pencil-off' : 'mdi-pencil'"
+            :color="editing ? 'primary' : ''"
+            icon="mdi-sort"
             round
             flat
             size="sm"
             @click="editing = !editing"
           >
             <q-tooltip>
-              {{ editing ? 'Stop editing' : 'Edit services' }}
+              Rearrange services
             </q-tooltip>
           </q-btn>
         </q-item-section>
@@ -90,32 +91,16 @@ export default class ServiceIndex extends Vue {
       :key="service.id"
       :to="editing ? undefined : `/service/${service.id}`"
       :inset-level="0.2"
-      :class="['q-pb-sm', {bordered: editing, hoverable: editing && !dragging}]"
+      :class="[
+        'q-pb-sm',
+        editing && 'bordered pointer',
+      ]"
       style="min-height: 0px"
     >
       <q-item-section :class="['ellipsis', {'text-italic': editing}]">
         {{ service.title }}
       </q-item-section>
-      <template v-if="editing">
-        <q-item-section avatar>
-          <q-icon name="mdi-dots-vertical" />
-        </q-item-section>
-        <q-menu :offset="[-50, 0]">
-          <q-list bordered>
-            <ActionItem
-              icon="edit"
-              label="Change service title"
-              @click="startChangeServiceTitle(service)"
-            />
-            <ActionItem
-              icon="delete"
-              label="Remove service"
-              @click="startRemoveService(service, $router)"
-            />
-          </q-list>
-        </q-menu>
-      </template>
-      <template v-else-if="status(service) !== null">
+      <template v-if="status(service) !== null">
         <q-item-section class="col-auto q-mr-sm">
           <q-icon
             :name="status(service).icon || 'mdi-checkbox-blank-circle'"

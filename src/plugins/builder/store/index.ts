@@ -65,6 +65,21 @@ export class BuilderModule extends VuexModule {
   }
 
   @Action
+  public async updateLayoutOrder(ids: string[]): Promise<void> {
+    await Promise.all(
+      ids
+        .map(id => this.layoutById(id))
+        .filter((v): v is BuilderLayout => v !== null)
+        .map((layout, idx) => {
+          const order = idx + 1;
+          if (order !== layout.order) {
+            this.saveLayout({ ...layout, order });
+          }
+        })
+    );
+  }
+
+  @Action
   public async start(): Promise<void> {
     const onChange = async (layout: BuilderLayout): Promise<void> => {
       this.layouts = extendById(this.layouts, layout);

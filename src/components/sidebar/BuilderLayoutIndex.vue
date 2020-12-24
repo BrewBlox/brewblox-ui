@@ -2,13 +2,13 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
-import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { builderStore } from '@/plugins/builder/store';
+import { BuilderLayout } from '@/plugins/builder/types';
 
 
 @Component
-export default class DashboardIndex extends Vue {
+export default class BuilderLayoutIndex extends Vue {
   dragging = false;
 
   @Prop({ type: Boolean, required: true })
@@ -22,20 +22,22 @@ export default class DashboardIndex extends Vue {
     this.$emit('input', val);
   }
 
-  get dashboards(): Dashboard[] {
+  get layouts(): BuilderLayout[] {
     // avoid modifying the store object
-    return [...dashboardStore.dashboards].sort(objectSorter('order'));
+    return [...builderStore.layouts]
+      .filter(layout => layout.listed ?? true)
+      .sort(objectSorter('order'));
   }
 
-  set dashboards(dashboards: Dashboard[]) {
-    dashboardStore.updateDashboardOrder(dashboards.map(v => v.id));
+  set layouts(layouts: BuilderLayout[]) {
+    builderStore.updateLayoutOrder(layouts.map(v => v.id));
   }
 
-  startWizard(): void {
-    createDialog({
-      component: 'WizardDialog',
-      initialWizard: 'DashboardWizard',
-    });
+  get builderPath(): string {
+    const { path } = this.$route;
+    return path.startsWith('/brewery')
+      ? path.replace('/brewery', '/builder')
+      : '/builder';
   }
 }
 </script>
@@ -44,22 +46,22 @@ export default class DashboardIndex extends Vue {
   <div>
     <q-item class="q-pb-none">
       <q-item-section class="text-bold">
-        Dashboards
+        Builder layouts
       </q-item-section>
       <q-item-section class="col-auto">
         <q-btn
-          icon="add"
-          round
-          flat
+          :to="builderPath"
+          icon="mdi-tools"
           size="sm"
-          @click="startWizard"
+          flat
+          round
         >
-          <q-tooltip>Add dashboard</q-tooltip>
+          <q-tooltip>Open builder</q-tooltip>
         </q-btn>
       </q-item-section>
       <q-item-section class="col-auto">
         <q-btn
-          :disable="dashboards.length === 0"
+          :disable="layouts.length === 0"
           :color="editing ? 'primary' : ''"
           icon="mdi-sort"
           round
@@ -68,22 +70,22 @@ export default class DashboardIndex extends Vue {
           @click="editing = !editing"
         >
           <q-tooltip>
-            Rearrange dashboards
+            Rearrange layouts
           </q-tooltip>
         </q-btn>
       </q-item-section>
     </q-item>
 
     <draggable
-      v-model="dashboards"
+      v-model="layouts"
       :disabled="$dense || !editing"
       @start="dragging=true"
       @end="dragging=false"
     >
       <q-item
-        v-for="dashboard in dashboards"
-        :key="dashboard.id"
-        :to="editing ? undefined : `/dashboard/${dashboard.id}`"
+        v-for="layout in layouts"
+        :key="layout.id"
+        :to="editing ? undefined : `/brewery/${layout.id}`"
         :inset-level="0.2"
         :class="[
           'q-pb-sm',
@@ -94,7 +96,7 @@ export default class DashboardIndex extends Vue {
         <q-item-section
           :class="['ellipsis', editing && 'text-italic']"
         >
-          {{ dashboard.title }}
+          {{ layout.title }}
         </q-item-section>
       </q-item>
     </draggable>

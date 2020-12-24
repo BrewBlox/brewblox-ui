@@ -7,7 +7,6 @@ import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 
-import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
 import { createDialog } from '../helpers/dialog';
 
 interface ValidatedWidget {
@@ -86,34 +85,6 @@ export default class DashboardPage extends Vue {
     await dashboardStore.saveWidget(widget);
   }
 
-  onIdChanged(oldId, newId): void {
-    if (newId && this.$route.path === `/dashboard/${oldId}`) {
-      this.$router.replace(`/dashboard/${newId}`);
-    }
-  }
-
-  editDashboardId(): void {
-    if (!this.dashboard) { return; }
-    const oldId = this.dashboard.id;
-    startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
-  }
-
-  editDashboardTitle(): void {
-    if (!this.dashboard) { return; }
-    const oldId = this.dashboard.id;
-    startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
-  }
-
-  toggleDefaultDashboard(): void {
-    if (!this.dashboard) { return; }
-    dashboardStore.updatePrimaryDashboard(this.dashboard.primary ? null : this.dashboardId);
-  }
-
-  removeDashboard(): void {
-    if (!this.dashboard) { return; }
-    startRemoveDashboard(this.dashboard);
-  }
-
   showWizard(): void {
     createDialog({
       component: 'WizardDialog',
@@ -125,11 +96,11 @@ export default class DashboardPage extends Vue {
 </script>
 
 <template>
-  <q-page padding>
+  <q-page style="overflow: auto" class="page-height">
     <q-inner-loading v-if="!dashboard">
       <q-spinner size="50px" color="primary" />
     </q-inner-loading>
-    <div v-else>
+    <div v-else class="q-pa-lg">
       <portal to="toolbar-title">
         {{ dashboard.title }}
       </portal>
@@ -147,20 +118,15 @@ export default class DashboardPage extends Vue {
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center" label="Dashboard actions">
-          <template #actions>
-            <ActionItem icon="add" label="New Widget" @click="showWizard" />
-            <q-item clickable @click="toggleDefaultDashboard">
-              <q-item-section avatar>
-                <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
-              </q-item-section>
-              <q-item-section>
-                {{ dashboard.primary ? 'Is home page' : 'Make home page' }}
-              </q-item-section>
-            </q-item>
-            <ActionItem icon="edit" label="Change dashboard ID" @click="editDashboardId" />
-            <ActionItem icon="edit" label="Change dashboard title" @click="editDashboardTitle" />
-            <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
+        <ActionMenu
+          round
+          class="self-center"
+        >
+          <q-tooltip>
+            Dashboard actions
+          </q-tooltip>
+          <template #menus>
+            <DashboardActions :dashboard-id="dashboardId" />
           </template>
         </ActionMenu>
       </portal>

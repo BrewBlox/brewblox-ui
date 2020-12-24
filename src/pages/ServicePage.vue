@@ -18,7 +18,7 @@ export default class ServicePage extends Vue {
 
   get pageComponent(): string | null {
     return this.service !== null
-      ? featureStore.serviceById(this.service.type)?.page ?? null
+      ? featureStore.serviceById(this.service.type)?.pageComponent ?? null
       : null;
   }
 }
@@ -30,7 +30,7 @@ export default class ServicePage extends Vue {
     v-if="pageComponent !== null"
     :service-id="serviceId"
   />
-  <q-page v-else class="text-h5 darkened">
+  <q-page v-else class="page-height text-h5 darkened">
     <div v-if="service !== null" class="absolute-center">
       Invalid service page for '{{ serviceId }}'
     </div>

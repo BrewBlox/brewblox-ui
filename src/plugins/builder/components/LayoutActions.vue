@@ -5,13 +5,14 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/functional';
-import { loadFile, saveFile } from '@/helpers/import-export';
+import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { dashboardStore, Widget } from '@/store/dashboards';
+import { systemStore } from '@/store/system';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '../getters';
 import { builderStore } from '../store';
-import { BuilderConfig, BuilderLayout, PersistentPart } from '../types';
+import { BuilderConfig, BuilderLayout } from '../types';
 
 
 @Component
@@ -20,14 +21,57 @@ export default class LayoutActions extends Vue {
   @Prop({ type: Object, default: null })
   public readonly layout!: BuilderLayout | null;
 
-  @Prop({ type: Function, required: true })
-  public readonly saveParts!: (parts: PersistentPart[]) => Promise<void>;
-
-  @Prop({ type: Function, required: true })
-  public readonly selectLayout!: (id: string | null) => void;
-
   get layoutIds(): string[] {
     return builderStore.layoutIds;
+  }
+
+  get title(): string {
+    return this.layout?.title ?? 'Unknown';
+  }
+
+  get scale(): number {
+    return this.layout?.scale ?? 1;
+  }
+
+  get listed(): boolean {
+    return this.layout?.listed ?? true;
+  }
+
+  set listed(v: boolean) {
+    if (this.layout) {
+      builderStore.saveLayout({ ...this.layout, listed: v });
+    }
+  }
+
+  get isHomePage(): boolean {
+    return systemStore.config.homePage === `/brewery/${this.layout?.id}`;
+  }
+
+  set isHomePage(v: boolean) {
+    const homePage = v && this.layout ? `/brewery/${this.layout.id}` : null;
+    systemStore.saveConfig({ homePage });
+  }
+
+  selectLayout(id: string | null): void {
+    this.$emit('selected', id);
+  }
+
+  editScale(): void {
+    createDialog({
+      component: 'InputDialog',
+      title: 'Set zoom level',
+      suffix: '%',
+      value: (1 / this.scale) * 100,
+      rules: [
+        v => v === null || v > 0 || 'Value must be > 0',
+      ],
+    })
+      .onOk(v => {
+        if (this.layout) {
+          const scale = 100 / (v ?? 100);
+          builderStore.saveLayout({ ...this.layout, scale });
+        }
+      });
   }
 
   startAddLayout(copy: boolean): void {
@@ -48,14 +92,6 @@ export default class LayoutActions extends Vue {
         });
         this.selectLayout(id);
       });
-  }
-
-  async importLayout(): Promise<void> {
-    loadFile<BuilderLayout>(async layout => {
-      const id = uid();
-      await builderStore.createLayout({ ...layout, id });
-      this.selectLayout(id);
-    });
   }
 
   exportLayout(): void {
@@ -91,7 +127,11 @@ export default class LayoutActions extends Vue {
       noBackdropDismiss: true,
       cancel: true,
     })
-      .onOk(() => this.saveParts([]));
+      .onOk(() => {
+        if (this.layout) {
+          builderStore.saveLayout({ ...this.layout, parts: [] });
+        }
+      });
   }
 
   removeLayout(): void {
@@ -153,22 +193,51 @@ export default class LayoutActions extends Vue {
 
 
 <template>
-  <ActionMenu v-bind="{...$attrs}">
-    <template #actions>
-      <ActionItem icon="add" label="New Layout" @click="startAddLayout(false)" />
-      <ActionItem icon="mdi-file-import" label="Import Layout" @click="importLayout" />
-      <template v-if="!!layout">
-        <ActionItem icon="file_copy" label="Copy Layout" @click="startAddLayout(true)" />
-        <ActionItem icon="edit" label="Rename Layout" @click="renameLayout" />
-        <ActionItem icon="dashboard" label="Show Layout on dashboard" @click="createLayoutWidget" />
-        <ActionItem icon="mdi-file-export" label="Export Layout" @click="exportLayout" />
-        <ActionItem icon="delete" label="Remove all parts" @click="clearParts" />
-        <ActionItem icon="delete" label="Remove Layout" @click="removeLayout" />
-      </template>
-    </template>
-    <template #menus>
-      <slot name="menus" />
-    </template>
+  <ActionSubmenu v-if="!!layout" :label="title" v-bind="{...$attrs}">
     <slot />
-  </ActionMenu>
+    <ToggleAction
+      v-model="isHomePage"
+      icon="home"
+      :label="isHomePage ? 'Is home page' : 'Make home page'"
+    />
+    <ToggleAction
+      v-model="listed"
+      label="Show in sidebar"
+    />
+    <ActionItem
+      icon="mdi-magnify-plus-outline"
+      :label="`Zoom: ${(1 / scale) * 100}%`"
+      @click="editScale"
+    />
+    <ActionItem
+      icon="file_copy"
+      label="Copy layout"
+      @click="startAddLayout(true)"
+    />
+    <ActionItem
+      icon="edit"
+      label="Rename layout"
+      @click="renameLayout"
+    />
+    <ActionItem
+      icon="dashboard"
+      label="Show layout on dashboard"
+      @click="createLayoutWidget"
+    />
+    <ActionItem
+      icon="mdi-file-export"
+      label="Export layout"
+      @click="exportLayout"
+    />
+    <ActionItem
+      icon="delete"
+      label="Remove all parts"
+      @click="clearParts"
+    />
+    <ActionItem
+      icon="delete"
+      label="Remove layout"
+      @click="removeLayout"
+    />
+  </ActionSubmenu>
 </template>

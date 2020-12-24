@@ -760,18 +760,17 @@ export default class BuilderEditor extends Vue {
     <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
-      <SidebarNavigator active-section="builder" />
+      <SidebarNavigator />
 
       <div class="row">
         <q-tabs v-model="drawerContent" active-color="primary" class="col-grow">
           <q-tab name="tools" label="Tools" />
           <q-tab name="layouts" label="Layouts" />
         </q-tabs>
-        <LayoutActions
+        <BuilderActions
           :layout="layout"
-          :select-layout="selectLayout"
-          :save-parts="saveParts"
           class="col-auto"
+          @selected="selectLayout"
         />
       </div>
 
@@ -919,7 +918,7 @@ export default class BuilderEditor extends Vue {
       @close="closeMenu"
     />
 
-    <q-page-container>
+    <q-page-container style="overflow: hidden">
       <q-page class="row no-wrap justify-center q-pa-md">
         <div class="col-auto column no-wrap">
           <div
@@ -1038,42 +1037,35 @@ export default class BuilderEditor extends Vue {
   </q-layout>
 </template>
 
-<style lang="scss" scoped>
-@import "./grid.sass";
+<style lang="sass" scoped>
+@import "./grid.sass"
 
-.editor-page {
-  outline: none;
-}
+.editor-page
+  outline: none
 
-.q-page-container {
-  max-height: 100vh;
-  max-width: 100vw;
-}
+.q-page-container
+  max-height: 100vh
+  max-width: 100vw
 
-.unfocus-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
-  background-color: rgba(0, 0, 0, 0.5);
-  transition: 1s;
-}
+.unfocus-overlay
+  position: fixed
+  top: 0
+  left: 0
+  height: 100vh
+  width: 100vw
+  background-color: rgba(0, 0, 0, 0.5)
+  transition: 1s
 
-.resume-message {
-  border-radius: 40px;
-  border: 2px solid silver;
-}
+.resume-message
+  border-radius: 40px
+  border: 2px solid silver
 
-.fade-enter-active {
-  transition: opacity 4s ease;
-}
+.fade-enter-active
+  transition: opacity 4s ease
 
-.fade-enter {
-  opacity: 0;
-}
+.fade-enter
+  opacity: 0
 
-.fade-enter-to {
-  opacity: 1;
-}
+  &-to
+    opacity: 1
 </style>

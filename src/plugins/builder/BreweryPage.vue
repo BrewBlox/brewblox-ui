@@ -73,13 +73,6 @@ export default class BreweryPage extends Vue {
     return this.layout?.scale ?? 1;
   }
 
-  set scale(v: number) {
-    if (this.layout && v !== this.scale) {
-      this.layout.scale = v;
-      this.debouncedSaveLayout(this.layout);
-    }
-  }
-
   get gridHeight(): number {
     return squares(this.layout?.height ?? 10) * this.scale;
   }
@@ -182,97 +175,56 @@ export default class BreweryPage extends Vue {
 </script>
 
 <template>
-  <q-layout
-    view="hHh Lpr fFf"
-  >
-    <LayoutHeader @menu="drawerOpen = !drawerOpen">
-      <template #title>
-        Builder Page
-      </template>
-    </LayoutHeader>
-    <LayoutFooter />
-
-    <q-drawer v-model="drawerOpen" content-class="column" elevated>
-      <SidebarNavigator active-section="brewery" />
-
-      <q-field
-        label="Scale"
-        stack-label
-        borderless
-        class="col-grow q-px-md"
+  <q-page class="page-height">
+    <portal to="toolbar-buttons">
+      <q-btn
+        v-if="!$dense"
+        unelevated
+        round
+        icon="mdi-tools"
+        class="self-center"
+        :to="`/builder/${layoutId}`"
       >
-        <q-slider
-          v-model.lazy="scale"
-          reverse
-          label
-          :min="0.4"
-          :max="4"
-          :step="0.2"
-        />
-        <q-btn
-          flat
-          round
-          size="sm"
-          color="white"
-          icon="mdi-backup-restore"
-          class="self-center q-ml-sm"
-          @click="scale = 1"
-        />
-      </q-field>
-
-      <q-scroll-area
-        class="col"
-        :thumb-style="{opacity: 0.5, background: 'silver'}"
+        <q-tooltip>Open builder</q-tooltip>
+      </q-btn>
+      <ActionMenu
+        round
+        class="self-center"
+        label="Layout actions"
       >
-        <q-item class="q-pb-none">
-          <q-item-section class="text-bold">
-            Layouts
-          </q-item-section>
-        </q-item>
-        <ActionItem
-          v-for="lay in layouts"
-          :key="lay.id"
-          :label="lay.title"
-          :active="lay.id === layoutId"
-          class="ellipsis"
-          style="min-height: 0"
-          :inset-level="0.2"
-          @click="selectLayout(lay.id)"
-        />
-      </q-scroll-area>
-    </q-drawer>
+        <template #menus>
+          <LayoutActions :layout="layout" />
+        </template>
+      </ActionMenu>
+    </portal>
 
-    <q-page-container>
-      <q-page class="row no-wrap justify-center q-pa-md">
-        <div class="fit">
-          <span v-if="parts.length === 0" class="absolute-center">
-            {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
-          </span>
-          <svg
-            ref="grid"
-            :viewBox="gridViewBox"
-            class="fit q-pa-md"
-          >
-            <g
-              v-for="part in flowParts"
-              :key="part.id"
-              :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-              :class="{ pointer: isClickable(part), [part.type]: true }"
-              @touchstart.prevent
-              @click="interact(part)"
-            >
-              <PartWrapper
-                v-touch-repeat:100.stop="args => handleRepeat(args, part)"
-                :part="part"
-                @update:part="savePart"
-                @dirty="debouncedCalculate"
-              />
-            </g>
-          </svg>
-        </div>
-      </q-page>
-    </q-page-container>
-  </q-layout>
+    <div class="fit">
+      <span v-if="parts.length === 0" class="absolute-center">
+        {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
+      </span>
+      <svg
+        ref="grid"
+        :viewBox="gridViewBox"
+        class="fit"
+      >
+        <g
+          v-for="part in flowParts"
+          :key="part.id"
+          :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+          :class="{ pointer: isClickable(part), [part.type]: true }"
+          @touchstart.prevent
+          @click="interact(part)"
+        >
+          <PartWrapper
+            v-touch-repeat:100.stop="args => handleRepeat(args, part)"
+            :part="part"
+            @update:part="savePart"
+            @dirty="debouncedCalculate"
+          />
+        </g>
+      </svg>
+    </div>
+  </q-page>
 </template>
 
 <style lang="sass" scoped>

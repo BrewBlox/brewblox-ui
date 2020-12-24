@@ -1,17 +1,15 @@
 <script lang="ts">
-import KeyboardLayouts from 'simple-keyboard-layouts';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
 import { systemStore } from '@/store/system';
-;
 
 @Component
 export default class DefaultLayout extends Vue {
   localDrawer: boolean | null = null;
   dashboardEditing = false;
   serviceEditing = false;
+  builderEditing = false;
 
   get drawerOpen(): boolean {
     return Boolean(
@@ -25,44 +23,28 @@ export default class DefaultLayout extends Vue {
     this.$q.localStorage.set('drawer', v);
   }
 
-  get buildDate(): string {
-    return process.env.BLOX_DATE ?? 'UNKNOWN';
+  get devMode(): boolean {
+    return !!process.env.DEV;
   }
 
-  get devMode() {
-    return process.env.DEV;
-  }
-
-  get experimental(): boolean {
-    return systemStore.config.experimental;
-  }
-
-  set experimental(experimental: boolean) {
-    systemStore.saveConfig({ experimental });
+  get showSidebarLayouts(): boolean {
+    return systemStore.config.showSidebarLayouts;
   }
 
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
+    this.builderEditing = false;
   }
 
-  startChangeKeyboardLayout(): void {
-    createDialog({
-      component: 'SelectDialog',
-      selectOptions: Object.keys(new KeyboardLayouts().layouts),
-      value: systemStore.config.keyboardLayout,
-      title: 'Select layout for virtual keyboard',
-      selectProps: {
-        label: 'Layout',
-      },
-    })
-      .onOk(keyboardLayout => systemStore.saveConfig({ keyboardLayout }));
+  routeActive(route: string): boolean {
+    return !!this.$route.path.match(route);
   }
 }
 </script>
 
 <template>
-  <q-layout view="hHh Lpr fFf">
+  <q-layout view="hHh Lpr fFf" style="overflow: hidden">
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
         <portal-target name="toolbar-title">
@@ -76,43 +58,22 @@ export default class DefaultLayout extends Vue {
     <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
-      <SidebarNavigator active-section="dashboards" />
+      <SidebarNavigator />
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
         <DashboardIndex v-model="dashboardEditing" />
+        <BuilderLayoutIndex v-if="showSidebarLayouts" v-model="builderEditing" />
         <ServiceIndex v-model="serviceEditing" />
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
-        <ActionMenu icon="mdi-bug-outline" label="Debugging">
-          <template #actions>
-            <ExportErrorsAction />
-            <q-separator inset />
-            <LabeledField
-              :value="buildDate"
-              label="Build date"
-              item-aligned
-              dense
-            />
-          </template>
-        </ActionMenu>
-        <ActionMenu icon="settings" label="Settings">
-          <template #actions>
-            <ActionItem
-              :active="experimental"
-              label="Enable experiments"
-              icon="mdi-test-tube"
-              style="min-width: 200px"
-              @click="experimental = !experimental"
-            />
-            <ActionItem
-              label="Set keyboard layout"
-              icon="mdi-keyboard"
-              @click="startChangeKeyboardLayout"
-            />
-          </template>
-        </ActionMenu>
-        <q-btn flat icon="mdi-format-paint" to="/styles">
+        <q-btn
+          v-if="devMode"
+          flat
+          icon="mdi-format-paint"
+          to="/styles"
+          :color="routeActive('/styles') ? 'primary' : ''"
+        >
           <q-tooltip>
             Theming
           </q-tooltip>
@@ -120,13 +81,11 @@ export default class DefaultLayout extends Vue {
       </div>
     </q-drawer>
 
-    <q-page-container @click.native="stopEditing">
+    <q-page-container
+      style="overflow: hidden"
+      @click.native="stopEditing"
+    >
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
-
-<style lang="sass">
-.q-layout
-  overflow-x: auto
-</style>

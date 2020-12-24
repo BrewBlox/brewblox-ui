@@ -3,31 +3,33 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
 @Component
-export default class StyleGuide extends Vue {
-  colors =
-    ['red',
-      'pink',
-      'purple',
-      'deep-purple',
-      'indigo',
-      'blue',
-      'light-blue',
-      'cyan',
-      'teal',
-      'green',
-      'light-green',
-      'lime',
-      'yellow',
-      'amber',
-      'orange',
-      'deep-orange',
-      'brown',
-      'grey',
-      'blue-grey'];
+export default class StylesPage extends Vue {
+  colors = [
+    'red',
+    'pink',
+    'purple',
+    'deep-purple',
+    'indigo',
+    'blue',
+    'light-blue',
+    'cyan',
+    'teal',
+    'green',
+    'light-green',
+    'lime',
+    'yellow',
+    'amber',
+    'orange',
+    'deep-orange',
+    'brown',
+    'grey',
+    'blue-grey',
+  ];
 
   created() {
     document.title = 'Brewblox | Style Guide';
   }
+
 }
 </script>
 
@@ -47,7 +49,7 @@ export default class StyleGuide extends Vue {
           v-for="n in 14"
           :key="n"
           class="detailed-color column flex-center"
-          :class="[`bg-${color}-${n}`, n > 5 && n < 11 ? 'text-white': '']"
+          :class="[`bg-${color}-${n}`, n < 8 && 'text-black']"
         >
           {{ color }}-{{ n }}
         </div>
