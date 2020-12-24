@@ -53,7 +53,7 @@ export default class SidebarNavigator extends Vue {
         icon="mdi-view-dashboard"
         label="Dashboards"
         to="/"
-        :color="btnColor('dashboard', 'service')"
+        :color="btnColor('dashboard', 'service', 'brewery')"
         v-bind="btnAttrs"
       />
       <q-btn
@@ -76,13 +76,6 @@ export default class SidebarNavigator extends Vue {
         label="Builder"
         to="/builder"
         :color="btnColor('builder')"
-        v-bind="btnAttrs"
-      />
-      <q-btn
-        icon="mdi-pipe"
-        label="Brewery"
-        to="/brewery"
-        :color="btnColor('brewery')"
         v-bind="btnAttrs"
       />
       <q-btn

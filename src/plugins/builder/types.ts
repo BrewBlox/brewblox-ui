@@ -71,6 +71,7 @@ export interface BuilderLayout extends StoreObject {
   width: number;
   height: number;
   scale?: number;
+  order?: number;
   parts: PersistentPart[];
 }
 

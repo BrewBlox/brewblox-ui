@@ -10,10 +10,6 @@ const router = new VueRouter({
       component: () => import('@/plugins/builder/BuilderEditor.vue'),
     },
     {
-      path: '/brewery/:id?',
-      component: () => import('@/plugins/builder/BreweryPage.vue'),
-    },
-    {
       path: '/automation/:id?',
       component: () => import('@/plugins/automation/AutomationLayout.vue'),
     },
@@ -27,6 +23,7 @@ const router = new VueRouter({
         // dynamic pages
         { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },
         { path: '/service/:id', component: () => import('@/pages/ServicePage.vue') },
+        { path: '/brewery/:id?', component: () => import('@/plugins/builder/BreweryPage.vue') },
       ],
     },
 

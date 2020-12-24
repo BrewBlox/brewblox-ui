@@ -383,6 +383,9 @@ export default class SparkPage extends Vue {
         size="12px"
         class="self-center"
       >
+        <q-tooltip>
+          Service actions
+        </q-tooltip>
         <template #menus>
           <SparkActions :service-id="serviceId" />
         </template>

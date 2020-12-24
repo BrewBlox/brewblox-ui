@@ -118,7 +118,13 @@ export default class DashboardPage extends Vue {
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center" label="Dashboard actions">
+        <ActionMenu
+          round
+          class="self-center"
+        >
+          <q-tooltip>
+            Dashboard actions
+          </q-tooltip>
           <template #menus>
             <DashboardActions :dashboard-id="dashboardId" />
           </template>

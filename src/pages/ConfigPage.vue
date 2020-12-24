@@ -5,6 +5,8 @@ import { Component } from 'vue-property-decorator';
 
 import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
+import { builderStore } from '@/plugins/builder/store';
+import { BuilderLayout } from '@/plugins/builder/types';
 import { dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
@@ -26,6 +28,14 @@ export default class ConfigPage extends Vue {
     systemStore.saveConfig({ experimental });
   }
 
+  get showSidebarLayouts(): boolean {
+    return systemStore.config.showSidebarLayouts;
+  }
+
+  set showSidebarLayouts(showSidebarLayouts: boolean) {
+    systemStore.saveConfig({ showSidebarLayouts });
+  }
+
   get buildDate(): string {
     return process.env.BLOX_DATE ?? 'UNKNOWN';
   }
@@ -44,6 +54,11 @@ export default class ConfigPage extends Vue {
         configComponent: featureStore.serviceById(v.type)?.configComponent,
       }))
       .filter((v): v is ConfigService => !!v.configComponent);
+  }
+
+  get layouts(): BuilderLayout[] {
+    return [...builderStore.layouts]
+      .sort(objectSorter('order'));
   }
 
   startChangeKeyboardLayout(): void {
@@ -70,12 +85,13 @@ export default class ConfigPage extends Vue {
       <div class="col-break q-my-none" />
 
       <ActionSubmenu label="Global settings">
-        <ActionItem
-          :active="experimental"
-          label="Enable experiments"
-          icon="mdi-test-tube"
-          style="min-width: 200px"
-          @click="experimental = !experimental"
+        <ToggleAction
+          v-model="experimental"
+          label="Experimental features"
+        />
+        <ToggleAction
+          v-model="showSidebarLayouts"
+          label="Show builder layouts in sidebar"
         />
         <ActionItem
           label="Set keyboard layout"
@@ -123,6 +139,24 @@ export default class ConfigPage extends Vue {
         :key="'service-'+svc.serviceId"
         :service-id="svc.serviceId"
       />
+
+      <div class="col-break" />
+      <div class="text-h5 text-grey-4 text-italic">
+        Builder layouts
+      </div>
+      <div class="col-break q-my-none" />
+
+      <LayoutActions
+        v-for="layout in layouts"
+        :key="'layout-'+layout.id"
+        :layout="layout"
+      >
+        <ActionItem
+          :to="`/builder/${layout.id}`"
+          icon="mdi-tools"
+          label="Edit layout"
+        />
+      </LayoutActions>
     </div>
   </q-page>
 </template>

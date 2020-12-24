@@ -128,7 +128,7 @@ export default class SparkActions extends Vue {
       />
       <ActionItem
         icon="edit"
-        label="Change service title"
+        label="Rename service"
         @click="funcs.startChangeServiceTitle(service)"
       />
       <ActionItem

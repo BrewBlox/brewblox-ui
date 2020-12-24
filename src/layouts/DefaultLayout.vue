@@ -2,11 +2,14 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
+import { systemStore } from '@/store/system';
+
 @Component
 export default class DefaultLayout extends Vue {
   localDrawer: boolean | null = null;
   dashboardEditing = false;
   serviceEditing = false;
+  builderEditing = false;
 
   get drawerOpen(): boolean {
     return Boolean(
@@ -20,13 +23,18 @@ export default class DefaultLayout extends Vue {
     this.$q.localStorage.set('drawer', v);
   }
 
-  get devMode() {
-    return process.env.DEV;
+  get devMode(): boolean {
+    return !!process.env.DEV;
+  }
+
+  get showSidebarLayouts(): boolean {
+    return systemStore.config.showSidebarLayouts;
   }
 
   stopEditing(): void {
     this.dashboardEditing = false;
     this.serviceEditing = false;
+    this.builderEditing = false;
   }
 
   routeActive(route: string): boolean {
@@ -55,6 +63,7 @@ export default class DefaultLayout extends Vue {
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
         <DashboardIndex v-model="dashboardEditing" />
         <ServiceIndex v-model="serviceEditing" />
+        <BuilderLayoutIndex v-if="showSidebarLayouts" v-model="builderEditing" />
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">

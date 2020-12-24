@@ -36,8 +36,8 @@ export async function startCreateService(stub: ServiceStub, router: VueRouter): 
 export function startChangeServiceTitle(service: Service): void {
   createDialog({
     component: 'InputDialog',
-    title: 'Change service Title',
-    message: "Change your service's display name",
+    title: 'Rename service',
+    message: 'This changes the service display name, not its unique identifier.',
     value: service.title,
   })
     .onOk(async (newTitle: string) => {

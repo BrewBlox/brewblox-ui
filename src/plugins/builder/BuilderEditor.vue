@@ -767,11 +767,10 @@ export default class BuilderEditor extends Vue {
           <q-tab name="tools" label="Tools" />
           <q-tab name="layouts" label="Layouts" />
         </q-tabs>
-        <LayoutActions
+        <BuilderActions
           :layout="layout"
-          :select-layout="selectLayout"
-          :save-parts="saveParts"
           class="col-auto"
+          @selected="selectLayout"
         />
       </div>
 

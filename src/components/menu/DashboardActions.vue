@@ -86,7 +86,7 @@ export default class DashboardActions extends Vue {
       />
       <ActionItem
         icon="edit"
-        label="Change dashboard title"
+        label="Rename dashboard"
         @click="changeDashboardTitle(dashboard)"
       />
       <ActionItem

@@ -68,8 +68,13 @@ export class DashboardModule extends VuexModule {
     await Promise.all(
       ids
         .map(id => this.dashboardById(id))
-        .filter(v => v !== null)
-        .map((dashboard, idx) => this.saveDashboard({ ...dashboard!, order: idx + 1 }))
+        .filter((v): v is Dashboard => v !== null)
+        .map((dashboard, idx) => {
+          const order = idx + 1;
+          if (order !== dashboard.order) {
+            this.saveDashboard({ ...dashboard, order });
+          }
+        })
     );
   }
 
