@@ -73,13 +73,6 @@ export default class BreweryPage extends Vue {
     return this.layout?.scale ?? 1;
   }
 
-  set scale(v: number) {
-    if (this.layout && v !== this.scale) {
-      this.layout.scale = v;
-      this.debouncedSaveLayout(this.layout);
-    }
-  }
-
   get gridHeight(): number {
     return squares(this.layout?.height ?? 10) * this.scale;
   }
@@ -182,7 +175,7 @@ export default class BreweryPage extends Vue {
 </script>
 
 <template>
-  <q-page class="row no-wrap justify-center q-pa-md">
+  <q-page class="page-height">
     <portal to="toolbar-buttons">
       <q-btn
         v-if="!$dense"
@@ -212,7 +205,7 @@ export default class BreweryPage extends Vue {
       <svg
         ref="grid"
         :viewBox="gridViewBox"
-        class="fit q-pa-md"
+        class="fit"
       >
         <g
           v-for="part in flowParts"

@@ -4,6 +4,7 @@ import UrlSafeString from 'url-safe-string';
 import { createDialog } from '@/helpers/dialog';
 import notify from '@/helpers/notify';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { systemStore } from '@/store/system';
 
 import { suggestId } from './functional';
 
@@ -32,8 +33,8 @@ export const execDashboardIdChange =
     );
     await dashboardStore.removeDashboard({ ...dashboard });
 
-    if (dashboardStore.primaryDashboardId === oldId) {
-      await dashboardStore.updatePrimaryDashboard(newId);
+    if (systemStore.config.homePage === `/dashboard/${oldId}`) {
+      systemStore.saveConfig({ homePage: `/dashboard/${newId}` });
     }
 
     notify.done(`Changed dashboard ID '${oldId}' to '${newId}'`);

@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { sparkStore } from '@/plugins/spark/store';
 import { dashboardStore } from '@/store/dashboards';
+import { systemStore } from '@/store/system';
 
 @Component
 export default class WizardDialog extends DialogBase {
@@ -27,9 +28,18 @@ export default class WizardDialog extends DialogBase {
     return sparkStore.modules.length > 0;
   }
 
+  get primaryDashboardId(): string | null {
+    const { homePage } = systemStore.config;
+    if (!homePage || !homePage.startsWith('/dashboard')) {
+      return null;
+    }
+    return homePage.split('/')[2] ?? null;
+  }
+
   get dashboardId(): string | null {
     return this.activeDashboardId
-      ?? dashboardStore.primaryDashboardId
+      ?? this.primaryDashboardId
+      ?? dashboardStore.dashboardIds[0]
       ?? null;
   }
 

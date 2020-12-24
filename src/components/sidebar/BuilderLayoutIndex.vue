@@ -24,7 +24,9 @@ export default class BuilderLayoutIndex extends Vue {
 
   get layouts(): BuilderLayout[] {
     // avoid modifying the store object
-    return [...builderStore.layouts].sort(objectSorter('order'));
+    return [...builderStore.layouts]
+      .filter(layout => layout.listed ?? true)
+      .sort(objectSorter('order'));
   }
 
   set layouts(layouts: BuilderLayout[]) {

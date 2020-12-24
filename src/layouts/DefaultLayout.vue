@@ -44,7 +44,7 @@ export default class DefaultLayout extends Vue {
 </script>
 
 <template>
-  <q-layout view="hHh Lpr fFf">
+  <q-layout view="hHh Lpr fFf" style="overflow: hidden">
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
         <portal-target name="toolbar-title">
@@ -62,8 +62,8 @@ export default class DefaultLayout extends Vue {
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
         <DashboardIndex v-model="dashboardEditing" />
-        <ServiceIndex v-model="serviceEditing" />
         <BuilderLayoutIndex v-if="showSidebarLayouts" v-model="builderEditing" />
+        <ServiceIndex v-model="serviceEditing" />
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
@@ -81,13 +81,11 @@ export default class DefaultLayout extends Vue {
       </div>
     </q-drawer>
 
-    <q-page-container @click.native="stopEditing">
+    <q-page-container
+      style="overflow: hidden"
+      @click.native="stopEditing"
+    >
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
-
-<style lang="sass">
-.q-layout
-  overflow-x: auto
-</style>

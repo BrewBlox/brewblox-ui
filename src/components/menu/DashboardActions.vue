@@ -5,6 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
 import { createDialog } from '@/helpers/dialog';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { systemStore } from '@/store/system';
 
 
 @Component
@@ -21,6 +22,15 @@ export default class DashboardActions extends Vue {
     return this.dashboard?.title ?? this.dashboardId;
   }
 
+  get isHomePage(): boolean {
+    return systemStore.config.homePage === `/dashboard/${this.dashboard?.id}`;
+  }
+
+  set isHomePage(v: boolean) {
+    const homePage = v && this.dashboard ? `/dashboard/${this.dashboard.id}` : null;
+    systemStore.saveConfig({ homePage });
+  }
+
   showWizard(): void {
     createDialog({
       component: 'WizardDialog',
@@ -33,10 +43,6 @@ export default class DashboardActions extends Vue {
     if (newId && this.$route.path === `/dashboard/${oldId}`) {
       this.$router.replace(`/dashboard/${newId}`);
     }
-  }
-
-  toggleDefaultDashboard(dashboard: Dashboard): void {
-    dashboardStore.updatePrimaryDashboard(dashboard.primary ? null : dashboard.id);
   }
 
   changeDashboardId(dashboard: Dashboard): void {
@@ -65,20 +71,11 @@ export default class DashboardActions extends Vue {
         label="New Widget"
         @click="showWizard"
       />
-      <q-item
-        clickable
-        @click="toggleDefaultDashboard(dashboard)"
-      >
-        <q-item-section avatar>
-          <q-icon
-            :color="dashboard.primary ? 'primary' : ''"
-            name="home"
-          />
-        </q-item-section>
-        <q-item-section>
-          {{ dashboard.primary ? 'Is home page' : 'Make home page' }}
-        </q-item-section>
-      </q-item>
+      <ToggleAction
+        v-model="isHomePage"
+        icon="home"
+        :label="isHomePage ? 'Is home page' : 'Make home page'"
+      />
       <ActionItem
         icon="edit"
         label="Change dashboard URL"

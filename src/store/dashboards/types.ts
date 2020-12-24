@@ -18,13 +18,6 @@ export interface Dashboard extends StoreObject {
    * Sorting order among other dashboards.
    */
   order: number;
-
-  /**
-   * The primary dashboard will be automatically
-   * selected if the user navigates to the application root URL,
-   * or clicks the home button.
-   */
-  primary?: boolean;
 }
 
 /**

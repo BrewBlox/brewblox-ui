@@ -96,11 +96,11 @@ export default class DashboardPage extends Vue {
 </script>
 
 <template>
-  <q-page padding>
+  <q-page style="overflow: auto" class="page-height">
     <q-inner-loading v-if="!dashboard">
       <q-spinner size="50px" color="primary" />
     </q-inner-loading>
-    <div v-else>
+    <div v-else class="q-pa-lg">
       <portal to="toolbar-title">
         {{ dashboard.title }}
       </portal>

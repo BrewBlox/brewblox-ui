@@ -77,8 +77,8 @@ export default class ConfigPage extends Vue {
 </script>
 
 <template>
-  <q-page padding>
-    <div class="row q-gutter-lg">
+  <q-page class="page-height overflow-auto">
+    <div class="row q-pa-lg q-gutter-lg">
       <div class="text-h5 text-grey-4 text-italic">
         System
       </div>

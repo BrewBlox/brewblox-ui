@@ -7,6 +7,7 @@ import { startChangeServiceTitle, startRemoveService } from '@/helpers/services'
 import { cleanUnusedNames, discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { serviceStore } from '@/store/services';
+import { systemStore } from '@/store/system';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { SparkService } from '../types';
@@ -37,6 +38,15 @@ export default class SparkActions extends Vue {
 
   get sparkModule(): SparkServiceModule | null {
     return sparkStore.moduleById(this.serviceId);
+  }
+
+  get isHomePage(): boolean {
+    return systemStore.config.homePage === `/service/${this.service?.id}`;
+  }
+
+  set isHomePage(v: boolean) {
+    const homePage = v && this.service ? `/service/${this.service.id}` : null;
+    systemStore.saveConfig({ homePage });
   }
 
   serviceReboot(): void {
@@ -125,6 +135,11 @@ export default class SparkActions extends Vue {
         icon="delete"
         label="Remove all blocks"
         @click="funcs.startResetBlocks(serviceId)"
+      />
+      <ToggleAction
+        v-model="isHomePage"
+        icon="home"
+        :label="isHomePage ? 'Is home page' : 'Make home page'"
       />
       <ActionItem
         icon="edit"

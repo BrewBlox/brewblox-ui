@@ -12,10 +12,16 @@ export default class ToggleAction extends Vue {
   @Prop({ type: Boolean, default: true })
   public readonly colored!: boolean;
 
+  @Prop({ type: String, default: 'mdi-checkbox-marked-outline' })
+  public readonly iconEnabled!: string;
+
+  @Prop({ type: String, default: 'mdi-checkbox-blank-outline' })
+  public readonly iconDisabled!: string;
+
   get icon(): string {
     return this.value
-      ? 'mdi-checkbox-marked-outline'
-      : 'mdi-checkbox-blank-outline';
+      ? this.iconEnabled
+      : this.iconDisabled;
   }
 
   get color(): string {
