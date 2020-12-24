@@ -121,6 +121,13 @@ export default class ConfigPage extends Vue {
       </div>
       <div class="col-break q-my-none" />
 
+      <div
+        v-if="dashboardIds.length === 0"
+        class="text-grey-4 text-italic"
+      >
+        There are no dashboards
+      </div>
+
       <DashboardActions
         v-for="id in dashboardIds"
         :key="'dashboard-'+id"
@@ -132,6 +139,13 @@ export default class ConfigPage extends Vue {
         Services
       </div>
       <div class="col-break q-my-none" />
+
+      <div
+        v-if="serviceComponents.length === 0"
+        class="text-grey-4 text-italic"
+      >
+        There are no services
+      </div>
 
       <component
         :is="svc.configComponent"
@@ -145,6 +159,13 @@ export default class ConfigPage extends Vue {
         Builder layouts
       </div>
       <div class="col-break q-my-none" />
+
+      <div
+        v-if="layouts.length === 0"
+        class="text-grey-4 text-italic"
+      >
+        There are no builder layouts
+      </div>
 
       <LayoutActions
         v-for="layout in layouts"
