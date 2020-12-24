@@ -65,11 +65,11 @@ export default class ConfigPage extends Vue {
   <q-page padding>
     <div class="row q-gutter-lg">
       <div class="text-h5 text-grey-4 text-italic">
-        System settings
+        System
       </div>
       <div class="col-break q-my-none" />
 
-      <ActionSubmenu label="Config">
+      <ActionSubmenu label="Global settings">
         <ActionItem
           :active="experimental"
           label="Enable experiments"
@@ -87,7 +87,7 @@ export default class ConfigPage extends Vue {
       <ActionSubmenu label="Debugging">
         <q-item class="fade-4">
           <q-item-section avatar>
-            <q-icon name="mdi-wrench" />
+            <q-icon name="mdi-factory" />
           </q-item-section>
           <q-item-section>
             <q-item-label caption>

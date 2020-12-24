@@ -760,7 +760,7 @@ export default class BuilderEditor extends Vue {
     <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
-      <SidebarNavigator active-section="builder" />
+      <SidebarNavigator />
 
       <div class="row">
         <q-tabs v-model="drawerContent" active-color="primary" class="col-grow">

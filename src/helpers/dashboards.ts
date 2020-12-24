@@ -45,8 +45,8 @@ export const startChangeDashboardId =
     createDialog({
       component: 'InputDialog',
       value: dashboard.id,
-      title: 'Change dashboard ID',
-      message: "This will change your dashboard's unique ID",
+      title: 'Change dashboard URL',
+      message: 'The dashboard URL is used as unique identifier.',
       rules: dashboardIdRules(),
     })
       .onOk(async (newId: string) => {

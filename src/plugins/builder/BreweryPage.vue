@@ -193,7 +193,7 @@ export default class BreweryPage extends Vue {
     <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
-      <SidebarNavigator active-section="brewery" />
+      <SidebarNavigator />
 
       <q-field
         label="Scale"

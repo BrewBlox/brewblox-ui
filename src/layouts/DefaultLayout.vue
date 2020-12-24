@@ -50,7 +50,7 @@ export default class DefaultLayout extends Vue {
     <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
-      <SidebarNavigator active-section="dashboards" />
+      <SidebarNavigator />
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
         <DashboardIndex v-model="dashboardEditing" />
@@ -58,16 +58,6 @@ export default class DefaultLayout extends Vue {
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
-        <q-btn
-          icon="settings"
-          flat
-          to="/config"
-          :color="routeActive('/config') ? 'primary' : ''"
-        >
-          <q-tooltip>
-            Settings
-          </q-tooltip>
-        </q-btn>
         <q-btn
           v-if="devMode"
           flat

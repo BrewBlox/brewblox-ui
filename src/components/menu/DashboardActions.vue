@@ -81,7 +81,7 @@ export default class DashboardActions extends Vue {
       </q-item>
       <ActionItem
         icon="edit"
-        label="Change dashboard ID"
+        label="Change dashboard URL"
         @click="changeDashboardId(dashboard)"
       />
       <ActionItem

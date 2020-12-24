@@ -206,7 +206,7 @@ export default class AutomationPage extends Vue {
     <LayoutFooter />
 
     <q-drawer v-model="drawerOpen" content-class="column" elevated>
-      <SidebarNavigator active-section="automation" />
+      <SidebarNavigator />
 
       <q-scroll-area
         class="col"
