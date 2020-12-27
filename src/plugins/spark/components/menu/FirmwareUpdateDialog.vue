@@ -4,9 +4,9 @@ import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { STATE_TOPIC } from '@/helpers/const';
+import { isSparkUpdate } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
-import { SparkUpdateEvent } from '@/shared-types';
 
 @Component
 export default class FirmwareUpdateDialog extends DialogBase {
@@ -21,9 +21,9 @@ export default class FirmwareUpdateDialog extends DialogBase {
   created(): void {
     this.listenerId = Vue.$eventbus.addListener(
       `${STATE_TOPIC}/${this.serviceId}/update`,
-      (_, evt: SparkUpdateEvent) => {
-        if (evt.type === 'Spark.update') {
-          evt.data.forEach(v => this.pushMessage(v));
+      (_, evt) => {
+        if (isSparkUpdate(evt)) {
+          evt.data.log.forEach(v => this.pushMessage(v));
         }
       });
   }

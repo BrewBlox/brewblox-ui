@@ -64,8 +64,14 @@ export default {
       }),
     });
 
-    Vue.$eventbus.subscribe(STATE_TOPIC + '/#');
-    Vue.$eventbus.addListener(STATE_TOPIC + '/#', (_, data) => {
+    // Basic spark state
+    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+`);
+    // Patch events
+    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+/patch`);
+    // Firmware update events
+    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+/update`);
+
+    Vue.$eventbus.addListener(`${STATE_TOPIC}/+`, (_, data) => {
       if (isSparkState(data)) {
         serviceStore.ensureStub({ id: data.key, type: sparkType });
       }

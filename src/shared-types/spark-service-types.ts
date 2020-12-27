@@ -1,4 +1,3 @@
-import { StateEvent } from './generic-types';
 import { Block } from './spark-block-types';
 
 // #region SparkFirmwareInfo
@@ -45,7 +44,8 @@ export interface ApiSparkStatus {
 // #endregion ApiSparkStatus
 
 // #region SparkStateEvent
-export interface SparkStateEvent extends StateEvent {
+export interface SparkStateEvent {
+  key: string; // Service ID
   type: 'Spark.state';
   data: {
     status: ApiSparkStatus | null;
@@ -55,14 +55,18 @@ export interface SparkStateEvent extends StateEvent {
 // #endregion SparkStateEvent
 
 // #region SparkUpdateEvent
-export interface SparkUpdateEvent extends StateEvent {
+export interface SparkUpdateEvent {
+  key: string; // Service ID
   type: 'Spark.update';
-  data: string[];
+  data: {
+    log: string[];
+  };
 }
 // #endregion SparkUpdateEvent
 
 // #region SparkPatchEvent
-export interface SparkPatchEvent extends StateEvent {
+export interface SparkPatchEvent {
+  key: string; // Service ID
   type: 'Spark.patch';
   data: {
     changed: Block[];

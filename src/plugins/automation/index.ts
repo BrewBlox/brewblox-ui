@@ -9,6 +9,8 @@ import AutomationWidget from './AutomationWidget.vue';
 import { automationStore } from './store';
 import { AutomationConfig, AutomationEvent } from './types';
 
+const automationTopic = STATE_TOPIC + '/automation';
+
 const widget: WidgetFeature = {
   id: 'Automation',
   title: 'Automation',
@@ -34,9 +36,9 @@ export default {
     featureStore.registerWidget(widget);
     featureStore.registerWatcher(watcher);
 
-    Vue.$eventbus.subscribe(STATE_TOPIC + '/#');
+    Vue.$eventbus.subscribe(automationTopic);
     Vue.$eventbus.addListener(
-      STATE_TOPIC + '/automation',
+      automationTopic,
       (_, evt: AutomationEvent) => {
         if (evt.type === 'automation.active') {
           automationStore.setEventData(deserialize(evt.data));
