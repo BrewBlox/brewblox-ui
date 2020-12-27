@@ -62,8 +62,8 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   private handlers: Mapped<EventHandler> = {}
 
   public async connect(): Promise<void> {
-    Vue.$eventbus.subscribe(STORE_TOPIC + '/#');
-    Vue.$eventbus.addListener(STORE_TOPIC + '/#', (_, data) => {
+    Vue.$eventbus.subscribe(STORE_TOPIC);
+    Vue.$eventbus.addListener(STORE_TOPIC, (_, data) => {
       if (isStoreEvent(data)) {
         data.changed && this.onChanged(data.changed);
         data.deleted && this.onDeleted(data.deleted);

@@ -1,4 +1,4 @@
-import { StateEvent, StoreObject, UUID } from './generic-types';
+import { StoreObject, UUID } from './generic-types';
 
 export interface ReqBlockAddress {
   serviceId: string;
@@ -311,7 +311,8 @@ export interface AutomationEventData {
   tasks: AutomationTask[];
 }
 
-export interface AutomationEvent extends StateEvent {
+export interface AutomationEvent {
+  key: string; // Service ID
   type: 'automation.active';
   data: AutomationEventData;
 }

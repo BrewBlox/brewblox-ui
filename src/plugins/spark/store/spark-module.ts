@@ -17,10 +17,11 @@ import type {
   SparkStatus,
   UserUnits,
 } from '@/plugins/spark/types';
-import { SparkPatchEvent, SparkStateEvent } from '@/shared-types';
+import { SparkPatchEvent } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 
+import { isSparkPatch, isSparkState } from '../helpers';
 import * as api from './api';
 import {
   asServiceStatus,
@@ -257,8 +258,8 @@ export class SparkServiceModule extends VuexModule {
   public async start(): Promise<void> {
     this.stateListenerId = Vue.$eventbus.addListener(
       `${STATE_TOPIC}/${this.id}`,
-      (_, evt: SparkStateEvent) => {
-        if (evt.type === 'Spark.state') {
+      (_, evt) => {
+        if (isSparkState(evt)) {
           const status = asSparkStatus(this.id, evt.data.status);
           const blocks = evt.data.blocks.map(deserialize);
 
@@ -269,8 +270,8 @@ export class SparkServiceModule extends VuexModule {
       });
     this.patchListenerId = Vue.$eventbus.addListener(
       `${STATE_TOPIC}/${this.id}/patch`,
-      (_, evt: SparkPatchEvent) => {
-        if (evt.type === 'Spark.patch') {
+      (_, evt) => {
+        if (isSparkPatch(evt)) {
           const changed = evt.data.changed.map(deserialize);
           const { deleted } = evt.data;
           this.patchBlocks({ changed, deleted });
