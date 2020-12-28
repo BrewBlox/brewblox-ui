@@ -122,10 +122,10 @@ export default class LayoutActions extends Vue {
 
   clearParts(): void {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Remove parts',
       message: 'Are you sure you wish to remove all parts?',
       noBackdropDismiss: true,
-      cancel: true,
     })
       .onOk(() => {
         if (this.layout) {
@@ -139,10 +139,10 @@ export default class LayoutActions extends Vue {
       return;
     }
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Remove layout',
       message: `Are you sure you wish to remove ${this.layout.title}?`,
       noBackdropDismiss: true,
-      cancel: true,
     })
       .onOk(async () => {
         if (this.layout) {
@@ -157,17 +157,19 @@ export default class LayoutActions extends Vue {
   createLayoutWidget(): void {
     if (!this.layout) { return; }
 
+    const selectOptions = dashboardStore.dashboards
+      .map(dashboard => ({
+        label: dashboard.title,
+        value: dashboard.id,
+      }));
+
     createDialog({
-      title: 'Copy widget',
-      message: `On which dashboard do you want to create a widget for ${this.layout.title}?`,
-      style: 'overflow-y: scroll',
-      options: {
-        type: 'radio',
-        model: '',
-        items: dashboardStore.dashboards
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-      },
-      cancel: true,
+      component: 'SelectDialog',
+      title: 'Make widget',
+      message: `On which dashboard do you want to create a widget for <b>${this.layout.title}</b>?`,
+      listSelect: selectOptions.length < 10,
+      html: true,
+      selectOptions,
     })
       .onOk(async (dashboard: string) => {
         const layout = this.layout!;

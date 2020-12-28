@@ -157,8 +157,10 @@ export function showAbsentBlock(part: PersistentPart, key: string): void {
   const addr = settingsAddress(part, key);
   if (!!addr.serviceId && !!addr.id) {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Broken Link',
       message: `Block '${addr.id}' was not found. Use the editor to change the link.`,
+      cancel: false,
     });
   }
 }
@@ -204,8 +206,10 @@ export function showLinkedWidgetDialog(part: PersistentPart, key: string): void 
   }
   else {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Broken Link',
       message: 'Widget was not found. Use the editor to change the link.',
+      cancel: false,
     });
   }
 }

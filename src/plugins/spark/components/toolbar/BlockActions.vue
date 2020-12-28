@@ -26,13 +26,14 @@ export default class BlockActions extends BlockCrudComponent {
         createDialog({
           component: 'SelectDialog',
           title: 'Select Graph widget',
+          listSelect: graphOpts.length < 10,
           selectProps: {
             label: 'Graph widgets',
           },
           value: null,
           selectOptions: graphOpts,
         })
-          .onOk(opt => resolve(opt.value))
+          .onOk(value => resolve(value))
           .onCancel(() => resolve(null))
           .onDismiss(() => resolve(null));
       }

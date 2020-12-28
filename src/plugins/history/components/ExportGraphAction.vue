@@ -52,7 +52,7 @@ export default class ExportGraphAction extends Vue {
   async exportData(): Promise<void> {
     createDialog({
       component: 'SelectDialog',
-      value: precisionOpts.find(v => v.value === 'ms'),
+      value: 'ms',
       selectOptions: precisionOpts,
       title: 'Select timestamp formatting',
       message: 'The first value on every line in the CSV file shows the timestamp.',
@@ -60,10 +60,11 @@ export default class ExportGraphAction extends Vue {
         label: 'Formatting',
       },
     })
-      .onOk(async (opt: SelectOption) => {
-        if (!opt) { return; }
-        const params: QueryParams = { ...this.config.params, policy: 'downsample_1m' };
-        await Promise.all(this.config.targets.map(target => this.fetchTarget(params, target, opt.value)));
+      .onOk(async (value: string) => {
+        if (value) {
+          const params: QueryParams = { ...this.config.params, policy: 'downsample_1m' };
+          await Promise.all(this.config.targets.map(target => this.fetchTarget(params, target, value)));
+        }
       });
   }
 }

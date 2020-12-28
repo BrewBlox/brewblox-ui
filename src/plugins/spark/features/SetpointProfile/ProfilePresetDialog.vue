@@ -57,6 +57,7 @@ export default class ProfilePresetDialog extends DialogBase {
     const points = deserialize(deepCopy(preset.data.points));
 
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Profile start',
       message: `Do you want to change '${this.value.id}' start time to now?`,
       ok: 'Yes',

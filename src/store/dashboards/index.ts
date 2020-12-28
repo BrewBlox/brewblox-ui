@@ -64,8 +64,6 @@ export class DashboardModule extends VuexModule {
 
   @Action
   public async removeDashboard(dashboard: Dashboard): Promise<void> {
-    this.dashboardWidgets(dashboard.id)
-      .forEach(widget => this.removeWidget(widget));
     await dashboardApi.remove(dashboard); // triggers callback
   }
 
