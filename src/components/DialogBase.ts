@@ -27,24 +27,30 @@ export default class DialogBase extends Vue {
   @Watch('$route')
   public async onRouteChange(): Promise<void> {
     await this.$nextTick();
-    if (!this.isDialogInQuery()) {
-      this.dialog.hide();
+    if (!this.$route.hash.includes(this.hashId)) {
+      this.hide();
     }
   }
 
-  private isDialogInQuery(): boolean {
-    return this.$route.query?.dialog?.includes(`.${this._uid}.`);
+  public get hashId(): string {
+    return `.${this._uid}.`;
   }
 
   public created(): void {
-    const query = this.$route.query ?? {};
-    const dialog = `${query.dialog ?? ''}.${this._uid}.`;
-    this.$router.push({ query: { ...query, dialog } }).catch(() => { });
+    const hash = `${this.$route.hash}${this.hashId}`;
+    this.$router
+      .push({ hash })
+      .catch(() => { });
   }
 
   public beforeDestroy(): void {
-    if (this.isDialogInQuery()) {
+    const { hash } = this.$route;
+
+    if (hash.endsWith(this.hashId)) {
       this.$router.back();
+    }
+    else if (hash.includes(this.hashId)) {
+      this.$router.replace({ hash: hash.replaceAll(this.hashId, '') });
     }
   }
 

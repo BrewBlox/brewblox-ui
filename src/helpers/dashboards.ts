@@ -1,4 +1,3 @@
-import isString from 'lodash/isString';
 import UrlSafeString from 'url-safe-string';
 
 import { createDialog } from '@/helpers/dialog';
@@ -6,7 +5,7 @@ import notify from '@/helpers/notify';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 
-import { suggestId } from './functional';
+import { ruleValidator, suggestId } from './functional';
 
 type IdChangedCallback = (id: string) => void;
 
@@ -34,7 +33,7 @@ export const execDashboardIdChange =
     await dashboardStore.removeDashboard({ ...dashboard });
 
     if (systemStore.config.homePage === `/dashboard/${oldId}`) {
-      systemStore.saveConfig({ homePage: `/dashboard/${newId}` });
+      await systemStore.saveConfig({ homePage: `/dashboard/${newId}` });
     }
 
     notify.done(`Changed dashboard ID '${oldId}' to '${newId}'`);
@@ -77,16 +76,19 @@ export const startChangeDashboardTitle =
         notify.done(`Renamed dashboard '${oldTitle}' to '${newTitle}'`);
 
         const defaultId = urlGenerator.generate(newTitle);
-        if (oldId == defaultId) {
+        if (oldId === defaultId) {
           return; // no change
         }
         const rules = dashboardIdRules();
-        const suggestedId = suggestId(defaultId, val => !rules.some(f => isString(f(val))));
+        const suggestedId = suggestId(defaultId, ruleValidator(rules));
 
         createDialog({
+          component: 'ConfirmDialog',
           title: 'Update dashboard URL',
-          message: `Do you want to change the dashboard URL from '${oldId}' to '${suggestedId}'?`,
-          cancel: true,
+          message: `Do you want to change the dashboard URL from <b>${oldId}</b> to <b>${suggestedId}</b>?`,
+          html: true,
+          ok: 'Yes',
+          cancel: 'No',
         })
           .onOk(() => execDashboardIdChange(oldId, suggestedId, onIdChanged));
       });
@@ -95,10 +97,15 @@ export const startChangeDashboardTitle =
 export const startRemoveDashboard =
   (dashboard: Dashboard): void => {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Remove dashboard',
       message: `Are you sure you want to remove ${dashboard.title}?`,
-      ok: 'Confirm',
-      cancel: 'Cancel',
     })
-      .onOk(() => dashboardStore.removeDashboard(dashboard));
+      .onOk(async () => {
+        await dashboardStore.removeDashboard(dashboard);
+        await Promise.all(
+          dashboardStore.widgets
+            .filter(widget => widget.dashboard === dashboard.id)
+            .map(widget => dashboardStore.removeWidget(widget)));
+      });
   };

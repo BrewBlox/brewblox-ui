@@ -39,10 +39,10 @@ export default class SparkImportMenu extends DialogBase {
 
   confirmImport(values: any): void {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Reset blocks',
       message: 'This will remove all blocks, and import new ones from file. Are you sure?',
       noBackdropDismiss: true,
-      cancel: true,
     })
       .onOk(() => this.importBlocks(values));
   }

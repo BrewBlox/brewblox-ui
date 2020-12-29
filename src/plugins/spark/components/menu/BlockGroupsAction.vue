@@ -35,18 +35,15 @@ export default class BlockGroupsAction extends BlockCrudComponent {
       ?.data.active
       ?? [];
     createDialog({
+      component: 'CheckboxDialog',
       title: this.label,
       message: 'The block will become inactive if it is not part of any active groups.',
-      cancel: true,
-      options: {
-        type: 'checkbox',
-        model: [...this.block.groups],
-        items: Array.apply(null, Array(7))
-          .map((_, idx) => ({
-            label: `Group ${idx + 1} ${active.includes(idx) ? '(active)' : ''}`,
-            value: idx,
-          })),
-      },
+      selectOptions: Array.apply(null, Array(7))
+        .map((_, idx) => ({
+          label: `Group ${idx + 1} ${active.includes(idx) ? '(active)' : ''}`,
+          value: idx,
+        })),
+      value: [...this.block.groups],
     })
       .onOk((groups: number[]) => this.saveBlock({ ...this.block, groups }));
   }

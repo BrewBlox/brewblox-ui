@@ -89,8 +89,6 @@ export default class AutomationConditions extends Vue {
       selectOptions: this.nextStepOptions,
       selectProps: {
         label: 'Step',
-        emitValue: true,
-        mapOptions: true,
       },
     })
       .onOk(value => {

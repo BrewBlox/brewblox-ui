@@ -25,6 +25,9 @@ export default class SelectField extends FieldBase {
   @Prop({ type: Boolean, default: false })
   public readonly clearable!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly listSelect!: boolean;
+
   @Prop({ type: Object, default: () => ({}) })
   public readonly selectProps!: any;
 
@@ -64,11 +67,10 @@ export default class SelectField extends FieldBase {
       message: this.message,
       html: this.html,
       value: this.value,
+      listSelect: this.listSelect,
       selectOptions: this.options,
       selectProps: {
         label: this.label,
-        emitValue: true,
-        mapOptions: true,
         optionsLabel: this.optionsLabel,
         optionsValue: this.optionsValue,
         clearable: this.clearable,

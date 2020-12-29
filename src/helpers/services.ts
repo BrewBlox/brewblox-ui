@@ -53,6 +53,7 @@ export function startChangeServiceTitle(service: Service): void {
 
 export function startRemoveService(service: Service, router: VueRouter): void {
   createDialog({
+    component: 'ConfirmDialog',
     title: 'Remove service',
     message: `Are you sure you want to remove ${service.title}?`,
     ok: 'Confirm',

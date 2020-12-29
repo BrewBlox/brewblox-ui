@@ -69,6 +69,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
 
   startRemoveStep(action: ChangeAction): void {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Remove ChangeAction',
       message: `Are you sure you want to remove ${action.name}?`,
       ok: 'Confirm',

@@ -9,7 +9,7 @@ export function getNumDialogs(): number {
   return document.getElementsByClassName('q-dialog').length;
 }
 
-export function createDialog(opts: QDialogOptions): DialogChainObject {
+export function createDialog(opts: { component: any } & QDialogOptions): DialogChainObject {
   return Dialog.create({
     ...opts,
     parent: Vue.$app, // This enables use of $router inside dialog components

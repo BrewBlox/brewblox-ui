@@ -164,10 +164,11 @@ export default class AutomationPage extends Vue {
 
   startRemoveTemplate(template: AutomationTemplate): void {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Remove template',
       message: `Are you sure you want to remove '${template.title}'`,
-      cancel: true,
-    }).onOk(() => automationStore.removeTemplate(template));
+    })
+      .onOk(() => automationStore.removeTemplate(template));
   }
 
   startAddStep(template: AutomationTemplate): void {

@@ -123,24 +123,25 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
 
   public startMakeWidget(): void {
     const id = uid();
+    const selectOptions = dashboardStore.dashboards
+      .map(dashboard => ({
+        label: dashboard.title,
+        value: dashboard.id,
+      }));
+
     createDialog({
+      component: 'SelectDialog',
       title: 'Make widget',
-      message: `On which dashboard do you want to create a widget for '${this.widget.title}'?`,
-      style: 'overflow-y: scroll',
-      options: {
-        type: 'radio',
-        model: '',
-        items: dashboardStore.dashboards
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-      },
-      cancel: true,
+      message: `On which dashboard do you want to create a widget for <i>${this.widget.title}</i>?`,
+      html: true,
+      listSelect: selectOptions.length < 10,
+      selectOptions,
     })
       .onOk((dashboard: string) => {
-        if (!dashboard) {
-          return;
+        if (dashboard) {
+          dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+          notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardTitle(dashboard)}`);
         }
-        dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
 
@@ -149,10 +150,11 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
     createDialog({
       component: 'InputDialog',
       title: 'Change block name',
-      message: `Choose a new name for '${this.blockId}'`,
-      rules: blockIdRules(this.serviceId),
+      message: `Choose a new name for <i>${this.blockId}</i>.`,
+      html: true,
       clearable: false,
       value: blockId,
+      rules: blockIdRules(this.serviceId),
     })
       .onOk(async (newId: string) => {
         await this.changeBlockId(newId);
@@ -170,10 +172,9 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
 
   public startRemoveBlock(): void {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Remove block',
       message: `Are you sure you want to remove ${this.block.id}?`,
-      cancel: true,
-      persistent: true,
     })
       .onOk(this.removeBlock);
   }

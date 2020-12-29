@@ -286,18 +286,15 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
 
 export const startResetBlocks = (serviceId: string): void => {
   createDialog({
+    component: 'CheckboxDialog',
     title: 'Reset blocks',
     message: `This will remove all blocks on ${serviceId}. Are you sure?`,
     noBackdropDismiss: true,
-    cancel: true,
-    options: {
-      type: 'checkbox',
-      items: [
-        { label: 'Remember names of discovered blocks', value: 0 },
-        { label: 'Export sensor and pin names', value: 1 },
-      ],
-      model: [0, 1], // pre-check default actions
-    },
+    selectOptions: [
+      { label: 'Remember names of discovered blocks', value: 0 },
+      { label: 'Export sensor and pin names', value: 1 },
+    ],
+    value: [0, 1], // pre-check default actions
   })
     .onOk((selected: number[]) => resetBlocks(serviceId, {
       restore: selected.includes(0),

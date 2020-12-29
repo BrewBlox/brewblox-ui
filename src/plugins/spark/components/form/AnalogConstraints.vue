@@ -62,13 +62,10 @@ export default class AnalogConstraints extends Vue {
 
   add(): void {
     createDialog({
+      component: 'CheckboxDialog',
       title: 'Add constraint',
-      cancel: true,
-      options: {
-        type: 'checkbox',
-        model: [],
-        items: this.constraintOpts,
-      },
+      selectOptions: this.constraintOpts,
+      value: [],
     })
       .onOk(keys => {
         this.constraints.push(...keys.map(this.createDefault));

@@ -5,12 +5,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "chrome",
+      "type": "pwa-chrome",
       "request": "launch",
       "name": "Launch Chrome",
-      "url": "http://localhost:8080",
+      "url": "https://localhost:8080/ui",
       "webRoot": "${workspaceFolder}/src",
-      "breakOnLoad": true,
       "sourceMapPathOverrides": {
         "webpack:///./src/*": "${webRoot}/*"
       }
@@ -31,17 +30,5 @@
         "webpack:///./src/*": "${webRoot}/*"
       }
     },
-    {
-      "type": "chrome",
-      "request": "launch",
-      "name": "Debug Quasar",
-      "url": "http://localhost:8080",
-      "webRoot": "${workspaceFolder}/src",
-      "breakOnLoad": true,
-      "sourceMaps": true,
-      "sourceMapPathOverrides": {
-        "webpack:///./src/*": "${webRoot}/*"
-      }
-    }
   ]
 }

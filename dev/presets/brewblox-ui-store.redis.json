@@ -312,7 +312,7 @@
   },
   {
     "id": "bb7aa0b4-a045-ad38-4887-308967ca8d63",
-    "namespace": "brewblox-ui-store:dashboard-items__dashboard-items",
+    "namespace": "brewblox-ui-store:dashboard-items",
     "feature": "SessionLog",
     "dashboard": "dashboard-home",
     "rows": 5,
