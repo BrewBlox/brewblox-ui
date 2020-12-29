@@ -2,6 +2,7 @@ import { omit } from 'lodash';
 import Vue from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
+import { intercept } from '@/helpers/http';
 import { StoreObject } from '@/shared-types';
 import store from '@/store';
 
@@ -22,7 +23,8 @@ const defaultSettings = (): SystemConfig => ({
 const persistConfig = async (settings: SystemConfig): Promise<SystemConfig> =>
   Vue.$database
     .persist(DB_MODULE_ID, { ...settings, id: DB_OBJ_ID })
-    .then(obj => omit(obj, 'id'));
+    .then(obj => omit(obj, 'id'))
+    .catch(intercept('Failed to save system config'));
 
 const fetchConfig = async (): Promise<SystemConfig> =>
   Vue.$database
@@ -38,7 +40,7 @@ const fetchConfig = async (): Promise<SystemConfig> =>
 @Module // generateMutationSetters not set
 export class SystemModule extends VuexModule {
   public now: Date = new Date();
-  public config: SystemConfig = defaultSettings()
+  public config: SystemConfig = defaultSettings();
 
   @Mutation
   public updateTime(): void {

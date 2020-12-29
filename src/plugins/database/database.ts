@@ -52,7 +52,7 @@ async function checkDatastore(): Promise<void> {
     await http.get('/history/datastore/ping', { timeout: 2000 });
   }
   catch (e) {
-    notify.error(`Datastore error: ${e}`, { shown: false });
+    notify.error(`Datastore error: ${parseHttpError(e, true)}`, { shown: false });
     await retryDatastore();
   }
 }
