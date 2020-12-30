@@ -52,17 +52,24 @@ export default class DialogBase extends Vue {
   // This requires two actions on startup:
   // - Push a new page with unique ID in hash when dialog opens.
   // - If back button is pressed, the ID disappears from hash -> close dialog.
-  private async setupRouteHash(): Promise<void> {
-    const hash = `${this.$route.hash}${this.hashId}`;
-    await this.$router
-      .push({ hash })
+  //
+  // NOTE FOR DEVELOPERS:
+  // HMR does not deal perfectly with component inheritance with multiple levels.
+  // If you make changes to DialogBase, you'll often see this function being applied twice.
+  // Reloading the page will fix the issue.
+  private setupRouteHash(): void {
+    this.$router
+      .push({ hash: this.$route.hash + this.hashId })
+      .then(() => this.$nextTick())
+      .then(() => this.$watch(
+        '$route',
+        (newRoute: DialogBase['$route']) => {
+          if (!newRoute.hash.includes(this.hashId)) {
+            this.hide();
+          }
+        }
+      ))
       .catch(() => { });
-    await this.$nextTick();
-    this.$watch('$route', (newRoute: DialogBase['$route']) => {
-      if (!newRoute.hash.includes(this.hashId)) {
-        this.hide();
-      }
-    });
   }
 
   // Dialogs can be closed manually, or by using the back button.
