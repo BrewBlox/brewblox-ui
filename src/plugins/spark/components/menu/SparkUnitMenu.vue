@@ -7,13 +7,6 @@ import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
 import { UserUnits } from '@/plugins/spark/types';
 
-const defaultMessage = `
-    The unit is part of the name in graph fields. <br>
-    If you change the unit, you need to update the graph field. <br> <br>
-    For example, <b>Setpoint/value[degC]</b> becomes <b>Setpoint/value[degF]</b>. <br> <br>
-    The old field will disappear from the graph options after 24h.
-     `;
-
 type ServiceTempUnit = UserUnits['Temp'];
 
 const unitTable: Record<ServiceTempUnit, DisplayTempUnit> = {
@@ -30,12 +23,6 @@ export default class SparkUnitMenu extends DialogBase {
 
   @Prop({ type: String, default: 'Temperature units' })
   public readonly title!: string;
-
-  @Prop({ type: String, default: defaultMessage })
-  public readonly message!: string;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly html!: boolean;
 
   get modules(): SparkServiceModule[] {
     return sparkStore.modules;
@@ -76,6 +63,15 @@ export default class SparkUnitMenu extends DialogBase {
     @keyup.enter="onDialogOk"
   >
     <DialogCard v-bind="{title, message, html}">
+      <p>
+        Choose temperature units for your services. <br>
+        This will affect how temperatures are displayed and logged.
+      </p>
+      <p>
+        Data with different units is logged under different field names to distinguish the values. <br>
+        After changing a unit, you will need to select different fields in your Graph and Metrics widgets.
+      </p>
+
       <LabeledField
         v-for="module in modules"
         :key="module.id"
