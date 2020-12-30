@@ -84,7 +84,7 @@ export default class SparkServiceWatcher extends Vue {
     notify.info({
       timeout: 0,
       icon: 'mdi-download-network',
-      message: `Firmware update available for ${this.service.title}`,
+      message: `Firmware update available for <b>${this.service.title}</b>`,
       actions: [
         {
           label: 'Update',

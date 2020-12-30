@@ -94,7 +94,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       .onOk((dashboard: string) => {
         if (dashboard) {
           dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-          notify.done(`Copied ${this.widget.title} to ${dashboardStore.dashboardTitle(dashboard)}`);
+          notify.done(`Copied <b>${this.widget.title}</b> to <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
         }
       });
   }
@@ -116,7 +116,7 @@ export default class CrudComponent<ConfigT = any> extends Vue {
       .onOk((dashboard: string) => {
         if (dashboard) {
           this.saveWidget({ ...this.widget, dashboard, pinnedPosition: null });
-          notify.done(`Moved ${this.widget.title} to ${dashboardStore.dashboardTitle(dashboard)}`);
+          notify.done(`Moved <b>${this.widget.title}</b> to <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
         }
       });
   }

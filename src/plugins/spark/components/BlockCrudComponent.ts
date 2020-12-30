@@ -140,7 +140,7 @@ export default class BlockCrudComponent<BlockT extends Block = Block>
       .onOk((dashboard: string) => {
         if (dashboard) {
           dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-          notify.done(`Created ${this.widget.title} on ${dashboardStore.dashboardTitle(dashboard)}`);
+          notify.done(`Created <b>${this.widget.title}</b> on <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
         }
       });
   }

@@ -84,7 +84,7 @@ export default class ImportWizard extends WizardBase {
         id: uid(),
         dashboard: this.chosenDashboardId,
       });
-      notify.done(`Created ${featureStore.widgetTitle(this.widget.feature)} '${this.widget.title}'`);
+      notify.done(`Created ${featureStore.widgetTitle(this.widget.feature)} <b>${this.widget.title}</b>`);
       this.$emit('close');
     } catch (e) {
       notify.error(`Failed to create widget: ${e.toString()}`);

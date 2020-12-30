@@ -64,7 +64,7 @@ export default class DashboardWizard extends WizardBase {
     };
 
     await dashboardStore.createDashboard(dashboard);
-    notify.done(`Added dashboard ${dashboard.title}`);
+    notify.done(`Added dashboard <b>${dashboard.title}</b>`);
     this.close();
   }
 }

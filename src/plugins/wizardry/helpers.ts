@@ -11,7 +11,7 @@ import { WizardDialogResult } from './types';
 export async function tryCreateWidget<T>(widget: Widget<T>): Promise<Widget<T> | null> {
   try {
     await dashboardStore.appendWidget(widget);
-    notify.done(`Created ${featureStore.widgetTitle(widget.feature)} widget '${widget.title}'`);
+    notify.done(`Created ${featureStore.widgetTitle(widget.feature)} widget <b>${widget.title}</b>`);
     return dashboardStore.widgetById(widget.id);
   }
   catch (e) {
@@ -23,7 +23,7 @@ export async function tryCreateWidget<T>(widget: Widget<T>): Promise<Widget<T> |
 export async function tryCreateBlock(block: Block): Promise<Block | null> {
   try {
     await sparkStore.createBlock(block);
-    notify.done(`Created ${featureStore.widgetTitle(block.type)} block '${block.id}'`);
+    notify.done(`Created ${featureStore.widgetTitle(block.type)} block <i>${block.id}</i>`);
     return sparkStore.blockByAddress(block);
   }
   catch (e) {

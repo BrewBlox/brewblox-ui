@@ -12,9 +12,9 @@ type IdChangedCallback = (id: string) => void;
 const urlGenerator = new UrlSafeString();
 
 export const dashboardIdRules = (): InputRule[] => [
-  v => !!v || 'ID is required',
-  v => !dashboardStore.dashboardIds.includes(v) || 'ID must be unique',
-  v => v === urlGenerator.generate(v) || 'ID must be URL-safe',
+  v => !!v || 'Value is required',
+  v => !dashboardStore.dashboardIds.includes(v) || 'Value must be unique',
+  v => v === urlGenerator.generate(v) || 'Value must be URL-safe',
 ];
 
 export const execDashboardIdChange =
@@ -36,7 +36,7 @@ export const execDashboardIdChange =
       await systemStore.saveConfig({ homePage: `/dashboard/${newId}` });
     }
 
-    notify.done(`Changed dashboard ID '${oldId}' to '${newId}'`);
+    notify.done(`Changed dashboard URL to <b>${newId}</b>`);
     onIdChanged(newId);
   };
 
@@ -73,7 +73,7 @@ export const startChangeDashboardTitle =
         }
 
         await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
-        notify.done(`Renamed dashboard '${oldTitle}' to '${newTitle}'`);
+        notify.done(`Renamed dashboard to <b>${newTitle}</b>`);
 
         const defaultId = urlGenerator.generate(newTitle);
         if (oldId === defaultId) {
@@ -99,7 +99,8 @@ export const startRemoveDashboard =
     createDialog({
       component: 'ConfirmDialog',
       title: 'Remove dashboard',
-      message: `Are you sure you want to remove ${dashboard.title}?`,
+      message: `Are you sure you want to remove <b>${dashboard.title}</b>?`,
+      html: true,
     })
       .onOk(async () => {
         await dashboardStore.removeDashboard(dashboard);

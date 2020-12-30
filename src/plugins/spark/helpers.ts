@@ -157,10 +157,10 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   };
 
   if (!canDisplay(addr)) {
-    notify.warn(`Block '${addr.id}' can't be shown on the Spark display`, { shown: opts.showNotify });
+    notify.warn(`Block <i>${addr.id}</i> can't be shown on the Spark display`, { shown: opts.showNotify });
   }
   else if (opts.unique && isDisplayed(addr)) {
-    notify.info(`Block '${addr.id}' is already shown on the Spark display`, { shown: opts.showNotify });
+    notify.info(`Block <i>${addr.id}</i> is already shown on the Spark display`, { shown: opts.showNotify });
   }
   else if (!opts.pos) {
     notify.info('Spark display is already full', { shown: opts.showNotify });
@@ -189,7 +189,7 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
 
     display.data.widgets = [slot, ...display.data.widgets.filter(w => w.pos !== opts.pos)];
     await sparkStore.saveBlock(display);
-    notify.info(`Added block '${addr.id}' to the Spark display`, { shown: opts.showNotify });
+    notify.info(`Added <i>${addr.id}</i> to the Spark display`, { shown: opts.showNotify });
   }
 
   if (opts.showDialog) {
@@ -251,7 +251,7 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
     const module = sparkStore.moduleById(serviceId);
 
     if (!module) {
-      throw new Error(`Service '${serviceId}' not found`);
+      throw new Error(`Service <b>${serviceId}</b> not found`);
     }
 
     if (opts.download) {
@@ -288,7 +288,8 @@ export const startResetBlocks = (serviceId: string): void => {
   createDialog({
     component: 'CheckboxDialog',
     title: 'Reset blocks',
-    message: `This will remove all blocks on ${serviceId}. Are you sure?`,
+    message: `This will remove all blocks on <b>${serviceId}</b>. Are you sure?`,
+    html: true,
     noBackdropDismiss: true,
     selectOptions: [
       { label: 'Remember names of discovered blocks', value: 0 },
@@ -411,7 +412,7 @@ export const discoverBlocks = async (serviceId: string | null, show = true): Pro
     notify.info({
       icon: 'mdi-magnify-plus-outline',
       message: discovered.length > 0
-        ? `Discovered ${discovered.join(', ')}.`
+        ? `Discovered <i>${discovered.join(', ')}</i>.`
         : 'Discovered no new blocks.',
     });
   }
@@ -424,7 +425,7 @@ export async function cleanUnusedNames(serviceId: string | null): Promise<void> 
   const names = await module.cleanUnusedNames();
 
   const message = names.length > 0
-    ? `Cleaned ${names.join(', ')}.`
+    ? `Cleaned block names: <i>${names.join(', ')}</i>.`
     : 'No unused names found.';
 
   notify.info({ message, icon: 'mdi-tag-remove' });

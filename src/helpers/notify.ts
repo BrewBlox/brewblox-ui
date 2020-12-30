@@ -30,6 +30,7 @@ export const notifyIcons: Record<LogLevel, string> = {
 const notify = (level: LogLevel, message: QNotifyArgs, opts: Partial<RecordOpts>): void => {
   const args = {
     message: '',
+    html: true,
     color: notifyColors[level],
     icon: notifyIcons[level],
     ...(isString(message) ? { message } : message),

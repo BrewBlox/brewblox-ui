@@ -14,7 +14,7 @@ export async function startCreateService(stub: ServiceStub, router: VueRouter): 
     return;
   }
   if (serviceStore.serviceIds.includes(stub.id)) {
-    notify.error(`Service '${stub.id}' already exists`);
+    notify.error(`Service <b>${stub.id}</b> already exists`);
     return;
   }
 
@@ -28,7 +28,7 @@ export async function startCreateService(stub: ServiceStub, router: VueRouter): 
   else {
     const service = await feature.wizard(stub);
     await serviceStore.appendService(service);
-    notify.done(`Added ${feature.title} '${service.id}'`);
+    notify.done(`Added ${feature.title} <b>${service.id}</b>`);
     router.push(`/service/${service.id}`);
   }
 }
@@ -47,7 +47,7 @@ export function startChangeServiceTitle(service: Service): void {
       }
 
       await serviceStore.saveService({ ...service, title: newTitle });
-      notify.done(`Renamed service '${oldTitle}' to '${newTitle}'`);
+      notify.done(`Renamed service to <b>${newTitle}</b>`);
     });
 }
 
@@ -55,7 +55,8 @@ export function startRemoveService(service: Service, router: VueRouter): void {
   createDialog({
     component: 'ConfirmDialog',
     title: 'Remove service',
-    message: `Are you sure you want to remove ${service.title}?`,
+    message: `Are you sure you want to remove <b>${service.title}</b>?`,
+    html: true,
     ok: 'Confirm',
     cancel: 'Cancel',
   })

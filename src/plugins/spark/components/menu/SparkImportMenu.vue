@@ -84,7 +84,7 @@ export default class SparkImportMenu extends DialogBase {
         nid: undefined,
         serviceId: this.serviceId,
       });
-      notify.done(`Imported block '${id}'`);
+      notify.done(`Imported block <i>${id}</i>`);
     } catch (e) {
       notify.error(`Failed to import block: ${e.toString()}`);
     }

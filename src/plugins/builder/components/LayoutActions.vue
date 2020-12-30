@@ -187,7 +187,7 @@ export default class LayoutActions extends Vue {
           },
         };
         await dashboardStore.appendWidget(widget);
-        notify.done(`Created ${layout.title} widget on ${dashboardStore.dashboardTitle(dashboard)}`);
+        notify.done(`Created <b>${layout.title}</b> widget on <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
       });
   }
 }
