@@ -65,7 +65,11 @@ export default class BuilderCatalog extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    v-bind="dialogProps"
+    @hide="onDialogHide"
+  >
     <CardWrapper no-scroll v-bind="{context}">
       <template #toolbar>
         <DialogToolbar title="Part Catalog" />

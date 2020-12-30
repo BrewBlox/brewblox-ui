@@ -127,6 +127,7 @@ export default class BlockGraph extends Vue {
 <template>
   <q-dialog
     v-model="dialogOpen"
+    v-bind="dialogProps"
     transition-show="fade"
     maximized
   >
