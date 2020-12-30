@@ -101,11 +101,11 @@ export default class SparkActions extends Vue {
         label="Configure Wifi"
         @click="startDialog('SparkWifiMenu')"
       />
-      <ActionItem
+      <!-- <ActionItem
         icon="mdi-checkbox-multiple-marked"
         label="Groups (deprecated)"
         @click="startDialog('SparkGroupMenu')"
-      />
+      /> -->
       <ActionItem
         icon="mdi-restart"
         label="Reboot service"
@@ -115,11 +115,6 @@ export default class SparkActions extends Vue {
         icon="mdi-restart"
         label="Reboot controller"
         @click="controllerReboot"
-      />
-      <ActionItem
-        icon="mdi-temperature-celsius"
-        label="Configure used units"
-        @click="startDialog('SparkUnitMenu')"
       />
       <ActionItem
         icon="mdi-file-export"

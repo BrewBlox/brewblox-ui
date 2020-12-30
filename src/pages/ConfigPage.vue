@@ -73,6 +73,10 @@ export default class ConfigPage extends Vue {
     })
       .onOk(keyboardLayout => systemStore.saveConfig({ keyboardLayout }));
   }
+
+  openMenu(component: string): void {
+    createDialog({ component });
+  }
 }
 </script>
 
@@ -97,6 +101,11 @@ export default class ConfigPage extends Vue {
           label="Set keyboard layout"
           icon="mdi-keyboard"
           @click="startChangeKeyboardLayout"
+        />
+        <ActionItem
+          icon="mdi-temperature-celsius"
+          label="Set temperature units"
+          @click="openMenu('SparkUnitMenu')"
         />
       </ActionSubmenu>
 

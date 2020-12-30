@@ -1,72 +1,70 @@
 <script lang="ts">
-import { Enum } from 'typescript-string-enums';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { typeMatchFilter } from '@/helpers/functional';
-import { displayTempLabels } from '@/plugins/spark/getters';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
 import { UserUnits } from '@/plugins/spark/types';
 
-const defaultMessage =
-  `When changing the UI temperature unit, you will need to update existing graphs.
-  The old name will disappear after 24h.`;
+const defaultMessage = `
+    The unit is part of the name in graph fields. <br>
+    If you change the unit, you need to update the graph field. <br> <br>
+    For example, <b>Setpoint/value[degC]</b> becomes <b>Setpoint/value[degF]</b>. <br> <br>
+    The old field will disappear from the graph options after 24h.
+     `;
+
+type ServiceTempUnit = UserUnits['Temp'];
+
+const unitTable: Record<ServiceTempUnit, DisplayTempUnit> = {
+  degC: DisplayTempUnit.TEMP_CELSIUS,
+  degF: DisplayTempUnit.TEMP_FAHRENHEIT,
+};
 
 @Component
 export default class SparkUnitMenu extends DialogBase {
-  serviceOpts: SelectOption<UserUnits['Temp']>[] = [
+  unitOpts: SelectOption<ServiceTempUnit>[] = [
     { label: 'Celsius', value: 'degC' },
     { label: 'Fahrenheit', value: 'degF' },
   ]
-  displayOpts: SelectOption<DisplayTempUnit>[] =
-    Enum.values(DisplayTempUnit)
-      .map(value => ({ value, label: displayTempLabels[value] }))
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
-
-  @Prop({ type: String, default: 'Spark units' })
+  @Prop({ type: String, default: 'Temperature units' })
   public readonly title!: string;
 
   @Prop({ type: String, default: defaultMessage })
   public readonly message!: string;
 
-  public get sparkModule(): SparkServiceModule {
-    return sparkStore.moduleById(this.serviceId)!;
+  @Prop({ type: Boolean, default: true })
+  public readonly html!: boolean;
+
+  get modules(): SparkServiceModule[] {
+    return sparkStore.modules;
   }
 
-  get units(): UserUnits {
-    return this.sparkModule.units;
-  }
-
-  get displayBlock(): DisplaySettingsBlock | null {
-    return this.sparkModule
+  findDisplayBlock(module: SparkServiceModule): DisplaySettingsBlock | null {
+    return module
       .blocks
       .find(typeMatchFilter<DisplaySettingsBlock>(BlockType.DisplaySettings))
       ?? null;
   }
 
-  get displayTemp(): DisplayTempUnit {
-    return this.displayBlock?.data.tempUnit ?? DisplayTempUnit.TEMP_CELSIUS;
+  getModuleUnit(module: SparkServiceModule): ServiceTempUnit | null {
+    const serviceUnit = module.units.Temp;
+    const displayUnit = this.findDisplayBlock(module)?.data.tempUnit;
+
+    return unitTable[serviceUnit] === displayUnit
+      ? serviceUnit
+      : null;
   }
 
-  set displayTemp(v: DisplayTempUnit) {
-    if (this.displayBlock) {
-      this.displayBlock.data.tempUnit = v;
-      this.sparkModule.saveBlock(this.displayBlock);
+  setModuleUnit(module: SparkServiceModule, unit: ServiceTempUnit): void {
+    const block = this.findDisplayBlock(module);
+    if (block) {
+      block.data.tempUnit = unitTable[unit];
+      module.saveUnits({ ...module.units, Temp: unit });
+      module.saveBlock(block);
     }
   }
-
-  get serviceTemp(): UserUnits['Temp'] {
-    return this.units.Temp;
-  }
-
-  set serviceTemp(v: UserUnits['Temp']) {
-    this.units.Temp = v;
-    this.sparkModule.saveUnits(this.units);
-  }
-
 }
 </script>
 
@@ -78,22 +76,21 @@ export default class SparkUnitMenu extends DialogBase {
     @keyup.enter="onDialogOk"
   >
     <DialogCard v-bind="{title, message, html}">
-      <q-select
-        v-model="serviceTemp"
-        :options="serviceOpts"
-        label="UI temperature unit"
-        map-options
-        emit-value
-        @keyup.enter.exact.stop
-      />
-      <q-select
-        v-model="displayTemp"
-        :options="displayOpts"
-        label="Spark Display temperature unit"
-        map-options
-        emit-value
-        @keyup.enter.exact.stop
-      />
+      <LabeledField
+        v-for="module in modules"
+        :key="module.id"
+        :label="`Spark service '${module.id}'`"
+      >
+        <q-btn-toggle
+          :value="getModuleUnit(module)"
+          :options="unitOpts"
+          unelevated
+          no-caps
+          :disable="!module.status.isSynchronized"
+          @input="v => setModuleUnit(module, v)"
+        />
+      </LabeledField>
+
       <template #actions>
         <q-btn
           flat
