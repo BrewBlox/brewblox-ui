@@ -84,7 +84,7 @@ export default class BlockWidgetDialog extends DialogBase {
     :maximized="$dense"
     transition-show="fade"
     class="row"
-    v-bind="$attrs"
+    v-bind="{...dialogProps, ...$attrs}"
     @hide="onDialogHide"
   >
     <component

@@ -64,7 +64,11 @@ export default class BuilderPartMenu extends Vue {
 </script>
 
 <template>
-  <q-dialog :value="true" v-bind="dialogProps" @input="close" @keyup.esc="close">
+  <q-dialog
+    v-bind="dialogProps"
+    @input="close"
+    @keyup.esc="close"
+  >
     <CardWrapper v-bind="{context}">
       <template #toolbar>
         <DialogToolbar :title="partTitle" @close="close" />

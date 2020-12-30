@@ -94,7 +94,12 @@ export default class SparkImportMenu extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$dense" v-bind="dialogProps" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    :maximized="$dense"
+    v-bind="dialogProps"
+    @hide="onDialogHide"
+  >
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
         <DialogToolbar :title="serviceId" subtitle="Import/Export blocks" />
