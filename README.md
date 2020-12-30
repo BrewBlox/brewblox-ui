@@ -88,11 +88,11 @@ The default data can be found in dev/presets/.
 The dev scripts allow for partially applying data, or replacing the defaults.
 
 Some examples:
-* `npm run datastore` only resets widgets
+* `npm run redis` only resets widgets
 * `npm run spark` only resets blocks
 * `npm run spark -- sparkey` only resets blocks on Sparkey
 
-You can use `npm run datastore:save` and `npm run spark:save` to replace the defaults.
+You can use `npm run redis:save` and `npm run spark:save` to replace the defaults.
 The files are indexed in git. Commit them to make the change permanent.
 
 ---
@@ -126,9 +126,9 @@ Implementation beyond proof-of-concept would require too much effort for a featu
 
 ## [Datastore](src/plugins/database/types.ts)
 
-Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Settings that are not session-specific (`Dashboard`, `Widget`, `Service`) are persisted to the CouchDB [datastore](https://pouchdb.com/).
+Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Persistent data (eg. `Dashboard`, `Widget`, `Service`) is saved using the Redis [datastore](https://redis.io/).
 
-The full datastore state is loaded on startup. After that, two-way synchronization is maintained between VueX (local), and CouchDB (remote).
+The full datastore state is loaded on startup. After that, two-way synchronization is maintained between VueX (local), and Redis (remote).
 
 ## [Eventbus](src/plugins/eventbus.ts)
 
