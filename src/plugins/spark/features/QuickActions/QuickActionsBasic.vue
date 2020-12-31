@@ -74,7 +74,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
         resolve(value);
         return;
       }
-      const pretty = specField.pretty ?? (v => `${v}`);
+      const pretty = specField.pretty ?? prettyAny;
       const field: EditableBlockField = {
         value,
         specField,
