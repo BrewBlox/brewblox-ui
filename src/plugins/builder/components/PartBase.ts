@@ -59,6 +59,10 @@ export default class PartBase extends Vue {
     return this.size[1];
   }
 
+  public get bordered(): boolean {
+    return this.settings.bordered ?? true;
+  }
+
   public textTransformation(textSize: [number, number], counterRotate = true): string {
     return textTransformation(this.part, textSize, counterRotate);
   }

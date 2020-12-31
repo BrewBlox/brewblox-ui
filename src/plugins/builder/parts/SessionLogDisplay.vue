@@ -73,6 +73,7 @@ export default class SessionLogDisplay extends PartBase {
     </SvgEmbedded>
     <g class="outline">
       <rect
+        v-show="bordered"
         :width="squares(sizeX)-2"
         :height="squares(sizeY)-2"
         x="1"

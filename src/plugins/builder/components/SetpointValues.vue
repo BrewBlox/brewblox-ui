@@ -1,4 +1,5 @@
 <script lang="ts">
+import { mdiThermometer } from '@quasar/extras/mdi-v5';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -12,6 +13,7 @@ import { PersistentPart } from '../types';
 
 @Component
 export default class SetpointValues extends Vue {
+  icons: Mapped<string> = {};
   squares = squares;
 
   @Prop({ type: Object, required: true })
@@ -31,6 +33,10 @@ export default class SetpointValues extends Vue {
 
   @Prop({ type: String })
   public readonly backgroundColor!: string;
+
+  created(): void {
+    this.icons.mdiThermometer = mdiThermometer;
+  }
 
   get textColor(): string {
     return this.backgroundColor
@@ -88,14 +94,20 @@ export default class SetpointValues extends Vue {
 </script>
 
 <template>
-  <g v-if="block || !hideUnset" :transform="`translate(${squares(startX)}, ${squares(startY)})`">
-    <SvgEmbedded :width="squares(2)" :height="squares(1)">
-      <BrokenIcon v-if="isBroken" />
-      <UnlinkedIcon v-else-if="!block" />
+  <g
+    v-if="block || !hideUnset"
+    :transform="`translate(${squares(startX)}, ${squares(startY)})`"
+  >
+    <SvgEmbedded
+      :width="squares(2)"
+      :height="squares(1)"
+    >
+      <BrokenIcon v-if="isBroken" class="col" />
+      <UnlinkedIcon v-else-if="!block" class="col" />
       <div v-else class="col column q-ma-xs">
         <div class="col row q-gutter-x-xs">
           <q-icon
-            name="mdi-thermometer"
+            :name="icons.mdiThermometer"
             size="20px"
             class="static col-auto"
           />

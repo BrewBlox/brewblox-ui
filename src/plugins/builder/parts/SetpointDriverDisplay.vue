@@ -136,6 +136,7 @@ export default class SetpointDriverDisplay extends PartBase {
     </SvgEmbedded>
     <g class="outline">
       <rect
+        v-show="bordered"
         :width="squares(2)-2"
         :height="squares(1)-2"
         x="1"

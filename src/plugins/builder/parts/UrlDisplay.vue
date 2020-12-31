@@ -19,6 +19,7 @@ export default class UrlDisplay extends PartBase {
   <g>
     <g class="outline">
       <rect
+        v-show="bordered"
         :width="squares(sizeX)-2"
         :height="squares(sizeY)-2"
         x="1"

@@ -37,6 +37,7 @@ export default class ProfileDisplay extends PartBase {
     if (!this.block) {
       return [];
     }
+    // Sorting modifies the list. Make a copy to prevent this.
     return [...this.block.data.points]
       .sort(objectSorter('time'));
   }
@@ -68,7 +69,6 @@ export default class ProfileDisplay extends PartBase {
     if (!this.block.data.enabled || !this.block.data.drivenTargetId.id) {
       return null;
     }
-    // Sorting modifies the list. Make a copy to prevent this.
     const point: Setpoint | undefined = this.points
       .find(point => start + point.time > now);
     return point ? point.temperature.value : null;
@@ -108,6 +108,7 @@ export default class ProfileDisplay extends PartBase {
     </SvgEmbedded>
     <g class="outline">
       <rect
+        v-show="bordered"
         :width="squares(sizeX)-2"
         :height="squares(sizeY)-2"
         x="1"

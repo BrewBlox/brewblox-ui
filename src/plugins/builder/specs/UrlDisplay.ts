@@ -44,6 +44,9 @@ const spec: PartSpec = {
         max: 10,
       },
     },
+    {
+      component: 'BorderCard',
+    },
   ],
   size: (part: PersistentPart) => [
     part.settings.sizeX || DEFAULT_SIZE_X,

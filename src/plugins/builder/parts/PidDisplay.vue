@@ -143,6 +143,7 @@ export default class PidDisplay extends PartBase {
     </SvgEmbedded>
     <g class="outline">
       <rect
+        v-show="bordered"
         :width="squares(1)-2"
         :height="squares(1)-2"
         :stroke="color"
