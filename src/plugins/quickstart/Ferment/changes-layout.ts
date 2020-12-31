@@ -12,13 +12,13 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
       id: uid(),
       title: withPrefix(config.prefix, 'Layout'),
       width: 8,
-      height: 9,
+      height: 10,
       parts: [
         {
           id: uid(),
           type: 'Fridge',
           x: 2,
-          y: 1,
+          y: 2,
           rotate: 0,
           flipped: false,
           settings: {
@@ -30,7 +30,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           id: uid(),
           type: 'Carboy',
           x: 3,
-          y: 3,
+          y: 4,
           rotate: 0,
           flipped: false,
           settings: {
@@ -43,12 +43,28 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
         },
         {
           id: uid(),
-          type: 'SetpointDisplay',
-          x: 2,
-          y: 7,
+          type: 'ProfileDisplay',
+          x: 3,
+          y: 6,
           rotate: 0,
           flipped: false,
           settings: {
+            bordered: false,
+            profile: {
+              serviceId,
+              blockId: config.names.tempProfile,
+            },
+          },
+        },
+        {
+          id: uid(),
+          type: 'SetpointDisplay',
+          x: 2,
+          y: 8,
+          rotate: 0,
+          flipped: false,
+          settings: {
+            bordered: false,
             setpoint: {
               serviceId,
               blockId: config.names.fridgeSetpoint,
@@ -59,7 +75,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           id: uid(),
           type: 'PidDisplay',
           x: 4,
-          y: 7,
+          y: 8,
           rotate: 0,
           flipped: false,
           settings: {
@@ -73,7 +89,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           id: uid(),
           type: 'PidDisplay',
           x: 5,
-          y: 7,
+          y: 8,
           rotate: 0,
           flipped: false,
           settings: {
@@ -87,12 +103,13 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           id: uid(),
           type: 'UrlDisplay',
           x: 2,
-          y: 0,
+          y: 1,
           rotate: 0,
           flipped: false,
           settings: {
+            bordered: false,
             text: 'User manual',
-            url: 'https://brewblox.netlify.app/user/ferment_guide.html#ferment-fridge-process-view',
+            url: 'https://brewblox.netlify.app/user/ferment_guide.html',
             sizeX: 4,
             sizeY: 1,
           },
