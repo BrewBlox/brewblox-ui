@@ -133,7 +133,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
             .map(v => v.serviceId)
             .filter(uniqueFilter)
             .map(serviceId => sparkStore.moduleById(serviceId)!.fetchBlocks())))
-      .catch(e => notify.warn(`Failed to apply ${action.name}: ${e.message}`))
+      .catch(e => notify.warn(`Failed to apply ${action.name}: ${e}`))
       .finally(() => this.applying = false);
   }
 
