@@ -422,15 +422,6 @@ export const defineWidgets = (
             {
               id: uid(),
               serviceId,
-              blockId: names.fridgeSetpoint,
-              data: {
-                storedSetting: opts.fridgeSetting,
-              },
-              confirmed: { storedSetting: true },
-            },
-            {
-              id: uid(),
-              serviceId,
               blockId: names.coolPid,
               data: {
                 inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
@@ -458,7 +449,6 @@ export const defineWidgets = (
               confirmed: {},
             },
           ] as [
-              BlockChange<SetpointSensorPairBlock>,
               BlockChange<PidBlock>,
               BlockChange<PidBlock>,
               BlockChange<SetpointProfileBlock>,
@@ -468,15 +458,6 @@ export const defineWidgets = (
           name: 'Constant beer temperature',
           id: uid(),
           changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerSetpoint,
-              data: {
-                storedSetting: opts.beerSetting,
-              },
-              confirmed: { storedSetting: true },
-            },
             {
               id: uid(),
               serviceId,
@@ -507,7 +488,6 @@ export const defineWidgets = (
               confirmed: {},
             },
           ] as [
-              BlockChange<SetpointSensorPairBlock>,
               BlockChange<PidBlock>,
               BlockChange<PidBlock>,
               BlockChange<SetpointProfileBlock>,
