@@ -45,7 +45,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           id: uid(),
           type: 'ProfileDisplay',
           x: 3,
-          y: 6,
+          y: 3,
           rotate: 0,
           flipped: false,
           settings: {
