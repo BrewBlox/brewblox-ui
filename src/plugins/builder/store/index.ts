@@ -61,6 +61,9 @@ export class BuilderModule extends VuexModule {
 
   @Action
   public async removeLayout(layout: BuilderLayout): Promise<void> {
+    if (this.lastLayoutId === layout.id) {
+      this.lastLayoutId = null;
+    }
     await api.remove(layout); // triggers callback
   }
 
