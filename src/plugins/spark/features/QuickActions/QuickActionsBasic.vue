@@ -87,9 +87,10 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
         field: specField,
         address: block,
         value: field.value,
-        title: `Confirm ${block.id} ${specField.title}`,
+        title: `Confirm ${specField.title}`,
+        html: true,
         message: `
-        Please confirm the ${specField.title} value in ${block.id}.
+        Please confirm the <b>${specField.title}</b> value in <i>${block.id}</i>.
         Current value is '${pretty(block.data[key])}'.
         `,
       })

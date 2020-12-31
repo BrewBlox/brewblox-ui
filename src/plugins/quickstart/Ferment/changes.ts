@@ -424,7 +424,6 @@ export const defineWidgets = (
               serviceId,
               blockId: names.fridgeSetpoint,
               data: {
-                settingEnabled: true,
                 storedSetting: opts.fridgeSetting,
               },
               confirmed: { storedSetting: true },
@@ -474,7 +473,6 @@ export const defineWidgets = (
               serviceId,
               blockId: names.beerSetpoint,
               data: {
-                settingEnabled: true,
                 storedSetting: opts.beerSetting,
               },
               confirmed: { storedSetting: true },
