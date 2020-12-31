@@ -1,7 +1,7 @@
 <script lang="ts">
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
+import DialogBase from '@/components/DialogBase';
 import { clampRotation } from '@/helpers/functional';
 import { WidgetContext } from '@/store/features';
 
@@ -10,7 +10,7 @@ import { builderStore } from './store';
 import { CardSpec, FlowPart, PartSpec } from './types';
 
 @Component
-export default class BuilderPartMenu extends Vue {
+export default class BuilderPartMenu extends DialogBase {
   squares = squares;
 
   @Prop({ type: Object, required: true })
@@ -65,7 +65,9 @@ export default class BuilderPartMenu extends Vue {
 
 <template>
   <q-dialog
-    v-bind="dialogProps"
+    ref="dialog"
+    persistent
+    :value="true"
     @input="close"
     @keyup.esc="close"
   >
