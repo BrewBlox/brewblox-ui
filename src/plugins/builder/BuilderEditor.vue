@@ -750,7 +750,7 @@ export default class BuilderEditor extends Vue {
         <q-btn
           flat
           round
-          icon="mdi-close-circle"
+          icon="mdi-arrow-left-circle"
           size="md"
           class="close-button"
           @click="leaveEditor"
