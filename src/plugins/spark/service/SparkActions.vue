@@ -144,7 +144,7 @@ export default class SparkActions extends Vue {
       <ActionItem
         icon="delete"
         label="Remove service from UI"
-        @click="funcs.startRemoveService(service, $router)"
+        @click="funcs.startRemoveService(service)"
       />
     </template>
   </ActionSubmenu>

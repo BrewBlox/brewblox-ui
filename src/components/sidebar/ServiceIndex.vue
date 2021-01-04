@@ -121,7 +121,7 @@ export default class ServiceIndex extends Vue {
         class="q-pb-sm darkish"
         style="min-height: 0px"
         clickable
-        @click="startCreateService(stub, $router)"
+        @click="startCreateService(stub)"
       >
         <q-item-section class="col-auto">
           <q-icon name="add" size="xs" />
