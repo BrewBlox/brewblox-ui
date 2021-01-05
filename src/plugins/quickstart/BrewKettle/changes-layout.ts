@@ -43,6 +43,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
+            bordered: false,
             setpoint: {
               serviceId,
               blockId: names.kettleSetpoint,
@@ -57,6 +58,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
+            bordered: false,
             pid: {
               serviceId,
               blockId: names.kettlePid,

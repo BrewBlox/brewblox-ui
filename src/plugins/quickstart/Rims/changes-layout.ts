@@ -6,6 +6,7 @@ import { withPrefix } from '../helpers';
 import { RimsConfig } from './types';
 
 export function defineLayouts(config: RimsConfig): BuilderLayout[] {
+  const { serviceId, names } = config;
   return [
     {
       id: uid(),
@@ -38,7 +39,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           rotate: 0,
           settings: {
             sizeX: 4,
-            pwm: { serviceId: config.serviceId, blockId: config.names.tubePwm },
+            pwm: { serviceId, blockId: names.tubePwm },
           },
           flipped: false,
           type: 'RimsTube',
@@ -58,7 +59,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            setpoint: { serviceId: config.serviceId, blockId: config.names.kettleSetpoint },
+            bordered: false,
+            setpoint: { serviceId, blockId: names.kettleSetpoint },
           },
           flipped: false,
           type: 'SetpointDisplay',
@@ -69,7 +71,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            setpoint: { serviceId: config.serviceId, blockId: config.names.tubeSetpoint },
+            setpoint: { serviceId, blockId: names.tubeSetpoint },
           },
           flipped: false,
           type: 'SetpointDisplay',
@@ -171,7 +173,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           rotate: 0,
           settings: {
             enabled: true,
-            actuator: { serviceId: config.serviceId, blockId: config.names.pumpAct },
+            actuator: { serviceId, blockId: names.pumpAct },
           },
           flipped: true,
           type: 'Pump',
@@ -191,7 +193,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            pid: { serviceId: config.serviceId, blockId: config.names.tubePid },
+            bordered: false,
+            pid: { serviceId, blockId: names.tubePid },
           },
           flipped: false,
           type: 'PidDisplay',
@@ -238,7 +241,8 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            pid: { serviceId: config.serviceId, blockId: config.names.kettlePid },
+            bordered: false,
+            pid: { serviceId, blockId: names.kettlePid },
           },
           flipped: false,
           type: 'PidDisplay',

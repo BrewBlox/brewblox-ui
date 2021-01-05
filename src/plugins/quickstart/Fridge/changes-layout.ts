@@ -6,7 +6,7 @@ import { withPrefix } from '../helpers';
 import { FridgeConfig } from './types';
 
 export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
-  const serviceId = config.serviceId;
+  const { serviceId, names } = config;
   return [
     {
       id: uid(),
@@ -80,9 +80,10 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
+            bordered: false,
             setpoint: {
               serviceId,
-              blockId: config.names.fridgeSetpoint,
+              blockId: names.fridgeSetpoint,
             },
           },
         },
@@ -96,7 +97,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           settings: {
             pid: {
               serviceId,
-              blockId: config.names.coolPid,
+              blockId: names.coolPid,
             },
           },
         },
@@ -110,7 +111,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           settings: {
             pid: {
               serviceId,
-              blockId: config.names.heatPid,
+              blockId: names.heatPid,
             },
           },
         },

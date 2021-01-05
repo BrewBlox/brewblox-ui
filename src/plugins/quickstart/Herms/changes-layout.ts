@@ -6,6 +6,7 @@ import { withPrefix } from '../helpers';
 import { HermsConfig } from './types';
 
 export function defineLayouts(config: HermsConfig): BuilderLayout[] {
+  const { serviceId, names } = config;
   return [
     {
       id: uid(),
@@ -53,7 +54,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            pwm: { serviceId: config.serviceId, blockId: config.names.bkPwm },
+            pwm: { serviceId, blockId: names.bkPwm },
             sizeX: 4,
           },
           flipped: true,
@@ -65,7 +66,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            pwm: { serviceId: config.serviceId, blockId: config.names.hltPwm },
+            pwm: { serviceId, blockId: names.hltPwm },
             sizeX: 4,
           },
           flipped: false,
@@ -103,7 +104,10 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 0,
-          settings: { setpoint: { serviceId: config.serviceId, blockId: config.names.mtSetpoint } },
+          settings: {
+            bordered: false,
+            setpoint: { serviceId, blockId: names.mtSetpoint },
+          },
           flipped: false,
           type: 'SetpointDisplay',
           x: 13,
@@ -112,7 +116,10 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 0,
-          settings: { setpoint: { serviceId: config.serviceId, blockId: config.names.bkSetpoint } },
+          settings: {
+            bordered: false,
+            setpoint: { serviceId, blockId: names.bkSetpoint },
+          },
           flipped: false,
           type: 'SetpointDisplay',
           x: 21,
@@ -121,7 +128,10 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
         {
           id: uid(),
           rotate: 0,
-          settings: { setpoint: { serviceId: config.serviceId, blockId: config.names.hltSetpoint } },
+          settings: {
+            bordered: false,
+            setpoint: { serviceId, blockId: names.hltSetpoint },
+          },
           flipped: false,
           type: 'SetpointDisplay',
           x: 5,
@@ -743,9 +753,10 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
+            bordered: false,
             pid: {
-              serviceId: config.serviceId,
-              blockId: config.names.mtPid,
+              serviceId,
+              blockId: names.mtPid,
             },
           },
           flipped: false,
@@ -757,9 +768,10 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
+            bordered: false,
             pid: {
-              serviceId: config.serviceId,
-              blockId: config.names.bkPid,
+              serviceId,
+              blockId: names.bkPid,
             },
           },
           flipped: false,
@@ -771,9 +783,10 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
+            bordered: false,
             pid: {
-              serviceId: config.serviceId,
-              blockId: config.names.hltPid,
+              serviceId,
+              blockId: names.hltPid,
             },
           },
           flipped: false,
@@ -785,9 +798,10 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
+            bordered: false,
             setpointDriver: {
-              serviceId: config.serviceId,
-              blockId: config.names.hltDriver,
+              serviceId,
+              blockId: names.hltDriver,
             },
           },
           flipped: false,
