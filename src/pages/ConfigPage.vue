@@ -105,7 +105,7 @@ export default class ConfigPage extends Vue {
         <ActionItem
           icon="mdi-temperature-celsius"
           label="Set temperature units"
-          @click="openMenu('SparkUnitMenu')"
+          @click="openMenu('TempUnitMenu')"
         />
       </ActionSubmenu>
 

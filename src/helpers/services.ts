@@ -1,13 +1,13 @@
 import isString from 'lodash/isString';
-import VueRouter from 'vue-router';
 
 import { createDialog } from '@/helpers/dialog';
 import notify from '@/helpers/notify';
+import router from '@/router';
 import { featureStore } from '@/store/features';
 import { Service, serviceStore, ServiceStub } from '@/store/services';
 
 
-export async function startCreateService(stub: ServiceStub, router: VueRouter): Promise<void> {
+export async function startCreateService(stub: ServiceStub): Promise<void> {
   const feature = featureStore.serviceById(stub.type);
   if (feature === null) {
     notify.error(`Unknown service type '${stub.type}'`);
@@ -51,7 +51,7 @@ export function startChangeServiceTitle(service: Service): void {
     });
 }
 
-export function startRemoveService(service: Service, router: VueRouter): void {
+export function startRemoveService(service: Service): void {
   createDialog({
     component: 'ConfirmDialog',
     title: 'Remove service',

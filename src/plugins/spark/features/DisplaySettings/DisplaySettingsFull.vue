@@ -123,10 +123,7 @@ export default class DisplaySettingsFull
   }
 
   showUnitMenu(): void {
-    createDialog({
-      component: 'SparkUnitMenu',
-      serviceId: this.serviceId,
-    });
+    createDialog({ component: 'TempUnitMenu' });
   }
 }
 </script>
