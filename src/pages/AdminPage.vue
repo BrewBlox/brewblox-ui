@@ -18,7 +18,7 @@ interface ConfigService {
 }
 
 @Component
-export default class ConfigPage extends Vue {
+export default class AdminPage extends Vue {
 
   get experimental(): boolean {
     return systemStore.config.experimental;

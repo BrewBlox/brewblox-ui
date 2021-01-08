@@ -58,9 +58,9 @@ export default class SidebarNavigator extends Vue {
       />
       <q-btn
         icon="mdi-settings"
-        label="Settings"
-        to="/config"
-        :color="btnColor('config')"
+        label="Admin"
+        to="/admin"
+        :color="btnColor('admin')"
         v-bind="btnAttrs"
       />
       <q-btn
