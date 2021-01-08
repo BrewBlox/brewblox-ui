@@ -69,7 +69,7 @@ export default class SparkActions extends Vue {
 </script>
 
 <template>
-  <ActionSubmenu :label="serviceTitle">
+  <ActionSubmenu>
     <CardWarning v-if="!sparkModule">
       <template #message>
         Service is not available

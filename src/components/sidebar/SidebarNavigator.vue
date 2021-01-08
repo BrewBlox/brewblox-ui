@@ -2,7 +2,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
 import { automationStore } from '@/plugins/automation/store';
 
 
@@ -33,13 +32,6 @@ export default class SidebarNavigator extends Vue {
       : null;
   }
 
-  showWizard(): void {
-    createDialog({
-      component: 'WizardDialog',
-      activeDashboardId: this.currentDashboard,
-    });
-  }
-
   btnColor(...sections: string[]): string {
     return sections.includes(this.activeSection) ? 'primary' : '';
   }
@@ -57,20 +49,6 @@ export default class SidebarNavigator extends Vue {
         v-bind="btnAttrs"
       />
       <q-btn
-        icon="mdi-settings"
-        label="Admin"
-        to="/admin"
-        :color="btnColor('admin')"
-        v-bind="btnAttrs"
-      />
-      <q-btn
-        icon="mdi-creation"
-        label="Wizardry"
-        v-bind="btnAttrs"
-        @click="showWizard"
-      />
-      <div class="col-break" />
-      <q-btn
         v-if="!editorDisabled"
         icon="mdi-tools"
         label="Builder"
@@ -78,6 +56,16 @@ export default class SidebarNavigator extends Vue {
         :color="btnColor('builder')"
         v-bind="btnAttrs"
       />
+      <q-btn
+        icon="mdi-settings"
+        label="Admin"
+        to="/admin"
+        :color="btnColor('admin')"
+        v-bind="btnAttrs"
+      />
+
+      <div class="col-break" />
+
       <q-btn
         v-if="automationAvailable"
         icon="mdi-calendar-check"

@@ -7,13 +7,15 @@ import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { dashboardStore } from '@/store/dashboards';
+import { sparkStore } from '@/plugins/spark/store';
+import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
 
 interface ConfigService {
   serviceId: string;
+  title: string;
   configComponent: string;
 }
 
@@ -40,10 +42,9 @@ export default class AdminPage extends Vue {
     return process.env.BLOX_DATE ?? 'UNKNOWN';
   }
 
-  get dashboardIds(): string[] {
+  get dashboards(): Dashboard[] {
     return [...dashboardStore.dashboards]
-      .sort(objectSorter('order'))
-      .map(v => v.id);
+      .sort(objectSorter('order'));
   }
 
   get serviceComponents(): ConfigService[] {
@@ -51,6 +52,7 @@ export default class AdminPage extends Vue {
       .sort(objectSorter('order'))
       .map(v => ({
         serviceId: v.id,
+        title: v.title,
         configComponent: featureStore.serviceById(v.type)?.configComponent,
       }))
       .filter((v): v is ConfigService => !!v.configComponent);
@@ -59,6 +61,10 @@ export default class AdminPage extends Vue {
   get layouts(): BuilderLayout[] {
     return [...builderStore.layouts]
       .sort(objectSorter('order'));
+  }
+
+  get sparkServiceAvailable(): boolean {
+    return sparkStore.modules.length > 0;
   }
 
   startChangeKeyboardLayout(): void {
@@ -82,111 +88,163 @@ export default class AdminPage extends Vue {
 
 <template>
   <q-page class="page-height overflow-auto">
-    <div class="row q-pa-lg q-gutter-lg">
-      <div class="text-h5 text-grey-4 text-italic">
+    <div class="column q-pa-lg q-gutter-sm">
+      <div class="text-h5 text-italic">
         System
       </div>
-      <div class="col-break q-my-none" />
 
-      <ActionSubmenu label="Global settings">
-        <ToggleAction
-          v-model="experimental"
-          label="Experimental features"
-        />
-        <ToggleAction
-          v-model="showSidebarLayouts"
-          label="Show builder layouts in sidebar"
-        />
-        <ActionItem
-          label="Set keyboard layout"
-          icon="mdi-keyboard"
-          @click="startChangeKeyboardLayout"
-        />
-        <ActionItem
-          icon="mdi-temperature-celsius"
-          label="Set temperature units"
-          @click="openMenu('TempUnitMenu')"
-        />
-      </ActionSubmenu>
+      <ActionItem
+        label="Wizardry"
+        icon="mdi-creation"
+        class="text-secondary"
+        @click="openMenu('WizardDialog')"
+      />
 
-      <ActionSubmenu label="Debugging">
-        <q-item class="fade-4">
-          <q-item-section avatar>
-            <q-icon name="mdi-factory" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label caption>
-              Build date
-            </q-item-label>
-            {{ buildDate }}
-          </q-item-section>
-        </q-item>
-        <ExportErrorsAction />
-      </ActionSubmenu>
+      <q-expansion-item
+        label="General settings"
+        group="expansion"
+        header-class="text-h6 text-italic admin-header"
+        switch-toggle-side
+      >
+        <ActionSubmenu
+          class="q-ml-md"
+        >
+          <ToggleAction
+            v-model="experimental"
+            label="Experimental features"
+          />
+          <ToggleAction
+            v-model="showSidebarLayouts"
+            label="Show builder layouts in sidebar"
+          />
+          <ActionItem
+            label="Set keyboard layout"
+            icon="mdi-keyboard"
+            @click="startChangeKeyboardLayout"
+          />
+          <ActionItem
+            icon="mdi-temperature-celsius"
+            label="Set temperature units"
+            @click="openMenu('TempUnitMenu')"
+          />
+        </ActionSubmenu>
+      </q-expansion-item>
 
-      <div class="col-break" />
-      <div class="text-h5 text-grey-4 text-italic">
+      <q-expansion-item
+        label="Debugging"
+        group="expansion"
+        header-class="text-h6 text-italic admin-header"
+        switch-toggle-side
+      >
+        <ActionSubmenu
+          class="q-ml-md"
+        >
+          <q-item class="fade-4">
+            <q-item-section avatar>
+              <q-icon name="mdi-factory" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>
+                Build date
+              </q-item-label>
+              {{ buildDate }}
+            </q-item-section>
+          </q-item>
+          <ExportErrorsAction />
+        </ActionSubmenu>
+      </q-expansion-item>
+
+      <div class="text-h5 text-italic q-mt-xl">
         Dashboards
       </div>
-      <div class="col-break q-my-none" />
 
       <div
-        v-if="dashboardIds.length === 0"
-        class="text-grey-4 text-italic"
+        v-if="dashboards.length === 0"
+        class="text-italic fade-2"
       >
         There are no dashboards
       </div>
 
-      <DashboardActions
-        v-for="id in dashboardIds"
-        :key="'dashboard-'+id"
-        :dashboard-id="id"
-      />
+      <q-expansion-item
+        v-for="dash in dashboards"
+        :key="'dashboard-'+dash.id"
+        :label="dash.title"
+        group="expansion"
+        header-class="text-h6 text-italic admin-header"
+        switch-toggle-side
+        class="q-ml-md"
+      >
+        <DashboardActions
+          :dashboard-id="dash.id"
+          class="q-ml-md"
+        />
+      </q-expansion-item>
 
-      <div class="col-break" />
-      <div class="text-h5 text-grey-4 text-italic">
+      <div class="text-h5 text-italic q-mt-xl">
         Services
       </div>
-      <div class="col-break q-my-none" />
 
       <div
         v-if="serviceComponents.length === 0"
-        class="text-grey-4 text-italic"
+        class="text-italic fade-2"
       >
         There are no services
       </div>
 
-      <component
-        :is="svc.configComponent"
+      <q-expansion-item
         v-for="svc in serviceComponents"
         :key="'service-'+svc.serviceId"
-        :service-id="svc.serviceId"
-      />
+        :label="svc.title"
+        group="expansion"
+        header-class="text-h6 text-italic admin-header"
+        switch-toggle-side
+      >
+        <component
+          :is="svc.configComponent"
+          :service-id="svc.serviceId"
+          class="q-ml-lg"
+        />
+      </q-expansion-item>
 
-      <div class="col-break" />
-      <div class="text-h5 text-grey-4 text-italic">
+      <div class="text-h5 text-italic q-mt-xl">
         Builder layouts
       </div>
-      <div class="col-break q-my-none" />
 
       <div
         v-if="layouts.length === 0"
-        class="text-grey-4 text-italic"
+        class="text-italic fade-2"
       >
         There are no builder layouts
       </div>
 
-      <LayoutActions
+      <q-expansion-item
         v-for="layout in layouts"
         :key="'layout-'+layout.id"
-        :layout="layout"
+        :label="layout.title"
+        group="expansion"
+        header-class="text-h6 text-italic admin-header"
+        switch-toggle-side
       >
-        <ActionItem
-          :to="`/builder/${layout.id}`"
-          icon="mdi-tools"
-          label="Edit layout"
-        />
-      </LayoutActions>
+        <LayoutActions
+          class="q-ml-lg"
+          :layout="layout"
+          no-label
+        >
+          <ActionItem
+            :to="`/builder/${layout.id}`"
+            icon="mdi-tools"
+            label="Edit layout"
+          />
+        </LayoutActions>
+      </q-expansion-item>
     </div>
   </q-page>
 </template>
+
+<style lang="sass">
+// not scoped
+.q-expansion-item--expanded .admin-header
+  opacity: 1
+  font-size: 120%
+  color: $primary
+</style>
