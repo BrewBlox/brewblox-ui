@@ -85,10 +85,10 @@ export default class DashboardPage extends Vue {
     await dashboardStore.saveWidget(widget);
   }
 
-  showWizard(): void {
+  showWizard(widget: boolean): void {
     createDialog({
       component: 'WizardDialog',
-      initialWizard: 'WidgetWizardPicker',
+      initialWizard: widget ? 'WidgetWizardPicker' : null,
       activeDashboardId: this.dashboardId,
     });
   }
@@ -131,7 +131,23 @@ export default class DashboardPage extends Vue {
         </ActionMenu>
       </portal>
 
-      <div v-if="$dense" class="column q-gutter-y-sm">
+      <div
+        v-if="validatedWidgets.length === 0"
+        class="absolute-center"
+      >
+        <q-btn
+          unelevated
+          color="secondary"
+          icon="mdi-creation"
+          size="lg"
+          label="Get started"
+          @click="showWizard(false)"
+        />
+      </div>
+      <div
+        v-else-if="$dense"
+        class="column q-gutter-y-sm"
+      >
         <component
           :is="val.component"
           v-for="val in validatedWidgets"
@@ -145,7 +161,7 @@ export default class DashboardPage extends Vue {
         v-else
         :editable="widgetEditable"
         @patch:widgets="patchWidgets"
-        @dblclick="showWizard"
+        @dblclick="showWizard(true)"
       >
         <component
           :is="val.component"

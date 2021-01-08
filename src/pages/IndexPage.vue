@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
 import { dashboardStore } from '@/store/dashboards';
@@ -43,11 +44,23 @@ export default class IndexPage extends Vue {
     }
   }
 
+  showWizard(): void {
+    createDialog({ component: 'WizardDialog' });
+  }
 }
 </script>
 
 <template>
   <q-page class="flex flex-center">
-    Home
+    <div class="absolute-center">
+      <q-btn
+        unelevated
+        color="secondary"
+        icon="mdi-creation"
+        size="lg"
+        label="Get started"
+        @click="showWizard"
+      />
+    </div>
   </q-page>
 </template>
