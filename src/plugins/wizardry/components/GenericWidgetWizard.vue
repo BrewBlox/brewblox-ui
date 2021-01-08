@@ -10,7 +10,6 @@ import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 @Component
 export default class GenericWidgetWizard extends WidgetWizardBase {
-  modalOpen = false;
   localConfig: any | null = null;
   dashboardId: string | null = null;
 
@@ -45,7 +44,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       isStoreWidget: false,
       widget: this.widget,
       saveWidget: v => this.widget = v,
-      closeDialog: () => this.modalOpen = false,
+      closeDialog: () => { },
     };
   }
 
@@ -80,6 +79,13 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       .onOk(v => this.widgetTitle = v);
   }
 
+  showWidget(): void {
+    createDialog({
+      component: 'WidgetDialog',
+      getCrud: () => this.crud,
+    });
+  }
+
   async createWidget(): Promise<void> {
     if (this.canCreate) {
       const widget = await tryCreateWidget(this.widget);
@@ -107,26 +113,13 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       </q-input>
     </div>
 
-    <q-dialog
-      v-model="modalOpen"
-      :maximized="$dense"
-      v-bind="dialogProps"
-    >
-      <component
-        :is="widgetComponent"
-        :initial-crud="crud"
-        :context="context"
-        @close="modalOpen = false"
-      />
-    </q-dialog>
-
     <template #actions>
       <q-btn unelevated label="Back" @click="back" />
       <q-space />
       <q-btn
         unelevated
         label="Configure"
-        @click="modalOpen = true"
+        @click="showWidget"
       />
       <q-btn
         :disable="!canCreate"
