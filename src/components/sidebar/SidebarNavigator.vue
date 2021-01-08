@@ -49,7 +49,7 @@ export default class SidebarNavigator extends Vue {
         v-bind="btnAttrs"
       />
       <q-btn
-        v-if="!editorDisabled"
+        :disable="editorDisabled"
         icon="mdi-tools"
         label="Builder"
         to="/builder"

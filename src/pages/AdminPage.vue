@@ -11,7 +11,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
-import { systemStore } from '@/store/system';
+import { SystemConfig, systemStore } from '@/store/system';
 
 interface ConfigService {
   serviceId: string;
@@ -80,6 +80,23 @@ export default class AdminPage extends Vue {
       .onOk(keyboardLayout => systemStore.saveConfig({ keyboardLayout }));
   }
 
+  startEditBuilderTouchDelay(): void {
+    const selectOptions: SelectOption<SystemConfig['builderTouchDelayed']>[] = [
+      { label: 'Always', value: 'always' },
+      { label: 'Never', value: 'never' },
+      { label: 'Only on mobile', value: 'dense' },
+    ];
+
+    createDialog({
+      component: 'SelectDialog',
+      listSelect: true,
+      selectOptions,
+      title: 'Hold to interact with builder parts?',
+      value: systemStore.config.builderTouchDelayed,
+    })
+      .onOk(builderTouchDelayed => systemStore.saveConfig({ builderTouchDelayed }));
+  }
+
   openMenu(component: string): void {
     createDialog({ component });
   }
@@ -127,7 +144,12 @@ export default class AdminPage extends Vue {
             label="Set temperature units"
             @click="openMenu('TempUnitMenu')"
           />
-        </ActionSubmenu>
+          <ActionItem
+            icon="mdi-gesture-tap-hold"
+            label="Set touch delay for builder layouts"
+            @click="startEditBuilderTouchDelay"
+          />
+        </actionsubmenu>
       </q-expansion-item>
 
       <q-expansion-item

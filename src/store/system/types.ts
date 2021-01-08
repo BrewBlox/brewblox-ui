@@ -3,4 +3,5 @@ export interface SystemConfig {
   experimental: boolean;
   showSidebarLayouts: boolean;
   homePage: string | null;
+  builderTouchDelayed: 'dense' | 'always' | 'never';
 }
