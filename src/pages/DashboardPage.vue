@@ -6,6 +6,7 @@ import { Watch } from 'vue-property-decorator';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import { createDialog } from '../helpers/dialog';
 
@@ -44,6 +45,10 @@ export default class DashboardPage extends Vue {
       container: 'Dashboard',
       size: this.$dense ? 'Content' : 'Fixed',
     };
+  }
+
+  get loaded(): boolean {
+    return systemStore.loaded;
   }
 
   get dashboardId(): string {
@@ -97,9 +102,11 @@ export default class DashboardPage extends Vue {
 
 <template>
   <q-page style="overflow: auto" class="page-height">
-    <q-inner-loading v-if="!dashboard">
-      <q-spinner size="50px" color="primary" />
-    </q-inner-loading>
+    <template v-if="!dashboard">
+      <PageError v-if="!dashboard">
+        <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
+      </PageError>
+    </template>
     <div v-else class="q-pa-lg">
       <portal to="toolbar-title">
         {{ dashboard.title }}

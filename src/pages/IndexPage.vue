@@ -38,7 +38,7 @@ export default class IndexPage extends Vue {
   }
 
   @Watch('homePage', { immediate: true })
-  onHomePageFound(): void {
+  watchHomePage(): void {
     if (this.homePage) {
       this.$router.replace(this.homePage);
     }
@@ -51,8 +51,8 @@ export default class IndexPage extends Vue {
 </script>
 
 <template>
-  <q-page class="flex flex-center">
-    <div class="absolute-center">
+  <q-page class="text-h5 darkened">
+    <PageError v-if="!homePage">
       <q-btn
         unelevated
         color="secondary"
@@ -61,6 +61,6 @@ export default class IndexPage extends Vue {
         label="Get started"
         @click="showWizard"
       />
-    </div>
+    </PageError>
   </q-page>
 </template>

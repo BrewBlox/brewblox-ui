@@ -36,12 +36,18 @@ const fetchConfig = async (): Promise<SystemConfig> =>
         ...omit(settings, 'id'),
       };
     })
-    .catch(() => persistConfig(defaultSettings()));
+    .catch(() => defaultSettings());
 
 @Module // generateMutationSetters not set
 export class SystemModule extends VuexModule {
+  public loaded: boolean = false;
   public now: Date = new Date();
   public config: SystemConfig = defaultSettings();
+
+  @Mutation
+  public setLoaded(): void {
+    this.loaded = true;
+  }
 
   @Mutation
   public updateTime(): void {

@@ -6,6 +6,7 @@ import { Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { Coordinates } from '@/helpers/coordinates';
 import { createDialog } from '@/helpers/dialog';
 import { clampRotation, deepCopy } from '@/helpers/functional';
+import { systemStore } from '@/store/system';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -59,8 +60,8 @@ export default class BuilderEditor extends Vue {
   squares = squares;
 
   layoutId: string | null = null;
-  debouncedSaveParts: Function = () => { };
-  debouncedCalculate: Function = () => { };
+  debouncedSaveParts = debounce(this.saveParts, 500);
+  debouncedCalculate = debounce(this.calculate, 150, true);
   flowParts: FlowPart[] = [];
   history: string[] = [];
   undoneHistory: string[] = [];
@@ -105,16 +106,12 @@ export default class BuilderEditor extends Vue {
     document.title = `Brewblox | ${newV ?? 'Builder editor'}`;
   }
 
-  created(): void {
-    this.debouncedSaveParts = debounce(this.saveParts, 500);
-    this.debouncedCalculate = debounce(this.calculate, 150, true);
-    this.debouncedCalculate();
-  }
-
-  async mounted(): Promise<void> {
-    this.selectLayout(null);
-    await this.$nextTick();
-    this.setFocus();
+  @Watch('loaded', { immediate: true })
+  watchLoaded(loaded: boolean): void {
+    if (loaded) {
+      this.selectLayout(null);
+      this.$nextTick(() => this.setFocus());
+    }
   }
 
   modes: ActionMode[] = [
@@ -192,7 +189,11 @@ export default class BuilderEditor extends Vue {
       shortcut: 'd',
       use: this.useDelete,
     },
-  ]
+  ];
+
+  get loaded(): boolean {
+    return systemStore.loaded;
+  }
 
   get drawerOpen(): boolean {
     return Boolean(
@@ -920,9 +921,11 @@ export default class BuilderEditor extends Vue {
 
     <q-page-container style="overflow: hidden">
       <q-page class="row no-wrap justify-center q-pa-md">
-        <div class="col-auto column no-wrap">
+        <PageError v-if="!layout">
+          No layout selected
+        </PageError>
+        <div v-else class="col-auto column no-wrap">
           <div
-            v-if="!!layout"
             v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
             :style="{
               width: `${squares(layout.width)}px`,

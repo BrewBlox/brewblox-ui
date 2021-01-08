@@ -46,6 +46,10 @@ export default class BreweryPage extends Vue {
     this.debouncedCalculate();
   }
 
+  get loaded(): boolean {
+    return systemStore.loaded;
+  }
+
   get drawerOpen(): boolean {
     return Boolean(
       this.localDrawer
@@ -212,7 +216,16 @@ export default class BreweryPage extends Vue {
       </ActionMenu>
     </portal>
 
-    <div class="fit">
+    <div
+      v-if="!loaded"
+      class="text-h5 darkened absolute-center column items-center q-gutter-md"
+    >
+      <q-spinner size="30px" />
+      <div>
+        Waiting for datastore...
+      </div>
+    </div>
+    <div v-else class="fit">
       <span v-if="parts.length === 0" class="absolute-center">
         {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
       </span>

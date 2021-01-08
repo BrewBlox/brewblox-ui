@@ -22,6 +22,10 @@ interface ConfigService {
 @Component
 export default class AdminPage extends Vue {
 
+  get loaded(): boolean {
+    return systemStore.loaded;
+  }
+
   get experimental(): boolean {
     return systemStore.config.experimental;
   }
@@ -105,7 +109,8 @@ export default class AdminPage extends Vue {
 
 <template>
   <q-page class="page-height overflow-auto">
-    <div class="column q-pa-lg q-gutter-sm">
+    <PageError v-if="!loaded" />
+    <div v-else class="column q-pa-lg q-gutter-sm">
       <div class="text-h5 text-italic">
         System
       </div>
