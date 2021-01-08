@@ -118,7 +118,7 @@ export default class AdminPage extends Vue {
       <ActionItem
         label="Wizardry"
         icon="mdi-creation"
-        class="text-secondary"
+        class="text-secondary text-h6 text-bold"
         @click="openMenu('WizardDialog')"
       />
 
