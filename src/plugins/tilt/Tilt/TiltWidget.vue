@@ -1,16 +1,19 @@
 <script lang="ts">
+import { debounce } from 'quasar';
 import { Component } from 'vue-property-decorator';
 
 import WidgetBase from '@/components/WidgetBase';
 import { serviceStore } from '@/store/services';
 
+import { fieldLabels } from '../getters';
 import { tiltStore } from '../store';
-import { TiltStateValue } from '../types';
+import { TiltFieldIndex, TiltStateValue } from '../types';
 import { TiltWidgetConfig } from './types';
-
 
 @Component
 export default class TiltWidget extends WidgetBase<TiltWidgetConfig> {
+  fieldLabels = fieldLabels;
+  debouncedSaveConfig = debounce(this.saveConfig, 100, false);
 
   get serviceOpts(): SelectOption<string>[] {
     return serviceStore
@@ -41,6 +44,11 @@ export default class TiltWidget extends WidgetBase<TiltWidgetConfig> {
         && v.color === this.config.color)
       ?? null;
   }
+
+  setShown(key: keyof TiltFieldIndex, value: boolean): void {
+    this.config.hidden[key] = !value || undefined;
+    this.debouncedSaveConfig();
+  }
 }
 </script>
 
@@ -57,6 +65,7 @@ export default class TiltWidget extends WidgetBase<TiltWidgetConfig> {
       <TiltValues
         v-if="value"
         :value="value"
+        :hidden="config.hidden"
       />
       <CardWarning v-else-if="config.serviceId && config.color">
         <template #message>
@@ -86,6 +95,16 @@ export default class TiltWidget extends WidgetBase<TiltWidgetConfig> {
         :value="config.color"
         @input="v => { config.color = v; saveConfig(); }"
       />
+      <ActionSubmenu label="Shown values">
+        <ToggleAction
+          v-for="(label, key) in fieldLabels"
+          :key="`toggle-${key}`"
+          :value="!config.hidden[key]"
+          :label="label"
+          class="q-ml-sm"
+          @input="v => setShown(key, v)"
+        />
+      </ActionSubmenu>
     </div>
   </CardWrapper>
 </template>

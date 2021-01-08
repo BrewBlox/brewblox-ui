@@ -16,6 +16,7 @@ const feature: WidgetFeature<TiltWidgetConfig> = {
   generateConfig: () => ({
     serviceId: null,
     color: null,
+    hidden: {},
   }),
 };
 
