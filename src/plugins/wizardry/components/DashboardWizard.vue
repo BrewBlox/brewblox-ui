@@ -7,6 +7,7 @@ import { createDialog } from '@/helpers/dialog';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import WizardBase from '@/plugins/wizardry/WizardBase';
+import router from '@/router';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
@@ -64,6 +65,7 @@ export default class DashboardWizard extends WizardBase {
     };
 
     await dashboardStore.createDashboard(dashboard);
+    router.push(`/dashboard/${dashboard.id}`);
     notify.done(`Added dashboard <b>${dashboard.title}</b>`);
     this.close();
   }
