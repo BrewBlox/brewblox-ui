@@ -416,7 +416,7 @@ export const defineWidgets = (
             ],
         },
         {
-          name: 'Constant fridge temperature',
+          name: 'Manage fridge temperature',
           id: uid(),
           changes: [
             {
@@ -455,7 +455,7 @@ export const defineWidgets = (
             ],
         },
         {
-          name: 'Constant beer temperature',
+          name: 'Manage beer temperature',
           id: uid(),
           changes: [
             {
@@ -494,7 +494,7 @@ export const defineWidgets = (
             ],
         },
         {
-          name: 'Start profile',
+          name: 'Enable temperature profile',
           id: uid(),
           changes: [
             {
@@ -508,7 +508,7 @@ export const defineWidgets = (
             ],
         },
         {
-          name: 'Disable profile',
+          name: 'Disable temperature profile',
           id: uid(),
           changes: [
             {

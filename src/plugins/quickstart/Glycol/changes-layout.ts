@@ -62,8 +62,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
         },
         flipped: false,
         type: 'PidDisplay',
-        x: 5,
-        y: 8,
+        x: 7,
+        y: 6,
       });
   }
   else if (config.glycolControl === 'Measure') {
@@ -247,7 +247,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           flipped: false,
           type: 'StraightTube',
           x: 5,
-          y: 4,
+          y: 6,
         },
         {
           id: uid(),
@@ -258,8 +258,8 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           },
           flipped: false,
           type: 'PidDisplay',
-          x: 4,
-          y: 2,
+          x: 6,
+          y: 4,
         },
         {
           id: uid(),
@@ -270,7 +270,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           flipped: false,
           type: 'Pump',
           x: 5,
-          y: 6,
+          y: 4,
         },
       ],
     },
