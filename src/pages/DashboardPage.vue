@@ -6,6 +6,7 @@ import { Watch } from 'vue-property-decorator';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import { createDialog } from '../helpers/dialog';
 
@@ -44,6 +45,10 @@ export default class DashboardPage extends Vue {
       container: 'Dashboard',
       size: this.$dense ? 'Content' : 'Fixed',
     };
+  }
+
+  get loaded(): boolean {
+    return systemStore.loaded;
   }
 
   get dashboardId(): string {
@@ -85,10 +90,10 @@ export default class DashboardPage extends Vue {
     await dashboardStore.saveWidget(widget);
   }
 
-  showWizard(): void {
+  showWizard(widget: boolean): void {
     createDialog({
       component: 'WizardDialog',
-      initialWizard: 'WidgetWizardPicker',
+      initialWizard: widget ? 'WidgetWizardPicker' : null,
       activeDashboardId: this.dashboardId,
     });
   }
@@ -97,9 +102,11 @@ export default class DashboardPage extends Vue {
 
 <template>
   <q-page style="overflow: auto" class="page-height">
-    <q-inner-loading v-if="!dashboard">
-      <q-spinner size="50px" color="primary" />
-    </q-inner-loading>
+    <template v-if="!dashboard">
+      <PageError v-if="!dashboard">
+        <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
+      </PageError>
+    </template>
     <div v-else class="q-pa-lg">
       <portal to="toolbar-title">
         {{ dashboard.title }}
@@ -131,7 +138,23 @@ export default class DashboardPage extends Vue {
         </ActionMenu>
       </portal>
 
-      <div v-if="$dense" class="column q-gutter-y-sm">
+      <div
+        v-if="validatedWidgets.length === 0"
+        class="absolute-center"
+      >
+        <q-btn
+          unelevated
+          color="secondary"
+          icon="mdi-creation"
+          size="lg"
+          label="Get started"
+          @click="showWizard(false)"
+        />
+      </div>
+      <div
+        v-else-if="$dense"
+        class="column q-gutter-y-sm"
+      >
         <component
           :is="val.component"
           v-for="val in validatedWidgets"
@@ -145,7 +168,7 @@ export default class DashboardPage extends Vue {
         v-else
         :editable="widgetEditable"
         @patch:widgets="patchWidgets"
-        @dblclick="showWizard"
+        @dblclick="showWizard(true)"
       >
         <component
           :is="val.component"

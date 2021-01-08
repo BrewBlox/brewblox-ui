@@ -62,13 +62,11 @@ export default class DashboardActions extends Vue {
 </script>
 
 <template>
-  <ActionSubmenu
-    :label="title"
-  >
+  <ActionSubmenu>
     <template v-if="dashboard">
       <ActionItem
         icon="add"
-        label="New Widget"
+        label="New widget"
         @click="showWizard"
       />
       <ToggleAction

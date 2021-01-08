@@ -5,6 +5,7 @@ import { Component, Watch } from 'vue-property-decorator';
 
 import { spliceById } from '@/helpers/functional';
 import notify from '@/helpers/notify';
+import { systemStore } from '@/store/system';
 
 import { calculateNormalizedFlows } from './calculateFlows';
 import { asPersistentPart, asStatePart, squares, vivifyParts } from './helpers';
@@ -45,6 +46,10 @@ export default class BreweryPage extends Vue {
     this.debouncedCalculate();
   }
 
+  get loaded(): boolean {
+    return systemStore.loaded;
+  }
+
   get drawerOpen(): boolean {
     return Boolean(
       this.localDrawer
@@ -55,6 +60,12 @@ export default class BreweryPage extends Vue {
   set drawerOpen(v: boolean) {
     this.localDrawer = v;
     this.$q.localStorage.set('drawer', v);
+  }
+
+  get delayTouch(): boolean {
+    const { builderTouchDelayed } = systemStore.config;
+    return builderTouchDelayed === 'always'
+      || (builderTouchDelayed === 'dense' && this.$dense);
   }
 
   get layouts(): BuilderLayout[] {
@@ -146,29 +157,36 @@ export default class BreweryPage extends Vue {
     if (!this.isClickable(part)) {
       return;
     }
-    if (args.repeatCount === 1) {
-      const title = builderStore.spec(part).title;
-      this.touchMessage({ timeout: 1 }); // Clear previous
-      this.touchMessage = Notify.create({
-        position: 'top',
-        group: false,
-        timeout: 500,
-        message: `Hold to interact with '${title}'`,
-        spinner: true,
-      });
-    }
-    if (args.repeatCount < this.touchMax) {
-      this.touchMessage({ timeout: 500 }); // Postpone timeout
-    }
-    if (args.repeatCount === this.touchMax) {
+
+    if (!this.delayTouch && args.repeatCount === 1) {
       this.interact(part);
-      this.touchMessage({
-        icon: 'done',
-        color: 'positive',
-        timeout: 100,
-        message: 'Done!',
-        spinner: false,
-      });
+    }
+
+    if (this.delayTouch) {
+      if (args.repeatCount === 1) {
+        const title = builderStore.spec(part).title;
+        this.touchMessage({ timeout: 1 }); // Clear previous
+        this.touchMessage = Notify.create({
+          position: 'top',
+          group: false,
+          timeout: 500,
+          message: `Hold to interact with '${title}'`,
+          spinner: true,
+        });
+      }
+      if (args.repeatCount < this.touchMax) {
+        this.touchMessage({ timeout: 500 }); // Postpone timeout
+      }
+      if (args.repeatCount === this.touchMax) {
+        this.interact(part);
+        this.touchMessage({
+          icon: 'done',
+          color: 'positive',
+          timeout: 100,
+          message: 'Done!',
+          spinner: false,
+        });
+      }
     }
   }
 }
@@ -198,7 +216,16 @@ export default class BreweryPage extends Vue {
       </ActionMenu>
     </portal>
 
-    <div class="fit">
+    <div
+      v-if="!loaded"
+      class="text-h5 darkened absolute-center column items-center q-gutter-md"
+    >
+      <q-spinner size="30px" />
+      <div>
+        Waiting for datastore...
+      </div>
+    </div>
+    <div v-else class="fit">
       <span v-if="parts.length === 0" class="absolute-center">
         {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
       </span>

@@ -27,24 +27,29 @@ export default class WebframeWidget extends WidgetBase<WebframeConfig> {
       <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
     </template>
 
-    <iframe
+    <div
       v-if="mode === 'Basic'"
-      :src="config.url"
-      referrerpolicy="no-referrer"
-      allowfullscreen
-      :style="{
-        margin: '1%',
-        border: 'none',
-        transform: `scale(${scale})`,
-        transformOrigin: '0 0',
+      style="overflow: hidden"
+      class="fit"
+    >
+      <iframe
+        :src="config.url"
+        referrerpolicy="no-referrer"
+        allowfullscreen
+        :style="{
+          margin: '1%',
+          border: 'none',
+          transform: `scale(${scale})`,
+          transformOrigin: '0 0',
 
-        // Desired width/height is 98%. (1% margin)
-        // To offset scaling, we need to increase/decrease size.
-        // If scale == 0.5, then width/height must be 196%
-        width: 98 * counterScale + '%',
-        height: 98 * counterScale + '%',
-      }"
-    />
+          // Desired width/height is 98%. (1% margin)
+          // To offset scaling, we need to increase/decrease size.
+          // If scale == 0.5, then width/height must be 196%
+          width: 98 * counterScale + '%',
+          height: 98 * counterScale + '%',
+        }"
+      />
+    </div>
 
     <div
       v-if="mode === 'Full'"

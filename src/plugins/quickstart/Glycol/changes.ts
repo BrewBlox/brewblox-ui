@@ -420,35 +420,24 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
             ],
         },
         {
-          name: 'Constant beer temperature',
+          name: 'Beer temperature control ON',
           id: uid(),
           changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerProfile,
-              data: { enabled: false },
-              confirmed: {},
-            },
             {
               id: uid(),
               serviceId,
               blockId: names.beerSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: bloxQty(20, 'degC').to(userTemp),
               },
-              confirmed: {
-                storedSetting: true,
-              },
+              confirmed: {},
             },
           ] as [
-              BlockChange<SetpointProfileBlock>,
               BlockChange<SetpointSensorPairBlock>,
             ],
         },
         {
-          name: 'Follow temperature profile',
+          name: 'Enable temperature profile',
           id: uid(),
           changes: [
             {
@@ -462,11 +451,26 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
               id: uid(),
               serviceId,
               blockId: names.beerProfile,
-              data: { enabled: true, start: new Date().getTime() / 1000 },
+              data: { enabled: true, start: 0 },
               confirmed: { start: true },
             },
           ] as [
               BlockChange<SetpointSensorPairBlock>,
+              BlockChange<SetpointProfileBlock>,
+            ],
+        },
+        {
+          name: 'Disable temperature profile',
+          id: uid(),
+          changes: [
+            {
+              id: uid(),
+              serviceId,
+              blockId: names.beerProfile,
+              data: { enabled: false },
+              confirmed: {},
+            },
+          ] as [
               BlockChange<SetpointProfileBlock>,
             ],
         },

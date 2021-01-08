@@ -43,3 +43,10 @@ export interface TiltStateValue {
     calibratedPlato: Quantity;
   };
 }
+
+export type TiltFieldIndex = {
+  [k in keyof TiltStateValue['data']]: boolean;
+} & {
+  timestamp: boolean;
+  color: boolean;
+}

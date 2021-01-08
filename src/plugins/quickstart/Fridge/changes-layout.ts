@@ -95,6 +95,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
+            bordered: false,
             pid: {
               serviceId,
               blockId: names.coolPid,
@@ -109,6 +110,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
+            bordered: false,
             pid: {
               serviceId,
               blockId: names.heatPid,

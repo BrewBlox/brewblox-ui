@@ -3,6 +3,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { objectSorter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
 import { dashboardStore } from '@/store/dashboards';
@@ -37,17 +38,29 @@ export default class IndexPage extends Vue {
   }
 
   @Watch('homePage', { immediate: true })
-  onHomePageFound(): void {
+  watchHomePage(): void {
     if (this.homePage) {
       this.$router.replace(this.homePage);
     }
   }
 
+  showWizard(): void {
+    createDialog({ component: 'WizardDialog' });
+  }
 }
 </script>
 
 <template>
-  <q-page class="flex flex-center">
-    Home
+  <q-page class="text-h5 darkened">
+    <PageError v-if="!homePage">
+      <q-btn
+        unelevated
+        color="secondary"
+        icon="mdi-creation"
+        size="lg"
+        label="Get started"
+        @click="showWizard"
+      />
+    </PageError>
   </q-page>
 </template>

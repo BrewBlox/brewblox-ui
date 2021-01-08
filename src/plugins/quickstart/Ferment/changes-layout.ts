@@ -79,6 +79,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
+            bordered: false,
             pid: {
               serviceId,
               blockId: config.names.coolPid,
@@ -93,6 +94,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           rotate: 0,
           flipped: false,
           settings: {
+            bordered: false,
             pid: {
               serviceId,
               blockId: config.names.heatPid,

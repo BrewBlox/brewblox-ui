@@ -21,12 +21,19 @@ export default class LayoutActions extends Vue {
   @Prop({ type: Object, default: null })
   public readonly layout!: BuilderLayout | null;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly noLabel!: boolean;
+
   get layoutIds(): string[] {
     return builderStore.layoutIds;
   }
 
   get title(): string {
     return this.layout?.title ?? 'Unknown';
+  }
+
+  get label(): string | null {
+    return this.noLabel ? null : this.title;
   }
 
   get scale(): number {
@@ -195,7 +202,7 @@ export default class LayoutActions extends Vue {
 
 
 <template>
-  <ActionSubmenu v-if="!!layout" :label="title" v-bind="{...$attrs}">
+  <ActionSubmenu v-if="!!layout" v-bind="{label, ...$attrs}">
     <slot />
     <ToggleAction
       v-model="isHomePage"

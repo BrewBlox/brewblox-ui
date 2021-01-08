@@ -102,7 +102,11 @@ export default class WizardDialog extends DialogBase {
 
       <template v-else>
         <q-card-section>
-          <q-item :disable="!sparkServiceAvailable" clickable @click="pickWizard('QuickStartWizardPicker')">
+          <q-item
+            :disable="!sparkServiceAvailable"
+            clickable
+            @click="pickWizard('QuickStartWizardPicker')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Quick Start
@@ -127,7 +131,10 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('DashboardWizard')">
+          <q-item
+            clickable
+            @click="pickWizard('DashboardWizard')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Dashboard
@@ -145,7 +152,10 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('WidgetWizardPicker')">
+          <q-item
+            clickable
+            @click="pickWizard('WidgetWizardPicker')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Widget
@@ -170,7 +180,11 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item :disable="!sparkServiceAvailable" clickable @click="pickWizard('BlockWizard')">
+          <q-item
+            :disable="!sparkServiceAvailable"
+            clickable
+            @click="pickWizard('BlockWizard')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Block
@@ -198,7 +212,10 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('ImportWizard')">
+          <q-item
+            clickable
+            @click="pickWizard('ImportWizard')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Import Widget
@@ -218,7 +235,10 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item class="darkish text-italic" style="cursor: not-allowed">
+          <q-item
+            class="darkish text-italic"
+            style="cursor: not-allowed"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Services
