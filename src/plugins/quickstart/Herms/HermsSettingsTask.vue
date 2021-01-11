@@ -124,7 +124,7 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
       value: this.driverMax.value,
       suffix: prettyUnit(this.driverMax),
     })
-      .onOk(v => this.mashVolume = v);
+      .onOk(v => this.driverMax = v);
   }
 }
 </script>
