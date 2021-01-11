@@ -18,7 +18,7 @@ const defaultSettings = (): SystemConfig => ({
   experimental: false,
   showSidebarLayouts: true,
   homePage: null,
-  builderTouchDelayed: 'always',
+  builderTouchDelayed: 'dense',
 });
 
 const persistConfig = async (settings: SystemConfig): Promise<SystemConfig> =>

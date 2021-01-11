@@ -96,6 +96,10 @@ export default class AdminPage extends Vue {
       listSelect: true,
       selectOptions,
       title: 'Hold to interact with builder parts?',
+      message: `
+      Actuators and valves can be activated by clicking on them in the builder.
+      For touch screens, a delay can be configured to prevent accidental activation.
+      `,
       value: systemStore.config.builderTouchDelayed,
     })
       .onOk(builderTouchDelayed => systemStore.saveConfig({ builderTouchDelayed }));
@@ -141,18 +145,18 @@ export default class AdminPage extends Vue {
             label="Show builder layouts in sidebar"
           />
           <ActionItem
-            label="Set keyboard layout"
+            label="On-screen keyboard layout"
             icon="mdi-keyboard"
             @click="startChangeKeyboardLayout"
           />
           <ActionItem
             icon="mdi-temperature-celsius"
-            label="Set temperature units"
+            label="Temperature units"
             @click="openMenu('TempUnitMenu')"
           />
           <ActionItem
             icon="mdi-gesture-tap-hold"
-            label="Set touch delay for builder layouts"
+            label="Accidental touch prevention"
             @click="startEditBuilderTouchDelay"
           />
         </actionsubmenu>
