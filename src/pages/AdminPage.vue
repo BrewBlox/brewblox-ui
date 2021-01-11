@@ -110,13 +110,13 @@ export default class AdminPage extends Vue {
 <template>
   <q-page class="page-height overflow-auto">
     <PageError v-if="!loaded" />
-    <div v-else class="column q-pa-lg q-gutter-sm">
-      <div class="text-h5 text-italic">
+    <div v-else class="column q-pa-lg">
+      <div class="text-h5">
         System
       </div>
 
       <ActionItem
-        label="Wizardry"
+        label="Start a wizard"
         icon="mdi-creation"
         class="text-secondary text-h6 text-bold"
         @click="openMenu('WizardDialog')"
@@ -125,7 +125,8 @@ export default class AdminPage extends Vue {
       <q-expansion-item
         label="General settings"
         group="expansion"
-        header-class="text-h6 text-italic admin-header"
+        header-class="text-h6 admin-header"
+        expand-icon-class="fade-4"
         switch-toggle-side
       >
         <ActionSubmenu
@@ -160,7 +161,8 @@ export default class AdminPage extends Vue {
       <q-expansion-item
         label="Debugging"
         group="expansion"
-        header-class="text-h6 text-italic admin-header"
+        header-class="text-h6 admin-header"
+        expand-icon-class="fade-4"
         switch-toggle-side
       >
         <ActionSubmenu
@@ -181,7 +183,11 @@ export default class AdminPage extends Vue {
         </ActionSubmenu>
       </q-expansion-item>
 
-      <div class="text-h5 text-italic q-mt-xl">
+      <div class="q-my-md">
+        <q-separator />
+      </div>
+
+      <div class="text-h5">
         Dashboards
       </div>
 
@@ -197,9 +203,9 @@ export default class AdminPage extends Vue {
         :key="'dashboard-'+dash.id"
         :label="dash.title"
         group="expansion"
-        header-class="text-h6 text-italic admin-header"
+        header-class="text-h6 admin-header"
+        expand-icon-class="fade-4"
         switch-toggle-side
-        class="q-ml-md"
       >
         <DashboardActions
           :dashboard-id="dash.id"
@@ -207,7 +213,12 @@ export default class AdminPage extends Vue {
         />
       </q-expansion-item>
 
-      <div class="text-h5 text-italic q-mt-xl">
+
+      <div class="q-my-md">
+        <q-separator />
+      </div>
+
+      <div class="text-h5">
         Services
       </div>
 
@@ -223,17 +234,22 @@ export default class AdminPage extends Vue {
         :key="'service-'+svc.serviceId"
         :label="svc.title"
         group="expansion"
-        header-class="text-h6 text-italic admin-header"
+        header-class="text-h6 admin-header"
+        expand-icon-class="fade-4"
         switch-toggle-side
       >
         <component
           :is="svc.configComponent"
           :service-id="svc.serviceId"
-          class="q-ml-lg"
+          class="q-ml-md"
         />
       </q-expansion-item>
 
-      <div class="text-h5 text-italic q-mt-xl">
+      <div class="q-my-md">
+        <q-separator />
+      </div>
+
+      <div class="text-h5">
         Builder layouts
       </div>
 
@@ -249,11 +265,12 @@ export default class AdminPage extends Vue {
         :key="'layout-'+layout.id"
         :label="layout.title"
         group="expansion"
-        header-class="text-h6 text-italic admin-header"
+        header-class="text-h6 admin-header"
+        expand-icon-class="fade-4"
         switch-toggle-side
       >
         <LayoutActions
-          class="q-ml-lg"
+          class="q-ml-md"
           :layout="layout"
           no-label
         >
