@@ -7,44 +7,63 @@ import { GlycolConfig } from './types';
 
 
 export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
-  const heatingParts = config.heated
-    ? [
+  const { serviceId, names } = config;
+  const heatingParts: PersistentPart[] = [];
+  const glycolParts: PersistentPart[] = [];
+
+  if (config.heated) {
+    heatingParts.push(
       {
         id: uid(),
         rotate: 0,
         settings: {
-          pid: { serviceId: config.serviceId, blockId: config.names.heatPid },
+          bordered: false,
+          pid: { serviceId, blockId: names.heatPid },
         },
         flipped: false,
         type: 'PidDisplay',
-        x: 5,
-        y: 2,
+        x: 2,
+        y: 5,
       },
       {
         id: uid(),
         rotate: 0,
         settings: {
-          pwm: { serviceId: config.serviceId, blockId: config.names.heatPwm },
+          bordered: false,
+          pwm: { serviceId, blockId: names.heatPwm },
         },
         flipped: false,
         type: 'PwmDisplay',
         x: 2,
         y: 6,
-      },
-    ]
-    : [];
+      });
+  }
 
-  const glycolParts: PersistentPart[] = [];
   if (config.glycolControl === 'Control') {
     glycolParts.push(
       {
         id: uid(),
         rotate: 0,
-        settings: { setpoint: { serviceId: config.serviceId, blockId: config.names.glycolSetpoint } },
+        settings: {
+          bordered: false,
+          setpoint: { serviceId, blockId: names.glycolSetpoint },
+        },
         flipped: false,
         type: 'SetpointDisplay',
         x: 6,
         y: 8,
+      },
+      {
+        id: uid(),
+        rotate: 0,
+        settings: {
+          bordered: false,
+          pid: { serviceId, blockId: names.glycolPid },
+        },
+        flipped: false,
+        type: 'PidDisplay',
+        x: 7,
+        y: 6,
       });
   }
   else if (config.glycolControl === 'Measure') {
@@ -52,14 +71,13 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
       {
         id: uid(),
         rotate: 0,
-        settings: { sensor: { serviceId: config.serviceId, blockId: config.names.glycolSensor } },
+        settings: { sensor: { serviceId, blockId: names.glycolSensor } },
         flipped: false,
         type: 'SensorDisplay',
         x: 7,
         y: 7,
       });
   }
-
 
   return [
     {
@@ -74,7 +92,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           id: uid(),
           rotate: 0,
           settings: {
-            setpoint: { serviceId: config.serviceId, blockId: config.names.beerSetpoint },
+            setpoint: { serviceId, blockId: names.beerSetpoint },
           },
           flipped: false,
           type: 'Conical',
@@ -229,29 +247,30 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
           flipped: false,
           type: 'StraightTube',
           x: 5,
-          y: 4,
+          y: 6,
         },
         {
           id: uid(),
           rotate: 0,
           settings: {
-            pid: { serviceId: config.serviceId, blockId: config.names.coolPid },
+            bordered: false,
+            pid: { serviceId, blockId: names.coolPid },
           },
           flipped: false,
           type: 'PidDisplay',
-          x: 4,
-          y: 2,
+          x: 6,
+          y: 4,
         },
         {
           id: uid(),
           rotate: 90,
           settings: {
-            actuator: { serviceId: config.serviceId, blockId: config.names.coolPwm },
+            actuator: { serviceId, blockId: names.coolPwm },
           },
           flipped: false,
           type: 'Pump',
           x: 5,
-          y: 6,
+          y: 4,
         },
       ],
     },

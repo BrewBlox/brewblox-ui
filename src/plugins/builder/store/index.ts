@@ -61,7 +61,25 @@ export class BuilderModule extends VuexModule {
 
   @Action
   public async removeLayout(layout: BuilderLayout): Promise<void> {
+    if (this.lastLayoutId === layout.id) {
+      this.lastLayoutId = null;
+    }
     await api.remove(layout); // triggers callback
+  }
+
+  @Action
+  public async updateLayoutOrder(ids: string[]): Promise<void> {
+    await Promise.all(
+      ids
+        .map(id => this.layoutById(id))
+        .filter((v): v is BuilderLayout => v !== null)
+        .map((layout, idx) => {
+          const order = idx + 1;
+          if (order !== layout.order) {
+            this.saveLayout({ ...layout, order });
+          }
+        })
+    );
   }
 
   @Action

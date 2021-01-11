@@ -6,10 +6,6 @@
 
 The following packages are pinned to specific versions:
 
-**mqtt@4.1.0**
-
-4.2.0 breaks websocket connections in browser environments. 4.2.1 fixes this issue, but [breaks explicit hostnames](https://github.com/mqttjs/MQTT.js/issues/1150).
-
 **vue-router@3.2.0**
 
 Quasar has its own dependency on vue-router@3.2.0. Using multiple versions leads to typing errors.
@@ -25,7 +21,7 @@ Due to limitations in the way Docker is handled on Windows, Linux or Mac are req
 
 ## Installation
 
-**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at https://brewblox.netlify.com/**
+**This will install the development version of brewblox-ui. The user install guide for Brewblox can be found at https://brewblox.netlify.app/**
 
 Note: this is tested on Ubuntu, and may or may not work on other distros. Please let us know if there are any issues.
 
@@ -35,7 +31,7 @@ sudo apt upgrade -y
 sudo apt install -y build-essential libssl-dev curl git python3-pip
 
 # Install Node Version Manager + Node.js
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 nvm install --lts
 
 # Install Docker
@@ -92,11 +88,11 @@ The default data can be found in dev/presets/.
 The dev scripts allow for partially applying data, or replacing the defaults.
 
 Some examples:
-* `npm run datastore` only resets widgets
+* `npm run redis` only resets widgets
 * `npm run spark` only resets blocks
 * `npm run spark -- sparkey` only resets blocks on Sparkey
 
-You can use `npm run datastore:save` and `npm run spark:save` to replace the defaults.
+You can use `npm run redis:save` and `npm run spark:save` to replace the defaults.
 The files are indexed in git. Commit them to make the change permanent.
 
 ---
@@ -130,9 +126,9 @@ Implementation beyond proof-of-concept would require too much effort for a featu
 
 ## [Datastore](src/plugins/database/types.ts)
 
-Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Settings that are not session-specific (`Dashboard`, `Widget`, `Service`) are persisted to the CouchDB [datastore](https://pouchdb.com/).
+Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Persistent data (eg. `Dashboard`, `Widget`, `Service`) is saved using the Redis [datastore](https://redis.io/).
 
-The full datastore state is loaded on startup. After that, two-way synchronization is maintained between VueX (local), and CouchDB (remote).
+The full datastore state is loaded on startup. After that, two-way synchronization is maintained between VueX (local), and Redis (remote).
 
 ## [Eventbus](src/plugins/eventbus.ts)
 

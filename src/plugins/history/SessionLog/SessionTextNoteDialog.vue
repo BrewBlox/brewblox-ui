@@ -26,6 +26,14 @@ export default class SessionTextNoteDialog extends DialogBase {
     }
   }
 
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.local,
+    })
+      .onOk(v => this.local = v);
+  }
+
   insertDate(): void {
     createDialog({
       component: 'DatetimeDialog',
@@ -71,7 +79,7 @@ export default class SessionTextNoteDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
@@ -86,7 +94,11 @@ export default class SessionTextNoteDialog extends DialogBase {
         item-aligned
         @keyup.enter.exact.stop
         @keyup.enter.shift.stop
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
       <template #actions>
         <q-btn flat label="Insert date" color="primary" @click="insertDate" />
         <q-space />

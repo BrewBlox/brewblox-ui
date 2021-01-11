@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty, JSQuantity } from '@/helpers/bloxfield';
+import { bloxQty, JSQuantity, prettyUnit } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 
@@ -23,7 +23,7 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
   mashActual = bloxQty(65, 'degC');
 
   volumeRules: InputRule[] = [
-    v => v !== 0 || 'Volume can\'t be 0',
+    v => Number(v) !== 0 || 'Volume can\'t be 0',
   ]
 
   created(): void {
@@ -95,6 +95,36 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
       displayedBlocks,
     });
     this.next();
+  }
+
+  showHltVolumeKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      type: 'number',
+      value: this.hltVolume,
+      rules: this.volumeRules,
+    })
+      .onOk(v => this.hltVolume = v);
+  }
+
+  showMashVolumeKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      type: 'number',
+      value: this.mashVolume,
+      rules: this.volumeRules,
+    })
+      .onOk(v => this.mashVolume = v);
+  }
+
+  showDriverMaxKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      type: 'number',
+      value: this.driverMax.value,
+      suffix: prettyUnit(this.driverMax),
+    })
+      .onOk(v => this.driverMax = v);
   }
 }
 </script>
@@ -174,7 +204,11 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
             inputmode="numeric"
             pattern="[0-9]*"
             label="HLT volume"
-          />
+          >
+            <template #append>
+              <KeyboardButton @click="showHltVolumeKeyboard" />
+            </template>
+          </q-input>
         </q-item-section>
         <q-item-section>
           <q-input
@@ -183,7 +217,11 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
             inputmode="numeric"
             pattern="[0-9]*"
             label="Mash volume"
-          />
+          >
+            <template #append>
+              <KeyboardButton @click="showMashVolumeKeyboard" />
+            </template>
+          </q-input>
         </q-item-section>
         <q-item-section>
           <q-input
@@ -193,6 +231,7 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
             label="Limit difference to"
           >
             <template #append>
+              <KeyboardButton @click="showDriverMaxKeyboard" />
               <small class="self-end q-pb-sm">
                 {{ driverMax | prettyUnit }}
               </small>

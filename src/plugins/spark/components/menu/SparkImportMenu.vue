@@ -39,10 +39,10 @@ export default class SparkImportMenu extends DialogBase {
 
   confirmImport(values: any): void {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Reset blocks',
       message: 'This will remove all blocks, and import new ones from file. Are you sure?',
       noBackdropDismiss: true,
-      cancel: true,
     })
       .onOk(() => this.importBlocks(values));
   }
@@ -84,7 +84,7 @@ export default class SparkImportMenu extends DialogBase {
         nid: undefined,
         serviceId: this.serviceId,
       });
-      notify.done(`Imported block '${id}'`);
+      notify.done(`Imported block <i>${id}</i>`);
     } catch (e) {
       notify.error(`Failed to import block: ${e.toString()}`);
     }
@@ -94,7 +94,12 @@ export default class SparkImportMenu extends DialogBase {
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    :maximized="$dense"
+    v-bind="dialogProps"
+    @hide="onDialogHide"
+  >
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
         <DialogToolbar :title="serviceId" subtitle="Import/Export blocks" />

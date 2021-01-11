@@ -54,13 +54,10 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
   renameAction(action: ChangeAction): void {
     const stepName = action.name;
     createDialog({
+      component: 'InputDialog',
       title: 'Change ChangeAction name',
       message: `Choose a new name for '${action.name}'`,
-      cancel: true,
-      prompt: {
-        model: stepName,
-        type: 'text',
-      },
+      value: stepName,
     })
       .onOk(newName => {
         if (newName !== stepName) {
@@ -72,6 +69,7 @@ export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> 
 
   startRemoveStep(action: ChangeAction): void {
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Remove ChangeAction',
       message: `Are you sure you want to remove ${action.name}?`,
       ok: 'Confirm',

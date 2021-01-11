@@ -12,5 +12,6 @@ declare module 'vue/types/vue' {
     $database: BrewbloxDatabase;
     $eventbus: BrewbloxEventbus;
     $startup: BrewbloxStartup;
+    $app: Vue;
   }
 }

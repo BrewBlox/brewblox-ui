@@ -55,6 +55,10 @@ export default class PwmValues extends Vue {
   get transform(): string {
     return textTransformation(this.part, [1, 1]);
   }
+
+  public get bordered(): boolean {
+    return this.part.settings.bordered ?? true;
+  }
 }
 </script>
 
@@ -62,7 +66,7 @@ export default class PwmValues extends Vue {
   <g>
     <g class="outline">
       <rect
-        v-if="!noBorder"
+        v-show="bordered"
         :width="squares(1)-2"
         :height="squares(1)-2"
         :x="squares(startX)+1"

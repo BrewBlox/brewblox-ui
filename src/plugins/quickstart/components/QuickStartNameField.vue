@@ -2,6 +2,8 @@
 import Vue from 'vue';
 import { Component, Emit, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
+
 
 @Component
 export default class QuickStartNameField extends Vue {
@@ -22,6 +24,14 @@ export default class QuickStartNameField extends Vue {
   set local(value: string) {
     this.$emit('input', value);
   }
+
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.local,
+    })
+      .onOk(v => this.local = v);
+  }
 }
 </script>
 
@@ -39,6 +49,7 @@ export default class QuickStartNameField extends Vue {
         >
           <q-tooltip>Reset to default</q-tooltip>
         </q-btn>
+        <KeyboardButton @click="showKeyboard" />
         <q-icon v-if="!!$scopedSlots.help" name="mdi-information" size="20px">
           <q-tooltip>
             <slot name="help" />

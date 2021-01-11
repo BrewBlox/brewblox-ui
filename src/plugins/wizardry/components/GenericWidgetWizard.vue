@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { tryCreateWidget } from '@/plugins/wizardry';
 import WidgetWizardBase from '@/plugins/wizardry/WidgetWizardBase';
 import { Widget } from '@/store/dashboards';
@@ -9,7 +10,6 @@ import { Crud, featureStore, WidgetContext } from '@/store/features';
 
 @Component
 export default class GenericWidgetWizard extends WidgetWizardBase {
-  modalOpen = false;
   localConfig: any | null = null;
   dashboardId: string | null = null;
 
@@ -44,7 +44,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       isStoreWidget: false,
       widget: this.widget,
       saveWidget: v => this.widget = v,
-      closeDialog: () => this.modalOpen = false,
+      closeDialog: () => { },
     };
   }
 
@@ -71,6 +71,21 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       ?? {};
   }
 
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.widgetTitle,
+    })
+      .onOk(v => this.widgetTitle = v);
+  }
+
+  showWidget(): void {
+    createDialog({
+      component: 'WidgetDialog',
+      getCrud: () => this.crud,
+    });
+  }
+
   async createWidget(): Promise<void> {
     if (this.canCreate) {
       const widget = await tryCreateWidget(this.widget);
@@ -91,21 +106,12 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       <q-input
         v-model="widgetTitle"
         label="Widget name"
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
     </div>
-
-    <q-dialog
-      v-model="modalOpen"
-      :maximized="$dense"
-      no-backdrop-dismiss
-    >
-      <component
-        :is="widgetComponent"
-        :initial-crud="crud"
-        :context="context"
-        @close="modalOpen = false"
-      />
-    </q-dialog>
 
     <template #actions>
       <q-btn unelevated label="Back" @click="back" />
@@ -113,7 +119,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
       <q-btn
         unelevated
         label="Configure"
-        @click="modalOpen = true"
+        @click="showWidget"
       />
       <q-btn
         :disable="!canCreate"

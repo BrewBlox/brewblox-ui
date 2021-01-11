@@ -8,6 +8,7 @@ import { serviceStore } from '@/store/services';
 import features from './features';
 import { sparkType } from './getters';
 import { installFilters, isSparkState } from './helpers';
+import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
 import { sparkStore } from './store';
@@ -51,7 +52,8 @@ export default {
     featureStore.registerService({
       id: sparkType,
       title: 'Spark Service',
-      page: ref(SparkPage),
+      pageComponent: ref(SparkPage),
+      configComponent: ref(SparkActions),
       onStart: service => sparkStore.addService(service.id),
       onRemove: service => sparkStore.removeService(service.id),
       wizard: stub => ({
@@ -62,8 +64,14 @@ export default {
       }),
     });
 
-    Vue.$eventbus.subscribe(STATE_TOPIC + '/#');
-    Vue.$eventbus.addListener(STATE_TOPIC + '/#', (_, data) => {
+    // Basic spark state
+    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+`);
+    // Patch events
+    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+/patch`);
+    // Firmware update events
+    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+/update`);
+
+    Vue.$eventbus.addListener(`${STATE_TOPIC}/+`, (_, data) => {
       if (isSparkState(data)) {
         serviceStore.ensureStub({ id: data.key, type: sparkType });
       }

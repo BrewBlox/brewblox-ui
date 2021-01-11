@@ -1,12 +1,12 @@
 import { AxiosError } from 'axios';
 import isObjectLike from 'lodash/isObjectLike';
-import { Notify } from 'quasar';
 import Vue from 'vue';
 
 import { STORE_TOPIC } from '@/helpers/const';
 import http, { parseHttpError } from '@/helpers/http';
 import notify from '@/helpers/notify';
 import { DatastoreEvent, StoreObject } from '@/shared-types';
+import { systemStore } from '@/store/system';
 
 import { BrewbloxDatabase, EventHandler } from './types';
 
@@ -32,17 +32,7 @@ async function retryDatastore(): Promise<void> {
       break;
     }
     catch (e) {
-      // show a notification with a progress bar
-      // The notification resolves the promise after `timeout` ms
-      await new Promise((resolve) =>
-        Notify.create({
-          timeout: 2000,
-          icon: 'mdi-wifi-off',
-          color: 'info',
-          message: 'Waiting for datastore...',
-          progress: true,
-          onDismiss: () => resolve(),
-        }));
+      await new Promise<void>(resolve => setTimeout(resolve, 2000));
     }
   }
 }
@@ -52,18 +42,19 @@ async function checkDatastore(): Promise<void> {
     await http.get('/history/datastore/ping', { timeout: 2000 });
   }
   catch (e) {
-    notify.error(`Datastore error: ${e}`, { shown: false });
+    notify.error(`Datastore error: ${parseHttpError(e, true)}`, { shown: false });
     await retryDatastore();
   }
+  systemStore.setLoaded();
 }
 
 export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   // handlers are indexed on fully qualified namespace
   private handlers: Mapped<EventHandler> = {}
 
-  public async start(): Promise<void> {
-    Vue.$eventbus.subscribe(STORE_TOPIC + '/#');
-    Vue.$eventbus.addListener(STORE_TOPIC + '/#', (_, data) => {
+  public async connect(): Promise<void> {
+    Vue.$eventbus.subscribe(STORE_TOPIC);
+    Vue.$eventbus.addListener(STORE_TOPIC, (_, data) => {
       if (isStoreEvent(data)) {
         data.changed && this.onChanged(data.changed);
         data.deleted && this.onDeleted(data.deleted);

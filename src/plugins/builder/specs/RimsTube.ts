@@ -30,6 +30,9 @@ const spec: PartSpec = {
         label: 'PWM',
       },
     },
+    {
+      component: 'BorderCard',
+    },
   ],
   size: (part: PersistentPart) => [
     part.settings.sizeX || DEFAULT_SIZE_X,

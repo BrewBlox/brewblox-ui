@@ -104,12 +104,9 @@ export default class GenericGraph extends Vue {
 
     const point = evt.points[0];
     createDialog({
+      component: 'InputDialog',
       title: 'Add annotation',
-      cancel: true,
-      prompt: {
-        model: 'New annotation',
-        type: 'text',
-      },
+      value: 'New annotation',
     })
       .onOk((text: string) => {
         this.annotations.push({

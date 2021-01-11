@@ -2,6 +2,7 @@
 import { Component } from 'vue-property-decorator';
 
 import { Link } from '@/helpers/bloxfield';
+import { round } from '@/helpers/functional';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
 
@@ -32,6 +33,12 @@ export default class ActuatorOffsetWidget
       .find(v => v.value === this.block.data.referenceSettingOrValue)
       ?.label
       ?? '???';
+  }
+
+  get isLimited(): boolean {
+    const { enabled, desiredSetting, setting } = this.block.data;
+    return enabled
+      && round(desiredSetting, 1) !== round(setting, 1);
   }
 }
 </script>
@@ -86,18 +93,28 @@ export default class ActuatorOffsetWidget
           :readonly="isDriven"
           :value="block.data.desiredSetting"
           tag="big"
-          title="Target offset"
-          label="Target offset"
+          title="Desired offset"
+          label="Desired offset"
           type="number"
           class="col-grow"
+          tag-class="text-primary"
           @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+        />
+        <LabeledField
+          :value="block.data.setting"
+          number
+          label="Limited offset"
+          tag="big"
+          class="col-grow"
+          :tag-class="['text-pink-4', !isLimited && 'fade-4']"
         />
         <LabeledField
           :value="block.data.value"
           number
-          label="Actual offset"
+          label="Achieved offset"
           tag="big"
           class="col-grow"
+          tag-class="text-secondary"
         />
 
         <template v-if="mode === 'Full'">

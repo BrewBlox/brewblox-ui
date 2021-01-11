@@ -5,11 +5,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Watch } from 'vue-property-decorator';
 
-import { createDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { capitalized, mutate, objectStringSorter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
-import { discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
-import SparkWidgetDialog from '@/plugins/spark/service/SparkWidgetDialog.vue';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
   Block,
@@ -29,6 +27,7 @@ import { serviceStore } from '@/store/services';
 import { roleIcons } from '../getters';
 import { blockSorters, defaultSessionConfig, storageKey } from './helpers';
 import SparkWidget from './SparkWidget.vue';
+import SparkWidgetDialog from './SparkWidgetDialog.vue';
 import Troubleshooter from './Troubleshooter.vue';
 import { ValidatedWidget } from './types';
 
@@ -46,9 +45,6 @@ interface ModalSettings {
 })
 export default class SparkPage extends Vue {
   capitalized = capitalized;
-  startResetBlocks = startResetBlocks;
-  saveHwInfo = saveHwInfo;
-  discoverBlocks = discoverBlocks;
 
   allSorters = blockSorters();
   volatileWidgets: { [blockId: string]: Widget } = {};
@@ -176,6 +172,14 @@ export default class SparkPage extends Vue {
     if (item !== undefined) {
       item.$el.scrollIntoView();
     }
+  }
+
+  showSearchKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.blockFilter,
+    })
+      .onOk((v: string) => this.blockFilter = v);
   }
 
   selectService(): void {
@@ -324,17 +328,6 @@ export default class SparkPage extends Vue {
     return this.sparkModule?.relations ?? [];
   }
 
-  async cleanUnusedNames(): Promise<void> {
-    if (!this.sparkModule) { return; }
-    const names = await this.sparkModule.cleanUnusedNames();
-
-    const message = names.length > 0
-      ? `Cleaned ${names.join(', ')}.`
-      : 'No unused names found.';
-
-    notify.info({ message, icon: 'mdi-tag-remove' });
-  }
-
   controllerReboot(): void {
     this.sparkModule?.controllerReboot();
   }
@@ -345,11 +338,7 @@ export default class SparkPage extends Vue {
 
   onBlockClick(val: ValidatedWidget): void {
     if (this.$dense) {
-      createDialog({
-        component: 'WidgetDialog',
-        mode: 'Basic',
-        getCrud: () => val.crud,
-      });
+      createBlockDialog(val.crud.block, { mode: 'Basic' });
     }
     else if (val.expanded) {
       this.scrollTo(val.id);
@@ -362,7 +351,7 @@ export default class SparkPage extends Vue {
 </script>
 
 <template>
-  <q-page padding>
+  <q-page class="page-height">
     <portal to="toolbar-title">
       {{ service.title }}
     </portal>
@@ -388,227 +377,181 @@ export default class SparkPage extends Vue {
           <q-tooltip>Show blocks as diagram</q-tooltip>
         </q-btn>
       </q-btn-group>
-      <ActionMenu :disable="!isReady || statusNok" round size="12px" class="self-center">
-        <template #actions>
-          <ActionItem
-            icon="add"
-            label="New block"
-            @click="startCreateBlock"
-          />
-          <ActionItem
-            icon="mdi-magnify-plus-outline"
-            label="Discover new OneWire blocks"
-            @click="discoverBlocks(serviceId)"
-          />
-          <ActionItem
-            icon="mdi-tag-remove"
-            label="Remove unused block names"
-            @click="cleanUnusedNames"
-          />
-          <ActionItem
-            icon="mdi-progress-download"
-            label="Update firmware"
-            @click="startDialog('FirmwareUpdateDialog')"
-          />
-          <ActionItem
-            icon="wifi"
-            label="Configure Wifi"
-            @click="startDialog('SparkWifiMenu')"
-          />
-          <ActionItem
-            icon="mdi-checkbox-multiple-marked"
-            label="Groups (deprecated)"
-            @click="startDialog('SparkGroupMenu')"
-          />
-          <ActionItem
-            icon="mdi-restart"
-            label="Reboot service"
-            @click="serviceReboot"
-          />
-          <ActionItem
-            icon="mdi-restart"
-            label="Reboot controller"
-            @click="controllerReboot"
-          />
-          <ActionItem
-            icon="mdi-temperature-celsius"
-            label="Configure used units"
-            @click="startDialog('SparkUnitMenu')"
-          />
-          <ActionItem
-            icon="mdi-file-export"
-            label="Import/Export blocks"
-            @click="startDialog('SparkImportMenu')"
-          />
-          <ActionItem
-            icon="mdi-power-plug"
-            label="Export sensor and pin names"
-            @click="saveHwInfo(serviceId)"
-          />
-          <ActionItem
-            icon="delete"
-            label="Remove all blocks"
-            @click="startResetBlocks(serviceId)"
-          />
+      <ActionMenu
+        :disable="!isReady || statusNok"
+        round
+        size="12px"
+        class="self-center"
+      >
+        <q-tooltip>
+          Service actions
+        </q-tooltip>
+        <template #menus>
+          <SparkActions :service-id="serviceId" />
         </template>
       </ActionMenu>
     </portal>
 
-    <!-- Shown if service was found in store, but not ok -->
-    <q-list v-if="statusNok">
-      <q-item>
-        <q-item-section>
-          <Troubleshooter :service-id="service.id" />
-        </q-item-section>
-      </q-item>
-    </q-list>
+    <!-- Troubleshooter -->
+    <div
+      v-if="statusNok"
+      class="q-pa-lg row"
+    >
+      <Troubleshooter
+        :service-id="service.id"
+      />
+    </div>
 
-    <template v-else-if="pageMode === 'Relations'">
-      <div class="page-height full-width" @dblclick="startCreateBlock">
-        <RelationsDiagram
-          :service-id="service.id"
-          :nodes="nodes"
-          :edges="edges"
-        />
-      </div>
-    </template>
+    <!-- Relations graph display -->
+    <div
+      v-else-if="pageMode === 'Relations'"
+      class="fit"
+      style="overflow: auto"
+      @dblclick="startCreateBlock"
+    >
+      <RelationsDiagram
+        :service-id="service.id"
+        :nodes="nodes"
+        :edges="edges"
+      />
+    </div>
 
-    <template v-else>
-      <!-- Normal display -->
-      <div
-        class="row no-wrap justify-start page-height"
-        @dblclick="startCreateBlock"
+    <!-- Block list display -->
+    <div
+      v-else-if="pageMode === 'List'"
+      class="fit q-pa-lg row no-wrap justify-start"
+      @dblclick="startCreateBlock"
+    >
+      <q-scroll-area
+        visible
+        class="content-column rounded-borders bg-dark"
       >
-        <q-scroll-area
-          visible
-          class="content-column rounded-borders bg-dark"
-        >
-          <q-list class="q-pr-md" @dblclick.stop.prevent>
-            <!-- Selection controls -->
-            <q-item class="q-mb-md">
-              <q-item-section>
-                <q-input v-model="blockFilter" placeholder="Search blocks" clearable>
-                  <template #append>
-                    <q-icon name="search" />
-                  </template>
-                </q-input>
-              </q-item-section>
-              <q-item-section class="col-auto">
-                <q-btn icon="mdi-sort" flat>
-                  <q-tooltip>Sort blocks</q-tooltip>
-                  <q-menu>
-                    <q-list>
-                      <ActionItem
-                        v-for="(func, name) in allSorters"
-                        :key="name"
-                        :active="sorting === name"
-                        :label="capitalized(name)"
-                        @click="sorting = name"
-                      />
-                    </q-list>
-                  </q-menu>
-                </q-btn>
-              </q-item-section>
-              <q-item-section v-if="!$dense" class="col-auto">
-                <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
-                  <q-tooltip>Unselect all</q-tooltip>
-                </q-btn>
-              </q-item-section>
-              <q-item-section v-if="!$dense" class="col-auto">
-                <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
-                  <q-tooltip>Select all</q-tooltip>
-                </q-btn>
-              </q-item-section>
-            </q-item>
-            <!-- Service -->
-            <q-item v-if="serviceShown" class="text-white widget-index">
-              <q-item-section v-if="!$dense" side class="q-px-sm">
-                <ToggleButton v-model="serviceExpanded" />
-              </q-item-section>
-              <q-item-section>
-                <q-item class="non-selectable" clickable @click="selectService">
-                  <q-item-section avatar>
-                    <q-icon name="mdi-information-variant" />
-                    <q-tooltip>Device Info</q-tooltip>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label caption class="text-italic">
-                      Device info
-                    </q-item-label>
-                    <div style="font-size: larger">
-                      {{ serviceId }}
-                    </div>
-                  </q-item-section>
-                </q-item>
-              </q-item-section>
-            </q-item>
-            <!-- Blocks -->
-            <q-item
-              v-for="val in filteredItems"
-              :key="`filtered-${val.key}`"
-              class="non-selectable text-white widget-index"
-            >
-              <q-item-section v-if="!$dense" side class="q-px-sm">
-                <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
-              </q-item-section>
-              <q-item-section>
-                <q-item
-                  clickable
-                  @click="onBlockClick(val)"
-                >
-                  <q-item-section avatar>
-                    <q-icon :name="val.icon" />
-                    <q-tooltip>{{ val.role }}</q-tooltip>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label caption class="text-italic darkish">
-                      {{ val.title }}
-                    </q-item-label>
-                    <div style="font-size: larger">
-                      {{ val.id }}
-                    </div>
-                  </q-item-section>
-                </q-item>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-scroll-area>
+        <q-list class="q-pr-md" @dblclick.stop.prevent>
+          <!-- Selection controls -->
+          <q-item class="q-mb-md">
+            <q-item-section>
+              <q-input v-model="blockFilter" placeholder="Search blocks" clearable>
+                <template #append>
+                  <KeyboardButton @click="showSearchKeyboard" />
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </q-item-section>
+            <q-item-section class="col-auto">
+              <q-btn icon="mdi-sort" flat>
+                <q-tooltip>Sort blocks</q-tooltip>
+                <q-menu>
+                  <q-list>
+                    <ActionItem
+                      v-for="(func, name) in allSorters"
+                      :key="name"
+                      :active="sorting === name"
+                      :label="capitalized(name)"
+                      @click="sorting = name"
+                    />
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </q-item-section>
+            <q-item-section v-if="!$dense" class="col-auto">
+              <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
+                <q-tooltip>Unselect all</q-tooltip>
+              </q-btn>
+            </q-item-section>
+            <q-item-section v-if="!$dense" class="col-auto">
+              <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
+                <q-tooltip>Select all</q-tooltip>
+              </q-btn>
+            </q-item-section>
+          </q-item>
+          <!-- Service -->
+          <q-item v-if="serviceShown" class="text-white widget-index">
+            <q-item-section v-if="!$dense" side class="q-px-sm">
+              <ToggleButton v-model="serviceExpanded" />
+            </q-item-section>
+            <q-item-section>
+              <q-item class="non-selectable" clickable @click="selectService">
+                <q-item-section avatar>
+                  <q-icon name="mdi-information-variant" />
+                  <q-tooltip>Device Info</q-tooltip>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label caption class="text-italic">
+                    Device info
+                  </q-item-label>
+                  <div style="font-size: larger">
+                    {{ serviceId }}
+                  </div>
+                </q-item-section>
+              </q-item>
+            </q-item-section>
+          </q-item>
+          <!-- Blocks -->
+          <q-item
+            v-for="val in filteredItems"
+            :key="`filtered-${val.key}`"
+            class="non-selectable text-white widget-index"
+          >
+            <q-item-section v-if="!$dense" side class="q-px-sm">
+              <ToggleButton :value="val.expanded" @input="v => updateExpandedBlock(val.id, v)" />
+            </q-item-section>
+            <q-item-section>
+              <q-item
+                clickable
+                @click="onBlockClick(val)"
+              >
+                <q-item-section avatar>
+                  <q-icon :name="val.icon" />
+                  <q-tooltip>{{ val.role }}</q-tooltip>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label caption class="text-italic darkish">
+                    {{ val.title }}
+                  </q-item-label>
+                  <div style="font-size: larger">
+                    {{ val.id }}
+                  </div>
+                </q-item-section>
+              </q-item>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-scroll-area>
 
-        <!-- Widget List -->
-        <q-scroll-area
-          v-if="!$dense"
-          visible
-          class="content-column"
-        >
-          <q-list class="q-ml-lg q-pr-none" @dblclick.stop.prevent>
-            <!-- Service -->
-            <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
-              <q-item-section>
-                <SparkWidget v-if="isReady" :service-id="service.id" />
-              </q-item-section>
-            </q-item>
-            <!-- Blocks -->
-            <q-item
-              v-for="val in expandedItems"
-              :ref="`widget-${val.key}`"
-              :key="`expanded-${val.key}`"
-              class="q-pt-none q-pb-md"
-            >
-              <q-item-section>
-                <component
-                  :is="val.component"
-                  :initial-crud="val.crud"
-                  :context="context"
-                  :error="val.error"
-                />
-              </q-item-section>
-            </q-item>
-            <!-- Blank space to always be able to show a widget at the top -->
-            <q-item class="page-height" @dblclick.native="startCreateBlock" />
-          </q-list>
-        </q-scroll-area>
-      </div>
-    </template>
+      <!-- Widget List -->
+      <q-scroll-area
+        v-if="!$dense"
+        visible
+        class="content-column"
+      >
+        <q-list class="q-ml-lg q-pr-none" @dblclick.stop.prevent>
+          <!-- Service -->
+          <q-item v-if="serviceShown && serviceExpanded" ref="widget-spark-service">
+            <q-item-section>
+              <SparkWidget v-if="isReady" :service-id="service.id" />
+            </q-item-section>
+          </q-item>
+          <!-- Blocks -->
+          <q-item
+            v-for="val in expandedItems"
+            :ref="`widget-${val.key}`"
+            :key="`expanded-${val.key}`"
+            class="q-pt-none q-pb-md"
+          >
+            <q-item-section>
+              <component
+                :is="val.component"
+                :initial-crud="val.crud"
+                :context="context"
+                :error="val.error"
+              />
+            </q-item-section>
+          </q-item>
+          <!-- Blank space to always be able to show a widget at the top -->
+          <q-item class="page-height" @dblclick.native="startCreateBlock" />
+        </q-list>
+      </q-scroll-area>
+    </div>
   </q-page>
 </template>
 

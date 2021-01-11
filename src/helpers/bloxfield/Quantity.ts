@@ -39,18 +39,19 @@ export const prettyUnit = (value: Quantity | string | null | undefined): string 
 };
 
 
-export const prettyQty = (q: Quantity | null): string => {
-  if (!isQuantity(q)) {
-    return '---';
-  }
-  if (isDurationUnit(q.unit)) {
-    return durationString(q);
-  }
-  const valueStr = isNumber(q.value)
-    ? q.value.toFixed(2)
-    : '--.--';
-  return `${valueStr} ${prettyUnit(q.unit)}`;
-};
+export const prettyQty =
+  (q: Quantity | null, precision: number = 2): string => {
+    if (!isQuantity(q)) {
+      return '---';
+    }
+    if (isDurationUnit(q.unit)) {
+      return durationString(q);
+    }
+    const valueStr = isNumber(q.value)
+      ? q.value.toFixed(precision)
+      : '--.--';
+    return `${valueStr} ${prettyUnit(q.unit)}`;
+  };
 
 export const roundedQty =
   (q: Quantity, precision: number = 2): Quantity => ({

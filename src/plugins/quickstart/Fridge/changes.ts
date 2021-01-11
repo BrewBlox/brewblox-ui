@@ -348,7 +348,7 @@ export const defineWidgets = (
             ],
         },
         {
-          name: 'Start profile',
+          name: 'Enable temperature profile',
           id: uid(),
           changes: [
             {
@@ -362,7 +362,7 @@ export const defineWidgets = (
             ],
         },
         {
-          name: 'Disable profile',
+          name: 'Disable temperature profile',
           id: uid(),
           changes: [
             {

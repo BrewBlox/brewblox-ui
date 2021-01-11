@@ -1,4 +1,10 @@
 <script lang="ts">
+import {
+  mdiBullseyeArrow,
+  mdiGauge,
+  mdiPlusMinus,
+  mdiThermometer,
+} from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
 import { bloxQty, isQuantity, Quantity } from '@/helpers/bloxfield';
@@ -18,8 +24,16 @@ import { settingsAddress } from '../helpers';
 
 @Component
 export default class SetpointDriverDisplay extends PartBase {
+  icons: Mapped<string> = {};
   readonly settingsKey = 'setpointDriver';
   readonly scaleKey = 'scale';
+
+  created(): void {
+    this.icons.mdiPlusMinus = mdiPlusMinus;
+    this.icons.mdiBullseyeArrow = mdiBullseyeArrow;
+    this.icons.mdiThermometer = mdiThermometer;
+    this.icons.mdiGauge = mdiGauge;
+  }
 
   get scale(): number {
     return this.settings[this.scaleKey] ?? 1;
@@ -64,11 +78,11 @@ export default class SetpointDriverDisplay extends PartBase {
       return '';
     }
     if (this.block.data.referenceSettingOrValue === ReferenceKind.REF_SETTING) {
-      return 'mdi-bullseye-arrow';
+      return 'mdiBullseyeArrow';
     }
     return isQuantity(this.refAmount)
-      ? 'mdi-thermometer'
-      : 'mdi-gauge';
+      ? 'mdiThermometer'
+      : 'mdiGauge';
   }
 
   get tempUnit(): 'delta_degC' | 'delta_degF' {
@@ -98,7 +112,7 @@ export default class SetpointDriverDisplay extends PartBase {
       <div v-else class="col column q-ma-xs">
         <div class="col row q-gutter-x-xs">
           <q-icon
-            :name="refIcon"
+            :name="icons[refIcon]"
             size="20px"
             class="static col-auto"
           />
@@ -109,7 +123,7 @@ export default class SetpointDriverDisplay extends PartBase {
         </div>
         <div class="col row q-gutter-x-xs">
           <q-icon
-            name="mdi-plus-minus"
+            :name="icons.mdiPlusMinus"
             size="20px"
             class="static col-auto"
           />
@@ -122,6 +136,7 @@ export default class SetpointDriverDisplay extends PartBase {
     </SvgEmbedded>
     <g class="outline">
       <rect
+        v-show="bordered"
         :width="squares(2)-2"
         :height="squares(1)-2"
         x="1"

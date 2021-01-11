@@ -60,13 +60,10 @@ export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
 
   addAction(): void {
     createDialog({
+      component: 'InputDialog',
       title: 'Add an action',
       message: 'Actions let you immediately set multiple block fields to predetermined values.',
-      cancel: true,
-      prompt: {
-        model: 'New action',
-        type: 'text',
-      },
+      value: 'New action',
     })
       .onOk(name => {
         this.actions.push({ name, id: uid(), changes: [] });

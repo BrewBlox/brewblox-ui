@@ -130,9 +130,9 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
     if (this.session === null) { return; }
     const session = this.session;
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Remove session',
       message: `Do you want remove session '${session.title}'?`,
-      cancel: true,
     })
       .onOk(() => {
         this.config.currentSession =

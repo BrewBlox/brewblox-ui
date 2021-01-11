@@ -27,7 +27,7 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { SparkStateEvent } from '@/shared-types';
+import { SparkPatchEvent, SparkStateEvent, SparkUpdateEvent } from '@/shared-types';
 import { ComponentResult, Crud, featureStore, WidgetFeature } from '@/store/features';
 
 import { compatibleTypes } from './getters';
@@ -157,10 +157,10 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
   };
 
   if (!canDisplay(addr)) {
-    notify.warn(`Block '${addr.id}' can't be shown on the Spark display`, { shown: opts.showNotify });
+    notify.warn(`Block <i>${addr.id}</i> can't be shown on the Spark display`, { shown: opts.showNotify });
   }
   else if (opts.unique && isDisplayed(addr)) {
-    notify.info(`Block '${addr.id}' is already shown on the Spark display`, { shown: opts.showNotify });
+    notify.info(`Block <i>${addr.id}</i> is already shown on the Spark display`, { shown: opts.showNotify });
   }
   else if (!opts.pos) {
     notify.info('Spark display is already full', { shown: opts.showNotify });
@@ -189,7 +189,7 @@ export const tryDisplayBlock = async (addr: BlockAddress, options: Partial<Displ
 
     display.data.widgets = [slot, ...display.data.widgets.filter(w => w.pos !== opts.pos)];
     await sparkStore.saveBlock(display);
-    notify.info(`Added block '${addr.id}' to the Spark display`, { shown: opts.showNotify });
+    notify.info(`Added <i>${addr.id}</i> to the Spark display`, { shown: opts.showNotify });
   }
 
   if (opts.showDialog) {
@@ -251,7 +251,7 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
     const module = sparkStore.moduleById(serviceId);
 
     if (!module) {
-      throw new Error(`Service '${serviceId}' not found`);
+      throw new Error(`Service <b>${serviceId}</b> not found`);
     }
 
     if (opts.download) {
@@ -286,18 +286,16 @@ export const resetBlocks = async (serviceId: string, opts: { restore: boolean; d
 
 export const startResetBlocks = (serviceId: string): void => {
   createDialog({
+    component: 'CheckboxDialog',
     title: 'Reset blocks',
-    message: `This will remove all blocks on ${serviceId}. Are you sure?`,
+    message: `This will remove all blocks on <b>${serviceId}</b>. Are you sure?`,
+    html: true,
     noBackdropDismiss: true,
-    cancel: true,
-    options: {
-      type: 'checkbox',
-      items: [
-        { label: 'Remember names of discovered blocks', value: 0 },
-        { label: 'Export sensor and pin names', value: 1 },
-      ],
-      model: [0, 1], // pre-check default actions
-    },
+    selectOptions: [
+      { label: 'Remember names of discovered blocks', value: 0 },
+      { label: 'Export sensor and pin names', value: 1 },
+    ],
+    value: [0, 1], // pre-check default actions
   })
     .onOk((selected: number[]) => resetBlocks(serviceId, {
       restore: selected.includes(0),
@@ -414,12 +412,24 @@ export const discoverBlocks = async (serviceId: string | null, show = true): Pro
     notify.info({
       icon: 'mdi-magnify-plus-outline',
       message: discovered.length > 0
-        ? `Discovered ${discovered.join(', ')}.`
+        ? `Discovered <i>${discovered.join(', ')}</i>.`
         : 'Discovered no new blocks.',
     });
   }
   return discovered;
 };
+
+export async function cleanUnusedNames(serviceId: string | null): Promise<void> {
+  const module = sparkStore.moduleById(serviceId);
+  if (!module) { return; }
+  const names = await module.cleanUnusedNames();
+
+  const message = names.length > 0
+    ? `Cleaned block names: <i>${names.join(', ')}</i>.`
+    : 'No unused names found.';
+
+  notify.info({ message, icon: 'mdi-tag-remove' });
+}
 
 export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
   sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';
@@ -437,3 +447,9 @@ export const isBlockDriven = (block: Block | null): boolean =>
 
 export const isSparkState = (data: any): data is SparkStateEvent =>
   (data as SparkStateEvent).type === 'Spark.state';
+
+export const isSparkPatch = (data: any): data is SparkPatchEvent =>
+  (data as SparkPatchEvent).type === 'Spark.patch';
+
+export const isSparkUpdate = (data: any): data is SparkUpdateEvent =>
+  (data as SparkUpdateEvent).type === 'Spark.update';

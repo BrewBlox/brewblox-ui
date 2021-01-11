@@ -82,9 +82,9 @@ export default class BlockWidgetDialog extends DialogBase {
   <q-dialog
     ref="dialog"
     :maximized="$dense"
-    no-backdrop-dismiss
     transition-show="fade"
     class="row"
+    v-bind="{...dialogProps, ...$attrs}"
     @hide="onDialogHide"
   >
     <component

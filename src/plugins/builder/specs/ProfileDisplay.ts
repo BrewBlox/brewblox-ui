@@ -40,6 +40,9 @@ const spec: PartSpec = {
         label: 'Allow liquid to flow through this part',
       },
     },
+    {
+      component: 'BorderCard',
+    },
   ],
   size,
   transitions: part => universalTransitions(size(part), part.settings[flowEnabledKey]),

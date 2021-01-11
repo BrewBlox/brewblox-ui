@@ -11,15 +11,6 @@ export interface StoreObject {
   namespace?: string; // Redis namespace
 }
 
-// #region StateEvent
-export interface StateEvent {
-  key: string;
-  type: string;
-  ttl: string;
-  data: unknown;
-}
-// #endregion StateEvent
-
 // #region DatastoreEvent
 export interface DatastoreEvent {
   changed?: StoreObject[];

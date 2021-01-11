@@ -221,16 +221,15 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           >
             <q-tooltip>Select layout</q-tooltip>
           </q-btn>
-          <LayoutActions
+          <BuilderActions
             fab-mini
             :flat="false"
             :layout="layout"
-            :select-layout="selectLayout"
-            :save-parts="saveParts"
             color="secondary"
+            @selected="selectLayout"
           >
             <q-tooltip>Actions</q-tooltip>
-          </LayoutActions>
+          </BuilderActions>
           <q-btn
             v-if="layout !== null"
             fab-mini

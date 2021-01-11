@@ -2,6 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { typeMatchFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { sparkStore } from '@/plugins/spark/store';
@@ -54,11 +55,25 @@ export default class SparkWifiMenu extends DialogBase {
       .then(() => notify.done('Wifi settings updated!'))
       .finally(() => this.busy = false);
   }
+
+  showKeyboard(field: 'ssid' | 'password'): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.values[field],
+      password: field === 'password',
+    })
+      .onOk(v => this.values[field] = v);
+  }
 }
 </script>
 
 <template>
-  <q-dialog ref="dialog" :maximized="$dense" no-backdrop-dismiss @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    :maximized="$dense"
+    v-bind="dialogProps"
+    @hide="onDialogHide"
+  >
     <ActionCardWrapper v-bind="{context}">
       <template #toolbar>
         <DialogToolbar :title="serviceId" subtitle="Wifi Configuration" />
@@ -67,7 +82,15 @@ export default class SparkWifiMenu extends DialogBase {
       <q-card-section>
         <q-item>
           <q-item-section>
-            <q-input v-model="values.ssid" label="SSID" autofocus />
+            <q-input
+              v-model="values.ssid"
+              label="SSID"
+              autofocus
+            >
+              <template #append>
+                <KeyboardButton @click="showKeyboard('ssid')" />
+              </template>
+            </q-input>
           </q-item-section>
         </q-item>
         <q-item>
@@ -79,6 +102,7 @@ export default class SparkWifiMenu extends DialogBase {
               label="Password"
             >
               <template #append>
+                <KeyboardButton @click="showKeyboard('password')" />
                 <q-icon
                   :name="isPwd ? 'visibility_off' : 'visibility'"
                   class="cursor-pointer"

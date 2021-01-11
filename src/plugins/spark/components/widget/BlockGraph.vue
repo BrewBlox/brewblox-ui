@@ -125,7 +125,12 @@ export default class BlockGraph extends Vue {
 </script>
 
 <template>
-  <q-dialog v-model="dialogOpen" transition-show="fade" maximized>
+  <q-dialog
+    v-model="dialogOpen"
+    v-bind="dialogProps"
+    transition-show="fade"
+    maximized
+  >
     <q-card v-if="dialogOpen" class="text-white">
       <HistoryGraph
         ref="graph"

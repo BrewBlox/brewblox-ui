@@ -9,6 +9,7 @@ import notify from '@/helpers/notify';
 import WizardBase from '@/plugins/wizardry/WizardBase';
 import { dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 const widgetRules: InputRule[] = [
   v => v !== null || 'Widget must have a value',
@@ -28,10 +29,19 @@ export default class ImportWizard extends WizardBase {
   @Prop({ type: String, default: '' })
   readonly dashboardId!: string;
 
+  get primaryDashboardId(): string | null {
+    const { homePage } = systemStore.config;
+    if (!homePage || !homePage.startsWith('/dashboard')) {
+      return null;
+    }
+    return homePage.split('/')[2] ?? null;
+  }
+
   get chosenDashboardId(): string {
     return this.localChosenDashboardId
       || this.dashboardId
-      || dashboardStore.primaryDashboardId
+      || this.primaryDashboardId
+      || dashboardStore.dashboardIds[0]
       || '';
   }
 
@@ -74,7 +84,7 @@ export default class ImportWizard extends WizardBase {
         id: uid(),
         dashboard: this.chosenDashboardId,
       });
-      notify.done(`Created ${featureStore.widgetTitle(this.widget.feature)} '${this.widget.title}'`);
+      notify.done(`Created ${featureStore.widgetTitle(this.widget.feature)} <b>${this.widget.title}</b>`);
       this.$emit('close');
     } catch (e) {
       notify.error(`Failed to create widget: ${e.toString()}`);

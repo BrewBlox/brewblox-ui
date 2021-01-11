@@ -25,6 +25,9 @@ const spec: PartSpec = {
         types: ['SessionLog'],
       },
     },
+    {
+      component: 'BorderCard',
+    },
   ],
   size: (part: PersistentPart) => [
     part.settings.sizeX || DEFAULT_SIZE_X,

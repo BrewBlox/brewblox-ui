@@ -1,12 +1,12 @@
 <script lang="ts">
+import isObject from 'lodash/isObject';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-
 
 @Component
 export default class ListSelect extends Vue {
 
-  @Prop({ type: Object, required: false })
+  @Prop({ required: false })
   public readonly value!: any;
 
   @Prop({ type: Array, required: true })
@@ -19,18 +19,34 @@ export default class ListSelect extends Vue {
   public readonly optionLabel!: string;
 
   @Prop({ type: Boolean, default: false })
+  public readonly emitValue!: boolean;
+
+  @Prop({ type: Boolean, default: false })
   public readonly dense!: boolean;
 
-  matches(val: any): boolean {
-    return this.value !== null
-      && this.value[this.optionValue] === val[this.optionValue];
+  get mappedOptions(): any[] {
+    return this.options
+      .map(opt => isObject(opt)
+        ? opt
+        : {
+          [this.optionValue]: opt,
+          [this.optionLabel]: opt,
+        });
   }
 
-  selectValue(value: any, save: boolean): void {
+  matches(opt: any): boolean {
+    if (this.value === null) { return false; }
+    return this.emitValue
+      ? opt[this.optionValue] === this.value
+      : opt[this.optionValue] === this.value[this.optionValue];
+  }
+
+  selectValue(opt: any, save: boolean): void {
+    const value = this.emitValue ? opt[this.optionValue] : opt;
     if (save) {
       this.$emit('confirm', value);
     }
-    else if (this.matches(value)) {
+    else if (this.matches(opt)) {
       this.$emit('input', null);
     }
     else {
@@ -43,7 +59,7 @@ export default class ListSelect extends Vue {
 <template>
   <div class="q-gutter-y-sm">
     <div
-      v-for="opt in options"
+      v-for="opt in mappedOptions"
       :key="opt[optionValue]"
       :class="[
         'col clickable q-pl-sm rounded-borders text-h6',

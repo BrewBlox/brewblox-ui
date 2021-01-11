@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { createDialog } from '@/helpers/dialog';
 import { objectStringSorter } from '@/helpers/functional';
 import WizardBase from '@/plugins/wizardry/WizardBase';
 import { featureStore } from '@/store/features';
@@ -17,7 +18,7 @@ export default class WidgetWizardPicker extends WizardBase {
   }
 
   get experimental(): boolean {
-    return systemStore.experimental;
+    return systemStore.config.experimental;
   }
 
   get wizardOptions(): SelectOption[] {
@@ -44,6 +45,14 @@ export default class WidgetWizardPicker extends WizardBase {
 
   get valuesOk(): boolean {
     return this.feature !== null;
+  }
+
+  showSearchKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.filter,
+    })
+      .onOk((v: string) => this.filter = v);
   }
 
   reset(): void {
@@ -82,6 +91,7 @@ export default class WidgetWizardPicker extends WizardBase {
         class="q-mb-md"
       >
         <template #append>
+          <KeyboardButton @click="showSearchKeyboard" />
           <q-icon name="search" />
         </template>
       </q-input>

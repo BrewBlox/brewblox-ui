@@ -4,6 +4,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import DialogBase from '@/components/DialogBase';
 import { sparkStore } from '@/plugins/spark/store';
 import { dashboardStore } from '@/store/dashboards';
+import { systemStore } from '@/store/system';
 
 @Component
 export default class WizardDialog extends DialogBase {
@@ -27,9 +28,18 @@ export default class WizardDialog extends DialogBase {
     return sparkStore.modules.length > 0;
   }
 
+  get primaryDashboardId(): string | null {
+    const { homePage } = systemStore.config;
+    if (!homePage || !homePage.startsWith('/dashboard')) {
+      return null;
+    }
+    return homePage.split('/')[2] ?? null;
+  }
+
   get dashboardId(): string | null {
     return this.activeDashboardId
-      ?? dashboardStore.primaryDashboardId
+      ?? this.primaryDashboardId
+      ?? dashboardStore.dashboardIds[0]
       ?? null;
   }
 
@@ -71,7 +81,7 @@ export default class WizardDialog extends DialogBase {
   <q-dialog
     ref="dialog"
     :maximized="$dense"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
   >
     <CardWrapper :no-scroll="!!activeWizard" v-bind="{context}">
@@ -92,7 +102,11 @@ export default class WizardDialog extends DialogBase {
 
       <template v-else>
         <q-card-section>
-          <q-item :disable="!sparkServiceAvailable" clickable @click="pickWizard('QuickStartWizardPicker')">
+          <q-item
+            :disable="!sparkServiceAvailable"
+            clickable
+            @click="pickWizard('QuickStartWizardPicker')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Quick Start
@@ -117,7 +131,10 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('DashboardWizard')">
+          <q-item
+            clickable
+            @click="pickWizard('DashboardWizard')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Dashboard
@@ -135,7 +152,10 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('WidgetWizardPicker')">
+          <q-item
+            clickable
+            @click="pickWizard('WidgetWizardPicker')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Widget
@@ -160,7 +180,11 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item :disable="!sparkServiceAvailable" clickable @click="pickWizard('BlockWizard')">
+          <q-item
+            :disable="!sparkServiceAvailable"
+            clickable
+            @click="pickWizard('BlockWizard')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Block
@@ -188,7 +212,10 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item clickable @click="pickWizard('ImportWizard')">
+          <q-item
+            clickable
+            @click="pickWizard('ImportWizard')"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Import Widget
@@ -208,7 +235,10 @@ export default class WizardDialog extends DialogBase {
         <q-separator inset />
 
         <q-card-section>
-          <q-item class="darkish text-italic" style="cursor: not-allowed">
+          <q-item
+            class="darkish text-italic"
+            style="cursor: not-allowed"
+          >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Services

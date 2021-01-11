@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 
 import { AutomationItem, AutomationSpec } from '../types';
 
@@ -36,6 +37,14 @@ export default class AutomationCreateDialog extends DialogBase {
     }
   }
 
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.name,
+    })
+      .onOk(v => this.name = v);
+  }
+
   save(spec: AutomationSpec | null): void {
     if (spec) {
       this.updateName(spec);
@@ -54,7 +63,7 @@ export default class AutomationCreateDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save(selected)"
   >
@@ -73,7 +82,11 @@ export default class AutomationCreateDialog extends DialogBase {
           clearable
           item-aligned
           class="col-12"
-        />
+        >
+          <template #append>
+            <KeyboardButton @click="showKeyboard" />
+          </template>
+        </q-input>
         <q-btn
           flat
           label="Cancel"

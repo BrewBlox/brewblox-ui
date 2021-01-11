@@ -3,9 +3,11 @@ import UrlSafeString from 'url-safe-string';
 import { Component } from 'vue-property-decorator';
 
 import { dashboardIdRules } from '@/helpers/dashboards';
+import { createDialog } from '@/helpers/dialog';
 import { ruleValidator, suggestId } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import WizardBase from '@/plugins/wizardry/WizardBase';
+import router from '@/router';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 @Component
@@ -35,6 +37,23 @@ export default class DashboardWizard extends WizardBase {
     return this.dashboardIdValidator(this.dashboardId);
   }
 
+  showTitleKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.dashboardTitle,
+    })
+      .onOk(v => this.dashboardTitle = v);
+  }
+
+  showIdKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.dashboardId,
+      rules: this.dashboardIdRules,
+    })
+      .onOk(v => this.dashboardId = v);
+  }
+
   async createDashboard(): Promise<void> {
     if (!this.valid) {
       return;
@@ -46,7 +65,8 @@ export default class DashboardWizard extends WizardBase {
     };
 
     await dashboardStore.createDashboard(dashboard);
-    notify.done(`Added dashboard ${dashboard.title}`);
+    router.push(`/dashboard/${dashboard.id}`);
+    notify.done(`Added dashboard <b>${dashboard.title}</b>`);
     this.close();
   }
 }
@@ -57,12 +77,27 @@ export default class DashboardWizard extends WizardBase {
     <q-card-section>
       <q-item>
         <q-item-section>
-          <q-input v-model="dashboardTitle" label="Dashboard Title" />
+          <q-input
+            v-model="dashboardTitle"
+            label="Dashboard Title"
+          >
+            <template #append>
+              <KeyboardButton @click="showTitleKeyboard" />
+            </template>
+          </q-input>
         </q-item-section>
       </q-item>
       <q-item>
         <q-item-section>
-          <q-input v-model="dashboardId" :rules="dashboardIdRules" label="Dashboard URL" />
+          <q-input
+            v-model="dashboardId"
+            :rules="dashboardIdRules"
+            label="Dashboard URL"
+          >
+            <template #append>
+              <KeyboardButton @click="showIdKeyboard" />
+            </template>
+          </q-input>
         </q-item-section>
         <q-item-section class="col-auto">
           <q-btn

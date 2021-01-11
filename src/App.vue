@@ -6,6 +6,8 @@ import { Component } from 'vue-property-decorator';
 export default class App extends Vue {
 
   async created(): Promise<void> {
+    Vue.$app = this;
+
     /**
      * Order of startup is important here.
      * We first ensure that the database is working.
@@ -13,9 +15,9 @@ export default class App extends Vue {
      * If they do so after the eventbus started,
      * they will miss the first (immediate) data push.
      */
-    await Vue.$database.start();
+    await Vue.$database.connect();
     await Vue.$startup.start();
-    await Vue.$eventbus.start();
+    await Vue.$eventbus.connect();
   }
 }
 </script>

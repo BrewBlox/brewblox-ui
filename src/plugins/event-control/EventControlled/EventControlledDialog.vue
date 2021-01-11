@@ -2,6 +2,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy, findById } from '@/helpers/functional';
 
 import { EventControlDevice } from '../types';
@@ -29,6 +30,15 @@ export default class EventControlledDialog extends DialogBase {
     }
   }
 
+  showKeyboard(v: StateValue): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: v.value,
+      type: v.type === 'number' ? 'number' : 'text',
+    })
+      .onOk(v => this.updateValue(v.id, v));
+  }
+
   save(): void {
     this.onDialogOk(this.localValues);
   }
@@ -38,7 +48,7 @@ export default class EventControlledDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
@@ -74,7 +84,14 @@ export default class EventControlledDialog extends DialogBase {
               pattern="[0-9]*"
               :readonly="!v.editable"
               @input="newV => $set(v, 'value', parseFloat(newV))"
-            />
+            >
+              <template #append>
+                <KeyboardButton
+                  v-if="v.editable"
+                  @click="showKeyboard(v)"
+                />
+              </template>
+            </q-input>
           </template>
           <template v-else-if="v.type === 'string'">
             <q-input
@@ -82,7 +99,14 @@ export default class EventControlledDialog extends DialogBase {
               :value="v.value"
               :readonly="!v.editable"
               @input="newV => $set(v, 'value', newV)"
-            />
+            >
+              <template #append>
+                <KeyboardButton
+                  v-if="v.editable"
+                  @click="showKeyboard(v)"
+                />
+              </template>
+            </q-input>
           </template>
         </div>
       </div>

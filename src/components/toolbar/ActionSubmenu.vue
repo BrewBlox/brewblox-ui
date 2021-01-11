@@ -6,7 +6,7 @@ import { Component, Prop } from 'vue-property-decorator';
 @Component
 export default class ActionSubmenu extends Vue {
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   public readonly label!: string;
 }
 </script>
@@ -14,6 +14,7 @@ export default class ActionSubmenu extends Vue {
 <template>
   <div class="col-auto column no-wrap">
     <div
+      v-if="!!label"
       class="col-auto q-py-sm q-px-md text-italic text-grey-5"
       style="font-size: 120%"
     >

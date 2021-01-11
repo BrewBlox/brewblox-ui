@@ -21,22 +21,6 @@ export class DashboardModule extends VuexModule {
     return this.widgets.map(v => v.id);
   }
 
-  public get primaryDashboardId(): string | null {
-    const sorted = [...this.dashboards]
-      .sort((left, right) => {
-        if (left.primary && !right.primary) {
-          return -1;
-        }
-        if (!left.primary && right.primary) {
-          return 1;
-        }
-        return left.order - right.order;
-      });
-    return sorted.length > 0
-      ? sorted[0].id
-      : null;
-  }
-
   public dashboardById(id: string): Dashboard | null {
     return findById(this.dashboards, id);
   }
@@ -68,20 +52,11 @@ export class DashboardModule extends VuexModule {
     await Promise.all(
       ids
         .map(id => this.dashboardById(id))
-        .filter(v => v !== null)
-        .map((dashboard, idx) => this.saveDashboard({ ...dashboard!, order: idx + 1 }))
-    );
-  }
-
-  @Action
-  public async updatePrimaryDashboard(newId: string | null): Promise<void> {
-    await Promise.all(
-      this.dashboards
-        .map((dash: Dashboard) => {
-          if (dash.id === newId && !dash.primary) {
-            return this.saveDashboard({ ...dash, primary: true });
-          } else if (dash.primary) {
-            return this.saveDashboard({ ...dash, primary: false });
+        .filter((v): v is Dashboard => v !== null)
+        .map((dashboard, idx) => {
+          const order = idx + 1;
+          if (order !== dashboard.order) {
+            this.saveDashboard({ ...dashboard, order });
           }
         })
     );
@@ -89,8 +64,6 @@ export class DashboardModule extends VuexModule {
 
   @Action
   public async removeDashboard(dashboard: Dashboard): Promise<void> {
-    this.dashboardWidgets(dashboard.id)
-      .forEach(widget => this.removeWidget(widget));
     await dashboardApi.remove(dashboard); // triggers callback
   }
 

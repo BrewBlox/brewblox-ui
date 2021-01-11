@@ -1,4 +1,5 @@
 <script lang="ts">
+import { mdiArrowRightBold } from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
 import { objectSorter } from '@/helpers/functional';
@@ -11,7 +12,12 @@ import { settingsAddress } from '../helpers';
 
 @Component
 export default class ProfileDisplay extends PartBase {
+  icons: Mapped<string> = {};
   settingsKey = 'profile';
+
+  created(): void {
+    this.icons.mdiArrowRightBold = mdiArrowRightBold;
+  }
 
   get address(): BlockAddress {
     return settingsAddress(this.part, this.settingsKey);
@@ -31,6 +37,7 @@ export default class ProfileDisplay extends PartBase {
     if (!this.block) {
       return [];
     }
+    // Sorting modifies the list. Make a copy to prevent this.
     return [...this.block.data.points]
       .sort(objectSorter('time'));
   }
@@ -62,7 +69,6 @@ export default class ProfileDisplay extends PartBase {
     if (!this.block.data.enabled || !this.block.data.drivenTargetId.id) {
       return null;
     }
-    // Sorting modifies the list. Make a copy to prevent this.
     const point: Setpoint | undefined = this.points
       .find(point => start + point.time > now);
     return point ? point.temperature.value : null;
@@ -88,7 +94,11 @@ export default class ProfileDisplay extends PartBase {
             {{ currentValue | round(0) }}
           </div>
           <div class="col">
-            <q-icon name="mdi-arrow-right-bold" size="20px" class="static" />
+            <q-icon
+              :name="icons.mdiArrowRightBold"
+              size="20px"
+              class="static"
+            />
           </div>
           <div class="col">
             {{ nextValue | round(0) }}
@@ -98,6 +108,7 @@ export default class ProfileDisplay extends PartBase {
     </SvgEmbedded>
     <g class="outline">
       <rect
+        v-show="bordered"
         :width="squares(sizeX)-2"
         :height="squares(sizeY)-2"
         x="1"

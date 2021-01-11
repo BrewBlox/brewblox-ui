@@ -41,12 +41,9 @@ export default class ProfilePresetDialog extends DialogBase {
     const { value } = this.selected;
     const preset = sparkStore.presetById(value)!;
     createDialog({
+      component: 'InputDialog',
       title: 'Edit profile name',
-      cancel: true,
-      prompt: {
-        model: preset.name,
-        type: 'text',
-      },
+      value: preset.name,
     })
       .onOk(name => sparkStore.savePreset({ ...preset, name }));
   }
@@ -60,6 +57,7 @@ export default class ProfilePresetDialog extends DialogBase {
     const points = deserialize(deepCopy(preset.data.points));
 
     createDialog({
+      component: 'ConfirmDialog',
       title: 'Profile start',
       message: `Do you want to change '${this.value.id}' start time to now?`,
       ok: 'Yes',
@@ -93,12 +91,9 @@ export default class ProfilePresetDialog extends DialogBase {
 
   createPreset(): void {
     createDialog({
+      component: 'InputDialog',
       title: 'Save as new profile',
-      cancel: true,
-      prompt: {
-        model: `${this.value.id} profile`,
-        type: 'text',
-      },
+      value: `${this.value.id} profile`,
     })
       .onOk(async name => {
         await sparkStore.createPreset({
@@ -118,7 +113,7 @@ export default class ProfilePresetDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
   >
     <DialogCard v-bind="{title, message, html}">

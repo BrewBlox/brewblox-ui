@@ -3,6 +3,7 @@ import { uid } from 'quasar';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { deepCopy } from '@/helpers/functional';
 
 import { emptyGraphConfig } from '../getters';
@@ -87,6 +88,14 @@ export default class SessionCreateDialog extends DialogBase {
     ];
   }
 
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.sessionTitle,
+    })
+      .onOk(v => this.sessionTitle = v);
+  }
+
   sourceNotes(): SessionNote[] {
     if (this.source === null) {
       return [];
@@ -124,7 +133,7 @@ export default class SessionCreateDialog extends DialogBase {
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
@@ -134,7 +143,11 @@ export default class SessionCreateDialog extends DialogBase {
         label="Session name"
         autofocus
         item-aligned
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
       <SessionSelectField
         v-model="source"
         :sessions="sessions"

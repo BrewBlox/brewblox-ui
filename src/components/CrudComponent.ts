@@ -69,79 +69,86 @@ export default class CrudComponent<ConfigT = any> extends Vue {
     createDialog({
       component: 'InputDialog',
       title: 'Change widget name',
-      message: `Choose a new name for '${widgetTitle}'`,
+      message: `Choose a new name for <b>${widgetTitle}</b>.`,
       value: widgetTitle,
+      html: true,
       clearable: false,
     })
-      .onOk(title => this.saveWidget({ ...this.widget, title }));
+      .onOk((title: string) => this.saveWidget({ ...this.widget, title }));
   }
 
   public startCopyWidget(): void {
     const id = uid();
+    const selectOptions = dashboardStore
+      .dashboards
+      .map(dashboard => ({ label: dashboard.title, value: dashboard.id }));
+
     createDialog({
+      component: 'SelectDialog',
       title: 'Copy widget',
-      message: `To which dashboard do you want to copy widget ${this.widget.title}?`,
-      style: 'overflow-y: scroll',
-      options: {
-        type: 'radio',
-        model: '',
-        items: dashboardStore.dashboards
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-      },
-      cancel: true,
+      message: `To which dashboard do you want to copy <b>${this.widget.title}</b>?`,
+      html: true,
+      listSelect: selectOptions.length < 10,
+      selectOptions,
     })
       .onOk((dashboard: string) => {
-        if (!dashboard) {
-          return;
+        if (dashboard) {
+          dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
+          notify.done(`Copied <b>${this.widget.title}</b> to <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
         }
-        dashboardStore.appendWidget({ ...deepCopy(this.widget), id, dashboard, pinnedPosition: null });
-        notify.done(`Copied ${this.widget.title} to ${dashboardStore.dashboardTitle(dashboard)}`);
       });
   }
 
   public startMoveWidget(): void {
+    const selectOptions = dashboardStore
+      .dashboards
+      .filter(dashboard => dashboard.id !== this.widget.dashboard)
+      .map(dashboard => ({ label: dashboard.title, value: dashboard.id }));
+
     createDialog({
+      component: 'SelectDialog',
       title: 'Move widget',
-      message: `To which dashboard do you want to move widget ${this.widget.title}?`,
-      style: 'overflow-y: scroll',
-      options: {
-        type: 'radio',
-        model: '',
-        items: dashboardStore.dashboards
-          .filter(dashboard => dashboard.id !== this.widget.dashboard)
-          .map(dashboard => ({ label: dashboard.title, value: dashboard.id })),
-      },
-      cancel: true,
+      message: `To which dashboard do you want to move <b>${this.widget.title}</b>?`,
+      listSelect: selectOptions.length < 10,
+      html: true,
+      selectOptions,
     })
-      .onOk((dashboard: string) =>
-        dashboard && this.saveWidget({ ...this.widget, dashboard, pinnedPosition: null }));
+      .onOk((dashboard: string) => {
+        if (dashboard) {
+          this.saveWidget({ ...this.widget, dashboard, pinnedPosition: null });
+          notify.done(`Moved <b>${this.widget.title}</b> to <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
+        }
+      });
   }
 
   public startRemoveWidget(): void {
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
-    const opts = [
+    const selectOptions = [
       {
         label: 'Remove widget from this dashboard',
+        value: 0,
         action: () => dashboardStore.removeWidget(this.widget),
       },
-      ...featureStore.widgetRemoveActions(this.widget.feature)
-        .map(opt => ({ label: opt.description, action: opt.action })),
-    ]
-      .map((opt, idx) => ({ ...opt, value: idx }));
+      ...featureStore
+        .widgetRemoveActions(this.widget.feature)
+        .map((opt, idx) => ({
+          label: opt.description,
+          value: idx + 1,
+          action: opt.action,
+        })),
+    ];
 
     createDialog({
+      component: 'CheckboxDialog',
       title: 'Remove widget',
-      message: `How do you want to remove widget ${this.widget.title}?`,
-      options: {
-        type: 'checkbox',
-        model: [0], // pre-check the default action
-        items: opts,
-      },
-      cancel: true,
+      message: `How do you want to remove widget <b>${this.widget.title}</b>?`,
+      html: true,
+      value: [0], // pre-check the default action
+      selectOptions,
     })
       .onOk((selected: number[]) => {
-        selected.forEach(idx => opts[idx].action(this.crud));
+        selected.forEach(idx => selectOptions[idx].action(this.crud));
         this.closeDialog();
       });
   }

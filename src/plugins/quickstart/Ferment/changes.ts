@@ -92,7 +92,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
         data: {
           sensorId: bloxLink(names.fridgeSensor),
           storedSetting: fridgeSetting,
-          settingEnabled: activeSetpoint === 'fridge',
+          settingEnabled: true,
           setting: bloxQty(null, 'degC'),
           value: bloxQty(null, 'degC'),
           valueUnfiltered: bloxQty(null, 'degC'),
@@ -109,7 +109,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
         data: {
           sensorId: bloxLink(names.beerSensor),
           storedSetting: beerSetting,
-          settingEnabled: activeSetpoint === 'beer',
+          settingEnabled: true,
           setting: bloxQty(null, 'degC'),
           value: bloxQty(null, 'degC'),
           valueUnfiltered: bloxQty(null, 'degC'),
@@ -416,26 +416,9 @@ export const defineWidgets = (
             ],
         },
         {
-          name: 'Constant fridge temperature',
+          name: 'Manage fridge temperature',
           id: uid(),
           changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.fridgeSetpoint,
-              data: {
-                settingEnabled: true,
-                storedSetting: opts.fridgeSetting,
-              },
-              confirmed: { storedSetting: true },
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerSetpoint,
-              data: { settingEnabled: false },
-              confirmed: {},
-            },
             {
               id: uid(),
               serviceId,
@@ -466,34 +449,15 @@ export const defineWidgets = (
               confirmed: {},
             },
           ] as [
-              BlockChange<SetpointSensorPairBlock>,
-              BlockChange<SetpointSensorPairBlock>,
               BlockChange<PidBlock>,
               BlockChange<PidBlock>,
               BlockChange<SetpointProfileBlock>,
             ],
         },
         {
-          name: 'Constant beer temperature',
+          name: 'Manage beer temperature',
           id: uid(),
           changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.fridgeSetpoint,
-              data: { settingEnabled: false },
-              confirmed: {},
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerSetpoint,
-              data: {
-                settingEnabled: true,
-                storedSetting: opts.beerSetting,
-              },
-              confirmed: { storedSetting: true },
-            },
             {
               id: uid(),
               serviceId,
@@ -524,15 +488,13 @@ export const defineWidgets = (
               confirmed: {},
             },
           ] as [
-              BlockChange<SetpointSensorPairBlock>,
-              BlockChange<SetpointSensorPairBlock>,
               BlockChange<PidBlock>,
               BlockChange<PidBlock>,
               BlockChange<SetpointProfileBlock>,
             ],
         },
         {
-          name: 'Start profile',
+          name: 'Enable temperature profile',
           id: uid(),
           changes: [
             {
@@ -546,7 +508,7 @@ export const defineWidgets = (
             ],
         },
         {
-          name: 'Disable profile',
+          name: 'Disable temperature profile',
           id: uid(),
           changes: [
             {

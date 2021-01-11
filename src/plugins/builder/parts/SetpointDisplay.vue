@@ -24,6 +24,7 @@ export default class SetpointDisplay extends PartBase {
     <SetpointValues v-bind="{ part }" />
     <g class="outline">
       <rect
+        v-show="bordered"
         :width="squares(2)-2"
         :height="squares(1)-2"
         :stroke="color"

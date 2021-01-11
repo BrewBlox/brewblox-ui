@@ -34,7 +34,7 @@ export default class FermentManualTask extends QuickStartTaskBase<FermentConfig>
             <span>
               Visit our
               <a
-                href="https://brewblox.netlify.com/user/ferment_guide.html"
+                href="https://brewblox.netlify.app/user/ferment_guide.html"
                 target="_blank"
                 style="color: white"
               >documentation page</a> for a more in-depth guide.

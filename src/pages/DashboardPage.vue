@@ -6,8 +6,8 @@ import { Watch } from 'vue-property-decorator';
 import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
+import { systemStore } from '@/store/system';
 
-import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '../helpers/dashboards';
 import { createDialog } from '../helpers/dialog';
 
 interface ValidatedWidget {
@@ -45,6 +45,10 @@ export default class DashboardPage extends Vue {
       container: 'Dashboard',
       size: this.$dense ? 'Content' : 'Fixed',
     };
+  }
+
+  get loaded(): boolean {
+    return systemStore.loaded;
   }
 
   get dashboardId(): string {
@@ -86,38 +90,10 @@ export default class DashboardPage extends Vue {
     await dashboardStore.saveWidget(widget);
   }
 
-  onIdChanged(oldId, newId): void {
-    if (newId && this.$route.path === `/dashboard/${oldId}`) {
-      this.$router.replace(`/dashboard/${newId}`);
-    }
-  }
-
-  editDashboardId(): void {
-    if (!this.dashboard) { return; }
-    const oldId = this.dashboard.id;
-    startChangeDashboardId(this.dashboard, newId => this.onIdChanged(oldId, newId));
-  }
-
-  editDashboardTitle(): void {
-    if (!this.dashboard) { return; }
-    const oldId = this.dashboard.id;
-    startChangeDashboardTitle(this.dashboard, newId => this.onIdChanged(oldId, newId));
-  }
-
-  toggleDefaultDashboard(): void {
-    if (!this.dashboard) { return; }
-    dashboardStore.updatePrimaryDashboard(this.dashboard.primary ? null : this.dashboardId);
-  }
-
-  removeDashboard(): void {
-    if (!this.dashboard) { return; }
-    startRemoveDashboard(this.dashboard);
-  }
-
-  showWizard(): void {
+  showWizard(widget: boolean): void {
     createDialog({
       component: 'WizardDialog',
-      initialWizard: 'WidgetWizardPicker',
+      initialWizard: widget ? 'WidgetWizardPicker' : null,
       activeDashboardId: this.dashboardId,
     });
   }
@@ -125,11 +101,13 @@ export default class DashboardPage extends Vue {
 </script>
 
 <template>
-  <q-page padding>
-    <q-inner-loading v-if="!dashboard">
-      <q-spinner size="50px" color="primary" />
-    </q-inner-loading>
-    <div v-else>
+  <q-page style="overflow: auto" class="page-height">
+    <template v-if="!dashboard">
+      <PageError v-if="!dashboard">
+        <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
+      </PageError>
+    </template>
+    <div v-else class="q-pa-lg">
       <portal to="toolbar-title">
         {{ dashboard.title }}
       </portal>
@@ -147,25 +125,36 @@ export default class DashboardPage extends Vue {
             Rearrange widgets
           </q-tooltip>
         </q-btn>
-        <ActionMenu round class="self-center">
-          <template #actions>
-            <ActionItem icon="add" label="New Widget" @click="showWizard" />
-            <q-item clickable @click="toggleDefaultDashboard">
-              <q-item-section avatar>
-                <q-icon :color="dashboard.primary ? 'primary' : ''" name="home" />
-              </q-item-section>
-              <q-item-section>
-                {{ dashboard.primary ? 'Is home page' : 'Make home page' }}
-              </q-item-section>
-            </q-item>
-            <ActionItem icon="edit" label="Change dashboard ID" @click="editDashboardId" />
-            <ActionItem icon="edit" label="Change dashboard title" @click="editDashboardTitle" />
-            <ActionItem icon="delete" label="Delete dashboard" @click="removeDashboard" />
+        <ActionMenu
+          round
+          class="self-center"
+        >
+          <q-tooltip>
+            Dashboard actions
+          </q-tooltip>
+          <template #menus>
+            <DashboardActions :dashboard-id="dashboardId" />
           </template>
         </ActionMenu>
       </portal>
 
-      <div v-if="$dense" class="column q-gutter-y-sm">
+      <div
+        v-if="validatedWidgets.length === 0"
+        class="absolute-center"
+      >
+        <q-btn
+          unelevated
+          color="secondary"
+          icon="mdi-creation"
+          size="lg"
+          label="Get started"
+          @click="showWizard(false)"
+        />
+      </div>
+      <div
+        v-else-if="$dense"
+        class="column q-gutter-y-sm"
+      >
         <component
           :is="val.component"
           v-for="val in validatedWidgets"
@@ -179,7 +168,7 @@ export default class DashboardPage extends Vue {
         v-else
         :editable="widgetEditable"
         @patch:widgets="patchWidgets"
-        @dblclick="showWizard"
+        @dblclick="showWizard(true)"
       >
         <component
           :is="val.component"

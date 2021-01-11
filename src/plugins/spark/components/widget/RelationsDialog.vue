@@ -22,6 +22,9 @@ export default class RelationsDialog extends DialogBase {
 
   @Prop({ type: Boolean, default: false })
   public readonly hideUnrelated!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  public readonly centered!: boolean;
 }
 </script>
 
@@ -29,7 +32,7 @@ export default class RelationsDialog extends DialogBase {
   <q-dialog
     ref="dialog"
     maximized
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     transition-show="fade"
     @hide="onDialogHide"
   >

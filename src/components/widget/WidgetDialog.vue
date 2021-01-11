@@ -48,7 +48,7 @@ export default class WidgetDialog extends DialogBase {
     ref="dialog"
     transition-show="fade"
     :maximized="$dense"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
   >
     <component

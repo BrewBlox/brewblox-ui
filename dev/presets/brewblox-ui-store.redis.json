@@ -1,36 +1,370 @@
 [
   {
+    "id": "93c393d1-3a4b-41cd-ba3a-e9ba9d1aa2c0",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "aa8d6d3e-9b7d-4ee6-92a8-a0aecef8a7bb",
+    "feature": "QuickValues",
+    "dashboard": "dashboard-home",
+    "rows": 4,
+    "cols": 4,
+    "config": {
+      "addr": {
+        "serviceId": "sparkey",
+        "id": "setpoint-sensor-pair-1",
+        "field": "storedSetting",
+        "type": "SetpointSensorPair"
+      },
+      "values": [
+        0,
+        10,
+        50
+      ],
+      "sliders": [
+        [
+          0,
+          100,
+          1
+        ],
+        [
+          0,
+          50,
+          1
+        ],
+        [
+          10,
+          90,
+          1
+        ]
+      ]
+    },
+    "title": "Quick Values",
+    "order": 7
+  },
+  {
+    "id": "a0636842-5499-11e9-8647-d663bd873d93",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "Graph",
+    "dashboard": "metrics",
+    "rows": 5,
+    "cols": 5,
+    "config": {
+      "layout": {},
+      "params": [],
+      "targets": [],
+      "renames": {}
+    },
+    "title": "empty-graph",
+    "order": 2
+  },
+  {
+    "id": "a0636b12-5499-11e9-8647-d663bd873d93",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "Pid",
+    "dashboard": "dashboard-home",
+    "rows": 4,
+    "cols": 4,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "pid-1"
+    },
+    "title": "pid-1",
+    "order": 1
+  },
+  {
+    "id": "a0635e1a-5499-11e9-8647-d663bd873d93",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "Graph",
+    "dashboard": "metrics",
+    "rows": 5,
+    "cols": 10,
+    "config": {
+      "layout": {},
+      "params": {
+        "duration": "10m"
+      },
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "actuator-pwm-1/setting",
+            "actuator-pwm-1/value"
+          ]
+        },
+        {
+          "measurement": "spock",
+          "fields": [
+            " Combined Influx points"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/actuator-pwm-1/setting": "Actuator setting"
+      }
+    },
+    "title": "item-graph",
+    "order": 1
+  },
+  {
+    "id": "a06350b4-5499-11e9-8647-d663bd873d93",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "SetpointSensorPair",
+    "dashboard": "derp",
     "rows": 3,
+    "cols": 3,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "BLARGH"
+    },
+    "title": "item-invalid",
+    "order": 1
+  },
+  {
+    "id": "builder",
+    "namespace": "brewblox-ui-store:dashboards",
+    "title": "Brewery Builder Dashboard",
+    "order": 3
+  },
+  {
+    "id": "ba342aed-d4ab-43aa-8286-1e7fed8f2afe",
+    "namespace": "brewblox-ui-store:autm-template",
+    "title": "ON/OFF",
+    "steps": [
+      {
+        "id": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
+        "title": "ON",
+        "preconditions": [
+          {
+            "id": "061b0d08-0d63-474b-9105-2ce3d86082ce",
+            "title": "Task status",
+            "enabled": true,
+            "impl": {
+              "type": "TaskStatus",
+              "ref": "wait-on",
+              "status": "Finished",
+              "resetStatus": null
+            }
+          }
+        ],
+        "actions": [
+          {
+            "id": "1336a493-316a-4b5c-9c5b-a7dc9eaeb312",
+            "title": "Block change",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "data": {
+                "desiredState": 1
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "50f30eb0-1269-432d-8e29-4fa93293caf0",
+            "next": true,
+            "enabled": true,
+            "conditions": [
+              {
+                "id": "77eb2f07-e933-407f-b9c2-796377637a69",
+                "title": "Duration",
+                "enabled": true,
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 10000,
+                  "start": "Step"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cd39929f-259e-4b4b-962e-d3b96edd3533",
+        "title": "OFF",
+        "preconditions": [
+          {
+            "id": "1b6bae71-a330-47cb-8ffb-a44e846d8700",
+            "title": "Duration",
+            "enabled": true,
+            "impl": {
+              "type": "TimeElapsed",
+              "duration": 10000,
+              "start": "Step"
+            }
+          },
+          {
+            "id": "774be828-8bba-4072-a510-386ab9463f26",
+            "title": "Block value",
+            "enabled": true,
+            "impl": {
+              "type": "BlockValue",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "key": "desiredState",
+              "operator": "eq",
+              "value": 1
+            }
+          }
+        ],
+        "actions": [
+          {
+            "id": "56eb0910-7b0c-43ea-a809-29599db823d1",
+            "title": "Block change",
+            "enabled": true,
+            "impl": {
+              "type": "BlockPatch",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "blockType": "DigitalActuator",
+              "data": {
+                "desiredState": 0
+              }
+            }
+          }
+        ],
+        "transitions": [
+          {
+            "id": "2f61eb56-a09c-419a-92dc-eb1348341c80",
+            "next": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
+            "enabled": true,
+            "conditions": [
+              {
+                "id": "484ab57b-888d-4d6f-8648-f31ee873783a",
+                "title": "Duration",
+                "enabled": true,
+                "impl": {
+                  "type": "TimeElapsed",
+                  "duration": 10000,
+                  "start": "Step"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "a06362e8-5499-11e9-8647-d663bd873d93",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "SessionView",
+    "dashboard": "metrics",
+    "rows": 5,
+    "cols": 4,
+    "config": {
+      "sessions": [
+        {
+          "id": "mgKBmi4sv",
+          "name": "brew-session",
+          "hidden": false,
+          "start": 1547723679298,
+          "end": null,
+          "graphCfg": {
+            "layout": {},
+            "params": {
+              "start": 1547723679298
+            },
+            "targets": [
+              {
+                "measurement": "sparkey",
+                "fields": [
+                  "actuator-pwm-1/value"
+                ]
+              }
+            ],
+            "renames": {
+              "sparkey/actuator-pwm-1/value": "PWM value"
+            }
+          }
+        }
+      ]
+    },
+    "title": "sessions",
+    "order": 2
+  },
+  {
+    "id": "a0635bb8-5499-11e9-8647-d663bd873d93",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "SetpointSensorPair",
+    "dashboard": "derp",
+    "rows": 3,
+    "cols": 3,
+    "config": {
+      "serviceId": "ZORP",
+      "blockId": "BLORP"
+    },
+    "title": "item-service-unknown",
+    "order": 3
+  },
+  {
+    "id": "1-55d75cbee5631853c77cd22f26e9a81c",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "Automation",
+    "dashboard": "dashboard-home",
+    "rows": 5,
+    "cols": 4,
+    "config": {},
+    "title": "Ministry of Silly Walks",
+    "order": 4
+  },
+  {
+    "id": "bb7aa0b4-a045-ad38-4887-308967ca8d63",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "SessionLog",
+    "dashboard": "dashboard-home",
+    "rows": 5,
+    "cols": 4,
+    "config": {
+      "currentSession": "3d15296d-0abd-4d45-383c-0bec436ae319"
+    },
+    "title": "Mr Beancounter",
+    "order": 5
+  },
+  {
+    "id": "aa8d6d3e-9b7d-4ee6-92a8-a0aecef8a7bb",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "SparkDisplay",
+    "dashboard": "dashboard-home",
+    "rows": 3,
+    "cols": 4,
     "config": {
       "serviceId": null
     },
-    "feature": "SparkDisplay",
     "title": "Spark Sim Display",
-    "cols": 4,
-    "order": 9,
-    "dashboard": "dashboard-home"
+    "order": 9
   },
   {
+    "id": "sparkey",
+    "namespace": "brewblox-ui-store:services",
+    "type": "Spark",
+    "title": "Spark Controller 'sparkey'",
+    "order": 1,
+    "config": {}
+  },
+  {
+    "id": "a06355e6-5499-11e9-8647-d663bd873d93",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a437050b-52a7-4c50-8051-26ec6addc28a",
+    "feature": "UnknownType",
+    "dashboard": "derp",
     "rows": 3,
+    "cols": 3,
     "config": {
       "serviceId": "sparkey",
-      "blockId": "Logic Actuator"
+      "blockId": "setpoint-1"
     },
-    "feature": "ActuatorLogic",
-    "title": "Logic Actuator",
-    "cols": 4,
-    "order": 6,
-    "dashboard": "dashboard-home",
-    "pinnedPosition": null
+    "title": "item-unknown",
+    "order": 2
   },
   {
-    "namespace": "brewblox-ui-store:dashboard-items",
     "id": "174108b9-e054-42b3-b19b-2eadabac6028",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "QuickActions",
+    "dashboard": "herms",
     "rows": 5,
+    "cols": 4,
     "config": {
       "changeIdMigrated": true,
       "serviceId": "sparkey",
@@ -166,310 +500,152 @@
         }
       ]
     },
-    "feature": "QuickActions",
     "title": "HERMS Actions",
-    "cols": 4,
-    "order": 3,
-    "dashboard": "herms",
     "pinnedPosition": {
       "x": 8,
       "y": 6
-    }
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "93c393d1-3a4b-41cd-ba3a-e9ba9d1aa2c0",
-    "rows": 4,
-    "config": {
-      "addr": {
-        "serviceId": "sparkey",
-        "id": "setpoint-sensor-pair-1",
-        "field": "storedSetting",
-        "type": "SetpointSensorPair"
-      },
-      "values": [
-        0,
-        10,
-        50
-      ],
-      "sliders": [
-        [
-          0,
-          100,
-          1
-        ],
-        [
-          0,
-          50,
-          1
-        ],
-        [
-          10,
-          90,
-          1
-        ]
-      ]
     },
-    "feature": "QuickValues",
-    "title": "Quick Values",
-    "cols": 4,
-    "order": 7,
-    "dashboard": "dashboard-home"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a06355e6-5499-11e9-8647-d663bd873d93",
-    "rows": 3,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "setpoint-1"
-    },
-    "feature": "UnknownType",
-    "title": "item-unknown",
-    "cols": 3,
-    "order": 2,
-    "dashboard": "derp"
-  },
-  {
-    "namespace": "brewblox-ui-store:services",
-    "id": "sparkey",
-    "title": "Spark Controller 'sparkey'",
-    "config": {},
-    "order": 1,
-    "type": "Spark"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "1-55d75cbee5631853c77cd22f26e9a81c",
-    "rows": 5,
-    "config": {},
-    "feature": "Automation",
-    "title": "Ministry of Silly Walks",
-    "cols": 4,
-    "order": 4,
-    "dashboard": "dashboard-home"
-  },
-  {
-    "namespace": "brewblox-ui-store:autm-template",
-    "id": "ba342aed-d4ab-43aa-8286-1e7fed8f2afe",
-    "title": "ON/OFF",
-    "steps": [
-      {
-        "id": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
-        "title": "ON",
-        "preconditions": [
-          {
-            "id": "061b0d08-0d63-474b-9105-2ce3d86082ce",
-            "title": "Task status",
-            "enabled": true,
-            "impl": {
-              "type": "TaskStatus",
-              "ref": "wait-on",
-              "status": "Finished",
-              "resetStatus": null
-            }
-          }
-        ],
-        "actions": [
-          {
-            "id": "1336a493-316a-4b5c-9c5b-a7dc9eaeb312",
-            "title": "Block change",
-            "enabled": true,
-            "impl": {
-              "type": "BlockPatch",
-              "blockId": "Logic Input 1",
-              "serviceId": "sparkey",
-              "blockType": "DigitalActuator",
-              "data": {
-                "desiredState": 1
-              }
-            }
-          }
-        ],
-        "transitions": [
-          {
-            "id": "50f30eb0-1269-432d-8e29-4fa93293caf0",
-            "next": true,
-            "enabled": true,
-            "conditions": [
-              {
-                "id": "77eb2f07-e933-407f-b9c2-796377637a69",
-                "title": "Duration",
-                "enabled": true,
-                "impl": {
-                  "type": "TimeElapsed",
-                  "duration": 10000,
-                  "start": "Step"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "id": "cd39929f-259e-4b4b-962e-d3b96edd3533",
-        "title": "OFF",
-        "preconditions": [
-          {
-            "id": "1b6bae71-a330-47cb-8ffb-a44e846d8700",
-            "title": "Duration",
-            "enabled": true,
-            "impl": {
-              "type": "TimeElapsed",
-              "duration": 10000,
-              "start": "Step"
-            }
-          },
-          {
-            "id": "774be828-8bba-4072-a510-386ab9463f26",
-            "title": "Block value",
-            "enabled": true,
-            "impl": {
-              "type": "BlockValue",
-              "blockId": "Logic Input 1",
-              "serviceId": "sparkey",
-              "blockType": "DigitalActuator",
-              "key": "desiredState",
-              "operator": "eq",
-              "value": 1
-            }
-          }
-        ],
-        "actions": [
-          {
-            "id": "56eb0910-7b0c-43ea-a809-29599db823d1",
-            "title": "Block change",
-            "enabled": true,
-            "impl": {
-              "type": "BlockPatch",
-              "blockId": "Logic Input 1",
-              "serviceId": "sparkey",
-              "blockType": "DigitalActuator",
-              "data": {
-                "desiredState": 0
-              }
-            }
-          }
-        ],
-        "transitions": [
-          {
-            "id": "2f61eb56-a09c-419a-92dc-eb1348341c80",
-            "next": "6e68a777-dfb5-4f47-b20c-c12f6fe89300",
-            "enabled": true,
-            "conditions": [
-              {
-                "id": "484ab57b-888d-4d6f-8648-f31ee873783a",
-                "title": "Duration",
-                "enabled": true,
-                "impl": {
-                  "type": "TimeElapsed",
-                  "duration": 10000,
-                  "start": "Step"
-                }
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboards",
-    "id": "derp",
-    "title": "Derp Dashboard",
-    "order": 4
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a06362e8-5499-11e9-8647-d663bd873d93",
-    "rows": 5,
-    "config": {
-      "sessions": [
-        {
-          "id": "mgKBmi4sv",
-          "name": "brew-session",
-          "hidden": false,
-          "start": 1547723679298,
-          "end": null,
-          "graphCfg": {
-            "layout": {},
-            "params": {
-              "start": 1547723679298
-            },
-            "targets": [
-              {
-                "measurement": "sparkey",
-                "fields": [
-                  "actuator-pwm-1/value"
-                ]
-              }
-            ],
-            "renames": {
-              "sparkey/actuator-pwm-1/value": "PWM value"
-            }
-          }
-        }
-      ]
-    },
-    "feature": "SessionView",
-    "title": "sessions",
-    "cols": 4,
-    "order": 2,
-    "dashboard": "metrics"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a0636842-5499-11e9-8647-d663bd873d93",
-    "rows": 5,
-    "config": {
-      "layout": {},
-      "params": [],
-      "targets": [],
-      "renames": {}
-    },
-    "feature": "Graph",
-    "title": "empty-graph",
-    "cols": 5,
-    "order": 2,
-    "dashboard": "metrics"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboards",
-    "id": "builder",
-    "title": "Brewery Builder Dashboard",
     "order": 3
   },
   {
+    "id": "herms",
+    "namespace": "brewblox-ui-store:dashboards",
+    "title": "HERMS",
+    "order": 5
+  },
+  {
+    "id": "default",
+    "namespace": "brewblox-ui-store:system-config",
+    "keyboardLayout": "english",
+    "homePage": "/dashboard/dashboard-home",
+    "experimental": true,
+    "showSidebarLayouts": true
+  },
+  {
+    "id": "spock",
+    "namespace": "brewblox-ui-store:services",
+    "type": "Spark",
+    "title": "Spark Controller 'spock'",
+    "order": 2,
+    "config": {}
+  },
+  {
+    "id": "a06358fc-5499-11e9-8647-d663bd873d95",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "117a2504-85b7-43c4-a48d-37bf5d6821cd",
+    "feature": "QuickActions",
+    "dashboard": "dashboard-home",
     "rows": 2,
-    "config": {
-      "session": null
-    },
-    "feature": "Stopwatch",
-    "title": "Stopwatch",
     "cols": 4,
-    "order": 9,
-    "dashboard": "dashboard-home"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a0635bb8-5499-11e9-8647-d663bd873d93",
-    "rows": 3,
     "config": {
-      "serviceId": "ZORP",
-      "blockId": "BLORP"
+      "serviceId": "sparkey",
+      "serviceIdMigrated": true,
+      "changeIdMigrated": true,
+      "actions": [
+        {
+          "id": "b92781c7-3a9f-440d-8df6-bd897b4bfa37",
+          "name": "step-10",
+          "changes": [
+            {
+              "blockId": "sensor-1",
+              "data": {
+                "value": {
+                  "__bloxtype": "Quantity",
+                  "value": 10,
+                  "unit": "degC"
+                }
+              },
+              "id": "4ab54887-4065-4563-8fe6-c39213d8dea6",
+              "serviceId": "sparkey"
+            },
+            {
+              "blockId": "setpoint-sensor-pair-1",
+              "data": {
+                "storedSetting": {
+                  "__bloxtype": "Quantity",
+                  "value": 10,
+                  "unit": "degC"
+                },
+                "settingEnabled": true
+              },
+              "id": "80edc81a-8ee6-4ad7-8c55-ca924def3258",
+              "serviceId": "sparkey"
+            },
+            {
+              "blockId": "actuator-pwm-1",
+              "data": {
+                "setting": 60
+              },
+              "id": "3e791f19-e631-48e0-9bb1-467746c6e87f",
+              "serviceId": "sparkey"
+            }
+          ]
+        },
+        {
+          "id": "6ab89a06-6103-4c59-a34c-f5a173cd3ee4",
+          "name": "step-20",
+          "changes": [
+            {
+              "blockId": "sensor-1",
+              "data": {
+                "value": {
+                  "__bloxtype": "Quantity",
+                  "value": 20,
+                  "unit": "degC"
+                }
+              },
+              "id": "8e818970-9d84-43fb-a76c-dbc8d24d9bf9",
+              "serviceId": "sparkey"
+            },
+            {
+              "blockId": "setpoint-sensor-pair-1",
+              "data": {
+                "storedSetting": {
+                  "__bloxtype": "Quantity",
+                  "value": 20,
+                  "unit": "degC"
+                },
+                "settingEnabled": true
+              },
+              "id": "90f603ac-7d3e-46d6-a784-822e44e68dd9",
+              "serviceId": "sparkey"
+            },
+            {
+              "blockId": "actuator-pwm-1",
+              "data": {
+                "setting": 60
+              },
+              "id": "519ba026-b12f-4c43-8f62-b91ca7186417",
+              "serviceId": "sparkey"
+            }
+          ]
+        },
+        {
+          "name": "Actuator state",
+          "id": "39c61856-482b-42a2-abc7-532c58ec8c62",
+          "changes": [
+            {
+              "id": "207e39c2-2a92-4305-8c8b-1250af079af0",
+              "blockId": "Logic Input 1",
+              "serviceId": "sparkey",
+              "data": {
+                "desiredState": 0
+              },
+              "confirmed": {
+                "desiredState": false
+              }
+            }
+          ]
+        }
+      ]
     },
-    "feature": "SetpointSensorPair",
-    "title": "item-service-unknown",
-    "cols": 3,
-    "order": 3,
-    "dashboard": "derp"
+    "title": "Charles",
+    "order": 3
   },
   {
-    "namespace": "brewblox-ui-store:layouts",
     "id": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
-    "title": "HERMS Layout",
+    "namespace": "brewblox-ui-store:layouts",
+    "width": 26,
+    "scale": 1,
     "parts": [
       {
         "id": "62ec5274-2564-441c-92d1-7d0e24eafa13",
@@ -1343,45 +1519,43 @@
       }
     ],
     "height": 11,
-    "width": 26
+    "title": "HERMS Layout"
   },
   {
+    "id": "a0634d76-5499-11e9-8647-d663bd873d93",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "972240e6-e12a-4abd-8c6c-bc850ff5096d",
-    "rows": 5,
+    "feature": "Builder",
+    "dashboard": "builder",
+    "rows": 8,
+    "cols": 12,
     "config": {
-      "currentLayoutId": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
+      "currentLayoutId": "68426d4c-edb9-4616-b13c-c6dbabbec725",
       "layoutIds": [
-        "90ca4326-b3a2-47ca-bec4-2c52281d8772"
+        "0e28d1ad-8e38-4204-b634-c1301aae73ac",
+        "ee021f01-fc29-2e06-c903-0c9288eb1bfe"
       ]
     },
-    "feature": "Builder",
-    "title": "HERMS Process",
-    "cols": 11,
-    "order": 1,
-    "dashboard": "herms",
-    "pinnedPosition": {
-      "x": 1,
-      "y": 1
-    }
+    "title": "Gone With the Flow",
+    "order": 1
   },
   {
+    "id": "a437050b-52a7-4c50-8051-26ec6addc28a",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "bd5f1830-b9c9-450a-88f9-bc2e548d2376",
-    "rows": 2,
+    "feature": "ActuatorLogic",
+    "dashboard": "dashboard-home",
+    "rows": 3,
+    "cols": 4,
     "config": {
       "serviceId": "sparkey",
-      "blockId": "Logic Input 1"
+      "blockId": "Logic Actuator"
     },
-    "feature": "DigitalActuator",
-    "title": "Logic Input 1",
-    "cols": 4,
-    "order": 7,
-    "dashboard": "dashboard-home"
+    "title": "Logic Actuator",
+    "pinnedPosition": null,
+    "order": 6
   },
   {
-    "namespace": "brewblox-ui-store:autm-template",
     "id": "eaa6154b-a5ec-4cab-a655-31985e2c5a9d",
+    "namespace": "brewblox-ui-store:autm-template",
     "title": "Test Template",
     "steps": [
       {
@@ -2352,47 +2526,103 @@
     ]
   },
   {
-    "namespace": "brewblox-ui-store:services",
-    "id": "spock",
-    "title": "Spark Controller 'spock'",
-    "config": {},
-    "order": 2,
-    "type": "Spark"
+    "id": "dashboard-home",
+    "namespace": "brewblox-ui-store:dashboards",
+    "title": "Home Dashboard",
+    "order": 1
   },
   {
-    "namespace": "brewblox-ui-store:dashboard-items__dashboard-items",
-    "id": "bb7aa0b4-a045-ad38-4887-308967ca8d63",
-    "rows": 5,
-    "config": {
-      "currentSession": "3d15296d-0abd-4d45-383c-0bec436ae319"
-    },
-    "feature": "SessionLog",
-    "title": "Mr Beancounter",
-    "cols": 4,
-    "order": 5,
-    "dashboard": "dashboard-home"
-  },
-  {
+    "id": "a0636b12-5499-11e9-8647-d663bd873d94",
     "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a0634d76-5499-11e9-8647-d663bd873d93",
-    "rows": 8,
+    "feature": "Metrics",
+    "dashboard": "dashboard-home",
+    "rows": 4,
+    "cols": 4,
     "config": {
-      "currentLayoutId": "68426d4c-edb9-4616-b13c-c6dbabbec725",
+      "targets": [
+        {
+          "measurement": "sparkey",
+          "fields": [
+            "actuator-pwm-1/setting",
+            "actuator-pwm-1/value"
+          ]
+        }
+      ],
+      "renames": {
+        "sparkey/actuator-pwm-1/value": "actuator value"
+      },
+      "freshDuration": {},
+      "decimals": {}
+    },
+    "title": "inspector",
+    "order": 2
+  },
+  {
+    "id": "972240e6-e12a-4abd-8c6c-bc850ff5096d",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "Builder",
+    "dashboard": "herms",
+    "rows": 5,
+    "cols": 11,
+    "config": {
+      "currentLayoutId": "90ca4326-b3a2-47ca-bec4-2c52281d8772",
       "layoutIds": [
-        "0e28d1ad-8e38-4204-b634-c1301aae73ac",
-        "ee021f01-fc29-2e06-c903-0c9288eb1bfe"
+        "90ca4326-b3a2-47ca-bec4-2c52281d8772"
       ]
     },
-    "feature": "Builder",
-    "title": "Gone With the Flow",
-    "cols": 12,
-    "order": 1,
-    "dashboard": "builder"
+    "title": "HERMS Process",
+    "pinnedPosition": {
+      "x": 1,
+      "y": 1
+    },
+    "order": 1
   },
   {
-    "namespace": "brewblox-ui-store:layouts",
+    "id": "a06358fc-5499-11e9-8647-d663bd873d93",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "Warbl",
+    "dashboard": "derp",
+    "rows": 3,
+    "cols": 3,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "BLORP"
+    },
+    "title": "item-invalid-unknown",
+    "order": 3
+  },
+  {
+    "id": "bd5f1830-b9c9-450a-88f9-bc2e548d2376",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "DigitalActuator",
+    "dashboard": "dashboard-home",
+    "rows": 2,
+    "cols": 4,
+    "config": {
+      "serviceId": "sparkey",
+      "blockId": "Logic Input 1"
+    },
+    "title": "Logic Input 1",
+    "order": 7
+  },
+  {
+    "id": "117a2504-85b7-43c4-a48d-37bf5d6821cd",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "Stopwatch",
+    "dashboard": "dashboard-home",
+    "rows": 2,
+    "cols": 4,
+    "config": {
+      "session": null
+    },
+    "title": "Stopwatch",
+    "order": 9
+  },
+  {
     "id": "68426d4c-edb9-4616-b13c-c6dbabbec725",
+    "namespace": "brewblox-ui-store:layouts",
     "title": "Gone With the Layout",
+    "height": 15,
     "parts": [
       {
         "type": "Conical",
@@ -3147,13 +3377,57 @@
         "flipped": false
       }
     ],
-    "height": 15,
     "width": 20
   },
   {
-    "namespace": "brewblox-ui-store:dashboard-items",
+    "id": "3d15296d-0abd-4d45-383c-0bec436ae319",
+    "namespace": "brewblox-ui-store:logged-sessions",
+    "date": 1579688563640,
+    "notes": [
+      {
+        "id": "66ea94b9-1c2a-6218-6469-a9b353e45e77",
+        "title": "Example note",
+        "type": "Text",
+        "value": "",
+        "col": 12
+      },
+      {
+        "id": "ea8631fd-9bb0-ac9f-6cfb-8bf01e56893c",
+        "title": "Subprocess graph",
+        "type": "Graph",
+        "start": null,
+        "end": null,
+        "config": {
+          "layout": {
+            "annotations": []
+          },
+          "params": {},
+          "targets": [],
+          "renames": {},
+          "axes": {},
+          "colors": {}
+        },
+        "col": 12
+      }
+    ],
+    "tags": [
+      "on: Home Dashboard"
+    ],
+    "title": "Teddy"
+  },
+  {
+    "id": "derp",
+    "namespace": "brewblox-ui-store:dashboards",
+    "title": "Derp Dashboard",
+    "order": 4
+  },
+  {
     "id": "f764bbe2-38ad-4970-998e-11a29eddb69a",
+    "namespace": "brewblox-ui-store:dashboard-items",
+    "feature": "Graph",
+    "dashboard": "herms",
     "rows": 5,
+    "cols": 7,
     "config": {
       "layout": {},
       "params": {
@@ -3190,282 +3464,17 @@
       },
       "colors": {}
     },
-    "feature": "Graph",
     "title": "HERMS Graph",
-    "cols": 7,
-    "order": 2,
-    "dashboard": "herms",
     "pinnedPosition": {
       "x": 1,
       "y": 6
-    }
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a06358fc-5499-11e9-8647-d663bd873d93",
-    "rows": 3,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "BLORP"
     },
-    "feature": "Warbl",
-    "title": "item-invalid-unknown",
-    "cols": 3,
-    "order": 3,
-    "dashboard": "derp"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboards",
-    "id": "dashboard-home",
-    "title": "Home Dashboard",
-    "order": 1
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboards",
-    "id": "metrics",
-    "title": "Metrics Dashboard",
     "order": 2
   },
   {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a0636b12-5499-11e9-8647-d663bd873d93",
-    "rows": 4,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "pid-1"
-    },
-    "feature": "Pid",
-    "title": "pid-1",
-    "cols": 4,
-    "order": 1,
-    "dashboard": "dashboard-home"
-  },
-  {
+    "id": "metrics",
     "namespace": "brewblox-ui-store:dashboards",
-    "id": "herms",
-    "title": "HERMS",
-    "order": 5
-  },
-  {
-    "namespace": "brewblox-ui-store:logged-sessions",
-    "id": "3d15296d-0abd-4d45-383c-0bec436ae319",
-    "tags": [
-      "on: Home Dashboard"
-    ],
-    "date": 1579688563640,
-    "notes": [
-      {
-        "id": "66ea94b9-1c2a-6218-6469-a9b353e45e77",
-        "title": "Example note",
-        "type": "Text",
-        "value": "",
-        "col": 12
-      },
-      {
-        "id": "ea8631fd-9bb0-ac9f-6cfb-8bf01e56893c",
-        "title": "Subprocess graph",
-        "type": "Graph",
-        "start": null,
-        "end": null,
-        "config": {
-          "layout": {
-            "annotations": []
-          },
-          "params": {},
-          "targets": [],
-          "renames": {},
-          "axes": {},
-          "colors": {}
-        },
-        "col": 12
-      }
-    ],
-    "title": "Teddy"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a06358fc-5499-11e9-8647-d663bd873d95",
-    "rows": 2,
-    "config": {
-      "serviceId": "sparkey",
-      "serviceIdMigrated": true,
-      "changeIdMigrated": true,
-      "actions": [
-        {
-          "id": "b92781c7-3a9f-440d-8df6-bd897b4bfa37",
-          "name": "step-10",
-          "changes": [
-            {
-              "blockId": "sensor-1",
-              "data": {
-                "value": {
-                  "__bloxtype": "Quantity",
-                  "value": 10,
-                  "unit": "degC"
-                }
-              },
-              "id": "4ab54887-4065-4563-8fe6-c39213d8dea6",
-              "serviceId": "sparkey"
-            },
-            {
-              "blockId": "setpoint-sensor-pair-1",
-              "data": {
-                "storedSetting": {
-                  "__bloxtype": "Quantity",
-                  "value": 10,
-                  "unit": "degC"
-                },
-                "settingEnabled": true
-              },
-              "id": "80edc81a-8ee6-4ad7-8c55-ca924def3258",
-              "serviceId": "sparkey"
-            },
-            {
-              "blockId": "actuator-pwm-1",
-              "data": {
-                "setting": 60
-              },
-              "id": "3e791f19-e631-48e0-9bb1-467746c6e87f",
-              "serviceId": "sparkey"
-            }
-          ]
-        },
-        {
-          "id": "6ab89a06-6103-4c59-a34c-f5a173cd3ee4",
-          "name": "step-20",
-          "changes": [
-            {
-              "blockId": "sensor-1",
-              "data": {
-                "value": {
-                  "__bloxtype": "Quantity",
-                  "value": 20,
-                  "unit": "degC"
-                }
-              },
-              "id": "8e818970-9d84-43fb-a76c-dbc8d24d9bf9",
-              "serviceId": "sparkey"
-            },
-            {
-              "blockId": "setpoint-sensor-pair-1",
-              "data": {
-                "storedSetting": {
-                  "__bloxtype": "Quantity",
-                  "value": 20,
-                  "unit": "degC"
-                },
-                "settingEnabled": true
-              },
-              "id": "90f603ac-7d3e-46d6-a784-822e44e68dd9",
-              "serviceId": "sparkey"
-            },
-            {
-              "blockId": "actuator-pwm-1",
-              "data": {
-                "setting": 60
-              },
-              "id": "519ba026-b12f-4c43-8f62-b91ca7186417",
-              "serviceId": "sparkey"
-            }
-          ]
-        },
-        {
-          "name": "Actuator state",
-          "id": "39c61856-482b-42a2-abc7-532c58ec8c62",
-          "changes": [
-            {
-              "id": "207e39c2-2a92-4305-8c8b-1250af079af0",
-              "blockId": "Logic Input 1",
-              "serviceId": "sparkey",
-              "data": {
-                "desiredState": 0
-              },
-              "confirmed": {
-                "desiredState": false
-              }
-            }
-          ]
-        }
-      ]
-    },
-    "feature": "QuickActions",
-    "title": "Charles",
-    "cols": 4,
-    "order": 3,
-    "dashboard": "dashboard-home"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a0635e1a-5499-11e9-8647-d663bd873d93",
-    "rows": 5,
-    "config": {
-      "layout": {},
-      "params": {
-        "duration": "10m"
-      },
-      "targets": [
-        {
-          "measurement": "sparkey",
-          "fields": [
-            "actuator-pwm-1/setting",
-            "actuator-pwm-1/value"
-          ]
-        },
-        {
-          "measurement": "spock",
-          "fields": [
-            " Combined Influx points"
-          ]
-        }
-      ],
-      "renames": {
-        "sparkey/actuator-pwm-1/setting": "Actuator setting"
-      }
-    },
-    "feature": "Graph",
-    "title": "item-graph",
-    "cols": 10,
-    "order": 1,
-    "dashboard": "metrics"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a0636b12-5499-11e9-8647-d663bd873d94",
-    "rows": 4,
-    "config": {
-      "targets": [
-        {
-          "measurement": "sparkey",
-          "fields": [
-            "actuator-pwm-1/setting",
-            "actuator-pwm-1/value"
-          ]
-        }
-      ],
-      "renames": {
-        "sparkey/actuator-pwm-1/value": "actuator value"
-      },
-      "freshDuration": {},
-      "decimals": {}
-    },
-    "feature": "Metrics",
-    "title": "inspector",
-    "cols": 4,
-    "order": 2,
-    "dashboard": "dashboard-home"
-  },
-  {
-    "namespace": "brewblox-ui-store:dashboard-items",
-    "id": "a06350b4-5499-11e9-8647-d663bd873d93",
-    "rows": 3,
-    "config": {
-      "serviceId": "sparkey",
-      "blockId": "BLARGH"
-    },
-    "feature": "SetpointSensorPair",
-    "title": "item-invalid",
-    "cols": 3,
-    "order": 1,
-    "dashboard": "derp"
+    "title": "Metrics Dashboard",
+    "order": 2
   }
 ]

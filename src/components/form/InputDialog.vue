@@ -4,6 +4,7 @@ import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
+import { createDialog } from '@/helpers/dialog';
 import { round, ruleValidator } from '@/helpers/functional';
 
 const typeValidator = (v: any): boolean => ['text', 'number'].includes(v);
@@ -36,6 +37,9 @@ export default class InputDialog extends DialogBase {
   @Prop({ type: String, default: '170%' })
   public readonly fontSize!: string;
 
+  @Prop({ type: String, required: false })
+  public readonly suffix!: string;
+
   get valid(): boolean {
     return ruleValidator(this.rules)(this.local);
   }
@@ -67,23 +71,37 @@ export default class InputDialog extends DialogBase {
       this.local = this.value;
     }
   }
+
+  showKeyboard(): void {
+    createDialog({
+      component: 'KeyboardDialog',
+      value: this.local,
+      type: this.type,
+      rules: this.rules,
+    })
+      .onOk(v => this.local = v);
+  }
 }
 </script>
 
 <template>
   <q-dialog
     ref="dialog"
-    no-backdrop-dismiss
+    v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"
-        v-bind="{ rules, clearable, label, autogrow, ...bound }"
+        v-bind="{ rules, clearable, label, autogrow, suffix, ...bound }"
         :input-style="{fontSize}"
         autofocus
-      />
+      >
+        <template #append>
+          <KeyboardButton @click="showKeyboard" />
+        </template>
+      </q-input>
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn :disable="!valid" flat label="OK" color="primary" @click="save" />

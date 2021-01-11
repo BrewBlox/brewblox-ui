@@ -134,6 +134,7 @@ export default class SetpointProfileFull
         const [first, second] = [pinned, changed].sort(objectSorter('absTimeMs'));
 
         createDialog({
+          component: 'ConfirmDialog',
           title: 'Insert point',
           message: `
           Do you want to insert an extra point to prevent an instant jump
@@ -141,7 +142,6 @@ export default class SetpointProfileFull
           html: true,
           cancel: 'No',
           ok: 'Yes',
-          persistent: true,
         })
           .onOk(() => this.splicePoints(index, first, second))
           .onCancel(() => this.splicePoints(index, changed));

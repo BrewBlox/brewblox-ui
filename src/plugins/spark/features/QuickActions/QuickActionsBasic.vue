@@ -74,7 +74,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
         resolve(value);
         return;
       }
-      const pretty = specField.pretty ?? (v => `${v}`);
+      const pretty = specField.pretty ?? prettyAny;
       const field: EditableBlockField = {
         value,
         specField,
@@ -87,9 +87,10 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
         field: specField,
         address: block,
         value: field.value,
-        title: `Confirm ${block.id} ${specField.title}`,
+        title: `Confirm ${specField.title}`,
+        html: true,
         message: `
-        Please confirm the ${specField.title} value in ${block.id}.
+        Please confirm the <b>${specField.title}</b> value in <i>${block.id}</i>.
         Current value is '${pretty(block.data[key])}'.
         `,
       })
@@ -132,7 +133,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
             .map(v => v.serviceId)
             .filter(uniqueFilter)
             .map(serviceId => sparkStore.moduleById(serviceId)!.fetchBlocks())))
-      .catch(e => notify.warn(`Failed to apply ${action.name}: ${e.message}`))
+      .catch(e => notify.warn(`Failed to apply ${action.name}: ${e}`))
       .finally(() => this.applying = false);
   }
 
