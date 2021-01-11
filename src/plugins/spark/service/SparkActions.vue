@@ -87,11 +87,6 @@ export default class SparkActions extends Vue {
         @click="funcs.discoverBlocks(serviceId)"
       />
       <ActionItem
-        icon="mdi-tag-remove"
-        label="Remove unused block names"
-        @click="funcs.cleanUnusedNames(serviceId)"
-      />
-      <ActionItem
         icon="mdi-progress-download"
         label="Update firmware"
         @click="startDialog('FirmwareUpdateDialog')"
@@ -125,6 +120,11 @@ export default class SparkActions extends Vue {
         icon="mdi-power-plug"
         label="Export sensor and pin names"
         @click="funcs.saveHwInfo(serviceId)"
+      />
+      <ActionItem
+        icon="mdi-tag-remove"
+        label="Remove unused block names"
+        @click="funcs.cleanUnusedNames(serviceId)"
       />
       <ActionItem
         icon="delete"
