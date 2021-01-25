@@ -11,8 +11,8 @@ export const isJSLink =
     isJSBloxField(obj)
     && obj.__bloxtype === 'Link';
 
-export const prettyLink = (v: Link): string =>
-  v?.id || '<not set>';
+export const prettyLink = (v: Link | null): string =>
+  v?.id || '[not set]';
 
 export function rawLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): Link;
 export function rawLink(other: Link): Link;

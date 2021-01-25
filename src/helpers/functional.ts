@@ -185,9 +185,9 @@ export const suggestId =
     }
 
     const copyName = (i: number): string =>
-      (id.match(/-\d+$/)
-        ? id.replace(/-\d+$/, `-${i}`)
-        : `${id}-${i}`);
+    (id.match(/-\d+$/)
+      ? id.replace(/-\d+$/, `-${i}`)
+      : `${id}-${i}`);
 
     let idx = 2;
     while (!validate(copyName(idx))) {
@@ -237,6 +237,18 @@ export const objReducer =
 export const mapEntries =
   (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
     fromEntries(Object.entries(obj).map(callback));
+
+export function combinations<T>(arr: T[]): [T, T][] {
+  const results: [T, T][] = [];
+  // last element is skipped
+  for (let i = 0; i < arr.length - 1; i++) {
+    // Capture the second part of the combination
+    for (let j = i + 1; j < arr.length; j++) {
+      results.push([arr[i], arr[j]]);
+    }
+  }
+  return results;
+}
 
 // Overloads for spliceById
 // if insert is false, the stub { id } is sufficient to remove the existing object
@@ -399,8 +411,8 @@ export function matchesType<T extends HasType>(type: T['type'], obj: HasType): o
  *
  * @param type
  */
-export function typeMatchFilter<T extends HasType>(type: T['type']): ((obj: HasType) => obj is T) {
-  return (obj): obj is T => obj.type === type;
+export function typeMatchFilter<T extends HasType>(type: T['type']): ((obj: HasType | null | undefined) => obj is T) {
+  return (obj): obj is T => obj != null && obj.type === type;
 }
 
 export function nullFilter<T>(value: T | null | undefined): value is T {

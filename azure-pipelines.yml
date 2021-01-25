@@ -1,5 +1,5 @@
 pool:
-  vmImage: 'Ubuntu-18.04'
+  vmImage: 'Ubuntu-20.04'
 
 trigger:
   tags:
@@ -25,7 +25,7 @@ variables:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '12.x'
+    versionSpec: '14.x'
   displayName: 'Install Node.js'
 
 - bash: |
@@ -49,23 +49,17 @@ steps:
   displayName: NPM build
 
 - bash: |
-    curl -L -o ~/.docker/cli-plugins/docker-buildx --create-dirs ${BUILDX_URL}
-    chmod a+x ~/.docker/cli-plugins/docker-buildx
-    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    docker buildx create --use
-    docker buildx inspect --bootstrap
+    curl -fsSL https://raw.githubusercontent.com/BrewBlox/deployed-images/develop/prepare_buildx.sh | bash
   displayName: Prepare buildx
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-  env:
-    BUILDX_URL: https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64
+  condition: and(succeeded(), variables.BRANCH)
 
 - bash: echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USER) --password-stdin
   displayName: Docker login
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), variables.BRANCH)
 
 - bash: cp -rf dist/ docker/
   displayName: Copy files to docker context
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), variables.BRANCH)
 
 - bash: >-
     docker buildx build

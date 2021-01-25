@@ -13,10 +13,19 @@ export default class ConfirmDialog extends DialogBase {
   @Prop({ type: [String, Boolean], default: true })
   public readonly cancel!: string | boolean;
 
+  @Prop({ type: [String, Boolean], default: false })
+  public readonly no!: string;
+
   get cancelLabel(): string {
     return typeof this.cancel === 'string'
       ? this.cancel
       : 'Cancel';
+  }
+
+  get noLabel(): string {
+    return typeof this.no === 'string'
+      ? this.no
+      : 'No';
   }
 }
 </script>
@@ -26,7 +35,7 @@ export default class ConfirmDialog extends DialogBase {
     ref="dialog"
     v-bind="dialogProps"
     @hide="onDialogHide"
-    @keyup.enter="onDialogOk()"
+    @keyup.enter="onDialogOk(true)"
   >
     <DialogCard v-bind="{title, message, html}">
       <template #actions>
@@ -34,14 +43,22 @@ export default class ConfirmDialog extends DialogBase {
           v-if="cancel"
           flat
           :label="cancelLabel"
-          color="primary"
+          :color="no ? '' : 'primary'"
           @click="onDialogCancel"
+        />
+        <q-space v-if="no" />
+        <q-btn
+          v-if="no"
+          flat
+          :label="noLabel"
+          color="primary"
+          @click="onDialogOk(false)"
         />
         <q-btn
           flat
           :label="ok"
           color="primary"
-          @click="onDialogOk()"
+          @click="onDialogOk(true)"
         />
       </template>
     </DialogCard>

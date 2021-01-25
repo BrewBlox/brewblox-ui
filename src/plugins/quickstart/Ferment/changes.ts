@@ -22,34 +22,9 @@ import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
-import { DisplayBlock } from '../types';
+import { DisplayBlock, PidConfig } from '../types';
+import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from './helpers';
 import { FermentConfig, FermentOpts } from './types';
-
-type PidData = PidBlock['data'];
-
-const beerCoolConfig: Partial<PidData> = {
-  kp: bloxQty(-50, '1/degC'),
-  ti: bloxQty('6h'),
-  td: bloxQty('30m'),
-};
-
-const fridgeCoolConfig: Partial<PidData> = {
-  kp: bloxQty(-20, '1/degC'),
-  ti: bloxQty('2h'),
-  td: bloxQty('10m'),
-};
-
-const beerHeatConfig: Partial<PidData> = {
-  kp: bloxQty(100, '1/degC'),
-  ti: bloxQty('6h'),
-  td: bloxQty('30m'),
-};
-
-const fridgeHeatConfig: Partial<PidData> = {
-  kp: bloxQty(20, '1/degC'),
-  ti: bloxQty('2h'),
-  td: bloxQty('10m'),
-};
 
 export const defineChangedBlocks = (config: FermentConfig): Block[] => {
   return unlinkedActuators(config.serviceId, [config.heatPin, config.coolPin]);
@@ -63,13 +38,13 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
   const activeSetpointId = isBeer ? names.beerSetpoint : names.fridgeSetpoint;
   const initialSetting = isBeer ? beerSetting : fridgeSetting;
 
-  const coolPidConfig: Partial<PidData> = isBeer
-    ? beerCoolConfig
-    : fridgeCoolConfig;
+  const coolPidConfig: PidConfig = isBeer
+    ? makeBeerCoolConfig()
+    : makeFridgeCoolConfig();
 
-  const heatPidConfig: Partial<PidData> = isBeer
-    ? beerHeatConfig
-    : fridgeHeatConfig;
+  const heatPidConfig: PidConfig = isBeer
+    ? makeBeerHeatConfig()
+    : makeFridgeHeatConfig();
 
   const blocks: [
     SetpointSensorPairBlock,
@@ -425,7 +400,7 @@ export const defineWidgets = (
               blockId: names.coolPid,
               data: {
                 inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
-                ...fridgeCoolConfig,
+                ...makeFridgeCoolConfig(),
               },
               confirmed: {},
             },
@@ -435,7 +410,7 @@ export const defineWidgets = (
               blockId: names.heatPid,
               data: {
                 inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
-                ...fridgeHeatConfig,
+                ...makeFridgeHeatConfig(),
               },
               confirmed: {},
             },
@@ -464,7 +439,7 @@ export const defineWidgets = (
               blockId: names.coolPid,
               data: {
                 inputId: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
-                ...beerCoolConfig,
+                ...makeBeerCoolConfig(),
               },
               confirmed: {},
             },
@@ -474,7 +449,7 @@ export const defineWidgets = (
               blockId: names.heatPid,
               data: {
                 inputId: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
-                ...beerHeatConfig,
+                ...makeBeerHeatConfig(),
               },
               confirmed: {},
             },

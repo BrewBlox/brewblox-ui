@@ -1,12 +1,11 @@
 <script lang="ts">
-import isString from 'lodash/isString';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
 import { bloxQty, isQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString } from '@/helpers/duration';
-import { ruleValidator } from '@/helpers/functional';
+import { ruleErrorFinder, ruleValidator } from '@/helpers/functional';
 import { Quantity } from '@/plugins/spark/types';
 
 @Component
@@ -40,7 +39,7 @@ export default class DurationQuantityDialog extends DialogBase {
   }
 
   get localMs(): number {
-    return durationMs(`${this.local}${this.defaultUnit}`);
+    return durationMs(`${this.local || 0}${this.defaultUnit}`);
   }
 
   get valueOk(): boolean {
@@ -48,13 +47,7 @@ export default class DurationQuantityDialog extends DialogBase {
   }
 
   get error(): string | null {
-    for (const rule of this.rules) {
-      const res = rule(this.localMs);
-      if (isString(res)) {
-        return res;
-      }
-    }
-    return null;
+    return ruleErrorFinder(this.rules)(this.localMs);
   }
 
   normalize(): void {
