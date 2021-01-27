@@ -2,10 +2,11 @@
 import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
+import { bloxQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { deepCopy, spliceById, typeMatchFilter } from '@/helpers/functional';
+import { spliceById, typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockType, SetpointProfileBlock } from '@/shared-types';
+import { BlockType, Link, PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
 
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import { TempControlConfig, TempControlMode } from './types';
@@ -15,10 +16,10 @@ import { TempControlConfig, TempControlMode } from './types';
     TempControlModeDialog,
   },
 })
-export default class TempControlFull
-  extends CrudComponent<TempControlConfig> {
-  pidFilter = typeMatchFilter(BlockType.Pid);
-  profileFilter = typeMatchFilter(BlockType.SetpointProfile);
+export default class TempControlFull extends CrudComponent<TempControlConfig> {
+  pidFilter = typeMatchFilter<PidBlock>(BlockType.Pid);
+  profileFilter = typeMatchFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
+  setpointFilter = typeMatchFilter<SetpointSensorPairBlock>(BlockType.SetpointSensorPair);
 
   get serviceOpts(): string[] {
     return sparkStore.serviceIds;
@@ -30,6 +31,10 @@ export default class TempControlFull
 
   get module(): SparkServiceModule | null {
     return sparkStore.moduleById(this.serviceId);
+  }
+
+  get serviceTemp(): 'degC' | 'degF' {
+    return this.module?.units.Temp ?? 'degC';
   }
 
   get profile(): SetpointProfileBlock | null {
@@ -49,6 +54,13 @@ export default class TempControlFull
     return this.config.modes.map(m => ({ label: m.title, value: m.id }));
   }
 
+  setpointValue(link: Link): Quantity {
+    const block = this.module?.blockByLink(link);
+    return this.setpointFilter(block)
+      ? block.data.storedSetting
+      : bloxQty(null, this.serviceTemp);
+  }
+
   saveMode(mode: TempControlMode): void {
     this.config.modes = spliceById(this.config.modes, mode);
     this.saveConfig();
@@ -57,14 +69,14 @@ export default class TempControlFull
   showMode(mode: TempControlMode): void {
     createDialog({
       component: TempControlModeDialog,
-      value: deepCopy(mode),
-      serviceId: this.serviceId,
       title: `Edit ${mode.title} mode`,
-    })
-      .onOk((mode: TempControlMode) => {
+      serviceId: this.serviceId,
+      value: mode,
+      saveMode: (mode: TempControlMode) => {
         this.config.modes = spliceById(this.config.modes, mode);
         this.saveConfig();
-      });
+      },
+    });
   }
 }
 </script>
@@ -116,12 +128,21 @@ export default class TempControlFull
       class="clickable"
       @click="showMode(mode)"
     >
-      <div class="text-red q-gutter-x-sm col-grow row justify-between">
+      <div class="text-italic fade-4">
+        {{ mode.setpoint | link }} {{ setpointValue(mode.setpoint) | quantity }}
+      </div>
+      <div
+        v-if="mode.heatConfig"
+        class="text-red q-gutter-x-sm col-grow row justify-between"
+      >
         <span>Kp={{ mode.heatConfig.kp | quantity }}</span>
         <span>Td={{ mode.heatConfig.td | duration }}</span>
         <span>Ti={{ mode.heatConfig.ti | duration }}</span>
       </div>
-      <div class="text-blue q-gutter-x-sm col-grow row justify-between">
+      <div
+        v-if="mode.coolConfig"
+        class="text-blue q-gutter-x-sm col-grow row justify-between"
+      >
         <span>Kp={{ mode.coolConfig.kp | quantity }}</span>
         <span>Td={{ mode.coolConfig.td | duration }}</span>
         <span>Ti={{ mode.coolConfig.ti | duration }}</span>

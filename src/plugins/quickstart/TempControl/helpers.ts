@@ -1,7 +1,14 @@
 import { bloxLink, prettyLink } from '@/helpers/bloxfield';
 import { typeMatchFilter } from '@/helpers/functional';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockType, PidBlock, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
+import {
+  ActuatorOffsetBlock,
+  Block,
+  BlockType,
+  PidBlock,
+  SetpointProfileBlock,
+  SetpointSensorPairBlock,
+} from '@/shared-types';
 
 import { TempControlConfig, TempControlMode } from './types';
 
@@ -11,6 +18,12 @@ interface TempControlBlocks {
   coolPid: PidBlock | null;
   heatPid: PidBlock | null;
 }
+
+const profileFilter = typeMatchFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
+const offsetFilter = typeMatchFilter<ActuatorOffsetBlock>(BlockType.ActuatorOffset);
+const driverFilter =
+  (block: Block): block is SetpointProfileBlock | ActuatorOffsetBlock =>
+    profileFilter(block) || offsetFilter(block);
 
 function getBlocks(config: TempControlConfig, mode: TempControlMode | null = null): TempControlBlocks {
   const module = sparkStore.moduleById(config.serviceId);
@@ -22,11 +35,11 @@ function getBlocks(config: TempControlConfig, mode: TempControlMode | null = nul
   const heatPid = module.blockByLink<PidBlock>(config.heatPid);
   const profile = module.blockByLink<SetpointProfileBlock>(config.profile);
 
-  if (config.coolPid && !coolPid) {
+  if (config.coolPid.id && !coolPid) {
     throw new Error(`Cool PID <i>${prettyLink(config.coolPid)}</i> not found.`);
   }
 
-  if (config.heatPid && !heatPid) {
+  if (config.heatPid.id && !heatPid) {
     throw new Error(`Heat PID <i>${prettyLink(config.heatPid)}</i> not found.`);
   }
 
@@ -56,8 +69,15 @@ function getBlocks(config: TempControlConfig, mode: TempControlMode | null = nul
 }
 
 export async function applyMode(config: TempControlConfig, mode: TempControlMode): Promise<void> {
-  const profileFilter = typeMatchFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
   const { coolPid, heatPid, setpoint, profile } = getBlocks(config, mode);
+
+  if (mode.coolConfig && !coolPid) {
+    throw new Error('No cool PID defined');
+  }
+
+  if (mode.heatConfig && !heatPid) {
+    throw new Error('No heat PID defined');
+  }
 
   setpoint.data.settingEnabled = false;
   await sparkStore.saveBlock(setpoint);
@@ -67,19 +87,18 @@ export async function applyMode(config: TempControlConfig, mode: TempControlMode
     await sparkStore.saveBlock(profile);
   }
 
-  // Disable all profiles that target the setpoint
+  // Disable all blocks driving target setpoint
   await Promise.all(
     sparkStore
-      .moduleById(config.serviceId)!
-      .blocks
-      .filter(profileFilter)
+      .serviceBlocks(config.serviceId)
+      .filter(driverFilter)
       .filter(block => block.data.drivenTargetId.id === setpoint.id)
       .map(block => {
         block.data.enabled = false;
         return sparkStore.saveBlock(block);
       }));
 
-  if (coolPid) {
+  if (coolPid && mode.coolConfig) {
     coolPid.data = {
       ...coolPid.data,
       ...mode.coolConfig,
@@ -88,24 +107,12 @@ export async function applyMode(config: TempControlConfig, mode: TempControlMode
     await sparkStore.saveBlock(coolPid);
   }
 
-  if (heatPid) {
+  if (heatPid && mode.heatConfig) {
     heatPid.data = {
       ...heatPid.data,
       ...mode.heatConfig,
       inputId: mode.setpoint,
     };
     await sparkStore.saveBlock(heatPid);
-  }
-}
-
-export async function autofix(config: TempControlConfig): Promise<void> {
-  const module = sparkStore.moduleById(config.serviceId);
-  if (!module) {
-    throw new Error(`Spark service with ID '${config.serviceId}' not found.`);
-  }
-
-  const mode = config.modes.find(v => v.id === config.activeMode);
-  if (mode) {
-    // TODO
   }
 }

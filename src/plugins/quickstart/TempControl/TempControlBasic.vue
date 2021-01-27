@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import CrudComponent from '@/components/CrudComponent';
 import { bloxQty } from '@/helpers/bloxfield';
 import { createBlockDialog, createDialog } from '@/helpers/dialog';
-import { shortDateString, spliceById, typeMatchFilter } from '@/helpers/functional';
+import { spliceById, typeMatchFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { profileValues } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
@@ -19,8 +19,7 @@ import { TempControlConfig, TempControlMode } from './types';
     TempControlModeDialog,
   },
 })
-export default class TempControlBasic
-  extends CrudComponent<TempControlConfig> {
+export default class TempControlBasic extends CrudComponent<TempControlConfig> {
   setpointFilter = typeMatchFilter<SetpointSensorPairBlock>(BlockType.SetpointSensorPair);
 
   get serviceId(): string | null {
@@ -111,10 +110,10 @@ export default class TempControlBasic
       component: 'ConfirmDialog',
       title: 'Start profile',
       message: `
-        Profile start time is ${shortDateString(start)}.
+        Profile start time is ${start.toLocaleString()}.
         Do you want to reset this value to current date and time?
         `,
-      no: 'No',
+      nok: 'No',
       ok: 'Yes',
     })
       .onOk(async (reset: boolean) => {
@@ -155,7 +154,6 @@ export default class TempControlBasic
   }
 
   setControlMode(mode: TempControlMode | null) {
-
     if (!mode) {
       this.config.activeMode = null;
       this.saveConfig();
@@ -167,17 +165,23 @@ export default class TempControlBasic
       value: mode,
       serviceId: this.serviceId,
       title: `Apply ${mode.title} mode`,
+      saveMode: (mode: TempControlMode) => {
+        this.config.modes = spliceById(this.config.modes, mode);
+        this.saveConfig();
+      },
     })
-      .onOk(async (mode: TempControlMode) => {
+      .onOk(async () => {
         try {
-          this.config.modes = spliceById(this.config.modes, mode);
-          this.config.activeMode = mode.id;
-          await this.saveConfig();
           await applyMode(this.config, mode);
+          this.config.activeMode = mode.id;
           notify.done(`Applied ${mode.title} mode`);
         }
         catch (e) {
+          this.config.activeMode = null;
           notify.error(e.message);
+        }
+        finally {
+          await this.saveConfig();
         }
       });
   }
@@ -193,9 +197,11 @@ export default class TempControlBasic
       <QuantityField
         v-if="setpoint"
         v-model="setpointSetting"
-        :disable="profileEnabled"
+        :readonly="profileEnabled"
         :label="setpoint.id"
         class="col-grow"
+        tag="big"
+        tag-class="text-secondary"
       />
 
       <LabeledField
@@ -213,12 +219,12 @@ export default class TempControlBasic
       <LabeledField
         v-if="profile"
         :readonly="false"
-        label="Profile"
+        :label="profile.id"
         class="col-grow"
         @click="showProfile"
       >
         <span v-if="profileValues">
-          {{ profileValues.current | quantity }} to {{ profileValues.next | quantity }}
+          {{ profileValues.prev | quantity }} to {{ profileValues.next | quantity }}
         </span>
         <span v-else>
           ---
@@ -227,7 +233,7 @@ export default class TempControlBasic
 
       <LabeledField
         v-if="!profile"
-        label="Profile"
+        label="Setpoint Profile"
         class="col-grow"
       >
         Not set

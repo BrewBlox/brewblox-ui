@@ -304,6 +304,7 @@ export const startResetBlocks = (serviceId: string): void => {
 };
 
 interface ProfileValues {
+  prev: Quantity;
   current: Quantity;
   next: Quantity;
 }
@@ -329,6 +330,7 @@ export const profileValues =
     const currentVal = prevVal + (now - start + prev.time) * (nextVal - prevVal) / duration;
 
     return {
+      prev: bloxQty(prevVal, unit),
       current: bloxQty(currentVal, unit),
       next: bloxQty(nextVal, unit),
     };

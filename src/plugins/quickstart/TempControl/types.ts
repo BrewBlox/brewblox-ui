@@ -7,14 +7,14 @@ export interface TempControlMode {
   id: string;
   title: string;
   setpoint: Link;
-  coolConfig: PidConfig;
-  heatConfig: PidConfig;
+  coolConfig: PidConfig | null;
+  heatConfig: PidConfig | null;
 }
 
 export interface TempControlConfig {
   serviceId: string | null;
-  coolPid: Link | null;
-  heatPid: Link | null;
+  coolPid: Link;
+  heatPid: Link;
   profile: Link;
   modes: TempControlMode[];
   activeMode: string | null;

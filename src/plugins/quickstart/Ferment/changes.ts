@@ -22,6 +22,7 @@ import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
 import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from './helpers';
 import { FermentConfig, FermentOpts } from './types';
@@ -331,173 +332,43 @@ export const defineWidgets = (
     },
   });
 
-  const createQuickActions = (): Widget<QuickActionsConfig> => ({
-    ...createWidget(withPrefix(prefix, 'Actions'), 'QuickActions'),
-    cols: 4,
-    rows: 4,
-    pinnedPosition: { x: 1, y: 6 },
-    config: {
-      changeIdMigrated: true,
-      serviceIdMigrated: true,
-      serviceId,
-      actions: [
-        {
-          name: 'Enable control',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerSetpoint,
-              data: { settingEnabled: true },
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.fridgeSetpoint,
-              data: { settingEnabled: true },
-            },
-          ] as [
-              BlockChange<SetpointSensorPairBlock>,
-              BlockChange<SetpointSensorPairBlock>,
-            ],
-        },
-        {
-          name: 'Disable control',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.tempProfile,
-              data: { enabled: false },
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerSetpoint,
-              data: { settingEnabled: false },
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.fridgeSetpoint,
-              data: { settingEnabled: false },
-            },
-          ] as [
-              BlockChange<SetpointProfileBlock>,
-              BlockChange<SetpointSensorPairBlock>,
-              BlockChange<SetpointSensorPairBlock>,
-            ],
-        },
-        {
-          name: 'Manage fridge temperature',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.coolPid,
-              data: {
-                inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
-                ...makeFridgeCoolConfig(),
-              },
-              confirmed: {},
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.heatPid,
-              data: {
-                inputId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
-                ...makeFridgeHeatConfig(),
-              },
-              confirmed: {},
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.tempProfile,
-              data: {
-                targetId: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
-              },
-              confirmed: {},
-            },
-          ] as [
-              BlockChange<PidBlock>,
-              BlockChange<PidBlock>,
-              BlockChange<SetpointProfileBlock>,
-            ],
-        },
-        {
-          name: 'Manage beer temperature',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.coolPid,
-              data: {
-                inputId: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
-                ...makeBeerCoolConfig(),
-              },
-              confirmed: {},
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.heatPid,
-              data: {
-                inputId: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
-                ...makeBeerHeatConfig(),
-              },
-              confirmed: {},
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.tempProfile,
-              data: {
-                targetId: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
-              },
-              confirmed: {},
-            },
-          ] as [
-              BlockChange<PidBlock>,
-              BlockChange<PidBlock>,
-              BlockChange<SetpointProfileBlock>,
-            ],
-        },
-        {
-          name: 'Enable temperature profile',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              blockId: names.tempProfile,
-              data: { enabled: true, start: 0 },
-              confirmed: { start: true },
-            },
-          ] as [
-              BlockChange<SetpointProfileBlock>,
-            ],
-        },
-        {
-          name: 'Disable temperature profile',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              blockId: names.tempProfile,
-              data: { enabled: false },
-            },
-          ] as [
-              BlockChange<SetpointProfileBlock>,
-            ],
-        },
-      ],
-    },
-  });
+  const createTempControl = (): TempControlWidget => {
+    const beerModeId = uid();
+    const fridgeModeId = uid();
+    const activeMode = opts.activeSetpoint === 'beer'
+      ? beerModeId
+      : fridgeModeId;
+
+    return {
+      ...createWidget(withPrefix(prefix, 'Control'), 'TempControl'),
+      cols: 4,
+      rows: 4,
+      pinnedPosition: { x: 1, y: 6 },
+      config: {
+        serviceId,
+        coolPid: bloxLink(names.coolPid, BlockType.Pid),
+        heatPid: bloxLink(names.heatPid, BlockType.Pid),
+        profile: bloxLink(names.tempProfile, BlockType.SetpointProfile),
+        activeMode,
+        modes: [
+          {
+            id: beerModeId,
+            title: 'beer',
+            setpoint: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
+            coolConfig: makeBeerCoolConfig(),
+            heatConfig: makeBeerHeatConfig(),
+          },
+          {
+            id: fridgeModeId,
+            title: 'fridge',
+            setpoint: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
+            coolConfig: makeFridgeCoolConfig(),
+            heatConfig: makeFridgeHeatConfig(),
+          },
+        ],
+      },
+    };
+  };
 
   const createProfile = (name: string): Widget => ({
     ...createWidget(name, BlockType.SetpointProfile),
@@ -506,7 +377,12 @@ export const defineWidgets = (
     pinnedPosition: { x: 5, y: 6 },
   });
 
-  return [createBuilder(), createGraph(), createQuickActions(), createProfile(names.tempProfile)];
+  return [
+    createBuilder(),
+    createGraph(),
+    createTempControl(),
+    createProfile(names.tempProfile),
+  ];
 };
 
 export const defineDisplayedBlocks = (config: FermentConfig): DisplayBlock[] => {
