@@ -185,9 +185,9 @@ export const suggestId =
     }
 
     const copyName = (i: number): string =>
-    (id.match(/-\d+$/)
-      ? id.replace(/-\d+$/, `-${i}`)
-      : `${id}-${i}`);
+      id.match(/-\d+$/)
+        ? id.replace(/-\d+$/, `-${i}`)
+        : `${id}-${i}`;
 
     let idx = 2;
     while (!validate(copyName(idx))) {
