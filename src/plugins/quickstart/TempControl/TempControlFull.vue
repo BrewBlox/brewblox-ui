@@ -148,9 +148,5 @@ export default class TempControlFull extends CrudComponent<TempControlConfig> {
         <span>Ti={{ mode.coolConfig.ti | duration }}</span>
       </div>
     </LabeledField>
-
-    <div class="row justify-end">
-      <q-btn flat color="secondary" label="New mode" />
-    </div>
   </div>
 </template>

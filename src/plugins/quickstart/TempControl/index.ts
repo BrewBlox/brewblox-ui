@@ -22,7 +22,7 @@ const feature: WidgetFeature<TempControlConfig> = {
     coolPid: bloxLink(null),
     heatPid: bloxLink(null),
     profile: bloxLink(null),
-    activeMode: 'beer',
+    activeMode: null,
     modes: [
       {
         id: uid(),
