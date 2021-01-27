@@ -10,11 +10,11 @@ export default class ConfirmDialog extends DialogBase {
   @Prop({ type: String, default: 'OK' })
   public readonly ok!: string;
 
+  @Prop({ type: [String, Boolean], default: false })
+  public readonly nok!: string;
+
   @Prop({ type: [String, Boolean], default: true })
   public readonly cancel!: string | boolean;
-
-  @Prop({ type: [String, Boolean], default: false })
-  public readonly no!: string;
 
   get cancelLabel(): string {
     return typeof this.cancel === 'string'
@@ -22,9 +22,9 @@ export default class ConfirmDialog extends DialogBase {
       : 'Cancel';
   }
 
-  get noLabel(): string {
-    return typeof this.no === 'string'
-      ? this.no
+  get nokLabel(): string {
+    return typeof this.nok === 'string'
+      ? this.nok
       : 'No';
   }
 }
@@ -43,14 +43,14 @@ export default class ConfirmDialog extends DialogBase {
           v-if="cancel"
           flat
           :label="cancelLabel"
-          :color="no ? '' : 'primary'"
+          :color="nok ? '' : 'primary'"
           @click="onDialogCancel"
         />
-        <q-space v-if="no" />
+        <q-space v-if="nok" />
         <q-btn
-          v-if="no"
+          v-if="nok"
           flat
-          :label="noLabel"
+          :label="nokLabel"
           color="primary"
           @click="onDialogOk(false)"
         />
