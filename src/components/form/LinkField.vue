@@ -15,8 +15,8 @@ export default class LinkField extends FieldBase {
   @Prop({ type: Object, required: true, validator: v => isLink(v) })
   public readonly value!: Link;
 
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
+  @Prop({ type: String, required: false })
+  public readonly serviceId!: string | null;
 
   @Prop({ type: String, default: 'Choose block' })
   public readonly title!: string;

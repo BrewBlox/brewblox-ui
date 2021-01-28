@@ -30,7 +30,7 @@ export default class SetpointSensorPairWidget
   }
 
   get formattedUsers(): string {
-    return this.usedBy.map(v => `'${v.id}'`).join(' and ');
+    return this.usedBy.map(v => `<i>${v.id}</i>`).join(' and ');
   }
 
   get enabledString(): string {
@@ -82,10 +82,10 @@ export default class SetpointSensorPairWidget
           data-key="settingEnabled"
         >
           <template #enabled>
-            {{ enabledString }}
+            <span v-html="enabledString" />
           </template>
           <template #disabled>
-            {{ disabledString }}
+            <span v-html="disabledString" />
           </template>
         </BlockEnableToggle>
       </template>

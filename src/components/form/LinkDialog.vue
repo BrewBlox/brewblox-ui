@@ -19,7 +19,7 @@ export default class LinkDialog extends DialogBase {
   public readonly value!: Link;
 
   @Prop({ type: String, required: true })
-  readonly serviceId!: string;
+  readonly serviceId!: string | null;
 
   @Prop({ type: String, default: 'Link' })
   public readonly label!: string;
@@ -114,7 +114,6 @@ export default class LinkDialog extends DialogBase {
         :label="label"
         option-label="id"
         option-value="id"
-        autofocus
         item-aligned
         @input="update"
         @keyup.enter.exact.stop

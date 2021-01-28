@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual';
 
-import { typeMatchFilter } from '@/helpers/functional';
+import { combinations, typeMatchFilter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
 import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
@@ -10,11 +10,13 @@ import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { WizardAction } from './components/QuickStartTaskBase';
 import { PinChannel, QuickStartOutput } from './types';
 
+const digitalActuatorFilter = typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
+
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {
   return sparkStore
     .serviceBlocks(serviceId)
+    .filter(digitalActuatorFilter)
     // Find existing drivers
-    .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
     .filter(
       block => pins
         .some((pin: PinChannel) =>
@@ -23,7 +25,7 @@ export function unlinkedActuators(serviceId: string, pins: PinChannel[]): Digita
     // Unlink them from pin
     .map((block) => {
       block.data.channel = 0;
-      return block as DigitalActuatorBlock;
+      return block;
     });
 }
 
@@ -86,18 +88,6 @@ export function createOutputActions(): WizardAction[] {
       }
     },
   ];
-}
-
-function combinations<T>(arr: T[]): [T, T][] {
-  const results: [T, T][] = [];
-  // last element is skipped
-  for (let i = 0; i < arr.length - 1; i++) {
-    // Capture the second part of the combination
-    for (let j = i + 1; j < arr.length; j++) {
-      results.push([arr[i], arr[j]]);
-    }
-  }
-  return results;
 }
 
 export function hasShared<T>(arr: T[]): boolean {

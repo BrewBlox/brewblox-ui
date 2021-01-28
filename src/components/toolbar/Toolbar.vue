@@ -33,7 +33,7 @@ export default class Toolbar extends Vue {
       <q-space />
       <div
         v-if="!!subtitle"
-        class="subtitle q-mx-sm col-shrink ellipsis"
+        class="subtitle q-px-sm col-shrink ellipsis"
       >
         {{ subtitle }}
       </div>

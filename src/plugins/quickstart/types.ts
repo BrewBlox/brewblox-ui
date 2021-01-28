@@ -1,6 +1,7 @@
 import { BuilderLayout } from '@/plugins/builder/types';
 import { Block } from '@/plugins/spark/types';
 import { DisplayOpts } from '@/plugins/spark/types';
+import { PidBlock } from '@/shared-types';
 import { Widget } from '@/store/dashboards';
 
 export interface PinChannel {
@@ -25,3 +26,8 @@ export interface QuickStartOutput {
   renamedBlocks: { [old: string]: string };
   displayedBlocks: DisplayBlock[];
 }
+
+export type PidConfig = Pick<
+  PidBlock['data'],
+  'kp' | 'ti' | 'td'
+>
