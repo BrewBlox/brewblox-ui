@@ -22,15 +22,15 @@ interface BlockDialogOpts {
   verify?: boolean;
 }
 
-export function createBlockDialog(addr: BlockAddress | null, opts: BlockDialogOpts = {}): void {
+export function createBlockDialog(addr: BlockAddress | null, opts: BlockDialogOpts = {}): DialogChainObject | null {
   if (!addr || !addr.id) {
-    return;
+    return null;
   }
   if (opts.verify && !sparkStore.blockById(addr.serviceId, addr.id)) {
-    return;
+    return null;
   }
   const { props, mode } = opts;
-  createDialog({
+  return createDialog({
     component: 'BlockWidgetDialog',
     serviceId: addr.serviceId,
     blockId: addr.id,
@@ -38,3 +38,10 @@ export function createBlockDialog(addr: BlockAddress | null, opts: BlockDialogOp
     getProps: () => props || {},
   });
 };
+
+export async function createBlockDialogPromise(addr: BlockAddress | null, opts: BlockDialogOpts = {}): Promise<void> {
+  const chain = createBlockDialog(addr, opts);
+  if (chain) {
+    await new Promise(resolve => chain.onDismiss(resolve));
+  }
+}

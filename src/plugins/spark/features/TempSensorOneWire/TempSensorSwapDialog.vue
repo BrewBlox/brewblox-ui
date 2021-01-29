@@ -44,11 +44,11 @@ export default class TempSensorSwapDialog extends DialogBase {
   }
 
   get leftBlock(): TempSensorOneWireBlock | null {
-    return this.sparkModule.blockByAddress(this.leftAddr);
+    return this.sparkModule.blockByAddress<TempSensorOneWireBlock>(this.leftAddr);
   }
 
   get rightBlock(): TempSensorOneWireBlock | null {
-    return this.sparkModule.blockByAddress(this.rightAddr);
+    return this.sparkModule.blockByAddress<TempSensorOneWireBlock>(this.rightAddr);
   }
 
   get valid(): boolean {
