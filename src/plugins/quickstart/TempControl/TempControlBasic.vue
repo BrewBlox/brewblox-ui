@@ -3,20 +3,25 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { bloxQty } from '@/helpers/bloxfield';
-import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { createBlockDialog, createDialog, createDialogPromise } from '@/helpers/dialog';
 import { spliceById, typeMatchFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { profileValues } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
 
+import { PidConfig } from '../types';
 import { applyMode, findControlProblems, TempControlProblem } from './helpers';
+import PidConfigView from './PidConfigView.vue';
 import TempControlModeDialog from './TempControlModeDialog.vue';
+import TempControlSyncDialog from './TempControlSyncDialog.vue';
 import { TempControlConfig, TempControlMode } from './types';
 
 @Component({
   components: {
+    PidConfigView,
     TempControlModeDialog,
+    TempControlSyncDialog,
   },
 })
 export default class TempControlBasic extends CrudComponent<TempControlConfig> {
@@ -135,6 +140,45 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
     return profileValues(this.profile);
   }
 
+  checkMismatch(pid: PidBlock | null, config: PidConfig | null | undefined): boolean {
+    return pid && config
+      ? ['kp', 'ti', 'td'].some(k => !bloxQty(pid.data[k]).eq(config[k]))
+      : false;
+  }
+
+  get coolConfigMismatch(): boolean {
+    return this.checkMismatch(this.coolPid, this.tempMode?.coolConfig);
+  }
+
+  get heatConfigMismatch(): boolean {
+    return this.checkMismatch(this.heatPid, this.tempMode?.heatConfig);
+  }
+
+  applySync(kind: 'cool' | 'heat', leading: 'pid' | 'mode'): void {
+    const pid = kind === 'cool'
+      ? this.coolPid
+      : this.heatPid;
+
+    if (!this.module || !this.tempMode || !pid) {
+      return;
+    }
+
+    if (leading === 'pid') {
+      const { kp, td, ti } = pid.data;
+      this.tempMode[`${kind}Config`] = { kp, td, ti };
+      this.config.modes = spliceById(this.config.modes, this.tempMode);
+      this.saveConfig();
+    }
+
+    if (leading === 'mode') {
+      const config: PidConfig = this.tempMode[`${kind}Config`];
+      if (config) {
+        pid.data = { ...pid.data, ...config };
+        this.module.saveBlock(pid);
+      }
+    }
+  }
+
   PidSetpoint(pid: PidBlock | null): SetpointSensorPairBlock | null {
     return this.module?.blockByLink(pid?.data.inputId ?? null) ?? null;
   }
@@ -155,7 +199,9 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
     }
   }
 
-  setControlMode(mode: TempControlMode | null | undefined) {
+  async setControlMode(id: string) {
+    const mode = this.config.modes.find(v => v.id === id);
+
     if (!mode) {
       this.config.activeMode = null;
       this.saveConfig();
@@ -167,6 +213,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
       value: mode,
       serviceId: this.serviceId,
       title: `Apply ${mode.title} mode`,
+      showConfirm: true,
       saveMode: (mode: TempControlMode) => {
         this.config.modes = spliceById(this.config.modes, mode);
         this.saveConfig();
@@ -188,6 +235,14 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
       });
   }
 
+  syncPid(): Promise<void> {
+    return createDialogPromise({
+      component: TempControlSyncDialog,
+      config: this.config,
+      saveConfig: this.saveConfig,
+    });
+  }
+
   selectControlMode(): void {
     createDialog({
       component: 'SelectDialog',
@@ -200,12 +255,11 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
         ...this.config.modes.map(v => ({ value: v.id, label: v.title })),
       ],
     })
-      .onOk((id: string) =>
-        this.setControlMode(this.config.modes.find(v => v.id === id)));
+      .onOk(this.setControlMode);
   }
 
   troubleshoot(): void {
-    this.problems = findControlProblems(this.config);
+    this.problems = findControlProblems(this.config, { showConfig: () => this.$emit('full') });
     this.detected = new Date();
   }
 
@@ -297,7 +351,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
 
     <q-item tag="label">
       <q-item-section>
-        <q-item-label>Temperature profile</q-item-label>
+        <q-item-label>Enable profile</q-item-label>
       </q-item-section>
       <q-item-section avatar>
         <q-toggle
@@ -333,6 +387,68 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
         <div
           class="text-negative"
           v-html="problem.desc"
+        />
+      </LabeledField>
+    </div>
+
+    <div
+      v-if="coolConfigMismatch"
+      class="dashed row q-ma-md q-gutter-sm q-pr-sm q-pb-sm"
+    >
+      <p class="q-px-sm col-12">
+        <i>{{ coolPid.id }}</i> and <b>{{ tempMode.title }} mode</b> have different PID settings.
+      </p>
+      <LabeledField
+        label="Click to use PID settings"
+        :readonly="false"
+        class="col-grow"
+        @click="applySync('cool', 'pid')"
+      >
+        <PidConfigView
+          :value="coolPid.data"
+          class="column"
+        />
+      </LabeledField>
+      <LabeledField
+        label="Click to use mode settings"
+        :readonly="false"
+        class="col-grow"
+        @click="applySync('cool', 'mode')"
+      >
+        <PidConfigView
+          :value="tempMode.coolConfig"
+          class="column"
+        />
+      </LabeledField>
+    </div>
+
+    <div
+      v-if="heatConfigMismatch"
+      class="dashed row q-ma-md q-gutter-sm q-pr-sm q-pb-sm"
+    >
+      <p class="q-px-sm col-12">
+        <i>{{ heatPid.id }}</i> and <b>{{ tempMode.title }}</b> mode have different PID settings.
+      </p>
+      <LabeledField
+        label="Click to use PID settings"
+        :readonly="false"
+        class="col-grow"
+        @click="applySync('heat', 'pid')"
+      >
+        <PidConfigView
+          :value="heatPid.data"
+          class="column"
+        />
+      </LabeledField>
+      <LabeledField
+        label="Click to use mode settings"
+        :readonly="false"
+        class="col-grow"
+        @click="applySync('heat', 'mode')"
+      >
+        <PidConfigView
+          :value="tempMode.heatConfig"
+          class="column"
         />
       </LabeledField>
     </div>

@@ -5,21 +5,31 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 
+interface BlockDialogOpts {
+  props?: any;
+  mode?: WidgetMode;
+  verify?: boolean;
+}
+
+type DialogOpts = { component: any } & QDialogOptions;
+
 export function getNumDialogs(): number {
   return document.getElementsByClassName('q-dialog').length;
 }
 
-export function createDialog(opts: { component: any } & QDialogOptions): DialogChainObject {
+export function createDialog(opts: DialogOpts): DialogChainObject {
   return Dialog.create({
     ...opts,
     parent: Vue.$app, // This enables use of $router inside dialog components
   });
 }
 
-interface BlockDialogOpts {
-  props?: any;
-  mode?: WidgetMode;
-  verify?: boolean;
+export function createDialogPromise(opts: DialogOpts): Promise<any> {
+  return new Promise<any>(resolve => {
+    createDialog(opts)
+      .onOk((v: any[]) => resolve(v))
+      .onDismiss(() => resolve(undefined));
+  });
 }
 
 export function createBlockDialog(addr: BlockAddress | null, opts: BlockDialogOpts = {}): DialogChainObject | null {

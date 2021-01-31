@@ -18,6 +18,7 @@ import {
 } from '@/shared-types';
 
 import { TempControlConfig, TempControlMode } from './types';
+
 interface TempControlBlocks {
   setpoint: SetpointSensorPairBlock;
   profile: SetpointProfileBlock | null;
@@ -28,6 +29,10 @@ interface TempControlBlocks {
 export interface TempControlProblem {
   desc: string;
   autofix?: (config: TempControlConfig) => Awaitable<unknown>;
+}
+
+export interface AutofixCallbacks {
+  showConfig(): Awaitable<unknown>;
 }
 
 type TempSensorBlock = TempSensorCombiBlock | TempSensorMockBlock | TempSensorOneWireBlock;
@@ -124,7 +129,7 @@ export async function applyMode(config: TempControlConfig, mode: TempControlMode
   await sparkStore.saveBlock(setpoint);
 
   if (profile) {
-    profile.data.drivenTargetId = bloxLink(setpoint.id);
+    profile.data.targetId = bloxLink(setpoint.id);
     await sparkStore.saveBlock(profile);
   }
 
@@ -295,17 +300,23 @@ function findPidProblems(module: SparkServiceModule, pid: PidBlock): TempControl
   return issues;
 }
 
-export function findControlProblems(config: TempControlConfig): TempControlProblem[] {
+export function findControlProblems(config: TempControlConfig, callbacks: AutofixCallbacks): TempControlProblem[] {
   const issues: TempControlProblem[] = [];
   const module = sparkStore.moduleById(config.serviceId);
 
   if (!config.serviceId) {
-    issues.push({ desc: 'Spark service not defined' });
+    issues.push({
+      desc: 'Spark service not defined',
+      autofix: callbacks.showConfig,
+    });
     return issues;
   }
 
   if (!module) {
-    issues.push({ desc: `Spark service not found: <b>${config.serviceId}</b>` });
+    issues.push({
+      desc: `Spark service not found: <b>${config.serviceId}</b>`,
+      autofix: callbacks.showConfig,
+    });
     return issues;
   }
 
@@ -314,21 +325,33 @@ export function findControlProblems(config: TempControlConfig): TempControlProbl
   const profile = module.blockByLink<SetpointProfileBlock>(config.profile);
 
   if (!config.coolPid.id && !config.heatPid.id) {
-    issues.push({ desc: 'Cool PID and Heat PID both undefined' });
+    issues.push({
+      desc: 'Cool PID and Heat PID both undefined',
+      autofix: callbacks.showConfig,
+    });
   }
 
   if (config.coolPid.id && !coolPid) {
-    issues.push({ desc: `Cool PID not found: ${linkStr(config.coolPid)}` });
+    issues.push({
+      desc: `Cool PID not found: ${linkStr(config.coolPid)}`,
+      autofix: callbacks.showConfig,
+    });
     return issues;
   }
 
   if (config.heatPid.id && !heatPid) {
-    issues.push({ desc: `Heat PID not found: ${linkStr(config.heatPid)}` });
+    issues.push({
+      desc: `Heat PID not found: ${linkStr(config.heatPid)}`,
+      autofix: callbacks.showConfig,
+    });
     return issues;
   }
 
   if (config.profile.id && !profile) {
-    issues.push({ desc: `Profile not found: ${linkStr(config.profile)}` });
+    issues.push({
+      desc: `Profile not found: ${linkStr(config.profile)}`,
+      autofix: callbacks.showConfig,
+    });
     return issues;
   }
 
@@ -345,18 +368,27 @@ export function findControlProblems(config: TempControlConfig): TempControlProbl
     .find(v => v && v.id);
 
   if (!setpointLink?.id) {
-    issues.push({ desc: 'Setpoint not defined' });
+    issues.push({
+      desc: 'Setpoint not defined',
+      autofix: callbacks.showConfig,
+    });
     return issues;
   }
 
   const setpoint = module.blockByLink<SetpointSensorPairBlock>(setpointLink);
   if (!setpoint) {
-    issues.push({ desc: `Setpoint not found: ${linkStr(setpointLink)}` });
+    issues.push({
+      desc: `Setpoint not found: ${linkStr(setpointLink)}`,
+      autofix: callbacks.showConfig,
+    });
     return issues;
   }
 
   if (mode && !linkEq(setpointLink, modeSetpointLink)) {
-    issues.push({ desc: `Setpoint not defined: ${mode.title} mode` });
+    issues.push({
+      desc: `Setpoint not defined: ${mode.title} mode`,
+      autofix: callbacks.showConfig,
+    });
   }
   if (coolPid && !linkEq(setpointLink, coolSetpointLink)) {
     issues.push({
@@ -387,7 +419,10 @@ export function findControlProblems(config: TempControlConfig): TempControlProbl
     });
   }
   else if (!sensor) {
-    issues.push({ desc: `Temp Sensor not found: ${linkStr(setpoint, sensorLink)}` });
+    issues.push({
+      desc: `Temp Sensor not found: ${linkStr(setpoint, sensorLink)}`,
+      autofix: () => createBlockDialogPromise(setpoint),
+    });
   }
 
   if (coolPid) {
