@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
 import { bloxQty } from '@/helpers/bloxfield';
-import { createBlockDialog, createDialog, createDialogPromise } from '@/helpers/dialog';
+import { createBlockDialog, createDialog } from '@/helpers/dialog';
 import { spliceById, typeMatchFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { profileValues } from '@/plugins/spark/helpers';
@@ -14,14 +14,12 @@ import { PidConfig } from '../types';
 import { applyMode, findControlProblems, TempControlProblem } from './helpers';
 import PidConfigView from './PidConfigView.vue';
 import TempControlModeDialog from './TempControlModeDialog.vue';
-import TempControlSyncDialog from './TempControlSyncDialog.vue';
 import { TempControlConfig, TempControlMode } from './types';
 
 @Component({
   components: {
     PidConfigView,
     TempControlModeDialog,
-    TempControlSyncDialog,
   },
 })
 export default class TempControlBasic extends CrudComponent<TempControlConfig> {
@@ -233,14 +231,6 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
           await this.saveConfig();
         }
       });
-  }
-
-  syncPid(): Promise<void> {
-    return createDialogPromise({
-      component: TempControlSyncDialog,
-      config: this.config,
-      saveConfig: this.saveConfig,
-    });
   }
 
   selectControlMode(): void {
