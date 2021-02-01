@@ -137,12 +137,12 @@ export default class TempControlFull extends CrudComponent<TempControlConfig> {
         <PidConfigView
           v-if="mode.coolConfig"
           :value="mode.coolConfig"
-          class="column"
+          class="column on-left"
         />
         <PidConfigView
           v-if="mode.heatConfig"
           :value="mode.heatConfig"
-          class="column on-right"
+          class="column"
         />
       </div>
     </LabeledField>
