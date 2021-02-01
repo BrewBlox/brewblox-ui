@@ -1,4 +1,4 @@
-import { Annotations, Layout } from 'plotly.js';
+import { Annotations, Layout, PlotData } from 'plotly.js';
 
 import { StoreObject } from '@/shared-types';
 
@@ -81,7 +81,7 @@ export interface QueryResult {
   initial?: boolean;
 }
 
-export interface GraphFieldResult {
+export interface GraphFieldResult extends PlotData {
   type: 'scatter';
   mode: 'lines';
   name: string;
