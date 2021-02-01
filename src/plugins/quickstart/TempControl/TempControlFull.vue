@@ -8,11 +8,13 @@ import { spliceById, typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, Link, PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
 
+import PidConfigView from './PidConfigView.vue';
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import { TempControlConfig, TempControlMode } from './types';
 
 @Component({
   components: {
+    PidConfigView,
     TempControlModeDialog,
   },
 })
@@ -129,23 +131,19 @@ export default class TempControlFull extends CrudComponent<TempControlConfig> {
       @click="showMode(mode)"
     >
       <div class="text-italic fade-4">
-        {{ mode.setpoint | link }} {{ setpointValue(mode.setpoint) | quantity }}
+        {{ mode.setpoint | link }}
       </div>
-      <div
-        v-if="mode.heatConfig"
-        class="text-red q-gutter-x-sm col-grow row justify-between"
-      >
-        <span>Kp={{ mode.heatConfig.kp | quantity }}</span>
-        <span>Td={{ mode.heatConfig.td | duration }}</span>
-        <span>Ti={{ mode.heatConfig.ti | duration }}</span>
-      </div>
-      <div
-        v-if="mode.coolConfig"
-        class="text-blue q-gutter-x-sm col-grow row justify-between"
-      >
-        <span>Kp={{ mode.coolConfig.kp | quantity }}</span>
-        <span>Td={{ mode.coolConfig.td | duration }}</span>
-        <span>Ti={{ mode.coolConfig.ti | duration }}</span>
+      <div class="row q-mt-xs">
+        <PidConfigView
+          v-if="mode.coolConfig"
+          :value="mode.coolConfig"
+          class="column"
+        />
+        <PidConfigView
+          v-if="mode.heatConfig"
+          :value="mode.heatConfig"
+          class="column on-right"
+        />
       </div>
     </LabeledField>
   </div>

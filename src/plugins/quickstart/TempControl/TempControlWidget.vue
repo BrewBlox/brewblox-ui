@@ -66,7 +66,7 @@ export default class TempControlWidget extends WidgetBase<TempControlConfig> {
       />
     </template>
 
-    <component :is="mode" :crud="crud">
+    <component :is="mode" :crud="crud" @full="mode = 'Full'">
       <template #warnings>
         <CardWarning v-if="false">
           <template #message>

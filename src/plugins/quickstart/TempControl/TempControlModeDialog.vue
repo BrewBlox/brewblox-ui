@@ -32,6 +32,9 @@ export default class TempControlModeDialog extends DialogBase {
   @Prop({ type: String, default: 'Edit control mode' })
   public readonly title!: string;
 
+  @Prop({ type: Boolean, default: false })
+  public readonly showConfirm!: boolean;
+
   created(): void {
     this.tempMode = deepCopy(this.value);
   }
@@ -211,7 +214,7 @@ export default class TempControlModeDialog extends DialogBase {
         />
       </q-card-section>
 
-      <template #actions>
+      <template v-if="showConfirm" #actions>
         <q-btn
           unelevated
           label="Cancel"
