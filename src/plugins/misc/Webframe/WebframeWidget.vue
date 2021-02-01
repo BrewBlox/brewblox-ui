@@ -79,3 +79,9 @@ export default class WebframeWidget extends WidgetBase<WebframeConfig> {
     </div>
   </CardWrapper>
 </template>
+
+
+<style lang="sass" scoped>
+.card__Dashboard.card__dense
+  height: 100vh !important
+</style>
