@@ -21,9 +21,9 @@ import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from '../helpers';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
-import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from './helpers';
 import { FermentConfig, FermentOpts } from './types';
 
 export const defineChangedBlocks = (config: FermentConfig): Block[] => {

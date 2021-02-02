@@ -5,7 +5,12 @@ import { ref } from '@/helpers/component-ref';
 import { BlockType } from '@/shared-types';
 import { WidgetFeature } from '@/store/features';
 
-import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from '../Ferment/helpers';
+import {
+  makeBeerCoolConfig,
+  makeBeerHeatConfig,
+  makeFridgeCoolConfig,
+  makeFridgeHeatConfig,
+} from '../helpers';
 import widget from './TempControlWidget.vue';
 import { TempControlConfig } from './types';
 

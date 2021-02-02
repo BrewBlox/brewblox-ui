@@ -4,7 +4,6 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
@@ -21,7 +20,15 @@ import { Block } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
-import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import {
+  makeFridgeCoolConfig,
+  makeFridgeHeatConfig,
+  pidDefaults,
+  unlinkedActuators,
+  withoutPrefix,
+  withPrefix,
+} from '../helpers';
+import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock } from '../types';
 import { FridgeConfig, FridgeOpts } from './types';
 
@@ -194,9 +201,7 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: bloxQty(-20, '1/degC'),
-          ti: bloxQty('2h'),
-          td: bloxQty('10m'),
+          ...makeFridgeCoolConfig(),
           enabled: true,
           inputId: bloxLink(names.fridgeSetpoint),
           outputId: bloxLink(names.coolPwm),
@@ -209,9 +214,7 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: bloxQty(20, '1/degC'),
-          ti: bloxQty('2h'),
-          td: bloxQty('10m'),
+          ...makeFridgeHeatConfig(),
           enabled: true,
           inputId: bloxLink(names.fridgeSetpoint),
           outputId: bloxLink(names.heatPwm),
@@ -301,82 +304,32 @@ export const defineWidgets = (
     },
   });
 
-  const createQuickActions = (): Widget<QuickActionsConfig> => ({
-    ...createWidget(withPrefix(prefix, 'Actions'), 'QuickActions'),
-    cols: 4,
-    rows: 4,
-    pinnedPosition: { x: 1, y: 6 },
-    config: {
-      changeIdMigrated: true,
-      serviceIdMigrated: true,
-      serviceId,
-      actions: [
-        {
-          name: 'Enable control',
-          id: uid(),
-          changes: [
+  const createTempControl = (): TempControlWidget => {
+    const modeId = uid();
 
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.fridgeSetpoint,
-              data: { settingEnabled: true },
-            },
-          ] as [
-              BlockChange<SetpointSensorPairBlock>,
-            ],
-        },
-        {
-          name: 'Disable control',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.tempProfile,
-              data: { enabled: false },
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.fridgeSetpoint,
-              data: { settingEnabled: false },
-            },
-          ] as [
-              BlockChange<SetpointProfileBlock>,
-              BlockChange<SetpointSensorPairBlock>,
-            ],
-        },
-        {
-          name: 'Enable temperature profile',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              blockId: names.tempProfile,
-              data: { enabled: true, start: 0 },
-              confirmed: { start: true },
-            },
-          ] as [
-              BlockChange<SetpointProfileBlock>,
-            ],
-        },
-        {
-          name: 'Disable temperature profile',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              blockId: names.tempProfile,
-              data: { enabled: false },
-            },
-          ] as [
-              BlockChange<SetpointProfileBlock>,
-            ],
-        },
-      ],
-    },
-  });
+    return {
+      ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
+      cols: 4,
+      rows: 4,
+      pinnedPosition: { x: 1, y: 6 },
+      config: {
+        serviceId,
+        coolPid: bloxLink(names.coolPid, BlockType.Pid),
+        heatPid: bloxLink(names.heatPid, BlockType.Pid),
+        profile: bloxLink(names.tempProfile, BlockType.SetpointProfile),
+        activeMode: modeId,
+        modes: [
+          {
+            id: modeId,
+            title: 'Fridge',
+            setpoint: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
+            coolConfig: makeFridgeCoolConfig(),
+            heatConfig: makeFridgeHeatConfig(),
+          },
+        ],
+      },
+    };
+  };
 
   const createProfile = (name: string): Widget => ({
     ...createWidget(name, BlockType.SetpointProfile),
@@ -385,7 +338,12 @@ export const defineWidgets = (
     pinnedPosition: { x: 5, y: 6 },
   });
 
-  return [createBuilder(), createGraph(), createQuickActions(), createProfile(names.tempProfile)];
+  return [
+    createBuilder(),
+    createGraph(),
+    createTempControl(),
+    createProfile(names.tempProfile),
+  ];
 };
 
 export const defineDisplayedBlocks = (config: FridgeConfig): DisplayBlock[] => {

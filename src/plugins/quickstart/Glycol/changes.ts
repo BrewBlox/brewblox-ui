@@ -4,7 +4,6 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
@@ -22,9 +21,27 @@ import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
-import { DisplayBlock } from '../types';
+import { TempControlWidget } from '../TempControl/types';
+import { DisplayBlock, PidConfig } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 
+const makeGlycolBeerCoolConfig = (): PidConfig => ({
+  kp: bloxQty(-20, '1/degC'),
+  ti: bloxQty('2h'),
+  td: bloxQty('10m'),
+});
+
+const makeGlycolBeerHeatConfig = (): PidConfig => ({
+  kp: bloxQty(100, '1/degC'),
+  ti: bloxQty('2h'),
+  td: bloxQty('10m'),
+});
+
+const makeGlycolConfig = (): PidConfig => ({
+  kp: bloxQty(-20, '1/degC'),
+  ti: bloxQty('2h'),
+  td: bloxQty('5m'),
+});
 
 export function defineChangedBlocks(config: GlycolConfig): Block[] {
   const pins = config.heated ? [config.heatPin!, config.coolPin] : [config.coolPin];
@@ -197,9 +214,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: bloxQty(-20, '1/degC'),
-          ti: bloxQty('2h'),
-          td: bloxQty('10m'),
+          ...makeGlycolBeerCoolConfig(),
           enabled: true,
           inputId: bloxLink(names.beerSetpoint),
           outputId: bloxLink(names.coolPwm),
@@ -212,9 +227,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          kp: bloxQty(100, '1/degC'),
-          ti: bloxQty('2h'),
-          td: bloxQty('10m'),
+          ...makeGlycolBeerHeatConfig(),
           enabled: true,
           inputId: bloxLink(names.beerSetpoint),
           outputId: bloxLink(names.heatPwm),
@@ -291,9 +304,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           groups,
           data: {
             ...pidDefaults(config.serviceId),
-            kp: bloxQty(-20, '1/degC'),
-            ti: bloxQty('2h'),
-            td: bloxQty('5m'),
+            ...makeGlycolConfig(),
             enabled: true,
             inputId: bloxLink(names.glycolSetpoint),
             outputId: bloxLink(names.glycolPwm),
@@ -310,7 +321,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
 }
 
 export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): Widget[] {
-  const { serviceId, dashboardId, names, prefix } = config;
+  const { serviceId, dashboardId, names, prefix, glycolControl } = config;
   const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
 
   const createWidget = (name: string, type: string): Widget => ({
@@ -386,93 +397,49 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     });
   }
 
-  const QuickActions: Widget<QuickActionsConfig> = {
-    ...createWidget(withPrefix(prefix, 'Actions'), 'QuickActions'),
+  const beerModeId = uid();
+  const beerTempControl: TempControlWidget = {
+    ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
     cols: 4,
     rows: 4,
     pinnedPosition: { x: 1, y: 6 },
     config: {
       serviceId,
-      changeIdMigrated: true,
-      serviceIdMigrated: true,
-      actions: [
+      coolPid: bloxLink(names.coolPid, BlockType.Pid),
+      heatPid: bloxLink(config.heated ? names.heatPid : null, BlockType.Pid),
+      profile: bloxLink(names.beerProfile, BlockType.SetpointProfile),
+      activeMode: beerModeId,
+      modes: [
         {
-          name: 'Beer temperature control OFF',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerSetpoint,
-              data: { settingEnabled: false },
-              confirmed: {},
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerProfile,
-              data: { enabled: false },
-              confirmed: {},
-            },
-          ] as [
-              BlockChange<SetpointSensorPairBlock>,
-              BlockChange<SetpointProfileBlock>,
-            ],
+          id: beerModeId,
+          title: 'Beer',
+          setpoint: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
+          coolConfig: makeGlycolBeerCoolConfig(),
+          heatConfig: config.heated ? makeGlycolBeerHeatConfig() : null,
         },
+      ],
+    },
+  };
+
+  const glycolModeId = uid();
+  const glycolTempControl: TempControlWidget = {
+    ...createWidget(withPrefix(prefix, 'Glycol'), 'TempControl'),
+    cols: 4,
+    rows: 4,
+    pinnedPosition: { x: 1, y: 10 },
+    config: {
+      serviceId,
+      coolPid: bloxLink(names.glycolPid, BlockType.Pid),
+      heatPid: bloxLink(null, BlockType.Pid),
+      profile: bloxLink(null, BlockType.SetpointProfile),
+      activeMode: glycolModeId,
+      modes: [
         {
-          name: 'Beer temperature control ON',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerSetpoint,
-              data: {
-                settingEnabled: true,
-              },
-              confirmed: {},
-            },
-          ] as [
-              BlockChange<SetpointSensorPairBlock>,
-            ],
-        },
-        {
-          name: 'Enable temperature profile',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerSetpoint,
-              data: { settingEnabled: true },
-              confirmed: {},
-            },
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerProfile,
-              data: { enabled: true, start: 0 },
-              confirmed: { start: true },
-            },
-          ] as [
-              BlockChange<SetpointSensorPairBlock>,
-              BlockChange<SetpointProfileBlock>,
-            ],
-        },
-        {
-          name: 'Disable temperature profile',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.beerProfile,
-              data: { enabled: false },
-              confirmed: {},
-            },
-          ] as [
-              BlockChange<SetpointProfileBlock>,
-            ],
+          id: glycolModeId,
+          title: 'Glycol',
+          setpoint: bloxLink(names.glycolSetpoint, BlockType.SetpointSensorPair),
+          coolConfig: makeGlycolConfig(),
+          heatConfig: null,
         },
       ],
     },
@@ -485,12 +452,18 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     pinnedPosition: { x: 5, y: 6 },
   };
 
-  return [
+  const output: Widget[] = [
     builder,
     graph,
-    QuickActions,
+    beerTempControl,
     profile,
   ];
+
+  if (glycolControl === 'Control') {
+    output.push(glycolTempControl);
+  }
+
+  return output;
 }
 
 export const defineDisplayedBlocks = (config: GlycolConfig): DisplayBlock[] => {

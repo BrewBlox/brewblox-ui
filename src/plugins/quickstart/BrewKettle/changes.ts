@@ -3,7 +3,6 @@ import { uid } from 'quasar';
 import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
@@ -19,6 +18,7 @@ import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
+import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock } from '../types';
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 
@@ -109,7 +109,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig, opts: BrewKettleOp
 }
 
 
-export function defineWidgets(config: BrewKettleConfig, layouts: BuilderLayout[]): Widget[] {
+export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, layouts: BuilderLayout[]): Widget[] {
   const { serviceId, names, dashboardId, prefix } = config;
   const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
   const genericSettings = {
@@ -174,55 +174,42 @@ export function defineWidgets(config: BrewKettleConfig, layouts: BuilderLayout[]
     },
   });
 
-  const createQuickActions = (): Widget<QuickActionsConfig> => ({
-    ...createWidget(withPrefix(prefix, 'Actions'), 'QuickActions'),
-    cols: 4,
-    rows: 5,
-    pinnedPosition: { x: 8, y: 6 },
-    config: {
-      serviceId,
-      changeIdMigrated: true,
-      serviceIdMigrated: true,
-      actions: [
-        {
-          name: 'Disable Setpoint',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              blockId: names.kettleSetpoint,
-              data: { settingEnabled: false },
-              confirmed: {},
-            },
-          ] as [
-              BlockChange<SetpointSensorPairBlock>,
-            ],
-        },
-        {
-          name: 'Constant Kettle Temp',
-          id: uid(),
-          changes: [
-            {
-              id: uid(),
-              serviceId,
-              blockId: names.kettleSetpoint,
-              data: {
-                settingEnabled: true,
-                storedSetting: bloxQty(100, 'degC').to(userTemp),
-              },
-              confirmed: {
-                storedSetting: true,
-              },
-            },
-          ] as [
-              BlockChange<SetpointSensorPairBlock>,
-            ],
-        },
-      ],
-    },
-  });
+  const createTempControl = (): TempControlWidget => {
+    const modeId = uid();
 
-  return [createBuilder(), createGraph(), createQuickActions()];
+    return {
+      ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
+      cols: 4,
+      rows: 5,
+      pinnedPosition: { x: 8, y: 6 },
+      config: {
+        serviceId,
+        coolPid: bloxLink(null, BlockType.Pid),
+        heatPid: bloxLink(names.kettlePid, BlockType.Pid),
+        profile: bloxLink(null, BlockType.SetpointProfile),
+        activeMode: modeId,
+        modes: [
+          {
+            id: modeId,
+            title: 'Kettle',
+            setpoint: bloxLink(names.kettleSetpoint, BlockType.SetpointSensorPair),
+            coolConfig: null,
+            heatConfig: {
+              kp: opts.kp,
+              ti: bloxQty('10m'),
+              td: bloxQty('10s'),
+            },
+          },
+        ],
+      },
+    };
+  };
+
+  return [
+    createBuilder(),
+    createGraph(),
+    createTempControl(),
+  ];
 }
 
 export const defineDisplayedBlocks = (config: BrewKettleConfig): DisplayBlock[] => {
