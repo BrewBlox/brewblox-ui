@@ -341,13 +341,17 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
       </q-item-section>
     </q-item>
 
-    <q-item tag="label">
+    <q-item
+      tag="label"
+      :disable="!profile"
+    >
       <q-item-section>
         <q-item-label>Setpoint driven by Profile</q-item-label>
       </q-item-section>
       <q-item-section avatar>
         <q-toggle
           v-model="profileEnabled"
+          :disable="!profile"
         />
       </q-item-section>
     </q-item>

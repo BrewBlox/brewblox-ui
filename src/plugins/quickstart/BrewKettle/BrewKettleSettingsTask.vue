@@ -40,7 +40,7 @@ export default class BrewKettleSettingsTask extends QuickStartTaskBase<BrewKettl
     const createdBlocks = defineCreatedBlocks(this.config, opts);
     const changedBlocks = defineChangedBlocks(this.config);
     const layouts = defineLayouts(this.config);
-    const widgets = defineWidgets(this.config, layouts);
+    const widgets = defineWidgets(this.config, opts, layouts);
     const displayedBlocks = defineDisplayedBlocks(this.config);
 
     this.pushActions(createOutputActions());

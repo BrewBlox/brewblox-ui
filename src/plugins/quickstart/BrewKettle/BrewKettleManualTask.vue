@@ -39,9 +39,9 @@ export default class BrewKettleManualTask extends QuickStartTaskBase<BrewKettleC
           <p>
             On your new dashboard, you will find:
             <ul>
+              <li>An assistant widget to enable or disable temperature control.</li>
               <li>A graphical representation of your setup. Parts are clickable for quick access to settings.</li>
               <li>A graph with the most important metrics.</li>
-              <li>Actions that reconfigure your blocks for different behavior.</li>
             </ul>
           </p>
         </q-item-section>
