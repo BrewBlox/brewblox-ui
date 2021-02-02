@@ -8,13 +8,13 @@ import { spliceById, typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, Link, PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
 
-import PidConfigView from './PidConfigView.vue';
 import TempControlModeDialog from './TempControlModeDialog.vue';
+import TempControlPidView from './TempControlPidView.vue';
 import { TempControlConfig, TempControlMode } from './types';
 
 @Component({
   components: {
-    PidConfigView,
+    TempControlPidView,
     TempControlModeDialog,
   },
 })
@@ -126,20 +126,19 @@ export default class TempControlFull extends CrudComponent<TempControlConfig> {
     <LabeledField
       v-for="mode in config.modes"
       :key="'config-'+mode.id"
-      :label="mode.title"
       class="clickable"
       @click="showMode(mode)"
     >
-      <div class="text-italic fade-4">
-        {{ mode.setpoint | link }}
-      </div>
+      <template #label>
+        <b>{{ mode.title }} mode</b>
+      </template>
       <div class="row q-mt-xs">
-        <PidConfigView
+        <TempControlPidView
           v-if="mode.coolConfig"
           :value="mode.coolConfig"
-          class="column on-left"
+          class="column q-mr-lg"
         />
-        <PidConfigView
+        <TempControlPidView
           v-if="mode.heatConfig"
           :value="mode.heatConfig"
           class="column"

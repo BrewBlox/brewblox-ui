@@ -4,7 +4,6 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
@@ -340,7 +339,7 @@ export const defineWidgets = (
       : fridgeModeId;
 
     return {
-      ...createWidget(withPrefix(prefix, 'Control'), 'TempControl'),
+      ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
       cols: 4,
       rows: 4,
       pinnedPosition: { x: 1, y: 6 },
@@ -353,14 +352,14 @@ export const defineWidgets = (
         modes: [
           {
             id: beerModeId,
-            title: 'beer',
+            title: 'Beer',
             setpoint: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
             coolConfig: makeBeerCoolConfig(),
             heatConfig: makeBeerHeatConfig(),
           },
           {
             id: fridgeModeId,
-            title: 'fridge',
+            title: 'Fridge',
             setpoint: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
             coolConfig: makeFridgeCoolConfig(),
             heatConfig: makeFridgeHeatConfig(),
