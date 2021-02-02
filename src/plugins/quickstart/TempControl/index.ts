@@ -11,7 +11,7 @@ import { TempControlConfig } from './types';
 
 const feature: WidgetFeature<TempControlConfig> = {
   id: 'TempControl',
-  title: 'Temperature Control',
+  title: 'Temp Control Assistant',
   component: ref(widget),
   wizard: true,
   widgetSize: {

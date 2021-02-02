@@ -257,7 +257,7 @@ export default class TempControlModeDialog extends DialogBase {
         </p>
         <p>
           PID settings can still be tuned by changing the block settings.
-          The Temperature Control widget detects changes,
+          This widget detects changes,
           and will offer to either update or re-apply the mode settings.
         </p>
         <p>

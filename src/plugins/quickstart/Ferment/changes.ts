@@ -339,7 +339,7 @@ export const defineWidgets = (
       : fridgeModeId;
 
     return {
-      ...createWidget(withPrefix(prefix, 'Control'), 'TempControl'),
+      ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
       cols: 4,
       rows: 4,
       pinnedPosition: { x: 1, y: 6 },
