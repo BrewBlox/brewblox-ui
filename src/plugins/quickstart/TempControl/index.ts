@@ -2,6 +2,7 @@ import { uid } from 'quasar';
 
 import { bloxLink } from '@/helpers/bloxfield';
 import { ref } from '@/helpers/component-ref';
+import { BlockType } from '@/shared-types';
 import { WidgetFeature } from '@/store/features';
 
 import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from '../Ferment/helpers';
@@ -19,22 +20,22 @@ const feature: WidgetFeature<TempControlConfig> = {
   },
   generateConfig: () => ({
     serviceId: null,
-    coolPid: bloxLink(null),
-    heatPid: bloxLink(null),
-    profile: bloxLink(null),
+    coolPid: bloxLink(null, BlockType.Pid),
+    heatPid: bloxLink(null, BlockType.Pid),
+    profile: bloxLink(null, BlockType.SetpointProfile),
     activeMode: null,
     modes: [
       {
         id: uid(),
-        title: 'beer',
-        setpoint: bloxLink(null),
+        title: 'Beer',
+        setpoint: bloxLink(null, BlockType.SetpointSensorPair),
         coolConfig: makeBeerCoolConfig(),
         heatConfig: makeBeerHeatConfig(),
       },
       {
         id: uid(),
-        title: 'fridge',
-        setpoint: bloxLink(null),
+        title: 'Fridge',
+        setpoint: bloxLink(null, BlockType.SetpointSensorPair),
         coolConfig: makeFridgeCoolConfig(),
         heatConfig: makeFridgeHeatConfig(),
       },

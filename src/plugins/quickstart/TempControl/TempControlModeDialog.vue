@@ -119,8 +119,8 @@ export default class TempControlModeDialog extends DialogBase {
           :service-id="serviceId"
           :block-filter="setpointFilter"
           :label-color="!setpoint ? 'negative' : ''"
-          title="Setpoint"
-          label="Setpoint"
+          title="PID input Setpoint"
+          label="PID input Setpoint"
           class="col-grow"
           @input="v => { tempMode.setpoint = v; save(); }"
         />

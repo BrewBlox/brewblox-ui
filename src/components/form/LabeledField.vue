@@ -45,13 +45,19 @@ export default class LabeledField extends FieldBase {
 
 <template>
   <q-field
-    :label="label"
     :class="[$attrs.class, 'rounded-borders q-px-sm', !readonly && 'depth-1 pointer']"
     v-bind="$attrs"
     borderless
+    label-slot
     stack-label
     @click.native="$emit('click')"
   >
+    <template #label>
+      <slot name="label">
+        {{ label }}
+      </slot>
+    </template>
+
     <template #control>
       <slot name="control">
         <component

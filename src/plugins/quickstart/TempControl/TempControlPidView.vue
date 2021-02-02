@@ -6,7 +6,7 @@ import { PidConfig } from '../types';
 
 
 @Component
-export default class PidConfigView extends Vue {
+export default class TempControlPidView extends Vue {
 
   @Prop({ type: Object, required: true })
   public readonly value!: PidConfig;

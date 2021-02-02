@@ -12,14 +12,16 @@ import { BlockType, PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPair
 
 import { PidConfig } from '../types';
 import { applyMode, findControlProblems, TempControlProblem } from './helpers';
-import PidConfigView from './PidConfigView.vue';
 import TempControlModeDialog from './TempControlModeDialog.vue';
+import TempControlPidView from './TempControlPidView.vue';
+import TempControlSyncView from './TempControlSyncView.vue';
 import { TempControlConfig, TempControlMode } from './types';
 
 @Component({
   components: {
-    PidConfigView,
     TempControlModeDialog,
+    TempControlPidView,
+    TempControlSyncView,
   },
 })
 export default class TempControlBasic extends CrudComponent<TempControlConfig> {
@@ -241,7 +243,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
       value: this.config.activeMode ?? '',
       listSelect: true,
       selectOptions: [
-        { value: '', label: 'None' },
+        { value: '', label: 'Manual' },
         ...this.config.modes.map(v => ({ value: v.id, label: v.title })),
       ],
     })
@@ -323,14 +325,14 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
           {{ tempMode.title }}
         </big>
         <big v-else>
-          None
+          Manual
         </big>
       </q-item-section>
     </q-item>
 
     <q-item tag="label">
       <q-item-section>
-        <q-item-label>Enable control</q-item-label>
+        <q-item-label>Setpoint enabled</q-item-label>
       </q-item-section>
       <q-item-section avatar>
         <q-toggle
@@ -341,7 +343,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
 
     <q-item tag="label">
       <q-item-section>
-        <q-item-label>Enable profile</q-item-label>
+        <q-item-label>Setpoint driven by Profile</q-item-label>
       </q-item-section>
       <q-item-section avatar>
         <q-toggle
@@ -352,7 +354,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
 
     <q-item tag="label" class="col-grow" @click="troubleshoot">
       <q-item-section>
-        <q-item-label>Troubleshooting</q-item-label>
+        <q-item-label>Check for problems</q-item-label>
       </q-item-section>
       <q-item-section v-if="detected" class="fade-4 col-auto">
         Last checked: {{ detected | shortDateString }}
@@ -362,7 +364,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
       </q-item-section>
     </q-item>
 
-    <div v-if="detected" class="column q-gutter-y-sm">
+    <div v-if="detected" class="column q-gutter-y-sm q-px-sm">
       <LabeledField
         v-for="(problem, idx) in problems"
         :key="`problem-${detected}-${idx}`"
@@ -372,75 +374,38 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
           'row items-center',
           !problem.autofix && 'cursor-not-allowed dashed'
         ]"
+        tag-class="row"
         @click="autofix(problem)"
       >
+        <template #before>
+          <q-icon name="warning" color="warning" size="lg" />
+        </template>
         <div
-          class="text-negative"
           v-html="problem.desc"
         />
       </LabeledField>
     </div>
 
-    <div
+    <TempControlSyncView
       v-if="coolConfigMismatch"
-      class="dashed row q-ma-md q-gutter-sm q-pr-sm q-pb-sm"
+      :block-config="coolPid.data"
+      :mode-config="tempMode.coolConfig"
+      @apply="v => applySync('cool', v)"
     >
-      <p class="q-px-sm col-12">
-        <i>{{ coolPid.id }}</i> and <b>{{ tempMode.title }} mode</b> have different PID settings.
-      </p>
-      <LabeledField
-        label="Click to use PID settings"
-        :readonly="false"
-        class="col-grow"
-        @click="applySync('cool', 'pid')"
-      >
-        <PidConfigView
-          :value="coolPid.data"
-          class="column"
-        />
-      </LabeledField>
-      <LabeledField
-        label="Click to use mode settings"
-        :readonly="false"
-        class="col-grow"
-        @click="applySync('cool', 'mode')"
-      >
-        <PidConfigView
-          :value="tempMode.coolConfig"
-          class="column"
-        />
-      </LabeledField>
-    </div>
+      <template #message>
+        Settings in cool PID do not match settings stored in {{ modeTitle }} mode.
+      </template>
+    </TempControlSyncView>
 
-    <div
+    <TempControlSyncView
       v-if="heatConfigMismatch"
-      class="dashed row q-ma-md q-gutter-sm q-pr-sm q-pb-sm"
+      :block-config="heatPid.data"
+      :mode-config="tempMode.heatConfig"
+      @apply="v => applySync('heat', v)"
     >
-      <p class="q-px-sm col-12">
-        <i>{{ heatPid.id }}</i> and <b>{{ tempMode.title }}</b> mode have different PID settings.
-      </p>
-      <LabeledField
-        label="Click to use PID settings"
-        :readonly="false"
-        class="col-grow"
-        @click="applySync('heat', 'pid')"
-      >
-        <PidConfigView
-          :value="heatPid.data"
-          class="column"
-        />
-      </LabeledField>
-      <LabeledField
-        label="Click to use mode settings"
-        :readonly="false"
-        class="col-grow"
-        @click="applySync('heat', 'mode')"
-      >
-        <PidConfigView
-          :value="tempMode.heatConfig"
-          class="column"
-        />
-      </LabeledField>
-    </div>
+      <template #message>
+        Settings in heat PID do not match settings stored in {{ modeTitle }} mode.
+      </template>
+    </TempControlSyncView>
   </div>
 </template>
