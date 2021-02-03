@@ -234,7 +234,7 @@ export default class BreweryPage extends Vue {
           />
           <g
             :transform="`translate(${squares(pending.x)}, ${squares(pending.y)})`"
-            :class="{ pointer: isClickable(pending), [pending.type]: true }"
+            class="pointer"
             @click.stop="interact(pending)"
           >
             <PartWrapper

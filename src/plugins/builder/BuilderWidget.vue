@@ -263,7 +263,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           />
           <g
             :transform="`translate(${squares(pending.x)}, ${squares(pending.y)})`"
-            :class="{ pointer: isClickable(pending), [pending.type]: true }"
+            class="pointer"
             @click.stop="interact(pending)"
           >
             <PartWrapper
