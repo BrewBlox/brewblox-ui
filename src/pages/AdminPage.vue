@@ -95,10 +95,11 @@ export default class AdminPage extends Vue {
       component: 'SelectDialog',
       listSelect: true,
       selectOptions,
-      title: 'Hold to interact with builder parts?',
+      title: 'Click twice to interact?',
       message: `
       Actuators and valves can be activated by clicking on them in the builder.
-      For touch screens, a delay can be configured to prevent accidental activation.
+      To prevent accidental activation, you can require two clicks:
+      the first to select, and the second to confirm.
       `,
       value: systemStore.config.builderTouchDelayed,
     })
