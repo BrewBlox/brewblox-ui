@@ -7,19 +7,25 @@ import Fridge from './Fridge';
 import Glycol from './Glycol';
 import Herms from './Herms';
 import Rims from './Rims';
+import TempControl from './TempControl';
 
 export default {
   install() {
-    autoRegister(require.context('./components', true));
-
-    [
+    const wizards = [
       Ferment,
       Glycol,
       Herms,
       Rims,
       BrewKettle,
       Fridge,
-    ]
-      .forEach(featureStore.registerQuickStart);
+    ];
+
+    const widgets = [
+      TempControl,
+    ];
+
+    autoRegister(require.context('./components', true));
+    wizards.forEach(featureStore.registerQuickStart);
+    widgets.forEach(featureStore.registerWidget);
   },
 };

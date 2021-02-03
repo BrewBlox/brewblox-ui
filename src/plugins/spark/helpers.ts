@@ -27,7 +27,7 @@ import { saveFile } from '@/helpers/import-export';
 import notify from '@/helpers/notify';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { SparkPatchEvent, SparkStateEvent, SparkUpdateEvent } from '@/shared-types';
+import { Quantity, SetpointProfileBlock, SparkPatchEvent, SparkStateEvent, SparkUpdateEvent } from '@/shared-types';
 import { ComponentResult, Crud, featureStore, WidgetFeature } from '@/store/features';
 
 import { compatibleTypes } from './getters';
@@ -302,6 +302,39 @@ export const startResetBlocks = (serviceId: string): void => {
       download: selected.includes(1),
     }));
 };
+
+interface ProfileValues {
+  prev: Quantity;
+  current: Quantity;
+  next: Quantity;
+}
+
+export const profileValues =
+  (block: SetpointProfileBlock | null): ProfileValues | null => {
+    if (!block || !block.data.enabled || !block.data.drivenTargetId.id) {
+      return null;
+    }
+
+    const now = new Date().getTime() / 1000;
+    const start = block.data.start || 0;
+    const idx = block.data.points.findIndex(point => start + point.time > now);
+    if (idx < 1) {
+      return null;
+    }
+    const prev = block.data.points[idx - 1];
+    const next = block.data.points[idx];
+    const unit = prev.temperature.unit;
+    const prevVal = prev.temperature.value as number;
+    const nextVal = next.temperature.value as number;
+    const duration = (next.time - prev.time) || 1;
+    const currentVal = prevVal + (now - start + prev.time) * (nextVal - prevVal) / duration;
+
+    return {
+      prev: bloxQty(prevVal, unit),
+      current: bloxQty(currentVal, unit),
+      next: bloxQty(nextVal, unit),
+    };
+  };
 
 export const asBlockAddress =
   (block: Block): BlockAddress =>

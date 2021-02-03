@@ -11,8 +11,8 @@ export const isJSLink =
     isJSBloxField(obj)
     && obj.__bloxtype === 'Link';
 
-export const prettyLink = (v: Link): string =>
-  v?.id || '<not set>';
+export const prettyLink = (v: Link | null): string =>
+  v?.id || '[not set]';
 
 export function rawLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): Link;
 export function rawLink(other: Link): Link;
@@ -38,11 +38,11 @@ export class JSLink implements JSBloxField, Link {
   public type: BlockOrIntfType | null;
   public driven: boolean;
 
-  public constructor(id: string | null, type?: BlockOrIntfType | null, driven?: boolean);
+  public constructor(id?: string | null, type?: BlockOrIntfType | null, driven?: boolean);
   public constructor(other: Link);
-  public constructor(value: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean) {
+  public constructor(value?: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean) {
     const obj = rawLink(value as any, type as any, driven as any);
-    this.id = obj.id;
+    this.id = obj.id ?? null;
     this.type = obj.type as BlockOrIntfType;
     this.driven = obj.driven ?? false;
   }
@@ -78,8 +78,8 @@ export class JSLink implements JSBloxField, Link {
   }
 }
 
-export function bloxLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink;
-export function bloxLink(other: Link): JSLink;
-export function bloxLink(value: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink {
+export function bloxLink(id?: string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink;
+export function bloxLink(other?: Link): JSLink;
+export function bloxLink(value?: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink {
   return new JSLink(value as any, type, driven);
 }

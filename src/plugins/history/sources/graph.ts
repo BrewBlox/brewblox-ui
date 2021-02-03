@@ -65,6 +65,7 @@ const transformer =
           const key = `${result.name}/${col}`;
           const existing = source.values[key];
           source.values[key] = {
+            ...existing, // Plotly can set values
             type: 'scatter',
             mode: 'lines',
             name: valueName(source, key, last(colValues)),

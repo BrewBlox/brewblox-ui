@@ -114,7 +114,7 @@ export class SparkServiceModule extends VuexModule {
     return this.blocks.find(v => v.id === blockId) as T ?? null;
   }
 
-  public blockByAddress<T extends Block>(addr: BlockAddress | null): T | null {
+  public blockByAddress<T extends Block>(addr: T | BlockAddress | null): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
     return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
   }
@@ -147,6 +147,13 @@ export class SparkServiceModule extends VuexModule {
   @Action
   public async saveBlock(block: Block): Promise<void> {
     await api.persistBlock(block); // triggers patch event
+  }
+
+  public async modifyBlock<T extends Block>(block: T, func: ((v: T) => T)): Promise<void> {
+    const actual = this.blockByAddress<T>(block);
+    if (actual) {
+      return this.saveBlock(func(actual));
+    }
   }
 
   @Action

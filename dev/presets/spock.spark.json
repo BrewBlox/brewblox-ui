@@ -1,18 +1,6 @@
 {
   "blocks": [
     {
-      "id": "balancer-1",
-      "nid": 200,
-      "groups": [
-        0
-      ],
-      "type": "Balancer",
-      "data": {
-        "clients": []
-      }
-    },
-    {
-      "id": "ActiveGroups",
       "nid": 1,
       "groups": [
         7
@@ -23,240 +11,11 @@
           0,
           7
         ]
-      }
+      },
+      "id": "ActiveGroups",
+      "serviceId": "spock"
     },
     {
-      "id": "SystemInfo",
-      "nid": 2,
-      "groups": [
-        7
-      ],
-      "type": "SysInfo",
-      "data": {
-        "deviceId": "",
-        "version": "",
-        "platform": 0,
-        "protocolVersion": "",
-        "releaseDate": "",
-        "protocolDate": ""
-      }
-    },
-    {
-      "id": "OneWireBus",
-      "nid": 4,
-      "groups": [
-        7
-      ],
-      "type": "OneWireBus",
-      "data": {
-        "address": []
-      }
-    },
-    {
-      "id": "WiFiSettings",
-      "nid": 5,
-      "groups": [
-        7
-      ],
-      "type": "WiFiSettings",
-      "data": {
-        "ssid": "",
-        "password": "",
-        "security": 0,
-        "cipher": 0,
-        "signal": 0,
-        "ip": ""
-      }
-    },
-    {
-      "id": "TouchSettings",
-      "nid": 6,
-      "groups": [
-        7
-      ],
-      "type": "TouchSettings",
-      "data": {
-        "calibrated": 1,
-        "xBitsPerPixelX16": 64,
-        "yBitsPerPixelX16": 64,
-        "xOffset": 0,
-        "yOffset": 0
-      }
-    },
-    {
-      "id": "DisplaySettings",
-      "nid": 7,
-      "groups": [
-        7
-      ],
-      "type": "DisplaySettings",
-      "data": {
-        "widgets": [
-          {
-            "pos": 1,
-            "color": "0088aa",
-            "name": "pwm1",
-            "actuatorAnalog<ActuatorAnalogInterface>": "actuator-pwm-1"
-          },
-          {
-            "pos": 2,
-            "color": "00aa88",
-            "name": "pair1",
-            "setpointSensorPair<SetpointSensorPair>": "setpoint-sensor-pair-1"
-          },
-          {
-            "pos": 3,
-            "color": "aa0088",
-            "name": "sensor1",
-            "tempSensor<TempSensorInterface>": "sensor-1"
-          },
-          {
-            "pos": 4,
-            "color": "aa8800",
-            "name": "pid",
-            "pid<Pid>": "pid-1"
-          }
-        ],
-        "name": "test",
-        "tempUnit": 0,
-        "brightness": 0
-      }
-    },
-    {
-      "id": "SparkPins",
-      "nid": 19,
-      "groups": [
-        7
-      ],
-      "type": "Spark3Pins",
-      "data": {
-        "enableIoSupply5V": true,
-        "enableIoSupply12V": true,
-        "pins": [],
-        "soundAlarm": false,
-        "voltage5": 0,
-        "voltage12": 0
-      }
-    },
-    {
-      "id": "mutex-1",
-      "nid": 201,
-      "groups": [
-        0
-      ],
-      "type": "Mutex",
-      "data": {
-        "differentActuatorWait[second]": 0.01,
-        "waitRemaining[second]": 0
-      }
-    },
-    {
-      "id": "profile-1",
-      "nid": 202,
-      "groups": [
-        0
-      ],
-      "type": "SetpointProfile",
-      "data": {
-        "points": [
-          {
-            "time": 10,
-            "temperature[degC]": 0
-          },
-          {
-            "time": 20,
-            "temperature[degC]": 50
-          },
-          {
-            "time": 30000,
-            "temperature[degC]": 100
-          }
-        ],
-        "start": 1540376829,
-        "enabled": false,
-        "targetId<SetpointSensorPair>": null,
-        "drivenTargetId<SetpointSensorPair,driven>": null
-      }
-    },
-    {
-      "id": "sensor-inactive",
-      "nid": 203,
-      "groups": [],
-      "type": "TempSensorMock",
-      "data": {
-        "connected": false,
-        "fluctuations": [],
-        "setting[degC]": 0,
-        "value[degC]": null
-      }
-    },
-    {
-      "id": "sensor-1",
-      "nid": 204,
-      "groups": [
-        0
-      ],
-      "type": "TempSensorMock",
-      "data": {
-        "connected": true,
-        "fluctuations": [],
-        "setting[degC]": 0,
-        "value[degC]": 0
-      }
-    },
-    {
-      "id": "sensor-onewire-1",
-      "nid": 205,
-      "groups": [
-        0
-      ],
-      "type": "TempSensorOneWire",
-      "data": {
-        "address": "deadbeef00000000",
-        "value[degC]": 0,
-        "offset[delta_degC]": 9
-      }
-    },
-    {
-      "id": "setpoint-sensor-pair-1",
-      "nid": 206,
-      "groups": [
-        0
-      ],
-      "type": "SetpointSensorPair",
-      "data": {
-        "settingEnabled": true,
-        "filter": 1,
-        "resetFilter": false,
-        "sensorId<TempSensorInterface>": "sensor-1",
-        "filterThreshold[delta_degC]": 4,
-        "value[degC]": 0,
-        "valueUnfiltered[degC]": 0,
-        "setting[degC]": 0,
-        "storedSetting[degC]": 20
-      }
-    },
-    {
-      "id": "setpoint-sensor-pair-2",
-      "nid": 207,
-      "groups": [
-        0
-      ],
-      "type": "SetpointSensorPair",
-      "data": {
-        "settingEnabled": true,
-        "filter": 0,
-        "resetFilter": false,
-        "sensorId<TempSensorInterface>": null,
-        "filterThreshold[delta_degC]": 5,
-        "value[degC]": 0,
-        "valueUnfiltered[degC]": 0,
-        "setting[degC]": 0,
-        "storedSetting[degC]": 20
-      }
-    },
-    {
-      "id": "actuator-1",
       "nid": 208,
       "groups": [
         0
@@ -270,16 +29,27 @@
         "desiredSetting": 10,
         "setting": 0,
         "value": 0
-      }
+      },
+      "id": "actuator-1",
+      "serviceId": "spock"
     },
     {
-      "id": "actuator-pwm-1",
       "nid": 209,
       "groups": [
         0
       ],
       "type": "ActuatorPwm",
       "data": {
+        "actuatorId": {
+          "__bloxtype": "Link",
+          "type": "ActuatorDigitalInterface",
+          "id": "pin-actuator-1"
+        },
+        "period": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 4
+        },
         "constrainedBy": {
           "constraints": [
             {
@@ -288,9 +58,13 @@
             },
             {
               "balanced": {
-                "id": 1,
-                "granted": 0,
-                "balancerId<BalancerInterface>": "balancer-1"
+                "balancerId": {
+                  "__bloxtype": "Link",
+                  "type": "BalancerInterface",
+                  "id": "balancer-1"
+                },
+                "granted": 100,
+                "id": 1
               },
               "limiting": false
             }
@@ -298,65 +72,87 @@
         },
         "setting": 0,
         "value": 0,
+        "drivenActuatorId": {
+          "__bloxtype": "Link",
+          "type": "ActuatorDigitalInterface",
+          "driven": true,
+          "id": null
+        },
         "enabled": false,
-        "desiredSetting": 0,
-        "period[second]": 4,
-        "actuatorId<ActuatorDigitalInterface>": "pin-actuator-1",
-        "drivenActuatorId<ProcessValueInterface,driven>": null
-      }
+        "desiredSetting": 0
+      },
+      "id": "actuator-pwm-1",
+      "serviceId": "spock"
     },
     {
-      "id": "offset-1",
-      "nid": 211,
+      "nid": 200,
       "groups": [
         0
       ],
-      "type": "ActuatorOffset",
+      "type": "Balancer",
       "data": {
-        "referenceSettingOrValue": 0,
-        "setting": 0,
-        "value": 0,
-        "enabled": false,
-        "desiredSetting": 0,
-        "referenceId<ProcessValueInterface>": "setpoint-sensor-pair-1",
-        "targetId<ProcessValueInterface>": "setpoint-sensor-pair-1",
-        "drivenTargetId<ProcessValueInterface,driven>": null
-      }
+        "clients": []
+      },
+      "id": "balancer-1",
+      "serviceId": "spock"
     },
     {
-      "id": "pid-1",
-      "nid": 212,
+      "nid": 7,
       "groups": [
-        0
+        7
       ],
-      "type": "Pid",
+      "type": "DisplaySettings",
       "data": {
-        "enabled": true,
-        "outputValue": 0,
-        "outputSetting": 0,
-        "active": false,
-        "p": 0,
-        "i": 0,
-        "d": 0,
-        "integralReset": 0,
-        "boilMinOutput": 0,
-        "boilModeActive": false,
-        "drivenOutputId<ActuatorAnalogInterface,driven>": null,
-        "outputId<ActuatorAnalogInterface>": "actuator-pwm-1",
-        "kp[1 / degC]": 20,
-        "error[delta_degC]": 0,
-        "inputId<SetpointSensorPairInterface>": "setpoint-sensor-pair-1",
-        "integral[delta_degC * hour]": 0,
-        "inputSetting[degC]": 0,
-        "ti[second]": 3600,
-        "boilPointAdjust[delta_degC]": 0,
-        "td[second]": 60,
-        "derivative[delta_degC / hour]": 0,
-        "inputValue[degC]": 0
-      }
+        "widgets": [
+          {
+            "pos": 1,
+            "color": "0088aa",
+            "name": "pwm1",
+            "actuatorAnalog": {
+              "__bloxtype": "Link",
+              "type": "ActuatorAnalogInterface",
+              "id": "actuator-pwm-1"
+            }
+          },
+          {
+            "pos": 2,
+            "color": "00aa88",
+            "name": "pair1",
+            "setpointSensorPair": {
+              "__bloxtype": "Link",
+              "type": "SetpointSensorPairInterface",
+              "id": "setpoint-sensor-pair-1"
+            }
+          },
+          {
+            "pos": 3,
+            "color": "aa0088",
+            "name": "sensor1",
+            "tempSensor": {
+              "__bloxtype": "Link",
+              "type": "TempSensorInterface",
+              "id": "sensor-1"
+            }
+          },
+          {
+            "pos": 4,
+            "color": "aa8800",
+            "name": "pid",
+            "pid": {
+              "__bloxtype": "Link",
+              "type": "Pid",
+              "id": "pid-1"
+            }
+          }
+        ],
+        "name": "test",
+        "tempUnit": 0,
+        "brightness": 0
+      },
+      "id": "DisplaySettings",
+      "serviceId": "spock"
     },
     {
-      "id": "ds2413-hw-1",
       "nid": 213,
       "groups": [
         0
@@ -366,81 +162,11 @@
         "address": "4444444444444444",
         "connected": false,
         "pins": []
-      }
+      },
+      "id": "ds2413-hw-1",
+      "serviceId": "spock"
     },
     {
-      "id": "pin-actuator-1",
-      "nid": 215,
-      "groups": [
-        0
-      ],
-      "type": "DigitalActuator",
-      "data": {
-        "channel": 1,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "mutexed": {
-                "hasCustomHoldTime": false,
-                "hasLock": false,
-                "mutexId<MutexInterface>": "mutex-1",
-                "extraHoldTime[second]": 0
-              },
-              "remaining[second]": 0
-            }
-          ]
-        },
-        "state": 0,
-        "invert": false,
-        "desiredState": 0,
-        "hwDevice<IoArrayInterface,driven>": "SparkPins"
-      }
-    },
-    {
-      "id": "pin-actuator-2",
-      "nid": 216,
-      "groups": [
-        0
-      ],
-      "type": "DigitalActuator",
-      "data": {
-        "channel": 2,
-        "constrainedBy": {
-          "constraints": [
-            {
-              "mutexed": {
-                "hasCustomHoldTime": false,
-                "hasLock": false,
-                "mutexId<MutexInterface>": "mutex-1",
-                "extraHoldTime[second]": 0
-              },
-              "remaining[second]": 0
-            }
-          ]
-        },
-        "state": 0,
-        "invert": false,
-        "desiredState": 0,
-        "hwDevice<IoArrayInterface,driven>": "SparkPins"
-      }
-    },
-    {
-      "id": "pin-actuator-3",
-      "nid": 217,
-      "groups": [
-        0
-      ],
-      "type": "DigitalActuator",
-      "data": {
-        "channel": 0,
-        "state": 0,
-        "invert": false,
-        "desiredState": 0,
-        "hwDevice<IoArrayInterface,driven>": null
-      }
-    },
-    {
-      "id": "mock-sensor-1",
       "nid": 218,
       "groups": [
         0
@@ -448,13 +174,23 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "fluctuations": [],
-        "setting[degC]": 0,
-        "value[degC]": 0
-      }
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0
+        },
+        "fluctuations": []
+      },
+      "id": "mock-sensor-1",
+      "serviceId": "spock"
     },
     {
-      "id": "mock-sensor-2",
       "nid": 219,
       "groups": [
         0
@@ -462,13 +198,23 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "fluctuations": [],
-        "setting[degC]": 0,
-        "value[degC]": 0
-      }
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0
+        },
+        "fluctuations": []
+      },
+      "id": "mock-sensor-2",
+      "serviceId": "spock"
     },
     {
-      "id": "mock-sensor-3",
       "nid": 220,
       "groups": [
         0
@@ -476,52 +222,75 @@
       "type": "TempSensorMock",
       "data": {
         "connected": true,
-        "fluctuations": [],
-        "setting[degC]": 0,
-        "value[degC]": 0
-      }
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0
+        },
+        "fluctuations": []
+      },
+      "id": "mock-sensor-3",
+      "serviceId": "spock"
     },
     {
-      "id": "New|TempSensorOneWire-1",
-      "nid": 221,
+      "nid": 201,
       "groups": [
         0
       ],
-      "type": "TempSensorOneWire",
+      "type": "Mutex",
       "data": {
-        "address": "2811111111111111",
-        "value[degC]": 0,
-        "offset[delta_degC]": 0
-      }
+        "differentActuatorWait": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 0.01
+        },
+        "waitRemaining": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "readonly": true,
+          "value": 0
+        }
+      },
+      "id": "mutex-1",
+      "serviceId": "spock"
     },
     {
-      "id": "New|TempSensorOneWire-2",
-      "nid": 222,
+      "nid": 225,
       "groups": [
         0
       ],
-      "type": "TempSensorOneWire",
+      "type": "DS2408",
       "data": {
-        "address": "2822222222222222",
-        "value[degC]": 0,
-        "offset[delta_degC]": 0
-      }
+        "address": "2955555555555555",
+        "connected": false,
+        "pins": [],
+        "connectMode": 0
+      },
+      "id": "New|DS2408-1",
+      "serviceId": "spock"
     },
     {
-      "id": "New|TempSensorOneWire-3",
-      "nid": 223,
+      "nid": 230,
       "groups": [
         0
       ],
-      "type": "TempSensorOneWire",
+      "type": "DS2408",
       "data": {
-        "address": "2833333333333333",
-        "value[degC]": 0,
-        "offset[delta_degC]": 0
-      }
+        "address": "29555555555555da",
+        "connected": false,
+        "pins": [],
+        "connectMode": 0
+      },
+      "id": "New|DS2408-2",
+      "serviceId": "spock"
     },
     {
-      "id": "New|DS2413-1",
       "nid": 224,
       "groups": [
         0
@@ -531,20 +300,690 @@
         "address": "3a44444444444444",
         "connected": false,
         "pins": []
-      }
+      },
+      "id": "New|DS2413-1",
+      "serviceId": "spock"
     },
     {
-      "id": "New|DS2408-1",
-      "nid": 225,
+      "nid": 229,
       "groups": [
         0
       ],
-      "type": "DS2408",
+      "type": "DS2413",
       "data": {
-        "address": "2955555555555555",
+        "address": "3a44444444444406",
         "connected": false,
         "pins": []
-      }
+      },
+      "id": "New|DS2413-2",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 221,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2811111111111111",
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "offset": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        }
+      },
+      "id": "New|TempSensorOneWire-1",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 222,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2822222222222222",
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "offset": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        }
+      },
+      "id": "New|TempSensorOneWire-2",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 223,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "2833333333333333",
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "offset": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        }
+      },
+      "id": "New|TempSensorOneWire-3",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 226,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "28222222222222de",
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "offset": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        }
+      },
+      "id": "New|TempSensorOneWire-4",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 227,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "281111111111117e",
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "offset": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        }
+      },
+      "id": "New|TempSensorOneWire-5",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 228,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "address": "28333333333333be",
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "offset": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        }
+      },
+      "id": "New|TempSensorOneWire-6",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 211,
+      "groups": [
+        0
+      ],
+      "type": "ActuatorOffset",
+      "data": {
+        "targetId": {
+          "__bloxtype": "Link",
+          "type": "ProcessValueInterface",
+          "id": "setpoint-sensor-pair-1"
+        },
+        "referenceId": {
+          "__bloxtype": "Link",
+          "type": "ProcessValueInterface",
+          "id": "setpoint-sensor-pair-1"
+        },
+        "referenceSettingOrValue": 0,
+        "setting": 0,
+        "value": 0,
+        "drivenTargetId": {
+          "__bloxtype": "Link",
+          "type": "ProcessValueInterface",
+          "driven": true,
+          "id": null
+        },
+        "enabled": false,
+        "desiredSetting": 0
+      },
+      "id": "offset-1",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 4,
+      "groups": [
+        7
+      ],
+      "type": "OneWireBus",
+      "data": {
+        "address": []
+      },
+      "id": "OneWireBus",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 212,
+      "groups": [
+        0
+      ],
+      "type": "Pid",
+      "data": {
+        "inputId": {
+          "__bloxtype": "Link",
+          "type": "SetpointSensorPairInterface",
+          "id": "setpoint-sensor-pair-1"
+        },
+        "outputId": {
+          "__bloxtype": "Link",
+          "type": "ActuatorAnalogInterface",
+          "id": "actuator-pwm-1"
+        },
+        "enabled": true,
+        "kp": {
+          "__bloxtype": "Quantity",
+          "unit": "1 / degC",
+          "value": 20
+        },
+        "ti": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 3600
+        },
+        "td": {
+          "__bloxtype": "Quantity",
+          "unit": "second",
+          "value": 60
+        },
+        "inputValue": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "inputSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "outputValue": 0,
+        "outputSetting": 0,
+        "active": false,
+        "p": 0,
+        "i": 0,
+        "d": 0,
+        "error": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "readonly": true,
+          "value": 0
+        },
+        "integral": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC * hour",
+          "readonly": true,
+          "value": 0
+        },
+        "derivative": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC / minute",
+          "readonly": true,
+          "value": 0
+        },
+        "drivenOutputId": {
+          "__bloxtype": "Link",
+          "type": "ActuatorAnalogInterface",
+          "driven": true,
+          "id": null
+        },
+        "integralReset": 0,
+        "boilPointAdjust": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 0
+        },
+        "boilMinOutput": 0,
+        "boilModeActive": false,
+        "derivativeFilter": 0
+      },
+      "id": "pid-1",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 215,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "hwDevice": {
+          "__bloxtype": "Link",
+          "type": "IoArrayInterface",
+          "driven": true,
+          "id": "SparkPins"
+        },
+        "channel": 1,
+        "constrainedBy": {
+          "constraints": [
+            {
+              "mutexed": {
+                "mutexId": {
+                  "__bloxtype": "Link",
+                  "type": "MutexInterface",
+                  "id": "mutex-1"
+                },
+                "extraHoldTime": {
+                  "__bloxtype": "Quantity",
+                  "unit": "second",
+                  "value": 0
+                },
+                "hasCustomHoldTime": false,
+                "hasLock": false
+              },
+              "remaining": {
+                "__bloxtype": "Quantity",
+                "unit": "second",
+                "readonly": true,
+                "value": 0
+              }
+            }
+          ]
+        },
+        "state": 0,
+        "invert": false,
+        "desiredState": 0
+      },
+      "id": "pin-actuator-1",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 216,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "hwDevice": {
+          "__bloxtype": "Link",
+          "type": "IoArrayInterface",
+          "driven": true,
+          "id": "SparkPins"
+        },
+        "channel": 2,
+        "constrainedBy": {
+          "constraints": [
+            {
+              "mutexed": {
+                "mutexId": {
+                  "__bloxtype": "Link",
+                  "type": "MutexInterface",
+                  "id": "mutex-1"
+                },
+                "extraHoldTime": {
+                  "__bloxtype": "Quantity",
+                  "unit": "second",
+                  "value": 0
+                },
+                "hasCustomHoldTime": false,
+                "hasLock": false
+              },
+              "remaining": {
+                "__bloxtype": "Quantity",
+                "unit": "second",
+                "readonly": true,
+                "value": 0
+              }
+            }
+          ]
+        },
+        "state": 0,
+        "invert": false,
+        "desiredState": 0
+      },
+      "id": "pin-actuator-2",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 217,
+      "groups": [
+        0
+      ],
+      "type": "DigitalActuator",
+      "data": {
+        "hwDevice": {
+          "__bloxtype": "Link",
+          "type": "IoArrayInterface",
+          "driven": true,
+          "id": null
+        },
+        "channel": 0,
+        "state": 0,
+        "invert": false,
+        "desiredState": 0
+      },
+      "id": "pin-actuator-3",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 202,
+      "groups": [
+        0
+      ],
+      "type": "SetpointProfile",
+      "data": {
+        "points": [
+          {
+            "time": 10,
+            "temperature": {
+              "__bloxtype": "Quantity",
+              "unit": "degC",
+              "value": 0
+            }
+          },
+          {
+            "time": 20,
+            "temperature": {
+              "__bloxtype": "Quantity",
+              "unit": "degC",
+              "value": 50
+            }
+          },
+          {
+            "time": 30000,
+            "temperature": {
+              "__bloxtype": "Quantity",
+              "unit": "degC",
+              "value": 100
+            }
+          }
+        ],
+        "start": 1540376829,
+        "enabled": false,
+        "targetId": {
+          "__bloxtype": "Link",
+          "type": "SetpointSensorPair",
+          "id": null
+        },
+        "drivenTargetId": {
+          "__bloxtype": "Link",
+          "type": "SetpointSensorPair",
+          "driven": true,
+          "id": null
+        }
+      },
+      "id": "profile-1",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 204,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorMock",
+      "data": {
+        "connected": true,
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0
+        },
+        "fluctuations": []
+      },
+      "id": "sensor-1",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 203,
+      "groups": [],
+      "type": "TempSensorMock",
+      "data": {
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": null
+        },
+        "connected": false,
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 0
+        },
+        "fluctuations": []
+      },
+      "id": "sensor-inactive",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 205,
+      "groups": [
+        0
+      ],
+      "type": "TempSensorOneWire",
+      "data": {
+        "offset": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 9
+        },
+        "address": "deadbeef00000000",
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        }
+      },
+      "id": "sensor-onewire-1",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 206,
+      "groups": [
+        0
+      ],
+      "type": "SetpointSensorPair",
+      "data": {
+        "sensorId": {
+          "__bloxtype": "Link",
+          "type": "TempSensorInterface",
+          "id": "sensor-1"
+        },
+        "settingEnabled": true,
+        "storedSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 20
+        },
+        "filter": 1,
+        "filterThreshold": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 4
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "valueUnfiltered": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "resetFilter": false
+      },
+      "id": "setpoint-sensor-pair-1",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 207,
+      "groups": [
+        0
+      ],
+      "type": "SetpointSensorPair",
+      "data": {
+        "settingEnabled": true,
+        "storedSetting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "value": 20
+        },
+        "filterThreshold": {
+          "__bloxtype": "Quantity",
+          "unit": "delta_degC",
+          "value": 5
+        },
+        "sensorId": {
+          "__bloxtype": "Link",
+          "type": "TempSensorInterface",
+          "id": null
+        },
+        "setting": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "value": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "filter": 0,
+        "valueUnfiltered": {
+          "__bloxtype": "Quantity",
+          "unit": "degC",
+          "readonly": true,
+          "value": 0
+        },
+        "resetFilter": false
+      },
+      "id": "setpoint-sensor-pair-2",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 19,
+      "groups": [
+        7
+      ],
+      "type": "Spark3Pins",
+      "data": {
+        "enableIoSupply5V": true,
+        "enableIoSupply12V": true,
+        "pins": [],
+        "soundAlarm": false,
+        "voltage5": 0,
+        "voltage12": 0
+      },
+      "id": "SparkPins",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 2,
+      "groups": [
+        7
+      ],
+      "type": "SysInfo",
+      "data": {
+        "deviceId": "",
+        "version": "",
+        "platform": 0,
+        "protocolVersion": "",
+        "releaseDate": "",
+        "protocolDate": "",
+        "command": 0,
+        "trace": []
+      },
+      "id": "SystemInfo",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 6,
+      "groups": [
+        7
+      ],
+      "type": "TouchSettings",
+      "data": {
+        "calibrated": 1,
+        "xBitsPerPixelX16": 64,
+        "yBitsPerPixelX16": 64,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      "id": "TouchSettings",
+      "serviceId": "spock"
+    },
+    {
+      "nid": 5,
+      "groups": [
+        7
+      ],
+      "type": "WiFiSettings",
+      "data": {
+        "ssid": "",
+        "password": "",
+        "security": 0,
+        "cipher": 0,
+        "signal": 0,
+        "ip": ""
+      },
+      "id": "WiFiSettings",
+      "serviceId": "spock"
     }
   ],
   "store": [
@@ -769,6 +1208,41 @@
       "keys": [
         "New|DS2408-1",
         225
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-4",
+        226
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-5",
+        227
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|TempSensorOneWire-6",
+        228
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|DS2413-2",
+        229
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|DS2408-2",
+        230
       ],
       "data": {}
     }

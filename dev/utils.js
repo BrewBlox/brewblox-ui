@@ -15,12 +15,21 @@ async function retry(desc, func) {
   throw new Error(`Retry attempts exhausted: "${desc}"`);
 };
 
+function objectSorter(key) {
+  return (a, b) => {
+    const left = a[key] ?? '';
+    const right = b[key] ?? '';
+    return left.localeCompare(right);
+  };
+}
+
 const host = 'http://localhost:9000';
 
 module.exports = {
   sleep,
   retry,
   host,
+  objectSorter,
   history: `${host}/history/history`,
   datastore: `${host}/history/datastore`,
   fileDir: path.resolve(__dirname, 'presets'),

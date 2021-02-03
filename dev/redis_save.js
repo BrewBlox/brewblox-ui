@@ -1,6 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
-const { datastore, retry, databases, fileDir } = require('./utils');
+const { datastore, retry, databases, fileDir, objectSorter } = require('./utils');
 const get = require('lodash/get');
 
 async function run() {
@@ -12,7 +12,9 @@ async function run() {
         namespace: db,
         filter: '*',
       })
-      .then(resp => resp.data.values);
+      .then(resp => resp.data.values)
+      .then(values => values.sort(objectSorter('id')));
+
 
     const fname = `${fileDir}/${db}.redis.json`;
     fs.writeFileSync(fname, JSON.stringify(docs, undefined, 2));
