@@ -1,5 +1,5 @@
 <script lang="ts">
-import { debounce, Notify } from 'quasar';
+import { debounce } from 'quasar';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
@@ -12,19 +12,16 @@ import { asPersistentPart, asStatePart, squares, vivifyParts } from './helpers';
 import { builderStore } from './store';
 import { BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
 
-
 @Component
 export default class BreweryPage extends Vue {
   squares = squares;
 
   localDrawer: boolean | null = null;
+  pending: FlowPart | null = null;
 
   flowParts: FlowPart[] = [];
   debouncedCalculate: Function = () => { };
   debouncedSaveLayout: Function = (layout: BuilderLayout) => { void layout; }
-
-  touchMax = 10;
-  touchMessage: Function = () => { }
 
   @Watch('layout')
   watchLayout(): void {
@@ -139,7 +136,20 @@ export default class BreweryPage extends Vue {
   }
 
   interact(part: FlowPart): void {
-    builderStore.spec(part).interactHandler?.(part, this.updater);
+    const handler = builderStore.spec(part).interactHandler;
+    if (!handler) {
+      return;
+    }
+    if (this.pending && this.pending.id === part.id) {
+      handler(part, this.updater);
+      this.pending = null;
+    }
+    else if (this.delayTouch) {
+      this.pending = part;
+    }
+    else {
+      handler(part, this.updater);
+    }
   }
 
   edit(part: FlowPart): void {
@@ -151,43 +161,6 @@ export default class BreweryPage extends Vue {
   async calculate(): Promise<void> {
     await this.$nextTick();
     this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
-  }
-
-  handleRepeat(args, part: FlowPart): void {
-    if (!this.isClickable(part)) {
-      return;
-    }
-
-    if (!this.delayTouch && args.repeatCount === 1) {
-      this.interact(part);
-    }
-
-    if (this.delayTouch) {
-      if (args.repeatCount === 1) {
-        const title = builderStore.spec(part).title;
-        this.touchMessage({ timeout: 1 }); // Clear previous
-        this.touchMessage = Notify.create({
-          position: 'top',
-          group: false,
-          timeout: 500,
-          message: `Hold to interact with '${title}'`,
-          spinner: true,
-        });
-      }
-      if (args.repeatCount < this.touchMax) {
-        this.touchMessage({ timeout: 500 }); // Postpone timeout
-      }
-      if (args.repeatCount === this.touchMax) {
-        this.interact(part);
-        this.touchMessage({
-          icon: 'done',
-          color: 'positive',
-          timeout: 100,
-          message: 'Done!',
-          spinner: false,
-        });
-      }
-    }
   }
 }
 </script>
@@ -225,7 +198,7 @@ export default class BreweryPage extends Vue {
         Waiting for datastore...
       </div>
     </div>
-    <div v-else class="fit">
+    <div v-else class="fit" @click="pending = null">
       <span v-if="parts.length === 0" class="absolute-center">
         {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
       </span>
@@ -238,17 +211,39 @@ export default class BreweryPage extends Vue {
           v-for="part in flowParts"
           :key="part.id"
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-          :class="{ pointer: isClickable(part), [part.type]: true }"
-          @touchstart.prevent
-          @click="interact(part)"
+          :class="{
+            [part.type]: true,
+            pointer: isClickable(part),
+            inactive: !!pending
+          }"
+          @click.stop="interact(part)"
         >
           <PartWrapper
-            v-touch-repeat:100.stop="args => handleRepeat(args, part)"
             :part="part"
             @update:part="savePart"
             @dirty="debouncedCalculate"
           />
         </g>
+        <template v-if="pending">
+          <rect
+            width="100%"
+            height="100%"
+            fill="black"
+            opacity="0"
+            @click.stop="pending = null"
+          />
+          <g
+            :transform="`translate(${squares(pending.x)}, ${squares(pending.y)})`"
+            class="pointer"
+            @click.stop="interact(pending)"
+          >
+            <PartWrapper
+              :part="pending"
+              @update:part="savePart"
+              @dirty="debouncedCalculate"
+            />
+          </g>
+        </template>
       </svg>
     </div>
   </q-page>
@@ -256,4 +251,7 @@ export default class BreweryPage extends Vue {
 
 <style lang="sass" scoped>
 @import './grid.sass'
+
+.inactive
+  opacity: 0.1
 </style>
