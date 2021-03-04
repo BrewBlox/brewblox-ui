@@ -55,7 +55,7 @@
     "url-safe-string": "^1.1.0",
     "vue": "^2.6.12",
     "vue-json-pretty": "^1.7.1",
-    "vue-router": "^3.5.1",
+    "vue-router": "^3.2.0",
     "vuedraggable": "^2.24.3",
     "vuex": "^3.6.2"
   },

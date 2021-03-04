@@ -2,6 +2,14 @@
 
 > UI representation of the Brewblox project
 
+## Pinned versions
+
+The following packages are pinned to specific versions:
+
+**vue-router@3.2.0**
+
+Quasar has its own dependency on vue-router@3.2.0. Using multiple versions leads to typing errors.
+
 ## Requirements
 
 * Node.js
