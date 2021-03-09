@@ -31,11 +31,6 @@ import SparkWidgetDialog from './SparkWidgetDialog.vue';
 import Troubleshooter from './Troubleshooter.vue';
 import { ValidatedWidget } from './types';
 
-interface ModalSettings {
-  component: string;
-  props: any;
-}
-
 @Component({
   components: {
     SparkWidget,
@@ -48,7 +43,7 @@ export default class SparkPage extends Vue {
 
   allSorters = blockSorters();
   volatileWidgets: { [blockId: string]: Widget } = {};
-  blockFilter = '';
+  blockFilter: string | null = null;
   sessionCfg = defaultSessionConfig();
 
   context: WidgetContext = {
@@ -269,7 +264,9 @@ export default class SparkPage extends Vue {
   }
 
   get filteredItems(): ValidatedWidget[] {
-    const filter = RegExp(this.blockFilter, 'i');
+    const filter = this.blockFilter
+      ? RegExp(this.blockFilter, 'i')
+      : null;
     return this.validatedItems
       .filter(val => !filter
         || val.id.match(filter)
