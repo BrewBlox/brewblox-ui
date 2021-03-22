@@ -6,10 +6,13 @@ import { Component, Prop, Ref } from 'vue-property-decorator';
 
 import { Widget } from '@/store/dashboards';
 
-const GRID_SIZE = 100;
-const GAP_SIZE = 20;
-const MIN_COLS = 2;
-const MIN_ROWS = 2;
+import {
+  GRID_GAP_SIZE,
+  GRID_SQUARE_SIZE,
+  MIN_COLS,
+  MIN_ROWS,
+} from './const';
+
 const MAX_TICK_DELTA = 15;
 
 const zeroPos = (): XYPosition => ({ x: 0, y: 0 });
@@ -105,7 +108,7 @@ export default class GridItem extends Vue {
     const { width, height } = this.containerSize();
     const parent = this.containerParentSize();
 
-    this.gridWidth = Math.floor((parent.width + GAP_SIZE) / (GAP_SIZE + GRID_SIZE));
+    this.gridWidth = Math.floor((parent.width + GRID_GAP_SIZE) / (GRID_GAP_SIZE + GRID_SQUARE_SIZE));
 
     this.dragWidth = width;
     this.dragHeight = height;
@@ -128,8 +131,8 @@ export default class GridItem extends Vue {
   }
 
   changeSize(): void {
-    const newCols = Math.round((this.dragWidth + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
-    const newRows = Math.round((this.dragHeight + GAP_SIZE) / (GRID_SIZE + GAP_SIZE));
+    const newCols = Math.round((this.dragWidth + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE));
+    const newRows = Math.round((this.dragHeight + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE));
 
     if (newCols !== this.currentCols && newCols <= this.gridWidth) {
       this.currentCols = Math.max(newCols, MIN_COLS);
@@ -191,8 +194,8 @@ export default class GridItem extends Vue {
       throw new Error('No starting drag positions known');
     }
 
-    const x = (((this.dragStart.x + delta.x) - this.dragStartParent.x) / (GRID_SIZE + GAP_SIZE)) + 1;
-    const y = (((this.dragStart.y + delta.y) - this.dragStartParent.y) / (GRID_SIZE + GAP_SIZE)) + 1;
+    const x = (((this.dragStart.x + delta.x) - this.dragStartParent.x) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1;
+    const y = (((this.dragStart.y + delta.y) - this.dragStartParent.y) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1;
     const cols = (this.currentCols || this.widget.cols) - 1;
 
     return {
@@ -212,8 +215,8 @@ export default class GridItem extends Vue {
     const parentY = firstChildRects.y;
 
     return {
-      x: ((touchX - parentX) / (GRID_SIZE + GAP_SIZE)) + 1,
-      y: ((touchY - parentY) / (GRID_SIZE + GAP_SIZE)) + 1,
+      x: ((touchX - parentX) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1,
+      y: ((touchY - parentY) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1,
     };
   }
 
