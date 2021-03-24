@@ -16,9 +16,11 @@ export default class GridContainer extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
 
-  get children(): VNode[] {
-    return (this.$slots.default || [])
-      .filter(slot => slot.tag != null);
+  // Making this a getter causes unwanted caching, as default can be undefined
+  activeChildren(): VNode[] {
+    return this.$slots.default
+      ?.filter(slot => slot.tag != null)
+      ?? [];
   }
 
   updateItemPosition(updatedId: string, pos: XYPosition | null): void {
@@ -50,7 +52,7 @@ export default class GridContainer extends Vue {
   }
 
   renderWidgets(h: CreateElement): VNode[] {
-    const elements = this.children
+    const elements = this.activeChildren()
       .map((slot: VNode) => h(
         GridItem, // Wrap each widget in a GridItem to handle dragging / moving
         {
@@ -74,7 +76,7 @@ export default class GridContainer extends Vue {
   }
 
   render(h: CreateElement): VNode {
-    const minWidth = this.children
+    const minWidth = this.activeChildren()
       .reduce(
         (width: number, node: VNode) => {
           const { cols, pinnedPosition } = this.slotProps(node).initialCrud.widget;
