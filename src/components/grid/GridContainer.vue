@@ -90,7 +90,6 @@ export default class GridContainer extends Vue {
       {
         class: 'grid-container grid-main-container',
         style: {
-          margin: `${GRID_GAP_SIZE}px 0 0 ${GRID_GAP_SIZE}px`,
           minHeight: this.editable ? '3000px' : '0',
           minWidth: `${minWidth}px`,
         },

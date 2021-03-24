@@ -164,6 +164,7 @@ export default class DashboardPage extends Vue {
       </div>
       <GridContainer
         v-else
+        class="q-ma-lg"
         :editable="widgetEditable"
         @patch:widgets="patchWidgets"
         @dblclick="showWizard(true)"
