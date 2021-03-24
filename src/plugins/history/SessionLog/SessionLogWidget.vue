@@ -5,10 +5,12 @@ import { Component } from 'vue-property-decorator';
 import WidgetBase from '@/components/WidgetBase';
 import { createDialog } from '@/helpers/dialog';
 import { saveFile } from '@/helpers/import-export';
+import notify from '@/helpers/notify';
 import { dashboardStore } from '@/store/dashboards';
 
+import { saveGraphToFile, selectGraphPrecision } from '../helpers';
 import { historyStore } from '../store';
-import { LoggedSession, SessionNote } from '../types';
+import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionCreateDialog from './SessionCreateDialog.vue';
 import SessionLoadDialog from './SessionLoadDialog.vue';
 import SessionLogBasic from './SessionLogBasic.vue';
@@ -106,11 +108,40 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
   }
 
   exportSession(): void {
-    if (this.session === null) { return; }
-    const session = this.session!;
+    const session = this.session;
+    if (session === null) { return; }
     const name = `${this.widget.title} ${session.title} ${this.renderDate(session.date)}`;
     const lines: string[] = [name, ...this.sessionLines()];
     saveFile(marked(lines.join('\n')), `${name}.html`, true);
+  }
+
+  async exportSessionGraphs(): Promise<void> {
+    const session = this.session;
+    if (session === null) { return; }
+    const sessionDate = this.renderDate(session.date);
+    const notes = this.notes
+      .filter((v): v is SessionGraphNote => v.type === 'Graph')
+      .filter(v => v.config.targets.length);
+
+    if (!notes.length) {
+      notify.warn('No valid graph notes found');
+      return;
+    }
+
+    const precision = await selectGraphPrecision();
+    if (!precision) {
+      return;
+    }
+
+    notify.info('Generating CSV... This may take a few seconds.');
+
+    for (const note of notes) {
+      await saveGraphToFile(
+        note.config,
+        precision,
+        `${session.title}__${note.title}__${sessionDate}`
+      );
+    }
   }
 
   clearNotes(): void {
@@ -180,6 +211,12 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
             icon="mdi-file-export"
             label="Export session"
             @click="exportSession"
+          />
+          <ActionItem
+            :disabled="!session"
+            icon="mdi-file-export"
+            label="Export graphs to CSV"
+            @click="exportSessionGraphs"
           />
           <ActionItem
             icon="mdi-file-restore"
