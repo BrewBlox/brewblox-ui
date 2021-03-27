@@ -4,6 +4,7 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { serviceTemp } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
@@ -37,14 +38,15 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
   const isBeer = activeSetpoint === 'beer';
   const activeSetpointId = isBeer ? names.beerSetpoint : names.fridgeSetpoint;
   const initialSetting = isBeer ? beerSetting : fridgeSetting;
+  const tempUnit = serviceTemp(serviceId);
 
   const coolPidConfig: PidConfig = isBeer
-    ? makeBeerCoolConfig()
-    : makeFridgeCoolConfig();
+    ? makeBeerCoolConfig(tempUnit)
+    : makeFridgeCoolConfig(tempUnit);
 
   const heatPidConfig: PidConfig = isBeer
-    ? makeBeerHeatConfig()
-    : makeFridgeHeatConfig();
+    ? makeBeerHeatConfig(tempUnit)
+    : makeFridgeHeatConfig(tempUnit);
 
   const blocks: [
     SetpointSensorPairBlock,
@@ -332,6 +334,7 @@ export const defineWidgets = (
   });
 
   const createTempControl = (): TempControlWidget => {
+    const tempUnit = serviceTemp(serviceId);
     const beerModeId = uid();
     const fridgeModeId = uid();
     const activeMode = opts.activeSetpoint === 'beer'
@@ -354,15 +357,15 @@ export const defineWidgets = (
             id: beerModeId,
             title: 'Beer',
             setpoint: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
-            coolConfig: makeBeerCoolConfig(),
-            heatConfig: makeBeerHeatConfig(),
+            coolConfig: makeBeerCoolConfig(tempUnit),
+            heatConfig: makeBeerHeatConfig(tempUnit),
           },
           {
             id: fridgeModeId,
             title: 'Fridge',
             setpoint: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
-            coolConfig: makeFridgeCoolConfig(),
-            heatConfig: makeFridgeHeatConfig(),
+            coolConfig: makeFridgeCoolConfig(tempUnit),
+            heatConfig: makeFridgeHeatConfig(tempUnit),
           },
         ],
       },

@@ -4,7 +4,7 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
+import { serviceTemp } from '@/plugins/spark/helpers';
 import {
   ActuatorPwmBlock,
   Block,
@@ -16,6 +16,7 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
+  TempUnit,
 } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
@@ -25,20 +26,20 @@ import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 
-const makeGlycolBeerCoolConfig = (): PidConfig => ({
-  kp: bloxQty(-20, '1/degC'),
+const makeGlycolBeerCoolConfig = (temp: TempUnit): PidConfig => ({
+  kp: bloxQty(-20, '1/degC').to(temp),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });
 
-const makeGlycolBeerHeatConfig = (): PidConfig => ({
-  kp: bloxQty(100, '1/degC'),
+const makeGlycolBeerHeatConfig = (temp: TempUnit): PidConfig => ({
+  kp: bloxQty(100, '1/degC').to(temp),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });
 
-const makeGlycolConfig = (): PidConfig => ({
-  kp: bloxQty(-20, '1/degC'),
+const makeGlycolConfig = (temp: TempUnit): PidConfig => ({
+  kp: bloxQty(-20, '1/degC').to(temp),
   ti: bloxQty('2h'),
   td: bloxQty('5m'),
 });
@@ -52,6 +53,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
   const { serviceId, names } = config;
   const { beerSetting, glycolSetting } = opts;
   const groups = [0];
+  const temp = serviceTemp(serviceId);
 
   const heatingBlocks = [
     names.heatPid,
@@ -214,7 +216,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          ...makeGlycolBeerCoolConfig(),
+          ...makeGlycolBeerCoolConfig(temp),
           enabled: true,
           inputId: bloxLink(names.beerSetpoint),
           outputId: bloxLink(names.coolPwm),
@@ -227,7 +229,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          ...makeGlycolBeerHeatConfig(),
+          ...makeGlycolBeerHeatConfig(temp),
           enabled: true,
           inputId: bloxLink(names.beerSetpoint),
           outputId: bloxLink(names.heatPwm),
@@ -304,7 +306,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           groups,
           data: {
             ...pidDefaults(config.serviceId),
-            ...makeGlycolConfig(),
+            ...makeGlycolConfig(temp),
             enabled: true,
             inputId: bloxLink(names.glycolSetpoint),
             outputId: bloxLink(names.glycolPwm),
@@ -322,7 +324,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
 
 export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): Widget[] {
   const { serviceId, dashboardId, names, prefix, glycolControl } = config;
-  const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
+  const userTemp = serviceTemp(serviceId);
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
@@ -414,8 +416,8 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           id: beerModeId,
           title: 'Beer',
           setpoint: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
-          coolConfig: makeGlycolBeerCoolConfig(),
-          heatConfig: config.heated ? makeGlycolBeerHeatConfig() : null,
+          coolConfig: makeGlycolBeerCoolConfig(userTemp),
+          heatConfig: config.heated ? makeGlycolBeerHeatConfig(userTemp) : null,
         },
       ],
     },
@@ -438,7 +440,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           id: glycolModeId,
           title: 'Glycol',
           setpoint: bloxLink(names.glycolSetpoint, BlockType.SetpointSensorPair),
-          coolConfig: makeGlycolConfig(),
+          coolConfig: makeGlycolConfig(userTemp),
           heatConfig: null,
         },
       ],
