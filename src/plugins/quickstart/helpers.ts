@@ -5,7 +5,7 @@ import { combinations, typeMatchFilter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
 import { tryDisplayBlock } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockType, DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
+import { BlockType, DigitalActuatorBlock, PidBlock, TempUnit } from '@/plugins/spark/types';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 
 import { WizardAction } from './components/QuickStartTaskBase';
@@ -111,26 +111,26 @@ export function pidDefaults(serviceId: string): PidBlock['data'] {
   return sparkStore.specById(BlockType.Pid).generate(serviceId);
 }
 
-export const makeBeerCoolConfig = (): PidConfig => ({
-  kp: bloxQty(-50, '1/degC'),
+export const makeBeerCoolConfig = (tempUnit: TempUnit): PidConfig => ({
+  kp: bloxQty(-50, '1/degC').to(tempUnit),
   ti: bloxQty('6h'),
   td: bloxQty('30m'),
 });
 
-export const makeBeerHeatConfig = (): PidConfig => ({
-  kp: bloxQty(100, '1/degC'),
+export const makeBeerHeatConfig = (tempUnit: TempUnit): PidConfig => ({
+  kp: bloxQty(100, '1/degC').to(tempUnit),
   ti: bloxQty('6h'),
   td: bloxQty('30m'),
 });
 
-export const makeFridgeCoolConfig = (): PidConfig => ({
-  kp: bloxQty(-20, '1/degC'),
+export const makeFridgeCoolConfig = (tempUnit: TempUnit): PidConfig => ({
+  kp: bloxQty(-20, '1/degC').to(tempUnit),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });
 
-export const makeFridgeHeatConfig = (): PidConfig => ({
-  kp: bloxQty(20, '1/degC'),
+export const makeFridgeHeatConfig = (tempUnit: TempUnit): PidConfig => ({
+  kp: bloxQty(20, '1/degC').to(tempUnit),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });

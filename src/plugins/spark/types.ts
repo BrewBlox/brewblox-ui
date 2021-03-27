@@ -26,8 +26,10 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
+export type TempUnit = 'degC' | 'degF';
+
 export interface UserUnits {
-  Temp: 'degC' | 'degF';
+  Temp: TempUnit;
 }
 
 export interface SparkStatus {

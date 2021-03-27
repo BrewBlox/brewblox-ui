@@ -4,6 +4,7 @@ import { bloxLink, bloxQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
+import { serviceTemp } from '@/plugins/spark/helpers';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
@@ -40,6 +41,7 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
   const groups = [0];
   const { serviceId, names } = config;
   const { fridgeSetting } = opts;
+  const tempUnit = serviceTemp(serviceId);
 
   const blocks: [
     SetpointSensorPairBlock,
@@ -201,7 +203,7 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          ...makeFridgeCoolConfig(),
+          ...makeFridgeCoolConfig(tempUnit),
           enabled: true,
           inputId: bloxLink(names.fridgeSetpoint),
           outputId: bloxLink(names.coolPwm),
@@ -214,7 +216,7 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
         groups,
         data: {
           ...pidDefaults(serviceId),
-          ...makeFridgeHeatConfig(),
+          ...makeFridgeHeatConfig(tempUnit),
           enabled: true,
           inputId: bloxLink(names.fridgeSetpoint),
           outputId: bloxLink(names.heatPwm),
@@ -306,6 +308,7 @@ export const defineWidgets = (
 
   const createTempControl = (): TempControlWidget => {
     const modeId = uid();
+    const tempUnit = serviceTemp(serviceId);
 
     return {
       ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
@@ -323,8 +326,8 @@ export const defineWidgets = (
             id: modeId,
             title: 'Fridge',
             setpoint: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
-            coolConfig: makeFridgeCoolConfig(),
-            heatConfig: makeFridgeHeatConfig(),
+            coolConfig: makeFridgeCoolConfig(tempUnit),
+            heatConfig: makeFridgeHeatConfig(tempUnit),
           },
         ],
       },

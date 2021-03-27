@@ -8,6 +8,7 @@ import { spliceById, typeMatchFilter } from '@/helpers/functional';
 import notify from '@/helpers/notify';
 import { profileValues } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { TempUnit } from '@/plugins/spark/types';
 import { BlockType, PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
 
 import { PidConfig } from '../types';
@@ -37,7 +38,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
     return sparkStore.moduleById(this.serviceId);
   }
 
-  get serviceTemp(): 'degC' | 'degF' {
+  get serviceTemp(): TempUnit {
     return this.module?.units.Temp ?? 'degC';
   }
 

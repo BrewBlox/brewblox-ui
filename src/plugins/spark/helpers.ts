@@ -47,6 +47,7 @@ import {
   DisplaySettingsBlock,
   DisplaySlot,
   MotorValveBlock,
+  TempUnit,
 } from './types';
 
 export const blockIdRules = (serviceId: string): InputRule[] => [
@@ -464,7 +465,7 @@ export async function cleanUnusedNames(serviceId: string | null): Promise<void> 
   notify.info({ message, icon: 'mdi-tag-remove' });
 }
 
-export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
+export const serviceTemp = (serviceId: string | null): TempUnit =>
   sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';
 
 export const enumHint = (e: Enum<any>): string =>
