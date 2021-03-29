@@ -53,7 +53,7 @@ export default class QuickStartWizardPicker extends WizardBase {
             Control blocks
           </q-item-label>
           <p>
-            Control blocks small elements that run on the Brewblox Spark that are combined into a control system.
+            Control blocks are small elements that run on the Brewblox Spark that are combined into a control system.
             Examples of control blocks are setpoints, sensors, actuators and PIDs.
           </p>
           <p>
@@ -76,7 +76,7 @@ export default class QuickStartWizardPicker extends WizardBase {
           <p>
             This wizard will create a new dashboard to show the most relevant values in your setup.
             The dashboard will have a graph, a graphical overview of your system
-            and some quick actions to change multiple blocks at once.
+            and quick actions to change multiple blocks at once.
           </p>
         </q-item-section>
       </q-item>
