@@ -258,7 +258,7 @@ export default class ActuatorLogicFull
               </div>
               <q-icon
                 name="mdi-checkbox-blank-circle"
-                :color="cmp.result === 1 ? 'positive' : 'negative'"
+                :color="cmp.result === 'RESULT_TRUE' ? 'positive' : 'negative'"
                 class="col-auto self-center"
               />
               <div class="col ellipsis">
@@ -290,7 +290,7 @@ export default class ActuatorLogicFull
               </div>
               <q-icon
                 name="mdi-checkbox-blank-circle"
-                :color="cmp.result === 1 ? 'positive' : 'negative'"
+                :color="cmp.result === 'RESULT_TRUE' ? 'positive' : 'negative'"
                 class="col-auto self-center"
               />
               <div class="col ellipsis">
