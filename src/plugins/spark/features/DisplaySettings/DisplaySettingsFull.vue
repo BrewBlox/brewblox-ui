@@ -6,7 +6,6 @@ import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { BlockIntfType, BlockOrIntfType, BlockType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
-import { startChangeTempUnit } from '@/store/system';
 
 @Component
 export default class DisplaySettingsFull
@@ -119,10 +118,6 @@ export default class DisplaySettingsFull
     this.block.data.widgets = this.block.data.widgets
       .map(w => (w.pos === pos ? { ...w, color: color.replace('#', '') } : w));
     this.saveBlock();
-  }
-
-  showUnitMenu(): void {
-    startChangeTempUnit();
   }
 }
 </script>

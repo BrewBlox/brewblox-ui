@@ -58,9 +58,6 @@ export function startChangeTempUnit(): DialogChainObject {
       Spark data with different units is logged under different field names to distinguish the values. <br>
       After changing a unit, you will need to select different fields in your Graph and Metrics widgets.
     </p>
-    <p>
-      You can find this setting in the Admin page, under general settings.
-    </p>
     `,
     html: true,
     selectProps: {
