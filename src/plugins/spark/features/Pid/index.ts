@@ -48,7 +48,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge cooling compressor (beer constant)',
       generate: () => ({
-        k: inverseTempQty(-50),
+        kp: inverseTempQty(-50),
         ti: bloxQty('6h'),
         td: bloxQty('30m'),
       }),
@@ -64,7 +64,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge cooling compressor (fridge constant)',
       generate: () => ({
-        k: inverseTempQty(-50),
+        kp: inverseTempQty(-50),
         ti: bloxQty('2h'),
         td: bloxQty('10m'),
       }),
@@ -72,7 +72,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge heating element (fridge constant)',
       generate: () => ({
-        k: inverseTempQty(20),
+        kp: inverseTempQty(20),
         ti: bloxQty('2h'),
         td: bloxQty('10m'),
       }),
@@ -80,7 +80,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Kettle heating element',
       generate: () => ({
-        k: inverseTempQty(50),
+        kp: inverseTempQty(50),
         ti: bloxQty('10m'),
         td: bloxQty('0s'),
       }),
@@ -88,7 +88,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'HLT setpoint driver',
       generate: () => ({
-        k: inverseTempQty(1),
+        kp: inverseTempQty(1),
         ti: bloxQty('10m'),
         td: bloxQty('0s'),
       }),
@@ -96,7 +96,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge setpoint driver',
       generate: () => ({
-        k: inverseTempQty(5),
+        kp: inverseTempQty(5),
         ti: bloxQty('2h'),
         td: bloxQty('0s'),
       }),
@@ -104,7 +104,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Glycol pump',
       generate: () => ({
-        k: inverseTempQty(-5),
+        kp: inverseTempQty(-5),
         ti: bloxQty('2h'),
         td: bloxQty('0s'),
       }),
@@ -112,7 +112,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Heating pad',
       generate: () => ({
-        k: inverseTempQty(100),
+        kp: inverseTempQty(100),
         ti: bloxQty('2h'),
         td: bloxQty('10m'),
       }),
