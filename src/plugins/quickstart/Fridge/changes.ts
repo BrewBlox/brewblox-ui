@@ -1,11 +1,9 @@
 import { uid } from 'quasar';
 
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { serviceTemp } from '@/plugins/spark/helpers';
-import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   BlockType,
@@ -20,6 +18,7 @@ import {
 import { Block } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import {
   makeFridgeCoolConfig,
@@ -41,7 +40,6 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
   const groups = [0];
   const { serviceId, names } = config;
   const { fridgeSetting } = opts;
-  const tempUnit = serviceTemp(serviceId);
 
   const blocks: [
     SetpointSensorPairBlock,
@@ -64,11 +62,11 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
           sensorId: bloxLink(names.fridgeSensor),
           storedSetting: fridgeSetting,
           settingEnabled: true,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
+          filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -202,8 +200,8 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
-          ...makeFridgeCoolConfig(tempUnit),
+          ...pidDefaults(),
+          ...makeFridgeCoolConfig(),
           enabled: true,
           inputId: bloxLink(names.fridgeSetpoint),
           outputId: bloxLink(names.coolPwm),
@@ -215,8 +213,8 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
-          ...makeFridgeHeatConfig(tempUnit),
+          ...pidDefaults(),
+          ...makeFridgeHeatConfig(),
           enabled: true,
           inputId: bloxLink(names.fridgeSetpoint),
           outputId: bloxLink(names.heatPwm),
@@ -240,7 +238,7 @@ export const defineWidgets = (
   };
 
   const { serviceId, names, prefix } = config;
-  const { Temp } = sparkStore.moduleById(serviceId)!.units;
+  const tempUnit = systemStore.units.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
@@ -278,8 +276,8 @@ export const defineWidgets = (
         {
           measurement: serviceId,
           fields: [
-            `${names.fridgeSensor}/value[${Temp}]`,
-            `${names.fridgeSetpoint}/setting[${Temp}]`,
+            `${names.fridgeSensor}/value[${tempUnit}]`,
+            `${names.fridgeSetpoint}/setting[${tempUnit}]`,
             `${names.coolPwm}/value`,
             `${names.heatPwm}/value`,
             `${names.coolAct}/state`,
@@ -288,8 +286,8 @@ export const defineWidgets = (
         },
       ],
       renames: {
-        [`${serviceId}/${names.fridgeSensor}/value[${Temp}]`]: 'Fridge temperature',
-        [`${serviceId}/${names.fridgeSetpoint}/setting[${Temp}]`]: 'Fridge setting',
+        [`${serviceId}/${names.fridgeSensor}/value[${tempUnit}]`]: 'Fridge temperature',
+        [`${serviceId}/${names.fridgeSetpoint}/setting[${tempUnit}]`]: 'Fridge setting',
         [`${serviceId}/${names.coolPwm}/value`]: 'Cool PWM value',
         [`${serviceId}/${names.heatPwm}/value`]: 'Heat PWM value',
         [`${serviceId}/${names.coolAct}/state`]: 'Cool Pin state',
@@ -308,7 +306,6 @@ export const defineWidgets = (
 
   const createTempControl = (): TempControlWidget => {
     const modeId = uid();
-    const tempUnit = serviceTemp(serviceId);
 
     return {
       ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
@@ -326,8 +323,8 @@ export const defineWidgets = (
             id: modeId,
             title: 'Fridge',
             setpoint: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
-            coolConfig: makeFridgeCoolConfig(tempUnit),
-            heatConfig: makeFridgeHeatConfig(tempUnit),
+            coolConfig: makeFridgeCoolConfig(),
+            heatConfig: makeFridgeHeatConfig(),
           },
         ],
       },

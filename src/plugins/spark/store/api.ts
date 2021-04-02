@@ -2,7 +2,7 @@
 import http, { intercept } from '@/helpers/http';
 import notify from '@/helpers/notify';
 
-import { ApiSparkStatus, Block, BlockIds, SparkExported, SparkStatus, UserUnits } from '../types';
+import { ApiSparkStatus, Block, BlockIds, SparkExported, SparkStatus } from '../types';
 import { asSparkStatus } from './helpers';
 
 export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
@@ -57,16 +57,6 @@ export const validateService = (serviceId: string): Promise<boolean> =>
   http.get<ApiSparkStatus>(`/${encodeURIComponent(serviceId)}/system/status`)
     .then(resp => resp.data.service_info !== undefined)
     .catch(() => false);
-
-export const fetchUnits = (serviceId: string): Promise<UserUnits> =>
-  http.get<UserUnits>(`/${encodeURIComponent(serviceId)}/settings/units`)
-    .then(resp => resp.data)
-    .catch(intercept(`Failed to fetch unit settings on ${serviceId}`));
-
-export const persistUnits = (serviceId: string, units: UserUnits): Promise<UserUnits> =>
-  http.put<UserUnits>(`/${encodeURIComponent(serviceId)}/settings/units`, units)
-    .then(resp => resp.data)
-    .catch(intercept(`Failed to persist unit settings on ${serviceId}`));
 
 export const persistAutoconnecting = (serviceId: string, enabled: boolean): Promise<boolean> =>
   http.put<{ enabled: boolean }>(`/${encodeURIComponent(serviceId)}/settings/autoconnecting`, { enabled })

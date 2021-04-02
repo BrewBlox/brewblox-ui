@@ -4,7 +4,7 @@ export type ChangeCb<T> = (obj: T) => unknown;
 export type DeleteCb = (id: string) => unknown;
 
 export interface EventHandler<T = StoreObject> {
-  id: string;
+  namespace: string;
   onChanged: ChangeCb<T>;
   onDeleted: DeleteCb;
 }
@@ -25,41 +25,41 @@ export interface BrewbloxDatabase {
   subscribe(handler: EventHandler): void;
 
   /**
-   * Fetch all documents from the collection where ID is `moduleId`
+   * Fetch all documents from the collection with matching namespace.
    *
-   * @param moduleId collection identifier.
+   * @param namespace collection identifier.
    */
-  fetchAll<T extends StoreObject>(moduleId: string): Promise<T[]>;
+  fetchAll<T extends StoreObject>(namespace: string): Promise<T[]>;
 
   /**
    * Fetch a single document.
    *
-   * @param moduleId collection ID.
+   * @param namespace collection ID.
    * @param objId unique document ID.
    */
-  fetchById<T extends StoreObject>(moduleId: string, objId: string): Promise<T>;
+  fetchById<T extends StoreObject>(namespace: string, objId: string): Promise<T | null>;
 
   /**
    * Save a new document to the store.
    *
-   * @param moduleId collection ID.
+   * @param namespace collection ID.
    * @param obj document. Its ID should be unique.
    */
-  create<T extends StoreObject>(moduleId: string, obj: T): Promise<T>;
+  create<T extends StoreObject>(namespace: string, obj: T): Promise<T>;
 
   /**
    * Save an already created document.
    *
-   * @param moduleId collection ID.
+   * @param namespace collection ID.
    * @param obj existing document in the database.
    */
-  persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T>;
+  persist<T extends StoreObject>(namespace: string, obj: T): Promise<T>;
 
   /**
    * Remove an existing document from the store.
    *
-   * @param moduleId collection ID.
+   * @param namespace collection ID.
    * @param obj existing document in the database.
    */
-  remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T>;
+  remove<T extends StoreObject>(namespace: string, obj: T): Promise<T>;
 }

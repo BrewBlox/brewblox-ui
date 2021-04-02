@@ -1,10 +1,9 @@
 import { uid } from 'quasar';
 
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/helpers/bloxfield';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -19,6 +18,7 @@ import {
 } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { DisplayBlock } from '../types';
@@ -53,13 +53,13 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         groups,
         data: {
           sensorId: bloxLink(names.kettleSensor),
-          storedSetting: bloxQty(67.7, 'degC'),
+          storedSetting: tempQty(67.7),
           settingEnabled: false,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
+          filterThreshold: deltaTempQty(5),
           resetFilter: false,
         },
       },
@@ -70,13 +70,13 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         groups,
         data: {
           sensorId: bloxLink(names.tubeSensor),
-          storedSetting: bloxQty(67.7, 'degC'),
-          settingEnabled: true,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          storedSetting: tempQty(67.7),
+          settingEnabled: false,
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
+          filterThreshold: deltaTempQty(5),
           resetFilter: false,
         },
       },
@@ -158,8 +158,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
-          kp: bloxQty(10, '1/degC'),
+          ...pidDefaults(),
+          kp: inverseTempQty(10),
           ti: bloxQty('5m'),
           td: bloxQty('10s'),
           enabled: true,
@@ -173,8 +173,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
-          kp: bloxQty(30, '1/degC'),
+          ...pidDefaults(),
+          kp: inverseTempQty(30),
           ti: bloxQty('2m'),
           td: bloxQty('10s'),
           enabled: true,
@@ -188,7 +188,7 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
 
 export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Widget[] {
   const { serviceId, dashboardId, names, prefix } = config;
-  const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
+  const userTemp = systemStore.units.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),

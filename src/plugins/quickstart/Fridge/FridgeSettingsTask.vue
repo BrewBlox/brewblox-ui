@@ -1,8 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty } from '@/helpers/bloxfield';
-import { sparkStore } from '@/plugins/spark/store';
+import { tempQty } from '@/helpers/bloxfield';
 
 import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
@@ -12,12 +11,7 @@ import { FridgeConfig, FridgeOpts } from './types';
 
 @Component
 export default class FridgeSettingsTask extends QuickStartTaskBase<FridgeConfig> {
-  fridgeSetting = bloxQty(20, 'degC');
-
-  created(): void {
-    const { Temp } = sparkStore.moduleById(this.config.serviceId)!.units;
-    this.fridgeSetting = this.fridgeSetting.to(Temp);
-  }
+  fridgeSetting = tempQty(20);
 
   done(): void {
     const opts: FridgeOpts = {

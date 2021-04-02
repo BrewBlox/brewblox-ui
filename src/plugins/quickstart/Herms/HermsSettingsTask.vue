@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty, JSQuantity, prettyUnit } from '@/helpers/bloxfield';
+import { bloxQty, deltaTempQty, JSQuantity, prettyUnit, tempQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
-import { sparkStore } from '@/plugins/spark/store';
+import { systemStore } from '@/store/system';
 
 import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
@@ -14,30 +14,20 @@ import { HermsConfig, HermsOpts } from './types';
 
 @Component
 export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
-  hltFullPowerDelta = bloxQty(2, 'delta_degC');
-  bkFullPowerDelta = bloxQty(2, 'delta_degC');
+  hltFullPowerDelta = deltaTempQty(2);
+  bkFullPowerDelta = deltaTempQty(2);
   hltVolume = 25;
   mashVolume = 25;
-  driverMax = bloxQty(10, 'delta_degC');
-  mashTarget = bloxQty(67, 'degC');
-  mashActual = bloxQty(65, 'degC');
+  driverMax = deltaTempQty(10);
+  mashTarget = tempQty(67);
+  mashActual = tempQty(65);
 
   volumeRules: InputRule[] = [
     v => Number(v) !== 0 || 'Volume can\'t be 0',
   ]
 
-  created(): void {
-    const deltaTemp = `delta_${this.userTemp}`;
-    this.hltFullPowerDelta = this.hltFullPowerDelta.to(deltaTemp);
-    this.bkFullPowerDelta = this.bkFullPowerDelta.to(deltaTemp);
-    this.driverMax = this.driverMax.to(deltaTemp);
-
-    this.mashTarget = this.mashTarget.to(this.userTemp);
-    this.mashActual = this.mashActual.to(this.userTemp);
-  }
-
   get userTemp(): string {
-    return sparkStore.moduleById(this.config.serviceId)!.units.Temp;
+    return systemStore.units.temperature;
   }
 
   get hltKp(): JSQuantity {

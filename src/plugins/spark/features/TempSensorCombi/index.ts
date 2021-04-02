@@ -1,6 +1,6 @@
-import { bloxQty } from '@/helpers/bloxfield';
+import { tempQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector, enumHint, serviceTemp } from '@/plugins/spark/helpers';
+import { blockWidgetSelector, enumHint } from '@/plugins/spark/helpers';
 import { BlockSpec, BlockType, SensorCombiFunc, TempSensorCombiBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
@@ -10,10 +10,10 @@ const typeName = BlockType.TempSensorCombi;
 
 const block: BlockSpec<TempSensorCombiBlock> = {
   id: typeName,
-  generate: serviceId => ({
+  generate: () => ({
     sensors: [],
     combineFunc: SensorCombiFunc.SENSOR_COMBI_FUNC_AVG,
-    value: bloxQty(20, 'degC').to(serviceTemp(serviceId)),
+    value: tempQty(20),
   }),
   fields: [
     {
@@ -28,7 +28,7 @@ const block: BlockSpec<TempSensorCombiBlock> = {
       key: 'value',
       title: 'Sensor value',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
+      generate: () => tempQty(20),
       readonly: true,
       graphed: true,
     },

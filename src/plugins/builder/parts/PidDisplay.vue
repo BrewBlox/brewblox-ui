@@ -2,11 +2,11 @@
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty, prettyUnit } from '@/helpers/bloxfield';
-import { serviceTemp } from '@/plugins/spark/helpers';
+import { deltaTempQty, prettyUnit } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
+import { systemStore } from '@/store/system';
 
 import PartBase from '../components/PartBase';
 import { CENTER, COLD_WATER, HOT_WATER } from '../getters';
@@ -73,17 +73,14 @@ export default class PidDisplay extends PartBase {
       && this.target.type === BlockType.ActuatorOffset;
   }
 
-  get tempUnit(): 'delta_degC' | 'delta_degF' {
-    return this.block !== null
-      && serviceTemp(this.block.serviceId) === 'degF'
-      ? 'delta_degF'
-      : 'delta_degC';
+  get deltaTempUnit(): string {
+    return `delta_${systemStore.units.temperature}`;
   }
 
   get convertedOutputSetting(): number | null {
     return this.drivingOffset
       && this.block !== null
-      ? bloxQty(this.outputSetting, 'delta_degC').to(this.tempUnit).value
+      ? deltaTempQty(this.outputSetting).value
       : this.outputSetting;
   }
 
@@ -91,7 +88,7 @@ export default class PidDisplay extends PartBase {
     return this.outputSetting === null
       ? ''
       : this.drivingOffset
-        ? prettyUnit(this.tempUnit)
+        ? prettyUnit(this.deltaTempUnit)
         : '%';
   }
 

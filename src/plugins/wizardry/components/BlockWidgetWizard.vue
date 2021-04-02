@@ -115,7 +115,7 @@ export default class BlockWidgetWizard extends WidgetWizardBase {
       serviceId,
       type: this.featureId,
       groups: [0],
-      data: sparkStore.spec({ type: this.featureId }).generate(this.serviceId),
+      data: sparkStore.spec({ type: this.featureId }).generate(),
     };
     const widget: Widget = {
       id: this.widgetId,

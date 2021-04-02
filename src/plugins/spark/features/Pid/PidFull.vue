@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty } from '@/helpers/bloxfield';
+import { tempQty } from '@/helpers/bloxfield';
 import { createBlockDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { isBlockDriven, serviceTemp } from '@/plugins/spark/helpers';
+import { isBlockDriven } from '@/plugins/spark/helpers';
 import { Block, PidBlock, Quantity, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 interface GridOpts {
@@ -43,8 +43,7 @@ export default class PidFull
   }
 
   get waterBoilTemp(): Quantity {
-    return bloxQty(100, 'degC')
-      .to(serviceTemp(this.serviceId));
+    return tempQty(100);
   }
 
   showInput(): void {

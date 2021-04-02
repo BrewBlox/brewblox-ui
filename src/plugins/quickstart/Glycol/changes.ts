@@ -1,10 +1,9 @@
 import { uid } from 'quasar';
 
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { serviceTemp } from '@/plugins/spark/helpers';
 import {
   ActuatorPwmBlock,
   Block,
@@ -16,30 +15,30 @@ import {
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
-  TempUnit,
 } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 
-const makeGlycolBeerCoolConfig = (temp: TempUnit): PidConfig => ({
-  kp: bloxQty(-20, '1/degC').to(temp),
+const makeGlycolBeerCoolConfig = (): PidConfig => ({
+  kp: inverseTempQty(-20),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });
 
-const makeGlycolBeerHeatConfig = (temp: TempUnit): PidConfig => ({
-  kp: bloxQty(100, '1/degC').to(temp),
+const makeGlycolBeerHeatConfig = (): PidConfig => ({
+  kp: inverseTempQty(100),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });
 
-const makeGlycolConfig = (temp: TempUnit): PidConfig => ({
-  kp: bloxQty(-20, '1/degC').to(temp),
+const makeGlycolConfig = (): PidConfig => ({
+  kp: inverseTempQty(-20),
   ti: bloxQty('2h'),
   td: bloxQty('5m'),
 });
@@ -53,7 +52,6 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
   const { serviceId, names } = config;
   const { beerSetting, glycolSetting } = opts;
   const groups = [0];
-  const temp = serviceTemp(serviceId);
 
   const heatingBlocks = [
     names.heatPid,
@@ -82,11 +80,11 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           sensorId: bloxLink(names.beerSensor),
           storedSetting: beerSetting,
           settingEnabled: true,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
+          filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -215,8 +213,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
-          ...makeGlycolBeerCoolConfig(temp),
+          ...pidDefaults(),
+          ...makeGlycolBeerCoolConfig(),
           enabled: true,
           inputId: bloxLink(names.beerSetpoint),
           outputId: bloxLink(names.coolPwm),
@@ -228,8 +226,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
-          ...makeGlycolBeerHeatConfig(temp),
+          ...pidDefaults(),
+          ...makeGlycolBeerHeatConfig(),
           enabled: true,
           inputId: bloxLink(names.beerSetpoint),
           outputId: bloxLink(names.heatPwm),
@@ -254,11 +252,11 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             sensorId: bloxLink(names.glycolSensor),
             storedSetting: glycolSetting,
             settingEnabled: true,
-            setting: bloxQty(null, 'degC'),
-            value: bloxQty(null, 'degC'),
-            valueUnfiltered: bloxQty(null, 'degC'),
+            setting: tempQty(null),
+            value: tempQty(null),
+            valueUnfiltered: tempQty(null),
+            filterThreshold: deltaTempQty(5),
             filter: FilterChoice.FILTER_15s,
-            filterThreshold: bloxQty(5, 'delta_degC'),
             resetFilter: false,
           },
         },
@@ -305,8 +303,8 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           serviceId,
           groups,
           data: {
-            ...pidDefaults(config.serviceId),
-            ...makeGlycolConfig(temp),
+            ...pidDefaults(),
+            ...makeGlycolConfig(),
             enabled: true,
             inputId: bloxLink(names.glycolSetpoint),
             outputId: bloxLink(names.glycolPwm),
@@ -324,7 +322,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
 
 export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): Widget[] {
   const { serviceId, dashboardId, names, prefix, glycolControl } = config;
-  const userTemp = serviceTemp(serviceId);
+  const tempUnit = systemStore.units.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
@@ -362,16 +360,16 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
         {
           measurement: serviceId,
           fields: [
-            `${names.beerSensor}/value[${userTemp}]`,
-            `${names.beerSetpoint}/setting[${userTemp}]`,
+            `${names.beerSensor}/value[${tempUnit}]`,
+            `${names.beerSetpoint}/setting[${tempUnit}]`,
             `${names.coolPwm}/value`,
             `${names.coolAct}/state`,
           ],
         },
       ],
       renames: {
-        [`${serviceId}/${names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
-        [`${serviceId}/${names.beerSetpoint}/setting[${userTemp}]`]: 'Beer setting',
+        [`${serviceId}/${names.beerSensor}/value[${tempUnit}]`]: 'Beer temperature',
+        [`${serviceId}/${names.beerSetpoint}/setting[${tempUnit}]`]: 'Beer setting',
         [`${serviceId}/${names.coolPwm}/value`]: 'Cool PWM value',
         [`${serviceId}/${names.coolAct}/state`]: 'Cool Pin state',
       },
@@ -416,8 +414,8 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           id: beerModeId,
           title: 'Beer',
           setpoint: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
-          coolConfig: makeGlycolBeerCoolConfig(userTemp),
-          heatConfig: config.heated ? makeGlycolBeerHeatConfig(userTemp) : null,
+          coolConfig: makeGlycolBeerCoolConfig(),
+          heatConfig: config.heated ? makeGlycolBeerHeatConfig() : null,
         },
       ],
     },
@@ -440,7 +438,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
           id: glycolModeId,
           title: 'Glycol',
           setpoint: bloxLink(names.glycolSetpoint, BlockType.SetpointSensorPair),
-          coolConfig: makeGlycolConfig(userTemp),
+          coolConfig: makeGlycolConfig(),
           heatConfig: null,
         },
       ],

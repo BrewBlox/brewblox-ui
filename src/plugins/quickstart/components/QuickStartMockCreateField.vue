@@ -43,7 +43,7 @@ export default class QuickStartMockCreateField extends Vue {
         serviceId: this.serviceId,
         groups: [0],
         type: BlockType.TempSensorMock,
-        data: spec.generate(this.serviceId),
+        data: spec.generate(),
       };
       await this.sparkModule.createBlock(block);
       notify.done(`Created sensor <i>${block.id}</i>`);
