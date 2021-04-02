@@ -30,7 +30,7 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
   }
 
   fieldFilter(field: BlockField): boolean {
-    const v = field.generate(this.config.addr.serviceId);
+    const v = field.generate();
     return !field.readonly && (isNumber(v) || isQuantity(v));
   }
 

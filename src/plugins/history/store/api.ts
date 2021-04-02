@@ -1,4 +1,4 @@
-import { WS_HOST } from '@/helpers/const';
+import { UI_NAMESPACE, WS_HOST } from '@/helpers/const';
 import http from '@/helpers/http';
 import { createApi } from '@/plugins/database/api';
 
@@ -21,4 +21,6 @@ export const historyApi = {
         .then(resp => resp.data),
 };
 
-export const sessionApi = createApi<LoggedSession>('logged-sessions');
+export const sessionApi = createApi<LoggedSession>({
+  namespace: `${UI_NAMESPACE}:logged-sessions`,
+});

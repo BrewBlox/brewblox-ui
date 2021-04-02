@@ -25,7 +25,7 @@ export default class BlockValue extends AutomationItemBase<BlockValueImpl> {
   set addr(val: BlockFieldAddress) {
     const { blockType, key } = this.impl;
     if (val.type !== blockType || val.field !== key) {
-      this.impl.value = sparkStore.fieldSpec(val)?.generate(val.serviceId) ?? null;
+      this.impl.value = sparkStore.fieldSpec(val)?.generate() ?? null;
     }
     this.impl.blockId = val.id;
     this.impl.serviceId = val.serviceId;

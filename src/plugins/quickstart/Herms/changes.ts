@@ -1,10 +1,9 @@
 import { uid } from 'quasar';
 
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/helpers/bloxfield';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
-import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -22,6 +21,7 @@ import {
 import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { DisplayBlock } from '../types';
@@ -104,13 +104,13 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         groups,
         data: {
           sensorId: bloxLink(names.hltSensor),
-          storedSetting: bloxQty(70, 'degC'),
+          storedSetting: tempQty(70),
           settingEnabled: false,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
+          filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -121,13 +121,13 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         groups,
         data: {
           sensorId: bloxLink(names.mtSensor),
-          storedSetting: bloxQty(67, 'degC'),
+          storedSetting: tempQty(67),
           settingEnabled: false,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
+          filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -138,13 +138,13 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         groups,
         data: {
           sensorId: bloxLink(names.bkSensor),
-          storedSetting: bloxQty(70, 'degC'),
+          storedSetting: tempQty(70),
           settingEnabled: false,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
+          filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -250,7 +250,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
+          ...pidDefaults(),
           enabled: true,
           inputId: bloxLink(names.hltSetpoint),
           outputId: bloxLink(names.hltPwm),
@@ -266,7 +266,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
+          ...pidDefaults(),
           enabled: true,
           inputId: bloxLink(names.mtSetpoint),
           outputId: bloxLink(names.hltDriver),
@@ -281,7 +281,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
+          ...pidDefaults(),
           enabled: true,
           inputId: bloxLink(names.bkSetpoint),
           outputId: bloxLink(names.bkPwm),
@@ -301,7 +301,7 @@ export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block
 
 export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Widget[] {
   const { serviceId, names, dashboardId, prefix } = config;
-  const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
+  const userTemp = systemStore.units.temperature;
   const genericSettings = {
     dashboard: dashboardId,
     cols: 4,
@@ -430,7 +430,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: names.hltSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: bloxQty(70, 'degC').to(userTemp),
+                storedSetting: tempQty(70),
               },
               confirmed: {
                 storedSetting: true,
@@ -451,7 +451,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: names.mtSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: bloxQty(66.7, 'degC').to(userTemp),
+                storedSetting: tempQty(66.7),
               },
               confirmed: {
                 storedSetting: true,
@@ -481,7 +481,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               blockId: names.bkSetpoint,
               data: {
                 settingEnabled: true,
-                storedSetting: bloxQty(100, 'degC').to(userTemp),
+                storedSetting: tempQty(100),
               },
               confirmed: {
                 storedSetting: true,

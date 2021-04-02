@@ -99,7 +99,7 @@ export default class QuickActionChange extends Vue {
 
   toggleField(field: EditableBlockField): void {
     field.value = field.value === null
-      ? field.specField.generate(this.change.serviceId)
+      ? field.specField.generate()
       : null;
     this.saveField(field);
   }

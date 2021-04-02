@@ -18,10 +18,17 @@ yarn-error.log*
 *.njsproj
 *.sln
 
-# Files in dev/ have to be whitelisted
-dev/*
+# Files and subdirectories in dev/ have to be whitelisted
+dev/*/
 !dev/*.js
 !dev/*.sh
 !dev/*.ts
+
+!dev/presets
+
+!dev/traefik
+dev/traefik/brewblox.crt
+dev/traefik/brewblox.key
+
+dev/dist/*
 !dev/dist/.gitkeep
-!dev/traefik/traefik-cert.yaml

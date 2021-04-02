@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty } from '@/helpers/bloxfield';
+import { bloxQty, tempQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { durationMs, durationString } from '@/helpers/duration';
 import { deepCopy, objectSorter } from '@/helpers/functional';
@@ -23,10 +23,6 @@ export default class SetpointProfileFull
   durationString = durationString;
   durationMs = durationMs;
   bloxQty = bloxQty;
-
-  get tempUnit(): string {
-    return this.sparkModule.units.Temp;
-  }
 
   get start(): number {
     return (this.block.data.start || 0) * 1000;
@@ -60,7 +56,7 @@ export default class SetpointProfileFull
     return {
       offsetMs: 0,
       absTimeMs: new Date(this.start).getTime(),
-      temperature: bloxQty(20, 'degC').to(this.tempUnit),
+      temperature: tempQty(20),
     };
   }
 

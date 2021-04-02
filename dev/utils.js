@@ -34,6 +34,7 @@ module.exports = {
   datastore: `${host}/history/datastore`,
   fileDir: path.resolve(__dirname, 'presets'),
   databases: [
+    'brewblox-global',
     'brewblox-automation',
     'brewblox-ui-store',
   ],

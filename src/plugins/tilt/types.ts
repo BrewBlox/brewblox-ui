@@ -1,12 +1,8 @@
 import { Service } from '@/store/services';
 
-import { Quantity, TempUnit } from '../spark/types';
+import { Quantity } from '../spark/types';
 
-export interface TiltServiceConfig {
-  tempUnit: TempUnit;
-}
-
-export type TiltService = Service<TiltServiceConfig>;
+export type TiltService = Service<{}>;
 
 export interface TiltStateEvent {
   key: string; // Service ID

@@ -2,6 +2,7 @@ import { bloxQty, isLink, isQuantity } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockField, BlockFieldAddress, BlockType } from '@/plugins/spark/types';
+import { systemStore } from '@/store/system';
 
 export type SnippetMode = 'append' | 'insert';
 export type SnippetCallback = (mode: SnippetMode, lines: string[]) => unknown;
@@ -28,7 +29,7 @@ const valueHint = (addr: BlockFieldAddress): string => {
   }
 
   // Infer hint based on value
-  const value = generate(addr.serviceId);
+  const value = generate();
 
   // Check for typed fields
   if (isQuantity(value)) {
@@ -73,7 +74,7 @@ export const generators: SnippetGenerator[] = [
   {
     desc: 'Quantity example',
     run(callback) {
-      const unit = sparkStore.modules[0]?.units.Temp ?? 'degC';
+      const unit = systemStore.units.temperature;
       const value = bloxQty(20, 'degC').to(unit).round().value;
       const other = unit === 'degC' ? 'degF' : 'degC';
       callback('insert', [

@@ -1,7 +1,15 @@
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import {
+  bloxLink,
+  bloxQty,
+  deltaTempMultHourQty,
+  deltaTempPerMinuteQty,
+  deltaTempQty,
+  inverseTempQty,
+  tempQty,
+} from '@/helpers/bloxfield';
 import { durationString } from '@/helpers/duration';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockIntfType, BlockSpec, BlockType, FilterChoice, PidBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
@@ -11,39 +19,36 @@ const typeName = BlockType.Pid;
 
 const block: BlockSpec<PidBlock> = {
   id: typeName,
-  generate: (serviceId: string | null) => {
-    const temp = serviceTemp(serviceId);
-    return {
-      inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
-      outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
-      inputValue: bloxQty(0, temp),
-      inputSetting: bloxQty(0, temp),
-      outputValue: 0,
-      outputSetting: 0,
-      enabled: false,
-      active: true,
-      kp: bloxQty(20, `1/${temp}`),
-      ti: bloxQty('2h'),
-      td: bloxQty('0s'),
-      p: 0,
-      i: 0,
-      d: 0,
-      error: bloxQty(0, `delta_${temp}`),
-      integral: bloxQty(0, `delta_${temp}*hour`),
-      derivative: bloxQty(0, `delta_${temp}/minute`),
-      derivativeFilter: FilterChoice.FILTER_NONE,
-      drivenOutputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
-      integralReset: 0,
-      boilPointAdjust: bloxQty(0, `delta_${temp}`),
-      boilMinOutput: 0,
-      boilModeActive: false,
-    };
-  },
+  generate: () => ({
+    inputId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+    outputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
+    inputValue: tempQty(0),
+    inputSetting: tempQty(0),
+    outputValue: 0,
+    outputSetting: 0,
+    enabled: false,
+    active: true,
+    kp: inverseTempQty(20),
+    ti: bloxQty('2h'),
+    td: bloxQty('0s'),
+    p: 0,
+    i: 0,
+    d: 0,
+    error: deltaTempQty(0),
+    integral: deltaTempMultHourQty(0),
+    derivative: deltaTempPerMinuteQty(0),
+    derivativeFilter: FilterChoice.FILTER_NONE,
+    drivenOutputId: bloxLink(null, BlockIntfType.ActuatorAnalogInterface),
+    integralReset: 0,
+    boilPointAdjust: deltaTempQty(0),
+    boilMinOutput: 0,
+    boilModeActive: false,
+  }),
   presets: [
     {
       name: 'Fridge cooling compressor (beer constant)',
       generate: () => ({
-        kp: bloxQty(-50, '1/degC'),
+        k: inverseTempQty(-50),
         ti: bloxQty('6h'),
         td: bloxQty('30m'),
       }),
@@ -51,7 +56,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge heating element (beer constant)',
       generate: () => ({
-        kp: bloxQty(100, '1/degC'),
+        kp: inverseTempQty(100),
         ti: bloxQty('6h'),
         td: bloxQty('30m'),
       }),
@@ -59,7 +64,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge cooling compressor (fridge constant)',
       generate: () => ({
-        kp: bloxQty(-50, '1/degC'),
+        k: inverseTempQty(-50),
         ti: bloxQty('2h'),
         td: bloxQty('10m'),
       }),
@@ -67,7 +72,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge heating element (fridge constant)',
       generate: () => ({
-        kp: bloxQty(20, '1/degC'),
+        k: inverseTempQty(20),
         ti: bloxQty('2h'),
         td: bloxQty('10m'),
       }),
@@ -75,7 +80,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Kettle heating element',
       generate: () => ({
-        kp: bloxQty(50, '1/degC'),
+        k: inverseTempQty(50),
         ti: bloxQty('10m'),
         td: bloxQty('0s'),
       }),
@@ -83,7 +88,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'HLT setpoint driver',
       generate: () => ({
-        kp: bloxQty(1, '1/degC'),
+        k: inverseTempQty(1),
         ti: bloxQty('10m'),
         td: bloxQty('0s'),
       }),
@@ -91,7 +96,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Fridge setpoint driver',
       generate: () => ({
-        kp: bloxQty(5, '1/degC'),
+        k: inverseTempQty(5),
         ti: bloxQty('2h'),
         td: bloxQty('0s'),
       }),
@@ -99,7 +104,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Glycol pump',
       generate: () => ({
-        kp: bloxQty(-5, '1/degC'),
+        k: inverseTempQty(-5),
         ti: bloxQty('2h'),
         td: bloxQty('0s'),
       }),
@@ -107,7 +112,7 @@ const block: BlockSpec<PidBlock> = {
     {
       name: 'Heating pad',
       generate: () => ({
-        kp: bloxQty(100, '1/degC'),
+        k: inverseTempQty(100),
         ti: bloxQty('2h'),
         td: bloxQty('10m'),
       }),
@@ -118,7 +123,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'kp',
       title: 'Kp',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(0, `1/${serviceTemp(serviceId)}`),
+      generate: () => inverseTempQty(0),
     },
     {
       key: 'ti',
@@ -156,7 +161,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'inputSetting',
       title: 'Input target',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
+      generate: () => tempQty(20),
       readonly: true,
       graphed: true,
     },
@@ -164,7 +169,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'inputValue',
       title: 'Input value',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
+      generate: () => tempQty(20),
       readonly: true,
       graphed: true,
     },
@@ -172,7 +177,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'error',
       title: 'Error',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(0, `delta_${serviceTemp(serviceId)}`),
+      generate: () => deltaTempQty(0),
       readonly: true,
       graphed: true,
     },
@@ -180,7 +185,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'integral',
       title: 'Integral of error',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(1, `delta_${serviceTemp(serviceId)}*hour`),
+      generate: () => deltaTempMultHourQty(1),
       readonly: true,
       graphed: true,
     },
@@ -188,7 +193,7 @@ const block: BlockSpec<PidBlock> = {
       key: 'derivative',
       title: 'Derivative of input',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(1, `delta_${serviceTemp(serviceId)}/minute`),
+      generate: () => deltaTempPerMinuteQty(1),
       readonly: true,
       graphed: true,
     },

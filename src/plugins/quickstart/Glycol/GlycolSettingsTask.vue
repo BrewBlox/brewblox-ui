@@ -1,8 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty } from '@/helpers/bloxfield';
-import { sparkStore } from '@/plugins/spark/store';
+import { tempQty } from '@/helpers/bloxfield';
 
 import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
@@ -12,14 +11,8 @@ import { GlycolConfig, GlycolOpts } from './types';
 
 @Component
 export default class GlycolSettingsTask extends QuickStartTaskBase<GlycolConfig> {
-  beerSetting = bloxQty(20, 'degC');
-  glycolSetting = bloxQty(4, 'degC');
-
-  created(): void {
-    const { Temp } = sparkStore.moduleById(this.config.serviceId)!.units;
-    this.beerSetting = this.beerSetting.to(Temp);
-    this.glycolSetting = this.glycolSetting.to(Temp);
-  }
+  beerSetting = tempQty(20);
+  glycolSetting = tempQty(4);
 
   done(): void {
     const opts: GlycolOpts = { beerSetting: this.beerSetting, glycolSetting: this.glycolSetting };

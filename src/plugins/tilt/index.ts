@@ -24,9 +24,7 @@ export default {
         ...stub,
         title: stub.id,
         order: 0,
-        config: {
-          tempUnit: 'degC',
-        },
+        config: {},
       }),
     });
 

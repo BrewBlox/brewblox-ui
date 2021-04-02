@@ -3,7 +3,7 @@ import { Enum } from 'typescript-string-enums';
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { bloxQty, isQuantity } from '@/helpers/bloxfield';
+import { bloxQty, isQuantity, tempQty } from '@/helpers/bloxfield';
 import { deepCopy } from '@/helpers/functional';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
@@ -30,10 +30,6 @@ export default class AnalogCompareEditDialog extends DialogBase {
     return sparkStore.moduleById(this.serviceId)!;
   }
 
-  get tempUnit(): string {
-    return this.sparkModule.units.Temp;
-  }
-
   get operatorOpts(): SelectOption[] {
     return Enum.values(AnalogCompareOp)
       .map(value => ({ value, label: analogOpTitles[value] }));
@@ -47,7 +43,7 @@ export default class AnalogCompareEditDialog extends DialogBase {
   get rhs(): Quantity | number {
     const cmp = this.local!;
     return this.isTemp
-      ? bloxQty(cmp.rhs, 'degC').to(this.tempUnit)
+      ? tempQty(cmp.rhs)
       : cmp.rhs;
   }
 

@@ -14,12 +14,9 @@ const isStoreEvent = (data: unknown): data is DatastoreEvent =>
   isObjectLike(data)
   && ('changed' in (data as any) || 'deleted' in (data as any));
 
-const moduleNamespace = (moduleId: string): string =>
-  `brewblox-ui-store:${moduleId}`;
-
-function intercept(message: string, moduleId: string): ((e: AxiosError) => never) {
+function intercept(message: string, namespace: string): ((e: AxiosError) => never) {
   return (e: AxiosError) => {
-    notify.error(`DB error in ${message}(${moduleId}): ${parseHttpError(e)}`, { shown: false });
+    notify.error(`DB error in ${message}(${namespace}): ${parseHttpError(e)}`, { shown: false });
     throw e;
   };
 }
@@ -49,18 +46,27 @@ async function checkDatastore(): Promise<void> {
 }
 
 export class BrewbloxRedisDatabase implements BrewbloxDatabase {
-  // handlers are indexed on fully qualified namespace
-  private handlers: Mapped<EventHandler> = {}
+  // handlers are indexed on namespace
+  private handlers: Mapped<EventHandler> = {};
+  private rootNamespaces: string[] = [];
 
   public async connect(): Promise<void> {
-    Vue.$eventbus.subscribe(STORE_TOPIC);
-    Vue.$eventbus.addListener(STORE_TOPIC, (_, data) => {
+    await checkDatastore();
+  }
+
+  private subscribeChanged(namespace: string): void {
+    const root = namespace.split(':')[0];
+    if (this.rootNamespaces.includes(root)) {
+      return;
+    }
+    this.rootNamespaces.push(root);
+    Vue.$eventbus.subscribe(`${STORE_TOPIC}/${root}`);
+    Vue.$eventbus.addListener(`${STORE_TOPIC}/${root}`, (_, data) => {
       if (isStoreEvent(data)) {
         data.changed && this.onChanged(data.changed);
         data.deleted && this.onDeleted(data.deleted);
       }
     });
-    await checkDatastore();
   }
 
   private onChanged(changed: StoreObject[]): void {
@@ -80,57 +86,58 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   }
 
   public subscribe(handler: EventHandler): void {
-    if (!handler.id) {
-      throw new Error('Database handler id not set');
+    const { namespace } = handler;
+    if (!namespace) {
+      throw new Error('Database handler namespace not set');
     }
-    const namespace = moduleNamespace(handler.id);
     if (this.handlers[namespace] !== undefined) {
-      throw new Error(`Database handler '${module.id}' is already registered`);
+      throw new Error(`Database handler '${namespace}' is already registered`);
     }
     this.handlers[namespace] = Object.freeze(handler);
+    this.subscribeChanged(namespace);
   }
 
-  public async fetchAll<T extends StoreObject>(moduleId: string): Promise<T[]> {
+  public async fetchAll<T extends StoreObject>(namespace: string): Promise<T[]> {
     return http
       .post<{ values: T[] }>('/history/datastore/mget', {
-        namespace: moduleNamespace(moduleId),
+        namespace,
         filter: '*',
       })
       .then(resp => resp.data.values)
-      .catch(intercept('Fetch all objects', moduleId));
+      .catch(intercept('Fetch all objects', namespace));
   }
 
-  public async fetchById<T extends StoreObject>(moduleId: string, objId: string): Promise<T> {
+  public async fetchById<T extends StoreObject>(namespace: string, objId: string): Promise<T | null> {
     return http
-      .post<{ value: T }>('/history/datastore/get', {
-        namespace: moduleNamespace(moduleId),
+      .post<{ value: T | null }>('/history/datastore/get', {
+        namespace,
         id: objId,
       })
       .then(resp => resp.data.value)
-      .catch(intercept(`Fetch '${objId}'`, moduleId));
+      .catch(intercept(`Fetch '${objId}'`, namespace));
   }
 
-  public async persist<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
+  public async persist<T extends StoreObject>(namespace: string, obj: T): Promise<T> {
     return http
       .post<{ value: T }>('/history/datastore/set', {
         value: {
           ...obj,
-          namespace: moduleNamespace(moduleId),
+          namespace,
         },
       })
       .then(resp => resp.data.value)
-      .catch(intercept(`Persist '${obj.id}'`, moduleId));
+      .catch(intercept(`Persist '${obj.id}'`, namespace));
   }
 
   public create = this.persist;
 
-  public async remove<T extends StoreObject>(moduleId: string, obj: T): Promise<T> {
+  public async remove<T extends StoreObject>(namespace: string, obj: T): Promise<T> {
     await http
       .post('/history/datastore/delete', {
-        namespace: moduleNamespace(moduleId),
+        namespace,
         id: obj.id,
       })
-      .catch(intercept(`Remove '${obj.id}'`, moduleId));
+      .catch(intercept(`Remove '${obj.id}'`, namespace));
     return obj;
   }
 }

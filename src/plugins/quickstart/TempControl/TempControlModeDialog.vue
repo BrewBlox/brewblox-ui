@@ -2,11 +2,10 @@
 import { Component, Prop } from 'vue-property-decorator';
 
 import DialogBase from '@/components/DialogBase';
-import { bloxQty } from '@/helpers/bloxfield';
+import { bloxQty, inverseTempQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { deepCopy, typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { TempUnit } from '@/plugins/spark/types';
 import { BlockType, SetpointSensorPairBlock } from '@/shared-types';
 
 import { TempControlMode } from './types';
@@ -44,10 +43,6 @@ export default class TempControlModeDialog extends DialogBase {
     return sparkStore.moduleById(this.serviceId);
   }
 
-  get serviceTemp(): TempUnit {
-    return this.module?.units.Temp ?? 'degC';
-  }
-
   get setpoint(): SetpointSensorPairBlock | null {
     return this.module && this.tempMode
       ? this.module.blockByLink(this.tempMode.setpoint)
@@ -73,7 +68,7 @@ export default class TempControlModeDialog extends DialogBase {
 
   addCoolConfig(): void {
     this.tempMode!.coolConfig = {
-      kp: bloxQty(-50, '1/degC').to(`1/${this.serviceTemp}`),
+      kp: inverseTempQty(-50),
       ti: bloxQty('0s'),
       td: bloxQty('0s'),
     };
@@ -82,7 +77,7 @@ export default class TempControlModeDialog extends DialogBase {
 
   addHeatConfig(): void {
     this.tempMode!.heatConfig = {
-      kp: bloxQty(100, '1/degC').to(`1/${this.serviceTemp}`),
+      kp: inverseTempQty(100),
       ti: bloxQty('0s'),
       td: bloxQty('0s'),
     };

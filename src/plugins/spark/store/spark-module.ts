@@ -15,7 +15,6 @@ import type {
   SparkExported,
   SparkService,
   SparkStatus,
-  UserUnits,
 } from '@/plugins/spark/types';
 import { SparkPatchEvent } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
@@ -40,7 +39,6 @@ export class SparkServiceModule extends VuexModule {
 
   public blocks: Block[] = [];
   public discoveredBlocks: string[] = [];
-  public units: UserUnits = { Temp: 'degC' };
   public status: SparkStatus | null = null;
   public lastBlocks: Date | null = null;
   public lastStatus: Date | null = null;
@@ -188,16 +186,6 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
-  public async fetchUnits(): Promise<void> {
-    this.units = await api.fetchUnits(this.id);
-  }
-
-  @Action
-  public async saveUnits(units: UserUnits): Promise<void> {
-    this.units = await api.persistUnits(this.id, units);
-  }
-
-  @Action
   public async saveAutoConnecting(enabled: boolean): Promise<void> {
     await api.persistAutoconnecting(this.id, enabled);
   }
@@ -226,7 +214,6 @@ export class SparkServiceModule extends VuexModule {
     serviceStore.updateStatus(asServiceStatus(status));
     if (status.isSynchronized) {
       await Promise.all([
-        this.fetchUnits(),
         this.fetchDiscoveredBlocks(),
         this.fetchBlocks(),
       ]);

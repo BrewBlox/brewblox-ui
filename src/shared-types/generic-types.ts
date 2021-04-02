@@ -4,6 +4,11 @@
 export type UUID = string;
 
 /**
+ * The default config notation for celsius/fahrenheit.
+ */
+export type TempUnit = 'degC' | 'degF';
+
+/**
  * Required fields for an object to be stored in the datastore.
  */
 export interface StoreObject {

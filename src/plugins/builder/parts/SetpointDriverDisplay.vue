@@ -7,8 +7,7 @@ import {
 } from '@quasar/extras/mdi-v5';
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty, isQuantity, Quantity } from '@/helpers/bloxfield';
-import { serviceTemp } from '@/plugins/spark/helpers';
+import { deltaTempQty, isQuantity, Quantity } from '@/helpers/bloxfield';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
@@ -17,6 +16,7 @@ import {
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
+import { systemStore } from '@/store/system';
 
 import PartBase from '../components/PartBase';
 import { settingsAddress } from '../helpers';
@@ -85,17 +85,14 @@ export default class SetpointDriverDisplay extends PartBase {
       : 'mdiGauge';
   }
 
-  get tempUnit(): 'delta_degC' | 'delta_degF' {
-    return this.block !== null
-      && serviceTemp(this.block.serviceId) === 'degF'
-      ? 'delta_degF'
-      : 'delta_degC';
+  get deltaTempUnit(): string {
+    return `delta_${systemStore.units.temperature}`;
   }
 
   get actualSetting(): Quantity | number | null {
     const v = this.block?.data.setting ?? null;
     return isQuantity(this.refAmount)
-      ? bloxQty(v, 'delta_degC').to(this.tempUnit)
+      ? deltaTempQty(v)
       : v;
   }
 }

@@ -72,10 +72,6 @@ export default class ActuatorLogicFull
     this.delayedSave = window.setTimeout(this.saveLocal, 1000);
   }
 
-  get tempUnit(): string {
-    return this.sparkModule.units.Temp;
-  }
-
   get validBlocks(): Block[] {
     return this.sparkModule.blocks
       .filter(block => isCompatible(block.type, validTypes));
@@ -108,7 +104,6 @@ export default class ActuatorLogicFull
         pretty: prettyAnalog(
           cmp,
           this.sparkModule.blockById(cmp.id.id)?.type ?? null,
-          this.tempUnit,
         ),
       }));
   }
