@@ -3,7 +3,6 @@ import { Notify } from 'quasar';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
-import { prettyUnit } from '@/helpers/bloxfield';
 import { systemStore } from '@/store/system';
 
 
@@ -23,12 +22,12 @@ export default class ConfigWatcher extends Vue {
       timeout: 0,
       actions: [
         {
-          label: 'Use ' + prettyUnit('degC'),
+          label: 'Celsius',
           textColor: 'white',
           handler: () => systemStore.saveUnits({ temperature: 'degC' }),
         },
         {
-          label: 'Use ' + prettyUnit('degF'),
+          label: 'Fahrenheit',
           textColor: 'white',
           handler: () => systemStore.saveUnits({ temperature: 'degF' }),
         },
