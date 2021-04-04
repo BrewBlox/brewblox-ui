@@ -7,7 +7,7 @@ import { featureStore } from '@/store/features';
 import { Service, serviceStore, ServiceStub } from '@/store/services';
 
 
-export async function startCreateService(stub: ServiceStub): Promise<void> {
+export async function startCreateService(stub: ServiceStub, navigate: boolean = true): Promise<void> {
   const feature = featureStore.serviceById(stub.type);
   if (feature === null) {
     notify.error(`Unknown service type '${stub.type}'`);
@@ -29,7 +29,9 @@ export async function startCreateService(stub: ServiceStub): Promise<void> {
     const service = await feature.wizard(stub);
     await serviceStore.appendService(service);
     notify.done(`Added ${feature.title} <b>${service.id}</b>`);
-    router.push(`/service/${service.id}`);
+    if (navigate) {
+      router.push(`/service/${service.id}`);
+    }
   }
 }
 

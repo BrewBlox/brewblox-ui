@@ -1,28 +1,38 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
+import { startCreateService } from '@/helpers/services';
 import { sparkType } from '@/plugins/spark/getters';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType } from '@/plugins/spark/types';
-import { Service, serviceStore } from '@/store/services';
+import { Service, serviceStore, ServiceStub } from '@/store/services';
 
 import { QuickStartOutput } from '../types';
 import QuickStartTaskBase from './QuickStartTaskBase';
 
 
-@Component
+@Component({
+  methods: {
+    startCreateService,
+  },
+})
 export default class QuickStartServiceTask extends QuickStartTaskBase<QuickStartOutput> {
   service: Service | null = null;
   handleExisting: 'keep' | 'clear' | null = null;
 
   mounted(): void {
-    this.service = serviceStore.serviceById(this.config.serviceId)
-      ?? this.services[0]
-      ?? null;
+    this.service = serviceStore.serviceById(this.config.serviceId);
+    if (!this.service && this.services.length === 1 && this.stubs.length === 0) {
+      this.service = this.services[0];
+    }
   }
 
   get services(): Service[] {
     return serviceStore.services.filter(v => v.type === sparkType);
+  }
+
+  get stubs(): ServiceStub[] {
+    return serviceStore.stubs.filter(v => v.type === sparkType);
   }
 
   get sparkModule(): SparkServiceModule | null {
@@ -81,6 +91,24 @@ export default class QuickStartServiceTask extends QuickStartTaskBase<QuickStart
         item-aligned
         label="Service"
       />
+
+      <div
+        v-for="stub in stubs"
+        :key="'stub-'+stub.id"
+        class="q-mt-lg q-pa-md column items-center q-gutter-md"
+      >
+        <q-icon name="warning" color="warning" size="md" class="col-auto" />
+        <span>
+          Detected new Spark service '{{ stub.id }}'
+        </span>
+        <div class="row q-gutter-x-sm">
+          <q-btn
+            outline
+            label="Add service to UI"
+            @click="startCreateService(stub, false)"
+          />
+        </div>
+      </div>
 
       <div v-if="hasBlocks" class="q-mt-lg q-pa-md column items-center q-gutter-md">
         <q-icon name="warning" color="warning" size="md" class="col-auto" />
