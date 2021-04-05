@@ -7,6 +7,7 @@ import { BrewbloxStartup } from './plugins/startup';
 declare module 'vue/types/vue' {
   interface Vue {
     $dense: boolean;
+    $touch: boolean;
   }
   interface VueConstructor {
     $database: BrewbloxDatabase;

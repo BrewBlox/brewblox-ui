@@ -248,7 +248,7 @@ export default class QuickActionsBasic extends CrudComponent<QuickActionsConfig>
           class="col-auto q-ml-sm"
           @click="applyAction(action)"
         >
-          <q-tooltip>
+          <q-tooltip v-if="!$touch">
             Apply action <span v-if="action.active">(no fields will be changed)</span>
           </q-tooltip>
         </q-btn>
