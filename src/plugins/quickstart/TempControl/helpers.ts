@@ -9,6 +9,7 @@ import {
   BlockType,
   DigitalActuatorBlock,
   Link,
+  MotorValveBlock,
   PidBlock,
   SetpointProfileBlock,
   SetpointSensorPairBlock,
@@ -208,7 +209,7 @@ function findPidProblems(module: SparkServiceModule, pid: PidBlock): TempControl
       return issues;
     }
 
-    const digital = module.blockByLink<DigitalActuatorBlock>(analog.data.actuatorId);
+    const digital = module.blockByLink<DigitalActuatorBlock | MotorValveBlock>(analog.data.actuatorId);
     if (!digital) {
       issues.push({
         desc: `Digital Actuator not found: ${linkStr(pid, analog, digitalLink)}`,
@@ -218,7 +219,8 @@ function findPidProblems(module: SparkServiceModule, pid: PidBlock): TempControl
     }
 
     const deviceLink = digital.data.hwDevice;
-    if (!deviceLink.id || !digital.data.channel) {
+    // It is possible for MotorValve startChannel to be 0, so only check for DigitalActuator channel
+    if (!deviceLink.id || (digital.type === BlockType.DigitalActuator && !digital.data.channel)) {
       issues.push({
         desc: `Pin Channel not defined: ${linkStr(pid, analog, digital)}`,
         autofix: () => createBlockDialogPromise(digital),
