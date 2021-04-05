@@ -3,10 +3,8 @@ import { select as d3Select } from 'd3-selection';
 import { render as dagreRender } from 'dagre-d3';
 import graphlib from 'graphlib';
 import isFinite from 'lodash/isFinite';
-import { setTimeout } from 'timers';
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
-import { Watch } from 'vue-property-decorator';
 
 import { createBlockDialog } from '@/helpers/dialog';
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
@@ -24,10 +22,12 @@ const INVERTED = [
 
 @Component
 export default class RelationsDiagram extends Vue {
-  graphObj: graphlib.Graph = new graphlib.Graph();
+  renderFunc = new dagreRender();
   autoscale: boolean = false;
-  finiteWidth: number = 0;
-  finiteHeight: number = 0;
+  graphSize: { width: number; height: number } = {
+    width: 0,
+    height: 0,
+  };
 
   @Ref()
   readonly svg!: SVGGraphicsElement;
@@ -53,13 +53,6 @@ export default class RelationsDiagram extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly centered!: boolean;
 
-  @Watch('edges', { immediate: true })
-  display(newV: RelationEdge[], oldV: RelationEdge[] | null): void {
-    if (newV && JSON.stringify(newV) !== JSON.stringify(oldV)) {
-      setTimeout(() => this.calc() && setTimeout(() => this.draw(), 100), 100);
-    }
-  }
-
   get drawnNodes(): RelationNode[] {
     return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
       .map(id => this.nodes.find(node => node.id === id) ?? { id, type: '???' });
@@ -70,24 +63,40 @@ export default class RelationsDiagram extends Vue {
   }
 
   get svgProps(): Mapped<any> {
+    const { width, height } = this.graphSize;
     return {
-      viewBox: [0, 0, this.finiteWidth, this.finiteHeight].join(' '),
-      width: this.autoscale ? '100%' : `${this.finiteWidth}px`,
-      height: this.autoscale ? '100%' : `${this.finiteHeight}px`,
+      viewBox: [0, 0, width, height].join(' '),
+      width: this.autoscale ? '100%' : `${width}px`,
+      height: this.autoscale ? '100%' : `${height}px`,
     };
   }
 
-  calc(): boolean {
-    const nodeTemplate = (id: string, type: string): string => {
-      return `
-        <div class="block-label">
-          <div class="block-type">${type}</div>
-          <div class="block-id">${id}</div>
-        </div>
-        `.replace(/\n\s+/gm, '');
-    };
+  mounted(): void {
+    // Graph rendering depends on HTML elements already being rendered
+    this.$watch('nodes', this.onRelationsChanged, { immediate: true });
+  }
 
-    const obj = new graphlib
+  finite(v: number): number {
+    return isFinite(v) ? v : 0;
+  }
+
+  nodeTemplate(id: string, type: string): string {
+    return [
+      '<div class="block-label">',
+      `  <div class="block-type">${type}</div>`,
+      `  <div class="block-id">${id}</div>`,
+      '</div>',
+    ].join('\n');
+  }
+
+  onRelationsChanged(newV: RelationNode[], oldV: RelationNode[] | null): void {
+    if (newV && JSON.stringify(newV) !== JSON.stringify(oldV)) {
+      this.drawGraph(this.createGraph());
+    }
+  }
+
+  createGraph(): graphlib.Graph {
+    const graph = new graphlib
       .Graph({ multigraph: true, compound: true })
       .setGraph({ marginx: 20, marginy: 20 });
 
@@ -96,9 +105,9 @@ export default class RelationsDiagram extends Vue {
       : [...this.drawnNodes, ...this.loneNodes];
 
     nodes.forEach(node => {
-      obj.setNode(node.id, {
+      graph.setNode(node.id, {
         id: node.id,
-        label: nodeTemplate(node.id, node.type),
+        label: this.nodeTemplate(node.id, node.type),
         labelType: 'html',
         width: LABEL_WIDTH,
         height: LABEL_HEIGHT,
@@ -115,7 +124,7 @@ export default class RelationsDiagram extends Vue {
         ? [edge.target, edge.source]
         : [edge.source, edge.target];
 
-      obj.setEdge(source, target, {
+      graph.setEdge(source, target, {
         label,
         labelStyle: 'fill: white; stroke: none;',
         style: 'fill: none; stroke: red; stroke-width: 1.5px;',
@@ -131,7 +140,7 @@ export default class RelationsDiagram extends Vue {
       // Skip an edge every few nodes to create a new column
       this.loneNodes.forEach((node, idx) => {
         if (idx % LONE_NODE_ROWS === 0) { return; }
-        obj.setEdge(this.loneNodes[idx - 1].id, node.id, {
+        graph.setEdge(this.loneNodes[idx - 1].id, node.id, {
           label: '',
           labelStyle: invisible,
           style: invisible,
@@ -140,34 +149,25 @@ export default class RelationsDiagram extends Vue {
       });
     }
 
-    this.graphObj = obj;
-    return true;
+    return graph;
   }
 
-  finite(v: number): number {
-    return isFinite(v) ? v : 0;
-  }
-
-  draw(): void {
-    const renderFunc = new dagreRender();
+  drawGraph(graph: graphlib.Graph): void {
     try {
-      renderFunc(d3Select(this.diagram), this.graphObj);
+      this.renderFunc(d3Select(this.diagram), graph);
     } catch (e) {
       // Workaround for a bug in FireFox where getScreenCTM() returns null for hidden or 0x0 elements
+      // https://github.com/dagrejs/dagre-d3/issues/340
       if (e.name === 'TypeError') {
-        renderFunc(d3Select(this.diagram), this.graphObj);
+        this.renderFunc(d3Select(this.diagram), graph);
       } else {
         throw e;
       }
     }
 
-    const { width, height } = this.graphObj.graph() as any;
-    this.finiteWidth = this.finite(width);
-    this.finiteHeight = this.finite(height);
-
-    this.graphObj
+    graph
       .nodes()
-      .map(id => this.graphObj.node(id))
+      .map(id => graph.node(id))
       .forEach((node: { id: string; elem: SVGGElement }) => {
         const { id, elem } = node;
         const label: SVGForeignObjectElement | null = elem.querySelector('foreignObject');
@@ -178,6 +178,12 @@ export default class RelationsDiagram extends Vue {
           label.onclick = () => this.openSettings(id);
         }
       });
+
+    const { width, height } = graph.graph() as any;
+    this.graphSize = {
+      width: this.finite(width),
+      height: this.finite(height),
+    };
   }
 
   openSettings(id: string): void {
@@ -198,7 +204,7 @@ export default class RelationsDiagram extends Vue {
     </svg>
     <q-btn
       fab-mini
-      class="absolute-bottom-right q-ma-lg z-top"
+      class="absolute-bottom-right q-ma-lg"
       color="secondary"
       :icon="autoscale ? 'mdi-arrow-expand-all' : 'mdi-arrow-collapse-all'"
       @click="autoscale = !autoscale"
