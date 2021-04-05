@@ -7,8 +7,8 @@ import { featureStore } from '@/store/features';
 
 
 @Component
-export default class InactiveObjectWidget extends BlockWidgetBase {
-  readonly block!: InactiveObjectBlock;
+export default class InactiveObjectWidget
+  extends BlockWidgetBase<InactiveObjectBlock> {
 
   get actualFeatureTitle(): string {
     return featureStore.widgetTitle(this.block.data.actualType);

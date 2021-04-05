@@ -7,8 +7,8 @@ import { fetchStoredBlock } from '@/plugins/spark/store/api';
 import { Block, DeprecatedObjectBlock } from '@/plugins/spark/types';
 
 @Component
-export default class DeprecatedObjectWidget extends BlockWidgetBase {
-  readonly block!: DeprecatedObjectBlock;
+export default class DeprecatedObjectWidget
+  extends BlockWidgetBase<DeprecatedObjectBlock> {
   actual: Block | null = null;
 
   async created(): Promise<void> {
