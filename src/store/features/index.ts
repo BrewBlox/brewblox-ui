@@ -4,7 +4,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 import { findById } from '@/helpers/functional';
 import store from '@/store';
 
-import {
+import type {
   ComponentResult,
   Crud,
   QuickStartFeature,

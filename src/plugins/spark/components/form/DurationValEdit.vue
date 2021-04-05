@@ -8,8 +8,7 @@ import { durationMs, durationString } from '@/helpers/duration';
 import ValEditBase from '../ValEditBase';
 
 @Component
-export default class DurationValEdit extends ValEditBase {
-  field!: Quantity | string;
+export default class DurationValEdit extends ValEditBase<Quantity | string> {
   local: string | null = '';
 
   created(): void {

@@ -8,8 +8,7 @@ import ValEditBase from '../ValEditBase';
 
 
 @Component
-export default class LinkValEdit extends ValEditBase {
-  field!: Link;
+export default class LinkValEdit extends ValEditBase<Link> {
   filtered: string[] | null = null;
 
   get blockIdOpts(): string[] {
