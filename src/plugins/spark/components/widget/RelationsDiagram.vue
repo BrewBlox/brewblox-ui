@@ -1,6 +1,7 @@
 <script lang="ts">
 import { select as d3Select } from 'd3-selection';
-import { graphlib, render as dagreRender } from 'dagre-d3';
+import { render as dagreRender } from 'dagre-d3';
+import graphlib from 'graphlib';
 import isFinite from 'lodash/isFinite';
 import { setTimeout } from 'timers';
 import Vue from 'vue';
@@ -11,8 +12,8 @@ import { createBlockDialog } from '@/helpers/dialog';
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
 const LONE_NODE_ROWS = 6;
-const LABEL_HEIGHT = 50;
-const LABEL_WIDTH = 150;
+const LABEL_HEIGHT = 70;
+const LABEL_WIDTH = 170;
 const INVERTED = [
   'input', // PID
   'reference', // Setpoint Driver
@@ -23,7 +24,7 @@ const INVERTED = [
 
 @Component
 export default class RelationsDiagram extends Vue {
-  graphObj: any = null;
+  graphObj: graphlib.Graph = new graphlib.Graph();
   autoscale: boolean = false;
   finiteWidth: number = 0;
   finiteHeight: number = 0;
@@ -101,6 +102,7 @@ export default class RelationsDiagram extends Vue {
         labelType: 'html',
         width: LABEL_WIDTH,
         height: LABEL_HEIGHT,
+        padding: 0,
         rx: 5,
         ry: 5,
         style: 'fill: #fff',
@@ -159,25 +161,23 @@ export default class RelationsDiagram extends Vue {
       }
     }
 
-    const outGraph = this.graphObj.graph();
-    this.finiteWidth = this.finite(outGraph.width);
-    this.finiteHeight = this.finite(outGraph.height);
+    const { width, height } = this.graphObj.graph() as any;
+    this.finiteWidth = this.finite(width);
+    this.finiteHeight = this.finite(height);
 
-    this.$nextTick(() => {
-      this.svg.querySelectorAll('foreignObject')
-        .forEach(el => {
-          const id = el.children[0].children[0].children[1].innerHTML;
-          // Add click listeners
-          el.addEventListener('click', () => this.openSettings(id));
-          // Dagre has issues setting the correct height/width on the generated ForeignObject elements
-          // This seems fixed on Linux, but still present on Windows
-          // Enforce values here to guarantee correctness
-          // el.setAttribute('class', 'label-node');
-          el.setAttribute('width', `${LABEL_WIDTH}`);
-          el.setAttribute('height', `${LABEL_HEIGHT}`);
-          el.parentElement!.setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
-        });
-    });
+    this.graphObj
+      .nodes()
+      .map(id => this.graphObj.node(id))
+      .forEach((node: { id: string; elem: SVGGElement }) => {
+        const { id, elem } = node;
+        const label: SVGForeignObjectElement | null = elem.querySelector('foreignObject');
+        if (label) {
+          label.setAttribute('width', `${LABEL_WIDTH}`);
+          label.setAttribute('height', `${LABEL_HEIGHT}`);
+          label.parentElement!.setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
+          label.onclick = () => this.openSettings(id);
+        }
+      });
   }
 
   openSettings(id: string): void {
@@ -222,6 +222,7 @@ export default class RelationsDiagram extends Vue {
 .block-label {
   height: 50px;
   width: 150px;
+  margin: 10px;
 }
 
 .block-label > div {
@@ -239,5 +240,8 @@ export default class RelationsDiagram extends Vue {
   font-size: 14px;
   color: black;
   padding: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>
