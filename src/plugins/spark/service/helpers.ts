@@ -29,7 +29,7 @@ export const blockSorters = (): { [id: string]: (a: ValidatedWidget, b: Validate
 export const defaultSessionConfig = (): SparkSessionConfig => ({
   expandedBlocks: {},
   sorting: 'name',
-  pageMode: 'List',
+  pageMode: 'Relations',
 });
 
 export const storageKey = (serviceId: string): string =>

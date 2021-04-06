@@ -98,7 +98,7 @@ export default class SparkPage extends Vue {
   }
 
   get pageMode(): PageMode {
-    return this.sessionCfg.pageMode ?? 'List';
+    return this.sessionCfg.pageMode ?? 'Relations';
   }
 
   set pageMode(mode: PageMode) {
