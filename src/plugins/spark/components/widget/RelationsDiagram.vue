@@ -183,7 +183,7 @@ export default class RelationsDiagram extends Vue {
     // Implemented as function to yield new values after window resize
     const centered = (scaleOffset: number = 0): d3.ZoomTransform => {
       const rect = this.svg.getBoundingClientRect();
-      const scale = Math.min((rect.width / width), (rect.height / height)) * (DEFAULT_SCALE + scaleOffset);
+      const scale = Math.min((rect.width / width), (rect.height / height), 1) * (DEFAULT_SCALE + scaleOffset);
       return d3
         .zoomIdentity
         .translate((rect.width - width * scale) / 2, (rect.height - height * scale) / 2)
