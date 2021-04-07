@@ -24,8 +24,8 @@ interface ValveArrayBlock extends Block {
 }
 
 @Component
-export default class ValveArray extends BlockCrudComponent {
-  readonly block!: ValveArrayBlock;
+export default class ValveArray
+  extends BlockCrudComponent<ValveArrayBlock> {
 
   @Prop({ type: Array, default: () => [] })
   public readonly mapping!: ChannelMapping[];

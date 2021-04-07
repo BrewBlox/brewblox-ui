@@ -2,11 +2,7 @@ import { Service } from '@/store/services';
 
 import { Quantity } from '../spark/types';
 
-export interface TiltServiceConfig {
-  tempUnit: 'degC' | 'degF';
-}
-
-export type TiltService = Service<TiltServiceConfig>;
+export type TiltService = Service<{}>;
 
 export interface TiltStateEvent {
   key: string; // Service ID

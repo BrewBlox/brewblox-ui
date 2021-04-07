@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual';
 
-import { bloxQty } from '@/helpers/bloxfield';
+import { bloxQty, inverseTempQty } from '@/helpers/bloxfield';
 import { combinations, typeMatchFilter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
 import { tryDisplayBlock } from '@/plugins/spark/helpers';
@@ -107,30 +107,29 @@ export function withoutPrefix(prefix: string, val: string): string {
     : val;
 }
 
-export function pidDefaults(serviceId: string): PidBlock['data'] {
-  return sparkStore.specById(BlockType.Pid).generate(serviceId);
-}
+export const pidDefaults = (): PidBlock['data'] =>
+  sparkStore.specById(BlockType.Pid).generate();
 
 export const makeBeerCoolConfig = (): PidConfig => ({
-  kp: bloxQty(-50, '1/degC'),
+  kp: inverseTempQty(-50),
   ti: bloxQty('6h'),
   td: bloxQty('30m'),
 });
 
 export const makeBeerHeatConfig = (): PidConfig => ({
-  kp: bloxQty(100, '1/degC'),
+  kp: inverseTempQty(100),
   ti: bloxQty('6h'),
   td: bloxQty('30m'),
 });
 
 export const makeFridgeCoolConfig = (): PidConfig => ({
-  kp: bloxQty(-20, '1/degC'),
+  kp: inverseTempQty(-20),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });
 
 export const makeFridgeHeatConfig = (): PidConfig => ({
-  kp: bloxQty(20, '1/degC'),
+  kp: inverseTempQty(20),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });

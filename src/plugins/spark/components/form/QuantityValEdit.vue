@@ -8,8 +8,7 @@ import { createDialog } from '@/helpers/dialog';
 import ValEditBase from '../ValEditBase';
 
 @Component
-export default class QuantityValEdit extends ValEditBase {
-  field!: Quantity;
+export default class QuantityValEdit extends ValEditBase<Quantity> {
   local: number | null = null;
 
   syncField(): void {

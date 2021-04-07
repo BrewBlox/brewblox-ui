@@ -3,9 +3,9 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import { bloxQty } from '@/helpers/bloxfield';
 import { extendById } from '@/helpers/functional';
 import store from '@/store';
-import { serviceStore } from '@/store/services';
+import { systemStore } from '@/store/system';
 
-import { TiltService, TiltStateEvent, TiltStateValue } from '../types';
+import { TiltStateEvent, TiltStateValue } from '../types';
 
 @Module({ generateMutationSetters: true })
 export class TiltModule extends VuexModule {
@@ -18,9 +18,7 @@ export class TiltModule extends VuexModule {
 
   @Action
   public async parseStateEvent(evt: TiltStateEvent): Promise<void> {
-    const service: TiltService | null = serviceStore.serviceById(evt.key);
-    const tempUnit = service?.config.tempUnit ?? 'degC';
-
+    const tempUnit = systemStore.units.temperature;
     const temp = evt.data[`Temperature[${tempUnit}]`];
     const sg = evt.data['Specific gravity'];
     const signalStrength = evt.data['Signal strength[dBm]'];

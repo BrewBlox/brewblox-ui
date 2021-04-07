@@ -4,14 +4,12 @@ import { Component } from 'vue-property-decorator';
 import { bloxLink, isLink, Link } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { displayTempLabels } from '@/plugins/spark/getters';
 import { isCompatible } from '@/plugins/spark/helpers';
 import { BlockIntfType, BlockOrIntfType, BlockType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 
 @Component
 export default class DisplaySettingsFull
   extends BlockCrudComponent<DisplaySettingsBlock> {
-  displayTempLabels = displayTempLabels
 
   slotNameRules: InputRule[] = [
     v => !v || v.length <= 15 || 'Name can only be 15 characters',
@@ -121,10 +119,6 @@ export default class DisplaySettingsFull
       .map(w => (w.pos === pos ? { ...w, color: color.replace('#', '') } : w));
     this.saveBlock();
   }
-
-  showUnitMenu(): void {
-    createDialog({ component: 'TempUnitMenu' });
-  }
 }
 </script>
 
@@ -178,13 +172,6 @@ export default class DisplaySettingsFull
           title="footer text"
           @input="v => {block.data.name = v; saveBlock()}"
         />
-        <LabeledField
-          label="Display temperature unit"
-          class="col-grow clickable"
-          @click="showUnitMenu"
-        >
-          {{ displayTempLabels[block.data.tempUnit] || 'Unknown' }}
-        </LabeledField>
         <q-field
           label="Display brightness"
           stack-label

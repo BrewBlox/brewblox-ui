@@ -1,8 +1,8 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty, JSQuantity } from '@/helpers/bloxfield';
-import { sparkStore } from '@/plugins/spark/store';
+import { bloxQty, deltaTempQty, JSQuantity } from '@/helpers/bloxfield';
+import { systemStore } from '@/store/system';
 
 import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
@@ -13,19 +13,14 @@ import { BrewKettleConfig, BrewKettleOpts } from './types';
 
 @Component
 export default class BrewKettleSettingsTask extends QuickStartTaskBase<BrewKettleConfig> {
-  fullPowerDelta = bloxQty(2, 'delta_degC');
+  fullPowerDelta = deltaTempQty(2);
 
   volumeRules: InputRule[] = [
     v => v !== 0 || 'Volume can\'t be 0',
   ]
 
-  created(): void {
-    const deltaTemp = `delta_${this.userTemp}`;
-    this.fullPowerDelta = this.fullPowerDelta.to(deltaTemp);
-  }
-
   get userTemp(): string {
-    return sparkStore.moduleById(this.config.serviceId)!.units.Temp;
+    return systemStore.units.temperature;
   }
 
   get kp(): JSQuantity {

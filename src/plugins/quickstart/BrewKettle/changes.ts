@@ -1,9 +1,8 @@
 import { uid } from 'quasar';
 
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/helpers/bloxfield';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   Block,
@@ -16,6 +15,7 @@ import {
 } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { TempControlWidget } from '../TempControl/types';
@@ -43,13 +43,13 @@ export function defineCreatedBlocks(config: BrewKettleConfig, opts: BrewKettleOp
         groups,
         data: {
           sensorId: bloxLink(names.kettleSensor),
-          storedSetting: bloxQty(70, 'degC'),
+          storedSetting: tempQty(70),
           settingEnabled: false,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
+          filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -93,7 +93,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig, opts: BrewKettleOp
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
+          ...pidDefaults(),
           enabled: true,
           inputId: bloxLink(names.kettleSetpoint),
           outputId: bloxLink(names.kettlePwm),
@@ -111,7 +111,7 @@ export function defineCreatedBlocks(config: BrewKettleConfig, opts: BrewKettleOp
 
 export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, layouts: BuilderLayout[]): Widget[] {
   const { serviceId, names, dashboardId, prefix } = config;
-  const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
+  const userTemp = systemStore.units.temperature;
   const genericSettings = {
     dashboard: dashboardId,
     cols: 4,

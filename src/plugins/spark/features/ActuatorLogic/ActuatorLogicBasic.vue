@@ -36,10 +36,6 @@ import { ExpressionError } from './types';
 export default class ActuatorLogicBasic
   extends BlockCrudComponent<ActuatorLogicBlock> {
 
-  get tempUnit(): string {
-    return this.sparkModule.units.Temp;
-  }
-
   keyColor(key: string): string {
     if (!isKey(key)) { return 'white'; }
     const arr: { key: string; cmp: AnalogCompare | DigitalCompare }[] =
@@ -101,7 +97,6 @@ export default class ActuatorLogicBasic
         pretty: prettyAnalog(
           cmp,
           this.sparkModule.blockById(cmp.id.id)?.type ?? null,
-          this.tempUnit,
         ),
       }));
   }
@@ -183,7 +178,7 @@ export default class ActuatorLogicBasic
               </div>
               <q-icon
                 name="mdi-checkbox-blank-circle"
-                :color="cmp.result === 1 ? 'positive' : 'negative'"
+                :color="cmp.result === 'RESULT_TRUE' ? 'positive' : 'negative'"
                 class="col-auto self-center"
               />
               <div class="col ellipsis">
@@ -213,7 +208,7 @@ export default class ActuatorLogicBasic
               </div>
               <q-icon
                 name="mdi-checkbox-blank-circle"
-                :color="cmp.result === 1 ? 'positive' : 'negative'"
+                :color="cmp.result === 'RESULT_TRUE' ? 'positive' : 'negative'"
                 class="col-auto self-center"
               />
               <div class="col ellipsis">

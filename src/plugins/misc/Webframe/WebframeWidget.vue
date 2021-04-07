@@ -60,6 +60,7 @@ export default class WebframeWidget extends WidgetBase<WebframeConfig> {
         title="URL"
         label="URL"
         class="col-grow"
+        tag-style="word-break: break-word"
         @input="v => { config.url = v; saveConfig(); }"
       />
 

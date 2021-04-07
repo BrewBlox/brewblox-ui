@@ -1,18 +1,18 @@
 <script lang="ts">
-import { select as d3Select } from 'd3-selection';
-import { graphlib, render as dagreRender } from 'dagre-d3';
+import * as d3 from 'd3';
+import dagre from 'dagre-d3';
+import graphlib from 'graphlib';
 import isFinite from 'lodash/isFinite';
-import { setTimeout } from 'timers';
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
-import { Watch } from 'vue-property-decorator';
 
 import { createBlockDialog } from '@/helpers/dialog';
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
+const DEFAULT_SCALE = 0.9;
 const LONE_NODE_ROWS = 6;
-const LABEL_HEIGHT = 50;
-const LABEL_WIDTH = 150;
+const LABEL_HEIGHT = 70;
+const LABEL_WIDTH = 170;
 const INVERTED = [
   'input', // PID
   'reference', // Setpoint Driver
@@ -23,10 +23,8 @@ const INVERTED = [
 
 @Component
 export default class RelationsDiagram extends Vue {
-  graphObj: any = null;
-  autoscale: boolean = false;
-  finiteWidth: number = 0;
-  finiteHeight: number = 0;
+  renderFunc = new dagre.render();
+  resetZoom: Function = () => { };
 
   @Ref()
   readonly svg!: SVGGraphicsElement;
@@ -52,13 +50,6 @@ export default class RelationsDiagram extends Vue {
   @Prop({ type: Boolean, default: false })
   public readonly centered!: boolean;
 
-  @Watch('edges', { immediate: true })
-  display(newV: RelationEdge[], oldV: RelationEdge[] | null): void {
-    if (newV && JSON.stringify(newV) !== JSON.stringify(oldV)) {
-      setTimeout(() => this.calc() && setTimeout(() => this.draw(), 100), 100);
-    }
-  }
-
   get drawnNodes(): RelationNode[] {
     return [...new Set(this.edges.flatMap(edge => [edge.target, edge.source]))]
       .map(id => this.nodes.find(node => node.id === id) ?? { id, type: '???' });
@@ -68,25 +59,33 @@ export default class RelationsDiagram extends Vue {
     return this.nodes.filter(node => !this.drawnNodes.find(n => n.id === node.id));
   }
 
-  get svgProps(): Mapped<any> {
-    return {
-      viewBox: [0, 0, this.finiteWidth, this.finiteHeight].join(' '),
-      width: this.autoscale ? '100%' : `${this.finiteWidth}px`,
-      height: this.autoscale ? '100%' : `${this.finiteHeight}px`,
-    };
+  mounted(): void {
+    // Graph rendering depends on HTML elements already being rendered
+    // We want to trigger first render after the svg element was mounted
+    this.$watch('nodes', this.onRelationsChanged, { immediate: true });
   }
 
-  calc(): boolean {
-    const nodeTemplate = (id: string, type: string): string => {
-      return `
-        <div class="block-label">
-          <div class="block-type">${type}</div>
-          <div class="block-id">${id}</div>
-        </div>
-        `.replace(/\n\s+/gm, '');
-    };
+  finite(v: number): number {
+    return isFinite(v) ? v : 0;
+  }
 
-    const obj = new graphlib
+  nodeTemplate(id: string, type: string): string {
+    return [
+      '<div class="block-label">',
+      `  <div class="block-type">${type}</div>`,
+      `  <div class="block-id">${id}</div>`,
+      '</div>',
+    ].join('\n');
+  }
+
+  onRelationsChanged(newV: RelationNode[], oldV: RelationNode[] | null): void {
+    if (newV && JSON.stringify(newV) !== JSON.stringify(oldV)) {
+      this.drawGraph(this.createGraph());
+    }
+  }
+
+  createGraph(): graphlib.Graph {
+    const graph = new graphlib
       .Graph({ multigraph: true, compound: true })
       .setGraph({ marginx: 20, marginy: 20 });
 
@@ -95,12 +94,13 @@ export default class RelationsDiagram extends Vue {
       : [...this.drawnNodes, ...this.loneNodes];
 
     nodes.forEach(node => {
-      obj.setNode(node.id, {
+      graph.setNode(node.id, {
         id: node.id,
-        label: nodeTemplate(node.id, node.type),
+        label: this.nodeTemplate(node.id, node.type),
         labelType: 'html',
         width: LABEL_WIDTH,
         height: LABEL_HEIGHT,
+        padding: 0,
         rx: 5,
         ry: 5,
         style: 'fill: #fff',
@@ -113,7 +113,7 @@ export default class RelationsDiagram extends Vue {
         ? [edge.target, edge.source]
         : [edge.source, edge.target];
 
-      obj.setEdge(source, target, {
+      graph.setEdge(source, target, {
         label,
         labelStyle: 'fill: white; stroke: none;',
         style: 'fill: none; stroke: red; stroke-width: 1.5px;',
@@ -129,7 +129,7 @@ export default class RelationsDiagram extends Vue {
       // Skip an edge every few nodes to create a new column
       this.loneNodes.forEach((node, idx) => {
         if (idx % LONE_NODE_ROWS === 0) { return; }
-        obj.setEdge(this.loneNodes[idx - 1].id, node.id, {
+        graph.setEdge(this.loneNodes[idx - 1].id, node.id, {
           label: '',
           labelStyle: invisible,
           style: invisible,
@@ -138,46 +138,72 @@ export default class RelationsDiagram extends Vue {
       });
     }
 
-    this.graphObj = obj;
-    return true;
+    return graph;
   }
 
-  finite(v: number): number {
-    return isFinite(v) ? v : 0;
-  }
+  drawGraph(graph: graphlib.Graph): void {
+    const svg = d3.select(this.svg);
+    const diagram = d3.select(this.diagram);
 
-  draw(): void {
-    const renderFunc = new dagreRender();
     try {
-      renderFunc(d3Select(this.diagram), this.graphObj);
+      this.renderFunc(diagram, graph);
     } catch (e) {
       // Workaround for a bug in FireFox where getScreenCTM() returns null for hidden or 0x0 elements
+      // https://github.com/dagrejs/dagre-d3/issues/340
       if (e.name === 'TypeError') {
-        renderFunc(d3Select(this.diagram), this.graphObj);
+        this.renderFunc(diagram, graph);
       } else {
         throw e;
       }
     }
 
-    const outGraph = this.graphObj.graph();
-    this.finiteWidth = this.finite(outGraph.width);
-    this.finiteHeight = this.finite(outGraph.height);
+    // Set custom formatting and onClick handlers for all nodes
+    graph
+      .nodes()
+      .map(id => graph.node(id))
+      .forEach((node: { id: string; elem: SVGGElement }) => {
+        const { id, elem } = node;
+        const label = elem.querySelector('foreignObject');
+        if (label) {
+          label.setAttribute('width', `${LABEL_WIDTH}`);
+          label.setAttribute('height', `${LABEL_HEIGHT}`);
+          label.parentElement!.setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
+          label.onclick = () => this.openSettings(id);
+        }
+      });
 
-    this.$nextTick(() => {
-      this.svg.querySelectorAll('foreignObject')
-        .forEach(el => {
-          const id = el.children[0].children[0].children[1].innerHTML;
-          // Add click listeners
-          el.addEventListener('click', () => this.openSettings(id));
-          // Dagre has issues setting the correct height/width on the generated ForeignObject elements
-          // This seems fixed on Linux, but still present on Windows
-          // Enforce values here to guarantee correctness
-          // el.setAttribute('class', 'label-node');
-          el.setAttribute('width', `${LABEL_WIDTH}`);
-          el.setAttribute('height', `${LABEL_HEIGHT}`);
-          el.parentElement!.setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
-        });
-    });
+    // Get actual diagram size
+    const { width, height } = graph.graph() as any;
+
+    // Enable zooming the graph
+    const zoom = d3.zoom<SVGGraphicsElement, unknown>()
+      .on('zoom', () => diagram.attr('transform', d3.event.transform));
+
+    // Enable centering the graph
+    // Implemented as function to yield new values after window resize
+    const centered = (scaleOffset: number = 0): d3.ZoomTransform => {
+      const rect = this.svg.getBoundingClientRect();
+      const scale = Math.min((rect.width / width), (rect.height / height), 1) * (DEFAULT_SCALE + scaleOffset);
+      return d3
+        .zoomIdentity
+        .translate((rect.width - width * scale) / 2, (rect.height - height * scale) / 2)
+        .scale(scale);
+    };
+
+    // Apply effects
+    // Initialize scale slightly larger
+    // We want something to happen if users immediately press the reset button
+    svg
+      .call(zoom)
+      .call(zoom.transform, centered(0.05));
+
+    // Provide functionality to reset zoom level
+    // This captures local variables
+    this.resetZoom = () =>
+      svg
+        .transition()
+        .duration(750)
+        .call(zoom.transform, centered());
   }
 
   openSettings(id: string): void {
@@ -193,16 +219,20 @@ export default class RelationsDiagram extends Vue {
 
 <template>
   <div :class="['fit', centered && 'flex flex-center']">
-    <svg ref="svg" v-bind="svgProps">
+    <svg ref="svg" class="fit">
       <g ref="diagram" />
     </svg>
     <q-btn
-      fab-mini
-      class="absolute-bottom-right q-ma-lg z-top"
+      unelevated
+      class="absolute-bottom-right q-ma-lg"
       color="secondary"
-      :icon="autoscale ? 'mdi-arrow-expand-all' : 'mdi-arrow-collapse-all'"
-      @click="autoscale = !autoscale"
-    />
+      icon="mdi-arrow-expand-all"
+      @click="resetZoom"
+    >
+      <q-tooltip>
+        Fit to screen
+      </q-tooltip>
+    </q-btn>
   </div>
 </template>
 
@@ -222,6 +252,7 @@ export default class RelationsDiagram extends Vue {
 .block-label {
   height: 50px;
   width: 150px;
+  margin: 10px;
 }
 
 .block-label > div {
@@ -239,5 +270,8 @@ export default class RelationsDiagram extends Vue {
   font-size: 14px;
   color: black;
   padding: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>

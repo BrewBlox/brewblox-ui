@@ -72,10 +72,6 @@ export default class ActuatorLogicFull
     this.delayedSave = window.setTimeout(this.saveLocal, 1000);
   }
 
-  get tempUnit(): string {
-    return this.sparkModule.units.Temp;
-  }
-
   get validBlocks(): Block[] {
     return this.sparkModule.blocks
       .filter(block => isCompatible(block.type, validTypes));
@@ -108,7 +104,6 @@ export default class ActuatorLogicFull
         pretty: prettyAnalog(
           cmp,
           this.sparkModule.blockById(cmp.id.id)?.type ?? null,
-          this.tempUnit,
         ),
       }));
   }
@@ -258,7 +253,7 @@ export default class ActuatorLogicFull
               </div>
               <q-icon
                 name="mdi-checkbox-blank-circle"
-                :color="cmp.result === 1 ? 'positive' : 'negative'"
+                :color="cmp.result === 'RESULT_TRUE' ? 'positive' : 'negative'"
                 class="col-auto self-center"
               />
               <div class="col ellipsis">
@@ -290,7 +285,7 @@ export default class ActuatorLogicFull
               </div>
               <q-icon
                 name="mdi-checkbox-blank-circle"
-                :color="cmp.result === 1 ? 'positive' : 'negative'"
+                :color="cmp.result === 'RESULT_TRUE' ? 'positive' : 'negative'"
                 class="col-auto self-center"
               />
               <div class="col ellipsis">

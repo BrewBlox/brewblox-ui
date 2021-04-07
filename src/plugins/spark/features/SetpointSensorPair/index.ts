@@ -1,6 +1,6 @@
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, deltaTempQty, tempQty } from '@/helpers/bloxfield';
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector, serviceTemp } from '@/plugins/spark/helpers';
+import { blockWidgetSelector } from '@/plugins/spark/helpers';
 import { BlockIntfType, BlockSpec, BlockType, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { WidgetFeature } from '@/store/features';
 
@@ -10,26 +10,23 @@ const typeName = BlockType.SetpointSensorPair;
 
 const block: BlockSpec<SetpointSensorPairBlock> = {
   id: typeName,
-  generate: (serviceId: string | null) => {
-    const temp = serviceTemp(serviceId);
-    return {
-      sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
-      storedSetting: bloxQty(20, 'degC').to(temp),
-      setting: bloxQty(null, temp),
-      value: bloxQty(null, temp),
-      valueUnfiltered: bloxQty(null, temp),
-      resetFilter: false,
-      settingEnabled: true,
-      filter: FilterChoice.FILTER_15s,
-      filterThreshold: bloxQty(5, 'delta_degC').to(`delta_${temp}`),
-    };
-  },
+  generate: () => ({
+    sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
+    storedSetting: tempQty(20),
+    setting: tempQty(null),
+    value: tempQty(null),
+    valueUnfiltered: tempQty(null),
+    resetFilter: false,
+    settingEnabled: true,
+    filter: FilterChoice.FILTER_15s,
+    filterThreshold: deltaTempQty(5),
+  }),
   fields: [
     {
       key: 'storedSetting',
       title: 'Setting',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
+      generate: () => tempQty(20),
     },
     {
       key: 'settingEnabled',
@@ -41,7 +38,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'filterThreshold',
       title: 'Fast step threshold',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(5, 'delta_degC').to(`delta_${serviceTemp(serviceId)}`),
+      generate: () => deltaTempQty(5),
     },
     {
       key: 'sensorId',
@@ -53,7 +50,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'setting',
       title: 'Setting (actual)',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
+      generate: () => tempQty(20),
       readonly: true,
       graphed: true,
     },
@@ -61,7 +58,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'value',
       title: 'Sensor',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
+      generate: () => tempQty(20),
       readonly: true,
       graphed: true,
     },
@@ -69,7 +66,7 @@ const block: BlockSpec<SetpointSensorPairBlock> = {
       key: 'valueUnfiltered',
       title: 'Sensor unfiltered',
       component: 'QuantityValEdit',
-      generate: serviceId => bloxQty(20, 'degC').to(serviceTemp(serviceId)),
+      generate: () => tempQty(20),
       readonly: true,
       graphed: true,
     },

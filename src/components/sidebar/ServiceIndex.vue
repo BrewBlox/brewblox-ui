@@ -12,12 +12,14 @@ interface ServiceSuggestion {
   feature: ServiceFeature;
 }
 
-@Component
+@Component({
+  methods: {
+    startChangeServiceTitle,
+    startCreateService,
+    startRemoveService,
+  },
+})
 export default class ServiceIndex extends Vue {
-  startChangeServiceTitle = startChangeServiceTitle;
-  startCreateService = startCreateService;
-  startRemoveService = startRemoveService;
-
   dragging = false;
 
   @Prop({ type: Boolean, required: true })

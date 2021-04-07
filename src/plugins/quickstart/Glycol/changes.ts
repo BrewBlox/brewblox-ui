@@ -1,10 +1,9 @@
 import { uid } from 'quasar';
 
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   Block,
@@ -19,6 +18,7 @@ import {
 } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { TempControlWidget } from '../TempControl/types';
@@ -26,19 +26,19 @@ import { DisplayBlock, PidConfig } from '../types';
 import { GlycolConfig, GlycolOpts } from './types';
 
 const makeGlycolBeerCoolConfig = (): PidConfig => ({
-  kp: bloxQty(-20, '1/degC'),
+  kp: inverseTempQty(-20),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });
 
 const makeGlycolBeerHeatConfig = (): PidConfig => ({
-  kp: bloxQty(100, '1/degC'),
+  kp: inverseTempQty(100),
   ti: bloxQty('2h'),
   td: bloxQty('10m'),
 });
 
 const makeGlycolConfig = (): PidConfig => ({
-  kp: bloxQty(-20, '1/degC'),
+  kp: inverseTempQty(-20),
   ti: bloxQty('2h'),
   td: bloxQty('5m'),
 });
@@ -80,11 +80,11 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           sensorId: bloxLink(names.beerSensor),
           storedSetting: beerSetting,
           settingEnabled: true,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
+          filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -213,7 +213,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
+          ...pidDefaults(),
           ...makeGlycolBeerCoolConfig(),
           enabled: true,
           inputId: bloxLink(names.beerSetpoint),
@@ -226,7 +226,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
+          ...pidDefaults(),
           ...makeGlycolBeerHeatConfig(),
           enabled: true,
           inputId: bloxLink(names.beerSetpoint),
@@ -252,11 +252,11 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
             sensorId: bloxLink(names.glycolSensor),
             storedSetting: glycolSetting,
             settingEnabled: true,
-            setting: bloxQty(null, 'degC'),
-            value: bloxQty(null, 'degC'),
-            valueUnfiltered: bloxQty(null, 'degC'),
+            setting: tempQty(null),
+            value: tempQty(null),
+            valueUnfiltered: tempQty(null),
+            filterThreshold: deltaTempQty(5),
             filter: FilterChoice.FILTER_15s,
-            filterThreshold: bloxQty(5, 'delta_degC'),
             resetFilter: false,
           },
         },
@@ -303,7 +303,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           serviceId,
           groups,
           data: {
-            ...pidDefaults(config.serviceId),
+            ...pidDefaults(),
             ...makeGlycolConfig(),
             enabled: true,
             inputId: bloxLink(names.glycolSetpoint),
@@ -322,7 +322,7 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
 
 export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): Widget[] {
   const { serviceId, dashboardId, names, prefix, glycolControl } = config;
-  const userTemp = sparkStore.moduleById(serviceId)!.units.Temp;
+  const tempUnit = systemStore.units.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
@@ -360,16 +360,16 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
         {
           measurement: serviceId,
           fields: [
-            `${names.beerSensor}/value[${userTemp}]`,
-            `${names.beerSetpoint}/setting[${userTemp}]`,
+            `${names.beerSensor}/value[${tempUnit}]`,
+            `${names.beerSetpoint}/setting[${tempUnit}]`,
             `${names.coolPwm}/value`,
             `${names.coolAct}/state`,
           ],
         },
       ],
       renames: {
-        [`${serviceId}/${names.beerSensor}/value[${userTemp}]`]: 'Beer temperature',
-        [`${serviceId}/${names.beerSetpoint}/setting[${userTemp}]`]: 'Beer setting',
+        [`${serviceId}/${names.beerSensor}/value[${tempUnit}]`]: 'Beer temperature',
+        [`${serviceId}/${names.beerSetpoint}/setting[${tempUnit}]`]: 'Beer setting',
         [`${serviceId}/${names.coolPwm}/value`]: 'Cool PWM value',
         [`${serviceId}/${names.coolAct}/state`]: 'Cool Pin state',
       },

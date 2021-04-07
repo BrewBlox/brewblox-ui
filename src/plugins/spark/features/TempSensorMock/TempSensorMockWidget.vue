@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty } from '@/helpers/bloxfield';
+import { bloxQty, deltaTempQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
 import { Fluctuation, TempSensorMockBlock } from '@/plugins/spark/types';
@@ -11,13 +11,9 @@ import { Fluctuation, TempSensorMockBlock } from '@/plugins/spark/types';
 export default class TempSensorMockWidget
   extends BlockWidgetBase<TempSensorMockBlock> {
 
-  get tempUnit(): string {
-    return this.sparkModule.units.Temp;
-  }
-
   addFluctuation(): void {
     this.block.data.fluctuations.push({
-      amplitude: bloxQty(1, 'delta_degC').to(`delta_${this.tempUnit}`),
+      amplitude: deltaTempQty(1),
       period: bloxQty('6h'),
     });
     this.saveBlock();

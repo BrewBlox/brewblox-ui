@@ -2,11 +2,18 @@
 import { Component } from 'vue-property-decorator';
 
 import CrudComponent from '@/components/CrudComponent';
-import { bloxQty } from '@/helpers/bloxfield';
+import { tempQty } from '@/helpers/bloxfield';
 import { createDialog } from '@/helpers/dialog';
 import { spliceById, typeMatchFilter } from '@/helpers/functional';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockType, Link, PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
+import {
+  BlockType,
+  Link,
+  PidBlock,
+  Quantity,
+  SetpointProfileBlock,
+  SetpointSensorPairBlock,
+} from '@/shared-types';
 
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlPidView from './TempControlPidView.vue';
@@ -35,10 +42,6 @@ export default class TempControlFull extends CrudComponent<TempControlConfig> {
     return sparkStore.moduleById(this.serviceId);
   }
 
-  get serviceTemp(): 'degC' | 'degF' {
-    return this.module?.units.Temp ?? 'degC';
-  }
-
   get profile(): SetpointProfileBlock | null {
     return this.module?.blockByLink(this.config.profile) ?? null;
   }
@@ -60,7 +63,7 @@ export default class TempControlFull extends CrudComponent<TempControlConfig> {
     const block = this.module?.blockByLink(link);
     return this.setpointFilter(block)
       ? block.data.storedSetting
-      : bloxQty(null, this.serviceTemp);
+      : tempQty(null);
   }
 
   saveMode(mode: TempControlMode): void {

@@ -1,8 +1,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator';
 
-import { bloxQty } from '@/helpers/bloxfield';
-import { sparkStore } from '@/plugins/spark/store';
+import { tempQty } from '@/helpers/bloxfield';
 
 import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { createOutputActions } from '../helpers';
@@ -12,15 +11,9 @@ import { FermentConfig, FermentOpts } from './types';
 
 @Component
 export default class FermentSettingsTask extends QuickStartTaskBase<FermentConfig> {
-  fridgeSetting = bloxQty(20, 'degC');
-  beerSetting = bloxQty(20, 'degC');
+  fridgeSetting = tempQty(20);
+  beerSetting = tempQty(20);
   activeSetpoint: 'beer' | 'fridge' = 'beer';
-
-  created(): void {
-    const { Temp } = sparkStore.moduleById(this.config.serviceId)!.units;
-    this.fridgeSetting = this.fridgeSetting.to(Temp);
-    this.beerSetting = this.beerSetting.to(Temp);
-  }
 
   get targetOpts(): SelectOption[] {
     return [

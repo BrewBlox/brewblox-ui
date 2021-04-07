@@ -102,12 +102,10 @@ export default class DashboardPage extends Vue {
 
 <template>
   <q-page style="overflow: auto" class="page-height">
-    <template v-if="!dashboard">
-      <PageError v-if="!dashboard">
-        <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
-      </PageError>
-    </template>
-    <div v-else class="q-pa-lg">
+    <PageError v-if="!dashboard">
+      <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
+    </PageError>
+    <template v-else>
       <portal to="toolbar-title">
         {{ dashboard.title }}
       </portal>
@@ -153,7 +151,7 @@ export default class DashboardPage extends Vue {
       </div>
       <div
         v-else-if="$dense"
-        class="column q-gutter-y-sm"
+        class="column q-gutter-y-sm q-pa-md"
       >
         <component
           :is="val.component"
@@ -166,6 +164,7 @@ export default class DashboardPage extends Vue {
       </div>
       <GridContainer
         v-else
+        class="q-ma-lg"
         :editable="widgetEditable"
         @patch:widgets="patchWidgets"
         @dblclick="showWizard(true)"
@@ -180,6 +179,6 @@ export default class DashboardPage extends Vue {
           class="fit"
         />
       </GridContainer>
-    </div>
+    </template>
   </q-page>
 </template>

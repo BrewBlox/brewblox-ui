@@ -39,7 +39,7 @@ export default class BlockActions extends BlockCrudComponent {
       }
       else {
         createWidgetWizard(graphType)
-          .onOk(output => resolve(output.widget?.id))
+          .onOk(output => resolve(output.widget?.id ?? null))
           .onCancel(() => resolve(null))
           .onDismiss(() => resolve(null));
       }

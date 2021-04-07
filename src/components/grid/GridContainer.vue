@@ -5,6 +5,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { WidgetProps } from '@/components/WidgetBase';
 import { Widget } from '@/store/dashboards';
 
+import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import GridItem from './GridItem.vue';
 
 @Component({
@@ -14,6 +15,13 @@ export default class GridContainer extends Vue {
 
   @Prop({ type: Boolean, default: false })
   readonly editable!: boolean;
+
+  // Making this a getter causes unwanted caching, as default can be undefined
+  activeChildren(): VNode[] {
+    return this.$slots.default
+      ?.filter(slot => slot.tag != null)
+      ?? [];
+  }
 
   updateItemPosition(updatedId: string, pos: XYPosition | null): void {
     const updated: Partial<Widget>[] = this.$children
@@ -44,38 +52,49 @@ export default class GridContainer extends Vue {
   }
 
   renderWidgets(h: CreateElement): VNode[] {
-    const children = (this.$slots.default || [])
-      .filter(slot => !!slot.tag)
-      .map((slot: VNode) =>
-        h(
-          GridItem, // Wrap each widget in a GridItem to handle dragging / moving
-          {
-            props: {
-              widget: this.slotProps(slot).initialCrud.widget,
-              editable: this.editable,
-            },
-            on: {
-              size: this.updateItemSize,
-              position: this.updateItemPosition,
-            },
+    const elements = this.activeChildren()
+      .map((slot: VNode) => h(
+        GridItem, // Wrap each widget in a GridItem to handle dragging / moving
+        {
+          props: {
+            widget: this.slotProps(slot).initialCrud.widget,
+            editable: this.editable,
           },
-          [slot], // The actual widget
-        ));
+          on: {
+            size: this.updateItemSize,
+            position: this.updateItemPosition,
+          },
+        },
+        [slot], // The actual widget
+      ));
 
     if (this.editable) {
-      children.push(this.renderOverlay(h));
+      elements.push(this.renderOverlay(h));
     }
 
-    return children;
+    return elements;
   }
 
   render(h: CreateElement): VNode {
+    const minWidth = this.activeChildren()
+      .reduce(
+        (width: number, node: VNode) => {
+          const { cols, pinnedPosition } = this.slotProps(node).initialCrud.widget;
+          const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
+          return Math.max(width, minCols * GRID_SQUARE_SIZE + minCols * GRID_GAP_SIZE);
+        },
+        0
+      );
+
     return h('div',
       {
         class: 'grid-container grid-main-container',
-        style: { minHeight: this.editable ? '3000px' : '0' },
+        style: {
+          minHeight: this.editable ? '3000px' : '0',
+          minWidth: `${minWidth}px`,
+        },
         on: {
-          dblclick: evt => {
+          dblclick: (evt: MouseEvent) => {
             if (evt.target === evt.currentTarget) {
               this.$emit('dblclick');
             }
@@ -88,9 +107,12 @@ export default class GridContainer extends Vue {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+// Grid square / gap size values are hardcoded here at 100px/20px
+
 .grid-container {
   background-color: transparent;
+  position: relative;
 }
 
 .grid-main-container,
@@ -101,7 +123,6 @@ export default class GridContainer extends Vue {
   grid-template-columns: repeat(auto-fill, 100px);
   grid-auto-columns: 100px;
   grid-auto-rows: 100px;
-  justify-content: center;
 }
 
 .grid-container-overlay {

@@ -1,5 +1,4 @@
 <script lang="ts">
-import KeyboardLayouts from 'simple-keyboard-layouts';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 
@@ -11,7 +10,12 @@ import { sparkStore } from '@/plugins/spark/store';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
-import { SystemConfig, systemStore } from '@/store/system';
+import {
+  startChangeKeyboardLayout,
+  startChangeTempUnit,
+  startEditBuilderTouchDelay,
+  systemStore,
+} from '@/store/system';
 
 interface ConfigService {
   serviceId: string;
@@ -19,7 +23,13 @@ interface ConfigService {
   configComponent: string;
 }
 
-@Component
+@Component({
+  methods: {
+    startChangeKeyboardLayout,
+    startChangeTempUnit,
+    startEditBuilderTouchDelay,
+  },
+})
 export default class AdminPage extends Vue {
 
   get loaded(): boolean {
@@ -71,41 +81,6 @@ export default class AdminPage extends Vue {
     return sparkStore.modules.length > 0;
   }
 
-  startChangeKeyboardLayout(): void {
-    createDialog({
-      component: 'SelectDialog',
-      selectOptions: Object.keys(new KeyboardLayouts().layouts),
-      value: systemStore.config.keyboardLayout,
-      title: 'Select layout for virtual keyboard',
-      selectProps: {
-        label: 'Layout',
-      },
-    })
-      .onOk(keyboardLayout => systemStore.saveConfig({ keyboardLayout }));
-  }
-
-  startEditBuilderTouchDelay(): void {
-    const selectOptions: SelectOption<SystemConfig['builderTouchDelayed']>[] = [
-      { label: 'Always', value: 'always' },
-      { label: 'Never', value: 'never' },
-      { label: 'Only on mobile', value: 'dense' },
-    ];
-
-    createDialog({
-      component: 'SelectDialog',
-      listSelect: true,
-      selectOptions,
-      title: 'Click twice to interact?',
-      message: `
-      Actuators and valves can be activated by clicking on them in the builder.
-      To prevent accidental activation, you can require two clicks:
-      the first to select, and the second to confirm.
-      `,
-      value: systemStore.config.builderTouchDelayed,
-    })
-      .onOk(builderTouchDelayed => systemStore.saveConfig({ builderTouchDelayed }));
-  }
-
   openMenu(component: string): void {
     createDialog({ component });
   }
@@ -153,7 +128,7 @@ export default class AdminPage extends Vue {
           <ActionItem
             icon="mdi-temperature-celsius"
             label="Temperature units"
-            @click="openMenu('TempUnitMenu')"
+            @click="startChangeTempUnit"
           />
           <ActionItem
             icon="mdi-gesture-tap-hold"

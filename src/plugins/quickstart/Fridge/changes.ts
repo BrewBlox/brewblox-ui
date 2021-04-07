@@ -1,10 +1,9 @@
 import { uid } from 'quasar';
 
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/helpers/bloxfield';
 import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
-import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   BlockType,
@@ -19,6 +18,7 @@ import {
 import { Block } from '@/plugins/spark/types';
 import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { systemStore } from '@/store/system';
 
 import {
   makeFridgeCoolConfig,
@@ -62,11 +62,11 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
           sensorId: bloxLink(names.fridgeSensor),
           storedSetting: fridgeSetting,
           settingEnabled: true,
-          setting: bloxQty(null, 'degC'),
-          value: bloxQty(null, 'degC'),
-          valueUnfiltered: bloxQty(null, 'degC'),
+          setting: tempQty(null),
+          value: tempQty(null),
+          valueUnfiltered: tempQty(null),
+          filterThreshold: deltaTempQty(5),
           filter: FilterChoice.FILTER_15s,
-          filterThreshold: bloxQty(5, 'delta_degC'),
           resetFilter: false,
         },
       },
@@ -200,7 +200,7 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
+          ...pidDefaults(),
           ...makeFridgeCoolConfig(),
           enabled: true,
           inputId: bloxLink(names.fridgeSetpoint),
@@ -213,7 +213,7 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
         serviceId,
         groups,
         data: {
-          ...pidDefaults(serviceId),
+          ...pidDefaults(),
           ...makeFridgeHeatConfig(),
           enabled: true,
           inputId: bloxLink(names.fridgeSetpoint),
@@ -238,7 +238,7 @@ export const defineWidgets = (
   };
 
   const { serviceId, names, prefix } = config;
-  const { Temp } = sparkStore.moduleById(serviceId)!.units;
+  const tempUnit = systemStore.units.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
@@ -276,8 +276,8 @@ export const defineWidgets = (
         {
           measurement: serviceId,
           fields: [
-            `${names.fridgeSensor}/value[${Temp}]`,
-            `${names.fridgeSetpoint}/setting[${Temp}]`,
+            `${names.fridgeSensor}/value[${tempUnit}]`,
+            `${names.fridgeSetpoint}/setting[${tempUnit}]`,
             `${names.coolPwm}/value`,
             `${names.heatPwm}/value`,
             `${names.coolAct}/state`,
@@ -286,8 +286,8 @@ export const defineWidgets = (
         },
       ],
       renames: {
-        [`${serviceId}/${names.fridgeSensor}/value[${Temp}]`]: 'Fridge temperature',
-        [`${serviceId}/${names.fridgeSetpoint}/setting[${Temp}]`]: 'Fridge setting',
+        [`${serviceId}/${names.fridgeSensor}/value[${tempUnit}]`]: 'Fridge temperature',
+        [`${serviceId}/${names.fridgeSetpoint}/setting[${tempUnit}]`]: 'Fridge setting',
         [`${serviceId}/${names.coolPwm}/value`]: 'Cool PWM value',
         [`${serviceId}/${names.heatPwm}/value`]: 'Heat PWM value',
         [`${serviceId}/${names.coolAct}/state`]: 'Cool Pin state',

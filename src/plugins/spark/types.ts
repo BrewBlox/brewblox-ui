@@ -26,10 +26,6 @@ export interface SparkFeature {
   block?: BlockSpec;
 }
 
-export interface UserUnits {
-  Temp: 'degC' | 'degF';
-}
-
 export interface SparkStatus {
   serviceId: string;
   isServiceReachable: boolean;
@@ -147,7 +143,7 @@ export interface BlockField<T extends Block = Block> {
   title: string;
   component: string;
   componentProps?: any;
-  generate: (serviceId: string | null) => any;
+  generate: () => any;
   valueHint?: string;
   pretty?: (val: any) => string;
   readonly?: boolean;
@@ -160,7 +156,7 @@ export interface BlockSpec<T extends Block = Block> {
   id: T['type'];
   systemObject?: boolean;
   discovered?: boolean;
-  generate: (serviceId: string | null) => T['data'];
+  generate: () => T['data'];
   fields: BlockField<T>[];
   presets?: BlockDataPreset<T>[];
 }

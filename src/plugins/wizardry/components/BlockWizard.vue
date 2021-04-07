@@ -146,7 +146,7 @@ export default class BlockWizard extends WizardBase {
       serviceId,
       type: featureId,
       groups: [0],
-      data: sparkStore.spec({ type: featureId }).generate(this.serviceId),
+      data: sparkStore.spec({ type: featureId }).generate(),
     };
     const widget: Widget = {
       id: uid(),

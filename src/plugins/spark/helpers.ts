@@ -464,9 +464,6 @@ export async function cleanUnusedNames(serviceId: string | null): Promise<void> 
   notify.info({ message, icon: 'mdi-tag-remove' });
 }
 
-export const serviceTemp = (serviceId: string | null): 'degC' | 'degF' =>
-  sparkStore.moduleById(serviceId)?.units.Temp ?? 'degC';
-
 export const enumHint = (e: Enum<any>): string =>
   'One of: ' + Enum.values(e).map(v => `'${v}'`).join(', ');
 

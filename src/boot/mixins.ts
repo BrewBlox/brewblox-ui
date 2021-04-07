@@ -6,6 +6,9 @@ export default ({ Vue }): void => {
       $dense() {
         return Screen.lt.md;
       },
+      $touch() {
+        return document.body.classList.contains('touch');
+      },
     },
   });
 };
