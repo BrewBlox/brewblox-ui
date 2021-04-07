@@ -16,7 +16,7 @@ export default class ConfigWatcher extends Vue {
 
   showPrompt(): void {
     this.notifyHandle = Notify.create({
-      message: 'How do you want temperature values formatted?',
+      message: 'Please select how temperatures should be displayed',
       html: true,
       icon: 'mdi-thermometer',
       timeout: 0,
