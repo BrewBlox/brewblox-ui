@@ -1,39 +1,50 @@
 <script lang="ts">
-import { CreateElement, VNode } from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, h, PropType } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialogBase } from '@/composables';
 
 import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
+export default defineComponent({
+  name: 'GraphDialog',
+  props: {
+    ...useDialogBase.props,
+    graphId: {
+      type: String,
+      required: true,
+    },
+    config: {
+      type: Object as PropType<GraphConfig>,
+      required: true,
+    },
+    sharedSources: {
+      type: Boolean,
+      default: false,
+    },
+    saveAnnotations: {
+      type: Function as PropType<(a: GraphAnnotation[]) => unknown>,
+      default: null,
+    },
+    saveParams: {
+      type: Function as PropType<(v: QueryParams) => unknown>,
+      default: null,
+    },
+  },
+  emits: useDialogBase.emits,
+  setup(props) {
+    const {
+      dialogRef,
+      onDialogHide,
+    } = useDialogBase();
 
-@Component
-export default class GraphDialog extends DialogBase {
-
-  @Prop({ type: String, required: true })
-  public readonly graphId!: string;
-
-  @Prop({ type: Object, required: true })
-  public readonly config!: GraphConfig;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly sharedSources!: boolean;
-
-  @Prop({ type: Function, required: false })
-  public readonly saveAnnotations!: (a: GraphAnnotation[]) => void;
-
-  @Prop({ type: Function, required: false })
-  public readonly saveParams!: (v: QueryParams) => void;
-
-  render(h: CreateElement): VNode {
     return h('q-dialog',
       {
-        ref: 'dialog',
+        ref: dialogRef,
         props: {
           maximized: true,
           transitionShow: 'fade',
         },
-        on: { hide: this.onDialogHide },
+        on: { hide: onDialogHide },
       },
       [
         h('q-card',
@@ -41,18 +52,18 @@ export default class GraphDialog extends DialogBase {
             h('HistoryGraph',
               {
                 props: {
-                  graphId: this.graphId,
-                  config: this.config,
-                  sharedSources: this.sharedSources,
-                  usePresets: this.saveParams !== undefined,
+                  graphId: props.graphId,
+                  config: props.config,
+                  sharedSources: props.sharedSources,
+                  usePresets: props.saveParams != null,
                 },
                 attrs: {
-                  annotated: !!this.saveAnnotations,
+                  annotated: props.saveAnnotations != null,
                   maximized: true,
                 },
                 on: {
-                  annotations: this.saveAnnotations ?? (() => { }),
-                  params: this.saveParams ?? (() => { }),
+                  annotations: props.saveAnnotations ?? (() => { }),
+                  params: props.saveParams ?? (() => { }),
                 },
                 scopedSlots: {
                   controls: () => [
@@ -62,6 +73,6 @@ export default class GraphDialog extends DialogBase {
               }),
           ]),
       ]);
-  }
-}
+  },
+});
 </script>

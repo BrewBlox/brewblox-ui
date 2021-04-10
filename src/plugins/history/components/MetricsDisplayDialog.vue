@@ -1,66 +1,85 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, reactive } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { durationMs, durationString } from '@/helpers/duration';
-import { deepCopy } from '@/helpers/functional';
+import { useDialogBase } from '@/composables';
+import { durationMs, durationString } from '@/utils/duration';
+import { deepCopy } from '@/utils/functional';
 
-import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/getters';
+import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/const';
 import { MetricsConfig } from '../Metrics/types';
 import { defaultLabel } from '../nodes';
 
+export default defineComponent({
+  name: 'MetricsDisplayDialog',
+  props: {
+    ...useDialogBase.props,
+    config: {
+      type: Object as PropType<MetricsConfig>,
+      required: true,
+    },
+    field: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: useDialogBase.emits,
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      context,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialogBase();
 
-@Component
-export default class MetricsDisplayDialog extends DialogBase {
-  local: MetricsConfig | null = null;
+    const local = reactive(deepCopy(props.config));
 
-  @Prop({ type: Object, required: true })
-  public readonly config!: MetricsConfig;
+    const rename = computed<string>({
+      get: () => local.renames[props.field] ?? defaultLabel(props.field),
+      set: v => local.renames[props.field] = v ?? defaultLabel(props.field),
+    });
 
-  @Prop({ type: String, required: true })
-  public readonly field!: string;
+    const fresh = computed<string>({
+      get: () => durationString(
+        local.freshDuration[props.field] ?? DEFAULT_FRESH_DURATION),
+      set: val => {
+        const ms = durationMs(val) ?? DEFAULT_FRESH_DURATION;
+        local.freshDuration[props.field] = ms;
+      },
+    });
 
-  created(): void {
-    this.local = deepCopy(this.config);
-  }
+    const decimals = computed<number>({
+      get: () => local.decimals[props.field] ?? DEFAULT_DECIMALS,
+      set: v => {
+        const numV = v !== null ? v : DEFAULT_DECIMALS;
+        local.decimals[props.field] = numV;
+      },
+    });
 
-  get rename(): string {
-    return this.local!.renames[this.field] ?? defaultLabel(this.field);
-  }
+    function save(): void {
+      onDialogOK(local);
+    }
 
-  set rename(val: string) {
-    this.$set(this.local!.renames, this.field, val ?? defaultLabel(this.field));
-  }
-
-  get fresh(): string {
-    return durationString(
-      this.local!.freshDuration[this.field] ?? DEFAULT_FRESH_DURATION);
-  }
-
-  set fresh(val: string) {
-    const ms = durationMs(val) ?? DEFAULT_FRESH_DURATION;
-    this.$set(this.local!.freshDuration, this.field, ms);
-  }
-
-  get decimals(): number {
-    return this.local!.decimals[this.field] ?? DEFAULT_DECIMALS;
-  }
-
-  set decimals(val: number) {
-    const numVal = val !== null ? val : DEFAULT_DECIMALS;
-    this.$set(this.local!.decimals, this.field, numVal);
-  }
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      context,
+      onDialogHide,
+      onDialogCancel,
+      rename,
+      fresh,
+      decimals,
+      save,
+    };
+  },
+});
 </script>
 
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

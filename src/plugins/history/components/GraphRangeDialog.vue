@@ -1,74 +1,103 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
+import { useDialogBase } from '@/composables';
+import { createDialog } from '@/utils/dialog';
 
+export default defineComponent({
+  name: 'GraphRangeDialog',
+  props: {
+    ...useDialogBase.props,
+    value: {
+      type: Array as PropType<(number | null)[]>, // [number|null, number|null] tuple
+      default: () => [null, null],
+    },
+  },
+  emits: useDialogBase.emits,
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialogBase();
 
-@Component
-export default class GraphRangeDialog extends DialogBase {
-  minV: number = 0;
-  maxV: number = 0;
+    const minV = ref(props.value[0] ?? -10);
+    const maxV = ref(props.value[1] ?? 20);
 
-  @Prop({ type: Array, default: () => [null, null] })
-  public readonly value!: [number, number];
+    const minVRules = computed<InputRule[]>(
+      () => [
+        v => Number(v) < maxV.value || 'Lower bound must be less than upper bound',
+      ],
+    );
 
-  created(): void {
-    this.minV = this.value[0] ?? -10;
-    this.maxV = this.value[1] ?? 20;
-  }
+    const maxVRules = computed<InputRule[]>(
+      () => [
+        v => Number(v) > maxV.value || 'Upper bound must be more than lower bound',
+      ],
+    );
 
-  get minVRules(): InputRule[] {
-    return [
-      v => Number(v) < this.maxV || 'Lower bound must be less than upper bound',
-    ];
-  }
+    const valuesOk = computed<boolean>(
+      () => minV.value < maxV.value,
+    );
 
-  get maxVRules(): InputRule[] {
-    return [
-      v => Number(v) > this.minV || 'Upper bound must be more than lower bound',
-    ];
-  }
-
-  get valuesOk(): boolean {
-    return this.minV < this.maxV;
-  }
-
-  showMinVKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.minV,
-      rules: this.minVRules,
-      type: 'number',
-    })
-      .onOk(v => this.minV = v);
-  }
-
-  showMaxVKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.maxV,
-      rules: this.maxVRules,
-      type: 'number',
-    })
-      .onOk(v => this.maxV = v);
-  }
-
-  save(): void {
-    if (this.valuesOk) {
-      this.onDialogOk([this.minV, this.maxV]);
+    function showMinVKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          value: minV.value,
+          rules: minVRules.value,
+          type: 'number',
+        },
+      })
+        .onOk(v => minV.value = v);
     }
-  }
 
-  clear(): void {
-    this.onDialogOk(null);
-  }
-}
+    function showMaxVKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          value: maxV.value,
+          rules: maxVRules.value,
+          type: 'number',
+        },
+      })
+        .onOk(v => maxV.value = v);
+    }
+
+    function save(): void {
+      if (valuesOk.value) {
+        onDialogOK([minV.value, maxV.value]);
+      }
+    }
+
+    function clear(): void {
+      onDialogOK(null);
+    }
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      minV,
+      maxV,
+      minVRules,
+      maxVRules,
+      valuesOk,
+      showMinVKeyboard,
+      showMaxVKeyboard,
+      save,
+      clear,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

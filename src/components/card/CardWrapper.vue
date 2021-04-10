@@ -1,46 +1,61 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, inject, PropType, Ref } from 'vue';
 
 import { WidgetContext } from '@/store/features';
 
 
-@Component
-export default class CardWrapper extends Vue {
+export default defineComponent({
+  props: {
+    noScroll: {
+      type: Boolean,
+      default: false,
+    },
+    context: {
+      type: Object as PropType<WidgetContext>,
+      required: true,
+    },
+    contentClass: {
+      type: [String, Array, Object],
+      default: '',
+    },
+  },
+  setup(ctx) {
+    const dense = inject<Ref<boolean>>('$dense');
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noScroll!: boolean;
+    const scrollable = computed<boolean>(
+      () => !ctx.noScroll && ctx.context.size === 'Fixed',
+    );
 
-  @Prop({ type: Object, required: true })
-  readonly context!: WidgetContext;
+    const cardClass = computed<string>(
+      () => {
+        const listed = [`card__${ctx.context.container} depth-2`];
+        if (dense?.value) {
+          listed.push('card__dense');
+        }
+        return listed.join(' ');
+      },
+    );
 
-  @Prop({ type: [String, Array, Object], default: '' })
-  public readonly contentClass!: any;
+    const toolbarClass = computed<string>(
+      () => `toolbar__${ctx.context.container}`,
+    );
 
-  get scrollable(): boolean {
-    return !this.noScroll && this.context.size === 'Fixed';
-  }
+    const bodyClass = computed<string>(
+      () => `content__${ctx.context.container}`,
+    );
 
-  get cardClass(): string {
-    const listed = [`card__${this.context.container} depth-2`];
-    if (this.$dense) {
-      listed.push('card__dense');
-    }
-    return listed.join(' ');
-  }
-
-  get toolbarClass(): string {
-    return `toolbar__${this.context.container}`;
-  }
-
-  get bodyClass(): string {
-    return `content__${this.context.container}`;
-  }
-}
+    return {
+      scrollable,
+      cardClass,
+      toolbarClass,
+      bodyClass,
+    };
+  },
+});
 </script>
 
 <template>
-  <div :class="cardClass" v-on="$listeners">
+  <div :class="cardClass">
     <div :class="toolbarClass">
       <slot name="toolbar" />
     </div>

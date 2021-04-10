@@ -1,53 +1,62 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { Watch } from 'vue-property-decorator';
+import { computed, defineComponent, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
-import { createDialog } from '@/helpers/dialog';
-import { objectSorter } from '@/helpers/functional';
-import { builderStore } from '@/plugins/builder/store';
+// import { builderStore } from '@/plugins/builder/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
+import { createDialog } from '@/utils/dialog';
+import { objectSorter } from '@/utils/functional';
 
-@Component
-export default class IndexPage extends Vue {
+export default defineComponent({
+  name: 'IndexPage',
+  setup() {
+    const router = useRouter();
 
-  get homePage(): string | null {
-    const { homePage } = systemStore.config;
+    const homePage = computed<string | null>(
+      () => {
+        const { homePage } = systemStore.config;
 
-    const defaultPage = [...dashboardStore.dashboards]
-      .sort(objectSorter('order'))
-      .map(v => `/dashboard/${v.id}`)[0] ?? null;
+        const defaultPage = [...dashboardStore.dashboards]
+          .sort(objectSorter('order'))
+          .map(v => `/dashboard/${v.id}`)[0] ?? null;
 
-    // Defaults to first dashboard
-    if (!homePage) {
-      return defaultPage;
-    }
+        // Defaults to first dashboard
+        if (!homePage) {
+          return defaultPage;
+        }
 
-    const [, section, pageId] = homePage.split('/');
-    const valid = (
-      (section === 'dashboard' && dashboardStore.dashboardIds.includes(pageId)) ||
-      (section === 'service' && serviceStore.serviceIds.includes(pageId)) ||
-      (section === 'brewery' && builderStore.layoutIds.includes(pageId))
+        const [, section, pageId] = homePage.split('/');
+        const valid = (
+          (section === 'dashboard' && dashboardStore.dashboardIds.includes(pageId)) ||
+          (section === 'service' && serviceStore.serviceIds.includes(pageId)) ||
+          // (section === 'brewery' && builderStore.layoutIds.includes(pageId))
+          false
+        );
+
+        return valid
+          ? homePage
+          : defaultPage;
+      },
     );
 
-    return valid
-      ? homePage
-      : defaultPage;
-  }
-
-  @Watch('homePage', { immediate: true })
-  watchHomePage(): void {
-    if (this.homePage) {
-      this.$router.replace(this.homePage);
+    function showWizard(): void {
+      createDialog({ component: 'WizardDialog' });
     }
-  }
 
-  showWizard(): void {
-    createDialog({ component: 'WizardDialog' });
-  }
-}
+    watch(
+      () => homePage.value,
+      v => v && router.replace(v),
+      { immediate: true },
+    );
+
+    return {
+      homePage,
+      showWizard,
+    };
+  },
+});
 </script>
 
 <template>

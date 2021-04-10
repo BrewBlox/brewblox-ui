@@ -1,4 +1,6 @@
-import { VueConstructor } from 'vue';
+import { Plugin } from 'vue';
+
+import { StartupKey } from '@/symbols';
 
 /**
  * Vue/VueX have the concept of lifecycle hooks for individual components,
@@ -12,7 +14,7 @@ import { VueConstructor } from 'vue';
  * They will be called in the App.vue `created()` hook.
  */
 export class BrewbloxStartup {
-  private startFuncs: Function[] = [];
+  private startFuncs: (() => Awaitable<unknown>)[] = [];
 
   public onStart(func: (() => Awaitable<unknown>)): void {
     this.startFuncs.push(func);
@@ -23,8 +25,10 @@ export class BrewbloxStartup {
   }
 }
 
-export default {
-  install(Vue: VueConstructor) {
-    Vue.$startup = new BrewbloxStartup();
+export const startup = new BrewbloxStartup();
+
+export const startupPlugin: Plugin = {
+  install(app) {
+    app.provide(StartupKey, startup);
   },
 };

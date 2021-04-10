@@ -1,79 +1,91 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, reactive } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/functional';
+import { useDialogBase } from '@/composables';
+import { deepCopy } from '@/utils/functional';
 
 import { defaultLabel } from '../nodes';
-import { GraphConfig } from '../types';
+import { GraphAxis, GraphConfig } from '../types';
 
-
-@Component
-export default class GraphDisplayDialog extends DialogBase {
-  local: GraphConfig | null = null;
-  axisOpts: SelectOption[] = [
-    {
-      value: 'y',
-      label: 'Y1',
+export default defineComponent({
+  name: 'GraphDisplayDialog',
+  props: {
+    ...useDialogBase.props,
+    config: {
+      type: Object as PropType<GraphConfig>,
+      required: true,
     },
-    {
-      value: 'y2',
-      label: 'Y2',
+    field: {
+      type: String,
+      required: true,
     },
-  ];
+  },
+  emits: useDialogBase.emits,
+  setup(props) {
+    const {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialogBase();
 
-  @Prop({ type: Object, required: true })
-  public readonly config!: GraphConfig;
+    const local = reactive(deepCopy(props.config));
+    const axisOpts: SelectOption<GraphAxis>[] = [
+      {
+        value: 'y',
+        label: 'Y1',
+      },
+      {
+        value: 'y2',
+        label: 'Y2',
+      },
+    ];
 
-  @Prop({ type: String, required: true })
-  public readonly field!: string;
+    const rename = computed<string>({
+      get: () => local.renames[props.field] ?? defaultLabel(props.field),
+      set: v => local.renames[props.field] = v ?? defaultLabel(props.field),
+    });
 
-  created(): void {
-    this.local = deepCopy(this.config);
-  }
+    const axis = computed<GraphAxis>({
+      get: () => local.axes[props.field] || 'y',
+      set: v => local.axes[props.field] = v,
+    });
 
-  get rename(): string {
-    return this.local!.renames[this.field] ?? defaultLabel(this.field);
-  }
+    const color = computed<string>({
+      get: () => local.colors[props.field] || '',
+      set: v => local.colors[props.field] = v,
+    });
 
-  set rename(val: string) {
-    this.$set(this.local!.renames, this.field, val ?? defaultLabel(this.field));
-  }
+    const precision = computed<number>({
+      get: () => local.precision[props.field] ?? 2,
+      set: v => local.precision[props.field] = v,
+    });
 
-  get axis(): GraphConfig['axes'][''] {
-    return this.local!.axes[this.field] || 'y';
-  }
+    function save(): void {
+      onDialogOK(local);
+    }
 
-  set axis(val: GraphConfig['axes']['']) {
-    this.$set(this.local!.axes, this.field, val);
-  }
-
-  get color(): string {
-    return this.local!.colors[this.field] || '';
-  }
-
-  set color(val: string) {
-    this.$set(this.local!.colors, this.field, val);
-  }
-
-  get precision(): number {
-    return this.local!.precision[this.field] ?? 2;
-  }
-
-  set precision(val: number) {
-    this.$set(this.local!.precision, this.field, val);
-  }
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      rename,
+      axis,
+      axisOpts,
+      color,
+      precision,
+      save,
+    };
+  },
+});
 </script>
 
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

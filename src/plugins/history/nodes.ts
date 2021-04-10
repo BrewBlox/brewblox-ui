@@ -1,9 +1,9 @@
 import escapeRegExp from 'lodash/escapeRegExp';
 import set from 'lodash/set';
 
-import { prettyUnit } from '@/helpers/bloxfield';
-import { sentenceCased } from '@/helpers/functional';
 import { propertyNameWithUnit } from '@/plugins/spark/parse-object';
+import { prettyUnit } from '@/utils/bloxfield';
+import { sentenceCased } from '@/utils/functional';
 
 import { QueryTarget } from './types';
 

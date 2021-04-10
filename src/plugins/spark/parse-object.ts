@@ -10,8 +10,8 @@ import {
   Quantity,
   rawLink,
   rawQty,
-} from '@/helpers/bloxfield';
-import { mapEntries } from '@/helpers/functional';
+} from '@/utils/bloxfield';
+import { mapEntries } from '@/utils/functional';
 
 
 // string start

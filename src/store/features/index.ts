@@ -1,8 +1,8 @@
 import isString from 'lodash/isString';
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { findById } from '@/helpers/functional';
 import store from '@/store';
+import { findById } from '@/utils/functional';
 
 import type {
   ComponentResult,
@@ -67,9 +67,9 @@ export class FeatureModule extends VuexModule {
 
   public widgetWizard(id: string): string | null {
     const feature = this.widgetById(id);
-    if (feature === null) { return null; };
-    if (isString(feature.wizard)) { return feature.wizard; };
-    if (feature.wizard === true) { return 'GenericWidgetWizard'; };
+    if (feature === null) { return null; }
+    if (isString(feature.wizard)) { return feature.wizard; }
+    if (feature.wizard === true) { return 'GenericWidgetWizard'; }
     return null;
   }
 

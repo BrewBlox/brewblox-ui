@@ -19,7 +19,7 @@ export interface SparkSessionConfig {
   pageMode: PageMode;
 }
 
-export type SparkService = Service<{}>;
+export type SparkService = Service<Record<string, never>>;
 
 export interface SparkFeature {
   feature: WidgetFeature<BlockConfig>;

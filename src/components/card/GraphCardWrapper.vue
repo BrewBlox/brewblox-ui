@@ -1,28 +1,31 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, ref } from 'vue';
 
-@Component
-export default class GraphCardWrapper extends Vue {
-  collapsed = true;
+export default defineComponent({
+  props: {
+    show: {
+      type: Boolean,
+      default: false,
+    },
+    showInitial: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(ctx) {
+    const collapsed = ref(!ctx.showInitial);
 
-  @Prop({ type: Boolean, default: false })
-  public readonly show!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly showInitial!: boolean;
-
-  created(): void {
-    this.collapsed = !this.showInitial;
-  }
-}
+    return {
+      collapsed,
+    };
+  },
+});
 </script>
 
 <template>
   <div
     v-if="show && $q.screen.gt.md"
     class="row no-wrap justify-center combined-wrapper"
-    v-on="$listeners"
   >
     <CardWrapper class="col-5" v-bind="$attrs">
       <template #toolbar>
@@ -47,7 +50,6 @@ export default class GraphCardWrapper extends Vue {
   <CardWrapper
     v-else
     v-bind="$attrs"
-    v-on="$listeners"
   >
     <template #toolbar>
       <slot name="toolbar" />

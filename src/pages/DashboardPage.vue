@@ -1,14 +1,13 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { Watch } from 'vue-property-decorator';
+import { computed, defineComponent, inject, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
-import { objectSorter } from '@/helpers/functional';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 import { systemStore } from '@/store/system';
-
-import { createDialog } from '../helpers/dialog';
+import { DenseKey } from '@/symbols';
+import { createDialog } from '@/utils/dialog';
+import { objectSorter } from '@/utils/functional';
 
 interface ValidatedWidget {
   id: string;
@@ -17,87 +16,111 @@ interface ValidatedWidget {
   error?: string;
 }
 
-@Component
-export default class DashboardPage extends Vue {
-  widgetEditable = false;
+export default defineComponent({
+  name: 'DashboardPage',
+  setup() {
+    const widgetEditable = ref(false);
+    const dense = inject(DenseKey)!;
+    const router = useRouter();
 
-  @Watch('dashboardId')
-  onChangeDashboardId(): void {
-    this.widgetEditable = false;
-  }
+    const context = computed<WidgetContext>(
+      () => ({
+        mode: 'Basic',
+        container: 'Dashboard',
+        size: dense.value ? 'Content' : 'Fixed',
+      }),
+    );
 
-  @Watch('dashboard', { immediate: true })
-  onChangeDashboard(newV: Dashboard, oldV: Dashboard): void {
-    if (!newV && oldV) {
-      // Dashboard was removed
-      this.$router.replace('/');
+    const loaded = computed<boolean>(
+      () => systemStore.loaded,
+    );
+
+    const dashboardId = computed<string>(
+      () => router.currentRoute.value.params.id as string,
+    );
+
+    const dashboard = computed<Dashboard | null>(
+      () => dashboardStore.dashboardById(dashboardId.value),
+    );
+
+    async function patchWidgets(updated: Patch<Widget>[]): Promise<void> {
+      await dashboardStore.patchWidgets(updated);
     }
-  }
 
-  @Watch('dashboard.title', { immediate: true })
-  watchTitle(newV: string): void {
-    document.title = `Brewblox | ${newV ?? 'Dashboard'}`;
-  }
+    async function saveWidget(widget: Widget): Promise<void> {
+      await dashboardStore.saveWidget(widget);
+    }
 
-  get context(): WidgetContext {
-    return {
-      mode: 'Basic',
-      container: 'Dashboard',
-      size: this.$dense ? 'Content' : 'Fixed',
-    };
-  }
-
-  get loaded(): boolean {
-    return systemStore.loaded;
-  }
-
-  get dashboardId(): string {
-    return this.$route.params.id;
-  }
-
-  get dashboard(): Dashboard | null {
-    return dashboardStore.dashboardById(this.dashboardId);
-  }
-
-  get widgets(): Widget[] {
-    // Avoid modifying the store object
-    return [...dashboardStore.dashboardWidgets(this.dashboardId)]
-      .sort(objectSorter('order'));
-  }
-
-  get validatedWidgets(): ValidatedWidget[] {
-    return this.widgets
-      .map((widget: Widget) => {
-        const crud: Crud = {
-          widget,
-          isStoreWidget: true,
-          saveWidget: this.saveWidget,
-          closeDialog: () => { },
-        };
-        return {
-          ...featureStore.widgetComponent(crud),
-          id: widget.id,
-          crud,
-        };
+    function showWizard(widget: boolean): void {
+      createDialog({
+        component: 'WizardDialog',
+        componentProps: {
+          initialWizard: widget ? 'WidgetWizardPicker' : null,
+          activeDashboardId: dashboardId.value,
+        },
       });
-  }
+    }
 
-  async patchWidgets(updated: Patch<Widget>[]): Promise<void> {
-    await dashboardStore.patchWidgets(updated);
-  }
+    const widgets = computed<Widget[]>(
+      // Avoid modifying the store object
+      () => [...dashboardStore.dashboardWidgets(dashboardId.value)]
+        .sort(objectSorter('order')),
+    );
 
-  public async saveWidget(widget: Widget): Promise<void> {
-    await dashboardStore.saveWidget(widget);
-  }
+    const validatedWidgets = computed<ValidatedWidget[]>(
+      () => widgets.value
+        .map(widget => {
+          const crud: Crud = {
+            widget,
+            saveWidget,
+            isStoreWidget: true,
+            closeDialog: () => { },
+          };
+          return {
+            ...featureStore.widgetComponent(crud),
+            id: widget.id,
+            crud,
+          };
+        }),
+    );
 
-  showWizard(widget: boolean): void {
-    createDialog({
-      component: 'WizardDialog',
-      initialWizard: widget ? 'WidgetWizardPicker' : null,
-      activeDashboardId: this.dashboardId,
-    });
-  }
-}
+    watch(
+      () => dashboardId.value,
+      () => widgetEditable.value = false,
+    );
+
+    watch(
+      () => dashboard.value,
+      (newV, oldV) => {
+        if (!newV && oldV) {
+          // Dashboard was removed
+          router.replace('/');
+        }
+      },
+      { immediate: true },
+    );
+
+    watch(
+      () => dashboard.value?.title,
+      v => document.title = `Brewblox | ${v ?? 'Dashboard'}`,
+      { immediate: true },
+    );
+
+    return {
+      widgetEditable,
+      dense,
+      context,
+      loaded,
+      dashboardId,
+      dashboard,
+      patchWidgets,
+      saveWidget,
+      showWizard,
+      widgets,
+      validatedWidgets,
+    };
+  },
+});
 </script>
 
 <template>
@@ -106,12 +129,12 @@ export default class DashboardPage extends Vue {
       <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
     </PageError>
     <template v-else>
-      <portal to="toolbar-title">
+      <teleport to="toolbar-title">
         {{ dashboard.title }}
-      </portal>
-      <portal to="toolbar-buttons">
+      </teleport>
+      <teleport to="toolbar-buttons">
         <q-btn
-          v-if="!$dense"
+          v-if="!dense"
           unelevated
           round
           icon="mdi-arrow-all"
@@ -134,7 +157,7 @@ export default class DashboardPage extends Vue {
             <DashboardActions :dashboard-id="dashboardId" />
           </template>
         </ActionMenu>
-      </portal>
+      </teleport>
 
       <div
         v-if="validatedWidgets.length === 0"
@@ -150,7 +173,7 @@ export default class DashboardPage extends Vue {
         />
       </div>
       <div
-        v-else-if="$dense"
+        v-else-if="dense"
         class="column q-gutter-y-sm q-pa-md"
       >
         <component

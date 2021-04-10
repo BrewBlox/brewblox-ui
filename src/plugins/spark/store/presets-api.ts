@@ -1,5 +1,5 @@
-import { UI_NAMESPACE } from '@/helpers/const';
 import { createApi } from '@/plugins/database/api';
+import { UI_NAMESPACE } from '@/utils/const';
 
 import { StoredDataPreset } from '../types';
 

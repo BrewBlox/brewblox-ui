@@ -1,127 +1,168 @@
 <script lang="ts">
 import cloneDeep from 'lodash/cloneDeep';
+import defaults from 'lodash/defaults';
+import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
-import { uid } from 'quasar';
-import { Component, Ref, Watch } from 'vue-property-decorator';
+import { ComponentPublicInstance, computed, defineComponent, nextTick, reactive, ref, watch } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
-import { bloxQty, Quantity } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
-import { durationString } from '@/helpers/duration';
-import { isJsonEqual } from '@/helpers/functional';
-import HistoryGraph from '@/plugins/history/components/HistoryGraph.vue';
+import { useWidget } from '@/composables';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { Widget } from '@/store/dashboards';
+import { bloxQty, Quantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { durationString } from '@/utils/duration';
+import { isJsonEqual } from '@/utils/functional';
 
-import { addBlockGraph } from './helpers';
+import { addBlockGraph } from './utils';
 
-@Component
-export default class GraphWidget extends WidgetBase<GraphConfig> {
-  usedCfg: GraphConfig | null = null;
-  downsampling: any = {};
-
-  // Separate IDs for graphs in widget and dialog wrapper
-  // This prevents source create/delete race conditions when switching
-  widgetGraphId: string | null = null;
-  wrapperGraphId: string | null = null;
-
-  @Ref()
-  readonly wrapperGraph!: HistoryGraph;
-
-  @Ref()
-  readonly widgetGraph!: HistoryGraph;
-
-  @Watch('config')
-  watchConfig(newV: GraphConfig): void {
-    if (!isJsonEqual(newV, this.usedCfg)) {
-      this.regraph();
-    }
-  }
-
-  created(): void {
-    this.usedCfg = cloneDeep(this.config);
-    this.widgetGraphId = uid();
-    this.wrapperGraphId = uid();
-  }
-
-  get config(): GraphConfig {
-    return {
-      ...emptyGraphConfig(),
-      ...this.widget.config,
-    };
-  }
-
-  // We override `this.config`
-  // It will not be picked up as default argument to super.saveConfig()
-  async saveConfig(config: GraphConfig = this.config): Promise<void> {
-    delete config.layout.title;
-    this.widget.config = config;
-    this.saveWidget(this.widget);
-  }
-
-  get presets(): QueryParams[] {
-    return defaultPresets();
-  }
-
-  isActivePreset(preset: QueryParams): boolean {
-    return isJsonEqual(preset, this.config.params);
-  }
-
-  saveParams(params: QueryParams): void {
-    this.$set(this.config, 'params', params);
-    this.saveConfig();
-  }
-
-  saveLayout(layout: Partial<Layout>): void {
-    this.$set(this.config, 'layout', layout);
-    this.saveConfig();
-  }
-
-  chooseDuration(): void {
-    const current = this.config.params.duration ?? '1h';
-    createDialog({
-      component: 'DurationQuantityDialog',
-      title: 'Custom graph duration',
-      value: bloxQty(current),
-      label: 'Duration',
-    })
-      .onOk((v: Quantity) => this.saveParams({ duration: durationString(v) }));
-  }
-
-  async regraph(): Promise<void> {
-    await this.$nextTick();
-    this.usedCfg = cloneDeep(this.config);
-    this.widgetGraph?.resetSources();
-    this.wrapperGraph?.resetSources();
-  }
-
-  async refresh(): Promise<void> {
-    await this.$nextTick();
-    this.widgetGraph?.refresh();
-    this.wrapperGraph?.refresh();
-  }
-
-  currentGraphId(): string | null {
-    if (this.widgetGraph !== undefined) { return this.widgetGraphId; };
-    if (this.wrapperGraph !== undefined) { return this.wrapperGraphId; };
-    return null;
-  }
-
-  showGraphDialog(): void {
-    const currentId = this.currentGraphId();
-    createDialog({
-      component: 'GraphDialog',
-      graphId: currentId || uid(),
-      config: { ...this.config, layout: { ...this.config.layout, title: this.widget.title } },
-      sharedSources: currentId !== null,
-      saveParams: v => this.saveParams(v),
-    });
-  }
-
-  startAddBlockGraph(): void {
-    addBlockGraph(this.widget.id, null);
-  }
+interface HistoryGraphApi extends ComponentPublicInstance {
+  resetSources(): void;
+  refresh(): void;
 }
+
+export default defineComponent({
+  name: 'GraphWidget',
+  props: {
+    ...useWidget.props,
+  },
+  emits: [
+    ...useWidget.emits,
+  ],
+  setup(props) {
+    const {
+      crud,
+      mode,
+      inDialog,
+      toolbarComponent,
+      saveWidget,
+    } = useWidget<GraphConfig>(props.crud, props.context);
+
+    function cloned(): GraphConfig {
+      return cloneDeep(defaults(crud.widget.config, emptyGraphConfig()));
+    }
+
+    const presets = defaultPresets();
+    const config = reactive(cloned());
+    const renderedConfig = ref(cloned());
+    const downsampling = ref<Mapped<string>>({});
+
+    // Separate IDs for graphs in widget and dialog wrapper
+    // This prevents source create/delete race conditions when switching
+    const widgetGraphId = nanoid();
+    const wrapperGraphId = nanoid();
+
+    const wrapperGraphRef = ref<HistoryGraphApi>();
+    const widgetGraphRef = ref<HistoryGraphApi>();
+
+    const widget = computed<Widget>(
+      () => crud.widget,
+    );
+
+    const title = computed<string>(
+      () => crud.widget.title,
+    );
+
+    async function saveConfig(config: GraphConfig): Promise<void> {
+      delete config.layout.title;
+      saveWidget({ ...crud.widget, config });
+    }
+
+    function isActivePreset(preset: QueryParams): boolean {
+      return isJsonEqual(preset, config.params);
+    }
+
+    function saveParams(params: QueryParams): void {
+      config.params = params;
+      saveConfig(config);
+    }
+
+    function saveLayout(layout: Partial<Layout>): void {
+      config.layout = layout;
+      saveConfig(config);
+    }
+
+    function chooseDuration(): void {
+      const current = config.params.duration ?? '1h';
+      createDialog({
+        component: 'DurationQuantityDialog',
+        componentProps: {
+          title: 'Custom graph duration',
+          value: bloxQty(current),
+          label: 'Duration',
+        },
+      })
+        .onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
+    }
+
+    async function regraph(): Promise<void> {
+      await nextTick();
+      renderedConfig.value = cloneDeep(config);
+      widgetGraphRef.value?.resetSources();
+      wrapperGraphRef.value?.resetSources();
+    }
+
+    async function refresh(): Promise<void> {
+      await nextTick();
+      widgetGraphRef.value?.refresh();
+      wrapperGraphRef.value?.refresh();
+    }
+
+    function currentGraphId(): string | null {
+      if (widgetGraphRef.value !== undefined) { return widgetGraphId; }
+      if (wrapperGraphRef.value !== undefined) { return wrapperGraphId; }
+      return null;
+    }
+
+    function showGraphDialog(): void {
+      const currentId = currentGraphId();
+      createDialog({
+        component: 'GraphDialog',
+        componentProps: {
+          graphId: currentId || nanoid(),
+          config: { ...config, layout: { ...config.layout, title: crud.widget.title } },
+          sharedSources: currentId !== null,
+          saveParams: v => saveParams(v),
+        },
+      });
+    }
+
+    function startAddBlockGraph(): void {
+      addBlockGraph(crud.widget.id, null);
+    }
+
+    watch(
+      () => crud.widget.config,
+      (newV) => {
+        if (!isJsonEqual(newV, renderedConfig.value)) {
+          regraph();
+        }
+      },
+    );
+
+    return {
+      mode,
+      inDialog,
+      toolbarComponent,
+      presets,
+      downsampling,
+      wrapperGraphId,
+      widgetGraphId,
+      widget,
+      title,
+      config,
+      isActivePreset,
+      saveConfig,
+      saveParams,
+      saveLayout,
+      chooseDuration,
+      regraph,
+      refresh,
+      showGraphDialog,
+      startAddBlockGraph,
+    };
+  },
+});
 </script>
 
 <template>
@@ -145,7 +186,7 @@ export default class GraphWidget extends WidgetBase<GraphConfig> {
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <component :is="toolbarComponent" v-model:mode="mode" :crud="crud">
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
           <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />

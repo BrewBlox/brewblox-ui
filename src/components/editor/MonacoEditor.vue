@@ -1,94 +1,112 @@
 <script lang="ts">
 import * as monaco from 'monaco-editor';
 import { debounce } from 'quasar';
-import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import {
+  defineComponent,
+  nextTick,
+  onBeforeMount,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from 'vue';
 
-@Component
-export default class MonacoEditor extends Vue {
-  private editor: monaco.editor.IStandaloneCodeEditor | null = null;
-  public layout: (() => void) = () => { };
+export default defineComponent({
+  props: {
+    title: {
+      type: String,
+      default: 'Editor',
+    },
+    body: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ['update:body', 'run'],
+  setup: (props, { emit }) => {
+    const root = ref<HTMLElement | null>(null);
+    const layout = debounce(() => editor?.layout(), 100);
+    let editor: monaco.editor.IStandaloneCodeEditor | null = null;
 
-  @Prop({ type: String, default: 'Editor' })
-  public readonly title!: string;
+    function initEditor(): void {
+      editor = monaco.editor.create(root.value!, {
+        value: props.body,
+        theme: 'vs-dark',
+        language: 'javascript',
+        tabSize: 2,
+        insertSpaces: true,
+      });
 
-  @Prop({ type: String, required: true })
-  public readonly value!: string;
+      editor.onDidChangeModelContent(ev => {
+        const value = editor?.getValue();
+        if (props.body !== value) {
+          emit('update:body', value, ev);
+        }
+      });
 
-  @Watch('value')
-  private watchExternalChanges(newV: string): void {
-    if (this.editor && newV !== this.editor.getValue()) {
-      this.setEditorValue(newV);
+      editor.addAction({
+        id: 'run-code',
+        label: 'Run',
+        keybindings: [
+          monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+        ],
+        contextMenuGroupId: 'navigation',
+        contextMenuOrder: 1,
+        run: () => { emit('run'); },
+      });
     }
-  }
 
-  private initEditor(): void {
-    this.editor = monaco.editor.create(this.$el as HTMLElement, {
-      value: this.value,
-      theme: 'vs-dark',
-      language: 'javascript',
-      tabSize: 2,
-      insertSpaces: true,
+    watch(
+      () => props.body,
+      (newV: string) => {
+        if (editor && newV !== editor.getValue()) {
+          setEditorValue(newV);
+        }
+      });
+
+    onBeforeMount(() => {
+      window.addEventListener('resize', layout);
     });
 
-    this.editor.onDidChangeModelContent(ev => {
-      const value = this.editor?.getValue();
-      if (this.value !== value) {
-        this.$emit('input', value, ev);
+    onMounted(() => {
+      setTimeout(() => initEditor(), 100);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('resize', layout);
+      editor?.dispose();
+    });
+
+    function setEditorValue(text: string): void {
+      editor?.setValue(text);
+      nextTick(() => editor?.focus());
+    }
+
+    function insert(text: string): void {
+      const range = editor?.getSelection();
+      if (!editor || !range) {
+        return;
       }
-    });
-
-    this.editor.addAction({
-      id: 'run-code',
-      label: 'Run',
-      keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-      ],
-      contextMenuGroupId: 'navigation',
-      contextMenuOrder: 1,
-      run: () => { this.$emit('run'); },
-    });
-  }
-
-  public created(): void {
-    this.layout = debounce(() => this.editor?.layout(), 100);
-    window.addEventListener('resize', this.layout);
-  }
-
-  public mounted(): void {
-    // Provides a smoother experience in dialogs
-    setTimeout(() => this.initEditor(), 100);
-  }
-
-  public beforeDestroy(): void {
-    window.removeEventListener('resize', this.layout);
-    this.editor?.dispose();
-  }
-
-  private setEditorValue(text: string): void {
-    this.editor?.setValue(text);
-    this.$nextTick(() => this.editor?.focus());
-  }
-
-  public insert(text: string): void {
-    const range = this.editor?.getSelection();
-    if (!this.editor || !range) {
-      return;
+      editor.executeEdits('MonacoEditor', [{
+        range,
+        text,
+        forceMoveMarkers: true,
+      }]);
+      nextTick(() => editor?.focus());
     }
-    this.editor.executeEdits('MonacoEditor', [{
-      range,
-      text,
-      forceMoveMarkers: true,
-    }]);
-    this.$nextTick(() => this.editor?.focus());
-  }
 
-  public append(text: string): void {
-    const sep = !this.value || this.value.endsWith('\n') ? '' : '\n';
-    this.setEditorValue(`${this.value}${sep}${text}\n`);
-  }
-}
+    function append(text: string): void {
+      const sep = !props.body || props.body.endsWith('\n') ? '' : '\n';
+      setEditorValue(`${props.body}${sep}${text}\n`);
+    }
 
+    return {
+      root,
+      insert,
+      append,
+    };
+  },
+});
 </script>
 
 <template>

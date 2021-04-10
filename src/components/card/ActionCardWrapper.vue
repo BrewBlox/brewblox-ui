@@ -1,16 +1,17 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
 import { WidgetContext } from '@/store/features';
 
 
-@Component
-export default class ActionCardWrapper extends Vue {
-
-  @Prop({ type: Object, required: true })
-  readonly context!: WidgetContext;
-}
+export default defineComponent({
+  props: {
+    context: {
+      required: true,
+      type: Object as PropType<WidgetContext>,
+    },
+  },
+});
 </script>
 
 <template>

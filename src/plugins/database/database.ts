@@ -1,12 +1,12 @@
 import { AxiosError } from 'axios';
 import isObjectLike from 'lodash/isObjectLike';
-import Vue from 'vue';
 
-import { STORE_TOPIC } from '@/helpers/const';
-import http, { parseHttpError } from '@/helpers/http';
-import notify from '@/helpers/notify';
+import { eventbus } from '@/plugins/eventbus';
 import { DatastoreEvent, StoreObject } from '@/shared-types';
 import { systemStore } from '@/store/system';
+import { STORE_TOPIC } from '@/utils/const';
+import http, { parseHttpError } from '@/utils/http';
+import notify from '@/utils/notify';
 
 import { BrewbloxDatabase, EventHandler } from './types';
 
@@ -60,8 +60,8 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
       return;
     }
     this.rootNamespaces.push(root);
-    Vue.$eventbus.subscribe(`${STORE_TOPIC}/${root}`);
-    Vue.$eventbus.addListener(`${STORE_TOPIC}/${root}`, (_, data) => {
+    eventbus.subscribe(`${STORE_TOPIC}/${root}`);
+    eventbus.addListener(`${STORE_TOPIC}/${root}`, (_, data) => {
       if (isStoreEvent(data)) {
         data.changed && this.onChanged(data.changed);
         data.deleted && this.onDeleted(data.deleted);

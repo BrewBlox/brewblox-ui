@@ -1,7 +1,6 @@
-import Vue from 'vue';
-
-import { deserialize } from '@/plugins/spark/parse-object';
+import { database } from '@/plugins/database';
 import { StoreObject } from '@/shared-types';
+import { deserialize } from '@/utils/parse-object';
 
 import { ChangeCb, DeleteCb } from './types';
 
@@ -32,26 +31,26 @@ export function createApi<T extends StoreObject>(args: DatabaseApiArgs): Databas
   const { namespace } = args;
   return {
     subscribe(onChanged: ChangeCb<T>, onDeleted: DeleteCb): void {
-      Vue.$database.subscribe({
+      database.subscribe({
         namespace,
         onChanged: v => onChanged(hydrate(v)),
         onDeleted,
       });
     },
     async fetch(): Promise<T[]> {
-      return hydrate(await Vue.$database.fetchAll(namespace));
+      return hydrate(await database.fetchAll(namespace));
     },
     async fetchById(id: string): Promise<T | null> {
-      return hydrate(await Vue.$database.fetchById(namespace, id));
+      return hydrate(await database.fetchById(namespace, id));
     },
     async create(val: T): Promise<T> {
-      return hydrate(await Vue.$database.create(namespace, val));
+      return hydrate(await database.create(namespace, val));
     },
     async persist(val: T): Promise<T> {
-      return hydrate(await Vue.$database.persist(namespace, val));
+      return hydrate(await database.persist(namespace, val));
     },
     async remove(val: T): Promise<T> {
-      return hydrate(await Vue.$database.remove(namespace, val));
+      return hydrate(await database.remove(namespace, val));
     },
   };
 }

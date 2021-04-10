@@ -1,44 +1,55 @@
 <script lang="ts">
 import { Layout } from 'plotly.js';
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import { deepCopy } from '@/helpers/functional';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/functional';
 
+export default defineComponent({
+  name: 'GraphRangeSubmenu',
+  props: {
+    layout: {
+      type: Object as PropType<Partial<Layout>>,
+      required: true,
+    },
+    save: {
+      type: Function as PropType<(v: Partial<Layout>) => unknown>,
+      required: true,
+    },
+  },
+  setup(props) {
 
-@Component
-export default class GraphRangeSubmenu extends Vue {
+    function label(side: 'Y1' | 'Y2'): string {
+      const key = { Y1: 'yaxis', Y2: 'yaxis2' }[side];
+      const obj = props.layout[key];
+      const range = obj?.range ? `(${obj.range.join(', ')})` : 'auto';
+      return `${side} range: ${range}`;
+    }
 
-  @Prop({ type: Object, required: true })
-  public readonly layout!: Partial<Layout>;
+    function edit(side: 'Y1' | 'Y2'): void {
+      const key = { Y1: 'yaxis', Y2: 'yaxis2' }[side];
+      createDialog({
+        component: 'GraphRangeDialog',
+        componentProps: {
+          title: `Set ${side} range`,
+          value: props.layout[key]?.range,
+        },
+      })
+        .onOk(range =>
+          props.save({
+            ...deepCopy(props.layout),
+            [key]: range
+              ? { range, autorange: false }
+              : undefined,
+          }));
+    }
 
-  @Prop({ type: Function, required: true })
-  public readonly save!: (v: Partial<Layout>) => void;
-
-  label(side: 'Y1' | 'Y2'): string {
-    const key = { Y1: 'yaxis', Y2: 'yaxis2' }[side];
-    const obj = this.layout[key];
-    const range = obj?.range ? `(${obj.range.join(', ')})` : 'auto';
-    return `${side} range: ${range}`;
-  }
-
-  edit(side: 'Y1' | 'Y2'): void {
-    const key = { Y1: 'yaxis', Y2: 'yaxis2' }[side];
-    createDialog({
-      component: 'GraphRangeDialog',
-      title: `Set ${side} range`,
-      value: this.layout[key]?.range,
-    })
-      .onOk(range =>
-        this.save({
-          ...deepCopy(this.layout),
-          [key]: range
-            ? { range, autorange: false }
-            : undefined,
-        }));
-  }
-}
+    return {
+      label,
+      edit,
+    };
+  },
+});
 </script>
 
 <template>

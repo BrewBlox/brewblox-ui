@@ -1,10 +1,10 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
+import { extendById, filterById, findById } from '@/utils/functional';
 
-import { Block, BlockField, BlockFieldAddress } from '../types';
 import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
+import { Block, BlockField, BlockFieldAddress } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
 import { SparkServiceModule } from './spark-module';

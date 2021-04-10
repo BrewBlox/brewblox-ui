@@ -1,7 +1,7 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById, patchedById } from '@/helpers/functional';
 import store from '@/store';
+import { extendById, filterById, findById, patchedById } from '@/utils/functional';
 
 import { dashboardApi, widgetApi } from './api';
 import { Dashboard, Widget } from './types';
@@ -58,7 +58,7 @@ export class DashboardModule extends VuexModule {
           if (order !== dashboard.order) {
             this.saveDashboard({ ...dashboard, order });
           }
-        })
+        }),
     );
   }
 

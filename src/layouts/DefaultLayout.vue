@@ -1,63 +1,77 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { useQuasar } from 'quasar';
+import { computed, defineComponent, inject, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { systemStore } from '@/store/system';
+import { DenseKey } from '@/symbols';
 
-@Component
-export default class DefaultLayout extends Vue {
-  localDrawer: boolean | null = null;
-  dashboardEditing = false;
-  serviceEditing = false;
-  builderEditing = false;
+export default defineComponent({
+  setup() {
+    const dense = inject(DenseKey)!;
+    const $q = useQuasar();
+    const router = useRouter();
+    let localDrawer: boolean | null = null;
 
-  get drawerOpen(): boolean {
-    return Boolean(
-      this.localDrawer
-      ?? this.$q.localStorage.getItem('drawer')
-      ?? !this.$dense);
-  }
+    const devMode = Boolean(process.env.DEV);
+    const dashboardEditing = ref<boolean>(false);
+    const serviceEditing = ref<boolean>(false);
+    const builderEditing = ref<boolean>(false);
 
-  set drawerOpen(v: boolean) {
-    this.localDrawer = v;
-    this.$q.localStorage.set('drawer', v);
-  }
+    const drawerOpen = computed<boolean>({
+      get: () => Boolean(
+        localDrawer
+        ?? $q.localStorage.getItem('drawer')
+        ?? !dense.value,
+      ),
+      set: v => {
+        localDrawer = v;
+        $q.localStorage.set('drawer', v);
+      },
+    });
 
-  get devMode(): boolean {
-    return !!process.env.DEV;
-  }
+    const showSidebarLayouts = computed<boolean>(
+      () => systemStore.config.showSidebarLayouts,
+    );
 
-  get showSidebarLayouts(): boolean {
-    return systemStore.config.showSidebarLayouts;
-  }
+    function stopEditing(): void {
+      dashboardEditing.value = false;
+      serviceEditing.value = false;
+      builderEditing.value = false;
+    }
 
-  stopEditing(): void {
-    this.dashboardEditing = false;
-    this.serviceEditing = false;
-    this.builderEditing = false;
-  }
-
-  routeActive(route: string): boolean {
-    return !!this.$route.path.match(route);
-  }
-}
+    function routeActive(route: string): boolean {
+      return Boolean(router.currentRoute.value.path.match(route));
+    }
+    return {
+      devMode,
+      dashboardEditing,
+      serviceEditing,
+      builderEditing,
+      drawerOpen,
+      showSidebarLayouts,
+      stopEditing,
+      routeActive,
+    };
+  },
+});
 </script>
 
 <template>
   <q-layout view="hHh Lpr fFf" style="overflow: hidden">
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
-        <portal-target name="toolbar-title">
+        <div id="toolbar-title">
           Brewblox
-        </portal-target>
+        </div>
       </template>
       <template #buttons>
-        <portal-target name="toolbar-buttons" class="full-height row q-gutter-x-sm q-pr-xs" />
+        <div id="toolbar-buttons" class="full-height row q-gutter-x-sm q-pr-xs" />
       </template>
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="drawerOpen" content-class="column" elevated>
+    <q-drawer v-model="drawerOpen" class="column" elevated>
       <SidebarNavigator />
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
@@ -83,7 +97,7 @@ export default class DefaultLayout extends Vue {
 
     <q-page-container
       style="overflow: hidden"
-      @click.native="stopEditing"
+      @click="stopEditing"
     >
       <router-view />
     </q-page-container>

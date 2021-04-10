@@ -19,7 +19,7 @@ module.exports = configure(function (ctx) {
       'externals',
       'register',
       'plugins',
-      'mixins',
+      'providers',
     ],
 
     css: [

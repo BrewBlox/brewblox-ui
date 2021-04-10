@@ -1,9 +1,9 @@
 import isEqual from 'lodash/isEqual';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 import { featureStore } from '@/store/features';
+import { extendById, filterById, findById } from '@/utils/functional';
 
 import api from './api';
 import { Service, ServiceStatus, ServiceStub } from './types';

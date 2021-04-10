@@ -1,39 +1,53 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
+import { createDialog } from '@/utils/dialog';
 
 import { DEFAULT_PRECISION } from '../getters';
 import { GraphConfig } from '../types';
 
-@Component
-export default class GraphEditor extends Vue {
-  DEFAULT_PRECISION = DEFAULT_PRECISION;
+export default defineComponent({
+  name: 'GraphEditor',
+  props: {
+    downsampling: {
+      type: Object as PropType<Mapped<string>>,
+      default: () => ({}),
+    },
+    noPeriod: {
+      type: Boolean,
+      default: false,
+    },
+    config: {
+      type: Object as PropType<GraphConfig>,
+      required: true,
+    },
+  },
+  emits: ['update:config'],
+  setup(props, { emit }) {
 
-  @Prop({ type: Object, default: () => ({}) })
-  readonly downsampling!: Mapped<string>;
+    function saveConfig(config: GraphConfig): void {
+      emit('update:config', config);
+    }
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noPeriod!: boolean;
+    function editLeaf(node: QuasarNode): void {
+      createDialog({
+        component: 'GraphDisplayDialog',
+        componentProps: {
+          title: node.value,
+          config: props.config,
+          field: node.value,
+        },
+      })
+        .onOk(config => saveConfig(config));
+    }
 
-  @Prop({ type: Object, required: true })
-  public readonly config!: GraphConfig;
-
-  saveConfig(config: GraphConfig = this.config): void {
-    this.$emit('update:config', config);
-  }
-
-  editLeaf(node: QuasarNode): void {
-    createDialog({
-      component: 'GraphDisplayDialog',
-      title: node.value,
-      config: this.config,
-      field: node.value,
-    })
-      .onOk(config => this.saveConfig(config));
-  }
-}
+    return {
+      DEFAULT_PRECISION,
+      saveConfig,
+      editLeaf,
+    };
+  },
+});
 </script>
 
 <template>

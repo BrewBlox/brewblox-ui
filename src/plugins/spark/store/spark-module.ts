@@ -1,9 +1,7 @@
-import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { STATE_TOPIC } from '@/helpers/const';
-import { extendById, typeMatchFilter } from '@/helpers/functional';
+import { eventbus } from '@/plugins/eventbus';
 import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   Block,
@@ -16,11 +14,13 @@ import type {
   SparkService,
   SparkStatus,
 } from '@/plugins/spark/types';
+import { isSparkPatch, isSparkState } from '@/plugins/spark/utils';
 import { SparkPatchEvent } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
+import { STATE_TOPIC } from '@/utils/const';
+import { extendById, typeMatchFilter } from '@/utils/functional';
 
-import { isSparkPatch, isSparkState } from '../helpers';
 import * as api from './api';
 import {
   asServiceStatus,
@@ -28,12 +28,12 @@ import {
   calculateDrivenChains,
   calculateLimiters,
   calculateRelations,
-} from './helpers';
+} from './utils';
 
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {
-  private patchListenerId: string = '';
-  private stateListenerId: string = '';
+  private patchListenerId = '';
+  private stateListenerId = '';
 
   public readonly id: string; // serviceId
 
@@ -118,7 +118,7 @@ export class SparkServiceModule extends VuexModule {
   }
 
   public blockByLink<T extends Block>(link: Link | null): T | null {
-    if (!link || !link.id) { return null; };
+    if (!link || !link.id) { return null; }
     return this.blockById<T>(link.id);
   }
 
@@ -250,7 +250,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async start(): Promise<void> {
-    this.stateListenerId = Vue.$eventbus.addListener(
+    this.stateListenerId = eventbus.addListener(
       `${STATE_TOPIC}/${this.id}`,
       (_, evt) => {
         if (isSparkState(evt)) {
@@ -262,7 +262,7 @@ export class SparkServiceModule extends VuexModule {
           serviceStore.updateStatus(asServiceStatus(status));
         }
       });
-    this.patchListenerId = Vue.$eventbus.addListener(
+    this.patchListenerId = eventbus.addListener(
       `${STATE_TOPIC}/${this.id}/patch`,
       (_, evt) => {
         if (isSparkPatch(evt)) {
@@ -277,7 +277,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async stop(): Promise<void> {
-    Vue.$eventbus.removeListener(this.stateListenerId);
-    Vue.$eventbus.removeListener(this.patchListenerId);
+    eventbus.removeListener(this.stateListenerId);
+    eventbus.removeListener(this.patchListenerId);
   }
 }

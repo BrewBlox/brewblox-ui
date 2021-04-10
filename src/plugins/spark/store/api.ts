@@ -1,9 +1,9 @@
 
-import http, { intercept } from '@/helpers/http';
-import notify from '@/helpers/notify';
+import http, { intercept } from '@/utils/http';
+import notify from '@/utils/notify';
 
 import { ApiSparkStatus, Block, BlockIds, SparkExported, SparkStatus } from '../types';
-import { asSparkStatus } from './helpers';
+import { asSparkStatus } from './utils';
 
 export const fetchBlocks = (serviceId: string): Promise<Block[]> =>
   http.post<Block[]>(`/${encodeURIComponent(serviceId)}/blocks/all/read`)

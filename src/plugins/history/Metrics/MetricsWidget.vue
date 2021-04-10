@@ -1,27 +1,47 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent, ref } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
+import { useWidget } from '@/composables';
 
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
+import { MetricsConfig } from './types';
 
-
-@Component({
+export default defineComponent({
+  name: 'MetricsWidget',
   components: {
     Basic: MetricsBasic,
     Full: MetricsFull,
   },
-})
-export default class MetricsWidget extends WidgetBase {
-  revision = 0;
-}
+  props: {
+    ...useWidget.props,
+  },
+  emits: [
+    ...useWidget.emits,
+  ],
+  setup(props) {
+    const {
+      crud,
+      mode,
+      toolbarComponent,
+    } = useWidget<MetricsConfig>(props.crud, props.context);
+
+    const revision = ref<number>(0);
+
+    return {
+      crud,
+      mode,
+      toolbarComponent,
+      revision,
+    };
+  },
+});
 </script>
 
 <template>
   <CardWrapper v-bind="{context}">
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <component :is="toolbarComponent" v-model:mode="mode" :crud="crud">
         <template #actions>
           <ActionItem
             v-if="mode === 'Basic'"

@@ -27,12 +27,12 @@ const defaultUnits = (): UserUnits => ({
 
 @Module // generateMutationSetters not set
 export class SystemModule extends VuexModule {
-  public loaded: boolean = false;
+  public loaded = false;
   public now: Date = new Date();
   public config: SystemConfig = defaultConfig();
   public units: UserUnits = defaultUnits();
 
-  public userDefinedUnits: boolean = true; // assume yes
+  public userDefinedUnits = true; // assume yes
 
   @Mutation
   public setLoaded(): void {
@@ -85,12 +85,12 @@ export class SystemModule extends VuexModule {
 
     configApi.subscribe(
       obj => obj.id === CONFIG_ID && this.updateConfig(obj),
-      id => id === CONFIG_ID && this.updateConfig(defaultConfig())
+      id => id === CONFIG_ID && this.updateConfig(defaultConfig()),
     );
 
     globalApi.subscribe(
       obj => obj.id === UNITS_ID && this.updateUnits(obj),
-      id => id === UNITS_ID && this.updateUnits(defaultUnits())
+      id => id === UNITS_ID && this.updateUnits(defaultUnits()),
     );
   }
 }

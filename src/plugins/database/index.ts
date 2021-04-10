@@ -1,11 +1,16 @@
-import { VueConstructor } from 'vue';
+import { Plugin } from 'vue';
+
+import { DatabaseKey } from '@/symbols';
 
 import { BrewbloxRedisDatabase } from './database';
+import { BrewbloxDatabase } from './types';
 
 export * from './types';
 
-export default {
-  install(Vue: VueConstructor) {
-    Vue.$database = new BrewbloxRedisDatabase();
+export const database: BrewbloxDatabase = new BrewbloxRedisDatabase();
+
+export const databasePlugin: Plugin = {
+  install(app) {
+    app.provide(DatabaseKey, database);
   },
 };

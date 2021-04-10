@@ -32,7 +32,7 @@
     "src/**/*.ts",
     "src/**/*.vue",
     "test/**/*.ts",
-    "test/**/*.vue",
+    "test/**/*.vue"
   ],
   "exclude": [
     "/dev",

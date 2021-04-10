@@ -1,21 +1,21 @@
-import { VueConstructor } from 'vue';
+import { Plugin } from 'vue';
 
-import { autoRegister } from '@/helpers/component-ref';
-import { featureStore } from '@/store/features';
+import { startup } from '@/plugins/startup';
+import { autoRegister } from '@/utils/component-ref';
 
 import Graph from './Graph';
 import Metrics from './Metrics';
-import SessionLog from './SessionLog';
 import { historyStore } from './store';
 
-export default {
-  install(Vue: VueConstructor) {
-    autoRegister(require.context('./components', true));
+const plugin: Plugin = {
+  install(app) {
+    autoRegister(app, require.context('./components', true));
 
-    featureStore.registerWidget(Graph);
-    featureStore.registerWidget(Metrics);
-    featureStore.registerWidget(SessionLog);
+    app.use(Graph);
+    app.use(Metrics);
 
-    Vue.$startup.onStart(() => historyStore.start());
+    startup.onStart(() => historyStore.start());
   },
 };
+
+export default plugin;

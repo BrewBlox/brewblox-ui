@@ -1,10 +1,11 @@
 import mqtt from 'mqtt';
-import shortid from 'shortid';
-import { VueConstructor } from 'vue';
+import { nanoid } from 'nanoid';
+import { Plugin } from 'vue';
 
-import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/helpers/const';
-import { mqttTopicExp, popById } from '@/helpers/functional';
-import notify from '@/helpers/notify';
+import { EventbusKey } from '@/symbols';
+import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/utils/const';
+import { mqttTopicExp, popById } from '@/utils/functional';
+import notify from '@/utils/notify';
 
 export type EventCallback = (topic: string, evt: any) => unknown;
 
@@ -89,7 +90,7 @@ export class BrewbloxEventbus {
   }
 
   public addListener(topic: string, callback: EventCallback): string {
-    const id = shortid.generate();
+    const id = nanoid();
     const exp = mqttTopicExp(topic);
     this.listeners.push({ id, topic, exp, callback });
     return id;
@@ -104,8 +105,10 @@ export class BrewbloxEventbus {
   }
 }
 
-export default {
-  install(Vue: VueConstructor) {
-    Vue.$eventbus = new BrewbloxEventbus();
+export const eventbus = new BrewbloxEventbus();
+
+export const eventbusPlugin: Plugin = {
+  install(app) {
+    app.provide(EventbusKey, eventbus);
   },
 };
