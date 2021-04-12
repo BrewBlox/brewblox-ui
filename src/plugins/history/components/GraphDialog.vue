@@ -1,14 +1,14 @@
 <script lang="ts">
 import { defineComponent, h, PropType } from 'vue';
 
-import { useDialogBase } from '@/composables';
+import { useDialog } from '@/composables';
 
 import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
 export default defineComponent({
   name: 'GraphDialog',
   props: {
-    ...useDialogBase.props,
+    ...useDialog.props,
     graphId: {
       type: String,
       required: true,
@@ -30,12 +30,12 @@ export default defineComponent({
       default: null,
     },
   },
-  emits: useDialogBase.emits,
+  emits: useDialog.emits,
   setup(props) {
     const {
       dialogRef,
       onDialogHide,
-    } = useDialogBase();
+    } = useDialog.setup();
 
     return h('q-dialog',
       {

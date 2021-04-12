@@ -1,14 +1,14 @@
 <script lang="ts">
 import { useQuasar } from 'quasar';
-import { computed, defineComponent, inject, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
-import { DenseKey } from '@/symbols';
 
 export default defineComponent({
   setup() {
-    const dense = inject(DenseKey)!;
+    const { dense } = useGlobals();
     const $q = useQuasar();
     const router = useRouter();
     let localDrawer: boolean | null = null;
@@ -75,9 +75,9 @@ export default defineComponent({
       <SidebarNavigator />
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
-        <DashboardIndex v-model="dashboardEditing" />
-        <BuilderLayoutIndex v-if="showSidebarLayouts" v-model="builderEditing" />
-        <ServiceIndex v-model="serviceEditing" />
+        <DashboardIndex v-model:editing="dashboardEditing" />
+        <!-- <BuilderLayoutIndex v-if="showSidebarLayouts" v-model="builderEditing" /> -->
+        <!-- <ServiceIndex v-model:editing="serviceEditing" /> -->
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">

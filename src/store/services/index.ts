@@ -6,7 +6,7 @@ import { featureStore } from '@/store/features';
 import { extendById, filterById, findById } from '@/utils/functional';
 
 import api from './api';
-import { Service, ServiceStatus, ServiceStub } from './types';
+import type { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
 

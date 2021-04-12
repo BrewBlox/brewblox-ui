@@ -40,7 +40,6 @@
     "js-quantities": "^1.7.6",
     "lodash": "^4.17.21",
     "marked": "^0.7.0",
-    "monaco-editor": "^0.20.0",
     "mqtt": "^4.2.6",
     "nanoid": "^3.1.22",
     "parse-duration": "^0.1.3",
@@ -54,7 +53,7 @@
     "url-safe-string": "^1.1.0",
     "vue-json-pretty": "^1.7.1",
     "vue-router": "^4.0.6",
-    "vuedraggable": "^2.24.3"
+    "vuedraggable": "^4.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.13.8",
@@ -92,7 +91,6 @@
     "fork-ts-checker-webpack-plugin": "^3.1.1",
     "jest": "^25.5.4",
     "minimist": "^1.2.5",
-    "monaco-editor-webpack-plugin": "^1.9.1",
     "node-sass": "^4.14.1",
     "sass-loader": "^8.0.2",
     "svgpath": "^2.3.1",
@@ -100,7 +98,6 @@
     "ts-loader": "^6.2.2",
     "tsargs": "^1.4.1",
     "tsutils": "^3.20.0",
-    "vue-property-decorator": "^8.5.1",
     "vue-template-compiler": "^2.6.12",
     "vuex-class-modules": "^1.2.0"
   },

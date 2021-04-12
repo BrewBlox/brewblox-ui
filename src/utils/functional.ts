@@ -206,7 +206,9 @@ export const isAbsoluteUrl =
 
 export const isJsonEqual =
   (left: unknown, right: unknown): boolean =>
-    isEqual(JSON.parse(JSON.stringify(left)), JSON.parse(JSON.stringify(right)));
+    (left != null && right != null)
+      ? isEqual(JSON.parse(JSON.stringify(left)), JSON.parse(JSON.stringify(right)))
+      : (left == null) === (right == null);
 
 export const ruleValidator =
   (rules: InputRule[]): ((val: any) => boolean) =>

@@ -16,15 +16,12 @@ export default defineComponent({
   props: {
     ...useWidget.props,
   },
-  emits: [
-    ...useWidget.emits,
-  ],
   setup(props) {
     const {
       crud,
       mode,
       toolbarComponent,
-    } = useWidget<MetricsConfig>(props.crud, props.context);
+    } = useWidget.setup<MetricsConfig>(props.crud, props.context);
 
     const revision = ref<number>(0);
 

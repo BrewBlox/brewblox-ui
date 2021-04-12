@@ -26,9 +26,6 @@ export default defineComponent({
   props: {
     ...useWidget.props,
   },
-  emits: [
-    ...useWidget.emits,
-  ],
   setup(props) {
     const {
       crud,
@@ -36,7 +33,7 @@ export default defineComponent({
       inDialog,
       toolbarComponent,
       saveWidget,
-    } = useWidget<GraphConfig>(props.crud, props.context);
+    } = useWidget.setup<GraphConfig>(props.crud, props.context);
 
     function cloned(): GraphConfig {
       return cloneDeep(defaults(crud.widget.config, emptyGraphConfig()));
@@ -148,6 +145,8 @@ export default defineComponent({
       downsampling,
       wrapperGraphId,
       widgetGraphId,
+      wrapperGraphRef,
+      widgetGraphRef,
       widget,
       title,
       config,
@@ -174,7 +173,7 @@ export default defineComponent({
   >
     <template #graph>
       <HistoryGraph
-        ref="wrapperGraph"
+        ref="wrapperGraphRef"
         :graph-id="wrapperGraphId"
         :config="config"
         use-presets
@@ -231,7 +230,7 @@ export default defineComponent({
     >
       <q-resize-observer :debounce="200" @resize="refresh" />
       <HistoryGraph
-        ref="widgetGraph"
+        ref="widgetGraphRef"
         :graph-id="widgetGraphId"
         :config="config"
         @downsample="v => downsampling = v"

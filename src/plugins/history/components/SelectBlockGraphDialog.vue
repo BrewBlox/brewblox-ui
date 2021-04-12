@@ -3,7 +3,7 @@ import mapValues from 'lodash/mapValues';
 import { uid } from 'quasar';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { useDialogBase } from '@/composables';
+import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress, BlockCrud, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
 import { blockGraphCfg } from '@/plugins/spark/utils';
@@ -14,7 +14,7 @@ import { GraphConfig } from '../types';
 export default defineComponent({
   name: 'SelectBlockGraphDialog',
   props: {
-    ...useDialogBase.props,
+    ...useDialog.props,
     address: {
       type: Object as PropType<BlockAddress | null>,
       default: null,
@@ -24,7 +24,7 @@ export default defineComponent({
       default: 'Add block to graph',
     },
   },
-  emits: useDialogBase.emits,
+  emits: useDialog.emits,
   setup(props) {
     const {
       dialogRef,
@@ -32,7 +32,7 @@ export default defineComponent({
       onDialogHide,
       onDialogCancel,
       onDialogOK,
-    } = useDialogBase();
+    } = useDialog.setup();
 
     const services = computed<SparkService[]>(
       () => sparkStore.modules.map(m => m.service),

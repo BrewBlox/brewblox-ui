@@ -208,6 +208,9 @@ export default defineComponent({
       error,
       graphData,
       policies,
+      // Used by parents
+      refresh,
+      resetSources,
     };
   },
 });

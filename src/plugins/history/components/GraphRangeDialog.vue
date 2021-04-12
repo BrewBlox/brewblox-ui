@@ -1,19 +1,19 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { useDialogBase } from '@/composables';
+import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 
 export default defineComponent({
   name: 'GraphRangeDialog',
   props: {
-    ...useDialogBase.props,
+    ...useDialog.props,
     value: {
       type: Array as PropType<(number | null)[]>, // [number|null, number|null] tuple
       default: () => [null, null],
     },
   },
-  emits: useDialogBase.emits,
+  emits: useDialog.emits,
   setup(props) {
     const {
       dialogRef,
@@ -21,7 +21,7 @@ export default defineComponent({
       onDialogHide,
       onDialogCancel,
       onDialogOK,
-    } = useDialogBase();
+    } = useDialog.setup();
 
     const minV = ref(props.value[0] ?? -10);
     const maxV = ref(props.value[1] ?? 20);

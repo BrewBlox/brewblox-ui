@@ -10,7 +10,7 @@ import {
 } from '@/utils/functional';
 import notify from '@/utils/notify';
 
-import {
+import type {
   ApiQuery,
   HistorySource,
   LoggedSession,

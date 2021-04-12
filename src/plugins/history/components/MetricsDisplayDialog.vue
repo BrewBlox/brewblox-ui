@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, reactive } from 'vue';
 
-import { useDialogBase } from '@/composables';
+import { useDialog } from '@/composables';
 import { durationMs, durationString } from '@/utils/duration';
 import { deepCopy } from '@/utils/functional';
 
@@ -12,7 +12,7 @@ import { defaultLabel } from '../nodes';
 export default defineComponent({
   name: 'MetricsDisplayDialog',
   props: {
-    ...useDialogBase.props,
+    ...useDialog.props,
     config: {
       type: Object as PropType<MetricsConfig>,
       required: true,
@@ -22,7 +22,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: useDialogBase.emits,
+  emits: useDialog.emits,
   setup(props) {
     const {
       dialogRef,
@@ -31,7 +31,7 @@ export default defineComponent({
       onDialogHide,
       onDialogCancel,
       onDialogOK,
-    } = useDialogBase();
+    } = useDialog.setup();
 
     const local = reactive(deepCopy(props.config));
 

@@ -2,7 +2,7 @@
 import { cloneDeep, defaults } from 'lodash';
 import { defineComponent, PropType, ref } from 'vue';
 
-import { useDialogBase } from '@/composables';
+import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 
 import { emptyGraphConfig } from '../getters';
@@ -12,7 +12,7 @@ import { GraphConfig, SharedGraphConfig } from '../types';
 export default defineComponent({
   name: 'GraphEditorDialog',
   props: {
-    ...useDialogBase.props,
+    ...useDialog.props,
     config: {
       type: Object as PropType<GraphConfig>,
       required: true,
@@ -26,7 +26,7 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: useDialogBase.emits,
+  emits: useDialog.emits,
   setup(props) {
     const {
       dialogRef,
@@ -35,7 +35,7 @@ export default defineComponent({
       onDialogHide,
       onDialogCancel,
       onDialogOK,
-    } = useDialogBase();
+    } = useDialog.setup();
 
     const local = ref<GraphConfig>(defaults(cloneDeep(props.config), emptyGraphConfig()));
 

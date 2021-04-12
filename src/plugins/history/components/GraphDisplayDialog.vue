@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, reactive } from 'vue';
 
-import { useDialogBase } from '@/composables';
+import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/functional';
 
 import { defaultLabel } from '../nodes';
@@ -10,7 +10,7 @@ import { GraphAxis, GraphConfig } from '../types';
 export default defineComponent({
   name: 'GraphDisplayDialog',
   props: {
-    ...useDialogBase.props,
+    ...useDialog.props,
     config: {
       type: Object as PropType<GraphConfig>,
       required: true,
@@ -20,7 +20,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: useDialogBase.emits,
+  emits: useDialog.emits,
   setup(props) {
     const {
       dialogProps,
@@ -28,7 +28,7 @@ export default defineComponent({
       onDialogHide,
       onDialogCancel,
       onDialogOK,
-    } = useDialogBase();
+    } = useDialog.setup();
 
     const local = reactive(deepCopy(props.config));
     const axisOpts: SelectOption<GraphAxis>[] = [

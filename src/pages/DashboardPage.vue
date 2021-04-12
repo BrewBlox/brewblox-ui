@@ -1,26 +1,20 @@
 <script lang="ts">
-import { computed, defineComponent, inject, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { ValidatedWidget } from '@/components/grid/types';
+import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 import { systemStore } from '@/store/system';
-import { DenseKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { objectSorter } from '@/utils/functional';
-
-interface ValidatedWidget {
-  id: string;
-  component: string;
-  crud: Crud;
-  error?: string;
-}
 
 export default defineComponent({
   name: 'DashboardPage',
   setup() {
     const widgetEditable = ref(false);
-    const dense = inject(DenseKey)!;
+    const { dense } = useGlobals.setup();
     const router = useRouter();
 
     const context = computed<WidgetContext>(
@@ -107,8 +101,8 @@ export default defineComponent({
     );
 
     return {
-      widgetEditable,
       dense,
+      widgetEditable,
       context,
       loaded,
       dashboardId,
@@ -129,10 +123,10 @@ export default defineComponent({
       <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
     </PageError>
     <template v-else>
-      <teleport to="toolbar-title">
+      <teleport to="#toolbar-title">
         {{ dashboard.title }}
       </teleport>
-      <teleport to="toolbar-buttons">
+      <teleport to="#toolbar-buttons">
         <q-btn
           v-if="!dense"
           unelevated
@@ -180,7 +174,7 @@ export default defineComponent({
           :is="val.component"
           v-for="val in validatedWidgets"
           :key="val.id"
-          :initial-crud="val.crud"
+          :crud="val.crud"
           :context="context"
           class="col full-width"
         />
@@ -188,19 +182,21 @@ export default defineComponent({
       <GridContainer
         v-else
         class="q-ma-lg"
+        :widgets="validatedWidgets"
+        :context="context"
         :editable="widgetEditable"
         @patch:widgets="patchWidgets"
         @dblclick="showWizard(true)"
       >
-        <component
+        <!-- <component
           :is="val.component"
           v-for="val in validatedWidgets"
           :key="val.id"
-          :initial-crud="val.crud"
+          :crud="val.crud"
           :context="context"
           :error="val.error"
           class="fit"
-        />
+        /> -->
       </GridContainer>
     </template>
   </q-page>

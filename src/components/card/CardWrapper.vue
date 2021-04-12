@@ -1,6 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent, inject, PropType, Ref } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
+import { useGlobals } from '@/composables';
 import { WidgetContext } from '@/store/features';
 
 
@@ -20,7 +21,7 @@ export default defineComponent({
     },
   },
   setup(ctx) {
-    const dense = inject<Ref<boolean>>('$dense');
+    const { dense } = useGlobals.setup();
 
     const scrollable = computed<boolean>(
       () => !ctx.noScroll && ctx.context.size === 'Fixed',
@@ -29,7 +30,7 @@ export default defineComponent({
     const cardClass = computed<string>(
       () => {
         const listed = [`card__${ctx.context.container} depth-2`];
-        if (dense?.value) {
+        if (dense.value) {
           listed.push('card__dense');
         }
         return listed.join(' ');

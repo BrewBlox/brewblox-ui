@@ -4,7 +4,7 @@ import store from '@/store';
 import { extendById, filterById, findById, patchedById } from '@/utils/functional';
 
 import { dashboardApi, widgetApi } from './api';
-import { Dashboard, Widget } from './types';
+import type { Dashboard, Widget } from './types';
 
 export * from './types';
 
