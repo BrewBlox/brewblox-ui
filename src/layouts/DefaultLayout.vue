@@ -8,7 +8,7 @@ import { systemStore } from '@/store/system';
 
 export default defineComponent({
   setup() {
-    const { dense } = useGlobals();
+    const { dense } = useGlobals.setup();
     const $q = useQuasar();
     const router = useRouter();
     let localDrawer: boolean | null = null;
@@ -77,7 +77,7 @@ export default defineComponent({
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
         <DashboardIndex v-model:editing="dashboardEditing" />
         <!-- <BuilderLayoutIndex v-if="showSidebarLayouts" v-model="builderEditing" /> -->
-        <!-- <ServiceIndex v-model:editing="serviceEditing" /> -->
+        <ServiceIndex v-model:editing="serviceEditing" />
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">

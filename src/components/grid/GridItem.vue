@@ -51,22 +51,22 @@ export default defineComponent({
     const moving = ref(false);
     const keying = ref(false);
 
-    let gridWidth = 0;
-    let touchStart: XYPosition = zeroPos();
-    let dragWidth = 0;
-    let dragHeight = 0;
-    let dragStartWidth = 0;
-    let dragStartHeight = 0;
-    let dragStart: XYPosition = zeroPos();
-    let dragStartParent: XYPosition = zeroPos();
+    const gridWidth = ref<number>(0);
+    const touchStart = ref<XYPosition>(zeroPos());
+    const dragWidth = ref<number>(0);
+    const dragHeight = ref<number>(0);
+    const dragStartWidth = ref<number>(0);
+    const dragStartHeight = ref<number>(0);
+    const dragStart = ref<XYPosition>(zeroPos());
+    const dragStartParent = ref<XYPosition>(zeroPos());
 
-    let currentCols: number | null = null;
-    let currentRows: number | null = null;
-    let current: XYPosition = zeroPos();
-    let lastDelta: XYPosition = zeroPos();
+    const currentCols = ref<number | null>(null);
+    const currentRows = ref<number | null>(null);
+    const current = ref<XYPosition>(zeroPos());
+    const lastDelta = ref<XYPosition>(zeroPos());
 
-    let resizePos: XYPosition = zeroPos();
-    let debouncedEmit = debounce(emit, 500);
+    const resizePos = ref<XYPosition>(zeroPos());
+    const debouncedEmit = debounce(emit, 500);
 
     const containerRef = ref<Element | null>(null);
     const dragOverlayRef = ref<Element | null>(null);
@@ -81,18 +81,23 @@ export default defineComponent({
         const pinned = pinnedPosition || zeroPos();
 
         return {
-          gridColumnStart: `${current.x || pinned.x || resizePos.x || 'auto'}`,
-          gridRowStart: `${current.y || pinned.y || resizePos.y || 'auto'}`,
-          gridColumnEnd: `span ${currentCols || cols}`,
-          gridRowEnd: `span ${currentRows || rows}`,
+          gridColumnStart: `${current.value.x || pinned.x || resizePos.value.x || 'auto'}`,
+          gridRowStart: `${current.value.y || pinned.y || resizePos.value.y || 'auto'}`,
+          gridColumnEnd: `span ${currentCols.value || cols}`,
+          gridRowEnd: `span ${currentRows.value || rows}`,
         };
       },
     );
 
+    // watch(
+    //   () => style.value,
+    //   (newV) => console.log({ ...newV }),
+    // );
+
     const dragStyle = computed<Mapped<string>>(
       () => ({
-        width: `${dragWidth}px`,
-        height: `${dragHeight}px`,
+        width: `${dragWidth.value}px`,
+        height: `${dragHeight.value}px`,
       }),
     );
 
@@ -111,119 +116,106 @@ export default defineComponent({
     function onInteractionStart(e: MouseEvent | TouchEvent): void {
       const touch = (e instanceof MouseEvent) ? e : e.touches[0];
 
-      touchStart = {
+      touchStart.value = {
         x: touch.pageX,
         y: touch.pageY,
       };
 
       // set initial values of item
-      const { width, height } = containerSize();
-      const parent = containerParentSize();
+      const container = containerRect();
+      const parent = containerParentRect();
 
-      gridWidth = Math.floor((parent.width + GRID_GAP_SIZE) / (GRID_GAP_SIZE + GRID_SQUARE_SIZE));
+      gridWidth.value = Math.floor((parent.width + GRID_GAP_SIZE) / (GRID_GAP_SIZE + GRID_SQUARE_SIZE));
 
-      dragWidth = width;
-      dragHeight = height;
+      dragWidth.value = container.width;
+      dragHeight.value = container.height;
 
-      dragStartWidth = width;
-      dragStartHeight = height;
+      dragStartWidth.value = container.width;
+      dragStartHeight.value = container.height;
     }
 
     function onInteractionEnd(): void {
-      touchStart = zeroPos();
+      touchStart.value = zeroPos();
 
       // reset values of item
-      currentCols = null;
-      currentRows = null;
+      currentCols.value = null;
+      currentRows.value = null;
 
-      lastDelta = zeroPos();
-      current = zeroPos();
-      dragStart = zeroPos();
-      dragStartParent = zeroPos();
+      lastDelta.value = zeroPos();
+      current.value = zeroPos();
+      dragStart.value = zeroPos();
+      dragStartParent.value = zeroPos();
     }
 
-
     function changeSize(): void {
-      const newCols = Math.round((dragWidth + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE));
-      const newRows = Math.round((dragHeight + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE));
+      const newCols = Math.round((dragWidth.value + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE));
+      const newRows = Math.round((dragHeight.value + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE));
 
-      if (newCols !== currentCols && newCols <= gridWidth) {
-        currentCols = Math.max(newCols, MIN_COLS);
+      if (newCols !== currentCols.value && newCols <= gridWidth.value) {
+        currentCols.value = Math.max(newCols, MIN_COLS);
       }
 
-      if (newRows !== currentRows) {
-        currentRows = Math.max(newRows, MIN_ROWS);
+      if (newRows !== currentRows.value) {
+        currentRows.value = Math.max(newRows, MIN_ROWS);
       }
     }
 
     function calcMoveDelta(e: MouseEvent | TouchEvent): XYPosition {
       const touch = (e instanceof MouseEvent) ? e : e.touches[0];
-      const { x, y } = lastDelta;
+      const { x, y } = lastDelta.value;
       const raw = {
-        x: touch.pageX - touchStart.x,
-        y: touch.pageY - touchStart.y,
+        x: touch.pageX - touchStart.value.x,
+        y: touch.pageY - touchStart.value.y,
       };
       // Clamp to avoid instant screen jumps
       const newDelta = {
         x: clamp(raw.x, x - MAX_TICK_DELTA, x + MAX_TICK_DELTA),
         y: clamp(raw.y, y - MAX_TICK_DELTA, y + MAX_TICK_DELTA),
       };
-      lastDelta = { ...newDelta };
+      lastDelta.value = { ...newDelta };
       return newDelta;
     }
 
-    function containerParentSize(): DOMRect {
-      const container = containerRef.value;
-      if (
-        container instanceof Element &&
-        container.parentNode &&
-        container.parentNode instanceof Element
-      ) {
-        return container.parentNode.getBoundingClientRect() as DOMRect;
+    function containerParentRect(): DOMRect {
+      const parent = containerRef.value?.parentElement;
+      if (parent instanceof Element) {
+        return parent.getBoundingClientRect();
       }
       throw new Error('Container parent is not a valid Element');
     }
 
-    function containerChildSize(): DOMRect {
-      const container = containerRef.value;
-      if (container?.firstElementChild instanceof Element) {
-        return container.firstElementChild.getBoundingClientRect() as DOMRect;
-      }
-      throw new Error('Container child is not a valid Element');
-    }
-
-    function containerSize(): DOMRect {
+    function containerRect(): DOMRect {
       const container = containerRef.value;
       if (container instanceof Element) {
-        return container.getBoundingClientRect() as DOMRect;
+        return container.getBoundingClientRect();
       }
       throw new Error('Container is not a valid Element');
     }
 
     function findDragGridPosition(delta: XYPosition = zeroPos()): XYPosition {
-      if (!dragStart.x || !dragStart.y || !dragStartParent.x || !dragStartParent.y) {
+      if (!dragStart.value.x || !dragStart.value.y || !dragStartParent.value.x || !dragStartParent.value.y) {
         throw new Error('No starting drag positions known');
       }
 
-      const x = (((dragStart.x + delta.x) - dragStartParent.x) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1;
-      const y = (((dragStart.y + delta.y) - dragStartParent.y) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1;
-      const cols = (currentCols || localWidget.value.cols) - 1;
+      const x = (((dragStart.value.x + delta.x) - dragStartParent.value.x) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1;
+      const y = (((dragStart.value.y + delta.y) - dragStartParent.value.y) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1;
+      const cols = (currentCols.value || localWidget.value.cols) - 1;
 
       return {
-        x: Math.min(Math.max(Math.round(x), 1), gridWidth - cols),
+        x: Math.min(Math.max(Math.round(x), 1), gridWidth.value - cols),
         y: Math.max(Math.round(y < 1 ? 1 : y), 1),
       };
     }
 
     function findAutomaticGridPosition(): XYPosition {
-      const rects = containerSize();
-      const firstChildRects = containerChildSize();
+      const container = containerRect();
+      const parent = containerParentRect();
 
-      const touchX = rects.x;
-      const touchY = rects.y;
+      const touchX = container.x;
+      const touchY = container.y;
 
-      const parentX = firstChildRects.x;
-      const parentY = firstChildRects.y;
+      const parentX = parent.x;
+      const parentY = parent.y;
 
       return {
         x: ((touchX - parentX) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1,
@@ -235,24 +227,24 @@ export default defineComponent({
       moving.value = true;
       onInteractionStart(e);
 
-      const rects = containerSize();
-      const firstChildRects = containerChildSize();
+      const container = containerRect();
+      const parent = containerParentRect();
 
-      dragStart = { x: rects.x, y: rects.y };
-      dragStartParent = { x: firstChildRects.x, y: firstChildRects.y };
+      dragStart.value = { x: container.x, y: container.y };
+      dragStartParent.value = { x: parent.x, y: parent.y };
 
-      current = findDragGridPosition();
+      current.value = findDragGridPosition();
     }
 
     function onDragStop(): void {
       moving.value = false;
-      updatePosition({ ...current });
+      updatePosition({ ...current.value });
       onInteractionEnd();
     }
 
     function onDragMove(e: MouseEvent | TouchEvent): void {
       const delta = calcMoveDelta(e);
-      current = findDragGridPosition(delta);
+      current.value = findDragGridPosition(delta);
     }
 
     function movePanHandler(args: PanArguments): void {
@@ -268,24 +260,24 @@ export default defineComponent({
     }
 
     function onResizeStart(e: MouseEvent | TouchEvent): void {
-      resizePos = findAutomaticGridPosition();
+      resizePos.value = findAutomaticGridPosition();
       resizing.value = true;
       onInteractionStart(e);
     }
 
     function onResizeStop(): void {
-      resizePos = zeroPos();
+      resizePos.value = zeroPos();
       resizing.value = false;
-      const cols = currentCols || localWidget.value.cols;
-      const rows = currentRows || localWidget.value.rows;
+      const cols = currentCols.value || localWidget.value.cols;
+      const rows = currentRows.value || localWidget.value.rows;
       updateSize(cols, rows);
       onInteractionEnd();
     }
 
     function onResizeMove(e: MouseEvent | TouchEvent): void {
       const delta = calcMoveDelta(e);
-      dragWidth = dragStartWidth + delta.x;
-      dragHeight = dragStartHeight + delta.y;
+      dragWidth.value = dragStartWidth.value + delta.x;
+      dragHeight.value = dragStartHeight.value + delta.y;
       changeSize();
     }
 
@@ -306,8 +298,8 @@ export default defineComponent({
     }
 
     function pin(): void {
-      const pos = current.x > 0
-        ? current
+      const pos = current.value.x > 0
+        ? current.value
         : findAutomaticGridPosition();
       updatePosition(pos);
     }
@@ -327,20 +319,20 @@ export default defineComponent({
         evt.stopPropagation();
         evt.preventDefault();
 
-        if (current.x === 0) {
-          current = localWidget.value.pinnedPosition ?? findAutomaticGridPosition();
+        if (current.value.x === 0) {
+          current.value = localWidget.value.pinnedPosition ?? findAutomaticGridPosition();
         }
 
-        current.x += delta.x;
-        current.y += delta.y;
+        current.value.x += delta.x;
+        current.value.y += delta.y;
       }
     }
 
     function applyKeyMove(): void {
       if (keying.value) {
         keying.value = false;
-        updatePosition({ ...current });
-        current = zeroPos();
+        updatePosition({ ...current.value });
+        current.value = zeroPos();
       }
     }
 

@@ -29,14 +29,13 @@ export default defineComponent({
     },
   },
   emits: [
-    ...useCrud.emits,
     'mode',
   ],
   setup(props) {
     const metricsId = ref<string>(nanoid());
     const {
       crud,
-    } = useCrud<MetricsConfig>(props.crud);
+    } = useCrud.setup<MetricsConfig>(props.crud);
 
     const config = computed<MetricsConfig>(
       () => defaults(crud.widget.config, emptyMetricsConfig()),

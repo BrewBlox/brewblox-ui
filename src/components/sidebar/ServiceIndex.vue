@@ -93,32 +93,33 @@ export default defineComponent({
         </q-item-section>
       </q-item>
     </template>
-    <q-item
-      v-for="service in services"
-      :key="service.id"
-      :to="editing ? undefined : `/service/${service.id}`"
-      :inset-level="0.2"
-      :class="[
-        'q-pb-sm',
-        editing && 'bordered pointer',
-      ]"
-      style="min-height: 0px"
-    >
-      <q-item-section :class="['ellipsis', {'text-italic': editing}]">
-        {{ service.title }}
-      </q-item-section>
-      <template v-if="status(service) !== null">
-        <q-item-section class="col-auto q-mr-sm">
-          <q-icon
-            :name="status(service)?.icon || 'mdi-checkbox-blank-circle'"
-            :color="status(service)?.color"
-          />
-          <q-tooltip>
-            {{ status(service)?.desc }}
-          </q-tooltip>
+
+    <template #item="{element}">
+      <q-item
+        :to="editing ? undefined : `/service/${element.id}`"
+        :inset-level="0.2"
+        :class="[
+          'q-pb-sm',
+          editing && 'bordered pointer',
+        ]"
+        style="min-height: 0px"
+      >
+        <q-item-section :class="['ellipsis', {'text-italic': editing}]">
+          {{ element.title }}
         </q-item-section>
-      </template>
-    </q-item>
+        <template v-if="status(element) !== null">
+          <q-item-section class="col-auto q-mr-sm">
+            <q-icon
+              :name="status(element)?.icon || 'mdi-checkbox-blank-circle'"
+              :color="status(element)?.color"
+            />
+            <q-tooltip>
+              {{ status(element)?.desc }}
+            </q-tooltip>
+          </q-item-section>
+        </template>
+      </q-item>
+    </template>
 
     <template #footer>
       <q-item

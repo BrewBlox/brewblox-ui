@@ -16,7 +16,7 @@ export default defineComponent({
     const {
       crud,
       saveConfig,
-    } = useCrud<MetricsConfig>(props.crud);
+    } = useCrud.setup<MetricsConfig>(props.crud);
 
     const config = computed<MetricsConfig>(
       () => defaults(crud.widget.config, emptyMetricsConfig()),
