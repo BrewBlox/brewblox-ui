@@ -102,7 +102,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          value: localBlockId.value,
+          modelValue: localBlockId.value,
           rules: createdBlockIdRules.value,
         },
       });

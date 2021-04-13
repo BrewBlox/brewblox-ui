@@ -118,8 +118,8 @@ export default defineComponent({
       createDialog({
         component: 'InputDialog',
         componentProps: {
+          modelValue: 'New annotation',
           title: 'Add annotation',
-          value: 'New annotation',
         },
       })
         .onOk((text: string) => {
@@ -146,7 +146,7 @@ export default defineComponent({
         component: 'GraphAnnotationDialog',
         componentProps: {
           title: 'Edit annotation',
-          value: annotation.text,
+          modelValue: annotation.text,
         },
       })
         .onOk(({ text, remove }: { text: string; remove: boolean }) => {

@@ -56,9 +56,9 @@ export const useCrud: UseCrudComposable = {
       createDialog({
         component: 'InputDialog',
         componentProps: {
+          modelValue: widgetTitle,
           title: 'Change widget name',
           message: `Choose a new name for <b>${widgetTitle}</b>.`,
-          value: widgetTitle,
           html: true,
           clearable: false,
         },
@@ -75,6 +75,7 @@ export const useCrud: UseCrudComposable = {
       createDialog({
         component: 'SelectDialog',
         componentProps: {
+          modelValue: null,
           title: 'Copy widget',
           message: `To which dashboard do you want to copy <b>${crud.widget.title}</b>?`,
           html: true,
@@ -99,6 +100,7 @@ export const useCrud: UseCrudComposable = {
       createDialog({
         component: 'SelectDialog',
         componentProps: {
+          modelValue: null,
           title: 'Move widget',
           message: `To which dashboard do you want to move <b>${crud.widget.title}</b>?`,
           listSelect: selectOptions.length < 10,
@@ -138,7 +140,7 @@ export const useCrud: UseCrudComposable = {
           title: 'Remove widget',
           message: `How do you want to remove widget <b>${crud.widget.title}</b>?`,
           html: true,
-          value: [0], // pre-check the default action
+          modelValue: [0], // pre-check the default action
           selectOptions,
         },
       })

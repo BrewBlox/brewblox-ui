@@ -86,7 +86,7 @@ export default defineComponent({
           message: `Choose a new name for '${blockId}'`,
           rules: blockIdRules(serviceId),
           clearable: false,
-          value: blockId,
+          modelValue: blockId,
         },
       })
         .onOk(async (newId: string) => {

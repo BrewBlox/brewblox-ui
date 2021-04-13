@@ -56,10 +56,10 @@ export default defineComponent({
       createDialog({
         component: 'DurationQuantityDialog',
         componentProps: {
+          modelValue: bloxQty(props.modelValue ?? ''),
           title: props.title,
           message: props.message,
           html: props.html,
-          value: bloxQty(props.modelValue ?? ''),
           label: props.label,
           rules: props.rules,
         },

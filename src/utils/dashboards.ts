@@ -45,7 +45,7 @@ export const startChangeDashboardId =
     createDialog({
       component: 'InputDialog',
       componentProps: {
-        value: dashboard.id,
+        modelValue: dashboard.id,
         title: 'Change dashboard URL',
         message: 'The dashboard URL is used as unique identifier.',
         rules: dashboardIdRules(),
@@ -66,7 +66,7 @@ export const startChangeDashboardTitle =
       componentProps: {
         title: 'Rename dashboard',
         message: 'This changes the dashboard display name, not its unique identifier.',
-        value: dashboard.title,
+        modelValue: dashboard.title,
       },
     })
       .onOk(async (newTitle: string) => {

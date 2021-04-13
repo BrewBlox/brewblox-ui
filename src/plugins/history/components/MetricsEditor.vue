@@ -26,8 +26,8 @@ export default defineComponent({
       createDialog({
         component: 'MetricsDisplayDialog',
         componentProps: {
-          title: node.value,
           config: props.config,
+          title: node.value,
           field: node.value,
         },
       })

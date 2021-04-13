@@ -101,7 +101,7 @@ export default defineComponent({
       createDialog({
         component: 'BlockFieldAddressDialog',
         componentProps: {
-          address: props.modelValue,
+          modelValue: props.modelValue,
           title: props.title,
           message: props.message,
           html: props.html,

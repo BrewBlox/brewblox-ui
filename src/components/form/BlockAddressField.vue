@@ -95,10 +95,10 @@ export default defineComponent({
       createDialog({
         component: 'BlockAddressDialog',
         componentProps: {
+          modelValue: props.modelValue,
           title: props.title,
           message: props.message,
           html: props.html,
-          address: props.modelValue,
           label: props.label,
           anyService: props.anyService,
           clearable: props.clearable,

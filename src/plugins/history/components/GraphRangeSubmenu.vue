@@ -32,7 +32,7 @@ export default defineComponent({
         component: 'GraphRangeDialog',
         componentProps: {
           title: `Set ${side} range`,
-          value: props.layout[key]?.range,
+          modelValue: props.layout[key]?.range,
         },
       })
         .onOk(range =>

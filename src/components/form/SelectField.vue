@@ -87,10 +87,10 @@ export default defineComponent({
       createDialog({
         component: 'SelectDialog',
         componentProps: {
+          modelValue: props.modelValue,
           title: props.title,
           message: props.message,
           html: props.html,
-          modelValue: props.modelValue,
           listSelect: props.listSelect,
           selectOptions: props.options,
           selectProps: {

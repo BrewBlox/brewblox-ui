@@ -69,10 +69,10 @@ export default defineComponent({
       createDialog({
         component: 'DatetimeDialog',
         componentProps: {
+          modelValue: date,
           title: props.title,
           message: props.message,
           html: props.html,
-          modelValue: date,
           label: props.label,
           resetIcon: props.resetIcon,
           rules: props.rules,

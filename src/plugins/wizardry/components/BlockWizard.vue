@@ -121,7 +121,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          value: searchFilter.value,
+          modelValue: searchFilter.value,
         },
       })
         .onOk(v => searchFilter.value = v);
@@ -131,7 +131,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          value: blockId.value,
+          modelValue: blockId.value,
           rules: activeBlockIdRules.value,
         },
       })

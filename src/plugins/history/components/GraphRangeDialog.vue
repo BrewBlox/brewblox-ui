@@ -46,7 +46,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          value: minV.value,
+          modelValue: minV.value,
           rules: minVRules.value,
           type: 'number',
         },
@@ -58,7 +58,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          value: maxV.value,
+          modelValue: maxV.value,
           rules: maxVRules.value,
           type: 'number',
         },

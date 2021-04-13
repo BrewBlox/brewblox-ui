@@ -50,7 +50,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          value: dashboardTitle.value,
+          modelValue: dashboardTitle.value,
         },
       })
         .onOk(v => dashboardTitle.value = v);
@@ -60,7 +60,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          value: dashboardId.value,
+          modelValue: dashboardId.value,
           rules: idRules,
         },
       })

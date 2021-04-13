@@ -33,9 +33,9 @@ export default defineComponent({
       createDialog({
         component: 'GraphDisplayDialog',
         componentProps: {
-          title: node.value,
           config: props.config,
           field: node.value,
+          title: node.value,
         },
       })
         .onOk(config => saveConfig(config));

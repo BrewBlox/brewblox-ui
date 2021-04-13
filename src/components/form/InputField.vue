@@ -63,10 +63,10 @@ export default defineComponent({
       createDialog({
         component: 'InputDialog',
         componentProps: {
+          modelValue: props.modelValue,
           title: props.title,
           message: props.message,
           html: props.html,
-          modelValue: props.modelValue,
           decimals: props.decimals,
           type: props.type,
           label: props.label,

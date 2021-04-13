@@ -84,8 +84,8 @@ export default defineComponent({
       createDialog({
         component: 'DurationQuantityDialog',
         componentProps: {
+          modelValue: bloxQty(current),
           title: 'Custom graph duration',
-          value: bloxQty(current),
           label: 'Duration',
         },
       })

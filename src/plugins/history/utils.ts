@@ -27,7 +27,7 @@ export async function selectGraphPrecision(): Promise<ExportPrecision | undefine
   return await createDialogPromise({
     component: 'SelectDialog',
     componentProps: {
-      value: 'ms',
+      modelValue: 'ms',
       selectOptions: precisionOpts,
       title: 'Select timestamp formatting',
       message: 'The first value on every line in the CSV file shows the timestamp.',

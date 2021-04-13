@@ -10,7 +10,7 @@ export function startChangeKeyboardLayout(): DialogChainObject {
     component: 'SelectDialog',
     componentProps: {
       selectOptions: Object.keys(new KeyboardLayouts().layouts),
-      value: systemStore.config.keyboardLayout,
+      modelValue: systemStore.config.keyboardLayout,
       title: 'Select layout for virtual keyboard',
       selectProps: {
         label: 'Layout',
@@ -38,7 +38,7 @@ export function startEditBuilderTouchDelay(): DialogChainObject {
       To prevent accidental activation, you can require two clicks:
       the first to select, and the second to confirm.
       `,
-      value: systemStore.config.builderTouchDelayed,
+      modelValue: systemStore.config.builderTouchDelayed,
     },
   })
     .onOk(builderTouchDelayed => systemStore.saveConfig({ builderTouchDelayed }));
@@ -52,7 +52,7 @@ export function startChangeTempUnit(): DialogChainObject {
         { value: 'degC', label: 'Celsius' },
         { value: 'degF', label: 'Fahrenheit' },
       ],
-      value: systemStore.units.temperature,
+      modelValue: systemStore.units.temperature,
       title: 'Choose temperature unit',
       message: `
       <p>

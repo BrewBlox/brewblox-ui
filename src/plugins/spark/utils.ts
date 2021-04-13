@@ -1,4 +1,3 @@
-import capitalize from 'lodash/capitalize';
 import defaults from 'lodash/defaults';
 import isArray from 'lodash/isArray';
 import keyBy from 'lodash/keyBy';
@@ -11,19 +10,12 @@ import { Component } from 'vue';
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Quantity, SetpointProfileBlock, SparkPatchEvent, SparkStateEvent, SparkUpdateEvent } from '@/shared-types';
-import { ComponentResult, Crud, featureStore, WidgetFeature } from '@/store/features';
+import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
 import { bloxLink, bloxQty, isLink, isQuantity, prettyLink, prettyQty, prettyUnit } from '@/utils/bloxfield';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/duration';
 import {
-  base64ToHex,
-  dateString,
-  hexToBase64,
   matchesType,
-  round,
-  shortDateString,
-  truncate,
-  truncateRound,
   typeMatchFilter,
 } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
@@ -56,7 +48,7 @@ export const blockIdRules = (serviceId: string): InputRule[] => [
   v => v.length < 200 || 'Name must be less than 200 characters',
 ];
 
-export const prettyAny = (v: any): string => {
+export const prettyAny = (v: unknown): string => {
   if (isQuantity(v)) {
     return prettyQty(v);
   }
@@ -296,7 +288,7 @@ export const startResetBlocks = (serviceId: string): void => {
         { label: 'Remember names of discovered blocks', value: 0 },
         { label: 'Export sensor and pin names', value: 1 },
       ],
-      value: [0, 1], // pre-check default actions
+      modelValue: [0, 1], // pre-check default actions
     },
   })
     .onOk((selected: number[]) => resetBlocks(serviceId, {
@@ -477,11 +469,11 @@ export const isBlockDriven = (block: Block | null): boolean =>
       ?.drivenChains
       .some((chain: string[]) => chain[0] === block.id));
 
-export const isSparkState = (data: any): data is SparkStateEvent =>
+export const isSparkState = (data: unknown): data is SparkStateEvent =>
   (data as SparkStateEvent).type === 'Spark.state';
 
-export const isSparkPatch = (data: any): data is SparkPatchEvent =>
+export const isSparkPatch = (data: unknown): data is SparkPatchEvent =>
   (data as SparkPatchEvent).type === 'Spark.patch';
 
-export const isSparkUpdate = (data: any): data is SparkUpdateEvent =>
+export const isSparkUpdate = (data: unknown): data is SparkUpdateEvent =>
   (data as SparkUpdateEvent).type === 'Spark.update';

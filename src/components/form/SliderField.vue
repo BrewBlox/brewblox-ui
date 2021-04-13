@@ -69,11 +69,11 @@ export default defineComponent({
       createDialog({
         component: 'SliderDialog',
         componentProps: {
+          modelValue: props.modelValue,
           title: props.title,
           label: props.label,
           message: props.message,
           html: props.html,
-          modelValue: props.modelValue,
           decimals: props.decimals,
           min: props.min,
           max: props.max,

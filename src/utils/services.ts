@@ -43,7 +43,7 @@ export function startChangeServiceTitle(service: Service): void {
     componentProps: {
       title: 'Rename service',
       message: 'This changes the service display name, not its unique identifier.',
-      value: service.title,
+      modelValue: service.title,
     },
   })
     .onOk(async (newTitle: string) => {

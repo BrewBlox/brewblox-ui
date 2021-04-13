@@ -85,10 +85,10 @@ export default defineComponent({
       createDialog({
         component: 'LinkDialog',
         componentProps: {
+          modelValue: props.modelValue,
           title: props.title,
           message: props.message,
           html: props.html,
-          modelValue: props.modelValue,
           label: props.label,
           serviceId: props.serviceId,
           compatible: props.compatible,

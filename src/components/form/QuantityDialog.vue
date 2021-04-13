@@ -55,8 +55,8 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          type: 'number',
           modelValue: local.value,
+          type: 'number',
           suffix: notation.value,
         },
       })
