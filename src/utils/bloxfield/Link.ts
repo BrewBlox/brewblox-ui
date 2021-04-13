@@ -2,12 +2,12 @@ import { isBloxField, isJSBloxField } from './BloxField';
 import { BlockOrIntfType, JSBloxField, Link } from './types';
 
 export const isLink =
-  (obj: any): obj is Link =>
+  (obj: unknown): obj is Link =>
     isBloxField(obj)
     && obj.__bloxtype === 'Link';
 
 export const isJSLink =
-  (obj: any): obj is JSLink =>
+  (obj: unknown): obj is JSLink =>
     isJSBloxField(obj)
     && obj.__bloxtype === 'Link';
 

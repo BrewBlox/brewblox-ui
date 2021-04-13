@@ -146,9 +146,9 @@ export default defineComponent({
         :key="val.field"
         :label="val.name"
       >
-        <big :class="{darkened: val.stale}">
+        <span :class="['text-big', val.stale && 'darkened']">
           {{ roundedValue(val) }}
-        </big>
+        </span>
         <template v-if="val.stale" #after>
           <q-icon name="warning" size="24px" />
           <q-tooltip>

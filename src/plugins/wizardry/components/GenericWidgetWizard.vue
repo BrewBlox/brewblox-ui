@@ -68,7 +68,7 @@ export default defineComponent({
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
-          value: widgetTitle.value,
+          modelValue: widgetTitle.value,
         },
       })
         .onOk(v => widgetTitle.value = v);

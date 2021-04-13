@@ -35,6 +35,8 @@ interface SelectOption<T = any> {
 
 type Mapped<T> = Record<string, T>;
 
+type LooseDictionary = { [index in string]: any };
+
 type Awaitable<T> = T | PromiseLike<T>;
 
 interface HasId {

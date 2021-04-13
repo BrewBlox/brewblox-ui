@@ -1,5 +1,5 @@
 import { LooseDictionary } from 'quasar';
-import { PropType } from 'vue';
+import { computed, ComputedRef, getCurrentInstance, PropType } from 'vue';
 
 export interface UseFieldProps {
   tag: {
@@ -52,9 +52,25 @@ export interface UseFieldProps {
   },
 }
 
+export interface UseFieldComponent {
+  activeSlots: ComputedRef<string[]>;
+}
+
 export interface UseFieldComposable {
   props: UseFieldProps;
+  setup(): UseFieldComponent;
 }
+
+const fieldSlots = [
+  'prepend',
+  'append',
+  'before',
+  'after',
+  'error',
+  'hint',
+  'counter',
+  'loading',
+];
 
 export const useField: UseFieldComposable = {
   props: {
@@ -106,5 +122,17 @@ export const useField: UseFieldComposable = {
       type: Array as PropType<InputRule[]>,
       default: (): InputRule[] => [],
     },
+  },
+  setup() {
+    const { slots } = getCurrentInstance()!;
+
+    const activeSlots = computed<string[]>(
+      () => Object.keys(slots)
+        .filter(s => fieldSlots.includes(s)),
+    );
+
+    return {
+      activeSlots,
+    };
   },
 };

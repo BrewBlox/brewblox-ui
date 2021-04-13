@@ -1,16 +1,28 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 
 export default defineComponent({
-  name: 'GraphAnnotationDialog',
+  name: 'TextAreaDialog',
   props: {
     ...useDialog.props,
     modelValue: {
       type: String,
-      default: '',
+      required: true,
+    },
+    autogrow: {
+      type: Boolean,
+      default: true,
+    },
+    rules: {
+      type: Array as PropType<InputRule[]>,
+      default: () => [],
+    },
+    label: {
+      type: String,
+      default: 'Value',
     },
   },
   emits: [
@@ -18,20 +30,17 @@ export default defineComponent({
   ],
   setup(props) {
     const {
-      dialogRef,
       dialogProps,
+      dialogRef,
       onDialogHide,
-      onDialogCancel,
       onDialogOK,
+      onDialogCancel,
     } = useDialog.setup();
-    const local = ref<string>(props.modelValue);
+
+    const local = ref<string>(props.modelValue ?? '');
 
     function save(): void {
-      onDialogOK({ text: local.value, remove: false });
-    }
-
-    function remove(): void {
-      onDialogOK({ text: local.value, remove: true });
+      onDialogOK(local.value);
     }
 
     function showKeyboard(): void {
@@ -39,9 +48,10 @@ export default defineComponent({
         component: 'KeyboardDialog',
         componentProps: {
           modelValue: local.value,
+          rules: props.rules,
         },
       })
-        .onOk((v: string) => local.value = v);
+        .onOk(v => local.value = v);
     }
 
     return {
@@ -51,7 +61,6 @@ export default defineComponent({
       onDialogCancel,
       local,
       save,
-      remove,
       showKeyboard,
     };
   },
@@ -63,22 +72,25 @@ export default defineComponent({
     ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
-    @keyup.ctrl.enter="save"
+    @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"
-        label="Title"
+        type="textarea"
+        :rules="rules"
+        :label="label"
+        :autogrow="autogrow"
         autofocus
-        item-aligned
+        @keyup.enter.exact.stop
+        @keyup.enter.shift.stop
       >
         <template #append>
           <KeyboardButton @click="showKeyboard" />
         </template>
       </q-input>
+
       <template #actions>
-        <q-btn flat label="Remove" color="primary" @click="remove" />
-        <q-space />
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
       </template>

@@ -32,7 +32,7 @@ export default defineComponent({
     },
     filter: {
       type: Function as PropType<(feature: string) => boolean>,
-      default: () => () => true,
+      default: () => true,
     },
   },
   emits: [

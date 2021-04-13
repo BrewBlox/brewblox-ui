@@ -1,16 +1,28 @@
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import round from 'lodash/round';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
+import { Quantity } from '@/plugins/spark/types';
+import { bloxQty, isQuantity, prettyUnit } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 
 export default defineComponent({
-  name: 'GraphAnnotationDialog',
+  name: 'QuantityDialog',
   props: {
     ...useDialog.props,
     modelValue: {
+      type: Object as PropType<Quantity>,
+      required: true,
+      validator: isQuantity,
+    },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+    label: {
       type: String,
-      default: '',
+      default: 'Value',
     },
   },
   emits: [
@@ -18,40 +30,47 @@ export default defineComponent({
   ],
   setup(props) {
     const {
-      dialogRef,
       dialogProps,
+      dialogRef,
       onDialogHide,
-      onDialogCancel,
       onDialogOK,
+      onDialogCancel,
     } = useDialog.setup();
-    const local = ref<string>(props.modelValue);
+
+    const local = ref<number | null>(
+      props.modelValue.value !== null
+        ? round(props.modelValue.value, props.decimals)
+        : null,
+    );
 
     function save(): void {
-      onDialogOK({ text: local.value, remove: false });
+      onDialogOK(bloxQty(props.modelValue).copy(local.value));
     }
 
-    function remove(): void {
-      onDialogOK({ text: local.value, remove: true });
-    }
+    const notation = computed<string>(
+      () => prettyUnit(props.modelValue),
+    );
 
     function showKeyboard(): void {
       createDialog({
         component: 'KeyboardDialog',
         componentProps: {
+          type: 'number',
           modelValue: local.value,
+          suffix: notation.value,
         },
       })
-        .onOk((v: string) => local.value = v);
+        .onOk(v => local.value = v);
     }
 
     return {
-      dialogRef,
       dialogProps,
+      dialogRef,
       onDialogHide,
       onDialogCancel,
       local,
       save,
-      remove,
+      notation,
       showKeyboard,
     };
   },
@@ -63,13 +82,18 @@ export default defineComponent({
     ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
-    @keyup.ctrl.enter="save"
+    @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-input
-        v-model="local"
-        label="Title"
+        v-model.number="local"
+        :label="label"
+        :suffix="notation"
+        input-class="text-big"
+        inputmode="numeric"
+        pattern="[0-9]*"
         autofocus
+        clearable
         item-aligned
       >
         <template #append>
@@ -77,8 +101,6 @@ export default defineComponent({
         </template>
       </q-input>
       <template #actions>
-        <q-btn flat label="Remove" color="primary" @click="remove" />
-        <q-space />
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
       </template>
