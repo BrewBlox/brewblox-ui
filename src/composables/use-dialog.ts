@@ -1,6 +1,16 @@
 import { nanoid } from 'nanoid';
-import { QDialogOptions, useDialogPluginComponent } from 'quasar';
-import { nextTick, onBeforeMount, onBeforeUnmount, PropType, reactive, watch } from 'vue';
+import { QDialog, QDialogOptions } from 'quasar';
+import {
+  getCurrentInstance,
+  nextTick,
+  onBeforeMount,
+  onUnmounted,
+  PropType,
+  reactive,
+  Ref,
+  ref,
+  watch,
+} from 'vue';
 import { useRouter } from 'vue-router';
 
 import { WidgetContext } from '@/store/features';
@@ -20,9 +30,16 @@ export interface UseDialogProps {
   }
 }
 
-export type UseDialogEmits = string[];
+export type UseDialogEmits = [
+  'ok',
+  'hide'
+];
 
-export interface UseDialogComponent extends ReturnType<useDialogPluginComponent> {
+export interface UseDialogComponent {
+  dialogRef: Ref<QDialog | null>;
+  onDialogHide: () => void;
+  onDialogOK: (payload?: any) => void;
+  onDialogCancel: () => void;
   context: WidgetContext;
   dialogProps: Partial<QDialogOptions>;
 }
@@ -49,43 +66,63 @@ export const useDialog: UseDialogComposable = {
     },
   },
   emits: [
-    ...useDialogPluginComponent.emits,
+    'ok',
+    'hide',
   ],
   setup(): UseDialogComponent {
     const hashId = `.${nanoid(6)}.`;
-    const {
-      dialogRef,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialogPluginComponent();
+    const { emit, proxy } = getCurrentInstance()!;
+    const dialogRef = ref<QDialog | null>(null);
+    const router = useRouter();
+
+    function show(): void {
+      dialogRef.value?.show();
+    }
+
+    function hide(): void {
+      dialogRef.value?.hide();
+    }
+
+    function onDialogHide(): void {
+      emit('hide');
+    }
+
+    function onDialogCancel(): void {
+      hide();
+    }
+
+    function onDialogOK(payload: unknown): void {
+      emit('ok', payload);
+      hide();
+    }
+
+    // expose public methods required by Dialog plugin
+    Object.assign(proxy, { show, hide });
 
     // We want the dialog to be part of the navigation stack.
     // This lets mobile users close dialogs by using the back button.
     // This requires two actions on startup:
     // - Push a new page with unique ID in hash when dialog opens.
     // - If back button is pressed, the ID disappears from hash -> close dialog.
-    const setupRouteHash = (): void => {
-      const router = useRouter();
+    function setupRouteHash(): void {
       router
-        .push({ hash: router.currentRoute.value.hash + hashId })
+        .push({ hash: (router.currentRoute.value.hash || '#') + hashId })
         .then(() => nextTick())
         .then(() => watch(
-          router.currentRoute,
+          () => router.currentRoute,
           (newRoute) => {
-            if (!newRoute.hash.includes(hashId)) {
-              onDialogHide();
+            if (!newRoute.value.hash.includes(hashId)) {
+              hide();
             }
           },
         ))
         .catch(() => { });
-    };
+    }
 
     // Dialogs can be closed manually, or by using the back button.
     // If closed manually, we need to clean up the current route.
     // Dialogs are not guaranteed to be closed in a LIFO order.
-    const teardownRouteHash = (): void => {
-      const router = useRouter();
+    function teardownRouteHash(): void {
       const hash = router.currentRoute.value.hash;
 
       if (hash.endsWith(hashId)) {
@@ -103,10 +140,10 @@ export const useDialog: UseDialogComposable = {
         // but for security/privacy reasons we can't inspect the stack before calling `router.back()`.
         router.replace({ hash: hash.replaceAll(hashId, '') });
       }
-    };
+    }
 
     onBeforeMount(() => setupRouteHash());
-    onBeforeUnmount(() => teardownRouteHash());
+    onUnmounted(() => teardownRouteHash());
 
     return {
       dialogRef,

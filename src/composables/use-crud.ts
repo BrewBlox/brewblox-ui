@@ -7,7 +7,6 @@ import { Crud, featureStore } from '@/store/features';
 import { createDialog } from '@/utils/dialog';
 import notify from '@/utils/notify';
 
-
 export interface UseCrudProps {
   crud: {
     type: PropType<Crud>,

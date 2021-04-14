@@ -1,10 +1,9 @@
 import isString from 'lodash/isString';
 import { Notify } from 'quasar';
-import { Arg1 } from 'tsargs';
 
 import { loggingStore, LogLevel } from '@/store/logging';
 
-export type QNotifyArgs = Arg1<Notify['create']>
+export type QNotifyArgs = Parameters<Notify['create']>[0]
 
 export interface RecordOpts {
   shown: boolean;

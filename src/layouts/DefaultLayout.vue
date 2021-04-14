@@ -8,25 +8,21 @@ import { systemStore } from '@/store/system';
 
 export default defineComponent({
   setup() {
+    const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
-    const $q = useQuasar();
     const router = useRouter();
-    let localDrawer: boolean | null = null;
 
     const devMode = Boolean(process.env.DEV);
     const dashboardEditing = ref<boolean>(false);
     const serviceEditing = ref<boolean>(false);
     const builderEditing = ref<boolean>(false);
 
+    const _drawerOpen = ref<boolean>(localStorage.getItem('drawer') ?? !dense.value);
     const drawerOpen = computed<boolean>({
-      get: () => Boolean(
-        localDrawer
-        ?? $q.localStorage.getItem('drawer')
-        ?? !dense.value,
-      ),
+      get: () => _drawerOpen.value,
       set: v => {
-        localDrawer = v;
-        $q.localStorage.set('drawer', v);
+        _drawerOpen.value = v;
+        localStorage.set('drawer', v);
       },
     });
 
