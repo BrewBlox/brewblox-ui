@@ -1,4 +1,5 @@
-import { dashboardStore, Widget } from '@/store/dashboards';
+import { dashboardStore } from '@/store/dashboards';
+import { Widget, widgetStore } from '@/store/widgets';
 import { createDialogPromise } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 
@@ -7,7 +8,7 @@ import { historyStore } from './store';
 import { GraphConfig, SharedGraphConfig } from './types';
 
 export const sharedWidgetConfigs = (excluded: string[] = []): SharedGraphConfig[] =>
-  dashboardStore.widgets
+  widgetStore.widgets
     .filter(widget => widget.feature === graphType && !excluded.includes(widget.id))
     .map((widget: Widget<GraphConfig>) => {
       const { id, title, config, dashboard } = widget;

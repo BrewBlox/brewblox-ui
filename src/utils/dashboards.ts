@@ -2,6 +2,7 @@ import UrlSafeString from 'url-safe-string';
 
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
+import { widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import notify from '@/utils/notify';
 
@@ -26,9 +27,9 @@ export const execDashboardIdChange =
 
     await dashboardStore.createDashboard({ ...dashboard, id: newId });
     await Promise.all(
-      dashboardStore.widgets
+      widgetStore.widgets
         .filter(item => item.dashboard === oldId)
-        .map(item => dashboardStore.saveWidget({ ...item, dashboard: newId })),
+        .map(item => widgetStore.saveWidget({ ...item, dashboard: newId })),
     );
     await dashboardStore.removeDashboard({ ...dashboard });
 
@@ -113,8 +114,8 @@ export const startRemoveDashboard =
       .onOk(async () => {
         await dashboardStore.removeDashboard(dashboard);
         await Promise.all(
-          dashboardStore.widgets
+          widgetStore.widgets
             .filter(widget => widget.dashboard === dashboard.id)
-            .map(widget => dashboardStore.removeWidget(widget)));
+            .map(widget => widgetStore.removeWidget(widget)));
       });
   };

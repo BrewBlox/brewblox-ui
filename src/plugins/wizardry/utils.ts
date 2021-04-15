@@ -1,7 +1,7 @@
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
-import { dashboardStore, Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import notify from '@/utils/notify';
 
@@ -10,9 +10,9 @@ import { WizardDialogResult } from './types';
 
 export async function tryCreateWidget<T>(widget: Widget<T>): Promise<Widget<T> | null> {
   try {
-    await dashboardStore.appendWidget(widget);
+    await widgetStore.appendWidget(widget);
     notify.done(`Created ${featureStore.widgetTitle(widget.feature)} widget <b>${widget.title}</b>`);
-    return dashboardStore.widgetById(widget.id);
+    return widgetStore.widgetById(widget.id);
   }
   catch (e) {
     notify.error(`Failed to create widget: ${e.toString()}`);

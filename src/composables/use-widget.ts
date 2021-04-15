@@ -1,17 +1,15 @@
 import { computed, ComputedRef, PropType, Ref, ref } from 'vue';
 
-import { Crud, WidgetContext, WidgetMode } from '@/store/features';
+import { WidgetContext, WidgetMode } from '@/store/features';
 
-import { useCrud, UseCrudComponent, UseCrudProps } from './use-crud';
-
-export interface UseWidgetProps extends UseCrudProps {
+export interface UseWidgetProps {
   context: {
     type: PropType<WidgetContext>,
     required: true,
   }
 }
 
-export interface UseWidgetComponent<ConfigT> extends UseCrudComponent<ConfigT> {
+export interface UseWidgetComponent {
   mode: Ref<WidgetMode>;
   toggleMode(): void;
   inDialog: ComputedRef<boolean>;
@@ -20,21 +18,17 @@ export interface UseWidgetComponent<ConfigT> extends UseCrudComponent<ConfigT> {
 
 export interface UseWidgetComposable {
   props: UseWidgetProps;
-  setup<ConfigT>(crud: Crud<ConfigT>, context: WidgetContext): UseWidgetComponent<ConfigT>;
+  setup(context: WidgetContext): UseWidgetComponent;
 }
 
 export const useWidget: UseWidgetComposable = {
   props: {
-    crud: {
-      type: Object as PropType<Crud>,
-      required: true,
-    },
     context: {
       type: Object as PropType<WidgetContext>,
       required: true,
     },
   },
-  setup<ConfigT>(crud: Crud<ConfigT>, context: WidgetContext) {
+  setup(context: WidgetContext) {
     const mode = ref<WidgetMode>(context.mode);
 
     function toggleMode(): void {
@@ -52,7 +46,6 @@ export const useWidget: UseWidgetComposable = {
     );
 
     return {
-      ...useCrud.setup(crud),
       mode,
       toggleMode,
       inDialog,

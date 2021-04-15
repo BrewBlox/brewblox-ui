@@ -11,15 +11,15 @@ import type {
   Link,
   RelationEdge,
   SparkExported,
+  SparkPatchEvent,
   SparkService,
   SparkStatus,
 } from '@/plugins/spark/types';
 import { isSparkPatch, isSparkState } from '@/plugins/spark/utils';
-import { SparkPatchEvent } from '@/shared-types';
-import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
+import { widgetStore } from '@/store/widgets';
 import { STATE_TOPIC } from '@/utils/const';
-import { extendById, typeMatchFilter } from '@/utils/functional';
+import { extendById, findById, typeMatchFilter } from '@/utils/functional';
 
 import * as api from './api';
 import {
@@ -108,8 +108,7 @@ export class SparkServiceModule extends VuexModule {
   }
 
   public blockById<T extends Block>(blockId: string | null): T | null {
-    if (!blockId) { return null; }
-    return this.blocks.find(v => v.id === blockId) as T ?? null;
+    return findById(this.blocks, blockId) as T | null;
   }
 
   public blockByAddress<T extends Block>(addr: T | BlockAddress | null): T | null {
@@ -171,11 +170,11 @@ export class SparkServiceModule extends VuexModule {
     }
     await api.renameBlock(this.id, currentId, newId);
     await this.fetchBlocks();
-    dashboardStore.widgets
+    widgetStore.widgets
       .filter(({ config }) => config.serviceId === this.id && config.blockId === currentId)
       .forEach(widget => {
         widget.config.blockId = newId;
-        dashboardStore.saveWidget(widget);
+        widgetStore.saveWidget(widget);
       });
   }
 

@@ -2,8 +2,8 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { dashboardStore, Widget } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext, WidgetMode } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
 
 export default defineComponent({
   name: 'StoreWidgetDialog',
@@ -36,7 +36,7 @@ export default defineComponent({
     } = useGlobals.setup();
 
     const widget = computed<Widget | null>(
-      () => dashboardStore.widgetById(props.widgetId),
+      () => widgetStore.widgetById(props.widgetId),
     );
 
     const crud = computed<Crud | null>(
@@ -45,7 +45,7 @@ export default defineComponent({
         : {
           isStoreWidget: true,
           widget: widget.value,
-          saveWidget: dashboardStore.saveWidget,
+          saveWidget: widgetStore.saveWidget,
           closeDialog: () => onDialogHide(),
         },
     );

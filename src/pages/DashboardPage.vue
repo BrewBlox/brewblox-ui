@@ -4,11 +4,12 @@ import { useRouter } from 'vue-router';
 
 import { ValidatedWidget } from '@/components/grid/types';
 import { useGlobals } from '@/composables';
-import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
+import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { Crud, featureStore, WidgetContext } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
-import { objectSorter } from '@/utils/functional';
+import { objectSorter, patchedById } from '@/utils/functional';
 
 export default defineComponent({
   name: 'DashboardPage',
@@ -38,11 +39,14 @@ export default defineComponent({
     );
 
     async function patchWidgets(updated: Patch<Widget>[]): Promise<void> {
-      await dashboardStore.patchWidgets(updated);
+      const applied = updated
+        .map(change => patchedById(widgetStore.widgets, change))
+        .filter((v): v is Widget => v !== null);
+      await Promise.all(applied.map(v => widgetStore.saveWidget(v)));
     }
 
     async function saveWidget(widget: Widget): Promise<void> {
-      await dashboardStore.saveWidget(widget);
+      await widgetStore.saveWidget(widget);
     }
 
     function showWizard(widget: boolean): void {
@@ -56,8 +60,9 @@ export default defineComponent({
     }
 
     const widgets = computed<Widget[]>(
-      // Avoid modifying the store object
-      () => [...dashboardStore.dashboardWidgets(dashboardId.value)]
+      () => widgetStore
+        .widgets
+        .filter(widget => widget.dashboard === dashboardId.value)
         .sort(objectSorter('order')),
     );
 

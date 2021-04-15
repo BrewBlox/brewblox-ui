@@ -2,8 +2,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import { nanoid } from 'nanoid';
 import { computed, ComputedRef, PropType } from 'vue';
 
-import { dashboardStore, Widget } from '@/store/dashboards';
+import { dashboardStore } from '@/store/dashboards';
 import { Crud, featureStore } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import notify from '@/utils/notify';
 
@@ -84,7 +85,7 @@ export const useCrud: UseCrudComposable = {
       })
         .onOk((dashboard: string) => {
           if (dashboard) {
-            dashboardStore.appendWidget({ ...cloneDeep(crud.widget), id, dashboard, pinnedPosition: null });
+            widgetStore.appendWidget({ ...cloneDeep(crud.widget), id, dashboard, pinnedPosition: null });
             notify.done(`Copied <b>${crud.widget.title}</b> to <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
           }
         });
@@ -122,7 +123,7 @@ export const useCrud: UseCrudComposable = {
         {
           label: 'Remove widget from this dashboard',
           value: 0,
-          action: () => dashboardStore.removeWidget(crud.widget),
+          action: () => widgetStore.removeWidget(crud.widget),
         },
         ...featureStore
           .widgetRemoveActions(crud.widget.feature)

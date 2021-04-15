@@ -4,7 +4,7 @@ import uniq from 'lodash/uniq';
 
 import { GraphConfig, QueryTarget } from '@/plugins/history/types';
 import { BlockAddress } from '@/plugins/spark/types';
-import { dashboardStore, Widget } from '@/store/dashboards';
+import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import notify from '@/utils/notify';
 
@@ -32,7 +32,7 @@ export function addBlockGraph(
     },
   })
     .onOk(async (cfg: GraphConfig) => {
-      const widget: Widget<GraphConfig> | null = dashboardStore.widgetById(widgetId);
+      const widget: Widget<GraphConfig> | null = widgetStore.widgetById(widgetId);
       if (!widget) {
         return;
       }
@@ -41,7 +41,7 @@ export function addBlockGraph(
           ? mergeTargets(a, b)
           : undefined;
       });
-      await dashboardStore.saveWidget({ ...widget, config: merged });
+      await widgetStore.saveWidget({ ...widget, config: merged });
       const numFields = cfg.targets.reduce((acc, v) => acc + v.fields.length, 0);
       notify.done(`Added ${numFields} fields to <b>${widget.title}</b>`);
     });

@@ -16,6 +16,7 @@ import { startup, startupPlugin } from '@/plugins/startup';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
+import { widgetStore } from '@/store/widgets';
 
 export default boot(({ app, store }) => {
   app.use(startupPlugin);
@@ -37,6 +38,7 @@ export default boot(({ app, store }) => {
   startup.onStart(() => systemStore.start());
   startup.onStart(() => serviceStore.start());
   startup.onStart(() => dashboardStore.start());
+  startup.onStart(() => widgetStore.start());
 
   plugins.forEach(plugin => app.use(plugin, { store }));
 });
