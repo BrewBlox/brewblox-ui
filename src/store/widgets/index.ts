@@ -18,9 +18,7 @@ export class WidgetModule extends VuexModule {
   }
 
   public widgetById(id: string, includeVolatile = false): Widget | null {
-    return includeVolatile
-      ? (findById(this.widgets, id) ?? findById(this.volatileWidgets, id))
-      : findById(this.widgets, id);
+    return findById(this.widgets, id) ?? (includeVolatile ? findById(this.volatileWidgets, id) : null);
   }
 
   @Action

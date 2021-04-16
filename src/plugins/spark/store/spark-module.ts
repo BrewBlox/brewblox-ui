@@ -19,7 +19,7 @@ import { isSparkPatch, isSparkState } from '@/plugins/spark/utils';
 import { serviceStore } from '@/store/services';
 import { widgetStore } from '@/store/widgets';
 import { STATE_TOPIC } from '@/utils/const';
-import { extendById, findById, typeMatchFilter } from '@/utils/functional';
+import { extendById, filterById, findById, typeMatchFilter } from '@/utils/functional';
 
 import * as api from './api';
 import {
@@ -38,6 +38,7 @@ export class SparkServiceModule extends VuexModule {
   public readonly id: string; // serviceId
 
   public blocks: Block[] = [];
+  public volatileBlocks: Block[] = [];
   public discoveredBlocks: string[] = [];
   public status: SparkStatus | null = null;
   public lastBlocks: Date | null = null;
@@ -107,24 +108,44 @@ export class SparkServiceModule extends VuexModule {
     this.lastBlocks = null;
   }
 
-  public blockById<T extends Block>(blockId: string | null): T | null {
-    return findById(this.blocks, blockId) as T | null;
+  private findById<T extends Block>(blocks: Block[], id: string | null): T | null {
+    return findById(blocks, id) as T | null;
   }
 
-  public blockByAddress<T extends Block>(addr: T | BlockAddress | null): T | null {
+  private findByAddress<T extends Block>(blocks: Block[], addr: T | BlockAddress | null): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
-    return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
+    return blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
   }
 
-  public blockByLink<T extends Block>(link: Link | null): T | null {
+  private findByLink<T extends Block>(blocks: Block[], link: Link | null): T | null {
     if (!link || !link.id) { return null; }
-    return this.blockById<T>(link.id);
+    return this.findById<T>(blocks, link.id);
   }
 
-  public fieldByAddress(addr: BlockFieldAddress | null): any {
-    const block = this.blockByAddress(addr);
+  private findFieldByAddress(blocks: Block[], addr: BlockFieldAddress | null): any | null {
+    const block = this.findByAddress(blocks, addr);
     if (!block || !addr?.field) { return null; }
     return block.data[addr.field] ?? null;
+  }
+
+  public blockById<T extends Block>(blockId: string | null, includeVolatile = false): T | null {
+    return this.findById<T>(this.blocks, blockId)
+      ?? (includeVolatile ? this.findById<T>(this.volatileBlocks, blockId) : null);
+  }
+
+  public blockByAddress<T extends Block>(addr: T | BlockAddress | null, includeVolatile = false): T | null {
+    return this.findByAddress<T>(this.blocks, addr)
+      ?? (includeVolatile ? this.findByAddress<T>(this.volatileBlocks, addr) : null);
+  }
+
+  public blockByLink<T extends Block>(link: Link | null, includeVolatile = false): T | null {
+    return this.findByLink<T>(this.blocks, link)
+      ?? (includeVolatile ? this.findByLink<T>(this.volatileBlocks, link) : null);
+  }
+
+  public fieldByAddress(addr: BlockFieldAddress | null, includeVolatile = false): any {
+    return this.findFieldByAddress(this.blocks, addr)
+      ?? (includeVolatile ? this.findFieldByAddress(this.volatileBlocks, addr) : null);
   }
 
   public blocksByType<T extends Block>(type: T['type']): T[] {
@@ -138,12 +159,24 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async createBlock(block: Block): Promise<void> {
-    await api.createBlock(block); // triggers patch event
+    await api.createBlock({ ...block, meta: undefined }); // triggers patch event
+  }
+
+  @Action
+  public async createVolatileBlock(block: Block): Promise<void> {
+    block.meta = block.meta ?? {};
+    block.meta.volatile = true;
+    this.volatileBlocks = extendById(this.volatileBlocks, block);
   }
 
   @Action
   public async saveBlock(block: Block): Promise<void> {
-    await api.persistBlock(block); // triggers patch event
+    if (block.meta?.volatile) {
+      this.volatileBlocks = extendById(this.volatileBlocks, block);
+    }
+    else {
+      await api.persistBlock(block); // triggers patch event
+    }
   }
 
   public async modifyBlock<T extends Block>(block: T, func: ((v: T) => T)): Promise<void> {
@@ -155,7 +188,12 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async removeBlock(block: Block): Promise<void> {
-    await api.deleteBlock(block); // triggers patch event
+    if (block.meta?.volatile) {
+      this.volatileBlocks = filterById(this.volatileBlocks, block);
+    }
+    else {
+      await api.deleteBlock(block); // triggers patch event
+    }
   }
 
   @Action
@@ -168,6 +206,16 @@ export class SparkServiceModule extends VuexModule {
     if (this.blockById(newId)) {
       throw new Error(`Block ${newId} already exists`);
     }
+
+    const volatile = this.findById(this.volatileBlocks, currentId);
+    if (volatile) {
+      this.volatileBlocks = [
+        ...filterById(this.volatileBlocks, volatile),
+        { ...volatile, id: newId },
+      ];
+      return;
+    }
+
     await api.renameBlock(this.id, currentId, newId);
     await this.fetchBlocks();
     widgetStore.widgets

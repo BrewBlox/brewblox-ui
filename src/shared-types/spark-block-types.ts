@@ -27,6 +27,7 @@ export interface Block {
   groups: number[];
   type: BlockType;
   data: any;
+  meta?: { [k: string]: any };
 }
 // #endregion Block
 
