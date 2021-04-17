@@ -1,11 +1,10 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 
-import { useWidget } from '@/composables';
+import { useContext, useWidget } from '@/composables';
 
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
-import { MetricsConfig } from './types';
 
 export default defineComponent({
   name: 'MetricsWidget',
@@ -15,20 +14,19 @@ export default defineComponent({
   },
   props: {
     ...useWidget.props,
+    ...useContext.props,
   },
   setup(props) {
     const {
-      crud,
       mode,
-      toolbarComponent,
-    } = useWidget.setup<MetricsConfig>(props.crud, props.context);
+      inDialog,
+    } = useContext.setup(props.context);
 
     const revision = ref<number>(0);
 
     return {
-      crud,
       mode,
-      toolbarComponent,
+      inDialog,
       revision,
     };
   },
@@ -38,7 +36,7 @@ export default defineComponent({
 <template>
   <CardWrapper v-bind="{context}">
     <template #toolbar>
-      <component :is="toolbarComponent" v-model:mode="mode" :crud="crud">
+      <WidgetToolbar v-model:mode="mode" :in-dialog="inDialog" :widget-id="widgetId">
         <template #actions>
           <ActionItem
             v-if="mode === 'Basic'"
@@ -47,12 +45,12 @@ export default defineComponent({
             @click="revision++"
           />
         </template>
-      </component>
+      </WidgetToolbar>
     </template>
 
     <component
       :is="mode"
-      :crud="crud"
+      :widget-id="widgetId"
       :revision="revision"
       @mode="v => mode = v"
     />

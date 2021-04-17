@@ -1,13 +1,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { useCrud } from '@/composables';
+import { useWidget } from '@/composables';
 import { saveFile } from '@/utils/import-export';
 
 export default defineComponent({
   name: 'ExportAction',
   props: {
-    ...useCrud.props,
+    ...useWidget.props,
     icon: {
       type: String,
       default: 'mdi-file-export',
@@ -18,12 +18,12 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { crud } = useCrud.setup(props.crud);
+    const { widget } = useWidget.setup(props.widgetId);
 
     async function startExport(): Promise<void> {
-      const { id, dashboard, pinnedPosition, ...exported } = crud.widget;
+      const { id, dashboard, pinnedPosition, ...exported } = widget.value;
       void { id, dashboard, pinnedPosition };
-      saveFile(exported, `brewblox-${crud.widget.title}-${crud.widget.feature}.json`);
+      saveFile(exported, `brewblox-${widget.value.title}-${widget.value.feature}.json`);
     }
 
     return {

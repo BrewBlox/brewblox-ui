@@ -128,24 +128,20 @@ export class SparkServiceModule extends VuexModule {
     return block.data[addr.field] ?? null;
   }
 
-  public blockById<T extends Block>(blockId: string | null, includeVolatile = false): T | null {
-    return this.findById<T>(this.blocks, blockId)
-      ?? (includeVolatile ? this.findById<T>(this.volatileBlocks, blockId) : null);
+  public blockById<T extends Block>(blockId: string | null): T | null {
+    return this.findById<T>(this.blocks, blockId) ?? this.findById<T>(this.volatileBlocks, blockId);
   }
 
-  public blockByAddress<T extends Block>(addr: T | BlockAddress | null, includeVolatile = false): T | null {
-    return this.findByAddress<T>(this.blocks, addr)
-      ?? (includeVolatile ? this.findByAddress<T>(this.volatileBlocks, addr) : null);
+  public blockByAddress<T extends Block>(addr: T | BlockAddress | null): T | null {
+    return this.findByAddress<T>(this.blocks, addr) ?? this.findByAddress<T>(this.volatileBlocks, addr);
   }
 
-  public blockByLink<T extends Block>(link: Link | null, includeVolatile = false): T | null {
-    return this.findByLink<T>(this.blocks, link)
-      ?? (includeVolatile ? this.findByLink<T>(this.volatileBlocks, link) : null);
+  public blockByLink<T extends Block>(link: Link | null): T | null {
+    return this.findByLink<T>(this.blocks, link) ?? this.findByLink<T>(this.volatileBlocks, link);
   }
 
-  public fieldByAddress(addr: BlockFieldAddress | null, includeVolatile = false): any {
-    return this.findFieldByAddress(this.blocks, addr)
-      ?? (includeVolatile ? this.findFieldByAddress(this.volatileBlocks, addr) : null);
+  public fieldByAddress(addr: BlockFieldAddress | null): any {
+    return this.findFieldByAddress(this.blocks, addr) ?? this.findFieldByAddress(this.volatileBlocks, addr);
   }
 
   public blocksByType<T extends Block>(type: T['type']): T[] {
@@ -159,11 +155,17 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async createBlock(block: Block): Promise<void> {
-    await api.createBlock({ ...block, meta: undefined }); // triggers patch event
+    if (block.meta?.volatile) {
+      throw new Error(`Block ${block.id} is volatile`);
+    }
+    await api.createBlock(block); // triggers patch event
   }
 
   @Action
   public async createVolatileBlock(block: Block): Promise<void> {
+    if (this.blockIds.includes(block.id)) {
+      throw new Error(`Block ${block.id} already exists as persistent block`);
+    }
     block.meta = block.meta ?? {};
     block.meta.volatile = true;
     this.volatileBlocks = extendById(this.volatileBlocks, block);
@@ -194,6 +196,11 @@ export class SparkServiceModule extends VuexModule {
     else {
       await api.deleteBlock(block); // triggers patch event
     }
+  }
+
+  @Action
+  public async removeVolatileBlock(block: Block): Promise<void> {
+    this.volatileBlocks = filterById(this.volatileBlocks, block);
   }
 
   @Action

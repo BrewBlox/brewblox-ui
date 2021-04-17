@@ -2,14 +2,14 @@
 import { computed, defineComponent, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { ValidatedWidget } from '@/components/grid/types';
+import { RenderedItem } from '@/components/grid/types';
 import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { Crud, featureStore, WidgetContext } from '@/store/features';
+import { featureStore, WidgetContext } from '@/store/features';
 import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
-import { objectSorter, patchedById } from '@/utils/functional';
+import { objectSorter } from '@/utils/functional';
 
 export default defineComponent({
   name: 'DashboardPage',
@@ -38,17 +38,6 @@ export default defineComponent({
       () => dashboardStore.dashboardById(dashboardId.value),
     );
 
-    async function patchWidgets(updated: Patch<Widget>[]): Promise<void> {
-      const applied = updated
-        .map(change => patchedById(widgetStore.widgets, change))
-        .filter((v): v is Widget => v !== null);
-      await Promise.all(applied.map(v => widgetStore.saveWidget(v)));
-    }
-
-    async function saveWidget(widget: Widget): Promise<void> {
-      await widgetStore.saveWidget(widget);
-    }
-
     function showWizard(widget: boolean): void {
       createDialog({
         component: 'WizardDialog',
@@ -66,21 +55,11 @@ export default defineComponent({
         .sort(objectSorter('order')),
     );
 
-    const validatedWidgets = computed<ValidatedWidget[]>(
-      () => widgets.value
-        .map(widget => {
-          const crud: Crud = {
-            widget,
-            saveWidget,
-            isStoreWidget: true,
-            closeDialog: () => { },
-          };
-          return {
-            ...featureStore.widgetComponent(crud),
-            id: widget.id,
-            crud,
-          };
-        }),
+    const dashboardItems = computed<RenderedItem[]>(
+      () => widgets.value.map(widget => ({
+        widget,
+        ...featureStore.widgetComponent(widget),
+      })),
     );
 
     watch(
@@ -92,8 +71,7 @@ export default defineComponent({
       () => dashboard.value,
       (newV, oldV) => {
         if (!newV && oldV) {
-          // Dashboard was removed
-          router.replace('/');
+          router.replace('/'); // Dashboard was removed
         }
       },
       { immediate: true },
@@ -112,11 +90,9 @@ export default defineComponent({
       loaded,
       dashboardId,
       dashboard,
-      patchWidgets,
-      saveWidget,
       showWizard,
       widgets,
-      validatedWidgets,
+      dashboardItems,
     };
   },
 });
@@ -159,7 +135,7 @@ export default defineComponent({
       </teleport>
 
       <div
-        v-if="validatedWidgets.length === 0"
+        v-if="dashboardItems.length === 0"
         class="absolute-center"
       >
         <q-btn
@@ -177,9 +153,9 @@ export default defineComponent({
       >
         <component
           :is="val.component"
-          v-for="val in validatedWidgets"
-          :key="val.id"
-          :crud="val.crud"
+          v-for="val in dashboardItems"
+          :key="val.widget.id"
+          :widget-id="val.widget.id"
           :context="context"
           class="col full-width"
         />
@@ -187,22 +163,11 @@ export default defineComponent({
       <GridContainer
         v-else
         class="q-ma-lg"
-        :widgets="validatedWidgets"
+        :items="dashboardItems"
         :context="context"
         :editable="widgetEditable"
-        @patch:widgets="patchWidgets"
         @dblclick="showWizard(true)"
-      >
-        <!-- <component
-          :is="val.component"
-          v-for="val in validatedWidgets"
-          :key="val.id"
-          :crud="val.crud"
-          :context="context"
-          :error="val.error"
-          class="fit"
-        /> -->
-      </GridContainer>
+      />
     </template>
   </q-page>
 </template>

@@ -1,12 +1,13 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { Widget } from '@/store/dashboards';
 import { WidgetContext } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
+import { patchedById } from '@/utils/functional';
 
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import GridItem from './GridItem.vue';
-import { ValidatedWidget } from './types';
+import { RenderedItem } from './types';
 
 export default defineComponent({
   name: 'GridContainer',
@@ -14,8 +15,8 @@ export default defineComponent({
     GridItem,
   },
   props: {
-    widgets: {
-      type: Array as PropType<ValidatedWidget[]>,
+    items: {
+      type: Array as PropType<RenderedItem[]>,
       required: true,
     },
     context: {
@@ -28,17 +29,16 @@ export default defineComponent({
     },
   },
   emits: [
-    'patch:widgets',
     'dblclick',
   ],
   setup(props, { emit }) {
     const containerRef = ref<HTMLDivElement>();
 
     const minWidth = computed<number>(
-      () => props.widgets
+      () => props.items
         .reduce(
-          (width: number, widget: ValidatedWidget) => {
-            const { cols, pinnedPosition } = widget.crud.widget;
+          (width: number, item: RenderedItem) => {
+            const { cols, pinnedPosition } = item.widget;
             const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
             return Math.max(width, minCols * GRID_SQUARE_SIZE + minCols * GRID_GAP_SIZE);
           },
@@ -55,6 +55,13 @@ export default defineComponent({
       },
     );
 
+    function patchWidgets(updated: Patch<Widget>[]): void {
+      const applied = updated
+        .map(change => patchedById(widgetStore.widgets, change))
+        .filter((v): v is Widget => v !== null);
+      applied.forEach(v => widgetStore.saveWidget(v));
+    }
+
     function updateItemPosition(updatedId: string, pos: XYPosition | null): void {
       const updated = Array.from(containerRef.value!.getElementsByClassName('grid-item'))
         .map((el): [string, DOMRect] => [el.getAttribute('widget-id')!, el.getBoundingClientRect()])
@@ -64,12 +71,11 @@ export default defineComponent({
             ? { id, order: idx + 1, pinnedPosition: pos }
             : { id, order: idx + 1 },
         );
-      emit('patch:widgets', updated);
+      patchWidgets(updated);
     }
 
     function updateItemSize(id: string, cols: number, rows: number): void {
-      const updated: Partial<Widget>[] = [{ id, cols, rows }];
-      emit('patch:widgets', updated);
+      patchWidgets([{ id, cols, rows }]);
     }
 
     function onDoubleClick(evt: MouseEvent): void {
@@ -97,16 +103,16 @@ export default defineComponent({
     @dblclick="onDoubleClick"
   >
     <GridItem
-      v-for="item in widgets"
-      :key="`grid-item-${item.id}`"
-      :widget="item.crud.widget"
+      v-for="item in items"
+      :key="`grid-item-${item.widget.id}`"
+      :widget-id="item.widget.id"
       :editable="editable"
       @size="updateItemSize"
       @position="updateItemPosition"
     >
       <component
         :is="item.component"
-        :crud="item.crud"
+        :widget-id="item.widget.id"
         :context="context"
         :error="item.error"
         class="fit"

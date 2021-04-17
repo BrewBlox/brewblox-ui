@@ -1,12 +1,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { useCrud } from '@/composables';
+import { useWidget } from '@/composables';
 
 export default defineComponent({
   name: 'WidgetActions',
   props: {
-    ...useCrud.props,
+    ...useWidget.props,
     noRename: {
       type: Boolean,
       default: false,
@@ -14,14 +14,14 @@ export default defineComponent({
   },
   setup(props) {
     const {
-      crud,
+      isVolatileWidget,
       startCopyWidget,
       startMoveWidget,
       startRemoveWidget,
-    } = useCrud.setup(props.crud);
+    } = useWidget.setup(props.widgetId);
 
     return {
-      crud,
+      isVolatileWidget,
       startCopyWidget,
       startMoveWidget,
       startRemoveWidget,
@@ -31,11 +31,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionSubmenu v-if="crud.isStoreWidget" label="Widget">
+  <ActionSubmenu v-if="!isVolatileWidget" label="Widget">
     <ActionItem icon="file_copy" label="Copy" @click="startCopyWidget" />
     <ActionItem icon="exit_to_app" label="Move" @click="startMoveWidget" />
     <slot />
-    <RenameWidgetAction v-if="!noRename" :crud="crud" />
+    <RenameWidgetAction v-if="!noRename" :widget-id="widgetId" />
     <ActionItem icon="delete" label="Remove" @click="startRemoveWidget" />
   </ActionSubmenu>
 </template>

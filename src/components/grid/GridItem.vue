@@ -1,9 +1,10 @@
 <script lang="ts">
 import clamp from 'lodash/clamp';
 import { debounce } from 'quasar';
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 
-import type { Widget } from '@/store/dashboards';
+import { useWidget } from '@/composables';
+import type { Widget } from '@/store/widgets';
 
 import {
   GRID_GAP_SIZE,
@@ -26,10 +27,7 @@ const moveCodes: Record<string, XYPosition> = {
 export default defineComponent({
   name: 'GridItem',
   props: {
-    widget: {
-      type: Object as PropType<Widget>,
-      required: true,
-    },
+    ...useWidget.props,
     editable: {
       type: Boolean,
       default: false,
@@ -40,11 +38,12 @@ export default defineComponent({
     'size',
   ],
   setup(props, { emit }) {
-    const localWidget = ref({ ...props.widget });
+    const { widget } = useWidget.setup(props.widgetId);
+    const localWidget = ref<Widget>(widget.value);
 
     watch(
-      () => props.widget,
-      (widget) => localWidget.value = { ...widget },
+      () => widget.value,
+      v => localWidget.value = v,
     );
 
     const resizing = ref(false);
@@ -71,10 +70,6 @@ export default defineComponent({
     const containerRef = ref<Element | null>(null);
     const dragOverlayRef = ref<Element | null>(null);
 
-    const id = computed<string>(
-      () => localWidget.value.id,
-    );
-
     const style = computed<Mapped<string>>(
       () => {
         const { pinnedPosition, cols, rows } = localWidget.value;
@@ -89,11 +84,6 @@ export default defineComponent({
       },
     );
 
-    // watch(
-    //   () => style.value,
-    //   (newV) => console.log({ ...newV }),
-    // );
-
     const dragStyle = computed<Mapped<string>>(
       () => ({
         width: `${dragWidth.value}px`,
@@ -104,13 +94,13 @@ export default defineComponent({
     function updatePosition(pinnedPosition: XYPosition | null): void {
       // set in local widget to avoid jumps while parents are handling update loops
       localWidget.value = { ...localWidget.value, pinnedPosition };
-      debouncedEmit('position', id.value, pinnedPosition);
+      debouncedEmit('position', widget.value.id, pinnedPosition);
     }
 
     function updateSize(cols: number, rows: number): void {
       // set in local widget to avoid jumps while parents are handling update loops
       localWidget.value = { ...localWidget.value, cols, rows };
-      debouncedEmit('size', id.value, cols, rows);
+      debouncedEmit('size', widget.value.id, cols, rows);
     }
 
     function onInteractionStart(e: MouseEvent | TouchEvent): void {

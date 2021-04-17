@@ -1,12 +1,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { useCrud } from '@/composables';
+import { useWidget } from '@/composables';
 
 export default defineComponent({
   name: 'RemoveWidgetAction',
   props: {
-    ...useCrud.props,
+    ...useWidget.props,
     icon: {
       type: String,
       default: 'delete',
@@ -17,7 +17,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { startRemoveWidget } = useCrud.setup(props.crud);
+    const { startRemoveWidget } = useWidget.setup(props.widgetId);
 
     return {
       startRemoveWidget,

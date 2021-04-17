@@ -1,26 +1,23 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { useWidget } from '@/composables';
+import { useContext, useWidget } from '@/composables';
 
 export default defineComponent({
   name: 'InvalidWidget',
   props: {
     ...useWidget.props,
+    ...useContext.props,
     error: {
       type: String,
       default: 'Unknown error',
     },
   },
   setup(props) {
-    const {
-      crud,
-      toolbarComponent,
-    } = useWidget.setup(props.crud, props.context);
+    const { inDialog } = useContext.setup(props.context);
 
     return {
-      crud,
-      toolbarComponent,
+      inDialog,
     };
   },
 });
@@ -29,7 +26,7 @@ export default defineComponent({
 <template>
   <CardWrapper v-bind="{context}">
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" />
+      <WidgetToolbar :in-dialog="inDialog" :widget-id="widgetId" />
     </template>
 
     <CardWarning color="negative" class="items-center">

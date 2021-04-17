@@ -84,8 +84,18 @@ export class SparkGlobalModule extends VuexModule {
   }
 
   @Action
+  public async createVolatileBlock(block: Block): Promise<void> {
+    await this.moduleById(block.serviceId)?.createVolatileBlock(block);
+  }
+
+  @Action
   public async removeBlock(block: Block): Promise<void> {
     await this.moduleById(block.serviceId)?.removeBlock(block);
+  }
+
+  @Action
+  public async removeVolatileBlock(block: Block): Promise<void> {
+    await this.moduleById(block.serviceId)?.removeVolatileBlock(block);
   }
 
   @Action

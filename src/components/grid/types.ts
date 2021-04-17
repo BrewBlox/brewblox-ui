@@ -1,8 +1,7 @@
-import type { Crud } from '@/store/features';
+import { Widget } from '@/store/widgets';
 
-export interface ValidatedWidget {
-  id: string;
+export interface RenderedItem {
+  widget: Widget;
   component: string;
-  crud: Crud;
   error?: string;
 }

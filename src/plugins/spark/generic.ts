@@ -1,10 +1,11 @@
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockConfig } from '@/plugins/spark/types';
-import { Crud, WidgetFeature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
+import { Widget } from '@/store/widgets';
 
 const removeBlock =
-  (crud: Crud<BlockConfig>): void => {
-    const { serviceId, blockId } = crud.widget.config;
+  (widget: Widget<BlockConfig>): void => {
+    const { serviceId, blockId } = widget.config;
     const block = sparkStore.blockById(serviceId, blockId);
     if (block) {
       sparkStore.removeBlock(block);

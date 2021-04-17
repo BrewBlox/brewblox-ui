@@ -2,11 +2,11 @@ import isString from 'lodash/isString';
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
+import type { Widget } from '@/store/widgets';
 import { findById } from '@/utils/functional';
 
 import type {
   ComponentResult,
-  Crud,
   QuickStartFeature,
   ServiceFeature,
   WatcherFeature,
@@ -73,17 +73,17 @@ export class FeatureModule extends VuexModule {
     return null;
   }
 
-  public widgetComponent(crud: Crud): ComponentResult {
-    const feature = this.widgetById(crud.widget.feature);
+  public widgetComponent(widget: Widget): ComponentResult {
+    const feature = this.widgetById(widget.feature);
     if (!feature) {
       return {
         component: 'InvalidWidget',
-        error: `No feature found for '${crud.widget.feature}'`,
+        error: `No feature found for '${widget.feature}'`,
       };
     }
     return isString(feature.component)
       ? { component: feature.component }
-      : feature.component(crud);
+      : feature.component(widget);
   }
 
   public widgetSize(id: string): GridSize {

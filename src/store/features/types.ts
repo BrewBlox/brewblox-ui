@@ -7,13 +7,6 @@ export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';
 export type ServiceHook = (service: Service) => any | Promise<any>;
 
-export interface Crud<ConfigT = any> {
-  widget: Widget<ConfigT>;
-  isStoreWidget: boolean;
-  saveWidget(widget: Widget<ConfigT>): unknown | Promise<unknown>;
-  closeDialog(): void;
-}
-
 export interface WidgetContext {
   mode: WidgetMode;
   container: WidgetContainer;
@@ -22,7 +15,7 @@ export interface WidgetContext {
 
 export interface WidgetRemoveAction {
   description: string;
-  action: (crud: Crud) => void;
+  action: (widget: Widget) => void;
 }
 
 export interface ComponentResult {
@@ -66,7 +59,7 @@ export interface WidgetFeature<ConfigT = any> {
    * Rendering component for this widget.
    * Should be or return the name of a globally registered Vue component.
    */
-  component: string | ((crud: Crud) => ComponentResult);
+  component: string | ((widget: Widget) => ComponentResult);
 
   /**
    * Wizard component.

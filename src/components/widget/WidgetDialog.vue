@@ -2,14 +2,15 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { Crud, featureStore, WidgetContext, WidgetMode } from '@/store/features';
+import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
 
 export default defineComponent({
   name: 'WidgetDialog',
   props: {
     ...useDialog.props,
-    getCrud: {
-      type: Function as PropType<() => Crud>,
+    widgetId: {
+      type: String,
       required: true,
     },
     mode: {
@@ -18,42 +19,42 @@ export default defineComponent({
     },
     getProps: {
       type: Function as PropType<() => LooseDictionary>,
-      required: true,
-    },
-    listeners: {
-      type: Object as PropType<Mapped<(...args: any[]) => void>>,
       default: () => ({}),
     },
   },
-  emits: {
+  emits: [
     ...useDialog.emits,
-  },
+  ],
   setup(props) {
     const {
       dialogRef,
       dialogProps,
       onDialogHide,
     } = useDialog.setup();
-    const { dense } = useGlobals.setup();
+    const {
+      dense,
+    } = useGlobals.setup();
+
+    const widget = computed<Widget | null>(
+      () => widgetStore.widgetById(props.widgetId),
+    );
 
     const context = computed<WidgetContext>(
       () => ({
-        mode: props.mode,
         container: 'Dialog',
+        mode: props.mode,
         size: 'Fixed',
       }),
     );
 
-    const crud = computed<Crud>(
-      () => props.getCrud(),
+    const widgetComponent = computed<string | null>(
+      () => widget.value === null
+        ? null
+        : featureStore.widgetComponent(widget.value).component,
     );
 
     const widgetProps = computed<LooseDictionary>(
-      () => props.getProps(),
-    );
-
-    const widgetComponent = computed<string>(
-      () => featureStore.widgetComponent(crud.value).component,
+      () => props.getProps() ?? {},
     );
 
     return {
@@ -62,9 +63,8 @@ export default defineComponent({
       onDialogHide,
       dense,
       context,
-      crud,
-      widgetProps,
       widgetComponent,
+      widgetProps,
     };
   },
 });
@@ -73,17 +73,17 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
-    transition-show="fade"
     :maximized="dense"
     v-bind="dialogProps"
+    class="row"
     @hide="onDialogHide"
   >
     <component
       :is="widgetComponent"
-      :initial-crud="crud"
+      v-if="widgetComponent"
+      :widget-id="widgetId"
       :context="context"
       v-bind="widgetProps"
-      v-on="listeners"
       @close="onDialogHide"
     />
   </q-dialog>

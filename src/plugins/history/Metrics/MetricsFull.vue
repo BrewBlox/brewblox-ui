@@ -2,7 +2,7 @@
 import defaults from 'lodash/defaults';
 import { computed, defineComponent } from 'vue';
 
-import { useCrud } from '@/composables';
+import { useWidget } from '@/composables';
 
 import { MetricsConfig } from './types';
 import { emptyMetricsConfig } from './utils';
@@ -10,28 +10,26 @@ import { emptyMetricsConfig } from './utils';
 export default defineComponent({
   name: 'MetricsFull',
   props: {
-    ...useCrud.props,
+    ...useWidget.props,
   },
   setup(props) {
     const {
-      crud,
+      widget,
       saveConfig,
-    } = useCrud.setup<MetricsConfig>(props.crud);
+    } = useWidget.setup<MetricsConfig>(props.widgetId);
 
-    const config = computed<MetricsConfig>(
-      () => defaults(crud.widget.config, emptyMetricsConfig()),
-    );
+    const config = computed<MetricsConfig>({
+      get: () => defaults(widget.value.config, emptyMetricsConfig()),
+      set: cfg => saveConfig(cfg),
+    });
 
     return {
       config,
-      saveConfig,
     };
   },
 });
-
-
 </script>
 
 <template>
-  <MetricsEditor :config="config" class="widget-md" @update:config="saveConfig" />
+  <MetricsEditor :v-model:config="config" class="widget-md" />
 </template>

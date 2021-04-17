@@ -1,12 +1,12 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, defineComponent, onUnmounted, PropType } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import type { Block, BlockConfig, BlockCrud } from '@/plugins/spark/types';
-import { Widget } from '@/store/dashboards';
+import type { Block } from '@/plugins/spark/types';
 import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
 
 export default defineComponent({
   name: 'BlockWidgetDialog',
@@ -32,13 +32,14 @@ export default defineComponent({
   emits: {
     ...useDialog.emits,
   },
-  setup(props) {
+  async setup(props) {
     const {
       dialogRef,
       dialogProps,
       onDialogHide,
     } = useDialog.setup();
     const { dense } = useGlobals.setup();
+    const widgetId = nanoid();
 
     const block = computed<Block | null>(
       () => sparkStore.blockById(props.serviceId, props.blockId),
@@ -48,8 +49,15 @@ export default defineComponent({
       () => block.value?.type ?? '',
     );
 
-    const widget = ref<Widget<BlockConfig>>({
-      id: nanoid(),
+    onUnmounted(() => {
+      const widget = widgetStore.widgetById(widgetId);
+      if (widget) {
+        widgetStore.removeWidget(widget);
+      }
+    });
+
+    await widgetStore.createWidget({
+      id: widgetId,
       title: props.blockId,
       feature: blockType.value,
       dashboard: '',
@@ -58,19 +66,12 @@ export default defineComponent({
         serviceId: props.serviceId,
         blockId: props.blockId,
       },
+      volatile: true,
       ...featureStore.widgetSize(blockType.value),
     });
 
-    const crud = computed<BlockCrud>(
-      () => ({
-        isStoreWidget: false,
-        isStoreBlock: true,
-        widget: widget.value,
-        saveWidget: v => widget.value = v,
-        block: block.value!,
-        saveBlock: v => sparkStore.saveBlock(v),
-        closeDialog: () => onDialogHide(),
-      }),
+    const widget = computed<Widget | null>(
+      () => widgetStore.widgetById(widgetId),
     );
 
     const context = computed<WidgetContext>(
@@ -81,8 +82,10 @@ export default defineComponent({
       }),
     );
 
-    const widgetComponent = computed<string>(
-      () => featureStore.widgetComponent(crud.value).component,
+    const widgetComponent = computed<string | null>(
+      () => widget.value
+        ? featureStore.widgetComponent(widget.value).component
+        : null,
     );
 
     const widgetProps = computed<LooseDictionary>(
@@ -95,8 +98,7 @@ export default defineComponent({
       onDialogHide,
       dense,
       block,
-      widget,
-      crud,
+      widgetId,
       context,
       widgetComponent,
       widgetProps,
@@ -114,13 +116,15 @@ export default defineComponent({
     v-bind="{...dialogProps, ...$attrs}"
     @hide="onDialogHide"
   >
-    <component
-      :is="widgetComponent"
-      v-if="block && widgetComponent"
-      :initial-crud="crud"
-      :context="context"
-      v-bind="widgetProps"
-      @close="onDialogHide"
-    />
+    <suspense>
+      <component
+        :is="widgetComponent"
+        v-if="block && widgetComponent"
+        :widget-id="widgetId"
+        :context="context"
+        v-bind="widgetProps"
+        @close="onDialogHide"
+      />
+    </suspense>
   </q-dialog>
 </template>

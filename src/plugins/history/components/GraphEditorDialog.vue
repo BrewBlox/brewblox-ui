@@ -1,9 +1,10 @@
 <script lang="ts">
-import { cloneDeep, defaults } from 'lodash';
+import { defaults } from 'lodash';
 import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/functional';
 
 import { emptyGraphConfig } from '../getters';
 import { GraphConfig, SharedGraphConfig } from '../types';
@@ -37,7 +38,7 @@ export default defineComponent({
       onDialogOK,
     } = useDialog.setup();
 
-    const local = ref<GraphConfig>(defaults(cloneDeep(props.config), emptyGraphConfig()));
+    const local = ref<GraphConfig>(defaults(deepCopy(props.config), emptyGraphConfig()));
 
     function loadShared(): void {
       createDialog({
@@ -53,7 +54,7 @@ export default defineComponent({
         .onOk(id => {
           const shared = props.shared.find(s => s.id === id);
           if (shared) {
-            local.value = defaults(cloneDeep(shared.config), emptyGraphConfig());
+            local.value = defaults(deepCopy(shared.config), emptyGraphConfig());
           }
         });
     }

@@ -17,21 +17,23 @@ export class WidgetModule extends VuexModule {
     return this.widgets.map(v => v.id);
   }
 
-  public widgetById(id: string, includeVolatile = false): Widget | null {
-    return findById(this.widgets, id) ?? (includeVolatile ? findById(this.volatileWidgets, id) : null);
+  public widgetById(id: string): Widget | null {
+    return findById(this.widgets, id) ?? findById(this.volatileWidgets, id);
   }
 
   @Action
   public async createWidget(widget: Widget): Promise<void> {
     if (widget.volatile) {
-      widget.volatile = undefined;
-      this.volatileWidgets = filterById(this.volatileWidgets, widget);
+      throw new Error(`Widget ${widget.title} (${widget.id}) is volatile`);
     }
-    await api.create(widget); // triggers callback
+    await api.create({ ...widget, volatile: undefined }); // triggers callback
   }
 
   @Action
   public async createVolatileWidget(widget: Widget): Promise<void> {
+    if (this.widgetIds.includes(widget.id)) {
+      throw new Error(`Widget ${widget.title} (${widget.id}) already exists as persistent widget`);
+    }
     widget.volatile = true;
     this.volatileWidgets = extendById(this.volatileWidgets, widget);
   }
@@ -62,6 +64,11 @@ export class WidgetModule extends VuexModule {
     else {
       await api.remove(widget); // triggers callback
     }
+  }
+
+  @Action
+  public async removeVolatileWidget(widget: Widget): Promise<void> {
+    this.volatileWidgets = filterById(this.volatileWidgets, widget);
   }
 
   @Action

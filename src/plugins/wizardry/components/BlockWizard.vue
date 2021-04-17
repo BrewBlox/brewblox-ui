@@ -1,14 +1,14 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
 import { DialogChainObject } from 'quasar';
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import type { Block, BlockCrud, BlockSpec, ComparedBlockType } from '@/plugins/spark/types';
+import { Block, BlockConfig, BlockSpec, ComparedBlockType } from '@/plugins/spark/types';
 import { blockIdRules, isCompatible } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
-import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { nullFilter, objectStringSorter, ruleValidator, suggestId } from '@/utils/functional';
 
@@ -53,11 +53,13 @@ export default defineComponent({
       ?? sparkStore.serviceIds[0]
       ?? null,
     );
+    const widgetId = nanoid();
     const dashboardId = ref<string | null>(null);
     const blockId = ref<string | null>(null);
     const searchFilter = ref<string>('');
 
-    const selectedBlock = ref<Block | null>(null);
+    const activeBlock = ref<Block | null>(null);
+    const activeWidget = ref<Widget<BlockConfig> | null>(null);
     const activeDialog = ref<DialogChainObject | null>(null);
     const discoveryActive = ref<boolean>(false);
 
@@ -138,9 +140,60 @@ export default defineComponent({
         .onOk(v => blockId.value = v);
     }
 
-    function selectOpt(opt: BlockWizardOption | null): void {
-      selectedBlock.value = null;
+    async function ensureVolatile(): Promise<void> {
+      if (activeBlock.value
+        && (activeBlock.value.id !== blockId.value
+          || activeBlock.value.serviceId !== serviceId.value
+          || activeBlock.value.type !== selected.value?.value)) {
+        await sparkStore.removeVolatileBlock(activeBlock.value);
+        activeBlock.value = null;
+      }
 
+      if (!activeBlock.value
+        && selected.value
+        && blockId.value
+        && serviceId.value
+        && createReady.value) {
+        await sparkStore.createVolatileBlock({
+          id: blockId.value,
+          serviceId: serviceId.value,
+          type: selected.value.value,
+          groups: [0],
+          data: sparkStore.spec({ type: selected.value.value }).generate(),
+        });
+        activeBlock.value = sparkStore.blockById(serviceId.value, blockId.value);
+      }
+
+      if (activeBlock.value) {
+        const block = activeBlock.value;
+        await widgetStore.createVolatileWidget({
+          id: widgetId,
+          title: block.id,
+          feature: block.type,
+          dashboard: dashboardId.value ?? '',
+          order: 0,
+          config: {
+            ...(activeWidget.value?.config ?? {}),
+            serviceId: block.serviceId,
+            blockId: block.id,
+          },
+          ...featureStore.widgetSize(block.type),
+          volatile: true,
+        });
+        activeWidget.value = widgetStore.widgetById(widgetId);
+      }
+    }
+
+    onBeforeUnmount(() => {
+      if (activeBlock.value) {
+        sparkStore.removeVolatileBlock(activeBlock.value);
+      }
+      if (activeWidget.value) {
+        widgetStore.removeVolatileWidget(activeWidget.value);
+      }
+    });
+
+    function selectOpt(opt: BlockWizardOption | null): void {
       selected.value = opt;
       if (opt === null) {
         return;
@@ -151,68 +204,27 @@ export default defineComponent({
       }
     }
 
-    function ensureLocals(serviceId: string): { block: Block; widget: Widget } {
-      if (selectedBlock.value?.serviceId !== serviceId) {
-        selectedBlock.value = null;
-      }
+    // function closeDialog(): void {
+    //   if (activeDialog.value) {
+    //     activeDialog.value.hide();
+    //     activeDialog.value = null;
+    //   }
+    // }
 
-      const featureId = selected.value!.value;
-      const newBlockId = blockId.value!;
-
-      const newBlock: Block = selectedBlock.value ?? {
-        id: newBlockId,
-        serviceId,
-        type: featureId,
-        groups: [0],
-        data: sparkStore.spec({ type: featureId }).generate(),
-      };
-      const widget: Widget = {
-        id: nanoid(),
-        title: newBlockId,
-        feature: featureId,
-        dashboard: dashboardId.value ?? '',
-        order: 0,
-        config: {
-          serviceId,
-          blockId: newBlockId,
-        },
-        ...featureStore.widgetSize(featureId),
-      };
-
-      selectedBlock.value = newBlock;
-      selectedBlock.value.id = newBlockId;
-
-      return { block: newBlock, widget };
-    }
-
-    function closeDialog(): void {
-      if (activeDialog.value) {
-        activeDialog.value.hide();
-        activeDialog.value = null;
-      }
-    }
-
-    function configureBlock(): void {
+    async function configureBlock(): Promise<void> {
       if (!createReady.value || !serviceId.value || !sparkModule.value) {
         return;
       }
-      const { block, widget } = ensureLocals(serviceId.value);
-      const crud: BlockCrud = {
-        block,
-        widget,
-        isStoreWidget: false,
-        saveWidget: () => { },
-        isStoreBlock: false,
-        saveBlock: v => { selectedBlock.value = v; },
-        closeDialog,
-      };
-      activeDialog.value = createDialog({
-        component: 'WidgetDialog',
-        componentProps: {
-          getCrud: () => crud,
-          mode: 'Full',
-        },
-      });
+      await ensureVolatile();
+      if (activeBlock.value && activeWidget.value) {
+        activeDialog.value = createDialog({
+          component: 'WidgetDialog',
+          componentProps: {
+            widgetId,
+            mode: 'Full',
+          },
+        });
+      }
     }
 
     function reset(): void {
@@ -224,19 +236,23 @@ export default defineComponent({
       if (!createReady.value || !serviceId.value || !sparkModule.value) {
         return;
       }
-      const { block, widget } = ensureLocals(serviceId.value);
+      await ensureVolatile();
 
-      const createdBlock = await tryCreateBlock(block);
+      if (!activeBlock.value || !activeWidget.value) {
+        return;
+      }
+
+      const createdBlock = await tryCreateBlock(activeBlock.value);
 
       if (!createdBlock) {
         return close();
       }
 
       const createdWidget = dashboardId.value
-        ? await tryCreateWidget(widget)
+        ? await tryCreateWidget(activeWidget.value)
         : null;
 
-      return onDone({ block: createdBlock, widget: createdWidget });
+      onDone({ block: createdBlock, widget: createdWidget });
     }
 
     return {
@@ -249,7 +265,6 @@ export default defineComponent({
       dashboardId,
       blockId,
       searchFilter,
-      selectedBlock,
       discoveryActive,
       serviceOpts,
       wizardOpts,

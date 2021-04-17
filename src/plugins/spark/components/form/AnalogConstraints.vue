@@ -1,5 +1,4 @@
 <script lang="ts">
-import { cloneDeep } from 'lodash';
 import { defineComponent, PropType, ref, watch } from 'vue';
 
 import { analogConstraintLabels } from '@/plugins/spark/getters';
@@ -7,6 +6,7 @@ import { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj, BlockType 
 import { BalancedConstraint, Link, MaxConstraint, MinConstraint } from '@/shared-types';
 import { bloxLink } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/functional';
 
 const constraintOpts: SelectOption[] =
   Object.entries(analogConstraintLabels)
@@ -32,7 +32,7 @@ export default defineComponent({
 
     watch(
       () => props.modelValue,
-      (newV) => constraints.value = cloneDeep(newV.constraints),
+      (newV) => constraints.value = deepCopy(newV.constraints),
       { deep: true, immediate: true },
     );
 

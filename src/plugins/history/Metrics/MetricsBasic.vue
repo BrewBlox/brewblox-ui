@@ -3,7 +3,7 @@ import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
-import { useCrud } from '@/composables';
+import { useWidget } from '@/composables';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { historyStore } from '@/plugins/history/store';
 import { MetricsResult, MetricsSource, QueryTarget } from '@/plugins/history/types';
@@ -22,7 +22,7 @@ interface CurrentValue extends MetricsResult {
 export default defineComponent({
   name: 'MetricsBasic',
   props: {
-    ...useCrud.props,
+    ...useWidget.props,
     revision: {
       type: Number,
       required: true,
@@ -34,11 +34,11 @@ export default defineComponent({
   setup(props) {
     const metricsId = ref<string>(nanoid());
     const {
-      crud,
-    } = useCrud.setup<MetricsConfig>(props.crud);
+      widget,
+    } = useWidget.setup<MetricsConfig>(props.widgetId);
 
     const config = computed<MetricsConfig>(
-      () => defaults(crud.widget.config, emptyMetricsConfig()),
+      () => defaults(widget.value.config, emptyMetricsConfig()),
     );
 
     function sourceId(target: QueryTarget): string {

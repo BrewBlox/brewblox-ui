@@ -5,10 +5,9 @@ import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
 import { ComponentPublicInstance, computed, defineComponent, nextTick, reactive, ref, watch } from 'vue';
 
-import { useWidget } from '@/composables';
+import { useContext, useWidget } from '@/composables';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { Widget } from '@/store/dashboards';
 import { bloxQty, Quantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/duration';
@@ -25,18 +24,20 @@ export default defineComponent({
   name: 'GraphWidget',
   props: {
     ...useWidget.props,
+    ...useContext.props,
   },
   setup(props) {
     const {
-      crud,
+      widget,
+      saveWidget,
+    } = useWidget.setup<GraphConfig>(props.widgetId);
+    const {
       mode,
       inDialog,
-      toolbarComponent,
-      saveWidget,
-    } = useWidget.setup<GraphConfig>(props.crud, props.context);
+    } = useContext.setup(props.context);
 
     function cloned(): GraphConfig {
-      return cloneDeep(defaults(crud.widget.config, emptyGraphConfig()));
+      return cloneDeep(defaults(widget.value.config, emptyGraphConfig()));
     }
 
     const presets = defaultPresets();
@@ -52,17 +53,13 @@ export default defineComponent({
     const wrapperGraphRef = ref<HistoryGraphApi>();
     const widgetGraphRef = ref<HistoryGraphApi>();
 
-    const widget = computed<Widget>(
-      () => crud.widget,
-    );
-
     const title = computed<string>(
-      () => crud.widget.title,
+      () => widget.value.title,
     );
 
     async function saveConfig(config: GraphConfig): Promise<void> {
       delete config.layout.title;
-      saveWidget({ ...crud.widget, config });
+      saveWidget({ ...widget.value, config });
     }
 
     function isActivePreset(preset: QueryParams): boolean {
@@ -117,7 +114,7 @@ export default defineComponent({
         component: 'GraphDialog',
         componentProps: {
           graphId: currentId || nanoid(),
-          config: { ...config, layout: { ...config.layout, title: crud.widget.title } },
+          config: { ...config, layout: { ...config.layout, title: widget.value.title } },
           sharedSources: currentId !== null,
           saveParams: v => saveParams(v),
         },
@@ -125,11 +122,11 @@ export default defineComponent({
     }
 
     function startAddBlockGraph(): void {
-      addBlockGraph(crud.widget.id, null);
+      addBlockGraph(widget.value.id, null);
     }
 
     watch(
-      () => crud.widget.config,
+      () => widget.value.config,
       (newV) => {
         if (!isJsonEqual(newV, renderedConfig.value)) {
           regraph();
@@ -140,7 +137,6 @@ export default defineComponent({
     return {
       mode,
       inDialog,
-      toolbarComponent,
       presets,
       downsampling,
       wrapperGraphId,
@@ -185,7 +181,7 @@ export default defineComponent({
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" v-model:mode="mode" :crud="crud">
+      <WidgetToolbar v-model:mode="mode" :in-dialog="inDialog" :widget-id="widgetId">
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
           <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />
@@ -193,7 +189,7 @@ export default defineComponent({
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
         </template>
         <template #menus>
-          <WidgetActions :crud="crud" />
+          <WidgetActions :widget-id="widgetId" />
           <GraphRangeSubmenu
             :layout="config.layout"
             :save="v => saveLayout(v)"
@@ -220,7 +216,7 @@ export default defineComponent({
             </div>
           </ActionSubmenu>
         </template>
-      </component>
+      </WidgetToolbar>
     </template>
 
     <div

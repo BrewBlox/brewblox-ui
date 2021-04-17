@@ -5,13 +5,15 @@ import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import range from 'lodash/range';
 import { Enum } from 'typescript-string-enums';
-import { Component } from 'vue';
+import { App, Component } from 'vue';
 
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { Quantity, SetpointProfileBlock, SparkPatchEvent, SparkStateEvent, SparkUpdateEvent } from '@/shared-types';
-import { ComponentResult, Crud, WidgetFeature } from '@/store/features';
+import { ComponentResult, WidgetFeature } from '@/store/features';
+import { Widget } from '@/store/widgets';
 import { bloxLink, bloxQty, isLink, isQuantity, prettyLink, prettyQty, prettyUnit } from '@/utils/bloxfield';
+import { cref } from '@/utils/component-ref';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/duration';
 import {
@@ -28,7 +30,6 @@ import {
   Block,
   BlockAddress,
   BlockConfig,
-  BlockCrud,
   BlockField,
   BlockIntfType,
   BlockType,
@@ -81,29 +82,28 @@ const errorComponent = (error: string): ComponentResult => ({
   error,
 });
 
-export const blockWidgetSelector = (ctor: Component, typeName: BlockType | null): WidgetFeature['component'] => {
-  // TODO(Bob)
-  // const component = cref(ctor);
-  return (crud: Crud<BlockConfig> | BlockCrud): ComponentResult => {
-    const { config } = crud.widget;
+export function blockWidgetSelector(
+  app: App,
+  ctor: Component,
+  typeName: BlockType | null,
+): WidgetFeature['component'] {
+  const component = cref(app, ctor);
+  return (widget: Widget): ComponentResult => {
+    const { config } = widget;
     const module = sparkStore.moduleById(config.serviceId);
     if (module === null) {
       return errorComponent(`Spark service '${config.serviceId}' not found`);
     }
-    // If crud is a BlockCrud, block is already set
-    // Otherwise we'll have to check the store
-    const block = ('block' in crud)
-      ? crud.block
-      : module.blockById(config.blockId);
+    const block = module.blockById(config.blockId);
     if (block === null) {
       return errorComponent(`Block '${config.blockId}' not found`);
     }
     if (typeName !== null && block.type !== typeName) {
       return errorComponent(`Block type '${block.type}' does not match widget type '${typeName}'`);
     }
-    return { component: 'TODO' }; // TODO(Bob)
+    return { component };
   };
-};
+}
 
 export const isCompatible = (type: string | null, intf: ComparedBlockType): boolean => {
   if (!intf) { return true; }
@@ -378,18 +378,19 @@ const postfix = (obj: any): string =>
     ? bloxQty(obj).postfix
     : '';
 
-export const blockGraphCfg = <BlockT extends Block = any>(
-  crud: BlockCrud<BlockT>,
+export function blockGraphCfg<BlockT extends Block = Block>(
+  block: BlockT,
+  config: Pick<BlockConfig, 'graphAxes' | 'graphLayout' | 'queryParams'>,
   fieldFilter: ((f: BlockField) => boolean) = (() => true),
-): GraphConfig => {
-  const { queryParams, graphAxes, graphLayout } = defaults(crud.widget.config, {
+): GraphConfig {
+  const { queryParams, graphAxes, graphLayout } = defaults(config, {
     queryParams: { duration: '1h' },
     graphAxes: {},
     graphLayout: {},
   });
 
   const graphedFields: BlockField[] = sparkStore
-    .spec(crud.block)
+    .spec(block)
     .fields
     .filter(f => f.graphed)
     .filter(f => fieldFilter(f));
@@ -398,9 +399,9 @@ export const blockGraphCfg = <BlockT extends Block = any>(
     graphedFields,
     f => {
       return [
-        crud.block.serviceId,
-        crud.block.id,
-        f.key + postfix(crud.block.data[f.key]),
+        block.serviceId,
+        block.id,
+        f.key + postfix(block.data[f.key]),
       ].join('/');
     });
 
@@ -410,24 +411,24 @@ export const blockGraphCfg = <BlockT extends Block = any>(
 
   const renames: Mapped<string> = mapValues(
     graphedObj,
-    f => `${f.graphName ?? f.title} ${prettyUnit(postfix(crud.block.data[f.key]))}`);
+    f => `${f.graphName ?? f.title} ${prettyUnit(postfix(block.data[f.key]))}`);
 
   const targets = [{
-    measurement: crud.block.serviceId,
+    measurement: block.serviceId,
     fields: graphedFields
-      .map(f => `${crud.block.id}/${f.key}${postfix(crud.block.data[f.key])}`),
+      .map(f => `${block.id}/${f.key}${postfix(block.data[f.key])}`),
   }];
 
   return {
     params: queryParams,
     axes: defaults(graphAxes, fieldAxes),
-    layout: defaults({ title: crud.widget.title }, graphLayout),
+    layout: defaults({ title: block.id }, graphLayout),
     targets,
     renames,
     colors: {},
     precision: {},
   };
-};
+}
 
 export const discoverBlocks = async (serviceId: string | null, show = true): Promise<string[]> => {
   const module = sparkStore.moduleById(serviceId);

@@ -1,9 +1,9 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 
 import { tryCreateWidget } from '@/plugins/wizardry';
-import { Widget } from '@/store/dashboards';
-import { Crud, featureStore } from '@/store/features';
+import { featureStore } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 
 import { useWidgetWizard } from '../composables';
@@ -29,40 +29,33 @@ export default defineComponent({
       featureTitle,
     } = useWidgetWizard.setup(props.featureId);
 
-    const localConfig = ref<any>(
-      featureStore
-        .widgetById(props.featureId)
-        ?.generateConfig?.()
-      ?? {},
-    );
+    const defaultConfig = featureStore.widgetById(props.featureId)?.generateConfig?.() ?? {};
+    const activeWidget = ref<Widget | null>(null);
     const dashboardId = ref<string | null>(null);
     const widgetTitle = ref<string>(featureTitle);
 
-    const widget = computed<Widget>({
-      get: () => ({
+    const canCreate = computed<boolean>(
+      () => Boolean(dashboardId.value),
+    );
+
+    async function ensureVolatile(): Promise<void> {
+      await widgetStore.createVolatileWidget({
         id: widgetId,
         title: widgetTitle.value,
         feature: props.featureId,
         order: 0,
         dashboard: dashboardId.value ?? '',
-        config: localConfig.value,
+        config: activeWidget.value?.config ?? defaultConfig,
         ...defaultWidgetSize,
-      }),
-      set: ({ config }) => localConfig.value = config,
+      });
+      activeWidget.value = widgetStore.widgetById(widgetId);
+    }
+
+    onBeforeUnmount(() => {
+      if (activeWidget.value) {
+        widgetStore.removeVolatileWidget(activeWidget.value);
+      }
     });
-
-    const crud = computed<Crud>(
-      () => ({
-        isStoreWidget: false,
-        widget: widget.value,
-        saveWidget: v => widget.value = v,
-        closeDialog: () => { },
-      }),
-    );
-
-    const canCreate = computed<boolean>(
-      () => !!dashboardId.value,
-    );
 
     function showKeyboard(): void {
       createDialog({
@@ -74,19 +67,21 @@ export default defineComponent({
         .onOk(v => widgetTitle.value = v);
     }
 
-    function showWidget(): void {
+    async function showWidget(): Promise<void> {
+      await ensureVolatile();
       createDialog({
         component: 'WidgetDialog',
         componentProps: {
-          getCrud: () => crud.value,
+          widgetId,
         },
       });
     }
 
     async function createWidget(): Promise<void> {
-      if (canCreate.value) {
-        const created = await tryCreateWidget(widget.value);
-        onDone({ widget: created });
+      await ensureVolatile();
+      if (canCreate.value && activeWidget.value) {
+        const widget = await tryCreateWidget(activeWidget.value);
+        onDone({ widget });
       }
     }
 

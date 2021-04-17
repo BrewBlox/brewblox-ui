@@ -1,11 +1,10 @@
 <script lang="ts">
 import mapValues from 'lodash/mapValues';
-import { uid } from 'quasar';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress, BlockCrud, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
+import { Block, BlockAddress, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
 import { blockGraphCfg } from '@/plugins/spark/utils';
 import { createBlockDialog } from '@/utils/dialog';
 
@@ -84,28 +83,10 @@ export default defineComponent({
         return;
       }
       const blockId = block.value.id;
-      const crud: BlockCrud = {
-        isStoreBlock: true,
-        isStoreWidget: false,
-        saveWidget: () => { },
-        saveBlock: block => sparkStore.saveBlock(block),
-        closeDialog: () => { },
-        block: block.value,
-        widget: {
-          id: uid(),
-          title: blockId,
-          feature: block.value.type,
-          dashboard: '',
-          cols: 1,
-          rows: 1,
-          order: 0,
-          config: {
-            serviceId: block.value.serviceId,
-            blockId: blockId,
-          },
-        },
-      };
-      const cfg = blockGraphCfg(crud, v => selectedFields.value.some(f => f.key === v.key));
+      const cfg = blockGraphCfg(
+        block.value,
+        {},
+        v => selectedFields.value.some(f => f.key === v.key));
       const sanitized: GraphConfig = {
         ...cfg,
         layout: {},

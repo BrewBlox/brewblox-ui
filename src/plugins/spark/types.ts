@@ -6,7 +6,7 @@ import { Layout } from 'plotly.js';
 
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
 import { Block, BlockOrIntfType, StoreObject } from '@/shared-types';
-import { Crud, WidgetFeature } from '@/store/features';
+import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 
 export type PageMode =
@@ -97,13 +97,6 @@ export interface BlockConfig {
   queryParams?: QueryParams;
   graphAxes?: GraphValueAxes;
   graphLayout?: Partial<Layout>;
-}
-
-export interface BlockCrud<BlockT extends Block = Block>
-  extends Crud<BlockConfig> {
-  block: BlockT;
-  isStoreBlock: boolean;
-  saveBlock: (block: BlockT) => unknown | Promise<unknown>;
 }
 
 export interface BlockDataPreset<T extends Block = Block> {

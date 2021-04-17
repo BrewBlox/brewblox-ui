@@ -2,7 +2,6 @@
 import { defineComponent } from 'vue';
 
 import { useWidget } from '@/composables';
-import { Widget } from '@/store/dashboards';
 
 const replacements = {
   StepView: 'QuickActions',
@@ -14,12 +13,11 @@ export default defineComponent({
     ...useWidget.props,
   },
   setup(props) {
-    const { crud, saveWidget } = useWidget.setup(props.crud, props.context);
-    const widget: Widget = {
-      ...crud.widget,
-      feature: replacements[crud.widget.feature] ?? 'Unknown',
-    };
-    saveWidget(widget);
+    const { widget, saveWidget } = useWidget.setup(props.widgetId);
+    saveWidget({
+      ...widget.value,
+      feature: replacements[widget.value.feature] ?? 'Unknown',
+    });
     return {};
   },
   render() {

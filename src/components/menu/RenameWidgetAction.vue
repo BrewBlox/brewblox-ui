@@ -1,12 +1,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { useCrud } from '@/composables';
+import { useWidget } from '@/composables';
 
 export default defineComponent({
   name: 'RenameWidgetAction',
   props: {
-    ...useCrud.props,
+    ...useWidget.props,
     icon: {
       type: String,
       default: 'edit',
@@ -17,7 +17,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { startChangeWidgetTitle } = useCrud.setup(props.crud);
+    const { startChangeWidgetTitle } = useWidget.setup(props.widgetId);
 
     return {
       startChangeWidgetTitle,

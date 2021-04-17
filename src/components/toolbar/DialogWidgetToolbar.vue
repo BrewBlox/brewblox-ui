@@ -1,13 +1,13 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { useCrud } from '@/composables';
+import { useWidget } from '@/composables';
 import { WidgetMode } from '@/store/features';
 
 export default defineComponent({
-  name: 'WidgetDialogToolbar',
+  name: 'DialogWidgetToolbar',
   props: {
-    ...useCrud.props,
+    ...useWidget.props,
     mode: {
       type: String as PropType<WidgetMode | null>,
       default: null,
@@ -19,14 +19,10 @@ export default defineComponent({
   ],
   setup(props, { attrs, emit }) {
     const {
-      crud,
+      widget,
       featureTitle,
       startChangeWidgetTitle,
-    } = useCrud.setup(props.crud);
-
-    const title = computed<string>(
-      () => crud.widget.title,
-    );
+    } = useWidget.setup(props.widgetId);
 
     const toggleIcon = computed<string>(
       () => props.mode === 'Basic'
@@ -54,9 +50,8 @@ export default defineComponent({
     }
 
     return {
-      crud,
+      widget,
       featureTitle,
-      title,
       toggleIcon,
       toggleTooltip,
       toggle,
@@ -68,7 +63,7 @@ export default defineComponent({
 
 <template>
   <DialogToolbar
-    :title="title"
+    :title="widget.title"
     :subtitle="featureTitle"
     @title-click="clickTitle"
   >
@@ -92,7 +87,7 @@ export default defineComponent({
         </template>
         <template #menus>
           <slot name="menus">
-            <WidgetActions :crud="crud" />
+            <WidgetActions :widget-id="widgetId" />
           </slot>
         </template>
       </ActionMenu>

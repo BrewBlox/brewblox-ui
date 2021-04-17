@@ -4,7 +4,6 @@ import { defineComponent } from 'vue';
 import { loggingStore } from '@/store/logging';
 import { saveFile } from '@/utils/import-export';
 
-
 export default defineComponent({
   name: 'ExportErrorsAction',
   props: {
