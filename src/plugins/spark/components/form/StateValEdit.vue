@@ -12,9 +12,14 @@ export default defineComponent({
   emits: [
     ...useValEdit.emits,
   ],
-  setup() {
-    const { field } = useValEdit.setup<DigitalState>();
-    return { field };
+  setup(props) {
+    const {
+      field,
+    } = useValEdit.setup<DigitalState>(props.modelValue);
+
+    return {
+      field,
+    };
   },
 });
 </script>

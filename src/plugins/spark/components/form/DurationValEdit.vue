@@ -14,8 +14,11 @@ export default defineComponent({
   emits: [
     ...useValEdit.emits,
   ],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<Quantity | string>();
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<Quantity | string>(props.modelValue);
     const local = ref<string>(durationString(field.value));
 
     function findUnit(s: string | null): string {

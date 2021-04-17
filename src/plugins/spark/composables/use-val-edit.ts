@@ -41,13 +41,13 @@ export interface UseValEditComponent<T> {
 export interface UseValEditComposable {
   props: UseValEditProps;
   emits: UseValEditEmits;
-  setup<T>(): UseValEditComponent<T>;
+  setup<T>(modelValue: unknown): UseValEditComponent<T>;
 }
 
 export const useValEdit: UseValEditComposable = {
   props: {
     modelValue: {
-      type: [Object, Array, String, Number, Date, Boolean],
+      type: [Object, Array, String, Number, Date, Boolean] as PropType<any>,
       required: true,
     },
     serviceId: {
@@ -75,11 +75,11 @@ export const useValEdit: UseValEditComposable = {
     'update:modelValue',
     'edit',
   ],
-  setup<T>(): UseValEditComponent<T> {
-    const { props, emit } = getCurrentInstance()!;
+  setup<T>(modelValue: unknown): UseValEditComponent<T> {
+    const { emit } = getCurrentInstance()!;
 
     const field = computed<T>({
-      get: () => props.modelValue as T,
+      get: () => modelValue as T,
       set: v => emit('update:modelValue', v),
     });
 

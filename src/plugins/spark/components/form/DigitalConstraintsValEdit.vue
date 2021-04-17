@@ -13,8 +13,11 @@ export default defineComponent({
   emits: [
     ...useValEdit.emits,
   ],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<DigitalConstraintsObj>();
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<DigitalConstraintsObj>(props.modelValue);
 
     const displayString = computed<string>(
       () => prettifyConstraints(field.value),

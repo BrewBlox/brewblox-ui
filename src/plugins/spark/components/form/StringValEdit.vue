@@ -13,8 +13,11 @@ export default defineComponent({
   emits: [
     ...useValEdit.emits,
   ],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<string>();
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<string>(props.modelValue);
 
     const displayValue = computed<string>(
       () => field.value || '<not set>',

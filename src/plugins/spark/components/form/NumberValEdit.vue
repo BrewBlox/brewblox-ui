@@ -12,8 +12,11 @@ export default defineComponent({
   emits: [
     ...useValEdit.emits,
   ],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<number>();
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<number>(props.modelValue);
 
     function showKeyboard(): void {
       createDialog({

@@ -11,8 +11,11 @@ export default defineComponent({
   emits: {
     ...useValEdit.emits,
   },
-  setup() {
-    const { field } = useValEdit.setup<boolean>();
+  setup(props) {
+    const {
+      field,
+    } = useValEdit.setup<boolean>(props.modelValue);
+
     return {
       field,
     };

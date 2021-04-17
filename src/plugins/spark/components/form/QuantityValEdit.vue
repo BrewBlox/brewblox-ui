@@ -14,8 +14,11 @@ export default defineComponent({
   emits: [
     ...useValEdit.emits,
   ],
-  setup() {
-    const { field, startEdit } = useValEdit.setup<Quantity>();
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<Quantity>(props.modelValue);
     const local = ref<number | null>(field.value.value);
 
     function syncField(): void {

@@ -17,7 +17,10 @@ export default defineComponent({
     ...useValEdit.emits,
   ],
   setup(props) {
-    const { field, startEdit } = useValEdit.setup<number>();
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<number>(props.modelValue);
 
     const scaledField = computed<number>({
       get: () => field.value * props.timeScale,
