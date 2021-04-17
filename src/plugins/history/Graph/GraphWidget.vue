@@ -3,7 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
-import { ComponentPublicInstance, computed, defineComponent, nextTick, reactive, ref, watch } from 'vue';
+import { ComponentPublicInstance, computed, defineComponent, nextTick, ref, watch } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
@@ -36,12 +36,15 @@ export default defineComponent({
       inDialog,
     } = useContext.setup(props.context);
 
+    const config = computed<GraphConfig>(
+      () => widget.value.config,
+    );
+
     function cloned(): GraphConfig {
-      return cloneDeep(defaults(widget.value.config, emptyGraphConfig()));
+      return cloneDeep(defaults(config.value, emptyGraphConfig()));
     }
 
     const presets = defaultPresets();
-    const config = reactive(cloned());
     const renderedConfig = ref(cloned());
     const downsampling = ref<Mapped<string>>({});
 
@@ -53,6 +56,22 @@ export default defineComponent({
     const wrapperGraphRef = ref<HistoryGraphApi>();
     const widgetGraphRef = ref<HistoryGraphApi>();
 
+    async function regraph(): Promise<void> {
+      await nextTick();
+      renderedConfig.value = cloneDeep(config.value);
+      widgetGraphRef.value?.resetSources();
+      wrapperGraphRef.value?.resetSources();
+    }
+
+    watch(
+      () => widget.value.config,
+      (newV) => {
+        if (!isJsonEqual(newV, renderedConfig.value)) {
+          regraph();
+        }
+      },
+    );
+
     const title = computed<string>(
       () => widget.value.title,
     );
@@ -63,21 +82,19 @@ export default defineComponent({
     }
 
     function isActivePreset(preset: QueryParams): boolean {
-      return isJsonEqual(preset, config.params);
+      return isJsonEqual(preset, config.value.params);
     }
 
     function saveParams(params: QueryParams): void {
-      config.params = params;
-      saveConfig(config);
+      saveConfig({ ...config.value, params });
     }
 
     function saveLayout(layout: Partial<Layout>): void {
-      config.layout = layout;
-      saveConfig(config);
+      saveConfig({ ...config.value, layout });
     }
 
     function chooseDuration(): void {
-      const current = config.params.duration ?? '1h';
+      const current = config.value.params.duration ?? '1h';
       createDialog({
         component: 'DurationQuantityDialog',
         componentProps: {
@@ -87,13 +104,6 @@ export default defineComponent({
         },
       })
         .onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
-    }
-
-    async function regraph(): Promise<void> {
-      await nextTick();
-      renderedConfig.value = cloneDeep(config);
-      widgetGraphRef.value?.resetSources();
-      wrapperGraphRef.value?.resetSources();
     }
 
     async function refresh(): Promise<void> {
@@ -110,11 +120,12 @@ export default defineComponent({
 
     function showGraphDialog(): void {
       const currentId = currentGraphId();
+      const layout = config.value.layout;
       createDialog({
         component: 'GraphDialog',
         componentProps: {
           graphId: currentId || nanoid(),
-          config: { ...config, layout: { ...config.layout, title: widget.value.title } },
+          config: { ...config, layout: { ...layout, title: widget.value.title } },
           sharedSources: currentId !== null,
           saveParams: v => saveParams(v),
         },
@@ -124,15 +135,6 @@ export default defineComponent({
     function startAddBlockGraph(): void {
       addBlockGraph(widget.value.id, null);
     }
-
-    watch(
-      () => widget.value.config,
-      (newV) => {
-        if (!isJsonEqual(newV, renderedConfig.value)) {
-          regraph();
-        }
-      },
-    );
 
     return {
       mode,

@@ -9,9 +9,9 @@ import { STATE_TOPIC } from '@/utils/const';
 
 // import features from './features';
 import { sparkType } from './getters';
-import SparkActions from './service/SparkActions.vue';
-import SparkPage from './service/SparkPage.vue';
-import SparkWatcher from './service/SparkWatcher.vue';
+// import SparkActions from './service/SparkActions.vue';
+// import SparkPage from './service/SparkPage.vue';
+// import SparkWatcher from './service/SparkWatcher.vue';
 import { sparkStore } from './store';
 import { BlockSpec } from './types';
 import { isSparkState } from './utils';
@@ -30,7 +30,7 @@ const deprecated: WidgetFeature[] = [
 
 const plugin: Plugin = {
   install(app) {
-    // autoRegister(app, require.context('./components', true));
+    autoRegister(app, require.context('./components', true));
 
     deprecated.forEach(featureStore.registerWidget);
 

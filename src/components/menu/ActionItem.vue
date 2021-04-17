@@ -1,5 +1,4 @@
 <script lang="ts">
-import { LooseDictionary } from 'quasar';
 import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
@@ -38,7 +37,7 @@ export default defineComponent({
     'click',
   ],
   setup(props, { attrs, emit }) {
-    const combinedProps = computed<LooseDictionary>(
+    const combinedProps = computed<AnyDict>(
       () => ({
         clickable: !props.disabled,
         active: props.active && !props.disabled,

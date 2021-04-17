@@ -1,4 +1,3 @@
-import { LooseDictionary } from 'quasar';
 import { computed, ComputedRef, getCurrentInstance, PropType } from 'vue';
 
 export interface UseFieldProps {
@@ -31,19 +30,19 @@ export interface UseFieldProps {
     default: boolean,
   },
   dialogProps: {
-    type: PropType<LooseDictionary>,
-    default: () => LooseDictionary,
+    type: PropType<AnyDict>,
+    default: () => AnyDict,
   },
   tagProps: {
-    type: PropType<LooseDictionary>,
-    default: () => LooseDictionary,
+    type: PropType<AnyDict>,
+    default: () => AnyDict,
   },
   tagClass: {
-    type: PropType<string | string[] | LooseDictionary>,
+    type: PropType<string | string[] | AnyDict>,
     default: string,
   },
   tagStyle: {
-    type: PropType<string | string[] | LooseDictionary>,
+    type: PropType<string | string[] | AnyDict>,
     default: string,
   },
   rules: {
@@ -104,11 +103,11 @@ export const useField: UseFieldComposable = {
     },
     dialogProps: {
       type: Object,
-      default: (): LooseDictionary => ({}),
+      default: (): AnyDict => ({}),
     },
     tagProps: {
       type: Object,
-      default: (): LooseDictionary => ({}),
+      default: (): AnyDict => ({}),
     },
     tagClass: {
       type: [Array, Object, String],

@@ -73,7 +73,7 @@ export default defineComponent({
       () => ruleValidator(props.rules)(local.value),
     );
 
-    const nativeProps = computed<LooseDictionary>(
+    const nativeProps = computed<AnyDict>(
       () => props.type === 'number'
         ? {
           inputmode: 'numeric',

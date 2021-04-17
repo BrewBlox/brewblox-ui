@@ -60,7 +60,10 @@ export default defineComponent({
     const local = ref({ ...props.config });
     const period = ref(makePeriod(props.config.params));
 
-    watch(props.config.params, params => { period.value = makePeriod(params); });
+    watch(
+      () => props.config.params,
+      params => { period.value = makePeriod(params); },
+    );
 
     function makePeriod(params: QueryParams): PeriodDisplay {
       const period: PeriodDisplay = {
@@ -73,7 +76,7 @@ export default defineComponent({
       return matching ? period : opts[0];
     }
 
-    function saveConfig(config: QueryConfig = local.value): void {
+    function saveConfig(config: QueryConfig): void {
       emit('update:config', config);
     }
 
@@ -86,7 +89,7 @@ export default defineComponent({
         duration: !period.duration ? undefined : (params.duration ?? defaults.duration),
         end: !period.end ? undefined : (params.end ?? defaults.end),
       };
-      saveConfig();
+      saveConfig(local.value);
     }
 
     const isLive = computed<boolean>(
@@ -127,13 +130,13 @@ export default defineComponent({
 <template>
   <div class="widget-body row">
     <q-select
-      :value="period"
+      :model-value="period"
       :options="periodOptions"
       emit-value
       map-options
       label="Time period"
       class="col-auto"
-      @input="saveSanitized"
+      @update:model-value="saveSanitized"
     >
       <template #append>
         <q-icon name="mdi-chart-timeline" size="sm">

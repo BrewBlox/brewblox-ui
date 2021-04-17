@@ -13,7 +13,7 @@ export default defineComponent({
       required: true,
     },
     selectProps: {
-      type: Object as PropType<LooseDictionary>,
+      type: Object as PropType<AnyDict>,
       default: () => ({}),
     },
   },

@@ -18,7 +18,7 @@ export default defineComponent({
       default: 'Full',
     },
     getProps: {
-      type: Function as PropType<() => LooseDictionary>,
+      type: Function as PropType<() => AnyDict>,
       default: () => ({}),
     },
   },
@@ -53,7 +53,7 @@ export default defineComponent({
         : featureStore.widgetComponent(widget.value).component,
     );
 
-    const widgetProps = computed<LooseDictionary>(
+    const widgetProps = computed<AnyDict>(
       () => props.getProps() ?? {},
     );
 
