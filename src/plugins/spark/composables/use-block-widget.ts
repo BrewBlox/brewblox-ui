@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { computed, ComputedRef, ref, watch, WritableComputedRef } from 'vue';
+import { computed, ComputedRef, PropType, ref, watch, WritableComputedRef } from 'vue';
 
 import { GraphConfig } from '@/plugins/history/types';
 import { Block } from '@/shared-types';
@@ -12,6 +12,13 @@ import notify from '@/utils/notify';
 import { SparkServiceModule, sparkStore } from '../store';
 import { BlockConfig, BlockSpec } from '../types';
 import { blockGraphCfg, blockIdRules, canDisplay as canDisplayFn } from '../utils';
+
+export interface UseBlockWidgetProps {
+  widgetId: {
+    type: PropType<string>;
+    required: true;
+  }
+}
 
 export interface UseBlockWidgetComponent<BlockT extends Block> {
   sparkModule: SparkServiceModule;
@@ -37,10 +44,17 @@ export interface UseBlockWidgetComponent<BlockT extends Block> {
 }
 
 export interface UseBlockWidgetComposable {
+  props: UseBlockWidgetProps;
   setup<BlockT extends Block>(widgetId: string): UseBlockWidgetComponent<BlockT>;
 }
 
 export const useBlockWidget: UseBlockWidgetComposable = {
+  props: {
+    widgetId: {
+      type: String,
+      required: true,
+    },
+  },
   setup<BlockT extends Block>(widgetId: string): UseBlockWidgetComponent<BlockT> {
     const widget = ref<Widget<BlockConfig>>(widgetStore.widgetById(widgetId)!);
 

@@ -3,7 +3,6 @@ import { defineComponent, PropType, ref, watch } from 'vue';
 
 import { analogConstraintLabels } from '@/plugins/spark/getters';
 import { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj, BlockType } from '@/plugins/spark/types';
-import { BalancedConstraint, Link, MaxConstraint, MinConstraint } from '@/shared-types';
 import { bloxLink } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/functional';
@@ -11,6 +10,25 @@ import { deepCopy } from '@/utils/functional';
 const constraintOpts: SelectOption[] =
   Object.entries(analogConstraintLabels)
     .map(([k, v]) => ({ value: k, label: v }));
+
+const defaultValues: Record<AnalogConstraintKey, AnalogConstraint> = {
+  min: {
+    limiting: false,
+    min: 0,
+  },
+  max: {
+    limiting: false,
+    max: 100,
+  },
+  balanced: {
+    limiting: false,
+    balanced: {
+      balancerId: bloxLink(null, BlockType.Balancer),
+      granted: 0,
+      id: 0,
+    },
+  },
+};
 
 export default defineComponent({
   name: 'AnalogConstraints',
@@ -40,28 +58,6 @@ export default defineComponent({
       emit('update:modelValue', { constraints: constraints.value });
     }
 
-    function createDefault(type: AnalogConstraintKey): AnalogConstraint {
-      const opts: Record<AnalogConstraintKey, AnalogConstraint> = {
-        min: {
-          limiting: false,
-          min: 0,
-        },
-        max: {
-          limiting: false,
-          max: 100,
-        },
-        balanced: {
-          limiting: false,
-          balanced: {
-            balancerId: bloxLink(null, BlockType.Balancer),
-            granted: 0,
-            id: 0,
-          },
-        },
-      };
-      return opts[type];
-    }
-
     function add(): void {
       createDialog({
         component: 'CheckboxDialog',
@@ -72,7 +68,7 @@ export default defineComponent({
         },
       })
         .onOk((keys: AnalogConstraintKey[]) => {
-          constraints.value.push(...keys.map(createDefault));
+          constraints.value.push(...keys.map(type => deepCopy(defaultValues[type])));
           save();
         });
     }
@@ -82,26 +78,9 @@ export default defineComponent({
       save();
     }
 
-    function setMinValue(constraint: MinConstraint, value: number): void {
-      constraint.min = value;
-      save();
-    }
-
-    function setMaxValue(constraint: MaxConstraint, value: number): void {
-      constraint.max = value;
-      save();
-    }
-
-    function setBalancedValue(constraint: BalancedConstraint, value: Link): void {
-      constraint.balanced.balancerId = value;
-      save();
-    }
-
     return {
       constraints,
-      setMinValue,
-      setMaxValue,
-      setBalancedValue,
+      save,
       add,
       remove,
     };
@@ -123,7 +102,7 @@ export default defineComponent({
         title="Balancer"
         label="Balancer"
         class="col-grow"
-        @update:model-value="v => setBalancedValue(constraint, v)"
+        @update:model-value="v => { constraint.balanced.balancerId = v; save(); }"
       />
       <InputField
         v-if="'min' in constraint"
@@ -132,7 +111,7 @@ export default defineComponent({
         label="Minimum value"
         type="number"
         class="col-grow"
-        @update:model-value="v => setMinValue(constraint, v)"
+        @update:model-value="v => { constraint.min = v; save(); }"
       />
       <InputField
         v-if="'max' in constraint"
@@ -141,7 +120,7 @@ export default defineComponent({
         label="Maximum value"
         type="number"
         class="col-grow"
-        @update:model-value="v => setMaxValue(constraint, v)"
+        @update:model-value="v => { constraint.max = v; save(); }"
       />
 
       <div class="col-auto column justify-center darkish">
