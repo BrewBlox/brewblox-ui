@@ -79,9 +79,9 @@ export default defineComponent({
     >
       <q-item-section class="col-5">
         <InputField
-          :value="fieldRename(field)"
+          :model-value="fieldRename(field)"
           title="Legend"
-          @input="v => saveRename(field, v)"
+          @update:model-value="v => saveRename(field, v)"
         />
       </q-item-section>
       <q-space />
@@ -105,10 +105,10 @@ export default defineComponent({
             </q-item-section>
             <q-item-section class="col-auto">
               <ColorField
-                :value="local.colors[field] || ''"
+                :model-value="local.colors[field] || ''"
                 title="Line color"
                 clearable
-                @input="v => saveColor(field, v)"
+                @update:model-value="v => saveColor(field, v)"
               />
             </q-item-section>
           </q-item>
@@ -120,11 +120,11 @@ export default defineComponent({
             </q-item-section>
             <q-item-section class="col-auto">
               <q-btn-toggle
-                :value="local.axes[field] || 'y'"
+                :model-value="local.axes[field] || 'y'"
                 :options="axisOpts"
                 flat
                 stretch
-                @input="v => saveAxis(field, v)"
+                @update:model-value="v => saveAxis(field, v)"
               />
             </q-item-section>
           </q-item>

@@ -1,9 +1,9 @@
 <script lang="ts">
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onBeforeUnmount, onMounted, watch } from 'vue';
 
-import { useWidget } from '@/composables';
+import { useContext, useWidget } from '@/composables';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { historyStore } from '@/plugins/history/store';
 import { MetricsResult, MetricsSource, QueryTarget } from '@/plugins/history/types';
@@ -22,27 +22,26 @@ interface CurrentValue extends MetricsResult {
 export default defineComponent({
   name: 'MetricsBasic',
   props: {
-    ...useWidget.props,
     revision: {
       type: Number,
       required: true,
     },
   },
-  emits: [
-    'mode',
-  ],
   setup(props) {
-    const metricsId = ref<string>(nanoid());
+    const metricsId = nanoid();
+    const {
+      context,
+    } = useContext.setup();
     const {
       widget,
-    } = useWidget.setup<MetricsConfig>(props.widgetId);
+    } = useWidget.setup<MetricsConfig>();
 
     const config = computed<MetricsConfig>(
       () => defaults(widget.value.config, emptyMetricsConfig()),
     );
 
     function sourceId(target: QueryTarget): string {
-      return `${metricsId.value}/${target.measurement}`;
+      return `${metricsId}/${target.measurement}`;
     }
 
     const sources = computed<MetricsSource[]>(
@@ -115,6 +114,7 @@ export default defineComponent({
     onBeforeUnmount(() => removeSources());
 
     return {
+      context,
       metricsId,
       config,
       sources,
@@ -170,7 +170,7 @@ export default defineComponent({
         icon="edit"
         label="Edit metrics"
         class="self-end"
-        @click="$emit('mode', 'Full')"
+        @click="context.mode = 'Full'"
       />
     </div>
   </div>

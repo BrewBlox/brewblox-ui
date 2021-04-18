@@ -6,19 +6,18 @@ import { useWidget } from '@/composables';
 export default defineComponent({
   name: 'WidgetActions',
   props: {
-    ...useWidget.props,
     noRename: {
       type: Boolean,
       default: false,
     },
   },
-  setup(props) {
+  setup() {
     const {
       isVolatileWidget,
       startCopyWidget,
       startMoveWidget,
       startRemoveWidget,
-    } = useWidget.setup(props.widgetId);
+    } = useWidget.setup();
 
     return {
       isVolatileWidget,
@@ -35,7 +34,7 @@ export default defineComponent({
     <ActionItem icon="file_copy" label="Copy" @click="startCopyWidget" />
     <ActionItem icon="exit_to_app" label="Move" @click="startMoveWidget" />
     <slot />
-    <RenameWidgetAction v-if="!noRename" :widget-id="widgetId" />
+    <RenameWidgetAction v-if="!noRename" />
     <ActionItem icon="delete" label="Remove" @click="startRemoveWidget" />
   </ActionSubmenu>
 </template>

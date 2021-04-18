@@ -9,11 +9,8 @@ const replacements = {
 
 export default defineComponent({
   name: 'DeprecatedWidget',
-  props: {
-    ...useWidget.props,
-  },
-  setup(props) {
-    const { widget, saveWidget } = useWidget.setup(props.widgetId);
+  setup() {
+    const { widget, saveWidget } = useWidget.setup();
     saveWidget({
       ...widget.value,
       feature: replacements[widget.value.feature] ?? 'Unknown',

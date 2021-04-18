@@ -206,7 +206,7 @@ export default defineComponent({
   >
     <DialogCard v-bind="{message, html}">
       <q-input
-        :value="local"
+        :model-value="local"
         :suffix="suffix"
         :type="(password && pwdActive) ? 'password' : 'textarea'"
         autogrow

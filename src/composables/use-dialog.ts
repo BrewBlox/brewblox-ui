@@ -6,6 +6,7 @@ import {
   onBeforeMount,
   onUnmounted,
   PropType,
+  provide,
   reactive,
   Ref,
   ref,
@@ -13,7 +14,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { WidgetContext } from '@/store/features';
+import { ContextKey } from '@/symbols';
 
 export interface UseDialogProps {
   title: {
@@ -40,7 +41,6 @@ export interface UseDialogComponent {
   onDialogHide: () => void;
   onDialogOK: (payload?: any) => void;
   onDialogCancel: () => void;
-  context: WidgetContext;
   dialogProps: Partial<QDialogOptions>;
 }
 
@@ -74,6 +74,14 @@ export const useDialog: UseDialogComposable = {
     const { emit, proxy } = getCurrentInstance()!;
     const dialogRef = ref<QDialog | null>(null);
     const router = useRouter();
+
+    // Will be overridden if this dialog is showing a widget
+    // Used for all other menus and edit dialogs
+    provide(ContextKey, reactive({
+      container: 'Dialog',
+      size: 'Fixed',
+      mode: 'Basic',
+    }));
 
     function show(): void {
       dialogRef.value?.show();
@@ -154,11 +162,6 @@ export const useDialog: UseDialogComposable = {
         noRouteDismiss: true,
         noBackdropDismiss: true,
       },
-      context: reactive({
-        container: 'Dialog',
-        size: 'Fixed',
-        mode: 'Basic',
-      }),
     };
   },
 };

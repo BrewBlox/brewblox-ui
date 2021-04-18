@@ -1,10 +1,11 @@
 import { nanoid } from 'nanoid';
-import { computed, ComputedRef, PropType, ref, watch, WritableComputedRef } from 'vue';
+import { computed, ComputedRef, watch, WritableComputedRef } from 'vue';
 
+import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { Block } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
-import { Widget, widgetStore } from '@/store/widgets';
+import { widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/functional';
 import notify from '@/utils/notify';
@@ -13,16 +14,10 @@ import { SparkServiceModule, sparkStore } from '../store';
 import { BlockConfig, BlockSpec } from '../types';
 import { blockGraphCfg, blockIdRules, canDisplay as canDisplayFn } from '../utils';
 
-export interface UseBlockWidgetProps {
-  widgetId: {
-    type: PropType<string>;
-    required: true;
-  }
-}
-
-export interface UseBlockWidgetComponent<BlockT extends Block> {
+export interface UseBlockWidgetComponent<BlockT extends Block>
+  extends UseWidgetComponent<BlockConfig> {
   sparkModule: SparkServiceModule;
-  block: ComputedRef<BlockT | null>;
+  block: ComputedRef<BlockT>;
   graphConfig: WritableComputedRef<GraphConfig | null>;
 
   spec: ComputedRef<BlockSpec<BlockT>>;
@@ -44,19 +39,15 @@ export interface UseBlockWidgetComponent<BlockT extends Block> {
 }
 
 export interface UseBlockWidgetComposable {
-  props: UseBlockWidgetProps;
-  setup<BlockT extends Block>(widgetId: string): UseBlockWidgetComponent<BlockT>;
+  setup<BlockT extends Block>(): UseBlockWidgetComponent<BlockT>;
 }
 
 export const useBlockWidget: UseBlockWidgetComposable = {
-  props: {
-    widgetId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup<BlockT extends Block>(widgetId: string): UseBlockWidgetComponent<BlockT> {
-    const widget = ref<Widget<BlockConfig>>(widgetStore.widgetById(widgetId)!);
+  setup<BlockT extends Block>(): UseBlockWidgetComponent<BlockT> {
+    const {
+      widget,
+      ...useWidgetResults
+    } = useWidget.setup<BlockConfig>();
 
     watch(
       () => widget.value.config.blockId,
@@ -196,6 +187,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     }
 
     return {
+      widget,
+      ...useWidgetResults,
       block,
       spec,
       isVolatileBlock,

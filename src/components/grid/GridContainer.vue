@@ -110,13 +110,13 @@ export default defineComponent({
       @size="updateItemSize"
       @position="updateItemPosition"
     >
-      <component
-        :is="item.component"
-        :widget-id="item.widget.id"
-        :context="context"
-        :error="item.error"
-        class="fit"
-      />
+      <WidgetProvider :context="context" :widget-id="item.widget.id">
+        <component
+          :is="item.component"
+          :error="item.error"
+          class="fit"
+        />
+      </WidgetProvider>
     </GridItem>
     <div
       v-if="editable"

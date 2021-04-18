@@ -1,47 +1,34 @@
-import { computed, ComputedRef, PropType, Ref, ref } from 'vue';
+import { computed, ComputedRef, inject, UnwrapRef } from 'vue';
 
-import { WidgetContext, WidgetMode } from '@/store/features';
-
-export interface UseContextProps {
-  context: {
-    type: PropType<WidgetContext>;
-    required: true;
-  };
-}
+import { WidgetContext } from '@/store/features';
+import { ContextKey } from '@/symbols';
 
 export interface UseContextComponent {
-  mode: Ref<WidgetMode>;
-  toggleMode(): void;
+  context: UnwrapRef<WidgetContext>;
   inDialog: ComputedRef<boolean>;
+  toggleMode(): void;
 }
 
 export interface UseContextComposable {
-  props: UseContextProps;
-  setup(context: WidgetContext): UseContextComponent;
+  setup(): UseContextComponent;
 }
 
 export const useContext: UseContextComposable = {
-  props: {
-    context: {
-      type: Object as PropType<WidgetContext>,
-      required: true,
-    },
-  },
-  setup(context: WidgetContext) {
-    const mode = ref<WidgetMode>(context.mode);
-
-    function toggleMode(): void {
-      mode.value = mode.value === 'Basic' ? 'Full' : 'Basic';
-    }
+  setup() {
+    const context = inject(ContextKey)!;
 
     const inDialog = computed<boolean>(
       () => context.container === 'Dialog',
     );
 
+    function toggleMode(): void {
+      context.mode = context.mode === 'Basic' ? 'Full' : 'Basic';
+    }
+
     return {
-      mode,
-      toggleMode,
+      context,
       inDialog,
+      toggleMode,
     };
   },
 };

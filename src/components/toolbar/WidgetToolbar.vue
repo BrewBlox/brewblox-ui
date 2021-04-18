@@ -1,13 +1,15 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import { useContext } from '@/composables';
+
 export default defineComponent({
   name: 'WidgetToolbar',
-  props: {
-    inDialog: {
-      type: Boolean,
-      default: false,
-    },
+  setup() {
+    const { inDialog } = useContext.setup();
+    return {
+      inDialog,
+    };
   },
 });
 </script>

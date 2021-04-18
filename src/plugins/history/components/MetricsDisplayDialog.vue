@@ -27,7 +27,6 @@ export default defineComponent({
     const {
       dialogRef,
       dialogProps,
-      context,
       onDialogHide,
       onDialogCancel,
       onDialogOK,
@@ -64,7 +63,6 @@ export default defineComponent({
     return {
       dialogRef,
       dialogProps,
-      context,
       onDialogHide,
       onDialogCancel,
       rename,

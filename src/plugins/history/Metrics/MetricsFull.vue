@@ -9,14 +9,11 @@ import { emptyMetricsConfig } from './utils';
 
 export default defineComponent({
   name: 'MetricsFull',
-  props: {
-    ...useWidget.props,
-  },
-  setup(props) {
+  setup() {
     const {
       widget,
       saveConfig,
-    } = useWidget.setup<MetricsConfig>(props.widgetId);
+    } = useWidget.setup<MetricsConfig>();
 
     const config = computed<MetricsConfig>({
       get: () => defaults(widget.value.config, emptyMetricsConfig()),
@@ -31,5 +28,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <MetricsEditor :v-model:config="config" class="widget-md" />
+  <MetricsEditor v-model:config="config" class="widget-md" />
 </template>

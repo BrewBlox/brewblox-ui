@@ -326,11 +326,11 @@ export default defineComponent({
       </q-input>
 
       <ListSelect
-        :value="selected"
+        :model-value="selected"
         :options="searchedOpts"
         option-value="value"
         option-label="label"
-        @input="selectOpt"
+        @update:model-value="selectOpt"
         @confirm="v => { selectOpt(v); createBlock(); }"
       />
     </div>

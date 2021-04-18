@@ -147,7 +147,7 @@ export default defineComponent({
               <LabeledField
                 v-for="(rate, meas) in downsampling"
                 :key="meas"
-                :value="rate"
+                :model-value="rate"
                 :label="meas"
                 item-aligned
                 class="col"
@@ -160,29 +160,29 @@ export default defineComponent({
     <div class="col-auto row q-gutter-x-sm q-ml-none">
       <DatetimeField
         v-if="period.start"
-        :value="config.params.start"
+        :model-value="config.params.start"
         emit-number
         title="Start time"
         label="Start date and time"
         class="col-auto min-width-sm"
-        @update:value="saveStart"
+        @update:model-value="saveStart"
       />
       <DurationField
         v-if="period.duration"
-        :value="config.params.duration"
+        :model-value="config.params.duration"
         title="Duration"
         label="Duration"
         class="col-auto min-width-sm"
-        @update:value="saveDuration"
+        @update:model-value="saveDuration"
       />
       <DatetimeField
         v-if="period.end"
-        :value="config.params.end"
+        :model-value="config.params.end"
         emit-number
         title="End time"
         label="End date and time"
         class="col-auto min-width-sm"
-        @update:value="saveEnd"
+        @update:model-value="saveEnd"
       />
       <LabeledField
         v-if="isLive"

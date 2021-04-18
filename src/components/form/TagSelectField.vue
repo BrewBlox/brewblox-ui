@@ -54,7 +54,7 @@ export default defineComponent({
 <template>
   <div>
     <q-select
-      :value="modelValue"
+      :model-value="modelValue"
       multiple
       use-chips
       stack-label
@@ -63,7 +63,7 @@ export default defineComponent({
       use-input
       hide-dropdown-icon
       new-value-mode="add-unique"
-      @input="save"
+      @update:model-value="save"
       @filter="onInput"
       @keyup.enter.stop
     >

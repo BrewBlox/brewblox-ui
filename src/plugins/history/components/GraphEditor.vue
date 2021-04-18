@@ -65,24 +65,24 @@ export default defineComponent({
           <q-tooltip class="q-gutter-y-sm">
             <i>Click to edit</i>
             <LabeledField
-              :value="config.renames[node.value] || node.label"
+              :model-value="config.renames[node.value] || node.label"
               label="Label"
               dense
             />
             <LabeledField
-              :value="config.precision[node.value] || DEFAULT_PRECISION"
+              :model-value="config.precision[node.value] || DEFAULT_PRECISION"
               label="Decimals in label"
               dense
             />
             <ColorField
-              :value="config.colors[node.value] || ''"
+              :model-value="config.colors[node.value] || ''"
               label="Color"
               null-text="automatic"
               readonly
               dense
             />
             <LabeledField
-              :value="config.axes[node.value] === 'y2' ? 'Y2' : 'Y1'"
+              :model-value="config.axes[node.value] === 'y2' ? 'Y2' : 'Y1'"
               label="Axis"
               dense
             />

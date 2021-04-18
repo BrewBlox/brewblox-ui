@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 
-import { useContext, useWidget } from '@/composables';
+import { useContext } from '@/composables';
 
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
@@ -12,21 +12,12 @@ export default defineComponent({
     Basic: MetricsBasic,
     Full: MetricsFull,
   },
-  props: {
-    ...useWidget.props,
-    ...useContext.props,
-  },
-  setup(props) {
-    const {
-      mode,
-      inDialog,
-    } = useContext.setup(props.context);
-
+  setup() {
+    const { context } = useContext.setup();
     const revision = ref<number>(0);
 
     return {
-      mode,
-      inDialog,
+      context,
       revision,
     };
   },
@@ -34,12 +25,12 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <CardWrapper>
     <template #toolbar>
-      <WidgetToolbar v-model:mode="mode" :in-dialog="inDialog" :widget-id="widgetId">
+      <WidgetToolbar has-mode-toggle>
         <template #actions>
           <ActionItem
-            v-if="mode === 'Basic'"
+            v-if="context.mode === 'Basic'"
             icon="refresh"
             label="Refresh"
             @click="revision++"
@@ -48,11 +39,6 @@ export default defineComponent({
       </WidgetToolbar>
     </template>
 
-    <component
-      :is="mode"
-      :widget-id="widgetId"
-      :revision="revision"
-      @mode="v => mode = v"
-    />
+    <component :is="context.mode" :revision="revision" />
   </CardWrapper>
 </template>

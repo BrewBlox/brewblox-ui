@@ -137,14 +137,14 @@ export default defineComponent({
       <template v-if="'mutexed' in constraint">
         <LinkField
           :service-id="serviceId"
-          :value="constraint.mutexed.mutexId"
+          :model-value="constraint.mutexed.mutexId"
           title="Mutex"
           label="Mutex"
           class="col-grow"
-          @input="v => { constraint.mutexed.mutexId = v; save(); }"
+          @update:model-value="v => { constraint.mutexed.mutexId = v; save(); }"
         />
         <DurationField
-          :value="holdTime(constraint)"
+          :model-value="holdTime(constraint)"
           title="Extra lock time"
           label="Extra lock time"
           message="The Mutex will be kept locked for this duration after the actuator turns off."
@@ -154,7 +154,7 @@ export default defineComponent({
               ? null
               : 'Using default value from Mutex block.'
           "
-          @input="v => {
+          @update:model-value="v => {
             constraint.mutexed.extraHoldTime = v;
             constraint.mutexed.hasCustomHoldTime = true;
             save();
@@ -177,35 +177,35 @@ export default defineComponent({
       </template>
       <DurationField
         v-if="'minOff' in constraint"
-        :value="constraint.minOff"
+        :model-value="constraint.minOff"
         title="Minimum OFF period"
         label="Minimum OFF period"
         class="col-grow"
-        @input="v => { constraint.minOff = v; save(); }"
+        @update:model-value="v => { constraint.minOff = v; save(); }"
       />
       <DurationField
         v-if="'minOn' in constraint"
-        :value="constraint.minOn"
+        :model-value="constraint.minOn"
         title="Minimum ON period"
         label="Minimum ON period"
         class="col-grow"
-        @input="v => { constraint.minOn = v; save(); }"
+        @update:model-value="v => { constraint.minOn = v; save(); }"
       />
       <DurationField
         v-if="'delayedOff' in constraint"
-        :value="constraint.delayedOff"
+        :model-value="constraint.delayedOff"
         title="Delay OFF"
         label="Delay OFF"
         class="col-grow"
-        @input="v => { constraint.delayedOff = v; save(); }"
+        @update:model-value="v => { constraint.delayedOff = v; save(); }"
       />
       <DurationField
         v-if="'delayedOn' in constraint"
-        :value="constraint.delayedOn"
+        :model-value="constraint.delayedOn"
         title="Delay ON"
         label="Delay ON"
         class="col-grow"
-        @input="v => { constraint.delayedOn = v; save(); }"
+        @update:model-value="v => { constraint.delayedOn = v; save(); }"
       />
 
       <div class="col-auto column justify-center darkish">

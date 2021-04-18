@@ -7,7 +7,6 @@ import { saveFile } from '@/utils/import-export';
 export default defineComponent({
   name: 'ExportAction',
   props: {
-    ...useWidget.props,
     icon: {
       type: String,
       default: 'mdi-file-export',
@@ -17,8 +16,8 @@ export default defineComponent({
       default: 'Export widget',
     },
   },
-  setup(props) {
-    const { widget } = useWidget.setup(props.widgetId);
+  setup() {
+    const { widget } = useWidget.setup();
 
     async function startExport(): Promise<void> {
       const { id, dashboard, pinnedPosition, ...exported } = widget.value;

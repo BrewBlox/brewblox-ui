@@ -142,14 +142,14 @@ export default defineComponent({
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
-        :value="local"
+        :model-value="local"
         :options="linkOpts"
         :clearable="clearable"
         :label="label"
         option-label="id"
         option-value="id"
         item-aligned
-        @input="update"
+        @update:model-value="update"
         @keyup.enter.exact.stop
       >
         <q-tooltip v-if="tooltip">

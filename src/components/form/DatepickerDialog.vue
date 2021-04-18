@@ -86,7 +86,7 @@ export default defineComponent({
               v-model="stringValue"
               mask="YYYY/MM/DD HH:mm:ss"
               class="fit"
-              @input="tab='time'"
+              @update:model-value="tab='time'"
             />
           </q-tab-panel>
           <q-tab-panel name="time" class="q-pa-none">

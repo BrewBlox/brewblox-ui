@@ -6,7 +6,6 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 export default defineComponent({
   name: 'BlockEnableToggle',
   props: {
-    ...useBlockWidget.props,
     dataKey: {
       type: String,
       default: 'enabled',
@@ -17,7 +16,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { block, modifyBlock } = useBlockWidget.setup(props.widgetId);
+    const { block, modifyBlock } = useBlockWidget.setup();
 
     const enabled = computed<boolean>(
       () => Boolean(block.value?.data[props.dataKey]),

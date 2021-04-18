@@ -133,21 +133,21 @@ export default defineComponent({
           No Spark services found
         </div>
         <ListSelect
-          :value="service"
+          :model-value="service"
           :options="services"
           option-value="id"
           option-label="title"
-          @input="selectService"
+          @update:model-value="selectService"
           @confirm="selectService"
         />
         <q-select
-          :value="block"
+          :model-value="block"
           :disable="!service"
           :options="blocks"
           label="Block"
           option-label="id"
           option-value="id"
-          @input="selectBlock"
+          @update:model-value="selectBlock"
           @keyup.enter.exact.stop
         >
           <template #no-option>

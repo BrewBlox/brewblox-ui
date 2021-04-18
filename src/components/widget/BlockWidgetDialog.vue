@@ -117,14 +117,14 @@ export default defineComponent({
     @hide="onDialogHide"
   >
     <suspense>
-      <component
-        :is="widgetComponent"
-        v-if="block && widgetComponent"
-        :widget-id="widgetId"
-        :context="context"
-        v-bind="widgetProps"
-        @close="onDialogHide"
-      />
+      <WidgetProvider :widget-id="widgetId" :context="context">
+        <component
+          :is="widgetComponent"
+          v-if="block && widgetComponent"
+          v-bind="widgetProps"
+          @close="onDialogHide"
+        />
+      </WidgetProvider>
     </suspense>
   </q-dialog>
 </template>

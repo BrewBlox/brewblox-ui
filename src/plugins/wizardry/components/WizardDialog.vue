@@ -34,7 +34,6 @@ export default defineComponent({
     const {
       dialogRef,
       dialogProps,
-      context,
       onDialogHide,
       onDialogCancel,
       onDialogOK,
@@ -98,7 +97,6 @@ export default defineComponent({
       dialogProps,
       onDialogHide,
       onDialogCancel,
-      context,
       dense,
       dialogTitle,
       activeWizard,
@@ -122,7 +120,7 @@ export default defineComponent({
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <CardWrapper :no-scroll="!!activeWizard" v-bind="{context}">
+    <CardWrapper :no-scroll="!!activeWizard">
       <template #toolbar>
         <DialogToolbar icon="mdi-creation" :title="dialogTitle" />
       </template>

@@ -1,8 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 
-import { useGlobals } from '@/composables';
-import { WidgetContext } from '@/store/features';
+import { useContext, useGlobals } from '@/composables';
 
 
 export default defineComponent({
@@ -11,25 +10,22 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    context: {
-      type: Object as PropType<WidgetContext>,
-      required: true,
-    },
     contentClass: {
       type: [String, Array, Object],
       default: '',
     },
   },
-  setup(ctx) {
+  setup(props) {
     const { dense } = useGlobals.setup();
+    const { context } = useContext.setup();
 
     const scrollable = computed<boolean>(
-      () => !ctx.noScroll && ctx.context.size === 'Fixed',
+      () => !props.noScroll && context.size === 'Fixed',
     );
 
     const cardClass = computed<string>(
       () => {
-        const listed = [`card__${ctx.context.container} depth-2`];
+        const listed = [`card__${context.container} depth-2`];
         if (dense.value) {
           listed.push('card__dense');
         }
@@ -38,11 +34,11 @@ export default defineComponent({
     );
 
     const toolbarClass = computed<string>(
-      () => `toolbar__${ctx.context.container}`,
+      () => `toolbar__${context.container}`,
     );
 
     const bodyClass = computed<string>(
-      () => `content__${ctx.context.container}`,
+      () => `content__${context.container}`,
     );
 
     return {

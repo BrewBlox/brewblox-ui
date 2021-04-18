@@ -1,44 +1,41 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 
-import { useWidget } from '@/composables';
-import { WidgetMode } from '@/store/features';
+import { useContext, useWidget } from '@/composables';
 
 export default defineComponent({
   name: 'DialogWidgetToolbar',
   props: {
-    ...useWidget.props,
-    mode: {
-      type: String as PropType<WidgetMode | null>,
-      default: null,
+    hasModeToggle: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: [
     'title-click',
-    'update:mode',
   ],
   setup(props, { attrs, emit }) {
+    const {
+      context,
+      toggleMode,
+    } = useContext.setup();
     const {
       widget,
       featureTitle,
       startChangeWidgetTitle,
-    } = useWidget.setup(props.widgetId);
+    } = useWidget.setup();
 
-    const toggleIcon = computed<string>(
-      () => props.mode === 'Basic'
+    const toggleBtnIcon = computed<string>(
+      () => context.mode === 'Basic'
         ? 'mdi-unfold-more-horizontal'
         : 'mdi-unfold-less-horizontal',
     );
 
-    const toggleTooltip = computed<string>(
-      () => props.mode === 'Basic'
+    const toggleBtnTooltip = computed<string>(
+      () => context.mode === 'Basic'
         ? 'Show full widget'
         : 'Show basic widget',
     );
-
-    function toggle(): void {
-      emit('update:mode', props.mode === 'Basic' ? 'Full' : 'Basic');
-    }
 
     function clickTitle(): void {
       if (attrs['onTitleClick'] !== undefined) {
@@ -52,9 +49,9 @@ export default defineComponent({
     return {
       widget,
       featureTitle,
-      toggleIcon,
-      toggleTooltip,
-      toggle,
+      toggleBtnIcon,
+      toggleBtnTooltip,
+      toggleMode,
       clickTitle,
     };
   },
@@ -70,15 +67,15 @@ export default defineComponent({
     <slot />
     <template #buttons>
       <q-btn
-        v-if="!!mode"
-        :icon="toggleIcon"
+        v-if="hasModeToggle"
+        :icon="toggleBtnIcon"
         flat
         dense
         round
-        @click="toggle"
+        @click="toggleMode"
       >
         <q-tooltip>
-          {{ toggleTooltip }}
+          {{ toggleBtnTooltip }}
         </q-tooltip>
       </q-btn>
       <ActionMenu round dense>
@@ -87,7 +84,7 @@ export default defineComponent({
         </template>
         <template #menus>
           <slot name="menus">
-            <WidgetActions :widget-id="widgetId" />
+            <WidgetActions />
           </slot>
         </template>
       </ActionMenu>

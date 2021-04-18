@@ -93,7 +93,7 @@ export default defineComponent({
   <q-btn-toggle
     v-if="known"
     v-bind="{options, disable, ...$attrs}"
-    :value="state"
+    :model-value="state"
     :class="['shadow-1', $attrs.class]"
     dense
     unelevated

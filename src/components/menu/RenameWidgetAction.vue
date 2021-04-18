@@ -6,7 +6,6 @@ import { useWidget } from '@/composables';
 export default defineComponent({
   name: 'RenameWidgetAction',
   props: {
-    ...useWidget.props,
     icon: {
       type: String,
       default: 'edit',
@@ -16,8 +15,8 @@ export default defineComponent({
       default: 'Rename',
     },
   },
-  setup(props) {
-    const { startChangeWidgetTitle } = useWidget.setup(props.widgetId);
+  setup() {
+    const { startChangeWidgetTitle } = useWidget.setup();
 
     return {
       startChangeWidgetTitle,

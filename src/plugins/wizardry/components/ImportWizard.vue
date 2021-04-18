@@ -155,7 +155,7 @@ export default defineComponent({
           <q-input
             label="Loaded widget"
             readonly
-            :value="widgetString"
+            :model-value="widgetString"
             :error-message="widgetError"
             :error="widget !== null && !widgetOk"
           />

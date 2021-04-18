@@ -3,8 +3,8 @@ import clamp from 'lodash/clamp';
 import { debounce } from 'quasar';
 import { computed, defineComponent, ref, watch } from 'vue';
 
-import { useWidget } from '@/composables';
-import type { Widget } from '@/store/widgets';
+import { Widget, widgetStore } from '@/store/widgets';
+import { deepCopy } from '@/utils/functional';
 
 import {
   GRID_GAP_SIZE,
@@ -27,7 +27,10 @@ const moveCodes: Record<string, XYPosition> = {
 export default defineComponent({
   name: 'GridItem',
   props: {
-    ...useWidget.props,
+    widgetId: {
+      type: String,
+      required: true,
+    },
     editable: {
       type: Boolean,
       default: false,
@@ -38,12 +41,15 @@ export default defineComponent({
     'size',
   ],
   setup(props, { emit }) {
-    const { widget } = useWidget.setup(props.widgetId);
-    const localWidget = ref<Widget>(widget.value);
+    const widget = computed<Widget>(
+      () => widgetStore.widgetById(props.widgetId)!,
+    );
+
+    const localWidget = ref<Widget>(deepCopy(widget.value));
 
     watch(
       () => widget.value,
-      v => localWidget.value = v,
+      v => localWidget.value = deepCopy(v),
     );
 
     const resizing = ref(false);

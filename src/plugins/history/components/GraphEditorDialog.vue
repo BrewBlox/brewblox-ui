@@ -32,7 +32,6 @@ export default defineComponent({
     const {
       dialogRef,
       dialogProps,
-      context,
       onDialogHide,
       onDialogCancel,
       onDialogOK,
@@ -66,7 +65,6 @@ export default defineComponent({
     return {
       dialogRef,
       dialogProps,
-      context,
       onDialogHide,
       onDialogCancel,
       local,
@@ -85,7 +83,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <CardWrapper no-scroll v-bind="{context}">
+    <CardWrapper no-scroll>
       <template #toolbar>
         <DialogToolbar :title="title" />
       </template>

@@ -22,19 +22,15 @@ interface HistoryGraphApi extends ComponentPublicInstance {
 
 export default defineComponent({
   name: 'GraphWidget',
-  props: {
-    ...useWidget.props,
-    ...useContext.props,
-  },
-  setup(props) {
+  setup() {
+    const {
+      context,
+      inDialog,
+    } = useContext.setup();
     const {
       widget,
       saveWidget,
-    } = useWidget.setup<GraphConfig>(props.widgetId);
-    const {
-      mode,
-      inDialog,
-    } = useContext.setup(props.context);
+    } = useWidget.setup<GraphConfig>();
 
     const config = computed<GraphConfig>(
       () => widget.value.config,
@@ -137,7 +133,7 @@ export default defineComponent({
     }
 
     return {
-      mode,
+      context,
       inDialog,
       presets,
       downsampling,
@@ -165,9 +161,8 @@ export default defineComponent({
 <template>
   <GraphCardWrapper
     show-initial
-    :show="inDialog && mode === 'Full'"
-    :no-scroll="mode === 'Basic'"
-    v-bind="{context}"
+    :show="inDialog && context.mode === 'Full'"
+    :no-scroll="context.mode === 'Basic'"
   >
     <template #graph>
       <HistoryGraph
@@ -183,7 +178,7 @@ export default defineComponent({
     </template>
 
     <template #toolbar>
-      <WidgetToolbar v-model:mode="mode" :in-dialog="inDialog" :widget-id="widgetId">
+      <WidgetToolbar has-mode-toggle>
         <template #actions>
           <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
           <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />
@@ -191,7 +186,7 @@ export default defineComponent({
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
         </template>
         <template #menus>
-          <WidgetActions :widget-id="widgetId" />
+          <WidgetActions />
           <GraphRangeSubmenu
             :layout="config.layout"
             :save="v => saveLayout(v)"
@@ -222,7 +217,7 @@ export default defineComponent({
     </template>
 
     <div
-      v-if="mode === 'Basic'"
+      v-if="context.mode === 'Basic'"
       v-touch-hold.mouse.stop="showGraphDialog"
       class="fit"
     >
@@ -235,7 +230,7 @@ export default defineComponent({
       />
     </div>
     <div
-      v-if="mode === 'Full'"
+      v-if="context.mode === 'Full'"
       class="widget-md"
     >
       <GraphEditor

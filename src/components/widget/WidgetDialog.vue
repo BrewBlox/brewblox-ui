@@ -78,13 +78,13 @@ export default defineComponent({
     class="row"
     @hide="onDialogHide"
   >
-    <component
-      :is="widgetComponent"
-      v-if="widgetComponent"
-      :widget-id="widgetId"
-      :context="context"
-      v-bind="widgetProps"
-      @close="onDialogHide"
-    />
+    <WidgetProvider :widget-id="widgetId" :context="context">
+      <component
+        :is="widgetComponent"
+        v-if="widgetComponent"
+        v-bind="widgetProps"
+        @close="onDialogHide"
+      />
+    </WidgetProvider>
   </q-dialog>
 </template>

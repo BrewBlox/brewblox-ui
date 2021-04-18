@@ -1,22 +1,17 @@
 import { nanoid } from 'nanoid';
-import { computed, ComputedRef, PropType } from 'vue';
+import { computed, ComputedRef, inject } from 'vue';
 
 import { dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
+import { WidgetIdKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/functional';
 import notify from '@/utils/notify';
 
-export interface UseWidgetProps {
-  widgetId: {
-    type: PropType<string>;
-    required: true;
-  }
-}
-
 export interface UseWidgetComponent<ConfigT> {
-  widget: ComputedRef<Widget<ConfigT>>
+  widgetId: string;
+  widget: ComputedRef<Widget<ConfigT>>;
   isVolatileWidget: ComputedRef<boolean>;
   featureTitle: ComputedRef<string>;
 
@@ -30,18 +25,13 @@ export interface UseWidgetComponent<ConfigT> {
 }
 
 export interface UseWidgetComposable {
-  props: UseWidgetProps;
-  setup<ConfigT>(widgetId: string): UseWidgetComponent<ConfigT>;
+  setup<ConfigT>(): UseWidgetComponent<ConfigT>;
 }
 
 export const useWidget: UseWidgetComposable = {
-  props: {
-    widgetId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup<ConfigT>(widgetId: string) {
+  setup<ConfigT>() {
+    const widgetId = inject(WidgetIdKey)!;
+
     const widget = computed<Widget<ConfigT>>(
       () => widgetStore.widgetById(widgetId)!,
     );
@@ -176,6 +166,7 @@ export const useWidget: UseWidgetComposable = {
     }
 
     return {
+      widgetId,
       widget,
       isVolatileWidget,
       featureTitle,

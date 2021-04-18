@@ -6,7 +6,6 @@ import { useWidget } from '@/composables';
 export default defineComponent({
   name: 'RemoveWidgetAction',
   props: {
-    ...useWidget.props,
     icon: {
       type: String,
       default: 'delete',
@@ -16,8 +15,8 @@ export default defineComponent({
       default: 'Delete widget',
     },
   },
-  setup(props) {
-    const { startRemoveWidget } = useWidget.setup(props.widgetId);
+  setup() {
+    const { startRemoveWidget } = useWidget.setup();
 
     return {
       startRemoveWidget,

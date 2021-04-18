@@ -1,21 +1,13 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
-import { WidgetContext } from '@/store/features';
-
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  props: {
-    context: {
-      required: true,
-      type: Object as PropType<WidgetContext>,
-    },
-  },
+  name: 'ActionCardWrapper',
 });
 </script>
 
 <template>
-  <CardWrapper no-scroll v-bind="{context}">
+  <CardWrapper no-scroll>
     <template #toolbar>
       <slot name="toolbar" />
     </template>
