@@ -1,10 +1,11 @@
 import { inject, Ref } from 'vue';
 
-import { DenseKey, TouchKey } from '@/symbols';
+import { DenseKey, NowKey, TouchKey } from '@/symbols';
 
 export interface UseGlobalsComponent {
   dense: Ref<boolean>;
   touch: Ref<boolean>;
+  now: Ref<Date>;
 }
 
 export interface UseGlobalsComposable {
@@ -15,10 +16,12 @@ export const useGlobals: UseGlobalsComposable = {
   setup(): UseGlobalsComponent {
     const dense = inject(DenseKey)!;
     const touch = inject(TouchKey)!;
+    const now = inject(NowKey)!;
 
     return {
       dense,
       touch,
+      now,
     };
   },
 };

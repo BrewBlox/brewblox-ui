@@ -16,6 +16,7 @@ import { blockGraphCfg, blockIdRules, canDisplay as canDisplayFn } from '../util
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockConfig> {
+  serviceId: string;
   sparkModule: SparkServiceModule;
   block: ComputedRef<BlockT>;
   graphConfig: WritableComputedRef<GraphConfig | null>;
@@ -58,7 +59,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       },
     );
 
-    const sparkModule = sparkStore.moduleById(widget.value.config.serviceId)!;
+    const serviceId = widget.value.config.serviceId;
+    const sparkModule = sparkStore.moduleById(serviceId)!;
 
     const block = computed<BlockT>(
       () => sparkModule.blockById(widget.value.config.blockId)!,
@@ -189,13 +191,14 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     return {
       widget,
       ...useWidgetResults,
+      serviceId,
+      sparkModule,
       block,
       spec,
       isVolatileBlock,
       saveBlock,
       saveBlockData,
       modifyBlock,
-      sparkModule,
       constrainers,
       graphConfig,
       canDisplay,

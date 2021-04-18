@@ -68,11 +68,15 @@ export default defineComponent({
     );
 
     watch(
-      () => dashboard.value,
-      (newV, oldV) => {
-        if (!newV && oldV) {
-          router.replace('/'); // Dashboard was removed
-        }
+      () => router.currentRoute.value,
+      () => {
+        // TODO(Bob) return to home if request dashboard doesn't exist
+        // if (!router.currentRoute.value.path.startsWith('/dashboard')) {
+        //   return;
+        // }
+        // if (!newV && oldV) {
+        //   router.replace('/'); // Dashboard was removed
+        // }
       },
       { immediate: true },
     );

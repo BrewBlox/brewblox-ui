@@ -37,7 +37,10 @@ export async function startCreateService(stub: ServiceStub, navigate = true): Pr
   }
 }
 
-export function startChangeServiceTitle(service: Service): void {
+export function startChangeServiceTitle(service: Service | null): void {
+  if (!service) {
+    return;
+  }
   createDialog({
     component: 'InputDialog',
     componentProps: {
@@ -57,7 +60,10 @@ export function startChangeServiceTitle(service: Service): void {
     });
 }
 
-export function startRemoveService(service: Service): void {
+export function startRemoveService(service: Service | null): void {
+  if (!service) {
+    return;
+  }
   createDialog({
     component: 'ConfirmDialog',
     componentProps: {

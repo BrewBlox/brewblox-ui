@@ -9,9 +9,9 @@ import { STATE_TOPIC } from '@/utils/const';
 
 // import features from './features';
 import { sparkType } from './getters';
-// import SparkActions from './service/SparkActions.vue';
-// import SparkPage from './service/SparkPage.vue';
-// import SparkWatcher from './service/SparkWatcher.vue';
+import SparkActions from './service/SparkActions.vue';
+import SparkPage from './service/SparkPage.vue';
+import SparkWatcher from './service/SparkWatcher.vue';
 import { sparkStore } from './store';
 import { BlockSpec } from './types';
 import { isSparkState } from './utils';
@@ -43,17 +43,17 @@ const plugin: Plugin = {
 
     // sparkStore.registerSpecs(specs);
 
-    // featureStore.registerWatcher({
-    //   id: 'SparkWatcher',
-    //   component: cref(SparkWatcher),
-    //   props: {},
-    // });
+    featureStore.registerWatcher({
+      id: 'SparkWatcher',
+      component: cref(app, SparkWatcher),
+      props: {},
+    });
 
     featureStore.registerService({
       id: sparkType,
       title: 'Spark Service',
-      // pageComponent: cref(SparkPage),
-      // configComponent: cref(SparkActions),
+      pageComponent: cref(app, SparkPage),
+      configComponent: cref(app, SparkActions),
       onStart: service => sparkStore.addService(service.id),
       onRemove: service => sparkStore.removeService(service.id),
       wizard: stub => ({

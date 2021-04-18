@@ -20,7 +20,7 @@ export const isDurationUnit =
 const defaultNullValue = Symbol();
 
 export const durationMs =
-  (duration: Quantity | number | string, nullValue: any = defaultNullValue): number => {
+  (duration: Quantity | number | string | null | undefined, nullValue: any = defaultNullValue): number => {
     if (!duration) {
       return 0;
     }
@@ -44,7 +44,7 @@ export const durationMs =
   };
 
 export const durationString =
-  (duration: Quantity | number | string, nullValue: any = defaultNullValue): string => {
+  (duration: Quantity | number | string | null | undefined, nullValue: any = defaultNullValue): string => {
     const ms = durationMs(duration, nullValue);
     if (ms === nullValue) {
       return nullValue;

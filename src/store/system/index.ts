@@ -28,7 +28,6 @@ const defaultUnits = (): UserUnits => ({
 @Module // generateMutationSetters not set
 export class SystemModule extends VuexModule {
   public loaded = false;
-  public now: Date = new Date();
   public config: SystemConfig = defaultConfig();
   public units: UserUnits = defaultUnits();
 
@@ -37,11 +36,6 @@ export class SystemModule extends VuexModule {
   @Mutation
   public setLoaded(): void {
     this.loaded = true;
-  }
-
-  @Mutation
-  public updateTime(): void {
-    this.now = new Date();
   }
 
   @Mutation
@@ -77,9 +71,6 @@ export class SystemModule extends VuexModule {
 
   @Action
   public async start(): Promise<void> {
-    // Every time updateTime() is called, it will trigger a reactive update.
-    setInterval(() => this.updateTime(), 10 * 1000);
-
     this.updateConfig(await configApi.fetchById(CONFIG_ID));
     this.updateUnits(await globalApi.fetchById(UNITS_ID));
 

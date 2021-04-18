@@ -1,4 +1,4 @@
-import { Action, Module, VuexModule } from 'vuex-class-modules';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import { extendById, filterById, findById } from '@/utils/functional';
@@ -27,6 +27,12 @@ export class WidgetModule extends VuexModule {
       throw new Error(`Widget ${widget.title} (${widget.id}) is volatile`);
     }
     await api.create({ ...widget, volatile: undefined }); // triggers callback
+  }
+
+  @Mutation
+  public setVolatileWidget(widget: Widget): void {
+    widget.volatile = true;
+    this.volatileWidgets = extendById(this.volatileWidgets, widget);
   }
 
   @Action
