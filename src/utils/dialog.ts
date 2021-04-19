@@ -1,5 +1,5 @@
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
-import { App, Plugin } from 'vue';
+import { App, getCurrentInstance, Plugin } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -15,6 +15,7 @@ interface BlockDialogOpts {
 // We save a reference to the current (and only) Vue app, so we can lookup components here
 export const dialogFixPlugin: Plugin & { globalApp: App | null } = {
   install(app) {
+    console.log('install');
     this.globalApp = app;
   },
   globalApp: null,
@@ -27,8 +28,13 @@ export function getNumDialogs(): number {
 }
 
 export function createDialog({ component, componentProps }: DialogOpts): DialogChainObject {
+  const instance = getCurrentInstance();
+  const actualComponent = typeof component === 'string'
+    ? dialogFixPlugin.globalApp!.component(component)
+    : component;
+  // debugger;
   return Dialog.create({
-    component: dialogFixPlugin.globalApp!.component(component),
+    component: actualComponent,
     componentProps,
   });
 }

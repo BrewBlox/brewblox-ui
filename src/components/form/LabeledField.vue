@@ -29,9 +29,6 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    'click',
-  ],
   setup(props, { slots }) {
     const { activeSlots } = useField.setup();
 
@@ -59,12 +56,10 @@ export default defineComponent({
 
 <template>
   <q-field
-    :class="[$attrs.class, 'rounded-borders q-px-sm', !readonly && 'depth-1 pointer']"
-    v-bind="$attrs"
+    :class="['rounded-borders q-px-sm', !readonly && 'depth-1 pointer']"
     borderless
     label-slot
     stack-label
-    @click="$emit('click')"
   >
     <template #label>
       <slot name="label">

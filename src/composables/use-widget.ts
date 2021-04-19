@@ -12,6 +12,7 @@ import notify from '@/utils/notify';
 export interface UseWidgetComponent<ConfigT> {
   widgetId: string;
   widget: ComputedRef<Widget<ConfigT>>;
+  config: ComputedRef<ConfigT>;
   isVolatileWidget: ComputedRef<boolean>;
   featureTitle: ComputedRef<string>;
 
@@ -34,6 +35,10 @@ export const useWidget: UseWidgetComposable = {
 
     const widget = computed<Widget<ConfigT>>(
       () => widgetStore.widgetById(widgetId)!,
+    );
+
+    const config = computed<ConfigT>(
+      () => widget.value.config,
     );
 
     const isVolatileWidget = computed<boolean>(
@@ -168,6 +173,7 @@ export const useWidget: UseWidgetComposable = {
     return {
       widgetId,
       widget,
+      config,
       isVolatileWidget,
       featureTitle,
       saveWidget,

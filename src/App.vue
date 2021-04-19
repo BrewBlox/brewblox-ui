@@ -20,5 +20,5 @@ export default defineComponent({
 
 <template>
   <router-view />
-  <!-- TODO: watchers -->
+  <Watchers />
 </template>
