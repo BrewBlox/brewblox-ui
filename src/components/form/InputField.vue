@@ -56,7 +56,6 @@ export default defineComponent({
     );
 
     function openDialog(): void {
-      debugger;
       if (props.readonly) {
         return;
       }
