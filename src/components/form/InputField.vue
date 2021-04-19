@@ -74,6 +74,7 @@ export default defineComponent({
           clearable: props.clearable,
           autogrow: props.autogrow,
           suffix: props.suffix,
+          ...props.dialogProps,
         },
       })
         .onOk(change);

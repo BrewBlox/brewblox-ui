@@ -24,7 +24,7 @@ export class WidgetModule extends VuexModule {
   @Action
   public async createWidget(widget: Widget): Promise<void> {
     if (widget.volatile) {
-      throw new Error(`Widget ${widget.title} (${widget.id}) is volatile`);
+      this.volatileWidgets = filterById(this.volatileWidgets, widget);
     }
     await api.create({ ...widget, volatile: undefined }); // triggers callback
   }

@@ -88,8 +88,10 @@ export default defineComponent({
         v-model="url"
         title="URL"
         label="URL"
+        message="URLs must include the http:// or https:// prefix."
         class="col-grow"
         tag-style="word-break: break-word"
+        :dialog-props="{ fontSize:'100%' }"
       />
 
       <InputField

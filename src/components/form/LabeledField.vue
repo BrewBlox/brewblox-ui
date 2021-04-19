@@ -1,5 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { QField } from 'quasar';
+import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
 
 import { useField } from '@/composables';
 import { round } from '@/utils/functional';
@@ -29,7 +30,11 @@ export default defineComponent({
       default: true,
     },
   },
-  setup(props, { slots }) {
+  emits: [
+    'click',
+  ],
+  setup(props, { slots, emit }) {
+    const fieldRef = ref<QField>();
     const { activeSlots } = useField.setup();
 
     const displayValue = computed<string>(
@@ -46,7 +51,17 @@ export default defineComponent({
       },
     );
 
+    onMounted(() => {
+      if (fieldRef.value) {
+        // Quasar fields have changed to use inheritAttrs: false,
+        // and do not have a click event handler
+        // We can bypass this by setting the click handler on the top-level html element
+        fieldRef.value.$el.onclick = () => emit('click');
+      }
+    });
+
     return {
+      fieldRef,
       activeSlots,
       displayValue,
     };
@@ -56,6 +71,7 @@ export default defineComponent({
 
 <template>
   <q-field
+    ref="fieldRef"
     :class="['rounded-borders q-px-sm', !readonly && 'depth-1 pointer']"
     borderless
     label-slot
