@@ -95,6 +95,9 @@ export default defineComponent({
         <span class="self-end q-mb-sm" :style="colorStyle" />
       </slot>
     </template>
-    <template v-for="slot in activeSlots" #[slot] :name="slot" />
+
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
   </LabeledField>
 </template>

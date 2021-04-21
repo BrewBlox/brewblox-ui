@@ -1,13 +1,12 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
 import { bloxLink, Link } from '@/utils/bloxfield';
 import { mutate, objectStringSorter, typeMatchFilter } from '@/utils/functional';
-
-import { useBlockWidget } from '../../composables';
 
 
 interface EditableChannel extends IoChannel {

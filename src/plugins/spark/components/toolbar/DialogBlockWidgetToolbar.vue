@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 
-import { useBlockWidget } from '../../composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
 export default defineComponent({
   name: 'DialogBlockWidgetToolbar',
@@ -28,7 +28,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <WidgetDialogToolbar
+  <DialogWidgetToolbar
     @title-click="startChangeBlockId"
   >
     <BlockGraph
@@ -51,5 +51,5 @@ export default defineComponent({
       <WidgetActions no-rename />
       <BlockActions />
     </template>
-  </WidgetDialogToolbar>
+  </DialogWidgetToolbar>
 </template>

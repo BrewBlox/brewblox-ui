@@ -17,6 +17,10 @@ export const useContext: UseContextComposable = {
   setup() {
     const context = inject(ContextKey)!;
 
+    if (!context) {
+      throw new Error('No widget context injected');
+    }
+
     const inDialog = computed<boolean>(
       () => context.container === 'Dialog',
     );

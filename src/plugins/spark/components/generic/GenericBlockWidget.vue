@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { useBlockWidget } from '../../composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
 export default defineComponent({
   name: 'GenericBlockWidget',

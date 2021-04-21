@@ -89,6 +89,9 @@ export default defineComponent({
     <component :is="unitTag" v-if="modelValue.value !== null" class="self-end darkish">
       {{ displayUnit }}
     </component>
-    <template v-for="slot in activeSlots" #[slot] :name="slot" />
+
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
   </LabeledField>
 </template>

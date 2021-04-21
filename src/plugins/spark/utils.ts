@@ -49,6 +49,9 @@ export const blockIdRules = (serviceId: string): InputRule[] => [
   v => v.length < 200 || 'Name must be less than 200 characters',
 ];
 
+export const prettyBlock = (v: BlockAddress | null | undefined): string =>
+  v?.id || '<not set>';
+
 export const prettyAny = (v: unknown): string => {
   if (isQuantity(v)) {
     return prettyQty(v);

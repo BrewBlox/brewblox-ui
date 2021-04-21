@@ -79,7 +79,9 @@ export default defineComponent({
           {{ scope.opt }}
         </q-chip>
       </template>
-      <template v-for="slot in activeSlots" #[slot] :name="slot" />
+      <template v-for="slot in activeSlots" #[slot] :name="slot">
+        <slot :name="slot" />
+      </template>
     </q-select>
     <LabeledField v-if="suggestions.length > 0" label="Add existing tag" item-aligned>
       <div class="row wrap q-gutter-xs">

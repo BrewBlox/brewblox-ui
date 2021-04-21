@@ -1,9 +1,8 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { featureStore } from '@/store/features';
-
-import { useBlockWidget } from '../../composables';
 
 export default defineComponent({
   name: 'RemoveBlockAction',

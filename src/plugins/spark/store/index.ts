@@ -69,8 +69,8 @@ export class SparkGlobalModule extends VuexModule {
   }
 
   @Action
-  public async registerSpecs(specs: BlockSpec[]): Promise<void> {
-    this.specs = specs;
+  public async registerSpec<T extends Block>(spec: BlockSpec<T>): Promise<void> {
+    this.specs = extendById(this.specs, spec as any);
   }
 
   @Action

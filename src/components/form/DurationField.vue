@@ -83,6 +83,8 @@ export default defineComponent({
     <slot name="value">
       {{ displayValue }}
     </slot>
-    <template v-for="slot in activeSlots" #[slot] :name="slot" />
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
   </LabeledField>
 </template>

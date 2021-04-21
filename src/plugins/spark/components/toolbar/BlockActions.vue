@@ -3,14 +3,13 @@ import { defineComponent } from 'vue';
 
 import { typeName as graphType } from '@/plugins/history/Graph/getters';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { tryDisplayBlock } from '@/plugins/spark/utils';
 import { createWidgetWizard } from '@/plugins/wizardry';
 import { dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
-
-import { useBlockWidget } from '../../composables';
 
 export default defineComponent({
   name: 'BlockActions',

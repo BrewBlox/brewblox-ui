@@ -7,13 +7,12 @@ import { serviceStore } from '@/store/services';
 import { autoRegister, cref } from '@/utils/component-ref';
 import { STATE_TOPIC } from '@/utils/const';
 
-// import features from './features';
+import features from './features';
 import { sparkType } from './getters';
 import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
 import { sparkStore } from './store';
-import { BlockSpec } from './types';
 import { isSparkState } from './utils';
 
 // Allows lookups based on the old type ID
@@ -33,15 +32,7 @@ const plugin: Plugin = {
     autoRegister(app, require.context('./components', true));
 
     deprecated.forEach(featureStore.registerWidget);
-
-    // features
-    //   .forEach(feature => featureStore.registerWidget(feature.feature));
-
-    // const specs = features
-    //   .filter(f => f.block !== undefined)
-    //   .map(f => f.block) as BlockSpec[];
-
-    // sparkStore.registerSpecs(specs);
+    features.forEach(app.use);
 
     featureStore.registerWatcher({
       id: 'SparkWatcher',

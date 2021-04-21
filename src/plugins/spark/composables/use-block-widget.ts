@@ -17,6 +17,7 @@ import { blockGraphCfg, blockIdRules, canDisplay as canDisplayFn } from '../util
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockConfig> {
   serviceId: string;
+  blockId: string;
   sparkModule: SparkServiceModule;
   block: ComputedRef<BlockT>;
   graphConfig: WritableComputedRef<GraphConfig | null>;
@@ -24,7 +25,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   spec: ComputedRef<BlockSpec<BlockT>>;
   isVolatileBlock: ComputedRef<boolean>;
 
-  saveBlock(block: BlockT): Promise<void>;
+  saveBlock(block?: BlockT): Promise<void>;
   saveBlockData(data: BlockT['data']): Promise<void>;
   modifyBlock(fn: (v: BlockT) => unknown): Promise<void>
 
@@ -59,8 +60,12 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       },
     );
 
-    const serviceId = widget.value.config.serviceId;
+    const { serviceId, blockId } = widget.value.config;
     const sparkModule = sparkStore.moduleById(serviceId)!;
+
+    if (!sparkModule) {
+      throw new Error(`No Spark Module found for widget ${widget.value?.title} (${serviceId} / ${blockId})`);
+    }
 
     const block = computed<BlockT>(
       () => sparkModule.blockById(widget.value.config.blockId)!,
@@ -74,8 +79,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       () => !block.value.meta?.volatile,
     );
 
-    async function saveBlock(block: BlockT): Promise<void> {
-      await sparkModule.saveBlock(block);
+    async function saveBlock(v: BlockT = block.value): Promise<void> {
+      await sparkModule.saveBlock(v);
     }
 
     async function saveBlockData(data: BlockT['data']): Promise<void> {
@@ -191,8 +196,9 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     return {
       widget,
       ...useWidgetResults,
-      serviceId,
       sparkModule,
+      serviceId,
+      blockId,
       block,
       spec,
       isVolatileBlock,

@@ -129,6 +129,8 @@ export default defineComponent({
         <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
     </template>
-    <template v-for="slot in activeSlots" #[slot] :name="slot" />
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
   </LabeledField>
 </template>

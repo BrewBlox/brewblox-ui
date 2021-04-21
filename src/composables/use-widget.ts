@@ -16,8 +16,8 @@ export interface UseWidgetComponent<ConfigT> {
   isVolatileWidget: ComputedRef<boolean>;
   featureTitle: ComputedRef<string>;
 
-  saveWidget(widget: Widget<ConfigT>): Promise<void>;
-  saveConfig(config: ConfigT): Promise<void>;
+  saveWidget(widget?: Widget<ConfigT>): Promise<void>;
+  saveConfig(config?: ConfigT): Promise<void>;
 
   startChangeWidgetTitle(): void;
   startCopyWidget(): void;
@@ -33,9 +33,17 @@ export const useWidget: UseWidgetComposable = {
   setup<ConfigT>() {
     const widgetId = inject(WidgetIdKey)!;
 
+    if (!widgetId) {
+      throw new Error('No widget ID injected');
+    }
+
     const widget = computed<Widget<ConfigT>>(
       () => widgetStore.widgetById(widgetId)!,
     );
+
+    if (!widget.value) {
+      throw new Error(`No widget found for ID ${widgetId}`);
+    }
 
     const config = computed<ConfigT>(
       () => widget.value.config,
@@ -49,12 +57,12 @@ export const useWidget: UseWidgetComposable = {
       () => featureStore.widgetTitle(widget.value.feature) ?? widget.value.feature,
     );
 
-    async function saveWidget(widget: Widget<ConfigT>): Promise<void> {
-      await widgetStore.saveWidget(widget);
+    async function saveWidget(w: Widget<ConfigT> = widget.value): Promise<void> {
+      await widgetStore.saveWidget(w);
     }
 
-    async function saveConfig(config: ConfigT): Promise<void> {
-      await widgetStore.saveWidget({ ...widget.value, config });
+    async function saveConfig(c: ConfigT = config.value): Promise<void> {
+      await widgetStore.saveWidget({ ...widget.value, config: c });
     }
 
     function startChangeWidgetTitle(): void {

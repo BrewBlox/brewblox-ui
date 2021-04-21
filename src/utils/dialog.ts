@@ -1,5 +1,5 @@
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
-import { App, getCurrentInstance, Plugin } from 'vue';
+import { App, Plugin } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';

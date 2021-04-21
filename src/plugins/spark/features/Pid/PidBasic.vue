@@ -1,0 +1,204 @@
+<script lang="ts">
+import { computed, defineComponent } from 'vue';
+
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { isBlockDriven } from '@/plugins/spark/utils';
+import { prettyQty } from '@/utils/bloxfield';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { round } from '@/utils/functional';
+
+export default defineComponent({
+  name: 'PidBasic',
+  setup() {
+    const {
+      sparkModule,
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<PidBlock>();
+
+    const inputBlock = computed<SetpointSensorPairBlock | null>(
+      () => sparkModule.blockByLink(block.value.data.inputId),
+    );
+
+    const inputDriven = computed<boolean>(
+      () => isBlockDriven(inputBlock.value),
+    );
+
+    const outputBlock = computed<Block | null>(
+      () => sparkModule.blockByLink(block.value.data.outputId),
+    );
+
+    const kp = computed<number | null>(
+      () => block.value.data.kp.value,
+    );
+
+    function fit(v: number): number {
+      return Math.min(v, 100);
+    }
+
+    function enable(): void {
+      block.value.data.enabled = true;
+      saveBlock();
+    }
+
+    function showInput(): void {
+      createBlockDialog(inputBlock.value);
+    }
+
+    function editInput(): void {
+      if (!inputBlock.value) return;
+
+      const id = inputBlock.value.id;
+
+      if (sparkModule.drivenBlocks.includes(id)) {
+        const driveChain = sparkModule
+          .drivenChains
+          .find(chain => chain[0] === inputBlock.value?.id);
+
+        const actual = driveChain !== undefined
+          ? sparkModule.blockById(driveChain[driveChain.length - 1])
+          : inputBlock.value;
+
+        createBlockDialog(actual);
+      }
+      else {
+        createDialog({
+          component: 'QuantityDialog',
+          componentProps: {
+            title: 'Edit setting',
+            message: `Edit ${id} setting`,
+            modelValue: inputBlock.value.data.storedSetting,
+            label: 'Setting',
+          },
+        })
+          .onOk(value => {
+            if (inputBlock.value) {
+              inputBlock.value.data.storedSetting = value;
+              sparkModule.saveBlock(inputBlock.value);
+            }
+          });
+      }
+    }
+
+    function showOutput(): void {
+      createBlockDialog(outputBlock.value);
+    }
+
+    return {
+      prettyQty,
+      round,
+      block,
+      saveBlock,
+      inputBlock,
+      inputDriven,
+      outputBlock,
+      kp,
+      fit,
+      enable,
+      showInput,
+      editInput,
+      showOutput,
+    };
+  },
+});
+</script>
+
+<template>
+  <div class="widget-md q-mx-auto">
+    <slot name="warnings" />
+
+    <div class="widget-body row justify-center">
+      <SettingValueField editable class="col-grow" @click="editInput">
+        <template #header>
+          Input
+        </template>
+        <template #valueIcon>
+          <q-icon name="mdi-thermometer" color="green-3" />
+        </template>
+        <template #value>
+          {{ prettyQty(block.data.inputValue) }}
+        </template>
+        <template #setting>
+          {{ prettyQty(block.data.inputSetting) }}
+        </template>
+      </SettingValueField>
+      <SettingValueField editable class="col-grow" @click="showOutput">
+        <template #header>
+          Output
+        </template>
+        <template #valueIcon>
+          <q-icon
+            v-if="kp === null"
+            name="mdi-calculator-variant"
+          />
+          <HeatingIcon
+            v-else-if="kp > 0"
+            color="red"
+            :svg-props="{'stroke-width': '2px'}"
+          />
+          <CoolingIcon
+            v-else-if="kp < 0"
+            color="dodgerblue"
+            :svg-props="{'stroke-width': '2px'}"
+          />
+        </template>
+        <template #value>
+          {{ round(block.data.outputValue) }} %
+        </template>
+        <template #setting>
+          {{ round(block.data.outputSetting) }} %
+        </template>
+      </SettingValueField>
+
+      <div class="col-break" />
+
+      <div class="col row no-wrap q-gutter-x-sm q-mr-md">
+        <div class="col-auto self-center text-bold">
+          P
+        </div>
+        <q-slider
+          :model-value="fit(block.data.p)"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
+
+        <div class="col-auto self-center text-bold">
+          I
+        </div>
+        <q-slider
+          :model-value="fit(block.data.i)"
+          :max="100"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
+
+        <div class="col-auto self-center text-bold">
+          D
+        </div>
+        <q-slider
+          :model-value="fit(block.data.d)"
+          :max="100"
+          readonly
+          class="col-grow"
+          thumb-path=""
+        />
+
+        <div
+          v-if="!!block.data.boilMinOutput"
+          :class="[
+            'col-auto self-center text-bold',
+            `text-${block.data.boilModeActive
+              ? 'deep-orange'
+              : 'grey'
+            }`,
+          ]"
+        >
+          boil
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

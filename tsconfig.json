@@ -39,6 +39,7 @@
     "/dist",
     ".quasar",
     ".vscode",
-    "node_modules"
+    "node_modules",
+    "**/*.wip"
   ]
 }

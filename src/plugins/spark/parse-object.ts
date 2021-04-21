@@ -41,7 +41,7 @@ export function propertyNameWithUnit(name: string): [string, string | null] {
   return [baseName, unit];
 }
 
-export function parsePostfixed(key: string, val: any): [string, Quantity | Link] | null {
+export function parsePostfixed(key: string, val: unknown): [string, Quantity | Link] | null {
   try {
     if (key.endsWith(']') || key.endsWith('>')) {
       const matched = key.match(postfixExpr);
@@ -49,10 +49,10 @@ export function parsePostfixed(key: string, val: any): [string, Quantity | Link]
         const [, name, leftBracket, bracketed] = matched;
         if (leftBracket === '<') {
           const [type, driven] = bracketed.split(',');
-          return [name, rawLink(val, type as BlockOrIntfType, !!driven)];
+          return [name, rawLink(val as string | null, type as BlockOrIntfType, !!driven)];
         }
         else if (leftBracket === '[') {
-          return [name, rawQty(val, bracketed)];
+          return [name, rawQty(val as number | null, bracketed)];
         }
       }
     }
@@ -61,9 +61,9 @@ export function parsePostfixed(key: string, val: any): [string, Quantity | Link]
   return null;
 }
 
-export function deserialize(obj: any): typeof obj {
+export function deserialize<T>(obj: T): T {
   if (isArray(obj)) {
-    return obj.map(deserialize);
+    return (obj as any).map(deserialize) as T;
   }
   if (isBloxField(obj)) {
     return obj;
@@ -75,15 +75,15 @@ export function deserialize(obj: any): typeof obj {
   return obj;
 }
 
-export function serialize(obj: any): typeof obj {
+export function serialize<T>(obj: T): T {
   if (isArray(obj)) {
-    return obj.map(serialize);
+    return (obj as any).map(serialize);
   }
   if (isJSBloxField(obj)) {
-    return obj.toJSON();
+    return obj.toJSON() as any; // lies
   }
   if (isObject(obj)) {
-    return mapValues(obj, serialize);
+    return mapValues(obj, serialize) as any; // lies
   }
   return obj;
 }

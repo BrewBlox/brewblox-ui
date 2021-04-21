@@ -227,14 +227,10 @@ export const ruleErrorFinder =
     };
 
 export const mutate =
-  <T extends unknown>(acc: T, key: keyof T, val: T[keyof T]): T => {
+  <T = AnyDict>(acc: T, key: keyof T, val: T[keyof T]): T => {
     acc[key] = val;
     return acc;
   };
-
-export const objReducer =
-  (key: string) =>
-    (acc: Mapped<unknown>, obj: any) => mutate(acc, obj[key], obj);
 
 export const mapEntries =
   (obj: Record<keyof any, any>, callback: ([k, v]) => [keyof any, any]): typeof obj =>
