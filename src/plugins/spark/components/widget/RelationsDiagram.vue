@@ -2,6 +2,7 @@
 import * as d3 from 'd3';
 import dagre from 'dagre-d3';
 import graphlib from 'graphlib';
+import toFinite from 'lodash/toFinite';
 import { computed, defineComponent, onMounted, PropType, ref, watch } from 'vue';
 
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
@@ -48,6 +49,9 @@ export default defineComponent({
       default: false,
     },
   },
+  emits: [
+    'dblclick',
+  ],
   setup(props) {
     const renderFunc = new dagre.render();
     const resetZoom = ref<() => void>(() => { });
@@ -184,7 +188,7 @@ export default defineComponent({
         const scale = Math.min((rect.width / width), (rect.height / height), 1) * (DEFAULT_SCALE + scaleOffset);
         return d3
           .zoomIdentity
-          .translate((rect.width - width * scale) / 2, (rect.height - height * scale) / 2)
+          .translate(toFinite(rect.width - width * scale) / 2, toFinite(rect.height - height * scale) / 2)
           .scale(scale);
       };
 
@@ -227,7 +231,7 @@ export default defineComponent({
 
 <template>
   <div :class="['fit', centered && 'flex flex-center']">
-    <svg ref="svgRef" class="fit">
+    <svg ref="svgRef" class="fit" @dblclick.stop.capture="$emit('dblclick')">
       <g ref="diagramRef" />
     </svg>
     <q-btn
