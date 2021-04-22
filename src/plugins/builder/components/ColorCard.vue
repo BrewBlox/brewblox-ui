@@ -4,7 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { BEER, COLD_WATER, HOT_WATER, WORT } from '@/plugins/builder/const';
 import { colorString } from '@/plugins/builder/utils';
 
-import PartCard from './PartCard';
+
 
 @Component
 export default class ColorCard extends PartCard {

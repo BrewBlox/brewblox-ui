@@ -1,37 +1,36 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
+import { settingsAddress } from '@/plugins/builder/utils';
 import { BlockAddress } from '@/plugins/spark/types';
 
-import { settingsAddress } from '@/plugins/builder/utils';
-import PartCard from './PartCard';
 
-@Component
-export default class BlockAddressCard extends PartCard {
+// @Component
+// export default class BlockAddressCard extends PartCard {
 
-  @Prop({ type: String, required: true })
-  public readonly settingsKey!: string;
+//   @Prop({ type: String, required: true })
+//   public readonly settingsKey!: string;
 
-  @Prop({ type: Array, required: true })
-  public readonly compatible!: string[];
+//   @Prop({ type: Array, required: true })
+//   public readonly compatible!: string[];
 
-  @Prop({ type: String, default: 'Block' })
-  public readonly label!: string;
+//   @Prop({ type: String, default: 'Block' })
+//   public readonly label!: string;
 
-  @Prop({ type: Boolean, default: true })
-  public readonly creatable!: boolean;
+//   @Prop({ type: Boolean, default: true })
+//   public readonly creatable!: boolean;
 
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.settingsKey);
-  }
+//   get address(): BlockAddress {
+//     return settingsAddress(this.part, this.settingsKey);
+//   }
 
-  set address(addr: BlockAddress) {
-    this.savePartSettings({
-      ...this.part.settings,
-      [this.settingsKey]: { ...addr },
-    });
-  }
-}
+//   set address(addr: BlockAddress) {
+//     this.savePartSettings({
+//       ...this.part.settings,
+//       [this.settingsKey]: { ...addr },
+//     });
+//   }
+// }
 </script>
 
 <template>

@@ -3,7 +3,6 @@ import { computed, defineComponent } from 'vue';
 
 import { clampRotation } from '@/utils/functional';
 
-import PartCard from './PartCard';
 
 @Component
 export default class PlacementCard extends PartCard {

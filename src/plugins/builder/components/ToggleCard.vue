@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import PartCard from './PartCard';
+
 
 @Component
 export default class ToggleCard extends PartCard {

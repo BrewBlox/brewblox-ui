@@ -6,7 +6,6 @@ import { dashboardStore, Widget } from '@/store/dashboards';
 import { Service, serviceStore } from '@/store/services';
 import { objectStringSorter } from '@/utils/functional';
 
-import PartCard from './PartCard';
 
 @Component
 export default class LinkedWidgetCard extends PartCard {

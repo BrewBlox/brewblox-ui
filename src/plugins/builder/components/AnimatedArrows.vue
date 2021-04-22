@@ -3,53 +3,71 @@
 import { svgPathProperties } from 'svg-path-properties';
 import { computed, defineComponent } from 'vue';
 
-@Component
-export default class AnimatedArrows extends Vue {
+export default defineComponent({
+  name: 'AnimatedArrows',
+  props: {
+    path: {
+      type: String,
+      required: true,
+    },
+    speed: {
+      type: Number,
+      default: 0,
+    },
+    numArrows: {
+      type: Number,
+      default: 2,
+    },
+  },
+  setup(props) {
 
-  @Prop({ type: String, required: true })
-  readonly path!: string;
+    const pathLength = computed<number>(
+      () => svgPathProperties(props.path).getTotalLength(),
+    );
 
-  @Prop({ type: Number, default: 0 })
-  readonly speed!: number;
+    const duration = computed<number>(
+      () => {
+        if (props.speed && pathLength.value) {
+          return pathLength.value / (25 * Math.abs(props.speed));
+        }
+        return 0;
+      },
+    );
 
-  @Prop({ type: Number, default: 2 })
-  readonly numArrows!: number;
+    const reversed = computed<boolean>(
+      () => props.speed < 0,
+    );
 
-  get pathLength(): number {
-    return svgPathProperties(this.path).getTotalLength();
-  }
+    const starts = computed<string[]>(
+      () => {
+        const interval = duration.value / props.numArrows;
+        return [...Array(props.numArrows).keys()]
+          .map(idx => `${idx * interval}s`);
+      },
+    );
 
-  get duration(): number {
-    if (this.speed && this.pathLength) {
-      return this.pathLength / (25 * Math.abs(this.speed));
-    }
-    return 0;
-  }
+    const transform = computed<string>(
+      // Flips the arrow
+      () => reversed.value
+        ? 'scale (-1, 1)'
+        : '',
+    );
 
-  get reversed(): boolean {
-    return this.speed < 0;
-  }
+    const keyPoints = computed<string>(
+      // Makes the arrow travel end-to-start
+      () => reversed.value
+        ? '1;0'
+        : '0;1',
+    );
 
-  get starts(): string[] {
-    const interval = this.duration / this.numArrows;
-    return [...Array(this.numArrows).keys()]
-      .map(idx => `${idx * interval}s`);
-  }
-
-  get transform(): string {
-    // Flips the arrow
-    return this.reversed
-      ? 'scale (-1, 1)'
-      : '';
-  }
-
-  get keyPoints(): string {
-    // Makes the arrow travel end-to-start
-    return this.reversed
-      ? '1;0'
-      : '0;1';
-  }
-}
+    return {
+      duration,
+      starts,
+      transform,
+      keyPoints,
+    };
+  },
+});
 </script>
 
 <template>

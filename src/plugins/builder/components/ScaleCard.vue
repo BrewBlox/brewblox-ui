@@ -3,7 +3,7 @@ import range from 'lodash/range';
 import { debounce } from 'quasar';
 import { computed, defineComponent } from 'vue';
 
-import PartCard from './PartCard';
+
 
 @Component
 export default class ScaleCard extends PartCard {
