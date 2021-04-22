@@ -456,12 +456,12 @@ export default defineComponent({
       v-else-if="pageMode === 'Relations'"
       class="fit"
       style="overflow: auto"
-      @dblclick="startCreateBlock"
     >
       <RelationsDiagram
         :service-id="serviceId"
         :nodes="nodes"
         :edges="edges"
+        @dblclick="startCreateBlock"
       />
     </div>
 
