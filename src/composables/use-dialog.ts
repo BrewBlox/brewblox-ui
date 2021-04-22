@@ -14,7 +14,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { ContextKey } from '@/symbols';
+import { ContextKey, InvalidateKey } from '@/symbols';
 
 export interface UseDialogProps {
   title: {
@@ -74,14 +74,7 @@ export const useDialog: UseDialogComposable = {
     const { emit, proxy } = getCurrentInstance()!;
     const dialogRef = ref<QDialog | null>(null);
     const router = useRouter();
-
-    // Will be overridden if this dialog is showing a widget
-    // Used for all other menus and edit dialogs
-    provide(ContextKey, reactive({
-      container: 'Dialog',
-      size: 'Fixed',
-      mode: 'Basic',
-    }));
+    const invalidationTrigger = ref(false);
 
     function show(): void {
       dialogRef.value?.show();
@@ -104,14 +97,34 @@ export const useDialog: UseDialogComposable = {
       hide();
     }
 
+
+    // Will be overridden if this dialog is showing a widget
+    // Used for all other menus and edit dialogs
+    provide(ContextKey, reactive({
+      container: 'Dialog',
+      size: 'Fixed',
+      mode: 'Basic',
+    }));
+
+    provide(InvalidateKey, hide);
+
+    watch(
+      () => invalidationTrigger.value,
+      (valid) => {
+        if (!valid) {
+          hide();
+        }
+      },
+    );
+
     // expose public methods required by Dialog plugin
     Object.assign(proxy, { show, hide });
 
     // We want the dialog to be part of the navigation stack.
     // This lets mobile users close dialogs by using the back button.
-    // This requires two actions on startup:
-    // - Push a new page with unique ID in hash when dialog opens.
-    // - If back button is pressed, the ID disappears from hash -> close dialog.
+    // This requires two actions:
+    // - Push a new page with a unique ID in hash when dialog opens.
+    // - Close dialog if the ID disappears from hash (because eg. back button was pressed).
     function setupRouteHash(): void {
       router
         .push({ hash: (router.currentRoute.value.hash || '#') + hashId })

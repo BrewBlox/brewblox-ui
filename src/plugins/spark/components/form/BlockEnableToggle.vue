@@ -16,14 +16,15 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { block, modifyBlock } = useBlockWidget.setup();
+    const { block, saveBlock } = useBlockWidget.setup();
 
     const enabled = computed<boolean>(
       () => Boolean(block.value?.data[props.dataKey]),
     );
 
     function toggleEnabled(): void {
-      modifyBlock(v => v.data[props.dataKey] = !enabled.value);
+      block.value.data[props.dataKey] = !enabled.value;
+      saveBlock();
     }
 
     return {

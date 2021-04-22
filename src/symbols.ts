@@ -13,3 +13,4 @@ export const DatabaseKey: InjectionKey<BrewbloxDatabase> = Symbol('$database');
 export const EventbusKey: InjectionKey<BrewbloxEventbus> = Symbol('$eventbus');
 export const ContextKey: InjectionKey<UnwrapRef<WidgetContext>> = Symbol('$context');
 export const WidgetIdKey: InjectionKey<string> = Symbol('$widgetId');
+export const InvalidateKey: InjectionKey<() => void> = Symbol('$invalidate');

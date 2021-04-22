@@ -11,7 +11,7 @@ import { createDialog } from '@/utils/dialog';
 import { deepCopy, filterById, spliceById } from '@/utils/functional';
 
 import QuickActionChange from './QuickActionChange.vue';
-import { BlockChange, ChangeAction, QuickActionsConfig } from './types';
+import { BlockChange, ChangeAction, QuickActionsWidget } from './types';
 
 export default defineComponent({
   name: 'QuickActionsFull',
@@ -29,7 +29,7 @@ export default defineComponent({
     const {
       config,
       saveConfig,
-    } = useWidget.setup<QuickActionsConfig>();
+    } = useWidget.setup<QuickActionsWidget>();
     const draggingStep = ref(false);
 
     const actions = computed<ChangeAction[]>(

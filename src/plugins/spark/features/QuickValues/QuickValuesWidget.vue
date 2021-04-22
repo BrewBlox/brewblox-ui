@@ -11,7 +11,7 @@ import { isQuantity, prettyQty, Quantity } from '@/utils/bloxfield';
 import { roundNumber } from '@/utils/functional';
 import notify from '@/utils/notify';
 
-import { QuickValuesConfig } from './types';
+import { QuickValuesWidget } from './types';
 
 export default defineComponent({
   name: 'QuickValuesWidget',
@@ -21,7 +21,7 @@ export default defineComponent({
       widget,
       config,
       saveConfig,
-    } = useWidget.setup<QuickValuesConfig>();
+    } = useWidget.setup<QuickValuesWidget>();
 
     const fieldValue = computed<Quantity | number | null>(
       () => sparkStore.fieldByAddress(config.value.addr),

@@ -1,5 +1,6 @@
 import { Block } from '@/plugins/spark/types';
 import { BlockField } from '@/plugins/spark/types';
+import { Widget } from '@/store/widgets';
 
 export interface BlockChange<BlockT extends Block = Block> {
   id: string;
@@ -22,6 +23,8 @@ export interface QuickActionsConfig {
   changeIdMigrated: boolean;
   serviceIdMigrated: boolean;
 }
+
+export type QuickActionsWidget = Widget<QuickActionsConfig>
 
 export interface EditableBlockField {
   id: string;

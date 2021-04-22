@@ -8,6 +8,7 @@ import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types'
 import { Block, BlockOrIntfType, StoreObject } from '@/shared-types';
 import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
+import { Widget } from '@/store/widgets';
 
 export type PageMode =
   | 'Relations'
@@ -98,6 +99,8 @@ export interface BlockConfig {
   graphAxes?: GraphValueAxes;
   graphLayout?: Partial<Layout>;
 }
+
+export type BlockWidget = Widget<BlockConfig>
 
 export interface BlockDataPreset<T extends Block = Block> {
   name: string;

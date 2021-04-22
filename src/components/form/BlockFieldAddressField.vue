@@ -57,13 +57,13 @@ export default defineComponent({
     },
   },
   emits: [
-    'update:address',
+    'update:modelValue',
   ],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
 
     function save(addr: BlockFieldAddress): void {
-      emit('update:address', addr);
+      emit('update:modelValue', addr);
     }
 
     const block = computed<Block | null>(

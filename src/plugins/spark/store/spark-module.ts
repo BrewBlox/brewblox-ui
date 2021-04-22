@@ -229,6 +229,7 @@ export class SparkServiceModule extends VuexModule {
       .filter(({ config }) => config.serviceId === this.id && config.blockId === currentId)
       .forEach(widget => {
         widget.config.blockId = newId;
+        widget.title = newId;
         widgetStore.saveWidget(widget);
       });
   }

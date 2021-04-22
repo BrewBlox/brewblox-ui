@@ -1,23 +1,24 @@
 import { nanoid } from 'nanoid';
-import { computed, ComputedRef, inject } from 'vue';
+import { computed, ComputedRef, inject, Ref, ref, UnwrapRef, watch } from 'vue';
 
 import { dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
-import { WidgetIdKey } from '@/symbols';
+import { InvalidateKey, WidgetIdKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/functional';
 import notify from '@/utils/notify';
 
-export interface UseWidgetComponent<ConfigT> {
+export interface UseWidgetComponent<WidgetT extends Widget> {
   widgetId: string;
-  widget: ComputedRef<Widget<ConfigT>>;
-  config: ComputedRef<ConfigT>;
+  widget: Ref<UnwrapRef<WidgetT>>;
+  config: ComputedRef<WidgetT['config']>;
   isVolatileWidget: ComputedRef<boolean>;
   featureTitle: ComputedRef<string>;
 
-  saveWidget(widget?: Widget<ConfigT>): Promise<void>;
-  saveConfig(config?: ConfigT): Promise<void>;
+  saveWidget(widget?: WidgetT): Promise<void>;
+  saveConfig(config?: WidgetT['config']): Promise<void>;
+  invalidate(cb?: () => Awaitable<unknown>): void;
 
   startChangeWidgetTitle(): void;
   startCopyWidget(): void;
@@ -26,26 +27,39 @@ export interface UseWidgetComponent<ConfigT> {
 }
 
 export interface UseWidgetComposable {
-  setup<ConfigT>(): UseWidgetComponent<ConfigT>;
+  setup<WidgetT extends Widget>(): UseWidgetComponent<WidgetT>;
 }
 
 export const useWidget: UseWidgetComposable = {
-  setup<ConfigT>() {
+  setup<WidgetT extends Widget>(): UseWidgetComponent<WidgetT> {
     const widgetId = inject(WidgetIdKey)!;
+    const invalidate = inject(InvalidateKey)!;
 
     if (!widgetId) {
       throw new Error('No widget ID injected');
     }
 
-    const widget = computed<Widget<ConfigT>>(
-      () => widgetStore.widgetById(widgetId)!,
+    const widget = ref<WidgetT>(
+      widgetStore.widgetById<WidgetT>(widgetId)!,
     );
 
     if (!widget.value) {
       throw new Error(`No widget found for ID ${widgetId}`);
     }
 
-    const config = computed<ConfigT>(
+    watch(
+      () => widgetStore.widgetById<WidgetT>(widgetId),
+      (newV) => {
+        if (newV) {
+          widget.value = newV;
+        }
+        else {
+          invalidate();
+        }
+      },
+    );
+
+    const config = computed<WidgetT['config']>(
       () => widget.value.config,
     );
 
@@ -57,13 +71,17 @@ export const useWidget: UseWidgetComposable = {
       () => featureStore.widgetTitle(widget.value.feature) ?? widget.value.feature,
     );
 
-    async function saveWidget(w: Widget<ConfigT> = widget.value): Promise<void> {
+    async function saveWidget(w: WidgetT = widget.value): Promise<void> {
       await widgetStore.saveWidget(w);
     }
 
-    async function saveConfig(c: ConfigT = config.value): Promise<void> {
+    async function saveConfig(c: WidgetT['config'] = config.value): Promise<void> {
       await widgetStore.saveWidget({ ...widget.value, config: c });
     }
+
+    // function invalidate(): void {
+    //   invalidationTrigger.value = true;
+    // }
 
     function startChangeWidgetTitle(): void {
       const widgetTitle = widget.value.title;
@@ -173,7 +191,6 @@ export const useWidget: UseWidgetComposable = {
         })
           .onOk((selected: number[]) => {
             selected.forEach(idx => selectOptions[idx].action(widget.value));
-            // closeDialog();
           });
       }
     }
@@ -186,6 +203,7 @@ export const useWidget: UseWidgetComposable = {
       featureTitle,
       saveWidget,
       saveConfig,
+      invalidate,
       startChangeWidgetTitle,
       startCopyWidget,
       startMoveWidget,

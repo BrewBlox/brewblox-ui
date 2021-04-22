@@ -5,7 +5,7 @@ import { useContext, useWidget } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { WS_HOST } from '@/utils/const';
 
-import { SparkDisplayConfig } from './types';
+import { SparkDisplayWidget } from './types';
 
 const WIDTH = 320;
 const HEIGHT = 240;
@@ -17,7 +17,7 @@ export default defineComponent({
     const {
       config,
       saveConfig,
-    } = useWidget.setup<SparkDisplayConfig>();
+    } = useWidget.setup<SparkDisplayWidget>();
 
     const connected = ref(true);
     let preventReconnection = false;

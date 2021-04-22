@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 
-import { WebframeConfig } from './types';
+import { WebframeWidget } from './types';
 
 export default defineComponent({
   name: 'WebframeWidget',
@@ -11,7 +11,7 @@ export default defineComponent({
     const {
       config,
       saveConfig,
-    } = useWidget.setup<WebframeConfig>();
+    } = useWidget.setup<WebframeWidget>();
     const {
       context,
     } = useContext.setup();

@@ -7,6 +7,7 @@ import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
 
 export default defineComponent({
+  name: 'DefaultLayout',
   setup() {
     const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
@@ -39,6 +40,7 @@ export default defineComponent({
     function routeActive(route: string): boolean {
       return Boolean(router.currentRoute.value.path.match(route));
     }
+
     return {
       devMode,
       dashboardEditing,

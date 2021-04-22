@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { computed, ComputedRef, watch, WritableComputedRef } from 'vue';
+import { computed, ComputedRef, Ref, ref, UnwrapRef, watch, WritableComputedRef } from 'vue';
 
 import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
@@ -11,29 +11,25 @@ import { deepCopy } from '@/utils/functional';
 import notify from '@/utils/notify';
 
 import { SparkServiceModule, sparkStore } from '../store';
-import { BlockConfig, BlockSpec } from '../types';
+import { BlockConfig, BlockSpec, BlockWidget } from '../types';
 import { blockGraphCfg, blockIdRules, canDisplay as canDisplayFn } from '../utils';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
-  extends UseWidgetComponent<BlockConfig> {
+  extends UseWidgetComponent<BlockWidget> {
   serviceId: string;
   blockId: string;
   sparkModule: SparkServiceModule;
-  block: ComputedRef<BlockT>;
+  block: Ref<UnwrapRef<BlockT>>;
   graphConfig: WritableComputedRef<GraphConfig | null>;
-
   spec: ComputedRef<BlockSpec<BlockT>>;
   isVolatileBlock: ComputedRef<boolean>;
 
   saveBlock(block?: BlockT): Promise<void>;
-  saveBlockData(data: BlockT['data']): Promise<void>;
-  modifyBlock(fn: (v: BlockT) => unknown): Promise<void>
-
-  constrainers: ComputedRef<string | null>;
 
   canDisplay: boolean;
   hasGraph: boolean;
   isDriven: ComputedRef<boolean>;
+  constrainers: ComputedRef<string | null>;
 
   startMakeWidget(): void;
   startChangeBlockId(): void;
@@ -48,27 +44,36 @@ export const useBlockWidget: UseBlockWidgetComposable = {
   setup<BlockT extends Block>(): UseBlockWidgetComponent<BlockT> {
     const {
       widget,
+      config,
+      invalidate,
       ...useWidgetResults
-    } = useWidget.setup<BlockConfig>();
+    } = useWidget.setup<BlockWidget>();
 
-    watch(
-      () => widget.value.config.blockId,
-      (newId) => {
-        if (newId && newId !== widget.value.title && !widget.value.volatile) {
-          widgetStore.saveWidget({ ...widget.value, title: newId });
-        }
-      },
-    );
-
-    const { serviceId, blockId } = widget.value.config;
+    // We assume that serviceId/blockId are constant while the widget is mounted
+    // If we rename the block, we invalidate the rendering dialog
+    const { serviceId, blockId } = config.value;
     const sparkModule = sparkStore.moduleById(serviceId)!;
 
     if (!sparkModule) {
+      // We expect parent objects to check configuration before creating the widget
+      // Module lifetime should always start before, and end after widget lifetime
       throw new Error(`No Spark Module found for widget ${widget.value?.title} (${serviceId} / ${blockId})`);
     }
 
-    const block = computed<BlockT>(
-      () => sparkModule.blockById(widget.value.config.blockId)!,
+    const block = ref<BlockT>(
+      sparkModule.blockById(config.value.blockId)!,
+    );
+
+    watch(
+      () => sparkModule.blockById(config.value.blockId),
+      (newV) => {
+        if (newV) {
+          block.value = newV;
+        }
+        else {
+          invalidate();
+        }
+      },
     );
 
     const spec = computed<BlockSpec<BlockT>>(
@@ -83,33 +88,23 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       await sparkModule.saveBlock(v);
     }
 
-    async function saveBlockData(data: BlockT['data']): Promise<void> {
-      block.value.data = data;
-      await sparkModule.saveBlock({ ...block.value, data });
-    }
-
-    async function modifyBlock(fn: (v: BlockT) => unknown): Promise<void> {
-      fn(block.value);
-      await sparkModule.saveBlock(block.value);
-    }
-
     const constrainers = computed<string | null>(
-      () => sparkModule.limiters[widget.value.config.blockId]?.join(', ') || null,
+      () => sparkModule.limiters[config.value.blockId]?.join(', ') || null,
     );
 
     const hasGraph: boolean = !isVolatileBlock.value
       && sparkStore.spec(block.value).fields.some(f => f.graphed);
 
     const graphConfig = computed<GraphConfig | null>({
-      get: () => hasGraph ? blockGraphCfg(block.value, widget.value.config) : null,
+      get: () => hasGraph ? blockGraphCfg(block.value, config.value) : null,
       set: cfg => {
-        const config: BlockConfig = {
-          ...widget.value.config,
+        const updated: BlockConfig = {
+          ...config.value,
           queryParams: cfg?.params,
           graphAxes: cfg?.axes,
           graphLayout: cfg?.layout,
         };
-        widgetStore.saveWidget({ ...widget.value, config });
+        widgetStore.saveWidget({ ...widget.value, config: updated });
       },
     });
 
@@ -120,7 +115,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     const isDriven = computed<boolean>(
       () => sparkModule
         .drivenBlocks
-        .includes(widget.value.config.blockId),
+        .includes(config.value.blockId),
     );
 
     function startMakeWidget(): void {
@@ -152,7 +147,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
 
     async function changeBlockId(newId: string): Promise<void> {
       if (!isVolatileBlock.value) {
-        await sparkModule.renameBlock([widget.value.config.blockId, newId])
+        await sparkModule.renameBlock([blockId, newId])
           .catch(() => { });
       } else {
         await sparkModule.saveBlock({ ...block.value, id: newId });
@@ -171,9 +166,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
           rules: blockIdRules(block.value.serviceId),
         },
       })
-        .onOk(async (newId: string) => {
-          await changeBlockId(newId);
-          // crud.closeDialog(); // TODO(Bob)
+        .onOk((newId: string) => {
+          changeBlockId(newId);
         });
     }
 
@@ -185,16 +179,15 @@ export const useBlockWidget: UseBlockWidgetComposable = {
           message: `Are you sure you want to remove ${block.value.id}?`,
         },
       })
-        .onOk(async () => {
-          if (!isVolatileBlock.value) {
-            await sparkStore.removeBlock(block.value);
-            // crud.closeDialog(); // TODO(Bob)
-          }
+        .onOk(() => {
+          sparkStore.removeBlock(block.value);
         });
     }
 
     return {
       widget,
+      config,
+      invalidate,
       ...useWidgetResults,
       sparkModule,
       serviceId,
@@ -203,8 +196,6 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       spec,
       isVolatileBlock,
       saveBlock,
-      saveBlockData,
-      modifyBlock,
       constrainers,
       graphConfig,
       canDisplay,

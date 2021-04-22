@@ -17,8 +17,8 @@ export class WidgetModule extends VuexModule {
     return this.widgets.map(v => v.id);
   }
 
-  public widgetById(id: string): Widget | null {
-    return findById(this.widgets, id) ?? findById(this.volatileWidgets, id);
+  public widgetById<T extends Widget>(id: string): T | null {
+    return (findById(this.widgets, id) ?? findById(this.volatileWidgets, id)) as T | null;
   }
 
   @Action

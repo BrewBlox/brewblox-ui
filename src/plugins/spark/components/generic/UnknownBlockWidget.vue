@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useWidget } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockConfig } from '@/plugins/spark/types';
+import { BlockWidget } from '@/plugins/spark/types';
 
 interface AbsenceReason {
   message: string;
@@ -14,12 +14,8 @@ export default defineComponent({
   name: 'UnknownBlockWidget',
   setup() {
     const {
-      widget,
-    } = useWidget.setup<BlockConfig>();
-
-    const config = computed<BlockConfig>(
-      () => widget.value.config,
-    );
+      config,
+    } = useWidget.setup<BlockWidget>();
 
     const sparkModule = computed<SparkServiceModule>(
       () => sparkStore.moduleById(config.value.serviceId)!,

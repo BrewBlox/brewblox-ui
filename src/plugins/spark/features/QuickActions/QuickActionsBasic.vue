@@ -11,7 +11,7 @@ import { createDialog } from '@/utils/dialog';
 import { deepCopy, spliceById, uniqueFilter } from '@/utils/functional';
 import notify from '@/utils/notify';
 
-import { BlockChange, ChangeAction, EditableBlockField, QuickActionsConfig } from './types';
+import { BlockChange, ChangeAction, EditableBlockField, QuickActionsWidget } from './types';
 
 interface FieldDiff {
   key: string;
@@ -41,7 +41,7 @@ export default defineComponent({
       widgetId,
       config,
       saveConfig,
-    } = useWidget.setup<QuickActionsConfig>();
+    } = useWidget.setup<QuickActionsWidget>();
 
     const applying = ref(false);
 

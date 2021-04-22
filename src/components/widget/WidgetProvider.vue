@@ -1,8 +1,8 @@
 <script lang="ts">
-import { defineComponent, PropType, provide, reactive } from 'vue';
+import { defineComponent, inject, PropType, provide, reactive, ref } from 'vue';
 
 import { WidgetContext } from '@/store/features';
-import { ContextKey, WidgetIdKey } from '@/symbols';
+import { ContextKey, InvalidateKey, WidgetIdKey } from '@/symbols';
 import { deepCopy } from '@/utils/functional';
 
 export default defineComponent({
@@ -18,16 +18,27 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const valid = ref(true);
+    const invalidateParent = inject(InvalidateKey, () => { });
+
+    function invalidate(): void {
+      valid.value = false;
+      invalidateParent();
+    }
+
     provide(WidgetIdKey, props.widgetId);
     provide(ContextKey, reactive<WidgetContext>(deepCopy(props.context)));
+    provide(InvalidateKey, invalidate);
 
-    return {};
+    return {
+      valid,
+    };
   },
 });
 </script>
 
 <template>
-  <template v-if="true">
+  <template v-if="valid">
     <slot />
   </template>
 </template>

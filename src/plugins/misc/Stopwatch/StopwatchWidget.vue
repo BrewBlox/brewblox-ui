@@ -3,7 +3,7 @@ import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
 import { useWidget } from '@/composables';
 
-import { StopwatchConfig, StopwatchSession } from './types';
+import { StopwatchSession, StopwatchWidget } from './types';
 
 export default defineComponent({
   name: 'StopwatchWidget',
@@ -11,7 +11,7 @@ export default defineComponent({
     const {
       config,
       saveConfig,
-    } = useWidget.setup<StopwatchConfig>();
+    } = useWidget.setup<StopwatchWidget>();
 
     const time = ref<string>('00:00:00.0');
     let tickTimer: NodeJS.Timer | null = null;

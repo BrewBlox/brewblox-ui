@@ -8,7 +8,7 @@ import { createDialog } from '@/utils/dialog';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';
-import { ChangeAction, QuickActionsConfig } from './types';
+import { ChangeAction, QuickActionsWidget } from './types';
 
 export default defineComponent({
   name: 'QuickActionsWidget',
@@ -27,7 +27,7 @@ export default defineComponent({
     const {
       config,
       saveConfig,
-    } = useWidget.setup<QuickActionsConfig>();
+    } = useWidget.setup<QuickActionsWidget>();
 
     const actions = computed<ChangeAction[]>(
       () => deserialize(config.value.actions ?? config.value.steps),

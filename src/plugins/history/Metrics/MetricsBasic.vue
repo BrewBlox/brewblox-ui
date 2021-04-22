@@ -11,7 +11,7 @@ import { durationString } from '@/utils/duration';
 import { isJsonEqual, round } from '@/utils/functional';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './const';
-import { MetricsConfig } from './types';
+import { MetricsConfig, MetricsWidget } from './types';
 import { emptyMetricsConfig } from './utils';
 
 interface CurrentValue extends MetricsResult {
@@ -34,7 +34,7 @@ export default defineComponent({
     } = useContext.setup();
     const {
       widget,
-    } = useWidget.setup<MetricsConfig>();
+    } = useWidget.setup<MetricsWidget>();
 
     const config = computed<MetricsConfig>(
       () => defaults(widget.value.config, emptyMetricsConfig()),

@@ -8,6 +8,7 @@ import { ComponentPublicInstance, computed, defineComponent, nextTick, ref, watc
 import { useContext, useWidget } from '@/composables';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { Widget } from '@/store/widgets';
 import { bloxQty, Quantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/duration';
@@ -30,7 +31,7 @@ export default defineComponent({
     const {
       widget,
       saveWidget,
-    } = useWidget.setup<GraphConfig>();
+    } = useWidget.setup<Widget<GraphConfig>>();
 
     const config = computed<GraphConfig>(
       () => widget.value.config,
