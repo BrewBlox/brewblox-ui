@@ -1,0 +1,57 @@
+<script lang="ts">
+import { computed, defineComponent } from 'vue';
+
+import { RIGHT } from '@/plugins/builder/const';
+import { horizontalChevrons } from '@/plugins/builder/utils';
+
+const chevrons = horizontalChevrons(15, 25);
+const paths = {
+  borders: [
+    'M30,21 H50',
+    'M30,29 H50',
+  ],
+  liquid: 'M30,25 H50',
+  arrows: 'M25,25 H50',
+};
+
+@Component
+export default class SystemIO extends PartBase {
+  readonly chevrons = chevrons;
+  readonly paths = paths;
+
+  get flowSpeed(): number {
+    return this.flowOnCoord(RIGHT);
+  }
+
+  get liquids(): string[] {
+    return this.liquidOnCoord(RIGHT);
+  }
+
+  get arrowTransform(): string {
+    if (this.flowSpeed < 0) {
+      return 'rotate(180)';
+    }
+    return '';
+  }
+}
+</script>
+
+<template>
+  <g>
+    <LiquidStroke :paths="[paths.liquid]" :colors="liquids" />
+    <AnimatedArrows :num-arrows="1" :speed="flowSpeed" :path="paths.arrows" />
+    <g class="outline">
+      <g v-if="flowSpeed > 0">
+        <polyline v-for="line in chevrons.right" :key="line" :points="line" />
+      </g>
+      <g v-else-if="flowSpeed < 0">
+        <polyline v-for="line in chevrons.left" :key="line" :points="line" />
+      </g>
+      <g v-else>
+        <polyline v-for="line in chevrons.straight" :key="line" :points="line" />
+      </g>
+      <path :d="paths.borders[0]" />
+      <path :d="paths.borders[1]" />
+    </g>
+  </g>
+</template>

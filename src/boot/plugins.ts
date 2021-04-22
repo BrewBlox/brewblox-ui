@@ -1,7 +1,7 @@
 import { boot } from 'quasar/wrappers';
 import { Plugin } from 'vue';
 
-// import builder from '@/plugins/builder';
+import builder from '@/plugins/builder';
 import { databasePlugin } from '@/plugins/database';
 import { eventbusPlugin } from '@/plugins/eventbus';
 import history from '@/plugins/history';
@@ -28,7 +28,7 @@ export default boot(({ app, store }) => {
     history,
     spark,
     // tilt,
-    // builder,
+    builder,
     // quickstart,
     misc,
   ];
