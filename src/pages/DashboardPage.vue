@@ -30,12 +30,19 @@ export default defineComponent({
       () => systemStore.loaded,
     );
 
-    const dashboardId = computed<string>(
-      () => router.currentRoute.value.params.id as string,
+    const dashboardId = computed<string | null>(
+      () => {
+        const route = router.currentRoute.value;
+        return route.path.startsWith('/dashboard')
+          ? route.params.id as string ?? null
+          : null;
+      },
     );
 
     const dashboard = computed<Dashboard | null>(
-      () => dashboardStore.dashboardById(dashboardId.value),
+      () => dashboardId.value
+        ? dashboardStore.dashboardById(dashboardId.value)
+        : null,
     );
 
     function showWizard(widget: boolean): void {
@@ -68,15 +75,15 @@ export default defineComponent({
     );
 
     watch(
-      () => router.currentRoute.value,
-      () => {
-        // TODO(Bob) return to home if request dashboard doesn't exist
-        // if (!router.currentRoute.value.path.startsWith('/dashboard')) {
-        //   return;
-        // }
-        // if (!newV && oldV) {
-        //   router.replace('/'); // Dashboard was removed
-        // }
+      () => dashboard.value,
+      (newV) => {
+        // We want to re-route to home if:
+        // - the dashboard was removed
+        // - the user navigates to a dashboard ID that does not exist (or just /dashboard)
+        // - dashboards are loaded from the datastore
+        if (newV === null && dashboardId.value !== null && dashboardStore.dashboards.length > 0) {
+          router.replace('/');
+        }
       },
       { immediate: true },
     );
