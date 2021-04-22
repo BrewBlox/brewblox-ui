@@ -29,10 +29,10 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: {
+  emits: [
     ...useDialog.emits,
-  },
-  async setup(props) {
+  ],
+  setup(props) {
     const {
       dialogRef,
       dialogProps,
@@ -49,14 +49,7 @@ export default defineComponent({
       () => block.value?.type ?? '',
     );
 
-    onUnmounted(() => {
-      const widget = widgetStore.widgetById(widgetId);
-      if (widget) {
-        widgetStore.removeWidget(widget);
-      }
-    });
-
-    await widgetStore.createWidget({
+    widgetStore.setVolatileWidget({
       id: widgetId,
       title: props.blockId,
       feature: blockType.value,
@@ -68,6 +61,13 @@ export default defineComponent({
       },
       volatile: true,
       ...featureStore.widgetSize(blockType.value),
+    });
+
+    onUnmounted(() => {
+      const widget = widgetStore.widgetById(widgetId);
+      if (widget) {
+        widgetStore.removeVolatileWidget(widget);
+      }
     });
 
     const widget = computed<Widget | null>(
@@ -116,15 +116,13 @@ export default defineComponent({
     v-bind="{...dialogProps, ...$attrs}"
     @hide="onDialogHide"
   >
-    <suspense>
-      <WidgetProvider :widget-id="widgetId" :context="context">
-        <component
-          :is="widgetComponent"
-          v-if="block && widgetComponent"
-          v-bind="widgetProps"
-          @close="onDialogHide"
-        />
-      </WidgetProvider>
-    </suspense>
+    <WidgetProvider :widget-id="widgetId" :context="context">
+      <component
+        :is="widgetComponent"
+        v-if="block && widgetComponent"
+        v-bind="widgetProps"
+        @close="onDialogHide"
+      />
+    </WidgetProvider>
   </q-dialog>
 </template>

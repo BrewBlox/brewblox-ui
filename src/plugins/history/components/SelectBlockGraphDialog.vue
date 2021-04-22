@@ -23,7 +23,9 @@ export default defineComponent({
       default: 'Add block to graph',
     },
   },
-  emits: useDialog.emits,
+  emits: [
+    ...useDialog.emits,
+  ],
   setup(props) {
     const {
       dialogRef,

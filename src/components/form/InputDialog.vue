@@ -51,9 +51,9 @@ export default defineComponent({
       default: '',
     },
   },
-  emits: {
+  emits: [
     ...useDialog.emits,
-  },
+  ],
   setup(props) {
     const {
       dialogRef,

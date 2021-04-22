@@ -30,7 +30,9 @@ export default defineComponent({
       default: null,
     },
   },
-  emits: useDialog.emits,
+  emits: [
+    ...useDialog.emits,
+  ],
   setup(props) {
     const {
       dialogRef,

@@ -7,6 +7,7 @@ import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 export default defineComponent({
   name: 'RelationsDialog',
   props: {
+    ...useDialog.props,
     serviceId: {
       type: String,
       required: true,
@@ -32,6 +33,9 @@ export default defineComponent({
       default: false,
     },
   },
+  emits: [
+    ...useDialog.emits,
+  ],
   setup() {
     const {
       dialogRef,

@@ -27,7 +27,9 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: useDialog.emits,
+  emits: [
+    ...useDialog.emits,
+  ],
   setup(props) {
     const {
       dialogRef,

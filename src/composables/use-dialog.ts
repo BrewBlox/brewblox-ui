@@ -3,8 +3,8 @@ import { QDialog, QDialogOptions } from 'quasar';
 import {
   getCurrentInstance,
   nextTick,
-  onBeforeMount,
-  onUnmounted,
+  onBeforeUnmount,
+  onMounted,
   PropType,
   provide,
   reactive,
@@ -73,8 +73,7 @@ export const useDialog: UseDialogComposable = {
     const hashId = `.${nanoid(6)}.`;
     const { emit, proxy } = getCurrentInstance()!;
     const dialogRef = ref<QDialog | null>(null);
-    const router = useRouter();
-    const invalidationTrigger = ref(false);
+    const cancelWatcher = ref<() => void>(() => { });
 
     function show(): void {
       dialogRef.value?.show();
@@ -97,7 +96,6 @@ export const useDialog: UseDialogComposable = {
       hide();
     }
 
-
     // Will be overridden if this dialog is showing a widget
     // Used for all other menus and edit dialogs
     provide(ContextKey, reactive({
@@ -106,16 +104,8 @@ export const useDialog: UseDialogComposable = {
       mode: 'Basic',
     }));
 
+    // Lets all nested elements declare that the dialog should be closed immediately
     provide(InvalidateKey, hide);
-
-    watch(
-      () => invalidationTrigger.value,
-      (valid) => {
-        if (!valid) {
-          hide();
-        }
-      },
-    );
 
     // expose public methods required by Dialog plugin
     Object.assign(proxy, { show, hide });
@@ -126,17 +116,21 @@ export const useDialog: UseDialogComposable = {
     // - Push a new page with a unique ID in hash when dialog opens.
     // - Close dialog if the ID disappears from hash (because eg. back button was pressed).
     function setupRouteHash(): void {
+      const router = useRouter();
       router
         .push({ hash: (router.currentRoute.value.hash || '#') + hashId })
         .then(() => nextTick())
-        .then(() => watch(
-          () => router.currentRoute,
-          (newRoute) => {
-            if (!newRoute.value.hash.includes(hashId)) {
-              hide();
-            }
-          },
-        ))
+        .then(() => {
+          cancelWatcher.value = watch(
+            () => router.currentRoute.value,
+            (newRoute) => {
+              if (!newRoute.hash.includes(hashId)) {
+                cancelWatcher.value();
+                hide();
+              }
+            },
+          );
+        })
         .catch(() => { });
     }
 
@@ -144,10 +138,12 @@ export const useDialog: UseDialogComposable = {
     // If closed manually, we need to clean up the current route.
     // Dialogs are not guaranteed to be closed in a LIFO order.
     function teardownRouteHash(): void {
+      const router = useRouter();
       const hash = router.currentRoute.value.hash;
 
       if (hash.endsWith(hashId)) {
         // Dialog was last to be opened - we can go back to undo the stack push.
+        cancelWatcher.value();
         router.back();
       }
       else if (hash.includes(hashId)) {
@@ -159,12 +155,13 @@ export const useDialog: UseDialogComposable = {
         //
         // Ideally, we'd want to remove duplicate pages from the navigation stack,
         // but for security/privacy reasons we can't inspect the stack before calling `router.back()`.
+        cancelWatcher.value();
         router.replace({ hash: hash.replaceAll(hashId, '') });
       }
     }
 
-    onBeforeMount(() => setupRouteHash());
-    onUnmounted(() => teardownRouteHash());
+    onMounted(() => setupRouteHash());
+    onBeforeUnmount(() => teardownRouteHash());
 
     return {
       dialogRef,
