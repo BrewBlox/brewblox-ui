@@ -1,28 +1,48 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
+import { FlowPart } from '../types';
 
+export default defineComponent({
+  name: 'ToggleCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+    defaultValue: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
+    const value = computed<boolean>({
+      get: () => Boolean(props.part.settings[props.settingsKey] ?? props.defaultValue),
+      set: v => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          [props.settingsKey]: v,
+        },
+      }),
+    });
 
-@Component
-export default class ToggleCard extends PartCard {
-
-  @Prop({ type: String, required: true })
-  public readonly settingsKey!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly defaultValue!: boolean;
-
-  @Prop({ type: String, required: true })
-  public readonly label!: string;
-
-  get value(): boolean {
-    return Boolean(this.part.settings[this.settingsKey] ?? this.defaultValue);
-  }
-
-  set value(v: boolean) {
-    this.savePartSettings({ ...this.part.settings, [this.settingsKey]: v });
-  }
-}
+    return {
+      value,
+    };
+  },
+});
 </script>
 
 <template>

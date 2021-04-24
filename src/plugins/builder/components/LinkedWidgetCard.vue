@@ -1,64 +1,78 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { sparkType } from '@/plugins/spark/getters';
-import { dashboardStore, Widget } from '@/store/dashboards';
-import { Service, serviceStore } from '@/store/services';
+import { dashboardStore } from '@/store/dashboards';
+import { Widget, widgetStore } from '@/store/widgets';
 import { objectStringSorter } from '@/utils/functional';
 
+import { FlowPart } from '../types';
 
-@Component
-export default class LinkedWidgetCard extends PartCard {
+export default defineComponent({
+  name: 'LinkedWidgetCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    types: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'Widget',
+    },
+    filter: {
+      type: Function as PropType<(w: Widget) => boolean>,
+      default: null,
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
 
-  @Prop({ type: String, required: true })
-  public readonly settingsKey!: string;
-
-  @Prop({ type: Array, required: true })
-  public readonly types!: string[];
-
-  @Prop({ type: String, default: 'Widget' })
-  public readonly label!: string;
-
-  @Prop({ type: Function })
-  readonly filter!: (widget: Widget) => boolean;
-
-  get sparkServices(): Service[] {
-    return serviceStore.services
-      .filter(svc => svc.type === sparkType);
-  }
-
-  get linked(): string | null {
-    return this.part.settings[this.settingsKey] ?? null;
-  }
-
-  set linked(val: string | null) {
-    this.savePartSettings({
-      ...this.part.settings,
-      [this.settingsKey]: val,
+    const linked = computed<string | null>({
+      get: () => props.part.settings[props.settingsKey] ?? null,
+      set: v => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          [props.settingsKey]: v,
+        },
+      }),
     });
-  }
 
-  get broken(): boolean {
-    return this.linked !== null && !dashboardStore.widgetIds.includes(this.linked);
-  }
+    const broken = computed<boolean>(
+      () => linked.value !== null
+        && !widgetStore.widgetIds.includes(linked.value),
+    );
 
-  get linkedOpts(): SelectOption[] {
-    return dashboardStore.widgets
-      .filter(this.actualFilter)
-      .sort(objectStringSorter('title'))
-      .map(widget => ({
-        label: `[${dashboardStore.dashboardTitle(widget.dashboard)}] ${widget.title}`,
-        value: widget.id,
-      }));
-  }
+    const actualFilter = computed<(v: Widget) => boolean>(
+      () => props.filter ?? (v => props.types.includes(v.feature)),
+    );
 
-  get actualFilter(): (widget: Widget) => boolean {
-    if (this.filter) {
-      return this.filter;
-    }
-    return widget => this.types.includes(widget.feature);
-  }
-}
+    const linkedOpts = computed<SelectOption[]>(
+      () => widgetStore.widgets
+        .filter(actualFilter.value)
+        .sort(objectStringSorter('title'))
+        .map(widget => ({
+          label: `[${dashboardStore.dashboardTitle(widget.dashboard)}] ${widget.title}`,
+          value: widget.id,
+        })),
+    );
+
+    return {
+      linked,
+      linkedOpts,
+      broken,
+    };
+  },
+});
 </script>
 
 <template>

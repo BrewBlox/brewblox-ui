@@ -20,7 +20,7 @@ export default class SetpointDisplay extends PartBase {
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
-    <SetpointValues v-bind="{ part }" />
+    <SetpointValues :part="part" settings-key="setpoint" />
     <g class="outline">
       <rect
         v-show="bordered"

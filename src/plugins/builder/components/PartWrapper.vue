@@ -1,58 +1,74 @@
 <script lang="ts">
+import { computed, defineComponent, PropType } from 'vue';
 
-import { computed, defineComponent } from 'vue';
-
+import { FlowPart } from '@/plugins/builder/types';
 import { squares } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 
 import parts from '../parts';
 import { builderStore } from '../store';
-import { FlowPart } from '@/plugins/builder/types';
 
-@Component({
-  components: { ...parts },
-})
-export default class PartWrapper extends Vue {
-  squares = squares
+export default defineComponent({
+  name: 'PartWrapper',
+  components: {
+    ...parts,
+  },
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    showHover: {
+      type: Boolean,
+      default: false,
+    },
+    selected: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
 
-  @Prop({ type: Object, required: true })
-  readonly part!: FlowPart;
+    const component = computed<string>(
+      () => builderStore.component(props.part),
+    );
 
-  @Prop({ type: Boolean, default: false })
-  readonly showHover!: boolean;
+    const rotateTransform = computed<string>(
+      () => {
+        const [partSizeX, partSizeY] = props.part.size;
+        const [renderSizeX, renderSizeY] = rotatedSize(props.part.rotate, props.part.size);
 
-  @Prop({ type: Boolean, default: false })
-  public readonly selected!: boolean;
+        const farEdge = new Coordinates([partSizeX, partSizeY, 0])
+          .rotate(props.part.rotate, [0, 0, 0]);
 
-  get component(): string {
-    return builderStore.component(this.part);
-  }
+        const trX = farEdge.x < 0 ? squares(renderSizeX) : 0;
+        const trY = farEdge.y < 0 ? squares(renderSizeY) : 0;
 
-  get rotateTransform(): string {
-    const [partSizeX, partSizeY] = this.part.size;
-    const [renderSizeX, renderSizeY] = rotatedSize(this.part.rotate, this.part.size);
+        return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
+      },
+    );
 
-    const farEdge = new Coordinates([partSizeX, partSizeY, 0])
-      .rotate(this.part.rotate, [0, 0, 0]);
+    const flipTransform = computed<string>(
+      () => {
+        if (!props.part.flipped) {
+          return '';
+        }
+        const sizeX = props.part.size[0];
+        return `translate(${squares(sizeX)}, 0) scale(-1, 1)`;
+      },
+    );
 
-    const trX = farEdge.x < 0 ? squares(renderSizeX) : 0;
-    const trY = farEdge.y < 0 ? squares(renderSizeY) : 0;
+    const transformation = computed<string>(
+      () => `${rotateTransform.value} ${flipTransform.value}`,
+    );
 
-    return `translate(${trX}, ${trY}) rotate(${this.part.rotate})`;
-  }
-
-  get flipTransform(): string {
-    if (!this.part.flipped) {
-      return '';
-    }
-    const sizeX = this.part.size[0];
-    return `translate(${squares(sizeX)}, 0) scale(-1, 1)`;
-  }
-
-  get transformation(): string {
-    return `${this.rotateTransform} ${this.flipTransform}`;
-  }
-}
+    return {
+      squares,
+      component,
+      transformation,
+    };
+  },
+});
 </script>
 
 <template>
@@ -60,9 +76,9 @@ export default class PartWrapper extends Vue {
     <component
       :is="component"
       v-if="component"
-      :value="part"
+      :model-value="part"
       class="BuilderPart"
-      v-on="$listeners"
+      v-bind="$attrs"
     />
     <!-- background element, to make the full part clickable -->
     <rect

@@ -1,36 +1,55 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { settingsAddress } from '@/plugins/builder/utils';
 import { BlockAddress } from '@/plugins/spark/types';
 
+import { FlowPart } from '../types';
 
-// @Component
-// export default class BlockAddressCard extends PartCard {
+export default defineComponent({
+  name: 'BlockAddressCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    compatible: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'Block',
+    },
+    creatable: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
+    const address = computed<BlockAddress>({
+      get: () => settingsAddress(props.part, props.settingsKey),
+      set: addr => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          [props.settingsKey]: addr,
+        },
+      }),
+    });
 
-//   @Prop({ type: String, required: true })
-//   public readonly settingsKey!: string;
-
-//   @Prop({ type: Array, required: true })
-//   public readonly compatible!: string[];
-
-//   @Prop({ type: String, default: 'Block' })
-//   public readonly label!: string;
-
-//   @Prop({ type: Boolean, default: true })
-//   public readonly creatable!: boolean;
-
-//   get address(): BlockAddress {
-//     return settingsAddress(this.part, this.settingsKey);
-//   }
-
-//   set address(addr: BlockAddress) {
-//     this.savePartSettings({
-//       ...this.part.settings,
-//       [this.settingsKey]: { ...addr },
-//     });
-//   }
-// }
+    return {
+      address,
+    };
+  },
+});
 </script>
 
 <template>

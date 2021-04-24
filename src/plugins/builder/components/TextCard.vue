@@ -1,25 +1,44 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
+import { FlowPart } from '../types';
 
+export default defineComponent({
+  name: 'TextCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'Text field',
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
+    const text = computed<string>({
+      get: () => props.part.settings[props.settingsKey] ?? '',
+      set: val => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          [props.settingsKey]: val,
+        },
+      }),
+    });
 
-@Component
-export default class TextCard extends PartCard {
-
-  @Prop({ type: String, default: 'text' })
-  public readonly settingsKey!: string;
-
-  @Prop({ type: String, default: 'Text field' })
-  public readonly label!: string;
-
-  get text(): string {
-    return this.part.settings[this.settingsKey] || '';
-  }
-
-  set text(val: string) {
-    this.savePartSettings({ ...this.part.settings, [this.settingsKey]: val });
-  }
-}
+    return {
+      text,
+    };
+  },
+});
 </script>
 
 <template>

@@ -48,7 +48,7 @@
     "query-string": "^6.14.1",
     "simple-keyboard": "^2.32.119",
     "simple-keyboard-layouts": "^1.15.155",
-    "svg-path-properties": "^0.4.11",
+    "svg-path-properties": "^1.0.11",
     "typescript-string-enums": "^1.0.0",
     "url-safe-string": "^1.1.0",
     "vue-json-pretty": "^1.7.1",

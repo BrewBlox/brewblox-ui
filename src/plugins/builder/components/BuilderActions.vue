@@ -1,6 +1,6 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { computed, defineComponent } from 'vue';
+import { nanoid } from 'nanoid';
+import { defineComponent, PropType } from 'vue';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
@@ -10,50 +10,65 @@ import { loadFile } from '@/utils/import-export';
 
 import { builderStore } from '../store';
 
+export default defineComponent({
+  name: 'BuilderActions',
+  props: {
+    layout: {
+      type: Object as PropType<BuilderLayout | null>,
+      default: null,
+    },
+  },
+  emits: [
+    'selected',
+  ],
+  setup(props, { emit }) {
 
-@Component
-export default class BuilderActions extends Vue {
+    function selectLayout(id: string | null): void {
+      emit('selected', id);
+    }
 
-  @Prop({ type: Object, default: null })
-  public readonly layout!: BuilderLayout | null;
-
-  selectLayout(id: string | null): void {
-    this.$emit('selected', id);
-  }
-
-  startAddLayout(copy: boolean): void {
-    createDialog({
-      component: 'InputDialog',
-      title: 'Add Layout',
-      message: 'Create a new Brewery Builder layout',
-      value: 'Brewery Layout',
-    })
-      .onOk(async title => {
-        const id = uid();
-        await builderStore.createLayout({
-          id,
-          title,
-          width: copy && this.layout ? this.layout.width : defaultLayoutWidth,
-          height: copy && this.layout ? this.layout.height : defaultLayoutHeight,
-          parts: copy && this.layout ? deepCopy(this.layout.parts) : [],
+    function startAddLayout(copy: boolean): void {
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          modelValue: 'Brewery Layout',
+          title: 'Add Layout',
+          message: 'Create a new Brewery Builder layout',
+        },
+      })
+        .onOk(async title => {
+          const id = nanoid();
+          await builderStore.createLayout({
+            id,
+            title,
+            width: copy && props.layout ? props.layout.width : defaultLayoutWidth,
+            height: copy && props.layout ? props.layout.height : defaultLayoutHeight,
+            parts: copy && props.layout ? deepCopy(props.layout.parts) : [],
+          });
+          selectLayout(id);
         });
-        this.selectLayout(id);
-      });
-  }
+    }
 
-  async importLayout(): Promise<void> {
-    loadFile<BuilderLayout>(async layout => {
-      const id = uid();
-      await builderStore.createLayout({ ...layout, id });
-      this.selectLayout(id);
-    });
-  }
-}
+    async function importLayout(): Promise<void> {
+      loadFile<BuilderLayout>(async layout => {
+        const id = nanoid();
+        await builderStore.createLayout({ ...layout, id });
+        selectLayout(id);
+      });
+    }
+
+    return {
+      selectLayout,
+      startAddLayout,
+      importLayout,
+    };
+  },
+});
 </script>
 
 
 <template>
-  <ActionMenu v-bind="{...$attrs}">
+  <ActionMenu>
     <template #actions>
       <slot name="actions" />
       <ActionItem

@@ -264,3 +264,19 @@ export function vivifyParts(parts: PersistentPart[]): PersistentPart[] {
     // This improves clickability of overlapping parts
     .sort((a, b) => sizes[b.id] - sizes[a.id]);
 }
+
+export function rotatedCoord(part: FlowPart, coord: string): string {
+  return new Coordinates(coord)
+    .flipShapeEdge(!!part.flipped, 0, part.size)
+    .rotateShapeEdge(part.rotate, 0, part.size)
+    .toString();
+}
+
+export function liquidOnCoord(part: FlowPart, coord: string): string[] {
+  return Object.keys(part.flows[rotatedCoord(part, coord)] ?? {});
+}
+
+export function flowOnCoord(part: FlowPart, coord: string): number {
+  return Object.values(part.flows[rotatedCoord(part, coord)] ?? {})
+    .reduce((sum, v) => sum + v, 0);
+}

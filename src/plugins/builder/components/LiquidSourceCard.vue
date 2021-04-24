@@ -1,41 +1,68 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { BEER, COLD_WATER, HOT_WATER, WORT } from '@/plugins/builder/const';
 import { colorString } from '@/plugins/builder/utils';
 
+import { FlowPart } from '../types';
 
+const presetColors: string[] = [
+  COLD_WATER,
+  HOT_WATER,
+  BEER,
+  WORT,
+];
 
-@Component
-export default class LiquidSourceCard extends PartCard {
-  presetColors = [
-    COLD_WATER,
-    HOT_WATER,
-    BEER,
-    WORT,
-  ];
+export default defineComponent({
+  name: 'ColorCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
 
-  get pressured(): boolean {
-    return this.part.settings.enabled ?? !!this.part.settings.pressure;
-  }
+    const pressured = computed<boolean>({
+      get: () => props.part.settings.enabled ?? Boolean(props.part.settings.pressure),
+      set: enabled => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          enabled,
+        },
+      }),
+    });
 
-  set pressured(enabled: boolean) {
-    this.savePart({ ...this.part, settings: { ...this.part.settings, enabled } });
-  }
+    const color = computed<string | null>({
+      get: () => props.part.settings.liquids?.[0] ?? null,
+      set: v => {
+        const liquids = v ? [colorString[v]] : [];
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            liquids,
+          },
+        });
+      },
+    });
 
-  get color(): string | null {
-    return this.part.settings.liquids?.[0] ?? null;
-  }
+    function toggle(c: string): void {
+      color.value = c !== color.value ? c : null;
+    }
 
-  set color(val: string | null) {
-    const liquids = val ? [colorString(val)] : [];
-    this.savePart({ ...this.part, settings: { ...this.part.settings, liquids } });
-  }
-
-  toggle(color: string): void {
-    this.color = color !== this.color ? color : null;
-  }
-}
+    return {
+      pressured,
+      presetColors,
+      color,
+      toggle,
+    };
+  },
+});
 </script>
 
 <template>

@@ -1,24 +1,27 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
+import { FlowPart } from '../types';
 
-
-
-@Component
-export default class BorderCard extends PartCard {
-
-  @Prop({ type: String, default: 'bordered' })
-  public readonly settingsKey!: string;
-
-  @Prop({ type: String, default: 'Show border' })
-  public readonly label!: string;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly defaultValue!: boolean;
-
-}
+export default defineComponent({
+  name: 'BorderCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      default: 'bordered',
+    },
+    defaultValue: {
+      type: Boolean,
+      default: true,
+    },
+  },
+});
 </script>
 
 <template>
-  <ToggleCard v-bind="{...$attrs, ...$props}" v-on="$listeners" />
+  <ToggleCard v-bind="{...$attrs, ...$props}" />
 </template>

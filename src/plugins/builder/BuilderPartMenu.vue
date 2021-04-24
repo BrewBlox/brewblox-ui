@@ -66,8 +66,8 @@ export default class BuilderPartMenu extends DialogBase {
   <q-dialog
     ref="dialog"
     persistent
-    :value="true"
-    @input="close"
+    :model-value="true"
+    @update:model-value="close"
     @keyup.esc="close"
   >
     <CardWrapper v-bind="{context}">

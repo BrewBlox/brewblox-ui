@@ -1,9 +1,11 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-
-@Component
-export default class UnknownPart extends PartBase { }
+export default defineComponent({
+  name: 'UnknownPart',
+});
+// @Component
+// export default class UnknownPart extends PartBase { }
 </script>
 
 <template>

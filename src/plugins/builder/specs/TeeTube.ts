@@ -1,4 +1,4 @@
-import { CENTER, LEFT, RIGHT, UP } from '@/plugins/builder/getters';
+import { CENTER, LEFT, RIGHT, UP } from '@/plugins/builder/const';
 import { PartSpec } from '@/plugins/builder/types';
 
 const spec: PartSpec = {

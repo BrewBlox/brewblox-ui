@@ -1,4 +1,4 @@
-import { LEFT, RIGHT } from '@/plugins/builder/getters';
+import { LEFT, RIGHT } from '@/plugins/builder/const';
 import { PartSpec, PartUpdater, PersistentPart, Transitions } from '@/plugins/builder/types';
 
 const spec: PartSpec = {

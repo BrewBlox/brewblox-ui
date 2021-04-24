@@ -1,4 +1,4 @@
-import { CENTER, LEFT } from '@/plugins/builder/getters';
+import { CENTER, LEFT } from '@/plugins/builder/const';
 import { PartSpec } from '@/plugins/builder/types';
 import { Coordinates } from '@/utils/coordinates';
 

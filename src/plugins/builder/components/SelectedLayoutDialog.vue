@@ -1,33 +1,55 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 
-
+import { useDialog } from '@/composables';
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 
+export default defineComponent({
+  name: 'SelectedLayoutDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: String,
+      default: null,
+    },
+    title: {
+      type: String,
+      default: 'Select layout',
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
+    const local = ref<BuilderLayout | null>(builderStore.layoutById(props.modelValue));
 
-@Component
-export default class SelectedLayoutDialog extends DialogBase {
-  local: BuilderLayout | null = null;
+    const layouts = computed<BuilderLayout[]>(
+      () => builderStore.layouts,
+    );
 
-  @Prop({ type: String, default: 'Select layout' })
-  public readonly title!: string;
+    function save(layout: BuilderLayout | null): void {
+      onDialogOK(layout?.id ?? null);
+    }
 
-  @Prop({ type: String, required: false })
-  public readonly value!: string;
-
-  created(): void {
-    this.local = builderStore.layoutById(this.value);
-  }
-
-  get layouts(): BuilderLayout[] {
-    return builderStore.layouts;
-  }
-
-  save(layout: BuilderLayout | null): void {
-    this.onDialogOk(layout?.id ?? null);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      layouts,
+      save,
+    };
+  },
+});
 </script>
 
 <template>

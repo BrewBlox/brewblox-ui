@@ -18,22 +18,22 @@ import { ContextKey, InvalidateKey } from '@/symbols';
 
 export interface UseDialogProps {
   title: {
-    type: PropType<string>,
-    default: string,
-  },
+    type: PropType<string>;
+    default: string;
+  };
   message: {
-    type: PropType<string>,
-    default: string,
-  },
+    type: PropType<string>;
+    default: string;
+  };
   html: {
-    type: PropType<boolean>,
-    default: false,
-  }
+    type: PropType<boolean>;
+    default: false;
+  };
 }
 
 export type UseDialogEmits = [
   'ok',
-  'hide'
+  'hide',
 ];
 
 export interface UseDialogComponent {

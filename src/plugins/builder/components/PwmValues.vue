@@ -1,65 +1,85 @@
 <script lang="ts">
 
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
-import { ActuatorPwmBlock } from '@/plugins/spark/types';
-import { BlockAddress } from '@/plugins/spark/types';
-
-import { settingsAddress, squares, textTransformation } from '@/plugins/builder/utils';
 import { PersistentPart } from '@/plugins/builder/types';
+import { settingsAddress, squares, textTransformation } from '@/plugins/builder/utils';
+import { sparkStore } from '@/plugins/spark/store';
+import { ActuatorPwmBlock, BlockType } from '@/plugins/spark/types';
+import { BlockAddress } from '@/plugins/spark/types';
+import { truncateRound } from '@/utils/functional';
 
+export default defineComponent({
+  name: 'PwmValues',
+  props: {
+    part: {
+      type: Object as PropType<PersistentPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    noBorder: {
+      type: Boolean,
+      default: false,
+    },
+    startX: {
+      type: Number,
+      default: 0,
+    },
+    startY: {
+      type: Number,
+      default: 0,
+    },
+    color: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
+    const address = computed<BlockAddress>(
+      () => settingsAddress(props.part, props.settingsKey),
+    );
 
-@Component
-export default class PwmValues extends Vue {
-  squares = squares;
+    const block = computed<ActuatorPwmBlock | null>(
+      () => {
+        const storeBlock = sparkStore.blockByAddress<ActuatorPwmBlock>(address.value);
+        return storeBlock?.type === BlockType.ActuatorPwm
+          ? storeBlock
+          : null;
+      },
+    );
 
-  @Prop({ type: Object, required: true })
-  public readonly part!: PersistentPart;
+    const isBroken = computed<boolean>(
+      () => block.value === null
+        && address.value.id !== null,
+    );
 
-  @Prop({ type: String, default: 'pwm' })
-  public readonly settingsKey!: string;
+    const pwmValue = computed<number | null>(
+      () => block.value?.data.enabled
+        ? block.value.data.value
+        : null,
+    );
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noBorder!: boolean;
+    const transform = computed<string>(
+      () => textTransformation(props.part, [1, 1]),
+    );
 
-  @Prop({ type: Number, default: 0 })
-  public readonly startX!: number;
-
-  @Prop({ type: Number, default: 0 })
-  public readonly startY!: number;
-
-  @Prop({ type: String, default: '' })
-  public readonly color!: string;
-
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.settingsKey);
-  }
-
-  get block(): ActuatorPwmBlock | null {
-    const { serviceId, id } = this.address;
-    return sparkStore.blockById(serviceId, id);
-  }
-
-  get isBroken(): boolean {
-    return this.block == null
-      && this.address.id !== null;
-  }
-
-  get pwmValue(): number | null {
-    return this.block && this.block.data.enabled
-      ? this.block.data.value
-      : null;
-  }
-
-  get transform(): string {
-    return textTransformation(this.part, [1, 1]);
-  }
-
-  public get bordered(): boolean {
-    return this.part.settings.bordered ?? true;
-  }
-}
+    const bordered = computed<boolean>(
+      () => props.part.settings.bordered ?? true,
+    );
+    return {
+      squares,
+      truncateRound,
+      block,
+      isBroken,
+      pwmValue,
+      transform,
+      bordered,
+    };
+  },
+});
 </script>
 
 <template>
@@ -91,7 +111,7 @@ export default class PwmValues extends Vue {
       <template v-else>
         <PwmIcon class="col" />
         <div class="col text-bold">
-          {{ pwmValue | truncateRound }}
+          {{ truncateRound(pwmValue) }}
           <small v-if="!!block">%</small>
         </div>
       </template>

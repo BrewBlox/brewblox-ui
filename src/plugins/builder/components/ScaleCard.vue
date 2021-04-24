@@ -1,55 +1,84 @@
 <script lang="ts">
 import range from 'lodash/range';
 import { debounce } from 'quasar';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
+import { FlowPart } from '../types';
 
+export default defineComponent({
+  name: 'ScaleCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    defaultSize: {
+      type: Array as unknown as PropType<[number, number]>,
+      required: true,
+    },
+    minSize: {
+      type: Number,
+      default: 1,
+    },
+    maxSize: {
+      type: Number,
+      default: 15,
+    },
+    label: {
+      type: String,
+      default: 'Scale',
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
+    const scales = computed<number[]>(
+      () => {
+        const [defaultX, defaultY] = props.defaultSize;
+        const [big, small] = defaultY > defaultX
+          ? [defaultY, defaultX]
+          : [defaultX, defaultY];
 
-@Component
-export default class ScaleCard extends PartCard {
+        // We only want scale values where both X and Y size are integer
+        // Iterate between small === minSize and big === maxSize
+        // Step size ensures small is integer
+        // Filter all values where the scaled big is not integer
+        return range(props.minSize, Math.floor(props.maxSize * (small / big)) + 1)
+          .map(smallScaled => smallScaled / small)
+          .filter(scale => (big * scale) % 1 === 0);
+      },
+    );
 
-  @Prop({ type: String, default: 'scale' })
-  public readonly settingsKey!: string;
+    const index = computed<number>(
+      () => {
+        const scale = props.part.settings[props.settingsKey] ?? 1;
+        const idx = scales.value.findIndex(v => v === scale);
+        return Math.max(idx, 0);
+      },
+    );
 
-  @Prop({ type: Array, required: true })
-  public readonly defaultSize!: [number, number];
+    const save = debounce(
+      (idx: number): void => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          [props.settingsKey]: scales.value[idx],
+        },
+      }),
+      50, true);
 
-  @Prop({ type: Number, default: 1 })
-  public readonly minSize!: number;
-
-  @Prop({ type: Number, default: 15 })
-  public readonly maxSize!: number;
-
-  @Prop({ type: String, default: 'Scale' })
-  public readonly label!: string;
-
-  get scales(): number[] {
-    const [defaultX, defaultY] = this.defaultSize;
-    const [big, small] = defaultY > defaultX
-      ? [defaultY, defaultX]
-      : [defaultX, defaultY];
-
-    // We only want scale values where both X and Y size are integer
-    // Iterate between small === minSize and big === maxSize
-    // Step size ensures small is integer
-    // Filter all values where the scaled big is not integer
-    return range(this.minSize, Math.floor(this.maxSize * (small / big)) + 1)
-      .map(smallScaled => smallScaled / small)
-      .filter(scale => (big * scale) % 1 === 0);
-  }
-
-  get index(): number {
-    const scale = this.part.settings[this.settingsKey] ?? 1;
-    const idx = this.scales.findIndex(v => v === scale);
-    return Math.max(idx, 0);
-  }
-
-  save(idx: number): void {
-    this.savePartSettings({ ...this.part.settings, [this.settingsKey]: this.scales[idx] });
-  }
-
-  debouncedSave = debounce(this.save, 50, true)
-}
+    return {
+      scales,
+      index,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
@@ -59,11 +88,11 @@ export default class ScaleCard extends PartCard {
         {{ label }}
       </q-item-label>
       <q-slider
-        :value="index"
+        :model-value="index"
         :min="0"
         :max="scales.length - 1"
         markers
-        @change="debouncedSave"
+        @change="save"
       />
     </q-item-section>
   </q-item>

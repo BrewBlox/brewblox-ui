@@ -1,202 +1,234 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { computed, defineComponent } from 'vue';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { defaultLayoutHeight, defaultLayoutWidth } from '@/plugins/builder/const';
+import { builderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
-import { dashboardStore, Widget } from '@/store/dashboards';
+import { dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
+import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { deepCopy } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
 import notify from '@/utils/notify';
 
-import { builderStore } from '../store';
+export default defineComponent({
+  name: 'LayoutActions',
+  props: {
+    layout: {
+      type: Object as PropType<BuilderLayout | null>,
+      default: null,
+    },
+    noLabel: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'selected',
+  ],
+  setup(props, { emit }) {
+    const layoutIds = computed<string[]>(
+      () => builderStore.layoutIds,
+    );
 
+    const title = computed<string>(
+      () => props.layout?.title ?? 'Unknown',
+    );
 
-@Component
-export default class LayoutActions extends Vue {
+    const label = computed<string | null>(
+      () => props.noLabel ? null : title.value,
+    );
 
-  @Prop({ type: Object, default: null })
-  public readonly layout!: BuilderLayout | null;
+    const scale = computed<number>(
+      () => props.layout?.scale || 1,
+    );
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noLabel!: boolean;
-
-  get layoutIds(): string[] {
-    return builderStore.layoutIds;
-  }
-
-  get title(): string {
-    return this.layout?.title ?? 'Unknown';
-  }
-
-  get label(): string | null {
-    return this.noLabel ? null : this.title;
-  }
-
-  get scale(): number {
-    return this.layout?.scale ?? 1;
-  }
-
-  get listed(): boolean {
-    return this.layout?.listed ?? true;
-  }
-
-  set listed(v: boolean) {
-    if (this.layout) {
-      builderStore.saveLayout({ ...this.layout, listed: v });
-    }
-  }
-
-  get isHomePage(): boolean {
-    return systemStore.config.homePage === `/brewery/${this.layout?.id}`;
-  }
-
-  set isHomePage(v: boolean) {
-    const homePage = v && this.layout ? `/brewery/${this.layout.id}` : null;
-    systemStore.saveConfig({ homePage });
-  }
-
-  selectLayout(id: string | null): void {
-    this.$emit('selected', id);
-  }
-
-  editScale(): void {
-    createDialog({
-      component: 'InputDialog',
-      title: 'Set zoom level',
-      suffix: '%',
-      value: (1 / this.scale) * 100,
-      rules: [
-        v => v === null || v > 0 || 'Value must be > 0',
-      ],
-    })
-      .onOk(v => {
-        if (this.layout) {
-          const scale = 100 / (v ?? 100);
-          builderStore.saveLayout({ ...this.layout, scale });
+    const listed = computed<boolean>({
+      get: () => props.layout?.listed ?? true,
+      set: v => {
+        if (props.layout) {
+          builderStore.saveLayout({ ...props.layout, listed: v });
         }
-      });
-  }
+      },
+    });
 
-  startAddLayout(copy: boolean): void {
-    createDialog({
-      component: 'InputDialog',
-      title: 'Add Layout',
-      message: 'Create a new Brewery Builder layout',
-      value: 'Brewery Layout',
-    })
-      .onOk(async title => {
-        const id = uid();
-        await builderStore.createLayout({
-          id,
-          title,
-          width: copy && this.layout ? this.layout.width : defaultLayoutWidth,
-          height: copy && this.layout ? this.layout.height : defaultLayoutHeight,
-          parts: copy && this.layout ? deepCopy(this.layout.parts) : [],
+    const isHomePage = computed<boolean>({
+      get: () => systemStore.config.homePage === `/brewery/${props.layout?.id}`,
+      set: v => {
+        const homePage = v && props.layout ? `/brewery/${props.layout.id}` : null;
+        systemStore.saveConfig({ homePage });
+      },
+    });
+
+    function selectLayout(id: string | null): void {
+      emit('selected', id);
+    }
+
+    function editScale(): void {
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          title: 'Set zoom level',
+          suffix: '%',
+          modelValue: (1 / scale.value) * 100,
+          rules: [
+            v => v === null || v > 0 || 'Value must be > 0',
+          ],
+        },
+      })
+        .onOk(v => {
+          if (props.layout) {
+            const scale = 100 / (v ?? 100);
+            builderStore.saveLayout({ ...props.layout, scale });
+          }
         });
-        this.selectLayout(id);
-      });
-  }
-
-  exportLayout(): void {
-    if (!this.layout) {
-      return;
     }
-    const { id, ...exported } = this.layout;
-    void id;
-    saveFile(exported, `brewblox-${this.layout.title}-layout.json`);
-  }
 
-  renameLayout(): void {
-    if (!this.layout) {
-      return;
+    function startAddLayout(copy: boolean): void {
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          title: 'Add Layout',
+          message: 'Create a new Brewery Builder layout',
+          modelValue: 'Brewery Layout',
+        },
+      })
+        .onOk(async title => {
+          const id = nanoid();
+          await builderStore.createLayout({
+            id,
+            title,
+            width: copy && props.layout ? props.layout.width : defaultLayoutWidth,
+            height: copy && props.layout ? props.layout.height : defaultLayoutHeight,
+            parts: copy && props.layout ? deepCopy(props.layout.parts) : [],
+          });
+          selectLayout(id);
+        });
     }
-    createDialog({
-      component: 'InputDialog',
-      title: 'Change Layout title',
-      message: `Choose a new name for ${this.layout.title}`,
-      value: this.layout.title,
-    })
-      .onOk(async title => {
-        if (this.layout) {
-          builderStore.saveLayout({ ...this.layout, title });
-        }
-      });
-  }
 
-  clearParts(): void {
-    createDialog({
-      component: 'ConfirmDialog',
-      title: 'Remove parts',
-      message: 'Are you sure you wish to remove all parts?',
-      noBackdropDismiss: true,
-    })
-      .onOk(() => {
-        if (this.layout) {
-          builderStore.saveLayout({ ...this.layout, parts: [] });
-        }
-      });
-  }
-
-  removeLayout(): void {
-    if (!this.layout) {
-      return;
+    function exportLayout(): void {
+      if (!props.layout) {
+        return;
+      }
+      const { id, ...exported } = props.layout;
+      void id;
+      saveFile(exported, `brewblox-${props.layout.title}-layout.json`);
     }
-    createDialog({
-      component: 'ConfirmDialog',
-      title: 'Remove layout',
-      message: `Are you sure you wish to remove ${this.layout.title}?`,
-      noBackdropDismiss: true,
-    })
-      .onOk(async () => {
-        if (this.layout) {
-          await builderStore.removeLayout(this.layout)
-            .catch(() => { });
-        }
-        const [id] = this.layoutIds;
-        this.selectLayout(id || null);
-      });
-  }
 
-  createLayoutWidget(): void {
-    if (!this.layout) { return; }
+    function renameLayout(): void {
+      if (!props.layout) {
+        return;
+      }
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          title: 'Change Layout title',
+          message: `Choose a new name for ${props.layout.title}`,
+          modelValue: props.layout.title,
+        },
+      })
+        .onOk(title => {
+          if (props.layout) {
+            builderStore.saveLayout({ ...props.layout, title });
+          }
+        });
+    }
 
-    const selectOptions = dashboardStore.dashboards
-      .map(dashboard => ({
-        label: dashboard.title,
-        value: dashboard.id,
-      }));
+    function clearParts(): void {
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Remove parts',
+          message: 'Are you sure you wish to remove all parts?',
+          noBackdropDismiss: true,
+        },
+      })
+        .onOk(() => {
+          if (props.layout) {
+            builderStore.saveLayout({ ...props.layout, parts: [] });
+          }
+        });
+    }
 
-    createDialog({
-      component: 'SelectDialog',
-      title: 'Make widget',
-      message: `On which dashboard do you want to create a widget for <b>${this.layout.title}</b>?`,
-      listSelect: selectOptions.length < 10,
-      html: true,
-      selectOptions,
-    })
-      .onOk(async (dashboard: string) => {
-        const layout = this.layout!;
-        const widget: Widget<BuilderConfig> = {
-          id: uid(),
-          title: layout.title,
-          order: 0,
-          dashboard,
-          feature: 'Builder',
-          cols: Math.max(2, Math.ceil(layout.width * (50 / 120))),
-          rows: Math.max(2, Math.ceil(layout.height * (50 / 120))),
-          config: {
-            currentLayoutId: layout.id,
-            layoutIds: [layout.id],
-          },
-        };
-        await dashboardStore.appendWidget(widget);
-        notify.done(`Created <b>${layout.title}</b> widget on <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
-      });
-  }
-}
+    function removeLayout(): void {
+      if (!props.layout) {
+        return;
+      }
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Remove layout',
+          message: `Are you sure you wish to remove ${props.layout.title}?`,
+          noBackdropDismiss: true,
+        },
+      })
+        .onOk(async () => {
+          if (props.layout) {
+            await builderStore.removeLayout(props.layout)
+              .catch(() => { });
+          }
+          const [id] = layoutIds.value;
+          selectLayout(id || null);
+        });
+    }
+
+    function createLayoutWidget(): void {
+      if (!props.layout) { return; }
+
+      const selectOptions = dashboardStore.dashboards
+        .map(dashboard => ({
+          label: dashboard.title,
+          value: dashboard.id,
+        }));
+
+      createDialog({
+        component: 'SelectDialog',
+        componentProps: {
+          title: 'Make widget',
+          message: `On which dashboard do you want to create a widget for <b>${props.layout.title}</b>?`,
+          listSelect: selectOptions.length < 10,
+          html: true,
+          selectOptions,
+        },
+      })
+        .onOk(async (dashboard: string) => {
+          const layout = props.layout!;
+          const widget: Widget<BuilderConfig> = {
+            id: nanoid(),
+            title: layout.title,
+            order: 0,
+            dashboard,
+            feature: 'Builder',
+            cols: Math.max(2, Math.ceil(layout.width * (50 / 120))),
+            rows: Math.max(2, Math.ceil(layout.height * (50 / 120))),
+            config: {
+              currentLayoutId: layout.id,
+              layoutIds: [layout.id],
+            },
+          };
+          await widgetStore.appendWidget(widget);
+          notify.done(`Created <b>${layout.title}</b> widget on <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
+        });
+    }
+
+    return {
+      label,
+      scale,
+      listed,
+      isHomePage,
+      selectLayout,
+      editScale,
+      startAddLayout,
+      renameLayout,
+      createLayoutWidget,
+      exportLayout,
+      clearParts,
+      removeLayout,
+    };
+  },
+});
 </script>
 
 

@@ -1,20 +1,43 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 import { clampRotation } from '@/utils/functional';
 
+import { FlowPart } from '../types';
 
-@Component
-export default class PlacementCard extends PartCard {
-  rotate(rotation: number): void {
-    const rotate = clampRotation(this.part.rotate + rotation);
-    this.savePart({ ...this.part, rotate });
-  }
+export default defineComponent({
+  name: 'PlacementPartCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:part',
+    'remove:part',
+  ],
+  setup(props, { emit }) {
+    function rotate(rotation: number): void {
+      const rotate = clampRotation(props.part.rotate + rotation);
+      emit('update:part', { ...props.part, rotate });
+    }
 
-  flip(): void {
-    this.savePart({ ...this.part, flipped: !this.part.flipped });
-  }
-}
+    function flip(): void {
+      emit('update:part', { ...props.part, flipped: !props.part.flipped });
+    }
+
+    function removePart(): void {
+      emit('remove:part', props.part);
+    }
+
+    return {
+      rotate,
+      flip,
+      removePart,
+    };
+  },
+});
 </script>
 
 <template>

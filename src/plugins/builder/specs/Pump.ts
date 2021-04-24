@@ -1,4 +1,4 @@
-import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '@/plugins/builder/getters';
+import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '@/plugins/builder/const';
 import { PartSpec, PartUpdater, PersistentPart } from '@/plugins/builder/types';
 import { settingsBlock, showAbsentBlock, showDrivingBlockDialog } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';

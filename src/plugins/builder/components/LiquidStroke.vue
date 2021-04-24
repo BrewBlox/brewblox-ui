@@ -1,39 +1,56 @@
 <script lang="ts">
 import { svgPathProperties } from 'svg-path-properties';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { computed, defineComponent } from 'vue';
+export default defineComponent({
+  name: 'LiquidStroke',
+  props: {
+    colors: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+    paths: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+  },
+  setup(props) {
 
-@Component
-export default class LiquidStroke extends Vue {
+    const pathLengths = computed<number[]>(
+      () => props.paths.map(v => svgPathProperties(v).getTotalLength()),
+    );
 
-  @Prop({ type: Array, required: true })
-  readonly colors!: string[];
+    const dashArrays = computed<number[][]>(
+      () => {
+        const numColors = props.colors.length;
+        if (numColors < 2) {
+          return [[1]];
+        }
+        return pathLengths.value.map(v => {
+          const colorLength = v / numColors;
+          return Array.from(new Array(numColors * 2), (x, i) => (i % 2 ? v - colorLength : colorLength));
+        });
+      },
+    );
 
-  @Prop({ type: Array, required: true })
-  readonly paths!: string[];
-
-  get pathLengths(): number[] {
-    return this.paths.map(v => svgPathProperties(v).getTotalLength());
-  }
-
-  get dashArrays(): number[][] {
-    const numColors = this.colors.length;
-    if (numColors < 2) {
-      return [[1]];
-    }
-    return this.pathLengths.map(v => {
-      const colorLength = v / numColors;
-      return Array.from(new Array(numColors * 2), (x, i) => (i % 2 ? v - colorLength : colorLength));
-    });
-  }
-}
+    return {
+      pathLengths,
+      dashArrays,
+    };
+  },
+});
 </script>
 
 <template>
   <g v-if="colors.length == 1">
-    <template v-for="(path, pidx) in paths">
-      <path :key="`${pidx}`" :d="path" :stroke="colors[0]" stroke-linecap="butt" class="liquid" />
-    </template>
+    <path
+      v-for="(path, pidx) in paths"
+      :key="`path-${pidx}`"
+      :d="path"
+      :stroke="colors[0]"
+      stroke-linecap="butt"
+      class="liquid"
+    />
   </g>
   <g v-else-if="colors.length > 1">
     <template v-for="(path, pidx) in paths">

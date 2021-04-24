@@ -1,4 +1,4 @@
-import { LEFT, RIGHT, UP } from '@/plugins/builder/getters';
+import { LEFT, RIGHT, UP } from '@/plugins/builder/const';
 import { PartSpec, PartUpdater, PersistentPart, Transitions } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';

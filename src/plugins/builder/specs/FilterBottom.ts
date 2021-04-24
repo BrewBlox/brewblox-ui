@@ -1,4 +1,4 @@
-import { CENTER, LEFT } from '@/plugins/builder/getters';
+import { CENTER, LEFT } from '@/plugins/builder/const';
 import { PartSpec, PersistentPart } from '@/plugins/builder/types';
 
 const DEFAULT_SIZE_X = 4;
