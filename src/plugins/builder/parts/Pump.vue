@@ -1,82 +1,107 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, onBeforeMount, PropType, watch } from 'vue';
 
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
-import { settingsBlock } from '@/plugins/builder/utils';
+import { liquidOnCoord, settingsBlock } from '@/plugins/builder/utils';
 import { ActuatorPwmBlock, BlockType, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
 
-type ActuatorType = DigitalActuatorBlock | ActuatorPwmBlock;
+import { PUMP_KEY, PUMP_TYPES, PumpT } from '../specs/Pump';
+import { FlowPart } from '../types';
 
-@Component
-export default class Pump extends PartBase {
-  addressKey = 'actuator';
+export default defineComponent({
+  name: 'Pump',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:part',
+    'dirty',
+  ],
+  setup(props, { emit }) {
+    const hasAddress = computed<boolean>(
+      () => props.part.settings[PUMP_KEY]?.id != null,
+    );
 
-  get hasAddress(): boolean {
-    return !!this.settings[this.addressKey]?.id;
-  }
+    const block = computed<PumpT | null>(
+      () => settingsBlock(props.part, PUMP_KEY, PUMP_TYPES),
+    );
 
-  get block(): ActuatorType | null {
-    return settingsBlock(this.part, this.addressKey);
-  }
+    const enabled = computed<boolean>(
+      () => {
+        if (block.value === null) {
+          return hasAddress.value
+            ? false
+            : Boolean(props.part.settings.enabled);
+        }
+        else if (block.value.type === BlockType.DigitalActuator) {
+          return block.value.data.state === DigitalState.STATE_ACTIVE;
+        }
+        else if (block.value.type === BlockType.ActuatorPwm) {
+          return block.value.data.setting > 0;
+        }
+        else {
+          return false;
+        }
+      },
+    );
 
-  get enabled(): boolean {
-    if (this.block === null) {
-      return this.hasAddress
-        ? false
-        : Boolean(this.settings.enabled);
-    }
-    else if (this.block.type === BlockType.DigitalActuator) {
-      return this.block.data.state === DigitalState.STATE_ACTIVE;
-    }
-    else if (this.block.type === BlockType.ActuatorPwm) {
-      return this.block.data.setting > 0;
-    }
-    else {
-      return false;
-    }
-  }
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, LEFT),
+    );
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(LEFT);
-  }
+    const pwmSetting = computed<number>(
+      () => block.value?.type === BlockType.ActuatorPwm
+        ? block.value.data.setting
+        : 100,
+    );
 
-  get pwmSetting(): number {
-    return this.block?.type == BlockType.ActuatorPwm
-      ? this.block.data.setting
-      : 100;
-  }
+    const duration = computed<number>(
+      () => {
+        const pressure = ((props.part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE) / 100 * pwmSetting.value) || 0.01;
+        const animationDuration = 60 / pressure;
+        return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
+      },
+    );
 
-  get duration(): number {
-    const pressure = ((this.settings.onPressure ?? DEFAULT_PUMP_PRESSURE) / 100 * this.pwmSetting) || 0.01;
-    const animationDuration = 60 / pressure;
-    return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
-  }
+    watch(
+      () => block.value,
+      (newV, oldV) => {
+        if (newV === null
+          || oldV === null
+          || (newV as DigitalActuatorBlock).data.state !== (oldV as DigitalActuatorBlock).data.state
+          || (newV as ActuatorPwmBlock).data.setting !== (oldV as ActuatorPwmBlock).data.setting
+        ) {
+          emit('dirty');
+        }
+      },
+    );
 
-  @Watch('block')
-  triggerUpdate(block, prevBlock): void {
-    if (block === null
-      || prevBlock === null
-      || block.data.state !== prevBlock.data.state // digital
-      || block.data.setting !== prevBlock.data.setting // PWM
-    ) {
-      this.invalidateFlows();
-    }
-  }
+    onBeforeMount(
+      () => {
+        if (props.part.settings.pwm !== undefined) {
+          emit('update:part', {
+            ...props.part,
+            settings: {
+              ...props.part.settings,
+              [PUMP_KEY]: props.part.settings.pwm,
+              pwm: undefined,
+            },
+          });
+        }
+      },
+    );
 
-  created(): void {
-    // Migrate key from PWMPump part
-    if (this.part.settings.pwm !== undefined) {
-      this.savePart({
-        ...this.part,
-        settings: {
-          ...this.part.settings,
-          actuator: this.part.settings.pwm,
-          pwm: undefined,
-        },
-      });
-    }
-  }
-}
+    return {
+      hasAddress,
+      enabled,
+      liquids,
+      duration,
+    };
+  },
+});
 </script>
 
 <template>

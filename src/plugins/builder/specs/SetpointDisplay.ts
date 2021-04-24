@@ -3,14 +3,15 @@ import { showSettingsBlock, universalTransitions } from '@/plugins/builder/utils
 import { BlockIntfType } from '@/plugins/spark/types';
 
 
-const SIZE_X = 2;
-const SIZE_Y = 1;
-const settingsKey = 'setpoint';
-const scaleKey = 'scale';
-const flowEnabledKey = 'flowEnabled';
+export const SIZE_X = 2;
+export const SIZE_Y = 1;
+export const SETPOINT_KEY = 'setpoint';
+export const SETPOINT_TYPES = [BlockIntfType.SetpointSensorPairInterface];
+export const SCALE_KEY = 'scale';
+export const FLOW_TOGGLE_KEY = 'flowEnabled';
 
 const size: PartSpec['size'] = ({ settings }) => {
-  const scale = settings[scaleKey] ?? 1;
+  const scale = settings[SCALE_KEY] ?? 1;
   return [SIZE_X * scale, SIZE_Y * scale];
 };
 
@@ -21,22 +22,22 @@ const spec: PartSpec = {
     {
       component: 'BlockAddressCard',
       props: {
-        settingsKey,
-        compatible: [BlockIntfType.SetpointSensorPairInterface],
+        settingsKey: SETPOINT_KEY,
+        compatible: SETPOINT_TYPES,
         label: 'Setpoint',
       },
     },
     {
       component: 'ScaleCard',
       props: {
-        settingsKey: scaleKey,
+        settingsKey: SCALE_KEY,
         defaultSize: [SIZE_X, SIZE_Y],
       },
     },
     {
       component: 'ToggleCard',
       props: {
-        settingsKey: flowEnabledKey,
+        settingsKey: FLOW_TOGGLE_KEY,
         label: 'Allow liquid to flow through this part',
       },
     },
@@ -45,8 +46,8 @@ const spec: PartSpec = {
     },
   ],
   size,
-  transitions: part => universalTransitions(size(part), part.settings[flowEnabledKey]),
-  interactHandler: part => showSettingsBlock(part, settingsKey),
+  transitions: part => universalTransitions(size(part), part.settings[FLOW_TOGGLE_KEY]),
+  interactHandler: part => showSettingsBlock(part, SETPOINT_KEY, SETPOINT_TYPES),
 };
 
 export default spec;

@@ -1,79 +1,94 @@
 <script lang="ts">
 import { mdiArrowRightBold } from '@quasar/extras/mdi-v5';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { settingsAddress } from '@/plugins/builder/utils';
-import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
-import { objectSorter } from '@/utils/functional';
+import { squares } from '@/plugins/builder/utils';
+import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
+import { objectSorter, round } from '@/utils/functional';
 
+import { usePart, useSettingsBlock } from '../composables';
+import { PROFILE_KEY, PROFILE_TYPES } from '../specs/ProfileDisplay';
+import { FlowPart } from '../types';
 
+export default defineComponent({
+  name: 'ProfileDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+    } = usePart.setup(props.part);
 
+    const {
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<SetpointProfileBlock>(props.part, PROFILE_KEY, PROFILE_TYPES);
 
-@Component
-export default class ProfileDisplay extends PartBase {
-  icons: Mapped<string> = {};
-  settingsKey = 'profile';
+    const points = computed<Setpoint[]>(
+      () => {
+        if (!block.value) {
+          return [];
+        }
+        // Sorting modifies the list. Make a copy to prevent this.
+        return [...block.value.data.points]
+          .sort(objectSorter('time'));
+      },
+    );
 
-  created(): void {
-    this.icons.mdiArrowRightBold = mdiArrowRightBold;
-  }
+    const currentValue = computed<number | null>(
+      () => {
+        if (!block.value || !block.value.data.enabled) {
+          return null;
+        }
+        const now = new Date().getTime() / 1000;
+        const start = block.value.data.start || 0;
+        const idx = points.value.findIndex(point => start + point.time > now);
+        if (idx < 1) {
+          return null;
+        }
+        const prev = points.value[idx - 1];
+        const next = points.value[idx];
+        const prevVal = prev.temperature.value as number;
+        const nextVal = next.temperature.value as number;
+        const duration = (next.time - prev.time) || 1;
+        return prevVal + (now - start + prev.time) * (nextVal - prevVal) / duration;
+      },
+    );
 
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.settingsKey);
-  }
+    const nextValue = computed<number | null>(
+      () => {
+        if (!block.value) {
+          return null;
+        }
+        const now = new Date().getTime() / 1000;
+        const start = block.value.data.start || 0;
+        if (!block.value.data.enabled || !block.value.data.drivenTargetId.id) {
+          return null;
+        }
+        const point: Setpoint | undefined = points.value
+          .find(point => start + point.time > now);
+        return point ? point.temperature.value : null;
+      },
+    );
 
-  get block(): SetpointProfileBlock | null {
-    const { serviceId, id } = this.address;
-    return sparkStore.blockById(serviceId, id);
-  }
-
-  get isBroken(): boolean {
-    return this.block == null
-      && this.address.id !== null;
-  }
-
-  get points(): Setpoint[] {
-    if (!this.block) {
-      return [];
-    }
-    // Sorting modifies the list. Make a copy to prevent this.
-    return [...this.block.data.points]
-      .sort(objectSorter('time'));
-  }
-
-  get currentValue(): number | null {
-    if (!this.block || !this.block.data.enabled) {
-      return null;
-    }
-    const now = new Date().getTime() / 1000;
-    const start = this.block.data.start || 0;
-    const idx = this.points.findIndex(point => start + point.time > now);
-    if (idx < 1) {
-      return null;
-    }
-    const prev = this.points[idx - 1];
-    const next = this.points[idx];
-    const prevVal = prev.temperature.value as number;
-    const nextVal = next.temperature.value as number;
-    const duration = (next.time - prev.time) || 1;
-    return prevVal + (now - start + prev.time) * (nextVal - prevVal) / duration;
-  }
-
-  get nextValue(): number | null {
-    if (!this.block) {
-      return null;
-    }
-    const now = new Date().getTime() / 1000;
-    const start = this.block.data.start || 0;
-    if (!this.block.data.enabled || !this.block.data.drivenTargetId.id) {
-      return null;
-    }
-    const point: Setpoint | undefined = this.points
-      .find(point => start + point.time > now);
-    return point ? point.temperature.value : null;
-  }
-}
+    return {
+      squares,
+      round,
+      mdiArrowRightBold,
+      sizeX,
+      sizeY,
+      block,
+      isBroken,
+      currentValue,
+      nextValue,
+    };
+  },
+});
 </script>
 
 <template>
@@ -91,24 +106,24 @@ export default class ProfileDisplay extends PartBase {
         </small>
         <div class="col row">
           <div class="col">
-            {{ currentValue | round(0) }}
+            {{ round(currentValue, 0) }}
           </div>
           <div class="col">
             <q-icon
-              :name="icons.mdiArrowRightBold"
+              :name="mdiArrowRightBold"
               size="20px"
               class="static"
             />
           </div>
           <div class="col">
-            {{ nextValue | round(0) }}
+            {{ round(nextValue, 0) }}
           </div>
         </div>
       </div>
     </SvgEmbedded>
     <g class="outline">
       <rect
-        v-show="bordered"
+        v-show="part.settings.border !== false"
         :width="squares(sizeX)-2"
         :height="squares(sizeY)-2"
         x="1"

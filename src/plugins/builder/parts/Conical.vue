@@ -1,15 +1,27 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
+import { SCALE_KEY } from '../specs/Conical';
+import { FlowPart } from '../types';
 
-@Component
-export default class Conical extends PartBase {
-  readonly scaleKey = 'scale';
+export default defineComponent({
+  name: 'Conical',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const scale = computed<number>(
+      () => props.part.settings[SCALE_KEY] ?? 1,
+    );
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
-}
+    return {
+      scale,
+    };
+  },
+});
 </script>
 
 <template>

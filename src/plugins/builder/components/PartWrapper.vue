@@ -5,6 +5,7 @@ import { FlowPart } from '@/plugins/builder/types';
 import { squares } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 
+import { usePart } from '../composables';
 import parts from '../parts';
 import { builderStore } from '../store';
 
@@ -28,6 +29,10 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const {
+      sizeX,
+      sizeY,
+    } = usePart.setup(props.part);
 
     const component = computed<string>(
       () => builderStore.component(props.part),
@@ -53,8 +58,7 @@ export default defineComponent({
         if (!props.part.flipped) {
           return '';
         }
-        const sizeX = props.part.size[0];
-        return `translate(${squares(sizeX)}, 0) scale(-1, 1)`;
+        return `translate(${squares(sizeX.value)}, 0) scale(-1, 1)`;
       },
     );
 
@@ -64,6 +68,8 @@ export default defineComponent({
 
     return {
       squares,
+      sizeX,
+      sizeY,
       component,
       transformation,
     };
@@ -82,8 +88,8 @@ export default defineComponent({
     />
     <!-- background element, to make the full part clickable -->
     <rect
-      :width="squares(part.size[0])"
-      :height="squares(part.size[1])"
+      :width="squares(sizeX)"
+      :height="squares(sizeY)"
       :class="{showhover: showHover, selected}"
       opacity="0"
     />

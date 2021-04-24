@@ -2,18 +2,20 @@
 import { mdiBullseyeArrow, mdiSwapVerticalBold, mdiThermometer } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent, PropType } from 'vue';
 
-import { PersistentPart } from '@/plugins/builder/types';
-import { settingsAddress, squares } from '@/plugins/builder/utils';
+import { FlowPart } from '@/plugins/builder/types';
+import { squares } from '@/plugins/builder/utils';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockType, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { BlockType, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { prettyUnit } from '@/utils/bloxfield';
 import { contrastColor, round, typeMatchFilter } from '@/utils/functional';
+
+import { useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'SetpointValues',
   props: {
     part: {
-      type: Object as PropType<PersistentPart>,
+      type: Object as PropType<FlowPart>,
       required: true,
     },
     settingsKey: {
@@ -38,32 +40,20 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const {
+      address,
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<SetpointSensorPairBlock>(props.part, props.settingsKey, [BlockType.SetpointSensorPair]);
+
     const textColor = computed<string>(
       () => props.backgroundColor
         ? contrastColor(props.backgroundColor)
         : 'white',
     );
 
-    const address = computed<BlockAddress>(
-      () => settingsAddress(props.part, props.settingsKey),
-    );
-
     const sparkModule = computed<SparkServiceModule | null>(
       () => sparkStore.moduleById(address.value.serviceId),
-    );
-
-    const block = computed<SetpointSensorPairBlock | null>(
-      () => {
-        const storeBlock = sparkModule.value?.blockByAddress(address.value);
-        return storeBlock?.type === BlockType.SetpointSensorPair
-          ? storeBlock as SetpointSensorPairBlock
-          : null;
-      },
-    );
-
-    const isBroken = computed<boolean>(
-      () => block.value === null
-        && address.value.id !== null,
     );
 
     const isUsed = computed<boolean>(

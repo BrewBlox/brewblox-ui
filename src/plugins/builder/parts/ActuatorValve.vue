@@ -1,10 +1,12 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType, watch } from 'vue';
 
 import { RIGHT } from '@/plugins/builder/const';
-import { settingsBlock } from '@/plugins/builder/utils';
-import { DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
+import { flowOnCoord, liquidOnCoord, settingsBlock, squares } from '@/plugins/builder/utils';
+import { DigitalState } from '@/plugins/spark/types';
 
+import { VALVE_KEY, VALVE_TYPES, ValveT } from '../specs/ActuatorValve';
+import { FlowPart } from '../types';
 
 const paths = {
   outerValve: [
@@ -25,53 +27,77 @@ const paths = {
   arrows: 'M0,25H50',
 };
 
-@Component
-export default class ActuatorValve extends PartBase {
-  readonly paths = paths;
+export default defineComponent({
+  name: 'ActuatorValve',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  emits: [
+    'dirty',
+  ],
+  setup(props, { emit }) {
 
-  get block(): DigitalActuatorBlock | MotorValveBlock | null {
-    return settingsBlock(this.part, 'valve');
-  }
+    const block = computed<ValveT | null>(
+      () => settingsBlock(props.part, VALVE_KEY, VALVE_TYPES),
+    );
 
-  get flowSpeed(): number {
-    return this.flowOnCoord(RIGHT);
-  }
+    const flowSpeed = computed<number>(
+      () => flowOnCoord(props.part, RIGHT),
+    );
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(RIGHT);
-  }
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, RIGHT),
+    );
 
-  get closed(): boolean {
-    return this.block?.data.state !== DigitalState.STATE_ACTIVE;
-  }
+    const closed = computed<boolean>(
+      () => block.value?.data.state !== DigitalState.STATE_ACTIVE,
+    );
 
-  get pending(): boolean {
-    return this.block?.data.desiredState !== this.block?.data.state;
-  }
+    const pending = computed<boolean>(
+      () => block.value?.data.desiredState !== block.value?.data.state,
+    );
 
-  get valveRotation(): number {
-    if (this.block) {
-      switch (this.block.data.state) {
-        case DigitalState.STATE_INACTIVE:
-          return 90;
-        case DigitalState.STATE_ACTIVE:
-          return 0;
-        default:
-          return 45;
-      }
-    }
-    return 90;
-  }
+    const valveRotation = computed<number>(
+      () => {
+        switch (block.value?.data.state) {
+          case undefined:
+            return 90;
+          case DigitalState.STATE_INACTIVE:
+            return 90;
+          case DigitalState.STATE_ACTIVE:
+            return 0;
+          default:
+            return 45;
+        }
+      },
+    );
 
-  @Watch('block')
-  triggerUpdate(block, prevBlock): void {
-    if (block === null
-      || prevBlock === null
-      || block.data.state !== prevBlock.data.state) {
-      this.invalidateFlows();
-    }
-  }
-}
+    watch(
+      () => block.value,
+      (newV, oldV) => {
+        if (newV === null
+          || oldV === null
+          || newV.data.state !== oldV.data.state) {
+          emit('dirty');
+        }
+      },
+    );
+
+    return {
+      squares,
+      paths,
+      block,
+      flowSpeed,
+      liquids,
+      closed,
+      pending,
+      valveRotation,
+    };
+  },
+});
 </script>
 
 <template>
@@ -79,7 +105,7 @@ export default class ActuatorValve extends PartBase {
     <SvgEmbedded v-if="!block" height="15" width="15">
       <UnlinkedIcon size="15px" class="self-end" />
     </SvgEmbedded>
-    <SvgEmbedded v-else-if="pending" :height="SQUARE_SIZE" :width="SQUARE_SIZE">
+    <SvgEmbedded v-else-if="pending" :height="squares(1)" :width="squares(1)">
       <q-spinner size="44px" class="col" color="blue-grey-5" />
     </SvgEmbedded>
     <g key="valve-outer" class="outline">

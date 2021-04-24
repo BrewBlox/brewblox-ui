@@ -2,10 +2,18 @@ import { LEFT, RIGHT } from '@/plugins/builder/const';
 import { PartSpec, PersistentPart, Transitions } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockType, DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
+import {
+  BlockType,
+  ComparedBlockType,
+  DigitalActuatorBlock,
+  DigitalState,
+  MotorValveBlock,
+} from '@/plugins/spark/types';
 
-type BlockT = DigitalActuatorBlock | MotorValveBlock;
-const addressKey = 'valve';
+export type ValveT = DigitalActuatorBlock | MotorValveBlock;
+
+export const VALVE_KEY = 'valve';
+export const VALVE_TYPES: ComparedBlockType = [BlockType.DigitalActuator, BlockType.MotorValve];
 
 const spec: PartSpec = {
   id: 'ActuatorValve',
@@ -14,13 +22,13 @@ const spec: PartSpec = {
   cards: [{
     component: 'BlockAddressCard',
     props: {
-      settingsKey: addressKey,
+      settingsKey: VALVE_KEY,
       compatible: [BlockType.MotorValve, BlockType.DigitalActuator],
       label: 'Valve or Actuator',
     },
   }],
   transitions: (part: PersistentPart): Transitions => {
-    const block = settingsBlock<BlockT>(part, addressKey);
+    const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
     return block?.data.state === DigitalState.STATE_ACTIVE
       ? {
         [LEFT]: [{ outCoords: RIGHT }],
@@ -29,7 +37,7 @@ const spec: PartSpec = {
       : {};
   },
   interactHandler: (part: PersistentPart) => {
-    const block = settingsBlock<BlockT>(part, addressKey);
+    const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
     if (block) {
       block.data.desiredState =
         block.data.state === DigitalState.STATE_ACTIVE

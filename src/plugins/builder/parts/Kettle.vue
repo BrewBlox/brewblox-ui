@@ -1,25 +1,52 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
+import { colorString, squares, textTransformation } from '@/plugins/builder/utils';
 
-import { colorString } from '@/plugins/builder/utils';
+import { usePart } from '../composables';
 import { DEFAULT_FILL_PCT } from '../specs/Kettle';
+import { FlowPart } from '../types';
 
-@Component
-export default class Kettle extends PartBase {
-  get titleText(): string {
-    return this.part.settings.text || '';
-  }
+export default defineComponent({
+  name: 'Kettle',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+    } = usePart.setup(props.part);
 
-  get filledSquares(): number {
-    const pct = this.part.settings.fillPct ?? DEFAULT_FILL_PCT;
-    return pct * (this.sizeY / 100);
-  }
+    const titleText = computed<string>(
+      () => props.part.settings.text ?? '',
+    );
 
-  get color(): string {
-    return colorString(this.part.settings.color);
-  }
-}
+    const filledSquares = computed<number>(
+      () => {
+        const pct = props.part.settings.fillPct ?? DEFAULT_FILL_PCT;
+        return pct * (sizeY.value / 100);
+      },
+    );
+
+    const color = computed<string>(
+      () => colorString(props.part.settings.color),
+    );
+
+    return {
+      textTransformation,
+      squares,
+      titleText,
+      filledSquares,
+      color,
+      sizeX,
+      sizeY,
+    };
+  },
+});
 </script>
 
 <template>
@@ -45,7 +72,7 @@ export default class Kettle extends PartBase {
       />
     </g>
     <SvgEmbedded
-      :transform="textTransformation([sizeX, sizeY], false)"
+      :transform="textTransformation(part, part.size, false)"
       :width="squares(sizeX)"
       :height="squares(sizeY)"
     >

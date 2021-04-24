@@ -1,21 +1,34 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { colorString } from '@/plugins/builder/utils';
 
+import { SCALE_KEY } from '../specs/Keg';
+import { FlowPart } from '../types';
 
-@Component
-export default class Keg extends PartBase {
-  readonly scaleKey = 'scale';
+export default defineComponent({
+  name: 'Keg',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const scale = computed<number>(
+      () => props.part.settings[SCALE_KEY] ?? 1,
+    );
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
+    const color = computed<string>(
+      () => colorString(props.part.settings.color),
+    );
 
-  get color(): string {
-    return colorString(this.part.settings.color);
-  }
-}
+    return {
+      scale,
+      color,
+    };
+  },
+});
 </script>
 
 <template>

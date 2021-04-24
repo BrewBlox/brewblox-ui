@@ -2,18 +2,18 @@
 
 import { computed, defineComponent, PropType } from 'vue';
 
-import { PersistentPart } from '@/plugins/builder/types';
-import { settingsAddress, squares, textTransformation } from '@/plugins/builder/utils';
-import { sparkStore } from '@/plugins/spark/store';
+import { FlowPart } from '@/plugins/builder/types';
+import { squares, textTransformation } from '@/plugins/builder/utils';
 import { ActuatorPwmBlock, BlockType } from '@/plugins/spark/types';
-import { BlockAddress } from '@/plugins/spark/types';
 import { truncateRound } from '@/utils/functional';
+
+import { usePart, useSettingsBlock } from '../composables';
 
 export default defineComponent({
   name: 'PwmValues',
   props: {
     part: {
-      type: Object as PropType<PersistentPart>,
+      type: Object as PropType<FlowPart>,
       required: true,
     },
     settingsKey: {
@@ -38,23 +38,14 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const address = computed<BlockAddress>(
-      () => settingsAddress(props.part, props.settingsKey),
-    );
+    const {
+      bordered,
+    } = usePart.setup(props.part);
 
-    const block = computed<ActuatorPwmBlock | null>(
-      () => {
-        const storeBlock = sparkStore.blockByAddress<ActuatorPwmBlock>(address.value);
-        return storeBlock?.type === BlockType.ActuatorPwm
-          ? storeBlock
-          : null;
-      },
-    );
-
-    const isBroken = computed<boolean>(
-      () => block.value === null
-        && address.value.id !== null,
-    );
+    const {
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<ActuatorPwmBlock>(props.part, props.settingsKey, [BlockType.ActuatorPwm]);
 
     const pwmValue = computed<number | null>(
       () => block.value?.data.enabled
@@ -66,9 +57,6 @@ export default defineComponent({
       () => textTransformation(props.part, [1, 1]),
     );
 
-    const bordered = computed<boolean>(
-      () => props.part.settings.bordered ?? true,
-    );
     return {
       squares,
       truncateRound,

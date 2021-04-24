@@ -1,35 +1,53 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { DOWN, LEFT, RIGHT, UP } from '@/plugins/builder/const';
 
-@Component
-export default class CrossTube extends PartBase {
-  readonly paths = {
-    up: 'M25,25 V0',
-    down: 'M25,25 V50',
-    left: 'M25,25 H0',
-    right: 'M25,25 H50',
-  };
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
-  get speed(): Mapped<number> {
-    return {
-      up: this.flowOnCoord(UP),
-      down: this.flowOnCoord(DOWN),
-      left: this.flowOnCoord(LEFT),
-      right: this.flowOnCoord(RIGHT),
-    };
-  }
+type Direction = 'up' | 'down' | 'left' | 'right'
+const paths = {
+  up: 'M25,25 V0',
+  down: 'M25,25 V50',
+  left: 'M25,25 H0',
+  right: 'M25,25 H50',
+};
 
-  get liquids(): Mapped<string[]> {
+export default defineComponent({
+  name: 'CrossTube',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const speed = computed<Record<Direction, number>>(
+      () => ({
+        up: flowOnCoord(props.part, UP),
+        down: flowOnCoord(props.part, DOWN),
+        left: flowOnCoord(props.part, LEFT),
+        right: flowOnCoord(props.part, RIGHT),
+      }),
+    );
+
+    const liquids = computed<Record<Direction, string[]>>(
+      () => ({
+        up: liquidOnCoord(props.part, UP),
+        down: liquidOnCoord(props.part, DOWN),
+        left: liquidOnCoord(props.part, LEFT),
+        right: liquidOnCoord(props.part, RIGHT),
+      }),
+    );
+
     return {
-      up: this.liquidOnCoord(UP),
-      down: this.liquidOnCoord(DOWN),
-      left: this.liquidOnCoord(LEFT),
-      right: this.liquidOnCoord(RIGHT),
+      paths,
+      speed,
+      liquids,
     };
-  }
-}
+  },
+});
 </script>
 
 <template>

@@ -1,23 +1,48 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
+import { usePart } from '../composables';
+import { FlowPart } from '../types';
+import { squares, textTransformation } from '../utils';
 
-@Component
-export default class BuilderLabel extends PartBase {
-  get text(): string {
-    return this.part.settings.text || '<edit to set text>';
-  }
+export default defineComponent({
+  name: 'BuilderLabel',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+    } = usePart.setup(props.part);
 
-  get fontSize(): number {
-    return this.part.settings.fontSize || 16;
-  }
-}
+    const text = computed<string>(
+      () => props.part.settings.text || '<edit to set text>',
+    );
+
+    const fontSize = computed<number>(
+      () => props.part.settings.fontSize || 16,
+    );
+
+    return {
+      textTransformation,
+      squares,
+      sizeX,
+      sizeY,
+      text,
+      fontSize,
+    };
+  },
+});
 </script>
 
 <template>
   <g>
     <SvgEmbedded
-      :transform="textTransformation([sizeX, sizeY], false)"
+      :transform="textTransformation(part, part.size, false)"
       :width="squares(sizeX)"
       :height="squares(sizeY)"
     >

@@ -1,6 +1,9 @@
-import { PartSpec, PersistentPart } from '@/plugins/builder/types';
+import { PartSpec } from '@/plugins/builder/types';
 import { showDrivingBlockDialog } from '@/plugins/builder/utils';
 import { BlockType } from '@/plugins/spark/types';
+
+export const PWM_KEY = 'pwm';
+export const PWM_TYPES = [BlockType.ActuatorPwm];
 
 const DEFAULT_SIZE_X = 5;
 const SIZE_Y = 1;
@@ -12,8 +15,8 @@ const spec: PartSpec = {
     {
       component: 'BlockAddressCard',
       props: {
-        settingsKey: 'pwm',
-        compatible: [BlockType.ActuatorPwm],
+        settingsKey: PWM_KEY,
+        compatible: PWM_TYPES,
         label: 'PWM',
       },
     },
@@ -31,12 +34,12 @@ const spec: PartSpec = {
       component: 'BorderCard',
     },
   ],
-  size: (part: PersistentPart) => [
+  size: part => [
     part.settings.sizeX || DEFAULT_SIZE_X,
     SIZE_Y,
   ],
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, 'pwm'),
+  interactHandler: part => showDrivingBlockDialog(part, PWM_KEY, PWM_TYPES),
 };
 
 export default spec;

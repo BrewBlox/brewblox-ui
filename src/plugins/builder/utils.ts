@@ -3,8 +3,9 @@ import range from 'lodash/range';
 import { uid } from 'quasar';
 
 import { sparkStore } from '@/plugins/spark/store';
-import { Block } from '@/plugins/spark/types';
+import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils';
 import { widgetStore } from '@/store/widgets';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
@@ -24,9 +25,12 @@ export function settingsAddress(part: PersistentPart, key: string): BlockAddress
   };
 }
 
-export function settingsBlock<T extends Block>(part: PersistentPart, key: string): T | null {
+export function settingsBlock<T extends Block>(part: PersistentPart, key: string, intf: ComparedBlockType): T | null {
   const addr = settingsAddress(part, key);
-  return sparkStore.blockById(addr.serviceId, addr.id);
+  const block = sparkStore.blockByAddress<T>(addr);
+  return block && isCompatible(block.type, intf)
+    ? block
+    : null;
 }
 
 export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPart {
@@ -167,18 +171,18 @@ export function showAbsentBlock(part: PersistentPart, key: string): void {
   }
 }
 
-export function showSettingsBlock(part: PersistentPart, key: string): void {
-  const block = settingsBlock(part, key);
+export function showSettingsBlock(part: PersistentPart, settingsKey: string, intf: ComparedBlockType): void {
+  const block = settingsBlock(part, settingsKey, intf);
   block !== null
     ? createBlockDialog(block, { mode: 'Basic' })
-    : showAbsentBlock(part, key);
+    : showAbsentBlock(part, settingsKey);
 }
 
-export function showDrivingBlockDialog(part: PersistentPart, key: string): void {
-  const block = settingsBlock(part, key);
+export function showDrivingBlockDialog(part: PersistentPart, settingsKey: string, intf: ComparedBlockType): void {
+  const block = settingsBlock(part, settingsKey, intf);
 
   if (!block) {
-    return showAbsentBlock(part, key);
+    return showAbsentBlock(part, settingsKey);
   }
 
   const driveChain = sparkStore.moduleById(block.serviceId)

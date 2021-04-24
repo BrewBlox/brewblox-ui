@@ -6,12 +6,13 @@ import { ActuatorPwmBlock, BlockType, DigitalActuatorBlock, DigitalState } from 
 import { isBlockDriven } from '@/plugins/spark/utils';
 import { createDialog } from '@/utils/dialog';
 
-type BlockT = DigitalActuatorBlock | ActuatorPwmBlock;
-const addressKey = 'actuator';
+export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock;
+export const PUMP_KEY = 'actuator';
+export const PUMP_TYPES = [BlockType.DigitalActuator, BlockType.ActuatorPwm];
 
 
 const calcPressure = (part: PersistentPart): number => {
-  const block = settingsBlock<BlockT>(part, addressKey);
+  const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
   if (block === null) {
     return part.settings.enabled
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
@@ -22,7 +23,6 @@ const calcPressure = (part: PersistentPart): number => {
       ? part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE
       : 0;
   }
-  // PWM Actuator
   if (block.type === BlockType.ActuatorPwm) {
     return (block.data.setting / 100) * (part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE);
   }
@@ -37,7 +37,7 @@ const spec: PartSpec = {
     {
       component: 'BlockAddressCard',
       props: {
-        settingsKey: addressKey,
+        settingsKey: PUMP_KEY,
         compatible: [BlockType.DigitalActuator, BlockType.ActuatorPwm],
         label: 'Actuator',
       },
@@ -60,8 +60,8 @@ const spec: PartSpec = {
     };
   },
   interactHandler: (part: PersistentPart, updater: PartUpdater) => {
-    const hasAddr = !!part.settings[addressKey]?.id;
-    const block = settingsBlock<BlockT>(part, addressKey);
+    const hasAddr = !!part.settings[PUMP_KEY]?.id;
+    const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
     const driven = isBlockDriven(block);
 
     if (!hasAddr) {
@@ -69,10 +69,10 @@ const spec: PartSpec = {
       updater.updatePart(part);
     }
     else if (block === null) {
-      showAbsentBlock(part, addressKey);
+      showAbsentBlock(part, PUMP_KEY);
     }
     else if (driven) {
-      showDrivingBlockDialog(part, addressKey);
+      showDrivingBlockDialog(part, PUMP_KEY, PUMP_TYPES);
     }
     else if (block.type === BlockType.DigitalActuator) {
       block.data.desiredState =

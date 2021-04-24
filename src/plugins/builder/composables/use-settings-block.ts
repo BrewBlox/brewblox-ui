@@ -1,0 +1,47 @@
+import { computed, ComputedRef, inject, Ref, ref, UnwrapRef, watch } from 'vue';
+
+import { Block, BlockAddress, ComparedBlockType } from '@/plugins/spark/types';
+
+import { FlowPart } from '../types';
+import { settingsAddress, settingsBlock } from '../utils';
+
+export interface useSettingsBlockComponent<BlockT extends Block> {
+  address: ComputedRef<BlockAddress>;
+  block: ComputedRef<BlockT | null>;
+  isBroken: ComputedRef<boolean>
+}
+
+export interface useSettingsBlockComposable {
+  setup<BlockT extends Block>(
+    part: FlowPart,
+    settingsKey: string,
+    intf: ComparedBlockType
+  ): useSettingsBlockComponent<BlockT>;
+}
+
+export const useSettingsBlock: useSettingsBlockComposable = {
+  setup<BlockT extends Block>(
+    part: FlowPart,
+    settingsKey: string,
+    intf: ComparedBlockType,
+  ): useSettingsBlockComponent<BlockT> {
+    const address = computed<BlockAddress>(
+      () => settingsAddress(part, settingsKey),
+    );
+
+    const block = computed<BlockT | null>(
+      () => settingsBlock(part, settingsKey, intf),
+    );
+
+    const isBroken = computed<boolean>(
+      () => block.value === null
+        && address.value.id !== null,
+    );
+
+    return {
+      address,
+      block,
+      isBroken,
+    };
+  },
+};

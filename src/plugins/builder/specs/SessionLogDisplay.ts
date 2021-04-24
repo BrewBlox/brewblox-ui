@@ -1,5 +1,8 @@
-import { PartSpec, PersistentPart } from '@/plugins/builder/types';
+import { PartSpec } from '@/plugins/builder/types';
 import { showLinkedWidgetDialog } from '@/plugins/builder/utils';
+
+export const WIDGET_KEY = 'widgetId';
+export const WIDGET_TYPES = ['SessionLog'];
 
 const DEFAULT_SIZE_X = 1;
 const SIZE_Y = 1;
@@ -21,20 +24,20 @@ const spec: PartSpec = {
     {
       component: 'LinkedWidgetCard',
       props: {
-        settingsKey: 'widgetId',
-        types: ['SessionLog'],
+        settingsKey: WIDGET_KEY,
+        types: WIDGET_TYPES,
       },
     },
     {
       component: 'BorderCard',
     },
   ],
-  size: (part: PersistentPart) => [
+  size: part => [
     part.settings.sizeX || DEFAULT_SIZE_X,
     SIZE_Y,
   ],
   transitions: () => ({}),
-  interactHandler: (part: PersistentPart) => showLinkedWidgetDialog(part, 'widgetId'),
+  interactHandler: part => showLinkedWidgetDialog(part, WIDGET_KEY),
 };
 
 export default spec;

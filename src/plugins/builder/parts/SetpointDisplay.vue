@@ -1,21 +1,42 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER } from '@/plugins/builder/const';
 
+import { usePart } from '../composables';
+import { SCALE_KEY } from '../specs/SetpointDisplay';
+import { FlowPart } from '../types';
+import { liquidOnCoord, squares } from '../utils';
 
-@Component
-export default class SetpointDisplay extends PartBase {
-  readonly scaleKey = 'scale';
+export default defineComponent({
+  name: 'SetpointDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      bordered,
+    } = usePart.setup(props.part);
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
+    const scale = computed<number>(
+      () => props.part.settings[SCALE_KEY] ?? 1,
+    );
 
-  get color(): string {
-    return this.liquidOnCoord(CENTER)[0] ?? '';
-  }
-}
+    const color = computed<string>(
+      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+    );
+
+    return {
+      squares,
+      bordered,
+      scale,
+      color,
+    };
+  },
+});
 </script>
 
 <template>

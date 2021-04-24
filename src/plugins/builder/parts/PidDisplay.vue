@@ -1,105 +1,120 @@
 <script lang="ts">
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
-import { settingsAddress } from '@/plugins/builder/utils';
+import { liquidOnCoord, squares, textTransformation } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
-import { BlockAddress } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
 import { deltaTempQty, prettyUnit } from '@/utils/bloxfield';
+import { truncateRound } from '@/utils/functional';
 
+import { usePart, useSettingsBlock } from '../composables';
+import { PID_KEY, PID_TYPES, SCALE_KEY } from '../specs/PidDisplay';
+import { FlowPart } from '../types';
 
-@Component
-export default class PidDisplay extends PartBase {
-  icons: Mapped<string> = {};
-  HOT_WATER = HOT_WATER;
-  COLD_WATER = COLD_WATER;
-  readonly addressKey = 'pid';
-  readonly scaleKey = 'scale';
+export default defineComponent({
+  name: 'PidDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      bordered,
+    } = usePart.setup(props.part);
 
-  created(): void {
-    this.icons.mdiCalculatorVariant = mdiCalculatorVariant;
-    this.icons.mdiPlusMinus = mdiPlusMinus;
-  }
+    const {
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<PidBlock>(props.part, PID_KEY, PID_TYPES);
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
+    const scale = computed<number>(
+      () => props.part.settings[SCALE_KEY] ?? 1,
+    );
 
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.addressKey);
-  }
+    const outputValue = computed<number | null>(
+      () => block.value?.data.enabled
+        ? block.value.data.outputValue
+        : null,
+    );
 
-  get block(): PidBlock | null {
-    const { serviceId, id } = this.address;
-    return sparkStore.blockById(serviceId, id);
-  }
+    const outputSetting = computed<number | null>(
+      () => block.value?.data.enabled
+        ? block.value.data.outputSetting
+        : null,
+    );
 
-  get isBroken(): boolean {
-    return this.block == null
-      && this.address.id !== null;
-  }
+    const kp = computed<number | null>(
+      () => block.value?.data.kp.value ?? null,
+    );
 
-  get outputValue(): number | null {
-    return this.block && this.block.data.enabled
-      ? this.block.data.outputValue
-      : null;
-  }
+    const target = computed<Block | null>(
+      () => block.value !== null
+        ? sparkStore.blockById(block.value.serviceId, block.value.data.inputId.id)
+        : null,
+    );
 
-  get outputSetting(): number | null {
-    return this.block && this.block.data.enabled
-      ? this.block.data.outputSetting
-      : null;
-  }
+    const drivingOffset = computed<boolean>(
+      () => target.value !== null
+        && target.value.type === BlockType.ActuatorOffset,
+    );
 
-  get kp(): number | null {
-    return this.block
-      ? this.block.data.kp.value
-      : null;
-  }
+    const deltaTempUnit = computed<string>(
+      () => `delta_${systemStore.units.temperature}`,
+    );
 
-  get target(): Block | null {
-    return this.block
-      ? sparkStore.blockById(this.block.serviceId, this.block.data.outputId.id)
-      : null;
-  }
+    const convertedOutputSetting = computed<number | null>(
+      () => drivingOffset.value
+        && block.value !== null
+        ? deltaTempQty(outputSetting.value).value
+        : outputSetting.value,
+    );
 
-  get drivingOffset(): boolean {
-    return this.target !== null
-      && this.target.type === BlockType.ActuatorOffset;
-  }
+    const suffix = computed<string>(
+      () => outputSetting.value === null
+        ? ''
+        : drivingOffset.value
+          ? prettyUnit(deltaTempUnit.value)
+          : '%',
+    );
 
-  get deltaTempUnit(): string {
-    return `delta_${systemStore.units.temperature}`;
-  }
+    const color = computed<string>(
+      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+    );
 
-  get convertedOutputSetting(): number | null {
-    return this.drivingOffset
-      && this.block !== null
-      ? deltaTempQty(this.outputSetting).value
-      : this.outputSetting;
-  }
-
-  get suffix(): string {
-    return this.outputSetting === null
-      ? ''
-      : this.drivingOffset
-        ? prettyUnit(this.deltaTempUnit)
-        : '%';
-  }
-
-  get color(): string {
-    return this.liquidOnCoord(CENTER)[0] ?? '';
-  }
-}
+    return {
+      HOT_WATER,
+      COLD_WATER,
+      squares,
+      textTransformation,
+      truncateRound,
+      mdiCalculatorVariant,
+      mdiPlusMinus,
+      scale,
+      block,
+      isBroken,
+      outputValue,
+      outputSetting,
+      kp,
+      target,
+      drivingOffset,
+      convertedOutputSetting,
+      suffix,
+      color,
+      bordered,
+    };
+  },
+});
 </script>
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
-      :transform="textTransformation([1,1])"
+      :transform="textTransformation(part, [1,1])"
       :width="squares(1)"
       :height="squares(1)"
       content-class="column items-center q-pt-xs"
@@ -110,13 +125,13 @@ export default class PidDisplay extends PartBase {
       <template v-else>
         <q-icon
           v-if="kp === null"
-          :name="icons.mdiCalculatorVariant"
+          :name="mdiCalculatorVariant"
           class="col-auto static"
           size="25px"
         />
         <q-icon
           v-else-if="drivingOffset"
-          :name="icons.mdiPlusMinus"
+          :name="mdiPlusMinus"
           class="col-auto static"
           size="25px"
         />
@@ -131,7 +146,7 @@ export default class PidDisplay extends PartBase {
           />
         </template>
         <div class="col text-bold">
-          {{ convertedOutputSetting | truncateRound }}
+          {{ truncateRound(convertedOutputSetting) }}
           <small v-if="!!block">{{ suffix }}</small>
         </div>
       </template>

@@ -1,19 +1,42 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
+import { usePart } from '../composables';
+import { FlowPart } from '../types';
+import { squares, textTransformation } from '../utils';
 
+export default defineComponent({
+  name: 'Fridge',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+    } = usePart.setup(props.part);
 
+    const titleText = computed<string>(
+      () => props.part.settings.text || '',
+    );
 
-@Component
-export default class Fridge extends PartBase {
-  get titleText(): string {
-    return this.part.settings.text || '';
-  }
+    const shelfY = computed<number>(
+      () => props.part.settings.shelfY || 1,
+    );
 
-  get shelfY(): number {
-    return this.part.settings.shelfY || 1;
-  }
-}
+    return {
+      textTransformation,
+      squares,
+      titleText,
+      shelfY,
+      sizeX,
+      sizeY,
+    };
+  },
+});
 </script>
 
 <template>
@@ -36,7 +59,7 @@ export default class Fridge extends PartBase {
       <line :x1="2" :y1="squares(shelfY)" :x2="squares(sizeX)-4" :y2="squares(shelfY)" />
     </g>
     <SvgEmbedded
-      :transform="textTransformation([sizeX, sizeY], false)"
+      :transform="textTransformation(part, part.size, false)"
       :width="squares(sizeX)"
       :height="squares(sizeY)"
     >

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { RIGHT } from '@/plugins/builder/const';
 import { horizontalChevrons } from '@/plugins/builder/utils';
