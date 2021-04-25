@@ -14,6 +14,10 @@ export default defineComponent({
       type: String,
       default: 'bordered',
     },
+    label: {
+      type: String,
+      default: 'Show border',
+    },
     defaultValue: {
       type: Boolean,
       default: true,

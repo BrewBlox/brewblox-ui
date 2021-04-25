@@ -6,8 +6,8 @@ import { systemStore } from '@/store/system';
 export default defineComponent({
   name: 'PageError',
   computed: {
-    loaded() {
-      return systemStore.loaded;
+    started() {
+      return systemStore.started;
     },
   },
 });
@@ -17,7 +17,7 @@ export default defineComponent({
   <div
     class="text-h5 darkened absolute-center column items-center q-gutter-md"
   >
-    <template v-if="loaded">
+    <template v-if="started">
       <slot />
     </template>
     <template v-else>

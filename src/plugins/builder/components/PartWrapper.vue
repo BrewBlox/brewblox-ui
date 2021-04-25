@@ -82,7 +82,7 @@ export default defineComponent({
     <component
       :is="component"
       v-if="component"
-      :model-value="part"
+      :part="part"
       class="BuilderPart"
       v-bind="$attrs"
     />

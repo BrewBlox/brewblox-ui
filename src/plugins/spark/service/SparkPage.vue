@@ -401,10 +401,10 @@ export default defineComponent({
 
 <template>
   <q-page class="page-height">
-    <teleport to="#toolbar-title">
+    <TitleTeleport>
       {{ title }}
-    </teleport>
-    <teleport to="#toolbar-buttons">
+    </TitleTeleport>
+    <ButtonsTeleport>
       <q-btn-group rounded outline class="q-pa-xs self-center">
         <q-btn
           :unelevated="pageMode === 'List'"
@@ -439,7 +439,7 @@ export default defineComponent({
           <SparkActions :service-id="serviceId" />
         </template>
       </ActionMenu>
-    </teleport>
+    </ButtonsTeleport>
 
     <!-- Troubleshooter -->
     <div

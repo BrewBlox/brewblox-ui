@@ -1,10 +1,11 @@
 <script lang="ts">
 import { useQuasar } from 'quasar';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, provide, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
+import { ButtonsTeleportRefKey, TitleTeleportRefKey } from '@/symbols';
 
 export default defineComponent({
   name: 'DefaultLayout',
@@ -17,6 +18,12 @@ export default defineComponent({
     const dashboardEditing = ref<boolean>(false);
     const serviceEditing = ref<boolean>(false);
     const builderEditing = ref<boolean>(false);
+
+    const toolbarTitleRef = ref<Element>();
+    const toolbarButtonsRef = ref<Element>();
+
+    provide(TitleTeleportRefKey, toolbarTitleRef);
+    provide(ButtonsTeleportRefKey, toolbarButtonsRef);
 
     const _drawerOpen = ref<boolean>(localStorage.getItem('drawer') ?? !dense.value);
     const drawerOpen = computed<boolean>({
@@ -43,6 +50,8 @@ export default defineComponent({
 
     return {
       devMode,
+      toolbarTitleRef,
+      toolbarButtonsRef,
       dashboardEditing,
       serviceEditing,
       builderEditing,
@@ -59,12 +68,12 @@ export default defineComponent({
   <q-layout view="hHh Lpr fFf" style="overflow: hidden">
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
-        <div id="toolbar-title">
+        <div ref="toolbarTitleRef">
           Brewblox
         </div>
       </template>
       <template #buttons>
-        <div id="toolbar-buttons" class="full-height row q-gutter-x-sm q-pr-xs" />
+        <div ref="toolbarButtonsRef" class="full-height row q-gutter-x-sm q-pr-xs" />
       </template>
     </LayoutHeader>
     <LayoutFooter />
@@ -74,7 +83,7 @@ export default defineComponent({
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
         <DashboardIndex v-model:editing="dashboardEditing" />
-        <!-- <BuilderLayoutIndex v-if="showSidebarLayouts" v-model="builderEditing" /> -->
+        <BreweryIndex v-if="showSidebarLayouts" v-model:editing="builderEditing" />
         <ServiceIndex v-model:editing="serviceEditing" />
       </q-scroll-area>
 

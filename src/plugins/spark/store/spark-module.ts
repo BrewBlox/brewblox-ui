@@ -114,7 +114,7 @@ export class SparkServiceModule extends VuexModule {
 
   private findByAddress<T extends Block>(blocks: Block[], addr: T | BlockAddress | null): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
-    return blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
+    return blocks.find(v => v.id === addr.id && (!addr.type || addr.type === v.type)) as T ?? null;
   }
 
   private findByLink<T extends Block>(blocks: Block[], link: Link | null): T | null {

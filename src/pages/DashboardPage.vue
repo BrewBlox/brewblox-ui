@@ -6,7 +6,6 @@ import { RenderedItem } from '@/components/grid/types';
 import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { featureStore, WidgetContext } from '@/store/features';
-import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { objectSorter } from '@/utils/functional';
@@ -26,15 +25,11 @@ export default defineComponent({
       }),
     );
 
-    const loaded = computed<boolean>(
-      () => systemStore.loaded,
-    );
-
     const dashboardId = computed<string | null>(
       () => {
         const route = router.currentRoute.value;
         return route.path.startsWith('/dashboard')
-          ? route.params.id as string ?? null
+          ? route.params.id as string || null
           : null;
       },
     );
@@ -98,7 +93,6 @@ export default defineComponent({
       dense,
       widgetEditable,
       context,
-      loaded,
       dashboardId,
       dashboard,
       showWizard,
@@ -115,10 +109,10 @@ export default defineComponent({
       <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
     </PageError>
     <template v-else>
-      <teleport to="#toolbar-title">
+      <TitleTeleport>
         {{ dashboard.title }}
-      </teleport>
-      <teleport to="#toolbar-buttons">
+      </TitleTeleport>
+      <ButtonsTeleport>
         <q-btn
           v-if="!dense"
           unelevated
@@ -143,7 +137,7 @@ export default defineComponent({
             <DashboardActions :dashboard-id="dashboardId" />
           </template>
         </ActionMenu>
-      </teleport>
+      </ButtonsTeleport>
 
       <div
         v-if="dashboardItems.length === 0"

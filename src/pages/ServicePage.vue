@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router';
 
 import { featureStore } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
-import { systemStore } from '@/store/system';
 
 export default defineComponent({
   name: 'ServicePage',
@@ -13,10 +12,6 @@ export default defineComponent({
 
     const serviceId = computed<string>(
       () => route.params.id as string,
-    );
-
-    const loaded = computed<boolean>(
-      () => systemStore.loaded,
     );
 
     const service = computed<Service | null>(
@@ -31,7 +26,6 @@ export default defineComponent({
 
     return {
       serviceId,
-      loaded,
       service,
       pageComponent,
     };

@@ -22,11 +22,13 @@ export default defineComponent({
     const {
       sizeX,
       sizeY,
+      bordered,
     } = usePart.setup(props.part);
 
     const {
       block,
       isBroken,
+      address,
     } = useSettingsBlock.setup<SetpointProfileBlock>(props.part, PROFILE_KEY, PROFILE_TYPES);
 
     const points = computed<Setpoint[]>(
@@ -80,9 +82,11 @@ export default defineComponent({
       squares,
       round,
       mdiArrowRightBold,
+      bordered,
       sizeX,
       sizeY,
       block,
+      address,
       isBroken,
       currentValue,
       nextValue,
@@ -123,7 +127,7 @@ export default defineComponent({
     </SvgEmbedded>
     <g class="outline">
       <rect
-        v-show="part.settings.border !== false"
+        v-show="bordered"
         :width="squares(sizeX)-2"
         :height="squares(sizeY)-2"
         x="1"

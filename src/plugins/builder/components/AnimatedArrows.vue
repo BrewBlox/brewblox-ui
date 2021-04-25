@@ -22,7 +22,7 @@ export default defineComponent({
   setup(props) {
 
     const pathLength = computed<number>(
-      () => svgPathProperties(props.path).getTotalLength(),
+      () => new svgPathProperties(props.path).getTotalLength(),
     );
 
     const duration = computed<number>(

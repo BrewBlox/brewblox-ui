@@ -6,14 +6,10 @@ import {
 } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
-  // {
-  //   path: '/builder/:id?',
-  //   component: () => import('@/plugins/builder/BuilderEditor.vue'),
-  // },
-  // {
-  //   path: '/automation/:id?',
-  //   component: () => import('@/plugins/automation/AutomationLayout.vue'),
-  // },
+  {
+    path: '/builder/:id?',
+    component: () => import('@/plugins/builder/BuilderEditor.vue'),
+  },
   {
     path: '/',
     component: () => import('@/layouts/DefaultLayout.vue'),
@@ -24,7 +20,7 @@ const routes: RouteRecordRaw[] = [
       //   // dynamic pages
       { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },
       { path: '/service/:id', component: () => import('@/pages/ServicePage.vue') },
-      //   { path: '/brewery/:id?', component: () => import('@/plugins/builder/BreweryPage.vue') },
+      { path: '/brewery/:id?', component: () => import('@/plugins/builder/BreweryPage.vue') },
     ],
   },
 

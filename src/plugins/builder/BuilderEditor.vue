@@ -1,11 +1,14 @@
 <script lang="ts">
-import { debounce, uid } from 'quasar';
-import { computed, defineComponent } from 'vue';
+import { nanoid } from 'nanoid';
+import { debounce, QLayout, useQuasar } from 'quasar';
+import { computed, defineComponent, nextTick, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
+import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
 import { Coordinates } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
-import { clampRotation, deepCopy } from '@/utils/functional';
+import { clampRotation, deepCopy, filterById, spliceById } from '@/utils/functional';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
@@ -32,9 +35,9 @@ interface EditorAction {
 }
 
 interface ActionMode extends EditorAction {
-  cursor: (part: FlowPart) => boolean;
-  onClick?: (evt: ClickEvent, part: FlowPart) => void;
-  onPan?: (args: PanArguments, part: FlowPart) => void;
+  cursor: (part: PersistentPart) => boolean;
+  onClick?: (evt: ClickEvent, part: FlowPart | null) => void;
+  onPan?: (args: PanArguments, part: FlowPart | null) => void;
 }
 
 interface ActionTool extends EditorAction {
@@ -49,698 +52,765 @@ const moveKeys: Record<string, XYPosition> = {
   ArrowRight: { x: 1, y: 0 },
 };
 
-@Component({
+export default defineComponent({
+  name: 'BuilderEditor',
   components: {
-    BuilderCatalog,
     BuilderPartMenu,
   },
-})
-export default class BuilderEditor extends Vue {
-  squares = squares;
+  setup() {
+    const { dense } = useGlobals.setup();
+    const { localStorage } = useQuasar();
+    const router = useRouter();
 
-  layoutId: string | null = null;
-  debouncedSaveParts = debounce(this.saveParts, 500);
-  debouncedCalculate = debounce(this.calculate, 150, true);
-  flowParts: FlowPart[] = [];
-  history: string[] = [];
-  undoneHistory: string[] = [];
+    const layoutId = ref<string | null>(null);
 
-  localDrawer: boolean | null = null;
-  drawerContent: 'tools' | 'layouts' = 'tools';
-  menuDialogOpen = false;
-  focusWarning = true;
+    const flowParts = ref<FlowPart[]>([]);
+    const flowPartsRev = ref<string>('');
+    const history = ref<string[]>([]);
+    const undoneHistory = ref<string[]>([]);
 
-  selectedTime = 0;
-  selectArea: SelectArea | null = null;
-  selectDragDelta: XYPosition | null = null
-  floatingSelection = false;
-  selectedParts: FlowPart[] = [];
-  hoverPos: XYPosition | null = null;
-  pageFocused = true;
+    const drawerContent = ref<'tools' | 'layouts'>('tools');
+    const menuDialogOpen = ref<boolean>(false);
+    const focusWarning = ref<boolean>(true);
 
-  floater: Floater | null = null;
-  configuredPartId: string | null = null;
+    const selectedTime = ref<number>(0);
+    const selectArea = ref<SelectArea | null>(null);
+    const selectedParts = ref<FlowPart[]>([]);
+    const hoverPos = ref<XYPosition | null>(null);
+    const pageFocused = ref<boolean>(true);
 
-  updater: PartUpdater = { updatePart: this.savePart };
+    const floater = ref<Floater | null>(null);
+    const configuredPartId = ref<string | null>(null);
 
-  @Ref()
-  readonly grid!: any;
+    const updater: PartUpdater = { updatePart: savePart };
 
-  @Ref()
-  readonly page!: any;
+    const gridRef = ref<SVGElement>();
+    const pageRef = ref<QLayout>();
 
-  @Prop({ type: String })
-  public readonly initialLayout!: string | null;
-
-  @Watch('layout')
-  watchLayout(newV: BuilderLayout, oldV: BuilderLayout): void {
-    if (newV === null || (oldV !== null && oldV.id !== newV.id)) {
-      this.history = [];
-    }
-    this.debouncedCalculate();
-  }
-
-  @Watch('layout.title', { immediate: true })
-  watchTitle(newV: string): void {
-    document.title = `Brewblox | ${newV ?? 'Builder editor'}`;
-  }
-
-  @Watch('loaded', { immediate: true })
-  watchLoaded(loaded: boolean): void {
-    if (loaded) {
-      this.selectLayout(null);
-      this.$nextTick(() => this.setFocus());
-    }
-  }
-
-  modes: ActionMode[] = [
-    {
-      label: 'Select',
-      value: 'select',
-      icon: 'mdi-select-drag',
-      cursor: part => !!part,
-      onPan: this.selectPanHandler,
-      onClick: this.selectClickHandler,
-    },
-    {
-      label: 'Interact',
-      value: 'interact',
-      icon: 'mdi-cursor-default',
-      cursor: part => !!part && !!builderStore.spec(part).interactHandler,
-      onClick: this.interactClickHandler,
-    },
-  ];
-
-  tools: ActionTool[] = [
-    {
-      label: 'New',
-      value: 'add',
-      icon: 'add',
-      shortcut: 'n',
-      use: this.useAdd,
-    },
-    {
-      label: 'Move',
-      value: 'move',
-      icon: 'mdi-cursor-move',
-      shortcut: 'm',
-      use: this.useMove,
-    },
-    {
-      label: 'Copy',
-      value: 'copy',
-      icon: 'file_copy',
-      shortcut: 'c',
-      use: this.useCopy,
-    },
-    {
-      label: 'Rotate',
-      value: 'rotate-right',
-      icon: 'mdi-rotate-right-variant',
-      shortcut: 'r',
-      use: this.useRotate,
-    },
-    {
-      label: 'Flip',
-      value: 'flip',
-      icon: 'mdi-swap-horizontal-bold',
-      shortcut: 'f',
-      use: this.useFlip,
-    },
-    {
-      label: 'Edit Settings',
-      value: 'config',
-      icon: 'settings',
-      shortcut: 'e',
-      use: this.useEdit,
-    },
-    {
-      label: 'Interact',
-      value: 'interact',
-      icon: 'mdi-cursor-default',
-      shortcut: 'i',
-      use: this.useInteract,
-    },
-    {
-      label: 'Delete',
-      value: 'delete',
-      icon: 'delete',
-      shortcut: 'd',
-      use: this.useDelete,
-    },
-  ];
-
-  get loaded(): boolean {
-    return systemStore.loaded;
-  }
-
-  get drawerOpen(): boolean {
-    return Boolean(
-      this.localDrawer
-      ?? this.$q.localStorage.getItem('drawer')
-      ?? !this.$dense);
-  }
-
-  set drawerOpen(v: boolean) {
-    this.localDrawer = v;
-    this.$q.localStorage.set('drawer', v);
-  }
-
-  get layouts(): BuilderLayout[] {
-    return builderStore.layouts;
-  }
-
-  get layout(): BuilderLayout | null {
-    return builderStore.layoutById(this.layoutId);
-  }
-
-  get parts(): PersistentPart[] {
-    return this.layout !== null
-      ? vivifyParts(this.layout.parts)
-      : [];
-  }
-
-  get configuredPart(): FlowPart | null {
-    return this.flowParts.find(p => p.id === this.configuredPartId) || null;
-  }
-
-  get overlaps(): [Coordinates, number][] {
-    const counts: Mapped<number> = {};
-    for (const part of this.parts) {
-      const key = new Coordinates([part.x, part.y, 0]).toString();
-      counts[key] = (counts[key] || 0) + 1;
-    }
-    return Object.entries(counts)
-      .filter(([, v]) => v > 1)
-      .map(([k, v]) => [new Coordinates(k), v] as [Coordinates, number]);
-  }
-
-  get currentMode(): ActionMode {
-    const toolId = builderStore.editorMode;
-    return this.modes.find(tool => tool.value === toolId) || this.modes[0];
-  }
-
-  set currentMode(tool: ActionMode) {
-    builderStore.editorMode = tool.value;
-  }
-
-  selectLayout(id: string | null): void {
-    this.layoutId = id
-      ?? this.$route.params.id
-      ?? builderStore.lastLayoutId
-      ?? builderStore.layoutIds[0]
-      ?? null;
-
-    const route = this.layoutId ? `/builder/${this.layoutId}` : '/builder';
-    this.$router.replace(route).catch(() => { });
-    builderStore.lastLayoutId = this.layoutId;
-  }
-
-  setFocus(): void {
-    this.page?.$el.focus();
-    this.checkFocus();
-  }
-
-  checkFocus(): void {
-    this.$nextTick(() => {
-      const el = document.querySelector('.editor-page:focus-within');
-      this.pageFocused = (el !== null);
+    const _drawerOpen = ref<boolean>(localStorage.getItem('drawer') ?? !dense.value);
+    const drawerOpen = computed<boolean>({
+      get: () => _drawerOpen.value,
+      set: v => {
+        _drawerOpen.value = v;
+        localStorage.set('drawer', v);
+      },
     });
-  }
 
-  async saveLayout(layout: BuilderLayout | null = this.layout): Promise<void> {
-    if (layout === null) { return; }
-    if (layout.id) {
-      await builderStore.saveLayout(layout);
-    } else {
-      const id = uid();
-      await builderStore.createLayout({ ...layout, id });
-      this.selectLayout(id);
-    }
-  }
+    const modes: ActionMode[] = [
+      {
+        label: 'Select',
+        value: 'select',
+        icon: 'mdi-select-drag',
+        cursor: part => !!part,
+        onPan: selectPanHandler,
+        onClick: selectClickHandler,
+      },
+      {
+        label: 'Interact',
+        value: 'interact',
+        icon: 'mdi-cursor-default',
+        cursor: part => !!part && !!builderStore.spec(part).interactHandler,
+        onClick: interactClickHandler,
+      },
+    ];
 
-  async saveParts(parts: PersistentPart[], saveHistory = true): Promise<void> {
-    if (!this.layout) { return; }
+    const tools: ActionTool[] = [
+      {
+        label: 'New',
+        value: 'add',
+        icon: 'add',
+        shortcut: 'n',
+        use: useAdd,
+      },
+      {
+        label: 'Move',
+        value: 'move',
+        icon: 'mdi-cursor-move',
+        shortcut: 'm',
+        use: useMove,
+      },
+      {
+        label: 'Copy',
+        value: 'copy',
+        icon: 'file_copy',
+        shortcut: 'c',
+        use: useCopy,
+      },
+      {
+        label: 'Rotate',
+        value: 'rotate-right',
+        icon: 'mdi-rotate-right-variant',
+        shortcut: 'r',
+        use: useRotate,
+      },
+      {
+        label: 'Flip',
+        value: 'flip',
+        icon: 'mdi-swap-horizontal-bold',
+        shortcut: 'f',
+        use: useFlip,
+      },
+      {
+        label: 'Edit Settings',
+        value: 'config',
+        icon: 'settings',
+        shortcut: 'e',
+        use: useEdit,
+      },
+      {
+        label: 'Interact',
+        value: 'interact',
+        icon: 'mdi-cursor-default',
+        shortcut: 'i',
+        use: useInteract,
+      },
+      {
+        label: 'Delete',
+        value: 'delete',
+        icon: 'delete',
+        shortcut: 'd',
+        use: useDelete,
+      },
+    ];
 
-    if (saveHistory) {
-      const stored = builderStore.layoutById(this.layout.id);
-      if (stored) {
-        this.history.push(JSON.stringify(stored.parts));
-        this.undoneHistory = [];
+    const layouts = computed<BuilderLayout[]>(
+      () => builderStore.layouts,
+    );
+
+    const layout = computed<BuilderLayout | null>(
+      () => builderStore.layoutById(layoutId.value),
+    );
+
+    function setLayoutWidth(v: number): void {
+      if (layout.value) {
+        layout.value.width = v;
+        saveLayout();
       }
     }
 
-    // first set local value, to avoid jitters caused by the period between action and VueX refresh
-    this.layout.parts = parts.map(asPersistentPart);
-    this.debouncedCalculate();
-    await this.saveLayout(this.layout);
-  }
-
-  async savePart(part: PersistentPart): Promise<void> {
-    await this.saveParts(this.parts.map(p => (p.id === part.id ? part : p)));
-  }
-
-  async addPart(part: PersistentPart): Promise<void> {
-    await this.saveParts([...this.parts, part]);
-  }
-
-  async removePart(part: PersistentPart): Promise<void> {
-    await this.saveParts(this.parts.filter(p => p.id !== part.id));
-  }
-
-  async undo(): Promise<void> {
-    if (this.layout && this.history.length > 0) {
-      this.cancelSelection();
-
-      const current = builderStore.layoutById(this.layout.id);
-      if (current) {
-        const state = JSON.stringify(current.parts);
-        const parts = JSON.parse(this.history.pop()!);
-        await this.saveParts(parts, false);
-        this.undoneHistory.push(state);
+    function setLayoutHeight(v: number): void {
+      if (layout.value) {
+        layout.value.height = v;
+        saveLayout();
       }
     }
-  }
 
-  async redo(): Promise<void> {
-    if (this.layout && this.undoneHistory.length > 0) {
-      this.cancelSelection();
+    const layoutTitle = computed<string>(
+      () => layout.value?.title ?? 'Builder editor',
+    );
 
-      const current = builderStore.layoutById(this.layout.id);
-      if (current) {
-        const state = JSON.stringify(current.parts);
-        const parts = JSON.parse(this.undoneHistory.pop()!);
-        await this.saveParts(parts, false);
-        this.history.push(state);
+    const parts = computed<PersistentPart[]>(
+      () => layout.value !== null
+        ? vivifyParts(layout.value.parts)
+        : [],
+    );
+
+    const configuredPart = computed<FlowPart | null>(
+      () => flowParts.value.find(p => p.id === configuredPartId.value) ?? null,
+    );
+
+    const overlaps = computed<[Coordinates, number][]>(
+      () => {
+        const counts: Mapped<number> = {};
+        for (const part of parts.value) {
+          const key = new Coordinates([part.x, part.y, 0]).toString();
+          counts[key] = (counts[key] || 0) + 1;
+        }
+        return Object.entries(counts)
+          .filter(([, v]) => v > 1)
+          .map(([k, v]) => [new Coordinates(k), v] as [Coordinates, number]);
+      },
+    );
+
+    const currentMode = computed<ActionMode>({
+      get: () => {
+        const toolId = builderStore.editorMode;
+        return modes.find(tool => tool.value === toolId) ?? modes[0];
+      },
+      set: tool => builderStore.editorMode = tool.value,
+    });
+
+    const routeId = computed<string | null>(
+      () => {
+        const route = router.currentRoute.value;
+        return route.path.startsWith('/builder')
+          ? route.params.id as string || null
+          : null;
+      },
+    );
+
+    function selectLayout(id: string | null): void {
+      layoutId.value = id
+        ?? routeId.value
+        ?? builderStore.lastLayoutId
+        ?? builderStore.layoutIds[0]
+        ?? null;
+
+      const route = layoutId.value ? `/builder/${layoutId.value}` : '/builder';
+      router.replace(route).catch(() => { });
+      builderStore.lastLayoutId = layoutId.value;
+    }
+
+    function setFocus(): void {
+      pageRef.value?.$el.focus();
+      checkFocus();
+    }
+
+    function checkFocus(): void {
+      nextTick(() => {
+        const el = document.querySelector('.editor-page:focus-within');
+        pageFocused.value = (el !== null);
+      });
+    }
+
+
+    async function saveLayout(saved: BuilderLayout | null = layout.value): Promise<void> {
+      if (saved === null) {
+        return;
+      }
+      else if (saved.id) {
+        await builderStore.saveLayout(saved);
+      } else {
+        const id = nanoid();
+        await builderStore.createLayout({ ...saved, id });
+        selectLayout(id);
       }
     }
-  }
 
-  async calculate(): Promise<void> {
-    await this.$nextTick();
-    this.updateFlowParts(calculateNormalizedFlows(this.parts.map(asStatePart)));
-  }
+    async function saveParts(parts: PersistentPart[], saveHistory = true): Promise<void> {
+      if (!layout.value) { return; }
 
-  gridRect(): Rect {
-    // Edge (pre-chromium) does not return x/y values
-    // We can infer them from left/top
-    const { left, right, top, bottom } = this.grid.getBoundingClientRect();
-    return { left, right, top, bottom, x: left, y: top };
-  }
+      if (saveHistory) {
+        const stored = builderStore.layoutById(layout.value.id);
+        if (stored) {
+          history.value.push(JSON.stringify(stored.parts));
+          undoneHistory.value = [];
+        }
+      }
 
-  isClickable(part): boolean {
-    return !!builderStore.spec(part).interactHandler;
-  }
-
-  interact(part: FlowPart): void {
-    const handler = builderStore.spec(part).interactHandler;
-    handler && handler(part, this.updater);
-  }
-
-  isBusy(part: PersistentPart): boolean {
-    return this.floater?.parts.some(p => p.id === part.id)
-      || this.selectedParts.some(p => p.id === part.id);
-  }
-
-  updateFlowParts(parts: FlowPart[]): void {
-    this.flowParts = parts;
-    if (this.selectedParts.length > 0) {
-      const selectedIds = this.selectedParts.map(p => p.id);
-      this.selectedParts = this.flowParts
-        .filter(p => selectedIds.includes(p.id))
-        .map(deepCopy);
+      // first set local value, to avoid jitters caused by the period between action and VueX refresh
+      layout.value.parts = parts.map(asPersistentPart);
+      calculate();
+      await saveLayout();
     }
-  }
 
-  clear(): void {
-    if (this.floater) {
-      this.floater = null;
+    const debouncedSaveParts = debounce(saveParts, 500);
+
+    async function savePart(part: PersistentPart): Promise<void> {
+      await saveParts(spliceById(parts.value, part));
     }
-    else if (this.selectedParts.length) {
-      this.selectedParts = [];
+
+    async function removePart(part: PersistentPart): Promise<void> {
+      await saveParts(filterById(parts.value, part));
     }
-  }
 
-  dropFloater(pos: XYPosition | null, isGridPos: boolean): void {
-    if (!this.floater) { return; }
+    async function undo(): Promise<void> {
+      if (layout.value && history.value.length > 0) {
+        cancelSelection();
 
-    pos = isGridPos ? pos : this.findGridSquare(pos);
-    if (pos) {
-      const ids: string[] = [];
+        const current = builderStore.layoutById(layout.value.id);
+        if (current) {
+          const state = JSON.stringify(current.parts);
+          const parts = JSON.parse(history.value.pop()!);
+          await saveParts(parts, false);
+          undoneHistory.value.push(state);
+        }
+      }
+    }
 
-      this.floater.parts
-        .forEach(part => {
-          ids.push(part.id);
-          part.x += this.floater!.x;
-          part.y += this.floater!.y;
-        });
+    async function redo(): Promise<void> {
+      if (layout.value && undoneHistory.value.length > 0) {
+        cancelSelection();
 
-      this.saveParts([
-        ...this.parts.filter(p => !ids.includes(p.id)),
-        ...this.floater.parts,
+        const current = builderStore.layoutById(layout.value.id);
+        if (current) {
+          const state = JSON.stringify(current.parts);
+          const parts = JSON.parse(undoneHistory.value.pop()!);
+          await saveParts(parts, false);
+          history.value.push(state);
+        }
+      }
+    }
+
+    function gridRect(): Rect {
+      // Edge (pre-chromium) does not return x/y values
+      // We can infer them from left/top
+      const { left, right, top, bottom } = gridRef.value!.getBoundingClientRect();
+      return { left, right, top, bottom, x: left, y: top };
+    }
+
+    function isBusy(part: PersistentPart): boolean {
+      return floater.value?.parts.some(p => p.id === part.id)
+        || selectedParts.value.some(p => p.id === part.id);
+    }
+
+    function updateFlowParts(parts: FlowPart[]): void {
+      flowParts.value = parts;
+      flowPartsRev.value = nanoid(5);
+      if (selectedParts.value.length > 0) {
+        const selectedIds = selectedParts.value.map(p => p.id);
+        selectedParts.value = flowParts.value
+          .filter(p => selectedIds.includes(p.id))
+          .map(deepCopy);
+      }
+    }
+
+    const calculate = debounce(
+      async () => {
+        await nextTick();
+        const source = deepCopy(parts.value);
+        updateFlowParts(calculateNormalizedFlows(source.map(asStatePart)));
+      },
+      150,
+      true,
+    );
+
+    function clear(): void {
+      if (floater.value) {
+        floater.value = null;
+      }
+      else if (selectedParts.value.length) {
+        selectedParts.value = [];
+      }
+    }
+
+    function dropFloater(pos: XYPosition | null, isGridPos: boolean): void {
+      if (!floater.value) { return; }
+
+      pos = isGridPos ? pos : findGridSquare(pos);
+      if (pos) {
+        const ids: string[] = [];
+
+        floater.value.parts
+          .forEach(part => {
+            ids.push(part.id);
+            part.x += floater.value!.x;
+            part.y += floater.value!.y;
+          });
+
+        saveParts([
+          ...parts.value.filter(p => !ids.includes(p.id)),
+          ...floater.value.parts,
+        ]);
+      }
+      selectedParts.value = [];
+      floater.value = null;
+    }
+
+    function findGridSquare(rawPos: XYPosition | null): XYPosition | null {
+      if (rawPos === null) { return null; }
+      const grid = gridRect();
+      let { x, y } = rawPos;
+
+      // Compensate for page scrolling
+      x -= window.pageXOffset;
+      y -= window.pageYOffset;
+
+      return rectContains(grid, x, y)
+        ? {
+          x: Math.floor((x - grid.x) / SQUARE_SIZE),
+          y: Math.floor((y - grid.y) / SQUARE_SIZE),
+        }
+        : null;
+    }
+
+    function findClickSquare(evt: ClickEvent): XYPosition | null {
+      const touch = (evt instanceof MouseEvent) ? evt : evt.touches[0];
+      return findGridSquare({ x: touch.clientX, y: touch.clientY });
+    }
+
+    function findPartAtPos(pos: XYPosition | null, isGridPos: boolean): FlowPart | null {
+      pos = isGridPos ? pos : findGridSquare(pos);
+      if (!pos) { return null; }
+      // iterate right to left to match rendering order
+      // when items overlap, the later item is rendered on top
+      for (let idx = flowParts.value.length - 1; idx >= 0; idx--) {
+        const part = flowParts.value[idx];
+        if (pos.x >= part.x
+          && pos.x < part.x + part.size[0]
+          && pos.y >= part.y
+          && pos.y < part.y + part.size[1]) {
+          return part;
+        }
+      }
+      return null;
+    }
+
+    function findActionParts(): FlowPart[] {
+      if (selectedParts.value.length) {
+        return selectedParts.value;
+      }
+      const hovered = findPartAtPos(hoverPos.value, false);
+      return hovered
+        ? [hovered]
+        : [];
+    }
+
+    function unflippedArea(area: SelectArea): SelectArea {
+      return {
+        x: area.width >= 0 ? area.x : area.x + area.width,
+        y: area.height >= 0 ? area.y : area.y + area.height,
+        width: Math.abs(area.width),
+        height: Math.abs(area.height),
+      };
+    }
+
+    function closeMenu(): void {
+      menuDialogOpen.value = false;
+      nextTick(setFocus);
+    }
+
+    function leaveEditor(): void {
+      router.back();
+    }
+
+    ////////////////////////////////////////////////////////////////
+    // Modes
+    ////////////////////////////////////////////////////////////////
+
+    function selectPanHandler(args: PanArguments): void {
+      if (args.isFirst) {
+        const grid = gridRect();
+        selectArea.value = {
+          x: args.position.left - grid.x,
+          y: args.position.top - grid.y,
+          width: 0,
+          height: 0,
+        };
+      }
+
+      if (selectArea.value) {
+        const { x, y } = args.delta;
+        selectArea.value.width += x;
+        selectArea.value.height += y;
+      }
+
+      if (args.isFinal && selectArea.value) {
+        const { x, y, width, height } = unflippedArea(selectArea.value);
+        const startX = x / SQUARE_SIZE;
+        const startY = y / SQUARE_SIZE;
+        const endX = startX + (width / SQUARE_SIZE);
+        const endY = startY + (height / SQUARE_SIZE);
+
+        const ids = selectedParts.value.map(part => part.id);
+
+        selectedParts.value.push(
+          ...flowParts.value
+            .filter(part =>
+              !ids.includes(part.id)
+              && part.x >= startX - 1
+              && part.x <= endX
+              && part.y >= startY - 1
+              && part.y <= endY)
+            .map(deepCopy));
+
+        selectArea.value = null;
+        selectedTime.value = new Date().getTime();
+      }
+    }
+
+    function selectClickHandler(evt: ClickEvent, part: FlowPart | null): void {
+      if (new Date().getTime() - selectedTime.value < 500) {
+        // The mouseup at the end of a pan also generates a click event - skip this
+        return;
+      }
+
+      if (!part) {
+        cancelSelection();
+        return;
+      }
+
+      const selectedIdx = selectedParts.value.findIndex(p => p.id === part.id);
+      if (selectedIdx >= 0) {
+        selectedParts.value.splice(selectedIdx, 1);
+      } else {
+        selectedParts.value.push(deepCopy(part));
+      }
+    }
+
+    function cancelSelection(): void {
+      selectedTime.value = 0;
+      selectArea.value = null;
+      selectedParts.value = [];
+    }
+
+    function interactClickHandler(evt: ClickEvent, part: FlowPart | null): void {
+      if (part) {
+        builderStore.spec(part).interactHandler?.(part, updater);
+      }
+    }
+
+    ////////////////////////////////////////////////////////////////
+    // Tools
+    ////////////////////////////////////////////////////////////////
+
+    function useAdd(): void {
+      if (!floater.value) {
+        createDialog({
+          component: BuilderCatalog,
+        })
+          .onOk((part: PersistentPart) => {
+            floater.value = {
+              moving: false,
+              x: 0,
+              y: 0,
+              parts: [part],
+            };
+            setFocus();
+          })
+          .onDismiss(setFocus);
+      }
+    }
+
+    function useMove(parts: PersistentPart[]): void {
+      if (floater.value) {
+        dropFloater(hoverPos.value, false);
+      }
+      else if (parts.length) {
+        const minX = Math.min(...parts.map(part => part.x));
+        const minY = Math.min(...parts.map(part => part.y));
+        const startPos = hoverPos.value || { x: 0, y: 0 };
+        floater.value = {
+          ...startPos,
+          moving: true,
+          parts: parts.map(part => ({
+            ...deepCopy(part),
+            x: part.x - minX,
+            y: part.y - minY,
+          })),
+        };
+      }
+    }
+
+    function useCopy(parts: PersistentPart[]): void {
+      if (floater.value) {
+        dropFloater(hoverPos.value, false);
+      }
+      else if (parts.length) {
+        const minX = Math.min(...parts.map(part => part.x));
+        const minY = Math.min(...parts.map(part => part.y));
+        const startPos = hoverPos.value ?? { x: 0, y: 0 };
+        floater.value = {
+          ...startPos,
+          moving: false,
+          parts: parts.map(part => ({
+            ...deepCopy(part),
+            id: nanoid(),
+            x: part.x - minX,
+            y: part.y - minY,
+          })),
+        };
+      }
+    }
+
+    function useRotate(parts: PersistentPart[]): void {
+      if (floater.value) {
+        if (floater.value.parts.length === 1) {
+          const [part] = floater.value.parts;
+          part.rotate = clampRotation(part.rotate + 90);
+        }
+      }
+      else if (parts.length === 1) {
+        const [part] = parts;
+        savePart({ ...part, rotate: clampRotation(part.rotate + 90) });
+      }
+    }
+
+    function useFlip(parts: PersistentPart[]): void {
+      if (floater.value) {
+        if (floater.value.parts.length === 1) {
+          const [part] = floater.value.parts;
+          part.flipped = !part.flipped;
+        }
+      }
+      else if (parts.length === 1) {
+        const [part] = parts;
+        savePart({ ...part, flipped: !part.flipped });
+      }
+    }
+
+    function useEdit(parts: PersistentPart[]): void {
+      if (!floater.value && parts.length === 1) {
+        configuredPartId.value = parts[0].id;
+        menuDialogOpen.value = true;
+      }
+    }
+
+    function useInteract(parts: PersistentPart[]): void {
+      if (!floater.value && parts.length === 1) {
+        const [part] = parts;
+        builderStore.spec(part).interactHandler?.(part, updater);
+      }
+    }
+
+    function useDelete(changed: PersistentPart[]): void {
+      if (!floater.value && changed.length) {
+        const ids = changed.map(p => p.id);
+        saveParts([...parts.value.filter(p => !ids.includes(p.id))]);
+        cancelSelection();
+      }
+    }
+
+    function deltaMove(changed: FlowPart[], delta: XYPosition): void {
+      changed.forEach(part => {
+        part.x += delta.x;
+        part.y += delta.y;
+      });
+      const ids = changed.map(v => v.id);
+      debouncedSaveParts([
+        ...parts.value.filter(p => !ids.includes(p.id)),
+        ...changed,
       ]);
     }
-    this.selectedParts = [];
-    this.floater = null;
-  }
 
-  findGridSquare(rawPos: XYPosition | null): XYPosition | null {
-    if (rawPos === null) { return null; }
-    const grid = this.gridRect();
-    let { x, y } = rawPos;
+    ////////////////////////////////////////////////////////////////
+    // Event handlers
+    ////////////////////////////////////////////////////////////////
 
-    // Compensate for page scrolling
-    x -= window.pageXOffset;
-    y -= window.pageYOffset;
-
-    return rectContains(grid, x, y)
-      ? {
-        x: Math.floor((x - grid.x) / SQUARE_SIZE),
-        y: Math.floor((y - grid.y) / SQUARE_SIZE),
-      }
-      : null;
-  }
-
-  findClickSquare(evt: ClickEvent): XYPosition | null {
-    const touch = (evt instanceof MouseEvent) ? evt : evt.touches[0];
-    return this.findGridSquare({ x: touch.clientX, y: touch.clientY });
-  }
-
-  findPartAtPos(pos: XYPosition | null, isGridPos: boolean): FlowPart | null {
-    pos = isGridPos ? pos : this.findGridSquare(pos);
-    if (!pos) { return null; }
-    // iterate right to left to match rendering order
-    // when items overlap, the later item is rendered on top
-    for (let idx = this.flowParts.length - 1; idx >= 0; idx--) {
-      const part = this.flowParts[idx];
-      if (pos.x >= part.x
-        && pos.x < part.x + part.size[0]
-        && pos.y >= part.y
-        && pos.y < part.y + part.size[1]) {
-        return part;
+    function onGridMove(evt: MouseEvent): void {
+      hoverPos.value = { x: evt.pageX, y: evt.pageY };
+      if (floater.value) {
+        const pos = findGridSquare(hoverPos.value);
+        if (pos) {
+          floater.value.x = pos.x;
+          floater.value.y = pos.y;
+        }
       }
     }
-    return null;
-  }
 
-  findActionParts(): FlowPart[] {
-    if (this.selectedParts.length) {
-      return this.selectedParts;
+    function onGridLeave(): void {
+      hoverPos.value = null;
     }
-    const hovered = this.findPartAtPos(this.hoverPos, false);
-    return hovered
-      ? [hovered]
-      : [];
-  }
 
-  unflippedArea(area: SelectArea): SelectArea {
+    function clickHandler(evt: ClickEvent, part: FlowPart | null): void {
+      if (floater.value) {
+        dropFloater(findClickSquare(evt), true);
+      }
+      else if (currentMode.value.onClick) {
+        currentMode.value.onClick(evt, part);
+      }
+      evt.stopPropagation();
+    }
+
+    function keyHandler(evt: KeyboardEvent): void {
+      const key = evt.key;
+      const keyDelta = moveKeys[key];
+      const tool = tools.find(t => t.shortcut === key);
+
+      if (key === 'Escape') {
+        clear();
+      }
+      else if (keyDelta) {
+        deltaMove(findActionParts(), keyDelta);
+      }
+      else if (evt.ctrlKey) {
+        if (key === 'z') { undo(); }
+        if (key === 'y') { redo(); }
+      }
+      else if (tool) {
+        tool.use(findActionParts());
+      }
+      else {
+        return; // not handled - don't stop propagation
+      }
+      evt.stopPropagation();
+    }
+
+    function panHandler(args: PanArguments, part: FlowPart | null): void {
+      if (currentMode.value.onPan) {
+        currentMode.value.onPan(args, part);
+      }
+      args.evt.stopPropagation();
+    }
+
+    watch(
+      () => layoutId.value,
+      (newV, oldV) => {
+        if (newV !== oldV) {
+          history.value = [];
+          undoneHistory.value = [];
+        }
+      },
+    );
+
+    watch(
+      () => layout.value,
+      () => calculate(),
+    );
+
+    watch(
+      () => layoutTitle.value,
+      title => document.title = `Brewblox | ${title}`,
+      { immediate: true },
+    );
+
+    watch(
+      () => systemStore.started,
+      (started) => {
+        if (started) {
+          selectLayout(null);
+          nextTick(() => setFocus());
+        }
+      },
+      { immediate: true },
+    );
+
     return {
-      x: area.width >= 0 ? area.x : area.x + area.width,
-      y: area.height >= 0 ? area.y : area.y + area.height,
-      width: Math.abs(area.width),
-      height: Math.abs(area.height),
+      squares,
+      pageRef,
+      gridRef,
+      keyHandler,
+      checkFocus,
+      leaveEditor,
+      drawerOpen,
+      drawerContent,
+      layout,
+      selectLayout,
+      setLayoutWidth,
+      setLayoutHeight,
+      modes,
+      currentMode,
+      tools,
+      findActionParts,
+      history,
+      undoneHistory,
+      undo,
+      redo,
+      saveLayout,
+      focusWarning,
+      layouts,
+      menuDialogOpen,
+      configuredPart,
+      savePart,
+      removePart,
+      calculate,
+      closeMenu,
+      clickHandler,
+      onGridMove,
+      onGridLeave,
+      panHandler,
+      flowParts,
+      flowPartsRev,
+      isBusy,
+      floater,
+      selectedParts,
+      overlaps,
+      selectArea,
+      unflippedArea,
+      pageFocused,
     };
-  }
-
-  closeMenu(): void {
-    this.menuDialogOpen = false;
-    this.$nextTick(this.setFocus);
-  }
-
-  leaveEditor(): void {
-    this.$router.back();
-  }
-
-  ////////////////////////////////////////////////////////////////
-  // Modes
-  ////////////////////////////////////////////////////////////////
-
-  selectPanHandler(args: PanArguments): void {
-    if (args.isFirst) {
-      const grid = this.gridRect();
-      this.selectArea = {
-        x: args.position.left - grid.x,
-        y: args.position.top - grid.y,
-        width: 0,
-        height: 0,
-      };
-    }
-
-    if (this.selectArea) {
-      const { x, y } = args.delta;
-      this.selectArea.width += x;
-      this.selectArea.height += y;
-    }
-
-    if (args.isFinal && this.selectArea) {
-      const { x, y, width, height } = this.unflippedArea(this.selectArea);
-      const startX = x / SQUARE_SIZE;
-      const startY = y / SQUARE_SIZE;
-      const endX = startX + (width / SQUARE_SIZE);
-      const endY = startY + (height / SQUARE_SIZE);
-
-      const ids = this.selectedParts.map(part => part.id);
-
-      this.selectedParts.push(
-        ...this.flowParts
-          .filter(part =>
-            !ids.includes(part.id)
-            && part.x >= startX - 1
-            && part.x <= endX
-            && part.y >= startY - 1
-            && part.y <= endY)
-          .map(deepCopy));
-
-      this.selectArea = null;
-      this.selectedTime = new Date().getTime();
-    }
-  }
-
-  selectClickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (new Date().getTime() - this.selectedTime < 500) {
-      // The mouseup at the end of a pan also generates a click event - skip this
-      return;
-    }
-
-    if (!part) {
-      this.cancelSelection();
-      return;
-    }
-
-    const selectedIdx = this.selectedParts.findIndex(p => p.id === part.id);
-    if (selectedIdx >= 0) {
-      this.selectedParts.splice(selectedIdx, 1);
-    } else {
-      this.selectedParts.push(deepCopy(part));
-    }
-  }
-
-  cancelSelection(): void {
-    this.selectedTime = 0;
-    this.selectArea = null;
-    this.selectedParts = [];
-  }
-
-  interactClickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (part) {
-      builderStore.spec(part).interactHandler?.(part, this.updater);
-    }
-  }
-
-  ////////////////////////////////////////////////////////////////
-  // Tools
-  ////////////////////////////////////////////////////////////////
-
-  useAdd(): void {
-    if (!this.floater) {
-      createDialog({
-        component: BuilderCatalog,
-      })
-        .onOk((part: PersistentPart) => {
-          this.floater = {
-            moving: false,
-            x: 0,
-            y: 0,
-            parts: [part],
-          };
-          this.setFocus();
-        })
-        .onDismiss(() => this.setFocus());
-    }
-  }
-
-  useMove(parts: PersistentPart[]): void {
-    if (this.floater) {
-      this.dropFloater(this.hoverPos, false);
-    }
-    else if (parts.length) {
-      const minX = Math.min(...parts.map(part => part.x));
-      const minY = Math.min(...parts.map(part => part.y));
-      const startPos = this.hoverPos || { x: 0, y: 0 };
-      this.floater = {
-        ...startPos,
-        moving: true,
-        parts: parts.map(part => ({
-          ...deepCopy(part),
-          x: part.x - minX,
-          y: part.y - minY,
-        })),
-      };
-    }
-  }
-
-  useCopy(parts: PersistentPart[]): void {
-    if (this.floater) {
-      this.dropFloater(this.hoverPos, false);
-    }
-    else if (parts.length) {
-      const minX = Math.min(...parts.map(part => part.x));
-      const minY = Math.min(...parts.map(part => part.y));
-      const startPos = this.hoverPos ?? { x: 0, y: 0 };
-      this.floater = {
-        ...startPos,
-        moving: false,
-        parts: parts.map(part => ({
-          ...deepCopy(part),
-          id: uid(),
-          x: part.x - minX,
-          y: part.y - minY,
-        })),
-      };
-    }
-  }
-
-  useRotate(parts: PersistentPart[]): void {
-    if (this.floater) {
-      if (this.floater.parts.length === 1) {
-        const [part] = this.floater.parts;
-        part.rotate = clampRotation(part.rotate + 90);
-      }
-    }
-    else if (parts.length === 1) {
-      const [part] = parts;
-      this.savePart({ ...part, rotate: clampRotation(part.rotate + 90) });
-    }
-  }
-
-  useFlip(parts: PersistentPart[]): void {
-    if (this.floater) {
-      if (this.floater.parts.length === 1) {
-        const [part] = this.floater.parts;
-        part.flipped = !part.flipped;
-      }
-    }
-    else if (parts.length === 1) {
-      const [part] = parts;
-      this.savePart({ ...part, flipped: !part.flipped });
-    }
-  }
-
-  useEdit(parts: PersistentPart[]): void {
-    if (!this.floater && parts.length === 1) {
-      this.configuredPartId = parts[0].id;
-      this.menuDialogOpen = true;
-    }
-  }
-
-  useInteract(parts: PersistentPart[]): void {
-    if (!this.floater && parts.length === 1) {
-      const [part] = parts;
-      builderStore.spec(part).interactHandler?.(part, this.updater);
-    }
-  }
-
-  useDelete(parts: PersistentPart[]): void {
-    if (!this.floater && parts.length) {
-      const ids = parts.map(p => p.id);
-      this.saveParts([...this.parts.filter(p => !ids.includes(p.id))]);
-      this.cancelSelection();
-    }
-  }
-
-  deltaMove(parts: FlowPart[], delta: XYPosition): void {
-    parts.forEach(part => {
-      part.x += delta.x;
-      part.y += delta.y;
-    });
-    const ids = parts.map(v => v.id);
-    this.debouncedSaveParts([
-      ...this.parts.filter(p => !ids.includes(p.id)),
-      ...parts,
-    ]);
-  }
-
-  ////////////////////////////////////////////////////////////////
-  // Event handlers
-  ////////////////////////////////////////////////////////////////
-
-  onGridMove(evt: MouseEvent): void {
-    this.hoverPos = { x: evt.pageX, y: evt.pageY };
-    if (this.floater) {
-      const pos = this.findGridSquare(this.hoverPos);
-      if (pos) {
-        this.floater.x = pos.x;
-        this.floater.y = pos.y;
-      }
-    }
-  }
-
-  onGridLeave(): void {
-    this.hoverPos = null;
-  }
-
-  clickHandler(evt: ClickEvent, part: FlowPart): void {
-    if (this.floater) {
-      this.dropFloater(this.findClickSquare(evt), true);
-    }
-    else if (this.currentMode.onClick) {
-      this.currentMode.onClick(evt, part);
-    }
-    evt.stopPropagation();
-  }
-
-  keyHandler(evt: KeyboardEvent): void {
-    const key = evt.key;
-    const keyDelta = moveKeys[key];
-    const tool = this.tools.find(t => t.shortcut === key);
-
-    if (key === 'Escape') {
-      this.clear();
-    }
-    else if (keyDelta) {
-      this.deltaMove(this.findActionParts(), keyDelta);
-    }
-    else if (evt.ctrlKey) {
-      if (key === 'z') { this.undo(); }
-      if (key === 'y') { this.redo(); }
-    }
-    else if (tool) {
-      tool.use(this.findActionParts());
-    }
-    else {
-      return; // not handled - don't stop propagation
-    }
-    evt.stopPropagation();
-  }
-
-  panHandler(args: PanArguments, part: FlowPart): void {
-    if (this.currentMode.onPan) {
-      this.currentMode.onPan(args, part);
-    }
-    args.evt.stopPropagation();
-  }
-
-}
+  },
+});
 </script>
 
 <template>
   <q-layout
-    ref="page"
+    ref="pageRef"
     view="hHh Lpr fFf"
     class="editor-page"
     tabindex="-1"
-    @keyup.native="keyHandler"
-    @focusout.native="checkFocus"
+    @keyup="keyHandler"
+    @focusout="checkFocus"
   >
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
@@ -759,7 +829,7 @@ export default class BuilderEditor extends Vue {
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="drawerOpen" content-class="column" elevated>
+    <q-drawer v-model="drawerOpen" class="column" elevated>
       <SidebarNavigator />
 
       <div class="row">
@@ -858,7 +928,7 @@ export default class BuilderEditor extends Vue {
                 :max="50"
                 label
                 label-always
-                @change="v => { layout.width = v; saveLayout() }"
+                @change="setLayoutWidth"
               />
             </q-item-section>
           </q-item>
@@ -873,7 +943,7 @@ export default class BuilderEditor extends Vue {
                 :max="50"
                 label
                 label-always
-                @change="v => { layout.height = v; saveLayout() }"
+                @change="setLayoutHeight"
               />
             </q-item-section>
           </q-item>
@@ -912,10 +982,11 @@ export default class BuilderEditor extends Vue {
     <BuilderPartMenu
       v-if="menuDialogOpen"
       :part="configuredPart"
+      :rev="flowPartsRev"
       @update:part="savePart"
       @remove:part="removePart"
-      @dirty="debouncedCalculate"
-      @close="closeMenu"
+      @dirty="calculate"
+      @hide="closeMenu"
     />
 
     <q-page-container style="overflow: hidden">
@@ -933,9 +1004,9 @@ export default class BuilderEditor extends Vue {
             class="q-mb-md"
           >
             <svg
-              ref="grid"
+              ref="gridRef"
               class="fit grid-editable"
-              @click="v => clickHandler(v, null)"
+              @click="evt => clickHandler(evt, null)"
               @mouseenter="onGridMove"
               @mousemove="onGridMove"
               @mouseleave="onGridLeave"
@@ -961,7 +1032,7 @@ export default class BuilderEditor extends Vue {
               <g
                 v-for="part in flowParts"
                 v-show="!isBusy(part)"
-                :key="part.id"
+                :key="`${flowPartsRev}-${part.id}`"
                 v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
                 :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
                 :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
@@ -971,7 +1042,7 @@ export default class BuilderEditor extends Vue {
                   :part="part"
                   show-hover
                   @update:part="savePart"
-                  @dirty="debouncedCalculate"
+                  @dirty="calculate"
                 />
               </g>
               <!-- Floating parts -->

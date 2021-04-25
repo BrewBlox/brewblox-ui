@@ -1,75 +1,105 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { computed, defineComponent } from 'vue';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
+import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { objectStringSorter } from '@/utils/functional';
 
-import { SQUARE_SIZE } from './const';
 import { builderStore } from './store';
 import { PartSpec, PersistentPart, StatePart } from './types';
-import { asStatePart } from './utils';
+import { asStatePart, squares } from './utils';
 
 interface PartDisplay {
   part: StatePart;
   spec: PartSpec;
 }
 
+export default defineComponent({
+  name: 'BuilderCatalog',
+  props: {
+    ...useDialog.props,
+    partial: {
+      type: Object as PropType<Partial<PersistentPart>>,
+      default: () => ({}),
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-@Component
-export default class BuilderCatalog extends DialogBase {
-  SQUARE_SIZE: number = SQUARE_SIZE;
+    const partFilter = ref<string | null>(null);
 
-  partFilter: string | null = null;
+    const available = computed<PartDisplay[]>(
+      () => {
+        const filter = new RegExp(partFilter.value || '', 'i');
+        return builderStore.specs
+          .filter(spec => `${spec.id}|${spec.title}`.match(filter))
+          .sort(objectStringSorter('title'))
+          .map(spec => ({
+            spec,
+            part: asStatePart({
+              type: spec.id,
+              id: nanoid(),
+              x: 0,
+              y: 0,
+              rotate: 0,
+              settings: {},
+              flipped: false,
+            }),
+          }));
+      },
+    );
 
-  @Prop({ type: Object, default: () => ({}) })
-  readonly partial!: Partial<PersistentPart>;
+    function partViewBox(display: PartDisplay): string {
+      return display.part.size.map(squares).join(' ');
+    }
 
-  get available(): PartDisplay[] {
-    const filter = (this.partFilter || '').toLowerCase();
-    return builderStore.specs
-      .filter(spec => `${spec.id}|${spec.title}`.toLowerCase().match(filter))
-      .sort(objectStringSorter('title'))
-      .map(spec => ({
-        spec,
-        part: asStatePart({
-          type: spec.id,
-          id: uid(),
-          x: 0,
-          y: 0,
-          rotate: 0,
-          settings: {},
-          flipped: false,
-        }),
-      }));
-  }
+    function selectPart(display: PartDisplay): void {
+      onDialogOK({ ...display.part, ...props.partial });
+    }
 
-  partViewBox(display: PartDisplay): string {
-    return display.part.size.map(v => v * SQUARE_SIZE).join(' ');
-  }
+    function showSearchKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: partFilter.value,
+        },
+      })
+        .onOk((v: string) => partFilter.value = v);
+    }
 
-  selectPart(display: PartDisplay): void {
-    this.onDialogOk({ ...display.part, ...this.partial });
-  }
-
-
-  showSearchKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.partFilter,
-    })
-      .onOk((v: string) => this.partFilter = v);
-  }
-}
+    return {
+      squares,
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      partFilter,
+      available,
+      partViewBox,
+      selectPart,
+      showSearchKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <CardWrapper no-scroll v-bind="{context}">
+    <CardWrapper no-scroll>
       <template #toolbar>
         <DialogToolbar title="Part Catalog" />
       </template>
@@ -98,8 +128,8 @@ export default class BuilderCatalog extends DialogBase {
               >
                 <q-item-section side>
                   <svg
-                    :width="`${SQUARE_SIZE}px`"
-                    :height="`${SQUARE_SIZE}px`"
+                    :width="`${squares(1)}px`"
+                    :height="`${squares(1)}px`"
                     :viewBox="`0 0 ${partViewBox(v)}`"
                   >
                     <PartWrapper :part="v.part" />

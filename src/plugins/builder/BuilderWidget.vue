@@ -1,8 +1,12 @@
 <script lang="ts">
-import { debounce, uid } from 'quasar';
-import { computed, defineComponent } from 'vue';
+import { nanoid } from 'nanoid';
+import { debounce } from 'quasar';
+import { computed, defineComponent, nextTick, onBeforeMount, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
+import { useGlobals, useWidget } from '@/composables';
 import { systemStore } from '@/store/system';
+import { Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { spliceById, uniqueFilter } from '@/utils/functional';
 
@@ -12,165 +16,183 @@ import { builderStore } from './store';
 import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
 import { asPersistentPart, asStatePart, squares, vivifyParts } from './utils';
 
-@Component
-export default class BuilderWidget extends WidgetBase<BuilderConfig> {
-  squares = squares;
+export default defineComponent({
+  name: 'BuilderWidget',
+  setup() {
+    const router = useRouter();
+    const { dense } = useGlobals.setup();
+    const {
+      widget,
+      config,
+      saveConfig,
+    } = useWidget.setup<Widget<BuilderConfig>>();
 
-  flowParts: FlowPart[] = [];
-  debouncedCalculate: Function = () => { };
+    const flowParts = ref<FlowPart[]>([]);
+    const pending = ref<FlowPart | null>(null);
 
-  pending: FlowPart | null = null;
+    const calculate = debounce(
+      async () => {
+        await nextTick();
+        flowParts.value = calculateNormalizedFlows(parts.value.map(asStatePart));
+      },
+      200,
+      false,
+    );
 
-  @Watch('layout')
-  watchLayout(): void {
-    this.debouncedCalculate();
-  }
+    const storeLayouts = computed<BuilderLayout[]>(
+      () => builderStore.layouts,
+    );
 
-  created(): void {
-    this.migrate();
-    this.debouncedCalculate = debounce(this.calculate, 200, false);
-    this.debouncedCalculate();
-  }
+    const layout = computed<BuilderLayout | null>(
+      () => builderStore.layoutById(config.value.currentLayoutId),
+    );
 
-  get allLayouts(): BuilderLayout[] {
-    return builderStore.layouts;
-  }
-
-  get layoutIds(): string[] {
-    return this.config.layoutIds ?? [];
-  }
-
-  get layouts(): BuilderLayout[] {
-    return this.layoutIds
-      .map(id => builderStore.layoutById(id))
-      .filter(v => v !== null) as BuilderLayout[];
-  }
-
-  get layout(): BuilderLayout | null {
-    return builderStore.layoutById(this.config.currentLayoutId);
-  }
-
-  startSelectLayout(): void {
-    createDialog({
-      component: 'SelectedLayoutDialog',
-      value: this.config.currentLayoutId,
-    })
-      .onOk(id => {
-        this.config.currentLayoutId = id;
-        this.saveConfig();
-      });
-  }
-
-  selectLayout(id: string | null): void {
-    if (id) {
-      this.config.layoutIds = [...this.config.layoutIds, id].filter(uniqueFilter);
-    }
-    this.config.currentLayoutId = id;
-    this.saveConfig(this.config);
-  }
-
-  get gridHeight(): number {
-    return squares(this.layout?.height ?? 10);
-  }
-
-  get gridWidth(): number {
-    return squares(this.layout?.width ?? 10);
-  }
-
-  startEditor(): void {
-    if (!this.$dense) {
-      this.$router.push(`/builder/${this.layout?.id ?? ''}`);
-    }
-  }
-
-  get gridViewBox(): string {
-    return [0, 0, this.gridWidth, this.gridHeight]
-      .join(' ');
-  }
-
-  async saveParts(parts: PersistentPart[]): Promise<void> {
-    if (!this.layout) {
-      return;
+    function startSelectLayout(): void {
+      createDialog({
+        component: 'SelectedLayoutDialog',
+        componentProps: {
+          modelValue: config.value.currentLayoutId,
+        },
+      })
+        .onOk(id => {
+          config.value.currentLayoutId = id;
+          saveConfig();
+        });
     }
 
-    // first set local value, to avoid jitters caused by the period between action and vueX refresh
-    this.layout.parts = parts.map(asPersistentPart);
-    await builderStore.saveLayout(this.layout);
-    this.debouncedCalculate();
-  }
+    function selectLayout(id: string | null): void {
+      if (id) {
+        config.value.layoutIds = [...config.value.layoutIds, id].filter(uniqueFilter);
+      }
+      config.value.currentLayoutId = id;
+      saveConfig(config.value);
+    }
 
-  async savePart(part: PersistentPart): Promise<void> {
-    await this.saveParts(spliceById(this.parts, part));
-  }
+    const gridViewBox = computed<string>(
+      () => {
+        const gridHeight = squares(layout.value?.height ?? 10);
+        const gridWidth = squares(layout.value?.width ?? 10);
+        return [0, 0, gridWidth, gridHeight].join(' ');
+      },
+    );
 
-  get parts(): PersistentPart[] {
-    return this.layout !== null
-      ? vivifyParts(this.layout.parts)
-      : [];
-  }
+    function startEditor(): void {
+      if (!dense.value) {
+        router.push(`/builder/${layout.value?.id ?? ''}`);
+      }
+    }
 
-  get updater(): PartUpdater {
+    async function saveParts(parts: PersistentPart[]): Promise<void> {
+      if (!layout.value) {
+        return;
+      }
+
+      // first set local value, to avoid jitters caused by the period between action and vueX refresh
+      layout.value.parts = parts.map(asPersistentPart);
+      await builderStore.saveLayout(layout.value);
+      await calculate();
+    }
+
+    async function savePart(part: PersistentPart): Promise<void> {
+      await saveParts(spliceById(parts.value, part));
+    }
+
+    const parts = computed<PersistentPart[]>(
+      () => layout.value !== null
+        ? vivifyParts(layout.value.parts)
+        : [],
+    );
+
+    const updater = computed<PartUpdater>(
+      () => ({
+        updatePart: savePart,
+      }),
+    );
+
+    const delayTouch = computed<boolean>(
+      () => {
+        const { builderTouchDelayed } = systemStore.config;
+        return builderTouchDelayed === 'always'
+          || (builderTouchDelayed === 'dense' && dense.value);
+      },
+    );
+
+
+    function isClickable(part: FlowPart): boolean {
+      return builderStore.spec(part).interactHandler !== undefined;
+    }
+
+    function interact(part: FlowPart | null): void {
+      if (!part) {
+        return;
+      }
+      const handler = builderStore.spec(part).interactHandler;
+      if (!handler) {
+        return;
+      }
+      if (pending.value && pending.value.id === part.id) {
+        handler(part, updater.value);
+        pending.value = null;
+      }
+      else if (delayTouch.value) {
+        pending.value = part;
+      }
+      else {
+        handler(part, updater.value);
+      }
+    }
+
+    async function migrate(): Promise<void> {
+      const oldParts: PersistentPart[] = (config.value as any).parts;
+      if (oldParts) {
+        const id = nanoid();
+        await builderStore.createLayout({
+          id,
+          title: `${widget.value.title} layout`,
+          width: defaultLayoutWidth,
+          height: defaultLayoutHeight,
+          parts: oldParts,
+        });
+        config.value.layoutIds.push(id);
+        config.value.currentLayoutId = id;
+        config.value['parts'] = undefined;
+        saveConfig();
+      }
+    }
+
+    watch(
+      () => layout.value,
+      () => calculate(),
+      { immediate: true },
+    );
+
+    onBeforeMount(() => migrate());
+
     return {
-      updatePart: this.savePart,
+      squares,
+      startSelectLayout,
+      dense,
+      startEditor,
+      parts,
+      layout,
+      storeLayouts,
+      selectLayout,
+      gridViewBox,
+      flowParts,
+      isClickable,
+      pending,
+      interact,
+      savePart,
+      calculate,
     };
-  }
-
-  get delayTouch(): boolean {
-    const { builderTouchDelayed } = systemStore.config;
-    return builderTouchDelayed === 'always'
-      || (builderTouchDelayed === 'dense' && this.$dense);
-  }
-
-  isClickable(part: FlowPart): boolean {
-    return builderStore.spec(part).interactHandler !== undefined;
-  }
-
-  interact(part: FlowPart): void {
-    const handler = builderStore.spec(part).interactHandler;
-    if (!handler) {
-      return;
-    }
-    if (this.pending && this.pending.id === part.id) {
-      handler(part, this.updater);
-      this.pending = null;
-    }
-    else if (this.delayTouch) {
-      this.pending = part;
-    }
-    else {
-      handler(part, this.updater);
-    }
-  }
-
-  async calculate(): Promise<void> {
-    await this.$nextTick();
-    this.flowParts = calculateNormalizedFlows(this.parts.map(asStatePart));
-  }
-
-  async migrate(): Promise<void> {
-    const oldParts: PersistentPart[] = (this.config as any).parts;
-    if (oldParts) {
-      const id = uid();
-      await builderStore.createLayout({
-        id,
-        title: `${this.widget.title} layout`,
-        width: defaultLayoutWidth,
-        height: defaultLayoutHeight,
-        parts: oldParts,
-      });
-      this.config.layoutIds.push(id);
-      this.config.currentLayoutId = id;
-      this.$delete(this.config, 'parts');
-      this.saveConfig(this.config);
-    }
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <CardWrapper no-scroll v-bind="{context}">
+  <CardWrapper no-scroll>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud">
+      <WidgetToolbar>
         <q-btn
           flat
           dense
@@ -182,13 +204,13 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
         </q-btn>
         <template #actions>
           <ActionItem
-            v-if="!$dense"
+            v-if="!dense"
             icon="mdi-tools"
             label="Edit layout"
             @click="startEditor"
           />
         </template>
-      </component>
+      </WidgetToolbar>
     </template>
 
     <div class="fit" @click="pending = null">
@@ -201,7 +223,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
         </div>
         <div class="row q-gutter-x-sm justify-center">
           <q-btn
-            v-if="allLayouts.length > 0"
+            v-if="storeLayouts.length > 0"
             fab-mini
             color="secondary"
             icon="mdi-format-list-bulleted"
@@ -230,7 +252,6 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
         </div>
       </span>
       <svg
-        ref="grid"
         :viewBox="gridViewBox"
         class="fit q-pa-md"
       >
@@ -246,10 +267,9 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
           @click.stop="interact(part)"
         >
           <PartWrapper
-            v-touch-repeat:100.stop="args => handleRepeat(args, part)"
             :part="part"
             @update:part="savePart"
-            @dirty="debouncedCalculate"
+            @dirty="calculate"
           />
         </g>
         <template v-if="pending">
@@ -268,7 +288,7 @@ export default class BuilderWidget extends WidgetBase<BuilderConfig> {
             <PartWrapper
               :part="pending"
               @update:part="savePart"
-              @dirty="debouncedCalculate"
+              @dirty="calculate"
             />
           </g>
         </template>

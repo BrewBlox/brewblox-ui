@@ -27,15 +27,21 @@ const defaultUnits = (): UserUnits => ({
 
 @Module // generateMutationSetters not set
 export class SystemModule extends VuexModule {
-  public loaded = false;
+  public connected = false;
+  public started = false;
   public config: SystemConfig = defaultConfig();
   public units: UserUnits = defaultUnits();
 
   public userDefinedUnits = true; // assume yes
 
   @Mutation
-  public setLoaded(): void {
-    this.loaded = true;
+  public setConnected(): void {
+    this.connected = true;
+  }
+
+  @Mutation
+  public setStarted(): void {
+    this.started = true;
   }
 
   @Mutation

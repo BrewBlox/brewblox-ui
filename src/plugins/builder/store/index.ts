@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { BuilderLayout, PartSpec } from '@/plugins/builder/types';
+import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
 import store from '@/store';
 import { extendById, filterById, findById } from '@/utils/functional';
 

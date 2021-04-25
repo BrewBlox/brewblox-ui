@@ -3,7 +3,6 @@ import isObjectLike from 'lodash/isObjectLike';
 
 import { eventbus } from '@/plugins/eventbus';
 import { DatastoreEvent, StoreObject } from '@/shared-types';
-import { systemStore } from '@/store/system';
 import { STORE_TOPIC } from '@/utils/const';
 import http, { parseHttpError } from '@/utils/http';
 import notify from '@/utils/notify';
@@ -42,7 +41,6 @@ async function checkDatastore(): Promise<void> {
     notify.error(`Datastore error: ${parseHttpError(e, true)}`, { shown: false });
     await retryDatastore();
   }
-  systemStore.setLoaded();
 }
 
 export class BrewbloxRedisDatabase implements BrewbloxDatabase {
