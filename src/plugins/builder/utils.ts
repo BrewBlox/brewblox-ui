@@ -269,7 +269,7 @@ export function vivifyParts(parts: PersistentPart[]): PersistentPart[] {
     .sort((a, b) => sizes[b.id] - sizes[a.id]);
 }
 
-export function rotatedCoord(part: FlowPart, coord: string): string {
+export function rotatedCoord(part: StatePart, coord: string): string {
   return new Coordinates(coord)
     .flipShapeEdge(!!part.flipped, 0, part.size)
     .rotateShapeEdge(part.rotate, 0, part.size)

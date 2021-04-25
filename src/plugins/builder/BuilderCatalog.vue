@@ -7,12 +7,16 @@ import { createDialog } from '@/utils/dialog';
 import { objectStringSorter } from '@/utils/functional';
 
 import { builderStore } from './store';
-import { PartSpec, PersistentPart, StatePart } from './types';
+import { FlowPart, PartSpec, PersistentPart } from './types';
 import { asStatePart, squares } from './utils';
 
 interface PartDisplay {
-  part: StatePart;
+  part: FlowPart;
   spec: PartSpec;
+}
+
+function asFlowPart(part: PersistentPart): FlowPart {
+  return { ...asStatePart(part), flows: {} };
 }
 
 export default defineComponent({
@@ -46,7 +50,7 @@ export default defineComponent({
           .sort(objectStringSorter('title'))
           .map(spec => ({
             spec,
-            part: asStatePart({
+            part: asFlowPart({
               type: spec.id,
               id: nanoid(),
               x: 0,
