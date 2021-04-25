@@ -3,6 +3,9 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { LEFT } from '@/plugins/builder/const';
 
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
+
 const paths = {
   borders: [
     'M0,21h20c5,0,9,4,9,9v144.1c0,0,0.1,4.9-4,4.9c-4.3,0-4-4.9-4-4.9V32c0-1.7-1.3-3-3-3H0',
@@ -11,18 +14,30 @@ const paths = {
   liquid: 'M0,25H20a5,5,0,0,1,5,5V175',
 };
 
-@Component
-export default class WhirlpoolInlet extends PartBase {
-  readonly paths = paths;
+export default defineComponent({
+  name: 'WhirlpoolInlet',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => -flowOnCoord(props.part, LEFT),
+    );
 
-  get flowSpeed(): number {
-    return -this.flowOnCoord(LEFT);
-  }
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, LEFT),
+    );
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(LEFT);
-  }
-}
+    return {
+      paths,
+      flowSpeed,
+      liquids,
+    };
+  },
+});
 </script>
 
 <template>

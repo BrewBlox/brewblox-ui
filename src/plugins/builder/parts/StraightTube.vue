@@ -3,24 +3,41 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { RIGHT } from '@/plugins/builder/const';
 
-@Component
-export default class StraightTube extends PartBase {
-  readonly paths = {
-    borders: [
-      'M 0,21 H 50',
-      'M 0,29 H 50',
-    ],
-    liquid: 'M 0,25 H 50',
-  };
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
-  get flowSpeed(): number {
-    return this.flowOnCoord(RIGHT);
-  }
+const paths = {
+  borders: [
+    'M 0,21 H 50',
+    'M 0,29 H 50',
+  ],
+  liquid: 'M 0,25 H 50',
+};
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(RIGHT);
-  }
-}
+export default defineComponent({
+  name: 'StraightTube',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => flowOnCoord(props.part, RIGHT),
+    );
+
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, RIGHT),
+    );
+
+    return {
+      paths,
+      flowSpeed,
+      liquids,
+    };
+  },
+});
 </script>
 
 <template>

@@ -1,8 +1,9 @@
+import { SCALE_KEY } from '@/plugins/builder/const';
 import { PartSpec } from '@/plugins/builder/types';
 
 export const SIZE_X = 1;
 export const SIZE_Y = 2;
-export const SCALE_KEY = 'scale';
+
 
 const spec: PartSpec = {
   id: 'BeerBottle',

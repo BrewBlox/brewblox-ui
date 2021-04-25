@@ -27,6 +27,10 @@ export const INNER_CORNER = 4;
 export const OUTER_CORNER = 12;
 export const LIQUID_CORNER = 8;
 
+// Generic settings values
+export const SCALE_KEY = 'scale';
+export const BORDER_KEY = 'bordered';
+
 export const deprecatedTypes = {
   SmallKettle: 'Kettle',
   LargeKettle: 'Kettle',

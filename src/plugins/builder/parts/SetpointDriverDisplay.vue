@@ -20,7 +20,7 @@ import { systemStore } from '@/store/system';
 import { deltaTempQty, isQuantity, Quantity } from '@/utils/bloxfield';
 
 import { usePart, useSettingsBlock } from '../composables';
-import { DRIVER_KEY, DRIVER_TYPES, SCALE_KEY } from '../specs/SetpointDriverDisplay';
+import { DRIVER_KEY, DRIVER_TYPES } from '../specs/SetpointDriverDisplay';
 import { FlowPart } from '../types';
 
 const icons = {
@@ -40,16 +40,14 @@ export default defineComponent({
   },
   setup(props) {
     const {
+      scale,
       bordered,
     } = usePart.setup(props.part);
+
     const {
       block,
       isBroken,
     } = useSettingsBlock.setup<ActuatorOffsetBlock>(props.part, DRIVER_KEY, DRIVER_TYPES);
-
-    const scale = computed<number>(
-      () => props.part.settings[SCALE_KEY] ?? 1,
-    );
 
     // Reference actually is a BlockIntf.ProcessValueInterface
     // We don't have a TS type for that, but Setpoint/PWM are a good intersection

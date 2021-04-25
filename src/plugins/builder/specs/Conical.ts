@@ -1,11 +1,10 @@
+import { SCALE_KEY } from '@/plugins/builder/const';
 import { PartSpec } from '@/plugins/builder/types';
 import { showSettingsBlock } from '@/plugins/builder/utils';
 import { BlockType } from '@/plugins/spark/types';
 
 export const SETPOINT_KEY = 'setpoint';
 export const SETPOINT_TYPES = [BlockType.SetpointSensorPair];
-
-export const SCALE_KEY = 'scale';
 
 const SIZE_X = 3;
 const SIZE_Y = 9;

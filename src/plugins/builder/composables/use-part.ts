@@ -1,12 +1,14 @@
-import { computed, ComputedRef, inject, Ref, ref, UnwrapRef, watch } from 'vue';
+import { computed, ComputedRef } from 'vue';
 
+import { BORDER_KEY, SCALE_KEY } from '../const';
 import { FlowPart } from '../types';
 
 export interface UsePartComponent {
   sizeX: ComputedRef<number>;
   sizeY: ComputedRef<number>;
-  bordered: ComputedRef<boolean>;
   flipped: ComputedRef<boolean>;
+  bordered: ComputedRef<boolean>;
+  scale: ComputedRef<number>;
 }
 
 export interface UsePartComposable {
@@ -23,19 +25,24 @@ export const usePart: UsePartComposable = {
       () => part.size[1],
     );
 
-    const bordered = computed<boolean>(
-      () => part.settings.bordered !== false,
-    );
-
     const flipped = computed<boolean>(
       () => part.flipped === true,
+    );
+
+    const bordered = computed<boolean>(
+      () => part.settings[BORDER_KEY] ?? true,
+    );
+
+    const scale = computed<number>(
+      () => part.settings[SCALE_KEY] ?? 1,
     );
 
     return {
       sizeX,
       sizeY,
-      bordered,
       flipped,
+      bordered,
+      scale,
     };
   },
 };

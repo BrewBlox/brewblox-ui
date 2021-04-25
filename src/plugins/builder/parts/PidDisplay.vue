@@ -11,7 +11,7 @@ import { deltaTempQty, prettyUnit } from '@/utils/bloxfield';
 import { truncateRound } from '@/utils/functional';
 
 import { usePart, useSettingsBlock } from '../composables';
-import { PID_KEY, PID_TYPES, SCALE_KEY } from '../specs/PidDisplay';
+import { PID_KEY, PID_TYPES } from '../specs/PidDisplay';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -24,6 +24,7 @@ export default defineComponent({
   },
   setup(props) {
     const {
+      scale,
       bordered,
     } = usePart.setup(props.part);
 
@@ -31,10 +32,6 @@ export default defineComponent({
       block,
       isBroken,
     } = useSettingsBlock.setup<PidBlock>(props.part, PID_KEY, PID_TYPES);
-
-    const scale = computed<number>(
-      () => props.part.settings[SCALE_KEY] ?? 1,
-    );
 
     const outputValue = computed<number | null>(
       () => block.value?.data.enabled

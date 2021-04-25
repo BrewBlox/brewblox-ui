@@ -3,6 +3,9 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { RIGHT } from '@/plugins/builder/const';
 
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
+
 const paths = {
   outerValve: [
     'M0,21h10.5c1.4-5.1,5.4-9.1,10.5-10.5C29,8.3,37.2,13,39.4,21h0.1H50',
@@ -22,22 +25,35 @@ const paths = {
   arrows: 'M0,25H50',
 };
 
-@Component
-export default class Valve extends PartBase {
-  readonly paths = paths;
+export default defineComponent({
+  name: 'Valve',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => flowOnCoord(props.part, RIGHT),
+    );
 
-  get flowSpeed(): number {
-    return this.flowOnCoord(RIGHT);
-  }
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, RIGHT),
+    );
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(RIGHT);
-  }
+    const closed = computed<boolean>(
+      () => Boolean(props.part.settings['closed']),
+    );
 
-  get closed(): boolean {
-    return Boolean(this.part.settings.closed);
-  }
-}
+    return {
+      paths,
+      flowSpeed,
+      liquids,
+      closed,
+    };
+  },
+});
 </script>
 
 <template>

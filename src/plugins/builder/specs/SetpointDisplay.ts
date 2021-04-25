@@ -1,3 +1,4 @@
+import { SCALE_KEY } from '@/plugins/builder/const';
 import { PartSpec } from '@/plugins/builder/types';
 import { showSettingsBlock, universalTransitions } from '@/plugins/builder/utils';
 import { BlockIntfType } from '@/plugins/spark/types';
@@ -7,7 +8,6 @@ export const SIZE_X = 2;
 export const SIZE_Y = 1;
 export const SETPOINT_KEY = 'setpoint';
 export const SETPOINT_TYPES = [BlockIntfType.SetpointSensorPairInterface];
-export const SCALE_KEY = 'scale';
 export const FLOW_TOGGLE_KEY = 'flowEnabled';
 
 const size: PartSpec['size'] = ({ settings }) => {

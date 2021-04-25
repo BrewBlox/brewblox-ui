@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { colorString } from '@/plugins/builder/utils';
 
-import { SCALE_KEY } from '../specs/BeerBottle';
+import { usePart } from '../composables';
 import { FlowPart } from '../types';
 
 const paths = {
@@ -44,12 +44,12 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const {
+      scale,
+    } = usePart.setup(props.part);
+
     const color = computed<string>(
       () => colorString(props.part.settings.color),
-    );
-
-    const scale = computed<number>(
-      () => props.part.settings[SCALE_KEY] ?? 1,
     );
 
     return {

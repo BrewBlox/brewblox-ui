@@ -2,7 +2,9 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER } from '@/plugins/builder/const';
-import { verticalChevrons } from '@/plugins/builder/utils';
+import { flowOnCoord, liquidOnCoord, verticalChevrons } from '@/plugins/builder/utils';
+
+import { FlowPart } from '../types';
 
 const chevrons = verticalChevrons(50, 86.4);
 const paths = {
@@ -14,19 +16,31 @@ const paths = {
   arrows: 'M25,0V20a5,5,0,0,0,5,5 h14.5 a5,5,0,0,1,5,6 V80',
 };
 
-@Component
-export default class ShiftedSystemIO extends PartBase {
-  readonly chevrons = chevrons;
-  readonly paths = paths;
+export default defineComponent({
+  name: 'ShiftedSystemIO',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => flowOnCoord(props.part, CENTER),
+    );
 
-  get flowSpeed(): number {
-    return this.flowOnCoord(CENTER);
-  }
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, CENTER),
+    );
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(CENTER);
-  }
-}
+    return {
+      chevrons,
+      paths,
+      flowSpeed,
+      liquids,
+    };
+  },
+});
 </script>
 
 <template>

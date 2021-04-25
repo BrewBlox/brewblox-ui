@@ -4,7 +4,6 @@ import { computed, defineComponent, PropType } from 'vue';
 import { CENTER } from '@/plugins/builder/const';
 
 import { usePart } from '../composables';
-import { SCALE_KEY } from '../specs/SetpointDisplay';
 import { FlowPart } from '../types';
 import { liquidOnCoord, squares } from '../utils';
 
@@ -18,12 +17,9 @@ export default defineComponent({
   },
   setup(props) {
     const {
+      scale,
       bordered,
     } = usePart.setup(props.part);
-
-    const scale = computed<number>(
-      () => props.part.settings[SCALE_KEY] ?? 1,
-    );
 
     const color = computed<string>(
       () => liquidOnCoord(props.part, CENTER)[0] ?? '',

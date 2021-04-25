@@ -8,7 +8,7 @@ import { prettyUnit } from '@/utils/bloxfield';
 import { round } from '@/utils/functional';
 
 import { usePart, useSettingsBlock } from '../composables';
-import { SCALE_KEY, SENSOR_KEY, SENSOR_TYPES, SensorT } from '../specs/SensorDisplay';
+import { SENSOR_KEY, SENSOR_TYPES, SensorT } from '../specs/SensorDisplay';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -22,15 +22,13 @@ export default defineComponent({
   setup(props) {
     const {
       bordered,
+      scale,
     } = usePart.setup(props.part);
+
     const {
       block,
       isBroken,
     } = useSettingsBlock.setup<SensorT>(props.part, SENSOR_KEY, SENSOR_TYPES);
-
-    const scale = computed<number>(
-      () => props.part.settings[SCALE_KEY] ?? 1,
-    );
 
     const temperature = computed<number | null>(
       () => block.value?.data.value?.value ?? null,

@@ -1,7 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
-import { SCALE_KEY } from '../specs/Conical';
+import { usePart } from '../composables';
 import { FlowPart } from '../types';
 
 export default defineComponent({
@@ -13,9 +13,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const scale = computed<number>(
-      () => props.part.settings[SCALE_KEY] ?? 1,
-    );
+    const {
+      scale,
+    } = usePart.setup(props.part);
 
     return {
       scale,
