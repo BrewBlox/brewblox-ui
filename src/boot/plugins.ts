@@ -9,7 +9,7 @@ import misc from '@/plugins/misc';
 // import quickstart from '@/plugins/quickstart';
 import spark from '@/plugins/spark';
 import { startup, startupPlugin } from '@/plugins/startup';
-// import tilt from '@/plugins/tilt';
+import tilt from '@/plugins/tilt';
 import wizardry from '@/plugins/wizardry';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
@@ -27,7 +27,7 @@ export default boot(({ app, store }) => {
     wizardry,
     history,
     spark,
-    // tilt,
+    tilt,
     builder,
     // quickstart,
     misc,
