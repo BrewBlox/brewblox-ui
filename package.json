@@ -65,6 +65,7 @@
     "@types/jest": "^23.3.14",
     "@types/js-quantities": "^1.6.2",
     "@types/lodash": "^4.14.168",
+    "@types/marked": "^2.0.2",
     "@types/nanoid": "^2.1.0",
     "@types/node": "11.9.5",
     "@types/plotly.js": "^1.54.9",

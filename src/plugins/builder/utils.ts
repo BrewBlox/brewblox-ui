@@ -1,6 +1,6 @@
 import defaults from 'lodash/defaults';
 import range from 'lodash/range';
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
@@ -257,7 +257,7 @@ export function vivifyParts(parts: PersistentPart[]): PersistentPart[] {
         settings: {},
         flipped: false,
       });
-      part.id = part.id ?? uid();
+      part.id = part.id ?? nanoid();
       part.type = deprecatedTypes[part.type] ?? part.type;
 
       const [sizeX, sizeY] = builderStore.spec(part).size(part);

@@ -95,11 +95,11 @@ export class HistoryModule extends VuexModule {
       .filter(uniqueFilter);
   }
 
-  public sessionById(id: string): LoggedSession | null {
+  public sessionById(id: string | null): LoggedSession | null {
     return findById(this.sessions, id);
   }
 
-  public sourceById(id: string): HistorySource | null {
+  public sourceById(id: string | null): HistorySource | null {
     return findById(this.sources, id);
   }
 

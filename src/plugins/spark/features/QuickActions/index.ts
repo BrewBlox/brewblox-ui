@@ -1,4 +1,4 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 import { Plugin } from 'vue';
 
 import { featureStore, WidgetFeature } from '@/store/features';
@@ -23,7 +23,7 @@ const plugin: Plugin = {
       generateConfig: () => ({
         actions: [
           {
-            id: uid(),
+            id: nanoid(),
             name: 'Example action - click to edit',
             changes: [],
           },

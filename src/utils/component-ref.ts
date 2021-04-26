@@ -20,7 +20,11 @@ export const autoRegister =
           const match = fileName.match(/([\w\-]+)\.vue$/);
           if (match) {
             const componentConfig = context(fileName);
-            app.component(match[1], componentConfig.default || componentConfig);
+            const component = componentConfig.default || componentConfig;
+            if (component.name !== match[1]) {
+              console.warn(`File name '${fileName}' doesn't match component name ${component.name}`);
+            }
+            app.component(component.name, component);
           }
         });
 
