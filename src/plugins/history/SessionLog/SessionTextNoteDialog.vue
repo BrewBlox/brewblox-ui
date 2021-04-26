@@ -2,7 +2,7 @@
 import { QInput } from 'quasar';
 import { defineComponent, nextTick, ref } from 'vue';
 
-import { useDialog } from '@/composables';
+import { useDialog, useGlobals } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 
 export default defineComponent({
@@ -18,6 +18,7 @@ export default defineComponent({
     ...useDialog.emits,
   ],
   setup(props) {
+    const { dense } = useGlobals.setup();
     const {
       dialogRef,
       dialogProps,
@@ -28,6 +29,7 @@ export default defineComponent({
 
     const local = ref<string>(props.modelValue);
     const editorRef = ref<QInput>();
+    const preview = ref<boolean>(false);
 
     if (local.value.length && local.value.charAt(local.value.length - 1) !== '\n') {
       local.value += '\n';
@@ -90,11 +92,13 @@ export default defineComponent({
     }
 
     return {
+      dense,
       dialogRef,
       dialogProps,
       onDialogHide,
       onDialogCancel,
       local,
+      preview,
       editorRef,
       save,
       showKeyboard,
@@ -108,31 +112,48 @@ export default defineComponent({
   <q-dialog
     ref="dialogRef"
     v-bind="dialogProps"
+    :maximized="dense"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
-      <q-input
-        ref="editor"
-        v-model="local"
-        type="textarea"
-        label="Note"
-        autogrow
-        autofocus
-        item-aligned
-        @keyup.enter.exact.stop
-        @keyup.enter.shift.stop
-      >
-        <template #append>
-          <KeyboardButton @click="showKeyboard" />
-        </template>
-      </q-input>
+    <ActionCardWrapper>
+      <template #toolbar>
+        <DialogToolbar :title="title" subtitle="Edit text note" />
+      </template>
+      <div class="q-pa-md">
+        <MarkdownView
+          v-if="preview"
+          :text="local"
+          class="depth-1 q-pa-sm"
+        />
+        <q-input
+          v-else
+          ref="editorRef"
+          v-model="local"
+          autogrow
+          autofocus
+          filled
+          class="editor-input"
+          @keyup.enter.exact.stop
+          @keyup.enter.shift.stop
+        >
+          <template #append>
+            <KeyboardButton @click="showKeyboard" />
+          </template>
+        </q-input>
+      </div>
       <template #actions>
-        <q-btn flat label="Insert date" color="primary" @click="insertDate" />
+        <q-btn flat :label="preview ? 'Edit' :'Preview'" @click="preview = !preview" />
+        <q-btn v-if="!preview" flat label="Insert date" @click="insertDate" />
         <q-space />
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
       </template>
-    </DialogCard>
+    </ActionCardWrapper>
   </q-dialog>
 </template>
+
+<style lang="sass">
+.editor-input textarea
+  min-height: 150px !important
+</style>

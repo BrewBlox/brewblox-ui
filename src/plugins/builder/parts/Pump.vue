@@ -148,7 +148,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-/deep/ .ballLiquid path {
+:deep(.ballLiquid path) {
   stroke-width: 15px !important;
 }
 </style>

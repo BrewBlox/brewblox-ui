@@ -151,17 +151,15 @@ export default defineComponent({
         >
           <!-- Text note -->
           <template v-if="note.type === 'Text'">
-            <div class="col column ellipsis" style="max-width: 100%;">
+            <div class="col column" style="max-width: 100%;">
               <q-item-label caption class="text-secondary">
                 <q-icon name="mdi-text-subject" />
                 {{ note.title }}
               </q-item-label>
-              <!-- No line breaks to allow correctly rendering whitespace -->
-              <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-              <div v-if="!!note.value" style="white-space: pre-wrap">{{ note.value }}</div>
-              <div v-else class="text-grey text-italic">
-                Click to set
-              </div>
+              <MarkdownView
+                :text="note.value || 'Click to set'"
+                style="max-height: 300px; overflow-y: hidden"
+              />
             </div>
           </template>
 

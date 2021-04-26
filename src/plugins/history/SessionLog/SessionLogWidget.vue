@@ -1,4 +1,5 @@
 <script lang="ts">
+import DOMPurify from 'dompurify';
 import marked from 'marked';
 import { computed, defineComponent } from 'vue';
 
@@ -119,7 +120,7 @@ export default defineComponent({
       if (session.value === null) { return; }
       const name = `${widget.value.title} ${session.value.title} ${renderDate(session.value.date)}`;
       const lines: string[] = [name, ...sessionLines()];
-      saveFile(marked(lines.join('\n')), `${name}.html`, true);
+      saveFile(DOMPurify.sanitize(marked(lines.join('\n'))), `${name}.html`, true);
     }
 
     async function exportSessionGraphs(): Promise<void> {

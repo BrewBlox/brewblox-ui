@@ -156,14 +156,18 @@ export default defineComponent({
         v-else-if="dense"
         class="column q-gutter-y-sm q-pa-md"
       >
-        <component
-          :is="val.component"
+        <WidgetProvider
           v-for="val in dashboardItems"
           :key="val.widget.id"
           :widget-id="val.widget.id"
           :context="context"
-          class="col full-width"
-        />
+        >
+          <component
+            :is="val.component"
+            :error="val.error"
+            class="col full-width"
+          />
+        </WidgetProvider>
       </div>
       <GridContainer
         v-else

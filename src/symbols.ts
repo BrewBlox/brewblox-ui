@@ -1,11 +1,11 @@
-import { InjectionKey, Ref, UnwrapRef } from 'vue';
+import { ComputedRef, InjectionKey, Ref, UnwrapRef } from 'vue';
 
 import { BrewbloxDatabase } from './plugins/database';
 import { BrewbloxEventbus } from './plugins/eventbus';
 import { BrewbloxStartup } from './plugins/startup';
 import { WidgetContext } from './store/features';
 
-export const DenseKey: InjectionKey<Ref<boolean>> = Symbol('$dense');
+export const DenseKey: InjectionKey<ComputedRef<boolean>> = Symbol('$dense');
 export const TouchKey: InjectionKey<Ref<boolean>> = Symbol('$touch');
 export const NowKey: InjectionKey<Ref<Date>> = Symbol('$now');
 export const StartupKey: InjectionKey<BrewbloxStartup> = Symbol('$startup');

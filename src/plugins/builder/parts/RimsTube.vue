@@ -74,7 +74,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-/deep/ .contentLiquid path {
+:deep(.contentLiquid path) {
   stroke-width: 30 !important;
   stroke-linecap: butt;
   fill: none;

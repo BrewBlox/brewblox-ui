@@ -99,7 +99,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-/deep/ .bulbLiquid path {
+:deep(.bulbLiquid path) {
   stroke-width: 18pt !important;
   stroke-linecap: round;
   fill: none;
