@@ -43,7 +43,7 @@ const paths = {
 };
 
 export default defineComponent({
-  name: 'ElbowTube',
+  name: 'ImmersionCoil',
   props: {
     part: {
       type: Object as PropType<FlowPart>,

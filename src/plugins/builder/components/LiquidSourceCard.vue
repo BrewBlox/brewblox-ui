@@ -14,7 +14,7 @@ const presetColors: string[] = [
 ];
 
 export default defineComponent({
-  name: 'ColorCard',
+  name: 'LiquidSourceCard',
   props: {
     part: {
       type: Object as PropType<FlowPart>,

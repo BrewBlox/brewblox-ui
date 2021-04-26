@@ -6,7 +6,7 @@ import { clampRotation } from '@/utils/functional';
 import { FlowPart } from '../types';
 
 export default defineComponent({
-  name: 'PlacementPartCard',
+  name: 'PlacementCard',
   props: {
     part: {
       type: Object as PropType<FlowPart>,

@@ -2,6 +2,7 @@
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
+  name: 'GraphCardWrapper',
   props: {
     show: {
       type: Boolean,
