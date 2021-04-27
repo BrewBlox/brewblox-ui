@@ -16,7 +16,6 @@ export interface FridgeConfigNames {
 }
 
 export interface FridgeConfig extends QuickstartConfig {
-  prefix: string;
   names: FridgeConfigNames;
   heatPin: PinChannel;
   coolPin: PinChannel;

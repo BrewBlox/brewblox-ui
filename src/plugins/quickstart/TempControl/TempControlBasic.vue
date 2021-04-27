@@ -1,263 +1,292 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
-import { bloxQty, tempQty } from '@/utils/bloxfield';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { spliceById, typeMatchFilter } from '@/utils/functional';
-import notify from '@/utils/notify';
-import { profileValues } from '@/plugins/spark/utils';
+import { useContext, useWidget } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockType, PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
+import { ProfileValues, profileValues as calcProfileValues } from '@/plugins/spark/utils';
+import { PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
+import { bloxQty, prettyQty, tempQty } from '@/utils/bloxfield';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { shortDateString, spliceById } from '@/utils/functional';
+import notify from '@/utils/notify';
 
 import { PidConfig } from '../types';
-import { applyMode, findControlProblems, TempControlProblem } from './helpers';
 import TempControlModeDialog from './TempControlModeDialog.vue';
-import TempControlPidView from './TempControlPidView.vue';
 import TempControlSyncView from './TempControlSyncView.vue';
-import { TempControlConfig, TempControlMode } from './types';
+import { TempControlMode, TempControlWidget } from './types';
+import { applyMode, findControlProblems, TempControlProblem } from './utils';
 
-@Component({
+export default defineComponent({
+  name: 'TempControlBasic',
   components: {
-    TempControlModeDialog,
-    TempControlPidView,
     TempControlSyncView,
   },
-})
-export default class TempControlBasic extends CrudComponent<TempControlConfig> {
-  setpointFilter = typeMatchFilter<SetpointSensorPairBlock>(BlockType.SetpointSensorPair);
-  problems: TempControlProblem[] = [];
-  detected: Date | null = null;
+  setup() {
+    const {
+      context,
+    } = useContext.setup();
+    const {
+      config,
+      saveConfig,
+    } = useWidget.setup<TempControlWidget>();
 
-  get serviceId(): string | null {
-    return this.config.serviceId;
-  }
+    const problems = ref<TempControlProblem[]>([]);
+    const detected = ref<Date | null>(null);
 
-  get module(): SparkServiceModule | null {
-    return sparkStore.moduleById(this.serviceId);
-  }
+    const serviceId = computed<string | null>(
+      () => config.value.serviceId,
+    );
 
-  get tempMode(): TempControlMode | null {
-    return this.config.modes.find(v => v.id === this.config.activeMode) ?? null;
-  }
+    const module = computed<SparkServiceModule | null>(
+      () => sparkStore.moduleById(serviceId.value),
+    );
 
-  get coolPid(): PidBlock | null {
-    return this.module?.blockByLink(this.config.coolPid) ?? null;
-  }
+    const tempMode = computed<TempControlMode | null>(
+      () => config.value.modes.find(v => v.id === config.value.activeMode) ?? null,
+    );
 
-  get heatPid(): PidBlock | null {
-    return this.module?.blockByLink(this.config.heatPid) ?? null;
-  }
+    const coolPid = computed<PidBlock | null>(
+      () => module.value?.blockByLink(config.value.coolPid) ?? null,
+    );
 
-  get differentSetpoints(): boolean {
-    return Boolean(this.module
-      && this.coolPid && this.heatPid
-      && this.coolPid.data.inputId.id !== this.heatPid.data.inputId.id);
-  }
+    const heatPid = computed<PidBlock | null>(
+      () => module.value?.blockByLink(config.value.heatPid) ?? null,
+    );
 
-  get setpoint(): SetpointSensorPairBlock | null {
-    return this.module && !this.differentSetpoints
-      ? this.PidSetpoint(this.coolPid) ?? this.PidSetpoint(this.heatPid)
-      : null;
-  }
+    const differentSetpoints = computed<boolean>(
+      () => Boolean(module.value
+        && coolPid.value && heatPid.value
+        && coolPid.value.data.inputId.id !== heatPid.value.data.inputId.id),
+    );
 
-  get setpointSettingLabel(): string {
-    return this.setpoint
-      ? `${this.setpoint.id} setting`
-      : 'Setpoint setting';
-  }
+    const setpoint = computed<SetpointSensorPairBlock | null>(
+      () => module.value && !differentSetpoints.value
+        ? pidSetpoint(coolPid.value) ?? pidSetpoint(heatPid.value)
+        : null,
+    );
 
-  get setpointSetting(): Quantity {
-    const value = this.profileEnabled
-      ? this.setpoint?.data.setting
-      : this.setpoint?.data.storedSetting;
-    return value ?? tempQty(null);
-  }
-
-  set setpointSetting(value: Quantity) {
-    if (this.module && this.setpoint) {
-      this.setpoint.data.storedSetting = value;
-      this.module.saveBlock(this.setpoint);
-    }
-  }
-
-  get setpointEnabled(): boolean | null {
-    return this.setpoint?.data.settingEnabled ?? null;
-  }
-
-  set setpointEnabled(value: boolean | null) {
-    this.setControl(!!value);
-  }
-
-  get profile(): SetpointProfileBlock | null {
-    return this.module?.blockByLink(this.config.profile) ?? null;
-  }
-
-  get profileEnabled(): boolean {
-    return Boolean(this.setpointEnabled && this.profile?.data.enabled);
-  }
-
-  set profileEnabled(value: boolean) {
-    if (!this.profile || !this.setpoint) {
-      return;
-    }
-
-    if (!value) {
-      this.profile.data.enabled = false;
-      this.module?.saveBlock(this.profile);
-      return;
-    }
-
-    const start = new Date((this.profile.data.start || 0) * 1000);
-    createDialog({
-      component: 'ConfirmDialog',
-      title: 'Start profile',
-      message: `
-        Profile start time is ${start.toLocaleString()}.
-        Do you want to reset this value to current date and time?
-        `,
-      nok: 'No',
-      ok: 'Yes',
-    })
-      .onOk(async (reset: boolean) => {
-        if (!this.profile || !this.setpoint) { return; }
-        if (reset) {
-          this.profile.data.start = new Date().getTime() / 1000;
+    const setpointSetting = computed<Quantity>({
+      get: () => {
+        const value = profileEnabled.value
+          ? setpoint.value?.data.setting
+          : setpoint.value?.data.storedSetting;
+        return value ?? tempQty(null);
+      },
+      set: value => {
+        if (module.value && setpoint.value) {
+          setpoint.value.data.storedSetting = value;
+          module.value.saveBlock(setpoint.value);
         }
-        this.profile.data.enabled = true;
-        this.setpoint.data.settingEnabled = true;
+      },
+    });
 
-        await this.module?.saveBlock(this.setpoint);
-        await this.module?.saveBlock(this.profile);
-      });
-  }
+    const setpointEnabled = computed<boolean | null>({
+      get: () => setpoint.value?.data.settingEnabled ?? null,
+      set: value => setControl(!!value),
+    });
 
-  get profileValues() {
-    return profileValues(this.profile);
-  }
+    const profile = computed<SetpointProfileBlock | null>(
+      () => module.value?.blockByLink(config.value.profile) ?? null,
+    );
 
-  checkMismatch(pid: PidBlock | null, config: PidConfig | null | undefined): boolean {
-    return pid && config
-      ? ['kp', 'ti', 'td'].some(k => !bloxQty(pid.data[k]).eq(config[k]))
-      : false;
-  }
+    const profileEnabled = computed<boolean>({
+      get: () => Boolean(setpointEnabled.value && profile.value?.data.enabled),
+      set: value => {
+        if (!profile.value || !setpoint.value) {
+          return;
+        }
 
-  get coolConfigMismatch(): boolean {
-    return this.checkMismatch(this.coolPid, this.tempMode?.coolConfig);
-  }
+        if (!value) {
+          profile.value.data.enabled = false;
+          module.value?.saveBlock(profile.value);
+          return;
+        }
 
-  get heatConfigMismatch(): boolean {
-    return this.checkMismatch(this.heatPid, this.tempMode?.heatConfig);
-  }
+        const start = new Date((profile.value.data.start || 0) * 1000);
+        createDialog({
+          component: 'ConfirmDialog',
+          componentProps: {
+            title: 'Start profile',
+            message: `
+          Profile start time is ${start.toLocaleString()}.
+          Do you want to reset this value to current date and time?
+          `,
+            nok: 'No',
+            ok: 'Yes',
+          },
+        })
+          .onOk(async (reset: boolean) => {
+            if (!profile.value || !setpoint.value) { return; }
+            if (reset) {
+              profile.value.data.start = new Date().getTime() / 1000;
+            }
+            profile.value.data.enabled = true;
+            setpoint.value.data.settingEnabled = true;
 
-  applySync(kind: 'cool' | 'heat', leading: 'pid' | 'mode'): void {
-    const pid = kind === 'cool'
-      ? this.coolPid
-      : this.heatPid;
+            await module.value?.saveBlock(setpoint.value);
+            await module.value?.saveBlock(profile.value);
+          });
+      },
+    });
 
-    if (!this.module || !this.tempMode || !pid) {
-      return;
+    const profileValues = computed<ProfileValues | null>(
+      () => calcProfileValues(profile.value),
+    );
+
+    function checkMismatch(pid: PidBlock | null, config: PidConfig | null | undefined): boolean {
+      return pid && config
+        ? ['kp', 'ti', 'td'].some(k => !bloxQty(pid.data[k]).eq(config[k]))
+        : false;
     }
 
-    if (leading === 'pid') {
-      const { kp, td, ti } = pid.data;
-      this.tempMode[`${kind}Config`] = { kp, td, ti };
-      this.config.modes = spliceById(this.config.modes, this.tempMode);
-      this.saveConfig();
-    }
+    const coolConfigMismatch = computed<boolean>(
+      () => checkMismatch(coolPid.value, tempMode.value?.coolConfig),
+    );
 
-    if (leading === 'mode') {
-      const config: PidConfig = this.tempMode[`${kind}Config`];
-      if (config) {
-        pid.data = { ...pid.data, ...config };
-        this.module.saveBlock(pid);
+    const heatConfigMismatch = computed<boolean>(
+      () => checkMismatch(heatPid.value, tempMode.value?.heatConfig),
+    );
+
+
+    function applySync(kind: 'cool' | 'heat', leading: 'pid' | 'mode'): void {
+      const pid = kind === 'cool'
+        ? coolPid.value
+        : heatPid.value;
+
+      if (!module.value || !tempMode.value || !pid) {
+        return;
+      }
+
+      if (leading === 'pid') {
+        const { kp, td, ti } = pid.data;
+        tempMode.value[`${kind}Config`] = { kp, td, ti };
+        config.value.modes = spliceById(config.value.modes, tempMode.value);
+        saveConfig();
+      }
+
+      if (leading === 'mode') {
+        const config: PidConfig = tempMode.value[`${kind}Config`];
+        if (config) {
+          pid.data = { ...pid.data, ...config };
+          module.value.saveBlock(pid);
+        }
       }
     }
-  }
 
-  PidSetpoint(pid: PidBlock | null): SetpointSensorPairBlock | null {
-    return this.module?.blockByLink(pid?.data.inputId ?? null) ?? null;
-  }
-
-  showProfile(): void {
-    createBlockDialog(this.profile);
-  }
-
-  async setControl(enabled: boolean): Promise<void> {
-    if (this.profile && !enabled) {
-      this.profile.data.enabled = false;
-      await this.module?.saveBlock(this.profile);
+    function pidSetpoint(pid: PidBlock | null): SetpointSensorPairBlock | null {
+      return module.value?.blockByLink(pid?.data.inputId ?? null) ?? null;
     }
 
-    if (this.setpoint) {
-      this.setpoint.data.settingEnabled = enabled;
-      await this.module?.saveBlock(this.setpoint);
-    }
-  }
-
-  async setControlMode(id: string) {
-    const mode = this.config.modes.find(v => v.id === id);
-
-    if (!mode) {
-      this.config.activeMode = null;
-      this.saveConfig();
-      return;
+    function showProfile(): void {
+      createBlockDialog(profile.value);
     }
 
-    createDialog({
-      component: TempControlModeDialog,
-      value: mode,
-      serviceId: this.serviceId,
-      title: `Apply ${mode.title} mode`,
-      showConfirm: true,
-      saveMode: (mode: TempControlMode) => {
-        this.config.modes = spliceById(this.config.modes, mode);
-        this.saveConfig();
-      },
-    })
-      .onOk(async () => {
-        try {
-          await applyMode(this.config, mode);
-          this.config.activeMode = mode.id;
-          notify.done(`Applied ${mode.title} mode`);
-        }
-        catch (e) {
-          this.config.activeMode = null;
-          notify.error(e.message);
-        }
-        finally {
-          await this.saveConfig();
-        }
+    async function setControl(enabled: boolean): Promise<void> {
+      if (profile.value && !enabled) {
+        profile.value.data.enabled = false;
+        await module.value?.saveBlock(profile.value);
+      }
+
+      if (setpoint.value) {
+        setpoint.value.data.settingEnabled = enabled;
+        await module.value?.saveBlock(setpoint.value);
+      }
+    }
+
+    async function setControlMode(id: string): Promise<void> {
+      const mode = config.value.modes.find(v => v.id === id);
+
+      if (!mode) {
+        config.value.activeMode = null;
+        saveConfig();
+        return;
+      }
+
+      createDialog({
+        component: TempControlModeDialog,
+        componentProps: {
+          modelValue: mode,
+          serviceId: serviceId.value,
+          title: `Apply ${mode.title} mode`,
+          showConfirm: true,
+          saveMode: (mode: TempControlMode) => {
+            config.value.modes = spliceById(config.value.modes, mode);
+            saveConfig();
+          },
+        },
+      })
+        .onOk(async () => {
+          try {
+            await applyMode(config.value, mode);
+            config.value.activeMode = mode.id;
+            notify.done(`Applied ${mode.title} mode`);
+          }
+          catch (e) {
+            config.value.activeMode = null;
+            notify.error(e.message);
+          }
+          finally {
+            await saveConfig();
+          }
+        });
+    }
+
+    function selectControlMode(): void {
+      createDialog({
+        component: 'SelectDialog',
+        componentProps: {
+          modelValue: config.value.activeMode ?? '',
+          title: 'Select control mode',
+          message: 'Pick a control mode. You can edit its settings before it is applied.',
+          listSelect: true,
+          selectOptions: [
+            { value: '', label: 'Manual' },
+            ...config.value.modes.map(v => ({ value: v.id, label: v.title })),
+          ],
+        },
+      })
+        .onOk(setControlMode);
+    }
+
+    function troubleshoot(): void {
+      problems.value = findControlProblems(config.value, {
+        showConfig: () => context.mode = 'Full',
       });
-  }
-
-  selectControlMode(): void {
-    createDialog({
-      component: 'SelectDialog',
-      title: 'Select control mode',
-      message: 'Pick a control mode. You can edit its settings before it is applied.',
-      value: this.config.activeMode ?? '',
-      listSelect: true,
-      selectOptions: [
-        { value: '', label: 'Manual' },
-        ...this.config.modes.map(v => ({ value: v.id, label: v.title })),
-      ],
-    })
-      .onOk(this.setControlMode);
-  }
-
-  troubleshoot(): void {
-    this.problems = findControlProblems(this.config, { showConfig: () => this.$emit('full') });
-    this.detected = new Date();
-  }
-
-  async autofix(problem: TempControlProblem): Promise<void> {
-    if (problem.autofix) {
-      await problem.autofix(this.config);
-      this.troubleshoot();
+      detected.value = new Date();
     }
-  }
-}
+
+    async function autofix(problem: TempControlProblem): Promise<void> {
+      if (problem.autofix) {
+        await problem.autofix(config.value);
+        troubleshoot();
+      }
+    }
+
+    return {
+      prettyQty,
+      shortDateString,
+      setpoint,
+      setpointSetting,
+      profileEnabled,
+      differentSetpoints,
+      profile,
+      showProfile,
+      profileValues,
+      selectControlMode,
+      tempMode,
+      setpointEnabled,
+      troubleshoot,
+      detected,
+      problems,
+      autofix,
+      coolPid,
+      coolConfigMismatch,
+      applySync,
+      heatPid,
+      heatConfigMismatch,
+    };
+  },
+});
 </script>
 
 
@@ -296,7 +325,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
         @click="showProfile"
       >
         <span v-if="profileValues">
-          {{ profileValues.prev | quantity }} to {{ profileValues.next | quantity }}
+          {{ prettyQty(profileValues.prev) }} to {{ prettyQty(profileValues.next) }}
         </span>
         <span v-else>
           ---
@@ -316,13 +345,13 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
       <q-item-section>
         <q-item-label>Control mode</q-item-label>
       </q-item-section>
-      <q-item-section avatar class="q-pr-sm">
-        <big v-if="tempMode" class="text-primary ">
+      <q-item-section avatar class="q-pr-sm text-big">
+        <span v-if="tempMode" class="text-primary ">
           {{ tempMode.title }}
-        </big>
-        <big v-else>
+        </span>
+        <span v-else>
           Manual
-        </big>
+        </span>
       </q-item-section>
     </q-item>
 
@@ -357,7 +386,7 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
         <q-item-label>Check for problems</q-item-label>
       </q-item-section>
       <q-item-section v-if="detected" class="fade-4 col-auto">
-        Last checked: {{ detected | shortDateString }}
+        Last checked: {{ shortDateString(detected) }}
       </q-item-section>
       <q-item-section avatar>
         <q-icon name="mdi-refresh" class="q-pr-md" />
@@ -387,24 +416,24 @@ export default class TempControlBasic extends CrudComponent<TempControlConfig> {
     </div>
 
     <TempControlSyncView
-      v-if="coolConfigMismatch"
+      v-if="coolPid && tempMode && coolConfigMismatch"
       :block-config="coolPid.data"
       :mode-config="tempMode.coolConfig"
       @apply="v => applySync('cool', v)"
     >
       <template #message>
-        Settings in cool PID do not match settings stored in {{ modeTitle }} mode.
+        Settings in cool PID do not match settings stored in {{ tempMode.title }} mode.
       </template>
     </TempControlSyncView>
 
     <TempControlSyncView
-      v-if="heatConfigMismatch"
+      v-if="heatPid && tempMode && heatConfigMismatch"
       :block-config="heatPid.data"
       :mode-config="tempMode.heatConfig"
       @apply="v => applySync('heat', v)"
     >
       <template #message>
-        Settings in heat PID do not match settings stored in {{ modeTitle }} mode.
+        Settings in heat PID do not match settings stored in {{ tempMode.title }} mode.
       </template>
     </TempControlSyncView>
   </div>

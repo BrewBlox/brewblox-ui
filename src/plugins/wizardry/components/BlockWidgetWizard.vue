@@ -4,7 +4,7 @@ import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress, BlockConfig, BlockType } from '@/plugins/spark/types';
-import { blockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { Widget, widgetStore } from '@/store/widgets';
@@ -48,7 +48,7 @@ export default defineComponent({
 
     const createdBlockIdRules = computed<InputRule[]>(
       () => serviceId.value
-        ? blockIdRules(serviceId.value)
+        ? makeBlockIdRules(serviceId.value)
         : [],
     );
 

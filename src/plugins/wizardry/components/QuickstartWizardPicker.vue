@@ -63,9 +63,9 @@ export default defineComponent({
 
 <template>
   <!-- Display selected wizard -->
-  <QuickstartTaskmaster
+  <QuickstartTaskMaster
     v-if="model && wizardActive"
-    :initial-tasks="model.tasks"
+    :tasks="model.tasks"
     @back="reset"
     @close="onClose"
   />

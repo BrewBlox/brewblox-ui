@@ -50,7 +50,8 @@ export default defineComponent({
     <q-input
       v-model="local"
       v-bind="$attrs"
-      :error="!optional && !local"
+      autocomplete="off"
+      reactive-rules
       dense
     >
       <template #append>

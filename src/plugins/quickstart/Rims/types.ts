@@ -16,7 +16,6 @@ export interface RimsBlockNames {
 }
 
 export interface RimsConfig extends QuickstartConfig {
-  prefix: string;
   names: RimsBlockNames;
   tubePin: PinChannel;
   pumpPin: PinChannel;

@@ -1,28 +1,38 @@
 <script lang="ts">
 
-import { computed, defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 import { PidConfig } from '../types';
 import TempControlPidView from './TempControlPidView.vue';
 
-@Component({
+export default defineComponent({
+  name: 'TempControlSyncView',
   components: {
     TempControlPidView,
   },
-})
-export default class TempControlSyncView extends Vue {
+  props: {
+    blockConfig: {
+      type: Object as PropType<PidConfig>,
+      required: true,
+    },
+    modeConfig: {
+      type: Object as PropType<PidConfig>,
+      required: true,
+    },
+  },
+  emits: [
+    'apply',
+  ],
+  setup(props, { emit }) {
+    function apply(leading: 'pid' | 'mode'): void {
+      emit('apply', leading);
+    }
 
-  @Prop({ type: Object, required: true })
-  public readonly blockConfig!: PidConfig;
-
-  @Prop({ type: Object, required: true })
-  public readonly modeConfig!: PidConfig;
-
-  apply(leading: 'pid' | 'mode'): void {
-    this.$emit('apply', leading);
-  }
-
-}
+    return {
+      apply,
+    };
+  },
+});
 </script>
 
 <template>

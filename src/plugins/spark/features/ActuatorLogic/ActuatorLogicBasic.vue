@@ -14,6 +14,7 @@ import { createDialog } from '@/utils/dialog';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { logicResultTitles, nonErrorResults } from './getters';
+import { ExpressionError } from './types';
 import {
   analogIdx, analogKey,
   comparisonCheck,
@@ -24,8 +25,7 @@ import {
   prettyAnalog,
   prettyDigital,
   syntaxCheck,
-} from './helpers';
-import { ExpressionError } from './types';
+} from './utils';
 
 export default defineComponent({
   name: 'ActuatorLogicBasic',

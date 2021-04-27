@@ -25,7 +25,6 @@ export interface HermsBlockNames {
 }
 
 export interface HermsConfig extends QuickstartConfig {
-  prefix: string;
   names: HermsBlockNames;
   hltPin: PinChannel;
   bkPin: PinChannel;

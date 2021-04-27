@@ -18,7 +18,6 @@ export interface FermentBlockNames {
 }
 
 export interface FermentConfig extends QuickstartConfig {
-  prefix: string;
   names: FermentBlockNames;
   heatPin: PinChannel;
   coolPin: PinChannel;

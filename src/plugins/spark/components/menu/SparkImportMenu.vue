@@ -4,7 +4,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { blockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { createDialog } from '@/utils/dialog';
 import { ruleValidator, suggestId } from '@/utils/functional';
 import { loadFile, saveFile } from '@/utils/import-export';
@@ -51,7 +51,7 @@ export default defineComponent({
     }
 
     const blockIdValidator = computed<(v: string) => boolean>(
-      () => ruleValidator(blockIdRules(props.serviceId)),
+      () => ruleValidator(makeBlockIdRules(props.serviceId)),
     );
 
     async function importSingleBlock(block: Block): Promise<void> {

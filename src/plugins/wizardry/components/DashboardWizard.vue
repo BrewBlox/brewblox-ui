@@ -5,13 +5,13 @@ import { useRouter } from 'vue-router';
 
 import { useWizard } from '@/plugins/wizardry/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { dashboardIdRules } from '@/utils/dashboards';
+import { makeDashboardIdRules } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { ruleValidator, suggestId } from '@/utils/functional';
 import notify from '@/utils/notify';
 
 const urlGenerator = new UrlSafeString();
-const idRules = dashboardIdRules();
+const idRules = makeDashboardIdRules();
 const idValidator = ruleValidator(idRules);
 
 export default defineComponent({

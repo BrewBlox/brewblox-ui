@@ -12,7 +12,7 @@ import notify from '@/utils/notify';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { BlockConfig, BlockSpec, BlockWidget } from '../types';
-import { blockGraphCfg, blockIdRules, canDisplay as canDisplayFn } from '../utils';
+import { blockGraphCfg, makeBlockIdRules, canDisplay as canDisplayFn } from '../utils';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {
@@ -163,7 +163,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
           message: `Choose a new name for <i>${block.value.id}</i>.`,
           html: true,
           clearable: false,
-          rules: blockIdRules(block.value.serviceId),
+          rules: makeBlockIdRules(block.value.serviceId),
         },
       })
         .onOk((newId: string) => {

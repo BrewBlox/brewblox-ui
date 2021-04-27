@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { systemStore } from '@/store/system';
-import { bloxQty, deltaTempQty, JSQuantity, prettyUnit, tempQty } from '@/utils/bloxfield';
+import { bloxQty, deltaTempQty, JSQuantity, prettyQty, prettyUnit, tempQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 
 import { QuickstartAction } from '../types';
@@ -135,6 +135,7 @@ export default defineComponent({
     }
 
     return {
+      prettyQty,
       prettyUnit,
       volumeRules,
       hltFullPowerDelta,
@@ -182,7 +183,7 @@ export default defineComponent({
             run at full power (100%).
           </p>
           <p class="text-italic">
-            Proportional gain Kp of the HLT PID will be set to {{ hltKp }}.
+            Proportional gain Kp of the HLT PID will be set to {{ prettyQty(hltKp) }}.
           </p>
         </q-item-section>
       </q-item>
@@ -197,7 +198,7 @@ export default defineComponent({
             run at full power (100%).
           </p>
           <p class="text-italic">
-            Proportional gain Kp of the BK PID will be set to {{ bkKp }}.
+            Proportional gain Kp of the BK PID will be set to {{ prettyQty(bkKp) }}.
           </p>
         </q-item-section>
       </q-item>
@@ -259,10 +260,10 @@ export default defineComponent({
             label="Limit difference to"
           >
             <template #append>
-              <KeyboardButton @click="showDriverMaxKeyboard" />
-              <small class="self-end q-pb-sm">
+              <span style="font-size: 70%">
                 {{ prettyUnit(driverMax) }}
-              </small>
+              </span>
+              <KeyboardButton @click="showDriverMaxKeyboard" />
             </template>
           </q-input>
         </q-item-section>
@@ -271,13 +272,13 @@ export default defineComponent({
       <q-item>
         <q-item-section>
           <p class="text-italic">
-            Kp will be set to {{ mtKp }}.
+            Kp will be set to {{ prettyQty(mtKp) }}.
             If your mash temperature is
             <InlineQuantityField v-model="mashActual" style="font-style: normal" />
             and should be
             <InlineQuantityField v-model="mashTarget" style="font-style: normal" />
             the HLT will be set to
-            {{ hltSetting }}.
+            {{ prettyQty(hltSetting) }}.
           </p>
         </q-item-section>
       </q-item>

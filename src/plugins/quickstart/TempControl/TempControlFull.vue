@@ -1,89 +1,68 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useWidget } from '@/composables';
+import { sparkStore } from '@/plugins/spark/store';
 import {
   BlockType,
-  Link,
   PidBlock,
-  Quantity,
   SetpointProfileBlock,
-  SetpointSensorPairBlock,
 } from '@/shared-types';
-import { tempQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 import { spliceById, typeMatchFilter } from '@/utils/functional';
 
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlPidView from './TempControlPidView.vue';
-import { TempControlConfig, TempControlMode } from './types';
+import { TempControlMode, TempControlWidget } from './types';
 
-@Component({
+const pidFilter = typeMatchFilter<PidBlock>(BlockType.Pid);
+const profileFilter = typeMatchFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
+
+export default defineComponent({
+  name: 'TempControlFull',
   components: {
     TempControlPidView,
-    TempControlModeDialog,
   },
-})
-export default class TempControlFull extends CrudComponent<TempControlConfig> {
-  pidFilter = typeMatchFilter<PidBlock>(BlockType.Pid);
-  profileFilter = typeMatchFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
-  setpointFilter = typeMatchFilter<SetpointSensorPairBlock>(BlockType.SetpointSensorPair);
+  setup() {
+    const {
+      config,
+      saveConfig,
+    } = useWidget.setup<TempControlWidget>();
 
-  get serviceOpts(): string[] {
-    return sparkStore.serviceIds;
-  }
+    const serviceOpts = computed<string[]>(
+      () => sparkStore.serviceIds,
+    );
 
-  get serviceId(): string | null {
-    return this.config.serviceId;
-  }
+    const serviceId = computed<string | null>(
+      () => config.value.serviceId,
+    );
 
-  get module(): SparkServiceModule | null {
-    return sparkStore.moduleById(this.serviceId);
-  }
+    function showMode(mode: TempControlMode): void {
+      createDialog({
+        component: TempControlModeDialog,
+        componentProps: {
+          modelValue: mode,
+          title: `Edit ${mode.title} mode`,
+          serviceId: serviceId.value,
+          saveMode: (mode: TempControlMode) => {
+            config.value.modes = spliceById(config.value.modes, mode);
+            saveConfig();
+          },
+        },
+      });
+    }
 
-  get profile(): SetpointProfileBlock | null {
-    return this.module?.blockByLink(this.config.profile) ?? null;
-  }
-
-  get controlMode(): string | null {
-    return this.config.activeMode;
-  }
-
-  set controlMode(v: string | null) {
-    this.config.activeMode = v;
-    this.saveConfig();
-  }
-
-  get modeOpts(): SelectOption[] {
-    return this.config.modes.map(m => ({ label: m.title, value: m.id }));
-  }
-
-  setpointValue(link: Link): Quantity {
-    const block = this.module?.blockByLink(link);
-    return this.setpointFilter(block)
-      ? block.data.storedSetting
-      : tempQty(null);
-  }
-
-  saveMode(mode: TempControlMode): void {
-    this.config.modes = spliceById(this.config.modes, mode);
-    this.saveConfig();
-  }
-
-  showMode(mode: TempControlMode): void {
-    createDialog({
-      component: TempControlModeDialog,
-      title: `Edit ${mode.title} mode`,
-      serviceId: this.serviceId,
-      value: mode,
-      saveMode: (mode: TempControlMode) => {
-        this.config.modes = spliceById(this.config.modes, mode);
-        this.saveConfig();
-      },
-    });
-  }
-}
+    return {
+      serviceId,
+      serviceOpts,
+      config,
+      saveConfig,
+      pidFilter,
+      profileFilter,
+      showMode,
+    };
+  },
+});
 </script>
 
 <template>

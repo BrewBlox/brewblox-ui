@@ -5,7 +5,7 @@ import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { Block, BlockConfig, BlockSpec, ComparedBlockType } from '@/plugins/spark/types';
-import { blockIdRules, isCompatible } from '@/plugins/spark/utils';
+import { isCompatible, makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
@@ -90,7 +90,7 @@ export default defineComponent({
 
     const activeBlockIdRules = computed<InputRule[]>(
       () => serviceId.value
-        ? blockIdRules(serviceId.value)
+        ? makeBlockIdRules(serviceId.value)
         : [() => 'No service selected'],
     );
 

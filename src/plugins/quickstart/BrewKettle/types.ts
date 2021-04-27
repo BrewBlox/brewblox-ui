@@ -11,7 +11,6 @@ export interface BrewKettleBlockNames {
 }
 
 export interface BrewKettleConfig extends QuickstartConfig {
-  prefix: string;
   names: BrewKettleBlockNames;
   kettlePin: PinChannel;
   kettleSensor: string;

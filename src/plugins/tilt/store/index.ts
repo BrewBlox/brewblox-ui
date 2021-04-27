@@ -5,7 +5,7 @@ import { systemStore } from '@/store/system';
 import { bloxQty } from '@/utils/bloxfield';
 import { extendById } from '@/utils/functional';
 
-import { TiltStateEvent, TiltStateValue } from '../types';
+import type { TiltStateEvent, TiltStateValue } from '../types';
 
 @Module({ generateMutationSetters: true })
 export class TiltModule extends VuexModule {

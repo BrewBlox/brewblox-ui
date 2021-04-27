@@ -15,7 +15,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
-      //   { path: '/admin', component: () => import('@/pages/AdminPage.vue') },
+      { path: '/admin', component: () => import('@/pages/AdminPage.vue') },
       { path: '/styles', component: () => import('@/pages/StylesPage.vue') },
       //   // dynamic pages
       { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },

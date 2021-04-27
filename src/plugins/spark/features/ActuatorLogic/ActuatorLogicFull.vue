@@ -20,6 +20,7 @@ import { createDialog } from '@/utils/dialog';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { characterTitles, logicResultTitles, nonErrorResults } from './getters';
+import { ExpressionError } from './types';
 import {
   analogIdx,
   analogKey,
@@ -30,8 +31,7 @@ import {
   prettyDigital,
   shiftRemainingComparisons,
   syntaxCheck,
-} from './helpers';
-import { ExpressionError } from './types';
+} from './utils';
 
 const validTypes: BlockIntfType[] = [
   BlockIntfType.ActuatorDigitalInterface,

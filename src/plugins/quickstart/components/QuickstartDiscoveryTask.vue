@@ -10,7 +10,7 @@ import {
   DS2413Block,
   TempSensorOneWireBlock,
 } from '@/plugins/spark/types';
-import { blockIdRules, discoverBlocks, isCompatible } from '@/plugins/spark/utils';
+import { makeBlockIdRules, discoverBlocks, isCompatible } from '@/plugins/spark/utils';
 import { featureStore } from '@/store/features';
 import { prettyQty } from '@/utils/bloxfield';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
@@ -84,7 +84,7 @@ export default defineComponent({
         componentProps: {
           title: 'Change block name',
           message: `Choose a new name for '${block.id}'`,
-          rules: blockIdRules(serviceId.value),
+          rules: makeBlockIdRules(serviceId.value),
           clearable: false,
           modelValue: block.id,
         },

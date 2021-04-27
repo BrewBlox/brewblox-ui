@@ -41,7 +41,7 @@ import {
   MotorValveBlock,
 } from './types';
 
-export const blockIdRules = (serviceId: string): InputRule[] => [
+export const makeBlockIdRules = (serviceId: string): InputRule[] => [
   v => !!v || 'Name must not be empty',
   v => sparkStore.blockById(serviceId, v) === null || 'Name must be unique',
   v => /^[a-zA-Z]/.test(v) || 'Name must start with a letter',
@@ -300,7 +300,7 @@ export const startResetBlocks = (serviceId: string): void => {
     }));
 };
 
-interface ProfileValues {
+export interface ProfileValues {
   prev: Quantity;
   current: Quantity;
   next: Quantity;

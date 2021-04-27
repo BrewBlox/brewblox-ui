@@ -29,7 +29,6 @@ export interface GlycolBlockNames {
 export type GlycolControlMode = 'No' | 'Measure' | 'Control'
 
 export interface GlycolConfig extends QuickstartConfig {
-  prefix: string;
   names: GlycolBlockNames;
   heated: boolean;
   coolPin: PinChannel;

@@ -16,9 +16,11 @@ export interface DisplayBlock {
 }
 
 export interface QuickstartConfig {
+  prefix: string;
   serviceId: string;
   dashboardId: string;
   dashboardTitle: string;
+  names: AnyDict;
   layouts: BuilderLayout[];
   widgets: Widget[];
   createdBlocks: Block[];

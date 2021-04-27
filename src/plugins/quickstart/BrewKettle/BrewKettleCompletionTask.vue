@@ -18,10 +18,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'close',
-  ],
-  setup(props, { emit }) {
+  setup(props) {
     const router = useRouter();
     const busy = ref(true);
 
@@ -31,8 +28,8 @@ export default defineComponent({
     );
 
     function done(): void {
+      // Will cause dialog to autoclose
       router.push(`/dashboard/${props.config.dashboardId}`);
-      emit('close');
     }
 
     return {
@@ -46,8 +43,8 @@ export default defineComponent({
 <template>
   <ActionCardBody>
     <q-card-section>
-      <q-item>
-        <big>About your new dashboard</big>
+      <q-item class="text-big">
+        About your new dashboard
       </q-item>
       <q-item>
         <q-item-section>

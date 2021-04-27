@@ -4,7 +4,7 @@ import { computed, defineComponent, ref, watch } from 'vue';
 
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { Block, BlockConfig } from '@/plugins/spark/types';
-import { blockIdRules, discoverBlocks } from '@/plugins/spark/utils';
+import { discoverBlocks, makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
@@ -84,7 +84,7 @@ export default defineComponent({
         componentProps: {
           title: 'Change block name',
           message: `Choose a new name for '${blockId}'`,
-          rules: blockIdRules(serviceId),
+          rules: makeBlockIdRules(serviceId),
           clearable: false,
           modelValue: blockId,
         },

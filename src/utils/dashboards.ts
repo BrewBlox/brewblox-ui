@@ -12,7 +12,7 @@ type IdChangedCallback = (id: string) => void;
 
 const urlGenerator = new UrlSafeString();
 
-export const dashboardIdRules = (): InputRule[] => [
+export const makeDashboardIdRules = (): InputRule[] => [
   v => !!v || 'Value is required',
   v => !dashboardStore.dashboardIds.includes(v) || 'Value must be unique',
   v => v === urlGenerator.generate(v) || 'Value must be URL-safe',
@@ -49,7 +49,7 @@ export const startChangeDashboardId =
         modelValue: dashboard.id,
         title: 'Change dashboard URL',
         message: 'The dashboard URL is used as unique identifier.',
-        rules: dashboardIdRules(),
+        rules: makeDashboardIdRules(),
       },
     })
       .onOk(async (newId: string) => {
@@ -84,8 +84,7 @@ export const startChangeDashboardTitle =
         if (oldId === defaultId) {
           return; // no change
         }
-        const rules = dashboardIdRules();
-        const suggestedId = suggestId(defaultId, ruleValidator(rules));
+        const suggestedId = suggestId(defaultId, ruleValidator(makeDashboardIdRules()));
 
         createDialog({
           component: 'ConfirmDialog',

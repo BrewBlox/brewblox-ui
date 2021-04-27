@@ -6,7 +6,7 @@ import { databasePlugin } from '@/plugins/database';
 import { eventbusPlugin } from '@/plugins/eventbus';
 import history from '@/plugins/history';
 import misc from '@/plugins/misc';
-// import quickstart from '@/plugins/quickstart';
+import quickstart from '@/plugins/quickstart';
 import spark from '@/plugins/spark';
 import { startup, startupPlugin } from '@/plugins/startup';
 import tilt from '@/plugins/tilt';
@@ -29,7 +29,7 @@ export default boot(({ app, store }) => {
     spark,
     tilt,
     builder,
-    // quickstart,
+    quickstart,
     misc,
   ];
 

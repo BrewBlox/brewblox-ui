@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
 import { SparkStatus } from '@/plugins/spark/types';
-import { blockIdRules } from '@/plugins/spark/utils';
+import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { ruleValidator, suggestId } from '@/utils/functional';
 import notify from '@/utils/notify';
 
@@ -37,7 +37,7 @@ export default defineComponent({
 
     async function createMockSensors(): Promise<void> {
       if (!sparkModule.value) { return; }
-      const validator = ruleValidator(blockIdRules(props.serviceId));
+      const validator = ruleValidator(makeBlockIdRules(props.serviceId));
       const spec = sparkStore.specById<TempSensorMockBlock>(BlockType.TempSensorMock);
 
       for (const name of props.names) {
