@@ -101,7 +101,7 @@ export default defineComponent({
         </q-tooltip>
       </q-btn>
       <ActionMenu dense round>
-        <template #actions>
+        <template v-if="!!$slots.actions" #actions>
           <slot name="actions" />
         </template>
         <template #menus>

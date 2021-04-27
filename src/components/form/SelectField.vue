@@ -21,11 +21,11 @@ export default defineComponent({
       type: String,
       default: 'value',
     },
-    optionsValue: {
+    optionValue: {
       type: String,
       default: 'value',
     },
-    optionsLabel: {
+    optionLabel: {
       type: String,
       default: 'label',
     },
@@ -56,8 +56,8 @@ export default defineComponent({
           }
 
           const text = props.modelValue
-            .map((v: any) => props.options.find((opt: any) => opt[props.optionsValue] === v))
-            .map((v: any) => v[props.optionsLabel])
+            .map((v: any) => props.options.find((opt: any) => opt[props.optionValue] === v))
+            .map((v: any) => v[props.optionLabel])
             .join(', ');
           return text || 'Click to set';
         }
@@ -66,8 +66,8 @@ export default defineComponent({
           if (opt === props.modelValue) {
             return opt;
           }
-          if (opt[props.optionsValue] === props.modelValue) {
-            return opt[props.optionsLabel];
+          if (opt[props.optionValue] === props.modelValue) {
+            return opt[props.optionLabel];
           }
         }
 
@@ -95,8 +95,8 @@ export default defineComponent({
           selectOptions: props.options,
           selectProps: {
             label: props.label,
-            optionsLabel: props.optionsLabel,
-            optionsValue: props.optionsValue,
+            optionLabel: props.optionLabel,
+            optionValue: props.optionValue,
             clearable: props.clearable,
           },
         },

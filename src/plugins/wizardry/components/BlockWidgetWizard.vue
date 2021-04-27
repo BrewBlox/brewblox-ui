@@ -129,15 +129,6 @@ export default defineComponent({
         }
       }
 
-      onBeforeUnmount(() => {
-        if (activeBlock.value) {
-          sparkStore.removeVolatileBlock(activeBlock.value);
-        }
-        if (activeWidget.value) {
-          widgetStore.removeVolatileWidget(activeWidget.value);
-        }
-      });
-
       const blockId = createMode.value === 'new'
         ? newBlockId.value
         : existingBlockId.value;
@@ -202,7 +193,8 @@ export default defineComponent({
         && activeBlock.value
         && activeWidget.value
       ) {
-        const block = await tryCreateBlock(activeBlock.value);
+        const realCandidate = { ...activeBlock.value, meta: undefined };
+        const block = await tryCreateBlock(realCandidate);
         if (!block) {
           return onClose();
         }
@@ -219,6 +211,15 @@ export default defineComponent({
         return onDone({ block, widget });
       }
     }
+
+    onBeforeUnmount(() => {
+      if (activeBlock.value) {
+        sparkStore.removeVolatileBlock(activeBlock.value);
+      }
+      if (activeWidget.value) {
+        widgetStore.removeVolatileWidget(activeWidget.value);
+      }
+    });
 
     return {
       featureTitle,

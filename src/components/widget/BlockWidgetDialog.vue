@@ -5,7 +5,7 @@ import { computed, defineComponent, onUnmounted, PropType } from 'vue';
 import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
-import { featureStore, WidgetContext, WidgetMode } from '@/store/features';
+import { ComponentResult, featureStore, WidgetContext, WidgetMode } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
 
 export default defineComponent({
@@ -82,9 +82,9 @@ export default defineComponent({
       }),
     );
 
-    const widgetComponent = computed<string | null>(
+    const widgetComponent = computed<ComponentResult | null>(
       () => widget.value
-        ? featureStore.widgetComponent(widget.value).component
+        ? featureStore.widgetComponent(widget.value)
         : null,
     );
 
@@ -118,8 +118,9 @@ export default defineComponent({
   >
     <WidgetProvider :widget-id="widgetId" :context="context">
       <component
-        :is="widgetComponent"
+        :is="widgetComponent.component"
         v-if="block && widgetComponent"
+        :error="widgetComponent.error"
         v-bind="widgetProps"
         @close="onDialogHide"
       />

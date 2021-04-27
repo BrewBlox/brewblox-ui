@@ -87,7 +87,7 @@ export default defineComponent({
                   subtitle="Tilt"
                 />
               </template>
-              <TiltValues :value="value" class="widget-body" />
+              <TiltValues :state="value" class="widget-body" />
             </CardWrapper>
           </div>
         </div>

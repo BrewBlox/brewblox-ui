@@ -94,12 +94,13 @@ export default defineComponent({
         </q-item-section>
       </q-item>
 
-      <q-select
+      <component
+        :is="services.length >= 10 ? 'q-select' : 'ListSelect'"
         v-model="service"
         :options="services"
         option-value="id"
         option-label="title"
-        item-aligned
+        class="q-mx-sm"
         label="Service"
       />
 
@@ -110,7 +111,7 @@ export default defineComponent({
       >
         <q-icon name="warning" color="warning" size="md" class="col-auto" />
         <span>
-          Detected new Spark service '{{ stub.id }}'
+          Detected new Spark service <i>{{ stub.id }}</i>
         </span>
         <div class="row q-gutter-x-sm">
           <q-btn
@@ -121,10 +122,10 @@ export default defineComponent({
         </div>
       </div>
 
-      <div v-if="hasBlocks" class="q-mt-lg q-pa-md column items-center q-gutter-md">
+      <div v-if="service && hasBlocks" class="q-mt-lg q-pa-md column items-center q-gutter-md">
         <q-icon name="warning" color="warning" size="md" class="col-auto" />
-        <span>
-          You already have blocks on your controller
+        <span class="no-select">
+          You already have blocks on <i>{{ service.title }}</i>
         </span>
         <div class="row q-gutter-x-sm">
           <q-btn

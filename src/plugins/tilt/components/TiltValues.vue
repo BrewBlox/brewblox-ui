@@ -10,7 +10,7 @@ const fieldClass = 'col-5 col-grow q-my-none';
 export default defineComponent({
   name: 'TiltValues',
   props: {
-    value: {
+    state: {
       type: Object as PropType<TiltStateValue>,
       required: true,
     },
@@ -37,14 +37,14 @@ export default defineComponent({
       label="Temperature"
       :class="fieldClass"
     >
-      {{ prettyQty(value.data.temperature) }}
+      {{ prettyQty(state.data.temperature) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.calibratedTemperature"
       label="Temperature (calibrated)"
       :class="fieldClass"
     >
-      {{ prettyQty(value.data.calibratedTemperature) }}
+      {{ prettyQty(state.data.calibratedTemperature) }}
     </LabeledField>
 
     <LabeledField
@@ -52,14 +52,14 @@ export default defineComponent({
       label="SG"
       :class="fieldClass"
     >
-      {{ round(value.data.specificGravity, 3) }}
+      {{ round(state.data.specificGravity, 3) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.calibratedSpecificGravity"
       label="SG (calibrated)"
       :class="fieldClass"
     >
-      {{ round(value.data.calibratedSpecificGravity, 3) }}
+      {{ round(state.data.calibratedSpecificGravity, 3) }}
     </LabeledField>
 
     <LabeledField
@@ -67,14 +67,14 @@ export default defineComponent({
       label="Plato"
       :class="fieldClass"
     >
-      {{ prettyQty(value.data.plato, 0) }}
+      {{ prettyQty(state.data.plato, 0) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.calibratedPlato"
       label="Plato (calibrated)"
       :class="fieldClass"
     >
-      {{ prettyQty(value.data.calibratedPlato) }}
+      {{ prettyQty(state.data.calibratedPlato) }}
     </LabeledField>
 
     <LabeledField
@@ -82,14 +82,14 @@ export default defineComponent({
       label="Signal strength"
       :class="fieldClass"
     >
-      {{ prettyQty(value.data.signalStrength) }}
+      {{ prettyQty(state.data.signalStrength) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.timestamp"
       label="Published"
       :class="fieldClass"
     >
-      {{ shortDateString(value.timestamp) }}
+      {{ shortDateString(state.timestamp) }}
     </LabeledField>
 
     <LabeledField
@@ -97,7 +97,7 @@ export default defineComponent({
       label="Color"
       :class="fieldClass"
     >
-      {{ value.color }}
+      {{ state.color }}
     </LabeledField>
   </div>
 </template>

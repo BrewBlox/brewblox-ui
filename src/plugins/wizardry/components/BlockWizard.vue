@@ -184,15 +184,6 @@ export default defineComponent({
       }
     }
 
-    onBeforeUnmount(() => {
-      if (activeBlock.value) {
-        sparkStore.removeVolatileBlock(activeBlock.value);
-      }
-      if (activeWidget.value) {
-        widgetStore.removeVolatileWidget(activeWidget.value);
-      }
-    });
-
     function selectOpt(opt: BlockWizardOption | null): void {
       selected.value = opt;
       if (opt === null) {
@@ -203,13 +194,6 @@ export default defineComponent({
         lastGeneratedId.value = blockId.value;
       }
     }
-
-    // function closeDialog(): void {
-    //   if (activeDialog.value) {
-    //     activeDialog.value.hide();
-    //     activeDialog.value = null;
-    //   }
-    // }
 
     async function configureBlock(): Promise<void> {
       if (!createReady.value || !serviceId.value || !sparkModule.value) {
@@ -242,7 +226,8 @@ export default defineComponent({
         return;
       }
 
-      const createdBlock = await tryCreateBlock(activeBlock.value);
+      const realCandidate = { ...activeBlock.value, meta: undefined };
+      const createdBlock = await tryCreateBlock(realCandidate);
 
       if (!createdBlock) {
         return close();
@@ -254,6 +239,15 @@ export default defineComponent({
 
       onDone({ block: createdBlock, widget: createdWidget });
     }
+
+    onBeforeUnmount(() => {
+      if (activeBlock.value) {
+        sparkStore.removeVolatileBlock(activeBlock.value);
+      }
+      if (activeWidget.value) {
+        widgetStore.removeVolatileWidget(activeWidget.value);
+      }
+    });
 
     return {
       onBack,

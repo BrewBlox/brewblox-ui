@@ -72,7 +72,7 @@ export default defineComponent({
     >
       <TiltValues
         v-if="value"
-        :value="value"
+        :state="value"
         :hidden="config.hidden"
       />
       <CardWarning v-else-if="config.serviceId && config.color">
@@ -94,20 +94,20 @@ export default defineComponent({
       <SelectField
         label="Service"
         :options="serviceOpts"
-        :value="config.serviceId"
+        :model-value="config.serviceId"
         @update:model-value="v => { config.serviceId = v; saveConfig(); }"
       />
       <SelectField
         label="Color"
         :options="colorOpts"
-        :value="config.color"
+        :model-value="config.color"
         @update:model-value="v => { config.color = v; saveConfig(); }"
       />
       <ActionSubmenu label="Shown values">
         <ToggleAction
           v-for="(label, key) in fieldLabels"
           :key="`toggle-${key}`"
-          :value="!config.hidden[key]"
+          :model-value="!config.hidden[key]"
           :label="label"
           class="q-ml-sm"
           @update:model-value="v => setShown(key, v)"
