@@ -108,10 +108,12 @@ export default defineComponent({
           <ToggleAction
             v-model="experimental"
             label="Experimental features"
+            :colored="false"
           />
           <ToggleAction
             v-model="showSidebarLayouts"
             label="Show builder layouts in sidebar"
+            :colored="false"
           />
           <ActionItem
             label="On-screen keyboard layout"

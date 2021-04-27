@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, h, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 import { useDialog } from '@/composables';
 
@@ -33,48 +33,43 @@ export default defineComponent({
   emits: [
     ...useDialog.emits,
   ],
-  setup(props) {
+  setup() {
     const {
       dialogRef,
+      dialogProps,
       onDialogHide,
     } = useDialog.setup();
 
-    return h('q-dialog',
-      {
-        ref: dialogRef,
-        props: {
-          maximized: true,
-          transitionShow: 'fade',
-        },
-        on: { hide: onDialogHide },
-      },
-      [
-        h('q-card',
-          [
-            h('HistoryGraph',
-              {
-                props: {
-                  graphId: props.graphId,
-                  config: props.config,
-                  sharedSources: props.sharedSources,
-                  usePresets: props.saveParams != null,
-                },
-                attrs: {
-                  annotated: props.saveAnnotations != null,
-                  maximized: true,
-                },
-                on: {
-                  annotations: props.saveAnnotations ?? (() => { }),
-                  params: props.saveParams ?? (() => { }),
-                },
-                scopedSlots: {
-                  controls: () => [
-                    h('DialogCloseButton', { props: { stretch: true } }),
-                  ],
-                },
-              }),
-          ]),
-      ]);
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+    };
   },
 });
 </script>
+
+<template>
+  <q-dialog
+    ref="dialogRef"
+    v-bind="dialogProps"
+    transition-show="fade"
+    maximized
+    @hide="onDialogHide"
+  >
+    <q-card>
+      <HistoryGraph
+        v-bind="{graphId, config, sharedSources}"
+        :use-presets="!!saveParams"
+        :annotated="!!saveAnnotations"
+        maximized
+        @annotations="saveAnnotations"
+        @params="saveParams"
+      >
+        <template #controls>
+          <DialogCloseButton stretch />
+        </template>
+      </HistoryGraph>
+    </q-card>
+  </q-dialog>
+</template>

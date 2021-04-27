@@ -117,12 +117,17 @@ export default defineComponent({
 
     function showGraphDialog(): void {
       const currentId = currentGraphId();
-      const layout = config.value.layout;
       createDialog({
         component: 'GraphDialog',
         componentProps: {
           graphId: currentId || nanoid(),
-          config: { ...config, layout: { ...layout, title: widget.value.title } },
+          config: {
+            ...config.value,
+            layout: {
+              ...config.value.layout,
+              title: widget.value.title,
+            },
+          },
           sharedSources: currentId !== null,
           saveParams: v => saveParams(v),
         },
