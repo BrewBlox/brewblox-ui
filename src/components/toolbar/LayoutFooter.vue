@@ -62,7 +62,7 @@ export default defineComponent({
                 <q-item-label caption>
                   {{ time(entry) }}
                 </q-item-label>
-                {{ entry.message }}
+                <span v-html="entry.message" />
               </q-item-section>
             </q-item>
           </q-list>
