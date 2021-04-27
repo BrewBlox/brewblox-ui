@@ -68,9 +68,7 @@ export default defineComponent({
   <q-layout view="hHh Lpr fFf" style="overflow: hidden">
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
-        <div ref="toolbarTitleRef">
-          Brewblox
-        </div>
+        <div ref="toolbarTitleRef" />
       </template>
       <template #buttons>
         <div ref="toolbarButtonsRef" class="full-height row q-gutter-x-sm q-pr-xs" />

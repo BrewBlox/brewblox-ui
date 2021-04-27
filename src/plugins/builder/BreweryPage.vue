@@ -63,6 +63,16 @@ export default defineComponent({
       () => builderStore.layoutById(layoutId.value ?? builderStore.layoutIds[0]),
     );
 
+    const layoutTitle = computed<string>(
+      () => layout.value?.title ?? 'Builder layout',
+    );
+
+    watch(
+      () => layoutTitle.value,
+      title => document.title = `Brewblox | ${title}`,
+      { immediate: true },
+    );
+
     const scale = computed<number>(
       () => layout.value?.scale ?? 1,
     );
@@ -149,6 +159,7 @@ export default defineComponent({
       dense,
       layoutId,
       layout,
+      layoutTitle,
       started,
       parts,
       gridViewBox,
@@ -176,6 +187,9 @@ export default defineComponent({
       </div>
     </div>
     <template v-else>
+      <TitleTeleport>
+        {{ layoutTitle }}
+      </TitleTeleport>
       <ButtonsTeleport>
         <q-btn
           v-if="!dense"

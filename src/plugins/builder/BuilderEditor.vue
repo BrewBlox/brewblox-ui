@@ -765,6 +765,7 @@ export default defineComponent({
       drawerOpen,
       drawerContent,
       layout,
+      layoutTitle,
       selectLayout,
       setLayoutWidth,
       setLayoutHeight,
@@ -814,7 +815,7 @@ export default defineComponent({
   >
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
-        Brewery Builder
+        {{ layoutTitle }}
       </template>
       <template #buttons>
         <q-btn
