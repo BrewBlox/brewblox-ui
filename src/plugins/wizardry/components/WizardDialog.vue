@@ -141,7 +141,7 @@ export default defineComponent({
           <q-item
             :disable="!sparkServiceAvailable"
             clickable
-            @click="pickWizard('QuickStartWizardPicker')"
+            @click="pickWizard('QuickstartWizardPicker')"
           >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">

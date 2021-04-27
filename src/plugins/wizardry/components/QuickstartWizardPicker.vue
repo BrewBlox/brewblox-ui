@@ -1,12 +1,12 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
-import { featureStore, QuickStartFeature } from '@/store/features';
+import { featureStore, QuickstartFeature } from '@/store/features';
 
 import { useWizard } from '../composables';
 
 export default defineComponent({
-  name: 'QuickStartWizardPicker',
+  name: 'QuickstartWizardPicker',
   props: {
     ...useWizard.props,
   },
@@ -20,7 +20,7 @@ export default defineComponent({
       setDialogTitle,
     } = useWizard.setup();
 
-    const model = ref<QuickStartFeature | null>(null);
+    const model = ref<QuickstartFeature | null>(null);
     const wizardActive = ref<boolean>(false);
 
     function reset(): void {
@@ -30,17 +30,18 @@ export default defineComponent({
 
     onBeforeMount(() => reset());
 
-    const wizardOpts = computed<QuickStartFeature[]>(
-      () => featureStore.quickStarts.filter(qs => !!qs.component),
+    const wizardOpts = computed<QuickstartFeature[]>(
+      () => featureStore.quickStarts,
     );
 
     function next(): void {
-      if (!model.value) { return; }
-      setDialogTitle(`${model.value.title} wizard`);
-      wizardActive.value = true;
+      if (model.value) {
+        setDialogTitle(`${model.value.title} wizard`);
+        wizardActive.value = true;
+      }
     }
 
-    function confirm(v: QuickStartFeature | null): void {
+    function confirm(v: QuickstartFeature | null): void {
       model.value = v;
       next();
     }
@@ -62,11 +63,9 @@ export default defineComponent({
 
 <template>
   <!-- Display selected wizard -->
-  <component
-    :is="model.component"
+  <QuickstartTaskmaster
     v-if="model && wizardActive"
-    :feature-id="model.id"
-    @title="setDialogTitle"
+    :initial-tasks="model.tasks"
     @back="reset"
     @close="onClose"
   />

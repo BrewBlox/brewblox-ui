@@ -95,13 +95,13 @@ export default defineComponent({
         label="Service"
         :options="serviceOpts"
         :value="config.serviceId"
-        @input="v => { config.serviceId = v; saveConfig(); }"
+        @update:model-value="v => { config.serviceId = v; saveConfig(); }"
       />
       <SelectField
         label="Color"
         :options="colorOpts"
         :value="config.color"
-        @input="v => { config.color = v; saveConfig(); }"
+        @update:model-value="v => { config.color = v; saveConfig(); }"
       />
       <ActionSubmenu label="Shown values">
         <ToggleAction
@@ -110,7 +110,7 @@ export default defineComponent({
           :value="!config.hidden[key]"
           :label="label"
           class="q-ml-sm"
-          @input="v => setShown(key, v)"
+          @update:model-value="v => setShown(key, v)"
         />
       </ActionSubmenu>
     </div>

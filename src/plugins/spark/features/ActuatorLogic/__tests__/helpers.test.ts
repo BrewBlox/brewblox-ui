@@ -8,7 +8,7 @@ import {
 import { AnalogCompare, DigitalCompare } from '@/plugins/spark/types';
 import { bloxLink } from '@/utils/bloxfield';
 
-import { comparisonCheck, sanitize, shiftRemainingComparisons, syntaxCheck } from '../helpers';
+import { comparisonCheck, sanitize, shiftRemainingComparisons, syntaxCheck } from '../utils';
 
 describe('Sanitize expression strings', () => {
   it('should remove invalid characters', () => {

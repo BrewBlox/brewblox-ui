@@ -151,11 +151,11 @@ export interface WatcherFeature {
 }
 
 /**
- * QuickStarts are independent wizards.
+ * Quickstarts are independent wizards.
  * They are not linked to any specific Widget or Service feature.
  * Instead, they may generate any combination of dashboards, widgets, and services.
  */
-export interface QuickStartFeature {
+export interface QuickstartFeature {
   /**
    * Unique type ID
    */
@@ -167,8 +167,9 @@ export interface QuickStartFeature {
   title: string;
 
   /**
-   * Name of globally registered Vue component.
-   * The component is expected to inherit from WidgetWizardBase.
+   * Names of globally registered Vue component.
+   * They are expected to accept props for config and actions,
+   * and emit events for config/action updates, along with back/next/close.
    */
-  component: string;
+  tasks: string[];
 }

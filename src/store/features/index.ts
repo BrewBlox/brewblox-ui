@@ -7,7 +7,7 @@ import { findById } from '@/utils/functional';
 
 import type {
   ComponentResult,
-  QuickStartFeature,
+  QuickstartFeature,
   ServiceFeature,
   WatcherFeature,
   WidgetFeature,
@@ -21,7 +21,7 @@ export * from './types';
 export class FeatureModule extends VuexModule {
 
   public widgets: WidgetFeature[] = [];
-  public quickStarts: QuickStartFeature[] = [];
+  public quickStarts: QuickstartFeature[] = [];
   public watchers: WatcherFeature[] = [];
   public services: ServiceFeature[] = [];
 
@@ -45,7 +45,7 @@ export class FeatureModule extends VuexModule {
     return findById(this.widgets, id);
   }
 
-  public quickStartById(id: string | null): QuickStartFeature | null {
+  public quickStartById(id: string | null): QuickstartFeature | null {
     return findById(this.quickStarts, id);
   }
 
@@ -106,7 +106,7 @@ export class FeatureModule extends VuexModule {
   }
 
   @Action
-  public async registerQuickStart(feature: QuickStartFeature): Promise<void> {
+  public async registerQuickstart(feature: QuickstartFeature): Promise<void> {
     if (this.quickStartById(feature.id)) {
       throw new Error(`Widget feature '${feature.id}' already exists`);
     }
