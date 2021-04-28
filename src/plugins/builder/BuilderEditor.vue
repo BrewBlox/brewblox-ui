@@ -1,7 +1,7 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
 import { debounce, QLayout, useQuasar } from 'quasar';
-import { computed, defineComponent, nextTick, ref, watch } from 'vue';
+import { computed, defineComponent, nextTick, reactive, ref, UnwrapRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
@@ -78,10 +78,10 @@ export default defineComponent({
     const selectedTime = ref<number>(0);
     const selectArea = ref<SelectArea | null>(null);
     const selectedParts = ref<FlowPart[]>([]);
-    const hoverPos = ref<XYPosition | null>(null);
+    const hoverPosRaw = ref<XYPosition | null>(null);
     const pageFocused = ref<boolean>(true);
 
-    const floater = ref<Floater | null>(null);
+    const floater = ref<UnwrapRef<Floater> | null>(null);
     const configuredPartId = ref<string | null>(null);
 
     const updater: PartUpdater = { updatePart: savePart };
@@ -376,6 +376,10 @@ export default defineComponent({
       }
     }
 
+    function makeFloater(source: Floater): void {
+      floater.value = reactive(deepCopy(source));
+    }
+
     function dropFloater(pos: XYPosition | null, isGridPos: boolean): void {
       if (!floater.value) { return; }
 
@@ -442,7 +446,7 @@ export default defineComponent({
       if (selectedParts.value.length) {
         return selectedParts.value;
       }
-      const hovered = findPartAtPos(hoverPos.value, false);
+      const hovered = findPartAtPos(hoverPosRaw.value, false);
       return hovered
         ? [hovered]
         : [];
@@ -552,12 +556,12 @@ export default defineComponent({
           component: BuilderCatalog,
         })
           .onOk((part: PersistentPart) => {
-            floater.value = {
+            makeFloater({
               moving: false,
               x: 0,
               y: 0,
               parts: [part],
-            };
+            });
             setFocus();
           })
           .onDismiss(setFocus);
@@ -566,42 +570,42 @@ export default defineComponent({
 
     function useMove(parts: PersistentPart[]): void {
       if (floater.value) {
-        dropFloater(hoverPos.value, false);
+        dropFloater(hoverPosRaw.value, false);
       }
       else if (parts.length) {
         const minX = Math.min(...parts.map(part => part.x));
         const minY = Math.min(...parts.map(part => part.y));
-        const startPos = hoverPos.value || { x: 0, y: 0 };
-        floater.value = {
+        const startPos = findGridSquare(hoverPosRaw.value) ?? { x: 0, y: 0 };
+        makeFloater({
           ...startPos,
           moving: true,
           parts: parts.map(part => ({
-            ...deepCopy(part),
+            ...part,
             x: part.x - minX,
             y: part.y - minY,
           })),
-        };
+        });
       }
     }
 
     function useCopy(parts: PersistentPart[]): void {
       if (floater.value) {
-        dropFloater(hoverPos.value, false);
+        dropFloater(hoverPosRaw.value, false);
       }
       else if (parts.length) {
         const minX = Math.min(...parts.map(part => part.x));
         const minY = Math.min(...parts.map(part => part.y));
-        const startPos = hoverPos.value ?? { x: 0, y: 0 };
-        floater.value = {
+        const startPos = findGridSquare(hoverPosRaw.value) ?? { x: 0, y: 0 };
+        makeFloater({
           ...startPos,
           moving: false,
           parts: parts.map(part => ({
-            ...deepCopy(part),
+            ...part,
             id: nanoid(),
             x: part.x - minX,
             y: part.y - minY,
           })),
-        };
+        });
       }
     }
 
@@ -670,9 +674,9 @@ export default defineComponent({
     ////////////////////////////////////////////////////////////////
 
     function onGridMove(evt: MouseEvent): void {
-      hoverPos.value = { x: evt.pageX, y: evt.pageY };
+      hoverPosRaw.value = { x: evt.pageX, y: evt.pageY };
       if (floater.value) {
-        const pos = findGridSquare(hoverPos.value);
+        const pos = findGridSquare(hoverPosRaw.value);
         if (pos) {
           floater.value.x = pos.x;
           floater.value.y = pos.y;
@@ -681,7 +685,7 @@ export default defineComponent({
     }
 
     function onGridLeave(): void {
-      hoverPos.value = null;
+      hoverPosRaw.value = null;
     }
 
     function clickHandler(evt: ClickEvent, part: FlowPart | null): void {
