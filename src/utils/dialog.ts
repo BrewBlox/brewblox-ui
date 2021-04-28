@@ -1,5 +1,4 @@
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
-import { App, Plugin } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
@@ -11,15 +10,6 @@ interface BlockDialogOpts {
   verify?: boolean;
 }
 
-// Workaround hack to fix https://github.com/quasarframework/quasar/issues/8885
-// We save a reference to the current (and only) Vue app, so we can lookup components here
-export const dialogFixPlugin: Plugin & { globalApp: App | null } = {
-  install(app) {
-    this.globalApp = app;
-  },
-  globalApp: null,
-};
-
 type DialogOpts = Pick<QDialogOptions, 'component' | 'componentProps'>
 
 export function getNumDialogs(): number {
@@ -27,11 +17,8 @@ export function getNumDialogs(): number {
 }
 
 export function createDialog({ component, componentProps }: DialogOpts): DialogChainObject {
-  const actualComponent = typeof component === 'string'
-    ? dialogFixPlugin.globalApp!.component(component)
-    : component;
   return Dialog.create({
-    component: actualComponent,
+    component,
     componentProps,
   });
 }

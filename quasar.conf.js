@@ -1,6 +1,7 @@
 const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = configure(function (ctx) {
   const buildDate = new Date().toISOString();
@@ -58,7 +59,6 @@ module.exports = configure(function (ctx) {
     devServer: {
       open: false,
       public: 'localhost',
-      quiet: false,
       https: {
         key: fs.readFileSync('dev/traefik/brewblox.key'),
         cert: fs.readFileSync('dev/traefik/brewblox.crt'),
@@ -83,7 +83,7 @@ module.exports = configure(function (ctx) {
       extractCSS: true,
 
       devtool: ctx.dev
-        ? 'cheap-module-eval-source-map'
+        ? 'eval-cheap-source-map'
         : undefined,
 
       supportTS: {
@@ -109,6 +109,23 @@ module.exports = configure(function (ctx) {
       extendWebpack: config => {
         config.performance.hints = ctx.prod ? 'warning' : false;
 
+        config.resolve.alias = {
+          ...config.resolve.alias,
+
+          // We're only using a subset from plotly
+          // Add alias to enable typing regardless
+          'plotly.js': 'plotly.js-basic-dist',
+
+          // This matches the @ alias set in tsconfig.json
+          '@': path.resolve(__dirname, './src'),
+        };
+
+        config.plugins.push(
+          // mqtt.js depends on multiple Node.JS libraries
+          // In webpack 5+, these are no longer polyfilled by default
+          new NodePolyfillPlugin(),
+        );
+
         if (ctx.prod) {
           // Function names are required to set up functions for VueX functionality
           config
@@ -118,15 +135,6 @@ module.exports = configure(function (ctx) {
             .terserOptions
             .keep_fnames = true;
         }
-      },
-
-      chainWebpack: config => {
-        // We're only using a subset from plotly
-        // Add alias to enable typing regardless
-        config.resolve.alias.set('plotly.js', 'plotly.js-basic-dist');
-
-        // This matches the @ alias set in tsconfig.json
-        config.resolve.alias.set('@', path.resolve(__dirname, './src'));
       },
     },
   };

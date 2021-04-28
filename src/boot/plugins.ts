@@ -15,7 +15,6 @@ import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
 import { widgetStore } from '@/store/widgets';
-import { dialogFixPlugin } from '@/utils/dialog';
 
 export default boot(({ app, store }) => {
   app.use(startupPlugin);
@@ -23,7 +22,6 @@ export default boot(({ app, store }) => {
   app.use(eventbusPlugin);
 
   const plugins: Plugin[] = [
-    dialogFixPlugin,
     wizardry,
     history,
     spark,
