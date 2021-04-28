@@ -1,7 +1,8 @@
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, reactive } from 'vue';
 
 import { useDialog } from '@/composables';
+import { deepCopy } from '@/utils/functional';
 
 import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
@@ -21,29 +22,48 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    usePresets: {
+      type: Boolean,
+      default: false,
+    },
+    annotated: {
+      type: Boolean,
+      default: false,
+    },
     saveAnnotations: {
       type: Function as PropType<(a: GraphAnnotation[]) => unknown>,
-      default: null,
+      default: () => { },
     },
     saveParams: {
       type: Function as PropType<(v: QueryParams) => unknown>,
-      default: null,
+      default: () => { },
     },
   },
   emits: [
     ...useDialog.emits,
   ],
-  setup() {
+  setup(props) {
     const {
       dialogRef,
       dialogProps,
       onDialogHide,
     } = useDialog.setup();
 
+    // Dialog props are not reactive.
+    // We'll keep changes cached locally, and assume the parent applies them unchanged
+    const localConfig = reactive(deepCopy(props.config));
+
+    function saveLocalParams(params: QueryParams): void {
+      localConfig.params = params;
+      props.saveParams(params);
+    }
+
     return {
       dialogRef,
       dialogProps,
       onDialogHide,
+      localConfig,
+      saveLocalParams,
     };
   },
 });
@@ -59,12 +79,11 @@ export default defineComponent({
   >
     <q-card>
       <HistoryGraph
-        v-bind="{graphId, config, sharedSources}"
-        :use-presets="!!saveParams"
-        :annotated="!!saveAnnotations"
+        :config="localConfig"
+        v-bind="{graphId, sharedSources, usePresets, annotated}"
         maximized
         @annotations="saveAnnotations"
-        @params="saveParams"
+        @params="saveLocalParams"
       >
         <template #controls>
           <DialogCloseButton stretch />

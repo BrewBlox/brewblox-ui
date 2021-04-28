@@ -68,6 +68,7 @@ export default defineComponent({
           component: 'GraphDialog',
           componentProps: {
             graphId: note.id,
+            annotated: true,
             saveAnnotations: v => saveAnnotations(note, v),
             config: {
               ...note.config,

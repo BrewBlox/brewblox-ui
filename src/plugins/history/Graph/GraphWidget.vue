@@ -129,7 +129,8 @@ export default defineComponent({
             },
           },
           sharedSources: currentId !== null,
-          saveParams: v => saveParams(v),
+          usePresets: true,
+          saveParams,
         },
       });
     }
