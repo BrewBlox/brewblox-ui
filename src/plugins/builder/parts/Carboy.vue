@@ -88,17 +88,15 @@ export default defineComponent({
       ry="8"
     />
     <g class="outline">
-      <path
-        :d="path"
-      />
-      <SetpointValues
-        :part="part"
-        :start-y="valueY"
-        :start-x="sizeX / 2 - 1"
-        :background-color="color"
-        settings-key="setpoint"
-        hide-unset
-      />
+      <path :d="path" />
     </g>
+    <SetpointValues
+      :part="part"
+      :start-y="valueY"
+      :start-x="sizeX / 2 - 1"
+      :background-color="color"
+      settings-key="setpoint"
+      hide-unset
+    />
   </g>
 </template>

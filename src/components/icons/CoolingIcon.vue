@@ -28,6 +28,7 @@ export default defineComponent({
       fill="none"
       :stroke="color"
       v-bind="svgProps"
+      stroke-width="1.5px"
     >
       <line x1="25" y1="10" x2="25" y2="40" />
       <polyline points="20.7,12 25,16.7 29.3,12" />

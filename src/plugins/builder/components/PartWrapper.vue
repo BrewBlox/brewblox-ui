@@ -100,7 +100,6 @@ export default defineComponent({
 /* not scoped */
 
 .BuilderPart
-  stroke-width: 2px
   stroke-linecap: round
   fill: none
 
@@ -108,6 +107,7 @@ export default defineComponent({
     fill: #fff
 
   .outline
+    stroke-width: 2px
     stroke: #fff
 
   .text
@@ -116,6 +116,9 @@ export default defineComponent({
 
   .liquid
     stroke-width: 7px
+
+  .q-icon
+    stroke-width: 0
 
 .showhover:hover
   fill: silver
