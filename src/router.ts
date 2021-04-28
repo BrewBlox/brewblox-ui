@@ -7,8 +7,9 @@ import {
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/builder/:id?',
+    path: '/builder/:routeId',
     component: () => import('@/plugins/builder/BuilderEditor.vue'),
+    props: true,
   },
   {
     path: '/',
@@ -17,10 +18,25 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
       { path: '/admin', component: () => import('@/pages/AdminPage.vue') },
       { path: '/styles', component: () => import('@/pages/StylesPage.vue') },
-      //   // dynamic pages
-      { path: '/dashboard/:id', component: () => import('@/pages/DashboardPage.vue') },
-      { path: '/service/:id', component: () => import('@/pages/ServicePage.vue') },
-      { path: '/brewery/:id?', component: () => import('@/plugins/builder/BreweryPage.vue') },
+      {
+        path: '/builder',
+        component: () => import('@/plugins/builder/BuilderIndexPage.vue'),
+      },
+      {
+        path: '/dashboard/:routeId',
+        component: () => import('@/pages/DashboardPage.vue'),
+        props: true,
+      },
+      {
+        path: '/service/:routeId',
+        component: () => import('@/pages/ServicePage.vue'),
+        props: true,
+      },
+      {
+        path: '/brewery/:routeId',
+        component: () => import('@/plugins/builder/BreweryPage.vue'),
+        props: true,
+      },
     ],
   },
 

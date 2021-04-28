@@ -1,14 +1,13 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
 import { defineComponent, PropType } from 'vue';
+import { useRouter } from 'vue-router';
 
-import { defaultLayoutHeight, defaultLayoutWidth } from '@/plugins/builder/const';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
 import { loadFile } from '@/utils/import-export';
 
 import { builderStore } from '../store';
+import { startAddLayout } from '../utils';
 
 export default defineComponent({
   name: 'BuilderActions',
@@ -18,35 +17,18 @@ export default defineComponent({
       default: null,
     },
   },
-  emits: [
-    'selected',
-  ],
-  setup(props, { emit }) {
+  setup() {
+    const router = useRouter();
 
-    function selectLayout(id: string | null): void {
-      emit('selected', id);
+    function selectLayout(id: string): void {
+      router.push(`/builder/${id}`).catch(() => { });
     }
 
-    function startAddLayout(copy: boolean): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: 'Brewery Layout',
-          title: 'Add Layout',
-          message: 'Create a new Brewery Builder layout',
-        },
-      })
-        .onOk(async title => {
-          const id = nanoid();
-          await builderStore.createLayout({
-            id,
-            title,
-            width: copy && props.layout ? props.layout.width : defaultLayoutWidth,
-            height: copy && props.layout ? props.layout.height : defaultLayoutHeight,
-            parts: copy && props.layout ? deepCopy(props.layout.parts) : [],
-          });
-          selectLayout(id);
-        });
+    async function createLayout(): Promise<void> {
+      const id = await startAddLayout();
+      if (id) {
+        selectLayout(id);
+      }
     }
 
     async function importLayout(): Promise<void> {
@@ -59,7 +41,7 @@ export default defineComponent({
 
     return {
       selectLayout,
-      startAddLayout,
+      createLayout,
       importLayout,
     };
   },
@@ -74,7 +56,7 @@ export default defineComponent({
       <ActionItem
         icon="add"
         label="New Layout"
-        @click="startAddLayout(false)"
+        @click="createLayout"
       />
       <ActionItem
         icon="mdi-file-import"

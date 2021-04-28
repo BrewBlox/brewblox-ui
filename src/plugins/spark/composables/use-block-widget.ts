@@ -12,7 +12,7 @@ import notify from '@/utils/notify';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { BlockConfig, BlockSpec, BlockWidget } from '../types';
-import { blockGraphCfg, makeBlockIdRules, canDisplay as canDisplayFn } from '../utils';
+import { blockGraphCfg, canDisplay as canDisplayFn, makeBlockIdRules } from '../utils';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {

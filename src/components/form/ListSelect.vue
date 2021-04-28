@@ -21,6 +21,10 @@ export default defineComponent({
       type: String,
       default: 'title',
     },
+    optionClass: {
+      type: [String, Array, Object],
+      default: '',
+    },
     emitValue: {
       type: Boolean,
       default: false,
@@ -87,7 +91,8 @@ export default defineComponent({
       v-for="opt in mappedOptions"
       :key="opt[optionValue]"
       :class="[
-        'col clickable q-pl-sm rounded-borders text-h6',
+        'col clickable q-px-sm rounded-borders text-h6',
+        optionClass,
         {'q-py-sm': !dense, 'depth-24': matches(opt)}
       ]"
       @click="selectValue(opt, false)"

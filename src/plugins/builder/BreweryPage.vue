@@ -1,7 +1,6 @@
 <script lang="ts">
 import { debounce, useQuasar } from 'quasar';
 import { computed, defineComponent, nextTick, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
@@ -14,10 +13,15 @@ import { asPersistentPart, asStatePart, squares, vivifyParts } from './utils';
 
 export default defineComponent({
   name: 'BreweryPage',
-  setup() {
+  props: {
+    routeId: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
     const { dense } = useGlobals.setup();
     const { localStorage } = useQuasar();
-    const router = useRouter();
 
     const pending = ref<FlowPart | null>(null);
     const flowParts = ref<FlowPart[]>([]);
@@ -50,27 +54,15 @@ export default defineComponent({
     );
 
     const layoutId = computed<string | null>(
-      () => {
-        const route = router.currentRoute.value;
-        const paramId = route.path.startsWith('/brewery')
-          ? route.params.id as string ?? null
-          : null;
-        return paramId ?? localStorage.getItem('brewery-page');
-      },
+      () => props.routeId,
     );
 
     const layout = computed<BuilderLayout | null>(
-      () => builderStore.layoutById(layoutId.value ?? builderStore.layoutIds[0]),
+      () => builderStore.layoutById(layoutId.value),
     );
 
     const layoutTitle = computed<string>(
       () => layout.value?.title ?? 'Builder layout',
-    );
-
-    watch(
-      () => layoutTitle.value,
-      title => document.title = `Brewblox | ${title}`,
-      { immediate: true },
     );
 
     const scale = computed<number>(
@@ -142,6 +134,12 @@ export default defineComponent({
     watch(
       () => layout.value,
       () => calculate(),
+      { immediate: true },
+    );
+
+    watch(
+      () => layoutTitle.value,
+      title => document.title = `Brewblox | ${title}`,
       { immediate: true },
     );
 

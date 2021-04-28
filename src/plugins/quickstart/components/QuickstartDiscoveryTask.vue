@@ -10,7 +10,7 @@ import {
   DS2413Block,
   TempSensorOneWireBlock,
 } from '@/plugins/spark/types';
-import { makeBlockIdRules, discoverBlocks, isCompatible } from '@/plugins/spark/utils';
+import { discoverBlocks, isCompatible, makeBlockIdRules } from '@/plugins/spark/utils';
 import { featureStore } from '@/store/features';
 import { prettyQty } from '@/utils/bloxfield';
 import { createBlockDialog, createDialog } from '@/utils/dialog';

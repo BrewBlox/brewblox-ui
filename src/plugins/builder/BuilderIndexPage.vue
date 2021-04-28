@@ -3,8 +3,6 @@ import { computed, defineComponent, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { builderStore } from '@/plugins/builder/store';
-import { dashboardStore } from '@/store/dashboards';
-import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { objectSorter } from '@/utils/functional';
@@ -14,29 +12,24 @@ export default defineComponent({
   setup() {
     const router = useRouter();
 
-    const homePage = computed<string | null>(
+    const builderPage = computed<string | null>(
       () => {
-        const { homePage } = systemStore.config;
-
-        const defaultPage = [...dashboardStore.dashboards]
-          .sort(objectSorter('order'))
-          .map(v => `/dashboard/${v.id}`)[0] ?? null;
-
-        // Defaults to first dashboard
-        if (!homePage) {
-          return defaultPage;
+        if (!systemStore.started) {
+          return null;
         }
 
-        const [, section, pageId] = homePage.split('/');
-        const valid = (
-          (section === 'dashboard' && dashboardStore.dashboardIds.includes(pageId)) ||
-          (section === 'service' && serviceStore.serviceIds.includes(pageId)) ||
-          (section === 'brewery' && builderStore.layoutIds.includes(pageId))
-        );
+        if (builderStore.layouts.length === 0) {
+          return '/builder/none';
+        }
 
-        return valid
-          ? homePage
-          : defaultPage;
+        const layout = null
+          ?? builderStore.layoutById(builderStore.lastLayoutId)
+          ?? [...builderStore.layouts].sort(objectSorter('order'))[0]
+          ?? null;
+
+        return layout
+          ? `/builder/${layout.id}`
+          : null;
       },
     );
 
@@ -45,13 +38,13 @@ export default defineComponent({
     }
 
     watch(
-      () => homePage.value,
+      () => builderPage.value,
       v => v && router.replace(v),
       { immediate: true },
     );
 
     return {
-      homePage,
+      builderPage,
       showWizard,
     };
   },
@@ -60,7 +53,7 @@ export default defineComponent({
 
 <template>
   <q-page class="text-h5 darkened">
-    <PageError v-if="!homePage">
+    <PageError v-if="!builderPage">
       <q-btn
         unelevated
         color="secondary"

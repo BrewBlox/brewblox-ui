@@ -20,6 +20,7 @@ export class BuilderModule extends VuexModule {
   public specs: PartSpec[] = [];
 
   public editorMode = '';
+  public drawerMode: 'tools' | 'layouts' = 'tools';
   public lastLayoutId: string | null = null;
   public layouts: BuilderLayout[] = [];
 

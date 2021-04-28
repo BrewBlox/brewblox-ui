@@ -5,7 +5,6 @@ import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { systemStore } from '@/store/system';
 import { Coordinates } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
 import { clampRotation, deepCopy, filterById, spliceById } from '@/utils/functional';
@@ -16,7 +15,7 @@ import { calculateNormalizedFlows } from './calculateFlows';
 import { SQUARE_SIZE } from './const';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
-import { asPersistentPart, asStatePart, rectContains, squares, vivifyParts } from './utils';
+import { asPersistentPart, asStatePart, rectContains, squares, startAddLayout, vivifyParts } from './utils';
 
 interface Floater extends XYPosition {
   moving: boolean;
@@ -57,19 +56,22 @@ export default defineComponent({
   components: {
     BuilderPartMenu,
   },
-  setup() {
+  props: {
+    routeId: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
     const { dense } = useGlobals.setup();
     const { localStorage } = useQuasar();
     const router = useRouter();
-
-    const layoutId = ref<string | null>(null);
 
     const flowParts = ref<FlowPart[]>([]);
     const flowPartsRev = ref<string>('');
     const history = ref<string[]>([]);
     const undoneHistory = ref<string[]>([]);
 
-    const drawerContent = ref<'tools' | 'layouts'>('tools');
     const menuDialogOpen = ref<boolean>(false);
     const focusWarning = ref<boolean>(true);
 
@@ -94,6 +96,11 @@ export default defineComponent({
         _drawerOpen.value = v;
         localStorage.set('drawer', v);
       },
+    });
+
+    const drawerMode = computed<'tools' | 'layouts'>({
+      get: () => builderStore.drawerMode,
+      set: v => builderStore.drawerMode = v,
     });
 
     const modes: ActionMode[] = [
@@ -177,6 +184,10 @@ export default defineComponent({
       () => builderStore.layouts,
     );
 
+    const layoutId = computed<string | null>(
+      () => props.routeId || null,
+    );
+
     const layout = computed<BuilderLayout | null>(
       () => builderStore.layoutById(layoutId.value),
     );
@@ -230,25 +241,9 @@ export default defineComponent({
       set: tool => builderStore.editorMode = tool.value,
     });
 
-    const routeId = computed<string | null>(
-      () => {
-        const route = router.currentRoute.value;
-        return route.path.startsWith('/builder')
-          ? route.params.id as string || null
-          : null;
-      },
-    );
-
     function selectLayout(id: string | null): void {
-      layoutId.value = id
-        ?? routeId.value
-        ?? builderStore.lastLayoutId
-        ?? builderStore.layoutIds[0]
-        ?? null;
-
-      const route = layoutId.value ? `/builder/${layoutId.value}` : '/builder';
-      router.replace(route).catch(() => { });
-      builderStore.lastLayoutId = layoutId.value;
+      const route = id ? `/builder/${id}` : '/builder';
+      router.push(route).catch(() => { });
     }
 
     function setFocus(): void {
@@ -263,6 +258,13 @@ export default defineComponent({
       });
     }
 
+    async function createLayout(): Promise<void> {
+      const id = await startAddLayout();
+      setFocus();
+      if (id) {
+        selectLayout(id);
+      }
+    }
 
     async function saveLayout(saved: BuilderLayout | null = layout.value): Promise<void> {
       if (saved === null) {
@@ -729,29 +731,21 @@ export default defineComponent({
         if (newV !== oldV) {
           history.value = [];
           undoneHistory.value = [];
+          builderStore.lastLayoutId = newV;
         }
       },
+      { immediate: true },
     );
 
     watch(
       () => layout.value,
       () => calculate(),
+      { immediate: true },
     );
 
     watch(
       () => layoutTitle.value,
       title => document.title = `Brewblox | ${title}`,
-      { immediate: true },
-    );
-
-    watch(
-      () => systemStore.started,
-      (started) => {
-        if (started) {
-          selectLayout(null);
-          nextTick(() => setFocus());
-        }
-      },
       { immediate: true },
     );
 
@@ -763,7 +757,7 @@ export default defineComponent({
       checkFocus,
       leaveEditor,
       drawerOpen,
-      drawerContent,
+      drawerMode,
       layout,
       layoutTitle,
       selectLayout,
@@ -778,6 +772,7 @@ export default defineComponent({
       undo,
       redo,
       saveLayout,
+      createLayout,
       focusWarning,
       layouts,
       menuDialogOpen,
@@ -834,14 +829,13 @@ export default defineComponent({
       <SidebarNavigator />
 
       <div class="row">
-        <q-tabs v-model="drawerContent" active-color="primary" class="col-grow">
+        <q-tabs v-model="drawerMode" active-color="primary" class="col-grow">
           <q-tab name="tools" label="Tools" />
           <q-tab name="layouts" label="Layouts" />
         </q-tabs>
         <BuilderActions
           :layout="layout"
           class="col-auto"
-          @selected="selectLayout"
         />
       </div>
 
@@ -849,7 +843,7 @@ export default defineComponent({
         class="col"
         :thumb-style="{opacity: 0.5, background: 'silver'}"
       >
-        <template v-if="drawerContent === 'tools' && layout !== null">
+        <template v-if="drawerMode === 'tools' && layout !== null">
           <q-item class="q-pb-none">
             <q-item-section class="text-bold">
               Mouse actions
@@ -960,7 +954,7 @@ export default defineComponent({
           />
         </template>
 
-        <template v-if="drawerContent === 'layouts'">
+        <template v-if="drawerMode === 'layouts'">
           <ActionItem
             v-for="lo in layouts"
             :key="lo.id"
@@ -993,7 +987,27 @@ export default defineComponent({
     <q-page-container style="overflow: hidden">
       <q-page class="row no-wrap justify-center q-pa-md">
         <PageError v-if="!layout">
-          No layout selected
+          <template v-if="layouts.length">
+            Select a layout
+            <ListSelect
+              :model-value="null"
+              :options="layouts"
+              option-value="id"
+              option-label="title"
+              option-class="q-px-md"
+              class="q-mx-lg q-my-md"
+              style="color:white"
+              @update:model-value="v => v && selectLayout(v.id)"
+            />
+            or
+          </template>
+          <q-btn
+            outline
+            color="secondary"
+            label="Create a layout"
+            class="q-mx-lg self-stretch"
+            @click="createLayout"
+          />
         </PageError>
         <div v-else class="col-auto column no-wrap">
           <div
@@ -1096,7 +1110,7 @@ export default defineComponent({
           </div>
         </div>
         <div
-          v-if="!pageFocused && focusWarning"
+          v-if="layout && !pageFocused && focusWarning"
           class="unfocus-overlay"
           @click.stop="checkFocus"
         >

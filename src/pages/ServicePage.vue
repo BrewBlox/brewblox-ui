@@ -1,17 +1,20 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { useRoute } from 'vue-router';
 
 import { featureStore } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
 
 export default defineComponent({
   name: 'ServicePage',
-  setup() {
-    const route = useRoute();
-
+  props: {
+    routeId: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
     const serviceId = computed<string>(
-      () => route.params.id as string,
+      () => props.routeId,
     );
 
     const service = computed<Service | null>(

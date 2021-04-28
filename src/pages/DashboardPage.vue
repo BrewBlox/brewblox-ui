@@ -12,7 +12,13 @@ import { objectSorter } from '@/utils/functional';
 
 export default defineComponent({
   name: 'DashboardPage',
-  setup() {
+  props: {
+    routeId: {
+      type: String,
+      default: null,
+    },
+  },
+  setup(props) {
     const widgetEditable = ref(false);
     const { dense } = useGlobals.setup();
     const router = useRouter();
@@ -26,12 +32,7 @@ export default defineComponent({
     );
 
     const dashboardId = computed<string | null>(
-      () => {
-        const route = router.currentRoute.value;
-        return route.path.startsWith('/dashboard')
-          ? route.params.id as string || null
-          : null;
-      },
+      () => props.routeId ?? null,
     );
 
     const dashboard = computed<Dashboard | null>(

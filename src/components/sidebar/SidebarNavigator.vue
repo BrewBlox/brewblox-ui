@@ -33,6 +33,12 @@ export default defineComponent({
         : null,
     );
 
+    const nextBuilderPage = computed<string>(
+      () => route.path.startsWith('/builder')
+        ? route.path
+        : '/builder',
+    );
+
     function btnColor(...sections: string[]): string {
       return sections.includes(activeSection.value) ? 'primary' : '';
     }
@@ -42,6 +48,7 @@ export default defineComponent({
       activeSection,
       editorDisabled,
       currentDashboard,
+      nextBuilderPage,
       btnAttrs,
       btnColor,
     };

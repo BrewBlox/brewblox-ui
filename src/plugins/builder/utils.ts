@@ -8,12 +8,12 @@ import { BlockAddress } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { widgetStore } from '@/store/widgets';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { mutate } from '@/utils/functional';
+import { createBlockDialog, createDialog, createDialogPromise } from '@/utils/dialog';
+import { deepCopy, mutate } from '@/utils/functional';
 
-import { CENTER, deprecatedTypes, SQUARE_SIZE } from './const';
+import { CENTER, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './const';
 import { builderStore } from './store';
-import { FlowPart, PersistentPart, Rect, StatePart, Transitions } from './types';
+import { BuilderLayout, FlowPart, PersistentPart, Rect, StatePart, Transitions } from './types';
 
 export function settingsAddress(part: PersistentPart, key: string): BlockAddress {
   const obj: any = part.settings[key] ?? {};
@@ -283,4 +283,27 @@ export function liquidOnCoord(part: FlowPart, coord: string): string[] {
 export function flowOnCoord(part: FlowPart, coord: string): number {
   return Object.values(part.flows[rotatedCoord(part, coord)] ?? {})
     .reduce((sum, v) => sum + v, 0);
+}
+
+export async function startAddLayout(source: BuilderLayout | null = null): Promise<string | null> {
+  const title = await createDialogPromise({
+    component: 'InputDialog',
+    componentProps: {
+      modelValue: 'Brewery Layout',
+      title: 'Add Layout',
+      message: 'Create a new Brewery Builder layout',
+    },
+  });
+  if (!title) {
+    return null;
+  }
+  const id = nanoid();
+  await builderStore.createLayout({
+    id,
+    title,
+    width: source?.width ?? defaultLayoutWidth,
+    height: source?.height ?? defaultLayoutHeight,
+    parts: deepCopy(source?.parts) ?? [],
+  });
+  return id;
 }

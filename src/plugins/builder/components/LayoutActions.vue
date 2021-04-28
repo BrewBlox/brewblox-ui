@@ -2,16 +2,16 @@
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType } from 'vue';
 
-import { defaultLayoutHeight, defaultLayoutWidth } from '@/plugins/builder/const';
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
 import notify from '@/utils/notify';
+
+import { startAddLayout } from '../utils';
 
 export default defineComponent({
   name: 'LayoutActions',
@@ -86,26 +86,11 @@ export default defineComponent({
         });
     }
 
-    function startAddLayout(copy: boolean): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          title: 'Add Layout',
-          message: 'Create a new Brewery Builder layout',
-          modelValue: 'Brewery Layout',
-        },
-      })
-        .onOk(async title => {
-          const id = nanoid();
-          await builderStore.createLayout({
-            id,
-            title,
-            width: copy && props.layout ? props.layout.width : defaultLayoutWidth,
-            height: copy && props.layout ? props.layout.height : defaultLayoutHeight,
-            parts: copy && props.layout ? deepCopy(props.layout.parts) : [],
-          });
-          selectLayout(id);
-        });
+    async function copyLayout(): Promise<void> {
+      const id = await startAddLayout(props.layout);
+      if (id) {
+        selectLayout(id);
+      }
     }
 
     function exportLayout(): void {
@@ -220,7 +205,7 @@ export default defineComponent({
       isHomePage,
       selectLayout,
       editScale,
-      startAddLayout,
+      copyLayout,
       renameLayout,
       createLayoutWidget,
       exportLayout,
@@ -252,7 +237,7 @@ export default defineComponent({
     <ActionItem
       icon="file_copy"
       label="Copy layout"
-      @click="startAddLayout(true)"
+      @click="copyLayout()"
     />
     <ActionItem
       icon="edit"
