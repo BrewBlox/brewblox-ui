@@ -1,5 +1,5 @@
 import isString from 'lodash/isString';
-import { Action, Module, VuexModule } from 'vuex-class-modules';
+import { Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import type { Widget } from '@/store/widgets';
@@ -94,8 +94,8 @@ export class FeatureModule extends VuexModule {
     return this.widgetById(id)?.removeActions ?? [];
   }
 
-  @Action
-  public async registerWidget(feature: WidgetFeature): Promise<void> {
+  @Mutation
+  public addWidgetFeature(feature: WidgetFeature): void {
     if (feature.wizard === true && feature.generateConfig === undefined) {
       throw new Error(`Widget feature ${feature.id} must define a generateConfig function to use the default wizard`);
     }
@@ -105,24 +105,24 @@ export class FeatureModule extends VuexModule {
     this.widgets = [...this.widgets, feature];
   }
 
-  @Action
-  public async registerQuickstart(feature: QuickstartFeature): Promise<void> {
+  @Mutation
+  public addQuickstartFeature(feature: QuickstartFeature): void {
     if (this.quickStartById(feature.id)) {
       throw new Error(`Widget feature '${feature.id}' already exists`);
     }
     this.quickStarts = [...this.quickStarts, feature];
   }
 
-  @Action
-  public async registerWatcher(feature: WatcherFeature): Promise<void> {
+  @Mutation
+  public addWatcherFeature(feature: WatcherFeature): void {
     if (this.watcherById(feature.id)) {
       throw new Error(`Watcher feature '${feature.id}' already exists`);
     }
     this.watchers = [...this.watchers, feature];
   }
 
-  @Action
-  public async registerService(feature: ServiceFeature): Promise<void> {
+  @Mutation
+  public addServiceFeature(feature: ServiceFeature): void {
     if (this.serviceById(feature.id)) {
       throw new Error(`Service feature '${feature.id}' already exists`);
     }

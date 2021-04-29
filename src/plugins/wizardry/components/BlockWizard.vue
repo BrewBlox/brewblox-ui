@@ -140,12 +140,12 @@ export default defineComponent({
         .onOk(v => blockId.value = v);
     }
 
-    async function ensureVolatile(): Promise<void> {
+    function ensureVolatile(): void {
       if (activeBlock.value
         && (activeBlock.value.id !== blockId.value
           || activeBlock.value.serviceId !== serviceId.value
           || activeBlock.value.type !== selected.value?.value)) {
-        await sparkStore.removeVolatileBlock(activeBlock.value);
+        sparkStore.removeVolatileBlock(activeBlock.value);
         activeBlock.value = null;
       }
 
@@ -154,7 +154,7 @@ export default defineComponent({
         && blockId.value
         && serviceId.value
         && createReady.value) {
-        await sparkStore.createVolatileBlock({
+        sparkStore.setVolatileBlock({
           id: blockId.value,
           serviceId: serviceId.value,
           type: selected.value.value,
@@ -166,7 +166,7 @@ export default defineComponent({
 
       if (activeBlock.value) {
         const block = activeBlock.value;
-        await widgetStore.createVolatileWidget({
+        widgetStore.setVolatileWidget({
           id: widgetId,
           title: block.id,
           feature: block.type,
@@ -195,11 +195,11 @@ export default defineComponent({
       }
     }
 
-    async function configureBlock(): Promise<void> {
+    function configureBlock(): void {
       if (!createReady.value || !serviceId.value || !sparkModule.value) {
         return;
       }
-      await ensureVolatile();
+      ensureVolatile();
       if (activeBlock.value && activeWidget.value) {
         activeDialog.value = createDialog({
           component: 'WidgetDialog',
@@ -220,7 +220,7 @@ export default defineComponent({
       if (!createReady.value || !serviceId.value || !sparkModule.value) {
         return;
       }
-      await ensureVolatile();
+      ensureVolatile();
 
       if (!activeBlock.value || !activeWidget.value) {
         return;

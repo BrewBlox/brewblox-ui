@@ -7,7 +7,7 @@ export default defineComponent({
   name: 'PageError',
   computed: {
     started() {
-      return systemStore.started;
+      return systemStore.startupDone;
     },
   },
 });

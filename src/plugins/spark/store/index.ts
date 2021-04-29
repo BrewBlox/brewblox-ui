@@ -1,4 +1,4 @@
-import { Action, Module, VuexModule } from 'vuex-class-modules';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import { extendById, filterById, findById } from '@/utils/functional';
@@ -68,8 +68,16 @@ export class SparkGlobalModule extends VuexModule {
       : null;
   }
 
-  @Action
-  public async registerSpec<T extends Block>(spec: BlockSpec<T>): Promise<void> {
+  public setVolatileBlock(block: Block): void {
+    this.moduleById(block.serviceId)?.setVolatileBlock(block);
+  }
+
+  public removeVolatileBlock(block: Block): void {
+    this.moduleById(block.serviceId)?.removeVolatileBlock(block);
+  }
+
+  @Mutation
+  public addBlockSpec<T extends Block>(spec: BlockSpec<T>): void {
     this.specs = extendById(this.specs, spec as any);
   }
 
@@ -83,20 +91,12 @@ export class SparkGlobalModule extends VuexModule {
     await this.moduleById(block.serviceId)?.createBlock(block);
   }
 
-  @Action
-  public async createVolatileBlock(block: Block): Promise<void> {
-    await this.moduleById(block.serviceId)?.createVolatileBlock(block);
-  }
 
   @Action
   public async removeBlock(block: Block): Promise<void> {
     await this.moduleById(block.serviceId)?.removeBlock(block);
   }
 
-  @Action
-  public async removeVolatileBlock(block: Block): Promise<void> {
-    await this.moduleById(block.serviceId)?.removeVolatileBlock(block);
-  }
 
   @Action
   public async validateService(serviceId: string): Promise<boolean> {

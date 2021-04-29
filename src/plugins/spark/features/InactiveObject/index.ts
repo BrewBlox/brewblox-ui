@@ -25,7 +25,7 @@ const plugin: Plugin = {
       },
     };
 
-    featureStore.registerWidget(feature);
+    featureStore.addWidgetFeature(feature);
   },
 };
 

@@ -14,7 +14,7 @@ export default defineComponent({
 
     const builderPage = computed<string | null>(
       () => {
-        if (!systemStore.started) {
+        if (!systemStore.startupDone) {
           return null;
         }
 

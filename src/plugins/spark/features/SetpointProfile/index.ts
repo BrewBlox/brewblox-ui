@@ -65,8 +65,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.registerSpec(spec);
-    featureStore.registerWidget(feature);
+    sparkStore.addBlockSpec(spec);
+    featureStore.addWidgetFeature(feature);
   },
 };
 

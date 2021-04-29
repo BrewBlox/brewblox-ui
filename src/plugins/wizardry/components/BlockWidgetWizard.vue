@@ -111,7 +111,7 @@ export default defineComponent({
         if (activeBlock.value
           && (activeBlock.value.id !== newBlockId.value
             || activeBlock.value.serviceId !== serviceId.value)) {
-          await sparkStore.removeVolatileBlock(activeBlock.value);
+          sparkStore.removeVolatileBlock(activeBlock.value);
           activeBlock.value = null;
         }
 
@@ -119,7 +119,7 @@ export default defineComponent({
           && newBlockId.value
           && serviceId.value
           && validator.value(newBlockId.value)) {
-          await sparkStore.createVolatileBlock({
+          sparkStore.setVolatileBlock({
             id: newBlockId.value,
             serviceId: serviceId.value,
             type: blockType,
@@ -135,7 +135,7 @@ export default defineComponent({
       const block = sparkStore.blockById(serviceId.value, blockId);
 
       if (block) {
-        await widgetStore.createVolatileWidget({
+        await widgetStore.setVolatileWidget({
           id: widgetId,
           title: block.id,
           feature: blockType,

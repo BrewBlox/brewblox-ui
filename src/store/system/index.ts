@@ -25,24 +25,14 @@ const defaultUnits = (): UserUnits => ({
   temperature: 'degC',
 });
 
-@Module // generateMutationSetters not set
+@Module({ generateMutationSetters: true })
 export class SystemModule extends VuexModule {
-  public connected = false;
-  public started = false;
+  public startupDone = false;
+
   public config: SystemConfig = defaultConfig();
   public units: UserUnits = defaultUnits();
 
   public userDefinedUnits = true; // assume yes
-
-  @Mutation
-  public setConnected(): void {
-    this.connected = true;
-  }
-
-  @Mutation
-  public setStarted(): void {
-    this.started = true;
-  }
 
   @Mutation
   private updateConfig(cfg: SystemConfig & Partial<StoreObject> | null): void {

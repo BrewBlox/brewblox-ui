@@ -1,6 +1,4 @@
-import { Plugin } from 'vue';
-
-import { StartupKey } from '@/symbols';
+import { systemStore } from '@/store/system';
 
 /**
  * Vue/VueX have the concept of lifecycle hooks for individual components,
@@ -11,7 +9,7 @@ import { StartupKey } from '@/symbols';
  * Inserting store data at that point will throw an error.
  *
  * As a solution, plugins can register callbacks here.
- * They will be called in the App.vue `created()` hook.
+ * They will be called during App.vue setup.
  */
 export class BrewbloxStartup {
   private startFuncs: (() => Awaitable<unknown>)[] = [];
@@ -22,13 +20,8 @@ export class BrewbloxStartup {
 
   public async start(): Promise<void> {
     await Promise.all(this.startFuncs.map(f => f()));
+    systemStore.startupDone = true;
   }
 }
 
 export const startup = new BrewbloxStartup();
-
-export const startupPlugin: Plugin = {
-  install(app) {
-    app.provide(StartupKey, startup);
-  },
-};

@@ -41,8 +41,8 @@ export default defineComponent({
       false,
     );
 
-    const started = computed<boolean>(
-      () => systemStore.started,
+    const startupDone = computed<boolean>(
+      () => systemStore.startupDone,
     );
 
     const delayTouch = computed<boolean>(
@@ -158,7 +158,7 @@ export default defineComponent({
       layoutId,
       layout,
       layoutTitle,
-      started,
+      startupDone,
       parts,
       gridViewBox,
       flowParts,
@@ -176,7 +176,7 @@ export default defineComponent({
 <template>
   <q-page class="page-height">
     <div
-      v-if="!started"
+      v-if="!startupDone"
       class="text-h5 darkened absolute-center column items-center q-gutter-md"
     >
       <q-spinner size="30px" />

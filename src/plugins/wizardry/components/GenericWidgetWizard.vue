@@ -39,7 +39,7 @@ export default defineComponent({
     );
 
     async function ensureVolatile(): Promise<void> {
-      await widgetStore.createVolatileWidget({
+      await widgetStore.setVolatileWidget({
         id: widgetId,
         title: widgetTitle.value,
         feature: props.featureId,

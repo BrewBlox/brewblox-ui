@@ -1,8 +1,6 @@
 import mqtt from 'mqtt';
 import { nanoid } from 'nanoid';
-import { Plugin } from 'vue';
 
-import { EventbusKey } from '@/symbols';
 import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/utils/const';
 import { mqttTopicExp, popById } from '@/utils/functional';
 import notify from '@/utils/notify';
@@ -106,9 +104,3 @@ export class BrewbloxEventbus {
 }
 
 export const eventbus = new BrewbloxEventbus();
-
-export const eventbusPlugin: Plugin = {
-  install(app) {
-    app.provide(EventbusKey, eventbus);
-  },
-};

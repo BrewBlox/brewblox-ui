@@ -13,7 +13,7 @@ const plugin: Plugin = {
       props: {},
     };
 
-    featureStore.registerWatcher(watcher);
+    featureStore.addWatcherFeature(watcher);
   },
 };
 

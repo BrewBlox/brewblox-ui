@@ -13,8 +13,8 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(ctx) {
-    const collapsed = ref(!ctx.showInitial);
+  setup(props) {
+    const collapsed = ref(!props.showInitial);
 
     return {
       collapsed,

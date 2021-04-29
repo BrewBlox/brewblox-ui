@@ -1,22 +1,28 @@
 <script lang="ts">
-import { defineComponent, inject, onBeforeMount } from 'vue';
+import { defineComponent } from 'vue';
 
-import { systemStore } from './store/system';
-import { DatabaseKey, EventbusKey, StartupKey } from './symbols';
+import { database } from '@/plugins/database';
+import { eventbus } from '@/plugins/eventbus';
+import { startup } from '@/plugins/startup';
+
+/**
+ * Order of startup is important here.
+ * We first ensure that the database is working.
+ * Startup functions may register eventbus listeners.
+ * If they do so after the eventbus started,
+ * they will miss the first (immediate) data push.
+ */
+async function onAppSetup(): Promise<void> {
+  await database.connect();
+  await startup.start();
+  await eventbus.connect();
+}
 
 export default defineComponent({
+  name: 'App',
   setup() {
-    const database = inject(DatabaseKey)!;
-    const startup = inject(StartupKey)!;
-    const eventbus = inject(EventbusKey)!;
-
-    onBeforeMount(async () => {
-      await database.connect();
-      systemStore.setConnected();
-      await startup.start();
-      systemStore.setStarted();
-      await eventbus.connect();
-    });
+    onAppSetup();
+    return {};
   },
 });
 </script>

@@ -48,8 +48,8 @@ const plugin: Plugin = {
       removeActions: undefined,
     };
 
-    sparkStore.registerSpec(spec);
-    featureStore.registerWidget(feature);
+    sparkStore.addBlockSpec(spec);
+    featureStore.addWidgetFeature(feature);
   },
 };
 

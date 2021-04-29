@@ -15,7 +15,7 @@ const plugin: Plugin = {
   install(app) {
     autoRegister(app, require.context('./components', true));
 
-    featureStore.registerService({
+    featureStore.addServiceFeature({
       id: 'Tilt',
       title: 'Tilt Service',
       pageComponent: 'TiltPage',

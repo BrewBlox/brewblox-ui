@@ -47,8 +47,8 @@ const plugin: Plugin = {
       wizard: 'BlockDiscoveryWizard',
     };
 
-    sparkStore.registerSpec(spec);
-    featureStore.registerWidget(feature);
+    sparkStore.addBlockSpec(spec);
+    featureStore.addWidgetFeature(feature);
   },
 };
 

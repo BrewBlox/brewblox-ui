@@ -24,8 +24,8 @@ interface ConfigService {
 export default defineComponent({
   name: 'AdminPage',
   setup() {
-    const connected = computed<boolean>(
-      () => systemStore.connected,
+    const startupDone = computed<boolean>(
+      () => systemStore.startupDone,
     );
 
     const experimental = computed<boolean>({
@@ -68,7 +68,7 @@ export default defineComponent({
       startChangeKeyboardLayout,
       startChangeTempUnit,
       startEditBuilderTouchDelay,
-      connected,
+      startupDone,
       experimental,
       showSidebarLayouts,
       buildDate,
@@ -82,7 +82,7 @@ export default defineComponent({
 
 <template>
   <q-page class="page-height overflow-auto">
-    <PageError v-if="!connected" />
+    <PageError v-if="!startupDone" />
     <div v-else class="column q-pa-lg">
       <div class="text-h5">
         System

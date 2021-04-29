@@ -148,6 +148,19 @@ export class SparkServiceModule extends VuexModule {
     return this.blocks.filter(typeMatchFilter<T>(type));
   }
 
+  public setVolatileBlock(block: Block): void {
+    if (this.blockIds.includes(block.id)) {
+      throw new Error(`Block ${block.id} already exists as persistent block`);
+    }
+    block.meta = block.meta ?? {};
+    block.meta.volatile = true;
+    this.volatileBlocks = extendById(this.volatileBlocks, block);
+  }
+
+  public removeVolatileBlock(block: Block): void {
+    this.volatileBlocks = filterById(this.volatileBlocks, block);
+  }
+
   @Action
   public async fetchBlock(block: Block): Promise<void> {
     this.setBlock(await api.fetchBlock(block));
@@ -159,16 +172,6 @@ export class SparkServiceModule extends VuexModule {
       throw new Error(`Block ${block.id} is volatile`);
     }
     await api.createBlock(block); // triggers patch event
-  }
-
-  @Action
-  public async createVolatileBlock(block: Block): Promise<void> {
-    if (this.blockIds.includes(block.id)) {
-      throw new Error(`Block ${block.id} already exists as persistent block`);
-    }
-    block.meta = block.meta ?? {};
-    block.meta.volatile = true;
-    this.volatileBlocks = extendById(this.volatileBlocks, block);
   }
 
   @Action
@@ -196,11 +199,6 @@ export class SparkServiceModule extends VuexModule {
     else {
       await api.deleteBlock(block); // triggers patch event
     }
-  }
-
-  @Action
-  public async removeVolatileBlock(block: Block): Promise<void> {
-    this.volatileBlocks = filterById(this.volatileBlocks, block);
   }
 
   @Action

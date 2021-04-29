@@ -33,7 +33,7 @@ const plugin: Plugin = {
     autoRegister(app, require.context('./components', true));
 
     builderStore.registerParts(Object.values(specs));
-    featureStore.registerWidget(feature);
+    featureStore.addWidgetFeature(feature);
   },
 
 };

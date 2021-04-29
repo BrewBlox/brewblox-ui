@@ -26,7 +26,7 @@ const plugin: Plugin = {
       ],
     };
 
-    featureStore.registerQuickstart(feature);
+    featureStore.addQuickstartFeature(feature);
   },
 };
 

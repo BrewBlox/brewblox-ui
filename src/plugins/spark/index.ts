@@ -31,16 +31,16 @@ const plugin: Plugin = {
   install(app) {
     autoRegister(app, require.context('./components', true));
 
-    deprecated.forEach(featureStore.registerWidget);
+    deprecated.forEach(featureStore.addWidgetFeature);
     features.forEach(app.use);
 
-    featureStore.registerWatcher({
+    featureStore.addWatcherFeature({
       id: 'SparkWatcher',
       component: cref(app, SparkWatcher),
       props: {},
     });
 
-    featureStore.registerService({
+    featureStore.addServiceFeature({
       id: sparkType,
       title: 'Spark Service',
       pageComponent: cref(app, SparkPage),
