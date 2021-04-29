@@ -67,7 +67,6 @@ export function startRelationsDialog(block: PidBlock): void {
       edges: relations(block),
       title: `${block.id} relations`,
       hideUnrelated: true,
-      centered: true,
     },
   });
 }

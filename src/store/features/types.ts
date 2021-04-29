@@ -8,7 +8,7 @@ export type WidgetRole =
   | 'Constraint'
   | 'Display'
   | 'Other'
-  ;
+
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';

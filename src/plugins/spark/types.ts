@@ -64,6 +64,8 @@ export interface RelationEdge {
 export interface RelationNode {
   id: string;
   type: string;
+  name?: string; // overrides `id` for rendering
+  title?: string; // overrides `type` for rendering
 }
 
 export interface Limiters {

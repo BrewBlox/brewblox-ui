@@ -81,7 +81,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     );
 
     const isVolatileBlock = computed<boolean>(
-      () => !block.value.meta?.volatile,
+      () => block.value.meta?.volatile === true,
     );
 
     async function saveBlock(v: BlockT = block.value): Promise<void> {

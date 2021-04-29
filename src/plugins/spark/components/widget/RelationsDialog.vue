@@ -28,7 +28,7 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    centered: {
+    canCreate: {
       type: Boolean,
       default: false,
     },

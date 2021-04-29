@@ -23,6 +23,8 @@ export default defineComponent({
       startRemoveBlock,
     } = useBlockWidget.setup();
 
+    console.log(isVolatileBlock.value);
+
     const canRemove = computed<boolean>(
       () => !isVolatileBlock.value
         && featureStore.widgetRemoveActions(block.value.type).length > 0,
@@ -34,20 +36,6 @@ export default defineComponent({
     };
   },
 });
-
-// @Component
-// export default class RemoveBlockAction extends BlockCrudComponent {
-
-//   @Prop({ type: String, default: 'Remove block' })
-//   readonly label!: string;
-
-//   @Prop({ type: String, default: 'delete' })
-//   readonly icon!: string;
-
-//   get canRemove(): boolean {
-//     return featureStore.widgetRemoveActions(this.widget.feature).length > 0;
-//   }
-// }
 </script>
 
 <template>

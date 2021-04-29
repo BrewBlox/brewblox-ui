@@ -3,13 +3,13 @@ import { computed, defineComponent, watch } from 'vue';
 
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
-  BlockType,
   PageMode,
   RelationEdge,
   RelationNode,
   SparkService,
   SparkStatus,
 } from '@/plugins/spark/types';
+import { BlockType } from '@/shared-types';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { objectStringSorter } from '@/utils/functional';
@@ -82,6 +82,9 @@ export default defineComponent({
         .map(block => ({
           id: block.id,
           type: featureStore.widgetTitle(block.type),
+          name: block.type === BlockType.SysInfo
+            ? title.value
+            : undefined,
         }))
         .sort(objectStringSorter('type')),
     );

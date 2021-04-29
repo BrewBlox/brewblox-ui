@@ -6,6 +6,7 @@ import toFinite from 'lodash/toFinite';
 import { computed, defineComponent, onMounted, PropType, ref, watch } from 'vue';
 
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
+import { createBlockWizard } from '@/plugins/wizardry';
 import { createBlockDialog } from '@/utils/dialog';
 import { isJsonEqual } from '@/utils/functional';
 
@@ -36,22 +37,15 @@ export default defineComponent({
       type: Array as PropType<RelationEdge[]>,
       required: true,
     },
-    title: {
-      type: String,
-      default: 'Block Relations',
-    },
     hideUnrelated: {
       type: Boolean,
       default: false,
     },
-    centered: {
+    canCreate: {
       type: Boolean,
       default: false,
     },
   },
-  emits: [
-    'dblclick',
-  ],
   setup(props) {
     const renderFunc = new dagre.render();
     const resetZoom = ref<() => void>(() => { });
@@ -77,11 +71,11 @@ export default defineComponent({
       createBlockDialog(addr, { mode: 'Basic' });
     }
 
-    function nodeTemplate(id: string, type: string): string {
+    function nodeTemplate(name: string, title: string): string {
       return [
-        '<div class="block-label">',
-        `  <div class="block-type">${type}</div>`,
-        `  <div class="block-id">${id}</div>`,
+        '<div class="relations-node">',
+        `  <div class="relations-node-title">${title}</div>`,
+        `  <div class="relations-node-name">${name}</div>`,
         '</div>',
       ].join('\n');
     }
@@ -98,7 +92,7 @@ export default defineComponent({
       nodes.forEach(node => {
         graph.setNode(node.id, {
           id: node.id,
-          label: nodeTemplate(node.id, node.type),
+          label: nodeTemplate(node.name ?? node.id, node.type),
           labelType: 'html',
           width: LABEL_WIDTH,
           height: LABEL_HEIGHT,
@@ -208,6 +202,12 @@ export default defineComponent({
           .call(zoom.transform, centered());
     }
 
+    function startCreateBlock(): void {
+      if (props.canCreate) {
+        createBlockWizard(props.serviceId);
+      }
+    }
+
     onMounted(() => {
       watch(
         () => props.nodes,
@@ -224,14 +224,19 @@ export default defineComponent({
       svgRef,
       diagramRef,
       resetZoom,
+      startCreateBlock,
     };
   },
 });
 </script>
 
 <template>
-  <div :class="['fit', centered && 'flex flex-center']">
-    <svg ref="svgRef" class="fit" @dblclick.stop.capture="$emit('dblclick')">
+  <div class="fit">
+    <svg
+      ref="svgRef"
+      class="fit"
+      @dblclick.stop.capture="startCreateBlock"
+    >
       <g ref="diagramRef" />
     </svg>
     <q-btn
@@ -261,24 +266,24 @@ export default defineComponent({
   fill-opacity: 0.8;
 }
 
-.block-label {
+.relations-node {
   height: 50px;
   width: 150px;
   margin: 10px;
 }
 
-.block-label > div {
+.relations-node > div {
   width: 100%;
   text-align: center;
   font-weight: 300;
 }
 
-.block-label > .block-type {
+.relations-node-title {
   font-size: 12px;
   color: green;
 }
 
-.block-label > .block-id {
+.relations-node-name {
   font-size: 14px;
   color: black;
   padding: 10px;

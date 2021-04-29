@@ -24,6 +24,8 @@ export default defineComponent({
       isVolatileBlock,
     } = useBlockWidget.setup();
 
+    console.log(isVolatileWidget.value);
+
     async function addToGraph(): Promise<void> {
       const graphOpts = widgetStore
         .widgets
