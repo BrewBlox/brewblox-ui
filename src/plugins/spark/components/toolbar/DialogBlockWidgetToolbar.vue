@@ -37,7 +37,9 @@ export default defineComponent({
       v-model="graphModalOpen"
       v-model:config="graphConfig"
     />
-    <template v-if="!isVolatileBlock" #actions>
+
+    <!-- Avoid the toolbar rendering an empty menu -->
+    <template v-if="hasGraph || $slots.actions" #actions>
       <ActionItem
         v-if="hasGraph"
         icon="mdi-chart-line"
@@ -46,6 +48,7 @@ export default defineComponent({
       />
       <slot name="actions" />
     </template>
+
     <template #menus>
       <slot name="menus" />
       <WidgetActions no-rename />

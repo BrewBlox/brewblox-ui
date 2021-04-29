@@ -79,10 +79,6 @@ export const useWidget: UseWidgetComposable = {
       await widgetStore.saveWidget({ ...widget.value, config: c });
     }
 
-    // function invalidate(): void {
-    //   invalidationTrigger.value = true;
-    // }
-
     function startChangeWidgetTitle(): void {
       const widgetTitle = widget.value.title;
       createDialog({

@@ -22,6 +22,7 @@ import SetpointSensorPair from './SetpointSensorPair';
 import Spark2Pins from './Spark2Pins';
 import Spark3Pins from './Spark3Pins';
 import SparkDisplay from './SparkDisplay';
+import SysInfo from './SysInfo';
 import TempSensorCombi from './TempSensorCombi';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
@@ -47,6 +48,7 @@ const plugins: Plugin[] = [
   Spark2Pins,
   Spark3Pins,
   SparkDisplay,
+  SysInfo,
   QuickActions,
   QuickValues,
   TempSensorCombi,

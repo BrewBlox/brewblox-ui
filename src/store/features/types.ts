@@ -1,7 +1,14 @@
 import { Service, ServiceStub } from '@/store/services';
 import { Widget } from '@/store/widgets';
 
-export type WidgetRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
+export type WidgetRole =
+  | 'Process'
+  | 'Control'
+  | 'Output'
+  | 'Constraint'
+  | 'Display'
+  | 'Other'
+  ;
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';

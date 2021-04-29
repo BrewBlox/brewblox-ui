@@ -62,24 +62,6 @@ export const prettyAny = (v: unknown): string => {
   return JSON.stringify(v);
 };
 
-// export const installFilters = (Vue: VueConstructor): void => {
-//   Vue.filter('quantity', prettyQty);
-//   Vue.filter('prettyUnit', prettyUnit);
-//   Vue.filter('duration', (v: any, nullV = '<not set>') => durationString(v, nullV));
-//   Vue.filter('link', prettyLink);
-//   Vue.filter('block', (v: BlockAddress) => v?.id || '<not set>');
-//   Vue.filter('widgetTitle', (type: string) => featureStore.widgetTitle(type));
-//   Vue.filter('pretty', prettyAny);
-//   Vue.filter('round', round);
-//   Vue.filter('truncateRound', truncateRound);
-//   Vue.filter('hexToBase64', hexToBase64);
-//   Vue.filter('base64ToHex', base64ToHex);
-//   Vue.filter('truncated', truncate);
-//   Vue.filter('dateString', dateString);
-//   Vue.filter('shortDateString', shortDateString);
-//   Vue.filter('capitalize', capitalize);
-// };
-
 const errorComponent = (error: string): ComponentResult => ({
   component: 'InvalidWidget',
   error,
@@ -481,3 +463,15 @@ export const isSparkPatch = (data: unknown): data is SparkPatchEvent =>
 
 export const isSparkUpdate = (data: unknown): data is SparkUpdateEvent =>
   (data as SparkUpdateEvent).type === 'Spark.update';
+
+// source: https://www.adriangranados.com/blog/dbm-to-percent-conversion
+export const calcWiFiPct =
+  (dbm: number): number => {
+    if (dbm < -92) {
+      return 1;
+    }
+    if (dbm > -21) {
+      return 100;
+    }
+    return Math.round(((-0.0154 * dbm * dbm) - (0.3794 * dbm)) + 98.182);
+  };

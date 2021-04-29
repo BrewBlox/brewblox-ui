@@ -2,6 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import {
   Block,
@@ -17,22 +18,17 @@ import { shortDateString } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
 
 export default defineComponent({
-  name: 'SparkWidget',
-  props: {
-    serviceId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
+  name: 'SysInfoWidget',
+  setup() {
     const { inDialog } = useContext.setup();
+    const { serviceId } = useBlockWidget.setup<SysInfoBlock>();
 
     const service = computed<SparkService | null>(
-      () => serviceStore.serviceById(props.serviceId),
+      () => serviceStore.serviceById(serviceId),
     );
 
     const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.serviceId),
+      () => sparkStore.moduleById(serviceId),
     );
 
     const ready = computed<boolean>(
@@ -84,6 +80,7 @@ export default defineComponent({
 
     return {
       inDialog,
+      serviceId,
       ready,
       lastBlocks,
       title,

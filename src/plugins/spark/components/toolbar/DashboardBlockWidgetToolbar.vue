@@ -34,7 +34,8 @@ export default defineComponent({
       v-model:config="graphConfig"
     />
 
-    <template #actions>
+    <!-- Avoid the toolbar rendering an empty menu -->
+    <template v-if="hasGraph || $slots.actions" #actions>
       <ActionItem
         v-if="hasGraph"
         icon="mdi-chart-line"

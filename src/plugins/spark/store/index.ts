@@ -11,6 +11,7 @@ import { SparkServiceModule } from './spark-module';
 
 export { SparkServiceModule } from './spark-module';
 
+
 @Module({ generateMutationSetters: true })
 export class SparkGlobalModule extends VuexModule {
   public modules: SparkServiceModule[] = [];

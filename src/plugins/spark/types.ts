@@ -15,9 +15,9 @@ export type PageMode =
   | 'List'
 
 export interface SparkSessionConfig {
-  expandedBlocks: { [id: string]: boolean };
-  sorting: string;
   pageMode: PageMode;
+  sorting: string;
+  expanded: string[];
 }
 
 export type SparkService = Service<Record<string, never>>;

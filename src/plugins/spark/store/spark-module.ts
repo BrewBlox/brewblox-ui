@@ -13,6 +13,7 @@ import type {
   SparkExported,
   SparkPatchEvent,
   SparkService,
+  SparkSessionConfig,
   SparkStatus,
 } from '@/plugins/spark/types';
 import { isSparkPatch, isSparkState } from '@/plugins/spark/utils';
@@ -30,12 +31,19 @@ import {
   calculateRelations,
 } from './utils';
 
+const defaultSessionConfig = (): SparkSessionConfig => ({
+  pageMode: 'Relations',
+  sorting: 'name',
+  expanded: [],
+});
+
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {
   private patchListenerId = '';
   private stateListenerId = '';
 
   public readonly id: string; // serviceId
+  private readonly storageKey: string;
 
   public blocks: Block[] = [];
   public volatileBlocks: Block[] = [];
@@ -43,10 +51,12 @@ export class SparkServiceModule extends VuexModule {
   public status: SparkStatus | null = null;
   public lastBlocks: Date | null = null;
   public lastStatus: Date | null = null;
+  public sessionConfig: SparkSessionConfig = defaultSessionConfig()
 
   public constructor(serviceId: string, options: RegisterOptions) {
     super(options);
     this.id = serviceId;
+    this.storageKey = `storage__Spark__${serviceId}`;
   }
 
   public get blockIds(): string[] {
@@ -302,6 +312,30 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
+  public async loadSessionConfig(): Promise<void> {
+    try {
+      const rawConfig: string | null = sessionStorage.getItem(this.storageKey);
+      this.sessionConfig = rawConfig
+        ? JSON.parse(rawConfig)
+        : defaultSessionConfig();
+    }
+    catch (e) {
+      this.sessionConfig = defaultSessionConfig();
+    }
+  }
+
+  @Action
+  public async updateSessionConfig(updates: Partial<SparkSessionConfig>): Promise<void> {
+    this.sessionConfig = { ...this.sessionConfig, ...updates };
+    try {
+      sessionStorage.setItem(this.storageKey, JSON.stringify(this.sessionConfig));
+    }
+    catch (e) {
+      // ignore
+    }
+  }
+
+  @Action
   public async start(): Promise<void> {
     this.stateListenerId = eventbus.addListener(
       `${STATE_TOPIC}/${this.id}`,
@@ -326,6 +360,7 @@ export class SparkServiceModule extends VuexModule {
       });
 
     await this.fetchAll().catch(() => { });
+    await this.loadSessionConfig();
   }
 
   @Action
