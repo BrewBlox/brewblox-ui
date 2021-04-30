@@ -6,6 +6,7 @@ import { FlowPart } from '../types';
 import { settingsAddress, settingsBlock } from '../utils';
 
 export interface useSettingsBlockComponent<BlockT extends Block> {
+  hasAddress: ComputedRef<boolean>;
   address: ComputedRef<BlockAddress>;
   block: ComputedRef<BlockT | null>;
   isBroken: ComputedRef<boolean>
@@ -33,12 +34,17 @@ export const useSettingsBlock: useSettingsBlockComposable = {
       () => settingsBlock(part, settingsKey, intf),
     );
 
+    const hasAddress = computed<boolean>(
+      () => address.value.id !== null,
+    );
+
     const isBroken = computed<boolean>(
       () => block.value === null
-        && address.value.id !== null,
+        && hasAddress.value,
     );
 
     return {
+      hasAddress,
       address,
       block,
       isBroken,
