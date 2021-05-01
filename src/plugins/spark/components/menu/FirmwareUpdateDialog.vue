@@ -109,7 +109,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="updateFirmware"
   >
-    <CardWrapper>
+    <Card>
       <template #toolbar>
         <DialogToolbar :title="serviceId" subtitle="Firmware update" />
       </template>
@@ -146,6 +146,6 @@ export default defineComponent({
           @click="updateFirmware"
         />
       </template>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>

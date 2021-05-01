@@ -103,7 +103,7 @@ export default defineComponent({
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <CardWrapper no-scroll>
+    <Card no-scroll>
       <template #toolbar>
         <DialogToolbar title="Part Catalog" />
       </template>
@@ -145,6 +145,6 @@ export default defineComponent({
           </q-card-section>
         </q-scroll-area>
       </div>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>

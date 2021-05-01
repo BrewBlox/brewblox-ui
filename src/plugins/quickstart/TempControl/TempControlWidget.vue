@@ -23,11 +23,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <WidgetToolbar has-mode-toggle />
     </template>
 
     <component :is="context.mode" />
-  </CardWrapper>
+  </Card>
 </template>

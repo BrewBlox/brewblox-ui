@@ -97,7 +97,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper v-if="ready">
+  <Card v-if="ready">
     <template #toolbar>
       <DialogToolbar
         v-if="inDialog"
@@ -149,5 +149,5 @@ export default defineComponent({
         </LabeledField>
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

@@ -2,7 +2,7 @@
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
-  name: 'PreviewCardWrapper',
+  name: 'PreviewCard',
   props: {
     enabled: {
       type: Boolean,
@@ -36,7 +36,8 @@ export default defineComponent({
     v-if="enabled && $q.screen.gt.md"
     class="row no-wrap justify-center combined-wrapper"
   >
-    <CardWrapper
+    <!-- Normal Card -->
+    <Card
       class="col-5"
       v-bind="$attrs"
     >
@@ -44,23 +45,29 @@ export default defineComponent({
         <slot name="toolbar" />
       </template>
       <slot />
-      <template #actions>
+      <template v-if="$slots.actions" #actions>
         <slot name="actions" />
       </template>
-    </CardWrapper>
+    </Card>
+    <!-- Pane toggle button -->
     <q-btn
       dense
       :class="['col-auto toggle-tab self-center',{collapsed}]"
       :label="collapsed ? expandLabel : collapseLabel"
       @click="collapsed = !collapsed"
     />
+    <!-- The preview pane -->
     <div v-if="!collapsed" class="col-5 bg-dark">
       <div class="preview-pane fit">
         <slot name="pane" />
       </div>
     </div>
   </div>
-  <CardWrapper
+  <!--
+  Preview pane is not available.
+  Fall back to acting like a normal Card.
+  -->
+  <Card
     v-else
     v-bind="$attrs"
   >
@@ -68,10 +75,10 @@ export default defineComponent({
       <slot name="toolbar" />
     </template>
     <slot />
-    <template #actions>
+    <template v-if="$slots.actions" #actions>
       <slot name="actions" />
     </template>
-  </CardWrapper>
+  </Card>
 </template>
 
 <style lang="sass" scoped>

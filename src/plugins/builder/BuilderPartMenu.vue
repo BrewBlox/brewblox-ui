@@ -107,7 +107,7 @@ export default defineComponent({
     @keyup.esc="onDialogHide"
     @hide="onDialogHide"
   >
-    <CardWrapper>
+    <Card>
       <template #toolbar>
         <DialogToolbar :title="partTitle" @close="onDialogHide" />
       </template>
@@ -136,6 +136,6 @@ export default defineComponent({
           @dirty="invalidate"
         />
       </div>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>

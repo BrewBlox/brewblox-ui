@@ -190,7 +190,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper no-scroll>
+  <Card no-scroll>
     <template #toolbar>
       <WidgetToolbar>
         <q-btn
@@ -294,7 +294,7 @@ export default defineComponent({
         </template>
       </svg>
     </div>
-  </CardWrapper>
+  </Card>
 </template>
 
 <style lang="sass" scoped>

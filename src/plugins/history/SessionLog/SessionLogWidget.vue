@@ -198,7 +198,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <WidgetToolbar has-mode-toggle>
         <template #actions>
@@ -270,5 +270,5 @@ export default defineComponent({
         </div>
       </template>
     </component>
-  </CardWrapper>
+  </Card>
 </template>

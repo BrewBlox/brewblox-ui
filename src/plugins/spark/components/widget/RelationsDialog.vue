@@ -60,13 +60,13 @@ export default defineComponent({
     transition-show="fade"
     @hide="onDialogHide"
   >
-    <CardWrapper no-scroll>
+    <Card no-scroll>
       <template #toolbar>
         <DialogToolbar :title="title" subtitle="Relations diagram" />
       </template>
       <div class="fit bg-dark">
         <RelationsDiagram v-bind="$props" />
       </div>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>

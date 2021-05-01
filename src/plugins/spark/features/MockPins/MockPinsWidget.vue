@@ -7,12 +7,12 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <BlockWidgetToolbar />
     </template>
     <div class="widget-md">
       <IoArray />
     </div>
-  </CardWrapper>
+  </Card>
 </template>

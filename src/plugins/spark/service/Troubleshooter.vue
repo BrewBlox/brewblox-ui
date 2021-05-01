@@ -156,7 +156,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper class="widget-md">
+  <Card class="widget-md">
     <template #toolbar>
       <Toolbar :title="serviceId" subtitle="Troubleshooter">
         <template #buttons>
@@ -331,5 +331,5 @@ export default defineComponent({
         </span>
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

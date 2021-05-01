@@ -166,7 +166,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <PreviewCardWrapper
+  <PreviewCard
     show-initial
     :enabled="inDialog && context.mode === 'Full'"
     :no-scroll="context.mode === 'Basic'"
@@ -246,7 +246,7 @@ export default defineComponent({
         @update:config="saveConfig"
       />
     </div>
-  </PreviewCardWrapper>
+  </PreviewCard>
 </template>
 
 <style lang="sass" scoped>

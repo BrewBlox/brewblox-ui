@@ -139,7 +139,7 @@ export default defineComponent({
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <CardWrapper>
+    <Card>
       <template #toolbar>
         <DialogToolbar :title="title" subtitle="Temperature control mode" />
       </template>
@@ -321,7 +321,7 @@ export default defineComponent({
           @click="onDialogOK()"
         />
       </template>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>
 

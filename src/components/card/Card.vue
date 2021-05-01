@@ -5,7 +5,7 @@ import { useContext, useGlobals } from '@/composables';
 
 
 export default defineComponent({
-  name: 'CardWrapper',
+  name: 'Card',
   props: {
     noScroll: {
       type: Boolean,

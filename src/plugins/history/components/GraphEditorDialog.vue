@@ -85,7 +85,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <CardWrapper no-scroll>
+    <Card no-scroll>
       <template #toolbar>
         <DialogToolbar :title="title" />
       </template>
@@ -103,6 +103,6 @@ export default defineComponent({
           <q-btn unelevated label="Save" color="primary" @click="save" />
         </q-card-actions>
       </div>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>

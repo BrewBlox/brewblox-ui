@@ -126,7 +126,7 @@ export default defineComponent({
 
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <WidgetToolbar has-mode-toggle />
     </template>
@@ -255,5 +255,5 @@ export default defineComponent({
         </q-tooltip>
       </q-select>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

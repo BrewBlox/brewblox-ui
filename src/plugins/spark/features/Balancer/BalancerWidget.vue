@@ -46,7 +46,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <BlockWidgetToolbar />
     </template>
@@ -80,5 +80,5 @@ export default defineComponent({
         </div>
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

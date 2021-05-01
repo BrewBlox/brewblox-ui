@@ -80,7 +80,7 @@ export default defineComponent({
             :key="value.id"
             style="max-width: 500px"
           >
-            <CardWrapper>
+            <Card>
               <template #toolbar>
                 <Toolbar
                   :title="value.color"
@@ -88,7 +88,7 @@ export default defineComponent({
                 />
               </template>
               <TiltValues :state="value" class="widget-body" />
-            </CardWrapper>
+            </Card>
           </div>
         </div>
       </buttonsteleport>

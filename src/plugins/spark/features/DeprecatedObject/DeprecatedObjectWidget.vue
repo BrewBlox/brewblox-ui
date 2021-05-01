@@ -43,7 +43,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <DialogToolbar v-if="inDialog" :title="widget.title" :subtitle="featureTitle" />
       <WidgetToolbar v-else readonly />
@@ -67,5 +67,5 @@ export default defineComponent({
         @click="removeBlock"
       />
     </div>
-  </CardWrapper>
+  </Card>
 </template>

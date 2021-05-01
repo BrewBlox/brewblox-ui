@@ -13,7 +13,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <WidgetToolbar />
     </template>
@@ -23,5 +23,5 @@ export default defineComponent({
         {{ error }}
       </template>
     </CardWarning>
-  </CardWrapper>
+  </Card>
 </template>

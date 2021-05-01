@@ -116,7 +116,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <PreviewCardWrapper enabled>
+    <PreviewCard enabled>
       <template #toolbar>
         <DialogToolbar :title="title" subtitle="Edit text note" />
       </template>
@@ -156,7 +156,7 @@ export default defineComponent({
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
       </template>
-    </PreviewCardWrapper>
+    </PreviewCard>
   </q-dialog>
 </template>
 

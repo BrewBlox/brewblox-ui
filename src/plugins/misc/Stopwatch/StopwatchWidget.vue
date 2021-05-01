@@ -102,7 +102,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <WidgetToolbar />
     </template>
@@ -118,5 +118,5 @@ export default defineComponent({
         <q-btn flat label="Reset" @click="reset" />
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

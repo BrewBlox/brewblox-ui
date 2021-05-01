@@ -120,7 +120,7 @@ export default defineComponent({
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <CardWrapper no-scroll>
+    <Card no-scroll>
       <template #toolbar>
         <DialogToolbar icon="mdi-creation" :title="dialogTitle" />
       </template>
@@ -290,6 +290,6 @@ export default defineComponent({
           </q-item>
         </q-card-section>
       </WizardBody>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>

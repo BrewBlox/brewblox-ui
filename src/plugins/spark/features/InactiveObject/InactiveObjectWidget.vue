@@ -23,7 +23,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <BlockWidgetToolbar />
     </template>
@@ -33,5 +33,5 @@ export default defineComponent({
         <br>To enable it, ensure that it is in an enabled group.
       </template>
     </CardWarning>
-  </CardWrapper>
+  </Card>
 </template>

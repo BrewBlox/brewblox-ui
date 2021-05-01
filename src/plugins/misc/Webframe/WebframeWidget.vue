@@ -51,7 +51,7 @@ export default defineComponent({
 
 
 <template>
-  <CardWrapper no-scroll>
+  <Card no-scroll>
     <template #toolbar>
       <WidgetToolbar has-mode-toggle />
     </template>
@@ -107,7 +107,7 @@ export default defineComponent({
         ]"
       />
     </div>
-  </CardWrapper>
+  </Card>
 </template>
 
 

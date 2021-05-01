@@ -20,10 +20,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <BlockWidgetToolbar has-mode-toggle />
     </template>
     <component :is="context.mode" />
-  </CardWrapper>
+  </Card>
 </template>

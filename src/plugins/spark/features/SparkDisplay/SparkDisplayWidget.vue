@@ -285,7 +285,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <CardWrapper>
+  <Card>
     <template #toolbar>
       <WidgetToolbar has-mode-toggle />
     </template>
@@ -335,7 +335,7 @@ export default defineComponent({
         @keyup.enter.exact.stop
       />
     </div>
-  </CardWrapper>
+  </Card>
 </template>
 
 
