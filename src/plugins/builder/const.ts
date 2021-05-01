@@ -36,4 +36,5 @@ export const deprecatedTypes = {
   LargeKettle: 'Kettle',
   TallFridge: 'Fridge',
   PwmPump: 'Pump',
+  ActuatorValve: 'Valve',
 };

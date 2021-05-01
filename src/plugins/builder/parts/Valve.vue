@@ -1,10 +1,13 @@
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType, watch } from 'vue';
 
 import { RIGHT } from '@/plugins/builder/const';
+import { DigitalState } from '@/shared-types';
 
+import { useSettingsBlock } from '../composables';
+import { VALVE_KEY, VALVE_TYPES, ValveT } from '../specs/Valve';
 import { FlowPart } from '../types';
-import { flowOnCoord, liquidOnCoord } from '../utils';
+import { flowOnCoord, liquidOnCoord, squares } from '../utils';
 
 const paths = {
   outerValve: [
@@ -33,7 +36,16 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  emits: [
+    'dirty',
+  ],
+  setup(props, { emit }) {
+    const {
+      hasAddress,
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
+
     const flowSpeed = computed<number>(
       () => flowOnCoord(props.part, RIGHT),
     );
@@ -43,14 +55,54 @@ export default defineComponent({
     );
 
     const closed = computed<boolean>(
-      () => Boolean(props.part.settings['closed']),
+      () => hasAddress.value
+        ? block.value?.data.state !== DigitalState.STATE_ACTIVE
+        : Boolean(props.part.settings['closed']),
+    );
+
+    const pending = computed<boolean>(
+      () => hasAddress.value
+        ? block.value?.data.desiredState !== block.value?.data.state
+        : false,
+    );
+
+    const valveRotation = computed<number>(
+      () => {
+        if (!hasAddress.value) {
+          return closed.value ? 90 : 0;
+        }
+        switch (block.value?.data.state) {
+          case undefined:
+            return 90;
+          case DigitalState.STATE_INACTIVE:
+            return 90;
+          case DigitalState.STATE_ACTIVE:
+            return 0;
+          default:
+            return 45;
+        }
+      },
+    );
+
+    watch(
+      () => block.value,
+      (newV, oldV) => {
+        if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
+          emit('dirty');
+        }
+      },
     );
 
     return {
+      squares,
       paths,
+      hasAddress,
+      isBroken,
       flowSpeed,
       liquids,
       closed,
+      pending,
+      valveRotation,
     };
   },
 });
@@ -58,6 +110,12 @@ export default defineComponent({
 
 <template>
   <g>
+    <SvgEmbedded v-if="isBroken" height="15" width="15">
+      <UnlinkedIcon size="15px" class="self-end" />
+    </SvgEmbedded>
+    <SvgEmbedded v-else-if="pending" :height="squares(1)" :width="squares(1)">
+      <q-spinner size="44px" class="col" color="blue-grey-5" />
+    </SvgEmbedded>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]" />
       <path :d="paths.outerValve[1]" />
@@ -66,11 +124,12 @@ export default defineComponent({
     <LiquidStroke v-else :paths="paths.openLiquid" :colors="liquids" />
     <g
       key="valve-inner"
-      :transform="`rotate(${closed ? '90' : '0'}, 25, 25)`"
+      :transform="`rotate(${valveRotation}, 25, 25)`"
       class="fill outline inner"
     >
       <path :d="paths.innerValve[0]" />
       <path :d="paths.innerValve[1]" />
+      <PowerIcon v-if="hasAddress" color="black" />
     </g>
     <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.arrows" />
   </g>

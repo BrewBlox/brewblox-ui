@@ -1,6 +1,7 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType } from 'vue';
+import { useRoute } from 'vue-router';
 
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
@@ -29,6 +30,8 @@ export default defineComponent({
     'selected',
   ],
   setup(props, { emit }) {
+    const route = useRoute();
+
     const layoutIds = computed<string[]>(
       () => builderStore.layoutIds,
     );
@@ -61,6 +64,10 @@ export default defineComponent({
         systemStore.saveConfig({ homePage });
       },
     });
+
+    const inEditor = computed<boolean>(
+      () => route.path.startsWith('/builder'),
+    );
 
     function selectLayout(id: string | null): void {
       emit('selected', id);
@@ -202,6 +209,7 @@ export default defineComponent({
       label,
       scale,
       listed,
+      inEditor,
       isHomePage,
       selectLayout,
       editScale,
@@ -230,6 +238,7 @@ export default defineComponent({
       label="Show in sidebar"
     />
     <ActionItem
+      v-if="!inEditor"
       icon="mdi-magnify-plus-outline"
       :label="`Zoom: ${(1 / scale) * 100}%`"
       @click="editScale"

@@ -1,5 +1,6 @@
 import defaults from 'lodash/defaults';
 import range from 'lodash/range';
+import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
 
 import { sparkStore } from '@/plugins/spark/store';
@@ -277,12 +278,17 @@ export function rotatedCoord(part: StatePart, coord: string): string {
 }
 
 export function liquidOnCoord(part: FlowPart, coord: string): string[] {
-  return Object.keys(part.flows[rotatedCoord(part, coord)] ?? {});
+  const flows = part.flows[rotatedCoord(part, coord)];
+  return flows
+    ? Object.keys(flows)
+    : [];
 }
 
 export function flowOnCoord(part: FlowPart, coord: string): number {
-  return Object.values(part.flows[rotatedCoord(part, coord)] ?? {})
-    .reduce((sum, v) => sum + v, 0);
+  const flows = part.flows[rotatedCoord(part, coord)];
+  return flows
+    ? reduce(flows, (sum, v) => sum + v, 0)
+    : 0;
 }
 
 export async function startAddLayout(source: BuilderLayout | null = null): Promise<string | null> {
