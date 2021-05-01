@@ -105,7 +105,7 @@ export default defineComponent({
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <ActionCardWrapper>
+    <CardWrapper>
       <template #toolbar>
         <DialogToolbar :title="serviceId" subtitle="Wifi Configuration" />
       </template>
@@ -181,6 +181,6 @@ export default defineComponent({
           @click="save"
         />
       </template>
-    </ActionCardWrapper>
+    </CardWrapper>
   </q-dialog>
 </template>

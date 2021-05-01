@@ -41,7 +41,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item class="text-big">
         About your new dashboard
@@ -81,5 +81,5 @@ export default defineComponent({
         </q-tooltip>
       </q-btn>
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

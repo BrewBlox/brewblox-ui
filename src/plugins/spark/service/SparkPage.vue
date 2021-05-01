@@ -127,7 +127,7 @@ export default defineComponent({
           :unelevated="pageMode === 'Relations'"
           :outline="pageMode !== 'Relations'"
           color="primary"
-          icon="mdi-vector-line"
+          icon="mdi-graph"
           @click="pageMode = 'Relations'"
         >
           <q-tooltip>Show blocks as diagram</q-tooltip>

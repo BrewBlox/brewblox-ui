@@ -99,7 +99,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <div class="widget-body column">
       <DashboardSelect
         v-model="dashboardId"
@@ -132,5 +132,5 @@ export default defineComponent({
         @click="createWidget"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

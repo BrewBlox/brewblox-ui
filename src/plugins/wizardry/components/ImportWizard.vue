@@ -132,9 +132,13 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
-      <LabeledField v-if="dashboardOpts.length <= 5" label="Dashboard" item-aligned>
+      <LabeledField
+        v-if="dashboardOpts.length <= 5"
+        label="Dashboard"
+        item-aligned
+      >
         <q-option-group
           v-model="chosenDashboardId"
           :options="dashboardOpts"
@@ -181,5 +185,5 @@ export default defineComponent({
         @click="createWidget"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

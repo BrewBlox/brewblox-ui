@@ -166,9 +166,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <GraphCardWrapper
+  <PreviewCardWrapper
     show-initial
-    :show="inDialog && context.mode === 'Full'"
+    :enabled="inDialog && context.mode === 'Full'"
     :no-scroll="context.mode === 'Basic'"
   >
     <template #graph>
@@ -246,7 +246,7 @@ export default defineComponent({
         @update:config="saveConfig"
       />
     </div>
-  </GraphCardWrapper>
+  </PreviewCardWrapper>
 </template>
 
 <style lang="sass" scoped>

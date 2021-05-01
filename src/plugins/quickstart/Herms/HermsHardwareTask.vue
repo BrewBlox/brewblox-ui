@@ -99,7 +99,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -212,5 +212,5 @@ export default defineComponent({
         @click="taskDone"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

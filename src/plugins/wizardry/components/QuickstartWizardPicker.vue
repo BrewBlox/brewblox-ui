@@ -71,7 +71,7 @@ export default defineComponent({
   />
 
   <!-- Select a wizard -->
-  <ActionCardBody v-else>
+  <WizardBody v-else>
     <q-card-section>
       <q-item>
         <q-item-section class="text-weight-light">
@@ -131,5 +131,5 @@ export default defineComponent({
         @click="next"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

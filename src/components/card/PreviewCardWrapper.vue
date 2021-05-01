@@ -2,15 +2,23 @@
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
-  name: 'GraphCardWrapper',
+  name: 'PreviewCardWrapper',
   props: {
-    show: {
+    enabled: {
       type: Boolean,
       default: false,
     },
     showInitial: {
       type: Boolean,
       default: false,
+    },
+    expandLabel: {
+      type: String,
+      default: 'Show',
+    },
+    collapseLabel: {
+      type: String,
+      default: 'Hide',
     },
   },
   setup(props) {
@@ -25,26 +33,30 @@ export default defineComponent({
 
 <template>
   <div
-    v-if="show && $q.screen.gt.md"
+    v-if="enabled && $q.screen.gt.md"
     class="row no-wrap justify-center combined-wrapper"
   >
-    <CardWrapper class="col-5" v-bind="$attrs">
+    <CardWrapper
+      class="col-5"
+      v-bind="$attrs"
+    >
       <template #toolbar>
         <slot name="toolbar" />
       </template>
       <slot />
+      <template #actions>
+        <slot name="actions" />
+      </template>
     </CardWrapper>
     <q-btn
       dense
-      :class="['col-auto graph-tab show self-center',{collapsed}]"
-      :icon="collapsed ? 'mdi-chart-line' : 'mdi-arrow-collapse-left'"
+      :class="['col-auto toggle-tab self-center',{collapsed}]"
+      :label="collapsed ? expandLabel : collapseLabel"
       @click="collapsed = !collapsed"
-    >
-      <q-tooltip>{{ collapsed ? 'Show Graph' : 'Hide Graph' }}</q-tooltip>
-    </q-btn>
+    />
     <div v-if="!collapsed" class="col-5 bg-dark">
-      <div class="graph-container fit">
-        <slot name="graph" />
+      <div class="preview-pane fit">
+        <slot name="pane" />
       </div>
     </div>
   </div>
@@ -56,6 +68,9 @@ export default defineComponent({
       <slot name="toolbar" />
     </template>
     <slot />
+    <template #actions>
+      <slot name="actions" />
+    </template>
   </CardWrapper>
 </template>
 
@@ -67,17 +82,17 @@ export default defineComponent({
   min-width: 90vw
   box-shadow: none
 
-.graph-tab
+.toggle-tab
   background-color: $dialog-toolbar-color
   padding: 30px 2px
   border-radius: 5px 0 0 5px
   margin-left: 5px
 
-.graph-tab.collapsed
+.toggle-tab.collapsed
   border-radius: 0 5px 5px 0
   margin-left: 0
 
-.graph-container
+.preview-pane
   border-radius: 4px
   border: 1px solid $blue-grey-9
 </style>

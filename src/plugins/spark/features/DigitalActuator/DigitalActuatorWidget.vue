@@ -100,9 +100,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-  >
+  <PreviewCardWrapper :enabled="inDialog">
     <template #graph>
       <BlockHistoryGraph />
     </template>
@@ -184,5 +182,5 @@ export default defineComponent({
         />
       </div>
     </div>
-  </GraphCardWrapper>
+  </PreviewCardWrapper>
 </template>

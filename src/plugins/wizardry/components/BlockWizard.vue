@@ -291,7 +291,7 @@ export default defineComponent({
     @done="onDone"
   />
 
-  <ActionCardBody v-else>
+  <WizardBody v-else>
     <div class="widget-body column">
       <q-select
         v-model="serviceId"
@@ -382,5 +382,5 @@ export default defineComponent({
         />
       </template>
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

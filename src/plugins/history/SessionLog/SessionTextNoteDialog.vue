@@ -116,23 +116,30 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <ActionCardWrapper>
+    <PreviewCardWrapper enabled>
       <template #toolbar>
         <DialogToolbar :title="title" subtitle="Edit text note" />
       </template>
+
+      <template #pane>
+        <q-scroll-area visible class="fit">
+          <MarkdownView
+            :text="local"
+            class="q-pa-lg"
+          />
+        </q-scroll-area>
+      </template>
+
       <div class="q-pa-md">
-        <MarkdownView
-          v-if="preview"
-          :text="local"
-          class="depth-1 q-pa-sm"
-        />
         <q-input
-          v-else
           ref="editorRef"
           v-model="local"
+          debounce="500"
           autogrow
           autofocus
           filled
+          label="Supports Markdown and HTML formatting"
+          stack-label
           class="editor-input"
           @keyup.enter.exact.stop
           @keyup.enter.shift.stop
@@ -142,18 +149,18 @@ export default defineComponent({
           </template>
         </q-input>
       </div>
+
       <template #actions>
-        <q-btn flat :label="preview ? 'Edit' :'Preview'" @click="preview = !preview" />
-        <q-btn v-if="!preview" flat label="Insert date" @click="insertDate" />
+        <q-btn flat label="Insert date" @click="insertDate" />
         <q-space />
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />
       </template>
-    </ActionCardWrapper>
+    </PreviewCardWrapper>
   </q-dialog>
 </template>
 
 <style lang="sass">
 .editor-input textarea
-  min-height: 150px !important
+  min-height: 200px !important
 </style>

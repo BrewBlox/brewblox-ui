@@ -6,7 +6,7 @@ import { TitleTeleportRefKey } from '@/symbols';
 export default defineComponent({
   name: 'TitleTeleport',
   setup() {
-    const titleRef = inject(TitleTeleportRefKey)!;
+    const titleRef = inject(TitleTeleportRefKey, undefined);
     return {
       titleRef,
     };

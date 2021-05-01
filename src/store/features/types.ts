@@ -130,7 +130,7 @@ export interface ServiceFeature {
    * Wizard implementation.
    * This can either be the name of a Vue component, or a function.
    *
-   * If it's a Vue component, it will be wrapped in WizardDialog,
+   * If it's a Vue component, it will be rendered as child of WizardDialog,
    * and given the stub as prop.
    */
   wizard: string | ((stub: ServiceStub) => Service | PromiseLike<Service>);

@@ -243,7 +243,7 @@ export default defineComponent({
       unelevated
       class="absolute-bottom-right q-ma-lg"
       color="secondary"
-      icon="mdi-arrow-expand-all"
+      icon="mdi-stretch-to-page-outline"
       @click="resetZoom"
     >
       <q-tooltip>

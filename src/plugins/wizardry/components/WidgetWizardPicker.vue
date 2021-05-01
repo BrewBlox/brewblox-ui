@@ -127,7 +127,7 @@ export default defineComponent({
     @done="onDone"
   />
 
-  <ActionCardBody v-else @keyup.ctrl.enter="next">
+  <WizardBody v-else @keyup.ctrl.enter="next">
     <div class="widget-body column">
       <q-input
         v-model="filter"
@@ -165,5 +165,5 @@ export default defineComponent({
         @click="next"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

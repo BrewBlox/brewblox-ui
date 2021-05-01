@@ -6,7 +6,7 @@ import { ButtonsTeleportRefKey } from '@/symbols';
 export default defineComponent({
   name: 'ButtonsTeleport',
   setup() {
-    const buttonsRef = inject(ButtonsTeleportRefKey)!;
+    const buttonsRef = inject(ButtonsTeleportRefKey, undefined);
     return {
       buttonsRef,
     };

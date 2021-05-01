@@ -120,7 +120,7 @@ export default defineComponent({
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <ActionCardWrapper>
+    <CardWrapper>
       <template #toolbar>
         <DialogToolbar :title="serviceId" subtitle="Import/Export blocks" />
       </template>
@@ -160,6 +160,6 @@ export default defineComponent({
           </q-item-section>
         </q-item>
       </q-card-section>
-    </ActionCardWrapper>
+    </CardWrapper>
   </q-dialog>
 </template>

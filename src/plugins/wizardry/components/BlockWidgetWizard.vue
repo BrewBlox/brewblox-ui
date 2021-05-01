@@ -246,7 +246,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <div class="widget-body column">
       <q-btn-toggle
         v-model="createMode"
@@ -320,5 +320,5 @@ export default defineComponent({
         @click="createWidget"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>
