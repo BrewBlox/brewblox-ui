@@ -73,7 +73,7 @@ export default defineComponent({
     :enabled="inDialog && context.mode ==='Full'"
     :no-scroll="context.mode === 'Basic'"
   >
-    <template #graph>
+    <template #preview>
       <GenericGraph v-bind="graphProps" :revision="revision" />
     </template>
 
@@ -107,7 +107,7 @@ export default defineComponent({
         </BlockEnableToggle>
       </template>
 
-      <template #graph>
+      <template #preview>
         <q-resize-observer @resize="refresh" />
         <GenericGraph
           v-bind="graphProps"

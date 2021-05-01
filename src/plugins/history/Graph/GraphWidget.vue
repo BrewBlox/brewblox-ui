@@ -171,7 +171,7 @@ export default defineComponent({
     :enabled="inDialog && context.mode === 'Full'"
     :no-scroll="context.mode === 'Basic'"
   >
-    <template #graph>
+    <template #preview>
       <HistoryGraph
         ref="wrapperGraphRef"
         :graph-id="wrapperGraphId"

@@ -121,7 +121,7 @@ export default defineComponent({
         <DialogToolbar :title="title" subtitle="Edit text note" />
       </template>
 
-      <template #pane>
+      <template #preview>
         <q-scroll-area visible class="fit">
           <MarkdownView
             :text="local"

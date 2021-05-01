@@ -59,7 +59,7 @@ export default defineComponent({
     <!-- The preview pane -->
     <div v-if="!collapsed" class="col-5 bg-dark">
       <div class="preview-pane fit">
-        <slot name="pane" />
+        <slot name="preview" />
       </div>
     </div>
   </div>

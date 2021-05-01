@@ -170,6 +170,7 @@ const plugin: Plugin = {
           generate: () => tempQty(20),
           readonly: true,
           graphed: true,
+          graphAxis: 'y2',
         },
         {
           key: 'inputValue',
@@ -178,6 +179,7 @@ const plugin: Plugin = {
           generate: () => tempQty(20),
           readonly: true,
           graphed: true,
+          graphAxis: 'y2',
         },
         {
           key: 'error',

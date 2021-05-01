@@ -101,7 +101,7 @@ export default defineComponent({
 
 <template>
   <PreviewCard :enabled="inDialog">
-    <template #graph>
+    <template #preview>
       <BlockHistoryGraph />
     </template>
 
