@@ -153,7 +153,7 @@ export default defineComponent({
         >
           <div
             class="col-grow clickable rounded-borders"
-            @click="show(block)"
+            @click="rename(block)"
           >
             <q-item>
               <q-item-section>
@@ -169,17 +169,19 @@ export default defineComponent({
               </q-item-section>
             </q-item>
             <q-tooltip>
-              Show block settings
+              Rename block
             </q-tooltip>
           </div>
           <q-btn
             flat
             round
-            icon="edit"
+            icon="mdi-launch"
             class="self-center"
-            @click="rename(block)"
+            @click="show(block)"
           >
-            <q-tooltip>Rename block</q-tooltip>
+            <q-tooltip>
+              Show block settings
+            </q-tooltip>
           </q-btn>
         </div>
       </div>
