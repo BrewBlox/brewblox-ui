@@ -1,15 +1,15 @@
 <script lang="ts">
-import { debounce, useQuasar } from 'quasar';
-import { computed, defineComponent, nextTick, ref, watch } from 'vue';
+import { useQuasar } from 'quasar';
+import { computed, defineComponent, ref, watch } from 'vue';
 
 import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
 import { spliceById } from '@/utils/functional';
 
-import { calculateNormalizedFlows } from './calculateFlows';
+import { useFlowParts } from './composables';
 import { builderStore } from './store';
-import { BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
-import { asPersistentPart, asStatePart, squares, vivifyParts } from './utils';
+import { FlowPart, PartUpdater, PersistentPart } from './types';
+import { squares } from './utils';
 
 export default defineComponent({
   name: 'BreweryPage',
@@ -24,22 +24,6 @@ export default defineComponent({
     const { localStorage } = useQuasar();
 
     const pending = ref<FlowPart | null>(null);
-    const flowParts = ref<FlowPart[]>([]);
-
-    const saveLayout = debounce(
-      layout => builderStore.saveLayout(layout),
-      200,
-      false,
-    );
-
-    const calculate = debounce(
-      async () => {
-        await nextTick();
-        flowParts.value = calculateNormalizedFlows(parts.value.map(asStatePart));
-      },
-      200,
-      false,
-    );
 
     const startupDone = computed<boolean>(
       () => systemStore.startupDone,
@@ -57,9 +41,13 @@ export default defineComponent({
       () => props.routeId,
     );
 
-    const layout = computed<BuilderLayout | null>(
-      () => builderStore.layoutById(layoutId.value),
-    );
+    const {
+      layout,
+      parts,
+      flowParts,
+      flowPartsRevision,
+      calculateFlowParts,
+    } = useFlowParts.setup(layoutId);
 
     const layoutTitle = computed<string>(
       () => layout.value?.title ?? 'Builder layout',
@@ -81,25 +69,9 @@ export default defineComponent({
       () => [0, 0, gridWidth.value, gridHeight.value].join(' '),
     );
 
-    async function saveParts(parts: PersistentPart[]): Promise<void> {
-      if (!layout.value) {
-        return;
-      }
-      // first set local value, to avoid jitters caused by the period between action and vueX refresh
-      layout.value.parts = parts.map(asPersistentPart);
-      saveLayout(layout.value);
-      calculate();
+    function savePart(part: PersistentPart): void {
+      parts.value = spliceById(parts.value, part);
     }
-
-    async function savePart(part: PersistentPart): Promise<void> {
-      await saveParts(spliceById(parts.value, part));
-    }
-
-    const parts = computed<PersistentPart[]>(
-      () => layout.value !== null
-        ? vivifyParts(layout.value.parts)
-        : [],
-    );
 
     const updater = computed<PartUpdater>(
       () => ({
@@ -132,12 +104,6 @@ export default defineComponent({
     }
 
     watch(
-      () => layout.value,
-      () => calculate(),
-      { immediate: true },
-    );
-
-    watch(
       () => layoutTitle.value,
       title => document.title = `Brewblox | ${title}`,
       { immediate: true },
@@ -145,7 +111,10 @@ export default defineComponent({
 
     watch(
       () => layoutId.value,
-      () => {
+      (newV, oldV) => {
+        if (newV !== oldV) {
+          flowParts.value = [];
+        }
         try {
           localStorage.set('brewery-page', layoutId.value);
         }
@@ -162,12 +131,13 @@ export default defineComponent({
       parts,
       gridViewBox,
       flowParts,
+      flowPartsRevision,
       squares,
       isClickable,
       pending,
       interact,
       savePart,
-      calculate,
+      calculateFlowParts,
     };
   },
 });
@@ -221,7 +191,7 @@ export default defineComponent({
         >
           <g
             v-for="part in flowParts"
-            :key="part.id"
+            :key="`${flowPartsRevision}-${part.id}`"
             :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
             :class="{
               [part.type]: true,
@@ -233,7 +203,7 @@ export default defineComponent({
             <PartWrapper
               :part="part"
               @update:part="savePart"
-              @dirty="calculate"
+              @dirty="calculateFlowParts"
             />
           </g>
           <template v-if="pending">
@@ -252,7 +222,7 @@ export default defineComponent({
               <PartWrapper
                 :part="pending"
                 @update:part="savePart"
-                @dirty="calculate"
+                @dirty="calculateFlowParts"
               />
             </g>
           </template>

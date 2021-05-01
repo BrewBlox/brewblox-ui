@@ -1,21 +1,20 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
-import { debounce, QLayout, useQuasar } from 'quasar';
+import { QLayout, useQuasar } from 'quasar';
 import { computed, defineComponent, nextTick, reactive, ref, UnwrapRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { Coordinates } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
-import { clampRotation, deepCopy, filterById, spliceById } from '@/utils/functional';
+import { clampRotation, deepCopy, filterById, nullFilter, spliceById } from '@/utils/functional';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
-import { calculateNormalizedFlows } from './calculateFlows';
+import { useFlowParts } from './composables';
 import { SQUARE_SIZE } from './const';
 import { builderStore } from './store';
 import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
-import { asPersistentPart, asStatePart, rectContains, squares, startAddLayout, vivifyParts } from './utils';
+import { rectContains, squares, startAddLayout } from './utils';
 
 interface Floater extends XYPosition {
   moving: boolean;
@@ -67,8 +66,6 @@ export default defineComponent({
     const { localStorage } = useQuasar();
     const router = useRouter();
 
-    const flowParts = ref<FlowPart[]>([]);
-    const flowPartsRev = ref<string>('');
     const history = ref<string[]>([]);
     const undoneHistory = ref<string[]>([]);
 
@@ -188,9 +185,15 @@ export default defineComponent({
       () => props.routeId || null,
     );
 
-    const layout = computed<BuilderLayout | null>(
-      () => builderStore.layoutById(layoutId.value),
-    );
+    const {
+      layout,
+      saveLayout,
+      parts,
+      overlaps,
+      flowParts,
+      flowPartsRevision,
+      calculateFlowParts,
+    } = useFlowParts.setup(layoutId);
 
     function setLayoutWidth(v: number): void {
       if (layout.value) {
@@ -210,27 +213,8 @@ export default defineComponent({
       () => layout.value?.title ?? 'Builder editor',
     );
 
-    const parts = computed<PersistentPart[]>(
-      () => layout.value !== null
-        ? vivifyParts(layout.value.parts)
-        : [],
-    );
-
     const configuredPart = computed<FlowPart | null>(
       () => flowParts.value.find(p => p.id === configuredPartId.value) ?? null,
-    );
-
-    const overlaps = computed<[Coordinates, number][]>(
-      () => {
-        const counts: Mapped<number> = {};
-        for (const part of parts.value) {
-          const key = new Coordinates([part.x, part.y, 0]).toString();
-          counts[key] = (counts[key] || 0) + 1;
-        }
-        return Object.entries(counts)
-          .filter(([, v]) => v > 1)
-          .map(([k, v]) => [new Coordinates(k), v] as [Coordinates, number]);
-      },
     );
 
     const currentMode = computed<ActionMode>({
@@ -242,8 +226,11 @@ export default defineComponent({
     });
 
     function selectLayout(id: string | null): void {
-      const route = id ? `/builder/${id}` : '/builder';
-      router.push(route).catch(() => { });
+      if (id !== layoutId.value) {
+        flowParts.value = [];
+        const route = id ? `/builder/${id}` : '/builder';
+        router.push(route);
+      }
     }
 
     function setFocus(): void {
@@ -266,71 +253,35 @@ export default defineComponent({
       }
     }
 
-    async function saveLayout(saved: BuilderLayout | null = layout.value): Promise<void> {
-      if (saved === null) {
-        return;
-      }
-      else if (saved.id) {
-        await builderStore.saveLayout(saved);
-      } else {
-        const id = nanoid();
-        await builderStore.createLayout({ ...saved, id });
-        selectLayout(id);
-      }
-    }
-
-    async function saveParts(parts: PersistentPart[], saveHistory = true): Promise<void> {
-      if (!layout.value) { return; }
-
+    function saveParts(updated: PersistentPart[], saveHistory = true): void {
       if (saveHistory) {
-        const stored = builderStore.layoutById(layout.value.id);
-        if (stored) {
-          history.value.push(JSON.stringify(stored.parts));
-          undoneHistory.value = [];
-        }
+        history.value.push(JSON.stringify(parts.value));
+        undoneHistory.value = [];
       }
-
-      // first set local value, to avoid jitters caused by the period between action and VueX refresh
-      layout.value.parts = parts.map(asPersistentPart);
-      calculateFlowParts();
-      await saveLayout();
+      parts.value = updated;
     }
 
-    const debouncedSaveParts = debounce(saveParts, 500);
-
-    async function savePart(part: PersistentPart): Promise<void> {
-      await saveParts(spliceById(parts.value, part));
+    function savePart(part: PersistentPart): void {
+      saveParts(spliceById(parts.value, part));
     }
 
-    async function removePart(part: PersistentPart): Promise<void> {
-      await saveParts(filterById(parts.value, part));
+    function removePart(part: PersistentPart): void {
+      saveParts(filterById(parts.value, part));
     }
 
-    async function undo(): Promise<void> {
+    function undo(): void {
       if (layout.value && history.value.length > 0) {
         cancelSelection();
-
-        const current = builderStore.layoutById(layout.value.id);
-        if (current) {
-          const state = JSON.stringify(current.parts);
-          const parts = JSON.parse(history.value.pop()!);
-          await saveParts(parts, false);
-          undoneHistory.value.push(state);
-        }
+        undoneHistory.value.push(JSON.stringify(parts.value));
+        parts.value = JSON.parse(history.value.pop()!);
       }
     }
 
-    async function redo(): Promise<void> {
+    function redo(): void {
       if (layout.value && undoneHistory.value.length > 0) {
         cancelSelection();
-
-        const current = builderStore.layoutById(layout.value.id);
-        if (current) {
-          const state = JSON.stringify(current.parts);
-          const parts = JSON.parse(undoneHistory.value.pop()!);
-          await saveParts(parts, false);
-          history.value.push(state);
-        }
+        history.value.push(JSON.stringify(parts.value));
+        parts.value = JSON.parse(undoneHistory.value.pop()!);
       }
     }
 
@@ -345,27 +296,6 @@ export default defineComponent({
       return floater.value?.parts.some(p => p.id === part.id)
         || selectedParts.value.some(p => p.id === part.id);
     }
-
-    function updateFlowParts(parts: FlowPart[]): void {
-      flowParts.value = parts;
-      flowPartsRev.value = nanoid(5);
-      if (selectedParts.value.length > 0) {
-        const selectedIds = selectedParts.value.map(p => p.id);
-        selectedParts.value = flowParts.value
-          .filter(p => selectedIds.includes(p.id))
-          .map(deepCopy);
-      }
-    }
-
-    const calculateFlowParts = debounce(
-      async () => {
-        await nextTick();
-        const source = deepCopy(parts.value);
-        updateFlowParts(calculateNormalizedFlows(source.map(asStatePart)));
-      },
-      150,
-      true,
-    );
 
     function clear(): void {
       if (floater.value) {
@@ -663,7 +593,7 @@ export default defineComponent({
         part.y += delta.y;
       });
       const ids = changed.map(v => v.id);
-      debouncedSaveParts([
+      saveParts([
         ...parts.value.filter(p => !ids.includes(p.id)),
         ...changed,
       ]);
@@ -742,15 +672,18 @@ export default defineComponent({
     );
 
     watch(
-      () => layout.value,
-      (v) => v ? calculateFlowParts() : updateFlowParts([]),
+      () => layoutTitle.value,
+      title => document.title = `Brewblox | ${title}`,
       { immediate: true },
     );
 
     watch(
-      () => layoutTitle.value,
-      title => document.title = `Brewblox | ${title}`,
-      { immediate: true },
+      () => flowPartsRevision.value,
+      () => {
+        selectedParts.value = selectedParts.value
+          .map(p => deepCopy(flowParts.value.find(fp => fp.id === p.id)))
+          .filter(nullFilter);
+      },
     );
 
     return {
@@ -775,7 +708,6 @@ export default defineComponent({
       undoneHistory,
       undo,
       redo,
-      saveLayout,
       createLayout,
       focusWarning,
       layouts,
@@ -790,7 +722,7 @@ export default defineComponent({
       onGridLeave,
       panHandler,
       flowParts,
-      flowPartsRev,
+      flowPartsRevision,
       isBusy,
       floater,
       selectedParts,
@@ -981,7 +913,7 @@ export default defineComponent({
     <BuilderPartMenu
       v-if="menuDialogOpen"
       :part="configuredPart"
-      :rev="flowPartsRev"
+      :rev="flowPartsRevision"
       @update:part="savePart"
       @remove:part="removePart"
       @dirty="calculateFlowParts"
@@ -1051,7 +983,7 @@ export default defineComponent({
             <g
               v-for="part in flowParts"
               v-show="!isBusy(part)"
-              :key="`${flowPartsRev}-${part.id}`"
+              :key="`${flowPartsRevision}-${part.id}`"
               v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
               :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
               :class="{ pointer: currentMode.cursor(part), [part.type]: true }"

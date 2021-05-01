@@ -1,7 +1,6 @@
 <script lang="ts">
 import { nanoid } from 'nanoid';
-import { debounce } from 'quasar';
-import { computed, defineComponent, nextTick, onBeforeMount, ref, watch } from 'vue';
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals, useWidget } from '@/composables';
@@ -10,11 +9,11 @@ import { Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { spliceById, uniqueFilter } from '@/utils/functional';
 
-import { calculateNormalizedFlows } from './calculateFlows';
+import { useFlowParts } from './composables';
 import { defaultLayoutHeight, defaultLayoutWidth } from './const';
 import { builderStore } from './store';
 import { BuilderConfig, BuilderLayout, FlowPart, PartUpdater, PersistentPart } from './types';
-import { asPersistentPart, asStatePart, squares, vivifyParts } from './utils';
+import { squares } from './utils';
 
 export default defineComponent({
   name: 'BuilderWidget',
@@ -27,25 +26,23 @@ export default defineComponent({
       saveConfig,
     } = useWidget.setup<Widget<BuilderConfig>>();
 
-    const flowParts = ref<FlowPart[]>([]);
     const pending = ref<FlowPart | null>(null);
-
-    const calculate = debounce(
-      async () => {
-        await nextTick();
-        flowParts.value = calculateNormalizedFlows(parts.value.map(asStatePart));
-      },
-      200,
-      false,
-    );
 
     const storeLayouts = computed<BuilderLayout[]>(
       () => builderStore.layouts,
     );
 
-    const layout = computed<BuilderLayout | null>(
-      () => builderStore.layoutById(config.value.currentLayoutId),
+    const layoutId = computed<string | null>(
+      () => config.value.currentLayoutId,
     );
+
+    const {
+      layout,
+      parts,
+      flowParts,
+      flowPartsRevision,
+      calculateFlowParts,
+    } = useFlowParts.setup(layoutId);
 
     function startSelectLayout(): void {
       createDialog({
@@ -82,32 +79,13 @@ export default defineComponent({
       }
     }
 
-    async function saveParts(parts: PersistentPart[]): Promise<void> {
-      if (!layout.value) {
-        return;
-      }
-
-      // first set local value, to avoid jitters caused by the period between action and vueX refresh
-      layout.value.parts = parts.map(asPersistentPart);
-      await builderStore.saveLayout(layout.value);
-      await calculate();
+    function savePart(part: PersistentPart): void {
+      parts.value = spliceById(parts.value, part);
     }
 
-    async function savePart(part: PersistentPart): Promise<void> {
-      await saveParts(spliceById(parts.value, part));
-    }
-
-    const parts = computed<PersistentPart[]>(
-      () => layout.value !== null
-        ? vivifyParts(layout.value.parts)
-        : [],
-    );
-
-    const updater = computed<PartUpdater>(
-      () => ({
-        updatePart: savePart,
-      }),
-    );
+    const updater: PartUpdater = {
+      updatePart: savePart,
+    };
 
     const delayTouch = computed<boolean>(
       () => {
@@ -131,14 +109,14 @@ export default defineComponent({
         return;
       }
       if (pending.value && pending.value.id === part.id) {
-        handler(part, updater.value);
+        handler(part, updater);
         pending.value = null;
       }
       else if (delayTouch.value) {
         pending.value = part;
       }
       else {
-        handler(part, updater.value);
+        handler(part, updater);
       }
     }
 
@@ -160,12 +138,6 @@ export default defineComponent({
       }
     }
 
-    watch(
-      () => layout.value,
-      () => calculate(),
-      { immediate: true },
-    );
-
     onBeforeMount(() => migrate());
 
     return {
@@ -179,11 +151,12 @@ export default defineComponent({
       selectLayout,
       gridViewBox,
       flowParts,
+      flowPartsRevision,
       isClickable,
       pending,
       interact,
       savePart,
-      calculate,
+      calculateFlowParts,
     };
   },
 });
@@ -257,7 +230,7 @@ export default defineComponent({
       >
         <g
           v-for="part in flowParts"
-          :key="part.id"
+          :key="`${flowPartsRevision}-${part.id}`"
           :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
           :class="{
             [part.type]: true,
@@ -269,7 +242,7 @@ export default defineComponent({
           <PartWrapper
             :part="part"
             @update:part="savePart"
-            @dirty="calculate"
+            @dirty="calculateFlowParts"
           />
         </g>
         <template v-if="pending">
@@ -288,7 +261,7 @@ export default defineComponent({
             <PartWrapper
               :part="pending"
               @update:part="savePart"
-              @dirty="calculate"
+              @dirty="calculateFlowParts"
             />
           </g>
         </template>

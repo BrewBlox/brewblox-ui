@@ -248,7 +248,10 @@ export function universalTransitions(size: [number, number], enabled: boolean): 
       { [CENTER]: coords.map(outCoords => ({ outCoords, friction: 0.5 })) });
 }
 
-export function vivifyParts(parts: PersistentPart[]): PersistentPart[] {
+export function vivifyParts(parts: PersistentPart[] | null | undefined): PersistentPart[] {
+  if (!parts) {
+    return [];
+  }
   const sizes: Mapped<number> = {};
   return parts
     .map(storePart => {
