@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Layout } from 'plotly.js';
-import { ComponentPublicInstance, computed, defineComponent, nextTick, PropType, ref, watch } from 'vue';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
@@ -9,11 +9,6 @@ import { bloxQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 import { durationString } from '@/utils/duration';
 import { deepCopy, isJsonEqual } from '@/utils/functional';
-
-interface HistoryGraphApi extends ComponentPublicInstance {
-  resetSources(): void;
-  refresh(): void;
-}
 
 export default defineComponent({
   name: 'BlockGraph',
@@ -40,8 +35,8 @@ export default defineComponent({
     'update:config',
   ],
   setup(props, { emit }) {
-    const graphRef = ref<HistoryGraphApi>();
     const presets: QueryParams[] = defaultPresets();
+    const sourceRevision = ref<Date>(new Date());
 
     const graphConfig = computed<GraphConfig>(
       () => ({
@@ -56,7 +51,7 @@ export default defineComponent({
       (newV) => {
         if (!isJsonEqual(newV, renderedConfig.value)) {
           renderedConfig.value = deepCopy(newV);
-          nextTick(() => graphRef.value?.resetSources());
+          sourceRevision.value = new Date();
         }
       },
     );
@@ -127,8 +122,8 @@ export default defineComponent({
 
     return {
       durationString,
-      graphRef,
       presets,
+      sourceRevision,
       dialogOpen,
       graphConfig,
       targetKeys,
@@ -152,9 +147,9 @@ export default defineComponent({
   >
     <q-card v-if="dialogOpen" class="text-white">
       <HistoryGraph
-        ref="graph"
         :graph-id="id"
         :config="graphConfig"
+        :source-revision="sourceRevision"
         :use-presets="!noDuration"
         use-range
         maximized

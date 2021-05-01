@@ -30,7 +30,7 @@ export default defineComponent({
     const { block } = useBlockWidget.setup<SetpointProfileBlock>();
 
     const usedData = ref<SetpointProfileData>(deepCopy(block.value.data));
-    const revision = ref<number>(0);
+    const revision = ref<Date>(new Date());
 
     const target = computed<Link>(
       () => block.value.data.targetId,
@@ -42,7 +42,7 @@ export default defineComponent({
 
     function refresh(): void {
       usedData.value = deepCopy(block.value.data);
-      revision.value++;
+      revision.value = new Date();
     }
 
     watch(

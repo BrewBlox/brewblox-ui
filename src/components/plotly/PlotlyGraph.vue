@@ -66,8 +66,8 @@ export default defineComponent({
       default: false,
     },
     revision: {
-      type: Number,
-      default: 0,
+      type: Date,
+      default: () => new Date(),
     },
     width: {
       type: String,

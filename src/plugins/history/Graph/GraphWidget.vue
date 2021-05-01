@@ -3,7 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
-import { ComponentPublicInstance, computed, defineComponent, nextTick, ref, watch } from 'vue';
+import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
@@ -16,11 +16,6 @@ import { isJsonEqual } from '@/utils/functional';
 
 import { addBlockGraph } from './utils';
 
-interface HistoryGraphApi extends ComponentPublicInstance {
-  resetSources(): void;
-  refresh(): void;
-}
-
 export default defineComponent({
   name: 'GraphWidget',
   setup() {
@@ -28,14 +23,12 @@ export default defineComponent({
       context,
       inDialog,
     } = useContext.setup();
+
     const {
       widget,
+      config,
       saveWidget,
     } = useWidget.setup<Widget<GraphConfig>>();
-
-    const config = computed<GraphConfig>(
-      () => widget.value.config,
-    );
 
     function cloned(): GraphConfig {
       return cloneDeep(defaults(config.value, emptyGraphConfig()));
@@ -48,26 +41,24 @@ export default defineComponent({
     // Separate IDs for graphs in widget and dialog wrapper
     // This prevents source create/delete race conditions when switching
     const widgetGraphId = nanoid();
-    const wrapperGraphId = nanoid();
+    const previewGraphId = nanoid();
 
-    const wrapperGraphRef = ref<HistoryGraphApi>();
-    const widgetGraphRef = ref<HistoryGraphApi>();
+    const previewGraphRef = ref();
+    const widgetGraphRef = ref();
+
+    const sourceRevision = ref<Date>(new Date());
+    const renderRevision = ref<Date>(new Date());
+
+    async function refresh(): Promise<void> {
+      await nextTick();
+      renderRevision.value = new Date();
+    }
 
     async function regraph(): Promise<void> {
       await nextTick();
       renderedConfig.value = cloneDeep(config.value);
-      widgetGraphRef.value?.resetSources();
-      wrapperGraphRef.value?.resetSources();
+      sourceRevision.value = new Date();
     }
-
-    watch(
-      () => widget.value.config,
-      (newV) => {
-        if (!isJsonEqual(newV, renderedConfig.value)) {
-          regraph();
-        }
-      },
-    );
 
     const title = computed<string>(
       () => widget.value.title,
@@ -103,15 +94,9 @@ export default defineComponent({
         .onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
     }
 
-    async function refresh(): Promise<void> {
-      await nextTick();
-      widgetGraphRef.value?.refresh();
-      wrapperGraphRef.value?.refresh();
-    }
-
     function currentGraphId(): string | null {
       if (widgetGraphRef.value !== undefined) { return widgetGraphId; }
-      if (wrapperGraphRef.value !== undefined) { return wrapperGraphId; }
+      if (previewGraphRef.value !== undefined) { return previewGraphId; }
       return null;
     }
 
@@ -139,15 +124,26 @@ export default defineComponent({
       addBlockGraph(widget.value.id, null);
     }
 
+    watch(
+      () => widget.value.config,
+      (newV) => {
+        if (!isJsonEqual(newV, renderedConfig.value)) {
+          regraph();
+        }
+      },
+    );
+
     return {
       context,
       inDialog,
       presets,
       downsampling,
-      wrapperGraphId,
+      previewGraphId,
       widgetGraphId,
-      wrapperGraphRef,
+      previewGraphRef,
       widgetGraphRef,
+      sourceRevision,
+      renderRevision,
       widget,
       title,
       config,
@@ -173,9 +169,13 @@ export default defineComponent({
   >
     <template #preview>
       <HistoryGraph
-        ref="wrapperGraphRef"
-        :graph-id="wrapperGraphId"
-        :config="config"
+        ref="previewGraphRef"
+        :graph-id="previewGraphId"
+        v-bind="{
+          config,
+          sourceRevision,
+          renderRevision
+        }"
         use-presets
         use-range
         @params="saveParams"
@@ -232,7 +232,11 @@ export default defineComponent({
       <HistoryGraph
         ref="widgetGraphRef"
         :graph-id="widgetGraphId"
-        :config="config"
+        v-bind="{
+          config,
+          sourceRevision,
+          renderRevision
+        }"
         @downsample="v => downsampling = v"
       />
     </div>

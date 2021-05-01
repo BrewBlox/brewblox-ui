@@ -14,7 +14,7 @@ export default defineComponent({
   },
   setup() {
     const { context } = useContext.setup();
-    const revision = ref<number>(0);
+    const revision = ref<Date>(new Date());
 
     return {
       context,
@@ -33,7 +33,7 @@ export default defineComponent({
             v-if="context.mode === 'Basic'"
             icon="refresh"
             label="Refresh"
-            @click="revision++"
+            @click="revision = new Date()"
           />
         </template>
       </WidgetToolbar>

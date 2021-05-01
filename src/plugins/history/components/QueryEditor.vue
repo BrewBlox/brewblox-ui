@@ -12,6 +12,7 @@ import {
 import { historyStore } from '@/plugins/history/store';
 import { DisplayNames, QueryConfig } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
+import { mutate } from '@/utils/functional';
 
 export default defineComponent({
   name: 'QueryEditor',
@@ -113,20 +114,15 @@ export default defineComponent({
       get: () => targetSplitter(props.config.targets),
       set: vals => {
         const targets = targetBuilder(vals, fields.value);
-        const renames: DisplayNames = {};
-        vals
+        const renames = vals
           .filter(key => props.config.renames[key] === undefined)
-          .forEach(key => renames[key] = defaultLabel(key));
+          .reduce(
+            (acc: DisplayNames, key) => mutate(acc, key, defaultLabel(key)),
+            { ...props.config.renames });
         saveConfig({
           ...props.config,
-          targets: {
-            ...props.config.targets,
-            ...targets,
-          },
-          renames: {
-            ...props.config.renames,
-            ...renames,
-          },
+          targets,
+          renames,
         });
       },
     });

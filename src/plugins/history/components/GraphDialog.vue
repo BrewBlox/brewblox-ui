@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, PropType, reactive } from 'vue';
+import { defineComponent, PropType, reactive, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/functional';
@@ -49,12 +49,15 @@ export default defineComponent({
       onDialogHide,
     } = useDialog.setup();
 
+    const sourceRevision = ref<Date>(new Date());
+
     // Dialog props are not reactive.
     // We'll keep changes cached locally, and assume the parent applies them unchanged
     const localConfig = reactive(deepCopy(props.config));
 
     function saveLocalParams(params: QueryParams): void {
       localConfig.params = params;
+      sourceRevision.value = new Date();
       props.saveParams(params);
     }
 
@@ -62,6 +65,7 @@ export default defineComponent({
       dialogRef,
       dialogProps,
       onDialogHide,
+      sourceRevision,
       localConfig,
       saveLocalParams,
     };
@@ -80,7 +84,13 @@ export default defineComponent({
     <q-card>
       <HistoryGraph
         :config="localConfig"
-        v-bind="{graphId, sharedSources, usePresets, annotated}"
+        v-bind="{
+          graphId,
+          sharedSources,
+          usePresets,
+          annotated,
+          sourceRevision,
+        }"
         maximized
         @annotations="saveAnnotations"
         @params="saveLocalParams"

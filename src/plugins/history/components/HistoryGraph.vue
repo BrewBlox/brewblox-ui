@@ -41,10 +41,6 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    refreshTrigger: {
-      type: String,
-      default: '',
-    },
     usePresets: {
       type: Boolean,
       default: false,
@@ -53,27 +49,20 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    sourceRevision: {
+      type: Date,
+      default: () => new Date(),
+    },
+    renderRevision: {
+      type: Date,
+      default: () => new Date(),
+    },
   },
   emits: ['params', 'layout', 'downsample'],
   setup(props, { emit }) {
     const presets = defaultPresets();
-    const revision = ref(0);
+    const revision = ref(new Date());
     const displayRef = ref(null);
-
-    onMounted(() => {
-      if (!props.sharedSources) {
-        addSources();
-      }
-      else {
-        nextTick(refresh);
-      }
-    });
-
-    onBeforeUnmount(() => {
-      if (!props.sharedSources) {
-        removeSources();
-      }
-    });
 
     function saveParams(params: QueryParams): void {
       emit('params', { ...params });
@@ -164,21 +153,17 @@ export default defineComponent({
     );
 
     function refresh(): void {
-      revision.value += 1;
+      revision.value = new Date();
     }
 
     watch(
-      () => props.refreshTrigger,
+      () => props.renderRevision,
       () => refresh(),
     );
 
     watch(
-      () => props.config,
-      (newV, oldV) => {
-        if (!isJsonEqual(newV, oldV)) {
-          resetSources();
-        }
-      },
+      () => props.sourceRevision,
+      () => resetSources(),
     );
 
     watch(
@@ -195,6 +180,21 @@ export default defineComponent({
       { immediate: true },
     );
 
+    onMounted(() => {
+      if (!props.sharedSources) {
+        addSources();
+      }
+      else {
+        nextTick(refresh);
+      }
+    });
+
+    onBeforeUnmount(() => {
+      if (!props.sharedSources) {
+        removeSources();
+      }
+    });
+
     return {
       layout,
       presets,
@@ -208,9 +208,6 @@ export default defineComponent({
       error,
       graphData,
       policies,
-      // Used by parents
-      refresh,
-      resetSources,
     };
   },
 });

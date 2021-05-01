@@ -23,7 +23,7 @@ export default defineComponent({
   name: 'MetricsBasic',
   props: {
     revision: {
-      type: Number,
+      type: Date,
       required: true,
     },
   },
