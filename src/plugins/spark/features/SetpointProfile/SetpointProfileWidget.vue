@@ -107,7 +107,7 @@ export default defineComponent({
         </BlockEnableToggle>
       </template>
 
-      <template #preview>
+      <template #graph>
         <q-resize-observer @resize="refresh" />
         <GenericGraph
           v-bind="graphProps"
