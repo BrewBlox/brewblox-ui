@@ -101,7 +101,7 @@ export default defineComponent({
     const createReady = computed<boolean>(
       () => selected.value !== null
         && sparkModule.value !== null
-        && validator.value(blockId.value),
+        && (activeBlock.value !== null || validator.value(blockId.value)),
     );
 
     const discoveredType = computed<boolean>(
@@ -226,15 +226,16 @@ export default defineComponent({
         return;
       }
 
-      const realCandidate = { ...activeBlock.value, meta: undefined };
-      const createdBlock = await tryCreateBlock(realCandidate);
+      const persistentBlock = { ...activeBlock.value, meta: undefined };
+      const createdBlock = await tryCreateBlock(persistentBlock);
 
       if (!createdBlock) {
         return close();
       }
 
+      const persistentWidget = { ...activeWidget.value, volatile: undefined };
       const createdWidget = dashboardId.value
-        ? await tryCreateWidget(activeWidget.value)
+        ? await tryCreateWidget(persistentWidget)
         : null;
 
       onDone({ block: createdBlock, widget: createdWidget });

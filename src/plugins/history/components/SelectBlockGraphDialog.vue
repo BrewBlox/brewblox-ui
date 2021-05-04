@@ -5,7 +5,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
-import { blockGraphCfg } from '@/plugins/spark/utils';
+import { makeBlockGraphConfig } from '@/plugins/spark/utils';
 import { createBlockDialog } from '@/utils/dialog';
 
 import { GraphConfig } from '../types';
@@ -54,7 +54,7 @@ export default defineComponent({
 
     const blocks = computed<Block[]>(
       () => sparkStore
-        .serviceBlocks(service.value?.id ?? null)
+        .serviceBlocks(service.value?.id)
         .filter(block => graphedTypes.includes(block.type)),
     );
 
@@ -85,7 +85,7 @@ export default defineComponent({
         return;
       }
       const blockId = block.value.id;
-      const cfg = blockGraphCfg(
+      const cfg = makeBlockGraphConfig(
         block.value,
         {},
         v => selectedFields.value.some(f => f.key === v.key));

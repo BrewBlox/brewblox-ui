@@ -70,8 +70,9 @@ export const useDialog: UseDialogComposable = {
     'hide',
   ],
   setup(): UseDialogComponent {
-    const hashId = `.${nanoid(6)}.`;
     const { emit, proxy } = getCurrentInstance()!;
+
+    const hashId = `.${nanoid(6)}.`;
     const dialogRef = ref<QDialog | null>(null);
     const cancelWatcher = ref<() => void>(() => { });
 

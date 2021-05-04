@@ -118,39 +118,39 @@ export class SparkServiceModule extends VuexModule {
     this.lastBlocks = null;
   }
 
-  private findById<T extends Block>(blocks: Block[], id: string | null): T | null {
+  private findById<T extends Block>(blocks: Block[], id: Nullable<string>): T | null {
     return findById(blocks, id) as T | null;
   }
 
-  private findByAddress<T extends Block>(blocks: Block[], addr: T | BlockAddress | null): T | null {
+  private findByAddress<T extends Block>(blocks: Block[], addr: T | Nullable<BlockAddress>): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
     return blocks.find(v => v.id === addr.id && (!addr.type || addr.type === v.type)) as T ?? null;
   }
 
-  private findByLink<T extends Block>(blocks: Block[], link: Link | null): T | null {
+  private findByLink<T extends Block>(blocks: Block[], link: Nullable<Link>): T | null {
     if (!link || !link.id) { return null; }
     return this.findById<T>(blocks, link.id);
   }
 
-  private findFieldByAddress(blocks: Block[], addr: BlockFieldAddress | null): any | null {
+  private findFieldByAddress(blocks: Block[], addr: Nullable<BlockFieldAddress>): any | null {
     const block = this.findByAddress(blocks, addr);
     if (!block || !addr?.field) { return null; }
     return block.data[addr.field] ?? null;
   }
 
-  public blockById<T extends Block>(blockId: string | null): T | null {
+  public blockById<T extends Block>(blockId: Nullable<string>): T | null {
     return this.findById<T>(this.blocks, blockId) ?? this.findById<T>(this.volatileBlocks, blockId);
   }
 
-  public blockByAddress<T extends Block>(addr: T | BlockAddress | null): T | null {
+  public blockByAddress<T extends Block>(addr: T | Nullable<BlockAddress>): T | null {
     return this.findByAddress<T>(this.blocks, addr) ?? this.findByAddress<T>(this.volatileBlocks, addr);
   }
 
-  public blockByLink<T extends Block>(link: Link | null): T | null {
+  public blockByLink<T extends Block>(link: Nullable<Link>): T | null {
     return this.findByLink<T>(this.blocks, link) ?? this.findByLink<T>(this.volatileBlocks, link);
   }
 
-  public fieldByAddress(addr: BlockFieldAddress | null): any {
+  public fieldByAddress(addr: Nullable<BlockFieldAddress>): any {
     return this.findFieldByAddress(this.blocks, addr) ?? this.findFieldByAddress(this.volatileBlocks, addr);
   }
 
@@ -167,8 +167,10 @@ export class SparkServiceModule extends VuexModule {
     this.volatileBlocks = extendById(this.volatileBlocks, block);
   }
 
-  public removeVolatileBlock(block: Block): void {
-    this.volatileBlocks = filterById(this.volatileBlocks, block);
+  public removeVolatileBlock({ id }: BlockAddress): void {
+    if (id) {
+      this.volatileBlocks = filterById(this.volatileBlocks, { id });
+    }
   }
 
   @Action

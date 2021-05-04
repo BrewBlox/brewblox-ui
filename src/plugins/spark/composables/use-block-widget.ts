@@ -1,18 +1,13 @@
-import { nanoid } from 'nanoid';
 import { computed, ComputedRef, Ref, ref, UnwrapRef, watch, WritableComputedRef } from 'vue';
 
 import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { Block } from '@/shared-types';
-import { dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
-import notify from '@/utils/notify';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { BlockConfig, BlockSpec, BlockWidget } from '../types';
-import { blockGraphCfg, canDisplay as canDisplayFn, makeBlockIdRules } from '../utils';
+import { isBlockVolatile, makeBlockGraphConfig } from '../utils';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {
@@ -26,14 +21,9 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
 
   saveBlock(block?: BlockT): Promise<void>;
 
-  canDisplay: boolean;
   hasGraph: boolean;
   isDriven: ComputedRef<boolean>;
   constrainers: ComputedRef<string | null>;
-
-  startMakeWidget(): void;
-  startChangeBlockId(): void;
-  startRemoveBlock(): void;
 }
 
 export interface UseBlockWidgetComposable {
@@ -81,7 +71,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     );
 
     const isVolatileBlock = computed<boolean>(
-      () => block.value.meta?.volatile === true,
+      () => isBlockVolatile(block.value),
     );
 
     async function saveBlock(v: BlockT = block.value): Promise<void> {
@@ -96,7 +86,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       && sparkStore.spec(block.value).fields.some(f => f.graphed);
 
     const graphConfig = computed<GraphConfig | null>({
-      get: () => hasGraph ? blockGraphCfg(block.value, config.value) : null,
+      get: () => hasGraph ? makeBlockGraphConfig(block.value, config.value) : null,
       set: cfg => {
         const updated: BlockConfig = {
           ...config.value,
@@ -108,81 +98,11 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       },
     });
 
-    const canDisplay: boolean = !isVolatileBlock.value
-      && canDisplayFn(block.value);
-
-
     const isDriven = computed<boolean>(
       () => sparkModule
         .drivenBlocks
         .includes(config.value.blockId),
     );
-
-    function startMakeWidget(): void {
-      const id = nanoid();
-      const selectOptions = dashboardStore.dashboards
-        .map(dashboard => ({
-          label: dashboard.title,
-          value: dashboard.id,
-        }));
-
-      createDialog({
-        component: 'SelectDialog',
-        componentProps: {
-          modelValue: null,
-          title: 'Make widget',
-          message: `On which dashboard do you want to create a widget for <i>${widget.value.title}</i>?`,
-          html: true,
-          listSelect: selectOptions.length < 10,
-          selectOptions,
-        },
-      })
-        .onOk((dashboard: string) => {
-          if (dashboard) {
-            widgetStore.appendWidget({ ...deepCopy(widget.value), id, dashboard, pinnedPosition: null });
-            notify.done(`Created <b>${widget.value.title}</b> on <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
-          }
-        });
-    }
-
-    async function changeBlockId(newId: string): Promise<void> {
-      if (!isVolatileBlock.value) {
-        await sparkModule.renameBlock([blockId, newId])
-          .catch(() => { });
-      } else {
-        await sparkModule.saveBlock({ ...block.value, id: newId });
-      }
-    }
-
-    function startChangeBlockId(): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: block.value.id,
-          title: 'Change block name',
-          message: `Choose a new name for <i>${block.value.id}</i>.`,
-          html: true,
-          clearable: false,
-          rules: makeBlockIdRules(block.value.serviceId),
-        },
-      })
-        .onOk((newId: string) => {
-          changeBlockId(newId);
-        });
-    }
-
-    function startRemoveBlock(): void {
-      createDialog({
-        component: 'ConfirmDialog',
-        componentProps: {
-          title: 'Remove block',
-          message: `Are you sure you want to remove ${block.value.id}?`,
-        },
-      })
-        .onOk(() => {
-          sparkStore.removeBlock(block.value);
-        });
-    }
 
     return {
       widget,
@@ -198,12 +118,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       saveBlock,
       constrainers,
       graphConfig,
-      canDisplay,
       hasGraph,
       isDriven,
-      startMakeWidget,
-      startChangeBlockId,
-      startRemoveBlock,
     };
   },
 };

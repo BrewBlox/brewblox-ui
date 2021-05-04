@@ -24,11 +24,11 @@ export interface UseFlowPartsComponent {
 }
 
 export interface UseFlowPartsComposable {
-  setup(layoutId: ComputedRef<string | null>): UseFlowPartsComponent;
+  setup(layoutId: Ref<string | null>): UseFlowPartsComponent;
 }
 
 export const useFlowParts: UseFlowPartsComposable = {
-  setup(layoutId: ComputedRef<string | null>): UseFlowPartsComponent {
+  setup(layoutId: Ref<string | null>): UseFlowPartsComponent {
 
     const layout = ref<BuilderLayout | null>(builderStore.layoutById(layoutId.value));
 
@@ -69,7 +69,7 @@ export const useFlowParts: UseFlowPartsComposable = {
         flowParts.value = calculateNormalizedFlows(source.map(asStatePart));
       },
       500,
-      { trailing: true },
+      { leading: true },
     );
 
     const overlaps = computed<[Coordinates, number][]>(

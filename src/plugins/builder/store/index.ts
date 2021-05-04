@@ -28,7 +28,7 @@ export class BuilderModule extends VuexModule {
     return this.layouts.map(v => v.id);
   }
 
-  public layoutById(id: string | null): BuilderLayout | null {
+  public layoutById(id: Nullable<string>): BuilderLayout | null {
     return findById(this.layouts, id);
   }
 

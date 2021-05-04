@@ -1,18 +1,5 @@
-import { isBloxField, isJSBloxField } from './BloxField';
 import { BlockOrIntfType, JSBloxField, Link } from './types';
-
-export const isLink =
-  (obj: unknown): obj is Link =>
-    isBloxField(obj)
-    && obj.__bloxtype === 'Link';
-
-export const isJSLink =
-  (obj: unknown): obj is JSLink =>
-    isJSBloxField(obj)
-    && obj.__bloxtype === 'Link';
-
-export const prettyLink = (v: Link | null): string =>
-  v?.id || '[not set]';
+import { isLink, prettyLink } from './utils';
 
 export function rawLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): Link;
 export function rawLink(other: Link): Link;

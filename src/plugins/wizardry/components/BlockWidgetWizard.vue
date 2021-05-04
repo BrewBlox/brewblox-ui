@@ -1,6 +1,6 @@
 <script lang="ts">
-import { DialogChainObject } from 'quasar';
-import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
+import isMatch from 'lodash/isMatch';
+import { computed, defineComponent, nextTick, onBeforeUnmount, ref } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress, BlockConfig, BlockType } from '@/plugins/spark/types';
@@ -8,7 +8,7 @@ import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { Widget, widgetStore } from '@/store/widgets';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils/dialog';
 import { objectStringSorter, ruleValidator, suggestId } from '@/utils/functional';
 
 type CreateMode = 'new' | 'existing';
@@ -39,40 +39,33 @@ export default defineComponent({
     const createMode = ref<CreateMode>('new');
     const blockType = props.featureId as BlockType;
 
-    const activeBlock = ref<Block | null>(null);
-    const activeWidget = ref<Widget<BlockConfig> | null>(null);
-    const activeDialog = ref<DialogChainObject>();
-
     const serviceId = ref<string | null>(sparkStore.serviceIds[0] ?? null);
     const dashboardId = ref<string | null>(props.activeDashboardId ?? null);
-
-    const createdBlockIdRules = computed<InputRule[]>(
-      () => serviceId.value
-        ? makeBlockIdRules(serviceId.value)
-        : [],
-    );
-
-    const validator = computed<(v: string) => boolean>(
-      () => ruleValidator(createdBlockIdRules.value),
-    );
-
-    const existingBlockId = ref<string | null>(null);
-    const newBlockId = ref<string>(suggestId(featureTitle, validator.value));
 
     const serviceOpts = computed<string[]>(
       () => sparkStore.serviceIds,
     );
 
-    const blockOpts = computed<HasId[]>(
-      () => {
-        if (!serviceId.value) { return []; }
-        return sparkStore.serviceBlocks(serviceId.value)
-          .filter(block => block.type === props.featureId)
-          .sort(objectStringSorter('id'));
-      },
+    const blockOpts = computed<Block[]>(
+      () => sparkStore.serviceBlocks(serviceId.value)
+        .filter(block => block.type === props.featureId)
+        .sort(objectStringSorter('id')),
     );
 
-    const blockAddress = computed<BlockAddress>({
+    const blockIdRules = computed<InputRule[]>(
+      () => serviceId.value
+        ? makeBlockIdRules(serviceId.value)
+        : [],
+    );
+
+    const blockIdValidator = computed<(v: string) => boolean>(
+      () => ruleValidator(blockIdRules.value),
+    );
+
+    const existingBlockId = ref<string | null>(null);
+    const newBlockId = ref<string>(suggestId(featureTitle, blockIdValidator.value));
+
+    const existingBlockAddress = computed<BlockAddress>({
       get: () => ({
         serviceId: serviceId.value,
         id: existingBlockId.value,
@@ -81,15 +74,36 @@ export default defineComponent({
       set: addr => existingBlockId.value = addr.id,
     });
 
+    const newBlockAddress = computed<BlockAddress>({
+      get: () => ({
+        serviceId: serviceId.value,
+        id: newBlockId.value,
+        type: blockType,
+      }),
+      set: addr => newBlockId.value = addr.id ?? '',
+    });
+
     const existingBlock = computed<Block | null>(
-      () => sparkStore.blockByAddress(blockAddress.value),
+      () => sparkStore.blockByAddress(existingBlockAddress.value),
     );
+    const newBlock = ref<Block | null>(null);
+
+    const newWidget = ref<Widget<BlockConfig> | null>(null);
 
     const canCreate = computed<boolean>(
-      () => serviceId.value !== null && dashboardId.value !== null
-        &&
-        ((createMode.value === 'new' && validator.value(newBlockId.value))
-          || (createMode.value === 'existing' && existingBlock.value !== null)),
+      () => {
+        if (!serviceId.value || !dashboardId.value) {
+          return false;
+        }
+        if (createMode.value === 'new') {
+          return newBlock.value !== null
+            || blockIdValidator.value(newBlockId.value);
+        }
+        if (createMode.value === 'existing') {
+          return existingBlock.value !== null;
+        }
+        return true;
+      },
     );
 
     function showIdKeyboard(): void {
@@ -97,128 +111,112 @@ export default defineComponent({
         component: 'KeyboardDialog',
         componentProps: {
           modelValue: newBlockId.value,
-          rules: createdBlockIdRules.value,
+          rules: blockIdRules.value,
         },
       });
     }
 
-    async function ensureVolatile(): Promise<void> {
-      if (!serviceId.value || !dashboardId.value) {
+    function generateVolatileObjects(): void {
+      if (!serviceId.value || !dashboardId.value || !canCreate.value) {
         return;
       }
 
       if (createMode.value === 'new') {
-        if (activeBlock.value
-          && (activeBlock.value.id !== newBlockId.value
-            || activeBlock.value.serviceId !== serviceId.value)) {
-          sparkStore.removeVolatileBlock(activeBlock.value);
-          activeBlock.value = null;
+        const blockData: Block['data'] =
+          newBlock.value?.data
+          ?? sparkStore.spec({ type: blockType }).generate();
+
+        if (newBlock.value && !isMatch(newBlock.value, newBlockAddress.value)) {
+          sparkStore.removeVolatileBlock(newBlock.value);
+          newBlock.value = null;
         }
 
-        if (!activeBlock.value
-          && newBlockId.value
-          && serviceId.value
-          && validator.value(newBlockId.value)) {
+        if (!newBlock.value) {
           sparkStore.setVolatileBlock({
             id: newBlockId.value,
             serviceId: serviceId.value,
             type: blockType,
             groups: [0],
-            data: sparkStore.spec({ type: blockType }).generate(),
+            data: blockData,
           });
+          newBlock.value = sparkStore.blockByAddress(newBlockAddress.value);
         }
       }
 
-      const blockId = createMode.value === 'new'
-        ? newBlockId.value
-        : existingBlockId.value;
-      const block = sparkStore.blockById(serviceId.value, blockId);
+      const actualBlock = createMode.value === 'new'
+        ? newBlock.value
+        : existingBlock.value;
 
-      if (block) {
-        await widgetStore.setVolatileWidget({
+      if (actualBlock) {
+        widgetStore.setVolatileWidget({
           id: widgetId,
-          title: block.id,
+          title: actualBlock.id,
           feature: blockType,
           dashboard: dashboardId.value,
           order: 0,
           config: {
-            ...(activeWidget.value?.config ?? {}),
-            serviceId: block.serviceId,
-            blockId: block.id,
+            ...(newWidget.value?.config ?? {}),
+            serviceId: actualBlock.serviceId,
+            blockId: actualBlock.id,
           },
           ...defaultWidgetSize,
           volatile: true,
         });
-        activeWidget.value = widgetStore.widgetById(widgetId);
-      }
-      else {
-        activeWidget.value = null;
+        newWidget.value = widgetStore.widgetById(widgetId);
       }
     }
 
     async function configureBlock(): Promise<void> {
+      generateVolatileObjects();
+      await nextTick();
+
       if (!canCreate.value) {
         return;
       }
 
-      await ensureVolatile();
-
-      if (createMode.value === 'new'
-        && activeBlock.value
-        && activeWidget.value) {
-        activeDialog.value = createDialog({
-          component: 'WidgetDialog',
-          componentProps: {
-            widgetId: activeWidget.value.id,
-            mode: 'Full',
-          },
-        });
-      }
-
-      if (createMode.value === 'existing'
-        && existingBlock.value
-        && activeWidget.value) {
-        createBlockDialog(blockAddress.value);
-      }
+      createDialog({
+        component: 'WidgetDialog',
+        componentProps: {
+          widgetId,
+          mode: 'Full',
+        },
+      });
     }
 
-    async function createWidget(): Promise<void> {
+    async function finish(): Promise<void> {
+      generateVolatileObjects();
+      await nextTick();
+
       if (!canCreate.value) {
         return;
       }
 
-      await ensureVolatile();
+      const persistentWidget = { ...newWidget.value!, volatile: undefined };
+      const widget = await tryCreateWidget<BlockConfig>(persistentWidget);
 
-      if (createMode.value === 'new'
-        && activeBlock.value
-        && activeWidget.value
-      ) {
-        const realCandidate = { ...activeBlock.value, meta: undefined };
-        const block = await tryCreateBlock(realCandidate);
-        if (!block) {
+      if (!widget) {
+        return onClose();
+      }
+
+      if (createMode.value === 'new') {
+        const persistentBlock = { ...newBlock.value!, meta: undefined };
+        const createdBlock = await tryCreateBlock(persistentBlock);
+        if (!createdBlock) {
+          widgetStore.removeWidget(widget);
           return onClose();
         }
-        const widget = await tryCreateWidget<BlockConfig>(activeWidget.value);
-        return onDone({ block, widget });
       }
 
-      if (createMode.value === 'existing'
-        && existingBlock.value
-        && activeWidget.value
-      ) {
-        const block = existingBlock.value;
-        const widget = await tryCreateWidget<BlockConfig>(activeWidget.value);
-        return onDone({ block, widget });
-      }
+      const block = createMode.value === 'new'
+        ? sparkStore.blockByAddress(newBlockAddress.value)
+        : sparkStore.blockByAddress(existingBlockAddress.value);
+
+      return onDone({ block, widget });
     }
 
     onBeforeUnmount(() => {
-      if (activeBlock.value) {
-        sparkStore.removeVolatileBlock(activeBlock.value);
-      }
-      if (activeWidget.value) {
-        widgetStore.removeVolatileWidget(activeWidget.value);
-      }
+      sparkStore.removeVolatileBlock(newBlockAddress.value);
+      widgetStore.removeVolatileWidget({ id: widgetId });
     });
 
     return {
@@ -229,17 +227,17 @@ export default defineComponent({
       serviceId,
       dashboardId,
       existingBlockId,
-      createdBlockIdRules,
-      validator,
+      blockIdRules,
+      blockIdValidator,
       newBlockId,
       serviceOpts,
       blockOpts,
-      blockAddress,
+      existingBlockAddress,
       existingBlock,
       canCreate,
       showIdKeyboard,
       configureBlock,
-      createWidget,
+      finish,
     };
   },
 });
@@ -270,7 +268,7 @@ export default defineComponent({
       <template v-if="createMode === 'new'">
         <q-input
           v-model="newBlockId"
-          :rules="createdBlockIdRules"
+          :rules="blockIdRules"
           autofocus
           label="Block name"
         >
@@ -296,7 +294,7 @@ export default defineComponent({
 
       <template v-if="createMode === 'existing'">
         <BlockAddressField
-          v-model="blockAddress"
+          v-model="existingBlockAddress"
           :creatable="false"
           label="Existing block"
         />
@@ -317,7 +315,7 @@ export default defineComponent({
         unelevated
         label="Create"
         color="primary"
-        @click="createWidget"
+        @click="finish"
       />
     </template>
   </WizardBody>

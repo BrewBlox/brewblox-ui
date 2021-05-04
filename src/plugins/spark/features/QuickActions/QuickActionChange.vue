@@ -59,7 +59,7 @@ export default defineComponent({
           serviceId,
           spec,
           block: block.value,
-          title: featureStore.widgetTitle(block.value?.type ?? null),
+          title: featureStore.widgetTitle(block.value?.type),
           fields: spec?.fields
             .filter(f => !f.readonly)
             .map(f => ({

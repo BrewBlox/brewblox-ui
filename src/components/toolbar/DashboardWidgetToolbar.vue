@@ -3,6 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { createDialog } from '@/utils/dialog';
+import { startChangeWidgetTitle } from '@/utils/widgets';
 
 export default defineComponent({
   name: 'DashboardWidgetToolbar',
@@ -24,7 +25,6 @@ export default defineComponent({
       widgetId,
       widget,
       featureTitle,
-      startChangeWidgetTitle,
     } = useWidget.setup();
 
     const title = computed<string>(
@@ -48,7 +48,7 @@ export default defineComponent({
         emit('title-click');
       }
       else {
-        startChangeWidgetTitle();
+        startChangeWidgetTitle(widget.value);
       }
     }
 

@@ -3,9 +3,9 @@ import { computed, defineComponent, reactive, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockType, WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
+import { WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
+import { getWiFiSettingsBlock } from '@/plugins/spark/utils';
 import { createDialog } from '@/utils/dialog';
-import { typeMatchFilter } from '@/utils/functional';
 import notify from '@/utils/notify';
 
 const securityOpts: SelectOption<WifiSecurityType>[] = [
@@ -56,8 +56,7 @@ export default defineComponent({
     });
 
     const block = computed<WiFiSettingsBlock>(
-      () => sparkStore.serviceBlocks(props.serviceId)
-        .find(typeMatchFilter<WiFiSettingsBlock>(BlockType.WiFiSettings))!,
+      () => getWiFiSettingsBlock(props.serviceId)!,
     );
 
     async function save(): Promise<void> {

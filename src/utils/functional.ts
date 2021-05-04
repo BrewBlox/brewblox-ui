@@ -324,7 +324,7 @@ export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
  */
 export function findById<T extends HasId>(
   arr: T[],
-  id: string | null,
+  id: Nullable<string>,
   fallback: T | null = null,
 ): T | typeof fallback {
   return id != null

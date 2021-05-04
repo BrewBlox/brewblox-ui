@@ -3,66 +3,13 @@ import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import round from 'lodash/round';
 
-import {
-  durationMs,
-  durationString,
-  isDurationString,
-  isDurationUnit,
-} from '@/utils/duration';
+import { durationMs, isDurationString } from '@/utils/duration';
 
-import { isBloxField, isJSBloxField } from './BloxField';
 import { findGroup, isCompatibleQty } from './groups';
 import { JSBloxField, Quantity } from './types';
+import { isQuantity, prettyQty, roundedQty } from './utils';
 
 type WrapperValue = Quantity | number | string | null;
-
-export const isQuantity =
-  (obj: unknown): obj is Quantity =>
-    isBloxField(obj)
-    && obj.__bloxtype === 'Quantity';
-
-export const isJSQuantity =
-  (obj: unknown): obj is JSQuantity =>
-    isJSBloxField(obj)
-    && obj.__bloxtype === 'Quantity';
-
-export const prettyUnit = (value: Quantity | string | null | undefined): string => {
-  const unit = isQuantity(value) ? value.unit : value;
-  if (!unit) {
-    return '';
-  }
-  return unit
-    .replace(/delta_/g, '')
-    .replace(/\b(deg)?(Celsius|Fahrenheit|Kelvin)/gi,
-      (full, deg, unit: string) => `deg${unit.charAt(0).toUpperCase()}`)
-    .replace(/\bdeg(\b|[A-Z])/g, '°$1') // deg, degC, degX, degSomething
-    .replace(/(milliseconds?|millis)/gi, 'ms')
-    .replace(/(seconds?|sec|minutes?|min|hours?|days?)/gi, v => v.charAt(0).toLowerCase())
-    .replace(/1 ?\/ ?/gi, '/') // 1 / degC
-    .replace(/ ?\/ ?/gi, '/')  // degC / hour
-    .replace(/ ?\* ?/gi, '·');  // degC * hour
-};
-
-
-export const prettyQty =
-  (q: Quantity | null, precision = 2): string => {
-    if (!isQuantity(q)) {
-      return '---';
-    }
-    if (isDurationUnit(q.unit)) {
-      return durationString(q);
-    }
-    const valueStr = isNumber(q.value)
-      ? q.value.toFixed(precision)
-      : '--.--';
-    return `${valueStr} ${prettyUnit(q.unit)}`;
-  };
-
-export const roundedQty =
-  (q: Quantity, precision = 2): Quantity => ({
-    ...q,
-    value: round(q.value ?? 0, precision),
-  });
 
 const libUnit = (unit: string): string =>
   findGroup(unit)?.convert(unit) ?? unit;

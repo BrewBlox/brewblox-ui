@@ -3,7 +3,8 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { ProfileValues, profileValues as calcProfileValues } from '@/plugins/spark/utils';
+import { ProfileValues } from '@/plugins/spark/types';
+import { calculateProfileValues } from '@/plugins/spark/utils';
 import { PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
 import { bloxQty, prettyQty, tempQty } from '@/utils/bloxfield';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
@@ -130,7 +131,7 @@ export default defineComponent({
     });
 
     const profileValues = computed<ProfileValues | null>(
-      () => calcProfileValues(profile.value),
+      () => calculateProfileValues(profile.value),
     );
 
     function checkMismatch(pid: PidBlock | null, config: PidConfig | null | undefined): boolean {

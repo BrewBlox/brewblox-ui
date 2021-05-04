@@ -5,7 +5,7 @@ export * from '@/shared-types/spark-service-types';
 import { Layout } from 'plotly.js';
 
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
-import { Block, BlockOrIntfType, StoreObject } from '@/shared-types';
+import { Block, BlockOrIntfType, Quantity, StoreObject } from '@/shared-types';
 import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 import { Widget } from '@/store/widgets';
@@ -82,6 +82,12 @@ export interface ChannelMapping {
   id: string;
   nid: number;
   name: string;
+}
+
+export interface ProfileValues {
+  prev: Quantity;
+  current: Quantity;
+  next: Quantity;
 }
 
 export interface DisplayOpts {

@@ -26,12 +26,12 @@ export class SparkGlobalModule extends VuexModule {
     return this.presets.map(v => v.id);
   }
 
-  public moduleById(serviceId: string | null): SparkServiceModule | null {
+  public moduleById(serviceId: Nullable<string>): SparkServiceModule | null {
     if (!serviceId) { return null; }
     return this.modules.find(v => v.id === serviceId) ?? null;
   }
 
-  public blockById<T extends Block>(serviceId: string | null, blockId: string | null): T | null {
+  public blockById<T extends Block>(serviceId: Nullable<string>, blockId: Nullable<string>): T | null {
     if (!serviceId || !blockId) { return null; }
     return this.moduleById(serviceId)?.blockById<T>(blockId) ?? null;
   }
@@ -46,7 +46,7 @@ export class SparkGlobalModule extends VuexModule {
     return this.moduleById(addr.serviceId)?.fieldByAddress(addr) ?? null;
   }
 
-  public serviceBlocks(serviceId: string | null): Block[] {
+  public serviceBlocks(serviceId: Nullable<string>): Block[] {
     return this.moduleById(serviceId)?.blocks ?? [];
   }
 
@@ -63,7 +63,7 @@ export class SparkGlobalModule extends VuexModule {
     return this.specById<T>(type);
   }
 
-  public fieldSpec<T extends Block>(addr: BlockFieldAddress | null): BlockField<T> | null {
+  public fieldSpec<T extends Block>(addr: Nullable<BlockFieldAddress>): BlockField<T> | null {
     return addr && addr.type && addr.field
       ? this.specById(addr.type as T['type'])?.fields.find(f => f.key === addr.field) ?? null
       : null;
@@ -73,7 +73,7 @@ export class SparkGlobalModule extends VuexModule {
     this.moduleById(block.serviceId)?.setVolatileBlock(block);
   }
 
-  public removeVolatileBlock(block: Block): void {
+  public removeVolatileBlock(block: BlockAddress): void {
     this.moduleById(block.serviceId)?.removeVolatileBlock(block);
   }
 
@@ -92,12 +92,10 @@ export class SparkGlobalModule extends VuexModule {
     await this.moduleById(block.serviceId)?.createBlock(block);
   }
 
-
   @Action
   public async removeBlock(block: Block): Promise<void> {
     await this.moduleById(block.serviceId)?.removeBlock(block);
   }
-
 
   @Action
   public async validateService(serviceId: string): Promise<boolean> {

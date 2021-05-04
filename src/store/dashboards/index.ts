@@ -16,11 +16,11 @@ export class DashboardModule extends VuexModule {
     return this.dashboards.map(v => v.id);
   }
 
-  public dashboardById(id: string): Dashboard | null {
+  public dashboardById(id: Nullable<string>): Dashboard | null {
     return findById(this.dashboards, id);
   }
 
-  public dashboardTitle(id: string): string {
+  public dashboardTitle(id: Nullable<string>): string {
     return this.dashboardById(id)?.title ?? 'Unknown';
   }
 

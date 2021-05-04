@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType } from 'vue';
 import { useField } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockField, BlockFieldAddress, ComparedBlockType } from '@/plugins/spark/types';
-import { prettyAny } from '@/plugins/spark/utils';
+import { prettyAny } from '@/utils/bloxfield';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 
 export default defineComponent({

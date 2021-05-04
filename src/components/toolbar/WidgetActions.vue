@@ -2,6 +2,12 @@
 import { defineComponent } from 'vue';
 
 import { useWidget } from '@/composables';
+import {
+  startChangeWidgetTitle,
+  startCopyWidget,
+  startMoveWidget,
+  startRemoveWidget,
+} from '@/utils/widgets';
 
 export default defineComponent({
   name: 'WidgetActions',
@@ -13,14 +19,14 @@ export default defineComponent({
   },
   setup() {
     const {
+      widget,
       isVolatileWidget,
-      startCopyWidget,
-      startMoveWidget,
-      startRemoveWidget,
     } = useWidget.setup();
 
     return {
+      widget,
       isVolatileWidget,
+      startChangeWidgetTitle,
       startCopyWidget,
       startMoveWidget,
       startRemoveWidget,
@@ -31,10 +37,27 @@ export default defineComponent({
 
 <template>
   <ActionSubmenu v-if="!isVolatileWidget" label="Widget">
-    <ActionItem icon="file_copy" label="Copy" @click="startCopyWidget" />
-    <ActionItem icon="exit_to_app" label="Move" @click="startMoveWidget" />
+    <ActionItem
+      icon="file_copy"
+      label="Copy"
+      @click="startCopyWidget(widget)"
+    />
+    <ActionItem
+      icon="exit_to_app"
+      label="Move"
+      @click="startMoveWidget(widget)"
+    />
     <slot />
-    <RenameWidgetAction v-if="!noRename" />
-    <ActionItem icon="delete" label="Remove" @click="startRemoveWidget" />
+    <ActionItem
+      v-if="!noRename"
+      icon="edit"
+      label="Rename"
+      @click="startChangeWidgetTitle(widget)"
+    />
+    <ActionItem
+      icon="delete"
+      label="Remove"
+      @click="startRemoveWidget(widget)"
+    />
   </ActionSubmenu>
 </template>

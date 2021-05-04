@@ -2,20 +2,22 @@
 import { defineComponent, ref } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
+import { startChangeBlockId } from '@/plugins/spark/utils';
 
 export default defineComponent({
   name: 'DashboardBlockWidgetToolbar',
   setup() {
     const {
       widgetId,
+      block,
       hasGraph,
       graphConfig,
-      startChangeBlockId,
     } = useBlockWidget.setup();
     const graphModalOpen = ref(false);
 
     return {
       widgetId,
+      block,
       hasGraph,
       graphConfig,
       graphModalOpen,
@@ -26,7 +28,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <WidgetToolbar @title-click="startChangeBlockId">
+  <WidgetToolbar @title-click="startChangeBlockId(block)">
     <BlockGraph
       v-if="graphModalOpen"
       :id="`graph-full--${widgetId}`"

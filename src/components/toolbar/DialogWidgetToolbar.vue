@@ -2,6 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
+import { startChangeWidgetTitle } from '@/utils/widgets';
 
 export default defineComponent({
   name: 'DialogWidgetToolbar',
@@ -22,7 +23,6 @@ export default defineComponent({
     const {
       widget,
       featureTitle,
-      startChangeWidgetTitle,
     } = useWidget.setup();
 
     const toggleBtnIcon = computed<string>(
@@ -42,7 +42,7 @@ export default defineComponent({
         emit('title-click');
       }
       else {
-        startChangeWidgetTitle();
+        startChangeWidgetTitle(widget.value);
       }
     }
 

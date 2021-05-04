@@ -17,7 +17,7 @@ export class WidgetModule extends VuexModule {
     return this.widgets.map(v => v.id);
   }
 
-  public widgetById<T extends Widget>(id: string | null): T | null {
+  public widgetById<T extends Widget>(id: Nullable<string>): T | null {
     return (findById(this.widgets, id) ?? findById(this.volatileWidgets, id)) as T | null;
   }
 
@@ -29,20 +29,23 @@ export class WidgetModule extends VuexModule {
     this.volatileWidgets = extendById(this.volatileWidgets, widget);
   }
 
-  public removeVolatileWidget(widget: Widget): void {
+  public removeVolatileWidget(widget: HasId): void {
     this.volatileWidgets = filterById(this.volatileWidgets, widget);
   }
 
   @Action
   public async createWidget(widget: Widget): Promise<void> {
     if (widget.volatile) {
-      this.volatileWidgets = filterById(this.volatileWidgets, widget);
+      throw new Error(`Widget ${widget.title} is volatile`);
     }
-    await api.create({ ...widget, volatile: undefined }); // triggers callback
+    await api.create(widget); // triggers callback
   }
 
   @Action
   public async appendWidget(widget: Widget): Promise<void> {
+    if (widget.volatile) {
+      throw new Error(`Widget ${widget.title} is volatile`);
+    }
     const order = this.widgets
       .filter(v => v.dashboard === widget.dashboard)
       .length + 1;

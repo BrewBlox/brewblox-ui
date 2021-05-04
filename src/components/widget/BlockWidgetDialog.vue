@@ -64,10 +64,7 @@ export default defineComponent({
     });
 
     onUnmounted(() => {
-      const widget = widgetStore.widgetById(widgetId);
-      if (widget) {
-        widgetStore.removeVolatileWidget(widget);
-      }
+      widgetStore.removeVolatileWidget({ id: widgetId });
     });
 
     const widget = computed<Widget | null>(

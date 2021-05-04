@@ -3,7 +3,7 @@ import isEqual from 'lodash/isEqual';
 import { builderStore } from '@/plugins/builder/store';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
-import { tryDisplayBlock } from '@/plugins/spark/utils';
+import { startAddBlockToDisplay } from '@/plugins/spark/utils';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
 import { bloxQty, inverseTempQty } from '@/utils/bloxfield';
@@ -86,7 +86,7 @@ export function createOutputActions(): QuickstartAction[] {
     async (config: QuickstartConfig) => {
       for (const val of config.displayedBlocks) {
         const block = sparkStore.blockById(config.serviceId, val.blockId);
-        await tryDisplayBlock(block!, val.opts);
+        await startAddBlockToDisplay(block!, val.opts);
       }
     },
   ];
