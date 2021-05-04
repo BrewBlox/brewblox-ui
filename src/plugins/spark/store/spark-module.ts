@@ -20,7 +20,7 @@ import { isSparkPatch, isSparkState } from '@/plugins/spark/utils';
 import { serviceStore } from '@/store/services';
 import { widgetStore } from '@/store/widgets';
 import { STATE_TOPIC } from '@/utils/const';
-import { extendById, filterById, findById, typeMatchFilter } from '@/utils/functional';
+import { deepCopy, extendById, filterById, findById, typeMatchFilter } from '@/utils/functional';
 
 import * as api from './api';
 import {
@@ -164,7 +164,7 @@ export class SparkServiceModule extends VuexModule {
     }
     block.meta = block.meta ?? {};
     block.meta.volatile = true;
-    this.volatileBlocks = extendById(this.volatileBlocks, block);
+    this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
   }
 
   public removeVolatileBlock({ id }: BlockAddress): void {
@@ -189,7 +189,7 @@ export class SparkServiceModule extends VuexModule {
   @Action
   public async saveBlock(block: Block): Promise<void> {
     if (block.meta?.volatile) {
-      this.volatileBlocks = extendById(this.volatileBlocks, block);
+      this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
     }
     else {
       await api.persistBlock(block); // triggers patch event

@@ -50,9 +50,11 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       throw new Error(`No Spark Module found for widget ${widget.value?.title} (${serviceId} / ${blockId})`);
     }
 
-    const block = ref<BlockT>(
-      sparkModule.blockById(config.value.blockId)!,
-    );
+    const block = ref<BlockT>(sparkModule.blockById(config.value.blockId)!);
+
+    if (!block.value) {
+      throw new Error(`Block not found: (${serviceId} / ${blockId})`);
+    }
 
     watch(
       () => sparkModule.blockById(config.value.blockId),
