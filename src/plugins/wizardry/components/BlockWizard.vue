@@ -1,4 +1,5 @@
 <script lang="ts">
+import isMatch from 'lodash/isMatch';
 import { nanoid } from 'nanoid';
 import { DialogChainObject } from 'quasar';
 import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
@@ -142,9 +143,11 @@ export default defineComponent({
 
     function ensureVolatile(): void {
       if (activeBlock.value
-        && (activeBlock.value.id !== blockId.value
-          || activeBlock.value.serviceId !== serviceId.value
-          || activeBlock.value.type !== selected.value?.value)) {
+        && !isMatch(activeBlock.value, {
+          id: blockId.value,
+          serviceId: serviceId.value,
+          type: selected.value?.value,
+        })) {
         sparkStore.removeVolatileBlock(activeBlock.value);
         activeBlock.value = null;
       }
