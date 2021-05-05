@@ -14,8 +14,15 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    emitToggle: {
+      type: Boolean,
+      default: false,
+    },
   },
-  setup(props) {
+  emits: [
+    'change',
+  ],
+  setup(props, { emit }) {
     const { block, saveBlock } = useBlockWidget.setup();
 
     const enabled = computed<boolean>(
@@ -23,8 +30,13 @@ export default defineComponent({
     );
 
     function toggleEnabled(): void {
-      block.value.data[props.dataKey] = !enabled.value;
-      saveBlock();
+      if (props.emitToggle) {
+        emit('change', !enabled.value);
+      }
+      else {
+        block.value.data[props.dataKey] = !enabled.value;
+        saveBlock();
+      }
     }
 
     return {

@@ -196,10 +196,11 @@ export class SparkServiceModule extends VuexModule {
     }
   }
 
-  public async modifyBlock<T extends Block>(block: T, func: ((v: T) => T)): Promise<void> {
-    const actual = this.blockByAddress<T>(block);
+  public async modifyBlock<T extends Block>(block: T, func: ((v: T) => void)): Promise<void> {
+    const actual = deepCopy(this.blockByAddress<T>(block));
     if (actual) {
-      return this.saveBlock(func(actual));
+      func(actual);
+      return this.saveBlock(actual);
     }
   }
 

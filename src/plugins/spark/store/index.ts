@@ -1,7 +1,8 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
+import { Link } from '@/shared-types';
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { deepCopy, extendById, filterById, findById } from '@/utils/functional';
 
 import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
 import type { Block, BlockField, BlockFieldAddress } from '../types';
@@ -39,6 +40,10 @@ export class SparkGlobalModule extends VuexModule {
   public blockByAddress<T extends Block>(addr: T | BlockAddress | null): T | null {
     if (!addr) { return null; }
     return this.moduleById(addr.serviceId)?.blockByAddress<T>(addr) ?? null;
+  }
+
+  public blockByLink<T extends Block>(serviceId: Nullable<string>, link: Nullable<Link>): T | null {
+    return this.moduleById(serviceId)?.blockByLink<T>(link) ?? null;
   }
 
   public fieldByAddress(addr: BlockFieldAddress | null): any {
@@ -85,6 +90,14 @@ export class SparkGlobalModule extends VuexModule {
   @Action
   public async saveBlock(block: Block): Promise<void> {
     await this.moduleById(block.serviceId)?.saveBlock(block);
+  }
+
+  public async modifyBlock<T extends Block>(block: T, func: ((v: T) => void)): Promise<void> {
+    const actual = deepCopy(this.blockByAddress<T>(block));
+    if (actual) {
+      func(actual);
+      return this.saveBlock(actual);
+    }
   }
 
   @Action

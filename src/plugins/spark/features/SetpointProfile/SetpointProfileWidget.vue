@@ -5,6 +5,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Link, SetpointProfileBlock } from '@/plugins/spark/types';
 import { prettyLink } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 import { deepCopy, isJsonEqual } from '@/utils/functional';
 
 import { GraphProps, profileGraphProps } from './helpers';
@@ -12,6 +13,7 @@ import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';
 import ProfilePresetAction from './ProfilePresetAction.vue';
 import SetpointProfileBasic from './SetpointProfileBasic.vue';
+import SetpointProfileDisableDialog from './SetpointProfileDisableDialog.vue';
 import SetpointProfileFull from './SetpointProfileFull.vue';
 
 type SetpointProfileData = SetpointProfileBlock['data'];
@@ -27,7 +29,7 @@ export default defineComponent({
   },
   setup() {
     const { context, inDialog } = useContext.setup();
-    const { block } = useBlockWidget.setup<SetpointProfileBlock>();
+    const { block, saveBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
     const usedData = ref<SetpointProfileData>(deepCopy(block.value.data));
     const revision = ref<Date>(new Date());
@@ -43,6 +45,21 @@ export default defineComponent({
     function refresh(): void {
       usedData.value = deepCopy(block.value.data);
       revision.value = new Date();
+    }
+
+    function changeEnabled(enabled: boolean): void {
+      if (enabled) {
+        block.value.data.enabled = enabled;
+        saveBlock();
+      }
+      else {
+        createDialog({
+          component: SetpointProfileDisableDialog,
+          componentProps: {
+            block: block.value,
+          },
+        });
+      }
     }
 
     watch(
@@ -62,6 +79,7 @@ export default defineComponent({
       target,
       graphProps,
       refresh,
+      changeEnabled,
     };
   },
 });
@@ -97,6 +115,8 @@ export default defineComponent({
         <BlockEnableToggle
           v-else
           :hide-enabled="context.mode === 'Basic'"
+          emit-toggle
+          @change="changeEnabled"
         >
           <template #enabled>
             Setpoint Profile is enabled and driving <i>{{ prettyLink(target) }}</i>.
