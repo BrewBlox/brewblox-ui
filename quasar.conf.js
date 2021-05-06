@@ -4,7 +4,7 @@ const path = require('path');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
-const zlib = require('zlib');
+const webpack = require('webpack');
 
 module.exports = configure(function (ctx) {
   const buildDate = new Date().toISOString();
@@ -119,7 +119,9 @@ module.exports = configure(function (ctx) {
 
           // We're only using a subset from plotly
           // Add alias to enable typing regardless
-          'plotly.js': 'plotly.js-basic-dist',
+          'plotly.js': path.resolve(__dirname, './plotly-bundle'),
+          // The bundler file still needs access to the actual plotly module
+          'plotly-src': path.resolve(__dirname, './node_modules/plotly.js'),
 
           // This matches the @ alias set in tsconfig.json
           '@': path.resolve(__dirname, './src'),
@@ -129,6 +131,10 @@ module.exports = configure(function (ctx) {
           // mqtt.js depends on multiple Node.JS libraries
           // In webpack 5+, these are no longer polyfilled by default
           new NodePolyfillPlugin(),
+          new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+            process: 'process/browser',
+          }),
         );
 
         if (ctx.prod) {
@@ -141,19 +147,7 @@ module.exports = configure(function (ctx) {
         config.plugins.splice(
           config.plugins.findIndex(v => v instanceof CompressionPlugin),
           1,
-          new CompressionPlugin({
-            filename: '[path][base].br',
-            algorithm: 'brotliCompress',
-            test: /\.(js|css|html|svg)$/,
-            compressionOptions: {
-              params: {
-                [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
-              },
-            },
-            threshold: 10240,
-            minRatio: 0.8,
-            deleteOriginalAssets: false,
-          }),
+          new CompressionPlugin(),
         );
 
       },
