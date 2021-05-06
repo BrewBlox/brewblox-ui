@@ -1,7 +1,6 @@
 const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
 const webpack = require('webpack');
@@ -121,16 +120,22 @@ module.exports = configure(function (ctx) {
           // Add alias to enable typing regardless
           'plotly.js': path.resolve(__dirname, './plotly-bundle'),
           // The bundler file still needs access to the actual plotly module
-          'plotly-src': path.resolve(__dirname, './node_modules/plotly.js'),
+          'plotly-dist': path.resolve(__dirname, './node_modules/plotly.js'),
 
           // This matches the @ alias set in tsconfig.json
           '@': path.resolve(__dirname, './src'),
         };
 
+        // Replace the compression plugin because it was generating unnamed output files
+        config.plugins.splice(
+          config.plugins.findIndex(v => v instanceof CompressionPlugin),
+          1,
+          new CompressionPlugin(),
+        );
+
         config.plugins.push(
           // mqtt.js depends on multiple Node.JS libraries
           // In webpack 5+, these are no longer polyfilled by default
-          new NodePolyfillPlugin(),
           new webpack.ProvidePlugin({
             Buffer: ['buffer', 'Buffer'],
             process: 'process/browser',
@@ -142,14 +147,6 @@ module.exports = configure(function (ctx) {
             new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
           );
         }
-
-        // Replace the compression plugin because it was generating unnamed output files
-        config.plugins.splice(
-          config.plugins.findIndex(v => v instanceof CompressionPlugin),
-          1,
-          new CompressionPlugin(),
-        );
-
       },
     },
   };
