@@ -5,21 +5,22 @@ export * from '@/shared-types/spark-service-types';
 import { Layout } from 'plotly.js';
 
 import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
-import { Block, BlockOrIntfType, StoreObject } from '@/shared-types';
-import { Crud, WidgetFeature } from '@/store/features';
+import { Block, BlockOrIntfType, Quantity, StoreObject } from '@/shared-types';
+import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
+import { Widget } from '@/store/widgets';
 
 export type PageMode =
   | 'Relations'
   | 'List'
 
 export interface SparkSessionConfig {
-  expandedBlocks: { [id: string]: boolean };
-  sorting: string;
   pageMode: PageMode;
+  sorting: string;
+  expanded: string[];
 }
 
-export type SparkService = Service<{}>;
+export type SparkService = Service<Record<string, never>>;
 
 export interface SparkFeature {
   feature: WidgetFeature<BlockConfig>;
@@ -63,6 +64,8 @@ export interface RelationEdge {
 export interface RelationNode {
   id: string;
   type: string;
+  name?: string; // overrides `id` for rendering
+  title?: string; // overrides `type` for rendering
 }
 
 export interface Limiters {
@@ -81,6 +84,12 @@ export interface ChannelMapping {
   name: string;
 }
 
+export interface ProfileValues {
+  prev: Quantity;
+  current: Quantity;
+  next: Quantity;
+}
+
 export interface DisplayOpts {
   color: string;
   name: string;
@@ -93,17 +102,13 @@ export interface DisplayOpts {
 export interface BlockConfig {
   serviceId: string;
   blockId: string;
+  volatile?: true;
   queryParams?: QueryParams;
   graphAxes?: GraphValueAxes;
   graphLayout?: Partial<Layout>;
 }
 
-export interface BlockCrud<BlockT extends Block = Block>
-  extends Crud<BlockConfig> {
-  block: BlockT;
-  isStoreBlock: boolean;
-  saveBlock: (block: BlockT) => unknown | Promise<unknown>;
-}
+export type BlockWidget = Widget<BlockConfig>
 
 export interface BlockDataPreset<T extends Block = Block> {
   name: string;

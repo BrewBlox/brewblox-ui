@@ -1,26 +1,29 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-
-@Component
-export default class ActionMenu extends Vue {
-
-  @Prop({ type: String, default: 'mdi-dots-vertical' })
-  public readonly icon!: string;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly flat!: boolean;
-
-  @Prop({ type: String, default: 'Actions' })
-  public readonly label!: string;
-}
+export default defineComponent({
+  name: 'ActionMenu',
+  props: {
+    icon: {
+      type: String,
+      default: 'mdi-dots-vertical',
+    },
+    flat: {
+      type: Boolean,
+      default: true,
+    },
+    label: {
+      type: String,
+      default: 'Actions',
+    },
+  },
+});
 </script>
 
 <template>
   <q-btn v-bind="{...$attrs, flat, icon}">
     <q-menu
-      content-class="row q-gutter-x-sm bordered"
+      class="row q-gutter-x-sm bordered action-menu"
       anchor="bottom right"
       self="top right"
     >
@@ -35,3 +38,9 @@ export default class ActionMenu extends Vue {
     <slot />
   </q-btn>
 </template>
+
+<style lang="sass">
+// Undo unwanted left-most margin introduced by q-gutter-x-sm
+.action-menu > *:first-child
+  margin-left: 0
+</style>

@@ -1,31 +1,40 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
+import { Plugin } from 'vue';
 
-import { ref } from '@/helpers/component-ref';
-import { WidgetFeature } from '@/store/features';
+import { featureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 
 import widget from './QuickActionsWidget.vue';
 import { QuickActionsConfig } from './types';
 
-const feature: WidgetFeature<QuickActionsConfig> = {
-  id: 'QuickActions',
-  title: 'Quick Actions',
-  component: ref(widget),
-  wizard: true,
-  widgetSize: {
-    cols: 4,
-    rows: 5,
-  },
-  generateConfig: () => ({
-    actions: [
-      {
-        id: uid(),
-        name: 'Example action - click to edit',
-        changes: [],
+
+const plugin: Plugin = {
+  install(app) {
+
+    const feature: WidgetFeature<QuickActionsConfig> = {
+      id: 'QuickActions',
+      title: 'Quick Actions',
+      component: cref(app, widget),
+      wizard: true,
+      widgetSize: {
+        cols: 4,
+        rows: 5,
       },
-    ],
-    changeIdMigrated: true,
-    serviceIdMigrated: true,
-  }),
+      generateConfig: () => ({
+        actions: [
+          {
+            id: nanoid(),
+            name: 'Example action - click to edit',
+            changes: [],
+          },
+        ],
+        changeIdMigrated: true,
+        serviceIdMigrated: true,
+      }),
+    };
+
+    featureStore.addWidgetFeature(feature);
+  },
 };
 
-export default { feature };
+export default plugin;

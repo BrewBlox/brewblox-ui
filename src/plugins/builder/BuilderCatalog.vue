@@ -1,76 +1,109 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
-import { objectStringSorter } from '@/helpers/functional';
+import { useDialog } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { objectStringSorter } from '@/utils/functional';
 
-import { SQUARE_SIZE } from './getters';
-import { asStatePart } from './helpers';
 import { builderStore } from './store';
-import { PartSpec, PersistentPart, StatePart } from './types';
+import { FlowPart, PartSpec, PersistentPart } from './types';
+import { asStatePart, squares } from './utils';
 
 interface PartDisplay {
-  part: StatePart;
+  part: FlowPart;
   spec: PartSpec;
 }
 
-
-@Component
-export default class BuilderCatalog extends DialogBase {
-  SQUARE_SIZE: number = SQUARE_SIZE;
-
-  partFilter: string | null = null;
-
-  @Prop({ type: Object, default: () => ({}) })
-  readonly partial!: Partial<PersistentPart>;
-
-  get available(): PartDisplay[] {
-    const filter = (this.partFilter || '').toLowerCase();
-    return builderStore.specs
-      .filter(spec => `${spec.id}|${spec.title}`.toLowerCase().match(filter))
-      .sort(objectStringSorter('title'))
-      .map(spec => ({
-        spec,
-        part: asStatePart({
-          type: spec.id,
-          id: uid(),
-          x: 0,
-          y: 0,
-          rotate: 0,
-          settings: {},
-          flipped: false,
-        }),
-      }));
-  }
-
-  partViewBox(display: PartDisplay): string {
-    return display.part.size.map(v => v * SQUARE_SIZE).join(' ');
-  }
-
-  selectPart(display: PartDisplay): void {
-    this.onDialogOk({ ...display.part, ...this.partial });
-  }
-
-
-  showSearchKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.partFilter,
-    })
-      .onOk((v: string) => this.partFilter = v);
-  }
+function asFlowPart(part: PersistentPart): FlowPart {
+  return { ...asStatePart(part), flows: {} };
 }
+
+export default defineComponent({
+  name: 'BuilderCatalog',
+  props: {
+    ...useDialog.props,
+    partial: {
+      type: Object as PropType<Partial<PersistentPart>>,
+      default: () => ({}),
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
+
+    const partFilter = ref<string | null>(null);
+
+    const available = computed<PartDisplay[]>(
+      () => {
+        const filter = new RegExp(partFilter.value || '', 'i');
+        return builderStore.specs
+          .filter(spec => `${spec.id}|${spec.title}`.match(filter))
+          .sort(objectStringSorter('title'))
+          .map(spec => ({
+            spec,
+            part: asFlowPart({
+              type: spec.id,
+              id: nanoid(),
+              x: 0,
+              y: 0,
+              rotate: 0,
+              settings: {},
+              flipped: false,
+            }),
+          }));
+      },
+    );
+
+    function partViewBox(display: PartDisplay): string {
+      return display.part.size.map(squares).join(' ');
+    }
+
+    function selectPart(display: PartDisplay): void {
+      onDialogOK({ ...display.part, ...props.partial });
+    }
+
+    function showSearchKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: partFilter.value,
+        },
+      })
+        .onOk((v: string) => partFilter.value = v);
+    }
+
+    return {
+      squares,
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      partFilter,
+      available,
+      partViewBox,
+      selectPart,
+      showSearchKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <CardWrapper no-scroll v-bind="{context}">
+    <Card no-scroll>
       <template #toolbar>
         <DialogToolbar title="Part Catalog" />
       </template>
@@ -99,8 +132,8 @@ export default class BuilderCatalog extends DialogBase {
               >
                 <q-item-section side>
                   <svg
-                    :width="`${SQUARE_SIZE}px`"
-                    :height="`${SQUARE_SIZE}px`"
+                    :width="`${squares(1)}px`"
+                    :height="`${squares(1)}px`"
                     :viewBox="`0 0 ${partViewBox(v)}`"
                   >
                     <PartWrapper :part="v.part" />
@@ -112,6 +145,6 @@ export default class BuilderCatalog extends DialogBase {
           </q-card-section>
         </q-scroll-area>
       </div>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>

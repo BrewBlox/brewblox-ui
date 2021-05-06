@@ -1,59 +1,88 @@
 <script lang="ts">
 import isObject from 'lodash/isObject';
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-@Component
-export default class ListSelect extends Vue {
+export default defineComponent({
+  name: 'ListSelect',
+  props: {
+    modelValue: {
+      type: [Object, String, Number, Symbol] as PropType<any>,
+      default: null,
+    },
+    options: {
+      type: Array as PropType<any[]>,
+      required: true,
+    },
+    optionValue: {
+      type: String,
+      default: 'id',
+    },
+    optionLabel: {
+      type: String,
+      default: 'title',
+    },
+    optionClass: {
+      type: [String, Array, Object],
+      default: '',
+    },
+    emitValue: {
+      type: Boolean,
+      default: false,
+    },
+    dense: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:modelValue',
+    'confirm',
+  ],
+  setup(props, { emit }) {
+    const mappedOptions = computed<any[]>(
+      () => props.options
+        .map(opt => isObject(opt)
+          ? opt
+          : {
+            [props.optionValue]: opt,
+            [props.optionLabel]: opt,
+          },
+        ),
+    );
 
-  @Prop({ required: false })
-  public readonly value!: any;
-
-  @Prop({ type: Array, required: true })
-  public readonly options!: any[];
-
-  @Prop({ type: String, default: 'id' })
-  public readonly optionValue!: string;
-
-  @Prop({ type: String, default: 'title' })
-  public readonly optionLabel!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly emitValue!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly dense!: boolean;
-
-  get mappedOptions(): any[] {
-    return this.options
-      .map(opt => isObject(opt)
-        ? opt
-        : {
-          [this.optionValue]: opt,
-          [this.optionLabel]: opt,
-        });
-  }
-
-  matches(opt: any): boolean {
-    if (this.value === null) { return false; }
-    return this.emitValue
-      ? opt[this.optionValue] === this.value
-      : opt[this.optionValue] === this.value[this.optionValue];
-  }
-
-  selectValue(opt: any, save: boolean): void {
-    const value = this.emitValue ? opt[this.optionValue] : opt;
-    if (save) {
-      this.$emit('confirm', value);
+    function matches(opt: any): boolean {
+      const model = props.modelValue;
+      const optValue = opt[props.optionValue];
+      if (model === null) {
+        return false;
+      }
+      else {
+        return props.emitValue
+          ? optValue === model
+          : optValue === model[props.optionValue];
+      }
     }
-    else if (this.matches(opt)) {
-      this.$emit('input', null);
+
+    function selectValue(opt: any, save: boolean): void {
+      const value = props.emitValue ? opt[props.optionValue] : opt;
+      if (save) {
+        emit('confirm', value);
+      }
+      else if (matches(opt)) {
+        emit('update:modelValue', null);
+      }
+      else {
+        emit('update:modelValue', value);
+      }
     }
-    else {
-      this.$emit('input', value);
-    }
-  }
-}
+
+    return {
+      mappedOptions,
+      matches,
+      selectValue,
+    };
+  },
+});
 </script>
 
 <template>
@@ -62,7 +91,8 @@ export default class ListSelect extends Vue {
       v-for="opt in mappedOptions"
       :key="opt[optionValue]"
       :class="[
-        'col clickable q-pl-sm rounded-borders text-h6',
+        'col clickable q-px-sm rounded-borders text-h6',
+        optionClass,
         {'q-py-sm': !dense, 'depth-24': matches(opt)}
       ]"
       @click="selectValue(opt, false)"

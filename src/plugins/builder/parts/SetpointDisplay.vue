@@ -1,27 +1,43 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { CENTER } from '../getters';
+import { CENTER } from '@/plugins/builder/const';
 
+import { usePart } from '../composables';
+import { FlowPart } from '../types';
+import { liquidOnCoord, squares } from '../utils';
 
-@Component
-export default class SetpointDisplay extends PartBase {
-  readonly scaleKey = 'scale';
+export default defineComponent({
+  name: 'SetpointDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      scale,
+      bordered,
+    } = usePart.setup(props.part);
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
+    const color = computed<string>(
+      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+    );
 
-  get color(): string {
-    return this.liquidOnCoord(CENTER)[0] ?? '';
-  }
-}
+    return {
+      squares,
+      bordered,
+      scale,
+      color,
+    };
+  },
+});
 </script>
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
-    <SetpointValues v-bind="{ part }" />
+    <SetpointValues :part="part" settings-key="setpoint" />
     <g class="outline">
       <rect
         v-show="bordered"

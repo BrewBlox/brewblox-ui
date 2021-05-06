@@ -1,24 +1,39 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { HermsConfig } from './types';
 
+export default defineComponent({
+  name: 'HermsMutexTask',
+  props: {
+    config: {
+      type: Object as PropType<HermsConfig>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const mutex = ref<boolean>(true);
 
-@Component
-export default class HermsMutexTask extends QuickStartTaskBase<HermsConfig> {
-  mutex = true;
+    function done(): void {
+      emit('update:config', { ...props.config, mutex: mutex.value });
+      emit('next');
+    }
 
-  done(): void {
-    this.config.mutex = this.mutex;
-    this.updateConfig(this.config);
-    this.next();
-  }
-}
+    return {
+      mutex,
+      done,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -40,14 +55,28 @@ export default class HermsMutexTask extends QuickStartTaskBase<HermsConfig> {
         </q-item-section>
       </q-item>
       <q-item>
-        <q-toggle v-model="mutex" class="q-mx-auto" left-label label="Mutually exclusive heaters" />
+        <q-toggle
+          v-model="mutex"
+          class="q-mx-auto"
+          left-label
+          label="Mutually exclusive heaters"
+        />
       </q-item>
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Next" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Next"
+        color="primary"
+        @click="done"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

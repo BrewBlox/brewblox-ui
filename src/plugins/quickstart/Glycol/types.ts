@@ -1,6 +1,6 @@
-import { JSQuantity } from '@/helpers/bloxfield';
+import { JSQuantity } from '@/utils/bloxfield';
 
-import { PinChannel, QuickStartOutput } from '../types';
+import { PinChannel, QuickstartConfig } from '../types';
 
 export interface GlycolBlockNames {
   beerSensor: string;
@@ -26,8 +26,9 @@ export interface GlycolBlockNames {
   glycolAct: string;
 }
 
-export interface GlycolConfig extends QuickStartOutput {
-  prefix: string;
+export type GlycolControlMode = 'No' | 'Measure' | 'Control'
+
+export interface GlycolConfig extends QuickstartConfig {
   names: GlycolBlockNames;
   heated: boolean;
   coolPin: PinChannel;
@@ -37,7 +38,7 @@ export interface GlycolConfig extends QuickStartOutput {
   glycolSensor: string;
   beerSensor: string;
 
-  glycolControl: 'No' | 'Measure' | 'Control';
+  glycolControl: GlycolControlMode;
 }
 
 export interface GlycolOpts {

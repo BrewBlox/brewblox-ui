@@ -1,30 +1,41 @@
+import { Plugin } from 'vue';
+
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, MockPinsBlock } from '@/plugins/spark/types';
-import { WidgetFeature } from '@/store/features';
+import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './MockPinsWidget.vue';
 
 const typeName = BlockType.MockPins;
 
-const block: BlockSpec<MockPinsBlock> = {
-  id: typeName,
-  generate: () => ({
-    pins: [],
-  }),
-  fields: [],
-};
+const plugin: Plugin = {
+  install(app) {
 
-const feature: WidgetFeature = {
-  ...genericBlockFeature,
-  id: typeName,
-  title: 'Mock Pins',
-  role: 'Output',
-  component: blockWidgetSelector(widget, typeName),
-  widgetSize: {
-    cols: 4,
-    rows: 4,
+    const spec: BlockSpec<MockPinsBlock> = {
+      id: typeName,
+      generate: () => ({
+        pins: [],
+      }),
+      fields: [],
+    };
+
+    const feature: WidgetFeature = {
+      ...genericBlockFeature,
+      id: typeName,
+      title: 'Mock Pins',
+      role: 'Output',
+      component: blockWidgetSelector(app, widget, typeName),
+      widgetSize: {
+        cols: 4,
+        rows: 4,
+      },
+    };
+
+    sparkStore.addBlockSpec(spec);
+    featureStore.addWidgetFeature(feature);
   },
 };
 
-export default { feature, block };
+export default plugin;

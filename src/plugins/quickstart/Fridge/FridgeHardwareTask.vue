@@ -1,68 +1,87 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
+import { hasShared } from '../utils';
 import { FridgeConfig } from './types';
 
+export default defineComponent({
+  name: 'FridgeHardwareTask',
+  props: {
+    config: {
+      type: Object as PropType<FridgeConfig>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const coolPin = ref<PinChannel | null>(props.config.coolPin ?? null);
+    const heatPin = ref<PinChannel | null>(props.config.heatPin ?? null);
+    const fridgeSensor = ref<string | null>(props.config.fridgeSensor ?? null);
 
-@Component
-export default class FridgeHardwareTask extends QuickStartTaskBase<FridgeConfig> {
-  coolPin: PinChannel | null = null;
-  heatPin: PinChannel | null = null;
-  fridgeSensor: string | null = null;
+    const pinSame = computed<boolean>(
+      () => hasShared([coolPin.value, heatPin.value]),
+    );
 
-  get valuesOk(): boolean {
-    return [
-      this.coolPin,
-      this.heatPin,
-      !this.pinSame,
-      this.fridgeSensor,
-    ]
-      .every(Boolean);
-  }
+    const valuesOk = computed<boolean>(
+      () => [
+        coolPin.value,
+        heatPin.value,
+        !pinSame.value,
+        fridgeSensor.value,
+      ]
+        .every(Boolean),
+    );
 
-  get pinSame(): boolean {
-    return hasShared([this.coolPin, this.heatPin]);
-  }
+    function discover(): void {
+      sparkStore.moduleById(props.config.serviceId)?.fetchDiscoveredBlocks();
+    }
 
-  created(): void {
-    this.discover();
+    function startBlockWizard(): void {
+      createBlockWizard(props.config.serviceId);
+    }
 
-    this.coolPin = this.config.coolPin || null;
-    this.heatPin = this.config.heatPin || null;
-    this.fridgeSensor = this.config.fridgeSensor || null;
-  }
+    function taskDone(): void {
+      if (!valuesOk.value) {
+        return;
+      }
+      const updates: Partial<FridgeConfig> = {
+        heatPin: heatPin.value!,
+        coolPin: coolPin.value!,
+        fridgeSensor: fridgeSensor.value!,
+        renamedBlocks: {
+          [fridgeSensor.value!]: props.config.names.fridgeSensor,
+        },
+      };
+      emit('update:config', { ...props.config, ...updates });
+      emit('next');
+    }
 
-  discover(): void {
-    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
-  }
+    onBeforeMount(() => discover());
 
-  startBlockWizard(): void {
-    createBlockWizard(this.config.serviceId);
-  }
-
-  taskDone(): void {
-    this.config.heatPin = this.heatPin!;
-    this.config.coolPin = this.coolPin!;
-    this.config.fridgeSensor = this.fridgeSensor!;
-
-    this.config.renamedBlocks = {
-      [this.fridgeSensor!]: this.config.names.fridgeSensor,
+    return {
+      coolPin,
+      heatPin,
+      fridgeSensor,
+      pinSame,
+      valuesOk,
+      discover,
+      startBlockWizard,
+      taskDone,
     };
-
-    this.updateConfig(this.config);
-    this.next();
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -100,13 +119,13 @@ export default class FridgeHardwareTask extends QuickStartTaskBase<FridgeConfig>
           </p>
         </q-item-section>
       </q-item>
-      <QuickStartMockCreateField
+      <QuickstartMockCreateField
         :service-id="config.serviceId"
         :names="[config.names.fridgeSensor]"
       />
       <q-item>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-model="coolPin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -114,7 +133,7 @@ export default class FridgeHardwareTask extends QuickStartTaskBase<FridgeConfig>
           />
         </q-item-section>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-model="heatPin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -124,7 +143,7 @@ export default class FridgeHardwareTask extends QuickStartTaskBase<FridgeConfig>
       </q-item>
       <q-item>
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="fridgeSensor"
             :service-id="config.serviceId"
             label="Fridge Sensor"
@@ -140,7 +159,11 @@ export default class FridgeHardwareTask extends QuickStartTaskBase<FridgeConfig>
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
       <q-btn
         :disable="!valuesOk"
@@ -150,5 +173,5 @@ export default class FridgeHardwareTask extends QuickStartTaskBase<FridgeConfig>
         @click="taskDone"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

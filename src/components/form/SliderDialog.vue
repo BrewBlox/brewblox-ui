@@ -1,53 +1,81 @@
 <script lang="ts">
+import { defineComponent, PropType, ref } from 'vue';
 
-import { Component, Prop } from 'vue-property-decorator';
+import { useDialog } from '@/composables';
 
-import DialogBase from '@/components/DialogBase';
+export default defineComponent({
+  name: 'SliderDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Number,
+      default: 0,
+    },
+    min: {
+      type: Number,
+      default: 0,
+    },
+    max: {
+      type: Number,
+      default: 100,
+    },
+    step: {
+      type: Number,
+      default: 1,
+    },
+    label: {
+      type: String,
+      default: '',
+    },
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    quickActions: {
+      type: Array as PropType<SelectOption[]>,
+      default: () => [],
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
+    const local = ref<number>(props.modelValue);
 
-@Component
-export default class SliderDialog extends DialogBase {
-  local = 0;
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  @Prop({ type: Number })
-  public readonly value!: number;
+    function apply(value: number): void {
+      local.value = value;
+      // Allow user to see slider filling before dialog closes
+      setTimeout(() => save(), 200);
+    }
 
-  @Prop({ type: Number, default: 0 })
-  public readonly min!: number;
-
-  @Prop({ type: Number, default: 100 })
-  public readonly max!: number;
-
-  @Prop({ type: Number, default: 1 })
-  public readonly step!: number;
-
-  @Prop({ type: String, required: false })
-  public readonly label!: string;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Prop({ type: Array, default: () => [] })
-  public readonly quickActions!: SelectOption[];
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-
-  apply(value: number): void {
-    this.local = value;
-    this.save();
-  }
-
-  created(): void {
-    this.local = this.value;
-  }
-}
+    return {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+      apply,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

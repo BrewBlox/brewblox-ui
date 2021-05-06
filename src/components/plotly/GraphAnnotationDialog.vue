@@ -1,41 +1,66 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
+import { useDialog } from '@/composables';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class GraphAnnotationDialog extends DialogBase {
-  local: string | null = null;
+export default defineComponent({
+  name: 'GraphAnnotationDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
+    const local = ref<string>(props.modelValue);
 
-  @Prop({ type: String })
-  public readonly value!: string;
+    function save(): void {
+      onDialogOK({ text: local.value, remove: false });
+    }
 
-  save(): void {
-    this.onDialogOk({ text: this.local, remove: false });
-  }
+    function remove(): void {
+      onDialogOK({ text: local.value, remove: true });
+    }
 
-  remove(): void {
-    this.onDialogOk({ text: this.local, remove: true });
-  }
+    function showKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: local.value,
+        },
+      })
+        .onOk((v: string) => local.value = v);
+    }
 
-  created(): void {
-    this.local = this.value;
-  }
-
-  showKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.local,
-    })
-      .onOk((v: string) => this.local = v);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+      remove,
+      showKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.ctrl.enter="save"

@@ -1,65 +1,73 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 import { defaultLabel } from '@/plugins/history/nodes';
 
 import { targetSplitter } from '../nodes';
-import { DisplayNames, GraphConfig, GraphValueAxes } from '../types';
+import { GraphAxis, GraphConfig } from '../types';
 
-
-@Component
-export default class GraphDisplayEditor extends Vue {
-  defaultLabel = defaultLabel;
-  axisOpts: SelectOption[] = [
-    {
-      value: 'y',
-      label: 'Y1',
+export default defineComponent({
+  name: 'GraphDisplayEditor',
+  props: {
+    config: {
+      type: Object as PropType<GraphConfig>,
+      required: true,
     },
-    {
-      value: 'y2',
-      label: 'Y2',
-    },
-  ];
+  },
+  emits: ['update:config'],
+  setup(props, { emit }) {
+    const axisOpts: SelectOption<GraphAxis>[] = [
+      {
+        value: 'y',
+        label: 'Y1',
+      },
+      {
+        value: 'y2',
+        label: 'Y2',
+      },
+    ];
 
-  @Prop({ type: Object, required: true })
-  public readonly config!: GraphConfig;
+    const local = ref({ ...props.config });
+    watch(props.config, cfg => { local.value = { ...cfg }; });
 
-  saveConfig(config: GraphConfig = this.config): void {
-    this.$emit('update:config', config);
-  }
+    function saveConfig(config: GraphConfig = local.value): void {
+      emit('update:config', config);
+    }
 
-  get selected(): string[] {
-    return targetSplitter(this.config.targets);
-  }
+    const selected = computed<string[]>(
+      () => targetSplitter(props.config.targets),
+    );
 
-  get renames(): DisplayNames {
-    return this.config.renames;
-  }
+    function saveAxis(field: string, value: GraphAxis): void {
+      local.value.axes[field] = value;
+      saveConfig();
+    }
 
-  set renames(renames: DisplayNames) {
-    this.saveConfig({ ...this.config, renames });
-  }
+    function saveColor(field: string, color: string | null): void {
+      local.value.colors[field] = color || '';
+      saveConfig();
+    }
 
-  saveAxis(field: string, value: GraphValueAxes['']): void {
-    this.config.axes[field] = value;
-    this.saveConfig();
-  }
+    function fieldRename(field: string): string {
+      return local.value.renames[field] ?? defaultLabel(field);
+    }
 
-  saveColor(field: string, color: string | null): void {
-    this.config.colors[field] = color || '';
-    this.saveConfig();
-  }
+    function saveRename(field: string, label: string | null): void {
+      local.value.renames[field] = label ?? defaultLabel(field);
+      saveConfig();
+    }
 
-  fieldRename(field): string {
-    return this.config.renames[field] ?? defaultLabel(field);
-  }
-
-  saveRename(field: string, label: string | null): void {
-    this.config.renames[field] = label ?? defaultLabel(field);
-    this.saveConfig();
-  }
-}
+    return {
+      axisOpts,
+      local,
+      selected,
+      saveAxis,
+      saveColor,
+      fieldRename,
+      saveRename,
+    };
+  },
+});
 </script>
 
 <template>
@@ -71,9 +79,9 @@ export default class GraphDisplayEditor extends Vue {
     >
       <q-item-section class="col-5">
         <InputField
-          :value="fieldRename(field)"
+          :model-value="fieldRename(field)"
           title="Legend"
-          @input="v => saveRename(field, v)"
+          @update:model-value="v => saveRename(field, v)"
         />
       </q-item-section>
       <q-space />
@@ -97,10 +105,10 @@ export default class GraphDisplayEditor extends Vue {
             </q-item-section>
             <q-item-section class="col-auto">
               <ColorField
-                :value="config.colors[field] || ''"
+                :model-value="local.colors[field] || ''"
                 title="Line color"
                 clearable
-                @input="v => saveColor(field, v)"
+                @update:model-value="v => saveColor(field, v)"
               />
             </q-item-section>
           </q-item>
@@ -112,11 +120,11 @@ export default class GraphDisplayEditor extends Vue {
             </q-item-section>
             <q-item-section class="col-auto">
               <q-btn-toggle
-                :value="config.axes[field] || 'y'"
+                :model-value="local.axes[field] || 'y'"
                 :options="axisOpts"
                 flat
                 stretch
-                @input="v => saveAxis(field, v)"
+                @update:model-value="v => saveAxis(field, v)"
               />
             </q-item-section>
           </q-item>

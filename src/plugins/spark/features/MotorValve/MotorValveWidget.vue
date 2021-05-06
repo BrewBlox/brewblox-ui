@@ -1,66 +1,71 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { typeMatchFilter } from '@/helpers/functional';
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { BlockType, MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
+import { typeMatchFilter } from '@/utils/functional';
 
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
 
-@Component({
+export default defineComponent({
+  name: 'MotorValveWidget',
   components: {
     Basic: MotorValveBasic,
     Full: MotorValveFull,
   },
-})
-export default class MotorValveWidget
-  extends BlockWidgetBase<MotorValveBlock> {
+  setup() {
+    const {
+      context,
+      inDialog,
+    } = useContext.setup();
+    const {
+      sparkModule,
+      block,
+    } = useBlockWidget.setup<MotorValveBlock>();
 
-  // Spark 2 pins have no support for toggling 12V
-  get spark3Pins(): Spark3PinsBlock | null {
-    return this.sparkModule
-      .blocks
-      .find(typeMatchFilter<Spark3PinsBlock>(BlockType.Spark3Pins))
-      ?? null;
-  }
+    // Spark 2 pins have no support for toggling 12V
+    const spark3Pins = computed<Spark3PinsBlock | null>(
+      () => sparkModule
+        .blocks
+        .find(typeMatchFilter<Spark3PinsBlock>(BlockType.Spark3Pins))
+        ?? null,
+    );
 
-  get disabled12V(): boolean {
-    return this.spark3Pins !== null
-      && !this.spark3Pins.data.enableIoSupply12V;
-  }
+    const disabled12V = computed<boolean>(
+      () => spark3Pins.value?.data.enableIoSupply12V === false,
+    );
 
-  enable12V(): void {
-    if (this.spark3Pins) {
-      this.spark3Pins.data.enableIoSupply12V = true;
-      this.sparkModule.saveBlock(this.spark3Pins);
+    function enable12V(): void {
+      if (spark3Pins.value) {
+        spark3Pins.value.data.enableIoSupply12V = true;
+        sparkModule.saveBlock(spark3Pins.value);
+      }
     }
-  }
-}
+
+    return {
+      inDialog,
+      context,
+      block,
+      disabled12V,
+      enable12V,
+    };
+  },
+});
 </script>
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-    v-bind="{context}"
-  >
-    <template #graph>
-      <HistoryGraph
-        :graph-id="widget.id"
-        :config="graphCfg"
-        :refresh-trigger="mode"
-        use-presets
-        use-range
-        @params="saveGraphParams"
-        @layout="saveGraphLayout"
-      />
+  <PreviewCard :enabled="inDialog">
+    <template #preview>
+      <BlockHistoryGraph />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <component :is="mode" :crud="crud">
+    <component :is="context.mode">
       <template #warnings>
         <CardWarning v-if="disabled12V">
           <template #message>
@@ -77,5 +82,5 @@ export default class MotorValveWidget
         </CardWarning>
       </template>
     </component>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>

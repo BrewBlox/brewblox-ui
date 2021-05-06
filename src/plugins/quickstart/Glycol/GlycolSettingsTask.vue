@@ -1,43 +1,72 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import { tempQty } from '@/helpers/bloxfield';
+import { JSQuantity, tempQty } from '@/utils/bloxfield';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { createOutputActions } from '../helpers';
+import { QuickstartAction } from '../types';
+import { createOutputActions } from '../utils';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { GlycolConfig, GlycolOpts } from './types';
 
-@Component
-export default class GlycolSettingsTask extends QuickStartTaskBase<GlycolConfig> {
-  beerSetting = tempQty(20);
-  glycolSetting = tempQty(4);
+export default defineComponent({
+  name: 'GlycolSettingsTask',
+  props: {
+    config: {
+      type: Object as PropType<GlycolConfig>,
+      required: true,
+    },
+    actions: {
+      type: Array as PropType<QuickstartAction[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'update:actions',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const beerSetting = ref<JSQuantity>(tempQty(20));
+    const glycolSetting = ref<JSQuantity>(tempQty(4));
 
-  done(): void {
-    const opts: GlycolOpts = { beerSetting: this.beerSetting, glycolSetting: this.glycolSetting };
-    const createdBlocks = defineCreatedBlocks(this.config, opts);
-    const changedBlocks = defineChangedBlocks(this.config);
-    const layouts = defineLayouts(this.config);
-    const widgets = defineWidgets(this.config, layouts);
-    const displayedBlocks = defineDisplayedBlocks(this.config);
+    function done(): void {
+      const opts: GlycolOpts = {
+        beerSetting: beerSetting.value,
+        glycolSetting: glycolSetting.value,
+      };
 
-    this.pushActions(createOutputActions());
-    this.updateConfig({
-      ...this.config,
-      layouts,
-      widgets,
-      changedBlocks,
-      createdBlocks,
-      displayedBlocks,
-    });
-    this.next();
-  }
-}
+      const createdBlocks = defineCreatedBlocks(props.config, opts);
+      const changedBlocks = defineChangedBlocks(props.config);
+      const layouts = defineLayouts(props.config);
+      const widgets = defineWidgets(props.config, layouts);
+      const displayedBlocks = defineDisplayedBlocks(props.config);
+
+      const updates: Partial<GlycolConfig> = {
+        createdBlocks,
+        changedBlocks,
+        layouts,
+        widgets,
+        displayedBlocks,
+      };
+
+      emit('update:config', { ...props.config, ...updates });
+      emit('update:actions', createOutputActions());
+      emit('next');
+    }
+
+    return {
+      beerSetting,
+      glycolSetting,
+      done,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -73,9 +102,18 @@ export default class GlycolSettingsTask extends QuickStartTaskBase<GlycolConfig>
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="done"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

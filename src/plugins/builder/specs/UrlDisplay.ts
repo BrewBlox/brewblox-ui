@@ -1,7 +1,7 @@
-import { isAbsoluteUrl } from '@/helpers/functional';
-import router from '@/router';
+import { useRouter } from 'vue-router';
 
-import { PartSpec, PersistentPart } from '../types';
+import { PartSpec, PersistentPart } from '@/plugins/builder/types';
+import { isAbsoluteUrl } from '@/utils/functional';
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 1;
@@ -59,7 +59,7 @@ const spec: PartSpec = {
       if (isAbsoluteUrl(url)) {
         window.open(url, '_blank');
       } else {
-        router.push(url);
+        useRouter().push(url);
       }
     }
   },

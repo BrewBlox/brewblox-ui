@@ -1,23 +1,33 @@
-import { ref } from '@/helpers/component-ref';
-import { QuickStartFeature } from '@/store/features';
+import { Plugin } from 'vue';
 
+import { featureStore, QuickstartFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+
+import HermsCompletionTask from './HermsCompletionTask.vue';
 import HermsHardwareTask from './HermsHardwareTask.vue';
-import HermsManualTask from './HermsManualTask.vue';
 import HermsMutexTask from './HermsMutexTask.vue';
 import HermsNamingTask from './HermsNamingTask.vue';
 import HermsSettingsTask from './HermsSettingsTask.vue';
-import HermsWizard from './HermsWizard.vue';
 
-ref(HermsNamingTask);
-ref(HermsHardwareTask);
-ref(HermsMutexTask);
-ref(HermsManualTask);
-ref(HermsSettingsTask);
+const plugin: Plugin = {
+  install(app) {
 
-const feature: QuickStartFeature = {
-  id: 'Herms',
-  title: 'HERMS',
-  component: ref(HermsWizard),
+    const feature: QuickstartFeature = {
+      id: 'Herms',
+      title: 'HERMS',
+      tasks: [
+        'QuickstartServiceTask',
+        'QuickstartDiscoveryTask',
+        cref(app, HermsNamingTask),
+        cref(app, HermsHardwareTask),
+        cref(app, HermsMutexTask),
+        cref(app, HermsSettingsTask),
+        cref(app, HermsCompletionTask),
+      ],
+    };
+
+    featureStore.addQuickstartFeature(feature);
+  },
 };
 
-export default feature;
+export default plugin;

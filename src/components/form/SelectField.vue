@@ -1,84 +1,116 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import isArray from 'lodash/isArray';
+import { computed, defineComponent, PropType } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { createDialog } from '@/helpers/dialog';
+import { useField } from '@/composables';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class SelectField extends FieldBase {
+export default defineComponent({
+  name: 'SelectField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: [Object, String, Number, Symbol] as PropType<any>,
+      default: null as any,
+    },
+    options: {
+      type: Array as PropType<any[]>,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'value',
+    },
+    optionValue: {
+      type: String,
+      default: 'value',
+    },
+    optionLabel: {
+      type: String,
+      default: 'label',
+    },
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
+    listSelect: {
+      type: Boolean,
+      default: false,
+    },
+    selectProps: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-  @Prop({ type: [String, Number, Array, Object], required: false })
-  public readonly value!: any;
+    const displayValue = computed<string>(
+      () => {
+        if (props.selectProps.multiple) {
+          if (!isArray(props.modelValue)) {
+            return `Invalid value: ${props.modelValue}`;
+          }
 
-  @Prop({ type: Array, required: true })
-  public readonly options!: any[];
+          const text = props.modelValue
+            .map((v: any) => props.options.find((opt: any) => opt[props.optionValue] === v))
+            .map((v: any) => v[props.optionLabel])
+            .join(', ');
+          return text || 'Click to set';
+        }
 
-  @Prop({ type: String, default: 'value' })
-  public readonly label!: string;
+        for (const opt of props.options) {
+          if (opt === props.modelValue) {
+            return opt;
+          }
+          if (opt[props.optionValue] === props.modelValue) {
+            return opt[props.optionLabel];
+          }
+        }
 
-  @Prop({ type: String, default: 'label' })
-  public readonly optionsLabel!: string;
-
-  @Prop({ type: String, default: 'value' })
-  public readonly optionsValue!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly clearable!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly listSelect!: boolean;
-
-  @Prop({ type: Object, default: () => ({}) })
-  public readonly selectProps!: any;
-
-  get displayValue(): string {
-    if (this.selectProps.multiple) {
-      const text = this.value
-        .map((v: any) => this.options.find((opt: any) => opt[this.optionsValue] === v))
-        .map((v: any) => v[this.optionsLabel])
-        .join(', ');
-      return text || 'Click to set';
-    }
-
-    for (const opt of this.options) {
-      if (opt === this.value) {
-        return opt;
-      }
-      if (opt[this.optionsValue] === this.value) {
-        return opt[this.optionsLabel];
-      }
-    }
-    return 'Click to set';
-  }
-
-  @Emit('input')
-  public change(v: any): any {
-    return v;
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
-    }
-
-    createDialog({
-      component: 'SelectDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      listSelect: this.listSelect,
-      selectOptions: this.options,
-      selectProps: {
-        label: this.label,
-        optionsLabel: this.optionsLabel,
-        optionsValue: this.optionsValue,
-        clearable: this.clearable,
+        return 'Click to set';
       },
-    })
-      .onOk(this.change);
-  }
-}
+    );
+
+    function change(v: any): void {
+      emit('update:modelValue', v);
+    }
+
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+
+      createDialog({
+        component: 'SelectDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          listSelect: props.listSelect,
+          selectOptions: props.options,
+          selectProps: {
+            label: props.label,
+            optionLabel: props.optionLabel,
+            optionValue: props.optionValue,
+            clearable: props.clearable,
+          },
+        },
+      })
+        .onOk(change);
+    }
+
+    return {
+      activeSlots,
+      displayValue,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
@@ -86,5 +118,9 @@ export default class SelectField extends FieldBase {
     <slot name="value">
       {{ displayValue }}
     </slot>
+
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
   </LabeledField>
 </template>

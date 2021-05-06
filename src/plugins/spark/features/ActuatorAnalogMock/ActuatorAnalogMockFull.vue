@@ -1,13 +1,27 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
 
-@Component
-export default class ActuatorAnalogMockFull
-  extends BlockCrudComponent<ActuatorAnalogMockBlock> {
-}
+export default defineComponent({
+  name: 'ActuatorAnalogMockFull',
+  setup() {
+    const {
+      serviceId,
+      block,
+      saveBlock,
+      isDriven,
+    } = useBlockWidget.setup<ActuatorAnalogMockBlock>();
+
+    return {
+      serviceId,
+      block,
+      saveBlock,
+      isDriven,
+    };
+  },
+});
 </script>
 
 <template>
@@ -17,57 +31,57 @@ export default class ActuatorAnalogMockFull
     <div class="widget-body row">
       <InputField
         :readonly="isDriven"
-        :value="block.data.setting"
+        :model-value="block.data.setting"
         label="Setting"
         type="number"
         title="Target"
         tag="big"
         class="col-grow"
-        @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+        @update:model-value="v => { block.data.desiredSetting = v; saveBlock(); }"
       />
       <InputField
-        :value="block.data.minSetting"
+        :model-value="block.data.minSetting"
         title="Setting min"
         label="Clip to min"
         type="number"
         tag="big"
         class="col-grow"
-        @input="v => { block.data.minSetting = v; saveBlock(); }"
+        @update:model-value="v => { block.data.minSetting = v; saveBlock(); }"
       />
       <InputField
-        :value="block.data.maxSetting"
+        :model-value="block.data.maxSetting"
         type="number"
         title="Setting max"
         label="Clip to max"
         tag="big"
         class="col-grow"
-        @input="v => { block.data.maxSetting = v; saveBlock(); }"
+        @update:model-value="v => { block.data.maxSetting = v; saveBlock(); }"
       />
       <div class="col-break" />
       <LabeledField
-        :value="block.data.value"
+        :model-value="block.data.value"
         type="number"
         label="Value"
         tag="big"
         class="col-grow"
       />
       <InputField
-        :value="block.data.minValue"
+        :model-value="block.data.minValue"
         type="number"
         title="Value min"
         label="Clip to min"
         tag="big"
         class="col-grow"
-        @input="v => { block.data.minValue = v; saveBlock(); }"
+        @update:model-value="v => { block.data.minValue = v; saveBlock(); }"
       />
       <InputField
-        :value="block.data.maxValue"
+        :model-value="block.data.maxValue"
         type="number"
         title="Value max"
         label="Clip to max"
         tag="big"
         class="col-grow"
-        @input="v => { block.data.maxValue = v; saveBlock(); }"
+        @update:model-value="v => { block.data.maxValue = v; saveBlock(); }"
       />
       <div class="col-break" />
       <DrivenIndicator
@@ -76,11 +90,11 @@ export default class ActuatorAnalogMockFull
         class="col-grow"
       />
       <ConstraintsField
-        :value="block.data.constrainedBy"
+        :model-value="block.data.constrainedBy"
         :service-id="serviceId"
         type="analog"
         class="col-grow"
-        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+        @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
       />
     </div>
   </div>

@@ -1,83 +1,105 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
+import { hasShared } from '../utils';
 import { HermsConfig } from './types';
 
+export default defineComponent({
+  name: 'HermsHardwareTask',
+  props: {
+    config: {
+      type: Object as PropType<HermsConfig>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const hltPin = ref<PinChannel | null>(props.config.hltPin ?? null);
+    const bkPin = ref<PinChannel | null>(props.config.bkPin ?? null);
+    const hltSensor = ref<string | null>(props.config.hltSensor ?? null);
+    const mtSensor = ref<string | null>(props.config.mtSensor ?? null);
+    const bkSensor = ref<string | null>(props.config.bkSensor ?? null);
 
-@Component
-export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
-  hltPin: PinChannel | null = null;
-  bkPin: PinChannel | null = null;
-  hltSensor: string | null = null;
-  mtSensor: string | null = null;
-  bkSensor: string | null = null;
+    const pinSame = computed<boolean>(
+      () => hasShared([hltPin.value, bkPin.value]),
+    );
 
-  get valuesOk(): boolean {
-    return [
-      this.hltPin,
-      this.bkPin,
-      !this.pinSame,
-      this.hltSensor,
-      this.mtSensor,
-      this.bkSensor,
-      !this.sensorSame,
-    ]
-      .every(Boolean);
-  }
+    const sensorSame = computed<boolean>(
+      () => hasShared([hltSensor.value, mtSensor.value, bkSensor.value]),
+    );
 
-  get pinSame(): boolean {
-    return hasShared([this.hltPin, this.bkPin]);
-  }
+    const valuesOk = computed<boolean>(
+      () => [
+        hltPin.value,
+        bkPin.value,
+        !pinSame.value,
+        hltSensor.value,
+        mtSensor.value,
+        bkSensor.value,
+        !sensorSame.value,
+      ]
+        .every(Boolean),
+    );
 
-  get sensorSame(): boolean {
-    return hasShared([this.hltSensor, this.mtSensor, this.bkSensor]);
-  }
+    function discover(): void {
+      sparkStore.moduleById(props.config.serviceId)?.fetchDiscoveredBlocks();
+    }
 
-  created(): void {
-    this.discover();
+    function startBlockWizard(): void {
+      createBlockWizard(props.config.serviceId);
+    }
 
-    this.hltPin = this.config.hltPin || null;
-    this.bkPin = this.config.bkPin || null;
-    this.hltSensor = this.config.hltSensor || null;
-    this.mtSensor = this.config.mtSensor || null;
-    this.bkSensor = this.config.bkSensor || null;
-  }
+    function taskDone(): void {
+      if (!valuesOk.value) {
+        return;
+      }
 
-  discover(): void {
-    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
-  }
+      const updates: Partial<HermsConfig> = {
+        hltPin: hltPin.value!,
+        bkPin: bkPin.value!,
+        hltSensor: hltSensor.value!,
+        mtSensor: mtSensor.value!,
+        bkSensor: bkSensor.value!,
+        renamedBlocks: {
+          [hltSensor.value!]: props.config.names.hltSensor,
+          [mtSensor.value!]: props.config.names.mtSensor,
+          [bkSensor.value!]: props.config.names.bkSensor,
+        },
+      };
 
-  startBlockWizard(): void {
-    createBlockWizard(this.config.serviceId);
-  }
+      emit('update:config', { ...props.config, ...updates });
+      emit('next');
+    }
 
-  taskDone(): void {
-    this.config.bkPin = this.bkPin!;
-    this.config.hltPin = this.hltPin!;
-    this.config.hltSensor = this.hltSensor!;
-    this.config.mtSensor = this.mtSensor!;
-    this.config.bkSensor = this.bkSensor!;
+    onBeforeMount(() => discover());
 
-    this.config.renamedBlocks = {
-      [this.hltSensor!]: this.config.names.hltSensor,
-      [this.mtSensor!]: this.config.names.mtSensor,
-      [this.bkSensor!]: this.config.names.bkSensor,
+    return {
+      hltPin,
+      bkPin,
+      hltSensor,
+      mtSensor,
+      bkSensor,
+      pinSame,
+      sensorSame,
+      valuesOk,
+      discover,
+      startBlockWizard,
+      taskDone,
     };
-
-    this.updateConfig(this.config);
-    this.next();
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -108,7 +130,7 @@ export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
           </p>
         </q-item-section>
       </q-item>
-      <QuickStartMockCreateField
+      <QuickstartMockCreateField
         :service-id="config.serviceId"
         :names="[
           config.names.hltSensor,
@@ -118,7 +140,7 @@ export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
       />
       <q-item>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-model="hltPin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -126,7 +148,7 @@ export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
           />
         </q-item-section>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-model="bkPin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -136,7 +158,7 @@ export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
       </q-item>
       <q-item>
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="hltSensor"
             :service-id="config.serviceId"
             :error="sensorSame"
@@ -144,7 +166,7 @@ export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
           />
         </q-item-section>
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="bkSensor"
             :service-id="config.serviceId"
             :error="sensorSame"
@@ -154,7 +176,7 @@ export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
       </q-item>
       <q-item>
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="mtSensor"
             :service-id="config.serviceId"
             :error="sensorSame"
@@ -176,9 +198,19 @@ export default class HermsHardwareTask extends QuickStartTaskBase<HermsConfig> {
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
+      <q-btn
+        :disable="!valuesOk"
+        unelevated
+        label="Next"
+        color="primary"
+        @click="taskDone"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

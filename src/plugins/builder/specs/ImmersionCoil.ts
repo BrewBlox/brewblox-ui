@@ -1,4 +1,4 @@
-import { PartSpec } from '../types';
+import { PartSpec } from '@/plugins/builder/types';
 
 export const COIL_TOP_LEFT = '0.5,0,0';
 export const COIL_TOP_RIGHT = '1.5,0,0';

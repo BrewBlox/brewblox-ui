@@ -1,122 +1,127 @@
 <script lang="ts">
 import mapValues from 'lodash/mapValues';
-import { uid } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createBlockDialog } from '@/helpers/dialog';
-import { blockGraphCfg } from '@/plugins/spark/helpers';
+import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress, BlockCrud, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
-import { serviceStore } from '@/store/services';
+import { Block, BlockAddress, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
+import { makeBlockGraphConfig } from '@/plugins/spark/utils';
+import { createBlockDialog } from '@/utils/dialog';
 
 import { GraphConfig } from '../types';
 
+export default defineComponent({
+  name: 'SelectBlockGraphDialog',
+  props: {
+    ...useDialog.props,
+    address: {
+      type: Object as PropType<BlockAddress | null>,
+      default: null,
+    },
+    title: {
+      type: String,
+      default: 'Add block to graph',
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
 
-@Component
-export default class SelectBlockGraphDialog extends DialogBase {
-  service: SparkService | null = null;
-  block: Block | null = null;
-  selectedFields: BlockField[] = [];
+    const services = computed<SparkService[]>(
+      () => sparkStore.modules.map(m => m.service),
+    );
 
-  @Prop({ type: String, default: 'Add block to graph' })
-  public readonly title!: string;
+    const block = ref<Block | null>(sparkStore.blockByAddress(props.address));
+    const service = ref<SparkService | null>(
+      services.value.find(svc => svc.id === props.address?.serviceId)
+      ?? null,
+    );
+    const selectedFields = ref<BlockField[]>([]);
 
-  @Prop({ type: Object, required: false })
-  public readonly address!: BlockAddress;
+    const graphedTypes: BlockType[] =
+      sparkStore
+        .specs
+        .filter(s => s.fields.some(f => f.graphed))
+        .map(s => s.id);
 
-  created(): void {
-    this.block = sparkStore.blockByAddress(this.address);
-    this.service =
-      serviceStore.serviceById(this.address?.serviceId)
-      ?? this.services[0]
-      ?? null;
-  }
+    const blocks = computed<Block[]>(
+      () => sparkStore
+        .serviceBlocks(service.value?.id)
+        .filter(block => graphedTypes.includes(block.type)),
+    );
 
-  get services(): SparkService[] {
-    return sparkStore.modules.map(m => m.service);
-  }
+    const fields = computed<BlockField[]>(
+      () => block.value
+        ? sparkStore.spec(block.value)
+          .fields
+          .filter(f => f.graphed)
+        : [],
+    );
 
-  get graphedTypes(): BlockType[] {
-    return sparkStore
-      .specs
-      .filter(s => s.fields.some(f => f.graphed))
-      .map(s => s.id);
-  }
-
-  get blocks(): Block[] {
-    return sparkStore
-      .serviceBlocks(this.service?.id ?? null)
-      .filter(block => this.graphedTypes.includes(block.type));
-  }
-
-  get fields(): BlockField[] {
-    return this.block
-      ? sparkStore.spec(this.block)
-        .fields
-        .filter(f => f.graphed)
-      : [];
-  }
-
-  selectService(svc: SparkService | null): void {
-    if (svc?.id !== this.service?.id) {
-      this.selectBlock(null);
+    function selectService(v: SparkService | null): void {
+      if (v?.id !== service.value?.id) {
+        selectBlock(null);
+      }
+      service.value = v;
     }
-    this.service = svc;
-  }
 
-  selectBlock(block: Block | null): void {
-    if (block?.id !== this.block?.id) {
-      this.selectedFields = [];
+    function selectBlock(v: Block | null): void {
+      if (v?.id !== block.value?.id) {
+        selectedFields.value = [];
+      }
+      block.value = v;
     }
-    this.block = block;
-  }
 
-  showBlock(block: Block): void {
-    createBlockDialog(block);
-  }
-
-  save(): void {
-    if (!this.block || !this.selectedFields.length) {
-      return;
+    function save(): void {
+      if (!block.value || !selectedFields.value.length) {
+        return;
+      }
+      const blockId = block.value.id;
+      const cfg = makeBlockGraphConfig(
+        block.value,
+        {},
+        v => selectedFields.value.some(f => f.key === v.key));
+      const sanitized: GraphConfig = {
+        ...cfg,
+        layout: {},
+        params: {},
+        renames: mapValues(cfg.renames, v => `[${blockId}] ${v}`),
+      };
+      onDialogOK(sanitized);
     }
-    const blockId = this.block.id;
-    const crud: BlockCrud = {
-      isStoreBlock: true,
-      isStoreWidget: false,
-      saveWidget: () => { },
-      saveBlock: block => sparkStore.saveBlock(block),
-      closeDialog: () => { },
-      block: this.block,
-      widget: {
-        id: uid(),
-        title: blockId,
-        feature: this.block.type,
-        dashboard: '',
-        cols: 1,
-        rows: 1,
-        order: 0,
-        config: {
-          serviceId: this.block.serviceId,
-          blockId: blockId,
-        },
-      },
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      services,
+      block,
+      service,
+      selectedFields,
+      graphedTypes,
+      blocks,
+      fields,
+      selectService,
+      selectBlock,
+      createBlockDialog,
+      save,
     };
-    const cfg = blockGraphCfg(crud, v => this.selectedFields.some(f => f.key === v.key));
-    const sanitized: GraphConfig = {
-      ...cfg,
-      layout: {},
-      params: {},
-      renames: mapValues(cfg.renames, v => `[${blockId}] ${v}`),
-    };
-    this.onDialogOk(sanitized);
-  }
-}
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
@@ -130,21 +135,21 @@ export default class SelectBlockGraphDialog extends DialogBase {
           No Spark services found
         </div>
         <ListSelect
-          :value="service"
+          :model-value="service"
           :options="services"
           option-value="id"
           option-label="title"
-          @input="selectService"
+          @update:model-value="selectService"
           @confirm="selectService"
         />
         <q-select
-          :value="block"
+          :model-value="block"
           :disable="!service"
           :options="blocks"
           label="Block"
           option-label="id"
           option-value="id"
-          @input="selectBlock"
+          @update:model-value="selectBlock"
           @keyup.enter.exact.stop
         >
           <template #no-option>
@@ -161,7 +166,7 @@ export default class SelectBlockGraphDialog extends DialogBase {
               dense
               icon="mdi-launch"
               class="self-end"
-              @click.stop="showBlock(block)"
+              @click.stop="createBlockDialog(block)"
             >
               <q-tooltip>Show block</q-tooltip>
             </q-btn>

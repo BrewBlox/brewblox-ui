@@ -1,5 +1,6 @@
-import { autoRegister } from '@/helpers/component-ref';
-import { featureStore } from '@/store/features';
+import { Plugin } from 'vue';
+
+import { autoRegister } from '@/utils/component-ref';
 
 import BrewKettle from './BrewKettle';
 import Ferment from './Ferment';
@@ -9,23 +10,22 @@ import Herms from './Herms';
 import Rims from './Rims';
 import TempControl from './TempControl';
 
-export default {
-  install() {
-    const wizards = [
+const plugin: Plugin = {
+  install(app) {
+    autoRegister(app, require.context('./components', true));
+
+    const plugins = [
       Ferment,
       Glycol,
       Herms,
       Rims,
       BrewKettle,
       Fridge,
-    ];
-
-    const widgets = [
       TempControl,
     ];
 
-    autoRegister(require.context('./components', true));
-    wizards.forEach(featureStore.registerQuickStart);
-    widgets.forEach(featureStore.registerWidget);
+    plugins.forEach(app.use);
   },
 };
+
+export default plugin;

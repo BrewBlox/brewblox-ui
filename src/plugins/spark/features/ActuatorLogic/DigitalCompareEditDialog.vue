@@ -1,42 +1,62 @@
 <script lang="ts">
 import { Enum } from 'typescript-string-enums';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/functional';
+import { useDialog } from '@/composables';
 import { DigitalCompare, DigitalCompareOp } from '@/plugins/spark/types';
+import { deepCopy } from '@/utils/functional';
 
 import { digitalOpTitles } from './getters';
 
+const operatorOpts: SelectOption[] = Enum.values(DigitalCompareOp)
+  .map(value => ({ value, label: digitalOpTitles[value] }));
 
-@Component
-export default class DigitalCompareEditDialog extends DialogBase {
-  local: DigitalCompare | null = null;
+export default defineComponent({
+  name: 'DigitalCompareEditDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<DigitalCompare>,
+      required: true,
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
+    const local = ref<DigitalCompare>(deepCopy(props.modelValue));
 
-  @Prop({ type: Object, required: true })
-  public readonly value!: DigitalCompare;
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
-
-  created(): void {
-    this.local = deepCopy(this.value);
-  }
-
-  get operatorOpts(): SelectOption[] {
-    return Enum.values(DigitalCompareOp)
-      .map(value => ({ value, label: digitalOpTitles[value] }));
-  }
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-}
+    return {
+      operatorOpts,
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

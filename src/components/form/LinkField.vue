@@ -1,98 +1,122 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { isLink, Link } from '@/helpers/bloxfield';
-import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { useField } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import type { Block } from '@/plugins/spark/types';
+import type { Block, ComparedBlockType } from '@/plugins/spark/types';
+import { bloxLink, Link } from '@/utils/bloxfield';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { truncate } from '@/utils/functional';
 
-import FieldBase from '../FieldBase';
+export default defineComponent({
+  name: 'LinkField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: Object as PropType<Link>,
+      default: () => bloxLink(null),
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'Link',
+    },
+    compatible: {
+      type: [String, Array] as PropType<ComparedBlockType>,
+      default: null,
+    },
+    blockFilter: {
+      type: Function as PropType<(block: Block) => boolean>,
+      default: () => true,
+    },
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    creatable: {
+      type: Boolean,
+      default: true,
+    },
+    configurable: {
+      type: Boolean,
+      default: true,
+    },
+    show: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-
-@Component
-export default class LinkField extends FieldBase {
-
-  @Prop({ type: Object, required: true, validator: v => isLink(v) })
-  public readonly value!: Link;
-
-  @Prop({ type: String, required: false })
-  public readonly serviceId!: string | null;
-
-  @Prop({ type: String, default: 'Choose block' })
-  public readonly title!: string;
-
-  @Prop({ type: String, default: 'Block' })
-  public readonly label!: string;
-
-  @Prop({ type: Array, required: false })
-  readonly compatible!: string[];
-
-  @Prop({ type: Function })
-  public readonly blockFilter!: ((block: Block) => boolean);
-
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly creatable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly configurable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly show!: boolean;
-
-  save(val: Link): void {
-    this.$emit('input', val);
-  }
-
-  get displayValue(): string {
-    return this.value.id ?? 'click to assign';
-  }
-
-  get block(): Block | null {
-    return sparkStore.blockById(this.serviceId, this.value.id);
-  }
-
-  get canEdit(): boolean {
-    return this.block !== null
-      && this.configurable
-      && this.show;
-  }
-
-  editBlock(): void {
-    createBlockDialog(this.block);
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function save(val: Link): void {
+      emit('update:modelValue', val);
     }
 
-    createDialog({
-      component: 'LinkDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      label: this.label,
-      serviceId: this.serviceId,
-      compatible: this.compatible,
-      blockFilter: this.blockFilter,
-      clearable: this.clearable,
-      creatable: this.creatable,
-      configurable: this.configurable,
-      ...this.dialogProps,
-    })
-      .onOk(this.save);
-  }
-}
+    const displayValue = computed<string>(
+      () => truncate(props.modelValue.id ?? 'click to assign'),
+    );
+
+    const block = computed<Block | null>(
+      () => sparkStore.blockById(props.serviceId, props.modelValue.id),
+    );
+
+    const canEdit = computed<boolean>(
+      () => block.value !== null
+        && props.configurable
+        && props.show,
+    );
+
+    function editBlock(): void {
+      createBlockDialog(block.value);
+    }
+
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+
+      createDialog({
+        component: 'LinkDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          label: props.label,
+          serviceId: props.serviceId,
+          compatible: props.compatible,
+          blockFilter: props.blockFilter,
+          clearable: props.clearable,
+          creatable: props.creatable,
+          configurable: props.configurable,
+          ...props.dialogProps,
+        },
+      })
+        .onOk(save);
+    }
+
+    return {
+      activeSlots,
+      displayValue,
+      canEdit,
+      editBlock,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <slot name="value">
-      {{ displayValue | truncated }}
+      {{ displayValue }}
     </slot>
     <template #append>
       <q-btn
@@ -102,8 +126,11 @@ export default class LinkField extends FieldBase {
         icon="mdi-launch"
         @click.stop="editBlock"
       >
-        <q-tooltip>Show {{ value.id }}</q-tooltip>
+        <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
+    </template>
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
   </LabeledField>
 </template>

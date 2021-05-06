@@ -2,7 +2,7 @@ import { BuilderLayout } from '@/plugins/builder/types';
 import { Block } from '@/plugins/spark/types';
 import { DisplayOpts } from '@/plugins/spark/types';
 import { PidBlock } from '@/shared-types';
-import { Widget } from '@/store/dashboards';
+import { Widget } from '@/store/widgets';
 
 export interface PinChannel {
   arrayId: string;
@@ -15,10 +15,12 @@ export interface DisplayBlock {
   opts: Partial<DisplayOpts>;
 }
 
-export interface QuickStartOutput {
+export interface QuickstartConfig {
+  prefix: string;
   serviceId: string;
   dashboardId: string;
   dashboardTitle: string;
+  names: AnyDict;
   layouts: BuilderLayout[];
   widgets: Widget[];
   createdBlocks: Block[];
@@ -27,7 +29,6 @@ export interface QuickStartOutput {
   displayedBlocks: DisplayBlock[];
 }
 
-export type PidConfig = Pick<
-  PidBlock['data'],
-  'kp' | 'ti' | 'td'
->
+export type QuickstartAction = (config: any) => Awaitable<unknown>;
+
+export type PidConfig = Pick<PidBlock['data'], 'kp' | 'ti' | 'td'>

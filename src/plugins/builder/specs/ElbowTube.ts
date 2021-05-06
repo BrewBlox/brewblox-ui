@@ -1,5 +1,5 @@
-import { RIGHT, UP } from '../getters';
-import { PartSpec } from '../types';
+import { RIGHT, UP } from '@/plugins/builder/const';
+import { PartSpec } from '@/plugins/builder/types';
 
 const spec: PartSpec = {
   id: 'ElbowTube',

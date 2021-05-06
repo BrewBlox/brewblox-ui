@@ -1,6 +1,5 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
 import { sparkType } from '@/plugins/spark/getters';
 import { SparkService } from '@/plugins/spark/types';
@@ -8,17 +7,18 @@ import { serviceStore } from '@/store/services';
 
 import SparkServiceWatcher from './SparkServiceWatcher.vue';
 
-@Component({
+export default defineComponent({
+  name: 'SparkWatcher',
   components: {
     SparkServiceWatcher,
   },
-})
-export default class SparkWatcher extends Vue {
-  get services(): SparkService[] {
-    return serviceStore.services
-      .filter(service => service.type === sparkType);
-  }
-}
+  computed: {
+    services(): SparkService[] {
+      return serviceStore.services
+        .filter(service => service.type === sparkType);
+    },
+  },
+});
 </script>
 
 <template>

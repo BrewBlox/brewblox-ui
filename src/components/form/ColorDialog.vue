@@ -1,31 +1,58 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
 
-@Component
-export default class ColorDialog extends DialogBase {
-  local = '';
+export default defineComponent({
+  name: 'ColorDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: String,
+      required: true,
+    },
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
+    const local = ref<string>(props.modelValue);
 
-  @Prop({ type: String, required: true })
-  public readonly value!: string;
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  @Prop({ type: Boolean, default: false })
-  public readonly clearable!: boolean;
+    function clear(): void {
+      onDialogOK('');
+    }
 
-  created(): void {
-    this.local = this.value;
-  }
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+      clear,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
@@ -33,9 +60,25 @@ export default class ColorDialog extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <q-color v-model="local" format-model="hex" />
       <template #actions>
-        <q-btn color="primary" flat label="Cancel" @click="onDialogCancel" />
-        <q-btn v-if="clearable" color="primary" flat label="Clear" @click="onDialogOk(null)" />
-        <q-btn color="primary" flat label="OK" @click="save" />
+        <q-btn
+          color="primary"
+          flat
+          label="Cancel"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          v-if="clearable"
+          color="primary"
+          flat
+          label="Clear"
+          @click="clear"
+        />
+        <q-btn
+          color="primary"
+          flat
+          label="OK"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

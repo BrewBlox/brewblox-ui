@@ -1,19 +1,28 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-
-@Component
-export default class SettingValueField extends Vue {
-  @Prop({ type: Boolean, default: false })
-  public readonly editable!: boolean;
-
-  edit(): void {
-    if (this.editable) {
-      this.$emit('click');
+export default defineComponent({
+  name: 'SettingValueField',
+  props: {
+    editable: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'click',
+  ],
+  setup(props, { emit }) {
+    function edit(): void {
+      if (props.editable) {
+        emit('click');
+      }
     }
-  }
-}
+    return {
+      edit,
+    };
+  },
+});
 </script>
 
 <template>

@@ -1,15 +1,13 @@
+import { BlockType } from '@/shared-types';
 import { WidgetRole } from '@/store/features';
 
-import { BlockCrud } from '../types';
+import { BlockAddress } from '../types';
 
-export interface ValidatedWidget {
+export interface ListRenderAddress extends BlockAddress {
+  serviceId: string;
   id: string;
-  key: string;
-  component: string;
-  crud: BlockCrud;
+  type: BlockType;
+  name: string;
   title: string;
   role: WidgetRole;
-  icon: string;
-  expanded: boolean;
-  error?: string;
 }

@@ -1,49 +1,66 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, provide, reactive, watch } from 'vue';
 
-import { objectStringSorter } from '@/helpers/functional';
 import { tiltStore } from '@/plugins/tilt/store';
 import { TiltService, TiltStateValue } from '@/plugins/tilt/types';
 import { WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
+import { ContextKey } from '@/symbols';
+import { objectStringSorter } from '@/utils/functional';
 
-@Component
-export default class TiltPage extends Vue {
+const context: WidgetContext = {
+  mode: 'Basic',
+  container: 'Dashboard',
+  size: 'Content',
+};
 
-  context: WidgetContext = {
-    mode: 'Basic',
-    container: 'Dashboard',
-    size: 'Content',
-  };
+export default defineComponent({
+  name: 'TiltPage',
+  props: {
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
+    provide(ContextKey, reactive<WidgetContext>(context));
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
+    const service = computed<TiltService | null>(
+      () => serviceStore.serviceById(props.serviceId),
+    );
 
-  @Watch('service.title', { immediate: true })
-  watchTitle(newV: string): void {
-    document.title = `Brewblox | ${newV ?? 'Tilt service'}`;
-  }
+    const title = computed<string>(
+      () => service.value?.title ?? 'Spark service',
+    );
 
-  get service(): TiltService {
-    return serviceStore.serviceById(this.serviceId)!;
-  }
+    watch(
+      () => title.value,
+      (title) => {
+        document.title = `Brewblox | ${title}`;
+      },
+    );
 
-  get values(): TiltStateValue[] {
-    return tiltStore.values
-      .filter(v => v.serviceId === this.serviceId)
-      .sort(objectStringSorter('color'));
-  }
+    const values = computed<TiltStateValue[]>(
+      () => tiltStore.values
+        .filter(v => v.serviceId === props.serviceId)
+        .sort(objectStringSorter('color')),
+    );
 
-}
+    return {
+      service,
+      title,
+      values,
+    };
+  },
+});
 </script>
 
 <template>
   <q-page class="page-height">
-    <portal to="toolbar-title">
-      {{ service.title }}
-    </portal>
-    <portal to="toolbar-buttons">
+    <TitleTeleport>
+      {{ title }}
+    </TitleTeleport>
+    <ButtonsTeleport>
       <ActionMenu
         round
         size="12px"
@@ -56,24 +73,25 @@ export default class TiltPage extends Vue {
           <TiltActions :service-id="serviceId" />
         </template>
       </ActionMenu>
-    </portal>
-
-    <div class="q-pa-lg q-gutter-md row">
-      <div
-        v-for="value in values"
-        :key="value.id"
-        style="max-width: 500px"
-      >
-        <CardWrapper v-bind="{context}">
-          <template #toolbar>
-            <Toolbar
-              :title="value.color"
-              subtitle="Tilt"
-            />
-          </template>
-          <TiltValues :value="value" class="widget-body" />
-        </CardWrapper>
-      </div>
-    </div>
+      <ButtonsTeleport>
+        <div class="q-pa-lg q-gutter-md row">
+          <div
+            v-for="value in values"
+            :key="value.id"
+            style="max-width: 500px"
+          >
+            <Card>
+              <template #toolbar>
+                <Toolbar
+                  :title="value.color"
+                  subtitle="Tilt"
+                />
+              </template>
+              <TiltValues :state="value" class="widget-body" />
+            </Card>
+          </div>
+        </div>
+      </buttonsteleport>
+    </buttonsteleport>
   </q-page>
 </template>

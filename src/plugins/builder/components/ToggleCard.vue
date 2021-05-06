@@ -1,28 +1,48 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartCard from './PartCard';
+import { FlowPart } from '../types';
 
-@Component
-export default class ToggleCard extends PartCard {
+export default defineComponent({
+  name: 'ToggleCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+    defaultValue: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
+    const value = computed<boolean>({
+      get: () => Boolean(props.part.settings[props.settingsKey] ?? props.defaultValue),
+      set: v => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          [props.settingsKey]: v,
+        },
+      }),
+    });
 
-  @Prop({ type: String, required: true })
-  public readonly settingsKey!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly defaultValue!: boolean;
-
-  @Prop({ type: String, required: true })
-  public readonly label!: string;
-
-  get value(): boolean {
-    return Boolean(this.part.settings[this.settingsKey] ?? this.defaultValue);
-  }
-
-  set value(v: boolean) {
-    this.savePartSettings({ ...this.part.settings, [this.settingsKey]: v });
-  }
-}
+    return {
+      value,
+    };
+  },
+});
 </script>
 
 <template>

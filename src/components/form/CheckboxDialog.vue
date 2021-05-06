@@ -1,44 +1,68 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '../DialogBase';
+import { useDialog } from '@/composables';
 
+export default defineComponent({
+  name: 'CheckboxDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Array,
+      required: true,
+    },
+    selectOptions: {
+      type: Array as PropType<SelectOption[]>,
+      required: true,
+    },
+    ok: {
+      type: String,
+      default: 'OK',
+    },
+    cancel: {
+      type: [String, Boolean],
+      default: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
+    const local = ref<any[]>([...props.modelValue]);
 
-@Component
-export default class CheckboxDialog extends DialogBase {
-  local: any[] = [];
+    const cancelLabel = computed<string>(
+      () => typeof props.cancel === 'string'
+        ? props.cancel
+        : 'Cancel',
+    );
 
-  @Prop({ type: Array, required: true })
-  public readonly value!: any[];
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  @Prop({ type: Array, required: true })
-  public readonly selectOptions!: SelectOption[];
-
-  @Prop({ type: String, default: 'OK' })
-  public readonly ok!: string;
-
-  @Prop({ type: [String, Boolean], default: true })
-  public readonly cancel!: string | boolean;
-
-  get cancelLabel(): string {
-    return typeof this.cancel === 'string'
-      ? this.cancel
-      : 'Cancel';
-  }
-
-  created(): void {
-    this.local = [...this.value];
-  }
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      cancelLabel,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

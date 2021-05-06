@@ -1,9 +1,13 @@
-import { autoRegister } from '@/helpers/component-ref';
+import { Plugin } from 'vue';
 
-export * from './helpers';
+import { autoRegister } from '@/utils/component-ref';
 
-export default {
-  install() {
-    autoRegister(require.context('./components', true));
+export * from './utils';
+
+const plugin: Plugin = {
+  install(app) {
+    autoRegister(app, require.context('./components', true));
   },
 };
+
+export default plugin;

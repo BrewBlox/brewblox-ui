@@ -1,8 +1,9 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
 import { CFC_BOTTOM_LEFT, CFC_TOP_RIGHT } from '../specs/CounterflowChiller';
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   borders: [
@@ -47,26 +48,40 @@ const paths = {
       `,
 };
 
-@Component
-export default class CounterflowChiller extends PartBase {
-  readonly paths = paths;
+export default defineComponent({
+  name: 'CounterflowChiller',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const topFlowSpeed = computed<number>(
+      () => flowOnCoord(props.part, CFC_TOP_RIGHT),
+    );
 
-  get topFlowSpeed(): number {
-    return this.flowOnCoord(CFC_TOP_RIGHT);
-  }
+    const bottomFlowSpeed = computed<number>(
+      () => flowOnCoord(props.part, CFC_BOTTOM_LEFT),
+    );
 
-  get bottomFlowSpeed(): number {
-    return this.flowOnCoord(CFC_BOTTOM_LEFT);
-  }
+    const topLiquids = computed<string[]>(
+      () => liquidOnCoord(props.part, CFC_TOP_RIGHT),
+    );
 
-  get topLiquids(): string[] {
-    return this.liquidOnCoord(CFC_TOP_RIGHT);
-  }
+    const bottomLiquids = computed<string[]>(
+      () => liquidOnCoord(props.part, CFC_BOTTOM_LEFT),
+    );
 
-  get bottomLiquids(): string[] {
-    return this.liquidOnCoord(CFC_BOTTOM_LEFT);
-  }
-}
+    return {
+      paths,
+      topFlowSpeed,
+      bottomFlowSpeed,
+      topLiquids,
+      bottomLiquids,
+    };
+  },
+});
 </script>
 
 <template>
@@ -84,7 +99,7 @@ export default class CounterflowChiller extends PartBase {
 </template>
 
 <style lang="scss" scoped>
-/deep/ .bulbLiquid path {
+:deep(.bulbLiquid path) {
   stroke-width: 18pt !important;
   stroke-linecap: round;
   fill: none;

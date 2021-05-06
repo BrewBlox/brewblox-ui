@@ -1,26 +1,46 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-
-import ValEditBase from '../ValEditBase';
-
-
-@Component
-export default class StringValEdit extends ValEditBase {
-  get displayValue(): string {
-    return this.field || '<not set>';
-  }
+import { useValEdit } from '@/plugins/spark/composables';
+import { createDialog } from '@/utils/dialog';
 
 
-  showKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.field,
-    })
-      .onOk(v => this.field = v);
-  }
-}
+export default defineComponent({
+  name: 'StringValEdit',
+  props: {
+    ...useValEdit.props,
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<string>(props.modelValue);
+
+    const displayValue = computed<string>(
+      () => field.value || '<not set>',
+    );
+
+    function showKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: field.value,
+        },
+      })
+        .onOk(v => field.value = v);
+    }
+
+    return {
+      field,
+      startEdit,
+      displayValue,
+      showKeyboard,
+    };
+  },
+});
 </script>
 
 <template>

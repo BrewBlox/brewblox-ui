@@ -1,40 +1,68 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
-import { colorString } from '../helpers';
-import PartCard from './PartCard';
+import { BEER, COLD_WATER, HOT_WATER, WORT } from '@/plugins/builder/const';
+import { colorString } from '@/plugins/builder/utils';
 
-@Component
-export default class LiquidSourceCard extends PartCard {
-  presetColors = [
-    COLD_WATER,
-    HOT_WATER,
-    BEER,
-    WORT,
-  ];
+import { FlowPart } from '../types';
 
-  get pressured(): boolean {
-    return this.part.settings.enabled ?? !!this.part.settings.pressure;
-  }
+const presetColors: string[] = [
+  COLD_WATER,
+  HOT_WATER,
+  BEER,
+  WORT,
+];
 
-  set pressured(enabled: boolean) {
-    this.savePart({ ...this.part, settings: { ...this.part.settings, enabled } });
-  }
+export default defineComponent({
+  name: 'LiquidSourceCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
 
-  get color(): string | null {
-    return this.part.settings.liquids?.[0] ?? null;
-  }
+    const pressured = computed<boolean>({
+      get: () => props.part.settings.enabled ?? Boolean(props.part.settings.pressure),
+      set: enabled => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          enabled,
+        },
+      }),
+    });
 
-  set color(val: string | null) {
-    const liquids = val ? [colorString(val)] : [];
-    this.savePart({ ...this.part, settings: { ...this.part.settings, liquids } });
-  }
+    const color = computed<string | null>({
+      get: () => props.part.settings.liquids?.[0] ?? null,
+      set: v => {
+        const liquids = v ? [colorString[v]] : [];
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            liquids,
+          },
+        });
+      },
+    });
 
-  toggle(color: string): void {
-    this.color = color !== this.color ? color : null;
-  }
-}
+    function toggle(c: string): void {
+      color.value = c !== color.value ? c : null;
+    }
+
+    return {
+      pressured,
+      presetColors,
+      color,
+      toggle,
+    };
+  },
+});
 </script>
 
 <template>

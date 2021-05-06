@@ -1,8 +1,13 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, watch } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { RIGHT } from '../getters';
+import { RIGHT } from '@/plugins/builder/const';
+import { DigitalState } from '@/shared-types';
+
+import { useSettingsBlock } from '../composables';
+import { VALVE_KEY, VALVE_TYPES, ValveT } from '../specs/Valve';
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord, squares } from '../utils';
 
 const paths = {
   outerValve: [
@@ -23,26 +28,94 @@ const paths = {
   arrows: 'M0,25H50',
 };
 
-@Component
-export default class Valve extends PartBase {
-  readonly paths = paths;
+export default defineComponent({
+  name: 'Valve',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  emits: [
+    'dirty',
+  ],
+  setup(props, { emit }) {
+    const {
+      hasAddress,
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
 
-  get flowSpeed(): number {
-    return this.flowOnCoord(RIGHT);
-  }
+    const flowSpeed = computed<number>(
+      () => flowOnCoord(props.part, RIGHT),
+    );
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(RIGHT);
-  }
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, RIGHT),
+    );
 
-  get closed(): boolean {
-    return Boolean(this.part.settings.closed);
-  }
-}
+    const closed = computed<boolean>(
+      () => hasAddress.value
+        ? block.value?.data.state !== DigitalState.STATE_ACTIVE
+        : Boolean(props.part.settings['closed']),
+    );
+
+    const pending = computed<boolean>(
+      () => hasAddress.value
+        ? block.value?.data.desiredState !== block.value?.data.state
+        : false,
+    );
+
+    const valveRotation = computed<number>(
+      () => {
+        if (!hasAddress.value) {
+          return closed.value ? 90 : 0;
+        }
+        switch (block.value?.data.state) {
+          case undefined:
+            return 90;
+          case DigitalState.STATE_INACTIVE:
+            return 90;
+          case DigitalState.STATE_ACTIVE:
+            return 0;
+          default:
+            return 45;
+        }
+      },
+    );
+
+    watch(
+      () => block.value,
+      (newV, oldV) => {
+        if (hasAddress.value && newV?.data.state !== oldV?.data.state) {
+          emit('dirty');
+        }
+      },
+    );
+
+    return {
+      squares,
+      paths,
+      hasAddress,
+      isBroken,
+      flowSpeed,
+      liquids,
+      closed,
+      pending,
+      valveRotation,
+    };
+  },
+});
 </script>
 
 <template>
   <g>
+    <SvgEmbedded v-if="isBroken" height="15" width="15">
+      <UnlinkedIcon size="15px" class="self-end" />
+    </SvgEmbedded>
+    <SvgEmbedded v-else-if="pending" :height="squares(1)" :width="squares(1)">
+      <q-spinner size="44px" class="col" color="blue-grey-5" />
+    </SvgEmbedded>
     <g key="valve-outer" class="outline">
       <path :d="paths.outerValve[0]" />
       <path :d="paths.outerValve[1]" />
@@ -51,11 +124,12 @@ export default class Valve extends PartBase {
     <LiquidStroke v-else :paths="paths.openLiquid" :colors="liquids" />
     <g
       key="valve-inner"
-      :transform="`rotate(${closed ? '90' : '0'}, 25, 25)`"
+      :transform="`rotate(${valveRotation}, 25, 25)`"
       class="fill outline inner"
     >
       <path :d="paths.innerValve[0]" />
       <path :d="paths.innerValve[1]" />
+      <PowerIcon v-if="hasAddress" color="black" />
     </g>
     <AnimatedArrows key="valve-arrows" :speed="flowSpeed" :path="paths.arrows" />
   </g>

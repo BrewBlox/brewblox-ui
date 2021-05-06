@@ -1,80 +1,102 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { createDialog } from '@/helpers/dialog';
-import { round } from '@/helpers/functional';
+import { useField } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { round } from '@/utils/functional';
 
+export default defineComponent({
+  name: 'InputField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: [String, Number],
+      default: null,
+    },
+    type: {
+      type: String as PropType<'text' | 'number'>,
+      default: 'text',
+    },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    autogrow: {
+      type: Boolean,
+      default: false,
+    },
+    suffix: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-@Component
-export default class InputField extends FieldBase {
-
-  @Prop({ type: [String, Number] })
-  public readonly value!: string | number;
-
-  @Prop({ type: String, default: 'text' })
-  public readonly type!: string;
-
-  @Prop({ type: Number, default: 2 })
-  readonly decimals!: number;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly autogrow!: boolean;
-
-  @Prop({ type: String, required: false })
-  public readonly suffix!: string;
-
-  @Emit('input')
-  public change(v: string | number): string | number {
-    return v;
-  }
-
-  get displayValue(): string | number {
-    if (this.value === ''
-      || this.value === null
-      || this.value === undefined) {
-      return '<not set>';
+    function change(v: string | number): void {
+      emit('update:modelValue', v);
     }
 
-    return this.type === 'number'
-      ? round(this.value, this.decimals)
-      : this.value;
-  }
+    const displayValue = computed<string>(
+      () => {
+        if (props.modelValue == null || props.modelValue === '') {
+          return '<not set>';
+        }
+        return props.type === 'number'
+          ? round(Number(props.modelValue), props.decimals)
+          : `${props.modelValue}`;
+      },
+    );
 
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          decimals: props.decimals,
+          type: props.type,
+          label: props.label,
+          rules: props.rules,
+          clearable: props.clearable,
+          autogrow: props.autogrow,
+          suffix: props.suffix,
+          ...props.dialogProps,
+        },
+      })
+        .onOk(change);
     }
 
-    createDialog({
-      component: 'InputDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      decimals: this.decimals,
-      type: this.type,
-      label: this.label,
-      rules: this.rules,
-      clearable: this.clearable,
-      autogrow: this.autogrow,
-      suffix: this.suffix,
-    })
-      .onOk(this.change);
-  }
-}
+    return {
+      activeSlots,
+      displayValue,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
-    <template v-if="!!$scopedSlots.before" #before>
-      <slot name="before" />
-    </template>
     <slot name="value">
       {{ displayValue }}
     </slot>
+
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
   </LabeledField>
 </template>

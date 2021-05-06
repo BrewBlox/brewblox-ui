@@ -1,66 +1,97 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { isQuantity, Quantity } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
+import { useField } from '@/composables';
+import { isQuantity, prettyUnit, Quantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { round } from '@/utils/functional';
 
-@Component
-export default class QuantityField extends FieldBase {
+export default defineComponent({
+  name: 'QuantityField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: Object as PropType<Quantity>,
+      required: true,
+      validator: isQuantity,
+    },
+    label: {
+      type: String,
+      default: '',
+    },
+    noLabel: {
+      type: Boolean,
+      default: false,
+    },
+    tagClass: {
+      type: [String, Object, Array],
+      default: '',
+    },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+    unitTag: {
+      type: String,
+      default: 'small',
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-  @Prop({ type: Object, required: true, validator: isQuantity })
-  public readonly value!: Quantity;
-
-  @Prop({ type: String, required: false })
-  public readonly label!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly noLabel!: boolean;
-
-  @Prop({ type: [String, Object, Array], default: '' })
-  public readonly tagClass!: any;
-
-  @Prop({ type: Number, default: 2 })
-  readonly decimals!: number;
-
-  @Prop({ type: String, default: 'small' })
-  public readonly unitTag!: string;
-
-  @Emit('input')
-  public change(v: Quantity): Quantity {
-    return v;
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function change(v: Quantity): void {
+      emit('update:modelValue', v);
     }
-    createDialog({
-      component: 'QuantityDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      label: this.label,
-    })
-      .onOk(this.change);
-  }
-}
+
+    const displayValue = computed<string>(
+      () => round(props.modelValue.value, props.decimals),
+    );
+
+    const displayUnit = computed<string>(
+      () => prettyUnit(props.modelValue),
+    );
+
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+      createDialog({
+        component: 'QuantityDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          label: props.label,
+        },
+      })
+        .onOk(change);
+    }
+
+    return {
+      activeSlots,
+      displayValue,
+      displayUnit,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <slot name="value">
-      {{ value.value | round }}
+      {{ displayValue }}
     </slot>
-    <component :is="unitTag" v-if="value.value !== null" class="self-end darkish">
-      {{ value | prettyUnit }}
+    <component :is="unitTag" v-if="modelValue.value !== null" class="self-end darkish">
+      {{ displayUnit }}
     </component>
-    <template v-if="!!$scopedSlots.append" #append>
-      <slot name="append" />
-    </template>
-    <template v-if="!!$scopedSlots.after" #after>
-      <slot name="after" />
+
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
   </LabeledField>
 </template>

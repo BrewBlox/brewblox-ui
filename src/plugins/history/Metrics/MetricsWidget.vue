@@ -1,43 +1,44 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent, ref } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
+import { useContext } from '@/composables';
 
 import MetricsBasic from './MetricsBasic.vue';
 import MetricsFull from './MetricsFull.vue';
 
-
-@Component({
+export default defineComponent({
+  name: 'MetricsWidget',
   components: {
     Basic: MetricsBasic,
     Full: MetricsFull,
   },
-})
-export default class MetricsWidget extends WidgetBase {
-  revision = 0;
-}
+  setup() {
+    const { context } = useContext.setup();
+    const revision = ref<Date>(new Date());
+
+    return {
+      context,
+      revision,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <WidgetToolbar has-mode-toggle>
         <template #actions>
           <ActionItem
-            v-if="mode === 'Basic'"
+            v-if="context.mode === 'Basic'"
             icon="refresh"
             label="Refresh"
-            @click="revision++"
+            @click="revision = new Date()"
           />
         </template>
-      </component>
+      </WidgetToolbar>
     </template>
 
-    <component
-      :is="mode"
-      :crud="crud"
-      :revision="revision"
-      @mode="v => mode = v"
-    />
-  </CardWrapper>
+    <component :is="context.mode" :revision="revision" />
+  </Card>
 </template>

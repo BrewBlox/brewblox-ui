@@ -1,39 +1,44 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
+import { createDialog } from '@/utils/dialog';
 
 import { LoggedSession } from '../types';
 import SessionHeaderDialog from './SessionHeaderDialog.vue';
 
-
-@Component({
-  components: {
-
+export default defineComponent({
+  name: 'SessionHeaderField',
+  props: {
+    session: {
+      type: Object as PropType<LoggedSession>,
+      required: true,
+    },
   },
-})
-export default class SessionHeaderField extends Vue {
-  @Prop({ type: Object, required: true })
-  public readonly session!: LoggedSession;
+  emits: [
+    'update:session',
+  ],
+  setup(props, { emit }) {
+    const tags = computed<string[]>(
+      () => props.session.tags ?? [],
+    );
 
-  save(session: LoggedSession = this.session): void {
-    this.$emit('update:session', session);
-  }
+    function showDialog(): void {
+      createDialog({
+        component: SessionHeaderDialog,
+        componentProps: {
+          modelValue: props.session,
+          title: 'Edit session',
+        },
+      })
+        .onOk(v => emit('update:session', v));
+    }
 
-  get tags(): string[] {
-    return this.session.tags ?? [];
-  }
-
-  showDialog(): void {
-    createDialog({
-      component: SessionHeaderDialog,
-      session: this.session,
-      title: 'Edit session',
-    })
-      .onOk(this.save);
-  }
-}
+    return {
+      tags,
+      showDialog,
+    };
+  },
+});
 </script>
 
 <template>
@@ -43,7 +48,7 @@ export default class SessionHeaderField extends Vue {
   >
     <q-tooltip
       v-if="tags.length > 0"
-      content-style="background: transparent"
+      style="background: transparent"
       anchor="bottom right"
       self="top right"
     >

@@ -1,10 +1,7 @@
 <script lang="ts">
 import { QTree, throttle } from 'quasar';
-import Vue from 'vue';
-import { Component, Prop, Ref } from 'vue-property-decorator';
-import { Watch } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
 import {
   defaultLabel,
   filteredNodes,
@@ -13,117 +10,139 @@ import {
   targetSplitter,
 } from '@/plugins/history/nodes';
 import { historyStore } from '@/plugins/history/store';
-import { QueryConfig } from '@/plugins/history/types';
+import { DisplayNames, QueryConfig } from '@/plugins/history/types';
+import { createDialog } from '@/utils/dialog';
+import { mutate } from '@/utils/functional';
 
+export default defineComponent({
+  name: 'QueryEditor',
+  props: {
+    config: {
+      type: Object as PropType<QueryConfig>,
+      required: true,
+    },
+  },
+  emits: ['update:config'],
+  setup(props, { emit }) {
+    const selectFilter = ref<string | null>(null);
+    const expandedKeys = ref<string[]>([]);
+    const showStale = ref(false);
+    const treeRef = ref<QTree>();
 
-@Component
-export default class QueryEditor extends Vue {
-  selectFilter: string | null = null;
-  expandedKeys: string[] = [];
-  showStale: boolean = false;
+    const limFetchFresh = throttle(historyStore.fetchFreshFields, 10000);
+    const limFetchAll = throttle(historyStore.fetchAllFields, 10000);
 
-  limFetchFresh: Function = () => { };
-  limFetchAll: Function = () => { };
+    onBeforeMount(() => limFetchFresh());
+    onMounted(() => expandTicked());
 
-  @Ref()
-  readonly tree!: QTree;
+    watch(
+      () => selectFilter.value,
+      (filter: string | null) => {
+        if (filter) {
+          expandedKeys.value = filteredNodes(nodes.value, filter);
+        }
+      },
+    );
 
-  @Prop({ type: Object, required: true })
-  public readonly config!: QueryConfig;
+    watch(
+      () => showStale.value,
+      (value) => value
+        ? limFetchAll()
+        : limFetchFresh(),
+    );
 
-  @Watch('selectFilter')
-  updateExpanded(filter: string): void {
-    if (filter) {
-      this.expandedKeys = filteredNodes(this.nodes, filter);
+    function showSearchKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: selectFilter.value,
+        },
+      })
+        .onOk(v => selectFilter.value = v);
     }
-  }
 
-  @Watch('showStale')
-  autoFetch(value: boolean): void {
-    value
-      ? this.limFetchAll()
-      : this.limFetchFresh();
-  }
+    function expandTicked(): void {
+      /**
+       * Expanded keys must include parent elements
+       * If we selected sparkey/blocky/value,
+       * we must expand the following keys:
+       * - sparkey
+       * - sparkey/blocky
+       */
+      expandedKeys.value = [...new Set(
+        ticked
+          .value
+          .flatMap(s => s
+            // Remove leaf node -> 'sparkey/blocky'
+            .replace(/\/[^\/]+$/, '')
+            // Split in sections -> ['sparkey', 'blocky']
+            .split('/')
+            // Gradually build parents -> ['sparkey', 'sparkey/blocky']
+            .map((v, idx, arr) => arr.slice(0, idx + 1).join('/'))),
+      )];
+    }
 
-  created(): void {
-    this.limFetchFresh = throttle(historyStore.fetchFreshFields, 10000);
-    this.limFetchAll = throttle(historyStore.fetchAllFields, 10000);
-    this.limFetchFresh();
-  }
+    function saveConfig(config: QueryConfig): void {
+      emit('update:config', config);
+    }
 
-  mounted(): void {
-    this.expandTicked();
-  }
+    function nodeHandler(node: QuasarNode): void {
+      if (!treeRef.value!.isTicked(node.value)) {
+        treeRef.value?.setTicked([node.value], true);
+      }
+    }
 
+    function nodeFilter(node: QuasarNode, filter: string): boolean {
+      return node && node.value.toLowerCase().match(filter.toLowerCase());
+    }
 
-  showSearchKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.selectFilter,
-    })
-      .onOk(v => this.selectFilter = v);
-  }
+    const fields = computed<Mapped<string[]>>(
+      () => showStale.value
+        ? historyStore.allFields
+        : historyStore.freshFields,
+    );
 
-  expandTicked(): void {
-    /**
-     * Expanded keys must include parent elements
-     * If we selected sparkey/blocky/value,
-     * we must expand the following keys:
-     * - sparkey
-     * - sparkey/blocky
-     */
-    this.expandedKeys = [...new Set(
-      this.ticked
-        .flatMap(s => s
-          // Remove leaf node -> 'sparkey/blocky'
-          .replace(/\/[^\/]+$/, '')
-          // Split in sections -> ['sparkey', 'blocky']
-          .split('/')
-          // Gradually build parents -> ['sparkey', 'sparkey/blocky']
-          .map((v, idx, arr) => arr.slice(0, idx + 1).join('/')))
-    )];
-  }
+    const nodes = computed<QuasarNode[]>(
+      () => nodeBuilder(fields.value, {
+        selectable: true,
+        handler: nodeHandler,
+        header: 'leaf',
+      }),
+    );
 
-  saveConfig(config: QueryConfig = this.config): void {
-    this.$emit('update:config', config);
-  }
-
-  get fields(): Mapped<string[]> {
-    return this.showStale
-      ? historyStore.allFields
-      : historyStore.freshFields;
-  }
-
-  get nodes(): QuasarNode[] {
-    return nodeBuilder(this.fields, {
-      selectable: true,
-      handler: this.nodeHandler,
-      header: 'leaf',
+    const ticked = computed<string[]>({
+      get: () => targetSplitter(props.config.targets),
+      set: vals => {
+        const targets = targetBuilder(vals, fields.value);
+        const renames = vals
+          .filter(key => props.config.renames[key] === undefined)
+          .reduce(
+            (acc: DisplayNames, key) => mutate(acc, key, defaultLabel(key)),
+            { ...props.config.renames });
+        saveConfig({
+          ...props.config,
+          targets,
+          renames,
+        });
+      },
     });
-  }
 
-  get ticked(): string[] {
-    return targetSplitter(this.config.targets);
-  }
-
-  set ticked(vals: string[]) {
-    this.$set(this.config, 'targets', targetBuilder(vals, this.fields));
-    vals
-      .filter(key => this.config.renames[key] === undefined)
-      .forEach(key => this.$set(this.config.renames, key, defaultLabel(key)));
-    this.saveConfig();
-  }
-
-  nodeHandler(node: QuasarNode): void {
-    if (!this.tree.isTicked(node.value)) {
-      this.tree.setTicked([node.value], true);
-    }
-  }
-
-  nodeFilter(node: QuasarNode, filter: string): boolean {
-    return node && node.value.toLowerCase().match(filter.toLowerCase());
-  }
-}
+    return {
+      selectFilter,
+      expandedKeys,
+      showStale,
+      treeRef,
+      showSearchKeyboard,
+      expandTicked,
+      saveConfig,
+      nodeHandler,
+      nodeFilter,
+      fields,
+      nodes,
+      ticked,
+    };
+  },
+});
 </script>
 
 <template>
@@ -141,10 +160,10 @@ export default class QueryEditor extends Vue {
       </template>
     </q-input>
     <div class="col-auto row justify-end q-gutter-x-sm q-gutter-y-xs q-mx-sm">
-      <q-btn flat icon="mdi-collapse-all" @click="tree.collapseAll()">
+      <q-btn flat icon="mdi-collapse-all" @click="treeRef?.collapseAll()">
         <q-tooltip>Collapse all</q-tooltip>
       </q-btn>
-      <q-btn flat icon="mdi-expand-all" @click="tree.expandAll()">
+      <q-btn flat icon="mdi-expand-all" @click="treeRef?.expandAll()">
         <q-tooltip>Expand all</q-tooltip>
       </q-btn>
       <q-btn flat icon="mdi-checkbox-multiple-marked-outline" @click="expandTicked">
@@ -167,10 +186,10 @@ export default class QueryEditor extends Vue {
 
     <q-item class="column">
       <q-tree
-        ref="tree"
+        ref="treeRef"
+        v-model:ticked="ticked"
+        v-model:expanded="expandedKeys"
         :nodes="nodes"
-        :ticked.sync="ticked"
-        :expanded.sync="expandedKeys"
         :filter="selectFilter"
         :filter-method="nodeFilter"
         tick-strategy="leaf"

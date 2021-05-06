@@ -1,288 +1,304 @@
 <script lang="ts">
-import { Component, Ref, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeUnmount, ref, watch } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
-import { WS_HOST } from '@/helpers/const';
+import { useContext, useWidget } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { WS_HOST } from '@/utils/const';
 
-import { SparkDisplayConfig } from './types';
+import { SparkDisplayWidget } from './types';
 
-@Component
-export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
-  width = 320;
-  height = 240;
+const WIDTH = 320;
+const HEIGHT = 240;
 
-  connected = true;
-  connecting = false;
-  preventReconnection = true;
+export default defineComponent({
+  name: 'SparkDisplayWidget',
+  setup() {
+    const { context } = useContext.setup();
+    const {
+      config,
+      saveConfig,
+    } = useWidget.setup<SparkDisplayWidget>();
 
-  debug = false;
+    const connected = ref(true);
+    let preventReconnection = false;
+    let debug = false;
 
-  // initialize to undefined so they are not reactive
-  renderContext: CanvasRenderingContext2D | undefined = undefined;
-  ws: WebSocket | undefined = undefined;
-  buf: ArrayBuffer | undefined = undefined;
-  buf8: Uint8ClampedArray | undefined = undefined;
-  data: Uint32Array | undefined = undefined;
-  rerender = true;
-  handle: number | undefined = undefined;
+    let renderContext: CanvasRenderingContext2D | null = null;
+    let ws: WebSocket | null = null;
+    let buf: ArrayBuffer | null = null;
+    let buf8: Uint8ClampedArray | null = null;
+    let data: Uint32Array | null = null;
+    let handle: number | undefined = undefined;
 
-  pressed = 0;
+    let pressed = 0;
+    const canvasRef = ref<HTMLCanvasElement>();
 
-  @Ref('screen-canvas')
-  readonly canvas!: HTMLCanvasElement;
-
-  get serviceId(): string | null {
-    return this.config.serviceId;
-  }
-
-  set serviceId(v: string | null) {
-    this.config.serviceId = v;
-    this.saveConfig();
-  }
-
-  get url(): string {
-    return `${WS_HOST}/${this.serviceId}/sim/display`;
-  }
-
-  get sparkModule(): SparkServiceModule | null {
-    return sparkStore.moduleById(this.serviceId);
-  }
-
-  get isValid(): boolean {
-    return this.sparkModule
-      ?.status
-      ?.connectionKind === 'simulation';
-  }
-
-  get error(): string | null {
-    if (!this.sparkModule) {
-      return 'No service configured';
-    }
-    if (!this.sparkModule.status?.isSynchronized) {
-      return 'Service is not connected';
-    }
-    if (!this.isValid) {
-      return 'Service is not a simulation';
-    }
-    return null;
-  }
-
-  get serviceIds(): string[] {
-    return sparkStore.serviceIds;
-  }
-
-  @Watch('serviceId')
-  watchUrl(): void {
-    this.closeSocket();
-    this.setupSocket();
-  }
-
-  log(logline): void {
-    if (this.debug === true) {
-      console.log(logline); // eslint-disable-line
-    }
-  }
-
-  beforeMount(): void {
-    this.preventReconnection = false;
-  }
-
-  renderCanvas(): void {
-    if (this.renderContext != null && this.buf8 != null) {
-      const imagedata = this.renderContext.createImageData(this.width, this.height);
-      imagedata.data.set(this.buf8);
-      this.renderContext.putImageData(imagedata, 0, 0);
-      this.rerender = false;
-    }
-  }
-
-  mounted(): void {
-    this.$nextTick(() => {
-      this.renderContext = this.canvas.getContext('2d')!;
-
-      if (this.renderContext != null) {
-        this.buf = new ArrayBuffer(this.width * this.height * 4);
-        this.buf8 = new Uint8ClampedArray(this.buf);
-        this.data = new Uint32Array(this.buf);
-
-        for (let i = 0; i < this.width * this.height; i += 1) {
-          this.data[i] = 255 << 24; // initalize alpha to 255, leave black
-        }
-        this.renderCanvas();
-      }
-
-      this.setupSocket();
-
-      this.handle = window.setInterval(this.renderCanvas, 100); // 10 frames per second max
+    const serviceId = computed<string | null>({
+      get: () => config.value.serviceId,
+      set: serviceId => saveConfig({ ...config.value, serviceId }),
     });
-  }
 
-  beforeDestroy(): void {
-    this.preventReconnection = true;
-    this.closeSocket();
-    this.renderContext = undefined;
-    window.clearInterval(this.handle);
-    this.handle = undefined;
-  }
+    const url = computed<string>(
+      () => `${WS_HOST}/${serviceId.value}/sim/display`,
+    );
 
-  closeSocket(): void {
-    if (this.ws) {
-      this.ws.close();
-      this.ws = undefined;
-      this.connecting = false;
-      this.connected = false;
-    }
-  }
+    const sparkModule = computed<SparkServiceModule | null>(
+      () => sparkStore.moduleById(serviceId.value),
+    );
 
-  getMousePos(evt): XYPosition {
-    return this.canvas != null
-      ? {
-        x: evt.clientX - this.canvas.offsetLeft,
-        y: evt.clientY - this.canvas.offsetTop,
+    const isValid = computed<boolean>(
+      () => sparkModule.value
+        ?.status
+        ?.connectionKind === 'simulation',
+    );
+
+    const error = computed<string | null>(
+      () => {
+        if (!sparkModule.value) {
+          return 'No service configured';
+        }
+        if (!sparkModule.value.status?.isSynchronized) {
+          return 'Service is not connected';
+        }
+        if (!isValid.value) {
+          return 'Service is not a simulation';
+        }
+        return null;
+      },
+    );
+
+    const serviceIds = computed<string[]>(
+      () => sparkStore.serviceIds,
+    );
+
+    watch(
+      () => serviceId.value,
+      () => {
+        closeSocket();
+        setupSocket();
+      },
+    );
+
+    function log(logline): void {
+      if (debug === true) {
+        console.log(logline); // eslint-disable-line
       }
-      : {
-        x: 0,
-        y: 0,
+    }
+
+    function renderCanvas(): void {
+      if (renderContext != null && buf8 != null) {
+        const imagedata = renderContext.createImageData(WIDTH, HEIGHT);
+        imagedata.data.set(buf8);
+        renderContext.putImageData(imagedata, 0, 0);
+      }
+    }
+
+    const cancelWatcher = watch(
+      () => canvasRef.value,
+      (el: HTMLCanvasElement | undefined) => {
+        if (el) {
+          renderContext = el.getContext('2d');
+          if (renderContext != null) {
+            buf = new ArrayBuffer(WIDTH * HEIGHT * 4);
+            buf8 = new Uint8ClampedArray(buf);
+            data = new Uint32Array(buf);
+
+            for (let i = 0; i < WIDTH * HEIGHT; i += 1) {
+              data[i] = 255 << 24; // initalize alpha to 255, leave black
+            }
+            renderCanvas();
+            setupSocket();
+            setupRender();
+            cancelWatcher();
+          }
+        }
+      },
+      { immediate: true },
+    );
+
+    onBeforeUnmount(() => {
+      preventReconnection = true;
+      closeSocket();
+      renderContext = null;
+      window.clearInterval(handle);
+      handle = undefined;
+    });
+
+    function closeSocket(): void {
+      if (ws) {
+        ws.close();
+        ws = null;
+        connected.value = false;
+      }
+    }
+
+    function getMousePos(evt): XYPosition {
+      return canvasRef.value != null
+        ? {
+          x: evt.clientX - canvasRef.value.offsetLeft,
+          y: evt.clientY - canvasRef.value.offsetTop,
+        }
+        : {
+          x: 0,
+          y: 0,
+        };
+    }
+
+    function onMouseDown(evt): void {
+      log(`mousedown ${evt} ${evt.button}`);
+      if (evt.button === 0) {
+        pressed += 1;
+        touchscreen(evt);
+      }
+    }
+
+    function onMouseUp(evt): void {
+      log(`mouseup ${evt} ${evt.button}`);
+      if (evt.button === 0) {
+        pressed -= 1;
+        touchscreen(evt);
+      }
+    }
+
+    function onMouseMove(evt): void {
+      if (pressed > 0) {
+        touchscreen(evt);
+      }
+    }
+
+    function touchscreen(evt): void {
+      const { x, y } = getMousePos(evt);
+      if (connected.value && ws != null) {
+        log(`sending touch ${x},${y},${pressed}`);
+        const buf = new ArrayBuffer(5);
+        const view = new DataView(buf);
+        view.setInt8(0, pressed ? 1 : 2); // command
+        view.setUint16(1, x, true);
+        view.setUint16(3, y, true);
+        ws.send(buf);
+      }
+      else {
+        log('no touch event sent - not connected');
+      }
+    }
+
+    function setupRender(): void {
+      if (handle !== undefined) {
+        window.clearInterval(handle);
+      }
+      handle = window.setInterval(renderCanvas, 100); // 10 frames per second max
+    }
+
+    function setupSocket(): void {
+      try {
+        createSocket();
+      }
+      catch (e) {
+        log(e);
+        rescheduleSetup();
+      }
+    }
+
+    function createSocket(): void {
+      if (error.value) {
+        log(error.value);
+        rescheduleSetup();
+        return;
+      }
+
+      ws = new WebSocket(url.value);
+      log('connecting');
+      ws.binaryType = 'arraybuffer';
+
+      ws.onopen = () => {
+        connected.value = true;
+        log('Websocket connected');
       };
-  }
 
-  onMouseDown(evt): void {
-    this.log(`mousedown ${evt} ${evt.button}`);
-    if (evt.button === 0) {
-      this.pressed += 1;
-      this.touchscreen(evt);
-    }
-  }
+      ws.onmessage = (msg: MessageEvent) => {
+        handleScreenUpdate(new DataView(msg.data), msg.data.byteLength);
+      };
 
-  onMouseUp(evt): void {
-    this.log(`mouseup ${evt} ${evt.button}`);
-    if (evt.button === 0) {
-      this.pressed -= 1;
-      this.touchscreen(evt);
-    }
-  }
+      ws.onerror = () => {
+        ws?.close();
+      };
 
-  onMouseMove(evt): void {
-    if (this.pressed > 0) {
-      this.touchscreen(evt);
-    }
-  }
-
-  touchscreen(evt): void {
-    const { x, y } = this.getMousePos(evt);
-    if (this.connected && this.ws != null) {
-      this.log(`sending touch ${x},${y},${this.pressed}`);
-      const buf = new ArrayBuffer(5);
-      const view = new DataView(buf);
-      view.setInt8(0, this.pressed ? 1 : 2); // command
-      view.setUint16(1, x, true);
-      view.setUint16(3, y, true);
-      this.ws.send(buf);
-    }
-    else {
-      this.log('no touch event sent - not connected');
-    }
-  }
-
-  setupSocket(): void {
-    try {
-      this.createSocket();
-    }
-    catch (e) {
-      this.log(e);
-      this.rescheduleSetup();
-    }
-  }
-
-  createSocket(): void {
-    if (this.error) {
-      this.log(this.error);
-      this.rescheduleSetup();
-      return;
+      ws.onclose = () => {
+        log('Websocket disconnected');
+        closeSocket();
+        rescheduleSetup();
+      };
     }
 
-    const ws = new WebSocket(this.url);
-    this.log('connecting');
-    ws.binaryType = 'arraybuffer';
-    this.ws = ws;
-    this.connecting = true;
+    function rescheduleSetup(): void {
+      if (!preventReconnection) {
+        log('rescheduling socket connect in 1000 ms');
 
-    ws.onopen = () => {
-      this.connecting = false;
-      this.connected = true;
-      this.log('Websocket connected');
+        setTimeout(() => {
+          closeSocket();
+          log('Websocket reconnecting');
+          setupSocket();
+        }, 1000);
+      }
+    }
+
+    function handleScreenUpdate(buffer: DataView, length: number): void {
+      let index = 0;
+      while (index < length && data != null) {
+        const addr = buffer.getUint32(index, true);
+        const color = buffer.getUint32(index + 4, true);
+
+        const rr = ((color >>> 11) % 32);
+        const gg = ((color >>> 5) % 64);
+        const bb = ((color >>> 0) % 32);
+
+        const r = (rr << 3) | ((rr >>> 2) & 7);
+        const g = (gg << 2) | ((gg >>> 3) & 3);
+        const b = (bb << 3) | ((bb >>> 2) & 7);
+
+        data[addr] =
+          (255 << 24) | // alpha
+          (b << 16) | // blue
+          (g << 8) | // green
+          r; // red
+
+        index += 8;
+      }
+    }
+
+    return {
+      WIDTH,
+      HEIGHT,
+      context,
+      canvasRef,
+      connected,
+      serviceId,
+      serviceIds,
+      isValid,
+      error,
+      onMouseDown,
+      onMouseUp,
+      onMouseMove,
     };
-
-    ws.onmessage = (msg: MessageEvent) => {
-      this.handleScreenUpdate(new DataView(msg.data), msg.data.byteLength);
-    };
-
-    ws.onerror = () => {
-      ws.close();
-    };
-
-    ws.onclose = () => {
-      this.log('Websocket disconnected');
-      this.closeSocket();
-      this.rescheduleSetup();
-    };
-  }
-
-  rescheduleSetup(): void {
-    if (!this.preventReconnection) {
-      this.log('rescheduling socket connect in 1000 ms');
-
-      setTimeout(() => {
-        this.closeSocket();
-        this.log('Websocket reconnecting');
-        this.setupSocket();
-      }, 1000);
-    }
-  }
-
-  handleScreenUpdate(buffer: DataView, length: number): void {
-    let index = 0;
-    while (index < length && this.data != null) {
-      const addr = buffer.getUint32(index, true);
-      const color = buffer.getUint32(index + 4, true);
-
-      const rr = ((color >>> 11) % 32);
-      const gg = ((color >>> 5) % 64);
-      const bb = ((color >>> 0) % 32);
-
-      const r = (rr << 3) | ((rr >>> 2) & 7);
-      const g = (gg << 2) | ((gg >>> 3) & 3);
-      const b = (bb << 3) | ((bb >>> 2) & 7);
-
-      this.data[addr] =
-        (255 << 24) | // alpha
-        (b << 16) | // blue
-        (g << 8) | // green
-        r; // red
-
-      index += 8;
-    }
-    this.rerender = true;
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <WidgetToolbar has-mode-toggle />
     </template>
 
     <div
-      v-show="mode === 'Basic' && isValid"
+      v-show="context.mode === 'Basic' && isValid"
       class="row items-center q-pa-md"
     >
       <canvas
-        ref="screen-canvas"
+        ref="canvasRef"
         :hidden="!connected"
-        :width="width"
-        :height="height"
+        :width="WIDTH"
+        :height="HEIGHT"
         class="view col-auto"
         @mousedown="onMouseDown"
         @mouseup="onMouseUp"
@@ -290,14 +306,14 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
       />
       <div
         :hidden="connected"
-        :width="width"
-        :height="height"
+        :width="WIDTH"
+        :height="HEIGHT"
         class="glass col-auto"
       />
     </div>
 
     <div
-      v-if="mode === 'Basic' && error"
+      v-if="context.mode === 'Basic' && error"
       class="col row justify-center items-center text-h5 q-gutter-x-md q-mt-lg"
     >
       <q-icon name="warning" color="warning" />
@@ -307,7 +323,7 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
     </div>
 
     <div
-      v-if="mode === 'Full'"
+      v-if="context.mode === 'Full'"
       class="widget-body row"
     >
       <q-select
@@ -319,7 +335,7 @@ export default class SparkDisplayWidget extends WidgetBase<SparkDisplayConfig> {
         @keyup.enter.exact.stop
       />
     </div>
-  </CardWrapper>
+  </Card>
 </template>
 
 

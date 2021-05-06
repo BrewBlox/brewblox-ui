@@ -1,29 +1,37 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { Spark3PinsBlock } from '@/plugins/spark/types';
+import { round } from '@/utils/functional';
 
-@Component
-export default class Spark3PinsWidget
-  extends BlockWidgetBase<Spark3PinsBlock> {
-}
+export default defineComponent({
+  name: 'Spark3PinsWidget',
+  setup() {
+    const { context } = useContext.setup();
+    const { block, saveBlock } = useBlockWidget.setup<Spark3PinsBlock>();
+    return {
+      round,
+      context,
+      block,
+      saveBlock,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper
-    v-bind="{context}"
-  >
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
     <div class="widget-md">
-      <IoArray :crud="crud" />
+      <IoArray />
 
-      <div v-if="mode === 'Full'" class="widget-body row">
+      <div v-if="context.mode === 'Full'" class="widget-body row">
         <q-separator inset />
-
         <div class="col-break" />
 
         <LabeledField
@@ -31,9 +39,9 @@ export default class Spark3PinsWidget
           class="col-grow"
         >
           <q-toggle
-            :value="block.data.enableIoSupply5V"
+            :model-value="block.data.enableIoSupply5V"
             dense
-            @input="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
+            @update:model-value="v => { block.data.enableIoSupply5V = v; saveBlock(); }"
           />
         </labeledfield>
         <LabeledField
@@ -41,9 +49,9 @@ export default class Spark3PinsWidget
           class="col-grow"
         >
           <q-toggle
-            :value="block.data.enableIoSupply12V"
+            :model-value="block.data.enableIoSupply12V"
             dense
-            @input="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
+            @update:model-value="v => { block.data.enableIoSupply12V = v; saveBlock(); }"
           />
         </LabeledField>
 
@@ -53,15 +61,15 @@ export default class Spark3PinsWidget
           label="5V Voltage"
           class="col-grow"
         >
-          {{ block.data.voltage5 | round }}
+          {{ round(block.data.voltage5) }}
         </LabeledField>
         <LabeledField
           label="12V Voltage"
           class="col-grow"
         >
-          {{ block.data.voltage12 | round }}
+          {{ round(block.data.voltage12) }}
         </LabeledField>
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

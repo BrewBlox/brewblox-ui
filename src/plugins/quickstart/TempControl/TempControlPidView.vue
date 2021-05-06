@@ -1,26 +1,36 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+
+import { computed, defineComponent, PropType } from 'vue';
+
+import { prettyQty } from '@/utils/bloxfield';
 
 import { PidConfig } from '../types';
 
-
-@Component
-export default class TempControlPidView extends Vue {
-
-  @Prop({ type: Object, required: true })
-  public readonly value!: PidConfig;
-
-  get colorClass(): string {
-    if (!this.value.kp.value) {
-      return '';
-    }
-    return this.value.kp.value > 0
-      ? 'text-red'
-      : 'text-blue';
-  }
-
-}
+export default defineComponent({
+  name: 'TempControlPidView',
+  props: {
+    modelValue: {
+      type: Object as PropType<PidConfig>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const colorClass = computed<string>(
+      () => {
+        if (!props.modelValue.kp.value) {
+          return '';
+        }
+        return props.modelValue.kp.value > 0
+          ? 'text-red'
+          : 'text-blue';
+      },
+    );
+    return {
+      prettyQty,
+      colorClass,
+    };
+  },
+});
 </script>
 
 <template>
@@ -32,15 +42,15 @@ export default class TempControlPidView extends Vue {
   >
     <div class="col-auto">
       <span>Kp</span>
-      <span>{{ value.kp | quantity }}</span>
+      <span>{{ prettyQty(modelValue.kp) }}</span>
     </div>
     <div class="col-auto">
       <span>Td</span>
-      <span>{{ value.td | duration }}</span>
+      <span>{{ prettyQty(modelValue.td) }}</span>
     </div>
     <div class="col-auto">
       <span>Ti</span>
-      <span>{{ value.ti | duration }}</span>
+      <span>{{ prettyQty(modelValue.ti) }}</span>
     </div>
   </div>
 </template>

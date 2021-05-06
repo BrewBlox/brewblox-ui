@@ -1,21 +1,21 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
 import { BuilderLayout } from '@/plugins/builder/types';
 
-import { withPrefix } from '../helpers';
+import { withPrefix } from '../utils';
 import { HermsConfig } from './types';
 
 export function defineLayouts(config: HermsConfig): BuilderLayout[] {
   const { serviceId, names } = config;
   return [
     {
-      id: uid(),
+      id: nanoid(),
       title: withPrefix(config.prefix, 'Layout'),
       width: 26,
       height: 11,
       parts: [
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: { color: '#c48600' },
           flipped: false,
@@ -24,7 +24,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: { color: '#9c4b00' },
           flipped: false,
@@ -33,7 +33,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: { color: '#b50000' },
           flipped: false,
@@ -42,7 +42,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -51,7 +51,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 4,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             pwm: { serviceId, blockId: names.bkPwm },
@@ -63,7 +63,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             pwm: { serviceId, blockId: names.hltPwm },
@@ -75,7 +75,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -84,7 +84,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -93,7 +93,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: { sizeX: 4 },
           flipped: true,
@@ -102,7 +102,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -114,7 +114,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 3,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -126,7 +126,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 3,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -138,7 +138,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 3,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -147,7 +147,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -156,7 +156,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -165,7 +165,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 3,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -174,7 +174,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 4,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -183,7 +183,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 5,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -192,7 +192,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -201,7 +201,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -210,7 +210,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -219,7 +219,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -228,7 +228,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -237,7 +237,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -246,7 +246,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -255,7 +255,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -264,7 +264,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -273,7 +273,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: { closed: true },
           flipped: false,
@@ -282,7 +282,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: { closed: true },
           flipped: false,
@@ -291,7 +291,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -300,7 +300,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -309,7 +309,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 3,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -318,7 +318,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 4,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -327,7 +327,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 5,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: true,
@@ -336,7 +336,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -345,7 +345,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -354,7 +354,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 270,
           settings: { closed: true },
           flipped: false,
@@ -363,7 +363,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -372,7 +372,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -381,7 +381,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -390,7 +390,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -399,7 +399,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 270,
           settings: { enabled: false },
           flipped: false,
@@ -408,7 +408,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -417,7 +417,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -426,7 +426,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -435,7 +435,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -444,7 +444,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -453,7 +453,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -462,7 +462,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -471,7 +471,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: { closed: true },
           flipped: false,
@@ -480,7 +480,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: { closed: true },
           flipped: false,
@@ -489,7 +489,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: { closed: true },
           flipped: false,
@@ -498,7 +498,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -507,7 +507,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -516,7 +516,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: { closed: true },
           flipped: false,
@@ -525,7 +525,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: { closed: true },
           flipped: false,
@@ -534,7 +534,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -543,7 +543,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -552,7 +552,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -561,7 +561,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -570,7 +570,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -579,7 +579,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: { closed: true },
           flipped: false,
@@ -588,7 +588,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -597,7 +597,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: { closed: true },
           flipped: false,
@@ -606,7 +606,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -615,7 +615,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -624,7 +624,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 270,
           settings: { enabled: false },
           flipped: false,
@@ -633,7 +633,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: { closed: true },
           flipped: false,
@@ -642,7 +642,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: { closed: true },
           flipped: false,
@@ -651,7 +651,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 270,
           settings: {},
           flipped: false,
@@ -660,7 +660,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -669,7 +669,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -678,7 +678,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 4,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -687,7 +687,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 5,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -696,7 +696,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 5,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -705,7 +705,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 4,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -714,7 +714,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 4,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -723,7 +723,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 5,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -732,7 +732,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 4,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -741,7 +741,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 5,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -750,7 +750,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 3,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -765,7 +765,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -780,7 +780,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -795,7 +795,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -810,7 +810,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -819,7 +819,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: { closed: true },
           flipped: false,
@@ -828,7 +828,7 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 270,
           settings: { closed: true },
           flipped: false,
@@ -837,9 +837,9 @@ export function defineLayouts(config: HermsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
-          settings: { pressure: 10, liquids: ['#4AA0EF'] },
+          settings: { pressure: 10, liqnanoids: ['#4AA0EF'] },
           flipped: false,
           type: 'SystemIO',
           x: 0,

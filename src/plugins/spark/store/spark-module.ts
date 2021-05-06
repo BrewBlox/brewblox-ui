@@ -1,9 +1,7 @@
-import Vue from 'vue';
-import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 import type { RegisterOptions } from 'vuex-class-modules';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { STATE_TOPIC } from '@/helpers/const';
-import { extendById, typeMatchFilter } from '@/helpers/functional';
+import { eventbus } from '@/eventbus';
 import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   Block,
@@ -13,14 +11,17 @@ import type {
   Link,
   RelationEdge,
   SparkExported,
+  SparkPatchEvent,
   SparkService,
+  SparkSessionConfig,
   SparkStatus,
 } from '@/plugins/spark/types';
-import { SparkPatchEvent } from '@/shared-types';
-import { dashboardStore } from '@/store/dashboards';
+import { isSparkPatch, isSparkState } from '@/plugins/spark/utils';
 import { serviceStore } from '@/store/services';
+import { widgetStore } from '@/store/widgets';
+import { STATE_TOPIC } from '@/utils/const';
+import { deepCopy, extendById, filterById, findById, typeMatchFilter } from '@/utils/functional';
 
-import { isSparkPatch, isSparkState } from '../helpers';
 import * as api from './api';
 import {
   asServiceStatus,
@@ -28,24 +29,34 @@ import {
   calculateDrivenChains,
   calculateLimiters,
   calculateRelations,
-} from './helpers';
+} from './utils';
+
+const defaultSessionConfig = (): SparkSessionConfig => ({
+  pageMode: 'Relations',
+  sorting: 'name',
+  expanded: [],
+});
 
 @Module({ generateMutationSetters: true })
 export class SparkServiceModule extends VuexModule {
-  private patchListenerId: string = '';
-  private stateListenerId: string = '';
+  private patchListenerId = '';
+  private stateListenerId = '';
 
   public readonly id: string; // serviceId
+  private readonly storageKey: string;
 
   public blocks: Block[] = [];
+  public volatileBlocks: Block[] = [];
   public discoveredBlocks: string[] = [];
   public status: SparkStatus | null = null;
   public lastBlocks: Date | null = null;
   public lastStatus: Date | null = null;
+  public sessionConfig: SparkSessionConfig = defaultSessionConfig()
 
   public constructor(serviceId: string, options: RegisterOptions) {
     super(options);
     this.id = serviceId;
+    this.storageKey = `storage__Spark__${serviceId}`;
   }
 
   public get blockIds(): string[] {
@@ -107,29 +118,59 @@ export class SparkServiceModule extends VuexModule {
     this.lastBlocks = null;
   }
 
-  public blockById<T extends Block>(blockId: string | null): T | null {
-    if (!blockId) { return null; }
-    return this.blocks.find(v => v.id === blockId) as T ?? null;
+  private findById<T extends Block>(blocks: Block[], id: Nullable<string>): T | null {
+    return findById(blocks, id) as T | null;
   }
 
-  public blockByAddress<T extends Block>(addr: T | BlockAddress | null): T | null {
+  private findByAddress<T extends Block>(blocks: Block[], addr: T | Nullable<BlockAddress>): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
-    return this.blocks.find(v => v.id === addr.id && (!v.type || v.type === addr.type)) as T ?? null;
+    return blocks.find(v => v.id === addr.id && (!addr.type || addr.type === v.type)) as T ?? null;
   }
 
-  public blockByLink<T extends Block>(link: Link | null): T | null {
-    if (!link || !link.id) { return null; };
-    return this.blockById<T>(link.id);
+  private findByLink<T extends Block>(blocks: Block[], link: Nullable<Link>): T | null {
+    if (!link || !link.id) { return null; }
+    return this.findById<T>(blocks, link.id);
   }
 
-  public fieldByAddress(addr: BlockFieldAddress | null): any {
-    const block = this.blockByAddress(addr);
+  private findFieldByAddress(blocks: Block[], addr: Nullable<BlockFieldAddress>): any | null {
+    const block = this.findByAddress(blocks, addr);
     if (!block || !addr?.field) { return null; }
     return block.data[addr.field] ?? null;
   }
 
+  public blockById<T extends Block>(blockId: Nullable<string>): T | null {
+    return this.findById<T>(this.blocks, blockId) ?? this.findById<T>(this.volatileBlocks, blockId);
+  }
+
+  public blockByAddress<T extends Block>(addr: T | Nullable<BlockAddress>): T | null {
+    return this.findByAddress<T>(this.blocks, addr) ?? this.findByAddress<T>(this.volatileBlocks, addr);
+  }
+
+  public blockByLink<T extends Block>(link: Nullable<Link>): T | null {
+    return this.findByLink<T>(this.blocks, link) ?? this.findByLink<T>(this.volatileBlocks, link);
+  }
+
+  public fieldByAddress(addr: Nullable<BlockFieldAddress>): any {
+    return this.findFieldByAddress(this.blocks, addr) ?? this.findFieldByAddress(this.volatileBlocks, addr);
+  }
+
   public blocksByType<T extends Block>(type: T['type']): T[] {
     return this.blocks.filter(typeMatchFilter<T>(type));
+  }
+
+  public setVolatileBlock(block: Block): void {
+    if (this.blockIds.includes(block.id)) {
+      throw new Error(`Block ${block.id} already exists as persistent block`);
+    }
+    block.meta = block.meta ?? {};
+    block.meta.volatile = true;
+    this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
+  }
+
+  public removeVolatileBlock({ id }: BlockAddress): void {
+    if (id) {
+      this.volatileBlocks = filterById(this.volatileBlocks, { id });
+    }
   }
 
   @Action
@@ -139,24 +180,38 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async createBlock(block: Block): Promise<void> {
+    if (block.meta?.volatile) {
+      throw new Error(`Block ${block.id} is volatile`);
+    }
     await api.createBlock(block); // triggers patch event
   }
 
   @Action
   public async saveBlock(block: Block): Promise<void> {
-    await api.persistBlock(block); // triggers patch event
+    if (block.meta?.volatile) {
+      this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
+    }
+    else {
+      await api.persistBlock(block); // triggers patch event
+    }
   }
 
-  public async modifyBlock<T extends Block>(block: T, func: ((v: T) => T)): Promise<void> {
-    const actual = this.blockByAddress<T>(block);
+  public async modifyBlock<T extends Block>(block: T, func: ((v: T) => void)): Promise<void> {
+    const actual = deepCopy(this.blockByAddress<T>(block));
     if (actual) {
-      return this.saveBlock(func(actual));
+      func(actual);
+      return this.saveBlock(actual);
     }
   }
 
   @Action
   public async removeBlock(block: Block): Promise<void> {
-    await api.deleteBlock(block); // triggers patch event
+    if (block.meta?.volatile) {
+      this.volatileBlocks = filterById(this.volatileBlocks, block);
+    }
+    else {
+      await api.deleteBlock(block); // triggers patch event
+    }
   }
 
   @Action
@@ -169,13 +224,24 @@ export class SparkServiceModule extends VuexModule {
     if (this.blockById(newId)) {
       throw new Error(`Block ${newId} already exists`);
     }
+
+    const volatile = this.findById(this.volatileBlocks, currentId);
+    if (volatile) {
+      this.volatileBlocks = [
+        ...filterById(this.volatileBlocks, volatile),
+        { ...volatile, id: newId },
+      ];
+      return;
+    }
+
     await api.renameBlock(this.id, currentId, newId);
     await this.fetchBlocks();
-    dashboardStore.widgets
+    widgetStore.widgets
       .filter(({ config }) => config.serviceId === this.id && config.blockId === currentId)
       .forEach(widget => {
         widget.config.blockId = newId;
-        dashboardStore.saveWidget(widget);
+        widget.title = newId;
+        widgetStore.saveWidget(widget);
       });
   }
 
@@ -249,8 +315,32 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
+  public async loadSessionConfig(): Promise<void> {
+    try {
+      const rawConfig: string | null = sessionStorage.getItem(this.storageKey);
+      this.sessionConfig = rawConfig
+        ? JSON.parse(rawConfig)
+        : defaultSessionConfig();
+    }
+    catch (e) {
+      this.sessionConfig = defaultSessionConfig();
+    }
+  }
+
+  @Action
+  public async updateSessionConfig(updates: Partial<SparkSessionConfig>): Promise<void> {
+    this.sessionConfig = { ...this.sessionConfig, ...updates };
+    try {
+      sessionStorage.setItem(this.storageKey, JSON.stringify(this.sessionConfig));
+    }
+    catch (e) {
+      // ignore
+    }
+  }
+
+  @Action
   public async start(): Promise<void> {
-    this.stateListenerId = Vue.$eventbus.addListener(
+    this.stateListenerId = eventbus.addListener(
       `${STATE_TOPIC}/${this.id}`,
       (_, evt) => {
         if (isSparkState(evt)) {
@@ -262,7 +352,7 @@ export class SparkServiceModule extends VuexModule {
           serviceStore.updateStatus(asServiceStatus(status));
         }
       });
-    this.patchListenerId = Vue.$eventbus.addListener(
+    this.patchListenerId = eventbus.addListener(
       `${STATE_TOPIC}/${this.id}/patch`,
       (_, evt) => {
         if (isSparkPatch(evt)) {
@@ -273,11 +363,12 @@ export class SparkServiceModule extends VuexModule {
       });
 
     await this.fetchAll().catch(() => { });
+    await this.loadSessionConfig();
   }
 
   @Action
   public async stop(): Promise<void> {
-    Vue.$eventbus.removeListener(this.stateListenerId);
-    Vue.$eventbus.removeListener(this.patchListenerId);
+    eventbus.removeListener(this.stateListenerId);
+    eventbus.removeListener(this.patchListenerId);
   }
 }

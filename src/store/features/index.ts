@@ -1,13 +1,13 @@
 import isString from 'lodash/isString';
-import { Action, Module, VuexModule } from 'vuex-class-modules';
+import { Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { findById } from '@/helpers/functional';
 import store from '@/store';
+import type { Widget } from '@/store/widgets';
+import { findById } from '@/utils/functional';
 
 import type {
   ComponentResult,
-  Crud,
-  QuickStartFeature,
+  QuickstartFeature,
   ServiceFeature,
   WatcherFeature,
   WidgetFeature,
@@ -21,7 +21,7 @@ export * from './types';
 export class FeatureModule extends VuexModule {
 
   public widgets: WidgetFeature[] = [];
-  public quickStarts: QuickStartFeature[] = [];
+  public quickStarts: QuickstartFeature[] = [];
   public watchers: WatcherFeature[] = [];
   public services: ServiceFeature[] = [];
 
@@ -41,49 +41,49 @@ export class FeatureModule extends VuexModule {
     return this.services.map(v => v.id);
   }
 
-  public widgetById(id: string | null): WidgetFeature | null {
+  public widgetById(id: Nullable<string>): WidgetFeature | null {
     return findById(this.widgets, id);
   }
 
-  public quickStartById(id: string | null): QuickStartFeature | null {
+  public quickStartById(id: Nullable<string>): QuickstartFeature | null {
     return findById(this.quickStarts, id);
   }
 
-  public watcherById(id: string | null): WatcherFeature | null {
+  public watcherById(id: Nullable<string>): WatcherFeature | null {
     return findById(this.watchers, id);
   }
 
-  public serviceById(id: string | null): ServiceFeature | null {
+  public serviceById(id: Nullable<string>): ServiceFeature | null {
     return findById(this.services, id);
   }
 
-  public widgetTitle(id: string | null): string {
+  public widgetTitle(id: Nullable<string>): string {
     return this.widgetById(id)?.title ?? 'Unknown';
   }
 
-  public widgetRole(id: string | null): WidgetRole {
+  public widgetRole(id: Nullable<string>): WidgetRole {
     return this.widgetById(id)?.role ?? 'Other';
   }
 
   public widgetWizard(id: string): string | null {
     const feature = this.widgetById(id);
-    if (feature === null) { return null; };
-    if (isString(feature.wizard)) { return feature.wizard; };
-    if (feature.wizard === true) { return 'GenericWidgetWizard'; };
+    if (feature === null) { return null; }
+    if (isString(feature.wizard)) { return feature.wizard; }
+    if (feature.wizard === true) { return 'GenericWidgetWizard'; }
     return null;
   }
 
-  public widgetComponent(crud: Crud): ComponentResult {
-    const feature = this.widgetById(crud.widget.feature);
+  public widgetComponent(widget: Widget): ComponentResult {
+    const feature = this.widgetById(widget.feature);
     if (!feature) {
       return {
         component: 'InvalidWidget',
-        error: `No feature found for '${crud.widget.feature}'`,
+        error: `No feature found for '${widget.feature}'`,
       };
     }
     return isString(feature.component)
       ? { component: feature.component }
-      : feature.component(crud);
+      : feature.component(widget);
   }
 
   public widgetSize(id: string): GridSize {
@@ -94,8 +94,8 @@ export class FeatureModule extends VuexModule {
     return this.widgetById(id)?.removeActions ?? [];
   }
 
-  @Action
-  public async registerWidget(feature: WidgetFeature): Promise<void> {
+  @Mutation
+  public addWidgetFeature(feature: WidgetFeature): void {
     if (feature.wizard === true && feature.generateConfig === undefined) {
       throw new Error(`Widget feature ${feature.id} must define a generateConfig function to use the default wizard`);
     }
@@ -105,24 +105,24 @@ export class FeatureModule extends VuexModule {
     this.widgets = [...this.widgets, feature];
   }
 
-  @Action
-  public async registerQuickStart(feature: QuickStartFeature): Promise<void> {
+  @Mutation
+  public addQuickstartFeature(feature: QuickstartFeature): void {
     if (this.quickStartById(feature.id)) {
       throw new Error(`Widget feature '${feature.id}' already exists`);
     }
     this.quickStarts = [...this.quickStarts, feature];
   }
 
-  @Action
-  public async registerWatcher(feature: WatcherFeature): Promise<void> {
+  @Mutation
+  public addWatcherFeature(feature: WatcherFeature): void {
     if (this.watcherById(feature.id)) {
       throw new Error(`Watcher feature '${feature.id}' already exists`);
     }
     this.watchers = [...this.watchers, feature];
   }
 
-  @Action
-  public async registerService(feature: ServiceFeature): Promise<void> {
+  @Mutation
+  public addServiceFeature(feature: ServiceFeature): void {
     if (this.serviceById(feature.id)) {
       throw new Error(`Service feature '${feature.id}' already exists`);
     }

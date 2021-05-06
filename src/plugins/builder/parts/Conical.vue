@@ -1,16 +1,27 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
+import { usePart } from '../composables';
+import { FlowPart } from '../types';
 
-@Component
-export default class Conical extends PartBase {
-  readonly scaleKey = 'scale';
+export default defineComponent({
+  name: 'Conical',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      scale,
+    } = usePart.setup(props.part);
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
-}
+    return {
+      scale,
+    };
+  },
+});
 </script>
 
 <template>
@@ -22,7 +33,7 @@ export default class Conical extends PartBase {
       <polygon points="1,250 149,250 82,363 67.5,363 " />
       <path d="M25,50c0,0,8.7-17,50-17s50,17,50,17H25z" />
       <!-- Setpoint -->
-      <SetpointValues :part="part" :start-y="1" hide-unset />
+      <SetpointValues :part="part" :start-y="1" hide-unset settings-key="setpoint" />
     </g>
     <g class="outline legs">
       <!-- Legs -->

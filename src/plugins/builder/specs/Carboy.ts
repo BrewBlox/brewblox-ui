@@ -1,11 +1,11 @@
+import { PartSpec, PersistentPart } from '@/plugins/builder/types';
+import { showSettingsBlock } from '@/plugins/builder/utils';
 import { BlockType } from '@/plugins/spark/types';
-
-import { showSettingsBlock } from '../helpers';
-import { PartSpec, PersistentPart } from '../types';
 
 export const DEFAULT_SIZE_X = 2;
 export const DEFAULT_SIZE_Y = 4;
-const settingsKey = 'setpoint';
+export const SETPOINT_KEY = 'setpoint';
+export const SETPOINT_TYPES = [BlockType.SetpointSensorPair];
 
 const size = (part: PersistentPart): [number, number] => [
   part.settings.sizeX || DEFAULT_SIZE_X,
@@ -20,8 +20,8 @@ const spec: PartSpec = {
     {
       component: 'BlockAddressCard',
       props: {
-        settingsKey,
-        compatible: [BlockType.SetpointSensorPair],
+        settingsKey: SETPOINT_KEY,
+        compatible: SETPOINT_TYPES,
         label: 'Setpoint',
       },
     },
@@ -50,7 +50,7 @@ const spec: PartSpec = {
     },
   ],
   size,
-  interactHandler: part => showSettingsBlock(part, settingsKey),
+  interactHandler: part => showSettingsBlock(part, SETPOINT_KEY, SETPOINT_TYPES),
 };
 
 export default spec;

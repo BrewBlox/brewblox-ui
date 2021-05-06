@@ -1,54 +1,82 @@
 <script lang="ts">
 import { date as qdate } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
 
-@Component
-export default class DatepickerDialog extends DialogBase {
-  tab = 'date';
-  stringValue = '';
 
-  @Prop({ type: Date, required: true })
-  public readonly value!: Date;
+export default defineComponent({
+  name: 'DatepickerDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Date,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'Date and time',
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
+    const tab = ref<'date' | 'time'>('date');
+    const stringValue = ref<string>(qdate.formatDate(props.modelValue, 'YYYY/MM/DD HH:mm:ss'));
 
-  @Prop({ type: String, default: 'Date and time' })
-  public readonly label!: string;
+    const parsed = computed<Date>(
+      () => qdate.extractDate(stringValue.value, 'YYYY/MM/DD HH:mm:ss'),
+    );
 
-  get parsed(): Date {
-    return qdate.extractDate(this.stringValue, 'YYYY/MM/DD HH:mm:ss');
-  }
+    const valid = computed<boolean>(
+      () => Number.isFinite(parsed.value.getTime()),
+    );
 
-  get valid(): boolean {
-    return !Number.isNaN(this.parsed.getTime());
-  }
-
-  setStringVal(dateVal: Date): void {
-    this.stringValue = qdate.formatDate(dateVal, 'YYYY/MM/DD HH:mm:ss');
-  }
-
-  save(): void {
-    if (this.valid) {
-      this.onDialogOk(this.parsed);
+    function save(): void {
+      if (valid.value) {
+        onDialogOK(parsed.value);
+      }
     }
-  }
 
-  created(): void {
-    this.setStringVal(this.value);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      tab,
+      stringValue,
+      parsed,
+      valid,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <template #body>
-        <q-tabs v-model="tab" dense active-color="primary" align="justify" narrow-indicator>
+        <q-tabs
+          v-model="tab"
+          dense
+          active-color="primary"
+          align="justify"
+          narrow-indicator
+        >
           <q-tab name="date" label="Date" />
           <q-tab name="time" label="Time" />
         </q-tabs>
@@ -58,17 +86,32 @@ export default class DatepickerDialog extends DialogBase {
               v-model="stringValue"
               mask="YYYY/MM/DD HH:mm:ss"
               class="fit"
-              @input="tab='time'"
+              @update:model-value="tab='time'"
             />
           </q-tab-panel>
           <q-tab-panel name="time" class="q-pa-none">
-            <q-time v-model="stringValue" mask="YYYY/MM/DD HH:mm:ss" class="fit" />
+            <q-time
+              v-model="stringValue"
+              mask="YYYY/MM/DD HH:mm:ss"
+              class="fit"
+            />
           </q-tab-panel>
         </q-tab-panels>
       </template>
       <template #actions>
-        <q-btn flat color="primary" label="Cancel" @click="onDialogCancel" />
-        <q-btn :disable="!valid" flat color="primary" label="OK" @click="save" />
+        <q-btn
+          flat
+          color="primary"
+          label="Cancel"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          :disable="!valid"
+          flat
+          color="primary"
+          label="OK"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

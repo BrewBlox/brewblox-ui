@@ -1,195 +1,207 @@
 <script lang="ts">
+import DOMPurify from 'dompurify';
 import marked from 'marked';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
-import { createDialog } from '@/helpers/dialog';
-import { saveFile } from '@/helpers/import-export';
-import notify from '@/helpers/notify';
+import { useContext, useWidget } from '@/composables';
 import { dashboardStore } from '@/store/dashboards';
+import { createDialog } from '@/utils/dialog';
+import { saveFile } from '@/utils/import-export';
+import notify from '@/utils/notify';
 
-import { saveGraphToFile, selectGraphPrecision } from '../helpers';
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
+import { saveGraphToFile, selectGraphPrecision } from '../utils';
 import SessionCreateDialog from './SessionCreateDialog.vue';
 import SessionLoadDialog from './SessionLoadDialog.vue';
 import SessionLogBasic from './SessionLogBasic.vue';
 import SessionLogFull from './SessionLogFull.vue';
-import SessionLogHelp from './SessionLogHelp.vue';
-import { SessionLogConfig } from './types';
+import { SessionLogWidget } from './types';
 
-
-@Component({
+export default defineComponent({
+  name: 'SessionLogWidget',
   components: {
-    SessionLogHelp,
     SessionCreateDialog,
     SessionLoadDialog,
     Basic: SessionLogBasic,
     Full: SessionLogFull,
   },
-})
-export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
+  setup() {
+    const {
+      context,
+    } = useContext.setup();
+    const {
+      widget,
+      config,
+      saveConfig,
+    } = useWidget.setup<SessionLogWidget>();
 
-  get sessions(): LoggedSession[] {
-    return historyStore.sessions;
-  }
+    const sessions = computed<LoggedSession[]>(
+      () => historyStore.sessions,
+    );
 
-  get session(): LoggedSession | null {
-    return this.config.currentSession === null
-      ? null
-      : historyStore.sessionById(this.config.currentSession);
-  }
+    const session = computed<LoggedSession | null>(
+      () => historyStore.sessionById(config.value.currentSession),
+    );
 
-  saveSession(session: LoggedSession | null = this.session): void {
-    if (session !== null) {
-      historyStore.saveSession(session);
+    function saveSession(sess: LoggedSession | null = session.value): void {
+      if (sess != null) {
+        historyStore.saveSession(sess);
+      }
     }
-  }
 
-  get notes(): SessionNote[] {
-    return this.session ? this.session.notes : [];
-  }
+    const notes = computed<SessionNote[]>(
+      () => session.value?.notes ?? [],
+    );
 
-  startAddSession(): void {
-    createDialog({
-      component: SessionCreateDialog,
-      title: 'New session',
-      preselected: this.config.currentSession,
-      widgetTags: [
-        `on: ${dashboardStore.dashboardTitle(this.widget.dashboard)}`,
-      ],
-    })
-      .onOk((session: LoggedSession) => {
-        this.config.currentSession = session.id;
-        this.saveConfig();
-      });
-  }
 
-  startLoadSession(): void {
-    createDialog({
-      component: SessionLoadDialog,
-      title: 'Open existing session',
-    })
-      .onOk((session: LoggedSession) => {
-        this.config.currentSession = session?.id ?? null;
-        this.saveConfig();
-      });
-  }
+    function startAddSession(): void {
+      createDialog({
+        component: SessionCreateDialog,
+        componentProps: {
+          title: 'New session',
+          preselected: config.value.currentSession,
+          widgetTags: [
+            `on: ${dashboardStore.dashboardTitle(widget.value.dashboard)}`,
+          ],
+        },
+      })
+        .onOk((session: LoggedSession) => {
+          config.value.currentSession = session.id;
+          saveConfig();
+        });
+    }
 
-  exitSession(): void {
-    this.config.currentSession = null;
-    this.saveConfig();
-  }
+    function startLoadSession(): void {
+      createDialog({
+        component: SessionLoadDialog,
+        componentProps: {
+          title: 'Open existing session',
+        },
+      })
+        .onOk((session: LoggedSession) => {
+          config.value.currentSession = session?.id ?? null;
+          saveConfig();
+        });
+    }
 
-  renderDate(date: number | null): string {
-    return date !== null
-      ? new Date(date).toLocaleString()
-      : '??';
-  }
+    function exitSession(): void {
+      config.value.currentSession = null;
+      saveConfig();
+    }
 
-  *sessionLines() {
-    yield '';
-    for (const note of this.notes) {
-      yield note.title;
-      yield '-'.repeat(note.title.length);
-      if (note.type === 'Text') {
-        yield note.value;
-      }
-      if (note.type === 'Graph') {
-        yield `${this.renderDate(note.start)} - ${this.renderDate(note.end)}`;
-        yield '';
-        for (const annotation of note.config.layout?.annotations ?? []) {
-          yield `${annotation.x} :: ${annotation.text}`;
-          yield '';
-        }
-      }
+    function renderDate(date: number | null): string {
+      return date !== null
+        ? new Date(date).toLocaleString()
+        : '??';
+    }
+
+    function* sessionLines(): Generator<string, void, unknown> {
       yield '';
-    }
-  }
-
-  exportSession(): void {
-    const session = this.session;
-    if (session === null) { return; }
-    const name = `${this.widget.title} ${session.title} ${this.renderDate(session.date)}`;
-    const lines: string[] = [name, ...this.sessionLines()];
-    saveFile(marked(lines.join('\n')), `${name}.html`, true);
-  }
-
-  async exportSessionGraphs(): Promise<void> {
-    const session = this.session;
-    if (session === null) { return; }
-    const sessionDate = this.renderDate(session.date);
-    const notes = this.notes
-      .filter((v): v is SessionGraphNote => v.type === 'Graph')
-      .filter(v => v.config.targets.length);
-
-    if (!notes.length) {
-      notify.warn('No valid graph notes found');
-      return;
-    }
-
-    const precision = await selectGraphPrecision();
-    if (!precision) {
-      return;
-    }
-
-    notify.info('Generating CSV... This may take a few seconds.');
-
-    for (const note of notes) {
-      await saveGraphToFile(
-        note.config,
-        precision,
-        `${session.title}__${note.title}__${sessionDate}`
-      );
-    }
-  }
-
-  clearNotes(): void {
-    this.notes.forEach(note => {
-      if (note.type === 'Text') {
-        note.value = '';
+      for (const note of notes.value) {
+        yield note.title;
+        yield '-'.repeat(note.title.length);
+        if (note.type === 'Text') {
+          yield note.value;
+        }
+        if (note.type === 'Graph') {
+          yield `${renderDate(note.start)} - ${renderDate(note.end)}`;
+          yield '';
+          for (const annotation of note.config.layout?.annotations ?? []) {
+            yield `${annotation.x} :: ${annotation.text}`;
+            yield '';
+          }
+        }
+        yield '';
       }
-      else if (note.type === 'Graph') {
-        note.start = null;
-        note.end = null;
-      }
-    });
-    this.saveSession();
-  }
+    }
 
-  startRemoveSession(): void {
-    if (this.session === null) { return; }
-    const session = this.session;
-    createDialog({
-      component: 'ConfirmDialog',
-      title: 'Remove session',
-      message: `Do you want remove session '${session.title}'?`,
-    })
-      .onOk(() => {
-        this.config.currentSession =
-          this.sessions.find(s => s.id !== this.session?.id)?.id ?? null;
-        this.saveConfig();
-        historyStore.removeSession(session);
+    function exportSession(): void {
+      if (session.value === null) { return; }
+      const name = `${widget.value.title} ${session.value.title} ${renderDate(session.value.date)}`;
+      const lines: string[] = [name, ...sessionLines()];
+      saveFile(DOMPurify.sanitize(marked(lines.join('\n'))), `${name}.html`, true);
+    }
+
+    async function exportSessionGraphs(): Promise<void> {
+      if (session.value === null) { return; }
+      const sessionDate = renderDate(session.value.date);
+      const validNotes = notes.value
+        .filter((v): v is SessionGraphNote => v.type === 'Graph')
+        .filter(v => v.config.targets.length);
+
+      if (!validNotes.length) {
+        notify.warn('No valid graph notes found');
+        return;
+      }
+
+      const precision = await selectGraphPrecision();
+      if (!precision) {
+        return;
+      }
+
+      notify.info('Generating CSV... This may take a few seconds.');
+
+      for (const note of validNotes) {
+        await saveGraphToFile(
+          note.config,
+          precision,
+          `${session.value.title}__${note.title}__${sessionDate}`,
+        );
+      }
+    }
+
+    function clearNotes(): void {
+      notes.value.forEach(note => {
+        if (note.type === 'Text') {
+          note.value = '';
+        }
+        else if (note.type === 'Graph') {
+          note.start = null;
+          note.end = null;
+        }
       });
-  }
+      saveSession();
+    }
 
-  showHelp(): void {
-    createDialog({
-      component: SessionLogHelp,
-    });
-  }
-}
+    function startRemoveSession(): void {
+      if (session.value === null) { return; }
+      const activeSession = session.value;
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Remove session',
+          message: `Do you want remove session '${activeSession.title}'?`,
+        },
+      })
+        .onOk(() => {
+          config.value.currentSession =
+            sessions.value.find(s => s.id !== activeSession?.id)?.id ?? null;
+          saveConfig();
+          historyStore.removeSession(activeSession);
+        });
+    }
+
+    return {
+      context,
+      session,
+      startLoadSession,
+      startAddSession,
+      exitSession,
+      exportSession,
+      exportSessionGraphs,
+      clearNotes,
+      startRemoveSession,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper
-    v-bind="{context}"
-  >
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <WidgetToolbar has-mode-toggle>
         <template #actions>
-          <!-- TODO -->
-          <!-- <ActionItem icon="help" label="About" @click="showHelp" /> -->
           <ActionItem
             icon="mdi-file-plus"
             label="New session"
@@ -229,9 +241,9 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
             @click="startRemoveSession"
           />
         </template>
-      </component>
+      </WidgetToolbar>
     </template>
-    <component :is="mode" :crud="crud" @add="startAddSession">
+    <component :is="context.mode">
       <template v-if="session === null" #warnings>
         <div class="column">
           <div class="text-italic text-h6 q-pa-md darkened text-center">
@@ -258,5 +270,5 @@ export default class SessionLogWidget extends WidgetBase<SessionLogConfig> {
         </div>
       </template>
     </component>
-  </CardWrapper>
+  </Card>
 </template>

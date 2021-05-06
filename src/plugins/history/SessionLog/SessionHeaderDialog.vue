@@ -1,46 +1,74 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
+import { deepCopy } from '@/utils/functional';
 
 import { historyStore } from '../store';
 import { LoggedSession } from '../types';
 
+export default defineComponent({
+  name: 'SessionHeaderDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<LoggedSession>,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-@Component
-export default class SessionHeaderDialog extends DialogBase {
+    const local = ref<LoggedSession>(deepCopy(props.modelValue));
 
-  @Prop({ type: Object, required: true })
-  public readonly session!: LoggedSession;
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  save(): void {
-    this.onDialogOk(this.session);
-  }
+    const knownTags = computed<string[]>(
+      () => historyStore.sessionTags,
+    );
 
-  get knownTags(): string[] {
-    return historyStore.sessionTags;
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+      knownTags,
+    };
+  },
+});
 </script>
 
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard :title="title">
       <InputField
-        v-model="session.title"
+        v-model="local.title"
         title="Session name"
         label="Session name"
         dense
         item-aligned
       />
       <DatetimeField
-        v-model="session.date"
+        v-model="local.date"
         label="Session date"
         title="Session date"
         emit-number
@@ -49,7 +77,7 @@ export default class SessionHeaderDialog extends DialogBase {
         item-aligned
       />
       <TagSelectField
-        v-model="session.tags"
+        v-model="local.tags"
         :existing="knownTags"
       />
       <template #actions>

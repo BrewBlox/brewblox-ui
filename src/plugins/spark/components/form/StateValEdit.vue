@@ -1,15 +1,27 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import ValEditBase from '../ValEditBase';
+import { useValEdit } from '@/plugins/spark/composables';
+import { DigitalState } from '@/shared-types';
 
+export default defineComponent({
+  name: 'StateValEdit',
+  props: {
+    ...useValEdit.props,
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+    } = useValEdit.setup<DigitalState>(props.modelValue);
 
-@Component
-export default class StateValEdit extends ValEditBase {
-  get fieldString(): string {
-    return this.field === 1 ? 'ON' : 'OFF';
-  }
-}
+    return {
+      field,
+    };
+  },
+});
 </script>
 
 <template>

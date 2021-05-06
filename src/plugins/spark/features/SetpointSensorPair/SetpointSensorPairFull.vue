@@ -1,29 +1,50 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { filterLabels } from '@/plugins/spark/getters';
 import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { createBlockDialog } from '@/utils/dialog';
 
+const filterOpts: SelectOption[] =
+  Object.entries(filterLabels)
+    .map(([value, label]) => ({ label, value }));
 
-@Component
-export default class SetpointSensorPairForm
-  extends BlockCrudComponent<SetpointSensorPairBlock> {
+export default defineComponent({
+  name: 'SetpointSensorPairFull',
+  setup() {
+    const {
+      serviceId,
+      blockId,
+      sparkModule,
+      block,
+      saveBlock,
+      isVolatileBlock,
+      isDriven,
+    } = useBlockWidget.setup<SetpointSensorPairBlock>();
 
-  get filterOpts(): SelectOption[] {
-    return Object.entries(filterLabels)
-      .map(([value, label]) => ({ label, value }));
-  }
+    const usedBy = computed<Block[]>(
+      () => {
+        if (isVolatileBlock.value) {
+          return [];
+        }
+        return sparkModule
+          .blocks
+          .filter(b => b.data.inputId?.id === blockId);
+      },
+    );
 
-  get usedBy(): Block[] {
-    if (!this.isStoreBlock) {
-      return [];
-    }
-    return this.sparkModule
-      .blocks
-      .filter(block => block.data.inputId?.id === this.blockId);
-  }
-}
+    return {
+      createBlockDialog,
+      filterOpts,
+      serviceId,
+      block,
+      saveBlock,
+      isDriven,
+      usedBy,
+    };
+  },
+});
 </script>
 
 <template>
@@ -32,24 +53,24 @@ export default class SetpointSensorPairForm
 
     <div class="widget-body row">
       <QuantityField
-        :value="block.data.storedSetting"
+        :model-value="block.data.storedSetting"
         :readonly="isDriven"
         :class="{darkened: !block.data.settingEnabled}"
         title="Setting"
         label="Setting"
         tag="big"
         class="col-grow"
-        @input="v => { block.data.storedSetting = v; saveBlock(); }"
+        @update:model-value="v => { block.data.storedSetting = v; saveBlock(); }"
       />
       <QuantityField
-        :value="block.data.value"
+        :model-value="block.data.value"
         label="Sensor"
         readonly
         tag="big"
         class="col-grow"
       />
       <QuantityField
-        :value="block.data.valueUnfiltered"
+        :model-value="block.data.valueUnfiltered"
         label="Unfiltered sensor"
         readonly
         tag="big"
@@ -59,7 +80,7 @@ export default class SetpointSensorPairForm
       <div class="col-break" />
 
       <SelectField
-        :value="block.data.filter"
+        :model-value="block.data.filter"
         :options="filterOpts"
         :html="true"
         title="Filter"
@@ -75,10 +96,10 @@ export default class SetpointSensorPairForm
               </p>
               "
         class="col-grow"
-        @input="v => { block.data.filter = v; saveBlock(); }"
+        @update:model-value="v => { block.data.filter = v; saveBlock(); }"
       />
       <QuantityField
-        :value="block.data.filterThreshold"
+        :model-value="block.data.filterThreshold"
         :html="true"
         title="Filter bypass threshold"
         label="Bypass threshold"
@@ -89,7 +110,7 @@ export default class SetpointSensorPairForm
               </p>
               "
         class="col-grow"
-        @input="v => { block.data.filterThreshold = v; saveBlock(); }"
+        @update:model-value="v => { block.data.filterThreshold = v; saveBlock(); }"
       >
         <template #append>
           <q-btn
@@ -107,13 +128,13 @@ export default class SetpointSensorPairForm
       <div class="col-break" />
 
       <LinkField
-        :value="block.data.sensorId"
+        :model-value="block.data.sensorId"
         :service-id="serviceId"
         title="Sensor Block"
         label="Sensor Block"
         tag="span"
         class="col-grow"
-        @input="v => { block.data.sensorId = v; saveBlock(); }"
+        @update:model-value="v => { block.data.sensorId = v; saveBlock(); }"
       />
       <LabeledField
         label="Input for:"
@@ -128,7 +149,7 @@ export default class SetpointSensorPairForm
             no-caps
             flat
             class="depth-1"
-            @click="showOtherBlock(block)"
+            @click="createBlockDialog(block)"
           />
           <div v-if="usedBy.length === 0">
             This setpoint is not used as PID input

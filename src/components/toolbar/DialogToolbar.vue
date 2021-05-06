@@ -1,21 +1,23 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import { getNumDialogs } from '@/helpers/dialog';
+import { getNumDialogs } from '@/utils/dialog';
 
-@Component
-export default class DialogToolbar extends Vue {
-  numDialogs = 1;
+export default defineComponent({
+  name: 'DialogToolbar',
+  emits: ['close'],
+  setup() {
+    const numDialogs = getNumDialogs();
 
-  created(): void {
-    this.numDialogs = getNumDialogs();
-  }
-}
+    return {
+      numDialogs,
+    };
+  },
+});
 </script>
 
 <template>
-  <Toolbar class="q-pa-none" v-bind="$attrs" v-on="$listeners">
+  <Toolbar class="q-pa-none" v-bind="$attrs">
     <slot />
     <template #buttons>
       <slot name="buttons" />

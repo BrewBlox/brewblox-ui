@@ -1,20 +1,42 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockWidgetBase from '../BlockWidgetBase';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
-@Component
-export default class GenericBlockWidget extends BlockWidgetBase { }
+export default defineComponent({
+  name: 'GenericBlockWidget',
+  setup() {
+    const {
+      widget,
+      featureTitle,
+      block,
+      sparkModule,
+    } = useBlockWidget.setup();
+
+    function refreshBlock(): void {
+      sparkModule.fetchBlock(block.value);
+    }
+
+    return {
+      widget,
+      featureTitle,
+      block,
+      refreshBlock,
+    };
+  },
+});
 </script>
 
 <template>
   <q-card class="column">
     <q-card-title class="title-bar">
       <div class="ellipsis">
-        {{ widget.id }}
+        {{ widget.title }}
       </div>
-      <span slot="right" class="vertical-middle on-left">{{ featureTitle }}</span>
-      <q-btn slot="right" flat round dense icon="refresh" @click="refreshBlock" />
+      <template #right>
+        <span class="vertical-middle on-left">{{ featureTitle }}</span>
+        <q-btn flat round dense icon="refresh" @click="refreshBlock" />
+      </template>
     </q-card-title>
     <q-card-separator />
 

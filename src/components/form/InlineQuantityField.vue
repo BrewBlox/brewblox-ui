@@ -1,46 +1,64 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { isQuantity } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
+import { useField } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
+import { isQuantity, prettyQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class InlineQuantityField extends FieldBase {
+export default defineComponent({
+  name: 'InlineQuantityField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: Object as PropType<Quantity>,
+      required: true,
+      validator: isQuantity,
+    },
+    label: {
+      type: String,
+      default: '',
+    },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const displayValue = computed<string>(
+      () => prettyQty(props.modelValue, props.decimals),
+    );
 
-  @Prop({ type: Object, required: true, validator: isQuantity })
-  public readonly value!: Quantity;
-
-  @Prop({ type: String, required: false })
-  public readonly label!: string;
-
-  @Prop({ type: Number, default: 2 })
-  readonly decimals!: number;
-
-  @Prop({ type: String, default: 'small' })
-  public readonly unitTag!: string;
-
-  @Emit('input')
-  public change(v: Quantity): Quantity {
-    return v;
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function change(v: Quantity): void {
+      emit('update:modelValue', v);
     }
-    createDialog({
-      component: 'QuantityDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      label: this.label,
-    })
-      .onOk(this.change);
-  }
-}
+
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+      createDialog({
+        component: 'QuantityDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          label: props.label,
+        },
+      })
+        .onOk(change);
+    }
+
+    return {
+      displayValue,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
@@ -49,6 +67,6 @@ export default class InlineQuantityField extends FieldBase {
     style="line-height: 200%"
     @click="openDialog"
   >
-    {{ value | quantity }}
+    {{ displayValue }}
   </span>
 </template>

@@ -1,51 +1,58 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
+import { Plugin } from 'vue';
 
-import { bloxLink } from '@/helpers/bloxfield';
-import { ref } from '@/helpers/component-ref';
 import { BlockType } from '@/shared-types';
-import { WidgetFeature } from '@/store/features';
+import { featureStore, WidgetFeature } from '@/store/features';
+import { bloxLink } from '@/utils/bloxfield';
+import { cref } from '@/utils/component-ref';
 
 import {
   makeBeerCoolConfig,
   makeBeerHeatConfig,
   makeFridgeCoolConfig,
   makeFridgeHeatConfig,
-} from '../helpers';
+} from '../utils';
 import widget from './TempControlWidget.vue';
 import { TempControlConfig } from './types';
 
-const feature: WidgetFeature<TempControlConfig> = {
-  id: 'TempControl',
-  title: 'Temp Control Assistant',
-  component: ref(widget),
-  wizard: true,
-  widgetSize: {
-    cols: 4,
-    rows: 4,
+const plugin: Plugin = {
+  install(app) {
+    const feature: WidgetFeature<TempControlConfig> = {
+      id: 'TempControl',
+      title: 'Temp Control Assistant',
+      component: cref(app, widget),
+      wizard: true,
+      widgetSize: {
+        cols: 4,
+        rows: 4,
+      },
+      generateConfig: () => ({
+        serviceId: null,
+        coolPid: bloxLink(null, BlockType.Pid),
+        heatPid: bloxLink(null, BlockType.Pid),
+        profile: bloxLink(null, BlockType.SetpointProfile),
+        activeMode: null,
+        modes: [
+          {
+            id: nanoid(),
+            title: 'Beer',
+            setpoint: bloxLink(null, BlockType.SetpointSensorPair),
+            coolConfig: makeBeerCoolConfig(),
+            heatConfig: makeBeerHeatConfig(),
+          },
+          {
+            id: nanoid(),
+            title: 'Fridge',
+            setpoint: bloxLink(null, BlockType.SetpointSensorPair),
+            coolConfig: makeFridgeCoolConfig(),
+            heatConfig: makeFridgeHeatConfig(),
+          },
+        ],
+      }),
+    };
+
+    featureStore.addWidgetFeature(feature);
   },
-  generateConfig: () => ({
-    serviceId: null,
-    coolPid: bloxLink(null, BlockType.Pid),
-    heatPid: bloxLink(null, BlockType.Pid),
-    profile: bloxLink(null, BlockType.SetpointProfile),
-    activeMode: null,
-    modes: [
-      {
-        id: uid(),
-        title: 'Beer',
-        setpoint: bloxLink(null, BlockType.SetpointSensorPair),
-        coolConfig: makeBeerCoolConfig(),
-        heatConfig: makeBeerHeatConfig(),
-      },
-      {
-        id: uid(),
-        title: 'Fridge',
-        setpoint: bloxLink(null, BlockType.SetpointSensorPair),
-        coolConfig: makeFridgeCoolConfig(),
-        heatConfig: makeFridgeHeatConfig(),
-      },
-    ],
-  }),
 };
 
-export default feature;
+export default plugin;

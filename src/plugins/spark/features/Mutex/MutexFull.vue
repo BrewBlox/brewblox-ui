@@ -1,13 +1,23 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { MutexBlock } from '@/plugins/spark/types';
 
-@Component
-export default class MutexFull
-  extends BlockCrudComponent<MutexBlock> {
-}
+export default defineComponent({
+  name: 'MutexFull',
+  setup() {
+    const {
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<MutexBlock>();
+
+    return {
+      block,
+      saveBlock,
+    };
+  },
+});
 </script>
 
 <template>
@@ -49,10 +59,10 @@ export default class MutexFull
       <q-item>
         <q-item-section>
           <DurationField
-            :value="block.data.differentActuatorWait"
+            :model-value="block.data.differentActuatorWait"
             title="Extra lock time"
             label="Extra lock time after an actuator turns off"
-            @input="v => { block.data.differentActuatorWait = v; saveBlock(); }"
+            @update:model-value="v => { block.data.differentActuatorWait = v; saveBlock(); }"
           />
         </q-item-section>
       </q-item>

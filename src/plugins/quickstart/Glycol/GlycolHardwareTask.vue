@@ -1,93 +1,122 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { hasShared } from '../helpers';
 import { PinChannel } from '../types';
-import { GlycolConfig } from './types';
+import { hasShared } from '../utils';
+import { GlycolConfig, GlycolControlMode } from './types';
 
+export default defineComponent({
+  name: 'GlycolHardwareTask',
+  props: {
+    config: {
+      type: Object as PropType<GlycolConfig>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const heated = ref<boolean>(props.config.heated ?? false);
+    const glycolControl = ref<GlycolControlMode>(props.config.glycolControl ?? 'No');
+    const coolPin = ref<PinChannel | null>(props.config.coolPin ?? null);
+    const heatPin = ref<PinChannel | null>(props.config.heatPin ?? null);
+    const glycolPin = ref<PinChannel | null>(props.config.glycolPin ?? null);
+    const beerSensor = ref<string | null>(props.config.beerSensor ?? null);
+    const glycolSensor = ref<string | null>(props.config.glycolSensor ?? null);
 
-@Component
-export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig> {
-  heated = false;
-  glycolControl: 'No' | 'Measure' | 'Control' = 'No';
-  coolPin: PinChannel | null = null;
-  heatPin: PinChannel | null = null;
-  glycolPin: PinChannel | null = null;
-  beerSensor: string | null = null;
-  glycolSensor: string | null = null;
+    const pinSame = computed<boolean>(
+      () => heated.value && hasShared([coolPin.value, heatPin.value, glycolPin.value])
+        || glycolControl.value === 'Control' && hasShared([coolPin.value, heatPin.value, glycolPin.value]),
+    );
 
-  get valuesOk(): boolean {
-    return [
-      this.coolPin,
-      this.heatPin || !this.heated,
-      this.glycolPin || this.glycolControl !== 'Control',
-      !this.pinSame,
-      this.beerSensor,
-      this.glycolSensor || this.glycolControl === 'No',
-      !this.sensorSame,
-    ]
-      .every(Boolean);
-  }
+    const sensorSame = computed<boolean>(
+      () => glycolControl.value !== 'No' && hasShared([beerSensor.value, glycolSensor.value]),
+    );
 
-  get pinSame(): boolean {
-    return this.heated && hasShared([this.coolPin, this.heatPin, this.glycolPin])
-      || this.glycolControl === 'Control' && hasShared([this.coolPin, this.heatPin, this.glycolPin]);
-  }
+    const valuesOk = computed<boolean>(
+      () => [
+        coolPin.value,
+        heatPin.value || !heated.value,
+        glycolPin.value || glycolControl.value !== 'Control',
+        !pinSame.value,
+        beerSensor.value,
+        glycolSensor.value || glycolControl.value === 'No',
+        !sensorSame.value,
+      ]
+        .every(Boolean),
+    );
 
-  get sensorSame(): boolean {
-    return this.glycolControl !== 'No' && hasShared([this.beerSensor, this.glycolSensor]);
-  }
-
-  created(): void {
-    this.discover();
-
-    this.heated = this.config.heated || false;
-    this.coolPin = this.config.coolPin || null;
-    this.heatPin = this.config.heatPin || null;
-    this.glycolPin = this.config.glycolPin || null;
-    this.beerSensor = this.config.beerSensor || null;
-    this.glycolSensor = this.config.glycolSensor || null;
-    this.glycolControl = this.config.glycolControl || 'No';
-  }
-
-  discover(): void {
-    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
-  }
-
-  startBlockWizard(): void {
-    createBlockWizard(this.config.serviceId);
-  }
-
-  taskDone(): void {
-    this.config.heated = this.heated;
-    this.config.heatPin = this.heated ? this.heatPin : null;
-    this.config.coolPin = this.coolPin!;
-    this.config.beerSensor = this.beerSensor!;
-    this.config.glycolSensor = this.glycolSensor!;
-    this.config.glycolControl = this.glycolControl;
-    this.config.glycolPin = this.glycolControl === 'Control' ? this.glycolPin : null;
-
-
-    this.config.renamedBlocks = {
-      [this.beerSensor!]: this.config.names.beerSensor,
-    };
-
-    if (this.glycolControl !== 'No') {
-      this.config.renamedBlocks[this.glycolSensor!] = this.config.names.glycolSensor;
+    function discover(): void {
+      sparkStore.moduleById(props.config.serviceId)?.fetchDiscoveredBlocks();
     }
 
-    this.updateConfig(this.config);
-    this.next();
-  }
-}
+    function startBlockWizard(): void {
+      createBlockWizard(props.config.serviceId);
+    }
+
+    function taskDone(): void {
+      if (!valuesOk.value) {
+        return;
+      }
+
+      const updates: Partial<GlycolConfig> = {
+        heated: heated.value,
+        heatPin:
+          heated.value
+            ? heatPin.value
+            : null,
+        coolPin: coolPin.value!,
+        beerSensor: beerSensor.value!,
+        glycolSensor: glycolSensor.value!,
+        glycolControl: glycolControl.value,
+        glycolPin:
+          glycolControl.value === 'Control'
+            ? glycolPin.value
+            : null,
+        renamedBlocks:
+          glycolControl.value === 'No'
+            ? {
+              [beerSensor.value!]: props.config.names.beerSensor,
+            }
+            : {
+              [beerSensor.value!]: props.config.names.beerSensor,
+              [glycolSensor.value!]: props.config.names.glycolSensor,
+            },
+      };
+
+      emit('update:config', { ...props.config, ...updates });
+      emit('next');
+    }
+
+    onBeforeMount(() => discover());
+
+    return {
+      heated,
+      glycolControl,
+      coolPin,
+      heatPin,
+      glycolPin,
+      beerSensor,
+      glycolSensor,
+      pinSame,
+      sensorSame,
+      valuesOk,
+      discover,
+      startBlockWizard,
+      taskDone,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -118,7 +147,7 @@ export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig>
           </p>
         </q-item-section>
       </q-item>
-      <QuickStartMockCreateField
+      <QuickstartMockCreateField
         :service-id="config.serviceId"
         :names="[
           config.names.beerSensor,
@@ -160,7 +189,7 @@ export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig>
       </LabeledField>
       <q-item>
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="beerSensor"
             :service-id="config.serviceId"
             :error="sensorSame"
@@ -171,7 +200,7 @@ export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig>
       </q-item>
       <q-item>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-model="coolPin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -179,7 +208,7 @@ export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig>
           />
         </q-item-section>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-if="heated"
             v-model="heatPin"
             :service-id="config.serviceId"
@@ -190,7 +219,7 @@ export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig>
       </q-item>
       <q-item v-if="glycolControl !== 'No'">
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="glycolSensor"
             :service-id="config.serviceId"
             :error="sensorSame"
@@ -198,7 +227,7 @@ export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig>
           />
         </q-item-section>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-if="glycolControl === 'Control'"
             v-model="glycolPin"
             :service-id="config.serviceId"
@@ -220,9 +249,19 @@ export default class GlycolHardwareTask extends QuickStartTaskBase<GlycolConfig>
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
+      <q-btn
+        :disable="!valuesOk"
+        unelevated
+        label="Next"
+        color="primary"
+        @click="taskDone"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

@@ -1,18 +1,18 @@
-import { Widget } from '@/store/dashboards';
 import { Service, ServiceStub } from '@/store/services';
+import { Widget } from '@/store/widgets';
 
-export type WidgetRole = 'Process' | 'Control' | 'Output' | 'Constraint' | 'Display' | 'Other';
+export type WidgetRole =
+  | 'Process'
+  | 'Control'
+  | 'Output'
+  | 'Constraint'
+  | 'Display'
+  | 'Other'
+
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';
 export type ServiceHook = (service: Service) => any | Promise<any>;
-
-export interface Crud<ConfigT = any> {
-  widget: Widget<ConfigT>;
-  isStoreWidget: boolean;
-  saveWidget(widget: Widget<ConfigT>): unknown | Promise<unknown>;
-  closeDialog(): void;
-}
 
 export interface WidgetContext {
   mode: WidgetMode;
@@ -22,7 +22,7 @@ export interface WidgetContext {
 
 export interface WidgetRemoveAction {
   description: string;
-  action: (crud: Crud) => void;
+  action: (widget: Widget) => void;
 }
 
 export interface ComponentResult {
@@ -66,7 +66,7 @@ export interface WidgetFeature<ConfigT = any> {
    * Rendering component for this widget.
    * Should be or return the name of a globally registered Vue component.
    */
-  component: string | ((crud: Crud) => ComponentResult);
+  component: string | ((widget: Widget) => ComponentResult);
 
   /**
    * Wizard component.
@@ -130,7 +130,7 @@ export interface ServiceFeature {
    * Wizard implementation.
    * This can either be the name of a Vue component, or a function.
    *
-   * If it's a Vue component, it will be wrapped in WizardDialog,
+   * If it's a Vue component, it will be rendered as child of WizardDialog,
    * and given the stub as prop.
    */
   wizard: string | ((stub: ServiceStub) => Service | PromiseLike<Service>);
@@ -158,11 +158,11 @@ export interface WatcherFeature {
 }
 
 /**
- * QuickStarts are independent wizards.
+ * Quickstarts are independent wizards.
  * They are not linked to any specific Widget or Service feature.
  * Instead, they may generate any combination of dashboards, widgets, and services.
  */
-export interface QuickStartFeature {
+export interface QuickstartFeature {
   /**
    * Unique type ID
    */
@@ -174,8 +174,9 @@ export interface QuickStartFeature {
   title: string;
 
   /**
-   * Name of globally registered Vue component.
-   * The component is expected to inherit from WidgetWizardBase.
+   * Names of globally registered Vue component.
+   * They are expected to accept props for config and actions,
+   * and emit events for config/action updates, along with back/next/close.
    */
-  component: string;
+  tasks: string[];
 }

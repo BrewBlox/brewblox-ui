@@ -1,106 +1,126 @@
 <script lang="ts">
-import isString from 'lodash/isString';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
-import { suggestId } from '@/helpers/functional';
-import { loadFile, saveFile } from '@/helpers/import-export';
-import notify from '@/helpers/notify';
-import { blockIdRules } from '@/plugins/spark/helpers';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useDialog, useGlobals } from '@/composables';
+import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
-import { Service, serviceStore } from '@/store/services';
+import { makeBlockIdRules } from '@/plugins/spark/utils';
+import { createDialog } from '@/utils/dialog';
+import { ruleValidator, suggestId } from '@/utils/functional';
+import { loadFile, saveFile } from '@/utils/import-export';
+import notify from '@/utils/notify';
 
-@Component
-export default class SparkImportMenu extends DialogBase {
-  importBusy = false;
-  messages: string[] = [];
+export default defineComponent({
+  name: 'SparkImportMenu',
+  props: {
+    ...useDialog.props,
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+    } = useDialog.setup();
+    const { dense } = useGlobals.setup();
+    const sparkModule = sparkStore.moduleById(props.serviceId)!;
+    const importBusy = ref<boolean>(false);
+    const messages = ref<string[]>([]);
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
-
-  get service(): Service {
-    return serviceStore.serviceById(this.serviceId)!;
-  }
-
-  public get sparkModule(): SparkServiceModule {
-    return sparkStore.moduleById(this.serviceId)!;
-  }
-
-  async exportBlocks(): Promise<void> {
-    const exported = await this.sparkModule.serviceExport();
-    saveFile(exported, `brewblox-blocks-${this.service.id}.json`);
-  }
-
-  startImport(): void {
-    loadFile(this.confirmImport);
-  }
-
-  confirmImport(values: any): void {
-    createDialog({
-      component: 'ConfirmDialog',
-      title: 'Reset blocks',
-      message: 'This will remove all blocks, and import new ones from file. Are you sure?',
-      noBackdropDismiss: true,
-    })
-      .onOk(() => this.importBlocks(values));
-  }
-
-  async importBlocks(values: any): Promise<void> {
-    try {
-      this.importBusy = true;
-      this.messages = [];
-      this.messages = await this.sparkModule.serviceImport(values);
-      this.messages
-        .forEach(msg => notify.info('Block import error: ' + msg, { shown: false }));
-      notify.done(this.messages.length
-        ? 'Block import completed with warnings. See the notification center for details.'
-        : 'Block import done!');
-    } catch (e) {
-      notify.error(`Failed to import blocks: ${e.toString()}`);
+    async function importBlocks(values: any): Promise<void> {
+      try {
+        importBusy.value = true;
+        messages.value = [];
+        messages.value = await sparkModule.serviceImport(values);
+        messages.value
+          .forEach(msg => notify.info('Block import error: ' + msg, { shown: false }));
+        notify.done(messages.value.length
+          ? 'Block import completed with warnings. See the notification center for details.'
+          : 'Block import done!');
+      } catch (e) {
+        notify.error(`Failed to import blocks: ${e.toString()}`);
+      }
+      importBusy.value = false;
     }
-    this.importBusy = false;
-  }
 
-  startImportSingle(): void {
-    loadFile(this.importSingleBlock);
-  }
+    const blockIdValidator = computed<(v: string) => boolean>(
+      () => ruleValidator(makeBlockIdRules(props.serviceId)),
+    );
 
-  validateBlockId(val: string): boolean {
-    return !blockIdRules(this.serviceId)
-      .map(rule => rule(val))
-      .some(isString);
-  }
-
-  async importSingleBlock(block: Block): Promise<void> {
-    try {
-      this.importBusy = true;
-      this.messages = [];
-      const id = suggestId(block.id ?? 'imported', this.validateBlockId);
-      await sparkStore.createBlock({
-        ...block,
-        id,
-        nid: undefined,
-        serviceId: this.serviceId,
-      });
-      notify.done(`Imported block <i>${id}</i>`);
-    } catch (e) {
-      notify.error(`Failed to import block: ${e.toString()}`);
+    async function importSingleBlock(block: Block): Promise<void> {
+      try {
+        importBusy.value = true;
+        messages.value = [];
+        const id = suggestId(block.id ?? 'imported', blockIdValidator.value);
+        await sparkStore.createBlock({
+          ...block,
+          id,
+          nid: undefined,
+          serviceId: props.serviceId,
+        });
+        notify.done(`Imported block <i>${id}</i>`);
+      } catch (e) {
+        notify.error(`Failed to import block: ${e.toString()}`);
+      }
+      importBusy.value = false;
     }
-    this.importBusy = false;
-  }
-}
+
+    function confirmImport(values: any): void {
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Reset blocks',
+          message: 'This will remove all blocks, and import new ones from file. Are you sure?',
+          noBackdropDismiss: true,
+        },
+      })
+        .onOk(() => importBlocks(values));
+    }
+
+    async function startExport(): Promise<void> {
+      const exported = await sparkModule.serviceExport();
+      saveFile(exported, `brewblox-blocks-${props.serviceId}.json`);
+    }
+
+    function startImport(): void {
+      loadFile(confirmImport);
+    }
+
+    function startImportSingle(): void {
+      loadFile(importSingleBlock);
+    }
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      dense,
+      importBusy,
+      messages,
+      startExport,
+      startImport,
+      startImportSingle,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
-    :maximized="$dense"
+    ref="dialogRef"
+    :maximized="dense"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <ActionCardWrapper v-bind="{context}">
+    <Card>
       <template #toolbar>
         <DialogToolbar :title="serviceId" subtitle="Import/Export blocks" />
       </template>
@@ -126,7 +146,7 @@ export default class SparkImportMenu extends DialogBase {
             outline
             label="Export blocks"
             class="col-auto full-width"
-            @click="exportBlocks"
+            @click="startExport"
           />
         </div>
         <q-item v-if="messages.length > 0">
@@ -140,6 +160,6 @@ export default class SparkImportMenu extends DialogBase {
           </q-item-section>
         </q-item>
       </q-card-section>
-    </ActionCardWrapper>
+    </Card>
   </q-dialog>
 </template>

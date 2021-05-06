@@ -1,10 +1,9 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { DS2408StartChannels } from '@/plugins/spark/getters';
-import { isCompatible } from '@/plugins/spark/helpers';
 import {
   BlockIntfType,
   DigitalActuatorBlock,
@@ -12,67 +11,85 @@ import {
   DS2408ConnectMode,
   MotorValveBlock,
 } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class DS2408Widget
-  extends BlockWidgetBase<DS2408Block> {
-  mapping = DS2408StartChannels;
+const connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
+  { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },
+  { label: '8 IO pins', value: DS2408ConnectMode.CONNECT_ACTUATOR },
+];
 
-  connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
-    { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },
-    { label: '8 IO pins', value: DS2408ConnectMode.CONNECT_ACTUATOR },
-  ];
+export default defineComponent({
+  name: 'DS2408Widget',
+  setup() {
+    const { context } = useContext.setup();
+    const {
+      sparkModule,
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<DS2408Block>();
 
-  get valveMode(): boolean {
-    return this.block.data.connectMode === DS2408ConnectMode.CONNECT_VALVE;
-  }
+    const valveMode = computed<boolean>(
+      () => block.value.data.connectMode === DS2408ConnectMode.CONNECT_VALVE,
+    );
 
-  setConnectMode(mode: DS2408ConnectMode): void {
-    if (!mode || this.block.data.connectMode === mode) {
-      return;
+    function setConnectMode(mode: DS2408ConnectMode): void {
+      if (!mode || block.value.data.connectMode === mode) {
+        return;
+      }
+      const linked = sparkModule
+        .blocks
+        .filter((b): b is DigitalActuatorBlock | MotorValveBlock =>
+          isCompatible(b.type, BlockIntfType.ActuatorDigitalInterface))
+        .filter(b => b.data.hwDevice.id === block.value.id);
+
+      if (linked.length) {
+        const names = linked
+          .map(block => `'${block.id}'`)
+          .join(', ');
+        const verbs = linked.length > 1
+          ? ['have', 'them']
+          : ['has', 'it'];
+        createDialog({
+          component: 'SaveConfirmDialog',
+          componentProps: {
+            title: 'Switch DS2408 mode',
+            message: `${names} ${verbs[0]} this block set as output. Do you wish to unlink ${verbs[1]}?`,
+            saveFunc: () =>
+              linked.forEach(block => {
+                block.data.hwDevice.id = null;
+                sparkModule.saveBlock(block);
+              }),
+          },
+        })
+          .onOk(() => {
+            block.value.data.connectMode = mode;
+            saveBlock();
+          });
+      }
+      else {
+        block.value.data.connectMode = mode;
+        saveBlock();
+      }
     }
-    const linked = this.sparkModule
-      .blocks
-      .filter((block): block is DigitalActuatorBlock | MotorValveBlock =>
-        isCompatible(block.type, BlockIntfType.ActuatorDigitalInterface))
-      .filter(block => block.data.hwDevice.id === this.blockId);
 
-    if (linked.length) {
-      const names = linked
-        .map(block => `'${block.id}'`)
-        .join(', ');
-      const verbs = linked.length > 1
-        ? ['have', 'them']
-        : ['has', 'it'];
-      createDialog({
-        component: 'SaveConfirmDialog',
-        title: 'Switch DS2408 mode',
-        message: `${names} ${verbs[0]} this block set as output. Do you wish to unlink ${verbs[1]}?`,
-        saveFunc: () =>
-          linked.forEach(block => {
-            block.data.hwDevice.id = null;
-            this.sparkModule.saveBlock(block);
-          }),
-      })
-        .onOk(() => {
-          this.block.data.connectMode = mode;
-          this.saveBlock();
-        });
-    }
-    else {
-      this.block.data.connectMode = mode;
-      this.saveBlock();
-    }
-  }
-}
+    return {
+      DS2408StartChannels,
+      connectModeOpts,
+      context,
+      block,
+      saveBlock,
+      valveMode,
+      setConnectMode,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper
-    v-bind="{context}"
-  >
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
     <div class="widget-md">
@@ -83,34 +100,34 @@ export default class DS2408Widget
       </CardWarning>
       <div class="column">
         <q-btn-toggle
-          :value="block.data.connectMode"
+          :model-value="block.data.connectMode"
           :options="connectModeOpts"
           outline
           class="self-center q-my-md"
-          @input="setConnectMode"
+          @update:model-value="setConnectMode"
         />
       </div>
-      <ValveArray v-if="valveMode" :crud="crud" :mapping="mapping" />
-      <IoArray v-else :crud="crud" />
+      <ValveArray v-if="valveMode" :mapping="DS2408StartChannels" />
+      <IoArray v-else />
 
-      <template v-if="mode === 'Full'">
+      <template v-if="context.mode === 'Full'">
         <q-separator inset />
 
         <div class="widget-body row">
           <LabeledField
-            :value="block.data.connected ? 'Yes' : 'No'"
+            :model-value="block.data.connected ? 'Yes' : 'No'"
             label="Connected"
             class="col-grow"
           />
           <InputField
-            :value="block.data.address"
+            :model-value="block.data.address"
             title="Address"
             label="Address"
             class="col-grow"
-            @input="v => { block.data.address = v; saveBlock(); }"
+            @update:model-value="v => { block.data.address = v; saveBlock(); }"
           />
         </div>
       </template>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

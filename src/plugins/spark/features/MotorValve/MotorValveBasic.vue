@@ -1,13 +1,29 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { MotorValveBlock } from '@/plugins/spark/types';
 
-@Component
-export default class MotorValveBasic
-  extends BlockCrudComponent<MotorValveBlock> {
-}
+export default defineComponent({
+  name: 'MotorValveBasic',
+  setup() {
+    const {
+      serviceId,
+      block,
+      saveBlock,
+      constrainers,
+      isDriven,
+    } = useBlockWidget.setup<MotorValveBlock>();
+
+    return {
+      serviceId,
+      block,
+      saveBlock,
+      constrainers,
+      isDriven,
+    };
+  },
+});
 </script>
 
 <template>
@@ -19,15 +35,15 @@ export default class MotorValveBasic
           class="col-grow"
         >
           <DigitalStateButton
-            :value="block.data.desiredState"
+            :model-value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
             :pending-reason="constrainers"
             :disable="isDriven"
-            @input="v => { block.data.desiredState = v; saveBlock(); }"
+            @update:model-value="v => { block.data.desiredState = v; saveBlock(); }"
           />
         </LabeledField>
         <LabeledField
-          :value="block.data.valveState"
+          :model-value="block.data.valveState"
           label="Valve State"
           class="col-grow"
         />
@@ -38,11 +54,11 @@ export default class MotorValveBasic
           class="col-grow"
         />
         <ConstraintsField
-          :value="block.data.constrainedBy"
+          :model-value="block.data.constrainedBy"
           :service-id="serviceId"
           type="digital"
           class="col-grow"
-          @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+          @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
         />
       </div>
     </slot>

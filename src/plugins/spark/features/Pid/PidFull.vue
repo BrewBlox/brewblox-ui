@@ -1,66 +1,157 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { tempQty } from '@/helpers/bloxfield';
-import { createBlockDialog } from '@/helpers/dialog';
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { isBlockDriven } from '@/plugins/spark/helpers';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, PidBlock, Quantity, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { isBlockDriven, prettyBlock } from '@/plugins/spark/utils';
+import { prettyQty, tempQty } from '@/utils/bloxfield';
+import { createBlockDialog } from '@/utils/dialog';
+import { round } from '@/utils/functional';
 
 interface GridOpts {
   start?: number;
   span?: number;
 }
 
-@Component
-export default class PidFull
-  extends BlockCrudComponent<PidBlock> {
+export default defineComponent({
+  name: 'PidFull',
+  setup() {
+    const {
+      sparkModule,
+      serviceId,
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<PidBlock>();
 
-  get inputBlock(): SetpointSensorPairBlock | null {
-    return this.sparkModule.blockByLink(this.block.data.inputId);
-  }
+    const inputBlock = computed<SetpointSensorPairBlock | null>(
+      () => sparkModule.blockByLink(block.value.data.inputId),
+    );
 
-  get inputDriven(): boolean {
-    return isBlockDriven(this.inputBlock);
-  }
+    const inputDriven = computed<boolean>(
+      () => isBlockDriven(inputBlock.value),
+    );
 
-  get outputBlock(): Block | null {
-    return this.sparkModule.blockByLink(this.block.data.outputId);
-  }
+    const inputStoredSetting = computed<Quantity | null>({
+      get: () => inputBlock.value?.data.storedSetting ?? null,
+      set: q => {
+        if (inputBlock.value && q) {
+          inputBlock.value.data.storedSetting = q;
+          sparkModule.saveBlock(inputBlock.value);
+        }
+      },
+    });
 
-  get baseOutput(): number {
-    return this.block.data.p + this.block.data.i + this.block.data.d;
-  }
+    const outputBlock = computed<Block | null>(
+      () => sparkModule.blockByLink(block.value.data.outputId),
+    );
 
-  get boiling(): boolean {
-    return this.block.data.boilModeActive;
-  }
+    const baseOutput = computed<number>(
+      () => {
+        const { p, i, d } = block.value.data;
+        return p + i + d;
+      },
+    );
 
-  get boilAdjustment(): number {
-    return this.boiling
-      ? this.block.data.boilMinOutput - this.baseOutput
-      : 0;
-  }
+    const boiling = computed<boolean>(
+      () => block.value.data.boilModeActive,
+    );
 
-  get waterBoilTemp(): Quantity {
-    return tempQty(100);
-  }
+    const boilAdjustment = computed<number>(
+      () => boiling.value
+        ? block.value.data.boilMinOutput - baseOutput.value
+        : 0,
+    );
 
-  showInput(): void {
-    createBlockDialog(this.inputBlock);
-  }
+    const waterBoilTemp = computed<Quantity>(
+      () => tempQty(100),
+    );
 
-  showOutput(): void {
-    createBlockDialog(this.outputBlock);
-  }
+    function showInput(): void {
+      createBlockDialog(inputBlock.value);
+    }
 
-  grid(opts: GridOpts): Mapped<string> {
+    function showOutput(): void {
+      createBlockDialog(outputBlock.value);
+    }
+
+    function grid(opts: GridOpts): Mapped<string> {
+      return {
+        gridColumnStart: `${opts.start || 'auto'}`,
+        gridColumnEnd: `span ${opts.span || 1}`,
+      };
+    }
+
     return {
-      gridColumnStart: `${opts.start || 'auto'}`,
-      gridColumnEnd: `span ${opts.span || 1}`,
+      prettyBlock,
+      prettyQty,
+      round,
+      serviceId,
+      block,
+      saveBlock,
+      inputBlock,
+      inputDriven,
+      inputStoredSetting,
+      outputBlock,
+      baseOutput,
+      boiling,
+      boilAdjustment,
+      waterBoilTemp,
+      showInput,
+      showOutput,
+      grid,
     };
-  }
-}
+  },
+});
+
+// @Component
+// export default class PidFull
+//   extends BlockCrudComponent<PidBlock> {
+
+//   get inputBlock(): SetpointSensorPairBlock | null {
+//     return sparkModule.blockByLink(block.value.data.inputId);
+//   }
+
+//   get inputDriven(): boolean {
+//     return isBlockDriven(inputBlock.value);
+//   }
+
+//   get outputBlock(): Block | null {
+//     return sparkModule.blockByLink(block.value.data.outputId);
+//   }
+
+//   get baseOutput(): number {
+//     return block.value.data.p + block.value.data.i + block.value.data.d;
+//   }
+
+//   get boiling(): boolean {
+//     return block.value.data.boilModeActive;
+//   }
+
+//   get boilAdjustment(): number {
+//     return boiling.value
+//       ? block.value.data.boilMinOutput - baseOutput.value
+//       : 0;
+//   }
+
+//   get waterBoilTemp(): Quantity {
+//     return tempQty(100);
+//   }
+
+//   showInput(): void {
+//     createBlockDialog(inputBlock.value);
+//   }
+
+//   showOutput(): void {
+//     createBlockDialog(outputBlock.value);
+//   }
+
+//   grid(opts: GridOpts): Mapped<string> {
+//     return {
+//       gridColumnStart: `${opts.start || 'auto'}`,
+//       gridColumnEnd: `span ${opts.span || 1}`,
+//     };
+//   }
+// }
 </script>
 
 <template>
@@ -70,7 +161,7 @@ export default class PidFull
     <div class="widget-body row">
       <!-- Input row -->
       <LinkField
-        :value="block.data.inputId"
+        :model-value="block.data.inputId"
         :service-id="serviceId"
         :show="false"
         title="Input"
@@ -85,28 +176,27 @@ export default class PidFull
               <p>The input target minus the input value is called the error</p>
               "
         class="col-grow"
-        @input="v => { block.data.inputId = v; saveBlock(); }"
+        @update:model-value="v => { block.data.inputId = v; saveBlock(); }"
       />
       <div class="col-grow">
         <QuantityField
-          v-if="!!inputBlock"
-          :value="inputBlock.data.storedSetting"
+          v-if="inputBlock !== null"
+          v-model="inputStoredSetting"
           :readonly="inputDriven"
           :class="[{darkened: !inputBlock.data.settingEnabled}, 'col']"
           label="Setting"
           tag="b"
-          @input="v => { inputBlock.data.storedSetting = v; saveStoreBlock(inputBlock); }"
         />
         <QuantityField
           v-else
-          :value="block.data.inputSetting"
+          :model-value="block.data.inputSetting"
           label="Setting"
           tag="b"
           readonly
         />
       </div>
       <QuantityField
-        :value="block.data.inputValue"
+        :model-value="block.data.inputValue"
         label="Measured"
         tag="b"
         class="col-grow"
@@ -119,7 +209,7 @@ export default class PidFull
         class="col-auto depth-1"
         @click="showInput"
       >
-        <q-tooltip>Edit {{ inputBlock | block }}</q-tooltip>
+        <q-tooltip>Edit {{ prettyBlock(inputBlock) }}</q-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -133,7 +223,7 @@ export default class PidFull
       <div class="col-break" />
 
       <LinkField
-        :value="block.data.outputId"
+        :model-value="block.data.outputId"
         :service-id="serviceId"
         :show="false"
         title="Output"
@@ -151,17 +241,17 @@ export default class PidFull
               </p>
               "
         class="col-grow"
-        @input="v => { block.data.outputId = v; saveBlock(); }"
+        @update:model-value="v => { block.data.outputId = v; saveBlock(); }"
       />
       <LabeledField
-        :value="block.data.outputSetting"
+        :model-value="block.data.outputSetting"
         number
         label="Target value"
         tag="b"
         class="col-grow"
       />
       <LabeledField
-        :value="block.data.outputValue"
+        :model-value="block.data.outputValue"
         number
         label="Achieved value"
         tag="b"
@@ -174,7 +264,7 @@ export default class PidFull
         class="col-auto depth-1"
         @click="showOutput"
       >
-        <q-tooltip>Edit {{ outputBlock | block }}</q-tooltip>
+        <q-tooltip>Edit {{ prettyBlock(outputBlock) }}</q-tooltip>
       </q-btn>
       <q-btn
         v-else
@@ -191,7 +281,7 @@ export default class PidFull
     <div class="widget-body items-center grid-container">
       <div class="span-2">
         <LabeledField label="Error">
-          {{ block.data.error | quantity }}
+          {{ prettyQty(block.data.error) }}
         </LabeledField>
       </div>
 
@@ -201,7 +291,7 @@ export default class PidFull
 
       <div class="span-2">
         <QuantityField
-          :value="block.data.kp"
+          :model-value="block.data.kp"
           :html="true"
           title="Proportional gain Kp"
           label="Kp"
@@ -214,7 +304,7 @@ export default class PidFull
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
               "
           borderless
-          @input="v => { block.data.kp = v; saveBlock(); }"
+          @update:model-value="v => { block.data.kp = v; saveBlock(); }"
         />
       </div>
 
@@ -224,7 +314,7 @@ export default class PidFull
 
       <div class="span-2">
         <LabeledField label="P">
-          {{ block.data.p | round }}
+          {{ round(block.data.p ) }}
         </LabeledField>
       </div>
 
@@ -232,7 +322,7 @@ export default class PidFull
 
       <div class="span-2">
         <LabeledField label="Integral">
-          {{ block.data.integral | quantity }}
+          {{ prettyQty(block.data.integral) }}
         </LabeledField>
       </div>
 
@@ -241,7 +331,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <QuantityField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
+        <QuantityField :model-value="block.data.kp" label="Kp" tag-class="darkish" readonly />
       </div>
 
       <div class="span-1 self-center text-center">
@@ -250,7 +340,7 @@ export default class PidFull
 
       <div class="span-2">
         <DurationField
-          :value="block.data.ti"
+          :model-value="block.data.ti"
           :rules="[
             v => v >= 0 || 'Value must be positive',
             v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
@@ -275,7 +365,7 @@ export default class PidFull
               <p>Setting Ti to zero will disable the integrator.</p>
               "
           borderless
-          @input="v => { block.data.ti = v; saveBlock(); }"
+          @update:model-value="v => { block.data.ti = v; saveBlock(); }"
         />
       </div>
 
@@ -285,7 +375,7 @@ export default class PidFull
 
       <div class="span-2">
         <InputField
-          :value="block.data.i"
+          :model-value="block.data.i"
           :html="true"
           type="number"
           title="Manually set integral"
@@ -300,7 +390,7 @@ export default class PidFull
               </p>
               "
           borderless
-          @input="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
+          @update:model-value="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
         />
       </div>
 
@@ -308,7 +398,7 @@ export default class PidFull
 
       <div class="span-2">
         <LabeledField :tag-class="{darkish: block.data.td.value === 0}" label="Derivative">
-          {{ block.data.derivative | quantity }}
+          {{ prettyQty(block.data.derivative) }}
         </LabeledField>
       </div>
 
@@ -317,7 +407,7 @@ export default class PidFull
       </div>
 
       <div class="span-2">
-        <QuantityField :value="block.data.kp" label="Kp" tag-class="darkish" readonly />
+        <QuantityField :model-value="block.data.kp" label="Kp" tag-class="darkish" readonly />
       </div>
 
       <div class="span-1 self-center text-center">
@@ -326,7 +416,7 @@ export default class PidFull
 
       <div class="span-2">
         <DurationField
-          :value="block.data.td"
+          :model-value="block.data.td"
           :rules="[
             v => v >= 0 || 'Value must be positive',
             v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
@@ -349,7 +439,7 @@ export default class PidFull
               </p>
               "
           borderless
-          @input="v => { block.data.td = v; saveBlock(); }"
+          @update:model-value="v => { block.data.td = v; saveBlock(); }"
         />
       </div>
 
@@ -359,7 +449,7 @@ export default class PidFull
 
       <div class="span-2 calc-line">
         <LabeledField label="D">
-          {{ block.data.d | round }}
+          {{ round(block.data.d) }}
           <template #after>
             <sub class="self-end">+</sub>
           </template>
@@ -374,7 +464,7 @@ export default class PidFull
         :style="grid({start: 10, span: 2})"
       >
         <LabeledField label="Boil mode">
-          {{ boilAdjustment | round }}
+          {{ round(boilAdjustment) }}
           <template #after>
             <sub class="self-end">+</sub>
           </template>
@@ -385,7 +475,7 @@ export default class PidFull
 
       <div :style="grid({start: 10, span: 2})">
         <LabeledField label="Output">
-          {{ baseOutput + boilAdjustment | round }}
+          {{ round(baseOutput + boilAdjustment) }}
         </LabeledField>
       </div>
     </div>
@@ -394,7 +484,7 @@ export default class PidFull
 
     <div class="widget-body row">
       <SliderField
-        :value="block.data.boilMinOutput"
+        :model-value="block.data.boilMinOutput"
         :decimals="0"
         :quick-actions="[
           { label: '0%', value: 0 },
@@ -405,18 +495,18 @@ export default class PidFull
         label="Minimum output when boiling"
         suffix="%"
         class="col-grow"
-        @input="v => { block.data.boilMinOutput = v; saveBlock(); }"
+        @update:model-value="v => { block.data.boilMinOutput = v; saveBlock(); }"
       />
       <QuantityField
-        :value="block.data.boilPointAdjust"
+        :model-value="block.data.boilPointAdjust"
         title="Boil point adjustment"
         label="Boil temperature setting"
         class="col-grow"
-        @input="v => { block.data.boilPointAdjust = v; saveBlock(); }"
+        @update:model-value="v => { block.data.boilPointAdjust = v; saveBlock(); }"
       >
         <template #value>
-          <span class="darkish">{{ waterBoilTemp.value | round(0) }}</span> +
-          <b>{{ block.data.boilPointAdjust.value | round }}</b>
+          <span class="darkish">{{ round(waterBoilTemp.value, 0) }}</span> +
+          <b>{{ round(block.data.boilPointAdjust.value) }}</b>
         </template>
       </QuantityField>
     </div>

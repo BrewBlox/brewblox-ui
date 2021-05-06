@@ -1,27 +1,43 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { LEFT } from '../getters';
+import { LEFT } from '@/plugins/builder/const';
 
-@Component
-export default class StraightInletTube extends PartBase {
-  readonly paths = {
-    borders: [
-      'M 0,21 L 25,21',
-      'M 0,29 L 25,29',
-    ],
-    liquid: 'M0,25 H25',
-  };
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
-  get flowSpeed(): number {
-    return -this.flowOnCoord(LEFT);
-  }
+const paths = {
+  borders: [
+    'M 0,21 L 25,21',
+    'M 0,29 L 25,29',
+  ],
+  liquid: 'M0,25 H25',
+};
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(LEFT);
-  }
-}
+export default defineComponent({
+  name: 'StraightInletTube',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => -flowOnCoord(props.part, LEFT),
+    );
+
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, LEFT),
+    );
+
+    return {
+      paths,
+      flowSpeed,
+      liquids,
+    };
+  },
+});
 </script>
 
 <template>

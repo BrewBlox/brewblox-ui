@@ -1,21 +1,31 @@
-import { ref } from '@/helpers/component-ref';
-import { QuickStartFeature } from '@/store/features';
+import { Plugin } from 'vue';
 
+import { featureStore, QuickstartFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+
+import FermentCompletionTask from './FermentCompletionTask.vue';
 import FermentHardwareTask from './FermentHardwareTask.vue';
-import FermentManualTask from './FermentManualTask.vue';
 import FermentNamingTask from './FermentNamingTask.vue';
 import FermentSettingsTask from './FermentSettingsTask.vue';
-import FermentWizard from './FermentWizard.vue';
 
-ref(FermentNamingTask);
-ref(FermentHardwareTask);
-ref(FermentSettingsTask);
-ref(FermentManualTask);
+const plugin: Plugin = {
+  install(app) {
 
-const feature: QuickStartFeature = {
-  id: 'Ferment',
-  title: 'Fermentation fridge',
-  component: ref(FermentWizard),
+    const feature: QuickstartFeature = {
+      id: 'Ferment',
+      title: 'Fermentation fridge',
+      tasks: [
+        'QuickstartServiceTask',
+        'QuickstartDiscoveryTask',
+        cref(app, FermentNamingTask),
+        cref(app, FermentHardwareTask),
+        cref(app, FermentSettingsTask),
+        cref(app, FermentCompletionTask),
+      ],
+    };
+
+    featureStore.addQuickstartFeature(feature);
+  },
 };
 
-export default feature;
+export default plugin;

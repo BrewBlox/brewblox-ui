@@ -1,111 +1,131 @@
 <script lang="ts">
-import Vue, { CreateElement, VNode } from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { WidgetProps } from '@/components/WidgetBase';
-import { Widget } from '@/store/dashboards';
+import { WidgetContext } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
+import { patchedById } from '@/utils/functional';
 
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import GridItem from './GridItem.vue';
+import { RenderedItem } from './types';
 
-@Component({
-  components: { GridItem },
-})
-export default class GridContainer extends Vue {
+export default defineComponent({
+  name: 'GridContainer',
+  components: {
+    GridItem,
+  },
+  props: {
+    items: {
+      type: Array as PropType<RenderedItem[]>,
+      required: true,
+    },
+    context: {
+      type: Object as PropType<WidgetContext>,
+      required: true,
+    },
+    editable: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'dblclick',
+  ],
+  setup(props, { emit }) {
+    const containerRef = ref<HTMLDivElement>();
 
-  @Prop({ type: Boolean, default: false })
-  readonly editable!: boolean;
-
-  // Making this a getter causes unwanted caching, as default can be undefined
-  activeChildren(): VNode[] {
-    return this.$slots.default
-      ?.filter(slot => slot.tag != null)
-      ?? [];
-  }
-
-  updateItemPosition(updatedId: string, pos: XYPosition | null): void {
-    const updated: Partial<Widget>[] = this.$children
-      .map(item => [item, item.$el.getBoundingClientRect()] as [GridItem, DOMRect])
-      .sort(([, rectA], [, rectB]) => (rectA.y - rectB.y) || (rectA.x - rectB.x))
-      .map(([{ id }], idx) =>
-        id === updatedId
-          ? { id, order: idx + 1, pinnedPosition: pos }
-          : { id, order: idx + 1 }
-      );
-    this.$emit('patch:widgets', updated);
-  }
-
-  updateItemSize(id: string, cols: number, rows: number): void {
-    const updated: Partial<Widget>[] = [{ id, cols, rows }];
-    this.$emit('patch:widgets', updated);
-  }
-
-  slotProps(slot: VNode): WidgetProps {
-    return slot.componentOptions!.propsData as WidgetProps;
-  }
-
-  renderOverlay(h: CreateElement): VNode {
-    return h('div',
-      { class: 'grid-container-overlay' },
-      [h('div', { class: 'grid-container-overlay-grid' })],
+    const minWidth = computed<number>(
+      () => props.items
+        .reduce(
+          (width: number, item: RenderedItem) => {
+            const { cols, pinnedPosition } = item.widget;
+            const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
+            return Math.max(width, minCols * GRID_SQUARE_SIZE + minCols * GRID_GAP_SIZE);
+          },
+          0,
+        ),
     );
-  }
 
-  renderWidgets(h: CreateElement): VNode[] {
-    const elements = this.activeChildren()
-      .map((slot: VNode) => h(
-        GridItem, // Wrap each widget in a GridItem to handle dragging / moving
-        {
-          props: {
-            widget: this.slotProps(slot).initialCrud.widget,
-            editable: this.editable,
-          },
-          on: {
-            size: this.updateItemSize,
-            position: this.updateItemPosition,
-          },
-        },
-        [slot], // The actual widget
-      ));
+    const gridStyle = computed<Mapped<string>>(
+      () => {
+        return {
+          minHeight: props.editable ? '3000px' : '0px',
+          minWidth: `${minWidth.value}px`,
+        };
+      },
+    );
 
-    if (this.editable) {
-      elements.push(this.renderOverlay(h));
+    function patchWidgets(updated: Patch<Widget>[]): void {
+      const applied = updated
+        .map(change => patchedById(widgetStore.widgets, change))
+        .filter((v): v is Widget => v !== null);
+      applied.forEach(v => widgetStore.saveWidget(v));
     }
 
-    return elements;
-  }
+    function updateItemPosition(updatedId: string, pos: XYPosition | null): void {
+      const updated = Array.from(containerRef.value!.getElementsByClassName('grid-item'))
+        .map((el): [string, DOMRect] => [el.getAttribute('widget-id')!, el.getBoundingClientRect()])
+        .sort(([, rectA], [, rectB]) => (rectA.y - rectB.y) || (rectA.x - rectB.x))
+        .map(([id], idx) =>
+          id === updatedId
+            ? { id, order: idx + 1, pinnedPosition: pos }
+            : { id, order: idx + 1 },
+        );
+      patchWidgets(updated);
+    }
 
-  render(h: CreateElement): VNode {
-    const minWidth = this.activeChildren()
-      .reduce(
-        (width: number, node: VNode) => {
-          const { cols, pinnedPosition } = this.slotProps(node).initialCrud.widget;
-          const minCols = cols + (pinnedPosition?.x ?? 1) - 1;
-          return Math.max(width, minCols * GRID_SQUARE_SIZE + minCols * GRID_GAP_SIZE);
-        },
-        0
-      );
+    function updateItemSize(id: string, cols: number, rows: number): void {
+      patchWidgets([{ id, cols, rows }]);
+    }
 
-    return h('div',
-      {
-        class: 'grid-container grid-main-container',
-        style: {
-          minHeight: this.editable ? '3000px' : '0',
-          minWidth: `${minWidth}px`,
-        },
-        on: {
-          dblclick: (evt: MouseEvent) => {
-            if (evt.target === evt.currentTarget) {
-              this.$emit('dblclick');
-            }
-          },
-        },
-      },
-      this.renderWidgets(h)
-    );
-  }
-}
+    function onDoubleClick(evt: MouseEvent): void {
+      if (evt.target === evt.currentTarget) {
+        emit('dblclick');
+      }
+    }
+
+    return {
+      containerRef,
+      gridStyle,
+      onDoubleClick,
+      updateItemSize,
+      updateItemPosition,
+    };
+  },
+});
 </script>
+
+<template>
+  <div
+    ref="containerRef"
+    class="grid-container grid-main-container"
+    :style="gridStyle"
+    @dblclick="onDoubleClick"
+  >
+    <GridItem
+      v-for="item in items"
+      :key="`grid-item-${item.widget.id}`"
+      :widget-id="item.widget.id"
+      :editable="editable"
+      @size="updateItemSize"
+      @position="updateItemPosition"
+    >
+      <WidgetProvider :context="context" :widget-id="item.widget.id">
+        <component
+          :is="item.component"
+          :error="item.error"
+          class="fit"
+        />
+      </WidgetProvider>
+    </GridItem>
+    <div
+      v-if="editable"
+      class="grid-container-overlay"
+    >
+      <div class="grid-container-overlay-grid" />
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 // Grid square / gap size values are hardcoded here at 100px/20px

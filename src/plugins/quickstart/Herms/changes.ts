@@ -1,6 +1,5 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
-import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/helpers/bloxfield';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
@@ -19,17 +18,18 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
-import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { Widget } from '@/store/widgets';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/utils/bloxfield';
 
-import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { DisplayBlock } from '../types';
+import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';
 import { HermsConfig, HermsOpts } from './types';
 
 export function defineChangedBlocks(config: HermsConfig): Block[] {
   return unlinkedActuators(config.serviceId, [config.hltPin, config.bkPin]);
-};
+}
 
 export function defineCreatedBlocks(config: HermsConfig, opts: HermsOpts): Block[] {
   const groups = [0];
@@ -312,7 +312,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
     ...featureStore.widgetSize(type),
-    id: uid(),
+    id: nanoid(),
     title: name,
     feature: type,
     order: 0,
@@ -387,22 +387,22 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
       actions: [
         {
           name: 'Disable all setpoints',
-          id: uid(),
+          id: nanoid(),
           changes: [
             {
-              id: uid(),
+              id: nanoid(),
               blockId: names.hltSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
-              id: uid(),
+              id: nanoid(),
               blockId: names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
-              id: uid(),
+              id: nanoid(),
               blockId: names.bkSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
@@ -415,17 +415,17 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
         },
         {
           name: 'Constant HLT Temp',
-          id: uid(),
+          id: nanoid(),
           changes: [
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.mtSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.hltSetpoint,
               data: {
@@ -443,10 +443,10 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
         },
         {
           name: 'Constant MT Temp',
-          id: uid(),
+          id: nanoid(),
           changes: [
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.mtSetpoint,
               data: {
@@ -458,7 +458,7 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
               },
             },
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.hltDriver,
               data: {
@@ -473,10 +473,10 @@ export function defineWidgets(config: HermsConfig, layouts: BuilderLayout[]): Wi
         },
         {
           name: 'Constant BK Temp',
-          id: uid(),
+          id: nanoid(),
           changes: [
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.bkSetpoint,
               data: {

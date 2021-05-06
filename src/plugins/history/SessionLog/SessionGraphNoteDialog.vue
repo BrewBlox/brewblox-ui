@@ -1,33 +1,55 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
+import { deepCopy } from '@/utils/functional';
 
 import { SessionGraphNote } from '../types';
 
 type NoteDates = Pick<SessionGraphNote, 'start' | 'end'>;
 
-@Component
-export default class SessionGraphNoteDialog extends DialogBase {
-  local: NoteDates | null = null;
+export default defineComponent({
+  name: 'SessionGraphNoteDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<NoteDates>,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-  @Prop({ type: Object })
-  public readonly value!: NoteDates;
+    const local = ref<NoteDates>(deepCopy(props.modelValue));
 
-  save(): void {
-    this.onDialogOk(this.local);
-  }
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  created(): void {
-    const { start, end } = this.value;
-    this.local = { start, end };
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

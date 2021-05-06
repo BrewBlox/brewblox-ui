@@ -1,44 +1,60 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import { Link } from '@/helpers/bloxfield';
-import { isCompatible } from '@/plugins/spark/helpers';
+import { useValEdit } from '@/plugins/spark/composables';
+import { sparkStore } from '@/plugins/spark/store';
+import { isCompatible } from '@/plugins/spark/utils';
+import { Link } from '@/utils/bloxfield';
 
-import ValEditBase from '../ValEditBase';
+export default defineComponent({
+  name: 'LinkValEdit',
+  props: {
+    ...useValEdit.props,
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<Link>(props.modelValue);
+    const sparkModule = sparkStore.moduleById(props.serviceId)!;
 
+    const blockIdOpts = computed<string[]>(
+      () => sparkModule
+        .blocks
+        .filter(block => isCompatible(block.type, field.value.type))
+        .map(block => block.id),
+    );
 
-@Component
-export default class LinkValEdit extends ValEditBase<Link> {
-  filtered: string[] | null = null;
+    const filteredOpts = ref<string[]>(blockIdOpts.value);
 
-  get blockIdOpts(): string[] {
-    return this.sparkModule
-      .blocks
-      .filter(block => isCompatible(block.type, this.field.type))
-      .map(block => block.id);
-  }
+    const displayVal = computed<string>(
+      () => field.value.id || '<None>',
+    );
 
-  get filteredOpts(): string[] {
-    return this.filtered || this.blockIdOpts;
-  }
-
-  get displayVal(): string {
-    return this.field.id || '<None>';
-  }
-
-  filterFn(val, update): void {
-    if (val === '') {
-      update(() => this.filtered = this.blockIdOpts);
-      return;
+    function filterFn(val, update): void {
+      if (val === '') {
+        update(() => filteredOpts.value = blockIdOpts.value);
+        return;
+      }
+      update(() => {
+        const needle = val.toLowerCase();
+        filteredOpts.value = blockIdOpts.value
+          .filter(opt => opt.toLowerCase().match(needle));
+      });
     }
 
-    update(() => {
-      const needle = val.toLowerCase();
-      this.filtered = this.blockIdOpts
-        .filter(opt => opt.toLowerCase().match(needle));
-    });
-  }
-}
+    return {
+      field,
+      startEdit,
+      filteredOpts,
+      displayVal,
+      filterFn,
+    };
+  },
+});
 </script>
 
 <template>

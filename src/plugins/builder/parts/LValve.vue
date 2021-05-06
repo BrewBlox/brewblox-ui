@@ -1,60 +1,90 @@
 <script lang="ts">
-import { Component, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, watch } from 'vue';
 
-import { DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
+import { UP } from '@/plugins/builder/const';
+import { elbow, flowOnCoord, liquidOnCoord, squares } from '@/plugins/builder/utils';
+import { DigitalState } from '@/plugins/spark/types';
 
-import PartBase from '../components/PartBase';
-import { UP } from '../getters';
-import { elbow, settingsBlock } from '../helpers';
+import { usePart, useSettingsBlock } from '../composables';
+import { VALVE_KEY, VALVE_TYPES, ValveT } from '../specs/LValve';
+import { FlowPart } from '../types';
 
-@Component
-export default class LValve extends PartBase {
-  readonly paths = {
-    bigEnclosure: `
-      M21,0 V17 ${elbow(12, 12, false)} H50
-      L39.5,29 c-1.4,5.1,-5.4,9.1,-10.5,10.5
-      L21,39.5 c-5.1,-1.4,-9.1,-5.4,-10.5,-10.5
-      L10.5,21 c1.4,-5.1,5.4,-9.1,10.5,-10.5`,
-    smallEnclosure: `
-      M29,0 V17 ${elbow(4, 4, false)} H50
-      L39.5 21c-1.4-5.1-5.4-9.1-10.5-10.5`,
-    liquidLeft: `M25,0 v17 ${elbow(-8, 8, false)} H0`,
-    liquidRight: `M25,0 v17 ${elbow(8, 8, false)} H50`,
-  };
+const paths = {
+  bigEnclosure: `
+    M21,0 V17 ${elbow(12, 12, false)} H50
+    L39.5,29 c-1.4,5.1,-5.4,9.1,-10.5,10.5
+    L21,39.5 c-5.1,-1.4,-9.1,-5.4,-10.5,-10.5
+    L10.5,21 c1.4,-5.1,5.4,-9.1,10.5,-10.5`,
+  smallEnclosure: `
+    M29,0 V17 ${elbow(4, 4, false)} H50
+    L39.5 21c-1.4-5.1-5.4-9.1-10.5-10.5`,
+  liquidLeft: `M25,0 v17 ${elbow(-8, 8, false)} H0`,
+  liquidRight: `M25,0 v17 ${elbow(8, 8, false)} H50`,
+};
 
-  get block(): DigitalActuatorBlock | MotorValveBlock | null {
-    return settingsBlock(this.part, 'valve');
-  }
+export default defineComponent({
+  name: 'LValve',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  emits: [
+    'dirty',
+  ],
+  setup(props, { emit }) {
+    const {
+      sizeX,
+    } = usePart.setup(props.part);
 
-  get closed(): boolean {
-    return this.block !== null
-      ? Boolean(this.block.data.state === DigitalState.STATE_ACTIVE)
-      : Boolean(this.settings.closed);
-  }
+    const {
+      block,
+    } = useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
 
-  get liquidPath(): string {
-    return this.closed
-      ? this.paths.liquidLeft
-      : this.paths.liquidRight;
-  }
+    const closed = computed<boolean>(
+      () => block.value !== null
+        ? Boolean(block.value.data.state === DigitalState.STATE_ACTIVE)
+        : Boolean(props.part.settings.closed),
+    );
 
-  get liquidSpeed(): number {
-    return -this.flowOnCoord(UP); // reversed
-  }
+    const liquidPath = computed<string>(
+      () => closed.value
+        ? paths.liquidLeft
+        : paths.liquidRight,
+    );
 
-  get liquidColor(): string[] {
-    return this.liquidOnCoord(UP);
-  }
+    const liquidSpeed = computed<number>(
+      () => -flowOnCoord(props.part, UP),
+    );
 
-  @Watch('block')
-  triggerUpdate(block, prevBlock): void {
-    if (block === null
-      || prevBlock === null
-      || block.data.state !== prevBlock.data.state) {
-      this.invalidateFlows();
-    }
-  }
-}
+    const liquidColor = computed<string[]>(
+      () => liquidOnCoord(props.part, UP),
+    );
+
+    watch(
+      () => block.value,
+      (newV, oldV) => {
+        if (newV === null
+          || oldV === null
+          || newV.data.state !== oldV.data.state) {
+          emit('dirty');
+        }
+      },
+    );
+
+    return {
+      squares,
+      paths,
+      sizeX,
+      block,
+      closed,
+      liquidPath,
+      liquidSpeed,
+      liquidColor,
+    };
+  },
+});
 </script>
 
 <template>

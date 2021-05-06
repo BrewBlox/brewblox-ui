@@ -1,11 +1,11 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { bloxQty } from '@/helpers/bloxfield';
-import { extendById } from '@/helpers/functional';
 import store from '@/store';
 import { systemStore } from '@/store/system';
+import { bloxQty } from '@/utils/bloxfield';
+import { extendById } from '@/utils/functional';
 
-import { TiltStateEvent, TiltStateValue } from '../types';
+import type { TiltStateEvent, TiltStateValue } from '../types';
 
 @Module({ generateMutationSetters: true })
 export class TiltModule extends VuexModule {

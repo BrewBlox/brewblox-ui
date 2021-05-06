@@ -1,23 +1,35 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-@Component
-export default class Toolbar extends Vue {
+export default defineComponent({
+  name: 'Toolbar',
+  props: {
+    icon: {
+      type: String,
+      default: '',
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    subtitle: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: [
+    'title-click',
+  ],
+  setup(props, { attrs }) {
+    const readonly = computed<boolean>(
+      () => attrs['onTitleClick'] === undefined,
+    );
 
-  @Prop({ type: String, required: false })
-  public readonly icon!: string;
-
-  @Prop({ type: String, required: true })
-  readonly title!: string;
-
-  @Prop({ type: String, required: false })
-  readonly subtitle!: string;
-
-  get readonly(): boolean {
-    return this.$listeners['title-click'] === undefined;
-  }
-}
+    return {
+      readonly,
+    };
+  },
+});
 </script>
 
 <template>

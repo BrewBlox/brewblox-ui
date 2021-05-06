@@ -1,24 +1,35 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
-import { saveFile } from '@/helpers/import-export';
+import { useWidget } from '@/composables';
+import { saveFile } from '@/utils/import-export';
 
-@Component
-export default class ExportAction extends CrudComponent {
+export default defineComponent({
+  name: 'ExportAction',
+  props: {
+    icon: {
+      type: String,
+      default: 'mdi-file-export',
+    },
+    label: {
+      type: String,
+      default: 'Export widget',
+    },
+  },
+  setup() {
+    const { widget } = useWidget.setup();
 
-  @Prop({ type: String, default: 'mdi-file-export' })
-  readonly icon!: string;
+    async function startExport(): Promise<void> {
+      const { id, dashboard, pinnedPosition, ...exported } = widget.value;
+      void { id, dashboard, pinnedPosition };
+      saveFile(exported, `brewblox-${widget.value.title}-${widget.value.feature}.json`);
+    }
 
-  @Prop({ type: String, default: 'Export widget' })
-  readonly label!: string;
-
-  async startExport(): Promise<void> {
-    const { id, dashboard, pinnedPosition, ...exported } = this.widget;
-    void { id, dashboard, pinnedPosition };
-    saveFile(exported, `brewblox-${this.widget.title}-${this.widget.feature}.json`);
-  }
-}
+    return {
+      startExport,
+    };
+  },
+});
 </script>
 
 <template>

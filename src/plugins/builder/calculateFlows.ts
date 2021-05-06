@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
 import set from 'lodash/set';
 
-import { Coordinates } from '@/helpers/coordinates';
+import { Coordinates } from '@/utils/coordinates';
 
 import { FlowSegment, mergeOverlappingSplits } from './FlowSegment';
 import {
@@ -36,7 +36,7 @@ const normalizeFlows = (part: FlowPart): FlowPart => {
     (flow, inCoord) =>
       new Coordinates(inCoord)
         .translate([-part.x, -part.y, 0])
-        .toString()
+        .toString(),
   );
 
   return { ...part, flows: newFlows };
@@ -204,7 +204,7 @@ const innerFlowPath = (
           next.sinksTo.forEach(sink => { path.sinksTo.add(sink); });
         }
       }
-    };
+    }
   }
 
   if (nextPaths.length === 1) {
@@ -265,7 +265,7 @@ export const addFlowForPath = (
   parts = additionalFlow(
     path.root,
     parts,
-    newFlows
+    newFlows,
   );
 
   // continue path
@@ -298,7 +298,7 @@ const addFlowFromPart = (parts: FlowPart[], part: FlowPart): FlowPart[] => {
       const startFlow: LiquidFlow = {};
       for (const liquid of path.inRoute.liquids) {
         startFlow[liquid] = pressureDiff / friction;
-      };
+      }
       parts = addFlowForPath(parts, path, startFlow);
     }
 

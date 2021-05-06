@@ -1,121 +1,148 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { useField } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockField, BlockFieldAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { prettyAny } from '@/utils/bloxfield';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
 
-import FieldBase from '../FieldBase';
+export default defineComponent({
+  name: 'BlockFieldAddressField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: Object as PropType<BlockFieldAddress>,
+      required: true,
+    },
+    title: {
+      type: String,
+      default: 'Choose field',
+    },
+    label: {
+      type: String,
+      default: 'Field',
+    },
+    services: {
+      type: Array as PropType<string[] | null>,
+      default: null,
+    },
+    compatible: {
+      type: [String, Array] as PropType<ComparedBlockType>,
+      default: null,
+    },
+    blockFilter: {
+      type: Function as PropType<(block: Block) => boolean>,
+      default: () => true,
+    },
+    fieldFilter: {
+      type: Function as PropType<(field: BlockField) => boolean>,
+      default: () => true,
+    },
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    configurable: {
+      type: Boolean,
+      default: true,
+    },
+    show: {
+      type: Boolean,
+      default: true,
+    },
+    showValue: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-
-@Component
-export default class BlockFieldAddressField extends FieldBase {
-
-  @Prop({ type: Object, required: true })
-  public readonly value!: BlockFieldAddress;
-
-  @Prop({ type: String, default: 'Choose field' })
-  public readonly title!: string;
-
-  @Prop({ type: String, default: 'Field' })
-  public readonly label!: string;
-
-  @Prop({ type: Array, required: false })
-  public readonly services!: string[];
-
-  @Prop({ type: [String, Array], required: false })
-  readonly compatible!: ComparedBlockType;
-
-  @Prop({ type: Function, required: false })
-  public readonly blockFilter!: ((block: Block) => boolean);
-
-  @Prop({ type: Function, required: false })
-  public readonly fieldFilter!: ((field: BlockField) => boolean);
-
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly configurable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly show!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly showValue!: boolean;
-
-  save(val: BlockFieldAddress): void {
-    this.$emit('input', val);
-  }
-
-  get fieldSpec(): BlockField | null {
-    return sparkStore.fieldSpec(this.value);
-  }
-
-  get block(): Block | null {
-    return sparkStore.blockByAddress(this.value);
-  }
-
-  get fieldValue(): any {
-    return sparkStore.fieldByAddress(this.value);
-  }
-
-  get broken(): boolean {
-    return this.block === null
-      && this.value.serviceId !== null
-      && this.value.id !== null;
-  }
-
-  get canEdit(): boolean {
-    return this.block !== null
-      && this.configurable
-      && this.show;
-  }
-
-  editBlock(): void {
-    createBlockDialog(this.block);
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function save(addr: BlockFieldAddress): void {
+      emit('update:modelValue', addr);
     }
 
-    createDialog({
-      component: 'BlockFieldAddressDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      label: this.label,
-      services: this.services,
-      compatible: this.compatible,
-      blockFilter: this.blockFilter,
-      fieldFilter: this.fieldFilter,
-      ...this.dialogProps,
-    })
-      .onOk(this.save);
-  }
+    const block = computed<Block | null>(
+      () => sparkStore.blockByAddress(props.modelValue),
+    );
 
-  // Can't be placed in parent class
-  get activeSlots(): string[] {
-    return Object.keys(this.$slots)
-      .filter(s => this.fieldSlots.includes(s));
-  }
-}
+    const fieldSpec = computed<BlockField | null>(
+      () => sparkStore.fieldSpec(props.modelValue),
+    );
+
+    const fieldDisplayValue = computed<string>(
+      () => prettyAny(sparkStore.fieldByAddress(props.modelValue)),
+    );
+
+    const broken = computed<boolean>(
+      () => block.value === null
+        && props.modelValue.serviceId !== null
+        && props.modelValue.id !== null,
+    );
+
+    const canEdit = computed<boolean>(
+      () => block.value !== null
+        && props.configurable
+        && props.show,
+    );
+
+    function editBlock(): void {
+      createBlockDialog(block.value);
+    }
+
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+      createDialog({
+        component: 'BlockFieldAddressDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          label: props.label,
+          services: props.services,
+          compatible: props.compatible,
+          blockFilter: props.blockFilter,
+          fieldFilter: props.fieldFilter,
+          ...props.dialogProps,
+        },
+      })
+        .onOk(save);
+    }
+
+
+    return {
+      activeSlots,
+      save,
+      fieldSpec,
+      block,
+      fieldDisplayValue,
+      broken,
+      canEdit,
+      editBlock,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <div v-if="fieldSpec" class="q-gutter-y-xs">
       <span>
-        {{ value.id }} &raquo; {{ fieldSpec.title }}
+        {{ modelValue.id }} &raquo; {{ fieldSpec.title }}
       </span>
       <span
         v-if="showValue"
         class="text-secondary"
       >
-        &raquo; {{ fieldValue | pretty }}
+        &raquo; {{ fieldDisplayValue }}
       </span>
     </div>
     <div v-else-if="readonly">
@@ -125,7 +152,7 @@ export default class BlockFieldAddressField extends FieldBase {
       Click to assign
     </div>
     <q-item-label v-if="broken" caption class="text-negative q-mt-xs">
-      Block {{ value.id }} not found
+      Block {{ modelValue.id }} not found
     </q-item-label>
     <template #append>
       <q-btn
@@ -135,7 +162,7 @@ export default class BlockFieldAddressField extends FieldBase {
         icon="mdi-launch"
         @click.stop="editBlock"
       >
-        <q-tooltip>Show {{ value.id }}</q-tooltip>
+        <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
       <q-icon
         v-if="broken"
@@ -144,10 +171,8 @@ export default class BlockFieldAddressField extends FieldBase {
       />
     </template>
 
-    <template v-for="slot in activeSlots">
-      <template :slot="slot">
-        <slot :name="slot" />
-      </template>
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
   </LabeledField>
 </template>

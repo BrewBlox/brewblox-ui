@@ -1,6 +1,6 @@
 import { Notify } from 'quasar';
 
-import { DEFAULT_FRICTION } from './getters';
+import { DEFAULT_FRICTION } from './const';
 import { FlowPart, FlowRoute, PathFriction } from './types';
 
 export class FlowSegment {
@@ -77,7 +77,7 @@ export class FlowSegment {
     return series;
   }
 
-  public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: any): any {
+  public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: AnyDict): any {
     acc = func(acc, this);
     this.splits.forEach((child) => {
       acc = child.reduceSegments(func, acc);
@@ -85,7 +85,7 @@ export class FlowSegment {
     if (this.next !== null) {
       acc = func(acc, this.next);
     }
-  };
+  }
 
   public trimAtRoute(route: FlowRoute): FlowSegment | null {
     if (this.next) {
@@ -128,7 +128,7 @@ export class FlowSegment {
       }
     });
     return routes;
-  };
+  }
 }
 
 const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSegment | null } => {
@@ -192,7 +192,7 @@ export const mergeOverlappingSplits = (path: FlowSegment): FlowSegment => {
         sortedBySink[sortName] = { splits: [split], end: null };
       }
     }
-  };
+  }
 
 
   for (const sink in sortedBySink) {

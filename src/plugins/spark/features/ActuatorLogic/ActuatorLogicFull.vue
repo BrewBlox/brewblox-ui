@@ -1,10 +1,7 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 
-import { bloxLink } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { isCompatible } from '@/plugins/spark/helpers';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import {
   ActuatorLogicBlock,
   AnalogCompare,
@@ -16,10 +13,14 @@ import {
   DigitalState,
   LogicResult,
 } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils';
+import { bloxLink, prettyLink } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { characterTitles, logicResultTitles, nonErrorResults } from './getters';
+import { ExpressionError } from './types';
 import {
   analogIdx,
   analogKey,
@@ -30,175 +31,193 @@ import {
   prettyDigital,
   shiftRemainingComparisons,
   syntaxCheck,
-} from './helpers';
-import { ExpressionError } from './types';
+} from './utils';
 
 const validTypes: BlockIntfType[] = [
   BlockIntfType.ActuatorDigitalInterface,
   BlockIntfType.ProcessValueInterface,
 ];
 
-@Component({
-  components: {
-    AnalogCompareEditDialog,
-    DigitalCompareEditDialog,
-  },
-})
-export default class ActuatorLogicFull
-  extends BlockCrudComponent<ActuatorLogicBlock> {
-  localExpression: string | null = null;
-  delayedSave: number | null = null;
+export default defineComponent({
+  name: 'ActuatorLogicFull',
+  setup() {
+    const {
+      serviceId,
+      block,
+      saveBlock,
+      sparkModule,
+    } = useBlockWidget.setup<ActuatorLogicBlock>();
+    const localExpression = ref<string | null>(null);
+    const delayedSave = ref<number | null>(null);
 
-  beforeDestroy(): void {
-    if (this.delayedSave !== null) {
-      clearTimeout(this.delayedSave);
-      this.saveLocal();
+    function commit(): void {
+      if (localExpression.value !== null) {
+        block.value.data.expression = localExpression.value;
+        saveBlock(block.value);
+      }
     }
-  }
 
-  saveLocal(): void {
-    if (this.localExpression !== null) {
-      this.block.data.expression = this.localExpression;
-      this.saveBlock();
+    function saveExpression(expr: string): void {
+      if (delayedSave.value !== null) {
+        clearTimeout(delayedSave.value);
+      }
+      localExpression.value = expr;
+      delayedSave.value = window.setTimeout(commit, 1000);
     }
-    this.localExpression = null;
-  }
 
-  saveExpression(expr: string): void {
-    if (this.delayedSave !== null) {
-      clearTimeout(this.delayedSave);
-    }
-    this.localExpression = expr;
-    this.delayedSave = window.setTimeout(this.saveLocal, 1000);
-  }
+    onBeforeUnmount(() => {
+      if (delayedSave.value !== null) {
+        clearTimeout(delayedSave.value);
+        commit();
+      }
+    });
 
-  get validBlocks(): Block[] {
-    return this.sparkModule.blocks
-      .filter(block => isCompatible(block.type, validTypes));
-  }
+    const validBlocks = computed<Block[]>(
+      () => sparkModule.blocks
+        .filter(block => isCompatible(block.type, validTypes)),
+    );
 
-  get expression(): string {
-    return this.localExpression ?? this.block.data.expression;
-  }
+    const expression = computed<string>(
+      () => localExpression.value ?? block.value.data.expression,
+    );
 
-  get characters(): { char: string; pretty: string }[] {
-    return '()!&|^'
-      .split('')
-      .map(char => ({ char, pretty: characterTitles[char] ?? char }));
-  }
+    const characters = computed<{ char: string, pretty: string }[]>(
+      () => '()!&|^'
+        .split('')
+        .map(char => ({ char, pretty: characterTitles[char] ?? char })),
+    );
 
-  get digital(): { key: string; cmp: DigitalCompare; pretty: string }[] {
-    return this.block.data.digital
-      .map((cmp, idx) => ({
-        cmp,
-        key: digitalKey(idx),
-        pretty: prettyDigital(cmp),
-      }));
-  }
-
-  get analog(): { key: string; cmp: AnalogCompare; pretty: string }[] {
-    return this.block.data.analog
-      .map((cmp, idx) => ({
-        cmp,
-        key: analogKey(idx),
-        pretty: prettyAnalog(
+    const digital = computed<{ key: string; cmp: DigitalCompare; pretty: string }[]>(
+      () => block.value.data.digital
+        .map((cmp, idx) => ({
           cmp,
-          this.sparkModule.blockById(cmp.id.id)?.type ?? null,
-        ),
-      }));
-  }
+          key: digitalKey(idx),
+          pretty: prettyDigital(cmp),
+        })),
+    );
 
-  get firmwareError(): null | ExpressionError {
-    const { result, errorPos } = this.block.data;
-    const index = Math.max(0, errorPos - 1);
-    return nonErrorResults.includes(result)
-      ? null
-      : {
-        index,
-        message: logicResultTitles[result],
-        indicator: '-'.repeat(index) + '^',
-      };
-  }
+    const analog = computed<{ key: string; cmp: AnalogCompare; pretty: string }[]>(
+      () => block.value.data.analog
+        .map((cmp, idx) => ({
+          cmp,
+          key: analogKey(idx),
+          pretty: prettyAnalog(
+            cmp,
+            sparkModule.blockById(cmp.id.id)?.type ?? null,
+          ),
+        })),
+    );
 
-  get err(): null | ExpressionError {
-    return syntaxCheck(this.expression)
-      ?? comparisonCheck(this.block.data)
-      ?? (this.localExpression === null ? this.firmwareError : null);
-  }
+    const firmwareError = computed<ExpressionError | null>(
+      () => {
+        const { result, errorPos } = block.value.data;
+        const index = Math.max(0, errorPos - 1);
+        return nonErrorResults.includes(result)
+          ? null
+          : {
+            index,
+            message: logicResultTitles[result],
+            indicator: '-'.repeat(index) + '^',
+          };
+      },
+    );
 
-  chipColor(index: number): string {
-    return index === this.err?.index
-      ? 'negative'
-      : 'blue-grey-8';
-  }
+    const err = computed<ExpressionError | null>(
+      () => syntaxCheck(expression.value)
+        ?? comparisonCheck(block.value.data)
+        ?? (localExpression.value === null ? firmwareError.value : null),
+    );
 
-  addComparison(block: Block): void {
-    if (isCompatible(block.type, BlockIntfType.ActuatorDigitalInterface)) {
-      this.block.data.digital.push({
-        op: DigitalCompareOp.OP_VALUE_IS,
-        id: bloxLink(block.id, block.type),
-        rhs: DigitalState.STATE_ACTIVE,
-        result: LogicResult.RESULT_EMPTY,
-      });
+    function addComparison(compared: Block): void {
+      if (isCompatible(compared.type, BlockIntfType.ActuatorDigitalInterface)) {
+        block.value.data.digital.push({
+          op: DigitalCompareOp.OP_VALUE_IS,
+          id: bloxLink(compared.id, compared.type),
+          rhs: DigitalState.STATE_ACTIVE,
+          result: LogicResult.RESULT_EMPTY,
+        });
+      }
+      else if (isCompatible(compared.type, BlockIntfType.ProcessValueInterface)) {
+        block.value.data.analog.push({
+          op: AnalogCompareOp.OP_VALUE_GE,
+          id: bloxLink(compared.id, compared.type),
+          rhs: 25,
+          result: LogicResult.RESULT_EMPTY,
+        });
+      }
+      saveBlock();
     }
-    else if (isCompatible(block.type, BlockIntfType.ProcessValueInterface)) {
-      this.block.data.analog.push({
-        op: AnalogCompareOp.OP_VALUE_GE,
-        id: bloxLink(block.id, block.type),
-        rhs: 25,
-        result: LogicResult.RESULT_EMPTY,
-      });
+
+    function editDigital(key: string, cmp: DigitalCompare): void {
+      createDialog({
+        component: DigitalCompareEditDialog,
+        componentProps: {
+          modelValue: cmp,
+          serviceId,
+          title: 'Edit comparison',
+        },
+      })
+        .onOk(cmp => {
+          block.value.data.digital.splice(digitalIdx(key), 1, cmp);
+          saveBlock();
+        });
     }
-    this.saveBlock();
-  }
 
-  editDigital(key: string, cmp: DigitalCompare): void {
-    createDialog({
-      component: DigitalCompareEditDialog,
-      serviceId: this.serviceId,
-      title: 'Edit comparison',
-      value: cmp,
-    })
-      .onOk(cmp => {
-        this.block.data.digital.splice(digitalIdx(key), 1, cmp);
-        this.saveBlock();
-      });
-  }
+    function editAnalog(key: string, cmp: AnalogCompare): void {
+      createDialog({
+        component: AnalogCompareEditDialog,
+        componentProps: {
+          serviceId,
+          title: 'Edit comparison',
+          modelValue: cmp,
+        },
+      })
+        .onOk(cmp => {
+          block.value.data.analog.splice(analogIdx(key), 1, cmp);
+          saveBlock();
+        });
+    }
 
-  editAnalog(key: string, cmp: AnalogCompare): void {
-    createDialog({
-      component: AnalogCompareEditDialog,
-      serviceId: this.serviceId,
-      title: 'Edit comparison',
-      value: cmp,
-    })
-      .onOk(cmp => {
-        this.block.data.analog.splice(analogIdx(key), 1, cmp);
-        this.saveBlock();
-      });
-  }
+    function removeDigital(key: string): void {
+      block.value.data.digital.splice(digitalIdx(key), 1);
+      block.value.data.expression = shiftRemainingComparisons(expression.value, key);
+      saveBlock();
+    }
 
-  removeDigital(key: string): void {
-    this.block.data.digital.splice(digitalIdx(key), 1);
-    this.block.data.expression = shiftRemainingComparisons(this.expression, key);
-    this.saveBlock();
-  }
+    function removeAnalog(key: string): void {
+      block.value.data.analog.splice(analogIdx(key), 1);
+      block.value.data.expression = shiftRemainingComparisons(expression.value, key);
+      saveBlock();
+    }
 
-  removeAnalog(key: string): void {
-    this.block.data.analog.splice(analogIdx(key), 1);
-    this.block.data.expression = shiftRemainingComparisons(this.expression, key);
-    this.saveBlock();
-  }
-}
+    return {
+      prettyLink,
+      serviceId,
+      block,
+      saveBlock,
+      validBlocks,
+      saveExpression,
+      expression,
+      err,
+      digital,
+      editDigital,
+      removeDigital,
+      analog,
+      editAnalog,
+      removeAnalog,
+      characters,
+      addComparison,
+    };
+  },
+});
 </script>
-
 <template>
   <div class="widget-md">
     <slot name="warnings" />
 
     <div class="widget-body">
       <q-input
-        :value="expression"
+        :model-value="expression"
         label="Expression"
         title="Expression"
         item-aligned
@@ -206,7 +225,7 @@ export default class ActuatorLogicFull
         placeholder="(a|b)&amp;(c^d)&amp;!e"
         type="text"
         class="expression-editor"
-        @input="saveExpression"
+        @update:model-value="saveExpression"
       >
         <template #append>
           <q-btn
@@ -241,7 +260,7 @@ export default class ActuatorLogicFull
             removable
             class="hoverable full-width"
             color="blue-grey-8"
-            @click.native="editDigital(key, cmp)"
+            @click="editDigital(key, cmp)"
             @remove="removeDigital(key)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
@@ -257,13 +276,13 @@ export default class ActuatorLogicFull
                 class="col-auto self-center"
               />
               <div class="col ellipsis">
-                {{ cmp.id | link }}
+                {{ prettyLink(cmp.id) }}
               </div>
               <div class="col ellipsis-left">
                 {{ pretty }}
               </div>
               <q-tooltip>
-                {{ cmp.id | link }} [{{ pretty }}]
+                {{ prettyLink(cmp.id) }} [{{ pretty }}]
               </q-tooltip>
             </div>
           </q-chip>
@@ -273,7 +292,7 @@ export default class ActuatorLogicFull
             removable
             class="hoverable full-width"
             color="blue-grey-8"
-            @click.native="editAnalog(key, cmp)"
+            @click="editAnalog(key, cmp)"
             @remove="removeAnalog(key)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
@@ -289,13 +308,13 @@ export default class ActuatorLogicFull
                 class="col-auto self-center"
               />
               <div class="col ellipsis">
-                {{ cmp.id | link }}
+                {{ prettyLink(cmp.id) }}
               </div>
               <div class="col ellipsis-left">
                 {{ pretty }}
               </div>
               <q-tooltip>
-                {{ cmp.id | link }} [{{ pretty }}]
+                {{ prettyLink(cmp.id) }} [{{ pretty }}]
               </q-tooltip>
             </div>
           </q-chip>
@@ -309,7 +328,7 @@ export default class ActuatorLogicFull
             :key="`suggestion-${char}`"
             class="hoverable"
             color="blue-grey-8"
-            @click.native="saveExpression(block.data.expression + char)"
+            @click="saveExpression(block.data.expression + char)"
           >
             {{ char }}
             <q-tooltip>{{ pretty }}</q-tooltip>
@@ -320,10 +339,10 @@ export default class ActuatorLogicFull
             class="hoverable text-bold"
             color="blue-grey-8"
             text-color="lime-6"
-            @click.native="saveExpression(block.data.expression + key)"
+            @click="saveExpression(block.data.expression + key)"
           >
             {{ key }}
-            <q-tooltip>{{ cmp.id | link }} [{{ pretty }}]</q-tooltip>
+            <q-tooltip>{{ prettyLink(cmp.id) }} [{{ pretty }}]</q-tooltip>
           </q-chip>
           <q-chip
             v-for="{key, cmp, pretty} in analog"
@@ -331,10 +350,10 @@ export default class ActuatorLogicFull
             class="hoverable text-bold"
             color="blue-grey-8"
             text-color="orange-6"
-            @click.native="saveExpression(block.data.expression + key)"
+            @click="saveExpression(block.data.expression + key)"
           >
             {{ key }}
-            <q-tooltip>{{ cmp.id | link }} [{{ pretty }}]</q-tooltip>
+            <q-tooltip>{{ prettyLink(cmp.id) }} [{{ pretty }}]</q-tooltip>
           </q-chip>
         </div>
       </LabeledField>
@@ -346,7 +365,7 @@ export default class ActuatorLogicFull
             :key="`block-${block.id}`"
             class="hoverable"
             color="blue-grey-8"
-            @click.native="addComparison(block)"
+            @click="addComparison(block)"
           >
             {{ block.id }}
           </q-chip>
@@ -354,11 +373,11 @@ export default class ActuatorLogicFull
       </LabeledField>
 
       <LinkField
-        :value="block.data.targetId"
+        :model-value="block.data.targetId"
         :service-id="serviceId"
         title="Digital Actuator target"
         label="Digital Actuator target"
-        @input="v => { block.data.targetId = v; saveBlock(); }"
+        @update:model-value="v => { block.data.targetId = v; saveBlock(); }"
       />
     </div>
   </div>

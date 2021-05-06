@@ -1,9 +1,10 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { RIGHT } from '../getters';
-import { horizontalChevrons } from '../helpers';
+import { RIGHT } from '@/plugins/builder/const';
+import { flowOnCoord, horizontalChevrons, liquidOnCoord } from '@/plugins/builder/utils';
+
+import { FlowPart } from '../types';
 
 const chevrons = horizontalChevrons(15, 25);
 const paths = {
@@ -15,26 +16,38 @@ const paths = {
   arrows: 'M25,25 H50',
 };
 
-@Component
-export default class SystemIO extends PartBase {
-  readonly chevrons = chevrons;
-  readonly paths = paths;
+export default defineComponent({
+  name: 'SystemIO',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => flowOnCoord(props.part, RIGHT),
+    );
 
-  get flowSpeed(): number {
-    return this.flowOnCoord(RIGHT);
-  }
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, RIGHT),
+    );
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(RIGHT);
-  }
+    const arrowTransform = computed<string>(
+      () => flowSpeed.value < 0
+        ? 'rotate(180)'
+        : '',
+    );
 
-  get arrowTransform(): string {
-    if (this.flowSpeed < 0) {
-      return 'rotate(180)';
-    }
-    return '';
-  }
-}
+    return {
+      chevrons,
+      paths,
+      flowSpeed,
+      liquids,
+      arrowTransform,
+    };
+  },
+});
 </script>
 
 <template>

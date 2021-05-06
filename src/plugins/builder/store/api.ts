@@ -1,7 +1,6 @@
-import { UI_NAMESPACE } from '@/helpers/const';
-import { createApi } from '@/plugins/database/api';
-
-import { BuilderLayout } from '../types';
+import { createApi } from '@/database/api';
+import { BuilderLayout } from '@/plugins/builder/types';
+import { UI_NAMESPACE } from '@/utils/const';
 
 const api = createApi<BuilderLayout>({
   namespace: `${UI_NAMESPACE}:layouts`,

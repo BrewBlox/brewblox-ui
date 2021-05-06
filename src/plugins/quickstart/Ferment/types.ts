@@ -1,8 +1,8 @@
-import { JSQuantity } from '@/helpers/bloxfield';
+import { JSQuantity } from '@/utils/bloxfield';
 
-import { PinChannel, QuickStartOutput } from '../types';
+import { PinChannel, QuickstartConfig } from '../types';
 
-export interface FermentConfigNames {
+export interface FermentBlockNames {
   fridgeSensor: string;
   beerSensor: string;
   fridgeSetpoint: string;
@@ -17,17 +17,18 @@ export interface FermentConfigNames {
   heatPid: string;
 }
 
-export interface FermentConfig extends QuickStartOutput {
-  prefix: string;
-  names: FermentConfigNames;
+export interface FermentConfig extends QuickstartConfig {
+  names: FermentBlockNames;
   heatPin: PinChannel;
   coolPin: PinChannel;
   fridgeSensor: string;
   beerSensor: string;
 }
 
+export type FermentMode = 'beer' | 'fridge';
+
 export interface FermentOpts {
   fridgeSetting: JSQuantity;
   beerSetting: JSQuantity;
-  activeSetpoint: 'beer' | 'fridge';
+  activeSetpoint: FermentMode;
 }

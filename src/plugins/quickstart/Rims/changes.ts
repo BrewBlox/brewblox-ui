@@ -1,6 +1,5 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
-import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/helpers/bloxfield';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import { BlockChange, QuickActionsConfig } from '@/plugins/spark/features/QuickActions/types';
@@ -16,12 +15,13 @@ import {
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { Widget } from '@/store/widgets';
+import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/utils/bloxfield';
 
-import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { DisplayBlock } from '../types';
+import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';
 import { RimsConfig } from './types';
 
 export function defineChangedBlocks(config: RimsConfig): Block[] {
@@ -193,7 +193,7 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
     dashboard: dashboardId,
-    id: uid(),
+    id: nanoid(),
     title: name,
     feature: type,
     order: 0,
@@ -267,17 +267,17 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
       actions: [
         {
           name: 'Enable pump and heater',
-          id: uid(),
+          id: nanoid(),
           changes: [
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.STATE_ACTIVE },
               confirmed: {},
             },
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: true },
@@ -290,17 +290,17 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
         },
         {
           name: 'Disable pump and heater',
-          id: uid(),
+          id: nanoid(),
           changes: [
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: false },
               confirmed: {},
             },
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.STATE_INACTIVE },
@@ -313,10 +313,10 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
         },
         {
           name: 'Enable pump',
-          id: uid(),
+          id: nanoid(),
           changes: [
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.pumpAct,
               data: { desiredState: DigitalState.STATE_ACTIVE },
@@ -328,10 +328,10 @@ export function defineWidgets(config: RimsConfig, layouts: BuilderLayout[]): Wid
         },
         {
           name: 'Disable heater',
-          id: uid(),
+          id: nanoid(),
           changes: [
             {
-              id: uid(),
+              id: nanoid(),
               serviceId,
               blockId: names.kettleSetpoint,
               data: { settingEnabled: false },

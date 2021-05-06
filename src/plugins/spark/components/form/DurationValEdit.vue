@@ -1,63 +1,82 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import { isQuantity, Quantity } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
-import { durationMs, durationString } from '@/helpers/duration';
+import { useValEdit } from '@/plugins/spark/composables';
+import { bloxQty, isQuantity, Quantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { durationMs, durationString } from '@/utils/duration';
 
-import ValEditBase from '../ValEditBase';
+export default defineComponent({
+  name: 'DurationValEdit',
+  props: {
+    ...useValEdit.props,
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<Quantity | string>(props.modelValue);
+    const local = ref<string>(durationString(field.value));
 
-@Component
-export default class DurationValEdit extends ValEditBase<Quantity | string> {
-  local: string | null = '';
-
-  created(): void {
-    this.local = durationString(this.field);
-  }
-
-  findUnit(s: string | null): string {
-    if (!s) { return ''; }
-    const match = s.match(/^[0-9\.]*([a-z]*)/i);
-    return match && match[1]
-      ? match[1]
-      : '';
-  }
-
-  get fallbackUnit(): string {
-    return this.findUnit(this.local)
-      ? ''
-      : this.findUnit(durationString(this.value));
-  }
-
-  get localMs(): number {
-    return this.local
-      ? durationMs(`${this.local}${this.fallbackUnit}`)
-      : 0;
-  }
-
-  normalize(): void {
-    this.local = durationString(this.localMs);
-    if (isQuantity(this.field)) {
-      this.field.value = this.localMs;
-      this.field.unit = 'ms';
+    function findUnit(s: string | null): string {
+      if (!s) { return ''; }
+      const match = s.match(/^[0-9\.]*([a-z]*)/i);
+      return match && match[1]
+        ? match[1]
+        : '';
     }
-    else {
-      this.field = this.local;
-    }
-  }
 
-  showKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.local,
-      type: 'duration',
-    })
-      .onOk(v => {
-        this.local = v;
-        this.normalize();
-      });
-  }
-}
+    const fallbackUnit = computed<string>(
+      () => findUnit(local.value)
+        ? ''
+        : findUnit(durationString(field.value)),
+    );
+
+    const localMs = computed<number>(
+      () => local.value
+        ? durationMs(`${local.value}${fallbackUnit.value}`)
+        : 0,
+    );
+
+    const displayValue = computed<string>(
+      () => durationString(field.value),
+    );
+
+    function saveNormalized(): void {
+      local.value = durationString(localMs.value);
+      field.value = isQuantity(field.value)
+        ? bloxQty(localMs.value, 'ms')
+        : local.value;
+    }
+
+    function showKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: local.value,
+          type: 'duration',
+        },
+      })
+        .onOk(v => {
+          local.value = v;
+          saveNormalized();
+        });
+    }
+
+    return {
+      startEdit,
+      local,
+      findUnit,
+      fallbackUnit,
+      displayValue,
+      saveNormalized,
+      showKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
@@ -70,7 +89,7 @@ export default class DurationValEdit extends ValEditBase<Quantity | string> {
       item-aligned
       clearable
       class="col-grow"
-      @change="normalize"
+      @change="saveNormalized"
     >
       <template #append>
         <KeyboardButton @click="showKeyboard" />
@@ -82,6 +101,6 @@ export default class DurationValEdit extends ValEditBase<Quantity | string> {
     class="clickable q-pa-sm rounded-borders"
     @click="startEdit"
   >
-    {{ field | duration }}
+    {{ displayValue }}
   </div>
 </template>

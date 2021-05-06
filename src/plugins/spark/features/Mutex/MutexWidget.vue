@@ -1,31 +1,30 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { MutexBlock } from '@/plugins/spark/types';
+import { useContext } from '@/composables';
 
 import MutexBasic from './MutexBasic.vue';
 import MutexFull from './MutexFull.vue';
 
-@Component({
+export default defineComponent({
+  name: 'MutexWidget',
   components: {
     Basic: MutexBasic,
     Full: MutexFull,
   },
-})
-export default class MutexWidget
-  extends BlockWidgetBase<MutexBlock> {
-}
+  setup() {
+    const { context } = useContext.setup();
+    return { context };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper
-    v-bind="{context}"
-  >
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <component :is="mode" :crud="crud" />
-  </CardWrapper>
+    <component :is="context.mode" />
+  </Card>
 </template>

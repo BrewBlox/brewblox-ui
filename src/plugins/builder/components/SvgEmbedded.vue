@@ -1,19 +1,19 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-
-@Component
-export default class SvgEmbedded extends Vue {
-
-  @Prop({ type: [String, Array, Object], default: 'fit column items-center' })
-  public readonly contentClass!: any;
-
-}
+export default defineComponent({
+  name: 'SvgEmbedded',
+  props: {
+    contentClass: {
+      type: [String, Array, Object],
+      default: 'fit column items-center',
+    },
+  },
+});
 </script>
 
 <template>
-  <foreignObject v-bind="$attrs">
+  <foreignObject>
     <div :class="contentClass" style="position: static">
       <slot />
     </div>

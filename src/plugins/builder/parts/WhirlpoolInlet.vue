@@ -1,8 +1,10 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { LEFT } from '../getters';
+import { LEFT } from '@/plugins/builder/const';
+
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   borders: [
@@ -12,18 +14,30 @@ const paths = {
   liquid: 'M0,25H20a5,5,0,0,1,5,5V175',
 };
 
-@Component
-export default class WhirlpoolInlet extends PartBase {
-  readonly paths = paths;
+export default defineComponent({
+  name: 'WhirlpoolInlet',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => -flowOnCoord(props.part, LEFT),
+    );
 
-  get flowSpeed(): number {
-    return -this.flowOnCoord(LEFT);
-  }
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, LEFT),
+    );
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(LEFT);
-  }
-}
+    return {
+      paths,
+      flowSpeed,
+      liquids,
+    };
+  },
+});
 </script>
 
 <template>

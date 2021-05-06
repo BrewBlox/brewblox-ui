@@ -1,4 +1,4 @@
-import { Widget } from '@/store/dashboards';
+import { Widget } from '@/store/widgets';
 
 import { TiltFieldIndex } from '../types';
 

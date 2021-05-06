@@ -1,8 +1,8 @@
 <script lang="ts">
 import escapeRegExp from 'lodash/escapeRegExp';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
+import { useField } from '@/composables';
 
 import { LoggedSession } from '../types';
 
@@ -10,57 +10,65 @@ interface SessionOpt extends SelectOption {
   session: LoggedSession;
 }
 
+function asOpt(session: LoggedSession): SessionOpt {
+  return {
+    session,
+    label: `${session.title} (${new Date(session.date).toLocaleDateString()})`,
+    value: session.id,
+  };
+}
 
-@Component
-export default class SessionSelectField extends FieldBase {
-  filteredOpts: SessionOpt[] = [];
+export default defineComponent({
+  name: 'SessionSelectField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: Object as PropType<LoggedSession | null>,
+      default: null,
+    },
+    sessions: {
+      type: Array as PropType<LoggedSession[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const sessionOpts = computed<SessionOpt[]>(
+      () => props.sessions.map(asOpt),
+    );
 
-  @Prop({ type: Object, default: null })
-  public readonly value!: LoggedSession | null;
+    const filteredOpts = ref<SessionOpt[]>(sessionOpts.value);
 
-  @Prop({ type: Array, required: true })
-  public readonly sessions!: LoggedSession[];
+    function filterFn(val, update): void {
+      if (val === '') {
+        update(() => filteredOpts.value = sessionOpts.value);
+        return;
+      }
 
-  created(): void {
-    this.filteredOpts = this.sessionOpts;
-  }
-
-  get selected(): SessionOpt | null {
-    return this.value === null
-      ? null
-      : this.asOpt(this.value);
-  }
-
-  set selected(opt: SessionOpt | null) {
-    this.$emit('input', opt?.session ?? null);
-  }
-
-  asOpt(session: LoggedSession): SessionOpt {
-    return {
-      session,
-      label: `${session.title} (${new Date(session.date).toLocaleDateString()})`,
-      value: session.id,
-    };
-  }
-
-  get sessionOpts(): SessionOpt[] {
-    return this.sessions.map(this.asOpt);
-  }
-
-  filterFn(val, update): void {
-    if (val === '') {
-      update(() => this.filteredOpts = this.sessionOpts);
-      return;
+      update(() => {
+        const needle = escapeRegExp(val.toLowerCase());
+        filteredOpts.value = sessionOpts.value
+          .filter(opt => opt.label.toLowerCase().match(needle)
+            || opt.session.tags?.some(t => t.toLowerCase().match(needle)));
+      });
     }
 
-    update(() => {
-      const needle = escapeRegExp(val.toLowerCase());
-      this.filteredOpts = this.sessionOpts
-        .filter(opt => opt.label.toLowerCase().match(needle)
-          || opt.session.tags?.some(t => t.toLowerCase().match(needle)));
+    const selected = computed<SessionOpt | null>({
+      get: () => props.modelValue !== null
+        ? asOpt(props.modelValue)
+        : null,
+      set: opt => emit('update:modelValue', opt?.session ?? null),
     });
-  }
-}
+
+    return {
+      filteredOpts,
+      filterFn,
+      selected,
+    };
+  },
+});
 </script>
 
 <template>

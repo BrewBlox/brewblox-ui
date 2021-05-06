@@ -1,11 +1,26 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import ValEditBase from '../ValEditBase';
+import { useValEdit } from '@/plugins/spark/composables';
 
+export default defineComponent({
+  name: 'BoolValEdit',
+  props: {
+    ...useValEdit.props,
+  },
+  emits: {
+    ...useValEdit.emits,
+  },
+  setup(props) {
+    const {
+      field,
+    } = useValEdit.setup<boolean>(props.modelValue);
 
-@Component
-export default class BoolValEdit extends ValEditBase { }
+    return {
+      field,
+    };
+  },
+});
 </script>
 
 <template>

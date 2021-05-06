@@ -1,30 +1,33 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component
-export default class App extends Vue {
+import { database } from '@/database';
+import { eventbus } from '@/eventbus';
+import { startup } from '@/startup';
 
-  async created(): Promise<void> {
-    Vue.$app = this;
-
-    /**
-     * Order of startup is important here.
-     * We first ensure that the database is working.
-     * Startup functions may register eventbus listeners.
-     * If they do so after the eventbus started,
-     * they will miss the first (immediate) data push.
-     */
-    await Vue.$database.connect();
-    await Vue.$startup.start();
-    await Vue.$eventbus.connect();
-  }
+/**
+ * Order of startup is important here.
+ * We first ensure that the database is working.
+ * Startup functions may register eventbus listeners.
+ * If they do so after the eventbus started,
+ * they will miss the first (immediate) data push.
+ */
+async function onAppSetup(): Promise<void> {
+  await database.connect();
+  await startup.start();
+  await eventbus.connect();
 }
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+    onAppSetup();
+    return {};
+  },
+});
 </script>
 
 <template>
-  <div id="q-app">
-    <router-view />
-    <Watchers />
-  </div>
+  <router-view />
+  <Watchers />
 </template>

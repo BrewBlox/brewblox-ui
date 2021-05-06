@@ -1,4 +1,5 @@
-import { defaults, omit } from 'lodash';
+import defaults from 'lodash/defaults';
+import omit from 'lodash/omit';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { StoreObject } from '@/shared-types';
@@ -25,24 +26,14 @@ const defaultUnits = (): UserUnits => ({
   temperature: 'degC',
 });
 
-@Module // generateMutationSetters not set
+@Module({ generateMutationSetters: true })
 export class SystemModule extends VuexModule {
-  public loaded: boolean = false;
-  public now: Date = new Date();
+  public startupDone = false;
+
   public config: SystemConfig = defaultConfig();
   public units: UserUnits = defaultUnits();
 
-  public userDefinedUnits: boolean = true; // assume yes
-
-  @Mutation
-  public setLoaded(): void {
-    this.loaded = true;
-  }
-
-  @Mutation
-  public updateTime(): void {
-    this.now = new Date();
-  }
+  public userDefinedUnits = true; // assume yes
 
   @Mutation
   private updateConfig(cfg: SystemConfig & Partial<StoreObject> | null): void {
@@ -77,20 +68,17 @@ export class SystemModule extends VuexModule {
 
   @Action
   public async start(): Promise<void> {
-    // Every time updateTime() is called, it will trigger a reactive update.
-    setInterval(() => this.updateTime(), 10 * 1000);
-
     this.updateConfig(await configApi.fetchById(CONFIG_ID));
     this.updateUnits(await globalApi.fetchById(UNITS_ID));
 
     configApi.subscribe(
       obj => obj.id === CONFIG_ID && this.updateConfig(obj),
-      id => id === CONFIG_ID && this.updateConfig(defaultConfig())
+      id => id === CONFIG_ID && this.updateConfig(defaultConfig()),
     );
 
     globalApi.subscribe(
       obj => obj.id === UNITS_ID && this.updateUnits(obj),
-      id => id === UNITS_ID && this.updateUnits(defaultUnits())
+      id => id === UNITS_ID && this.updateUnits(defaultUnits()),
     );
   }
 }

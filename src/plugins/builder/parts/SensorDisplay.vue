@@ -1,63 +1,68 @@
 <script lang="ts">
 import { mdiThermometer } from '@quasar/extras/mdi-v5';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { prettyUnit } from '@/helpers/bloxfield';
-import { sparkStore } from '@/plugins/spark/store';
-import { TempSensorMockBlock, TempSensorOneWireBlock } from '@/plugins/spark/types';
-import { BlockAddress } from '@/plugins/spark/types';
+import { CENTER } from '@/plugins/builder/const';
+import { liquidOnCoord, squares, textTransformation } from '@/plugins/builder/utils';
+import { prettyUnit } from '@/utils/bloxfield';
+import { round } from '@/utils/functional';
 
-import PartBase from '../components/PartBase';
-import { CENTER } from '../getters';
-import { settingsAddress } from '../helpers';
+import { usePart, useSettingsBlock } from '../composables';
+import { SENSOR_KEY, SENSOR_TYPES, SensorT } from '../specs/SensorDisplay';
+import { FlowPart } from '../types';
 
+export default defineComponent({
+  name: 'SensorDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      bordered,
+      scale,
+    } = usePart.setup(props.part);
 
-@Component
-export default class SensorDisplay extends PartBase {
-  icons: Mapped<string> = {};
-  readonly addressKey = 'sensor';
-  readonly scaleKey = 'scale';
+    const {
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<SensorT>(props.part, SENSOR_KEY, SENSOR_TYPES);
 
-  created(): void {
-    this.icons.mdiThermometer = mdiThermometer;
-  }
+    const temperature = computed<number | null>(
+      () => block.value?.data.value?.value ?? null,
+    );
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
+    const tempUnit = computed<string>(
+      () => prettyUnit(block.value?.data.value),
+    );
 
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.addressKey);
-  }
+    const color = computed<string>(
+      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+    );
 
-  get block(): TempSensorMockBlock | TempSensorOneWireBlock | null {
-    const { serviceId, id } = this.address;
-    return sparkStore.blockById(serviceId, id);
-  }
-
-  get isBroken(): boolean {
-    return this.block == null
-      && this.address.id !== null;
-  }
-
-  get temperature(): number | null {
-    return this.block?.data.value?.value ?? null;
-  }
-
-  get tempUnit(): string {
-    return prettyUnit(this.block?.data.value);
-  }
-
-  get color(): string {
-    return this.liquidOnCoord(CENTER)[0] ?? '';
-  }
-}
+    return {
+      mdiThermometer,
+      squares,
+      textTransformation,
+      round,
+      scale,
+      block,
+      isBroken,
+      temperature,
+      tempUnit,
+      color,
+      bordered,
+    };
+  },
+});
 </script>
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
-      :transform="textTransformation([1,1])"
+      :transform="textTransformation(part, [1,1])"
       :width="squares(1)"
       :height="squares(1)"
       content-class="column items-center q-pt-xs"
@@ -67,14 +72,14 @@ export default class SensorDisplay extends PartBase {
       <template v-else>
         <div class="col row q-pt-xs">
           <q-icon
-            :name="icons.mdiThermometer"
+            :name="mdiThermometer"
             class="static"
             size="20px"
           />
           <small>{{ tempUnit }}</small>
         </div>
         <div class="col text-bold text-center">
-          {{ temperature | round(1) }}
+          {{ round(temperature, 1) }}
         </div>
       </template>
     </SvgEmbedded>

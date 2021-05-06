@@ -1,35 +1,42 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { SetpointProfileBlock } from '@/plugins/spark/types';
+import { createDialog } from '@/utils/dialog';
 
 import ProfilePresetDialog from './ProfilePresetDialog.vue';
 
-
-@Component({
-  components: {
-    ProfilePresetDialog,
+export default defineComponent({
+  name: 'ProfilePresetAction',
+  props: {
+    icon: {
+      type: String,
+      default: 'mdi-file',
+    },
+    label: {
+      type: String,
+      default: 'Load/Save profile',
+    },
   },
-})
-export default class ProfilePresetAction
-  extends BlockCrudComponent<SetpointProfileBlock> {
+  setup() {
+    const { block } = useBlockWidget.setup<SetpointProfileBlock>();
 
-  @Prop({ type: String, default: 'mdi-file' })
-  readonly icon!: string;
+    async function showDialog(): Promise<void> {
+      createDialog({
+        component: ProfilePresetDialog,
+        componentProps: {
+          block: block.value,
+          title: 'Load/Save Profile',
+        },
+      });
+    }
 
-  @Prop({ type: String, default: 'Load/Save profile' })
-  readonly label!: string;
-
-  async showDialog(): Promise<void> {
-    createDialog({
-      component: ProfilePresetDialog,
-      value: this.block,
-      title: 'Load/Save Profile',
-    });
-  }
-}
+    return {
+      showDialog,
+    };
+  },
+});
 </script>
 
 <template>

@@ -1,12 +1,8 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import { objectSorter } from '@/helpers/functional';
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { sparkStore } from '@/plugins/spark/store';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
@@ -16,6 +12,8 @@ import {
   startEditBuilderTouchDelay,
   systemStore,
 } from '@/store/system';
+import { createDialog } from '@/utils/dialog';
+import { objectSorter } from '@/utils/functional';
 
 interface ConfigService {
   serviceId: string;
@@ -23,73 +21,68 @@ interface ConfigService {
   configComponent: string;
 }
 
-@Component({
-  methods: {
-    startChangeKeyboardLayout,
-    startChangeTempUnit,
-    startEditBuilderTouchDelay,
+export default defineComponent({
+  name: 'AdminPage',
+  setup() {
+    const startupDone = computed<boolean>(
+      () => systemStore.startupDone,
+    );
+
+    const experimental = computed<boolean>({
+      get: () => systemStore.config.experimental,
+      set: v => systemStore.saveConfig({ experimental: v }),
+    });
+
+    const showSidebarLayouts = computed<boolean>({
+      get: () => systemStore.config.showSidebarLayouts,
+      set: v => systemStore.saveConfig({ showSidebarLayouts: v }),
+    });
+
+    const buildDate = computed<string>(
+      () => process.env.BLOX_DATE ?? 'UNKNOWN',
+    );
+
+    const dashboards = computed<Dashboard[]>(
+      () => [...dashboardStore.dashboards]
+        .sort(objectSorter('order')),
+    );
+
+    const serviceComponents = computed<ConfigService[]>(
+      () => [...serviceStore.services]
+        .sort(objectSorter('order'))
+        .map(v => ({
+          serviceId: v.id,
+          title: v.title,
+          configComponent: featureStore.serviceById(v.type)?.configComponent,
+        }))
+        .filter((v): v is ConfigService => !!v.configComponent),
+    );
+
+    const layouts = computed<BuilderLayout[]>(
+      () => [...builderStore.layouts]
+        .sort(objectSorter('order')),
+    );
+
+    return {
+      createDialog,
+      startChangeKeyboardLayout,
+      startChangeTempUnit,
+      startEditBuilderTouchDelay,
+      startupDone,
+      experimental,
+      showSidebarLayouts,
+      buildDate,
+      dashboards,
+      serviceComponents,
+      layouts,
+    };
   },
-})
-export default class AdminPage extends Vue {
-
-  get loaded(): boolean {
-    return systemStore.loaded;
-  }
-
-  get experimental(): boolean {
-    return systemStore.config.experimental;
-  }
-
-  set experimental(experimental: boolean) {
-    systemStore.saveConfig({ experimental });
-  }
-
-  get showSidebarLayouts(): boolean {
-    return systemStore.config.showSidebarLayouts;
-  }
-
-  set showSidebarLayouts(showSidebarLayouts: boolean) {
-    systemStore.saveConfig({ showSidebarLayouts });
-  }
-
-  get buildDate(): string {
-    return process.env.BLOX_DATE ?? 'UNKNOWN';
-  }
-
-  get dashboards(): Dashboard[] {
-    return [...dashboardStore.dashboards]
-      .sort(objectSorter('order'));
-  }
-
-  get serviceComponents(): ConfigService[] {
-    return [...serviceStore.services]
-      .sort(objectSorter('order'))
-      .map(v => ({
-        serviceId: v.id,
-        title: v.title,
-        configComponent: featureStore.serviceById(v.type)?.configComponent,
-      }))
-      .filter((v): v is ConfigService => !!v.configComponent);
-  }
-
-  get layouts(): BuilderLayout[] {
-    return [...builderStore.layouts]
-      .sort(objectSorter('order'));
-  }
-
-  get sparkServiceAvailable(): boolean {
-    return sparkStore.modules.length > 0;
-  }
-
-  openMenu(component: string): void {
-    createDialog({ component });
-  }
-}
+});
 </script>
 
 <template>
   <q-page class="page-height overflow-auto">
-    <PageError v-if="!loaded" />
+    <PageError v-if="!startupDone" />
     <div v-else class="column q-pa-lg">
       <div class="text-h5">
         System
@@ -99,7 +92,7 @@ export default class AdminPage extends Vue {
         label="Start a wizard"
         icon="mdi-creation"
         class="text-secondary text-h6 text-bold"
-        @click="openMenu('WizardDialog')"
+        @click="createDialog({component: 'WizardDialog'})"
       />
 
       <q-expansion-item
@@ -115,10 +108,12 @@ export default class AdminPage extends Vue {
           <ToggleAction
             v-model="experimental"
             label="Experimental features"
+            :colored="false"
           />
           <ToggleAction
             v-model="showSidebarLayouts"
             label="Show builder layouts in sidebar"
+            :colored="false"
           />
           <ActionItem
             label="On-screen keyboard layout"

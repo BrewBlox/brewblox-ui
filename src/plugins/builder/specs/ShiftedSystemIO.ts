@@ -1,5 +1,5 @@
-import { CENTER, DEFAULT_IO_PRESSURE, MAX_IO_PRESSURE, MIN_IO_PRESSURE, UP } from '../getters';
-import { PartSpec, PersistentPart } from '../types';
+import { CENTER, DEFAULT_IO_PRESSURE, MAX_IO_PRESSURE, MIN_IO_PRESSURE, UP } from '@/plugins/builder/const';
+import { PartSpec, PersistentPart } from '@/plugins/builder/types';
 
 const SIZE_X = 2;
 const SIZE_Y = 2;

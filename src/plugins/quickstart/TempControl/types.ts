@@ -1,5 +1,5 @@
 import { Link } from '@/shared-types';
-import { Widget } from '@/store/dashboards';
+import { Widget } from '@/store/widgets';
 
 import { PidConfig } from '../types';
 

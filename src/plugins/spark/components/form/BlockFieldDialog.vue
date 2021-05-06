@@ -1,40 +1,63 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/functional';
+import { useDialog } from '@/composables';
 import type { BlockAddress, BlockField } from '@/plugins/spark/types';
+import { deepCopy } from '@/utils/functional';
 
+export default defineComponent({
+  name: 'BlockFieldDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: [Object, Array, String, Number, Boolean, Date] as PropType<any>,
+      required: true,
+    },
+    address: {
+      type: Object as PropType<BlockAddress>,
+      required: true,
+    },
+    field: {
+      type: Object as PropType<BlockField>,
+      required: true,
+    },
+    comparison: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: {
+    ...useDialog.emits,
+  },
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
+    const local = ref<any>(deepCopy(props.modelValue));
 
-@Component
-export default class BlockFieldDialog extends DialogBase {
-  local: any = null;
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  @Prop({ type: Object, required: true })
-  public readonly address!: BlockAddress;
-
-  @Prop({ type: Object, required: true })
-  public readonly field!: BlockField;
-
-  @Prop({ required: true })
-  public readonly value!: any;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly comparison!: boolean;
-
-  created(): void {
-    this.local = deepCopy(this.value);
-  }
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

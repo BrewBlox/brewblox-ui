@@ -1,39 +1,64 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
 
-@Component
-export default class SelectDialog extends DialogBase {
-  local: any = null;
+export default defineComponent({
+  name: 'SelectDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: [Object, String, Number, Symbol] as PropType<any>,
+      default: null,
+    },
+    selectOptions: {
+      type: Array,
+      required: true,
+    },
+    selectProps: {
+      type: Object,
+      default: () => ({}),
+    },
+    listSelect: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-  @Prop({ default: () => null })
-  public readonly value!: any;
+    const local = ref<any>(props.modelValue);
 
-  @Prop({ type: Array, required: true })
-  public readonly selectOptions!: any[];
-
-  @Prop({ type: Object, default: () => ({}) })
-  public readonly selectProps!: any;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly listSelect!: boolean;
-
-  created(): void {
-    this.local = this.value;
-  }
-
-  save(value: SelectOption): void {
-    if (value !== null || this.selectProps.clearable) {
-      this.onDialogOk(value);
+    function save(value: any): void {
+      if (value !== null || props.selectProps.clearable) {
+        onDialogOK(value);
+      }
     }
-  }
-}
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save(local)"

@@ -1,16 +1,16 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
+import store from '@/store';
 import {
   extendById,
   filterById,
   findById,
   isoDateString,
   uniqueFilter,
-} from '@/helpers/functional';
-import notify from '@/helpers/notify';
-import store from '@/store';
+} from '@/utils/functional';
+import notify from '@/utils/notify';
 
-import {
+import type {
   ApiQuery,
   HistorySource,
   LoggedSession,
@@ -22,20 +22,20 @@ import { historyApi, sessionApi } from './api';
 
 
 const buildQuery =
-  (params: QueryParams, target: QueryTarget, epoch: string = 'ms'): ApiQuery =>
-    ({
-      database: params.database,
-      start: isoDateString(params.start),
-      end: isoDateString(params.end),
-      duration: params.duration,
-      limit: params.limit,
-      order_by: params.orderBy,
-      policy: params.policy,
-      approx_points: params.approxPoints,
-      measurement: target.measurement,
-      fields: target.fields,
-      epoch,
-    });
+  (params: QueryParams, target: QueryTarget, epoch = 'ms'): ApiQuery =>
+  ({
+    database: params.database,
+    start: isoDateString(params.start),
+    end: isoDateString(params.end),
+    duration: params.duration,
+    limit: params.limit,
+    order_by: params.orderBy,
+    policy: params.policy,
+    approx_points: params.approxPoints,
+    measurement: target.measurement,
+    fields: target.fields,
+    epoch,
+  });
 
 @Module({ generateMutationSetters: true })
 export class HistoryModule extends VuexModule {
@@ -44,7 +44,7 @@ export class HistoryModule extends VuexModule {
   public allFields: Mapped<string[]> = {};
   public sources: HistorySource[] = [];
 
-  private streamConnected: boolean = false;
+  private streamConnected = false;
   private stream: WebSocket | null = null;
 
   private startQuery(src: HistorySource): void {
@@ -95,11 +95,11 @@ export class HistoryModule extends VuexModule {
       .filter(uniqueFilter);
   }
 
-  public sessionById(id: string): LoggedSession | null {
+  public sessionById(id: string | null): LoggedSession | null {
     return findById(this.sessions, id);
   }
 
-  public sourceById(id: string): HistorySource | null {
+  public sourceById(id: string | null): HistorySource | null {
     return findById(this.sources, id);
   }
 

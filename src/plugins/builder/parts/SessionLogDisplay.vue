@@ -1,50 +1,69 @@
 <script lang="ts">
 import { mdiTextSubject } from '@quasar/extras/mdi-v5';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { SessionLogWidget } from '@/plugins/history/SessionLog/types';
+// import type { SessionLogWidget } from '@/plugins/history/SessionLog/types';
 import { historyStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
-import { dashboardStore } from '@/store/dashboards';
+import { Widget, widgetStore } from '@/store/widgets';
 
-import PartBase from '../components/PartBase';
+import { usePart } from '../composables';
+import { WIDGET_KEY } from '../specs/SessionLogDisplay';
+import { FlowPart } from '../types';
+import { squares, textTransformation } from '../utils';
 
-@Component
-export default class SessionLogDisplay extends PartBase {
-  icons: Mapped<string> = {};
+export default defineComponent({
+  name: 'SessionLogDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+      bordered,
+    } = usePart.setup(props.part);
 
-  created(): void {
-    this.icons.mdiTextSubject = mdiTextSubject;
-  }
+    const isLinked = computed<boolean>(
+      () => Boolean(props.part.settings[WIDGET_KEY]),
+    );
 
-  get isLinked(): boolean {
-    return !!this.settings.widgetId;
-  }
+    const widget = computed<Widget | null>( // TODO(Bob)
+      () => widgetStore.widgetById(props.part.settings[WIDGET_KEY]),
+    );
 
-  get isBroken(): boolean {
-    return this.isLinked
-      && !dashboardStore.widgetIds.includes(this.settings.widgetId);
-  }
+    const isBroken = computed<boolean>(
+      () => isLinked.value && !widget.value,
+    );
 
-  get widget(): SessionLogWidget | null {
-    return this.isLinked && !this.isBroken
-      ? dashboardStore.widgetById(this.settings.widgetId)
-      : null;
-  }
+    const session = computed<LoggedSession | null>(
+      () => widget.value?.config.currentSession
+        ? historyStore.sessionById(widget.value.config.currentSession)
+        : null,
+    );
 
-  get session(): LoggedSession | null {
-    return this.widget && this.widget.config.currentSession
-      ? historyStore.sessionById(this.widget.config.currentSession)
-      : null;
-  }
+    const displayText = computed<string>(
+      () => isLinked.value
+        ? (session.value?.title ?? 'no active session')
+        : 'Not linked',
+    );
 
-  get displayText(): string {
-    if (!this.isLinked) {
-      return 'Not linked';
-    }
-    return this.session?.title ?? 'No active session';
-  }
-}
+    return {
+      mdiTextSubject,
+      squares,
+      textTransformation,
+      sizeX,
+      sizeY,
+      bordered,
+      isLinked,
+      isBroken,
+      displayText,
+    };
+  },
+});
 </script>
 
 <template>
@@ -57,7 +76,7 @@ export default class SessionLogDisplay extends PartBase {
         <BrokenIcon v-if="isBroken" />
         <q-icon
           v-else
-          :name="icons.mdiTextSubject"
+          :name="mdiTextSubject"
           size="40px"
           class="col-auto static"
         />
@@ -84,7 +103,7 @@ export default class SessionLogDisplay extends PartBase {
       />
       <line
         v-if="!isLinked && sizeX === 1"
-        :transform="textTransformation([sizeX, sizeY])"
+        :transform="textTransformation(part, part.size)"
         x1="10"
         y1="10"
         :x2="squares(sizeX)-10"

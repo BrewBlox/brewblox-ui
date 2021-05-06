@@ -1,55 +1,64 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorLogicBlock, Link } from '@/plugins/spark/types';
+import { prettyLink } from '@/utils/bloxfield';
 
 import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
 import ActuatorLogicFull from './ActuatorLogicFull.vue';
 
-@Component({
+export default defineComponent({
+  name: 'ActuatorLogicWidget',
   components: {
-    Basic: ActuatorLogicBasic,
-    Full: ActuatorLogicFull,
+    'Basic': ActuatorLogicBasic,
+    'Full': ActuatorLogicFull,
   },
-})
-export default class ActuatorLogicWidget
-  extends BlockWidgetBase<ActuatorLogicBlock> {
+  setup() {
+    const {
+      context,
+      inDialog,
+    } = useContext.setup();
+    const {
+      widgetId,
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<ActuatorLogicBlock>();
 
-  enable(): void {
-    this.block.data.enabled = true;
-    this.saveBlock();
-  }
+    function enable(): void {
+      block.value.data.enabled = true;
+      saveBlock();
+    }
 
-  get target(): Link {
-    return this.block.data.targetId;
-  }
-}
+    const target = computed<Link>(
+      () => block.value.data.targetId,
+    );
+    return {
+      prettyLink,
+      context,
+      inDialog,
+      widgetId,
+      block,
+      enable,
+      target,
+    };
+  },
+});
 </script>
 
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-    v-bind="{context}"
-  >
-    <template #graph>
-      <HistoryGraph
-        :graph-id="widget.id"
-        :config="graphCfg"
-        :refresh-trigger="mode"
-        use-presets
-        use-range
-        @params="saveGraphParams"
-        @layout="saveGraphLayout"
-      />
+  <PreviewCard :enabled="inDialog">
+    <template #preview>
+      <BlockHistoryGraph />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <component :is="mode" :crud="crud">
+    <component :is="context.mode">
       <template #warnings>
         <CardWarning v-if="!target.id">
           <template #message>
@@ -58,17 +67,16 @@ export default class ActuatorLogicWidget
         </CardWarning>
         <BlockEnableToggle
           v-else
-          :crud="crud"
-          :hide-enabled="mode === 'Basic'"
+          :hide-enabled="context.mode === 'Basic'"
         >
           <template #enabled>
-            Logic Actuator is enabled and driving <i>{{ target | link }}</i>.
+            Logic Actuator is enabled and driving <i>{{ prettyLink(target) }}</i>.
           </template>
           <template #disabled>
-            Logic Actuator is disabled and not driving <i>{{ target | link }}</i>.
+            Logic Actuator is disabled and not driving <i>{{ prettyLink(target) }}</i>.
           </template>
         </BlockEnableToggle>
       </template>
     </component>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>

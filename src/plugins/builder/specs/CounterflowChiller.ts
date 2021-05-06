@@ -1,4 +1,4 @@
-import { PartSpec } from '../types';
+import { PartSpec } from '@/plugins/builder/types';
 
 export const CFC_TOP_LEFT = '0,0.5,0';
 export const CFC_TOP_RIGHT = '3,0.5,0';

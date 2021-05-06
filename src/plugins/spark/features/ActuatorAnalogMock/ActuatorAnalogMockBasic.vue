@@ -1,13 +1,27 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
 
-@Component
-export default class ActuatorAnalogMockBasic
-  extends BlockCrudComponent<ActuatorAnalogMockBlock> {
-}
+export default defineComponent({
+  name: 'ActuatorAnalogMockBasic',
+  setup() {
+    const {
+      serviceId,
+      block,
+      isDriven,
+      saveBlock,
+    } = useBlockWidget.setup<ActuatorAnalogMockBlock>();
+
+    return {
+      serviceId,
+      block,
+      isDriven,
+      saveBlock,
+    };
+  },
+});
 </script>
 
 <template>
@@ -16,17 +30,17 @@ export default class ActuatorAnalogMockBasic
 
     <div class="widget-body row">
       <SliderField
-        :value="block.data.setting"
+        :model-value="block.data.setting"
         :readonly="isDriven"
         title="Analog actuator Setting"
         label="Setting"
         tag="big"
         class="col-grow"
         :tag-class="{'text-orange': block.data.setting !== block.data.desiredSetting}"
-        @input="v => { block.data.desiredSetting = v; saveBlock(); }"
+        @update:model-value="v => { block.data.desiredSetting = v; saveBlock(); }"
       />
       <LabeledField
-        :value="block.data.value"
+        :model-value="block.data.value"
         label="Value"
         type="number"
         tag="big"
@@ -39,11 +53,11 @@ export default class ActuatorAnalogMockBasic
         class="col-grow"
       />
       <ConstraintsField
-        :value="block.data.constrainedBy"
+        :model-value="block.data.constrainedBy"
         :service-id="serviceId"
         type="analog"
         class="col-grow"
-        @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+        @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
       />
     </div>
   </div>

@@ -1,41 +1,59 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { useQuasar } from 'quasar';
+import { computed, defineComponent } from 'vue';
+import { useRoute } from 'vue-router';
 
-import { automationStore } from '@/plugins/automation/store';
+import { useGlobals } from '@/composables';
 
+const btnAttrs = {
+  stack: true,
+  flat: true,
+  noCaps: true,
+  class: 'col-grow q-py-sm max-small',
+};
 
-@Component
-export default class SidebarNavigator extends Vue {
-  btnAttrs = {
-    stack: true,
-    flat: true,
-    noCaps: true,
-    class: 'col-grow q-py-sm max-small',
-  }
+export default defineComponent({
+  name: 'SidebarNavigator',
+  setup() {
+    const $q = useQuasar();
+    const route = useRoute();
+    const { dense } = useGlobals.setup();
 
-  get activeSection(): string {
-    return this.$route.path.split('/')[1] ?? '';
-  }
+    const activeSection = computed<string>(
+      () => route.path.split('/')[1] ?? '',
+    );
 
-  get editorDisabled(): boolean {
-    return this.$q.platform.is.ie || this.$dense;
-  }
+    const editorDisabled = computed<boolean>(
+      () => $q.platform.is.ie || dense.value,
+    );
 
-  get automationAvailable(): boolean {
-    return automationStore.available;
-  }
+    const currentDashboard = computed<string | null>(
+      () => route.path.startsWith('/dashboard')
+        ? route.params.id as string
+        : null,
+    );
 
-  get currentDashboard(): string | null {
-    return this.$route.path.startsWith('/dashboard')
-      ? this.$route.params.id
-      : null;
-  }
+    const nextBuilderPage = computed<string>(
+      () => route.path.startsWith('/builder')
+        ? route.path
+        : '/builder',
+    );
 
-  btnColor(...sections: string[]): string {
-    return sections.includes(this.activeSection) ? 'primary' : '';
-  }
-}
+    function btnColor(...sections: string[]): string {
+      return sections.includes(activeSection.value) ? 'primary' : '';
+    }
+
+    return {
+      dense,
+      activeSection,
+      editorDisabled,
+      currentDashboard,
+      nextBuilderPage,
+      btnAttrs,
+      btnColor,
+    };
+  },
+});
 </script>
 
 <template>
@@ -61,17 +79,6 @@ export default class SidebarNavigator extends Vue {
         label="Admin"
         to="/admin"
         :color="btnColor('admin')"
-        v-bind="btnAttrs"
-      />
-
-      <div class="col-break" />
-
-      <q-btn
-        v-if="automationAvailable"
-        icon="mdi-calendar-check"
-        label="Automation"
-        to="/automation"
-        :color="btnColor('automation')"
         v-bind="btnAttrs"
       />
     </div>

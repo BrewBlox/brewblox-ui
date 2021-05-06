@@ -1,21 +1,32 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { DS2413Block } from '@/plugins/spark/types';
 
-@Component
-export default class DS2413Widget
-  extends BlockWidgetBase<DS2413Block> {
-}
+export default defineComponent({
+  name: 'DS2413Widget',
+  setup() {
+    const { context } = useContext.setup();
+    const {
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<DS2413Block>();
+
+    return {
+      context,
+      block,
+      saveBlock,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper
-    v-bind="{context}"
-  >
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
     <div class="widget-md">
@@ -24,26 +35,26 @@ export default class DS2413Widget
           DS2413 is not connected
         </template>
       </CardWarning>
-      <IoArray :crud="crud" />
+      <IoArray />
 
-      <template v-if="mode === 'Full'">
+      <template v-if="context.mode === 'Full'">
         <q-separator inset />
 
         <div class="widget-body row">
           <LabeledField
-            :value="block.data.connected ? 'Yes' : 'No'"
+            :model-value="block.data.connected ? 'Yes' : 'No'"
             label="Connected"
             class="col-grow"
           />
           <InputField
-            :value="block.data.address"
+            :model-value="block.data.address"
             title="Address"
             label="Address"
             class="col-grow"
-            @input="v => { block.data.address = v; saveBlock(); }"
+            @update:model-value="v => { block.data.address = v; saveBlock(); }"
           />
         </div>
       </template>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

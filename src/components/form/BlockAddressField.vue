@@ -1,105 +1,134 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { createBlockDialog, createDialog } from '@/helpers/dialog';
+import { useField } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block, ComparedBlockType } from '@/plugins/spark/types';
 import type { BlockAddress } from '@/plugins/spark/types';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { truncate } from '@/utils/functional';
 
-import FieldBase from '../FieldBase';
+export default defineComponent({
+  name: 'BlockAddressField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: Object as PropType<BlockAddress>,
+      required: true,
+    },
+    title: {
+      type: String,
+      default: 'Choose block',
+    },
+    label: {
+      type: String,
+      default: 'Block',
+    },
+    anyService: {
+      type: Boolean,
+      default: false,
+    },
+    compatible: {
+      type: [String, Array] as PropType<ComparedBlockType>,
+      default: null,
+    },
+    blockFilter: {
+      type: Function as PropType<(block: Block) => boolean>,
+      default: () => true,
+    },
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    creatable: {
+      type: Boolean,
+      default: true,
+    },
+    configurable: {
+      type: Boolean,
+      default: true,
+    },
+    show: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-
-@Component
-export default class BlockAddressField extends FieldBase {
-
-  @Prop({ type: Object, required: true })
-  public readonly value!: BlockAddress;
-
-  @Prop({ type: String, default: 'Choose block' })
-  public readonly title!: string;
-
-  @Prop({ type: String, default: 'Block' })
-  public readonly label!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly anyService!: boolean;
-
-  @Prop({ type: [String, Array], required: false })
-  readonly compatible!: ComparedBlockType;
-
-  @Prop({ type: Function, required: false })
-  public readonly blockFilter!: ((block: Block) => boolean);
-
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly creatable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly configurable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly show!: boolean;
-
-  save(val: BlockAddress): void {
-    this.$emit('input', val);
-  }
-
-  get displayValue(): string {
-    return this.value.id ?? 'click to assign';
-  }
-
-  get block(): Block | null {
-    return sparkStore.blockById(this.value.serviceId, this.value.id);
-  }
-
-  get canEdit(): boolean {
-    return this.block !== null
-      && this.configurable
-      && this.show;
-  }
-
-  get broken(): boolean {
-    return this.block === null
-      && this.value.serviceId !== null
-      && this.value.id !== null;
-  }
-
-  editBlock(): void {
-    createBlockDialog(this.block);
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function save(val: BlockAddress): void {
+      emit('update:modelValue', val);
     }
 
-    createDialog({
-      component: 'BlockAddressDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      label: this.label,
-      anyService: this.anyService,
-      clearable: this.clearable,
-      creatable: this.creatable,
-      configurable: this.configurable,
-      compatible: this.compatible,
-      blockFilter: this.blockFilter,
-      ...this.dialogProps,
-    })
-      .onOk(this.save);
-  }
-}
+    const displayValue = computed<string>(
+      () => truncate(props.modelValue.id ?? 'click to assign'),
+    );
+
+    const block = computed<Block | null>(
+      () => sparkStore.blockByAddress(props.modelValue),
+    );
+
+    const canEdit = computed<boolean>(
+      () => block.value !== null
+        && props.configurable
+        && props.show,
+    );
+
+    const broken = computed<boolean>(
+      () => block.value === null
+        && props.modelValue.serviceId !== null
+        && props.modelValue.id !== null,
+    );
+
+    function editBlock(): void {
+      createBlockDialog(block.value);
+    }
+
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+
+      createDialog({
+        component: 'BlockAddressDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          label: props.label,
+          anyService: props.anyService,
+          clearable: props.clearable,
+          creatable: props.creatable,
+          configurable: props.configurable,
+          compatible: props.compatible,
+          blockFilter: props.blockFilter,
+          ...props.dialogProps,
+        },
+      })
+        .onOk(save);
+    }
+
+    return {
+      activeSlots,
+      displayValue,
+      broken,
+      canEdit,
+      editBlock,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
-    {{ displayValue | truncated }}
+    {{ displayValue }}
     <q-item-label v-if="broken" caption class="text-negative q-mt-xs">
-      Block {{ value.id }} not found
+      Block {{ modelValue.id }} not found
     </q-item-label>
     <template #append>
       <q-btn
@@ -109,13 +138,17 @@ export default class BlockAddressField extends FieldBase {
         icon="mdi-launch"
         @click.stop="editBlock"
       >
-        <q-tooltip>Show {{ value.id }}</q-tooltip>
+        <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
       <q-icon
         v-if="broken"
         name="error"
         color="negative"
       />
+    </template>
+
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
   </LabeledField>
 </template>

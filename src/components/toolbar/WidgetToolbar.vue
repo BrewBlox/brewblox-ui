@@ -1,77 +1,42 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
-import { WidgetMode } from '@/store/features';
+import { useContext } from '@/composables';
 
-@Component
-export default class WidgetToolbar extends CrudComponent {
+const toolbarSlots = [
+  'default',
+  'buttons',
+  'actions',
+  'menus',
+];
 
-  @Prop({ type: String, required: false })
-  public readonly mode!: WidgetMode | null;
+export default defineComponent({
+  name: 'WidgetToolbar',
+  setup(props, { slots }) {
+    const { inDialog } = useContext.setup();
 
-  get toggleIcon(): string {
-    return this.mode === 'Basic'
-      ? 'mdi-unfold-more-horizontal'
-      : 'mdi-unfold-less-horizontal';
-  }
+    const activeSlots = computed<string[]>(
+      () => Object.keys(slots)
+        .filter(s => toolbarSlots.includes(s)),
+    );
 
-  get toggleTooltip(): string {
-    return this.mode === 'Basic'
-      ? 'Show full widget'
-      : 'Show basic widget';
-  }
-
-  public toggle(): void {
-    this.$emit('update:mode', this.mode === 'Basic' ? 'Full' : 'Basic');
-  }
-
-  public onTitleClick(): void {
-    if (this.$listeners['title-click'] !== undefined) {
-      this.$emit('title-click');
-    }
-    else {
-      this.startChangeWidgetTitle();
-    }
-  }
-}
+    return {
+      inDialog,
+      activeSlots,
+    };
+  },
+});
 </script>
 
 <template>
-  <Toolbar
-    :title="widget.title"
-    :subtitle="featureTitle"
-    @title-click="onTitleClick"
-  >
-    <slot />
-    <template #buttons>
-      <q-btn
-        v-if="!!mode"
-        flat
-        dense
-        round
-        :icon="toggleIcon"
-        @click="toggle"
-      >
-        <q-tooltip>
-          {{ toggleTooltip }}
-        </q-tooltip>
-      </q-btn>
-      <q-btn flat icon="mdi-launch" dense round @click="showDialog">
-        <q-tooltip>
-          Show in dialog
-        </q-tooltip>
-      </q-btn>
-      <ActionMenu dense round>
-        <template #actions>
-          <slot name="actions" />
-        </template>
-        <template #menus>
-          <slot name="menus">
-            <WidgetActions :crud="crud" />
-          </slot>
-        </template>
-      </ActionMenu>
+  <DialogWidgetToolbar v-if="inDialog" v-bind="$attrs">
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
-  </Toolbar>
+  </DialogWidgetToolbar>
+  <DashboardWidgetToolbar v-else v-bind="$attrs">
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
+  </DashboardWidgetToolbar>
 </template>

@@ -1,32 +1,43 @@
-import { bloxQty } from '@/helpers/bloxfield';
+import { Plugin } from 'vue';
+
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, MutexBlock } from '@/plugins/spark/types';
-import { WidgetFeature } from '@/store/features';
+import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { featureStore, WidgetFeature } from '@/store/features';
+import { bloxQty } from '@/utils/bloxfield';
 
 import widget from './MutexWidget.vue';
 
 const typeName = BlockType.Mutex;
 
-const block: BlockSpec<MutexBlock> = {
-  id: typeName,
-  generate: () => ({
-    differentActuatorWait: bloxQty('0s'),
-    waitRemaining: bloxQty('0s'),
-  }),
-  fields: [],
-};
+const plugin: Plugin = {
+  install(app) {
 
-const feature: WidgetFeature = {
-  ...genericBlockFeature,
-  id: typeName,
-  title: 'Mutex',
-  role: 'Constraint',
-  component: blockWidgetSelector(widget, typeName),
-  widgetSize: {
-    cols: 4,
-    rows: 2,
+    const spec: BlockSpec<MutexBlock> = {
+      id: typeName,
+      generate: () => ({
+        differentActuatorWait: bloxQty('0s'),
+        waitRemaining: bloxQty('0s'),
+      }),
+      fields: [],
+    };
+
+    const feature: WidgetFeature = {
+      ...genericBlockFeature,
+      id: typeName,
+      title: 'Mutex',
+      role: 'Constraint',
+      component: blockWidgetSelector(app, widget, typeName),
+      widgetSize: {
+        cols: 4,
+        rows: 2,
+      },
+    };
+
+    sparkStore.addBlockSpec(spec);
+    featureStore.addWidgetFeature(feature);
   },
 };
 
-export default { feature, block };
+export default plugin;

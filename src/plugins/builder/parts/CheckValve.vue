@@ -1,26 +1,40 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { RIGHT } from '../getters';
+import { RIGHT } from '@/plugins/builder/const';
 
-@Component
-export default class CheckValve extends PartBase {
-  readonly paths = {
-    liquid: [
-      'M 0,25 h 50',
-      'M 20,15 L 30,25 L 20,35',
-    ],
-  };
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
-  get flowSpeed(): number {
-    return this.flowOnCoord(RIGHT);
-  }
+const liquidPaths = [
+  'M 0,25 h 50',
+  'M 20,15 L 30,25 L 20,35',
+];
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(RIGHT);
-  }
-}
+export default defineComponent({
+  name: 'CheckValve',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => flowOnCoord(props.part, RIGHT),
+    );
+
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, RIGHT),
+    );
+
+    return {
+      liquidPaths,
+      flowSpeed,
+      liquids,
+    };
+  },
+});
 </script>
 
 <template>
@@ -29,7 +43,7 @@ export default class CheckValve extends PartBase {
       <path d="M0,21h10.5c1.4-5.1,5.4-9.1,10.5-10.5C29,8.3,37.2,13,39.4,21h0.1H50" />
       <path d="M0,29h10.5h0C12.7,37,21,41.6,29,39.4C34,38,38,34,39.4,29h0.1H50" />
     </g>
-    <LiquidStroke :paths="paths.liquid" :colors="liquids" />
+    <LiquidStroke :paths="liquidPaths" :colors="liquids" />
     <g class="fill">
       <path d="M22.81,22l-2.38-2.38a3,3,0,0,1,4.24-4.24L31.3,22h8.4a15,15,0,0,0-29.4,0H22.81Z" />
       <path d="M31.3,28l-6.62,6.62a3,3,0,0,1-4.24-4.24L22.81,28H10.3a15,15,0,0,0,29.4,0H31.3Z" />

@@ -1,5 +1,5 @@
 import { BlockFieldAddress } from '@/plugins/spark/types';
-import { Widget } from '@/store/dashboards';
+import { Widget } from '@/store/widgets';
 
 export interface QuickValuesConfig {
   addr: BlockFieldAddress;

@@ -1,100 +1,145 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, reactive } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { bloxQty, inverseTempQty } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
-import { deepCopy, typeMatchFilter } from '@/helpers/functional';
+import { useDialog, useGlobals } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockType, SetpointSensorPairBlock } from '@/shared-types';
+import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
+import { bloxQty, inverseTempQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy, typeMatchFilter } from '@/utils/functional';
 
+import { PidConfig } from '../types';
 import { TempControlMode } from './types';
 
+const setpointFilter = typeMatchFilter(BlockType.SetpointSensorPair);
+const durationRules: InputRule[] = [
+  v => v >= 0 || 'Value must be positive',
+  v => v < (2 ** 16 * 1000) || 'Value is too large to be stored in firmware',
+];
 
-@Component
-export default class TempControlModeDialog extends DialogBase {
-  setpointFilter = typeMatchFilter(BlockType.SetpointSensorPair);
-  durationRules: InputRule[] = [
-    v => v >= 0 || 'Value must be positive',
-    v => v < (2 ** 16 * 1000) || 'Value is too large to be stored in firmware',
-  ];
-  tempMode: TempControlMode | null = null;
+export default defineComponent({
+  name: 'TempControlModeDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<TempControlMode>,
+      required: true,
+    },
+    saveMode: {
+      type: Function as PropType<(mode: TempControlMode) => unknown>,
+      required: true,
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      default: 'Edit control mode',
+    },
+    showConfirm: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dense,
+    } = useGlobals.setup();
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
+    const tempMode = reactive<TempControlMode>(deepCopy(props.modelValue));
 
-  @Prop({ type: Object, required: true })
-  public readonly value!: TempControlMode;
+    function save(): void {
+      props.saveMode(tempMode);
+    }
 
-  @Prop({ type: Function, required: true })
-  public readonly saveMode!: (mode: TempControlMode) => unknown;
+    const module = computed<SparkServiceModule | null>(
+      () => sparkStore.moduleById(props.serviceId),
+    );
 
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
+    const setpoint = computed<SetpointSensorPairBlock | null>(
+      () => module.value?.blockByLink(tempMode.setpoint) ?? null,
+    );
 
-  @Prop({ type: String, default: 'Edit control mode' })
-  public readonly title!: string;
+    function removeConfig(kind: 'cool' | 'heat'): void {
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: `Remove ${kind} config`,
+          message: `Are you sure you want to remove the ${kind} config from the ${tempMode.title} mode?`,
+          noBackdropDismiss: true,
+        },
+      })
+        .onOk(() => {
+          tempMode[kind + 'Config'] = null;
+          save();
+        });
+    }
 
-  @Prop({ type: Boolean, default: false })
-  public readonly showConfirm!: boolean;
+    function updateConfig(cfg: 'cool' | 'heat', key: keyof PidConfig, value: Quantity): void {
+      const config: PidConfig | undefined = tempMode[cfg + 'Config'];
+      if (config) {
+        config[key] = value;
+        save();
+      }
+    }
 
-  created(): void {
-    this.tempMode = deepCopy(this.value);
-  }
+    function addCoolConfig(): void {
+      tempMode.coolConfig = {
+        kp: inverseTempQty(-50),
+        ti: bloxQty('0s'),
+        td: bloxQty('0s'),
+      };
+      save();
+    }
 
-  get module(): SparkServiceModule | null {
-    return sparkStore.moduleById(this.serviceId);
-  }
+    function addHeatConfig(): void {
+      tempMode.heatConfig = {
+        kp: inverseTempQty(100),
+        ti: bloxQty('0s'),
+        td: bloxQty('0s'),
+      };
+      save();
+    }
 
-  get setpoint(): SetpointSensorPairBlock | null {
-    return this.module && this.tempMode
-      ? this.module.blockByLink(this.tempMode.setpoint)
-      : null;
-  }
-
-  save(): void {
-    this.saveMode(this.tempMode!);
-  }
-
-  removeConfig(kind: 'cool' | 'heat'): void {
-    createDialog({
-      component: 'ConfirmDialog',
-      title: `Remove ${kind} config`,
-      message: `Are you sure you want to remove the ${kind} config from the ${this.tempMode!.title} mode?`,
-      noBackdropDismiss: true,
-    })
-      .onOk(() => {
-        this.$set(this.tempMode!, kind + 'Config', null);
-        this.save();
-      });
-  }
-
-  addCoolConfig(): void {
-    this.tempMode!.coolConfig = {
-      kp: inverseTempQty(-50),
-      ti: bloxQty('0s'),
-      td: bloxQty('0s'),
+    return {
+      setpointFilter,
+      durationRules,
+      dense,
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+      tempMode,
+      save,
+      setpoint,
+      removeConfig,
+      updateConfig,
+      addCoolConfig,
+      addHeatConfig,
     };
-    this.save();
-  }
-
-  addHeatConfig(): void {
-    this.tempMode!.heatConfig = {
-      kp: inverseTempQty(100),
-      ti: bloxQty('0s'),
-      td: bloxQty('0s'),
-    };
-    this.save();
-  }
-
-}
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
-    :maximized="$dense"
+    ref="dialogRef"
+    :maximized="dense"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <ActionCardWrapper v-bind="{context}">
+    <Card>
       <template #toolbar>
         <DialogToolbar :title="title" subtitle="Temperature control mode" />
       </template>
@@ -103,49 +148,49 @@ export default class TempControlModeDialog extends DialogBase {
         class="row q-gutter-xs"
       >
         <InputField
-          :value="tempMode.title"
+          :model-value="tempMode.title"
           label="Mode name"
           title="Mode name"
           class="col-grow"
-          @input="v => { tempMode.title = v; save(); }"
+          @update:model-value="v => { tempMode.title = v; save(); }"
         />
 
         <LinkField
-          :value="tempMode.setpoint"
+          :model-value="tempMode.setpoint"
           :service-id="serviceId"
           :block-filter="setpointFilter"
           :label-color="!setpoint ? 'negative' : ''"
           title="PID input Setpoint"
           label="PID input Setpoint"
           class="col-grow"
-          @input="v => { tempMode.setpoint = v; save(); }"
+          @update:model-value="v => { tempMode.setpoint = v; save(); }"
         />
 
         <div class="col-break" />
 
         <template v-if="tempMode.coolConfig">
           <QuantityField
-            :value="tempMode.coolConfig.kp"
+            :model-value="tempMode.coolConfig.kp"
             title="Cool Kp"
             label="Cool Kp"
             class="col cool-field"
-            @input="v => { tempMode.coolConfig.kp = v; save(); }"
+            @update:model-value="v => updateConfig('cool', 'kp', v)"
           />
           <DurationField
-            :value="tempMode.coolConfig.ti"
+            :model-value="tempMode.coolConfig.ti"
             :rules="durationRules"
             title="Cool Ti"
             label="Cool Ti"
             class="col cool-field"
-            @input="v => { tempMode.coolConfig.ti = v; save(); }"
+            @update:model-value="v => updateConfig('cool', 'ti', v)"
           />
           <DurationField
-            :value="tempMode.coolConfig.td"
+            :model-value="tempMode.coolConfig.td"
             :rules="durationRules"
             title="Cool Td"
             label="Cool Td"
             class="col cool-field"
-            @input="v => { tempMode.coolConfig.td = v; save(); }"
+            @update:model-value="v => updateConfig('cool', 'td', v)"
           />
           <q-btn
             flat
@@ -169,27 +214,27 @@ export default class TempControlModeDialog extends DialogBase {
 
         <template v-if="tempMode.heatConfig">
           <QuantityField
-            :value="tempMode.heatConfig.kp"
+            :model-value="tempMode.heatConfig.kp"
             title="Heat Kp"
             label="Heat Kp"
             class="col heat-field"
-            @input="v => { tempMode.heatConfig.kp = v; save(); }"
+            @update:model-value="v => updateConfig('heat', 'kp', v)"
           />
           <DurationField
-            :value="tempMode.heatConfig.ti"
+            :model-value="tempMode.heatConfig.ti"
             :rules="durationRules"
             title="Heat Ti"
             label="Heat Ti"
             class="col heat-field"
-            @input="v => { tempMode.heatConfig.ti = v; save(); }"
+            @update:model-value="v => updateConfig('heat', 'ti', v)"
           />
           <DurationField
-            :value="tempMode.heatConfig.td"
+            :model-value="tempMode.heatConfig.td"
             :rules="durationRules"
             title="Heat Td"
             label="Heat Td"
             class="col heat-field"
-            @input="v => { tempMode.heatConfig.td = v; save(); }"
+            @update:model-value="v => updateConfig('heat', 'td', v)"
           />
           <q-btn
             flat
@@ -273,10 +318,10 @@ export default class TempControlModeDialog extends DialogBase {
           unelevated
           label="Confirm"
           color="primary"
-          @click="onDialogOk()"
+          @click="onDialogOK()"
         />
       </template>
-    </ActionCardWrapper>
+    </Card>
   </q-dialog>
 </template>
 

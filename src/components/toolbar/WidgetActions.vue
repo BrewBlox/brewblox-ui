@@ -1,22 +1,63 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
+import { useWidget } from '@/composables';
+import {
+  startChangeWidgetTitle,
+  startCopyWidget,
+  startMoveWidget,
+  startRemoveWidget,
+} from '@/utils/widgets';
 
-@Component
-export default class WidgetActions extends CrudComponent {
+export default defineComponent({
+  name: 'WidgetActions',
+  props: {
+    noRename: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup() {
+    const {
+      widget,
+      isVolatileWidget,
+    } = useWidget.setup();
 
-  @Prop({ type: Boolean, default: false })
-  readonly noRename!: boolean;
-}
+    return {
+      widget,
+      isVolatileWidget,
+      startChangeWidgetTitle,
+      startCopyWidget,
+      startMoveWidget,
+      startRemoveWidget,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionSubmenu v-if="isStoreWidget" label="Widget">
-    <ActionItem icon="file_copy" label="Copy" @click="startCopyWidget" />
-    <ActionItem icon="exit_to_app" label="Move" @click="startMoveWidget" />
+  <ActionSubmenu v-if="!isVolatileWidget" label="Widget">
+    <ActionItem
+      icon="file_copy"
+      label="Copy"
+      @click="startCopyWidget(widget)"
+    />
+    <ActionItem
+      icon="exit_to_app"
+      label="Move"
+      @click="startMoveWidget(widget)"
+    />
     <slot />
-    <RenameWidgetAction v-if="!noRename" :crud="crud" />
-    <ActionItem icon="delete" label="Remove" @click="startRemoveWidget" />
+    <ActionItem
+      v-if="!noRename"
+      icon="edit"
+      label="Rename"
+      @click="startChangeWidgetTitle(widget)"
+    />
+    <ActionItem
+      icon="delete"
+      label="Remove"
+      @click="startRemoveWidget(widget)"
+    />
   </ActionSubmenu>
 </template>

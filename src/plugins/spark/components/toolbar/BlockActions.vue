@@ -1,95 +1,94 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import { typeName as graphType } from '@/plugins/history/Graph/getters';
-import { addBlockGraph } from '@/plugins/history/Graph/helpers';
-import { createWidgetWizard } from '@/plugins/wizardry';
-import { dashboardStore } from '@/store/dashboards';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import {
+  isBlockDisplayReady,
+  isBlockRemovable,
+  startAddBlockToDisplay,
+  startAddBlockToGraphWidget,
+  startChangeBlockId,
+  startRemoveBlock,
+} from '@/plugins/spark/utils';
+import { saveFile } from '@/utils/import-export';
+import { startCopyWidget } from '@/utils/widgets';
 
-import BlockCrudComponent from '../BlockCrudComponent';
+export default defineComponent({
+  name: 'BlockActions',
+  setup() {
+    const {
+      widget,
+      block,
+      isVolatileWidget,
+      hasGraph,
+    } = useBlockWidget.setup();
 
-@Component
-export default class BlockActions extends BlockCrudComponent {
+    const canRemove = computed<boolean>(
+      () => isBlockRemovable(block.value),
+    );
 
-  async addToGraph(): Promise<void> {
-    const graphOpts = dashboardStore
-      .widgets
-      .filter(v => v.feature === graphType)
-      .map(v => ({
-        label: `[${dashboardStore.dashboardTitle(v.dashboard)}] ${v.title}`,
-        value: v.id,
-      }));
+    const canDisplay = computed<boolean>(
+      () => isBlockDisplayReady(block.value),
+    );
 
-    const widgetId: string | null = await new Promise((resolve) => {
-      if (graphOpts.length) {
-        createDialog({
-          component: 'SelectDialog',
-          title: 'Select Graph widget',
-          listSelect: graphOpts.length < 10,
-          selectProps: {
-            label: 'Graph widgets',
-          },
-          value: null,
-          selectOptions: graphOpts,
-        })
-          .onOk(value => resolve(value))
-          .onCancel(() => resolve(null))
-          .onDismiss(() => resolve(null));
-      }
-      else {
-        createWidgetWizard(graphType)
-          .onOk(output => resolve(output.widget?.id ?? null))
-          .onCancel(() => resolve(null))
-          .onDismiss(() => resolve(null));
-      }
-    });
-
-    if (widgetId) {
-      addBlockGraph(widgetId, this.block);
+    function exportBlock(): void {
+      saveFile(block.value, `${block.value.id}.json`);
     }
-  }
-}
+
+    return {
+      startAddBlockToGraphWidget,
+      startRemoveBlock,
+      startAddBlockToDisplay,
+      startCopyWidget,
+      startChangeBlockId,
+      widget,
+      isVolatileWidget,
+      block,
+      hasGraph,
+      canDisplay,
+      canRemove,
+      exportBlock,
+    };
+  },
+});
 </script>
 
 <template>
   <ActionSubmenu label="Block">
     <slot name="block-actions" />
     <ActionItem
-      v-if="!crud.isStoreWidget"
+      v-if="isVolatileWidget"
       icon="mdi-widgets"
       label="Show on dashboard"
-      @click="startMakeWidget"
+      @click="startCopyWidget(widget)"
     />
     <ActionItem
       icon="edit"
       label="Rename"
-      @click="startChangeBlockId"
+      @click="startChangeBlockId(block)"
     />
     <ActionItem
       v-if="hasGraph"
       icon="mdi-chart-line"
       label="Add to Graph widget"
-      @click="addToGraph"
+      @click="startAddBlockToGraphWidget(block)"
     />
     <ActionItem
       v-if="canDisplay"
       icon="mdi-monitor"
       label="Add to Spark display"
-      @click="displayBlock"
-    />
-    <BlockGroupsAction
-      v-if="crud.isStoreBlock"
-      :crud="crud"
+      @click="startAddBlockToDisplay(block)"
     />
     <ActionItem
       icon="mdi-file-export"
       label="Export"
       @click="exportBlock"
     />
-    <RemoveBlockAction
-      v-if="!crud.isStoreWidget"
-      :crud="crud"
+    <ActionItem
+      v-if="canRemove"
+      icon="delete"
+      label="Remove block"
+      @click="startRemoveBlock(block)"
     />
   </ActionSubmenu>
 </template>

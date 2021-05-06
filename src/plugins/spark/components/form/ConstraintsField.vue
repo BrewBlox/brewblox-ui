@@ -1,83 +1,113 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import isString from 'lodash/isString';
+import { computed, defineComponent, PropType } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { prettyQty } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
+import { useField } from '@/composables';
 import { analogConstraintLabels, digitalConstraintLabels } from '@/plugins/spark/getters';
-import { prettifyConstraints } from '@/plugins/spark/helpers';
 import type { AnalogConstraint, AnyConstraintsObj, DigitalConstraint } from '@/plugins/spark/types';
+import { prettifyConstraints } from '@/plugins/spark/utils';
+import { prettyQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
 const constraintLabels = {
   ...digitalConstraintLabels,
   ...analogConstraintLabels,
 };
 
-@Component
-export default class ConstraintsField extends FieldBase {
-
-  @Prop({ type: String, default: 'Edit constraints' })
-  public readonly title!: string;
-
-  @Prop({ type: Object, default: () => ({ constraints: [] }) })
-  protected readonly value!: AnyConstraintsObj;
-
-  @Prop({ type: String, required: true })
-  protected readonly serviceId!: string;
-
-  @Prop({ type: String, required: true, validator: v => ['analog', 'digital'].includes(v) })
-  public readonly type!: 'analog' | 'digital';
-
-  @Emit('input')
-  public change(v: AnyConstraintsObj): AnyConstraintsObj {
-    return v;
-  }
-
-  get numConstraints(): number {
-    return this.value.constraints.length;
-  }
-
-  get limiters(): string[] {
-    if (this.type === 'analog') {
-      return (this.value.constraints as AnalogConstraint[])
-        .filter(c => c.limiting)
-        .map(c => Object.keys(c).find(k => k !== 'limiting') ?? 'Unknown')
-        .map(k => constraintLabels[k] ?? k);
-    }
-    else {
-      return (this.value.constraints as DigitalConstraint[])
-        .filter(c => c.remaining.value)
-        .map(c => {
-          const key = Object.keys(c).find(k => k !== 'remaining') ?? 'Unknown';
-          const label = constraintLabels[key] ?? key;
-          return `${label} (${prettyQty(c.remaining)})`;
-        });
-    }
-  }
-
-  get textColor(): string {
-    if (this.limiters.length > 0) { return 'text-pink-4'; }
-    if (this.numConstraints > 0) { return 'text-indigo-4'; }
-    return 'darkish';
-  }
-
-  get displayString(): string {
-    return prettifyConstraints(this.value);
-  }
-
-  openDialog(): void {
-    createDialog({
-      component: 'ConstraintsDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      serviceId: this.serviceId,
-      type: this.type,
-    })
-      .onOk(this.change);
-  }
+function typeValidator(v: unknown): boolean {
+  return isString(v) && ['analog', 'digital'].includes(v);
 }
+
+export default defineComponent({
+  name: 'ConstraintsField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: Object as PropType<AnyConstraintsObj>,
+      default: () => ({ constraints: [] }),
+    },
+    title: {
+      type: String,
+      default: 'Edit constraints',
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String as PropType<'analog' | 'digital'>,
+      required: true,
+      validator: typeValidator,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    function change(obj: AnyConstraintsObj): void {
+      emit('update:modelValue', obj);
+    }
+
+    const numConstraints = computed<number>(
+      () => props.modelValue.constraints.length,
+    );
+
+    const limiters = computed<string[]>(
+      () => {
+        if (props.type === 'analog') {
+          return (props.modelValue.constraints as AnalogConstraint[])
+            .filter(c => c.limiting)
+            .map(c => Object.keys(c).find(k => k !== 'limiting') ?? 'Unknown')
+            .map(k => constraintLabels[k] ?? k);
+        }
+        else {
+          return (props.modelValue.constraints as DigitalConstraint[])
+            .filter(c => c.remaining.value)
+            .map(c => {
+              const key = Object.keys(c).find(k => k !== 'remaining') ?? 'Unknown';
+              const label = constraintLabels[key] ?? key;
+              return `${label} (${prettyQty(c.remaining)})`;
+            });
+        }
+      },
+    );
+
+    const textColor = computed<string>(
+      () => {
+        if (limiters.value.length > 0) { return 'text-pink-4'; }
+        if (numConstraints.value > 0) { return 'text-indigo-4'; }
+        return 'darkish';
+      },
+    );
+
+    const displayString = computed<string>(
+      () => prettifyConstraints(props.modelValue),
+    );
+
+    function openDialog(): void {
+      createDialog({
+        component: 'ConstraintsDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          serviceId: props.serviceId,
+          type: props.type,
+        },
+      })
+        .onOk(change);
+    }
+
+    return {
+      numConstraints,
+      limiters,
+      textColor,
+      displayString,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>

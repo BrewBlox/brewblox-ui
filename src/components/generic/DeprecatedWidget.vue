@@ -1,21 +1,24 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
+import { useWidget } from '@/composables';
 
 const replacements = {
   StepView: 'QuickActions',
 };
 
-@Component
-export default class DeprecatedWidget extends WidgetBase {
-  created(): void {
-    this.widget.feature = replacements[this.widget.feature] ?? 'Unknown';
-    this.saveWidget();
-  }
-
-  render(): null {
+export default defineComponent({
+  name: 'DeprecatedWidget',
+  setup() {
+    const { widget, saveWidget } = useWidget.setup();
+    saveWidget({
+      ...widget.value,
+      feature: replacements[widget.value.feature] ?? 'Unknown',
+    });
+    return {};
+  },
+  render() {
     return null;
-  }
-}
+  },
+});
 </script>

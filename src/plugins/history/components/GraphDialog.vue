@@ -1,67 +1,104 @@
 <script lang="ts">
-import { CreateElement, VNode } from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType, reactive, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
+import { deepCopy } from '@/utils/functional';
 
 import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 
+export default defineComponent({
+  name: 'GraphDialog',
+  props: {
+    ...useDialog.props,
+    graphId: {
+      type: String,
+      required: true,
+    },
+    config: {
+      type: Object as PropType<GraphConfig>,
+      required: true,
+    },
+    sharedSources: {
+      type: Boolean,
+      default: false,
+    },
+    usePresets: {
+      type: Boolean,
+      default: false,
+    },
+    annotated: {
+      type: Boolean,
+      default: false,
+    },
+    saveAnnotations: {
+      type: Function as PropType<(a: GraphAnnotation[]) => unknown>,
+      default: () => { },
+    },
+    saveParams: {
+      type: Function as PropType<(v: QueryParams) => unknown>,
+      default: () => { },
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+    } = useDialog.setup();
 
-@Component
-export default class GraphDialog extends DialogBase {
+    const sourceRevision = ref<Date>(new Date());
 
-  @Prop({ type: String, required: true })
-  public readonly graphId!: string;
+    // Dialog props are not reactive.
+    // We'll keep changes cached locally, and assume the parent applies them unchanged
+    const localConfig = reactive(deepCopy(props.config));
 
-  @Prop({ type: Object, required: true })
-  public readonly config!: GraphConfig;
+    function saveLocalParams(params: QueryParams): void {
+      localConfig.params = params;
+      sourceRevision.value = new Date();
+      props.saveParams(params);
+    }
 
-  @Prop({ type: Boolean, default: false })
-  public readonly sharedSources!: boolean;
-
-  @Prop({ type: Function, required: false })
-  public readonly saveAnnotations!: (a: GraphAnnotation[]) => void;
-
-  @Prop({ type: Function, required: false })
-  public readonly saveParams!: (v: QueryParams) => void;
-
-  render(h: CreateElement): VNode {
-    return h('q-dialog',
-      {
-        ref: 'dialog',
-        props: {
-          maximized: true,
-          transitionShow: 'fade',
-        },
-        on: { hide: this.onDialogHide },
-      },
-      [
-        h('q-card',
-          [
-            h('HistoryGraph',
-              {
-                props: {
-                  graphId: this.graphId,
-                  config: this.config,
-                  sharedSources: this.sharedSources,
-                  usePresets: this.saveParams !== undefined,
-                },
-                attrs: {
-                  annotated: !!this.saveAnnotations,
-                  maximized: true,
-                },
-                on: {
-                  annotations: this.saveAnnotations ?? (() => { }),
-                  params: this.saveParams ?? (() => { }),
-                },
-                scopedSlots: {
-                  controls: () => [
-                    h('DialogCloseButton', { props: { stretch: true } }),
-                  ],
-                },
-              }),
-          ]),
-      ]);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      sourceRevision,
+      localConfig,
+      saveLocalParams,
+    };
+  },
+});
 </script>
+
+<template>
+  <q-dialog
+    ref="dialogRef"
+    v-bind="dialogProps"
+    transition-show="fade"
+    maximized
+    @hide="onDialogHide"
+  >
+    <q-card>
+      <HistoryGraph
+        :config="localConfig"
+        v-bind="{
+          graphId,
+          sharedSources,
+          usePresets,
+          annotated,
+          sourceRevision,
+        }"
+        maximized
+        @annotations="saveAnnotations"
+        @params="saveLocalParams"
+      >
+        <template #controls>
+          <DialogCloseButton stretch />
+        </template>
+      </HistoryGraph>
+    </q-card>
+  </q-dialog>
+</template>

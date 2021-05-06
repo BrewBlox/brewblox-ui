@@ -1,17 +1,35 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { prettifyConstraints } from '@/plugins/spark/helpers';
+import { useValEdit } from '@/plugins/spark/composables';
+import { prettifyConstraints } from '@/plugins/spark/utils';
+import { DigitalConstraintsObj } from '@/shared-types';
 
-import ValEditBase from '../ValEditBase';
+export default defineComponent({
+  name: 'DigitalConstraintsValEdit',
+  props: {
+    ...useValEdit.props,
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<DigitalConstraintsObj>(props.modelValue);
 
+    const displayString = computed<string>(
+      () => prettifyConstraints(field.value),
+    );
 
-@Component
-export default class DigitalConstraintsValEdit extends ValEditBase {
-  get displayString(): string {
-    return prettifyConstraints(this.field);
-  }
-}
+    return {
+      field,
+      startEdit,
+      displayString,
+    };
+  },
+});
 </script>
 
 <template>
@@ -21,7 +39,7 @@ export default class DigitalConstraintsValEdit extends ValEditBase {
     </div>
     <DigitalConstraints
       v-model="field"
-      v-bind="{serviceId}"
+      :service-id="serviceId"
     />
   </div>
   <div

@@ -1,21 +1,30 @@
-import { ref } from '@/helpers/component-ref';
-import { WidgetFeature } from '@/store/features';
+import { Plugin } from 'vue';
+
+import { featureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 
 import widget from './SparkDisplayWidget.vue';
 import { SparkDisplayConfig } from './types';
 
-const feature: WidgetFeature<SparkDisplayConfig> = {
-  id: 'SparkDisplay',
-  title: 'Spark Sim Display',
-  component: ref(widget),
-  wizard: true,
-  widgetSize: {
-    cols: 4,
-    rows: 3,
+const plugin: Plugin = {
+  install(app) {
+
+    const feature: WidgetFeature<SparkDisplayConfig> = {
+      id: 'SparkDisplay',
+      title: 'Spark Sim Display',
+      component: cref(app, widget),
+      wizard: true,
+      widgetSize: {
+        cols: 4,
+        rows: 3,
+      },
+      generateConfig: () => ({
+        serviceId: null,
+      }),
+    };
+
+    featureStore.addWidgetFeature(feature);
   },
-  generateConfig: () => ({
-    serviceId: null,
-  }),
 };
 
-export default { feature };
+export default plugin;

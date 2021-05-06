@@ -1,22 +1,18 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { MockPinsBlock } from '@/plugins/spark/types';
-
-@Component
-export default class MockPinsWidget
-  extends BlockWidgetBase<MockPinsBlock> {
-}
+export default defineComponent({
+  name: 'MockPinsWidget',
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" />
+      <BlockWidgetToolbar />
     </template>
     <div class="widget-md">
-      <IoArray :crud="crud" />
+      <IoArray />
     </div>
-  </CardWrapper>
+  </Card>
 </template>

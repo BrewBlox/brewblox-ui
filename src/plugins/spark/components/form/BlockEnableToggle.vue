@@ -1,26 +1,50 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import BlockCrudComponent from '../BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 
-@Component
-export default class BlockEnableToggle extends BlockCrudComponent {
+export default defineComponent({
+  name: 'BlockEnableToggle',
+  props: {
+    dataKey: {
+      type: String,
+      default: 'enabled',
+    },
+    hideEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    emitToggle: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'change',
+  ],
+  setup(props, { emit }) {
+    const { block, saveBlock } = useBlockWidget.setup();
 
-  @Prop({ type: String, default: 'enabled' })
-  public readonly dataKey!: string;
+    const enabled = computed<boolean>(
+      () => Boolean(block.value?.data[props.dataKey]),
+    );
 
-  @Prop({ type: Boolean, default: false })
-  public readonly hideEnabled!: boolean;
+    function toggleEnabled(): void {
+      if (props.emitToggle) {
+        emit('change', !enabled.value);
+      }
+      else {
+        block.value.data[props.dataKey] = !enabled.value;
+        saveBlock();
+      }
+    }
 
-  get enabled(): boolean {
-    return Boolean(this.block.data[this.dataKey]);
-  }
-
-  toggleEnabled(): void {
-    this.block.data[this.dataKey] = !this.enabled;
-    this.saveBlock();
-  }
-}
+    return {
+      enabled,
+      toggleEnabled,
+    };
+  },
+});
 </script>
 
 <template>

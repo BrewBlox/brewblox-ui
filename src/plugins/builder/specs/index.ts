@@ -1,5 +1,5 @@
-import { PartSpec } from '../types';
-import ActuatorValve from './ActuatorValve';
+import { PartSpec } from '@/plugins/builder/types';
+
 import BeerBottle from './BeerBottle';
 import BridgeTube from './BridgeTube';
 import BuilderLabel from './BuilderLabel';
@@ -39,7 +39,6 @@ import Valve from './Valve';
 import WhirlpoolInlet from './WhirlpoolInlet';
 
 const specs: { [key: string]: PartSpec } = {
-  ActuatorValve,
   BeerBottle,
   BridgeTube,
   BuilderLabel,

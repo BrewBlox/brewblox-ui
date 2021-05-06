@@ -1,19 +1,29 @@
-import { ref } from '@/helpers/component-ref';
-import { QuickStartFeature } from '@/store/features';
+import { Plugin } from 'vue';
 
+import { featureStore, QuickstartFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+
+import RimsCompletionTask from './RimsCompletionTask.vue';
 import RimsHardwareTask from './RimsHardwareTask.vue';
-import RimsManualTask from './RimsManualTask.vue';
 import RimsNamingTask from './RimsNamingTask.vue';
-import RimsWizard from './RimsWizard.vue';
 
-ref(RimsHardwareTask);
-ref(RimsManualTask);
-ref(RimsNamingTask);
+const plugin: Plugin = {
+  install(app) {
 
-const feature: QuickStartFeature = {
-  id: 'Rims',
-  title: 'RIMS Brew-in-a-Bag',
-  component: ref(RimsWizard),
+    const feature: QuickstartFeature = {
+      id: 'Rims',
+      title: 'RIMS Brew-in-a-Bag',
+      tasks: [
+        'QuickstartServiceTask',
+        'QuickstartDiscoveryTask',
+        cref(app, RimsNamingTask),
+        cref(app, RimsHardwareTask),
+        cref(app, RimsCompletionTask),
+      ],
+    };
+
+    featureStore.addQuickstartFeature(feature);
+  },
 };
 
-export default feature;
+export default plugin;

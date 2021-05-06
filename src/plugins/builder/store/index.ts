@@ -1,9 +1,9 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById } from '@/helpers/functional';
+import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
 import store from '@/store';
+import { extendById, filterById, findById } from '@/utils/functional';
 
-import { BuilderLayout, PartSpec } from '../types';
 import api from './api';
 
 const fallbackSpec = (): PartSpec => ({
@@ -20,6 +20,7 @@ export class BuilderModule extends VuexModule {
   public specs: PartSpec[] = [];
 
   public editorMode = '';
+  public drawerMode: 'tools' | 'layouts' = 'tools';
   public lastLayoutId: string | null = null;
   public layouts: BuilderLayout[] = [];
 
@@ -27,7 +28,7 @@ export class BuilderModule extends VuexModule {
     return this.layouts.map(v => v.id);
   }
 
-  public layoutById(id: string | null): BuilderLayout | null {
+  public layoutById(id: Nullable<string>): BuilderLayout | null {
     return findById(this.layouts, id);
   }
 
@@ -78,7 +79,7 @@ export class BuilderModule extends VuexModule {
           if (order !== layout.order) {
             this.saveLayout({ ...layout, order });
           }
-        })
+        }),
     );
   }
 

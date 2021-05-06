@@ -1,71 +1,77 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import { startChangeServiceTitle, startRemoveService } from '@/helpers/services';
-import { cleanUnusedNames, discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/helpers';
+import { cleanUnusedNames, discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
+import { createDialog } from '@/utils/dialog';
+import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { SparkService } from '../types';
 
+export default defineComponent({
+  name: 'SparkActions',
+  props: {
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
+    const sparkModule = computed<SparkServiceModule | null>(
+      () => sparkStore.moduleById(props.serviceId),
+    );
 
-@Component
-export default class SparkActions extends Vue {
-  funcs = {
-    startResetBlocks,
-    saveHwInfo,
-    discoverBlocks,
-    createBlockWizard,
-    cleanUnusedNames,
-    startChangeServiceTitle,
-    startRemoveService,
-  }
+    const service = computed<SparkService | null>(
+      () => serviceStore.serviceById(props.serviceId),
+    );
 
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
-
-  get service(): SparkService | null {
-    return serviceStore.serviceById(this.serviceId);
-  }
-
-  get serviceTitle(): string {
-    return this.service?.title || `Spark '${this.serviceId}'`;
-  }
-
-  get sparkModule(): SparkServiceModule | null {
-    return sparkStore.moduleById(this.serviceId);
-  }
-
-  get isHomePage(): boolean {
-    return systemStore.config.homePage === `/service/${this.service?.id}`;
-  }
-
-  set isHomePage(v: boolean) {
-    const homePage = v && this.service ? `/service/${this.service.id}` : null;
-    systemStore.saveConfig({ homePage });
-  }
-
-  serviceReboot(): void {
-    this.sparkModule?.serviceReboot();
-  }
-
-  controllerReboot(): void {
-    this.sparkModule?.controllerReboot();
-  }
-
-  startDialog(component: string): void {
-    if (!this.sparkModule) { return; }
-    createDialog({
-      component,
-      serviceId: this.serviceId,
+    const isHomePage = computed<boolean>({
+      get: () => systemStore.config.homePage === `/service/${props.serviceId}`,
+      set: v => {
+        const homePage = v && service.value ? `/service/${props.serviceId}` : null;
+        systemStore.saveConfig({ homePage });
+      },
     });
-  }
 
-}
+    function serviceReboot(): void {
+      sparkModule.value?.serviceReboot();
+    }
+
+    function controllerReboot(): void {
+      sparkModule.value?.controllerReboot();
+    }
+
+    function startDialog(component: string): void {
+      if (sparkModule.value) {
+        createDialog({
+          component,
+          componentProps: {
+            serviceId: props.serviceId,
+          },
+        });
+      }
+    }
+
+    return {
+      startResetBlocks,
+      saveHwInfo,
+      discoverBlocks,
+      createBlockWizard,
+      cleanUnusedNames,
+      startChangeServiceTitle,
+      startRemoveService,
+      sparkModule,
+      service,
+      isHomePage,
+      serviceReboot,
+      controllerReboot,
+      startDialog,
+    };
+  },
+});
 </script>
 
 <template>
@@ -79,12 +85,12 @@ export default class SparkActions extends Vue {
       <ActionItem
         icon="add"
         label="New block"
-        @click="funcs.createBlockWizard(serviceId)"
+        @click="createBlockWizard(serviceId)"
       />
       <ActionItem
         icon="mdi-magnify-plus-outline"
         label="Discover new OneWire blocks"
-        @click="funcs.discoverBlocks(serviceId)"
+        @click="discoverBlocks(serviceId)"
       />
       <ActionItem
         icon="mdi-progress-download"
@@ -96,11 +102,6 @@ export default class SparkActions extends Vue {
         label="Configure Wifi"
         @click="startDialog('SparkWifiMenu')"
       />
-      <!-- <ActionItem
-        icon="mdi-checkbox-multiple-marked"
-        label="Groups (deprecated)"
-        @click="startDialog('SparkGroupMenu')"
-      /> -->
       <ActionItem
         icon="mdi-restart"
         label="Reboot service"
@@ -119,17 +120,17 @@ export default class SparkActions extends Vue {
       <ActionItem
         icon="mdi-power-plug"
         label="Export sensor and pin names"
-        @click="funcs.saveHwInfo(serviceId)"
+        @click="saveHwInfo(serviceId)"
       />
       <ActionItem
         icon="mdi-tag-remove"
         label="Remove unused block names"
-        @click="funcs.cleanUnusedNames(serviceId)"
+        @click="cleanUnusedNames(serviceId)"
       />
       <ActionItem
         icon="delete"
         label="Remove all blocks"
-        @click="funcs.startResetBlocks(serviceId)"
+        @click="startResetBlocks(serviceId)"
       />
       <ToggleAction
         v-model="isHomePage"
@@ -139,12 +140,12 @@ export default class SparkActions extends Vue {
       <ActionItem
         icon="edit"
         label="Rename service"
-        @click="funcs.startChangeServiceTitle(service)"
+        @click="startChangeServiceTitle(service)"
       />
       <ActionItem
         icon="delete"
         label="Remove service from UI"
-        @click="funcs.startRemoveService(service)"
+        @click="startRemoveService(service)"
       />
     </template>
   </ActionSubmenu>

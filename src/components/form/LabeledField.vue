@@ -1,56 +1,81 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { QField } from 'quasar';
+import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { round } from '@/helpers/functional';
+import { useField } from '@/composables';
+import { round } from '@/utils/functional';
 
+export default defineComponent({
+  name: 'LabeledField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: [String, Number, Boolean, Array, Object, Date] as PropType<any>,
+      default: null,
+    },
+    number: {
+      type: Boolean,
+      default: false,
+    },
+    suffix: {
+      type: String,
+      default: '',
+    },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+    readonly: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  emits: [
+    'click',
+  ],
+  setup(props, { slots, emit }) {
+    const fieldRef = ref<QField>();
+    const { activeSlots } = useField.setup();
 
-@Component
-export default class LabeledField extends FieldBase {
+    const displayValue = computed<string>(
+      () => {
+        if (slots.control || slots.default) {
+          return ''; // parent has custom implementation
+        }
+        if (props.modelValue == null || props.modelValue === '') {
+          return '<not set>';
+        }
+        return props.number
+          ? round(props.modelValue, props.decimals)
+          : `${props.modelValue}`;
+      },
+    );
 
-  @Prop({ default: null })
-  public readonly value!: any;
+    onMounted(() => {
+      if (fieldRef.value) {
+        // Quasar fields have changed to use inheritAttrs: false,
+        // and do not have a click event handler
+        // We can bypass this by setting the click handler on the top-level html element
+        fieldRef.value.$el.onclick = () => emit('click');
+      }
+    });
 
-  @Prop({ type: Boolean, default: false })
-  public readonly number!: boolean;
-
-  @Prop({ type: String, required: false })
-  public readonly suffix!: string;
-
-  @Prop({ type: Number, default: 2 })
-  readonly decimals!: number;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly readonly!: boolean;
-
-  get displayValue(): string | number {
-    if (this.$slots.control || this.$slots.default) {
-      return ''; // parent has custom implementation
-    }
-    if ((this.value ?? '') === '') {
-      return '<not set>';
-    }
-    return this.number
-      ? round(this.value, this.decimals)
-      : this.value;
-  }
-
-  // Can't be placed in parent class
-  get activeSlots(): string[] {
-    return Object.keys(this.$slots)
-      .filter(s => this.fieldSlots.includes(s));
-  }
-}
+    return {
+      fieldRef,
+      activeSlots,
+      displayValue,
+    };
+  },
+});
 </script>
 
 <template>
   <q-field
-    :class="[$attrs.class, 'rounded-borders q-px-sm', !readonly && 'depth-1 pointer']"
-    v-bind="$attrs"
+    ref="fieldRef"
+    :class="['rounded-borders q-px-sm', !readonly && 'depth-1 pointer']"
     borderless
     label-slot
     stack-label
-    @click.native="$emit('click')"
   >
     <template #label>
       <slot name="label">
@@ -73,10 +98,8 @@ export default class LabeledField extends FieldBase {
       </slot>
     </template>
 
-    <template v-for="slot in activeSlots">
-      <template :slot="slot">
-        <slot :name="slot" />
-      </template>
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
 
     <q-tooltip v-if="tooltip">

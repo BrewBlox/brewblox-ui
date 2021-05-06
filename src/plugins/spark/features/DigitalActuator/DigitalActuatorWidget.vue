@@ -1,88 +1,112 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { mutate, typeMatchFilter } from '@/helpers/functional';
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, DigitalActuatorBlock, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
+import { mutate, typeMatchFilter } from '@/utils/functional';
 
-@Component
-export default class DigitalActuatorWidget
-  extends BlockWidgetBase<DigitalActuatorBlock> {
-
-  get hwBlock(): Block | null {
-    return this.sparkModule.blockById(this.block.data.hwDevice.id);
-  }
-
-  get claimedChannels(): { [channel: number]: string } {
-    if (!this.hwBlock) {
-      return {};
-    }
-    const targetId = this.hwBlock.id;
-    return this.sparkModule
-      .blocks
-      .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
-      .filter(block => block.data.hwDevice.id === targetId)
-      .reduce((acc, block) => mutate(acc, block.data.channel, block.id), {});
-  }
-
-  pinOptName(idx: number): string {
-    const driver = this.claimedChannels[idx + 1];
-    const [name] = Object.keys(this.hwBlock!.data.pins[idx]);
-    return driver && driver !== this.block.id
-      ? `${name} (replace '${driver}')`
-      : name;
-  }
-
-  get channelOpts(): SelectOption[] {
-    const opts = [{ label: 'Not set', value: 0 }];
-    if (this.hwBlock) {
-      opts.push(
-        ...Object.keys(this.hwBlock.data.pins || this.hwBlock.data.channels)
-          .map((k, idx) => ({ label: this.pinOptName(idx), value: idx + 1 })));
-    }
-    return opts;
-  }
-
-  async claimChannel(pinId: number): Promise<void> {
-    if (this.block.data.channel === pinId) {
-      return;
-    }
-    const currentDriverId = this.claimedChannels[pinId] ?? null;
-    if (currentDriverId) {
-      const currentDriverBlock = this.sparkModule.blockById<DigitalActuatorBlock>(currentDriverId)!;
-      currentDriverBlock.data.channel = 0;
-      await this.sparkModule.saveBlock(currentDriverBlock);
-    }
-    this.block.data.channel = pinId;
-    await this.saveBlock();
-  }
-
-  filterDS2408(block: Block): boolean {
-    return block.type !== BlockType.DS2408
-      || (block as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
-  }
+interface ClaimDict {
+  [channel: number]: string; // block ID of driver
 }
+
+export default defineComponent({
+  name: 'DigitalActuatorWidget',
+  setup() {
+    const {
+      inDialog,
+      context,
+    } = useContext.setup();
+    const {
+      serviceId,
+      sparkModule,
+      block,
+      saveBlock,
+      isDriven,
+      constrainers,
+    } = useBlockWidget.setup<DigitalActuatorBlock>();
+
+    const hwBlock = computed<Block | null>(
+      () => sparkModule.blockById(block.value.data.hwDevice.id),
+    );
+
+    const claimedChannels = computed<ClaimDict>(
+      () => {
+        if (!hwBlock.value) {
+          return {};
+        }
+        const targetId = hwBlock.value.id;
+        return sparkModule
+          .blocks
+          .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
+          .filter(block => block.data.hwDevice.id === targetId)
+          .reduce((acc: ClaimDict, b) => mutate(acc, b.data.channel, b.id), {});
+      },
+    );
+
+    function pinOptName(idx: number): string {
+      const driver = claimedChannels.value[idx + 1];
+      const [name] = Object.keys(hwBlock.value!.data.pins[idx]);
+      return driver && driver !== block.value.id
+        ? `${name} (replace '${driver}')`
+        : name;
+    }
+
+    const channelOpts = computed<SelectOption<number>[]>(
+      () => {
+        const opts = [{ label: 'Not set', value: 0 }];
+        if (hwBlock.value) {
+          opts.push(
+            ...Object.keys(hwBlock.value.data.pins || hwBlock.value.data.channels)
+              .map((k, idx) => ({ label: pinOptName(idx), value: idx + 1 })));
+        }
+        return opts;
+      },
+    );
+
+    async function claimChannel(pinId: number): Promise<void> {
+      if (block.value.data.channel === pinId) {
+        return;
+      }
+      const currentDriverId = claimedChannels.value[pinId] ?? null;
+      if (currentDriverId) {
+        const currentDriverBlock = sparkModule.blockById<DigitalActuatorBlock>(currentDriverId)!;
+        currentDriverBlock.data.channel = 0;
+        await sparkModule.saveBlock(currentDriverBlock);
+      }
+      block.value.data.channel = pinId;
+      await saveBlock();
+    }
+
+    function filterDS2408(b: Block): boolean {
+      return b.type !== BlockType.DS2408
+        || (b as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
+    }
+
+    return {
+      inDialog,
+      context,
+      serviceId,
+      block,
+      saveBlock,
+      isDriven,
+      constrainers,
+      channelOpts,
+      claimChannel,
+      filterDS2408,
+    };
+  },
+});
 </script>
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-    v-bind="{context}"
-  >
-    <template #graph>
-      <HistoryGraph
-        :graph-id="widget.id"
-        :config="graphCfg"
-        :refresh-trigger="mode"
-        use-range
-        use-presets
-        @params="saveGraphParams"
-        @layout="saveGraphLayout"
-      />
+  <PreviewCard :enabled="inDialog">
+    <template #preview>
+      <BlockHistoryGraph />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
     <div class="widget-md">
@@ -98,46 +122,46 @@ export default class DigitalActuatorWidget
           tag-class="full-width row justify-center"
         >
           <DigitalStateButton
-            :value="block.data.desiredState"
+            :model-value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
             :pending-reason="constrainers"
             :disable="isDriven"
             dense
             class="col-auto"
-            @input="v => { block.data.desiredState = v; saveBlock(); }"
+            @update:model-value="v => { block.data.desiredState = v; saveBlock(); }"
           />
         </LabeledField>
 
-        <template v-if="mode === 'Full'">
+        <template v-if="context.mode === 'Full'">
           <div class="col-break" />
 
           <LinkField
-            :value="block.data.hwDevice"
+            :model-value="block.data.hwDevice"
             :service-id="serviceId"
             :creatable="false"
             :block-filter="filterDS2408"
             title="Pin Array"
             label="Target Pin Array"
             class="col-grow"
-            @input="v => { block.data.hwDevice = v; block.data.channel = 0; saveBlock(); }"
+            @update:model-value="v => { block.data.hwDevice = v; block.data.channel = 0; saveBlock(); }"
           />
           <SelectField
-            :value="block.data.channel"
+            :model-value="block.data.channel"
             :options="channelOpts"
             :readonly="!block.data.hwDevice.id"
             title="Pin Channel"
             label="Pin Channel"
             class="col-grow"
-            @input="claimChannel"
+            @update:model-value="claimChannel"
           />
           <LabeledField
             label="Invert"
             class="col-grow"
           >
             <q-toggle
-              :value="block.data.invert"
+              :model-value="block.data.invert"
               dense
-              @input="v => { block.data.invert = v; saveBlock(); }"
+              @update:model-value="v => { block.data.invert = v; saveBlock(); }"
             />
           </LabeledField>
         </template>
@@ -150,13 +174,13 @@ export default class DigitalActuatorWidget
           class="col-grow"
         />
         <ConstraintsField
-          :value="block.data.constrainedBy"
+          :model-value="block.data.constrainedBy"
           :service-id="serviceId"
           type="digital"
           class="col-grow"
-          @input="v => { block.data.constrainedBy = v; saveBlock(); }"
+          @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
         />
       </div>
     </div>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>

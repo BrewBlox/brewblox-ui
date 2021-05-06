@@ -1,61 +1,67 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { Link } from '@/helpers/bloxfield';
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { PidBlock } from '@/plugins/spark/types';
+import { Link, prettyLink } from '@/utils/bloxfield';
 
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';
 import { startRelationsDialog } from './relations';
 
-@Component({
+export default defineComponent({
+  name: 'PidWidget',
   components: {
     Basic: PidBasic,
     Full: PidFull,
   },
-})
-export default class PidWidget
-  extends BlockWidgetBase<PidBlock> {
+  setup() {
+    const { context, inDialog } = useContext.setup();
+    const {
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<PidBlock>();
 
-  get inputLink(): Link {
-    return this.block.data.inputId;
-  }
+    const inputLink = computed<Link>(
+      () => block.value.data.inputId,
+    );
 
-  get outputLink(): Link {
-    return this.block.data.outputId;
-  }
+    const outputLink = computed<Link>(
+      () => block.value.data.outputId,
+    );
 
-  enable(): void {
-    this.block.data.enabled = true;
-    this.saveBlock();
-  }
+    function enable(): void {
+      block.value.data.enabled = true;
+      saveBlock();
+    }
 
-  showRelations(): void {
-    startRelationsDialog(this.block);
-  }
-}
+    function showRelations(): void {
+      startRelationsDialog(block.value);
+    }
+
+    return {
+      prettyLink,
+      context,
+      inDialog,
+      block,
+      inputLink,
+      outputLink,
+      enable,
+      showRelations,
+    };
+  },
+});
 </script>
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-    v-bind="{context}"
-  >
-    <template #graph>
-      <HistoryGraph
-        :graph-id="widget.id"
-        :config="graphCfg"
-        :refresh-trigger="mode"
-        use-range
-        use-presets
-        @params="saveGraphParams"
-        @layout="saveGraphLayout"
-      />
+  <PreviewCard :enabled="inDialog">
+    <template #preview>
+      <BlockHistoryGraph />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <BlockWidgetToolbar has-mode-toggle>
         <template #actions>
           <ActionItem
             icon="mdi-vector-line"
@@ -63,10 +69,10 @@ export default class PidWidget
             @click="showRelations"
           />
         </template>
-      </component>
+      </BlockWidgetToolbar>
     </template>
 
-    <component :is="mode" :crud="crud">
+    <component :is="context.mode">
       <template #warnings>
         <CardWarning v-if="!inputLink.id">
           <template #message>
@@ -84,23 +90,22 @@ export default class PidWidget
           <CardWarning v-if="block.data.enabled && !block.data.active">
             <template #message>
               <span>
-                PID is inactive and not driving <i>{{ outputLink | link }}</i>.
+                PID is inactive and not driving <i>{{ prettyLink(outputLink) }}</i>.
               </span>
             </template>
           </CardWarning>
           <BlockEnableToggle
-            :hide-enabled="mode === 'Basic'"
-            :crud="crud"
+            :hide-enabled="context.mode === 'Basic'"
           >
             <template #enabled>
-              PID is enabled and driving <i>{{ outputLink | link }}</i>.
+              PID is enabled and driving <i>{{ prettyLink(outputLink) }}</i>.
             </template>
             <template #disabled>
-              PID is disabled and not driving <i>{{ outputLink | link }}</i>.
+              PID is disabled and not driving <i>{{ prettyLink(outputLink) }}</i>.
             </template>
           </BlockEnableToggle>
         </template>
       </template>
     </component>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>

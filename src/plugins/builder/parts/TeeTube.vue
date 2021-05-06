@@ -1,41 +1,61 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { LEFT, RIGHT, UP } from '../getters';
+import { LEFT, RIGHT, UP } from '@/plugins/builder/const';
 
-@Component
-export default class TeeTube extends PartBase {
-  readonly paths = {
-    top: 'M25,25 V0',
-    left: 'M25,25 H0',
-    right: 'M25,25 H50',
-  };
+import { FlowPart } from '../types';
+import { flowOnCoord, liquidOnCoord } from '../utils';
 
-  get topSpeed(): number {
-    return this.flowOnCoord(UP);
-  }
+const paths = {
+  top: 'M25,25 V0',
+  left: 'M25,25 H0',
+  right: 'M25,25 H50',
+};
 
-  get leftSpeed(): number {
-    return this.flowOnCoord(LEFT);
-  }
+export default defineComponent({
+  name: 'TeeTube',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const topSpeed = computed<number>(
+      () => flowOnCoord(props.part, UP),
+    );
 
-  get rightSpeed(): number {
-    return this.flowOnCoord(RIGHT);
-  }
+    const leftSpeed = computed<number>(
+      () => flowOnCoord(props.part, LEFT),
+    );
 
-  get topLiquids(): string[] {
-    return this.liquidOnCoord(UP);
-  }
+    const rightSpeed = computed<number>(
+      () => flowOnCoord(props.part, RIGHT),
+    );
 
-  get leftLiquids(): string[] {
-    return this.liquidOnCoord(LEFT);
-  }
+    const topLiquids = computed<string[]>(
+      () => liquidOnCoord(props.part, UP),
+    );
 
-  get rightLiquids(): string[] {
-    return this.liquidOnCoord(RIGHT);
-  }
-}
+    const leftLiquids = computed<string[]>(
+      () => liquidOnCoord(props.part, LEFT),
+    );
+
+    const rightLiquids = computed<string[]>(
+      () => liquidOnCoord(props.part, RIGHT),
+    );
+
+    return {
+      paths,
+      topSpeed,
+      leftSpeed,
+      rightSpeed,
+      topLiquids,
+      leftLiquids,
+      rightLiquids,
+    };
+  },
+});
 </script>
 
 <template>

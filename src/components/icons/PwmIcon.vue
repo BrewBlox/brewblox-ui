@@ -1,20 +1,23 @@
 <script lang="ts">
-/* eslint-disable vue/attribute-hyphenation */
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component
-export default class PwmIcon extends Vue {
-  @Prop({ type: String, default: '25px' })
-  public readonly size!: string;
-
-  @Prop({ type: String, default: 'white' })
-  public readonly color!: string;
-}
+export default defineComponent({
+  name: 'PwmIcon',
+  props: {
+    size: {
+      type: String,
+      default: '25px',
+    },
+    color: {
+      type: String,
+      default: 'white',
+    },
+  },
+});
 </script>
 
 <template>
-  <q-icon :size="size" class="static" v-bind="$attrs">
+  <q-icon :size="size" class="static">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 50 50"

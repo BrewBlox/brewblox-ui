@@ -1,26 +1,35 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import { saveFile } from '@/helpers/import-export';
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { SetpointProfileBlock } from '@/plugins/spark/types';
+import { saveFile } from '@/utils/import-export';
 
+export default defineComponent({
+  name: 'ProfileExportAction',
+  props: {
+    icon: {
+      type: String,
+      default: 'mdi-file-export',
+    },
+    label: {
+      type: String,
+      default: 'Export profile to file',
+    },
+  },
+  setup() {
+    const { block } = useBlockWidget.setup<SetpointProfileBlock>();
 
-@Component
-export default class ProfileExportAction
-  extends BlockCrudComponent<SetpointProfileBlock> {
+    function startExport(): void {
+      const { points } = block.value.data;
+      saveFile({ points }, `${block.value.serviceId}-${block.value.id}.profile.json`);
+    }
 
-  @Prop({ type: String, default: 'mdi-file-export' })
-  readonly icon!: string;
-
-  @Prop({ type: String, default: 'Export profile to file' })
-  readonly label!: string;
-
-  startExport(): void {
-    const { points } = this.block.data;
-    saveFile({ points }, `${this.block.serviceId}-${this.block.id}.profile.json`);
-  }
-}
+    return {
+      startExport,
+    };
+  },
+});
 </script>
 
 <template>

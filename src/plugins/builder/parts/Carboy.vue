@@ -1,10 +1,12 @@
 <script lang="ts">
 import svgpath from 'svgpath';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { colorString } from '../helpers';
+import { colorString, squares } from '@/plugins/builder/utils';
+
+import { usePart } from '../composables';
 import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../specs/Carboy';
+import { FlowPart } from '../types';
 
 const basePath = `
     M89.2,199
@@ -22,34 +24,57 @@ const basePath = `
     C99,194.6,94.6,199,89.2,199
     z`;
 
-@Component
-export default class Carboy extends PartBase {
+export default defineComponent({
+  name: 'Carboy',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+    } = usePart.setup(props.part);
 
-  get color(): string {
-    return colorString(this.part.settings.color);
-  }
+    const color = computed<string>(
+      () => colorString(props.part.settings.color),
+    );
 
-  get scaleX(): number {
-    return this.sizeX / DEFAULT_SIZE_X;
-  }
+    const scaleX = computed<number>(
+      () => sizeX.value / DEFAULT_SIZE_X,
+    );
 
-  get scaleY(): number {
-    return this.sizeY / DEFAULT_SIZE_Y;
-  }
+    const scaleY = computed<number>(
+      () => sizeY.value / DEFAULT_SIZE_Y,
+    );
 
-  get valueY(): number {
-    return Math.round(this.sizeY / 4);
-  }
+    const valueY = computed<number>(
+      () => Math.round(sizeY.value / 4),
+    );
 
-  get path(): string {
-    return this.scaleX === 1 && this.scaleY === 1
-      ? basePath
-      : svgpath(basePath)
-        .transform(`scale(${this.scaleX} ${this.scaleY})`)
-        .round(1)
-        .toString();
-  }
-}
+    const path = computed<string>(
+      () => scaleX.value === 1 && scaleY.value === 1
+        ? basePath
+        : svgpath(basePath)
+          .transform(`scale(${scaleX.value} ${scaleY.value})`)
+          .round(1)
+          .toString(),
+    );
+
+    return {
+      squares,
+      color,
+      sizeX,
+      sizeY,
+      scaleX,
+      scaleY,
+      valueY,
+      path,
+    };
+  },
+});
 </script>
 
 <template>
@@ -63,16 +88,15 @@ export default class Carboy extends PartBase {
       ry="8"
     />
     <g class="outline">
-      <path
-        :d="path"
-      />
-      <SetpointValues
-        :part="part"
-        :start-y="valueY"
-        :start-x="sizeX / 2 - 1"
-        :background-color="color"
-        hide-unset
-      />
+      <path :d="path" />
     </g>
+    <SetpointValues
+      :part="part"
+      :start-y="valueY"
+      :start-x="sizeX / 2 - 1"
+      :background-color="color"
+      settings-key="setpoint"
+      hide-unset
+    />
   </g>
 </template>

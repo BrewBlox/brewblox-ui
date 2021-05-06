@@ -1,41 +1,62 @@
 <script lang="ts">
 import { debounce } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartCard from './PartCard';
+import { FlowPart } from '../types';
 
-@Component
-export default class PressureCard extends PartCard {
-  @Prop({ type: String, required: true })
-  public readonly settingsKey!: string;
+export default defineComponent({
+  name: 'PressureCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'Pressure',
+    },
+    defaultValue: {
+      type: Number,
+      required: true,
+    },
+    min: {
+      type: Number,
+      required: true,
+    },
+    max: {
+      type: Number,
+      required: true,
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
+    const value = computed<number>(
+      () => props.part.settings[props.settingsKey] ?? props.defaultValue,
+    );
 
-  @Prop({ type: String, default: 'Pressure' })
-  public readonly label!: string;
+    const save = debounce((v: number | null): void => {
+      const pressure = v ?? props.defaultValue;
+      emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          [props.settingsKey]: pressure,
+        },
+      });
+    }, 50, true);
 
-  @Prop({ type: Number, required: true })
-  public readonly defaultValue!: number;
-
-  @Prop({ type: Number, required: true })
-  public readonly min!: number;
-
-  @Prop({ type: Number, required: true })
-  public readonly max!: number;
-
-  get value(): number {
-    return this.part.settings[this.settingsKey] ?? this.defaultValue;
-  }
-
-  save(val: number): void {
-    const pressure = val ?? this.defaultValue;
-    this.savePartSettings({ ...this.part.settings, [this.settingsKey]: pressure });
-  }
-
-  debouncedSave = debounce(this.save, 50, true)
-
-  reset(): void {
-    this.debouncedSave(this.defaultValue);
-  }
-}
+    return {
+      value,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
@@ -44,10 +65,10 @@ export default class PressureCard extends PartCard {
       <q-item-label caption>
         {{ label }}
       </q-item-label>
-      <q-slider :value="value" :min="min" :max="max" @change="debouncedSave" />
+      <q-slider :model-value="value" :min="min" :max="max" @change="save" />
     </q-item-section>
     <q-item-section class="col-auto">
-      <q-btn icon="mdi-backup-restore" flat round size="sm" @click="reset">
+      <q-btn icon="mdi-backup-restore" flat round size="sm" @click="save(null)">
         <q-tooltip>
           Reset to default
         </q-tooltip>

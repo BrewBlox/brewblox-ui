@@ -1,90 +1,126 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 
-@Component
-export default class WizardDialog extends DialogBase {
-  dialogTitle: string | null = null;
-  activeWizard: string | null = null;
-  activeProps: any = {};
+export default defineComponent({
+  name: 'WizardDialog',
+  props: {
+    ...useDialog.props,
+    activeDashboardId: {
+      type: String,
+      default: null,
+    },
+    initialWizard: {
+      type: String,
+      default: null,
+    },
+    initialProps: {
+      type: Object,
+      default: () => ({}),
+    },
+    showMenu: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
+    const { dense } = useGlobals.setup();
 
-  @Prop({ type: String, required: false })
-  readonly activeDashboardId!: string | undefined;
+    const dialogTitle = ref<string>('Wizardry');
+    const activeWizard = ref<string | null>(props.initialWizard);
+    const activeProps = ref(props.initialProps);
 
-  @Prop({ type: String, required: false })
-  readonly initialWizard!: string | undefined;
+    const sparkServiceAvailable = computed<boolean>(
+      () => sparkStore.modules.length > 0,
+    );
 
-  @Prop({ type: Object, default: () => ({}) })
-  readonly initialProps!: any;
+    const primaryDashboardId = computed<string | null>(
+      () => {
+        const { homePage } = systemStore.config;
+        if (!homePage || !homePage.startsWith('/dashboard')) {
+          return null;
+        }
+        return homePage.split('/')[2] ?? null;
+      },
+    );
 
-  @Prop({ type: Boolean, default: true })
-  readonly showMenu!: boolean;
+    const dashboardId = computed<string | null>(
+      () => props.activeDashboardId
+        ?? primaryDashboardId.value
+        ?? dashboardStore.dashboardIds[0]
+        ?? null,
+    );
 
-  get sparkServiceAvailable(): boolean {
-    return sparkStore.modules.length > 0;
-  }
-
-  get primaryDashboardId(): string | null {
-    const { homePage } = systemStore.config;
-    if (!homePage || !homePage.startsWith('/dashboard')) {
-      return null;
+    function reset(): void {
+      activeWizard.value = null;
+      dialogTitle.value = 'Wizardry';
     }
-    return homePage.split('/')[2] ?? null;
-  }
 
-  get dashboardId(): string | null {
-    return this.activeDashboardId
-      ?? this.primaryDashboardId
-      ?? dashboardStore.dashboardIds[0]
-      ?? null;
-  }
-
-  mounted(): void {
-    this.reset();
-    this.pickWizard(this.initialWizard ?? null, this.initialProps);
-  }
-
-  reset(): void {
-    this.activeWizard = null;
-    this.dialogTitle = 'Wizardry';
-  }
-
-  pickWizard(component: string | null, props: any = {}) {
-    this.activeWizard = component;
-    this.activeProps = props;
-  }
-
-  onBack(): void {
-    if (this.showMenu) {
-      this.reset();
+    function pickWizard(component: string | null, props: any = {}): void {
+      activeWizard.value = component;
+      activeProps.value = props;
     }
-    else {
-      this.onDialogHide();
+
+    function onBack(): void {
+      if (props.showMenu) {
+        reset();
+      }
+      else {
+        onDialogHide();
+      }
     }
-  }
 
-  onClose(): void {
-    this.onDialogHide();
-  }
+    function onClose(): void {
+      onDialogHide();
+    }
 
-  onDone(...args: any[]): void {
-    this.onDialogOk(...args);
-  }
-}
+    function onDone(...args: any[]): void {
+      onDialogOK(...args);
+    }
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      dense,
+      dialogTitle,
+      activeWizard,
+      activeProps,
+      sparkServiceAvailable,
+      dashboardId,
+      reset,
+      pickWizard,
+      onBack,
+      onClose,
+      onDone,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
-    :maximized="$dense"
+    ref="dialogRef"
+    :maximized="dense"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <CardWrapper :no-scroll="!!activeWizard" v-bind="{context}">
+    <Card no-scroll>
       <template #toolbar>
         <DialogToolbar icon="mdi-creation" :title="dialogTitle" />
       </template>
@@ -100,12 +136,12 @@ export default class WizardDialog extends DialogBase {
         @done="onDone"
       />
 
-      <template v-else>
+      <WizardBody v-else>
         <q-card-section>
           <q-item
             :disable="!sparkServiceAvailable"
             clickable
-            @click="pickWizard('QuickStartWizardPicker')"
+            @click="pickWizard('QuickstartWizardPicker')"
           >
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
@@ -253,7 +289,7 @@ export default class WizardDialog extends DialogBase {
             </q-item-section>
           </q-item>
         </q-card-section>
-      </template>
-    </CardWrapper>
+      </WizardBody>
+    </Card>
   </q-dialog>
 </template>

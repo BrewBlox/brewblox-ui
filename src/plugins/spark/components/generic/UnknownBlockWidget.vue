@@ -1,62 +1,53 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
+import { useWidget } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { Block, BlockType } from '@/plugins/spark/types';
+import { BlockWidget } from '@/plugins/spark/types';
 
 interface AbsenceReason {
   message: string;
   temporary: boolean;
 }
 
-@Component
-export default class UnknownBlockWidget extends WidgetBase {
+export default defineComponent({
+  name: 'UnknownBlockWidget',
+  setup() {
+    const {
+      config,
+    } = useWidget.setup<BlockWidget>();
 
-  get serviceId(): string {
-    return this.widget.config.serviceId;
-  }
+    const sparkModule = computed<SparkServiceModule>(
+      () => sparkStore.moduleById(config.value.serviceId)!,
+    );
 
-  public get sparkModule(): SparkServiceModule {
-    return sparkStore.moduleById(this.serviceId)!;
-  }
+    const reason = computed<AbsenceReason>(
+      () => sparkModule.value.lastBlocks
+        ? {
+          message: `Block ${config.value.blockId} not found on service ${config.value.serviceId}`,
+          temporary: false,
+        }
+        : {
+          message: 'Waiting for service...',
+          temporary: true,
+        },
+    );
 
-  get blockId(): string {
-    return this.widget.config.blockId;
-  }
+    function fetch(): void {
+      sparkModule.value.fetchAll();
+    }
 
-  get block(): Block {
     return {
-      id: this.blockId,
-      serviceId: this.serviceId,
-      type: this.widget.feature as BlockType, // Lies!
-      groups: [],
-      data: {},
+      reason,
+      fetch,
     };
-  }
-
-  get reason(): AbsenceReason {
-    return this.sparkModule.lastBlocks
-      ? {
-        message: `Block ${this.blockId} not found on service ${this.serviceId}`,
-        temporary: false,
-      }
-      : {
-        message: 'Waiting for service...',
-        temporary: true,
-      };
-  }
-
-  fetch(): void {
-    this.sparkModule.fetchAll();
-  }
-}
-
+  },
+});
 </script>
 
 <template>
   <q-card>
-    <component :is="toolbarComponent" :crud="crud">
+    <WidgetToolbar>
       <template #actions>
         <ActionItem
           :disable="!reason.temporary"
@@ -65,7 +56,7 @@ export default class UnknownBlockWidget extends WidgetBase {
           @click="fetch"
         />
       </template>
-    </component>
+    </WidgetToolbar>
 
     <CardWarning color="negative">
       <template #message>

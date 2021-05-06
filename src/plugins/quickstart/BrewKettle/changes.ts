@@ -1,6 +1,5 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
-import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/helpers/bloxfield';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import {
@@ -13,18 +12,19 @@ import {
   PidBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { Widget } from '@/store/widgets';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/utils/bloxfield';
 
-import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock } from '../types';
+import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 
 export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
   return unlinkedActuators(config.serviceId, [config.kettlePin]);
-};
+}
 
 export function defineCreatedBlocks(config: BrewKettleConfig, opts: BrewKettleOpts): Block[] {
   const groups = [0];
@@ -122,7 +122,7 @@ export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, la
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
     ...featureStore.widgetSize(type),
-    id: uid(),
+    id: nanoid(),
     title: name,
     feature: type,
     order: 0,
@@ -175,7 +175,7 @@ export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, la
   });
 
   const createTempControl = (): TempControlWidget => {
-    const modeId = uid();
+    const modeId = nanoid();
 
     return {
       ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),

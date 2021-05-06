@@ -1,5 +1,5 @@
-import { CENTER, LEFT } from '../getters';
-import { PartSpec } from '../types';
+import { CENTER, LEFT } from '@/plugins/builder/const';
+import { PartSpec } from '@/plugins/builder/types';
 
 const spec: PartSpec = {
   id: 'StraightInletTube',

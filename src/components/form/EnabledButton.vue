@@ -1,24 +1,34 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
+export default defineComponent({
+  name: 'EnabledButton',
+  props: {
+    modelValue: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const icon = computed<string>(
+      () => props.modelValue
+        ? 'mdi-checkbox-marked-outline'
+        : 'mdi-checkbox-blank-outline',
+    );
 
-@Component
-export default class EnabledButton extends Vue {
-  @Prop({ type: Boolean, required: true })
-  public readonly value!: boolean;
+    function save(val: boolean): void {
+      emit('update:modelValue', val);
+    }
 
-  save(val: boolean): void {
-    this.$emit('input', val);
-  }
-
-
-  get icon(): string {
-    return this.value
-      ? 'mdi-checkbox-marked-outline'
-      : 'mdi-checkbox-blank-outline';
-  }
-}
+    return {
+      icon,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
@@ -26,7 +36,7 @@ export default class EnabledButton extends Vue {
     flat
     :icon="icon"
     v-bind="$attrs"
-    @click="save(!value)"
+    @click="save(!modelValue)"
   >
     <q-tooltip>
       Toggle enabled

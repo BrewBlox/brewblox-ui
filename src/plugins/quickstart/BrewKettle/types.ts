@@ -1,6 +1,6 @@
-import { JSQuantity } from '@/helpers/bloxfield';
+import { JSQuantity } from '@/utils/bloxfield';
 
-import { PinChannel, QuickStartOutput } from '../types';
+import { PinChannel, QuickstartConfig } from '../types';
 
 export interface BrewKettleBlockNames {
   kettleSensor: string;
@@ -10,8 +10,7 @@ export interface BrewKettleBlockNames {
   kettleAct: string;
 }
 
-export interface BrewKettleConfig extends QuickStartOutput {
-  prefix: string;
+export interface BrewKettleConfig extends QuickstartConfig {
   names: BrewKettleBlockNames;
   kettlePin: PinChannel;
   kettleSensor: string;

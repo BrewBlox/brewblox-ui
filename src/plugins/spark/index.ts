@@ -1,18 +1,19 @@
-import { VueConstructor } from 'vue';
+import { Plugin } from 'vue';
 
-import { autoRegister, ref } from '@/helpers/component-ref';
-import { STATE_TOPIC } from '@/helpers/const';
+import { eventbus } from '@/eventbus';
+import { startup } from '@/startup';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { serviceStore } from '@/store/services';
+import { autoRegister, cref } from '@/utils/component-ref';
+import { STATE_TOPIC } from '@/utils/const';
 
 import features from './features';
 import { sparkType } from './getters';
-import { installFilters, isSparkState } from './helpers';
 import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
 import { sparkStore } from './store';
-import { BlockSpec } from './types';
+import { isSparkState } from './utils';
 
 // Allows lookups based on the old type ID
 // DeprecatedWidget will update the widget in the datastore
@@ -26,34 +27,24 @@ const deprecated: WidgetFeature[] = [
   },
 ];
 
-export default {
-  install(Vue: VueConstructor) {
-    installFilters(Vue);
+const plugin: Plugin = {
+  install(app) {
+    autoRegister(app, require.context('./components', true));
 
-    autoRegister(require.context('./components', true));
+    deprecated.forEach(featureStore.addWidgetFeature);
+    features.forEach(app.use);
 
-    deprecated.forEach(featureStore.registerWidget);
-
-    features
-      .forEach(feature => featureStore.registerWidget(feature.feature));
-
-    const specs = features
-      .filter(f => f.block !== undefined)
-      .map(f => f.block) as BlockSpec[];
-
-    sparkStore.registerSpecs(specs);
-
-    featureStore.registerWatcher({
+    featureStore.addWatcherFeature({
       id: 'SparkWatcher',
-      component: ref(SparkWatcher),
+      component: cref(app, SparkWatcher),
       props: {},
     });
 
-    featureStore.registerService({
+    featureStore.addServiceFeature({
       id: sparkType,
       title: 'Spark Service',
-      pageComponent: ref(SparkPage),
-      configComponent: ref(SparkActions),
+      pageComponent: cref(app, SparkPage),
+      configComponent: cref(app, SparkActions),
       onStart: service => sparkStore.addService(service.id),
       onRemove: service => sparkStore.removeService(service.id),
       wizard: stub => ({
@@ -65,18 +56,20 @@ export default {
     });
 
     // Basic spark state
-    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+`);
+    eventbus.subscribe(`${STATE_TOPIC}/+`);
     // Patch events
-    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+/patch`);
+    eventbus.subscribe(`${STATE_TOPIC}/+/patch`);
     // Firmware update events
-    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+/update`);
+    eventbus.subscribe(`${STATE_TOPIC}/+/update`);
 
-    Vue.$eventbus.addListener(`${STATE_TOPIC}/+`, (_, data) => {
+    eventbus.addListener(`${STATE_TOPIC}/+`, (_, data) => {
       if (isSparkState(data)) {
         serviceStore.ensureStub({ id: data.key, type: sparkType });
       }
     });
 
-    Vue.$startup.onStart(() => sparkStore.start());
+    startup.onStart(() => sparkStore.start());
   },
 };
+
+export default plugin;

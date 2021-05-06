@@ -1,65 +1,93 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { createDialog } from '@/helpers/dialog';
-import { dateString, shortDateString } from '@/helpers/functional';
+import { useField } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { dateString, shortDateString } from '@/utils/functional';
 
-@Component
-export default class DatetimeField extends FieldBase {
+export default defineComponent({
+  name: 'DatetimeField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: [Number, String, Date] as PropType<number | string | Date | null>,
+      default: null,
+    },
+    short: {
+      type: Boolean,
+      default: false,
+    },
+    resetIcon: {
+      type: String,
+      default: 'restore',
+    },
+    label: {
+      type: String,
+      default: 'Date and time',
+    },
+    clearLabel: {
+      type: String,
+      default: '<not set>',
+    },
+    defaultNow: {
+      type: Boolean,
+      default: false,
+    },
+    emitNumber: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-  @Prop({ type: [Number, String, Date] })
-  public readonly value!: number | string | Date | null;
-
-  @Prop({ type: Boolean, default: false })
-  readonly short!: boolean;
-
-  @Prop({ type: String })
-  readonly resetIcon!: string;
-
-  @Prop({ type: String, default: 'Date and time' })
-  public readonly label!: string;
-
-  @Prop({ type: String, default: '<not set>' })
-  readonly clearLabel!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly defaultNow!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly emitNumber!: boolean;
-
-  public save(v: Date): void {
-    const result = this.emitNumber
-      ? v.getTime()
-      : v;
-    this.$emit('input', result);
-  }
-
-  get displayValue(): string {
-    return this.short
-      ? shortDateString(this.value, this.clearLabel)
-      : dateString(this.value, this.clearLabel);
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function save(v: Date): void {
+      const result = props.emitNumber
+        ? v.getTime()
+        : v;
+      emit('update:modelValue', result);
     }
 
-    createDialog({
-      component: 'DatetimeDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: new Date(this.value || (this.defaultNow ? new Date().getTime() : 0)),
-      label: this.label,
-      resetIcon: this.resetIcon,
-      rules: this.rules,
-    })
-      .onOk(v => this.save(v));
-  }
-}
+    const displayValue = computed<string>(
+      () => props.short
+        ? shortDateString(props.modelValue, props.clearLabel)
+        : dateString(props.modelValue, props.clearLabel),
+    );
+
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+
+      const date = new Date(
+        props.modelValue
+        || (props.defaultNow ? new Date().getTime() : 0));
+
+      createDialog({
+        component: 'DatetimeDialog',
+        componentProps: {
+          modelValue: date,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          label: props.label,
+          resetIcon: props.resetIcon,
+          rules: props.rules,
+        },
+      })
+        .onOk(save);
+    }
+
+    return {
+      activeSlots,
+      displayValue,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
@@ -67,5 +95,8 @@ export default class DatetimeField extends FieldBase {
     <slot name="value">
       {{ displayValue }}
     </slot>
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
   </LabeledField>
 </template>

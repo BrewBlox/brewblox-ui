@@ -1,45 +1,58 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount } from 'vue';
 
 import { dashboardStore } from '@/store/dashboards';
 
+export default defineComponent({
+  name: 'DashboardSelect',
+  props: {
+    modelValue: {
+      type: String,
+      default: null,
+    },
+    defaultValue: {
+      type: String,
+      default: null,
+    },
+    label: {
+      type: String,
+      default: 'Dashboard',
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const local = computed<string | null>({
+      get: () => props.modelValue,
+      set: v => emit('update:modelValue', v),
+    });
 
-@Component
-export default class DashboardSelect extends Vue {
+    const options = computed<SelectOption[]>(
+      () => dashboardStore.dashboards
+        .map(dash => ({ label: dash.title, value: dash.id })),
+    );
 
-  @Prop({ type: String, required: false })
-  public readonly value!: string | null;
+    onBeforeMount(() => {
+      if (!props.modelValue && props.defaultValue) {
+        local.value = props.defaultValue;
+      }
+    });
 
-  @Prop({ type: String, required: false })
-  public readonly defaultValue!: string;
-
-  @Prop({ type: String, default: 'Dashboard' })
-  public readonly label!: string;
-
-  mounted(): void {
-    if (!this.value && this.defaultValue) {
-      this.save(this.defaultValue);
-    }
-  }
-
-  get options(): SelectOption[] {
-    return dashboardStore.dashboards
-      .map(dash => ({ label: dash.title, value: dash.id }));
-  }
-
-  save(value: string | null): void {
-    this.$emit('input', value);
-  }
-}
+    return {
+      local,
+      options,
+    };
+  },
+});
 </script>
 
 <template>
   <q-select
-    v-bind="{ label, value, options, ...$attrs }"
+    v-model="local"
+    v-bind="{ label, options, ...$attrs }"
     map-options
     emit-value
-    @input="save"
     @keyup.enter.exact.stop
   />
 </template>

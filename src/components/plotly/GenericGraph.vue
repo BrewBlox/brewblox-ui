@@ -1,15 +1,15 @@
 <script lang="ts">
 import merge from 'lodash/merge';
+import { nanoid } from 'nanoid';
 import { ClickAnnotationEvent, Config, Layout, PlotData, PlotMouseEvent } from 'plotly.js';
-import { uid } from 'quasar';
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import notify from '@/helpers/notify';
+import { useGlobals } from '@/composables';
 import { GraphAnnotation } from '@/plugins/history/types';
+import { createDialog } from '@/utils/dialog';
+import notify from '@/utils/notify';
 
-import PlotlyGraph from './PlotlyGraph';
+import PlotlyGraph from './PlotlyGraph.vue';
 
 const layoutDefaults = (): Partial<Layout> => ({
   title: '',
@@ -53,94 +53,121 @@ const layoutDefaults = (): Partial<Layout> => ({
   hovermode: 'closest',
 });
 
-@Component({
+export default defineComponent({
+  name: 'GenericGraph',
   components: {
     PlotlyGraph,
   },
-})
-export default class GenericGraph extends Vue {
-  id: string = uid();
+  props: {
+    data: {
+      type: Array as PropType<PlotData[]>,
+      required: true,
+    },
+    layout: {
+      type: Object as PropType<Partial<Layout>>,
+      required: true,
+    },
+    annotated: {
+      type: Boolean,
+      default: false,
+    },
+    maximized: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'annotations',
+  ],
+  setup(props, { emit }) {
+    const id = nanoid();
 
-  @Prop({ type: Array, required: true })
-  readonly data!: PlotData[];
+    const { dense } = useGlobals.setup();
 
-  @Prop({ type: Object, required: true })
-  readonly layout!: Partial<Layout>;
+    const plotlyLayout = computed<Partial<Layout>>(
+      () => merge(layoutDefaults(), props.layout),
+    );
 
-  @Prop({ type: Boolean, default: false })
-  public readonly annotated!: boolean;
+    const plotlyConfig = computed<Partial<Config>>(
+      () => ({
+        displaylogo: false,
+        responsive: true,
+        staticPlot: dense.value && !props.maximized,
+      }),
+    );
 
-  @Prop({ type: Boolean, default: false })
-  public readonly maximized!: boolean;
+    const ready = computed<boolean>(
+      () => props.data != null
+        && plotlyLayout.value != null
+        && plotlyConfig.value != null,
+    );
 
-  get plotlyLayout(): Partial<Layout> {
-    return merge(layoutDefaults(), this.layout);
-  }
+    const annotations = computed<GraphAnnotation[]>(
+      () => props.layout.annotations ?? [],
+    );
 
-  get plotlyConfig(): Partial<Config> {
-    return {
-      displaylogo: false,
-      responsive: true,
-      staticPlot: this.$dense && !this.maximized,
-    };
-  }
+    function displayError(msg: string): void {
+      notify.warn(`Failed to render graph: ${msg}`);
+    }
 
-  get ready(): boolean {
-    return this.data !== undefined
-      && this.plotlyLayout !== undefined
-      && this.plotlyConfig !== undefined;
-  }
 
-  get annotations(): GraphAnnotation[] {
-    return this.layout.annotations ?? [];
-  }
+    function onGraphClick(evt: PlotMouseEvent): void {
+      if (!props.annotated || !evt.points.length) { return; }
 
-  displayError(msg: string): void {
-    notify.warn(`Failed to render graph: ${msg}`);
-  }
-
-  onGraphClick(evt: PlotMouseEvent): void {
-    if (!this.annotated || !evt.points.length) { return; }
-
-    const point = evt.points[0];
-    createDialog({
-      component: 'InputDialog',
-      title: 'Add annotation',
-      value: 'New annotation',
-    })
-      .onOk((text: string) => {
-        this.annotations.push({
-          x: point.x as string,
-          y: parseFloat((point.y as number).toPrecision(4)),
-          xref: 'x',
-          yref: point.data.yaxis as 'y',
-          text,
-          visible: true,
-          arrowhead: 7,
-          arrowcolor: 'white',
-          captureevents: true,
+      const point = evt.points[0];
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          modelValue: 'New annotation',
+          title: 'Add annotation',
+        },
+      })
+        .onOk((text: string) => {
+          annotations.value.push({
+            x: point.x as string,
+            y: parseFloat((point.y as number).toPrecision(4)),
+            xref: 'x',
+            yref: point.data.yaxis as 'y',
+            text,
+            visible: true,
+            arrowhead: 7,
+            arrowcolor: 'white',
+            captureevents: true,
+          });
+          emit('annotations', annotations);
         });
-        this.$emit('annotations', this.annotations);
-      });
-  }
+    }
 
-  onAnnotationClick(evt: ClickAnnotationEvent): void {
-    if (!this.annotated || this.annotations.length < evt.index) { return; }
+    function onAnnotationClick(evt: ClickAnnotationEvent): void {
+      if (!props.annotated || annotations.value.length < evt.index) { return; }
 
-    const annotation = this.annotations[evt.index];
-    createDialog({
-      component: 'GraphAnnotationDialog',
-      title: 'Edit annotation',
-      value: annotation.text,
-    })
-      .onOk(({ text, remove }: { text: string; remove: boolean }) => {
-        remove
-          ? this.annotations.splice(evt.index, 1)
-          : this.annotations.splice(evt.index, 1, { ...annotation, text });
-        this.$emit('annotations', this.annotations);
-      });
-  }
-}
+      const annotation = annotations.value[evt.index];
+      createDialog({
+        component: 'GraphAnnotationDialog',
+        componentProps: {
+          title: 'Edit annotation',
+          modelValue: annotation.text,
+        },
+      })
+        .onOk(({ text, remove }: { text: string; remove: boolean }) => {
+          remove
+            ? annotations.value.splice(evt.index, 1)
+            : annotations.value.splice(evt.index, 1, { ...annotation, text });
+          emit('annotations', annotations.value);
+        });
+    }
+
+    return {
+      id,
+      ready,
+      plotlyLayout,
+      plotlyConfig,
+      displayError,
+      onGraphClick,
+      onAnnotationClick,
+    };
+  },
+});
 </script>
 
 <template>

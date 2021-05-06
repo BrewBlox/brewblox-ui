@@ -1,44 +1,69 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import { tempQty } from '@/helpers/bloxfield';
+import { JSQuantity, tempQty } from '@/utils/bloxfield';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { createOutputActions } from '../helpers';
+import { QuickstartAction } from '../types';
+import { createOutputActions } from '../utils';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { FridgeConfig, FridgeOpts } from './types';
 
-@Component
-export default class FridgeSettingsTask extends QuickStartTaskBase<FridgeConfig> {
-  fridgeSetting = tempQty(20);
+export default defineComponent({
+  name: 'FridgeSettingsTask',
+  props: {
+    config: {
+      type: Object as PropType<FridgeConfig>,
+      required: true,
+    },
+    actions: {
+      type: Array as PropType<QuickstartAction[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'update:actions',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const fridgeSetting = ref<JSQuantity>(tempQty(20));
 
-  done(): void {
-    const opts: FridgeOpts = {
-      fridgeSetting: this.fridgeSetting!,
+    function done(): void {
+      const opts: FridgeOpts = {
+        fridgeSetting: fridgeSetting.value,
+      };
+
+      const createdBlocks = defineCreatedBlocks(props.config, opts);
+      const changedBlocks = defineChangedBlocks(props.config);
+      const layouts = defineLayouts(props.config);
+      const widgets = defineWidgets(props.config, opts, layouts);
+      const displayedBlocks = defineDisplayedBlocks(props.config);
+
+      const updates: Partial<FridgeConfig> = {
+        layouts,
+        widgets,
+        changedBlocks,
+        createdBlocks,
+        displayedBlocks,
+      };
+
+      emit('update:config', { ...props.config, ...updates });
+      emit('update:actions', createOutputActions());
+      emit('next');
+    }
+
+    return {
+      fridgeSetting,
+      done,
     };
-    const createdBlocks = defineCreatedBlocks(this.config, opts);
-    const changedBlocks = defineChangedBlocks(this.config);
-    const layouts = defineLayouts(this.config);
-    const widgets = defineWidgets(this.config, opts, layouts);
-    const displayedBlocks = defineDisplayedBlocks(this.config);
-
-    this.pushActions(createOutputActions());
-    this.updateConfig({
-      ...this.config,
-      layouts,
-      widgets,
-      changedBlocks,
-      createdBlocks,
-      displayedBlocks,
-    });
-    this.next();
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -63,9 +88,18 @@ export default class FridgeSettingsTask extends QuickStartTaskBase<FridgeConfig>
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="done"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

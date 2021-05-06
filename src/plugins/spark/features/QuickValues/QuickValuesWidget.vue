@@ -1,130 +1,153 @@
 <script lang="ts">
 import isNumber from 'lodash/isNumber';
 import { debounce } from 'quasar';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
-import { isQuantity, prettyQty, Quantity } from '@/helpers/bloxfield';
-import { roundNumber } from '@/helpers/functional';
-import notify from '@/helpers/notify';
+import { useContext, useWidget } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockField } from '@/plugins/spark/types';
+import { isQuantity, prettyAny, prettyQty, Quantity } from '@/utils/bloxfield';
+import { roundNumber } from '@/utils/functional';
+import notify from '@/utils/notify';
 
-import { QuickValuesConfig } from './types';
+import { QuickValuesWidget } from './types';
 
+export default defineComponent({
+  name: 'QuickValuesWidget',
+  setup() {
+    const { context } = useContext.setup();
+    const {
+      widget,
+      config,
+      saveConfig,
+    } = useWidget.setup<QuickValuesWidget>();
 
-@Component
-export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
+    const fieldValue = computed<Quantity | number | null>(
+      () => sparkStore.fieldByAddress(config.value.addr),
+    );
 
-  get fieldValue(): number | Quantity | null {
-    return sparkStore.fieldByAddress(this.config.addr);
-  }
+    const numValue = computed<number | null>(
+      () => {
+        const v = fieldValue.value;
+        return roundNumber(isQuantity(v) ? v.value : v);
+      },
+    );
 
-  get numValue(): number | null {
-    const v = this.fieldValue;
-    return roundNumber(isQuantity(v) ? v.value : v);
-  }
-
-  blockFilter(block: Block): boolean {
-    return !!sparkStore.spec(block)?.fields.some(f => !f.readonly);
-  }
-
-  fieldFilter(field: BlockField): boolean {
-    const v = field.generate();
-    return !field.readonly && (isNumber(v) || isQuantity(v));
-  }
-
-  stringValue(value: number): string {
-    return isQuantity(this.fieldValue)
-      ? prettyQty({ ...this.fieldValue, value })
-      : `${value}`;
-  }
-
-  appliedValue(value: number): number | Quantity {
-    return isQuantity(this.fieldValue)
-      ? { ...this.fieldValue, value }
-      : value;
-  }
-
-  save(value: number): void {
-    const { field } = this.config.addr;
-    const block = sparkStore.blockByAddress(this.config.addr);
-    if (block && field) {
-      block.data[field] = this.appliedValue(value);
-      sparkStore.saveBlock(block);
-    }
-  }
-
-  debouncedSave = debounce(this.save, 300, true);
-
-  addValue(value: string, done: ((v?: number) => void)): void {
-    const parsed = Number(value);
-
-    if (Number.isFinite(parsed)) {
-      done(parsed);
-    }
-    else {
-      notify.warn(`Input value is not a number: '${value}'`);
-      done();
-    }
-  }
-
-  addSliderValue(value: string, done: ((v?: number[]) => void)): void {
-    const parsed = value
-      .split(/[,:]/)
-      .map(Number);
-
-    let [min, max, step] = parsed;
-
-    if (max === undefined) {
-      max = min;
-      min = 0;
+    function blockFilter(block: Block): boolean {
+      return !!sparkStore.spec(block)?.fields.some(f => !f.readonly);
     }
 
-    if (step === undefined) {
-      step = 1;
+    function fieldFilter(field: BlockField): boolean {
+      const v = field.generate();
+      return !field.readonly && (isNumber(v) || isQuantity(v));
     }
 
-    if (parsed.length > 3) {
-      notify.warn(`Too many values: '${value}'`);
-      return done();
+    function stringValue(value: number): string {
+      return isQuantity(fieldValue.value)
+        ? prettyQty({ ...fieldValue.value, value })
+        : `${value}`;
     }
 
-    if ([min, max, step].some(v => !Number.isFinite(v))) {
-      notify.warn(`Unable to parse: '${value}'`);
-      return done();
+    function appliedValue(value: number): number | Quantity {
+      return isQuantity(fieldValue.value)
+        ? { ...fieldValue.value, value }
+        : value;
     }
 
-    done([min, max, step]);
-  }
-}
+    const debouncedSave = debounce((value: number): void => {
+      const { field } = config.value.addr;
+      const block = sparkStore.blockByAddress(config.value.addr);
+      if (block && field) {
+        block.data[field] = appliedValue(value);
+        sparkStore.saveBlock(block);
+      }
+    }, 300, true);
+
+    function addValue(value: string, done: ((v?: number) => void)): void {
+      const parsed = Number(value);
+
+      if (Number.isFinite(parsed)) {
+        done(parsed);
+      }
+      else {
+        notify.warn(`Input value is not a number: '${value}'`);
+        done();
+      }
+    }
+
+    function addSliderValue(value: string, done: ((v?: number[]) => void)): void {
+      const parsed = value
+        .split(/[,:]/)
+        .map(Number);
+
+      let [min, max, step] = parsed;
+
+      if (max === undefined) {
+        max = min;
+        min = 0;
+      }
+
+      if (step === undefined) {
+        step = 1;
+      }
+
+      if (parsed.length > 3) {
+        notify.warn(`Too many values: '${value}'`);
+        return done();
+      }
+
+      if ([min, max, step].some(v => !Number.isFinite(v))) {
+        notify.warn(`Unable to parse: '${value}'`);
+        return done();
+      }
+
+      done([min, max, step]);
+    }
+
+    return {
+      prettyAny,
+      context,
+      widget,
+      config,
+      saveConfig,
+      fieldValue,
+      numValue,
+      blockFilter,
+      fieldFilter,
+      stringValue,
+      debouncedSave,
+      addValue,
+      addSliderValue,
+    };
+  },
+});
 </script>
 
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <WidgetToolbar has-mode-toggle />
     </template>
 
     <div
-      v-if="mode === 'Basic'"
+      v-if="context.mode === 'Basic'"
       class="widget-body row justify-center"
     >
       <template v-if="widget.rows > 2 && widget.cols > 2">
         <BlockFieldAddressField
-          :value="config.addr"
+          :model-value="config.addr"
           :block-filter="blockFilter"
           :field-filter="fieldFilter"
           class="col-grow fade-2"
           show-value
 
-          @input="v => { config.addr = v; saveConfig(); }"
+          @update:model-value="v => { config.addr = v; saveConfig(); }"
         />
       </template>
       <template v-else>
         <div class="text-h6 text-secondary">
-          {{ fieldValue | pretty }}
+          {{ prettyAny(fieldValue) }}
         </div>
       </template>
 
@@ -154,9 +177,9 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
           {{ min }}
         </div>
         <q-slider
-          :value="numValue"
-          :min="Math.min(min, numValue)"
-          :max="Math.max(max, numValue)"
+          :model-value="numValue"
+          :min="Math.min(min, numValue ?? min)"
+          :max="Math.max(max, numValue ?? max)"
           :step="step"
           label-always
           class="col-grow"
@@ -172,19 +195,19 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
     </div>
 
     <div
-      v-if="mode === 'Full'"
+      v-if="context.mode === 'Full'"
       class="widget-body column"
     >
       <BlockFieldAddressField
-        :value="config.addr"
+        :model-value="config.addr"
         :block-filter="blockFilter"
         :field-filter="fieldFilter"
         class="col-grow"
         show-value
-        @input="v => { config.addr = v; saveConfig(); }"
+        @update:model-value="v => { config.addr = v; saveConfig(); }"
       />
       <q-select
-        :value="config.values"
+        :model-value="config.values"
         label="Preset values"
         use-chips
         use-input
@@ -192,14 +215,14 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
         hide-dropdown-icon
         class="col-grow"
         @new-value="addValue"
-        @input="v => { config.values = v; saveConfig(); }"
+        @update:model-value="v => { config.values = v; saveConfig(); }"
       >
         <q-tooltip>
           Add a new value, and press ENTER.
         </q-tooltip>
       </q-select>
       <q-select
-        :value="config.sliders"
+        :model-value="config.sliders"
         label="Preset sliders"
         use-chips
         use-input
@@ -207,9 +230,9 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
         hide-dropdown-icon
         class="col-grow"
         @new-value="addSliderValue"
-        @input="v => { config.sliders = v; saveConfig(); }"
+        @update:model-value="v => { config.sliders = v; saveConfig(); }"
       >
-        <template v-slot:selected-item="scope">
+        <template #selected-item="scope">
           <q-chip
             removable
             dense
@@ -231,5 +254,5 @@ export default class QuickValuesWidget extends WidgetBase<QuickValuesConfig> {
         </q-tooltip>
       </q-select>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

@@ -1,87 +1,133 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import { objectStringSorter } from '@/helpers/functional';
-import WizardBase from '@/plugins/wizardry/WizardBase';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { createDialog } from '@/utils/dialog';
+import { objectStringSorter } from '@/utils/functional';
 
-@Component
-export default class WidgetWizardPicker extends WizardBase {
-  feature: any = null;
-  wizardActive = false;
-  filter = '';
+import { useWizard } from '../composables';
 
-  mounted(): void {
-    this.reset();
-  }
-
-  get experimental(): boolean {
-    return systemStore.config.experimental;
-  }
-
-  get wizardOptions(): SelectOption[] {
-    return featureStore.widgets
-      .filter(feature => this.experimental || !feature.experimental)
-      .map(feature => ({
-        label: feature.title,
-        value: feature.id,
-        component: featureStore.widgetWizard(feature.id),
-        badge: feature.experimental ? 'experimental' : null,
-      }))
-      .filter(opt => opt.component !== null)
-      .sort(objectStringSorter('label'));
-  }
-
-  get filteredOptions(): SelectOption[] {
-    if (!this.filter) {
-      return this.wizardOptions;
-    }
-    const needle = this.filter.toLowerCase();
-    return this.wizardOptions
-      .filter(opt => opt.label.toLowerCase().match(needle));
-  }
-
-  get valuesOk(): boolean {
-    return this.feature !== null;
-  }
-
-  showSearchKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.filter,
-    })
-      .onOk((v: string) => this.filter = v);
-  }
-
-  reset(): void {
-    this.wizardActive = false;
-    this.setDialogTitle('Widget wizard');
-    this.filter = '';
-  }
-
-  next(): void {
-    if (!this.valuesOk) { return; }
-    this.wizardActive = true;
-    this.setDialogTitle(`${this.feature.label} wizard`);
-  }
+interface WidgetFeatureOption {
+  label: string,
+  value: string,
+  component: string,
+  badge: string | null,
 }
+
+export default defineComponent({
+  name: 'WidgetWizardPicker',
+  props: {
+    ...useWizard.props,
+  },
+  emits: [
+    ...useWizard.emits,
+  ],
+  setup() {
+    const feature = ref<WidgetFeatureOption | null>(null);
+    const wizardActive = ref<boolean>(false);
+    const filter = ref<string>('');
+    const {
+      onBack,
+      onClose,
+      onDone,
+      setDialogTitle,
+    } = useWizard.setup();
+
+    function reset(): void {
+      wizardActive.value = false;
+      setDialogTitle('Widget wizard');
+      filter.value = '';
+    }
+
+    onBeforeMount(() => reset());
+
+    const experimental = computed<boolean>(
+      () => systemStore.config.experimental,
+    );
+
+    const wizardOpts = computed<WidgetFeatureOption[]>(
+      () => featureStore.widgets
+        .filter(feature => experimental.value || !feature.experimental)
+        .map(feature => ({
+          label: feature.title,
+          value: feature.id,
+          component: featureStore.widgetWizard(feature.id),
+          badge: feature.experimental ? 'experimental' : null,
+        }))
+        .filter((opt): opt is WidgetFeatureOption => opt.component !== null)
+        .sort(objectStringSorter('label')),
+    );
+
+    const filteredOpts = computed<SelectOption[]>(
+      () => {
+        if (!filter.value) {
+          return wizardOpts.value;
+        }
+        const needle = filter.value.toLowerCase();
+        return wizardOpts
+          .value
+          .filter(opt => opt.label.toLowerCase().match(needle));
+      },
+    );
+
+    const valuesOk = computed<boolean>(
+      () => feature.value !== null,
+    );
+
+    function showSearchKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: filter.value,
+        },
+      })
+        .onOk((v: string) => filter.value = v);
+    }
+
+    function next(): void {
+      if (feature.value === null) { return; }
+      wizardActive.value = true;
+      setDialogTitle(`${feature.value.label} wizard`);
+    }
+
+    function confirm(opt: WidgetFeatureOption | null): void {
+      feature.value = opt;
+      next();
+    }
+
+    return {
+      onBack,
+      onClose,
+      onDone,
+      setDialogTitle,
+      filter,
+      feature,
+      wizardActive,
+      reset,
+      filteredOpts,
+      valuesOk,
+      showSearchKeyboard,
+      next,
+      confirm,
+    };
+  },
+});
 </script>
 
 <template>
   <component
     :is="feature.component"
-    v-if="wizardActive"
+    v-if="feature && wizardActive"
     :feature-id="feature.value"
     :active-dashboard-id="activeDashboardId"
     @title="setDialogTitle"
     @back="reset"
-    @close="close"
-    @done="done"
+    @close="onClose"
+    @done="onDone"
   />
 
-  <ActionCardBody v-else @keyup.ctrl.enter="next">
+  <WizardBody v-else @keyup.ctrl.enter="next">
     <div class="widget-body column">
       <q-input
         v-model="filter"
@@ -97,15 +143,19 @@ export default class WidgetWizardPicker extends WizardBase {
       </q-input>
       <ListSelect
         v-model="feature"
-        :options="filteredOptions"
+        :options="filteredOpts"
         option-value="value"
         option-label="label"
-        @confirm="v => { feature = v; next(); }"
+        @confirm="confirm"
       />
     </div>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
       <q-btn
         :disable="!valuesOk"
@@ -115,5 +165,5 @@ export default class WidgetWizardPicker extends WizardBase {
         @click="next"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

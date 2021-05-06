@@ -1,49 +1,42 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { WidgetMode } from '@/store/features';
+import { useContext } from '@/composables';
 
-import BlockCrudComponent from '../BlockCrudComponent';
+const toolbarSlots = [
+  'default',
+  'buttons',
+  'actions',
+  'menus',
+];
 
-@Component
-export default class BlockWidgetToolbar extends BlockCrudComponent {
-  graphModalOpen = false;
+export default defineComponent({
+  name: 'BlockWidgetToolbar',
+  setup(props, { slots }) {
+    const { inDialog } = useContext.setup();
 
-  @Prop({ type: String, required: false })
-  public readonly mode!: WidgetMode | null;
+    const activeSlots = computed<string[]>(
+      () => Object.keys(slots)
+        .filter(s => toolbarSlots.includes(s)),
+    );
 
-  get localMode(): WidgetMode | null {
-    return this.mode;
-  }
-
-  set localMode(val: WidgetMode | null) {
-    this.$emit('update:mode', val);
-  }
-}
+    return {
+      inDialog,
+      activeSlots,
+    };
+  },
+});
 </script>
 
 <template>
-  <WidgetToolbar :crud="crud" :mode.sync="localMode" @title-click="startChangeBlockId">
-    <BlockGraph
-      v-if="graphModalOpen"
-      :id="`graph-full--${widget.id}`"
-      v-model="graphModalOpen"
-      :config.sync="graphCfg"
-    />
-
-    <template #actions>
-      <ActionItem
-        v-if="hasGraph"
-        icon="mdi-chart-line"
-        label="Graph"
-        @click="graphModalOpen = true"
-      />
-      <slot name="actions" />
+  <DialogBlockWidgetToolbar v-if="inDialog" v-bind="$attrs">
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
-
-    <template #menus>
-      <WidgetActions :crud="crud" no-rename />
-      <BlockActions :crud="crud" />
+  </DialogBlockWidgetToolbar>
+  <DashboardBlockWidgetToolbar v-else v-bind="$attrs">
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
-  </WidgetToolbar>
+  </DashboardBlockWidgetToolbar>
 </template>

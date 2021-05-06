@@ -1,30 +1,41 @@
+import { Plugin } from 'vue';
+
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { sparkStore } from '@/plugins/spark/store';
 import { BalancerBlock, BlockSpec, BlockType } from '@/plugins/spark/types';
-import { WidgetFeature } from '@/store/features';
+import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './BalancerWidget.vue';
 
 const typeName = BlockType.Balancer;
 
-const block: BlockSpec<BalancerBlock> = {
-  id: typeName,
-  generate: () => ({
-    clients: [],
-  }),
-  fields: [],
-};
 
-const feature: WidgetFeature = {
-  ...genericBlockFeature,
-  id: typeName,
-  title: 'Balancer',
-  role: 'Constraint',
-  component: blockWidgetSelector(widget, typeName),
-  widgetSize: {
-    cols: 4,
-    rows: 2,
+const plugin: Plugin = {
+  install(app) {
+    const spec: BlockSpec<BalancerBlock> = {
+      id: typeName,
+      generate: () => ({
+        clients: [],
+      }),
+      fields: [],
+    };
+
+    const feature: WidgetFeature = {
+      ...genericBlockFeature,
+      id: typeName,
+      title: 'Balancer',
+      role: 'Constraint',
+      component: blockWidgetSelector(app, widget, typeName),
+      widgetSize: {
+        cols: 4,
+        rows: 2,
+      },
+    };
+
+    sparkStore.addBlockSpec(spec);
+    featureStore.addWidgetFeature(feature);
   },
 };
 
-export default { feature, block };
+export default plugin;
