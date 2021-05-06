@@ -1,5 +1,5 @@
 <script lang="ts">
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 import Plotly, { Config, Frame, Layout, PlotData, PlotlyHTMLElement } from 'plotly.js';

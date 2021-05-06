@@ -1,4 +1,4 @@
-import { range } from 'lodash';
+import range from 'lodash/range';
 
 import { typeName as graphType } from '@/plugins/history/Graph/getters';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';

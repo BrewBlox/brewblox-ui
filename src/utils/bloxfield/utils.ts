@@ -1,4 +1,5 @@
-import { isNumber, round } from 'lodash';
+import isNumber from 'lodash/isNumber';
+import round from 'lodash/round';
 
 import { durationString, isDurationUnit } from '../duration';
 import { BloxField, JSBloxField, Link, Quantity } from './types';

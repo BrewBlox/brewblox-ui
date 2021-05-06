@@ -1,4 +1,4 @@
-import { createApi } from '@/plugins/database/api';
+import { createApi } from '@/database/api';
 import { UI_NAMESPACE, WS_HOST } from '@/utils/const';
 import http from '@/utils/http';
 

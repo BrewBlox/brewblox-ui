@@ -1,5 +1,5 @@
 <script lang="ts">
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';

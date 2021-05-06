@@ -1,4 +1,4 @@
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 
 import { Block, BlockIntfType, BlockType, SparkPatchEvent, SparkStateEvent, SparkUpdateEvent } from '@/shared-types';
 import { featureStore } from '@/store/features';

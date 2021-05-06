@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defaults } from 'lodash';
+import defaults from 'lodash/defaults';
 import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';

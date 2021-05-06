@@ -1,4 +1,4 @@
-import { database } from '@/plugins/database';
+import { database } from '@/database';
 import { StoreObject } from '@/shared-types';
 import { deserialize } from '@/utils/parse-object';
 

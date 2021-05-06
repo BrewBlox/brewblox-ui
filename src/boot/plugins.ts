@@ -6,9 +6,9 @@ import history from '@/plugins/history';
 import misc from '@/plugins/misc';
 import quickstart from '@/plugins/quickstart';
 import spark from '@/plugins/spark';
-import { startup } from '@/plugins/startup';
 import tilt from '@/plugins/tilt';
 import wizardry from '@/plugins/wizardry';
+import { startup } from '@/startup';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
@@ -30,13 +30,13 @@ export default boot(({ app, store }) => {
     misc,
   ];
 
-  const stores: Startable[] = [
+  const started: Startable[] = [
     systemStore,
     serviceStore,
     dashboardStore,
     widgetStore,
   ];
 
-  stores.forEach(store => startup.onStart(store.start));
+  started.forEach(store => startup.onStart(store.start));
   plugins.forEach(plugin => app.use(plugin, { store }));
 });

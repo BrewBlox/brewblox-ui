@@ -1,4 +1,5 @@
-import { defaults, omit } from 'lodash';
+import defaults from 'lodash/defaults';
+import omit from 'lodash/omit';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { StoreObject } from '@/shared-types';

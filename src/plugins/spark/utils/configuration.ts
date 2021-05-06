@@ -1,4 +1,7 @@
-import { defaults, keyBy, mapValues, pick } from 'lodash';
+import defaults from 'lodash/defaults';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
+import pick from 'lodash/pick';
 
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';

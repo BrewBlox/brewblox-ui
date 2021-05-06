@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { startup } from '@/plugins/startup';
+import { startup } from '@/startup';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { autoRegister, cref } from '@/utils/component-ref';
 

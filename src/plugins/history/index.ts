@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { historyStore } from '@/plugins/history/store';
-import { startup } from '@/plugins/startup';
+import { startup } from '@/startup';
 import { autoRegister } from '@/utils/component-ref';
 
 import Graph from './Graph';

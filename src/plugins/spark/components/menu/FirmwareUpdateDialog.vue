@@ -2,7 +2,7 @@
 import { computed, defineComponent, onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { eventbus } from '@/plugins/eventbus';
+import { eventbus } from '@/eventbus';
 import { sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { isSparkUpdate } from '@/plugins/spark/utils';

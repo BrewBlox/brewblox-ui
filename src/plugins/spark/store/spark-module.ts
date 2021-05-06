@@ -1,7 +1,7 @@
 import type { RegisterOptions } from 'vuex-class-modules';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { eventbus } from '@/plugins/eventbus';
+import { eventbus } from '@/eventbus';
 import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   Block,

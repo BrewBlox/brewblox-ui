@@ -94,14 +94,14 @@ The files are indexed in git. Commit them to make the change permanent.
 
 ## Directory structure
 
-Brewblox uses and extends the [Quasar application structure](https://quasar.dev/quasar-cli/cli-documentation/directory-structure).
+Brewblox uses and extends the [Quasar application structure](https://next.quasar.dev/quasar-cli/directory-structure).
 
 Notable new directories:
 
-**src/helpers/** - Stateless utility functions.
+**src/utils/** - Stateless utility functions.
 
-**src/plugins/** - Application submodules. Plugins behave like [Vue plugins](https://vuejs.org/v2/guide/plugins.html) in that they have an `install(Vue: VueConstructor)` function. <br>
-Plugins may have their own `components/`, `helpers/`, and `store/` subdirectories. <br>
+**src/plugins/** - Application submodules. Plugins behave like [Vue plugins](https://v3.vuejs.org/guide/plugins.html) in that they have an `install(app: App)` function. <br>
+Plugins may have their own `components/`, `utils/`, and `store/` subdirectories. <br>
 New plugins should be declared in `src/boot/plugins.ts`.
 
 ## Third-party plugins (discontinued)
@@ -116,13 +116,13 @@ Implementation beyond proof-of-concept would require too much effort for a featu
 
 # Data sources
 
-## [Datastore](src/plugins/database/types.ts)
+## [Datastore](src/database/types.ts)
 
 Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Persistent data (eg. `Dashboard`, `Widget`, `Service`) is saved using the Redis [datastore](https://redis.io/).
 
 The full datastore state is loaded on startup. After that, two-way synchronization is maintained between VueX (local), and Redis (remote).
 
-## [Eventbus](src/plugins/eventbus.ts)
+## [Eventbus](src/eventbus.ts)
 
 Backend services intermittently push MQTT state events.
 
@@ -132,7 +132,7 @@ Plugins can subscribe to receive callbacks for events matching an identifier.
 
 There are some generic interfaces used throughout the UI. Plugins can register functionality they provide.
 
-## [Dashboard, Widget](src/store/dashboards/types.ts)
+## [Dashboard](src/store/dashboards/types.ts), [Widget](src/store/widgets/types.ts)
 
 To ensure flexibility, one of the core display elements in the UI is the `Dashboard`. A dashboard is populated with `Widget` elements.
 

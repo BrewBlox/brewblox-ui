@@ -1,4 +1,4 @@
-import { createApi } from '@/plugins/database/api';
+import { createApi } from '@/database/api';
 import { StoreObject } from '@/shared-types';
 import { GLOBAL_NAMESPACE, UI_NAMESPACE } from '@/utils/const';
 

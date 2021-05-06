@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import isObjectLike from 'lodash/isObjectLike';
 
-import { eventbus } from '@/plugins/eventbus';
+import { eventbus } from '@/eventbus';
 import { DatastoreEvent, StoreObject } from '@/shared-types';
 import { STORE_TOPIC } from '@/utils/const';
 import http, { parseHttpError } from '@/utils/http';

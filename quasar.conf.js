@@ -2,13 +2,24 @@ const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require('compression-webpack-plugin');
+const zlib = require('zlib');
 
 module.exports = configure(function (ctx) {
   const buildDate = new Date().toISOString();
 
   return {
     preFetch: false,
-    supportTS: true,
+
+    supportTS: {
+      tsCheckerConfig: {
+        eslint: {
+          enabled: true,
+          files: './src/**/*.{ts,tsx,js,jsx,vue}',
+        },
+      },
+    },
 
     sourceFiles: {
       router: 'src/router.ts',
@@ -86,12 +97,6 @@ module.exports = configure(function (ctx) {
         ? 'eval-cheap-source-map'
         : undefined,
 
-      supportTS: {
-        tsCheckerConfig: {
-          eslint: true,
-        },
-      },
-
       env: ctx.dev
         ? {
           BLOX_DATE: buildDate,
@@ -127,14 +132,30 @@ module.exports = configure(function (ctx) {
         );
 
         if (ctx.prod) {
-          // Function names are required to set up functions for VueX functionality
-          config
-            .optimization
-            .minimizer[0] // Terser
-            .options
-            .terserOptions
-            .keep_fnames = true;
+          config.plugins.push(
+            new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
+          );
         }
+
+        // Replace the compression plugin because it was generating unnamed output files
+        config.plugins.splice(
+          config.plugins.findIndex(v => v instanceof CompressionPlugin),
+          1,
+          new CompressionPlugin({
+            filename: '[path][base].br',
+            algorithm: 'brotliCompress',
+            test: /\.(js|css|html|svg)$/,
+            compressionOptions: {
+              params: {
+                [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
+              },
+            },
+            threshold: 10240,
+            minRatio: 0.8,
+            deleteOriginalAssets: false,
+          }),
+        );
+
       },
     },
   };

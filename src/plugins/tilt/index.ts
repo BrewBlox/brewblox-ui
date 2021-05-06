@@ -1,11 +1,11 @@
 import { Plugin } from 'vue';
 
+import { eventbus } from '@/eventbus';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { autoRegister } from '@/utils/component-ref';
 import { STATE_TOPIC } from '@/utils/const';
 
-import { eventbus } from '../eventbus';
 import { tiltStore } from './store';
 import TiltWidget from './Tilt';
 import { TiltService } from './types';

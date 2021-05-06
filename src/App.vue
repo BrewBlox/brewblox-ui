@@ -1,9 +1,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { database } from '@/plugins/database';
-import { eventbus } from '@/plugins/eventbus';
-import { startup } from '@/plugins/startup';
+import { database } from '@/database';
+import { eventbus } from '@/eventbus';
+import { startup } from '@/startup';
 
 /**
  * Order of startup is important here.

@@ -1,4 +1,4 @@
-import { createApi } from '@/plugins/database/api';
+import { createApi } from '@/database/api';
 import { Service } from '@/store/services';
 import { UI_NAMESPACE } from '@/utils/const';
 
