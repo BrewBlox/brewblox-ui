@@ -127,11 +127,11 @@ module.exports = configure(function (ctx) {
         };
 
         // Replace the compression plugin because it was generating unnamed output files
-        // config.plugins.splice(
-        //   config.plugins.findIndex(v => v instanceof CompressionPlugin),
-        //   1,
-        //   new CompressionPlugin(),
-        // );
+        config.plugins.splice(
+          config.plugins.findIndex(v => v instanceof CompressionPlugin),
+          1,
+          new CompressionPlugin(),
+        );
 
         config.plugins.push(
           // mqtt.js depends on multiple Node.JS libraries
