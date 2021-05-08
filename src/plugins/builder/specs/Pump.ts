@@ -1,5 +1,5 @@
 import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '@/plugins/builder/const';
-import { PartSpec, PartUpdater, PersistentPart } from '@/plugins/builder/types';
+import { PartSpec, PersistentPart } from '@/plugins/builder/types';
 import { settingsBlock, showAbsentBlock, showDrivingBlockDialog } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import { ActuatorPwmBlock, BlockType, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
@@ -59,14 +59,14 @@ const spec: PartSpec = {
       [RIGHT]: [{ outCoords: LEFT, pressure }],
     };
   },
-  interactHandler: (part: PersistentPart, updater: PartUpdater) => {
+  interactHandler: (part: PersistentPart, { savePart }) => {
     const hasAddr = !!part.settings[PUMP_KEY]?.id;
     const block = settingsBlock<PumpT>(part, PUMP_KEY, PUMP_TYPES);
     const driven = isBlockDriven(block);
 
     if (!hasAddr) {
       part.settings.enabled = !part.settings.enabled;
-      updater.updatePart(part);
+      savePart(part);
     }
     else if (block === null) {
       showAbsentBlock(part, PUMP_KEY);

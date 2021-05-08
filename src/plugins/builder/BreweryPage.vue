@@ -6,9 +6,9 @@ import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
 import { spliceById } from '@/utils/functional';
 
-import { useFlowParts } from './composables';
+import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderStore } from './store';
-import { FlowPart, PartUpdater, PersistentPart } from './types';
+import { FlowPart, PersistentPart } from './types';
 import { squares } from './utils';
 
 export default defineComponent({
@@ -49,35 +49,26 @@ export default defineComponent({
       calculateFlowParts,
     } = useFlowParts.setup(layoutId);
 
+    const gridDimensions = computed<UseSvgZoomDimensions>(
+      () => ({
+        width: squares(layout.value?.width ?? 10),
+        height: squares(layout.value?.height ?? 10),
+      }),
+    );
+
+    const {
+      svgRef,
+      svgContentRef,
+      resetZoom,
+    } = useSvgZoom.setup(gridDimensions);
+
     const layoutTitle = computed<string>(
       () => layout.value?.title ?? 'Builder layout',
-    );
-
-    const scale = computed<number>(
-      () => layout.value?.scale ?? 1,
-    );
-
-    const gridHeight = computed<number>(
-      () => squares(layout.value?.height ?? 10) * scale.value,
-    );
-
-    const gridWidth = computed<number>(
-      () => squares(layout.value?.width ?? 10) * scale.value,
-    );
-
-    const gridViewBox = computed<string>(
-      () => [0, 0, gridWidth.value, gridHeight.value].join(' '),
     );
 
     function savePart(part: PersistentPart): void {
       parts.value = spliceById(parts.value, part);
     }
-
-    const updater = computed<PartUpdater>(
-      () => ({
-        updatePart: savePart,
-      }),
-    );
 
     function isClickable(part: FlowPart): boolean {
       return builderStore.spec(part).interactHandler !== undefined;
@@ -92,14 +83,14 @@ export default defineComponent({
         return;
       }
       if (pending.value && pending.value.id === part.id) {
-        handler(part, updater.value);
+        handler(part, { savePart });
         pending.value = null;
       }
       else if (delayTouch.value) {
         pending.value = part;
       }
       else {
-        handler(part, updater.value);
+        handler(part, { savePart });
       }
     }
 
@@ -127,9 +118,11 @@ export default defineComponent({
       layoutId,
       layout,
       layoutTitle,
+      svgRef,
+      svgContentRef,
+      resetZoom,
       startupDone,
       parts,
-      gridViewBox,
       flowParts,
       flowPartsRevision,
       squares,
@@ -184,49 +177,60 @@ export default defineComponent({
         <span v-if="parts.length === 0" class="absolute-center">
           {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
         </span>
-        <svg
-          ref="grid"
-          :viewBox="gridViewBox"
-          class="fit"
-        >
-          <g
-            v-for="part in flowParts"
-            :key="`${flowPartsRevision}-${part.id}`"
-            :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-            :class="{
-              [part.type]: true,
-              pointer: isClickable(part),
-              inactive: !!pending
-            }"
-            @click.stop="interact(part)"
-          >
-            <PartWrapper
-              :part="part"
-              @update:part="savePart"
-              @dirty="calculateFlowParts"
-            />
-          </g>
-          <template v-if="pending">
-            <rect
-              width="100%"
-              height="100%"
-              fill="black"
-              opacity="0"
-              @click.stop="pending = null"
-            />
+        <svg ref="svgRef" class="fit">
+          <g ref="svgContentRef" :key="`content-${layoutId}`">
             <g
-              :transform="`translate(${squares(pending.x)}, ${squares(pending.y)})`"
-              class="pointer"
-              @click.stop="interact(pending)"
+              v-for="part in flowParts"
+              :key="`${flowPartsRevision}-${part.id}`"
+              :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+              :class="{
+                [part.type]: true,
+                pointer: isClickable(part),
+                inactive: !!pending
+              }"
+              @click.stop="interact(part)"
+              @dblclick.stop
             >
               <PartWrapper
-                :part="pending"
+                :part="part"
                 @update:part="savePart"
                 @dirty="calculateFlowParts"
               />
             </g>
-          </template>
+            <template v-if="pending">
+              <rect
+                width="100%"
+                height="100%"
+                fill="black"
+                opacity="0"
+                @click.stop="pending = null"
+              />
+              <g
+                :transform="`translate(${squares(pending.x)}, ${squares(pending.y)})`"
+                class="pointer"
+                @click.stop="interact(pending)"
+                @dblclick.stop
+              >
+                <PartWrapper
+                  :part="pending"
+                  @update:part="savePart"
+                  @dirty="calculateFlowParts"
+                />
+              </g>
+            </template>
+          </g>
         </svg>
+        <q-btn
+          unelevated
+          class="absolute-bottom-right q-ma-lg"
+          color="secondary"
+          icon="mdi-stretch-to-page-outline"
+          @click="resetZoom"
+        >
+          <q-tooltip>
+            Fit to screen
+          </q-tooltip>
+        </q-btn>
       </div>
     </template>
   </q-page>

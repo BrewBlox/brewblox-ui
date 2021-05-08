@@ -1,5 +1,5 @@
 import { LEFT, RIGHT, UP } from '@/plugins/builder/const';
-import { PartSpec, PartUpdater, PersistentPart, Transitions } from '@/plugins/builder/types';
+import { PartSpec, PersistentPart, Transitions } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
@@ -36,7 +36,7 @@ const spec: PartSpec = {
         [RIGHT]: [{ outCoords: UP }],
       };
   },
-  interactHandler: (part: PersistentPart, updater: PartUpdater) => {
+  interactHandler: (part: PersistentPart, { savePart }) => {
     const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
     if (block) {
       block.data.desiredState =
@@ -47,7 +47,7 @@ const spec: PartSpec = {
     }
     else {
       part.settings.closed = !part.settings.closed;
-      updater.updatePart(part);
+      savePart(part);
     }
   },
 };

@@ -44,10 +44,6 @@ export default defineComponent({
       () => props.noLabel ? null : title.value,
     );
 
-    const scale = computed<number>(
-      () => props.layout?.scale || 1,
-    );
-
     const listed = computed<boolean>({
       get: () => props.layout?.listed ?? true,
       set: v => {
@@ -71,26 +67,6 @@ export default defineComponent({
 
     function selectLayout(id: string | null): void {
       emit('selected', id);
-    }
-
-    function editScale(): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          title: 'Set zoom level',
-          suffix: '%',
-          modelValue: (1 / scale.value) * 100,
-          rules: [
-            v => v === null || v > 0 || 'Value must be > 0',
-          ],
-        },
-      })
-        .onOk(v => {
-          if (props.layout) {
-            const scale = 100 / (v ?? 100);
-            builderStore.saveLayout({ ...props.layout, scale });
-          }
-        });
     }
 
     async function copyLayout(): Promise<void> {
@@ -207,12 +183,10 @@ export default defineComponent({
 
     return {
       label,
-      scale,
       listed,
       inEditor,
       isHomePage,
       selectLayout,
-      editScale,
       copyLayout,
       renameLayout,
       createLayoutWidget,
@@ -236,12 +210,6 @@ export default defineComponent({
     <ToggleAction
       v-model="listed"
       label="Show in sidebar"
-    />
-    <ActionItem
-      v-if="!inEditor"
-      icon="mdi-magnify-plus-outline"
-      :label="`Zoom: ${(1 / scale) * 100}%`"
-      @click="editScale"
     />
     <ActionItem
       icon="file_copy"
