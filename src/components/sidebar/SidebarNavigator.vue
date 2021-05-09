@@ -1,9 +1,6 @@
 <script lang="ts">
-import { useQuasar } from 'quasar';
 import { computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
-
-import { useGlobals } from '@/composables';
 
 const btnAttrs = {
   stack: true,
@@ -15,16 +12,10 @@ const btnAttrs = {
 export default defineComponent({
   name: 'SidebarNavigator',
   setup() {
-    const $q = useQuasar();
     const route = useRoute();
-    const { dense } = useGlobals.setup();
 
     const activeSection = computed<string>(
       () => route.path.split('/')[1] ?? '',
-    );
-
-    const editorDisabled = computed<boolean>(
-      () => $q.platform.is.ie || dense.value,
     );
 
     const currentDashboard = computed<string | null>(
@@ -44,9 +35,7 @@ export default defineComponent({
     }
 
     return {
-      dense,
       activeSection,
-      editorDisabled,
       currentDashboard,
       nextBuilderPage,
       btnAttrs,
@@ -67,7 +56,6 @@ export default defineComponent({
         v-bind="btnAttrs"
       />
       <q-btn
-        :disable="editorDisabled"
         icon="mdi-tools"
         label="Builder"
         to="/builder"
