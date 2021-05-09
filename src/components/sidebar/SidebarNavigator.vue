@@ -18,26 +18,11 @@ export default defineComponent({
       () => route.path.split('/')[1] ?? '',
     );
 
-    const currentDashboard = computed<string | null>(
-      () => route.path.startsWith('/dashboard')
-        ? route.params.id as string
-        : null,
-    );
-
-    const nextBuilderPage = computed<string>(
-      () => route.path.startsWith('/builder')
-        ? route.path
-        : '/builder',
-    );
-
     function btnColor(...sections: string[]): string {
       return sections.includes(activeSection.value) ? 'primary' : '';
     }
 
     return {
-      activeSection,
-      currentDashboard,
-      nextBuilderPage,
       btnAttrs,
       btnColor,
     };
