@@ -1,9 +1,10 @@
 import { LEFT, RIGHT } from '@/plugins/builder/const';
-import { PartSpec, PartUpdater, PersistentPart, Transitions } from '@/plugins/builder/types';
+import { PartSpec, PersistentPart, Transitions } from '@/plugins/builder/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { ComparedBlockType } from '@/plugins/spark/types';
 import { BlockType, DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/shared-types';
 
+import { builderStore } from '../store';
 import { settingsAddress, settingsBlock } from '../utils';
 
 export type ValveT = DigitalActuatorBlock | MotorValveBlock;
@@ -40,7 +41,7 @@ const spec: PartSpec = {
         [RIGHT]: [{ outCoords: LEFT }],
       };
   },
-  interactHandler: (part: PersistentPart, updater: PartUpdater) => {
+  interactHandler: (part: PersistentPart, { savePart }) => {
     const hasAddress = settingsAddress(part, VALVE_KEY).id !== null;
     if (hasAddress) {
       const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
@@ -54,7 +55,8 @@ const spec: PartSpec = {
     }
     else {
       part.settings[CLOSED_KEY] = !part.settings[CLOSED_KEY];
-      updater.updatePart(part);
+      builderStore;
+      savePart(part);
     }
   },
 };

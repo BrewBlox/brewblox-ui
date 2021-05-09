@@ -1,29 +1,44 @@
 <script lang="ts">
+import * as d3 from 'd3';
+import isEqual from 'lodash/isEqual';
+import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
 import { QLayout, useQuasar } from 'quasar';
-import { computed, defineComponent, nextTick, reactive, ref, UnwrapRef, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  nextTick,
+  reactive,
+  ref,
+  UnwrapRef,
+  watch,
+} from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { clampRotation, deepCopy, filterById, nullFilter, spliceById } from '@/utils/functional';
+import { clampRotation, deepCopy, filterById, findById, spliceById, uniqueFilter } from '@/utils/functional';
 
 import BuilderCatalog from './BuilderCatalog.vue';
 import BuilderPartMenu from './BuilderPartMenu.vue';
-import { useFlowParts } from './composables';
+import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { SQUARE_SIZE } from './const';
 import { builderStore } from './store';
-import { BuilderLayout, ClickEvent, FlowPart, PartUpdater, PersistentPart, Rect } from './types';
-import { rectContains, squares, startAddLayout } from './utils';
+import { BuilderLayout, FlowPart, PersistentPart } from './types';
+import { squares, startAddLayout } from './utils';
 
 interface Floater extends XYPosition {
+  startX: number;
+  startY: number;
   moving: boolean;
   parts: PersistentPart[];
 }
 
-interface SelectArea extends XYPosition {
-  width: number;
-  height: number;
+interface SelectArea {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
 }
 
 interface EditorAction {
@@ -34,8 +49,6 @@ interface EditorAction {
 
 interface ActionMode extends EditorAction {
   cursor: (part: PersistentPart) => boolean;
-  onClick?: (evt: ClickEvent, part: FlowPart | null) => void;
-  onPan?: (args: PanArguments, part: FlowPart | null) => void;
 }
 
 interface ActionTool extends EditorAction {
@@ -72,18 +85,15 @@ export default defineComponent({
     const menuDialogOpen = ref<boolean>(false);
     const focusWarning = ref<boolean>(true);
 
-    const selectedTime = ref<number>(0);
     const selectArea = ref<SelectArea | null>(null);
-    const selectedParts = ref<FlowPart[]>([]);
-    const hoverPosRaw = ref<XYPosition | null>(null);
+    const selectedIds = ref<string[]>([]);
+    const gridHoverPos = ref<XYPosition | null>(null);
     const pageFocused = ref<boolean>(true);
+    const partDragStart = ref<XYPosition | null>(null);
 
     const floater = ref<UnwrapRef<Floater> | null>(null);
     const configuredPartId = ref<string | null>(null);
 
-    const updater: PartUpdater = { updatePart: savePart };
-
-    const gridRef = ref<SVGGraphicsElement>();
     const pageRef = ref<QLayout>();
 
     const _drawerOpen = ref<boolean>(localStorage.getItem('drawer') ?? !dense.value);
@@ -102,19 +112,23 @@ export default defineComponent({
 
     const modes: ActionMode[] = [
       {
-        label: 'Select',
+        label: 'Select and move',
         value: 'select',
         icon: 'mdi-select-drag',
-        cursor: part => !!part,
-        onPan: selectPanHandler,
-        onClick: selectClickHandler,
+        cursor: part => part != null,
+      },
+      {
+        label: 'Pan',
+        value: 'zoom',
+        icon: 'mdi-drag-variant',
+        cursor: () => false,
       },
       {
         label: 'Interact',
         value: 'interact',
         icon: 'mdi-cursor-default',
-        cursor: part => !!part && !!builderStore.spec(part).interactHandler,
-        onClick: interactClickHandler,
+        cursor: part => part != null
+          && builderStore.spec(part).interactHandler !== undefined,
       },
     ];
 
@@ -213,6 +227,13 @@ export default defineComponent({
       () => layout.value?.title ?? 'Builder editor',
     );
 
+    const gridDimensions = computed<UseSvgZoomDimensions>(
+      () => ({
+        width: squares(layout.value?.width ?? 10),
+        height: squares(layout.value?.height ?? 10),
+      }),
+    );
+
     const configuredPart = computed<FlowPart | null>(
       () => flowParts.value.find(p => p.id === configuredPartId.value) ?? null,
     );
@@ -224,6 +245,16 @@ export default defineComponent({
       },
       set: tool => builderStore.editorMode = tool.value,
     });
+
+    const dragEnabled = computed<boolean>(
+      () => currentMode.value.value === 'zoom',
+    );
+
+    const {
+      svgRef,
+      svgContentRef,
+      resetZoom,
+    } = useSvgZoom.setup(gridDimensions, { dragEnabled });
 
     function selectLayout(id: string | null): void {
       if (id !== layoutId.value) {
@@ -285,36 +316,36 @@ export default defineComponent({
       }
     }
 
-    function gridRect(): Rect {
-      // Edge (pre-chromium) does not return x/y values
-      // We can infer them from left/top
-      const { left, right, top, bottom } = gridRef.value!.getBoundingClientRect();
-      return { left, right, top, bottom, x: left, y: top };
+
+    // Return the grid coordinates of the current event
+    function toCoords(pos: XYPosition): XYPosition;
+    function toCoords(pos: XYPosition | null): XYPosition | null;
+    function toCoords(pos: XYPosition | null): XYPosition | null {
+      return pos !== null
+        ? {
+          x: Math.floor(pos.x / SQUARE_SIZE),
+          y: Math.floor(pos.y / SQUARE_SIZE),
+        }
+        : null;
     }
 
     function isBusy(part: PersistentPart): boolean {
-      return floater.value?.parts.some(p => p.id === part.id)
-        || selectedParts.value.some(p => p.id === part.id);
+      return floater.value?.parts.some(p => p.id === part.id) === true;
     }
 
     function clear(): void {
-      if (floater.value) {
-        floater.value = null;
-      }
-      else if (selectedParts.value.length) {
-        selectedParts.value = [];
-      }
+      floater.value = null;
+      selectedIds.value = [];
     }
 
     function makeFloater(source: Floater): void {
       floater.value = reactive(deepCopy(source));
     }
 
-    function dropFloater(pos: XYPosition | null, isGridPos: boolean): void {
+    function dropFloater(coords: XYPosition | null): void {
       if (!floater.value) { return; }
 
-      pos = isGridPos ? pos : findGridSquare(pos);
-      if (pos) {
+      if (coords) {
         const ids: string[] = [];
 
         floater.value.parts
@@ -329,54 +360,32 @@ export default defineComponent({
           ...floater.value.parts,
         ]);
       }
-      selectedParts.value = [];
+      selectedIds.value = [];
       floater.value = null;
     }
 
-    function findGridSquare(rawPos: XYPosition | null): XYPosition | null {
-      if (rawPos === null) { return null; }
-      const grid = gridRect();
-      let { x, y } = rawPos;
-
-      // Compensate for page scrolling
-      x -= window.pageXOffset;
-      y -= window.pageYOffset;
-
-      return rectContains(grid, x, y)
-        ? {
-          x: Math.floor((x - grid.x) / SQUARE_SIZE),
-          y: Math.floor((y - grid.y) / SQUARE_SIZE),
-        }
-        : null;
-    }
-
-    function findClickSquare(evt: ClickEvent): XYPosition | null {
-      const touch = (evt instanceof MouseEvent) ? evt : evt.touches[0];
-      return findGridSquare({ x: touch.clientX, y: touch.clientY });
-    }
-
-    function findPartAtPos(pos: XYPosition | null, isGridPos: boolean): FlowPart | null {
-      pos = isGridPos ? pos : findGridSquare(pos);
-      if (!pos) { return null; }
+    function findPartAtCoords(coords: XYPosition | null): FlowPart | null {
       // iterate right to left to match rendering order
       // when items overlap, the later item is rendered on top
-      for (let idx = flowParts.value.length - 1; idx >= 0; idx--) {
-        const part = flowParts.value[idx];
-        if (pos.x >= part.x
-          && pos.x < part.x + part.size[0]
-          && pos.y >= part.y
-          && pos.y < part.y + part.size[1]) {
-          return part;
+      if (coords) {
+        for (let idx = flowParts.value.length - 1; idx >= 0; idx--) {
+          const part = flowParts.value[idx];
+          if (coords.x >= part.x
+            && coords.x < part.x + part.size[0]
+            && coords.y >= part.y
+            && coords.y < part.y + part.size[1]) {
+            return deepCopy(part);
+          }
         }
       }
       return null;
     }
 
     function findActionParts(): FlowPart[] {
-      if (selectedParts.value.length) {
-        return selectedParts.value;
+      if (selectedIds.value.length) {
+        return deepCopy(flowParts.value.filter(v => selectedIds.value.includes(v.id)));
       }
-      const hovered = findPartAtPos(hoverPosRaw.value, false);
+      const hovered = findPartAtCoords(toCoords(gridHoverPos.value));
       return hovered
         ? [hovered]
         : [];
@@ -384,10 +393,20 @@ export default defineComponent({
 
     function unflippedArea(area: SelectArea): SelectArea {
       return {
-        x: area.width >= 0 ? area.x : area.x + area.width,
-        y: area.height >= 0 ? area.y : area.y + area.height,
-        width: Math.abs(area.width),
-        height: Math.abs(area.height),
+        startX: Math.min(area.startX, area.endX),
+        startY: Math.min(area.startY, area.endY),
+        endX: Math.max(area.startX, area.endX),
+        endY: Math.max(area.startY, area.endY),
+      };
+    }
+
+    function renderArea(area: SelectArea): AnyDict {
+      const unflipped = unflippedArea(area);
+      return {
+        x: unflipped.startX,
+        y: unflipped.startY,
+        width: unflipped.endX - unflipped.startX,
+        height: unflipped.endY - unflipped.startY,
       };
     }
 
@@ -404,76 +423,9 @@ export default defineComponent({
     // Modes
     ////////////////////////////////////////////////////////////////
 
-    function selectPanHandler(args: PanArguments): void {
-      if (args.isFirst) {
-        const grid = gridRect();
-        selectArea.value = {
-          x: args.position.left - grid.x,
-          y: args.position.top - grid.y,
-          width: 0,
-          height: 0,
-        };
-      }
-
-      if (selectArea.value) {
-        const { x, y } = args.delta;
-        selectArea.value.width += x;
-        selectArea.value.height += y;
-      }
-
-      if (args.isFinal && selectArea.value) {
-        const { x, y, width, height } = unflippedArea(selectArea.value);
-        const startX = x / SQUARE_SIZE;
-        const startY = y / SQUARE_SIZE;
-        const endX = startX + (width / SQUARE_SIZE);
-        const endY = startY + (height / SQUARE_SIZE);
-
-        const ids = selectedParts.value.map(part => part.id);
-
-        selectedParts.value.push(
-          ...flowParts.value
-            .filter(part =>
-              !ids.includes(part.id)
-              && part.x >= startX - 1
-              && part.x <= endX
-              && part.y >= startY - 1
-              && part.y <= endY)
-            .map(deepCopy));
-
-        selectArea.value = null;
-        selectedTime.value = new Date().getTime();
-      }
-    }
-
-    function selectClickHandler(evt: ClickEvent, part: FlowPart | null): void {
-      if (new Date().getTime() - selectedTime.value < 500) {
-        // The mouseup at the end of a pan also generates a click event - skip this
-        return;
-      }
-
-      if (!part) {
-        cancelSelection();
-        return;
-      }
-
-      const selectedIdx = selectedParts.value.findIndex(p => p.id === part.id);
-      if (selectedIdx >= 0) {
-        selectedParts.value.splice(selectedIdx, 1);
-      } else {
-        selectedParts.value.push(deepCopy(part));
-      }
-    }
-
     function cancelSelection(): void {
-      selectedTime.value = 0;
       selectArea.value = null;
-      selectedParts.value = [];
-    }
-
-    function interactClickHandler(evt: ClickEvent, part: FlowPart | null): void {
-      if (part) {
-        builderStore.spec(part).interactHandler?.(part, updater);
-      }
+      selectedIds.value = [];
     }
 
     ////////////////////////////////////////////////////////////////
@@ -490,6 +442,8 @@ export default defineComponent({
               moving: false,
               x: 0,
               y: 0,
+              startX: part.x,
+              startY: part.y,
               parts: [part],
             });
             setFocus();
@@ -500,15 +454,17 @@ export default defineComponent({
 
     function useMove(parts: PersistentPart[]): void {
       if (floater.value) {
-        dropFloater(hoverPosRaw.value, false);
+        dropFloater(toCoords(gridHoverPos.value));
       }
       else if (parts.length) {
         const minX = Math.min(...parts.map(part => part.x));
         const minY = Math.min(...parts.map(part => part.y));
-        const startPos = findGridSquare(hoverPosRaw.value) ?? { x: 0, y: 0 };
+        const startPos = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         makeFloater({
           ...startPos,
           moving: true,
+          startX: minX,
+          startY: minY,
           parts: parts.map(part => ({
             ...part,
             x: part.x - minX,
@@ -520,15 +476,17 @@ export default defineComponent({
 
     function useCopy(parts: PersistentPart[]): void {
       if (floater.value) {
-        dropFloater(hoverPosRaw.value, false);
+        dropFloater(toCoords(gridHoverPos.value));
       }
       else if (parts.length) {
         const minX = Math.min(...parts.map(part => part.x));
         const minY = Math.min(...parts.map(part => part.y));
-        const startPos = findGridSquare(hoverPosRaw.value) ?? { x: 0, y: 0 };
+        const startPos = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         makeFloater({
           ...startPos,
           moving: false,
+          startX: minX,
+          startY: minY,
           parts: parts.map(part => ({
             ...part,
             id: nanoid(),
@@ -575,7 +533,7 @@ export default defineComponent({
     function useInteract(parts: PersistentPart[]): void {
       if (!floater.value && parts.length === 1) {
         const [part] = parts;
-        builderStore.spec(part).interactHandler?.(part, updater);
+        builderStore.spec(part).interactHandler?.(part, { savePart });
       }
     }
 
@@ -603,29 +561,26 @@ export default defineComponent({
     // Event handlers
     ////////////////////////////////////////////////////////////////
 
-    function onGridMove(evt: MouseEvent): void {
-      hoverPosRaw.value = { x: evt.pageX, y: evt.pageY };
-      if (floater.value) {
-        const pos = findGridSquare(hoverPosRaw.value);
-        if (pos) {
-          floater.value.x = pos.x;
-          floater.value.y = pos.y;
+    // Return the exact position of the current event
+    function d3EventPos(): XYPosition {
+      const [x, y] = d3.mouse(svgContentRef.value!);
+      return { x, y };
+    }
+
+    const throttledMove = throttle(
+      (gridPos: XYPosition) => {
+        gridHoverPos.value = gridPos;
+        const coords = toCoords(gridPos);
+        if (floater.value) {
+          floater.value.x = coords.x;
+          floater.value.y = coords.y;
         }
-      }
-    }
+      },
+      50,
+    );
 
-    function onGridLeave(): void {
-      hoverPosRaw.value = null;
-    }
-
-    function clickHandler(evt: ClickEvent, part: FlowPart | null): void {
-      if (floater.value) {
-        dropFloater(findClickSquare(evt), true);
-      }
-      else if (currentMode.value.onClick) {
-        currentMode.value.onClick(evt, part);
-      }
-      evt.stopPropagation();
+    function onSvgMouseLeave(): void {
+      gridHoverPos.value = null;
     }
 
     function keyHandler(evt: KeyboardEvent): void {
@@ -639,9 +594,11 @@ export default defineComponent({
       else if (keyDelta) {
         deltaMove(findActionParts(), keyDelta);
       }
-      else if (evt.ctrlKey) {
-        if (key === 'z') { undo(); }
-        if (key === 'y') { redo(); }
+      else if (evt.ctrlKey && key === 'z') {
+        undo();
+      }
+      else if (evt.ctrlKey && key === 'y') {
+        redo();
       }
       else if (tool) {
         tool.use(findActionParts());
@@ -650,13 +607,6 @@ export default defineComponent({
         return; // not handled - don't stop propagation
       }
       evt.stopPropagation();
-    }
-
-    function panHandler(args: PanArguments, part: FlowPart | null): void {
-      if (currentMode.value.onPan) {
-        currentMode.value.onPan(args, part);
-      }
-      args.evt.stopPropagation();
     }
 
     watch(
@@ -677,20 +627,201 @@ export default defineComponent({
       { immediate: true },
     );
 
-    watch(
-      () => flowPartsRevision.value,
-      () => {
-        selectedParts.value = selectedParts.value
-          .map(p => deepCopy(flowParts.value.find(fp => fp.id === p.id)))
-          .filter(nullFilter);
+    const updateFloater = throttle(
+      (gridCoords: XYPosition): void => {
+        if (floater.value) {
+          floater.value.x = gridCoords.x - floater.value.startX;
+          floater.value.y = gridCoords.y - floater.value.startY;
+        }
       },
+      50,
+    );
+
+    const gridDragHandler = d3.drag<SVGElement, unknown>()
+      .on('start', function () {
+        if (!floater.value) {
+          const { x, y } = d3EventPos();
+          selectArea.value = {
+            startX: x,
+            startY: y,
+            endX: x,
+            endY: y,
+          };
+        }
+      })
+      .on('drag', function () {
+        const { x, y } = d3EventPos();
+        if (selectArea.value) {
+          selectArea.value.endX = x;
+          selectArea.value.endY = y;
+        }
+      })
+      .on('end', function () {
+        if (floater.value) {
+          dropFloater(toCoords(d3EventPos()));
+          return;
+        }
+
+        if (!selectArea.value) {
+          return;
+        }
+
+        const { altKey, shiftKey } = (d3.event.sourceEvent as MouseEvent);
+        const area = unflippedArea(selectArea.value);
+        const startX = area.startX / SQUARE_SIZE;
+        const startY = area.startY / SQUARE_SIZE;
+        const endX = area.endX / SQUARE_SIZE;
+        const endY = area.endY / SQUARE_SIZE;
+
+        const targetIds = flowParts.value
+          .filter(part =>
+            part.x >= startX - 1
+            && part.x <= endX
+            && part.y >= startY - 1
+            && part.y <= endY,
+          )
+          .map(v => v.id);
+
+
+        if (shiftKey) {
+          selectedIds.value = [
+            ...selectedIds.value,
+            ...targetIds,
+          ]
+            .filter(uniqueFilter);
+        }
+        else if (altKey) {
+          selectedIds.value = selectedIds.value
+            .filter(id => !targetIds.includes(id));
+        }
+        else {
+          selectedIds.value = targetIds;
+        }
+
+        selectArea.value = null;
+      });
+
+    const partDragHandler = d3.drag()
+      .on('start', function () {
+        // We're not sure yet whether this is a select or a click
+        partDragStart.value = toCoords(d3EventPos());
+      })
+      .on('drag', function () {
+        const { x, y } = toCoords(d3EventPos());
+        const start = partDragStart.value;
+
+        // We're already dragging.
+        if (floater.value) {
+          updateFloater({ x, y });
+        }
+        // The mousedown happened in a different grid square
+        // We don't have a floater yet, so now we make one
+        else if (start && !isEqual(start, { x, y })) {
+          const partIds = selectedIds.value.length
+            ? selectedIds.value
+            : [this.getAttribute('part-id')];
+          const parts = flowParts.value
+            .filter(part => partIds.includes(part.id))
+            .map(deepCopy);
+
+          makeFloater({
+            moving: true,
+            parts,
+            startX: start.x,
+            startY: start.y,
+            x: x - start.x,
+            y: y - start.y,
+          });
+        }
+
+      })
+      .on('end', function () {
+        const coords = toCoords(d3EventPos());
+        const id = this.getAttribute('part-id');
+        partDragStart.value = null;
+
+        // Stop dragging
+        if (floater.value) {
+          dropFloater(coords);
+        }
+        // This was a click event
+        // Toggle selection of target part
+        else if (id) {
+          const idx = selectedIds.value.indexOf(id);
+          selectedIds.value = idx >= 0
+            ? selectedIds.value.filter(v => v !== id)
+            : [...selectedIds.value, id];
+        }
+      });
+
+    watch(
+      [svgRef, currentMode],
+      ([el, mode]) => {
+        if (el) {
+          d3.select(el)
+            .on('mouseenter', function () {
+              throttledMove(d3EventPos());
+            })
+            .on('mousemove', function () {
+              throttledMove(d3EventPos());
+            })
+            .on('mouseout', function () {
+              onSvgMouseLeave();
+            });
+
+          if (mode.value === 'select') {
+            d3.select(el)
+              .call(gridDragHandler);
+          }
+          else {
+            d3.select(el)
+              .on('.drag', null);
+          }
+        }
+      },
+      { immediate: true },
+    );
+
+    watch(
+      [svgContentRef, currentMode, flowPartsRevision],
+      ([el, mode]) => nextTick(() => {
+        if (el) {
+          const partSelect = d3.select(el)
+            .selectAll<Element, any>('.flowpart');
+
+          if (mode.value === 'select') {
+            partSelect
+              .call(partDragHandler);
+          }
+          else if (mode.value === 'zoom') {
+            partSelect
+              .on('.drag', null);
+          }
+          else if (mode.value === 'interact') {
+            partSelect
+              .on('.drag', null)
+              .on('click', function () {
+                const id = this.getAttribute('part-id');
+                const part = findById(flowParts.value, id);
+                if (part) {
+                  builderStore.spec(part).interactHandler?.(part, { savePart });
+                }
+              });
+          }
+        }
+      }),
+      { immediate: true },
     );
 
     return {
       squares,
       pageRef,
-      gridRef,
+      svgRef,
+      svgContentRef,
+      gridDimensions,
+      resetZoom,
       keyHandler,
+      selectedIds,
       checkFocus,
       leaveEditor,
       drawerOpen,
@@ -717,18 +848,13 @@ export default defineComponent({
       removePart,
       calculateFlowParts,
       closeMenu,
-      clickHandler,
-      onGridMove,
-      onGridLeave,
-      panHandler,
       flowParts,
       flowPartsRevision,
       isBusy,
       floater,
-      selectedParts,
       overlaps,
       selectArea,
-      unflippedArea,
+      renderArea,
       pageFocused,
     };
   },
@@ -782,7 +908,7 @@ export default defineComponent({
         <template v-if="drawerMode === 'tools' && layout !== null">
           <q-item class="q-pb-none">
             <q-item-section class="text-bold">
-              Mouse actions
+              Modes
             </q-item-section>
           </q-item>
 
@@ -921,7 +1047,7 @@ export default defineComponent({
     />
 
     <q-page-container style="overflow: hidden">
-      <q-page class="page-height q-pa-md overflow-auto">
+      <q-page class="page-height q-pa-md">
         <PageError v-if="!layout">
           <template v-if="layouts.length">
             Select a layout
@@ -945,23 +1071,16 @@ export default defineComponent({
             @click="createLayout"
           />
         </PageError>
-        <div
+        <svg
           v-else
-          v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, null)"
-          :style="{
-            width: `${squares(layout.width)}px`,
-            height: `${squares(layout.height)}px`,
-          }"
-          class="q-mb-md"
+          ref="svgRef"
+          class="fit"
         >
-          <svg
-            ref="gridRef"
-            class="fit grid-editable"
-            @click="evt => clickHandler(evt, null)"
-            @mouseenter="onGridMove"
-            @mousemove="onGridMove"
-            @mouseleave="onGridLeave"
-          >
+          <g ref="svgContentRef">
+            <foreignObject
+              class="grid-background"
+              v-bind="gridDimensions"
+            />
             <!-- Coordinate numbers -->
             <text
               v-for="x in layout.width"
@@ -984,14 +1103,18 @@ export default defineComponent({
               v-for="part in flowParts"
               v-show="!isBusy(part)"
               :key="`${flowPartsRevision}-${part.id}`"
-              v-touch-pan.stop.prevent.mouse.mouseStop.mousePrevent="v => panHandler(v, part)"
+              :part-id="part.id"
               :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-              :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
-              @click.stop="v => clickHandler(v, part)"
+              :class="{
+                pointer: currentMode.cursor(part),
+                [part.type]: true,
+                flowpart: true
+              }"
             >
               <PartWrapper
                 :part="part"
                 show-hover
+                :selected="selectedIds.includes(part.id)"
                 @update:part="savePart"
                 @dirty="calculateFlowParts"
               />
@@ -1007,18 +1130,6 @@ export default defineComponent({
                 <PartWrapper :part="part" selected />
               </g>
             </g>
-            <!-- Selected parts -->
-            <template v-if="!floater || !floater.moving">
-              <g
-                v-for="part in selectedParts"
-                :key="`selected-${part.id}`"
-                :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
-                :class="{ pointer: currentMode.cursor(part), [part.type]: true }"
-                @click.stop="v => clickHandler(v, part)"
-              >
-                <PartWrapper :part="part" selected />
-              </g>
-            </template>
             <!-- Overlap indicators -->
             <g
               v-for="([coord, val], idx) in overlaps"
@@ -1036,14 +1147,25 @@ export default defineComponent({
             <!-- Selection area -->
             <rect
               v-if="selectArea"
-              v-bind="unflippedArea(selectArea)"
+              v-bind="renderArea(selectArea)"
               stroke="white"
               fill="dodgerblue"
               opacity="0.3"
               style="pointer-events: none;"
             />
-          </svg>
-        </div>
+          </g>
+        </svg>
+        <q-btn
+          unelevated
+          class="absolute-bottom-right q-ma-lg"
+          color="secondary"
+          icon="mdi-stretch-to-page-outline"
+          @click="resetZoom"
+        >
+          <q-tooltip>
+            Fit to screen
+          </q-tooltip>
+        </q-btn>
         <div
           v-if="layout && !pageFocused && focusWarning"
           class="unfocus-overlay"

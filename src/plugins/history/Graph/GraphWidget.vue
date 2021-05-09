@@ -252,8 +252,3 @@ export default defineComponent({
     </div>
   </PreviewCard>
 </template>
-
-<style lang="sass" scoped>
-.card__Dashboard.card__dense
-  height: 100vh !important
-</style>

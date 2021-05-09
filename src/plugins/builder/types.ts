@@ -46,8 +46,8 @@ export interface FlowPart extends StatePart {
   flows: CalculatedFlows;
 }
 
-export interface PartUpdater {
-  updatePart: (part: PersistentPart) => void;
+export interface PartApi {
+  savePart: (part: PersistentPart) => unknown;
 }
 
 export interface CardSpec {
@@ -62,7 +62,7 @@ export interface PartSpec {
   cards: CardSpec[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
-  interactHandler?: (part: PersistentPart, updater: PartUpdater) => void;
+  interactHandler?: (part: PersistentPart, api: PartApi) => void;
 }
 
 export interface BuilderLayout extends StoreObject {
@@ -70,7 +70,6 @@ export interface BuilderLayout extends StoreObject {
   title: string;
   width: number;
   height: number;
-  scale?: number;
   order?: number;
   listed?: boolean;
   parts: PersistentPart[];

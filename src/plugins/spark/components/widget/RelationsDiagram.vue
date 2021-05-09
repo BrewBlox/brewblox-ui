@@ -50,8 +50,8 @@ export default defineComponent({
     const renderFunc = new dagre.render();
     const resetZoom = ref<() => void>(() => { });
 
-    const svgRef = ref<SVGGraphicsElement>();
-    const diagramRef = ref<SVGGraphicsElement>();
+    const svgRef = ref<SVGElement>();
+    const diagramRef = ref<SVGGElement>();
 
     const drawnNodes = computed<RelationNode[]>(
       () => [...new Set(props.edges.flatMap(edge => [edge.target, edge.source]))]
@@ -172,7 +172,7 @@ export default defineComponent({
       const { width, height } = graph.graph() as any;
 
       // Enable zooming the graph
-      const zoom = d3.zoom<SVGGraphicsElement, unknown>()
+      const zoom = d3.zoom<SVGElement, unknown>()
         .on('zoom', () => diagram.attr('transform', d3.event.transform));
 
       // Enable centering the graph
@@ -191,7 +191,8 @@ export default defineComponent({
       // We want something to happen if users immediately press the reset button
       svg
         .call(zoom)
-        .call(zoom.transform, centered(0.05));
+        .call(zoom.transform, centered(0.05))
+        .on('dblclick.zoom', resetZoom.value);
 
       // Provide functionality to reset zoom level
       // This captures local variables

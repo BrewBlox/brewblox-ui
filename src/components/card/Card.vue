@@ -30,6 +30,9 @@ export default defineComponent({
         if (dense.value) {
           listed.push('card__dense');
         }
+        if (props.noScroll) {
+          listed.push('card__no-scroll');
+        }
         return listed.join(' ');
       },
     );
