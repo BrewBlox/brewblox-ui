@@ -73,25 +73,23 @@ export default defineComponent({
           <TiltActions :service-id="serviceId" />
         </template>
       </ActionMenu>
-      <ButtonsTeleport>
-        <div class="q-pa-lg q-gutter-md row">
-          <div
-            v-for="value in values"
-            :key="value.id"
-            style="max-width: 500px"
-          >
-            <Card>
-              <template #toolbar>
-                <Toolbar
-                  :title="value.color"
-                  subtitle="Tilt"
-                />
-              </template>
-              <TiltValues :state="value" class="widget-body" />
-            </Card>
-          </div>
-        </div>
-      </buttonsteleport>
-    </buttonsteleport>
+    </ButtonsTeleport>
+    <div class="q-pa-lg q-gutter-md row">
+      <div
+        v-for="value in values"
+        :key="value.id"
+        style="max-width: 500px"
+      >
+        <Card>
+          <template #toolbar>
+            <Toolbar
+              :title="value.color"
+              subtitle="Tilt"
+            />
+          </template>
+          <TiltValues :state="value" class="widget-body" />
+        </Card>
+      </div>
+    </div>
   </q-page>
 </template>

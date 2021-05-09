@@ -49,6 +49,11 @@ services:
       - ./dev/simulator__spock:/app/simulator
     command: --name=spock --simulation --device-id=432109876543210987654321
 
+  tilt:
+    image: brewblox/brewblox-tilt:develop
+    restart: unless-stopped
+    command: --simulate=Pink --mqtt-host=eventbus --mqtt-protocol=mqtt
+
   traefik:
     image: traefik:2.2
     ports:
