@@ -80,7 +80,8 @@ export default defineComponent({
     async function createWidget(): Promise<void> {
       await ensureVolatile();
       if (canCreate.value && activeWidget.value) {
-        const widget = await tryCreateWidget(activeWidget.value);
+        const persistentWidget: Widget = { ...activeWidget.value, volatile: undefined };
+        const widget = await tryCreateWidget(persistentWidget);
         onDone({ widget });
       }
     }
