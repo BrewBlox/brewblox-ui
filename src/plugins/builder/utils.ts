@@ -8,13 +8,13 @@ import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { widgetStore } from '@/store/widgets';
-import { Coordinates, rotatedSize } from '@/utils/coordinates';
+import { Coordinates, CoordinatesParam, rotatedSize } from '@/utils/coordinates';
 import { createBlockDialog, createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy, mutate } from '@/utils/functional';
 
 import { CENTER, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './const';
 import { builderStore } from './store';
-import { BuilderLayout, FlowPart, PersistentPart, Rect, StatePart, Transitions } from './types';
+import { BuilderLayout, FlowPart, PersistentPart, StatePart, Transitions } from './types';
 
 export function settingsAddress(part: PersistentPart, key: string): BlockAddress {
   const obj: any = part.settings[key] ?? {};
@@ -35,8 +35,8 @@ export function settingsBlock<T extends Block>(part: PersistentPart, key: string
 }
 
 export function asPersistentPart(part: PersistentPart | FlowPart): PersistentPart {
-  const { transitions, size, flows, ...persistent } = part as FlowPart;
-  void { transitions, size, flows };
+  const { transitions, size, flows, canInteract, ...persistent } = part as FlowPart;
+  void { transitions, size, flows, canInteract };
   return persistent;
 }
 
@@ -46,6 +46,7 @@ export function asStatePart(part: PersistentPart): StatePart {
     ...part,
     transitions: spec.transitions(part),
     size: spec.size(part),
+    canInteract: spec.interactHandler !== undefined,
   };
 }
 
@@ -225,13 +226,6 @@ export function showLinkedWidgetDialog(part: PersistentPart, key: string): void 
   }
 }
 
-export function rectContains(rect: Rect, x: number, y: number): boolean {
-  return x >= rect.left
-    && x <= rect.right
-    && y >= rect.top
-    && y <= rect.bottom;
-}
-
 export function universalTransitions(size: [number, number], enabled: boolean): Transitions {
   if (!enabled) {
     return {};
@@ -273,7 +267,7 @@ export function vivifyParts(parts: PersistentPart[] | null | undefined): Persist
     .sort((a, b) => sizes[b.id] - sizes[a.id]);
 }
 
-export function rotatedCoord(part: StatePart, coord: string): string {
+export function rotatedCoord(part: StatePart, coord: CoordinatesParam): string {
   return new Coordinates(coord)
     .flipShapeEdge(!!part.flipped, 0, part.size)
     .rotateShapeEdge(part.rotate, 0, part.size)

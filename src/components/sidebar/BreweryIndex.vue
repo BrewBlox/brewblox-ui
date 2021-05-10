@@ -29,54 +29,35 @@ export default defineComponent({
       set: layouts => builderStore.updateLayoutOrder(layouts.map(v => v.id)),
     });
 
-    const builderPath = computed<string>(
-      () => route.path.startsWith('/brewery')
-        ? route.path.replace('/brewery', '/builder')
-        : '/builder',
+    const navPrefix = computed<string>(
+      () => route.path.startsWith('/builder')
+        ? '/builder'
+        : '/brewery',
+    );
+
+    const editorButtonPath = computed<string>(
+      () => {
+        if (route.path.startsWith('/brewery')) {
+          return route.path.replace('/brewery', '/builder');
+        }
+        else if (route.path.startsWith('/builder')) {
+          return route.path.replace('/builder', '/brewery');
+        }
+        else {
+          return '/builder';
+        }
+      },
     );
 
     return {
       dense,
       dragging,
       layouts,
-      builderPath,
+      navPrefix,
+      editorButtonPath,
     };
   },
 });
-
-// @Component
-// export default class BuilderLayoutIndex extends Vue {
-//   dragging = false;
-
-//   @Prop({ type: Boolean, required: true })
-//   public readonly value!: boolean;
-
-//   get editing(): boolean {
-//     return this.value;
-//   }
-
-//   set editing(val: boolean) {
-//     this.$emit('input', val);
-//   }
-
-//   get layouts(): BuilderLayout[] {
-//     // avoid modifying the store object
-//     return [...builderStore.layouts]
-//       .filter(layout => layout.listed ?? true)
-//       .sort(objectSorter('order'));
-//   }
-
-//   set layouts(layouts: BuilderLayout[]) {
-//     builderStore.updateLayoutOrder(layouts.map(v => v.id));
-//   }
-
-//   get builderPath(): string {
-//     const { path } = this.$route;
-//     return path.startsWith('/brewery')
-//       ? path.replace('/brewery', '/builder')
-//       : '/builder';
-//   }
-// }
 </script>
 
 <template>
@@ -87,13 +68,14 @@ export default defineComponent({
       </q-item-section>
       <q-item-section class="col-auto">
         <q-btn
-          :to="builderPath"
+          :to="editorButtonPath"
           icon="mdi-tools"
           size="sm"
+          :color="navPrefix === '/builder' ? 'primary' : ''"
           flat
           round
         >
-          <q-tooltip>Open builder</q-tooltip>
+          <q-tooltip>Toggle editor mode</q-tooltip>
         </q-btn>
       </q-item-section>
       <q-item-section class="col-auto">
@@ -122,7 +104,7 @@ export default defineComponent({
     >
       <template #item="{element}">
         <q-item
-          :to="editing ? undefined : `/brewery/${element.id}`"
+          :to="editing ? undefined : `${navPrefix}/${element.id}`"
           :inset-level="0.2"
           :class="[
             'q-pb-sm',

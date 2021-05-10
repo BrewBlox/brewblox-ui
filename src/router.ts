@@ -7,17 +7,17 @@ import {
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/builder/:routeId',
-    component: () => import('@/plugins/builder/BuilderEditor.vue'),
-    props: true,
-  },
-  {
     path: '/',
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
       { path: '/admin', component: () => import('@/pages/AdminPage.vue') },
       { path: '/styles', component: () => import('@/pages/StylesPage.vue') },
+      {
+        path: '/builder/:routeId',
+        component: () => import('@/plugins/builder/BuilderEditor.vue'),
+        props: true,
+      },
       {
         path: '/builder',
         component: () => import('@/plugins/builder/BuilderIndexPage.vue'),

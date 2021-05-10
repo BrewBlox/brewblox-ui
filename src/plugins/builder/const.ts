@@ -1,3 +1,5 @@
+import { FlowPart } from './types';
+
 export const typeName = 'Builder';
 export const defaultLayoutWidth = 20;
 export const defaultLayoutHeight = 15;
@@ -38,3 +40,104 @@ export const deprecatedTypes = {
   PwmPump: 'Pump',
   ActuatorValve: 'Valve',
 };
+
+export type BuilderModeName =
+  | 'select'
+  | 'pan'
+  | 'interact'
+
+export type BuilderToolName =
+  | 'add'
+  | 'move'
+  | 'copy'
+  | 'rotate'
+  | 'flip'
+  | 'edit'
+  | 'interact'
+  | 'delete'
+
+export interface BuilderMode {
+  value: BuilderModeName;
+  label: string;
+  icon: string;
+  class: (part: FlowPart) => string | string[] | AnyDict;
+}
+
+export interface BuilderTool {
+  value: BuilderToolName;
+  label: string;
+  icon: string;
+  shortcut: string;
+}
+
+export const builderModes: BuilderMode[] = [
+  {
+    label: 'Select',
+    value: 'select',
+    icon: 'mdi-select-drag',
+    class: part => part != null ? 'pointer' : '',
+  },
+  {
+    value: 'pan',
+    label: 'Pan',
+    icon: 'mdi-drag-variant',
+    class: () => '',
+  },
+  {
+    value: 'interact',
+    label: 'Interact',
+    icon: 'mdi-cursor-default',
+    class: part => part?.canInteract ? 'pointer' : '',
+  },
+];
+
+export const builderTools: BuilderTool[] = [
+  {
+    value: 'add',
+    label: 'New',
+    icon: 'add',
+    shortcut: 'n',
+  },
+  {
+    value: 'move',
+    label: 'Move',
+    icon: 'mdi-cursor-move',
+    shortcut: 'm',
+  },
+  {
+    value: 'copy',
+    label: 'Copy',
+    icon: 'file_copy',
+    shortcut: 'c',
+  },
+  {
+    value: 'rotate',
+    label: 'Rotate',
+    icon: 'mdi-rotate-right-variant',
+    shortcut: 'r',
+  },
+  {
+    label: 'Flip',
+    value: 'flip',
+    icon: 'mdi-swap-horizontal-bold',
+    shortcut: 'f',
+  },
+  {
+    value: 'edit',
+    label: 'Edit Settings',
+    icon: 'settings',
+    shortcut: 'e',
+  },
+  {
+    label: 'Interact',
+    value: 'interact',
+    icon: 'mdi-cursor-default',
+    shortcut: 'i',
+  },
+  {
+    label: 'Delete',
+    value: 'delete',
+    icon: 'delete',
+    shortcut: 'd',
+  },
+];

@@ -17,6 +17,7 @@ function asStatePart(part: PersistentPart): StatePart {
     ...part,
     transitions: spec.transitions(part),
     size: spec.size(part),
+    canInteract: spec.interactHandler !== undefined,
   };
 }
 

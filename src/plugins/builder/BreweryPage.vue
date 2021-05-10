@@ -221,6 +221,7 @@ export default defineComponent({
           </g>
         </svg>
         <q-btn
+          v-if="!dense"
           unelevated
           class="absolute-bottom-right q-ma-lg"
           color="secondary"

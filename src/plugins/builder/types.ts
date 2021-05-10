@@ -40,6 +40,7 @@ export interface PersistentPart {
 export interface StatePart extends PersistentPart {
   transitions: Transitions;
   size: [number, number];
+  canInteract: boolean;
 }
 
 export interface FlowPart extends StatePart {

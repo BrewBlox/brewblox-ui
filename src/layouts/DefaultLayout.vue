@@ -35,7 +35,8 @@ export default defineComponent({
     });
 
     const showSidebarLayouts = computed<boolean>(
-      () => systemStore.config.showSidebarLayouts,
+      () => systemStore.config.showSidebarLayouts
+        || /^\/(builder|brewery)/.test(router.currentRoute.value.path),
     );
 
     function stopEditing(): void {

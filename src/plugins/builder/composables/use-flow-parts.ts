@@ -1,8 +1,7 @@
 import debounce from 'lodash/debounce';
 import { nanoid } from 'nanoid';
-import { computed, ComputedRef, Ref, ref, watch, WritableComputedRef } from 'vue';
+import { computed, Ref, ref, watch, WritableComputedRef } from 'vue';
 
-import { Coordinates } from '@/utils/coordinates';
 import { deepCopy } from '@/utils/functional';
 
 import { calculateNormalizedFlows } from '../calculateFlows';
@@ -15,8 +14,6 @@ export interface UseFlowPartsComponent {
   saveLayout(): Awaitable<unknown>;
 
   parts: WritableComputedRef<PersistentPart[]>;
-  overlaps: ComputedRef<[Coordinates, number][]>;
-
   flowParts: Ref<FlowPart[]>;
   flowPartsRevision: Ref<string>;
 
@@ -72,19 +69,6 @@ export const useFlowParts: UseFlowPartsComposable = {
       { leading: true },
     );
 
-    const overlaps = computed<[Coordinates, number][]>(
-      () => {
-        const counts: Mapped<number> = {};
-        for (const part of parts.value) {
-          const key = new Coordinates([part.x, part.y, 0]).toString();
-          counts[key] = (counts[key] || 0) + 1;
-        }
-        return Object.entries(counts)
-          .filter(([, v]) => v > 1)
-          .map(([k, v]) => [new Coordinates(k), v] as [Coordinates, number]);
-      },
-    );
-
     watch(
       () => builderStore.layoutById(layoutId.value),
       newV => layout.value = newV,
@@ -100,7 +84,6 @@ export const useFlowParts: UseFlowPartsComposable = {
       layout,
       saveLayout,
       parts,
-      overlaps,
       flowParts,
       flowPartsRevision,
       calculateFlowParts,

@@ -102,56 +102,6 @@ export default defineComponent({
     };
   },
 });
-
-// @Component
-// export default class PidFull
-//   extends BlockCrudComponent<PidBlock> {
-
-//   get inputBlock(): SetpointSensorPairBlock | null {
-//     return sparkModule.blockByLink(block.value.data.inputId);
-//   }
-
-//   get inputDriven(): boolean {
-//     return isBlockDriven(inputBlock.value);
-//   }
-
-//   get outputBlock(): Block | null {
-//     return sparkModule.blockByLink(block.value.data.outputId);
-//   }
-
-//   get baseOutput(): number {
-//     return block.value.data.p + block.value.data.i + block.value.data.d;
-//   }
-
-//   get boiling(): boolean {
-//     return block.value.data.boilModeActive;
-//   }
-
-//   get boilAdjustment(): number {
-//     return boiling.value
-//       ? block.value.data.boilMinOutput - baseOutput.value
-//       : 0;
-//   }
-
-//   get waterBoilTemp(): Quantity {
-//     return tempQty(100);
-//   }
-
-//   showInput(): void {
-//     createBlockDialog(inputBlock.value);
-//   }
-
-//   showOutput(): void {
-//     createBlockDialog(outputBlock.value);
-//   }
-
-//   grid(opts: GridOpts): Mapped<string> {
-//     return {
-//       gridColumnStart: `${opts.start || 'auto'}`,
-//       gridColumnEnd: `span ${opts.span || 1}`,
-//     };
-//   }
-// }
 </script>
 
 <template>

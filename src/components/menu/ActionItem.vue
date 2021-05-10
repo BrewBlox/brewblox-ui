@@ -73,7 +73,9 @@ export default defineComponent({
     <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>
-    <q-item-section>{{ label }}</q-item-section>
+    <q-item-section v-if="label">
+      {{ label }}
+    </q-item-section>
     <slot />
   </q-item>
 </template>
