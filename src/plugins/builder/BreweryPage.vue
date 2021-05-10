@@ -178,7 +178,7 @@ export default defineComponent({
           {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
         </span>
         <svg ref="svgRef" class="fit">
-          <g ref="svgContentRef" :key="`content-${layoutId}`">
+          <g ref="svgContentRef">
             <g
               v-for="part in flowParts"
               :key="`${flowPartsRevision}-${part.id}`"

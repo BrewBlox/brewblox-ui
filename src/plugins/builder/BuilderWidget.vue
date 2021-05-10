@@ -252,6 +252,7 @@ export default defineComponent({
               inactive: !!pending
             }"
             @click.stop="interact(part)"
+            @dblclick.stop
           >
             <PartWrapper
               :part="part"

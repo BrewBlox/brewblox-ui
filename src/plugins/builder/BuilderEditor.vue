@@ -721,8 +721,7 @@ export default defineComponent({
             ? selectedIds.value
             : [this.getAttribute('part-id')];
           const parts = flowParts.value
-            .filter(part => partIds.includes(part.id))
-            .map(deepCopy);
+            .filter(part => partIds.includes(part.id));
 
           makeFloater({
             moving: true,
