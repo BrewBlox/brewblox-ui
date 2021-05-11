@@ -29,6 +29,7 @@ module.exports = {
     'object-curly-newline': 0,
     'no-param-reassign': 0,
     'no-console': 'warn',
+    'no-debugger': 'warn',
     'no-multiple-empty-lines': 'error',
     'comma-dangle': [
       'error',

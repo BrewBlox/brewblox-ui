@@ -88,7 +88,8 @@ export const useSvgZoom: UseSvgZoomComposable = {
 
       if (!dragEnabled.value) {
         selection
-          .on('mousedown.zoom', null);
+          .on('mousedown.zoom', null)
+          .on('touchstart.zoom', null);
       }
     }
 

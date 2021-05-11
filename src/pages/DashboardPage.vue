@@ -7,6 +7,7 @@ import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { featureStore, WidgetContext } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
+import { startChangeDashboardTitle } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { objectSorter } from '@/utils/functional';
 
@@ -65,6 +66,15 @@ export default defineComponent({
       })),
     );
 
+    function editTitle(): void {
+      if (dashboard.value) {
+        startChangeDashboardTitle(
+          dashboard.value,
+          newId => router.replace(`/dashboard/${newId}`),
+        );
+      }
+    }
+
     watch(
       () => dashboardId.value,
       () => widgetEditable.value = false,
@@ -99,6 +109,7 @@ export default defineComponent({
       showWizard,
       widgets,
       dashboardItems,
+      editTitle,
     };
   },
 });
@@ -111,7 +122,7 @@ export default defineComponent({
     </PageError>
     <template v-else>
       <TitleTeleport>
-        {{ dashboard.title }}
+        <span @click="editTitle">{{ dashboard.title }}</span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn

@@ -7,6 +7,7 @@ import { WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { ContextKey } from '@/symbols';
 import { objectStringSorter } from '@/utils/functional';
+import { startChangeServiceTitle } from '@/utils/services';
 
 const context: WidgetContext = {
   mode: 'Basic',
@@ -33,6 +34,10 @@ export default defineComponent({
       () => service.value?.title ?? 'Spark service',
     );
 
+    function editTitle(): void {
+      startChangeServiceTitle(service.value);
+    }
+
     watch(
       () => title.value,
       (title) => {
@@ -49,6 +54,7 @@ export default defineComponent({
     return {
       service,
       title,
+      editTitle,
       values,
     };
   },
@@ -58,7 +64,7 @@ export default defineComponent({
 <template>
   <q-page class="page-height">
     <TitleTeleport>
-      {{ title }}
+      <span @click="editTitle">{{ title }}</span>
     </TitleTeleport>
     <ButtonsTeleport>
       <ActionMenu

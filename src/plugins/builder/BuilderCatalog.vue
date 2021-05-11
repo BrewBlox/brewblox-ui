@@ -2,7 +2,7 @@
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { useDialog } from '@/composables';
+import { useDialog, useGlobals } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { objectStringSorter } from '@/utils/functional';
 
@@ -32,6 +32,7 @@ export default defineComponent({
     ...useDialog.emits,
   ],
   setup(props) {
+    const { dense } = useGlobals.setup();
     const {
       dialogRef,
       dialogProps,
@@ -83,6 +84,7 @@ export default defineComponent({
 
     return {
       squares,
+      dense,
       dialogRef,
       dialogProps,
       onDialogHide,
@@ -100,6 +102,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
+    :maximized="dense"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >

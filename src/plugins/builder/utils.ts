@@ -310,3 +310,22 @@ export async function startAddLayout(source: BuilderLayout | null = null): Promi
   });
   return id;
 }
+
+export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
+  if (!layout) {
+    return;
+  }
+  createDialog({
+    component: 'InputDialog',
+    componentProps: {
+      title: 'Change Layout title',
+      message: `Choose a new name for ${layout.title}`,
+      modelValue: layout.title,
+    },
+  })
+    .onOk(title => {
+      if (layout) {
+        builderStore.saveLayout({ ...layout, title });
+      }
+    });
+}

@@ -12,7 +12,7 @@ import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import notify from '@/utils/notify';
 
-import { startAddLayout } from '../utils';
+import { startAddLayout, startChangeLayoutTitle } from '../utils';
 
 export default defineComponent({
   name: 'LayoutActions',
@@ -86,22 +86,7 @@ export default defineComponent({
     }
 
     function renameLayout(): void {
-      if (!props.layout) {
-        return;
-      }
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          title: 'Change Layout title',
-          message: `Choose a new name for ${props.layout.title}`,
-          modelValue: props.layout.title,
-        },
-      })
-        .onOk(title => {
-          if (props.layout) {
-            builderStore.saveLayout({ ...props.layout, title });
-          }
-        });
+      startChangeLayoutTitle(props.layout);
     }
 
     function clearParts(): void {

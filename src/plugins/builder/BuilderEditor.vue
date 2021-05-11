@@ -26,14 +26,19 @@ import { useDragSelect, useFlowParts, useSvgZoom, UseSvgZoomDimensions } from '.
 import { BuilderMode, BuilderModeName, builderModes, BuilderToolName, builderTools, SQUARE_SIZE } from './const';
 import { builderStore } from './store';
 import { BuilderLayout, FlowPart, PersistentPart } from './types';
-import { asStatePart, squares, startAddLayout } from './utils';
+import { asStatePart, squares, startAddLayout, startChangeLayoutTitle } from './utils';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>
 
+/**
+ * A group of parts that is currently being moved.
+ * For performance reasons, this is kept as a local variable,
+ * as the x/y coordinates will be constantly updated.
+ *
+ * All parts in the floater will be rendered at `floater.x + part.x` / `floater.y + part.y`.
+ * This way, only floater.x/y have to be updated to move all contained parts.
+ */
 interface Floater extends XYPosition {
-  startX: number;
-  startY: number;
-  moving: boolean;
   parts: FlowPart[];
 }
 
@@ -75,7 +80,6 @@ export default defineComponent({
 
     const focusRef = ref<HTMLElement>();
     const hasFocus = ref<boolean>(true);
-    const focusWarningEnabled = ref<boolean>(true);
 
     function checkFocus(): void {
       nextTick(() => {
@@ -91,6 +95,11 @@ export default defineComponent({
     const startupDone = computed<boolean>(
       () => systemStore.startupDone,
     );
+
+    const focusWarningEnabled = computed<boolean>({
+      get: () => builderStore.focusWarningEnabled,
+      set: v => builderStore.focusWarningEnabled = v,
+    });
 
     const layouts = computed<BuilderLayout[]>(
       () => builderStore.layouts,
@@ -111,6 +120,10 @@ export default defineComponent({
     const layoutTitle = computed<string>(
       () => layout.value?.title ?? 'Builder editor',
     );
+
+    function editTitle(): void {
+      startChangeLayoutTitle(layout.value);
+    }
 
     const gridDimensions = computed<UseSvgZoomDimensions>(
       () => ({
@@ -215,14 +228,13 @@ export default defineComponent({
     }
 
     function makeFloater(source: Floater): void {
-      floater.value = reactive(deepCopy(source));
+      floater.value = deepCopy(source);
     }
 
     const moveFloater = throttle(
-      (gridCoords: XYPosition): void => {
+      ({ x, y }: XYPosition): void => {
         if (floater.value) {
-          floater.value.x = gridCoords.x - floater.value.startX;
-          floater.value.y = gridCoords.y - floater.value.startY;
+          floater.value = { ...floater.value, x, y };
         }
       },
       50,
@@ -230,6 +242,7 @@ export default defineComponent({
 
     function dropFloater(coords: XYPosition | null): void {
       if (!floater.value) { return; }
+      const source = floater.value;
 
       if (coords) {
         const ids: string[] = [];
@@ -237,16 +250,16 @@ export default defineComponent({
         floater.value.parts
           .forEach(part => {
             ids.push(part.id);
-            part.x += floater.value!.x;
-            part.y += floater.value!.y;
+            part.x += coords.x;
+            part.y += coords.y;
           });
 
         saveParts([
           ...parts.value.filter(p => !ids.includes(p.id)),
-          ...floater.value.parts,
+          ...source.parts,
         ]);
       }
-      // selectedIds.value = [];
+
       floater.value = null;
     }
 
@@ -303,11 +316,8 @@ export default defineComponent({
         })
           .onOk((part: PersistentPart) => {
             makeFloater({
-              moving: false,
               x: 0,
               y: 0,
-              startX: part.x,
-              startY: part.y,
               parts: [{ ...asStatePart(part), flows: {} }],
             });
             setFocus();
@@ -321,20 +331,17 @@ export default defineComponent({
         dropFloater(toCoords(gridHoverPos.value));
       }
       else if (activeParts.length) {
+        // gridHoverPos will not be set if the tool is used by clicking on the tools menu
+        const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         const minX = Math.min(...activeParts.map(part => part.x));
         const minY = Math.min(...activeParts.map(part => part.y));
-        const startPos = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
-        makeFloater({
-          ...startPos,
-          moving: true,
-          startX: minX,
-          startY: minY,
-          parts: activeParts.map(part => ({
-            ...part,
-            x: part.x - minX,
-            y: part.y - minY,
-          })),
-        });
+        const parts = activeParts.map(part => ({
+          ...part,
+          x: part.x - minX,
+          y: part.y - minY,
+        }));
+
+        makeFloater({ x, y, parts });
       }
     }
 
@@ -343,21 +350,17 @@ export default defineComponent({
         dropFloater(toCoords(gridHoverPos.value));
       }
       else if (activeParts.length) {
+        // gridHoverPos will not be set if the tool is used by clicking on the tools menu
+        const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         const minX = Math.min(...activeParts.map(part => part.x));
         const minY = Math.min(...activeParts.map(part => part.y));
-        const startPos = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
-        makeFloater({
-          ...startPos,
-          moving: false,
-          startX: minX,
-          startY: minY,
-          parts: activeParts.map(part => ({
-            ...part,
-            id: nanoid(),
-            x: part.x - minX,
-            y: part.y - minY,
-          })),
-        });
+        const parts = activeParts.map(part => ({
+          ...part,
+          id: nanoid(),
+          x: part.x - minX,
+          y: part.y - minY,
+        }));
+        makeFloater({ x, y, parts });
       }
     }
 
@@ -431,6 +434,14 @@ export default defineComponent({
       interact: useInteract,
       delete: useDelete,
     };
+
+    function useTool(name: BuilderToolName): void {
+      const action = builderToolActions[name];
+      if (action) {
+        action(findActiveParts());
+        setFocus();
+      }
+    }
 
     ////////////////////////////////////////////////////////////////
     // Event handlers
@@ -535,18 +546,15 @@ export default defineComponent({
             ? selectedIds.value
             : [this.getAttribute('part-id')];
           const parts = flowParts.value
-            .filter(part => partIds.includes(part.id));
+            .filter(part => partIds.includes(part.id))
+            .map(part => ({
+              ...part,
+              x: part.x - start.x,
+              y: part.y - start.y,
+            }));
 
-          makeFloater({
-            moving: true,
-            parts,
-            startX: start.x,
-            startY: start.y,
-            x: x - start.x,
-            y: y - start.y,
-          });
+          makeFloater({ x, y, parts });
         }
-
       })
       .on('end', function () {
         const coords = toCoords(d3EventPos());
@@ -575,6 +583,9 @@ export default defineComponent({
       if (key === 'Escape') {
         clear();
       }
+      else if (key === 'Delete') {
+        useTool('delete');
+      }
       else if (keyDelta) {
         deltaMove(findActiveParts(), keyDelta);
       }
@@ -585,7 +596,7 @@ export default defineComponent({
         redo();
       }
       else if (tool) {
-        builderToolActions[tool.value](findActiveParts());
+        useTool(tool.value);
       }
       else {
         return; // not handled - don't stop propagation
@@ -686,8 +697,10 @@ export default defineComponent({
       startupDone,
       activeMode,
       layouts,
+      layoutId,
       layout,
       layoutTitle,
+      editTitle,
       selectLayout,
       createLayout,
       savePart,
@@ -698,6 +711,7 @@ export default defineComponent({
       closeMenu,
 
       keyHandler,
+      useTool,
       leaveEditor,
 
       history,
@@ -725,18 +739,20 @@ export default defineComponent({
     />
 
     <TitleTeleport>
-      {{ layoutTitle }}
+      <span @click="editTitle">{{ layoutTitle }}</span>
     </TitleTeleport>
 
     <ButtonsTeleport v-if="layout">
       <q-btn
         flat
         round
-        icon="mdi-arrow-left-circle"
-        size="md"
-        class="close-button"
-        @click="leaveEditor"
-      />
+        icon="mdi-tools"
+        class="self-center"
+        color="primary"
+        :to="`/brewery/${layoutId}`"
+      >
+        <q-tooltip>Leave editor</q-tooltip>
+      </q-btn>
       <ActionMenu
         round
         class="self-center"
@@ -744,6 +760,17 @@ export default defineComponent({
       >
         <template #menus>
           <LayoutActions :layout="layout" />
+        </template>
+        <template #actions>
+          <ToggleAction
+            v-model="focusWarningEnabled"
+            label="Show focus warning"
+          />
+          <ActionItem
+            label="Reset zoom"
+            icon="mdi-stretch-to-page-outline"
+            @click="resetZoom"
+          />
         </template>
       </ActionMenu>
     </ButtonsTeleport>
@@ -844,51 +871,35 @@ export default defineComponent({
             style="pointer-events: none;"
           />
         </g>
-        <BuilderToolbar v-model:mode="activeMode">
+        <BuilderToolsMenu v-model:mode="activeMode" @use="useTool">
           <template #tools>
             <ActionItem
               :disable="!history.length"
               icon="mdi-undo"
-              :label="dense ? '' : 'Undo'"
+              label="Undo"
               :inset-level="0.2"
               style="min-height: 0px"
               @click="undo"
             >
-              <q-item-section side class="text-uppercase">
+              <q-item-section v-if="!dense" side class="text-uppercase">
                 ctrl-Z
               </q-item-section>
             </ActionItem>
             <ActionItem
               :disable="!undoneHistory.length"
               icon="mdi-redo"
-              :label="dense ? '' : 'Redo'"
+              label="Redo"
               :inset-level="0.2"
               style="min-height: 0px"
               @click="redo"
             >
-              <q-item-section side class="text-uppercase">
+              <q-item-section v-if="!dense" side class="text-uppercase">
                 ctrl-Y
               </q-item-section>
             </ActionItem>
           </template>
-        </BuilderToolbar>
+        </BuilderToolsMenu>
       </svg>
-      <div
-        v-if="!dense"
-        class="absolute-bottom-right q-ma-lg row q-gutter-x-sm"
-      >
-        <ToggleButton v-model="focusWarningEnabled" />
-        <q-btn
-          unelevated
-          color="secondary"
-          icon="mdi-stretch-to-page-outline"
-          @click="resetZoom"
-        >
-          <q-tooltip>
-            Fit to screen
-          </q-tooltip>
-        </q-btn>
-      </div>
       <div
         v-if="!hasFocus && focusWarningEnabled"
         class="unfocus-overlay row items-center justify-center"

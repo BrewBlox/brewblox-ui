@@ -93,7 +93,7 @@ module.exports = configure(function (ctx) {
       extractCSS: true,
 
       devtool: ctx.dev
-        ? 'eval-cheap-source-map'
+        ? 'eval-cheap-module-source-map'
         : undefined,
 
       env: ctx.dev
