@@ -116,7 +116,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-page style="overflow: auto" class="page-height">
+  <q-page class="page-height">
     <PageError v-if="!dashboard">
       <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
     </PageError>
@@ -151,44 +151,46 @@ export default defineComponent({
         </ActionMenu>
       </ButtonsTeleport>
 
-      <div
-        v-if="dashboardItems.length === 0"
-        class="absolute-center"
-      >
-        <q-btn
-          unelevated
-          color="secondary"
-          icon="mdi-creation"
-          size="lg"
-          label="Get started"
-          @click="showWizard(false)"
-        />
-      </div>
-      <div
-        v-else-if="dense"
-        class="column q-gutter-y-sm q-pa-md"
-      >
-        <WidgetProvider
-          v-for="val in dashboardItems"
-          :key="val.widget.id"
-          :widget-id="val.widget.id"
-          :context="context"
+      <q-scroll-area class="fit">
+        <div
+          v-if="dashboardItems.length === 0"
+          class="absolute-center"
         >
-          <component
-            :is="val.component"
-            :error="val.error"
-            class="col full-width"
+          <q-btn
+            unelevated
+            color="secondary"
+            icon="mdi-creation"
+            size="lg"
+            label="Get started"
+            @click="showWizard(false)"
           />
-        </WidgetProvider>
-      </div>
-      <GridContainer
-        v-else
-        class="q-ma-lg"
-        :items="dashboardItems"
-        :context="context"
-        :editable="widgetEditable"
-        @dblclick="showWizard(true)"
-      />
+        </div>
+        <div
+          v-else-if="dense"
+          class="column q-gutter-y-sm q-pa-md"
+        >
+          <WidgetProvider
+            v-for="val in dashboardItems"
+            :key="val.widget.id"
+            :widget-id="val.widget.id"
+            :context="context"
+          >
+            <component
+              :is="val.component"
+              :error="val.error"
+              class="col full-width"
+            />
+          </WidgetProvider>
+        </div>
+        <GridContainer
+          v-else
+          class="q-ma-lg"
+          :items="dashboardItems"
+          :context="context"
+          :editable="widgetEditable"
+          @dblclick="showWizard(true)"
+        />
+      </q-scroll-area>
     </template>
   </q-page>
 </template>
