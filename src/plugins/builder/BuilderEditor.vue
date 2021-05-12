@@ -7,7 +7,6 @@ import {
   computed,
   defineComponent,
   nextTick,
-  reactive,
   ref,
   UnwrapRef,
   watch,
@@ -18,14 +17,13 @@ import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
 import { rotatedSize } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
+import { keyEventString } from '@/utils/events';
 import { clampRotation, deepCopy, filterById, spliceById, uniqueFilter } from '@/utils/functional';
 
-import BuilderCatalog from './BuilderCatalog.vue';
-import BuilderPartMenu from './BuilderPartMenu.vue';
 import { useDragSelect, useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
-import { BuilderMode, BuilderModeName, builderModes, BuilderToolName, builderTools, SQUARE_SIZE } from './const';
+import { builderModes, builderTools, SQUARE_SIZE } from './const';
 import { builderStore } from './store';
-import { BuilderLayout, FlowPart, PersistentPart } from './types';
+import { BuilderLayout, BuilderMode, BuilderModeName, BuilderToolName, FlowPart, PersistentPart } from './types';
 import { asStatePart, squares, startAddLayout, startChangeLayoutTitle } from './utils';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>
@@ -51,9 +49,6 @@ const moveKeys: Record<string, XYPosition> = {
 
 export default defineComponent({
   name: 'BuilderEditor',
-  components: {
-    BuilderPartMenu,
-  },
   props: {
     routeId: {
       type: String,
@@ -67,7 +62,8 @@ export default defineComponent({
     const history = ref<string[]>([]);
     const undoneHistory = ref<string[]>([]);
 
-    const menuDialogOpen = ref<boolean>(false);
+    const settingsDialogOpen = ref<boolean>(false);
+    const toolsMenuExpanded = ref<boolean>(!dense.value);
 
     const activeMode = ref<BuilderModeName>('select');
 
@@ -190,22 +186,6 @@ export default defineComponent({
       saveParts(filterById(parts.value, part));
     }
 
-    function undo(): void {
-      if (history.value.length > 0) {
-        cancelSelection();
-        undoneHistory.value.push(JSON.stringify(parts.value));
-        parts.value = JSON.parse(history.value.pop()!);
-      }
-    }
-
-    function redo(): void {
-      if (undoneHistory.value.length > 0) {
-        cancelSelection();
-        history.value.push(JSON.stringify(parts.value));
-        parts.value = JSON.parse(undoneHistory.value.pop()!);
-      }
-    }
-
     // Return the grid coordinates of the current event
     function toCoords(pos: XYPosition): XYPosition;
     function toCoords(pos: XYPosition | null): XYPosition | null;
@@ -292,12 +272,8 @@ export default defineComponent({
     }
 
     function closeMenu(): void {
-      menuDialogOpen.value = false;
+      settingsDialogOpen.value = false;
       nextTick(setFocus);
-    }
-
-    function leaveEditor(): void {
-      router.back();
     }
 
     function cancelSelection(): void {
@@ -312,7 +288,7 @@ export default defineComponent({
     function useAdd(): void {
       if (!floater.value) {
         createDialog({
-          component: BuilderCatalog,
+          component: 'BuilderCatalogDialog',
         })
           .onOk((part: PersistentPart) => {
             makeFloater({
@@ -393,7 +369,7 @@ export default defineComponent({
     function useEdit(activeParts: FlowPart[]): void {
       if (!floater.value && activeParts.length === 1) {
         configuredId.value = activeParts[0].id;
-        menuDialogOpen.value = true;
+        settingsDialogOpen.value = true;
       }
     }
 
@@ -409,6 +385,22 @@ export default defineComponent({
         const ids = activeParts.map(p => p.id);
         saveParts([...parts.value.filter(p => !ids.includes(p.id))]);
         cancelSelection();
+      }
+    }
+
+    function useUndo(): void {
+      if (history.value.length > 0) {
+        cancelSelection();
+        undoneHistory.value.push(JSON.stringify(parts.value));
+        parts.value = JSON.parse(history.value.pop()!);
+      }
+    }
+
+    function useRedo(): void {
+      if (undoneHistory.value.length > 0) {
+        cancelSelection();
+        history.value.push(JSON.stringify(parts.value));
+        parts.value = JSON.parse(undoneHistory.value.pop()!);
       }
     }
 
@@ -433,6 +425,8 @@ export default defineComponent({
       edit: useEdit,
       interact: useInteract,
       delete: useDelete,
+      undo: useUndo,
+      redo: useRedo,
     };
 
     function useTool(name: BuilderToolName): void {
@@ -442,6 +436,28 @@ export default defineComponent({
         setFocus();
       }
     }
+
+    const disabledTools = computed<BuilderToolName[]>(
+      () => {
+        const tools: BuilderToolName[] = [];
+        if (floater.value) {
+          tools.push('add', 'delete', 'edit', 'interact');
+          if (floater.value.parts.length > 1) {
+            tools.push('rotate', 'flip');
+          }
+        }
+        else if (selectedIds.value.length > 1) {
+          tools.push('interact', 'edit', 'rotate', 'flip');
+        }
+        if (!history.value.length) {
+          tools.push('undo');
+        }
+        if (!undoneHistory.value.length) {
+          tools.push('redo');
+        }
+        return tools;
+      },
+    );
 
     ////////////////////////////////////////////////////////////////
     // Event handlers
@@ -576,7 +592,7 @@ export default defineComponent({
       });
 
     function keyHandler(evt: KeyboardEvent): void {
-      const key = evt.key;
+      const key = keyEventString(evt);
       const keyDelta = moveKeys[key];
       const tool = builderTools.find(v => v.shortcut === key);
 
@@ -588,12 +604,6 @@ export default defineComponent({
       }
       else if (keyDelta) {
         deltaMove(findActiveParts(), keyDelta);
-      }
-      else if (evt.ctrlKey && key === 'z') {
-        undo();
-      }
-      else if (evt.ctrlKey && key === 'y') {
-        redo();
       }
       else if (tool) {
         useTool(tool.value);
@@ -695,7 +705,6 @@ export default defineComponent({
       modeClass,
 
       startupDone,
-      activeMode,
       layouts,
       layoutId,
       layout,
@@ -706,18 +715,16 @@ export default defineComponent({
       savePart,
       removePart,
 
-      menuDialogOpen,
+      settingsDialogOpen,
       configuredPart,
       closeMenu,
 
-      keyHandler,
+      activeMode,
+      disabledTools,
+      toolsMenuExpanded,
       useTool,
-      leaveEditor,
 
-      history,
-      undoneHistory,
-      undo,
-      redo,
+      keyHandler,
     };
   },
 });
@@ -726,10 +733,10 @@ export default defineComponent({
 <template>
   <q-page
     class="page-height"
-    @keyup="keyHandler"
+    @keydown="keyHandler"
   >
-    <BuilderPartMenu
-      v-if="menuDialogOpen"
+    <BuilderPartSettingsDialog
+      v-if="settingsDialogOpen"
       :part="configuredPart"
       :rev="flowPartsRevision"
       @update:part="savePart"
@@ -738,7 +745,7 @@ export default defineComponent({
       @hide="closeMenu"
     />
 
-    <TitleTeleport>
+    <TitleTeleport v-if="layout">
       <span @click="editTitle">{{ layoutTitle }}</span>
     </TitleTeleport>
 
@@ -756,7 +763,7 @@ export default defineComponent({
       <ActionMenu
         round
         class="self-center"
-        label="Layout actions"
+        label="Builder actions"
       >
         <template #menus>
           <LayoutActions :layout="layout" />
@@ -871,35 +878,13 @@ export default defineComponent({
             style="pointer-events: none;"
           />
         </g>
-        <BuilderToolsMenu v-model:mode="activeMode" @use="useTool">
-          <template #tools>
-            <ActionItem
-              :disable="!history.length"
-              icon="mdi-undo"
-              label="Undo"
-              :inset-level="0.2"
-              style="min-height: 0px"
-              @click="undo"
-            >
-              <q-item-section v-if="!dense" side class="text-uppercase">
-                ctrl-Z
-              </q-item-section>
-            </ActionItem>
-            <ActionItem
-              :disable="!undoneHistory.length"
-              icon="mdi-redo"
-              label="Redo"
-              :inset-level="0.2"
-              style="min-height: 0px"
-              @click="redo"
-            >
-              <q-item-section v-if="!dense" side class="text-uppercase">
-                ctrl-Y
-              </q-item-section>
-            </ActionItem>
-          </template>
-        </BuilderToolsMenu>
       </svg>
+      <BuilderToolsMenu
+        v-model:mode="activeMode"
+        v-model:expanded="toolsMenuExpanded"
+        :disabled-tools="disabledTools"
+        @use="useTool"
+      />
       <div
         v-if="!hasFocus && focusWarningEnabled"
         class="unfocus-overlay row items-center justify-center"

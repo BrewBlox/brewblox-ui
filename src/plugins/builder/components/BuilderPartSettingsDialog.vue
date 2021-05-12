@@ -1,15 +1,15 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { useDialog } from '@/composables';
+import { useDialog, useGlobals } from '@/composables';
 import { clampRotation } from '@/utils/functional';
 
-import { builderStore } from './store';
-import { CardSpec, FlowPart, PartSpec } from './types';
-import { squares } from './utils';
+import { builderStore } from '../store';
+import { CardSpec, FlowPart, PartSpec } from '../types';
+import { squares } from '../utils';
 
 export default defineComponent({
-  name: 'BuilderPartMenu',
+  name: 'BuilderPartSettingsDialog',
   props: {
     ...useDialog.props,
     part: {
@@ -28,6 +28,7 @@ export default defineComponent({
     'dirty',
   ],
   setup(props, { emit }) {
+    const { dense } = useGlobals.setup();
     const {
       dialogRef,
       onDialogHide,
@@ -84,6 +85,7 @@ export default defineComponent({
 
     return {
       squares,
+      dense,
       dialogRef,
       onDialogHide,
       cards,
@@ -103,6 +105,7 @@ export default defineComponent({
     ref="dialogRef"
     persistent
     :model-value="true"
+    :maximized="dense"
     @update:model-value="onDialogHide"
     @keyup.esc="onDialogHide"
     @hide="onDialogHide"

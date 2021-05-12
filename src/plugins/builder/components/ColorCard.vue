@@ -51,7 +51,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="row">
+  <div class="row q-gutter-x-md q-pl-sm">
     <ColorField
       v-model="color"
       clearable
@@ -60,18 +60,16 @@ export default defineComponent({
       message="Select the fill color for this part."
       class="col-auto"
     />
-    <div class="col-grow row justify-around">
-      <q-btn
-        v-for="colorOpt in presetColors"
-        :key="colorOpt"
-        :style="`background-color: ${colorOpt}`"
-        :size="color == colorOpt ? 'lg' : 'md'"
-        :color="colorOpt"
-        round
-        icon="format_color_fill"
-        class="self-center"
-        @click="toggle(colorOpt)"
-      />
-    </div>
+    <q-btn
+      v-for="colorOpt in presetColors"
+      :key="colorOpt"
+      :style="`background-color: ${colorOpt}`"
+      :size="color == colorOpt ? 'lg' : 'md'"
+      :color="colorOpt"
+      round
+      icon="format_color_fill"
+      class="self-center"
+      @click="toggle(colorOpt)"
+    />
   </div>
 </template>

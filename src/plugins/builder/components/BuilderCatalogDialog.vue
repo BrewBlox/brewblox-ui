@@ -6,9 +6,9 @@ import { useDialog, useGlobals } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { objectStringSorter } from '@/utils/functional';
 
-import { builderStore } from './store';
-import { FlowPart, PartSpec, PersistentPart } from './types';
-import { asStatePart, squares } from './utils';
+import { builderStore } from '../store';
+import { FlowPart, PartSpec, PersistentPart } from '../types';
+import { asStatePart, squares } from '../utils';
 
 interface PartDisplay {
   part: FlowPart;
@@ -20,7 +20,7 @@ function asFlowPart(part: PersistentPart): FlowPart {
 }
 
 export default defineComponent({
-  name: 'BuilderCatalog',
+  name: 'BuilderCatalogDialog',
   props: {
     ...useDialog.props,
     partial: {

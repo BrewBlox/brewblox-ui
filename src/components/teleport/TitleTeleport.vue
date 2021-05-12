@@ -1,24 +1,13 @@
 <script lang="ts">
-import { defineComponent, inject, onErrorCaptured } from 'vue';
-
-import { TitleTeleportRefKey } from '@/symbols';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TitleTeleport',
-  setup() {
-    const titleRef = inject(TitleTeleportRefKey, undefined);
-
-    onErrorCaptured(() => false);
-
-    return {
-      titleRef,
-    };
-  },
 });
 </script>
 
 <template>
-  <teleport v-if="titleRef" :to="titleRef">
+  <portal to="toolbar-title">
     <slot />
-  </teleport>
+  </portal>
 </template>

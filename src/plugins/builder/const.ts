@@ -1,4 +1,4 @@
-import { FlowPart } from './types';
+import { BuilderMode, BuilderTool } from './types';
 
 export const typeName = 'Builder';
 export const defaultLayoutWidth = 20;
@@ -40,35 +40,6 @@ export const deprecatedTypes = {
   PwmPump: 'Pump',
   ActuatorValve: 'Valve',
 };
-
-export type BuilderModeName =
-  | 'select'
-  | 'pan'
-  | 'interact'
-
-export type BuilderToolName =
-  | 'add'
-  | 'move'
-  | 'copy'
-  | 'rotate'
-  | 'flip'
-  | 'edit'
-  | 'interact'
-  | 'delete'
-
-export interface BuilderMode {
-  value: BuilderModeName;
-  label: string;
-  icon: string;
-  class: (part: FlowPart) => string | string[] | AnyDict;
-}
-
-export interface BuilderTool {
-  value: BuilderToolName;
-  label: string;
-  icon: string;
-  shortcut: string;
-}
 
 export const builderModes: BuilderMode[] = [
   {
@@ -139,5 +110,17 @@ export const builderTools: BuilderTool[] = [
     value: 'delete',
     icon: 'delete',
     shortcut: 'd',
+  },
+  {
+    label: 'Undo',
+    value: 'undo',
+    icon: 'mdi-undo',
+    shortcut: 'ctrl+z',
+  },
+  {
+    label: 'Redo',
+    value: 'redo',
+    icon: 'mdi-redo',
+    shortcut: 'ctrl+y',
   },
 ];

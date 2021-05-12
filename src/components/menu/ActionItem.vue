@@ -46,9 +46,9 @@ export default defineComponent({
       }),
     );
 
-    function onClick(): void {
+    function onClick(evt: MouseEvent | TouchEvent): void {
       if (!props.disabled) {
-        emit('click');
+        emit('click', evt);
       }
     }
 

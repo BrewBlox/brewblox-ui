@@ -41,7 +41,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="row justify-between">
+  <div class="row justify-center q-gutter-xs">
     <q-btn
       outline
       icon="mdi-rotate-left-variant"
