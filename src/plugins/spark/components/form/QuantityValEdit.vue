@@ -5,6 +5,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { useValEdit } from '@/plugins/spark/composables';
 import { prettyQty, prettyUnit, Quantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
+import { roundNumber } from '@/utils/functional';
 
 export default defineComponent({
   name: 'QuantityValEdit',
@@ -19,7 +20,7 @@ export default defineComponent({
       field,
       startEdit,
     } = useValEdit.setup<Quantity>(props.modelValue);
-    const local = ref<number | null>(field.value.value);
+    const local = ref<number | null>(roundNumber(field.value.value));
 
     function syncField(): void {
       if (local.value === null || isFinite(local.value)) {
