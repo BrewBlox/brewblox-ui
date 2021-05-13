@@ -27,6 +27,7 @@ export default defineComponent({
     } = useWidget.setup<Widget<BuilderConfig>>();
 
     const pending = ref<FlowPart | null>(null);
+    const blocked = ref<boolean>(dense.value);
 
     const storeLayouts = computed<BuilderLayout[]>(
       () => builderStore.layouts,
@@ -51,18 +52,11 @@ export default defineComponent({
       }),
     );
 
-    const zoomEnabled = computed<boolean>(
-      () => !dense.value,
-    );
-
     const {
       svgRef,
       svgContentRef,
       resetZoom,
-    } = useSvgZoom.setup(gridDimensions, {
-      wheelEnabled: zoomEnabled,
-      dragEnabled: zoomEnabled,
-    });
+    } = useSvgZoom.setup(gridDimensions);
 
     function startSelectLayout(): void {
       createDialog({
@@ -102,11 +96,6 @@ export default defineComponent({
           || (builderTouchDelayed === 'dense' && dense.value);
       },
     );
-
-
-    function isClickable(part: FlowPart): boolean {
-      return builderStore.spec(part).interactHandler !== undefined;
-    }
 
     function interact(part: FlowPart | null): void {
       if (!part) {
@@ -152,6 +141,7 @@ export default defineComponent({
       squares,
       startSelectLayout,
       dense,
+      blocked,
       svgRef,
       svgContentRef,
       startEditor,
@@ -162,7 +152,6 @@ export default defineComponent({
       selectLayout,
       flowParts,
       flowPartsRevision,
-      isClickable,
       pending,
       interact,
       savePart,
@@ -248,7 +237,7 @@ export default defineComponent({
             :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
             :class="{
               [part.type]: true,
-              pointer: isClickable(part),
+              pointer: part.canInteract,
               inactive: !!pending
             }"
             @click.stop="interact(part)"
@@ -282,6 +271,23 @@ export default defineComponent({
           </template>
         </g>
       </svg>
+      <div
+        v-if="dense && blocked"
+        class="absolute-top-left fit bg-dark"
+        style="opacity: 0.4"
+        @touchstart.stop
+        @touchend.stop
+        @touchmove.stop
+      />
+      <q-btn
+        v-if="dense"
+        class="absolute-top-right q-ma-sm"
+        round
+        flat
+        color="primary"
+        :icon="blocked ? 'mdi-lock' : 'mdi-lock-open'"
+        @click="blocked = !blocked"
+      />
     </div>
   </Card>
 </template>
