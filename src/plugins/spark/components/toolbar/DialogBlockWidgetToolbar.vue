@@ -32,7 +32,7 @@ export default defineComponent({
     <BlockGraph
       v-if="graphModalOpen"
       :id="`graph-full-toolbar--${widgetId}`"
-      v-model="graphModalOpen"
+      v-model:modal="graphModalOpen"
       v-model:config="graphConfig"
     />
 
