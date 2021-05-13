@@ -16,6 +16,14 @@ interface HoldArguments {
   duration: number;
 }
 
+interface SwipeArguments {
+  touch: boolean;
+  mouse: boolean;
+  direction: 'up' | 'down' | 'left' | 'right';
+  duration: number;
+  distance: { x: number; y: number };
+}
+
 interface XYPosition {
   x: number;
   y: number;

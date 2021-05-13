@@ -43,16 +43,16 @@ export const deprecatedTypes = {
 
 export const builderModes: BuilderMode[] = [
   {
-    label: 'Select',
-    value: 'select',
-    icon: 'mdi-select-drag',
-    class: part => part != null ? 'pointer' : '',
-  },
-  {
     value: 'pan',
     label: 'Pan',
     icon: 'mdi-drag-variant',
     class: () => '',
+  },
+  {
+    label: 'Select',
+    value: 'select',
+    icon: 'mdi-select-drag',
+    class: part => part != null ? 'pointer' : '',
   },
   {
     value: 'interact',

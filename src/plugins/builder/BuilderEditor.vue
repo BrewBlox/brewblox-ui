@@ -18,7 +18,7 @@ import { systemStore } from '@/store/system';
 import { rotatedSize } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
-import { clampRotation, deepCopy, filterById, spliceById, uniqueFilter } from '@/utils/functional';
+import { clampRotation, deepCopy, uniqueFilter } from '@/utils/functional';
 
 import { useDragSelect, useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderModes, builderTools, SQUARE_SIZE } from './const';
@@ -65,7 +65,7 @@ export default defineComponent({
     const settingsDialogOpen = ref<boolean>(false);
     const toolsMenuExpanded = ref<boolean>(!dense.value);
 
-    const activeMode = ref<BuilderModeName>('select');
+    const activeMode = ref<BuilderModeName>('pan');
 
     const gridHoverPos = ref<XYPosition | null>(null);
     const partDragStart = ref<XYPosition | null>(null);
@@ -179,11 +179,11 @@ export default defineComponent({
     }
 
     function savePart(part: PersistentPart): void {
-      saveParts(spliceById(parts.value, part));
+      saveParts(parts.value.map(v => v.id === part.id ? part : v));
     }
 
     function removePart(part: PersistentPart): void {
-      saveParts(filterById(parts.value, part));
+      saveParts(parts.value.filter(v => v.id !== part.id));
     }
 
     // Return the grid coordinates of the current event
@@ -274,6 +274,15 @@ export default defineComponent({
     function closeMenu(): void {
       settingsDialogOpen.value = false;
       nextTick(setFocus);
+    }
+
+    function toggleSelect(id: string | null): void {
+      if (id) {
+        const idx = selectedIds.value.indexOf(id);
+        selectedIds.value = idx >= 0
+          ? [...selectedIds.value.filter(v => v !== id)]
+          : [...selectedIds.value, id];
+      }
     }
 
     function cancelSelection(): void {
@@ -383,24 +392,26 @@ export default defineComponent({
     function useDelete(activeParts: FlowPart[]): void {
       if (!floater.value && activeParts.length) {
         const ids = activeParts.map(p => p.id);
-        saveParts([...parts.value.filter(p => !ids.includes(p.id))]);
+        saveParts(parts.value.filter(p => !ids.includes(p.id)));
         cancelSelection();
       }
     }
 
     function useUndo(): void {
-      if (history.value.length > 0) {
+      const state = history.value.pop();
+      if (state) {
         cancelSelection();
         undoneHistory.value.push(JSON.stringify(parts.value));
-        parts.value = JSON.parse(history.value.pop()!);
+        parts.value = JSON.parse(state);
       }
     }
 
     function useRedo(): void {
-      if (undoneHistory.value.length > 0) {
+      const state = undoneHistory.value.pop();
+      if (state) {
         cancelSelection();
         history.value.push(JSON.stringify(parts.value));
-        parts.value = JSON.parse(undoneHistory.value.pop()!);
+        parts.value = JSON.parse(state);
       }
     }
 
@@ -494,6 +505,7 @@ export default defineComponent({
     }
 
     const gridDragHandler = d3.drag<SVGElement, unknown>()
+      .clickDistance(25)
       .on('start', function () {
         if (!floater.value) {
           const { x, y } = d3EventPos();
@@ -541,6 +553,7 @@ export default defineComponent({
       });
 
     const partDragHandler = d3.drag()
+      .clickDistance(25)
       .on('start', function () {
         // We're not sure yet whether this is a drag or a click
         // The action becomes a drag once the mouse leaves the square
@@ -573,22 +586,8 @@ export default defineComponent({
         }
       })
       .on('end', function () {
-        const coords = toCoords(d3EventPos());
-        const id = this.getAttribute('part-id');
         partDragStart.value = null;
-
-        // This was a drag event
-        if (floater.value) {
-          dropFloater(coords);
-        }
-        // This was a click event
-        // Toggle selection of target part
-        else if (id) {
-          const idx = selectedIds.value.indexOf(id);
-          selectedIds.value = idx >= 0
-            ? selectedIds.value.filter(v => v !== id)
-            : [...selectedIds.value, id];
-        }
+        dropFloater(toCoords(d3EventPos()));
       });
 
     function keyHandler(evt: KeyboardEvent): void {
@@ -638,7 +637,10 @@ export default defineComponent({
       ([el, mode]) => {
         if (el) {
           d3.select(el)
-            .call(gridHoverHandler);
+            .call(gridHoverHandler)
+            .on('click', function () {
+              cancelSelection();
+            });
 
           if (mode === 'select') {
             d3.select(el)
@@ -660,20 +662,31 @@ export default defineComponent({
           const partSelection = d3.select(el)
             .selectAll<Element, any>('.flowpart');
 
+          if (mode === 'pan') {
+            partSelection
+              .on('.drag', null)
+              .on('click', function () {
+                const id = this.getAttribute('part-id');
+                toggleSelect(id);
+                d3.event.stopPropagation();
+              });
+          }
           if (mode === 'select') {
             partSelection
-              .call(partDragHandler);
+              .call(partDragHandler)
+              .on('click', function () {
+                const id = this.getAttribute('part-id');
+                toggleSelect(id);
+                d3.event.stopPropagation();
+              });
           }
-          else if (mode === 'pan') {
-            partSelection
-              .on('.drag', null);
-          }
-          else if (mode === 'interact') {
+          if (mode === 'interact') {
             partSelection
               .on('.drag', null)
               .on('click', function () {
                 const id = this.getAttribute('part-id');
                 useInteract(flowParts.value.filter(v => v.id === id));
+                d3.event.stopPropagation();
               });
           }
         }
@@ -769,14 +782,19 @@ export default defineComponent({
           <LayoutActions :layout="layout" />
         </template>
         <template #actions>
-          <ToggleAction
-            v-model="focusWarningEnabled"
-            label="Show focus warning"
+          <ActionItem
+            label="New layout"
+            icon="add"
+            @click="createLayout"
           />
           <ActionItem
             label="Reset zoom"
             icon="mdi-stretch-to-page-outline"
             @click="resetZoom"
+          />
+          <ToggleAction
+            v-model="focusWarningEnabled"
+            label="Show focus warning"
           />
         </template>
       </ActionMenu>
@@ -884,6 +902,8 @@ export default defineComponent({
         v-model:expanded="toolsMenuExpanded"
         :disabled-tools="disabledTools"
         @use="useTool"
+        @touchstart.stop
+        @mousedown.stop
       />
       <div
         v-if="!hasFocus && focusWarningEnabled"
