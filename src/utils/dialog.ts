@@ -4,6 +4,8 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 
+import notify from './notify';
+
 interface BlockDialogOpts {
   props?: any;
   mode?: WidgetMode;
@@ -35,7 +37,8 @@ export function createBlockDialog(addr: BlockAddress | null, opts: BlockDialogOp
   if (!addr || !addr.id) {
     return null;
   }
-  if (opts.verify && !sparkStore.blockById(addr.serviceId, addr.id)) {
+  if (opts.verify !== false && !sparkStore.blockById(addr.serviceId, addr.id)) {
+    notify.warn(`Block not found: <i>${addr.id}</i>`);
     return null;
   }
   const { props, mode } = opts;
