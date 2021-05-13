@@ -1,6 +1,7 @@
 <script lang="ts">
 import difference from 'lodash/difference';
-import { computed, defineComponent, PropType } from 'vue';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
@@ -36,6 +37,7 @@ export default defineComponent({
     'switch',
   ],
   setup(props, { emit }) {
+
     const block = computed<Block | null>(
       () => {
         const { blockId, serviceId } = props.modelValue;
@@ -43,34 +45,40 @@ export default defineComponent({
       },
     );
 
-    const change = computed<EditableBlockChange>(
-      () => {
-        const { id, blockId, serviceId } = props.modelValue;
-        const spec = block.value !== null
-          ? sparkStore.spec(block.value) ?? null
-          : null;
+    function makeChange(): EditableBlockChange {
+      const { id, blockId, serviceId } = props.modelValue;
+      const spec = block.value !== null
+        ? sparkStore.spec(block.value) ?? null
+        : null;
 
-        const data = props.modelValue.data ?? {};
-        const confirmed = props.modelValue.confirmed ?? {};
+      const data = props.modelValue.data ?? {};
+      const confirmed = props.modelValue.confirmed ?? {};
 
-        return {
-          id,
-          blockId,
-          serviceId,
-          spec,
-          block: block.value,
-          title: featureStore.widgetTitle(block.value?.type),
-          fields: spec?.fields
-            .filter(f => !f.readonly)
-            .map(f => ({
-              id: f.key,
-              specField: f,
-              value: data[f.key] ?? null,
-              confirmed: confirmed[f.key] ?? false,
-            }))
-            ?? [],
-        };
-      },
+      return reactive({
+        id,
+        blockId,
+        serviceId,
+        spec,
+        block: block.value,
+        title: featureStore.widgetTitle(block.value?.type),
+        fields: spec?.fields
+          .filter(f => !f.readonly)
+          .map(f => ({
+            id: f.key,
+            specField: f,
+            value: data[f.key] ?? null,
+            confirmed: confirmed[f.key] ?? false,
+          }))
+          ?? [],
+      });
+    }
+
+    const change = ref<EditableBlockChange>(makeChange());
+    const rev = ref<string>('');
+
+    watch(
+      () => props.modelValue,
+      () => { change.value = makeChange(); rev.value = nanoid(6); },
     );
 
     const unknownValues = computed<string[]>(
@@ -88,11 +96,11 @@ export default defineComponent({
       },
     );
 
-    function saveChange(value: EditableBlockChange = change.value): void {
+    function saveChange(): void {
       const data = {};
       const confirmed = {};
 
-      value.fields
+      change.value.fields
         .filter(field => field.value !== null)
         .forEach(field => {
           data[field.id] = field.value;
@@ -131,12 +139,16 @@ export default defineComponent({
           title: `${change.value.blockId} ${field.specField.title}`,
         },
       })
-        .onOk(value => saveField({ ...field, value }));
+        .onOk(value => {
+          field.value = value;
+          saveField(field);
+        });
     }
 
     return {
       block,
       change,
+      rev,
       unknownValues,
       saveChange,
       toggleField,
@@ -171,7 +183,7 @@ export default defineComponent({
     </div>
     <div
       v-for="field in change.fields"
-      :key="field.id"
+      :key="`${rev}-${field.id}`"
       class="row q-gutter-x-sm q-ml-none items-center"
     >
       <q-btn

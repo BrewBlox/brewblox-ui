@@ -1,9 +1,13 @@
 <script lang="ts">
+import isEmpty from 'lodash/isEmpty';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, onBeforeMount } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { deserialize } from '@/plugins/spark/parse-object';
+import { TempUnit } from '@/shared-types';
+import { systemStore } from '@/store/system';
+import { bloxQty, isQuantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
@@ -29,6 +33,14 @@ export default defineComponent({
       saveConfig,
     } = useWidget.setup<QuickActionsWidget>();
 
+    const systemTemp = computed<TempUnit>(
+      () => systemStore.units.temperature,
+    );
+
+    const otherTemp = computed<TempUnit>(
+      () => systemTemp.value === 'degC' ? 'degF' : 'degC',
+    );
+
     const actions = computed<ChangeAction[]>(
       () => deserialize(config.value.actions ?? config.value.steps),
     );
@@ -41,6 +53,7 @@ export default defineComponent({
 
     onBeforeMount(() => {
       let dirty = false;
+
       // Change IDs were added after initial release
       actions.value.forEach(action =>
         action.changes
@@ -49,6 +62,7 @@ export default defineComponent({
             change.id = nanoid();
             dirty = true;
           }));
+
       // Service IDs became a key of individual changes
       actions.value.forEach(action =>
         action.changes
@@ -57,8 +71,30 @@ export default defineComponent({
             change.serviceId = config.value.serviceId!;
             dirty = true;
           }));
-      // Config field was renamed to 'actions'
-      dirty = dirty || !!config.value.steps;
+
+      // 'steps' field was renamed to 'actions'
+      dirty = dirty || config.value.steps !== undefined;
+
+      // Convert units if user changed system temperature
+      actions.value.forEach(action =>
+        action.changes.forEach(change => {
+          const updates: AnyDict = {};
+          for (let key in change.data) {
+            const value = change.data[key];
+            if (isQuantity(value) && value.unit.includes(otherTemp.value)) {
+              updates[key] = bloxQty(value).to(value.unit.replace(otherTemp.value, systemTemp.value));
+            }
+          }
+          if (!isEmpty(updates)) {
+            dirty = true;
+            change.data = {
+              ...change.data,
+              ...updates,
+            };
+          }
+        }),
+      );
+
       // Save if dirty
       if (dirty) {
         config.value.serviceIdMigrated = true;

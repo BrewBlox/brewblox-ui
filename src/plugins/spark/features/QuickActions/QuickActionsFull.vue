@@ -179,68 +179,69 @@ export default defineComponent({
         v-if="actions.length > 0"
         :disabled="dense"
         :model-value="actions"
+        item-key="id"
         @update:model-value="saveActions"
         @start="draggingStep=true"
         @end="draggingStep=false"
       >
-        <q-expansion-item
-          v-for="action in actions"
-          :key="action.id"
-          :label="action.name"
-          :default-opened="activeId === action.id"
-          :disable="draggingStep"
-          header-style="font-size: 120%"
-          group="actions"
-          icon="mdi-format-list-checks"
-          class="action-container q-mr-md q-mb-sm depth-1"
-        >
-          <draggable
-            :disabled="dense"
-            :model-value="action.changes"
-            item-key="id"
-            @update:model-value="v => saveChanges(action, v)"
+        <template #item="action">
+          <q-expansion-item
+            :label="action.element.name"
+            :default-opened="activeId === action.element.id"
+            :disable="draggingStep"
+            header-style="font-size: 120%"
+            group="actions"
+            icon="mdi-format-list-checks"
+            class="action-container q-mr-md q-mb-sm depth-1"
           >
-            <template #item="{element}">
-              <QuickActionChange
-                :model-value="element"
-                class="q-mr-sm q-my-sm"
-                @update:model-value="saveChange(action, element)"
-                @remove="removeChange(action, element)"
-                @switch="startSwitchBlock(action, element)"
+            <draggable
+              :disabled="dense"
+              :model-value="action.element.changes"
+              item-key="id"
+              @update:model-value="v => saveChanges(action.element, v)"
+            >
+              <template #item="change">
+                <QuickActionChange
+                  :model-value="change.element"
+                  class="q-mr-sm q-my-sm"
+                  @update:model-value="v => saveChange(action.element, v)"
+                  @remove="removeChange(action.element, change.element)"
+                  @switch="startSwitchBlock(action.element, change.element)"
+                />
+              </template>
+            </draggable>
+            <div class="row justify-end q-px-md q-py-sm action-actions">
+              <q-btn
+                size="sm"
+                label="Add Block"
+                icon="mdi-cube"
+                flat
+                @click="startAddChange(action.element)"
               />
-            </template>
-          </draggable>
-          <div class="row justify-end q-px-md q-py-sm action-actions">
-            <q-btn
-              size="sm"
-              label="Add Block"
-              icon="mdi-cube"
-              flat
-              @click="startAddChange(action)"
-            />
-            <q-btn
-              size="sm"
-              label="Copy"
-              icon="file_copy"
-              flat
-              @click="duplicateAction(action)"
-            />
-            <q-btn
-              size="sm"
-              label="Rename"
-              icon="edit"
-              flat
-              @click="renameAction(action)"
-            />
-            <q-btn
-              size="sm"
-              label="Remove"
-              icon="delete"
-              flat
-              @click="startRemoveStep(action)"
-            />
-          </div>
-        </q-expansion-item>
+              <q-btn
+                size="sm"
+                label="Copy"
+                icon="file_copy"
+                flat
+                @click="duplicateAction(action.element)"
+              />
+              <q-btn
+                size="sm"
+                label="Rename"
+                icon="edit"
+                flat
+                @click="renameAction(action.element)"
+              />
+              <q-btn
+                size="sm"
+                label="Remove"
+                icon="delete"
+                flat
+                @click="startRemoveStep(action.element)"
+              />
+            </div>
+          </q-expansion-item>
+        </template>
       </draggable>
       <slot name="below" />
     </div>

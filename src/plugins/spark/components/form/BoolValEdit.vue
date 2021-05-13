@@ -8,9 +8,9 @@ export default defineComponent({
   props: {
     ...useValEdit.props,
   },
-  emits: {
+  emits: [
     ...useValEdit.emits,
-  },
+  ],
   setup(props) {
     const {
       field,
