@@ -2,6 +2,7 @@
 import * as d3 from 'd3';
 import dagre from 'dagre-d3';
 import graphlib from 'graphlib';
+import startCase from 'lodash/startCase';
 import toFinite from 'lodash/toFinite';
 import { computed, defineComponent, onMounted, PropType, ref, watch } from 'vue';
 
@@ -11,6 +12,7 @@ import { createBlockDialog } from '@/utils/dialog';
 import { isJsonEqual } from '@/utils/functional';
 
 const DEFAULT_SCALE = 0.9;
+const UNKNOWN_TYPE = '???';
 const LONE_NODE_ROWS = 6;
 const LABEL_HEIGHT = 70;
 const LABEL_WIDTH = 170;
@@ -55,7 +57,7 @@ export default defineComponent({
 
     const drawnNodes = computed<RelationNode[]>(
       () => [...new Set(props.edges.flatMap(edge => [edge.target, edge.source]))]
-        .map(id => props.nodes.find(node => node.id === id) ?? { id, type: '???' }),
+        .map(id => props.nodes.find(node => node.id === id) ?? { id, type: UNKNOWN_TYPE }),
     );
 
     const loneNodes = computed<RelationNode[]>(
@@ -99,7 +101,9 @@ export default defineComponent({
           padding: 0,
           rx: 5,
           ry: 5,
-          style: 'fill: #fff',
+          style: node.type === UNKNOWN_TYPE
+            ? 'fill: gray'
+            : undefined,
         });
       });
 
@@ -110,7 +114,7 @@ export default defineComponent({
           : [edge.source, edge.target];
 
         graph.setEdge(source, target, {
-          label,
+          label: startCase(label),
           labelStyle: 'fill: white; stroke: none;',
           style: 'fill: none; stroke: red; stroke-width: 1.5px;',
           arrowheadStyle: 'fill: red; stroke: red;',
@@ -267,7 +271,7 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.node rect {
+.label-container {
   fill: #fff;
 }
 
