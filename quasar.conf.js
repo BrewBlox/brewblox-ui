@@ -93,7 +93,7 @@ module.exports = configure(function (ctx) {
       extractCSS: true,
 
       devtool: ctx.dev
-        ? 'eval-cheap-source-map'
+        ? 'eval-cheap-module-source-map'
         : undefined,
 
       env: ctx.dev
@@ -127,11 +127,10 @@ module.exports = configure(function (ctx) {
         };
 
         // Replace the compression plugin because it was generating unnamed output files
-        config.plugins.splice(
-          config.plugins.findIndex(v => v instanceof CompressionPlugin),
-          1,
-          new CompressionPlugin(),
-        );
+        const compressionIdx = config.plugins.findIndex(v => v instanceof CompressionPlugin);
+        if (compressionIdx >= 0) {
+          config.plugins.splice(compressionIdx, 1, new CompressionPlugin());
+        }
 
         config.plugins.push(
           // mqtt.js depends on multiple Node.JS libraries

@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import defaults from 'lodash/defaults';
+import isEqual from 'lodash/isEqual';
 import toFinite from 'lodash/toFinite';
 import { Ref, ref, watch } from 'vue';
 
@@ -87,7 +88,8 @@ export const useSvgZoom: UseSvgZoomComposable = {
 
       if (!dragEnabled.value) {
         selection
-          .on('mousedown.zoom', null);
+          .on('mousedown.zoom', null)
+          .on('touchstart.zoom', null);
       }
     }
 
@@ -99,8 +101,8 @@ export const useSvgZoom: UseSvgZoomComposable = {
 
     watch(
       [svgContentRef, dimensions],
-      ([el, size]) => {
-        if (el) {
+      ([el, size], [prevEl, prevSize]) => {
+        if (el && (!prevEl || !isEqual(size, prevSize))) {
           el.setAttribute('width', `${size.width}`);
           el.setAttribute('height', `${size.height}`);
           resetZoom();

@@ -9,7 +9,7 @@ import { spliceById } from '@/utils/functional';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderStore } from './store';
 import { FlowPart, PersistentPart } from './types';
-import { squares } from './utils';
+import { squares, startChangeLayoutTitle } from './utils';
 
 export default defineComponent({
   name: 'BreweryPage',
@@ -94,6 +94,10 @@ export default defineComponent({
       }
     }
 
+    function editTitle(): void {
+      startChangeLayoutTitle(layout.value);
+    }
+
     watch(
       () => layoutTitle.value,
       title => document.title = `Brewblox | ${title}`,
@@ -118,6 +122,7 @@ export default defineComponent({
       layoutId,
       layout,
       layoutTitle,
+      editTitle,
       svgRef,
       svgContentRef,
       resetZoom,
@@ -149,18 +154,17 @@ export default defineComponent({
     </div>
     <template v-else>
       <TitleTeleport>
-        {{ layoutTitle }}
+        <span @click="editTitle">{{ layoutTitle }}</span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn
-          v-if="!dense"
           unelevated
           round
           icon="mdi-tools"
           class="self-center"
           :to="`/builder/${layoutId}`"
         >
-          <q-tooltip>Open builder</q-tooltip>
+          <q-tooltip>Open editor</q-tooltip>
         </q-btn>
         <ActionMenu
           round
@@ -170,6 +174,13 @@ export default defineComponent({
           <template #menus>
             <LayoutActions :layout="layout" />
           </template>
+          <template #actions>
+            <ActionItem
+              label="Reset zoom"
+              icon="mdi-stretch-to-page-outline"
+              @click="resetZoom"
+            />
+          </template>
         </ActionMenu>
       </ButtonsTeleport>
 
@@ -178,7 +189,7 @@ export default defineComponent({
           {{ layout === null ? 'No layout selected' : 'Layout is empty' }}
         </span>
         <svg ref="svgRef" class="fit">
-          <g ref="svgContentRef" :key="`content-${layoutId}`">
+          <g ref="svgContentRef">
             <g
               v-for="part in flowParts"
               :key="`${flowPartsRevision}-${part.id}`"
@@ -220,17 +231,6 @@ export default defineComponent({
             </template>
           </g>
         </svg>
-        <q-btn
-          unelevated
-          class="absolute-bottom-right q-ma-lg"
-          color="secondary"
-          icon="mdi-stretch-to-page-outline"
-          @click="resetZoom"
-        >
-          <q-tooltip>
-            Fit to screen
-          </q-tooltip>
-        </q-btn>
       </div>
     </template>
   </q-page>

@@ -1,3 +1,5 @@
+import { BuilderMode, BuilderTool } from './types';
+
 export const typeName = 'Builder';
 export const defaultLayoutWidth = 20;
 export const defaultLayoutHeight = 15;
@@ -38,3 +40,87 @@ export const deprecatedTypes = {
   PwmPump: 'Pump',
   ActuatorValve: 'Valve',
 };
+
+export const builderModes: BuilderMode[] = [
+  {
+    value: 'pan',
+    label: 'Pan',
+    icon: 'mdi-drag-variant',
+    class: () => '',
+  },
+  {
+    label: 'Select',
+    value: 'select',
+    icon: 'mdi-select-drag',
+    class: part => part != null ? 'pointer' : '',
+  },
+  {
+    value: 'interact',
+    label: 'Interact',
+    icon: 'mdi-cursor-default',
+    class: part => part?.canInteract ? 'pointer' : '',
+  },
+];
+
+export const builderTools: BuilderTool[] = [
+  {
+    value: 'add',
+    label: 'New',
+    icon: 'add',
+    shortcut: 'n',
+  },
+  {
+    value: 'move',
+    label: 'Move',
+    icon: 'mdi-cursor-move',
+    shortcut: 'm',
+  },
+  {
+    value: 'copy',
+    label: 'Copy',
+    icon: 'file_copy',
+    shortcut: 'c',
+  },
+  {
+    value: 'rotate',
+    label: 'Rotate',
+    icon: 'mdi-rotate-right-variant',
+    shortcut: 'r',
+  },
+  {
+    label: 'Flip',
+    value: 'flip',
+    icon: 'mdi-swap-horizontal-bold',
+    shortcut: 'f',
+  },
+  {
+    value: 'edit',
+    label: 'Edit Settings',
+    icon: 'settings',
+    shortcut: 'e',
+  },
+  {
+    label: 'Interact',
+    value: 'interact',
+    icon: 'mdi-cursor-default',
+    shortcut: 'i',
+  },
+  {
+    label: 'Delete',
+    value: 'delete',
+    icon: 'delete',
+    shortcut: 'd',
+  },
+  {
+    label: 'Undo',
+    value: 'undo',
+    icon: 'mdi-undo',
+    shortcut: 'ctrl+z',
+  },
+  {
+    label: 'Redo',
+    value: 'redo',
+    icon: 'mdi-redo',
+    shortcut: 'ctrl+y',
+  },
+];

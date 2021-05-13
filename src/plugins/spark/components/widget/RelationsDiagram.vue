@@ -173,17 +173,34 @@ export default defineComponent({
 
       // Enable zooming the graph
       const zoom = d3.zoom<SVGElement, unknown>()
-        .on('zoom', () => diagram.attr('transform', d3.event.transform));
+        .on('zoom', function () {
+          diagramRef.value?.setAttribute('transform', d3.event.transform);
+        });
 
       // Enable centering the graph
       // Implemented as function to yield new values after window resize
       const centered = (scaleOffset = 0): d3.ZoomTransform => {
         const rect = svgRef.value!.getBoundingClientRect();
-        const scale = Math.min((rect.width / width), (rect.height / height), 1) * (DEFAULT_SCALE + scaleOffset);
+        const scale = (DEFAULT_SCALE + scaleOffset) * Math.min(
+          (rect.width / width),
+          (rect.height / height),
+          1,
+        );
         return d3
           .zoomIdentity
           .translate(toFinite(rect.width - width * scale) / 2, toFinite(rect.height - height * scale) / 2)
           .scale(scale);
+      };
+
+      // Provide functionality to reset zoom level
+      // This captures local variables
+      resetZoom.value = () => {
+        if (svgRef.value) {
+          d3.select(svgRef.value)
+            .transition()
+            .duration(750)
+            .call(zoom.transform, centered());
+        }
       };
 
       // Apply effects
@@ -193,14 +210,6 @@ export default defineComponent({
         .call(zoom)
         .call(zoom.transform, centered(0.05))
         .on('dblclick.zoom', resetZoom.value);
-
-      // Provide functionality to reset zoom level
-      // This captures local variables
-      resetZoom.value = () =>
-        svg
-          .transition()
-          .duration(750)
-          .call(zoom.transform, centered());
     }
 
     function startCreateBlock(): void {
@@ -236,7 +245,6 @@ export default defineComponent({
     <svg
       ref="svgRef"
       class="fit"
-      @dblclick.stop.capture="startCreateBlock"
     >
       <g ref="diagramRef" />
     </svg>

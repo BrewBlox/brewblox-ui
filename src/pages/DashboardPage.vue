@@ -7,6 +7,7 @@ import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { featureStore, WidgetContext } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
+import { startChangeDashboardTitle } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { objectSorter } from '@/utils/functional';
 
@@ -65,6 +66,15 @@ export default defineComponent({
       })),
     );
 
+    function editTitle(): void {
+      if (dashboard.value) {
+        startChangeDashboardTitle(
+          dashboard.value,
+          newId => router.replace(`/dashboard/${newId}`),
+        );
+      }
+    }
+
     watch(
       () => dashboardId.value,
       () => widgetEditable.value = false,
@@ -99,19 +109,20 @@ export default defineComponent({
       showWizard,
       widgets,
       dashboardItems,
+      editTitle,
     };
   },
 });
 </script>
 
 <template>
-  <q-page style="overflow: auto" class="page-height">
+  <q-page class="page-height">
     <PageError v-if="!dashboard">
       <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
     </PageError>
     <template v-else>
       <TitleTeleport>
-        {{ dashboard.title }}
+        <span @click="editTitle">{{ dashboard.title }}</span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn
@@ -140,44 +151,46 @@ export default defineComponent({
         </ActionMenu>
       </ButtonsTeleport>
 
-      <div
-        v-if="dashboardItems.length === 0"
-        class="absolute-center"
-      >
-        <q-btn
-          unelevated
-          color="secondary"
-          icon="mdi-creation"
-          size="lg"
-          label="Get started"
-          @click="showWizard(false)"
-        />
-      </div>
-      <div
-        v-else-if="dense"
-        class="column q-gutter-y-sm q-pa-md"
-      >
-        <WidgetProvider
-          v-for="val in dashboardItems"
-          :key="val.widget.id"
-          :widget-id="val.widget.id"
-          :context="context"
+      <q-scroll-area class="fit">
+        <div
+          v-if="dashboardItems.length === 0"
+          class="absolute-center"
         >
-          <component
-            :is="val.component"
-            :error="val.error"
-            class="col full-width"
+          <q-btn
+            unelevated
+            color="secondary"
+            icon="mdi-creation"
+            size="lg"
+            label="Get started"
+            @click="showWizard(false)"
           />
-        </WidgetProvider>
-      </div>
-      <GridContainer
-        v-else
-        class="q-ma-lg"
-        :items="dashboardItems"
-        :context="context"
-        :editable="widgetEditable"
-        @dblclick="showWizard(true)"
-      />
+        </div>
+        <div
+          v-else-if="dense"
+          class="column q-gutter-y-sm q-pa-md"
+        >
+          <WidgetProvider
+            v-for="val in dashboardItems"
+            :key="val.widget.id"
+            :widget-id="val.widget.id"
+            :context="context"
+          >
+            <component
+              :is="val.component"
+              :error="val.error"
+              class="col full-width"
+            />
+          </WidgetProvider>
+        </div>
+        <GridContainer
+          v-else
+          class="q-ma-lg"
+          :items="dashboardItems"
+          :context="context"
+          :editable="widgetEditable"
+          @dblclick="showWizard(true)"
+        />
+      </q-scroll-area>
     </template>
   </q-page>
 </template>

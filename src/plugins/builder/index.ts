@@ -32,7 +32,7 @@ const plugin: Plugin = {
     startup.onStart(() => builderStore.start());
     autoRegister(app, require.context('./components', true));
 
-    builderStore.registerParts(Object.values(specs));
+    builderStore.specs = Object.values(specs);
     featureStore.addWidgetFeature(feature);
   },
 

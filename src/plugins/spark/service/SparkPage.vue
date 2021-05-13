@@ -13,6 +13,7 @@ import { BlockType } from '@/shared-types';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { objectStringSorter } from '@/utils/functional';
+import { startChangeServiceTitle } from '@/utils/services';
 
 import SparkListView from './SparkListView.vue';
 import Troubleshooter from './Troubleshooter.vue';
@@ -93,8 +94,15 @@ export default defineComponent({
       () => sparkModule.value?.relations ?? [],
     );
 
+    function editTitle(): void {
+      if (service.value) {
+        startChangeServiceTitle(service.value);
+      }
+    }
+
     return {
       title,
+      editTitle,
       isReady,
       status,
       statusNok,
@@ -109,7 +117,7 @@ export default defineComponent({
 <template>
   <q-page class="page-height">
     <TitleTeleport>
-      {{ title }}
+      <span @click="editTitle">{{ title }}</span>
     </TitleTeleport>
     <ButtonsTeleport>
       <q-btn-group rounded outline class="q-pa-xs self-center">

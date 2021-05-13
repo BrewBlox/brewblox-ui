@@ -2,13 +2,13 @@
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { useDialog } from '@/composables';
+import { useDialog, useGlobals } from '@/composables';
 import { createDialog } from '@/utils/dialog';
 import { objectStringSorter } from '@/utils/functional';
 
-import { builderStore } from './store';
-import { FlowPart, PartSpec, PersistentPart } from './types';
-import { asStatePart, squares } from './utils';
+import { builderStore } from '../store';
+import { FlowPart, PartSpec, PersistentPart } from '../types';
+import { asStatePart, squares } from '../utils';
 
 interface PartDisplay {
   part: FlowPart;
@@ -20,7 +20,7 @@ function asFlowPart(part: PersistentPart): FlowPart {
 }
 
 export default defineComponent({
-  name: 'BuilderCatalog',
+  name: 'BuilderCatalogDialog',
   props: {
     ...useDialog.props,
     partial: {
@@ -32,6 +32,7 @@ export default defineComponent({
     ...useDialog.emits,
   ],
   setup(props) {
+    const { dense } = useGlobals.setup();
     const {
       dialogRef,
       dialogProps,
@@ -83,6 +84,7 @@ export default defineComponent({
 
     return {
       squares,
+      dense,
       dialogRef,
       dialogProps,
       onDialogHide,
@@ -100,6 +102,7 @@ export default defineComponent({
 <template>
   <q-dialog
     ref="dialogRef"
+    :maximized="dense"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >

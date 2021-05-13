@@ -1,4 +1,4 @@
-import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
+import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
 import store from '@/store';
@@ -19,8 +19,7 @@ const fallbackSpec = (): PartSpec => ({
 export class BuilderModule extends VuexModule {
   public specs: PartSpec[] = [];
 
-  public editorMode = '';
-  public drawerMode: 'tools' | 'layouts' = 'tools';
+  public focusWarningEnabled = true;
   public lastLayoutId: string | null = null;
   public layouts: BuilderLayout[] = [];
 
@@ -43,11 +42,6 @@ export class BuilderModule extends VuexModule {
   public component({ type }: { type: string }): string {
     const spec = this.spec({ type });
     return spec.component || spec.id;
-  }
-
-  @Mutation
-  public registerParts(specs: PartSpec[]): void {
-    this.specs = specs;
   }
 
   @Action

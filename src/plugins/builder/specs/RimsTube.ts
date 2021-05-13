@@ -19,7 +19,7 @@ const spec: PartSpec = {
         settingsKey: 'sizeX',
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
-        min: 2,
+        min: 3,
         max: 10,
       },
     },

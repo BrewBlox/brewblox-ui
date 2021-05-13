@@ -9,6 +9,7 @@ const spec: PartSpec = {
   title: 'Global inlet: shifted',
   size: () => [SIZE_X, SIZE_Y],
   cards: [
+    { component: 'LiquidSourceCard' },
     {
       component: 'PressureCard',
       props: {
@@ -18,7 +19,6 @@ const spec: PartSpec = {
         defaultValue: DEFAULT_IO_PRESSURE,
       },
     },
-    { component: 'LiquidSourceCard' },
   ],
   transitions: (part: PersistentPart) => {
     const enabled = part.settings.enabled ?? !!part.settings.pressure;

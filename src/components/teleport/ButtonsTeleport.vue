@@ -1,21 +1,13 @@
 <script lang="ts">
-import { defineComponent, inject } from 'vue';
-
-import { ButtonsTeleportRefKey } from '@/symbols';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ButtonsTeleport',
-  setup() {
-    const buttonsRef = inject(ButtonsTeleportRefKey, undefined);
-    return {
-      buttonsRef,
-    };
-  },
 });
 </script>
 
 <template>
-  <teleport v-if="buttonsRef" :to="buttonsRef">
+  <portal to="toolbar-buttons">
     <slot />
-  </teleport>
+  </portal>
 </template>

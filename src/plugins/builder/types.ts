@@ -40,6 +40,7 @@ export interface PersistentPart {
 export interface StatePart extends PersistentPart {
   transitions: Transitions;
   size: [number, number];
+  canInteract: boolean;
 }
 
 export interface FlowPart extends StatePart {
@@ -89,4 +90,33 @@ export interface Rect {
   bottom: number;
 }
 
-export type ClickEvent = MouseEvent | TouchEvent;
+export type BuilderModeName =
+  | 'select'
+  | 'pan'
+  | 'interact'
+
+export type BuilderToolName =
+  | 'add'
+  | 'move'
+  | 'copy'
+  | 'rotate'
+  | 'flip'
+  | 'edit'
+  | 'interact'
+  | 'delete'
+  | 'undo'
+  | 'redo'
+
+export interface BuilderMode {
+  value: BuilderModeName;
+  label: string;
+  icon: string;
+  class: (part: FlowPart) => string | string[] | AnyDict;
+}
+
+export interface BuilderTool {
+  value: BuilderToolName;
+  label: string;
+  icon: string;
+  shortcut: string;
+}
