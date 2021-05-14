@@ -1,3 +1,4 @@
+import isMatch from 'lodash/isMatch';
 import range from 'lodash/range';
 
 import { typeName as graphType } from '@/plugins/history/Graph/getters';
@@ -59,16 +60,49 @@ export function startRemoveBlock(block: Block | null): void {
   if (!block) {
     return;
   }
-  createDialog({
-    component: 'ConfirmDialog',
-    componentProps: {
-      title: 'Remove block',
-      message: `Are you sure you want to remove ${block.id}?`,
-    },
-  })
-    .onOk(() => {
-      sparkStore.removeBlock(block);
-    });
+
+  const widgets = widgetStore
+    .widgets
+    .filter(v => v.feature === block.type
+      && isMatch(v.config, { serviceId: block.serviceId, blockId: block.id }));
+
+  // Has dedicated dashboard widgets
+  if (widgets.length) {
+    const selectOptions = [{
+      label: 'Also remove widgets from dashboards',
+      value: 0,
+    }];
+    createDialog({
+      component: 'CheckboxDialog',
+      componentProps: {
+        title: 'Remove widget',
+        message: `Are you sure you want to remove <i>${block.id}</i>?`,
+        html: true,
+        modelValue: [0], // pre-check the default action
+        selectOptions,
+      },
+    })
+      .onOk((selected: number[]) => {
+        sparkStore.removeBlock(block);
+        if (selected.includes(0)) {
+          widgets.forEach(widgetStore.removeWidget);
+        }
+      });
+  }
+  // No dashboard widgets found
+  else {
+    createDialog({
+      component: 'ConfirmDialog',
+      componentProps: {
+        title: 'Remove block',
+        message: `Are you sure you want to remove <i>${block.id}</i>?`,
+        html: true,
+      },
+    })
+      .onOk(() => {
+        sparkStore.removeBlock(block);
+      });
+  }
 }
 
 export async function startAddBlockToGraphWidget(block: Block | null): Promise<void> {
