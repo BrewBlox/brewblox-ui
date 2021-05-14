@@ -89,8 +89,8 @@ export default defineComponent({
       createDialog({
         component: 'InputDialog',
         componentProps: {
-          modelValue: 'New text field',
-          title: 'Add field',
+          modelValue: 'New text note',
+          title: 'Add note',
           label: 'Name',
         },
       })
@@ -110,8 +110,8 @@ export default defineComponent({
       createDialog({
         component: 'InputDialog',
         componentProps: {
-          modelValue: 'New graph field',
-          title: 'Add field',
+          modelValue: 'New graph',
+          title: 'Add graph',
           label: 'Name',
         },
       })
@@ -212,8 +212,8 @@ export default defineComponent({
               <div class="row q-gutter-x-xs q-pa-xs">
                 <InputField
                   :model-value="element.title"
-                  title="Note name"
-                  label="Note name"
+                  title="Name"
+                  label="Name"
                   dense
                   tag-class="ellipsis-3-lines text-secondary"
                   style="max-width: 100%;"
@@ -258,7 +258,7 @@ export default defineComponent({
                           @click="clearNote(element)"
                         />
                         <ActionItem
-                          label="Remove note"
+                          label="Remove"
                           icon="delete"
                           @click="removeNote(element)"
                         />
@@ -268,11 +268,11 @@ export default defineComponent({
                 </div>
                 <template v-if="element.type === 'Text' && element.value">
                   <div class="col-break" />
-                  <div class="col darkish ellipsis q-pa-xs">
-                    <!-- No line breaks to allow correctly rendering whitespace -->
-                    <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-                    <div style="white-space: pre-wrap; cursor: default;">{{ element.value }}</div>
-                  </div>
+                  <MarkdownView
+                    :text="element.value || 'Click to set'"
+                    class="col darkish q-pa-xs"
+                    style="max-height: 300px; overflow: hidden"
+                  />
                 </template>
               </div>
             </div>
@@ -289,7 +289,7 @@ export default defineComponent({
                 @click="addTextNote"
               />
               <ActionItem
-                label="Add graph note"
+                label="Add graph"
                 @click="addGraphNote"
               />
             </q-list>
