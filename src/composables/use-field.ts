@@ -69,6 +69,7 @@ const fieldSlots = [
   'hint',
   'counter',
   'loading',
+  'label',
 ];
 
 export const useField: UseFieldComposable = {

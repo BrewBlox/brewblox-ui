@@ -232,7 +232,7 @@ export default defineComponent({
           />
           <ActionItem
             icon="mdi-file-restore"
-            label="Clear session notes"
+            label="Clear session fields"
             @click="clearNotes"
           />
           <ActionItem
