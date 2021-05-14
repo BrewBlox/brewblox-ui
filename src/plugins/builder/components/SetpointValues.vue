@@ -3,7 +3,7 @@ import { mdiBullseyeArrow, mdiSwapVerticalBold, mdiThermometer } from '@quasar/e
 import { computed, defineComponent, PropType } from 'vue';
 
 import { FlowPart } from '@/plugins/builder/types';
-import { squares } from '@/plugins/builder/utils';
+import { coord2grid } from '@/plugins/builder/utils';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { prettyUnit } from '@/utils/bloxfield';
@@ -90,7 +90,7 @@ export default defineComponent({
       mdiThermometer,
       mdiSwapVerticalBold,
       mdiBullseyeArrow,
-      squares,
+      coord2grid,
       round,
       textColor,
       block,
@@ -107,11 +107,11 @@ export default defineComponent({
 <template>
   <g
     v-if="block || !hideUnset"
-    :transform="`translate(${squares(startX)}, ${squares(startY)})`"
+    :transform="`translate(${coord2grid(startX)}, ${coord2grid(startY)})`"
   >
     <SvgEmbedded
-      :width="squares(2)"
-      :height="squares(1)"
+      :width="coord2grid(2)"
+      :height="coord2grid(1)"
     >
       <BrokenIcon v-if="isBroken" class="col" />
       <UnlinkedIcon v-else-if="!block" class="col" />

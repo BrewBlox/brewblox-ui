@@ -5,7 +5,7 @@ import { CENTER } from '@/plugins/builder/const';
 
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
-import { liquidOnCoord, squares } from '../utils';
+import { coord2grid, liquidOnCoord } from '../utils';
 
 export default defineComponent({
   name: 'SetpointDisplay',
@@ -26,7 +26,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       bordered,
       scale,
       color,
@@ -41,8 +41,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(2)-2"
-        :height="squares(1)-2"
+        :width="coord2grid(2)-2"
+        :height="coord2grid(1)-2"
         :stroke="color"
         stroke-width="2px"
         x="1"

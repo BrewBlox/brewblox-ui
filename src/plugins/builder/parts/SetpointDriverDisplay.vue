@@ -7,7 +7,7 @@ import {
 } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent, PropType } from 'vue';
 
-import { squares } from '@/plugins/builder/utils';
+import { coord2grid } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
@@ -97,7 +97,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       prettyAny,
       icons,
       bordered,
@@ -116,8 +116,8 @@ export default defineComponent({
 <template>
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
-      :width="squares(2)"
-      :height="squares(1)"
+      :width="coord2grid(2)"
+      :height="coord2grid(1)"
     >
       <BrokenIcon v-if="isBroken" class="col" />
       <UnlinkedIcon v-else-if="!block" class="col" />
@@ -149,8 +149,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(2)-2"
-        :height="squares(1)-2"
+        :width="coord2grid(2)-2"
+        :height="coord2grid(1)-2"
         x="1"
         y="1"
         rx="6"

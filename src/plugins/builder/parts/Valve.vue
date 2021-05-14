@@ -7,7 +7,7 @@ import { DigitalState } from '@/shared-types';
 import { useSettingsBlock } from '../composables';
 import { VALVE_KEY, VALVE_TYPES, ValveT } from '../specs/Valve';
 import { FlowPart } from '../types';
-import { flowOnCoord, liquidOnCoord, squares } from '../utils';
+import { coord2grid, flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   outerValve: [
@@ -94,7 +94,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       paths,
       hasAddress,
       isBroken,
@@ -113,7 +113,7 @@ export default defineComponent({
     <SvgEmbedded v-if="isBroken" height="15" width="15">
       <UnlinkedIcon size="15px" class="self-end" />
     </SvgEmbedded>
-    <SvgEmbedded v-else-if="pending" :height="squares(1)" :width="squares(1)">
+    <SvgEmbedded v-else-if="pending" :height="coord2grid(1)" :width="coord2grid(1)">
       <q-spinner size="44px" class="col" color="blue-grey-5" />
     </SvgEmbedded>
     <g key="valve-outer" class="outline">

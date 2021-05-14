@@ -3,7 +3,7 @@ import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
-import { liquidOnCoord, squares, textTransformation } from '@/plugins/builder/utils';
+import { coord2grid, liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
@@ -86,7 +86,7 @@ export default defineComponent({
     return {
       HOT_WATER,
       COLD_WATER,
-      squares,
+      coord2grid,
       textTransformation,
       truncateRound,
       mdiCalculatorVariant,
@@ -112,8 +112,8 @@ export default defineComponent({
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
       :transform="textTransformation(part, [1,1])"
-      :width="squares(1)"
-      :height="squares(1)"
+      :width="coord2grid(1)"
+      :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
       <BrokenIcon v-if="isBroken" class="col" />
@@ -151,8 +151,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(1)-2"
-        :height="squares(1)-2"
+        :width="coord2grid(1)-2"
+        :height="coord2grid(1)-2"
         :stroke="color"
         x="1"
         y="1"

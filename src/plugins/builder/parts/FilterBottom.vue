@@ -5,7 +5,7 @@ import { LEFT } from '@/plugins/builder/const';
 
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
-import { flowOnCoord, liquidOnCoord, squares } from '../utils';
+import { coord2grid, flowOnCoord, liquidOnCoord } from '../utils';
 
 const paths = {
   borders: [
@@ -35,7 +35,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       paths,
       sizeX,
       flowSpeed,
@@ -49,7 +49,7 @@ export default defineComponent({
   <g>
     <g class="outline">
       <line
-        :x2="squares(sizeX)-4"
+        :x2="coord2grid(sizeX)-4"
         x1="2"
         y1="11"
         m

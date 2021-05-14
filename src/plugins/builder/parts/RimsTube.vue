@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { elbow, flowOnCoord, liquidOnCoord, squares } from '@/plugins/builder/utils';
+import { coord2grid, elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { Coordinates } from '@/utils/coordinates';
 
 import { usePart } from '../composables';
@@ -22,7 +22,7 @@ export default defineComponent({
 
     const paths = computed<Mapped<string>>(
       () => {
-        const startLast = squares(sizeX.value - 1);
+        const startLast = coord2grid(sizeX.value - 1);
         return {
           closeLeft: 'M50,10 v30',
           entry: `M71,0 v10 M79,0 v10 M${startLast + 21},0 v10 M${startLast + 29},0 v10`,

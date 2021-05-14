@@ -15,7 +15,7 @@ interface DragSelectArea {
 // Reorder area start/end so that the start is in the top left corner,
 // and the end is in the bottom right corner,
 // regardless of whether the user dragged ltr or rtl.
-function normalizedArea(area: DragSelectArea): DragSelectArea {
+export function normalizeSelectArea(area: DragSelectArea): DragSelectArea {
   return {
     startX: Math.min(area.startX, area.endX),
     startY: Math.min(area.startY, area.endY),
@@ -25,6 +25,7 @@ function normalizedArea(area: DragSelectArea): DragSelectArea {
 }
 
 export interface UseDragSelectComponent {
+  activeSelectArea: Ref<DragSelectArea | null>;
   selectAreaRef: Ref<SVGRectElement | undefined>;
   startDragSelect(area: DragSelectArea): void;
   updateDragSelect(x: number, y: number): void;
@@ -39,15 +40,15 @@ export interface UseDragSelectComposable {
 export const useDragSelect: UseDragSelectComposable = {
   setup(): UseDragSelectComponent {
     const selectAreaRef = ref<SVGRectElement>();
-    const activeArea = ref<DragSelectArea | null>(null);
+    const activeSelectArea = ref<DragSelectArea | null>(null);
 
     function applyAttributes(): void {
       if (!selectAreaRef.value) {
         return;
       }
-      const area = activeArea.value;
+      const area = activeSelectArea.value;
       if (area) {
-        const { startX, startY, endX, endY } = normalizedArea(area);
+        const { startX, startY, endX, endY } = normalizeSelectArea(area);
         selectAreaRef.value.setAttribute('x', `${startX}`);
         selectAreaRef.value.setAttribute('y', `${startY}`);
         selectAreaRef.value.setAttribute('width', `${endX - startX}`);
@@ -60,29 +61,29 @@ export const useDragSelect: UseDragSelectComposable = {
     }
 
     function startDragSelect(area: DragSelectArea): void {
-      activeArea.value = { ...area };
+      activeSelectArea.value = { ...area };
       applyAttributes();
     }
 
     function updateDragSelect(x: number, y: number): void {
-      if (activeArea.value) {
-        activeArea.value.endX = x;
-        activeArea.value.endY = y;
+      if (activeSelectArea.value) {
+        activeSelectArea.value.endX = x;
+        activeSelectArea.value.endY = y;
         applyAttributes();
       }
     }
 
     function stopDragSelect(): void {
-      activeArea.value = null;
+      activeSelectArea.value = null;
       applyAttributes();
     }
 
     function makeSelectAreaFilter(): (part: FlowPart) => boolean {
-      if (!activeArea.value) {
+      if (!activeSelectArea.value) {
         return () => false;
       }
 
-      const area = normalizedArea(activeArea.value);
+      const area = normalizeSelectArea(activeSelectArea.value);
       const startX = area.startX / SQUARE_SIZE;
       const startY = area.startY / SQUARE_SIZE;
       const endX = area.endX / SQUARE_SIZE;
@@ -103,6 +104,7 @@ export const useDragSelect: UseDragSelectComposable = {
     }
 
     return {
+      activeSelectArea,
       selectAreaRef,
       startDragSelect,
       updateDragSelect,

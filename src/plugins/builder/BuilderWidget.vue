@@ -13,7 +13,7 @@ import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { defaultLayoutHeight, defaultLayoutWidth } from './const';
 import { builderStore } from './store';
 import { BuilderConfig, BuilderLayout, FlowPart, PersistentPart } from './types';
-import { squares } from './utils';
+import { coord2grid } from './utils';
 
 export default defineComponent({
   name: 'BuilderWidget',
@@ -47,8 +47,8 @@ export default defineComponent({
 
     const gridDimensions = computed<UseSvgZoomDimensions>(
       () => ({
-        width: squares(layout.value?.width ?? 10),
-        height: squares(layout.value?.height ?? 10),
+        width: coord2grid(layout.value?.width || 10),
+        height: coord2grid(layout.value?.height || 10),
       }),
     );
 
@@ -138,7 +138,7 @@ export default defineComponent({
     onBeforeMount(() => migrate());
 
     return {
-      squares,
+      coord2grid,
       startSelectLayout,
       dense,
       blocked,
@@ -234,7 +234,7 @@ export default defineComponent({
           <g
             v-for="part in flowParts"
             :key="`${flowPartsRevision}-${part.id}`"
-            :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+            :transform="`translate(${coord2grid(part.x)}, ${coord2grid(part.y)})`"
             :class="{
               [part.type]: true,
               pointer: part.canInteract,
@@ -258,7 +258,7 @@ export default defineComponent({
               @click.stop="pending = null"
             />
             <g
-              :transform="`translate(${squares(pending.x)}, ${squares(pending.y)})`"
+              :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(pending.y)})`"
               class="pointer"
               @click.stop="interact(pending)"
             >

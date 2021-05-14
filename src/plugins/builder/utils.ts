@@ -135,18 +135,22 @@ export function containerTransitions([sizeX, sizeY]: [number, number], color?: s
   return result;
 }
 
-export function squares(val: number): number {
-  return SQUARE_SIZE * val;
+export function coord2grid(val: number): number {
+  return val * SQUARE_SIZE;
+}
+
+export function grid2coord(val: number): number {
+  return Math.round(val / SQUARE_SIZE);
 }
 
 export function textTransformation(part: PersistentPart, textSize: [number, number], counterRotate = true): string {
   const [sizeX] = rotatedSize(part.rotate, textSize);
   const transforms: string[] = [];
   if (part.flipped) {
-    transforms.push(`translate(${squares(sizeX)}, 0) scale(-1,1)`);
+    transforms.push(`translate(${coord2grid(sizeX)}, 0) scale(-1,1)`);
   }
   if (part.rotate && counterRotate) {
-    transforms.push(`rotate(${-part.rotate},${squares(0.5 * textSize[0])},${squares(0.5 * textSize[1])})`);
+    transforms.push(`rotate(${-part.rotate},${coord2grid(0.5 * textSize[0])},${coord2grid(0.5 * textSize[1])})`);
   }
   return transforms.join(' ');
 }

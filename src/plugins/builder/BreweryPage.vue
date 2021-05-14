@@ -9,7 +9,7 @@ import { spliceById } from '@/utils/functional';
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderStore } from './store';
 import { FlowPart, PersistentPart } from './types';
-import { squares, startChangeLayoutTitle } from './utils';
+import { coord2grid, startChangeLayoutTitle } from './utils';
 
 export default defineComponent({
   name: 'BreweryPage',
@@ -51,8 +51,8 @@ export default defineComponent({
 
     const gridDimensions = computed<UseSvgZoomDimensions>(
       () => ({
-        width: squares(layout.value?.width ?? 10),
-        height: squares(layout.value?.height ?? 10),
+        width: coord2grid(layout.value?.width || 10),
+        height: coord2grid(layout.value?.height || 10),
       }),
     );
 
@@ -130,7 +130,7 @@ export default defineComponent({
       parts,
       flowParts,
       flowPartsRevision,
-      squares,
+      coord2grid,
       isClickable,
       pending,
       interact,
@@ -193,7 +193,7 @@ export default defineComponent({
             <g
               v-for="part in flowParts"
               :key="`${flowPartsRevision}-${part.id}`"
-              :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+              :transform="`translate(${coord2grid(part.x)}, ${coord2grid(part.y)})`"
               :class="{
                 [part.type]: true,
                 pointer: isClickable(part),
@@ -217,7 +217,7 @@ export default defineComponent({
                 @click.stop="pending = null"
               />
               <g
-                :transform="`translate(${squares(pending.x)}, ${squares(pending.y)})`"
+                :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(pending.y)})`"
                 class="pointer"
                 @click.stop="interact(pending)"
                 @dblclick.stop

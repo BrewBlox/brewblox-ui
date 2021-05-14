@@ -2,7 +2,7 @@
 import svgpath from 'svgpath';
 import { computed, defineComponent, PropType } from 'vue';
 
-import { colorString, squares } from '@/plugins/builder/utils';
+import { colorString, coord2grid } from '@/plugins/builder/utils';
 
 import { usePart } from '../composables';
 import { DEFAULT_SIZE_X, DEFAULT_SIZE_Y } from '../specs/Carboy';
@@ -64,7 +64,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       color,
       sizeX,
       sizeY,
@@ -80,9 +80,9 @@ export default defineComponent({
 <template>
   <g>
     <rect
-      :y="squares(1)"
-      :width="squares(sizeX)"
-      :height="squares(sizeY-1)-2"
+      :y="coord2grid(1)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY-1)-2"
       :fill="color"
       rx="8"
       ry="8"
