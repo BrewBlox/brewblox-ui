@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { FlowPart } from '@/plugins/builder/types';
-import { squares } from '@/plugins/builder/utils';
+import { coord2grid } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 
 import { usePart } from '../composables';
@@ -46,8 +46,8 @@ export default defineComponent({
         const farEdge = new Coordinates([partSizeX, partSizeY, 0])
           .rotate(props.part.rotate, [0, 0, 0]);
 
-        const trX = farEdge.x < 0 ? squares(renderSizeX) : 0;
-        const trY = farEdge.y < 0 ? squares(renderSizeY) : 0;
+        const trX = farEdge.x < 0 ? coord2grid(renderSizeX) : 0;
+        const trY = farEdge.y < 0 ? coord2grid(renderSizeY) : 0;
 
         return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
       },
@@ -58,7 +58,7 @@ export default defineComponent({
         if (!props.part.flipped) {
           return '';
         }
-        return `translate(${squares(sizeX.value)}, 0) scale(-1, 1)`;
+        return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
       },
     );
 
@@ -67,7 +67,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       sizeX,
       sizeY,
       component,
@@ -88,8 +88,8 @@ export default defineComponent({
     />
     <!-- background element, to make the full part clickable -->
     <rect
-      :width="squares(sizeX)"
-      :height="squares(sizeY)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
       :class="{showhover: showHover, selected}"
       opacity="0"
     />

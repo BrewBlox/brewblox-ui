@@ -20,11 +20,11 @@ import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
 import { clampRotation, deepCopy, uniqueFilter } from '@/utils/functional';
 
-import { useDragSelect, useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
+import { normalizeSelectArea, useDragSelect, useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderModes, builderTools, SQUARE_SIZE } from './const';
 import { builderStore } from './store';
 import { BuilderLayout, BuilderMode, BuilderModeName, BuilderToolName, FlowPart, PersistentPart } from './types';
-import { asStatePart, squares, startAddLayout, startChangeLayoutTitle } from './utils';
+import { asStatePart, coord2grid, grid2coord, startAddLayout, startChangeLayoutTitle } from './utils';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>
 
@@ -65,7 +65,7 @@ export default defineComponent({
     const settingsDialogOpen = ref<boolean>(false);
     const toolsMenuExpanded = ref<boolean>(!dense.value);
 
-    const activeMode = ref<BuilderModeName>('pan');
+    const activeModeId = ref<BuilderModeName>('pan');
 
     const gridHoverPos = ref<XYPosition | null>(null);
     const partDragStart = ref<XYPosition | null>(null);
@@ -123,8 +123,8 @@ export default defineComponent({
 
     const gridDimensions = computed<UseSvgZoomDimensions>(
       () => ({
-        width: squares(layout.value?.width ?? 10),
-        height: squares(layout.value?.height ?? 10),
+        width: coord2grid(layout.value?.width ?? 10),
+        height: coord2grid(layout.value?.height ?? 10),
       }),
     );
 
@@ -132,12 +132,12 @@ export default defineComponent({
       () => flowParts.value.find(p => p.id === configuredId.value) ?? null,
     );
 
-    const modeClass = computed<BuilderMode['class']>(
-      () => builderModes.find(v => v.value === activeMode.value)?.class ?? (() => ''),
+    const activeMode = computed<BuilderMode>(
+      () => builderModes.find(v => v.value === activeModeId.value) ?? builderModes[0],
     );
 
     const dragEnabled = computed<boolean>(
-      () => activeMode.value === 'pan',
+      () => activeModeId.value === 'pan',
     );
 
     const {
@@ -147,6 +147,7 @@ export default defineComponent({
     } = useSvgZoom.setup(gridDimensions, { dragEnabled });
 
     const {
+      activeSelectArea,
       selectAreaRef,
       startDragSelect,
       updateDragSelect,
@@ -203,8 +204,15 @@ export default defineComponent({
     }
 
     function clear(): void {
-      floater.value = null;
-      selectedIds.value = [];
+      if (floater.value) {
+        floater.value = null;
+      }
+      else if (activeSelectArea.value) {
+        stopDragSelect();
+      }
+      else {
+        selectedIds.value = [];
+      }
     }
 
     function makeFloater(source: Floater): void {
@@ -504,6 +512,48 @@ export default defineComponent({
         });
     }
 
+    const gridResizeDragHandler = d3.drag<SVGElement, unknown>()
+      .on('start', function () {
+        const { x, y } = d3EventPos();
+        const sqX = coord2grid(grid2coord(x));
+        const sqY = coord2grid(grid2coord(y));
+        startDragSelect({
+          startX: sqX,
+          startY: sqY,
+          endX: sqX,
+          endY: sqY,
+        });
+      })
+      .on('drag', function () {
+        const { x, y } = d3EventPos();
+        const sqX = coord2grid(grid2coord(x));
+        const sqY = coord2grid(grid2coord(y));
+        updateDragSelect(sqX, sqY);
+      })
+      .on('end', function () {
+        if (activeSelectArea.value && layout.value) {
+          const { startX, startY, endX, endY } = normalizeSelectArea(activeSelectArea.value);
+          stopDragSelect();
+
+          if (startX === endX || startY === endY) {
+            return;
+          }
+
+          // Saving parts also saves layout
+          layout.value.width = grid2coord(endX - startX);
+          layout.value.height = grid2coord(endY - startY);
+
+          const offsetX = grid2coord(startX);
+          const offsetY = grid2coord(startY);
+
+          parts.value = parts.value.map(part => ({
+            ...part,
+            x: part.x - offsetX,
+            y: part.y - offsetY,
+          }));
+        }
+      });
+
     const gridDragHandler = d3.drag<SVGElement, unknown>()
       .clickDistance(25)
       .on('start', function () {
@@ -633,7 +683,7 @@ export default defineComponent({
     );
 
     watch(
-      [svgRef, activeMode],
+      [svgRef, activeModeId],
       ([el, mode]) => {
         if (el) {
           d3.select(el)
@@ -646,6 +696,10 @@ export default defineComponent({
             d3.select(el)
               .call(gridDragHandler);
           }
+          else if (mode === 'gridsize') {
+            d3.select(el)
+              .call(gridResizeDragHandler);
+          }
           else {
             d3.select(el)
               .on('.drag', null);
@@ -656,7 +710,7 @@ export default defineComponent({
     );
 
     watch(
-      [svgContentRef, activeMode, flowPartsRevision],
+      [svgContentRef, activeModeId, flowPartsRevision],
       ([el, mode]) => nextTick(() => {
         if (el) {
           const partSelection = d3.select(el)
@@ -695,7 +749,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
 
       dense,
       svgRef,
@@ -715,7 +769,7 @@ export default defineComponent({
       selectedIds,
       floater,
       isFloating,
-      modeClass,
+      activeMode,
 
       startupDone,
       layouts,
@@ -732,7 +786,7 @@ export default defineComponent({
       configuredPart,
       closeMenu,
 
-      activeMode,
+      activeModeId,
       disabledTools,
       toolsMenuExpanded,
       useTool,
@@ -847,6 +901,7 @@ export default defineComponent({
       <svg
         ref="svgRef"
         class="fit"
+        :style="{cursor: activeMode.gridCursor}"
       >
         <g ref="svgContentRef">
           <EditorBackground :width="layout.width" :height="layout.height" />
@@ -856,30 +911,30 @@ export default defineComponent({
             v-show="!isFloating(part)"
             :key="`${flowPartsRevision}-${part.id}`"
             :part-id="part.id"
-            :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+            :transform="`translate(${coord2grid(part.x)}, ${coord2grid(part.y)})`"
             :class="[
               'flowpart',
               part.type,
-              modeClass(part),
+              activeMode.partClass(part),
             ]"
           >
             <PartWrapper
               :part="part"
               :selected="selectedIds.includes(part.id)"
-              show-hover
+              :show-hover="activeMode.showHover"
               @update:part="savePart"
               @dirty="calculateFlowParts"
             />
           </g>
           <!-- Floating parts -->
-          <g v-if="floater" :transform="`translate(${squares(floater.x)}, ${squares(floater.y)})`">
+          <g v-if="floater" :transform="`translate(${coord2grid(floater.x)}, ${coord2grid(floater.y)})`">
             <g
               v-for="part in floater.parts"
               :key="`floating-${part.id}`"
-              :transform="`translate(${squares(part.x)}, ${squares(part.y)})`"
+              :transform="`translate(${coord2grid(part.x)}, ${coord2grid(part.y)})`"
               :class="[
                 part.type,
-                modeClass(part),
+                activeMode.partClass(part),
               ]"
             >
               <PartWrapper :part="part" selected />
@@ -898,7 +953,7 @@ export default defineComponent({
         </g>
       </svg>
       <BuilderToolsMenu
-        v-model:mode="activeMode"
+        v-model:mode="activeModeId"
         v-model:expanded="toolsMenuExpanded"
         :disabled-tools="disabledTools"
         @use="useTool"

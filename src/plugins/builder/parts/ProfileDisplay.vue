@@ -2,7 +2,7 @@
 import { mdiArrowRightBold } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent, PropType } from 'vue';
 
-import { squares } from '@/plugins/builder/utils';
+import { coord2grid } from '@/plugins/builder/utils';
 import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
 import { objectSorter, round } from '@/utils/functional';
 
@@ -79,7 +79,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       round,
       mdiArrowRightBold,
       bordered,
@@ -98,8 +98,8 @@ export default defineComponent({
 <template>
   <g>
     <SvgEmbedded
-      :width="squares(2)"
-      :height="squares(1)"
+      :width="coord2grid(2)"
+      :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
       <BrokenIcon v-if="isBroken" class="col" />
@@ -128,8 +128,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(sizeX)-2"
-        :height="squares(sizeY)-2"
+        :width="coord2grid(sizeX)-2"
+        :height="coord2grid(sizeY)-2"
         x="1"
         y="1"
         rx="6"

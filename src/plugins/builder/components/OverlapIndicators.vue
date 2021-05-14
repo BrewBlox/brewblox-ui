@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType } from 'vue';
 import { Coordinates } from '@/utils/coordinates';
 
 import { FlowPart } from '../types';
-import { squares } from '../utils';
+import { coord2grid } from '../utils';
 
 
 export default defineComponent({
@@ -31,7 +31,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       overlaps,
     };
   },
@@ -42,7 +42,7 @@ export default defineComponent({
   <g
     v-for="([coord, val], idx) in overlaps"
     :key="idx"
-    :transform="`translate(${squares(coord.x) + 40}, ${squares(coord.y) + 4})`"
+    :transform="`translate(${coord2grid(coord.x) + 40}, ${coord2grid(coord.y) + 4})`"
   >
     <circle r="8" fill="dodgerblue" />
     <text

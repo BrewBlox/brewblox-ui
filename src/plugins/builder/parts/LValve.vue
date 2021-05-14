@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, watch } from 'vue';
 
 import { UP } from '@/plugins/builder/const';
-import { elbow, flowOnCoord, liquidOnCoord, squares } from '@/plugins/builder/utils';
+import { coord2grid, elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 import { DigitalState } from '@/plugins/spark/types';
 
 import { usePart, useSettingsBlock } from '../composables';
@@ -74,7 +74,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       paths,
       sizeX,
       block,
@@ -93,7 +93,7 @@ export default defineComponent({
     <g class="outline">
       <AnimatedArrows :path="liquidPath" :speed="liquidSpeed" />
     </g>
-    <g class="outline fill" :transform="closed ? `translate(${squares(sizeX)}, 0) scale(-1, 1)` : ''">
+    <g class="outline fill" :transform="closed ? `translate(${coord2grid(sizeX)}, 0) scale(-1, 1)` : ''">
       <path d="M0,21 H10" />
       <path d="M0,29 H10" />
       <path :d="paths.bigEnclosure" />

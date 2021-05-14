@@ -6,7 +6,7 @@ import { clampRotation } from '@/utils/functional';
 
 import { builderStore } from '../store';
 import { CardSpec, FlowPart, PartSpec } from '../types';
-import { squares } from '../utils';
+import { coord2grid } from '../utils';
 
 export default defineComponent({
   name: 'BuilderPartSettingsDialog',
@@ -84,7 +84,7 @@ export default defineComponent({
     }
 
     return {
-      squares,
+      coord2grid,
       dense,
       dialogRef,
       onDialogHide,
@@ -118,9 +118,9 @@ export default defineComponent({
       <div class="widget-body column q-gutter-y-lg">
         <div class="row justify-center">
           <svg
-            :width="`${squares(rotatedSize[0]) * displayScale}px`"
-            :height="`${squares(rotatedSize[1] * displayScale)}px`"
-            :viewBox="`0, 0, ${squares(rotatedSize[0])}, ${squares(rotatedSize[1])}`"
+            :width="`${coord2grid(rotatedSize[0]) * displayScale}px`"
+            :height="`${coord2grid(rotatedSize[1] * displayScale)}px`"
+            :viewBox="`0, 0, ${coord2grid(rotatedSize[0])}, ${coord2grid(rotatedSize[1])}`"
             class="col-auto"
           >
             <PartWrapper :key="`menu-${part.id}-${rev}`" :part="part" />

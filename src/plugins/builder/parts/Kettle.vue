@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { colorString, squares, textTransformation } from '@/plugins/builder/utils';
+import { colorString, coord2grid, textTransformation } from '@/plugins/builder/utils';
 
 import { usePart } from '../composables';
 import { DEFAULT_FILL_PCT } from '../specs/Kettle';
@@ -38,7 +38,7 @@ export default defineComponent({
 
     return {
       textTransformation,
-      squares,
+      coord2grid,
       titleText,
       filledSquares,
       color,
@@ -54,16 +54,16 @@ export default defineComponent({
     <rect
       :fill="color"
       :x="2"
-      :y="squares(sizeY-filledSquares)+2"
-      :width="squares(sizeX)-4"
-      :height="squares(filledSquares)-4"
+      :y="coord2grid(sizeY-filledSquares)+2"
+      :width="coord2grid(sizeX)-4"
+      :height="coord2grid(filledSquares)-4"
       rx="2"
       ry="2"
     />
     <g class="outline">
       <rect
-        :width="squares(sizeX)-4"
-        :height="squares(sizeY)-4"
+        :width="coord2grid(sizeX)-4"
+        :height="coord2grid(sizeY)-4"
         x="2"
         y="2"
         rx="8"
@@ -73,8 +73,8 @@ export default defineComponent({
     </g>
     <SvgEmbedded
       :transform="textTransformation(part, part.size, false)"
-      :width="squares(sizeX)"
-      :height="squares(sizeY)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
     >
       <div class="col-auto text-bold text-center q-pt-sm full-width" style="font-size: 130%">
         {{ titleText }}

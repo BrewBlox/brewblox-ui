@@ -3,7 +3,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { FlowPart } from '@/plugins/builder/types';
-import { squares, textTransformation } from '@/plugins/builder/utils';
+import { coord2grid, textTransformation } from '@/plugins/builder/utils';
 import { ActuatorPwmBlock, BlockType } from '@/plugins/spark/types';
 import { truncateRound } from '@/utils/functional';
 
@@ -58,7 +58,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       truncateRound,
       block,
       isBroken,
@@ -75,10 +75,10 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(1)-2"
-        :height="squares(1)-2"
-        :x="squares(startX)+1"
-        :y="squares(startY)+1"
+        :width="coord2grid(1)-2"
+        :height="coord2grid(1)-2"
+        :x="coord2grid(startX)+1"
+        :y="coord2grid(startY)+1"
         :stroke="color"
         stroke-width="2px"
         rx="6"
@@ -86,11 +86,11 @@ export default defineComponent({
       />
     </g>
     <SvgEmbedded
-      :x="squares(startX)"
-      :y="squares(startY)"
+      :x="coord2grid(startX)"
+      :y="coord2grid(startY)"
       :transform="transform"
-      :width="squares(1)"
-      :height="squares(1)"
+      :width="coord2grid(1)"
+      :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
       <BrokenIcon v-if="isBroken" class="col" />

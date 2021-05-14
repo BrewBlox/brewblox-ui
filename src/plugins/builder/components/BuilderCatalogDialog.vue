@@ -8,7 +8,7 @@ import { objectStringSorter } from '@/utils/functional';
 
 import { builderStore } from '../store';
 import { FlowPart, PartSpec, PersistentPart } from '../types';
-import { asStatePart, squares } from '../utils';
+import { asStatePart, coord2grid } from '../utils';
 
 interface PartDisplay {
   part: FlowPart;
@@ -65,7 +65,7 @@ export default defineComponent({
     );
 
     function partViewBox(display: PartDisplay): string {
-      return display.part.size.map(squares).join(' ');
+      return display.part.size.map(coord2grid).join(' ');
     }
 
     function selectPart(display: PartDisplay): void {
@@ -83,7 +83,7 @@ export default defineComponent({
     }
 
     return {
-      squares,
+      coord2grid,
       dense,
       dialogRef,
       dialogProps,
@@ -135,8 +135,8 @@ export default defineComponent({
               >
                 <q-item-section side>
                   <svg
-                    :width="`${squares(1)}px`"
-                    :height="`${squares(1)}px`"
+                    :width="`${coord2grid(1)}px`"
+                    :height="`${coord2grid(1)}px`"
                     :viewBox="`0 0 ${partViewBox(v)}`"
                   >
                     <PartWrapper :part="v.part" />

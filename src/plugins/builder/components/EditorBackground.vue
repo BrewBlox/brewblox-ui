@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { squares } from '../utils';
+import { coord2grid } from '../utils';
 
 
 export default defineComponent({
@@ -18,7 +18,7 @@ export default defineComponent({
   },
   setup() {
     return {
-      squares,
+      coord2grid,
     };
   },
 });
@@ -28,14 +28,14 @@ export default defineComponent({
   <g>
     <foreignObject
       class="grid-background"
-      :width="squares(width)"
-      :height="squares(height)"
+      :width="coord2grid(width)"
+      :height="coord2grid(height)"
     />
     <!-- Coordinate numbers -->
     <text
       v-for="x in width"
       :key="`edge-x-${x}`"
-      :x="squares(x-1)+20"
+      :x="coord2grid(x-1)+20"
       :y="8"
       fill="white"
       class="grid-square-text"
@@ -46,7 +46,7 @@ export default defineComponent({
       v-for="y in height"
       :key="`edge-y-${y}`"
       :x="0"
-      :y="squares(y-1)+28"
+      :y="coord2grid(y-1)+28"
       fill="white"
       class="grid-square-text"
     >

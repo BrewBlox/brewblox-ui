@@ -10,7 +10,7 @@ import { Widget, widgetStore } from '@/store/widgets';
 import { usePart } from '../composables';
 import { WIDGET_KEY } from '../specs/SessionLogDisplay';
 import { FlowPart } from '../types';
-import { squares, textTransformation } from '../utils';
+import { coord2grid, textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'SessionLogDisplay',
@@ -53,7 +53,7 @@ export default defineComponent({
 
     return {
       mdiTextSubject,
-      squares,
+      coord2grid,
       textTransformation,
       sizeX,
       sizeY,
@@ -69,8 +69,8 @@ export default defineComponent({
 <template>
   <g>
     <SvgEmbedded
-      :width="squares(sizeX)"
-      :height="squares(sizeY)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
     >
       <div class="col row no-wrap items-center q-pa-sm full-width">
         <BrokenIcon v-if="isBroken" />
@@ -93,8 +93,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(sizeX)-2"
-        :height="squares(sizeY)-2"
+        :width="coord2grid(sizeX)-2"
+        :height="coord2grid(sizeY)-2"
         x="1"
         y="1"
         rx="6"
@@ -106,8 +106,8 @@ export default defineComponent({
         :transform="textTransformation(part, part.size)"
         x1="10"
         y1="10"
-        :x2="squares(sizeX)-10"
-        :y2="squares(sizeY)-10"
+        :x2="coord2grid(sizeX)-10"
+        :y2="coord2grid(sizeY)-10"
       />
     </g>
   </g>

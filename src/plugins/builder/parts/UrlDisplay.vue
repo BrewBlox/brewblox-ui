@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
-import { squares, textTransformation } from '../utils';
+import { coord2grid, textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'UrlDisplay',
@@ -29,7 +29,7 @@ export default defineComponent({
     );
 
     return {
-      squares,
+      coord2grid,
       textTransformation,
       sizeX,
       sizeY,
@@ -46,8 +46,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(sizeX)-2"
-        :height="squares(sizeY)-2"
+        :width="coord2grid(sizeX)-2"
+        :height="coord2grid(sizeY)-2"
         x="1"
         y="1"
         rx="6"
@@ -57,8 +57,8 @@ export default defineComponent({
     </g>
     <SvgEmbedded
       :transform="textTransformation(part, part.size, false)"
-      :width="squares(sizeX)"
-      :height="squares(sizeY)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
     >
       <div class="text-bold text-center q-mt-sm grid-label" style="text-decoration: underline; font-size: 130%">
         {{ titleText }}

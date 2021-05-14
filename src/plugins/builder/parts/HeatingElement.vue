@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
-import { squares } from '../utils';
+import { coord2grid } from '../utils';
 
 
 export default defineComponent({
@@ -21,7 +21,7 @@ export default defineComponent({
 
     const path = computed<string>(
       () => {
-        const straight = squares(sizeX.value - 2);
+        const straight = coord2grid(sizeX.value - 2);
         return `M50,24.7h24c7.1,0,6.6-6.7,14-6.7 h${straight} c0,0,7,0.1,7,7 c0,7-7,7-7,7 H90`;
       },
     );

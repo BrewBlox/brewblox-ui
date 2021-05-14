@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { usePart } from '../composables';
 import { FlowPart } from '../types';
-import { squares, textTransformation } from '../utils';
+import { coord2grid, textTransformation } from '../utils';
 
 export default defineComponent({
   name: 'BuilderLabel',
@@ -29,7 +29,7 @@ export default defineComponent({
 
     return {
       textTransformation,
-      squares,
+      coord2grid,
       sizeX,
       sizeY,
       text,
@@ -43,8 +43,8 @@ export default defineComponent({
   <g>
     <SvgEmbedded
       :transform="textTransformation(part, part.size, false)"
-      :width="squares(sizeX)"
-      :height="squares(sizeY)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
     >
       <div
         class="col-auto text-bold full-width q-pa-sm"

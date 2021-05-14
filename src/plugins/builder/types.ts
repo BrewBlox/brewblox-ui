@@ -94,6 +94,7 @@ export type BuilderModeName =
   | 'select'
   | 'pan'
   | 'interact'
+  | 'gridsize'
 
 export type BuilderToolName =
   | 'add'
@@ -111,7 +112,9 @@ export interface BuilderMode {
   value: BuilderModeName;
   label: string;
   icon: string;
-  class: (part: FlowPart) => string | string[] | AnyDict;
+  partClass: (part: FlowPart) => string;
+  gridCursor: string;
+  showHover: boolean;
 }
 
 export interface BuilderTool {
