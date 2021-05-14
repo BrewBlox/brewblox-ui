@@ -283,9 +283,9 @@ export default defineComponent({
         v-if="dense"
         class="absolute-top-right q-ma-sm"
         round
-        flat
-        color="primary"
-        :icon="blocked ? 'mdi-lock' : 'mdi-lock-open'"
+        unelevated
+        :color="blocked ? 'secondary' : 'negative'"
+        :icon="blocked ? 'mdi-gesture-swipe-vertical' : 'mdi-gesture-swipe-vertical'"
         @click="blocked = !blocked"
       />
     </div>
