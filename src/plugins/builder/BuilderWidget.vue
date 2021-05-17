@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { useGlobals, useWidget } from '@/composables';
+import { useContext, useGlobals, useWidget } from '@/composables';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
@@ -19,6 +19,7 @@ export default defineComponent({
   name: 'BuilderWidget',
   setup() {
     const router = useRouter();
+    const { inDialog } = useContext.setup();
     const { dense } = useGlobals.setup();
     const {
       widget,
@@ -140,6 +141,7 @@ export default defineComponent({
     return {
       coord2grid,
       startSelectLayout,
+      inDialog,
       dense,
       blocked,
       svgRef,
@@ -271,23 +273,25 @@ export default defineComponent({
           </template>
         </g>
       </svg>
-      <div
-        v-if="dense && blocked"
-        class="absolute-top-left fit bg-dark"
-        style="opacity: 0.4"
-        @touchstart.stop
-        @touchend.stop
-        @touchmove.stop
-      />
-      <q-btn
-        v-if="dense"
-        class="absolute-top-right q-ma-sm"
-        round
-        unelevated
-        :color="blocked ? 'secondary' : 'negative'"
-        :icon="blocked ? 'mdi-gesture-swipe-vertical' : 'mdi-gesture-swipe-vertical'"
-        @click="blocked = !blocked"
-      />
+      <template v-if="!inDialog">
+        <div
+          v-if="dense && blocked"
+          class="absolute-top-left fit bg-dark"
+          style="opacity: 0.4"
+          @touchstart.stop
+          @touchend.stop
+          @touchmove.stop
+        />
+        <q-btn
+          v-if="dense"
+          class="absolute-top-right q-ma-sm"
+          round
+          unelevated
+          :color="blocked ? 'secondary' : 'negative'"
+          :icon="blocked ? 'mdi-gesture-swipe-vertical' : 'mdi-gesture-swipe-vertical'"
+          @click="blocked = !blocked"
+        />
+      </template>
     </div>
   </Card>
 </template>
