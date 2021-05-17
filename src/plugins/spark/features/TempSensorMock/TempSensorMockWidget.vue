@@ -77,7 +77,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div class="widget-md widget-body">
+    <div class="widget-body">
       <div class="row justify-around">
         <SettingValueField
           :class="['col-auto', !block.data.connected && 'darkish']"

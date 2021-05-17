@@ -13,6 +13,7 @@ export default defineComponent({
   setup() {
     const {
       sparkModule,
+      blockId,
       block,
       saveBlock,
     } = useBlockWidget.setup<PidBlock>();
@@ -47,14 +48,14 @@ export default defineComponent({
     }
 
     function editInput(): void {
-      if (!inputBlock.value) return;
+      if (!inputBlock.value) { return; }
 
-      const id = inputBlock.value.id;
+      const setpointId = inputBlock.value.id;
 
-      if (sparkModule.drivenBlocks.includes(id)) {
+      if (sparkModule.drivenBlocks.includes(setpointId)) {
         const driveChain = sparkModule
           .drivenChains
-          .find(chain => chain[0] === inputBlock.value?.id);
+          .find(chain => chain[0] === setpointId);
 
         const actual = driveChain !== undefined
           ? sparkModule.blockById(driveChain[driveChain.length - 1])
@@ -64,20 +65,17 @@ export default defineComponent({
       }
       else {
         createDialog({
-          component: 'QuantityDialog',
+          component: 'SetpointSettingDialog',
           componentProps: {
-            title: 'Edit setting',
-            message: `Edit ${id} setting`,
-            modelValue: inputBlock.value.data.storedSetting,
-            label: 'Setting',
+            title: 'Edit Setpoint',
+            message: `
+            Edit settings for the PID Setpoint. <br>
+            <i>${blockId}</i> and actuators will be inactive if <i>${setpointId}</i> is disabled.
+            `,
+            html: true,
+            address: inputBlock.value,
           },
-        })
-          .onOk(value => {
-            if (inputBlock.value) {
-              inputBlock.value.data.storedSetting = value;
-              sparkModule.saveBlock(inputBlock.value);
-            }
-          });
+        });
       }
     }
 
@@ -105,7 +103,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-md q-mx-auto">
+  <div>
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">

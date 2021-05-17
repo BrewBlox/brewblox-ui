@@ -54,7 +54,6 @@ export default defineComponent({
   <q-btn
     :icon="icon"
     :color="color"
-    flat
     @click="$emit('update:modelValue', !modelValue)"
   >
     <slot />

@@ -183,7 +183,7 @@ export default defineComponent({
 
 
 <template>
-  <div class="widget-lg">
+  <div>
     <slot name="warnings" />
 
     <div v-if="session !== null" class="column q-ma-md">

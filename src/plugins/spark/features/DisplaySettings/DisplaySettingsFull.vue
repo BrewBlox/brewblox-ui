@@ -149,7 +149,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-lg">
+  <div>
     <slot name="warnings" />
 
     <q-card-section class="q-gutter-y-sm">

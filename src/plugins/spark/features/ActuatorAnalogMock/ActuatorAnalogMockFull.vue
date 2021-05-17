@@ -25,7 +25,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-md">
+  <div>
     <slot name="warnings" />
 
     <div class="widget-body row">

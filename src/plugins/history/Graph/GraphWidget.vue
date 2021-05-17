@@ -166,6 +166,7 @@ export default defineComponent({
     show-initial
     :enabled="inDialog && context.mode === 'Full'"
     :no-scroll="context.mode === 'Basic'"
+    size="lg"
   >
     <template #preview>
       <HistoryGraph
@@ -242,7 +243,6 @@ export default defineComponent({
     </div>
     <div
       v-if="context.mode === 'Full'"
-      class="widget-md"
     >
       <GraphEditor
         :config="config"

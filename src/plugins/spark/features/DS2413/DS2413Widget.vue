@@ -29,7 +29,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div class="widget-md">
+    <div>
       <CardWarning v-if="!block.data.connected">
         <template #message>
           DS2413 is not connected

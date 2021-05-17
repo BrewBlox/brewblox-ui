@@ -121,7 +121,7 @@ export default defineComponent({
       </Toolbar>
     </template>
 
-    <div class="widget-md">
+    <div>
       <div class="widget-body row">
         <LabeledField label="Firmware version" class="col-lg-5 col-11">
           {{ sysInfo.data.version.substring(0, 8) /* We only use first 8 characters of version hash */ }}

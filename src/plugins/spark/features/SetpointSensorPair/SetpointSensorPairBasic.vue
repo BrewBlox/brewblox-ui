@@ -44,7 +44,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-md q-mx-auto">
+  <div>
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">

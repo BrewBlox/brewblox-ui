@@ -66,7 +66,7 @@ export default defineComponent({
     >
       <slot name="body" :opt="opt">
         <div class="row q-gutter-x-sm">
-          <ToggleButton :model-value="matches(opt)" dense />
+          <ToggleButton :model-value="matches(opt)" dense flat />
           <div class="self-center">
             {{ opt[optionLabel] }}
           </div>

@@ -271,6 +271,7 @@ export default defineComponent({
           <q-item-section v-if="!dense" side class="q-px-sm">
             <ToggleButton
               :model-value="expanded.includes(val.id)"
+              flat
               @update:model-value="v => setExpanded(val.id, v)"
             />
           </q-item-section>

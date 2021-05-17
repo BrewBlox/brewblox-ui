@@ -16,7 +16,7 @@ import type {
   SparkSessionConfig,
   SparkStatus,
 } from '@/plugins/spark/types';
-import { isSparkPatch, isSparkState } from '@/plugins/spark/utils';
+import { isBlockVolatile, isSparkPatch, isSparkState } from '@/plugins/spark/utils';
 import { serviceStore } from '@/store/services';
 import { widgetStore } from '@/store/widgets';
 import { STATE_TOPIC } from '@/utils/const';
@@ -175,12 +175,14 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async fetchBlock(block: Block): Promise<void> {
-    this.setBlock(await api.fetchBlock(block));
+    if (!isBlockVolatile(block)) {
+      this.setBlock(await api.fetchBlock(block));
+    }
   }
 
   @Action
   public async createBlock(block: Block): Promise<void> {
-    if (block.meta?.volatile) {
+    if (isBlockVolatile(block)) {
       throw new Error(`Block ${block.id} is volatile`);
     }
     await api.createBlock(block); // triggers patch event
@@ -188,7 +190,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async saveBlock(block: Block): Promise<void> {
-    if (block.meta?.volatile) {
+    if (isBlockVolatile(block)) {
       this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
     }
     else {
@@ -206,7 +208,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async removeBlock(block: Block): Promise<void> {
-    if (block.meta?.volatile) {
+    if (isBlockVolatile(block)) {
       this.volatileBlocks = filterById(this.volatileBlocks, block);
     }
     else {
