@@ -27,7 +27,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div class="widget-md">
+    <div>
       <IoArray />
 
       <div v-if="context.mode === 'Full'" class="widget-body row">

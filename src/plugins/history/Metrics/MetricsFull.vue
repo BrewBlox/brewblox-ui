@@ -28,5 +28,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <MetricsEditor v-model:config="config" class="widget-md" />
+  <MetricsEditor v-model:config="config" />
 </template>

@@ -105,7 +105,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-lg">
+  <div>
     <slot name="warnings" />
 
     <div class="widget-body row">

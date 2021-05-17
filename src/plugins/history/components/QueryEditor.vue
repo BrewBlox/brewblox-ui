@@ -177,6 +177,7 @@ export default defineComponent({
       v-model="showStale"
       label="Include old fields"
       class="q-mx-sm"
+      flat
     >
       <q-tooltip>
         By default, deleted or renamed fields are removed from the list after 24h.

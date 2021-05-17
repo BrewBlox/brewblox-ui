@@ -82,7 +82,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div class="widget-md">
+    <div class="q-mx-auto">
       <CardWarning v-if="!outputLink.id">
         <template #message>
           PWM has no target actuator configured.

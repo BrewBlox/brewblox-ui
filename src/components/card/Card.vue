@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { useContext, useGlobals } from '@/composables';
 
@@ -15,6 +15,10 @@ export default defineComponent({
       type: [String, Array, Object],
       default: '',
     },
+    size: {
+      type: String as PropType<'sm' | 'md' | 'lg'>,
+      default: 'md',
+    },
   },
   setup(props) {
     const { dense } = useGlobals.setup();
@@ -26,7 +30,11 @@ export default defineComponent({
 
     const cardClass = computed<string>(
       () => {
-        const listed = [`card__${context.container} depth-2`];
+        const listed = [
+          `card__${context.container}`,
+          `card__${props.size}`,
+          'depth-2',
+        ];
         if (dense.value) {
           listed.push('card__dense');
         }

@@ -49,7 +49,7 @@ export default defineComponent({
       <WidgetToolbar v-else readonly />
     </template>
 
-    <div class="widget-md widget-body">
+    <div class="widget-body">
       <LabeledField
         :model-value="actual ? actual.id : 'Unknown'"
         label="ID"

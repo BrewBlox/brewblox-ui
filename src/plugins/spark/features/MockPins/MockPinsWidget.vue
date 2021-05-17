@@ -11,7 +11,7 @@ export default defineComponent({
     <template #toolbar>
       <BlockWidgetToolbar />
     </template>
-    <div class="widget-md">
+    <div>
       <IoArray />
     </div>
   </Card>

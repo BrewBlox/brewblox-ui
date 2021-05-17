@@ -83,7 +83,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div class="widget-md">
+    <div>
       <CardWarning v-if="!target.id">
         <template #message>
           Setpoint Driver has no target Setpoint configured.

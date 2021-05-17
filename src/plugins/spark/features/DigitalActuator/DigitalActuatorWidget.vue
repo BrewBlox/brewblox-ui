@@ -109,7 +109,7 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div class="widget-md">
+    <div>
       <CardWarning v-if="!block.data.hwDevice.id || !block.data.channel">
         <template #message>
           <span>Digital Actuator has no channel selected.</span>

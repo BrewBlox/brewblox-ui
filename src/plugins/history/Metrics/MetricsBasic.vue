@@ -128,7 +128,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-md">
+  <div>
     <div v-if="config.targets.length === 0">
       <div class="text-italic text-h6 q-pa-md darkened text-center">
         Add metrics to get started.

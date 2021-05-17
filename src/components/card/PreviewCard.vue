@@ -38,7 +38,7 @@ export default defineComponent({
   >
     <!-- Normal Card -->
     <Card
-      class="col-5"
+      class="col-auto"
       v-bind="$attrs"
     >
       <template #toolbar>

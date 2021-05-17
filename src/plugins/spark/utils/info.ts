@@ -18,6 +18,12 @@ export function isCompatible(type: string | null, intf: ComparedBlockType): bool
   return Boolean(compatibleTypes[intf]?.includes(type));
 }
 
+export function ifCompatible<T extends Block>(block: Nullable<Block>, intf: ComparedBlockType): T | null {
+  return block && isCompatible(block.type, intf)
+    ? block as T
+    : null;
+}
+
 export function isBlockDisplayReady(addr: BlockAddress): boolean {
   return isCompatible(addr?.type, [
     BlockIntfType.TempSensorInterface,

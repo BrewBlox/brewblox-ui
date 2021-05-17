@@ -51,7 +51,7 @@ export default defineComponent({
       <BlockWidgetToolbar />
     </template>
 
-    <div class="widget-md column q-ma-md q-gutter-y-sm">
+    <div class="column q-ma-md q-gutter-y-sm">
       <div class="col-auto row q-gutter-x-sm darkened">
         <div class="col">
           Client

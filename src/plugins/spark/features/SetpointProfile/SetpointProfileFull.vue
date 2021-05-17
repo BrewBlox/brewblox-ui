@@ -204,7 +204,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-lg">
+  <div>
     <slot name="warnings" />
 
     <div class="q-ma-md row q-gutter-xs">
