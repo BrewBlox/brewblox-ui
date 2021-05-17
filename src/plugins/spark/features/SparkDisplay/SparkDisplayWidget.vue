@@ -314,7 +314,7 @@ export default defineComponent({
 
     <div
       v-if="context.mode === 'Basic' && error"
-      class="col row justify-center items-center text-h5 q-gutter-x-md q-mt-lg"
+      class="col row justify-center items-center text-h5 q-gutter-x-md q-my-lg"
     >
       <q-icon name="warning" color="warning" />
       <div class="col-auto">
