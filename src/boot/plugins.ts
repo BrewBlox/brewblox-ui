@@ -1,6 +1,7 @@
 import { boot } from 'quasar/wrappers';
 import { Plugin } from 'vue';
 
+import automation from '@/plugins/automation';
 import builder from '@/plugins/builder';
 import history from '@/plugins/history';
 import misc from '@/plugins/misc';
@@ -28,6 +29,7 @@ export default boot(({ app, store }) => {
     builder,
     quickstart,
     misc,
+    automation,
   ];
 
   const started: Startable[] = [

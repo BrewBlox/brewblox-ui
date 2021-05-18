@@ -24,10 +24,6 @@ services:
   history:
     image: brewblox/brewblox-history:develop
 
-  automation:
-    image: brewblox/brewblox-automation:develop
-    init: true
-
   node-red:
     image: brewblox/node-red:develop
     volumes:
