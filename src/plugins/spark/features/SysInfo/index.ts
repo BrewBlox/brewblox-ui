@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { genericBlockFeature } from '@/plugins/spark/generic';
+import { systemBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
@@ -31,18 +31,15 @@ const plugin: Plugin = {
     };
 
     const feature: WidgetFeature = {
-      ...genericBlockFeature,
+      ...systemBlockFeature,
       id: typeName,
-      title: 'Device Info',
+      title: 'Spark System Info',
       role: 'Display',
       component: blockWidgetSelector(app, widget, typeName),
       widgetSize: {
         cols: 4,
         rows: 3,
       },
-      // System objects can't be created or deleted
-      wizard: false,
-      removeActions: undefined,
     };
 
     sparkStore.addBlockSpec(spec);

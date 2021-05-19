@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { genericBlockFeature } from '@/plugins/spark/generic';
+import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
@@ -26,7 +26,7 @@ const plugin: Plugin = {
     };
 
     const feature: WidgetFeature = {
-      ...genericBlockFeature,
+      ...discoveredBlockFeature,
       id: typeName,
       title: 'DS2408 Chip',
       role: 'Output',
@@ -35,7 +35,6 @@ const plugin: Plugin = {
         cols: 4,
         rows: 3,
       },
-      wizard: 'BlockDiscoveryWizard',
     };
 
     sparkStore.addBlockSpec(spec);

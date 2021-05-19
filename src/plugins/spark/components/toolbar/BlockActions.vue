@@ -19,9 +19,14 @@ export default defineComponent({
     const {
       widget,
       block,
+      sparkModule,
       isVolatileWidget,
       hasGraph,
     } = useBlockWidget.setup();
+
+    const serviceTitle = computed<string>(
+      () => sparkModule.service.title,
+    );
 
     const canRemove = computed<boolean>(
       () => isBlockRemovable(block.value),
@@ -41,6 +46,7 @@ export default defineComponent({
       startAddBlockToDisplay,
       startCopyWidget,
       startChangeBlockId,
+      serviceTitle,
       widget,
       isVolatileWidget,
       block,
@@ -55,6 +61,17 @@ export default defineComponent({
 
 <template>
   <ActionSubmenu label="Block">
+    <q-item class="fade-4">
+      <q-item-section avatar>
+        <q-icon name="mdi-cloud" />
+      </q-item-section>
+      <q-item-section>
+        <q-item-label caption>
+          Service
+        </q-item-label>
+        {{ serviceTitle }}
+      </q-item-section>
+    </q-item>
     <slot name="block-actions" />
     <ActionItem
       v-if="isVolatileWidget"

@@ -3,8 +3,11 @@ import { defineComponent } from 'vue';
 
 import { getNumDialogs } from '@/utils/dialog';
 
+import Toolbar from './Toolbar.vue';
+
 export default defineComponent({
   name: 'DialogToolbar',
+  components: { Toolbar },
   emits: ['close'],
   setup() {
     const numDialogs = getNumDialogs();

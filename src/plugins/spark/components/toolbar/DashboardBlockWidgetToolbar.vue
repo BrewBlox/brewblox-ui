@@ -15,20 +15,24 @@ export default defineComponent({
     } = useBlockWidget.setup();
     const graphModalOpen = ref(false);
 
+    function changeTitle(): void {
+      startChangeBlockId(block.value);
+    }
+
     return {
       widgetId,
       block,
       hasGraph,
       graphConfig,
       graphModalOpen,
-      startChangeBlockId,
+      changeTitle,
     };
   },
 });
 </script>
 
 <template>
-  <WidgetToolbar @title-click="startChangeBlockId(block)">
+  <WidgetToolbar :change-title-fn="changeTitle">
     <BlockGraph
       v-if="graphModalOpen"
       :id="`graph-full--${widgetId}`"

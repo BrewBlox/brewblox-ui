@@ -182,8 +182,7 @@ export default defineComponent({
     <div class="widget-body column">
       <CardWarning v-if="!automationAvailable">
         <template #message>
-          The automation service is not available. <br>
-          This feature is still in preview.
+          No automation service detected.
         </template>
       </CardWarning>
       <div class="col-grow text-h6 text-secondary">

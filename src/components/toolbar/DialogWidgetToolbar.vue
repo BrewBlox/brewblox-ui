@@ -4,6 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { startChangeWidgetTitle } from '@/utils/widgets';
 
+
 export default defineComponent({
   name: 'DialogWidgetToolbar',
   props: {
@@ -11,11 +12,12 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    changeTitleFn: {
+      type: Function,
+      default: null,
+    },
   },
-  emits: [
-    'title-click',
-  ],
-  setup(props, { attrs, emit }) {
+  setup(props) {
     const {
       context,
       toggleMode,
@@ -37,9 +39,9 @@ export default defineComponent({
         : 'Show basic widget',
     );
 
-    function clickTitle(): void {
-      if (attrs['onTitleClick'] !== undefined) {
-        emit('title-click');
+    function changeTitle(): void {
+      if (props.changeTitleFn) {
+        props.changeTitleFn();
       }
       else {
         startChangeWidgetTitle(widget.value);
@@ -52,7 +54,7 @@ export default defineComponent({
       toggleBtnIcon,
       toggleBtnTooltip,
       toggleMode,
-      clickTitle,
+      changeTitle,
     };
   },
 });
@@ -62,7 +64,8 @@ export default defineComponent({
   <DialogToolbar
     :title="widget.title"
     :subtitle="featureTitle"
-    @title-click="clickTitle"
+    :change-title-fn="changeTitle"
+    v-bind="$attrs"
   >
     <slot />
     <template #buttons>

@@ -46,7 +46,7 @@ export default defineComponent({
   <Card>
     <template #toolbar>
       <DialogToolbar v-if="inDialog" :title="widget.title" :subtitle="featureTitle" />
-      <WidgetToolbar v-else readonly />
+      <Toolbar v-else :title="widget.title" :subtitle="featureTitle" />
     </template>
 
     <div class="widget-body">

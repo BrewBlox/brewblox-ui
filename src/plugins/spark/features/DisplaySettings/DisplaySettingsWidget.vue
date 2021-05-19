@@ -37,11 +37,11 @@ export default defineComponent({
 <template>
   <Card size="lg">
     <template #toolbar>
-      <WidgetToolbar has-mode-toggle>
+      <BlockWidgetToolbar has-mode-toggle>
         <template #actions>
           <ActionItem icon="clear" label="Clear slots" @click="clearSlots" />
         </template>
-      </WidgetToolbar>
+      </BlockWidgetToolbar>
     </template>
 
     <component :is="context.mode" />

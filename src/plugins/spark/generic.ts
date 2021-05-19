@@ -12,16 +12,25 @@ const removeBlock =
     }
   };
 
-export const genericBlockFeature: Pick<WidgetFeature, 'wizard' | 'widgetSize' | 'removeActions'> = {
+type BlockFeatureBase = Pick<WidgetFeature, 'wizard' | 'removeActions'>
+
+export const genericBlockFeature: BlockFeatureBase = {
   wizard: 'BlockWidgetWizard',
-  widgetSize: {
-    cols: 4,
-    rows: 4,
-  },
   removeActions: [
     {
       description: 'Remove block on controller',
       action: removeBlock,
     },
   ],
+};
+
+export const systemBlockFeature: BlockFeatureBase = {
+  ...genericBlockFeature,
+  removeActions: undefined,
+  wizard: 'SystemBlockWidgetWizard',
+};
+
+export const discoveredBlockFeature: BlockFeatureBase = {
+  ...genericBlockFeature,
+  wizard: 'BlockDiscoveryWizard',
 };
