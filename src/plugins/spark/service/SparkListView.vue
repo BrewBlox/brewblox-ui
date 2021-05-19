@@ -76,10 +76,6 @@ export default defineComponent({
       () => serviceStore.serviceById(props.serviceId),
     );
 
-    const serviceTitle = computed<string>(
-      () => service.value?.title ?? 'Spark service',
-    );
-
     const sparkModule = computed<SparkServiceModule | null>(
       () => sparkStore.moduleById(props.serviceId),
     );
@@ -117,9 +113,7 @@ export default defineComponent({
         // Override sorting - Device Info should always come first
         const sysIdx = blockItems.findIndex(v => v.type === BlockType.SysInfo);
         if (sysIdx !== -1) {
-          const [sysItem] = blockItems.splice(sysIdx, 1);
-          sysItem.name = serviceTitle.value;
-          blockItems.unshift(sysItem);
+          blockItems.unshift(...blockItems.splice(sysIdx, 1));
         }
 
         return blockItems;

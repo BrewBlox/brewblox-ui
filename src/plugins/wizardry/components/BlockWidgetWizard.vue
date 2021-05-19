@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
+import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress, BlockConfig, BlockType } from '@/plugins/spark/types';
@@ -21,6 +21,10 @@ export default defineComponent({
   name: 'BlockWidgetWizard',
   props: {
     ...useWidgetWizard.props,
+    singleMode: {
+      type: String as PropType<CreateMode | undefined>,
+      default: undefined,
+    },
   },
   emits: [
     ...useWidgetWizard.emits,
@@ -35,7 +39,7 @@ export default defineComponent({
       onDone,
     } = useWidgetWizard.setup(props.featureId);
 
-    const createMode = ref<CreateMode>('new');
+    const createMode = ref<CreateMode>(props.singleMode ?? 'new');
     const blockType = props.featureId as BlockType;
 
     const serviceId = ref<string | null>(sparkStore.serviceIds[0] ?? null);
@@ -241,6 +245,7 @@ export default defineComponent({
   <WizardBody>
     <div class="widget-body column">
       <q-btn-toggle
+        v-if="!singleMode"
         v-model="createMode"
         :options="createModeOpts"
         outline

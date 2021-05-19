@@ -3,6 +3,9 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 
+import DashboardWidgetToolbar from './DashboardWidgetToolbar.vue';
+import DialogWidgetToolbar from './DialogWidgetToolbar.vue';
+
 const toolbarSlots = [
   'default',
   'buttons',
@@ -12,6 +15,10 @@ const toolbarSlots = [
 
 export default defineComponent({
   name: 'WidgetToolbar',
+  components: {
+    DialogWidgetToolbar,
+    DashboardWidgetToolbar,
+  },
   setup(props, { slots }) {
     const { inDialog } = useContext.setup();
 

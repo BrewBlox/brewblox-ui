@@ -14,14 +14,13 @@ import {
 } from '@/plugins/spark/types';
 import { serviceStore } from '@/store/services';
 import { durationString } from '@/utils/duration';
-import { shortDateString } from '@/utils/functional';
-import { startChangeServiceTitle } from '@/utils/services';
+import { findByKey, shortDateString } from '@/utils/functional';
 
 export default defineComponent({
   name: 'SysInfoWidget',
   setup() {
     const { inDialog } = useContext.setup();
-    const { serviceId } = useBlockWidget.setup<SysInfoBlock>();
+    const { block, serviceId } = useBlockWidget.setup<SysInfoBlock>();
 
     const service = computed<SparkService | null>(
       () => serviceStore.serviceById(serviceId),
@@ -31,66 +30,57 @@ export default defineComponent({
       () => sparkStore.moduleById(serviceId),
     );
 
+    const lastBlocks = computed<string>(
+      () => shortDateString(sparkModule.value?.lastBlocks, 'Unknown'),
+    );
+
+    function sysBlock<T extends Block>(blockType: SystemBlockType): T | null {
+      return findByKey(sparkStore.serviceBlocks(serviceId), 'type', blockType) as T | null;
+    }
+
+    const sysInfo = computed<SysInfoBlock>(
+      () => block.value,
+    );
+
+    const ticks = computed<TicksBlock | null>(
+      () => sysBlock(SystemBlockType.Ticks),
+    );
+
+    const wifi = computed<WiFiSettingsBlock | null>(
+      () => sysBlock(SystemBlockType.WiFiSettings),
+    );
+
+    const uptime = computed<string>(
+      () => durationString(ticks.value?.data.millisSinceBoot),
+    );
+
+    const sysDate = computed<string>(
+      () => ticks.value
+        ? new Date(ticks.value.data.secondsSinceEpoch * 1000).toLocaleString()
+        : 'Unknown',
+    );
+
+    const ipAddress = computed<string>(
+      () => wifi.value
+        ? wifi.value.data.ip
+        : '0.0.0.0',
+    );
+
     const ready = computed<boolean>(
       () => service.value !== null
         && sparkModule.value !== null
         && sparkModule.value.lastBlocks !== null,
     );
 
-    const lastBlocks = computed<string>(
-      () => shortDateString(sparkModule.value?.lastBlocks, 'Unknown'),
-    );
-
-    const title = computed<string>(
-      () => service.value?.title ?? 'Unknown',
-    );
-
-    function sysBlock<T extends Block>(blockType: SystemBlockType): T {
-      return sparkModule.value!.blocks
-        .find(block => block.type === blockType) as T;
-    }
-
-    const sysInfo = computed<SysInfoBlock>(
-      () => sysBlock(SystemBlockType.SysInfo),
-    );
-
-    const ticks = computed<TicksBlock>(
-      () => sysBlock(SystemBlockType.Ticks),
-    );
-
-    const wifi = computed<WiFiSettingsBlock>(
-      () => sysBlock(SystemBlockType.WiFiSettings),
-    );
-
-    const uptime = computed<string>(
-      () => durationString(ticks.value.data.millisSinceBoot),
-    );
-
-    const sysDate = computed<string>(
-      () => new Date(ticks.value.data.secondsSinceEpoch * 1000).toLocaleString(),
-    );
-
-    function fetchAll(): void {
-      sparkModule.value?.fetchAll();
-    }
-
-    function changeTitle(): void {
-      startChangeServiceTitle(service.value);
-    }
-
     return {
       inDialog,
       serviceId,
       ready,
       lastBlocks,
-      title,
       sysInfo,
-      ticks,
-      wifi,
       uptime,
       sysDate,
-      fetchAll,
-      changeTitle,
+      ipAddress,
     };
   },
 });
@@ -99,26 +89,7 @@ export default defineComponent({
 <template>
   <Card v-if="ready">
     <template #toolbar>
-      <DialogToolbar
-        v-if="inDialog"
-        :title="title"
-        subtitle="Device info"
-        @title-click="changeTitle"
-      >
-        <template #buttons>
-          <q-btn flat round icon="refresh" @click="fetchAll" />
-        </template>
-      </DialogToolbar>
-      <Toolbar
-        v-else
-        :title="title"
-        subtitle="Device info"
-        @title-click="changeTitle"
-      >
-        <template #buttons>
-          <q-btn flat dense round icon="refresh" @click="fetchAll" />
-        </template>
-      </Toolbar>
+      <BlockWidgetToolbar />
     </template>
 
     <div>
@@ -142,7 +113,7 @@ export default defineComponent({
           {{ sysInfo.data.deviceId }}
         </LabeledField>
         <LabeledField label="IP address" class="col-lg-5 col-11">
-          {{ wifi.data.ip }}
+          {{ ipAddress }}
         </LabeledField>
         <LabeledField label="Last blocks update" class="col-lg-5 col-11">
           {{ lastBlocks }}

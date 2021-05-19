@@ -12,11 +12,12 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    changeTitleFn: {
+      type: Function,
+      default: null,
+    },
   },
-  emits: [
-    'title-click',
-  ],
-  setup(props, { attrs, emit }) {
+  setup(props) {
     const {
       context,
       toggleMode,
@@ -43,15 +44,6 @@ export default defineComponent({
         : 'Show basic widget',
     );
 
-    function clickTitle(): void {
-      if (attrs['onTitleClick'] !== undefined) {
-        emit('title-click');
-      }
-      else {
-        startChangeWidgetTitle(widget.value);
-      }
-    }
-
     function showDialog(): void {
       createDialog({
         component: 'WidgetDialog',
@@ -59,6 +51,15 @@ export default defineComponent({
           widgetId,
         },
       });
+    }
+
+    function changeTitle(): void {
+      if (props.changeTitleFn) {
+        props.changeTitleFn();
+      }
+      else {
+        startChangeWidgetTitle(widget.value);
+      }
     }
 
     return {
@@ -69,7 +70,7 @@ export default defineComponent({
       toggleBtnIcon,
       toggleBtnTooltip,
       toggleMode,
-      clickTitle,
+      changeTitle,
     };
   },
 });
@@ -79,7 +80,8 @@ export default defineComponent({
   <Toolbar
     :title="widget.title"
     :subtitle="featureTitle"
-    @title-click="clickTitle"
+    :change-title-fn="changeTitle"
+    v-bind="$attrs"
   >
     <slot />
     <template #buttons>

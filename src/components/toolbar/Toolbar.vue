@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'Toolbar',
@@ -16,18 +16,10 @@ export default defineComponent({
       type: String,
       default: '',
     },
-  },
-  emits: [
-    'title-click',
-  ],
-  setup(props, { attrs }) {
-    const readonly = computed<boolean>(
-      () => attrs['onTitleClick'] === undefined,
-    );
-
-    return {
-      readonly,
-    };
+    changeTitleFn: {
+      type: Function,
+      default: null,
+    },
   },
 });
 </script>
@@ -37,8 +29,8 @@ export default defineComponent({
     <q-icon v-if="icon" :name="icon" class="col-auto self-center q-px-sm" size="sm" />
     <div class="col no-wrap row ellipsis q-px-xs text-h6 items-center">
       <div
-        :class="{pointer: !readonly}"
-        @click="$emit('title-click')"
+        :class="{pointer: !!changeTitleFn}"
+        @click="changeTitleFn && changeTitleFn()"
       >
         {{ title }}
       </div>

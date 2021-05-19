@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { genericBlockFeature } from '@/plugins/spark/generic';
+import { systemBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, Spark2Hardware, Spark2PinsBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
@@ -25,7 +25,7 @@ const plugin: Plugin = {
     };
 
     const feature: WidgetFeature = {
-      ...genericBlockFeature,
+      ...systemBlockFeature,
       id: typeName,
       title: 'Spark 2 Pins',
       role: 'Output',
@@ -34,9 +34,6 @@ const plugin: Plugin = {
         cols: 4,
         rows: 4,
       },
-      // System objects can't be created or deleted
-      wizard: false,
-      removeActions: undefined,
     };
 
     sparkStore.addBlockSpec(spec);

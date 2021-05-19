@@ -321,6 +321,7 @@ export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
  *
  * @param arr object collection.
  * @param id unique ID of desired object.
+ * @param fallback returned if no match found.
  */
 export function findById<T extends HasId>(
   arr: T[],
@@ -329,6 +330,27 @@ export function findById<T extends HasId>(
 ): T | typeof fallback {
   return id != null
     ? arr.find(v => v.id === id) ?? fallback
+    : fallback;
+}
+
+/**
+ * Looks for object in array collection.
+ * Functions like `findById`, but can use keys other than `id`.
+ *
+ * @param arr object collection.
+ * @param key object key where the value should equal `desired`.
+ * @param desired value of `obj[key]`
+ * @param fallback returned if no match found
+ * @returns
+ */
+export function findByKey<T>(
+  arr: T[],
+  key: keyof T,
+  desired: Nullable<T[keyof T]>,
+  fallback: T | null = null,
+): T | typeof fallback {
+  return desired != null
+    ? arr.find(v => v[key] === desired) ?? fallback
     : fallback;
 }
 
