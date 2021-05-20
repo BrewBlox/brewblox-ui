@@ -1,49 +1,125 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import { useContext } from '@/composables';
+import { useContext, useWidget } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { startChangeWidgetTitle } from '@/utils/widgets';
 
-import DashboardWidgetToolbar from './DashboardWidgetToolbar.vue';
-import DialogWidgetToolbar from './DialogWidgetToolbar.vue';
-
-const toolbarSlots = [
-  'default',
-  'buttons',
-  'actions',
-  'menus',
-];
+import Toolbar from './Toolbar.vue';
 
 export default defineComponent({
   name: 'WidgetToolbar',
   components: {
-    DialogWidgetToolbar,
-    DashboardWidgetToolbar,
+    Toolbar,
   },
-  setup(props, { slots }) {
-    const { inDialog } = useContext.setup();
+  props: {
+    hasModeToggle: {
+      type: Boolean,
+      default: false,
+    },
+    changeTitleFn: {
+      type: Function,
+      default: null,
+    },
+  },
+  setup(props) {
+    const {
+      inDialog,
+      context,
+      toggleMode,
+    } = useContext.setup();
+    const {
+      widgetId,
+      widget,
+      featureTitle,
+    } = useWidget.setup();
 
-    const activeSlots = computed<string[]>(
-      () => Object.keys(slots)
-        .filter(s => toolbarSlots.includes(s)),
+    const toggleBtnIcon = computed<string>(
+      () => context.mode === 'Basic'
+        ? 'mdi-unfold-more-horizontal'
+        : 'mdi-unfold-less-horizontal',
     );
+
+    const toggleBtnTooltip = computed<string>(
+      () => context.mode === 'Basic'
+        ? 'Show full widget'
+        : 'Show basic widget',
+    );
+
+    function showDialog(): void {
+      createDialog({
+        component: 'WidgetDialog',
+        componentProps: {
+          widgetId,
+        },
+      });
+    }
+
+    function changeTitle(): void {
+      if (props.changeTitleFn) {
+        props.changeTitleFn();
+      }
+      else {
+        startChangeWidgetTitle(widget.value);
+      }
+    }
 
     return {
       inDialog,
-      activeSlots,
+      widget,
+      featureTitle,
+      toggleBtnIcon,
+      toggleBtnTooltip,
+      toggleMode,
+      showDialog,
+      changeTitle,
     };
   },
 });
 </script>
 
 <template>
-  <DialogWidgetToolbar v-if="inDialog" v-bind="$attrs">
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
-      <slot :name="slot" />
+  <Toolbar
+    :title="widget.title"
+    :subtitle="featureTitle"
+    :change-title-fn="changeTitle"
+  >
+    <slot />
+    <template #buttons>
+      <q-btn
+        v-if="hasModeToggle"
+        :icon="toggleBtnIcon"
+        flat
+        dense
+        round
+        @click="toggleMode"
+      >
+        <q-tooltip>
+          {{ toggleBtnTooltip }}
+        </q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="!inDialog"
+        icon="mdi-launch"
+        flat
+        dense
+        round
+        @click="showDialog"
+      >
+        <q-tooltip>
+          Show in dialog
+        </q-tooltip>
+      </q-btn>
+      <ActionMenu round dense>
+        <template v-if="!!$slots.actions" #actions>
+          <slot name="actions" />
+        </template>
+        <template #menus>
+          <slot name="menus">
+            <WidgetActions />
+          </slot>
+        </template>
+      </ActionMenu>
     </template>
-  </DialogWidgetToolbar>
-  <DashboardWidgetToolbar v-else v-bind="$attrs">
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
-      <slot :name="slot" />
-    </template>
-  </DashboardWidgetToolbar>
+  </Toolbar>
 </template>

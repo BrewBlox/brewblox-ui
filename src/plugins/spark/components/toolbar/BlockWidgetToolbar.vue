@@ -1,42 +1,61 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 
-import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { startChangeBlockId } from '@/plugins/spark/utils';
 
-const toolbarSlots = [
-  'default',
-  'buttons',
-  'actions',
-  'menus',
-];
 
 export default defineComponent({
   name: 'BlockWidgetToolbar',
-  setup(props, { slots }) {
-    const { inDialog } = useContext.setup();
+  setup() {
+    const {
+      widgetId,
+      block,
+      hasGraph,
+      graphConfig,
+    } = useBlockWidget.setup();
+    const graphModalOpen = ref(false);
 
-    const activeSlots = computed<string[]>(
-      () => Object.keys(slots)
-        .filter(s => toolbarSlots.includes(s)),
-    );
+    function changeTitle(): void {
+      startChangeBlockId(block.value);
+    }
 
     return {
-      inDialog,
-      activeSlots,
+      widgetId,
+      block,
+      hasGraph,
+      graphConfig,
+      graphModalOpen,
+      changeTitle,
     };
   },
 });
 </script>
 
 <template>
-  <DialogBlockWidgetToolbar v-if="inDialog" v-bind="$attrs">
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
-      <slot :name="slot" />
+  <WidgetToolbar :change-title-fn="changeTitle">
+    <BlockGraph
+      v-if="graphModalOpen"
+      :id="`graph-full--${widgetId}`"
+      v-model:modal="graphModalOpen"
+      v-model:config="graphConfig"
+    />
+    <slot />
+
+    <!-- Avoid the toolbar rendering an empty menu -->
+    <template v-if="hasGraph || $slots.actions" #actions>
+      <ActionItem
+        v-if="hasGraph"
+        icon="mdi-chart-line"
+        label="Graph"
+        @click="graphModalOpen = true"
+      />
+      <slot name="actions" />
     </template>
-  </DialogBlockWidgetToolbar>
-  <DashboardBlockWidgetToolbar v-else v-bind="$attrs">
-    <template v-for="slot in activeSlots" #[slot] :name="slot">
-      <slot :name="slot" />
+
+    <template #menus>
+      <WidgetActions no-rename />
+      <BlockActions />
     </template>
-  </DashboardBlockWidgetToolbar>
+  </WidgetToolbar>
 </template>
