@@ -156,7 +156,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <Card>
+  <Card style="max-width: 500px">
     <template #toolbar>
       <Toolbar :title="serviceId" subtitle="Troubleshooter">
         <template #buttons>
