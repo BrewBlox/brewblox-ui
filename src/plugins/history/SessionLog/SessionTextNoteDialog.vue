@@ -116,9 +116,9 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <PreviewCard enabled>
+    <PreviewCard enabled toggle-icon="mdi-file-document-edit-outline">
       <template #toolbar>
-        <DialogToolbar :title="title" subtitle="Edit text note" />
+        <Toolbar :title="title" subtitle="Edit text note" />
       </template>
 
       <template #preview>

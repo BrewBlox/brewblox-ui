@@ -3,19 +3,19 @@ import { defineComponent, PropType } from 'vue';
 
 import { useGlobals } from '@/composables';
 
-import { builderModes, builderTools } from '../const';
-import { BuilderModeName, BuilderToolName } from '../types';
+import { builderTools } from '../const';
+import { BuilderToolName } from '../types';
 
 
 export default defineComponent({
   name: 'BuilderToolsMenu',
   props: {
-    mode: {
-      type: String as PropType<BuilderModeName>,
-      required: true,
-    },
     expanded: {
       type: Boolean,
+      required: true,
+    },
+    activeTool: {
+      type: String as PropType<string | null>,
       required: true,
     },
     disabledTools: {
@@ -24,7 +24,6 @@ export default defineComponent({
     },
   },
   emits: [
-    'update:mode',
     'update:expanded',
     'use',
   ],
@@ -39,7 +38,6 @@ export default defineComponent({
     }
 
     return {
-      builderModes,
       builderTools,
       dense,
       handleSwipe,
@@ -55,7 +53,7 @@ export default defineComponent({
     @click="$emit('update:expanded', !expanded)"
   >
     <div class="column no-wrap" @click.stop>
-      <div
+      <!-- <div
         class="no-select q-py-sm q-pl-md text-italic text-grey-5"
         style="font-size: 120%"
       >
@@ -72,7 +70,7 @@ export default defineComponent({
         :class="[expanded ? 'q-pr-md' : 'q-pr-none']"
         style="min-height: 0px"
         @click="$emit('update:mode', opt.value)"
-      />
+      /> -->
 
       <div
         class="no-select q-py-sm q-pl-md text-italic text-grey-5"
@@ -84,6 +82,7 @@ export default defineComponent({
       <ActionItem
         v-for="tool in builderTools"
         :key="'tool-' + tool.value"
+        :active="activeTool === tool.value"
         :disable="disabledTools.includes(tool.value)"
         :icon="tool.icon"
         :label="expanded ? tool.label : ''"

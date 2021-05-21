@@ -106,7 +106,7 @@ export default defineComponent({
   >
     <Card>
       <template #toolbar>
-        <DialogToolbar :title="serviceId" subtitle="Wifi Configuration" />
+        <Toolbar :title="serviceId" subtitle="Wifi Configuration" />
       </template>
 
       <q-card-section>

@@ -122,7 +122,7 @@ export default defineComponent({
   >
     <Card no-scroll>
       <template #toolbar>
-        <DialogToolbar icon="mdi-creation" :title="dialogTitle" />
+        <Toolbar icon="mdi-creation" :title="dialogTitle" />
       </template>
 
       <component

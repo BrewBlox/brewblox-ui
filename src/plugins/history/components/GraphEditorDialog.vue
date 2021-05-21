@@ -87,7 +87,7 @@ export default defineComponent({
   >
     <Card no-scroll>
       <template #toolbar>
-        <DialogToolbar :title="title" />
+        <Toolbar :title="title" />
       </template>
 
       <div class="fit column">

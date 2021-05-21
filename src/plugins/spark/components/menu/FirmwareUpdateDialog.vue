@@ -111,7 +111,7 @@ export default defineComponent({
   >
     <Card>
       <template #toolbar>
-        <DialogToolbar :title="serviceId" subtitle="Firmware update" />
+        <Toolbar :title="serviceId" subtitle="Firmware update" />
       </template>
 
       <q-card-section>

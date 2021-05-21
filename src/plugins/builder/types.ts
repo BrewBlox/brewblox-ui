@@ -90,13 +90,10 @@ export interface Rect {
   bottom: number;
 }
 
-export type BuilderModeName =
-  | 'select'
-  | 'pan'
-  | 'interact'
-  | 'gridsize'
-
 export type BuilderToolName =
+  | 'pan'
+  | 'select'
+  | 'gridresize'
   | 'add'
   | 'move'
   | 'copy'
@@ -108,18 +105,11 @@ export type BuilderToolName =
   | 'undo'
   | 'redo'
 
-export interface BuilderMode {
-  value: BuilderModeName;
-  label: string;
-  icon: string;
-  partClass: (part: FlowPart) => string;
-  gridCursor: string;
-  showHover: boolean;
-}
-
 export interface BuilderTool {
   value: BuilderToolName;
   label: string;
   icon: string;
   shortcut: string;
+  cursor: string;
+  partClass?: (part: FlowPart) => string;
 }
