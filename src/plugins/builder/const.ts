@@ -1,4 +1,4 @@
-import { BuilderMode, BuilderTool } from './types';
+import { BuilderTool } from './types';
 
 export const typeName = 'Builder';
 export const defaultLayoutWidth = 20;
@@ -41,100 +41,97 @@ export const deprecatedTypes = {
   ActuatorValve: 'Valve',
 };
 
-export const builderModes: BuilderMode[] = [
+export const builderTools: BuilderTool[] = [
   {
     value: 'pan',
     label: 'Pan',
     icon: 'mdi-drag-variant',
-    gridCursor: 'all-scroll',
-    partClass: () => '',
-    showHover: false,
+    shortcut: 'q',
+    cursor: 'all-scroll',
   },
   {
     label: 'Select',
     value: 'select',
     icon: 'mdi-select-drag',
-    gridCursor: 'crosshair',
+    shortcut: 's',
+    cursor: 'crosshair',
     partClass: part => part != null ? 'pointer' : '',
-    showHover: true,
   },
   {
-    value: 'interact',
-    label: 'Interact',
-    icon: 'mdi-cursor-default',
-    gridCursor: 'auto',
-    partClass: part => part?.canInteract ? 'pointer' : '',
-    showHover: true,
-  },
-  {
-    value: 'gridsize',
+    value: 'gridresize',
     label: 'Resize grid',
     icon: 'mdi-grid',
-    gridCursor: 'crosshair',
-    partClass: () => '',
-    showHover: false,
+    shortcut: 'g',
+    cursor: 'crosshair',
   },
-];
-
-export const builderTools: BuilderTool[] = [
   {
     value: 'add',
     label: 'New',
     icon: 'add',
     shortcut: 'n',
+    cursor: 'auto',
   },
   {
     value: 'move',
     label: 'Move',
     icon: 'mdi-cursor-move',
     shortcut: 'm',
+    cursor: 'auto',
   },
   {
     value: 'copy',
     label: 'Copy',
     icon: 'file_copy',
     shortcut: 'c',
+    cursor: 'auto',
   },
   {
     value: 'rotate',
     label: 'Rotate',
     icon: 'mdi-rotate-right-variant',
     shortcut: 'r',
+    cursor: 'auto',
   },
   {
     label: 'Flip',
     value: 'flip',
     icon: 'mdi-swap-horizontal-bold',
     shortcut: 'f',
+    cursor: 'auto',
   },
   {
     value: 'edit',
     label: 'Edit Settings',
     icon: 'settings',
     shortcut: 'e',
+    cursor: 'auto',
   },
   {
     label: 'Interact',
     value: 'interact',
     icon: 'mdi-cursor-default',
     shortcut: 'i',
+    cursor: 'auto',
   },
   {
     label: 'Delete',
     value: 'delete',
     icon: 'delete',
     shortcut: 'd',
+    cursor: 'auto',
   },
   {
     label: 'Undo',
     value: 'undo',
     icon: 'mdi-undo',
     shortcut: 'ctrl+z',
+    cursor: 'auto',
   },
   {
     label: 'Redo',
     value: 'redo',
     icon: 'mdi-redo',
     shortcut: 'ctrl+y',
+    cursor: 'auto',
   },
 ];

@@ -21,12 +21,17 @@ import { keyEventString } from '@/utils/events';
 import { clampRotation, deepCopy, uniqueFilter } from '@/utils/functional';
 
 import { normalizeSelectArea, useDragSelect, useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
-import { builderModes, builderTools, SQUARE_SIZE } from './const';
+import { builderTools, SQUARE_SIZE } from './const';
 import { builderStore } from './store';
-import { BuilderLayout, BuilderMode, BuilderModeName, BuilderToolName, FlowPart, PersistentPart } from './types';
+import { BuilderLayout, BuilderTool, BuilderToolName, FlowPart, PersistentPart } from './types';
 import { asStatePart, coord2grid, grid2coord, startAddLayout, startChangeLayoutTitle } from './utils';
 
 type SVGSelection = d3.Selection<SVGElement, unknown, null, undefined>
+
+type ToolSource =
+  | 'shortcut'
+  | 'menu'
+  | 'click'
 
 /**
  * A group of parts that is currently being moved.
@@ -62,16 +67,14 @@ export default defineComponent({
     const history = ref<string[]>([]);
     const undoneHistory = ref<string[]>([]);
 
-    const settingsDialogOpen = ref<boolean>(false);
     const toolsMenuExpanded = ref<boolean>(!dense.value);
-
-    const activeModeId = ref<BuilderModeName>('pan');
+    const activeToolId = ref<BuilderToolName | null>('pan');
 
     const gridHoverPos = ref<XYPosition | null>(null);
     const partDragStart = ref<XYPosition | null>(null);
 
     const selectedIds = ref<string[]>([]);
-    const configuredId = ref<string | null>(null);
+    const configuredPart = ref<FlowPart | null>(null);
     const floater = ref<UnwrapRef<Floater> | null>(null);
 
     const focusRef = ref<HTMLElement>();
@@ -128,17 +131,21 @@ export default defineComponent({
       }),
     );
 
-    const configuredPart = computed<FlowPart | null>(
-      () => flowParts.value.find(p => p.id === configuredId.value) ?? null,
-    );
-
-    const activeMode = computed<BuilderMode>(
-      () => builderModes.find(v => v.value === activeModeId.value) ?? builderModes[0],
+    const activeTool = computed<BuilderTool | null>(
+      () => builderTools.find(v => v.value === activeToolId.value) ?? null,
     );
 
     const dragEnabled = computed<boolean>(
-      () => activeModeId.value === 'pan',
+      () => activeToolId.value === 'pan',
     );
+
+    const cursor = computed<string>(
+      () => activeTool.value?.cursor ?? 'auto',
+    );
+
+    function partClass(part: FlowPart): string {
+      return activeTool.value?.partClass?.(part) ?? '';
+    }
 
     const {
       svgRef,
@@ -203,18 +210,6 @@ export default defineComponent({
       return floater.value?.parts.some(p => p.id === part.id) === true;
     }
 
-    function clear(): void {
-      if (floater.value) {
-        floater.value = null;
-      }
-      else if (activeSelectArea.value) {
-        stopDragSelect();
-      }
-      else {
-        selectedIds.value = [];
-      }
-    }
-
     function makeFloater(source: Floater): void {
       floater.value = deepCopy(source);
     }
@@ -248,7 +243,18 @@ export default defineComponent({
         ]);
       }
 
+      cancelSelection();
       floater.value = null;
+    }
+
+    function cancelFloater(): void {
+      if (floater.value) {
+        selectedIds.value =
+          [...floater.value.parts]
+            .map(v => v.id)
+            .filter(id => flowParts.value.some(v => v.id === id));
+        floater.value = null;
+      }
     }
 
     function findPartAtCoords(coords: XYPosition | null): FlowPart | null {
@@ -269,18 +275,35 @@ export default defineComponent({
       return null;
     }
 
-    function findActiveParts(): FlowPart[] {
-      if (selectedIds.value.length) {
+    function findHoveredPart(): FlowPart | null {
+      return findPartAtCoords(toCoords(gridHoverPos.value));
+    }
+
+    function findActiveParts(alwaysIncludeSelected = false): FlowPart[] {
+      const hovered = findHoveredPart();
+
+      if (hovered) {
+        return selectedIds.value.length && (alwaysIncludeSelected || selectedIds.value.includes(hovered.id))
+          ? deepCopy(flowParts.value.filter(v => selectedIds.value.includes(v.id)))
+          : [hovered];
+      }
+      else if (alwaysIncludeSelected) {
         return deepCopy(flowParts.value.filter(v => selectedIds.value.includes(v.id)));
       }
-      const hovered = findPartAtCoords(toCoords(gridHoverPos.value));
-      return hovered
-        ? [hovered]
-        : [];
+      else {
+        return [];
+      }
+    }
+
+    function isHoveringUnselectedPart(): boolean {
+      const hovered = findHoveredPart();
+      return Boolean(hovered
+        && selectedIds.value.length
+        && !selectedIds.value.some(v => v === hovered.id));
     }
 
     function closeMenu(): void {
-      settingsDialogOpen.value = false;
+      configuredPart.value = null;
       nextTick(setFocus);
     }
 
@@ -298,9 +321,42 @@ export default defineComponent({
       selectedIds.value = [];
     }
 
+    function clear(): void {
+      if (floater.value) {
+        cancelFloater();
+      }
+      else if (activeSelectArea.value) {
+        stopDragSelect();
+      }
+      else {
+        selectedIds.value = [];
+      }
+    }
+
     ////////////////////////////////////////////////////////////////
     // Tools
     ////////////////////////////////////////////////////////////////
+
+    function usePan(): void {
+      activeToolId.value = 'pan';
+    }
+
+    function useSelect(): void {
+      if (activeToolId.value !== 'select') {
+        activeToolId.value = 'select';
+      }
+      else {
+        const part = findHoveredPart();
+        if (part) {
+          toggleSelect(part.id);
+        }
+      }
+    }
+
+    function useGridResize(): void {
+      activeToolId.value = 'gridresize';
+      cancelFloater();
+    }
 
     function useAdd(): void {
       if (!floater.value) {
@@ -313,17 +369,35 @@ export default defineComponent({
               y: 0,
               parts: [{ ...asStatePart(part), flows: {} }],
             });
-            setFocus();
+            nextTick(setFocus);
           })
           .onDismiss(setFocus);
       }
     }
 
-    function useMove(activeParts: FlowPart[]): void {
+    function useMove(src: ToolSource): void {
+      if (activeToolId.value !== 'move') {
+        activeToolId.value = 'move';
+        cancelFloater();
+      }
+
+      // Menu clicks only activate the mode
+      if (src === 'menu') {
+        return;
+      }
+
       if (floater.value) {
         dropFloater(toCoords(gridHoverPos.value));
+        return;
       }
-      else if (activeParts.length) {
+
+      if (isHoveringUnselectedPart()) {
+        cancelSelection();
+        return;
+      }
+
+      const activeParts = findActiveParts(true);
+      if (activeParts.length) {
         // gridHoverPos will not be set if the tool is used by clicking on the tools menu
         const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         const minX = Math.min(...activeParts.map(part => part.x));
@@ -338,11 +412,29 @@ export default defineComponent({
       }
     }
 
-    function useCopy(activeParts: FlowPart[]): void {
+    function useCopy(src: ToolSource): void {
+      if (activeToolId.value !== 'copy') {
+        activeToolId.value = 'copy';
+        cancelFloater();
+      }
+
+      // Menu clicks only activate the mode
+      if (src === 'menu') {
+        return;
+      }
+
       if (floater.value) {
         dropFloater(toCoords(gridHoverPos.value));
+        return;
       }
-      else if (activeParts.length) {
+
+      if (isHoveringUnselectedPart()) {
+        cancelSelection();
+        return;
+      }
+
+      const activeParts = findActiveParts(true);
+      if (activeParts.length) {
         // gridHoverPos will not be set if the tool is used by clicking on the tools menu
         const { x, y } = toCoords(gridHoverPos.value) ?? { x: 0, y: 0 };
         const minX = Math.min(...activeParts.map(part => part.x));
@@ -357,85 +449,114 @@ export default defineComponent({
       }
     }
 
-    function useRotate(activeParts: FlowPart[]): void {
+    function useRotate(): void {
       if (floater.value) {
         if (floater.value.parts.length === 1) {
-          const [part] = floater.value.parts;
+          const part = floater.value.parts[0];
           part.rotate = clampRotation(part.rotate + 90);
         }
       }
-      else if (activeParts.length === 1) {
-        const [part] = activeParts;
-        savePart({ ...part, rotate: clampRotation(part.rotate + 90) });
+      else {
+        activeToolId.value = 'rotate';
+        const part = findHoveredPart();
+        if (part) {
+          savePart({ ...part, rotate: clampRotation(part.rotate + 90) });
+        }
       }
     }
 
-    function useFlip(activeParts: FlowPart[]): void {
+    function useFlip(): void {
       if (floater.value) {
         if (floater.value.parts.length === 1) {
-          const [part] = floater.value.parts;
+          const part = floater.value.parts[0];
           part.flipped = !part.flipped;
         }
       }
-      else if (activeParts.length === 1) {
-        const [part] = activeParts;
-        savePart({ ...part, flipped: !part.flipped });
+      else {
+        activeToolId.value = 'flip';
+        const part = findHoveredPart();
+        if (part) {
+          savePart({ ...part, flipped: !part.flipped });
+        }
       }
     }
 
-    function useEdit(activeParts: FlowPart[]): void {
-      if (!floater.value && activeParts.length === 1) {
-        configuredId.value = activeParts[0].id;
-        settingsDialogOpen.value = true;
+    function useEdit(): void {
+      activeToolId.value = 'edit';
+      if (floater.value) {
+        cancelFloater();
+      }
+      else {
+        const part = findHoveredPart();
+        if (part) {
+          configuredPart.value = part;
+        }
       }
     }
 
-    function useInteract(activeParts: FlowPart[]): void {
-      if (!floater.value && activeParts.length === 1) {
-        const [part] = activeParts;
-        builderStore.spec(part).interactHandler?.(part, { savePart });
+    function useInteract(): void {
+      activeToolId.value = 'interact';
+      if (floater.value) {
+        cancelFloater();
+      }
+      else {
+        const part = findHoveredPart();
+        if (part) {
+          builderStore.spec(part).interactHandler?.(part, { savePart });
+        }
       }
     }
 
-    function useDelete(activeParts: FlowPart[]): void {
-      if (!floater.value && activeParts.length) {
+    function useDelete(): void {
+      if (activeToolId.value !== 'delete') {
+        activeToolId.value = 'delete';
+        cancelFloater();
+      }
+
+      if (isHoveringUnselectedPart()) {
+        cancelSelection();
+        return;
+      }
+
+      const activeParts = findActiveParts(true);
+      if (activeParts.length) {
         const ids = activeParts.map(p => p.id);
         saveParts(parts.value.filter(p => !ids.includes(p.id)));
+        cancelFloater();
         cancelSelection();
       }
     }
 
     function useUndo(): void {
+      if (floater.value) {
+        cancelFloater();
+        return;
+      }
+
       const state = history.value.pop();
       if (state) {
-        cancelSelection();
         undoneHistory.value.push(JSON.stringify(parts.value));
         parts.value = JSON.parse(state);
       }
     }
 
     function useRedo(): void {
+      if (floater.value) {
+        cancelFloater();
+        return;
+      }
+
       const state = undoneHistory.value.pop();
       if (state) {
-        cancelSelection();
         history.value.push(JSON.stringify(parts.value));
         parts.value = JSON.parse(state);
       }
     }
 
-    function deltaMove(activeParts: FlowPart[], delta: XYPosition): void {
-      activeParts.forEach(part => {
-        part.x += delta.x;
-        part.y += delta.y;
-      });
-      const ids = activeParts.map(v => v.id);
-      saveParts([
-        ...parts.value.filter(p => !ids.includes(p.id)),
-        ...activeParts,
-      ]);
-    }
-
-    const builderToolActions: Record<BuilderToolName, (parts: FlowPart[]) => unknown> = {
+    const builderToolActions: Record<BuilderToolName, (src: ToolSource) => void> = {
+      pan: usePan,
+      select: useSelect,
+      gridresize: useGridResize,
       add: useAdd,
       move: useMove,
       copy: useCopy,
@@ -448,10 +569,10 @@ export default defineComponent({
       redo: useRedo,
     };
 
-    function useTool(name: BuilderToolName): void {
+    function useTool(name: BuilderToolName, src: ToolSource): void {
       const action = builderToolActions[name];
       if (action) {
-        action(findActiveParts());
+        action(src);
         setFocus();
       }
     }
@@ -460,7 +581,7 @@ export default defineComponent({
       () => {
         const tools: BuilderToolName[] = [];
         if (floater.value) {
-          tools.push('add', 'delete', 'edit', 'interact');
+          tools.push('add', 'edit', 'interact');
           if (floater.value.parts.length > 1) {
             tools.push('rotate', 'flip');
           }
@@ -481,6 +602,45 @@ export default defineComponent({
     ////////////////////////////////////////////////////////////////
     // Event handlers
     ////////////////////////////////////////////////////////////////
+
+    function deltaMove(delta: XYPosition): void {
+      const activeParts = findActiveParts(true);
+      activeParts.forEach(part => {
+        part.x += delta.x;
+        part.y += delta.y;
+      });
+      const ids = activeParts.map(v => v.id);
+      saveParts([
+        ...parts.value.filter(p => !ids.includes(p.id)),
+        ...activeParts,
+      ]);
+    }
+
+    function keyHandler(evt: KeyboardEvent): void {
+      const key = keyEventString(evt);
+      const keyDelta = moveKeys[key];
+      const tool = builderTools.find(v => v.shortcut === key);
+
+      if (key === 'Escape') {
+        clear();
+      }
+      else if (key === 'Delete') {
+        useTool('delete', 'shortcut');
+      }
+      else if (keyDelta) {
+        deltaMove(keyDelta);
+      }
+      else if (tool) {
+        if (!disabledTools.value.includes(tool.value)) {
+          useTool(tool.value, 'shortcut');
+        }
+      }
+      else {
+        return; // not handled - don't stop propagation
+      }
+      evt.stopPropagation();
+      evt.preventDefault();
+    }
 
     // Return the exact position of the current event
     function d3EventPos(): XYPosition {
@@ -621,13 +781,15 @@ export default defineComponent({
         // Check if the drag event has left the initial square
         // Create a floater when this happens
         else if (start && !isEqual(start, { x, y })) {
-          const partIds = selectedIds.value.length
+          const targetId = this.getAttribute('part-id')!;
+          const partIds = selectedIds.value.includes(targetId)
             ? selectedIds.value
-            : [this.getAttribute('part-id')];
+            : [targetId];
           const parts = flowParts.value
             .filter(part => partIds.includes(part.id))
             .map(part => ({
               ...part,
+              id: activeToolId.value === 'copy' ? nanoid() : part.id,
               x: part.x - start.x,
               y: part.y - start.y,
             }));
@@ -640,27 +802,57 @@ export default defineComponent({
         dropFloater(toCoords(d3EventPos()));
       });
 
-    function keyHandler(evt: KeyboardEvent): void {
-      const key = keyEventString(evt);
-      const keyDelta = moveKeys[key];
-      const tool = builderTools.find(v => v.shortcut === key);
+    function selectGridHandlers(el: SVGElement, tool: BuilderToolName | null): void {
+      const selection = d3.select(el);
+      selection
+        .call(gridHoverHandler);
 
-      if (key === 'Escape') {
-        clear();
+      selection
+        .on('click', function () {
+          if (floater.value) {
+            dropFloater(toCoords(d3EventPos()));
+          }
+        });
+
+      if (tool && ['select', 'copy', 'move', 'delete'].includes(tool)) {
+        selection
+          .call(gridDragHandler);
       }
-      else if (key === 'Delete') {
-        useTool('delete');
-      }
-      else if (keyDelta) {
-        deltaMove(findActiveParts(), keyDelta);
-      }
-      else if (tool) {
-        useTool(tool.value);
+      else if (tool === 'gridresize') {
+        selection
+          .call(gridResizeDragHandler);
       }
       else {
-        return; // not handled - don't stop propagation
+        // pan is handled by useSvgZoom
+        selection
+          .on('.drag', null);
       }
-      evt.stopPropagation();
+    }
+
+    function selectPartHandlers(el: SVGElement, tool: BuilderToolName | null): void {
+      const partSelection = d3.select(el)
+        .selectAll<Element, any>('.flowpart');
+
+      if (tool === 'move' || tool === 'copy') {
+        partSelection
+          .call(partDragHandler);
+      }
+      else {
+        partSelection
+          .on('.drag', null);
+      }
+
+      if (tool && ['select', 'new', 'move', 'copy', 'rotate', 'flip', 'edit', 'interact', 'delete'].includes(tool)) {
+        partSelection
+          .on('click', function () {
+            builderToolActions[tool]('click');
+            d3.event.stopPropagation();
+          });
+      }
+      else {
+        partSelection
+          .on('click', null);
+      }
     }
 
     watch(
@@ -683,66 +875,20 @@ export default defineComponent({
     );
 
     watch(
-      [svgRef, activeModeId],
-      ([el, mode]) => {
-        if (el) {
-          d3.select(el)
-            .call(gridHoverHandler)
-            .on('click', function () {
-              cancelSelection();
-            });
-
-          if (mode === 'select') {
-            d3.select(el)
-              .call(gridDragHandler);
-          }
-          else if (mode === 'gridsize') {
-            d3.select(el)
-              .call(gridResizeDragHandler);
-          }
-          else {
-            d3.select(el)
-              .on('.drag', null);
-          }
-        }
-      },
+      [svgRef, activeToolId],
+      ([el, tool]) => el && selectGridHandlers(el, tool),
       { immediate: true },
     );
 
     watch(
-      [svgContentRef, activeModeId, flowPartsRevision],
-      ([el, mode]) => nextTick(() => {
+      [svgContentRef, activeToolId, flowPartsRevision],
+      ([el, tool]) => nextTick(() => {
         if (el) {
-          const partSelection = d3.select(el)
-            .selectAll<Element, any>('.flowpart');
-
-          if (mode === 'pan') {
-            partSelection
-              .on('.drag', null)
-              .on('click', function () {
-                const id = this.getAttribute('part-id');
-                toggleSelect(id);
-                d3.event.stopPropagation();
-              });
-          }
-          if (mode === 'select') {
-            partSelection
-              .call(partDragHandler)
-              .on('click', function () {
-                const id = this.getAttribute('part-id');
-                toggleSelect(id);
-                d3.event.stopPropagation();
-              });
-          }
-          if (mode === 'interact') {
-            partSelection
-              .on('.drag', null)
-              .on('click', function () {
-                const id = this.getAttribute('part-id');
-                useInteract(flowParts.value.filter(v => v.id === id));
-                d3.event.stopPropagation();
-              });
-          }
+          selectPartHandlers(el, tool);
+        }
+        if (configuredPart.value) {
+          const id = configuredPart.value.id;
+          configuredPart.value = flowParts.value.find(v => v.id === id) ?? null;
         }
       }),
       { immediate: true },
@@ -769,7 +915,6 @@ export default defineComponent({
       selectedIds,
       floater,
       isFloating,
-      activeMode,
 
       startupDone,
       layouts,
@@ -782,14 +927,15 @@ export default defineComponent({
       savePart,
       removePart,
 
-      settingsDialogOpen,
       configuredPart,
       closeMenu,
 
-      activeModeId,
+      activeToolId,
       disabledTools,
       toolsMenuExpanded,
       useTool,
+      partClass,
+      cursor,
 
       keyHandler,
     };
@@ -803,7 +949,7 @@ export default defineComponent({
     @keydown="keyHandler"
   >
     <BuilderPartSettingsDialog
-      v-if="settingsDialogOpen"
+      v-if="configuredPart"
       :part="configuredPart"
       :rev="flowPartsRevision"
       @update:part="savePart"
@@ -901,7 +1047,7 @@ export default defineComponent({
       <svg
         ref="svgRef"
         class="fit"
-        :style="{cursor: activeMode.gridCursor}"
+        :style="{ cursor }"
       >
         <g ref="svgContentRef">
           <EditorBackground :width="layout.width" :height="layout.height" />
@@ -915,13 +1061,13 @@ export default defineComponent({
             :class="[
               'flowpart',
               part.type,
-              activeMode.partClass(part),
+              partClass(part),
             ]"
           >
             <PartWrapper
               :part="part"
               :selected="selectedIds.includes(part.id)"
-              :show-hover="activeMode.showHover"
+              :show-hover="activeToolId !== null"
               @update:part="savePart"
               @dirty="calculateFlowParts"
             />
@@ -934,7 +1080,7 @@ export default defineComponent({
               :transform="`translate(${coord2grid(part.x)}, ${coord2grid(part.y)})`"
               :class="[
                 part.type,
-                activeMode.partClass(part),
+                partClass(part),
               ]"
             >
               <PartWrapper :part="part" selected />
@@ -953,10 +1099,10 @@ export default defineComponent({
         </g>
       </svg>
       <BuilderToolsMenu
-        v-model:mode="activeModeId"
         v-model:expanded="toolsMenuExpanded"
+        :active-tool="activeToolId"
         :disabled-tools="disabledTools"
-        @use="useTool"
+        @use="v => useTool(v, 'menu')"
         @touchstart.stop
         @mousedown.stop
       />
