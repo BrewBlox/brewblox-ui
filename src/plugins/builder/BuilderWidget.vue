@@ -28,7 +28,6 @@ export default defineComponent({
     } = useWidget.setup<Widget<BuilderConfig>>();
 
     const pending = ref<FlowPart | null>(null);
-    const blocked = ref<boolean>(dense.value);
 
     const storeLayouts = computed<BuilderLayout[]>(
       () => builderStore.layouts,
@@ -143,7 +142,6 @@ export default defineComponent({
       startSelectLayout,
       inDialog,
       dense,
-      blocked,
       svgRef,
       svgContentRef,
       startEditor,
@@ -273,25 +271,7 @@ export default defineComponent({
           </template>
         </g>
       </svg>
-      <template v-if="!inDialog">
-        <div
-          v-if="dense && blocked"
-          class="absolute-top-left fit bg-dark"
-          style="opacity: 0.4"
-          @touchstart.stop
-          @touchend.stop
-          @touchmove.stop
-        />
-        <q-btn
-          v-if="dense"
-          class="absolute-top-right q-ma-sm"
-          round
-          unelevated
-          :color="blocked ? 'secondary' : 'negative'"
-          :icon="blocked ? 'mdi-gesture-swipe-vertical' : 'mdi-gesture-swipe-vertical'"
-          @click="blocked = !blocked"
-        />
-      </template>
+      <ScrollBlocker v-if="!inDialog" />
     </div>
   </Card>
 </template>
