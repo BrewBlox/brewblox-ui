@@ -62,7 +62,7 @@ export default defineComponent({
   >
     <Card no-scroll>
       <template #toolbar>
-        <DialogToolbar :title="title" subtitle="Relations diagram" />
+        <Toolbar :title="title" subtitle="Relations diagram" />
       </template>
       <div class="fit bg-dark">
         <RelationsDiagram v-bind="$props" />

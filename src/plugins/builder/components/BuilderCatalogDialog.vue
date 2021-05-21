@@ -104,11 +104,12 @@ export default defineComponent({
     ref="dialogRef"
     :maximized="dense"
     v-bind="dialogProps"
+    transition-hide="fade"
     @hide="onDialogHide"
   >
     <Card no-scroll>
       <template #toolbar>
-        <DialogToolbar title="Part Catalog" />
+        <Toolbar title="Part Catalog" />
       </template>
 
       <div class="fit column q-pb-md">

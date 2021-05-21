@@ -106,13 +106,14 @@ export default defineComponent({
     persistent
     :model-value="true"
     :maximized="dense"
+    transition-hide="fade"
     @update:model-value="onDialogHide"
     @keyup.esc="onDialogHide"
     @hide="onDialogHide"
   >
     <Card>
       <template #toolbar>
-        <DialogToolbar :title="partTitle" @close="onDialogHide" />
+        <Toolbar :title="partTitle" />
       </template>
 
       <div class="widget-body column q-gutter-y-lg">

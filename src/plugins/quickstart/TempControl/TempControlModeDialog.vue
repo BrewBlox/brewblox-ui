@@ -141,7 +141,7 @@ export default defineComponent({
   >
     <Card>
       <template #toolbar>
-        <DialogToolbar :title="title" subtitle="Temperature control mode" />
+        <Toolbar :title="title" subtitle="Temperature control mode" />
       </template>
 
       <q-card-section

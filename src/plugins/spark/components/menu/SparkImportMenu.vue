@@ -122,7 +122,7 @@ export default defineComponent({
   >
     <Card>
       <template #toolbar>
-        <DialogToolbar :title="serviceId" subtitle="Import/Export blocks" />
+        <Toolbar :title="serviceId" subtitle="Import/Export blocks" />
       </template>
 
       <q-card-section>

@@ -20,6 +20,10 @@ export default defineComponent({
       type: String,
       default: 'Hide',
     },
+    toggleIcon: {
+      type: String,
+      default: 'mdi-chart-line',
+    },
   },
   setup(props) {
     const collapsed = ref(!props.showInitial);
@@ -52,6 +56,8 @@ export default defineComponent({
     <!-- Pane toggle button -->
     <q-btn
       dense
+      stack
+      :icon="toggleIcon"
       :class="['col-auto toggle-tab self-center',{collapsed}]"
       :label="collapsed ? expandLabel : collapseLabel"
       @click="collapsed = !collapsed"
@@ -91,7 +97,7 @@ export default defineComponent({
 
 .toggle-tab
   background-color: $dialog-toolbar-color
-  padding: 30px 2px
+  padding: 30px 5px
   border-radius: 5px 0 0 5px
   margin-left: 5px
 
