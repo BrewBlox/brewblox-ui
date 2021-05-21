@@ -1,10 +1,11 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
+import { startAddLayout } from '@/plugins/builder/utils';
 import { objectSorter } from '@/utils/functional';
 
 export default defineComponent({
@@ -20,6 +21,7 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const dragging = ref(false);
     const route = useRoute();
+    const router = useRouter();
 
     const layouts = computed<BuilderLayout[]>({
       // avoid modifying the store object
@@ -49,12 +51,20 @@ export default defineComponent({
       },
     );
 
+    async function createLayout(): Promise<void> {
+      const id = await startAddLayout();
+      if (id) {
+        router.push(`/builder/${id}`);
+      }
+    }
+
     return {
       dense,
       dragging,
       layouts,
       navPrefix,
       editorButtonPath,
+      createLayout,
     };
   },
 });
@@ -76,6 +86,17 @@ export default defineComponent({
           round
         >
           <q-tooltip>Toggle editor mode</q-tooltip>
+        </q-btn>
+      </q-item-section>
+      <q-item-section class="col-auto">
+        <q-btn
+          icon="add"
+          round
+          flat
+          size="sm"
+          @click="createLayout"
+        >
+          <q-tooltip>Add layout</q-tooltip>
         </q-btn>
       </q-item-section>
       <q-item-section class="col-auto">
