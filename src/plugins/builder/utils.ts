@@ -311,6 +311,7 @@ export async function startAddLayout(source: BuilderLayout | null = null): Promi
     width: source?.width ?? defaultLayoutWidth,
     height: source?.height ?? defaultLayoutHeight,
     parts: deepCopy(source?.parts) ?? [],
+    order: builderStore.layouts.length + 1,
   });
   return id;
 }
