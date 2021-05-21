@@ -116,7 +116,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-page class="page-height">
+  <q-page
+    class="page-height"
+    @dblclick="showWizard(true)"
+  >
     <PageError v-if="!dashboard">
       <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
     </PageError>
@@ -179,6 +182,7 @@ export default defineComponent({
               :is="val.component"
               :error="val.error"
               class="col full-width"
+              @dblclick.stop
             />
           </WidgetProvider>
         </div>
@@ -188,7 +192,6 @@ export default defineComponent({
           :items="dashboardItems"
           :context="context"
           :editable="widgetEditable"
-          @dblclick="showWizard(true)"
         />
       </q-scroll-area>
     </template>

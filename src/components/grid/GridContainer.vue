@@ -28,10 +28,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'dblclick',
-  ],
-  setup(props, { emit }) {
+  setup(props) {
     const containerRef = ref<HTMLDivElement>();
 
     const minWidth = computed<number>(
@@ -78,16 +75,9 @@ export default defineComponent({
       patchWidgets([{ id, cols, rows }]);
     }
 
-    function onDoubleClick(evt: MouseEvent): void {
-      if (evt.target === evt.currentTarget) {
-        emit('dblclick');
-      }
-    }
-
     return {
       containerRef,
       gridStyle,
-      onDoubleClick,
       updateItemSize,
       updateItemPosition,
     };
@@ -100,7 +90,6 @@ export default defineComponent({
     ref="containerRef"
     class="grid-container grid-main-container"
     :style="gridStyle"
-    @dblclick="onDoubleClick"
   >
     <GridItem
       v-for="item in items"
@@ -115,6 +104,7 @@ export default defineComponent({
           :is="item.component"
           :error="item.error"
           class="fit"
+          @dblclick.stop
         />
       </WidgetProvider>
     </GridItem>

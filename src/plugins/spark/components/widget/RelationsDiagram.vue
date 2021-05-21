@@ -260,7 +260,7 @@ export default defineComponent({
       @click="resetZoom"
     >
       <q-tooltip>
-        Fit to screen
+        Reset zoom
       </q-tooltip>
     </q-btn>
   </div>
