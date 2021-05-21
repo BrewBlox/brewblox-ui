@@ -624,9 +624,6 @@ export default defineComponent({
       if (key === 'Escape') {
         clear();
       }
-      else if (key === 'Delete') {
-        useTool('delete', 'shortcut');
-      }
       else if (keyDelta) {
         deltaMove(keyDelta);
       }

@@ -46,7 +46,7 @@ export const builderTools: BuilderTool[] = [
     value: 'pan',
     label: 'Pan',
     icon: 'mdi-drag-variant',
-    shortcut: 'q',
+    shortcut: 'd',
     cursor: 'all-scroll',
   },
   {
@@ -117,7 +117,7 @@ export const builderTools: BuilderTool[] = [
     label: 'Delete',
     value: 'delete',
     icon: 'delete',
-    shortcut: 'd',
+    shortcut: 'Delete',
     cursor: 'auto',
   },
   {
