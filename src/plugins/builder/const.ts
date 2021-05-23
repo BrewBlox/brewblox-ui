@@ -46,7 +46,7 @@ export const builderTools: BuilderTool[] = [
     value: 'pan',
     label: 'Pan',
     icon: 'mdi-drag-variant',
-    shortcut: 'd',
+    shortcut: 'p',
     cursor: 'all-scroll',
   },
   {
