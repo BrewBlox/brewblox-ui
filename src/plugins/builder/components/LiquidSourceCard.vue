@@ -40,7 +40,7 @@ export default defineComponent({
     const color = computed<string | null>({
       get: () => props.part.settings.liquids?.[0] ?? null,
       set: v => {
-        const liquids = v ? [colorString[v]] : [];
+        const liquids = v ? [colorString(v)] : [];
         emit('update:part', {
           ...props.part,
           settings: {

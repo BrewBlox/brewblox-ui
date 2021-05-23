@@ -101,7 +101,7 @@ export const builderTools: BuilderTool[] = [
   },
   {
     value: 'edit',
-    label: 'Edit Settings',
+    label: 'Edit settings',
     icon: 'settings',
     shortcut: 'e',
     cursor: 'auto',
