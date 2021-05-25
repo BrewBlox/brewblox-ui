@@ -1,12 +1,8 @@
 <script lang="ts">
-import { date as qdate } from 'quasar';
-import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { createDialog } from '@/utils/dialog';
 import { ruleValidator } from '@/utils/functional';
-
-const dateExp = /^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})$/;
 
 export default defineComponent({
   name: 'DatetimeDialog',
@@ -40,55 +36,16 @@ export default defineComponent({
       onDialogCancel,
       onDialogOK,
     } = useDialog.setup();
-    const dateString = ref<string>('');
-    const timeString = ref<string>('');
-
-    function setStringVal(dateVal: Date): void {
-      dateString.value = qdate.formatDate(dateVal, 'YYYY/MM/DD');
-      timeString.value = qdate.formatDate(dateVal, 'HH:mm:ss');
-    }
-
-    onBeforeMount(() => setStringVal(props.modelValue));
-
-    const parsed = computed<Date | null>(
-      () => {
-        const combined = `${dateString.value} ${timeString.value}`;
-        return dateExp.test(combined) && qdate.isValid(combined)
-          ? qdate.extractDate(combined, 'YYYY/MM/DD HH:mm:ss')
-          : null;
-      },
-    );
-
-    const parsedRules = computed<InputRule[]>(
-      () => [
-        () => parsed.value !== null || 'Invalid date',
-        ...props.rules.map(rule => () => rule(parsed.value)),
-      ],
-    );
+    const local = ref<Date | null>(props.modelValue);
 
     const valid = computed<boolean>(
-      () => ruleValidator(parsedRules.value)(parsed.value),
+      () => ruleValidator(props.rules)(local.value),
     );
 
     function save(): void {
-      if (valid.value && parsed.value !== null) {
-        onDialogOK(parsed.value);
+      if (valid.value) {
+        onDialogOK(local.value);
       }
-    }
-
-    function openPicker(): void {
-      if (!valid.value) { return; }
-      createDialog({
-        component: 'DatepickerDialog',
-        componentProps: {
-          modelValue: parsed.value,
-          title: props.title,
-          message: props.message,
-          html: props.html,
-          label: props.label,
-        },
-      })
-        .onOk(setStringVal);
     }
 
     return {
@@ -96,13 +53,8 @@ export default defineComponent({
       dialogProps,
       onDialogHide,
       onDialogCancel,
-      dateString,
-      timeString,
-      setStringVal,
-      parsed,
-      parsedRules,
+      local,
       valid,
-      openPicker,
       save,
     };
   },
@@ -117,50 +69,16 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
-      <q-item>
-        <q-item-section>
-          <q-input
-            v-model="dateString"
-            :rules="parsedRules"
-            label="Date"
-            hint="YYYY/MM/DD"
-            mask="####/##/##"
-            autofocus
-          />
-        </q-item-section>
-        <q-item-section>
-          <q-input
-            v-model="timeString"
-            :rules="parsedRules"
-            label="Time"
-            hint="HH:mm:ss"
-            mask="##:##:##"
-          />
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn
-            :disable="!valid"
-            icon="mdi-calendar-edit"
-            flat
-            dense
-            @click="openPicker"
-          >
-            <q-tooltip>Pick a date and time</q-tooltip>
-          </q-btn>
-        </q-item-section>
-        <q-item-section class="col-auto">
-          <q-btn
-            :icon="resetIcon"
-            flat
-            dense
-            class="text-white"
-            @click="setStringVal(new Date())"
-          >
-            <q-tooltip>Reset to current date and time</q-tooltip>
-          </q-btn>
-        </q-item-section>
-      </q-item>
+      <DatetimeInput v-model="local" output="date" />
       <template #actions>
+        <q-btn
+          :icon="resetIcon"
+          flat
+          @click="local = new Date()"
+        >
+          <q-tooltip>Reset to current date and time</q-tooltip>
+        </q-btn>
+        <q-space />
         <q-btn
           flat
           color="primary"

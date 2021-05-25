@@ -170,18 +170,26 @@ export default defineComponent({
                 <q-icon name="mdi-chart-line" />
                 {{ note.title }}
               </q-item-label>
-              <div class="col-grow row wrap">
+              <div
+                :class="[
+                  'col-grow row wrap',
+                  {'text-negative': note.start && note.end && note.start > note.end}
+                ]"
+              >
                 <span :class="{'text-grey': note.start === null}">
-                  {{ shortDateString(note.start, 'Not started') }}
+                  {{ shortDateString(note.start, 'No start date') }}
                 </span>
-                <span v-if="note.start" :class="{'text-grey': note.end === null, 'q-ml-xs': true}">
+                <span
+                  v-if="note.start || note.end"
+                  :class="['q-ml-xs', {'text-grey': note.end === null}]"
+                >
                   <q-icon name="mdi-arrow-right" />
                   {{ shortDateString(note.end, 'In progress') }}
                 </span>
               </div>
             </div>
             <q-btn
-              v-if="note.start === null"
+              v-if="note.start === null && note.end === null"
               flat
               dense
               icon="mdi-play"
@@ -190,7 +198,7 @@ export default defineComponent({
               <q-tooltip>Start</q-tooltip>
             </q-btn>
             <q-btn
-              v-else-if="note.end === null"
+              v-if="note.start !== null && note.end === null"
               flat
               dense
               icon="mdi-stop"
