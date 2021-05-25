@@ -11,3 +11,17 @@ export const fieldLabels: Record<keyof TiltFieldIndex, string> = {
   timestamp: 'Published',
   color: 'Color',
 };
+
+export const colorOpts: SelectOption<string>[] =
+  [
+    'Red',
+    'Green',
+    'Black',
+    'Purple',
+    'Orange',
+    'Blue',
+    'Yellow',
+    'Pink',
+  ]
+    .sort()
+    .map(v => ({ label: v, value: v }));

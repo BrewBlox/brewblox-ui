@@ -1,58 +1,70 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-@Component
-export default class ActionItem extends Vue {
-  @Prop({ type: String, required: false })
-  public readonly label!: string;
+export default defineComponent({
+  name: 'ActionItem',
+  props: {
+    label: {
+      type: String,
+      default: '',
+    },
+    icon: {
+      type: String,
+      default: '',
+    },
+    tooltip: {
+      type: String,
+      default: '',
+    },
+    active: {
+      type: Boolean,
+      default: false,
+    },
+    noClose: {
+      type: Boolean,
+      default: false,
+    },
+    itemProps: {
+      type: Object,
+      default: () => ({}),
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'click',
+  ],
+  setup(props, { attrs, emit }) {
+    const combinedProps = computed<AnyDict>(
+      () => ({
+        clickable: !props.disabled,
+        active: props.active && !props.disabled,
+        ...props.itemProps,
+        ...attrs,
+      }),
+    );
 
-  @Prop({ type: String, required: false })
-  public readonly icon!: string;
-
-  @Prop({ type: String, required: false })
-  public readonly tooltip!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly active!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly noClose!: boolean;
-
-  @Prop({ type: Object, default: () => ({}) })
-  public readonly itemProps!: any;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly disabled!: boolean;
-
-  get combinedProps(): Mapped<any> {
-    return {
-      clickable: !this.disabled,
-      active: this.active && !this.disabled,
-      ...this.itemProps,
-      ...this.$attrs,
-    };
-  }
-
-  get itemClass(): Mapped<boolean> {
-    return {
-      darkened: this.disabled,
-    };
-  }
-
-  onClick(): void {
-    if (!this.disabled) {
-      this.$emit('click');
+    function onClick(evt: MouseEvent | TouchEvent): void {
+      if (!props.disabled) {
+        emit('click', evt);
+      }
     }
-  }
-}
+
+    return {
+      combinedProps,
+      onClick,
+    };
+  },
+});
 </script>
 
 <template>
   <q-item
     v-close-popup="noClose || disabled ? 0 : 1"
     v-bind="combinedProps"
-    :class="itemClass"
+    :class="{darkened: disabled}"
     @click="onClick"
   >
     <q-tooltip v-if="tooltip && !disabled">
@@ -61,7 +73,9 @@ export default class ActionItem extends Vue {
     <q-item-section v-if="icon" avatar>
       <q-icon :name="icon" />
     </q-item-section>
-    <q-item-section>{{ label }}</q-item-section>
+    <q-item-section v-if="label">
+      {{ label }}
+    </q-item-section>
     <slot />
   </q-item>
 </template>

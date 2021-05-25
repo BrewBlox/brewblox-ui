@@ -1,102 +1,106 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
 import { tryCreateWidget } from '@/plugins/wizardry';
-import WidgetWizardBase from '@/plugins/wizardry/WidgetWizardBase';
-import { Widget } from '@/store/dashboards';
-import { Crud, featureStore, WidgetContext } from '@/store/features';
+import { featureStore } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
+import { createDialog } from '@/utils/dialog';
 
+import { useWidgetWizard } from '../composables';
 
-@Component
-export default class GenericWidgetWizard extends WidgetWizardBase {
-  localConfig: any | null = null;
-  dashboardId: string | null = null;
+export default defineComponent({
+  name: 'GenericWidgetWizard',
+  props: {
+    ...useWidgetWizard.props,
+    activeDashboardId: {
+      type: String,
+      default: null,
+    },
+  },
+  emits: [
+    ...useWidgetWizard.emits,
+  ],
+  setup(props) {
+    const {
+      onBack,
+      onDone,
+      defaultWidgetSize,
+      widgetId,
+      featureTitle,
+    } = useWidgetWizard.setup(props.featureId);
 
-  @Prop({ type: String, required: false })
-  readonly activeDashboardId!: string;
+    const defaultConfig = featureStore.widgetById(props.featureId)?.generateConfig?.() ?? {};
+    const activeWidget = ref<Widget | null>(null);
+    const dashboardId = ref<string | null>(null);
+    const widgetTitle = ref<string>(featureTitle);
 
-  created(): void {
-    this.widgetTitle = this.featureTitle;
-  }
+    const canCreate = computed<boolean>(
+      () => Boolean(dashboardId.value),
+    );
 
-  get widget(): Widget {
-    if (this.localConfig === null) {
-      this.localConfig = this.emptyConfig();
+    async function ensureVolatile(): Promise<void> {
+      await widgetStore.setVolatileWidget({
+        id: widgetId,
+        title: widgetTitle.value,
+        feature: props.featureId,
+        order: 0,
+        dashboard: dashboardId.value ?? '',
+        config: activeWidget.value?.config ?? defaultConfig,
+        ...defaultWidgetSize,
+      });
+      activeWidget.value = widgetStore.widgetById(widgetId);
     }
-    return {
-      id: this.widgetId,
-      title: this.widgetTitle,
-      feature: this.featureId,
-      order: 0,
-      dashboard: this.dashboardId ?? '',
-      config: this.localConfig,
-      ...this.defaultWidgetSize,
-    };
-  }
 
-  set widget(val: Widget) {
-    this.localConfig = val.config;
-  }
-
-  get crud(): Crud {
-    return {
-      isStoreWidget: false,
-      widget: this.widget,
-      saveWidget: v => this.widget = v,
-      closeDialog: () => { },
-    };
-  }
-
-  get context(): WidgetContext {
-    return {
-      container: 'Dialog',
-      mode: 'Full',
-      size: 'Fixed',
-    };
-  }
-
-  get widgetComponent(): string {
-    return featureStore.widgetComponent(this.crud).component;
-  }
-
-  get canCreate(): boolean {
-    return !!this.dashboardId;
-  }
-
-  emptyConfig(): any {
-    return featureStore
-      .widgetById(this.featureId)
-      ?.generateConfig?.()
-      ?? {};
-  }
-
-  showKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.widgetTitle,
-    })
-      .onOk(v => this.widgetTitle = v);
-  }
-
-  showWidget(): void {
-    createDialog({
-      component: 'WidgetDialog',
-      getCrud: () => this.crud,
+    onBeforeUnmount(() => {
+      if (activeWidget.value) {
+        widgetStore.removeVolatileWidget(activeWidget.value);
+      }
     });
-  }
 
-  async createWidget(): Promise<void> {
-    if (this.canCreate) {
-      const widget = await tryCreateWidget(this.widget);
-      this.done({ widget });
+    function showKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: widgetTitle.value,
+        },
+      })
+        .onOk(v => widgetTitle.value = v);
     }
-  }
-}
+
+    async function showWidget(): Promise<void> {
+      await ensureVolatile();
+      createDialog({
+        component: 'WidgetDialog',
+        componentProps: {
+          widgetId,
+        },
+      });
+    }
+
+    async function createWidget(): Promise<void> {
+      await ensureVolatile();
+      if (canCreate.value && activeWidget.value) {
+        const persistentWidget: Widget = { ...activeWidget.value, volatile: undefined };
+        const widget = await tryCreateWidget(persistentWidget);
+        onDone({ widget });
+      }
+    }
+
+    return {
+      onBack,
+      dashboardId,
+      widgetTitle,
+      showKeyboard,
+      showWidget,
+      canCreate,
+      createWidget,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <div class="widget-body column">
       <DashboardSelect
         v-model="dashboardId"
@@ -114,7 +118,7 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
     </div>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn unelevated label="Back" @click="onBack" />
       <q-space />
       <q-btn
         unelevated
@@ -129,5 +133,5 @@ export default class GenericWidgetWizard extends WidgetWizardBase {
         @click="createWidget"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

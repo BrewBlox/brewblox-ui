@@ -1,24 +1,31 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
-import PartCard from './PartCard';
+import { FlowPart } from '../types';
 
-
-@Component
-export default class BorderCard extends PartCard {
-
-  @Prop({ type: String, default: 'bordered' })
-  public readonly settingsKey!: string;
-
-  @Prop({ type: String, default: 'Show border' })
-  public readonly label!: string;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly defaultValue!: boolean;
-
-}
+export default defineComponent({
+  name: 'BorderCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      default: 'bordered',
+    },
+    label: {
+      type: String,
+      default: 'Show border',
+    },
+    defaultValue: {
+      type: Boolean,
+      default: true,
+    },
+  },
+});
 </script>
 
 <template>
-  <ToggleCard v-bind="{...$attrs, ...$props}" v-on="$listeners" />
+  <ToggleCard v-bind="{...$attrs, ...$props}" />
 </template>

@@ -1,126 +1,165 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { bloxQty, deltaTempQty, JSQuantity, prettyUnit, tempQty } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
 import { systemStore } from '@/store/system';
+import { bloxQty, deltaTempQty, JSQuantity, prettyQty, prettyUnit, tempQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { createOutputActions } from '../helpers';
+import { QuickstartAction } from '../types';
+import { createOutputActions } from '../utils';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { HermsConfig, HermsOpts } from './types';
 
+const volumeRules: InputRule[] = [
+  v => Number(v) !== 0 || 'Volume can\'t be 0',
+];
 
-@Component
-export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
-  hltFullPowerDelta = deltaTempQty(2);
-  bkFullPowerDelta = deltaTempQty(2);
-  hltVolume = 25;
-  mashVolume = 25;
-  driverMax = deltaTempQty(10);
-  mashTarget = tempQty(67);
-  mashActual = tempQty(65);
+export default defineComponent({
+  name: 'HermsSettingsTask',
+  props: {
+    config: {
+      type: Object as PropType<HermsConfig>,
+      required: true,
+    },
+    actions: {
+      type: Array as PropType<QuickstartAction[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'update:actions',
+    'back',
+    'next',
+    'close',
+  ],
+  setup(props, { emit }) {
+    const hltFullPowerDelta = ref<JSQuantity>(deltaTempQty(2));
+    const bkFullPowerDelta = ref<JSQuantity>(deltaTempQty(2));
+    const hltVolume = ref<number>(25);
+    const mashVolume = ref<number>(25);
+    const driverMax = ref<JSQuantity>(deltaTempQty(10));
+    const mashTarget = ref<JSQuantity>(tempQty(67));
+    const mashActual = ref<JSQuantity>(tempQty(65));
 
-  volumeRules: InputRule[] = [
-    v => Number(v) !== 0 || 'Volume can\'t be 0',
-  ]
+    const userTemp = computed<string>(
+      () => systemStore.units.temperature,
+    );
 
-  get userTemp(): string {
-    return systemStore.units.temperature;
-  }
+    const hltKp = computed<JSQuantity>(
+      () => bloxQty(100 / (hltFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+    );
 
-  get hltKp(): JSQuantity {
-    return bloxQty(100 / (this.hltFullPowerDelta.value || 2), `1/${this.userTemp}`);
-  }
+    const bkKp = computed<JSQuantity>(
+      () => bloxQty(100 / (bkFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+    );
 
-  get bkKp(): JSQuantity {
-    return bloxQty(100 / (this.bkFullPowerDelta.value || 2), `1/${this.userTemp}`);
-  }
+    const mtKp = computed<JSQuantity>(
+      () => bloxQty(mashVolume.value / (hltVolume.value || 1), `1/${userTemp.value}`),
+    );
 
-  get mtKp(): JSQuantity {
-    return bloxQty(this.mashVolume / (this.hltVolume || 1), `1/${this.userTemp}`);
-  }
+    const hltSetting = computed<JSQuantity>(
+      () => {
+        if (mashTarget.value.value && mtKp.value.value && mashActual.value.value && driverMax.value.value) {
+          const upperLimit = mashTarget.value.value + driverMax.value.value;
+          const setting = mashTarget.value.value + (mashTarget.value.value - mashActual.value.value) * mtKp.value.value;
 
-  get hltSetting(): JSQuantity {
-    if (this.mashTarget.value && this.mtKp.value && this.mashActual.value && this.driverMax.value) {
-      const upperLimit = this.mashTarget.value + this.driverMax.value;
-      const setting = this.mashTarget.value + (this.mashTarget.value - this.mashActual.value) * this.mtKp.value;
+          return bloxQty(Math.min(upperLimit, setting), userTemp.value);
+        }
+        return bloxQty(null, userTemp.value);
+      },
+    );
 
-      return bloxQty(Math.min(upperLimit, setting), this.userTemp);
+    function done(): void {
+      const opts: HermsOpts = {
+        hltKp: hltKp.value,
+        bkKp: bkKp.value,
+        mtKp: mtKp.value,
+        driverMax: driverMax.value,
+      };
+
+      const createdBlocks = defineCreatedBlocks(props.config, opts);
+      const changedBlocks = defineChangedBlocks(props.config);
+      const layouts = defineLayouts(props.config);
+      const widgets = defineWidgets(props.config, layouts);
+      const displayedBlocks = defineDisplayedBlocks(props.config);
+
+      const updates: Partial<HermsConfig> = {
+        layouts,
+        widgets,
+        changedBlocks,
+        createdBlocks,
+        displayedBlocks,
+      };
+
+      emit('update:config', { ...props.config, ...updates });
+      emit('update:actions', createOutputActions());
+      emit('next');
     }
-    return bloxQty(null, this.userTemp);
-  }
 
-  editHLTDelta(): void {
-    createDialog({
-      component: 'QuantityDialog',
-      title: 'Full power delta',
-      value: this.hltFullPowerDelta,
-    })
-      .onOk(v => this.hltFullPowerDelta = v);
-  }
+    function showHltVolumeKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          type: 'number',
+          modelValue: hltVolume.value,
+          rules: volumeRules,
+        },
+      })
+        .onOk(v => hltVolume.value = v);
+    }
 
-  done(): void {
-    const opts: HermsOpts = {
-      hltKp: this.hltKp,
-      bkKp: this.bkKp,
-      mtKp: this.mtKp,
-      driverMax: this.driverMax,
+    function showMashVolumeKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: mashVolume.value,
+          type: 'number',
+          rules: volumeRules,
+        },
+      })
+        .onOk(v => mashVolume.value = v);
+    }
+
+    function showDriverMaxKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: driverMax.value.value,
+          type: 'number',
+          suffix: prettyUnit(driverMax.value),
+        },
+      })
+        .onOk(v => driverMax.value = v);
+    }
+
+    return {
+      prettyQty,
+      prettyUnit,
+      volumeRules,
+      hltFullPowerDelta,
+      bkFullPowerDelta,
+      hltVolume,
+      mashVolume,
+      driverMax,
+      mashTarget,
+      mashActual,
+      hltKp,
+      bkKp,
+      mtKp,
+      hltSetting,
+      done,
+      showHltVolumeKeyboard,
+      showMashVolumeKeyboard,
+      showDriverMaxKeyboard,
     };
-
-    const createdBlocks = defineCreatedBlocks(this.config, opts);
-    const changedBlocks = defineChangedBlocks(this.config);
-    const layouts = defineLayouts(this.config);
-    const widgets = defineWidgets(this.config, layouts);
-    const displayedBlocks = defineDisplayedBlocks(this.config);
-
-    this.pushActions(createOutputActions());
-    this.updateConfig({
-      ...this.config,
-      layouts,
-      widgets,
-      changedBlocks,
-      createdBlocks,
-      displayedBlocks,
-    });
-    this.next();
-  }
-
-  showHltVolumeKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      type: 'number',
-      value: this.hltVolume,
-      rules: this.volumeRules,
-    })
-      .onOk(v => this.hltVolume = v);
-  }
-
-  showMashVolumeKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      type: 'number',
-      value: this.mashVolume,
-      rules: this.volumeRules,
-    })
-      .onOk(v => this.mashVolume = v);
-  }
-
-  showDriverMaxKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      type: 'number',
-      value: this.driverMax.value,
-      suffix: prettyUnit(this.driverMax),
-    })
-      .onOk(v => this.driverMax = v);
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section class="text-weight-light">
       <q-item>
         <q-item-section>
@@ -144,7 +183,7 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
             run at full power (100%).
           </p>
           <p class="text-italic">
-            Proportional gain Kp of the HLT PID will be set to {{ hltKp }}.
+            Proportional gain Kp of the HLT PID will be set to {{ prettyQty(hltKp) }}.
           </p>
         </q-item-section>
       </q-item>
@@ -159,7 +198,7 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
             run at full power (100%).
           </p>
           <p class="text-italic">
-            Proportional gain Kp of the BK PID will be set to {{ bkKp }}.
+            Proportional gain Kp of the BK PID will be set to {{ prettyQty(bkKp) }}.
           </p>
         </q-item-section>
       </q-item>
@@ -221,10 +260,10 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
             label="Limit difference to"
           >
             <template #append>
+              <span style="font-size: 70%">
+                {{ prettyUnit(driverMax) }}
+              </span>
               <KeyboardButton @click="showDriverMaxKeyboard" />
-              <small class="self-end q-pb-sm">
-                {{ driverMax | prettyUnit }}
-              </small>
             </template>
           </q-input>
         </q-item-section>
@@ -233,22 +272,22 @@ export default class HermsSettingsTask extends QuickStartTaskBase<HermsConfig> {
       <q-item>
         <q-item-section>
           <p class="text-italic">
-            Kp will be set to {{ mtKp }}.
+            Kp will be set to {{ prettyQty(mtKp) }}.
             If your mash temperature is
             <InlineQuantityField v-model="mashActual" style="font-style: normal" />
             and should be
             <InlineQuantityField v-model="mashTarget" style="font-style: normal" />
             the HLT will be set to
-            {{ hltSetting }}.
+            {{ prettyQty(hltSetting) }}.
           </p>
         </q-item-section>
       </q-item>
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
       <q-btn unelevated label="Done" color="primary" @click="done" />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

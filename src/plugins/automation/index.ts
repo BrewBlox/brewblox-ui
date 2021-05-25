@@ -1,43 +1,45 @@
-import { VueConstructor } from 'vue';
+import { Plugin } from 'vue';
 
-import { autoRegister, ref } from '@/helpers/component-ref';
-import { STATE_TOPIC } from '@/helpers/const';
+import { eventbus } from '@/eventbus';
 import { deserialize } from '@/plugins/spark/parse-object';
+import { startup } from '@/startup';
 import { featureStore, WatcherFeature, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+import { STATE_TOPIC } from '@/utils/const';
 
+import AutomationWatcher from './AutomationWatcher.vue';
 import AutomationWidget from './AutomationWidget.vue';
 import { automationStore } from './store';
 import { AutomationConfig, AutomationEvent } from './types';
 
 const automationTopic = STATE_TOPIC + '/automation';
 
-const widget: WidgetFeature = {
-  id: 'Automation',
-  title: 'Automation',
-  component: ref(AutomationWidget),
-  wizard: true,
-  widgetSize: {
-    cols: 4,
-    rows: 5,
-  },
-  generateConfig: (): AutomationConfig => ({}),
-};
+const plugin: Plugin = {
+  install(app) {
 
-const watcher: WatcherFeature = {
-  id: 'AutomationWatcher',
-  component: 'AutomationWatcher',
-  props: {},
-};
+    const widget: WidgetFeature<AutomationConfig> = {
+      id: 'Automation',
+      title: 'Automation (Deprecated)',
+      component: cref(app, AutomationWidget),
+      wizard: true,
+      widgetSize: {
+        cols: 4,
+        rows: 5,
+      },
+      generateConfig: () => ({}),
+    };
 
-export default {
-  install(Vue: VueConstructor) {
-    autoRegister(require.context('./components', true));
+    const watcher: WatcherFeature = {
+      id: 'AutomationWatcher',
+      component: cref(app, AutomationWatcher),
+      props: {},
+    };
 
-    featureStore.registerWidget(widget);
-    featureStore.registerWatcher(watcher);
+    featureStore.addWidgetFeature(widget);
+    featureStore.addWatcherFeature(watcher);
 
-    Vue.$eventbus.subscribe(automationTopic);
-    Vue.$eventbus.addListener(
+    eventbus.subscribe(automationTopic);
+    eventbus.addListener(
       automationTopic,
       (_, evt: AutomationEvent) => {
         if (evt.type === 'automation.active') {
@@ -45,6 +47,8 @@ export default {
         }
       });
 
-    Vue.$startup.onStart(() => automationStore.start());
+    startup.onStart(() => automationStore.start());
   },
 };
+
+export default plugin;

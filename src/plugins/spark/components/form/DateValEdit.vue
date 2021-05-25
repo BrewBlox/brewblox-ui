@@ -1,35 +1,49 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, onMounted } from 'vue';
 
-import { shortDateString } from '@/helpers/functional';
+import { useValEdit } from '@/plugins/spark/composables';
+import { shortDateString } from '@/utils/functional';
 
-import ValEditBase from '../ValEditBase';
+export default defineComponent({
+  name: 'DateValEdit',
+  props: {
+    ...useValEdit.props,
+    timeScale: {
+      type: Number,
+      default: 1,
+    },
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<number>(props.modelValue);
 
+    const scaledField = computed<number>({
+      get: () => field.value * props.timeScale,
+      set: v => field.value = Math.round(v / props.timeScale),
+    });
 
-@Component
-export default class DateValEdit extends ValEditBase {
+    const displayVal = computed<string>(
+      () => shortDateString(scaledField.value),
+    );
 
-  @Prop({ type: Number, default: 1 })
-  readonly timeScale!: number;
+    onMounted(() => {
+      if (field.value === 0) {
+        scaledField.value = new Date().getTime();
+      }
+    });
 
-  created(): void {
-    if (this.field === 0) {
-      this.scaledField = new Date().getTime();
-    }
-  }
-
-  get scaledField(): number {
-    return this.field * this.timeScale;
-  }
-
-  set scaledField(val: number) {
-    this.saveField(Math.round(val / this.timeScale));
-  }
-
-  get displayVal(): string {
-    return shortDateString(this.scaledField);
-  }
-}
+    return {
+      scaledField,
+      displayVal,
+      startEdit,
+    };
+  },
+});
 </script>
 
 <template>

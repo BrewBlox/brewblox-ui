@@ -1,7 +1,5 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
-import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/helpers/bloxfield';
-import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import {
@@ -16,14 +14,16 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { Block } from '@/plugins/spark/types';
-import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { Widget } from '@/store/widgets';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/utils/bloxfield';
+import { durationMs } from '@/utils/duration';
 
-import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
-import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from '../helpers';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
+import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';
+import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from '../utils';
 import { FermentConfig, FermentOpts } from './types';
 
 export const defineChangedBlocks = (config: FermentConfig): Block[] => {
@@ -251,7 +251,7 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
 export const defineWidgets = (
   config: FermentConfig,
   opts: FermentOpts,
-  layouts: BuilderLayout[]
+  layouts: BuilderLayout[],
 ): Widget[] => {
   const genericSettings = {
     dashboard: config.dashboardId,
@@ -266,7 +266,7 @@ export const defineWidgets = (
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
     ...featureStore.widgetSize(type),
-    id: uid(),
+    id: nanoid(),
     title: name,
     feature: type,
     order: 0,
@@ -332,8 +332,8 @@ export const defineWidgets = (
   });
 
   const createTempControl = (): TempControlWidget => {
-    const beerModeId = uid();
-    const fridgeModeId = uid();
+    const beerModeId = nanoid();
+    const fridgeModeId = nanoid();
     const activeMode = opts.activeSetpoint === 'beer'
       ? beerModeId
       : fridgeModeId;

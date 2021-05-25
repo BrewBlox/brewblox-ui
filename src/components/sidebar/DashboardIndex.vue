@@ -1,43 +1,47 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import { objectSorter } from '@/helpers/functional';
+import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { createDialog } from '@/utils/dialog';
+import { objectSorter } from '@/utils/functional';
 
+export default defineComponent({
+  name: 'DashboardIndex',
+  props: {
+    editing: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  emits: ['update:editing'],
+  setup() {
+    const { dense } = useGlobals.setup();
+    const dragging = ref(false);
 
-@Component
-export default class DashboardIndex extends Vue {
-  dragging = false;
-
-  @Prop({ type: Boolean, required: true })
-  public readonly value!: boolean;
-
-  get editing(): boolean {
-    return this.value;
-  }
-
-  set editing(val: boolean) {
-    this.$emit('input', val);
-  }
-
-  get dashboards(): Dashboard[] {
-    // avoid modifying the store object
-    return [...dashboardStore.dashboards].sort(objectSorter('order'));
-  }
-
-  set dashboards(dashboards: Dashboard[]) {
-    dashboardStore.updateDashboardOrder(dashboards.map(v => v.id));
-  }
-
-  startWizard(): void {
-    createDialog({
-      component: 'WizardDialog',
-      initialWizard: 'DashboardWizard',
+    const dashboards = computed<Dashboard[]>({
+      // Avoid modifying the store object when calling sort()
+      get: () => [...dashboardStore.dashboards].sort(objectSorter('order')),
+      set: dashboards => dashboardStore.updateDashboardOrder(dashboards.map(v => v.id)),
     });
-  }
-}
+
+    function startWizard(): void {
+      createDialog({
+        component: 'WizardDialog',
+        componentProps: {
+          initialWizard: 'DashboardWizard',
+        },
+      });
+    }
+
+    return {
+      dense,
+      dragging,
+      dashboards,
+      startWizard,
+    };
+  },
+});
 </script>
 
 <template>
@@ -65,7 +69,7 @@ export default class DashboardIndex extends Vue {
           round
           flat
           size="sm"
-          @click="editing = !editing"
+          @click="$emit('update:editing', !editing)"
         >
           <q-tooltip>
             Rearrange dashboards
@@ -76,27 +80,29 @@ export default class DashboardIndex extends Vue {
 
     <draggable
       v-model="dashboards"
-      :disabled="$dense || !editing"
+      :disabled="dense || !editing"
+      item-key="id"
       @start="dragging=true"
       @end="dragging=false"
     >
-      <q-item
-        v-for="dashboard in dashboards"
-        :key="dashboard.id"
-        :to="editing ? undefined : `/dashboard/${dashboard.id}`"
-        :inset-level="0.2"
-        :class="[
-          'q-pb-sm',
-          editing && 'bordered pointer',
-        ]"
-        style="min-height: 0px"
-      >
-        <q-item-section
-          :class="['ellipsis', editing && 'text-italic']"
+      <template #item="{element}">
+        <q-item
+          :to="editing ? undefined : `/dashboard/${element.id}`"
+          :inset-level="0.2"
+          :class="[
+            'q-pb-sm',
+            editing && 'bordered pointer',
+          ]"
+          style="min-height: 0px"
         >
-          {{ dashboard.title }}
-        </q-item-section>
-      </q-item>
+          <!-- {{ element }} -->
+          <q-item-section
+            :class="['ellipsis', editing && 'text-italic']"
+          >
+            {{ element.title }}
+          </q-item-section>
+        </q-item>
+      </template>
     </draggable>
   </div>
 </template>

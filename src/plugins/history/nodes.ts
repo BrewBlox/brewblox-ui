@@ -1,9 +1,10 @@
 import escapeRegExp from 'lodash/escapeRegExp';
+import flatMap from 'lodash/flatMap';
 import set from 'lodash/set';
 
-import { prettyUnit } from '@/helpers/bloxfield';
-import { sentenceCased } from '@/helpers/functional';
 import { propertyNameWithUnit } from '@/plugins/spark/parse-object';
+import { prettyUnit } from '@/utils/bloxfield';
+import { sentenceCased } from '@/utils/functional';
 
 import { QueryTarget } from './types';
 
@@ -88,8 +89,10 @@ export const filteredNodes =
 
 export const targetSplitter =
   (targets: QueryTarget[]): string[] =>
-    targets
-      .flatMap(tar => tar.fields.map(f => `${tar.measurement}/${f}`));
+    flatMap(
+      targets,
+      tar => tar.fields.map(f => `${tar.measurement}/${f}`),
+    );
 
 export const targetBuilder =
   (vals: string[], knownFields: Mapped<string[]>): QueryTarget[] => {

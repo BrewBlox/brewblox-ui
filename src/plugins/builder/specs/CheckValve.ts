@@ -1,5 +1,5 @@
-import { LEFT, RIGHT } from '../getters';
-import { PartSpec, Transitions } from '../types';
+import { LEFT, RIGHT } from '@/plugins/builder/const';
+import { PartSpec, Transitions } from '@/plugins/builder/types';
 
 const spec: PartSpec = {
   id: 'CheckValve',

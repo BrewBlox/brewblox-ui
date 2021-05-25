@@ -1,21 +1,21 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
 import { BuilderLayout } from '@/plugins/builder/types';
 
-import { withPrefix } from '../helpers';
+import { withPrefix } from '../utils';
 import { FermentConfig } from './types';
 
 export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
   const serviceId = config.serviceId;
   return [
     {
-      id: uid(),
+      id: nanoid(),
       title: withPrefix(config.prefix, 'Layout'),
       width: 8,
       height: 10,
       parts: [
         {
-          id: uid(),
+          id: nanoid(),
           type: 'Fridge',
           x: 2,
           y: 2,
@@ -27,7 +27,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'Carboy',
           x: 3,
           y: 4,
@@ -42,7 +42,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'ProfileDisplay',
           x: 3,
           y: 3,
@@ -57,7 +57,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'SetpointDisplay',
           x: 2,
           y: 8,
@@ -72,7 +72,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'PidDisplay',
           x: 4,
           y: 8,
@@ -87,7 +87,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'PidDisplay',
           x: 5,
           y: 8,
@@ -102,7 +102,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'UrlDisplay',
           x: 2,
           y: 1,
@@ -111,7 +111,7 @@ export const defineLayouts = (config: FermentConfig): BuilderLayout[] => {
           settings: {
             bordered: false,
             text: 'User manual',
-            url: 'https://brewblox.netlify.app/user/ferment_guide.html',
+            url: 'https://brewblox.netlify.app/user/ferment_gnanoide.html',
             sizeX: 4,
             sizeY: 1,
           },

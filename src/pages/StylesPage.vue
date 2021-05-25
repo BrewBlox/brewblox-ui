@@ -1,36 +1,38 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component
-export default class StylesPage extends Vue {
-  colors = [
-    'red',
-    'pink',
-    'purple',
-    'deep-purple',
-    'indigo',
-    'blue',
-    'light-blue',
-    'cyan',
-    'teal',
-    'green',
-    'light-green',
-    'lime',
-    'yellow',
-    'amber',
-    'orange',
-    'deep-orange',
-    'brown',
-    'grey',
-    'blue-grey',
-  ];
+const colors = [
+  'red',
+  'pink',
+  'purple',
+  'deep-purple',
+  'indigo',
+  'blue',
+  'light-blue',
+  'cyan',
+  'teal',
+  'green',
+  'light-green',
+  'lime',
+  'yellow',
+  'amber',
+  'orange',
+  'deep-orange',
+  'brown',
+  'grey',
+  'blue-grey',
+];
 
-  created() {
+export default defineComponent({
+  name: 'StylesPage',
+  setup() {
     document.title = 'Brewblox | Style Guide';
-  }
 
-}
+    return {
+      colors,
+    };
+  },
+});
 </script>
 
 <template>

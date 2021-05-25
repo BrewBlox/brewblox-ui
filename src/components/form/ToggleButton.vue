@@ -1,36 +1,61 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
+export default defineComponent({
+  name: 'ToggleButton',
+  props: {
+    modelValue: {
+      type: Boolean,
+      required: true,
+    },
+    colored: {
+      type: Boolean,
+      default: true,
+    },
+    iconEnabled: {
+      type: String,
+      default: 'mdi-checkbox-marked-outline',
+    },
+    iconDisabled: {
+      type: String,
+      default: 'mdi-checkbox-blank-outline',
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props) {
+    const icon = computed<string>(
+      () => props.modelValue
+        ? props.iconEnabled
+        : props.iconDisabled,
+    );
 
-@Component
-export default class ToggleButton extends Vue {
+    const color = computed<string>(
+      () => {
+        if (!props.colored) {
+          return '';
+        }
+        return props.modelValue
+          ? 'primary'
+          : 'smoke';
+      },
+    );
 
-  @Prop({ type: Boolean, required: true })
-  public readonly value!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly colored!: boolean;
-
-  get icon(): string {
-    return this.value
-      ? 'mdi-checkbox-marked-outline'
-      : 'mdi-checkbox-blank-outline';
-  }
-
-  get color(): string {
-    if (!this.colored) {
-      return '';
-    }
-    return this.value
-      ? 'primary'
-      : 'smoke';
-  }
-}
+    return {
+      icon,
+      color,
+    };
+  },
+});
 </script>
 
 <template>
-  <q-btn :icon="icon" :color="color" v-bind="$attrs" flat @click="$emit('input', !value)">
+  <q-btn
+    :icon="icon"
+    :color="color"
+    @click="$emit('update:modelValue', !modelValue)"
+  >
     <slot />
   </q-btn>
 </template>

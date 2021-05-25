@@ -2,10 +2,9 @@
 import find from 'lodash/find';
 import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
-import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
-import { durationMs, durationString } from '@/helpers/duration';
+import { durationMs, durationString } from '@/utils/duration';
 
 import { QueryConfig, QueryParams } from '../types';
 
@@ -15,115 +14,129 @@ interface PeriodDisplay {
   end: boolean;
 }
 
-@Component
-export default class GraphPeriodEditor extends Vue {
-  periodOptions: SelectOption[] = [
-    {
-      label: 'Live: [duration] to now',
-      value: { start: false, duration: true, end: false },
+const periodOptions: SelectOption[] = [
+  {
+    label: 'Live: [duration] to now',
+    value: { start: false, duration: true, end: false },
+  },
+  {
+    label: 'Live: from [date] to now',
+    value: { start: true, duration: false, end: false },
+  },
+  {
+    label: 'Fixed: [duration] to [date]',
+    value: { start: false, duration: true, end: true },
+  },
+  {
+    label: 'Fixed: [duration] since [date]',
+    value: { start: true, duration: true, end: false },
+  },
+  {
+    label: 'Fixed: from [date] to [date]',
+    value: { start: true, duration: false, end: true },
+  },
+];
+
+const paramDefaults = (): QueryParams => ({
+  start: new Date().getTime() - durationMs('1d'),
+  duration: '1d',
+  end: new Date().getTime(),
+});
+
+export default defineComponent({
+  name: 'GraphPeriodEditor',
+  props: {
+    config: {
+      type: Object as PropType<QueryConfig>,
+      required: true,
     },
-    {
-      label: 'Live: from [date] to now',
-      value: { start: true, duration: false, end: false },
+    downsampling: {
+      type: Object as PropType<Mapped<string>>,
+      default: () => ({}),
     },
-    {
-      label: 'Fixed: [duration] to [date]',
-      value: { start: false, duration: true, end: true },
-    },
-    {
-      label: 'Fixed: [duration] since [date]',
-      value: { start: true, duration: true, end: false },
-    },
-    {
-      label: 'Fixed: from [date] to [date]',
-      value: { start: true, duration: false, end: true },
-    },
-  ];
+  },
+  emits: ['update:config'],
+  setup(props, { emit }) {
+    const local = ref({ ...props.config });
+    const period = ref(makePeriod(props.config.params));
 
-  period: PeriodDisplay | null = null;
+    watch(
+      () => props.config.params,
+      params => { period.value = makePeriod(params); },
+    );
 
-  @Prop({ type: Object, default: () => ({}) })
-  readonly downsampling!: Mapped<string>;
+    function makePeriod(params: QueryParams): PeriodDisplay {
+      const period: PeriodDisplay = {
+        start: params?.start !== undefined,
+        duration: params?.duration !== undefined,
+        end: params?.end !== undefined,
+      };
+      const opts = periodOptions.map(opt => opt.value);
+      const matching = opts.some(v => isEqual(v, period));
+      return matching ? period : opts[0];
+    }
 
-  @Prop({ type: Object, required: true })
-  public readonly config!: QueryConfig;
+    function saveConfig(config: QueryConfig): void {
+      emit('update:config', config);
+    }
 
-  @Watch('config.params', { immediate: true })
-  watchParams(params: QueryParams): void {
-    const period: PeriodDisplay = {
-      start: params?.start !== undefined,
-      duration: params?.duration !== undefined,
-      end: params?.end !== undefined,
-    };
-    const opts = this.periodOptions.map(opt => opt.value);
-    const matching = opts.some(v => isEqual(v, period));
-    this.period = matching ? period : opts[0];
-  }
+    function saveSanitized(period: PeriodDisplay): void {
+      const defaults = paramDefaults();
+      const { params } = local.value;
+      local.value.params = {
+        ...params,
+        start: !period.start ? undefined : (params.start ?? defaults.start),
+        duration: !period.duration ? undefined : (params.duration ?? defaults.duration),
+        end: !period.end ? undefined : (params.end ?? defaults.end),
+      };
+      saveConfig(local.value);
+    }
 
-  saveConfig(config: QueryConfig = this.config): void {
-    this.$emit('update:config', config);
-  }
+    const isLive = computed<boolean>(
+      () => {
+        const opt = find(periodOptions, matches({ value: period.value }));
+        return opt !== undefined && opt.label.startsWith('Live');
+      },
+    );
 
-  paramDefaults(): QueryParams {
+    function saveStart(val: number): void {
+      local.value.params.start = val;
+      saveSanitized(period.value);
+    }
+
+    function saveDuration(val: string): void {
+      local.value.params.duration = durationString(val || '10m');
+      saveSanitized(period.value);
+    }
+
+    function saveEnd(val: number): void {
+      local.value.params.end = val;
+      saveSanitized(period.value);
+    }
+
     return {
-      start: new Date().getTime() - durationMs('1d'),
-      duration: '1d',
-      end: new Date().getTime(),
+      periodOptions,
+      period,
+      isLive,
+      saveStart,
+      saveDuration,
+      saveEnd,
+      saveSanitized,
     };
-  }
-
-  get shownPeriod(): PeriodDisplay {
-    return this.period ?? this.periodOptions[0].value;
-  }
-
-  saveSanitized(period: PeriodDisplay = this.shownPeriod): void {
-    const defaults = this.paramDefaults();
-    const current = this.config.params;
-    this.config.params = {
-      ...this.config.params,
-      start: !period.start ? undefined : (current.start ?? defaults.start),
-      duration: !period.duration ? undefined : (current.duration ?? defaults.duration),
-      end: !period.end ? undefined : (current.end ?? defaults.end),
-    };
-    this.saveConfig();
-  }
-
-  get isLive(): boolean {
-    const opt = find(this.periodOptions, matches({ value: this.shownPeriod }));
-    return opt !== undefined && opt.label.startsWith('Live');
-  }
-
-  saveShownPeriod(period: PeriodDisplay): void {
-    this.saveSanitized(period);
-  }
-
-  saveStart(val: number): void {
-    this.config.params.start = val;
-    this.saveSanitized();
-  }
-
-  saveDuration(val: string): void {
-    this.config.params.duration = durationString(val || '10m');
-    this.saveSanitized();
-  }
-
-  saveEnd(val: number): void {
-    this.config.params.end = val;
-    this.saveSanitized();
-  }
-}
+  },
+});
 </script>
 
 <template>
   <div class="widget-body row">
     <q-select
-      :value="shownPeriod"
+      :model-value="period"
       :options="periodOptions"
       emit-value
       map-options
       label="Time period"
       class="col-auto"
-      @input="saveShownPeriod"
+      @update:model-value="saveSanitized"
     >
       <template #append>
         <q-icon name="mdi-chart-timeline" size="sm">
@@ -134,7 +147,7 @@ export default class GraphPeriodEditor extends Vue {
               <LabeledField
                 v-for="(rate, meas) in downsampling"
                 :key="meas"
-                :value="rate"
+                :model-value="rate"
                 :label="meas"
                 item-aligned
                 class="col"
@@ -146,30 +159,30 @@ export default class GraphPeriodEditor extends Vue {
     </q-select>
     <div class="col-auto row q-gutter-x-sm q-ml-none">
       <DatetimeField
-        v-if="shownPeriod.start"
-        :value="config.params.start"
+        v-if="period.start"
+        :model-value="config.params.start"
         emit-number
         title="Start time"
         label="Start date and time"
         class="col-auto min-width-sm"
-        @input="saveStart"
+        @update:model-value="saveStart"
       />
       <DurationField
-        v-if="shownPeriod.duration"
-        :value="config.params.duration"
+        v-if="period.duration"
+        :model-value="config.params.duration"
         title="Duration"
         label="Duration"
         class="col-auto min-width-sm"
-        @input="saveDuration"
+        @update:model-value="saveDuration"
       />
       <DatetimeField
-        v-if="shownPeriod.end"
-        :value="config.params.end"
+        v-if="period.end"
+        :model-value="config.params.end"
         emit-number
         title="End time"
         label="End date and time"
         class="col-auto min-width-sm"
-        @input="saveEnd"
+        @update:model-value="saveEnd"
       />
       <LabeledField
         v-if="isLive"

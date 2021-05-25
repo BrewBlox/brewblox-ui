@@ -1,76 +1,103 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { createDialog } from '@/helpers/dialog';
+import { useField } from '@/composables';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class ColorField extends FieldBase {
+export default defineComponent({
+  name: 'ColorField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: String,
+      default: null,
+    },
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
+    nullText: {
+      type: String,
+      default: '<not set>',
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-  @Prop({ type: String, required: false })
-  public readonly value!: string | null;
+    const color = computed<string>(
+      () => {
+        const c = props.modelValue || '#ffffff';
+        return c.startsWith('#') ? c : `#${c}`;
+      },
+    );
 
-  @Prop({ type: Boolean, default: false })
-  public readonly clearable!: boolean;
+    const colorDesc = computed<string>(
+      () => !!props.modelValue
+        ? color.value
+        : props.nullText,
+    );
 
-  @Prop({ type: String, default: '<not set>' })
-  public readonly nullText!: string;
+    const colorStyle = computed<Mapped<string | null>>(
+      () => ({
+        color: color.value,
+        backgroundColor: props.modelValue ? color.value : null,
+        border: `1px ${props.modelValue ? 'solid' : 'dashed'} ${color.value}`,
+        borderRadius: '50%',
+        height: '20px',
+        width: '20px',
+        display: 'inline-block',
+      }),
+    );
 
-  @Emit('input')
-  public change(v: string | null): string | null {
-    return v?.replace('#', '') ?? null;
-  }
-
-  get color(): string {
-    const color = this.value || '#ffffff';
-    return color.startsWith('#') ? color : `#${color}`;
-  }
-
-  get colorString(): string {
-    return !!this.value
-      ? this.color
-      : this.nullText;
-  }
-
-  get colorStyle(): Mapped<any> {
-    return {
-      color: this.color,
-      backgroundColor: this.value ? this.color : null,
-      border: `1px ${this.value ? 'solid' : 'dashed'} ${this.color}`,
-      borderRadius: '50%',
-      height: '20px',
-      width: '20px',
-      display: 'inline-block',
-    };
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function change(c: string | null): void {
+      emit('update:modelValue', c?.replace('#', '') ?? null);
     }
 
-    createDialog({
-      component: 'ColorDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: this.color,
-      clearable: this.clearable,
-    })
-      .onOk(this.change);
-  }
-}
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+
+      createDialog({
+        component: 'ColorDialog',
+        componentProps: {
+          modelValue: color.value,
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          clearable: props.clearable,
+        },
+      })
+        .onOk(change);
+    }
+
+    return {
+      activeSlots,
+      color,
+      colorDesc,
+      colorStyle,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <slot name="value">
-      {{ colorString }}
+      {{ colorDesc }}
     </slot>
     <template #after>
       <slot name="indicator">
         <span class="self-end q-mb-sm" :style="colorStyle" />
       </slot>
+    </template>
+
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
   </LabeledField>
 </template>

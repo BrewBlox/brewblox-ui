@@ -1,34 +1,63 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
+import { useContext, useWidget } from '@/composables';
 
-import { WebframeConfig } from './types';
+import { WebframeWidget } from './types';
 
+export default defineComponent({
+  name: 'WebframeWidget',
+  setup() {
+    const {
+      config,
+      saveConfig,
+    } = useWidget.setup<WebframeWidget>();
+    const {
+      context,
+    } = useContext.setup();
 
-@Component
-export default class WebframeWidget extends WidgetBase<WebframeConfig> {
+    const scale = computed<number>({
+      get: () => config.value.scale || 1,
+      set: scale => saveConfig({ ...config.value, scale }),
+    });
 
-  get scale(): number {
-    return this.config.scale || 1;
-  }
+    const pctScale = computed<number>({
+      get: () => scale.value * 100,
+      set: v => scale.value = (v || 100) / 100,
+    });
 
-  get counterScale(): number {
-    // value * scale * counterScale == value
-    return ((1 - this.scale) / this.scale) + 1;
-  }
-}
+    const url = computed<string>({
+      get: () => config.value.url,
+      set: url => saveConfig({ ...config.value, url }),
+    });
+
+    const counterScale = computed<number>(
+      // value * scale * counterScale == value
+      () => ((1 - scale.value) / scale.value) + 1,
+    );
+
+    return {
+      config,
+      saveConfig,
+      context,
+      url,
+      scale,
+      pctScale,
+      counterScale,
+    };
+  },
+});
 </script>
 
 
 <template>
-  <CardWrapper v-bind="{context}" no-scroll>
+  <Card no-scroll>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <WidgetToolbar has-mode-toggle />
     </template>
 
     <div
-      v-if="mode === 'Basic'"
+      v-if="context.mode === 'Basic'"
       style="overflow: hidden"
       class="fit"
     >
@@ -52,20 +81,21 @@ export default class WebframeWidget extends WidgetBase<WebframeConfig> {
     </div>
 
     <div
-      v-if="mode === 'Full'"
+      v-if="context.mode === 'Full'"
       class="widget-body column q-mt-none"
     >
       <InputField
-        :value="config.url"
+        v-model="url"
         title="URL"
         label="URL"
+        message="URLs must include the http:// or https:// prefix."
         class="col-grow"
         tag-style="word-break: break-word"
-        @input="v => { config.url = v; saveConfig(); }"
+        :dialog-props="{ fontSize:'100%' }"
       />
 
       <InputField
-        :value="scale * 100"
+        v-model="pctScale"
         type="number"
         label="Content size"
         title="Set zoom level"
@@ -75,14 +105,7 @@ export default class WebframeWidget extends WidgetBase<WebframeConfig> {
         :rules="[
           v => v === null || v > 0 || 'Value must be > 0',
         ]"
-        @input="v => { config.scale = (v || 100) / 100; saveConfig(); }"
       />
     </div>
-  </CardWrapper>
+  </Card>
 </template>
-
-
-<style lang="sass" scoped>
-.card__Dashboard.card__dense
-  height: 100vh !important
-</style>

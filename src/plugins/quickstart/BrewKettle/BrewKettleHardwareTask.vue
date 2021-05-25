@@ -1,58 +1,74 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
 import { PinChannel } from '../types';
 import { BrewKettleConfig } from './types';
 
+export default defineComponent({
+  name: 'BrewKettleHardwareTask',
+  props: {
+    config: {
+      type: Object as PropType<BrewKettleConfig>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const kettlePin = ref<PinChannel | null>(props.config.kettlePin ?? null);
+    const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
 
-@Component
-export default class BrewKettleHardwareTask extends QuickStartTaskBase<BrewKettleConfig> {
-  kettlePin: PinChannel | null = null;
-  kettleSensor: string | null = null;
+    const valuesOk = computed<boolean>(
+      () => Boolean(kettlePin.value && kettleSensor.value),
+    );
 
-  get valuesOk(): boolean {
-    return [
-      this.kettlePin,
-      this.kettleSensor,
-    ]
-      .every(Boolean);
-  }
+    function discover(): void {
+      sparkStore.moduleById(props.config.serviceId)?.fetchDiscoveredBlocks();
+    }
 
-  created(): void {
-    this.discover();
+    function startBlockWizard(): void {
+      createBlockWizard(props.config.serviceId);
+    }
 
-    this.kettlePin = this.config.kettlePin || null;
-    this.kettleSensor = this.config.kettleSensor || null;
-  }
+    function taskDone(): void {
+      if (!valuesOk.value) {
+        return;
+      }
+      const updated: BrewKettleConfig = {
+        ...props.config,
+        kettlePin: kettlePin.value!,
+        kettleSensor: kettleSensor.value!,
+        renamedBlocks: {
+          ...props.config.renamedBlocks,
+          [kettleSensor.value!]: props.config.names.kettleSensor,
+        },
+      };
+      emit('update:config', updated);
+      emit('next');
+    }
 
-  discover(): void {
-    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
-  }
+    onBeforeMount(() => discover());
 
-  startBlockWizard(): void {
-    createBlockWizard(this.config.serviceId);
-  }
-
-  taskDone(): void {
-    this.config.kettlePin = this.kettlePin!;
-    this.config.kettleSensor = this.kettleSensor!;
-
-    this.config.renamedBlocks = {
-      [this.kettleSensor!]: this.config.names.kettleSensor,
+    return {
+      kettlePin,
+      kettleSensor,
+      valuesOk,
+      discover,
+      startBlockWizard,
+      taskDone,
     };
-
-    this.updateConfig(this.config);
-    this.next();
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -83,7 +99,7 @@ export default class BrewKettleHardwareTask extends QuickStartTaskBase<BrewKettl
           </p>
         </q-item-section>
       </q-item>
-      <QuickStartMockCreateField
+      <QuickstartMockCreateField
         :service-id="config.serviceId"
         :names="[
           config.names.kettleSensor,
@@ -91,14 +107,14 @@ export default class BrewKettleHardwareTask extends QuickStartTaskBase<BrewKettl
       />
       <q-item>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-model="kettlePin"
             :service-id="config.serviceId"
             label="Output pin"
           />
         </q-item-section>
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="kettleSensor"
             :service-id="config.serviceId"
             label="Sensor"
@@ -108,7 +124,7 @@ export default class BrewKettleHardwareTask extends QuickStartTaskBase<BrewKettl
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
       <q-btn
         :disable="!valuesOk"
@@ -118,5 +134,5 @@ export default class BrewKettleHardwareTask extends QuickStartTaskBase<BrewKettl
         @click="taskDone"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

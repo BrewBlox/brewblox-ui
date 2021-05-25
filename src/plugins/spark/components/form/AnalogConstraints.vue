@@ -1,118 +1,126 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType, ref, watch } from 'vue';
 
-import { bloxLink } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
 import { analogConstraintLabels } from '@/plugins/spark/getters';
 import { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj, BlockType } from '@/plugins/spark/types';
+import { bloxLink } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/functional';
 
-interface Wrapped {
-  type: AnalogConstraintKey;
-  constraint: AnalogConstraint;
-}
+const constraintOpts: SelectOption[] =
+  Object.entries(analogConstraintLabels)
+    .map(([k, v]) => ({ value: k, label: v }));
 
-@Component
-export default class AnalogConstraints extends Vue {
+const defaultValues: Record<AnalogConstraintKey, AnalogConstraint> = {
+  min: {
+    limiting: false,
+    min: 0,
+  },
+  max: {
+    limiting: false,
+    max: 100,
+  },
+  balanced: {
+    limiting: false,
+    balanced: {
+      balancerId: bloxLink(null, BlockType.Balancer),
+      granted: 0,
+      id: 0,
+    },
+  },
+};
 
-  @Prop({ type: Object, default: () => ({ constraints: [] }) })
-  protected readonly value!: AnalogConstraintsObj;
+export default defineComponent({
+  name: 'AnalogConstraints',
+  props: {
+    modelValue: {
+      type: Object as PropType<AnalogConstraintsObj>,
+      default: () => ({ constraints: [] }),
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const constraints = ref<AnalogConstraint[]>([]);
 
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
+    watch(
+      () => props.modelValue,
+      (newV) => constraints.value = deepCopy(newV.constraints),
+      { deep: true, immediate: true },
+    );
 
-  get constraints(): Wrapped[] {
-    return this.value.constraints
-      .map(constraint => {
-        const type = Object.keys(constraint).find(k => k != 'limiting') as AnalogConstraintKey;
-        return { type, constraint };
-      });
-  }
+    function save(): void {
+      emit('update:modelValue', { constraints: constraints.value });
+    }
 
-  save(constraints: Wrapped[] = this.constraints): void {
-    this.$emit('input', { constraints: constraints.map(c => c.constraint) });
-  }
-
-  get constraintOpts(): SelectOption[] {
-    return Object.entries(analogConstraintLabels)
-      .map(([k, v]) => ({ value: k, label: v }));
-  }
-
-  createDefault(type: AnalogConstraintKey): Wrapped {
-    const opts: Record<AnalogConstraintKey, AnalogConstraint> = {
-      min: {
-        limiting: false,
-        min: 0,
-      },
-      max: {
-        limiting: false,
-        max: 100,
-      },
-      balanced: {
-        limiting: false,
-        balanced: {
-          balancerId: bloxLink(null, BlockType.Balancer),
-          granted: 0,
-          id: 0,
+    function add(): void {
+      createDialog({
+        component: 'CheckboxDialog',
+        componentProps: {
+          title: 'Add constraint',
+          selectOptions: constraintOpts,
+          modelValue: [],
         },
-      },
+      })
+        .onOk((keys: AnalogConstraintKey[]) => {
+          constraints.value.push(...keys.map(type => deepCopy(defaultValues[type])));
+          save();
+        });
+    }
+
+    function remove(idx: number): void {
+      constraints.value.splice(idx, 1);
+      save();
+    }
+
+    return {
+      constraints,
+      save,
+      add,
+      remove,
     };
-    return { type, constraint: opts[type] };
-  }
-
-  add(): void {
-    createDialog({
-      component: 'CheckboxDialog',
-      title: 'Add constraint',
-      selectOptions: this.constraintOpts,
-      value: [],
-    })
-      .onOk(keys => {
-        this.constraints.push(...keys.map(this.createDefault));
-        this.save();
-      });
-  }
-
-  remove(idx: number): void {
-    this.$delete(this.constraints, idx);
-    this.save();
-  }
-}
+  },
+});
 </script>
 
 <template>
   <div class="column q-gutter-y-sm">
     <div
-      v-for="({type, constraint}, idx) in constraints"
-      :key="idx"
+      v-for="(constraint, idx) in constraints"
+      :key="`constraint-${idx}`"
       :class="['row q-gutter-x-sm constraint', {limiting: constraint.limiting}]"
     >
       <LinkField
-        v-if="type === 'balanced'"
+        v-if="'balanced' in constraint"
         :service-id="serviceId"
-        :value="constraint.balanced.balancerId"
+        :model-value="constraint.balanced.balancerId"
         title="Balancer"
         label="Balancer"
         class="col-grow"
-        @input="v => { constraint.balanced.balancerId = v; save() }"
+        @update:model-value="v => { constraint.balanced.balancerId = v; save(); }"
       />
       <InputField
-        v-if="type === 'min'"
-        :value="constraint.min"
+        v-if="'min' in constraint"
+        :model-value="constraint.min"
         title="Minimum value"
         label="Minimum value"
         type="number"
         class="col-grow"
-        @input="v => { constraint.min = v; save() }"
+        @update:model-value="v => { constraint.min = v; save(); }"
       />
       <InputField
-        v-if="type === 'max'"
-        :value="constraint.max"
+        v-if="'max' in constraint"
+        :model-value="constraint.max"
         title="Maximum value"
         label="Maximum value"
         type="number"
         class="col-grow"
-        @input="v => { constraint.max = v; save() }"
+        @update:model-value="v => { constraint.max = v; save(); }"
       />
 
       <div class="col-auto column justify-center darkish">

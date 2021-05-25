@@ -1,41 +1,33 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
+import { useRoute } from 'vue-router';
 
-import { automationStore } from '@/plugins/automation/store';
+const btnAttrs = {
+  stack: true,
+  flat: true,
+  noCaps: true,
+  class: 'col-grow q-py-sm max-small',
+};
 
+export default defineComponent({
+  name: 'SidebarNavigator',
+  setup() {
+    const route = useRoute();
 
-@Component
-export default class SidebarNavigator extends Vue {
-  btnAttrs = {
-    stack: true,
-    flat: true,
-    noCaps: true,
-    class: 'col-grow q-py-sm max-small',
-  }
+    const activeSection = computed<string>(
+      () => route.path.split('/')[1] ?? '',
+    );
 
-  get activeSection(): string {
-    return this.$route.path.split('/')[1] ?? '';
-  }
+    function btnColor(...sections: string[]): string {
+      return sections.includes(activeSection.value) ? 'primary' : '';
+    }
 
-  get editorDisabled(): boolean {
-    return this.$q.platform.is.ie || this.$dense;
-  }
-
-  get automationAvailable(): boolean {
-    return automationStore.available;
-  }
-
-  get currentDashboard(): string | null {
-    return this.$route.path.startsWith('/dashboard')
-      ? this.$route.params.id
-      : null;
-  }
-
-  btnColor(...sections: string[]): string {
-    return sections.includes(this.activeSection) ? 'primary' : '';
-  }
-}
+    return {
+      btnAttrs,
+      btnColor,
+    };
+  },
+});
 </script>
 
 <template>
@@ -49,7 +41,6 @@ export default class SidebarNavigator extends Vue {
         v-bind="btnAttrs"
       />
       <q-btn
-        :disable="editorDisabled"
         icon="mdi-tools"
         label="Builder"
         to="/builder"
@@ -61,17 +52,6 @@ export default class SidebarNavigator extends Vue {
         label="Admin"
         to="/admin"
         :color="btnColor('admin')"
-        v-bind="btnAttrs"
-      />
-
-      <div class="col-break" />
-
-      <q-btn
-        v-if="automationAvailable"
-        icon="mdi-calendar-check"
-        label="Automation"
-        to="/automation"
-        :color="btnColor('automation')"
         v-bind="btnAttrs"
       />
     </div>

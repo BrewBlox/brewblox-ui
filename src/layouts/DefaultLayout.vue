@@ -1,69 +1,82 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { useQuasar } from 'quasar';
+import { computed, defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
 
-@Component
-export default class DefaultLayout extends Vue {
-  localDrawer: boolean | null = null;
-  dashboardEditing = false;
-  serviceEditing = false;
-  builderEditing = false;
+export default defineComponent({
+  name: 'DefaultLayout',
+  setup() {
+    const { localStorage } = useQuasar();
+    const { dense } = useGlobals.setup();
+    const router = useRouter();
 
-  get drawerOpen(): boolean {
-    return Boolean(
-      this.localDrawer
-      ?? this.$q.localStorage.getItem('drawer')
-      ?? !this.$dense);
-  }
+    const devMode = Boolean(process.env.DEV);
+    const dashboardEditing = ref<boolean>(false);
+    const serviceEditing = ref<boolean>(false);
+    const builderEditing = ref<boolean>(false);
 
-  set drawerOpen(v: boolean) {
-    this.localDrawer = v;
-    this.$q.localStorage.set('drawer', v);
-  }
+    const _drawerOpen = ref<boolean>(localStorage.getItem('drawer') ?? !dense.value);
+    const drawerOpen = computed<boolean>({
+      get: () => _drawerOpen.value,
+      set: v => {
+        _drawerOpen.value = v;
+        localStorage.set('drawer', v);
+      },
+    });
 
-  get devMode(): boolean {
-    return !!process.env.DEV;
-  }
+    const showSidebarLayouts = computed<boolean>(
+      () => systemStore.config.showSidebarLayouts
+        || /^\/(builder|brewery)/.test(router.currentRoute.value.path),
+    );
 
-  get showSidebarLayouts(): boolean {
-    return systemStore.config.showSidebarLayouts;
-  }
+    function stopEditing(): void {
+      dashboardEditing.value = false;
+      serviceEditing.value = false;
+      builderEditing.value = false;
+    }
 
-  stopEditing(): void {
-    this.dashboardEditing = false;
-    this.serviceEditing = false;
-    this.builderEditing = false;
-  }
+    function routeActive(route: string): boolean {
+      return Boolean(router.currentRoute.value.path.match(route));
+    }
 
-  routeActive(route: string): boolean {
-    return !!this.$route.path.match(route);
-  }
-}
+    return {
+      devMode,
+      dashboardEditing,
+      serviceEditing,
+      builderEditing,
+      drawerOpen,
+      showSidebarLayouts,
+      stopEditing,
+      routeActive,
+    };
+  },
+});
 </script>
 
 <template>
   <q-layout view="hHh Lpr fFf" style="overflow: hidden">
     <LayoutHeader @menu="drawerOpen = !drawerOpen">
       <template #title>
-        <portal-target name="toolbar-title">
-          Brewblox
-        </portal-target>
+        <portal-target name="toolbar-title" />
       </template>
       <template #buttons>
-        <portal-target name="toolbar-buttons" class="full-height row q-gutter-x-sm q-pr-xs" />
+        <div class="full-height row q-gutter-x-sm q-pr-xs">
+          <portal-target name="toolbar-buttons" />
+        </div>
       </template>
     </LayoutHeader>
     <LayoutFooter />
 
-    <q-drawer v-model="drawerOpen" content-class="column" elevated>
+    <q-drawer v-model="drawerOpen" class="column" elevated>
       <SidebarNavigator />
 
       <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
-        <DashboardIndex v-model="dashboardEditing" />
-        <BuilderLayoutIndex v-if="showSidebarLayouts" v-model="builderEditing" />
-        <ServiceIndex v-model="serviceEditing" />
+        <DashboardIndex v-model:editing="dashboardEditing" />
+        <BreweryIndex v-if="showSidebarLayouts" v-model:editing="builderEditing" />
+        <ServiceIndex v-model:editing="serviceEditing" />
       </q-scroll-area>
 
       <div class="col-auto row q-gutter-sm q-pa-sm">
@@ -83,7 +96,7 @@ export default class DefaultLayout extends Vue {
 
     <q-page-container
       style="overflow: hidden"
-      @click.native="stopEditing"
+      @click="stopEditing"
     >
       <router-view />
     </q-page-container>

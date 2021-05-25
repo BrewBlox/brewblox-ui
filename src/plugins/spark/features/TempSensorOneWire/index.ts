@@ -1,44 +1,54 @@
-import { deltaTempQty, tempQty } from '@/helpers/bloxfield';
-import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { Plugin } from 'vue';
+
+import { discoveredBlockFeature } from '@/plugins/spark/generic';
+import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
-import { WidgetFeature } from '@/store/features';
+import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { featureStore, WidgetFeature } from '@/store/features';
+import { deltaTempQty, tempQty } from '@/utils/bloxfield';
 
 import widget from './TempSensorOneWireWidget.vue';
 
 const typeName = BlockType.TempSensorOneWire;
 
-const block: BlockSpec<TempSensorOneWireBlock> = {
-  id: typeName,
-  discovered: true,
-  generate: () => ({
-    value: tempQty(20),
-    offset: deltaTempQty(0),
-    address: '',
-  }),
-  fields: [
-    {
-      key: 'value',
-      title: 'Sensor value',
-      component: 'QuantityValEdit',
-      generate: () => tempQty(20),
-      readonly: true,
-      graphed: true,
-    },
-  ],
-};
+const plugin: Plugin = {
+  install(app) {
 
-const feature: WidgetFeature = {
-  ...genericBlockFeature,
-  id: typeName,
-  title: 'OneWire Temp Sensor',
-  role: 'Process',
-  component: blockWidgetSelector(widget, typeName),
-  widgetSize: {
-    cols: 4,
-    rows: 2,
+    const spec: BlockSpec<TempSensorOneWireBlock> = {
+      id: typeName,
+      discovered: true,
+      generate: () => ({
+        value: tempQty(20),
+        offset: deltaTempQty(0),
+        address: '',
+      }),
+      fields: [
+        {
+          key: 'value',
+          title: 'Sensor value',
+          component: 'QuantityValEdit',
+          generate: () => tempQty(20),
+          readonly: true,
+          graphed: true,
+        },
+      ],
+    };
+
+    const feature: WidgetFeature = {
+      ...discoveredBlockFeature,
+      id: typeName,
+      title: 'OneWire Temp Sensor',
+      role: 'Process',
+      component: blockWidgetSelector(app, widget, typeName),
+      widgetSize: {
+        cols: 4,
+        rows: 2,
+      },
+    };
+
+    sparkStore.addBlockSpec(spec);
+    featureStore.addWidgetFeature(feature);
   },
-  wizard: 'BlockDiscoveryWizard',
 };
 
-export default { feature, block };
+export default plugin;

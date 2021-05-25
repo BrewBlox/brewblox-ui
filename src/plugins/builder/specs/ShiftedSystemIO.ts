@@ -1,5 +1,5 @@
-import { CENTER, DEFAULT_IO_PRESSURE, MAX_IO_PRESSURE, MIN_IO_PRESSURE, UP } from '../getters';
-import { PartSpec, PersistentPart } from '../types';
+import { CENTER, DEFAULT_IO_PRESSURE, MAX_IO_PRESSURE, MIN_IO_PRESSURE, UP } from '@/plugins/builder/const';
+import { PartSpec, PersistentPart } from '@/plugins/builder/types';
 
 const SIZE_X = 2;
 const SIZE_Y = 2;
@@ -9,6 +9,7 @@ const spec: PartSpec = {
   title: 'Global inlet: shifted',
   size: () => [SIZE_X, SIZE_Y],
   cards: [
+    { component: 'LiquidSourceCard' },
     {
       component: 'PressureCard',
       props: {
@@ -18,7 +19,6 @@ const spec: PartSpec = {
         defaultValue: DEFAULT_IO_PRESSURE,
       },
     },
-    { component: 'LiquidSourceCard' },
   ],
   transitions: (part: PersistentPart) => {
     const enabled = part.settings.enabled ?? !!part.settings.pressure;

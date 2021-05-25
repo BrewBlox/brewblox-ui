@@ -1,43 +1,67 @@
 <script lang="ts">
 import isFinite from 'lodash/isFinite';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import { prettyUnit, Quantity } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
+import { useValEdit } from '@/plugins/spark/composables';
+import { prettyQty, prettyUnit, Quantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { roundNumber } from '@/utils/functional';
 
-import ValEditBase from '../ValEditBase';
+export default defineComponent({
+  name: 'QuantityValEdit',
+  props: {
+    ...useValEdit.props,
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<Quantity>(props.modelValue);
+    const local = ref<number | null>(roundNumber(field.value.value));
 
-@Component
-export default class QuantityValEdit extends ValEditBase<Quantity> {
-  local: number | null = null;
-
-  syncField(): void {
-    if (this.local === null || isFinite(this.local)) {
-      this.field.value = this.local;
+    function syncField(): void {
+      if (local.value === null || isFinite(local.value)) {
+        field.value.value = local.value;
+      }
     }
-  }
 
-  created(): void {
-    this.local = this.field.value;
-  }
+    const displayValue = computed<string>(
+      () => prettyQty(field.value),
+    );
 
-  get notation(): string {
-    return prettyUnit(this.field);
-  }
+    const notation = computed<string>(
+      () => prettyUnit(field.value),
+    );
 
-  showKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.local,
-      type: 'number',
-      suffix: this.notation,
-    })
-      .onOk(v => {
-        this.local = v;
-        this.syncField();
-      });
-  }
-}
+    function showKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: local.value,
+          type: 'number',
+          suffix: notation.value,
+        },
+      })
+        .onOk(v => {
+          local.value = v;
+          syncField();
+        });
+    }
+
+    return {
+      field,
+      startEdit,
+      local,
+      syncField,
+      displayValue,
+      notation,
+      showKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
@@ -63,6 +87,6 @@ export default class QuantityValEdit extends ValEditBase<Quantity> {
     class="clickable q-pa-sm rounded-borders"
     @click="startEdit"
   >
-    {{ field | quantity }}
+    {{ displayValue }}
   </div>
 </template>

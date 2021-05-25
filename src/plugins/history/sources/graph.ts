@@ -2,7 +2,6 @@ import forEach from 'lodash/forEach';
 import last from 'lodash/last';
 import parseDuration from 'parse-duration';
 
-import { round } from '@/helpers/functional';
 import { DEFAULT_PRECISION, MAX_POINTS } from '@/plugins/history/getters';
 import { historyStore } from '@/plugins/history/store';
 import {
@@ -15,6 +14,7 @@ import {
   QueryResult,
   QueryTarget,
 } from '@/plugins/history/types';
+import { round } from '@/utils/functional';
 
 const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
 

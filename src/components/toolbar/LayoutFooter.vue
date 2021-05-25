@@ -1,64 +1,45 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import { shortDateString } from '@/helpers/functional';
-import { notifyColors, notifyIcons } from '@/helpers/notify';
-import { automationStore } from '@/plugins/automation/store';
 import { LogEntry, loggingStore } from '@/store/logging';
+import { shortDateString } from '@/utils/functional';
+import { notifyColors, notifyIcons } from '@/utils/notify';
 
-@Component
-export default class LayoutFooter extends Vue {
-  logButtonColor = '';
+export default defineComponent({
+  name: 'LayoutFooter',
+  setup() {
+    const logButtonColor = ref<string>('');
 
-  @Watch('logEntries')
-  onEntriesChanged(newV: LogEntry[], oldV: LogEntry[]): void {
-    if (newV.length > oldV.length) {
-      this.logButtonColor = 'primary';
+    const logEntries = computed<LogEntry[]>(
+      () => loggingStore.entries.slice().reverse(),
+    );
+
+    function color(entry: LogEntry): string {
+      return notifyColors[entry.level];
     }
-  }
 
-  get automationAvailable(): boolean {
-    return automationStore.available;
-  }
+    function icon(entry: LogEntry): string {
+      return notifyIcons[entry.level];
+    }
 
-  get numTasks(): number {
-    return automationStore.tasks.length;
-  }
+    function time(entry: LogEntry): string {
+      return shortDateString(entry.time);
+    }
 
-  get logEntries(): LogEntry[] {
-    return loggingStore.entries.slice().reverse();
-  }
-
-  color(entry: LogEntry): string {
-    return notifyColors[entry.level];
-  }
-
-  icon(entry: LogEntry): string {
-    return notifyIcons[entry.level];
-  }
-
-  time(entry: LogEntry): string {
-    return shortDateString(entry.time);
-  }
-}
+    return {
+      logButtonColor,
+      logEntries,
+      color,
+      icon,
+      time,
+    };
+  },
+});
 </script>
 
 <template>
   <q-footer class="bg-dark shadow-up-1">
     <q-bar class="bg-transparent q-px-none row justify-end">
-      <q-btn
-        v-if="automationAvailable"
-        flat
-        stretch
-        icon="mdi-check-all"
-      >
-        <q-tooltip>Automation tasks</q-tooltip>
-        <AutomationTaskMenu />
-        <q-badge v-if="numTasks > 0" class="q-ml-sm">
-          {{ numTasks }}
-        </q-badge>
-      </q-btn>
       <q-btn
         flat
         stretch
@@ -81,7 +62,7 @@ export default class LayoutFooter extends Vue {
                 <q-item-label caption>
                   {{ time(entry) }}
                 </q-item-label>
-                {{ entry.message }}
+                <span v-html="entry.message" />
               </q-item-section>
             </q-item>
           </q-list>

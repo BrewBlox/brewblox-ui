@@ -1,21 +1,21 @@
-import { VueConstructor } from 'vue';
+import { Plugin } from 'vue';
 
-import { autoRegister } from '@/helpers/component-ref';
-import { STATE_TOPIC } from '@/helpers/const';
+import { eventbus } from '@/eventbus';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
+import { autoRegister } from '@/utils/component-ref';
+import { STATE_TOPIC } from '@/utils/const';
 
-import { isTiltState } from './helpers';
 import { tiltStore } from './store';
 import TiltWidget from './Tilt';
 import { TiltService } from './types';
+import { isTiltState } from './utils';
 
-export default {
-  install(Vue: VueConstructor) {
+const plugin: Plugin = {
+  install(app) {
+    autoRegister(app, require.context('./components', true));
 
-    autoRegister(require.context('./components', true));
-
-    featureStore.registerService({
+    featureStore.addServiceFeature({
       id: 'Tilt',
       title: 'Tilt Service',
       pageComponent: 'TiltPage',
@@ -28,10 +28,10 @@ export default {
       }),
     });
 
-    featureStore.registerWidget(TiltWidget);
+    app.use(TiltWidget);
 
-    Vue.$eventbus.subscribe(`${STATE_TOPIC}/+/+`); // id/colour
-    Vue.$eventbus.addListener(`${STATE_TOPIC}/+/+`, (_, data) => {
+    eventbus.subscribe(`${STATE_TOPIC}/+/+`); // id/colour
+    eventbus.addListener(`${STATE_TOPIC}/+/+`, (_, data) => {
       if (isTiltState(data)) {
         serviceStore.ensureStub({ id: data.key, type: 'Tilt' });
         tiltStore.parseStateEvent(data);
@@ -39,3 +39,5 @@ export default {
     });
   },
 };
+
+export default plugin;

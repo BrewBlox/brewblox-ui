@@ -1,5 +1,5 @@
-import { containerTransitions } from '../helpers';
-import { PartSpec, PersistentPart } from '../types';
+import { PartSpec, PersistentPart } from '@/plugins/builder/types';
+import { containerTransitions } from '@/plugins/builder/utils';
 
 export const DEFAULT_FILL_PCT = 85;
 export const DEFAULT_SIZE_X = 4;

@@ -1,17 +1,35 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { prettifyConstraints } from '@/plugins/spark/helpers';
+import { useValEdit } from '@/plugins/spark/composables';
+import { prettifyConstraints } from '@/plugins/spark/utils';
+import { AnalogConstraintsObj } from '@/shared-types';
 
-import ValEditBase from '../ValEditBase';
+export default defineComponent({
+  name: 'AnalogConstraintsValEdit',
+  props: {
+    ...useValEdit.props,
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<AnalogConstraintsObj>(props.modelValue);
 
+    const displayString = computed<string>(
+      () => prettifyConstraints(field.value),
+    );
 
-@Component
-export default class AnalogConstraintsValEdit extends ValEditBase {
-  get displayString(): string {
-    return prettifyConstraints(this.field);
-  }
-}
+    return {
+      field,
+      displayString,
+      startEdit,
+    };
+  },
+});
 </script>
 
 <template>

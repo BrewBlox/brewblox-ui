@@ -1,138 +1,162 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, provide, reactive } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
+import { ContextKey } from '@/symbols';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class Troubleshooter extends Vue {
-  context: WidgetContext = {
-    container: 'Dashboard',
-    size: 'Content',
-    mode: 'Basic',
-  };
+export default defineComponent({
+  name: 'Troubleshooter',
+  props: {
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
+    provide(ContextKey, reactive<WidgetContext>({
+      container: 'Dashboard',
+      size: 'Content',
+      mode: 'Basic',
+    }));
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
+    const sparkModule = computed<SparkServiceModule | null>(
+      () => sparkStore.moduleById(props.serviceId),
+    );
 
-  get sparkModule(): SparkServiceModule | null {
-    return sparkStore.moduleById(this.serviceId);
-  }
+    const status = computed<SparkStatus | null>(
+      () => sparkModule.value?.status ?? null,
+    );
 
-  get status(): SparkStatus | null {
-    return this.sparkModule?.status ?? null;
-  }
+    const lastStatus = computed<string>(
+      () => sparkModule.value?.lastStatus?.toLocaleString() ?? 'Unknown',
+    );
 
-  get lastStatus(): string {
-    return this.sparkModule?.lastStatus?.toLocaleString() ?? 'Unknown';
-  }
-
-  triStateDesc(
-    value: boolean | null | undefined,
-    trueDesc: string,
-    falseDesc: string,
-    nullDesc: string = 'Service status unknown'
-  ): string {
-    if (value == null) {
-      return nullDesc;
+    function triStateDesc(
+      value: boolean | null | undefined,
+      trueDesc: string,
+      falseDesc: string,
+      nullDesc = 'Service status unknown',
+    ): string {
+      if (value == null) {
+        return nullDesc;
+      }
+      return value
+        ? trueDesc
+        : falseDesc;
     }
-    return value
-      ? trueDesc
-      : falseDesc;
-  }
 
-  get isReachableDesc(): string {
-    return this.triStateDesc(
-      this.status?.isServiceReachable,
-      'Service running',
-      'Unable to connect to service'
+    const isReachableDesc = computed<string>(
+      () => triStateDesc(
+        status.value?.isServiceReachable,
+        'Service running',
+        'Unable to connect to service',
+      ),
     );
-  }
 
-  get autoconnectingDesc(): string {
-    return this.triStateDesc(
-      this.status?.isAutoconnecting,
-      'Service automatically connects to controller',
-      'Service does not automatically connect to controller'
+    const autoconnectingDesc = computed<string>(
+      () => triStateDesc(
+        status.value?.isAutoconnecting,
+        'Service automatically connects to controller',
+        'Service does not automatically connect to controller',
+      ),
     );
-  }
 
-  get isConnectedDesc(): string {
-    return this.triStateDesc(
-      this.status?.isConnected,
-      'Service connected to controller',
-      'Service not connected to controller'
+    const isConnectedDesc = computed<string>(
+      () => triStateDesc(
+        status.value?.isConnected,
+        'Service connected to controller',
+        'Service not connected to controller',
+      ),
     );
-  }
 
-  get isAcknowledgedDesc(): string {
-    return this.triStateDesc(
-      this.status?.isAcknowledged,
-      'Handshake performed',
-      'Handshake not performed'
+    const isAcknowledgedDesc = computed<string>(
+      () => triStateDesc(
+        status.value?.isAcknowledged,
+        'Handshake performed',
+        'Handshake not performed',
+      ),
     );
-  }
 
-  get isCompatibleDesc(): string {
-    return this.triStateDesc(
-      this.status?.isCompatibleFirmware,
-      'Firmware compatible',
-      'Firmware not compatible'
+    const isCompatibleDesc = computed<string>(
+      () => triStateDesc(
+        status.value?.isCompatibleFirmware,
+        'Firmware compatible',
+        'Firmware not compatible',
+      ),
     );
-  }
 
-  get isValidDesc(): string {
-    return this.triStateDesc(
-      this.status?.isValidDeviceId,
-      'Valid device ID',
-      'Invalid device ID'
+    const isValidDesc = computed<string>(
+      () => triStateDesc(
+        status.value?.isValidDeviceId,
+        'Valid device ID',
+        'Invalid device ID',
+      ),
     );
-  }
 
-  get isSynchronizedDesc(): string {
-    return this.triStateDesc(
-      this.status?.isSynchronized,
-      'Service synchronized',
-      'Service not synchronized'
+    const isSynchronizedDesc = computed<string>(
+      () => triStateDesc(
+        status.value?.isSynchronized,
+        'Service synchronized',
+        'Service not synchronized',
+      ),
     );
-  }
 
-  async refresh(): Promise<void> {
-    await this.sparkModule?.fetchAll();
-  }
+    async function refresh(): Promise<void> {
+      await sparkModule.value?.fetchAll();
+    }
 
-  async toggleAutoconnecting(): Promise<void> {
-    await this.sparkModule?.saveAutoConnecting(!this.status?.isAutoconnecting);
-    await this.refresh();
-  }
+    async function toggleAutoconnecting(): Promise<void> {
+      await sparkModule.value?.saveAutoConnecting(!status.value?.isAutoconnecting);
+      await refresh();
+    }
 
-  iconProps(val: boolean): Mapped<any> {
+    function iconProps(val: boolean | undefined): AnyDict {
+      return {
+        name: val ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline',
+        color: val ? 'positive' : 'negative',
+        size: 'md',
+        class: 'col-auto q-mr-sm',
+      };
+    }
+
+    function startFirmwareUpdate(): void {
+      createDialog({
+        component: 'FirmwareUpdateDialog',
+        componentProps: {
+          serviceId: props.serviceId,
+        },
+      });
+    }
+
+    function serviceReboot(): void {
+      sparkModule.value?.serviceReboot();
+    }
+
     return {
-      name: val ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline',
-      color: val ? 'positive' : 'negative',
-      size: 'md',
-      class: 'col-auto q-mr-sm',
+      status,
+      lastStatus,
+      isReachableDesc,
+      autoconnectingDesc,
+      isConnectedDesc,
+      isAcknowledgedDesc,
+      isCompatibleDesc,
+      isValidDesc,
+      isSynchronizedDesc,
+      refresh,
+      toggleAutoconnecting,
+      iconProps,
+      startFirmwareUpdate,
+      serviceReboot,
     };
-  }
-
-  startFirmwareUpdate(): void {
-    createDialog({
-      component: 'FirmwareUpdateDialog',
-      serviceId: this.serviceId,
-    });
-  }
-
-  serviceReboot(): void {
-    this.sparkModule?.serviceReboot();
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}" class="widget-md">
+  <Card style="max-width: 500px">
     <template #toolbar>
       <Toolbar :title="serviceId" subtitle="Troubleshooter">
         <template #buttons>
@@ -307,5 +331,5 @@ export default class Troubleshooter extends Vue {
         </span>
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

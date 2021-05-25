@@ -1,22 +1,27 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-
-@Component
-export default class DialogCard extends Vue {
-  @Prop({ type: String, required: false })
-  public readonly title!: string;
-
-  @Prop({ type: String, default: '' })
-  public readonly message!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly html!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly separated!: boolean;
-}
+export default defineComponent({
+  name: 'DialogCard',
+  props: {
+    title: {
+      type: String,
+      default: null,
+    },
+    message: {
+      type: String,
+      default: '',
+    },
+    html: {
+      type: Boolean,
+      default: false,
+    },
+    separated: {
+      type: Boolean,
+      default: false,
+    },
+  },
+});
 </script>
 
 <template>
@@ -41,10 +46,8 @@ export default class DialogCard extends Vue {
       </q-card-section>
     </slot>
     <q-separator v-if="separated" />
-    <template>
-      <q-card-actions v-if="$slots.actions" align="right">
-        <slot name="actions" />
-      </q-card-actions>
-    </template>
+    <q-card-actions v-if="$slots.actions" align="right">
+      <slot name="actions" />
+    </q-card-actions>
   </q-card>
 </template>

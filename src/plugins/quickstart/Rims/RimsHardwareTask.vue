@@ -1,94 +1,125 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { createOutputActions, hasShared } from '../helpers';
-import { PinChannel } from '../types';
+import { PinChannel, QuickstartAction } from '../types';
+import { createOutputActions, hasShared } from '../utils';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { RimsConfig } from './types';
 
+export default defineComponent({
+  name: 'RimsHardwareTask',
+  props: {
+    config: {
+      type: Object as PropType<RimsConfig>,
+      required: true,
+    },
+    actions: {
+      type: Array as PropType<QuickstartAction[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'update:actions',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const tubePin = ref<PinChannel | null>(props.config.tubePin ?? null);
+    const pumpPin = ref<PinChannel | null>(props.config.pumpPin ?? null);
+    const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
+    const tubeSensor = ref<string | null>(props.config.tubeSensor ?? null);
 
-@Component
-export default class RimsHardwareTask extends QuickStartTaskBase<RimsConfig> {
-  tubePin: PinChannel | null = null;
-  pumpPin: PinChannel | null = null;
-  kettleSensor: string | null = null;
-  tubeSensor: string | null = null;
 
-  get valuesOk(): boolean {
-    return [
-      this.tubePin,
-      this.pumpPin,
-      !this.pinSame,
-      this.kettleSensor,
-      this.tubeSensor,
-      !this.sensorSame,
-    ]
-      .every(Boolean);
-  }
+    const pinSame = computed<boolean>(
+      () => hasShared([tubePin.value, pumpPin.value]),
+    );
 
-  get pinSame(): boolean {
-    return hasShared([this.tubePin, this.pumpPin]);
-  }
+    const sensorSame = computed<boolean>(
+      () => hasShared([kettleSensor.value, tubeSensor.value]),
+    );
 
-  get sensorSame(): boolean {
-    return hasShared([this.kettleSensor, this.tubeSensor]);
-  }
+    const valuesOk = computed<boolean>(
+      () => [
+        tubePin.value,
+        pumpPin.value,
+        !pinSame.value,
+        kettleSensor.value,
+        tubeSensor.value,
+        !sensorSame.value,
+      ]
+        .every(Boolean),
+    );
 
-  created(): void {
-    this.discover();
+    function discover(): void {
+      sparkStore.moduleById(props.config.serviceId)?.fetchDiscoveredBlocks();
+    }
 
-    this.tubePin = this.config.tubePin || null;
-    this.pumpPin = this.config.pumpPin || null;
-    this.kettleSensor = this.config.kettleSensor || null;
-    this.tubeSensor = this.config.tubeSensor || null;
-  }
+    function startBlockWizard(): void {
+      createBlockWizard(props.config.serviceId);
+    }
 
-  discover(): void {
-    sparkStore.moduleById(this.config.serviceId)?.fetchDiscoveredBlocks();
-  }
+    function taskDone(): void {
+      if (!valuesOk.value) {
+        return;
+      }
 
-  startBlockWizard(): void {
-    createBlockWizard(this.config.serviceId);
-  }
+      const localConfig: RimsConfig = {
+        ...props.config,
+        pumpPin: pumpPin.value!,
+        tubePin: tubePin.value!,
+        kettleSensor: kettleSensor.value!,
+        tubeSensor: tubeSensor.value!,
+        renamedBlocks: {
+          [kettleSensor.value!]: props.config.names.kettleSensor,
+          [tubeSensor.value!]: props.config.names.tubeSensor,
+        },
+      };
 
-  taskDone(): void {
-    this.config.tubePin = this.tubePin!;
-    this.config.pumpPin = this.pumpPin!;
-    this.config.kettleSensor = this.kettleSensor!;
-    this.config.tubeSensor = this.tubeSensor!;
+      const createdBlocks = defineCreatedBlocks(localConfig);
+      const changedBlocks = defineChangedBlocks(localConfig);
+      const layouts = defineLayouts(localConfig);
+      const widgets = defineWidgets(localConfig, layouts);
+      const displayedBlocks = defineDisplayedBlocks(localConfig);
 
-    this.config.renamedBlocks = {
-      [this.kettleSensor!]: this.config.names.kettleSensor,
-      [this.tubeSensor!]: this.config.names.tubeSensor,
+      const finalizedConfig: RimsConfig = {
+        ...localConfig,
+        createdBlocks,
+        changedBlocks,
+        layouts,
+        widgets,
+        displayedBlocks,
+      };
+
+      emit('update:config', finalizedConfig);
+      emit('update:actions', createOutputActions());
+      emit('next');
+    }
+
+    onBeforeMount(() => discover());
+
+    return {
+      tubePin,
+      pumpPin,
+      kettleSensor,
+      tubeSensor,
+      pinSame,
+      sensorSame,
+      valuesOk,
+      discover,
+      startBlockWizard,
+      taskDone,
     };
-
-    const createdBlocks = defineCreatedBlocks(this.config);
-    const changedBlocks = defineChangedBlocks(this.config);
-    const layouts = defineLayouts(this.config);
-    const widgets = defineWidgets(this.config, layouts);
-    const displayedBlocks = defineDisplayedBlocks(this.config);
-
-    this.pushActions(createOutputActions());
-    this.updateConfig({
-      ...this.config,
-      layouts,
-      widgets,
-      changedBlocks,
-      createdBlocks,
-      displayedBlocks,
-    });
-    this.next();
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -119,7 +150,7 @@ export default class RimsHardwareTask extends QuickStartTaskBase<RimsConfig> {
           </p>
         </q-item-section>
       </q-item>
-      <QuickStartMockCreateField
+      <QuickstartMockCreateField
         :service-id="config.serviceId"
         :names="[
           config.names.kettleSensor,
@@ -128,7 +159,7 @@ export default class RimsHardwareTask extends QuickStartTaskBase<RimsConfig> {
       />
       <q-item>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-model="pumpPin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -136,7 +167,7 @@ export default class RimsHardwareTask extends QuickStartTaskBase<RimsConfig> {
           />
         </q-item-section>
         <q-item-section>
-          <QuickStartPinField
+          <QuickstartPinField
             v-model="tubePin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -146,7 +177,7 @@ export default class RimsHardwareTask extends QuickStartTaskBase<RimsConfig> {
       </q-item>
       <q-item>
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="kettleSensor"
             :service-id="config.serviceId"
             :error="sensorSame"
@@ -154,7 +185,7 @@ export default class RimsHardwareTask extends QuickStartTaskBase<RimsConfig> {
           />
         </q-item-section>
         <q-item-section>
-          <QuickStartSensorField
+          <QuickstartSensorField
             v-model="tubeSensor"
             :service-id="config.serviceId"
             :error="sensorSame"
@@ -175,9 +206,19 @@ export default class RimsHardwareTask extends QuickStartTaskBase<RimsConfig> {
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn :disable="!valuesOk" unelevated label="Next" color="primary" @click="taskDone" />
+      <q-btn
+        :disable="!valuesOk"
+        unelevated
+        label="Next"
+        color="primary"
+        @click="taskDone"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

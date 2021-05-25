@@ -1,15 +1,17 @@
 <script lang="ts">
 import isString from 'lodash/isString';
-import { uid } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, ref } from 'vue';
 
-import { ruleErrorFinder } from '@/helpers/functional';
-import { loadFile } from '@/helpers/import-export';
-import notify from '@/helpers/notify';
-import WizardBase from '@/plugins/wizardry/WizardBase';
-import { dashboardStore, Widget } from '@/store/dashboards';
+import { dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { Widget, widgetStore } from '@/store/widgets';
+import { ruleErrorFinder } from '@/utils/functional';
+import { loadFile } from '@/utils/import-export';
+import notify from '@/utils/notify';
+
+import { useWizard } from '../composables';
 
 const widgetRules: InputRule[] = [
   v => v !== null || 'Widget must have a value',
@@ -21,100 +23,132 @@ const widgetRules: InputRule[] = [
 
 const errorFinder = ruleErrorFinder(widgetRules);
 
-@Component
-export default class ImportWizard extends WizardBase {
-  localChosenDashboardId = '';
-  widget: Widget | null = null;
+export default defineComponent({
+  name: 'ImportWizard',
+  props: {
+    ...useWizard.props,
+    dashboardId: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: [
+    ...useWizard.emits,
+  ],
+  setup(props) {
+    const {
+      onBack,
+      onDone,
+      setDialogTitle,
+    } = useWizard.setup();
 
-  @Prop({ type: String, default: '' })
-  readonly dashboardId!: string;
+    setDialogTitle('Import wizard');
 
-  get primaryDashboardId(): string | null {
-    const { homePage } = systemStore.config;
-    if (!homePage || !homePage.startsWith('/dashboard')) {
-      return null;
+    const widget = ref<Widget | null>(null);
+
+    const primaryDashboardId = computed<string | null>(
+      () => {
+        const { homePage } = systemStore.config;
+        if (!homePage || !homePage.startsWith('/dashboard')) {
+          return null;
+        }
+        return homePage.split('/')[2] ?? null;
+      },
+    );
+
+    const _chosenDashboardId = ref<string>('');
+    const chosenDashboardId = computed<string>({
+      get: () => _chosenDashboardId.value
+        || props.dashboardId
+        || primaryDashboardId.value
+        || dashboardStore.dashboardIds[0]
+        || '',
+      set: id => _chosenDashboardId.value = id,
+    });
+
+    const dashboardOpts = computed<SelectOption<string>[]>(
+      () => dashboardStore.dashboards
+        .map(dash => ({ label: dash.title, value: dash.id })),
+    );
+
+    const widgetError = computed<string | null>(
+      () => errorFinder(widget.value),
+    );
+
+    const widgetOk = computed<boolean>(
+      () => widgetError.value === null,
+    );
+
+    const featureTitle = computed<string>(
+      () => widget.value !== null
+        ? featureStore.widgetTitle(widget.value.feature)
+        : '',
+    );
+
+    const widgetString = computed<string>(
+      () => widget.value === null
+        ? ''
+        : (widgetError.value
+          || `[${featureTitle.value}] ${widget.value.title}`),
+    );
+
+    const valuesOk = computed<boolean>(
+      () => !!chosenDashboardId.value && widgetOk.value,
+    );
+
+    async function createWidget(): Promise<void> {
+      if (widget.value === null) { return; }
+      try {
+        await widgetStore.appendWidget({
+          ...widget.value,
+          id: nanoid(),
+          dashboard: chosenDashboardId.value,
+        });
+        notify.done(`Created ${featureTitle.value} <b>${widget.value.title}</b>`);
+        onDone({ widget: widget.value });
+      } catch (e) {
+        notify.error(`Failed to create widget: ${e.toString()}`);
+      }
     }
-    return homePage.split('/')[2] ?? null;
-  }
 
-  get chosenDashboardId(): string {
-    return this.localChosenDashboardId
-      || this.dashboardId
-      || this.primaryDashboardId
-      || dashboardStore.dashboardIds[0]
-      || '';
-  }
-
-  set chosenDashboardId(id: string) {
-    this.localChosenDashboardId = id;
-  }
-
-  get dashboardOptions(): SelectOption[] {
-    return dashboardStore.dashboards
-      .map(dash => ({ label: dash.title, value: dash.id }));
-  }
-
-  get widgetError(): string | null {
-    return errorFinder(this.widget);
-  }
-
-  get widgetOk(): boolean {
-    return this.widgetError === null;
-  }
-
-  get widgetString(): string {
-    if (this.widget === null) {
-      return '';
+    function startImport(): void {
+      loadFile<Widget>(v => widget.value = v);
     }
-    if (!this.widgetOk) {
-      return '<invalid config>';
-    }
-    return `[${featureStore.widgetTitle(this.widget.feature)}] ${this.widget.title}`;
-  }
 
-  get valuesOk(): boolean {
-    return !!this.chosenDashboardId && this.widgetOk;
-  }
-
-  async createWidget(): Promise<void> {
-    if (this.widget === null) { return; }
-    try {
-      await dashboardStore.appendWidget({
-        ...this.widget,
-        id: uid(),
-        dashboard: this.chosenDashboardId,
-      });
-      notify.done(`Created ${featureStore.widgetTitle(this.widget.feature)} <b>${this.widget.title}</b>`);
-      this.$emit('close');
-    } catch (e) {
-      notify.error(`Failed to create widget: ${e.toString()}`);
-    }
-  }
-
-  mounted(): void {
-    this.setDialogTitle('Import wizard');
-  }
-
-  startImport(): void {
-    loadFile<Widget>(v => this.widget = v);
-  }
-}
+    return {
+      onBack,
+      widget,
+      chosenDashboardId,
+      dashboardOpts,
+      widgetError,
+      widgetOk,
+      widgetString,
+      valuesOk,
+      createWidget,
+      startImport,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
-      <LabeledField v-if="dashboardOptions.length <= 5" label="Dashboard" item-aligned>
+      <LabeledField
+        v-if="dashboardOpts.length <= 5"
+        label="Dashboard"
+        item-aligned
+      >
         <q-option-group
           v-model="chosenDashboardId"
-          :options="dashboardOptions"
+          :options="dashboardOpts"
           label="test"
         />
       </LabeledField>
       <q-select
         v-else
         v-model="chosenDashboardId"
-        :options="dashboardOptions"
+        :options="dashboardOpts"
         label="Dashboard"
         map-options
         emit-value
@@ -125,7 +159,7 @@ export default class ImportWizard extends WizardBase {
           <q-input
             label="Loaded widget"
             readonly
-            :value="widgetString"
+            :model-value="widgetString"
             :error-message="widgetError"
             :error="widget !== null && !widgetOk"
           />
@@ -137,9 +171,19 @@ export default class ImportWizard extends WizardBase {
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
-      <q-btn :disable="!valuesOk" unelevated label="Create" color="primary" @click="createWidget" />
+      <q-btn
+        :disable="!valuesOk"
+        unelevated
+        label="Create"
+        color="primary"
+        @click="createWidget"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

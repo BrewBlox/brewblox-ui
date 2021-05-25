@@ -102,7 +102,7 @@ export interface GraphSource extends HistorySource {
 
 export interface MetricsResult {
   field: string;
-  time: number | null;
+  time: number;
   value: number | null;
 }
 

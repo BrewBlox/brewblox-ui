@@ -1,41 +1,68 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import DialogBase from '../DialogBase';
+import { useDialog } from '@/composables';
 
+export default defineComponent({
+  name: 'ConfirmDialog',
+  props: {
+    ...useDialog.props,
+    ok: {
+      type: String,
+      default: 'OK',
+    },
+    nok: {
+      type: [String, Boolean],
+      default: false,
+    },
+    cancel: {
+      type: [String, Boolean],
+      default: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
 
-@Component
-export default class ConfirmDialog extends DialogBase {
+    const cancelLabel = computed<string>(
+      () => typeof props.cancel === 'string'
+        ? props.cancel
+        : 'Cancel',
+    );
 
-  @Prop({ type: String, default: 'OK' })
-  public readonly ok!: string;
+    const nokLabel = computed<string>(
+      () => typeof props.nok === 'string'
+        ? props.nok
+        : 'No',
+    );
 
-  @Prop({ type: [String, Boolean], default: false })
-  public readonly nok!: string;
-
-  @Prop({ type: [String, Boolean], default: true })
-  public readonly cancel!: string | boolean;
-
-  get cancelLabel(): string {
-    return typeof this.cancel === 'string'
-      ? this.cancel
-      : 'Cancel';
-  }
-
-  get nokLabel(): string {
-    return typeof this.nok === 'string'
-      ? this.nok
-      : 'No';
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+      cancelLabel,
+      nokLabel,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
-    @keyup.enter="onDialogOk(true)"
+    @keyup.enter="onDialogOK(true)"
   >
     <DialogCard v-bind="{title, message, html}">
       <template #actions>
@@ -52,13 +79,13 @@ export default class ConfirmDialog extends DialogBase {
           flat
           :label="nokLabel"
           color="primary"
-          @click="onDialogOk(false)"
+          @click="onDialogOK(false)"
         />
         <q-btn
           flat
           :label="ok"
           color="primary"
-          @click="onDialogOk(true)"
+          @click="onDialogOK(true)"
         />
       </template>
     </DialogCard>

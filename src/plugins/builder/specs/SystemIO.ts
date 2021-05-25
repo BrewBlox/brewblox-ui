@@ -1,5 +1,5 @@
-import { CENTER, DEFAULT_IO_PRESSURE, MAX_IO_PRESSURE, MIN_IO_PRESSURE, RIGHT } from '../getters';
-import { PartSpec, PersistentPart } from '../types';
+import { CENTER, DEFAULT_IO_PRESSURE, MAX_IO_PRESSURE, MIN_IO_PRESSURE, RIGHT } from '@/plugins/builder/const';
+import { PartSpec, PersistentPart } from '@/plugins/builder/types';
 
 const spec: PartSpec = {
   id: 'SystemIO',

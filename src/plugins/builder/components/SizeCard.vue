@@ -1,39 +1,65 @@
 <script lang="ts">
 import { debounce } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartCard from './PartCard';
+import { FlowPart } from '../types';
 
-@Component
-export default class SizeCard extends PartCard {
+export default defineComponent({
+  name: 'SizeCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    defaultSize: {
+      type: Number,
+      required: true,
+    },
+    min: {
+      type: Number,
+      required: true,
+    },
+    max: {
+      type: Number,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'Size',
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
+    const size = computed<number>(
+      () => {
+        const val = props.part.settings[props.settingsKey];
+        return (typeof val === 'number') ? val : props.defaultSize;
+      },
+    );
 
-  @Prop({ type: String, required: true })
-  public readonly settingsKey!: string;
+    const save = debounce((val: number): void => {
+      const size = (typeof val === 'number') ? val : props.defaultSize;
+      emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          [props.settingsKey]: size,
+        },
+      });
+    }, 50, true);
 
-  @Prop({ type: Number, required: true })
-  public readonly defaultSize!: number;
-
-  @Prop({ type: Number, required: true })
-  public readonly min!: number;
-
-  @Prop({ type: Number, required: true })
-  public readonly max!: number;
-
-  @Prop({ type: String, default: 'Size' })
-  public readonly label!: string;
-
-  get size(): number {
-    const val = this.part.settings[this.settingsKey];
-    return (typeof val === 'number') ? val : this.defaultSize;
-  }
-
-  save(val: number): void {
-    const size = (typeof val === 'number') ? val : this.defaultSize;
-    this.savePartSettings({ ...this.part.settings, [this.settingsKey]: size });
-  }
-
-  debouncedSave = debounce(this.save, 50, true);
-}
+    return {
+      size,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
@@ -42,7 +68,7 @@ export default class SizeCard extends PartCard {
       <q-item-label caption>
         {{ label }}
       </q-item-label>
-      <q-slider :value="size" :min="min" :max="max" label @change="debouncedSave" />
+      <q-slider :model-value="size" :min="min" :max="max" label @change="save" />
     </q-item-section>
   </q-item>
 </template>

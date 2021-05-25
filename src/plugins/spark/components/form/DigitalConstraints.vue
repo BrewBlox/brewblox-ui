@@ -1,139 +1,150 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType, ref, watch } from 'vue';
 
-import { bloxLink, bloxQty } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
 import { digitalConstraintLabels } from '@/plugins/spark/getters';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockType, MutexBlock, Quantity } from '@/plugins/spark/types';
 import type {
   DigitalConstraint,
   DigitalConstraintKey,
   DigitalConstraintsObj,
   MutexedConstraint,
 } from '@/plugins/spark/types';
+import { BlockType, MutexBlock, Quantity } from '@/plugins/spark/types';
+import { bloxLink, bloxQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/functional';
 
-interface Wrapped {
-  type: DigitalConstraintKey;
-  constraint: DigitalConstraint;
-}
+const constraintOpts: SelectOption[] =
+  Object.entries(digitalConstraintLabels)
+    .map(([k, v]) => ({ value: k, label: v }));
 
-@Component
-export default class DigitalConstraints extends Vue {
-  @Prop({ type: Object, default: () => ({ constraints: [] }) })
-  protected readonly value!: DigitalConstraintsObj;
+const defaultValues: Record<DigitalConstraintKey, DigitalConstraint> = {
+  minOff: {
+    remaining: bloxQty('0s'),
+    minOff: bloxQty('0s'),
+  },
+  minOn: {
+    remaining: bloxQty('0s'),
+    minOn: bloxQty('0s'),
+  },
+  delayedOff: {
+    remaining: bloxQty('0s'),
+    delayedOff: bloxQty('0s'),
+  },
+  delayedOn: {
+    remaining: bloxQty('0s'),
+    delayedOn: bloxQty('0s'),
+  },
+  mutexed: {
+    remaining: bloxQty('0s'),
+    mutexed: {
+      mutexId: bloxLink(null, BlockType.Mutex),
+      hasCustomHoldTime: false,
+      extraHoldTime: bloxQty('0s'),
+      hasLock: false,
+    },
+  },
+};
 
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
+export default defineComponent({
+  name: 'DigitalConstraints',
+  props: {
+    modelValue: {
+      type: Object as PropType<DigitalConstraintsObj>,
+      default: () => ({ constraints: [] }),
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const constraints = ref<DigitalConstraint[]>([]);
 
-  get constraints(): Wrapped[] {
-    return this.value.constraints
-      .map(constraint => {
-        const type = Object.keys(constraint).find(k => k != 'remaining') as DigitalConstraintKey;
-        return { type, constraint };
-      });
-  }
+    watch(
+      () => props.modelValue,
+      (newV) => constraints.value = deepCopy(newV.constraints),
+      { deep: true, immediate: true },
+    );
 
-  save(constraints: Wrapped[] = this.constraints): void {
-    this.$emit('input', { constraints: constraints.map(c => c.constraint) });
-  }
+    function save(): void {
+      emit('update:modelValue', { constraints: constraints.value });
+    }
 
-  get constraintOpts(): SelectOption[] {
-    return Object.entries(digitalConstraintLabels)
-      .map(([k, v]) => ({ value: k, label: v }));
-  }
+    function isCustom(constraint: MutexedConstraint): boolean {
+      return constraint.mutexed.hasCustomHoldTime;
+    }
 
-  createDefault(type: DigitalConstraintKey): Wrapped {
-    const opts: Record<DigitalConstraintKey, DigitalConstraint> = {
-      minOff: {
-        remaining: bloxQty('0s'),
-        minOff: bloxQty('0s'),
-      },
-      minOn: {
-        remaining: bloxQty('0s'),
-        minOn: bloxQty('0s'),
-      },
-      delayedOff: {
-        remaining: bloxQty('0s'),
-        delayedOff: bloxQty('0s'),
-      },
-      delayedOn: {
-        remaining: bloxQty('0s'),
-        delayedOn: bloxQty('0s'),
-      },
-      mutexed: {
-        remaining: bloxQty('0s'),
-        mutexed: {
-          mutexId: bloxLink(null, BlockType.Mutex),
-          hasCustomHoldTime: false,
-          extraHoldTime: bloxQty('0s'),
-          hasLock: false,
+    function holdTime(constraint: MutexedConstraint): Quantity {
+      if (isCustom(constraint)) {
+        return constraint.mutexed.extraHoldTime;
+      }
+      else if (constraint.mutexed.mutexId.id) {
+        const mutex = sparkStore.blockById<MutexBlock>(
+          props.serviceId,
+          constraint.mutexed.mutexId.id);
+        return mutex?.data.differentActuatorWait ?? bloxQty('0s');
+      }
+      else {
+        return bloxQty('0s');
+      }
+    }
+
+    function add(): void {
+      createDialog({
+        component: 'CheckboxDialog',
+        componentProps: {
+          title: 'Add constraint',
+          selectOptions: constraintOpts,
         },
-      },
+      })
+        .onOk(keys => {
+          constraints.value.push(...keys.map(type => deepCopy(defaultValues[type])));
+          save();
+        });
+    }
+
+    function remove(idx: number): void {
+      constraints.value.splice(idx, 1);
+      save();
+    }
+
+    return {
+      constraints,
+      save,
+      isCustom,
+      holdTime,
+      add,
+      remove,
     };
-    return { type, constraint: opts[type] };
-  }
-
-  isCustom(constraint: MutexedConstraint): boolean {
-    return constraint.mutexed.hasCustomHoldTime;
-  }
-
-  holdTime(constraint: MutexedConstraint): Quantity {
-    if (this.isCustom(constraint)) {
-      return constraint.mutexed.extraHoldTime;
-    }
-    else if (constraint.mutexed.mutexId.id) {
-      const mutex = sparkStore.blockById<MutexBlock>(
-        this.serviceId,
-        constraint.mutexed.mutexId.id);
-      return mutex?.data.differentActuatorWait ?? bloxQty('0s');
-    }
-    else {
-      return bloxQty('0s');
-    }
-  }
-
-  add(): void {
-    createDialog({
-      component: 'CheckboxDialog',
-      title: 'Add constraint',
-      selectOptions: this.constraintOpts,
-    })
-      .onOk(keys => {
-        this.constraints.push(...keys.map(this.createDefault));
-        this.save();
-      });
-  }
-
-  remove(idx: number): void {
-    this.$delete(this.constraints, idx);
-    this.save();
-  }
-}
+  },
+});
 </script>
 
 <template>
   <div class="column q-gutter-y-xs">
     <div
-      v-for="({type, constraint}, idx) in constraints"
+      v-for="(constraint, idx) in constraints"
       :key="idx"
       :class="[
         'row q-gutter-x-sm q-gutter-y-xs constraint',
         { limiting: constraint.remaining.value }
       ]"
     >
-      <template v-if="type === 'mutexed'">
+      <template v-if="'mutexed' in constraint">
         <LinkField
           :service-id="serviceId"
-          :value="constraint.mutexed.mutexId"
+          :model-value="constraint.mutexed.mutexId"
           title="Mutex"
           label="Mutex"
           class="col-grow"
-          @input="v => { constraint.mutexed.mutexId = v; save(); }"
+          @update:model-value="v => { constraint.mutexed.mutexId = v; save(); }"
         />
         <DurationField
-          :value="holdTime(constraint)"
+          :model-value="holdTime(constraint)"
           title="Extra lock time"
           label="Extra lock time"
           message="The Mutex will be kept locked for this duration after the actuator turns off."
@@ -143,7 +154,7 @@ export default class DigitalConstraints extends Vue {
               ? null
               : 'Using default value from Mutex block.'
           "
-          @input="v => {
+          @update:model-value="v => {
             constraint.mutexed.extraHoldTime = v;
             constraint.mutexed.hasCustomHoldTime = true;
             save();
@@ -165,36 +176,36 @@ export default class DigitalConstraints extends Vue {
         </DurationField>
       </template>
       <DurationField
-        v-if="type === 'minOff'"
-        :value="constraint.minOff"
+        v-if="'minOff' in constraint"
+        :model-value="constraint.minOff"
         title="Minimum OFF period"
         label="Minimum OFF period"
         class="col-grow"
-        @input="v => { constraint.minOff = v; save(); }"
+        @update:model-value="v => { constraint.minOff = v; save(); }"
       />
       <DurationField
-        v-if="type === 'minOn'"
-        :value="constraint.minOn"
+        v-if="'minOn' in constraint"
+        :model-value="constraint.minOn"
         title="Minimum ON period"
         label="Minimum ON period"
         class="col-grow"
-        @input="v => { constraint.minOn = v; save(); }"
+        @update:model-value="v => { constraint.minOn = v; save(); }"
       />
       <DurationField
-        v-if="type === 'delayedOff'"
-        :value="constraint.delayedOff"
+        v-if="'delayedOff' in constraint"
+        :model-value="constraint.delayedOff"
         title="Delay OFF"
         label="Delay OFF"
         class="col-grow"
-        @input="v => { constraint.delayedOff = v; save(); }"
+        @update:model-value="v => { constraint.delayedOff = v; save(); }"
       />
       <DurationField
-        v-if="type === 'delayedOn'"
-        :value="constraint.delayedOn"
+        v-if="'delayedOn' in constraint"
+        :model-value="constraint.delayedOn"
         title="Delay ON"
         label="Delay ON"
         class="col-grow"
-        @input="v => { constraint.delayedOn = v; save(); }"
+        @update:model-value="v => { constraint.delayedOn = v; save(); }"
       />
 
       <div class="col-auto column justify-center darkish">

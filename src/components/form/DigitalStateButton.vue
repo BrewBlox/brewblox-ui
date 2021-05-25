@@ -1,7 +1,6 @@
 <script lang="ts">
 import { Enum } from 'typescript-string-enums';
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
 import { DigitalState } from '@/plugins/spark/types';
 
@@ -14,76 +13,91 @@ const alternatives: Record<number | string, DigitalState> = {
   Unknown: DigitalState.STATE_UNKNOWN,
 };
 
-@Component
-export default class DigitalStateButton extends Vue {
-  on: DigitalState = DigitalState.STATE_ACTIVE;
-  off: DigitalState = DigitalState.STATE_INACTIVE;
+const commonOpts = {
+  color: 'grey-9',
+  toggleColor: 'primary',
+  textColor: 'grey',
+  toggleTextColor: 'white',
+};
 
-  commonOpts = {
-    color: 'grey-9',
-    toggleColor: 'primary',
-    textColor: 'grey',
-    toggleTextColor: 'white',
-  };
-  options = [
-    {
-      ...this.commonOpts,
-      value: this.off,
-      slot: 'off',
+const options = [
+  {
+    ...commonOpts,
+    value: DigitalState.STATE_INACTIVE,
+    slot: 'off',
+  },
+  {
+    ...commonOpts,
+    value: DigitalState.STATE_ACTIVE,
+    slot: 'on',
+  },
+];
+
+export default defineComponent({
+  name: 'DigitalStateButton',
+  props: {
+    modelValue: {
+      type: [String, Number] as PropType<DigitalState | number>,
+      required: true,
     },
-    {
-      ...this.commonOpts,
-      value: this.on,
-      slot: 'on',
+    pending: {
+      type: Boolean,
+      default: false,
     },
-  ];
+    pendingReason: {
+      type: String,
+      default: null,
+    },
+    disable: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const on = DigitalState.STATE_ACTIVE;
+    const off = DigitalState.STATE_INACTIVE;
 
-  @Prop({ type: [String, Number], required: true })
-  readonly value!: DigitalState | number;
+    const state = computed<DigitalState>({
+      get: () => Enum.isType(DigitalState, props.modelValue)
+        ? props.modelValue
+        : alternatives[props.modelValue] ?? DigitalState.STATE_UNKNOWN,
+      set: v => emit('update:modelValue', v),
+    });
 
-  @Prop({ type: Boolean, default: false })
-  public readonly pending!: boolean;
+    const known = computed<boolean>(
+      () => state.value in DigitalState,
+    );
 
-  @Prop({ type: String })
-  public readonly pendingReason!: string;
-
-  @Prop({ type: Boolean, default: false })
-  readonly disable!: boolean;
-
-  get state(): DigitalState {
-    return Enum.isType(DigitalState, this.value)
-      ? this.value
-      : alternatives[this.value] ?? DigitalState.STATE_UNKNOWN;
-  }
-
-  set state(v: DigitalState) {
-    this.$emit('input', v);
-  }
-
-  get known(): boolean {
-    return this.state in DigitalState;
-  }
-
-  toggle(): void {
-    if (this.disable) {
-      return;
+    function toggle(): void {
+      if (!props.disable) {
+        state.value = (state.value === off ? on : off);
+      }
     }
-    this.state = this.state === this.off
-      ? DigitalState.STATE_ACTIVE
-      : DigitalState.STATE_INACTIVE;
-  }
-}
+
+    return {
+      options,
+      on,
+      off,
+      state,
+      known,
+      toggle,
+    };
+  },
+});
 </script>
 
 <template>
   <q-btn-toggle
     v-if="known"
     v-bind="{options, disable, ...$attrs}"
-    :value="state"
+    :model-value="state"
     :class="['shadow-1', $attrs.class]"
     dense
     unelevated
-    @click.native="toggle"
+    @click="toggle"
   >
     <template #off>
       <span class="row">

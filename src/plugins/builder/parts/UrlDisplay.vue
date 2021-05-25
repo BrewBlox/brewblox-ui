@@ -1,18 +1,44 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
+import { usePart } from '../composables';
+import { FlowPart } from '../types';
+import { coord2grid, textTransformation } from '../utils';
 
-@Component
-export default class UrlDisplay extends PartBase {
-  get url(): string {
-    return this.part.settings.url || '';
-  }
+export default defineComponent({
+  name: 'UrlDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+      bordered,
+    } = usePart.setup(props.part);
 
-  get titleText(): string {
-    return this.part.settings.text || this.url || 'Url Display';
-  }
-}
+    const url = computed<string>(
+      () => props.part.settings['url'] || '',
+    );
+
+    const titleText = computed<string>(
+      () => props.part.settings['text'] || url.value || 'Url Display',
+    );
+
+    return {
+      coord2grid,
+      textTransformation,
+      sizeX,
+      sizeY,
+      bordered,
+      url,
+      titleText,
+    };
+  },
+});
 </script>
 
 <template>
@@ -20,8 +46,8 @@ export default class UrlDisplay extends PartBase {
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(sizeX)-2"
-        :height="squares(sizeY)-2"
+        :width="coord2grid(sizeX)-2"
+        :height="coord2grid(sizeY)-2"
         x="1"
         y="1"
         rx="6"
@@ -30,9 +56,9 @@ export default class UrlDisplay extends PartBase {
       />
     </g>
     <SvgEmbedded
-      :transform="textTransformation([sizeX, sizeY], false)"
-      :width="squares(sizeX)"
-      :height="squares(sizeY)"
+      :transform="textTransformation(part, part.size, false)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
     >
       <div class="text-bold text-center q-mt-sm grid-label" style="text-decoration: underline; font-size: 130%">
         {{ titleText }}

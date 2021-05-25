@@ -1,12 +1,13 @@
-import { Coordinates } from '@/helpers/coordinates';
+import { PartSpec, PersistentPart, Transitions } from '@/plugins/builder/types';
+import { showDrivingBlockDialog } from '@/plugins/builder/utils';
 import { BlockType } from '@/plugins/spark/types';
+import { Coordinates } from '@/utils/coordinates';
 
-import { showDrivingBlockDialog } from '../helpers';
-import { PartSpec, PersistentPart, Transitions } from '../types';
-
-const DEFAULT_SIZE_X = 4;
-const SIZE_Y = 1;
-const ENTRY = '1.5,0,0';
+export const DEFAULT_SIZE_X = 4;
+export const SIZE_Y = 1;
+export const ENTRY = '1.5,0,0';
+export const PWM_KEY = 'pwm';
+export const PWM_TYPES = [BlockType.ActuatorPwm];
 
 const spec: PartSpec = {
   id: 'RimsTube',
@@ -18,15 +19,15 @@ const spec: PartSpec = {
         settingsKey: 'sizeX',
         defaultSize: DEFAULT_SIZE_X,
         label: 'Width',
-        min: 2,
+        min: 3,
         max: 10,
       },
     },
     {
       component: 'BlockAddressCard',
       props: {
-        settingsKey: 'pwm',
-        compatible: [BlockType.ActuatorPwm],
+        settingsKey: PWM_KEY,
+        compatible: PWM_TYPES,
         label: 'PWM',
       },
     },
@@ -46,7 +47,7 @@ const spec: PartSpec = {
       [rightOut]: [{ outCoords: ENTRY, friction: sizeX - 1 }],
     };
   },
-  interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, 'pwm'),
+  interactHandler: (part: PersistentPart) => showDrivingBlockDialog(part, PWM_KEY, PWM_TYPES),
 };
 
 export default spec;

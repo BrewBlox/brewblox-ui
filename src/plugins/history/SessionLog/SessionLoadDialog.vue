@@ -1,41 +1,66 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
 
 import { historyStore } from '../store';
 import { LoggedSession } from '../types';
 import SessionSelectField from './SessionSelectField.vue';
 
 
-@Component({
+export default defineComponent({
+  name: 'SessionLoadDialog',
   components: {
     SessionSelectField,
   },
-})
-export default class SessionLoadDialog extends DialogBase {
-  selected: LoggedSession | null = null;
+  props: {
+    ...useDialog.props,
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup() {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-  get sessions(): LoggedSession[] {
-    return historyStore.sessions;
-  }
+    const local = ref<LoggedSession | null>(null);
 
-  save(): void {
-    this.onDialogOk(this.selected);
-  }
-}
+    const sessions = computed<LoggedSession[]>(
+      () => historyStore.sessions,
+    );
+
+    function save(): void {
+      onDialogOK(local.value);
+    }
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      sessions,
+      save,
+    };
+  },
+});
 </script>
 
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
-      <SessionSelectField v-model="selected" :sessions="sessions" label="Select session" />
+      <SessionSelectField v-model="local" :sessions="sessions" label="Select session" />
 
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />

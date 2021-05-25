@@ -1,40 +1,56 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
-
-@Component
-export default class ListMultiSelect extends Vue {
-
-  @Prop({ type: Array, required: true })
-  public readonly value!: any[];
-
-  @Prop({ type: Array, required: true })
-  public readonly options!: any[];
-
-  @Prop({ type: String, default: 'id' })
-  public readonly optionValue!: string;
-
-  @Prop({ type: String, default: 'title' })
-  public readonly optionLabel!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly dense!: boolean;
-
-  matches(val: any): boolean {
-    const key = val[this.optionValue];
-    return this.value.some(v => v[this.optionValue] === key);
-  }
-
-  selectValue(val: any): void {
-    const key = val[this.optionValue];
-    const updated = this.value.filter(v => v[this.optionValue] !== key);
-    if (updated.length === this.value.length) {
-      updated.push(val);
+export default defineComponent({
+  name: 'ListMultiSelect',
+  props: {
+    modelValue: {
+      type: Array as PropType<any[]>,
+      required: true,
+    },
+    options: {
+      type: Array as PropType<any[]>,
+      required: true,
+    },
+    optionValue: {
+      type: String,
+      default: 'id',
+    },
+    optionLabel: {
+      type: String,
+      default: 'title',
+    },
+    dense: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    function matches(val: any): boolean {
+      const key = val[props.optionValue];
+      return props.modelValue.some(v => v[props.optionValue] === key);
     }
-    this.$emit('input', updated);
-  }
-}
+
+    function selectValue(val: any): void {
+      const key = val[props.optionValue];
+      // Check if value already selected
+      const updated = props.modelValue.filter(v => v[props.optionValue] !== key);
+      // Add if it was not
+      if (updated.length === props.modelValue.length) {
+        updated.push(val);
+      }
+      emit('update:modelValue', updated);
+    }
+
+    return {
+      matches,
+      selectValue,
+    };
+  },
+});
 </script>
 
 <template>
@@ -50,7 +66,7 @@ export default class ListMultiSelect extends Vue {
     >
       <slot name="body" :opt="opt">
         <div class="row q-gutter-x-sm">
-          <ToggleButton :value="matches(opt)" dense />
+          <ToggleButton :model-value="matches(opt)" dense flat />
           <div class="self-center">
             {{ opt[optionLabel] }}
           </div>

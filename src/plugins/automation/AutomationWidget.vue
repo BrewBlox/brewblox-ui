@@ -1,15 +1,16 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
-import { createDialog } from '@/helpers/dialog';
-import { findById, shortDateString } from '@/helpers/functional';
-import router from '@/router';
+import { useContext } from '@/composables';
+import { HOST } from '@/utils/const';
+import { createDialog } from '@/utils/dialog';
+import { findById, shortDateString } from '@/utils/functional';
 
+import AutomationInfoDialog from './AutomationInfoDialog.vue';
+import AutomationJumpDialog from './AutomationJumpDialog.vue';
 import { settableStates } from './getters';
 import { automationStore } from './store';
 import {
-  AutomationConfig,
   AutomationProcess,
   AutomationStatus,
   AutomationStepResult,
@@ -25,138 +26,163 @@ interface ProcessDisplay {
   error: string | null;
 }
 
-@Component
-export default class AutomationWidget extends WidgetBase<AutomationConfig> {
-  settableStates = settableStates;
+export default defineComponent({
+  name: 'AutomationWidget',
+  setup() {
+    const { context } = useContext.setup();
 
-  get automationAvailable(): boolean {
-    return automationStore.available;
-  }
+    const automationAvailable = computed<boolean>(
+      () => automationStore.available,
+    );
 
-  get templates(): AutomationTemplate[] {
-    return automationStore.templates;
-  }
+    const templates = computed<AutomationTemplate[]>(
+      () => automationStore.templates,
+    );
 
-  get processes(): ProcessDisplay[] {
-    return automationStore.processes
-      .map(proc => {
-        const recent: AutomationStepResult[] = this.processHistory(proc);
-        return {
-          proc,
-          status: this.resultStatus(proc, recent[0]),
-          history: this.historyStatus(proc, recent),
-          tasks: automationStore.tasks.filter(v => v.processId === proc.id),
-          error: null,
-        };
+    const tasks = computed<AutomationTask[]>(
+      () => automationStore.tasks,
+    );
+
+    function processHistory(proc: AutomationProcess): AutomationStepResult[] {
+      return [...proc.results]
+        .reverse()
+        .slice(0, 10);
+    }
+
+    function resultStatus(proc: AutomationProcess, res: AutomationStepResult | undefined): string {
+      if (!res) {
+        return 'No results yet';
+      }
+      const step = proc.steps.find(v => v.id === res.stepId);
+      if (!step) {
+        return 'No associated step';
+      }
+      return `Step ${step.title} is in the ${res.phase} phase since ${shortDateString(res.date)}.`;
+    }
+
+    function historyStatus(proc: AutomationProcess, results: AutomationStepResult[]): string {
+      const stepTitle =
+        (id: string | null): string =>
+          findById(proc.steps, id)?.title ?? 'Unknown';
+      return results
+        .reverse()
+        .map(res => `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${res.phase} ${res.error ?? ''}`)
+        .join('\n');
+    }
+
+    const processes = computed<ProcessDisplay[]>(
+      () => automationStore.processes
+        .map(proc => {
+          const recent: AutomationStepResult[] = processHistory(proc);
+          return {
+            proc,
+            status: resultStatus(proc, recent[0]),
+            history: historyStatus(proc, recent),
+            tasks: automationStore.tasks.filter(v => v.processId === proc.id),
+            error: null,
+          };
+        }),
+    );
+
+    function startEditor(): void {
+      window.open(`${HOST}/automation-ui`, '_blank');
+    }
+
+    function init(template: AutomationTemplate): void {
+      automationStore.initProcess(template);
+    }
+
+    function edit(template: AutomationTemplate): void {
+      window.open(`${HOST}/automation-ui/${template.id}`, '_blank');
+    }
+
+    function show(value: AutomationTemplate | AutomationProcess): void {
+      createDialog({
+        component: AutomationInfoDialog,
+        componentProps: {
+          modelValue: value,
+          title: `Automation process '${value.title}'`,
+          message: 'A running process is not editable.',
+          initialStepId: ('results' in value)
+            ? value.results[value.results.length - 1]?.stepId
+            : null,
+        },
       });
-  }
-
-  get tasks(): AutomationTask[] {
-    return automationStore.tasks;
-  }
-
-  startEditor(): void {
-    router.push('/automation');
-  }
-
-  init(template: AutomationTemplate): void {
-    automationStore.initProcess(template);
-  }
-
-  edit(template: AutomationTemplate): void {
-    router.push(`/automation/${template.id}`);
-  }
-
-  show(value: AutomationTemplate | AutomationProcess): void {
-    createDialog({
-      component: 'AutomationInfoDialog',
-      value,
-      title: `Automation process '${value.title}'`,
-      message: 'A running process is not editable.',
-      initialStepId: ('results' in value)
-        ? value.results[value.results.length - 1]?.stepId
-        : null,
-    });
-  }
-
-  jump(proc: AutomationProcess): void {
-    const processId = proc.id;
-    createDialog({
-      component: 'AutomationJumpDialog',
-      processId,
-    })
-      .onOk(stepId => automationStore.jumpProcess({ processId, stepId }));
-  }
-
-  removeProcess(proc: AutomationProcess): void {
-    automationStore.removeProcess(proc);
-  }
-
-  quickStatusIcon(task: AutomationTask): string {
-    return task.status === 'Finished'
-      ? 'mdi-sync'
-      : 'mdi-check-all';
-  }
-
-  quickStatusValue(task: AutomationTask): AutomationStatus {
-    return task.status === 'Finished'
-      ? 'Active'
-      : 'Finished';
-  }
-
-  changeTaskStatus(task: AutomationTask, status: AutomationStatus): void {
-    if (status !== task.status) {
-      automationStore.saveTask({ ...task, status });
     }
-  }
 
-  removeTask(task: AutomationTask): void {
-    automationStore.removeTask(task);
-  }
-
-  processHistory(proc: AutomationProcess): AutomationStepResult[] {
-    return [...proc.results]
-      .reverse()
-      .slice(0, 10);
-  }
-
-  resultStatus(proc: AutomationProcess, res: AutomationStepResult | undefined): string {
-    if (!res) {
-      return 'No results yet';
+    function jump(proc: AutomationProcess): void {
+      const processId = proc.id;
+      createDialog({
+        component: AutomationJumpDialog,
+        componentProps: {
+          processId,
+        },
+      })
+        .onOk(stepId => automationStore.jumpProcess({ processId, stepId }));
     }
-    const step = proc.steps.find(v => v.id === res.stepId);
-    if (!step) {
-      return 'No associated step';
+
+    function removeProcess(proc: AutomationProcess): void {
+      automationStore.removeProcess(proc);
     }
-    return `Step ${step.title} is in the ${res.phase} phase since ${shortDateString(res.date)}.`;
-  }
 
-  historyStatus(proc: AutomationProcess, results: AutomationStepResult[]): string {
-    const stepTitle = id => findById(proc.steps, id)?.title ?? 'Unknown';
-    return results
-      .reverse()
-      .map(res => `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${res.phase} ${res.error ?? ''}`)
-      .join('\n');
-  }
+    function quickStatusIcon(task: AutomationTask): string {
+      return task.status === 'Finished'
+        ? 'mdi-sync'
+        : 'mdi-check-all';
+    }
 
-}
+    function quickStatusValue(task: AutomationTask): AutomationStatus {
+      return task.status === 'Finished'
+        ? 'Active'
+        : 'Finished';
+    }
+
+    function changeTaskStatus(task: AutomationTask, status: AutomationStatus): void {
+      if (status !== task.status) {
+        automationStore.saveTask({ ...task, status });
+      }
+    }
+
+    function removeTask(task: AutomationTask): void {
+      automationStore.removeTask(task);
+    }
+
+    return {
+      settableStates,
+      context,
+      automationAvailable,
+      templates,
+      tasks,
+      processes,
+      startEditor,
+      init,
+      edit,
+      show,
+      jump,
+      removeProcess,
+      quickStatusIcon,
+      quickStatusValue,
+      changeTaskStatus,
+      removeTask,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud">
+      <WidgetToolbar>
         <template #actions>
           <ActionItem icon="settings" label="Editor" @click="startEditor" />
         </template>
-      </component>
+      </WidgetToolbar>
     </template>
 
     <div class="widget-body column">
       <CardWarning v-if="!automationAvailable">
         <template #message>
-          The automation service is not available. <br>
-          This feature is still in preview.
+          No automation service detected.
         </template>
       </CardWarning>
       <div class="col-grow text-h6 text-secondary">
@@ -324,5 +350,5 @@ export default class AutomationWidget extends WidgetBase<AutomationConfig> {
         </q-btn>
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

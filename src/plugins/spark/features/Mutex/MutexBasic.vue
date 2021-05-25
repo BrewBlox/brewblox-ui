@@ -1,8 +1,9 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { MutexBlock, MutexedConstraint, Quantity } from '@/plugins/spark/types';
+import { durationString } from '@/utils/duration';
 
 interface MutexClient {
   id: string;
@@ -11,35 +12,46 @@ interface MutexClient {
   hasLock: boolean;
 }
 
-@Component
-export default class MutexBasic
-  extends BlockCrudComponent<MutexBlock> {
+export default defineComponent({
+  name: 'MutexBasic',
+  setup() {
+    const {
+      sparkModule,
+      block,
+    } = useBlockWidget.setup<MutexBlock>();
 
-  get mutexClients(): MutexClient[] {
-    return this.sparkModule.blocks
-      // Does the block have -any- digital constraint?
-      .filter(block => block.data.constrainedBy?.constraints[0]?.remaining)
-      .flatMap(block => {
-        // Cast to MutexedConstraint for typing reasons
-        // We haven't yet checked whether this is actually true
-        const constraints: MutexedConstraint[] = block.data.constrainedBy.constraints;
-        return constraints
-          // Is this a mutexed constraint?
-          // Is this mutexed constraint using this Mutex block?
-          .filter(c => c.mutexed?.mutexId.id === this.blockId)
-          .map(c => ({
-            id: block.id,
-            remaining: c.remaining,
-            limited: !!c.remaining.value,
-            hasLock: c.mutexed.hasLock,
-          }));
-      });
-  }
-}
+    const mutexClients = computed<MutexClient[]>(
+      () => sparkModule.blocks
+        // Does the block have -any- digital constraint?
+        .filter(b => b.data.constrainedBy?.constraints[0]?.remaining)
+        .flatMap(b => {
+          // Cast to MutexedConstraint for typing reasons
+          // We haven't yet checked whether this is actually true
+          const constraints: MutexedConstraint[] = b.data.constrainedBy.constraints;
+          return constraints
+            // Is this a mutexed constraint?
+            // Is this mutexed constraint using this Mutex block?
+            .filter(c => c.mutexed?.mutexId.id === block.value.id)
+            .map(c => ({
+              id: b.id,
+              remaining: c.remaining,
+              limited: !!c.remaining.value,
+              hasLock: c.mutexed.hasLock,
+            }));
+        }),
+    );
+
+    return {
+      durationString,
+      block,
+      mutexClients,
+    };
+  },
+});
 </script>
 
 <template>
-  <div class="widget-md">
+  <div>
     <slot name="warnings" />
 
     <div class="widget-body row items-start">
@@ -65,7 +77,7 @@ export default class MutexBasic
         label="Lock time remaining"
         class="col-grow"
       >
-        {{ block.data.waitRemaining | duration }}
+        {{ durationString(block.data.waitRemaining) }}
       </LabeledField>
     </div>
   </div>

@@ -1,29 +1,34 @@
 <script lang="ts">
-/* eslint-disable vue/attribute-hyphenation */
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-@Component
-export default class CoolingIcon extends Vue {
-  @Prop({ type: String, default: '25px' })
-  public readonly size!: string;
-
-  @Prop({ type: String, default: 'white' })
-  public readonly color!: string;
-
-  @Prop({ type: Object, default: () => ({}) })
-  public readonly svgProps!: Mapped<any>;
-}
+export default defineComponent({
+  name: 'CoolingIcon',
+  props: {
+    size: {
+      type: String,
+      default: '25px',
+    },
+    color: {
+      type: String,
+      default: 'white',
+    },
+    svgProps: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+});
 </script>
 
 <template>
-  <q-icon :size="size" class="static" v-bind="$attrs">
+  <q-icon :size="size" class="static">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="8 8 35 35"
       fill="none"
       :stroke="color"
       v-bind="svgProps"
+      stroke-width="1.5px"
     >
       <line x1="25" y1="10" x2="25" y2="40" />
       <polyline points="20.7,12 25,16.7 29.3,12" />

@@ -1,7 +1,5 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
-import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/helpers/bloxfield';
-import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import {
@@ -16,13 +14,15 @@ import {
   SetpointProfileBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { Widget } from '@/store/widgets';
+import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/utils/bloxfield';
+import { durationMs } from '@/utils/duration';
 
-import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../helpers';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
+import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';
 import { GlycolConfig, GlycolOpts } from './types';
 
 const makeGlycolBeerCoolConfig = (): PidConfig => ({
@@ -46,7 +46,7 @@ const makeGlycolConfig = (): PidConfig => ({
 export function defineChangedBlocks(config: GlycolConfig): Block[] {
   const pins = config.heated ? [config.heatPin!, config.coolPin] : [config.coolPin];
   return unlinkedActuators(config.serviceId, pins);
-};
+}
 
 export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Block[] {
   const { serviceId, names } = config;
@@ -327,7 +327,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
   const createWidget = (name: string, type: string): Widget => ({
     ...featureStore.widgetSize(type),
     dashboard: dashboardId,
-    id: uid(),
+    id: nanoid(),
     title: name,
     feature: type,
     order: 0,
@@ -397,7 +397,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     });
   }
 
-  const beerModeId = uid();
+  const beerModeId = nanoid();
   const beerTempControl: TempControlWidget = {
     ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
     cols: 4,
@@ -421,7 +421,7 @@ export function defineWidgets(config: GlycolConfig, layouts: BuilderLayout[]): W
     },
   };
 
-  const glycolModeId = uid();
+  const glycolModeId = nanoid();
   const glycolTempControl: TempControlWidget = {
     ...createWidget(withPrefix(prefix, 'Glycol'), 'TempControl'),
     cols: 4,

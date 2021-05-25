@@ -1,41 +1,64 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent, onBeforeMount, ref } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { fetchStoredBlock } from '@/plugins/spark/store/api';
 import { Block, DeprecatedObjectBlock } from '@/plugins/spark/types';
 
-@Component
-export default class DeprecatedObjectWidget
-  extends BlockWidgetBase<DeprecatedObjectBlock> {
-  actual: Block | null = null;
+export default defineComponent({
+  name: 'DeprecatedObjectWidget',
+  setup() {
+    const {
+      inDialog,
+    } = useContext.setup();
+    const {
+      serviceId,
+      widget,
+      featureTitle,
+      block,
+    } = useBlockWidget.setup<DeprecatedObjectBlock>();
 
-  async created(): Promise<void> {
-    this.actual = await fetchStoredBlock(this.serviceId, { nid: this.block.data.actualId });
-  }
+    const actual = ref<Block | null>(null);
 
-  removeBlock(): void {
-    sparkStore.removeBlock(this.block);
-  }
-}
+    onBeforeMount(async () => {
+      actual.value = await fetchStoredBlock(serviceId, { nid: block.value.data.actualId });
+    });
+
+    function removeBlock(): void {
+      sparkStore.removeBlock(block.value);
+    }
+
+    return {
+      inDialog,
+      serviceId,
+      widget,
+      featureTitle,
+      actual,
+      removeBlock,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <DialogToolbar v-if="inDialog" :title="widget.title" :subtitle="featureTitle" />
-      <WidgetToolbar v-else :crud="crud" readonly />
+      <Toolbar
+        :title="widget.title"
+        :subtitle="featureTitle"
+      />
     </template>
 
-    <div class="widget-md widget-body">
+    <div class="widget-body">
       <LabeledField
-        :value="actual ? actual.id : 'Unknown'"
+        :model-value="actual ? actual.id : 'Unknown'"
         label="ID"
         class="col-grow"
       />
       <LabeledField
-        :value="actual ? actual.type : 'Unknown'"
+        :model-value="actual ? actual.type : 'Unknown'"
         label="Type"
         class="col-grow"
       />
@@ -46,5 +69,5 @@ export default class DeprecatedObjectWidget
         @click="removeBlock"
       />
     </div>
-  </CardWrapper>
+  </Card>
 </template>

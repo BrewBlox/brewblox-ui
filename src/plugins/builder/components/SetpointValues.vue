@@ -1,131 +1,142 @@
 <script lang="ts">
-import { mdiThermometer } from '@quasar/extras/mdi-v5';
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { mdiBullseyeArrow, mdiSwapVerticalBold, mdiThermometer } from '@quasar/extras/mdi-v5';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { prettyUnit } from '@/helpers/bloxfield';
-import { contrastColor, typeMatchFilter } from '@/helpers/functional';
+import { FlowPart } from '@/plugins/builder/types';
+import { coord2grid } from '@/plugins/builder/utils';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockType, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { BlockType, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { prettyUnit } from '@/utils/bloxfield';
+import { contrastColor, round, typeMatchFilter } from '@/utils/functional';
 
-import { settingsAddress, squares } from '../helpers';
-import { PersistentPart } from '../types';
+import { useSettingsBlock } from '../composables';
 
-@Component
-export default class SetpointValues extends Vue {
-  icons: Mapped<string> = {};
-  squares = squares;
+export default defineComponent({
+  name: 'SetpointValues',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    startX: {
+      type: Number,
+      default: 0,
+    },
+    startY: {
+      type: Number,
+      default: 0,
+    },
+    hideUnset: {
+      type: Boolean,
+      default: false,
+    },
+    backgroundColor: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
+    const {
+      address,
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<SetpointSensorPairBlock>(props.part, props.settingsKey, [BlockType.SetpointSensorPair]);
 
-  @Prop({ type: Object, required: true })
-  public readonly part!: PersistentPart;
+    const textColor = computed<string>(
+      () => props.backgroundColor
+        ? contrastColor(props.backgroundColor)
+        : 'white',
+    );
 
-  @Prop({ type: String, default: 'setpoint' })
-  public readonly settingsKey!: string;
+    const sparkModule = computed<SparkServiceModule | null>(
+      () => sparkStore.moduleById(address.value.serviceId),
+    );
 
-  @Prop({ type: Number, default: 0 })
-  public readonly startX!: number;
+    const isUsed = computed<boolean>(
+      () => block.value !== null
+        && block.value.data.settingEnabled
+        && sparkModule.value!
+          .blocks
+          .filter(typeMatchFilter<PidBlock>(BlockType.Pid))
+          .some(blk => blk.data.inputId.id === address.value.id),
+    );
 
-  @Prop({ type: Number, default: 0 })
-  public readonly startY!: number;
+    const isDriven = computed<boolean>(
+      () => block.value !== null
+        && sparkModule.value!
+          .drivenBlocks
+          .includes(block.value.id),
+    );
 
-  @Prop({ type: Boolean, default: false })
-  public readonly hideUnset!: boolean;
+    const setpointSetting = computed<number | null>(
+      () => block.value && isUsed.value
+        ? block.value.data.storedSetting.value
+        : null,
+    );
 
-  @Prop({ type: String })
-  public readonly backgroundColor!: string;
+    const setpointValue = computed<number | null>(
+      () => block.value?.data.value.value ?? null,
+    );
 
-  created(): void {
-    this.icons.mdiThermometer = mdiThermometer;
-  }
+    const setpointUnit = computed<string>(
+      () => prettyUnit(block.value?.data.storedSetting),
+    );
 
-  get textColor(): string {
-    return this.backgroundColor
-      ? contrastColor(this.backgroundColor)
-      : 'white';
-  }
-
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.settingsKey);
-  }
-
-  get sparkModule(): SparkServiceModule | null {
-    return sparkStore.moduleById(this.address.serviceId);
-  }
-
-  get block(): SetpointSensorPairBlock | null {
-    return this.sparkModule?.blockById(this.address.id) ?? null;
-  }
-
-  get isBroken(): boolean {
-    return this.block == null
-      && this.address.id !== null;
-  }
-
-  get isUsed(): boolean {
-    return !!this.block
-      && this.block.data.settingEnabled
-      && this.sparkModule!
-        .blocks
-        .filter(typeMatchFilter<PidBlock>(BlockType.Pid))
-        .some(block => block.data.inputId.id === this.block!.id);
-  }
-
-  get isDriven(): boolean {
-    return !!this.block
-      && this.sparkModule!
-        .drivenBlocks
-        .includes(this.block.id);
-  }
-
-  get setpointSetting(): number | null {
-    return this.block && this.isUsed
-      ? this.block.data.storedSetting.value
-      : null;
-  }
-
-  get setpointValue(): number | null {
-    return this.block?.data.value.value ?? null;
-  }
-
-  get setpointUnit(): string {
-    return prettyUnit(this.block?.data.storedSetting);
-  }
-}
+    return {
+      mdiThermometer,
+      mdiSwapVerticalBold,
+      mdiBullseyeArrow,
+      coord2grid,
+      round,
+      textColor,
+      block,
+      isBroken,
+      isDriven,
+      setpointSetting,
+      setpointValue,
+      setpointUnit,
+    };
+  },
+});
 </script>
 
 <template>
   <g
     v-if="block || !hideUnset"
-    :transform="`translate(${squares(startX)}, ${squares(startY)})`"
+    :transform="`translate(${coord2grid(startX)}, ${coord2grid(startY)})`"
   >
     <SvgEmbedded
-      :width="squares(2)"
-      :height="squares(1)"
+      :width="coord2grid(2)"
+      :height="coord2grid(1)"
     >
       <BrokenIcon v-if="isBroken" class="col" />
       <UnlinkedIcon v-else-if="!block" class="col" />
-      <div v-else class="col column q-ma-xs">
+      <div v-else class="col column q-ma-xs" :style="{color: textColor}">
         <div class="col row q-gutter-x-xs">
           <q-icon
-            :name="icons.mdiThermometer"
+            :name="mdiThermometer"
             size="20px"
             class="static col-auto"
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ setpointValue | round(1) }}
+            {{ round(setpointValue, 1) }}
             <small>{{ setpointUnit }}</small>
           </div>
         </div>
         <div class="col row q-gutter-x-xs">
           <q-icon
-            :name="isDriven ? 'mdi-swap-vertical-bold' : 'mdi-bullseye-arrow'"
+            :name="isDriven ? mdiSwapVerticalBold : mdiBullseyeArrow"
             size="20px"
             class="static col-auto"
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ setpointSetting | round(1) }}
+            {{ round(setpointSetting, 1) }}
             <small>{{ setpointUnit }}</small>
           </div>
         </div>

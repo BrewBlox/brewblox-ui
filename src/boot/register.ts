@@ -1,5 +1,7 @@
-import { autoRegister } from '@/helpers/component-ref';
+import { boot } from 'quasar/wrappers';
 
-export default (): void => {
-  autoRegister(require.context('../components', true));
-};
+import { autoRegister } from '@/utils/component-ref';
+
+export default boot(({ app }) => {
+  autoRegister(app, require.context('../components', true));
+});

@@ -1,63 +1,91 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { Crud, featureStore, WidgetContext, WidgetMode } from '@/store/features';
+import { useDialog, useGlobals } from '@/composables';
+import { ComponentResult, featureStore, WidgetContext, WidgetMode } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
 
-@Component
-export default class WidgetDialog extends DialogBase {
+export default defineComponent({
+  name: 'WidgetDialog',
+  props: {
+    ...useDialog.props,
+    widgetId: {
+      type: String,
+      required: true,
+    },
+    mode: {
+      type: String as PropType<WidgetMode>,
+      default: 'Full',
+    },
+    getProps: {
+      type: Function as PropType<() => AnyDict>,
+      default: () => ({}),
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+    } = useDialog.setup();
+    const {
+      dense,
+    } = useGlobals.setup();
 
-  // Objects directly passed into a dialog lose their reactivity
-  // We can bypass this by passing a function that returns a reactive object
-  @Prop({ type: Function, required: true })
-  public readonly getCrud!: () => Crud;
+    const widget = computed<Widget | null>(
+      () => widgetStore.widgetById(props.widgetId),
+    );
 
-  @Prop({ type: String, default: 'Full' })
-  public readonly mode!: WidgetMode;
+    const context = computed<WidgetContext>(
+      () => ({
+        container: 'Dialog',
+        mode: props.mode,
+        size: 'Fixed',
+      }),
+    );
 
-  @Prop({ type: Function, default: () => null })
-  public readonly getProps!: () => any;
+    const widgetComponent = computed<ComponentResult | null>(
+      () => widget.value === null
+        ? null
+        : featureStore.widgetComponent(widget.value),
+    );
 
-  @Prop({ type: Object, default: () => ({}) })
-  public readonly listeners!: any;
+    const widgetProps = computed<AnyDict>(
+      () => props.getProps() ?? {},
+    );
 
-  get context(): WidgetContext {
     return {
-      mode: this.mode,
-      container: 'Dialog',
-      size: 'Fixed',
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      dense,
+      context,
+      widgetComponent,
+      widgetProps,
     };
-  }
-
-  get crud(): Crud {
-    return this.getCrud();
-  }
-
-  get widgetProps(): any {
-    return this.getProps() || {};
-  }
-
-  get widgetComponent(): string {
-    return featureStore.widgetComponent(this.crud).component;
-  }
-}
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
-    transition-show="fade"
-    :maximized="$dense"
+    ref="dialogRef"
+    :maximized="dense"
     v-bind="dialogProps"
+    class="row"
     @hide="onDialogHide"
   >
-    <component
-      :is="widgetComponent"
-      :initial-crud="crud"
-      :context="context"
-      v-bind="widgetProps"
-      v-on="listeners"
-      @close="hide"
-    />
+    <WidgetProvider :widget-id="widgetId" :context="context">
+      <component
+        :is="widgetComponent.component"
+        v-if="widgetComponent"
+        :error="widgetComponent.error"
+        v-bind="widgetProps"
+        @close="onDialogHide"
+      />
+    </WidgetProvider>
   </q-dialog>
 </template>

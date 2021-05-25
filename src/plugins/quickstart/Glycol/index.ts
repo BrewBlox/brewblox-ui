@@ -1,21 +1,31 @@
-import { ref } from '@/helpers/component-ref';
-import { QuickStartFeature } from '@/store/features';
+import { Plugin } from 'vue';
 
+import { featureStore, QuickstartFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+
+import GlycolCompletionTask from './GlycolCompletionTask.vue';
 import GlycolHardwareTask from './GlycolHardwareTask.vue';
-import GlycolManualTask from './GlycolManualTask.vue';
 import GlycolNamingTask from './GlycolNamingTask.vue';
 import GlycolSettingsTask from './GlycolSettingsTask.vue';
-import GlycolWizard from './GlycolWizard.vue';
 
-ref(GlycolNamingTask);
-ref(GlycolHardwareTask);
-ref(GlycolSettingsTask);
-ref(GlycolManualTask);
+const plugin: Plugin = {
+  install(app) {
 
-const feature: QuickStartFeature = {
-  id: 'Glycol',
-  title: 'Glycol-cooled fermenter',
-  component: ref(GlycolWizard),
+    const feature: QuickstartFeature = {
+      id: 'Glycol',
+      title: 'Glycol-cooled fermenter',
+      tasks: [
+        'QuickstartServiceTask',
+        'QuickstartDiscoveryTask',
+        cref(app, GlycolNamingTask),
+        cref(app, GlycolHardwareTask),
+        cref(app, GlycolSettingsTask),
+        cref(app, GlycolCompletionTask),
+      ],
+    };
+
+    featureStore.addQuickstartFeature(feature);
+  },
 };
 
-export default feature;
+export default plugin;

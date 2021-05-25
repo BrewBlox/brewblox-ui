@@ -1,15 +1,16 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import { featureStore, WatcherFeature } from '@/store/features';
+import { featureStore } from '@/store/features';
 
-@Component
-export default class Watchers extends Vue {
-  get watchers(): WatcherFeature[] {
-    return featureStore.watchers;
-  }
-}
+export default defineComponent({
+  name: 'Watchers',
+  computed: {
+    watchers() {
+      return featureStore.watchers;
+    },
+  },
+});
 </script>
 
 <template>

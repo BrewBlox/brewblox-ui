@@ -1,6 +1,6 @@
-import { JSQuantity } from '@/helpers/bloxfield';
+import { JSQuantity } from '@/utils/bloxfield';
 
-import { PinChannel, QuickStartOutput } from '../types';
+import { PinChannel, QuickstartConfig } from '../types';
 
 export interface HermsBlockNames {
   hltSensor: string;
@@ -24,8 +24,7 @@ export interface HermsBlockNames {
   balancer: string;
 }
 
-export interface HermsConfig extends QuickStartOutput {
-  prefix: string;
+export interface HermsConfig extends QuickstartConfig {
   names: HermsBlockNames;
   hltPin: PinChannel;
   bkPin: PinChannel;

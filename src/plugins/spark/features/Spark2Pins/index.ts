@@ -1,36 +1,44 @@
-import { genericBlockFeature } from '@/plugins/spark/generic';
-import { blockWidgetSelector } from '@/plugins/spark/helpers';
+import { Plugin } from 'vue';
+
+import { systemBlockFeature } from '@/plugins/spark/generic';
+import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, Spark2Hardware, Spark2PinsBlock } from '@/plugins/spark/types';
-import { WidgetFeature } from '@/store/features';
+import { blockWidgetSelector } from '@/plugins/spark/utils';
+import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './Spark2PinsWidget.vue';
 
 const typeName = BlockType.Spark2Pins;
 
-const block: BlockSpec<Spark2PinsBlock> = {
-  id: typeName,
-  systemObject: true,
-  generate: () => ({
-    pins: [],
-    soundAlarm: false,
-    hardware: Spark2Hardware.HW_UNKNOWN,
-  }),
-  fields: [],
-};
+const plugin: Plugin = {
+  install(app) {
 
-const feature: WidgetFeature = {
-  ...genericBlockFeature,
-  id: typeName,
-  title: 'Spark 2 Pins',
-  role: 'Output',
-  component: blockWidgetSelector(widget, typeName),
-  widgetSize: {
-    cols: 4,
-    rows: 4,
+    const spec: BlockSpec<Spark2PinsBlock> = {
+      id: typeName,
+      systemObject: true,
+      generate: () => ({
+        pins: [],
+        soundAlarm: false,
+        hardware: Spark2Hardware.HW_UNKNOWN,
+      }),
+      fields: [],
+    };
+
+    const feature: WidgetFeature = {
+      ...systemBlockFeature,
+      id: typeName,
+      title: 'Spark 2 Pins',
+      role: 'Output',
+      component: blockWidgetSelector(app, widget, typeName),
+      widgetSize: {
+        cols: 4,
+        rows: 4,
+      },
+    };
+
+    sparkStore.addBlockSpec(spec);
+    featureStore.addWidgetFeature(feature);
   },
-  // System objects can't be created or deleted
-  wizard: false,
-  removeActions: undefined,
 };
 
-export default { feature, block };
+export default plugin;

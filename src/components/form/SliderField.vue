@@ -1,71 +1,96 @@
 <script lang="ts">
-import { Component, Emit, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { createDialog } from '@/helpers/dialog';
-import { round } from '@/helpers/functional';
+import { useField } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { round } from '@/utils/functional';
 
+export default defineComponent({
+  name: 'SliderField',
+  props: {
+    ...useField.props,
+    modelValue: {
+      type: Number,
+      default: 0,
+    },
+    tagClass: {
+      type: [String, Array, Object],
+      default: '',
+    },
+    label: {
+      type: String,
+      default: 'value',
+    },
+    suffix: {
+      type: String,
+      default: '',
+    },
+    min: {
+      type: Number,
+      default: 0,
+    },
+    max: {
+      type: Number,
+      default: 100,
+    },
+    step: {
+      type: Number,
+      default: 1,
+    },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+    quickActions: {
+      type: Array as PropType<SelectOption[]>,
+      default: () => [],
+    },
 
-@Component
-export default class SliderField extends FieldBase {
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-  @Prop({ type: Number })
-  public readonly value!: number;
-
-  @Prop({ type: [Object, Array, String], default: '' })
-  public readonly tagClass!: any;
-
-  @Prop({ type: String, default: 'value' })
-  public readonly label!: string;
-
-  @Prop({ type: String, required: false })
-  public readonly suffix!: string;
-
-  @Prop({ type: Number, default: 0 })
-  public readonly min!: number;
-
-  @Prop({ type: Number, default: 100 })
-  public readonly max!: number;
-
-  @Prop({ type: Number, default: 1 })
-  public readonly step!: number;
-
-  @Prop({ type: Number, default: 2 })
-  readonly decimals!: number;
-
-  @Prop({ type: Array, default: () => [] })
-  public readonly quickActions!: SelectOption[];
-
-  @Emit('input')
-  public change(v: number): number {
-    return v;
-  }
-
-  get displayValue(): string | number {
-    return round(this.value, this.decimals);
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function change(v: number): void {
+      emit('update:modelValue', v);
     }
 
-    createDialog({
-      component: 'SliderDialog',
-      title: this.title,
-      label: this.label,
-      message: this.message,
-      html: this.html,
-      value: this.value,
-      decimals: this.decimals,
-      min: this.min,
-      max: this.max,
-      step: this.step,
-      quickActions: this.quickActions,
-    })
-      .onOk(this.change);
-  }
-}
+    const displayValue = computed<string>(
+      () => round(props.modelValue, props.decimals),
+    );
+
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+
+      createDialog({
+        component: 'SliderDialog',
+        componentProps: {
+          modelValue: props.modelValue,
+          title: props.title,
+          label: props.label,
+          message: props.message,
+          html: props.html,
+          decimals: props.decimals,
+          min: props.min,
+          max: props.max,
+          step: props.step,
+          quickActions: props.quickActions,
+        },
+      })
+        .onOk(change);
+    }
+
+    return {
+      activeSlots,
+      displayValue,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
@@ -73,5 +98,9 @@ export default class SliderField extends FieldBase {
     <slot name="value">
       {{ displayValue }}
     </slot>
+
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
+    </template>
   </LabeledField>
 </template>

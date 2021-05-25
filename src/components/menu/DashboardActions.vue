@@ -1,64 +1,83 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
-import { startChangeDashboardId, startChangeDashboardTitle, startRemoveDashboard } from '@/helpers/dashboards';
-import { createDialog } from '@/helpers/dialog';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
+import {
+  startChangeDashboardId,
+  startChangeDashboardTitle,
+  startRemoveDashboard,
+} from '@/utils/dashboards';
+import { createDialog } from '@/utils/dialog';
 
+export default defineComponent({
+  name: 'DashboardActions',
+  props: {
+    dashboardId: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
+    const router = useRouter();
 
-@Component
-export default class DashboardActions extends Vue {
+    const dashboard = computed<Dashboard | null>(
+      () => dashboardStore.dashboardById(props.dashboardId),
+    );
 
-  @Prop({ type: String, required: true })
-  public readonly dashboardId!: string;
+    const title = computed<string>(
+      () => dashboard.value?.title ?? props.dashboardId,
+    );
 
-  get dashboard(): Dashboard | null {
-    return dashboardStore.dashboardById(this.dashboardId);
-  }
+    const isHomePage = computed<boolean>(
+      () => systemStore.config.homePage === `/dashboard/${props.dashboardId}`,
+    );
 
-  get title(): string {
-    return this.dashboard?.title ?? this.dashboardId;
-  }
-
-  get isHomePage(): boolean {
-    return systemStore.config.homePage === `/dashboard/${this.dashboard?.id}`;
-  }
-
-  set isHomePage(v: boolean) {
-    const homePage = v && this.dashboard ? `/dashboard/${this.dashboard.id}` : null;
-    systemStore.saveConfig({ homePage });
-  }
-
-  showWizard(): void {
-    createDialog({
-      component: 'WizardDialog',
-      initialWizard: 'WidgetWizardPicker',
-      activeDashboardId: this.dashboardId,
-    });
-  }
-
-  onIdChanged(oldId: string, newId: string): void {
-    if (newId && this.$route.path === `/dashboard/${oldId}`) {
-      this.$router.replace(`/dashboard/${newId}`);
+    function showWizard(): void {
+      createDialog({
+        component: 'WizardDialog',
+        componentProps: {
+          initialWizard: 'WidgetWizardPicker',
+          activeDashboardId: props.dashboardId,
+        },
+      });
     }
-  }
 
-  changeDashboardId(dashboard: Dashboard): void {
-    const oldId = dashboard.id;
-    startChangeDashboardId(dashboard, newId => this.onIdChanged(oldId, newId));
-  }
+    function onIdChanged(oldId: string, newId: string): void {
+      if (newId && router.currentRoute.value.path === `/dashboard/${oldId}`) {
+        router.replace(`/dashboard/${newId}`);
+      }
+    }
 
-  changeDashboardTitle(dashboard: Dashboard): void {
-    const oldId = dashboard.id;
-    startChangeDashboardTitle(dashboard, newId => this.onIdChanged(oldId, newId));
-  }
+    function changeDashboardId(): void {
+      if (!dashboard.value) { return; }
+      const oldId = props.dashboardId;
+      startChangeDashboardId(dashboard.value, newId => onIdChanged(oldId, newId));
+    }
 
-  removeDashboard(dashboard: Dashboard): void {
-    startRemoveDashboard(dashboard);
-  }
-}
+    function changeDashboardTitle(): void {
+      if (!dashboard.value) { return; }
+      const oldId = props.dashboardId;
+      startChangeDashboardTitle(dashboard.value, newId => onIdChanged(oldId, newId));
+    }
+
+    function removeDashboard(): void {
+      if (!dashboard.value) { return; }
+      startRemoveDashboard(dashboard.value);
+    }
+
+    return {
+      dashboard,
+      title,
+      isHomePage,
+      showWizard,
+      changeDashboardId,
+      changeDashboardTitle,
+      removeDashboard,
+    };
+  },
+});
 </script>
 
 <template>
@@ -77,17 +96,17 @@ export default class DashboardActions extends Vue {
       <ActionItem
         icon="edit"
         label="Change dashboard URL"
-        @click="changeDashboardId(dashboard)"
+        @click="changeDashboardId"
       />
       <ActionItem
         icon="edit"
         label="Rename dashboard"
-        @click="changeDashboardTitle(dashboard)"
+        @click="changeDashboardTitle"
       />
       <ActionItem
         icon="delete"
         label="Remove dashboard"
-        @click="removeDashboard(dashboard)"
+        @click="removeDashboard"
       />
     </template>
   </ActionSubmenu>

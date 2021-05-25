@@ -1,75 +1,90 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import FieldBase from '@/components/FieldBase';
-import { bloxQty, isQuantity } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
-import { durationString, isDurationString } from '@/helpers/duration';
+import { useField } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
+import { bloxQty, isQuantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { durationString, isDurationString } from '@/utils/duration';
 
-@Component
-export default class DurationField extends FieldBase {
+function modelValidator(v: unknown): boolean {
+  return isQuantity(v) || isDurationString(v);
+}
 
-  // Duration can be:
-  // - Quantity -> bloxQty(10, 'min')
-  // - duration string -> '10m'
-  // @input events emitted will match type of value
-  // If input is undefined, type is assumed to be string
-  @Prop({
-    type: [Object, String],
-    required: false,
-    validator: v => isQuantity(v) || isDurationString(v),
-  })
-  public readonly value!: Quantity | string | undefined;
+export default defineComponent({
+  name: 'DurationField',
+  props: {
+    ...useField.props,
+    // Duration can be:
+    // - Quantity -> bloxQty(10, 'min')
+    // - duration string -> '10m'
+    // update:modelValue events emitted will match type of value
+    // If modelValue is undefined, type is assumed to be string
+    modelValue: {
+      type: [Object, String] as PropType<Quantity | string>,
+      validator: modelValidator,
+      default: null,
+    },
+    label: {
+      type: String,
+      default: 'duration',
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props, { emit }) {
+    const { activeSlots } = useField.setup();
 
-  @Prop({ type: String, default: 'duration' })
-  public readonly label!: string;
+    const isQtyValue = computed<boolean>(
+      () => isQuantity(props.modelValue),
+    );
 
-  get isQtyValue(): boolean {
-    return isQuantity(this.value);
-  }
+    const displayValue = computed<string>(
+      () => durationString(props.modelValue),
+    );
 
-  public save(v: Quantity): void {
-    const matching = this.isQtyValue
-      ? v
-      : durationString(v);
-    this.$emit('input', matching);
-  }
-
-  openDialog(): void {
-    if (this.readonly) {
-      return;
+    function save(v: Quantity): void {
+      const outputValue = isQtyValue.value ? v : durationString(v);
+      emit('update:modelValue', outputValue);
     }
 
-    createDialog({
-      component: 'DurationQuantityDialog',
-      title: this.title,
-      message: this.message,
-      html: this.html,
-      value: bloxQty(this.value ?? ''),
-      label: this.label,
-      rules: this.rules,
-    })
-      .onOk(this.save);
-  }
+    function openDialog(): void {
+      if (props.readonly) {
+        return;
+      }
+      createDialog({
+        component: 'DurationQuantityDialog',
+        componentProps: {
+          modelValue: bloxQty(props.modelValue ?? ''),
+          title: props.title,
+          message: props.message,
+          html: props.html,
+          label: props.label,
+          rules: props.rules,
+        },
+      })
+        .onOk(save);
+    }
 
-  // Can't be placed in parent class
-  get activeSlots(): string[] {
-    return this.fieldSlots.filter(s => !!this.$slots[s]);
-  }
-}
+    return {
+      activeSlots,
+      isQtyValue,
+      displayValue,
+      save,
+      openDialog,
+    };
+  },
+});
 </script>
 
 <template>
   <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
     <slot name="value">
-      {{ value | duration }}
+      {{ displayValue }}
     </slot>
-
-    <template v-for="slot in activeSlots">
-      <template :slot="slot">
-        <slot :name="slot" />
-      </template>
+    <template v-for="slot in activeSlots" #[slot] :name="slot">
+      <slot :name="slot" />
     </template>
   </LabeledField>
 </template>

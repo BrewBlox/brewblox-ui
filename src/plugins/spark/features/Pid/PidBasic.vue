@@ -1,85 +1,109 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createBlockDialog, createDialog } from '@/helpers/dialog';
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { isBlockDriven } from '@/plugins/spark/helpers';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { isBlockDriven } from '@/plugins/spark/utils';
+import { prettyQty } from '@/utils/bloxfield';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { round } from '@/utils/functional';
 
-@Component
-export default class PidBasic
-  extends BlockCrudComponent<PidBlock> {
+export default defineComponent({
+  name: 'PidBasic',
+  setup() {
+    const {
+      sparkModule,
+      blockId,
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<PidBlock>();
 
-  get inputBlock(): SetpointSensorPairBlock | null {
-    return this.sparkModule.blockById(this.block.data.inputId.id);
-  }
+    const inputBlock = computed<SetpointSensorPairBlock | null>(
+      () => sparkModule.blockByLink(block.value.data.inputId),
+    );
 
-  get inputDriven(): boolean {
-    return isBlockDriven(this.inputBlock);
-  }
+    const inputDriven = computed<boolean>(
+      () => isBlockDriven(inputBlock.value),
+    );
 
-  get outputBlock(): Block | null {
-    return this.sparkModule.blockById(this.block.data.outputId.id);
-  }
+    const outputBlock = computed<Block | null>(
+      () => sparkModule.blockByLink(block.value.data.outputId),
+    );
 
-  get kp(): number | null {
-    return this.block.data.kp.value;
-  }
+    const kp = computed<number | null>(
+      () => block.value.data.kp.value,
+    );
 
-  fit(v: number): number {
-    return Math.min(v, 100);
-  }
-
-  enable(): void {
-    this.block.data.enabled = true;
-    this.saveBlock();
-  }
-
-  showInput(): void {
-    createBlockDialog(this.inputBlock);
-  }
-
-  editInput(): void {
-    if (!this.inputBlock) return;
-
-    const id = this.inputBlock.id;
-
-    if (this.sparkModule.drivenBlocks.includes(id)) {
-      const driveChain = this.sparkModule
-        .drivenChains
-        .find(chain => chain[0] === this.inputBlock?.id);
-
-      const actual = driveChain !== undefined
-        ? this.sparkModule.blockById(driveChain[driveChain.length - 1])
-        : this.inputBlock;
-
-      this.showOtherBlock(actual);
+    function fit(v: number): number {
+      return Math.min(v, 100);
     }
-    else {
-      createDialog({
-        component: 'QuantityDialog',
-        title: 'Edit setting',
-        message: `Edit ${id} setting`,
-        value: this.inputBlock.data.storedSetting,
-        label: 'Setting',
-      })
-        .onOk(value => {
-          if (this.inputBlock) {
-            this.inputBlock.data.storedSetting = value;
-            this.saveStoreBlock(this.inputBlock);
-          }
+
+    function enable(): void {
+      block.value.data.enabled = true;
+      saveBlock();
+    }
+
+    function showInput(): void {
+      createBlockDialog(inputBlock.value);
+    }
+
+    function editInput(): void {
+      if (!inputBlock.value) { return; }
+
+      const setpointId = inputBlock.value.id;
+
+      if (sparkModule.drivenBlocks.includes(setpointId)) {
+        const driveChain = sparkModule
+          .drivenChains
+          .find(chain => chain[0] === setpointId);
+
+        const actual = driveChain !== undefined
+          ? sparkModule.blockById(driveChain[driveChain.length - 1])
+          : inputBlock.value;
+
+        createBlockDialog(actual);
+      }
+      else {
+        createDialog({
+          component: 'SetpointSettingDialog',
+          componentProps: {
+            title: 'Edit Setpoint',
+            message: `
+            Edit settings for the PID Setpoint. <br>
+            <i>${blockId}</i> and actuators will be inactive if <i>${setpointId}</i> is disabled.
+            `,
+            html: true,
+            address: inputBlock.value,
+          },
         });
+      }
     }
-  }
 
-  showOutput(): void {
-    createBlockDialog(this.outputBlock);
-  }
-}
+    function showOutput(): void {
+      createBlockDialog(outputBlock.value);
+    }
+
+    return {
+      prettyQty,
+      round,
+      block,
+      saveBlock,
+      inputBlock,
+      inputDriven,
+      outputBlock,
+      kp,
+      fit,
+      enable,
+      showInput,
+      editInput,
+      showOutput,
+    };
+  },
+});
 </script>
 
 <template>
-  <div class="widget-md q-mx-auto">
+  <div>
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
@@ -91,10 +115,10 @@ export default class PidBasic
           <q-icon name="mdi-thermometer" color="green-3" />
         </template>
         <template #value>
-          {{ block.data.inputValue | quantity }}
+          {{ prettyQty(block.data.inputValue) }}
         </template>
         <template #setting>
-          {{ block.data.inputSetting | quantity }}
+          {{ prettyQty(block.data.inputSetting) }}
         </template>
       </SettingValueField>
       <SettingValueField editable class="col-grow" @click="showOutput">
@@ -118,10 +142,10 @@ export default class PidBasic
           />
         </template>
         <template #value>
-          {{ block.data.outputValue | round }} %
+          {{ round(block.data.outputValue) }} %
         </template>
         <template #setting>
-          {{ block.data.outputSetting | round }} %
+          {{ round(block.data.outputSetting) }} %
         </template>
       </SettingValueField>
 
@@ -132,7 +156,7 @@ export default class PidBasic
           P
         </div>
         <q-slider
-          :value="fit(block.data.p)"
+          :model-value="fit(block.data.p)"
           readonly
           class="col-grow"
           thumb-path=""
@@ -142,7 +166,7 @@ export default class PidBasic
           I
         </div>
         <q-slider
-          :value="fit(block.data.i)"
+          :model-value="fit(block.data.i)"
           :max="100"
           readonly
           class="col-grow"
@@ -153,7 +177,7 @@ export default class PidBasic
           D
         </div>
         <q-slider
-          :value="fit(block.data.d)"
+          :model-value="fit(block.data.d)"
           :max="100"
           readonly
           class="col-grow"

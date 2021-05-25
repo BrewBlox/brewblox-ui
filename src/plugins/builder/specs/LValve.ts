@@ -1,12 +1,13 @@
+import { LEFT, RIGHT, UP } from '@/plugins/builder/const';
+import { PartSpec, PersistentPart, Transitions } from '@/plugins/builder/types';
+import { settingsBlock } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, DigitalActuatorBlock, DigitalState, MotorValveBlock } from '@/plugins/spark/types';
 
-import { LEFT, RIGHT, UP } from '../getters';
-import { settingsBlock } from '../helpers';
-import { PartSpec, PartUpdater, PersistentPart, Transitions } from '../types';
+export type ValveT = DigitalActuatorBlock | MotorValveBlock;
 
-type BlockT = DigitalActuatorBlock | MotorValveBlock;
-const addressKey = 'valve';
+export const VALVE_KEY = 'valve';
+export const VALVE_TYPES = [BlockType.MotorValve, BlockType.DigitalActuator];
 
 const spec: PartSpec = {
   id: 'LValve',
@@ -15,13 +16,13 @@ const spec: PartSpec = {
   cards: [{
     component: 'BlockAddressCard',
     props: {
-      settingsKey: addressKey,
-      compatible: [BlockType.MotorValve, BlockType.DigitalActuator],
+      settingsKey: VALVE_KEY,
+      compatible: VALVE_TYPES,
       label: 'Valve or Actuator',
     },
   }],
   transitions: (part: PersistentPart): Transitions => {
-    const block = settingsBlock<BlockT>(part, addressKey);
+    const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
     const closed = block !== null
       ? Boolean(block.data.state === DigitalState.STATE_ACTIVE)
       : Boolean(part.settings.closed);
@@ -35,8 +36,8 @@ const spec: PartSpec = {
         [RIGHT]: [{ outCoords: UP }],
       };
   },
-  interactHandler: (part: PersistentPart, updater: PartUpdater) => {
-    const block = settingsBlock<BlockT>(part, addressKey);
+  interactHandler: (part: PersistentPart, { savePart }) => {
+    const block = settingsBlock<ValveT>(part, VALVE_KEY, VALVE_TYPES);
     if (block) {
       block.data.desiredState =
         block.data.state === DigitalState.STATE_ACTIVE
@@ -46,7 +47,7 @@ const spec: PartSpec = {
     }
     else {
       part.settings.closed = !part.settings.closed;
-      updater.updatePart(part);
+      savePart(part);
     }
   },
 };

@@ -1,92 +1,144 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import isEmpty from 'lodash/isEmpty';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, onBeforeMount } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
-import { createDialog } from '@/helpers/dialog';
+import { useContext, useWidget } from '@/composables';
 import { deserialize } from '@/plugins/spark/parse-object';
+import { TempUnit } from '@/shared-types';
+import { systemStore } from '@/store/system';
+import { bloxQty, isQuantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';
-import { ChangeAction, QuickActionsConfig } from './types';
+import { ChangeAction, QuickActionsWidget } from './types';
 
-@Component({
+export default defineComponent({
+  name: 'QuickActionsWidget',
   components: {
     Basic: QuickActionsBasic,
     Full: QuickActionsFull,
   },
-})
-export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
-  @Prop({ type: String, required: false })
-  public readonly activeId!: string;
+  props: {
+    activeId: {
+      type: String,
+      default: null,
+    },
+  },
+  setup() {
+    const { context } = useContext.setup();
+    const {
+      config,
+      saveConfig,
+    } = useWidget.setup<QuickActionsWidget>();
 
-  get actions(): ChangeAction[] {
-    return deserialize(this.config.actions ?? this.config.steps);
-  }
+    const systemTemp = computed<TempUnit>(
+      () => systemStore.units.temperature,
+    );
 
-  saveActions(actions: ChangeAction[] = this.actions): void {
-    this.config.actions = actions;
-    this.config.steps = undefined;
-    this.saveConfig();
-  }
+    const otherTemp = computed<TempUnit>(
+      () => systemTemp.value === 'degC' ? 'degF' : 'degC',
+    );
 
-  created(): void {
-    let dirty = false;
-    // Change IDs were added after initial release
-    this.actions.forEach(action =>
-      action.changes
-        .filter(change => change.id === undefined)
-        .forEach(change => {
-          change.id = uid();
-          dirty = true;
-        }));
-    // Service IDs became a key of individual changes
-    this.actions.forEach(action =>
-      action.changes
-        .filter(change => change.serviceId === undefined)
-        .forEach(change => {
-          change.serviceId = this.config.serviceId!;
-          dirty = true;
-        }));
-    // Config field was renamed to 'actions'
-    dirty = dirty || !!this.config.steps;
-    // Save if dirty
-    if (dirty) {
-      this.config.serviceIdMigrated = true;
-      this.config.changeIdMigrated = true;
-      this.saveActions();
+    const actions = computed<ChangeAction[]>(
+      () => deserialize(config.value.actions ?? config.value.steps),
+    );
+
+    function saveActions(acs: ChangeAction[] = actions.value): void {
+      config.value.actions = acs;
+      config.value.steps = undefined;
+      saveConfig();
     }
-  }
 
-  addAction(): void {
-    createDialog({
-      component: 'InputDialog',
-      title: 'Add an action',
-      message: 'Actions let you immediately set multiple block fields to predetermined values.',
-      value: 'New action',
-    })
-      .onOk(name => {
-        this.actions.push({ name, id: uid(), changes: [] });
-        this.saveActions();
-      });
-  }
-}
+    onBeforeMount(() => {
+      let dirty = false;
+
+      // Change IDs were added after initial release
+      actions.value.forEach(action =>
+        action.changes
+          .filter(change => change.id === undefined)
+          .forEach(change => {
+            change.id = nanoid();
+            dirty = true;
+          }));
+
+      // Service IDs became a key of individual changes
+      actions.value.forEach(action =>
+        action.changes
+          .filter(change => change.serviceId === undefined)
+          .forEach(change => {
+            change.serviceId = config.value.serviceId!;
+            dirty = true;
+          }));
+
+      // 'steps' field was renamed to 'actions'
+      dirty = dirty || config.value.steps !== undefined;
+
+      // Convert units if user changed system temperature
+      actions.value.forEach(action =>
+        action.changes.forEach(change => {
+          const updates: AnyDict = {};
+          for (let key in change.data) {
+            const value = change.data[key];
+            if (isQuantity(value) && value.unit.includes(otherTemp.value)) {
+              updates[key] = bloxQty(value).to(value.unit.replace(otherTemp.value, systemTemp.value));
+            }
+          }
+          if (!isEmpty(updates)) {
+            dirty = true;
+            change.data = {
+              ...change.data,
+              ...updates,
+            };
+          }
+        }),
+      );
+
+      // Save if dirty
+      if (dirty) {
+        config.value.serviceIdMigrated = true;
+        config.value.changeIdMigrated = true;
+        saveActions();
+      }
+    });
+
+    function addAction(): void {
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          title: 'Add an action',
+          message: 'Actions let you immediately set multiple block fields to predetermined values.',
+          modelValue: 'New action',
+        },
+      })
+        .onOk(name => {
+          actions.value.push({ name, id: nanoid(), changes: [] });
+          saveActions();
+        });
+    }
+
+    return {
+      context,
+      actions,
+      addAction,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper
-    v-bind="{context}"
-  >
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <WidgetToolbar has-mode-toggle>
         <template #menus>
-          <WidgetActions :crud="crud">
-            <ExportAction :crud="crud" />
+          <WidgetActions>
+            <ExportAction />
           </WidgetActions>
         </template>
-      </component>
+      </WidgetToolbar>
     </template>
-    <component :is="mode" :crud="crud" :active-id="activeId">
+    <component :is="context.mode" :active-id="activeId">
       <template v-if="actions.length === 0" #warnings>
         <div class="text-italic text-h6 q-pa-md darkened text-center">
           Create an action to get started.
@@ -104,5 +156,5 @@ export default class QuickActionsWidget extends WidgetBase<QuickActionsConfig> {
         />
       </template>
     </component>
-  </CardWrapper>
+  </Card>
 </template>

@@ -1,41 +1,54 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
+export default defineComponent({
+  name: 'ToggleAction',
+  props: {
+    modelValue: {
+      type: Boolean,
+      required: true,
+    },
+    colored: {
+      type: Boolean,
+      default: true,
+    },
+    iconEnabled: {
+      type: String,
+      default: 'mdi-checkbox-marked-outline',
+    },
+    iconDisabled: {
+      type: String,
+      default: 'mdi-checkbox-blank-outline',
+    },
+  },
+  emits: [
+    'update:modelValue',
+  ],
+  setup(props) {
+    const icon = computed<string>(
+      () => props.modelValue
+        ? props.iconEnabled
+        : props.iconDisabled,
+    );
 
-@Component
-export default class ToggleAction extends Vue {
+    const color = computed<string>(
+      () => props.modelValue
+        ? 'primary'
+        : 'white',
+    );
 
-  @Prop({ type: Boolean, required: true })
-  public readonly value!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly colored!: boolean;
-
-  @Prop({ type: String, default: 'mdi-checkbox-marked-outline' })
-  public readonly iconEnabled!: string;
-
-  @Prop({ type: String, default: 'mdi-checkbox-blank-outline' })
-  public readonly iconDisabled!: string;
-
-  get icon(): string {
-    return this.value
-      ? this.iconEnabled
-      : this.iconDisabled;
-  }
-
-  get color(): string {
-    return this.value
-      ? 'primary'
-      : 'white';
-  }
-}
+    return {
+      icon,
+      color,
+    };
+  },
+});
 </script>
 
 <template>
   <ActionItem
-    v-bind="{icon, ...$attrs}"
+    :icon="icon"
     :class="colored && `text-${color}`"
-    @click="$emit('input', !value)"
+    @click="$emit('update:modelValue', !modelValue)"
   />
 </template>

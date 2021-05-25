@@ -1,45 +1,94 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-@Component
-export default class Toolbar extends Vue {
+import { getNumDialogs } from '@/utils/dialog';
 
-  @Prop({ type: String, required: false })
-  public readonly icon!: string;
+export default defineComponent({
+  name: 'Toolbar',
+  props: {
+    icon: {
+      type: String,
+      default: '',
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    subtitle: {
+      type: String,
+      default: '',
+    },
+    changeTitleFn: {
+      type: Function,
+      default: null,
+    },
+  },
+  emits: [
+    'close',
+  ],
+  setup() {
+    const toolbarRef = ref<Element>();
 
-  @Prop({ type: String, required: true })
-  readonly title!: string;
+    // We can't use WidgetContext here: this component is also used by non-widgets.
+    // We'll assume that if any parent is a q-dialog, this is a dialog toolbar.
+    // This will break if we have a dialog with a nested component with toolbar.
+    const inDialog = computed<boolean>(
+      () => toolbarRef.value?.closest('.q-dialog') != null,
+    );
 
-  @Prop({ type: String, required: false })
-  readonly subtitle!: string;
+    const numDialogs = computed<number>(
+      () => getNumDialogs(),
+    );
 
-  get readonly(): boolean {
-    return this.$listeners['title-click'] === undefined;
-  }
-}
+    return {
+      toolbarRef,
+      inDialog,
+      numDialogs,
+    };
+  },
+});
 </script>
 
 <template>
-  <div class="row no-wrap full-height items-center">
-    <q-icon v-if="icon" :name="icon" class="col-auto self-center q-px-sm" size="sm" />
-    <div class="col no-wrap row ellipsis q-px-xs text-h6 items-center">
+  <div
+    ref="toolbarRef"
+    class="row no-wrap full-height items-center"
+  >
+    <q-icon
+      v-if="icon"
+      :name="icon"
+      class="col-auto self-center q-px-sm"
+      size="sm"
+    />
+    <div class="col row no-wrap ellipsis q-px-xs text-h6 items-center">
       <div
-        :class="{pointer: !readonly}"
-        @click="$emit('title-click')"
+        :class="{pointer: !!changeTitleFn}"
+        @click="changeTitleFn && changeTitleFn()"
       >
         {{ title }}
       </div>
       <q-space />
       <div
         v-if="!!subtitle"
-        class="subtitle q-px-sm col-shrink ellipsis"
+        class="col-shrink subtitle q-px-sm ellipsis"
       >
         {{ subtitle }}
       </div>
     </div>
     <slot />
     <slot name="buttons" />
+    <q-btn
+      v-if="inDialog"
+      v-close-popup
+      flat
+      round
+      dense
+      :icon="numDialogs > 1
+        ? 'mdi-arrow-left-circle'
+        : 'mdi-close-circle'"
+      class="close-button"
+      @click="$emit('close')"
+    />
   </div>
 </template>
 

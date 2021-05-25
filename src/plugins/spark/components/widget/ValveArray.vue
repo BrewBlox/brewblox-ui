@@ -1,14 +1,13 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { bloxLink, Link } from '@/helpers/bloxfield';
-import { mutate, objectStringSorter, typeMatchFilter } from '@/helpers/functional';
-import { isBlockDriven } from '@/plugins/spark/helpers';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
-import { createBlockWizard } from '@/plugins/wizardry';
+import { isBlockDriven } from '@/plugins/spark/utils';
+import { bloxLink, Link } from '@/utils/bloxfield';
+import { mutate, objectStringSorter, typeMatchFilter } from '@/utils/functional';
 
-import BlockCrudComponent from '../BlockCrudComponent';
 
 interface EditableChannel extends IoChannel {
   id: string;
@@ -23,101 +22,107 @@ interface ValveArrayBlock extends Block {
   };
 }
 
-@Component
-export default class ValveArray
-  extends BlockCrudComponent<ValveArrayBlock> {
-
-  @Prop({ type: Array, default: () => [] })
-  public readonly mapping!: ChannelMapping[];
-
-  get claimedChannels(): { [nid: number]: MotorValveBlock } {
-    return this.sparkModule
-      .blocks
-      .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
-      .filter(block => block.data.hwDevice.id === this.block.id)
-      .reduce((acc, block) => mutate(acc, block.data.startChannel, block), {});
-  }
-
-  mappedName(id: string): string | null {
-    return this.mapping.length
-      ? this.mapping.find(m => m.id === id)?.name ?? null
-      : id;
-  }
-
-  get channels(): EditableChannel[] {
-    return this.block.data.pins
-      .reduce(
-        (acc: EditableChannel[], pin: IoPin, idx: number) => {
-          const nid = idx + 1;
-          const [[id, channel]] = Object.entries(pin);
-          const name = this.mappedName(id);
-          if (name) {
-            const driver = this.claimedChannels[nid] ?? null;
-            acc.push({ ...channel, id, nid, name, driver });
-          }
-          return acc;
-        },
-        []
-      )
-      .sort(objectStringSorter('name'));
-  }
-
-  saveChannels(): void {
-    this.block.data.pins = this.channels
-      .map(channel => {
-        const { state, config, id } = channel;
-        return { [id]: { state, config } };
-      });
-    this.saveBlock();
-  }
-
-  driverLink(channel: EditableChannel): Link {
-    return bloxLink(channel.driver?.id ?? null, BlockType.MotorValve);
-  }
-
-  driverDriven(block: Block): boolean {
-    return isBlockDriven(block);
-  }
-
-  driverLimitedBy(block: Block): string {
-    return this.sparkModule
-      .limiters[block.id]
-      ?.join(', ')
-      ?? '';
-  }
-
-  async saveDriver(channel: EditableChannel, link: Link): Promise<void> {
-    if (channel.driver && channel.driver.id === link.id) {
-      return;
-    }
-    if (channel.driver) {
-      channel.driver.data.startChannel = 0;
-      await this.sparkModule.saveBlock(channel.driver);
-    }
-    if (link.id) {
-      const newDriver = this.sparkModule.blockById<MotorValveBlock>(link.id)!;
-      newDriver.data.hwDevice = bloxLink(this.blockId, this.block.type);
-      newDriver.data.startChannel = channel.nid;
-      await this.sparkModule.saveBlock(newDriver);
-    }
-  }
-
-  async saveState(channel: EditableChannel, state: DigitalState): Promise<void> {
-    if (channel.driver) {
-      channel.driver.data.desiredState = state;
-      await this.sparkModule.saveBlock(channel.driver);
-    }
-  }
-
-  createActuator(channel: EditableChannel): void {
-    createBlockWizard(this.serviceId, BlockType.MotorValve)
-      .onOk(({ block }) => {
-        if (block && block.type === BlockType.MotorValve) {
-          this.saveDriver(channel, bloxLink(block.id, block.type));
-        }
-      });
-  }
+interface ChannelClaims {
+  [nid: number]: MotorValveBlock
 }
+
+export default defineComponent({
+  name: 'ValveArray',
+  props: {
+    mapping: {
+      type: Array as PropType<ChannelMapping[]>,
+      default: () => [],
+    },
+  },
+  setup(props) {
+    const {
+      serviceId,
+      sparkModule,
+      block,
+    } = useBlockWidget.setup<ValveArrayBlock>();
+
+    const claimedChannels = computed<ChannelClaims>(
+      () => sparkModule
+        .blocks
+        .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
+        .filter(v => v.data.hwDevice.id === block.value.id)
+        .reduce((acc, v) => mutate<ChannelClaims>(acc, v.data.startChannel, v), {}),
+    );
+
+    function mappedName(id: string): string | null {
+      return props.mapping.length
+        ? props.mapping.find(m => m.id === id)?.name ?? null
+        : id;
+    }
+
+    const channels = computed<EditableChannel[]>(
+      () => block.value.data.pins
+        .reduce(
+          (acc: EditableChannel[], pin: IoPin, idx: number) => {
+            const nid = idx + 1;
+            const [[id, channel]] = Object.entries(pin);
+            const name = mappedName(id);
+            if (name) {
+              const driver = claimedChannels.value[nid] ?? null;
+              acc.push({ ...channel, id, nid, name, driver });
+            }
+            return acc;
+          },
+          [],
+        )
+        .sort(objectStringSorter('name')),
+    );
+
+    function driverLink(channel: EditableChannel): Link {
+      return bloxLink(channel.driver?.id ?? null, BlockType.MotorValve);
+    }
+
+    function driverDriven(block: Block): boolean {
+      return isBlockDriven(block);
+    }
+
+    function driverLimitedBy(block: Block): string {
+      return sparkModule
+        .limiters[block.id]
+        ?.join(', ')
+        ?? '';
+    }
+
+    async function saveDriver(channel: EditableChannel, link: Link): Promise<void> {
+      if (channel.driver && channel.driver.id === link.id) {
+        return;
+      }
+      if (channel.driver) {
+        channel.driver.data.startChannel = 0;
+        await sparkModule.saveBlock(channel.driver);
+      }
+      if (link.id) {
+        const newDriver = sparkModule.blockById<MotorValveBlock>(link.id)!;
+        const { id, type } = block.value;
+        newDriver.data.hwDevice = bloxLink(id, type);
+        newDriver.data.startChannel = channel.nid;
+        await sparkModule.saveBlock(newDriver);
+      }
+    }
+
+    async function saveState(channel: EditableChannel, state: DigitalState): Promise<void> {
+      if (channel.driver) {
+        channel.driver.data.desiredState = state;
+        await sparkModule.saveBlock(channel.driver);
+      }
+    }
+
+    return {
+      channels,
+      driverDriven,
+      driverLimitedBy,
+      saveState,
+      driverLink,
+      serviceId,
+      saveDriver,
+    };
+  },
+});
 </script>
 
 <template>
@@ -134,24 +139,24 @@ export default class ValveArray
         <DigitalStateButton
           v-if="channel.driver"
           :disable="driverDriven(channel.driver)"
-          :value="channel.driver.data.desiredState"
+          :model-value="channel.driver.data.desiredState"
           :pending="channel.driver.data.state !== channel.driver.data.desiredState"
           :pending-reason="driverLimitedBy(channel.driver)"
           class="col-auto self-center"
-          @input="v => saveState(channel, v)"
+          @update:model-value="v => saveState(channel, v)"
         />
         <div v-else class="darkened text-italic q-pa-sm">
           Not set
         </div>
       </div>
       <LinkField
-        :value="driverLink(channel)"
+        :model-value="driverLink(channel)"
         :service-id="serviceId"
         title="Driver"
         label="Driver"
         dense
         class="col-grow"
-        @input="link => saveDriver(channel, link)"
+        @update:model-value="link => saveDriver(channel, link)"
       />
     </div>
   </div>

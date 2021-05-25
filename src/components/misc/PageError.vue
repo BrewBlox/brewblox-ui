@@ -1,24 +1,23 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
 import { systemStore } from '@/store/system';
 
-
-@Component
-export default class PageError extends Vue {
-
-  get loaded(): boolean {
-    return systemStore.loaded;
-  }
-}
+export default defineComponent({
+  name: 'PageError',
+  computed: {
+    started() {
+      return systemStore.startupDone;
+    },
+  },
+});
 </script>
 
 <template>
   <div
     class="text-h5 darkened absolute-center column items-center q-gutter-md"
   >
-    <template v-if="loaded">
+    <template v-if="started">
       <slot />
     </template>
     <template v-else>

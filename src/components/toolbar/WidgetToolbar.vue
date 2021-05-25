@@ -1,74 +1,122 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
-import { WidgetMode } from '@/store/features';
+import { useContext, useWidget } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { startChangeWidgetTitle } from '@/utils/widgets';
 
-@Component
-export default class WidgetToolbar extends CrudComponent {
+import Toolbar from './Toolbar.vue';
 
-  @Prop({ type: String, required: false })
-  public readonly mode!: WidgetMode | null;
+export default defineComponent({
+  name: 'WidgetToolbar',
+  components: {
+    Toolbar,
+  },
+  props: {
+    hasModeToggle: {
+      type: Boolean,
+      default: false,
+    },
+    changeTitleFn: {
+      type: Function,
+      default: null,
+    },
+  },
+  setup(props) {
+    const {
+      inDialog,
+      context,
+      toggleMode,
+    } = useContext.setup();
+    const {
+      widgetId,
+      widget,
+      featureTitle,
+    } = useWidget.setup();
 
-  get toggleIcon(): string {
-    return this.mode === 'Basic'
-      ? 'mdi-unfold-more-horizontal'
-      : 'mdi-unfold-less-horizontal';
-  }
+    const toggleBtnIcon = computed<string>(
+      () => context.mode === 'Basic'
+        ? 'mdi-unfold-more-horizontal'
+        : 'mdi-unfold-less-horizontal',
+    );
 
-  get toggleTooltip(): string {
-    return this.mode === 'Basic'
-      ? 'Show full widget'
-      : 'Show basic widget';
-  }
+    const toggleBtnTooltip = computed<string>(
+      () => context.mode === 'Basic'
+        ? 'Show full widget'
+        : 'Show basic widget',
+    );
 
-  public toggle(): void {
-    this.$emit('update:mode', this.mode === 'Basic' ? 'Full' : 'Basic');
-  }
-
-  public onTitleClick(): void {
-    if (this.$listeners['title-click'] !== undefined) {
-      this.$emit('title-click');
+    function showDialog(): void {
+      createDialog({
+        component: 'WidgetDialog',
+        componentProps: {
+          widgetId,
+        },
+      });
     }
-    else {
-      this.startChangeWidgetTitle();
+
+    function changeTitle(): void {
+      if (props.changeTitleFn) {
+        props.changeTitleFn();
+      }
+      else {
+        startChangeWidgetTitle(widget.value);
+      }
     }
-  }
-}
+
+    return {
+      inDialog,
+      widget,
+      featureTitle,
+      toggleBtnIcon,
+      toggleBtnTooltip,
+      toggleMode,
+      showDialog,
+      changeTitle,
+    };
+  },
+});
 </script>
 
 <template>
   <Toolbar
     :title="widget.title"
     :subtitle="featureTitle"
-    @title-click="onTitleClick"
+    :change-title-fn="changeTitle"
   >
     <slot />
     <template #buttons>
       <q-btn
-        v-if="!!mode"
+        v-if="hasModeToggle"
+        :icon="toggleBtnIcon"
         flat
         dense
         round
-        :icon="toggleIcon"
-        @click="toggle"
+        @click="toggleMode"
       >
         <q-tooltip>
-          {{ toggleTooltip }}
+          {{ toggleBtnTooltip }}
         </q-tooltip>
       </q-btn>
-      <q-btn flat icon="mdi-launch" dense round @click="showDialog">
+      <q-btn
+        v-if="!inDialog"
+        icon="mdi-launch"
+        flat
+        dense
+        round
+        @click="showDialog"
+      >
         <q-tooltip>
           Show in dialog
         </q-tooltip>
       </q-btn>
-      <ActionMenu dense round>
-        <template #actions>
+      <ActionMenu round dense>
+        <template v-if="!!$slots.actions" #actions>
           <slot name="actions" />
         </template>
         <template #menus>
           <slot name="menus">
-            <WidgetActions :crud="crud" />
+            <WidgetActions />
           </slot>
         </template>
       </ActionMenu>

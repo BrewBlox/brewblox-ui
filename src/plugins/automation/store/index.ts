@@ -1,9 +1,9 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
+import { extendById, filterById, findById } from '@/utils/functional';
 
-import {
+import type {
   AutomationEventData,
   AutomationProcess,
   AutomationStepJump,

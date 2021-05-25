@@ -1,32 +1,39 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
 import { featureStore } from '@/store/features';
 import { Service, serviceStore } from '@/store/services';
-import { systemStore } from '@/store/system';
 
+export default defineComponent({
+  name: 'ServicePage',
+  props: {
+    routeId: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
+    const serviceId = computed<string>(
+      () => props.routeId,
+    );
 
-@Component
-export default class ServicePage extends Vue {
-  get serviceId(): string {
-    return this.$route.params.id;
-  }
+    const service = computed<Service | null>(
+      () => serviceStore.serviceById(serviceId.value),
+    );
 
-  get loaded(): boolean {
-    return systemStore.loaded;
-  }
+    const pageComponent = computed<string | null>(
+      () => service.value !== null
+        ? featureStore.serviceById(service.value.type)?.pageComponent ?? null
+        : null,
+    );
 
-  get service(): Service | null {
-    return serviceStore.serviceById(this.serviceId);
-  }
-
-  get pageComponent(): string | null {
-    return this.service !== null
-      ? featureStore.serviceById(this.service.type)?.pageComponent ?? null
-      : null;
-  }
-}
+    return {
+      serviceId,
+      service,
+      pageComponent,
+    };
+  },
+});
 </script>
 
 <template>

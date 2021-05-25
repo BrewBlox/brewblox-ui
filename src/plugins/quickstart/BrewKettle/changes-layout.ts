@@ -1,8 +1,8 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
 import { BuilderLayout } from '@/plugins/builder/types';
 
-import { withPrefix } from '../helpers';
+import { withPrefix } from '../utils';
 import { BrewKettleConfig } from './types';
 
 export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
@@ -10,13 +10,13 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
 
   return [
     {
-      id: uid(),
+      id: nanoid(),
       title: withPrefix(prefix, 'Layout'),
       width: 7,
       height: 8,
       parts: [
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: { color: '#c48600' },
           flipped: false,
@@ -25,7 +25,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             pwm: {
@@ -40,7 +40,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -55,7 +55,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
           y: 3,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,

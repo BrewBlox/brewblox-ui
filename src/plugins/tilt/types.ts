@@ -2,7 +2,7 @@ import { Service } from '@/store/services';
 
 import { Quantity } from '../spark/types';
 
-export type TiltService = Service<{}>;
+export type TiltService = Service<Record<string, never>>;
 
 export interface TiltStateEvent {
   key: string; // Service ID

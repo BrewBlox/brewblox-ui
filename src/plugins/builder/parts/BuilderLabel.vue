@@ -1,26 +1,50 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
+import { usePart } from '../composables';
+import { FlowPart } from '../types';
+import { coord2grid, textTransformation } from '../utils';
 
-@Component
-export default class BuilderLabel extends PartBase {
-  get text(): string {
-    return this.part.settings.text || '<edit to set text>';
-  }
+export default defineComponent({
+  name: 'BuilderLabel',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+    } = usePart.setup(props.part);
 
-  get fontSize(): number {
-    return this.part.settings.fontSize || 16;
-  }
-}
+    const text = computed<string>(
+      () => props.part.settings.text || '<edit to set text>',
+    );
+
+    const fontSize = computed<number>(
+      () => props.part.settings.fontSize || 16,
+    );
+
+    return {
+      textTransformation,
+      coord2grid,
+      sizeX,
+      sizeY,
+      text,
+      fontSize,
+    };
+  },
+});
 </script>
 
 <template>
   <g>
     <SvgEmbedded
-      :transform="textTransformation([sizeX, sizeY], false)"
-      :width="squares(sizeX)"
-      :height="squares(sizeY)"
+      :transform="textTransformation(part, part.size, false)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
     >
       <div
         class="col-auto text-bold full-width q-pa-sm"

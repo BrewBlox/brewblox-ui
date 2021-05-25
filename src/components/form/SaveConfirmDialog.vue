@@ -1,33 +1,58 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
-import DialogBase from '../DialogBase';
+import { useDialog } from '@/composables';
 
+export default defineComponent({
+  name: 'SaveConfirmDialog',
+  props: {
+    ...useDialog.props,
+    title: {
+      type: String,
+      default: 'Unsaved changes',
+    },
+    message: {
+      type: String,
+      default: 'Do you want to save your changes before closing?',
+    },
+    saveFunc: {
+      type: Function as PropType<() => Awaitable<unknown>>,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-@Component
-export default class SaveConfirmDialog extends DialogBase {
-
-  @Prop({ type: String, default: 'Unsaved changes' })
-  public readonly title!: string;
-
-  @Prop({ type: String, default: 'Do you want to save your changes before closing?' })
-  public readonly message!: string;
-
-  @Prop({ type: Function, required: true })
-  public readonly saveFunc!: () => unknown | Promise<unknown>;
-
-  async done(save: boolean): Promise<void> {
-    if (save) {
-      await this.saveFunc();
+    async function done(save: boolean): Promise<void> {
+      if (save) {
+        await props.saveFunc();
+      }
+      onDialogOK();
     }
-    this.onDialogOk();
-  }
-}
+
+    return {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogCancel,
+      done,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     no-esc-dismiss
     @hide="onDialogHide"

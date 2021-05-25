@@ -1,21 +1,33 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
 import { TiltFieldIndex, TiltStateValue } from '@/plugins/tilt/types';
+import { prettyQty } from '@/utils/bloxfield';
+import { round, shortDateString } from '@/utils/functional';
 
+const fieldClass = 'col-5 col-grow q-my-none';
 
-@Component
-export default class TiltValues extends Vue {
-  fieldClass = 'col-5 col-grow q-my-none'
-
-  @Prop({ type: Object, required: true })
-  public readonly value!: TiltStateValue;
-
-  @Prop({ type: Object, default: () => ({}) })
-  public readonly hidden!: Partial<TiltFieldIndex>;
-
-}
+export default defineComponent({
+  name: 'TiltValues',
+  props: {
+    state: {
+      type: Object as PropType<TiltStateValue>,
+      required: true,
+    },
+    hidden: {
+      type: Object as PropType<Partial<TiltFieldIndex>>,
+      default: () => ({}),
+    },
+  },
+  setup() {
+    return {
+      round,
+      shortDateString,
+      prettyQty,
+      fieldClass,
+    };
+  },
+});
 </script>
 
 <template>
@@ -25,14 +37,14 @@ export default class TiltValues extends Vue {
       label="Temperature"
       :class="fieldClass"
     >
-      {{ value.data.temperature | quantity }}
+      {{ prettyQty(state.data.temperature) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.calibratedTemperature"
       label="Temperature (calibrated)"
       :class="fieldClass"
     >
-      {{ value.data.calibratedTemperature | quantity }}
+      {{ prettyQty(state.data.calibratedTemperature) }}
     </LabeledField>
 
     <LabeledField
@@ -40,14 +52,14 @@ export default class TiltValues extends Vue {
       label="SG"
       :class="fieldClass"
     >
-      {{ value.data.specificGravity | round(3) }}
+      {{ round(state.data.specificGravity, 3) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.calibratedSpecificGravity"
       label="SG (calibrated)"
       :class="fieldClass"
     >
-      {{ value.data.calibratedSpecificGravity | round(3) }}
+      {{ round(state.data.calibratedSpecificGravity, 3) }}
     </LabeledField>
 
     <LabeledField
@@ -55,14 +67,14 @@ export default class TiltValues extends Vue {
       label="Plato"
       :class="fieldClass"
     >
-      {{ value.data.plato | quantity(0) }}
+      {{ prettyQty(state.data.plato, 0) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.calibratedPlato"
       label="Plato (calibrated)"
       :class="fieldClass"
     >
-      {{ value.data.calibratedPlato | quantity }}
+      {{ prettyQty(state.data.calibratedPlato) }}
     </LabeledField>
 
     <LabeledField
@@ -70,14 +82,14 @@ export default class TiltValues extends Vue {
       label="Signal strength"
       :class="fieldClass"
     >
-      {{ value.data.signalStrength | quantity }}
+      {{ prettyQty(state.data.signalStrength) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.timestamp"
       label="Published"
       :class="fieldClass"
     >
-      {{ value.timestamp | shortDateString }}
+      {{ shortDateString(state.timestamp) }}
     </LabeledField>
 
     <LabeledField
@@ -85,7 +97,7 @@ export default class TiltValues extends Vue {
       label="Color"
       :class="fieldClass"
     >
-      {{ value.color }}
+      {{ state.color }}
     </LabeledField>
   </div>
 </template>

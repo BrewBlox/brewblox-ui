@@ -1,92 +1,128 @@
 <script lang="ts">
-
 import isString from 'lodash/isString';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
-import { round, ruleValidator } from '@/helpers/functional';
+import { useDialog } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { round, ruleValidator } from '@/utils/functional';
 
-const typeValidator = (v: any): boolean => ['text', 'number'].includes(v);
+const typeValidator = (v: unknown): boolean =>
+  isString(v) && ['text', 'number'].includes(v);
 
-@Component
-export default class InputDialog extends DialogBase {
-  local: string | number | null = null;
+export default defineComponent({
+  name: 'InputDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: [String, Number] as PropType<string | number>,
+      default: null,
+    },
+    type: {
+      type: String as PropType<'text' | 'number'>,
+      default: 'text',
+      validator: typeValidator,
+    },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+    label: {
+      type: String,
+      default: '',
+    },
+    rules: {
+      type: Array as PropType<InputRule[]>,
+      default: () => [],
+    },
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    autogrow: {
+      type: Boolean,
+      default: false,
+    },
+    fontSize: {
+      type: String,
+      default: '170%',
+    },
+    suffix: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
 
-  @Prop({ type: [String, Number] })
-  public readonly value!: string | number;
+    const local = ref<string | number>(
+      props.type === 'number'
+        ? round(Number(props.modelValue), props.decimals)
+        : props.modelValue,
+    );
 
-  @Prop({ type: String, default: 'text', validator: typeValidator })
-  public readonly type!: 'text' | 'number';
+    const isValid = computed<boolean>(
+      () => ruleValidator(props.rules)(local.value),
+    );
 
-  @Prop({ type: Number, default: 2 })
-  readonly decimals!: number;
+    const nativeProps = computed<AnyDict>(
+      () => props.type === 'number'
+        ? {
+          inputmode: 'numeric',
+          pattern: '[0-9]*',
+        }
+        : {},
+    );
 
-  @Prop({ type: String, default: '' })
-  public readonly label!: string;
-
-  @Prop({ type: Array, default: () => [] })
-  public readonly rules!: InputRule[];
-
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly autogrow!: boolean;
-
-  @Prop({ type: String, default: '170%' })
-  public readonly fontSize!: string;
-
-  @Prop({ type: String, required: false })
-  public readonly suffix!: string;
-
-  get valid(): boolean {
-    return ruleValidator(this.rules)(this.local);
-  }
-
-  get bound(): any {
-    return this.type === 'number'
-      ? {
-        inputmode: 'numeric',
-        pattern: '[0-9]*',
+    function save(): void {
+      if (!isValid.value) {
+        return;
       }
-      : {};
-  }
-
-  save(): void {
-    if (!this.valid) {
-      return;
+      const outputValue =
+        (props.type === 'number' && isString(local.value))
+          ? parseFloat(local.value as string)
+          : local.value;
+      onDialogOK(outputValue);
     }
-    const val =
-      (this.type === 'number' && isString(this.local))
-        ? parseFloat(this.local as string)
-        : this.local;
-    this.onDialogOk(val);
-  }
 
-  created(): void {
-    if (this.type === 'number') {
-      this.local = round(this.value, this.decimals);
-    } else {
-      this.local = this.value;
+    function showKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: local.value,
+          type: props.type,
+          rules: props.rules,
+        },
+      })
+        .onOk(v => local.value = v);
     }
-  }
 
-  showKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.local,
-      type: this.type,
-      rules: this.rules,
-    })
-      .onOk(v => this.local = v);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      isValid,
+      nativeProps,
+      save,
+      showKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
@@ -94,7 +130,7 @@ export default class InputDialog extends DialogBase {
     <DialogCard v-bind="{title, message, html}">
       <q-input
         v-model="local"
-        v-bind="{ rules, clearable, label, autogrow, suffix, ...bound }"
+        v-bind="{ rules, clearable, label, autogrow, suffix, ...nativeProps }"
         :input-style="{fontSize}"
         autofocus
       >
@@ -103,8 +139,19 @@ export default class InputDialog extends DialogBase {
         </template>
       </q-input>
       <template #actions>
-        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn :disable="!valid" flat label="OK" color="primary" @click="save" />
+        <q-btn
+          flat
+          label="Cancel"
+          color="primary"
+          @click="onDialogCancel"
+        />
+        <q-btn
+          :disable="!isValid"
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

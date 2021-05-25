@@ -1,31 +1,37 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { InactiveObjectBlock } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 
+export default defineComponent({
+  name: 'InactiveObjectWidget',
+  setup() {
+    const { block } = useBlockWidget.setup<InactiveObjectBlock>();
 
-@Component
-export default class InactiveObjectWidget
-  extends BlockWidgetBase<InactiveObjectBlock> {
+    const actualFeatureTitle = computed<string>(
+      () => featureStore.widgetTitle(block.value.data.actualType),
+    );
 
-  get actualFeatureTitle(): string {
-    return featureStore.widgetTitle(this.block.data.actualType);
-  }
-}
+    return {
+      block,
+      actualFeatureTitle,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" />
+      <BlockWidgetToolbar />
     </template>
-    <CardWarning v-if="!block.data.connected">
+    <CardWarning>
       <template #message>
         This {{ actualFeatureTitle }} block is disabled.
         <br>To enable it, ensure that it is in an enabled group.
       </template>
     </CardWarning>
-  </CardWrapper>
+  </Card>
 </template>

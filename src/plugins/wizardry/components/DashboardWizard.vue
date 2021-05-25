@@ -1,79 +1,104 @@
 <script lang="ts">
 import UrlSafeString from 'url-safe-string';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-import { dashboardIdRules } from '@/helpers/dashboards';
-import { createDialog } from '@/helpers/dialog';
-import { ruleValidator, suggestId } from '@/helpers/functional';
-import notify from '@/helpers/notify';
-import WizardBase from '@/plugins/wizardry/WizardBase';
-import router from '@/router';
+import { useWizard } from '@/plugins/wizardry/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { makeDashboardIdRules } from '@/utils/dashboards';
+import { createDialog } from '@/utils/dialog';
+import { ruleValidator, suggestId } from '@/utils/functional';
+import notify from '@/utils/notify';
 
-@Component
-export default class DashboardWizard extends WizardBase {
-  idGenerator = new UrlSafeString();
-  dashboardIdRules = dashboardIdRules();
-  dashboardIdValidator = ruleValidator(dashboardIdRules());
+const urlGenerator = new UrlSafeString();
+const idRules = makeDashboardIdRules();
+const idValidator = ruleValidator(idRules);
 
-  chosenId: string | null = null;
-  dashboardTitle = 'New dashboard';
+export default defineComponent({
+  name: 'DashboardWizard',
+  props: {
+    ...useWizard.props,
+  },
+  emits: [
+    ...useWizard.emits,
+  ],
+  setup() {
+    const {
+      onBack,
+      onClose,
+      setDialogTitle,
+    } = useWizard.setup();
+    const router = useRouter();
 
-  mounted(): void {
-    this.setDialogTitle('Dashboard wizard');
-  }
+    setDialogTitle('Dashboard wizard');
 
-  get dashboardId(): string {
-    return this.chosenId !== null
-      ? this.chosenId
-      : suggestId(this.idGenerator.generate(this.dashboardTitle), this.dashboardIdValidator);
-  }
+    const dashboardTitle = ref<string>('New dashboard');
 
-  set dashboardId(id: string) {
-    this.chosenId = id;
-  }
+    const _dashboardId = ref<string | null>(null);
+    const dashboardId = computed<string>({
+      get: () => _dashboardId.value !== null
+        ? _dashboardId.value
+        : suggestId(urlGenerator.generate(dashboardTitle.value), idValidator),
+      set: id => _dashboardId.value = id,
+    });
 
-  get valid(): boolean {
-    return this.dashboardIdValidator(this.dashboardId);
-  }
+    const valid = computed<boolean>(
+      () => idValidator(dashboardId.value),
+    );
 
-  showTitleKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.dashboardTitle,
-    })
-      .onOk(v => this.dashboardTitle = v);
-  }
-
-  showIdKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.dashboardId,
-      rules: this.dashboardIdRules,
-    })
-      .onOk(v => this.dashboardId = v);
-  }
-
-  async createDashboard(): Promise<void> {
-    if (!this.valid) {
-      return;
+    function showTitleKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: dashboardTitle.value,
+        },
+      })
+        .onOk(v => dashboardTitle.value = v);
     }
-    const dashboard: Dashboard = {
-      id: this.dashboardId,
-      title: this.dashboardTitle || this.dashboardId,
-      order: dashboardStore.dashboardIds.length + 1,
-    };
 
-    await dashboardStore.createDashboard(dashboard);
-    router.push(`/dashboard/${dashboard.id}`);
-    notify.done(`Added dashboard <b>${dashboard.title}</b>`);
-    this.close();
-  }
-}
+    function showIdKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: dashboardId.value,
+          rules: idRules,
+        },
+      })
+        .onOk(v => dashboardId.value = v);
+    }
+
+    async function createDashboard(): Promise<void> {
+      if (!valid.value) {
+        return;
+      }
+      const dashboard: Dashboard = {
+        id: dashboardId.value,
+        title: dashboardTitle.value || dashboardId.value,
+        order: dashboardStore.dashboardIds.length + 1,
+      };
+
+      await dashboardStore.createDashboard(dashboard);
+      router.push(`/dashboard/${dashboard.id}`);
+      notify.done(`Added dashboard <b>${dashboard.title}</b>`);
+      onClose();
+    }
+
+    return {
+      onBack,
+      dashboardId,
+      idRules,
+      valid,
+      dashboardTitle,
+      showIdKeyboard,
+      showTitleKeyboard,
+      createDashboard,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item>
         <q-item-section>
@@ -91,7 +116,7 @@ export default class DashboardWizard extends WizardBase {
         <q-item-section>
           <q-input
             v-model="dashboardId"
-            :rules="dashboardIdRules"
+            :rules="idRules"
             label="Dashboard URL"
           >
             <template #append>
@@ -115,9 +140,19 @@ export default class DashboardWizard extends WizardBase {
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="onBack"
+      />
       <q-space />
-      <q-btn :disable="!valid" unelevated label="Create" color="primary" @click="createDashboard" />
+      <q-btn
+        :disable="!valid"
+        unelevated
+        label="Create"
+        color="primary"
+        @click="createDashboard"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

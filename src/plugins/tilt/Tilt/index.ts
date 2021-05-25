@@ -1,23 +1,32 @@
-import { ref } from '@/helpers/component-ref';
-import { WidgetFeature } from '@/store/features';
+import { Plugin } from 'vue';
+
+import { featureStore, WidgetFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 
 import widget from './TiltWidget.vue';
 import { TiltWidgetConfig } from './types';
 
-const feature: WidgetFeature<TiltWidgetConfig> = {
-  id: 'Tilt',
-  title: 'Tilt',
-  component: ref(widget),
-  wizard: true,
-  widgetSize: {
-    cols: 4,
-    rows: 4,
+const plugin: Plugin = {
+  install(app) {
+    const feature: WidgetFeature<TiltWidgetConfig> = {
+      id: 'Tilt',
+      title: 'Tilt',
+      component: cref(app, widget),
+      wizard: true,
+      widgetSize: {
+        cols: 4,
+        rows: 4,
+      },
+      generateConfig: () => ({
+        serviceId: null,
+        color: null,
+        hidden: {},
+      }),
+    };
+
+    featureStore.addWidgetFeature(feature);
   },
-  generateConfig: () => ({
-    serviceId: null,
-    color: null,
-    hidden: {},
-  }),
 };
 
-export default feature;
+
+export default plugin;

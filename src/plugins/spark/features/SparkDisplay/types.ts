@@ -1,5 +1,4 @@
-import { Widget } from '@/store/dashboards';
-
+import { Widget } from '@/store/widgets';
 
 export interface SparkDisplayConfig {
   serviceId: string | null;

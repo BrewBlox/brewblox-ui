@@ -1,79 +1,105 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
 
+export default defineComponent({
+  name: 'TempSensorSwapDialog',
+  props: {
+    ...useDialog.props,
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    leftId: {
+      type: String,
+      default: null,
+    },
+    rightId: {
+      type: String,
+      default: null,
+    },
+    title: {
+      type: String,
+      default: 'Swap OneWire Temp Sensors',
+    },
+    message: {
+      type: String,
+      default: 'Pick two sensors to exchange their OneWire bus address.',
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-@Component
-export default class TempSensorSwapDialog extends DialogBase {
-  leftAddr: BlockAddress | null = null;
-  rightAddr: BlockAddress | null = null;
-
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
-
-  @Prop({ type: String, required: false })
-  public readonly leftId!: string;
-
-  @Prop({ type: String, required: false })
-  public readonly rightId!: string;
-
-  @Prop({ type: String, default: 'Swap OneWire Temp Sensors' })
-  public readonly title!: string;
-
-  @Prop({ type: String, default: 'Pick two sensors to exchange their OneWire bus address.' })
-  public readonly message!: string;
-
-  created(): void {
-    this.leftAddr = {
-      id: this.leftId ?? null,
+    const leftAddr = ref<BlockAddress>({
+      id: props.leftId,
       type: BlockType.TempSensorOneWire,
-      serviceId: this.serviceId,
-    };
-    this.rightAddr = {
-      id: this.rightId ?? null,
+      serviceId: props.serviceId,
+    });
+    const rightAddr = ref<BlockAddress>({
+      id: props.rightId,
       type: BlockType.TempSensorOneWire,
-      serviceId: this.serviceId,
-    };
-  }
+      serviceId: props.serviceId,
+    });
 
-  get sparkModule(): SparkServiceModule {
-    return sparkStore.moduleById(this.serviceId)!;
-  }
+    const sparkModule = computed<SparkServiceModule>(
+      () => sparkStore.moduleById(props.serviceId)!,
+    );
 
-  get leftBlock(): TempSensorOneWireBlock | null {
-    return this.sparkModule.blockByAddress<TempSensorOneWireBlock>(this.leftAddr);
-  }
+    const leftBlock = computed<TempSensorOneWireBlock | null>(
+      () => sparkModule.value.blockByAddress<TempSensorOneWireBlock>(leftAddr.value),
+    );
 
-  get rightBlock(): TempSensorOneWireBlock | null {
-    return this.sparkModule.blockByAddress<TempSensorOneWireBlock>(this.rightAddr);
-  }
+    const rightBlock = computed<TempSensorOneWireBlock | null>(
+      () => sparkModule.value.blockByAddress<TempSensorOneWireBlock>(rightAddr.value),
+    );
 
-  get valid(): boolean {
-    return this.leftBlock !== null
-      && this.rightBlock !== null
-      && this.leftBlock.id !== this.rightBlock.id;
-  }
+    const valid = computed<boolean>(
+      () => leftBlock.value !== null
+        && rightBlock.value !== null
+        && leftBlock.value.id !== rightBlock.value.id,
+    );
 
-  save(): void {
-    if (this.leftBlock && this.rightBlock && this.leftBlock.id !== this.rightBlock.id) {
-      const left = this.leftBlock.data.address;
-      const right = this.rightBlock.data.address;
-      this.leftBlock.data.address = right;
-      this.rightBlock.data.address = left;
-      this.sparkModule.saveBlock(this.leftBlock);
-      this.sparkModule.saveBlock(this.rightBlock);
-      this.onDialogOk();
+    function save(): void {
+      if (valid.value && leftBlock.value && rightBlock.value) {
+        const left = leftBlock.value.data.address;
+        const right = rightBlock.value.data.address;
+        leftBlock.value.data.address = right;
+        rightBlock.value.data.address = left;
+        sparkModule.value.saveBlock(leftBlock.value);
+        sparkModule.value.saveBlock(rightBlock.value);
+        onDialogOK();
+      }
     }
-  }
-}
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      leftAddr,
+      rightAddr,
+      valid,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

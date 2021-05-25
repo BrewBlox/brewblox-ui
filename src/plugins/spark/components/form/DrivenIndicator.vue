@@ -1,53 +1,67 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createBlockDialog } from '@/helpers/dialog';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { sparkStore } from '@/plugins/spark/store';
+import { createBlockDialog } from '@/utils/dialog';
 
-@Component
-export default class DrivenIndicator extends Vue {
+export default defineComponent({
+  name: 'DrivenIndicator',
+  props: {
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    blockId: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
+    const sparkModule = sparkStore.moduleById(props.serviceId)!;
 
-  @Prop({ type: String, required: true })
-  readonly blockId!: string;
+    const driveChains = computed<string[][]>(
+      () => sparkModule
+        .drivenChains
+        .filter(chain => chain[0] === props.blockId),
+    );
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
+    const textChains = computed<string[][]>(
+      () => driveChains.value
+        .map(chain => chain
+          .slice(1)
+          .map((id, idx) => {
+            return idx === 0
+              ? `Driven by <i>${id}</i>`
+              : `&emsp; which is driven by <i>${id}</i>`;
+          })),
+    );
 
-  public get sparkModule(): SparkServiceModule {
-    return sparkStore.moduleById(this.serviceId)!;
-  }
+    const isDriven = computed<boolean>(
+      () => textChains.value.length > 0,
+    );
 
-  get driveChains(): string[][] {
-    return this.sparkModule
-      .drivenChains
-      .filter(chain => chain[0] === this.blockId);
-  }
+    function bossDriver(chainIdx: number): string {
+      const chain = driveChains.value[chainIdx];
+      return chain[chain.length - 1];
+    }
 
-  get textChains(): string[][] {
-    return this.driveChains
-      .map(chain => chain
-        .slice(1)
-        .map((id, idx) => {
-          return idx === 0
-            ? `Driven by <i>${id}</i>`
-            : `&emsp; which is driven by <i>${id}</i>`;
-        }));
-  }
+    function showDialog(chainIdx: number): void {
+      createBlockDialog({
+        serviceId: props.serviceId,
+        id: bossDriver(chainIdx),
+        type: null,
+      });
+    }
 
-  get isDriven(): boolean {
-    return this.textChains.length > 0;
-  }
-
-  bossDriver(chainIdx: number): string {
-    const chain = this.driveChains[chainIdx];
-    return chain[chain.length - 1];
-  }
-
-  showDialog(chainIdx: number): void {
-    createBlockDialog(this.sparkModule.blockById(this.bossDriver(chainIdx)));
-  }
-}
+    return {
+      driveChains,
+      textChains,
+      isDriven,
+      bossDriver,
+      showDialog,
+    };
+  },
+});
 </script>
 
 <template>

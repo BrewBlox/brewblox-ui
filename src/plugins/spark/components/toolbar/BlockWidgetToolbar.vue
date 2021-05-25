@@ -1,37 +1,49 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, ref } from 'vue';
 
-import { WidgetMode } from '@/store/features';
+import { useBlockWidget } from '@/plugins/spark/composables';
+import { startChangeBlockId } from '@/plugins/spark/utils';
 
-import BlockCrudComponent from '../BlockCrudComponent';
 
-@Component
-export default class BlockWidgetToolbar extends BlockCrudComponent {
-  graphModalOpen = false;
+export default defineComponent({
+  name: 'BlockWidgetToolbar',
+  setup() {
+    const {
+      widgetId,
+      block,
+      hasGraph,
+      graphConfig,
+    } = useBlockWidget.setup();
+    const graphModalOpen = ref(false);
 
-  @Prop({ type: String, required: false })
-  public readonly mode!: WidgetMode | null;
+    function changeTitle(): void {
+      startChangeBlockId(block.value);
+    }
 
-  get localMode(): WidgetMode | null {
-    return this.mode;
-  }
-
-  set localMode(val: WidgetMode | null) {
-    this.$emit('update:mode', val);
-  }
-}
+    return {
+      widgetId,
+      block,
+      hasGraph,
+      graphConfig,
+      graphModalOpen,
+      changeTitle,
+    };
+  },
+});
 </script>
 
 <template>
-  <WidgetToolbar :crud="crud" :mode.sync="localMode" @title-click="startChangeBlockId">
+  <WidgetToolbar :change-title-fn="changeTitle">
     <BlockGraph
       v-if="graphModalOpen"
-      :id="`graph-full--${widget.id}`"
-      v-model="graphModalOpen"
-      :config.sync="graphCfg"
+      :id="`graph-full--${widgetId}`"
+      v-model:modal="graphModalOpen"
+      v-model:config="graphConfig"
     />
+    <slot />
 
-    <template #actions>
+    <!-- Avoid the toolbar rendering an empty menu -->
+    <template v-if="hasGraph || $slots.actions" #actions>
       <ActionItem
         v-if="hasGraph"
         icon="mdi-chart-line"
@@ -42,8 +54,8 @@ export default class BlockWidgetToolbar extends BlockCrudComponent {
     </template>
 
     <template #menus>
-      <WidgetActions :crud="crud" no-rename />
-      <BlockActions :crud="crud" />
+      <WidgetActions no-rename />
+      <BlockActions />
     </template>
   </WidgetToolbar>
 </template>

@@ -18,9 +18,12 @@ services:
   #     - ../node-red-contrib-brewblox:/node-red-contrib-brewblox
   # automation:
   #   image: brewblox/brewblox-automation:develop
+  #   init: true
   #   volumes:
   #     - "../brewblox-automation:/app"
   #   entrypoint: 'npm run dev'
+  # automation-ui:
+  #   image: brewblox/brewblox-automation-ui:develop
   # sparksimulator:
   #   image: brewblox/firmware-simulator:feature-multiplatform
   #   init: true
@@ -43,3 +46,6 @@ services:
   #   volumes:
   #     - ../brewblox-devcon-spark/binaries:/app/binaries
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark
+  # tilt:
+  #   volumes:
+  #     - ../brewblox-tilt:/app

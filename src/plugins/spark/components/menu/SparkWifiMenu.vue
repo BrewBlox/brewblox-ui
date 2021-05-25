@@ -1,82 +1,112 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, reactive, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
-import { typeMatchFilter } from '@/helpers/functional';
-import notify from '@/helpers/notify';
+import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockType, WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
+import { WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
+import { getWiFiSettingsBlock } from '@/plugins/spark/utils';
+import { createDialog } from '@/utils/dialog';
+import notify from '@/utils/notify';
 
-@Component
-export default class SparkWifiMenu extends DialogBase {
-  WifiCipherType = WifiCipherType;
-  WifiSecurityType = WifiSecurityType;
+const securityOpts: SelectOption<WifiSecurityType>[] = [
+  { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },
+  { label: 'WEP', value: WifiSecurityType.WLAN_SEC_WEP },
+  { label: 'WPA', value: WifiSecurityType.WLAN_SEC_WPA },
+  { label: 'WPA2', value: WifiSecurityType.WLAN_SEC_WPA2 },
+  { label: 'Enterprise WPA', value: WifiSecurityType.WLAN_SEC_WPA_ENTERPRISE },
+  { label: 'Enterprise WPA2', value: WifiSecurityType.WLAN_SEC_WPA2_ENTERPRISE },
+];
 
-  securityOpts: SelectOption<WifiSecurityType>[] = [
-    { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },
-    { label: 'WEP', value: WifiSecurityType.WLAN_SEC_WEP },
-    { label: 'WPA', value: WifiSecurityType.WLAN_SEC_WPA },
-    { label: 'WPA2', value: WifiSecurityType.WLAN_SEC_WPA2 },
-    { label: 'Enterprise WPA', value: WifiSecurityType.WLAN_SEC_WPA_ENTERPRISE },
-    { label: 'Enterprise WPA2', value: WifiSecurityType.WLAN_SEC_WPA2_ENTERPRISE },
-  ];
+const cipherOpts: SelectOption<WifiCipherType>[] = [
+  { label: 'Auto', value: WifiCipherType.WLAN_CIPHER_NOT_SET },
+  { label: 'AES', value: WifiCipherType.WLAN_CIPHER_AES },
+  { label: 'TKIP', value: WifiCipherType.WLAN_CIPHER_TKIP },
+  { label: 'AES or TKIP', value: WifiCipherType.WLAN_CIPHER_AES_OR_TKIP },
+];
 
-  cipherOpts: SelectOption<WifiCipherType>[] = [
-    { label: 'Auto', value: WifiCipherType.WLAN_CIPHER_NOT_SET },
-    { label: 'AES', value: WifiCipherType.WLAN_CIPHER_AES },
-    { label: 'TKIP', value: WifiCipherType.WLAN_CIPHER_TKIP },
-    { label: 'AES or TKIP', value: WifiCipherType.WLAN_CIPHER_AES_OR_TKIP },
-  ];
+export default defineComponent({
+  name: 'SparkWifiMenu',
+  props: {
+    ...useDialog.props,
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+    } = useDialog.setup();
+    const { dense } = useGlobals.setup();
+    const busy = ref(false);
+    const isPwd = ref(true);
+    const values = reactive<WiFiSettingsBlock['data']>({
+      ssid: '',
+      password: '',
+      security: WifiSecurityType.WLAN_SEC_WPA2,
+      cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
+      signal: 0,
+      ip: '',
+    });
 
-  busy = false;
-  isPwd = true;
-  values: WiFiSettingsBlock['data'] = {
-    ssid: '',
-    password: '',
-    security: WifiSecurityType.WLAN_SEC_WPA2,
-    cipher: WifiCipherType.WLAN_CIPHER_NOT_SET,
-    signal: 0,
-    ip: '',
-  }
+    const block = computed<WiFiSettingsBlock>(
+      () => getWiFiSettingsBlock(props.serviceId)!,
+    );
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
+    async function save(): Promise<void> {
+      busy.value = true;
+      await sparkStore
+        .saveBlock({ ...block.value, data: values })
+        .then(() => notify.done('Wifi settings updated!'))
+        .finally(() => busy.value = false);
+    }
 
-  get block(): WiFiSettingsBlock {
-    return sparkStore.serviceBlocks(this.serviceId)
-      .find(typeMatchFilter<WiFiSettingsBlock>(BlockType.WiFiSettings))!;
-  }
+    function showKeyboard(field: 'ssid' | 'password'): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: values[field],
+          password: field === 'password',
+        },
+      })
+        .onOk(v => values[field] = v);
+    }
 
-  async save(): Promise<void> {
-    this.busy = true;
-    await sparkStore
-      .saveBlock({ ...this.block, data: this.values })
-      .then(() => notify.done('Wifi settings updated!'))
-      .finally(() => this.busy = false);
-  }
-
-  showKeyboard(field: 'ssid' | 'password'): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.values[field],
-      password: field === 'password',
-    })
-      .onOk(v => this.values[field] = v);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      dense,
+      values,
+      isPwd,
+      busy,
+      WifiSecurityType,
+      securityOpts,
+      cipherOpts,
+      save,
+      showKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
-    :maximized="$dense"
+    ref="dialogRef"
+    :maximized="dense"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >
-    <ActionCardWrapper v-bind="{context}">
+    <Card>
       <template #toolbar>
-        <DialogToolbar :title="serviceId" subtitle="Wifi Configuration" />
+        <Toolbar :title="serviceId" subtitle="Wifi Configuration" />
       </template>
 
       <q-card-section>
@@ -150,6 +180,6 @@ export default class SparkWifiMenu extends DialogBase {
           @click="save"
         />
       </template>
-    </ActionCardWrapper>
+    </Card>
   </q-dialog>
 </template>

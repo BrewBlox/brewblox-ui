@@ -1,5 +1,3 @@
-import { WidgetRole } from '@/store/features';
-
 import {
   AnalogConstraintKey,
   BlockIntfType,
@@ -13,15 +11,6 @@ import {
 
 export const sparkType = 'Spark';
 export const systemGroup = 7;
-
-export const roleIcons: Record<WidgetRole, string> = {
-  Display: 'mdi-monitor-dashboard',
-  Process: 'mdi-thermometer',
-  Control: 'mdi-calculator-variant',
-  Output: 'mdi-power-plug',
-  Constraint: 'mdi-lock-outline',
-  Other: 'mdi-cube',
-};
 
 export const digitalConstraintLabels: Record<DigitalConstraintKey, string> = {
   minOff: 'Minimum OFF time',

@@ -1,54 +1,85 @@
 <script lang="ts">
 import round from 'lodash/round';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { bloxQty, isQuantity, prettyUnit } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
+import { useDialog } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
+import { bloxQty, isQuantity, prettyUnit } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class QuantityDialog extends DialogBase {
-  local: number | null = null;
+export default defineComponent({
+  name: 'QuantityDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<Quantity>,
+      required: true,
+      validator: isQuantity,
+    },
+    decimals: {
+      type: Number,
+      default: 2,
+    },
+    label: {
+      type: String,
+      default: 'Value',
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-  @Prop({ type: Object, required: true, validator: isQuantity })
-  public readonly value!: Quantity;
+    const local = ref<number | null>(
+      props.modelValue.value !== null
+        ? round(props.modelValue.value, props.decimals)
+        : null,
+    );
 
-  @Prop({ type: Number, default: 2 })
-  readonly decimals!: number;
+    function save(): void {
+      onDialogOK(bloxQty(props.modelValue).copy(local.value));
+    }
 
-  @Prop({ type: String, default: 'Value' })
-  public readonly label!: string;
+    const notation = computed<string>(
+      () => prettyUnit(props.modelValue),
+    );
 
-  created(): void {
-    this.local = this.value.value !== null
-      ? round(this.value.value, this.decimals)
-      : null;
-  }
+    function showKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: local.value,
+          type: 'number',
+          suffix: notation.value,
+        },
+      })
+        .onOk(v => local.value = v);
+    }
 
-  save(): void {
-    this.onDialogOk(bloxQty(this.value).copy(this.local));
-  }
-
-  get notation(): string {
-    return prettyUnit(this.value);
-  }
-
-  showKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      type: 'number',
-      value: this.local,
-      suffix: this.notation,
-    })
-      .onOk(v => this.local = v);
-  }
-}
+    return {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+      notation,
+      showKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
@@ -58,7 +89,7 @@ export default class QuantityDialog extends DialogBase {
         v-model.number="local"
         :label="label"
         :suffix="notation"
-        input-style="font-size: 170%"
+        input-class="text-big"
         inputmode="numeric"
         pattern="[0-9]*"
         autofocus

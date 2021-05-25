@@ -1,109 +1,119 @@
 <script lang="ts">
 import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { deltaTempQty, prettyUnit } from '@/helpers/bloxfield';
+import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
+import { coord2grid, liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
-import { BlockAddress } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
+import { deltaTempQty, prettyUnit } from '@/utils/bloxfield';
+import { truncateRound } from '@/utils/functional';
 
-import PartBase from '../components/PartBase';
-import { CENTER, COLD_WATER, HOT_WATER } from '../getters';
-import { settingsAddress } from '../helpers';
+import { usePart, useSettingsBlock } from '../composables';
+import { PID_KEY, PID_TYPES } from '../specs/PidDisplay';
+import { FlowPart } from '../types';
 
+export default defineComponent({
+  name: 'PidDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      scale,
+      bordered,
+    } = usePart.setup(props.part);
 
-@Component
-export default class PidDisplay extends PartBase {
-  icons: Mapped<string> = {};
-  HOT_WATER = HOT_WATER;
-  COLD_WATER = COLD_WATER;
-  readonly addressKey = 'pid';
-  readonly scaleKey = 'scale';
+    const {
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<PidBlock>(props.part, PID_KEY, PID_TYPES);
 
-  created(): void {
-    this.icons.mdiCalculatorVariant = mdiCalculatorVariant;
-    this.icons.mdiPlusMinus = mdiPlusMinus;
-  }
+    const outputValue = computed<number | null>(
+      () => block.value?.data.enabled
+        ? block.value.data.outputValue
+        : null,
+    );
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
+    const outputSetting = computed<number | null>(
+      () => block.value?.data.enabled
+        ? block.value.data.outputSetting
+        : null,
+    );
 
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.addressKey);
-  }
+    const kp = computed<number | null>(
+      () => block.value?.data.kp.value ?? null,
+    );
 
-  get block(): PidBlock | null {
-    const { serviceId, id } = this.address;
-    return sparkStore.blockById(serviceId, id);
-  }
+    const target = computed<Block | null>(
+      () => block.value !== null
+        ? sparkStore.blockById(block.value.serviceId, block.value.data.inputId.id)
+        : null,
+    );
 
-  get isBroken(): boolean {
-    return this.block == null
-      && this.address.id !== null;
-  }
+    const drivingOffset = computed<boolean>(
+      () => target.value !== null
+        && target.value.type === BlockType.ActuatorOffset,
+    );
 
-  get outputValue(): number | null {
-    return this.block && this.block.data.enabled
-      ? this.block.data.outputValue
-      : null;
-  }
+    const deltaTempUnit = computed<string>(
+      () => `delta_${systemStore.units.temperature}`,
+    );
 
-  get outputSetting(): number | null {
-    return this.block && this.block.data.enabled
-      ? this.block.data.outputSetting
-      : null;
-  }
+    const convertedOutputSetting = computed<number | null>(
+      () => drivingOffset.value
+        && block.value !== null
+        ? deltaTempQty(outputSetting.value).value
+        : outputSetting.value,
+    );
 
-  get kp(): number | null {
-    return this.block
-      ? this.block.data.kp.value
-      : null;
-  }
+    const suffix = computed<string>(
+      () => outputSetting.value === null
+        ? ''
+        : drivingOffset.value
+          ? prettyUnit(deltaTempUnit.value)
+          : '%',
+    );
 
-  get target(): Block | null {
-    return this.block
-      ? sparkStore.blockById(this.block.serviceId, this.block.data.outputId.id)
-      : null;
-  }
+    const color = computed<string>(
+      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+    );
 
-  get drivingOffset(): boolean {
-    return this.target !== null
-      && this.target.type === BlockType.ActuatorOffset;
-  }
-
-  get deltaTempUnit(): string {
-    return `delta_${systemStore.units.temperature}`;
-  }
-
-  get convertedOutputSetting(): number | null {
-    return this.drivingOffset
-      && this.block !== null
-      ? deltaTempQty(this.outputSetting).value
-      : this.outputSetting;
-  }
-
-  get suffix(): string {
-    return this.outputSetting === null
-      ? ''
-      : this.drivingOffset
-        ? prettyUnit(this.deltaTempUnit)
-        : '%';
-  }
-
-  get color(): string {
-    return this.liquidOnCoord(CENTER)[0] ?? '';
-  }
-}
+    return {
+      HOT_WATER,
+      COLD_WATER,
+      coord2grid,
+      textTransformation,
+      truncateRound,
+      mdiCalculatorVariant,
+      mdiPlusMinus,
+      scale,
+      block,
+      isBroken,
+      outputValue,
+      outputSetting,
+      kp,
+      target,
+      drivingOffset,
+      convertedOutputSetting,
+      suffix,
+      color,
+      bordered,
+    };
+  },
+});
 </script>
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
-      :transform="textTransformation([1,1])"
-      :width="squares(1)"
-      :height="squares(1)"
+      :transform="textTransformation(part, [1,1])"
+      :width="coord2grid(1)"
+      :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
       <BrokenIcon v-if="isBroken" class="col" />
@@ -112,13 +122,13 @@ export default class PidDisplay extends PartBase {
       <template v-else>
         <q-icon
           v-if="kp === null"
-          :name="icons.mdiCalculatorVariant"
+          :name="mdiCalculatorVariant"
           class="col-auto static"
           size="25px"
         />
         <q-icon
           v-else-if="drivingOffset"
-          :name="icons.mdiPlusMinus"
+          :name="mdiPlusMinus"
           class="col-auto static"
           size="25px"
         />
@@ -133,7 +143,7 @@ export default class PidDisplay extends PartBase {
           />
         </template>
         <div class="col text-bold">
-          {{ convertedOutputSetting | truncateRound }}
+          {{ truncateRound(convertedOutputSetting) }}
           <small v-if="!!block">{{ suffix }}</small>
         </div>
       </template>
@@ -141,8 +151,8 @@ export default class PidDisplay extends PartBase {
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(1)-2"
-        :height="squares(1)-2"
+        :width="coord2grid(1)-2"
+        :height="coord2grid(1)-2"
         :stroke="color"
         x="1"
         y="1"

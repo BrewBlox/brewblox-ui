@@ -1,14 +1,13 @@
 <script lang="ts">
-import 'simple-keyboard/build/css/index.css';
-
 import Keyboard from 'simple-keyboard';
 import KeyboardLayouts from 'simple-keyboard-layouts';
-import { Component, Prop } from 'vue-property-decorator';
+import 'simple-keyboard/build/css/index.css';
+import { computed, defineComponent, nextTick, onMounted, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { isDurationString } from '@/helpers/duration';
-import { ruleValidator } from '@/helpers/functional';
+import { useDialog } from '@/composables';
 import { systemStore } from '@/store/system';
+import { isDurationString } from '@/utils/duration';
+import { ruleValidator } from '@/utils/functional';
 
 type BoardType = 'text' | 'number' | 'duration';
 
@@ -40,132 +39,165 @@ const basicRules: Record<BoardType, InputRule[]> = {
   ],
 };
 
-@Component
-export default class KeyboardDialog extends DialogBase {
-  keyboard: Keyboard | null = null;
-  local: string = '';
+export default defineComponent({
+  name: 'KeyboardDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: [String, Number],
+      default: null,
+    },
+    suffix: {
+      type: String,
+      default: '',
+    },
+    type: {
+      type: String as PropType<BoardType>,
+      default: 'text',
+      validator: typeValidator,
+    },
+    password: {
+      type: Boolean,
+      default: false,
+    },
+    rules: {
+      type: Array as PropType<InputRule[]>,
+      default: () => [],
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
 
-  lockActive: boolean = false;
-  shiftActive: boolean = false;
-  pwdActive: boolean = true;
+    const keyboard = ref<Keyboard | null>(null);
+    const local = ref<string>(`${props.modelValue ?? ''}`);
 
-  @Prop({ type: [String, Number], required: false })
-  public readonly value!: string | number | null;
+    const lockActive = ref(false);
+    const shiftActive = ref(false);
+    const pwdActive = ref(true);
 
-  @Prop({ type: String, required: false })
-  public readonly suffix!: string;
-
-  @Prop({ type: String, default: 'text', validator: typeValidator })
-  public readonly type!: BoardType;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly password!: boolean;
-
-  @Prop({ type: Array, default: () => ([]) })
-  public readonly rules!: InputRule[];
-
-  get localRules(): InputRule[] {
-    return [
-      ...basicRules[this.type],
-      ...this.rules,
-    ];
-  }
-
-  get valid(): boolean {
-    return ruleValidator(this.localRules)(this.local);
-  }
-
-  findLayout(): any {
-    const custom = customLayouts[this.type];
-    if (custom) {
-      return custom;
-    }
-
-    const layouts = new KeyboardLayouts();
-    const layoutName = systemStore.config.keyboardLayout;
-    return layouts.get(layoutName);
-  }
-
-  async mounted(): Promise<void> {
-    await this.$nextTick();
-
-    this.keyboard = new Keyboard({
-      onChange: this.onChange,
-      onKeyPress: this.onKeyPress,
-      theme: 'hg-theme-default keyboard-theme-brewblox',
-      layout: this.findLayout(),
-      newLineOnEnter: true,
-      display: {
-        '{bksp}': '⌫',
-        '{enter}': 'Enter',
-        '{tab}': 'tab ⇥',
-        '{lock}': 'Caps Lock',
-        '{shift}': '⇧',
-        '{space}': ' ',
-        '{esc}': '⊗',
-      },
-      buttonTheme: [
-        { buttons: '-', class: 'text-h5' },
+    const localRules = computed<InputRule[]>(
+      () => [
+        ...basicRules[props.type],
+        ...props.rules,
       ],
+    );
+
+    const valid = computed<boolean>(
+      () => ruleValidator(localRules.value)(local.value),
+    );
+
+    function findLayout(): any {
+      const custom = customLayouts[props.type];
+      if (custom) {
+        return custom;
+      }
+      const layouts = new KeyboardLayouts();
+      const layoutName = systemStore.config.keyboardLayout;
+      return layouts.get(layoutName);
+    }
+
+    function applyShift(): void {
+      keyboard.value?.setOptions({
+        layoutName: (lockActive.value || shiftActive.value) ? 'shift' : 'default',
+      });
+      lockActive.value
+        ? keyboard.value?.addButtonTheme('{lock}', 'text-primary')
+        : keyboard.value?.removeButtonTheme('{lock}', 'text-primary');
+      shiftActive.value
+        ? keyboard.value?.addButtonTheme('{shift}', 'text-primary')
+        : keyboard.value?.removeButtonTheme('{shift}', 'text-primary');
+    }
+
+
+    function clearInput(): void {
+      local.value = '';
+      keyboard.value?.clearInput();
+    }
+
+
+    function save(): void {
+      const actual = props.type === 'number'
+        ? Number(local.value)
+        : local.value;
+      onDialogOK(actual);
+    }
+
+    function onChange(value: string): void {
+      local.value = value;
+    }
+
+    async function onKeyPress(button: string): Promise<void> {
+      if (button === '{lock}') {
+        lockActive.value = !lockActive.value;
+        shiftActive.value = false;
+        applyShift();
+      }
+      else if (button === '{shift}') {
+        shiftActive.value = !shiftActive.value;
+        applyShift();
+      }
+      else if (shiftActive.value) {
+        shiftActive.value = false;
+        applyShift();
+      }
+    }
+
+
+    onMounted(async () => {
+      await nextTick();
+      keyboard.value = new Keyboard({
+        onChange,
+        onKeyPress,
+        theme: 'hg-theme-default keyboard-theme-brewblox',
+        layout: findLayout(),
+        newLineOnEnter: true,
+        display: {
+          '{bksp}': '⌫',
+          '{enter}': 'Enter',
+          '{tab}': 'tab ⇥',
+          '{lock}': 'Caps Lock',
+          '{shift}': '⇧',
+          '{space}': ' ',
+          '{esc}': '⊗',
+        },
+        buttonTheme: [
+          { buttons: '-', class: 'text-h5' },
+        ],
+      });
+      keyboard.value.setInput(local.value);
     });
-    this.local = `${this.value ?? ''}`;
-    this.keyboard.setInput(this.local);
-  }
 
-  beforeDestroy(): void {
-    this.keyboard?.destroy();
-  }
-
-  onChange(value: string): void {
-    this.local = value;
-  }
-
-  clearInput(): void {
-    this.local = '';
-    this.keyboard?.clearInput();
-  }
-
-  async onKeyPress(button: string): Promise<void> {
-    if (button === '{lock}') {
-      this.lockActive = !this.lockActive;
-      this.shiftActive = false;
-      this.applyShift();
-    }
-    else if (button === '{shift}') {
-      this.shiftActive = !this.shiftActive;
-      this.applyShift();
-    }
-    else if (this.shiftActive) {
-      this.shiftActive = false;
-      this.applyShift();
-    }
-  }
-
-  applyShift(): void {
-    this.keyboard?.setOptions({
-      layoutName: (this.lockActive || this.shiftActive) ? 'shift' : 'default',
-    });
-    this.lockActive
-      ? this.keyboard?.addButtonTheme('{lock}', 'text-primary')
-      : this.keyboard?.removeButtonTheme('{lock}', 'text-primary');
-    this.shiftActive
-      ? this.keyboard?.addButtonTheme('{shift}', 'text-primary')
-      : this.keyboard?.removeButtonTheme('{shift}', 'text-primary');
-  }
-
-  save(): void {
-    const actual = this.type === 'number'
-      ? Number(this.local)
-      : this.local;
-    this.onDialogOk(actual);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      keyboard,
+      local,
+      lockActive,
+      pwdActive,
+      localRules,
+      valid,
+      clearInput,
+      save,
+    };
+  },
+});
 </script>
 
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     transition-show="fade"
     :class="`keyboard-dialog--${type}`"
@@ -174,7 +206,7 @@ export default class KeyboardDialog extends DialogBase {
   >
     <DialogCard v-bind="{message, html}">
       <q-input
-        :value="local"
+        :model-value="local"
         :suffix="suffix"
         :type="(password && pwdActive) ? 'password' : 'textarea'"
         autogrow

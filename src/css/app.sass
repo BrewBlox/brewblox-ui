@@ -5,17 +5,37 @@ $widget-border-radius: 4px
 
 .card
   &__Dialog
-    width: 800px
     height: 800px
-    max-width: 100vw
-    max-height: 100vh
+    max-height: 100%
     border-radius: $widget-border-radius
     border: 1px solid $dialog-toolbar-color
 
+    &.card__sm
+      min-width: 400px
+      @media screen and ( max-width: 400px )
+        min-width: 100vw
+    &.card__md
+      min-width: 600px
+      @media screen and ( max-width: 600px )
+        min-width: 100vw
+    &.card__lg
+      min-width: 800px
+      @media screen and ( max-width: 800px )
+        min-width: 100vw
+
   &__Dashboard
     max-width: 100%
+    max-height: 100%
     position: relative
     border-radius: $widget-border-radius
+
+    &.card__dense.card__no-scroll
+      height: 100vh
+      min-height: 100vh
+      max-height: 100vh
+
+      .content__Dashboard
+        height: calc(100vh - 40px) !important
 
 .toolbar
   &__Dialog
@@ -50,14 +70,6 @@ $widget-border-radius: 4px
 .card__dense .content__Dialog
   border-radius: 0 0 0 0
 
-.widget
-  &-sm
-    max-width: 400px
-  &-md
-    max-width: 600px
-  &-lg
-    max-width: 800px
-
 .widget-body
   @extend .q-pa-md, .q-gutter-sm
 
@@ -82,6 +94,7 @@ $widget-border-radius: 4px
   background-color: $hover
 
 .no-select
+  -webkit-touch-callout: none
   -webkit-user-select: none
   -moz-user-select: none
   -ms-user-select: none
@@ -102,6 +115,7 @@ $widget-border-radius: 4px
   cursor: pointer
 
 .grabbable
+  cursor: -webkit-grab
   cursor: grab
 
 .static
@@ -161,6 +175,9 @@ label
 .dashed
   border: 1px dashed silver
 
+.rounded
+  border-radius: $widget-border-radius
+
 .col-break
   flex-basis: 100%
   width: 0
@@ -173,6 +190,9 @@ label
   direction: rtl
   text-align: left
 
+.text-big
+  font-size: 170%
+
 .dev
   &-border
     border: 1px solid red
@@ -180,6 +200,10 @@ label
     border: 1px dotted yellow
   &-highlight
     background-color: $hover
+
+// Fixes dark icons in chrome date/time inputs
+::-webkit-calendar-picker-indicator
+  filter: invert(1)
 
 @for $d from 1 through 9
   .fade-#{$d}

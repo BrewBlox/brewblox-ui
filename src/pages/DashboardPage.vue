@@ -1,117 +1,135 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { Watch } from 'vue-property-decorator';
+import { computed, defineComponent, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
-import { objectSorter } from '@/helpers/functional';
-import { Dashboard, dashboardStore, Widget } from '@/store/dashboards';
-import { Crud, featureStore, WidgetContext } from '@/store/features';
-import { systemStore } from '@/store/system';
+import { RenderedItem } from '@/components/grid/types';
+import { useGlobals } from '@/composables';
+import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { featureStore, WidgetContext } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
+import { startChangeDashboardTitle } from '@/utils/dashboards';
+import { createDialog } from '@/utils/dialog';
+import { objectSorter } from '@/utils/functional';
 
-import { createDialog } from '../helpers/dialog';
+export default defineComponent({
+  name: 'DashboardPage',
+  props: {
+    routeId: {
+      type: String,
+      default: null,
+    },
+  },
+  setup(props) {
+    const widgetEditable = ref(false);
+    const { dense } = useGlobals.setup();
+    const router = useRouter();
 
-interface ValidatedWidget {
-  id: string;
-  component: string;
-  crud: Crud;
-  error?: string;
-}
+    const context = computed<WidgetContext>(
+      () => ({
+        mode: 'Basic',
+        container: 'Dashboard',
+        size: dense.value ? 'Content' : 'Fixed',
+      }),
+    );
 
-@Component
-export default class DashboardPage extends Vue {
-  widgetEditable = false;
+    const dashboardId = computed<string | null>(
+      () => props.routeId ?? null,
+    );
 
-  @Watch('dashboardId')
-  onChangeDashboardId(): void {
-    this.widgetEditable = false;
-  }
+    const dashboard = computed<Dashboard | null>(
+      () => dashboardId.value
+        ? dashboardStore.dashboardById(dashboardId.value)
+        : null,
+    );
 
-  @Watch('dashboard', { immediate: true })
-  onChangeDashboard(newV: Dashboard, oldV: Dashboard): void {
-    if (!newV && oldV) {
-      // Dashboard was removed
-      this.$router.replace('/');
-    }
-  }
-
-  @Watch('dashboard.title', { immediate: true })
-  watchTitle(newV: string): void {
-    document.title = `Brewblox | ${newV ?? 'Dashboard'}`;
-  }
-
-  get context(): WidgetContext {
-    return {
-      mode: 'Basic',
-      container: 'Dashboard',
-      size: this.$dense ? 'Content' : 'Fixed',
-    };
-  }
-
-  get loaded(): boolean {
-    return systemStore.loaded;
-  }
-
-  get dashboardId(): string {
-    return this.$route.params.id;
-  }
-
-  get dashboard(): Dashboard | null {
-    return dashboardStore.dashboardById(this.dashboardId);
-  }
-
-  get widgets(): Widget[] {
-    // Avoid modifying the store object
-    return [...dashboardStore.dashboardWidgets(this.dashboardId)]
-      .sort(objectSorter('order'));
-  }
-
-  get validatedWidgets(): ValidatedWidget[] {
-    return this.widgets
-      .map((widget: Widget) => {
-        const crud: Crud = {
-          widget,
-          isStoreWidget: true,
-          saveWidget: this.saveWidget,
-          closeDialog: () => { },
-        };
-        return {
-          ...featureStore.widgetComponent(crud),
-          id: widget.id,
-          crud,
-        };
+    function showWizard(widget: boolean): void {
+      createDialog({
+        component: 'WizardDialog',
+        componentProps: {
+          initialWizard: widget ? 'WidgetWizardPicker' : null,
+          activeDashboardId: dashboardId.value,
+        },
       });
-  }
+    }
 
-  async patchWidgets(updated: Patch<Widget>[]): Promise<void> {
-    await dashboardStore.patchWidgets(updated);
-  }
+    const widgets = computed<Widget[]>(
+      () => widgetStore
+        .widgets
+        .filter(widget => widget.dashboard === dashboardId.value)
+        .sort(objectSorter('order')),
+    );
 
-  public async saveWidget(widget: Widget): Promise<void> {
-    await dashboardStore.saveWidget(widget);
-  }
+    const dashboardItems = computed<RenderedItem[]>(
+      () => widgets.value.map(widget => ({
+        widget,
+        ...featureStore.widgetComponent(widget),
+      })),
+    );
 
-  showWizard(widget: boolean): void {
-    createDialog({
-      component: 'WizardDialog',
-      initialWizard: widget ? 'WidgetWizardPicker' : null,
-      activeDashboardId: this.dashboardId,
-    });
-  }
-}
+    function editTitle(): void {
+      if (dashboard.value) {
+        startChangeDashboardTitle(
+          dashboard.value,
+          newId => router.replace(`/dashboard/${newId}`),
+        );
+      }
+    }
+
+    watch(
+      () => dashboardId.value,
+      () => widgetEditable.value = false,
+    );
+
+    watch(
+      () => dashboard.value,
+      (newV) => {
+        // We want to re-route to home if:
+        // - the dashboard was removed
+        // - the user navigates to a dashboard ID that does not exist (or just /dashboard)
+        // - dashboards are loaded from the datastore
+        if (newV === null && dashboardId.value !== null && dashboardStore.dashboards.length > 0) {
+          router.replace('/');
+        }
+      },
+      { immediate: true },
+    );
+
+    watch(
+      () => dashboard.value?.title,
+      v => document.title = `Brewblox | ${v ?? 'Dashboard'}`,
+      { immediate: true },
+    );
+
+    return {
+      dense,
+      widgetEditable,
+      context,
+      dashboardId,
+      dashboard,
+      showWizard,
+      widgets,
+      dashboardItems,
+      editTitle,
+    };
+  },
+});
 </script>
 
 <template>
-  <q-page style="overflow: auto" class="page-height">
+  <q-page
+    class="page-height"
+    @dblclick="showWizard(true)"
+  >
     <PageError v-if="!dashboard">
       <span>Unknown dashboard: <b>{{ dashboardId }}</b></span>
     </PageError>
     <template v-else>
-      <portal to="toolbar-title">
-        {{ dashboard.title }}
-      </portal>
-      <portal to="toolbar-buttons">
+      <TitleTeleport>
+        <span class="cursor-pointer" @click="editTitle">{{ dashboard.title }}</span>
+      </TitleTeleport>
+      <ButtonsTeleport>
         <q-btn
-          v-if="!$dense"
+          v-if="!dense"
           unelevated
           round
           icon="mdi-arrow-all"
@@ -134,51 +152,48 @@ export default class DashboardPage extends Vue {
             <DashboardActions :dashboard-id="dashboardId" />
           </template>
         </ActionMenu>
-      </portal>
+      </ButtonsTeleport>
 
-      <div
-        v-if="validatedWidgets.length === 0"
-        class="absolute-center"
-      >
-        <q-btn
-          unelevated
-          color="secondary"
-          icon="mdi-creation"
-          size="lg"
-          label="Get started"
-          @click="showWizard(false)"
-        />
-      </div>
-      <div
-        v-else-if="$dense"
-        class="column q-gutter-y-sm q-pa-md"
-      >
-        <component
-          :is="val.component"
-          v-for="val in validatedWidgets"
-          :key="val.id"
-          :initial-crud="val.crud"
+      <q-scroll-area class="fit">
+        <div
+          v-if="dashboardItems.length === 0"
+          class="absolute-center"
+        >
+          <q-btn
+            unelevated
+            color="secondary"
+            icon="mdi-creation"
+            size="lg"
+            label="Get started"
+            @click="showWizard(false)"
+          />
+        </div>
+        <div
+          v-else-if="dense"
+          class="column q-gutter-y-sm q-pa-md"
+        >
+          <WidgetProvider
+            v-for="val in dashboardItems"
+            :key="val.widget.id"
+            :widget-id="val.widget.id"
+            :context="context"
+          >
+            <component
+              :is="val.component"
+              :error="val.error"
+              class="col full-width"
+              @dblclick.stop
+            />
+          </WidgetProvider>
+        </div>
+        <GridContainer
+          v-else
+          class="q-ma-lg"
+          :items="dashboardItems"
           :context="context"
-          class="col full-width"
+          :editable="widgetEditable"
         />
-      </div>
-      <GridContainer
-        v-else
-        class="q-ma-lg"
-        :editable="widgetEditable"
-        @patch:widgets="patchWidgets"
-        @dblclick="showWizard(true)"
-      >
-        <component
-          :is="val.component"
-          v-for="val in validatedWidgets"
-          :key="val.id"
-          :initial-crud="val.crud"
-          :context="context"
-          :error="val.error"
-          class="fit"
-        />
-      </GridContainer>
+      </q-scroll-area>
     </template>
   </q-page>
 </template>

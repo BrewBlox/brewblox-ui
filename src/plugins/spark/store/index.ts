@@ -1,15 +1,17 @@
-import { Action, Module, VuexModule } from 'vuex-class-modules';
+import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById } from '@/helpers/functional';
+import { Link } from '@/shared-types';
 import store from '@/store';
+import { deepCopy, extendById, filterById, findById } from '@/utils/functional';
 
-import { Block, BlockField, BlockFieldAddress } from '../types';
 import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
+import type { Block, BlockField, BlockFieldAddress } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
 import { SparkServiceModule } from './spark-module';
 
 export { SparkServiceModule } from './spark-module';
+
 
 @Module({ generateMutationSetters: true })
 export class SparkGlobalModule extends VuexModule {
@@ -25,12 +27,12 @@ export class SparkGlobalModule extends VuexModule {
     return this.presets.map(v => v.id);
   }
 
-  public moduleById(serviceId: string | null): SparkServiceModule | null {
+  public moduleById(serviceId: Nullable<string>): SparkServiceModule | null {
     if (!serviceId) { return null; }
     return this.modules.find(v => v.id === serviceId) ?? null;
   }
 
-  public blockById<T extends Block>(serviceId: string | null, blockId: string | null): T | null {
+  public blockById<T extends Block>(serviceId: Nullable<string>, blockId: Nullable<string>): T | null {
     if (!serviceId || !blockId) { return null; }
     return this.moduleById(serviceId)?.blockById<T>(blockId) ?? null;
   }
@@ -40,12 +42,16 @@ export class SparkGlobalModule extends VuexModule {
     return this.moduleById(addr.serviceId)?.blockByAddress<T>(addr) ?? null;
   }
 
+  public blockByLink<T extends Block>(serviceId: Nullable<string>, link: Nullable<Link>): T | null {
+    return this.moduleById(serviceId)?.blockByLink<T>(link) ?? null;
+  }
+
   public fieldByAddress(addr: BlockFieldAddress | null): any {
     if (!addr) { return null; }
     return this.moduleById(addr.serviceId)?.fieldByAddress(addr) ?? null;
   }
 
-  public serviceBlocks(serviceId: string | null): Block[] {
+  public serviceBlocks(serviceId: Nullable<string>): Block[] {
     return this.moduleById(serviceId)?.blocks ?? [];
   }
 
@@ -62,20 +68,36 @@ export class SparkGlobalModule extends VuexModule {
     return this.specById<T>(type);
   }
 
-  public fieldSpec<T extends Block>(addr: BlockFieldAddress | null): BlockField<T> | null {
+  public fieldSpec<T extends Block>(addr: Nullable<BlockFieldAddress>): BlockField<T> | null {
     return addr && addr.type && addr.field
       ? this.specById(addr.type as T['type'])?.fields.find(f => f.key === addr.field) ?? null
       : null;
   }
 
-  @Action
-  public async registerSpecs(specs: BlockSpec[]): Promise<void> {
-    this.specs = specs;
+  public setVolatileBlock(block: Block): void {
+    this.moduleById(block.serviceId)?.setVolatileBlock(block);
+  }
+
+  public removeVolatileBlock(block: BlockAddress): void {
+    this.moduleById(block.serviceId)?.removeVolatileBlock(block);
+  }
+
+  @Mutation
+  public addBlockSpec<T extends Block>(spec: BlockSpec<T>): void {
+    this.specs = extendById(this.specs, spec as any);
   }
 
   @Action
   public async saveBlock(block: Block): Promise<void> {
     await this.moduleById(block.serviceId)?.saveBlock(block);
+  }
+
+  public async modifyBlock<T extends Block>(block: T, func: ((v: T) => void)): Promise<void> {
+    const actual = deepCopy(this.blockByAddress<T>(block));
+    if (actual) {
+      func(actual);
+      return this.saveBlock(actual);
+    }
   }
 
   @Action

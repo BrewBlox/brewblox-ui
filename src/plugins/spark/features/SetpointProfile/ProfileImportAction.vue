@@ -1,33 +1,46 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import { loadFile } from '@/helpers/import-export';
-import notify from '@/helpers/notify';
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { SetpointProfileBlock } from '@/plugins/spark/types';
+import { loadFile } from '@/utils/import-export';
+import notify from '@/utils/notify';
 
 
-@Component
-export default class ProfileImportAction
-  extends BlockCrudComponent<SetpointProfileBlock> {
+export default defineComponent({
+  name: 'ProfileImportAction',
+  props: {
+    icon: {
+      type: String,
+      default: 'mdi-file-import',
+    },
+    label: {
+      type: String,
+      default: 'Import profile from file',
+    },
+  },
+  setup() {
+    const {
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<SetpointProfileBlock>();
 
-  @Prop({ type: String, default: 'mdi-file-import' })
-  readonly icon!: string;
+    async function showDialog(): Promise<void> {
+      loadFile((cfg: Pick<SetpointProfileBlock['data'], 'points'>) => {
+        if (cfg.points === undefined) {
+          notify.error('Invalid configuration file');
+          return;
+        }
+        block.value.data.points = cfg.points;
+        saveBlock();
+      });
+    }
 
-  @Prop({ type: String, default: 'Import profile from file' })
-  readonly label!: string;
-
-  async showDialog(): Promise<void> {
-    loadFile((cfg: Pick<SetpointProfileBlock['data'], 'points'>) => {
-      if (cfg.points === undefined) {
-        notify.error('Invalid configuration file');
-        return;
-      }
-      this.block.data.points = cfg.points;
-      this.saveBlock();
-    });
-  }
-}
+    return {
+      showDialog,
+    };
+  },
+});
 </script>
 
 <template>

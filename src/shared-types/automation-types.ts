@@ -67,7 +67,7 @@ export interface BlockPatchImpl {
   /**
    * @nullable
    */
-  data: object;
+  data: Record<string, unknown>;
 }
 
 /**

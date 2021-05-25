@@ -1,21 +1,21 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
 import { BuilderLayout } from '@/plugins/builder/types';
 
-import { withPrefix } from '../helpers';
+import { withPrefix } from '../utils';
 import { RimsConfig } from './types';
 
 export function defineLayouts(config: RimsConfig): BuilderLayout[] {
   const { serviceId, names } = config;
   return [
     {
-      id: uid(),
+      id: nanoid(),
       title: withPrefix(config.prefix, 'Layout'),
       width: 12,
       height: 12,
       parts: [
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             color: '#E1AC00',
@@ -26,7 +26,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -35,7 +35,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             sizeX: 4,
@@ -47,7 +47,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: true,
@@ -56,7 +56,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -68,7 +68,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             setpoint: { serviceId, blockId: names.tubeSetpoint },
@@ -79,7 +79,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -88,7 +88,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -97,7 +97,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 5,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -106,7 +106,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -115,7 +115,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 1,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -124,7 +124,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 4,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -133,7 +133,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 3,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -142,7 +142,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 2,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -151,7 +151,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -160,7 +160,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 6,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {},
           flipped: false,
@@ -169,7 +169,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             enabled: true,
@@ -181,7 +181,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 180,
           settings: {},
           flipped: false,
@@ -190,7 +190,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,
@@ -202,7 +202,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 9,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -211,7 +211,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -220,7 +220,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 7,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 90,
           settings: {},
           flipped: false,
@@ -229,7 +229,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 270,
           settings: {},
           flipped: false,
@@ -238,7 +238,7 @@ export function defineLayouts(config: RimsConfig): BuilderLayout[] {
           y: 8,
         },
         {
-          id: uid(),
+          id: nanoid(),
           rotate: 0,
           settings: {
             bordered: false,

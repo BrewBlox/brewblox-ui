@@ -1,66 +1,71 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, ref } from 'vue';
 
-import { objectSorter } from '@/helpers/functional';
-import { startChangeServiceTitle, startCreateService, startRemoveService } from '@/helpers/services';
+import { useGlobals } from '@/composables';
 import { featureStore, ServiceFeature } from '@/store/features';
-import { Service, ServiceStatus, serviceStore, ServiceStub } from '@/store/services';;
+import { Service, ServiceStatus, serviceStore, ServiceStub } from '@/store/services';
+import { objectSorter } from '@/utils/functional';
+import { startChangeServiceTitle, startCreateService, startRemoveService } from '@/utils/services';
 
 interface ServiceSuggestion {
   stub: ServiceStub;
   feature: ServiceFeature;
 }
 
-@Component({
-  methods: {
-    startChangeServiceTitle,
-    startCreateService,
-    startRemoveService,
+export default defineComponent({
+  name: 'ServiceIndex',
+  props: {
+    editing: {
+      type: Boolean,
+      required: true,
+    },
   },
-})
-export default class ServiceIndex extends Vue {
-  dragging = false;
+  emits: [
+    'update:editing',
+  ],
+  setup() {
+    const { dense } = useGlobals.setup();
+    const dragging = ref(false);
 
-  @Prop({ type: Boolean, required: true })
-  public readonly value!: boolean;
+    const services = computed<Service[]>({
+      // avoid modifying the store object
+      get: () => [...serviceStore.services].sort(objectSorter('order')),
+      set: services => serviceStore.updateServiceOrder(services.map(v => v.id)),
+    });
 
-  get editing(): boolean {
-    return this.value;
-  }
+    const suggestions = computed<ServiceSuggestion[]>(
+      () => serviceStore
+        .stubs
+        .map(stub => {
+          const feature = featureStore.serviceById(stub.type)!;
+          return { stub, feature };
+        })
+        .filter(({ feature }) => feature !== null),
+    );
 
-  set editing(val: boolean) {
-    this.$emit('input', val);
-  }
+    function status(service: Service): ServiceStatus | null {
+      return serviceStore.statuses.find(v => v.id === service.id) ?? null;
+    }
 
-  get services(): Service[] {
-    // Avoid modifying the store object
-    return [...serviceStore.services].sort(objectSorter('order'));
-  }
-
-  set services(services: Service[]) {
-    serviceStore.updateServiceOrder(services.map(v => v.id));
-  }
-
-  get suggestions(): ServiceSuggestion[] {
-    return serviceStore.stubs
-      .map(stub => {
-        const feature = featureStore.serviceById(stub.type)!;
-        return { stub, feature };
-      })
-      .filter(({ feature }) => feature !== null);
-  }
-
-  status(service: Service): ServiceStatus | null {
-    return serviceStore.statuses.find(v => v.id === service.id) ?? null;
-  }
-}
+    return {
+      dense,
+      dragging,
+      services,
+      suggestions,
+      status,
+      startChangeServiceTitle,
+      startCreateService,
+      startRemoveService,
+    };
+  },
+});
 </script>
 
 <template>
   <draggable
     v-model="services"
-    :disabled="$dense || !editing"
+    :disabled="dense || !editing"
+    item-key="id"
     @start="dragging=true"
     @end="dragging=false"
   >
@@ -79,7 +84,7 @@ export default class ServiceIndex extends Vue {
             round
             flat
             size="sm"
-            @click="editing = !editing"
+            @click="$emit('update:editing', !editing)"
           >
             <q-tooltip>
               Rearrange services
@@ -88,32 +93,33 @@ export default class ServiceIndex extends Vue {
         </q-item-section>
       </q-item>
     </template>
-    <q-item
-      v-for="service in services"
-      :key="service.id"
-      :to="editing ? undefined : `/service/${service.id}`"
-      :inset-level="0.2"
-      :class="[
-        'q-pb-sm',
-        editing && 'bordered pointer',
-      ]"
-      style="min-height: 0px"
-    >
-      <q-item-section :class="['ellipsis', {'text-italic': editing}]">
-        {{ service.title }}
-      </q-item-section>
-      <template v-if="status(service) !== null">
-        <q-item-section class="col-auto q-mr-sm">
-          <q-icon
-            :name="status(service).icon || 'mdi-checkbox-blank-circle'"
-            :color="status(service).color"
-          />
-          <q-tooltip>
-            {{ status(service).desc }}
-          </q-tooltip>
+
+    <template #item="{element}">
+      <q-item
+        :to="editing ? undefined : `/service/${element.id}`"
+        :inset-level="0.2"
+        :class="[
+          'q-pb-sm',
+          editing && 'bordered pointer',
+        ]"
+        style="min-height: 0px"
+      >
+        <q-item-section :class="['ellipsis', {'text-italic': editing}]">
+          {{ element.title }}
         </q-item-section>
-      </template>
-    </q-item>
+        <template v-if="status(element) !== null">
+          <q-item-section class="col-auto q-mr-sm">
+            <q-icon
+              :name="status(element)?.icon || 'mdi-checkbox-blank-circle'"
+              :color="status(element)?.color"
+            />
+            <q-tooltip>
+              {{ status(element)?.desc }}
+            </q-tooltip>
+          </q-item-section>
+        </template>
+      </q-item>
+    </template>
 
     <template #footer>
       <q-item

@@ -1,26 +1,41 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { CENTER } from '../getters';
+import { CENTER } from '@/plugins/builder/const';
 
+import { usePart } from '../composables';
+import { PWM_KEY } from '../specs/PwmDisplay';
+import { FlowPart } from '../types';
+import { liquidOnCoord } from '../utils';
 
-@Component
-export default class PwmDisplay extends PartBase {
-  readonly scaleKey = 'scale';
+export default defineComponent({
+  name: 'PwmDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      scale,
+    } = usePart.setup(props.part);
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
+    const color = computed<string>(
+      () => liquidOnCoord(props.part, CENTER)[0] ?? '',
+    );
 
-  get color(): string {
-    return this.liquidOnCoord(CENTER)[0] ?? '';
-  }
-}
+    return {
+      PWM_KEY,
+      scale,
+      color,
+    };
+  },
+});
 </script>
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
-    <PwmValues :part="part" settings-key="pwm" :color="color" />
+    <PwmValues :part="part" :settings-key="PWM_KEY" :color="color" />
   </g>
 </template>

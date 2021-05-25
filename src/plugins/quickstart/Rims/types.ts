@@ -1,4 +1,4 @@
-import { PinChannel, QuickStartOutput } from '../types';
+import { PinChannel, QuickstartConfig } from '../types';
 
 export interface RimsBlockNames {
   kettleSensor: string;
@@ -15,8 +15,7 @@ export interface RimsBlockNames {
   pumpAct: string;
 }
 
-export interface RimsConfig extends QuickStartOutput {
-  prefix: string;
+export interface RimsConfig extends QuickstartConfig {
   names: RimsBlockNames;
   tubePin: PinChannel;
   pumpPin: PinChannel;

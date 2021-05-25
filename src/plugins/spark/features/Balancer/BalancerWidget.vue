@@ -1,41 +1,57 @@
 <script lang="ts">
 import get from 'lodash/get';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { BalancerBlock } from '@/plugins/spark/types';
+import { Block } from '@/shared-types';
+import { round } from '@/utils/functional';
 
-@Component
-export default class BalancerWidget
-  extends BlockWidgetBase<BalancerBlock> {
+export default defineComponent({
+  name: 'BalancerWidget',
+  setup() {
+    const {
+      sparkModule,
+      block,
+    } = useBlockWidget.setup<BalancerBlock>();
 
-  get clientNames(): Mapped<string> {
-    const result = {};
-    this.sparkModule
-      .blocks
-      .forEach((block) => {
-        const constraint = get(block, 'data.constrainedBy.constraints', [])
-          .find(constraint => get(constraint, 'balanced.balancerId.id') === this.blockId);
-        if (constraint) {
-          result[constraint.balanced.id] = block.id;
-        }
-      });
-    return result;
-  }
+    const clientNames = computed<Mapped<string>>(
+      () => {
+        const result = {};
+        sparkModule
+          .blocks
+          .forEach((v: Block) => {
+            const constraint = get(v, 'data.constrainedBy.constraints', [])
+              .find(constraint => get(constraint, 'balanced.balancerId.id') === block.value.id);
+            if (constraint) {
+              result[constraint.balanced.id] = v.id;
+            }
+          });
+        return result;
+      },
+    );
 
-  clientName(id: number): string {
-    return this.clientNames[id] || `${id}` || 'unknown';
-  }
-}
+    function clientName(id: number): string {
+      return clientNames.value[id] || `${id}` || 'unknown';
+    }
+
+    return {
+      round,
+      sparkModule,
+      block,
+      clientName,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" />
+      <BlockWidgetToolbar />
     </template>
 
-    <div class="widget-md column q-ma-md q-gutter-y-sm">
+    <div class="column q-ma-md q-gutter-y-sm">
       <div class="col-auto row q-gutter-x-sm darkened">
         <div class="col">
           Client
@@ -50,19 +66,19 @@ export default class BalancerWidget
 
       <div
         v-for="client in block.data.clients"
-        :key="client.id.id"
+        :key="`client-${client.id}`"
         class="col-auto row q-gutter-x-sm"
       >
         <div class="col text-italic">
           {{ clientName(client.id) }}
         </div>
         <div class="col">
-          {{ client.granted | round }}
+          {{ round(client.granted) }}
         </div>
         <div class="col">
-          {{ client.requested | round }}
+          {{ round(client.requested) }}
         </div>
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

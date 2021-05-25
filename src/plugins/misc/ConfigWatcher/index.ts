@@ -1,12 +1,20 @@
-import { ref } from '@/helpers/component-ref';
-import { WatcherFeature } from '@/store/features';
+import { Plugin } from 'vue';
+
+import { featureStore, WatcherFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
 
 import ConfigWatcher from './ConfigWatcher.vue';
 
-const watcher: WatcherFeature = {
-  id: 'ConfigWatcher',
-  component: ref(ConfigWatcher),
-  props: {},
+const plugin: Plugin = {
+  install(app) {
+    const watcher: WatcherFeature = {
+      id: 'ConfigWatcher',
+      component: cref(app, ConfigWatcher),
+      props: {},
+    };
+
+    featureStore.addWatcherFeature(watcher);
+  },
 };
 
-export default watcher;
+export default plugin;

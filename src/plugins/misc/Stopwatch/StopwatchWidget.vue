@@ -1,101 +1,121 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
+import { useWidget } from '@/composables';
 
-import { StopwatchConfig, StopwatchSession } from './types';
+import { StopwatchSession, StopwatchWidget } from './types';
 
+export default defineComponent({
+  name: 'StopwatchWidget',
+  setup() {
+    const {
+      config,
+      saveConfig,
+    } = useWidget.setup<StopwatchWidget>();
 
-@Component
-export default class StopwatchWidget extends WidgetBase<StopwatchConfig> {
-  time: string = '00:00:00.0';
-  tickTimer: NodeJS.Timer | null = null;
+    const time = ref<string>('00:00:00.0');
+    let tickTimer: NodeJS.Timer | null = null;
 
-  created(): void {
-    if (this.running) {
-      this.startTick();
-    }
-  }
+    const session = computed<StopwatchSession | null>(
+      () => config.value.session,
+    );
 
-  get session(): StopwatchSession | null {
-    return this.config.session;
-  }
-
-  get running(): boolean {
-    return !!this.session?.running;
-  }
-
-  start(): void {
-    if (this.running) {
-      return;
-    }
-
-    const session = this.session ?? {
-      timeStarted: new Date().getTime(),
-      timeStopped: null,
-      stoppedDuration: 0,
-      running: true,
-    };
-
-    if (session.timeStopped) {
-      session.stoppedDuration += (new Date().getTime() - session.timeStopped);
-    }
-
-    session.running = true;
-    this.startTick();
-    this.saveConfig({ session });
-  }
-
-  startTick(): void {
-    this.endTick();
-    this.tickTimer = setInterval(this.tick, 10);
-  }
-
-  endTick(): void {
-    if (this.tickTimer) {
-      clearInterval(this.tickTimer);
-      this.tickTimer = null;
-    }
-  }
-
-  tick(): void {
-    if (this.session) {
-      const { timeStarted, stoppedDuration } = this.session;
-      const now = new Date().getTime();
-      const elapsed = new Date(now - timeStarted - stoppedDuration);
+    function renderTime(elapsed: Date): void {
       const hour = elapsed.getUTCHours().toString().padStart(2, '0');
       const min = elapsed.getUTCMinutes().toString().padStart(2, '0');
       const sec = elapsed.getUTCSeconds().toString().padStart(2, '0');
       const ms = Math.floor(elapsed.getUTCMilliseconds() / 100).toString().padStart(1, '0');
-      this.time = `${hour}:${min}:${sec}.${ms}`;
+      time.value = `${hour}:${min}:${sec}.${ms}`;
     }
-  }
 
-  stop(): void {
-    if (!this.session) {
-      return;
+    function tick(): void {
+      if (session.value) {
+        const { timeStarted, stoppedDuration } = session.value;
+        const now = new Date().getTime();
+        const elapsed = new Date(now - timeStarted - stoppedDuration);
+        renderTime(elapsed);
+      }
     }
-    this.session.running = false;
-    this.session.timeStopped = new Date().getTime();
-    this.endTick();
-    this.saveConfig();
-  }
 
-  reset(): void {
-    if (!this.session) {
-      return;
+    function startTick(): void {
+      endTick();
+      tickTimer = setInterval(tick, 10);
     }
-    this.endTick();
-    this.saveConfig({ session: null });
-    this.time = '00:00:00.0';
-  }
-}
+
+    function endTick(): void {
+      if (tickTimer) {
+        clearInterval(tickTimer);
+        tickTimer = null;
+      }
+    }
+
+    function start(): void {
+      if (session.value?.running) {
+        return;
+      }
+
+      const newSession = session.value ?? {
+        timeStarted: new Date().getTime(),
+        timeStopped: null,
+        stoppedDuration: 0,
+        running: true,
+      };
+
+      if (newSession.timeStopped) {
+        newSession.stoppedDuration += (new Date().getTime() - newSession.timeStopped);
+      }
+
+      newSession.running = true;
+      startTick();
+      saveConfig({ session: newSession });
+    }
+
+    function stop(): void {
+      if (!session.value) {
+        return;
+      }
+      session.value.running = false;
+      session.value.timeStopped = new Date().getTime();
+      endTick();
+      saveConfig({ session: session.value });
+    }
+
+    function reset(): void {
+      if (!session.value) {
+        return;
+      }
+      endTick();
+      saveConfig({ session: null });
+      time.value = '00:00:00.0';
+    }
+
+    onBeforeMount(() => {
+      if (session.value) {
+        const { running, timeStarted, stoppedDuration, timeStopped } = session.value;
+        if (running) {
+          startTick();
+        }
+        else if (timeStopped) {
+          const elapsed = new Date(timeStopped - timeStarted - stoppedDuration);
+          renderTime(elapsed);
+        }
+      }
+    });
+
+    return {
+      time,
+      start,
+      stop,
+      reset,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" />
+      <WidgetToolbar />
     </template>
 
     <div class="widget-body row q-mt-lg">
@@ -109,5 +129,5 @@ export default class StopwatchWidget extends WidgetBase<StopwatchConfig> {
         <q-btn flat label="Reset" @click="reset" />
       </div>
     </div>
-  </CardWrapper>
+  </Card>
 </template>

@@ -1,30 +1,29 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
-import { ActuatorAnalogMockBlock } from '@/plugins/spark/types';
+import { useContext } from '@/composables';
 
 import ActuatorAnalogMockBasic from './ActuatorAnalogMockBasic.vue';
 import ActuatorAnalogMockFull from './ActuatorAnalogMockFull.vue';
 
-@Component({
+export default defineComponent({
+  name: 'ActuatorAnalogMockWidget',
   components: {
     Basic: ActuatorAnalogMockBasic,
     Full: ActuatorAnalogMockFull,
   },
-})
-export default class ActuatorAnalogMockWidget
-  extends BlockWidgetBase<ActuatorAnalogMockBlock> {
-}
+  setup() {
+    const { context } = useContext.setup();
+    return { context };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper
-    v-bind="{context}"
-  >
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
-    <component :is="mode" :crud="crud" />
-  </CardWrapper>
+    <component :is="context.mode" />
+  </Card>
 </template>

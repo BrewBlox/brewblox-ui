@@ -1,71 +1,83 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import { bloxQty, deltaTempQty } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { Fluctuation, TempSensorMockBlock } from '@/plugins/spark/types';
+import { bloxQty, deltaTempQty, prettyQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
+export default defineComponent({
+  name: 'TempSensorMockWidget',
+  setup() {
+    const {
+      context,
+      inDialog,
+    } = useContext.setup();
+    const {
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<TempSensorMockBlock>();
 
-@Component
-export default class TempSensorMockWidget
-  extends BlockWidgetBase<TempSensorMockBlock> {
-
-  addFluctuation(): void {
-    this.block.data.fluctuations.push({
-      amplitude: deltaTempQty(1),
-      period: bloxQty('6h'),
-    });
-    this.saveBlock();
-  }
-
-  updateFluctuation(idx: number, fluct: Fluctuation): void {
-    this.block.data.fluctuations.splice(idx, 1, fluct);
-    this.saveBlock();
-  }
-
-  removeFluctuation(idx: number): void {
-    this.block.data.fluctuations.splice(idx, 1);
-    this.saveBlock();
-  }
-
-  editSetting(): void {
-    createDialog({
-      component: 'QuantityDialog',
-      title: 'Setting',
-      label: 'Setting',
-      value: this.block.data.setting,
-    })
-      .onOk(v => {
-        this.block.data.setting = v;
-        this.saveBlock();
+    function addFluctuation(): void {
+      block.value.data.fluctuations.push({
+        amplitude: deltaTempQty(1),
+        period: bloxQty('6h'),
       });
-  }
-}
+      saveBlock();
+    }
+
+    function updateFluctuation(idx: number, fluct: Fluctuation): void {
+      block.value.data.fluctuations.splice(idx, 1, fluct);
+      saveBlock();
+    }
+
+    function removeFluctuation(idx: number): void {
+      block.value.data.fluctuations.splice(idx, 1);
+      saveBlock();
+    }
+
+    function editSetting(): void {
+      createDialog({
+        component: 'QuantityDialog',
+        componentProps: {
+          modelValue: block.value.data.setting,
+          title: 'Setting',
+          label: 'Setting',
+        },
+      })
+        .onOk(v => {
+          block.value.data.setting = v;
+          saveBlock();
+        });
+    }
+
+    return {
+      prettyQty,
+      context,
+      inDialog,
+      block,
+      saveBlock,
+      addFluctuation,
+      updateFluctuation,
+      removeFluctuation,
+      editSetting,
+    };
+  },
+});
 </script>
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-    v-bind="{context}"
-  >
-    <template #graph>
-      <HistoryGraph
-        :graph-id="widget.id"
-        :config="graphCfg"
-        :refresh-trigger="mode"
-        use-range
-        use-presets
-        @params="saveGraphParams"
-        @layout="saveGraphLayout"
-      />
+  <PreviewCard :enabled="inDialog">
+    <template #preview>
+      <BlockHistoryGraph />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div class="widget-md widget-body">
+    <div class="widget-body">
       <div class="row justify-around">
         <SettingValueField
           :class="['col-auto', !block.data.connected && 'darkish']"
@@ -76,15 +88,15 @@ export default class TempSensorMockWidget
             <q-icon name="mdi-thermometer" color="green-3" />
           </template>
           <template #value>
-            {{ block.data.value | quantity }}
+            {{ prettyQty(block.data.value) }}
           </template>
           <template #setting>
-            {{ block.data.setting | quantity }}
+            {{ prettyQty(block.data.setting) }}
           </template>
         </SettingValueField>
       </div>
 
-      <template v-if="mode === 'Full'">
+      <template v-if="context.mode === 'Full'">
         <q-separator inset />
         <LabeledField
           label="Connected"
@@ -92,9 +104,9 @@ export default class TempSensorMockWidget
         >
           <q-toggle
             dense
-            :value="block.data.connected"
+            :model-value="block.data.connected"
             class="q-pl-md"
-            @input="v => { block.data.connected = v; saveBlock(); }"
+            @update:model-value="v => { block.data.connected = v; saveBlock(); }"
           />
         </LabeledField>
         <div class="text-h6 text-italic q-pl-sm">
@@ -112,18 +124,18 @@ export default class TempSensorMockWidget
           class="row q-gutter-x-sm q-ml-none fluctuation"
         >
           <QuantityField
-            :value="fluct.amplitude"
+            :model-value="fluct.amplitude"
             title="Amplitude"
             label="Amplitude"
             class="col-grow"
-            @input="amplitude => updateFluctuation(idx, {...fluct, amplitude})"
+            @update:model-value="amplitude => updateFluctuation(idx, {...fluct, amplitude})"
           />
           <DurationField
-            :value="fluct.period"
+            :model-value="fluct.period"
             title="Period"
             label="Period"
             class="col-grow"
-            @input="period => updateFluctuation(idx, {...fluct, period})"
+            @update:model-value="period => updateFluctuation(idx, {...fluct, period})"
           />
           <q-btn
             flat
@@ -140,7 +152,7 @@ export default class TempSensorMockWidget
         </div>
       </template>
     </div>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>
 
 <style lang="sass" scoped>

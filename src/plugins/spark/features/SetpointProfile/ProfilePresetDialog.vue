@@ -1,118 +1,157 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
-import { deepCopy } from '@/helpers/functional';
+import { useDialog } from '@/composables';
 import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/functional';
 
 const typeName = BlockType.SetpointProfile;
 
-@Component
-export default class ProfilePresetDialog extends DialogBase {
-  selected: SelectOption | null = null;
+export default defineComponent({
+  name: 'ProfilePresetDialog',
+  props: {
+    ...useDialog.props,
+    block: {
+      type: Object as PropType<SetpointProfileBlock>,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-  @Prop({ type: Object })
-  public readonly value!: SetpointProfileBlock;
+    const selected = ref<SelectOption | null>(null);
+    const block = ref<SetpointProfileBlock>(deepCopy(props.block));
 
-  get options(): SelectOption[] {
-    return sparkStore.presets
-      .filter(preset => preset.type === typeName)
-      .map(preset => ({ label: preset.name, value: preset.id }));
-  }
+    const options = computed<SelectOption[]>(
+      () => sparkStore.presets
+        .filter(preset => preset.type === typeName)
+        .map(preset => ({ label: preset.name, value: preset.id })),
+    );
 
-  removeSelected(): void {
-    if (this.selected === null) {
-      return;
+
+    function removeSelected(): void {
+      if (selected.value === null) {
+        return;
+      }
+      const { value } = selected.value;
+      const preset = sparkStore.presetById(value)!;
+      selected.value = null;
+      sparkStore.removePreset(preset);
     }
-    const { value } = this.selected;
-    const preset = sparkStore.presetById(value)!;
-    this.selected = null;
-    sparkStore.removePreset(preset);
-  }
 
-  editSelected(): void {
-    if (this.selected === null) {
-      return;
-    }
-    const { value } = this.selected;
-    const preset = sparkStore.presetById(value)!;
-    createDialog({
-      component: 'InputDialog',
-      title: 'Edit profile name',
-      value: preset.name,
-    })
-      .onOk(name => sparkStore.savePreset({ ...preset, name }));
-  }
-
-  async loadSelected(): Promise<void> {
-    if (this.selected === null) {
-      return;
-    }
-    const { value } = this.selected;
-    const preset = sparkStore.presetById(value)!;
-    const points = deserialize(deepCopy(preset.data.points));
-
-    createDialog({
-      component: 'ConfirmDialog',
-      title: 'Profile start',
-      message: `Do you want to change '${this.value.id}' start time to now?`,
-      ok: 'Yes',
-      cancel: 'No',
-    })
-      .onOk(async () => {
-        this.value.data.start = new Date().getTime() / 1000;
-        this.value.data.points = points;
-        await sparkStore.saveBlock(this.value);
-        this.onDialogOk();
+    function editSelected(): void {
+      if (selected.value === null) {
+        return;
+      }
+      const { value } = selected.value;
+      const preset = sparkStore.presetById(value)!;
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          title: 'Edit profile name',
+          modelValue: preset.name,
+        },
       })
-      .onCancel(async () => {
-        this.value.data.points = points;
-        await sparkStore.saveBlock(this.value);
-        this.onDialogOk();
-      });
-  }
-
-  async saveSelected(): Promise<void> {
-    if (this.selected === null) {
-      return;
+        .onOk(name => sparkStore.savePreset({ ...preset, name }));
     }
-    const { value } = this.selected;
-    const preset = sparkStore.presetById(value)!;
-    preset.data = {
-      points: deepCopy(this.value.data.points),
-    };
-    await sparkStore.savePreset(preset);
-    this.onDialogOk();
-  }
 
-  createPreset(): void {
-    createDialog({
-      component: 'InputDialog',
-      title: 'Save as new profile',
-      value: `${this.value.id} profile`,
-    })
-      .onOk(async name => {
-        await sparkStore.createPreset({
-          id: uid(),
-          name,
-          type: typeName,
-          data: {
-            points: deepCopy(this.value.data.points),
-          },
+    async function loadSelected(): Promise<void> {
+      if (selected.value === null) {
+        return;
+      }
+      const { value } = selected.value;
+      const preset = sparkStore.presetById(value)!;
+      const points = deserialize(deepCopy(preset.data.points));
+
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Profile start',
+          message: `Do you want to change '${block.value.id}' start time to now?`,
+          ok: 'Yes',
+          cancel: 'No',
+        },
+      })
+        .onOk(async () => {
+          block.value.data.start = new Date().getTime() / 1000;
+          block.value.data.points = points;
+          await sparkStore.saveBlock(block.value);
+          onDialogOK();
+        })
+        .onCancel(async () => {
+          block.value.data.points = points;
+          await sparkStore.saveBlock(block.value);
+          onDialogOK();
         });
-        this.onDialogOk();
-      });
-  }
-}
+    }
+
+    async function saveSelected(): Promise<void> {
+      if (selected.value === null) {
+        return;
+      }
+      const { value } = selected.value;
+      const preset = sparkStore.presetById(value)!;
+      preset.data = {
+        points: deepCopy(block.value.data.points),
+      };
+      await sparkStore.savePreset(preset);
+      onDialogOK();
+    }
+
+    function createPreset(): void {
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          modelValue: `${block.value.id} profile`,
+          title: 'Save as new profile',
+        },
+      })
+        .onOk(async name => {
+          await sparkStore.createPreset({
+            id: nanoid(),
+            name,
+            type: typeName,
+            data: {
+              points: deepCopy(block.value.data.points),
+            },
+          });
+          onDialogOK();
+        });
+    }
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      selected,
+      options,
+      editSelected,
+      removeSelected,
+      loadSelected,
+      saveSelected,
+      createPreset,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
   >

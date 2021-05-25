@@ -1,21 +1,31 @@
-import { ref } from '@/helpers/component-ref';
-import { QuickStartFeature } from '@/store/features';
+import { Plugin } from 'vue';
 
+import { featureStore, QuickstartFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+
+import FridgeCompletionTask from './FridgeCompletionTask.vue';
 import FridgeHardwareTask from './FridgeHardwareTask.vue';
-import FridgeManualTask from './FridgeManualTask.vue';
 import FridgeNamingTask from './FridgeNamingTask.vue';
 import FridgeSettingsTask from './FridgeSettingsTask.vue';
-import FridgeWizard from './FridgeWizard.vue';
 
-ref(FridgeNamingTask);
-ref(FridgeHardwareTask);
-ref(FridgeSettingsTask);
-ref(FridgeManualTask);
+const plugin: Plugin = {
+  install(app) {
 
-const feature: QuickStartFeature = {
-  id: 'Fridge',
-  title: 'Fridge without beer sensor',
-  component: ref(FridgeWizard),
+    const feature: QuickstartFeature = {
+      id: 'Fridge',
+      title: 'Fridge without beer sensor',
+      tasks: [
+        'QuickstartServiceTask',
+        'QuickstartDiscoveryTask',
+        cref(app, FridgeNamingTask),
+        cref(app, FridgeHardwareTask),
+        cref(app, FridgeSettingsTask),
+        cref(app, FridgeCompletionTask),
+      ],
+    };
+
+    featureStore.addQuickstartFeature(feature);
+  },
 };
 
-export default feature;
+export default plugin;

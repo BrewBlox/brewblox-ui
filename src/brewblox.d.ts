@@ -16,6 +16,14 @@ interface HoldArguments {
   duration: number;
 }
 
+interface SwipeArguments {
+  touch: boolean;
+  mouse: boolean;
+  direction: 'up' | 'down' | 'left' | 'right';
+  duration: number;
+  distance: { x: number; y: number };
+}
+
 interface XYPosition {
   x: number;
   y: number;
@@ -35,7 +43,11 @@ interface SelectOption<T = any> {
 
 type Mapped<T> = Record<string, T>;
 
+type AnyDict = { [index in string]: any };
+
 type Awaitable<T> = T | PromiseLike<T>;
+
+type Nullable<T> = T | null | undefined;
 
 interface HasId {
   id: string;

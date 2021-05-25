@@ -5,104 +5,119 @@ import {
   mdiPlusMinus,
   mdiThermometer,
 } from '@quasar/extras/mdi-v5';
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { deltaTempQty, isQuantity, Quantity } from '@/helpers/bloxfield';
+import { coord2grid } from '@/plugins/builder/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
-  BlockAddress,
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
+import { deltaTempQty, isQuantity, prettyAny, Quantity } from '@/utils/bloxfield';
 
-import PartBase from '../components/PartBase';
-import { settingsAddress } from '../helpers';
+import { usePart, useSettingsBlock } from '../composables';
+import { DRIVER_KEY, DRIVER_TYPES } from '../specs/SetpointDriverDisplay';
+import { FlowPart } from '../types';
 
+const icons = {
+  mdiPlusMinus,
+  mdiBullseyeArrow,
+  mdiThermometer,
+  mdiGauge,
+};
 
-@Component
-export default class SetpointDriverDisplay extends PartBase {
-  icons: Mapped<string> = {};
-  readonly settingsKey = 'setpointDriver';
-  readonly scaleKey = 'scale';
+export default defineComponent({
+  name: 'SetpointDriverDisplay',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      scale,
+      bordered,
+    } = usePart.setup(props.part);
 
-  created(): void {
-    this.icons.mdiPlusMinus = mdiPlusMinus;
-    this.icons.mdiBullseyeArrow = mdiBullseyeArrow;
-    this.icons.mdiThermometer = mdiThermometer;
-    this.icons.mdiGauge = mdiGauge;
-  }
+    const {
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<ActuatorOffsetBlock>(props.part, DRIVER_KEY, DRIVER_TYPES);
 
-  get scale(): number {
-    return this.settings[this.scaleKey] ?? 1;
-  }
+    // Reference actually is a BlockIntf.ProcessValueInterface
+    // We don't have a TS type for that, but Setpoint/PWM are a good intersection
+    const refBlock = computed<SetpointSensorPairBlock | ActuatorPwmBlock | null>(
+      () => block.value !== null
+        ? sparkStore.blockById(
+          block.value.serviceId,
+          block.value.data.referenceId.id)
+        : null,
+    );
 
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.settingsKey);
-  }
+    const refAmount = computed<Quantity | number | null>(
+      () => {
+        if (!block.value || !refBlock.value) {
+          return null;
+        }
+        return block.value.data.referenceSettingOrValue === ReferenceKind.REF_SETTING
+          ? refBlock.value.data.setting
+          : refBlock.value.data.value;
+      },
+    );
 
-  get block(): ActuatorOffsetBlock | null {
-    const { serviceId, id } = this.address;
-    return sparkStore.blockById(serviceId, id);
-  }
+    const refIcon = computed<keyof typeof icons | ''>(
+      () => {
+        if (!block.value || !refBlock.value) {
+          return '';
+        }
+        if (block.value.data.referenceSettingOrValue === ReferenceKind.REF_SETTING) {
+          return 'mdiBullseyeArrow';
+        }
+        return isQuantity(refAmount.value)
+          ? 'mdiThermometer'
+          : 'mdiGauge';
+      },
+    );
 
-  get isBroken(): boolean {
-    return this.block === null
-      && this.address.id !== null;
-  }
+    const deltaTempUnit = computed<string>(
+      () => `delta_${systemStore.units.temperature}`,
+    );
 
-  // Reference actually is a BlockIntf.ProcessValueInterface
-  // We don't have a TS type for that, but Setpoint/PWM are a good intersection
-  get refBlock(): SetpointSensorPairBlock | ActuatorPwmBlock | null {
-    if (!this.block) {
-      return null;
-    }
-    return sparkStore.blockById(
-      this.block.serviceId,
-      this.block.data.referenceId.id);
-  }
+    const actualSetting = computed<Quantity | number | null>(
+      () => {
+        const v = block.value?.data.setting ?? null;
+        return isQuantity(refAmount.value)
+          ? deltaTempQty(v)
+          : v;
+      },
+    );
 
-  get refAmount(): Quantity | number | null {
-    if (!this.block || !this.refBlock) {
-      return null;
-    }
-    return this.block.data.referenceSettingOrValue === ReferenceKind.REF_SETTING
-      ? this.refBlock.data.setting
-      : this.refBlock.data.value;
-  }
-
-  get refIcon(): string {
-    if (!this.block || !this.refBlock) {
-      return '';
-    }
-    if (this.block.data.referenceSettingOrValue === ReferenceKind.REF_SETTING) {
-      return 'mdiBullseyeArrow';
-    }
-    return isQuantity(this.refAmount)
-      ? 'mdiThermometer'
-      : 'mdiGauge';
-  }
-
-  get deltaTempUnit(): string {
-    return `delta_${systemStore.units.temperature}`;
-  }
-
-  get actualSetting(): Quantity | number | null {
-    const v = this.block?.data.setting ?? null;
-    return isQuantity(this.refAmount)
-      ? deltaTempQty(v)
-      : v;
-  }
-}
+    return {
+      coord2grid,
+      prettyAny,
+      icons,
+      bordered,
+      isBroken,
+      block,
+      scale,
+      refAmount,
+      refIcon,
+      deltaTempUnit,
+      actualSetting,
+    };
+  },
+});
 </script>
 
 <template>
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
-      :width="squares(2)"
-      :height="squares(1)"
+      :width="coord2grid(2)"
+      :height="coord2grid(1)"
     >
       <BrokenIcon v-if="isBroken" class="col" />
       <UnlinkedIcon v-else-if="!block" class="col" />
@@ -115,7 +130,7 @@ export default class SetpointDriverDisplay extends PartBase {
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ refAmount | quantity }}
+            {{ prettyAny(refAmount) }}
           </div>
         </div>
         <div class="col row q-gutter-x-xs">
@@ -126,7 +141,7 @@ export default class SetpointDriverDisplay extends PartBase {
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ actualSetting | quantity }}
+            {{ prettyAny(actualSetting) }}
           </div>
         </div>
       </div>
@@ -134,8 +149,8 @@ export default class SetpointDriverDisplay extends PartBase {
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(2)-2"
-        :height="squares(1)-2"
+        :width="coord2grid(2)-2"
+        :height="coord2grid(1)-2"
         x="1"
         y="1"
         rx="6"

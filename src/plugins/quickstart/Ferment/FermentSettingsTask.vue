@@ -1,61 +1,87 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import { tempQty } from '@/helpers/bloxfield';
+import { JSQuantity, tempQty } from '@/utils/bloxfield';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { createOutputActions } from '../helpers';
+import { QuickstartAction } from '../types';
+import { createOutputActions } from '../utils';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
-import { FermentConfig, FermentOpts } from './types';
+import { FermentConfig, FermentMode, FermentOpts } from './types';
 
-@Component
-export default class FermentSettingsTask extends QuickStartTaskBase<FermentConfig> {
-  fridgeSetting = tempQty(20);
-  beerSetting = tempQty(20);
-  activeSetpoint: 'beer' | 'fridge' = 'beer';
+const targetOpts: SelectOption<FermentMode>[] = [
+  {
+    label: 'Beer',
+    value: 'beer',
+  },
+  {
+    label: 'Fridge',
+    value: 'fridge',
+  },
+];
 
-  get targetOpts(): SelectOption[] {
-    return [
-      {
-        label: 'Beer',
-        value: 'beer',
-      },
-      {
-        label: 'Fridge',
-        value: 'fridge',
-      },
-    ];
-  }
+export default defineComponent({
+  name: 'FermentSettingsTask',
+  props: {
+    config: {
+      type: Object as PropType<FermentConfig>,
+      required: true,
+    },
+    actions: {
+      type: Array as PropType<QuickstartAction[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'update:actions',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const fridgeSetting = ref<JSQuantity>(tempQty(20));
+    const beerSetting = ref<JSQuantity>(tempQty(20));
+    const activeSetpoint = ref<FermentMode>('beer');
 
-  done(): void {
-    const opts: FermentOpts = {
-      fridgeSetting: this.fridgeSetting!,
-      beerSetting: this.beerSetting!,
-      activeSetpoint: this.activeSetpoint,
+    function done(): void {
+      const opts: FermentOpts = {
+        fridgeSetting: fridgeSetting.value,
+        beerSetting: beerSetting.value,
+        activeSetpoint: activeSetpoint.value,
+      };
+
+      const createdBlocks = defineCreatedBlocks(props.config, opts);
+      const changedBlocks = defineChangedBlocks(props.config);
+      const layouts = defineLayouts(props.config);
+      const widgets = defineWidgets(props.config, opts, layouts);
+      const displayedBlocks = defineDisplayedBlocks(props.config);
+
+      const updates: Partial<FermentConfig> = {
+        layouts,
+        widgets,
+        changedBlocks,
+        createdBlocks,
+        displayedBlocks,
+      };
+
+      emit('update:config', { ...props.config, ...updates });
+      emit('update:actions', createOutputActions());
+      emit('next');
+    }
+
+    return {
+      targetOpts,
+      fridgeSetting,
+      beerSetting,
+      activeSetpoint,
+      done,
     };
-    const createdBlocks = defineCreatedBlocks(this.config, opts);
-    const changedBlocks = defineChangedBlocks(this.config);
-    const layouts = defineLayouts(this.config);
-    const widgets = defineWidgets(this.config, opts, layouts);
-    const displayedBlocks = defineDisplayedBlocks(this.config);
-
-    this.pushActions(createOutputActions());
-    this.updateConfig({
-      ...this.config,
-      layouts,
-      widgets,
-      changedBlocks,
-      createdBlocks,
-      displayedBlocks,
-    });
-    this.next();
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section>
       <q-item class="text-weight-light">
         <q-item-section>
@@ -93,9 +119,18 @@ export default class FermentSettingsTask extends QuickStartTaskBase<FermentConfi
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn
+        unelevated
+        label="Back"
+        @click="$emit('back')"
+      />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn
+        unelevated
+        label="Done"
+        color="primary"
+        @click="done"
+      />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

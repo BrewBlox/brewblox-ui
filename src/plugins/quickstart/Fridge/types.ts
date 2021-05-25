@@ -1,6 +1,6 @@
-import { JSQuantity } from '@/helpers/bloxfield';
+import { JSQuantity } from '@/utils/bloxfield';
 
-import { PinChannel, QuickStartOutput } from '../types';
+import { PinChannel, QuickstartConfig } from '../types';
 
 export interface FridgeConfigNames {
   fridgeSensor: string;
@@ -15,8 +15,7 @@ export interface FridgeConfigNames {
   heatPid: string;
 }
 
-export interface FridgeConfig extends QuickStartOutput {
-  prefix: string;
+export interface FridgeConfig extends QuickstartConfig {
   names: FridgeConfigNames;
   heatPin: PinChannel;
   coolPin: PinChannel;

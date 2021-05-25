@@ -1,8 +1,9 @@
-import { PartSpec } from '../types';
+import { SCALE_KEY } from '@/plugins/builder/const';
+import { PartSpec } from '@/plugins/builder/types';
 
-const SIZE_X = 1;
-const SIZE_Y = 2;
-const scaleKey = 'scale';
+export const SIZE_X = 1;
+export const SIZE_Y = 2;
+
 
 const spec: PartSpec = {
   id: 'BeerBottle',
@@ -12,13 +13,13 @@ const spec: PartSpec = {
     {
       component: 'ScaleCard',
       props: {
-        settingsKey: scaleKey,
+        settingsKey: SCALE_KEY,
         defaultSize: [SIZE_X, SIZE_Y],
       },
     },
   ],
   size: ({ settings }) => {
-    const scale = settings[scaleKey] ?? 1;
+    const scale = settings[SCALE_KEY] ?? 1;
     return [SIZE_X * scale, SIZE_Y * scale];
   },
   transitions: () => ({}),

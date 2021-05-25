@@ -1,21 +1,32 @@
-import { ref } from '@/helpers/component-ref';
-import { QuickStartFeature } from '@/store/features';
+import { Plugin } from 'vue';
 
+import { featureStore, QuickstartFeature } from '@/store/features';
+import { cref } from '@/utils/component-ref';
+
+import BrewKettleCompletionTask from './BrewKettleCompletionTask.vue';
 import BrewKettleHardwareTask from './BrewKettleHardwareTask.vue';
-import BrewKettleManualTask from './BrewKettleManualTask.vue';
 import BrewKettleNamingTask from './BrewKettleNamingTask.vue';
 import BrewKettleSettingsTask from './BrewKettleSettingsTask.vue';
-import BrewKettleWizard from './BrewKettleWizard.vue';
 
-ref(BrewKettleNamingTask);
-ref(BrewKettleHardwareTask);
-ref(BrewKettleManualTask);
-ref(BrewKettleSettingsTask);
 
-const feature: QuickStartFeature = {
-  id: 'BrewKettle',
-  title: 'Brew kettle',
-  component: ref(BrewKettleWizard),
+const plugin: Plugin = {
+  install(app) {
+
+    const feature: QuickstartFeature = {
+      id: 'BrewKettle',
+      title: 'Brew kettle',
+      tasks: [
+        'QuickstartServiceTask',
+        'QuickstartDiscoveryTask',
+        cref(app, BrewKettleNamingTask),
+        cref(app, BrewKettleHardwareTask),
+        cref(app, BrewKettleSettingsTask),
+        cref(app, BrewKettleCompletionTask),
+      ],
+    };
+
+    featureStore.addQuickstartFeature(feature);
+  },
 };
 
-export default feature;
+export default plugin;

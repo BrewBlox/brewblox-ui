@@ -1,7 +1,5 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
-import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/helpers/bloxfield';
-import { durationMs } from '@/helpers/duration';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import { GraphConfig } from '@/plugins/history/types';
 import {
@@ -16,10 +14,14 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { Block } from '@/plugins/spark/types';
-import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
+import { Widget } from '@/store/widgets';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/utils/bloxfield';
+import { durationMs } from '@/utils/duration';
 
+import { TempControlWidget } from '../TempControl/types';
+import { DisplayBlock } from '../types';
 import {
   makeFridgeCoolConfig,
   makeFridgeHeatConfig,
@@ -27,9 +29,7 @@ import {
   unlinkedActuators,
   withoutPrefix,
   withPrefix,
-} from '../helpers';
-import { TempControlWidget } from '../TempControl/types';
-import { DisplayBlock } from '../types';
+} from '../utils';
 import { FridgeConfig, FridgeOpts } from './types';
 
 export const defineChangedBlocks = (config: FridgeConfig): Block[] => {
@@ -228,7 +228,7 @@ export const defineCreatedBlocks = (config: FridgeConfig, opts: FridgeOpts): Blo
 export const defineWidgets = (
   config: FridgeConfig,
   opts: FridgeOpts,
-  layouts: BuilderLayout[]
+  layouts: BuilderLayout[],
 ): Widget[] => {
   const genericSettings = {
     dashboard: config.dashboardId,
@@ -243,7 +243,7 @@ export const defineWidgets = (
   const createWidget = (name: string, type: string): Widget => ({
     ...genericSettings,
     ...featureStore.widgetSize(type),
-    id: uid(),
+    id: nanoid(),
     title: name,
     feature: type,
     order: 0,
@@ -305,7 +305,7 @@ export const defineWidgets = (
   });
 
   const createTempControl = (): TempControlWidget => {
-    const modeId = uid();
+    const modeId = nanoid();
 
     return {
       ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),

@@ -1,19 +1,21 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import WidgetBase from '@/components/WidgetBase';
-
-@Component
-export default class InvalidWidget extends WidgetBase {
-  @Prop({ type: String, default: 'Unknown error' })
-  readonly error!: string;
-}
+export default defineComponent({
+  name: 'InvalidWidget',
+  props: {
+    error: {
+      type: String,
+      default: 'Unknown error',
+    },
+  },
+});
 </script>
 
 <template>
-  <CardWrapper v-bind="{context}">
+  <Card>
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" />
+      <WidgetToolbar />
     </template>
 
     <CardWarning color="negative" class="items-center">
@@ -21,5 +23,5 @@ export default class InvalidWidget extends WidgetBase {
         {{ error }}
       </template>
     </CardWarning>
-  </CardWrapper>
+  </Card>
 </template>

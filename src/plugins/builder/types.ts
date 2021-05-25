@@ -40,14 +40,15 @@ export interface PersistentPart {
 export interface StatePart extends PersistentPart {
   transitions: Transitions;
   size: [number, number];
+  canInteract: boolean;
 }
 
 export interface FlowPart extends StatePart {
   flows: CalculatedFlows;
 }
 
-export interface PartUpdater {
-  updatePart: (part: PersistentPart) => void;
+export interface PartApi {
+  savePart: (part: PersistentPart) => unknown;
 }
 
 export interface CardSpec {
@@ -62,7 +63,7 @@ export interface PartSpec {
   cards: CardSpec[];
   transitions: (part: PersistentPart) => Transitions;
   size: (part: PersistentPart) => [number, number];
-  interactHandler?: (part: PersistentPart, updater: PartUpdater) => void;
+  interactHandler?: (part: PersistentPart, api: PartApi) => void;
 }
 
 export interface BuilderLayout extends StoreObject {
@@ -70,7 +71,6 @@ export interface BuilderLayout extends StoreObject {
   title: string;
   width: number;
   height: number;
-  scale?: number;
   order?: number;
   listed?: boolean;
   parts: PersistentPart[];
@@ -90,4 +90,26 @@ export interface Rect {
   bottom: number;
 }
 
-export type ClickEvent = MouseEvent | TouchEvent;
+export type BuilderToolName =
+  | 'pan'
+  | 'select'
+  | 'gridresize'
+  | 'add'
+  | 'move'
+  | 'copy'
+  | 'rotate'
+  | 'flip'
+  | 'edit'
+  | 'interact'
+  | 'delete'
+  | 'undo'
+  | 'redo'
+
+export interface BuilderTool {
+  value: BuilderToolName;
+  label: string;
+  icon: string;
+  shortcut: string;
+  cursor: string;
+  partClass?: (part: FlowPart) => string;
+}

@@ -1,80 +1,94 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { bloxLink, prettyQty } from '@/helpers/bloxfield';
-import { createDialog } from '@/helpers/dialog';
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { combineFuncLabels } from '@/plugins/spark/getters';
 import { BlockIntfType, Link, TempSensorCombiBlock } from '@/plugins/spark/types';
+import { bloxLink, prettyQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class TempSensorCombiWidget
-  extends BlockWidgetBase<TempSensorCombiBlock> {
+const combineFuncOpts: SelectOption[] =
+  Object.entries(combineFuncLabels)
+    .map(([value, label]) => ({ label, value }));
 
-  get combineFuncOpts(): SelectOption[] {
-    return Object.entries(combineFuncLabels)
-      .map(([value, label]) => ({ label, value }));
-  }
+export default defineComponent({
+  name: 'TempSensorCombiWidget',
+  setup() {
+    const { context, inDialog } = useContext.setup();
+    const {
+      serviceId,
+      sparkModule,
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<TempSensorCombiBlock>();
 
-  get hasValue(): boolean {
-    return this.block.data.value.value !== null;
-  }
+    const hasValue = computed<boolean>(
+      () => block.value.data.value.value !== null,
+    );
 
-  get sensors(): Link[] {
-    return this.block.data.sensors;
-  }
+    const sensors = computed<Link[]>(
+      () => block.value.data.sensors,
+    );
 
-  addSensor(): void {
-    createDialog({
-      component: 'LinkDialog',
-      title: 'Add sensor',
-      message: 'All linked sensors are evaluated to determine the output value',
-      value: bloxLink(null, BlockIntfType.TempSensorInterface),
-      label: 'Sensor',
-      serviceId: this.serviceId,
-    })
-      .onOk((value: Link) => {
-        this.block.data.sensors.push(value);
-        this.saveBlock();
-      });
-  }
+    function addSensor(): void {
+      createDialog({
+        component: 'LinkDialog',
+        componentProps: {
+          modelValue: bloxLink(null, BlockIntfType.TempSensorInterface),
+          title: 'Add sensor',
+          message: 'All linked sensors are evaluated to determine the output value',
+          label: 'Sensor',
+          serviceId,
+        },
+      })
+        .onOk((value: Link) => {
+          block.value.data.sensors.push(value);
+          saveBlock();
+        });
+    }
 
-  removeSensor(idx): void {
-    this.block.data.sensors.splice(idx, 1);
-    this.saveBlock();
-  }
+    function removeSensor(idx): void {
+      block.value.data.sensors.splice(idx, 1);
+      saveBlock();
+    }
 
-  updateSensor(idx: number, value: Link): void {
-    this.block.data.sensors.splice(idx, 1, value);
-    this.saveBlock();
-  }
+    function updateSensor(idx: number, value: Link): void {
+      block.value.data.sensors.splice(idx, 1, value);
+      saveBlock();
+    }
 
-  sensorValue(link: Link): string {
-    const block = this.sparkModule.blockByLink(link);
-    return prettyQty(block?.data.value ?? null);
-  }
-}
+    function sensorValue(link: Link): string {
+      const block = sparkModule.blockByLink(link);
+      return prettyQty(block?.data.value ?? null);
+    }
+
+    return {
+      combineFuncOpts,
+      context,
+      inDialog,
+      serviceId,
+      block,
+      saveBlock,
+      sensors,
+      hasValue,
+      addSensor,
+      removeSensor,
+      updateSensor,
+      sensorValue,
+    };
+  },
+});
 </script>
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-    v-bind="{context}"
-  >
-    <template #graph>
-      <HistoryGraph
-        :graph-id="widget.id"
-        :config="graphCfg"
-        :refresh-trigger="mode"
-        use-range
-        use-presets
-        @params="saveGraphParams"
-        @layout="saveGraphLayout"
-      />
+  <PreviewCard :enabled="inDialog">
+    <template #preview>
+      <BlockHistoryGraph />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
     <div>
@@ -98,7 +112,7 @@ export default class TempSensorCombiWidget
             class="col-auto"
           />
           <QuantityField
-            :value="block.data.value"
+            :model-value="block.data.value"
             readonly
             tag="big"
             class="col-auto"
@@ -106,17 +120,17 @@ export default class TempSensorCombiWidget
         </div>
       </div>
 
-      <template v-if="mode === 'Full'">
+      <template v-if="context.mode === 'Full'">
         <q-separator inset />
 
         <div class="q-ma-md row q-gutter-xs">
           <SelectField
-            :value="block.data.combineFunc"
+            :model-value="block.data.combineFunc"
             :options="combineFuncOpts"
             title="Select function"
             label="Value calculation"
             class="col-grow"
-            @input="v => { block.data.combineFunc = v; saveBlock(); }"
+            @update:model-value="v => { block.data.combineFunc = v; saveBlock(); }"
           />
 
           <div class="col-break" />
@@ -127,13 +141,13 @@ export default class TempSensorCombiWidget
             class="col-12 row q-gutter-xs q-mt-none "
           >
             <LinkField
-              :value="link"
+              :model-value="link"
               :service-id="serviceId"
               title="Sensor Block"
               :label="`Sensor ${idx+1}`"
               tag="span"
               class="col-grow"
-              @input="v => updateSensor(idx, v)"
+              @update:model-value="v => updateSensor(idx, v)"
             />
             <LabeledField
               label="Value"
@@ -167,5 +181,5 @@ export default class TempSensorCombiWidget
         </div>
       </template>
     </div>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>

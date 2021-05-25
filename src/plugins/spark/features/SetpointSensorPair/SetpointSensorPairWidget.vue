@@ -1,86 +1,91 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 
 import SetpointSensorPairBasic from './SetpointSensorPairBasic.vue';
 import SetpointSensorPairFull from './SetpointSensorPairFull.vue';
 
-@Component({
+export default defineComponent({
+  name: 'SetpointSensorPairWidget',
   components: {
     Basic: SetpointSensorPairBasic,
     Full: SetpointSensorPairFull,
   },
-})
-export default class SetpointSensorPairWidget
-  extends BlockWidgetBase<SetpointSensorPairBlock> {
+  setup() {
+    const {
+      context,
+      inDialog,
+    } = useContext.setup();
+    const {
+      sparkModule,
+      blockId,
+      isVolatileBlock,
+    } = useBlockWidget.setup<SetpointSensorPairBlock>();
 
-  get usedBy(): Block[] {
-    if (!this.crud.isStoreBlock) {
-      return [];
-    }
-    return this.sparkModule
-      .blocks
-      .filter(block => block.data.inputId?.id === this.blockId);
-  }
+    const usedBy = computed<Block[]>(
+      () => {
+        if (isVolatileBlock.value) {
+          return [];
+        }
+        return sparkModule
+          .blocks
+          .filter(b => b.data.inputId?.id === blockId);
+      },
+    );
 
-  get unused(): boolean {
-    return this.crud.isStoreBlock && this.usedBy.length === 0;
-  }
+    const formattedUsers = computed<string>(
+      () => usedBy.value.map(v => `<i>${v.id}</i>`).join(' and '),
+    );
 
-  get formattedUsers(): string {
-    return this.usedBy.map(v => `<i>${v.id}</i>`).join(' and ');
-  }
+    const enabledString = computed<string>(
+      () => {
+        if (usedBy.value.length > 0) {
+          return `Setpoint is enabled and used by ${formattedUsers.value}.`;
+        }
+        else {
+          return 'Setpoint is enabled and unused.';
+        }
+      },
+    );
 
-  get enabledString(): string {
-    if (this.usedBy.length > 0) {
-      return `Setpoint is enabled and used by ${this.formattedUsers}.`;
-    }
-    else {
-      return 'Setpoint is enabled and unused.';
-    }
-  }
+    const disabledString = computed<string>(
+      () => {
+        if (usedBy.value.length > 0) {
+          const verb = usedBy.value.length > 1 ? 'are' : 'is';
+          return `Setpoint is disabled and therefore ${formattedUsers.value} ${verb} inactive.`;
+        }
+        else {
+          return 'Setpoint is disabled and unused.';
+        }
+      },
+    );
 
-  get disabledString(): string {
-    if (this.usedBy.length > 0) {
-      const verb = this.usedBy.length > 1 ? 'are' : 'is';
-      return `Setpoint is disabled and therefore ${this.formattedUsers} ${verb} inactive.`;
-    }
-    else {
-      return 'Setpoint is disabled and unused.';
-    }
-  }
-}
+    return {
+      context,
+      inDialog,
+      enabledString,
+      disabledString,
+    };
+  },
+});
 </script>
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-    v-bind="{context}"
-  >
-    <template #graph>
-      <HistoryGraph
-        :graph-id="widget.id"
-        :config="graphCfg"
-        :refresh-trigger="mode"
-        use-presets
-        use-range
-        @params="saveGraphParams"
-        @layout="saveGraphLayout"
-      />
+  <PreviewCard :enabled="inDialog">
+    <template #preview>
+      <BlockHistoryGraph />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode" />
+      <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <component :is="mode" :crud="crud">
+    <component :is="context.mode">
       <template #warnings>
-        <BlockEnableToggle
-          :crud="crud"
-          data-key="settingEnabled"
-        >
+        <BlockEnableToggle data-key="settingEnabled">
           <template #enabled>
             <span v-html="enabledString" />
           </template>
@@ -90,5 +95,5 @@ export default class SetpointSensorPairWidget
         </BlockEnableToggle>
       </template>
     </component>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>

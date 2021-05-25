@@ -1,25 +1,52 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { colorString } from '../helpers';
+import { colorString, coord2grid, textTransformation } from '@/plugins/builder/utils';
+
+import { usePart } from '../composables';
 import { DEFAULT_FILL_PCT } from '../specs/Kettle';
+import { FlowPart } from '../types';
 
-@Component
-export default class Kettle extends PartBase {
-  get titleText(): string {
-    return this.part.settings.text || '';
-  }
+export default defineComponent({
+  name: 'Kettle',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const {
+      sizeX,
+      sizeY,
+    } = usePart.setup(props.part);
 
-  get filledSquares(): number {
-    const pct = this.part.settings.fillPct ?? DEFAULT_FILL_PCT;
-    return pct * (this.sizeY / 100);
-  }
+    const titleText = computed<string>(
+      () => props.part.settings.text ?? '',
+    );
 
-  get color(): string {
-    return colorString(this.part.settings.color);
-  }
-}
+    const filledSquares = computed<number>(
+      () => {
+        const pct = props.part.settings.fillPct ?? DEFAULT_FILL_PCT;
+        return pct * (sizeY.value / 100);
+      },
+    );
+
+    const color = computed<string>(
+      () => colorString(props.part.settings.color),
+    );
+
+    return {
+      textTransformation,
+      coord2grid,
+      titleText,
+      filledSquares,
+      color,
+      sizeX,
+      sizeY,
+    };
+  },
+});
 </script>
 
 <template>
@@ -27,16 +54,16 @@ export default class Kettle extends PartBase {
     <rect
       :fill="color"
       :x="2"
-      :y="squares(sizeY-filledSquares)+2"
-      :width="squares(sizeX)-4"
-      :height="squares(filledSquares)-4"
+      :y="coord2grid(sizeY-filledSquares)+2"
+      :width="coord2grid(sizeX)-4"
+      :height="coord2grid(filledSquares)-4"
       rx="2"
       ry="2"
     />
     <g class="outline">
       <rect
-        :width="squares(sizeX)-4"
-        :height="squares(sizeY)-4"
+        :width="coord2grid(sizeX)-4"
+        :height="coord2grid(sizeY)-4"
         x="2"
         y="2"
         rx="8"
@@ -45,9 +72,9 @@ export default class Kettle extends PartBase {
       />
     </g>
     <SvgEmbedded
-      :transform="textTransformation([sizeX, sizeY], false)"
-      :width="squares(sizeX)"
-      :height="squares(sizeY)"
+      :transform="textTransformation(part, part.size, false)"
+      :width="coord2grid(sizeX)"
+      :height="coord2grid(sizeY)"
     >
       <div class="col-auto text-bold text-center q-pt-sm full-width" style="font-size: 130%">
         {{ titleText }}

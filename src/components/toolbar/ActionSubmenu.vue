@@ -1,14 +1,15 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-
-@Component
-export default class ActionSubmenu extends Vue {
-
-  @Prop({ type: String, required: false })
-  public readonly label!: string;
-}
+export default defineComponent({
+  name: 'ActionSubmenu',
+  props: {
+    label: {
+      type: String,
+      default: '',
+    },
+  },
+});
 </script>
 
 <template>

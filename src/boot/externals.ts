@@ -1,7 +1,8 @@
-import VueJsonPretty from 'vue-json-pretty';
+import PortalVue from 'portal-vue';
+import { boot } from 'quasar/wrappers';
 import draggable from 'vuedraggable';
 
-export default ({ Vue }): void => {
-  Vue.component('draggable', draggable);
-  Vue.component('vue-json-pretty', VueJsonPretty);
-};
+export default boot(({ app }) => {
+  app.component('Draggable', draggable);
+  app.use(PortalVue);
+});

@@ -1,35 +1,57 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { BEER, COLD_WATER, HOT_WATER, WORT } from '../getters';
-import { colorString } from '../helpers';
-import PartCard from './PartCard';
+import { BEER, COLD_WATER, HOT_WATER, WORT } from '@/plugins/builder/const';
+import { colorString } from '@/plugins/builder/utils';
 
-@Component
-export default class ColorCard extends PartCard {
-  presetColors = [
-    COLD_WATER,
-    HOT_WATER,
-    BEER,
-    WORT,
-  ];
+import { FlowPart } from '../types';
 
-  get color(): string | null {
-    return this.part.settings.color;
-  }
+const presetColors: string[] = [
+  COLD_WATER,
+  HOT_WATER,
+  BEER,
+  WORT,
+];
 
-  set color(val: string | null) {
-    this.savePartSettings({ ...this.part.settings, color: colorString(val) });
-  }
+export default defineComponent({
+  name: 'ColorCard',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:part',
+  ],
+  setup(props, { emit }) {
 
-  toggle(color: string): void {
-    this.color = color !== this.color ? color : null;
-  }
-}
+    const color = computed<string | null>({
+      get: () => props.part.settings.color,
+      set: c => emit('update:part', {
+        ...props.part,
+        settings: {
+          ...props.part.settings,
+          color: colorString(c),
+        },
+      }),
+    });
+
+    function toggle(c: string): void {
+      color.value = c !== color.value ? c : null;
+    }
+
+    return {
+      presetColors,
+      color,
+      toggle,
+    };
+  },
+});
 </script>
 
 <template>
-  <div class="row">
+  <div class="row q-gutter-x-md q-pl-sm">
     <ColorField
       v-model="color"
       clearable
@@ -38,18 +60,16 @@ export default class ColorCard extends PartCard {
       message="Select the fill color for this part."
       class="col-auto"
     />
-    <div class="col-grow row justify-around">
-      <q-btn
-        v-for="colorOpt in presetColors"
-        :key="colorOpt"
-        :style="`background-color: ${colorOpt}`"
-        :size="color == colorOpt ? 'lg' : 'md'"
-        :color="colorOpt"
-        round
-        icon="format_color_fill"
-        class="self-center"
-        @click="toggle(colorOpt)"
-      />
-    </div>
+    <q-btn
+      v-for="colorOpt in presetColors"
+      :key="colorOpt"
+      :style="`background-color: ${colorOpt}`"
+      :size="color == colorOpt ? 'lg' : 'md'"
+      :color="colorOpt"
+      round
+      icon="format_color_fill"
+      class="self-center"
+      @click="toggle(colorOpt)"
+    />
   </div>
 </template>

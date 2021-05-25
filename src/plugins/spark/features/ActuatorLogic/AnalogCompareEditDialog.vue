@@ -1,67 +1,89 @@
 <script lang="ts">
 import { Enum } from 'typescript-string-enums';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { bloxQty, isQuantity, tempQty } from '@/helpers/bloxfield';
-import { deepCopy } from '@/helpers/functional';
-import { isCompatible } from '@/plugins/spark/helpers';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useDialog } from '@/composables';
+import { sparkStore } from '@/plugins/spark/store';
 import { AnalogCompare, AnalogCompareOp, BlockIntfType, Quantity } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils';
+import { bloxQty, isQuantity, tempQty } from '@/utils/bloxfield';
+import { deepCopy } from '@/utils/functional';
 
 import { analogOpTitles } from './getters';
 
+const operatorOpts = Enum.values(AnalogCompareOp)
+  .map(value => ({ value, label: analogOpTitles[value] }));
 
-@Component
-export default class AnalogCompareEditDialog extends DialogBase {
-  local: AnalogCompare | null = null;
+export default defineComponent({
+  name: 'AnalogCompareEdit',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<AnalogCompare>,
+      required: true,
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
+    const local = ref<AnalogCompare>(deepCopy(props.modelValue));
+    const sparkModule = sparkStore.moduleById(props.serviceId)!;
 
-  @Prop({ type: Object, required: true })
-  public readonly value!: AnalogCompare;
+    const isTemp = computed<boolean>(
+      () => {
+        const block = sparkModule.blockById(local.value.id.id);
+        return !!block && isCompatible(block.type, BlockIntfType.SetpointSensorPairInterface);
+      },
+    );
 
-  @Prop({ type: String, required: true })
-  public readonly serviceId!: string;
+    const rhs = computed<Quantity | number>({
+      get: () => {
+        const cmp = local.value;
+        return isTemp.value
+          ? tempQty(cmp.rhs)
+          : cmp.rhs;
+      },
+      set: v => {
+        local.value.rhs = isQuantity(v)
+          ? bloxQty(v).to('degC').value ?? 0
+          : v;
+      },
+    });
 
-  created(): void {
-    this.local = deepCopy(this.value);
-  }
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  public get sparkModule(): SparkServiceModule {
-    return sparkStore.moduleById(this.serviceId)!;
-  }
-
-  get operatorOpts(): SelectOption[] {
-    return Enum.values(AnalogCompareOp)
-      .map(value => ({ value, label: analogOpTitles[value] }));
-  }
-
-  get isTemp(): boolean {
-    const block = this.sparkModule.blockById(this.local!.id.id);
-    return !!block && isCompatible(block.type, BlockIntfType.SetpointSensorPairInterface);
-  }
-
-  get rhs(): Quantity | number {
-    const cmp = this.local!;
-    return this.isTemp
-      ? tempQty(cmp.rhs)
-      : cmp.rhs;
-  }
-
-  set rhs(v: Quantity | number) {
-    this.local!.rhs = isQuantity(v)
-      ? bloxQty(v).to('degC').value ?? 0
-      : v;
-  }
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      operatorOpts,
+      local,
+      isTemp,
+      rhs,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

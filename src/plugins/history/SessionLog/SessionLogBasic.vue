@@ -1,120 +1,135 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
-import { createDialog } from '@/helpers/dialog';
-import { shortDateString, spliceById } from '@/helpers/functional';
+import { useWidget } from '@/composables';
+import { createDialog } from '@/utils/dialog';
+import { shortDateString, spliceById } from '@/utils/functional';
 
 import { historyStore } from '../store';
 import { GraphAnnotation, LoggedSession, SessionGraphNote, SessionNote } from '../types';
 import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
 import SessionHeaderField from './SessionHeaderField.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
-import { SessionLogConfig } from './types';
+import { SessionLogWidget } from './types';
 
-
-@Component({
+export default defineComponent({
+  name: 'SessionLogBasic',
   components: {
-    SessionTextNoteDialog,
-    SessionGraphNoteDialog,
     SessionHeaderField,
   },
-})
-export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
-  shortDateString = shortDateString;
+  emits: [
+    'add',
+  ],
+  setup() {
+    const {
+      config,
+    } = useWidget.setup<SessionLogWidget>();
 
-  get session(): LoggedSession | null {
-    return this.config.currentSession === null
-      ? null
-      : historyStore.sessionById(this.config.currentSession);
-  }
+    const session = computed<LoggedSession | null>(
+      () => historyStore.sessionById(config.value.currentSession),
+    );
 
-  saveSession(session: LoggedSession | null = this.session): void {
-    if (session !== null) {
-      historyStore.saveSession(session);
-    }
-  }
-
-  get notes(): SessionNote[] {
-    return this.session ? this.session.notes : [];
-  }
-
-  saveNote(note: SessionNote): void {
-    spliceById(this.notes, note);
-    this.saveSession();
-  }
-
-  saveAnnotations(note: SessionGraphNote, annotations: GraphAnnotation[]): void {
-    note.config.layout.annotations = annotations;
-    this.saveNote(note);
-  }
-
-  openNote(note: SessionNote): void {
-    if (note.type === 'Text') {
-      createDialog({
-        component: SessionTextNoteDialog,
-        title: note.title,
-        value: note.value,
-        type: 'text',
-        label: 'Content',
-      })
-        .onOk(value => this.saveNote({ ...note, value }));
+    function saveSession(sess: LoggedSession | null = session.value): void {
+      if (sess != null) {
+        historyStore.saveSession(sess);
+      }
     }
 
-    if (note.type === 'Graph') {
-      createDialog({
-        component: 'GraphDialog',
-        graphId: note.id,
-        saveAnnotations: v => this.saveAnnotations(note, v),
-        config: {
-          ...note.config,
-          params: {
-            start: note.start || undefined,
-            end: note.end || undefined,
-            duration: note.start ? undefined : '1h',
+    const notes = computed<SessionNote[]>(
+      () => session.value?.notes ?? [],
+    );
+
+    function saveNote(note: SessionNote): void {
+      spliceById(notes.value, note);
+      saveSession();
+    }
+
+    function saveAnnotations(note: SessionGraphNote, annotations: GraphAnnotation[]): void {
+      note.config.layout.annotations = annotations;
+      saveNote(note);
+    }
+
+    function openNote(note: SessionNote): void {
+      if (note.type === 'Text') {
+        createDialog({
+          component: SessionTextNoteDialog,
+          componentProps: {
+            title: note.title,
+            modelValue: note.value,
+            type: 'text',
+            label: 'Content',
           },
-        },
-      });
+        })
+          .onOk(value => saveNote({ ...note, value }));
+      }
+
+      if (note.type === 'Graph') {
+        createDialog({
+          component: 'GraphDialog',
+          componentProps: {
+            graphId: note.id,
+            annotated: true,
+            saveAnnotations: v => saveAnnotations(note, v),
+            config: {
+              ...note.config,
+              params: {
+                start: note.start || undefined,
+                end: note.end || undefined,
+                duration: note.start ? undefined : '1h',
+              },
+            },
+          },
+        });
+      }
     }
-  }
 
-  startGraphNote(note: SessionGraphNote): void {
-    note.start = new Date().getTime();
-    this.saveSession();
-  }
+    function startGraphNote(note: SessionGraphNote): void {
+      note.start = new Date().getTime();
+      saveSession();
+    }
 
-  stopGraphNote(note: SessionGraphNote): void {
-    note.end = new Date().getTime();
-    this.saveSession();
-  }
+    function stopGraphNote(note: SessionGraphNote): void {
+      note.end = new Date().getTime();
+      saveSession();
+    }
 
-  editGraphNote(note: SessionGraphNote): void {
-    createDialog({
-      component: SessionGraphNoteDialog,
-      title: note.title,
-      message: 'You can choose graph lines in the widget settings.',
-      value: note,
-      label: 'Dates',
-    })
-      .onOk(({ start, end }) => {
-        const actual = this.notes.find(n => n.id === note.id);
-        if (actual && actual.type === 'Graph') {
-          actual.start = start;
-          actual.end = end;
-          this.saveSession();
-        }
-      });
-  }
+    function editGraphNote(note: SessionGraphNote): void {
+      createDialog({
+        component: SessionGraphNoteDialog,
+        componentProps: {
+          modelValue: note,
+          title: note.title,
+          message: 'You can choose graph lines in the widget settings.',
+          label: 'Dates',
+        },
+      })
+        .onOk(({ start, end }) => {
+          const actual = notes.value.find(n => n.id === note.id);
+          if (actual && actual.type === 'Graph') {
+            actual.start = start;
+            actual.end = end;
+            saveSession();
+          }
+        });
+    }
 
-  addSession(): void {
-    this.$emit('add');
-  }
-}
+    return {
+      shortDateString,
+      session,
+      saveSession,
+      notes,
+      openNote,
+      startGraphNote,
+      stopGraphNote,
+      editGraphNote,
+    };
+  },
+});
 </script>
 
 
 <template>
-  <div class="widget-lg">
+  <div>
     <slot name="warnings" />
 
     <div v-if="session !== null" class="row q-ma-md">
@@ -137,17 +152,15 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
         >
           <!-- Text note -->
           <template v-if="note.type === 'Text'">
-            <div class="col column ellipsis" style="max-width: 100%;">
+            <div class="col-grow">
               <q-item-label caption class="text-secondary">
                 <q-icon name="mdi-text-subject" />
                 {{ note.title }}
               </q-item-label>
-              <!-- No line breaks to allow correctly rendering whitespace -->
-              <!-- eslint-disable-next-line vue/singleline-html-element-content-newline -->
-              <div v-if="!!note.value" style="white-space: pre-wrap">{{ note.value }}</div>
-              <div v-else class="text-grey text-italic">
-                Click to set
-              </div>
+              <MarkdownView
+                style="overflow: hidden; max-height: 300px"
+                :text="note.value || 'Click to set'"
+              />
             </div>
           </template>
 
@@ -157,23 +170,48 @@ export default class SessionLogBasic extends CrudComponent<SessionLogConfig> {
                 <q-icon name="mdi-chart-line" />
                 {{ note.title }}
               </q-item-label>
-              <div class="col-grow row wrap">
+              <div
+                :class="[
+                  'col-grow row wrap',
+                  {'text-negative': note.start && note.end && note.start > note.end}
+                ]"
+              >
                 <span :class="{'text-grey': note.start === null}">
-                  {{ shortDateString(note.start, 'Not started') }}
+                  {{ shortDateString(note.start, 'No start date') }}
                 </span>
-                <span v-if="note.start" :class="{'text-grey': note.end === null, 'q-ml-xs': true}">
+                <span
+                  v-if="note.start || note.end"
+                  :class="['q-ml-xs', {'text-grey': note.end === null}]"
+                >
                   <q-icon name="mdi-arrow-right" />
                   {{ shortDateString(note.end, 'In progress') }}
                 </span>
               </div>
             </div>
-            <q-btn v-if="note.start === null" flat dense icon="mdi-play" @click.stop="startGraphNote(note)">
+            <q-btn
+              v-if="note.start === null && note.end === null"
+              flat
+              dense
+              icon="mdi-play"
+              @click.stop="startGraphNote(note)"
+            >
               <q-tooltip>Start</q-tooltip>
             </q-btn>
-            <q-btn v-else-if="note.end === null" flat dense icon="mdi-stop" @click.stop="stopGraphNote(note)">
+            <q-btn
+              v-if="note.start !== null && note.end === null"
+              flat
+              dense
+              icon="mdi-stop"
+              @click.stop="stopGraphNote(note)"
+            >
               <q-tooltip>Stop</q-tooltip>
             </q-btn>
-            <q-btn flat dense icon="mdi-calendar-clock" @click.stop="editGraphNote(note)">
+            <q-btn
+              flat
+              dense
+              icon="mdi-calendar-clock"
+              @click.stop="editGraphNote(note)"
+            >
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
           </template>

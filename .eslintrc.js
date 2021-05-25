@@ -6,7 +6,7 @@ module.exports = {
     'parser': '@typescript-eslint/parser',
   },
   'extends': [
-    'plugin:vue/recommended',
+    'plugin:vue/vue3-recommended',
     'plugin:@typescript-eslint/recommended',
     '@vue/typescript',
     'plugin:quasar/standard',
@@ -29,6 +29,7 @@ module.exports = {
     'object-curly-newline': 0,
     'no-param-reassign': 0,
     'no-console': 'warn',
+    'no-debugger': 'warn',
     'no-multiple-empty-lines': 'error',
     'comma-dangle': [
       'error',
@@ -69,7 +70,7 @@ module.exports = {
       'files': ['*.js'],
       'rules': {
         '@typescript-eslint/no-var-requires': 'off',
-      }
+      },
     },
     {
       'files': ['dev/**.js'],
@@ -78,4 +79,4 @@ module.exports = {
       },
     },
   ],
-}
+};

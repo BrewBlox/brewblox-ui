@@ -1,48 +1,72 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
+import { useDialog } from '@/composables';
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 
+export default defineComponent({
+  name: 'RelationsDialog',
+  props: {
+    ...useDialog.props,
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    nodes: {
+      type: Array as PropType<RelationNode[]>,
+      required: true,
+    },
+    edges: {
+      type: Array as PropType<RelationEdge[]>,
+      required: true,
+    },
+    title: {
+      type: String,
+      default: 'Block Relations',
+    },
+    hideUnrelated: {
+      type: Boolean,
+      default: false,
+    },
+    canCreate: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup() {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+    } = useDialog.setup();
 
-@Component
-export default class RelationsDialog extends DialogBase {
-
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
-
-  @Prop({ type: Array, required: true })
-  readonly nodes!: RelationNode[];
-
-  @Prop({ type: Array, required: true })
-  readonly edges!: RelationEdge[];
-
-  @Prop({ type: String, default: 'Block Relations' })
-  public readonly title!: string;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly hideUnrelated!: boolean;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly centered!: boolean;
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     maximized
     v-bind="dialogProps"
     transition-show="fade"
     @hide="onDialogHide"
   >
-    <CardWrapper no-scroll v-bind="{context}">
+    <Card no-scroll>
       <template #toolbar>
-        <DialogToolbar :title="title" subtitle="Relations diagram" />
+        <Toolbar :title="title" subtitle="Relations diagram" />
       </template>
       <div class="fit bg-dark">
         <RelationsDiagram v-bind="$props" />
       </div>
-    </CardWrapper>
+    </Card>
   </q-dialog>
 </template>

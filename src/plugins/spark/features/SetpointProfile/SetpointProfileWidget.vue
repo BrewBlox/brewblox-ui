@@ -1,20 +1,25 @@
 <script lang="ts">
-import { Component, Watch } from 'vue-property-decorator';
+import { computed, defineComponent, ref, watch } from 'vue';
 
-import { deepCopy, isJsonEqual } from '@/helpers/functional';
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { Link, SetpointProfileBlock } from '@/plugins/spark/types';
+import { prettyLink } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy, isJsonEqual } from '@/utils/functional';
 
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';
 import ProfileImportAction from './ProfileImportAction.vue';
 import ProfilePresetAction from './ProfilePresetAction.vue';
 import SetpointProfileBasic from './SetpointProfileBasic.vue';
+import SetpointProfileDisableDialog from './SetpointProfileDisableDialog.vue';
 import SetpointProfileFull from './SetpointProfileFull.vue';
 
 type SetpointProfileData = SetpointProfileBlock['data'];
 
-@Component({
+export default defineComponent({
+  name: 'SetpointProfileWidget',
   components: {
     Basic: SetpointProfileBasic,
     Full: SetpointProfileFull,
@@ -22,60 +27,85 @@ type SetpointProfileData = SetpointProfileBlock['data'];
     ProfilePresetAction,
     ProfileExportAction,
   },
-})
-export default class SetpointProfileWidget
-  extends BlockWidgetBase<SetpointProfileBlock> {
-  usedData: SetpointProfileData | null = null;
-  revision = 0;
+  setup() {
+    const { context, inDialog } = useContext.setup();
+    const { block, saveBlock } = useBlockWidget.setup<SetpointProfileBlock>();
 
-  @Watch('block.data')
-  watchData(newV: SetpointProfileData): void {
-    if (!isJsonEqual(newV, this.usedData)) {
-      this.refresh();
+    const usedData = ref<SetpointProfileData>(deepCopy(block.value.data));
+    const revision = ref<Date>(new Date());
+
+    const target = computed<Link>(
+      () => block.value.data.targetId,
+    );
+
+    const graphProps = computed<GraphProps>(
+      () => profileGraphProps(block.value),
+    );
+
+    function refresh(): void {
+      usedData.value = deepCopy(block.value.data);
+      revision.value = new Date();
     }
-  }
 
-  created(): void {
-    this.usedData = deepCopy(this.block.data);
-  }
+    function changeEnabled(enabled: boolean): void {
+      if (enabled) {
+        block.value.data.enabled = enabled;
+        saveBlock();
+      }
+      else {
+        createDialog({
+          component: SetpointProfileDisableDialog,
+          componentProps: {
+            block: block.value,
+          },
+        });
+      }
+    }
 
-  get target(): Link {
-    return this.block.data.targetId;
-  }
+    watch(
+      () => block.value.data,
+      (newV) => {
+        if (!isJsonEqual(newV, usedData.value)) {
+          refresh();
+        }
+      },
+    );
 
-  get graphProps(): GraphProps {
-    return profileGraphProps(this.block);
-  }
-
-  refresh(): void {
-    this.usedData = deepCopy(this.block.data);
-    this.revision++;
-  }
-}
+    return {
+      prettyLink,
+      context,
+      inDialog,
+      revision,
+      target,
+      graphProps,
+      refresh,
+      changeEnabled,
+    };
+  },
+});
 </script>
 
 <template>
-  <GraphCardWrapper
+  <PreviewCard
     show-initial
-    :show="inDialog && mode ==='Full'"
-    :no-scroll="mode === 'Basic'"
-    v-bind="{context}"
+    :enabled="inDialog && context.mode ==='Full'"
+    :no-scroll="context.mode === 'Basic'"
   >
-    <template #graph>
+    <template #preview>
       <GenericGraph v-bind="graphProps" :revision="revision" />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <BlockWidgetToolbar has-mode-toggle>
         <template #actions>
-          <ProfilePresetAction :crud="crud" />
-          <ProfileExportAction :crud="crud" />
-          <ProfileImportAction :crud="crud" />
+          <ProfilePresetAction />
+          <ProfileExportAction />
+          <ProfileImportAction />
         </template>
-      </component>
+      </BlockWidgetToolbar>
     </template>
 
-    <component :is="mode" :crud="crud">
+    <component :is="context.mode">
       <template #warnings>
         <CardWarning v-if="!target.id">
           <template #message>
@@ -84,14 +114,15 @@ export default class SetpointProfileWidget
         </CardWarning>
         <BlockEnableToggle
           v-else
-          :hide-enabled="mode === 'Basic'"
-          :crud="crud"
+          :hide-enabled="context.mode === 'Basic'"
+          emit-toggle
+          @change="changeEnabled"
         >
           <template #enabled>
-            Setpoint Profile is enabled and driving <i>{{ target | link }}</i>.
+            Setpoint Profile is enabled and driving <i>{{ prettyLink(target) }}</i>.
           </template>
           <template #disabled>
-            Setpoint Profile is disabled and not driving <i>{{ target | link }}</i>.
+            Setpoint Profile is disabled and not driving <i>{{ prettyLink(target) }}</i>.
           </template>
         </BlockEnableToggle>
       </template>
@@ -107,5 +138,5 @@ export default class SetpointProfileWidget
         />
       </template>
     </component>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>

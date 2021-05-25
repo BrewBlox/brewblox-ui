@@ -1,216 +1,247 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import { nanoid } from 'nanoid';
+import { computed, defineComponent, ref } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
-import { createDialog } from '@/helpers/dialog';
-import { deepCopy, filterById, spliceById } from '@/helpers/functional';
+import { useGlobals, useWidget } from '@/composables';
 import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
+import { Block } from '@/shared-types';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy, filterById, spliceById } from '@/utils/functional';
 
 import QuickActionChange from './QuickActionChange.vue';
-import { BlockChange, ChangeAction, QuickActionsConfig } from './types';
+import { BlockChange, ChangeAction, QuickActionsWidget } from './types';
 
-@Component({
+export default defineComponent({
+  name: 'QuickActionsFull',
   components: {
     QuickActionChange,
   },
-})
-export default class QuickActionsFull extends CrudComponent<QuickActionsConfig> {
-  draggingStep = false;
-  editableChanges: Mapped<boolean> = {};
+  props: {
+    activeId: {
+      type: String,
+      default: null,
+    },
+  },
+  setup() {
+    const { dense } = useGlobals.setup();
+    const {
+      config,
+      saveConfig,
+    } = useWidget.setup<QuickActionsWidget>();
+    const draggingStep = ref(false);
 
-  @Prop({ type: String })
-  readonly activeId!: string;
+    const actions = computed<ChangeAction[]>(
+      () => deserialize(config.value.actions ?? config.value.steps),
+    );
 
-  get defaultServiceId(): string | null {
-    return this.config.serviceId ?? null;
-  }
+    function saveActions(acs: ChangeAction[] = actions.value): void {
+      config.value.actions = acs;
+      saveConfig();
+    }
 
-  get actions(): ChangeAction[] {
-    return deserialize(this.config.actions ?? this.config.steps);
-  }
+    function saveAction(action: ChangeAction): void {
+      spliceById(actions.value, action);
+      saveActions();
+    }
 
-  saveActions(actions: ChangeAction[] = this.actions): void {
-    this.config.actions = actions;
-    this.saveConfig();
-  }
-
-  saveAction(action: ChangeAction): void {
-    spliceById(this.actions, action);
-    this.saveActions();
-  }
-
-  duplicateAction(action: ChangeAction): void {
-    this.actions.push({
-      id: uid(),
-      name: `${action.name} (copy)`,
-      changes: action.changes.map(change => ({ ...deepCopy(change), id: uid() })),
-    });
-    this.saveActions();
-  }
-
-  renameAction(action: ChangeAction): void {
-    const stepName = action.name;
-    createDialog({
-      component: 'InputDialog',
-      title: 'Change ChangeAction name',
-      message: `Choose a new name for '${action.name}'`,
-      value: stepName,
-    })
-      .onOk(newName => {
-        if (newName !== stepName) {
-          action.name = newName;
-          this.saveAction(action);
-        }
+    function duplicateAction(action: ChangeAction): void {
+      actions.value.push({
+        id: nanoid(),
+        name: `${action.name} (copy)`,
+        changes: action.changes.map(change => ({ ...deepCopy(change), id: nanoid() })),
       });
-  }
+      saveActions();
+    }
 
-  startRemoveStep(action: ChangeAction): void {
-    createDialog({
-      component: 'ConfirmDialog',
-      title: 'Remove ChangeAction',
-      message: `Are you sure you want to remove ${action.name}?`,
-      ok: 'Confirm',
-      cancel: 'Cancel',
-    })
-      .onOk(() => this.saveActions(filterById(this.actions, action)));
-  }
+    function renameAction(action: ChangeAction): void {
+      const stepName = action.name;
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          modelValue: stepName,
+          title: 'Change ChangeAction name',
+          message: `Choose a new name for '${action.name}'`,
+        },
+      })
+        .onOk(newName => {
+          if (newName !== stepName) {
+            action.name = newName;
+            saveAction(action);
+          }
+        });
+    }
 
-  startAddChange(action: ChangeAction): void {
-    createDialog({
-      component: 'BlockAddressDialog',
-      title: 'Choose a Block',
-      value: {
-        id: null,
-        serviceId: null,
-        type: null,
-      },
-      anyService: true,
-      clearable: false,
-      blockFilter: block => !!sparkStore.spec(block)?.fields.some(f => !f.readonly),
-    })
-      .onOk((addr: BlockAddress) => {
-        if (addr && addr.id && addr.serviceId) {
-          action.changes.push({
-            id: uid(),
-            blockId: addr.id,
-            serviceId: addr.serviceId,
-            data: {},
-            confirmed: {},
-          });
-          this.saveAction(action);
-        }
-      });
-  }
 
-  saveChanges(action: ChangeAction, changes: BlockChange[]): void {
-    action.changes = changes;
-    this.saveAction(action);
-  }
+    function startRemoveStep(action: ChangeAction): void {
+      createDialog({
+        component: 'ConfirmDialog',
+        componentProps: {
+          title: 'Remove ChangeAction',
+          message: `Are you sure you want to remove ${action.name}?`,
+          ok: 'Confirm',
+          cancel: 'Cancel',
+        },
+      })
+        .onOk(() => saveActions(filterById(actions.value, action)));
+    }
 
-  saveChange(action: ChangeAction, change: BlockChange): void {
-    spliceById(action.changes, change);
-    this.saveAction(action);
-  }
+    function startAddChange(action: ChangeAction): void {
+      createDialog({
+        component: 'BlockAddressDialog',
+        componentProps: {
+          modelValue: {
+            id: null,
+            serviceId: null,
+            type: null,
+          },
+          title: 'Choose a Block',
+          anyService: true,
+          clearable: false,
+          blockFilter: (block: Block) => !!sparkStore.spec(block)?.fields.some(f => !f.readonly),
+        },
+      })
+        .onOk((addr: BlockAddress) => {
+          if (addr && addr.id && addr.serviceId) {
+            action.changes.push({
+              id: nanoid(),
+              blockId: addr.id,
+              serviceId: addr.serviceId,
+              data: {},
+              confirmed: {},
+            });
+            saveAction(action);
+          }
+        });
+    }
 
-  removeChange(action: ChangeAction, change: BlockChange): void {
-    spliceById(action.changes, change, false);
-    this.saveAction(action);
-  }
+    function saveChanges(action: ChangeAction, changes: BlockChange[]): void {
+      action.changes = changes;
+      saveAction(action);
+    }
 
-  startSwitchBlock(action: ChangeAction, change: BlockChange): void {
-    const { serviceId, blockId } = change;
-    const currentBlock = sparkStore.blockById(serviceId, blockId);
-    createDialog({
-      component: 'BlockAddressDialog',
-      title: `Switch target block '${blockId}'`,
-      value: currentBlock,
-      anyService: true,
-      blockFilter: block => currentBlock === null || block.type === currentBlock.type,
-    })
-      .onOk((addr: BlockAddress) => {
-        if (addr && addr.id && addr.serviceId) {
-          change.blockId = addr.id;
-          change.serviceId = addr.serviceId;
-          this.saveChange(action, change);
-        }
-      });
-  }
-}
+    function saveChange(action: ChangeAction, change: BlockChange): void {
+      spliceById(action.changes, change);
+      saveAction(action);
+    }
+
+    function removeChange(action: ChangeAction, change: BlockChange): void {
+      spliceById(action.changes, change, false);
+      saveAction(action);
+    }
+
+    function startSwitchBlock(action: ChangeAction, change: BlockChange): void {
+      const { serviceId, blockId } = change;
+      const currentBlock = sparkStore.blockById(serviceId, blockId);
+      createDialog({
+        component: 'BlockAddressDialog',
+        componentProps: {
+          modelValue: currentBlock,
+          title: `Switch target block '${blockId}'`,
+          anyService: true,
+          blockFilter: block => currentBlock === null || block.type === currentBlock.type,
+        },
+      })
+        .onOk((addr: BlockAddress) => {
+          if (addr && addr.id && addr.serviceId) {
+            change.blockId = addr.id;
+            change.serviceId = addr.serviceId;
+            saveChange(action, change);
+          }
+        });
+    }
+
+    return {
+      dense,
+      draggingStep,
+      actions,
+      saveActions,
+      saveChanges,
+      saveChange,
+      removeChange,
+      startSwitchBlock,
+      startAddChange,
+      duplicateAction,
+      renameAction,
+      startRemoveStep,
+    };
+  },
+});
 </script>
 
 <template>
-  <div class="widget-lg">
+  <div>
     <slot name="warnings" />
 
     <div class="widget-body column">
       <draggable
         v-if="actions.length > 0"
-        :disabled="$dense"
-        :value="actions"
-        @input="saveActions"
+        :disabled="dense"
+        :model-value="actions"
+        item-key="id"
+        @update:model-value="saveActions"
         @start="draggingStep=true"
         @end="draggingStep=false"
       >
-        <q-expansion-item
-          v-for="action in actions"
-          :key="action.id"
-          :label="action.name"
-          :default-opened="activeId === action.id"
-          :disable="draggingStep"
-          header-style="font-size: 120%"
-          group="actions"
-          icon="mdi-format-list-checks"
-          class="action-container q-mr-md q-mb-sm depth-1"
-        >
-          <draggable
-            :disabled="$dense"
-            :value="action.changes"
-            @input="v => saveChanges(action, v)"
+        <template #item="action">
+          <q-expansion-item
+            :label="action.element.name"
+            :default-opened="activeId === action.element.id"
+            :disable="draggingStep"
+            header-style="font-size: 120%"
+            group="actions"
+            icon="mdi-format-list-checks"
+            class="action-container q-mr-md q-mb-sm depth-1"
           >
-            <QuickActionChange
-              v-for="change in action.changes"
-              :key="`change--${action.id}--${change.id}`"
-              :value="change"
-              class="q-mr-sm q-my-sm"
-              @input="saveChange(action, change)"
-              @remove="removeChange(action, change)"
-              @switch="startSwitchBlock(action, change)"
-            />
-          </draggable>
-          <div class="row justify-end q-px-md q-py-sm action-actions">
-            <q-btn
-              size="sm"
-              label="Add Block"
-              icon="mdi-cube"
-              flat
-              @click="startAddChange(action)"
-            />
-            <q-btn
-              size="sm"
-              label="Copy"
-              icon="file_copy"
-              flat
-              @click="duplicateAction(action)"
-            />
-            <q-btn
-              size="sm"
-              label="Rename"
-              icon="edit"
-              flat
-              @click="renameAction(action)"
-            />
-            <q-btn
-              size="sm"
-              label="Remove"
-              icon="delete"
-              flat
-              @click="startRemoveStep(action)"
-            />
-          </div>
-        </q-expansion-item>
+            <draggable
+              :disabled="dense"
+              :model-value="action.element.changes"
+              item-key="id"
+              @update:model-value="v => saveChanges(action.element, v)"
+            >
+              <template #item="change">
+                <QuickActionChange
+                  :model-value="change.element"
+                  class="q-mr-sm q-my-sm"
+                  @update:model-value="v => saveChange(action.element, v)"
+                  @remove="removeChange(action.element, change.element)"
+                  @switch="startSwitchBlock(action.element, change.element)"
+                />
+              </template>
+            </draggable>
+            <div class="row justify-end q-px-md q-py-sm action-actions">
+              <q-btn
+                size="sm"
+                label="Add Block"
+                icon="mdi-cube"
+                flat
+                @click="startAddChange(action.element)"
+              />
+              <q-btn
+                size="sm"
+                label="Copy"
+                icon="file_copy"
+                flat
+                @click="duplicateAction(action.element)"
+              />
+              <q-btn
+                size="sm"
+                label="Rename"
+                icon="edit"
+                flat
+                @click="renameAction(action.element)"
+              />
+              <q-btn
+                size="sm"
+                label="Remove"
+                icon="delete"
+                flat
+                @click="startRemoveStep(action.element)"
+              />
+            </div>
+          </q-expansion-item>
+        </template>
       </draggable>
       <slot name="below" />
     </div>

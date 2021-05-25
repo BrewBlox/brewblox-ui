@@ -1,9 +1,7 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createBlockDialog } from '@/helpers/dialog';
-import { isCompatible } from '@/plugins/spark/helpers';
+import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   Block,
@@ -13,189 +11,212 @@ import {
   BlockSpec,
   ComparedBlockType,
 } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
+import { createBlockDialog } from '@/utils/dialog';
 
+export default defineComponent({
+  name: 'BlockFieldAddressDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<BlockFieldAddress>,
+      default: () => ({
+        serviceId: null,
+        id: null,
+        type: null,
+        field: null,
+      }),
+    },
+    services: {
+      type: Array as PropType<string[] | null>,
+      default: null,
+    },
+    compatible: {
+      type: [String, Array] as PropType<ComparedBlockType>,
+      default: null,
+    },
+    blockFilter: {
+      type: Function as PropType<(block: Block) => boolean>,
+      default: () => true,
+    },
+    fieldFilter: {
+      type: Function as PropType<(field: BlockField) => boolean>,
+      default: () => true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
 
-@Component
-export default class BlockFieldAddressDialog extends DialogBase {
-  selectedLocal: string | null = null;
-  expanded: string[] = [];
+    const fieldId = ref<string | null>(props.modelValue.field);
 
-  serviceLocal: string | null = null;
-  blockLocal: string | null = null;
-  fieldLocal: string | null = null;
-
-  @Prop({
-    type: Object, default: (): BlockFieldAddress => ({
-      serviceId: null,
-      id: null,
-      type: null,
-      field: null,
-    }),
-  })
-  public readonly value!: BlockFieldAddress;
-
-  @Prop({ type: Array, required: false })
-  public readonly services!: string[];
-
-  @Prop({ type: [String, Array], required: false })
-  readonly compatible!: ComparedBlockType;
-
-  @Prop({ type: Function, default: (() => true) })
-  public readonly blockFilter!: ((block: Block) => boolean);
-
-  @Prop({ type: Function, default: (() => true) })
-  public readonly fieldFilter!: ((field: BlockField) => boolean);
-
-  created(): void {
-    this.serviceLocal = this.value.serviceId;
-    this.blockLocal = this.value.id;
-    this.fieldLocal = this.value.field;
-    if (!this.serviceLocal && this.serviceOpts.length === 1) {
-      this.serviceLocal = this.serviceOpts[0];
-    }
-  }
-
-  get serviceOpts(): string[] {
-    return this.services ?? sparkStore.serviceIds;
-  }
-
-  get serviceId(): string | null {
-    return this.serviceLocal;
-  }
-
-  set serviceId(v: string | null) {
-    if (v !== this.serviceLocal) {
-      this.serviceLocal = v;
-      this.blockLocal = null;
-      this.fieldLocal = null;
-    }
-  }
-
-  get validTypes(): BlockOrIntfType[] {
-    return sparkStore
-      .specs
-      .filter(v => isCompatible(v.id, this.compatible ?? null))
-      .filter(v => v.fields.some(f => this.fieldFilter(f)))
-      .map(v => v.id);
-  }
-
-  get blockOpts(): string[] {
-    return sparkStore.moduleById(this.serviceId)
-      ?.blocks
-      .filter(block => this.blockFilter(block))
-      .filter(block => this.validTypes.includes(block.type))
-      .map(block => block.id)
-      .sort()
-      ?? [];
-  }
-
-  get blockId(): string | null {
-    return this.blockLocal;
-  }
-
-  set blockId(v: string | null) {
-    if (v !== this.blockLocal) {
-      this.blockLocal = v;
-      this.fieldLocal = null;
-    }
-  }
-
-  get block(): Block | null {
-    return sparkStore.blockById(this.serviceId, this.blockId);
-  }
-
-  get spec(): BlockSpec | null {
-    return this.block
-      ? sparkStore.spec(this.block)
-      : null;
-  }
-
-  get fieldOpts(): SelectOption<string>[] {
-    return this.spec
-      ?.fields
-      .filter(f => this.fieldFilter(f))
-      .map(f => ({ label: f.title, value: f.key }))
-      ?? [];
-  }
-
-  get fieldId(): string | null {
-    return this.fieldLocal;
-  }
-
-  set fieldId(v: string | null) {
-    this.fieldLocal = v;
-  }
-
-  get fieldSpec(): BlockField | null {
-    return this.spec && this.fieldId
-      ? this.spec.fields.find(f => f.key === this.fieldId) ?? null
-      : null;
-  }
-
-  get local(): BlockFieldAddress | null {
-    const [serviceId, id, field] = [
-      this.serviceId,
-      this.blockId,
-      this.fieldId,
-    ];
-    if (!field || !this.spec || !this.fieldSpec) {
-      return null;
-    }
-    return {
-      serviceId,
-      id,
-      field,
-      type: this.spec.id,
-    };
-  }
-
-  get localOk(): boolean {
-    return this.local !== null;
-  }
-
-  configureBlock(): void {
-    createBlockDialog(this.block);
-  }
-
-  createBlock(): void {
-    createBlockWizard(this.serviceId, this.validTypes)
-      .onOk(({ block }) => {
-        if (block) {
-          this.serviceLocal = block.serviceId;
-          this.blockLocal = block.id;
-          this.fieldLocal = null;
+    const _blockId = ref<string | null>(props.modelValue.id);
+    const blockId = computed<string | null>({
+      get: () => _blockId.value,
+      set: id => {
+        if (id !== _blockId.value) {
+          _blockId.value = id;
+          fieldId.value = null;
         }
-      });
-  }
+      },
+    });
 
-  save(): void {
-    if (this.localOk) {
-      this.onDialogOk(this.local);
+    const _serviceId = ref<string | null>(props.modelValue.serviceId);
+    const serviceId = computed<string | null>({
+      get: () => _serviceId.value,
+      set: id => {
+        if (id !== _serviceId.value) {
+          _serviceId.value = id;
+          blockId.value = null;
+          fieldId.value = null;
+        }
+      },
+    });
+
+    const serviceIdOpts = computed<string[]>(
+      () => props.services ?? sparkStore.serviceIds,
+    );
+
+    onBeforeMount(() => {
+      if (!props.modelValue.serviceId && serviceIdOpts.value.length === 1) {
+        serviceId.value = serviceIdOpts.value[0];
+      }
+    });
+
+    const validTypes = computed<BlockOrIntfType[]>(
+      () => sparkStore
+        .specs
+        .filter(v => isCompatible(v.id, props.compatible))
+        .filter(v => v.fields.some(f => props.fieldFilter(f)))
+        .map(v => v.id),
+    );
+
+    const blockIdOpts = computed<string[]>(
+      () => sparkStore.moduleById(serviceId.value)
+        ?.blocks
+        .filter(block => props.blockFilter(block))
+        .filter(block => validTypes.value.includes(block.type))
+        .map(block => block.id)
+        .sort()
+        ?? [],
+    );
+
+    const block = computed<Block | null>(
+      () => sparkStore.blockById(serviceId.value, blockId.value),
+    );
+
+    const spec = computed<BlockSpec | null>(
+      () => block.value
+        ? sparkStore.spec(block.value)
+        : null,
+    );
+
+    const fieldIdOpts = computed<SelectOption<string>[]>(
+      () => spec.value
+        ?.fields
+        .filter(f => props.fieldFilter(f))
+        .map(f => ({ label: f.title, value: f.key }))
+        ?? [],
+    );
+
+    const field = computed<BlockField | null>(
+      () => spec.value && fieldId.value
+        ? spec.value.fields.find(f => f.key === fieldId.value) ?? null
+        : null,
+    );
+
+    const localAddress = computed<BlockFieldAddress | null>(
+      () => {
+        if (!fieldId.value || !spec.value || !field.value) {
+          return null;
+        }
+        return {
+          serviceId: serviceId.value,
+          id: blockId.value,
+          field: fieldId.value,
+          type: spec.value.id,
+        };
+      },
+    );
+
+    const localOk = computed<boolean>(
+      () => localAddress.value !== null,
+    );
+
+    function configureBlock(): void {
+      createBlockDialog(block.value);
     }
-  }
-}
+
+    function createBlock(): void {
+      createBlockWizard(serviceId.value, validTypes.value)
+        .onOk(({ block }) => {
+          if (block) {
+            serviceId.value = block.serviceId;
+            blockId.value = block.id;
+            fieldId.value = null;
+          }
+        });
+    }
+
+    function save(): void {
+      if (localOk.value) {
+        onDialogOK(localAddress.value);
+      }
+    }
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      fieldId,
+      blockId,
+      serviceId,
+      serviceIdOpts,
+      validTypes,
+      blockIdOpts,
+      block,
+      spec,
+      fieldIdOpts,
+      field,
+      localAddress,
+      localOk,
+      configureBlock,
+      createBlock,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
-        v-if="serviceOpts.length > 1"
+        v-if="serviceIdOpts.length > 1"
         v-model="serviceId"
-        :options="serviceOpts"
+        :options="serviceIdOpts"
         label="Service"
         item-aligned
         @keyup.enter.exact.stop
       />
       <q-select
         v-model="blockId"
-        :options="blockOpts"
+        :options="blockIdOpts"
         :disable="!serviceId"
         label="Block"
         item-aligned
@@ -232,7 +253,7 @@ export default class BlockFieldAddressDialog extends DialogBase {
 
       <q-select
         v-model="fieldId"
-        :options="fieldOpts"
+        :options="fieldIdOpts"
         :disable="!blockId"
         label="Field"
         item-aligned

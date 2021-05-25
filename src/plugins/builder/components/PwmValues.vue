@@ -1,65 +1,73 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
 
-import { sparkStore } from '@/plugins/spark/store';
-import { ActuatorPwmBlock } from '@/plugins/spark/types';
-import { BlockAddress } from '@/plugins/spark/types';
+import { computed, defineComponent, PropType } from 'vue';
 
-import { settingsAddress, squares, textTransformation } from '../helpers';
-import { PersistentPart } from '../types';
+import { FlowPart } from '@/plugins/builder/types';
+import { coord2grid, textTransformation } from '@/plugins/builder/utils';
+import { ActuatorPwmBlock, BlockType } from '@/plugins/spark/types';
+import { truncateRound } from '@/utils/functional';
 
+import { usePart, useSettingsBlock } from '../composables';
 
-@Component
-export default class PwmValues extends Vue {
-  squares = squares;
+export default defineComponent({
+  name: 'PwmValues',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+    settingsKey: {
+      type: String,
+      required: true,
+    },
+    noBorder: {
+      type: Boolean,
+      default: false,
+    },
+    startX: {
+      type: Number,
+      default: 0,
+    },
+    startY: {
+      type: Number,
+      default: 0,
+    },
+    color: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
+    const {
+      bordered,
+    } = usePart.setup(props.part);
 
-  @Prop({ type: Object, required: true })
-  public readonly part!: PersistentPart;
+    const {
+      block,
+      isBroken,
+    } = useSettingsBlock.setup<ActuatorPwmBlock>(props.part, props.settingsKey, [BlockType.ActuatorPwm]);
 
-  @Prop({ type: String, default: 'pwm' })
-  public readonly settingsKey!: string;
+    const pwmValue = computed<number | null>(
+      () => block.value?.data.enabled
+        ? block.value.data.value
+        : null,
+    );
 
-  @Prop({ type: Boolean, default: false })
-  public readonly noBorder!: boolean;
+    const transform = computed<string>(
+      () => textTransformation(props.part, [1, 1]),
+    );
 
-  @Prop({ type: Number, default: 0 })
-  public readonly startX!: number;
-
-  @Prop({ type: Number, default: 0 })
-  public readonly startY!: number;
-
-  @Prop({ type: String, default: '' })
-  public readonly color!: string;
-
-  get address(): BlockAddress {
-    return settingsAddress(this.part, this.settingsKey);
-  }
-
-  get block(): ActuatorPwmBlock | null {
-    const { serviceId, id } = this.address;
-    return sparkStore.blockById(serviceId, id);
-  }
-
-  get isBroken(): boolean {
-    return this.block == null
-      && this.address.id !== null;
-  }
-
-  get pwmValue(): number | null {
-    return this.block && this.block.data.enabled
-      ? this.block.data.value
-      : null;
-  }
-
-  get transform(): string {
-    return textTransformation(this.part, [1, 1]);
-  }
-
-  public get bordered(): boolean {
-    return this.part.settings.bordered ?? true;
-  }
-}
+    return {
+      coord2grid,
+      truncateRound,
+      block,
+      isBroken,
+      pwmValue,
+      transform,
+      bordered,
+    };
+  },
+});
 </script>
 
 <template>
@@ -67,10 +75,10 @@ export default class PwmValues extends Vue {
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="squares(1)-2"
-        :height="squares(1)-2"
-        :x="squares(startX)+1"
-        :y="squares(startY)+1"
+        :width="coord2grid(1)-2"
+        :height="coord2grid(1)-2"
+        :x="coord2grid(startX)+1"
+        :y="coord2grid(startY)+1"
         :stroke="color"
         stroke-width="2px"
         rx="6"
@@ -78,11 +86,11 @@ export default class PwmValues extends Vue {
       />
     </g>
     <SvgEmbedded
-      :x="squares(startX)"
-      :y="squares(startY)"
+      :x="coord2grid(startX)"
+      :y="coord2grid(startY)"
       :transform="transform"
-      :width="squares(1)"
-      :height="squares(1)"
+      :width="coord2grid(1)"
+      :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
     >
       <BrokenIcon v-if="isBroken" class="col" />
@@ -91,7 +99,7 @@ export default class PwmValues extends Vue {
       <template v-else>
         <PwmIcon class="col" />
         <div class="col text-bold">
-          {{ pwmValue | truncateRound }}
+          {{ truncateRound(pwmValue) }}
           <small v-if="!!block">%</small>
         </div>
       </template>

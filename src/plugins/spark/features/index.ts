@@ -1,4 +1,4 @@
-import { SparkFeature } from '@/plugins/spark/types';
+import { Plugin } from 'vue';
 
 import ActuatorAnalogMock from './ActuatorAnalogMock';
 import ActuatorLogic from './ActuatorLogic';
@@ -22,11 +22,12 @@ import SetpointSensorPair from './SetpointSensorPair';
 import Spark2Pins from './Spark2Pins';
 import Spark3Pins from './Spark3Pins';
 import SparkDisplay from './SparkDisplay';
+import SysInfo from './SysInfo';
 import TempSensorCombi from './TempSensorCombi';
 import TempSensorMock from './TempSensorMock';
 import TempSensorOneWire from './TempSensorOneWire';
 
-const features: SparkFeature[] = [
+const plugins: Plugin[] = [
   ActuatorAnalogMock,
   ActuatorLogic,
   ActuatorOffset,
@@ -47,6 +48,7 @@ const features: SparkFeature[] = [
   Spark2Pins,
   Spark3Pins,
   SparkDisplay,
+  SysInfo,
   QuickActions,
   QuickValues,
   TempSensorCombi,
@@ -54,4 +56,4 @@ const features: SparkFeature[] = [
   TempSensorOneWire,
 ];
 
-export default features;
+export default plugins;

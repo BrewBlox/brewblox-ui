@@ -1,14 +1,24 @@
 const { configure } = require('quasar/wrappers');
 const fs = require('fs');
 const path = require('path');
-const MonacoEditorPlugin = require('monaco-editor-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require('compression-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = configure(function (ctx) {
   const buildDate = new Date().toISOString();
 
   return {
     preFetch: false,
-    supportTS: true,
+
+    supportTS: {
+      tsCheckerConfig: {
+        eslint: {
+          enabled: true,
+          files: './src/**/*.{ts,tsx,js,jsx,vue}',
+        },
+      },
+    },
 
     sourceFiles: {
       router: 'src/router.ts',
@@ -19,7 +29,7 @@ module.exports = configure(function (ctx) {
       'externals',
       'register',
       'plugins',
-      'mixins',
+      'providers',
     ],
 
     css: [
@@ -59,7 +69,6 @@ module.exports = configure(function (ctx) {
     devServer: {
       open: false,
       public: 'localhost',
-      quiet: false,
       https: {
         key: fs.readFileSync('dev/traefik/brewblox.key'),
         cert: fs.readFileSync('dev/traefik/brewblox.crt'),
@@ -84,14 +93,8 @@ module.exports = configure(function (ctx) {
       extractCSS: true,
 
       devtool: ctx.dev
-        ? 'cheap-module-eval-source-map'
+        ? 'eval-cheap-module-source-map'
         : undefined,
-
-      supportTS: {
-        tsCheckerConfig: {
-          eslint: true,
-        },
-      },
 
       env: ctx.dev
         ? {
@@ -108,29 +111,41 @@ module.exports = configure(function (ctx) {
         },
 
       extendWebpack: config => {
-        config.plugins.push(new MonacoEditorPlugin({
-          languages: ['javascript', 'css', 'html', 'typescript'],
-        }));
         config.performance.hints = ctx.prod ? 'warning' : false;
 
-        if (ctx.prod) {
-          // Function names are required to set up functions for VueX functionality
-          config
-            .optimization
-            .minimizer[0] // Terser
-            .options
-            .terserOptions
-            .keep_fnames = true;
+        config.resolve.alias = {
+          ...config.resolve.alias,
+
+          // We're only using a subset from plotly
+          // Add alias to enable typing regardless
+          'plotly.js': path.resolve(__dirname, './plotly-bundle'),
+          // The bundler file still needs access to the actual plotly module
+          'plotly-dist': path.resolve(__dirname, './node_modules/plotly.js'),
+
+          // This matches the @ alias set in tsconfig.json
+          '@': path.resolve(__dirname, './src'),
+        };
+
+        // Replace the compression plugin because it was generating unnamed output files
+        const compressionIdx = config.plugins.findIndex(v => v instanceof CompressionPlugin);
+        if (compressionIdx >= 0) {
+          config.plugins.splice(compressionIdx, 1, new CompressionPlugin());
         }
-      },
 
-      chainWebpack: config => {
-        // We're only using a subset from plotly
-        // Add alias to enable typing regardless
-        config.resolve.alias.set('plotly.js', 'plotly.js-basic-dist');
+        config.plugins.push(
+          // mqtt.js depends on multiple Node.JS libraries
+          // In webpack 5+, these are no longer polyfilled by default
+          new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+            process: 'process/browser',
+          }),
+        );
 
-        // This matches the @ alias set in tsconfig.json
-        config.resolve.alias.set('@', path.resolve(__dirname, './src'));
+        if (ctx.prod) {
+          config.plugins.push(
+            new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
+          );
+        }
       },
     },
   };

@@ -1,25 +1,34 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import { saveFile } from '@/helpers/import-export';
 import { loggingStore } from '@/store/logging';
-@Component
-export default class ExportErrorsAction extends Vue {
+import { saveFile } from '@/utils/import-export';
 
-  @Prop({ type: String, default: 'mdi-file-export' })
-  public readonly icon!: string;
+export default defineComponent({
+  name: 'ExportErrorsAction',
+  props: {
+    icon: {
+      type: String,
+      default: 'mdi-file-export',
+    },
+    label: {
+      type: String,
+      default: 'Export UI logs',
+    },
+  },
+  setup() {
+    async function startExport(): Promise<void> {
+      const logs = loggingStore.entries;
+      saveFile(JSON.stringify(logs, null, 2), 'brewblox-logs.json', true);
+    }
 
-  @Prop({ type: String, default: 'Export UI logs' })
-  public readonly label!: string;
-
-  async showDialog(): Promise<void> {
-    const logs = loggingStore.entries;
-    saveFile(JSON.stringify(logs, null, 2), 'brewblox-logs.json', true);
-  }
-}
+    return {
+      startExport,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionItem v-bind="{...$attrs, icon, label}" @click="showDialog" />
+  <ActionItem v-bind="{...$attrs, icon, label}" @click="startExport" />
 </template>

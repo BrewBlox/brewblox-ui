@@ -1,13 +1,9 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
-import { SetpointProfileBlock } from '@/plugins/spark/types';
-
-@Component
-export default class SetpointProfileBasic
-  extends BlockCrudComponent<SetpointProfileBlock> {
-}
+export default defineComponent({
+  name: 'SetpointProfileBasic',
+});
 </script>
 
 <template>

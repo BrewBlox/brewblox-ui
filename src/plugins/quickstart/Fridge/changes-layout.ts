@@ -1,21 +1,21 @@
-import { uid } from 'quasar';
+import { nanoid } from 'nanoid';
 
 import { BuilderLayout } from '@/plugins/builder/types';
 
-import { withPrefix } from '../helpers';
+import { withPrefix } from '../utils';
 import { FridgeConfig } from './types';
 
 export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
   const { serviceId, names } = config;
   return [
     {
-      id: uid(),
+      id: nanoid(),
       title: withPrefix(config.prefix, 'Layout'),
       width: 8,
       height: 9,
       parts: [
         {
-          id: uid(),
+          id: nanoid(),
           type: 'Fridge',
           x: 2,
           y: 1,
@@ -28,7 +28,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'BeerBottle',
           x: 3,
           y: 3,
@@ -37,7 +37,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           settings: {},
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'BeerBottle',
           x: 4,
           y: 3,
@@ -46,7 +46,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           settings: {},
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'BeerBottle',
           x: 3,
           y: 5,
@@ -55,7 +55,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           settings: {},
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'BeerBottle',
           x: 4,
           y: 5,
@@ -64,7 +64,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           settings: {},
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'BeerBottle',
           x: 5,
           y: 5,
@@ -73,7 +73,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           settings: {},
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'SetpointDisplay',
           x: 2,
           y: 7,
@@ -88,7 +88,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'PidDisplay',
           x: 4,
           y: 7,
@@ -103,7 +103,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
           },
         },
         {
-          id: uid(),
+          id: nanoid(),
           type: 'PidDisplay',
           x: 5,
           y: 7,

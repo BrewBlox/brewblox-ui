@@ -1,7 +1,8 @@
 import { DialogChainObject } from 'quasar';
 
 import { Block } from '@/plugins/spark/types';
-import { Dashboard, Widget } from '@/store/dashboards';
+import { Dashboard } from '@/store/dashboards';
+import { Widget } from '@/store/widgets';
 
 export interface WizardOutput {
   dashboard?: Dashboard | null;

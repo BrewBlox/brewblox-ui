@@ -1,28 +1,38 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+
+import { defineComponent, PropType } from 'vue';
 
 import { PidConfig } from '../types';
 import TempControlPidView from './TempControlPidView.vue';
 
-@Component({
+export default defineComponent({
+  name: 'TempControlSyncView',
   components: {
     TempControlPidView,
   },
-})
-export default class TempControlSyncView extends Vue {
+  props: {
+    blockConfig: {
+      type: Object as PropType<PidConfig>,
+      required: true,
+    },
+    modeConfig: {
+      type: Object as PropType<PidConfig>,
+      required: true,
+    },
+  },
+  emits: [
+    'apply',
+  ],
+  setup(props, { emit }) {
+    function apply(leading: 'pid' | 'mode'): void {
+      emit('apply', leading);
+    }
 
-  @Prop({ type: Object, required: true })
-  public readonly blockConfig!: PidConfig;
-
-  @Prop({ type: Object, required: true })
-  public readonly modeConfig!: PidConfig;
-
-  apply(leading: 'pid' | 'mode'): void {
-    this.$emit('apply', leading);
-  }
-
-}
+    return {
+      apply,
+    };
+  },
+});
 </script>
 
 <template>
@@ -46,7 +56,7 @@ export default class TempControlSyncView extends Vue {
       class="col-grow bordered"
     >
       <TempControlPidView
-        :value="blockConfig"
+        :model-value="blockConfig"
         class="column"
       />
     </LabeledField>
@@ -71,7 +81,7 @@ export default class TempControlSyncView extends Vue {
       class="col-grow bordered"
     >
       <TempControlPidView
-        :value="modeConfig"
+        :model-value="modeConfig"
         class="column"
       />
     </LabeledField>

@@ -2,6 +2,7 @@
   "vetur.format.defaultFormatter.html": "none",
   "vetur.format.defaultFormatter.js": "vscode-typescript",
   "vetur.format.defaultFormatter.ts": "vscode-typescript",
+  "vetur.experimental.templateInterpolationService": true,
   "eslint.run": "onType",
   "eslint.validate": [
     "vue",

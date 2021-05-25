@@ -1,7 +1,5 @@
-import { VueConstructor } from 'vue/types/umd';
+import { autoComponents } from '@/utils/component-ref';
 
-import { autoComponents } from '@/helpers/component-ref';
-
-const parts: { [name: string]: VueConstructor } = autoComponents(require.context('./'));
+const parts = autoComponents(require.context('./'));
 
 export default parts;

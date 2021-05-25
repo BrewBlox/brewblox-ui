@@ -1,46 +1,75 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import isString from 'lodash/isString';
+import { defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { deepCopy } from '@/helpers/functional';
+import { useDialog } from '@/composables';
 import { AnalogConstraintsObj, DigitalConstraintsObj } from '@/plugins/spark/types';
+import { deepCopy } from '@/utils/functional';
 
 import AnalogConstraints from './AnalogConstraints.vue';
 import DigitalConstraints from './DigitalConstraints.vue';
 
 type ConstraintsObj = AnalogConstraintsObj | DigitalConstraintsObj;
 
-@Component({
+function typeValidator(v: unknown): boolean {
+  return isString(v) && ['analog', 'digital'].includes(v);
+}
+
+export default defineComponent({
+  name: 'ConstraintsDialog',
   components: {
     analog: AnalogConstraints,
     digital: DigitalConstraints,
   },
-})
-export default class ConstraintsDialog extends DialogBase {
-  local: ConstraintsObj | null = null;
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<ConstraintsObj>,
+      default: () => ({ constraints: [] }),
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String as PropType<'analog' | 'digital'>,
+      required: true,
+      validator: typeValidator,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-  @Prop({ type: Object, default: () => ({ constraints: [] }) })
-  protected readonly value!: ConstraintsObj;
+    const local = ref<ConstraintsObj>(deepCopy(props.modelValue));
 
-  @Prop({ type: String, required: true })
-  protected readonly serviceId!: string;
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  @Prop({ type: String, required: true, validator: v => ['analog', 'digital'].includes(v) })
-  public readonly type!: string;
-
-  created(): void {
-    this.local = deepCopy(this.value);
-  }
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

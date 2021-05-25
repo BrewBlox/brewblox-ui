@@ -1,59 +1,79 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { bloxQty, deltaTempQty, JSQuantity } from '@/helpers/bloxfield';
 import { systemStore } from '@/store/system';
+import { bloxQty, deltaTempQty, JSQuantity } from '@/utils/bloxfield';
 
-import QuickStartTaskBase from '../components/QuickStartTaskBase';
-import { createOutputActions } from '../helpers';
+import { QuickstartAction } from '../types';
+import { createOutputActions } from '../utils';
 import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
 import { defineLayouts } from './changes-layout';
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 
+export default defineComponent({
+  name: 'BrewKettleSettingsTask',
+  props: {
+    config: {
+      type: Object as PropType<BrewKettleConfig>,
+      required: true,
+    },
+    actions: {
+      type: Array as PropType<QuickstartAction[]>,
+      required: true,
+    },
+  },
+  emits: [
+    'update:config',
+    'update:actions',
+    'back',
+    'next',
+  ],
+  setup(props, { emit }) {
+    const fullPowerDelta = ref<JSQuantity>(deltaTempQty(2));
 
-@Component
-export default class BrewKettleSettingsTask extends QuickStartTaskBase<BrewKettleConfig> {
-  fullPowerDelta = deltaTempQty(2);
+    const userTemp = computed<string>(
+      () => systemStore.units.temperature,
+    );
 
-  volumeRules: InputRule[] = [
-    v => v !== 0 || 'Volume can\'t be 0',
-  ]
+    const kp = computed<JSQuantity>(
+      () => bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+    );
 
-  get userTemp(): string {
-    return systemStore.units.temperature;
-  }
+    function taskDone(): void {
+      const opts: BrewKettleOpts = {
+        kp: kp.value,
+      };
 
-  get kp(): JSQuantity {
-    return bloxQty(100 / (this.fullPowerDelta.value || 2), `1/${this.userTemp}`);
-  }
+      const createdBlocks = defineCreatedBlocks(props.config, opts);
+      const changedBlocks = defineChangedBlocks(props.config);
+      const layouts = defineLayouts(props.config);
+      const widgets = defineWidgets(props.config, opts, layouts);
+      const displayedBlocks = defineDisplayedBlocks(props.config);
 
-  done(): void {
-    const opts: BrewKettleOpts = {
-      kp: this.kp,
+      const updates: Partial<BrewKettleConfig> = {
+        layouts,
+        widgets,
+        changedBlocks,
+        createdBlocks,
+        displayedBlocks,
+      };
+
+      emit('update:config', { ...props.config, ...updates });
+      emit('update:actions', createOutputActions());
+      emit('next');
+    }
+
+    return {
+      fullPowerDelta,
+      kp,
+      taskDone,
     };
-
-    const createdBlocks = defineCreatedBlocks(this.config, opts);
-    const changedBlocks = defineChangedBlocks(this.config);
-    const layouts = defineLayouts(this.config);
-    const widgets = defineWidgets(this.config, opts, layouts);
-    const displayedBlocks = defineDisplayedBlocks(this.config);
-
-    this.pushActions(createOutputActions());
-    this.updateConfig({
-      ...this.config,
-      layouts,
-      widgets,
-      changedBlocks,
-      createdBlocks,
-      displayedBlocks,
-    });
-    this.next();
-  }
-}
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <q-card-section class="text-weight-light">
       <q-item>
         <q-item-section>
@@ -73,9 +93,9 @@ export default class BrewKettleSettingsTask extends QuickStartTaskBase<BrewKettl
     </q-card-section>
 
     <template #actions>
-      <q-btn unelevated label="Back" @click="back" />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
-      <q-btn unelevated label="Done" color="primary" @click="done" />
+      <q-btn unelevated label="Done" color="primary" @click="taskDone" />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

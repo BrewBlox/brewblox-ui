@@ -1,37 +1,47 @@
 <script lang="ts">
 import isString from 'lodash/isString';
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createBlockDialog } from '@/helpers/dialog';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
+import { createBlockDialog } from '@/utils/dialog';
 
-@Component
-export default class BlockDialogButton extends Vue {
-
-  @Prop({ type: String, validator: v => v === null || isString(v) })
-  readonly blockId!: string;
-
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
-
-  get block(): Block | null {
-    return sparkStore.blockById(this.serviceId, this.blockId);
-  }
-
-  openDialog(): void {
-    createBlockDialog(this.block);
-  }
+function validateBlockId(v: unknown): boolean {
+  return v === null || isString(v);
 }
+
+export default defineComponent({
+  name: 'BlockDialogButton',
+  props: {
+    blockId: {
+      type: String,
+      default: null,
+      validator: validateBlockId,
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
+
+    const block = computed<Block | null>(
+      () => sparkStore.blockById(props.serviceId, props.blockId),
+    );
+
+    return {
+      block,
+      createBlockDialog,
+    };
+  },
+});
 </script>
 
 <template>
   <q-btn
     :disable="!block"
     :icon="block ? 'mdi-pencil' : 'mdi-pencil-off'"
-    v-bind="$attrs"
-    @click="openDialog"
+    @click="createBlockDialog(block)"
   >
     <slot />
   </q-btn>

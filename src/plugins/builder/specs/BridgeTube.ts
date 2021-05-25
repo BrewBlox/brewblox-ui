@@ -1,5 +1,5 @@
-import { DOWN, LEFT, RIGHT, UP } from '../getters';
-import { PartSpec } from '../types';
+import { DOWN, LEFT, RIGHT, UP } from '@/plugins/builder/const';
+import { PartSpec } from '@/plugins/builder/types';
 
 const spec: PartSpec = {
   id: 'BridgeTube',

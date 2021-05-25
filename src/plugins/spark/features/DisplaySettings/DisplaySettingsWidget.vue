@@ -1,40 +1,49 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { DisplaySettingsBlock } from '@/plugins/spark/types';
 
 import DisplaySettingsBasic from './DisplaySettingsBasic.vue';
 import DisplaySettingsFull from './DisplaySettingsFull.vue';
 
-@Component({
+export default defineComponent({
+  name: 'DisplaySettingsWidget',
   components: {
     Basic: DisplaySettingsBasic,
     Full: DisplaySettingsFull,
   },
-})
-export default class DisplaySettingsWidget
-  extends BlockWidgetBase<DisplaySettingsBlock> {
+  setup() {
+    const { context } = useContext.setup();
+    const {
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<DisplaySettingsBlock>();
 
-  clearSlots(): void {
-    this.block.data.widgets = [];
-    this.saveBlock();
-  }
-}
+    function clearSlots(): void {
+      block.value.data.widgets = [];
+      saveBlock();
+    }
+
+    return {
+      context,
+      clearSlots,
+    };
+  },
+});
 </script>
 
 <template>
-  <CardWrapper
-    v-bind="{context}"
-  >
+  <Card size="lg">
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <BlockWidgetToolbar has-mode-toggle>
         <template #actions>
           <ActionItem icon="clear" label="Clear slots" @click="clearSlots" />
         </template>
-      </component>
+      </BlockWidgetToolbar>
     </template>
 
-    <component :is="mode" :crud="crud" />
-  </CardWrapper>
+    <component :is="context.mode" />
+  </Card>
 </template>

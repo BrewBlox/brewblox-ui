@@ -1,22 +1,37 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType } from 'vue';
 
-import ValEditBase from '../ValEditBase';
+import { useValEdit } from '@/plugins/spark/composables';
 
 
-@Component
-export default class EnumValEdit extends ValEditBase {
+export default defineComponent({
+  name: 'EnumValEdit',
+  props: {
+    ...useValEdit.props,
+    options: {
+      type: Array as PropType<SelectOption[]>,
+      required: true,
+    },
+    selectProps: {
+      type: Object as PropType<AnyDict>,
+      default: () => ({}),
+    },
+  },
+  emits: [
+    ...useValEdit.emits,
+  ],
+  setup(props) {
+    const {
+      field,
+      startEdit,
+    } = useValEdit.setup<string>(props.modelValue);
 
-  @Prop({ type: Number, default: 1 })
-  readonly timeScale!: number;
-
-  @Prop({ type: Array, required: true })
-  public readonly options!: SelectOption[];
-
-  @Prop({ type: Object, default: () => ({}) })
-  public readonly selectProps!: any;
-
-}
+    return {
+      field,
+      startEdit,
+    };
+  },
+});
 </script>
 
 <template>
@@ -36,6 +51,6 @@ export default class EnumValEdit extends ValEditBase {
     class="clickable q-pa-sm rounded-borders"
     @click="startEdit"
   >
-    {{ value }}
+    {{ field }}
   </div>
 </template>

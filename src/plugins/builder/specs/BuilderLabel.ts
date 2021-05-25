@@ -1,4 +1,4 @@
-import { PartSpec, PersistentPart } from '../types';
+import { PartSpec, PersistentPart } from '@/plugins/builder/types';
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 1;

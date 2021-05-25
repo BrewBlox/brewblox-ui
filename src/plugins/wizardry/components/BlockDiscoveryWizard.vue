@@ -1,118 +1,153 @@
 <script lang="ts">
-import { Component, Prop, Watch } from 'vue-property-decorator';
 
-import { createBlockDialog, createDialog } from '@/helpers/dialog';
-import { blockIdRules, discoverBlocks } from '@/plugins/spark/helpers';
+import { computed, defineComponent, ref, watch } from 'vue';
+
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { Block, BlockConfig } from '@/plugins/spark/types';
+import { discoverBlocks, makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateWidget } from '@/plugins/wizardry';
-import WidgetWizardBase from '@/plugins/wizardry/WidgetWizardBase';
+import { useWidgetWizard } from '@/plugins/wizardry/composables';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
 
+export default defineComponent({
+  name: 'BlockDiscoveryWizard',
+  props: {
+    ...useWidgetWizard.props,
+    activeServiceId: {
+      type: String,
+      default: null,
+    },
+    optionalWidget: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    ...useWidgetWizard.emits,
+  ],
+  setup(props) {
+    const {
+      onBack,
+      onClose,
+      onDone,
+      setDialogTitle,
+      widgetId,
+      featureTitle,
+      defaultWidgetSize,
+    } = useWidgetWizard.setup(props.featureId);
 
-@Component
-export default class BlockDiscoveryWizard extends WidgetWizardBase {
-  dashboardId: string | null = null;
-  sparkModule: SparkServiceModule | null = null;
-  block: Block | null = null;
-  busy = false;
+    setDialogTitle(`${featureTitle} wizard`);
 
-  @Prop({ type: String })
-  public readonly activeServiceId!: string | null;
-
-  @Prop({ type: Boolean, default: false })
-  public readonly optionalWidget!: boolean;
-
-  @Watch('sparkModule')
-  watchModule(newV: SparkServiceModule, oldV: SparkServiceModule): void {
-    if (newV?.id !== oldV?.id) {
-      this.block = null;
-    }
-  }
-
-  mounted(): void {
-    this.setDialogTitle(`${this.featureTitle} wizard`);
-    this.sparkModule = sparkStore.moduleById(this.activeServiceId)
+    const dashboardId = ref<string | null>(null);
+    const sparkModule = ref<SparkServiceModule | null>(
+      sparkStore.moduleById(props.activeServiceId)
       ?? sparkStore.modules[0]
-      ?? null;
-  }
+      ?? null,
+    );
+    const selectedBlock = ref<Block | null>(null);
+    const busy = ref(false);
 
-  get moduleOpts(): SelectOption[] {
-    return sparkStore.modules
-      .map(module => ({
-        label: module.id,
-        value: module,
-      }));
-  }
-
-  get blockOpts(): Block[] {
-    return this.sparkModule
-      ?.blocks
-      .filter(v => v.type === this.featureId)
-      ?? [];
-  }
-
-  toggleOpt(opt: Block): void {
-    this.block = this.block?.id !== opt.id
-      ? opt
-      : null;
-  }
-
-  showBlock(block: Block): void {
-    createBlockDialog(block);
-  }
-
-  public startChangeBlockId(block: Block): void {
-    const blockId = block.id;
-    const serviceId = block.serviceId;
-    createDialog({
-      component: 'InputDialog',
-      title: 'Change block name',
-      message: `Choose a new name for '${blockId}'`,
-      rules: blockIdRules(serviceId),
-      clearable: false,
-      value: blockId,
-    })
-      .onOk(async (newId: string) => {
-        await this.sparkModule?.renameBlock([blockId, newId]);
-        if (this.block?.id === blockId) {
-          this.block = this.sparkModule?.blockById(newId) ?? null;
+    watch(
+      () => sparkModule.value,
+      (newV, oldV) => {
+        if (newV?.id !== oldV?.id) {
+          selectedBlock.value = null;
         }
-      });
-  }
+      },
+    );
 
-  async discover(): Promise<void> {
-    this.busy = true;
-    await discoverBlocks(this.activeServiceId)
-      .finally(() => this.busy = false);
-  }
+    const moduleOpts = computed<SelectOption<SparkServiceModule>[]>(
+      () => sparkStore.modules
+        .map(module => ({
+          label: module.id,
+          value: module,
+        })),
+    );
 
-  async finish(): Promise<void> {
-    if (!this.block) { return; }
+    const blockOpts = computed<Block[]>(
+      () => sparkModule.value
+        ?.blocks
+        .filter(v => v.type === props.featureId)
+        ?? [],
+    );
 
-    if (this.dashboardId) {
-      const widget = await tryCreateWidget<BlockConfig>({
-        id: this.widgetId,
-        title: this.block.id,
-        feature: this.featureId,
-        dashboard: this.dashboardId,
-        order: 0,
-        config: {
-          serviceId: this.block.serviceId,
-          blockId: this.block.id,
+    function confirmBlock(block: Block | null): void {
+      selectedBlock.value = block;
+      finish();
+    }
+
+    function startChangeBlockId(block: Block): void {
+      const blockId = block.id;
+      const serviceId = block.serviceId;
+      createDialog({
+        component: 'InputDialog',
+        componentProps: {
+          title: 'Change block name',
+          message: `Choose a new name for '${blockId}'`,
+          rules: makeBlockIdRules(serviceId),
+          clearable: false,
+          modelValue: blockId,
         },
-        ...this.defaultWidgetSize,
-      });
-      this.done({ widget, block: this.block });
+      })
+        .onOk(async (newId: string) => {
+          await sparkModule.value?.renameBlock([blockId, newId]);
+          if (selectedBlock.value?.id === blockId) {
+            selectedBlock.value = sparkModule.value?.blockById(newId) ?? null;
+          }
+        });
     }
-    else if (this.optionalWidget) {
-      this.done({ block: this.block });
+
+    async function discover(): Promise<void> {
+      busy.value = true;
+      await discoverBlocks(props.activeServiceId)
+        .finally(() => busy.value = false);
     }
-  }
-}
+
+    async function finish(): Promise<void> {
+      if (!selectedBlock.value) { return; }
+
+      if (dashboardId.value) {
+        const widget = await tryCreateWidget<BlockConfig>({
+          id: widgetId,
+          title: selectedBlock.value.id,
+          feature: props.featureId,
+          dashboard: dashboardId.value,
+          order: 0,
+          config: {
+            serviceId: selectedBlock.value.serviceId,
+            blockId: selectedBlock.value.id,
+          },
+          ...defaultWidgetSize,
+        });
+        onDone({ widget, block: selectedBlock.value });
+      }
+      else if (props.optionalWidget) {
+        onDone({ block: selectedBlock.value });
+      }
+    }
+
+    return {
+      onBack,
+      onClose,
+      featureTitle,
+      dashboardId,
+      sparkModule,
+      selectedBlock,
+      busy,
+      moduleOpts,
+      blockOpts,
+      confirmBlock,
+      createBlockDialog,
+      startChangeBlockId,
+      discover,
+      finish,
+    };
+  },
+});
 </script>
 
 <template>
-  <ActionCardBody>
+  <WizardBody>
     <div class="widget-body column">
       <DashboardSelect
         v-model="dashboardId"
@@ -143,12 +178,12 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase {
       </div>
 
       <ListSelect
-        v-model="block"
+        v-model="selectedBlock"
         :options="blockOpts"
         option-value="id"
         option-label="id"
         dense
-        @confirm="v => { block = v; createWidget(); }"
+        @confirm="confirmBlock"
       >
         <template #body="{ opt }">
           <div class="row">
@@ -165,7 +200,7 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase {
             <q-btn
               flat
               icon="mdi-launch"
-              @click.stop="showBlock(opt)"
+              @click.stop="createBlockDialog(opt)"
             >
               <q-tooltip>Edit block</q-tooltip>
             </q-btn>
@@ -178,7 +213,7 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase {
       <q-btn
         flat
         label="Back"
-        @click="back"
+        @click="onBack"
       />
       <q-space />
       <q-btn
@@ -189,7 +224,7 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase {
       />
       <q-btn
         v-if="optionalWidget"
-        :disable="!block"
+        :disable="!selectedBlock"
         unelevated
         label="Done"
         color="primary"
@@ -197,12 +232,12 @@ export default class BlockDiscoveryWizard extends WidgetWizardBase {
       />
       <q-btn
         v-else
-        :disable="!block || !dashboardId"
+        :disable="!selectedBlock || !dashboardId"
         unelevated
         label="Create widget"
         color="primary"
         @click="finish"
       />
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

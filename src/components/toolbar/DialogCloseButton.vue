@@ -1,10 +1,9 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-
-@Component
-export default class DialogCloseButton extends Vue { }
+export default defineComponent({
+  name: 'DialogCloseButton',
+});
 </script>
 
 <template>

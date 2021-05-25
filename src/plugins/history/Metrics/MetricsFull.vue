@@ -1,30 +1,32 @@
 <script lang="ts">
 import defaults from 'lodash/defaults';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import CrudComponent from '@/components/CrudComponent';
+import { useWidget } from '@/composables';
 
-import { MetricsConfig } from './types';
+import { MetricsConfig, MetricsWidget } from './types';
+import { emptyMetricsConfig } from './utils';
 
-@Component
-export default class MetricsFull extends CrudComponent<MetricsConfig> {
+export default defineComponent({
+  name: 'MetricsFull',
+  setup() {
+    const {
+      widget,
+      saveConfig,
+    } = useWidget.setup<MetricsWidget>();
 
-  @Prop({ type: Boolean, default: false })
-  public readonly inDialog!: boolean;
-
-  get config(): MetricsConfig {
-    return defaults(this.widget.config, {
-      targets: [],
-      renames: {},
-      params: {},
-      freshDuration: {},
-      decimals: {},
+    const config = computed<MetricsConfig>({
+      get: () => defaults(widget.value.config, emptyMetricsConfig()),
+      set: cfg => saveConfig(cfg),
     });
-  }
 
-}
+    return {
+      config,
+    };
+  },
+});
 </script>
 
 <template>
-  <MetricsEditor :config="config" class="widget-md" @update:config="saveConfig" />
+  <MetricsEditor v-model:config="config" />
 </template>

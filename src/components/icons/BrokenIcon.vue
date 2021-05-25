@@ -1,13 +1,15 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-
-@Component
-export default class BrokenIcon extends Vue {
-  @Prop({ type: String, default: '40px' })
-  public readonly size!: string;
-}
+export default defineComponent({
+  name: 'BrokenIcon',
+  props: {
+    size: {
+      type: String,
+      default: '40px',
+    },
+  },
+});
 </script>
 
 <template>

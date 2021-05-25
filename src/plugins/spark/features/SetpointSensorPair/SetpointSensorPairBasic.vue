@@ -1,33 +1,50 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { defineComponent } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import BlockCrudComponent from '@/plugins/spark/components/BlockCrudComponent';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { SetpointSensorPairBlock } from '@/plugins/spark/types';
+import { prettyQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
+export default defineComponent({
+  name: 'SetpointSensorPairBasic',
+  setup() {
+    const {
+      serviceId,
+      block,
+      saveBlock,
+      isDriven,
+    } = useBlockWidget.setup<SetpointSensorPairBlock>();
 
-@Component
-export default class SetpointSensorPairBasic
-  extends BlockCrudComponent<SetpointSensorPairBlock> {
+    function editSetting(): void {
+      if (isDriven.value) { return; }
+      createDialog({
+        component: 'QuantityDialog',
+        componentProps: {
+          title: 'Setting',
+          label: 'Setting',
+          modelValue: block.value.data.storedSetting,
+        },
+      })
+        .onOk(v => {
+          block.value.data.storedSetting = v;
+          saveBlock();
+        });
+    }
 
-  editSetting(): void {
-    if (this.isDriven) { return; }
-    createDialog({
-      component: 'QuantityDialog',
-      title: 'Setting',
-      label: 'Setting',
-      value: this.block.data.storedSetting,
-    })
-      .onOk(v => {
-        this.block.data.storedSetting = v;
-        this.saveBlock();
-      });
-  }
-}
+    return {
+      prettyQty,
+      serviceId,
+      block,
+      isDriven,
+      editSetting,
+    };
+  },
+});
 </script>
 
 <template>
-  <div class="widget-md q-mx-auto">
+  <div>
     <slot name="warnings" />
 
     <div class="widget-body row justify-center">
@@ -36,10 +53,10 @@ export default class SetpointSensorPairBasic
           <q-icon name="mdi-thermometer" color="green-3" />
         </template>
         <template #value>
-          {{ block.data.value | quantity }}
+          {{ prettyQty(block.data.value) }}
         </template>
         <template #setting>
-          {{ block.data.storedSetting | quantity }}
+          {{ prettyQty(block.data.storedSetting) }}
         </template>
       </SettingValueField>
 

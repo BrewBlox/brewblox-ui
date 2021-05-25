@@ -1,121 +1,155 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { bloxLink, JSLink, Link } from '@/helpers/bloxfield';
-import { createBlockDialog } from '@/helpers/dialog';
-import { objectStringSorter } from '@/helpers/functional';
-import { isCompatible } from '@/plugins/spark/helpers';
+import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockOrIntfType, ComparedBlockType } from '@/plugins/spark/types';
+import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
+import { bloxLink, JSLink, Link } from '@/utils/bloxfield';
+import { createBlockDialog } from '@/utils/dialog';
+import { objectStringSorter } from '@/utils/functional';
 
-@Component
-export default class LinkDialog extends DialogBase {
-  local: JSLink | null = null
+export default defineComponent({
+  name: 'LinkDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: Object as PropType<Link>,
+      default: () => bloxLink(null),
+    },
+    serviceId: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: 'Link',
+    },
+    compatible: {
+      type: [String, Array] as PropType<ComparedBlockType>,
+      default: null,
+    },
+    blockFilter: {
+      type: Function as PropType<(block: Block) => boolean>,
+      default: () => true,
+    },
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    creatable: {
+      type: Boolean,
+      default: true,
+    },
+    configurable: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      onDialogOK,
+    } = useDialog.setup();
 
-  @Prop({ type: Object })
-  public readonly value!: Link;
+    const local = ref<JSLink>(bloxLink(props.modelValue));
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string | null;
+    const typeFilter = computed<(type: BlockOrIntfType) => boolean>(
+      () => type => isCompatible(type, props.compatible ?? props.modelValue?.type ?? null),
+    );
 
-  @Prop({ type: String, default: 'Link' })
-  public readonly label!: string;
+    const linkOpts = computed<Link[]>(
+      () => sparkStore.serviceBlocks(props.serviceId)
+        .filter(block => typeFilter.value(block.type))
+        .filter(props.blockFilter)
+        .map(block => bloxLink(block.id, block.type))
+        .sort(objectStringSorter('id')),
+    );
 
-  @Prop({ type: [String, Array], required: false })
-  readonly compatible!: ComparedBlockType;
+    const block = computed<Block | null>(
+      () => sparkStore.blockById(props.serviceId, local.value.id),
+    );
 
-  @Prop({ type: Function, default: (() => true) })
-  public readonly blockFilter!: ((block: Block) => boolean);
+    const tooltip = computed<string | null>(
+      () => block.value
+        ? featureStore.widgetTitle(block.value.type)
+        : null,
+    );
 
-  @Prop({ type: Boolean, default: true })
-  public readonly clearable!: boolean;
+    const localOk = computed<boolean>(
+      () => block.value !== null || props.clearable,
+    );
 
-  @Prop({ type: Boolean, default: true })
-  public readonly creatable!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  public readonly configurable!: boolean;
-
-  created(): void {
-    this.local = bloxLink(this.value);
-  }
-
-  get typeFilter(): ((type: BlockOrIntfType) => boolean) {
-    return type => isCompatible(type, this.compatible ?? this.value.type);
-  }
-
-  get linkOpts(): Link[] {
-    return sparkStore.serviceBlocks(this.serviceId)
-      .filter(block => this.typeFilter(block.type))
-      .filter(this.blockFilter)
-      .map(block => bloxLink(block.id, block.type))
-      .sort(objectStringSorter('id'));
-  }
-
-  get block(): Block | null {
-    return this.local
-      ? sparkStore.blockById(this.serviceId, this.local.id)
-      : null;
-  }
-
-  get tooltip(): string | null {
-    return this.block
-      ? featureStore.widgetTitle(this.block.type)
-      : null;
-  }
-
-  get localOk(): boolean {
-    return this.block !== null || this.clearable;
-  }
-
-  update(link: Link | null): void {
-    this.local = link !== null
-      ? bloxLink(link)
-      : bloxLink(null, this.value.type);
-  }
-
-  configureBlock(): void {
-    createBlockDialog(this.block);
-  }
-
-  createBlock(): void {
-    createBlockWizard(this.serviceId, this.compatible ?? this.value.type)
-      .onOk(({ block }) => {
-        if (block) {
-          // Retain original type
-          this.local = bloxLink(block.id, this.value.type);
-        }
-      });
-  }
-
-  save(): void {
-    if (this.localOk) {
-      this.onDialogOk(this.local);
+    function update(link: Link | null): void {
+      local.value = link !== null
+        ? bloxLink(link)
+        : bloxLink(null, props.modelValue.type);
     }
-  }
-}
+
+    function configureBlock(): void {
+      createBlockDialog(block.value);
+    }
+
+    function createBlock(): void {
+      createBlockWizard(props.serviceId, props.compatible ?? local.value.type)
+        .onOk(({ block }) => {
+          if (block) {
+            // Retain original type
+            local.value = bloxLink(block.id, props.modelValue.type);
+          }
+        });
+    }
+
+    function save(): void {
+      if (localOk.value) {
+        onDialogOK(local.value);
+      }
+    }
+
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      linkOpts,
+      block,
+      tooltip,
+      localOk,
+      update,
+      configureBlock,
+      createBlock,
+      save,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
       <q-select
-        :value="local"
+        :model-value="local"
         :options="linkOpts"
         :clearable="clearable"
         :label="label"
         option-label="id"
         option-value="id"
         item-aligned
-        @input="update"
+        @update:model-value="update"
         @keyup.enter.exact.stop
       >
         <q-tooltip v-if="tooltip">

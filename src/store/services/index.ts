@@ -1,12 +1,12 @@
 import isEqual from 'lodash/isEqual';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
-import { extendById, filterById, findById } from '@/helpers/functional';
 import store from '@/store';
 import { featureStore } from '@/store/features';
+import { extendById, filterById, findById } from '@/utils/functional';
 
 import api from './api';
-import { Service, ServiceStatus, ServiceStub } from './types';
+import type { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
 
@@ -27,7 +27,7 @@ export class ServiceModule extends VuexModule {
     return this.services.map(v => v.id);
   }
 
-  public serviceById(id: string | null): Service | null {
+  public serviceById(id: Nullable<string>): Service | null {
     return findById(this.services, id);
   }
 

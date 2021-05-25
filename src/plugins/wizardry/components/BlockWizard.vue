@@ -1,224 +1,285 @@
 <script lang="ts">
-import { uid } from 'quasar';
-import { Component, Prop } from 'vue-property-decorator';
+import isMatch from 'lodash/isMatch';
+import { nanoid } from 'nanoid';
+import { DialogChainObject } from 'quasar';
+import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import { nullFilter, objectStringSorter, ruleValidator, suggestId } from '@/helpers/functional';
-import { blockIdRules, isCompatible } from '@/plugins/spark/helpers';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import type { Block, BlockCrud, BlockSpec, ComparedBlockType } from '@/plugins/spark/types';
+import { Block, BlockConfig, BlockSpec, ComparedBlockType } from '@/plugins/spark/types';
+import { isCompatible, makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
-import WizardBase from '@/plugins/wizardry/WizardBase';
-import { Widget } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
+import { Widget, widgetStore } from '@/store/widgets';
+import { createDialog } from '@/utils/dialog';
+import { nullFilter, objectStringSorter, ruleValidator, suggestId } from '@/utils/functional';
+
+import { useWizard } from '../composables';
 
 interface BlockWizardOption extends SelectOption {
   spec: BlockSpec;
 }
 
-@Component
-export default class BlockWizard extends WizardBase {
-  selected: BlockWizardOption | null = null;
-  lastGeneratedId = '';
-  serviceId: string | null = null;
-  dashboardId: string | null = null;
-  blockId = '';
-  searchFilter = '';
+export default defineComponent({
+  name: 'BlockWizard',
+  props: {
+    ...useWizard.props,
+    activeServiceId: {
+      type: String,
+      default: null,
+    },
+    compatible: {
+      type: [String, Array] as PropType<ComparedBlockType>,
+      default: null,
+    },
+    filter: {
+      type: Function as PropType<(feature: string) => boolean>,
+      default: () => true,
+    },
+  },
+  emits: [
+    ...useWizard.emits,
+  ],
+  setup(props) {
+    const {
+      onBack,
+      onClose,
+      onDone,
+      setDialogTitle,
+    } = useWizard.setup();
 
-  block: Block | null = null;
-  activeDialog: any = null;
-  discoveryActive = false;
-
-  @Prop({ type: String })
-  public readonly activeServiceId!: string;
-
-  @Prop({ type: [String, Array], required: false })
-  readonly compatible!: ComparedBlockType;
-
-  @Prop({ type: Function, default: () => () => true })
-  readonly filter!: (feature: string) => boolean;
-
-  mounted(): void {
-    this.serviceId = this.activeServiceId
+    const selected = ref<BlockWizardOption | null>(null);
+    const lastGeneratedId = ref<string>('');
+    const serviceId = ref<string | null>(
+      props.activeServiceId
       ?? sparkStore.serviceIds[0]
-      ?? null;
+      ?? null,
+    );
+    const widgetId = nanoid();
+    const dashboardId = ref<string | null>(null);
+    const blockId = ref<string | null>(null);
+    const searchFilter = ref<string>('');
 
-    if (this.wizardOptions.length === 1) {
-      this.selectOpt(this.wizardOptions[0]);
-    }
+    const activeBlock = ref<Block | null>(null);
+    const activeWidget = ref<Widget<BlockConfig> | null>(null);
+    const activeDialog = ref<DialogChainObject | null>(null);
+    const discoveryActive = ref<boolean>(false);
 
-    this.reset();
-  }
+    const serviceOpts = computed<string[]>(
+      () => sparkStore.serviceIds,
+    );
 
-  get serviceOpts(): string[] {
-    return sparkStore.serviceIds;
-  }
+    const wizardOpts = computed<BlockWizardOption[]>(
+      () => sparkStore
+        .specs
+        .filter(spec =>
+          !spec.systemObject
+          && isCompatible(spec.id, props.compatible)
+          && props.filter(spec.id))
+        .map(spec => {
+          const feature = featureStore.widgetById(spec.id);
+          return feature
+            ? { spec, value: spec.id, label: feature.title }
+            : null;
+        })
+        .filter(nullFilter)
+        .sort(objectStringSorter('label')),
+    );
 
-  get wizardOptions(): BlockWizardOption[] {
-    return sparkStore
-      .specs
-      .filter(spec =>
-        !spec.systemObject
-        && isCompatible(spec.id, this.compatible)
-        && this.filter(spec.id))
-      .map(spec => {
-        const feature = featureStore.widgetById(spec.id);
-        return feature
-          ? { spec, value: spec.id, label: feature.title }
-          : null;
-      })
-      .filter(nullFilter)
-      .sort(objectStringSorter('label'));
-  }
+    const sparkModule = computed<SparkServiceModule | null>(
+      () => sparkStore.moduleById(serviceId.value),
+    );
 
-  public get sparkModule(): SparkServiceModule | null {
-    return sparkStore.moduleById(this.serviceId);
-  }
+    const activeBlockIdRules = computed<InputRule[]>(
+      () => serviceId.value
+        ? makeBlockIdRules(serviceId.value)
+        : [() => 'No service selected'],
+    );
 
-  get blockIdRules(): InputRule[] {
-    return this.serviceId
-      ? blockIdRules(this.serviceId)
-      : [() => 'No service selected'];
-  }
+    const validator = computed<(v: any) => boolean>(
+      () => ruleValidator(activeBlockIdRules.value),
+    );
 
-  get validator(): ((val: any) => boolean) {
-    return ruleValidator(this.blockIdRules);
-  }
+    const createReady = computed<boolean>(
+      () => selected.value !== null
+        && sparkModule.value !== null
+        && (activeBlock.value !== null || validator.value(blockId.value)),
+    );
 
-  get createReady(): boolean {
-    return this.selected !== null
-      && this.sparkModule !== null
-      && this.validator(this.blockId);
-  }
+    const discoveredType = computed<boolean>(
+      () => selected.value?.spec.discovered === true,
+    );
 
-  get discoveredType(): boolean {
-    return this.selected?.spec.discovered === true;
-  }
-
-  get searchedOptions(): SelectOption[] {
-    if (!this.searchFilter) {
-      return this.wizardOptions;
-    }
-    const needle = this.searchFilter.toLowerCase();
-    return this.wizardOptions
-      .filter(opt => opt.label.toLowerCase().match(needle));
-  }
-
-  showSearchKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.searchFilter,
-    })
-      .onOk(v => this.searchFilter = v);
-  }
-
-  showNameKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.blockId,
-      rules: this.blockIdRules,
-    })
-      .onOk(v => this.blockId = v);
-  }
-
-  selectOpt(opt: BlockWizardOption | null): void {
-    this.block = null;
-
-    this.selected = opt;
-    if (opt === null) {
-      return;
-    }
-    else if (!this.blockId || this.blockId === this.lastGeneratedId) {
-      this.blockId = suggestId(opt.label, this.validator);
-      this.lastGeneratedId = this.blockId;
-    }
-  }
-
-  ensureLocals(serviceId: string): { block: Block; widget: Widget } {
-    if (this.block?.serviceId !== serviceId) {
-      this.block = null;
-    }
-
-    const featureId = this.selected!.value;
-
-    const block: Block = this.block ?? {
-      id: this.blockId,
-      serviceId,
-      type: featureId,
-      groups: [0],
-      data: sparkStore.spec({ type: featureId }).generate(),
-    };
-    const widget: Widget = {
-      id: uid(),
-      title: this.blockId,
-      feature: featureId,
-      dashboard: this.dashboardId ?? '',
-      order: 0,
-      config: {
-        serviceId,
-        blockId: this.blockId,
+    const searchedOpts = computed<SelectOption[]>(
+      () => {
+        if (!searchFilter.value) {
+          return wizardOpts.value;
+        }
+        const needle = searchFilter.value.toLowerCase();
+        return wizardOpts.value
+          .filter(opt => opt.label.toLowerCase().match(needle));
       },
-      ...featureStore.widgetSize(featureId),
-    };
+    );
 
-    this.block = block;
-    this.block.id = this.blockId;
-
-    return { block, widget };
-  }
-
-  configureBlock(): void {
-    if (!this.createReady || !this.serviceId || !this.sparkModule) {
-      return;
+    function showSearchKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: searchFilter.value,
+        },
+      })
+        .onOk(v => searchFilter.value = v);
     }
-    const { block, widget } = this.ensureLocals(this.serviceId);
-    const crud: BlockCrud = {
-      block,
-      widget,
-      isStoreWidget: false,
-      saveWidget: () => { },
-      isStoreBlock: false,
-      saveBlock: v => { this.block = v; },
-      closeDialog: this.closeDialog,
-    };
-    this.activeDialog = createDialog({
-      component: 'WidgetDialog',
-      getCrud: () => crud,
-      mode: 'Full',
+
+    function showNameKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: blockId.value,
+          rules: activeBlockIdRules.value,
+        },
+      })
+        .onOk(v => blockId.value = v);
+    }
+
+    function ensureVolatile(): void {
+      if (activeBlock.value
+        && !isMatch(activeBlock.value, {
+          id: blockId.value,
+          serviceId: serviceId.value,
+          type: selected.value?.value,
+        })) {
+        sparkStore.removeVolatileBlock(activeBlock.value);
+        activeBlock.value = null;
+      }
+
+      if (!activeBlock.value
+        && selected.value
+        && blockId.value
+        && serviceId.value
+        && createReady.value) {
+        sparkStore.setVolatileBlock({
+          id: blockId.value,
+          serviceId: serviceId.value,
+          type: selected.value.value,
+          groups: [0],
+          data: sparkStore.spec({ type: selected.value.value }).generate(),
+        });
+        activeBlock.value = sparkStore.blockById(serviceId.value, blockId.value);
+      }
+
+      if (activeBlock.value) {
+        const block = activeBlock.value;
+        widgetStore.setVolatileWidget({
+          id: widgetId,
+          title: block.id,
+          feature: block.type,
+          dashboard: dashboardId.value ?? '',
+          order: 0,
+          config: {
+            ...(activeWidget.value?.config ?? {}),
+            serviceId: block.serviceId,
+            blockId: block.id,
+          },
+          ...featureStore.widgetSize(block.type),
+          volatile: true,
+        });
+        activeWidget.value = widgetStore.widgetById(widgetId);
+      }
+    }
+
+    function selectOpt(opt: BlockWizardOption | null): void {
+      selected.value = opt;
+      if (opt === null) {
+        return;
+      }
+      else if (!blockId.value || blockId.value === lastGeneratedId.value) {
+        blockId.value = suggestId(opt.label, validator.value);
+        lastGeneratedId.value = blockId.value;
+      }
+    }
+
+    function configureBlock(): void {
+      if (!createReady.value || !serviceId.value || !sparkModule.value) {
+        return;
+      }
+      ensureVolatile();
+      if (activeBlock.value && activeWidget.value) {
+        activeDialog.value = createDialog({
+          component: 'WidgetDialog',
+          componentProps: {
+            widgetId,
+            mode: 'Full',
+          },
+        });
+      }
+    }
+
+    function reset(): void {
+      discoveryActive.value = false;
+      setDialogTitle('Block wizard');
+    }
+
+    async function createBlock(): Promise<void> {
+      if (!createReady.value || !serviceId.value || !sparkModule.value) {
+        return;
+      }
+      ensureVolatile();
+
+      if (!activeBlock.value || !activeWidget.value) {
+        return;
+      }
+
+      const persistentBlock = { ...activeBlock.value, meta: undefined };
+      const createdBlock = await tryCreateBlock(persistentBlock);
+
+      if (!createdBlock) {
+        return close();
+      }
+
+      const persistentWidget = { ...activeWidget.value, volatile: undefined };
+      const createdWidget = dashboardId.value
+        ? await tryCreateWidget(persistentWidget)
+        : null;
+
+      onDone({ block: createdBlock, widget: createdWidget });
+    }
+
+    onBeforeUnmount(() => {
+      if (activeBlock.value) {
+        sparkStore.removeVolatileBlock(activeBlock.value);
+      }
+      if (activeWidget.value) {
+        widgetStore.removeVolatileWidget(activeWidget.value);
+      }
     });
-  }
 
-  closeDialog(): void {
-    if (this.activeDialog) {
-      this.activeDialog.hide();
-      this.activeDialog = null;
-    }
-  }
-
-  reset(): void {
-    this.discoveryActive = false;
-    this.setDialogTitle('Block wizard');
-  }
-
-  async createBlock(): Promise<void> {
-    if (!this.createReady || !this.serviceId || !this.sparkModule) {
-      return;
-    }
-    const { block, widget } = this.ensureLocals(this.serviceId);
-
-    const createdBlock = await tryCreateBlock(block);
-
-    if (!createdBlock) {
-      return this.close();
-    }
-
-    const createdWidget = this.dashboardId
-      ? await tryCreateWidget(widget)
-      : null;
-
-    return this.done({ block: createdBlock, widget: createdWidget });
-  }
-}
+    return {
+      onBack,
+      onClose,
+      onDone,
+      setDialogTitle,
+      selected,
+      serviceId,
+      dashboardId,
+      blockId,
+      searchFilter,
+      discoveryActive,
+      serviceOpts,
+      wizardOpts,
+      activeBlockIdRules,
+      validator,
+      createReady,
+      discoveredType,
+      searchedOpts,
+      showSearchKeyboard,
+      showNameKeyboard,
+      selectOpt,
+      configureBlock,
+      reset,
+      createBlock,
+    };
+  },
+});
 </script>
 
 <template>
@@ -230,11 +291,11 @@ export default class BlockWizard extends WizardBase {
     optional-widget
     @title="setDialogTitle"
     @back="reset"
-    @close="close"
-    @done="done"
+    @close="onClose"
+    @done="onDone"
   />
 
-  <ActionCardBody v-else>
+  <WizardBody v-else>
     <div class="widget-body column">
       <q-select
         v-model="serviceId"
@@ -263,11 +324,11 @@ export default class BlockWizard extends WizardBase {
       </q-input>
 
       <ListSelect
-        :value="selected"
-        :options="searchedOptions"
+        :model-value="selected"
+        :options="searchedOpts"
         option-value="value"
         option-label="label"
-        @input="selectOpt"
+        @update:model-value="selectOpt"
         @confirm="v => { selectOpt(v); createBlock(); }"
       />
     </div>
@@ -276,7 +337,7 @@ export default class BlockWizard extends WizardBase {
       <q-input
         v-model="blockId"
         :disable="discoveredType"
-        :rules="blockIdRules"
+        :rules="activeBlockIdRules"
         label="Block name"
         clearable
         class="col-12"
@@ -299,7 +360,7 @@ export default class BlockWizard extends WizardBase {
           </q-icon>
         </template>
       </q-input>
-      <q-btn flat label="Back" @click="back" />
+      <q-btn flat label="Back" @click="onBack" />
       <q-space />
       <template v-if="discoveredType">
         <q-btn
@@ -325,5 +386,5 @@ export default class BlockWizard extends WizardBase {
         />
       </template>
     </template>
-  </ActionCardBody>
+  </WizardBody>
 </template>

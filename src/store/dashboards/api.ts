@@ -1,12 +1,10 @@
-import { UI_NAMESPACE } from '@/helpers/const';
-import { createApi } from '@/plugins/database/api';
+import { createApi } from '@/database/api';
+import { UI_NAMESPACE } from '@/utils/const';
 
-import { Dashboard, Widget } from './types';
+import { Dashboard } from './types';
 
-export const dashboardApi = createApi<Dashboard>({
+export const api = createApi<Dashboard>({
   namespace: `${UI_NAMESPACE}:dashboards`,
 });
 
-export const widgetApi = createApi<Widget>({
-  namespace: `${UI_NAMESPACE}:dashboard-items`,
-});
+export default api;

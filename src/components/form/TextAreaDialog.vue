@@ -1,47 +1,75 @@
 <script lang="ts">
-import { Component, Prop } from 'vue-property-decorator';
+import { defineComponent, PropType, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { createDialog } from '@/helpers/dialog';
+import { useDialog } from '@/composables';
+import { createDialog } from '@/utils/dialog';
 
-@Component
-export default class TextAreaDialog extends DialogBase {
-  local: string | null = null;
+export default defineComponent({
+  name: 'TextAreaDialog',
+  props: {
+    ...useDialog.props,
+    modelValue: {
+      type: String,
+      required: true,
+    },
+    autogrow: {
+      type: Boolean,
+      default: true,
+    },
+    rules: {
+      type: Array as PropType<InputRule[]>,
+      default: () => [],
+    },
+    label: {
+      type: String,
+      default: 'Value',
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogProps,
+      dialogRef,
+      onDialogHide,
+      onDialogOK,
+      onDialogCancel,
+    } = useDialog.setup();
 
-  @Prop({ type: String })
-  public readonly value!: string;
+    const local = ref<string>(props.modelValue ?? '');
 
-  @Prop({ type: Boolean, default: true })
-  public readonly autogrow!: boolean;
+    function save(): void {
+      onDialogOK(local.value);
+    }
 
-  @Prop({ type: Array, default: () => [] })
-  public readonly rules!: InputRule[];
+    function showKeyboard(): void {
+      createDialog({
+        component: 'KeyboardDialog',
+        componentProps: {
+          modelValue: local.value,
+          rules: props.rules,
+        },
+      })
+        .onOk(v => local.value = v);
+    }
 
-  @Prop({ type: String, default: 'Value' })
-  public readonly label!: string;
-
-  save(): void {
-    this.onDialogOk(this.local);
-  }
-
-  created(): void {
-    this.local = this.value;
-  }
-
-  showKeyboard(): void {
-    createDialog({
-      component: 'KeyboardDialog',
-      value: this.local,
-      rules: this.rules,
-    })
-      .onOk(v => this.local = v);
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      onDialogCancel,
+      local,
+      save,
+      showKeyboard,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="save"

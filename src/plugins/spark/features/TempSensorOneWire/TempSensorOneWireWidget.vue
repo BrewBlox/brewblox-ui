@@ -1,57 +1,65 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent } from 'vue';
 
-import { createDialog } from '@/helpers/dialog';
-import BlockWidgetBase from '@/plugins/spark/components/BlockWidgetBase';
+import { useContext } from '@/composables';
+import { useBlockWidget } from '@/plugins/spark/composables';
 import { TempSensorOneWireBlock } from '@/plugins/spark/types';
+import { createDialog } from '@/utils/dialog';
 
 import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 
-@Component({
-  components: {
-    TempSensorSwapDialog,
+export default defineComponent({
+  name: 'TempSensorOneWireWidget',
+  setup() {
+    const {
+      context,
+      inDialog,
+    } = useContext.setup();
+    const {
+      serviceId,
+      blockId,
+      block,
+      saveBlock,
+    } = useBlockWidget.setup<TempSensorOneWireBlock>();
+
+    const hasValue = computed<boolean>(
+      () => block.value.data.value.value !== null,
+    );
+
+    function startSwap(): void {
+      createDialog({
+        component: TempSensorSwapDialog,
+        componentProps: {
+          serviceId,
+          leftId: blockId,
+        },
+      });
+    }
+
+    return {
+      context,
+      inDialog,
+      block,
+      saveBlock,
+      hasValue,
+      startSwap,
+    };
   },
-})
-export default class TempSensorOneWireWidget
-  extends BlockWidgetBase<TempSensorOneWireBlock> {
-
-  get hasValue(): boolean {
-    return this.block.data.value.value !== null;
-  }
-
-  startSwap(): void {
-    createDialog({
-      component: TempSensorSwapDialog,
-      serviceId: this.serviceId,
-      leftId: this.blockId,
-    });
-  }
-}
+});
 </script>
 
 <template>
-  <GraphCardWrapper
-    :show="inDialog"
-    v-bind="{context}"
-  >
-    <template #graph>
-      <HistoryGraph
-        :graph-id="widget.id"
-        :config="graphCfg"
-        :refresh-trigger="mode"
-        use-range
-        use-presets
-        @params="saveGraphParams"
-        @layout="saveGraphLayout"
-      />
+  <PreviewCard :enabled="inDialog">
+    <template #preview>
+      <BlockHistoryGraph />
     </template>
 
     <template #toolbar>
-      <component :is="toolbarComponent" :crud="crud" :mode.sync="mode">
+      <BlockWidgetToolbar has-mode-toggle>
         <template #actions>
           <ActionItem icon="mdi-swap-horizontal" label="Swap OneWire address" @click="startSwap" />
         </template>
-      </component>
+      </BlockWidgetToolbar>
     </template>
 
     <div>
@@ -70,7 +78,7 @@ export default class TempSensorOneWireWidget
             class="col-auto"
           />
           <QuantityField
-            :value="block.data.value"
+            :model-value="block.data.value"
             readonly
             tag="big"
             class="col-auto"
@@ -78,26 +86,26 @@ export default class TempSensorOneWireWidget
         </div>
       </div>
 
-      <template v-if="mode === 'Full'">
+      <template v-if="context.mode === 'Full'">
         <q-separator inset />
 
         <div class="widget-body row">
           <QuantityField
-            :value="block.data.offset"
+            :model-value="block.data.offset"
             title="Offset"
             label="Offset"
             class="col-grow"
-            @input="v => { block.data.offset = v; saveBlock(); }"
+            @update:model-value="v => { block.data.offset = v; saveBlock(); }"
           />
           <InputField
-            :value="block.data.address"
+            :model-value="block.data.address"
             title="Address"
             label="Address"
             class="col-grow"
-            @input="v => { block.data.address = v; saveBlock(); }"
+            @update:model-value="v => { block.data.address = v; saveBlock(); }"
           />
         </div>
       </template>
     </div>
-  </GraphCardWrapper>
+  </PreviewCard>
 </template>

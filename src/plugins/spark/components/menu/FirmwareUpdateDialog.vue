@@ -1,94 +1,117 @@
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { computed, defineComponent, onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue';
 
-import DialogBase from '@/components/DialogBase';
-import { STATE_TOPIC } from '@/helpers/const';
-import { isSparkUpdate } from '@/plugins/spark/helpers';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useDialog } from '@/composables';
+import { eventbus } from '@/eventbus';
+import { sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
+import { isSparkUpdate } from '@/plugins/spark/utils';
+import { STATE_TOPIC } from '@/utils/const';
 
-@Component
-export default class FirmwareUpdateDialog extends DialogBase {
-  busy = false;
-  error = '';
-  listenerId: string = '';
-  messages: string[] = [];
+export default defineComponent({
+  name: 'FirmwareUpdateDialog',
+  props: {
+    ...useDialog.props,
+    serviceId: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: [
+    ...useDialog.emits,
+  ],
+  setup(props) {
+    const {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+    } = useDialog.setup();
 
-  @Prop({ type: String, required: true })
-  readonly serviceId!: string;
+    const sparkModule = sparkStore.moduleById(props.serviceId)!;
+    const busy = ref<boolean>(false);
+    const error = ref<string>('');
+    const listenerId = ref<string>('');
+    const messages = reactive<string[]>([]);
 
-  created(): void {
-    this.listenerId = Vue.$eventbus.addListener(
-      `${STATE_TOPIC}/${this.serviceId}/update`,
-      (_, evt) => {
-        if (isSparkUpdate(evt)) {
-          evt.data.log.forEach(v => this.pushMessage(v));
-        }
-      });
-  }
+    onBeforeMount(() => {
+      listenerId.value = eventbus.addListener(
+        `${STATE_TOPIC}/${props.serviceId}/update`,
+        (_, evt) => {
+          if (isSparkUpdate(evt)) {
+            evt.data.log.forEach(v => messages.push(v));
+          }
+        });
+    });
 
-  beforeDestroy(): void {
-    Vue.$eventbus.removeListener(this.listenerId);
-  }
+    onBeforeUnmount(() => {
+      eventbus.removeListener(listenerId.value);
+    });
 
-  get sparkModule(): SparkServiceModule {
-    return sparkStore.moduleById(this.serviceId)!;
-  }
+    const status = computed<SparkStatus | null>(
+      () => sparkModule.status,
+    );
 
-  get status(): SparkStatus | null {
-    return this.sparkModule.status;
-  }
+    const updateAvailableText = computed<string>(
+      () => {
+        const latest = status.value?.isLatestFirmware;
+        return latest === undefined
+          ? 'Current firmware version is unknown.'
+          : latest
+            ? "You're using the latest firmware."
+            : 'A firmware update is available.';
+      },
+    );
 
-  get updateAvailableText(): string {
-    const latest = this.status?.isLatestFirmware;
-    return latest === undefined
-      ? 'Current firmware version is unknown.'
-      : latest
-        ? "You're using the latest firmware."
-        : 'A firmware update is available.';
-  }
+    const ready = computed<boolean>(
+      () => Boolean(status.value?.isConnected),
+    );
 
-  get ready(): boolean {
-    return !!this.status?.isConnected;
-  }
+    const buttonColor = computed<string>(
+      () => status.value?.isLatestFirmware
+        ? ''
+        : 'primary',
+    );
 
-  get buttonColor(): string {
-    return this.status?.isLatestFirmware
-      ? ''
-      : 'primary';
-  }
+    function updateFirmware(): void {
+      if (busy.value || ready.value) {
+        return;
+      }
+      busy.value = true;
+      error.value = '';
+      messages.length = 0;
 
-  pushMessage(msg: string): void {
-    this.$set(this.messages, this.messages.length, msg);
-  }
-
-  updateFirmware(): void {
-    if (this.busy || !this.ready) {
-      return;
+      sparkModule
+        .flashFirmware()
+        .catch(e => { error.value = e.message; })
+        .finally(() => { busy.value = false; });
     }
-    this.busy = true;
-    this.error = '';
-    this.messages = [];
 
-    this.sparkModule
-      .flashFirmware()
-      .catch(e => { this.error = e.message; })
-      .finally(() => { this.busy = false; });
-  }
-}
+    return {
+      dialogRef,
+      dialogProps,
+      onDialogHide,
+      busy,
+      error,
+      messages,
+      updateAvailableText,
+      ready,
+      buttonColor,
+      updateFirmware,
+    };
+  },
+});
 </script>
 
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     v-bind="dialogProps"
     @hide="onDialogHide"
     @keyup.enter="updateFirmware"
   >
-    <ActionCardWrapper v-bind="{context}">
+    <Card>
       <template #toolbar>
-        <DialogToolbar :title="serviceId" subtitle="Firmware update" />
+        <Toolbar :title="serviceId" subtitle="Firmware update" />
       </template>
 
       <q-card-section>
@@ -123,6 +146,6 @@ export default class FirmwareUpdateDialog extends DialogBase {
           @click="updateFirmware"
         />
       </template>
-    </ActionCardWrapper>
+    </Card>
   </q-dialog>
 </template>

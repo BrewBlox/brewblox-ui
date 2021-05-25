@@ -1,28 +1,43 @@
 <script lang="ts">
-import { Component } from 'vue-property-decorator';
+import { computed, defineComponent, PropType } from 'vue';
 
-import PartBase from '../components/PartBase';
-import { RIGHT } from '../getters';
-import { elbow } from '../helpers';
+import { RIGHT } from '@/plugins/builder/const';
+import { elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
 
-@Component
-export default class ElbowTube extends PartBase {
-  readonly paths = {
-    borders: [
-      `M21,0 v17 ${elbow(12, 12, false)} H50`,
-      `M29,0 v17 ${elbow(4, 4, false)} H50`,
-    ],
-    liquid: `M25,0 v17 ${elbow(8, 8, false)} H50`,
-  };
+import { FlowPart } from '../types';
 
-  get flowSpeed(): number {
-    return this.flowOnCoord(RIGHT);
-  }
+const paths = {
+  borders: [
+    `M21,0 v17 ${elbow(12, 12, false)} H50`,
+    `M29,0 v17 ${elbow(4, 4, false)} H50`,
+  ],
+  liquid: `M25,0 v17 ${elbow(8, 8, false)} H50`,
+};
 
-  get liquids(): string[] {
-    return this.liquidOnCoord(RIGHT);
-  }
-}
+export default defineComponent({
+  name: 'ElbowTube',
+  props: {
+    part: {
+      type: Object as PropType<FlowPart>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const flowSpeed = computed<number>(
+      () => flowOnCoord(props.part, RIGHT),
+    );
+
+    const liquids = computed<string[]>(
+      () => liquidOnCoord(props.part, RIGHT),
+    );
+
+    return {
+      paths,
+      flowSpeed,
+      liquids,
+    };
+  },
+});
 </script>
 
 <template>
