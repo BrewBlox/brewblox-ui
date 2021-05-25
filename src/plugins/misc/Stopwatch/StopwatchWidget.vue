@@ -20,14 +20,37 @@ export default defineComponent({
       () => config.value.session,
     );
 
-    const running = computed<boolean>(
-      () => Boolean(session.value?.running),
-    );
+    function renderTime(elapsed: Date): void {
+      const hour = elapsed.getUTCHours().toString().padStart(2, '0');
+      const min = elapsed.getUTCMinutes().toString().padStart(2, '0');
+      const sec = elapsed.getUTCSeconds().toString().padStart(2, '0');
+      const ms = Math.floor(elapsed.getUTCMilliseconds() / 100).toString().padStart(1, '0');
+      time.value = `${hour}:${min}:${sec}.${ms}`;
+    }
 
-    onBeforeMount(() => running.value && startTick());
+    function tick(): void {
+      if (session.value) {
+        const { timeStarted, stoppedDuration } = session.value;
+        const now = new Date().getTime();
+        const elapsed = new Date(now - timeStarted - stoppedDuration);
+        renderTime(elapsed);
+      }
+    }
+
+    function startTick(): void {
+      endTick();
+      tickTimer = setInterval(tick, 10);
+    }
+
+    function endTick(): void {
+      if (tickTimer) {
+        clearInterval(tickTimer);
+        tickTimer = null;
+      }
+    }
 
     function start(): void {
-      if (running.value) {
+      if (session.value?.running) {
         return;
       }
 
@@ -45,31 +68,6 @@ export default defineComponent({
       newSession.running = true;
       startTick();
       saveConfig({ session: newSession });
-    }
-
-    function startTick(): void {
-      endTick();
-      tickTimer = setInterval(tick, 10);
-    }
-
-    function endTick(): void {
-      if (tickTimer) {
-        clearInterval(tickTimer);
-        tickTimer = null;
-      }
-    }
-
-    function tick(): void {
-      if (session.value) {
-        const { timeStarted, stoppedDuration } = session.value;
-        const now = new Date().getTime();
-        const elapsed = new Date(now - timeStarted - stoppedDuration);
-        const hour = elapsed.getUTCHours().toString().padStart(2, '0');
-        const min = elapsed.getUTCMinutes().toString().padStart(2, '0');
-        const sec = elapsed.getUTCSeconds().toString().padStart(2, '0');
-        const ms = Math.floor(elapsed.getUTCMilliseconds() / 100).toString().padStart(1, '0');
-        time.value = `${hour}:${min}:${sec}.${ms}`;
-      }
     }
 
     function stop(): void {
@@ -90,6 +88,19 @@ export default defineComponent({
       saveConfig({ session: null });
       time.value = '00:00:00.0';
     }
+
+    onBeforeMount(() => {
+      if (session.value) {
+        const { running, timeStarted, stoppedDuration, timeStopped } = session.value;
+        if (running) {
+          startTick();
+        }
+        else if (timeStopped) {
+          const elapsed = new Date(timeStopped - timeStarted - stoppedDuration);
+          renderTime(elapsed);
+        }
+      }
+    });
 
     return {
       time,
