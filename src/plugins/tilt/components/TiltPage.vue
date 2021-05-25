@@ -64,7 +64,7 @@ export default defineComponent({
 <template>
   <q-page class="page-height">
     <TitleTeleport>
-      <span @click="editTitle">{{ title }}</span>
+      <span class="cursor-pointer" @click="editTitle">{{ title }}</span>
     </TitleTeleport>
     <ButtonsTeleport>
       <ActionMenu

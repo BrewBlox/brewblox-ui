@@ -154,7 +154,7 @@ export default defineComponent({
     </div>
     <template v-else>
       <TitleTeleport>
-        <span @click="editTitle">{{ layoutTitle }}</span>
+        <span class="cursor-pointer" @click="editTitle">{{ layoutTitle }}</span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn

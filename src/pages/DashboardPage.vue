@@ -125,7 +125,7 @@ export default defineComponent({
     </PageError>
     <template v-else>
       <TitleTeleport>
-        <span @click="editTitle">{{ dashboard.title }}</span>
+        <span class="cursor-pointer" @click="editTitle">{{ dashboard.title }}</span>
       </TitleTeleport>
       <ButtonsTeleport>
         <q-btn

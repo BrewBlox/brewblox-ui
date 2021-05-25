@@ -117,7 +117,7 @@ export default defineComponent({
 <template>
   <q-page class="page-height">
     <TitleTeleport>
-      <span @click="editTitle">{{ title }}</span>
+      <span class="cursor-pointer" @click="editTitle">{{ title }}</span>
     </TitleTeleport>
     <ButtonsTeleport>
       <q-btn-group rounded outline class="q-pa-xs self-center">

@@ -956,7 +956,7 @@ export default defineComponent({
     />
 
     <TitleTeleport v-if="layout">
-      <span @click="editTitle">{{ layoutTitle }}</span>
+      <span class="cursor-pointer" @click="editTitle">{{ layoutTitle }}</span>
     </TitleTeleport>
 
     <ButtonsTeleport v-if="layout">
