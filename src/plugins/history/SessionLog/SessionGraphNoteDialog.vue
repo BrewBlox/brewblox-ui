@@ -55,52 +55,61 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
-      <div class="row q-gutter-xs q-ml-md">
-        <DatetimeField
+      <div class="q-pl-sm">
+        <div class="row items-center q-ml-none">
+          <span class="col-grow text-secondary text-italic text-bold">
+            Graph start
+          </span>
+          <q-btn
+            icon="restore"
+            flat
+            round
+            @click="local.start = new Date().getTime()"
+          />
+          <q-btn
+            :disable="local.start == null"
+            icon="clear"
+            flat
+            round
+            @click="local.start = null"
+          />
+        </div>
+
+        <DatetimeInput
           v-model="local.start"
-          :rules="[
-            date => local.end === null
-              || date.getTime() < local.end
-              || 'Start must be before than end']"
-          emit-number
-          title="Start"
-          label="Start"
-          clear-label="Not started"
-          default-now
-          class="col-grow"
-        />
-        <q-btn
-          v-if="local.start !== null"
-          :disable="local.end !== null"
-          icon="clear"
-          flat
-          class="col-auto"
-          @click="local.start = null"
+          output="number"
         />
 
-        <div class="col-break" />
+        <div class="row items-center q-mt-md q-ml-none">
+          <span class="col-grow text-secondary text-italic text-bold">
+            Graph end
+          </span>
+          <q-btn
+            icon="restore"
+            flat
+            round
+            @click="local.end = new Date().getTime()"
+          />
+          <q-btn
+            :disable="local.end == null"
+            icon="clear"
+            flat
+            round
+            @click="local.end = null"
+          />
+        </div>
 
-        <DatetimeField
+        <DatetimeInput
           v-model="local.end"
-          :rules="[
-            date => local.start === null
-              || date.getTime() > local.start
-              || 'End must be after start']"
-          emit-number
-          title="End"
-          label="End"
-          :readonly="local.start === null"
-          :clear-label="local.start === null ? 'Not started' : 'In progress'"
-          default-now
-          class="col-grow"
+          output="number"
         />
-        <q-btn
-          v-if="local.end !== null"
-          icon="clear"
-          flat
-          class="col-auto"
-          @click="local.end = null"
-        />
+
+        <div
+          v-if="local.start && local.end && local.start > local.end"
+          class="q-mt-md text-negative"
+        >
+          Warning: graph ends before it starts.
+        </div>
       </div>
 
       <template #actions>

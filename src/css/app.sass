@@ -201,6 +201,10 @@ label
   &-highlight
     background-color: $hover
 
+// Fixes dark icons in chrome date/time inputs
+::-webkit-calendar-picker-indicator
+  filter: invert(1)
+
 @for $d from 1 through 9
   .fade-#{$d}
     opacity: 1-$d/10
