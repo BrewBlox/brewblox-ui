@@ -23,7 +23,7 @@ const plugin: Plugin = {
         widgets: [],
         brightness: 255,
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'name',
           title: 'Footer text',

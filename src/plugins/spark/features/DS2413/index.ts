@@ -22,7 +22,7 @@ const plugin: Plugin = {
         connected: false,
         pins: [],
       }),
-      fields: [],
+      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {

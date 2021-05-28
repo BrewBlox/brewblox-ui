@@ -99,7 +99,7 @@ export default defineComponent({
           title: 'Choose a Block',
           anyService: true,
           clearable: false,
-          blockFilter: (block: Block) => !!sparkStore.spec(block)?.fields.some(f => !f.readonly),
+          blockFilter: (block: Block) => sparkStore.blockFieldSpecsByAddress(block).some(f => !f.readonly),
         },
       })
         .onOk((addr: BlockAddress) => {

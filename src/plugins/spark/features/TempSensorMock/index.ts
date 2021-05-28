@@ -22,7 +22,7 @@ const plugin: Plugin = {
         fluctuations: [],
         connected: true,
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'setting',
           title: 'Sensor Setting',

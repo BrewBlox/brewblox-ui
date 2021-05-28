@@ -18,7 +18,7 @@ const plugin: Plugin = {
       generate: () => ({
         pins: [],
       }),
-      fields: [],
+      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {

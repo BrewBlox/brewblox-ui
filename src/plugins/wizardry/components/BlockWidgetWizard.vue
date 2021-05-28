@@ -21,6 +21,10 @@ export default defineComponent({
   name: 'BlockWidgetWizard',
   props: {
     ...useWidgetWizard.props,
+    featureId: {
+      type: String as PropType<BlockType>,
+      required: true,
+    },
     singleMode: {
       type: String as PropType<CreateMode | undefined>,
       default: undefined,
@@ -40,7 +44,6 @@ export default defineComponent({
     } = useWidgetWizard.setup(props.featureId);
 
     const createMode = ref<CreateMode>(props.singleMode ?? 'new');
-    const blockType = props.featureId as BlockType;
 
     const serviceId = ref<string | null>(sparkStore.serviceIds[0] ?? null);
     const dashboardId = ref<string | null>(props.activeDashboardId ?? null);
@@ -66,13 +69,13 @@ export default defineComponent({
     );
 
     const newBlockId = ref<string>(suggestId(featureTitle, blockIdValidator.value));
-    const newBlockData = ref<Block['data']>(sparkStore.spec({ type: blockType }).generate());
+    const newBlockData = ref(sparkStore.blockSpecById(props.featureId)!.generate());
 
     const newBlockAddress = computed<BlockAddress>(
       () => ({
         serviceId: serviceId.value,
         id: newBlockId.value,
-        type: blockType,
+        type: props.featureId,
       }));
 
     const existingBlockId = ref<string | null>(null);
@@ -80,7 +83,7 @@ export default defineComponent({
       get: () => ({
         serviceId: serviceId.value,
         id: existingBlockId.value,
-        type: blockType,
+        type: props.featureId,
       }),
       set: addr => existingBlockId.value = addr.id,
     });
@@ -125,7 +128,7 @@ export default defineComponent({
         sparkStore.setVolatileBlock({
           id: newBlockId.value,
           serviceId: serviceId.value,
-          type: blockType,
+          type: props.featureId,
           groups: [0],
           data: newBlockData.value,
         });
@@ -138,7 +141,7 @@ export default defineComponent({
       widgetStore.setVolatileWidget({
         id: widgetId,
         title: blockId,
-        feature: blockType,
+        feature: props.featureId,
         dashboard: dashboardId.value,
         order: 0,
         config: {

@@ -24,7 +24,7 @@ const plugin: Plugin = {
         voltage5: 0,
         voltage12: 0,
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'soundAlarm',
           title: 'Alarm sound',

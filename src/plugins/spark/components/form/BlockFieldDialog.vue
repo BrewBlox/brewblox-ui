@@ -2,7 +2,7 @@
 import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import type { BlockAddress, BlockField } from '@/plugins/spark/types';
+import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
 import { deepCopy } from '@/utils/functional';
 
 export default defineComponent({
@@ -18,7 +18,7 @@ export default defineComponent({
       required: true,
     },
     field: {
-      type: Object as PropType<BlockField>,
+      type: Object as PropType<BlockFieldSpec>,
       required: true,
     },
     comparison: {

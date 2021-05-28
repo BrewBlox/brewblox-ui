@@ -23,7 +23,7 @@ const plugin: Plugin = {
         maxValue: 100,
         constrainedBy: { constraints: [] },
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'desiredSetting',
           title: 'Setting',

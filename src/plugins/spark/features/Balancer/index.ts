@@ -18,7 +18,7 @@ const plugin: Plugin = {
       generate: () => ({
         clients: [],
       }),
-      fields: [],
+      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {

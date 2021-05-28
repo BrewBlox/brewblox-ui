@@ -26,7 +26,7 @@ const plugin: Plugin = {
         filter: FilterChoice.FILTER_15s,
         filterThreshold: deltaTempQty(5),
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'storedSetting',
           title: 'Setting',

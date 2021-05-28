@@ -20,7 +20,7 @@ const plugin: Plugin = {
         differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       }),
-      fields: [],
+      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {

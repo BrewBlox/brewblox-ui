@@ -22,7 +22,7 @@ const plugin: Plugin = {
         offset: deltaTempQty(0),
         address: '',
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'value',
           title: 'Sensor value',

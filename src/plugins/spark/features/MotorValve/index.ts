@@ -32,8 +32,7 @@ const plugin: Plugin = {
         valveState: ValveState.VALVE_INIT_IDLE,
         constrainedBy: { constraints: [] },
       }),
-      presets: [],
-      fields: [
+      fieldSpecs: [
         {
           key: 'desiredState',
           title: 'State',

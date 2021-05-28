@@ -27,7 +27,7 @@ const plugin: Plugin = {
         command: null,
         trace: [],
       }),
-      fields: [],
+      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {

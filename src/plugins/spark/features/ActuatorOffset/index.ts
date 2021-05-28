@@ -34,7 +34,7 @@ const plugin: Plugin = {
         constrainedBy: { constraints: [] },
         enabled: true,
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'desiredSetting',
           title: 'Target offset',

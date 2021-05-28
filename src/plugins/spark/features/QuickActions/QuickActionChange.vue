@@ -47,9 +47,7 @@ export default defineComponent({
 
     function makeChange(): EditableBlockChange {
       const { id, blockId, serviceId } = props.modelValue;
-      const spec = block.value !== null
-        ? sparkStore.spec(block.value) ?? null
-        : null;
+      const spec = sparkStore.blockSpecByAddress(block.value);
 
       const data = props.modelValue.data ?? {};
       const confirmed = props.modelValue.confirmed ?? {};
@@ -61,7 +59,7 @@ export default defineComponent({
         spec,
         block: block.value,
         title: featureStore.widgetTitle(block.value?.type),
-        fields: spec?.fields
+        fields: spec?.fieldSpecs
           .filter(f => !f.readonly)
           .map(f => ({
             id: f.key,
@@ -89,7 +87,7 @@ export default defineComponent({
         }
         const keys = Object.keys(props.modelValue.data ?? {});
         const validKeys = spec
-          .fields
+          .fieldSpecs
           .filter(f => !f.readonly)
           .map(f => f.key);
         return difference(keys, validKeys);

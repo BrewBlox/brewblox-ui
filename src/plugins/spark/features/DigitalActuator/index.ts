@@ -12,7 +12,7 @@ import {
 } from '@/plugins/spark/types';
 import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
-import { bloxLink, bloxQty } from '@/utils/bloxfield';
+import { bloxLink } from '@/utils/bloxfield';
 
 import widget from './DigitalActuatorWidget.vue';
 
@@ -32,55 +32,7 @@ const plugin: Plugin = {
         invert: false,
         constrainedBy: { constraints: [] },
       }),
-      presets: [
-        {
-          name: 'Fridge cooler (compressor)',
-          generate: () => ({
-            invert: false,
-            constrainedBy: {
-              constraints: [
-                {
-                  minOff: bloxQty('5m'),
-                  remaining: bloxQty('0s'),
-                },
-                {
-                  minOn: bloxQty('3m'),
-                  remaining: bloxQty('0s'),
-                },
-                {
-                  mutexed: {
-                    mutexId: bloxLink(null, BlockIntfType.MutexInterface),
-                    extraHoldTime: bloxQty('0s'),
-                    hasCustomHoldTime: true,
-                    hasLock: false,
-                  },
-                  remaining: bloxQty('0s'),
-                },
-              ],
-            },
-          }),
-        },
-        {
-          name: 'Fridge heater',
-          generate: () => ({
-            invert: false,
-            constrainedBy: {
-              constraints: [
-                {
-                  mutexed: {
-                    mutexId: bloxLink(null, BlockIntfType.MutexInterface),
-                    extraHoldTime: bloxQty('0s'),
-                    hasCustomHoldTime: true,
-                    hasLock: false,
-                  },
-                  remaining: bloxQty('0s'),
-                },
-              ],
-            },
-          }),
-        },
-      ],
-      fields: [
+      fieldSpecs: [
         {
           key: 'desiredState',
           title: 'State',

@@ -21,7 +21,7 @@ const plugin: Plugin = {
         combineFunc: SensorCombiFunc.SENSOR_COMBI_FUNC_AVG,
         value: tempQty(20),
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'combineFunc',
           title: 'Sensor combination function',

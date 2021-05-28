@@ -26,7 +26,7 @@ const plugin: Plugin = {
         digital: [],
         expression: '',
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'result',
           title: 'Result',

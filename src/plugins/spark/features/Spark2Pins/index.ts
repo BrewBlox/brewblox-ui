@@ -21,7 +21,7 @@ const plugin: Plugin = {
         soundAlarm: false,
         hardware: Spark2Hardware.HW_UNKNOWN,
       }),
-      fields: [],
+      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {

@@ -27,21 +27,7 @@ const plugin: Plugin = {
         constrainedBy: { constraints: [] },
         enabled: true,
       }),
-      presets: [
-        {
-          name: 'Heater - 4s period',
-          generate: () => ({
-            period: bloxQty('4s'),
-          }),
-        },
-        {
-          name: 'Fridge - 30m period',
-          generate: () => ({
-            period: bloxQty('30m'),
-          }),
-        },
-      ],
-      fields: [
+      fieldSpecs: [
         {
           key: 'desiredSetting',
           title: 'Duty Setting',

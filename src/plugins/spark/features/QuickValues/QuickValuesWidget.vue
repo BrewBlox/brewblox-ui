@@ -5,7 +5,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockField } from '@/plugins/spark/types';
+import { Block, BlockFieldSpec } from '@/plugins/spark/types';
 import { isQuantity, prettyAny, prettyQty, Quantity } from '@/utils/bloxfield';
 import { roundNumber } from '@/utils/functional';
 import notify from '@/utils/notify';
@@ -34,10 +34,12 @@ export default defineComponent({
     );
 
     function blockFilter(block: Block): boolean {
-      return !!sparkStore.spec(block)?.fields.some(f => !f.readonly);
+      return sparkStore
+        .blockFieldSpecsByAddress(block)
+        .some(f => !f.readonly);
     }
 
-    function fieldFilter(field: BlockField): boolean {
+    function fieldFilter(field: BlockFieldSpec): boolean {
       const v = field.generate();
       return !field.readonly && (isNumber(v) || isQuantity(v));
     }

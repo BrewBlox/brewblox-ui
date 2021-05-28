@@ -22,7 +22,7 @@ const plugin: Plugin = {
         pins: [],
         connectMode: DS2408ConnectMode.CONNECT_VALVE,
       }),
-      fields: [],
+      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {

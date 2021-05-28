@@ -70,7 +70,7 @@ export default defineComponent({
 
     const wizardOpts = computed<BlockWizardOption[]>(
       () => sparkStore
-        .specs
+        .blockSpecs
         .filter(spec =>
           !spec.systemObject
           && isCompatible(spec.id, props.compatible)
@@ -162,7 +162,7 @@ export default defineComponent({
           serviceId: serviceId.value,
           type: selected.value.value,
           groups: [0],
-          data: sparkStore.spec({ type: selected.value.value }).generate(),
+          data: sparkStore.blockSpecById(selected.value.value).generate(),
         });
         activeBlock.value = sparkStore.blockById(serviceId.value, blockId.value);
       }

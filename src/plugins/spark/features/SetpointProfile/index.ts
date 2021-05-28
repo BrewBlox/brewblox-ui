@@ -24,7 +24,7 @@ const plugin: Plugin = {
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         drivenTargetId: bloxLink(null),
       }),
-      fields: [
+      fieldSpecs: [
         {
           key: 'enabled',
           title: 'Enabled',

@@ -110,11 +110,6 @@ export interface BlockConfig {
 
 export type BlockWidget = Widget<BlockConfig>
 
-export interface BlockDataPreset<T extends Block = Block> {
-  name: string;
-  generate: () => Partial<T['data']>;
-}
-
 export interface BlockIds {
   id?: string;
   nid?: number;
@@ -143,11 +138,11 @@ export interface BlockFieldAddress extends BlockAddress {
   field: string | null;
 }
 
-export interface BlockField<T extends Block = Block> {
+export interface BlockFieldSpec<T extends Block = Block> {
   key: string & keyof T['data'];
   title: string;
   component: string;
-  componentProps?: any;
+  componentProps?: AnyDict;
   generate: () => any;
   valueHint?: string;
   pretty?: (val: any) => string;
@@ -162,8 +157,7 @@ export interface BlockSpec<T extends Block = Block> {
   systemObject?: boolean;
   discovered?: boolean;
   generate: () => T['data'];
-  fields: BlockField<T>[];
-  presets?: BlockDataPreset<T>[];
+  fieldSpecs: BlockFieldSpec<T>[];
 }
 
 export type ComparedBlockType = BlockOrIntfType | BlockOrIntfType[] | null;
