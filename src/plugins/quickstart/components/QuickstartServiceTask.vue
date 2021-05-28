@@ -39,7 +39,7 @@ export default defineComponent({
     }
 
     const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.config.serviceId),
+      () => sparkStore.moduleById(service.value?.id),
     );
 
     const hasBlocks = computed<boolean>(
