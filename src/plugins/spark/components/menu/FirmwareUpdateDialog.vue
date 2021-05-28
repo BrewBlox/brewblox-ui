@@ -73,7 +73,7 @@ export default defineComponent({
     );
 
     function updateFirmware(): void {
-      if (busy.value || ready.value) {
+      if (busy.value || !ready.value) {
         return;
       }
       busy.value = true;
