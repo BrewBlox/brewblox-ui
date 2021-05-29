@@ -158,16 +158,6 @@ export interface BlockFieldSpec<T extends Block = Block> {
   graphName?: string;
 }
 
-export interface BlockChangeSpec<ConfigT extends AnyDict = AnyDict> {
-  id: string;
-  title: string;
-  component: string;
-  componentProps?: AnyDict;
-  generate: () => ConfigT;
-  pretty: (config: ConfigT) => string;
-  apply: (config: ConfigT) => Block[];
-}
-
 export interface BlockSpec<T extends Block = Block> {
   type: T['type'];
   generate: () => T['data'];

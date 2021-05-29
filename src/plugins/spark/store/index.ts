@@ -5,7 +5,7 @@ import { BlockType, Link, UserBlockType } from '@/shared-types';
 import store from '@/store';
 import { deepCopy, extendById, filterById, findById, findByKey } from '@/utils/functional';
 
-import type { BlockAddress, BlockChangeSpec, BlockSpec, StoredDataPreset } from '../types';
+import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
 import type { Block, BlockFieldAddress, BlockFieldSpec } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
@@ -20,7 +20,6 @@ export class SparkGlobalModule extends VuexModule {
   public presets: StoredDataPreset[] = [];
   public blockSpecs: BlockSpec[] = [];
   public fieldSpecs: BlockFieldSpec[] = [];
-  public changeSpecs: BlockChangeSpec[] = [];
 
   public get serviceIds(): string[] {
     return this.modules.map(v => v.id);
@@ -101,11 +100,6 @@ export class SparkGlobalModule extends VuexModule {
   @Mutation
   public addFieldSpecs<T extends Block>(specs: BlockFieldSpec<T>[]): void {
     this.fieldSpecs = markRaw([...this.fieldSpecs, ...(specs as any[])]);
-  }
-
-  @Mutation
-  public addChangeSpec(spec: BlockChangeSpec): void {
-    this.changeSpecs = markRaw([...this.changeSpecs, spec]);
   }
 
   @Action
