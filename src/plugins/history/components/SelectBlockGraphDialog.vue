@@ -48,9 +48,9 @@ export default defineComponent({
 
     const graphedTypes: BlockType[] =
       sparkStore
-        .blockSpecs
-        .filter(s => s.fieldSpecs.some(f => f.graphed))
-        .map(s => s.id);
+        .fieldSpecs
+        .filter(f => f.graphed)
+        .map(s => s.type);
 
     const blocks = computed<Block[]>(
       () => sparkStore
@@ -60,7 +60,7 @@ export default defineComponent({
 
     const fields = computed<BlockFieldSpec[]>(
       () => sparkStore
-        .blockFieldSpecsByAddress(block.value)
+        .fieldSpecsByType(block.value?.type)
         .filter(f => f.graphed),
     );
 

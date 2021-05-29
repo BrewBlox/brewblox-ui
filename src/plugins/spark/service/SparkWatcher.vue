@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { sparkType } from '@/plugins/spark/getters';
+import { sparkType } from '@/plugins/spark/const';
 import { SparkService } from '@/plugins/spark/types';
 import { serviceStore } from '@/store/services';
 

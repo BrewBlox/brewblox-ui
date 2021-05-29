@@ -76,7 +76,7 @@ export default defineComponent({
     function confirmActionChange(block: Block, key: string, value: any): Promise<any> {
       return new Promise((resolve, reject) => {
         const specField = sparkStore
-          .blockFieldSpecsByAddress(block)
+          .fieldSpecsByType(block.type)
           .find(field => field.key === key && !field.readonly);
         if (!specField) {
           resolve(value);
@@ -114,10 +114,10 @@ export default defineComponent({
       const actualChanges: [Block, any][] = [];
       for (const change of changes) {
         const block = blockByChange(change)!;
-        const spec = sparkStore.blockSpecByAddress(block)!;
+        const fieldSpecs = sparkStore.fieldSpecsByType(block.type);
         const actualData = deepCopy(change.data);
         for (const key in change.data) {
-          if (!spec.fieldSpecs.some(c => c.key === key)) {
+          if (!fieldSpecs.some(c => c.key === key)) {
             delete actualData[key];
           }
           if (change.confirmed?.[key]) {
@@ -169,11 +169,11 @@ export default defineComponent({
         };
       }
 
-      const spec = sparkStore.blockSpecByAddress(block)!;
+      const fieldSpecs = sparkStore.fieldSpecsByType(block.type);
       const diffs =
         Object.entries(change.data)
           .map(([key, val]) => {
-            const specChange = spec.fieldSpecs.find(s => s.key === key);
+            const specChange = fieldSpecs.find(s => s.key === key);
             const pretty = specChange?.pretty ?? prettyAny;
             const oldV = pretty(block.data[key]);
             const newV = pretty(val);

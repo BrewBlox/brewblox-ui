@@ -9,33 +9,32 @@ import { bloxQty } from '@/utils/bloxfield';
 
 import widget from './MutexWidget.vue';
 
-const typeName = BlockType.Mutex;
+const type = BlockType.Mutex;
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<MutexBlock> = {
-      id: typeName,
+    const blockSpec: BlockSpec<MutexBlock> = {
+      type,
       generate: () => ({
         differentActuatorWait: bloxQty('0s'),
         waitRemaining: bloxQty('0s'),
       }),
-      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {
       ...genericBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Mutex',
       role: 'Constraint',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 2,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

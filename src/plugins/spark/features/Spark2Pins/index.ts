@@ -8,35 +8,33 @@ import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './Spark2PinsWidget.vue';
 
-const typeName = BlockType.Spark2Pins;
+const type = BlockType.Spark2Pins;
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<Spark2PinsBlock> = {
-      id: typeName,
-      systemObject: true,
+    const blockSpec: BlockSpec<Spark2PinsBlock> = {
+      type,
       generate: () => ({
         pins: [],
         soundAlarm: false,
         hardware: Spark2Hardware.HW_UNKNOWN,
       }),
-      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {
       ...systemBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Spark 2 Pins',
       role: 'Output',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 4,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

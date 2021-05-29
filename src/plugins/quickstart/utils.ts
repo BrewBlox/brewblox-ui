@@ -122,7 +122,7 @@ export function withoutPrefix(prefix: string, val: string): string {
 }
 
 export const pidDefaults = (): PidBlock['data'] =>
-  sparkStore.blockSpecById(BlockType.Pid).generate();
+  sparkStore.blockSpecByType(BlockType.Pid).generate();
 
 export const makeBeerCoolConfig = (): PidConfig => ({
   kp: inverseTempQty(-50),

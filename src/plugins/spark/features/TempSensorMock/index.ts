@@ -2,63 +2,68 @@ import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
+import { BlockFieldSpec, BlockSpec, BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { tempQty } from '@/utils/bloxfield';
 
 import widget from './TempSensorMockWidget.vue';
 
-const typeName = BlockType.TempSensorMock;
+const type = BlockType.TempSensorMock;
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<TempSensorMockBlock> = {
-      id: typeName,
+    const blockSpec: BlockSpec<TempSensorMockBlock> = {
+      type,
       generate: () => ({
         value: tempQty(20),
         setting: tempQty(20),
         fluctuations: [],
         connected: true,
       }),
-      fieldSpecs: [
-        {
-          key: 'setting',
-          title: 'Sensor Setting',
-          component: 'QuantityValEdit',
-          generate: () => tempQty(20),
-        },
-        {
-          key: 'connected',
-          title: 'Connected',
-          component: 'BoolValEdit',
-          generate: () => true,
-        },
-        {
-          key: 'value',
-          title: 'Sensor value',
-          component: 'QuantityValEdit',
-          generate: () => tempQty(20),
-          readonly: true,
-          graphed: true,
-        },
-      ],
     };
+
+    const fieldSpecs: BlockFieldSpec<TempSensorMockBlock>[] = [
+      {
+        type,
+        key: 'setting',
+        title: 'Sensor Setting',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+      },
+      {
+        type,
+        key: 'connected',
+        title: 'Connected',
+        component: 'BoolValEdit',
+        generate: () => true,
+      },
+      {
+        type,
+        key: 'value',
+        title: 'Sensor value',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+        readonly: true,
+        graphed: true,
+      },
+    ];
 
     const feature: WidgetFeature = {
       ...genericBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Temp Sensor (Mock)',
       role: 'Process',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 3,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
+    sparkStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

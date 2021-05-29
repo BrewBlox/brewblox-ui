@@ -10,6 +10,11 @@ import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 import { Widget } from '@/store/widgets';
 
+export type ComparedBlockType =
+  | BlockOrIntfType
+  | BlockOrIntfType[]
+  | null;
+
 export type PageMode =
   | 'Relations'
   | 'List'
@@ -139,6 +144,7 @@ export interface BlockFieldAddress extends BlockAddress {
 }
 
 export interface BlockFieldSpec<T extends Block = Block> {
+  type: T['type'];
   key: string & keyof T['data'];
   title: string;
   component: string;
@@ -152,12 +158,17 @@ export interface BlockFieldSpec<T extends Block = Block> {
   graphName?: string;
 }
 
-export interface BlockSpec<T extends Block = Block> {
-  id: T['type'];
-  systemObject?: boolean;
-  discovered?: boolean;
-  generate: () => T['data'];
-  fieldSpecs: BlockFieldSpec<T>[];
+export interface BlockChangeSpec<ConfigT extends AnyDict = AnyDict> {
+  id: string;
+  title: string;
+  component: string;
+  componentProps?: AnyDict;
+  generate: () => ConfigT;
+  pretty: (config: ConfigT) => string;
+  apply: (config: ConfigT) => Block[];
 }
 
-export type ComparedBlockType = BlockOrIntfType | BlockOrIntfType[] | null;
+export interface BlockSpec<T extends Block = Block> {
+  type: T['type'];
+  generate: () => T['data'];
+}

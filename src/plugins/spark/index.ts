@@ -7,8 +7,8 @@ import { serviceStore } from '@/store/services';
 import { autoRegister, cref } from '@/utils/component-ref';
 import { STATE_TOPIC } from '@/utils/const';
 
+import { sparkType } from './const';
 import features from './features';
-import { sparkType } from './getters';
 import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';

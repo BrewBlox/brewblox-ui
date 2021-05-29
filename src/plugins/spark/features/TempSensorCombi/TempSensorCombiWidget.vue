@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { combineFuncLabels } from '@/plugins/spark/getters';
+import { combineFuncLabels } from '@/plugins/spark/const';
 import { BlockIntfType, Link, TempSensorCombiBlock } from '@/plugins/spark/types';
 import { bloxLink, prettyQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';

@@ -2,50 +2,52 @@ import { Plugin } from 'vue';
 
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
+import { BlockFieldSpec, BlockSpec, BlockType, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './DisplaySettingsWidget.vue';
 
-const typeName = BlockType.DisplaySettings;
+const type = BlockType.DisplaySettings;
 
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<DisplaySettingsBlock> = {
-      id: typeName,
-      systemObject: true,
+    const blockSpec: BlockSpec<DisplaySettingsBlock> = {
+      type,
       generate: () => ({
         name: 'Display settings',
         tempUnit: DisplayTempUnit.TEMP_CELSIUS,
         widgets: [],
         brightness: 255,
       }),
-      fieldSpecs: [
-        {
-          key: 'name',
-          title: 'Footer text',
-          component: 'StringValEdit',
-          generate: () => '',
-        },
-      ],
     };
+
+    const fieldSpecs: BlockFieldSpec<DisplaySettingsBlock>[] = [
+      {
+        type,
+        key: 'name',
+        title: 'Footer text',
+        component: 'StringValEdit',
+        generate: () => '',
+      },
+    ];
 
     const feature: WidgetFeature = {
       ...systemBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Spark Display',
       role: 'Display',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 3,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
+    sparkStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

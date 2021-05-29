@@ -8,32 +8,31 @@ import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './MockPinsWidget.vue';
 
-const typeName = BlockType.MockPins;
+const type = BlockType.MockPins;
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<MockPinsBlock> = {
-      id: typeName,
+    const blockSpec: BlockSpec<MockPinsBlock> = {
+      type,
       generate: () => ({
         pins: [],
       }),
-      fieldSpecs: [],
     };
 
     const feature: WidgetFeature = {
       ...genericBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Mock Pins',
       role: 'Output',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 4,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

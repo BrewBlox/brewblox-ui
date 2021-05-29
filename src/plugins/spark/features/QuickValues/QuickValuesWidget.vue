@@ -35,7 +35,7 @@ export default defineComponent({
 
     function blockFilter(block: Block): boolean {
       return sparkStore
-        .blockFieldSpecsByAddress(block)
+        .fieldSpecsByType(block.type)
         .some(f => !f.readonly);
     }
 

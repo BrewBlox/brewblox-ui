@@ -41,7 +41,7 @@ export function makeBlockGraphConfig<BlockT extends Block = Block>(
   });
 
   const graphedFields: BlockFieldSpec[] = sparkStore
-    .blockFieldSpecsByAddress(block)
+    .fieldSpecsByType(block.type)
     .filter(f => f.graphed && fieldFilter(f));
 
   const graphedObj: Mapped<BlockFieldSpec> = keyBy(

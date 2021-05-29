@@ -38,7 +38,7 @@ export default defineComponent({
     async function createMockSensors(): Promise<void> {
       if (!sparkModule.value) { return; }
       const validator = ruleValidator(makeBlockIdRules(props.serviceId));
-      const spec = sparkStore.blockSpecById<TempSensorMockBlock>(BlockType.TempSensorMock);
+      const spec = sparkStore.blockSpecByType<TempSensorMockBlock>(BlockType.TempSensorMock);
 
       for (const name of props.names) {
         const block: TempSensorMockBlock = {

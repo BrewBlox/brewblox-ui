@@ -95,9 +95,9 @@ export default defineComponent({
     const validTypes = computed<BlockOrIntfType[]>(
       () => sparkStore
         .blockSpecs
-        .filter(v => isCompatible(v.id, props.compatible))
-        .filter(v => v.fieldSpecs.some(f => props.fieldFilter(f)))
-        .map(v => v.id),
+        .filter(spec => isCompatible(spec.type, props.compatible))
+        .filter(spec => sparkStore.fieldSpecs.some(f => f.type === spec.type && props.fieldFilter(f)))
+        .map(v => v.type),
     );
 
     const blockIdOpts = computed<string[]>(
@@ -121,17 +121,18 @@ export default defineComponent({
     );
 
     const fieldIdOpts = computed<SelectOption<string>[]>(
-      () => blockSpec.value
-        ?.fieldSpecs
+      () => sparkStore
+        .fieldSpecsByType(block.value?.type)
         .filter(f => props.fieldFilter(f))
         .map(f => ({ label: f.title, value: f.key }))
         ?? [],
     );
 
     const field = computed<BlockFieldSpec | null>(
-      () => blockSpec.value && fieldId.value
-        ? blockSpec.value.fieldSpecs.find(f => f.key === fieldId.value) ?? null
-        : null,
+      () => sparkStore
+        .fieldSpecs
+        .find(f => f.type === block.value?.type && f.key === fieldId.value)
+        ?? null,
     );
 
     const localAddress = computed<BlockFieldAddress | null>(
@@ -143,7 +144,7 @@ export default defineComponent({
           serviceId: serviceId.value,
           id: blockId.value,
           field: fieldId.value,
-          type: blockSpec.value.id,
+          type: blockSpec.value.type,
         };
       },
     );

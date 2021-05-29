@@ -65,7 +65,7 @@ export default defineComponent({
       setElementRef,
     } = useElementRefs.setup();
 
-    const validTypes: BlockType[] = sparkStore.blockSpecs.map(s => s.id);
+    const validTypes: BlockType[] = sparkStore.blockSpecs.map(s => s.type);
 
     const searchText = ref<string | null>(null);
     const searchExpression = computed<RegExp>(

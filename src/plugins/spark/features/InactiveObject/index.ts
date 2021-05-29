@@ -7,7 +7,7 @@ import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './InactiveObjectWidget.vue';
 
-const typeName = BlockType.InactiveObject;
+const type = BlockType.InactiveObject;
 
 
 const plugin: Plugin = {
@@ -15,9 +15,9 @@ const plugin: Plugin = {
 
     const feature: WidgetFeature<InactiveObjectBlock> = {
       ...genericBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Inactive Block',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       wizard: false,
       widgetSize: {
         cols: 4,

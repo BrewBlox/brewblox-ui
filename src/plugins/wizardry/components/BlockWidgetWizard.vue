@@ -69,7 +69,7 @@ export default defineComponent({
     );
 
     const newBlockId = ref<string>(suggestId(featureTitle, blockIdValidator.value));
-    const newBlockData = ref(sparkStore.blockSpecById(props.featureId)!.generate());
+    const newBlockData = ref(sparkStore.blockSpecByType(props.featureId)!.generate());
 
     const newBlockAddress = computed<BlockAddress>(
       () => ({

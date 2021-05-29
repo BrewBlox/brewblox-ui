@@ -1,10 +1,11 @@
+import { markRaw } from 'vue';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { BlockType, Link, UserBlockType } from '@/shared-types';
 import store from '@/store';
-import { deepCopy, extendById, filterById, findById } from '@/utils/functional';
+import { deepCopy, extendById, filterById, findById, findByKey } from '@/utils/functional';
 
-import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
+import type { BlockAddress, BlockChangeSpec, BlockSpec, StoredDataPreset } from '../types';
 import type { Block, BlockFieldAddress, BlockFieldSpec } from '../types';
 import * as api from './api';
 import presetsApi from './presets-api';
@@ -18,6 +19,8 @@ export class SparkGlobalModule extends VuexModule {
   public modules: SparkServiceModule[] = [];
   public presets: StoredDataPreset[] = [];
   public blockSpecs: BlockSpec[] = [];
+  public fieldSpecs: BlockFieldSpec[] = [];
+  public changeSpecs: BlockChangeSpec[] = [];
 
   public get serviceIds(): string[] {
     return this.modules.map(v => v.id);
@@ -60,26 +63,26 @@ export class SparkGlobalModule extends VuexModule {
   }
 
   // We're assuming here that a spec is registered for every user block type
-  public blockSpecById<T extends Block>(type: UserBlockType & T['type']): BlockSpec<T>;
-  public blockSpecById<T extends Block>(type: BlockType & T['type']): BlockSpec<T> | null;
-  public blockSpecById<T extends Block>(type: T['type']): BlockSpec<T> | null {
-    return findById<BlockSpec<T>>(this.blockSpecs as any, type);
+  public blockSpecByType<T extends Block>(type: UserBlockType & T['type']): BlockSpec<T>;
+  public blockSpecByType<T extends Block>(type: BlockType & T['type']): BlockSpec<T> | null;
+  public blockSpecByType<T extends Block>(type: T['type']): BlockSpec<T> | null {
+    return findByKey<BlockSpec<T>>(this.blockSpecs as any, 'type', type);
   }
 
   public blockSpecByAddress<T extends Block>(addr: Nullable<T | BlockAddress>): BlockSpec<T> | null {
     return addr && addr.type
-      ? this.blockSpecById<T>(addr.type as T['type'])
+      ? this.blockSpecByType<T>(addr.type as T['type'])
       : null;
   }
 
-  public fieldSpecByAddress<T extends Block>(addr: Nullable<BlockFieldAddress>): BlockFieldSpec<T> | null {
+  public fieldSpecByAddress(addr: Nullable<BlockFieldAddress>): BlockFieldSpec | null {
     return addr && addr.type && addr.field
-      ? this.blockSpecByAddress(addr)?.fieldSpecs.find(f => f.key === addr.field) ?? null
+      ? this.fieldSpecs.find(f => f.type === addr.type && f.key === addr.field) ?? null
       : null;
   }
 
-  public blockFieldSpecsByAddress(addr: Nullable<BlockAddress>): BlockFieldSpec[] {
-    return this.blockSpecByAddress(addr)?.fieldSpecs ?? [];
+  public fieldSpecsByType(type: Nullable<BlockType>): BlockFieldSpec[] {
+    return this.fieldSpecs.filter(f => f.type === type);
   }
 
   public setVolatileBlock(block: Block): void {
@@ -92,7 +95,17 @@ export class SparkGlobalModule extends VuexModule {
 
   @Mutation
   public addBlockSpec<T extends Block>(spec: BlockSpec<T>): void {
-    this.blockSpecs = extendById(this.blockSpecs, spec as any);
+    this.blockSpecs = markRaw([...this.blockSpecs, spec]);
+  }
+
+  @Mutation
+  public addFieldSpecs<T extends Block>(specs: BlockFieldSpec<T>[]): void {
+    this.fieldSpecs = markRaw([...this.fieldSpecs, ...(specs as any[])]);
+  }
+
+  @Mutation
+  public addChangeSpec(spec: BlockChangeSpec): void {
+    this.changeSpecs = markRaw([...this.changeSpecs, spec]);
   }
 
   @Action

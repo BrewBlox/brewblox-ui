@@ -85,7 +85,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     );
 
     const hasGraph: boolean = !isVolatileBlock.value
-      && blockSpec.value.fieldSpecs.some(f => f.graphed);
+      && sparkStore.fieldSpecs.some(f => f.type === block.value.type && f.graphed);
 
     const graphConfig = computed<GraphConfig | null>({
       get: () => hasGraph ? makeBlockGraphConfig(block.value, config.value) : null,
