@@ -1,4 +1,9 @@
 {
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "typescript.tsdk": "./node_modules/typescript/lib",
   "vetur.format.defaultFormatter.html": "none",
   "vetur.format.defaultFormatter.js": "vscode-typescript",
   "vetur.format.defaultFormatter.ts": "vscode-typescript",
@@ -10,10 +15,6 @@
     "javascript",
     "typescript"
   ],
-  "editor.formatOnSave": true,
-  "jest.pathToConfig": "jest.config.js",
-  "jestTestExplorer.pathToJest": "./node_modules/.bin/jest",
-  "jestTestExplorer.pathToJestConfig": "jest.config.js",
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
@@ -23,9 +24,4 @@
   "[vue]": {
     "editor.defaultFormatter": "octref.vetur"
   },
-  "typescript.tsdk": "./node_modules/typescript/lib",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  "jest.enableInlineErrorMessages": true,
 }

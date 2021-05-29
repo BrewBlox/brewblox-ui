@@ -50,21 +50,3 @@ export const autoComponents =
           return acc;
         },
         {});
-
-// The same as autoComponents, but for TS files
-// We don't need to check for a naming mismatch here
-export const autoModules =
-  <T>(context: __WebpackModuleApi.RequireContext): Mapped<T> =>
-    context
-      .keys()
-      .reduce(
-        (acc: Mapped<T>, fileName: string) => {
-          const match = fileName.match(/([\w\-]+)\.ts$/);
-          if (match && match[1] !== 'index') {
-            const module = context(fileName);
-            const exported = module.default || module;
-            acc[match[1]] = exported;
-          }
-          return acc;
-        },
-        {});
