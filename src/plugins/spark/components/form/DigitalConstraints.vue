@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, watch } from 'vue';
 
-import { digitalConstraintLabels } from '@/plugins/spark/getters';
+import { digitalConstraintLabels } from '@/plugins/spark/const';
 import { sparkStore } from '@/plugins/spark/store';
 import type {
   DigitalConstraint,

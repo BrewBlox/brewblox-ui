@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DS2408StartChannels } from '@/plugins/spark/getters';
+import { DS2408StartChannels } from '@/plugins/spark/const';
 import {
   BlockIntfType,
   DigitalActuatorBlock,

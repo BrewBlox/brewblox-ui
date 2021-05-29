@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockField, BlockFieldAddress, ComparedBlockType } from '@/plugins/spark/types';
+import { Block, BlockFieldAddress, BlockFieldSpec, ComparedBlockType } from '@/plugins/spark/types';
 import { prettyAny } from '@/utils/bloxfield';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 
@@ -36,7 +36,7 @@ export default defineComponent({
       default: () => true,
     },
     fieldFilter: {
-      type: Function as PropType<(field: BlockField) => boolean>,
+      type: Function as PropType<(field: BlockFieldSpec) => boolean>,
       default: () => true,
     },
     clearable: {
@@ -70,8 +70,8 @@ export default defineComponent({
       () => sparkStore.blockByAddress(props.modelValue),
     );
 
-    const fieldSpec = computed<BlockField | null>(
-      () => sparkStore.fieldSpec(props.modelValue),
+    const fieldSpec = computed<BlockFieldSpec | null>(
+      () => sparkStore.fieldSpecByAddress(props.modelValue),
     );
 
     const fieldDisplayValue = computed<string>(

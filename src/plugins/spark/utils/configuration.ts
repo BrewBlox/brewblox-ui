@@ -5,7 +5,7 @@ import pick from 'lodash/pick';
 
 import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockConfig, BlockField, ProfileValues } from '@/plugins/spark/types';
+import { BlockAddress, BlockConfig, BlockFieldSpec, ProfileValues } from '@/plugins/spark/types';
 import { Block, SetpointProfileBlock } from '@/shared-types';
 import { bloxQty, isQuantity, prettyUnit } from '@/utils/bloxfield';
 import notify from '@/utils/notify';
@@ -32,7 +32,7 @@ const postfix = (obj: any): string =>
 export function makeBlockGraphConfig<BlockT extends Block = Block>(
   block: BlockT,
   config: Pick<BlockConfig, 'graphAxes' | 'graphLayout' | 'queryParams'>,
-  fieldFilter: ((f: BlockField) => boolean) = (() => true),
+  fieldFilter: ((f: BlockFieldSpec) => boolean) = (() => true),
 ): GraphConfig {
   const { queryParams, graphAxes, graphLayout } = defaults(config, {
     queryParams: { duration: '1h' },
@@ -40,13 +40,11 @@ export function makeBlockGraphConfig<BlockT extends Block = Block>(
     graphLayout: {},
   });
 
-  const graphedFields: BlockField[] = sparkStore
-    .spec(block)
-    .fields
-    .filter(f => f.graphed)
-    .filter(f => fieldFilter(f));
+  const graphedFields: BlockFieldSpec[] = sparkStore
+    .fieldSpecsByType(block.type)
+    .filter(f => f.graphed && fieldFilter(f));
 
-  const graphedObj: Mapped<BlockField> = keyBy(
+  const graphedObj: Mapped<BlockFieldSpec> = keyBy(
     graphedFields,
     f => {
       return [

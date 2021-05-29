@@ -3,6 +3,7 @@ import { Plugin } from 'vue';
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
 import {
+  BlockFieldSpec,
   BlockIntfType,
   BlockSpec,
   BlockType,
@@ -17,13 +18,13 @@ import { bloxLink } from '@/utils/bloxfield';
 
 import widget from './MotorValveWidget.vue';
 
-const typeName = BlockType.MotorValve;
+const type = BlockType.MotorValve;
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<MotorValveBlock> = {
-      id: typeName,
+    const blockSpec: BlockSpec<MotorValveBlock> = {
+      type,
       generate: () => ({
         hwDevice: bloxLink(null, BlockIntfType.IoArrayInterface),
         startChannel: 0,
@@ -32,49 +33,53 @@ const plugin: Plugin = {
         valveState: ValveState.VALVE_INIT_IDLE,
         constrainedBy: { constraints: [] },
       }),
-      presets: [],
-      fields: [
-        {
-          key: 'desiredState',
-          title: 'State',
-          component: 'StateValEdit',
-          generate: () => DigitalState.STATE_INACTIVE,
-          valueHint: enumHint(DigitalState),
-          graphed: true,
-          graphName: 'Desired state',
-        },
-        {
-          key: 'constrainedBy',
-          title: 'Constraints',
-          component: 'DigitalConstraintsValEdit',
-          generate: (): DigitalConstraintsObj => ({ constraints: [] }),
-          pretty: prettifyConstraints,
-        },
-        {
-          key: 'state',
-          title: 'Actual state',
-          component: 'StateValEdit',
-          generate: () => DigitalState.STATE_INACTIVE,
-          valueHint: enumHint(DigitalState),
-          readonly: true,
-          graphed: true,
-        },
-      ],
     };
+
+    const fieldSpecs: BlockFieldSpec<MotorValveBlock>[] = [
+      {
+        type,
+        key: 'desiredState',
+        title: 'State',
+        component: 'StateValEdit',
+        generate: () => DigitalState.STATE_INACTIVE,
+        valueHint: enumHint(DigitalState),
+        graphed: true,
+        graphName: 'Desired state',
+      },
+      {
+        type,
+        key: 'constrainedBy',
+        title: 'Constraints',
+        component: 'DigitalConstraintsValEdit',
+        generate: (): DigitalConstraintsObj => ({ constraints: [] }),
+        pretty: prettifyConstraints,
+      },
+      {
+        type,
+        key: 'state',
+        title: 'Actual state',
+        component: 'StateValEdit',
+        generate: () => DigitalState.STATE_INACTIVE,
+        valueHint: enumHint(DigitalState),
+        readonly: true,
+        graphed: true,
+      },
+    ];
 
     const feature: WidgetFeature = {
       ...genericBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Motor Valve',
       role: 'Output',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 2,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
+    sparkStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

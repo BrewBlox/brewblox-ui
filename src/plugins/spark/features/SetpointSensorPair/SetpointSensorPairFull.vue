@@ -2,7 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { filterLabels } from '@/plugins/spark/getters';
+import { filterLabels } from '@/plugins/spark/const';
 import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/dialog';
 

@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress, BlockField, BlockType, SparkService } from '@/plugins/spark/types';
+import { Block, BlockAddress, BlockFieldSpec, BlockType, SparkService } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils';
 import { createBlockDialog } from '@/utils/dialog';
 
@@ -44,13 +44,13 @@ export default defineComponent({
       services.value.find(svc => svc.id === props.address?.serviceId)
       ?? null,
     );
-    const selectedFields = ref<BlockField[]>([]);
+    const selectedFields = ref<BlockFieldSpec[]>([]);
 
     const graphedTypes: BlockType[] =
       sparkStore
-        .specs
-        .filter(s => s.fields.some(f => f.graphed))
-        .map(s => s.id);
+        .fieldSpecs
+        .filter(f => f.graphed)
+        .map(s => s.type);
 
     const blocks = computed<Block[]>(
       () => sparkStore
@@ -58,12 +58,10 @@ export default defineComponent({
         .filter(block => graphedTypes.includes(block.type)),
     );
 
-    const fields = computed<BlockField[]>(
-      () => block.value
-        ? sparkStore.spec(block.value)
-          .fields
-          .filter(f => f.graphed)
-        : [],
+    const fields = computed<BlockFieldSpec[]>(
+      () => sparkStore
+        .fieldSpecsByType(block.value?.type)
+        .filter(f => f.graphed),
     );
 
     function selectService(v: SparkService | null): void {

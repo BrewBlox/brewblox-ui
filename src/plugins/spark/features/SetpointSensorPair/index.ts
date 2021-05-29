@@ -2,19 +2,26 @@ import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockIntfType, BlockSpec, BlockType, FilterChoice, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import {
+  BlockFieldSpec,
+  BlockIntfType,
+  BlockSpec,
+  BlockType,
+  FilterChoice,
+  SetpointSensorPairBlock,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { bloxLink, deltaTempQty, tempQty } from '@/utils/bloxfield';
 
 import widget from './SetpointSensorPairWidget.vue';
 
-const typeName = BlockType.SetpointSensorPair;
+const type = BlockType.SetpointSensorPair;
 
 const plugin: Plugin = {
   install(app) {
-    const spec: BlockSpec<SetpointSensorPairBlock> = {
-      id: typeName,
+    const blockSpec: BlockSpec<SetpointSensorPairBlock> = {
+      type,
       generate: () => ({
         sensorId: bloxLink(null, BlockIntfType.TempSensorInterface),
         storedSetting: tempQty(20),
@@ -26,71 +33,80 @@ const plugin: Plugin = {
         filter: FilterChoice.FILTER_15s,
         filterThreshold: deltaTempQty(5),
       }),
-      fields: [
-        {
-          key: 'storedSetting',
-          title: 'Setting',
-          component: 'QuantityValEdit',
-          generate: () => tempQty(20),
-        },
-        {
-          key: 'settingEnabled',
-          title: 'Enabled',
-          component: 'BoolValEdit',
-          generate: () => true,
-        },
-        {
-          key: 'filterThreshold',
-          title: 'Fast step threshold',
-          component: 'QuantityValEdit',
-          generate: () => deltaTempQty(5),
-        },
-        {
-          key: 'sensorId',
-          title: 'Linked Sensor',
-          component: 'LinkValEdit',
-          generate: () => bloxLink(null, BlockIntfType.TempSensorInterface),
-        },
-        {
-          key: 'setting',
-          title: 'Setting (actual)',
-          component: 'QuantityValEdit',
-          generate: () => tempQty(20),
-          readonly: true,
-          graphed: true,
-        },
-        {
-          key: 'value',
-          title: 'Sensor',
-          component: 'QuantityValEdit',
-          generate: () => tempQty(20),
-          readonly: true,
-          graphed: true,
-        },
-        {
-          key: 'valueUnfiltered',
-          title: 'Sensor unfiltered',
-          component: 'QuantityValEdit',
-          generate: () => tempQty(20),
-          readonly: true,
-          graphed: true,
-        },
-      ],
     };
+
+    const fieldSpecs: BlockFieldSpec<SetpointSensorPairBlock>[] = [
+      {
+        type,
+        key: 'storedSetting',
+        title: 'Setting',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+      },
+      {
+        type,
+        key: 'settingEnabled',
+        title: 'Enabled',
+        component: 'BoolValEdit',
+        generate: () => true,
+      },
+      {
+        type,
+        key: 'filterThreshold',
+        title: 'Fast step threshold',
+        component: 'QuantityValEdit',
+        generate: () => deltaTempQty(5),
+      },
+      {
+        type,
+        key: 'sensorId',
+        title: 'Linked Sensor',
+        component: 'LinkValEdit',
+        generate: () => bloxLink(null, BlockIntfType.TempSensorInterface),
+      },
+      {
+        type,
+        key: 'setting',
+        title: 'Setting (actual)',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
+        key: 'value',
+        title: 'Sensor',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
+        key: 'valueUnfiltered',
+        title: 'Sensor unfiltered',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+        readonly: true,
+        graphed: true,
+      },
+    ];
 
     const feature: WidgetFeature = {
       ...genericBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Setpoint',
       role: 'Process',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 2,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
+    sparkStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

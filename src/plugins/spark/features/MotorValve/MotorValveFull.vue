@@ -2,7 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DS2408StartChannels } from '@/plugins/spark/getters';
+import { DS2408StartChannels } from '@/plugins/spark/const';
 import { Block, BlockType, DS2408Block, DS2408ConnectMode, MotorValveBlock } from '@/plugins/spark/types';
 import { typeMatchFilter } from '@/utils/functional';
 import { mutate } from '@/utils/functional';

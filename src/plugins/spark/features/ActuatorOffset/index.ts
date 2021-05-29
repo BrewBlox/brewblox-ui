@@ -5,6 +5,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   AnalogConstraintsObj,
+  BlockFieldSpec,
   BlockIntfType,
   BlockSpec,
   BlockType,
@@ -16,13 +17,13 @@ import { bloxLink } from '@/utils/bloxfield';
 
 import widget from './ActuatorOffsetWidget.vue';
 
-const typeName = BlockType.ActuatorOffset;
+const type = BlockType.ActuatorOffset;
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<ActuatorOffsetBlock> = {
-      id: typeName,
+    const blockSpec: BlockSpec<ActuatorOffsetBlock> = {
+      type,
       generate: () => ({
         targetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
         drivenTargetId: bloxLink(null, BlockIntfType.SetpointSensorPairInterface, true),
@@ -34,73 +35,82 @@ const plugin: Plugin = {
         constrainedBy: { constraints: [] },
         enabled: true,
       }),
-      fields: [
-        {
-          key: 'desiredSetting',
-          title: 'Target offset',
-          component: 'NumberValEdit',
-          generate: () => 0,
-          valueHint: 'degC or %, depending on target',
-        },
-        {
-          key: 'enabled',
-          title: 'Enabled',
-          component: 'BoolValEdit',
-          generate: () => true,
-        },
-        {
-          key: 'targetId',
-          title: 'Target',
-          component: 'LinkValEdit',
-          generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
-        },
-        {
-          key: 'referenceId',
-          title: 'Reference',
-          component: 'LinkValEdit',
-          generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
-        },
-        {
-          key: 'constrainedBy',
-          title: 'Constraints',
-          component: 'AnalogConstraintsValEdit',
-          generate: (): AnalogConstraintsObj => ({ constraints: [] }),
-          pretty: prettifyConstraints,
-        },
-        {
-          key: 'setting',
-          title: 'Target offset',
-          component: 'NumberValEdit',
-          generate: () => 0,
-          valueHint: 'number',
-          readonly: true,
-          graphed: true,
-        },
-        {
-          key: 'value',
-          title: 'Actual offset',
-          component: 'NumberValEdit',
-          generate: () => 0,
-          valueHint: 'number',
-          readonly: true,
-          graphed: true,
-        },
-      ],
     };
+
+    const fieldSpecs: BlockFieldSpec<ActuatorOffsetBlock>[] = [
+      {
+        type,
+        key: 'desiredSetting',
+        title: 'Target offset',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: 'degC or %, depending on target',
+      },
+      {
+        type,
+        key: 'enabled',
+        title: 'Enabled',
+        component: 'BoolValEdit',
+        generate: () => true,
+      },
+      {
+        type,
+        key: 'targetId',
+        title: 'Target',
+        component: 'LinkValEdit',
+        generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+      },
+      {
+        type,
+        key: 'referenceId',
+        title: 'Reference',
+        component: 'LinkValEdit',
+        generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+      },
+      {
+        type,
+        key: 'constrainedBy',
+        title: 'Constraints',
+        component: 'AnalogConstraintsValEdit',
+        generate: (): AnalogConstraintsObj => ({ constraints: [] }),
+        pretty: prettifyConstraints,
+      },
+      {
+        type,
+        key: 'setting',
+        title: 'Target offset',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: 'number',
+        readonly: true,
+        graphed: true,
+      },
+      {
+        type,
+        key: 'value',
+        title: 'Actual offset',
+        component: 'NumberValEdit',
+        generate: () => 0,
+        valueHint: 'number',
+        readonly: true,
+        graphed: true,
+      },
+    ];
 
     const feature: WidgetFeature = {
       ...genericBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Setpoint Driver',
       role: 'Output',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 3,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
+    sparkStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

@@ -8,36 +8,34 @@ import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './DS2408Widget.vue';
 
-const typeName = BlockType.DS2408;
+const type = BlockType.DS2408;
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<DS2408Block> = {
-      id: typeName,
-      discovered: true,
+    const blockSpec: BlockSpec<DS2408Block> = {
+      type,
       generate: () => ({
         address: '',
         connected: false,
         pins: [],
         connectMode: DS2408ConnectMode.CONNECT_VALVE,
       }),
-      fields: [],
     };
 
     const feature: WidgetFeature = {
       ...discoveredBlockFeature,
-      id: typeName,
+      id: type,
       title: 'DS2408 Chip',
       role: 'Output',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 3,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };
