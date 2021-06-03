@@ -17,7 +17,7 @@ export default defineComponent({
   setup(props) {
 
     const pathLengths = computed<number[]>(
-      () => props.paths.map(v => svgPathProperties(v).getTotalLength()),
+      () => props.paths.map(v => new svgPathProperties(v).getTotalLength()),
     );
 
     const dashArrays = computed<number[][]>(

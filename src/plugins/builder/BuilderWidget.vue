@@ -28,6 +28,7 @@ export default defineComponent({
     } = useWidget.setup<Widget<BuilderConfig>>();
 
     const pending = ref<FlowPart | null>(null);
+    const zoomEnabled = ref<boolean>(inDialog.value);
 
     const storeLayouts = computed<BuilderLayout[]>(
       () => builderStore.layouts,
@@ -56,7 +57,10 @@ export default defineComponent({
       svgRef,
       svgContentRef,
       resetZoom,
-    } = useSvgZoom.setup(gridDimensions);
+    } = useSvgZoom.setup(gridDimensions, {
+      dragEnabled: zoomEnabled,
+      wheelEnabled: zoomEnabled,
+    });
 
     function startSelectLayout(): void {
       createDialog({
@@ -157,6 +161,7 @@ export default defineComponent({
       savePart,
       calculateFlowParts,
       resetZoom,
+      zoomEnabled,
     };
   },
 });
@@ -271,7 +276,13 @@ export default defineComponent({
           </template>
         </g>
       </svg>
-      <ScrollBlocker v-if="!inDialog" />
+      <q-toggle
+        v-if="!inDialog"
+        v-model="zoomEnabled"
+        class="absolute-top-right q-ma-sm"
+        icon="mdi-arrow-all"
+        left-label
+      />
     </div>
   </Card>
 </template>
