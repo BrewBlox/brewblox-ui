@@ -2,51 +2,53 @@ import { Plugin } from 'vue';
 
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
+import { BlockFieldSpec, BlockSpec, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { deltaTempQty, tempQty } from '@/utils/bloxfield';
 
 import widget from './TempSensorOneWireWidget.vue';
 
-const typeName = BlockType.TempSensorOneWire;
+const type = BlockType.TempSensorOneWire;
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<TempSensorOneWireBlock> = {
-      id: typeName,
-      discovered: true,
+    const blockSpec: BlockSpec<TempSensorOneWireBlock> = {
+      type,
       generate: () => ({
         value: tempQty(20),
         offset: deltaTempQty(0),
         address: '',
       }),
-      fields: [
-        {
-          key: 'value',
-          title: 'Sensor value',
-          component: 'QuantityValEdit',
-          generate: () => tempQty(20),
-          readonly: true,
-          graphed: true,
-        },
-      ],
     };
+
+    const fieldSpecs: BlockFieldSpec<TempSensorOneWireBlock>[] = [
+      {
+        type,
+        key: 'value',
+        title: 'Sensor value',
+        component: 'QuantityValEdit',
+        generate: () => tempQty(20),
+        readonly: true,
+        graphed: true,
+      },
+    ];
 
     const feature: WidgetFeature = {
       ...discoveredBlockFeature,
-      id: typeName,
+      id: type,
       title: 'OneWire Temp Sensor',
       role: 'Process',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 2,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
+    sparkStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

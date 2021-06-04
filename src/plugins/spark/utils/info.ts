@@ -1,16 +1,25 @@
 import isArray from 'lodash/isArray';
+import { Enum } from 'typescript-string-enums';
 
-import { Block, BlockIntfType, BlockType, SparkPatchEvent, SparkStateEvent, SparkUpdateEvent } from '@/shared-types';
+import {
+  Block,
+  BlockIntfType,
+  BlockType,
+  SparkPatchEvent,
+  SparkStateEvent,
+  SparkUpdateEvent,
+  SystemBlockType,
+} from '@/shared-types';
 import { featureStore } from '@/store/features';
 import { isLink } from '@/utils/bloxfield';
 
-import { compatibleTypes } from '../getters';
+import { compatibleTypes } from '../const';
 import { sparkStore } from '../store';
 import { BlockAddress, ComparedBlockType } from '../types';
 import { getDisplaySettingsBlock } from './system';
 
 
-export function isCompatible(type: string | null, intf: ComparedBlockType): boolean {
+export function isCompatible(type: Nullable<string>, intf: ComparedBlockType): boolean {
   if (!intf) { return true; }
   if (!type) { return false; }
   if (type === intf) { return true; }
@@ -22,6 +31,10 @@ export function ifCompatible<T extends Block>(block: Nullable<Block>, intf: Comp
   return block && isCompatible(block.type, intf)
     ? block as T
     : null;
+}
+
+export function isSystemBlockType(type: Nullable<string>): boolean {
+  return Enum.isType(SystemBlockType, type);
 }
 
 export function isBlockDisplayReady(addr: BlockAddress): boolean {

@@ -5,8 +5,8 @@ import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import {
   Block,
-  BlockField,
   BlockFieldAddress,
+  BlockFieldSpec,
   BlockOrIntfType,
   BlockSpec,
   ComparedBlockType,
@@ -41,7 +41,7 @@ export default defineComponent({
       default: () => true,
     },
     fieldFilter: {
-      type: Function as PropType<(field: BlockField) => boolean>,
+      type: Function as PropType<(field: BlockFieldSpec) => boolean>,
       default: () => true,
     },
   },
@@ -94,10 +94,10 @@ export default defineComponent({
 
     const validTypes = computed<BlockOrIntfType[]>(
       () => sparkStore
-        .specs
-        .filter(v => isCompatible(v.id, props.compatible))
-        .filter(v => v.fields.some(f => props.fieldFilter(f)))
-        .map(v => v.id),
+        .blockSpecs
+        .filter(spec => isCompatible(spec.type, props.compatible))
+        .filter(spec => sparkStore.fieldSpecs.some(f => f.type === spec.type && props.fieldFilter(f)))
+        .map(v => v.type),
     );
 
     const blockIdOpts = computed<string[]>(
@@ -114,36 +114,37 @@ export default defineComponent({
       () => sparkStore.blockById(serviceId.value, blockId.value),
     );
 
-    const spec = computed<BlockSpec | null>(
+    const blockSpec = computed<BlockSpec | null>(
       () => block.value
-        ? sparkStore.spec(block.value)
+        ? sparkStore.blockSpecByAddress(block.value)
         : null,
     );
 
     const fieldIdOpts = computed<SelectOption<string>[]>(
-      () => spec.value
-        ?.fields
+      () => sparkStore
+        .fieldSpecsByType(block.value?.type)
         .filter(f => props.fieldFilter(f))
         .map(f => ({ label: f.title, value: f.key }))
         ?? [],
     );
 
-    const field = computed<BlockField | null>(
-      () => spec.value && fieldId.value
-        ? spec.value.fields.find(f => f.key === fieldId.value) ?? null
-        : null,
+    const field = computed<BlockFieldSpec | null>(
+      () => sparkStore
+        .fieldSpecs
+        .find(f => f.type === block.value?.type && f.key === fieldId.value)
+        ?? null,
     );
 
     const localAddress = computed<BlockFieldAddress | null>(
       () => {
-        if (!fieldId.value || !spec.value || !field.value) {
+        if (!fieldId.value || !blockSpec.value || !field.value) {
           return null;
         }
         return {
           serviceId: serviceId.value,
           id: blockId.value,
           field: fieldId.value,
-          type: spec.value.id,
+          type: blockSpec.value.type,
         };
       },
     );
@@ -185,7 +186,6 @@ export default defineComponent({
       validTypes,
       blockIdOpts,
       block,
-      spec,
       fieldIdOpts,
       field,
       localAddress,

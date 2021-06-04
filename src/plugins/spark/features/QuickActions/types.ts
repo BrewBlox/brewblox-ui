@@ -1,5 +1,5 @@
 import { Block } from '@/plugins/spark/types';
-import { BlockField } from '@/plugins/spark/types';
+import { BlockFieldSpec } from '@/plugins/spark/types';
 import { Widget } from '@/store/widgets';
 
 export interface BlockChange<BlockT extends Block = Block> {
@@ -24,11 +24,28 @@ export interface QuickActionsConfig {
   serviceIdMigrated: boolean;
 }
 
+export interface QuickActionsChange {
+  id: string;
+  type: string;
+  config: unknown;
+
+  confirmed?: boolean;
+}
+
+export interface QuickActionsSpec {
+  id: string;
+  title: string;
+  pretty: (config: unknown) => string;
+  generate: () => unknown;
+  component: string;
+  componentProps?: AnyDict;
+}
+
 export type QuickActionsWidget = Widget<QuickActionsConfig>
 
 export interface EditableBlockField {
   id: string;
   value: any;
   confirmed: boolean;
-  specField: BlockField;
+  specField: BlockFieldSpec;
 }

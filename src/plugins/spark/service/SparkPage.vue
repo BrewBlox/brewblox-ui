@@ -31,7 +31,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const validTypes: BlockType[] = sparkStore.specs.map(s => s.id);
+    const validTypes: BlockType[] = sparkStore.blockSpecs.map(s => s.type);
 
     const service = computed<SparkService | null>(
       () => serviceStore.serviceById(props.serviceId),

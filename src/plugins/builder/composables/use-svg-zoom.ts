@@ -87,6 +87,10 @@ export const useSvgZoom: UseSvgZoomComposable = {
       }
 
       if (!dragEnabled.value) {
+        // Applied by d3.
+        // Remove to re-enable drag-based scrolling in widgets
+        svgRef.value.style.touchAction = '';
+
         selection
           .on('mousedown.zoom', null)
           .on('mouseup.zoom', null)

@@ -5,16 +5,16 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import {
-  Block,
   SparkService,
   SysInfoBlock,
-  SystemBlockType,
   TicksBlock,
   WiFiSettingsBlock,
 } from '@/plugins/spark/types';
 import { serviceStore } from '@/store/services';
 import { durationString } from '@/utils/duration';
-import { findByKey, shortDateString } from '@/utils/functional';
+import { shortDateString } from '@/utils/functional';
+
+import { getTicksBlock, getWiFiSettingsBlock } from '../../utils';
 
 export default defineComponent({
   name: 'SysInfoWidget',
@@ -34,20 +34,16 @@ export default defineComponent({
       () => shortDateString(sparkModule.value?.lastBlocks, 'Unknown'),
     );
 
-    function sysBlock<T extends Block>(blockType: SystemBlockType): T | null {
-      return findByKey(sparkStore.serviceBlocks(serviceId), 'type', blockType) as T | null;
-    }
-
     const sysInfo = computed<SysInfoBlock>(
       () => block.value,
     );
 
-    const ticks = computed<TicksBlock | null>(
-      () => sysBlock(SystemBlockType.Ticks),
+    const ticks = computed<TicksBlock | undefined>(
+      () => getTicksBlock(serviceId),
     );
 
-    const wifi = computed<WiFiSettingsBlock | null>(
-      () => sysBlock(SystemBlockType.WiFiSettings),
+    const wifi = computed<WiFiSettingsBlock | undefined>(
+      () => getWiFiSettingsBlock(serviceId),
     );
 
     const uptime = computed<string>(

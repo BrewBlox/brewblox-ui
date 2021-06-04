@@ -11,11 +11,11 @@ export interface UseFieldProps {
   },
   label: {
     type: PropType<string>,
-    required: false,
+    default: string,
   },
   message: {
     type: PropType<string>,
-    required: false,
+    default: string,
   },
   html: {
     type: PropType<boolean>,
@@ -23,7 +23,7 @@ export interface UseFieldProps {
   },
   tooltip: {
     type: PropType<string>,
-    required: false,
+    default: string,
   },
   readonly: {
     type: PropType<boolean>,
@@ -84,11 +84,11 @@ export const useField: UseFieldComposable = {
     },
     label: {
       type: String,
-      required: false,
+      default: '',
     },
     message: {
       type: String,
-      required: false,
+      default: '',
     },
     html: {
       type: Boolean,
@@ -96,7 +96,7 @@ export const useField: UseFieldComposable = {
     },
     tooltip: {
       type: String,
-      required: false,
+      default: '',
     },
     readonly: {
       type: Boolean,

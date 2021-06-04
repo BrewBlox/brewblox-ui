@@ -57,11 +57,11 @@ export default defineComponent({
       }
     }
 
-    function saveExpression(expr: string): void {
+    function saveExpression(expr: string | null): void {
       if (delayedSave.value !== null) {
         clearTimeout(delayedSave.value);
       }
-      localExpression.value = expr;
+      localExpression.value = expr ?? '';
       delayedSave.value = window.setTimeout(commit, 1000);
     }
 
@@ -258,6 +258,7 @@ export default defineComponent({
             v-for="{key, cmp, pretty} in digital"
             :key="`digital-${key}`"
             removable
+            clickable
             class="hoverable full-width"
             color="blue-grey-8"
             @click="editDigital(key, cmp)"
@@ -290,6 +291,7 @@ export default defineComponent({
             v-for="{key, cmp, pretty} in analog"
             :key="`analog-${key}`"
             removable
+            clickable
             class="hoverable full-width"
             color="blue-grey-8"
             @click="editAnalog(key, cmp)"
@@ -328,6 +330,7 @@ export default defineComponent({
             :key="`suggestion-${char}`"
             class="hoverable"
             color="blue-grey-8"
+            clickable
             @click="saveExpression(block.data.expression + char)"
           >
             {{ char }}
@@ -339,6 +342,7 @@ export default defineComponent({
             class="hoverable text-bold"
             color="blue-grey-8"
             text-color="lime-6"
+            clickable
             @click="saveExpression(block.data.expression + key)"
           >
             {{ key }}
@@ -350,6 +354,7 @@ export default defineComponent({
             class="hoverable text-bold"
             color="blue-grey-8"
             text-color="orange-6"
+            clickable
             @click="saveExpression(block.data.expression + key)"
           >
             {{ key }}
@@ -365,6 +370,7 @@ export default defineComponent({
             :key="`block-${block.id}`"
             class="hoverable"
             color="blue-grey-8"
+            clickable
             @click="addComparison(block)"
           >
             {{ block.id }}

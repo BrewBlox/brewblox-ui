@@ -28,6 +28,8 @@ export const SystemBlockType = Enum(
   'Ticks',
   'TouchSettings',
   'WiFiSettings',
+  'Spark2Pins',
+  'Spark3Pins',
 );
 
 export const UserBlockType = Enum(
@@ -47,8 +49,6 @@ export const UserBlockType = Enum(
   'Pid',
   'SetpointProfile',
   'SetpointSensorPair',
-  'Spark2Pins',
-  'Spark3Pins',
   'TempSensorCombi',
   'TempSensorMock',
   'TempSensorOneWire',

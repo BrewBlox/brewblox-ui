@@ -5,8 +5,8 @@ import { DialogChainObject } from 'quasar';
 import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { Block, BlockConfig, BlockSpec, ComparedBlockType } from '@/plugins/spark/types';
-import { isCompatible, makeBlockIdRules } from '@/plugins/spark/utils';
+import { Block, BlockConfig, BlockIntfType, ComparedBlockType, UserBlockType } from '@/plugins/spark/types';
+import { isCompatible, isSystemBlockType, makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
@@ -14,10 +14,6 @@ import { createDialog } from '@/utils/dialog';
 import { nullFilter, objectStringSorter, ruleValidator, suggestId } from '@/utils/functional';
 
 import { useWizard } from '../composables';
-
-interface BlockWizardOption extends SelectOption {
-  spec: BlockSpec;
-}
 
 export default defineComponent({
   name: 'BlockWizard',
@@ -47,7 +43,7 @@ export default defineComponent({
       setDialogTitle,
     } = useWizard.setup();
 
-    const selected = ref<BlockWizardOption | null>(null);
+    const selected = ref<SelectOption<UserBlockType> | null>(null);
     const lastGeneratedId = ref<string>('');
     const serviceId = ref<string | null>(
       props.activeServiceId
@@ -68,17 +64,20 @@ export default defineComponent({
       () => sparkStore.serviceIds,
     );
 
-    const wizardOpts = computed<BlockWizardOption[]>(
+    const wizardOpts = computed<SelectOption<UserBlockType>[]>(
       () => sparkStore
-        .specs
+        .blockSpecs
         .filter(spec =>
-          !spec.systemObject
-          && isCompatible(spec.id, props.compatible)
-          && props.filter(spec.id))
+          !isSystemBlockType(spec.type)
+          && isCompatible(spec.type, props.compatible)
+          && props.filter(spec.type))
         .map(spec => {
-          const feature = featureStore.widgetById(spec.id);
+          const feature = featureStore.widgetById(spec.type);
           return feature
-            ? { spec, value: spec.id, label: feature.title }
+            ? {
+              value: spec.type as UserBlockType,
+              label: feature.title,
+            }
             : null;
         })
         .filter(nullFilter)
@@ -106,7 +105,7 @@ export default defineComponent({
     );
 
     const discoveredType = computed<boolean>(
-      () => selected.value?.spec.discovered === true,
+      () => isCompatible(selected.value?.value, BlockIntfType.OneWireDeviceInterface),
     );
 
     const searchedOpts = computed<SelectOption[]>(
@@ -162,7 +161,7 @@ export default defineComponent({
           serviceId: serviceId.value,
           type: selected.value.value,
           groups: [0],
-          data: sparkStore.spec({ type: selected.value.value }).generate(),
+          data: sparkStore.blockSpecByType(selected.value.value).generate(),
         });
         activeBlock.value = sparkStore.blockById(serviceId.value, blockId.value);
       }
@@ -187,7 +186,7 @@ export default defineComponent({
       }
     }
 
-    function selectOpt(opt: BlockWizardOption | null): void {
+    function selectOpt(opt: SelectOption<UserBlockType> | null): void {
       selected.value = opt;
       if (opt === null) {
         return;

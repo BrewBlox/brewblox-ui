@@ -16,7 +16,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
   sparkModule: SparkServiceModule;
   block: Ref<UnwrapRef<BlockT>>;
   graphConfig: WritableComputedRef<GraphConfig | null>;
-  spec: ComputedRef<BlockSpec<BlockT>>;
+  blockSpec: ComputedRef<BlockSpec<BlockT>>;
   isVolatileBlock: ComputedRef<boolean>;
 
   saveBlock(block?: BlockT): Promise<void>;
@@ -68,8 +68,8 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       },
     );
 
-    const spec = computed<BlockSpec<BlockT>>(
-      () => sparkStore.spec(block.value),
+    const blockSpec = computed<BlockSpec<BlockT>>(
+      () => sparkStore.blockSpecByAddress(block.value)!,
     );
 
     const isVolatileBlock = computed<boolean>(
@@ -85,7 +85,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     );
 
     const hasGraph: boolean = !isVolatileBlock.value
-      && sparkStore.spec(block.value).fields.some(f => f.graphed);
+      && sparkStore.fieldSpecs.some(f => f.type === block.value.type && f.graphed);
 
     const graphConfig = computed<GraphConfig | null>({
       get: () => hasGraph ? makeBlockGraphConfig(block.value, config.value) : null,
@@ -115,7 +115,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       serviceId,
       blockId,
       block,
-      spec,
+      blockSpec,
       isVolatileBlock,
       saveBlock,
       constrainers,

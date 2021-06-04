@@ -2,7 +2,7 @@ import { ServiceStatus } from '@/store/services';
 import { isLink, prettyQty } from '@/utils/bloxfield';
 import { capitalized } from '@/utils/functional';
 
-import { constraintLabels } from '../getters';
+import { constraintLabels } from '../const';
 import { ApiSparkStatus, Block } from '../types';
 import { AnalogConstraint, DigitalConstraint, Limiters, RelationEdge, SparkStatus } from '../types';
 

@@ -9,14 +9,14 @@ import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './SysInfoWidget.vue';
 
-const typeName = BlockType.SysInfo;
+const type = BlockType.SysInfo;
 
 
 const plugin: Plugin = {
   install(app) {
 
-    const spec: BlockSpec<SysInfoBlock> = {
-      id: typeName,
+    const blockSpec: BlockSpec<SysInfoBlock> = {
+      type,
       generate: () => ({
         deviceId: '',
         platform: SparkPlatform.PLATFORM_UNKNOWN,
@@ -27,22 +27,21 @@ const plugin: Plugin = {
         command: null,
         trace: [],
       }),
-      fields: [],
     };
 
     const feature: WidgetFeature = {
       ...systemBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Spark System Info',
       role: 'Display',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 3,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

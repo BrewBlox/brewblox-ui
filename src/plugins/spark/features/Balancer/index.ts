@@ -8,32 +8,31 @@ import { featureStore, WidgetFeature } from '@/store/features';
 
 import widget from './BalancerWidget.vue';
 
-const typeName = BlockType.Balancer;
+const type = BlockType.Balancer;
 
 
 const plugin: Plugin = {
   install(app) {
-    const spec: BlockSpec<BalancerBlock> = {
-      id: typeName,
+    const blockSpec: BlockSpec<BalancerBlock> = {
+      type,
       generate: () => ({
         clients: [],
       }),
-      fields: [],
     };
 
     const feature: WidgetFeature = {
       ...genericBlockFeature,
-      id: typeName,
+      id: type,
       title: 'Balancer',
       role: 'Constraint',
-      component: blockWidgetSelector(app, widget, typeName),
+      component: blockWidgetSelector(app, widget, type),
       widgetSize: {
         cols: 4,
         rows: 2,
       },
     };
 
-    sparkStore.addBlockSpec(spec);
+    sparkStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };
