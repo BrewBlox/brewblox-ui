@@ -90,6 +90,7 @@ export default defineComponent({
           :key="`suggestion-${tag}`"
           class="hoverable"
           color="blue-grey-8"
+          clickable
           @click="save([...modelValue, tag])"
         >
           {{ tag }}

@@ -111,22 +111,26 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-list class="clickable">
-    <div :class="['q-pa-sm q-gutter-x-sm row', textColor]" @click="openDialog">
-      <q-icon name="mdi-border-outside" class="col-auto" size="sm" />
-      <div class="col-auto">
-        <small v-if="limiters.length">
-          Limited by:
-          <i>{{ limiters.join(', ') }}</i>
-        </small>
-        <small v-else-if="numConstraints > 0">
-          {{ numConstraints }} constraint(s), not limited</small>
-        <small v-else>
-          No constraints configured</small>
-      </div>
+  <div
+    :class="[
+      'q-ma-sm q-pa-sm q-gutter-x-sm row clickable rounded-borders',
+      textColor
+    ]"
+    @click="openDialog"
+  >
+    <q-icon name="mdi-border-outside" class="col-auto" size="sm" />
+    <div class="col-auto">
+      <small v-if="limiters.length">
+        Limited by:
+        <i>{{ limiters.join(', ') }}</i>
+      </small>
+      <small v-else-if="numConstraints > 0">
+        {{ numConstraints }} constraint(s), not limited</small>
+      <small v-else>
+        No constraints configured</small>
     </div>
     <q-tooltip v-if="numConstraints > 0">
       {{ displayString }}
     </q-tooltip>
-  </q-list>
+  </div>
 </template>

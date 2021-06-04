@@ -9,7 +9,7 @@ export default defineComponent({
     ...useDialog.props,
     modelValue: {
       type: Array,
-      required: true,
+      default: () => [],
     },
     selectOptions: {
       type: Array as PropType<SelectOption[]>,
@@ -68,7 +68,7 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{title, message, html}">
-      <div class="q-gutter-sm">
+      <div class="q-gutter-sm column">
         <q-checkbox
           v-for="(opt, idx) in selectOptions"
           :key="'opt-'+idx"
