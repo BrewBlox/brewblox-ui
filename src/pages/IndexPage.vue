@@ -6,8 +6,9 @@ import { builderStore } from '@/plugins/builder/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
-import { createDialog } from '@/utils/dialog';
-import { objectSorter } from '@/utils/functional';
+import { createDialog, makeObjectSorter } from '@/utils';
+
+const dashboardSorter = makeObjectSorter('order');
 
 export default defineComponent({
   name: 'IndexPage',
@@ -19,7 +20,7 @@ export default defineComponent({
         const { homePage } = systemStore.config;
 
         const defaultPage = [...dashboardStore.dashboards]
-          .sort(objectSorter('order'))
+          .sort(dashboardSorter)
           .map(v => `/dashboard/${v.id}`)[0] ?? null;
 
         // Defaults to first dashboard

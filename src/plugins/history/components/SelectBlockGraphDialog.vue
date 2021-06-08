@@ -6,7 +6,7 @@ import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockAddress, BlockFieldSpec, BlockType, SparkService } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils';
 
 import { GraphConfig } from '../types';
 

@@ -8,15 +8,14 @@ import {
   PidBlock,
   SetpointProfileBlock,
 } from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
-import { spliceById, typeMatchFilter } from '@/utils/functional';
+import { createDialog, makeTypeFilter, spliceById } from '@/utils';
 
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlPidView from './TempControlPidView.vue';
 import { TempControlMode, TempControlWidget } from './types';
 
-const pidFilter = typeMatchFilter<PidBlock>(BlockType.Pid);
-const profileFilter = typeMatchFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
+const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
+const profileFilter = makeTypeFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
 
 export default defineComponent({
   name: 'TempControlFull',

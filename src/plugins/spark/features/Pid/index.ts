@@ -11,10 +11,10 @@ import {
   deltaTempMultHourQty,
   deltaTempPerMinuteQty,
   deltaTempQty,
+  durationString,
   inverseTempQty,
   tempQty,
-} from '@/utils/bloxfield';
-import { durationString } from '@/utils/duration';
+} from '@/utils';
 
 import widget from './PidWidget.vue';
 

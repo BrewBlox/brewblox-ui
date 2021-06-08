@@ -6,9 +6,7 @@ import { computed, defineComponent } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockFieldSpec } from '@/plugins/spark/types';
-import { isQuantity, prettyAny, prettyQty, Quantity } from '@/utils/bloxfield';
-import { roundNumber } from '@/utils/functional';
-import notify from '@/utils/notify';
+import { isQuantity, notify, prettyAny, prettyQty, Quantity, roundNumber } from '@/utils';
 
 import { QuickValuesWidget } from './types';
 

@@ -2,8 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { startChangeWidgetTitle } from '@/utils/widgets';
+import { createDialog, startChangeWidgetTitle } from '@/utils';
 
 import Toolbar from './Toolbar.vue';
 

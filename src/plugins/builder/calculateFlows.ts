@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
 import set from 'lodash/set';
 
-import { Coordinates } from '@/utils/coordinates';
+import { Coordinates } from '@/utils';
 
 import { FlowSegment, mergeOverlappingSplits } from './FlowSegment';
 import {

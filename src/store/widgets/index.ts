@@ -1,7 +1,7 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { extendById, filterById, findById } from '@/utils';
 
 import api from './api';
 import type { Widget } from './types';
@@ -17,7 +17,7 @@ export class WidgetModule extends VuexModule {
     return this.widgets.map(v => v.id);
   }
 
-  public widgetById<T extends Widget>(id: Nullable<string>): T | null {
+  public widgetById<T extends Widget>(id: Maybe<string>): T | null {
     return (findById(this.widgets, id) ?? findById(this.volatileWidgets, id)) as T | null;
   }
 

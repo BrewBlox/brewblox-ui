@@ -4,7 +4,7 @@ import { settingsBlock, showAbsentBlock, showDrivingBlockDialog } from '@/plugin
 import { sparkStore } from '@/plugins/spark/store';
 import { ActuatorPwmBlock, BlockType, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
-import { createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils';
 
 export type PumpT = DigitalActuatorBlock | ActuatorPwmBlock;
 export const PUMP_KEY = 'actuator';

@@ -1,13 +1,16 @@
+import capitalize from 'lodash/capitalize';
 import escapeRegExp from 'lodash/escapeRegExp';
 import flatMap from 'lodash/flatMap';
 import set from 'lodash/set';
+import startCase from 'lodash/startCase';
 
-import { propertyNameWithUnit } from '@/plugins/spark/parse-object';
-import { prettyUnit } from '@/utils/bloxfield';
-import { sentenceCased } from '@/utils/functional';
+import { prettyUnit, propertyNameWithUnit } from '@/utils';
 
 import { QueryTarget } from './types';
 
+function sentenceCased(s: string): string {
+  return capitalize(startCase(s));
+}
 
 export const defaultLabel = (key: string): string => {
   const [name, postfix] = propertyNameWithUnit(key);

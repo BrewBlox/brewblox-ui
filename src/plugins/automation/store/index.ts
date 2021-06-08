@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { extendById, filterById, findById } from '@/utils';
 
 import type {
   AutomationEventData,

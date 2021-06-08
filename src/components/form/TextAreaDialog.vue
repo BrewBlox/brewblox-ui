@@ -2,7 +2,7 @@
 import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils';
 
 export default defineComponent({
   name: 'TextAreaDialog',

@@ -5,8 +5,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { combineFuncLabels } from '@/plugins/spark/const';
 import { BlockIntfType, Link, TempSensorCombiBlock } from '@/plugins/spark/types';
-import { bloxLink, prettyQty } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
+import { bloxLink, createDialog, prettyQty } from '@/utils';
 
 const combineFuncOpts: SelectOption[] =
   Object.entries(combineFuncLabels)

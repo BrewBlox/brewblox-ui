@@ -7,9 +7,7 @@ import { dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
-import { ruleErrorFinder } from '@/utils/functional';
-import { loadFile } from '@/utils/import-export';
-import notify from '@/utils/notify';
+import { loadFile, makeRuleErrorFinder, notify } from '@/utils';
 
 import { useWizard } from '../composables';
 
@@ -21,7 +19,7 @@ const widgetRules: InputRule[] = [
   v => !!v.config || 'Widget must have config settings',
 ];
 
-const errorFinder = ruleErrorFinder(widgetRules);
+const errorFinder = makeRuleErrorFinder(widgetRules);
 
 export default defineComponent({
   name: 'ImportWizard',

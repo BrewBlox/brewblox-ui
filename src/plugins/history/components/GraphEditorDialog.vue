@@ -3,8 +3,7 @@ import defaults from 'lodash/defaults';
 import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { createDialog, deepCopy } from '@/utils';
 
 import { emptyGraphConfig } from '../getters';
 import { GraphConfig, SharedGraphConfig } from '../types';

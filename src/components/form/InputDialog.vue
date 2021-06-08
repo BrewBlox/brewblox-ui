@@ -3,8 +3,7 @@ import isString from 'lodash/isString';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { round, ruleValidator } from '@/utils/functional';
+import { createDialog, fixedNumber, makeRuleValidator } from '@/utils';
 
 const typeValidator = (v: unknown): boolean =>
   isString(v) && ['text', 'number'].includes(v);
@@ -63,14 +62,14 @@ export default defineComponent({
       onDialogOK,
     } = useDialog.setup();
 
-    const local = ref<string | number>(
+    const local = ref<string>(
       props.type === 'number'
-        ? round(Number(props.modelValue), props.decimals)
-        : props.modelValue,
+        ? fixedNumber(Number(props.modelValue), props.decimals)
+        : `${props.modelValue}`,
     );
 
     const isValid = computed<boolean>(
-      () => ruleValidator(props.rules)(local.value),
+      () => makeRuleValidator(props.rules)(local.value),
     );
 
     const nativeProps = computed<AnyDict>(
@@ -87,8 +86,8 @@ export default defineComponent({
         return;
       }
       const outputValue =
-        (props.type === 'number' && isString(local.value))
-          ? parseFloat(local.value as string)
+        (props.type === 'number')
+          ? parseFloat(local.value)
           : local.value;
       onDialogOK(outputValue);
     }

@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { ruleValidator } from '@/utils/functional';
+import { makeRuleValidator } from '@/utils';
 
 export default defineComponent({
   name: 'DatetimeDialog',
@@ -39,7 +39,7 @@ export default defineComponent({
     const local = ref<Date | null>(props.modelValue);
 
     const valid = computed<boolean>(
-      () => ruleValidator(props.rules)(local.value),
+      () => makeRuleValidator(props.rules)(local.value),
     );
 
     function save(): void {

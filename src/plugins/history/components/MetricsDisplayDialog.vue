@@ -2,8 +2,7 @@
 import { computed, defineComponent, PropType, reactive } from 'vue';
 
 import { useDialog } from '@/composables';
-import { durationMs, durationString } from '@/utils/duration';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy, durationMs, durationString } from '@/utils';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/const';
 import { MetricsConfig } from '../Metrics/types';

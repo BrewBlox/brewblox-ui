@@ -7,8 +7,7 @@ import { GraphAxis, GraphConfig } from '@/plugins/history/types';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, BlockConfig, BlockFieldSpec, ProfileValues } from '@/plugins/spark/types';
 import { Block, SetpointProfileBlock } from '@/shared-types';
-import { bloxQty, isQuantity, prettyUnit } from '@/utils/bloxfield';
-import notify from '@/utils/notify';
+import { bloxQty, isQuantity, notify, prettyUnit } from '@/utils';
 
 export const asBlockAddress =
   (block: Block): BlockAddress =>

@@ -1,8 +1,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import { createDialog } from '@/utils/dialog';
-import { durationString } from '@/utils/duration';
+import { createDialog, durationString } from '@/utils';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/const';
 import { MetricsConfig } from '../Metrics/types';

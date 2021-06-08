@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { featureStore, QuickstartFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
+import { cref } from '@/utils';
 
 import FermentCompletionTask from './FermentCompletionTask.vue';
 import FermentHardwareTask from './FermentHardwareTask.vue';

@@ -1,7 +1,7 @@
 import { dashboardStore } from '@/store/dashboards';
 import { Widget, widgetStore } from '@/store/widgets';
-import { createDialogPromise } from '@/utils/dialog';
-import { saveFile } from '@/utils/import-export';
+import { createDialogPromise } from '@/utils';
+import { saveFile } from '@/utils';
 
 import { typeName as graphType } from './Graph/getters';
 import { historyStore } from './store';

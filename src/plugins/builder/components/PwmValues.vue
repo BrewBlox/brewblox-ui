@@ -1,11 +1,10 @@
 <script lang="ts">
-
 import { computed, defineComponent, PropType } from 'vue';
 
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, textTransformation } from '@/plugins/builder/utils';
 import { ActuatorPwmBlock, BlockType } from '@/plugins/spark/types';
-import { truncateRound } from '@/utils/functional';
+import { preciseNumber } from '@/utils';
 
 import { usePart, useSettingsBlock } from '../composables';
 
@@ -59,7 +58,7 @@ export default defineComponent({
 
     return {
       coord2grid,
-      truncateRound,
+      preciseNumber,
       block,
       isBroken,
       pwmValue,
@@ -99,7 +98,7 @@ export default defineComponent({
       <template v-else>
         <PwmIcon class="col" />
         <div class="col text-bold">
-          {{ truncateRound(pwmValue) }}
+          {{ preciseNumber(pwmValue) }}
           <small v-if="!!block">%</small>
         </div>
       </template>

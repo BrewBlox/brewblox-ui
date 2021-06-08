@@ -4,9 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, PidBlock, Quantity, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { isBlockDriven, prettyBlock } from '@/plugins/spark/utils';
-import { prettyQty, tempQty } from '@/utils/bloxfield';
-import { createBlockDialog } from '@/utils/dialog';
-import { round } from '@/utils/functional';
+import { createBlockDialog, fixedNumber, prettyQty, tempQty } from '@/utils';
 
 interface GridOpts {
   start?: number;
@@ -84,7 +82,7 @@ export default defineComponent({
     return {
       prettyBlock,
       prettyQty,
-      round,
+      fixedNumber,
       serviceId,
       block,
       saveBlock,
@@ -264,7 +262,7 @@ export default defineComponent({
 
       <div class="span-2">
         <LabeledField label="P">
-          {{ round(block.data.p ) }}
+          {{ fixedNumber(block.data.p ) }}
         </LabeledField>
       </div>
 
@@ -399,7 +397,7 @@ export default defineComponent({
 
       <div class="span-2 calc-line">
         <LabeledField label="D">
-          {{ round(block.data.d) }}
+          {{ fixedNumber(block.data.d) }}
           <template #after>
             <sub class="self-end">+</sub>
           </template>
@@ -414,7 +412,7 @@ export default defineComponent({
         :style="grid({start: 10, span: 2})"
       >
         <LabeledField label="Boil mode">
-          {{ round(boilAdjustment) }}
+          {{ fixedNumber(boilAdjustment) }}
           <template #after>
             <sub class="self-end">+</sub>
           </template>
@@ -425,7 +423,7 @@ export default defineComponent({
 
       <div :style="grid({start: 10, span: 2})">
         <LabeledField label="Output">
-          {{ round(baseOutput + boilAdjustment) }}
+          {{ fixedNumber(baseOutput + boilAdjustment) }}
         </LabeledField>
       </div>
     </div>
@@ -455,8 +453,8 @@ export default defineComponent({
         @update:model-value="v => { block.data.boilPointAdjust = v; saveBlock(); }"
       >
         <template #value>
-          <span class="darkish">{{ round(waterBoilTemp.value, 0) }}</span> +
-          <b>{{ round(block.data.boilPointAdjust.value) }}</b>
+          <span class="darkish">{{ fixedNumber(waterBoilTemp.value, 0) }}</span> +
+          <b>{{ fixedNumber(block.data.boilPointAdjust.value) }}</b>
         </template>
       </QuantityField>
     </div>

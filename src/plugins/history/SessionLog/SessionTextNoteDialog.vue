@@ -3,7 +3,7 @@ import { QInput } from 'quasar';
 import { defineComponent, nextTick, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils';
 
 export default defineComponent({
   name: 'SessionTextNoteDialog',

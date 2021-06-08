@@ -1,6 +1,6 @@
 import { CENTER, LEFT } from '@/plugins/builder/const';
 import { PartSpec } from '@/plugins/builder/types';
-import { Coordinates } from '@/utils/coordinates';
+import { Coordinates } from '@/utils';
 
 const SIZE_X = 1;
 const SIZE_Y = 4;

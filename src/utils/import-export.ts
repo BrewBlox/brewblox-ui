@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import { exportFile } from 'quasar';
 
-import { deserialize } from '@/utils/parse-object';
+import { deserialize } from './parsing';
 
 export function saveFile(exported: unknown, title: string, raw = false): void {
   const content = raw ? exported : JSON.stringify(exported);

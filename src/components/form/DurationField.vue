@@ -3,9 +3,13 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
-import { bloxQty, isQuantity } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
-import { durationString, isDurationString } from '@/utils/duration';
+import {
+  bloxQty,
+  createDialog,
+  durationString,
+  isDurationString,
+  isQuantity,
+} from '@/utils';
 
 function modelValidator(v: unknown): boolean {
   return isQuantity(v) || isDurationString(v);

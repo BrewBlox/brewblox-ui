@@ -3,11 +3,16 @@ import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Quantity, Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
-import { bloxQty, tempQty } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
-import { durationMs, durationString } from '@/utils/duration';
-import { deepCopy, objectSorter } from '@/utils/functional';
-import notify from '@/utils/notify';
+import {
+  bloxQty,
+  createDialog,
+  deepCopy,
+  durationMs,
+  durationString,
+  makeObjectSorter,
+  notify,
+  tempQty,
+} from '@/utils';
 
 interface DisplaySetpoint {
   offsetMs: number;
@@ -30,7 +35,7 @@ export default defineComponent({
 
     const points = computed<DisplaySetpoint[]>(
       () => [...block.value.data.points]
-        .sort(objectSorter('time'))
+        .sort(makeObjectSorter('time'))
         .map((point: Setpoint) => ({
           offsetMs: point.time * 1000,
           absTimeMs: start.value + (point.time * 1000),
@@ -40,7 +45,7 @@ export default defineComponent({
 
     function savePoints(pts: DisplaySetpoint[] = points.value): void {
       block.value.data.points = [...pts]
-        .sort(objectSorter('offsetMs'))
+        .sort(makeObjectSorter('offsetMs'))
         .map((point: DisplaySetpoint) => ({
           time: point.offsetMs / 1000,
           temperature: point.temperature,
@@ -123,7 +128,7 @@ export default defineComponent({
             temperature: current,
           };
 
-          const [first, second] = [pinned, changed].sort(objectSorter('absTimeMs'));
+          const [first, second] = [pinned, changed].sort(makeObjectSorter('absTimeMs'));
 
           createDialog({
             component: 'ConfirmDialog',

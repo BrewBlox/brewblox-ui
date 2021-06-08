@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 
-import { findById } from '@/utils/functional';
+import { findById } from '@/utils';
 
 import { AutomationTemplate, AutomationTransition } from './types';
 

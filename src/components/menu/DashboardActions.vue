@@ -5,11 +5,11 @@ import { useRouter } from 'vue-router';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 import {
+  createDialog,
   startChangeDashboardId,
   startChangeDashboardTitle,
   startRemoveDashboard,
-} from '@/utils/dashboards';
-import { createDialog } from '@/utils/dialog';
+} from '@/utils';
 
 export default defineComponent({
   name: 'DashboardActions',

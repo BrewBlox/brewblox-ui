@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils';
 
 import { historyStore } from '../store';
 import { LoggedSession } from '../types';

@@ -3,7 +3,7 @@ import KeyboardLayouts from 'simple-keyboard-layouts';
 
 import { systemStore } from '@/store/system';
 import { SystemConfig } from '@/store/system/types';
-import { createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils';
 
 export function startChangeKeyboardLayout(): DialogChainObject {
   return createDialog({

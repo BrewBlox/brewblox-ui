@@ -2,7 +2,7 @@
 
 import { computed, defineComponent, PropType } from 'vue';
 
-import { prettyQty } from '@/utils/bloxfield';
+import { prettyQty } from '@/utils';
 
 import { PidConfig } from '../types';
 

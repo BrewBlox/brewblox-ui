@@ -7,8 +7,7 @@ import type { Block, BlockAddress, ComparedBlockType } from '@/plugins/spark/typ
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
-import { createBlockDialog } from '@/utils/dialog';
-import { objectStringSorter } from '@/utils/functional';
+import { createBlockDialog, makeObjectSorter } from '@/utils';
 
 const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
   id: v?.id ?? null,
@@ -100,7 +99,7 @@ export default defineComponent({
         .filter(block => typeFilter.value(block.type))
         .filter(props.blockFilter)
         .map(asAddr)
-        .sort(objectStringSorter('id')),
+        .sort(makeObjectSorter('id')),
     );
 
     const block = computed<Block | null>(

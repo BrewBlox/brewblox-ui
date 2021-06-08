@@ -3,9 +3,7 @@ import { defineComponent, PropType, ref, watch } from 'vue';
 
 import { analogConstraintLabels } from '@/plugins/spark/const';
 import { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj, BlockType } from '@/plugins/spark/types';
-import { bloxLink } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { bloxLink, createDialog, deepCopy } from '@/utils';
 
 const constraintOpts: SelectOption[] =
   Object.entries(analogConstraintLabels)

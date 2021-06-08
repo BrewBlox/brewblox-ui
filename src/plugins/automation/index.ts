@@ -1,11 +1,10 @@
 import { Plugin } from 'vue';
 
+import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
-import { deserialize } from '@/plugins/spark/parse-object';
 import { startup } from '@/startup';
 import { featureStore, WatcherFeature, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
-import { STATE_TOPIC } from '@/utils/const';
+import { cref, deserialize } from '@/utils';
 
 import AutomationWatcher from './AutomationWatcher.vue';
 import AutomationWidget from './AutomationWidget.vue';

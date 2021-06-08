@@ -1,10 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import get from 'lodash/get';
 
-import { HOST } from '@/utils/const';
-import notify from '@/utils/notify';
+import { HOST } from '@/const';
 
-const instance = axios.create({ baseURL: HOST });
+import { notify } from './notify';
+
+export const http = axios.create({ baseURL: HOST });
 
 export function parseHttpError(e: AxiosError, verbose = false): string {
   const resp = get(e, 'response.data', e.message ?? null);
@@ -23,5 +24,3 @@ export function intercept(desc: string): ((e: AxiosError) => never) {
     throw e;
   };
 }
-
-export default instance;

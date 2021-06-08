@@ -1,6 +1,8 @@
+import fromPairs from 'lodash/fromPairs';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 import mapValues from 'lodash/mapValues';
+import toPairs from 'lodash/toPairs';
 
 import {
   BlockOrIntfType,
@@ -10,8 +12,7 @@ import {
   Quantity,
   rawLink,
   rawQty,
-} from '@/utils/bloxfield';
-import { mapEntries } from '@/utils/functional';
+} from './bloxfield';
 
 
 // string start
@@ -69,8 +70,10 @@ export function deserialize<T>(obj: T): T {
     return obj;
   }
   if (isObject(obj)) {
-    return mapEntries(obj,
-      ([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]);
+    return fromPairs(
+      toPairs(obj)
+        .map(([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]),
+    ) as T;
   }
   return obj;
 }

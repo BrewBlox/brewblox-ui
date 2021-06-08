@@ -5,7 +5,7 @@ import { sparkType } from '@/plugins/spark/const';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType } from '@/plugins/spark/types';
 import { Service, serviceStore, ServiceStub } from '@/store/services';
-import { startCreateService } from '@/utils/services';
+import { startCreateService } from '@/utils';
 
 import { QuickstartConfig } from '../types';
 

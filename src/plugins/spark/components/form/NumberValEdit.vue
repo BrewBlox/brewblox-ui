@@ -2,7 +2,7 @@
 import { defineComponent } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
-import { createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils';
 
 export default defineComponent({
   name: 'NumberValEdit',

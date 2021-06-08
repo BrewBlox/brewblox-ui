@@ -24,7 +24,7 @@ export const isLink =
     isBloxField(obj)
     && obj.__bloxtype === 'Link';
 
-export const prettyUnit = (value: Nullable<Quantity | string>): string => {
+export const prettyUnit = (value: Maybe<Quantity | string>): string => {
   const unit = isQuantity(value) ? value.unit : value;
   if (!unit) {
     return '';
@@ -42,7 +42,7 @@ export const prettyUnit = (value: Nullable<Quantity | string>): string => {
 };
 
 export const prettyQty =
-  (q: Nullable<Quantity>, precision = 2): string => {
+  (q: Maybe<Quantity>, precision = 2): string => {
     if (!isQuantity(q)) {
       return '---';
     }
@@ -61,7 +61,7 @@ export const roundedQty =
     value: round(q.value ?? 0, precision),
   });
 
-export const prettyLink = (v: Nullable<Link>): string =>
+export const prettyLink = (v: Maybe<Link>): string =>
   v?.id || '[not set]';
 
 export const prettyAny = (v: unknown): string => {

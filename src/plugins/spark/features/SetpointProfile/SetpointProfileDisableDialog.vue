@@ -5,9 +5,7 @@ import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { calculateProfileValues } from '@/plugins/spark/utils';
 import { Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
-import { prettyUnit, roundedQty, tempQty } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { createDialog, deepCopy, prettyUnit, roundedQty, tempQty } from '@/utils';
 
 
 export default defineComponent({

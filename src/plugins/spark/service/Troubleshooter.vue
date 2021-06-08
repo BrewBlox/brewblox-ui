@@ -5,7 +5,7 @@ import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
 import { ContextKey } from '@/symbols';
-import { createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils';
 
 export default defineComponent({
   name: 'Troubleshooter',

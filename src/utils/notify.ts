@@ -3,6 +3,8 @@ import { Notify } from 'quasar';
 
 import { loggingStore, LogLevel } from '@/store/logging';
 
+type NotifyFunc = (message: QNotifyArgs, options?: Partial<RecordOpts>) => void;
+
 export type QNotifyArgs = Parameters<Notify['create']>[0]
 
 export interface RecordOpts {
@@ -26,7 +28,7 @@ export const notifyIcons: Record<LogLevel, string> = {
   ERROR: 'error',
 };
 
-const notify = (level: LogLevel, message: QNotifyArgs, opts: Partial<RecordOpts>): void => {
+function basicNotify(level: LogLevel, message: QNotifyArgs, opts: Partial<RecordOpts> = {}): void {
   const args = {
     message: '',
     html: true,
@@ -46,20 +48,15 @@ const notify = (level: LogLevel, message: QNotifyArgs, opts: Partial<RecordOpts>
   if (opts.shown ?? true) {
     Notify.create(args);
   }
-};
-const debug = (message: QNotifyArgs, options: Partial<RecordOpts> = {}): void =>
-  notify('DEBUG', message, options);
-const info = (message: QNotifyArgs, options: Partial<RecordOpts> = {}): void =>
-  notify('INFO', message, options);
-const done = (message: QNotifyArgs, options: Partial<RecordOpts> = {}): void =>
-  notify('DONE', message, options);
-const warn = (message: QNotifyArgs, options: Partial<RecordOpts> = {}): void =>
-  notify('WARN', message, options);
-const error = (message: QNotifyArgs, options: Partial<RecordOpts> = {}): void =>
-  notify('ERROR', message, options);
+}
 
-export default {
-  notify,
+const debug: NotifyFunc = (msg, opts) => basicNotify('DEBUG', msg, opts);
+const info: NotifyFunc = (msg, opts) => basicNotify('INFO', msg, opts);
+const done: NotifyFunc = (msg, opts) => basicNotify('DONE', msg, opts);
+const warn: NotifyFunc = (msg, opts) => basicNotify('WARN', msg, opts);
+const error: NotifyFunc = (msg, opts) => basicNotify('ERROR', msg, opts);
+
+export const notify = {
   debug,
   info,
   done,

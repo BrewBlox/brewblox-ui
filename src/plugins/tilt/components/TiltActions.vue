@@ -4,7 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { TiltService } from '@/plugins/tilt/types';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
-import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
+import { startChangeServiceTitle, startRemoveService } from '@/utils';
 
 export default defineComponent({
   name: 'TiltActions',

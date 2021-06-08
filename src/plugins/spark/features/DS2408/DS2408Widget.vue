@@ -12,7 +12,7 @@ import {
   MotorValveBlock,
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils';
 
 const connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
   { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },

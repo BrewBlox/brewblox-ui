@@ -6,8 +6,7 @@ import { computed, defineComponent, nextTick, onMounted, PropType, ref } from 'v
 
 import { useDialog } from '@/composables';
 import { systemStore } from '@/store/system';
-import { isDurationString } from '@/utils/duration';
-import { ruleValidator } from '@/utils/functional';
+import { isDurationString, makeRuleValidator } from '@/utils';
 
 type BoardType = 'text' | 'number' | 'duration';
 
@@ -92,7 +91,7 @@ export default defineComponent({
     );
 
     const valid = computed<boolean>(
-      () => ruleValidator(localRules.value)(local.value),
+      () => makeRuleValidator(localRules.value)(local.value),
     );
 
     function findLayout(): any {

@@ -3,8 +3,7 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { objectStringSorter } from '@/utils/functional';
+import { createDialog, makeObjectSorter } from '@/utils';
 
 import { builderStore } from '../store';
 import { FlowPart, PartSpec, PersistentPart } from '../types';
@@ -48,7 +47,7 @@ export default defineComponent({
         const filter = new RegExp(partFilter.value || '', 'i');
         return builderStore.specs
           .filter(spec => `${spec.id}|${spec.title}`.match(filter))
-          .sort(objectStringSorter('title'))
+          .sort(makeObjectSorter('title'))
           .map(spec => ({
             spec,
             part: asFlowPart({

@@ -2,8 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useWidget } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { shortDateString, spliceById } from '@/utils/functional';
+import { createDialog, shortDateString, spliceById } from '@/utils';
 
 import { historyStore } from '../store';
 import { GraphAnnotation, LoggedSession, SessionGraphNote, SessionNote } from '../types';

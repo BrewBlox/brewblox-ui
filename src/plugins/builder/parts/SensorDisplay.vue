@@ -4,8 +4,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER } from '@/plugins/builder/const';
 import { coord2grid, liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
-import { prettyUnit } from '@/utils/bloxfield';
-import { round } from '@/utils/functional';
+import { fixedNumber, prettyUnit } from '@/utils';
 
 import { usePart, useSettingsBlock } from '../composables';
 import { SENSOR_KEY, SENSOR_TYPES, SensorT } from '../specs/SensorDisplay';
@@ -46,7 +45,7 @@ export default defineComponent({
       mdiThermometer,
       coord2grid,
       textTransformation,
-      round,
+      fixedNumber,
       scale,
       block,
       isBroken,
@@ -79,7 +78,7 @@ export default defineComponent({
           <small>{{ tempUnit }}</small>
         </div>
         <div class="col text-bold text-center">
-          {{ round(temperature, 1) }}
+          {{ fixedNumber(temperature, 1) }}
         </div>
       </template>
     </SvgEmbedded>

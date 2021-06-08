@@ -12,8 +12,7 @@ import {
 } from '@/plugins/spark/types';
 import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
-import { bloxLink, bloxQty } from '@/utils/bloxfield';
-import { durationString } from '@/utils/duration';
+import { bloxLink, bloxQty, durationString } from '@/utils';
 
 import widget from './ActuatorPwmWidget.vue';
 

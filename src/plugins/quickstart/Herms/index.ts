@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { featureStore, QuickstartFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
+import { cref } from '@/utils';
 
 import HermsCompletionTask from './HermsCompletionTask.vue';
 import HermsHardwareTask from './HermsHardwareTask.vue';

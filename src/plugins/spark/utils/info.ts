@@ -11,7 +11,7 @@ import {
   SystemBlockType,
 } from '@/shared-types';
 import { featureStore } from '@/store/features';
-import { isLink } from '@/utils/bloxfield';
+import { isLink } from '@/utils';
 
 import { compatibleTypes } from '../const';
 import { sparkStore } from '../store';
@@ -19,7 +19,7 @@ import { BlockAddress, ComparedBlockType } from '../types';
 import { getDisplaySettingsBlock } from './system';
 
 
-export function isCompatible(type: Nullable<string>, intf: ComparedBlockType): boolean {
+export function isCompatible(type: Maybe<string>, intf: ComparedBlockType): boolean {
   if (!intf) { return true; }
   if (!type) { return false; }
   if (type === intf) { return true; }
@@ -27,13 +27,13 @@ export function isCompatible(type: Nullable<string>, intf: ComparedBlockType): b
   return Boolean(compatibleTypes[intf]?.includes(type));
 }
 
-export function ifCompatible<T extends Block>(block: Nullable<Block>, intf: ComparedBlockType): T | null {
+export function ifCompatible<T extends Block>(block: Maybe<Block>, intf: ComparedBlockType): T | null {
   return block && isCompatible(block.type, intf)
     ? block as T
     : null;
 }
 
-export function isSystemBlockType(type: Nullable<string>): boolean {
+export function isSystemBlockType(type: Maybe<string>): boolean {
   return Enum.isType(SystemBlockType, type);
 }
 

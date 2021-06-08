@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils';
 
 const footerRules: InputRule[] = [
   v => !v || v.length <= 40 || 'Footer text can only be 40 characters',

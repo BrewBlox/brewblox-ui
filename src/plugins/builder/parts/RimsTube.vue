@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { coord2grid, elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
-import { Coordinates } from '@/utils/coordinates';
+import { Coordinates } from '@/utils';
 
 import { usePart } from '../composables';
 import { FlowPart } from '../types';

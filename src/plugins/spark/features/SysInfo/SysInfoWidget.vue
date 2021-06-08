@@ -11,8 +11,7 @@ import {
   WiFiSettingsBlock,
 } from '@/plugins/spark/types';
 import { serviceStore } from '@/store/services';
-import { durationString } from '@/utils/duration';
-import { shortDateString } from '@/utils/functional';
+import { durationString, shortDateString } from '@/utils';
 
 import { getTicksBlock, getWiFiSettingsBlock } from '../../utils';
 

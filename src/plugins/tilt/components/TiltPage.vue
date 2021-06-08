@@ -6,8 +6,7 @@ import { TiltService, TiltStateValue } from '@/plugins/tilt/types';
 import { WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { ContextKey } from '@/symbols';
-import { objectStringSorter } from '@/utils/functional';
-import { startChangeServiceTitle } from '@/utils/services';
+import { makeObjectSorter, startChangeServiceTitle } from '@/utils';
 
 const context: WidgetContext = {
   mode: 'Basic',
@@ -48,7 +47,7 @@ export default defineComponent({
     const values = computed<TiltStateValue[]>(
       () => tiltStore.values
         .filter(v => v.serviceId === props.serviceId)
-        .sort(objectStringSorter('color')),
+        .sort(makeObjectSorter('color')),
     );
 
     return {

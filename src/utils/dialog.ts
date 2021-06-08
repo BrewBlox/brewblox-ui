@@ -4,7 +4,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 
-import notify from './notify';
+import { notify } from './notify';
 
 interface BlockDialogOpts {
   props?: any;

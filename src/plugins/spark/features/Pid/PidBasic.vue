@@ -4,9 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
-import { prettyQty } from '@/utils/bloxfield';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { round } from '@/utils/functional';
+import { createBlockDialog, createDialog, fixedNumber, prettyQty } from '@/utils';
 
 export default defineComponent({
   name: 'PidBasic',
@@ -85,7 +83,7 @@ export default defineComponent({
 
     return {
       prettyQty,
-      round,
+      fixedNumber,
       block,
       saveBlock,
       inputBlock,
@@ -142,10 +140,10 @@ export default defineComponent({
           />
         </template>
         <template #value>
-          {{ round(block.data.outputValue) }} %
+          {{ fixedNumber(block.data.outputValue) }} %
         </template>
         <template #setting>
-          {{ round(block.data.outputSetting) }} %
+          {{ fixedNumber(block.data.outputSetting) }} %
         </template>
       </SettingValueField>
 

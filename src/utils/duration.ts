@@ -2,7 +2,7 @@ import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import parseDuration from 'parse-duration';
 
-import { bloxQty, isQuantity, Quantity } from '@/utils/bloxfield';
+import { bloxQty, isQuantity, Quantity } from './bloxfield';
 
 // repeated number + time unit
 // 'm' for minute is allowed here

@@ -2,7 +2,7 @@
 import { defineComponent } from 'vue';
 
 import { loggingStore } from '@/store/logging';
-import { saveFile } from '@/utils/import-export';
+import { saveFile } from '@/utils';
 
 export default defineComponent({
   name: 'ExportErrorsAction',

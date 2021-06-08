@@ -12,7 +12,7 @@ import {
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
-import { bloxLink, deltaTempQty, tempQty } from '@/utils/bloxfield';
+import { bloxLink, deltaTempQty, tempQty } from '@/utils';
 
 import widget from './SetpointSensorPairWidget.vue';
 

@@ -21,7 +21,7 @@ import { AnalogConstraint, DigitalConstraint } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
-import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/utils/bloxfield';
+import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/utils';
 
 import { DisplayBlock } from '../types';
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';

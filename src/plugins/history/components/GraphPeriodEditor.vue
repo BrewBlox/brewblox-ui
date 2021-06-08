@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
-import { durationMs, durationString } from '@/utils/duration';
+import { durationMs, durationString } from '@/utils';
 
 import { QueryConfig, QueryParams } from '../types';
 

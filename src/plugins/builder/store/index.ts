@@ -2,7 +2,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { extendById, filterById, findById } from '@/utils';
 
 import api from './api';
 
@@ -27,7 +27,7 @@ export class BuilderModule extends VuexModule {
     return this.layouts.map(v => v.id);
   }
 
-  public layoutById(id: Nullable<string>): BuilderLayout | null {
+  public layoutById(id: Maybe<string>): BuilderLayout | null {
     return findById(this.layouts, id);
   }
 

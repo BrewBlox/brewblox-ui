@@ -1,5 +1,5 @@
+import { isLink, prettyLink } from './formatting';
 import { BlockOrIntfType, JSBloxField, Link } from './types';
-import { isLink, prettyLink } from './utils';
 
 export function rawLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): Link;
 export function rawLink(other: Link): Link;

@@ -6,8 +6,7 @@ import { useField } from '@/composables';
 import { analogConstraintLabels, digitalConstraintLabels } from '@/plugins/spark/const';
 import type { AnalogConstraint, AnyConstraintsObj, DigitalConstraint } from '@/plugins/spark/types';
 import { prettifyConstraints } from '@/plugins/spark/utils';
-import { prettyQty } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
+import { createDialog, prettyQty } from '@/utils';
 
 const constraintLabels = {
   ...digitalConstraintLabels,

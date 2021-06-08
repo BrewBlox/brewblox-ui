@@ -3,10 +3,16 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
-import { bloxQty, isQuantity } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
-import { durationMs, durationString } from '@/utils/duration';
-import { ruleErrorFinder, ruleValidator } from '@/utils/functional';
+import {
+  bloxQty,
+  createDialog,
+  durationMs,
+  durationString,
+  isQuantity,
+  makeRuleErrorFinder,
+  makeRuleValidator,
+} from '@/utils';
+
 
 export default defineComponent({
   name: 'DurationQuantityDialog',
@@ -57,11 +63,11 @@ export default defineComponent({
     );
 
     const valueOk = computed<boolean>(
-      () => ruleValidator(props.rules)(localMs.value),
+      () => makeRuleValidator(props.rules)(localMs.value),
     );
 
     const error = computed<string | null>(
-      () => ruleErrorFinder(props.rules)(localMs.value),
+      () => makeRuleErrorFinder(props.rules)(localMs.value),
     );
 
     function normalize(): void {

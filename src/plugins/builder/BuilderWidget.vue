@@ -6,8 +6,7 @@ import { useRouter } from 'vue-router';
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
-import { spliceById, uniqueFilter } from '@/utils/functional';
+import { createDialog, spliceById, uniqueFilter } from '@/utils';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { defaultLayoutHeight, defaultLayoutWidth } from './const';
@@ -131,6 +130,7 @@ export default defineComponent({
           width: defaultLayoutWidth,
           height: defaultLayoutHeight,
           parts: oldParts,
+          order: builderStore.layouts.length + 1,
         });
         config.value.layoutIds.push(id);
         config.value.currentLayoutId = id;

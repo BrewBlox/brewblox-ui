@@ -3,7 +3,7 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import { featureStore } from '@/store/features';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { extendById, filterById, findById } from '@/utils';
 
 import api from './api';
 import type { Service, ServiceStatus, ServiceStub } from './types';
@@ -27,7 +27,7 @@ export class ServiceModule extends VuexModule {
     return this.services.map(v => v.id);
   }
 
-  public serviceById(id: Nullable<string>): Service | null {
+  public serviceById(id: Maybe<string>): Service | null {
     return findById(this.services, id);
   }
 

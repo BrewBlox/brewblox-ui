@@ -5,8 +5,7 @@ import uniq from 'lodash/uniq';
 import { GraphConfig, QueryTarget } from '@/plugins/history/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { Widget, widgetStore } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
-import notify from '@/utils/notify';
+import { createDialog, notify } from '@/utils';
 
 export function mergeTargets(a: QueryTarget[], b: QueryTarget[]): QueryTarget[] {
   return uniq([...a, ...b].map(v => v.measurement))

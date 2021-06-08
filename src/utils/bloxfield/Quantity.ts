@@ -3,11 +3,10 @@ import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import round from 'lodash/round';
 
-import { durationMs, isDurationString } from '@/utils/duration';
-
+import { durationMs, isDurationString } from '../duration';
+import { isQuantity, prettyQty, roundedQty } from './formatting';
 import { findGroup, isCompatibleQty } from './groups';
 import { JSBloxField, Quantity } from './types';
-import { isQuantity, prettyQty, roundedQty } from './utils';
 
 type WrapperValue = Quantity | number | string | null;
 

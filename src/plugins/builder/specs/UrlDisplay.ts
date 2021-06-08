@@ -1,7 +1,7 @@
 import { useRouter } from 'vue-router';
 
 import { PartSpec, PersistentPart } from '@/plugins/builder/types';
-import { isAbsoluteUrl } from '@/utils/functional';
+import { isAbsoluteUrl } from '@/utils';
 
 const DEFAULT_SIZE_X = 4;
 const DEFAULT_SIZE_Y = 1;

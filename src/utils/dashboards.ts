@@ -3,10 +3,10 @@ import UrlSafeString from 'url-safe-string';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 import { widgetStore } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
-import notify from '@/utils/notify';
 
-import { ruleValidator, suggestId } from './functional';
+import { createDialog } from './dialog';
+import { notify } from './notify';
+import { makeRuleValidator, suggestId } from './rules';
 
 type IdChangedCallback = (id: string) => void;
 
@@ -84,7 +84,7 @@ export const startChangeDashboardTitle =
         if (oldId === defaultId) {
           return; // no change
         }
-        const suggestedId = suggestId(defaultId, ruleValidator(makeDashboardIdRules()));
+        const suggestedId = suggestId(defaultId, makeRuleValidator(makeDashboardIdRules()));
 
         createDialog({
           component: 'ConfirmDialog',

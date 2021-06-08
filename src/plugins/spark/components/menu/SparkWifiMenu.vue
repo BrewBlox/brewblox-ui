@@ -5,8 +5,7 @@ import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { WifiCipherType, WifiSecurityType, WiFiSettingsBlock } from '@/plugins/spark/types';
 import { getWiFiSettingsBlock } from '@/plugins/spark/utils';
-import { createDialog } from '@/utils/dialog';
-import notify from '@/utils/notify';
+import { createDialog, notify } from '@/utils';
 
 const securityOpts: SelectOption<WifiSecurityType>[] = [
   { label: 'Unsecured', value: WifiSecurityType.WLAN_SEC_UNSEC },

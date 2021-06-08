@@ -1,14 +1,11 @@
 import {
-  deserialize,
-  serialize,
-} from '@/plugins/spark/parse-object';
-import {
   bloxQty,
+  deserialize,
   isLink,
   isQuantity,
   JSLink,
-} from '@/utils/bloxfield';
-
+  serialize,
+} from '@/utils';
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {

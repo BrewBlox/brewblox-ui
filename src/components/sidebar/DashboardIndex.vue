@@ -3,8 +3,9 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { createDialog } from '@/utils/dialog';
-import { objectSorter } from '@/utils/functional';
+import { createDialog, makeObjectSorter } from '@/utils';
+
+const dashboardSorter = makeObjectSorter<Dashboard>('order');
 
 export default defineComponent({
   name: 'DashboardIndex',
@@ -21,7 +22,7 @@ export default defineComponent({
 
     const dashboards = computed<Dashboard[]>({
       // Avoid modifying the store object when calling sort()
-      get: () => [...dashboardStore.dashboards].sort(objectSorter('order')),
+      get: () => [...dashboardStore.dashboards].sort(dashboardSorter),
       set: dashboards => dashboardStore.updateDashboardOrder(dashboards.map(v => v.id)),
     });
 

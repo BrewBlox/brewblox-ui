@@ -2,8 +2,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
-import { createDialog } from '@/utils/dialog';
-import { round } from '@/utils/functional';
+import { createDialog, fixedNumber } from '@/utils';
 
 export default defineComponent({
   name: 'SliderField',
@@ -58,7 +57,7 @@ export default defineComponent({
     }
 
     const displayValue = computed<string>(
-      () => round(props.modelValue, props.decimals),
+      () => fixedNumber(props.modelValue, props.decimals),
     );
 
     function openDialog(): void {

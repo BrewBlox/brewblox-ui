@@ -6,13 +6,11 @@ import { BlockType, DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types
 import { startAddBlockToDisplay } from '@/plugins/spark/utils';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
-import { bloxQty, inverseTempQty } from '@/utils/bloxfield';
-import { combinations, typeMatchFilter } from '@/utils/functional';
-import notify from '@/utils/notify';
+import { bloxQty, combinations, inverseTempQty, makeTypeFilter, notify } from '@/utils';
 
 import { PidConfig, PinChannel, QuickstartAction, QuickstartConfig } from './types';
 
-const digitalActuatorFilter = typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
+const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
 
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {
   return sparkStore

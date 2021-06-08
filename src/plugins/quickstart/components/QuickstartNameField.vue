@@ -2,7 +2,7 @@
 
 import { computed, defineComponent } from 'vue';
 
-import { createDialog } from '@/utils/dialog';
+import { createDialog } from '@/utils';
 
 export default defineComponent({
   name: 'QuickstartNameField',

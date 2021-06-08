@@ -1,4 +1,5 @@
 <script lang="ts">
+import capitalize from 'lodash/capitalize';
 import { computed, defineComponent, nextTick, ref } from 'vue';
 
 import { useElementRefs, useGlobals } from '@/composables';
@@ -6,8 +7,7 @@ import { createBlockWizard } from '@/plugins/wizardry';
 import { BlockType } from '@/shared-types';
 import { featureStore, WidgetRole } from '@/store/features';
 import { serviceStore } from '@/store/services';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { capitalized, objectStringSorter } from '@/utils/functional';
+import { createBlockDialog, createDialog, makeObjectSorter } from '@/utils';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { SparkService } from '../types';
@@ -36,12 +36,8 @@ const roleOrder: WidgetRole[] = [
 
 const allSorters: Mapped<ItemSortFunction> = {
   unsorted: () => 0,
-  name: (a, b) => objectStringSorter('id')(a, b),
-  type: (a, b): number => {
-    const left = a.title.toLowerCase();
-    const right = b.title.toLowerCase();
-    return left.localeCompare(right);
-  },
+  name: makeObjectSorter('id'),
+  type: makeObjectSorter('title'),
   role: (a, b): number =>
     roleOrder.indexOf[a.role] - roleOrder.indexOf[b.role],
 };
@@ -186,7 +182,7 @@ export default defineComponent({
     }
 
     return {
-      capitalized,
+      capitalize,
       roleIcons,
       allSorters,
       dense,
@@ -237,7 +233,7 @@ export default defineComponent({
                     v-for="(func, name) in allSorters"
                     :key="name"
                     :active="sorting === name"
-                    :label="capitalized(name)"
+                    :label="capitalize(name)"
                     @click="sorting = name"
                   />
                 </q-list>

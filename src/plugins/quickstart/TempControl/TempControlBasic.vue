@@ -6,10 +6,16 @@ import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { ProfileValues } from '@/plugins/spark/types';
 import { calculateProfileValues } from '@/plugins/spark/utils';
 import { PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
-import { bloxQty, prettyQty, tempQty } from '@/utils/bloxfield';
-import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { shortDateString, spliceById } from '@/utils/functional';
-import notify from '@/utils/notify';
+import {
+  bloxQty,
+  createBlockDialog,
+  createDialog,
+  notify,
+  prettyQty,
+  shortDateString,
+  spliceById,
+  tempQty,
+} from '@/utils';
 
 import { PidConfig } from '../types';
 import TempControlModeDialog from './TempControlModeDialog.vue';

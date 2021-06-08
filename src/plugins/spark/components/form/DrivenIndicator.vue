@@ -2,7 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
-import { createBlockDialog } from '@/utils/dialog';
+import { createBlockDialog } from '@/utils';
 
 export default defineComponent({
   name: 'DrivenIndicator',

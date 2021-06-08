@@ -3,7 +3,7 @@ import { defineComponent, inject, PropType, provide, reactive, ref } from 'vue';
 
 import { WidgetContext } from '@/store/features';
 import { ContextKey, InvalidateKey, WidgetIdKey } from '@/symbols';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils';
 
 export default defineComponent({
   name: 'WidgetProvider',

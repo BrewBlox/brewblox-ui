@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { Plugin } from 'vue';
 
 import { featureStore, WidgetFeature } from '@/store/features';
-import { cref } from '@/utils/component-ref';
+import { cref } from '@/utils';
 
 import widget from './QuickActionsWidget.vue';
 import { QuickActionsConfig } from './types';

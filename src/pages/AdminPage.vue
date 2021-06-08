@@ -12,14 +12,15 @@ import {
   startEditBuilderTouchDelay,
   systemStore,
 } from '@/store/system';
-import { createDialog } from '@/utils/dialog';
-import { objectSorter } from '@/utils/functional';
+import { createDialog, makeObjectSorter } from '@/utils';
 
 interface ConfigService {
   serviceId: string;
   title: string;
   configComponent: string;
 }
+
+const orderSorter = makeObjectSorter<{ order: number }>('order');
 
 export default defineComponent({
   name: 'AdminPage',
@@ -44,12 +45,12 @@ export default defineComponent({
 
     const dashboards = computed<Dashboard[]>(
       () => [...dashboardStore.dashboards]
-        .sort(objectSorter('order')),
+        .sort(orderSorter),
     );
 
     const serviceComponents = computed<ConfigService[]>(
       () => [...serviceStore.services]
-        .sort(objectSorter('order'))
+        .sort(orderSorter)
         .map(v => ({
           serviceId: v.id,
           title: v.title,
@@ -60,7 +61,7 @@ export default defineComponent({
 
     const layouts = computed<BuilderLayout[]>(
       () => [...builderStore.layouts]
-        .sort(objectSorter('order')),
+        .sort(orderSorter),
     );
 
     return {

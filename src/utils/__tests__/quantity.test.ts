@@ -4,7 +4,7 @@ import {
   prettyQty,
   prettyUnit,
   rawQty,
-} from '@/utils/bloxfield';
+} from '@/utils';
 
 
 describe('Type checking', () => {

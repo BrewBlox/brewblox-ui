@@ -133,7 +133,7 @@ describe('Node labels', () => {
     expect(defaultLabel('spock/ Combined Influx points')).toEqual('Combined influx points');
     expect(defaultLabel('sparkey/actuator-pwm-1/setting[1/degC]')).toEqual('[actuator-pwm-1] Setting /°C');
     expect(defaultLabel('single/')).toEqual('');
-    expect(() => defaultLabel('service')).toThrowError();
+    expect(defaultLabel('single')).toEqual('');
   });
 });
 

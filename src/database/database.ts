@@ -1,11 +1,14 @@
+// Note: some utils indirectly import this file
+// Import from specific utils modules to avoid circular dependencies
+
 import { AxiosError } from 'axios';
 import isObjectLike from 'lodash/isObjectLike';
 
+import { STORE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { DatastoreEvent, StoreObject } from '@/shared-types';
-import { STORE_TOPIC } from '@/utils/const';
-import http, { parseHttpError } from '@/utils/http';
-import notify from '@/utils/notify';
+import { http, parseHttpError } from '@/utils/http';
+import { notify } from '@/utils/notify';
 
 import { BrewbloxDatabase, EventHandler } from './types';
 

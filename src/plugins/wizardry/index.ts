@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { autoRegister } from '@/utils/component-ref';
+import { autoRegister } from '@/utils';
 
 export * from './utils';
 

@@ -4,8 +4,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
-import { bloxQty, isQuantity, prettyUnit } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
+import { bloxQty, createDialog, isQuantity, prettyUnit } from '@/utils';
 
 export default defineComponent({
   name: 'QuantityDialog',

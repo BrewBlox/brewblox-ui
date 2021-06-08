@@ -47,7 +47,7 @@ type AnyDict = { [index in string]: any };
 
 type Awaitable<T> = T | PromiseLike<T>;
 
-type Nullable<T> = T | null | undefined;
+type Maybe<T> = T | null | undefined;
 
 interface HasId {
   id: string;

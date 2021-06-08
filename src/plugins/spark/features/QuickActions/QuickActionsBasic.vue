@@ -3,13 +3,17 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, ref } from 'vue';
 
 import { useGlobals, useWidget } from '@/composables';
-import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
-import { prettyAny } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
-import { deepCopy, spliceById, uniqueFilter } from '@/utils/functional';
-import notify from '@/utils/notify';
+import {
+  createDialog,
+  deepCopy,
+  deserialize,
+  notify,
+  prettyAny,
+  spliceById,
+  uniqueFilter,
+} from '@/utils';
 
 import { BlockChange, ChangeAction, EditableBlockField, QuickActionsWidget } from './types';
 

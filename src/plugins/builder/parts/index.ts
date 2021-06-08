@@ -1,4 +1,4 @@
-import { autoComponents } from '@/utils/component-ref';
+import { autoComponents } from '@/utils';
 
 const parts = autoComponents(require.context('./'));
 

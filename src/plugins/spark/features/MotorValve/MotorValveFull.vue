@@ -1,11 +1,11 @@
 <script lang="ts">
+import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { DS2408StartChannels } from '@/plugins/spark/const';
 import { Block, BlockType, DS2408Block, DS2408ConnectMode, MotorValveBlock } from '@/plugins/spark/types';
-import { typeMatchFilter } from '@/utils/functional';
-import { mutate } from '@/utils/functional';
+import { makeTypeFilter } from '@/utils';
 
 interface ClaimDict {
   [startChannel: number]: string; // block ID
@@ -35,9 +35,9 @@ export default defineComponent({
         const targetId = hwBlock.value.id;
         return sparkModule
           .blocks
-          .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
+          .filter(makeTypeFilter<MotorValveBlock>(BlockType.MotorValve))
           .filter(block => block.data.hwDevice.id === targetId)
-          .reduce((acc: ClaimDict, b) => mutate(acc, b.data.startChannel, b.id), {});
+          .reduce((acc: ClaimDict, b) => set(acc, b.data.startChannel, b.id), {});
       },
     );
 

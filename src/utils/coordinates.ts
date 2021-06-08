@@ -1,4 +1,4 @@
-import { clampRotation } from './functional';
+import { clampRotation } from './formatting';
 
 export type CoordinatesParam =
   string | { x: number; y: number; z: number } | [number, number, number] | Coordinates;

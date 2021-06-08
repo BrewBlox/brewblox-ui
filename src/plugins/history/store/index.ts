@@ -6,9 +6,9 @@ import {
   filterById,
   findById,
   isoDateString,
+  notify,
   uniqueFilter,
-} from '@/utils/functional';
-import notify from '@/utils/notify';
+} from '@/utils';
 
 import type {
   ApiQuery,

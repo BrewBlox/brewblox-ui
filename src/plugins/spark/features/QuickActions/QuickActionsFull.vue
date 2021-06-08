@@ -3,12 +3,10 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, ref } from 'vue';
 
 import { useGlobals, useWidget } from '@/composables';
-import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { Block } from '@/shared-types';
-import { createDialog } from '@/utils/dialog';
-import { deepCopy, filterById, spliceById } from '@/utils/functional';
+import { createDialog, deepCopy, deserialize, filterById, spliceById } from '@/utils';
 
 import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, ChangeAction, QuickActionsWidget } from './types';

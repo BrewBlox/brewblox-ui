@@ -2,8 +2,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import { TiltFieldIndex, TiltStateValue } from '@/plugins/tilt/types';
-import { prettyQty } from '@/utils/bloxfield';
-import { round, shortDateString } from '@/utils/functional';
+import { fixedNumber, prettyQty, shortDateString } from '@/utils';
 
 const fieldClass = 'col-5 col-grow q-my-none';
 
@@ -21,7 +20,7 @@ export default defineComponent({
   },
   setup() {
     return {
-      round,
+      fixedNumber,
       shortDateString,
       prettyQty,
       fieldClass,
@@ -52,14 +51,14 @@ export default defineComponent({
       label="SG"
       :class="fieldClass"
     >
-      {{ round(state.data.specificGravity, 3) }}
+      {{ fixedNumber(state.data.specificGravity, 3) }}
     </LabeledField>
     <LabeledField
       v-if="!hidden.calibratedSpecificGravity"
       label="SG (calibrated)"
       :class="fieldClass"
     >
-      {{ round(state.data.calibratedSpecificGravity, 3) }}
+      {{ fixedNumber(state.data.calibratedSpecificGravity, 3) }}
     </LabeledField>
 
     <LabeledField

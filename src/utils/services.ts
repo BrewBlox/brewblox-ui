@@ -3,8 +3,9 @@ import { useRouter } from 'vue-router';
 
 import { featureStore } from '@/store/features';
 import { Service, serviceStore, ServiceStub } from '@/store/services';
-import { createDialog } from '@/utils/dialog';
-import notify from '@/utils/notify';
+
+import { createDialog } from './dialog';
+import { notify } from './notify';
 
 
 export async function startCreateService(stub: ServiceStub, navigate = true): Promise<void> {

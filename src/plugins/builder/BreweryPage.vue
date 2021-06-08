@@ -4,7 +4,7 @@ import { computed, defineComponent, ref, watch } from 'vue';
 
 import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
-import { spliceById } from '@/utils/functional';
+import { spliceById } from '@/utils';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderStore } from './store';

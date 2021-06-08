@@ -3,8 +3,7 @@ import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
-import { createDialog } from '@/utils/dialog';
-import { objectStringSorter } from '@/utils/functional';
+import { createDialog, makeObjectSorter } from '@/utils';
 
 import { useWizard } from '../composables';
 
@@ -56,7 +55,7 @@ export default defineComponent({
           badge: feature.experimental ? 'experimental' : null,
         }))
         .filter((opt): opt is WidgetFeatureOption => opt.component !== null)
-        .sort(objectStringSorter('label')),
+        .sort(makeObjectSorter('label')),
     );
 
     const filteredOpts = computed<SelectOption[]>(

@@ -1,4 +1,4 @@
-import http, { intercept } from '@/utils/http';
+import { http, intercept } from '@/utils';
 
 import { AutomationProcess, AutomationStepJump, AutomationTemplate } from '../types';
 

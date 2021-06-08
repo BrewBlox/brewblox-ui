@@ -7,7 +7,7 @@ import {
   startCopyWidget,
   startMoveWidget,
   startRemoveWidget,
-} from '@/utils/widgets';
+} from '@/utils';
 
 export default defineComponent({
   name: 'WidgetActions',

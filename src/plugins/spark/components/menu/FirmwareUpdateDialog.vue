@@ -2,11 +2,11 @@
 import { computed, defineComponent, onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue';
 
 import { useDialog } from '@/composables';
+import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { sparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { isSparkUpdate } from '@/plugins/spark/utils';
-import { STATE_TOPIC } from '@/utils/const';
 
 export default defineComponent({
   name: 'FirmwareUpdateDialog',

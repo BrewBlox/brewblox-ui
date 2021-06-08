@@ -5,14 +5,11 @@ import { useRoute } from 'vue-router';
 
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
+import { startAddLayout, startChangeLayoutTitle } from '@/plugins/builder/utils';
 import { dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
-import { createDialog } from '@/utils/dialog';
-import { saveFile } from '@/utils/import-export';
-import notify from '@/utils/notify';
-
-import { startAddLayout, startChangeLayoutTitle } from '../utils';
+import { createDialog, notify, saveFile } from '@/utils';
 
 export default defineComponent({
   name: 'LayoutActions',

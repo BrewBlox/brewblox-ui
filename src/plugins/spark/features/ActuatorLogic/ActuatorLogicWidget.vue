@@ -4,7 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorLogicBlock, Link } from '@/plugins/spark/types';
-import { prettyLink } from '@/utils/bloxfield';
+import { prettyLink } from '@/utils';
 
 import ActuatorLogicBasic from './ActuatorLogicBasic.vue';
 import ActuatorLogicFull from './ActuatorLogicFull.vue';

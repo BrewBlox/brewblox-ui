@@ -3,7 +3,7 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { BlockType, Link, UserBlockType } from '@/shared-types';
 import store from '@/store';
-import { deepCopy, extendById, filterById, findById, findByKey } from '@/utils/functional';
+import { deepCopy, extendById, filterById, findById, findByKey } from '@/utils';
 
 import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
 import type { Block, BlockFieldAddress, BlockFieldSpec } from '../types';
@@ -29,12 +29,12 @@ export class SparkGlobalModule extends VuexModule {
     return this.presets.map(v => v.id);
   }
 
-  public moduleById(serviceId: Nullable<string>): SparkServiceModule | null {
+  public moduleById(serviceId: Maybe<string>): SparkServiceModule | null {
     if (!serviceId) { return null; }
     return this.modules.find(v => v.id === serviceId) ?? null;
   }
 
-  public blockById<T extends Block>(serviceId: Nullable<string>, blockId: Nullable<string>): T | null {
+  public blockById<T extends Block>(serviceId: Maybe<string>, blockId: Maybe<string>): T | null {
     if (!serviceId || !blockId) { return null; }
     return this.moduleById(serviceId)?.blockById<T>(blockId) ?? null;
   }
@@ -44,7 +44,7 @@ export class SparkGlobalModule extends VuexModule {
     return this.moduleById(addr.serviceId)?.blockByAddress<T>(addr) ?? null;
   }
 
-  public blockByLink<T extends Block>(serviceId: Nullable<string>, link: Nullable<Link>): T | null {
+  public blockByLink<T extends Block>(serviceId: Maybe<string>, link: Maybe<Link>): T | null {
     return this.moduleById(serviceId)?.blockByLink<T>(link) ?? null;
   }
 
@@ -53,7 +53,7 @@ export class SparkGlobalModule extends VuexModule {
     return this.moduleById(addr.serviceId)?.fieldByAddress(addr) ?? null;
   }
 
-  public serviceBlocks(serviceId: Nullable<string>): Block[] {
+  public serviceBlocks(serviceId: Maybe<string>): Block[] {
     return this.moduleById(serviceId)?.blocks ?? [];
   }
 
@@ -68,19 +68,19 @@ export class SparkGlobalModule extends VuexModule {
     return findByKey<BlockSpec<T>>(this.blockSpecs as any, 'type', type);
   }
 
-  public blockSpecByAddress<T extends Block>(addr: Nullable<T | BlockAddress>): BlockSpec<T> | null {
+  public blockSpecByAddress<T extends Block>(addr: Maybe<T | BlockAddress>): BlockSpec<T> | null {
     return addr && addr.type
       ? this.blockSpecByType<T>(addr.type as T['type'])
       : null;
   }
 
-  public fieldSpecByAddress(addr: Nullable<BlockFieldAddress>): BlockFieldSpec | null {
+  public fieldSpecByAddress(addr: Maybe<BlockFieldAddress>): BlockFieldSpec | null {
     return addr && addr.type && addr.field
       ? this.fieldSpecs.find(f => f.type === addr.type && f.key === addr.field) ?? null
       : null;
   }
 
-  public fieldSpecsByType(type: Nullable<BlockType>): BlockFieldSpec[] {
+  public fieldSpecsByType(type: Maybe<BlockType>): BlockFieldSpec[] {
     return this.fieldSpecs.filter(f => f.type === type);
   }
 

@@ -7,7 +7,7 @@ import {
   TicksBlock,
   WiFiSettingsBlock,
 } from '@/shared-types';
-import { typeMatchFilter } from '@/utils/functional';
+import { makeTypeFilter } from '@/utils';
 
 type SysBlockFn<BlockT extends Block> = (serviceId: string | null | undefined) => BlockT | undefined;
 
@@ -17,7 +17,7 @@ export function getSysBlock<BlockT extends Block>(
 ): BlockT | undefined {
   return serviceId
     ? sparkStore.serviceBlocks(serviceId)
-      .find(typeMatchFilter<BlockT>(type))
+      .find(makeTypeFilter<BlockT>(type))
     : undefined;
 }
 

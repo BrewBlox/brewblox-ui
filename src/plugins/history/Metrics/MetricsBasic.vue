@@ -7,8 +7,7 @@ import { useContext, useWidget } from '@/composables';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { historyStore } from '@/plugins/history/store';
 import { MetricsResult, MetricsSource, QueryTarget } from '@/plugins/history/types';
-import { durationString } from '@/utils/duration';
-import { isJsonEqual, round } from '@/utils/functional';
+import { durationString, fixedNumber, isJsonEqual } from '@/utils';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './const';
 import { MetricsConfig, MetricsWidget } from './types';
@@ -58,8 +57,8 @@ export default defineComponent({
       return config.value.decimals[field] ?? DEFAULT_DECIMALS;
     }
 
-    function roundedValue(value: CurrentValue): string {
-      return round(value.value, fieldDecimals(value.field));
+    function fixedValue(value: CurrentValue): string {
+      return fixedNumber(value.value, fieldDecimals(value.field));
     }
 
     const values = computed<CurrentValue[]>(
@@ -119,7 +118,7 @@ export default defineComponent({
       config,
       sources,
       values,
-      roundedValue,
+      fixedValue,
       durationString,
       fieldFreshDuration,
     };
@@ -147,7 +146,7 @@ export default defineComponent({
         :label="val.name"
       >
         <span :class="['text-big', val.stale && 'darkened']">
-          {{ roundedValue(val) }}
+          {{ fixedValue(val) }}
         </span>
         <template v-if="val.stale" #after>
           <q-icon name="warning" size="24px" />
