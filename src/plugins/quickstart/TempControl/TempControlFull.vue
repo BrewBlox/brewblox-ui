@@ -8,7 +8,7 @@ import {
   PidBlock,
   SetpointProfileBlock,
 } from '@/shared-types';
-import { spliceById } from '@/utils/collections';
+import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 
@@ -46,7 +46,7 @@ export default defineComponent({
           title: `Edit ${mode.title} mode`,
           serviceId: serviceId.value,
           saveMode: (mode: TempControlMode) => {
-            config.value.modes = spliceById(config.value.modes, mode);
+            config.value.modes = concatById(config.value.modes, mode);
             saveConfig();
           },
         },

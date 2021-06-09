@@ -9,7 +9,7 @@ import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
 import { loadFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
-import { makeRuleErrorFinder } from '@/utils/rules';
+import { makeRuleValidator } from '@/utils/rules';
 
 import { useWizard } from '../composables';
 
@@ -21,7 +21,7 @@ const widgetRules: InputRule[] = [
   v => !!v.config || 'Widget must have config settings',
 ];
 
-const errorFinder = makeRuleErrorFinder(widgetRules);
+const validator = makeRuleValidator(widgetRules, 'error');
 
 export default defineComponent({
   name: 'ImportWizard',
@@ -72,7 +72,7 @@ export default defineComponent({
     );
 
     const widgetError = computed<string | null>(
-      () => errorFinder(widget.value),
+      () => validator(widget.value),
     );
 
     const widgetOk = computed<boolean>(

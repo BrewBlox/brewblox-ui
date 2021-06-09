@@ -2,7 +2,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/collections';
+import { concatById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
 
@@ -80,7 +80,7 @@ export class BuilderModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = async (layout: BuilderLayout): Promise<void> => {
-      this.layouts = extendById(this.layouts, layout);
+      this.layouts = concatById(this.layouts, layout);
     };
     const onDelete = (id: string): void => {
       this.layouts = filterById(this.layouts, { id });

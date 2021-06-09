@@ -1,69 +1,4 @@
 /**
- * Modifies input array by either replacing or removing a member.
- * Returns the modified array.
- * If no members match `obj`, `arr` is not modified.
- *
- * @param arr object collection
- * @param obj compared object
- * @param insert true to replace the object, false to remove
- */
-export function spliceById<T extends HasId>(arr: T[], obj: T): T[];
-export function spliceById<T extends HasId>(arr: T[], obj: T, insert: true): T[];
-export function spliceById<T extends HasId>(arr: T[], obj: HasId, insert: false): T[];
-export function spliceById<T extends HasId>(arr: T[], obj: T, insert = true): T[] {
-  const idx = arr.findIndex(v => v.id === obj.id);
-  if (idx !== -1) {
-    insert
-      ? arr.splice(idx, 1, obj)
-      : arr.splice(idx, 1);
-  }
-  return arr;
-}
-
-/**
- * Modifies input array by removing the member matching `obj`.
- * Returns the matched member, or undefined.
- *
- * @param arr object collection
- * @param obj full object or { id } stub to compare against
- */
-export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
-  const idx = arr.findIndex(v => v.id === obj.id);
-  return idx !== -1
-    ? arr.splice(idx, 1)[0]
-    : undefined;
-}
-
-/**
- * Returns a new array consisting of all members of input array
- * minus those matching `obj`.
- * Does not modify input array.
- *
- * @param arr object collection
- * @param obj full object or { id } stub to compare against
- */
-export function filterById<T extends HasId>(arr: T[], obj: HasId): T[] {
-  return arr.filter(v => v.id !== obj.id);
-}
-
-/**
- * Returns a new array consisting of all members of input array
- * minus those matching `obj`, and plus `obj` itself.
- * Does not modify input array.
- * If no members match `obj`, `obj` is appended.
- * If a member matches `obj`, `obj` is inserted at the same index.
- *
- * @param arr object collection
- * @param obj object to be inserted
- */
-export function extendById<T extends HasId>(arr: T[], obj: T): T[] {
-  const idx = arr.findIndex(v => v.id === obj.id);
-  return idx !== -1
-    ? [...arr.slice(0, idx), obj, ...arr.slice(idx + 1)]
-    : [...arr, obj];
-}
-
-/**
  * Looks for object in array collection.
  *
  * @param arr object collection.
@@ -102,22 +37,69 @@ export function findByKey<T>(
 }
 
 /**
- * Finds object in `arr` with ID matching `patch`.
- * Returns a shallow merge of found object and `patch`.
+ * Replaces or removes a member in input array.
+ * Modifies and returns input array.
+ * If `obj` does not match any member, it is inserted at the end of the array.
  *
- * Returns `fallback` if no match was found in `arr`.
- * Does not modify `arr`.
- *
- * @param arr object collection.
- * @param patch partial object with required ID.
+ * @param arr object collection
+ * @param obj compared object
+ * @param insert true to replace the object, false to remove
  */
-export function patchedById<T extends HasId>(
-  arr: T[],
-  patch: Patch<T>,
-  fallback: T | null = null,
-): T | typeof fallback {
-  const existing = findById(arr, patch.id);
-  return existing
-    ? { ...existing, ...patch }
-    : fallback;
+export function spliceById<T extends HasId>(arr: T[], obj: T): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: T, insert: true): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: HasId, insert: false): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: T, insert = true): T[] {
+  const idx = arr.findIndex(v => v.id === obj.id);
+  if (idx >= 0) {
+    insert
+      ? arr.splice(idx, 1, obj)
+      : arr.splice(idx, 1);
+  }
+  else if (insert) {
+    arr.push(obj);
+  }
+  return arr;
+}
+
+/**
+ * Modifies input array by removing the member matching `obj`.
+ * Returns the matched member, or undefined.
+ *
+ * @param arr object collection
+ * @param obj full object or { id } stub to compare against
+ */
+export function popById<T extends HasId>(arr: T[], obj: HasId): T | undefined {
+  const idx = arr.findIndex(v => v.id === obj.id);
+  return idx >= 0
+    ? arr.splice(idx, 1)[0]
+    : undefined;
+}
+
+/**
+ * Returns a new array consisting of all members of input array
+ * minus the first member matching `obj`, and plus `obj` itself.
+ * Does not modify input array.
+ * If no members match `obj`, `obj` is appended.
+ * If a member matches `obj`, `obj` is inserted at the same index.
+ *
+ * @param arr object collection
+ * @param obj object to be inserted
+ */
+export function concatById<T extends HasId>(arr: T[], obj: T): T[] {
+  const idx = arr.findIndex(v => v.id === obj.id);
+  return idx >= 0
+    ? [...arr.slice(0, idx), obj, ...arr.slice(idx + 1)]
+    : [...arr, obj];
+}
+
+/**
+ * Returns a new array consisting of all members of input array
+ * minus those matching `obj`.
+ * Does not modify input array.
+ *
+ * @param arr object collection
+ * @param obj full object or { id } stub to compare against
+ */
+export function filterById<T extends HasId>(arr: T[], obj: T | HasId): T[] {
+  return arr.filter(v => v.id !== obj.id);
 }

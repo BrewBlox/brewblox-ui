@@ -4,7 +4,7 @@ import { computed, defineComponent, ref, watch } from 'vue';
 
 import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
-import { spliceById } from '@/utils/collections';
+import { concatById } from '@/utils/collections';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderStore } from './store';
@@ -67,7 +67,7 @@ export default defineComponent({
     );
 
     function savePart(part: PersistentPart): void {
-      parts.value = spliceById(parts.value, part);
+      parts.value = concatById(parts.value, part);
     }
 
     function isClickable(part: FlowPart): boolean {

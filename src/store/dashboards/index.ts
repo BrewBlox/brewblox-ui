@@ -1,7 +1,7 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/collections';
+import { concatById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
 import type { Dashboard } from './types';
@@ -58,7 +58,7 @@ export class DashboardModule extends VuexModule {
   public async start(): Promise<void> {
     this.dashboards = await api.fetch();
     api.subscribe(
-      dashboard => this.dashboards = extendById(this.dashboards, dashboard),
+      dashboard => this.dashboards = concatById(this.dashboards, dashboard),
       id => this.dashboards = filterById(this.dashboards, { id }),
     );
   }

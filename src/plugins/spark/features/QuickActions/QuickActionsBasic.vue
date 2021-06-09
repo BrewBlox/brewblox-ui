@@ -132,7 +132,8 @@ export default defineComponent({
         await sparkStore.saveBlock({ ...block, data: { ...block.data, ...actualData } });
       }
       action.changes = action.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
-      saveActions(spliceById(actions.value, action));
+      spliceById(actions.value, action);
+      saveActions();
     }
 
     function applyAction(action: ChangeAction): void {

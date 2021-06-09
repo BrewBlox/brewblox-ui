@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { WidgetContext } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
-import { patchedById } from '@/utils/collections';
+import { nullFilter } from '@/utils/functional';
 
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import GridItem from './GridItem.vue';
@@ -54,8 +54,13 @@ export default defineComponent({
 
     function patchWidgets(updated: Patch<Widget>[]): void {
       const applied = updated
-        .map(change => patchedById(widgetStore.widgets, change))
-        .filter((v): v is Widget => v !== null);
+        .map(change => {
+          const existing = widgetStore.widgetById(change.id);
+          return existing
+            ? { ...existing, ...change }
+            : null;
+        })
+        .filter(nullFilter);
       applied.forEach(v => widgetStore.saveWidget(v));
     }
 

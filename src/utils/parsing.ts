@@ -27,12 +27,7 @@ import {
 //   'field_underscored[1 / degC]'
 const postfixExpr = /^(.*)([\[<])(.*)[\]>]$/;
 
-export function propertyNameWithoutUnit(name: string): string {
-  const matched = name.match(postfixExpr);
-  return matched ? matched[1] : name;
-}
-
-export function propertyNameWithUnit(name: string): [string, string | null] {
+export function splitPostfixed(name: string): [string, string | null] {
   const matched = name.match(postfixExpr);
   if (!matched) {
     return [name, null];
@@ -70,10 +65,9 @@ export function deserialize<T>(obj: T): T {
     return obj;
   }
   if (isObject(obj)) {
-    return fromPairs(
-      toPairs(obj)
-        .map(([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]),
-    ) as T;
+    const parsed = toPairs(obj)
+      .map(([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]);
+    return fromPairs(parsed) as T;
   }
   return obj;
 }

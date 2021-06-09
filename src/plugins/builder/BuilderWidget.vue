@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router';
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
-import { spliceById } from '@/utils/collections';
+import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { uniqueFilter } from '@/utils/functional';
 
@@ -91,7 +91,7 @@ export default defineComponent({
     }
 
     function savePart(part: PersistentPart): void {
-      parts.value = spliceById(parts.value, part);
+      parts.value = concatById(parts.value, part);
     }
 
     const delayTouch = computed<boolean>(

@@ -6,7 +6,7 @@ import { Quantity } from '@/plugins/spark/types';
 import { bloxQty, isQuantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 import { durationMs, durationString } from '@/utils/duration';
-import { makeRuleErrorFinder, makeRuleValidator } from '@/utils/rules';
+import { makeRuleValidator } from '@/utils/rules';
 
 
 export default defineComponent({
@@ -62,7 +62,7 @@ export default defineComponent({
     );
 
     const error = computed<string | null>(
-      () => makeRuleErrorFinder(props.rules)(localMs.value),
+      () => makeRuleValidator(props.rules, 'error')(localMs.value),
     );
 
     function normalize(): void {

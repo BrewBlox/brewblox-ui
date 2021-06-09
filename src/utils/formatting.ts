@@ -51,7 +51,7 @@ export function roundNumber(value: Maybe<number>, digits = 2): number | null {
 export function fixedNumber(value: Maybe<number>, digits = 2): string {
   return value != null
     ? Number(value).toFixed(digits)
-    : digits > 0 ? `-.${'-'.repeat(digits)}` : '--';
+    : digits > 0 ? '--.--' : '---';
 }
 
 export function preciseNumber(value: Maybe<number>, precision = 3, digits = 2): string | number {

@@ -8,8 +8,8 @@ import isEqual from 'lodash/isEqual';
  */
 export function makeObjectSorter<T>(key: keyof T): (a: T, b: T) => number {
   return (a: T, b: T) => {
-    const left = a[key] ?? '';
-    const right = b[key] ?? '';
+    const left = a[key] ?? 0;
+    const right = b[key] ?? 0;
 
     if (typeof left === 'number' && typeof right === 'number') {
       return left - right;
@@ -28,7 +28,7 @@ export function makeObjectSorter<T>(key: keyof T): (a: T, b: T) => number {
  * It checks whether `obj.type` matches the desired type.
  *
  * ```ts
- * interface Circular = PancakeInterface | FrisbeeInterface;
+ * type Circular = PancakeInterface | FrisbeeInterface;
  *
  * function eat(pancake: PancakeInterface): void {
  *   // yum
@@ -36,7 +36,7 @@ export function makeObjectSorter<T>(key: keyof T): (a: T, b: T) => number {
  *
  * const items: Circular[] = [
  *   { type: 'Pancake' },
- *   { type: 'Frisbee' }
+ *   { type: 'Frisbee' },
  * ];
  *
  * items

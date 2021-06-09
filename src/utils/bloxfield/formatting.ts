@@ -42,7 +42,7 @@ export const prettyUnit = (value: Maybe<Quantity | string>): string => {
 };
 
 export const prettyQty =
-  (q: Maybe<Quantity>, precision = 2): string => {
+  (q: Maybe<Quantity>, digits = 2): string => {
     if (!isQuantity(q)) {
       return '---';
     }
@@ -50,15 +50,15 @@ export const prettyQty =
       return durationString(q);
     }
     const valueStr = isNumber(q.value)
-      ? q.value.toFixed(precision)
-      : '--.--';
+      ? q.value.toFixed(digits)
+      : digits > 0 ? '--.--' : '---';
     return `${valueStr} ${prettyUnit(q.unit)}`;
   };
 
 export const roundedQty =
-  (q: Quantity, precision = 2): Quantity => ({
+  (q: Quantity, digits = 2): Quantity => ({
     ...q,
-    value: round(q.value ?? 0, precision),
+    value: round(q.value ?? 0, digits),
   });
 
 export const prettyLink = (v: Maybe<Link>): string =>

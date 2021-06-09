@@ -20,7 +20,7 @@ import { isBlockVolatile, isSparkPatch, isSparkState } from '@/plugins/spark/uti
 import { serviceStore } from '@/store/services';
 import { widgetStore } from '@/store/widgets';
 import {
-  extendById,
+  concatById,
   filterById,
   findById,
 } from '@/utils/collections';
@@ -91,7 +91,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Mutation
   public setBlock(block: Block): void {
-    this.blocks = extendById(this.blocks, block);
+    this.blocks = concatById(this.blocks, block);
   }
 
   @Mutation
@@ -170,7 +170,7 @@ export class SparkServiceModule extends VuexModule {
     }
     block.meta = block.meta ?? {};
     block.meta.volatile = true;
-    this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
+    this.volatileBlocks = concatById(this.volatileBlocks, deepCopy(block));
   }
 
   public removeVolatileBlock({ id }: BlockAddress): void {
@@ -197,7 +197,7 @@ export class SparkServiceModule extends VuexModule {
   @Action
   public async saveBlock(block: Block): Promise<void> {
     if (isBlockVolatile(block)) {
-      this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
+      this.volatileBlocks = concatById(this.volatileBlocks, deepCopy(block));
     }
     else {
       await api.persistBlock(block); // triggers patch event

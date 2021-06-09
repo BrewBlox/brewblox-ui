@@ -3,7 +3,7 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { BlockType, Link, UserBlockType } from '@/shared-types';
 import store from '@/store';
-import { extendById, filterById, findById, findByKey } from '@/utils/collections';
+import { concatById, filterById, findById, findByKey } from '@/utils/collections';
 import { deepCopy } from '@/utils/objects';
 
 import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
@@ -169,7 +169,7 @@ export class SparkGlobalModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = async (preset: StoredDataPreset): Promise<void> => {
-      this.presets = extendById(this.presets, preset);
+      this.presets = concatById(this.presets, preset);
     };
     const onDelete = (id: string): void => {
       this.presets = filterById(this.presets, { id });
