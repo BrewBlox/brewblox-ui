@@ -7,7 +7,9 @@ import { dashboardStore } from '@/store/dashboards';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
-import { loadFile, makeRuleErrorFinder, notify } from '@/utils';
+import { loadFile } from '@/utils/import-export';
+import { notify } from '@/utils/notify';
+import { makeRuleErrorFinder } from '@/utils/rules';
 
 import { useWizard } from '../composables';
 

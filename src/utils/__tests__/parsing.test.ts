@@ -1,11 +1,6 @@
-import {
-  bloxQty,
-  deserialize,
-  isLink,
-  isQuantity,
-  JSLink,
-  serialize,
-} from '@/utils';
+import { bloxQty, isLink, isQuantity, JSLink } from '../bloxfield';
+import { deserialize, serialize } from '../parsing';
+
 
 describe('deserialize', () => {
   it('Should recognise properties structured as units', () => {

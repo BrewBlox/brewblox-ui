@@ -3,7 +3,8 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import { BlockType, Link, UserBlockType } from '@/shared-types';
 import store from '@/store';
-import { deepCopy, extendById, filterById, findById, findByKey } from '@/utils';
+import { extendById, filterById, findById, findByKey } from '@/utils/collections';
+import { deepCopy } from '@/utils/objects';
 
 import type { BlockAddress, BlockSpec, StoredDataPreset } from '../types';
 import type { Block, BlockFieldAddress, BlockFieldSpec } from '../types';

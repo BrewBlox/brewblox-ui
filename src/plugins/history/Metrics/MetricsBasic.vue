@@ -7,7 +7,9 @@ import { useContext, useWidget } from '@/composables';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { historyStore } from '@/plugins/history/store';
 import { MetricsResult, MetricsSource, QueryTarget } from '@/plugins/history/types';
-import { durationString, fixedNumber, isJsonEqual } from '@/utils';
+import { durationString } from '@/utils/duration';
+import { fixedNumber } from '@/utils/formatting';
+import { isJsonEqual } from '@/utils/objects';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './const';
 import { MetricsConfig, MetricsWidget } from './types';

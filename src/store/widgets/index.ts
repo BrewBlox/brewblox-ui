@@ -1,7 +1,7 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils';
+import { extendById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
 import type { Widget } from './types';

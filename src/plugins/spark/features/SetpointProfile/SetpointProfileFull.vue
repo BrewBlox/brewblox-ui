@@ -3,16 +3,13 @@ import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Quantity, Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
-import {
-  bloxQty,
-  createDialog,
-  deepCopy,
-  durationMs,
-  durationString,
-  makeObjectSorter,
-  notify,
-  tempQty,
-} from '@/utils';
+import { bloxQty, tempQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { durationMs, durationString } from '@/utils/duration';
+import { makeObjectSorter } from '@/utils/functional';
+import { notify } from '@/utils/notify';
+import { deepCopy } from '@/utils/objects';
+
 
 interface DisplaySetpoint {
   offsetMs: number;

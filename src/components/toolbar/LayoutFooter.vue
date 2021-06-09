@@ -2,7 +2,8 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { LogEntry, loggingStore } from '@/store/logging';
-import { notifyColors, notifyIcons, shortDateString } from '@/utils';
+import { shortDateString } from '@/utils/formatting';
+import { notifyColors, notifyIcons } from '@/utils/notify';
 
 export default defineComponent({
   name: 'LayoutFooter',

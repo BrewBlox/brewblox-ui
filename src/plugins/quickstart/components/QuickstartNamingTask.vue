@@ -1,10 +1,11 @@
 <script lang="ts">
 import mapValues from 'lodash/mapValues';
-import UrlSafeString from 'url-safe-string';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 
 import { makeBlockIdRules } from '@/plugins/spark/utils';
-import { makeDashboardIdRules, makeRuleValidator, suggestId } from '@/utils';
+import { makeDashboardIdRules } from '@/utils/dashboards';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
+import { makeUrlSafe } from '@/utils/url';
 
 import { QuickstartConfig } from '../types';
 import { withPrefix } from '../utils';
@@ -37,7 +38,6 @@ export default defineComponent({
   ],
   setup(props, { emit }) {
     const customNames = reactive<AnyDict>({});
-    const idGenerator = new UrlSafeString();
 
     const serviceId = computed<string>(
       () => props.config.serviceId,
@@ -62,7 +62,7 @@ export default defineComponent({
 
     const dashboardId = computed<string>({
       get: () => props.config.dashboardId
-        ?? suggestId(idGenerator.generate(dashboardTitle.value), dashboardIdValidator),
+        ?? suggestId(makeUrlSafe(dashboardTitle.value), dashboardIdValidator),
       set: dashboardId => updateConfig({ dashboardId }),
     });
 

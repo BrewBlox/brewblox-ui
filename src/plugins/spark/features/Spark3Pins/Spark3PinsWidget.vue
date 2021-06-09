@@ -4,7 +4,7 @@ import { defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Spark3PinsBlock } from '@/plugins/spark/types';
-import { fixedNumber } from '@/utils';
+import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'Spark3PinsWidget',

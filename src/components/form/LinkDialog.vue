@@ -3,11 +3,13 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, ComparedBlockType } from '@/plugins/spark/types';
+import { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
-import { bloxLink, createBlockDialog, JSLink, Link, makeObjectSorter } from '@/utils';
+import { bloxLink, JSLink } from '@/utils/bloxfield';
+import { createBlockDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 export default defineComponent({
   name: 'LinkDialog',

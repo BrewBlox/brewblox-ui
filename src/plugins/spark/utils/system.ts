@@ -7,7 +7,7 @@ import {
   TicksBlock,
   WiFiSettingsBlock,
 } from '@/shared-types';
-import { makeTypeFilter } from '@/utils';
+import { makeTypeFilter } from '@/utils/functional';
 
 type SysBlockFn<BlockT extends Block> = (serviceId: string | null | undefined) => BlockT | undefined;
 

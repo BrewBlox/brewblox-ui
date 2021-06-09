@@ -4,7 +4,9 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Link, SetpointProfileBlock } from '@/plugins/spark/types';
-import { createDialog, deepCopy, isJsonEqual, prettyLink } from '@/utils';
+import { prettyLink } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy, isJsonEqual } from '@/utils/objects';
 
 import { GraphProps, profileGraphProps } from './helpers';
 import ProfileExportAction from './ProfileExportAction.vue';

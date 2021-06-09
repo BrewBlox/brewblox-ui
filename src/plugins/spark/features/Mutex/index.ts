@@ -5,7 +5,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, MutexBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
-import { bloxQty } from '@/utils';
+import { bloxQty } from '@/utils/bloxfield';
 
 import widget from './MutexWidget.vue';
 

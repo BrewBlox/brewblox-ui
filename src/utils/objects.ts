@@ -1,12 +1,26 @@
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
+/**
+ * Creates a deep copy of input.
+ * The returned object will be equal, but not same to `obj`,
+ * and will have lost reactivity.
+ *
+ * @param obj input object or primitive
+ * @returns the copied object
+ */
 export function deepCopy<T>(obj: T): T {
-  return obj
-    ? cloneDeep(obj)
-    : obj;
+  return cloneDeep(obj);
 }
 
+/**
+ * JSON serializes and parses `left` and `right`, and then checks equality.
+ * This will accurately check object equality for reactive objects.
+ *
+ * @param left
+ * @param right
+ * @returns Whether `left` and `right` are equal in their serialized form.
+ */
 export function isJsonEqual(left: unknown, right: unknown): boolean {
   return (left != null && right != null)
     ? isEqual(JSON.parse(JSON.stringify(left)), JSON.parse(JSON.stringify(right)))

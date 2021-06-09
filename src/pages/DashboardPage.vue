@@ -7,11 +7,10 @@ import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { featureStore, WidgetContext } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
-import {
-  createDialog,
-  makeObjectSorter,
-  startChangeDashboardTitle,
-} from '@/utils';
+import { startChangeDashboardTitle } from '@/utils/dashboards';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
+
 
 const widgetSorter = makeObjectSorter<Widget>('order');
 

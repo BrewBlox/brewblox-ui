@@ -1,6 +1,6 @@
 import { UI_NAMESPACE, WS_HOST } from '@/const';
 import { createApi } from '@/database/api';
-import { http } from '@/utils';
+import { http } from '@/utils/http';
 
 import { ApiQuery, LoggedSession, QueryResult } from '../types';
 

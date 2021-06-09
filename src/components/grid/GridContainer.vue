@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { WidgetContext } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
-import { patchedById } from '@/utils';
+import { patchedById } from '@/utils/collections';
 
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE } from './const';
 import GridItem from './GridItem.vue';

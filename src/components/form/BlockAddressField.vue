@@ -6,7 +6,7 @@ import { useField } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block, ComparedBlockType } from '@/plugins/spark/types';
 import type { BlockAddress } from '@/plugins/spark/types';
-import { createBlockDialog, createDialog } from '@/utils';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
 
 export default defineComponent({
   name: 'BlockAddressField',

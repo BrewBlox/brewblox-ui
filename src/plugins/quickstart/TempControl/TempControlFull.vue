@@ -8,7 +8,9 @@ import {
   PidBlock,
   SetpointProfileBlock,
 } from '@/shared-types';
-import { createDialog, makeTypeFilter, spliceById } from '@/utils';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
 
 import TempControlModeDialog from './TempControlModeDialog.vue';
 import TempControlPidView from './TempControlPidView.vue';

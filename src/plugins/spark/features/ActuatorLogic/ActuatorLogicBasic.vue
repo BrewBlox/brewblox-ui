@@ -8,7 +8,8 @@ import {
   DigitalCompare,
   LogicResult,
 } from '@/plugins/spark/types';
-import { createDialog, prettyLink } from '@/utils';
+import { prettyLink } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';

@@ -11,7 +11,7 @@ import {
   SystemBlockType,
 } from '@/shared-types';
 import { featureStore } from '@/store/features';
-import { isLink } from '@/utils';
+import { isLink } from '@/utils/bloxfield';
 
 import { compatibleTypes } from '../const';
 import { sparkStore } from '../store';

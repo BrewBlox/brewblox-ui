@@ -4,12 +4,12 @@ import { computed, defineComponent, ref } from 'vue';
 import { useGlobals } from '@/composables';
 import { featureStore, ServiceFeature } from '@/store/features';
 import { Service, ServiceStatus, serviceStore, ServiceStub } from '@/store/services';
+import { makeObjectSorter } from '@/utils/functional';
 import {
-  makeObjectSorter,
   startChangeServiceTitle,
   startCreateService,
   startRemoveService,
-} from '@/utils';
+} from '@/utils/services';
 
 interface ServiceSuggestion {
   stub: ServiceStub;

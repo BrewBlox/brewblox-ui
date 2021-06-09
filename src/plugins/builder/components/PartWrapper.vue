@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
-import { Coordinates, rotatedSize } from '@/utils';
+import { Coordinates, rotatedSize } from '@/utils/coordinates';
 
 import { usePart } from '../composables';
 import parts from '../parts';

@@ -6,7 +6,8 @@ import { TiltService, TiltStateValue } from '@/plugins/tilt/types';
 import { WidgetContext } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { ContextKey } from '@/symbols';
-import { makeObjectSorter, startChangeServiceTitle } from '@/utils';
+import { makeObjectSorter } from '@/utils/functional';
+import { startChangeServiceTitle } from '@/utils/services';
 
 const context: WidgetContext = {
   mode: 'Basic',

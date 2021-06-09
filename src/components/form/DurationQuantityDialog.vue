@@ -3,15 +3,10 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
-import {
-  bloxQty,
-  createDialog,
-  durationMs,
-  durationString,
-  isQuantity,
-  makeRuleErrorFinder,
-  makeRuleValidator,
-} from '@/utils';
+import { bloxQty, isQuantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { durationMs, durationString } from '@/utils/duration';
+import { makeRuleErrorFinder, makeRuleValidator } from '@/utils/rules';
 
 
 export default defineComponent({

@@ -1,6 +1,6 @@
 import { ActuatorLogicBlock, AnalogCompare, BlockIntfType, DigitalCompare } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { tempQty } from '@/utils';
+import { tempQty } from '@/utils/bloxfield';
 
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './getters';
 import { ExpressionError } from './types';

@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { makeRuleValidator } from '@/utils';
+import { makeRuleValidator } from '@/utils/rules';
 
 export default defineComponent({
   name: 'DatetimeDialog',

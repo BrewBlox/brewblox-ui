@@ -3,7 +3,7 @@ import { QField } from 'quasar';
 import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
 
 import { useField } from '@/composables';
-import { fixedNumber } from '@/utils';
+import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'LabeledField',

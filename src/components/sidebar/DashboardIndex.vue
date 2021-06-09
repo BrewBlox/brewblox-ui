@@ -3,7 +3,8 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useGlobals } from '@/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { createDialog, makeObjectSorter } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 const dashboardSorter = makeObjectSorter<Dashboard>('order');
 

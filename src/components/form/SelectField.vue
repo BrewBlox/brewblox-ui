@@ -3,7 +3,7 @@ import isArray from 'lodash/isArray';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
-import { createDialog } from '@/utils';
+import { createDialog } from '@/utils/dialog';
 
 export default defineComponent({
   name: 'SelectField',

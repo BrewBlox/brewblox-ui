@@ -4,7 +4,8 @@ import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
 import { featureStore, WatcherFeature, WidgetFeature } from '@/store/features';
-import { cref, deserialize } from '@/utils';
+import { cref } from '@/utils/component-ref';
+import { deserialize } from '@/utils/parsing';
 
 import AutomationWatcher from './AutomationWatcher.vue';
 import AutomationWidget from './AutomationWidget.vue';

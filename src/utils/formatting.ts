@@ -3,15 +3,20 @@ import isString from 'lodash/isString';
 import round from 'lodash/round';
 import { date } from 'quasar';
 
-export function dateString(value: number | string | Date | null, nullLabel = '<not set>'): string {
-  if (value === null || value === undefined) {
+type DateCompatible =
+  | Date
+  | number
+  | string
+
+export function dateString(value: Maybe<DateCompatible>, nullLabel = '<not set>'): string {
+  if (value == null) {
     return nullLabel;
   }
   return new Date(value).toLocaleString();
 }
 
-export function shortDateString(value: number | string | Date | null | undefined, nullLabel = '<not set>'): string {
-  if (value === null || value === undefined) {
+export function shortDateString(value: Maybe<DateCompatible>, nullLabel = '<not set>'): string {
+  if (value == null) {
     return nullLabel;
   }
   const date = new Date(value);
@@ -21,30 +26,18 @@ export function shortDateString(value: number | string | Date | null | undefined
   return date.toLocaleDateString();
 }
 
-export function isoDateString(val: Maybe<Date | number | string>): string | undefined {
-  if (val instanceof Date) {
-    return val.toISOString();
+export function isoDateString(value: Maybe<DateCompatible>): string | undefined {
+  if (value instanceof Date) {
+    return value.toISOString();
   }
-  const numV = Number(val);
+  const numV = Number(value);
   if (isFinite(numV) && date.isValid(numV)) {
     return new Date(numV).toISOString();
   }
-  if (isString(val) && date.isValid(val)) {
-    return new Date(val).toISOString();
+  if (isString(value) && date.isValid(value)) {
+    return new Date(value).toISOString();
   }
   return undefined;
-}
-
-export function fixedNumber(value: Maybe<number>, digits = 2): string {
-  return value != null
-    ? Number(value).toFixed(digits)
-    : digits > 0 ? `--.${'-'.repeat(digits)}` : '--';
-}
-
-export function preciseNumber(value: Maybe<number>, precision = 3): string | number {
-  return value != null
-    ? Number(value).toPrecision(precision)
-    : '-'.repeat(precision);
 }
 
 export function roundNumber(value: number, digits?: number): number;
@@ -55,17 +48,42 @@ export function roundNumber(value: Maybe<number>, digits = 2): number | null {
     : null;
 }
 
+export function fixedNumber(value: Maybe<number>, digits = 2): string {
+  return value != null
+    ? Number(value).toFixed(digits)
+    : digits > 0 ? `-.${'-'.repeat(digits)}` : '--';
+}
+
+export function preciseNumber(value: Maybe<number>, precision = 3, digits = 2): string | number {
+  return value != null
+    ? round(value, digits).toPrecision(precision)
+    : '-'.repeat(precision);
+}
+
+/**
+ * Clamp any given number to degrees rotation.
+ *
+ * @param value Unbounded value
+ * @returns 0-360 value that matches the rotation of `value`.
+ */
 export function clampRotation(value: number): number {
   return (value + 360) % 360;
 }
 
-export const mqttTopicExp =
-  (topicFilter: string): RegExp =>
-    new RegExp(
-      topicFilter
-        .split('/')
-        .map(s => s
-          .replace('+', '[a-zA-Z0-9 _.-]*')
-          .replace('#', '?($|[a-zA-Z0-9 \/_.-]*)'))
-        .join('\\/')
-      + '$');
+/**
+ * Generates a regular expression that matches the MQTT topic filter.
+ * MQTT wildcards + and # are converted to RegEx syntax.
+ *
+ * @param topicFilter A MQTT topic path that may include wildcards.
+ * @returns A regular expression that will test true for topics matching `topicFilter`.
+ */
+export function mqttTopicExp(topicFilter: string): RegExp {
+  return new RegExp(
+    topicFilter
+      .split('/')
+      .map(s => s
+        .replace('+', '[a-zA-Z0-9 _.-]*')
+        .replace('#', '?($|[a-zA-Z0-9 \/_.-]*)'))
+      .join('\\/')
+    + '$');
+}

@@ -2,7 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
-import { createDialog } from '@/utils';
+import { createDialog } from '@/utils/dialog';
 
 
 export default defineComponent({

@@ -6,7 +6,8 @@ import { builderStore } from '@/plugins/builder/store';
 import { dashboardStore } from '@/store/dashboards';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
-import { createDialog, makeObjectSorter } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 const dashboardSorter = makeObjectSorter('order');
 

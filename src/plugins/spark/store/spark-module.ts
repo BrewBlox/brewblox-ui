@@ -20,13 +20,13 @@ import { isBlockVolatile, isSparkPatch, isSparkState } from '@/plugins/spark/uti
 import { serviceStore } from '@/store/services';
 import { widgetStore } from '@/store/widgets';
 import {
-  deepCopy,
-  deserialize,
   extendById,
   filterById,
   findById,
-  makeTypeFilter,
-} from '@/utils';
+} from '@/utils/collections';
+import { makeTypeFilter } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
+import { deserialize } from '@/utils/parsing';
 
 import * as api from './api';
 import {

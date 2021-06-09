@@ -6,7 +6,9 @@ import { useRouter } from 'vue-router';
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
-import { createDialog, spliceById, uniqueFilter } from '@/utils';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
+import { uniqueFilter } from '@/utils/functional';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { defaultLayoutHeight, defaultLayoutWidth } from './const';

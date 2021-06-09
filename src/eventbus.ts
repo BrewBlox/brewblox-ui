@@ -1,6 +1,3 @@
-// Note: some utils indirectly import this file
-// Import from specific utils modules to avoid circular dependencies
-
 import mqtt from 'mqtt';
 import { nanoid } from 'nanoid';
 

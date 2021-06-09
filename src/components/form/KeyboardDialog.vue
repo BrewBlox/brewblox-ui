@@ -6,7 +6,8 @@ import { computed, defineComponent, nextTick, onMounted, PropType, ref } from 'v
 
 import { useDialog } from '@/composables';
 import { systemStore } from '@/store/system';
-import { isDurationString, makeRuleValidator } from '@/utils';
+import { isDurationString } from '@/utils/duration';
+import { makeRuleValidator } from '@/utils/rules';
 
 type BoardType = 'text' | 'number' | 'duration';
 

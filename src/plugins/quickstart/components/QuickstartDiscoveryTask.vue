@@ -12,7 +12,9 @@ import {
 } from '@/plugins/spark/types';
 import { discoverBlocks, isCompatible, makeBlockIdRules } from '@/plugins/spark/utils';
 import { featureStore } from '@/store/features';
-import { createBlockDialog, createDialog, makeObjectSorter, prettyQty } from '@/utils';
+import { prettyQty } from '@/utils/bloxfield';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 import { QuickstartConfig } from '../types';
 

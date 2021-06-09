@@ -5,7 +5,7 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { BalancerBlock } from '@/plugins/spark/types';
 import { Block } from '@/shared-types';
-import { fixedNumber } from '@/utils';
+import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'BalancerWidget',

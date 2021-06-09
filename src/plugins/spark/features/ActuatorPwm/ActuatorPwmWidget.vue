@@ -4,7 +4,9 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorPwmBlock } from '@/plugins/spark/types';
-import { fixedNumber, Link, prettyLink, roundNumber } from '@/utils';
+import { Link } from '@/shared-types';
+import { prettyLink } from '@/utils/bloxfield';
+import { fixedNumber, roundNumber } from '@/utils/formatting';
 
 const quickValues: SelectOption<number>[] = [
   { label: '0%', value: 0 },

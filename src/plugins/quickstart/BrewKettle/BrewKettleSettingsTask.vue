@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { systemStore } from '@/store/system';
-import { bloxQty, deltaTempQty, JSQuantity } from '@/utils';
+import { bloxQty, deltaTempQty, JSQuantity } from '@/utils/bloxfield';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';

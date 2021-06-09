@@ -6,7 +6,10 @@ import { useGlobals, useWidget } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { Block } from '@/shared-types';
-import { createDialog, deepCopy, deserialize, filterById, spliceById } from '@/utils';
+import { filterById, spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/objects';
+import { deserialize } from '@/utils/parsing';
 
 import QuickActionChange from './QuickActionChange.vue';
 import { BlockChange, ChangeAction, QuickActionsWidget } from './types';

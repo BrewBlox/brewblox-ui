@@ -1,7 +1,7 @@
 import { PartSpec, PersistentPart, Transitions } from '@/plugins/builder/types';
 import { showDrivingBlockDialog } from '@/plugins/builder/utils';
 import { BlockType } from '@/plugins/spark/types';
-import { Coordinates } from '@/utils';
+import { Coordinates } from '@/utils/coordinates';
 
 export const DEFAULT_SIZE_X = 4;
 export const SIZE_Y = 1;

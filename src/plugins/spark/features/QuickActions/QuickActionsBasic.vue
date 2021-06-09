@@ -5,15 +5,13 @@ import { computed, defineComponent, ref } from 'vue';
 import { useGlobals, useWidget } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
-import {
-  createDialog,
-  deepCopy,
-  deserialize,
-  notify,
-  prettyAny,
-  spliceById,
-  uniqueFilter,
-} from '@/utils';
+import { prettyAny } from '@/utils/bloxfield';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
+import { uniqueFilter } from '@/utils/functional';
+import { notify } from '@/utils/notify';
+import { deepCopy } from '@/utils/objects';
+import { deserialize } from '@/utils/parsing';
 
 import { BlockChange, ChangeAction, EditableBlockField, QuickActionsWidget } from './types';
 

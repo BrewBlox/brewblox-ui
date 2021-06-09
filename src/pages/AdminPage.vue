@@ -12,7 +12,8 @@ import {
   startEditBuilderTouchDelay,
   systemStore,
 } from '@/store/system';
-import { createDialog, makeObjectSorter } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 interface ConfigService {
   serviceId: string;

@@ -3,7 +3,7 @@ import { defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { SetpointProfileBlock } from '@/plugins/spark/types';
-import { saveFile } from '@/utils';
+import { saveFile } from '@/utils/import-export';
 
 export default defineComponent({
   name: 'ProfileExportAction',

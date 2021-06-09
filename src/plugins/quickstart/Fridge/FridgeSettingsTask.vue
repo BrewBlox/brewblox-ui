@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue';
 
-import { JSQuantity, tempQty } from '@/utils';
+import { JSQuantity, tempQty } from '@/utils/bloxfield';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';

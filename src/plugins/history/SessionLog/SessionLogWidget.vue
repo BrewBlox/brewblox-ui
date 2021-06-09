@@ -5,7 +5,9 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { dashboardStore } from '@/store/dashboards';
-import { createDialog, notify, saveFile } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { saveFile } from '@/utils/import-export';
+import { notify } from '@/utils/notify';
 
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';

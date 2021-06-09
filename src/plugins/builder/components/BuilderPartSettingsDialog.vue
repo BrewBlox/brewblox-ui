@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { clampRotation } from '@/utils';
+import { clampRotation } from '@/utils/formatting';
 
 import { builderStore } from '../store';
 import { CardSpec, FlowPart, PartSpec } from '../types';

@@ -2,7 +2,9 @@
 import { defineComponent, PropType } from 'vue';
 
 import { TiltFieldIndex, TiltStateValue } from '@/plugins/tilt/types';
-import { fixedNumber, prettyQty, shortDateString } from '@/utils';
+import { prettyQty } from '@/utils/bloxfield';
+import { fixedNumber, shortDateString } from '@/utils/formatting';
+
 
 const fieldClass = 'col-5 col-grow q-my-none';
 

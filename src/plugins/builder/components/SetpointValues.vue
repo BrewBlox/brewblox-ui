@@ -6,7 +6,10 @@ import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
-import { contrastColor, fixedNumber, makeTypeFilter, prettyUnit } from '@/utils';
+import { prettyUnit } from '@/utils/bloxfield';
+import { fixedNumber } from '@/utils/formatting';
+import { makeTypeFilter } from '@/utils/functional';
+import { contrastColor } from '@/utils/misc';
 
 import { useSettingsBlock } from '../composables';
 

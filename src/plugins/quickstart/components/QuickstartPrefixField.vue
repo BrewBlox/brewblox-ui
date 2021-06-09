@@ -2,7 +2,7 @@
 
 import { computed, defineComponent, ref } from 'vue';
 
-import { makeRuleValidator } from '@/utils';
+import { makeRuleValidator } from '@/utils/rules';
 
 const rules = [
   v => /^($|[a-zA-Z])/.test(v) || 'Name must start with a letter',

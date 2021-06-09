@@ -5,7 +5,8 @@ import { dom } from 'quasar';
 import { ComponentPublicInstance, computed, defineComponent, ref } from 'vue';
 
 import { useGlobals, useWidget } from '@/composables';
-import { createDialog, spliceById } from '@/utils';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
 
 import { emptyGraphConfig } from '../getters';
 import { historyStore } from '../store';

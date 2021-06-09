@@ -4,7 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { TempSensorOneWireBlock } from '@/plugins/spark/types';
-import { createDialog } from '@/utils';
+import { createDialog } from '@/utils/dialog';
 
 import TempSensorSwapDialog from './TempSensorSwapDialog.vue';
 

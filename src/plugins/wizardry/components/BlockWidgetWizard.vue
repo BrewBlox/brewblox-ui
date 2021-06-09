@@ -7,7 +7,10 @@ import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { widgetStore } from '@/store/widgets';
-import { createDialog, createDialogPromise, makeObjectSorter, makeRuleValidator, suggestId } from '@/utils';
+import { createDialog, createDialogPromise } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
+
 
 type CreateMode = 'new' | 'existing';
 

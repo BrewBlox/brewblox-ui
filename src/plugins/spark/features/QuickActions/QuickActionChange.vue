@@ -7,7 +7,8 @@ import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 import { BlockSpec } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
-import { createDialog, spliceById } from '@/utils';
+import { spliceById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
 
 import { BlockChange, EditableBlockField } from './types';
 

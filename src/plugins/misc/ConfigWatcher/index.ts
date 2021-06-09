@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { featureStore, WatcherFeature } from '@/store/features';
-import { cref } from '@/utils';
+import { cref } from '@/utils/component-ref';
 
 import ConfigWatcher from './ConfigWatcher.vue';
 

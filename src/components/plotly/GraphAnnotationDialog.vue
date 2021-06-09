@@ -2,7 +2,7 @@
 import { defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { createDialog } from '@/utils';
+import { createDialog } from '@/utils/dialog';
 
 export default defineComponent({
   name: 'GraphAnnotationDialog',

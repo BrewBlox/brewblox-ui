@@ -3,7 +3,7 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import { featureStore } from '@/store/features';
-import { extendById, filterById, findById } from '@/utils';
+import { extendById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
 import type { Service, ServiceStatus, ServiceStub } from './types';

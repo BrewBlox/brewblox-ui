@@ -16,7 +16,7 @@ import {
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
-import { deltaTempQty, isQuantity, prettyAny, Quantity } from '@/utils';
+import { deltaTempQty, isQuantity, prettyAny, Quantity } from '@/utils/bloxfield';
 
 import { usePart, useSettingsBlock } from '../composables';
 import { DRIVER_KEY, DRIVER_TYPES } from '../specs/SetpointDriverDisplay';

@@ -18,7 +18,7 @@ import {
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
-import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/utils';
+import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/utils/bloxfield';
 
 import { DisplayBlock } from '../types';
 import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';

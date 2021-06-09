@@ -9,13 +9,10 @@ import { useContext, useWidget } from '@/composables';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { Widget } from '@/store/widgets';
-import {
-  bloxQty,
-  createDialog,
-  durationString,
-  isJsonEqual,
-  Quantity,
-} from '@/utils';
+import { bloxQty, Quantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { durationString } from '@/utils/duration';
+import { isJsonEqual } from '@/utils/objects';
 
 import { addBlockGraph } from './utils';
 

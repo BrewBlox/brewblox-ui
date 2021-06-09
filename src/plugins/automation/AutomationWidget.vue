@@ -3,7 +3,9 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { HOST } from '@/const';
-import { createDialog, findById, shortDateString } from '@/utils';
+import { findById } from '@/utils/collections';
+import { createDialog } from '@/utils/dialog';
+import { shortDateString } from '@/utils/formatting';
 
 import AutomationInfoDialog from './AutomationInfoDialog.vue';
 import AutomationJumpDialog from './AutomationJumpDialog.vue';

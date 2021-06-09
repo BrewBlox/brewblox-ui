@@ -2,7 +2,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils';
+import { extendById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
 

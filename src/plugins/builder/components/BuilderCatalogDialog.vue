@@ -3,7 +3,8 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { createDialog, makeObjectSorter } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 import { builderStore } from '../store';
 import { FlowPart, PartSpec, PersistentPart } from '../types';

@@ -7,7 +7,8 @@ import { createBlockWizard } from '@/plugins/wizardry';
 import { BlockType } from '@/shared-types';
 import { featureStore, WidgetRole } from '@/store/features';
 import { serviceStore } from '@/store/services';
-import { createBlockDialog, createDialog, makeObjectSorter } from '@/utils';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { SparkService } from '../types';

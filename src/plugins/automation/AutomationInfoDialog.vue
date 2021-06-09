@@ -13,7 +13,9 @@ import {
   TimeElapsedImpl,
   WebhookImpl,
 } from '@/shared-types';
-import { durationString, matchesType, shortDateString } from '@/utils';
+import { durationString } from '@/utils/duration';
+import { shortDateString } from '@/utils/formatting';
+import { matchesType } from '@/utils/objects';
 
 import {
   AutomationImpl,

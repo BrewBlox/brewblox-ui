@@ -6,7 +6,9 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
-import { bloxLink, Link, makeObjectSorter, makeTypeFilter } from '@/utils';
+import { Link } from '@/shared-types';
+import { bloxLink } from '@/utils/bloxfield';
+import { makeObjectSorter, makeTypeFilter } from '@/utils/functional';
 
 interface EditableChannel extends IoChannel {
   id: number;

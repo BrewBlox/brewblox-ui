@@ -5,7 +5,10 @@ import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { bloxQty, createDialog, deepCopy, durationString, isJsonEqual } from '@/utils';
+import { bloxQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { durationString } from '@/utils/duration';
+import { deepCopy, isJsonEqual } from '@/utils/objects';
 
 export default defineComponent({
   name: 'BlockGraph',

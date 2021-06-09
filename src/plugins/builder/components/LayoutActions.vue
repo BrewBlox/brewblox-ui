@@ -9,7 +9,9 @@ import { startAddLayout, startChangeLayoutTitle } from '@/plugins/builder/utils'
 import { dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
-import { createDialog, notify, saveFile } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { saveFile } from '@/utils/import-export';
+import { notify } from '@/utils/notify';
 
 export default defineComponent({
   name: 'LayoutActions',

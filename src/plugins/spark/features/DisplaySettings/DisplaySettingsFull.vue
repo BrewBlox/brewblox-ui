@@ -4,7 +4,8 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { BlockIntfType, BlockOrIntfType, BlockType, DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { bloxLink, createDialog, isLink, Link } from '@/utils';
+import { bloxLink, isLink, Link } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
 const slotNameRules: InputRule[] = [
   v => !v || v.length <= 15 || 'Name can only be 15 characters',

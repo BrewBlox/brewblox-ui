@@ -1,6 +1,3 @@
-// Note: some utils indirectly import this file
-// Import from specific utils modules to avoid circular dependencies
-
 import { AxiosError } from 'axios';
 import isObjectLike from 'lodash/isObjectLike';
 

@@ -4,7 +4,7 @@ import { defineComponent, PropType } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { BuilderLayout } from '@/plugins/builder/types';
-import { loadFile } from '@/utils';
+import { loadFile } from '@/utils/import-export';
 
 import { builderStore } from '../store';
 import { startAddLayout } from '../utils';

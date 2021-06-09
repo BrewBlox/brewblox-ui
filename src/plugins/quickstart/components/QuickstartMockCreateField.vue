@@ -5,7 +5,8 @@ import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, TempSensorMockBlock } from '@/plugins/spark/types';
 import { SparkStatus } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils';
-import { makeRuleValidator, notify, suggestId } from '@/utils';
+import { notify } from '@/utils/notify';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
 
 export default defineComponent({
   name: 'QuickstartMockCreateField',

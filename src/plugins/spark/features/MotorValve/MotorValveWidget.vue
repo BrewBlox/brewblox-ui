@@ -4,10 +4,12 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { BlockType, MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
-import { makeTypeFilter } from '@/utils';
+import { makeTypeFilter } from '@/utils/functional';
 
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
+
+const spark3Filter = makeTypeFilter<Spark3PinsBlock>(BlockType.Spark3Pins);
 
 export default defineComponent({
   name: 'MotorValveWidget',
@@ -29,7 +31,7 @@ export default defineComponent({
     const spark3Pins = computed<Spark3PinsBlock | null>(
       () => sparkModule
         .blocks
-        .find(makeTypeFilter<Spark3PinsBlock>(BlockType.Spark3Pins))
+        .find(spark3Filter)
         ?? null,
     );
 

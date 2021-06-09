@@ -10,10 +10,10 @@ import {
   TicksBlock,
   WiFiSettingsBlock,
 } from '@/plugins/spark/types';
+import { getTicksBlock, getWiFiSettingsBlock } from '@/plugins/spark/utils';
 import { serviceStore } from '@/store/services';
-import { durationString, shortDateString } from '@/utils';
-
-import { getTicksBlock, getWiFiSettingsBlock } from '../../utils';
+import { durationString } from '@/utils/duration';
+import { shortDateString } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'SysInfoWidget',

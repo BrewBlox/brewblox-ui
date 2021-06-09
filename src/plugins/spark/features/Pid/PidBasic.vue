@@ -4,7 +4,9 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
-import { createBlockDialog, createDialog, fixedNumber, prettyQty } from '@/utils';
+import { prettyQty } from '@/utils/bloxfield';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'PidBasic',

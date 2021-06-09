@@ -7,7 +7,7 @@ import type { Block, BlockConfig } from '@/plugins/spark/types';
 import { discoverBlocks, makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
-import { createBlockDialog, createDialog } from '@/utils';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
 
 export default defineComponent({
   name: 'BlockDiscoveryWizard',

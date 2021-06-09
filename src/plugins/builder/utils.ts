@@ -9,9 +9,9 @@ import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { widgetStore } from '@/store/widgets';
-import { Coordinates, CoordinatesParam, rotatedSize } from '@/utils';
-import { createBlockDialog, createDialog, createDialogPromise } from '@/utils';
-import { deepCopy } from '@/utils';
+import { Coordinates, CoordinatesParam, rotatedSize } from '@/utils/coordinates';
+import { createBlockDialog, createDialog, createDialogPromise } from '@/utils/dialog';
+import { deepCopy } from '@/utils/objects';
 
 import { CENTER, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './const';
 import { builderStore } from './store';

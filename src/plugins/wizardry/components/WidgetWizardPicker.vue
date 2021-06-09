@@ -3,7 +3,8 @@ import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
-import { createDialog, makeObjectSorter } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 import { useWizard } from '../composables';
 

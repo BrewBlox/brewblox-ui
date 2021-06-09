@@ -5,7 +5,10 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
-import { createDialog, deepCopy, deserialize } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/objects';
+import { deserialize } from '@/utils/parsing';
+
 
 const typeName = BlockType.SetpointProfile;
 

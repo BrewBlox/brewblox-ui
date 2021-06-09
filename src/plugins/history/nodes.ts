@@ -4,7 +4,8 @@ import flatMap from 'lodash/flatMap';
 import set from 'lodash/set';
 import startCase from 'lodash/startCase';
 
-import { prettyUnit, propertyNameWithUnit } from '@/utils';
+import { prettyUnit } from '@/utils/bloxfield';
+import { propertyNameWithUnit } from '@/utils/parsing';
 
 import { QueryTarget } from './types';
 

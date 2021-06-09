@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { autoRegister } from '@/utils';
+import { autoRegister } from '@/utils/component-ref';
 
 import BrewKettle from './BrewKettle';
 import Ferment from './Ferment';

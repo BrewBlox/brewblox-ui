@@ -1,21 +1,3 @@
-export function combinations<T>(arr: T[]): [T, T][] {
-  const results: [T, T][] = [];
-  // last element is skipped
-  for (let i = 0; i < arr.length - 1; i++) {
-    // Capture the second part of the combination
-    for (let j = i + 1; j < arr.length; j++) {
-      results.push([arr[i], arr[j]]);
-    }
-  }
-  return results;
-}
-
-// Overloads for spliceById
-// if insert is false, the stub { id } is sufficient to remove the existing object
-export function spliceById<T extends HasId>(arr: T[], obj: T): T[];
-export function spliceById<T extends HasId>(arr: T[], obj: T, insert: true): T[];
-export function spliceById<T extends HasId>(arr: T[], obj: HasId, insert: false): T[];
-
 /**
  * Modifies input array by either replacing or removing a member.
  * Returns the modified array.
@@ -25,6 +7,9 @@ export function spliceById<T extends HasId>(arr: T[], obj: HasId, insert: false)
  * @param obj compared object
  * @param insert true to replace the object, false to remove
  */
+export function spliceById<T extends HasId>(arr: T[], obj: T): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: T, insert: true): T[];
+export function spliceById<T extends HasId>(arr: T[], obj: HasId, insert: false): T[];
 export function spliceById<T extends HasId>(arr: T[], obj: T, insert = true): T[] {
   const idx = arr.findIndex(v => v.id === obj.id);
   if (idx !== -1) {

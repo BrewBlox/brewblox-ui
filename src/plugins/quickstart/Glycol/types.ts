@@ -1,4 +1,4 @@
-import { JSQuantity } from '@/utils';
+import { JSQuantity } from '@/utils/bloxfield';
 
 import { PinChannel, QuickstartConfig } from '../types';
 

@@ -12,7 +12,7 @@ import {
 } from '@/plugins/history/nodes';
 import { historyStore } from '@/plugins/history/store';
 import type { QueryConfig } from '@/plugins/history/types';
-import { createDialog } from '@/utils';
+import { createDialog } from '@/utils/dialog';
 
 export default defineComponent({
   name: 'QueryEditor',

@@ -1,7 +1,8 @@
 import { sparkStore } from '@/plugins/spark/store';
 import { PidBlock, RelationEdge, RelationNode } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
-import { createDialog, isLink, Link } from '@/utils';
+import { isLink, Link } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
 function findLinks(serviceId: string, id: string | null): RelationEdge[] {
   const block = sparkStore.blockById(serviceId, id);

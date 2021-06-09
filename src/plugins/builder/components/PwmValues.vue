@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType } from 'vue';
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid, textTransformation } from '@/plugins/builder/utils';
 import { ActuatorPwmBlock, BlockType } from '@/plugins/spark/types';
-import { preciseNumber } from '@/utils';
+import { preciseNumber } from '@/utils/formatting';
 
 import { usePart, useSettingsBlock } from '../composables';
 

@@ -5,7 +5,8 @@ import { cleanUnusedNames, discoverBlocks, saveHwInfo, startResetBlocks } from '
 import { createBlockWizard } from '@/plugins/wizardry';
 import { serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
-import { createDialog, startChangeServiceTitle, startRemoveService } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { SparkService } from '../types';

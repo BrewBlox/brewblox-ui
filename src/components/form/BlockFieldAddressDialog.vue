@@ -13,7 +13,7 @@ import {
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { createBlockDialog } from '@/utils';
+import { createBlockDialog } from '@/utils/dialog';
 
 export default defineComponent({
   name: 'BlockFieldAddressDialog',

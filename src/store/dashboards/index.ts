@@ -1,9 +1,7 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
-import { UI_NAMESPACE } from '@/const';
-import { createApi } from '@/database/api';
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils';
+import { extendById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
 import type { Dashboard } from './types';
@@ -12,10 +10,6 @@ export * from './types';
 
 @Module({ generateMutationSetters: true })
 export class DashboardModule extends VuexModule {
-  private api = createApi<Dashboard>({
-    namespace: `${UI_NAMESPACE}:dashboards`,
-  });
-
   public dashboards: Dashboard[] = [];
 
   public get dashboardIds(): string[] {

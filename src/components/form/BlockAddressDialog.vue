@@ -7,7 +7,8 @@ import type { Block, BlockAddress, ComparedBlockType } from '@/plugins/spark/typ
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
-import { createBlockDialog, makeObjectSorter } from '@/utils';
+import { createBlockDialog } from '@/utils/dialog';
+import { makeObjectSorter } from '@/utils/functional';
 
 const asAddr = (v: Block | BlockAddress | null): BlockAddress => ({
   id: v?.id ?? null,

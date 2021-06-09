@@ -10,7 +10,9 @@ import {
   startChangeBlockId,
   startRemoveBlock,
 } from '@/plugins/spark/utils';
-import { saveFile, startCopyWidget } from '@/utils';
+import { saveFile } from '@/utils/import-export';
+import { startCopyWidget } from '@/utils/widgets';
+
 
 export default defineComponent({
   name: 'BlockActions',

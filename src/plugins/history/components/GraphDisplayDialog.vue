@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, reactive } from 'vue';
 
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils';
+import { deepCopy } from '@/utils/objects';
 
 import { defaultLabel } from '../nodes';
 import { GraphAxis, GraphConfig } from '../types';

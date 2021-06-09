@@ -6,7 +6,7 @@ import {
   LogicResult,
 } from '@/plugins/spark/types';
 import { AnalogCompare, DigitalCompare } from '@/plugins/spark/types';
-import { bloxLink } from '@/utils';
+import { bloxLink } from '@/utils/bloxfield';
 
 import {
   comparisonCheck,

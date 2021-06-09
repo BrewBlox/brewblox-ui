@@ -2,14 +2,10 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
-import {
-  bloxQty,
-  createDialog,
-  durationMs,
-  durationString,
-  isQuantity,
-  Quantity,
-} from '@/utils';
+import { Quantity } from '@/shared-types';
+import { bloxQty, isQuantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { durationMs, durationString } from '@/utils/duration';
 
 export default defineComponent({
   name: 'DurationValEdit',

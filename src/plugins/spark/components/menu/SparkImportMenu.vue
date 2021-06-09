@@ -5,7 +5,10 @@ import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils';
-import { createDialog, loadFile, makeRuleValidator, notify, saveFile, suggestId } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { loadFile, saveFile } from '@/utils/import-export';
+import { notify } from '@/utils/notify';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
 
 export default defineComponent({
   name: 'SparkImportMenu',

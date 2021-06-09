@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 import { computed, defineComponent, ref, watch } from 'vue';
 
 import { Widget, widgetStore } from '@/store/widgets';
-import { deepCopy } from '@/utils';
+import { deepCopy } from '@/utils/objects';
 
 import {
   GRID_GAP_SIZE,

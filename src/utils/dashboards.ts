@@ -1,5 +1,3 @@
-import UrlSafeString from 'url-safe-string';
-
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 import { widgetStore } from '@/store/widgets';
@@ -7,15 +5,15 @@ import { widgetStore } from '@/store/widgets';
 import { createDialog } from './dialog';
 import { notify } from './notify';
 import { makeRuleValidator, suggestId } from './rules';
+import { isUrlSafe, makeUrlSafe } from './url';
 
 type IdChangedCallback = (id: string) => void;
 
-const urlGenerator = new UrlSafeString();
 
 export const makeDashboardIdRules = (): InputRule[] => [
   v => !!v || 'Value is required',
   v => !dashboardStore.dashboardIds.includes(v) || 'Value must be unique',
-  v => v === urlGenerator.generate(v) || 'Value must be URL-safe',
+  v => isUrlSafe(v) || 'Value must be URL-safe',
 ];
 
 export const execDashboardIdChange =
@@ -80,7 +78,7 @@ export const startChangeDashboardTitle =
         await dashboardStore.saveDashboard({ ...dashboard, title: newTitle });
         notify.done(`Renamed dashboard to <b>${newTitle}</b>`);
 
-        const defaultId = urlGenerator.generate(newTitle);
+        const defaultId = makeUrlSafe(newTitle);
         if (oldId === defaultId) {
           return; // no change
         }

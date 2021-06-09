@@ -2,7 +2,9 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
-import { createDialog, fixedNumber, isQuantity, prettyUnit, Quantity } from '@/utils';
+import { isQuantity, prettyUnit, Quantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'QuantityField',

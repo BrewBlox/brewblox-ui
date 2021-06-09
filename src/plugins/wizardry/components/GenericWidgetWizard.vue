@@ -4,7 +4,7 @@ import { computed, defineComponent, onBeforeUnmount, ref } from 'vue';
 import { tryCreateWidget } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
-import { createDialog } from '@/utils';
+import { createDialog } from '@/utils/dialog';
 
 import { useWidgetWizard } from '../composables';
 

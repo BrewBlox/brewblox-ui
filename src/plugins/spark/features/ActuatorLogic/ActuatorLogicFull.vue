@@ -14,7 +14,8 @@ import {
   LogicResult,
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { bloxLink, createDialog, prettyLink } from '@/utils';
+import { bloxLink, prettyLink } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';

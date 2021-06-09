@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { dashboardStore } from '@/store/dashboards';
 import { Widget, widgetStore } from '@/store/widgets';
-import { makeObjectSorter } from '@/utils';
+import { makeObjectSorter } from '@/utils/functional';
 
 import { FlowPart } from '../types';
 

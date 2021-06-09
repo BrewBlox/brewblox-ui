@@ -3,7 +3,8 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
-import { createDialog, prettyUnit, tempQty } from '@/utils';
+import { prettyUnit, tempQty } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
 
 import { sparkStore } from '../../store';
 import { BlockAddress } from '../../types';

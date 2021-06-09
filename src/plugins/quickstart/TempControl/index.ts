@@ -3,7 +3,8 @@ import { Plugin } from 'vue';
 
 import { BlockType } from '@/shared-types';
 import { featureStore, WidgetFeature } from '@/store/features';
-import { bloxLink, cref } from '@/utils';
+import { bloxLink } from '@/utils/bloxfield';
+import { cref } from '@/utils/component-ref';
 
 import {
   makeBeerCoolConfig,

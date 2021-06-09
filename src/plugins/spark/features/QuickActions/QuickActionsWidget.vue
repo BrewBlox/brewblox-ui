@@ -6,7 +6,9 @@ import { computed, defineComponent, onBeforeMount } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { TempUnit } from '@/shared-types';
 import { systemStore } from '@/store/system';
-import { bloxQty, createDialog, deserialize, isQuantity } from '@/utils';
+import { bloxQty, isQuantity } from '@/utils/bloxfield';
+import { createDialog } from '@/utils/dialog';
+import { deserialize } from '@/utils/parsing';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';

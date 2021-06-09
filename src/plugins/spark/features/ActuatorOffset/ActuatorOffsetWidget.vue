@@ -4,7 +4,8 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
-import { fixedNumber, Link, prettyLink } from '@/utils';
+import { Link, prettyLink } from '@/utils/bloxfield';
+import { fixedNumber } from '@/utils/formatting';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
   { label: 'Setting', value: ReferenceKind.REF_SETTING },

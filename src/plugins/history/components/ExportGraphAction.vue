@@ -2,7 +2,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import { GraphConfig } from '@/plugins/history/types';
-import { notify } from '@/utils';
+import { notify } from '@/utils/notify';
 
 import { saveGraphToFile, selectGraphPrecision } from '../utils';
 

@@ -1,6 +1,6 @@
 import { Ref, ref } from 'vue';
 
-import { rotatedSize } from '@/utils';
+import { rotatedSize } from '@/utils/coordinates';
 
 import { SQUARE_SIZE } from '../const';
 import { FlowPart } from '../types';

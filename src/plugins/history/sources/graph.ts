@@ -14,7 +14,7 @@ import {
   QueryResult,
   QueryTarget,
 } from '@/plugins/history/types';
-import { fixedNumber } from '@/utils';
+import { fixedNumber } from '@/utils/formatting';
 
 const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
 

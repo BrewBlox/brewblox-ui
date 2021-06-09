@@ -53,7 +53,6 @@
     "simple-keyboard-layouts": "^1.15.155",
     "svg-path-properties": "^1.0.11",
     "typescript-string-enums": "^1.0.0",
-    "url-safe-string": "^1.1.0",
     "vue-router": "^4.0.8",
     "vuedraggable": "^4.0.1",
     "vuex": "^4.0.1",

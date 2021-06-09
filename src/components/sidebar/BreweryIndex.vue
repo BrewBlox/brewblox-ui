@@ -6,7 +6,7 @@ import { useGlobals } from '@/composables';
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { startAddLayout } from '@/plugins/builder/utils';
-import { makeObjectSorter } from '@/utils';
+import { makeObjectSorter } from '@/utils/functional';
 
 export default defineComponent({
   name: 'BreweryIndex',

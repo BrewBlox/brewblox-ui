@@ -6,7 +6,8 @@ import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { AnalogCompare, AnalogCompareOp, BlockIntfType, Quantity } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { bloxQty, deepCopy, isQuantity, tempQty } from '@/utils';
+import { bloxQty, isQuantity, tempQty } from '@/utils/bloxfield';
+import { deepCopy } from '@/utils/objects';
 
 import { analogOpTitles } from './getters';
 

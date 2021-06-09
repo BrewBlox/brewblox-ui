@@ -4,7 +4,7 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { PidBlock } from '@/plugins/spark/types';
-import { Link, prettyLink } from '@/utils';
+import { Link, prettyLink } from '@/utils/bloxfield';
 
 import PidBasic from './PidBasic.vue';
 import PidFull from './PidFull.vue';

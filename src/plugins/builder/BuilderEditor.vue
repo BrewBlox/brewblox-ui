@@ -15,14 +15,12 @@ import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
 import { systemStore } from '@/store/system';
-import {
-  clampRotation,
-  createDialog,
-  deepCopy,
-  keyEventString,
-  rotatedSize,
-  uniqueFilter,
-} from '@/utils';
+import { rotatedSize } from '@/utils/coordinates';
+import { createDialog } from '@/utils/dialog';
+import { keyEventString } from '@/utils/events';
+import { clampRotation } from '@/utils/formatting';
+import { uniqueFilter } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 import { normalizeSelectArea, useDragSelect, useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderTools, SQUARE_SIZE } from './const';

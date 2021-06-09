@@ -2,7 +2,8 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import { systemStore } from '@/store/system';
-import { bloxQty, extendById } from '@/utils';
+import { bloxQty } from '@/utils/bloxfield';
+import { extendById } from '@/utils/collections';
 
 import type { TiltStateEvent, TiltStateValue } from '../types';
 

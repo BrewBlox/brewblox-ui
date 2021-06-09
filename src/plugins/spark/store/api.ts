@@ -1,4 +1,5 @@
-import { http, intercept, notify } from '@/utils';
+import { http, intercept } from '@/utils/http';
+import { notify } from '@/utils/notify';
 
 import { ApiSparkStatus, Block, BlockIds, SparkExported, SparkStatus } from '../types';
 import { asSparkStatus } from './utils';

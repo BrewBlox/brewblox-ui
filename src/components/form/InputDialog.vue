@@ -3,7 +3,10 @@ import isString from 'lodash/isString';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { createDialog, fixedNumber, makeRuleValidator } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { fixedNumber } from '@/utils/formatting';
+import { makeRuleValidator } from '@/utils/rules';
+
 
 const typeValidator = (v: unknown): boolean =>
   isString(v) && ['text', 'number'].includes(v);

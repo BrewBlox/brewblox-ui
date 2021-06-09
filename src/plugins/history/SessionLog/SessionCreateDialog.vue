@@ -3,7 +3,8 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 import { useDialog } from '@/composables';
-import { createDialog, deepCopy } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { deepCopy } from '@/utils/objects';
 
 import { emptyGraphConfig } from '../getters';
 import { historyStore } from '../store';

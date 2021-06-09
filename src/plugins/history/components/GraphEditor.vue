@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-import { createDialog } from '@/utils';
+import { createDialog } from '@/utils/dialog';
 
 import { DEFAULT_PRECISION } from '../getters';
 import { GraphConfig } from '../types';

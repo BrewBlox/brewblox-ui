@@ -3,7 +3,7 @@ import { Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import type { Widget } from '@/store/widgets';
-import { findById } from '@/utils';
+import { findById } from '@/utils/collections';
 
 import type {
   ComponentResult,

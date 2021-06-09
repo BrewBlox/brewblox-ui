@@ -4,7 +4,7 @@ import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
-import { autoRegister } from '@/utils';
+import { autoRegister } from '@/utils/component-ref';
 
 import { tiltStore } from './store';
 import TiltWidget from './Tilt';

@@ -3,7 +3,7 @@ import { defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { SetpointProfileBlock } from '@/plugins/spark/types';
-import { createDialog } from '@/utils';
+import { createDialog } from '@/utils/dialog';
 
 import ProfilePresetDialog from './ProfilePresetDialog.vue';
 

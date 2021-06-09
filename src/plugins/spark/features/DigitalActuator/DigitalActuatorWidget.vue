@@ -5,7 +5,7 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, DigitalActuatorBlock, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
-import { makeTypeFilter } from '@/utils';
+import { makeTypeFilter } from '@/utils/functional';
 
 interface ClaimDict {
   [channel: number]: string; // block ID of driver

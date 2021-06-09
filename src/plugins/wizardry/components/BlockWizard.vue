@@ -10,7 +10,9 @@ import { isCompatible, isSystemBlockType, makeBlockIdRules } from '@/plugins/spa
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
-import { createDialog, makeObjectSorter, makeRuleValidator, nullFilter, suggestId } from '@/utils';
+import { createDialog } from '@/utils/dialog';
+import { makeObjectSorter, nullFilter } from '@/utils/functional';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
 
 import { useWizard } from '../composables';
 

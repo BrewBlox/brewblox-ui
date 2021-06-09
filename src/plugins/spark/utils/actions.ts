@@ -16,14 +16,11 @@ import {
 } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
-import {
-  bloxLink,
-  createBlockDialog,
-  createDialog,
-  matchesType,
-  notify,
-  saveFile,
-} from '@/utils';
+import { bloxLink } from '@/utils/bloxfield';
+import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { saveFile } from '@/utils/import-export';
+import { notify } from '@/utils/notify';
+import { matchesType } from '@/utils/objects';
 
 import { makeBlockIdRules } from './configuration';
 import { isBlockDisplayed, isBlockDisplayReady, isBlockVolatile, isCompatible } from './info';
