@@ -7,8 +7,8 @@ import { useContext, useWidget } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockFieldSpec } from '@/plugins/spark/types';
 import { Quantity } from '@/shared-types';
-import { isQuantity, prettyAny, prettyQty } from '@/utils/bloxfield';
-import { roundNumber } from '@/utils/formatting';
+import { prettyAny, prettyQty, roundNumber } from '@/utils/formatting';
+import { isQuantity } from '@/utils/identity';
 import { notify } from '@/utils/notify';
 
 import { QuickValuesWidget } from './types';

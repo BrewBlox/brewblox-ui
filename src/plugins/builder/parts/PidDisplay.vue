@@ -7,8 +7,8 @@ import { coord2grid, liquidOnCoord, textTransformation } from '@/plugins/builder
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
-import { deltaTempQty, prettyUnit } from '@/utils/bloxfield';
-import { preciseNumber } from '@/utils/formatting';
+import { preciseNumber, prettyUnit } from '@/utils/formatting';
+import { deltaTempQty } from '@/utils/quantity';
 
 import { usePart, useSettingsBlock } from '../composables';
 import { PID_KEY, PID_TYPES } from '../specs/PidDisplay';

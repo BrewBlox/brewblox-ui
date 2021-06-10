@@ -12,11 +12,14 @@ import { sparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
+  Quantity,
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
-import { deltaTempQty, isQuantity, prettyAny, Quantity } from '@/utils/bloxfield';
+import { prettyAny } from '@/utils/formatting';
+import { isQuantity } from '@/utils/identity';
+import { deltaTempQty } from '@/utils/quantity';
 
 import { usePart, useSettingsBlock } from '../composables';
 import { DRIVER_KEY, DRIVER_TYPES } from '../specs/SetpointDriverDisplay';

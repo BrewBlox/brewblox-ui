@@ -8,11 +8,11 @@ import { computed, defineComponent, nextTick, ref, watch } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { Quantity } from '@/shared-types';
 import { Widget } from '@/store/widgets';
-import { bloxQty, Quantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
-import { durationString } from '@/utils/duration';
 import { isJsonEqual } from '@/utils/objects';
+import { bloxQty, durationString } from '@/utils/quantity';
 
 import { addBlockGraph } from './utils';
 

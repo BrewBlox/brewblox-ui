@@ -2,10 +2,11 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
-import { Quantity } from '@/plugins/spark/types';
-import { bloxQty, isQuantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { durationString, isDurationString } from '@/utils/duration';
+import { isDurationString, isQuantity } from '@/utils/identity';
+import { bloxQty, durationString } from '@/utils/quantity';
+
 
 function modelValidator(v: unknown): boolean {
   return isQuantity(v) || isDurationString(v);

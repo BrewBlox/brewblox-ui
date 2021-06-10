@@ -2,7 +2,7 @@
 import { defineComponent, PropType } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
-import { durationString } from '@/utils/duration';
+import { durationString } from '@/utils/quantity';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from '../Metrics/const';
 import { MetricsConfig } from '../Metrics/types';

@@ -4,9 +4,9 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, PidBlock, Quantity, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { isBlockDriven, prettyBlock } from '@/plugins/spark/utils';
-import { prettyQty, tempQty } from '@/utils/bloxfield';
 import { createBlockDialog } from '@/utils/dialog';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber, prettyQty } from '@/utils/formatting';
+import { tempQty } from '@/utils/quantity';
 
 interface GridOpts {
   start?: number;

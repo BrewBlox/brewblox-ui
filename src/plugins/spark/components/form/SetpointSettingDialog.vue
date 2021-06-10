@@ -2,13 +2,13 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
+import { sparkStore } from '@/plugins/spark/store';
+import { BlockAddress } from '@/plugins/spark/types';
+import { ifCompatible } from '@/plugins/spark/utils';
 import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
-import { prettyUnit, tempQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
-
-import { sparkStore } from '../../store';
-import { BlockAddress } from '../../types';
-import { ifCompatible } from '../../utils';
+import { prettyUnit } from '@/utils/formatting';
+import { tempQty } from '@/utils/quantity';
 
 
 export default defineComponent({

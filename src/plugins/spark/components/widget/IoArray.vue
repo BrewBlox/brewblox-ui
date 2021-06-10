@@ -7,8 +7,8 @@ import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
 import { Link } from '@/shared-types';
-import { bloxLink } from '@/utils/bloxfield';
 import { makeObjectSorter, makeTypeFilter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 
 interface EditableChannel extends IoChannel {
   id: number;

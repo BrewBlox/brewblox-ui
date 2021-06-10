@@ -14,9 +14,9 @@ import {
   TempSensorMockBlock,
   TempSensorOneWireBlock,
 } from '@/shared-types';
-import { bloxLink } from '@/utils/bloxfield';
 import { createBlockDialogPromise } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 
 import { TempControlConfig, TempControlMode } from './types';
 

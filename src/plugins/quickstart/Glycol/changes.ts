@@ -17,8 +17,8 @@ import {
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
-import { bloxLink, bloxQty, deltaTempQty, inverseTempQty, tempQty } from '@/utils/bloxfield';
-import { durationMs } from '@/utils/duration';
+import { bloxLink } from '@/utils/link';
+import { bloxQty, deltaTempQty, durationMs, inverseTempQty, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
@@ -99,9 +99,18 @@ export function defineCreatedBlocks(config: GlycolConfig, opts: GlycolOpts): Blo
           enabled: false,
           targetId: bloxLink(names.beerSetpoint),
           points: [
-            { time: 0, temperature: beerSetting },
-            { time: durationMs('7d') / 1000, temperature: beerSetting },
-            { time: durationMs('10d') / 1000, temperature: beerSetting.copy(beerSetting.value! + 3) },
+            {
+              time: 0,
+              temperature: beerSetting,
+            },
+            {
+              time: durationMs('7d') / 1000,
+              temperature: beerSetting,
+            },
+            {
+              time: durationMs('10d') / 1000,
+              temperature: bloxQty(beerSetting).copy(beerSetting.value! + 3),
+            },
           ],
           drivenTargetId: bloxLink(null),
         },

@@ -4,7 +4,7 @@ import flatMap from 'lodash/flatMap';
 import set from 'lodash/set';
 import startCase from 'lodash/startCase';
 
-import { prettyUnit } from '@/utils/bloxfield';
+import { prettyUnit } from '@/utils/formatting';
 import { splitPostfixed } from '@/utils/parsing';
 
 import { QueryTarget } from './types';

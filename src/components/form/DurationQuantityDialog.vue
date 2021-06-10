@@ -3,9 +3,9 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { Quantity } from '@/plugins/spark/types';
-import { bloxQty, isQuantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
-import { durationMs, durationString } from '@/utils/duration';
+import { isQuantity } from '@/utils/identity';
+import { bloxQty, durationMs, durationString } from '@/utils/quantity';
 import { makeRuleValidator } from '@/utils/rules';
 
 

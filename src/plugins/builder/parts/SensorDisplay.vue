@@ -4,8 +4,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER } from '@/plugins/builder/const';
 import { coord2grid, liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
-import { prettyUnit } from '@/utils/bloxfield';
-import { fixedNumber } from '@/utils/formatting';
+import { fixedNumber, prettyUnit } from '@/utils/formatting';
 
 import { usePart, useSettingsBlock } from '../composables';
 import { SENSOR_KEY, SENSOR_TYPES, SensorT } from '../specs/SensorDisplay';

@@ -1,7 +1,13 @@
 import isFinite from 'lodash/isFinite';
+import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 import round from 'lodash/round';
 import { date } from 'quasar';
+
+import { Link, Quantity } from '@/shared-types';
+
+import { isDurationUnit, isLink, isQuantity } from './identity';
+import { durationString } from './quantity';
 
 type DateCompatible =
   | Date
@@ -87,3 +93,54 @@ export function mqttTopicExp(topicFilter: string): RegExp {
       .join('\\/')
     + '$');
 }
+
+
+export const prettyUnit = (value: Maybe<Quantity | string>): string => {
+  const unit = isQuantity(value) ? value.unit : value;
+  if (!unit) {
+    return '';
+  }
+  return unit
+    .replace(/delta_/g, '')
+    .replace(/\b(deg)?(Celsius|Fahrenheit|Kelvin)/gi,
+      (full, deg, unit: string) => `deg${unit.charAt(0).toUpperCase()}`)
+    .replace(/\bdeg(\b|[A-Z])/g, '°$1') // deg, degC, degX, degSomething
+    .replace(/(milliseconds?|millis)/gi, 'ms')
+    .replace(/(seconds?|sec|minutes?|min|hours?|days?)/gi, v => v.charAt(0).toLowerCase())
+    .replace(/1 ?\/ ?/gi, '/') // 1 / degC
+    .replace(/ ?\/ ?/gi, '/')  // degC / hour
+    .replace(/ ?\* ?/gi, '·');  // degC * hour
+};
+
+export const prettyQty =
+  (q: Maybe<Quantity>, digits = 2): string => {
+    if (!isQuantity(q)) {
+      return '---';
+    }
+    if (isDurationUnit(q.unit)) {
+      return durationString(q);
+    }
+    const valueStr = isNumber(q.value)
+      ? q.value.toFixed(digits)
+      : digits > 0 ? '--.--' : '---';
+    return `${valueStr} ${prettyUnit(q.unit)}`;
+  };
+
+export const roundedQty =
+  (q: Quantity, digits = 2): Quantity => ({
+    ...q,
+    value: round(q.value ?? 0, digits),
+  });
+
+export const prettyLink = (v: Maybe<Link>): string =>
+  v?.id || '[not set]';
+
+export const prettyAny = (v: unknown): string => {
+  if (isQuantity(v)) {
+    return prettyQty(v);
+  }
+  if (isLink(v)) {
+    return prettyLink(v);
+  }
+  return JSON.stringify(v);
+};

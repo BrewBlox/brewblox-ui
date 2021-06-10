@@ -6,7 +6,7 @@ import { computed, defineComponent, nextTick, onMounted, PropType, ref } from 'v
 
 import { useDialog } from '@/composables';
 import { systemStore } from '@/store/system';
-import { isDurationString } from '@/utils/duration';
+import { isDurationString } from '@/utils/identity';
 import { makeRuleValidator } from '@/utils/rules';
 
 type BoardType = 'text' | 'number' | 'duration';

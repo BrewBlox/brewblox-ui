@@ -1,5 +1,7 @@
-import { bloxQty, isLink, isQuantity, JSLink } from '../bloxfield';
+import { isLink, isQuantity } from '../identity';
+import { JSLink } from '../link';
 import { deserialize, serialize } from '../parsing';
+import { bloxQty } from '../quantity';
 
 
 describe('deserialize', () => {

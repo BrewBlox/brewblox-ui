@@ -1,4 +1,4 @@
-import { JSQuantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 
 import { PinChannel, QuickstartConfig } from '../types';
 
@@ -23,5 +23,5 @@ export interface FridgeConfig extends QuickstartConfig {
 }
 
 export interface FridgeOpts {
-  fridgeSetting: JSQuantity;
+  fridgeSetting: Quantity;
 }

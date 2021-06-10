@@ -1,5 +1,7 @@
-import { isLink, prettyLink } from './formatting';
-import { BlockOrIntfType, JSBloxField, Link } from './types';
+import { BlockOrIntfType, Link } from '@/shared-types';
+
+import { prettyLink } from './formatting';
+import { isLink } from './identity';
 
 export function rawLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): Link;
 export function rawLink(other: Link): Link;
@@ -19,7 +21,7 @@ export function rawLink(value: Link | string | null, type?: BlockOrIntfType | nu
     };
 }
 
-export class JSLink implements JSBloxField, Link {
+export class JSLink implements Link {
   public readonly __bloxtype = 'Link';
   public id: string | null;
   public type: BlockOrIntfType | null;

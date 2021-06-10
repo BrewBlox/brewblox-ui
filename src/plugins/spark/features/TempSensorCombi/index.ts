@@ -5,7 +5,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockSpec, BlockType, SensorCombiFunc, TempSensorCombiBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector, enumHint } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
-import { tempQty } from '@/utils/bloxfield';
+import { tempQty } from '@/utils/quantity';
 
 import widget from './TempSensorCombiWidget.vue';
 

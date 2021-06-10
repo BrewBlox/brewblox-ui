@@ -6,9 +6,9 @@ import {
   AnyConstraintsObj,
   BlockAddress,
 } from '@/plugins/spark/types';
-import { prettyLink } from '@/utils/bloxfield';
-import { durationString } from '@/utils/duration';
+import { prettyLink } from '@/utils/formatting';
 import { notify } from '@/utils/notify';
+import { durationString } from '@/utils/quantity';
 
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>

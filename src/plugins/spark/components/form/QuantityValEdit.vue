@@ -3,9 +3,9 @@ import isFinite from 'lodash/isFinite';
 import { computed, defineComponent, ref } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
-import { prettyQty, prettyUnit, Quantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { roundNumber } from '@/utils/formatting';
+import { prettyQty, prettyUnit, roundNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'QuantityValEdit',

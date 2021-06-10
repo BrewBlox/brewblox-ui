@@ -12,8 +12,8 @@ import {
 } from '@/plugins/spark/types';
 import { discoverBlocks, isCompatible, makeBlockIdRules } from '@/plugins/spark/utils';
 import { featureStore } from '@/store/features';
-import { prettyQty } from '@/utils/bloxfield';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
+import { prettyQty } from '@/utils/formatting';
 import { makeObjectSorter } from '@/utils/functional';
 
 import { QuickstartConfig } from '../types';

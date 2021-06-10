@@ -1,9 +1,11 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
+import { Quantity } from '@/shared-types';
 import { systemStore } from '@/store/system';
-import { bloxQty, deltaTempQty, JSQuantity, prettyQty, prettyUnit, tempQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
+import { prettyQty, prettyUnit } from '@/utils/formatting';
+import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';
@@ -35,31 +37,31 @@ export default defineComponent({
     'close',
   ],
   setup(props, { emit }) {
-    const hltFullPowerDelta = ref<JSQuantity>(deltaTempQty(2));
-    const bkFullPowerDelta = ref<JSQuantity>(deltaTempQty(2));
+    const hltFullPowerDelta = ref<Quantity>(deltaTempQty(2));
+    const bkFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const hltVolume = ref<number>(25);
     const mashVolume = ref<number>(25);
-    const driverMax = ref<JSQuantity>(deltaTempQty(10));
-    const mashTarget = ref<JSQuantity>(tempQty(67));
-    const mashActual = ref<JSQuantity>(tempQty(65));
+    const driverMax = ref<Quantity>(deltaTempQty(10));
+    const mashTarget = ref<Quantity>(tempQty(67));
+    const mashActual = ref<Quantity>(tempQty(65));
 
     const userTemp = computed<string>(
       () => systemStore.units.temperature,
     );
 
-    const hltKp = computed<JSQuantity>(
+    const hltKp = computed<Quantity>(
       () => bloxQty(100 / (hltFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
     );
 
-    const bkKp = computed<JSQuantity>(
+    const bkKp = computed<Quantity>(
       () => bloxQty(100 / (bkFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
     );
 
-    const mtKp = computed<JSQuantity>(
+    const mtKp = computed<Quantity>(
       () => bloxQty(mashVolume.value / (hltVolume.value || 1), `1/${userTemp.value}`),
     );
 
-    const hltSetting = computed<JSQuantity>(
+    const hltSetting = computed<Quantity>(
       () => {
         if (mashTarget.value.value && mtKp.value.value && mashActual.value.value && driverMax.value.value) {
           const upperLimit = mashTarget.value.value + driverMax.value.value;

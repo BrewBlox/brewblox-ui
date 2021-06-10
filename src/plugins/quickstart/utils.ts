@@ -4,10 +4,10 @@ import { BlockType, DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types
 import { startAddBlockToDisplay } from '@/plugins/spark/utils';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
-import { bloxQty, inverseTempQty } from '@/utils/bloxfield';
 import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
+import { bloxQty, inverseTempQty } from '@/utils/quantity';
 
 import { PidConfig, PinChannel, QuickstartAction, QuickstartConfig } from './types';
 

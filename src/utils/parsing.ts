@@ -4,15 +4,11 @@ import isObject from 'lodash/isObject';
 import mapValues from 'lodash/mapValues';
 import toPairs from 'lodash/toPairs';
 
-import {
-  BlockOrIntfType,
-  isBloxField,
-  isJSBloxField,
-  Link,
-  Quantity,
-  rawLink,
-  rawQty,
-} from './bloxfield';
+import { BlockOrIntfType, Link, Quantity } from '@/shared-types';
+
+import { canSerialize, isBloxField } from './identity';
+import { rawLink } from './link';
+import { rawQty } from './quantity';
 
 
 // string start
@@ -76,8 +72,8 @@ export function serialize<T>(obj: T): T {
   if (isArray(obj)) {
     return (obj as any).map(serialize);
   }
-  if (isJSBloxField(obj)) {
-    return obj.toJSON() as any; // lies
+  if (canSerialize(obj)) {
+    return obj.toJSON();
   }
   if (isObject(obj)) {
     return mapValues(obj, serialize) as any; // lies

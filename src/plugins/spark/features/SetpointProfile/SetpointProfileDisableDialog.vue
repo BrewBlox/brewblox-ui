@@ -5,9 +5,10 @@ import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { calculateProfileValues } from '@/plugins/spark/utils';
 import { Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
-import { prettyUnit, roundedQty, tempQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
+import { prettyUnit, roundedQty } from '@/utils/formatting';
 import { deepCopy } from '@/utils/objects';
+import { tempQty } from '@/utils/quantity';
 
 
 export default defineComponent({

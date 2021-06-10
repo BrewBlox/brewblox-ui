@@ -5,8 +5,8 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockIntfType, BlockSpec, BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
-import { bloxLink } from '@/utils/bloxfield';
 import { shortDateString } from '@/utils/formatting';
+import { bloxLink } from '@/utils/link';
 
 import widget from './SetpointProfileWidget.vue';
 

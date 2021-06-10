@@ -4,7 +4,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { useValEdit } from '@/plugins/spark/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { isCompatible } from '@/plugins/spark/utils';
-import { Link } from '@/utils/bloxfield';
+import { Link } from '@/shared-types';
 
 export default defineComponent({
   name: 'LinkValEdit',

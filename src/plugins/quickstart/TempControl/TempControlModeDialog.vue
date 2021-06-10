@@ -4,10 +4,10 @@ import { computed, defineComponent, PropType, reactive } from 'vue';
 import { useDialog, useGlobals } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
-import { bloxQty, inverseTempQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 import { deepCopy } from '@/utils/objects';
+import { bloxQty, inverseTempQty } from '@/utils/quantity';
 
 import { PidConfig } from '../types';
 import { TempControlMode } from './types';

@@ -7,9 +7,9 @@ import { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
-import { bloxLink, JSLink } from '@/utils/bloxfield';
 import { createBlockDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 
 export default defineComponent({
   name: 'LinkDialog',
@@ -60,7 +60,7 @@ export default defineComponent({
       onDialogOK,
     } = useDialog.setup();
 
-    const local = ref<JSLink>(bloxLink(props.modelValue));
+    const local = ref<Link>(bloxLink(props.modelValue));
 
     const blockTypeFilter = computed<(block: Block) => boolean>(
       () => block => isCompatible(block.type, props.compatible ?? props.modelValue?.type ?? null),

@@ -1,7 +1,8 @@
 import capitalize from 'lodash/capitalize';
 
 import { ServiceStatus } from '@/store/services';
-import { isLink, prettyQty } from '@/utils/bloxfield';
+import { prettyQty } from '@/utils/formatting';
+import { isLink } from '@/utils/identity';
 
 import { constraintLabels } from '../const';
 import { ApiSparkStatus, Block } from '../types';
