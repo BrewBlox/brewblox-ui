@@ -3,6 +3,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
 import store from '@/store';
 import { concatById, filterById, findById } from '@/utils/collections';
+import { nullFilter } from '@/utils/functional';
 
 import api from './api';
 
@@ -67,7 +68,7 @@ export class BuilderModule extends VuexModule {
     await Promise.all(
       ids
         .map(id => this.layoutById(id))
-        .filter((v): v is BuilderLayout => v !== null)
+        .filter(nullFilter)
         .map((layout, idx) => {
           const order = idx + 1;
           if (order !== layout.order) {

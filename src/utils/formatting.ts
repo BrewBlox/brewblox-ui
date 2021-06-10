@@ -46,9 +46,9 @@ export function isoDateString(value: Maybe<DateCompatible>): string | undefined 
   return undefined;
 }
 
-export function roundNumber(value: number, digits?: number): number;
-export function roundNumber(value: Maybe<number>, digits?: number): number | null;
-export function roundNumber(value: Maybe<number>, digits = 2): number | null {
+export function roundedNumber(value: number, digits?: number): number;
+export function roundedNumber(value: Maybe<number>, digits?: number): number | null;
+export function roundedNumber(value: Maybe<number>, digits = 2): number | null {
   return value != null
     ? round(value, digits)
     : null;
@@ -94,8 +94,14 @@ export function mqttTopicExp(topicFilter: string): RegExp {
     + '$');
 }
 
+export function roundedQty(q: Quantity, digits = 2): Quantity {
+  return {
+    ...q,
+    value: round(q.value ?? 0, digits),
+  };
+}
 
-export const prettyUnit = (value: Maybe<Quantity | string>): string => {
+export function prettyUnit(value: Maybe<Quantity | string>): string {
   const unit = isQuantity(value) ? value.unit : value;
   if (!unit) {
     return '';
@@ -107,40 +113,36 @@ export const prettyUnit = (value: Maybe<Quantity | string>): string => {
     .replace(/\bdeg(\b|[A-Z])/g, '°$1') // deg, degC, degX, degSomething
     .replace(/(milliseconds?|millis)/gi, 'ms')
     .replace(/(seconds?|sec|minutes?|min|hours?|days?)/gi, v => v.charAt(0).toLowerCase())
-    .replace(/1 ?\/ ?/gi, '/') // 1 / degC
-    .replace(/ ?\/ ?/gi, '/')  // degC / hour
-    .replace(/ ?\* ?/gi, '·');  // degC * hour
-};
+    .replace(/1? ?\/ ?/gi, '/')  // 'degC / hour' | '1 / degC'
+    .replace(/ ?\* ?/gi, '·'); // 'degC * hour'
+}
 
-export const prettyQty =
-  (q: Maybe<Quantity>, digits = 2): string => {
-    if (!isQuantity(q)) {
-      return '---';
-    }
-    if (isDurationUnit(q.unit)) {
-      return durationString(q);
-    }
-    const valueStr = isNumber(q.value)
-      ? q.value.toFixed(digits)
-      : digits > 0 ? '--.--' : '---';
-    return `${valueStr} ${prettyUnit(q.unit)}`;
-  };
+export function prettyQty(q: Maybe<Quantity>, digits = 2): string {
+  if (!isQuantity(q)) {
+    return '---';
+  }
+  if (isDurationUnit(q.unit)) {
+    return durationString(q);
+  }
+  return `${fixedNumber(q.value, digits)} ${prettyUnit(q.unit)}`;
+}
 
-export const roundedQty =
-  (q: Quantity, digits = 2): Quantity => ({
-    ...q,
-    value: round(q.value ?? 0, digits),
-  });
+export function prettyLink(v: Maybe<Link>): string {
+  return v?.id || '[not set]';
+}
 
-export const prettyLink = (v: Maybe<Link>): string =>
-  v?.id || '[not set]';
-
-export const prettyAny = (v: unknown): string => {
+export function prettyAny(v: unknown): string {
   if (isQuantity(v)) {
     return prettyQty(v);
   }
   if (isLink(v)) {
     return prettyLink(v);
   }
+  if (isNumber(v)) {
+    return fixedNumber(v);
+  }
+  if (v instanceof Date) {
+    return shortDateString(v);
+  }
   return JSON.stringify(v);
-};
+}

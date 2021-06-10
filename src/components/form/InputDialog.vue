@@ -1,5 +1,4 @@
 <script lang="ts">
-import isString from 'lodash/isString';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
@@ -9,7 +8,7 @@ import { makeRuleValidator } from '@/utils/rules';
 
 
 const typeValidator = (v: unknown): boolean =>
-  isString(v) && ['text', 'number'].includes(v);
+  typeof v === 'string' && ['text', 'number'].includes(v);
 
 export default defineComponent({
   name: 'InputDialog',
@@ -79,7 +78,7 @@ export default defineComponent({
       () => props.type === 'number'
         ? {
           inputmode: 'numeric',
-          pattern: '[0-9]*',
+          pattern: '[0-9\.]*',
         }
         : {},
     );

@@ -26,6 +26,8 @@ interface ClaimDict {
   [channel: number]: string; // block ID of driver
 }
 
+const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
+
 export default defineComponent({
   name: 'IoArray',
   setup() {
@@ -38,7 +40,7 @@ export default defineComponent({
     const claimedChannels = computed<ClaimDict>(
       () => sparkModule
         .blocks
-        .filter(makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
+        .filter(actuatorFilter)
         .filter(v => v.data.hwDevice.id === block.value.id)
         .reduce((acc, v) => set(acc, v.data.channel, v.id), {}),
     );

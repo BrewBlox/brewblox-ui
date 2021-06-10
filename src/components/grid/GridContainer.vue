@@ -53,15 +53,15 @@ export default defineComponent({
     );
 
     function patchWidgets(updated: Patch<Widget>[]): void {
-      const applied = updated
+      updated
         .map(change => {
           const existing = widgetStore.widgetById(change.id);
           return existing
             ? { ...existing, ...change }
             : null;
         })
-        .filter(nullFilter);
-      applied.forEach(v => widgetStore.saveWidget(v));
+        .filter(nullFilter)
+        .forEach(v => widgetStore.saveWidget(v));
     }
 
     function updateItemPosition(updatedId: string, pos: XYPosition | null): void {

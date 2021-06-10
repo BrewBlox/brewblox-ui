@@ -5,7 +5,7 @@ import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorPwmBlock } from '@/plugins/spark/types';
 import { Link } from '@/shared-types';
-import { fixedNumber, prettyLink, roundNumber } from '@/utils/formatting';
+import { fixedNumber, prettyLink, roundedNumber } from '@/utils/formatting';
 
 const quickValues: SelectOption<number>[] = [
   { label: '0%', value: 0 },
@@ -48,7 +48,7 @@ export default defineComponent({
       () => {
         const v = block.value.data.desiredSetting;
         return v
-          ? roundNumber(v, 0)
+          ? roundedNumber(v, 0)
           : v;
       },
     );

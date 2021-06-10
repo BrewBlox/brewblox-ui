@@ -124,7 +124,7 @@ export default defineComponent({
         :suffix="prettyUnit(setpointSetting.unit)"
         input-class="text-big"
         inputmode="numeric"
-        pattern="[0-9]*"
+        pattern="[0-9\.]*"
         autofocus
         clearable
         item-aligned

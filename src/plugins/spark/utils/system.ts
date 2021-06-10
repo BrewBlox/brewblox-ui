@@ -2,6 +2,8 @@ import { sparkStore } from '@/plugins/spark/store';
 import {
   Block,
   DisplaySettingsBlock,
+  Spark2PinsBlock,
+  Spark3PinsBlock,
   SysInfoBlock,
   SystemBlockType,
   TicksBlock,
@@ -32,3 +34,9 @@ export const getWiFiSettingsBlock: SysBlockFn<WiFiSettingsBlock> =
 
 export const getTicksBlock: SysBlockFn<TicksBlock> =
   serviceId => getSysBlock(serviceId, SystemBlockType.Ticks);
+
+export const getSpark2PinsBlock: SysBlockFn<Spark2PinsBlock> =
+  serviceId => getSysBlock(serviceId, SystemBlockType.Spark2Pins);
+
+export const getSpark3PinsBlock: SysBlockFn<Spark3PinsBlock> =
+  serviceId => getSysBlock(serviceId, SystemBlockType.Spark3Pins);

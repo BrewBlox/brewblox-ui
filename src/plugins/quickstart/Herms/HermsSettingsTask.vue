@@ -233,7 +233,7 @@ export default defineComponent({
             v-model="hltVolume"
             :rules="volumeRules"
             inputmode="numeric"
-            pattern="[0-9]*"
+            pattern="[0-9\.]*"
             label="HLT volume"
           >
             <template #append>
@@ -246,7 +246,7 @@ export default defineComponent({
             v-model="mashVolume"
             :rules="volumeRules"
             inputmode="numeric"
-            pattern="[0-9]*"
+            pattern="[0-9\.]*"
             label="Mash volume"
           >
             <template #append>
@@ -258,7 +258,7 @@ export default defineComponent({
           <q-input
             v-model.number="driverMax.value"
             inputmode="numeric"
-            pattern="[0-9]*"
+            pattern="[0-9\.]*"
             label="Limit difference to"
           >
             <template #append>

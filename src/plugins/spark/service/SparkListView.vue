@@ -40,7 +40,7 @@ const allSorters: Mapped<ItemSortFunction> = {
   name: makeObjectSorter('id'),
   type: makeObjectSorter('title'),
   role: (a, b): number =>
-    roleOrder.indexOf[a.role] - roleOrder.indexOf[b.role],
+    roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role),
 };
 
 

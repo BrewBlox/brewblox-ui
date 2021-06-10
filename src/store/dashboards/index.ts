@@ -2,6 +2,7 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import { concatById, filterById, findById } from '@/utils/collections';
+import { nullFilter } from '@/utils/functional';
 
 import api from './api';
 import type { Dashboard } from './types';
@@ -39,7 +40,7 @@ export class DashboardModule extends VuexModule {
     await Promise.all(
       ids
         .map(id => this.dashboardById(id))
-        .filter((v): v is Dashboard => v !== null)
+        .filter(nullFilter)
         .map((dashboard, idx) => {
           const order = idx + 1;
           if (order !== dashboard.order) {
