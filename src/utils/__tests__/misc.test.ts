@@ -1,4 +1,4 @@
-import { mqttTopicExp } from '@/utils/formatting';
+import { mqttTopicExp } from '@/utils/misc';
 
 
 describe('MQTT helpers', () => {

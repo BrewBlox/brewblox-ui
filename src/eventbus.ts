@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 
 import { HOSTNAME, IS_IOS, PORT, WS_PROTOCOL } from '@/const';
 import { popById } from '@/utils/collections';
-import { mqttTopicExp } from '@/utils/formatting';
+import { mqttTopicExp } from '@/utils/misc';
 import { notify } from '@/utils/notify';
 
 export type EventCallback = (topic: string, evt: any) => unknown;

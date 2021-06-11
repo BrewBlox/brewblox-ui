@@ -7,7 +7,7 @@ import parseDuration from 'parse-duration';
 import { Quantity, TempUnit } from '@/shared-types';
 import { systemStore } from '@/store/system';
 
-import { prettyQty, roundedQty } from './formatting';
+import { prettyQty } from './formatting';
 import { isCompatibleQty, isDurationString, isDurationUnit, isQuantity, libUnit, toLibQty } from './identity';
 
 type QuantityCompatible =
@@ -94,7 +94,7 @@ export class JSQuantity implements Quantity {
     return isQuantity(other)
       && isCompatibleQty(this, other)
       && (this.value === null) === (other.value === null)
-      && toLibQty(roundedQty(this)).eq(toLibQty(roundedQty(other)));
+      && toLibQty(this.round()).eq(toLibQty(bloxQty(other).round()));
   }
 
   public to(unit: string): JSQuantity {
@@ -118,13 +118,16 @@ export class JSQuantity implements Quantity {
 /**
  * Create a Quantity object.
  *
+ * Quantities express a value with a unit,
+ * and are commonly used in block data.
+ *
  * The following input types are supported:
  * - Raw arguments: `bloxQty(10, 'degC')`
  * - Duration-formatted string: `bloxQty('10s')`
  * - Another Quantity object: `bloxQty(bloxQty(10, 'degC'))`
  *
- * @param value
- * @param unit
+ * https://brewblox.netlify.app/dev/decisions/20200723_typed_fields.html
+ *
  */
 export function bloxQty(value: number | null, unit: string): JSQuantity;
 export function bloxQty(value: Quantity | string): JSQuantity;

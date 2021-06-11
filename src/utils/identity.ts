@@ -59,6 +59,18 @@ const findGroup = (unit?: string): UnitGroup | null =>
     ? unitConversionGroups.find(g => g.test(unit)) ?? null
     : null;
 
+export const libUnit = (unit: string): string =>
+  findGroup(unit)?.convert(unit) ?? unit;
+
+export const toLibQty = (v: Quantity): LibQty =>
+  LibQty(v.value ?? 0, libUnit(v.unit)!);
+
+export const isCompatibleQty = (qty1: Quantity, qty2: Quantity): boolean => {
+  const group1 = findGroup(qty1.unit)?.name;
+  const group2 = findGroup(qty2.unit)?.name;
+  return group1 === group2;
+};
+
 export const canSerialize =
   (obj: unknown): obj is { toJSON(): any; } =>
     obj instanceof Object
@@ -86,15 +98,3 @@ export const isDurationString =
 export const isDurationUnit =
   (v: unknown): v is string =>
     isString(v) && durationUnitExp.test(v);
-
-export const isCompatibleQty = (qty1: Quantity, qty2: Quantity): boolean => {
-  const group1 = findGroup(qty1.unit)?.name;
-  const group2 = findGroup(qty2.unit)?.name;
-  return group1 === group2;
-};
-
-export const libUnit = (unit: string): string =>
-  findGroup(unit)?.convert(unit) ?? unit;
-
-export const toLibQty = (v: Quantity): LibQty =>
-  LibQty(v.value ?? 0, libUnit(v.unit)!);

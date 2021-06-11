@@ -38,7 +38,7 @@ export async function startCreateService(stub: ServiceStub, navigate = true): Pr
   }
 }
 
-export function startChangeServiceTitle(service: Service | null): void {
+export function startChangeServiceTitle(service: Maybe<Service>): void {
   if (!service) {
     return;
   }
@@ -61,7 +61,7 @@ export function startChangeServiceTitle(service: Service | null): void {
     });
 }
 
-export function startRemoveService(service: Service | null): void {
+export function startRemoveService(service: Maybe<Service>): void {
   if (!service) {
     return;
   }

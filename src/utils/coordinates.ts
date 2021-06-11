@@ -1,7 +1,12 @@
+import isFinite from 'lodash/isFinite';
+
 import { clampRotation } from './formatting';
 
 export type CoordinatesParam =
-  string | { x: number; y: number; z: number } | [number, number, number] | Coordinates;
+  | string
+  | { x: number; y: number; z: number }
+  | [number, number, number] // [x, y, z]
+  | Coordinates
 
 export const rotatedSize =
   (rotation: number, size: [number, number]): [number, number] =>
@@ -76,12 +81,7 @@ export class Coordinates {
       throw new Error(`${param} is not a valid argument`);
     }
 
-    const rules = [
-      (v: number) => typeof v === 'number',
-      (v: number) => !Number.isNaN(v),
-    ];
-
-    if (!rules.every(rule => [this.x, this.y, this.z].every(v => rule(v)))) {
+    if ([this.x, this.y, this.z].some(v => !isFinite(v))) {
       throw new Error(`${param} could not be parsed as a coordinate`);
     }
   }
