@@ -1,11 +1,11 @@
 <script lang="ts">
 import mapValues from 'lodash/mapValues';
-import UrlSafeString from 'url-safe-string';
 import { computed, defineComponent, PropType, reactive } from 'vue';
 
 import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { makeDashboardIdRules } from '@/utils/dashboards';
-import { ruleValidator, suggestId } from '@/utils/functional';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
+import { makeUrlSafe } from '@/utils/url';
 
 import { QuickstartConfig } from '../types';
 import { withPrefix } from '../utils';
@@ -38,7 +38,6 @@ export default defineComponent({
   ],
   setup(props, { emit }) {
     const customNames = reactive<AnyDict>({});
-    const idGenerator = new UrlSafeString();
 
     const serviceId = computed<string>(
       () => props.config.serviceId,
@@ -59,11 +58,11 @@ export default defineComponent({
     });
 
     const dashboardIdRules = makeDashboardIdRules();
-    const dashboardIdValidator = ruleValidator(dashboardIdRules);
+    const dashboardIdValidator = makeRuleValidator(dashboardIdRules);
 
     const dashboardId = computed<string>({
       get: () => props.config.dashboardId
-        ?? suggestId(idGenerator.generate(dashboardTitle.value), dashboardIdValidator),
+        ?? suggestId(makeUrlSafe(dashboardTitle.value), dashboardIdValidator),
       set: dashboardId => updateConfig({ dashboardId }),
     });
 
@@ -77,7 +76,7 @@ export default defineComponent({
       () => ({
         ...mapValues(
           props.defaultNames,
-          v => suggestId(withPrefix(prefix.value, v), ruleValidator(limitedNameRules.value)),
+          v => suggestId(withPrefix(prefix.value, v), makeRuleValidator(limitedNameRules.value)),
         ),
         ...customNames,
       }),
@@ -92,7 +91,7 @@ export default defineComponent({
     );
 
     const nameValidator = computed<(v: any) => boolean>(
-      () => ruleValidator(nameRules.value),
+      () => makeRuleValidator(nameRules.value),
     );
 
     const valuesOk = computed<boolean>(

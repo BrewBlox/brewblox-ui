@@ -1,5 +1,4 @@
 <script lang="ts">
-import UrlSafeString from 'url-safe-string';
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -7,12 +6,13 @@ import { useWizard } from '@/plugins/wizardry/composables';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { makeDashboardIdRules } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
-import { ruleValidator, suggestId } from '@/utils/functional';
-import notify from '@/utils/notify';
+import { notify } from '@/utils/notify';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
+import { makeUrlSafe } from '@/utils/url';
 
-const urlGenerator = new UrlSafeString();
+
 const idRules = makeDashboardIdRules();
-const idValidator = ruleValidator(idRules);
+const idValidator = makeRuleValidator(idRules);
 
 export default defineComponent({
   name: 'DashboardWizard',
@@ -38,7 +38,7 @@ export default defineComponent({
     const dashboardId = computed<string>({
       get: () => _dashboardId.value !== null
         ? _dashboardId.value
-        : suggestId(urlGenerator.generate(dashboardTitle.value), idValidator),
+        : suggestId(makeUrlSafe(dashboardTitle.value), idValidator),
       set: id => _dashboardId.value = id,
     });
 

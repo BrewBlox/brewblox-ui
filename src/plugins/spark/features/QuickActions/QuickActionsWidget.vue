@@ -4,11 +4,12 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, onBeforeMount } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
-import { deserialize } from '@/plugins/spark/parse-object';
 import { TempUnit } from '@/shared-types';
 import { systemStore } from '@/store/system';
-import { bloxQty, isQuantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
+import { isQuantity } from '@/utils/identity';
+import { deserialize } from '@/utils/parsing';
+import { bloxQty } from '@/utils/quantity';
 
 import QuickActionsBasic from './QuickActionsBasic.vue';
 import QuickActionsFull from './QuickActionsFull.vue';

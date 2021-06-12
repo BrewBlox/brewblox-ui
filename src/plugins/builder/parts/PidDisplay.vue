@@ -7,8 +7,8 @@ import { coord2grid, liquidOnCoord, textTransformation } from '@/plugins/builder
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
 import { systemStore } from '@/store/system';
-import { deltaTempQty, prettyUnit } from '@/utils/bloxfield';
-import { truncateRound } from '@/utils/functional';
+import { preciseNumber, prettyUnit } from '@/utils/formatting';
+import { deltaTempQty } from '@/utils/quantity';
 
 import { usePart, useSettingsBlock } from '../composables';
 import { PID_KEY, PID_TYPES } from '../specs/PidDisplay';
@@ -88,7 +88,7 @@ export default defineComponent({
       COLD_WATER,
       coord2grid,
       textTransformation,
-      truncateRound,
+      preciseNumber,
       mdiCalculatorVariant,
       mdiPlusMinus,
       scale,
@@ -143,7 +143,7 @@ export default defineComponent({
           />
         </template>
         <div class="col text-bold">
-          {{ truncateRound(convertedOutputSetting) }}
+          {{ preciseNumber(convertedOutputSetting) }}
           <small v-if="!!block">{{ suffix }}</small>
         </div>
       </template>

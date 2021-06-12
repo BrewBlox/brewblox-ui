@@ -1,13 +1,14 @@
 <script lang="ts">
+import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
-import { bloxLink, Link } from '@/utils/bloxfield';
-import { mutate, objectStringSorter, typeMatchFilter } from '@/utils/functional';
-
+import { Link } from '@/shared-types';
+import { makeObjectSorter, makeTypeFilter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 
 interface EditableChannel extends IoChannel {
   id: number;
@@ -25,6 +26,8 @@ interface ClaimDict {
   [channel: number]: string; // block ID of driver
 }
 
+const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
+
 export default defineComponent({
   name: 'IoArray',
   setup() {
@@ -37,9 +40,9 @@ export default defineComponent({
     const claimedChannels = computed<ClaimDict>(
       () => sparkModule
         .blocks
-        .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
+        .filter(actuatorFilter)
         .filter(v => v.data.hwDevice.id === block.value.id)
-        .reduce((acc, v) => mutate<ClaimDict>(acc, v.data.channel, v.id), {}),
+        .reduce((acc, v) => set(acc, v.data.channel, v.id), {}),
     );
 
     const channels = computed<EditableChannel[]>(
@@ -51,7 +54,7 @@ export default defineComponent({
           const driver = sparkModule.blockById<DigitalActuatorBlock>(driverId);
           return { ...pin[name], id, driver, name };
         })
-        .sort(objectStringSorter('name')),
+        .sort(makeObjectSorter('name')),
     );
 
     function driverLink(channel: EditableChannel): Link {

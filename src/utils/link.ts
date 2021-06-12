@@ -1,5 +1,7 @@
-import { BlockOrIntfType, JSBloxField, Link } from './types';
-import { isLink, prettyLink } from './utils';
+import { BlockOrIntfType, Link } from '@/shared-types';
+
+import { prettyLink } from './formatting';
+import { isLink } from './identity';
 
 export function rawLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): Link;
 export function rawLink(other: Link): Link;
@@ -19,7 +21,7 @@ export function rawLink(value: Link | string | null, type?: BlockOrIntfType | nu
     };
 }
 
-export class JSLink implements JSBloxField, Link {
+export class JSLink implements Link {
   public readonly __bloxtype = 'Link';
   public id: string | null;
   public type: BlockOrIntfType | null;
@@ -65,7 +67,20 @@ export class JSLink implements JSBloxField, Link {
   }
 }
 
-export function bloxLink(id?: string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink;
+/**
+ * Create a Link object.
+ *
+ * Links are used to indicate relations between blocks,
+ * and consist of an ID + type/interface.
+ *
+ * The following input types are supported:
+ * - Raw arguments: `bloxLink('temp-sensor-1', BlockType.TempSensorOneWire)`
+ * - Another Quantity object: `bloxLink(bloxLink('temp-sensor-1'))`
+ *
+ * https://brewblox.netlify.app/dev/decisions/20200723_typed_fields.html
+ *
+ */
+export function bloxLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink;
 export function bloxLink(other?: Link): JSLink;
 export function bloxLink(value?: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink {
   return new JSLink(value as any, type, driven);

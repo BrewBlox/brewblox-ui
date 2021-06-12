@@ -12,7 +12,7 @@ import type {
 import { BlockType } from '@/shared-types';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
-import { objectStringSorter } from '@/utils/functional';
+import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
 
 import SparkListView from './SparkListView.vue';
@@ -87,7 +87,7 @@ export default defineComponent({
             ? title.value
             : undefined,
         }))
-        .sort(objectStringSorter('type')),
+        .sort(makeObjectSorter('type')),
     );
 
     const edges = computed<RelationEdge[]>(

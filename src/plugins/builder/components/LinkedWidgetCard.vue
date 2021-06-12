@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { dashboardStore } from '@/store/dashboards';
 import { Widget, widgetStore } from '@/store/widgets';
-import { objectStringSorter } from '@/utils/functional';
+import { makeObjectSorter } from '@/utils/functional';
 
 import { FlowPart } from '../types';
 
@@ -59,7 +59,7 @@ export default defineComponent({
     const linkedOpts = computed<SelectOption[]>(
       () => widgetStore.widgets
         .filter(actualFilter.value)
-        .sort(objectStringSorter('title'))
+        .sort(makeObjectSorter('title'))
         .map(widget => ({
           label: `[${dashboardStore.dashboardTitle(widget.dashboard)}] ${widget.title}`,
           value: widget.id,

@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { dateString, shortDateString } from '@/utils/functional';
+import { dateString, shortDateString } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'DatetimeField',

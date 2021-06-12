@@ -1,4 +1,5 @@
 <script lang="ts">
+import truncate from 'lodash/truncate';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
@@ -6,7 +7,6 @@ import { sparkStore } from '@/plugins/spark/store';
 import type { Block, ComparedBlockType } from '@/plugins/spark/types';
 import type { BlockAddress } from '@/plugins/spark/types';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { truncate } from '@/utils/functional';
 
 export default defineComponent({
   name: 'BlockAddressField',

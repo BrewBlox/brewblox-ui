@@ -1,4 +1,4 @@
-import { JSQuantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 
 import { PinChannel, QuickstartConfig } from '../types';
 
@@ -42,6 +42,6 @@ export interface GlycolConfig extends QuickstartConfig {
 }
 
 export interface GlycolOpts {
-  beerSetting: JSQuantity;
-  glycolSetting: JSQuantity;
+  beerSetting: Quantity;
+  glycolSetting: Quantity;
 }

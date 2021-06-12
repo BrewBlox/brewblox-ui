@@ -10,9 +10,11 @@ import type {
   MutexedConstraint,
 } from '@/plugins/spark/types';
 import { BlockType, MutexBlock, Quantity } from '@/plugins/spark/types';
-import { bloxLink, bloxQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
+import { deepCopy } from '@/utils/objects';
+import { bloxQty } from '@/utils/quantity';
+
 
 const constraintOpts: SelectOption[] =
   Object.entries(digitalConstraintLabels)

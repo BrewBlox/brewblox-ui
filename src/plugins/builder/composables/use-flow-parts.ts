@@ -2,7 +2,7 @@ import debounce from 'lodash/debounce';
 import { nanoid } from 'nanoid';
 import { computed, Ref, ref, watch, WritableComputedRef } from 'vue';
 
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 import { calculateNormalizedFlows } from '../calculateFlows';
 import { builderStore } from '../store';

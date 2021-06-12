@@ -1,4 +1,4 @@
-import { JSQuantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 
 import { PinChannel, QuickstartConfig } from '../types';
 
@@ -17,5 +17,5 @@ export interface BrewKettleConfig extends QuickstartConfig {
 }
 
 export interface BrewKettleOpts {
-  kp: JSQuantity;
+  kp: Quantity;
 }

@@ -1,17 +1,14 @@
+import fromPairs from 'lodash/fromPairs';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 import mapValues from 'lodash/mapValues';
+import toPairs from 'lodash/toPairs';
 
-import {
-  BlockOrIntfType,
-  isBloxField,
-  isJSBloxField,
-  Link,
-  Quantity,
-  rawLink,
-  rawQty,
-} from '@/utils/bloxfield';
-import { mapEntries } from '@/utils/functional';
+import { BlockOrIntfType, Link, Quantity } from '@/shared-types';
+
+import { canSerialize, isBloxField } from './identity';
+import { rawLink } from './link';
+import { rawQty } from './quantity';
 
 
 // string start
@@ -26,12 +23,14 @@ import { mapEntries } from '@/utils/functional';
 //   'field_underscored[1 / degC]'
 const postfixExpr = /^(.*)([\[<])(.*)[\]>]$/;
 
-export function propertyNameWithoutUnit(name: string): string {
-  const matched = name.match(postfixExpr);
-  return matched ? matched[1] : name;
-}
-
-export function propertyNameWithUnit(name: string): [string, string | null] {
+/**
+ * Parses given name, and extracts base name and postfix.
+ * If no postfix was detected, the full name is considered the base name.
+ *
+ * @param name
+ * @returns
+ */
+export function splitPostfixed(name: string): [string, string | null] {
   const matched = name.match(postfixExpr);
   if (!matched) {
     return [name, null];
@@ -41,6 +40,14 @@ export function propertyNameWithUnit(name: string): [string, string | null] {
   return [baseName, unit];
 }
 
+/**
+ * Parses given name and value,
+ * and returns base name + parsed Quantity or Link.
+ *
+ * @param key
+ * @param val
+ * @returns
+ */
 export function parsePostfixed(key: string, val: unknown): [string, Quantity | Link] | null {
   try {
     if (key.endsWith(']') || key.endsWith('>')) {
@@ -61,6 +68,14 @@ export function parsePostfixed(key: string, val: unknown): [string, Quantity | L
   return null;
 }
 
+/**
+ * Recursively deserializes given object.
+ * If any postfixed Quantity/Link values are detected,
+ * they are converted, and the postfix is stripped from the key.
+ *
+ * @param obj
+ * @returns
+ */
 export function deserialize<T>(obj: T): T {
   if (isArray(obj)) {
     return (obj as any).map(deserialize) as T;
@@ -69,18 +84,29 @@ export function deserialize<T>(obj: T): T {
     return obj;
   }
   if (isObject(obj)) {
-    return mapEntries(obj,
-      ([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]);
+    const parsed = toPairs(obj)
+      .map(([key, val]) => parsePostfixed(key, val) ?? [key, deserialize(val)]);
+    return fromPairs(parsed) as T;
   }
   return obj;
 }
 
+/**
+ * Recursively serializes given object.
+ * Attempts to reduce class objects to a JSON-compatible object.
+ *
+ * If an object with a `toJSON` function is encountered,
+ * the function is used instead of deeper recursion.
+ *
+ * @param obj
+ * @returns
+ */
 export function serialize<T>(obj: T): T {
   if (isArray(obj)) {
     return (obj as any).map(serialize);
   }
-  if (isJSBloxField(obj)) {
-    return obj.toJSON() as any; // lies
+  if (canSerialize(obj)) {
+    return obj.toJSON();
   }
   if (isObject(obj)) {
     return mapValues(obj, serialize) as any; // lies

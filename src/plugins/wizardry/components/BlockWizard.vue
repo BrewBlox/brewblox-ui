@@ -11,7 +11,8 @@ import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
-import { nullFilter, objectStringSorter, ruleValidator, suggestId } from '@/utils/functional';
+import { makeObjectSorter, nullFilter } from '@/utils/functional';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
 
 import { useWizard } from '../composables';
 
@@ -81,7 +82,7 @@ export default defineComponent({
             : null;
         })
         .filter(nullFilter)
-        .sort(objectStringSorter('label')),
+        .sort(makeObjectSorter('label')),
     );
 
     const sparkModule = computed<SparkServiceModule | null>(
@@ -95,7 +96,7 @@ export default defineComponent({
     );
 
     const validator = computed<(v: any) => boolean>(
-      () => ruleValidator(activeBlockIdRules.value),
+      () => makeRuleValidator(activeBlockIdRules.value),
     );
 
     const createReady = computed<boolean>(

@@ -3,7 +3,7 @@ import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import type { BlockAddress, BlockFieldSpec } from '@/plugins/spark/types';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 export default defineComponent({
   name: 'BlockFieldDialog',

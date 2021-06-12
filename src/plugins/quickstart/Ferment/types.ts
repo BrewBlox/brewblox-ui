@@ -1,4 +1,4 @@
-import { JSQuantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 
 import { PinChannel, QuickstartConfig } from '../types';
 
@@ -28,7 +28,7 @@ export interface FermentConfig extends QuickstartConfig {
 export type FermentMode = 'beer' | 'fridge';
 
 export interface FermentOpts {
-  fridgeSetting: JSQuantity;
-  beerSetting: JSQuantity;
+  fridgeSetting: Quantity;
+  beerSetting: Quantity;
   activeSetpoint: FermentMode;
 }

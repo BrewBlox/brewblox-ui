@@ -2,13 +2,13 @@
 
 import { computed, defineComponent, ref } from 'vue';
 
-import { ruleValidator } from '@/utils/functional';
+import { makeRuleValidator } from '@/utils/rules';
 
 const rules = [
   v => /^($|[a-zA-Z])/.test(v) || 'Name must start with a letter',
   v => /^[a-zA-Z0-9 \(\)_\-\|]*$/.test(v) || 'Name may only contain letters, numbers, spaces, and ()-_|',
 ];
-const validator = ruleValidator(rules);
+const validator = makeRuleValidator(rules);
 
 export default defineComponent({
   name: 'QuickstartPrefixField',

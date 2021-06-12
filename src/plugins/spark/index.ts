@@ -1,11 +1,11 @@
 import { Plugin } from 'vue';
 
+import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { autoRegister, cref } from '@/utils/component-ref';
-import { STATE_TOPIC } from '@/utils/const';
 
 import { sparkType } from './const';
 import features from './features';

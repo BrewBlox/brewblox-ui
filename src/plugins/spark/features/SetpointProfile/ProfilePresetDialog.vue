@@ -3,11 +3,12 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
+import { deserialize } from '@/utils/parsing';
+
 
 const typeName = BlockType.SetpointProfile;
 

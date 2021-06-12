@@ -3,7 +3,7 @@ import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { MutexBlock, MutexedConstraint, Quantity } from '@/plugins/spark/types';
-import { durationString } from '@/utils/duration';
+import { durationString } from '@/utils/quantity';
 
 interface MutexClient {
   id: string;

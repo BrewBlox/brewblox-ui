@@ -1,5 +1,5 @@
+import { UI_NAMESPACE } from '@/const';
 import { createApi } from '@/database/api';
-import { UI_NAMESPACE } from '@/utils/const';
 
 import { Widget } from './types';
 

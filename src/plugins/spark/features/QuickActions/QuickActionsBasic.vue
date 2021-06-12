@@ -3,13 +3,15 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, ref } from 'vue';
 
 import { useGlobals, useWidget } from '@/composables';
-import { deserialize } from '@/plugins/spark/parse-object';
 import { sparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
-import { prettyAny } from '@/utils/bloxfield';
+import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy, spliceById, uniqueFilter } from '@/utils/functional';
-import notify from '@/utils/notify';
+import { prettyAny } from '@/utils/formatting';
+import { uniqueFilter } from '@/utils/functional';
+import { notify } from '@/utils/notify';
+import { deepCopy } from '@/utils/objects';
+import { deserialize } from '@/utils/parsing';
 
 import { BlockChange, ChangeAction, EditableBlockField, QuickActionsWidget } from './types';
 
@@ -130,7 +132,8 @@ export default defineComponent({
         await sparkStore.saveBlock({ ...block, data: { ...block.data, ...actualData } });
       }
       action.changes = action.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
-      saveActions(spliceById(actions.value, action));
+      spliceById(actions.value, action);
+      saveActions();
     }
 
     function applyAction(action: ChangeAction): void {

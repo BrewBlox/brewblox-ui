@@ -9,7 +9,10 @@ import { featureStore, WidgetContext } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
 import { startChangeDashboardTitle } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
-import { objectSorter } from '@/utils/functional';
+import { makeObjectSorter } from '@/utils/functional';
+
+
+const widgetSorter = makeObjectSorter<Widget>('order');
 
 export default defineComponent({
   name: 'DashboardPage',
@@ -56,7 +59,7 @@ export default defineComponent({
       () => widgetStore
         .widgets
         .filter(widget => widget.dashboard === dashboardId.value)
-        .sort(objectSorter('order')),
+        .sort(widgetSorter),
     );
 
     const dashboardItems = computed<RenderedItem[]>(

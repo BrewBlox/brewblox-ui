@@ -1,12 +1,13 @@
 <script lang="ts">
+import truncate from 'lodash/truncate';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import type { Block, ComparedBlockType } from '@/plugins/spark/types';
-import { bloxLink, Link } from '@/utils/bloxfield';
+import type { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { truncate } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
+
 
 export default defineComponent({
   name: 'LinkField',

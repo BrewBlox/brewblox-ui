@@ -1,13 +1,7 @@
-import {
-  deserialize,
-  serialize,
-} from '@/plugins/spark/parse-object';
-import {
-  bloxQty,
-  isLink,
-  isQuantity,
-  JSLink,
-} from '@/utils/bloxfield';
+import { isLink, isQuantity } from '../identity';
+import { JSLink } from '../link';
+import { deserialize, serialize } from '../parsing';
+import { bloxQty } from '../quantity';
 
 
 describe('deserialize', () => {

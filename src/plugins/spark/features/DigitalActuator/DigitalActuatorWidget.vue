@@ -1,14 +1,17 @@
 <script lang="ts">
+import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, DigitalActuatorBlock, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
-import { mutate, typeMatchFilter } from '@/utils/functional';
+import { makeTypeFilter } from '@/utils/functional';
 
 interface ClaimDict {
   [channel: number]: string; // block ID of driver
 }
+
+const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
 
 export default defineComponent({
   name: 'DigitalActuatorWidget',
@@ -38,9 +41,9 @@ export default defineComponent({
         const targetId = hwBlock.value.id;
         return sparkModule
           .blocks
-          .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
+          .filter(actuatorFilter)
           .filter(block => block.data.hwDevice.id === targetId)
-          .reduce((acc: ClaimDict, b) => mutate(acc, b.data.channel, b.id), {});
+          .reduce((acc, b) => set(acc, b.data.channel, b.id), {});
       },
     );
 

@@ -2,7 +2,8 @@ import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import type { BuilderLayout, PartSpec } from '@/plugins/builder/types';
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { concatById, filterById, findById } from '@/utils/collections';
+import { nullFilter } from '@/utils/functional';
 
 import api from './api';
 
@@ -27,7 +28,7 @@ export class BuilderModule extends VuexModule {
     return this.layouts.map(v => v.id);
   }
 
-  public layoutById(id: Nullable<string>): BuilderLayout | null {
+  public layoutById(id: Maybe<string>): BuilderLayout | null {
     return findById(this.layouts, id);
   }
 
@@ -67,7 +68,7 @@ export class BuilderModule extends VuexModule {
     await Promise.all(
       ids
         .map(id => this.layoutById(id))
-        .filter((v): v is BuilderLayout => v !== null)
+        .filter(nullFilter)
         .map((layout, idx) => {
           const order = idx + 1;
           if (order !== layout.order) {
@@ -80,7 +81,7 @@ export class BuilderModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = async (layout: BuilderLayout): Promise<void> => {
-      this.layouts = extendById(this.layouts, layout);
+      this.layouts = concatById(this.layouts, layout);
     };
     const onDelete = (id: string): void => {
       this.layouts = filterById(this.layouts, { id });

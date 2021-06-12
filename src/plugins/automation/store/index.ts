@@ -1,7 +1,7 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { concatById, filterById, findById } from '@/utils/collections';
 
 import type {
   AutomationEventData,
@@ -54,12 +54,12 @@ export class AutomationModule extends VuexModule {
 
   @Mutation
   public setTask(task: AutomationTask): void {
-    this.tasks = extendById(this.tasks, task);
+    this.tasks = concatById(this.tasks, task);
   }
 
   @Mutation
   public setProcess(proc: AutomationProcess): void {
-    this.processes = extendById(this.processes, proc);
+    this.processes = concatById(this.processes, proc);
   }
 
   @Mutation
@@ -133,7 +133,7 @@ export class AutomationModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = (template: AutomationTemplate): void => {
-      this.templates = extendById(this.templates, template);
+      this.templates = concatById(this.templates, template);
     };
     const onDelete = (id: string): void => {
       this.templates = filterById(this.templates, { id });

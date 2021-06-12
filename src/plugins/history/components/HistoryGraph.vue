@@ -22,7 +22,7 @@ import {
   QueryParams,
   QueryTarget,
 } from '@/plugins/history/types';
-import { isJsonEqual } from '@/utils/functional';
+import { isJsonEqual } from '@/utils/objects';
 
 interface Policies { [measurement: string]: string }
 

@@ -1,14 +1,10 @@
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import {
-  extendById,
-  filterById,
-  findById,
-  isoDateString,
-  uniqueFilter,
-} from '@/utils/functional';
-import notify from '@/utils/notify';
+import { concatById, filterById, findById } from '@/utils/collections';
+import { isoDateString } from '@/utils/formatting';
+import { uniqueFilter } from '@/utils/functional';
+import { notify } from '@/utils/notify';
 
 import type {
   ApiQuery,
@@ -107,13 +103,13 @@ export class HistoryModule extends VuexModule {
   public transform({ id, data }: { id: string; data: QueryResult }): void {
     const source = this.sourceById(id);
     if (source !== null) {
-      this.sources = extendById(this.sources, source.transformer(source, data));
+      this.sources = concatById(this.sources, source.transformer(source, data));
     }
   }
 
   @Mutation
   public setSource(source: HistorySource): void {
-    this.sources = extendById(this.sources, source);
+    this.sources = concatById(this.sources, source);
   }
 
   @Action
@@ -161,7 +157,7 @@ export class HistoryModule extends VuexModule {
   @Action
   public async start(): Promise<void> {
     const onChange = (session: LoggedSession): void => {
-      this.sessions = extendById(this.sessions, session);
+      this.sessions = concatById(this.sessions, session);
     };
     const onDelete = (id: string): void => {
       this.sessions = filterById(this.sessions, { id });

@@ -1,6 +1,8 @@
+import capitalize from 'lodash/capitalize';
+
 import { ServiceStatus } from '@/store/services';
-import { isLink, prettyQty } from '@/utils/bloxfield';
-import { capitalized } from '@/utils/functional';
+import { prettyQty } from '@/utils/formatting';
+import { isLink } from '@/utils/identity';
 
 import { constraintLabels } from '../const';
 import { ApiSparkStatus, Block } from '../types';
@@ -176,6 +178,6 @@ export const asServiceStatus =
     const [descText, color] = statusDesc(status);
     const connectionKind = status.connectionKind ?? 'unknown';
     const icon = iconOpts[connectionKind];
-    const desc = capitalized(`${connectionKind} (${descText})`);
+    const desc = capitalize(`${connectionKind} (${descText})`);
     return { id, color, desc, icon };
   };

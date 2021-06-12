@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 import { emptyGraphConfig } from '../getters';
 import { historyStore } from '../store';

@@ -1,10 +1,10 @@
 <script lang="ts">
 import clamp from 'lodash/clamp';
-import { debounce } from 'quasar';
+import debounce from 'lodash/debounce';
 import { computed, defineComponent, ref, watch } from 'vue';
 
 import { Widget, widgetStore } from '@/store/widgets';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 import {
   GRID_GAP_SIZE,

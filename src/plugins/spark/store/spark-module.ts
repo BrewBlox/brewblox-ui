@@ -1,8 +1,8 @@
 import type { RegisterOptions } from 'vuex-class-modules';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
+import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
-import { deserialize } from '@/plugins/spark/parse-object';
 import type {
   Block,
   BlockAddress,
@@ -19,8 +19,14 @@ import type {
 import { isBlockVolatile, isSparkPatch, isSparkState } from '@/plugins/spark/utils';
 import { serviceStore } from '@/store/services';
 import { widgetStore } from '@/store/widgets';
-import { STATE_TOPIC } from '@/utils/const';
-import { deepCopy, extendById, filterById, findById, typeMatchFilter } from '@/utils/functional';
+import {
+  concatById,
+  filterById,
+  findById,
+} from '@/utils/collections';
+import { makeTypeFilter } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
+import { deserialize } from '@/utils/parsing';
 
 import * as api from './api';
 import {
@@ -85,7 +91,7 @@ export class SparkServiceModule extends VuexModule {
 
   @Mutation
   public setBlock(block: Block): void {
-    this.blocks = extendById(this.blocks, block);
+    this.blocks = concatById(this.blocks, block);
   }
 
   @Mutation
@@ -118,44 +124,44 @@ export class SparkServiceModule extends VuexModule {
     this.lastBlocks = null;
   }
 
-  private findById<T extends Block>(blocks: Block[], id: Nullable<string>): T | null {
+  private findById<T extends Block>(blocks: Block[], id: Maybe<string>): T | null {
     return findById(blocks, id) as T | null;
   }
 
-  private findByAddress<T extends Block>(blocks: Block[], addr: T | Nullable<BlockAddress>): T | null {
+  private findByAddress<T extends Block>(blocks: Block[], addr: T | Maybe<BlockAddress>): T | null {
     if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
     return blocks.find(v => v.id === addr.id && (!addr.type || addr.type === v.type)) as T ?? null;
   }
 
-  private findByLink<T extends Block>(blocks: Block[], link: Nullable<Link>): T | null {
+  private findByLink<T extends Block>(blocks: Block[], link: Maybe<Link>): T | null {
     if (!link || !link.id) { return null; }
     return this.findById<T>(blocks, link.id);
   }
 
-  private findFieldByAddress(blocks: Block[], addr: Nullable<BlockFieldAddress>): any | null {
+  private findFieldByAddress(blocks: Block[], addr: Maybe<BlockFieldAddress>): any | null {
     const block = this.findByAddress(blocks, addr);
     if (!block || !addr?.field) { return null; }
     return block.data[addr.field] ?? null;
   }
 
-  public blockById<T extends Block>(blockId: Nullable<string>): T | null {
+  public blockById<T extends Block>(blockId: Maybe<string>): T | null {
     return this.findById<T>(this.blocks, blockId) ?? this.findById<T>(this.volatileBlocks, blockId);
   }
 
-  public blockByAddress<T extends Block>(addr: T | Nullable<BlockAddress>): T | null {
+  public blockByAddress<T extends Block>(addr: T | Maybe<BlockAddress>): T | null {
     return this.findByAddress<T>(this.blocks, addr) ?? this.findByAddress<T>(this.volatileBlocks, addr);
   }
 
-  public blockByLink<T extends Block>(link: Nullable<Link>): T | null {
+  public blockByLink<T extends Block>(link: Maybe<Link>): T | null {
     return this.findByLink<T>(this.blocks, link) ?? this.findByLink<T>(this.volatileBlocks, link);
   }
 
-  public fieldByAddress(addr: Nullable<BlockFieldAddress>): any {
+  public fieldByAddress(addr: Maybe<BlockFieldAddress>): any {
     return this.findFieldByAddress(this.blocks, addr) ?? this.findFieldByAddress(this.volatileBlocks, addr);
   }
 
   public blocksByType<T extends Block>(type: T['type']): T[] {
-    return this.blocks.filter(typeMatchFilter<T>(type));
+    return this.blocks.filter(makeTypeFilter<T>(type));
   }
 
   public setVolatileBlock(block: Block): void {
@@ -164,7 +170,7 @@ export class SparkServiceModule extends VuexModule {
     }
     block.meta = block.meta ?? {};
     block.meta.volatile = true;
-    this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
+    this.volatileBlocks = concatById(this.volatileBlocks, deepCopy(block));
   }
 
   public removeVolatileBlock({ id }: BlockAddress): void {
@@ -191,7 +197,7 @@ export class SparkServiceModule extends VuexModule {
   @Action
   public async saveBlock(block: Block): Promise<void> {
     if (isBlockVolatile(block)) {
-      this.volatileBlocks = extendById(this.volatileBlocks, deepCopy(block));
+      this.volatileBlocks = concatById(this.volatileBlocks, deepCopy(block));
     }
     else {
       await api.persistBlock(block); // triggers patch event

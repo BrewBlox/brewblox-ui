@@ -5,7 +5,7 @@ import { computed, defineComponent } from 'vue';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockIntfType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { prettyQty } from '@/utils/bloxfield';
+import { prettyQty } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'QuickstartSensorField',

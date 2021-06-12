@@ -7,7 +7,7 @@ import { computed, defineComponent, PropType } from 'vue';
 import { useGlobals } from '@/composables';
 import { GraphAnnotation } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
-import notify from '@/utils/notify';
+import { notify } from '@/utils/notify';
 
 import PlotlyGraph from './PlotlyGraph.vue';
 

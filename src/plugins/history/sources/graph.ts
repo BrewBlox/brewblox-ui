@@ -14,7 +14,7 @@ import {
   QueryResult,
   QueryTarget,
 } from '@/plugins/history/types';
-import { round } from '@/utils/functional';
+import { fixedNumber } from '@/utils/formatting';
 
 const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
 
@@ -39,7 +39,7 @@ const valueName =
     const prop = source.axes[key] === 'y2'
       ? 'style="color: #aef"'
       : '';
-    return `<span ${prop}>${label}</span><br>${round(value, precision)}`;
+    return `<span ${prop}>${label}</span><br>${fixedNumber(value, precision)}`;
   };
 
 const transformer =

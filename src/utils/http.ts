@@ -1,11 +1,19 @@
 import axios, { AxiosError } from 'axios';
 import get from 'lodash/get';
 
-import { HOST } from '@/utils/const';
-import notify from '@/utils/notify';
+import { HOST } from '@/const';
 
-const instance = axios.create({ baseURL: HOST });
+import { notify } from './notify';
 
+export const http = axios.create({ baseURL: HOST });
+
+/**
+ * Extracts human-readable error message from given Axios error.
+ *
+ * @param e
+ * @param verbose
+ * @returns
+ */
 export function parseHttpError(e: AxiosError, verbose = false): string {
   const resp = get(e, 'response.data', e.message ?? null);
   const err = (resp instanceof Object) ? JSON.stringify(resp) : resp;
@@ -17,11 +25,25 @@ export function parseHttpError(e: AxiosError, verbose = false): string {
   return `url=${url}, status=${status}, response=${err}`;
 }
 
+/**
+ * Higher order function to show a human-readable error notification for API errors.
+ * The error argument is rethrown after handling.
+ *
+ * The below example will show an error notification with the description + error message
+ * if the http call fails.
+ *
+ * ```ts
+ * http.post('/service/endpoint', data)
+ *   .then(resp => resp.data)
+ *   .catch(intercept('Failed to call endpoint'));
+ * ```
+ *
+ * @param desc
+ * @returns
+ */
 export function intercept(desc: string): ((e: AxiosError) => never) {
   return (e: AxiosError) => {
     notify.warn(`${desc}: ${parseHttpError(e)}`);
     throw e;
   };
 }
-
-export default instance;

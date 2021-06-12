@@ -6,10 +6,11 @@ import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { ProfileValues } from '@/plugins/spark/types';
 import { calculateProfileValues } from '@/plugins/spark/utils';
 import { PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
-import { bloxQty, prettyQty, tempQty } from '@/utils/bloxfield';
+import { concatById } from '@/utils/collections';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { shortDateString, spliceById } from '@/utils/functional';
-import notify from '@/utils/notify';
+import { prettyQty, shortDateString } from '@/utils/formatting';
+import { notify } from '@/utils/notify';
+import { bloxQty, tempQty } from '@/utils/quantity';
 
 import { PidConfig } from '../types';
 import TempControlModeDialog from './TempControlModeDialog.vue';
@@ -161,7 +162,7 @@ export default defineComponent({
       if (leading === 'pid') {
         const { kp, td, ti } = pid.data;
         tempMode.value[`${kind}Config`] = { kp, td, ti };
-        config.value.modes = spliceById(config.value.modes, tempMode.value);
+        config.value.modes = concatById(config.value.modes, tempMode.value);
         saveConfig();
       }
 
@@ -211,7 +212,7 @@ export default defineComponent({
           title: `Apply ${mode.title} mode`,
           showConfirm: true,
           saveMode: (mode: TempControlMode) => {
-            config.value.modes = spliceById(config.value.modes, mode);
+            config.value.modes = concatById(config.value.modes, mode);
             saveConfig();
           },
         },

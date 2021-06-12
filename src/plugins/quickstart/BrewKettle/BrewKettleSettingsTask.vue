@@ -1,8 +1,9 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
+import { Quantity } from '@/shared-types';
 import { systemStore } from '@/store/system';
-import { bloxQty, deltaTempQty, JSQuantity } from '@/utils/bloxfield';
+import { bloxQty, deltaTempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';
@@ -29,13 +30,13 @@ export default defineComponent({
     'next',
   ],
   setup(props, { emit }) {
-    const fullPowerDelta = ref<JSQuantity>(deltaTempQty(2));
+    const fullPowerDelta = ref<Quantity>(deltaTempQty(2));
 
     const userTemp = computed<string>(
       () => systemStore.units.temperature,
     );
 
-    const kp = computed<JSQuantity>(
+    const kp = computed<Quantity>(
       () => bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
     );
 

@@ -3,7 +3,7 @@ import { Layout } from 'plotly.js';
 import { defineComponent, PropType } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 export default defineComponent({
   name: 'GraphRangeSubmenu',

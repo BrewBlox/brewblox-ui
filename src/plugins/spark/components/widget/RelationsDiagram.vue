@@ -9,7 +9,7 @@ import { computed, defineComponent, onMounted, PropType, ref, watch } from 'vue'
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { createBlockDialog } from '@/utils/dialog';
-import { isJsonEqual } from '@/utils/functional';
+import { isJsonEqual } from '@/utils/objects';
 
 const DEFAULT_SCALE = 0.9;
 const UNKNOWN_TYPE = '???';

@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 
+import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 
 import { withPrefix } from '../utils';
@@ -14,6 +15,7 @@ export function defineLayouts(config: BrewKettleConfig): BuilderLayout[] {
       title: withPrefix(prefix, 'Layout'),
       width: 7,
       height: 8,
+      order: builderStore.layouts.length + 1,
       parts: [
         {
           id: nanoid(),

@@ -9,7 +9,7 @@ import { configApi, globalApi } from './api';
 import { SystemConfig, UserUnits } from './types';
 
 export * from './types';
-export * from './helpers';
+export * from './utils';
 
 const CONFIG_ID = 'default';
 const UNITS_ID = 'units';

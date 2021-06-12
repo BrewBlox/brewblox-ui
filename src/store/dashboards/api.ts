@@ -1,5 +1,5 @@
+import { UI_NAMESPACE } from '@/const';
 import { createApi } from '@/database/api';
-import { UI_NAMESPACE } from '@/utils/const';
 
 import { Dashboard } from './types';
 

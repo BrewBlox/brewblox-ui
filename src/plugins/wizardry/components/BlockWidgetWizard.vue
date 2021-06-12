@@ -8,7 +8,9 @@ import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
 import { widgetStore } from '@/store/widgets';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
-import { objectStringSorter, ruleValidator, suggestId } from '@/utils/functional';
+import { makeObjectSorter } from '@/utils/functional';
+import { makeRuleValidator, suggestId } from '@/utils/rules';
+
 
 type CreateMode = 'new' | 'existing';
 
@@ -55,7 +57,7 @@ export default defineComponent({
     const blockOpts = computed<Block[]>(
       () => sparkStore.serviceBlocks(serviceId.value)
         .filter(block => block.type === props.featureId)
-        .sort(objectStringSorter('id')),
+        .sort(makeObjectSorter('id')),
     );
 
     const blockIdRules = computed<InputRule[]>(
@@ -65,7 +67,7 @@ export default defineComponent({
     );
 
     const blockIdValidator = computed<(v: string) => boolean>(
-      () => ruleValidator(blockIdRules.value),
+      () => makeRuleValidator(blockIdRules.value),
     );
 
     const newBlockId = ref<string>(suggestId(featureTitle, blockIdValidator.value));

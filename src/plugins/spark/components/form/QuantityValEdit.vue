@@ -3,9 +3,9 @@ import isFinite from 'lodash/isFinite';
 import { computed, defineComponent, ref } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
-import { prettyQty, prettyUnit, Quantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { roundNumber } from '@/utils/functional';
+import { prettyQty, prettyUnit, roundedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'QuantityValEdit',
@@ -20,7 +20,7 @@ export default defineComponent({
       field,
       startEdit,
     } = useValEdit.setup<Quantity>(props.modelValue);
-    const local = ref<number | null>(roundNumber(field.value.value));
+    const local = ref<number | null>(roundedNumber(field.value.value));
 
     function syncField(): void {
       if (local.value === null || isFinite(local.value)) {
@@ -70,7 +70,7 @@ export default defineComponent({
       v-model.number="local"
       :dense="dense"
       inputmode="numeric"
-      pattern="[0-9]*"
+      pattern="[0-9\.]*"
       class="col-grow"
       label="Value"
       :suffix="notation"

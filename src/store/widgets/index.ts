@@ -1,7 +1,7 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { concatById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
 import type { Widget } from './types';
@@ -17,7 +17,7 @@ export class WidgetModule extends VuexModule {
     return this.widgets.map(v => v.id);
   }
 
-  public widgetById<T extends Widget>(id: Nullable<string>): T | null {
+  public widgetById<T extends Widget>(id: Maybe<string>): T | null {
     return (findById(this.widgets, id) ?? findById(this.volatileWidgets, id)) as T | null;
   }
 
@@ -26,7 +26,7 @@ export class WidgetModule extends VuexModule {
       throw new Error(`Widget ${widget.title} (${widget.id}) already exists as persistent widget`);
     }
     widget.volatile = true;
-    this.volatileWidgets = extendById(this.volatileWidgets, widget);
+    this.volatileWidgets = concatById(this.volatileWidgets, widget);
   }
 
   public removeVolatileWidget(widget: HasId): void {
@@ -55,7 +55,7 @@ export class WidgetModule extends VuexModule {
   @Action
   public async saveWidget(widget: Widget): Promise<void> {
     if (widget.volatile) {
-      this.volatileWidgets = extendById(this.volatileWidgets, widget);
+      this.volatileWidgets = concatById(this.volatileWidgets, widget);
     }
     else {
       await api.persist(widget); // triggers callback
@@ -76,7 +76,7 @@ export class WidgetModule extends VuexModule {
   public async start(): Promise<void> {
     this.widgets = await api.fetch();
     api.subscribe(
-      widget => this.widgets = extendById(this.widgets, widget),
+      widget => this.widgets = concatById(this.widgets, widget),
       id => this.widgets = filterById(this.widgets, { id }),
     );
   }

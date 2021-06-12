@@ -4,8 +4,8 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorPwmBlock } from '@/plugins/spark/types';
-import { Link, prettyLink } from '@/utils/bloxfield';
-import { round, roundNumber } from '@/utils/functional';
+import { Link } from '@/shared-types';
+import { fixedNumber, prettyLink, roundedNumber } from '@/utils/formatting';
 
 const quickValues: SelectOption<number>[] = [
   { label: '0%', value: 0 },
@@ -48,14 +48,14 @@ export default defineComponent({
       () => {
         const v = block.value.data.desiredSetting;
         return v
-          ? roundNumber(v, 0)
+          ? roundedNumber(v, 0)
           : v;
       },
     );
 
     return {
       prettyLink,
-      round,
+      fixedNumber,
       quickValues,
       context,
       inDialog,
@@ -136,13 +136,13 @@ export default defineComponent({
 
         <div class="col-grow row justify-around text-h6 text-bold">
           <div class="col-auto text-primary">
-            Desired: {{ round(block.data.desiredSetting, 0) }}%
+            Desired: {{ fixedNumber(block.data.desiredSetting, 0) }}%
           </div>
           <div :class="['col-auto text-pink-4', !isLimited && 'fade-4']">
-            Limited: {{ round(block.data.setting, 0) }}%
+            Limited: {{ fixedNumber(block.data.setting, 0) }}%
           </div>
           <div class="col-auto text-secondary">
-            Achieved: {{ round(block.data.value, 0) }}%
+            Achieved: {{ fixedNumber(block.data.value, 0) }}%
           </div>
         </div>
 

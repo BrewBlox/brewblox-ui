@@ -1,12 +1,14 @@
 <script lang="ts">
+import set from 'lodash/set';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
-import { bloxLink, Link } from '@/utils/bloxfield';
-import { mutate, objectStringSorter, typeMatchFilter } from '@/utils/functional';
+import { Link } from '@/shared-types';
+import { makeObjectSorter, makeTypeFilter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 
 
 interface EditableChannel extends IoChannel {
@@ -26,6 +28,8 @@ interface ChannelClaims {
   [nid: number]: MotorValveBlock
 }
 
+const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
+
 export default defineComponent({
   name: 'ValveArray',
   props: {
@@ -44,9 +48,9 @@ export default defineComponent({
     const claimedChannels = computed<ChannelClaims>(
       () => sparkModule
         .blocks
-        .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
+        .filter(motorValveFilter)
         .filter(v => v.data.hwDevice.id === block.value.id)
-        .reduce((acc, v) => mutate<ChannelClaims>(acc, v.data.startChannel, v), {}),
+        .reduce((acc, v) => set(acc, v.data.startChannel, v), {}),
     );
 
     function mappedName(id: string): string | null {
@@ -70,7 +74,7 @@ export default defineComponent({
           },
           [],
         )
-        .sort(objectStringSorter('name')),
+        .sort(makeObjectSorter('name')),
     );
 
     function driverLink(channel: EditableChannel): Link {

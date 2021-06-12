@@ -1,6 +1,6 @@
 import { database } from '@/database';
 import { StoreObject } from '@/shared-types';
-import { deserialize } from '@/utils/parse-object';
+import { deserialize } from '@/utils/parsing';
 
 import { ChangeCb, DeleteCb } from './types';
 

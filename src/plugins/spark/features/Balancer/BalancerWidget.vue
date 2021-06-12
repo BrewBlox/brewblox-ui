@@ -5,7 +5,7 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { BalancerBlock } from '@/plugins/spark/types';
 import { Block } from '@/shared-types';
-import { round } from '@/utils/functional';
+import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'BalancerWidget',
@@ -36,7 +36,7 @@ export default defineComponent({
     }
 
     return {
-      round,
+      fixedNumber,
       sparkModule,
       block,
       clientName,
@@ -73,10 +73,10 @@ export default defineComponent({
           {{ clientName(client.id) }}
         </div>
         <div class="col">
-          {{ round(client.granted) }}
+          {{ fixedNumber(client.granted) }}
         </div>
         <div class="col">
-          {{ round(client.requested) }}
+          {{ fixedNumber(client.requested) }}
         </div>
       </div>
     </div>

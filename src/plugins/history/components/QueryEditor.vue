@@ -1,4 +1,5 @@
 <script lang="ts">
+import set from 'lodash/set';
 import { QTree, throttle } from 'quasar';
 import { computed, defineComponent, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
 
@@ -10,9 +11,8 @@ import {
   targetSplitter,
 } from '@/plugins/history/nodes';
 import { historyStore } from '@/plugins/history/store';
-import { DisplayNames, QueryConfig } from '@/plugins/history/types';
+import type { QueryConfig } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';
-import { mutate } from '@/utils/functional';
 
 export default defineComponent({
   name: 'QueryEditor',
@@ -117,7 +117,7 @@ export default defineComponent({
         const renames = vals
           .filter(key => props.config.renames[key] === undefined)
           .reduce(
-            (acc: DisplayNames, key) => mutate(acc, key, defaultLabel(key)),
+            (acc, key) => set(acc, key, defaultLabel(key)),
             { ...props.config.renames });
         saveConfig({
           ...props.config,

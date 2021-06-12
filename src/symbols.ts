@@ -1,6 +1,6 @@
 import { ComputedRef, InjectionKey, Ref, UnwrapRef } from 'vue';
 
-import { WidgetContext } from './store/features';
+import { WidgetContext } from '@/store/features';
 
 export const DenseKey: InjectionKey<ComputedRef<boolean>> = Symbol('$dense');
 export const TouchKey: InjectionKey<Ref<boolean>> = Symbol('$touch');

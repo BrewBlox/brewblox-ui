@@ -4,7 +4,7 @@ import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { AnalogConstraintsObj, DigitalConstraintsObj } from '@/plugins/spark/types';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 import AnalogConstraints from './AnalogConstraints.vue';
 import DigitalConstraints from './DigitalConstraints.vue';

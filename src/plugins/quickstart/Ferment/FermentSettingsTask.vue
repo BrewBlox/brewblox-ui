@@ -1,7 +1,8 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue';
 
-import { JSQuantity, tempQty } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
+import { tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';
@@ -39,8 +40,8 @@ export default defineComponent({
     'next',
   ],
   setup(props, { emit }) {
-    const fridgeSetting = ref<JSQuantity>(tempQty(20));
-    const beerSetting = ref<JSQuantity>(tempQty(20));
+    const fridgeSetting = ref<Quantity>(tempQty(20));
+    const beerSetting = ref<Quantity>(tempQty(20));
     const activeSetpoint = ref<FermentMode>('beer');
 
     function done(): void {

@@ -4,13 +4,19 @@ import { computed, defineComponent, ref } from 'vue';
 import { useGlobals } from '@/composables';
 import { featureStore, ServiceFeature } from '@/store/features';
 import { Service, ServiceStatus, serviceStore, ServiceStub } from '@/store/services';
-import { objectSorter } from '@/utils/functional';
-import { startChangeServiceTitle, startCreateService, startRemoveService } from '@/utils/services';
+import { makeObjectSorter } from '@/utils/functional';
+import {
+  startChangeServiceTitle,
+  startCreateService,
+  startRemoveService,
+} from '@/utils/services';
 
 interface ServiceSuggestion {
   stub: ServiceStub;
   feature: ServiceFeature;
 }
+
+const serviceSorter = makeObjectSorter<Service>('order');
 
 export default defineComponent({
   name: 'ServiceIndex',
@@ -29,7 +35,7 @@ export default defineComponent({
 
     const services = computed<Service[]>({
       // avoid modifying the store object
-      get: () => [...serviceStore.services].sort(objectSorter('order')),
+      get: () => [...serviceStore.services].sort(serviceSorter),
       set: services => serviceStore.updateServiceOrder(services.map(v => v.id)),
     });
 
