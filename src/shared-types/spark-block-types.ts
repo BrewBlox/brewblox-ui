@@ -51,6 +51,15 @@ export interface Link extends BloxField {
 }
 // #endregion BloxField
 
+export interface DefinedQuantity extends Quantity {
+  value: number;
+}
+
+export interface DefinedLink extends Link {
+  id: string;
+  type: BlockOrIntfType;
+}
+
 // #region IoPin
 export interface IoChannel {
   config: ChannelConfig;

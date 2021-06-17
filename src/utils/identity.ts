@@ -1,7 +1,7 @@
 import LibQty from 'js-quantities';
 import isString from 'lodash/isString';
 
-import { BloxField, Link, Quantity } from '@/shared-types';
+import { BloxField, DefinedLink, DefinedQuantity, Link, Quantity } from '@/shared-types';
 
 interface UnitGroup {
   name: string;
@@ -86,10 +86,21 @@ export const isQuantity =
     isBloxField(obj)
     && obj.__bloxtype === 'Quantity';
 
+export const isDefinedQuantity =
+  (obj: unknown): obj is DefinedQuantity =>
+    isQuantity(obj)
+    && isFinite(obj.value!);
+
 export const isLink =
   (obj: unknown): obj is Link =>
     isBloxField(obj)
     && obj.__bloxtype === 'Link';
+
+export const isDefinedLink =
+  (obj: unknown): obj is DefinedLink =>
+    isLink(obj)
+    && obj.id != null
+    && obj.type != null;
 
 export const isDurationString =
   (v: unknown): v is string =>

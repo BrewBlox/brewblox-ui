@@ -26,7 +26,7 @@ export default defineComponent({
       block,
       saveBlock,
       isDriven,
-      constrainers,
+      limitations,
     } = useBlockWidget.setup<DigitalActuatorBlock>();
 
     const hwBlock = computed<Block | null>(
@@ -81,9 +81,14 @@ export default defineComponent({
       await saveBlock();
     }
 
-    function filterDS2408(b: Block): boolean {
-      return b.type !== BlockType.DS2408
-        || (b as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
+    function targetFilter(b: Block): boolean {
+      // Special exception for DS2408 targets
+      // They are only compatible in actuator mode
+      if (b.type === BlockType.DS2408) {
+        return (b as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
+      }
+      // Filter is in addition to the default compatibility check
+      return true;
     }
 
     return {
@@ -93,10 +98,10 @@ export default defineComponent({
       block,
       saveBlock,
       isDriven,
-      constrainers,
+      limitations,
       channelOpts,
       claimChannel,
-      filterDS2408,
+      targetFilter,
     };
   },
 });
@@ -127,7 +132,7 @@ export default defineComponent({
           <DigitalStateButton
             :model-value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
-            :pending-reason="constrainers"
+            :pending-reason="limitations"
             :disable="isDriven"
             dense
             class="col-auto"
@@ -142,7 +147,7 @@ export default defineComponent({
             :model-value="block.data.hwDevice"
             :service-id="serviceId"
             :creatable="false"
-            :block-filter="filterDS2408"
+            :block-filter="targetFilter"
             title="Pin Array"
             label="Target Pin Array"
             class="col-grow"
