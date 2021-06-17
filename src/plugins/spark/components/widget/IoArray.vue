@@ -7,6 +7,7 @@ import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
 import { Link } from '@/shared-types';
+import { findById } from '@/utils/collections';
 import { makeObjectSorter, makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 
@@ -65,11 +66,11 @@ export default defineComponent({
       return isBlockDriven(block);
     }
 
-    function driverLimitedBy(block: Block): string {
-      return sparkModule
-        .limiters[block.id]
-        ?.join(', ')
-        ?? '';
+    function driverLimitations(block: Block): string | null {
+      return findById(sparkModule.limitations, block.id)
+        ?.limitedBy
+        .join(', ')
+        || null;
     }
 
     async function saveDriver(channel: EditableChannel, link: Link): Promise<void> {
@@ -101,7 +102,7 @@ export default defineComponent({
       serviceId,
       channels,
       driverDriven,
-      driverLimitedBy,
+      driverLimitations,
       saveState,
       driverLink,
       saveDriver,
@@ -126,7 +127,7 @@ export default defineComponent({
           :disable="driverDriven(channel.driver)"
           :model-value="channel.driver.data.desiredState"
           :pending="channel.driver.data.state !== channel.driver.data.desiredState"
-          :pending-reason="driverLimitedBy(channel.driver)"
+          :pending-reason="driverLimitations(channel.driver)"
           class="col-auto self-center"
           @update:model-value="v => saveState(channel, v)"
         />

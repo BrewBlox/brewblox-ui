@@ -7,7 +7,7 @@ import type {
   Block,
   BlockAddress,
   BlockFieldAddress,
-  Limiters,
+  BlockLimitation,
   Link,
   RelationEdge,
   SparkExported,
@@ -33,7 +33,7 @@ import {
   asServiceStatus,
   asSparkStatus,
   calculateDrivenChains,
-  calculateLimiters,
+  calculateLimitations,
   calculateRelations,
 } from './utils';
 
@@ -81,8 +81,8 @@ export class SparkServiceModule extends VuexModule {
     return calculateRelations(this.blocks);
   }
 
-  public get limiters(): Limiters {
-    return calculateLimiters(this.blocks);
+  public get limitations(): BlockLimitation[] {
+    return calculateLimitations(this.blocks);
   }
 
   public get service(): SparkService {

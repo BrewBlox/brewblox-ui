@@ -21,7 +21,7 @@ export default defineComponent({
       sparkModule,
       block,
       saveBlock,
-      constrainers,
+      limitations,
       isDriven,
     } = useBlockWidget.setup<MotorValveBlock>();
 
@@ -84,7 +84,7 @@ export default defineComponent({
       serviceId,
       block,
       saveBlock,
-      constrainers,
+      limitations,
       isDriven,
       channelOpts,
       claimChannel,
@@ -126,7 +126,7 @@ export default defineComponent({
         <DigitalStateButton
           :model-value="block.data.desiredState"
           :pending="block.data.state !== block.data.desiredState"
-          :pending-reason="constrainers"
+          :pending-reason="limitations"
           :disable="isDriven"
           @update:model-value="v => { block.data.desiredState = v; saveBlock(); }"
         />

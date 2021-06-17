@@ -4,8 +4,7 @@ import { startup } from '@/startup';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { autoRegister, cref } from '@/utils/component-ref';
 
-import widget from './BuilderWidget.vue';
-import { typeName } from './const';
+import BuilderWidget from './BuilderWidget.vue';
 import specs from './specs';
 import { builderStore } from './store';
 import { BuilderConfig } from './types';
@@ -14,10 +13,10 @@ import { BuilderConfig } from './types';
 const plugin: Plugin = {
   install(app) {
 
-    const feature: WidgetFeature<BuilderConfig> = {
-      id: typeName,
+    const widget: WidgetFeature<BuilderConfig> = {
+      id: 'Builder',
       title: 'Brewery Builder',
-      component: cref(app, widget),
+      component: cref(app, BuilderWidget),
       wizard: true,
       widgetSize: {
         cols: 8,
@@ -33,7 +32,7 @@ const plugin: Plugin = {
     autoRegister(app, require.context('./components', true));
 
     builderStore.specs = Object.values(specs);
-    featureStore.addWidgetFeature(feature);
+    featureStore.addWidgetFeature(widget);
   },
 
 };

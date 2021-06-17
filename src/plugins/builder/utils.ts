@@ -13,7 +13,7 @@ import { Coordinates, CoordinatesParam, rotatedSize } from '@/utils/coordinates'
 import { createBlockDialog, createDialog, createDialogPromise } from '@/utils/dialog';
 import { deepCopy } from '@/utils/objects';
 
-import { CENTER, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './const';
+import { CENTER, DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH, deprecatedTypes, SQUARE_SIZE } from './const';
 import { builderStore } from './store';
 import { BuilderLayout, FlowPart, PersistentPart, StatePart, Transitions } from './types';
 
@@ -309,8 +309,8 @@ export async function startAddLayout(source: BuilderLayout | null = null): Promi
   await builderStore.createLayout({
     id,
     title,
-    width: source?.width ?? defaultLayoutWidth,
-    height: source?.height ?? defaultLayoutHeight,
+    width: source?.width ?? DEFAULT_LAYOUT_WIDTH,
+    height: source?.height ?? DEFAULT_LAYOUT_HEIGHT,
     parts: deepCopy(source?.parts) ?? [],
     order: builderStore.layouts.length + 1,
   });

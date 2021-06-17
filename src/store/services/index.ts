@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { featureStore } from '@/store/features';
+import { featureStore, ServiceHook } from '@/store/features';
 import { concatById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
@@ -10,11 +10,11 @@ import type { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
 
-const onStartService = (service: Service): Promise<void> =>
-  featureStore.serviceById(service.type)?.onStart?.(service);
+const onStartService: ServiceHook =
+  service => featureStore.serviceById(service.type)?.onStart?.(service);
 
-const onRemoveService = (service: Service): Promise<void> =>
-  featureStore.serviceById(service.type)?.onRemove?.(service);
+const onRemoveService: ServiceHook =
+  service => featureStore.serviceById(service.type)?.onRemove?.(service);
 
 
 @Module({ generateMutationSetters: true })

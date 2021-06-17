@@ -73,8 +73,9 @@ export interface RelationNode {
   title?: string; // overrides `type` for rendering
 }
 
-export interface Limiters {
-  [blockId: string]: string[];
+export interface BlockLimitation {
+  id: string; // block ID
+  limitedBy: string[]; // descriptions
 }
 
 export interface StoredDataPreset<DataT = any> extends StoreObject {
