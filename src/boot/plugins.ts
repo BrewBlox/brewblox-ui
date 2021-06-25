@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers';
 import { Plugin } from 'vue';
 
 import automation from '@/plugins/automation';
+import brewfather from '@/plugins/brewfather';
 import builder from '@/plugins/builder';
 import history from '@/plugins/history';
 import misc from '@/plugins/misc';
@@ -26,6 +27,7 @@ export default boot(({ app, store }) => {
     history,
     spark,
     tilt,
+    brewfather,
     builder,
     quickstart,
     misc,
