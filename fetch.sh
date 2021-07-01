@@ -15,8 +15,8 @@ set -ex
 #   -H 'Content-Type: application/x-www-form-urlencoded' \
 #   http://localhost:9000/victoria/api/v1/query \
 #   -w "\n" \
-#   -d 'query=avg_over_time({__name__="tilt/Pink/Specific gravity"}[10s])[1m]&step=10s&time=' \
-#   | jq . \
+#   -d 'query=avg_over_time({__name__="tilt/Pink/Specific gravity"}[10s])[1m]&step=10s&time=2021-07-01T21:59:37.309Z' \
+#   | jq '(.data.result[]? | .values[]? | .[0] // empty ) |= todate' \
 #   > output.json
 
 # curl \
@@ -28,14 +28,14 @@ set -ex
 #   | jq . \
 #   > output.json
 
-curl \
-  -X POST \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  http://localhost:9000/victoria/api/v1/query \
-  -w "\n" \
-  -d 'query={__name__="spock/actuator-1/value"}' \
-  | jq . \
-  > output.json
+# curl \
+#   -X POST \
+#   -H 'Content-Type: application/x-www-form-urlencoded' \
+#   http://localhost:9000/victoria/api/v1/query \
+#   -w "\n" \
+#   -d 'query={__name__="spock/actuator-1/value"}' \
+#   | jq . \
+#   > output.json
 
 # curl \
 #   -X POST \
@@ -46,18 +46,21 @@ curl \
 #   | jq . \
 #   > output.json
 
-# brewblox-ctl http post \
-#   http://localhost:9000/history/tsdb/ranges \
-#   -d '{
-#         "fields": [
-#           "sparkey/HERMS MT Sensor/value[degC]",
-#           "spock/WiFiSettings/signal"
-#         ],
-#         "duration": "10s",
-#         "start": "2021-06-29T15:49:06.825Z"
-#       }' \
-#   | jq . \
-#   > output.json
+curl \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  http://localhost:9000/history/tsdb/ranges \
+  -w "\n" \
+  -d '{
+        "fields": [
+          "sparkey/HERMS MT Sensor/value[degC]",
+          "spock/WiFiSettings/signal"
+        ],
+        "duration": "10s",
+        "start": "2021-06-29T15:49:06.825Z"
+      }' \
+  | jq '(.[]? | .data.result[]? | .values[]? | .[0] // empty ) |= todate' \
+  > output.json
 
 # curl \
 #   -X GET \
