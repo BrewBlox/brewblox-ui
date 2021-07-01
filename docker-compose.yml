@@ -47,6 +47,8 @@ services:
 
   tilt:
     image: brewblox/brewblox-tilt:develop
+    labels:
+      - traefik.enable=false
     restart: unless-stopped
     command: --simulate=Pink --mqtt-host=eventbus --mqtt-protocol=mqtt
 
