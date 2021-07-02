@@ -8,7 +8,7 @@ import { ApiQuery, LoggedSession, QueryResult } from '../types';
 export const historyApi = {
   openStream:
     (): WebSocket =>
-      new WebSocket(`${WS_HOST}/history/history/stream`),
+      new WebSocket(`${WS_HOST}/history/tsdb/stream`),
 
   fetchFields:
     async (includeStale: boolean): Promise<Mapped<any>> =>

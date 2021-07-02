@@ -56,10 +56,10 @@ curl \
           "sparkey/HERMS MT Sensor/value[degC]",
           "spock/WiFiSettings/signal"
         ],
-        "duration": "10s",
-        "start": "2021-06-29T15:49:06.825Z"
+        "start": "2021-07-02T10:34:21.627Z",
+        "end": "2021-07-02T12:40:21.627Z"
       }' \
-  | jq '(.[]? | .data.result[]? | .values[]? | .[0] // empty ) |= todate' \
+  | jq '(.[] | .values[] | .[0] // empty ) |= todate' \
   > output.json
 
 # curl \

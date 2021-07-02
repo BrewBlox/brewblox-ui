@@ -18,19 +18,19 @@ import { historyApi, sessionApi } from './api';
 
 
 const buildQuery =
-  (params: QueryParams, target: QueryTarget, epoch = 'ms'): ApiQuery =>
+  (params: QueryParams, target: QueryTarget, epoch = 'ms'): any =>
   ({
-    database: params.database,
+    // database: params.database,
     start: isoDateString(params.start),
     end: isoDateString(params.end),
     duration: params.duration,
-    limit: params.limit,
-    order_by: params.orderBy,
-    policy: params.policy,
-    approx_points: params.approxPoints,
-    measurement: target.measurement,
-    fields: target.fields,
-    epoch,
+    // limit: params.limit,
+    // order_by: params.orderBy,
+    // policy: params.policy,
+    // approx_points: params.approxPoints,
+    // measurement: target.measurement,
+    fields: target.fields.map(f => `${target.measurement}/${f}`),
+    // epoch,
   });
 
 @Module({ generateMutationSetters: true })

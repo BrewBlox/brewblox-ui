@@ -63,7 +63,7 @@ export interface LabelPrecision {
 
 export interface HistorySource {
   id: string;
-  command: 'values' | 'last_values';
+  command: 'metrics' | 'ranges';
   transformer: (source: any, result: any) => HistorySource;
   params: QueryParams;
   target: QueryTarget;
@@ -81,6 +81,30 @@ export interface QueryResult {
   initial?: boolean;
 }
 
+export interface TsdbRange {
+  metric: {
+    __name__: string;
+  }
+  values: [timestamp: number, value: string][]
+}
+
+export interface TsdbMetric {
+  metric: {
+    __name__: string;
+  }
+  value: [timestamp: number, value: string]
+}
+
+export interface TsdbRangesResult {
+  initial: boolean;
+  ranges: TsdbRange[];
+}
+
+export interface TsdbMetricsResult {
+  initial: boolean;
+  metrics: TsdbMetric[];
+}
+
 export interface GraphFieldResult extends PlotData {
   type: 'scatter';
   mode: 'lines';
@@ -92,7 +116,7 @@ export interface GraphFieldResult extends PlotData {
 }
 
 export interface GraphSource extends HistorySource {
-  transformer: (source: GraphSource, result: QueryResult) => HistorySource;
+  transformer: (source: GraphSource, result: TsdbRangesResult) => HistorySource;
   axes: GraphValueAxes;
   colors: LineColors;
   precision: LabelPrecision;
@@ -107,7 +131,7 @@ export interface MetricsResult {
 }
 
 export interface MetricsSource extends HistorySource {
-  transformer: (source: MetricsSource, result: MetricsResult[]) => HistorySource;
+  transformer: (source: MetricsSource, result: TsdbMetricsResult) => HistorySource;
   values: MetricsResult[];
 }
 

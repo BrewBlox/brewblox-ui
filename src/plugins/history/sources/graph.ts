@@ -13,6 +13,7 @@ import {
   QueryParams,
   QueryResult,
   QueryTarget,
+  TsdbRangesResult,
 } from '@/plugins/history/types';
 import { fixedNumber } from '@/utils/formatting';
 
@@ -42,87 +43,128 @@ const valueName =
     return `<span ${prop}>${label}</span><br>${fixedNumber(value, precision)}`;
   };
 
-const transformer =
-  (source: GraphSource, result: QueryResult): GraphSource => {
-    if (result.values && result.values.length > 0) {
-      const resultCols = transpose(result.values);
-      const time = resultCols[0];
-      source.usedPolicy = result.policy;
+// const transformer =
+//   (source: GraphSource, result: QueryResult): GraphSource => {
+//     if (result.values && result.values.length > 0) {
+//       const resultCols = transpose(result.values);
+//       const time = resultCols[0];
+//       source.usedPolicy = result.policy;
 
-      // After connection interrupts, the data source may have been restarted
-      // Remove earlier values if the service signals it's sending the initial batch
-      if (result.initial) {
-        source.values = {};
-      }
+//       // After connection interrupts, the data source may have been restarted
+//       // Remove earlier values if the service signals it's sending the initial batch
+//       if (result.initial) {
+//         source.values = {};
+//       }
 
-      result
-        .columns
-        .forEach((col: string, idx: number) => {
-          if (idx === 0) {
-            return; // skip time
-          }
-          const colValues = resultCols[idx];
-          const key = `${result.name}/${col}`;
-          const existing = source.values[key];
-          source.values[key] = {
-            ...existing, // Plotly can set values
-            type: 'scatter',
-            mode: 'lines',
-            name: valueName(source, key, last(colValues)),
-            yaxis: source.axes[key] ?? 'y',
-            line: { color: source.colors[key] },
-            x: boundedConcat(existing?.x, time),
-            y: boundedConcat(existing?.y, colValues),
-          };
-        });
+//       result
+//         .columns
+//         .forEach((col: string, idx: number) => {
+//           if (idx === 0) {
+//             return; // skip time
+//           }
+//           const colValues = resultCols[idx];
+//           const key = `${result.name}/${col}`;
+//           const existing = source.values[key];
+//           source.values[key] = {
+//             ...existing, // Plotly can set values
+//             type: 'scatter',
+//             mode: 'lines',
+//             name: valueName(source, key, last(colValues)),
+//             yaxis: source.axes[key] ?? 'y',
+//             line: { color: source.colors[key] },
+//             x: boundedConcat(existing?.x, time),
+//             y: boundedConcat(existing?.y, colValues),
+//           };
+//         });
 
-      if (
-        source.params.duration
-        && !source.params.start
-        && !source.params.end
-      ) {
-        // timestamp in Ms that should be discarded
-        const boundary = new Date().getTime() - parseDuration(source.params.duration);
-        forEach(source.values, val => {
-          const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
-          if (boundaryIdx > 0) {
-            val.x = val.x.slice(boundaryIdx);
-            val.y = val.y.slice(boundaryIdx);
-          }
-        });
-      }
+//       if (
+//         source.params.duration
+//         && !source.params.start
+//         && !source.params.end
+//       ) {
+//         // timestamp in Ms that should be discarded
+//         const boundary = new Date().getTime() - parseDuration(source.params.duration);
+//         forEach(source.values, val => {
+//           const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
+//           if (boundaryIdx > 0) {
+//             val.x = val.x.slice(boundaryIdx);
+//             val.y = val.y.slice(boundaryIdx);
+//           }
+//         });
+//       }
+//     }
+//     return source;
+//   };
+
+function transformer(source: GraphSource, result: TsdbRangesResult): GraphSource {
+  if (result.ranges.length > 0) {
+    if (result.initial) {
+      source.values = {};
     }
-    return source;
-  };
 
-export const addSource =
-  async (
-    id: string,
-    params: QueryParams,
-    renames: DisplayNames,
-    axes: GraphValueAxes,
-    colors: LineColors,
-    precision: LabelPrecision,
-    target: QueryTarget,
-  ): Promise<void> => {
-    const filteredTarget = {
-      ...target,
-      fields: target.fields.filter(field => !!field),
-    };
-    if (filteredTarget.fields.length == 0) {
-      return;
+    result
+      .ranges
+      .forEach((range) => {
+        const key = range.metric.__name__;
+        const existing = source.values[key];
+        source.values[key] = {
+          ...existing, // Plotly can set values
+          type: 'scatter',
+          mode: 'lines',
+          name: valueName(source, key, Number(last(range.values)?.[1])),
+          yaxis: source.axes[key] ?? 'y',
+          line: { color: source.colors[key] },
+          x: boundedConcat(existing?.x, range.values.map(v => v[0] * 1000)),
+          y: boundedConcat(existing?.y, range.values.map(v => Number(v[1]))),
+        };
+      });
+
+    if (
+      source.params.duration
+      && !source.params.start
+      && !source.params.end
+    ) {
+      // timestamp in Ms that should be discarded
+      const boundary = new Date().getTime() - parseDuration(source.params.duration);
+      forEach(source.values, val => {
+        const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
+        if (boundaryIdx > 0) {
+          val.x = val.x.slice(boundaryIdx);
+          val.y = val.y.slice(boundaryIdx);
+        }
+      });
     }
-    const source: GraphSource = {
-      id,
-      params,
-      renames,
-      axes,
-      colors,
-      precision,
-      transformer,
-      command: 'values',
-      target: filteredTarget,
-      values: {},
-    };
-    await historyStore.addSource(source);
+  }
+  return source;
+}
+
+export async function addSource(
+  id: string,
+  params: QueryParams,
+  renames: DisplayNames,
+  axes: GraphValueAxes,
+  colors: LineColors,
+  precision: LabelPrecision,
+  target: QueryTarget,
+): Promise<void> {
+  const filteredTarget = {
+    ...target,
+    fields: target.fields.filter(field => !!field),
   };
+  if (filteredTarget.fields.length == 0) {
+    return;
+  }
+  const source: GraphSource = {
+    id,
+    params,
+    renames,
+    axes,
+    colors,
+    precision,
+    transformer,
+    command: 'ranges',
+    target: filteredTarget,
+    values: {},
+  };
+  await historyStore.addSource(source);
+}

@@ -2,21 +2,22 @@ import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
   HistorySource,
-  MetricsResult,
   MetricsSource,
   QueryParams,
   QueryTarget,
+  TsdbMetricsResult,
 } from '@/plugins/history/types';
 
-const metricsTransformer =
-  (source: HistorySource, result: MetricsResult[]): MetricsSource => ({
+function metricsTransformer(source: HistorySource, result: TsdbMetricsResult): MetricsSource {
+  return {
     ...source,
-    values: result.map(res => ({
-      ...res,
-      field: `${source.target.measurement}/${res.field}`,
+    values: result.metrics.map(res => ({
+      field: res.metric.__name__,
+      time: res.value[0] * 1000,
+      value: Number(res.value[1]),
     })),
-  });
-
+  };
+}
 
 export const addSource =
   async (
@@ -36,7 +37,7 @@ export const addSource =
       id,
       params,
       renames,
-      command: 'last_values',
+      command: 'metrics',
       transformer: metricsTransformer,
       target: filteredTarget,
       values: [],
