@@ -3,7 +3,7 @@ import { defineComponent, PropType } from 'vue';
 
 import { createDialog } from '@/utils/dialog';
 
-import { DEFAULT_PRECISION } from '../getters';
+import { DEFAULT_PRECISION } from '../const';
 import { GraphConfig } from '../types';
 
 export default defineComponent({

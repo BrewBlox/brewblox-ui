@@ -11,27 +11,18 @@ import type {
   HistorySource,
   LoggedSession,
   QueryParams,
-  QueryResult,
-  QueryTarget,
 } from '../types';
 import { historyApi, sessionApi } from './api';
 
 
-const buildQuery =
-  (params: QueryParams, target: QueryTarget, epoch = 'ms'): any =>
-  ({
-    // database: params.database,
+function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
+  return {
     start: isoDateString(params.start),
     end: isoDateString(params.end),
     duration: params.duration,
-    // limit: params.limit,
-    // order_by: params.orderBy,
-    // policy: params.policy,
-    // approx_points: params.approxPoints,
-    // measurement: target.measurement,
-    fields: target.fields.map(f => `${target.measurement}/${f}`),
-    // epoch,
-  });
+    fields,
+  };
+}
 
 @Module({ generateMutationSetters: true })
 export class HistoryModule extends VuexModule {
@@ -48,7 +39,7 @@ export class HistoryModule extends VuexModule {
       this.stream.send(JSON.stringify({
         id: src.id,
         command: src.command,
-        query: buildQuery(src.params, src.target),
+        query: buildQuery(src.params, src.fields),
       }));
     }
   }
@@ -95,12 +86,12 @@ export class HistoryModule extends VuexModule {
     return findById(this.sessions, id);
   }
 
-  public sourceById(id: string | null): HistorySource | null {
-    return findById(this.sources, id);
+  public sourceById<T extends HistorySource>(id: string | null): T | null {
+    return findById(this.sources, id) as T | null;
   }
 
   @Mutation
-  public transform({ id, data }: { id: string; data: QueryResult }): void {
+  public transform({ id, data }: { id: string; data: any }): void {
     const source = this.sourceById(id);
     if (source !== null) {
       this.sources = concatById(this.sources, source.transformer(source, data));
@@ -134,25 +125,46 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action
-  public async removeSource(source: HistorySource): Promise<void> {
-    this.endQuery(source);
-    this.sources = filterById(this.sources, source);
+  public async removeSource(source: Maybe<HistorySource>): Promise<void> {
+    if (source) {
+      this.endQuery(source);
+      this.sources = filterById(this.sources, source);
+    }
   }
 
   @Action
   public async fetchFreshFields(): Promise<void> {
-    this.freshFields = await historyApi.fetchFields(false);
+    const fields = await historyApi.fetchFields('1d');
+    this.freshFields = fields
+      .reduce(
+        (acc: Mapped<string[]>, f: string) => {
+          const [service, ...sections] = f.split('/');
+          const arr = acc[service] ?? [];
+          return { ...acc, [service]: [...arr, sections.join('/')] };
+        },
+        {},
+      );
   }
 
   @Action
   public async fetchAllFields(): Promise<void> {
-    this.allFields = await historyApi.fetchFields(true);
+    const fields = await historyApi.fetchFields('');
+    this.allFields = fields
+      .reduce(
+        (acc: Mapped<string[]>, f: string) => {
+          const [service, ...sections] = f.split('/');
+          const arr = acc[service] ?? [];
+          return { ...acc, [service]: [...arr, sections.join('/')] };
+        },
+        {},
+      );
   }
 
-  @Action
-  public async fetchValues([params, target, epoch]: [QueryParams, QueryTarget, string]): Promise<QueryResult> {
-    return await historyApi.fetchValues(buildQuery(params, target, epoch));
-  }
+  // TODO(Bob): replace with dedicated CSV fetch
+  // @Action
+  // public async fetchValues([params, target, epoch]: [QueryParams, QueryTarget, string]): Promise<QueryResult> {
+  //   return await historyApi.fetchValues(buildQuery(params, target, epoch));
+  // }
 
   @Action
   public async start(): Promise<void> {

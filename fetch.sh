@@ -1,14 +1,14 @@
 #! /bin/bash
 set -ex
 
-# curl \
-#   -X POST \
-#   -H 'Content-Type: application/x-www-form-urlencoded' \
-#   http://localhost:9000/victoria/api/v1/query_range \
-#   -w "\n" \
-#   -d 'query=avg_over_time({__name__="tilt/Pink/Specific gravity"}[1m:10s])' \
-#   | jq . \
-#   > output.json
+curl \
+  -X POST \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  http://localhost:9000/victoria/api/v1/query_range \
+  -w "\n" \
+  -d 'query=avg_over_time({__name__="tilt/Pink/Specific gravity"}[1m])&step=1m' \
+  | jq '(.data.result[]? | .values[]? | .[0] // empty ) |= todate' \
+  > output.json
 
 # curl \
 #   -X POST \
@@ -46,21 +46,21 @@ set -ex
 #   | jq . \
 #   > output.json
 
-curl \
-  -X POST \
-  -H 'Content-Type: application/json' \
-  http://localhost:9000/history/tsdb/ranges \
-  -w "\n" \
-  -d '{
-        "fields": [
-          "sparkey/HERMS MT Sensor/value[degC]",
-          "spock/WiFiSettings/signal"
-        ],
-        "start": "2021-07-02T10:34:21.627Z",
-        "end": "2021-07-02T12:40:21.627Z"
-      }' \
-  | jq '(.[] | .values[] | .[0] // empty ) |= todate' \
-  > output.json
+# curl \
+#   -X POST \
+#   -H 'Content-Type: application/json' \
+#   http://localhost:9000/history/timeseries/ranges \
+#   -w "\n" \
+#   -d '{
+#         "fields": [
+#           "sparkey/HERMS MT Sensor/value[degC]",
+#           "spock/WiFiSettings/signal"
+#         ],
+#         "start": "2021-07-02T10:34:21.627Z",
+#         "end": "2021-07-02T12:40:21.627Z"
+#       }' \
+#   | jq '(.[] | .values[] | .[0] // empty ) |= todate' \
+#   > output.json
 
 # curl \
 #   -X GET \

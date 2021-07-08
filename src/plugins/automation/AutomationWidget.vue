@@ -9,7 +9,7 @@ import { shortDateString } from '@/utils/formatting';
 
 import AutomationInfoDialog from './AutomationInfoDialog.vue';
 import AutomationJumpDialog from './AutomationJumpDialog.vue';
-import { settableStates } from './getters';
+import { settableStates } from './const';
 import { automationStore } from './store';
 import {
   AutomationProcess,

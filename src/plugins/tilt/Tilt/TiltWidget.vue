@@ -5,7 +5,7 @@ import { computed, defineComponent } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { serviceStore } from '@/store/services';
 
-import { colorOpts, fieldLabels } from '../getters';
+import { colorOpts, fieldLabels } from '../const';
 import { tiltStore } from '../store';
 import { TiltStateValue } from '../types';
 import { TiltWidget } from './types';

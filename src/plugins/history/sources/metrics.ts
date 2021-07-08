@@ -4,11 +4,13 @@ import {
   HistorySource,
   MetricsSource,
   QueryParams,
-  QueryTarget,
-  TsdbMetricsResult,
+  TimeSeriesMetricsResult,
 } from '@/plugins/history/types';
 
-function metricsTransformer(source: HistorySource, result: TsdbMetricsResult): MetricsSource {
+function metricsTransformer(
+  source: HistorySource,
+  result: TimeSeriesMetricsResult,
+): MetricsSource {
   return {
     ...source,
     values: result.metrics.map(res => ({
@@ -19,28 +21,24 @@ function metricsTransformer(source: HistorySource, result: TsdbMetricsResult): M
   };
 }
 
-export const addSource =
-  async (
-    id: string,
-    params: QueryParams,
-    renames: DisplayNames,
-    target: QueryTarget,
-  ): Promise<void> => {
-    const filteredTarget = {
-      ...target,
-      fields: target.fields.filter(field => !!field),
-    };
-    if (filteredTarget.fields.length === 0) {
-      return;
-    }
-    const source: MetricsSource = {
-      id,
-      params,
-      renames,
-      command: 'metrics',
-      transformer: metricsTransformer,
-      target: filteredTarget,
-      values: [],
-    };
-    await historyStore.addSource(source);
+export async function addSource(
+  id: string,
+  params: QueryParams,
+  renames: DisplayNames,
+  fields: string[],
+): Promise<void> {
+  const validFields = fields.filter(field => !!field);
+  if (validFields.length === 0) {
+    return;
+  }
+  const source: MetricsSource = {
+    id,
+    params,
+    renames,
+    command: 'metrics',
+    transformer: metricsTransformer,
+    fields: validFields,
+    values: [],
   };
+  await historyStore.addSource(source);
+}

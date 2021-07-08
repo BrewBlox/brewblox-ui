@@ -1,6 +1,5 @@
 <script lang="ts">
 import debounce from 'lodash/debounce';
-import mapValues from 'lodash/mapValues';
 import { Layout, PlotData } from 'plotly.js';
 import {
   computed,
@@ -13,7 +12,7 @@ import {
   watch,
 } from 'vue';
 
-import { defaultPresets } from '@/plugins/history/getters';
+import { defaultPresets } from '@/plugins/history/const';
 import { addSource } from '@/plugins/history/sources/graph';
 import { historyStore } from '@/plugins/history/store';
 import {
@@ -23,8 +22,6 @@ import {
   QueryTarget,
 } from '@/plugins/history/types';
 import { isJsonEqual } from '@/utils/objects';
-
-interface Policies { [measurement: string]: string }
 
 export default defineComponent({
   name: 'HistoryGraph',
@@ -84,20 +81,23 @@ export default defineComponent({
       () => props.config.targets ?? [],
     );
 
+    const fields = computed<string[]>(
+      () => targets.value
+        .flatMap(t => t.fields.map(f => `${t.measurement}/${f}`)),
+    );
+
     const layout = computed<Partial<Layout>>(
       () => props.config.layout ?? {},
     );
 
-    const sources = computed<GraphSource[]>(
-      () => targets.value
-        .map(target => historyStore.sourceById(sourceId(target)))
-        .filter((source): source is GraphSource => source != null),
+    const source = computed<GraphSource | null>(
+      () => historyStore.sourceById(props.graphId) as GraphSource | null,
     );
 
     const error = computed<string | null>(
       () => {
-        if (!sources.value || sources.value.length === 0) {
-          return targets.value.length > 0
+        if (!source.value) {
+          return fields.value.length > 0
             ? 'No data sources'
             : 'No fields selected';
         }
@@ -109,44 +109,31 @@ export default defineComponent({
     );
 
     const graphData = computed<Partial<PlotData>[]>(
-      () => sources
-        .value
-        .flatMap(source => Object.values(source.values)),
+      () => source.value
+        ? Object.values(source.value.values)
+        : [],
     );
 
-    const policies = computed<Policies>(
-      () => {
-        const result: Policies = {};
-        sources.value.forEach(source => {
-          if (source.target && source.usedPolicy) {
-            result[source.target.measurement] = source.usedPolicy;
-          }
-        });
-        return result;
-      },
-    );
-
-    function addSources(): void {
-      targets.value.forEach(target =>
-        addSource(
-          sourceId(target),
-          props.config.params ?? {},
-          props.config.renames ?? {},
-          props.config.axes ?? {},
-          props.config.colors ?? {},
-          props.config.precision ?? {},
-          target,
-        ));
+    function createSource(): void {
+      addSource(
+        props.graphId,
+        props.config.params ?? {},
+        props.config.renames ?? {},
+        props.config.axes ?? {},
+        props.config.colors ?? {},
+        props.config.precision ?? {},
+        fields.value,
+      );
     }
 
-    function removeSources(): void {
-      sources.value.forEach(historyStore.removeSource);
+    function removeSource(): void {
+      historyStore.removeSource(source.value);
     }
 
-    const resetSources = debounce(
+    const resetSource = debounce(
       () => {
-        removeSources();
-        addSources();
+        removeSource();
+        createSource();
       },
       100,
       { trailing: true },
@@ -163,26 +150,12 @@ export default defineComponent({
 
     watch(
       () => props.sourceRevision,
-      () => resetSources(),
-    );
-
-    watch(
-      () => policies,
-      (newV, oldV) => {
-        if (newV.value && !isJsonEqual(newV.value, oldV?.value)) {
-          const downsampling = mapValues(newV.value, policy =>
-            policy
-              .replace(/autogen/, 'No averaging')
-              .replace(/downsample_/, ''));
-          emit('downsample', downsampling);
-        }
-      },
-      { immediate: true },
+      () => resetSource(),
     );
 
     onMounted(() => {
       if (!props.sharedSources) {
-        addSources();
+        createSource();
       }
       else {
         nextTick(refresh);
@@ -191,7 +164,7 @@ export default defineComponent({
 
     onBeforeUnmount(() => {
       if (!props.sharedSources) {
-        removeSources();
+        removeSource();
       }
     });
 
@@ -204,10 +177,8 @@ export default defineComponent({
       saveLayout,
       isActivePreset,
       sourceId,
-      sources,
       error,
       graphData,
-      policies,
     };
   },
 });

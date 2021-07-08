@@ -8,7 +8,7 @@ import { useGlobals, useWidget } from '@/composables';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 
-import { emptyGraphConfig } from '../getters';
+import { emptyGraphConfig } from '../const';
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote, SharedGraphConfig } from '../types';
 import { sharedWidgetConfigs } from '../utils';

@@ -2,7 +2,7 @@ import forEach from 'lodash/forEach';
 import last from 'lodash/last';
 import parseDuration from 'parse-duration';
 
-import { DEFAULT_PRECISION, MAX_POINTS } from '@/plugins/history/getters';
+import { DEFAULT_PRECISION, MAX_POINTS } from '@/plugins/history/const';
 import { historyStore } from '@/plugins/history/store';
 import {
   DisplayNames,
@@ -11,92 +11,41 @@ import {
   LabelPrecision,
   LineColors,
   QueryParams,
-  QueryResult,
-  QueryTarget,
-  TsdbRangesResult,
+  TimeSeriesRangesResult,
 } from '@/plugins/history/types';
 import { fixedNumber } from '@/utils/formatting';
 
-const transpose = (matrix: any[][]): any[][] => matrix[0].map((_, idx) => matrix.map(row => row[idx]));
+function boundedConcat(left: number[] = [], right: number[] = []): number[] {
+  const sliced = Math.max((left.length + right.length) - MAX_POINTS, 0);
+  if (sliced > left.length) {
+    return right.slice(sliced - left.length);
+  }
+  if (sliced > 0) {
+    const result = left.slice(sliced);
+    result.push(...right);
+    return result;
+  }
+  return [...left, ...right];
+}
 
-const boundedConcat =
-  (left: number[] = [], right: number[] = [], maxLength: number = MAX_POINTS): number[] => {
-    const sliced = Math.max((left.length + right.length) - maxLength, 0);
-    if (sliced > left.length) {
-      return right.slice(sliced - left.length);
-    }
-    if (sliced > 0) {
-      const result = left.slice(sliced);
-      result.push(...right);
-      return result;
-    }
-    return [...left, ...right];
-  };
+/**
+ * Returns a HTML span element with the field name postfixed with the current value.
+ *
+ * @param source
+ * @param key
+ * @param value
+ * @returns
+ */
+function fieldLabel(source: GraphSource, key: string, value: number | undefined): string {
+  const label = source.renames[key] || key;
+  const precision = source.precision[key] ?? DEFAULT_PRECISION;
+  const prop = source.axes[key] === 'y2'
+    ? 'style="color: #aef"'
+    : '';
+  return `<span ${prop}>${label}</span><br>${fixedNumber(value, precision)}`;
+}
 
-const valueName =
-  (source: GraphSource, key: string, value: number | undefined): string => {
-    const label = source.renames[key] || key;
-    const precision = source.precision[key] ?? DEFAULT_PRECISION;
-    const prop = source.axes[key] === 'y2'
-      ? 'style="color: #aef"'
-      : '';
-    return `<span ${prop}>${label}</span><br>${fixedNumber(value, precision)}`;
-  };
-
-// const transformer =
-//   (source: GraphSource, result: QueryResult): GraphSource => {
-//     if (result.values && result.values.length > 0) {
-//       const resultCols = transpose(result.values);
-//       const time = resultCols[0];
-//       source.usedPolicy = result.policy;
-
-//       // After connection interrupts, the data source may have been restarted
-//       // Remove earlier values if the service signals it's sending the initial batch
-//       if (result.initial) {
-//         source.values = {};
-//       }
-
-//       result
-//         .columns
-//         .forEach((col: string, idx: number) => {
-//           if (idx === 0) {
-//             return; // skip time
-//           }
-//           const colValues = resultCols[idx];
-//           const key = `${result.name}/${col}`;
-//           const existing = source.values[key];
-//           source.values[key] = {
-//             ...existing, // Plotly can set values
-//             type: 'scatter',
-//             mode: 'lines',
-//             name: valueName(source, key, last(colValues)),
-//             yaxis: source.axes[key] ?? 'y',
-//             line: { color: source.colors[key] },
-//             x: boundedConcat(existing?.x, time),
-//             y: boundedConcat(existing?.y, colValues),
-//           };
-//         });
-
-//       if (
-//         source.params.duration
-//         && !source.params.start
-//         && !source.params.end
-//       ) {
-//         // timestamp in Ms that should be discarded
-//         const boundary = new Date().getTime() - parseDuration(source.params.duration);
-//         forEach(source.values, val => {
-//           const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
-//           if (boundaryIdx > 0) {
-//             val.x = val.x.slice(boundaryIdx);
-//             val.y = val.y.slice(boundaryIdx);
-//           }
-//         });
-//       }
-//     }
-//     return source;
-//   };
-
-function transformer(source: GraphSource, result: TsdbRangesResult): GraphSource {
+function transformer(source: GraphSource, result: TimeSeriesRangesResult): GraphSource {
   if (result.ranges.length > 0) {
     if (result.initial) {
       source.values = {};
@@ -111,7 +60,7 @@ function transformer(source: GraphSource, result: TsdbRangesResult): GraphSource
           ...existing, // Plotly can set values
           type: 'scatter',
           mode: 'lines',
-          name: valueName(source, key, Number(last(range.values)?.[1])),
+          name: fieldLabel(source, key, Number(last(range.values)?.[1])),
           yaxis: source.axes[key] ?? 'y',
           line: { color: source.colors[key] },
           x: boundedConcat(existing?.x, range.values.map(v => v[0] * 1000)),
@@ -145,13 +94,10 @@ export async function addSource(
   axes: GraphValueAxes,
   colors: LineColors,
   precision: LabelPrecision,
-  target: QueryTarget,
+  fields: string[],
 ): Promise<void> {
-  const filteredTarget = {
-    ...target,
-    fields: target.fields.filter(field => !!field),
-  };
-  if (filteredTarget.fields.length == 0) {
+  const validFields = fields.filter(field => !!field);
+  if (validFields.length === 0) {
     return;
   }
   const source: GraphSource = {
@@ -163,7 +109,7 @@ export async function addSource(
     precision,
     transformer,
     command: 'ranges',
-    target: filteredTarget,
+    fields: validFields,
     values: {},
   };
   await historyStore.addSource(source);
