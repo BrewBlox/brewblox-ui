@@ -56,15 +56,16 @@ function transformer(source: GraphSource, result: TimeSeriesRangesResult): Graph
       .forEach((range) => {
         const key = range.metric.__name__;
         const existing = source.values[key];
+        const x: number[] = boundedConcat(existing?.x, range.values.map(v => v[0] * 1000));
+        const y: number[] = boundedConcat(existing?.y, range.values.map(v => Number(v[1])));
         source.values[key] = {
           ...existing, // Plotly can set values
+          x, y,
           type: 'scatter',
           mode: 'lines',
-          name: fieldLabel(source, key, Number(last(range.values)?.[1])),
+          name: fieldLabel(source, key, last(y)),
           yaxis: source.axes[key] ?? 'y',
           line: { color: source.colors[key] },
-          x: boundedConcat(existing?.x, range.values.map(v => v[0] * 1000)),
-          y: boundedConcat(existing?.y, range.values.map(v => Number(v[1]))),
         };
       });
 

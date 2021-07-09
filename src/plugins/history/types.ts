@@ -57,10 +57,9 @@ export interface TimeSeriesRange {
 }
 
 export interface TimeSeriesMetric {
-  metric: {
-    __name__: string;
-  }
-  value: [timestamp: number, value: string]
+  metric: string;
+  value: number;
+  timestamp: number;
 }
 
 export interface TimeSeriesRangesResult {
@@ -69,7 +68,6 @@ export interface TimeSeriesRangesResult {
 }
 
 export interface TimeSeriesMetricsResult {
-  initial: boolean;
   metrics: TimeSeriesMetric[];
 }
 
@@ -108,6 +106,7 @@ export interface GraphSource extends HistorySource {
 
 export interface MetricsSource extends HistorySource {
   transformer: (source: MetricsSource, result: TimeSeriesMetricsResult) => HistorySource;
+  updated: Date;
   values: MetricValue[];
 }
 

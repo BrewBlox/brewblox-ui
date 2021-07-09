@@ -138,18 +138,19 @@ export default defineComponent({
         v-for="val in values"
         :key="val.field"
         :label="val.name"
+        tag-class="row items-center q-gutter-x-sm"
       >
-        <span :class="['text-big', val.stale && 'darkened']">
+        <div :class="['text-big col-auto', val.stale && 'darkened']">
           {{ fixedValue(val) }}
-        </span>
-        <template v-if="val.stale" #after>
+        </div>
+        <div v-if="val.stale" class="col-auto">
           <q-icon name="warning" size="24px" />
           <q-tooltip>
             {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
             <br>
             Last update: {{ new Date(val.time).toLocaleString() }}.
           </q-tooltip>
-        </template>
+        </div>
       </LabeledField>
     </div>
     <div

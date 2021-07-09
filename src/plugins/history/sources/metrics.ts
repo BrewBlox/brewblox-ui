@@ -13,10 +13,11 @@ function metricsTransformer(
 ): MetricsSource {
   return {
     ...source,
+    updated: new Date(),
     values: result.metrics.map(res => ({
-      field: res.metric.__name__,
-      time: res.value[0] * 1000,
-      value: Number(res.value[1]),
+      field: res.metric,
+      time: res.timestamp,
+      value: res.value,
     })),
   };
 }
@@ -38,6 +39,7 @@ export async function addSource(
     command: 'metrics',
     transformer: metricsTransformer,
     fields: validFields,
+    updated: new Date(),
     values: [],
   };
   await historyStore.addSource(source);
