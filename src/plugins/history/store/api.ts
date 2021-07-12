@@ -2,7 +2,7 @@ import { UI_NAMESPACE, WS_HOST } from '@/const';
 import { createApi } from '@/database/api';
 import { http } from '@/utils/http';
 
-import { LoggedSession } from '../types';
+import { CsvQuery, LoggedSession } from '../types';
 
 
 export const historyApi = {
@@ -15,11 +15,10 @@ export const historyApi = {
       http.post<string[]>('/history/timeseries/fields', { start })
         .then(resp => resp.data),
 
-  // TODO(Bob): replace with dedicated CSV fetch
-  // fetchValues:
-  //   async (query: ApiQuery): Promise<QueryResult> =>
-  //     http.post<QueryResult>('/history/history/values', query)
-  //       .then(resp => resp.data),
+  downloadCsv:
+    async (query: CsvQuery): Promise<Blob> =>
+      http.post<Blob>('/history/timeseries/csv', query, { responseType: 'blob' })
+        .then(resp => resp.data),
 };
 
 export const sessionApi = createApi<LoggedSession>({

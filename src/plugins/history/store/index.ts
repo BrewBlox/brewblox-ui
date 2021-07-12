@@ -1,3 +1,4 @@
+import { exportFile } from 'quasar';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
@@ -8,6 +9,7 @@ import { notify } from '@/utils/notify';
 
 import type {
   ApiQuery,
+  CsvPrecision,
   HistorySource,
   LoggedSession,
   QueryParams,
@@ -160,11 +162,20 @@ export class HistoryModule extends VuexModule {
       );
   }
 
-  // TODO(Bob): replace with dedicated CSV fetch
-  // @Action
-  // public async fetchValues([params, target, epoch]: [QueryParams, QueryTarget, string]): Promise<QueryResult> {
-  //   return await historyApi.fetchValues(buildQuery(params, target, epoch));
-  // }
+  @Action
+  public async downloadCsv({
+    params,
+    fields,
+    precision,
+    fileName,
+  }: {
+    params: QueryParams;
+    fields: string[];
+    precision: CsvPrecision;
+    fileName: string;
+  }): Promise<void> {
+    exportFile(fileName, await historyApi.downloadCsv({ ...buildQuery(params, fields), precision }));
+  }
 
   @Action
   public async start(): Promise<void> {

@@ -25,6 +25,16 @@ export interface ApiQuery {
   fields: string[];
 }
 
+export type CsvPrecision =
+  | 'ns'
+  | 'ms'
+  | 's'
+  | 'ISO8601'
+
+export interface CsvQuery extends ApiQuery {
+  precision: CsvPrecision;
+}
+
 export interface DisplayNames {
   [key: string]: string;
 }
