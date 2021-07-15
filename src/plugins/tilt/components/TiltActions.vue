@@ -1,8 +1,9 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { TiltService } from '@/plugins/tilt/types';
-import { serviceStore } from '@/store/services';
+import { Service, serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 
@@ -15,6 +16,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const router = useRouter();
+
     const service = computed<TiltService | null>(
       () => serviceStore.serviceById(props.serviceId),
     );
@@ -31,9 +34,13 @@ export default defineComponent({
       },
     });
 
+    function removeService(service: Maybe<Service>): void {
+      startRemoveService(service, router);
+    }
+
     return {
       startChangeServiceTitle,
-      startRemoveService,
+      removeService,
       service,
       serviceTitle,
       isHomePage,
@@ -57,7 +64,7 @@ export default defineComponent({
     <ActionItem
       icon="delete"
       label="Remove service from UI"
-      @click="startRemoveService(service)"
+      @click="removeService(service)"
     />
   </ActionSubmenu>
 </template>

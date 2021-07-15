@@ -1,15 +1,12 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
 import { featureStore, ServiceFeature } from '@/store/features';
 import { Service, ServiceStatus, serviceStore, ServiceStub } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
-import {
-  startChangeServiceTitle,
-  startCreateService,
-  startRemoveService,
-} from '@/utils/services';
+import { startCreateService } from '@/utils/services';
 
 interface ServiceSuggestion {
   stub: ServiceStub;
@@ -30,6 +27,7 @@ export default defineComponent({
     'update:editing',
   ],
   setup() {
+    const router = useRouter();
     const { dense } = useGlobals.setup();
     const dragging = ref(false);
 
@@ -53,15 +51,17 @@ export default defineComponent({
       return serviceStore.statuses.find(v => v.id === service.id) ?? null;
     }
 
+    function createService(stub: ServiceStub): void {
+      startCreateService(stub, router);
+    }
+
     return {
       dense,
       dragging,
       services,
       suggestions,
       status,
-      startChangeServiceTitle,
-      startCreateService,
-      startRemoveService,
+      createService,
     };
   },
 });
@@ -135,7 +135,7 @@ export default defineComponent({
         class="q-pb-sm darkish"
         style="min-height: 0px"
         clickable
-        @click="startCreateService(stub)"
+        @click="createService(stub)"
       >
         <q-item-section class="col-auto">
           <q-icon name="add" size="xs" />

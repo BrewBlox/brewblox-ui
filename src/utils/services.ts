@@ -1,5 +1,5 @@
 import isString from 'lodash/isString';
-import { useRouter } from 'vue-router';
+import { Router } from 'vue-router';
 
 import { featureStore } from '@/store/features';
 import { Service, serviceStore, ServiceStub } from '@/store/services';
@@ -8,7 +8,7 @@ import { createDialog } from './dialog';
 import { notify } from './notify';
 
 
-export async function startCreateService(stub: ServiceStub, navigate = true): Promise<void> {
+export async function startCreateService(stub: ServiceStub, router: Maybe<Router> = null): Promise<void> {
   const feature = featureStore.serviceById(stub.type);
   if (feature === null) {
     notify.error(`Unknown service type '${stub.type}'`);
@@ -32,8 +32,8 @@ export async function startCreateService(stub: ServiceStub, navigate = true): Pr
     const service = await feature.wizard(stub);
     await serviceStore.appendService(service);
     notify.done(`Added ${feature.title} <b>${service.id}</b>`);
-    if (navigate) {
-      useRouter().push(`/service/${service.id}`);
+    if (router) {
+      router.push(`/service/${service.id}`);
     }
   }
 }
@@ -61,7 +61,7 @@ export function startChangeServiceTitle(service: Maybe<Service>): void {
     });
 }
 
-export function startRemoveService(service: Maybe<Service>): void {
+export function startRemoveService(service: Maybe<Service>, router: Router): void {
   if (!service) {
     return;
   }
@@ -76,7 +76,6 @@ export function startRemoveService(service: Maybe<Service>): void {
     },
   })
     .onOk(() => {
-      const router = useRouter();
       if (router.currentRoute.value.path === `/service/${service.id}`) {
         router.replace('/');
       }
