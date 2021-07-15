@@ -1,14 +1,14 @@
 #! /bin/bash
 set -ex
 
-curl \
-  -X POST \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  http://localhost:9000/victoria/api/v1/query_range \
-  -w "\n" \
-  -d 'query=avg_over_time({__name__="tilt/Pink/Specific gravity"}[1m])&step=1m' \
-  | jq '(.data.result[]? | .values[]? | .[0] // empty ) |= todate' \
-  > output.json
+# curl \
+#   -X POST \
+#   -H 'Content-Type: application/x-www-form-urlencoded' \
+#   http://localhost:9000/victoria/api/v1/query_range \
+#   -w "\n" \
+#   -d 'query=avg_over_time({__name__="tilt/Pink/Specific gravity"}[1m])&step=1m' \
+#   | jq '(.data.result[]? | .values[]? | .[0] // empty ) |= todate' \
+#   > output.json
 
 # curl \
 #   -X POST \
@@ -62,11 +62,20 @@ curl \
 #   | jq '(.[] | .values[] | .[0] // empty ) |= todate' \
 #   > output.json
 
+curl \
+  -X GET \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  http://localhost:9000/victoria/api/v1/label/__name__/values \
+  -w "\n" \
+  -d 'start=1600282611.100432' \
+  | jq . \
+  > output.json
+
 # curl \
-#   -X GET \
-#   -H 'Content-Type: application/x-www-form-urlencoded' \
-#   http://localhost:9000/victoria/api/v1/label/__name__/values \
+#   -G -v \
+#   http://localhost:8086/query \
 #   -w "\n" \
-#   -d 'start=1624981107606' \
+#   --data-urlencode 'db=brewblox' \
+#   --data-urlencode 'q=SHOW FIELD KEYS' \
 #   | jq . \
 #   > output.json
