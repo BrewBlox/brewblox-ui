@@ -7,16 +7,15 @@ services:
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
   victoria:
-    image: victoriametrics/victoria-metrics:v1.62.0
+    image: victoriametrics/victoria-metrics:v1.63.0
     labels:
-      - traefik.http.routers.victoria.middlewares=prefix-strip
       - traefik.http.services.victoria.loadbalancer.server.port=8428
     volumes:
       - ./dev/victoria:/victoria-metrics-data
     command: >-
-      --retentionPeriod=1200
+      --retentionPeriod=100y
       --influxMeasurementFieldSeparator=/
-
+      --http.pathPrefix=/victoria
   redis:
     image: redis:6.0
     labels:
