@@ -6,6 +6,7 @@ import { concatById, filterById, findById } from '@/utils/collections';
 import { isoDateString } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
+import { bloxQty, JSQuantity } from '@/utils/quantity';
 
 import type {
   ApiQuery,
@@ -29,8 +30,8 @@ function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
 @Module({ generateMutationSetters: true })
 export class HistoryModule extends VuexModule {
   public sessions: LoggedSession[] = [];
-  public freshFields: Mapped<string[]> = {};
-  public allFields: Mapped<string[]> = {};
+  public fieldsDuration: JSQuantity = bloxQty('1d')
+  public fields: Mapped<string[]> = {};
   public sources: HistorySource[] = [];
 
   private streamConnected = false;
@@ -135,23 +136,10 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action
-  public async fetchFreshFields(): Promise<void> {
-    const fields = await historyApi.fetchFields('1d');
-    this.freshFields = fields
-      .reduce(
-        (acc: Mapped<string[]>, f: string) => {
-          const [service, ...sections] = f.split('/');
-          const arr = acc[service] ?? [];
-          return { ...acc, [service]: [...arr, sections.join('/')] };
-        },
-        {},
-      );
-  }
-
-  @Action
-  public async fetchAllFields(): Promise<void> {
-    const fields = await historyApi.fetchFields('');
-    this.allFields = fields
+  public async fetchFields(): Promise<void> {
+    const s = this.fieldsDuration.to('s').round(0).toString();
+    const fields = await historyApi.fetchFields(s);
+    this.fields = fields
       .reduce(
         (acc: Mapped<string[]>, f: string) => {
           const [service, ...sections] = f.split('/');

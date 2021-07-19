@@ -36,7 +36,6 @@ export default defineComponent({
 
     const presets = defaultPresets();
     const renderedConfig = ref(cloned());
-    const downsampling = ref<Mapped<string>>({});
 
     // Separate IDs for graphs in widget and dialog wrapper
     // This prevents source create/delete race conditions when switching
@@ -137,7 +136,6 @@ export default defineComponent({
       context,
       inDialog,
       presets,
-      downsampling,
       previewGraphId,
       widgetGraphId,
       previewGraphRef,
@@ -181,7 +179,6 @@ export default defineComponent({
         use-range
         @params="saveParams"
         @layout="saveLayout"
-        @downsample="v => downsampling = v"
       />
     </template>
 
@@ -238,7 +235,6 @@ export default defineComponent({
           sourceRevision,
           renderRevision
         }"
-        @downsample="v => downsampling = v"
       />
     </div>
     <div
@@ -246,7 +242,6 @@ export default defineComponent({
     >
       <GraphEditor
         :config="config"
-        :downsampling="downsampling"
         @update:config="saveConfig"
       />
     </div>

@@ -55,7 +55,7 @@ export default defineComponent({
       default: () => new Date(),
     },
   },
-  emits: ['params', 'layout', 'downsample'],
+  emits: ['params', 'layout'],
   setup(props, { emit }) {
     const presets = defaultPresets();
     const revision = ref(new Date());

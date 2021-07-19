@@ -1,6 +1,7 @@
 <script lang="ts">
+import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
-import { QTree, throttle } from 'quasar';
+import { QTree } from 'quasar';
 import { computed, defineComponent, onBeforeMount, onMounted, PropType, ref, watch } from 'vue';
 
 import {
@@ -12,7 +13,9 @@ import {
 } from '@/plugins/history/nodes';
 import { historyStore } from '@/plugins/history/store';
 import type { QueryConfig } from '@/plugins/history/types';
+import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
+import { bloxQty } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'QueryEditor',
@@ -26,14 +29,10 @@ export default defineComponent({
   setup(props, { emit }) {
     const selectFilter = ref<string | null>(null);
     const expandedKeys = ref<string[]>([]);
-    const showStale = ref(false);
     const treeRef = ref<QTree>();
 
-    const limFetchFresh = throttle(historyStore.fetchFreshFields, 10000);
-    const limFetchAll = throttle(historyStore.fetchAllFields, 10000);
-
-    onBeforeMount(() => limFetchFresh());
-    onMounted(() => expandTicked());
+    onBeforeMount(() => historyStore.fetchFields());
+    onMounted(() => expand());
 
     watch(
       () => selectFilter.value,
@@ -42,13 +41,6 @@ export default defineComponent({
           expandedKeys.value = filteredNodes(nodes.value, filter);
         }
       },
-    );
-
-    watch(
-      () => showStale.value,
-      (value) => value
-        ? limFetchAll()
-        : limFetchFresh(),
     );
 
     function showSearchKeyboard(): void {
@@ -61,15 +53,17 @@ export default defineComponent({
         .onOk(v => selectFilter.value = v);
     }
 
-    function expandTicked(): void {
-      /**
-       * Expanded keys must include parent elements
-       * If we selected sparkey/blocky/value,
-       * we must expand the following keys:
-       * - sparkey
-       * - sparkey/blocky
-       */
-      expandedKeys.value = [...new Set(
+    /**
+     * Calculate expanded keys if we want to (only) see all ticked values.
+     *
+     * Expanded keys must include parent elements
+     * If we selected sparkey/blocky/value,
+     * we must expand the following keys:
+     * - sparkey
+     * - sparkey/blocky
+     */
+    function calcTickedExpanded(): string[] {
+      return [...new Set(
         ticked
           .value
           .flatMap(s => s
@@ -78,8 +72,36 @@ export default defineComponent({
             // Split in sections -> ['sparkey', 'blocky']
             .split('/')
             // Gradually build parents -> ['sparkey', 'sparkey/blocky']
-            .map((v, idx, arr) => arr.slice(0, idx + 1).join('/'))),
+            .map((v, idx, arr) => arr.slice(0, idx + 1).join('/')),
+          )
+          .sort(),
       )];
+    }
+
+    function expand(): void {
+      const tickedExpanded = calcTickedExpanded();
+
+      // First try to equalize expansion and selection
+      if (!isEqual(tickedExpanded, expandedKeys.value)) {
+        expandedKeys.value = tickedExpanded;
+      }
+      // On next call, expand all
+      else {
+        treeRef.value?.expandAll();
+      }
+    }
+
+    function collapse(): void {
+      const tickedExpanded = calcTickedExpanded();
+
+      // First try to equalize expansion and selection
+      if (!isEqual(tickedExpanded, expandedKeys.value)) {
+        expandedKeys.value = tickedExpanded;
+      }
+      // On next call, collapse all
+      else {
+        treeRef.value?.collapseAll();
+      }
     }
 
     function saveConfig(config: QueryConfig): void {
@@ -96,10 +118,19 @@ export default defineComponent({
       return node && node.value.toLowerCase().match(filter.toLowerCase());
     }
 
+    const fieldsDuration = computed<Quantity>({
+      get: () => historyStore.fieldsDuration,
+      set: v => {
+        const jsv = bloxQty(v);
+        if (!jsv.eq(historyStore.fieldsDuration)) {
+          historyStore.fieldsDuration = jsv;
+          historyStore.fetchFields();
+        }
+      },
+    });
+
     const fields = computed<Mapped<string[]>>(
-      () => showStale.value
-        ? historyStore.allFields
-        : historyStore.freshFields,
+      () => historyStore.fields,
     );
 
     const nodes = computed<QuasarNode[]>(
@@ -130,13 +161,14 @@ export default defineComponent({
     return {
       selectFilter,
       expandedKeys,
-      showStale,
       treeRef,
       showSearchKeyboard,
-      expandTicked,
+      expand,
+      collapse,
       saveConfig,
       nodeHandler,
       nodeFilter,
+      fieldsDuration,
       fields,
       nodes,
       ticked,
@@ -146,62 +178,80 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-list>
+  <div class="widget-body row">
     <q-input
       v-model="selectFilter"
       placeholder="Search"
       clearable
-      item-aligned
-      class="q-mx-sm"
+      autofocus
+      class="col-grow"
     >
       <template #append>
         <KeyboardButton @click="showSearchKeyboard" />
         <q-icon name="search" />
       </template>
     </q-input>
-    <div class="col-auto row justify-end q-gutter-x-sm q-gutter-y-xs q-mx-sm">
-      <q-btn flat icon="mdi-collapse-all" @click="treeRef?.collapseAll()">
-        <q-tooltip>Collapse all</q-tooltip>
-      </q-btn>
-      <q-btn flat icon="mdi-expand-all" @click="treeRef?.expandAll()">
-        <q-tooltip>Expand all</q-tooltip>
-      </q-btn>
-      <q-btn flat icon="mdi-checkbox-multiple-marked-outline" @click="expandTicked">
-        <q-tooltip>Expand selected fields</q-tooltip>
-      </q-btn>
-      <q-btn flat icon="clear" @click="ticked = []">
-        <q-tooltip>Unselect all</q-tooltip>
-      </q-btn>
-    </div>
-    <ToggleButton
-      v-model="showStale"
-      label="Include old fields"
-      class="q-mx-sm"
-      flat
-    >
-      <q-tooltip>
-        By default, deleted or renamed fields are removed from the list after 24h.
-        <br>Enable this option to show all fields known to the database.
-      </q-tooltip>
-    </ToggleButton>
 
-    <q-item class="column">
-      <q-tree
-        ref="treeRef"
-        v-model:ticked="ticked"
-        v-model:expanded="expandedKeys"
-        :nodes="nodes"
-        :filter="selectFilter"
-        :filter-method="nodeFilter"
-        tick-strategy="leaf"
-        node-key="value"
-      >
-        <template #header-leaf="props">
-          <div class="q-pa-xs full-width editable hoverable rounded-borders">
-            <slot name="leaf" :node="props.node" />
-          </div>
-        </template>
-      </q-tree>
-    </q-item>
-  </q-list>
+    <div class="col-break" />
+
+    <DurationField
+      v-model="fieldsDuration"
+      title="Inactive fields filter"
+      label="Inactive"
+      message="
+      Inactive fields are automatically hidden.
+      Select the cutoff period:
+      only fields with a published value more recent than this are shown.
+      "
+      class="col-auto min-width-sm"
+    />
+    <slot name="settings" />
+
+    <div class="col-break" />
+
+    <q-btn
+      flat
+      dense
+      icon="mdi-expand-all"
+      @click="expand"
+    >
+      <q-tooltip>Expand</q-tooltip>
+    </q-btn>
+    <q-btn
+      flat
+      dense
+      icon="mdi-collapse-all"
+      @click="collapse"
+    >
+      <q-tooltip>Collapse</q-tooltip>
+    </q-btn>
+    <q-btn
+      flat
+      dense
+      icon="mdi-checkbox-blank-off-outline"
+      @click="ticked = []"
+    >
+      <q-tooltip>Clear selection</q-tooltip>
+    </q-btn>
+
+    <div class="col-break" />
+
+    <q-tree
+      ref="treeRef"
+      v-model:ticked="ticked"
+      v-model:expanded="expandedKeys"
+      :nodes="nodes"
+      :filter="selectFilter"
+      :filter-method="nodeFilter"
+      tick-strategy="leaf"
+      node-key="value"
+      class="col-grow"
+    >
+      <template #header-leaf="props">
+        <div class="q-pa-xs full-width editable hoverable rounded-borders">
+          <slot name="leaf" :node="props.node" />
+        </div>
+      </template>
+    </q-tree>
+  </div>
 </template>

@@ -11,8 +11,8 @@ export const historyApi = {
       new WebSocket(`${WS_HOST}/history/timeseries/stream`),
 
   fetchFields:
-    async (start: string): Promise<string[]> =>
-      http.post<string[]>('/history/timeseries/fields', { start })
+    async (duration: string): Promise<string[]> =>
+      http.post<string[]>('/history/timeseries/fields', { duration })
         .then(resp => resp.data),
 
   downloadCsv:
