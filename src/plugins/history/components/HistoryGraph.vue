@@ -46,6 +46,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    useTeleport: {
+      type: Boolean,
+      default: false,
+    },
     sourceRevision: {
       type: Date,
       default: () => new Date(),
@@ -186,7 +190,14 @@ export default defineComponent({
 
 <template>
   <div class="fit column">
-    <div class="col-auto row justify-end z-top">
+    <component
+      :is="useTeleport
+        ? 'ButtonsTeleport'
+        : 'div'"
+      :class="useTeleport
+        ? ''
+        : 'col-auto row justify-end z-top'"
+    >
       <ActionMenu
         v-if="useRange"
         icon="mdi-arrow-expand-vertical"
@@ -215,7 +226,7 @@ export default defineComponent({
         </template>
       </ActionMenu>
       <slot name="controls" />
-    </div>
+    </component>
     <div v-if="error" class="col row justify-center items-center text-h5 q-gutter-x-md">
       <q-icon name="warning" color="negative" />
       <div class="col-auto">

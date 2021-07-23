@@ -16,6 +16,7 @@ services:
       --retentionPeriod=100y
       --influxMeasurementFieldSeparator=/
       --http.pathPrefix=/victoria
+
   redis:
     image: redis:6.0
     labels:

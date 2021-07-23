@@ -4,6 +4,7 @@ import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
 import { computed, defineComponent, nextTick, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { useContext, useWidget } from '@/composables';
 import { defaultPresets, emptyGraphConfig } from '@/plugins/history/const';
@@ -19,12 +20,15 @@ import { addBlockGraph } from './utils';
 export default defineComponent({
   name: 'GraphWidget',
   setup() {
+    const router = useRouter();
+
     const {
       context,
       inDialog,
     } = useContext.setup();
 
     const {
+      widgetId,
       widget,
       config,
       saveWidget,
@@ -93,30 +97,8 @@ export default defineComponent({
         .onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
     }
 
-    function currentGraphId(): string | null {
-      if (widgetGraphRef.value !== undefined) { return widgetGraphId; }
-      if (previewGraphRef.value !== undefined) { return previewGraphId; }
-      return null;
-    }
-
-    function showGraphDialog(): void {
-      const currentId = currentGraphId();
-      createDialog({
-        component: 'GraphDialog',
-        componentProps: {
-          graphId: currentId || nanoid(),
-          config: {
-            ...config.value,
-            layout: {
-              ...config.value.layout,
-              title: widget.value.title,
-            },
-          },
-          sharedSources: currentId !== null,
-          usePresets: true,
-          saveParams,
-        },
-      });
+    function showGraphPage(): void {
+      router.push(`/graph/${widgetId}`);
     }
 
     function startAddBlockGraph(): void {
@@ -152,7 +134,7 @@ export default defineComponent({
       chooseDuration,
       regraph,
       refresh,
-      showGraphDialog,
+      showGraphPage,
       startAddBlockGraph,
     };
   },
@@ -185,7 +167,7 @@ export default defineComponent({
     <template #toolbar>
       <WidgetToolbar has-mode-toggle>
         <template #actions>
-          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
+          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphPage" />
           <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
@@ -223,7 +205,6 @@ export default defineComponent({
 
     <div
       v-if="context.mode === 'Basic'"
-      v-touch-hold.mouse.stop="showGraphDialog"
       class="fit"
     >
       <q-resize-observer :debounce="200" @resize="refresh" />
