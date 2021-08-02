@@ -194,25 +194,27 @@ export default defineComponent({
 
     <div class="col-break" />
 
+    <slot name="settings" />
+
+    <div class="col-break" />
+
     <DurationField
       v-model="fieldsDuration"
       title="Inactive fields filter"
-      label="Inactive"
+      label="Hide after"
       message="
-      Inactive fields are automatically hidden.
+      Stale fields are automatically hidden.
       Select the cutoff period:
       only fields with a published value more recent than this are shown.
       "
       class="col-auto min-width-sm"
     />
-    <slot name="settings" />
-
-    <div class="col-break" />
 
     <q-btn
       flat
       dense
       icon="mdi-expand-all"
+      class="self-end"
       @click="expand"
     >
       <q-tooltip>Expand</q-tooltip>
@@ -221,6 +223,7 @@ export default defineComponent({
       flat
       dense
       icon="mdi-collapse-all"
+      class="self-end"
       @click="collapse"
     >
       <q-tooltip>Collapse</q-tooltip>
@@ -229,6 +232,7 @@ export default defineComponent({
       flat
       dense
       icon="mdi-checkbox-blank-off-outline"
+      class="self-end"
       @click="ticked = []"
     >
       <q-tooltip>Clear selection</q-tooltip>

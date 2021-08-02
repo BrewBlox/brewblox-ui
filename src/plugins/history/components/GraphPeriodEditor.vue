@@ -134,7 +134,7 @@ export default defineComponent({
       class="col-auto"
       @update:model-value="saveSanitized"
     />
-    <div class="col-auto row q-gutter-x-sm q-ml-none">
+    <div class="col-auto row q-gutter-x-sm q-mt-sm q-ml-none">
       <DatetimeField
         v-if="period.start"
         :model-value="config.params.start"
