@@ -9,20 +9,13 @@ import { computed, defineComponent, onMounted, PropType, ref, watch } from 'vue'
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { createBlockDialog } from '@/utils/dialog';
-import { isJsonEqual } from '@/utils/functional';
+import { isJsonEqual } from '@/utils/objects';
 
 const DEFAULT_SCALE = 0.9;
 const UNKNOWN_TYPE = '???';
 const LONE_NODE_ROWS = 6;
 const LABEL_HEIGHT = 70;
 const LABEL_WIDTH = 170;
-const INVERTED = [
-  'input', // PID
-  'reference', // Setpoint Driver
-  'sensor', // Setpoint
-  'analog', // Logic Actuator
-  'digital', // Logic Actuator
-];
 
 export default defineComponent({
   name: 'RelationsDiagram',
@@ -109,11 +102,7 @@ export default defineComponent({
 
       props.edges.forEach(edge => {
         const label = edge.relation[0].replace(/Id$/, '');
-        const [source, target] = INVERTED.includes(label)
-          ? [edge.target, edge.source]
-          : [edge.source, edge.target];
-
-        graph.setEdge(source, target, {
+        graph.setEdge(edge.source, edge.target, {
           label: startCase(label),
           labelStyle: 'fill: white; stroke: none;',
           style: 'fill: none; stroke: red; stroke-width: 1.5px;',

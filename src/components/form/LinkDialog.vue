@@ -3,13 +3,13 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockOrIntfType, ComparedBlockType } from '@/plugins/spark/types';
+import { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
-import { bloxLink, JSLink, Link } from '@/utils/bloxfield';
 import { createBlockDialog } from '@/utils/dialog';
-import { objectStringSorter } from '@/utils/functional';
+import { makeObjectSorter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 
 export default defineComponent({
   name: 'LinkDialog',
@@ -60,18 +60,18 @@ export default defineComponent({
       onDialogOK,
     } = useDialog.setup();
 
-    const local = ref<JSLink>(bloxLink(props.modelValue));
+    const local = ref<Link>(bloxLink(props.modelValue));
 
-    const typeFilter = computed<(type: BlockOrIntfType) => boolean>(
-      () => type => isCompatible(type, props.compatible ?? props.modelValue?.type ?? null),
+    const blockTypeFilter = computed<(block: Block) => boolean>(
+      () => block => isCompatible(block.type, props.compatible ?? props.modelValue?.type ?? null),
     );
 
     const linkOpts = computed<Link[]>(
       () => sparkStore.serviceBlocks(props.serviceId)
-        .filter(block => typeFilter.value(block.type))
+        .filter(blockTypeFilter.value)
         .filter(props.blockFilter)
         .map(block => bloxLink(block.id, block.type))
-        .sort(objectStringSorter('id')),
+        .sort(makeObjectSorter('id')),
     );
 
     const block = computed<Block | null>(

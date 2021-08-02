@@ -1,4 +1,4 @@
-import { JSQuantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 
 import { PinChannel, QuickstartConfig } from '../types';
 
@@ -35,8 +35,8 @@ export interface HermsConfig extends QuickstartConfig {
 }
 
 export interface HermsOpts {
-  hltKp: JSQuantity;
-  bkKp: JSQuantity;
-  mtKp: JSQuantity;
-  driverMax: JSQuantity;
+  hltKp: Quantity;
+  bkKp: Quantity;
+  mtKp: Quantity;
+  driverMax: Quantity;
 }

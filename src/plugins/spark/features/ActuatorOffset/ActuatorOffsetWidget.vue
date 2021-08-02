@@ -4,8 +4,8 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { ActuatorOffsetBlock, ReferenceKind } from '@/plugins/spark/types';
-import { Link, prettyLink } from '@/utils/bloxfield';
-import { round } from '@/utils/functional';
+import { Link } from '@/shared-types';
+import { fixedNumber, prettyLink } from '@/utils/formatting';
 
 const referenceOpts: SelectOption<ReferenceKind>[] = [
   { label: 'Setting', value: ReferenceKind.REF_SETTING },
@@ -50,7 +50,7 @@ export default defineComponent({
       () => {
         const { enabled, desiredSetting, setting } = block.value.data;
         return enabled
-          && round(desiredSetting, 1) !== round(setting, 1);
+          && fixedNumber(desiredSetting, 1) !== fixedNumber(setting, 1);
       },
     );
 

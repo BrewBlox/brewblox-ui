@@ -6,11 +6,12 @@ import { useRouter } from 'vue-router';
 import { useContext, useGlobals, useWidget } from '@/composables';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
+import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
-import { spliceById, uniqueFilter } from '@/utils/functional';
+import { uniqueFilter } from '@/utils/functional';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
-import { defaultLayoutHeight, defaultLayoutWidth } from './const';
+import { DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH } from './const';
 import { builderStore } from './store';
 import { BuilderConfig, BuilderLayout, FlowPart, PersistentPart } from './types';
 import { coord2grid } from './utils';
@@ -90,7 +91,7 @@ export default defineComponent({
     }
 
     function savePart(part: PersistentPart): void {
-      parts.value = spliceById(parts.value, part);
+      parts.value = concatById(parts.value, part);
     }
 
     const delayTouch = computed<boolean>(
@@ -128,9 +129,10 @@ export default defineComponent({
         await builderStore.createLayout({
           id,
           title: `${widget.value.title} layout`,
-          width: defaultLayoutWidth,
-          height: defaultLayoutHeight,
+          width: DEFAULT_LAYOUT_WIDTH,
+          height: DEFAULT_LAYOUT_HEIGHT,
           parts: oldParts,
+          order: builderStore.layouts.length + 1,
         });
         config.value.layoutIds.push(id);
         config.value.currentLayoutId = id;

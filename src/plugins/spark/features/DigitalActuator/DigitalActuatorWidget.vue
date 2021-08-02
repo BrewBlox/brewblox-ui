@@ -1,14 +1,17 @@
 <script lang="ts">
+import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, DigitalActuatorBlock, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
-import { mutate, typeMatchFilter } from '@/utils/functional';
+import { makeTypeFilter } from '@/utils/functional';
 
 interface ClaimDict {
   [channel: number]: string; // block ID of driver
 }
+
+const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
 
 export default defineComponent({
   name: 'DigitalActuatorWidget',
@@ -23,7 +26,7 @@ export default defineComponent({
       block,
       saveBlock,
       isDriven,
-      constrainers,
+      limitations,
     } = useBlockWidget.setup<DigitalActuatorBlock>();
 
     const hwBlock = computed<Block | null>(
@@ -38,9 +41,9 @@ export default defineComponent({
         const targetId = hwBlock.value.id;
         return sparkModule
           .blocks
-          .filter(typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator))
+          .filter(actuatorFilter)
           .filter(block => block.data.hwDevice.id === targetId)
-          .reduce((acc: ClaimDict, b) => mutate(acc, b.data.channel, b.id), {});
+          .reduce((acc, b) => set(acc, b.data.channel, b.id), {});
       },
     );
 
@@ -78,9 +81,14 @@ export default defineComponent({
       await saveBlock();
     }
 
-    function filterDS2408(b: Block): boolean {
-      return b.type !== BlockType.DS2408
-        || (b as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
+    function targetFilter(b: Block): boolean {
+      // Special exception for DS2408 targets
+      // They are only compatible in actuator mode
+      if (b.type === BlockType.DS2408) {
+        return (b as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
+      }
+      // Filter is in addition to the default compatibility check
+      return true;
     }
 
     return {
@@ -90,10 +98,10 @@ export default defineComponent({
       block,
       saveBlock,
       isDriven,
-      constrainers,
+      limitations,
       channelOpts,
       claimChannel,
-      filterDS2408,
+      targetFilter,
     };
   },
 });
@@ -124,7 +132,7 @@ export default defineComponent({
           <DigitalStateButton
             :model-value="block.data.desiredState"
             :pending="block.data.state !== block.data.desiredState"
-            :pending-reason="constrainers"
+            :pending-reason="limitations"
             :disable="isDriven"
             dense
             class="col-auto"
@@ -139,7 +147,7 @@ export default defineComponent({
             :model-value="block.data.hwDevice"
             :service-id="serviceId"
             :creatable="false"
-            :block-filter="filterDS2408"
+            :block-filter="targetFilter"
             title="Pin Array"
             label="Target Pin Array"
             class="col-grow"

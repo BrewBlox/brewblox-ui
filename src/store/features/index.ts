@@ -3,7 +3,7 @@ import { Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import type { Widget } from '@/store/widgets';
-import { findById } from '@/utils/functional';
+import { findById } from '@/utils/collections';
 
 import type {
   ComponentResult,
@@ -41,27 +41,27 @@ export class FeatureModule extends VuexModule {
     return this.services.map(v => v.id);
   }
 
-  public widgetById(id: Nullable<string>): WidgetFeature | null {
+  public widgetById(id: Maybe<string>): WidgetFeature | null {
     return findById(this.widgets, id);
   }
 
-  public quickStartById(id: Nullable<string>): QuickstartFeature | null {
+  public quickStartById(id: Maybe<string>): QuickstartFeature | null {
     return findById(this.quickStarts, id);
   }
 
-  public watcherById(id: Nullable<string>): WatcherFeature | null {
+  public watcherById(id: Maybe<string>): WatcherFeature | null {
     return findById(this.watchers, id);
   }
 
-  public serviceById(id: Nullable<string>): ServiceFeature | null {
+  public serviceById(id: Maybe<string>): ServiceFeature | null {
     return findById(this.services, id);
   }
 
-  public widgetTitle(id: Nullable<string>): string {
+  public widgetTitle(id: Maybe<string>): string {
     return this.widgetById(id)?.title ?? 'Unknown';
   }
 
-  public widgetRole(id: Nullable<string>): WidgetRole {
+  public widgetRole(id: Maybe<string>): WidgetRole {
     return this.widgetById(id)?.role ?? 'Other';
   }
 

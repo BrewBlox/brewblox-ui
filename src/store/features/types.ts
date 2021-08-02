@@ -12,7 +12,7 @@ export type WidgetRole =
 export type WidgetMode = 'Basic' | 'Full';
 export type WidgetContainer = 'Dashboard' | 'Dialog';
 export type WidgetSize = 'Fixed' | 'Content';
-export type ServiceHook = (service: Service) => any | Promise<any>;
+export type ServiceHook = (service: Service) => Awaitable<unknown>;
 
 export interface WidgetContext {
   mode: WidgetMode;

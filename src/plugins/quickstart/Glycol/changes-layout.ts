@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 
+import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout, PersistentPart } from '@/plugins/builder/types';
 
 import { withPrefix } from '../utils';
@@ -83,6 +84,7 @@ export function defineLayouts(config: GlycolConfig): BuilderLayout[] {
     {
       id: nanoid(),
       title: withPrefix(config.prefix, 'Layout'),
+      order: builderStore.layouts.length + 1,
       width: 9,
       height: 11,
       parts: [

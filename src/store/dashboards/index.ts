@@ -1,7 +1,8 @@
 import { Action, Module, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { concatById, filterById, findById } from '@/utils/collections';
+import { nullFilter } from '@/utils/functional';
 
 import api from './api';
 import type { Dashboard } from './types';
@@ -16,11 +17,11 @@ export class DashboardModule extends VuexModule {
     return this.dashboards.map(v => v.id);
   }
 
-  public dashboardById(id: Nullable<string>): Dashboard | null {
+  public dashboardById(id: Maybe<string>): Dashboard | null {
     return findById(this.dashboards, id);
   }
 
-  public dashboardTitle(id: Nullable<string>): string {
+  public dashboardTitle(id: Maybe<string>): string {
     return this.dashboardById(id)?.title ?? 'Unknown';
   }
 
@@ -39,7 +40,7 @@ export class DashboardModule extends VuexModule {
     await Promise.all(
       ids
         .map(id => this.dashboardById(id))
-        .filter((v): v is Dashboard => v !== null)
+        .filter(nullFilter)
         .map((dashboard, idx) => {
           const order = idx + 1;
           if (order !== dashboard.order) {
@@ -58,7 +59,7 @@ export class DashboardModule extends VuexModule {
   public async start(): Promise<void> {
     this.dashboards = await api.fetch();
     api.subscribe(
-      dashboard => this.dashboards = extendById(this.dashboards, dashboard),
+      dashboard => this.dashboards = concatById(this.dashboards, dashboard),
       id => this.dashboards = filterById(this.dashboards, { id }),
     );
   }

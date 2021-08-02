@@ -30,6 +30,7 @@ services:
   #   ports:
   #     - "7376:7376"
   # history:
+  #   image: brewblox/brewblox-history:develop
   #   volumes:
   #     - ../brewblox-history:/app
   # sparkey:

@@ -6,8 +6,9 @@ import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type { SparkService, SparkStatus } from '@/plugins/spark/types';
 import { NowKey } from '@/symbols';
 import { createDialog } from '@/utils/dialog';
-import { durationMs } from '@/utils/duration';
-import notify from '@/utils/notify';
+import { notify } from '@/utils/notify';
+import { durationMs } from '@/utils/quantity';
+
 
 const snoozeDuration = durationMs('1d');
 const updateValidDuration = durationMs('30s');

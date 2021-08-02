@@ -3,9 +3,9 @@ import { Plugin } from 'vue';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 
-import { emptyGraphConfig } from '../getters';
+import { emptyGraphConfig } from '../const';
 import { GraphConfig } from '../types';
-import { typeName } from './getters';
+import { typeName } from './const';
 import widget from './GraphWidget.vue';
 
 

@@ -6,10 +6,13 @@ import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
-import { prettyUnit } from '@/utils/bloxfield';
-import { contrastColor, round, typeMatchFilter } from '@/utils/functional';
+import { fixedNumber, prettyUnit } from '@/utils/formatting';
+import { makeTypeFilter } from '@/utils/functional';
+import { contrastColor } from '@/utils/misc';
 
 import { useSettingsBlock } from '../composables';
+
+const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
 
 export default defineComponent({
   name: 'SetpointValues',
@@ -61,7 +64,7 @@ export default defineComponent({
         && block.value.data.settingEnabled
         && sparkModule.value!
           .blocks
-          .filter(typeMatchFilter<PidBlock>(BlockType.Pid))
+          .filter(pidFilter)
           .some(blk => blk.data.inputId.id === address.value.id),
     );
 
@@ -91,7 +94,7 @@ export default defineComponent({
       mdiSwapVerticalBold,
       mdiBullseyeArrow,
       coord2grid,
-      round,
+      fixedNumber,
       textColor,
       block,
       isBroken,
@@ -124,7 +127,7 @@ export default defineComponent({
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ round(setpointValue, 1) }}
+            {{ fixedNumber(setpointValue, 1) }}
             <small>{{ setpointUnit }}</small>
           </div>
         </div>
@@ -136,7 +139,7 @@ export default defineComponent({
           />
           <q-space />
           <div class="col-auto text-bold">
-            {{ round(setpointSetting, 1) }}
+            {{ fixedNumber(setpointSetting, 1) }}
             <small>{{ setpointUnit }}</small>
           </div>
         </div>

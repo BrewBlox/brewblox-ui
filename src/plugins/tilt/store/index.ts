@@ -2,8 +2,8 @@ import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
 import { systemStore } from '@/store/system';
-import { bloxQty } from '@/utils/bloxfield';
-import { extendById } from '@/utils/functional';
+import { concatById } from '@/utils/collections';
+import { bloxQty } from '@/utils/quantity';
 
 import type { TiltStateEvent, TiltStateValue } from '../types';
 
@@ -13,7 +13,7 @@ export class TiltModule extends VuexModule {
 
   @Mutation
   public setValue(value: TiltStateValue): void {
-    this.values = extendById(this.values, value);
+    this.values = concatById(this.values, value);
   }
 
   @Action

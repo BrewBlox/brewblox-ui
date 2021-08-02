@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 
-import http, { intercept } from '@/utils/http';
+import { http, intercept } from '@/utils/http';
 
 import { SandboxResult, WebhookImpl } from '../types';
 

@@ -3,7 +3,7 @@ import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
-import notify from '@/utils/notify';
+import { notify } from '@/utils/notify';
 
 import { WizardDialogResult } from './types';
 

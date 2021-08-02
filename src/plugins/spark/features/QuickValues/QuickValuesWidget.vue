@@ -6,9 +6,10 @@ import { computed, defineComponent } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { Block, BlockFieldSpec } from '@/plugins/spark/types';
-import { isQuantity, prettyAny, prettyQty, Quantity } from '@/utils/bloxfield';
-import { roundNumber } from '@/utils/functional';
-import notify from '@/utils/notify';
+import { Quantity } from '@/shared-types';
+import { prettyAny, prettyQty, roundedNumber } from '@/utils/formatting';
+import { isQuantity } from '@/utils/identity';
+import { notify } from '@/utils/notify';
 
 import { QuickValuesWidget } from './types';
 
@@ -29,7 +30,7 @@ export default defineComponent({
     const numValue = computed<number | null>(
       () => {
         const v = fieldValue.value;
-        return roundNumber(isQuantity(v) ? v.value : v);
+        return roundedNumber(isQuantity(v) ? v.value : v);
       },
     );
 

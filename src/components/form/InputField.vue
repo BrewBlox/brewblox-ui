@@ -3,7 +3,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { round } from '@/utils/functional';
+import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'InputField',
@@ -50,7 +50,7 @@ export default defineComponent({
           return '<not set>';
         }
         return props.type === 'number'
-          ? round(Number(props.modelValue), props.decimals)
+          ? fixedNumber(Number(props.modelValue), props.decimals)
           : `${props.modelValue}`;
       },
     );

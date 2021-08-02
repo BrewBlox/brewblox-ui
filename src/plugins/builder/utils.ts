@@ -1,6 +1,7 @@
 import defaults from 'lodash/defaults';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
+import set from 'lodash/set';
 import { nanoid } from 'nanoid';
 
 import { sparkStore } from '@/plugins/spark/store';
@@ -10,9 +11,9 @@ import { isCompatible } from '@/plugins/spark/utils';
 import { widgetStore } from '@/store/widgets';
 import { Coordinates, CoordinatesParam, rotatedSize } from '@/utils/coordinates';
 import { createBlockDialog, createDialog, createDialogPromise } from '@/utils/dialog';
-import { deepCopy, mutate } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
-import { CENTER, defaultLayoutHeight, defaultLayoutWidth, deprecatedTypes, SQUARE_SIZE } from './const';
+import { CENTER, DEFAULT_LAYOUT_HEIGHT, DEFAULT_LAYOUT_WIDTH, deprecatedTypes, SQUARE_SIZE } from './const';
 import { builderStore } from './store';
 import { BuilderLayout, FlowPart, PersistentPart, StatePart, Transitions } from './types';
 
@@ -242,7 +243,7 @@ export function universalTransitions(size: [number, number], enabled: boolean): 
     .flat(2);
   return coords
     .reduce(
-      (acc: Transitions, coord) => mutate(acc, coord, [{ outCoords: CENTER, internal: true, friction: 0.5 }]),
+      (acc, coord) => set(acc, coord, [{ outCoords: CENTER, internal: true, friction: 0.5 }]),
       { [CENTER]: coords.map(outCoords => ({ outCoords, friction: 0.5 })) });
 }
 
@@ -308,8 +309,8 @@ export async function startAddLayout(source: BuilderLayout | null = null): Promi
   await builderStore.createLayout({
     id,
     title,
-    width: source?.width ?? defaultLayoutWidth,
-    height: source?.height ?? defaultLayoutHeight,
+    width: source?.width ?? DEFAULT_LAYOUT_WIDTH,
+    height: source?.height ?? DEFAULT_LAYOUT_HEIGHT,
     parts: deepCopy(source?.parts) ?? [],
     order: builderStore.layouts.length + 1,
   });

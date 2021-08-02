@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 import { builderStore } from '@/plugins/builder/store';
 import { systemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
-import { objectSorter } from '@/utils/functional';
+import { makeObjectSorter } from '@/utils/functional';
 
 export default defineComponent({
   name: 'IndexPage',
@@ -24,7 +24,7 @@ export default defineComponent({
 
         const layout = null
           ?? builderStore.layoutById(builderStore.lastLayoutId)
-          ?? [...builderStore.layouts].sort(objectSorter('order'))[0]
+          ?? [...builderStore.layouts].sort(makeObjectSorter('order'))[0]
           ?? null;
 
         return layout

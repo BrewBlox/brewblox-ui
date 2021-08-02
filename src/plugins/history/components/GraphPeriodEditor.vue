@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 import matches from 'lodash/matches';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
-import { durationMs, durationString } from '@/utils/duration';
+import { durationMs, durationString } from '@/utils/quantity';
 
 import { QueryConfig, QueryParams } from '../types';
 
@@ -49,10 +49,6 @@ export default defineComponent({
     config: {
       type: Object as PropType<QueryConfig>,
       required: true,
-    },
-    downsampling: {
-      type: Object as PropType<Mapped<string>>,
-      default: () => ({}),
     },
   },
   emits: ['update:config'],
@@ -128,7 +124,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-body row">
+  <div class="row">
     <q-select
       :model-value="period"
       :options="periodOptions"
@@ -137,27 +133,8 @@ export default defineComponent({
       label="Time period"
       class="col-auto"
       @update:model-value="saveSanitized"
-    >
-      <template #append>
-        <q-icon name="mdi-chart-timeline" size="sm">
-          <q-tooltip>
-            <i>To improve performance, the history service automatically selects an averaging period.</i> <br>
-            <i>One point is returned per period, with the average value of all points in that period.</i> <br>
-            <div class="row q-mt-sm">
-              <LabeledField
-                v-for="(rate, meas) in downsampling"
-                :key="meas"
-                :model-value="rate"
-                :label="meas"
-                item-aligned
-                class="col"
-              />
-            </div>
-          </q-tooltip>
-        </q-icon>
-      </template>
-    </q-select>
-    <div class="col-auto row q-gutter-x-sm q-ml-none">
+    />
+    <div class="col-auto row q-gutter-x-sm q-mt-sm q-ml-none">
       <DatetimeField
         v-if="period.start"
         :model-value="config.params.start"

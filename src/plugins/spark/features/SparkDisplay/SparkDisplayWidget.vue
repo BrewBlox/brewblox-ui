@@ -2,8 +2,8 @@
 import { computed, defineComponent, onBeforeUnmount, ref, watch } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
+import { WS_HOST } from '@/const';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { WS_HOST } from '@/utils/const';
 
 import { SparkDisplayWidget } from './types';
 

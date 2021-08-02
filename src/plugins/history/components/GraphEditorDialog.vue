@@ -4,9 +4,9 @@ import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
-import { emptyGraphConfig } from '../getters';
+import { emptyGraphConfig } from '../const';
 import { GraphConfig, SharedGraphConfig } from '../types';
 
 

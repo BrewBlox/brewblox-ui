@@ -1,16 +1,19 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
 import { featureStore, ServiceFeature } from '@/store/features';
 import { Service, ServiceStatus, serviceStore, ServiceStub } from '@/store/services';
-import { objectSorter } from '@/utils/functional';
-import { startChangeServiceTitle, startCreateService, startRemoveService } from '@/utils/services';
+import { makeObjectSorter } from '@/utils/functional';
+import { startCreateService } from '@/utils/services';
 
 interface ServiceSuggestion {
   stub: ServiceStub;
   feature: ServiceFeature;
 }
+
+const serviceSorter = makeObjectSorter<Service>('order');
 
 export default defineComponent({
   name: 'ServiceIndex',
@@ -24,12 +27,13 @@ export default defineComponent({
     'update:editing',
   ],
   setup() {
+    const router = useRouter();
     const { dense } = useGlobals.setup();
     const dragging = ref(false);
 
     const services = computed<Service[]>({
       // avoid modifying the store object
-      get: () => [...serviceStore.services].sort(objectSorter('order')),
+      get: () => [...serviceStore.services].sort(serviceSorter),
       set: services => serviceStore.updateServiceOrder(services.map(v => v.id)),
     });
 
@@ -47,15 +51,17 @@ export default defineComponent({
       return serviceStore.statuses.find(v => v.id === service.id) ?? null;
     }
 
+    function createService(stub: ServiceStub): void {
+      startCreateService(stub, router);
+    }
+
     return {
       dense,
       dragging,
       services,
       suggestions,
       status,
-      startChangeServiceTitle,
-      startCreateService,
-      startRemoveService,
+      createService,
     };
   },
 });
@@ -129,7 +135,7 @@ export default defineComponent({
         class="q-pb-sm darkish"
         style="min-height: 0px"
         clickable
-        @click="startCreateService(stub)"
+        @click="createService(stub)"
       >
         <q-item-section class="col-auto">
           <q-icon name="add" size="xs" />

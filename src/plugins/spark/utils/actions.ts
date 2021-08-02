@@ -1,7 +1,7 @@
 import isMatch from 'lodash/isMatch';
 import range from 'lodash/range';
 
-import { typeName as graphType } from '@/plugins/history/Graph/getters';
+import { typeName as graphType } from '@/plugins/history/Graph/const';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, DisplayOpts } from '@/plugins/spark/types';
@@ -16,11 +16,11 @@ import {
 } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
-import { bloxLink } from '@/utils/bloxfield';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
-import { matchesType } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
-import notify from '@/utils/notify';
+import { bloxLink } from '@/utils/link';
+import { notify } from '@/utils/notify';
+import { matchesType } from '@/utils/objects';
 
 import { makeBlockIdRules } from './configuration';
 import { isBlockDisplayed, isBlockDisplayReady, isBlockVolatile, isCompatible } from './info';

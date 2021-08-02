@@ -1,7 +1,8 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue';
 
-import { JSQuantity, tempQty } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
+import { tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';
@@ -28,8 +29,8 @@ export default defineComponent({
     'next',
   ],
   setup(props, { emit }) {
-    const beerSetting = ref<JSQuantity>(tempQty(20));
-    const glycolSetting = ref<JSQuantity>(tempQty(4));
+    const beerSetting = ref<Quantity>(tempQty(20));
+    const glycolSetting = ref<Quantity>(tempQty(4));
 
     function done(): void {
       const opts: GlycolOpts = {

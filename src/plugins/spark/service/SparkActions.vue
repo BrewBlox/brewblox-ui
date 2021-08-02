@@ -1,9 +1,10 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { cleanUnusedNames, discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { serviceStore } from '@/store/services';
+import { Service, serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
@@ -20,6 +21,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const router = useRouter();
+
     const sparkModule = computed<SparkServiceModule | null>(
       () => sparkStore.moduleById(props.serviceId),
     );
@@ -55,6 +58,10 @@ export default defineComponent({
       }
     }
 
+    function removeService(service: Maybe<Service>): void {
+      startRemoveService(service, router);
+    }
+
     return {
       startResetBlocks,
       saveHwInfo,
@@ -62,7 +69,7 @@ export default defineComponent({
       createBlockWizard,
       cleanUnusedNames,
       startChangeServiceTitle,
-      startRemoveService,
+      removeService,
       sparkModule,
       service,
       isHomePage,
@@ -145,7 +152,7 @@ export default defineComponent({
       <ActionItem
         icon="delete"
         label="Remove service from UI"
-        @click="startRemoveService(service)"
+        @click="removeService(service)"
       />
     </template>
   </ActionSubmenu>

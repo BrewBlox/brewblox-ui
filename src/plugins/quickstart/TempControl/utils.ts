@@ -14,9 +14,9 @@ import {
   TempSensorMockBlock,
   TempSensorOneWireBlock,
 } from '@/shared-types';
-import { bloxLink } from '@/utils/bloxfield';
 import { createBlockDialogPromise } from '@/utils/dialog';
-import { typeMatchFilter } from '@/utils/functional';
+import { makeTypeFilter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 
 import { TempControlConfig, TempControlMode } from './types';
 
@@ -38,9 +38,9 @@ export interface AutofixCallbacks {
 
 type TempSensorBlock = TempSensorCombiBlock | TempSensorMockBlock | TempSensorOneWireBlock;
 
-const isProfile = typeMatchFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
-const isPwm = typeMatchFilter<ActuatorPwmBlock>(BlockType.ActuatorPwm);
-const isActuatorOffset = typeMatchFilter<ActuatorOffsetBlock>(BlockType.ActuatorOffset);
+const isProfile = makeTypeFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
+const isPwm = makeTypeFilter<ActuatorPwmBlock>(BlockType.ActuatorPwm);
+const isActuatorOffset = makeTypeFilter<ActuatorOffsetBlock>(BlockType.ActuatorOffset);
 const isDriver =
   (block: Block): block is SetpointProfileBlock | ActuatorOffsetBlock =>
     isProfile(block) || isActuatorOffset(block);

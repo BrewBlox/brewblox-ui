@@ -6,15 +6,16 @@ import { computed, defineComponent, onBeforeUnmount, onMounted, watch } from 'vu
 import { useContext, useWidget } from '@/composables';
 import { addSource } from '@/plugins/history/sources/metrics';
 import { historyStore } from '@/plugins/history/store';
-import { MetricsResult, MetricsSource, QueryTarget } from '@/plugins/history/types';
-import { durationString } from '@/utils/duration';
-import { isJsonEqual, round } from '@/utils/functional';
+import { MetricsSource, MetricValue } from '@/plugins/history/types';
+import { fixedNumber } from '@/utils/formatting';
+import { isJsonEqual } from '@/utils/objects';
+import { durationString } from '@/utils/quantity';
 
 import { DEFAULT_DECIMALS, DEFAULT_FRESH_DURATION } from './const';
 import { MetricsConfig, MetricsWidget } from './types';
 import { emptyMetricsConfig } from './utils';
 
-interface CurrentValue extends MetricsResult {
+interface CurrentValue extends MetricValue {
   name: string;
   stale: boolean;
 }
@@ -40,14 +41,8 @@ export default defineComponent({
       () => defaults(widget.value.config, emptyMetricsConfig()),
     );
 
-    function sourceId(target: QueryTarget): string {
-      return `${metricsId}/${target.measurement}`;
-    }
-
-    const sources = computed<MetricsSource[]>(
-      () => config.value.targets
-        .map(target => historyStore.sourceById(sourceId(target)))
-        .filter((source): source is MetricsSource => source != null),
+    const source = computed<MetricsSource | null>(
+      () => historyStore.sourceById<MetricsSource>(metricsId),
     );
 
     function fieldFreshDuration(field: string): number {
@@ -58,48 +53,47 @@ export default defineComponent({
       return config.value.decimals[field] ?? DEFAULT_DECIMALS;
     }
 
-    function roundedValue(value: CurrentValue): string {
-      return round(value.value, fieldDecimals(value.field));
+    function fixedValue(value: CurrentValue): string {
+      return fixedNumber(value.value, fieldDecimals(value.field));
     }
 
     const values = computed<CurrentValue[]>(
       () => {
         const now = new Date().getTime();
-        return sources.value
-          .flatMap(source => source.values)
+        return source.value
+          ?.values
           .map(result => ({
             ...result,
             name: config.value.renames[result.field] || result.field,
             stale: !!result.time && (now - result.time as number > fieldFreshDuration(result.field)),
-          }));
+          }))
+          ?? [];
       },
     );
 
-    function addSources(): void {
-      config.value.targets
-        .forEach(target =>
-          addSource(
-            sourceId(target),
-            config.value.params,
-            config.value.renames,
-            target,
-          ));
+    function createSource(): void {
+      addSource(
+        metricsId,
+        config.value.params,
+        config.value.renames,
+        config.value.targets.flatMap(t => t.fields.map(f => `${t.measurement}/${f}`)),
+      );
     }
 
-    function removeSources(): void {
-      sources.value.forEach(historyStore.removeSource);
+    function removeSource(): void {
+      historyStore.removeSource(source.value);
     }
 
-    function resetSources(): void {
-      removeSources();
-      addSources();
+    function resetSource(): void {
+      removeSource();
+      createSource();
     }
 
     watch(
       () => config.value,
       (newV, oldV) => {
         if (!isJsonEqual(newV, oldV)) {
-          resetSources();
+          resetSource();
         }
       },
       { deep: true },
@@ -107,19 +101,18 @@ export default defineComponent({
 
     watch(
       () => props.revision,
-      () => resetSources(),
+      () => resetSource(),
     );
 
-    onMounted(() => resetSources());
-    onBeforeUnmount(() => removeSources());
+    onMounted(() => resetSource());
+    onBeforeUnmount(() => removeSource());
 
     return {
       context,
       metricsId,
       config,
-      sources,
       values,
-      roundedValue,
+      fixedValue,
       durationString,
       fieldFreshDuration,
     };
@@ -145,18 +138,19 @@ export default defineComponent({
         v-for="val in values"
         :key="val.field"
         :label="val.name"
+        tag-class="row items-center q-gutter-x-sm"
       >
-        <span :class="['text-big', val.stale && 'darkened']">
-          {{ roundedValue(val) }}
-        </span>
-        <template v-if="val.stale" #after>
+        <div :class="['text-big col-auto', val.stale && 'darkened']">
+          {{ fixedValue(val) }}
+        </div>
+        <div v-if="val.stale" class="col-auto">
           <q-icon name="warning" size="24px" />
           <q-tooltip>
             {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
             <br>
             Last update: {{ new Date(val.time).toLocaleString() }}.
           </q-tooltip>
-        </template>
+        </div>
       </LabeledField>
     </div>
     <div

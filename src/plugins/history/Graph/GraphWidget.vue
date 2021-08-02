@@ -4,27 +4,31 @@ import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
 import { Layout } from 'plotly.js';
 import { computed, defineComponent, nextTick, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { useContext, useWidget } from '@/composables';
-import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
+import { defaultPresets, emptyGraphConfig } from '@/plugins/history/const';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
+import { Quantity } from '@/shared-types';
 import { Widget } from '@/store/widgets';
-import { bloxQty, Quantity } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
-import { durationString } from '@/utils/duration';
-import { isJsonEqual } from '@/utils/functional';
+import { isJsonEqual } from '@/utils/objects';
+import { bloxQty, durationString } from '@/utils/quantity';
 
 import { addBlockGraph } from './utils';
 
 export default defineComponent({
   name: 'GraphWidget',
   setup() {
+    const router = useRouter();
+
     const {
       context,
       inDialog,
     } = useContext.setup();
 
     const {
+      widgetId,
       widget,
       config,
       saveWidget,
@@ -36,7 +40,6 @@ export default defineComponent({
 
     const presets = defaultPresets();
     const renderedConfig = ref(cloned());
-    const downsampling = ref<Mapped<string>>({});
 
     // Separate IDs for graphs in widget and dialog wrapper
     // This prevents source create/delete race conditions when switching
@@ -94,30 +97,8 @@ export default defineComponent({
         .onOk((v: Quantity) => saveParams({ duration: durationString(v) }));
     }
 
-    function currentGraphId(): string | null {
-      if (widgetGraphRef.value !== undefined) { return widgetGraphId; }
-      if (previewGraphRef.value !== undefined) { return previewGraphId; }
-      return null;
-    }
-
-    function showGraphDialog(): void {
-      const currentId = currentGraphId();
-      createDialog({
-        component: 'GraphDialog',
-        componentProps: {
-          graphId: currentId || nanoid(),
-          config: {
-            ...config.value,
-            layout: {
-              ...config.value.layout,
-              title: widget.value.title,
-            },
-          },
-          sharedSources: currentId !== null,
-          usePresets: true,
-          saveParams,
-        },
-      });
+    function showGraphPage(): void {
+      router.push(`/graph/${widgetId}`);
     }
 
     function startAddBlockGraph(): void {
@@ -137,7 +118,6 @@ export default defineComponent({
       context,
       inDialog,
       presets,
-      downsampling,
       previewGraphId,
       widgetGraphId,
       previewGraphRef,
@@ -154,7 +134,7 @@ export default defineComponent({
       chooseDuration,
       regraph,
       refresh,
-      showGraphDialog,
+      showGraphPage,
       startAddBlockGraph,
     };
   },
@@ -181,14 +161,13 @@ export default defineComponent({
         use-range
         @params="saveParams"
         @layout="saveLayout"
-        @downsample="v => downsampling = v"
       />
     </template>
 
     <template #toolbar>
       <WidgetToolbar has-mode-toggle>
         <template #actions>
-          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphDialog" />
+          <ActionItem icon="mdi-chart-line" label="Show maximized" @click="showGraphPage" />
           <ActionItem icon="add" label="Add block to graph" @click="startAddBlockGraph" />
           <ExportGraphAction :config="config" :header="widget.title" />
           <ActionItem icon="refresh" label="Refresh" @click="regraph" />
@@ -226,7 +205,6 @@ export default defineComponent({
 
     <div
       v-if="context.mode === 'Basic'"
-      v-touch-hold.mouse.stop="showGraphDialog"
       class="fit"
     >
       <q-resize-observer :debounce="200" @resize="refresh" />
@@ -238,7 +216,6 @@ export default defineComponent({
           sourceRevision,
           renderRevision
         }"
-        @downsample="v => downsampling = v"
       />
     </div>
     <div
@@ -246,7 +223,6 @@ export default defineComponent({
     >
       <GraphEditor
         :config="config"
-        :downsampling="downsampling"
         @update:config="saveConfig"
       />
     </div>

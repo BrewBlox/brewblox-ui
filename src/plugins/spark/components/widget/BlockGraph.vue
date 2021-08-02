@@ -2,13 +2,11 @@
 import { Layout } from 'plotly.js';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
-import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
+import { defaultPresets, emptyGraphConfig } from '@/plugins/history/const';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { bloxQty } from '@/utils/bloxfield';
-import { createDialog } from '@/utils/dialog';
-import { durationString } from '@/utils/duration';
-import { deepCopy, isJsonEqual } from '@/utils/functional';
+import { deepCopy, isJsonEqual } from '@/utils/objects';
+import { durationString } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'BlockGraph',
@@ -93,33 +91,6 @@ export default defineComponent({
       save(graphConfig.value);
     }
 
-    function updateDuration(): void {
-      createDialog({
-        component: 'InputDialog',
-        componentProps: {
-          modelValue: graphConfig.value.params.duration,
-          title: 'Duration',
-        },
-      })
-        .onOk(val => {
-          graphConfig.value.params.duration = durationString(val);
-          save(graphConfig.value);
-        });
-    }
-
-    function chooseDuration(): void {
-      const current = graphConfig.value.params.duration ?? '1h';
-      createDialog({
-        component: 'DurationQuantityDialog',
-        componentProps: {
-          modelValue: bloxQty(current),
-          title: 'Custom graph duration',
-          label: 'Duration',
-        },
-      })
-        .onOk(unit => saveParams({ duration: durationString(unit) }));
-    }
-
     return {
       durationString,
       presets,
@@ -132,8 +103,6 @@ export default defineComponent({
       updateKeySide,
       saveParams,
       saveLayout,
-      updateDuration,
-      chooseDuration,
     };
   },
 });
@@ -157,17 +126,11 @@ export default defineComponent({
         @layout="saveLayout"
       >
         <template #controls>
-          <q-btn-dropdown flat icon="settings">
+          <q-btn-dropdown flat icon="settings" :auto-close="1">
             <ExportGraphAction
               :config="graphConfig"
               :header="graphConfig.layout.title"
             />
-            <q-item clickable @click="updateDuration">
-              <q-item-section>Duration</q-item-section>
-              <q-item-section class="col-auto">
-                {{ durationString(graphConfig.params.duration) }}
-              </q-item-section>
-            </q-item>
             <q-expansion-item label="Display Axis">
               <q-item
                 v-for="[key, renamed] in targetKeys"

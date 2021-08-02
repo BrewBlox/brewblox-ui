@@ -4,7 +4,8 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { coord2grid } from '@/plugins/builder/utils';
 import { Setpoint, SetpointProfileBlock } from '@/plugins/spark/types';
-import { objectSorter, round } from '@/utils/functional';
+import { fixedNumber } from '@/utils/formatting';
+import { makeObjectSorter } from '@/utils/functional';
 
 import { usePart, useSettingsBlock } from '../composables';
 import { PROFILE_KEY, PROFILE_TYPES } from '../specs/ProfileDisplay';
@@ -38,7 +39,7 @@ export default defineComponent({
         }
         // Sorting modifies the list. Make a copy to prevent this.
         return [...block.value.data.points]
-          .sort(objectSorter('time'));
+          .sort(makeObjectSorter('time'));
       },
     );
 
@@ -80,7 +81,7 @@ export default defineComponent({
 
     return {
       coord2grid,
-      round,
+      fixedNumber,
       mdiArrowRightBold,
       bordered,
       sizeX,
@@ -110,7 +111,7 @@ export default defineComponent({
         </small>
         <div class="col row">
           <div class="col">
-            {{ round(currentValue, 0) }}
+            {{ fixedNumber(currentValue, 0) }}
           </div>
           <div class="col">
             <q-icon
@@ -120,7 +121,7 @@ export default defineComponent({
             />
           </div>
           <div class="col">
-            {{ round(nextValue, 0) }}
+            {{ fixedNumber(nextValue, 0) }}
           </div>
         </div>
       </div>

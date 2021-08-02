@@ -3,8 +3,8 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { BlockType, MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
-import { typeMatchFilter } from '@/utils/functional';
+import { MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
+import { getSpark3PinsBlock } from '@/plugins/spark/utils';
 
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
@@ -21,16 +21,14 @@ export default defineComponent({
       inDialog,
     } = useContext.setup();
     const {
+      serviceId,
       sparkModule,
       block,
     } = useBlockWidget.setup<MotorValveBlock>();
 
     // Spark 2 pins have no support for toggling 12V
     const spark3Pins = computed<Spark3PinsBlock | null>(
-      () => sparkModule
-        .blocks
-        .find(typeMatchFilter<Spark3PinsBlock>(BlockType.Spark3Pins))
-        ?? null,
+      () => getSpark3PinsBlock(serviceId) ?? null,
     );
 
     const disabled12V = computed<boolean>(

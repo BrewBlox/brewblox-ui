@@ -4,6 +4,7 @@ import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { Block } from '@/shared-types';
 import { widgetStore } from '@/store/widgets';
+import { findById } from '@/utils/collections';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { BlockConfig, BlockSpec, BlockWidget } from '../types';
@@ -23,7 +24,7 @@ export interface UseBlockWidgetComponent<BlockT extends Block>
 
   hasGraph: boolean;
   isDriven: ComputedRef<boolean>;
-  constrainers: ComputedRef<string | null>;
+  limitations: ComputedRef<string | null>;
 }
 
 export interface UseBlockWidgetComposable {
@@ -80,23 +81,27 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       await sparkModule.saveBlock(v);
     }
 
-    const constrainers = computed<string | null>(
-      () => sparkModule.limiters[config.value.blockId]?.join(', ') || null,
+    const limitations = computed<string | null>(
+      () => findById(sparkModule.limitations, config.value.blockId)?.limitedBy.join(', ') || null,
     );
 
     const hasGraph: boolean = !isVolatileBlock.value
       && sparkStore.fieldSpecs.some(f => f.type === block.value.type && f.graphed);
 
     const graphConfig = computed<GraphConfig | null>({
-      get: () => hasGraph ? makeBlockGraphConfig(block.value, config.value) : null,
+      get: () => hasGraph
+        ? makeBlockGraphConfig(block.value, config.value)
+        : null,
       set: cfg => {
-        const updated: BlockConfig = {
-          ...config.value,
-          queryParams: cfg?.params,
-          graphAxes: cfg?.axes,
-          graphLayout: cfg?.layout,
-        };
-        widgetStore.saveWidget({ ...widget.value, config: updated });
+        if (hasGraph) {
+          const updated: BlockConfig = {
+            ...config.value,
+            queryParams: cfg?.params,
+            graphAxes: cfg?.axes,
+            graphLayout: cfg?.layout,
+          };
+          widgetStore.saveWidget({ ...widget.value, config: updated });
+        }
       },
     });
 
@@ -118,7 +123,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       blockSpec,
       isVolatileBlock,
       saveBlock,
-      constrainers,
+      limitations,
       graphConfig,
       hasGraph,
       isDriven,

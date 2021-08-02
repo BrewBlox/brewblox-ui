@@ -6,10 +6,11 @@ import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { AnalogCompare, AnalogCompareOp, BlockIntfType, Quantity } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { bloxQty, isQuantity, tempQty } from '@/utils/bloxfield';
-import { deepCopy } from '@/utils/functional';
+import { isQuantity } from '@/utils/identity';
+import { deepCopy } from '@/utils/objects';
+import { bloxQty, tempQty } from '@/utils/quantity';
 
-import { analogOpTitles } from './getters';
+import { analogOpTitles } from './const';
 
 const operatorOpts = Enum.values(AnalogCompareOp)
   .map(value => ({ value, label: analogOpTitles[value] }));

@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 
+import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 
 import { withPrefix } from '../utils';
@@ -11,6 +12,7 @@ export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
     {
       id: nanoid(),
       title: withPrefix(config.prefix, 'Layout'),
+      order: builderStore.layouts.length + 1,
       width: 8,
       height: 9,
       parts: [

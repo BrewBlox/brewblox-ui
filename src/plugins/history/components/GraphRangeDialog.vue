@@ -110,7 +110,7 @@ export default defineComponent({
           v-model.number="minV"
           label="Lower bound"
           inputmode="numeric"
-          pattern="[0-9]*"
+          pattern="[0-9\.]*"
           autofocus
           class="col"
           :rules="minVRules"
@@ -123,7 +123,7 @@ export default defineComponent({
           v-model.number="maxV"
           label="Upper bound"
           inputmode="numeric"
-          pattern="[0-9]*"
+          pattern="[0-9\.]*"
           class="col"
           :rules="maxVRules"
         >

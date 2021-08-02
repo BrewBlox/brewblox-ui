@@ -5,9 +5,10 @@ import { useDialog } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';
 import { calculateProfileValues } from '@/plugins/spark/utils';
 import { Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
-import { prettyUnit, roundedQty, tempQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy } from '@/utils/functional';
+import { prettyUnit } from '@/utils/formatting';
+import { deepCopy } from '@/utils/objects';
+import { bloxQty, tempQty } from '@/utils/quantity';
 
 
 export default defineComponent({
@@ -49,11 +50,11 @@ export default defineComponent({
     const setpointId = setpoint?.id ?? 'Unknown';
     const setpointEnabled = ref<boolean>(true);
     const setpointSetting = ref<Quantity>(
-      roundedQty(
+      bloxQty(
         profileValue?.current
         ?? setpoint?.data.storedSetting
         ?? tempQty(20),
-      ),
+      ).round(),
     );
 
     function showKeyboard(): void {
@@ -123,7 +124,7 @@ export default defineComponent({
         :suffix="prettyUnit(setpointSetting.unit)"
         input-class="text-big"
         inputmode="numeric"
-        pattern="[0-9]*"
+        pattern="[0-9\.]*"
         autofocus
         clearable
         item-aligned

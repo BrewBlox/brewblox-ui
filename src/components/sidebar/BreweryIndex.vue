@@ -6,7 +6,7 @@ import { useGlobals } from '@/composables';
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { startAddLayout } from '@/plugins/builder/utils';
-import { objectSorter } from '@/utils/functional';
+import { makeObjectSorter } from '@/utils/functional';
 
 export default defineComponent({
   name: 'BreweryIndex',
@@ -27,7 +27,7 @@ export default defineComponent({
       // avoid modifying the store object
       get: () => [...builderStore.layouts]
         .filter(layout => layout.listed ?? true)
-        .sort(objectSorter('order')),
+        .sort(makeObjectSorter('order')),
       set: layouts => builderStore.updateLayoutOrder(layouts.map(v => v.id)),
     });
 

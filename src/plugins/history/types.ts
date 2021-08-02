@@ -19,22 +19,20 @@ export interface QueryTarget {
 }
 
 export interface ApiQuery {
-  // QueryParams
-  database?: string;
-  start?: string | number;
+  start?: string;
   duration?: string;
-  end?: string | number;
-  limit?: number;
-  order_by?: string;
-  policy?: string;
-  approx_points?: number;
-
-  // QueryTarget
-  measurement: string;
+  end?: string;
   fields: string[];
+}
 
-  // new
-  epoch: string;
+export type CsvPrecision =
+  | 'ns'
+  | 'ms'
+  | 's'
+  | 'ISO8601'
+
+export interface CsvQuery extends ApiQuery {
+  precision: CsvPrecision;
 }
 
 export interface DisplayNames {
@@ -61,27 +59,29 @@ export interface LabelPrecision {
   [key: string]: number;
 }
 
-export interface HistorySource {
-  id: string;
-  command: 'values' | 'last_values';
-  transformer: (source: any, result: any) => HistorySource;
-  params: QueryParams;
-  target: QueryTarget;
-  renames: DisplayNames;
+export interface TimeSeriesRange {
+  metric: {
+    __name__: string;
+  }
+  values: [timestamp: number, value: string][]
 }
 
-export type Slice = number[];
-
-export interface QueryResult {
-  name: string;
-  columns: string[];
-  values: Slice[];
-  database: string;
-  policy: string;
-  initial?: boolean;
+export interface TimeSeriesMetric {
+  metric: string;
+  value: number;
+  timestamp: number;
 }
 
-export interface GraphFieldResult extends PlotData {
+export interface TimeSeriesRangesResult {
+  initial: boolean;
+  ranges: TimeSeriesRange[];
+}
+
+export interface TimeSeriesMetricsResult {
+  metrics: TimeSeriesMetric[];
+}
+
+export interface RangeValue extends PlotData {
   type: 'scatter';
   mode: 'lines';
   name: string;
@@ -91,24 +91,33 @@ export interface GraphFieldResult extends PlotData {
   y: number[];
 }
 
-export interface GraphSource extends HistorySource {
-  transformer: (source: GraphSource, result: QueryResult) => HistorySource;
-  axes: GraphValueAxes;
-  colors: LineColors;
-  precision: LabelPrecision;
-  usedPolicy?: string;
-  values: Mapped<GraphFieldResult>;
-}
-
-export interface MetricsResult {
+export interface MetricValue {
   field: string;
   time: number;
   value: number | null;
 }
 
+export interface HistorySource {
+  id: string;
+  command: 'metrics' | 'ranges';
+  transformer: (source: any, result: any) => HistorySource;
+  params: QueryParams;
+  fields: string[];
+  renames: DisplayNames;
+}
+
+export interface GraphSource extends HistorySource {
+  transformer: (source: GraphSource, result: TimeSeriesRangesResult) => HistorySource;
+  axes: GraphValueAxes;
+  colors: LineColors;
+  precision: LabelPrecision;
+  values: Mapped<RangeValue>;
+}
+
 export interface MetricsSource extends HistorySource {
-  transformer: (source: MetricsSource, result: MetricsResult[]) => HistorySource;
-  values: MetricsResult[];
+  transformer: (source: MetricsSource, result: TimeSeriesMetricsResult) => HistorySource;
+  updated: Date;
+  values: MetricValue[];
 }
 
 export type GraphAnnotation = Partial<Annotations>;

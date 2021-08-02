@@ -43,7 +43,7 @@ export default defineComponent({
     v-if="editable"
     v-model.number="field"
     inputmode="numeric"
-    pattern="[0-9]*"
+    pattern="[0-9\.]*"
     item-aligned
     dense
   >

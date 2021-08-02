@@ -2,7 +2,7 @@
 import { defineComponent, inject, watch } from 'vue';
 
 import { NowKey } from '@/symbols';
-import { durationMs } from '@/utils/duration';
+import { durationMs } from '@/utils/quantity';
 
 import { automationStore } from './store';
 

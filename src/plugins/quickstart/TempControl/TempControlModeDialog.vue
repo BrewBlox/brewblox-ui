@@ -4,14 +4,15 @@ import { computed, defineComponent, PropType, reactive } from 'vue';
 import { useDialog, useGlobals } from '@/composables';
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
-import { bloxQty, inverseTempQty } from '@/utils/bloxfield';
 import { createDialog } from '@/utils/dialog';
-import { deepCopy, typeMatchFilter } from '@/utils/functional';
+import { makeTypeFilter } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
+import { bloxQty, inverseTempQty } from '@/utils/quantity';
 
 import { PidConfig } from '../types';
 import { TempControlMode } from './types';
 
-const setpointFilter = typeMatchFilter(BlockType.SetpointSensorPair);
+const setpointFilter = makeTypeFilter(BlockType.SetpointSensorPair);
 const durationRules: InputRule[] = [
   v => v >= 0 || 'Value must be positive',
   v => v < (2 ** 16 * 1000) || 'Value is too large to be stored in firmware',

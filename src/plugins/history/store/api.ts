@@ -1,23 +1,23 @@
+import { UI_NAMESPACE, WS_HOST } from '@/const';
 import { createApi } from '@/database/api';
-import { UI_NAMESPACE, WS_HOST } from '@/utils/const';
-import http from '@/utils/http';
+import { http } from '@/utils/http';
 
-import { ApiQuery, LoggedSession, QueryResult } from '../types';
+import { CsvQuery, LoggedSession } from '../types';
 
 
 export const historyApi = {
   openStream:
     (): WebSocket =>
-      new WebSocket(`${WS_HOST}/history/history/stream`),
+      new WebSocket(`${WS_HOST}/history/timeseries/stream`),
 
   fetchFields:
-    async (includeStale: boolean): Promise<Mapped<any>> =>
-      http.post<Mapped<any>>('/history/history/fields', { include_stale: includeStale })
+    async (duration: string): Promise<string[]> =>
+      http.post<string[]>('/history/timeseries/fields', { duration })
         .then(resp => resp.data),
 
-  fetchValues:
-    async (query: ApiQuery): Promise<QueryResult> =>
-      http.post<QueryResult>('/history/history/values', query)
+  downloadCsv:
+    async (query: CsvQuery): Promise<Blob> =>
+      http.post<Blob>('/history/timeseries/csv', query, { responseType: 'blob' })
         .then(resp => resp.data),
 };
 

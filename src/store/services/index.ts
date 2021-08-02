@@ -2,19 +2,19 @@ import isEqual from 'lodash/isEqual';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
-import { featureStore } from '@/store/features';
-import { extendById, filterById, findById } from '@/utils/functional';
+import { featureStore, ServiceHook } from '@/store/features';
+import { concatById, filterById, findById } from '@/utils/collections';
 
 import api from './api';
 import type { Service, ServiceStatus, ServiceStub } from './types';
 
 export * from './types';
 
-const onStartService = (service: Service): Promise<void> =>
-  featureStore.serviceById(service.type)?.onStart?.(service);
+const onStartService: ServiceHook =
+  service => featureStore.serviceById(service.type)?.onStart?.(service);
 
-const onRemoveService = (service: Service): Promise<void> =>
-  featureStore.serviceById(service.type)?.onRemove?.(service);
+const onRemoveService: ServiceHook =
+  service => featureStore.serviceById(service.type)?.onRemove?.(service);
 
 
 @Module({ generateMutationSetters: true })
@@ -27,7 +27,7 @@ export class ServiceModule extends VuexModule {
     return this.services.map(v => v.id);
   }
 
-  public serviceById(id: Nullable<string>): Service | null {
+  public serviceById(id: Maybe<string>): Service | null {
     return findById(this.services, id);
   }
 
@@ -37,7 +37,7 @@ export class ServiceModule extends VuexModule {
 
   @Mutation
   public setService(service: Service): void {
-    this.services = extendById(this.services, service);
+    this.services = concatById(this.services, service);
     this.stubs = filterById(this.stubs, service); // stubs have the same ID
   }
 
@@ -51,13 +51,13 @@ export class ServiceModule extends VuexModule {
   @Mutation
   public trySetStub(stub: ServiceStub): void {
     if (!this.serviceById(stub.id)) {
-      this.stubs = extendById(this.stubs, stub);
+      this.stubs = concatById(this.stubs, stub);
     }
   }
 
   @Mutation
   public setStatus(status: ServiceStatus): void {
-    this.statuses = extendById(this.statuses, status);
+    this.statuses = concatById(this.statuses, status);
   }
 
   @Action

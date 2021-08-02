@@ -2,7 +2,7 @@
 import { defineComponent, PropType, reactive, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { deepCopy } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 import { GraphAnnotation, GraphConfig, QueryParams } from '../types';
 

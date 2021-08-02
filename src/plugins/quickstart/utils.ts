@@ -1,18 +1,17 @@
-import isEqual from 'lodash/isEqual';
-
 import { builderStore } from '@/plugins/builder/store';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockType, DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
 import { startAddBlockToDisplay } from '@/plugins/spark/utils';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
-import { bloxQty, inverseTempQty } from '@/utils/bloxfield';
-import { combinations, typeMatchFilter } from '@/utils/functional';
-import notify from '@/utils/notify';
+import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';
+import { notify } from '@/utils/notify';
+import { deepCopy } from '@/utils/objects';
+import { bloxQty, inverseTempQty } from '@/utils/quantity';
 
 import { PidConfig, PinChannel, QuickstartAction, QuickstartConfig } from './types';
 
-const digitalActuatorFilter = typeMatchFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
+const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
 
 export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {
   return sparkStore
@@ -105,8 +104,10 @@ export async function executeActions(actions: QuickstartAction[], config: AnyDic
   }
 }
 
-export function hasShared<T>(arr: T[]): boolean {
-  return combinations(arr.filter(v => v !== null)).some(([v1, v2]) => isEqual(v1, v2));
+export function hasShared(arr: any[]): boolean {
+  const base = deepCopy(arr).filter(nullFilter);
+  const unique = base.filter(uniqueFilter);
+  return base.length > unique.length;
 }
 
 export function withPrefix(prefix: string, val: string): string {

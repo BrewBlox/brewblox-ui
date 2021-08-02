@@ -2,7 +2,7 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { LogEntry, loggingStore } from '@/store/logging';
-import { shortDateString } from '@/utils/functional';
+import { shortDateString } from '@/utils/formatting';
 import { notifyColors, notifyIcons } from '@/utils/notify';
 
 export default defineComponent({

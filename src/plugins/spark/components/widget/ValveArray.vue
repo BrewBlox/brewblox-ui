@@ -1,12 +1,15 @@
 <script lang="ts">
+import set from 'lodash/set';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
-import { bloxLink, Link } from '@/utils/bloxfield';
-import { mutate, objectStringSorter, typeMatchFilter } from '@/utils/functional';
+import { Link } from '@/shared-types';
+import { findById } from '@/utils/collections';
+import { makeObjectSorter, makeTypeFilter } from '@/utils/functional';
+import { bloxLink } from '@/utils/link';
 
 
 interface EditableChannel extends IoChannel {
@@ -26,6 +29,8 @@ interface ChannelClaims {
   [nid: number]: MotorValveBlock
 }
 
+const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
+
 export default defineComponent({
   name: 'ValveArray',
   props: {
@@ -44,9 +49,9 @@ export default defineComponent({
     const claimedChannels = computed<ChannelClaims>(
       () => sparkModule
         .blocks
-        .filter(typeMatchFilter<MotorValveBlock>(BlockType.MotorValve))
+        .filter(motorValveFilter)
         .filter(v => v.data.hwDevice.id === block.value.id)
-        .reduce((acc, v) => mutate<ChannelClaims>(acc, v.data.startChannel, v), {}),
+        .reduce((acc, v) => set(acc, v.data.startChannel, v), {}),
     );
 
     function mappedName(id: string): string | null {
@@ -70,7 +75,7 @@ export default defineComponent({
           },
           [],
         )
-        .sort(objectStringSorter('name')),
+        .sort(makeObjectSorter('name')),
     );
 
     function driverLink(channel: EditableChannel): Link {
@@ -81,11 +86,11 @@ export default defineComponent({
       return isBlockDriven(block);
     }
 
-    function driverLimitedBy(block: Block): string {
-      return sparkModule
-        .limiters[block.id]
-        ?.join(', ')
-        ?? '';
+    function driverLimitations(block: Block): string | null {
+      return findById(sparkModule.limitations, block.id)
+        ?.limitedBy
+        .join(', ')
+        || null;
     }
 
     async function saveDriver(channel: EditableChannel, link: Link): Promise<void> {
@@ -115,7 +120,7 @@ export default defineComponent({
     return {
       channels,
       driverDriven,
-      driverLimitedBy,
+      driverLimitations,
       saveState,
       driverLink,
       serviceId,
@@ -141,7 +146,7 @@ export default defineComponent({
           :disable="driverDriven(channel.driver)"
           :model-value="channel.driver.data.desiredState"
           :pending="channel.driver.data.state !== channel.driver.data.desiredState"
-          :pending-reason="driverLimitedBy(channel.driver)"
+          :pending-reason="driverLimitations(channel.driver)"
           class="col-auto self-center"
           @update:model-value="v => saveState(channel, v)"
         />

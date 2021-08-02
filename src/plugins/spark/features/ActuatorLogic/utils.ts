@@ -1,8 +1,8 @@
 import { ActuatorLogicBlock, AnalogCompare, BlockIntfType, DigitalCompare } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { tempQty } from '@/utils/bloxfield';
+import { tempQty } from '@/utils/quantity';
 
-import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './getters';
+import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './const';
 import { ExpressionError } from './types';
 
 export const keyCode = (s: string): number =>

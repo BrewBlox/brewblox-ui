@@ -6,8 +6,9 @@ import { computed, defineComponent } from 'vue';
 import { useContext, useWidget } from '@/composables';
 import { dashboardStore } from '@/store/dashboards';
 import { createDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
 import { saveFile } from '@/utils/import-export';
-import notify from '@/utils/notify';
+import { notify } from '@/utils/notify';
 
 import { historyStore } from '../store';
 import { LoggedSession, SessionGraphNote, SessionNote } from '../types';
@@ -17,6 +18,8 @@ import SessionLoadDialog from './SessionLoadDialog.vue';
 import SessionLogBasic from './SessionLogBasic.vue';
 import SessionLogFull from './SessionLogFull.vue';
 import { SessionLogWidget } from './types';
+
+const graphFilter = makeTypeFilter<SessionGraphNote>('Graph');
 
 export default defineComponent({
   name: 'SessionLogWidget',
@@ -127,7 +130,7 @@ export default defineComponent({
       if (session.value === null) { return; }
       const sessionDate = renderDate(session.value.date);
       const validNotes = notes.value
-        .filter((v): v is SessionGraphNote => v.type === 'Graph')
+        .filter(graphFilter)
         .filter(v => v.config.targets.length);
 
       if (!validNotes.length) {

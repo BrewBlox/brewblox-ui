@@ -17,8 +17,8 @@ import { Block } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 import { systemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
-import { bloxLink, bloxQty, deltaTempQty, tempQty } from '@/utils/bloxfield';
-import { durationMs } from '@/utils/duration';
+import { bloxLink } from '@/utils/link';
+import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
@@ -210,9 +210,18 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
           targetId: bloxLink(activeSetpointId),
           drivenTargetId: bloxLink(null),
           points: [
-            { time: 0, temperature: initialSetting },
-            { time: durationMs('7d') / 1000, temperature: initialSetting },
-            { time: durationMs('10d') / 1000, temperature: initialSetting.copy(initialSetting.value! + 3) },
+            {
+              time: 0,
+              temperature: initialSetting,
+            },
+            {
+              time: durationMs('7d') / 1000,
+              temperature: initialSetting,
+            },
+            {
+              time: durationMs('10d') / 1000,
+              temperature: bloxQty(initialSetting).copy(initialSetting.value! + 3),
+            },
           ],
         },
       },

@@ -18,7 +18,9 @@ import { systemStore } from '@/store/system';
 import { rotatedSize } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
-import { clampRotation, deepCopy, uniqueFilter } from '@/utils/functional';
+import { clampRotation } from '@/utils/formatting';
+import { uniqueFilter } from '@/utils/functional';
+import { deepCopy } from '@/utils/objects';
 
 import { normalizeSelectArea, useDragSelect, useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
 import { builderTools, SQUARE_SIZE } from './const';

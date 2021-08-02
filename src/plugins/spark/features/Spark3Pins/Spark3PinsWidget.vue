@@ -4,7 +4,7 @@ import { defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Spark3PinsBlock } from '@/plugins/spark/types';
-import { round } from '@/utils/functional';
+import { fixedNumber } from '@/utils/formatting';
 
 export default defineComponent({
   name: 'Spark3PinsWidget',
@@ -12,7 +12,7 @@ export default defineComponent({
     const { context } = useContext.setup();
     const { block, saveBlock } = useBlockWidget.setup<Spark3PinsBlock>();
     return {
-      round,
+      fixedNumber,
       context,
       block,
       saveBlock,
@@ -61,13 +61,13 @@ export default defineComponent({
           label="5V Voltage"
           class="col-grow"
         >
-          {{ round(block.data.voltage5) }}
+          {{ fixedNumber(block.data.voltage5) }}
         </LabeledField>
         <LabeledField
           label="12V Voltage"
           class="col-grow"
         >
-          {{ round(block.data.voltage12) }}
+          {{ fixedNumber(block.data.voltage12) }}
         </LabeledField>
       </div>
     </div>

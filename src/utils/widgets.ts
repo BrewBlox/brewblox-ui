@@ -5,8 +5,8 @@ import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
 
 import { createDialog } from './dialog';
-import { deepCopy } from './functional';
-import notify from './notify';
+import { notify } from './notify';
+import { deepCopy } from './objects';
 
 
 export function startChangeWidgetTitle(widget: Widget): void {

@@ -2,9 +2,10 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
-import { isQuantity, prettyUnit, Quantity } from '@/utils/bloxfield';
+import { Quantity } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-import { round } from '@/utils/functional';
+import { fixedNumber, prettyUnit } from '@/utils/formatting';
+import { isQuantity } from '@/utils/identity';
 
 export default defineComponent({
   name: 'QuantityField',
@@ -47,7 +48,7 @@ export default defineComponent({
     }
 
     const displayValue = computed<string>(
-      () => round(props.modelValue.value, props.decimals),
+      () => fixedNumber(props.modelValue.value, props.decimals),
     );
 
     const displayUnit = computed<string>(

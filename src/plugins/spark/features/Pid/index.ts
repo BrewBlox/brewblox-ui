@@ -5,16 +5,16 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockFieldSpec, BlockIntfType, BlockSpec, BlockType, FilterChoice, PidBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
+import { bloxLink } from '@/utils/link';
 import {
-  bloxLink,
   bloxQty,
   deltaTempMultHourQty,
   deltaTempPerMinuteQty,
   deltaTempQty,
+  durationString,
   inverseTempQty,
   tempQty,
-} from '@/utils/bloxfield';
-import { durationString } from '@/utils/duration';
+} from '@/utils/quantity';
 
 import widget from './PidWidget.vue';
 

@@ -12,10 +12,10 @@ import {
 } from '@/plugins/spark/types';
 import { blockWidgetSelector, enumHint } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
-import { bloxLink } from '@/utils/bloxfield';
+import { bloxLink } from '@/utils/link';
 
 import widget from './ActuatorLogicWidget.vue';
-import { nonErrorResults } from './getters';
+import { nonErrorResults } from './const';
 
 const type = BlockType.ActuatorLogic;
 
