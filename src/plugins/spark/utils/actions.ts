@@ -1,7 +1,7 @@
 import isMatch from 'lodash/isMatch';
 import range from 'lodash/range';
 
-import { typeName as graphType } from '@/plugins/history/Graph/getters';
+import { typeName as graphType } from '@/plugins/history/Graph/const';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockAddress, DisplayOpts } from '@/plugins/spark/types';

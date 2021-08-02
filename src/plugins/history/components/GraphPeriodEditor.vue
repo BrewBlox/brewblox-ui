@@ -50,10 +50,6 @@ export default defineComponent({
       type: Object as PropType<QueryConfig>,
       required: true,
     },
-    downsampling: {
-      type: Object as PropType<Mapped<string>>,
-      default: () => ({}),
-    },
   },
   emits: ['update:config'],
   setup(props, { emit }) {
@@ -128,7 +124,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="widget-body row">
+  <div class="row">
     <q-select
       :model-value="period"
       :options="periodOptions"
@@ -137,26 +133,7 @@ export default defineComponent({
       label="Time period"
       class="col-auto"
       @update:model-value="saveSanitized"
-    >
-      <template #append>
-        <q-icon name="mdi-chart-timeline" size="sm">
-          <q-tooltip>
-            <i>To improve performance, the history service automatically selects an averaging period.</i> <br>
-            <i>One point is returned per period, with the average value of all points in that period.</i> <br>
-            <div class="row q-mt-sm">
-              <LabeledField
-                v-for="(rate, meas) in downsampling"
-                :key="meas"
-                :model-value="rate"
-                :label="meas"
-                item-aligned
-                class="col"
-              />
-            </div>
-          </q-tooltip>
-        </q-icon>
-      </template>
-    </q-select>
+    />
     <div class="col-auto row q-gutter-x-sm q-ml-none">
       <DatetimeField
         v-if="period.start"

@@ -1,3 +1,4 @@
+import { exportFile } from 'quasar';
 import { Action, Module, Mutation, VuexModule } from 'vuex-class-modules';
 
 import store from '@/store';
@@ -5,39 +6,32 @@ import { concatById, filterById, findById } from '@/utils/collections';
 import { isoDateString } from '@/utils/formatting';
 import { uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
+import { bloxQty, JSQuantity } from '@/utils/quantity';
 
 import type {
   ApiQuery,
+  CsvPrecision,
   HistorySource,
   LoggedSession,
   QueryParams,
-  QueryResult,
-  QueryTarget,
 } from '../types';
 import { historyApi, sessionApi } from './api';
 
 
-const buildQuery =
-  (params: QueryParams, target: QueryTarget, epoch = 'ms'): ApiQuery =>
-  ({
-    database: params.database,
+function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
+  return {
     start: isoDateString(params.start),
     end: isoDateString(params.end),
     duration: params.duration,
-    limit: params.limit,
-    order_by: params.orderBy,
-    policy: params.policy,
-    approx_points: params.approxPoints,
-    measurement: target.measurement,
-    fields: target.fields,
-    epoch,
-  });
+    fields,
+  };
+}
 
 @Module({ generateMutationSetters: true })
 export class HistoryModule extends VuexModule {
   public sessions: LoggedSession[] = [];
-  public freshFields: Mapped<string[]> = {};
-  public allFields: Mapped<string[]> = {};
+  public fieldsDuration: JSQuantity = bloxQty('1d')
+  public fields: Mapped<string[]> = {};
   public sources: HistorySource[] = [];
 
   private streamConnected = false;
@@ -48,7 +42,7 @@ export class HistoryModule extends VuexModule {
       this.stream.send(JSON.stringify({
         id: src.id,
         command: src.command,
-        query: buildQuery(src.params, src.target),
+        query: buildQuery(src.params, src.fields),
       }));
     }
   }
@@ -95,12 +89,12 @@ export class HistoryModule extends VuexModule {
     return findById(this.sessions, id);
   }
 
-  public sourceById(id: string | null): HistorySource | null {
-    return findById(this.sources, id);
+  public sourceById<T extends HistorySource>(id: string | null): T | null {
+    return findById(this.sources, id) as T | null;
   }
 
   @Mutation
-  public transform({ id, data }: { id: string; data: QueryResult }): void {
+  public transform({ id, data }: { id: string; data: any }): void {
     const source = this.sourceById(id);
     if (source !== null) {
       this.sources = concatById(this.sources, source.transformer(source, data));
@@ -134,24 +128,41 @@ export class HistoryModule extends VuexModule {
   }
 
   @Action
-  public async removeSource(source: HistorySource): Promise<void> {
-    this.endQuery(source);
-    this.sources = filterById(this.sources, source);
+  public async removeSource(source: Maybe<HistorySource>): Promise<void> {
+    if (source) {
+      this.endQuery(source);
+      this.sources = filterById(this.sources, source);
+    }
   }
 
   @Action
-  public async fetchFreshFields(): Promise<void> {
-    this.freshFields = await historyApi.fetchFields(false);
+  public async fetchFields(): Promise<void> {
+    const s = this.fieldsDuration.to('s').round(0).toString();
+    const fields = await historyApi.fetchFields(s);
+    this.fields = fields
+      .reduce(
+        (acc: Mapped<string[]>, f: string) => {
+          const [service, ...sections] = f.split('/');
+          const arr = acc[service] ?? [];
+          return { ...acc, [service]: [...arr, sections.join('/')] };
+        },
+        {},
+      );
   }
 
   @Action
-  public async fetchAllFields(): Promise<void> {
-    this.allFields = await historyApi.fetchFields(true);
-  }
-
-  @Action
-  public async fetchValues([params, target, epoch]: [QueryParams, QueryTarget, string]): Promise<QueryResult> {
-    return await historyApi.fetchValues(buildQuery(params, target, epoch));
+  public async downloadCsv({
+    params,
+    fields,
+    precision,
+    fileName,
+  }: {
+    params: QueryParams;
+    fields: string[];
+    precision: CsvPrecision;
+    fileName: string;
+  }): Promise<void> {
+    exportFile(fileName, await historyApi.downloadCsv({ ...buildQuery(params, fields), precision }));
   }
 
   @Action

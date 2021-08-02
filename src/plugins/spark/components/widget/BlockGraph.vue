@@ -2,7 +2,7 @@
 import { Layout } from 'plotly.js';
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 
-import { defaultPresets, emptyGraphConfig } from '@/plugins/history/getters';
+import { defaultPresets, emptyGraphConfig } from '@/plugins/history/const';
 import { targetSplitter } from '@/plugins/history/nodes';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
 import { createDialog } from '@/utils/dialog';

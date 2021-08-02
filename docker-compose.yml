@@ -6,12 +6,16 @@ services:
     labels:
       - traefik.http.services.eventbus.loadbalancer.server.port=15675
 
-  influx:
-    image: influxdb:1.8
+  victoria:
+    image: victoriametrics/victoria-metrics:v1.63.0
     labels:
-      - traefik.enable=false
+      - traefik.http.services.victoria.loadbalancer.server.port=8428
     volumes:
-      - ./dev/influxdb/:/var/lib/influxdb/
+      - ./dev/victoria:/victoria-metrics-data
+    command: >-
+      --retentionPeriod=100y
+      --influxMeasurementFieldSeparator=/
+      --http.pathPrefix=/victoria
 
   redis:
     image: redis:6.0

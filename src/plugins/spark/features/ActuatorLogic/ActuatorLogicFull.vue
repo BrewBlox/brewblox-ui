@@ -19,8 +19,8 @@ import { prettyLink } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
+import { characterTitles, logicResultTitles, nonErrorResults } from './const';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
-import { characterTitles, logicResultTitles, nonErrorResults } from './getters';
 import { ExpressionError } from './types';
 import {
   analogIdx,

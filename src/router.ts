@@ -37,6 +37,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/plugins/builder/BreweryPage.vue'),
         props: true,
       },
+      {
+        path: '/graph/:routeId',
+        component: () => import('@/plugins/history/GraphPage.vue'),
+        props: true,
+      },
     ],
   },
 

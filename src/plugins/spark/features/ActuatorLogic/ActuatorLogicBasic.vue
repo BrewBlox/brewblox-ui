@@ -12,8 +12,8 @@ import { createDialog } from '@/utils/dialog';
 import { prettyLink } from '@/utils/formatting';
 
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
+import { logicResultTitles, nonErrorResults } from './const';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
-import { logicResultTitles, nonErrorResults } from './getters';
 import { ExpressionError } from './types';
 import {
   analogIdx, analogKey,

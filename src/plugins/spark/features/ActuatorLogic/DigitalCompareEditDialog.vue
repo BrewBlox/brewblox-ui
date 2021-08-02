@@ -6,7 +6,7 @@ import { useDialog } from '@/composables';
 import { DigitalCompare, DigitalCompareOp } from '@/plugins/spark/types';
 import { deepCopy } from '@/utils/objects';
 
-import { digitalOpTitles } from './getters';
+import { digitalOpTitles } from './const';
 
 const operatorOpts: SelectOption[] = Enum.values(DigitalCompareOp)
   .map(value => ({ value, label: digitalOpTitles[value] }));

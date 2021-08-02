@@ -1,11 +1,10 @@
 import { dashboardStore } from '@/store/dashboards';
 import { Widget, widgetStore } from '@/store/widgets';
 import { createDialogPromise } from '@/utils/dialog';
-import { saveFile } from '@/utils/import-export';
 
-import { typeName as graphType } from './Graph/getters';
+import { typeName as graphType } from './Graph/const';
 import { historyStore } from './store';
-import { GraphConfig, SharedGraphConfig } from './types';
+import { CsvPrecision, GraphConfig, SharedGraphConfig } from './types';
 
 export const sharedWidgetConfigs = (excluded: string[] = []): SharedGraphConfig[] =>
   widgetStore.widgets
@@ -15,16 +14,15 @@ export const sharedWidgetConfigs = (excluded: string[] = []): SharedGraphConfig[
       return { id, title: `[${dashboardStore.dashboardTitle(dashboard)}] ${title}`, config };
     });
 
-type ExportPrecision = 'ns' | 'ms' | 's' | 'ISO8601';
 
-const precisionOpts: SelectOption<ExportPrecision>[] = [
+const precisionOpts: SelectOption<CsvPrecision>[] = [
   { label: 'Nanoseconds since 1-1-1970', value: 'ns' },
   { label: 'Milliseconds since 1-1-1970', value: 'ms' },
   { label: 'Seconds since 1-1-1970', value: 's' },
   { label: 'String (ISO-8601)', value: 'ISO8601' },
 ];
 
-export async function selectGraphPrecision(): Promise<ExportPrecision | undefined> {
+export async function selectGraphPrecision(): Promise<CsvPrecision | undefined> {
   return await createDialogPromise({
     component: 'SelectDialog',
     componentProps: {
@@ -41,26 +39,13 @@ export async function selectGraphPrecision(): Promise<ExportPrecision | undefine
 
 export async function saveGraphToFile(
   config: GraphConfig,
-  precision: ExportPrecision,
+  precision: CsvPrecision,
   header: string,
 ): Promise<void> {
-  const isText = precision === 'ISO8601';
-  const epoch = isText ? 'ms' : precision;
-  const params = { ...config.params, policy: 'downsample_1m' };
-
-  for (const target of config.targets) {
-    const result = await historyStore.fetchValues([params, target, epoch]);
-    if (isText) {
-      result
-        .values
-        .forEach(slice => slice[0] = new Date(slice[0]).toISOString() as any);
-    }
-    const lines: string[] = [
-      result.columns.join(),
-      ...result
-        .values
-        .map(slice => slice.map(v => v === null ? '' : v.toString()).join()),
-    ];
-    saveFile(lines.join('\n'), `${header}__${result.name}.csv`, true);
-  }
+  await historyStore.downloadCsv({
+    params: config.params,
+    fields: config.targets.flatMap(t => t.fields.map(f => `${t.measurement}/${f}`)),
+    precision,
+    fileName: `${header}.csv`,
+  });
 }

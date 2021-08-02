@@ -10,7 +10,7 @@ import { isQuantity } from '@/utils/identity';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, tempQty } from '@/utils/quantity';
 
-import { analogOpTitles } from './getters';
+import { analogOpTitles } from './const';
 
 const operatorOpts = Enum.values(AnalogCompareOp)
   .map(value => ({ value, label: analogOpTitles[value] }));
