@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import defaults from 'lodash/defaults';
 import isEqual from 'lodash/isEqual';
+import isFinite from 'lodash/isFinite';
 import toFinite from 'lodash/toFinite';
 import { Ref, ref, watch } from 'vue';
 
@@ -60,7 +61,10 @@ export const useSvgZoom: UseSvgZoomComposable = {
 
     const gridZoom = d3.zoom<SVGElement, unknown>()
       .on('zoom', function () {
-        svgContentRef.value?.setAttribute('transform', d3.event.transform);
+        const { transform } = d3.event;
+        if (isFinite(transform.x + transform.y + transform.k)) {
+          svgContentRef.value?.setAttribute('transform', transform);
+        }
       });
 
     function resetZoom(): void {

@@ -76,6 +76,7 @@ export default defineComponent({
     :maximized="dense"
     v-bind="dialogProps"
     class="row"
+    transition-show="fade"
     @hide="onDialogHide"
   >
     <WidgetProvider :widget-id="widgetId" :context="context">
