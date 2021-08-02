@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Layout } from 'plotly.js';
-import { defineComponent } from 'vue';
+import { defineComponent, nextTick, ref } from 'vue';
 
 import { useContext } from '@/composables';
 import { QueryParams } from '@/plugins/history/types';
@@ -17,15 +17,30 @@ export default defineComponent({
       graphConfig,
     } = useBlockWidget.setup();
 
+    const sourceRevision = ref<Date>(new Date());
+    const renderRevision = ref<Date>(new Date());
+
+    async function refresh(): Promise<void> {
+      await nextTick();
+      renderRevision.value = new Date();
+    }
+
+    async function regraph(): Promise<void> {
+      await nextTick();
+      sourceRevision.value = new Date();
+    }
+
     function saveGraphParams(params: QueryParams): void {
       if (graphConfig.value) {
         graphConfig.value = { ...graphConfig.value, params };
+        regraph();
       }
     }
 
     function saveGraphLayout(layout: Partial<Layout>): void {
       if (graphConfig.value) {
         graphConfig.value = { ...graphConfig.value, layout };
+        refresh();
       }
     }
 
@@ -33,6 +48,8 @@ export default defineComponent({
       context,
       widgetId,
       graphConfig,
+      sourceRevision,
+      renderRevision,
       saveGraphParams,
       saveGraphLayout,
     };
@@ -44,7 +61,8 @@ export default defineComponent({
   <HistoryGraph
     :graph-id="widgetId"
     :config="graphConfig"
-    :refresh-trigger="context.mode"
+    :source-revision="sourceRevision"
+    :render-revision="renderRevision"
     use-presets
     use-range
     @params="saveGraphParams"

@@ -89,15 +89,19 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       && sparkStore.fieldSpecs.some(f => f.type === block.value.type && f.graphed);
 
     const graphConfig = computed<GraphConfig | null>({
-      get: () => hasGraph ? makeBlockGraphConfig(block.value, config.value) : null,
+      get: () => hasGraph
+        ? makeBlockGraphConfig(block.value, config.value)
+        : null,
       set: cfg => {
-        const updated: BlockConfig = {
-          ...config.value,
-          queryParams: cfg?.params,
-          graphAxes: cfg?.axes,
-          graphLayout: cfg?.layout,
-        };
-        widgetStore.saveWidget({ ...widget.value, config: updated });
+        if (hasGraph) {
+          const updated: BlockConfig = {
+            ...config.value,
+            queryParams: cfg?.params,
+            graphAxes: cfg?.axes,
+            graphLayout: cfg?.layout,
+          };
+          widgetStore.saveWidget({ ...widget.value, config: updated });
+        }
       },
     });
 
