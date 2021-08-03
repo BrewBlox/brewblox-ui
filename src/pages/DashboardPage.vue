@@ -174,6 +174,7 @@ export default defineComponent({
         <div
           v-else-if="dense"
           class="column q-gutter-y-sm q-pa-md"
+          style="width: 100vw"
         >
           <WidgetProvider
             v-for="val in dashboardItems"
@@ -184,7 +185,7 @@ export default defineComponent({
             <component
               :is="val.component"
               :error="val.error"
-              class="col full-width"
+              class="col"
               @dblclick.stop
             />
           </WidgetProvider>
