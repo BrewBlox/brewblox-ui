@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 
 import { useValEdit } from '@/plugins/spark/composables';
 import { createDialog } from '@/utils/dialog';
@@ -17,6 +17,7 @@ export default defineComponent({
       field,
       startEdit,
     } = useValEdit.setup<number>(props.modelValue);
+    const local = ref<number>(field.value);
 
     function showKeyboard(): void {
       createDialog({
@@ -29,10 +30,17 @@ export default defineComponent({
         .onOk(v => field.value = v);
     }
 
+    function syncField(): void {
+      if (isFinite(local.value)) {
+        field.value = local.value;
+      }
+    }
+
     return {
-      field,
+      local,
       startEdit,
       showKeyboard,
+      syncField,
     };
   },
 });
@@ -41,11 +49,12 @@ export default defineComponent({
 <template>
   <q-input
     v-if="editable"
-    v-model.number="field"
+    v-model.number="local"
     inputmode="numeric"
     pattern="[0-9\.]*"
     item-aligned
     dense
+    @change="syncField"
   >
     <template #append>
       <KeyboardButton @click="showKeyboard" />
@@ -56,6 +65,6 @@ export default defineComponent({
     class="clickable q-pa-sm rounded-borders"
     @click="startEdit"
   >
-    {{ field }}
+    {{ local }}
   </div>
 </template>
