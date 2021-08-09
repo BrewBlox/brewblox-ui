@@ -306,8 +306,9 @@ export interface DS2408Block extends Block {
   data: {
     address: string;
     pins: Readonly<IoPin[]>;
-    connected: Readonly<boolean>;
     connectMode: DS2408ConnectMode;
+    connected: Readonly<boolean>;
+    oneWireBusId: Readonly<number>;
   };
 }
 // #endregion DS2408
@@ -319,6 +320,7 @@ export interface DS2413Block extends Block {
     address: string;
     pins: Readonly<IoPin[]>;
     connected: Readonly<boolean>;
+    oneWireBusId: Readonly<number>;
   };
 }
 // #endregion DS2413
@@ -489,6 +491,40 @@ export interface Spark3PinsBlock extends Block {
   };
 }
 // #endregion Spark3Pins
+
+// #region OneWireGpioModule
+export interface GpioChannel {
+  id: number;
+  config: ChannelConfig;
+  pins: number;
+  whenActive: number;
+  whenInactive: number;
+  pwmDuty: number;
+}
+
+export enum GpioModuleStatus {
+  NONE = 0,
+  POWER_ON_RESET = 1 << 0,
+  OVERVOLTAGE = 1 << 1,
+  UNDERVOLTAGE_LOCKOUT = 1 << 2,
+  OVERCURRENT = 1 << 3,
+  OPEN_LOAD = 1 << 4,
+  OVERTEMPERATURE_WARNING = 1 << 5,
+  OVERTEMPERATURE_SHUTDOWN = 1 << 6,
+}
+
+export interface OneWireGpioModule extends Block {
+  type: 'OneWireGpioModule',
+  data: {
+    channels: GpioChannel[];
+    modulePosition: number;
+    status: Readonly<GpioModuleStatus>;
+    drive: Readonly<number>;
+    overCurrent: Readonly<number>;
+    openload: Readonly<number>;
+  }
+}
+// #endregion OneWireGpioModule
 
 // #region SysInfo
 export interface SysInfoBlock extends Block {

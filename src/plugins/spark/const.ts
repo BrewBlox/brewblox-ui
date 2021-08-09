@@ -86,16 +86,21 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
   MutexInterface: [
     BlockType.Mutex,
   ],
+  OneWireBusInterface: [
+    BlockType.OneWireGpioModule,
+  ],
   OneWireDeviceInterface: [
     BlockType.TempSensorOneWire,
     BlockType.DS2408,
     BlockType.DS2413,
   ],
+  IoModuleInterface: [],
   IoArrayInterface: [
     BlockType.DS2408,
     BlockType.DS2413,
     BlockType.Spark2Pins,
     BlockType.Spark3Pins,
+    BlockType.OneWireGpioModule,
     BlockType.MockPins,
   ],
   DS2408Interface: [

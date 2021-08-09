@@ -15,7 +15,9 @@ export const BlockIntfType = Enum(
   'ActuatorDigitalInterface',
   'BalancerInterface',
   'MutexInterface',
+  'OneWireBusInterface',
   'OneWireDeviceInterface',
+  'IoModuleInterface',
   'IoArrayInterface',
   'DS2408Interface',
 );
@@ -30,6 +32,7 @@ export const SystemBlockType = Enum(
   'WiFiSettings',
   'Spark2Pins',
   'Spark3Pins',
+  'OneWireGpioModule',
 );
 
 export const UserBlockType = Enum(
@@ -81,10 +84,19 @@ export const AnalogConstraintKey = Enum(
 // #region ChannelConfig
 export const ChannelConfig = Enum(
   'CHANNEL_UNUSED',
-  'CHANNEL_ACTIVE_LOW',
-  'CHANNEL_ACTIVE_HIGH',
+  'CHANNEL_DRIVING_OFF',
+  'CHANNEL_DRIVING_ON',
+  'CHANNEL_DRIVING_REVERSE',
+  'CHANNEL_DRIVING_BRAKE_LOW_SIDE',
+  'CHANNEL_DRIVING_BRAKE_HIGH_SIDE',
+  'CHANNEL_DRIVING_PWM',
+  'CHANNEL_DRIVING_PWM_REVERSE',
   'CHANNEL_INPUT',
   'CHANNEL_UNKNOWN',
+
+  // Kept for backwards compatibility
+  'CHANNEL_ACTIVE_LOW', // == CHANNEL_DRIVING_OFF
+  'CHANNEL_ACTIVE_HIGH', // == CHANNEL_DRIVING_ON
 );
 // #endregion ChannelConfig
 
@@ -207,6 +219,8 @@ export const TouchCalibrated = Enum(
   'CALIBRATED_NEW',
 );
 // #endregion TouchCalibrated
+
+// #region
 
 // #region Wifi
 export const WifiSecurityType = Enum(
