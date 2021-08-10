@@ -513,7 +513,7 @@ export enum GpioModuleStatus {
   OVERTEMPERATURE_SHUTDOWN = 1 << 6,
 }
 
-export interface OneWireGpioModule extends Block {
+export interface OneWireGpioModuleBlock extends Block {
   type: 'OneWireGpioModule',
   data: {
     channels: GpioChannel[];
@@ -521,7 +521,7 @@ export interface OneWireGpioModule extends Block {
     status: Readonly<GpioModuleStatus>;
     drive: Readonly<number>;
     overCurrent: Readonly<number>;
-    openload: Readonly<number>;
+    openLoad: Readonly<number>;
   }
 }
 // #endregion OneWireGpioModule
