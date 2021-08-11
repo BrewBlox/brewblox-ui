@@ -393,6 +393,52 @@ export interface OneWireBusBlock extends Block {
 }
 // #endregion OneWireBus
 
+// #region OneWireGpioModule
+export enum GpioChannelPins {
+  NONE = 0,
+  PIN_1 = 1 << 0,
+  PIN_2 = 1 << 1,
+  PIN_3 = 1 << 2,
+  PIN_4 = 1 << 3,
+  PIN_5 = 1 << 4,
+  PIN_6 = 1 << 5,
+  PIN_7 = 1 << 6,
+  PIN_8 = 1 << 7,
+}
+
+export interface GpioChannel {
+  id: number;
+  config: ChannelConfig;
+  pins: GpioChannelPins;
+  whenActive: number;
+  whenInactive: number;
+  pwmDuty: number;
+}
+
+export enum GpioModuleStatus {
+  NONE = 0,
+  POWER_ON_RESET = 1 << 0,
+  OVERVOLTAGE = 1 << 1,
+  UNDERVOLTAGE_LOCKOUT = 1 << 2,
+  OVERCURRENT = 1 << 3,
+  OPEN_LOAD = 1 << 4,
+  OVERTEMPERATURE_WARNING = 1 << 5,
+  OVERTEMPERATURE_SHUTDOWN = 1 << 6,
+}
+
+export interface OneWireGpioModuleBlock extends Block {
+  type: 'OneWireGpioModule',
+  data: {
+    channels: GpioChannel[];
+    modulePosition: number;
+    status: Readonly<GpioModuleStatus>;
+    drive: Readonly<number>;
+    overCurrent: Readonly<number>;
+    openLoad: Readonly<number>;
+  }
+}
+// #endregion OneWireGpioModule
+
 // #region Pid
 export interface PidBlock extends Block {
   type: 'Pid';
@@ -491,40 +537,6 @@ export interface Spark3PinsBlock extends Block {
   };
 }
 // #endregion Spark3Pins
-
-// #region OneWireGpioModule
-export interface GpioChannel {
-  id: number;
-  config: ChannelConfig;
-  pins: number;
-  whenActive: number;
-  whenInactive: number;
-  pwmDuty: number;
-}
-
-export enum GpioModuleStatus {
-  NONE = 0,
-  POWER_ON_RESET = 1 << 0,
-  OVERVOLTAGE = 1 << 1,
-  UNDERVOLTAGE_LOCKOUT = 1 << 2,
-  OVERCURRENT = 1 << 3,
-  OPEN_LOAD = 1 << 4,
-  OVERTEMPERATURE_WARNING = 1 << 5,
-  OVERTEMPERATURE_SHUTDOWN = 1 << 6,
-}
-
-export interface OneWireGpioModuleBlock extends Block {
-  type: 'OneWireGpioModule',
-  data: {
-    channels: GpioChannel[];
-    modulePosition: number;
-    status: Readonly<GpioModuleStatus>;
-    drive: Readonly<number>;
-    overCurrent: Readonly<number>;
-    openLoad: Readonly<number>;
-  }
-}
-// #endregion OneWireGpioModule
 
 // #region SysInfo
 export interface SysInfoBlock extends Block {
