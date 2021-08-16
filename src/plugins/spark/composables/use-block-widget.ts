@@ -1,3 +1,4 @@
+import debounce from 'lodash/debounce';
 import { computed, ComputedRef, Ref, ref, UnwrapRef, watch, WritableComputedRef } from 'vue';
 
 import { useWidget, UseWidgetComponent } from '@/composables';
@@ -57,6 +58,16 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       throw new Error(`Block not found: (${serviceId} / ${blockId})`);
     }
 
+    const debouncedCheckValid = debounce(
+      () => {
+        if (!sparkModule.blockById(config.value.blockId)) {
+          invalidate();
+        }
+      },
+      1000,
+      { leading: false, trailing: true },
+    );
+
     watch(
       () => sparkModule.blockById(config.value.blockId),
       (newV) => {
@@ -64,7 +75,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
           block.value = newV;
         }
         else {
-          invalidate();
+          debouncedCheckValid();
         }
       },
     );
