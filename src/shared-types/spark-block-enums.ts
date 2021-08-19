@@ -100,11 +100,74 @@ export const ChannelConfig = Enum(
 );
 // #endregion ChannelConfig
 
+// #region ChannelStatus
+export const ChannelStatus = Enum(
+  'UNKNOWN',
+  'OPERATIONAL',
+  'OVERCURRENT',
+  'OPEN_LOAD',
+  'UNDERVOLTAGE',
+  'OVERVOLTAGE',
+  'OVERTEMPERATURE_SHUTDOWN',
+  'OVERTEMPERATURE_WARNING',
+  'POWER_ON_RESET',
+);
+// #endregion ChannelStatus
+
+// #region GpioDeviceType
+export const GpioDeviceType = Enum(
+  'NONE',
+  'TWO_PIN_SSR',
+  'ONE_PIN_SSR',
+  'SINGLE_PIN_COIL_TO_EXTERNAL_GND',
+  'SINGLE_PIN_COIL_TO_EXTERNAL_PWR',
+  'TWO_PIN_COIL',
+  'TWO_PIN_COIL_PUSH_PULL',
+  'TWO_PIN_MOTOR_UNIDIRECTIONAL',
+  'SINGLE_PIN_MOTOR_HIGH_SIDE',
+  'SINGLE_PIN_MOTOR_LOW_SIDE',
+  'TWO_PIN_MOTOR_BIDIRECTIONAL',
+  'TWO_PIN_SWITCH_INPUT',
+  'SWITCH_TO_EXTERNAL_GND',
+  'SWITCH_TO_PWR',
+  'POWERED_SWITCH_TO_EXTERNAL_GND',
+  'POWERED_SWITCH_TO_EXTERNAL_PWR',
+);
+// #endregion GpioDeviceType
+
+// #region GpioPins
+export enum GpioPins {
+  NONE = 0,
+  PIN_1 = 1 << 0,
+  PIN_2 = 1 << 1,
+  PIN_3 = 1 << 2,
+  PIN_4 = 1 << 3,
+  PIN_5 = 1 << 4,
+  PIN_6 = 1 << 5,
+  PIN_7 = 1 << 6,
+  PIN_8 = 1 << 7,
+}
+// #endregion GpioPins
+
+// #region GpioModuleStatus
+export enum GpioModuleStatus {
+  NONE = 0,
+  POWER_ON_RESET = 1 << 0,
+  OVERVOLTAGE = 1 << 1,
+  UNDERVOLTAGE_LOCKOUT = 1 << 2,
+  OVERCURRENT = 1 << 3,
+  OPEN_LOAD = 1 << 4,
+  OVERTEMPERATURE_WARNING = 1 << 5,
+  OVERTEMPERATURE_SHUTDOWN = 1 << 6,
+}
+// #endregion GpioModuleStatus
+
 // #region DigitalState
 export const DigitalState = Enum(
   'STATE_INACTIVE',
   'STATE_ACTIVE',
   'STATE_UNKNOWN',
+  'STATE_REVERSE',
 );
 // #endregion DigitalState
 
@@ -249,6 +312,8 @@ export type BlockOrIntfType = Enum<typeof BlockOrIntfType>;
 export type DigitalConstraintKey = Enum<typeof DigitalConstraintKey>;
 export type AnalogConstraintKey = Enum<typeof AnalogConstraintKey>;
 export type ChannelConfig = Enum<typeof ChannelConfig>;
+export type ChannelStatus = Enum<typeof ChannelStatus>;
+export type GpioDeviceType = Enum<typeof GpioDeviceType>;
 export type DigitalState = Enum<typeof DigitalState>;
 export type DigitalCompareOp = Enum<typeof DigitalCompareOp>;
 export type AnalogCompareOp = Enum<typeof AnalogCompareOp>;

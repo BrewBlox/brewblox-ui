@@ -13,6 +13,7 @@ export const digitalStateTitles: Record<DigitalState, string> = {
   [DigitalState.STATE_ACTIVE]: 'ON',
   [DigitalState.STATE_INACTIVE]: 'OFF',
   [DigitalState.STATE_UNKNOWN]: 'UNKNOWN',
+  [DigitalState.STATE_REVERSE]: 'REVERSED',
 };
 
 export const digitalOpTitles: Record<DigitalCompareOp, string> = {

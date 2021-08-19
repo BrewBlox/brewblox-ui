@@ -3,11 +3,15 @@ import type {
   BlockOrIntfType,
   BlockType,
   ChannelConfig,
+  ChannelStatus,
   DigitalCompareOp,
   DigitalState,
   DisplayTempUnit,
   DS2408ConnectMode,
   FilterChoice,
+  GpioDeviceType,
+  GpioModuleStatus,
+  GpioPins,
   LogicResult,
   ReferenceKind,
   SensorCombiFunc,
@@ -394,47 +398,33 @@ export interface OneWireBusBlock extends Block {
 // #endregion OneWireBus
 
 // #region OneWireGpioModule
-export enum GpioChannelPins {
-  NONE = 0,
-  PIN_1 = 1 << 0,
-  PIN_2 = 1 << 1,
-  PIN_3 = 1 << 2,
-  PIN_4 = 1 << 3,
-  PIN_5 = 1 << 4,
-  PIN_6 = 1 << 5,
-  PIN_7 = 1 << 6,
-  PIN_8 = 1 << 7,
-}
-
-export interface GpioChannel {
+export interface GpioModuleChannel {
   id: number;
-  config: ChannelConfig;
-  pins: GpioChannelPins;
-  whenActive: number;
-  whenInactive: number;
-  pwmDuty: number;
-}
-
-export enum GpioModuleStatus {
-  NONE = 0,
-  POWER_ON_RESET = 1 << 0,
-  OVERVOLTAGE = 1 << 1,
-  UNDERVOLTAGE_LOCKOUT = 1 << 2,
-  OVERCURRENT = 1 << 3,
-  OPEN_LOAD = 1 << 4,
-  OVERTEMPERATURE_WARNING = 1 << 5,
-  OVERTEMPERATURE_SHUTDOWN = 1 << 6,
+  deviceType: GpioDeviceType;
+  pinsMask: GpioPins;
+  status: Readonly<ChannelStatus>;
+  config: Readonly<ChannelConfig>;
+  state: Readonly<DigitalState>;
+  pwmDuty: Readonly<number>;
 }
 
 export interface OneWireGpioModuleBlock extends Block {
   type: 'OneWireGpioModule',
   data: {
-    channels: GpioChannel[];
+    channels: GpioModuleChannel[];
     modulePosition: number;
-    status: Readonly<GpioModuleStatus>;
-    drive: Readonly<number>;
-    overCurrent: Readonly<number>;
-    openLoad: Readonly<number>;
+    moduleStatus: GpioModuleStatus;
+    pullUp: Readonly<GpioPins>;
+    pullUpWhenActive: Readonly<GpioPins>;
+    pullUpWhenInactive: Readonly<GpioPins>;
+    pullDown: Readonly<GpioPins>;
+    pullDownWhenActive: Readonly<GpioPins>;
+    pullDownWhenInactive: Readonly<GpioPins>;
+    pullUpOverCurrent: Readonly<GpioPins>;
+    pullDownOverCurrent: Readonly<GpioPins>;
+    pullUpOpenLoad: Readonly<GpioPins>;
+    pullDownOpenLoad: Readonly<GpioPins>;
+    moduleStatusClear: GpioPins; // write-only
   }
 }
 // #endregion OneWireGpioModule
