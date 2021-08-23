@@ -1,6 +1,6 @@
 {
   "recommendations": [
-    "octref.vetur",
+    "johnsoncodehk.volar",
     "editorconfig.editorconfig",
     "syler.sass-indented",
     "orta.vscode-jest",

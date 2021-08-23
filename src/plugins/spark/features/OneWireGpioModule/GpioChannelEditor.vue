@@ -1,80 +1,217 @@
 <script lang="ts">
-import { computed, defineComponent, PropType, reactive } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
-// import { OneWireGpioModuleBlock } from '@/shared-types';
+import {
+  ChannelConfig,
+  ChannelStatus,
+  DigitalState,
+  GpioDeviceType,
+  GpioModuleChannel,
+  GpioPins,
+  OneWireGpioModuleBlock,
+} from '@/shared-types';
 
-interface DeviceOpt {
+interface DeviceSlot {
+  id: number;
   name: string;
-  length: number;
-}
-
-interface DeviceSlot extends DeviceOpt {
   start: number;
+  width: number;
 }
 
-const deviceOpts: DeviceOpt[] = [
-  { name: '1-pin', length: 1 },
-  { name: '2-pin', length: 2 },
-  { name: '3-pin', length: 3 },
-  { name: '4-pin', length: 4 },
-];
+interface UnusedSlot {
+  start: number;
+  free: number;
+}
 
-const empty: DeviceOpt = { name: '', length: 1 };
+function startBit(n: number): number {
+  return n > 0
+    ? Math.log2(n & -n)
+    : -1;
+}
 
 export default defineComponent({
   name: 'GpioChannelEditor',
   props: {
-    // block: {
-    //   type: Object as PropType<OneWireGpioModuleBlock>,
-    //   required: true,
-    // },
+    block: {
+      type: Object as PropType<OneWireGpioModuleBlock>,
+      required: true,
+    },
   },
-  setup() {
+  emits: ['update:block'],
+  setup(props, { emit }) {
+    const selectedId = ref<number | null>(null);
 
-    const unassigned = reactive<DeviceSlot[]>([]);
 
-    const slots1 = reactive<DeviceSlot[]>(
-      [
-        { ...deviceOpts[0], start: 2 },
-        { ...deviceOpts[2], start: 3 },
-        { ...deviceOpts[1], start: 7 },
-      ],
+    const selectedChannel = computed<GpioModuleChannel | null>(
+      () => props.block.data.channels
+        .find(c => c.id === selectedId.value)
+        ?? null,
     );
 
-    const fillCount1 = computed<number>(
-      () => 8 - slots1.reduce((acc: number, slot: DeviceSlot) => acc + slot.length, 0),
-    );
-
-    const slots2 = reactive<DeviceSlot[]>(
-      [
-        { ...deviceOpts[3], start: 1 },
-        { ...deviceOpts[2], start: 5 },
-      ],
-    );
-
-    const fillCount2 = computed<number>(
-      () => 8 - slots2.reduce((acc: number, slot: DeviceSlot) => acc + slot.length, 0),
-    );
-
-    function clickSlot1(idx: number): void {
-      const [v] = slots1.splice(idx, 1);
-      unassigned.push(v);
+    function saveBlock(v: OneWireGpioModuleBlock = props.block): void {
+      emit('update:block', v);
     }
 
-    function clickUnassigned(idx: number): void {
-      const [v] = unassigned.splice(idx, 1);
-      slots1.push(v);
+    const unassigned = computed<DeviceSlot[]>(
+      () => props.block.data.channels
+        .filter(c => c.pinsMask === GpioPins.NONE)
+        .map(c => ({
+          id: c.id,
+          name: c.deviceType,
+          width: c.width,
+          start: -1,
+        })),
+    );
+
+    const active = computed<DeviceSlot[]>(
+      () => props.block.data.channels
+        .filter(c => c.pinsMask !== GpioPins.NONE)
+        .map(c => ({
+          id: c.id,
+          name: c.deviceType,
+          width: c.width,
+          start: startBit(c.pinsMask),
+        })),
+    );
+
+    const unused = computed<UnusedSlot[]>(
+      () => {
+        // always set a bit at idx 8
+        // this provides an upper boundary when calculating free space
+        const mask: number = props.block.data.channels
+          .reduce((acc, c) => acc | c.pinsMask, (1 << 8));
+
+        const output: UnusedSlot[] = [];
+        for (let i = 0; i <= 8; i++) {
+          if (!((1 << i) & mask)) {
+            output.push({
+              start: i,
+              free: startBit(mask >> i),
+            });
+          }
+        }
+        return output;
+      },
+    );
+
+    function clickUnassignedArea(): void {
+      const channel = selectedChannel.value;
+      if (!channel) {
+        return;
+      }
+      saveBlock({
+        ...props.block,
+        data: {
+          ...props.block.data,
+          channels: props.block.data.channels
+            .map(c =>
+              c.id === channel.id
+                ? { ...c, pinsMask: GpioPins.NONE }
+                : c,
+            ),
+        },
+          });
+    }
+
+    function clickUnassigned(id: number): void {
+      if (selectedId.value === id) {
+        selectedId.value = null;
+      }
+      else {
+        selectedId.value = id;
+      }
+    }
+
+    function clickActive(id: number): void {
+      if (selectedId.value === id) {
+        selectedId.value = null;
+      }
+      else {
+        selectedId.value = id;
+      }
+    }
+
+    function buildMask(start: number, width: number): number {
+      let mask = 0;
+      for (let i = 0; i < width; i++) {
+        mask |= (1 << (i + start));
+      }
+      return mask;
+    }
+
+    function clickUnused(start: number): void {
+      const channel = selectedChannel.value;
+      if (!channel) {
+        return;
+      }
+      saveBlock({
+        ...props.block,
+        data: {
+          ...props.block.data,
+          channels: props.block.data.channels
+            .map(c =>
+              c.id === channel.id
+                ? { ...c, pinsMask: buildMask(start, channel.width) }
+                : c,
+            ),
+        },
+      });
+    }
+
+    function unusedId(): number {
+      const ids = props.block.data.channels.map(c => c.id);
+      let i = 0;
+      while (ids.includes(i)) {
+        i++;
+      }
+      return i;
+    }
+
+    function addChannel(): void {
+      const id = unusedId();
+      const channel: GpioModuleChannel = {
+        id,
+        deviceType: GpioDeviceType.TWO_PIN_SSR,
+        pinsMask: GpioPins.NONE,
+        width: 2,
+        status: ChannelStatus.UNKNOWN,
+        config: ChannelConfig.CHANNEL_UNUSED,
+        state: DigitalState.STATE_UNKNOWN,
+        pwmDuty: 0,
+      };
+      saveBlock({
+        ...props.block,
+        data: {
+          ...props.block.data,
+          channels: [
+            ...props.block.data.channels,
+            channel,
+          ],
+        },
+      });
+    }
+
+    function editChannel(id: number): void {
+
+    }
+
+    function removeChannel(id: number): void {
+
     }
 
     return {
-      deviceOpts,
+      selectedId,
+      selectedChannel,
       unassigned,
-      slots1,
-      slots2,
-      fillCount1,
-      fillCount2,
-      clickSlot1,
+      active,
+      unused,
+      clickUnassignedArea,
       clickUnassigned,
+      clickActive,
+      clickUnused,
+      addChannel,
+      editChannel,
+      removeChannel,
     };
   },
 });
@@ -82,14 +219,26 @@ export default defineComponent({
 
 <template>
   <div>
-    Unassigned
-    <div class="container unassigned-area">
+    <div class="row q-gutter-md">
+      <q-btn flat label="new" :disable="block.data.channels.length >= 8" @click="addChannel" />
+      <q-btn v-if="selectedId != null" flat label="edit" @click="editChannel" />
+      <q-btn v-if="selectedId != null" flat label="remove" @click="removeChannel" />
+    </div>Unassigned
+    <div
+      :class="[
+        'container unassigned-area',
+        selectedId !== null && 'bg-selected'
+      ]"
+      @click="clickUnassignedArea"
+    >
       <div
-        v-for="(slot, idx) in unassigned"
-        :key="`slot-0-${slot.start}`"
-        class="content"
-        :style="`grid-column-end: span ${slot.length}`"
-        @click="clickUnassigned(idx)"
+        v-for="slot in unassigned"
+        :key="`unassigned-${slot.start}`"
+        :class="['content', selectedId === slot.id && 'bg-selected']"
+        :style="{
+          gridColumnEnd: `span ${slot.width}`,
+        }"
+        @click="clickUnassigned(slot.id)"
       >
         {{ slot.name }}
       </div>
@@ -97,33 +246,26 @@ export default defineComponent({
     Gpio Modules
     <div class="container pins-area">
       <div
-        v-for="(slot, idx) in slots1"
-        :key="`slot-1-${slot.start}`"
-        class="content"
-        :style="`grid-column: ${slot.start} / span ${slot.length}`"
-        @click="clickSlot1(idx)"
+        v-for="slot in active"
+        :key="`active-${slot.start}`"
+        :class="{
+          content: true,
+          'bg-selected': selectedId === slot.id,
+        }"
+        :style="`grid-column: ${slot.start + 1} / span ${slot.width}`"
+        @click="clickActive(slot.id)"
       >
         {{ slot.name }}
       </div>
       <div
-        v-for="idx in fillCount1"
-        :key="`filler-1-${idx}`"
-        class="filler"
-      />
-    </div>
-    <div class="container pins-area">
-      <div
-        v-for="slot in slots2"
-        :key="`slot-2-${slot.start}`"
-        class="content"
-        :style="`grid-column: ${slot.start} / span ${slot.length}`"
-      >
-        {{ slot.name }}
-      </div>
-      <div
-        v-for="idx in fillCount2"
-        :key="`filler-2-${idx}`"
-        class="filler"
+        v-for="slot in unused"
+        :key="`unused-${slot.start}`"
+        :class="{
+          filler: true,
+          'bg-selected': selectedChannel && selectedChannel.width <= slot.free,
+        }"
+        :style="`grid-column: ${slot.start + 1}`"
+        @click="clickUnused(slot.start)"
       />
     </div>
   </div>

@@ -135,12 +135,13 @@ export default defineComponent({
       const diagram = d3.select(diagramRef.value!);
 
       try {
-        renderFunc(diagram, graph);
+        // dagre typings for graphlib are outdated
+        renderFunc(diagram, graph as any);
       } catch (e) {
         // Workaround for a bug in FireFox where getScreenCTM() returns null for hidden or 0x0 elements
         // https://github.com/dagrejs/dagre-d3/issues/340
         if (e.name === 'TypeError') {
-          renderFunc(diagram, graph);
+          renderFunc(diagram, graph as any);
         } else {
           throw e;
         }

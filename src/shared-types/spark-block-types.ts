@@ -402,6 +402,7 @@ export interface GpioModuleChannel {
   id: number;
   deviceType: GpioDeviceType;
   pinsMask: GpioPins;
+  width: number;
   status: Readonly<ChannelStatus>;
   config: Readonly<ChannelConfig>;
   state: Readonly<DigitalState>;
