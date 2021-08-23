@@ -1,7 +1,6 @@
 import defaults from 'lodash/defaults';
 import range from 'lodash/range';
 import reduce from 'lodash/reduce';
-import set from 'lodash/set';
 import { nanoid } from 'nanoid';
 
 import { sparkStore } from '@/plugins/spark/store';
@@ -243,7 +242,10 @@ export function universalTransitions(size: [number, number], enabled: boolean): 
     .flat(2);
   return coords
     .reduce(
-      (acc, coord) => set(acc, coord, [{ outCoords: CENTER, internal: true, friction: 0.5 }]),
+      (acc, coord) => {
+        acc[coord] = [{ outCoords: CENTER, internal: true, friction: 0.5 }];
+        return acc;
+      },
       { [CENTER]: coords.map(outCoords => ({ outCoords, friction: 0.5 })) });
 }
 
