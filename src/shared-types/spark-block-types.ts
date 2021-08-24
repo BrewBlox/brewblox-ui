@@ -3,7 +3,6 @@ import type {
   BlockOrIntfType,
   BlockType,
   ChannelConfig,
-  ChannelStatus,
   DigitalCompareOp,
   DigitalState,
   DisplayTempUnit,
@@ -403,10 +402,6 @@ export interface GpioModuleChannel {
   deviceType: GpioDeviceType;
   pinsMask: GpioPins;
   width: number;
-  status: Readonly<ChannelStatus>;
-  config: Readonly<ChannelConfig>;
-  state: Readonly<DigitalState>;
-  pwmDuty: Readonly<number>;
 }
 
 export interface OneWireGpioModuleBlock extends Block {
@@ -415,16 +410,17 @@ export interface OneWireGpioModuleBlock extends Block {
     channels: GpioModuleChannel[];
     modulePosition: number;
     moduleStatus: GpioModuleStatus;
-    pullUp: Readonly<GpioPins>;
+    useExternalPower: boolean;
+    pullUpDesired: Readonly<GpioPins>;
+    pullUpStatus: Readonly<GpioPins>;
     pullUpWhenActive: Readonly<GpioPins>;
     pullUpWhenInactive: Readonly<GpioPins>;
-    pullDown: Readonly<GpioPins>;
+    pullDownDesired: Readonly<GpioPins>;
+    pullDownStatus: Readonly<GpioPins>;
     pullDownWhenActive: Readonly<GpioPins>;
     pullDownWhenInactive: Readonly<GpioPins>;
-    pullUpOverCurrent: Readonly<GpioPins>;
-    pullDownOverCurrent: Readonly<GpioPins>;
-    pullUpOpenLoad: Readonly<GpioPins>;
-    pullDownOpenLoad: Readonly<GpioPins>;
+    overCurrent: Readonly<GpioPins>;
+    openLoad: Readonly<GpioPins>;
     moduleStatusClear: GpioPins; // write-only
   }
 }

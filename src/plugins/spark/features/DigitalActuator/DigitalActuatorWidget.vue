@@ -5,7 +5,9 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, DigitalActuatorBlock, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
+import { OneWireGpioModuleBlock } from '@/shared-types';
 import { makeTypeFilter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
 
 interface ClaimDict {
   [channel: number]: string; // block ID of driver
@@ -59,9 +61,17 @@ export default defineComponent({
       () => {
         const opts = [{ label: 'Not set', value: 0 }];
         if (hwBlock.value) {
-          opts.push(
-            ...Object.keys(hwBlock.value.data.pins || hwBlock.value.data.channels)
-              .map((k, idx) => ({ label: pinOptName(idx), value: idx + 1 })));
+          if(matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, hwBlock.value)) {
+            opts.push(
+              ...hwBlock.value.data.channels
+                .map(c => ({label: `${c.deviceType} ${c.pinsMask.toString(2)}`, value: c.id})),
+            );
+          }
+          else {
+            opts.push(
+              ...Object.keys(hwBlock.value.data.pins || hwBlock.value.data.channels)
+                .map((k, idx) => ({ label: pinOptName(idx), value: idx + 1 })));
+          }
         }
         return opts;
       },
@@ -84,8 +94,8 @@ export default defineComponent({
     function targetFilter(b: Block): boolean {
       // Special exception for DS2408 targets
       // They are only compatible in actuator mode
-      if (b.type === BlockType.DS2408) {
-        return (b as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
+      if (matchesType<DS2408Block>(BlockType.DS2408, b)) {
+        return b.data.connectMode === DS2408ConnectMode.CONNECT_ACTUATOR;
       }
       // Filter is in addition to the default compatibility check
       return true;

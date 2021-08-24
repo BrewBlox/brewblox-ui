@@ -4,6 +4,10 @@
     "source.fixAll.eslint": true
   },
   "volar.autoCompleteRefs": false,
+  "volar.codeLens.pugTools": false,
+  "volar.tsPlugin": true,
+  "volar.checkVueTscVersion": true,
+  "volar-api.trace.server": "verbose",
   "vetur.format.defaultFormatter.html": "none",
   "vetur.format.defaultFormatter.js": "vscode-typescript",
   "vetur.format.defaultFormatter.ts": "vscode-typescript",

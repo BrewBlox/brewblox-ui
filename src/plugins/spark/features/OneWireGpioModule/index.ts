@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { systemBlockFeature } from '@/plugins/spark/generic';
+import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, OneWireGpioModuleBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
@@ -19,23 +19,24 @@ const plugin: Plugin = {
       generate: () => ({
         channels: [],
         modulePosition: 0,
+        useExternalPower: false,
         moduleStatus: GpioModuleStatus.NONE,
-        pullUp: GpioPins.NONE,
+        pullUpDesired: GpioPins.NONE,
+        pullUpStatus: GpioPins.NONE,
         pullUpWhenActive: GpioPins.NONE,
         pullUpWhenInactive: GpioPins.NONE,
-        pullDown: GpioPins.NONE,
+        pullDownDesired: GpioPins.NONE,
+        pullDownStatus: GpioPins.NONE,
         pullDownWhenActive: GpioPins.NONE,
         pullDownWhenInactive: GpioPins.NONE,
-        pullUpOverCurrent: GpioPins.NONE,
-        pullDownOverCurrent: GpioPins.NONE,
-        pullUpOpenLoad: GpioPins.NONE,
-        pullDownOpenLoad: GpioPins.NONE,
+        overCurrent: GpioPins.NONE,
+        openLoad: GpioPins.NONE,
         moduleStatusClear: GpioPins.NONE, // write-only
       }),
     };
 
     const feature: WidgetFeature = {
-      ...systemBlockFeature,
+      ...discoveredBlockFeature,
       id: type,
       title: 'OneWire GPIO Module',
       role: 'Output',

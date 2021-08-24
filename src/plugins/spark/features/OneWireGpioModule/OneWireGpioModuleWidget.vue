@@ -5,23 +5,25 @@ import { useContext } from '@/composables';
 import { OneWireGpioModuleBlock } from '@/shared-types';
 
 import { useBlockWidget } from '../../composables';
-
+import GpioChannelEditor from './GpioChannelEditor.vue';
 
 export default defineComponent({
   name: 'OneWireGpioModuleWidget',
+  components: {
+    GpioChannelEditor,
+  },
   setup() {
     const { context } = useContext.setup();
     const { block, saveBlock } = useBlockWidget.setup<OneWireGpioModuleBlock>();
 
-    const raw = computed<string>(
-      () => JSON.stringify(block.value.data),
-    );
+    function doSaveBlock(b: OneWireGpioModuleBlock): void {
+      saveBlock(b);
+    }
 
     return {
       context,
       block,
-      saveBlock,
-      raw,
+      doSaveBlock,
     };
   },
 });
@@ -33,11 +35,6 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <div>
-      <IoArray />
-      <div>
-        {{ raw }}
-      </div>
-    </div>
+    <GpioChannelEditor :block="block" @update:block="doSaveBlock" />
   </Card>
 </template>
