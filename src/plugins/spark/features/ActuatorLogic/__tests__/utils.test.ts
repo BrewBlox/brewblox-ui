@@ -54,7 +54,7 @@ describe('Check symbol syntax', () => {
   });
 });
 
-const analog = (): AnalogCompare[] => ([
+const analog = (): AnalogCompare[] => [
   {
     op: AnalogCompareOp.OP_SETTING_GE,
     result: LogicResult.RESULT_EMPTY,
@@ -73,8 +73,8 @@ const analog = (): AnalogCompare[] => ([
     id: bloxLink('analog-2'),
     rhs: 20,
   },
-]);
-const digital = (): DigitalCompare[] => ([
+];
+const digital = (): DigitalCompare[] => [
   {
     op: DigitalCompareOp.OP_DESIRED_IS,
     result: LogicResult.RESULT_EMPTY,
@@ -93,9 +93,11 @@ const digital = (): DigitalCompare[] => ([
     id: bloxLink('digital-2'),
     rhs: DigitalState.STATE_ACTIVE,
   },
-]);
+];
 
-const args = (expression: string): Pick<ActuatorLogicBlock['data'], 'expression' | 'digital' | 'analog'> => ({
+const args = (
+  expression: string,
+): Pick<ActuatorLogicBlock['data'], 'expression' | 'digital' | 'analog'> => ({
   expression,
   analog: analog(),
   digital: digital(),

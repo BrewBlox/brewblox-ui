@@ -21,8 +21,8 @@ async function run() {
 
     console.log('Database loaded', fname);
   }
-};
+}
 
 run()
   .then(() => console.log('Script done!', __filename))
-  .catch(e => console.log(get(e, 'response.data', e)));
+  .catch((e) => console.log(get(e, 'response.data', e)));

@@ -46,11 +46,14 @@ export default defineComponent({
             because the total available power is limited, we can configure constraints to:
             <ul>
               <li>Prevent turning on both elements at any time <i>(Mutually exclusive)</i></li>
-              <li>Divide the time fairly between them when heating both kettles <i>(Balanced)</i></li>
+              <li>
+                Divide the time fairly between them when heating both kettles <i>(Balanced)</i>
+              </li>
             </ul>
           </p>
           <p class="text-weight-regular">
-            Turn ON the setting below if the running both elements at the same time would trip a fuse.
+            Turn ON the setting below if the running both elements
+            at the same time would trip a fuse.
           </p>
         </q-item-section>
       </q-item>

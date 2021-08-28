@@ -9,7 +9,12 @@ import {
 import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
 import { FlowSegment } from '@/plugins/builder/FlowSegment';
 import specs from '@/plugins/builder/specs';
-import { FlowPart, FlowRoute, PersistentPart, StatePart } from '@/plugins/builder/types';
+import {
+  FlowPart,
+  FlowRoute,
+  PersistentPart,
+  StatePart,
+} from '@/plugins/builder/types';
 
 function asStatePart(part: PersistentPart): StatePart {
   const spec = specs[part.type];
@@ -21,7 +26,11 @@ function asStatePart(part: PersistentPart): StatePart {
   };
 }
 
-const propertyWalker = (acc: any[], item: FlowSegment, prop: string[]): any[] => {
+const propertyWalker = (
+  acc: any[],
+  item: FlowSegment,
+  prop: string[],
+): any[] => {
   type StringList = string | any[];
   const subtree: StringList[] = [];
 
@@ -38,7 +47,11 @@ const propertyWalker = (acc: any[], item: FlowSegment, prop: string[]): any[] =>
   return acc;
 };
 
-const routeWalker = (acc: any[], item: FlowSegment, inRoute: FlowRoute | null = null): any[] => {
+const routeWalker = (
+  acc: any[],
+  item: FlowSegment,
+  inRoute: FlowRoute | null = null,
+): any[] => {
   type StringList = string | any[];
   const subtree: StringList[] = [];
 
@@ -58,28 +71,20 @@ const routeWalker = (acc: any[], item: FlowSegment, inRoute: FlowRoute | null = 
   return acc;
 };
 
-const findPath = (
-  parts: FlowPart[],
-  start: FlowPart): FlowSegment => {
-
+const findPath = (parts: FlowPart[], start: FlowPart): FlowSegment => {
   const paths = findPathsFromSources(parts, start);
   if (paths.length > 1) {
-    throw ('Multiple paths found');
+    throw 'Multiple paths found';
   }
   if (paths.length === 0) {
-    throw ('no path found');
+    throw 'no path found';
   }
   return paths[0];
 };
 
-
-const findPaths = (
-  parts: FlowPart[],
-  start: FlowPart): FlowSegment[] => {
-
+const findPaths = (parts: FlowPart[], start: FlowPart): FlowSegment[] => {
   return findPathsFromSources(parts, start);
 };
-
 
 describe('Data describing an input tube', () => {
   const part: PersistentPart = {
@@ -96,14 +101,19 @@ describe('Data describing an input tube', () => {
   };
 
   it('can resolve to transitions', () => {
-    expect(asStatePart(part).transitions).toEqual(
-      {
-        [CENTER]: [{ outCoords: '1,0.5,0', pressure: 11, liquids: [COLD_WATER], source: true }],
-        '1,0.5,0': [{ outCoords: CENTER, sink: true }],
-      });
+    expect(asStatePart(part).transitions).toEqual({
+      [CENTER]: [
+        {
+          outCoords: '1,0.5,0',
+          pressure: 11,
+          liquids: [COLD_WATER],
+          source: true,
+        },
+      ],
+      '1,0.5,0': [{ outCoords: CENTER, sink: true }],
+    });
   });
 });
-
 
 describe('asFlowParts', () => {
   const path: PersistentPart[] = [
@@ -136,12 +146,11 @@ describe('asFlowParts', () => {
   ];
 
   it('it adds transitions', () => {
-    asFlowParts(path.map(asStatePart)).forEach(part => {
+    asFlowParts(path.map(asStatePart)).forEach((part) => {
       expect(part).toHaveProperty('transitions');
     });
   });
 });
-
 
 describe('A single path without splits', () => {
   const parts: PersistentPart[] = [
@@ -192,8 +201,8 @@ describe('A single path without splits', () => {
 
   it('Should have a flow of value of 2 for all parts', () => {
     const partsWithFlow = calculateFlows(flowParts);
-    expect(partsWithFlow).toMatchObject(
-      [{
+    expect(partsWithFlow).toMatchObject([
+      {
         x: 1,
         y: 2,
         rotate: 0,
@@ -227,14 +236,14 @@ describe('A single path without splits', () => {
         type: 'StraightTube',
         flows: {
           '2,2.5,0': {
-            [HOT_WATER]: - 2,
+            [HOT_WATER]: -2,
           },
           '3,2.5,0': {
             [HOT_WATER]: 2,
           },
         },
-      }],
-    );
+      },
+    ]);
   });
 
   it('The end can be cut of at a specified route', () => {
@@ -243,12 +252,14 @@ describe('A single path without splits', () => {
     if (end !== null) {
       expect(end.root.x).toBe(3);
 
-      expect(propertyWalker([], path, ['root', 'type'])).toEqual(['SystemIO', 'StraightTube']);
+      expect(propertyWalker([], path, ['root', 'type'])).toEqual([
+        'SystemIO',
+        'StraightTube',
+      ]);
       expect(propertyWalker([], end, ['root', 'type'])).toEqual(['SystemIO']);
     }
   });
 });
-
 
 describe('A path with a split, but no joins', () => {
   const parts: PersistentPart[] = [
@@ -304,42 +315,36 @@ describe('A path with a split, but no joins', () => {
   const path = findPath(flowParts, start);
 
   it('Should return a forking path', () => {
-
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
-      [
-        'SystemIO',
-        'StraightTube',
-        'TeeTube',
-        'TeeTube',
-        [
-          [
-            'SystemIO',
-          ],
-          [
-            'SystemIO',
-          ],
-        ],
-      ]);
+    expect(visitedTypes).toEqual([
+      'SystemIO',
+      'StraightTube',
+      'TeeTube',
+      'TeeTube',
+      [['SystemIO'], ['SystemIO']],
+    ]);
 
     const route = routeWalker([], path);
-    expect(route).toEqual(
+    expect(route).toEqual([
+      {
+        outCoords: '2,2.5,0',
+        pressure: 13,
+        liquids: [COLD_WATER],
+        source: true,
+      },
+      { outCoords: '3,2.5,0' },
+      { outCoords: '3.5,2.5,0', friction: 0.5, internal: true },
       [
-        { outCoords: '2,2.5,0', pressure: 13, liquids: [COLD_WATER], source: true },
-        { outCoords: '3,2.5,0' },
-        { outCoords: '3.5,2.5,0', friction: 0.5, internal: true },
         [
-          [
-            { outCoords: '3.5,3,0', friction: 0.5 },
-            { outCoords: '3.5,3.5,0', sink: true },
-          ],
-          [
-            { outCoords: '3.5,2,0', friction: 0.5 },
-            { outCoords: '3.5,1.5,0', sink: true },
-          ],
+          { outCoords: '3.5,3,0', friction: 0.5 },
+          { outCoords: '3.5,3.5,0', sink: true },
         ],
-
-      ]);
+        [
+          { outCoords: '3.5,2,0', friction: 0.5 },
+          { outCoords: '3.5,1.5,0', sink: true },
+        ],
+      ],
+    ]);
   });
 
   it('Should have a friction value of 3.25', () => {
@@ -349,61 +354,59 @@ describe('A path with a split, but no joins', () => {
 
   it('Should have a flow of value of 4 total and 2 for each split', () => {
     const partsWithFlow = calculateFlows(flowParts);
-    expect(partsWithFlow).toMatchObject(
-      [
-        {
-          flows: {
-            '2,2.5,0': {
-              [COLD_WATER]: 4,
-            },
+    expect(partsWithFlow).toMatchObject([
+      {
+        flows: {
+          '2,2.5,0': {
+            [COLD_WATER]: 4,
           },
-          type: 'SystemIO',
         },
-        {
-          flows: {
-            '2,2.5,0': {
-              [COLD_WATER]: -4,
-            },
-            '3,2.5,0': {
-              [COLD_WATER]: 4,
-            },
+        type: 'SystemIO',
+      },
+      {
+        flows: {
+          '2,2.5,0': {
+            [COLD_WATER]: -4,
           },
-          type: 'StraightTube',
-        },
-        {
-          flows: {
-            '3,2.5,0': {
-              [COLD_WATER]: -4,
-            },
-            '3.5,2,0': {
-              [COLD_WATER]: 2,
-            },
-            '3.5,3,0': {
-              [COLD_WATER]: 2,
-            },
+          '3,2.5,0': {
+            [COLD_WATER]: 4,
           },
-          type: 'TeeTube',
         },
-        {
-          flows: {
-            '3.5,2,0': {
-              [COLD_WATER]: -2,
-            },
+        type: 'StraightTube',
+      },
+      {
+        flows: {
+          '3,2.5,0': {
+            [COLD_WATER]: -4,
           },
-          type: 'SystemIO',
-          x: 3,
-          y: 1,
-        },
-        {
-          flows: {
-            '3.5,3,0': {
-              [COLD_WATER]: -2,
-            },
+          '3.5,2,0': {
+            [COLD_WATER]: 2,
           },
-          type: 'SystemIO',
+          '3.5,3,0': {
+            [COLD_WATER]: 2,
+          },
         },
-      ],
-    );
+        type: 'TeeTube',
+      },
+      {
+        flows: {
+          '3.5,2,0': {
+            [COLD_WATER]: -2,
+          },
+        },
+        type: 'SystemIO',
+        x: 3,
+        y: 1,
+      },
+      {
+        flows: {
+          '3.5,3,0': {
+            [COLD_WATER]: -2,
+          },
+        },
+        type: 'SystemIO',
+      },
+    ]);
   });
 });
 
@@ -492,46 +495,48 @@ describe('A path that forks and rejoins', () => {
 
   const path = findPath(flowParts, start);
   it('Should return a forking and rejoining path', () => {
-
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
 
-    expect(visitedTypes).toEqual(
+    expect(visitedTypes).toEqual([
+      'SystemIO',
+      'StraightTube',
+      'TeeTube',
+      'TeeTube',
       [
-        'SystemIO',
-        'StraightTube',
-        'TeeTube',
-        'TeeTube',
-        [
-          [
-            'ElbowTube',
-            'ElbowTube',
-            'TeeTube',
-          ],
-          [
-            'ElbowTube',
-            'ElbowTube',
-            'TeeTube',
-          ],
-        ],
-        'TeeTube',
-        'SystemIO',
-      ]);
+        ['ElbowTube', 'ElbowTube', 'TeeTube'],
+        ['ElbowTube', 'ElbowTube', 'TeeTube'],
+      ],
+      'TeeTube',
+      'SystemIO',
+    ]);
   });
   it('It should should have the correct routes', () => {
     const routes = routeWalker([], path);
-    expect(routes).toEqual(
+    expect(routes).toEqual([
+      {
+        liquids: ['#4AA0EF'],
+        outCoords: '2,2.5,0',
+        pressure: 11.5,
+        source: true,
+      },
+      { outCoords: '3,2.5,0' },
+      { friction: 0.5, internal: true, outCoords: '3.5,2.5,0' },
       [
-        { 'liquids': ['#4AA0EF'], 'outCoords': '2,2.5,0', 'pressure': 11.5, 'source': true },
-        { 'outCoords': '3,2.5,0' },
-        { 'friction': 0.5, 'internal': true, 'outCoords': '3.5,2.5,0' },
         [
-          [{ 'friction': 0.5, 'outCoords': '3.5,3,0' }, { 'outCoords': '4,3.5,0' }, { 'outCoords': '4.5,3,0' }],
-          [{ 'friction': 0.5, 'outCoords': '3.5,2,0' }, { 'outCoords': '4,1.5,0' }, { 'outCoords': '4.5,2,0' }],
+          { friction: 0.5, outCoords: '3.5,3,0' },
+          { outCoords: '4,3.5,0' },
+          { outCoords: '4.5,3,0' },
         ],
-        { 'friction': 0.5, 'internal': true, 'outCoords': '4.5,2.5,0' },
-        { 'friction': 0.5, 'outCoords': '5,2.5,0' },
-        { outCoords: '5.5,2.5,0', 'sink': true }],
-    );
+        [
+          { friction: 0.5, outCoords: '3.5,2,0' },
+          { outCoords: '4,1.5,0' },
+          { outCoords: '4.5,2,0' },
+        ],
+      ],
+      { friction: 0.5, internal: true, outCoords: '4.5,2.5,0' },
+      { friction: 0.5, outCoords: '5,2.5,0' },
+      { outCoords: '5.5,2.5,0', sink: true },
+    ]);
   });
 
   it('Should have a friction value of 5.75', () => {
@@ -541,74 +546,71 @@ describe('A path that forks and rejoins', () => {
 
   it('Should have a flow of value of 2 total and 1 for each split', () => {
     const partsWithFlow = calculateFlows(flowParts);
-    expect(partsWithFlow).toMatchObject(
-      [
-        {
-          flows: {
-            '2,2.5,0': { [COLD_WATER]: 2 },
-          },
-          type: 'SystemIO',
+    expect(partsWithFlow).toMatchObject([
+      {
+        flows: {
+          '2,2.5,0': { [COLD_WATER]: 2 },
         },
-        {
-          flows: {
-            '2,2.5,0': { [COLD_WATER]: -2 },
-            '3,2.5,0': { [COLD_WATER]: 2 },
-          },
-          type: 'StraightTube',
+        type: 'SystemIO',
+      },
+      {
+        flows: {
+          '2,2.5,0': { [COLD_WATER]: -2 },
+          '3,2.5,0': { [COLD_WATER]: 2 },
         },
-        {
-          flows: {
-            '3,2.5,0': { [COLD_WATER]: -2 },
-            '3.5,2,0': { [COLD_WATER]: 1 },
-            '3.5,3,0': { [COLD_WATER]: 1 },
-          },
-          type: 'TeeTube',
-
+        type: 'StraightTube',
+      },
+      {
+        flows: {
+          '3,2.5,0': { [COLD_WATER]: -2 },
+          '3.5,2,0': { [COLD_WATER]: 1 },
+          '3.5,3,0': { [COLD_WATER]: 1 },
         },
-        {
-          flows: {
-            '3.5,2,0': { [COLD_WATER]: -1 },
-            '4,1.5,0': { [COLD_WATER]: 1 },
-          },
-          type: 'ElbowTube',
+        type: 'TeeTube',
+      },
+      {
+        flows: {
+          '3.5,2,0': { [COLD_WATER]: -1 },
+          '4,1.5,0': { [COLD_WATER]: 1 },
         },
-        {
-          flows: {
-            '3.5,3,0': { [COLD_WATER]: -1 },
-            '4,3.5,0': { [COLD_WATER]: 1 },
-          },
-          type: 'ElbowTube',
+        type: 'ElbowTube',
+      },
+      {
+        flows: {
+          '3.5,3,0': { [COLD_WATER]: -1 },
+          '4,3.5,0': { [COLD_WATER]: 1 },
         },
-        {
-          flows: {
-            '4,1.5,0': { [COLD_WATER]: -1 },
-            '4.5,2,0': { [COLD_WATER]: 1 },
-          },
-          type: 'ElbowTube',
+        type: 'ElbowTube',
+      },
+      {
+        flows: {
+          '4,1.5,0': { [COLD_WATER]: -1 },
+          '4.5,2,0': { [COLD_WATER]: 1 },
         },
-        {
-          flows: {
-            '4,3.5,0': { [COLD_WATER]: -1 },
-            '4.5,3,0': { [COLD_WATER]: 1 },
-          },
-          type: 'ElbowTube',
+        type: 'ElbowTube',
+      },
+      {
+        flows: {
+          '4,3.5,0': { [COLD_WATER]: -1 },
+          '4.5,3,0': { [COLD_WATER]: 1 },
         },
-        {
-          flows: {
-            '4.5,2,0': { [COLD_WATER]: -1 },
-            '4.5,3,0': { [COLD_WATER]: -1 },
-            '5,2.5,0': { [COLD_WATER]: 2 },
-          },
-          type: 'TeeTube',
+        type: 'ElbowTube',
+      },
+      {
+        flows: {
+          '4.5,2,0': { [COLD_WATER]: -1 },
+          '4.5,3,0': { [COLD_WATER]: -1 },
+          '5,2.5,0': { [COLD_WATER]: 2 },
         },
-        {
-          flows: {
-            '5,2.5,0': { [COLD_WATER]: -2 },
-          },
-          type: 'SystemIO',
+        type: 'TeeTube',
+      },
+      {
+        flows: {
+          '5,2.5,0': { [COLD_WATER]: -2 },
         },
-      ],
-    );
+        type: 'SystemIO',
+      },
+    ]);
   });
 });
 
@@ -647,12 +649,11 @@ describe('A single path with a pump', () => {
     },
   ];
 
-
   it('Should have a flow of value of 3 for all parts with the pump disabled', () => {
     const flowParts = asFlowParts(parts.map(asStatePart));
     const partsWithFlow = calculateFlows(flowParts);
-    expect(partsWithFlow).toMatchObject(
-      [{
+    expect(partsWithFlow).toMatchObject([
+      {
         id: '1',
         x: 3,
         y: 2,
@@ -692,8 +693,7 @@ describe('A single path with a pump', () => {
           '2,2.5,0': { [COLD_WATER]: -3 },
         },
       },
-      ],
-    );
+    ]);
   });
 
   describe('Two input tubes with different liquid joining', () => {
@@ -702,8 +702,8 @@ describe('A single path with a pump', () => {
       set(parts[1], ['settings', 'enabled'], true);
       const flowParts = asFlowParts(parts.map(asStatePart));
       const partsWithFlow = calculateFlows(flowParts);
-      expect(partsWithFlow).toMatchObject(
-        [{
+      expect(partsWithFlow).toMatchObject([
+        {
           id: '1',
           x: 3,
           y: 2,
@@ -742,12 +742,10 @@ describe('A single path with a pump', () => {
             '2,2.5,0': { [COLD_WATER]: -7 },
           },
         },
-        ],
-      );
+      ]);
     });
   });
 });
-
 
 describe('Two sources joining', () => {
   const parts: PersistentPart[] = [
@@ -817,26 +815,22 @@ describe('Two sources joining', () => {
     },
   ];
 
-
   const flowParts = asFlowParts(parts.map(asStatePart));
   const start = flowParts[0];
   const path = findPath(flowParts, start);
   it('Should return the correct path from a source', () => {
-
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
 
-    expect(visitedTypes).toEqual(
+    expect(visitedTypes).toEqual([
+      'SystemIO',
+      'ElbowTube',
+      'TeeTube',
+      'TeeTube',
       [
-        'SystemIO',
-        'ElbowTube',
-        'TeeTube',
-        'TeeTube',
-        [
-          ['StraightTube', 'SystemIO'],
-          ['ElbowTube', 'SystemIO'],
-        ],
+        ['StraightTube', 'SystemIO'],
+        ['ElbowTube', 'SystemIO'],
       ],
-    );
+    ]);
   });
 
   it('Should have the expected friction for that path', () => {
@@ -846,142 +840,147 @@ describe('Two sources joining', () => {
 
   it('It should should have the correct routes', () => {
     const routes = routeWalker([], path);
-    expect(routes).toEqual(
-      [{
-        'liquids': ['#4AA0EF'],
-        'outCoords': '2,1.5,0',
-        'pressure': 15,
-        'source': true,
-      }, {
-        'outCoords': '2.5,2,0',
-      }, {
-        'friction': 0.5,
-        'internal': true,
-        'outCoords': '2.5,2.5,0',
+    expect(routes).toEqual([
+      {
+        liquids: ['#4AA0EF'],
+        outCoords: '2,1.5,0',
+        pressure: 15,
+        source: true,
+      },
+      {
+        outCoords: '2.5,2,0',
+      },
+      {
+        friction: 0.5,
+        internal: true,
+        outCoords: '2.5,2.5,0',
       },
       [
-        [{
-          'friction': 0.5,
-          'outCoords': '3,2.5,0',
-        }, {
-          'outCoords': '4,2.5,0',
-        },
-        {
-          'outCoords': '4.5,2.5,0',
-          'sink': true,
-        }],
-        [{
-          'friction': 0.5,
-          'outCoords': '2.5,3,0',
-        }, {
-          'outCoords': '2,3.5,0',
-        },
-        {
-          'outCoords': '1.5,3.5,0',
-          'sink': true,
-        }],
-      ]],
-    );
+        [
+          {
+            friction: 0.5,
+            outCoords: '3,2.5,0',
+          },
+          {
+            outCoords: '4,2.5,0',
+          },
+          {
+            outCoords: '4.5,2.5,0',
+            sink: true,
+          },
+        ],
+        [
+          {
+            friction: 0.5,
+            outCoords: '2.5,3,0',
+          },
+          {
+            outCoords: '2,3.5,0',
+          },
+          {
+            outCoords: '1.5,3.5,0',
+            sink: true,
+          },
+        ],
+      ],
+    ]);
   });
 
   it('Should have the correct flow and liquids in all paths', () => {
     const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
-    expect(partsWithFlow).toMatchObject(
-      [
-        {
-          'flows': {
-            '2,1.5,0': {
-              [COLD_WATER]: 2,
-            },
+    expect(partsWithFlow).toMatchObject([
+      {
+        flows: {
+          '2,1.5,0': {
+            [COLD_WATER]: 2,
           },
-          'type': 'SystemIO',
-          'x': 1,
-          'y': 1,
         },
-        {
-          'flows': {
-            '2,3.5,0': {
-              [HOT_WATER]: 2,
-            },
+        type: 'SystemIO',
+        x: 1,
+        y: 1,
+      },
+      {
+        flows: {
+          '2,3.5,0': {
+            [HOT_WATER]: 2,
           },
-          'type': 'SystemIO',
-          'x': 1,
-          'y': 3,
         },
-        {
-          flows: {
-            '2,1.5,0': {
-              [COLD_WATER]: -2,
-            },
-            '2.5,2,0': {
-              [COLD_WATER]: 2,
-            },
+        type: 'SystemIO',
+        x: 1,
+        y: 3,
+      },
+      {
+        flows: {
+          '2,1.5,0': {
+            [COLD_WATER]: -2,
           },
-          'type': 'ElbowTube',
-          'x': 2,
-          'y': 1,
-        },
-        {
-          'flows': {
-            '2,3.5,0': {
-              [HOT_WATER]: -2,
-            },
-            '2.5,3,0': {
-              [HOT_WATER]: 2,
-            },
+          '2.5,2,0': {
+            [COLD_WATER]: 2,
           },
-          'type': 'ElbowTube',
-          'x': 2,
-          'y': 3,
         },
-        {
-          'flows': {
-            '2.5,2,0': {
-              [COLD_WATER]: -2,
-            },
-            '2.5,3,0': {
-              [HOT_WATER]: -2,
-            },
-            '3,2.5,0': {
-              [COLD_WATER]: 2,
-              [HOT_WATER]: 2,
-            },
+        type: 'ElbowTube',
+        x: 2,
+        y: 1,
+      },
+      {
+        flows: {
+          '2,3.5,0': {
+            [HOT_WATER]: -2,
           },
-          'type': 'TeeTube',
-          'x': 2,
-          'y': 2,
-        },
-        {
-          'flows': {
-            '3,2.5,0': {
-              [COLD_WATER]: -2,
-              [HOT_WATER]: -2,
-            },
-            '4,2.5,0': {
-              [COLD_WATER]: 2,
-              [HOT_WATER]: 2,
-            },
+          '2.5,3,0': {
+            [HOT_WATER]: 2,
           },
-          'type': 'StraightTube',
-          'x': 3,
-          'y': 2,
         },
-        {
-          'flows': {
-            '4,2.5,0': {
-              [COLD_WATER]: -2,
-              [HOT_WATER]: -2,
-            },
+        type: 'ElbowTube',
+        x: 2,
+        y: 3,
+      },
+      {
+        flows: {
+          '2.5,2,0': {
+            [COLD_WATER]: -2,
           },
-          'type': 'SystemIO',
-          'x': 4,
-          'y': 2,
+          '2.5,3,0': {
+            [HOT_WATER]: -2,
+          },
+          '3,2.5,0': {
+            [COLD_WATER]: 2,
+            [HOT_WATER]: 2,
+          },
         },
-      ],
-    );
+        type: 'TeeTube',
+        x: 2,
+        y: 2,
+      },
+      {
+        flows: {
+          '3,2.5,0': {
+            [COLD_WATER]: -2,
+            [HOT_WATER]: -2,
+          },
+          '4,2.5,0': {
+            [COLD_WATER]: 2,
+            [HOT_WATER]: 2,
+          },
+        },
+        type: 'StraightTube',
+        x: 3,
+        y: 2,
+      },
+      {
+        flows: {
+          '4,2.5,0': {
+            [COLD_WATER]: -2,
+            [HOT_WATER]: -2,
+          },
+        },
+        type: 'SystemIO',
+        x: 4,
+        y: 2,
+      },
+    ]);
   });
 });
-
 
 describe('A path with a bridge', () => {
   // 7 transitions long, passes the bridge twice
@@ -1050,191 +1049,190 @@ describe('A path with a bridge', () => {
 
   it('Should have the correct flow and liquids in all paths', () => {
     const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
-    expect(partsWithFlow).toMatchObject(
-      [
-        {
-          x: 11,
-          y: 2,
-          type: 'SystemIO',
-          rotate: 0,
-          settings: {
-            liquids: [COLD_WATER],
-            enabled: true,
-            onPressure: 8,
-          },
-          flows: {
-            '12,2.5,0': {
-              [COLD_WATER]: 1,
-            },
+    expect(partsWithFlow).toMatchObject([
+      {
+        x: 11,
+        y: 2,
+        type: 'SystemIO',
+        rotate: 0,
+        settings: {
+          liquids: [COLD_WATER],
+          enabled: true,
+          onPressure: 8,
+        },
+        flows: {
+          '12,2.5,0': {
+            [COLD_WATER]: 1,
           },
         },
-        {
-          x: 12,
-          y: 2,
-          type: 'StraightTube',
-          rotate: 0,
-          settings: {},
-          flows: {
-            '12,2.5,0': {
-              [COLD_WATER]: -1,
-            },
-            '13,2.5,0': {
-              [COLD_WATER]: 1,
-            },
+      },
+      {
+        x: 12,
+        y: 2,
+        type: 'StraightTube',
+        rotate: 0,
+        settings: {},
+        flows: {
+          '12,2.5,0': {
+            [COLD_WATER]: -1,
+          },
+          '13,2.5,0': {
+            [COLD_WATER]: 1,
           },
         },
-        {
-          type: 'BridgeTube',
-          x: 13,
-          y: 2,
-          rotate: 0,
-          settings: {},
-          flows: {
-            '13.5,3,0': {
-              [COLD_WATER]: -1,
-            },
-            '13.5,2,0': {
-              [COLD_WATER]: 1,
-            },
-            '14,2.5,0': {
-              [COLD_WATER]: 1,
-            },
-            '13,2.5,0': {
-              [COLD_WATER]: -1,
-            },
+      },
+      {
+        type: 'BridgeTube',
+        x: 13,
+        y: 2,
+        rotate: 0,
+        settings: {},
+        flows: {
+          '13.5,3,0': {
+            [COLD_WATER]: -1,
+          },
+          '13.5,2,0': {
+            [COLD_WATER]: 1,
+          },
+          '14,2.5,0': {
+            [COLD_WATER]: 1,
+          },
+          '13,2.5,0': {
+            [COLD_WATER]: -1,
           },
         },
-        {
-          type: 'SystemIO',
-          x: 13,
-          y: 1,
-          rotate: 90,
-          settings: {},
-          flows: {
-            '13.5,2,0': {
-              [COLD_WATER]: -1,
-            },
+      },
+      {
+        type: 'SystemIO',
+        x: 13,
+        y: 1,
+        rotate: 90,
+        settings: {},
+        flows: {
+          '13.5,2,0': {
+            [COLD_WATER]: -1,
           },
         },
-        {
-          x: 14,
-          y: 2,
-          type: 'ElbowTube',
-          rotate: 180,
-          settings: {},
-          flows: {
-            '14,2.5,0': {
-              [COLD_WATER]: -1,
-            },
-            '14.5,3,0': {
-              [COLD_WATER]: 1,
-            },
+      },
+      {
+        x: 14,
+        y: 2,
+        type: 'ElbowTube',
+        rotate: 180,
+        settings: {},
+        flows: {
+          '14,2.5,0': {
+            [COLD_WATER]: -1,
+          },
+          '14.5,3,0': {
+            [COLD_WATER]: 1,
           },
         },
-        {
-          type: 'ElbowTube',
-          x: 14,
-          y: 3,
-          rotate: 270,
-          settings: {},
-          flows: {
-            '14.5,3,0': {
-              [COLD_WATER]: -1,
-            },
-            '14,3.5,0': {
-              [COLD_WATER]: 1,
-            },
+      },
+      {
+        type: 'ElbowTube',
+        x: 14,
+        y: 3,
+        rotate: 270,
+        settings: {},
+        flows: {
+          '14.5,3,0': {
+            [COLD_WATER]: -1,
+          },
+          '14,3.5,0': {
+            [COLD_WATER]: 1,
           },
         },
-        {
-          x: 13,
-          y: 3,
-          type: 'ElbowTube',
-          rotate: 0,
-          settings: {},
-          flows: {
-            '14,3.5,0': {
-              [COLD_WATER]: -1,
-            },
-            '13.5,3,0': {
-              [COLD_WATER]: 1,
-            },
+      },
+      {
+        x: 13,
+        y: 3,
+        type: 'ElbowTube',
+        rotate: 0,
+        settings: {},
+        flows: {
+          '14,3.5,0': {
+            [COLD_WATER]: -1,
+          },
+          '13.5,3,0': {
+            [COLD_WATER]: 1,
           },
         },
-      ]);
+      },
+    ]);
   });
 });
 
 describe('A kettle with 2 outflows', () => {
   const parts: PersistentPart[] = [
     {
-      'id': '1',
-      'rotate': 0,
-      'settings': { color: '#ff0000' },
-      'flipped': false,
-      'type': 'Kettle',
-      'x': 1,
-      'y': 1,
+      id: '1',
+      rotate: 0,
+      settings: { color: '#ff0000' },
+      flipped: false,
+      type: 'Kettle',
+      x: 1,
+      y: 1,
     },
     {
-      'id': '2',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'DipTube',
-      'x': 4,
-      'y': 6,
+      id: '2',
+      rotate: 0,
+      settings: {},
+      flipped: true,
+      type: 'DipTube',
+      x: 4,
+      y: 6,
     },
     {
-      'id': '3',
-      'rotate': 0,
+      id: '3',
+      rotate: 0,
       settings: {
         enabled: true,
         onPressure: 10,
       },
-      'flipped': true,
-      'type': 'Pump',
-      'x': 5,
-      'y': 6,
+      flipped: true,
+      type: 'Pump',
+      x: 5,
+      y: 6,
     },
     {
-      'id': '4',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'SystemIO',
-      'x': 6,
-      'y': 6,
+      id: '4',
+      rotate: 0,
+      settings: {},
+      flipped: true,
+      type: 'SystemIO',
+      x: 6,
+      y: 6,
     },
     {
-      'id': '5',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'DipTube',
-      'x': 4,
-      'y': 5,
+      id: '5',
+      rotate: 0,
+      settings: {},
+      flipped: true,
+      type: 'DipTube',
+      x: 4,
+      y: 5,
     },
     {
-      'id': '6',
-      'rotate': 0,
-      'type': 'Pump',
+      id: '6',
+      rotate: 0,
+      type: 'Pump',
       settings: {
         enabled: true,
         onPressure: 10,
       },
-      'flipped': true,
-      'x': 5,
-      'y': 5,
+      flipped: true,
+      x: 5,
+      y: 5,
     },
     {
-      'id': '7',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'SystemIO',
-      'x': 6,
-      'y': 5,
+      id: '7',
+      rotate: 0,
+      settings: {},
+      flipped: true,
+      type: 'SystemIO',
+      x: 6,
+      y: 5,
     },
   ];
 
@@ -1245,115 +1243,102 @@ describe('A kettle with 2 outflows', () => {
     const paths = findPaths(flowParts, start);
 
     let visitedTypes = propertyWalker([], paths[0], ['root', 'type']);
-    expect(visitedTypes).toEqual(
-      [
-        'Kettle',
-        'DipTube',
-        'Pump',
-        'SystemIO',
-      ]);
+    expect(visitedTypes).toEqual(['Kettle', 'DipTube', 'Pump', 'SystemIO']);
 
     visitedTypes = propertyWalker([], paths[1], ['root', 'type']);
-    expect(visitedTypes).toEqual(
-      [
-        'Kettle',
-        'DipTube',
-        'Pump',
-        'SystemIO',
-      ]);
+    expect(visitedTypes).toEqual(['Kettle', 'DipTube', 'Pump', 'SystemIO']);
   });
   it('Each branch should have flow 10/3', () => {
     const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
     const straight1 = partsWithFlow.find((part) => part.id === '3');
-    expect(straight1).toMatchObject(
-      {
-        'id': '3',
-        'flows': {
-          '5,6.5,0': {
-            '#ff0000': -3.3333333333333335,
-          },
-          '6,6.5,0': {
-            '#ff0000': 3.3333333333333335,
-          },
+    expect(straight1).toMatchObject({
+      id: '3',
+      flows: {
+        '5,6.5,0': {
+          '#ff0000': -3.3333333333333335,
         },
-      });
+        '6,6.5,0': {
+          '#ff0000': 3.3333333333333335,
+        },
+      },
+    });
 
     const straight2 = partsWithFlow.find((part) => part.id === '6');
-    expect(straight2).toMatchObject(
-      {
-        'id': '6',
-        'flows': {
-          '5,5.5,0': {
-            '#ff0000': -3.3333333333333335,
-          },
-          '6,5.5,0': {
-            '#ff0000': 3.3333333333333335,
-          },
+    expect(straight2).toMatchObject({
+      id: '6',
+      flows: {
+        '5,5.5,0': {
+          '#ff0000': -3.3333333333333335,
         },
-      });
+        '6,5.5,0': {
+          '#ff0000': 3.3333333333333335,
+        },
+      },
+    });
   });
 });
-
 
 describe('A kettle with flow back to itself', () => {
   let parts: PersistentPart[] = [
     {
-      'id': '1',
-      'rotate': 0,
-      'settings': { color: '#ff0000' },
-      'type': 'Kettle',
-      'x': 1,
-      'y': 1,
+      id: '1',
+      rotate: 0,
+      settings: { color: '#ff0000' },
+      type: 'Kettle',
+      x: 1,
+      y: 1,
     },
     {
-      'id': '2',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'DipTube',
-      'x': 4,
-      'y': 4,
+      id: '2',
+      rotate: 0,
+      settings: {},
+      flipped: true,
+      type: 'DipTube',
+      x: 4,
+      y: 4,
     },
     {
-      'id': '3',
-      'rotate': 180,
-      'settings': {},
-      'type': 'ElbowTube',
-      'x': 5,
-      'y': 4,
+      id: '3',
+      rotate: 180,
+      settings: {},
+      type: 'ElbowTube',
+      x: 5,
+      y: 4,
     },
     {
-      'id': '5',
-      'rotate': 270,
-      'settings': {},
-      'type': 'ElbowTube',
-      'x': 5,
-      'y': 6,
+      id: '5',
+      rotate: 270,
+      settings: {},
+      type: 'ElbowTube',
+      x: 5,
+      y: 6,
     },
     {
-      'id': '6',
-      'rotate': 0,
-      'settings': {},
-      'flipped': true,
-      'type': 'DipTube',
-      'x': 4,
-      'y': 6,
+      id: '6',
+      rotate: 0,
+      settings: {},
+      flipped: true,
+      type: 'DipTube',
+      x: 4,
+      y: 6,
     },
   ];
 
-
   describe('with a disabled pump', () => {
-    parts = [...parts, {
-      'id': '4',
-      'rotate': 270,
-      settings: {
-        enabled: false,
-        onPressure: 10,
+    parts = [
+      ...parts,
+      {
+        id: '4',
+        rotate: 270,
+        settings: {
+          enabled: false,
+          onPressure: 10,
+        },
+        type: 'Pump',
+        x: 5,
+        y: 5,
       },
-      'type': 'Pump',
-      'x': 5,
-      'y': 5,
-    }];
+    ];
 
     const flowParts = asFlowParts(parts.map(asStatePart));
     it('Should return the right path starting at the kettle', () => {
@@ -1362,72 +1347,76 @@ describe('A kettle with flow back to itself', () => {
       const path = findPaths(flowParts, start)[0];
 
       const visitedTypes = propertyWalker([], path, ['root', 'type']);
-      expect(visitedTypes).toEqual(
-        [
-          'Kettle',
-          'DipTube',
-          'ElbowTube',
-          'Pump',
-          'ElbowTube',
-          'DipTube',
-          'Kettle',
-        ]);
+      expect(visitedTypes).toEqual([
+        'Kettle',
+        'DipTube',
+        'ElbowTube',
+        'Pump',
+        'ElbowTube',
+        'DipTube',
+        'Kettle',
+      ]);
 
-
-      const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+      const { friction, pressureDiff } = path.friction({
+        pressureDiff: 0,
+        friction: 0,
+      });
       expect(friction).toEqual(5);
       expect(pressureDiff).toEqual(0);
     });
 
-
     it('Should have zero flow with the pump disabled', () => {
       const partsWithFlow = calculateFlows(flowParts);
       const part = partsWithFlow.find((part) => part.id === '3');
-      expect(part).toMatchObject(
-        {
-          'id': '3',
-          'flows': {
-            '5,4.5,0': {
-              '#ff0000': 0,
-            },
-            '5.5,5,0': {
-              '#ff0000': 0,
-            },
+      expect(part).toMatchObject({
+        id: '3',
+        flows: {
+          '5,4.5,0': {
+            '#ff0000': 0,
           },
-        });
+          '5.5,5,0': {
+            '#ff0000': 0,
+          },
+        },
+      });
     });
   });
 
   describe('with an enabled pump', () => {
-    parts = [...parts.filter(p => p.type !== 'Pump'), {
-      'id': '4',
-      'rotate': 270,
-      settings: {
-        enabled: true,
-        onPressure: 10,
+    parts = [
+      ...parts.filter((p) => p.type !== 'Pump'),
+      {
+        id: '4',
+        rotate: 270,
+        settings: {
+          enabled: true,
+          onPressure: 10,
+        },
+        type: 'Pump',
+        x: 5,
+        y: 5,
       },
-      'type': 'Pump',
-      'x': 5,
-      'y': 5,
-    }];
+    ];
     const flowParts = asFlowParts(parts.map(asStatePart));
     it('Should return the right path starting at the kettle', () => {
       const start = flowParts[0];
       const path = findPaths(flowParts, start)[0];
 
       const visitedTypes = propertyWalker([], path, ['root', 'type']);
-      expect(visitedTypes).toEqual(
-        [
-          'Kettle',
-          'DipTube',
-          'ElbowTube',
-          'Pump',
-          'ElbowTube',
-          'DipTube',
-          'Kettle',
-        ]);
+      expect(visitedTypes).toEqual([
+        'Kettle',
+        'DipTube',
+        'ElbowTube',
+        'Pump',
+        'ElbowTube',
+        'DipTube',
+        'Kettle',
+      ]);
 
-      const { friction, pressureDiff } = path.friction({ pressureDiff: 0, friction: 0 });
+      const { friction, pressureDiff } = path.friction({
+        pressureDiff: 0,
+        friction: 0,
+      });
       expect(friction).toEqual(5);
       expect(pressureDiff).toEqual(10);
     });
@@ -1435,101 +1424,101 @@ describe('A kettle with flow back to itself', () => {
     it('Should have flow 2', () => {
       const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
       const part = partsWithFlow.find((part) => part.id === '3');
-      expect(part).toMatchObject(
-        {
-          'id': '3',
-          'flows': {
-            '5,4.5,0': {
-              '#ff0000': -2,
-            },
-            '5.5,5,0': {
-              '#ff0000': 2,
-            },
+      expect(part).toMatchObject({
+        id: '3',
+        flows: {
+          '5,4.5,0': {
+            '#ff0000': -2,
           },
-        });
+          '5.5,5,0': {
+            '#ff0000': 2,
+          },
+        },
+      });
     });
   });
 });
 
-
 describe('A forking and joining path with a pump in each fork', () => {
   const partsBase: PersistentPart[] = [
     {
-      'id': '1a',
-      'rotate': 180,
-      'settings': { 'liquids': ['#DB0023'], 'enabled': true, 'onPressure': 0 },
-      'flipped': false,
-      'type': 'SystemIO',
-      'x': 2,
-      'y': 2,
+      id: '1a',
+      rotate: 180,
+      settings: { liquids: ['#DB0023'], enabled: true, onPressure: 0 },
+      flipped: false,
+      type: 'SystemIO',
+      x: 2,
+      y: 2,
     },
     {
-      'id': '1b',
-      'rotate': 180,
-      'settings': {},
-      'flipped': false,
-      'type': 'SystemIO',
-      'x': 2,
-      'y': 0,
+      id: '1b',
+      rotate: 180,
+      settings: {},
+      flipped: false,
+      type: 'SystemIO',
+      x: 2,
+      y: 0,
     },
     {
-      'id': '2',
-      'rotate': 0,
-      'settings': {},
-      'flipped': false,
-      'type': 'ElbowTube',
-      'x': 0,
-      'y': 2,
-    }, {
-      'id': '3',
-      'rotate': 90,
-      'settings': {},
-      'flipped': false,
-      'type': 'ElbowTube',
-      'x': 0,
-      'y': 0,
+      id: '2',
+      rotate: 0,
+      settings: {},
+      flipped: false,
+      type: 'ElbowTube',
+      x: 0,
+      y: 2,
     },
     {
-      'id': '4',
-      'rotate': 0,
-      'settings': {},
-      'flipped': false,
-      'type': 'TeeTube',
-      'x': 1,
-      'y': 2,
+      id: '3',
+      rotate: 90,
+      settings: {},
+      flipped: false,
+      type: 'ElbowTube',
+      x: 0,
+      y: 0,
     },
     {
-      'id': '5',
-      'rotate': 180,
-      'settings': {},
-      'flipped': false,
-      'type': 'TeeTube',
-      'x': 1,
-      'y': 0,
+      id: '4',
+      rotate: 0,
+      settings: {},
+      flipped: false,
+      type: 'TeeTube',
+      x: 1,
+      y: 2,
+    },
+    {
+      id: '5',
+      rotate: 180,
+      settings: {},
+      flipped: false,
+      type: 'TeeTube',
+      x: 1,
+      y: 0,
     },
   ];
 
-
   it('has no flow with both pumps disabled', () => {
-    const parts = [...partsBase,
-    {
-      'id': '8',
-      'rotate': 90,
-      'settings': { 'enabled': false },
-      'flipped': false,
-      'type': 'Pump',
-      'x': 1,
-      'y': 1,
-    },
-    {
-      'id': '9',
-      'rotate': 90,
-      'settings': { 'enabled': false },
-      'flipped': false,
-      'type': 'Pump',
-      'x': 0,
-      'y': 1,
-    }];
+    const parts = [
+      ...partsBase,
+      {
+        id: '8',
+        rotate: 90,
+        settings: { enabled: false },
+        flipped: false,
+        type: 'Pump',
+        x: 1,
+        y: 1,
+      },
+      {
+        id: '9',
+        rotate: 90,
+        settings: { enabled: false },
+        flipped: false,
+        type: 'Pump',
+        x: 0,
+        y: 1,
+      },
+    ];
 
     const flowParts = asFlowParts(parts.map(asStatePart));
 
@@ -1538,56 +1527,49 @@ describe('A forking and joining path with a pump in each fork', () => {
     const path = findPaths(flowParts, start)[0];
 
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
+    expect(visitedTypes).toEqual([
+      'SystemIO',
+      'TeeTube',
+      'TeeTube',
       [
-        'SystemIO',
-        'TeeTube',
-        'TeeTube',
-        [
-          [
-            'Pump',
-            'TeeTube',
-          ],
-          [
-            'ElbowTube',
-            'Pump',
-            'ElbowTube',
-            'TeeTube',
-          ],
-        ],
-        'TeeTube',
-        'SystemIO',
-      ]);
-
+        ['Pump', 'TeeTube'],
+        ['ElbowTube', 'Pump', 'ElbowTube', 'TeeTube'],
+      ],
+      'TeeTube',
+      'SystemIO',
+    ]);
 
     const { friction } = path.friction({ pressureDiff: 0, friction: 0 });
-    expect(friction).toEqual(1 + 0.5 + 0.5 + (1.5 * 3.5) / (1.5 + 3.5) + 0.5 + 1);
+    expect(friction).toEqual(
+      1 + 0.5 + 0.5 + (1.5 * 3.5) / (1.5 + 3.5) + 0.5 + 1,
+    );
 
     const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
     expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(0, 2);
   });
 
-
   it('has flow with one pump enabled', () => {
-    const parts = [...partsBase,
-    {
-      'id': '10',
-      'rotate': 90,
-      'settings': { 'enabled': true, 'onPressure': 10 },
-      'flipped': false,
-      'type': 'Pump',
-      'x': 1,
-      'y': 1,
-    },
-    {
-      'id': '11',
-      'rotate': 90,
-      'settings': { 'enabled': false, 'onPressure': 10 },
-      'flipped': false,
-      'type': 'Pump',
-      'x': 0,
-      'y': 1,
-    }];
+    const parts = [
+      ...partsBase,
+      {
+        id: '10',
+        rotate: 90,
+        settings: { enabled: true, onPressure: 10 },
+        flipped: false,
+        type: 'Pump',
+        x: 1,
+        y: 1,
+      },
+      {
+        id: '11',
+        rotate: 90,
+        settings: { enabled: false, onPressure: 10 },
+        flipped: false,
+        type: 'Pump',
+        x: 0,
+        y: 1,
+      },
+    ];
 
     const flowParts = asFlowParts(parts.map(asStatePart));
 
@@ -1596,51 +1578,44 @@ describe('A forking and joining path with a pump in each fork', () => {
     const path = findPaths(flowParts, start)[0];
 
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
+    expect(visitedTypes).toEqual([
+      'SystemIO',
+      'TeeTube',
+      'TeeTube',
       [
-        'SystemIO',
-        'TeeTube',
-        'TeeTube',
-        [
-          [
-            'Pump',
-            'TeeTube',
-          ],
-          [
-            'ElbowTube',
-            'Pump',
-            'ElbowTube',
-            'TeeTube',
-          ],
-        ],
-        'TeeTube',
-        'SystemIO',
-      ]);
+        ['Pump', 'TeeTube'],
+        ['ElbowTube', 'Pump', 'ElbowTube', 'TeeTube'],
+      ],
+      'TeeTube',
+      'SystemIO',
+    ]);
 
     const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
     expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(1.54, 2);
   });
 
   it('has flow with the other pump enabled', () => {
-    const parts = [...partsBase,
-    {
-      'id': '10',
-      'rotate': 90,
-      'settings': { 'enabled': false, 'onPressure': 10 },
-      'flipped': false,
-      'type': 'Pump',
-      'x': 1,
-      'y': 1,
-    },
-    {
-      'id': '11',
-      'rotate': 90,
-      'settings': { 'enabled': true, 'onPressure': 10 },
-      'flipped': false,
-      'type': 'Pump',
-      'x': 0,
-      'y': 1,
-    }];
+    const parts = [
+      ...partsBase,
+      {
+        id: '10',
+        rotate: 90,
+        settings: { enabled: false, onPressure: 10 },
+        flipped: false,
+        type: 'Pump',
+        x: 1,
+        y: 1,
+      },
+      {
+        id: '11',
+        rotate: 90,
+        settings: { enabled: true, onPressure: 10 },
+        flipped: false,
+        type: 'Pump',
+        x: 0,
+        y: 1,
+      },
+    ];
 
     const flowParts = asFlowParts(parts.map(asStatePart));
 
@@ -1649,52 +1624,44 @@ describe('A forking and joining path with a pump in each fork', () => {
     const path = findPaths(flowParts, start)[0];
 
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
+    expect(visitedTypes).toEqual([
+      'SystemIO',
+      'TeeTube',
+      'TeeTube',
       [
-        'SystemIO',
-        'TeeTube',
-        'TeeTube',
-        [
-          [
-            'Pump',
-            'TeeTube',
-          ],
-          [
-            'ElbowTube',
-            'Pump',
-            'ElbowTube',
-            'TeeTube',
-          ],
-        ],
-        'TeeTube',
-        'SystemIO',
-      ]);
+        ['Pump', 'TeeTube'],
+        ['ElbowTube', 'Pump', 'ElbowTube', 'TeeTube'],
+      ],
+      'TeeTube',
+      'SystemIO',
+    ]);
 
     const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
     expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(0.66, 2);
   });
 
-
   it('has more flow with both pumps', () => {
-    const parts = [...partsBase,
-    {
-      'id': '10',
-      'rotate': 90,
-      'settings': { 'enabled': true, 'onPressure': 10 },
-      'flipped': false,
-      'type': 'Pump',
-      'x': 1,
-      'y': 1,
-    },
-    {
-      'id': '11',
-      'rotate': 90,
-      'settings': { 'enabled': true, 'onPressure': 10 },
-      'flipped': false,
-      'type': 'Pump',
-      'x': 0,
-      'y': 1,
-    }];
+    const parts = [
+      ...partsBase,
+      {
+        id: '10',
+        rotate: 90,
+        settings: { enabled: true, onPressure: 10 },
+        flipped: false,
+        type: 'Pump',
+        x: 1,
+        y: 1,
+      },
+      {
+        id: '11',
+        rotate: 90,
+        settings: { enabled: true, onPressure: 10 },
+        flipped: false,
+        type: 'Pump',
+        x: 0,
+        y: 1,
+      },
+    ];
 
     const flowParts = asFlowParts(parts.map(asStatePart));
 
@@ -1703,30 +1670,19 @@ describe('A forking and joining path with a pump in each fork', () => {
     const path = findPaths(flowParts, start)[0];
 
     const visitedTypes = propertyWalker([], path, ['root', 'type']);
-    expect(visitedTypes).toEqual(
+    expect(visitedTypes).toEqual([
+      'SystemIO',
+      'TeeTube',
+      'TeeTube',
       [
-        'SystemIO',
-        'TeeTube',
-        'TeeTube',
-        [
-          [
-            'Pump',
-            'TeeTube',
-          ],
-          [
-            'ElbowTube',
-            'Pump',
-            'ElbowTube',
-            'TeeTube',
-          ],
-        ],
-        'TeeTube',
-        'SystemIO',
-      ]);
+        ['Pump', 'TeeTube'],
+        ['ElbowTube', 'Pump', 'ElbowTube', 'TeeTube'],
+      ],
+      'TeeTube',
+      'SystemIO',
+    ]);
 
     const partsWithFlow = calculateFlows(asFlowParts(parts.map(asStatePart)));
-    expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(2.20, 2);
+    expect(partsWithFlow[0].flows['2,2.5,0']['#DB0023']).toBeCloseTo(2.2, 2);
   });
 });
-
-

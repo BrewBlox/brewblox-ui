@@ -1,8 +1,6 @@
 import isString from 'lodash/isString';
 
-type ValidationMode =
-  | 'result'
-  | 'error'
+type ValidationMode = 'result' | 'error';
 
 /**
  * Creates a function to check whether a given value is valid.
@@ -15,23 +13,28 @@ type ValidationMode =
  * @param rules
  * @param mode
  */
-export function makeRuleValidator(rules: InputRule[]): ((val: any) => boolean);
-export function makeRuleValidator(rules: InputRule[], mode: 'result'): ((val: any) => boolean);
-export function makeRuleValidator(rules: InputRule[], mode: 'error'): ((val: any) => string | null);
-export function makeRuleValidator(rules: InputRule[], mode?: ValidationMode): ((val: any) => boolean | string | null) {
-  return val => {
+export function makeRuleValidator(rules: InputRule[]): (val: any) => boolean;
+export function makeRuleValidator(
+  rules: InputRule[],
+  mode: 'result',
+): (val: any) => boolean;
+export function makeRuleValidator(
+  rules: InputRule[],
+  mode: 'error',
+): (val: any) => string | null;
+export function makeRuleValidator(
+  rules: InputRule[],
+  mode?: ValidationMode,
+): (val: any) => boolean | string | null {
+  return (val) => {
     for (const rule of rules) {
       const res = rule(val);
       if (isString(res)) {
-        return mode === 'error'
-          ? res
-          : false;
+        return mode === 'error' ? res : false;
       }
     }
     // No errors found
-    return mode === 'error'
-      ? null
-      : true;
+    return mode === 'error' ? null : true;
   };
 }
 
@@ -58,15 +61,16 @@ export function makeRuleValidator(rules: InputRule[], mode?: ValidationMode): ((
  * @param validate
  * @returns The first value where `validate(value)` is true.
  */
-export function suggestId(id: string, validate: (val: string) => boolean): string {
+export function suggestId(
+  id: string,
+  validate: (val: string) => boolean,
+): string {
   if (validate(id)) {
     return id;
   }
 
   const copyName = (i: number): string =>
-    id.match(/-\d+$/)
-      ? id.replace(/-\d+$/, `-${i}`)
-      : `${id}-${i}`;
+    id.match(/-\d+$/) ? id.replace(/-\d+$/, `-${i}`) : `${id}-${i}`;
 
   let idx = 2;
   while (!validate(copyName(idx))) {

@@ -8,39 +8,40 @@ import { Quantity, TempUnit } from '@/shared-types';
 import { systemStore } from '@/store/system';
 
 import { prettyQty } from './formatting';
-import { isCompatibleQty, isDurationString, isDurationUnit, isQuantity, libUnit, toLibQty } from './identity';
+import {
+  isCompatibleQty,
+  isDurationString,
+  isDurationUnit,
+  isQuantity,
+  libUnit,
+  toLibQty,
+} from './identity';
 
-type QuantityCompatible =
-  | Quantity
-  | number
-  | string
-  | null
+type QuantityCompatible = Quantity | number | string | null;
 
-type DurationCompatible =
-  | Quantity
-  | number
-  | string
+type DurationCompatible = Quantity | number | string;
 
 type TempFunc = (valueDegC: number | null) => Quantity;
 
-const fromArgs =
-  (value: number | null, unit: string, readonly = false): Quantity => ({
-    __bloxtype: 'Quantity',
-    value,
-    unit,
-    readonly: readonly || undefined,
-  });
+const fromArgs = (
+  value: number | null,
+  unit: string,
+  readonly = false,
+): Quantity => ({
+  __bloxtype: 'Quantity',
+  value,
+  unit,
+  readonly: readonly || undefined,
+});
 
 export function rawQty(value: number | null, unit: string): Quantity;
 export function rawQty(value: Quantity | string): Quantity;
 export function rawQty(value: QuantityCompatible, unit?: string): Quantity {
   if (isQuantity(value)) {
     return fromArgs(value.value, value.unit, value.readonly);
-  }
-  else if (isDurationString(value)) {
+  } else if (isDurationString(value)) {
     return fromArgs(durationMs(value) / 1000, 's');
-  }
-  else if ((value === null || isNumber(value)) && isString(unit)) {
+  } else if ((value === null || isNumber(value)) && isString(unit)) {
     return fromArgs(value, unit);
   }
   throw new Error(`Invalid Quantity args: ${value}, ${unit}`);
@@ -91,26 +92,25 @@ export class JSQuantity implements Quantity {
   }
 
   public eq(other: Quantity): boolean {
-    return isQuantity(other)
-      && isCompatibleQty(this, other)
-      && (this.value === null) === (other.value === null)
-      && toLibQty(this.round()).eq(toLibQty(bloxQty(other).round()));
+    return (
+      isQuantity(other) &&
+      isCompatibleQty(this, other) &&
+      (this.value === null) === (other.value === null) &&
+      toLibQty(this.round()).eq(toLibQty(bloxQty(other).round()))
+    );
   }
 
   public to(unit: string): JSQuantity {
     if (unit === this.unit) {
       return this.copy();
     }
-    const value = this.value !== null
-      ? toLibQty(this).to(libUnit(unit)).scalar
-      : null;
+    const value =
+      this.value !== null ? toLibQty(this).to(libUnit(unit)).scalar : null;
     return this.copy(value, unit);
   }
 
   public round(precision = 2): JSQuantity {
-    const value = this.value !== null
-      ? round(this.value, precision)
-      : null;
+    const value = this.value !== null ? round(this.value, precision) : null;
     return this.copy(value);
   }
 }
@@ -152,14 +152,11 @@ export function durationMs(duration: Maybe<DurationCompatible>): number {
     return isDurationUnit(duration.unit)
       ? bloxQty(duration).to('ms').value ?? 0
       : 0;
-  }
-  else if (isFinite(duration)) {
+  } else if (isFinite(duration)) {
     return Number(duration);
-  }
-  else if (isDurationString(duration)) {
+  } else if (isDurationString(duration)) {
     return parseDuration(duration);
-  }
-  else {
+  } else {
     return 0;
   }
 }
@@ -184,12 +181,12 @@ export function durationString(duration: Maybe<DurationCompatible>): string {
 
   const secondsTotal = Number(ms) / 1000;
   const days = Math.floor(secondsTotal / 86400);
-  const hours = Math.floor((secondsTotal - (days * 86400)) / 3600);
-  const minutes =
-    Math.floor((secondsTotal - (days * 86400) - (hours * 3600)) / 60);
+  const hours = Math.floor((secondsTotal - days * 86400) / 3600);
+  const minutes = Math.floor((secondsTotal - days * 86400 - hours * 3600) / 60);
   const seconds = Math.floor(
-    secondsTotal - (days * 86400) - (hours * 3600) - (minutes * 60));
-  const milliseconds = (secondsTotal < 10) ? ms % 1000 : 0;
+    secondsTotal - days * 86400 - hours * 3600 - minutes * 60,
+  );
+  const milliseconds = secondsTotal < 10 ? ms % 1000 : 0;
   const values = [
     [days, 'd'],
     [hours, 'h'],
@@ -205,15 +202,24 @@ export function durationString(duration: Maybe<DurationCompatible>): string {
   return strVal;
 }
 
-const converted = (valueDegC: number | null, fmt: (unit: TempUnit) => string): Quantity =>
+const converted = (
+  valueDegC: number | null,
+  fmt: (unit: TempUnit) => string,
+): Quantity =>
   bloxQty(valueDegC, fmt('degC')).to(fmt(systemStore.units.temperature));
 
-export const tempQty: TempFunc = v => converted(v, u => u);
-export const inverseTempQty: TempFunc = v => converted(v, u => `1 / ${u}`);
-export const deltaTempQty: TempFunc = v => converted(v, u => `delta_${u}`);
-export const deltaTempPerSecondQty: TempFunc = v => converted(v, u => `delta_${u} / second`);
-export const deltaTempPerMinuteQty: TempFunc = v => converted(v, u => `delta_${u} / minute`);
-export const deltaTempPerHourQty: TempFunc = v => converted(v, u => `delta_${u} / hour`);
-export const deltaTempMultSecondQty: TempFunc = v => converted(v, u => `delta_${u} * second`);
-export const deltaTempMultMinuteQty: TempFunc = v => converted(v, u => `delta_${u} * minute`);
-export const deltaTempMultHourQty: TempFunc = v => converted(v, u => `delta_${u} * hour`);
+export const tempQty: TempFunc = (v) => converted(v, (u) => u);
+export const inverseTempQty: TempFunc = (v) => converted(v, (u) => `1 / ${u}`);
+export const deltaTempQty: TempFunc = (v) => converted(v, (u) => `delta_${u}`);
+export const deltaTempPerSecondQty: TempFunc = (v) =>
+  converted(v, (u) => `delta_${u} / second`);
+export const deltaTempPerMinuteQty: TempFunc = (v) =>
+  converted(v, (u) => `delta_${u} / minute`);
+export const deltaTempPerHourQty: TempFunc = (v) =>
+  converted(v, (u) => `delta_${u} / hour`);
+export const deltaTempMultSecondQty: TempFunc = (v) =>
+  converted(v, (u) => `delta_${u} * second`);
+export const deltaTempMultMinuteQty: TempFunc = (v) =>
+  converted(v, (u) => `delta_${u} * minute`);
+export const deltaTempMultHourQty: TempFunc = (v) =>
+  converted(v, (u) => `delta_${u} * hour`);

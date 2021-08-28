@@ -1,23 +1,20 @@
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 
 import { useWidget } from '@/composables';
 import { BlockType, GpioModuleStatus, GpioPins, OneWireGpioModuleBlock } from '@/shared-types';
 import { Widget } from '@/store/widgets';
 
-import GpioChannelEditor from '../OneWireGpioModule/GpioChannelEditor.vue';
+import OneWireGpioEditor from '../OneWireGpioModule/OneWireGpioEditor.vue';
 
 export default defineComponent({
   name: 'OneWireGpioTestWidget',
   components: {
-    GpioChannelEditor,
+    OneWireGpioEditor,
   },
-  props: {
-
-  },
+  props: {},
   setup() {
-
-    const { } = useWidget.setup<Widget>();
+    const {} = useWidget.setup<Widget>();
 
     const block = ref<OneWireGpioModuleBlock>({
       id: 'test-gpio',
@@ -50,15 +47,12 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <Card>
     <template #toolbar>
       <WidgetToolbar />
     </template>
 
-    <GpioChannelEditor
-      v-model:block="block"
-    />
+    <OneWireGpioEditor v-model:block="block" />
   </Card>
 </template>

@@ -4,7 +4,7 @@ pool:
 trigger:
   tags:
     include:
-      - "*"
+      - '*'
   branches:
     include:
       - refs/heads/*
@@ -23,50 +23,52 @@ variables:
     value: brewblox/brewblox-ui
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '14.x'
-  displayName: 'Install Node.js'
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '14.x'
+    displayName: 'Install Node.js'
 
-- bash: |
-    BRANCH=$(echo $(Build.SourceBranch) | grep -oP "^refs/heads/\K.*")
-    TAG=$(echo $BRANCH | tr '/' '-' | tr '[:upper:]' '[:lower:]')
-    echo "##vso[task.setvariable variable=BRANCH]$BRANCH"
-    echo "##vso[task.setvariable variable=TAG]$TAG"
-  displayName: Export build variables
+  - bash: |
+      BRANCH=$(echo $(Build.SourceBranch) | grep -oP "^refs/heads/\K.*")
+      TAG=$(echo $BRANCH | tr '/' '-' | tr '[:upper:]' '[:lower:]')
+      echo "##vso[task.setvariable variable=BRANCH]$BRANCH"
+      echo "##vso[task.setvariable variable=TAG]$TAG"
+    displayName: Export build variables
 
-- bash: |
-    npm ci
-  displayName: NPM install
+  - bash: |
+      yarn ci
+    displayName: Install
 
-- bash: |
-    npm run lint
-    npm run test
-  displayName: NPM test
+  - bash: |
+      yarn lint
+      yarn test
+    displayName: Test
 
-- bash: |
-    npm run build
-  displayName: NPM build
+  - bash: |
+      yarn build
+    displayName: Build dist
 
-- bash: |
-    curl -fsSL https://raw.githubusercontent.com/BrewBlox/deployed-images/develop/prepare_buildx.sh | bash
-  displayName: Prepare buildx
-  condition: and(succeeded(), variables.BRANCH)
+  - bash: |
+      docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      docker buildx create --use
+      docker buildx inspect --bootstrap
+    displayName: Prepare buildx
+    condition: and(succeeded(), variables.BRANCH)
 
-- bash: echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USER) --password-stdin
-  displayName: Docker login
-  condition: and(succeeded(), variables.BRANCH)
+  - bash: echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USER) --password-stdin
+    displayName: Docker login
+    condition: and(succeeded(), variables.BRANCH)
 
-- bash: cp -rf dist/ docker/
-  displayName: Copy files to docker context
-  condition: and(succeeded(), variables.BRANCH)
+  - bash: cp -rf dist/ docker/
+    displayName: Copy files to docker context
+    condition: and(succeeded(), variables.BRANCH)
 
-- bash: >-
-    docker buildx build
-    --tag $(DOCKER_REPO):$(TAG)
-    --build-arg service_info="$(git describe) @ $(date)"
-    --push
-    --platform linux/amd64,linux/arm/v7,linux/arm64/v8
-    docker
-  displayName: Build Docker images
-  condition: and(succeeded(), variables['BRANCH'])
+  - bash: >-
+      docker buildx build
+      --tag $(DOCKER_REPO):$(TAG)
+      --build-arg service_info="$(git describe) @ $(date)"
+      --push
+      --platform linux/amd64,linux/arm/v7,linux/arm64/v8
+      docker
+    displayName: Build Docker images
+    condition: and(succeeded(), variables['BRANCH'])

@@ -1,16 +1,16 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { OneWireGpioModuleBlock } from '@/shared-types';
 
 import { useBlockWidget } from '../../composables';
-import GpioChannelEditor from './GpioChannelEditor.vue';
+import OneWireGpioEditor from './OneWireGpioEditor.vue';
 
 export default defineComponent({
   name: 'OneWireGpioModuleWidget',
   components: {
-    GpioChannelEditor,
+    OneWireGpioEditor,
   },
   setup() {
     const { context } = useContext.setup();
@@ -35,6 +35,6 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <GpioChannelEditor :block="block" @update:block="doSaveBlock" />
+    <OneWireGpioEditor :block="block" @update:block="doSaveBlock" />
   </Card>
 </template>

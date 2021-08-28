@@ -10,7 +10,12 @@ import { createDialog } from '@/utils/dialog';
 
 import { emptyGraphConfig } from '../const';
 import { historyStore } from '../store';
-import { LoggedSession, SessionGraphNote, SessionNote, SharedGraphConfig } from '../types';
+import {
+  LoggedSession,
+  SessionGraphNote,
+  SessionNote,
+  SharedGraphConfig,
+} from '../types';
 import { sharedWidgetConfigs } from '../utils';
 import SessionHeaderField from './SessionHeaderField.vue';
 import { SessionLogWidget } from './types';
@@ -30,8 +35,8 @@ export default defineComponent({
     const colDistance = ref<number>(0);
     const noteboxRef = ref<ComponentPublicInstance>();
 
-    const session = computed<LoggedSession | null>(
-      () => historyStore.sessionById(config.value.currentSession),
+    const session = computed<LoggedSession | null>(() =>
+      historyStore.sessionById(config.value.currentSession),
     );
 
     function saveSession(sess: LoggedSession | null = session.value): void {
@@ -42,7 +47,7 @@ export default defineComponent({
 
     const notes = computed<SessionNote[]>({
       get: () => session.value?.notes ?? [],
-      set: notes => {
+      set: (notes) => {
         if (session.value) {
           session.value.notes = notes;
           saveSession();
@@ -54,8 +59,10 @@ export default defineComponent({
       return [
         ...sharedWidgetConfigs(excluded),
         ...notes.value
-          .filter(note => note.type === 'Graph' && !excluded.includes(note.id))
-          .map(note => {
+          .filter(
+            (note) => note.type === 'Graph' && !excluded.includes(note.id),
+          )
+          .map((note) => {
             const { id, title, config } = note as SessionGraphNote;
             return { id, title: `(Note) ${title}`, config };
           }),
@@ -93,17 +100,16 @@ export default defineComponent({
           title: 'Add note',
           label: 'Name',
         },
-      })
-        .onOk(title => {
-          notes.value.push({
-            id: nanoid(),
-            type: 'Text',
-            title,
-            value: '',
-            col: 12,
-          });
-          saveSession();
+      }).onOk((title) => {
+        notes.value.push({
+          id: nanoid(),
+          type: 'Text',
+          title,
+          value: '',
+          col: 12,
         });
+        saveSession();
+      });
     }
 
     function addGraphNote(): void {
@@ -114,19 +120,18 @@ export default defineComponent({
           title: 'Add graph',
           label: 'Name',
         },
-      })
-        .onOk(title => {
-          notes.value.push({
-            id: nanoid(),
-            type: 'Graph',
-            title,
-            start: null,
-            end: null,
-            config: emptyGraphConfig(),
-            col: 12,
-          });
-          saveSession();
+      }).onOk((title) => {
+        notes.value.push({
+          id: nanoid(),
+          type: 'Graph',
+          title,
+          start: null,
+          end: null,
+          config: emptyGraphConfig(),
+          col: 12,
         });
+        saveSession();
+      });
     }
 
     function editGraph(note: SessionGraphNote): void {
@@ -138,22 +143,22 @@ export default defineComponent({
           noPeriod: true,
           shared: sharedConfigs([note.id]),
         },
-      })
-        .onOk(config => {
-          const actual = notes.value.find(n => n.id === note.id);
-          if (actual?.type === 'Graph') {
-            actual.config = config;
-            saveSession();
-          }
-        });
+      }).onOk((config) => {
+        const actual = notes.value.find((n) => n.id === note.id);
+        if (actual?.type === 'Graph') {
+          actual.config = config;
+          saveSession();
+        }
+      });
     }
 
     function onSwipe(args: PanArguments, note: SessionNote): void {
       if (args.isFirst) {
         initialCol.value = note.col;
-        colDistance.value = noteboxRef.value !== undefined
-          ? (width(noteboxRef.value.$el) || 600) / 12
-          : 50;
+        colDistance.value =
+          noteboxRef.value !== undefined
+            ? (width(noteboxRef.value.$el) || 600) / 12
+            : 50;
       }
 
       const delta = Math.round(args.offset.x / colDistance.value);
@@ -181,7 +186,6 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <div>
     <slot name="warnings" />
@@ -200,13 +204,14 @@ export default defineComponent({
         item-key="id"
         class="col row q-gutter-xs"
       >
-        <template #item="{element}">
-          <div
-            :class="[`col-${element.col}`, 'q-pa-xs q-ma-none']"
-          >
-            <div style="border: 1px solid silver; border-right: 3px dotted silver;" class="relative-position">
+        <template #item="{ element }">
+          <div :class="[`col-${element.col}`, 'q-pa-xs q-ma-none']">
+            <div
+              style="border: 1px solid silver; border-right: 3px dotted silver"
+              class="relative-position"
+            >
               <div
-                v-touch-pan.prevent.stop.mouse="v => onSwipe(v, element)"
+                v-touch-pan.prevent.stop.mouse="(v) => onSwipe(v, element)"
                 class="move-border"
               />
               <div class="row q-gutter-x-xs q-pa-xs">
@@ -216,27 +221,27 @@ export default defineComponent({
                   label="Name"
                   dense
                   tag-class="ellipsis-3-lines text-secondary"
-                  style="max-width: 100%;"
+                  style="max-width: 100%"
                   class="col q-pb-xs"
-                  @update:model-value="v => saveTitle(element, v)"
+                  @update:model-value="(v) => saveTitle(element, v)"
                 >
                   <template #before>
                     <q-icon
-                      :name="element.type === 'Graph' ? 'mdi-chart-line' : 'mdi-text-subject'"
+                      :name="
+                        element.type === 'Graph'
+                          ? 'mdi-chart-line'
+                          : 'mdi-text-subject'
+                      "
                       size="xs"
                       class="self-end q-mb-none"
                       color="secondary"
                     />
                   </template>
                 </InputField>
-                <div
-                  v-if="element.type === 'Graph'"
-                  class="col-auto row"
-                >
+                <div v-if="element.type === 'Graph'" class="col-auto row">
                   <q-btn
                     icon="settings"
                     flat
-
                     class="col self-stretch depth-1"
                     @click="editGraph(element)"
                   >
@@ -284,14 +289,8 @@ export default defineComponent({
         <q-btn fab-mini color="secondary" icon="add">
           <q-menu>
             <q-list>
-              <ActionItem
-                label="Add text note"
-                @click="addTextNote"
-              />
-              <ActionItem
-                label="Add graph"
-                @click="addGraphNote"
-              />
+              <ActionItem label="Add text note" @click="addTextNote" />
+              <ActionItem label="Add graph" @click="addGraphNote" />
             </q-list>
           </q-menu>
         </q-btn>

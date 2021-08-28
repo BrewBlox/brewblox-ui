@@ -1,4 +1,9 @@
-import { AnalogCompareOp, DigitalCompareOp, DigitalState, LogicResult } from '@/plugins/spark/types';
+import {
+  AnalogCompareOp,
+  DigitalCompareOp,
+  DigitalState,
+  LogicResult,
+} from '@/plugins/spark/types';
 
 export const characterTitles = {
   '(': 'Sub-expression start',

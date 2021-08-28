@@ -18,39 +18,58 @@ export class FlowSegment {
   public next: FlowSegment | null = null;
 
   public friction(input: PathFriction): PathFriction {
-    const equivalentFriction =
-      (toTransform: PathFriction[], splitInput: PathFriction): { total: PathFriction; split: number[] } => {
+    const equivalentFriction = (
+      toTransform: PathFriction[],
+      splitInput: PathFriction,
+    ): { total: PathFriction; split: number[] } => {
+      const basePressure = splitInput.pressureDiff ? 0 : 0.01;
+      splitInput.pressureDiff += basePressure; // zero input pressure throws off calculation.
 
-        const basePressure = splitInput.pressureDiff ? 0 : 0.01;
-        splitInput.pressureDiff += basePressure; // zero input pressure throws off calculation.
-
-        // Apply Millman’s Theorem Equation to calculate node pressure on the split
-        const allPaths = [splitInput, ...toTransform.map(entry => ({
+      // Apply Millman’s Theorem Equation to calculate node pressure on the split
+      const allPaths = [
+        splitInput,
+        ...toTransform.map((entry) => ({
           pressureDiff: -entry.pressureDiff,
           friction: entry.friction,
-        }))];
-        const num = allPaths.reduce((acc, p) => p.friction ? acc + p.pressureDiff / p.friction : acc, 0);
-        const denum = allPaths.reduce((acc, p) => p.friction ? acc + 1 / p.friction : acc, 0);
-        const nodePressure = num / denum;
+        })),
+      ];
+      const num = allPaths.reduce(
+        (acc, p) => (p.friction ? acc + p.pressureDiff / p.friction : acc),
+        0,
+      );
+      const denum = allPaths.reduce(
+        (acc, p) => (p.friction ? acc + 1 / p.friction : acc),
+        0,
+      );
+      const nodePressure = num / denum;
 
-        let equivalentSplitFrictions = toTransform.map(v => v.friction);
-        let totalPressureDiff = input.pressureDiff;
+      let equivalentSplitFrictions = toTransform.map((v) => v.friction);
+      let totalPressureDiff = input.pressureDiff;
 
-        if (input.pressureDiff !== 0 || allPaths.some(v => v.pressureDiff !== 0)) {
-          // convert pressure difference + friction on each split to only an equivalent (possibly negative) friction
-          equivalentSplitFrictions = toTransform.map((entry): number =>
-            nodePressure * entry.friction / (nodePressure + entry.pressureDiff));
-        }
-        else {
-          totalPressureDiff = nodePressure;
-        }
-        const eqInv = equivalentSplitFrictions.map(v => 1 / v);
-        const eqFriction = 1 / eqInv.reduce((acc, entry) => acc + entry, 0);
-        return {
-          total: { pressureDiff: totalPressureDiff, friction: input.friction + eqFriction },
-          split: eqInv.map(v => v * eqFriction),
-        };
+      if (
+        input.pressureDiff !== 0 ||
+        allPaths.some((v) => v.pressureDiff !== 0)
+      ) {
+        // convert pressure difference + friction on each split
+        // to only an equivalent (possibly negative) friction
+        equivalentSplitFrictions = toTransform.map(
+          (entry): number =>
+            (nodePressure * entry.friction) /
+            (nodePressure + entry.pressureDiff),
+        );
+      } else {
+        totalPressureDiff = nodePressure;
+      }
+      const eqInv = equivalentSplitFrictions.map((v) => 1 / v);
+      const eqFriction = 1 / eqInv.reduce((acc, entry) => acc + entry, 0);
+      return {
+        total: {
+          pressureDiff: totalPressureDiff,
+          friction: input.friction + eqFriction,
+        },
+        split: eqInv.map((v) => v * eqFriction),
       };
+    };
 
     let series = input;
 
@@ -61,13 +80,14 @@ export class FlowSegment {
       series = this.next.friction(series);
     }
 
-
     if (this.splits.length > 1) {
       // splitting. Convert the combined paths into an equivalent series friction
-      const splitPF = this.splits.map(split => split.friction({
-        pressureDiff: split.inRoute.pressure ?? 0,
-        friction: split.inRoute.friction ?? DEFAULT_FRICTION,
-      }));
+      const splitPF = this.splits.map((split) =>
+        split.friction({
+          pressureDiff: split.inRoute.pressure ?? 0,
+          friction: split.inRoute.friction ?? DEFAULT_FRICTION,
+        }),
+      );
 
       const splitFriction = equivalentFriction(splitPF, series);
       series = splitFriction.total;
@@ -77,7 +97,10 @@ export class FlowSegment {
     return series;
   }
 
-  public reduceSegments(func: (acc: any, segment: FlowSegment) => any, acc: AnyDict): any {
+  public reduceSegments(
+    func: (acc: any, segment: FlowSegment) => any,
+    acc: AnyDict,
+  ): any {
     acc = func(acc, this);
     this.splits.forEach((child) => {
       acc = child.reduceSegments(func, acc);
@@ -118,20 +141,23 @@ export class FlowSegment {
       }
       return last;
     }
-    this.splits.forEach(split => {
+    this.splits.forEach((split) => {
       const r = split.lastRoutes();
       if (r.length === 0) {
         routes.push(split.inRoute);
-      }
-      else {
-        r.forEach(v => { routes.push(v); });
+      } else {
+        r.forEach((v) => {
+          routes.push(v);
+        });
       }
     });
     return routes;
   }
 }
 
-const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSegment | null } => {
+const mergeEnds = (
+  splits: FlowSegment[],
+): { splits: FlowSegment[]; end: FlowSegment | null } => {
   if (splits.length < 2) {
     return { splits, end: null };
   }
@@ -157,8 +183,7 @@ const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSeg
       for (const [idx, split] of splits.entries()) {
         if (sharedEndIdx.indexOf(idx) !== -1) {
           combinedSplits.push(split);
-        }
-        else {
+        } else {
           unTouchedSplits.push(split);
         }
       }
@@ -166,34 +191,34 @@ const mergeEnds = (splits: FlowSegment[]): { splits: FlowSegment[]; end: FlowSeg
         Notify.create({
           icon: 'warning',
           color: 'warning',
-          message: 'The flows split and rejoin in too many places. Some flows might be incorrect.',
+          message:
+            'The flows split and rejoin in too many places. Some flows might be incorrect.',
         });
       }
       return { splits: combinedSplits, end: end };
     }
     if (walker.next) {
       walker = walker.next;
-    }
-    else {
+    } else {
       return { splits, end: null };
     }
   }
 };
 
 export const mergeOverlappingSplits = (path: FlowSegment): FlowSegment => {
-  const sortedBySink: { [coords: string]: { splits: FlowSegment[]; end: FlowSegment | null } } = {};
+  const sortedBySink: {
+    [coords: string]: { splits: FlowSegment[]; end: FlowSegment | null };
+  } = {};
   for (const split of path.splits) {
     if (split.sinksTo.size) {
       const sortName = JSON.stringify(split.sinksTo);
       if (sortedBySink[sortName] !== undefined) {
         sortedBySink[sortName].splits.push(split);
-      }
-      else {
+      } else {
         sortedBySink[sortName] = { splits: [split], end: null };
       }
     }
   }
-
 
   for (const sink in sortedBySink) {
     while (sortedBySink[sink].splits.length > 1) {

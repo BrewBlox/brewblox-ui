@@ -22,13 +22,11 @@ interface UnusedSlot {
 }
 
 function startBit(n: number): number {
-  return n > 0
-    ? Math.log2(n & -n)
-    : -1;
+  return n > 0 ? Math.log2(n & -n) : -1;
 }
 
 export default defineComponent({
-  name: 'GpioChannelEditor',
+  name: 'OneWireGpioEditor',
   props: {
     block: {
       type: Object as PropType<OneWireGpioModuleBlock>,
@@ -44,9 +42,9 @@ export default defineComponent({
     const typeOpts = Enum.values(GpioDeviceType);
 
     const selectedChannel = computed<GpioModuleChannel | null>(
-      () => props.block.data.channels
-        .find(c => c.id === selectedId.value)
-        ?? null,
+      () =>
+        props.block.data.channels.find((c) => c.id === selectedId.value) ??
+        null,
     );
 
     function saveBlock(v: OneWireGpioModuleBlock = props.block): void {
@@ -55,19 +53,20 @@ export default defineComponent({
 
     const power = computed<boolean>({
       get: () => props.block.data.useExternalPower,
-      set: useExternalPower => saveBlock({
-        ...props.block,
-        data: {
-          ...props.block.data,
-          useExternalPower,
-        },
-      }),
+      set: (useExternalPower) =>
+        saveBlock({
+          ...props.block,
+          data: {
+            ...props.block.data,
+            useExternalPower,
+          },
+        }),
     });
 
-    const unassigned = computed<DeviceSlot[]>(
-      () => props.block.data.channels
-        .filter(c => c.pinsMask === GpioPins.NONE)
-        .map(c => ({
+    const unassigned = computed<DeviceSlot[]>(() =>
+      props.block.data.channels
+        .filter((c) => c.pinsMask === GpioPins.NONE)
+        .map((c) => ({
           id: c.id,
           name: c.deviceType,
           width: c.width,
@@ -75,36 +74,36 @@ export default defineComponent({
         })),
     );
 
-    const active = computed<DeviceSlot[]>(
-      () => props.block.data.channels
-        .filter(c => c.pinsMask !== GpioPins.NONE)
-        .map(c => ({
+    const active = computed<DeviceSlot[]>(() =>
+      props.block.data.channels
+        .filter((c) => c.pinsMask !== GpioPins.NONE)
+        .map((c) => ({
           id: c.id,
           name: c.deviceType,
           width: c.width,
           start: startBit(c.pinsMask),
-          })),
+        })),
     );
 
-    const unused = computed<UnusedSlot[]>(
-      () => {
-        // always set a bit at idx 8
-        // this provides an upper boundary when calculating free space
-        const mask: number = props.block.data.channels
-          .reduce((acc, c) => acc | c.pinsMask, (1 << 8));
+    const unused = computed<UnusedSlot[]>(() => {
+      // always set a bit at idx 8
+      // this provides an upper boundary when calculating free space
+      const mask: number = props.block.data.channels.reduce(
+        (acc, c) => acc | c.pinsMask,
+        1 << 8,
+      );
 
-        const output: UnusedSlot[] = [];
-        for (let i = 0; i <= 8; i++) {
-          if (!((1 << i) & mask)) {
-            output.push({
-              start: i,
-              free: startBit(mask >> i),
-            });
-          }
+      const output: UnusedSlot[] = [];
+      for (let i = 0; i <= 8; i++) {
+        if (!((1 << i) & mask)) {
+          output.push({
+            start: i,
+            free: startBit(mask >> i),
+          });
         }
-        return output;
-      },
-    );
+      }
+      return output;
+    });
 
     function clickUnassignedArea(): void {
       const channel = selectedChannel.value;
@@ -115,12 +114,9 @@ export default defineComponent({
         ...props.block,
         data: {
           ...props.block.data,
-          channels: props.block.data.channels
-            .map(c =>
-              c.id === channel.id
-                ? { ...c, pinsMask: GpioPins.NONE }
-                : c,
-            ),
+          channels: props.block.data.channels.map((c) =>
+            c.id === channel.id ? { ...c, pinsMask: GpioPins.NONE } : c,
+          ),
         },
       });
     }
@@ -128,8 +124,7 @@ export default defineComponent({
     function clickUnassigned(id: number): void {
       if (selectedId.value === id) {
         selectedId.value = null;
-      }
-      else {
+      } else {
         selectedId.value = id;
       }
     }
@@ -137,8 +132,7 @@ export default defineComponent({
     function clickActive(id: number): void {
       if (selectedId.value === id) {
         selectedId.value = null;
-      }
-      else {
+      } else {
         selectedId.value = id;
       }
     }
@@ -146,7 +140,7 @@ export default defineComponent({
     function buildMask(start: number, width: number): number {
       let mask = 0;
       for (let i = 0; i < width; i++) {
-        mask |= (1 << (i + start));
+        mask |= 1 << (i + start);
       }
       return mask;
     }
@@ -160,18 +154,17 @@ export default defineComponent({
         ...props.block,
         data: {
           ...props.block.data,
-          channels: props.block.data.channels
-            .map(c =>
-              c.id === channel.id
-                ? { ...c, pinsMask: buildMask(start, channel.width) }
-                : c,
-            ),
+          channels: props.block.data.channels.map((c) =>
+            c.id === channel.id
+              ? { ...c, pinsMask: buildMask(start, channel.width) }
+              : c,
+          ),
         },
       });
     }
 
     function unusedId(): number {
-      const ids = props.block.data.channels.map(c => c.id);
+      const ids = props.block.data.channels.map((c) => c.id);
       let i = 1;
       while (ids.includes(i)) {
         i++;
@@ -191,33 +184,36 @@ export default defineComponent({
         ...props.block,
         data: {
           ...props.block.data,
-          channels: [
-            ...props.block.data.channels,
-            channel,
-          ],
+          channels: [...props.block.data.channels, channel],
         },
       });
     }
 
     function editChannel(): void {
       const channel = selectedChannel.value;
-      if (!channel) { return; }
+      if (!channel) {
+        return;
+      }
     }
 
     function removeChannel(): void {
       const channel = selectedChannel.value;
-      if (!channel) { return; }
+      if (!channel) {
+        return;
+      }
       saveBlock({
         ...props.block,
         data: {
           ...props.block.data,
-          channels: props.block.data.channels.filter(c => c.id !== channel.id),
+          channels: props.block.data.channels.filter(
+            (c) => c.id !== channel.id,
+          ),
         },
       });
     }
 
-    const raw = computed<string>(
-      () => JSON.stringify(props.block.data, undefined, 2),
+    const raw = computed<string>(() =>
+      JSON.stringify(props.block.data, undefined, 2),
     );
 
     return {
@@ -245,16 +241,9 @@ export default defineComponent({
 
 <template>
   <div>
+    <div>Module {{ block.data.modulePosition }}</div>
     <div>
-      Module {{ block.data.modulePosition }}
-    </div>
-    <div>
-      <q-select
-        v-model="newType"
-        :options="typeOpts"
-        emit-value
-        map-options
-      />
+      <q-select v-model="newType" :options="typeOpts" emit-value map-options />
       <q-slider
         v-model="newWidth"
         class="col-grow"
@@ -266,15 +255,25 @@ export default defineComponent({
     </div>
     <div class="row q-gutter-md">
       <q-toggle v-model="power" />
-      <q-btn flat label="new" :disable="block.data.channels.length >= 8" @click="addChannel" />
+      <q-btn
+        flat
+        label="new"
+        :disable="block.data.channels.length >= 8"
+        @click="addChannel"
+      />
       <q-btn v-if="selectedId != null" flat label="edit" @click="editChannel" />
-      <q-btn v-if="selectedId != null" flat label="remove" @click="removeChannel" />
+      <q-btn
+        v-if="selectedId != null"
+        flat
+        label="remove"
+        @click="removeChannel"
+      />
     </div>
     Unassigned
     <div
       :class="[
         'container unassigned-area',
-        selectedId !== null && 'bg-selected'
+        selectedId !== null && 'bg-selected',
       ]"
       @click="clickUnassignedArea"
     >
@@ -300,7 +299,7 @@ export default defineComponent({
           'bg-selected': selectedId === slot.id,
         }"
         :style="{
-          gridColumn: `${slot.start + 1} / span ${slot.width}`
+          gridColumn: `${slot.start + 1} / span ${slot.width}`,
         }"
         @click="clickActive(slot.id)"
       >
@@ -314,7 +313,7 @@ export default defineComponent({
           'bg-selected': selectedChannel && selectedChannel.width <= slot.free,
         }"
         :style="{
-          gridColumn: `${slot.start + 1}`
+          gridColumn: `${slot.start + 1}`,
         }"
         @click="clickUnused(slot.start)"
       />
@@ -322,7 +321,7 @@ export default defineComponent({
         Power
       </div>
     </div>
-    <div style="white-space: pre;">
+    <div style="white-space: pre">
       {{ raw }}
     </div>
   </div>

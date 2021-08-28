@@ -7,7 +7,12 @@ import { bloxQty, deltaTempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';
-import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
+import {
+  defineChangedBlocks,
+  defineCreatedBlocks,
+  defineDisplayedBlocks,
+  defineWidgets,
+} from './changes';
 import { defineLayouts } from './changes-layout';
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 
@@ -23,21 +28,14 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'update:actions',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'update:actions', 'back', 'next'],
   setup(props, { emit }) {
     const fullPowerDelta = ref<Quantity>(deltaTempQty(2));
 
-    const userTemp = computed<string>(
-      () => systemStore.units.temperature,
-    );
+    const userTemp = computed<string>(() => systemStore.units.temperature);
 
-    const kp = computed<Quantity>(
-      () => bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+    const kp = computed<Quantity>(() =>
+      bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
     );
 
     function taskDone(): void {
@@ -83,8 +81,11 @@ export default defineComponent({
           </q-item-label>
           <p>
             If the temperature is more than
-            <InlineQuantityField v-model="fullPowerDelta" title="Full power delta" /> too low,
-            run at full power (100%).
+            <InlineQuantityField
+              v-model="fullPowerDelta"
+              title="Full power delta"
+            />
+            too low, run at full power (100%).
           </p>
           <p class="text-italic">
             Proportional gain Kp of the Kettle PID will be set to {{ kp }}.

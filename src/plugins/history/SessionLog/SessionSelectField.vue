@@ -31,41 +31,37 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const sessionOpts = computed<SessionOpt[]>(
-      () => props.sessions.map(asOpt),
-    );
+    const sessionOpts = computed<SessionOpt[]>(() => props.sessions.map(asOpt));
 
     const filteredOpts = ref<SessionOpt[]>(sessionOpts.value);
 
     function filterFn(val, update): void {
       if (val === '') {
-        update(() => filteredOpts.value = sessionOpts.value);
+        update(() => (filteredOpts.value = sessionOpts.value));
         return;
       }
 
       update(() => {
         const needle = escapeRegExp(val.toLowerCase());
-        filteredOpts.value = sessionOpts.value
-          .filter(opt => opt.label.toLowerCase().match(needle)
-            || opt.session.tags?.some(t => t.toLowerCase().match(needle)));
+        filteredOpts.value = sessionOpts.value.filter(
+          (opt) =>
+            opt.label.toLowerCase().match(needle) ||
+            opt.session.tags?.some((t) => t.toLowerCase().match(needle)),
+        );
       });
     }
 
-    const selected = computed<SessionOpt | null>({
-      get: () => props.modelValue !== null
-        ? asOpt(props.modelValue)
-        : null,
-      set: opt => emit('update:modelValue', opt?.session ?? null),
+    const selectedOpt = computed<SessionOpt | null>({
+      get: () => (props.modelValue !== null ? asOpt(props.modelValue) : null),
+      set: (opt) => emit('update:modelValue', opt?.session ?? null),
     });
 
     return {
       filteredOpts,
       filterFn,
-      selected,
+      selectedOpt,
     };
   },
 });
@@ -73,7 +69,7 @@ export default defineComponent({
 
 <template>
   <q-select
-    v-model="selected"
+    v-model="selectedOpt"
     :options="filteredOpts"
     :label="label"
     autofocus
@@ -86,11 +82,14 @@ export default defineComponent({
     @filter="filterFn"
     @keyup.enter.exact.stop
   >
-    <template #option="{opt, selected, toggleOption}">
+    <template #option="{ opt, selected, toggleOption }">
       <q-item :active="selected" clickable @click="toggleOption(opt)">
         <q-item-section style="max-width: 300px">
           {{ opt.label }}
-          <q-item-label v-if="opt.session.tags && opt.session.tags.length > 0" caption>
+          <q-item-label
+            v-if="opt.session.tags && opt.session.tags.length > 0"
+            caption
+          >
             <div class="row wrap q-gutter-xs">
               <q-badge
                 v-for="tag in opt.session.tags"

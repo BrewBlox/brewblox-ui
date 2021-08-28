@@ -2,7 +2,12 @@
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { cleanUnusedNames, discoverBlocks, saveHwInfo, startResetBlocks } from '@/plugins/spark/utils';
+import {
+  cleanUnusedNames,
+  discoverBlocks,
+  saveHwInfo,
+  startResetBlocks,
+} from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { Service, serviceStore } from '@/store/services';
 import { systemStore } from '@/store/system';
@@ -23,18 +28,19 @@ export default defineComponent({
   setup(props) {
     const router = useRouter();
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.serviceId),
+    const sparkModule = computed<SparkServiceModule | null>(() =>
+      sparkStore.moduleById(props.serviceId),
     );
 
-    const service = computed<SparkService | null>(
-      () => serviceStore.serviceById(props.serviceId),
+    const service = computed<SparkService | null>(() =>
+      serviceStore.serviceById(props.serviceId),
     );
 
     const isHomePage = computed<boolean>({
       get: () => systemStore.config.homePage === `/service/${props.serviceId}`,
-      set: v => {
-        const homePage = v && service.value ? `/service/${props.serviceId}` : null;
+      set: (v) => {
+        const homePage =
+          v && service.value ? `/service/${props.serviceId}` : null;
         systemStore.saveConfig({ homePage });
       },
     });

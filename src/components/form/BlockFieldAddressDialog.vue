@@ -45,24 +45,17 @@ export default defineComponent({
       default: () => true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
 
     const fieldId = ref<string | null>(props.modelValue.field);
 
     const _blockId = ref<string | null>(props.modelValue.id);
     const blockId = computed<string | null>({
       get: () => _blockId.value,
-      set: id => {
+      set: (id) => {
         if (id !== _blockId.value) {
           _blockId.value = id;
           fieldId.value = null;
@@ -73,7 +66,7 @@ export default defineComponent({
     const _serviceId = ref<string | null>(props.modelValue.serviceId);
     const serviceId = computed<string | null>({
       get: () => _serviceId.value,
-      set: id => {
+      set: (id) => {
         if (id !== _serviceId.value) {
           _serviceId.value = id;
           blockId.value = null;
@@ -92,80 +85,76 @@ export default defineComponent({
       }
     });
 
-    const validTypes = computed<BlockOrIntfType[]>(
-      () => sparkStore
-        .blockSpecs
-        .filter(spec => isCompatible(spec.type, props.compatible))
-        .filter(spec => sparkStore.fieldSpecs.some(f => f.type === spec.type && props.fieldFilter(f)))
-        .map(v => v.type),
+    const validTypes = computed<BlockOrIntfType[]>(() =>
+      sparkStore.blockSpecs
+        .filter((spec) => isCompatible(spec.type, props.compatible))
+        .filter((spec) =>
+          sparkStore.fieldSpecs.some(
+            (f) => f.type === spec.type && props.fieldFilter(f),
+          ),
+        )
+        .map((v) => v.type),
     );
 
     const blockIdOpts = computed<string[]>(
-      () => sparkStore.moduleById(serviceId.value)
-        ?.blocks
-        .filter(block => props.blockFilter(block))
-        .filter(block => validTypes.value.includes(block.type))
-        .map(block => block.id)
-        .sort()
-        ?? [],
+      () =>
+        sparkStore
+          .moduleById(serviceId.value)
+          ?.blocks.filter((block) => props.blockFilter(block))
+          .filter((block) => validTypes.value.includes(block.type))
+          .map((block) => block.id)
+          .sort() ?? [],
     );
 
-    const block = computed<Block | null>(
-      () => sparkStore.blockById(serviceId.value, blockId.value),
+    const block = computed<Block | null>(() =>
+      sparkStore.blockById(serviceId.value, blockId.value),
     );
 
-    const blockSpec = computed<BlockSpec | null>(
-      () => block.value
-        ? sparkStore.blockSpecByAddress(block.value)
-        : null,
+    const blockSpec = computed<BlockSpec | null>(() =>
+      block.value ? sparkStore.blockSpecByAddress(block.value) : null,
     );
 
     const fieldIdOpts = computed<SelectOption<string>[]>(
-      () => sparkStore
-        .fieldSpecsByType(block.value?.type)
-        .filter(f => props.fieldFilter(f))
-        .map(f => ({ label: f.title, value: f.key }))
-        ?? [],
+      () =>
+        sparkStore
+          .fieldSpecsByType(block.value?.type)
+          .filter((f) => props.fieldFilter(f))
+          .map((f) => ({ label: f.title, value: f.key })) ?? [],
     );
 
     const field = computed<BlockFieldSpec | null>(
-      () => sparkStore
-        .fieldSpecs
-        .find(f => f.type === block.value?.type && f.key === fieldId.value)
-        ?? null,
+      () =>
+        sparkStore.fieldSpecs.find(
+          (f) => f.type === block.value?.type && f.key === fieldId.value,
+        ) ?? null,
     );
 
-    const localAddress = computed<BlockFieldAddress | null>(
-      () => {
-        if (!fieldId.value || !blockSpec.value || !field.value) {
-          return null;
-        }
-        return {
-          serviceId: serviceId.value,
-          id: blockId.value,
-          field: fieldId.value,
-          type: blockSpec.value.type,
-        };
-      },
-    );
+    const localAddress = computed<BlockFieldAddress | null>(() => {
+      if (!fieldId.value || !blockSpec.value || !field.value) {
+        return null;
+      }
+      return {
+        serviceId: serviceId.value,
+        id: blockId.value,
+        field: fieldId.value,
+        type: blockSpec.value.type,
+      };
+    });
 
-    const localOk = computed<boolean>(
-      () => localAddress.value !== null,
-    );
+    const localOk = computed<boolean>(() => localAddress.value !== null);
 
     function configureBlock(): void {
       createBlockDialog(block.value);
     }
 
     function createBlock(): void {
-      createBlockWizard(serviceId.value, validTypes.value)
-        .onOk(({ block }) => {
-          if (block) {
-            serviceId.value = block.serviceId;
-            blockId.value = block.id;
-            fieldId.value = null;
-          }
-        });
+      createBlockWizard(serviceId.value, validTypes.value).onOk(({ block }) => {
+        if (block) {
+          serviceId.value = block.serviceId;
+          blockId.value = block.id;
+          fieldId.value = null;
+        }
+      });
     }
 
     function save(): void {
@@ -205,7 +194,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-select
         v-if="serviceIdOpts.length > 1"
         v-model="serviceId"
@@ -232,20 +221,9 @@ export default defineComponent({
           >
             <q-tooltip>Show {{ blockId }}</q-tooltip>
           </q-btn>
-          <q-btn
-            v-else
-            flat
-            round
-            disable
-            icon="mdi-launch"
-          />
+          <q-btn v-else flat round disable icon="mdi-launch" />
 
-          <q-btn
-            flat
-            round
-            icon="add"
-            @click="createBlock"
-          >
+          <q-btn flat round icon="add" @click="createBlock">
             <q-tooltip>Create new block</q-tooltip>
           </q-btn>
         </template>
@@ -263,12 +241,7 @@ export default defineComponent({
       />
 
       <template #actions>
-        <q-btn
-          flat
-          label="Cancel"
-          color="primary"
-          @click="onDialogCancel"
-        />
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
           :disable="!localOk"
           flat

@@ -25,22 +25,11 @@ module.exports = configure(function (ctx) {
       store: 'src/store/index.ts',
     },
 
-    boot: [
-      'externals',
-      'register',
-      'plugins',
-      'providers',
-    ],
+    boot: ['externals', 'register', 'plugins', 'providers'],
 
-    css: [
-      'app.sass',
-    ],
+    css: ['app.sass'],
 
-    extras: [
-      'roboto-font',
-      'material-icons',
-      'mdi-v4',
-    ],
+    extras: ['roboto-font', 'material-icons', 'mdi-v4'],
 
     animations: [],
 
@@ -48,19 +37,13 @@ module.exports = configure(function (ctx) {
       importStrategy: 'auto',
       iconSet: 'mdi-v4',
 
-      plugins: [
-        'Cookies',
-        'Notify',
-        'Dialog',
-        'LocalStorage',
-        'SessionStorage',
-      ],
+      plugins: ['Cookies', 'Notify', 'Dialog', 'LocalStorage', 'SessionStorage'],
 
       config: {
         dark: true,
         notify: { message: '', color: 'info' },
         brand: {
-          'dark': '#282c34',
+          dark: '#282c34',
           'dark-bright': '#454c59',
         },
       },
@@ -68,7 +51,7 @@ module.exports = configure(function (ctx) {
 
     devServer: {
       open: false,
-      public: 'localhost',
+      host: '0.0.0.0',
       https: {
         key: fs.readFileSync('dev/traefik/brewblox.key'),
         cert: fs.readFileSync('dev/traefik/brewblox.crt'),
@@ -92,25 +75,23 @@ module.exports = configure(function (ctx) {
       gzip: true,
       extractCSS: true,
 
-      devtool: ctx.dev
-        ? 'eval-cheap-module-source-map'
-        : undefined,
+      devtool: ctx.dev ? 'eval-cheap-module-source-map' : undefined,
 
       env: ctx.dev
         ? {
-          BLOX_DATE: buildDate,
-          BLOX_API_DEV: true,
-          BLOX_PERFORMANCE: false,
-          // Replace these values when using a remote backend
-          // Host/port are also defined in dev/utils.js
-          BLOX_API_HOST: undefined,
-          BLOX_API_PORT: 9001,
-        }
+            BLOX_DATE: buildDate,
+            BLOX_API_DEV: true,
+            BLOX_PERFORMANCE: false,
+            // Replace these values when using a remote backend
+            // Host/port are also defined in dev/utils.js
+            BLOX_API_HOST: undefined,
+            BLOX_API_PORT: 9001,
+          }
         : {
-          BLOX_DATE: buildDate,
-        },
+            BLOX_DATE: buildDate,
+          },
 
-      extendWebpack: config => {
+      extendWebpack: (config) => {
         config.performance.hints = ctx.prod ? 'warning' : false;
 
         config.resolve.alias = {
@@ -127,7 +108,7 @@ module.exports = configure(function (ctx) {
         };
 
         // Replace the compression plugin because it was generating unnamed output files
-        const compressionIdx = config.plugins.findIndex(v => v instanceof CompressionPlugin);
+        const compressionIdx = config.plugins.findIndex((v) => v instanceof CompressionPlugin);
         if (compressionIdx >= 0) {
           config.plugins.splice(compressionIdx, 1, new CompressionPlugin());
         }
@@ -142,9 +123,7 @@ module.exports = configure(function (ctx) {
         );
 
         if (ctx.prod) {
-          config.plugins.push(
-            new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
-          );
+          config.plugins.push(new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }));
         }
       },
     },

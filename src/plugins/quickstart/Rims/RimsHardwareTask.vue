@@ -6,7 +6,12 @@ import { createBlockWizard } from '@/plugins/wizardry';
 
 import { PinChannel, QuickstartAction } from '../types';
 import { createOutputActions, hasShared } from '../utils';
-import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
+import {
+  defineChangedBlocks,
+  defineCreatedBlocks,
+  defineDisplayedBlocks,
+  defineWidgets,
+} from './changes';
 import { defineLayouts } from './changes-layout';
 import { RimsConfig } from './types';
 
@@ -22,37 +27,30 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'update:actions',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'update:actions', 'back', 'next'],
   setup(props, { emit }) {
     const tubePin = ref<PinChannel | null>(props.config.tubePin ?? null);
     const pumpPin = ref<PinChannel | null>(props.config.pumpPin ?? null);
     const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
     const tubeSensor = ref<string | null>(props.config.tubeSensor ?? null);
 
-
-    const pinSame = computed<boolean>(
-      () => hasShared([tubePin.value, pumpPin.value]),
+    const pinSame = computed<boolean>(() =>
+      hasShared([tubePin.value, pumpPin.value]),
     );
 
-    const sensorSame = computed<boolean>(
-      () => hasShared([kettleSensor.value, tubeSensor.value]),
+    const sensorSame = computed<boolean>(() =>
+      hasShared([kettleSensor.value, tubeSensor.value]),
     );
 
-    const valuesOk = computed<boolean>(
-      () => [
+    const valuesOk = computed<boolean>(() =>
+      [
         tubePin.value,
         pumpPin.value,
         !pinSame.value,
         kettleSensor.value,
         tubeSensor.value,
         !sensorSame.value,
-      ]
-        .every(Boolean),
+      ].every(Boolean),
     );
 
     function discover(): void {
@@ -142,20 +140,18 @@ export default defineComponent({
         <q-item-section>
           <p>
             Select which hardware should be used for each function.<br>
-            You can unplug or heat sensors to identify them.
-            The current value will be shown under each dropdown menu.
+            You can unplug or heat sensors to identify them. The current value
+            will be shown under each dropdown menu.
           </p>
           <p>
-            Use the buttons above to discover new OneWire blocks or manually create a block.
+            Use the buttons above to discover new OneWire blocks or manually
+            create a block.
           </p>
         </q-item-section>
       </q-item>
       <QuickstartMockCreateField
         :service-id="config.serviceId"
-        :names="[
-          config.names.kettleSensor,
-          config.names.tubeSensor,
-        ]"
+        :names="[config.names.kettleSensor, config.names.tubeSensor]"
       />
       <q-item>
         <q-item-section>
@@ -206,11 +202,7 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
       <q-btn
         :disable="!valuesOk"

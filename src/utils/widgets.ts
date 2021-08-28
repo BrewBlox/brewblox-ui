@@ -8,7 +8,6 @@ import { createDialog } from './dialog';
 import { notify } from './notify';
 import { deepCopy } from './objects';
 
-
 export function startChangeWidgetTitle(widget: Widget): void {
   const widgetTitle = widget.title;
   createDialog({
@@ -20,15 +19,15 @@ export function startChangeWidgetTitle(widget: Widget): void {
       html: true,
       clearable: false,
     },
-  })
-    .onOk((title: string) => widgetStore.saveWidget({ ...widget, title }));
+  }).onOk((title: string) => widgetStore.saveWidget({ ...widget, title }));
 }
 
 export function startCopyWidget(widget: Widget): void {
   const id = nanoid();
-  const selectOptions = dashboardStore
-    .dashboards
-    .map(dashboard => ({ label: dashboard.title, value: dashboard.id }));
+  const selectOptions = dashboardStore.dashboards.map((dashboard) => ({
+    label: dashboard.title,
+    value: dashboard.id,
+  }));
 
   createDialog({
     component: 'SelectDialog',
@@ -40,26 +39,25 @@ export function startCopyWidget(widget: Widget): void {
       listSelect: selectOptions.length < 10,
       selectOptions,
     },
-  })
-    .onOk((dashboard: string) => {
-      if (dashboard) {
-        widgetStore.appendWidget({
-          ...deepCopy(widget),
-          id,
-          dashboard,
-          pinnedPosition: null,
-          volatile: undefined,
-        });
-        notify.done(`Copied <b>${widget.title}</b> to <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
-      }
-    });
+  }).onOk((dashboard: string) => {
+    if (dashboard) {
+      widgetStore.appendWidget({
+        ...deepCopy(widget),
+        id,
+        dashboard,
+        pinnedPosition: null,
+        volatile: undefined,
+      });
+      const dashTitle = dashboardStore.dashboardTitle(dashboard);
+      notify.done(`Copied <b>${widget.title}</b> to <b>${dashTitle}</b>`);
+    }
+  });
 }
 
 export function startMoveWidget(widget: Widget): void {
-  const selectOptions = dashboardStore
-    .dashboards
-    .filter(dashboard => dashboard.id !== widget.dashboard)
-    .map(dashboard => ({ label: dashboard.title, value: dashboard.id }));
+  const selectOptions = dashboardStore.dashboards
+    .filter((dashboard) => dashboard.id !== widget.dashboard)
+    .map((dashboard) => ({ label: dashboard.title, value: dashboard.id }));
 
   createDialog({
     component: 'SelectDialog',
@@ -71,13 +69,13 @@ export function startMoveWidget(widget: Widget): void {
       html: true,
       selectOptions,
     },
-  })
-    .onOk((dashboard: string) => {
-      if (dashboard) {
-        widgetStore.saveWidget({ ...widget, dashboard, pinnedPosition: null });
-        notify.done(`Moved <b>${widget.title}</b> to <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
-      }
-    });
+  }).onOk((dashboard: string) => {
+    if (dashboard) {
+      widgetStore.saveWidget({ ...widget, dashboard, pinnedPosition: null });
+      const dashTitle = dashboardStore.dashboardTitle(dashboard);
+      notify.done(`Moved <b>${widget.title}</b> to <b>${dashTitle}</b>`);
+    }
+  });
 }
 
 export function startRemoveWidget(widget: Widget): void {
@@ -93,10 +91,8 @@ export function startRemoveWidget(widget: Widget): void {
         ok: 'Yes',
         cancel: 'No',
       },
-    })
-      .onOk(() => widgetStore.removeWidget(widget));
-  }
-  else {
+    }).onOk(() => widgetStore.removeWidget(widget));
+  } else {
     // Quasar dialog can't handle objects as value - they will be returned as null
     // As workaround, we use array index as value, and add the "action" key to each option
     const selectOptions = [
@@ -120,9 +116,8 @@ export function startRemoveWidget(widget: Widget): void {
         modelValue: [0], // pre-check the default action
         selectOptions,
       },
-    })
-      .onOk((selected: number[]) => {
-        selected.forEach(idx => selectOptions[idx].action(widget));
-      });
+    }).onOk((selected: number[]) => {
+      selected.forEach((idx) => selectOptions[idx].action(widget));
+    });
   }
 }

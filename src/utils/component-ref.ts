@@ -23,8 +23,10 @@ export function cref(app: App, component: Component): string {
 }
 
 /**
- * Globally registers all Vue components found in the provided Webpack context.
- * This function must be called with literal arguments, as the context is processed during the build.
+ * Globally registers all Vue components found
+ * in the provided Webpack context.
+ * This function must be called with literal arguments,
+ * as the context is processed during the build.
  *
  * - https://v3.vuejs.org/guide/component-registration.html#component-registration
  * - https://webpack.js.org/guides/dependency-management/#requirecontext
@@ -32,22 +34,24 @@ export function cref(app: App, component: Component): string {
  * @param app Active Vue App
  * @param context
  */
-export function autoRegister(app: App, context: __WebpackModuleApi.RequireContext): void {
-  context
-    .keys()
-    .forEach(
-      (fileName: string) => {
-        const match = fileName.match(/([\w\-]+)\.vue$/);
-        if (match) {
-          const componentConfig = context(fileName);
-          const component = componentConfig.default || componentConfig;
-          if (component.name !== undefined && component.name !== match[1]) {
-            // eslint-disable-next-line no-console
-            console.warn(`File name '${fileName}' doesn't match component name ${component.name}`);
-          }
-          app.component(match[1], component);
-        }
-      });
+export function autoRegister(
+  app: App,
+  context: __WebpackModuleApi.RequireContext,
+): void {
+  context.keys().forEach((fileName: string) => {
+    const match = fileName.match(/([\w\-]+)\.vue$/);
+    if (match) {
+      const componentConfig = context(fileName);
+      const component = componentConfig.default || componentConfig;
+      if (component.name !== undefined && component.name !== match[1]) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `File name '${fileName}' doesn't match component name ${component.name}`,
+        );
+      }
+      app.component(match[1], component);
+    }
+  });
 }
 
 /**
@@ -59,22 +63,22 @@ export function autoRegister(app: App, context: __WebpackModuleApi.RequireContex
  * @param context
  * @returns Dictionary of components, where key is component name.
  */
-export function autoComponents(context: __WebpackModuleApi.RequireContext): Mapped<Component> {
-  return context
-    .keys()
-    .reduce(
-      (acc: Mapped<Component>, fileName: string) => {
-        const match = fileName.match(/([\w\-]+)\.vue$/);
-        if (match) {
-          const componentConfig = context(fileName);
-          const component = componentConfig.default || componentConfig;
-          if (component.name !== undefined && component.name !== match[1]) {
-            // eslint-disable-next-line no-console
-            console.warn(`File name '${fileName}' doesn't match component name ${component.name}`);
-          }
-          acc[match[1]] = component;
-        }
-        return acc;
-      },
-      {});
+export function autoComponents(
+  context: __WebpackModuleApi.RequireContext,
+): Mapped<Component> {
+  return context.keys().reduce((acc: Mapped<Component>, fileName: string) => {
+    const match = fileName.match(/([\w\-]+)\.vue$/);
+    if (match) {
+      const componentConfig = context(fileName);
+      const component = componentConfig.default || componentConfig;
+      if (component.name !== undefined && component.name !== match[1]) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `File name '${fileName}' doesn't match component name ${component.name}`,
+        );
+      }
+      acc[match[1]] = component;
+    }
+    return acc;
+  }, {});
 }

@@ -60,7 +60,10 @@ export default defineComponent({
             On your new dashboard, you will find:
             <ul>
               <li>An assistant widget to enable or disable temperature control.</li>
-              <li>A graphical representation of your setup. Parts are clickable for quick access to settings.</li>
+              <li>
+                A graphical representation of your setup.
+                Parts are clickable for quick access to settings.
+              </li>
               <li>A graph with the most important metrics.</li>
               <li>A temperature profile that can slowly change a setpoint over time.</li>
             </ul>

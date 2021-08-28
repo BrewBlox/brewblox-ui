@@ -19,26 +19,25 @@ export * from './types';
 
 @Module({ generateMutationSetters: true })
 export class FeatureModule extends VuexModule {
-
   public widgets: WidgetFeature[] = [];
   public quickStarts: QuickstartFeature[] = [];
   public watchers: WatcherFeature[] = [];
   public services: ServiceFeature[] = [];
 
   public get widgetIds(): string[] {
-    return this.widgets.map(v => v.id);
+    return this.widgets.map((v) => v.id);
   }
 
   public get quickStartIds(): string[] {
-    return this.quickStarts.map(v => v.id);
+    return this.quickStarts.map((v) => v.id);
   }
 
   public get watcherIds(): string[] {
-    return this.watchers.map(v => v.id);
+    return this.watchers.map((v) => v.id);
   }
 
   public get serviceIds(): string[] {
-    return this.services.map(v => v.id);
+    return this.services.map((v) => v.id);
   }
 
   public widgetById(id: Maybe<string>): WidgetFeature | null {
@@ -67,9 +66,15 @@ export class FeatureModule extends VuexModule {
 
   public widgetWizard(id: string): string | null {
     const feature = this.widgetById(id);
-    if (feature === null) { return null; }
-    if (isString(feature.wizard)) { return feature.wizard; }
-    if (feature.wizard === true) { return 'GenericWidgetWizard'; }
+    if (feature === null) {
+      return null;
+    }
+    if (isString(feature.wizard)) {
+      return feature.wizard;
+    }
+    if (feature.wizard === true) {
+      return 'GenericWidgetWizard';
+    }
     return null;
   }
 
@@ -97,7 +102,10 @@ export class FeatureModule extends VuexModule {
   @Mutation
   public addWidgetFeature(feature: WidgetFeature): void {
     if (feature.wizard === true && feature.generateConfig === undefined) {
-      throw new Error(`Widget feature ${feature.id} must define a generateConfig function to use the default wizard`);
+      throw new Error(
+        `Widget feature ${feature.id} ` +
+          'must define a generateConfig function to use the default wizard',
+      );
     }
     if (this.widgetById(feature.id)) {
       throw new Error(`Widget feature '${feature.id}' already exists`);

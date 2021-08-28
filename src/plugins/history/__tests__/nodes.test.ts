@@ -1,41 +1,36 @@
-import { defaultLabel, nodeBuilder, targetBuilder, targetSplitter } from '../nodes';
+import {
+  defaultLabel,
+  nodeBuilder,
+  targetBuilder,
+  targetSplitter,
+} from '../nodes';
 import { QueryTarget } from '../types';
 
-const targets = (): QueryTarget[] => ([
+const targets = (): QueryTarget[] => [
   {
     measurement: 'sparkey',
-    fields: [
-      'actuator-pwm-1/setting',
-      'actuator-pwm-1/value',
-    ],
+    fields: ['actuator-pwm-1/setting', 'actuator-pwm-1/value'],
   },
   {
     measurement: 'spock',
-    fields: [
-      ' Combined Influx points',
-    ],
+    fields: [' Combined Influx points'],
   },
-]);
+];
 
-const flatFields = (): string[] => ([
+const flatFields = (): string[] => [
   'sparkey/actuator-pwm-1/setting',
   'sparkey/actuator-pwm-1/value',
   'spock/ Combined Influx points',
-]);
-
+];
 
 const groupedFields = (): Mapped<string[]> => ({
-  sparkey: [
-    'actuator-pwm-1/setting',
-    'actuator-pwm-1/value',
-  ],
+  sparkey: ['actuator-pwm-1/setting', 'actuator-pwm-1/value'],
   spock: [
     ' Combined Influx points',
     'Ferment Cool PID/p',
     'Ferment Cool PWM/desiredSetting',
   ],
 });
-
 
 const knownFields = (): Mapped<string[]> => ({
   sparkey: [
@@ -59,7 +54,7 @@ const knownFields = (): Mapped<string[]> => ({
   ],
 });
 
-const nodes = (): QuasarNode[] => ([
+const nodes = (): QuasarNode[] => [
   {
     label: 'sparkey',
     value: 'sparkey',
@@ -115,7 +110,7 @@ const nodes = (): QuasarNode[] => ([
       },
     ],
   },
-]);
+];
 
 describe('Targets and fields', () => {
   it('should split targets into fields', () => {
@@ -123,15 +118,20 @@ describe('Targets and fields', () => {
   });
   it('should build fields into targets', () => {
     expect(targetBuilder(flatFields(), knownFields())).toMatchObject(targets());
-    expect(targetBuilder([...flatFields(), 'leftovers'], knownFields())).toMatchObject(targets());
+    expect(
+      targetBuilder([...flatFields(), 'leftovers'], knownFields()),
+    ).toMatchObject(targets());
   });
-
 });
 
 describe('Node labels', () => {
   it('should generate default labels', () => {
-    expect(defaultLabel('spock/ Combined Influx points')).toEqual('Combined influx points');
-    expect(defaultLabel('sparkey/actuator-pwm-1/setting[1/degC]')).toEqual('[actuator-pwm-1] Setting /°C');
+    expect(defaultLabel('spock/ Combined Influx points')).toEqual(
+      'Combined influx points',
+    );
+    expect(defaultLabel('sparkey/actuator-pwm-1/setting[1/degC]')).toEqual(
+      '[actuator-pwm-1] Setting /°C',
+    );
     expect(defaultLabel('single/')).toEqual('');
     expect(defaultLabel('single')).toEqual('');
   });
@@ -139,6 +139,8 @@ describe('Node labels', () => {
 
 describe('Building nodes', () => {
   it('should build quasar nodes', () => {
-    expect(nodeBuilder(groupedFields(), { selectable: true })).toMatchObject(nodes());
+    expect(nodeBuilder(groupedFields(), { selectable: true })).toMatchObject(
+      nodes(),
+    );
   });
 });

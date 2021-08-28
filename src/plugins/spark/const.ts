@@ -107,3 +107,5 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
     BlockType.DS2408,
   ],
 };
+
+export const GpioDeviceOpts = [];

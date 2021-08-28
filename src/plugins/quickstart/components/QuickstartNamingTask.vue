@@ -10,7 +10,6 @@ import { makeUrlSafe } from '@/utils/url';
 import { QuickstartConfig } from '../types';
 import { withPrefix } from '../utils';
 
-
 export default defineComponent({
   name: 'QuickstartNamingTask',
   props: {
@@ -31,17 +30,11 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
     const customNames = reactive<AnyDict>({});
 
-    const serviceId = computed<string>(
-      () => props.config.serviceId,
-    );
+    const serviceId = computed<string>(() => props.config.serviceId);
 
     function updateConfig(cfg: Partial<QuickstartConfig>): void {
       emit('update:config', { ...props.config, ...cfg });
@@ -49,59 +42,58 @@ export default defineComponent({
 
     const prefix = computed<string>({
       get: () => props.config.prefix ?? props.defaultPrefix,
-      set: prefix => updateConfig({ prefix }),
+      set: (prefix) => updateConfig({ prefix }),
     });
 
     const dashboardTitle = computed<string>({
       get: () => props.config.dashboardTitle ?? props.defaultDashboardTitle,
-      set: dashboardTitle => updateConfig({ dashboardTitle }),
+      set: (dashboardTitle) => updateConfig({ dashboardTitle }),
     });
 
     const dashboardIdRules = makeDashboardIdRules();
     const dashboardIdValidator = makeRuleValidator(dashboardIdRules);
 
     const dashboardId = computed<string>({
-      get: () => props.config.dashboardId
-        ?? suggestId(makeUrlSafe(dashboardTitle.value), dashboardIdValidator),
-      set: dashboardId => updateConfig({ dashboardId }),
+      get: () =>
+        props.config.dashboardId ??
+        suggestId(makeUrlSafe(dashboardTitle.value), dashboardIdValidator),
+      set: (dashboardId) => updateConfig({ dashboardId }),
     });
 
-    // We want to avoid circular references between validator and the `actualNames` computed property
+    // We want to avoid circular references between
+    // validator and the `actualNames` computed property
     // These rules do not yet check for duplicates
-    const limitedNameRules = computed<InputRule[]>(
-      () => makeBlockIdRules(serviceId.value),
+    const limitedNameRules = computed<InputRule[]>(() =>
+      makeBlockIdRules(serviceId.value),
     );
 
-    const actualNames = computed<AnyDict>(
-      () => ({
-        ...mapValues(
-          props.defaultNames,
-          v => suggestId(withPrefix(prefix.value, v), makeRuleValidator(limitedNameRules.value)),
+    const actualNames = computed<AnyDict>(() => ({
+      ...mapValues(props.defaultNames, (v) =>
+        suggestId(
+          withPrefix(prefix.value, v),
+          makeRuleValidator(limitedNameRules.value),
         ),
-        ...customNames,
-      }),
+      ),
+      ...customNames,
+    }));
+
+    const nameRules = computed<InputRule[]>(() => [
+      ...limitedNameRules.value,
+      (v) =>
+        Object.values(actualNames.value).filter((n) => n === v).length < 2 ||
+        "Name can't be a duplicate",
+    ]);
+
+    const nameValidator = computed<(v: any) => boolean>(() =>
+      makeRuleValidator(nameRules.value),
     );
 
-    const nameRules = computed<InputRule[]>(
-      () => [
-        ...limitedNameRules.value,
-        v => Object.values(actualNames.value).filter(n => n === v).length < 2
-          || "Name can't be a duplicate",
-      ],
-    );
-
-    const nameValidator = computed<(v: any) => boolean>(
-      () => makeRuleValidator(nameRules.value),
-    );
-
-    const valuesOk = computed<boolean>(
-      () =>
-        [
-          dashboardTitle,
-          dashboardIdValidator(dashboardId.value),
-          Object.values(actualNames.value).every(nameValidator.value),
-        ]
-          .every(Boolean),
+    const valuesOk = computed<boolean>(() =>
+      [
+        dashboardTitle,
+        dashboardIdValidator(dashboardId.value),
+        Object.values(actualNames.value).every(nameValidator.value),
+      ].every(Boolean),
     );
 
     function updateName(key: string, val: string): void {
@@ -170,10 +162,7 @@ export default defineComponent({
       </QuickstartNameField>
 
       <!-- Overall prefix -->
-      <QuickstartPrefixField
-        v-model="prefix"
-        @clear="clearKey('prefix')"
-      />
+      <QuickstartPrefixField v-model="prefix" @clear="clearKey('prefix')" />
 
       <!-- Automatically generated names -->
       <q-expansion-item label="Generated names" icon="mdi-tag-multiple" dense>
@@ -186,7 +175,8 @@ export default defineComponent({
         >
           <template #help>
             The unique identifier for your dashboard.
-            <br> By default, this is an URL-safe version of the dashboard title.
+            <br>
+            By default, this is an URL-safe version of the dashboard title.
           </template>
         </QuickstartNameField>
         <!-- Block names -->
@@ -197,17 +187,13 @@ export default defineComponent({
           :label="defaultNames[nKey]"
           :rules="nameRules"
           @clear="clearName(nKey)"
-          @update:model-value="v => updateName(nKey, v)"
+          @update:model-value="(v) => updateName(nKey, v)"
         />
       </q-expansion-item>
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
       <q-btn
         :disable="!valuesOk"

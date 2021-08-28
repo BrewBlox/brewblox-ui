@@ -7,14 +7,15 @@ import { notify } from '@/utils/notify';
 
 import { WizardDialogResult } from './types';
 
-
-export async function tryCreateWidget<T>(widget: Widget<T>): Promise<Widget<T> | null> {
+export async function tryCreateWidget<T>(
+  widget: Widget<T>,
+): Promise<Widget<T> | null> {
   try {
     await widgetStore.appendWidget(widget);
-    notify.done(`Created ${featureStore.widgetTitle(widget.feature)} widget <b>${widget.title}</b>`);
+    const featureTitle = featureStore.widgetTitle(widget.feature);
+    notify.done(`Created ${featureTitle} widget <b>${widget.title}</b>`);
     return widgetStore.widgetById(widget.id);
-  }
-  catch (e) {
+  } catch (e) {
     notify.error(`Failed to create widget: ${e.toString()}`);
     return null;
   }
@@ -23,10 +24,10 @@ export async function tryCreateWidget<T>(widget: Widget<T>): Promise<Widget<T> |
 export async function tryCreateBlock(block: Block): Promise<Block | null> {
   try {
     await sparkStore.createBlock(block);
-    notify.done(`Created ${featureStore.widgetTitle(block.type)} block <i>${block.id}</i>`);
+    const featureTitle = featureStore.widgetTitle(block.type);
+    notify.done(`Created ${featureTitle} block <i>${block.id}</i>`);
     return sparkStore.blockByAddress(block);
-  }
-  catch (e) {
+  } catch (e) {
     notify.error(`Failed to create block: ${e.toString()}`);
     return null;
   }

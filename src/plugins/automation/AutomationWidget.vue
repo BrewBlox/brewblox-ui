@@ -40,49 +40,56 @@ export default defineComponent({
       () => automationStore.templates,
     );
 
-    const tasks = computed<AutomationTask[]>(
-      () => automationStore.tasks,
-    );
+    const tasks = computed<AutomationTask[]>(() => automationStore.tasks);
 
     function processHistory(proc: AutomationProcess): AutomationStepResult[] {
-      return [...proc.results]
-        .reverse()
-        .slice(0, 10);
+      return [...proc.results].reverse().slice(0, 10);
     }
 
-    function resultStatus(proc: AutomationProcess, res: AutomationStepResult | undefined): string {
+    function resultStatus(
+      proc: AutomationProcess,
+      res: AutomationStepResult | undefined,
+    ): string {
       if (!res) {
         return 'No results yet';
       }
-      const step = proc.steps.find(v => v.id === res.stepId);
+      const step = proc.steps.find((v) => v.id === res.stepId);
       if (!step) {
         return 'No associated step';
       }
-      return `Step ${step.title} is in the ${res.phase} phase since ${shortDateString(res.date)}.`;
+      return `Step ${step.title} is in the ${
+        res.phase
+      } phase since ${shortDateString(res.date)}.`;
     }
 
-    function historyStatus(proc: AutomationProcess, results: AutomationStepResult[]): string {
-      const stepTitle =
-        (id: string | null): string =>
-          findById(proc.steps, id)?.title ?? 'Unknown';
+    function historyStatus(
+      proc: AutomationProcess,
+      results: AutomationStepResult[],
+    ): string {
+      const stepTitle = (id: string | null): string =>
+        findById(proc.steps, id)?.title ?? 'Unknown';
       return results
         .reverse()
-        .map(res => `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${res.phase} ${res.error ?? ''}`)
+        .map(
+          (res) =>
+            `${shortDateString(res.date)} | ${stepTitle(res.stepId)} | ${
+              res.phase
+            } ${res.error ?? ''}`,
+        )
         .join('\n');
     }
 
-    const processes = computed<ProcessDisplay[]>(
-      () => automationStore.processes
-        .map(proc => {
-          const recent: AutomationStepResult[] = processHistory(proc);
-          return {
-            proc,
-            status: resultStatus(proc, recent[0]),
-            history: historyStatus(proc, recent),
-            tasks: automationStore.tasks.filter(v => v.processId === proc.id),
-            error: null,
-          };
-        }),
+    const processes = computed<ProcessDisplay[]>(() =>
+      automationStore.processes.map((proc) => {
+        const recent: AutomationStepResult[] = processHistory(proc);
+        return {
+          proc,
+          status: resultStatus(proc, recent[0]),
+          history: historyStatus(proc, recent),
+          tasks: automationStore.tasks.filter((v) => v.processId === proc.id),
+          error: null,
+        };
+      }),
     );
 
     function startEditor(): void {
@@ -104,9 +111,10 @@ export default defineComponent({
           modelValue: value,
           title: `Automation process '${value.title}'`,
           message: 'A running process is not editable.',
-          initialStepId: ('results' in value)
-            ? value.results[value.results.length - 1]?.stepId
-            : null,
+          initialStepId:
+            'results' in value
+              ? value.results[value.results.length - 1]?.stepId
+              : null,
         },
       });
     }
@@ -118,8 +126,7 @@ export default defineComponent({
         componentProps: {
           processId,
         },
-      })
-        .onOk(stepId => automationStore.jumpProcess({ processId, stepId }));
+      }).onOk((stepId) => automationStore.jumpProcess({ processId, stepId }));
     }
 
     function removeProcess(proc: AutomationProcess): void {
@@ -127,18 +134,17 @@ export default defineComponent({
     }
 
     function quickStatusIcon(task: AutomationTask): string {
-      return task.status === 'Finished'
-        ? 'mdi-sync'
-        : 'mdi-check-all';
+      return task.status === 'Finished' ? 'mdi-sync' : 'mdi-check-all';
     }
 
     function quickStatusValue(task: AutomationTask): AutomationStatus {
-      return task.status === 'Finished'
-        ? 'Active'
-        : 'Finished';
+      return task.status === 'Finished' ? 'Active' : 'Finished';
     }
 
-    function changeTaskStatus(task: AutomationTask, status: AutomationStatus): void {
+    function changeTaskStatus(
+      task: AutomationTask,
+      status: AutomationStatus,
+    ): void {
       if (status !== task.status) {
         automationStore.saveTask({ ...task, status });
       }
@@ -194,19 +200,19 @@ export default defineComponent({
         </q-tooltip>
       </div>
       <div
-        v-for="{proc, status, history, tasks, error} in processes"
-        :key="proc.id"
+        v-for="pd in processes"
+        :key="pd.proc.id"
         class="rounded-borders depth-1 q-pl-sm q-gutter-y-xs column"
       >
         <div class="row q-mt-none">
           <div class="col-grow self-center text-bold text-blue-grey-4">
-            {{ proc.title }}
+            {{ pd.proc.title }}
           </div>
           <q-btn
             flat
             icon="mdi-information-outline"
             class="col-auto"
-            @click="show(proc)"
+            @click="show(pd.proc)"
           >
             <q-tooltip>Show process steps</q-tooltip>
           </q-btn>
@@ -214,7 +220,7 @@ export default defineComponent({
             flat
             icon="mdi-fast-forward"
             class="col-auto"
-            @click="jump(proc)"
+            @click="jump(pd.proc)"
           >
             <q-tooltip>Jump to step</q-tooltip>
           </q-btn>
@@ -222,7 +228,7 @@ export default defineComponent({
             flat
             icon="clear"
             class="col-auto"
-            @click="removeProcess(proc)"
+            @click="removeProcess(pd.proc)"
           >
             <q-tooltip>Close and remove process</q-tooltip>
           </q-btn>
@@ -235,14 +241,10 @@ export default defineComponent({
             </div>
           </q-tooltip>
         </div>
-        <div v-if="error" class="text-negative q-pr-sm">
-          {{ error }}
+        <div v-if="pd.error" class="text-negative q-pr-sm">
+          {{ pd.error }}
         </div>
-        <div
-          v-for="task in tasks"
-          :key="task.id"
-          class="row q-mr-sm q-mb-sm"
-        >
+        <div v-for="task in tasks" :key="task.id" class="row q-mr-sm q-mb-sm">
           <div class="col-grow self-center q-pl-sm text-italic">
             {{ task.title }} ({{ task.ref }}) {{ task.status }}
           </div>
@@ -312,7 +314,8 @@ export default defineComponent({
         All tasks
         <q-tooltip>
           Tasks are used to coordinate manual actions. <br>
-          Processes can create tasks, and wait for the user to mark them as finished.
+          Processes can create tasks, and wait for the user to mark them as
+          finished.
         </q-tooltip>
       </div>
       <div
@@ -323,12 +326,7 @@ export default defineComponent({
         <div class="col-grow">
           {{ task.title }} ({{ task.ref }}) {{ task.status }}
         </div>
-        <q-btn
-          flat
-          class="col-auto"
-          icon="delete"
-          @click="removeTask(task)"
-        >
+        <q-btn flat class="col-auto" icon="delete" @click="removeTask(task)">
           <q-tooltip>Remove task</q-tooltip>
         </q-btn>
         <q-btn

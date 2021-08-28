@@ -6,7 +6,12 @@ import { tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';
-import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
+import {
+  defineChangedBlocks,
+  defineCreatedBlocks,
+  defineDisplayedBlocks,
+  defineWidgets,
+} from './changes';
 import { defineLayouts } from './changes-layout';
 import { FridgeConfig, FridgeOpts } from './types';
 
@@ -22,12 +27,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'update:actions',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'update:actions', 'back', 'next'],
   setup(props, { emit }) {
     const fridgeSetting = ref<Quantity>(tempQty(20));
 
@@ -89,18 +89,9 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
-      <q-btn
-        unelevated
-        label="Done"
-        color="primary"
-        @click="done"
-      />
+      <q-btn unelevated label="Done" color="primary" @click="done" />
     </template>
   </WizardBody>
 </template>

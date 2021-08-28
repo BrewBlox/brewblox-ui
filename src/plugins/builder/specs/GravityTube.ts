@@ -1,4 +1,10 @@
-import { DEFAULT_PUMP_PRESSURE, LEFT, MAX_PUMP_PRESSURE, MIN_PUMP_PRESSURE, RIGHT } from '@/plugins/builder/const';
+import {
+  DEFAULT_PUMP_PRESSURE,
+  LEFT,
+  MAX_PUMP_PRESSURE,
+  MIN_PUMP_PRESSURE,
+  RIGHT,
+} from '@/plugins/builder/const';
 import { PartSpec, PersistentPart } from '@/plugins/builder/types';
 
 const spec: PartSpec = {

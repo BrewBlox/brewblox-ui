@@ -4,6 +4,7 @@
     "editorconfig.editorconfig",
     "syler.sass-indented",
     "orta.vscode-jest",
-    "dbaeumer.vscode-eslint"
+    "dbaeumer.vscode-eslint",
+    "rvest.vs-code-prettier-eslint"
   ]
 }
