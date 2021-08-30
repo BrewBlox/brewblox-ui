@@ -35,6 +35,10 @@ export default defineComponent({
       <BlockWidgetToolbar has-mode-toggle />
     </template>
 
-    <OneWireGpioEditor :block="block" @update:block="doSaveBlock" />
+    <OneWireGpioEditor
+      :block="block"
+      class="widget-body"
+      @update:block="doSaveBlock"
+    />
   </Card>
 </template>

@@ -128,14 +128,14 @@ export default defineComponent({
 
     const modeOpts = computed<SelectOption<EditingMode>[]>(() => {
       const opts: SelectOption<EditingMode>[] = [
-        { value: 'BOTH', label: '- and + connected' },
-        { value: 'PLUS', label: '+ connected' },
+        { value: 'BOTH', label: '- and +' },
+        { value: 'PLUS', label: 'Only +' },
       ];
       if (local.kind !== 'SSR') {
-        opts.push({ value: 'MINUS', label: '- connected' });
+        opts.push({ value: 'MINUS', label: 'Only -' });
       }
       if (local.kind === 'MOTOR' || local.kind === 'SOLENOID') {
-        opts.push({ value: 'BIDIRECTIONAL', label: 'Bidirectional' });
+        opts.push({ value: 'BIDIRECTIONAL', label: '- and + (bidirectional)' });
       }
       return opts;
     });

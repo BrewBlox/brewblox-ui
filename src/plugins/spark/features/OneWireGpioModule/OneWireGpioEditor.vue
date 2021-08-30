@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Enum } from 'typescript-string-enums';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
+import { useContext } from '@/composables';
 import {
   GpioDeviceType,
   GpioModuleChannel,
@@ -28,6 +28,25 @@ function startBit(n: number): number {
   return n > 0 ? Math.log2(n & -n) : -1;
 }
 
+function deviceTypeDesc(deviceType: GpioDeviceType): string {
+  if (deviceType.startsWith('GPIO_DEV_SSR')) {
+    return 'SSR';
+  } else if (deviceType.startsWith('GPIO_DEV_MOTOR')) {
+    return 'Motor';
+  } else if (deviceType.startsWith('GPIO_DEV_COIL')) {
+    return 'Solenoid';
+  } else if (deviceType.startsWith('GPIO_DEV_MECHANICAL_RELAY')) {
+    return 'Mech. relay';
+  } else {
+    return 'Unknown';
+  }
+}
+
+function channelDesc(channel: GpioModuleChannel): string {
+  const typeDesc = deviceTypeDesc(channel.deviceType);
+  return `#${channel.id}: ${typeDesc} (${channel.width} pins)`;
+}
+
 export default defineComponent({
   name: 'OneWireGpioEditor',
   props: {
@@ -38,11 +57,8 @@ export default defineComponent({
   },
   emits: ['update:block'],
   setup(props, { emit }) {
+    const { context } = useContext.setup();
     const selectedId = ref<number | null>(null);
-    const newWidth = ref<number>(2);
-    const newType = ref<GpioDeviceType>(GpioDeviceType.GPIO_DEV_SSR_2P);
-
-    const typeOpts = Enum.values(GpioDeviceType);
 
     const selectedChannel = computed<GpioModuleChannel | null>(
       () =>
@@ -71,7 +87,7 @@ export default defineComponent({
         .filter((c) => c.pinsMask === GpioPins.NONE)
         .map((c) => ({
           id: c.id,
-          name: c.deviceType,
+          name: channelDesc(c),
           width: c.width,
           start: -1,
         })),
@@ -82,7 +98,7 @@ export default defineComponent({
         .filter((c) => c.pinsMask !== GpioPins.NONE)
         .map((c) => ({
           id: c.id,
-          name: c.deviceType,
+          name: channelDesc(c),
           width: c.width,
           start: startBit(c.pinsMask),
         })),
@@ -122,6 +138,7 @@ export default defineComponent({
           ),
         },
       });
+      selectedId.value = null;
     }
 
     function clickUnassigned(id: number): void {
@@ -148,9 +165,9 @@ export default defineComponent({
       return mask;
     }
 
-    function clickUnused(start: number): void {
+    function clickUnused(slot: UnusedSlot): void {
       const channel = selectedChannel.value;
-      if (!channel) {
+      if (!channel || channel.width > slot.free) {
         return;
       }
       saveBlock({
@@ -159,11 +176,12 @@ export default defineComponent({
           ...props.block.data,
           channels: props.block.data.channels.map((c) =>
             c.id === channel.id
-              ? { ...c, pinsMask: buildMask(start, channel.width) }
+              ? { ...c, pinsMask: buildMask(slot.start, channel.width) }
               : c,
           ),
         },
       });
+      selectedId.value = null;
     }
 
     function unusedId(): number {
@@ -236,10 +254,8 @@ export default defineComponent({
     );
 
     return {
+      context,
       power,
-      newWidth,
-      newType,
-      typeOpts,
       raw,
       selectedId,
       selectedChannel,
@@ -259,21 +275,17 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
-    <div>Module {{ block.data.modulePosition }}</div>
-    <div>
-      <q-select v-model="newType" :options="typeOpts" emit-value map-options />
-      <q-slider
-        v-model="newWidth"
-        class="col-grow"
-        :min="0"
-        :max="8"
-        markers
-        snap
-      />
+  <div class="column q-gutter-y-sm">
+    <div class="col-grow text-h6 text-secondary">
+      Module {{ block.data.modulePosition }}
     </div>
-    <div class="row q-gutter-md">
-      <q-toggle v-model="power" />
+    <div class="row">
+      <ToggleButton v-model="power" label="Use external power" unelevated />
+    </div>
+    <div class="col-grow text-h6 text-secondary">
+      Pin layout
+    </div>
+    <div class="row">
       <q-btn
         flat
         label="new"
@@ -288,59 +300,82 @@ export default defineComponent({
         @click="removeChannel"
       />
     </div>
-    Unassigned
-    <div
-      :class="[
-        'container unassigned-area',
-        selectedId !== null && 'bg-selected',
-      ]"
-      @click="clickUnassignedArea"
-    >
-      <div
-        v-for="slot in unassigned"
-        :key="`unassigned-${slot.start}`"
-        :class="['content', selectedId === slot.id && 'bg-selected']"
-        :style="{
-          gridColumnEnd: `span ${slot.width}`,
-        }"
-        @click.stop="clickUnassigned(slot.id)"
-      >
-        {{ slot.name }}
-      </div>
-    </div>
-    Gpio Modules
+    <!-- Pins -->
     <div class="container pins-area">
       <div
         v-for="slot in active"
         :key="`active-${slot.start}`"
-        :class="{
-          content: true,
-          'bg-selected': selectedId === slot.id,
-        }"
+        :class="[
+          'content ellipsis',
+          {
+            'target-clickable': selectedId === slot.id,
+          },
+        ]"
         :style="{
           gridColumn: `${slot.start + 1} / span ${slot.width}`,
+          position: 'relative',
         }"
         @click="clickActive(slot.id)"
       >
         {{ slot.name }}
+        <q-tooltip>{{ slot.name }}</q-tooltip>
       </div>
       <div
         v-for="slot in unused"
         :key="`unused-${slot.start}`"
         :class="{
           filler: true,
-          'bg-selected': selectedChannel && selectedChannel.width <= slot.free,
+          'target-clickable':
+            selectedChannel && selectedChannel.width <= slot.free,
+          'target-invalid':
+            selectedChannel && selectedChannel.width > slot.free,
         }"
         :style="{
           gridColumn: `${slot.start + 1}`,
         }"
-        @click="clickUnused(slot.start)"
+        @click="clickUnused(slot)"
       />
       <div style="grid-column: 9 / span 2" class="power">
         Power
       </div>
     </div>
-    <div style="white-space: pre">
+    <!-- Unassigned -->
+    <div
+      v-if="unassigned.length > 0 || selectedId !== null"
+      :class="[
+        'container unassigned-area',
+        {
+          'target-clickable':
+            selectedChannel !== null && selectedChannel.pinsMask !== 0,
+        },
+      ]"
+      @click="clickUnassignedArea"
+    >
+      <div
+        v-if="unassigned.length === 0"
+        class="text-italic darkened"
+        style="grid-column-end: span 4"
+      >
+        Unassigned channels
+      </div>
+      <div
+        v-for="slot in unassigned"
+        :key="`unassigned-${slot.start}`"
+        :class="[
+          'content ellipsis',
+          { 'target-clickable': selectedId === slot.id },
+        ]"
+        :style="{
+          gridColumnEnd: `span ${slot.width}`,
+        }"
+        @click.stop="clickUnassigned(slot.id)"
+      >
+        {{ slot.name }}
+        <q-tooltip>{{ slot.name }}</q-tooltip>
+      </div>
+    </div>
+    <!-- Development: raw block data -->
+    <div v-if="context.mode === 'Full'" style="white-space: pre">
       {{ raw }}
     </div>
   </div>
@@ -355,16 +390,28 @@ export default defineComponent({
   grid-gap: 5px 5px
   padding: 5px
   .content
-    border: 1px solid red
+    border: 1px solid white
     overflow: hidden
+    padding-top: 2px
+    padding-left: 5px
   .filler
-    border: 1px dotted lightgreen
+    border: 1px dotted $light-green
     overflow: hidden
   .power
     border: 1px solid orange
     overflow: hidden
     text-align: center
     margin-left: 10px
+.target-clickable
+  background-color: $hover
+  cursor: pointer
+.target-invalid
+  background-color: $red
+  opacity: 0.05
+  cursor: not-allowed
+  border: none
 .unassigned-area
   min-height: 100px
+  &.target-clickable
+    border: 1px dotted $amber
 </style>
