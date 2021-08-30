@@ -8,6 +8,9 @@ import {
   GpioPins,
   OneWireGpioModuleBlock,
 } from '@/shared-types';
+import { createDialog } from '@/utils/dialog';
+
+import GpioChannelDialog from './GpioChannelDialog.vue';
 
 interface DeviceSlot {
   id: number;
@@ -172,21 +175,36 @@ export default defineComponent({
       return i;
     }
 
+    function modifyChannel(channel: GpioModuleChannel): void {
+      createDialog({
+        component: GpioChannelDialog,
+        componentProps: {
+          title: 'Edit channel',
+          channel,
+        },
+      }).onOk((updated: GpioModuleChannel) => {
+        saveBlock({
+          ...props.block,
+          data: {
+            ...props.block.data,
+            channels: [
+              ...props.block.data.channels.filter((c) => c.id !== updated.id),
+              updated,
+            ],
+          },
+        });
+      });
+    }
+
     function addChannel(): void {
       const id = unusedId();
       const channel: GpioModuleChannel = {
         id,
-        deviceType: newType.value,
+        deviceType: GpioDeviceType.GPIO_DEV_SSR_2P,
         pinsMask: GpioPins.NONE,
-        width: newWidth.value,
+        width: 2,
       };
-      saveBlock({
-        ...props.block,
-        data: {
-          ...props.block.data,
-          channels: [...props.block.data.channels, channel],
-        },
-      });
+      modifyChannel(channel);
     }
 
     function editChannel(): void {
@@ -194,6 +212,7 @@ export default defineComponent({
       if (!channel) {
         return;
       }
+      modifyChannel(channel);
     }
 
     function removeChannel(): void {
