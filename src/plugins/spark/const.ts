@@ -68,27 +68,16 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
     BlockType.TempSensorMock,
     BlockType.TempSensorOneWire,
   ],
-  SetpointSensorPairInterface: [
-    BlockType.SetpointSensorPair,
-  ],
+  SetpointSensorPairInterface: [BlockType.SetpointSensorPair],
   ActuatorAnalogInterface: [
     BlockType.ActuatorAnalogMock,
     BlockType.ActuatorOffset,
     BlockType.ActuatorPwm,
   ],
-  ActuatorDigitalInterface: [
-    BlockType.DigitalActuator,
-    BlockType.MotorValve,
-  ],
-  BalancerInterface: [
-    BlockType.Balancer,
-  ],
-  MutexInterface: [
-    BlockType.Mutex,
-  ],
-  OneWireBusInterface: [
-    BlockType.OneWireGpioModule,
-  ],
+  ActuatorDigitalInterface: [BlockType.DigitalActuator, BlockType.MotorValve],
+  BalancerInterface: [BlockType.Balancer],
+  MutexInterface: [BlockType.Mutex],
+  OneWireBusInterface: [BlockType.OneWireGpioModule],
   OneWireDeviceInterface: [
     BlockType.TempSensorOneWire,
     BlockType.DS2408,
@@ -103,9 +92,7 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
     BlockType.OneWireGpioModule,
     BlockType.MockPins,
   ],
-  DS2408Interface: [
-    BlockType.DS2408,
-  ],
+  DS2408Interface: [BlockType.DS2408],
 };
 
 export const GpioDeviceOpts = [];
