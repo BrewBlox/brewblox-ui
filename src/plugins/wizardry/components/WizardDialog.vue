@@ -27,17 +27,10 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
     const { dense } = useGlobals.setup();
 
     const dialogTitle = ref<string>('Wizardry');
@@ -48,21 +41,20 @@ export default defineComponent({
       () => sparkStore.modules.length > 0,
     );
 
-    const primaryDashboardId = computed<string | null>(
-      () => {
-        const { homePage } = systemStore.config;
-        if (!homePage || !homePage.startsWith('/dashboard')) {
-          return null;
-        }
-        return homePage.split('/')[2] ?? null;
-      },
-    );
+    const primaryDashboardId = computed<string | null>(() => {
+      const { homePage } = systemStore.config;
+      if (!homePage || !homePage.startsWith('/dashboard')) {
+        return null;
+      }
+      return homePage.split('/')[2] ?? null;
+    });
 
     const dashboardId = computed<string | null>(
-      () => props.activeDashboardId
-        ?? primaryDashboardId.value
-        ?? dashboardStore.dashboardIds[0]
-        ?? null,
+      () =>
+        props.activeDashboardId ??
+        primaryDashboardId.value ??
+        dashboardStore.dashboardIds[0] ??
+        null,
     );
 
     function reset(): void {
@@ -78,8 +70,7 @@ export default defineComponent({
     function onBack(): void {
       if (props.showMenu) {
         reset();
-      }
-      else {
+      } else {
         onDialogHide();
       }
     }
@@ -130,7 +121,7 @@ export default defineComponent({
         v-if="activeWizard"
         v-bind="activeProps"
         :active-dashboard-id="dashboardId"
-        @title="v => dialogTitle = v"
+        @title="(v) => (dialogTitle = v)"
         @back="onBack"
         @close="onClose"
         @done="onDone"
@@ -152,10 +143,13 @@ export default defineComponent({
               </q-item-label>
             </q-item-section>
             <q-item-section>
-              <p>This wizard helps to set up common brewing setups, like a fermentation fridge or a HERMS.</p>
               <p>
-                It will create all required blocks on the controller
-                and a new dashboard for quick access to settings and graphs.
+                This wizard helps to set up common brewing setups, like a
+                fermentation fridge or a HERMS.
+              </p>
+              <p>
+                It will create all required blocks on the controller and a new
+                dashboard for quick access to settings and graphs.
               </p>
             </q-item-section>
             <q-tooltip v-if="!sparkServiceAvailable">
@@ -167,10 +161,7 @@ export default defineComponent({
         <q-separator inset />
 
         <q-card-section>
-          <q-item
-            clickable
-            @click="pickWizard('DashboardWizard')"
-          >
+          <q-item clickable @click="pickWizard('DashboardWizard')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Dashboard
@@ -180,7 +171,10 @@ export default defineComponent({
               </q-item-label>
             </q-item-section>
             <q-item-section>
-              <p>Add widgets to dashboards to create a custom UI for your brewery.</p>
+              <p>
+                Add widgets to dashboards to create a custom UI for your
+                brewery.
+              </p>
             </q-item-section>
           </q-item>
         </q-card-section>
@@ -188,10 +182,7 @@ export default defineComponent({
         <q-separator inset />
 
         <q-card-section>
-          <q-item
-            clickable
-            @click="pickWizard('WidgetWizardPicker')"
-          >
+          <q-item clickable @click="pickWizard('WidgetWizardPicker')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 New Widget
@@ -202,12 +193,12 @@ export default defineComponent({
             </q-item-section>
             <q-item-section>
               <p>
-                A widget is a card on dashboard with a specific function.
-                Many different widget types are available.
+                A widget is a card on dashboard with a specific function. Many
+                different widget types are available.
               </p>
               <p>
-                There are graph widgets, brewery overview widgets,
-                block widgets, and more.
+                There are graph widgets, brewery overview widgets, block
+                widgets, and more.
               </p>
             </q-item-section>
           </q-item>
@@ -231,12 +222,12 @@ export default defineComponent({
             </q-item-section>
             <q-item-section>
               <p>
-                Blocks can be combined to build the control chains
-                that manage brew day or fermentation temperature.
+                Blocks can be combined to build the control chains that manage
+                brew day or fermentation temperature.
               </p>
               <p>
-                Blocks exist on Spark controllers.
-                You can add a widget to show a block on a dashboard.
+                Blocks exist on Spark controllers. You can add a widget to show
+                a block on a dashboard.
               </p>
             </q-item-section>
             <q-tooltip v-if="!sparkServiceAvailable">
@@ -248,10 +239,7 @@ export default defineComponent({
         <q-separator inset />
 
         <q-card-section>
-          <q-item
-            clickable
-            @click="pickWizard('ImportWizard')"
-          >
+          <q-item clickable @click="pickWizard('ImportWizard')">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Import Widget
@@ -261,9 +249,7 @@ export default defineComponent({
               </q-item-label>
             </q-item-section>
             <q-item-section>
-              <p>
-                Import a previously exported widget from a file.
-              </p>
+              <p>Import a previously exported widget from a file.</p>
             </q-item-section>
           </q-item>
         </q-card-section>
@@ -271,10 +257,7 @@ export default defineComponent({
         <q-separator inset />
 
         <q-card-section>
-          <q-item
-            class="darkish text-italic"
-            style="cursor: not-allowed"
-          >
+          <q-item class="darkish text-italic" style="cursor: not-allowed">
             <q-item-section side class="col-4">
               <q-item-label class="text-h6">
                 Services
@@ -284,8 +267,8 @@ export default defineComponent({
               </q-item-label>
             </q-item-section>
             <q-item-section>
-              Discovered services automatically appear in the sidebar.
-              Click on them to add them as UI service.
+              Discovered services automatically appear in the sidebar. Click on
+              them to add them as UI service.
             </q-item-section>
           </q-item>
         </q-card-section>

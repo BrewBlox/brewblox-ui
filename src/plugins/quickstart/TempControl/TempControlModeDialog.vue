@@ -76,7 +76,8 @@ export default defineComponent({
         component: 'ConfirmDialog',
         componentProps: {
           title: `Remove ${kind} config`,
-          message: `Are you sure you want to remove the ${kind} config from the ${tempMode.title} mode?`,
+          message: `Are you sure you want to remove the ${kind} ` +
+          `config from the ${tempMode.title} mode?`,
           noBackdropDismiss: true,
         },
       })

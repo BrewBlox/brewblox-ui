@@ -6,7 +6,12 @@ import { tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
 import { createOutputActions } from '../utils';
-import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
+import {
+  defineChangedBlocks,
+  defineCreatedBlocks,
+  defineDisplayedBlocks,
+  defineWidgets,
+} from './changes';
 import { defineLayouts } from './changes-layout';
 import { GlycolConfig, GlycolOpts } from './types';
 
@@ -22,12 +27,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'update:actions',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'update:actions', 'back', 'next'],
   setup(props, { emit }) {
     const beerSetting = ref<Quantity>(tempQty(20));
     const glycolSetting = ref<Quantity>(tempQty(4));
@@ -75,7 +75,8 @@ export default defineComponent({
             Initial setpoints
           </q-item-label>
           <p v-if="config.glycolControl === 'Control'">
-            The setup creates a setpoint for your beer temperature and your glycol temperature.
+            The setup creates a setpoint for your beer temperature and your
+            glycol temperature.
           </p>
           <p v-else>
             The setup creates a setpoint for your beer temperature.
@@ -93,7 +94,7 @@ export default defineComponent({
         </q-item-section>
         <q-item-section>
           <QuantityField
-            v-if="config.glycolControl==='Control'"
+            v-if="config.glycolControl === 'Control'"
             v-model="glycolSetting"
             title="Glycol setting"
             label="Glycol setpoint"
@@ -103,18 +104,9 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
-      <q-btn
-        unelevated
-        label="Done"
-        color="primary"
-        @click="done"
-      />
+      <q-btn unelevated label="Done" color="primary" @click="done" />
     </template>
   </WizardBody>
 </template>

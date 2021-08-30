@@ -5,7 +5,10 @@ import { useRoute } from 'vue-router';
 
 import { builderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
-import { startAddLayout, startChangeLayoutTitle } from '@/plugins/builder/utils';
+import {
+  startAddLayout,
+  startChangeLayoutTitle,
+} from '@/plugins/builder/utils';
 import { dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 import { Widget, widgetStore } from '@/store/widgets';
@@ -25,27 +28,21 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'selected',
-  ],
+  emits: ['selected'],
   setup(props, { emit }) {
     const route = useRoute();
 
-    const layoutIds = computed<string[]>(
-      () => builderStore.layoutIds,
-    );
+    const layoutIds = computed<string[]>(() => builderStore.layoutIds);
 
-    const title = computed<string>(
-      () => props.layout?.title ?? 'Unknown',
-    );
+    const title = computed<string>(() => props.layout?.title ?? 'Unknown');
 
-    const label = computed<string | null>(
-      () => props.noLabel ? null : title.value,
+    const label = computed<string | null>(() =>
+      props.noLabel ? null : title.value,
     );
 
     const listed = computed<boolean>({
       get: () => props.layout?.listed ?? true,
-      set: v => {
+      set: (v) => {
         if (props.layout) {
           builderStore.saveLayout({ ...props.layout, listed: v });
         }
@@ -54,15 +51,14 @@ export default defineComponent({
 
     const isHomePage = computed<boolean>({
       get: () => systemStore.config.homePage === `/brewery/${props.layout?.id}`,
-      set: v => {
-        const homePage = v && props.layout ? `/brewery/${props.layout.id}` : null;
+      set: (v) => {
+        const homePage =
+          v && props.layout ? `/brewery/${props.layout.id}` : null;
         systemStore.saveConfig({ homePage });
       },
     });
 
-    const inEditor = computed<boolean>(
-      () => route.path.startsWith('/builder'),
-    );
+    const inEditor = computed<boolean>(() => route.path.startsWith('/builder'));
 
     function selectLayout(id: string | null): void {
       emit('selected', id);
@@ -96,12 +92,11 @@ export default defineComponent({
           message: 'Are you sure you wish to remove all parts?',
           noBackdropDismiss: true,
         },
-      })
-        .onOk(() => {
-          if (props.layout) {
-            builderStore.saveLayout({ ...props.layout, parts: [] });
-          }
-        });
+      }).onOk(() => {
+        if (props.layout) {
+          builderStore.saveLayout({ ...props.layout, parts: [] });
+        }
+      });
     }
 
     function removeLayout(): void {
@@ -115,54 +110,57 @@ export default defineComponent({
           message: `Are you sure you wish to remove ${props.layout.title}?`,
           noBackdropDismiss: true,
         },
-      })
-        .onOk(async () => {
-          if (props.layout) {
-            await builderStore.removeLayout(props.layout)
-              .catch(() => { });
-          }
-          const [id] = layoutIds.value;
-          selectLayout(id || null);
-        });
+      }).onOk(async () => {
+        if (props.layout) {
+          await builderStore.removeLayout(props.layout).catch(() => {});
+        }
+        const [id] = layoutIds.value;
+        selectLayout(id || null);
+      });
     }
 
     function createLayoutWidget(): void {
-      if (!props.layout) { return; }
+      if (!props.layout) {
+        return;
+      }
 
-      const selectOptions = dashboardStore.dashboards
-        .map(dashboard => ({
-          label: dashboard.title,
-          value: dashboard.id,
-        }));
+      const selectOptions = dashboardStore.dashboards.map((dashboard) => ({
+        label: dashboard.title,
+        value: dashboard.id,
+      }));
 
       createDialog({
         component: 'SelectDialog',
         componentProps: {
           title: 'Make widget',
-          message: `On which dashboard do you want to create a widget for <b>${props.layout.title}</b>?`,
+          message:
+            'On which dashboard do you want to create a widget' +
+            `for <b>${props.layout.title}</b>?`,
           listSelect: selectOptions.length < 10,
           html: true,
           selectOptions,
         },
-      })
-        .onOk(async (dashboard: string) => {
-          const layout = props.layout!;
-          const widget: Widget<BuilderConfig> = {
-            id: nanoid(),
-            title: layout.title,
-            order: 0,
-            dashboard,
-            feature: 'Builder',
-            cols: Math.max(2, Math.ceil(layout.width * (50 / 120))),
-            rows: Math.max(2, Math.ceil(layout.height * (50 / 120))),
-            config: {
-              currentLayoutId: layout.id,
-              layoutIds: [layout.id],
-            },
-          };
-          await widgetStore.appendWidget(widget);
-          notify.done(`Created <b>${layout.title}</b> widget on <b>${dashboardStore.dashboardTitle(dashboard)}</b>`);
-        });
+      }).onOk(async (dashboard: string) => {
+        const layout = props.layout!;
+        const widget: Widget<BuilderConfig> = {
+          id: nanoid(),
+          title: layout.title,
+          order: 0,
+          dashboard,
+          feature: 'Builder',
+          cols: Math.max(2, Math.ceil(layout.width * (50 / 120))),
+          rows: Math.max(2, Math.ceil(layout.height * (50 / 120))),
+          config: {
+            currentLayoutId: layout.id,
+            layoutIds: [layout.id],
+          },
+        };
+        await widgetStore.appendWidget(widget);
+        const dashTitle = dashboardStore.dashboardTitle(dashboard);
+        notify.done(
+          `Created <b>${layout.title}</b> widget on <b>${dashTitle}</b>`,
+        );
+      });
     }
 
     return {
@@ -182,29 +180,17 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
-  <ActionSubmenu v-if="!!layout" v-bind="{label, ...$attrs}">
+  <ActionSubmenu v-if="!!layout" v-bind="{ label, ...$attrs }">
     <slot />
     <ToggleAction
       v-model="isHomePage"
       icon="home"
       :label="isHomePage ? 'Is home page' : 'Make home page'"
     />
-    <ToggleAction
-      v-model="listed"
-      label="Show in sidebar"
-    />
-    <ActionItem
-      icon="file_copy"
-      label="Copy layout"
-      @click="copyLayout()"
-    />
-    <ActionItem
-      icon="edit"
-      label="Rename layout"
-      @click="renameLayout"
-    />
+    <ToggleAction v-model="listed" label="Show in sidebar" />
+    <ActionItem icon="file_copy" label="Copy layout" @click="copyLayout()" />
+    <ActionItem icon="edit" label="Rename layout" @click="renameLayout" />
     <ActionItem
       icon="dashboard"
       label="Show layout on dashboard"
@@ -215,15 +201,7 @@ export default defineComponent({
       label="Export layout"
       @click="exportLayout"
     />
-    <ActionItem
-      icon="delete"
-      label="Remove all parts"
-      @click="clearParts"
-    />
-    <ActionItem
-      icon="delete"
-      label="Remove layout"
-      @click="removeLayout"
-    />
+    <ActionItem icon="delete" label="Remove all parts" @click="clearParts" />
+    <ActionItem icon="delete" label="Remove layout" @click="removeLayout" />
   </ActionSubmenu>
 </template>

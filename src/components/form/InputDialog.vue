@@ -6,7 +6,6 @@ import { createDialog } from '@/utils/dialog';
 import { fixedNumber } from '@/utils/formatting';
 import { makeRuleValidator } from '@/utils/rules';
 
-
 const typeValidator = (v: unknown): boolean =>
   typeof v === 'string' && ['text', 'number'].includes(v);
 
@@ -52,17 +51,10 @@ export default defineComponent({
       default: '',
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
 
     const local = ref<string>(
       props.type === 'number'
@@ -70,16 +62,16 @@ export default defineComponent({
         : `${props.modelValue}`,
     );
 
-    const isValid = computed<boolean>(
-      () => makeRuleValidator(props.rules)(local.value),
+    const isValid = computed<boolean>(() =>
+      makeRuleValidator(props.rules)(local.value),
     );
 
-    const nativeProps = computed<AnyDict>(
-      () => props.type === 'number'
+    const nativeProps = computed<AnyDict>(() =>
+      props.type === 'number'
         ? {
-          inputmode: 'numeric',
-          pattern: '[0-9\.]*',
-        }
+            inputmode: 'numeric',
+            pattern: '[0-9\.]*',
+          }
         : {},
     );
 
@@ -88,9 +80,7 @@ export default defineComponent({
         return;
       }
       const outputValue =
-        (props.type === 'number')
-          ? parseFloat(local.value)
-          : local.value;
+        props.type === 'number' ? parseFloat(local.value) : local.value;
       onDialogOK(outputValue);
     }
 
@@ -102,8 +92,7 @@ export default defineComponent({
           type: props.type,
           rules: props.rules,
         },
-      })
-        .onOk(v => local.value = v);
+      }).onOk((v) => (local.value = v));
     }
 
     return {
@@ -128,11 +117,11 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-input
         v-model="local"
         v-bind="{ rules, clearable, label, autogrow, suffix, ...nativeProps }"
-        :input-style="{fontSize}"
+        :input-style="{ fontSize }"
         autofocus
       >
         <template #append>
@@ -140,12 +129,7 @@ export default defineComponent({
         </template>
       </q-input>
       <template #actions>
-        <q-btn
-          flat
-          label="Cancel"
-          color="primary"
-          @click="onDialogCancel"
-        />
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
           :disable="!isValid"
           flat

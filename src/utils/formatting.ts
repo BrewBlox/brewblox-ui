@@ -9,10 +9,7 @@ import { Link, Quantity } from '@/shared-types';
 import { isDurationUnit, isLink, isQuantity } from './identity';
 import { durationString } from './quantity';
 
-type DateCompatible =
-  | Date
-  | number
-  | string
+type DateCompatible = Date | number | string;
 
 /**
  * Converts date-compatible value to date/time string.
@@ -23,7 +20,10 @@ type DateCompatible =
  * @param nullLabel returned if value was null or undefined.
  * @returns
  */
-export function dateString(value: Maybe<DateCompatible>, nullLabel = '<not set>'): string {
+export function dateString(
+  value: Maybe<DateCompatible>,
+  nullLabel = '<not set>',
+): string {
   if (value == null) {
     return nullLabel;
   }
@@ -42,12 +42,15 @@ export function dateString(value: Maybe<DateCompatible>, nullLabel = '<not set>'
  * @param nullLabel returned if value was null or undefined.
  * @returns
  */
-export function shortDateString(value: Maybe<DateCompatible>, nullLabel = '<not set>'): string {
+export function shortDateString(
+  value: Maybe<DateCompatible>,
+  nullLabel = '<not set>',
+): string {
   if (value == null) {
     return nullLabel;
   }
   const date = new Date(value);
-  if (Math.abs(new Date().getTime() - date.getTime()) < (24 * 3600 * 1000)) {
+  if (Math.abs(new Date().getTime() - date.getTime()) < 24 * 3600 * 1000) {
     return date.toLocaleTimeString();
   }
   return date.toLocaleDateString();
@@ -60,9 +63,12 @@ export function shortDateString(value: Maybe<DateCompatible>, nullLabel = '<not 
  * "date-compatible" is defined as "valid argument for `new Date()`"
  *
  * @param value
- * @returns ISO-8601 string ('2021-06-11T15:21:14.564Z') or undefined if `value` was null or invalid.
+ * @returns ISO-8601 string ('2021-06-11T15:21:14.564Z')
+ * or undefined if `value` was null or invalid.
  */
-export function isoDateString(value: Maybe<DateCompatible>): string | undefined {
+export function isoDateString(
+  value: Maybe<DateCompatible>,
+): string | undefined {
   if (value instanceof Date) {
     return value.toISOString();
   }
@@ -85,11 +91,12 @@ export function isoDateString(value: Maybe<DateCompatible>): string | undefined 
  * @returns number if input was number, else null
  */
 export function roundedNumber(value: number, digits?: number): number;
-export function roundedNumber(value: Maybe<number>, digits?: number): number | null;
+export function roundedNumber(
+  value: Maybe<number>,
+  digits?: number,
+): number | null;
 export function roundedNumber(value: Maybe<number>, digits = 2): number | null {
-  return isNumber(value)
-    ? round(value, digits)
-    : null;
+  return isNumber(value) ? round(value, digits) : null;
 }
 
 /**
@@ -101,9 +108,7 @@ export function roundedNumber(value: Maybe<number>, digits = 2): number | null {
  * @returns
  */
 export function fixedNumber(value: Maybe<number>, digits = 2): string {
-  return isNumber(value)
-    ? value.toFixed(digits)
-    : digits > 0 ? '--.--' : '---';
+  return isNumber(value) ? value.toFixed(digits) : digits > 0 ? '--.--' : '---';
 }
 
 /**
@@ -121,7 +126,11 @@ export function fixedNumber(value: Maybe<number>, digits = 2): string {
  * @param digits
  * @returns
  */
-export function preciseNumber(value: Maybe<number>, precision = 3, digits = 2): string | number {
+export function preciseNumber(
+  value: Maybe<number>,
+  precision = 3,
+  digits = 2,
+): string | number {
   return isNumber(value)
     ? round(value, digits).toPrecision(precision)
     : '-'.repeat(precision);
@@ -152,12 +161,16 @@ export function prettyUnit(value: Maybe<Quantity | string>): string {
   }
   return unit
     .replace(/delta_/g, '')
-    .replace(/\b(deg)?(Celsius|Fahrenheit|Kelvin)/gi,
-      (full, deg, unit: string) => `deg${unit.charAt(0).toUpperCase()}`)
+    .replace(
+      /\b(deg)?(Celsius|Fahrenheit|Kelvin)/gi,
+      (full, deg, unit: string) => `deg${unit.charAt(0).toUpperCase()}`,
+    )
     .replace(/\bdeg(\b|[A-Z])/g, '°$1') // deg, degC, degX, degSomething
     .replace(/(milliseconds?|millis)/gi, 'ms')
-    .replace(/(seconds?|sec|minutes?|min|hours?|days?)/gi, v => v.charAt(0).toLowerCase())
-    .replace(/1? ?\/ ?/gi, '/')  // 'degC / hour' | '1 / degC'
+    .replace(/(seconds?|sec|minutes?|min|hours?|days?)/gi, (v) =>
+      v.charAt(0).toLowerCase(),
+    )
+    .replace(/1? ?\/ ?/gi, '/') // 'degC / hour' | '1 / degC'
     .replace(/ ?\* ?/gi, '·'); // 'degC * hour'
 }
 

@@ -18,19 +18,30 @@ import { sparkStore } from '../store';
 import { BlockAddress, ComparedBlockType } from '../types';
 import { getDisplaySettingsBlock } from './system';
 
-
-export function isCompatible(type: Maybe<string>, intf: ComparedBlockType): boolean {
-  if (!intf) { return true; }
-  if (!type) { return false; }
-  if (type === intf) { return true; }
-  if (isArray(intf)) { return intf.some(i => isCompatible(type, i)); }
+export function isCompatible(
+  type: Maybe<string>,
+  intf: ComparedBlockType,
+): boolean {
+  if (!intf) {
+    return true;
+  }
+  if (!type) {
+    return false;
+  }
+  if (type === intf) {
+    return true;
+  }
+  if (isArray(intf)) {
+    return intf.some((i) => isCompatible(type, i));
+  }
   return Boolean(compatibleTypes[intf]?.includes(type));
 }
 
-export function ifCompatible<T extends Block>(block: Maybe<Block>, intf: ComparedBlockType): T | null {
-  return block && isCompatible(block.type, intf)
-    ? block as T
-    : null;
+export function ifCompatible<T extends Block>(
+  block: Maybe<Block>,
+  intf: ComparedBlockType,
+): T | null {
+  return block && isCompatible(block.type, intf) ? (block as T) : null;
 }
 
 export function isSystemBlockType(type: Maybe<string>): boolean {
@@ -47,9 +58,12 @@ export function isBlockDisplayReady(addr: BlockAddress): boolean {
 }
 
 export function isBlockDisplayed(addr: BlockAddress): boolean {
-  return addr.id !== null
-    && !!getDisplaySettingsBlock(addr.serviceId)?.data.widgets
-      .find(w => Object.values(w).find(v => isLink(v) && v.id === addr.id));
+  return (
+    addr.id !== null &&
+    !!getDisplaySettingsBlock(addr.serviceId)?.data.widgets.find((w) =>
+      Object.values(w).find((v) => isLink(v) && v.id === addr.id),
+    )
+  );
 }
 
 export function isBlockVolatile(block: Block | null): boolean {
@@ -57,18 +71,20 @@ export function isBlockVolatile(block: Block | null): boolean {
 }
 
 export function isBlockRemovable(block: Block | null): boolean {
-  return block !== null
-    && !isBlockVolatile(block)
-    && featureStore.widgetRemoveActions(block.type).length > 0;
+  return (
+    block !== null &&
+    !isBlockVolatile(block) &&
+    featureStore.widgetRemoveActions(block.type).length > 0
+  );
 }
 
 export const isBlockDriven = (block: Block | null): boolean =>
   Boolean(
-    block
-    && sparkStore
-      .moduleById(block.serviceId)
-      ?.drivenChains
-      .some((chain: string[]) => chain[0] === block.id));
+    block &&
+      sparkStore
+        .moduleById(block.serviceId)
+        ?.drivenChains.some((chain: string[]) => chain[0] === block.id),
+  );
 
 export const isSparkState = (data: unknown): data is SparkStateEvent =>
   (data as SparkStateEvent).type === 'Spark.state';

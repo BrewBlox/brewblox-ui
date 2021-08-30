@@ -2,7 +2,13 @@ import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockIntfType, BlockSpec, BlockType, SetpointProfileBlock } from '@/plugins/spark/types';
+import {
+  BlockFieldSpec,
+  BlockIntfType,
+  BlockSpec,
+  BlockType,
+  SetpointProfileBlock,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { shortDateString } from '@/utils/formatting';
@@ -14,7 +20,6 @@ const type = BlockType.SetpointProfile;
 
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<SetpointProfileBlock> = {
       type,
       generate: () => ({
@@ -43,8 +48,12 @@ const plugin: Plugin = {
         generate: () => new Date().getTime() / 1000,
         valueHint: 'seconds since 1/1/1970',
         pretty: (val: number): string => {
-          if (val === 0) { return 'now'; }
-          if (!val) { return 'invalid date'; }
+          if (val === 0) {
+            return 'now';
+          }
+          if (!val) {
+            return 'invalid date';
+          }
           return shortDateString(val * 1000);
         },
       },
@@ -53,7 +62,8 @@ const plugin: Plugin = {
         key: 'targetId',
         title: 'Target',
         component: 'LinkValEdit',
-        generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+        generate: () =>
+          bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
       },
     ];
 

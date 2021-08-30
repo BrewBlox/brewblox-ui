@@ -15,23 +15,22 @@ export default defineComponent({
     },
   },
   setup(props) {
-
-    const pathLengths = computed<number[]>(
-      () => props.paths.map(v => new svgPathProperties(v).getTotalLength()),
+    const pathLengths = computed<number[]>(() =>
+      props.paths.map((v) => new svgPathProperties(v).getTotalLength()),
     );
 
-    const dashArrays = computed<number[][]>(
-      () => {
-        const numColors = props.colors.length;
-        if (numColors < 2) {
-          return [[1]];
-        }
-        return pathLengths.value.map(v => {
-          const colorLength = v / numColors;
-          return Array.from(new Array(numColors * 2), (x, i) => (i % 2 ? v - colorLength : colorLength));
-        });
-      },
-    );
+    const dashArrays = computed<number[][]>(() => {
+      const numColors = props.colors.length;
+      if (numColors < 2) {
+        return [[1]];
+      }
+      return pathLengths.value.map((v) => {
+        const colorLength = v / numColors;
+        return Array.from(new Array(numColors * 2), (x, i) =>
+          i % 2 ? v - colorLength : colorLength,
+        );
+      });
+    });
 
     return {
       pathLengths,

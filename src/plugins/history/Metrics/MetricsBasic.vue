@@ -1,7 +1,13 @@
 <script lang="ts">
 import defaults from 'lodash/defaults';
 import { nanoid } from 'nanoid';
-import { computed, defineComponent, onBeforeUnmount, onMounted, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  watch,
+} from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { addSource } from '@/plugins/history/sources/metrics';
@@ -30,19 +36,15 @@ export default defineComponent({
   },
   setup(props) {
     const metricsId = nanoid();
-    const {
-      context,
-    } = useContext.setup();
-    const {
-      widget,
-    } = useWidget.setup<MetricsWidget>();
+    const { context } = useContext.setup();
+    const { widget } = useWidget.setup<MetricsWidget>();
 
-    const config = computed<MetricsConfig>(
-      () => defaults(widget.value.config, emptyMetricsConfig()),
+    const config = computed<MetricsConfig>(() =>
+      defaults(widget.value.config, emptyMetricsConfig()),
     );
 
-    const source = computed<MetricsSource | null>(
-      () => historyStore.sourceById<MetricsSource>(metricsId),
+    const source = computed<MetricsSource | null>(() =>
+      historyStore.sourceById<MetricsSource>(metricsId),
     );
 
     function fieldFreshDuration(field: string): number {
@@ -57,26 +59,27 @@ export default defineComponent({
       return fixedNumber(value.value, fieldDecimals(value.field));
     }
 
-    const values = computed<CurrentValue[]>(
-      () => {
-        const now = new Date().getTime();
-        return source.value
-          ?.values
-          .map(result => ({
-            ...result,
-            name: config.value.renames[result.field] || result.field,
-            stale: !!result.time && (now - result.time as number > fieldFreshDuration(result.field)),
-          }))
-          ?? [];
-      },
-    );
+    const values = computed<CurrentValue[]>(() => {
+      const now = new Date().getTime();
+      return (
+        source.value?.values.map((result) => ({
+          ...result,
+          name: config.value.renames[result.field] || result.field,
+          stale:
+            !!result.time &&
+            ((now - result.time) as number) > fieldFreshDuration(result.field),
+        })) ?? []
+      );
+    });
 
     function createSource(): void {
       addSource(
         metricsId,
         config.value.params,
         config.value.renames,
-        config.value.targets.flatMap(t => t.fields.map(f => `${t.measurement}/${f}`)),
+        config.value.targets.flatMap((t) =>
+          t.fields.map((f) => `${t.measurement}/${f}`),
+        ),
       );
     }
 
@@ -146,17 +149,15 @@ export default defineComponent({
         <div v-if="val.stale" class="col-auto">
           <q-icon name="warning" size="24px" />
           <q-tooltip>
-            {{ val.name }} was updated more than {{ durationString(fieldFreshDuration(val.field)) }} ago.
+            {{ val.name }} was updated more than
+            {{ durationString(fieldFreshDuration(val.field)) }} ago.
             <br>
             Last update: {{ new Date(val.time).toLocaleString() }}.
           </q-tooltip>
         </div>
       </LabeledField>
     </div>
-    <div
-      v-if="values.length === 0"
-      class="column q-px-md"
-    >
+    <div v-if="values.length === 0" class="column q-px-md">
       <q-btn
         flat
         dense

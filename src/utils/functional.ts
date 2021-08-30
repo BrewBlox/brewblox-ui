@@ -13,8 +13,7 @@ export function makeObjectSorter<T>(key: keyof T): (a: T, b: T) => number {
 
     if (typeof left === 'number' && typeof right === 'number') {
       return left - right;
-    }
-    else {
+    } else {
       return `${left}`.localeCompare(`${right}`, undefined, {
         sensitivity: 'base',
         ignorePunctuation: true,
@@ -46,7 +45,9 @@ export function makeObjectSorter<T>(key: keyof T): (a: T, b: T) => number {
  *
  * @param type
  */
-export function makeTypeFilter<T extends HasType>(type: T['type']): ((obj: Maybe<HasType>) => obj is T) {
+export function makeTypeFilter<T extends HasType>(
+  type: T['type'],
+): (obj: Maybe<HasType>) => obj is T {
   return (obj): obj is T => obj != null && obj.type === type;
 }
 
@@ -87,5 +88,5 @@ export function nullFilter<T>(value: Maybe<T>): value is T {
  * ```
  */
 export function uniqueFilter<T>(val: T, idx: number, coll: T[]): boolean {
-  return coll.findIndex(v => isEqual(v, val)) === idx;
+  return coll.findIndex((v) => isEqual(v, val)) === idx;
 }

@@ -15,7 +15,9 @@ export const BlockIntfType = Enum(
   'ActuatorDigitalInterface',
   'BalancerInterface',
   'MutexInterface',
+  'OneWireBusInterface',
   'OneWireDeviceInterface',
+  'IoModuleInterface',
   'IoArrayInterface',
   'DS2408Interface',
 );
@@ -30,6 +32,7 @@ export const SystemBlockType = Enum(
   'WiFiSettings',
   'Spark2Pins',
   'Spark3Pins',
+  'OneWireGpioModule',
 );
 
 export const UserBlockType = Enum(
@@ -81,18 +84,109 @@ export const AnalogConstraintKey = Enum(
 // #region ChannelConfig
 export const ChannelConfig = Enum(
   'CHANNEL_UNUSED',
-  'CHANNEL_ACTIVE_LOW',
-  'CHANNEL_ACTIVE_HIGH',
+  'CHANNEL_DRIVING_OFF',
+  'CHANNEL_DRIVING_ON',
+  'CHANNEL_DRIVING_REVERSE',
+  'CHANNEL_DRIVING_BRAKE_LOW_SIDE',
+  'CHANNEL_DRIVING_BRAKE_HIGH_SIDE',
+  'CHANNEL_DRIVING_PWM',
+  'CHANNEL_DRIVING_PWM_REVERSE',
   'CHANNEL_INPUT',
   'CHANNEL_UNKNOWN',
+
+  // Kept for backwards compatibility
+  'CHANNEL_ACTIVE_LOW', // == CHANNEL_DRIVING_OFF
+  'CHANNEL_ACTIVE_HIGH', // == CHANNEL_DRIVING_ON
 );
 // #endregion ChannelConfig
+
+// #region ChannelStatus
+export const ChannelStatus = Enum(
+  'UNKNOWN',
+  'OPERATIONAL',
+  'OVERCURRENT',
+  'OPEN_LOAD',
+  'UNDERVOLTAGE',
+  'OVERVOLTAGE',
+  'OVERTEMPERATURE_SHUTDOWN',
+  'OVERTEMPERATURE_WARNING',
+  'POWER_ON_RESET',
+);
+// #endregion ChannelStatus
+
+// #region GpioDeviceType
+export const GpioDeviceType = Enum(
+  'GPIO_DEV_NONE',
+  'GPIO_DEV_SSR_2P',
+  'GPIO_DEV_SSR_1P',
+  'GPIO_DEV_MECHANICAL_RELAY_2P',
+  'GPIO_DEV_MECHANICAL_RELAY_1P_HIGH_SIDE',
+  'GPIO_DEV_MECHANICAL_RELAY_1P_LOW_SIDE',
+  'GPIO_DEV_COIL_2P',
+  'GPIO_DEV_COIL_2P_BIDIRECTIONAL',
+  'GPIO_DEV_COIL_1P_HIGH_SIDE',
+  'GPIO_DEV_COIL_1P_LOW_SIDE',
+  'GPIO_DEV_MOTOR_2P',
+  'GPIO_DEV_MOTOR_2P_BIDIRECTIONAL',
+  'GPIO_DEV_MOTOR_1P_HIGH_SIDE',
+  'GPIO_DEV_MOTOR_1P_LOW_SIDE',
+  'GPIO_DEV_LOAD_DETECT_2P',
+  'GPIO_DEV_LOAD_DETECT_1P_PULL_DOWN',
+  'GPIO_DEV_LOAD_DETECT_1P_PULL_UP',
+  'GPIO_DEV_POWER_1P',
+  'GPIO_DEV_POWER_1P_LOAD_DETECT',
+  'GPIO_DEV_GND_1P',
+  'GPIO_DEV_GND_1P_LOAD_DETECT',
+);
+// #endregion GpioDeviceType
+
+// #region GpioErrorFlags
+export enum GpioErrorFlags {
+  GPIO_ERR_NONE = 0,
+  GPIO_ERR_POWER_ON_RESET = 1 << 0,
+  GPIO_ERR_OVERVOLTAGE = 1 << 1,
+  GPIO_ERR_UNDERVOLTAGE = 1 << 2,
+  GPIO_ERR_OVERCURRENT = 1 << 3,
+  GPIO_ERR_OPEN_LOAD = 1 << 4,
+  GPIO_ERR_OVERTEMPERATURE_WARNING = 1 << 5,
+  GPIO_ERR_OVERTEMPERATURE_ERROR = 1 << 6,
+  GPIO_ERR_SPI_ERROR = 1 << 7,
+}
+// #endregion GpioErrorFlags
+
+// #region GpioPins
+export enum GpioPins {
+  NONE = 0,
+  PIN_1 = 1 << 0,
+  PIN_2 = 1 << 1,
+  PIN_3 = 1 << 2,
+  PIN_4 = 1 << 3,
+  PIN_5 = 1 << 4,
+  PIN_6 = 1 << 5,
+  PIN_7 = 1 << 6,
+  PIN_8 = 1 << 7,
+}
+// #endregion GpioPins
+
+// #region GpioModuleStatus
+export enum GpioModuleStatus {
+  NONE = 0,
+  POWER_ON_RESET = 1 << 0,
+  OVERVOLTAGE = 1 << 1,
+  UNDERVOLTAGE_LOCKOUT = 1 << 2,
+  OVERCURRENT = 1 << 3,
+  OPEN_LOAD = 1 << 4,
+  OVERTEMPERATURE_WARNING = 1 << 5,
+  OVERTEMPERATURE_SHUTDOWN = 1 << 6,
+}
+// #endregion GpioModuleStatus
 
 // #region DigitalState
 export const DigitalState = Enum(
   'STATE_INACTIVE',
   'STATE_ACTIVE',
   'STATE_UNKNOWN',
+  'STATE_REVERSE',
 );
 // #endregion DigitalState
 
@@ -208,6 +302,8 @@ export const TouchCalibrated = Enum(
 );
 // #endregion TouchCalibrated
 
+// #region
+
 // #region Wifi
 export const WifiSecurityType = Enum(
   'WLAN_SEC_UNSEC',
@@ -235,6 +331,8 @@ export type BlockOrIntfType = Enum<typeof BlockOrIntfType>;
 export type DigitalConstraintKey = Enum<typeof DigitalConstraintKey>;
 export type AnalogConstraintKey = Enum<typeof AnalogConstraintKey>;
 export type ChannelConfig = Enum<typeof ChannelConfig>;
+export type ChannelStatus = Enum<typeof ChannelStatus>;
+export type GpioDeviceType = Enum<typeof GpioDeviceType>;
 export type DigitalState = Enum<typeof DigitalState>;
 export type DigitalCompareOp = Enum<typeof DigitalCompareOp>;
 export type AnalogCompareOp = Enum<typeof AnalogCompareOp>;

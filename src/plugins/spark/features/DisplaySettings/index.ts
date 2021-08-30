@@ -2,7 +2,13 @@ import { Plugin } from 'vue';
 
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec, BlockType, DisplaySettingsBlock, DisplayTempUnit } from '@/plugins/spark/types';
+import {
+  BlockFieldSpec,
+  BlockSpec,
+  BlockType,
+  DisplaySettingsBlock,
+  DisplayTempUnit,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 
@@ -10,10 +16,8 @@ import widget from './DisplaySettingsWidget.vue';
 
 const type = BlockType.DisplaySettings;
 
-
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<DisplaySettingsBlock> = {
       type,
       generate: () => ({

@@ -23,11 +23,8 @@ export default defineComponent({
   name: 'DS2408Widget',
   setup() {
     const { context } = useContext.setup();
-    const {
-      sparkModule,
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<DS2408Block>();
+    const { sparkModule, block, saveBlock } =
+      useBlockWidget.setup<DS2408Block>();
 
     const valveMode = computed<boolean>(
       () => block.value.data.connectMode === DS2408ConnectMode.CONNECT_VALVE,
@@ -37,37 +34,34 @@ export default defineComponent({
       if (!mode || block.value.data.connectMode === mode) {
         return;
       }
-      const linked = sparkModule
-        .blocks
+      const linked = sparkModule.blocks
         .filter((b): b is DigitalActuatorBlock | MotorValveBlock =>
-          isCompatible(b.type, BlockIntfType.ActuatorDigitalInterface))
-        .filter(b => b.data.hwDevice.id === block.value.id);
+          isCompatible(b.type, BlockIntfType.ActuatorDigitalInterface),
+        )
+        .filter((b) => b.data.hwDevice.id === block.value.id);
 
       if (linked.length) {
-        const names = linked
-          .map(block => `'${block.id}'`)
-          .join(', ');
-        const verbs = linked.length > 1
-          ? ['have', 'them']
-          : ['has', 'it'];
+        const names = linked.map((block) => `'${block.id}'`).join(', ');
+        const verbs = linked.length > 1 ? ['have', 'them'] : ['has', 'it'];
+        const message =
+          `${names} ${verbs[0]} this block set as output. ` +
+          `Do you wish to unlink ${verbs[1]}?`;
         createDialog({
           component: 'SaveConfirmDialog',
           componentProps: {
             title: 'Switch DS2408 mode',
-            message: `${names} ${verbs[0]} this block set as output. Do you wish to unlink ${verbs[1]}?`,
+            message,
             saveFunc: () =>
-              linked.forEach(block => {
+              linked.forEach((block) => {
                 block.data.hwDevice.id = null;
                 sparkModule.saveBlock(block);
               }),
           },
-        })
-          .onOk(() => {
-            block.value.data.connectMode = mode;
-            saveBlock();
-          });
-      }
-      else {
+        }).onOk(() => {
+          block.value.data.connectMode = mode;
+          saveBlock();
+        });
+      } else {
         block.value.data.connectMode = mode;
         saveBlock();
       }
@@ -124,7 +118,12 @@ export default defineComponent({
             title="Address"
             label="Address"
             class="col-grow"
-            @update:model-value="v => { block.data.address = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.address = v;
+                saveBlock();
+              }
+            "
           />
         </div>
       </template>

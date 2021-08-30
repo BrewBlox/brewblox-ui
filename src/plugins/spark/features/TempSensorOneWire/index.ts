@@ -2,7 +2,12 @@ import { Plugin } from 'vue';
 
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
+import {
+  BlockFieldSpec,
+  BlockSpec,
+  BlockType,
+  TempSensorOneWireBlock,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { deltaTempQty, tempQty } from '@/utils/quantity';
@@ -13,7 +18,6 @@ const type = BlockType.TempSensorOneWire;
 
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<TempSensorOneWireBlock> = {
       type,
       generate: () => ({

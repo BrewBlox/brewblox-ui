@@ -37,23 +37,20 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      bordered,
-    } = usePart.setup(props.part);
+    const { bordered } = usePart.setup(props.part);
 
-    const {
-      block,
-      isBroken,
-    } = useSettingsBlock.setup<ActuatorPwmBlock>(props.part, props.settingsKey, [BlockType.ActuatorPwm]);
-
-    const pwmValue = computed<number | null>(
-      () => block.value?.data.enabled
-        ? block.value.data.value
-        : null,
+    const { block, isBroken } = useSettingsBlock.setup<ActuatorPwmBlock>(
+      props.part,
+      props.settingsKey,
+      [BlockType.ActuatorPwm],
     );
 
-    const transform = computed<string>(
-      () => textTransformation(props.part, [1, 1]),
+    const pwmValue = computed<number | null>(() =>
+      block.value?.data.enabled ? block.value.data.value : null,
+    );
+
+    const transform = computed<string>(() =>
+      textTransformation(props.part, [1, 1]),
     );
 
     return {
@@ -74,10 +71,10 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(1)-2"
-        :height="coord2grid(1)-2"
-        :x="coord2grid(startX)+1"
-        :y="coord2grid(startY)+1"
+        :width="coord2grid(1) - 2"
+        :height="coord2grid(1) - 2"
+        :x="coord2grid(startX) + 1"
+        :y="coord2grid(startY) + 1"
         :stroke="color"
         stroke-width="2px"
         rx="6"

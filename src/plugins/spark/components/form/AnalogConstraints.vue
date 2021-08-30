@@ -2,14 +2,19 @@
 import { defineComponent, PropType, ref, watch } from 'vue';
 
 import { analogConstraintLabels } from '@/plugins/spark/const';
-import { AnalogConstraint, AnalogConstraintKey, AnalogConstraintsObj, BlockType } from '@/plugins/spark/types';
+import {
+  AnalogConstraint,
+  AnalogConstraintKey,
+  AnalogConstraintsObj,
+  BlockType,
+} from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { bloxLink } from '@/utils/link';
 import { deepCopy } from '@/utils/objects';
 
-const constraintOpts: SelectOption[] =
-  Object.entries(analogConstraintLabels)
-    .map(([k, v]) => ({ value: k, label: v }));
+const constraintOpts: SelectOption[] = Object.entries(
+  analogConstraintLabels,
+).map(([k, v]) => ({ value: k, label: v }));
 
 const defaultValues: Record<AnalogConstraintKey, AnalogConstraint> = {
   min: {
@@ -42,15 +47,13 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const constraints = ref<AnalogConstraint[]>([]);
 
     watch(
       () => props.modelValue,
-      (newV) => constraints.value = deepCopy(newV.constraints),
+      (newV) => (constraints.value = deepCopy(newV.constraints)),
       { deep: true, immediate: true },
     );
 
@@ -66,11 +69,12 @@ export default defineComponent({
           selectOptions: constraintOpts,
           modelValue: [],
         },
-      })
-        .onOk((keys: AnalogConstraintKey[]) => {
-          constraints.value.push(...keys.map(type => deepCopy(defaultValues[type])));
-          save();
-        });
+      }).onOk((keys: AnalogConstraintKey[]) => {
+        constraints.value.push(
+          ...keys.map((type) => deepCopy(defaultValues[type])),
+        );
+        save();
+      });
     }
 
     function remove(idx: number): void {
@@ -93,7 +97,10 @@ export default defineComponent({
     <div
       v-for="(constraint, idx) in constraints"
       :key="`constraint-${idx}`"
-      :class="['row q-gutter-x-sm constraint', {limiting: constraint.limiting}]"
+      :class="[
+        'row q-gutter-x-sm constraint',
+        { limiting: constraint.limiting },
+      ]"
     >
       <LinkField
         v-if="'balanced' in constraint"
@@ -102,7 +109,12 @@ export default defineComponent({
         title="Balancer"
         label="Balancer"
         class="col-grow"
-        @update:model-value="v => { constraint.balanced.balancerId = v; save(); }"
+        @update:model-value="
+          (v) => {
+            constraint.balanced.balancerId = v;
+            save();
+          }
+        "
       />
       <InputField
         v-if="'min' in constraint"
@@ -111,7 +123,12 @@ export default defineComponent({
         label="Minimum value"
         type="number"
         class="col-grow"
-        @update:model-value="v => { constraint.min = v; save(); }"
+        @update:model-value="
+          (v) => {
+            constraint.min = v;
+            save();
+          }
+        "
       />
       <InputField
         v-if="'max' in constraint"
@@ -120,7 +137,12 @@ export default defineComponent({
         label="Maximum value"
         type="number"
         class="col-grow"
-        @update:model-value="v => { constraint.max = v; save(); }"
+        @update:model-value="
+          (v) => {
+            constraint.max = v;
+            save();
+          }
+        "
       />
 
       <div class="col-auto column justify-center darkish">

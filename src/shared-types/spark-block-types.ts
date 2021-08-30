@@ -8,6 +8,9 @@ import type {
   DisplayTempUnit,
   DS2408ConnectMode,
   FilterChoice,
+  GpioDeviceType,
+  GpioModuleStatus,
+  GpioPins,
   LogicResult,
   ReferenceKind,
   SensorCombiFunc,
@@ -306,8 +309,9 @@ export interface DS2408Block extends Block {
   data: {
     address: string;
     pins: Readonly<IoPin[]>;
-    connected: Readonly<boolean>;
     connectMode: DS2408ConnectMode;
+    connected: Readonly<boolean>;
+    oneWireBusId: Readonly<number>;
   };
 }
 // #endregion DS2408
@@ -319,6 +323,7 @@ export interface DS2413Block extends Block {
     address: string;
     pins: Readonly<IoPin[]>;
     connected: Readonly<boolean>;
+    oneWireBusId: Readonly<number>;
   };
 }
 // #endregion DS2413
@@ -390,6 +395,36 @@ export interface OneWireBusBlock extends Block {
   };
 }
 // #endregion OneWireBus
+
+// #region OneWireGpioModule
+export interface GpioModuleChannel {
+  id: number;
+  deviceType: GpioDeviceType;
+  pinsMask: GpioPins;
+  width: number;
+}
+
+export interface OneWireGpioModuleBlock extends Block {
+  type: 'OneWireGpioModule',
+  data: {
+    channels: GpioModuleChannel[];
+    modulePosition: number;
+    moduleStatus: GpioModuleStatus;
+    useExternalPower: boolean;
+    pullUpDesired: Readonly<GpioPins>;
+    pullUpStatus: Readonly<GpioPins>;
+    pullUpWhenActive: Readonly<GpioPins>;
+    pullUpWhenInactive: Readonly<GpioPins>;
+    pullDownDesired: Readonly<GpioPins>;
+    pullDownStatus: Readonly<GpioPins>;
+    pullDownWhenActive: Readonly<GpioPins>;
+    pullDownWhenInactive: Readonly<GpioPins>;
+    overCurrent: Readonly<GpioPins>;
+    openLoad: Readonly<GpioPins>;
+    moduleStatusClear: GpioPins; // write-only
+  }
+}
+// #endregion OneWireGpioModule
 
 // #region Pid
 export interface PidBlock extends Block {

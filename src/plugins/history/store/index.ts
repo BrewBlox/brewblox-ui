@@ -17,7 +17,6 @@ import type {
 } from '../types';
 import { historyApi, sessionApi } from './api';
 
-
 function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
   return {
     start: isoDateString(params.start),
@@ -30,7 +29,7 @@ function buildQuery(params: QueryParams, fields: string[]): ApiQuery {
 @Module({ generateMutationSetters: true })
 export class HistoryModule extends VuexModule {
   public sessions: LoggedSession[] = [];
-  public fieldsDuration: JSQuantity = bloxQty('1d')
+  public fieldsDuration: JSQuantity = bloxQty('1d');
   public fields: Mapped<string[]> = {};
   public sources: HistorySource[] = [];
 
@@ -39,26 +38,30 @@ export class HistoryModule extends VuexModule {
 
   private startQuery(src: HistorySource): void {
     if (this.stream?.readyState === WebSocket.OPEN) {
-      this.stream.send(JSON.stringify({
-        id: src.id,
-        command: src.command,
-        query: buildQuery(src.params, src.fields),
-      }));
+      this.stream.send(
+        JSON.stringify({
+          id: src.id,
+          command: src.command,
+          query: buildQuery(src.params, src.fields),
+        }),
+      );
     }
   }
 
   private endQuery(src: HistorySource): void {
-    this.stream?.send(JSON.stringify({
-      id: src.id,
-      command: 'stop',
-    }));
+    this.stream?.send(
+      JSON.stringify({
+        id: src.id,
+        command: 'stop',
+      }),
+    );
   }
 
   private connect(): void {
     this.stream = historyApi.openStream();
     this.stream.onopen = () => {
       this.streamConnected = true;
-      this.sources.forEach(src => this.startQuery(src));
+      this.sources.forEach((src) => this.startQuery(src));
     };
     this.stream.onmessage = (event: MessageEvent) => {
       const data = JSON.parse(event.data);
@@ -81,7 +84,7 @@ export class HistoryModule extends VuexModule {
 
   public get sessionTags(): string[] {
     return this.sessions
-      .flatMap(session => session.tags ?? [])
+      .flatMap((session) => session.tags ?? [])
       .filter(uniqueFilter);
   }
 
@@ -139,15 +142,11 @@ export class HistoryModule extends VuexModule {
   public async fetchFields(): Promise<void> {
     const s = this.fieldsDuration.to('s').round(0).toString();
     const fields = await historyApi.fetchFields(s);
-    this.fields = fields
-      .reduce(
-        (acc: Mapped<string[]>, f: string) => {
-          const [service, ...sections] = f.split('/');
-          const arr = acc[service] ?? [];
-          return { ...acc, [service]: [...arr, sections.join('/')] };
-        },
-        {},
-      );
+    this.fields = fields.reduce((acc: Mapped<string[]>, f: string) => {
+      const [service, ...sections] = f.split('/');
+      const arr = acc[service] ?? [];
+      return { ...acc, [service]: [...arr, sections.join('/')] };
+    }, {});
   }
 
   @Action
@@ -162,7 +161,13 @@ export class HistoryModule extends VuexModule {
     precision: CsvPrecision;
     fileName: string;
   }): Promise<void> {
-    exportFile(fileName, await historyApi.downloadCsv({ ...buildQuery(params, fields), precision }));
+    exportFile(
+      fileName,
+      await historyApi.downloadCsv({
+        ...buildQuery(params, fields),
+        precision,
+      }),
+    );
   }
 
   @Action

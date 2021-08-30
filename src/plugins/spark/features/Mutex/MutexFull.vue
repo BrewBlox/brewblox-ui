@@ -40,7 +40,10 @@ export default defineComponent({
             This can be used to:
             <ul>
               <li>Prevent heating and cooling at the same time.</li>
-              <li>Prevent two or more heating elements from exceeding your maximum available power.</li>
+              <li>
+                Prevent two or more heating elements from exceeding
+                your maximum available power.
+              </li>
             </ul>
           </p>
           <p>

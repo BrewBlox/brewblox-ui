@@ -59,7 +59,10 @@ export default defineComponent({
           <p>
             On your new dashboard, you will find:
             <ul>
-              <li>A graphical representation of your setup. Parts are clickable for quick access to settings.</li>
+              <li>
+                A graphical representation of your setup.
+                Parts are clickable for quick access to settings.
+              </li>
               <li>A graph with the most important metrics.</li>
               <li>Actions that reconfigure your blocks for different behavior.</li>
             </ul>

@@ -1,6 +1,6 @@
 const path = require('path');
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function retry(desc, func) {
   const start = new Date().getTime();
@@ -13,7 +13,7 @@ async function retry(desc, func) {
     }
   }
   throw new Error(`Retry attempts exhausted: "${desc}"`);
-};
+}
 
 function objectSorter(key) {
   return (a, b) => {
@@ -33,13 +33,6 @@ module.exports = {
   history: `${host}/history/history`,
   datastore: `${host}/history/datastore`,
   fileDir: path.resolve(__dirname, 'presets'),
-  databases: [
-    'brewblox-global',
-    'brewblox-automation',
-    'brewblox-ui-store',
-  ],
-  sparks: [
-    'sparkey',
-    'spock',
-  ],
+  databases: ['brewblox-global', 'brewblox-automation', 'brewblox-ui-store'],
+  sparks: ['sparkey', 'spock'],
 };

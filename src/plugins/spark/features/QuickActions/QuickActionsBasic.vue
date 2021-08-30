@@ -13,7 +13,12 @@ import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 
-import { BlockChange, ChangeAction, EditableBlockField, QuickActionsWidget } from './types';
+import {
+  BlockChange,
+  ChangeAction,
+  EditableBlockField,
+  QuickActionsWidget,
+} from './types';
 
 interface FieldDiff {
   key: string;
@@ -39,16 +44,13 @@ export default defineComponent({
   name: 'QuickActionsBasic',
   setup() {
     const { touch } = useGlobals.setup();
-    const {
-      widgetId,
-      config,
-      saveConfig,
-    } = useWidget.setup<QuickActionsWidget>();
+    const { widgetId, config, saveConfig } =
+      useWidget.setup<QuickActionsWidget>();
 
     const applying = ref(false);
 
-    const actions = computed<ChangeAction[]>(
-      () => deserialize(config.value.actions ?? config.value.steps),
+    const actions = computed<ChangeAction[]>(() =>
+      deserialize(config.value.actions ?? config.value.steps),
     );
 
     function saveActions(values: ChangeAction[] = actions.value): void {
@@ -60,26 +62,33 @@ export default defineComponent({
       return sparkStore.blockById(change.serviceId, change.blockId);
     }
 
-    const actionDisplays = computed<ActionDisplay[]>(
-      () => actions.value
-        .map((action: ChangeAction): ActionDisplay => {
-          const applicable = action.changes.every(change => blockByChange(change));
-          const diffs = applicable ? action.changes.map(blockDiff) : [];
-          const active = applicable && diffs.every(bdiff => bdiff.diffs.every(fdiff => !fdiff.changed));
-          return {
-            ...action,
-            applicable,
-            diffs,
-            active,
-          };
-        }),
+    const actionDisplays = computed<ActionDisplay[]>(() =>
+      actions.value.map((action: ChangeAction): ActionDisplay => {
+        const applicable = action.changes.every((change) =>
+          blockByChange(change),
+        );
+        const diffs = applicable ? action.changes.map(blockDiff) : [];
+        const active =
+          applicable &&
+          diffs.every((bdiff) => bdiff.diffs.every((fdiff) => !fdiff.changed));
+        return {
+          ...action,
+          applicable,
+          diffs,
+          active,
+        };
+      }),
     );
 
-    function confirmActionChange(block: Block, key: string, value: any): Promise<any> {
+    function confirmActionChange(
+      block: Block,
+      key: string,
+      value: any,
+    ): Promise<any> {
       return new Promise((resolve, reject) => {
         const specField = sparkStore
           .fieldSpecsByType(block.type)
-          .find(field => field.key === key && !field.readonly);
+          .find((field) => field.key === key && !field.readonly);
         if (!specField) {
           resolve(value);
           return;
@@ -101,12 +110,14 @@ export default defineComponent({
             title: `Confirm ${specField.title}`,
             html: true,
             message: `
-          Please confirm the <b>${specField.title}</b> value in <i>${block.id}</i>.
+          Please confirm the <b>${specField.title}</b> value in <i>${
+              block.id
+            }</i>.
           Current value is '${pretty(block.data[key])}'.
           `,
           },
         })
-          .onOk(value => resolve(value))
+          .onOk((value) => resolve(value))
           .onCancel(() => reject());
       });
     }
@@ -119,19 +130,29 @@ export default defineComponent({
         const fieldSpecs = sparkStore.fieldSpecsByType(block.type);
         const actualData = deepCopy(change.data);
         for (const key in change.data) {
-          if (!fieldSpecs.some(c => c.key === key)) {
+          if (!fieldSpecs.some((c) => c.key === key)) {
             delete actualData[key];
           }
           if (change.confirmed?.[key]) {
-            actualData[key] = await confirmActionChange(block, key, actualData[key]);
+            actualData[key] = await confirmActionChange(
+              block,
+              key,
+              actualData[key],
+            );
           }
         }
         actualChanges.push([block, actualData]);
       }
       for (const [block, actualData] of actualChanges) {
-        await sparkStore.saveBlock({ ...block, data: { ...block.data, ...actualData } });
+        await sparkStore.saveBlock({
+          ...block,
+          data: { ...block.data, ...actualData },
+        });
       }
-      action.changes = action.changes.map((change, idx) => ({ ...change, data: actualChanges[idx][1] }));
+      action.changes = action.changes.map((change, idx) => ({
+        ...change,
+        data: actualChanges[idx][1],
+      }));
       spliceById(actions.value, action);
       saveActions();
     }
@@ -140,14 +161,19 @@ export default defineComponent({
       applying.value = true;
       applyChanges(action)
         .then(() => notify.done(`Applied ${action.name}`))
-        .then(() => // Fetch all blocks to show secondary effects
+        .then(() =>
+          // Fetch all blocks to show secondary effects
           Promise.all(
             action.changes
-              .map(v => v.serviceId)
+              .map((v) => v.serviceId)
               .filter(uniqueFilter)
-              .map(serviceId => sparkStore.moduleById(serviceId)!.fetchBlocks())))
-        .catch(e => notify.warn(`Failed to apply ${action.name}: ${e}`))
-        .finally(() => applying.value = false);
+              .map((serviceId) =>
+                sparkStore.moduleById(serviceId)!.fetchBlocks(),
+              ),
+          ),
+        )
+        .catch((e) => notify.warn(`Failed to apply ${action.name}: ${e}`))
+        .finally(() => (applying.value = false));
     }
 
     function showActionDialog(action: ChangeAction): void {
@@ -173,20 +199,18 @@ export default defineComponent({
       }
 
       const fieldSpecs = sparkStore.fieldSpecsByType(block.type);
-      const diffs =
-        Object.entries(change.data)
-          .map(([key, val]) => {
-            const specChange = fieldSpecs.find(s => s.key === key);
-            const pretty = specChange?.pretty ?? prettyAny;
-            const oldV = pretty(block.data[key]);
-            const newV = pretty(val);
-            return {
-              key: specChange?.title ?? key,
-              oldV,
-              newV,
-              changed: oldV !== newV,
-            };
-          });
+      const diffs = Object.entries(change.data).map(([key, val]) => {
+        const specChange = fieldSpecs.find((s) => s.key === key);
+        const pretty = specChange?.pretty ?? prettyAny;
+        const oldV = pretty(block.data[key]);
+        const newV = pretty(val);
+        return {
+          key: specChange?.title ?? key,
+          oldV,
+          newV,
+          changed: oldV !== newV,
+        };
+      });
 
       return {
         id: change.id,
@@ -212,17 +236,13 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body column">
-      <div
-        v-for="action in actionDisplays"
-        :key="action.id"
-        class="row"
-      >
+      <div v-for="action in actionDisplays" :key="action.id" class="row">
         <div
           class="col-grow q-py-xs q-px-sm rounded-borders clickable"
           style="min-width: 100px"
           @click="showActionDialog(action)"
         >
-          <div :class="action.active ? 'text-positive': ''">
+          <div :class="action.active ? 'text-positive' : ''">
             {{ action.name }}
           </div>
           <q-item-label caption class="darkened">
@@ -276,7 +296,8 @@ export default defineComponent({
           @click="applyAction(action)"
         >
           <q-tooltip v-if="!touch">
-            Apply action <span v-if="action.active">(no fields will be changed)</span>
+            Apply action
+            <span v-if="action.active">(no fields will be changed)</span>
           </q-tooltip>
         </q-btn>
       </div>

@@ -31,10 +31,7 @@ export interface UseDialogProps {
   };
 }
 
-export type UseDialogEmits = [
-  'ok',
-  'hide',
-];
+export type UseDialogEmits = ['ok', 'hide'];
 
 export interface UseDialogComponent {
   dialogRef: Ref<QDialog | null>;
@@ -65,16 +62,13 @@ export const useDialog: UseDialogComposable = {
       default: false,
     },
   },
-  emits: [
-    'ok',
-    'hide',
-  ],
+  emits: ['ok', 'hide'],
   setup(): UseDialogComponent {
     const { emit, proxy } = getCurrentInstance()!;
 
     const hashId = `.${nanoid(6)}.`;
     const dialogRef = ref<QDialog | null>(null);
-    const cancelWatcher = ref<() => void>(() => { });
+    const cancelWatcher = ref<() => void>(() => {});
 
     function show(): void {
       dialogRef.value?.show();
@@ -99,11 +93,14 @@ export const useDialog: UseDialogComposable = {
 
     // Will be overridden if this dialog is showing a widget
     // Used for all other menus and edit dialogs
-    provide(ContextKey, reactive({
-      container: 'Dialog',
-      size: 'Fixed',
-      mode: 'Basic',
-    }));
+    provide(
+      ContextKey,
+      reactive({
+        container: 'Dialog',
+        size: 'Fixed',
+        mode: 'Basic',
+      }),
+    );
 
     // Lets all nested elements declare that the dialog should be closed immediately
     provide(InvalidateKey, hide);
@@ -132,7 +129,7 @@ export const useDialog: UseDialogComposable = {
             },
           );
         })
-        .catch(() => { });
+        .catch(() => {});
     }
 
     // Dialogs can be closed manually, or by using the back button.
@@ -146,16 +143,16 @@ export const useDialog: UseDialogComposable = {
         // Dialog was last to be opened - we can go back to undo the stack push.
         cancelWatcher.value();
         router.back();
-      }
-      else if (hash.includes(hashId)) {
+      } else if (hash.includes(hashId)) {
         // Dialog was not last to be opened.
         // We want to clear the dialog ID,
         // but can't remove a page from the middle of the navigation stack.
         // This means we'll have a bit of junk left on the stack after last dialog is closed.
         // It's not optimal, but usually won't be noticed by users.
         //
-        // Ideally, we'd want to remove duplicate pages from the navigation stack,
-        // but for security/privacy reasons we can't inspect the stack before calling `router.back()`.
+        // Ideally, we'd want to remove duplicate pages from the navigation stack.
+        // For security/privacy reasons we can't inspect the stack
+        // before calling `router.back()`.
         cancelWatcher.value();
         router.replace({ hash: hash.replaceAll(hashId, '') });
       }

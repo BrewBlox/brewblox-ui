@@ -2,7 +2,12 @@
 import { computed, defineComponent, PropType, watch } from 'vue';
 
 import { UP } from '@/plugins/builder/const';
-import { coord2grid, elbow, flowOnCoord, liquidOnCoord } from '@/plugins/builder/utils';
+import {
+  coord2grid,
+  elbow,
+  flowOnCoord,
+  liquidOnCoord,
+} from '@/plugins/builder/utils';
 import { DigitalState } from '@/plugins/spark/types';
 
 import { usePart, useSettingsBlock } from '../composables';
@@ -30,44 +35,38 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'dirty',
-  ],
+  emits: ['dirty'],
   setup(props, { emit }) {
-    const {
-      sizeX,
-    } = usePart.setup(props.part);
+    const { sizeX } = usePart.setup(props.part);
 
-    const {
-      block,
-    } = useSettingsBlock.setup<ValveT>(props.part, VALVE_KEY, VALVE_TYPES);
+    const { block } = useSettingsBlock.setup<ValveT>(
+      props.part,
+      VALVE_KEY,
+      VALVE_TYPES,
+    );
 
-    const closed = computed<boolean>(
-      () => block.value !== null
+    const closed = computed<boolean>(() =>
+      block.value !== null
         ? Boolean(block.value.data.state === DigitalState.STATE_ACTIVE)
         : Boolean(props.part.settings.closed),
     );
 
-    const liquidPath = computed<string>(
-      () => closed.value
-        ? paths.liquidLeft
-        : paths.liquidRight,
+    const liquidPath = computed<string>(() =>
+      closed.value ? paths.liquidLeft : paths.liquidRight,
     );
 
-    const liquidSpeed = computed<number>(
-      () => -flowOnCoord(props.part, UP),
-    );
+    const liquidSpeed = computed<number>(() => -flowOnCoord(props.part, UP));
 
-    const liquidColor = computed<string[]>(
-      () => liquidOnCoord(props.part, UP),
-    );
+    const liquidColor = computed<string[]>(() => liquidOnCoord(props.part, UP));
 
     watch(
       () => block.value,
       (newV, oldV) => {
-        if (newV === null
-          || oldV === null
-          || newV.data.state !== oldV.data.state) {
+        if (
+          newV === null ||
+          oldV === null ||
+          newV.data.state !== oldV.data.state
+        ) {
           emit('dirty');
         }
       },
@@ -93,12 +92,21 @@ export default defineComponent({
     <g class="outline">
       <AnimatedArrows :path="liquidPath" :speed="liquidSpeed" />
     </g>
-    <g class="outline fill" :transform="closed ? `translate(${coord2grid(sizeX)}, 0) scale(-1, 1)` : ''">
+    <g
+      class="outline fill"
+      :transform="
+        closed ? `translate(${coord2grid(sizeX)}, 0) scale(-1, 1)` : ''
+      "
+    >
       <path d="M0,21 H10" />
       <path d="M0,29 H10" />
       <path :d="paths.bigEnclosure" />
       <path :d="paths.smallEnclosure" />
     </g>
-    <PowerIcon v-if="block" :transform="`translate(${closed ? 5 : -5}, 15)`" color="black" />
+    <PowerIcon
+      v-if="block"
+      :transform="`translate(${closed ? 5 : -5}, 15)`"
+      color="black"
+    />
   </g>
 </template>

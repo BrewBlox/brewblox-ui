@@ -3,7 +3,12 @@ import { computed, defineComponent, onBeforeMount, PropType, watch } from 'vue';
 
 import { DEFAULT_PUMP_PRESSURE, LEFT } from '@/plugins/builder/const';
 import { liquidOnCoord, settingsBlock } from '@/plugins/builder/utils';
-import { ActuatorPwmBlock, BlockType, DigitalActuatorBlock, DigitalState } from '@/plugins/spark/types';
+import {
+  ActuatorPwmBlock,
+  BlockType,
+  DigitalActuatorBlock,
+  DigitalState,
+} from '@/plugins/spark/types';
 
 import { PUMP_KEY, PUMP_TYPES, PumpT } from '../specs/Pump';
 import { FlowPart } from '../types';
@@ -16,83 +21,72 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:part',
-    'dirty',
-  ],
+  emits: ['update:part', 'dirty'],
   setup(props, { emit }) {
     const hasAddress = computed<boolean>(
       () => props.part.settings[PUMP_KEY]?.id != null,
     );
 
-    const block = computed<PumpT | null>(
-      () => settingsBlock(props.part, PUMP_KEY, PUMP_TYPES),
+    const block = computed<PumpT | null>(() =>
+      settingsBlock(props.part, PUMP_KEY, PUMP_TYPES),
     );
 
-    const enabled = computed<boolean>(
-      () => {
-        if (block.value === null) {
-          return hasAddress.value
-            ? false
-            : Boolean(props.part.settings.enabled);
-        }
-        else if (block.value.type === BlockType.DigitalActuator) {
-          return block.value.data.state === DigitalState.STATE_ACTIVE;
-        }
-        else if (block.value.type === BlockType.ActuatorPwm) {
-          return block.value.data.setting > 0;
-        }
-        else {
-          return false;
-        }
-      },
-    );
+    const enabled = computed<boolean>(() => {
+      if (block.value === null) {
+        return hasAddress.value ? false : Boolean(props.part.settings.enabled);
+      } else if (block.value.type === BlockType.DigitalActuator) {
+        return block.value.data.state === DigitalState.STATE_ACTIVE;
+      } else if (block.value.type === BlockType.ActuatorPwm) {
+        return block.value.data.setting > 0;
+      } else {
+        return false;
+      }
+    });
 
-    const liquids = computed<string[]>(
-      () => liquidOnCoord(props.part, LEFT),
-    );
+    const liquids = computed<string[]>(() => liquidOnCoord(props.part, LEFT));
 
-    const pwmSetting = computed<number>(
-      () => block.value?.type === BlockType.ActuatorPwm
+    const pwmSetting = computed<number>(() =>
+      block.value?.type === BlockType.ActuatorPwm
         ? block.value.data.setting
         : 100,
     );
 
-    const duration = computed<number>(
-      () => {
-        const pressure = ((props.part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE) / 100 * pwmSetting.value) || 0.01;
-        const animationDuration = 60 / pressure;
-        return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
-      },
-    );
+    const duration = computed<number>(() => {
+      const pressure =
+        ((props.part.settings.onPressure ?? DEFAULT_PUMP_PRESSURE) / 100) *
+          pwmSetting.value || 0.01;
+      const animationDuration = 60 / pressure;
+      return Math.max(animationDuration, 0.5); // Max out animation speed at 120 pressure
+    });
 
     watch(
       () => block.value,
       (newV, oldV) => {
-        if (newV === null
-          || oldV === null
-          || (newV as DigitalActuatorBlock).data.state !== (oldV as DigitalActuatorBlock).data.state
-          || (newV as ActuatorPwmBlock).data.setting !== (oldV as ActuatorPwmBlock).data.setting
+        if (
+          newV === null ||
+          oldV === null ||
+          (newV as DigitalActuatorBlock).data.state !==
+            (oldV as DigitalActuatorBlock).data.state ||
+          (newV as ActuatorPwmBlock).data.setting !==
+            (oldV as ActuatorPwmBlock).data.setting
         ) {
           emit('dirty');
         }
       },
     );
 
-    onBeforeMount(
-      () => {
-        if (props.part.settings.pwm !== undefined) {
-          emit('update:part', {
-            ...props.part,
-            settings: {
-              ...props.part.settings,
-              [PUMP_KEY]: props.part.settings.pwm,
-              pwm: undefined,
-            },
-          });
-        }
-      },
-    );
+    onBeforeMount(() => {
+      if (props.part.settings.pwm !== undefined) {
+        emit('update:part', {
+          ...props.part,
+          settings: {
+            ...props.part.settings,
+            [PUMP_KEY]: props.part.settings.pwm,
+            pwm: undefined,
+          },
+        });
+      }
+    });
 
     return {
       hasAddress,
@@ -109,7 +103,11 @@ export default defineComponent({
     <!-- tube liquid bottom-->
     <LiquidStroke :paths="['M50,25H0']" :colors="liquids" />
     <!-- ball liquid -->
-    <LiquidStroke :paths="['M 17 29 A 8 8 0 1 1 17 31 Z']" :colors="liquids" class="ballLiquid" />
+    <LiquidStroke
+      :paths="['M 17 29 A 8 8 0 1 1 17 31 Z']"
+      :colors="liquids"
+      class="ballLiquid"
+    />
     <!-- ball outline-->
     <circle cx="25" cy="30" r="16" class="outline" />
     <!-- blades -->
@@ -140,7 +138,9 @@ export default defineComponent({
       <line x1="32.5" y1="6" x2="16.5" y2="6" />
       <line x1="0" y1="21" x2="11" y2="21" />
       <line x1="0" y1="29" x2="9" y2="29" />
-      <path d="M50,29H29v3.5c0,2.2-1.8,4-4,4s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25" />
+      <path
+        d="M50,29H29v3.5c0,2.2-1.8,4-4,4s-4-1.8-4-4V25c0-2.2,1.8-4,4-4h25"
+      />
     </g>
     <rect fill="green" fill-opacity="0" x="0" y="0" width="50" height="50" />
     <PowerIcon v-if="hasAddress" transform="translate(15,-5)" />

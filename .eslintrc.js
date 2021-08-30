@@ -1,22 +1,18 @@
 module.exports = {
-  'root': true,
-  'parserOptions': {
-    'ecmaVersion': 2018,
-    'sourceType': 'module',
-    'parser': '@typescript-eslint/parser',
+  root: true,
+  parser: 'vue-eslint-parser',
+  parserOptions: {
+    parser: '@typescript-eslint/parser',
   },
-  'extends': [
+  extends: [
     'plugin:vue/vue3-recommended',
     'plugin:@typescript-eslint/recommended',
     '@vue/typescript',
     'plugin:quasar/standard',
   ],
-  'plugins': [
-    'simple-import-sort',
-    'quasar',
-  ],
-  'rules': {
-    'quotes': ['error', 'single', { 'avoidEscape': true }],
+  plugins: ['@typescript-eslint', 'simple-import-sort', 'quasar'],
+  rules: {
+    quotes: ['error', 'single', { avoidEscape: true }],
     'class-methods-use-this': 0,
     'simple-import-sort/sort': 'error',
     'sort-imports': 'off',
@@ -31,18 +27,15 @@ module.exports = {
     'no-console': 'warn',
     'no-debugger': 'warn',
     'no-multiple-empty-lines': 'error',
-    'comma-dangle': [
-      'error',
-      'always-multiline',
-    ],
-    'semi': 'error',
+    'comma-dangle': ['error', 'always-multiline'],
+    semi: 'error',
     'max-len': [
       'error',
-      120,
+      100,
       2,
       {
-        'ignoreUrls': true,
-        'ignoreComments': false,
+        ignoreUrls: true,
+        ignoreComments: false,
       },
     ],
     '@typescript-eslint/indent': 0,
@@ -50,31 +43,38 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 0,
     '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/camelcase': 0,
-    '@typescript-eslint/explicit-function-return-type': ['warn', {
-      allowExpressions: true,
-      allowTypedFunctionExpressions: true,
-      allowHigherOrderFunctions: true,
-    }],
+    '@typescript-eslint/explicit-function-return-type': [
+      'warn',
+      {
+        allowExpressions: true,
+        allowTypedFunctionExpressions: true,
+        allowHigherOrderFunctions: true,
+      },
+    ],
     'quasar/check-valid-props': 'warn',
     'vue/no-v-html': 0,
-    'vue/max-attributes-per-line': ['warn', {
-      'singleline': 8,
-      'multiline': {
-        'max': 1,
-        'allowFirstLine': false,
+    'vue/max-attributes-per-line': [
+      'warn',
+      {
+        singleline: 8,
+        multiline: {
+          max: 1,
+          allowFirstLine: false,
+        },
       },
-    }],
+    ],
   },
-  'overrides': [
+  overrides: [
     {
-      'files': ['*.js'],
-      'rules': {
+      files: ['*.js'],
+      rules: {
         '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off',
       },
     },
     {
-      'files': ['dev/**.js'],
-      'rules': {
+      files: ['dev/**.js'],
+      rules: {
         'no-console': 'off',
       },
     },
