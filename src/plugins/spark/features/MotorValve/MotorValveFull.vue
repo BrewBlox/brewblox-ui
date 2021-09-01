@@ -3,7 +3,6 @@ import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DS2408StartChannels } from '@/plugins/spark/const';
 import {
   Block,
   BlockType,
@@ -48,11 +47,9 @@ export default defineComponent({
     }
 
     const channelOpts = computed<SelectOption<number>[]>(() => [
-      { label: 'Not set', value: 0 },
-      ...DS2408StartChannels.map(({ name, nid }) => ({
-        label: `${name}${driverStr(nid)}`,
-        value: nid,
-      })),
+      { value: 0, label: 'Not set' },
+      { value: 5, label: `A${driverStr(5)}` },
+      { value: 1, label: `B${driverStr(5)}` },
     ]);
 
     async function claimChannel(pinId: number): Promise<void> {

@@ -3,7 +3,6 @@ import { computed, defineComponent } from 'vue';
 
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DS2408StartChannels } from '@/plugins/spark/const';
 import {
   BlockIntfType,
   DigitalActuatorBlock,
@@ -16,7 +15,7 @@ import { createDialog } from '@/utils/dialog';
 
 const connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
   { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },
-  { label: '8 IO pins', value: DS2408ConnectMode.CONNECT_ACTUATOR },
+  { label: '8 IO channels', value: DS2408ConnectMode.CONNECT_ACTUATOR },
 ];
 
 export default defineComponent({
@@ -68,7 +67,6 @@ export default defineComponent({
     }
 
     return {
-      DS2408StartChannels,
       connectModeOpts,
       context,
       block,
@@ -101,7 +99,7 @@ export default defineComponent({
           @update:model-value="setConnectMode"
         />
       </div>
-      <ValveArray v-if="valveMode" :mapping="DS2408StartChannels" />
+      <ValveArray v-if="valveMode" />
       <IoArray v-else />
 
       <template v-if="context.mode === 'Full'">

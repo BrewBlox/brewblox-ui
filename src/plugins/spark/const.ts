@@ -2,7 +2,6 @@ import {
   AnalogConstraintKey,
   BlockIntfType,
   BlockType,
-  ChannelMapping,
   DigitalConstraintKey,
   DisplayTempUnit,
   FilterChoice,
@@ -25,11 +24,6 @@ export const analogConstraintLabels: Record<AnalogConstraintKey, string> = {
   max: 'Maximum',
   balanced: 'Balanced',
 };
-
-export const DS2408StartChannels: ChannelMapping[] = [
-  { id: 'A', nid: 1, name: 'B' },
-  { id: 'E', nid: 5, name: 'A' },
-];
 
 export const constraintLabels = {
   ...digitalConstraintLabels,
@@ -95,4 +89,42 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
   DS2408Interface: [BlockType.DS2408],
 };
 
-export const GpioDeviceOpts = [];
+const ioChannelNamesBasic: Record<number, string> = {
+  1: 'A',
+  2: 'B',
+  3: 'C',
+  4: 'D',
+  5: 'E',
+  6: 'F',
+  7: 'G',
+  8: 'H',
+};
+
+export const ioChannelNamesDS2408 = ioChannelNamesBasic;
+
+export const valveChannelNamesDS2408: Record<number, string> = {
+  1: 'B',
+  5: 'A',
+};
+
+export const ioChannelNamesDS2413: Record<number, string> = {
+  1: 'A',
+  2: 'B',
+};
+
+export const ioChannelNamesMockPins = ioChannelNamesBasic;
+
+export const ioChannelNamesSpark2: Record<number, string> = {
+  1: 'Bottom 1',
+  2: 'Bottom 2',
+  3: 'Bottom 3',
+  4: 'Bottom 4',
+};
+
+export const ioChannelNamesSpark3: Record<number, string> = {
+  1: 'Top 1',
+  2: 'Top 2',
+  3: 'Top 3',
+  4: 'Bottom 1',
+  5: 'Bottom 2',
+};

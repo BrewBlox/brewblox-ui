@@ -41,11 +41,11 @@ services:
   #   labels:
   #     - traefik.http.services.sparkey.loadbalancer.server.port=5000
   #   volumes:
-  #     - ../brewblox-devcon-spark/binaries:/app/binaries
+  #     - ../brewblox-devcon-spark/firmware:/app/firmware
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark
   # spock:
   #   volumes:
-  #     - ../brewblox-devcon-spark/binaries:/app/binaries
+  #     - ../brewblox-devcon-spark/firmware:/app/firmware
   #     - ../brewblox-devcon-spark/brewblox_devcon_spark:/app/brewblox_devcon_spark
   # tilt:
   #   volumes:

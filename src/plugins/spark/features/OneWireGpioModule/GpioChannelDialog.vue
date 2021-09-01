@@ -165,9 +165,10 @@ export default defineComponent({
         return;
       }
 
-      const { id, pinsMask } = props.channel;
+      const { id, pinsMask, name } = props.channel;
       const channel: GpioModuleChannel = {
         id,
+        name, // TODO(Bob): editable name
         pinsMask,
         deviceType: inferChannelDeviceType(local),
         width: inferChannelWidth(local),

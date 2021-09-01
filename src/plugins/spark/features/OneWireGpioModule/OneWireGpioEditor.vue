@@ -218,6 +218,7 @@ export default defineComponent({
       const id = unusedId();
       const channel: GpioModuleChannel = {
         id,
+        name: `Channel ${id}`,
         deviceType: GpioDeviceType.GPIO_DEV_SSR_2P,
         pinsMask: GpioPins.NONE,
         width: 2,

@@ -10,17 +10,15 @@ import widget from './DS2413Widget.vue';
 
 const type = BlockType.DS2413;
 
-
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<DS2413Block> = {
       type,
       generate: () => ({
         oneWireBusId: 0,
         address: '',
         connected: false,
-        pins: [],
+        channels: [],
       }),
     };
 

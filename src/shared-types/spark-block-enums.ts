@@ -75,30 +75,7 @@ export const DigitalConstraintKey = Enum(
   'delayedOn',
 );
 
-export const AnalogConstraintKey = Enum(
-  'min',
-  'max',
-  'balanced',
-);
-
-// #region ChannelConfig
-export const ChannelConfig = Enum(
-  'CHANNEL_UNUSED',
-  'CHANNEL_DRIVING_OFF',
-  'CHANNEL_DRIVING_ON',
-  'CHANNEL_DRIVING_REVERSE',
-  'CHANNEL_DRIVING_BRAKE_LOW_SIDE',
-  'CHANNEL_DRIVING_BRAKE_HIGH_SIDE',
-  'CHANNEL_DRIVING_PWM',
-  'CHANNEL_DRIVING_PWM_REVERSE',
-  'CHANNEL_INPUT',
-  'CHANNEL_UNKNOWN',
-
-  // Kept for backwards compatibility
-  'CHANNEL_ACTIVE_LOW', // == CHANNEL_DRIVING_OFF
-  'CHANNEL_ACTIVE_HIGH', // == CHANNEL_DRIVING_ON
-);
-// #endregion ChannelConfig
+export const AnalogConstraintKey = Enum('min', 'max', 'balanced');
 
 // #region ChannelStatus
 export const ChannelStatus = Enum(
@@ -225,24 +202,15 @@ export const LogicResult = Enum(
 // #endregion Logic
 
 // #region ReferenceKind
-export const ReferenceKind = Enum(
-  'REF_SETTING',
-  'REF_VALUE',
-);
+export const ReferenceKind = Enum('REF_SETTING', 'REF_VALUE');
 // #endregion ReferenceKind
 
 // #region DisplayTempUnit
-export const DisplayTempUnit = Enum(
-  'TEMP_CELSIUS',
-  'TEMP_FAHRENHEIT',
-);
+export const DisplayTempUnit = Enum('TEMP_CELSIUS', 'TEMP_FAHRENHEIT');
 // #endregion DisplayTempUnit
 
 // #region DS2408ConnectMode
-export const DS2408ConnectMode = Enum(
-  'CONNECT_VALVE',
-  'CONNECT_ACTUATOR',
-);
+export const DS2408ConnectMode = Enum('CONNECT_VALVE', 'CONNECT_ACTUATOR');
 // #endregion DS2408ConnectMode
 
 // #region ValveState
@@ -278,11 +246,7 @@ export const SensorCombiFunc = Enum(
 // #endregion SensorCombiFunc
 
 // #region Spark2Hardware
-export const Spark2Hardware = Enum(
-  'HW_UNKNOWN',
-  'HW_SPARK1',
-  'HW_SPARK2',
-);
+export const Spark2Hardware = Enum('HW_UNKNOWN', 'HW_SPARK1', 'HW_SPARK2');
 // #endregion Spark2Hardware
 
 // #region SparkPlatform
@@ -330,7 +294,6 @@ export type BlockType = Enum<typeof BlockType>;
 export type BlockOrIntfType = Enum<typeof BlockOrIntfType>;
 export type DigitalConstraintKey = Enum<typeof DigitalConstraintKey>;
 export type AnalogConstraintKey = Enum<typeof AnalogConstraintKey>;
-export type ChannelConfig = Enum<typeof ChannelConfig>;
 export type ChannelStatus = Enum<typeof ChannelStatus>;
 export type GpioDeviceType = Enum<typeof GpioDeviceType>;
 export type DigitalState = Enum<typeof DigitalState>;
