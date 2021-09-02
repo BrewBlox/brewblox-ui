@@ -1,5 +1,4 @@
 <script lang="ts">
-import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
@@ -16,8 +15,9 @@ interface EditableChannel extends IoChannel {
   driver: MotorValveBlock | null;
 }
 
-interface ChannelClaims {
-  [nid: number]: MotorValveBlock;
+interface Claim {
+  driverId: string;
+  channelId: number;
 }
 
 const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
@@ -28,19 +28,20 @@ export default defineComponent({
     const { serviceId, sparkModule, block } =
       useBlockWidget.setup<IoArrayBlock>();
 
-    const claimedChannels = computed<ChannelClaims>(() =>
+    const claims = computed<Claim[]>(() =>
       sparkModule.blocks
         .filter(motorValveFilter)
-        .filter((v) => v.data.hwDevice.id === block.value.id)
-        .reduce((acc, v) => set(acc, v.data.startChannel, v), {}),
+        .filter((b) => b.data.hwDevice.id === block.value.id)
+        .map((b) => ({ driverId: b.id, channelId: b.data.startChannel })),
     );
 
     const channels = computed<EditableChannel[]>(() =>
       block.value.data.channels.map((channel: IoChannel) => {
         const { id } = channel;
-        const name = channelName(block.value, id) ?? `Channel ${id}`;
-        const driver = claimedChannels.value[id] ?? null;
-        return { ...channel, id, name, driver };
+        const claim = claims.value.find((c) => c.channelId === id);
+        const name = channelName(block.value, id) ?? 'Unknown';
+        const driver = sparkModule.blockById<MotorValveBlock>(claim?.driverId);
+        return { id, driver, name };
       }),
     );
 

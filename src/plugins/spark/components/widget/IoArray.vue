@@ -1,30 +1,23 @@
 <script lang="ts">
-import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
 import { Block, DigitalState, IoChannel } from '@/plugins/spark/types';
-import { isBlockDriven } from '@/plugins/spark/utils';
-import { Link } from '@/shared-types';
+import { channelName, isBlockDriven } from '@/plugins/spark/utils';
+import { IoArrayBlock, Link } from '@/shared-types';
 import { findById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 
 interface EditableChannel extends IoChannel {
-  id: number;
   name: string;
   driver: DigitalActuatorBlock | null;
 }
 
-interface IoArrayBlock extends Block {
-  data: {
-    channels: IoChannel[];
-  };
-}
-
-interface ClaimDict {
-  [channel: number]: string; // block ID of driver
+interface Claim {
+  driverId: string;
+  channelId: number;
 }
 
 const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
@@ -37,19 +30,21 @@ export default defineComponent({
     const { serviceId, sparkModule, block } =
       useBlockWidget.setup<IoArrayBlock>();
 
-    const claimedChannels = computed<ClaimDict>(() =>
+    const claims = computed<Claim[]>(() =>
       sparkModule.blocks
         .filter(actuatorFilter)
-        .filter((v) => v.data.hwDevice.id === block.value.id)
-        .reduce((acc, v) => set(acc, v.data.channel, v.id), {}),
+        .filter((b) => b.data.hwDevice.id === block.value.id)
+        .map((b) => ({ driverId: b.id, channelId: b.data.channel })),
     );
 
     const channels = computed<EditableChannel[]>(() =>
-      block.value.data.channels.map((ch: IoChannel) => {
-        const { id } = ch;
-        const driverId = claimedChannels.value[id];
-        const name = `ch ${id}`;
-        const driver = sparkModule.blockById<DigitalActuatorBlock>(driverId);
+      block.value.data.channels.map((channel: IoChannel) => {
+        const { id } = channel;
+        const claim = claims.value.find((c) => c.channelId === id);
+        const name = channelName(block.value, id) ?? 'Unknown';
+        const driver = sparkModule.blockById<DigitalActuatorBlock>(
+          claim?.driverId,
+        );
         return { id, driver, name };
       }),
     );

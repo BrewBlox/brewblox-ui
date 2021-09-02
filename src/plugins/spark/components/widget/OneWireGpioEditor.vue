@@ -1,7 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { useContext } from '@/composables';
 import {
   GpioDeviceType,
   GpioModuleChannel,
@@ -9,8 +8,6 @@ import {
   OneWireGpioModuleBlock,
 } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-
-import GpioChannelDialog from './GpioChannelDialog.vue';
 
 interface DeviceSlot {
   id: number;
@@ -28,25 +25,6 @@ function startBit(n: number): number {
   return n > 0 ? Math.log2(n & -n) : -1;
 }
 
-function deviceTypeDesc(deviceType: GpioDeviceType): string {
-  if (deviceType.startsWith('GPIO_DEV_SSR')) {
-    return 'SSR';
-  } else if (deviceType.startsWith('GPIO_DEV_MOTOR')) {
-    return 'Motor';
-  } else if (deviceType.startsWith('GPIO_DEV_COIL')) {
-    return 'Solenoid';
-  } else if (deviceType.startsWith('GPIO_DEV_MECHANICAL_RELAY')) {
-    return 'Mech. relay';
-  } else {
-    return 'Unknown';
-  }
-}
-
-function channelDesc(channel: GpioModuleChannel): string {
-  const typeDesc = deviceTypeDesc(channel.deviceType);
-  return `#${channel.id}: ${typeDesc} (${channel.width} pins)`;
-}
-
 export default defineComponent({
   name: 'OneWireGpioEditor',
   props: {
@@ -57,7 +35,6 @@ export default defineComponent({
   },
   emits: ['update:block'],
   setup(props, { emit }) {
-    const { context } = useContext.setup();
     const selectedId = ref<number | null>(null);
 
     const selectedChannel = computed<GpioModuleChannel | null>(
@@ -70,24 +47,12 @@ export default defineComponent({
       emit('update:block', v);
     }
 
-    const power = computed<boolean>({
-      get: () => props.block.data.useExternalPower,
-      set: (useExternalPower) =>
-        saveBlock({
-          ...props.block,
-          data: {
-            ...props.block.data,
-            useExternalPower,
-          },
-        }),
-    });
-
     const unassigned = computed<DeviceSlot[]>(() =>
       props.block.data.channels
         .filter((c) => c.pinsMask === GpioPins.NONE)
         .map((c) => ({
           id: c.id,
-          name: channelDesc(c),
+          name: c.name,
           width: c.width,
           start: -1,
         })),
@@ -98,7 +63,7 @@ export default defineComponent({
         .filter((c) => c.pinsMask !== GpioPins.NONE)
         .map((c) => ({
           id: c.id,
-          name: channelDesc(c),
+          name: c.name,
           width: c.width,
           start: startBit(c.pinsMask),
         })),
@@ -195,7 +160,7 @@ export default defineComponent({
 
     function modifyChannel(channel: GpioModuleChannel): void {
       createDialog({
-        component: GpioChannelDialog,
+        component: 'GpioChannelDialog',
         componentProps: {
           title: 'Edit channel',
           channel,
@@ -250,14 +215,7 @@ export default defineComponent({
       });
     }
 
-    const raw = computed<string>(() =>
-      JSON.stringify(props.block.data, undefined, 2),
-    );
-
     return {
-      context,
-      power,
-      raw,
       selectedId,
       selectedChannel,
       unassigned,
@@ -277,15 +235,6 @@ export default defineComponent({
 
 <template>
   <div class="column q-gutter-y-sm">
-    <div class="col-grow text-h6 text-secondary">
-      Module {{ block.data.modulePosition }}
-    </div>
-    <div class="row">
-      <ToggleButton v-model="power" label="Use external power" unelevated />
-    </div>
-    <div class="col-grow text-h6 text-secondary">
-      Pin layout
-    </div>
     <div class="row">
       <q-btn
         flat
@@ -375,10 +324,6 @@ export default defineComponent({
         <q-tooltip>{{ slot.name }}</q-tooltip>
       </div>
     </div>
-    <!-- Development: raw block data -->
-    <div v-if="context.mode === 'Full'" style="white-space: pre">
-      {{ raw }}
-    </div>
   </div>
 </template>
 
@@ -413,6 +358,5 @@ export default defineComponent({
   border: none
 .unassigned-area
   min-height: 100px
-  &.target-clickable
-    border: 1px dotted $amber
+  border: 1px dotted $amber
 </style>
