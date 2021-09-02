@@ -4,7 +4,7 @@ import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import { PinChannel } from '../types';
+import { IoChannelAddress } from '../types';
 import { hasShared } from '../utils';
 import { FermentConfig } from './types';
 
@@ -22,8 +22,8 @@ export default defineComponent({
     'next',
   ],
   setup(props, { emit }) {
-    const coolPin = ref<PinChannel | null>(props.config.coolPin ?? null);
-    const heatPin = ref<PinChannel | null>(props.config.heatPin ?? null);
+    const coolPin = ref<IoChannelAddress | null>(props.config.coolPin ?? null);
+    const heatPin = ref<IoChannelAddress | null>(props.config.heatPin ?? null);
     const fridgeSensor = ref<string | null>(props.config.fridgeSensor ?? null);
     const beerSensor = ref<string | null>(props.config.beerSensor ?? null);
 
@@ -139,7 +139,7 @@ export default defineComponent({
       />
       <q-item>
         <q-item-section>
-          <QuickstartPinField
+          <QuickstartChannelField
             v-model="coolPin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -147,7 +147,7 @@ export default defineComponent({
           />
         </q-item-section>
         <q-item-section>
-          <QuickstartPinField
+          <QuickstartChannelField
             v-model="heatPin"
             :service-id="config.serviceId"
             :error="pinSame"

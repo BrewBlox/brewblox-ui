@@ -124,8 +124,8 @@ export const defineCreatedBlocks = (
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.coolPin.arrayId),
-        channel: config.coolPin.pinId,
+        hwDevice: bloxLink(config.coolPin.blockId),
+        channel: config.coolPin.channel.id,
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
@@ -158,8 +158,8 @@ export const defineCreatedBlocks = (
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.heatPin.arrayId),
-        channel: config.heatPin.pinId,
+        hwDevice: bloxLink(config.heatPin.blockId),
+        channel: config.heatPin.channel.id,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,

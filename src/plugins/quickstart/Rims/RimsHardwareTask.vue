@@ -4,7 +4,7 @@ import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import { PinChannel, QuickstartAction } from '../types';
+import { IoChannelAddress, QuickstartAction } from '../types';
 import { createOutputActions, hasShared } from '../utils';
 import {
   defineChangedBlocks,
@@ -29,8 +29,8 @@ export default defineComponent({
   },
   emits: ['update:config', 'update:actions', 'back', 'next'],
   setup(props, { emit }) {
-    const tubePin = ref<PinChannel | null>(props.config.tubePin ?? null);
-    const pumpPin = ref<PinChannel | null>(props.config.pumpPin ?? null);
+    const tubePin = ref<IoChannelAddress | null>(props.config.tubePin ?? null);
+    const pumpPin = ref<IoChannelAddress | null>(props.config.pumpPin ?? null);
     const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
     const tubeSensor = ref<string | null>(props.config.tubeSensor ?? null);
 
@@ -155,7 +155,7 @@ export default defineComponent({
       />
       <q-item>
         <q-item-section>
-          <QuickstartPinField
+          <QuickstartChannelField
             v-model="pumpPin"
             :service-id="config.serviceId"
             :error="pinSame"
@@ -163,7 +163,7 @@ export default defineComponent({
           />
         </q-item-section>
         <q-item-section>
-          <QuickstartPinField
+          <QuickstartChannelField
             v-model="tubePin"
             :service-id="config.serviceId"
             :error="pinSame"

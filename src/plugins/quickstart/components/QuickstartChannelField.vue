@@ -5,13 +5,13 @@ import { sparkStore } from '@/plugins/spark/store';
 import { BlockIntfType, IoArrayBlock, IoChannel } from '@/plugins/spark/types';
 import { channelName, isCompatible } from '@/plugins/spark/utils';
 
-import { PinChannel } from '../types';
+import { IoChannelAddress } from '../types';
 
 export default defineComponent({
-  name: 'QuickstartPinField',
+  name: 'QuickstartChannelField',
   props: {
     modelValue: {
-      type: Object as PropType<PinChannel | null>,
+      type: Object as PropType<IoChannelAddress | null>,
       default: null,
     },
     serviceId: {
@@ -21,26 +21,26 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const local = computed<PinChannel | null>({
+    const local = computed<IoChannelAddress | null>({
       get: () => props.modelValue,
       set: (v) => emit('update:modelValue', v),
     });
 
-    const opts = computed<SelectOption<PinChannel>[]>(() =>
+    const opts = computed<SelectOption<IoChannelAddress>[]>(() =>
       sparkStore
         .serviceBlocks(props.serviceId)
         .filter((block): block is IoArrayBlock =>
           isCompatible(block.type, BlockIntfType.IoArrayInterface),
         )
-        .flatMap((block): PinChannel[] =>
-          block.data.channels.map((channel: IoChannel) => {
-            const { id } = channel;
-            const pinName = channelName(block, channel.id) ?? `Channel ${id}`;
-            return { pinName, arrayId: block.id, pinId: id };
-          }),
+        .flatMap((block): IoChannelAddress[] =>
+          block.data.channels.map((channel: IoChannel) => ({
+            channel,
+            blockId: block.id,
+            name: channelName(block, channel.id) || `Channel ${channel.id}`,
+          })),
         )
         .map((channel) => ({
-          label: `${channel.arrayId} ${channel.pinName}`,
+          label: `${channel.blockId} ${channel.name}`,
           value: channel,
         })),
     );
@@ -49,13 +49,13 @@ export default defineComponent({
       if (!local.value) {
         return '';
       }
-      const block = sparkStore.blockById(props.serviceId, local.value.arrayId);
+      const block = sparkStore.blockById(props.serviceId, local.value.blockId);
       if (!block) {
-        return `Block '${local.value.arrayId}' not found`;
+        return `Block '${local.value.blockId}' not found`;
       }
       return block.data.connected === false
-        ? `${local.value.arrayId} is not connected`
-        : `${local.value.arrayId} is connected`;
+        ? `${local.value.blockId} is not connected`
+        : `${local.value.blockId} is connected`;
     });
 
     return {
@@ -72,7 +72,7 @@ export default defineComponent({
     v-model="local"
     :options="opts"
     :hint="status"
-    :rules="[(v) => !!v || 'Pin must be selected']"
+    :rules="[(v) => !!v || 'Channel must be selected']"
     emit-value
     map-options
   />

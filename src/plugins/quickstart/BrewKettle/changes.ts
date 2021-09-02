@@ -68,8 +68,8 @@ export function defineCreatedBlocks(
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.kettlePin.arrayId),
-        channel: config.kettlePin.pinId,
+        hwDevice: bloxLink(config.kettlePin.blockId),
+        channel: config.kettlePin.channel.id,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
