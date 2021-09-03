@@ -1,7 +1,10 @@
 import { ComponentPublicInstance, onBeforeUpdate, Ref, ref } from 'vue';
 
 export interface UseElementRefsComponent<T extends Element> {
-  setElementRef(key: string, el: ComponentPublicInstance | null | undefined): void;
+  setElementRef(
+    key: string,
+    el: ComponentPublicInstance | Element | null | undefined,
+  ): void;
   getElementRef(key: string): T | null;
 }
 

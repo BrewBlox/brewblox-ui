@@ -1,12 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import {
-  GpioDeviceType,
-  GpioModuleChannel,
-  GpioPins,
-  OneWireGpioModuleBlock,
-} from '@/shared-types';
+import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 
 interface DeviceSlot {
@@ -28,27 +23,25 @@ function startBit(n: number): number {
 export default defineComponent({
   name: 'OneWireGpioEditor',
   props: {
-    block: {
-      type: Object as PropType<OneWireGpioModuleBlock>,
+    channels: {
+      type: Array as PropType<GpioModuleChannel[]>,
       required: true,
     },
   },
-  emits: ['update:block'],
+  emits: ['update:channels'],
   setup(props, { emit }) {
     const selectedId = ref<number | null>(null);
 
     const selectedChannel = computed<GpioModuleChannel | null>(
-      () =>
-        props.block.data.channels.find((c) => c.id === selectedId.value) ??
-        null,
+      () => props.channels.find((c) => c.id === selectedId.value) ?? null,
     );
 
-    function saveBlock(v: OneWireGpioModuleBlock = props.block): void {
-      emit('update:block', v);
+    function saveChannels(channels: GpioModuleChannel[]): void {
+      emit('update:channels', channels);
     }
 
     const unassigned = computed<DeviceSlot[]>(() =>
-      props.block.data.channels
+      props.channels
         .filter((c) => c.pinsMask === GpioPins.NONE)
         .map((c) => ({
           id: c.id,
@@ -59,7 +52,7 @@ export default defineComponent({
     );
 
     const active = computed<DeviceSlot[]>(() =>
-      props.block.data.channels
+      props.channels
         .filter((c) => c.pinsMask !== GpioPins.NONE)
         .map((c) => ({
           id: c.id,
@@ -72,7 +65,7 @@ export default defineComponent({
     const unused = computed<UnusedSlot[]>(() => {
       // always set a bit at idx 8
       // this provides an upper boundary when calculating free space
-      const mask: number = props.block.data.channels.reduce(
+      const mask: number = props.channels.reduce(
         (acc, c) => acc | c.pinsMask,
         1 << 8,
       );
@@ -94,15 +87,11 @@ export default defineComponent({
       if (!channel) {
         return;
       }
-      saveBlock({
-        ...props.block,
-        data: {
-          ...props.block.data,
-          channels: props.block.data.channels.map((c) =>
-            c.id === channel.id ? { ...c, pinsMask: GpioPins.NONE } : c,
-          ),
-        },
-      });
+      saveChannels(
+        props.channels.map((c) =>
+          c.id === channel.id ? { ...c, pinsMask: GpioPins.NONE } : c,
+        ),
+      );
       selectedId.value = null;
     }
 
@@ -135,22 +124,18 @@ export default defineComponent({
       if (!channel || channel.width > slot.free) {
         return;
       }
-      saveBlock({
-        ...props.block,
-        data: {
-          ...props.block.data,
-          channels: props.block.data.channels.map((c) =>
-            c.id === channel.id
-              ? { ...c, pinsMask: buildMask(slot.start, channel.width) }
-              : c,
-          ),
-        },
-      });
+      saveChannels(
+        props.channels.map((c) =>
+          c.id === channel.id
+            ? { ...c, pinsMask: buildMask(slot.start, channel.width) }
+            : c,
+        ),
+      );
       selectedId.value = null;
     }
 
     function unusedId(): number {
-      const ids = props.block.data.channels.map((c) => c.id);
+      const ids = props.channels.map((c) => c.id);
       let i = 1;
       while (ids.includes(i)) {
         i++;
@@ -166,16 +151,10 @@ export default defineComponent({
           channel,
         },
       }).onOk((updated: GpioModuleChannel) => {
-        saveBlock({
-          ...props.block,
-          data: {
-            ...props.block.data,
-            channels: [
-              ...props.block.data.channels.filter((c) => c.id !== updated.id),
-              updated,
-            ],
-          },
-        });
+        saveChannels([
+          ...props.channels.filter((c) => c.id !== updated.id),
+          updated,
+        ]);
       });
     }
 
@@ -204,15 +183,7 @@ export default defineComponent({
       if (!channel) {
         return;
       }
-      saveBlock({
-        ...props.block,
-        data: {
-          ...props.block.data,
-          channels: props.block.data.channels.filter(
-            (c) => c.id !== channel.id,
-          ),
-        },
-      });
+      saveChannels(props.channels.filter((c) => c.id !== channel.id));
     }
 
     return {
@@ -238,8 +209,8 @@ export default defineComponent({
     <div class="row">
       <q-btn
         flat
-        label="new"
-        :disable="block.data.channels.length >= 8"
+        label="add"
+        :disable="channels.length >= 8"
         @click="addChannel"
       />
       <q-btn v-if="selectedId != null" flat label="edit" @click="editChannel" />
@@ -286,7 +257,11 @@ export default defineComponent({
         @click="clickUnused(slot)"
       />
       <div style="grid-column: 9 / span 2" class="power">
-        Power
+        <slot name="power">
+          <div class="default">
+            Power
+          </div>
+        </slot>
       </div>
     </div>
     <!-- Unassigned -->
@@ -344,10 +319,11 @@ export default defineComponent({
     border: 1px dotted $light-green
     overflow: hidden
   .power
-    border: 1px solid orange
-    overflow: hidden
-    text-align: center
-    margin-left: 10px
+    margin-left: 5px
+    .default
+      text-align: center
+      overflow: hidden
+      border: 1px solid orange
 .target-clickable
   background-color: $hover
   cursor: pointer

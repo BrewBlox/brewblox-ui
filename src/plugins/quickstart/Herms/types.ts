@@ -26,8 +26,8 @@ export interface HermsBlockNames {
 
 export interface HermsConfig extends QuickstartConfig {
   names: HermsBlockNames;
-  hltPin: IoChannelAddress;
-  bkPin: IoChannelAddress;
+  hltChannel: IoChannelAddress;
+  bkChannel: IoChannelAddress;
   mutex: boolean;
   hltSensor: string;
   mtSensor: string;

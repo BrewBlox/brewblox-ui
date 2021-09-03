@@ -31,6 +31,7 @@ import {
 
 import { DisplayBlock } from '../types';
 import {
+  changedIoModules,
   pidDefaults,
   unlinkedActuators,
   withoutPrefix,
@@ -39,7 +40,13 @@ import {
 import { RimsConfig } from './types';
 
 export function defineChangedBlocks(config: RimsConfig): Block[] {
-  return unlinkedActuators(config.serviceId, [config.tubePin, config.pumpPin]);
+  return [
+    ...unlinkedActuators(config.serviceId, [
+      config.tubeChannel,
+      config.pumpChannel,
+    ]),
+    ...changedIoModules(config.serviceId, config.changedGpio),
+  ];
 }
 
 export function defineCreatedBlocks(config: RimsConfig): Block[] {
@@ -123,8 +130,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.tubePin.blockId),
-        channel: config.tubePin.channel.id,
+        hwDevice: bloxLink(config.tubeChannel.blockId),
+        channel: config.tubeChannel.channelId,
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
@@ -137,8 +144,8 @@ export function defineCreatedBlocks(config: RimsConfig): Block[] {
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.pumpPin.blockId),
-        channel: config.pumpPin.channel.id,
+        hwDevice: bloxLink(config.pumpChannel.blockId),
+        channel: config.pumpChannel.channelId,
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,

@@ -29,6 +29,7 @@ import {
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
 import {
+  changedIoModules,
   pidDefaults,
   unlinkedActuators,
   withoutPrefix,
@@ -55,10 +56,13 @@ const makeGlycolConfig = (): PidConfig => ({
 });
 
 export function defineChangedBlocks(config: GlycolConfig): Block[] {
-  const pins = config.heated
-    ? [config.heatPin!, config.coolPin]
-    : [config.coolPin];
-  return unlinkedActuators(config.serviceId, pins);
+  const channels = config.heated
+    ? [config.heatChannel!, config.coolChannel]
+    : [config.coolChannel];
+  return [
+    ...unlinkedActuators(config.serviceId, channels),
+    ...changedIoModules(config.serviceId, config.changedGpio),
+  ];
 }
 
 export function defineCreatedBlocks(
@@ -145,8 +149,8 @@ export function defineCreatedBlocks(
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.coolPin.blockId),
-        channel: config.coolPin.channel.id,
+        hwDevice: bloxLink(config.coolChannel.blockId),
+        channel: config.coolChannel.channelId,
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
@@ -175,8 +179,8 @@ export function defineCreatedBlocks(
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.heatPin ? config.heatPin!.blockId : null),
-        channel: config.heatPin ? config.heatPin!.channel.id : 0,
+        hwDevice: bloxLink(config.heatChannel?.blockId ?? null),
+        channel: config.heatChannel?.channelId ?? 0,
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
@@ -288,8 +292,8 @@ export function defineCreatedBlocks(
         serviceId,
         groups,
         data: {
-          hwDevice: bloxLink(config.glycolPin!.blockId),
-          channel: config.glycolPin!.channel.id,
+          hwDevice: bloxLink(config.glycolChannel!.blockId),
+          channel: config.glycolChannel!.channelId,
           invert: false,
           desiredState: DigitalState.STATE_INACTIVE,
           state: DigitalState.STATE_INACTIVE,

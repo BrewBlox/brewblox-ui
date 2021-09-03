@@ -1,13 +1,19 @@
 import { BuilderLayout } from '@/plugins/builder/types';
 import { Block } from '@/plugins/spark/types';
 import { DisplayOpts } from '@/plugins/spark/types';
-import { GpioModuleChannel, IoChannel, PidBlock } from '@/shared-types';
+import { GpioModuleChannel, PidBlock } from '@/shared-types';
 import { Widget } from '@/store/widgets';
 
 export interface IoChannelAddress {
   blockId: string;
   name: string;
-  channel: IoChannel | GpioModuleChannel;
+  channelId: number;
+}
+
+export interface GpioChange {
+  blockId: string;
+  modulePosition: number;
+  channels: GpioModuleChannel[];
 }
 
 export interface DisplayBlock {
@@ -23,6 +29,7 @@ export interface QuickstartConfig {
   names: AnyDict;
   layouts: BuilderLayout[];
   widgets: Widget[];
+  changedGpio: GpioChange[];
   createdBlocks: Block[];
   changedBlocks: Block[];
   renamedBlocks: { [old: string]: string };

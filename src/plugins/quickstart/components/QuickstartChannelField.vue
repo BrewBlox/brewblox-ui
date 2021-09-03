@@ -2,10 +2,15 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockIntfType, IoArrayBlock, IoChannel } from '@/plugins/spark/types';
+import {
+  BlockIntfType,
+  BlockType,
+  IoArrayBlock,
+  IoChannel,
+} from '@/plugins/spark/types';
 import { channelName, isCompatible } from '@/plugins/spark/utils';
 
-import { IoChannelAddress } from '../types';
+import { GpioChange, IoChannelAddress } from '../types';
 
 export default defineComponent({
   name: 'QuickstartChannelField',
@@ -18,6 +23,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    changedGpio: {
+      type: Array as PropType<GpioChange[]>,
+      required: true,
+    },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -26,16 +35,18 @@ export default defineComponent({
       set: (v) => emit('update:modelValue', v),
     });
 
-    const opts = computed<SelectOption<IoChannelAddress>[]>(() =>
-      sparkStore
+    const opts = computed<SelectOption<IoChannelAddress>[]>(() => [
+      // Based on IO arrays except OneWireGPIO
+      ...sparkStore
         .serviceBlocks(props.serviceId)
         .filter((block): block is IoArrayBlock =>
           isCompatible(block.type, BlockIntfType.IoArrayInterface),
         )
+        .filter((block) => block.type !== BlockType.OneWireGpioModule)
         .flatMap((block): IoChannelAddress[] =>
           block.data.channels.map((channel: IoChannel) => ({
-            channel,
             blockId: block.id,
+            channelId: channel.id,
             name: channelName(block, channel.id) || `Channel ${channel.id}`,
           })),
         )
@@ -43,7 +54,18 @@ export default defineComponent({
           label: `${channel.blockId} ${channel.name}`,
           value: channel,
         })),
-    );
+      // Based on GPIO changes
+      ...props.changedGpio.flatMap((change) =>
+        change.channels.map((channel) => ({
+          label: `${change.blockId} ${channel.name}`,
+          value: {
+            blockId: change.blockId,
+            name: channel.name,
+            channelId: channel.id,
+          },
+        })),
+      ),
+    ]);
 
     const status = computed<string>(() => {
       if (!local.value) {

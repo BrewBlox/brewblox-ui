@@ -19,8 +19,8 @@ export interface FermentBlockNames {
 
 export interface FermentConfig extends QuickstartConfig {
   names: FermentBlockNames;
-  heatPin: IoChannelAddress;
-  coolPin: IoChannelAddress;
+  heatChannel: IoChannelAddress;
+  coolChannel: IoChannelAddress;
   fridgeSensor: string;
   beerSensor: string;
 }

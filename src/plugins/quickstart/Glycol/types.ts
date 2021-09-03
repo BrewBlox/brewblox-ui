@@ -31,10 +31,10 @@ export type GlycolControlMode = 'No' | 'Measure' | 'Control';
 export interface GlycolConfig extends QuickstartConfig {
   names: GlycolBlockNames;
   heated: boolean;
-  coolPin: IoChannelAddress;
-  heatPin: IoChannelAddress | null;
+  coolChannel: IoChannelAddress;
+  heatChannel: IoChannelAddress | null;
 
-  glycolPin: IoChannelAddress | null;
+  glycolChannel: IoChannelAddress | null;
   glycolSensor: string;
   beerSensor: string;
 

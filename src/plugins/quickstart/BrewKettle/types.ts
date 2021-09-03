@@ -12,7 +12,7 @@ export interface BrewKettleBlockNames {
 
 export interface BrewKettleConfig extends QuickstartConfig {
   names: BrewKettleBlockNames;
-  kettlePin: IoChannelAddress;
+  kettleChannel: IoChannelAddress;
   kettleSensor: string;
 }
 

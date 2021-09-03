@@ -17,8 +17,8 @@ export interface FridgeConfigNames {
 
 export interface FridgeConfig extends QuickstartConfig {
   names: FridgeConfigNames;
-  heatPin: IoChannelAddress;
-  coolPin: IoChannelAddress;
+  heatChannel: IoChannelAddress;
+  coolChannel: IoChannelAddress;
   fridgeSensor: string;
 }
 

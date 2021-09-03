@@ -1,11 +1,18 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  PropType,
+  reactive,
+  ref,
+} from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import { IoChannelAddress } from '../types';
-import { hasShared } from '../utils';
+import { GpioChange, IoChannelAddress } from '../types';
+import { hasShared, resetGpioChanges } from '../utils';
 import { FermentConfig } from './types';
 
 export default defineComponent({
@@ -16,35 +23,37 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
-    const coolPin = ref<IoChannelAddress | null>(props.config.coolPin ?? null);
-    const heatPin = ref<IoChannelAddress | null>(props.config.heatPin ?? null);
+    const coolChannel = ref<IoChannelAddress | null>(
+      props.config.coolChannel ?? null,
+    );
+    const heatChannel = ref<IoChannelAddress | null>(
+      props.config.heatChannel ?? null,
+    );
     const fridgeSensor = ref<string | null>(props.config.fridgeSensor ?? null);
     const beerSensor = ref<string | null>(props.config.beerSensor ?? null);
-
-    const pinSame = computed<boolean>(
-      () => hasShared([coolPin.value, heatPin.value]),
+    const changedGpio = reactive<GpioChange[]>(
+      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
     );
 
-    const sensorSame = computed<boolean>(
-      () => hasShared([fridgeSensor.value, beerSensor.value]),
+    const channelSame = computed<boolean>(() =>
+      hasShared([coolChannel.value, heatChannel.value]),
     );
 
-    const valuesOk = computed<boolean>(
-      () => [
-        coolPin.value,
-        heatPin.value,
-        !pinSame.value,
+    const sensorSame = computed<boolean>(() =>
+      hasShared([fridgeSensor.value, beerSensor.value]),
+    );
+
+    const valuesOk = computed<boolean>(() =>
+      [
+        coolChannel.value,
+        heatChannel.value,
+        !channelSame.value,
         fridgeSensor.value,
         beerSensor.value,
         !sensorSame.value,
-      ]
-        .every(Boolean),
+      ].every(Boolean),
     );
 
     function discover(): void {
@@ -60,8 +69,9 @@ export default defineComponent({
         return;
       }
       const updates: Partial<FermentConfig> = {
-        heatPin: heatPin.value!,
-        coolPin: coolPin.value!,
+        changedGpio,
+        heatChannel: heatChannel.value!,
+        coolChannel: coolChannel.value!,
         fridgeSensor: fridgeSensor.value!,
         beerSensor: beerSensor.value!,
         renamedBlocks: {
@@ -76,11 +86,12 @@ export default defineComponent({
     onBeforeMount(() => discover());
 
     return {
-      coolPin,
-      heatPin,
+      coolChannel,
+      heatChannel,
+      changedGpio,
       fridgeSensor,
       beerSensor,
-      pinSame,
+      channelSame,
       sensorSame,
       valuesOk,
       discover,
@@ -115,42 +126,46 @@ export default defineComponent({
         <q-item-section>
           <p>
             Select which hardware should be used for each function.<br>
-            You can unplug or heat sensors to identify them.
-            The current value will be shown under each dropdown menu.
+            You can unplug or heat sensors to identify them. The current value
+            will be shown under each dropdown menu.
           </p>
           <p>
-            Use the buttons above to discover new OneWire blocks or manually create a block.
+            Use the buttons above to discover new OneWire blocks or manually
+            create a block.
           </p>
-          <p>
-            We will also set some constraints on the heater and cooler:
-            <ul>
-              <li>Minimum ON and OFF times to protect the compressor</li>
-              <li>Minimum wait times for switching between heating and cooling</li>
-            </ul>
+          <p v-if="changedGpio.length">
+            The GPIO modules are shown below. You can create IO channels there
+            to add them to the dropdown menus.
           </p>
+          <p>We will also set some constraints on the heater and cooler:</p>
+          <ul>
+            <li>Minimum ON and OFF times to protect the compressor</li>
+            <li>
+              Minimum wait times for switching between heating and cooling
+            </li>
+          </ul>
         </q-item-section>
       </q-item>
       <QuickstartMockCreateField
         :service-id="config.serviceId"
-        :names="[
-          config.names.fridgeSensor,
-          config.names.beerSensor,
-        ]"
+        :names="[config.names.fridgeSensor, config.names.beerSensor]"
       />
       <q-item>
         <q-item-section>
           <QuickstartChannelField
-            v-model="coolPin"
+            v-model="coolChannel"
             :service-id="config.serviceId"
-            :error="pinSame"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
             label="Cooler output"
           />
         </q-item-section>
         <q-item-section>
           <QuickstartChannelField
-            v-model="heatPin"
+            v-model="heatChannel"
             :service-id="config.serviceId"
-            :error="pinSame"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
             label="Heater output"
           />
         </q-item-section>
@@ -173,24 +188,30 @@ export default defineComponent({
           />
         </q-item-section>
       </q-item>
-      <CardWarning v-if="pinSame">
+      <CardWarning v-if="channelSame">
         <template #message>
-          Multiple outputs are using the same Pin.
+          Multiple outputs are using the same IO Channel.
         </template>
       </CardWarning>
       <CardWarning v-if="sensorSame">
         <template #message>
-          Multiple sensors are using the same Block.
+          Multiple sensors are using the same block.
         </template>
       </CardWarning>
     </q-card-section>
 
+    <q-card-section
+      v-for="change in changedGpio"
+      :key="`gpio-${change.blockId}`"
+    >
+      <div class="text-subtitle1">
+        GPIO Module {{ change.modulePosition }}: {{ change.blockId }}
+      </div>
+      <OneWireGpioEditor v-model:channels="change.channels" />
+    </q-card-section>
+
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
       <q-btn
         :disable="!valuesOk"

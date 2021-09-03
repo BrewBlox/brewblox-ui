@@ -17,8 +17,8 @@ export interface RimsBlockNames {
 
 export interface RimsConfig extends QuickstartConfig {
   names: RimsBlockNames;
-  tubePin: IoChannelAddress;
-  pumpPin: IoChannelAddress;
+  tubeChannel: IoChannelAddress;
+  pumpChannel: IoChannelAddress;
   kettleSensor: string;
   tubeSensor: string;
 }

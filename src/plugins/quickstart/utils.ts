@@ -3,6 +3,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import {
   BlockType,
   DigitalActuatorBlock,
+  OneWireGpioModuleBlock,
   PidBlock,
 } from '@/plugins/spark/types';
 import { startAddBlockToDisplay } from '@/plugins/spark/utils';
@@ -14,6 +15,7 @@ import { deepCopy } from '@/utils/objects';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
 
 import {
+  GpioChange,
   IoChannelAddress,
   PidConfig,
   QuickstartAction,
@@ -23,6 +25,22 @@ import {
 const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
   BlockType.DigitalActuator,
 );
+
+const oneWireGpioFilter = makeTypeFilter<OneWireGpioModuleBlock>(
+  BlockType.OneWireGpioModule,
+);
+
+export function resetGpioChanges(serviceId: string): GpioChange[] {
+  return sparkStore
+    .serviceBlocks(serviceId)
+    .filter(oneWireGpioFilter)
+    .sort((a, b) => a.data.modulePosition - b.data.modulePosition)
+    .map((block) => ({
+      blockId: block.id,
+      modulePosition: block.data.modulePosition,
+      channels: deepCopy(block.data.channels),
+    }));
+}
 
 export function unlinkedActuators(
   serviceId: string,
@@ -37,15 +55,33 @@ export function unlinkedActuators(
         channels.some(
           (channel: IoChannelAddress) =>
             channel.blockId === block.data.hwDevice.id &&
-            channel.channel.id === block.data.channel,
+            channel.channelId === block.data.channel,
         ),
       )
-      // Unlink them from pin
+      // Unlink them from channel
       .map((block) => {
         block.data.channel = 0;
         return block;
       })
   );
+}
+
+export function changedIoModules(
+  serviceId: string,
+  changes: GpioChange[],
+): OneWireGpioModuleBlock[] {
+  return changes
+    .map((change) => {
+      const block = sparkStore.blockById<OneWireGpioModuleBlock>(
+        serviceId,
+        change.blockId,
+      );
+      if (block) {
+        block.data.channels = change.channels;
+      }
+      return block;
+    })
+    .filter(nullFilter);
 }
 
 export function createOutputActions(): QuickstartAction[] {

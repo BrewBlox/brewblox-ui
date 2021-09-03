@@ -1,11 +1,18 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  PropType,
+  reactive,
+  ref,
+} from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import { IoChannelAddress, QuickstartAction } from '../types';
-import { createOutputActions, hasShared } from '../utils';
+import { GpioChange, IoChannelAddress, QuickstartAction } from '../types';
+import { createOutputActions, hasShared, resetGpioChanges } from '../utils';
 import {
   defineChangedBlocks,
   defineCreatedBlocks,
@@ -29,13 +36,20 @@ export default defineComponent({
   },
   emits: ['update:config', 'update:actions', 'back', 'next'],
   setup(props, { emit }) {
-    const tubePin = ref<IoChannelAddress | null>(props.config.tubePin ?? null);
-    const pumpPin = ref<IoChannelAddress | null>(props.config.pumpPin ?? null);
+    const tubeChannel = ref<IoChannelAddress | null>(
+      props.config.tubeChannel ?? null,
+    );
+    const pumpChannel = ref<IoChannelAddress | null>(
+      props.config.pumpChannel ?? null,
+    );
     const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
     const tubeSensor = ref<string | null>(props.config.tubeSensor ?? null);
+    const changedGpio = reactive<GpioChange[]>(
+      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
+    );
 
-    const pinSame = computed<boolean>(() =>
-      hasShared([tubePin.value, pumpPin.value]),
+    const channelSame = computed<boolean>(() =>
+      hasShared([tubeChannel.value, pumpChannel.value]),
     );
 
     const sensorSame = computed<boolean>(() =>
@@ -44,9 +58,9 @@ export default defineComponent({
 
     const valuesOk = computed<boolean>(() =>
       [
-        tubePin.value,
-        pumpPin.value,
-        !pinSame.value,
+        tubeChannel.value,
+        pumpChannel.value,
+        !channelSame.value,
         kettleSensor.value,
         tubeSensor.value,
         !sensorSame.value,
@@ -68,8 +82,8 @@ export default defineComponent({
 
       const localConfig: RimsConfig = {
         ...props.config,
-        pumpPin: pumpPin.value!,
-        tubePin: tubePin.value!,
+        pumpChannel: pumpChannel.value!,
+        tubeChannel: tubeChannel.value!,
         kettleSensor: kettleSensor.value!,
         tubeSensor: tubeSensor.value!,
         renamedBlocks: {
@@ -86,6 +100,7 @@ export default defineComponent({
 
       const finalizedConfig: RimsConfig = {
         ...localConfig,
+        changedGpio,
         createdBlocks,
         changedBlocks,
         layouts,
@@ -101,11 +116,12 @@ export default defineComponent({
     onBeforeMount(() => discover());
 
     return {
-      tubePin,
-      pumpPin,
+      tubeChannel,
+      pumpChannel,
       kettleSensor,
       tubeSensor,
-      pinSame,
+      changedGpio,
+      channelSame,
       sensorSame,
       valuesOk,
       discover,
@@ -147,6 +163,10 @@ export default defineComponent({
             Use the buttons above to discover new OneWire blocks or manually
             create a block.
           </p>
+          <p v-if="changedGpio.length">
+            The GPIO modules are shown below. You can create IO channels there
+            to add them to the dropdown menus.
+          </p>
         </q-item-section>
       </q-item>
       <QuickstartMockCreateField
@@ -156,17 +176,19 @@ export default defineComponent({
       <q-item>
         <q-item-section>
           <QuickstartChannelField
-            v-model="pumpPin"
+            v-model="pumpChannel"
             :service-id="config.serviceId"
-            :error="pinSame"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
             label="Pump"
           />
         </q-item-section>
         <q-item-section>
           <QuickstartChannelField
-            v-model="tubePin"
+            v-model="tubeChannel"
             :service-id="config.serviceId"
-            :error="pinSame"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
             label="Tube heater"
           />
         </q-item-section>
@@ -189,16 +211,26 @@ export default defineComponent({
           />
         </q-item-section>
       </q-item>
-      <CardWarning v-if="pinSame">
+      <CardWarning v-if="channelSame">
         <template #message>
-          Multiple outputs are using the same Pin.
+          Multiple outputs are using the same IO Channel.
         </template>
       </CardWarning>
       <CardWarning v-if="sensorSame">
         <template #message>
-          Multiple sensors are using the same Block.
+          Multiple sensors are using the same block.
         </template>
       </CardWarning>
+    </q-card-section>
+
+    <q-card-section
+      v-for="change in changedGpio"
+      :key="`gpio-${change.blockId}`"
+    >
+      <div class="text-subtitle1">
+        GPIO Module {{ change.modulePosition }}: {{ change.blockId }}
+      </div>
+      <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
 
     <template #actions>

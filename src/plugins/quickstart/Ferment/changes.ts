@@ -23,6 +23,7 @@ import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
 import {
+  changedIoModules,
   pidDefaults,
   unlinkedActuators,
   withoutPrefix,
@@ -36,14 +37,20 @@ import {
 } from '../utils';
 import { FermentConfig, FermentOpts } from './types';
 
-export const defineChangedBlocks = (config: FermentConfig): Block[] => {
-  return unlinkedActuators(config.serviceId, [config.heatPin, config.coolPin]);
-};
+export function defineChangedBlocks(config: FermentConfig): Block[] {
+  return [
+    ...unlinkedActuators(config.serviceId, [
+      config.heatChannel,
+      config.coolChannel,
+    ]),
+    ...changedIoModules(config.serviceId, config.changedGpio),
+  ];
+}
 
-export const defineCreatedBlocks = (
+export function defineCreatedBlocks(
   config: FermentConfig,
   opts: FermentOpts,
-): Block[] => {
+): Block[] {
   const groups = [0];
   const { serviceId, names } = config;
   const { fridgeSetting, beerSetting, activeSetpoint } = opts;
@@ -124,8 +131,8 @@ export const defineCreatedBlocks = (
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.coolPin.blockId),
-        channel: config.coolPin.channel.id,
+        hwDevice: bloxLink(config.coolChannel.blockId),
+        channel: config.coolChannel.channelId,
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
@@ -158,8 +165,8 @@ export const defineCreatedBlocks = (
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.heatPin.blockId),
-        channel: config.heatPin.channel.id,
+        hwDevice: bloxLink(config.heatChannel.blockId),
+        channel: config.heatChannel.channelId,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
@@ -269,7 +276,7 @@ export const defineCreatedBlocks = (
     },
   ];
   return blocks;
-};
+}
 
 export const defineWidgets = (
   config: FermentConfig,

@@ -23,6 +23,7 @@ import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock } from '../types';
 import {
+  changedIoModules,
   makeFridgeCoolConfig,
   makeFridgeHeatConfig,
   pidDefaults,
@@ -32,14 +33,18 @@ import {
 } from '../utils';
 import { FridgeConfig, FridgeOpts } from './types';
 
-export const defineChangedBlocks = (config: FridgeConfig): Block[] => {
-  return unlinkedActuators(config.serviceId, [config.heatPin, config.coolPin]);
-};
+export function defineChangedBlocks(config: FridgeConfig): Block[] {
+  const channels = [config.heatChannel, config.coolChannel];
+  return [
+    ...unlinkedActuators(config.serviceId, channels),
+    ...changedIoModules(config.serviceId, config.changedGpio),
+  ];
+}
 
-export const defineCreatedBlocks = (
+export function defineCreatedBlocks(
   config: FridgeConfig,
   opts: FridgeOpts,
-): Block[] => {
+): Block[] {
   const groups = [0];
   const { serviceId, names } = config;
   const { fridgeSetting } = opts;
@@ -91,8 +96,8 @@ export const defineCreatedBlocks = (
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.coolPin.blockId),
-        channel: config.coolPin.channel.id,
+        hwDevice: bloxLink(config.coolChannel.blockId),
+        channel: config.coolChannel.channelId,
         invert: false,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
@@ -125,8 +130,8 @@ export const defineCreatedBlocks = (
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.heatPin.blockId),
-        channel: config.heatPin.channel.id,
+        hwDevice: bloxLink(config.heatChannel.blockId),
+        channel: config.heatChannel.channelId,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
@@ -234,7 +239,7 @@ export const defineCreatedBlocks = (
     },
   ];
   return blocks;
-};
+}
 
 export const defineWidgets = (
   config: FridgeConfig,

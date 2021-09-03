@@ -29,6 +29,7 @@ import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { DisplayBlock } from '../types';
 import {
+  changedIoModules,
   pidDefaults,
   unlinkedActuators,
   withoutPrefix,
@@ -37,7 +38,13 @@ import {
 import { HermsConfig, HermsOpts } from './types';
 
 export function defineChangedBlocks(config: HermsConfig): Block[] {
-  return unlinkedActuators(config.serviceId, [config.hltPin, config.bkPin]);
+  return [
+    ...unlinkedActuators(config.serviceId, [
+      config.hltChannel,
+      config.bkChannel,
+    ]),
+    ...changedIoModules(config.serviceId, config.changedGpio),
+  ];
 }
 
 export function defineCreatedBlocks(
@@ -187,8 +194,8 @@ export function defineCreatedBlocks(
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.hltPin.blockId),
-        channel: config.hltPin.channel.id,
+        hwDevice: bloxLink(config.hltChannel.blockId),
+        channel: config.hltChannel.channelId,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
@@ -203,8 +210,8 @@ export function defineCreatedBlocks(
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.bkPin.blockId),
-        channel: config.bkPin.channel.id,
+        hwDevice: bloxLink(config.bkChannel.blockId),
+        channel: config.bkChannel.channelId,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,
