@@ -12,11 +12,10 @@ const type = BlockType.MockPins;
 
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<MockPinsBlock> = {
       type,
       generate: () => ({
-        pins: [],
+        channels: [],
       }),
     };
 

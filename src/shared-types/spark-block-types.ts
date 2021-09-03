@@ -2,7 +2,6 @@ import type {
   AnalogCompareOp,
   BlockOrIntfType,
   BlockType,
-  ChannelConfig,
   DigitalCompareOp,
   DigitalState,
   DisplayTempUnit,
@@ -63,16 +62,17 @@ export interface DefinedLink extends Link {
   type: BlockOrIntfType;
 }
 
-// #region IoPin
+// #region IoChannel
 export interface IoChannel {
-  config: ChannelConfig;
-  state: DigitalState;
+  id: number;
 }
 
-export interface IoPin {
-  [pinId: string]: IoChannel;
+export interface IoArrayBlock extends Block {
+  data: {
+    channels: IoChannel[];
+  };
 }
-// #endregion IoPin
+// #endregion IoChannel
 
 // #region Constraints
 export interface MinConstraint {
@@ -127,14 +127,14 @@ export interface DelayedOffConstraint {
 export type AnalogConstraint =
   | MinConstraint
   | MaxConstraint
-  | BalancedConstraint
+  | BalancedConstraint;
 
 export type DigitalConstraint =
   | MutexedConstraint
   | MinOnConstraint
   | MinOffConstraint
   | DelayedOnConstraint
-  | DelayedOffConstraint
+  | DelayedOffConstraint;
 
 export interface AnalogConstraintsObj {
   constraints: AnalogConstraint[];
@@ -146,9 +146,7 @@ export interface DigitalConstraintsObj {
 // #endregion Constraints
 
 // #region AnyConstraint
-export type AnyConstraint =
-  | AnalogConstraint
-  | DigitalConstraint
+export type AnyConstraint = AnalogConstraint | DigitalConstraint;
 
 export interface AnyConstraintsObj {
   constraints: AnyConstraint[];
@@ -308,7 +306,7 @@ export interface DS2408Block extends Block {
   type: 'DS2408';
   data: {
     address: string;
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
     connectMode: DS2408ConnectMode;
     connected: Readonly<boolean>;
     oneWireBusId: Readonly<number>;
@@ -321,7 +319,7 @@ export interface DS2413Block extends Block {
   type: 'DS2413';
   data: {
     address: string;
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
     connected: Readonly<boolean>;
     oneWireBusId: Readonly<number>;
   };
@@ -350,7 +348,7 @@ export interface GroupsBlock extends Block {
 export interface MockPinsBlock extends Block {
   type: 'MockPins';
   data: {
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
   };
 }
 // #endregion MockPins
@@ -397,15 +395,16 @@ export interface OneWireBusBlock extends Block {
 // #endregion OneWireBus
 
 // #region OneWireGpioModule
-export interface GpioModuleChannel {
+export interface GpioModuleChannel extends IoChannel {
   id: number;
+  name: string;
   deviceType: GpioDeviceType;
   pinsMask: GpioPins;
   width: number;
 }
 
 export interface OneWireGpioModuleBlock extends Block {
-  type: 'OneWireGpioModule',
+  type: 'OneWireGpioModule';
   data: {
     channels: GpioModuleChannel[];
     modulePosition: number;
@@ -422,7 +421,7 @@ export interface OneWireGpioModuleBlock extends Block {
     overCurrent: Readonly<GpioPins>;
     openLoad: Readonly<GpioPins>;
     moduleStatusClear: GpioPins; // write-only
-  }
+  };
 }
 // #endregion OneWireGpioModule
 
@@ -505,7 +504,7 @@ export interface Spark2PinsBlock extends Block {
   type: 'Spark2Pins';
   data: {
     soundAlarm: boolean;
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
     hardware: Readonly<Spark2Hardware>;
   };
 }
@@ -518,7 +517,7 @@ export interface Spark3PinsBlock extends Block {
     enableIoSupply5V: boolean;
     enableIoSupply12V: boolean;
     soundAlarm: boolean;
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
     voltage5: Readonly<number>;
     voltage12: Readonly<number>;
   };

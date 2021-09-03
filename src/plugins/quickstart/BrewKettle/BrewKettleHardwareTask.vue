@@ -1,10 +1,18 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  PropType,
+  reactive,
+  ref,
+} from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import { PinChannel } from '../types';
+import { GpioChange, IoChannelAddress } from '../types';
+import { resetGpioChanges } from '../utils';
 import { BrewKettleConfig } from './types';
 
 export default defineComponent({
@@ -15,17 +23,18 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
-    const kettlePin = ref<PinChannel | null>(props.config.kettlePin ?? null);
+    const kettleChannel = ref<IoChannelAddress | null>(
+      props.config.kettleChannel ?? null,
+    );
     const kettleSensor = ref<string | null>(props.config.kettleSensor ?? null);
+    const changedGpio = reactive<GpioChange[]>(
+      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
+    );
 
-    const valuesOk = computed<boolean>(
-      () => Boolean(kettlePin.value && kettleSensor.value),
+    const valuesOk = computed<boolean>(() =>
+      Boolean(kettleChannel.value && kettleSensor.value),
     );
 
     function discover(): void {
@@ -42,7 +51,8 @@ export default defineComponent({
       }
       const updated: BrewKettleConfig = {
         ...props.config,
-        kettlePin: kettlePin.value!,
+        changedGpio,
+        kettleChannel: kettleChannel.value!,
         kettleSensor: kettleSensor.value!,
         renamedBlocks: {
           ...props.config.renamedBlocks,
@@ -56,8 +66,9 @@ export default defineComponent({
     onBeforeMount(() => discover());
 
     return {
-      kettlePin,
+      kettleChannel,
       kettleSensor,
+      changedGpio,
       valuesOk,
       discover,
       startBlockWizard,
@@ -91,25 +102,29 @@ export default defineComponent({
         <q-item-section>
           <p>
             Select which hardware should be used for each function.<br>
-            You can unplug or heat sensors to identify them.
-            The current value will be shown under each dropdown menu.
+            You can unplug or heat sensors to identify them. The current value
+            will be shown under each dropdown menu.
           </p>
           <p>
-            Use the buttons above to discover new OneWire blocks or manually create a block.
+            Use the buttons above to discover new OneWire blocks or manually
+            create a block.
+          </p>
+          <p v-if="changedGpio.length">
+            The GPIO modules are shown below. You can create IO channels there
+            to add them to the dropdown menu.
           </p>
         </q-item-section>
       </q-item>
       <QuickstartMockCreateField
         :service-id="config.serviceId"
-        :names="[
-          config.names.kettleSensor,
-        ]"
+        :names="[config.names.kettleSensor]"
       />
       <q-item>
         <q-item-section>
-          <QuickstartPinField
-            v-model="kettlePin"
+          <QuickstartChannelField
+            v-model="kettleChannel"
             :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
             label="Output pin"
           />
         </q-item-section>
@@ -121,6 +136,16 @@ export default defineComponent({
           />
         </q-item-section>
       </q-item>
+    </q-card-section>
+
+    <q-card-section
+      v-for="change in changedGpio"
+      :key="`gpio-${change.blockId}`"
+    >
+      <div class="text-subtitle1">
+        GPIO Module {{ change.modulePosition }}: {{ change.blockId }}
+      </div>
+      <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
 
     <template #actions>

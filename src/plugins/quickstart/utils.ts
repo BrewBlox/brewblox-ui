@@ -1,6 +1,11 @@
 import { builderStore } from '@/plugins/builder/store';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockType, DigitalActuatorBlock, PidBlock } from '@/plugins/spark/types';
+import {
+  BlockType,
+  DigitalActuatorBlock,
+  OneWireGpioModuleBlock,
+  PidBlock,
+} from '@/plugins/spark/types';
 import { startAddBlockToDisplay } from '@/plugins/spark/utils';
 import { Dashboard, dashboardStore } from '@/store/dashboards';
 import { widgetStore } from '@/store/widgets';
@@ -9,25 +14,74 @@ import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, inverseTempQty } from '@/utils/quantity';
 
-import { PidConfig, PinChannel, QuickstartAction, QuickstartConfig } from './types';
+import {
+  GpioChange,
+  IoChannelAddress,
+  PidConfig,
+  QuickstartAction,
+  QuickstartConfig,
+} from './types';
 
-const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
+const digitalActuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
+  BlockType.DigitalActuator,
+);
 
-export function unlinkedActuators(serviceId: string, pins: PinChannel[]): DigitalActuatorBlock[] {
+const oneWireGpioFilter = makeTypeFilter<OneWireGpioModuleBlock>(
+  BlockType.OneWireGpioModule,
+);
+
+export function resetGpioChanges(serviceId: string): GpioChange[] {
   return sparkStore
     .serviceBlocks(serviceId)
-    .filter(digitalActuatorFilter)
-    // Find existing drivers
-    .filter(
-      block => pins
-        .some((pin: PinChannel) =>
-          pin.arrayId === block.data.hwDevice.id
-          && pin.pinId === block.data.channel))
-    // Unlink them from pin
-    .map((block) => {
-      block.data.channel = 0;
+    .filter(oneWireGpioFilter)
+    .sort((a, b) => a.data.modulePosition - b.data.modulePosition)
+    .map((block) => ({
+      blockId: block.id,
+      modulePosition: block.data.modulePosition,
+      channels: deepCopy(block.data.channels),
+    }));
+}
+
+export function unlinkedActuators(
+  serviceId: string,
+  channels: IoChannelAddress[],
+): DigitalActuatorBlock[] {
+  return (
+    sparkStore
+      .serviceBlocks(serviceId)
+      .filter(digitalActuatorFilter)
+      // Find existing drivers
+      .filter((block) =>
+        channels.some(
+          (channel: IoChannelAddress) =>
+            channel.blockId === block.data.hwDevice.id &&
+            channel.channelId === block.data.channel,
+        ),
+      )
+      // Unlink them from channel
+      .map((block) => {
+        block.data.channel = 0;
+        return block;
+      })
+  );
+}
+
+export function changedIoModules(
+  serviceId: string,
+  changes: GpioChange[],
+): OneWireGpioModuleBlock[] {
+  return changes
+    .map((change) => {
+      const block = sparkStore.blockById<OneWireGpioModuleBlock>(
+        serviceId,
+        change.blockId,
+      );
+      if (block) {
+        block.data.channels = change.channels;
+      }
       return block;
-    });
+    })
+    .filter(nullFilter);
 }
 
 export function createOutputActions(): QuickstartAction[] {
@@ -37,16 +91,20 @@ export function createOutputActions(): QuickstartAction[] {
       const module = sparkStore.moduleById(config.serviceId)!;
       await Promise.all(
         Object.entries(config.renamedBlocks)
-          .filter(([currVal, newVal]: [string, string]) => newVal && currVal !== newVal)
-          .map(([currVal, newVal]: [string, string]) => module.renameBlock([currVal, newVal])),
+          .filter(
+            ([currVal, newVal]: [string, string]) =>
+              newVal && currVal !== newVal,
+          )
+          .map(([currVal, newVal]: [string, string]) =>
+            module.renameBlock([currVal, newVal]),
+          ),
       );
     },
 
     // Change blocks
     async (config: QuickstartConfig) => {
       await Promise.all(
-        config.changedBlocks
-          .map(block => sparkStore.saveBlock(block)),
+        config.changedBlocks.map((block) => sparkStore.saveBlock(block)),
       );
     },
 
@@ -60,10 +118,7 @@ export function createOutputActions(): QuickstartAction[] {
 
     // Create layouts
     async (config: QuickstartConfig) => {
-      await Promise.all(
-        config.layouts
-          .map(builderStore.createLayout),
-      );
+      await Promise.all(config.layouts.map(builderStore.createLayout));
     },
 
     // Create dashboards / widgets
@@ -91,7 +146,10 @@ export function createOutputActions(): QuickstartAction[] {
   ];
 }
 
-export async function executeActions(actions: QuickstartAction[], config: AnyDict): Promise<void> {
+export async function executeActions(
+  actions: QuickstartAction[],
+  config: AnyDict,
+): Promise<void> {
   try {
     // We're intentionally waiting for each async function
     // Actions may be async, but can have dependencies
@@ -111,15 +169,11 @@ export function hasShared(arr: any[]): boolean {
 }
 
 export function withPrefix(prefix: string, val: string): string {
-  return !!prefix
-    ? `${prefix} ${val}`
-    : val;
+  return !!prefix ? `${prefix} ${val}` : val;
 }
 
 export function withoutPrefix(prefix: string, val: string): string {
-  return val.startsWith(prefix)
-    ? val.substring(prefix.length).trim()
-    : val;
+  return val.startsWith(prefix) ? val.substring(prefix.length).trim() : val;
 }
 
 export const pidDefaults = (): PidBlock['data'] =>

@@ -2,7 +2,12 @@ import { Plugin } from 'vue';
 
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec, BlockType, Spark3PinsBlock } from '@/plugins/spark/types';
+import {
+  BlockFieldSpec,
+  BlockSpec,
+  BlockType,
+  Spark3PinsBlock,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 
@@ -12,11 +17,10 @@ const type = BlockType.Spark3Pins;
 
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<Spark3PinsBlock> = {
       type,
       generate: () => ({
-        pins: [],
+        channels: [],
         enableIoSupply5V: false,
         enableIoSupply12V: false,
         soundAlarm: false,

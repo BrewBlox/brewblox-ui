@@ -83,12 +83,6 @@ export interface StoredDataPreset<DataT = any> extends StoreObject {
   data: Partial<DataT>;
 }
 
-export interface ChannelMapping {
-  id: string;
-  nid: number;
-  name: string;
-}
-
 export interface ProfileValues {
   prev: Quantity;
   current: Quantity;

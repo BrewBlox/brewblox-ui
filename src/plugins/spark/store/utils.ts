@@ -25,6 +25,7 @@ const IGNORED_RELATIONS: (keyof Block['data'])[] = [
   'drivenOutputId', // PID
   'drivenTargetId', // Setpoint, Setpoint Driver, Logic Actuator
   'drivenActuatorId', // PWM
+  'oneWireBusId', // OneWireTempSensor, DS2408, DS2413
 ];
 
 /**

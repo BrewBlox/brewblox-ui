@@ -1,6 +1,6 @@
 import { Quantity } from '@/shared-types';
 
-import { PinChannel, QuickstartConfig } from '../types';
+import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export interface FermentBlockNames {
   fridgeSensor: string;
@@ -19,8 +19,8 @@ export interface FermentBlockNames {
 
 export interface FermentConfig extends QuickstartConfig {
   names: FermentBlockNames;
-  heatPin: PinChannel;
-  coolPin: PinChannel;
+  heatChannel: IoChannelAddress;
+  coolChannel: IoChannelAddress;
   fridgeSensor: string;
   beerSensor: string;
 }

@@ -4,12 +4,12 @@ import { computed, defineComponent, PropType, reactive } from 'vue';
 
 import { useDialog } from '@/composables';
 import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
-import { isJsonEqual } from '@/utils/objects';
 
 type EditingKind = 'UNKNOWN' | 'SSR' | 'MOTOR' | 'SOLENOID' | 'MECH_RELAY';
 type EditingMode = 'BOTH' | 'PLUS' | 'MINUS' | 'BIDIRECTIONAL';
 
 interface EditingChannel {
+  name: string;
   kind: EditingKind;
   mode: EditingMode;
   amps: number;
@@ -114,6 +114,7 @@ export default defineComponent({
       useDialog.setup();
 
     const local = reactive<EditingChannel>({
+      name: props.channel.name,
       kind: inferEditingKind(props.channel),
       mode: inferEditingMode(props.channel),
       amps: inferEditingAmps(props.channel),
@@ -157,6 +158,9 @@ export default defineComponent({
       if (hasAmps.value && (local.amps < 1 || local.amps > 4)) {
         return 'Invalid amperage value';
       }
+      if (local.name.length >= 32) {
+        return 'Invalid name: too long';
+      }
       return null;
     });
 
@@ -165,18 +169,22 @@ export default defineComponent({
         return;
       }
 
-      const { id, pinsMask } = props.channel;
+      const { id } = props.channel;
+      const { name } = local;
+      const deviceType = inferChannelDeviceType(local);
+      const width = inferChannelWidth(local);
+      const changed =
+        deviceType !== props.channel.deviceType ||
+        width !== props.channel.width;
+      const pinsMask = changed ? GpioPins.NONE : props.channel.pinsMask;
+
       const channel: GpioModuleChannel = {
         id,
+        name,
         pinsMask,
-        deviceType: inferChannelDeviceType(local),
-        width: inferChannelWidth(local),
+        deviceType,
+        width,
       };
-
-      // If the channel has meaningful changes, always unassign its pins
-      if (!isJsonEqual(props.channel, channel)) {
-        channel.pinsMask = GpioPins.NONE;
-      }
 
       onDialogOK(channel);
     }
@@ -206,7 +214,7 @@ export default defineComponent({
     @keyup.enter="save"
   >
     <DialogCard v-bind="{ title, message, html }">
-      <div class="row q-gutter-md">
+      <div class="row q-gutter-x-md">
         <q-select
           v-model="local.kind"
           :options="kindOpts"
@@ -218,6 +226,19 @@ export default defineComponent({
         />
 
         <div class="col-break" />
+
+        <q-input
+          v-model="local.name"
+          label="Channel name"
+          class="col-grow"
+          stack-label
+          :rules="[
+            (v) => v.length < 32 || 'Name must be less than 32 characters',
+          ]"
+        />
+
+        <div class="col-break" />
+
         <q-option-group
           v-if="hasAmps"
           v-model="local.amps"

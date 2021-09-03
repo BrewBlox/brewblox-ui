@@ -6,20 +6,36 @@ import {
   AnyConstraintsObj,
   BlockAddress,
 } from '@/plugins/spark/types';
+import {
+  Block,
+  BlockType,
+  DS2408Block,
+  DS2408ConnectMode,
+  OneWireGpioModuleBlock,
+} from '@/shared-types';
 import { prettyLink } from '@/utils/formatting';
 import { notify } from '@/utils/notify';
+import { matchesType } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
 
+import {
+  ioChannelNamesDS2408,
+  ioChannelNamesDS2413,
+  ioChannelNamesMockPins,
+  ioChannelNamesSpark2,
+  ioChannelNamesSpark3,
+  valveChannelNamesDS2408,
+} from '../const';
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>
   v?.id || '<not set>';
 
-export const prettifyConstraints =
-  (obj: AnyConstraintsObj | undefined): string =>
-    (obj === undefined || obj.constraints.length === 0)
-      ? '<no constraints>'
-      : obj
-        .constraints
+export const prettifyConstraints = (
+  obj: AnyConstraintsObj | undefined,
+): string =>
+  obj === undefined || obj.constraints.length === 0
+    ? '<no constraints>'
+    : obj.constraints
         .map((c: AnyConstraint) => {
           // Analog
           if ('min' in c) {
@@ -53,18 +69,51 @@ export const prettifyConstraints =
         .sort()
         .join(', ');
 
-
-export async function cleanUnusedNames(serviceId: string | null): Promise<void> {
+export async function cleanUnusedNames(
+  serviceId: string | null,
+): Promise<void> {
   const module = sparkStore.moduleById(serviceId);
-  if (!module) { return; }
+  if (!module) {
+    return;
+  }
   const names = await module.cleanUnusedNames();
 
-  const message = names.length > 0
-    ? `Cleaned block names: <i>${names.join(', ')}</i>.`
-    : 'No unused names found.';
+  const message =
+    names.length > 0
+      ? `Cleaned block names: <i>${names.join(', ')}</i>.`
+      : 'No unused names found.';
 
   notify.info({ message, icon: 'mdi-tag-remove' });
 }
 
 export const enumHint = (e: Enum<any>): string =>
-  'One of: ' + Enum.values(e).map(v => `'${v}'`).join(', ');
+  'One of: ' +
+  Enum.values(e)
+    .map((v) => `'${v}'`)
+    .join(', ');
+
+export function channelName(block: Block, id: number): string | undefined {
+  if (block.type === BlockType.DS2413) {
+    return ioChannelNamesDS2413[id];
+  }
+  if (block.type === BlockType.Spark2Pins) {
+    return ioChannelNamesSpark2[id];
+  }
+  if (block.type === BlockType.Spark3Pins) {
+    return ioChannelNamesSpark3[id];
+  }
+  if (block.type === BlockType.MockPins) {
+    return ioChannelNamesMockPins[id];
+  }
+  if (matchesType<DS2408Block>(BlockType.DS2408, block)) {
+    if (block.data.connectMode === DS2408ConnectMode.CONNECT_VALVE) {
+      return valveChannelNamesDS2408[id];
+    } else {
+      return ioChannelNamesDS2408[id];
+    }
+  }
+  if (matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)) {
+    return block.data.channels.find((c) => c.id === id)?.name;
+  }
+  return undefined;
+}

@@ -1,9 +1,7 @@
 <script lang="ts">
-import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DS2408StartChannels } from '@/plugins/spark/const';
 import {
   Block,
   BlockType,
@@ -12,9 +10,20 @@ import {
   MotorValveBlock,
 } from '@/plugins/spark/types';
 import { makeTypeFilter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
 
-interface ClaimDict {
-  [startChannel: number]: string; // block ID
+interface Claim {
+  driverId: string;
+  channelId: number;
+}
+
+function targetFilter(b: Block): boolean {
+  // DS2408 is only valid if in valve mode
+  if (matchesType<DS2408Block>(BlockType.DS2408, b)) {
+    return b.data.connectMode === DS2408ConnectMode.CONNECT_VALVE;
+  }
+  // Filter is in addition to the default compatibility check
+  return true;
 }
 
 const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
@@ -29,52 +38,41 @@ export default defineComponent({
       sparkModule.blockById(block.value.data.hwDevice.id),
     );
 
-    const claimedChannels = computed<ClaimDict>(() => {
+    const claims = computed<Claim[]>(() => {
       if (!hwBlock.value) {
-        return {};
+        return [];
       }
       const targetId = hwBlock.value.id;
       return sparkModule.blocks
         .filter(motorValveFilter)
-        .filter((block) => block.data.hwDevice.id === targetId)
-        .reduce((acc: ClaimDict, b) => set(acc, b.data.startChannel, b.id), {});
+        .filter((b) => b.id !== block.value.id)
+        .filter((b) => b.data.hwDevice.id === targetId)
+        .map((b) => ({ driverId: b.id, channelId: b.data.startChannel }));
     });
 
     function driverStr(startChannel: number): string {
-      const driver = claimedChannels.value[startChannel];
-      return driver && driver !== block.value.id
-        ? ` (replace '${driver}')`
-        : '';
+      const claim = claims.value.find((c) => c.channelId === startChannel);
+      return claim ? ` (replace '${claim.driverId}')` : '';
     }
 
     const channelOpts = computed<SelectOption<number>[]>(() => [
-      { label: 'Not set', value: 0 },
-      ...DS2408StartChannels.map(({ name, nid }) => ({
-        label: `${name}${driverStr(nid)}`,
-        value: nid,
-      })),
+      { value: 0, label: 'Not set' },
+      { value: 5, label: `A${driverStr(5)}` },
+      { value: 1, label: `B${driverStr(1)}` },
     ]);
 
-    async function claimChannel(pinId: number): Promise<void> {
-      if (block.value.data.startChannel === pinId) {
+    async function claimChannel(channelId: number): Promise<void> {
+      if (block.value.data.startChannel === channelId) {
         return;
       }
-      const currentDriverId = claimedChannels.value[pinId] ?? null;
-      if (currentDriverId) {
-        const currentDriverBlock =
-          sparkModule.blockById<MotorValveBlock>(currentDriverId)!;
-        currentDriverBlock.data.startChannel = 0;
-        await sparkModule.saveBlock(currentDriverBlock);
+      const claim = claims.value.find((c) => c.channelId === channelId);
+      if (claim) {
+        const driver = sparkModule.blockById<MotorValveBlock>(claim.driverId)!;
+        driver.data.startChannel = 0;
+        await sparkModule.saveBlock(driver);
       }
-      block.value.data.startChannel = pinId;
+      block.value.data.startChannel = channelId;
       await saveBlock();
-    }
-
-    function filterDS2408(b: Block): boolean {
-      return (
-        b.type !== BlockType.DS2408 ||
-        (b as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_VALVE
-      );
     }
 
     return {
@@ -85,7 +83,7 @@ export default defineComponent({
       isDriven,
       channelOpts,
       claimChannel,
-      filterDS2408,
+      targetFilter,
     };
   },
 });
@@ -100,7 +98,7 @@ export default defineComponent({
         :model-value="block.data.hwDevice"
         :service-id="serviceId"
         :creatable="false"
-        :block-filter="filterDS2408"
+        :block-filter="targetFilter"
         title="Target DS2408 Chip"
         label="Target DS2408 Chip"
         class="col-grow"

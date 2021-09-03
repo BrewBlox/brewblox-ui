@@ -21,6 +21,7 @@ import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock } from '../types';
 import {
+  changedIoModules,
   pidDefaults,
   unlinkedActuators,
   withoutPrefix,
@@ -29,7 +30,10 @@ import {
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 
 export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
-  return unlinkedActuators(config.serviceId, [config.kettlePin]);
+  return [
+    ...unlinkedActuators(config.serviceId, [config.kettleChannel]),
+    ...changedIoModules(config.serviceId, config.changedGpio),
+  ];
 }
 
 export function defineCreatedBlocks(
@@ -68,8 +72,8 @@ export function defineCreatedBlocks(
       serviceId,
       groups,
       data: {
-        hwDevice: bloxLink(config.kettlePin.arrayId),
-        channel: config.kettlePin.pinId,
+        hwDevice: bloxLink(config.kettleChannel.blockId),
+        channel: config.kettleChannel.channelId,
         desiredState: DigitalState.STATE_INACTIVE,
         state: DigitalState.STATE_INACTIVE,
         invert: false,

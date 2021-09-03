@@ -1,16 +1,8 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 
-import { useContext } from '@/composables';
-import {
-  GpioDeviceType,
-  GpioModuleChannel,
-  GpioPins,
-  OneWireGpioModuleBlock,
-} from '@/shared-types';
+import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
-
-import GpioChannelDialog from './GpioChannelDialog.vue';
 
 interface DeviceSlot {
   id: number;
@@ -28,77 +20,43 @@ function startBit(n: number): number {
   return n > 0 ? Math.log2(n & -n) : -1;
 }
 
-function deviceTypeDesc(deviceType: GpioDeviceType): string {
-  if (deviceType.startsWith('GPIO_DEV_SSR')) {
-    return 'SSR';
-  } else if (deviceType.startsWith('GPIO_DEV_MOTOR')) {
-    return 'Motor';
-  } else if (deviceType.startsWith('GPIO_DEV_COIL')) {
-    return 'Solenoid';
-  } else if (deviceType.startsWith('GPIO_DEV_MECHANICAL_RELAY')) {
-    return 'Mech. relay';
-  } else {
-    return 'Unknown';
-  }
-}
-
-function channelDesc(channel: GpioModuleChannel): string {
-  const typeDesc = deviceTypeDesc(channel.deviceType);
-  return `#${channel.id}: ${typeDesc} (${channel.width} pins)`;
-}
-
 export default defineComponent({
   name: 'OneWireGpioEditor',
   props: {
-    block: {
-      type: Object as PropType<OneWireGpioModuleBlock>,
+    channels: {
+      type: Array as PropType<GpioModuleChannel[]>,
       required: true,
     },
   },
-  emits: ['update:block'],
+  emits: ['update:channels'],
   setup(props, { emit }) {
-    const { context } = useContext.setup();
     const selectedId = ref<number | null>(null);
 
     const selectedChannel = computed<GpioModuleChannel | null>(
-      () =>
-        props.block.data.channels.find((c) => c.id === selectedId.value) ??
-        null,
+      () => props.channels.find((c) => c.id === selectedId.value) ?? null,
     );
 
-    function saveBlock(v: OneWireGpioModuleBlock = props.block): void {
-      emit('update:block', v);
+    function saveChannels(channels: GpioModuleChannel[]): void {
+      emit('update:channels', channels);
     }
 
-    const power = computed<boolean>({
-      get: () => props.block.data.useExternalPower,
-      set: (useExternalPower) =>
-        saveBlock({
-          ...props.block,
-          data: {
-            ...props.block.data,
-            useExternalPower,
-          },
-        }),
-    });
-
     const unassigned = computed<DeviceSlot[]>(() =>
-      props.block.data.channels
+      props.channels
         .filter((c) => c.pinsMask === GpioPins.NONE)
         .map((c) => ({
           id: c.id,
-          name: channelDesc(c),
+          name: c.name,
           width: c.width,
           start: -1,
         })),
     );
 
     const active = computed<DeviceSlot[]>(() =>
-      props.block.data.channels
+      props.channels
         .filter((c) => c.pinsMask !== GpioPins.NONE)
         .map((c) => ({
           id: c.id,
-          name: channelDesc(c),
+          name: c.name,
           width: c.width,
           start: startBit(c.pinsMask),
         })),
@@ -107,7 +65,7 @@ export default defineComponent({
     const unused = computed<UnusedSlot[]>(() => {
       // always set a bit at idx 8
       // this provides an upper boundary when calculating free space
-      const mask: number = props.block.data.channels.reduce(
+      const mask: number = props.channels.reduce(
         (acc, c) => acc | c.pinsMask,
         1 << 8,
       );
@@ -129,15 +87,11 @@ export default defineComponent({
       if (!channel) {
         return;
       }
-      saveBlock({
-        ...props.block,
-        data: {
-          ...props.block.data,
-          channels: props.block.data.channels.map((c) =>
-            c.id === channel.id ? { ...c, pinsMask: GpioPins.NONE } : c,
-          ),
-        },
-      });
+      saveChannels(
+        props.channels.map((c) =>
+          c.id === channel.id ? { ...c, pinsMask: GpioPins.NONE } : c,
+        ),
+      );
       selectedId.value = null;
     }
 
@@ -170,22 +124,18 @@ export default defineComponent({
       if (!channel || channel.width > slot.free) {
         return;
       }
-      saveBlock({
-        ...props.block,
-        data: {
-          ...props.block.data,
-          channels: props.block.data.channels.map((c) =>
-            c.id === channel.id
-              ? { ...c, pinsMask: buildMask(slot.start, channel.width) }
-              : c,
-          ),
-        },
-      });
+      saveChannels(
+        props.channels.map((c) =>
+          c.id === channel.id
+            ? { ...c, pinsMask: buildMask(slot.start, channel.width) }
+            : c,
+        ),
+      );
       selectedId.value = null;
     }
 
     function unusedId(): number {
-      const ids = props.block.data.channels.map((c) => c.id);
+      const ids = props.channels.map((c) => c.id);
       let i = 1;
       while (ids.includes(i)) {
         i++;
@@ -195,22 +145,16 @@ export default defineComponent({
 
     function modifyChannel(channel: GpioModuleChannel): void {
       createDialog({
-        component: GpioChannelDialog,
+        component: 'GpioChannelDialog',
         componentProps: {
           title: 'Edit channel',
           channel,
         },
       }).onOk((updated: GpioModuleChannel) => {
-        saveBlock({
-          ...props.block,
-          data: {
-            ...props.block.data,
-            channels: [
-              ...props.block.data.channels.filter((c) => c.id !== updated.id),
-              updated,
-            ],
-          },
-        });
+        saveChannels([
+          ...props.channels.filter((c) => c.id !== updated.id),
+          updated,
+        ]);
       });
     }
 
@@ -218,6 +162,7 @@ export default defineComponent({
       const id = unusedId();
       const channel: GpioModuleChannel = {
         id,
+        name: `Channel ${id}`,
         deviceType: GpioDeviceType.GPIO_DEV_SSR_2P,
         pinsMask: GpioPins.NONE,
         width: 2,
@@ -238,25 +183,10 @@ export default defineComponent({
       if (!channel) {
         return;
       }
-      saveBlock({
-        ...props.block,
-        data: {
-          ...props.block.data,
-          channels: props.block.data.channels.filter(
-            (c) => c.id !== channel.id,
-          ),
-        },
-      });
+      saveChannels(props.channels.filter((c) => c.id !== channel.id));
     }
 
-    const raw = computed<string>(() =>
-      JSON.stringify(props.block.data, undefined, 2),
-    );
-
     return {
-      context,
-      power,
-      raw,
       selectedId,
       selectedChannel,
       unassigned,
@@ -276,20 +206,11 @@ export default defineComponent({
 
 <template>
   <div class="column q-gutter-y-sm">
-    <div class="col-grow text-h6 text-secondary">
-      Module {{ block.data.modulePosition }}
-    </div>
-    <div class="row">
-      <ToggleButton v-model="power" label="Use external power" unelevated />
-    </div>
-    <div class="col-grow text-h6 text-secondary">
-      Pin layout
-    </div>
     <div class="row">
       <q-btn
         flat
-        label="new"
-        :disable="block.data.channels.length >= 8"
+        label="add"
+        :disable="channels.length >= 8"
         @click="addChannel"
       />
       <q-btn v-if="selectedId != null" flat label="edit" @click="editChannel" />
@@ -336,7 +257,11 @@ export default defineComponent({
         @click="clickUnused(slot)"
       />
       <div style="grid-column: 9 / span 2" class="power">
-        Power
+        <slot name="power">
+          <div class="default">
+            Power
+          </div>
+        </slot>
       </div>
     </div>
     <!-- Unassigned -->
@@ -374,10 +299,6 @@ export default defineComponent({
         <q-tooltip>{{ slot.name }}</q-tooltip>
       </div>
     </div>
-    <!-- Development: raw block data -->
-    <div v-if="context.mode === 'Full'" style="white-space: pre">
-      {{ raw }}
-    </div>
   </div>
 </template>
 
@@ -398,10 +319,11 @@ export default defineComponent({
     border: 1px dotted $light-green
     overflow: hidden
   .power
-    border: 1px solid orange
-    overflow: hidden
-    text-align: center
-    margin-left: 10px
+    margin-left: 5px
+    .default
+      text-align: center
+      overflow: hidden
+      border: 1px solid orange
 .target-clickable
   background-color: $hover
   cursor: pointer
@@ -412,6 +334,5 @@ export default defineComponent({
   border: none
 .unassigned-area
   min-height: 100px
-  &.target-clickable
-    border: 1px dotted $amber
+  border: 1px dotted $amber
 </style>

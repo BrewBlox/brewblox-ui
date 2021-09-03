@@ -2,7 +2,12 @@ import { Plugin } from 'vue';
 
 import { systemBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType, Spark2Hardware, Spark2PinsBlock } from '@/plugins/spark/types';
+import {
+  BlockSpec,
+  BlockType,
+  Spark2Hardware,
+  Spark2PinsBlock,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 
@@ -12,11 +17,10 @@ const type = BlockType.Spark2Pins;
 
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<Spark2PinsBlock> = {
       type,
       generate: () => ({
-        pins: [],
+        channels: [],
         soundAlarm: false,
         hardware: Spark2Hardware.HW_UNKNOWN,
       }),

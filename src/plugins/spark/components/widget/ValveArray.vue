@@ -1,81 +1,48 @@
 <script lang="ts">
-import set from 'lodash/set';
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Block, BlockType, ChannelMapping, MotorValveBlock } from '@/plugins/spark/types';
-import { DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
-import { isBlockDriven } from '@/plugins/spark/utils';
-import { Link } from '@/shared-types';
+import { Block, BlockType, MotorValveBlock } from '@/plugins/spark/types';
+import { DigitalState, IoChannel } from '@/plugins/spark/types';
+import { channelName, isBlockDriven } from '@/plugins/spark/utils';
+import { IoArrayBlock, Link } from '@/shared-types';
 import { findById } from '@/utils/collections';
-import { makeObjectSorter, makeTypeFilter } from '@/utils/functional';
+import { makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 
-
 interface EditableChannel extends IoChannel {
-  id: string;
-  nid: number;
   name: string;
   driver: MotorValveBlock | null;
 }
 
-interface ValveArrayBlock extends Block {
-  data: {
-    pins: IoPin[];
-  };
-}
-
-interface ChannelClaims {
-  [nid: number]: MotorValveBlock
+interface Claim {
+  driverId: string;
+  channelId: number;
 }
 
 const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
 
 export default defineComponent({
   name: 'ValveArray',
-  props: {
-    mapping: {
-      type: Array as PropType<ChannelMapping[]>,
-      default: () => [],
-    },
-  },
-  setup(props) {
-    const {
-      serviceId,
-      sparkModule,
-      block,
-    } = useBlockWidget.setup<ValveArrayBlock>();
+  setup() {
+    const { serviceId, sparkModule, block } =
+      useBlockWidget.setup<IoArrayBlock>();
 
-    const claimedChannels = computed<ChannelClaims>(
-      () => sparkModule
-        .blocks
+    const claims = computed<Claim[]>(() =>
+      sparkModule.blocks
         .filter(motorValveFilter)
-        .filter(v => v.data.hwDevice.id === block.value.id)
-        .reduce((acc, v) => set(acc, v.data.startChannel, v), {}),
+        .filter((b) => b.data.hwDevice.id === block.value.id)
+        .map((b) => ({ driverId: b.id, channelId: b.data.startChannel })),
     );
 
-    function mappedName(id: string): string | null {
-      return props.mapping.length
-        ? props.mapping.find(m => m.id === id)?.name ?? null
-        : id;
-    }
-
-    const channels = computed<EditableChannel[]>(
-      () => block.value.data.pins
-        .reduce(
-          (acc: EditableChannel[], pin: IoPin, idx: number) => {
-            const nid = idx + 1;
-            const [[id, channel]] = Object.entries(pin);
-            const name = mappedName(id);
-            if (name) {
-              const driver = claimedChannels.value[nid] ?? null;
-              acc.push({ ...channel, id, nid, name, driver });
-            }
-            return acc;
-          },
-          [],
-        )
-        .sort(makeObjectSorter('name')),
+    const channels = computed<EditableChannel[]>(() =>
+      block.value.data.channels.map((channel: IoChannel) => {
+        const { id } = channel;
+        const claim = claims.value.find((c) => c.channelId === id);
+        const name = channelName(block.value, id) ?? 'Unknown';
+        const driver = sparkModule.blockById<MotorValveBlock>(claim?.driverId);
+        return { id, driver, name };
+      }),
     );
 
     function driverLink(channel: EditableChannel): Link {
@@ -87,13 +54,16 @@ export default defineComponent({
     }
 
     function driverLimitations(block: Block): string | null {
-      return findById(sparkModule.limitations, block.id)
-        ?.limitedBy
-        .join(', ')
-        || null;
+      return (
+        findById(sparkModule.limitations, block.id)?.limitedBy.join(', ') ||
+        null
+      );
     }
 
-    async function saveDriver(channel: EditableChannel, link: Link): Promise<void> {
+    async function saveDriver(
+      channel: EditableChannel,
+      link: Link,
+    ): Promise<void> {
       if (channel.driver && channel.driver.id === link.id) {
         return;
       }
@@ -105,12 +75,15 @@ export default defineComponent({
         const newDriver = sparkModule.blockById<MotorValveBlock>(link.id)!;
         const { id, type } = block.value;
         newDriver.data.hwDevice = bloxLink(id, type);
-        newDriver.data.startChannel = channel.nid;
+        newDriver.data.startChannel = channel.id;
         await sparkModule.saveBlock(newDriver);
       }
     }
 
-    async function saveState(channel: EditableChannel, state: DigitalState): Promise<void> {
+    async function saveState(
+      channel: EditableChannel,
+      state: DigitalState,
+    ): Promise<void> {
       if (channel.driver) {
         channel.driver.data.desiredState = state;
         await sparkModule.saveBlock(channel.driver);
@@ -135,7 +108,13 @@ export default defineComponent({
     <div
       v-for="channel in channels"
       :key="`channel-${channel.id}`"
-      class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
+      class="
+        col
+        row
+        q-gutter-x-sm q-gutter-y-xs q-mt-none
+        items-stretch
+        justify-start
+      "
     >
       <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
         {{ channel.name }}
@@ -145,10 +124,12 @@ export default defineComponent({
           v-if="channel.driver"
           :disable="driverDriven(channel.driver)"
           :model-value="channel.driver.data.desiredState"
-          :pending="channel.driver.data.state !== channel.driver.data.desiredState"
+          :pending="
+            channel.driver.data.state !== channel.driver.data.desiredState
+          "
           :pending-reason="driverLimitations(channel.driver)"
           class="col-auto self-center"
-          @update:model-value="v => saveState(channel, v)"
+          @update:model-value="(v) => saveState(channel, v)"
         />
         <div v-else class="darkened text-italic q-pa-sm">
           Not set
@@ -161,7 +142,7 @@ export default defineComponent({
         label="Driver"
         dense
         class="col-grow"
-        @update:model-value="link => saveDriver(channel, link)"
+        @update:model-value="(link) => saveDriver(channel, link)"
       />
     </div>
   </div>

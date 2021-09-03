@@ -1,6 +1,6 @@
 import { Quantity } from '@/shared-types';
 
-import { PinChannel, QuickstartConfig } from '../types';
+import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export interface HermsBlockNames {
   hltSensor: string;
@@ -26,8 +26,8 @@ export interface HermsBlockNames {
 
 export interface HermsConfig extends QuickstartConfig {
   names: HermsBlockNames;
-  hltPin: PinChannel;
-  bkPin: PinChannel;
+  hltChannel: IoChannelAddress;
+  bkChannel: IoChannelAddress;
   mutex: boolean;
   hltSensor: string;
   mtSensor: string;
