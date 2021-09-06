@@ -297,6 +297,7 @@ export interface DisplaySettingsBlock extends Block {
     tempUnit: DisplayTempUnit;
     widgets: DisplaySlot[];
     brightness: number;
+    timeZone: string;
   };
 }
 // #endregion DisplaySettings

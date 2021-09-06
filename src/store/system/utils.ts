@@ -1,6 +1,9 @@
 import { DialogChainObject } from 'quasar';
 import KeyboardLayouts from 'simple-keyboard-layouts';
+import timezones from 'timezones/zones.json';
 
+import { sparkStore } from '@/plugins/spark/store';
+import { BlockType, DisplaySettingsBlock } from '@/shared-types';
 import { systemStore } from '@/store/system';
 import { SystemConfig } from '@/store/system/types';
 import { createDialog } from '@/utils/dialog';
@@ -72,4 +75,44 @@ export function startChangeTempUnit(): DialogChainObject {
       },
     },
   }).onOk((temperature) => systemStore.saveUnits({ temperature }));
+}
+
+export function startChangeTimezone(): DialogChainObject {
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: Object.keys(timezones).map((value) => ({
+        value,
+        label: value.replaceAll('_', ' '),
+      })),
+      modelValue: systemStore.config.timeZone.name,
+      title: 'Choose timezone',
+      message: `
+      <p>
+        Choose the timezone for your Spark 4 services.
+        This will affect the time displayed on the display.
+      </p>
+      <p>
+        History data is always stored as UTC, and is unaffected by this setting.
+      </p>
+      `,
+      html: true,
+      selectProps: {
+        label: 'Timezone',
+      },
+    },
+  }).onOk(async (name: string) => {
+    const posixValue = timezones[name];
+    await Promise.all([
+      systemStore.saveConfig({ timeZone: { name, posixValue } }),
+      sparkStore.modules
+        .flatMap((m) =>
+          m.blocksByType<DisplaySettingsBlock>(BlockType.DisplaySettings),
+        )
+        .map((block) => {
+          block.data.timeZone = posixValue;
+          return sparkStore.saveBlock(block);
+        }),
+    ]);
+  });
 }

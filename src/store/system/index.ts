@@ -20,6 +20,7 @@ const defaultConfig = (): SystemConfig => ({
   showSidebarLayouts: true,
   homePage: null,
   builderTouchDelayed: 'dense',
+  timeZone: { name: 'Etc/UTC', posixValue: 'UTC0' },
 });
 
 const defaultUnits = (): UserUnits => ({
@@ -36,12 +37,14 @@ export class SystemModule extends VuexModule {
   public userDefinedUnits = true; // assume yes
 
   @Mutation
-  private updateConfig(cfg: SystemConfig & Partial<StoreObject> | null): void {
+  private updateConfig(
+    cfg: (SystemConfig & Partial<StoreObject>) | null,
+  ): void {
     this.config = omit(defaults(cfg, defaultConfig()), 'id', 'namespace');
   }
 
   @Mutation
-  private updateUnits(units: UserUnits & Partial<StoreObject> | null): void {
+  private updateUnits(units: (UserUnits & Partial<StoreObject>) | null): void {
     this.units = omit(defaults(units, defaultUnits()), 'id', 'namespace');
     this.userDefinedUnits = units !== null;
   }
@@ -72,13 +75,13 @@ export class SystemModule extends VuexModule {
     this.updateUnits(await globalApi.fetchById(UNITS_ID));
 
     configApi.subscribe(
-      obj => obj.id === CONFIG_ID && this.updateConfig(obj),
-      id => id === CONFIG_ID && this.updateConfig(defaultConfig()),
+      (obj) => obj.id === CONFIG_ID && this.updateConfig(obj),
+      (id) => id === CONFIG_ID && this.updateConfig(defaultConfig()),
     );
 
     globalApi.subscribe(
-      obj => obj.id === UNITS_ID && this.updateUnits(obj),
-      id => id === UNITS_ID && this.updateUnits(defaultUnits()),
+      (obj) => obj.id === UNITS_ID && this.updateUnits(obj),
+      (id) => id === UNITS_ID && this.updateUnits(defaultUnits()),
     );
   }
 }

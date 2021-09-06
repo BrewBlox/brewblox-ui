@@ -38,6 +38,7 @@ export interface SparkStatus {
   deviceAddress: string | null;
   connectionKind: 'simulation' | 'usb' | 'wifi' | null;
 
+  devicePlatform?: string;
   isCompatibleFirmware?: boolean;
   isLatestFirmware?: boolean;
   isValidDeviceId?: boolean;

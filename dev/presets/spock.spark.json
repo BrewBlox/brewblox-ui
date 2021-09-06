@@ -63,8 +63,8 @@
                   "type": "BalancerInterface",
                   "id": "balancer-1"
                 },
-                "granted": 100,
-                "id": 1
+                "id": 1,
+                "granted": 0
               },
               "limiting": false
             }
@@ -146,24 +146,11 @@
           }
         ],
         "name": "test",
+        "timeZone": "CET-1CEST,M3.5.0,M10.5.0/3",
         "tempUnit": 0,
         "brightness": 0
       },
       "id": "DisplaySettings",
-      "serviceId": "spock"
-    },
-    {
-      "nid": 213,
-      "groups": [
-        0
-      ],
-      "type": "DS2413",
-      "data": {
-        "address": "4444444444444444",
-        "connected": false,
-        "pins": []
-      },
-      "id": "ds2413-hw-1",
       "serviceId": "spock"
     },
     {
@@ -261,21 +248,6 @@
       "serviceId": "spock"
     },
     {
-      "nid": 225,
-      "groups": [
-        0
-      ],
-      "type": "DS2408",
-      "data": {
-        "address": "2955555555555555",
-        "connected": false,
-        "pins": [],
-        "connectMode": 0
-      },
-      "id": "New|DS2408-1",
-      "serviceId": "spock"
-    },
-    {
       "nid": 230,
       "groups": [
         0
@@ -284,24 +256,15 @@
       "data": {
         "address": "29555555555555da",
         "connected": false,
-        "pins": [],
-        "connectMode": 0
+        "connectMode": 0,
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
+        },
+        "channels": []
       },
-      "id": "New|DS2408-2",
-      "serviceId": "spock"
-    },
-    {
-      "nid": 224,
-      "groups": [
-        0
-      ],
-      "type": "DS2413",
-      "data": {
-        "address": "3a44444444444444",
-        "connected": false,
-        "pins": []
-      },
-      "id": "New|DS2413-1",
+      "id": "New|DS2408-1",
       "serviceId": "spock"
     },
     {
@@ -313,9 +276,14 @@
       "data": {
         "address": "3a44444444444406",
         "connected": false,
-        "pins": []
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
+        },
+        "channels": []
       },
-      "id": "New|DS2413-2",
+      "id": "New|DS2413-1",
       "serviceId": "spock"
     },
     {
@@ -336,6 +304,11 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-1",
@@ -359,6 +332,11 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-2",
@@ -382,6 +360,11 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-3",
@@ -405,6 +388,11 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-4",
@@ -428,6 +416,11 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-5",
@@ -451,6 +444,11 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-6",
@@ -817,6 +815,11 @@
           "unit": "degC",
           "readonly": true,
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "sensor-onewire-1",
@@ -925,10 +928,10 @@
       "data": {
         "enableIoSupply5V": true,
         "enableIoSupply12V": true,
-        "pins": [],
         "soundAlarm": false,
         "voltage5": 0,
-        "voltage12": 0
+        "voltage12": 0,
+        "channels": []
       },
       "id": "SparkPins",
       "serviceId": "spock"
@@ -1129,13 +1132,6 @@
     },
     {
       "keys": [
-        "ds2413-hw-1",
-        213
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
         "pin-actuator-1",
         215
       ],
@@ -1199,20 +1195,6 @@
     },
     {
       "keys": [
-        "New|DS2413-1",
-        224
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "New|DS2408-1",
-        225
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
         "New|TempSensorOneWire-4",
         226
       ],
@@ -1234,14 +1216,14 @@
     },
     {
       "keys": [
-        "New|DS2413-2",
+        "New|DS2413-1",
         229
       ],
       "data": {}
     },
     {
       "keys": [
-        "New|DS2408-2",
+        "New|DS2408-1",
         230
       ],
       "data": {}

@@ -74,6 +74,7 @@
             }
           }
         ],
+        "timeZone": "CET-1CEST,M3.5.0,M10.5.0/3",
         "name": "",
         "tempUnit": 0,
         "brightness": 0
@@ -94,13 +95,26 @@
           "unit": "degC",
           "value": 20
         },
+        "fluctuations": [
+          {
+            "amplitude": {
+              "__bloxtype": "Quantity",
+              "unit": "delta_degC",
+              "value": 1
+            },
+            "period": {
+              "__bloxtype": "Quantity",
+              "unit": "second",
+              "value": 10
+            }
+          }
+        ],
         "value": {
           "__bloxtype": "Quantity",
           "unit": "degC",
           "readonly": true,
           "value": 0
-        },
-        "fluctuations": []
+        }
       },
       "id": "Ferment Beer Sensor",
       "serviceId": "sparkey"
@@ -826,7 +840,7 @@
                   "type": "BalancerInterface",
                   "id": "HERMS Balancer"
                 },
-                "id": 2,
+                "id": 1,
                 "granted": 0
               },
               "limiting": false
@@ -1079,7 +1093,7 @@
                   "type": "BalancerInterface",
                   "id": "HERMS Balancer"
                 },
-                "id": 1,
+                "id": 2,
                 "granted": 0
               },
               "limiting": false
@@ -1393,7 +1407,7 @@
       "serviceId": "sparkey"
     },
     {
-      "nid": 104,
+      "nid": 134,
       "groups": [
         0
       ],
@@ -1401,14 +1415,19 @@
       "data": {
         "address": "29555555555555da",
         "connected": false,
-        "pins": [],
-        "connectMode": 0
+        "connectMode": 0,
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
+        },
+        "channels": []
       },
       "id": "New|DS2408-1",
       "serviceId": "sparkey"
     },
     {
-      "nid": 103,
+      "nid": 133,
       "groups": [
         0
       ],
@@ -1416,7 +1435,12 @@
       "data": {
         "address": "3a44444444444406",
         "connected": false,
-        "pins": []
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
+        },
+        "channels": []
       },
       "id": "New|DS2413-1",
       "serviceId": "sparkey"
@@ -1439,6 +1463,11 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-1",
@@ -1462,6 +1491,11 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-2",
@@ -1485,57 +1519,14 @@
           "__bloxtype": "Quantity",
           "unit": "delta_degC",
           "value": 0
+        },
+        "oneWireBusId": {
+          "__bloxtype": "Link",
+          "type": "OneWireBus",
+          "id": null
         }
       },
       "id": "New|TempSensorOneWire-3",
-      "serviceId": "sparkey"
-    },
-    {
-      "nid": 4,
-      "groups": [
-        7
-      ],
-      "type": "OneWireBus",
-      "data": {
-        "address": []
-      },
-      "id": "OneWireBus",
-      "serviceId": "sparkey"
-    },
-    {
-      "nid": 19,
-      "groups": [
-        7
-      ],
-      "type": "Spark3Pins",
-      "data": {
-        "enableIoSupply5V": true,
-        "enableIoSupply12V": true,
-        "pins": [],
-        "soundAlarm": false,
-        "voltage5": 0,
-        "voltage12": 0
-      },
-      "id": "SparkPins",
-      "serviceId": "sparkey"
-    },
-    {
-      "nid": 2,
-      "groups": [
-        7
-      ],
-      "type": "SysInfo",
-      "data": {
-        "deviceId": "",
-        "version": "",
-        "platform": 0,
-        "protocolVersion": "",
-        "releaseDate": "",
-        "protocolDate": "",
-        "command": 0,
-        "trace": []
-      },
-      "id": "SystemInfo",
       "serviceId": "sparkey"
     },
     {
@@ -1647,20 +1638,6 @@
       "keys": [
         "New|TempSensorOneWire-3",
         102
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "New|DS2413-1",
-        103
-      ],
-      "data": {}
-    },
-    {
-      "keys": [
-        "New|DS2408-1",
-        104
       ],
       "data": {}
     },
@@ -1857,6 +1834,20 @@
       "keys": [
         "HERMS BK PID",
         132
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|DS2413-1",
+        133
+      ],
+      "data": {}
+    },
+    {
+      "keys": [
+        "New|DS2408-1",
+        134
       ],
       "data": {}
     }
