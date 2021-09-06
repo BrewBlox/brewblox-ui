@@ -260,6 +260,7 @@ export function asSparkStatus(
     serviceId,
     isServiceReachable: true,
     deviceAddress: status.device_address,
+    devicePlatform: status.device_info?.platform,
     connectionKind: status.connection_kind,
     isCompatibleFirmware: status.handshake_info?.is_compatible_firmware,
     isLatestFirmware: status.handshake_info?.is_latest_firmware,

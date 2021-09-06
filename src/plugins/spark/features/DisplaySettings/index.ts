@@ -25,6 +25,7 @@ const plugin: Plugin = {
         tempUnit: DisplayTempUnit.TEMP_CELSIUS,
         widgets: [],
         brightness: 255,
+        timeZone: '',
       }),
     };
 

@@ -1,7 +1,7 @@
 [
   {
-    "id": "stepper-runtime",
     "namespace": "brewblox-automation",
+    "id": "stepper-runtime",
     "data": {}
   }
 ]
