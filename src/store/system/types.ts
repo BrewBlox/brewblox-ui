@@ -6,9 +6,13 @@ export interface SystemConfig {
   showSidebarLayouts: boolean;
   homePage: string | null;
   builderTouchDelayed: 'dense' | 'always' | 'never';
-  timeZone: { name: string; posixValue: string };
 }
 
 export interface UserUnits {
   temperature: TempUnit;
+}
+
+export interface UserTimeZone {
+  name: string;
+  posixValue: string;
 }

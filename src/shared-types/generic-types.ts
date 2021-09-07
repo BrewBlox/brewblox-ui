@@ -16,6 +16,8 @@ export interface StoreObject {
   namespace?: string; // Redis namespace
 }
 
+export type StoreObjectImpl<T> = T & StoreObject;
+
 // #region DatastoreEvent
 export interface DatastoreEvent {
   changed?: StoreObject[];
