@@ -410,7 +410,9 @@ export interface OneWireGpioModuleBlock extends Block {
     channels: GpioModuleChannel[];
     modulePosition: number;
     moduleStatus: GpioModuleStatus;
+    moduleStatusClear: GpioPins; // write-only
     useExternalPower: boolean;
+
     pullUpDesired: Readonly<GpioPins>;
     pullUpStatus: Readonly<GpioPins>;
     pullUpWhenActive: Readonly<GpioPins>;
@@ -421,7 +423,6 @@ export interface OneWireGpioModuleBlock extends Block {
     pullDownWhenInactive: Readonly<GpioPins>;
     overCurrent: Readonly<GpioPins>;
     openLoad: Readonly<GpioPins>;
-    moduleStatusClear: GpioPins; // write-only
   };
 }
 // #endregion OneWireGpioModule
@@ -578,6 +579,7 @@ export interface TempSensorOneWireBlock extends Block {
     offset: Quantity;
     address: string;
     value: Readonly<Quantity>;
+    oneWireBusId: Readonly<Link>;
   };
 }
 // #endregion TempSensorOneWire

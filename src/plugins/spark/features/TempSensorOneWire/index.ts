@@ -10,6 +10,7 @@ import {
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
+import { bloxLink } from '@/utils/link';
 import { deltaTempQty, tempQty } from '@/utils/quantity';
 
 import widget from './TempSensorOneWireWidget.vue';
@@ -24,6 +25,7 @@ const plugin: Plugin = {
         value: tempQty(20),
         offset: deltaTempQty(0),
         address: '',
+        oneWireBusId: bloxLink(null),
       }),
     };
 

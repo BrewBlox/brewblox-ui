@@ -46,6 +46,7 @@ describe('Calculate relational data', () => {
         address: 'deadbeef',
         offset: deltaTempQty(0),
         value: tempQty(20),
+        oneWireBusId: bloxLink(null),
       },
     },
     {
