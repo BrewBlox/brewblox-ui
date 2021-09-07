@@ -2,8 +2,6 @@ import { DialogChainObject } from 'quasar';
 import KeyboardLayouts from 'simple-keyboard-layouts';
 import timezones from 'timezones/zones.json';
 
-import { sparkStore } from '@/plugins/spark/store';
-import { BlockType, DisplaySettingsBlock } from '@/shared-types';
 import { systemStore } from '@/store/system';
 import { SystemConfig } from '@/store/system/types';
 import { createDialog } from '@/utils/dialog';
@@ -85,7 +83,7 @@ export function startChangeTimezone(): DialogChainObject {
         value,
         label: value.replaceAll('_', ' '),
       })),
-      modelValue: systemStore.config.timeZone.name,
+      modelValue: systemStore.timeZone.name,
       title: 'Choose timezone',
       message: `
       <p>
@@ -101,18 +99,8 @@ export function startChangeTimezone(): DialogChainObject {
         label: 'Timezone',
       },
     },
-  }).onOk(async (name: string) => {
+  }).onOk((name: string) => {
     const posixValue = timezones[name];
-    await Promise.all([
-      systemStore.saveConfig({ timeZone: { name, posixValue } }),
-      sparkStore.modules
-        .flatMap((m) =>
-          m.blocksByType<DisplaySettingsBlock>(BlockType.DisplaySettings),
-        )
-        .map((block) => {
-          block.data.timeZone = posixValue;
-          return sparkStore.saveBlock(block);
-        }),
-    ]);
+    systemStore.saveTimeZone({ name, posixValue });
   });
 }
