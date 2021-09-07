@@ -77,21 +77,7 @@ export const DigitalConstraintKey = Enum(
 
 export const AnalogConstraintKey = Enum('min', 'max', 'balanced');
 
-// #region ChannelStatus
-export const ChannelStatus = Enum(
-  'UNKNOWN',
-  'OPERATIONAL',
-  'OVERCURRENT',
-  'OPEN_LOAD',
-  'UNDERVOLTAGE',
-  'OVERVOLTAGE',
-  'OVERTEMPERATURE_SHUTDOWN',
-  'OVERTEMPERATURE_WARNING',
-  'POWER_ON_RESET',
-);
-// #endregion ChannelStatus
-
-// #region GpioDeviceType
+// #region Gpio
 export const GpioDeviceType = Enum(
   'GPIO_DEV_NONE',
   'GPIO_DEV_SSR_2P',
@@ -115,23 +101,7 @@ export const GpioDeviceType = Enum(
   'GPIO_DEV_GND_1P',
   'GPIO_DEV_GND_1P_LOAD_DETECT',
 );
-// #endregion GpioDeviceType
 
-// #region GpioErrorFlags
-export enum GpioErrorFlags {
-  GPIO_ERR_NONE = 0,
-  GPIO_ERR_POWER_ON_RESET = 1 << 0,
-  GPIO_ERR_OVERVOLTAGE = 1 << 1,
-  GPIO_ERR_UNDERVOLTAGE = 1 << 2,
-  GPIO_ERR_OVERCURRENT = 1 << 3,
-  GPIO_ERR_OPEN_LOAD = 1 << 4,
-  GPIO_ERR_OVERTEMPERATURE_WARNING = 1 << 5,
-  GPIO_ERR_OVERTEMPERATURE_ERROR = 1 << 6,
-  GPIO_ERR_SPI_ERROR = 1 << 7,
-}
-// #endregion GpioErrorFlags
-
-// #region GpioPins
 export enum GpioPins {
   NONE = 0,
   PIN_1 = 1 << 0,
@@ -143,9 +113,7 @@ export enum GpioPins {
   PIN_7 = 1 << 6,
   PIN_8 = 1 << 7,
 }
-// #endregion GpioPins
 
-// #region GpioModuleStatus
 export enum GpioModuleStatus {
   NONE = 0,
   POWER_ON_RESET = 1 << 0,
@@ -156,7 +124,7 @@ export enum GpioModuleStatus {
   OVERTEMPERATURE_WARNING = 1 << 5,
   OVERTEMPERATURE_SHUTDOWN = 1 << 6,
 }
-// #endregion GpioModuleStatus
+// #endregion Gpio
 
 // #region DigitalState
 export const DigitalState = Enum(
@@ -294,7 +262,6 @@ export type BlockType = Enum<typeof BlockType>;
 export type BlockOrIntfType = Enum<typeof BlockOrIntfType>;
 export type DigitalConstraintKey = Enum<typeof DigitalConstraintKey>;
 export type AnalogConstraintKey = Enum<typeof AnalogConstraintKey>;
-export type ChannelStatus = Enum<typeof ChannelStatus>;
 export type GpioDeviceType = Enum<typeof GpioDeviceType>;
 export type DigitalState = Enum<typeof DigitalState>;
 export type DigitalCompareOp = Enum<typeof DigitalCompareOp>;

@@ -10,7 +10,6 @@ import {
   Block,
   BlockType,
   DS2408Block,
-  DS2408ConnectMode,
   OneWireGpioModuleBlock,
 } from '@/shared-types';
 import { prettyLink } from '@/utils/formatting';
@@ -18,14 +17,7 @@ import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
 
-import {
-  ioChannelNamesDS2408,
-  ioChannelNamesDS2413,
-  ioChannelNamesMockPins,
-  ioChannelNamesSpark2,
-  ioChannelNamesSpark3,
-  valveChannelNamesDS2408,
-} from '../const';
+import { ioChannelNames } from '../const';
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>
   v?.id || '<not set>';
@@ -93,27 +85,11 @@ export const enumHint = (e: Enum<any>): string =>
     .join(', ');
 
 export function channelName(block: Block, id: number): string | undefined {
-  if (block.type === BlockType.DS2413) {
-    return ioChannelNamesDS2413[id];
-  }
-  if (block.type === BlockType.Spark2Pins) {
-    return ioChannelNamesSpark2[id];
-  }
-  if (block.type === BlockType.Spark3Pins) {
-    return ioChannelNamesSpark3[id];
-  }
-  if (block.type === BlockType.MockPins) {
-    return ioChannelNamesMockPins[id];
-  }
   if (matchesType<DS2408Block>(BlockType.DS2408, block)) {
-    if (block.data.connectMode === DS2408ConnectMode.CONNECT_VALVE) {
-      return valveChannelNamesDS2408[id];
-    } else {
-      return ioChannelNamesDS2408[id];
-    }
+    return ioChannelNames[block.data.connectMode][id];
   }
   if (matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)) {
     return block.data.channels.find((c) => c.id === id)?.name;
   }
-  return undefined;
+  return ioChannelNames[block.type]?.[id];
 }

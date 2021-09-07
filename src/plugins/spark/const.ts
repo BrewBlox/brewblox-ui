@@ -1,3 +1,5 @@
+import { DS2408ConnectMode } from '@/shared-types';
+
 import {
   AnalogConstraintKey,
   BlockIntfType,
@@ -89,42 +91,48 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
   DS2408Interface: [BlockType.DS2408],
 };
 
-const ioChannelNamesBasic: Record<number, string> = {
-  1: 'A',
-  2: 'B',
-  3: 'C',
-  4: 'D',
-  5: 'E',
-  6: 'F',
-  7: 'G',
-  8: 'H',
-};
-
-export const ioChannelNamesDS2408 = ioChannelNamesBasic;
-
-export const valveChannelNamesDS2408: Record<number, string> = {
-  1: 'B',
-  5: 'A',
-};
-
-export const ioChannelNamesDS2413: Record<number, string> = {
-  1: 'A',
-  2: 'B',
-};
-
-export const ioChannelNamesMockPins = ioChannelNamesBasic;
-
-export const ioChannelNamesSpark2: Record<number, string> = {
-  1: 'Bottom 1',
-  2: 'Bottom 2',
-  3: 'Bottom 3',
-  4: 'Bottom 4',
-};
-
-export const ioChannelNamesSpark3: Record<number, string> = {
-  1: 'Top 1',
-  2: 'Top 2',
-  3: 'Top 3',
-  4: 'Bottom 1',
-  5: 'Bottom 2',
+export const ioChannelNames = {
+  [BlockType.DS2408]: {
+    [DS2408ConnectMode.CONNECT_ACTUATOR]: {
+      1: 'A',
+      2: 'B',
+      3: 'C',
+      4: 'D',
+      5: 'E',
+      6: 'F',
+      7: 'G',
+      8: 'H',
+    },
+    [DS2408ConnectMode.CONNECT_VALVE]: {
+      1: 'B',
+      5: 'A',
+    },
+  },
+  [BlockType.DS2413]: {
+    1: 'A',
+    2: 'B',
+  },
+  [BlockType.MockPins]: {
+    1: 'A',
+    2: 'B',
+    3: 'C',
+    4: 'D',
+    5: 'E',
+    6: 'F',
+    7: 'G',
+    8: 'H',
+  },
+  [BlockType.Spark2Pins]: {
+    1: 'Bottom 1',
+    2: 'Bottom 2',
+    3: 'Bottom 3',
+    4: 'Bottom 4',
+  },
+  [BlockType.Spark3Pins]: {
+    1: 'Top 1',
+    2: 'Top 2',
+    3: 'Top 3',
+    4: 'Bottom 1',
+    5: 'Bottom 2',
+  },
 };
