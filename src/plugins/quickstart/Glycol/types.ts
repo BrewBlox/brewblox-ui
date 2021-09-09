@@ -28,6 +28,11 @@ export interface GlycolBlockNames {
 
 export type GlycolControlMode = 'No' | 'Measure' | 'Control';
 
+export interface GlycolOpts {
+  beerSetting: Quantity;
+  glycolSetting: Quantity;
+}
+
 export interface GlycolConfig extends QuickstartConfig {
   names: GlycolBlockNames;
   heated: boolean;
@@ -39,9 +44,5 @@ export interface GlycolConfig extends QuickstartConfig {
   beerSensor: string;
 
   glycolControl: GlycolControlMode;
-}
-
-export interface GlycolOpts {
-  beerSetting: Quantity;
-  glycolSetting: Quantity;
+  glycolOpts: GlycolOpts;
 }

@@ -209,15 +209,20 @@ export default defineComponent({
     <div class="row">
       <q-btn
         flat
-        label="add"
+        label="add channel"
         :disable="channels.length >= 8"
         @click="addChannel"
       />
-      <q-btn v-if="selectedId != null" flat label="edit" @click="editChannel" />
       <q-btn
-        v-if="selectedId != null"
         flat
-        label="remove"
+        label="edit channel"
+        :disable="selectedId == null"
+        @click="editChannel"
+      />
+      <q-btn
+        flat
+        label="remove channel"
+        :disable="selectedId == null"
         @click="removeChannel"
       />
     </div>
@@ -257,11 +262,7 @@ export default defineComponent({
         @click="clickUnused(slot)"
       />
       <div style="grid-column: 9 / span 2" class="power">
-        <slot name="power">
-          <div class="default">
-            Power
-          </div>
-        </slot>
+        Power
       </div>
     </div>
     <!-- Unassigned -->
@@ -320,10 +321,10 @@ export default defineComponent({
     overflow: hidden
   .power
     margin-left: 5px
-    .default
-      text-align: center
-      overflow: hidden
-      border: 1px solid orange
+    min-height: 100%
+    text-align: center
+    overflow: hidden
+    border: 1px solid orange
 .target-clickable
   background-color: $hover
   cursor: pointer

@@ -5,13 +5,12 @@ import { cref } from '@/utils/component-ref';
 
 import BrewKettleCompletionTask from './BrewKettleCompletionTask.vue';
 import BrewKettleHardwareTask from './BrewKettleHardwareTask.vue';
+import BrewKettleIoTask from './BrewKettleIoTask.vue';
 import BrewKettleNamingTask from './BrewKettleNamingTask.vue';
 import BrewKettleSettingsTask from './BrewKettleSettingsTask.vue';
 
-
 const plugin: Plugin = {
   install(app) {
-
     const feature: QuickstartFeature = {
       id: 'BrewKettle',
       title: 'Brew kettle',
@@ -20,6 +19,7 @@ const plugin: Plugin = {
         'QuickstartDiscoveryTask',
         cref(app, BrewKettleNamingTask),
         cref(app, BrewKettleHardwareTask),
+        cref(app, BrewKettleIoTask),
         cref(app, BrewKettleSettingsTask),
         cref(app, BrewKettleCompletionTask),
       ],

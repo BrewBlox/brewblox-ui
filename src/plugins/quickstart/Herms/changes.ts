@@ -35,7 +35,7 @@ import {
   withoutPrefix,
   withPrefix,
 } from '../utils';
-import { HermsConfig, HermsOpts } from './types';
+import { HermsConfig } from './types';
 
 export function defineChangedBlocks(config: HermsConfig): Block[] {
   return [
@@ -47,12 +47,9 @@ export function defineChangedBlocks(config: HermsConfig): Block[] {
   ];
 }
 
-export function defineCreatedBlocks(
-  config: HermsConfig,
-  opts: HermsOpts,
-): Block[] {
+export function defineCreatedBlocks(config: HermsConfig): Block[] {
   const groups = [0];
-  const { serviceId, names } = config;
+  const { serviceId, names, hermsOpts } = config;
 
   const pwmConstraints: AnalogConstraint[] = [];
   const actuatorConstraints: DigitalConstraint[] = [];
@@ -180,7 +177,7 @@ export function defineCreatedBlocks(
         constrainedBy: {
           constraints: [
             {
-              max: opts.driverMax.value!,
+              max: hermsOpts.driverMax.value!,
               limiting: false,
             },
           ],
@@ -268,7 +265,7 @@ export function defineCreatedBlocks(
         enabled: true,
         inputId: bloxLink(names.hltSetpoint),
         outputId: bloxLink(names.hltPwm),
-        kp: opts.hltKp,
+        kp: hermsOpts.hltKp,
         ti: bloxQty('10m'),
         td: bloxQty('10s'),
         boilMinOutput: 25,
@@ -284,7 +281,7 @@ export function defineCreatedBlocks(
         enabled: true,
         inputId: bloxLink(names.mtSetpoint),
         outputId: bloxLink(names.hltDriver),
-        kp: opts.mtKp,
+        kp: hermsOpts.mtKp,
         ti: bloxQty('5m'),
         td: bloxQty('10m'),
       },
@@ -299,7 +296,7 @@ export function defineCreatedBlocks(
         enabled: true,
         inputId: bloxLink(names.bkSetpoint),
         outputId: bloxLink(names.bkPwm),
-        kp: opts.bkKp,
+        kp: hermsOpts.bkKp,
         ti: bloxQty('10m'),
         td: bloxQty('10s'),
         boilMinOutput: 25,

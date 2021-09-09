@@ -3,7 +3,14 @@ import { defineComponent, onMounted, PropType, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { QuickstartAction } from '../types';
-import { executeActions } from '../utils';
+import { createOutputActions, executeActions } from '../utils';
+import {
+  defineChangedBlocks,
+  defineCreatedBlocks,
+  defineDisplayedBlocks,
+  defineWidgets,
+} from './changes';
+import { defineLayouts } from './changes-layout';
 import { FridgeConfig } from './types';
 
 export default defineComponent({
@@ -22,10 +29,26 @@ export default defineComponent({
     const router = useRouter();
     const busy = ref(true);
 
-    onMounted(() =>
-      executeActions(props.actions, props.config)
-        .finally(() => busy.value = false),
-    );
+    async function execute(): Promise<void> {
+      const createdBlocks = defineCreatedBlocks(props.config);
+      const changedBlocks = defineChangedBlocks(props.config);
+      const layouts = defineLayouts(props.config);
+      const widgets = defineWidgets(props.config, layouts);
+      const displayedBlocks = defineDisplayedBlocks(props.config);
+
+      const finalizedConfig: FridgeConfig = {
+        ...props.config,
+        createdBlocks,
+        changedBlocks,
+        layouts,
+        widgets,
+        displayedBlocks,
+      };
+
+      await executeActions(createOutputActions(), finalizedConfig);
+    }
+
+    onMounted(() => execute().finally(() => (busy.value = false)));
 
     function done(): void {
       // Will cause dialog to autoclose
@@ -53,25 +76,28 @@ export default defineComponent({
             here is a quick explanation of what we set up.
           </p>
           <p>
-            On the controller we created two PIDs to drive the heater and the cooler.
+            On the controller we created two PIDs to drive the heater and the
+            cooler.
             <br>They both use the <i>Fridge Setpoint</i> as input.
           </p>
           <p>
-            We did not put every controller block on your new dashboard.
-            You can find all blocks and their relations on the Spark service page.
+            We did not put every controller block on your new dashboard. You can
+            find all blocks and their relations on the Spark service page.
           </p>
-          <p>
-            On your new dashboard, you will find:
-            <ul>
-              <li>An assistant widget to enable or disable temperature control.</li>
-              <li>
-                A graphical representation of your fridge.
-                Parts are clickable for quick access to settings.
-              </li>
-              <li>A graph with the most important metrics.</li>
-              <li>A temperature profile that can slowly change a setpoint over time.</li>
-            </ul>
-          </p>
+          <p>On your new dashboard, you will find:</p>
+          <ul>
+            <li>
+              An assistant widget to enable or disable temperature control.
+            </li>
+            <li>
+              A graphical representation of your fridge. Parts are clickable for
+              quick access to settings.
+            </li>
+            <li>A graph with the most important metrics.</li>
+            <li>
+              A temperature profile that can slowly change a setpoint over time.
+            </li>
+          </ul>
         </q-item-section>
       </q-item>
     </q-card-section>

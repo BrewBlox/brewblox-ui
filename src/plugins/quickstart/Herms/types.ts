@@ -24,6 +24,13 @@ export interface HermsBlockNames {
   balancer: string;
 }
 
+export interface HermsOpts {
+  hltKp: Quantity;
+  bkKp: Quantity;
+  mtKp: Quantity;
+  driverMax: Quantity;
+}
+
 export interface HermsConfig extends QuickstartConfig {
   names: HermsBlockNames;
   hltChannel: IoChannelAddress;
@@ -32,11 +39,5 @@ export interface HermsConfig extends QuickstartConfig {
   hltSensor: string;
   mtSensor: string;
   bkSensor: string;
-}
-
-export interface HermsOpts {
-  hltKp: Quantity;
-  bkKp: Quantity;
-  mtKp: Quantity;
-  driverMax: Quantity;
+  hermsOpts: HermsOpts;
 }

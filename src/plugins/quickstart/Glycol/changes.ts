@@ -35,7 +35,7 @@ import {
   withoutPrefix,
   withPrefix,
 } from '../utils';
-import { GlycolConfig, GlycolOpts } from './types';
+import { GlycolConfig } from './types';
 
 const makeGlycolBeerCoolConfig = (): PidConfig => ({
   kp: inverseTempQty(-20),
@@ -65,12 +65,9 @@ export function defineChangedBlocks(config: GlycolConfig): Block[] {
   ];
 }
 
-export function defineCreatedBlocks(
-  config: GlycolConfig,
-  opts: GlycolOpts,
-): Block[] {
+export function defineCreatedBlocks(config: GlycolConfig): Block[] {
   const { serviceId, names } = config;
-  const { beerSetting, glycolSetting } = opts;
+  const { beerSetting, glycolSetting } = config.glycolOpts;
   const groups = [0];
 
   const heatingBlocks = [names.heatPid, names.heatPwm, names.heatAct];

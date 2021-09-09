@@ -17,42 +17,45 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
-    const service = ref<Service | null>(serviceStore.serviceById(props.config.serviceId));
+    const service = ref<Service | null>(
+      serviceStore.serviceById(props.config.serviceId),
+    );
     const handleExisting = ref<'keep' | 'clear' | null>(null);
 
-    const services = computed<Service[]>(
-      () => serviceStore.services.filter(v => v.type === sparkType),
+    const services = computed<Service[]>(() =>
+      serviceStore.services.filter((v) => v.type === sparkType),
     );
 
-    const stubs = computed<ServiceStub[]>(
-      () => serviceStore.stubs.filter(v => v.type === sparkType),
+    const stubs = computed<ServiceStub[]>(() =>
+      serviceStore.stubs.filter((v) => v.type === sparkType),
     );
 
-    if (!service.value && services.value.length === 1 && stubs.value.length === 0) {
+    if (
+      !service.value &&
+      services.value.length === 1 &&
+      stubs.value.length === 0
+    ) {
       service.value = services.value[0];
     }
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(service.value?.id),
+    const sparkModule = computed<SparkServiceModule | null>(() =>
+      sparkStore.moduleById(service.value?.id),
     );
 
     const hasBlocks = computed<boolean>(
       // Ignore discovered blocks
       // Any previous control chain will have included a PID
-      () => sparkModule.value
-        ?.blocks
-        .find(v => v.type === BlockType.Pid) !== undefined,
+      () =>
+        sparkModule.value?.blocks.find((v) => v.type === BlockType.Pid) !==
+        undefined,
     );
 
     const ready = computed<boolean>(
-      () => sparkModule.value !== null
-        && (!hasBlocks.value || handleExisting.value !== null),
+      () =>
+        sparkModule.value !== null &&
+        (!hasBlocks.value || handleExisting.value !== null),
     );
 
     async function taskDone(): Promise<void> {
@@ -106,7 +109,7 @@ export default defineComponent({
 
       <div
         v-for="stub in stubs"
-        :key="'stub-'+stub.id"
+        :key="'stub-' + stub.id"
         class="q-mt-lg q-pa-md column items-center q-gutter-md"
       >
         <q-icon name="warning" color="warning" size="md" class="col-auto" />
@@ -117,12 +120,15 @@ export default defineComponent({
           <q-btn
             outline
             label="Add service to UI"
-            @click="startCreateService(stub, false)"
+            @click="startCreateService(stub)"
           />
         </div>
       </div>
 
-      <div v-if="service && hasBlocks" class="q-mt-lg q-pa-md column items-center q-gutter-md">
+      <div
+        v-if="service && hasBlocks"
+        class="q-mt-lg q-pa-md column items-center q-gutter-md"
+      >
         <q-icon name="warning" color="warning" size="md" class="col-auto" />
         <span class="no-select">
           You already have blocks on <i>{{ service.title }}</i>
@@ -145,11 +151,7 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
       <q-btn
         :disable="!ready"

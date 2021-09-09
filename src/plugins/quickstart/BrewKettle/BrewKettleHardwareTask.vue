@@ -109,10 +109,6 @@ export default defineComponent({
             Use the buttons above to discover new OneWire blocks or manually
             create a block.
           </p>
-          <p v-if="changedGpio.length">
-            The GPIO modules are shown below. You can create IO channels there
-            to add them to the dropdown menu.
-          </p>
         </q-item-section>
       </q-item>
       <QuickstartMockCreateField
@@ -121,31 +117,22 @@ export default defineComponent({
       />
       <q-item>
         <q-item-section>
+          <q-item-section>
+            <QuickstartSensorField
+              v-model="kettleSensor"
+              :service-id="config.serviceId"
+              label="Sensor"
+            />
+          </q-item-section>
           <QuickstartChannelField
             v-model="kettleChannel"
             :service-id="config.serviceId"
             :changed-gpio="changedGpio"
+            :desc="`${config.prefix} heater`"
             label="Output pin"
           />
         </q-item-section>
-        <q-item-section>
-          <QuickstartSensorField
-            v-model="kettleSensor"
-            :service-id="config.serviceId"
-            label="Sensor"
-          />
-        </q-item-section>
       </q-item>
-    </q-card-section>
-
-    <q-card-section
-      v-for="change in changedGpio"
-      :key="`gpio-${change.blockId}`"
-    >
-      <div class="text-subtitle1">
-        GPIO Module {{ change.modulePosition }}: {{ change.blockId }}
-      </div>
-      <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
 
     <template #actions>

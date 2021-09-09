@@ -5,14 +5,6 @@ import { Quantity } from '@/shared-types';
 import { tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
-import { createOutputActions } from '../utils';
-import {
-  defineChangedBlocks,
-  defineCreatedBlocks,
-  defineDisplayedBlocks,
-  defineWidgets,
-} from './changes';
-import { defineLayouts } from './changes-layout';
 import { FridgeConfig, FridgeOpts } from './types';
 
 export default defineComponent({
@@ -27,31 +19,16 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['update:config', 'update:actions', 'back', 'next'],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
     const fridgeSetting = ref<Quantity>(tempQty(20));
 
     function done(): void {
-      const opts: FridgeOpts = {
+      const fridgeOpts: FridgeOpts = {
         fridgeSetting: fridgeSetting.value,
       };
 
-      const createdBlocks = defineCreatedBlocks(props.config, opts);
-      const changedBlocks = defineChangedBlocks(props.config);
-      const layouts = defineLayouts(props.config);
-      const widgets = defineWidgets(props.config, opts, layouts);
-      const displayedBlocks = defineDisplayedBlocks(props.config);
-
-      const updates: Partial<FridgeConfig> = {
-        layouts,
-        widgets,
-        changedBlocks,
-        createdBlocks,
-        displayedBlocks,
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('update:actions', createOutputActions());
+      emit('update:config', { ...props.config, fridgeOpts });
       emit('next');
     }
 

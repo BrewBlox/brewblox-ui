@@ -1,18 +1,9 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
+import { defineComponent, PropType, reactive } from 'vue';
 
-import { Quantity } from '@/shared-types';
 import { tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
-import { createOutputActions } from '../utils';
-import {
-  defineChangedBlocks,
-  defineCreatedBlocks,
-  defineDisplayedBlocks,
-  defineWidgets,
-} from './changes';
-import { defineLayouts } from './changes-layout';
 import { FermentConfig, FermentMode, FermentOpts } from './types';
 
 const targetOpts: SelectOption<FermentMode>[] = [
@@ -38,43 +29,24 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['update:config', 'update:actions', 'back', 'next'],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
-    const fridgeSetting = ref<Quantity>(tempQty(20));
-    const beerSetting = ref<Quantity>(tempQty(20));
-    const activeSetpoint = ref<FermentMode>('beer');
+    const fermentOpts = reactive<FermentOpts>(
+      props.config.fermentOpts ?? {
+        fridgeSetting: tempQty(20),
+        beerSetting: tempQty(20),
+        activeSetpoint: 'beer',
+      },
+    );
 
     function done(): void {
-      const opts: FermentOpts = {
-        fridgeSetting: fridgeSetting.value,
-        beerSetting: beerSetting.value,
-        activeSetpoint: activeSetpoint.value,
-      };
-
-      const createdBlocks = defineCreatedBlocks(props.config, opts);
-      const changedBlocks = defineChangedBlocks(props.config);
-      const layouts = defineLayouts(props.config);
-      const widgets = defineWidgets(props.config, opts, layouts);
-      const displayedBlocks = defineDisplayedBlocks(props.config);
-
-      const updates: Partial<FermentConfig> = {
-        layouts,
-        widgets,
-        changedBlocks,
-        createdBlocks,
-        displayedBlocks,
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('update:actions', createOutputActions());
+      emit('update:config', { ...props.config, fermentOpts });
       emit('next');
     }
 
     return {
       targetOpts,
-      fridgeSetting,
-      beerSetting,
-      activeSetpoint,
+      fermentOpts,
       done,
     };
   },
@@ -104,14 +76,14 @@ export default defineComponent({
       <q-item>
         <q-item-section>
           <QuantityField
-            v-model="fridgeSetting"
+            v-model="fermentOpts.fridgeSetting"
             label="Fridge setpoint"
             title="Fridge setting"
           />
         </q-item-section>
         <q-item-section>
           <QuantityField
-            v-model="beerSetting"
+            v-model="fermentOpts.beerSetting"
             label="Beer setpoint"
             title="Beer setting"
           />
@@ -119,7 +91,7 @@ export default defineComponent({
         <q-item-section class="col-auto">
           <LabeledField label="Active setpoint">
             <q-btn-toggle
-              v-model="activeSetpoint"
+              v-model="fermentOpts.activeSetpoint"
               :options="targetOpts"
               unelevated
               dense

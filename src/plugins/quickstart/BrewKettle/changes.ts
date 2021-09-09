@@ -27,7 +27,7 @@ import {
   withoutPrefix,
   withPrefix,
 } from '../utils';
-import { BrewKettleConfig, BrewKettleOpts } from './types';
+import { BrewKettleConfig } from './types';
 
 export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
   return [
@@ -36,10 +36,7 @@ export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
   ];
 }
 
-export function defineCreatedBlocks(
-  config: BrewKettleConfig,
-  opts: BrewKettleOpts,
-): Block[] {
+export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
   const groups = [0];
   const { serviceId, names } = config;
 
@@ -110,7 +107,7 @@ export function defineCreatedBlocks(
         enabled: true,
         inputId: bloxLink(names.kettleSetpoint),
         outputId: bloxLink(names.kettlePwm),
-        kp: opts.kp,
+        kp: config.kettleOpts.kp,
         ti: bloxQty('10m'),
         td: bloxQty('10s'),
         boilMinOutput: 25,
@@ -123,7 +120,6 @@ export function defineCreatedBlocks(
 
 export function defineWidgets(
   config: BrewKettleConfig,
-  opts: BrewKettleOpts,
   layouts: BuilderLayout[],
 ): Widget[] {
   const { serviceId, names, dashboardId, prefix } = config;
@@ -216,7 +212,7 @@ export function defineWidgets(
             ),
             coolConfig: null,
             heatConfig: {
-              kp: opts.kp,
+              kp: config.kettleOpts.kp,
               ti: bloxQty('10m'),
               td: bloxQty('10s'),
             },
