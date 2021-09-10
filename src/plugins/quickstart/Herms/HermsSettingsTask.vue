@@ -8,14 +8,6 @@ import { prettyQty, prettyUnit } from '@/utils/formatting';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
-import { createOutputActions } from '../utils';
-import {
-  defineChangedBlocks,
-  defineCreatedBlocks,
-  defineDisplayedBlocks,
-  defineWidgets,
-} from './changes';
-import { defineLayouts } from './changes-layout';
 import { HermsConfig, HermsOpts } from './types';
 
 const volumeRules: InputRule[] = [
@@ -34,7 +26,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['update:config', 'update:actions', 'back', 'next', 'close'],
+  emits: ['update:config', 'back', 'next', 'close'],
   setup(props, { emit }) {
     const hltFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const bkFullPowerDelta = ref<Quantity>(deltaTempQty(2));
@@ -79,29 +71,14 @@ export default defineComponent({
     });
 
     function done(): void {
-      const opts: HermsOpts = {
+      const hermsOpts: HermsOpts = {
         hltKp: hltKp.value,
         bkKp: bkKp.value,
         mtKp: mtKp.value,
         driverMax: driverMax.value,
       };
 
-      const createdBlocks = defineCreatedBlocks(props.config, opts);
-      const changedBlocks = defineChangedBlocks(props.config);
-      const layouts = defineLayouts(props.config);
-      const widgets = defineWidgets(props.config, layouts);
-      const displayedBlocks = defineDisplayedBlocks(props.config);
-
-      const updates: Partial<HermsConfig> = {
-        layouts,
-        widgets,
-        changedBlocks,
-        createdBlocks,
-        displayedBlocks,
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('update:actions', createOutputActions());
+      emit('update:config', { ...props.config, hermsOpts });
       emit('next');
     }
 

@@ -5,14 +5,6 @@ import { Quantity } from '@/shared-types';
 import { tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
-import { createOutputActions } from '../utils';
-import {
-  defineChangedBlocks,
-  defineCreatedBlocks,
-  defineDisplayedBlocks,
-  defineWidgets,
-} from './changes';
-import { defineLayouts } from './changes-layout';
 import { GlycolConfig, GlycolOpts } from './types';
 
 export default defineComponent({
@@ -27,33 +19,18 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['update:config', 'update:actions', 'back', 'next'],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
     const beerSetting = ref<Quantity>(tempQty(20));
     const glycolSetting = ref<Quantity>(tempQty(4));
 
     function done(): void {
-      const opts: GlycolOpts = {
+      const glycolOpts: GlycolOpts = {
         beerSetting: beerSetting.value,
         glycolSetting: glycolSetting.value,
       };
 
-      const createdBlocks = defineCreatedBlocks(props.config, opts);
-      const changedBlocks = defineChangedBlocks(props.config);
-      const layouts = defineLayouts(props.config);
-      const widgets = defineWidgets(props.config, layouts);
-      const displayedBlocks = defineDisplayedBlocks(props.config);
-
-      const updates: Partial<GlycolConfig> = {
-        createdBlocks,
-        changedBlocks,
-        layouts,
-        widgets,
-        displayedBlocks,
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('update:actions', createOutputActions());
+      emit('update:config', { ...props.config, glycolOpts });
       emit('next');
     }
 

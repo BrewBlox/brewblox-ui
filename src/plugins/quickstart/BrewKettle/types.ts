@@ -10,12 +10,13 @@ export interface BrewKettleBlockNames {
   kettleAct: string;
 }
 
+export interface BrewKettleOpts {
+  kp: Quantity;
+}
+
 export interface BrewKettleConfig extends QuickstartConfig {
   names: BrewKettleBlockNames;
   kettleChannel: IoChannelAddress;
   kettleSensor: string;
-}
-
-export interface BrewKettleOpts {
-  kp: Quantity;
+  kettleOpts: BrewKettleOpts;
 }

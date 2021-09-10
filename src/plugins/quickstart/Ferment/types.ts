@@ -17,18 +17,19 @@ export interface FermentBlockNames {
   heatPid: string;
 }
 
-export interface FermentConfig extends QuickstartConfig {
-  names: FermentBlockNames;
-  heatChannel: IoChannelAddress;
-  coolChannel: IoChannelAddress;
-  fridgeSensor: string;
-  beerSensor: string;
-}
-
 export type FermentMode = 'beer' | 'fridge';
 
 export interface FermentOpts {
   fridgeSetting: Quantity;
   beerSetting: Quantity;
   activeSetpoint: FermentMode;
+}
+
+export interface FermentConfig extends QuickstartConfig {
+  names: FermentBlockNames;
+  heatChannel: IoChannelAddress;
+  coolChannel: IoChannelAddress;
+  fridgeSensor: string;
+  beerSensor: string;
+  fermentOpts: FermentOpts;
 }

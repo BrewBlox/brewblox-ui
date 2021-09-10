@@ -133,10 +133,6 @@ export default defineComponent({
             Use the buttons above to discover new OneWire blocks or manually
             create a block.
           </p>
-          <p v-if="changedGpio.length">
-            The GPIO modules are shown below. You can create IO channels there
-            to add them to the dropdown menus.
-          </p>
           <p>We will also set some constraints on the heater and cooler:</p>
           <ul>
             <li>Minimum ON and OFF times to protect the compressor</li>
@@ -150,26 +146,6 @@ export default defineComponent({
         :service-id="config.serviceId"
         :names="[config.names.fridgeSensor, config.names.beerSensor]"
       />
-      <q-item>
-        <q-item-section>
-          <QuickstartChannelField
-            v-model="coolChannel"
-            :service-id="config.serviceId"
-            :changed-gpio="changedGpio"
-            :error="channelSame"
-            label="Cooler output"
-          />
-        </q-item-section>
-        <q-item-section>
-          <QuickstartChannelField
-            v-model="heatChannel"
-            :service-id="config.serviceId"
-            :changed-gpio="changedGpio"
-            :error="channelSame"
-            label="Heater output"
-          />
-        </q-item-section>
-      </q-item>
       <q-item>
         <q-item-section>
           <QuickstartSensorField
@@ -188,6 +164,28 @@ export default defineComponent({
           />
         </q-item-section>
       </q-item>
+      <q-item>
+        <q-item-section>
+          <QuickstartChannelField
+            v-model="coolChannel"
+            :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
+            :desc="`${config.prefix} cooler`"
+            label="Cooler output"
+          />
+        </q-item-section>
+        <q-item-section>
+          <QuickstartChannelField
+            v-model="heatChannel"
+            :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
+            :desc="`${config.prefix} heater`"
+            :error="channelSame"
+            label="Heater output"
+          />
+        </q-item-section>
+      </q-item>
       <CardWarning v-if="channelSame">
         <template #message>
           Multiple outputs are using the same IO Channel.
@@ -198,16 +196,6 @@ export default defineComponent({
           Multiple sensors are using the same block.
         </template>
       </CardWarning>
-    </q-card-section>
-
-    <q-card-section
-      v-for="change in changedGpio"
-      :key="`gpio-${change.blockId}`"
-    >
-      <div class="text-subtitle1">
-        GPIO Module {{ change.modulePosition }}: {{ change.blockId }}
-      </div>
-      <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
 
     <template #actions>

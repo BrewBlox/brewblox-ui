@@ -141,26 +141,6 @@ export default defineComponent({
       />
       <q-item>
         <q-item-section>
-          <QuickstartChannelField
-            v-model="coolChannel"
-            :service-id="config.serviceId"
-            :changed-gpio="changedGpio"
-            :error="channelSame"
-            label="Cooler output"
-          />
-        </q-item-section>
-        <q-item-section>
-          <QuickstartChannelField
-            v-model="heatChannel"
-            :service-id="config.serviceId"
-            :changed-gpio="changedGpio"
-            :error="channelSame"
-            label="Heater output"
-          />
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
           <QuickstartSensorField
             v-model="fridgeSensor"
             :service-id="config.serviceId"
@@ -169,21 +149,33 @@ export default defineComponent({
         </q-item-section>
         <q-item-section />
       </q-item>
+      <q-item>
+        <q-item-section>
+          <QuickstartChannelField
+            v-model="coolChannel"
+            :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
+            :desc="`${config.prefix} cooler`"
+            label="Cooler output"
+          />
+        </q-item-section>
+        <q-item-section>
+          <QuickstartChannelField
+            v-model="heatChannel"
+            :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
+            :desc="`${config.prefix} heater`"
+            :error="channelSame"
+            label="Heater output"
+          />
+        </q-item-section>
+      </q-item>
       <CardWarning v-if="channelSame">
         <template #message>
           Multiple outputs are using the same IO Channel.
         </template>
       </CardWarning>
-    </q-card-section>
-
-    <q-card-section
-      v-for="change in changedGpio"
-      :key="`gpio-${change.blockId}`"
-    >
-      <div class="text-subtitle1">
-        GPIO Module {{ change.modulePosition }}: {{ change.blockId }}
-      </div>
-      <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
 
     <template #actions>

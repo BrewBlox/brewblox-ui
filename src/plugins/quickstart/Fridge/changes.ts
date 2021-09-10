@@ -31,7 +31,7 @@ import {
   withoutPrefix,
   withPrefix,
 } from '../utils';
-import { FridgeConfig, FridgeOpts } from './types';
+import { FridgeConfig } from './types';
 
 export function defineChangedBlocks(config: FridgeConfig): Block[] {
   const channels = [config.heatChannel, config.coolChannel];
@@ -41,13 +41,10 @@ export function defineChangedBlocks(config: FridgeConfig): Block[] {
   ];
 }
 
-export function defineCreatedBlocks(
-  config: FridgeConfig,
-  opts: FridgeOpts,
-): Block[] {
+export function defineCreatedBlocks(config: FridgeConfig): Block[] {
   const groups = [0];
   const { serviceId, names } = config;
-  const { fridgeSetting } = opts;
+  const { fridgeSetting } = config.fridgeOpts;
 
   const blocks: [
     SetpointSensorPairBlock,
@@ -243,7 +240,6 @@ export function defineCreatedBlocks(
 
 export const defineWidgets = (
   config: FridgeConfig,
-  opts: FridgeOpts,
   layouts: BuilderLayout[],
 ): Widget[] => {
   const genericSettings = {

@@ -62,7 +62,7 @@ export default defineComponent({
       if (
         matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)
       ) {
-        return `Module ${block.data.modulePosition}`;
+        return `Position ${block.data.modulePosition}`;
       }
 
       if (isCompatible(block.type, [BlockType.DS2408, BlockType.DS2413])) {
@@ -123,7 +123,7 @@ export default defineComponent({
       <q-item class="text-weight-light">
         <q-item-section>
           <q-item-label class="text-subtitle1">
-            Configure discovered blocks
+            Discovered blocks
           </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto self-start">
@@ -149,7 +149,7 @@ export default defineComponent({
           </p>
           <p>
             If a device is not shown below, please ensure it is plugged in, and
-            click the Discover button.
+            click the <b>Discover</b> button.
           </p>
         </q-item-section>
       </q-item>

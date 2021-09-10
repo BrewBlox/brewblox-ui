@@ -35,7 +35,7 @@ import {
   makeFridgeCoolConfig,
   makeFridgeHeatConfig,
 } from '../utils';
-import { FermentConfig, FermentOpts } from './types';
+import { FermentConfig } from './types';
 
 export function defineChangedBlocks(config: FermentConfig): Block[] {
   return [
@@ -47,13 +47,10 @@ export function defineChangedBlocks(config: FermentConfig): Block[] {
   ];
 }
 
-export function defineCreatedBlocks(
-  config: FermentConfig,
-  opts: FermentOpts,
-): Block[] {
+export function defineCreatedBlocks(config: FermentConfig): Block[] {
   const groups = [0];
   const { serviceId, names } = config;
-  const { fridgeSetting, beerSetting, activeSetpoint } = opts;
+  const { fridgeSetting, beerSetting, activeSetpoint } = config.fermentOpts;
   const isBeer = activeSetpoint === 'beer';
   const activeSetpointId = isBeer ? names.beerSetpoint : names.fridgeSetpoint;
   const initialSetting = isBeer ? beerSetting : fridgeSetting;
@@ -280,7 +277,6 @@ export function defineCreatedBlocks(
 
 export const defineWidgets = (
   config: FermentConfig,
-  opts: FermentOpts,
   layouts: BuilderLayout[],
 ): Widget[] => {
   const genericSettings = {
@@ -290,7 +286,7 @@ export const defineWidgets = (
     order: 0,
   };
 
-  const { serviceId, names, prefix } = config;
+  const { serviceId, names, prefix, fermentOpts } = config;
   const tempUnit = systemStore.units.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
@@ -369,7 +365,7 @@ export const defineWidgets = (
     const beerModeId = nanoid();
     const fridgeModeId = nanoid();
     const activeMode =
-      opts.activeSetpoint === 'beer' ? beerModeId : fridgeModeId;
+      fermentOpts.activeSetpoint === 'beer' ? beerModeId : fridgeModeId;
 
     return {
       ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),

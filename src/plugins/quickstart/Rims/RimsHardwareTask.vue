@@ -12,14 +12,7 @@ import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
 import { GpioChange, IoChannelAddress, QuickstartAction } from '../types';
-import { createOutputActions, hasShared, resetGpioChanges } from '../utils';
-import {
-  defineChangedBlocks,
-  defineCreatedBlocks,
-  defineDisplayedBlocks,
-  defineWidgets,
-} from './changes';
-import { defineLayouts } from './changes-layout';
+import { hasShared, resetGpioChanges } from '../utils';
 import { RimsConfig } from './types';
 
 export default defineComponent({
@@ -34,7 +27,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['update:config', 'update:actions', 'back', 'next'],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
     const tubeChannel = ref<IoChannelAddress | null>(
       props.config.tubeChannel ?? null,
@@ -80,8 +73,9 @@ export default defineComponent({
         return;
       }
 
-      const localConfig: RimsConfig = {
+      const updatedConfig: RimsConfig = {
         ...props.config,
+        changedGpio,
         pumpChannel: pumpChannel.value!,
         tubeChannel: tubeChannel.value!,
         kettleSensor: kettleSensor.value!,
@@ -92,24 +86,7 @@ export default defineComponent({
         },
       };
 
-      const createdBlocks = defineCreatedBlocks(localConfig);
-      const changedBlocks = defineChangedBlocks(localConfig);
-      const layouts = defineLayouts(localConfig);
-      const widgets = defineWidgets(localConfig, layouts);
-      const displayedBlocks = defineDisplayedBlocks(localConfig);
-
-      const finalizedConfig: RimsConfig = {
-        ...localConfig,
-        changedGpio,
-        createdBlocks,
-        changedBlocks,
-        layouts,
-        widgets,
-        displayedBlocks,
-      };
-
-      emit('update:config', finalizedConfig);
-      emit('update:actions', createOutputActions());
+      emit('update:config', updatedConfig);
       emit('next');
     }
 
@@ -175,26 +152,6 @@ export default defineComponent({
       />
       <q-item>
         <q-item-section>
-          <QuickstartChannelField
-            v-model="pumpChannel"
-            :service-id="config.serviceId"
-            :changed-gpio="changedGpio"
-            :error="channelSame"
-            label="Pump"
-          />
-        </q-item-section>
-        <q-item-section>
-          <QuickstartChannelField
-            v-model="tubeChannel"
-            :service-id="config.serviceId"
-            :changed-gpio="changedGpio"
-            :error="channelSame"
-            label="Tube heater"
-          />
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section>
           <QuickstartSensorField
             v-model="kettleSensor"
             :service-id="config.serviceId"
@@ -211,6 +168,28 @@ export default defineComponent({
           />
         </q-item-section>
       </q-item>
+      <q-item>
+        <q-item-section>
+          <QuickstartChannelField
+            v-model="pumpChannel"
+            :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
+            :desc="`${config.prefix} pump`"
+            label="Pump"
+          />
+        </q-item-section>
+        <q-item-section>
+          <QuickstartChannelField
+            v-model="tubeChannel"
+            :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
+            :desc="`${config.prefix} tube`"
+            label="Tube heater"
+          />
+        </q-item-section>
+      </q-item>
       <CardWarning v-if="channelSame">
         <template #message>
           Multiple outputs are using the same IO Channel.
@@ -221,16 +200,6 @@ export default defineComponent({
           Multiple sensors are using the same block.
         </template>
       </CardWarning>
-    </q-card-section>
-
-    <q-card-section
-      v-for="change in changedGpio"
-      :key="`gpio-${change.blockId}`"
-    >
-      <div class="text-subtitle1">
-        GPIO Module {{ change.modulePosition }}: {{ change.blockId }}
-      </div>
-      <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
 
     <template #actions>

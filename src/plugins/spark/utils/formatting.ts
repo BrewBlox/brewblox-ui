@@ -86,7 +86,7 @@ export const enumHint = (e: Enum<any>): string =>
 
 export function channelName(block: Block, id: number): string | undefined {
   if (matchesType<DS2408Block>(BlockType.DS2408, block)) {
-    return ioChannelNames[block.data.connectMode][id];
+    return ioChannelNames[block.type][block.data.connectMode][id];
   }
   if (matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)) {
     return block.data.channels.find((c) => c.id === id)?.name;

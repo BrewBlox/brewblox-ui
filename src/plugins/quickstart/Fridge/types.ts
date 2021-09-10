@@ -15,13 +15,14 @@ export interface FridgeConfigNames {
   heatPid: string;
 }
 
+export interface FridgeOpts {
+  fridgeSetting: Quantity;
+}
+
 export interface FridgeConfig extends QuickstartConfig {
   names: FridgeConfigNames;
   heatChannel: IoChannelAddress;
   coolChannel: IoChannelAddress;
   fridgeSensor: string;
-}
-
-export interface FridgeOpts {
-  fridgeSetting: Quantity;
+  fridgeOpts: FridgeOpts;
 }

@@ -217,6 +217,7 @@ export default defineComponent({
             :service-id="config.serviceId"
             :changed-gpio="changedGpio"
             :error="channelSame"
+            :desc="`${config.prefix} cooler`"
             label="Glycol pump output"
           />
         </q-item-section>
@@ -227,6 +228,7 @@ export default defineComponent({
             :service-id="config.serviceId"
             :changed-gpio="changedGpio"
             :error="channelSame"
+            :desc="`${config.prefix} heater`"
             label="Heater output"
           />
         </q-item-section>
@@ -248,6 +250,7 @@ export default defineComponent({
             :service-id="config.serviceId"
             :changed-gpio="changedGpio"
             :error="channelSame"
+            :desc="`${config.prefix} glycol`"
             label="Glycol chiller output"
           />
         </q-item-section>
@@ -262,16 +265,6 @@ export default defineComponent({
           Multiple sensors are using the same block.
         </template>
       </CardWarning>
-    </q-card-section>
-
-    <q-card-section
-      v-for="change in changedGpio"
-      :key="`gpio-${change.blockId}`"
-    >
-      <div class="text-subtitle1">
-        GPIO Module {{ change.modulePosition }}: {{ change.blockId }}
-      </div>
-      <OneWireGpioEditor v-model:channels="change.channels" />
     </q-card-section>
 
     <template #actions>

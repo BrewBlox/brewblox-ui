@@ -5,11 +5,11 @@ import { cref } from '@/utils/component-ref';
 
 import RimsCompletionTask from './RimsCompletionTask.vue';
 import RimsHardwareTask from './RimsHardwareTask.vue';
+import RimsIoTask from './RimsIoTask.vue';
 import RimsNamingTask from './RimsNamingTask.vue';
 
 const plugin: Plugin = {
   install(app) {
-
     const feature: QuickstartFeature = {
       id: 'Rims',
       title: 'RIMS Brew-in-a-Bag',
@@ -18,6 +18,7 @@ const plugin: Plugin = {
         'QuickstartDiscoveryTask',
         cref(app, RimsNamingTask),
         cref(app, RimsHardwareTask),
+        cref(app, RimsIoTask),
         cref(app, RimsCompletionTask),
       ],
     };

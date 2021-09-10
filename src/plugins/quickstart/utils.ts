@@ -157,9 +157,18 @@ export async function executeActions(
       await func(config);
     }
     notify.done('Wizard done!');
-  } catch (e) {
+  } catch (e: any) {
     notify.error(`Failed to execute actions: ${e.message}`);
   }
+}
+
+export function channelsOverlap(
+  channels: (IoChannelAddress | null)[],
+): boolean {
+  const listed = channels
+    .filter(nullFilter)
+    .map((addr) => `${addr.blockId} ${addr.channelId}`);
+  return new Set(listed).size < listed.length;
 }
 
 export function hasShared(arr: any[]): boolean {
