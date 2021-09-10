@@ -25,30 +25,16 @@ export default defineComponent({
 
     const layouts = computed<BuilderLayout[]>({
       // avoid modifying the store object
-      get: () => [...builderStore.layouts]
-        .filter(layout => layout.listed ?? true)
-        .sort(makeObjectSorter('order')),
-      set: layouts => builderStore.updateLayoutOrder(layouts.map(v => v.id)),
+      get: () =>
+        [...builderStore.layouts]
+          .filter((layout) => layout.listed ?? true)
+          .sort(makeObjectSorter('order')),
+      set: (layouts) =>
+        builderStore.updateLayoutOrder(layouts.map((v) => v.id)),
     });
 
-    const navPrefix = computed<string>(
-      () => route.path.startsWith('/builder')
-        ? '/builder'
-        : '/brewery',
-    );
-
-    const editorButtonPath = computed<string>(
-      () => {
-        if (route.path.startsWith('/brewery')) {
-          return route.path.replace('/brewery', '/builder');
-        }
-        else if (route.path.startsWith('/builder')) {
-          return route.path.replace('/builder', '/brewery');
-        }
-        else {
-          return '/builder';
-        }
-      },
+    const navPrefix = computed<string>(() =>
+      route.path.startsWith('/builder') ? '/builder' : '/brewery',
     );
 
     async function createLayout(): Promise<void> {
@@ -63,7 +49,6 @@ export default defineComponent({
       dragging,
       layouts,
       navPrefix,
-      editorButtonPath,
       createLayout,
     };
   },
@@ -77,25 +62,7 @@ export default defineComponent({
         Builder layouts
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn
-          :to="editorButtonPath"
-          icon="mdi-tools"
-          size="sm"
-          :color="navPrefix === '/builder' ? 'primary' : ''"
-          flat
-          round
-        >
-          <q-tooltip>Toggle editor mode</q-tooltip>
-        </q-btn>
-      </q-item-section>
-      <q-item-section class="col-auto">
-        <q-btn
-          icon="add"
-          round
-          flat
-          size="sm"
-          @click="createLayout"
-        >
+        <q-btn icon="add" round flat size="sm" @click="createLayout">
           <q-tooltip>Add layout</q-tooltip>
         </q-btn>
       </q-item-section>
@@ -109,9 +76,7 @@ export default defineComponent({
           size="sm"
           @click="$emit('update:editing', !editing)"
         >
-          <q-tooltip>
-            Rearrange layouts
-          </q-tooltip>
+          <q-tooltip> Rearrange layouts </q-tooltip>
         </q-btn>
       </q-item-section>
     </q-item>
@@ -120,22 +85,17 @@ export default defineComponent({
       v-model="layouts"
       :disabled="dense || !editing"
       item-key="id"
-      @start="dragging=true"
-      @end="dragging=false"
+      @start="dragging = true"
+      @end="dragging = false"
     >
-      <template #item="{element}">
+      <template #item="{ element }">
         <q-item
           :to="editing ? undefined : `${navPrefix}/${element.id}`"
           :inset-level="0.2"
-          :class="[
-            'q-pb-sm',
-            editing && 'bordered pointer',
-          ]"
+          :class="['q-pb-sm', editing && 'bordered pointer']"
           style="min-height: 0px"
         >
-          <q-item-section
-            :class="['ellipsis', editing && 'text-italic']"
-          >
+          <q-item-section :class="['ellipsis', editing && 'text-italic']">
             {{ element.title }}
           </q-item-section>
         </q-item>
