@@ -28,19 +28,16 @@ export default defineComponent({
         <b>ESP BLE Provisioning</b> app. The app is available for both Android
         and iOS.
       </p>
-      <p>To clear previous Wifi credentials:</p>
+      <p>To set Wifi credentials:</p>
       <ul>
-        <li>
-          Press the <b style="color: cyan">RESET</b> button on your Spark.
-        </li>
+        <li>Press the <b>(R)ESET</b> button on your Spark.</li>
         <li>
           While the Spark restarts, press and hold the
-          <b style="color: lightgreen">OK</b> button for five seconds. <br>
-          Both buttons will be blinking blue.
+          <b>OK</b> button for five seconds. <br>
         </li>
-      </ul>
-      <p>To set new Wifi credentials:</p>
-      <ul>
+        <li>
+          The Spark is ready for provisioning if its buttons are blinking blue.
+        </li>
         <li>Download the <b>ESP BLE Provisioning</b> app.</li>
         <li>Enable Bluetooth in your phone settings.</li>
         <li>Open the app.</li>
