@@ -49,12 +49,8 @@ export default defineComponent({
         <li>Select your Wifi network, and enter your credentials.</li>
       </ul>
       <p>
-        The app will now set Wifi credentials for your Spark. You can ignore the
-        error shown when checking provisioned status.
-      </p>
-      <p>
-        If provisioning was successful, an additional IP address is shown in the
-        top left corner of the Spark display.
+        The app will now set Wifi credentials for your Spark. An additional IP
+        address will be shown in the top left corner of the Spark display.
       </p>
     </q-card-section>
     <template #actions>
