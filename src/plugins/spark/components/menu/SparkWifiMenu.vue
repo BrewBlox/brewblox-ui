@@ -29,7 +29,6 @@ export default defineComponent({
       () => {
         const module = sparkStore.moduleById(props.serviceId);
         const platform = module?.status?.devicePlatform;
-        console.log(platform);
         if (platform === 'p1' || platform === 'photon') {
           return 'particle';
         }
