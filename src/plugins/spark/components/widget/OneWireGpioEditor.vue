@@ -268,36 +268,36 @@ export default defineComponent({
     <!-- Unassigned -->
     <div
       v-if="unassigned.length > 0 || selectedId !== null"
-      :class="[
-        'container unassigned-area',
-        {
-          'target-clickable':
-            selectedChannel !== null && selectedChannel.pinsMask !== 0,
-        },
-      ]"
-      @click="clickUnassignedArea"
+      class="column unassigned-area"
     >
-      <div
-        v-if="unassigned.length === 0"
-        class="text-italic darkened"
-        style="grid-column-end: span 4"
-      >
-        Unassigned channels
+      <div class="col-auto text-italic darkened q-px-xs">
+        Not assigned to pins
       </div>
       <div
-        v-for="slot in unassigned"
-        :key="`unassigned-${slot.start}`"
         :class="[
-          'content ellipsis',
-          { 'target-clickable': selectedId === slot.id },
+          'container col-grow',
+          {
+            'target-clickable':
+              selectedChannel !== null && selectedChannel.pinsMask !== 0,
+          },
         ]"
-        :style="{
-          gridColumnEnd: `span ${slot.width}`,
-        }"
-        @click.stop="clickUnassigned(slot.id)"
+        @click="clickUnassignedArea"
       >
-        {{ slot.name }}
-        <q-tooltip>{{ slot.name }}</q-tooltip>
+        <div
+          v-for="slot in unassigned"
+          :key="`unassigned-${slot.start}`"
+          :class="[
+            'content ellipsis',
+            { 'target-clickable': selectedId === slot.id },
+          ]"
+          :style="{
+            gridColumnEnd: `span ${slot.width}`,
+          }"
+          @click.stop="clickUnassigned(slot.id)"
+        >
+          {{ slot.name }}
+          <q-tooltip>{{ slot.name }}</q-tooltip>
+        </div>
       </div>
     </div>
   </div>

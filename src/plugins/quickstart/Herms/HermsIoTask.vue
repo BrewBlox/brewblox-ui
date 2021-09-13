@@ -41,9 +41,12 @@ export default defineComponent({
       </q-item>
       <q-item class="text-weight-light">
         <q-item-section>
-          <p>
-            These are your selected output channels. If you are using Spark 4
-            GPIO channels, you can edit them here.
+          <p>These are your selected output channels.</p>
+          <p v-if="changedGpio.length">
+            To assign a GPIO channel to pins, click the channel, and then click
+            on the left-most pin you want to use. <br>
+            If you are not using an SSR for an actuator, click the
+            <b>Edit Channel</b> button to change the device type.
           </p>
           <LabeledField label="HLT output">
             <i>{{ config.hltChannel.blockId }}</i>

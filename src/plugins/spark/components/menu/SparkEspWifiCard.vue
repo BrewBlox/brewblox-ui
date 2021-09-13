@@ -35,7 +35,8 @@ export default defineComponent({
         </li>
         <li>
           While the Spark restarts, press and hold the
-          <b style="color: lightgreen">OK</b> button for five seconds.
+          <b style="color: lightgreen">OK</b> button for five seconds. <br>
+          Both buttons will be blinking blue.
         </li>
       </ul>
       <p>To set new Wifi credentials:</p>

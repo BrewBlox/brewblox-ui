@@ -105,7 +105,8 @@ export default defineComponent({
         ...props.changedGpio
           .filter((change) => change.channels.length < 8)
           .map((change) => ({
-            label: `[ADD CHANNEL] ${change.blockId}`,
+            label: `<span class="text-secondary">Add channel on ${change.blockId}</span>`,
+            html: true,
             value: {
               blockId: change.blockId,
               name: props.desc,
