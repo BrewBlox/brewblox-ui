@@ -158,7 +158,7 @@ export default defineComponent({
       try {
         // dagre typings for graphlib are outdated
         renderFunc(diagram, graph as any);
-      } catch (e) {
+      } catch (e: any) {
         // Workaround for a bug in FireFox where getScreenCTM()
         // returns null for hidden or 0x0 elements
         // https://github.com/dagrejs/dagre-d3/issues/340
@@ -192,7 +192,11 @@ export default defineComponent({
 
       // Enable zooming the graph
       const zoom = d3.zoom<SVGElement, unknown>().on('zoom', function () {
-        diagramRef.value?.setAttribute('transform', d3.event.transform);
+        const transform = d3.event.transform;
+        if (typeof transform === 'string' && transform.includes('NaN')) {
+          return; // invalid transformation
+        }
+        diagramRef.value?.setAttribute('transform', transform);
       });
 
       // Enable centering the graph

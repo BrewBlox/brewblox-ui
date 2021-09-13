@@ -1,6 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
+import { useContext } from '@/composables';
 import { GpioModuleChannel, OneWireGpioModuleBlock } from '@/shared-types';
 import { createDialogPromise } from '@/utils/dialog';
 
@@ -9,6 +10,7 @@ import { useBlockWidget } from '../../composables';
 export default defineComponent({
   name: 'OneWireGpioModuleWidget',
   setup() {
+    const { context } = useContext.setup();
     const { block, saveBlock } = useBlockWidget.setup<OneWireGpioModuleBlock>();
 
     const power = computed<boolean>({
@@ -41,6 +43,7 @@ export default defineComponent({
     });
 
     return {
+      context,
       block,
       power,
       channels,
@@ -64,24 +67,28 @@ export default defineComponent({
 
       <OneWireGpioEditor v-model:channels="channels" />
 
-      <div class="column q-gutter-sm">
-        <div>
-          All channels in a module use the same power source. This is either 5V,
-          or the external power supply.
+      <template v-if="context.mode === 'Full'">
+        <q-separator inset />
+
+        <div class="column q-gutter-sm">
+          <div>
+            All channels in a module use the same power source. This is either
+            5V, or the external power supply.
+          </div>
+          <div>
+            There are two ways to attach an external power source: connected to
+            the two right-most pins in any GPIO module, or using a Power over
+            Ethernet (PoE) adapter. <br>
+            Any external power supply is a valid source for all modules.
+          </div>
         </div>
-        <div>
-          There are two ways to attach an external power source: connected to
-          the two right-most pins in any GPIO module, or using a Power over
-          Ethernet (PoE) adapter. <br>
-          Any external power supply is a valid source for all modules.
-        </div>
-      </div>
-      <LabeledField label="Module power source">
-        <q-btn-group outline class="fit" @click="power = !power">
-          <q-btn outline label="5V" :color="power ? '' : 'primary'" />
-          <q-btn outline label="External" :color="power ? 'primary' : ''" />
-        </q-btn-group>
-      </LabeledField>
+        <LabeledField label="Module power source">
+          <q-btn-group outline class="fit" @click="power = !power">
+            <q-btn outline label="5V" :color="power ? '' : 'primary'" />
+            <q-btn outline label="External" :color="power ? 'primary' : ''" />
+          </q-btn-group>
+        </LabeledField>
+      </template>
     </div>
   </Card>
 </template>
