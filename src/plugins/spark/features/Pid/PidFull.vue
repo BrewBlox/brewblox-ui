@@ -2,7 +2,12 @@
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Block, PidBlock, Quantity, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import {
+  Block,
+  PidBlock,
+  Quantity,
+  SetpointSensorPairBlock,
+} from '@/plugins/spark/types';
 import { isBlockDriven, prettyBlock } from '@/plugins/spark/utils';
 import { createBlockDialog } from '@/utils/dialog';
 import { fixedNumber, prettyQty } from '@/utils/formatting';
@@ -16,24 +21,20 @@ interface GridOpts {
 export default defineComponent({
   name: 'PidFull',
   setup() {
-    const {
-      sparkModule,
-      serviceId,
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<PidBlock>();
+    const { sparkModule, serviceId, block, saveBlock } =
+      useBlockWidget.setup<PidBlock>();
 
-    const inputBlock = computed<SetpointSensorPairBlock | null>(
-      () => sparkModule.blockByLink(block.value.data.inputId),
+    const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
+      sparkModule.blockByLink(block.value.data.inputId),
     );
 
-    const inputDriven = computed<boolean>(
-      () => isBlockDriven(inputBlock.value),
+    const inputDriven = computed<boolean>(() =>
+      isBlockDriven(inputBlock.value),
     );
 
     const inputStoredSetting = computed<Quantity | null>({
       get: () => inputBlock.value?.data.storedSetting ?? null,
-      set: q => {
+      set: (q) => {
         if (inputBlock.value && q) {
           inputBlock.value.data.storedSetting = q;
           sparkModule.saveBlock(inputBlock.value);
@@ -41,30 +42,22 @@ export default defineComponent({
       },
     });
 
-    const outputBlock = computed<Block | null>(
-      () => sparkModule.blockByLink(block.value.data.outputId),
+    const outputBlock = computed<Block | null>(() =>
+      sparkModule.blockByLink(block.value.data.outputId),
     );
 
-    const baseOutput = computed<number>(
-      () => {
-        const { p, i, d } = block.value.data;
-        return p + i + d;
-      },
+    const baseOutput = computed<number>(() => {
+      const { p, i, d } = block.value.data;
+      return p + i + d;
+    });
+
+    const boiling = computed<boolean>(() => block.value.data.boilModeActive);
+
+    const boilAdjustment = computed<number>(() =>
+      boiling.value ? block.value.data.boilMinOutput - baseOutput.value : 0,
     );
 
-    const boiling = computed<boolean>(
-      () => block.value.data.boilModeActive,
-    );
-
-    const boilAdjustment = computed<number>(
-      () => boiling.value
-        ? block.value.data.boilMinOutput - baseOutput.value
-        : 0,
-    );
-
-    const waterBoilTemp = computed<Quantity>(
-      () => tempQty(100),
-    );
+    const waterBoilTemp = computed<Quantity>(() => tempQty(100));
 
     function showInput(): void {
       createBlockDialog(inputBlock.value);
@@ -120,20 +113,26 @@ export default defineComponent({
         message="
               <p>A PID block drives its output to regulate its input.</p>
               <p>
-                This input is a process value: something that has a target value and an actual value.
+                This input is a process value:
+                something that has a target value and an actual value.
                 In most cases, this will be a sensor and setpoint pair.
               </p>
               <p>The input target minus the input value is called the error</p>
               "
         class="col-grow"
-        @update:model-value="v => { block.data.inputId = v; saveBlock(); }"
+        @update:model-value="
+          (v) => {
+            block.data.inputId = v;
+            saveBlock();
+          }
+        "
       />
       <div class="col-grow">
         <QuantityField
           v-if="inputBlock !== null"
           v-model="inputStoredSetting"
           :readonly="inputDriven"
-          :class="[{darkened: !inputBlock.data.settingEnabled}, 'col']"
+          :class="[{ darkened: !inputBlock.data.settingEnabled }, 'col']"
           label="Setting"
           tag="b"
         />
@@ -161,13 +160,7 @@ export default defineComponent({
       >
         <q-tooltip>Edit {{ prettyBlock(inputBlock) }}</q-tooltip>
       </q-btn>
-      <q-btn
-        v-else
-        disable
-        flat
-        class="col-auto"
-        icon="mdi-cancel"
-      />
+      <q-btn v-else disable flat class="col-auto" icon="mdi-cancel" />
 
       <!-- Output row -->
       <div class="col-break" />
@@ -191,7 +184,12 @@ export default defineComponent({
               </p>
               "
         class="col-grow"
-        @update:model-value="v => { block.data.outputId = v; saveBlock(); }"
+        @update:model-value="
+          (v) => {
+            block.data.outputId = v;
+            saveBlock();
+          }
+        "
       />
       <LabeledField
         :model-value="block.data.outputSetting"
@@ -216,13 +214,7 @@ export default defineComponent({
       >
         <q-tooltip>Edit {{ prettyBlock(outputBlock) }}</q-tooltip>
       </q-btn>
-      <q-btn
-        v-else
-        disable
-        flat
-        icon="mdi-cancel"
-        class="col-auto"
-      />
+      <q-btn v-else disable flat icon="mdi-cancel" class="col-auto" />
     </div>
 
     <q-separator inset />
@@ -254,17 +246,22 @@ export default defineComponent({
               <p>Kp should be negative if the actuator brings down the input, like a cooler.</p>
               "
           borderless
-          @update:model-value="v => { block.data.kp = v; saveBlock(); }"
+          @update:model-value="
+            (v) => {
+              block.data.kp = v;
+              saveBlock();
+            }
+          "
         />
       </div>
 
-      <div :style="grid({start: 9})" class="self-center text-center">
+      <div :style="grid({ start: 9 })" class="self-center text-center">
         =
       </div>
 
       <div class="span-2">
         <LabeledField label="P">
-          {{ fixedNumber(block.data.p ) }}
+          {{ fixedNumber(block.data.p) }}
         </LabeledField>
       </div>
 
@@ -281,7 +278,12 @@ export default defineComponent({
       </div>
 
       <div class="span-2">
-        <QuantityField :model-value="block.data.kp" label="Kp" tag-class="darkish" readonly />
+        <QuantityField
+          :model-value="block.data.kp"
+          label="Kp"
+          tag-class="darkish"
+          readonly
+        />
       </div>
 
       <div class="span-1 self-center text-center">
@@ -292,8 +294,10 @@ export default defineComponent({
         <DurationField
           :model-value="block.data.ti"
           :rules="[
-            v => v >= 0 || 'Value must be positive',
-            v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
+            (v) => v >= 0 || 'Value must be positive',
+            (v) =>
+              v < 2 ** 16 * 1000 ||
+              'Value is too large to be stored in firmware',
           ]"
           :html="true"
           title="Integral time constant Ti"
@@ -304,18 +308,26 @@ export default defineComponent({
                 The integrator slowly builds up when the error is not zero.
               </p>
               <p>
-                When the proportional action (P) brings the input close to the target value but a small error remains,
+                When the proportional action (P) brings the input close
+                to the target value but a small error remains,
                 the integrator corrects it.
-                The integrator action (I) will increase by (P) every period of duration Ti.
+                The integrator action (I) will increase by (P)
+                every period of duration Ti.
               </p>
               <p>
-                The integrator should be slow enough to give the process time to respond to proportional action (P).
+                The integrator should be slow enough
+                to give the process time to respond to proportional action (P).
                 Overshoot due to too much integrator action is usually a sign of Kp being too low.
               </p>
               <p>Setting Ti to zero will disable the integrator.</p>
               "
           borderless
-          @update:model-value="v => { block.data.ti = v; saveBlock(); }"
+          @update:model-value="
+            (v) => {
+              block.data.ti = v;
+              saveBlock();
+            }
+          "
         />
       </div>
 
@@ -333,21 +345,30 @@ export default defineComponent({
           message="
               <p>
                 The integrator slowly builds up when the error is not zero.
-                If you don't want to wait for that, you can manually set the integral part of the output here.
+                If you don't want to wait for that,
+                you can manually set the integral part of the output here.
               </p>
               <p>
                 It will continue to adjust automatically afterwards.
               </p>
               "
           borderless
-          @update:model-value="v => { block.data.integralReset = v || 0.001; saveBlock(); }"
+          @update:model-value="
+            (v) => {
+              block.data.integralReset = v || 0.001;
+              saveBlock();
+            }
+          "
         />
       </div>
 
       <!-- Break -->
 
       <div class="span-2">
-        <LabeledField :tag-class="{darkish: block.data.td.value === 0}" label="Derivative">
+        <LabeledField
+          :tag-class="{ darkish: block.data.td.value === 0 }"
+          label="Derivative"
+        >
           {{ prettyQty(block.data.derivative) }}
         </LabeledField>
       </div>
@@ -357,7 +378,12 @@ export default defineComponent({
       </div>
 
       <div class="span-2">
-        <QuantityField :model-value="block.data.kp" label="Kp" tag-class="darkish" readonly />
+        <QuantityField
+          :model-value="block.data.kp"
+          label="Kp"
+          tag-class="darkish"
+          readonly
+        />
       </div>
 
       <div class="span-1 self-center text-center">
@@ -368,28 +394,36 @@ export default defineComponent({
         <DurationField
           :model-value="block.data.td"
           :rules="[
-            v => v >= 0 || 'Value must be positive',
-            v => v < (2**16*1000) || 'Value is too large to be stored in firmware',
+            (v) => v >= 0 || 'Value must be positive',
+            (v) =>
+              v < 2 ** 16 * 1000 ||
+              'Value is too large to be stored in firmware',
           ]"
           :html="true"
           title="Derivative time constant Td"
           label="Td"
           message="
               <p>
-              When the input is approaching its target fast,
-              the derivative action (D) can counteract the proportional action (P).
-              This slows down the approach to avoid overshoot.
+                When the input is approaching its target fast,
+                the derivative action (D) can counteract the proportional action (P).
+                This slows down the approach to avoid overshoot.
               </p>
               <p>
-              Td is the derivative time constant.
-              It should be equal to how long it takes for the process to stabilize after you turn off the actuator.
+                Td is the derivative time constant.
+                It should be equal to how long it takes for the process
+                to stabilize after you turn off the actuator.
               </p>
               <p>
-              When there is no overshoot in the system, Td should be set to zero.
+                When there is no overshoot in the system, Td should be set to zero.
               </p>
               "
           borderless
-          @update:model-value="v => { block.data.td = v; saveBlock(); }"
+          @update:model-value="
+            (v) => {
+              block.data.td = v;
+              saveBlock();
+            }
+          "
         />
       </div>
 
@@ -411,7 +445,7 @@ export default defineComponent({
       <div
         v-if="boiling"
         class="calc-line"
-        :style="grid({start: 10, span: 2})"
+        :style="grid({ start: 10, span: 2 })"
       >
         <LabeledField label="Boil mode">
           {{ fixedNumber(boilAdjustment) }}
@@ -423,7 +457,7 @@ export default defineComponent({
 
       <!-- Break -->
 
-      <div :style="grid({start: 10, span: 2})">
+      <div :style="grid({ start: 10, span: 2 })">
         <LabeledField label="Output">
           {{ fixedNumber(baseOutput + boilAdjustment) }}
         </LabeledField>
@@ -445,17 +479,28 @@ export default defineComponent({
         label="Minimum output when boiling"
         suffix="%"
         class="col-grow"
-        @update:model-value="v => { block.data.boilMinOutput = v; saveBlock(); }"
+        @update:model-value="
+          (v) => {
+            block.data.boilMinOutput = v;
+            saveBlock();
+          }
+        "
       />
       <QuantityField
         :model-value="block.data.boilPointAdjust"
         title="Boil point adjustment"
         label="Boil temperature setting"
         class="col-grow"
-        @update:model-value="v => { block.data.boilPointAdjust = v; saveBlock(); }"
+        @update:model-value="
+          (v) => {
+            block.data.boilPointAdjust = v;
+            saveBlock();
+          }
+        "
       >
         <template #value>
-          <span class="darkish">{{ fixedNumber(waterBoilTemp.value, 0) }}</span> +
+          <span class="darkish">{{ fixedNumber(waterBoilTemp.value, 0) }}</span>
+          +
           <b>{{ fixedNumber(block.data.boilPointAdjust.value) }}</b>
         </template>
       </QuantityField>

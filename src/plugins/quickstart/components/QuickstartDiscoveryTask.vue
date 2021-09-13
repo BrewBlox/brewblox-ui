@@ -8,13 +8,19 @@ import {
   BlockType,
   DS2408Block,
   DS2413Block,
+  OneWireGpioModuleBlock,
   TempSensorOneWireBlock,
 } from '@/plugins/spark/types';
-import { discoverBlocks, isCompatible, makeBlockIdRules } from '@/plugins/spark/utils';
+import {
+  discoverBlocks,
+  isCompatible,
+  makeBlockIdRules,
+} from '@/plugins/spark/utils';
 import { featureStore } from '@/store/features';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/formatting';
 import { makeObjectSorter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
 
 import { QuickstartConfig } from '../types';
 
@@ -26,38 +32,42 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'back',
-    'next',
-  ],
+  emits: ['back', 'next'],
   setup(props) {
-    const serviceId = computed<string>(
-      () => props.config.serviceId,
-    );
+    const serviceId = computed<string>(() => props.config.serviceId);
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(serviceId.value),
+    const sparkModule = computed<SparkServiceModule | null>(() =>
+      sparkStore.moduleById(serviceId.value),
     );
 
     const discoveredBlocks = computed<Block[]>(
-      () => sparkModule.value
-        ?.blocks
-        .filter(block => isCompatible(block.type, BlockIntfType.OneWireDeviceInterface))
-        .sort(makeObjectSorter('id'))
-        ?? [],
+      () =>
+        sparkModule.value?.blocks
+          .filter((block) =>
+            isCompatible(block.type, [
+              BlockIntfType.OneWireDeviceInterface,
+              BlockType.OneWireGpioModule,
+            ]),
+          )
+          .sort(makeObjectSorter('id')) ?? [],
     );
 
     function about(block: Block): string {
-      if (block.type === BlockType.TempSensorOneWire) {
-        const typed = block as TempSensorOneWireBlock;
-        return prettyQty(typed.data.value);
+      if (
+        matchesType<TempSensorOneWireBlock>(BlockType.TempSensorOneWire, block)
+      ) {
+        return prettyQty(block.data.value);
       }
 
-      if (isCompatible(block.type, BlockIntfType.IoArrayInterface)) {
+      if (
+        matchesType<OneWireGpioModuleBlock>(BlockType.OneWireGpioModule, block)
+      ) {
+        return `Position ${block.data.modulePosition}`;
+      }
+
+      if (isCompatible(block.type, [BlockType.DS2408, BlockType.DS2413])) {
         const typed = block as DS2408Block | DS2413Block;
-        return typed.data.connected
-          ? ''
-          : 'disconnected';
+        return typed.data.connected ? '' : 'disconnected';
       }
 
       return '';
@@ -88,10 +98,9 @@ export default defineComponent({
           clearable: false,
           modelValue: block.id,
         },
-      })
-        .onOk((newId: string) => {
-          sparkModule.value?.renameBlock([block.id, newId]);
-        });
+      }).onOk((newId: string) => {
+        sparkModule.value?.renameBlock([block.id, newId]);
+      });
     }
 
     onBeforeMount(() => discover());
@@ -114,7 +123,7 @@ export default defineComponent({
       <q-item class="text-weight-light">
         <q-item-section>
           <q-item-label class="text-subtitle1">
-            Configure discovered blocks
+            Discovered blocks
           </q-item-label>
         </q-item-section>
         <q-item-section class="col-auto self-start">
@@ -134,13 +143,13 @@ export default defineComponent({
             Here you can give your discovered blocks a meaningful name.
           </p>
           <p>
-            If you unplug a discovered device, it will be shown as disconnected. <br>
+            If you unplug a discovered device, it will be shown as disconnected.
+            <br>
             Use this to quickly identify its block.
           </p>
           <p>
-            If a device is not shown below,
-            please ensure it is plugged in,
-            and click the Discover button.
+            If a device is not shown below, please ensure it is plugged in, and
+            click the <b>Discover</b> button.
           </p>
         </q-item-section>
       </q-item>
@@ -168,9 +177,7 @@ export default defineComponent({
                 {{ about(block) }}
               </q-item-section>
             </q-item>
-            <q-tooltip>
-              Rename block
-            </q-tooltip>
+            <q-tooltip> Rename block </q-tooltip>
           </div>
           <q-btn
             flat
@@ -179,27 +186,16 @@ export default defineComponent({
             class="self-center"
             @click="show(block)"
           >
-            <q-tooltip>
-              Show block settings
-            </q-tooltip>
+            <q-tooltip> Show block settings </q-tooltip>
           </q-btn>
         </div>
       </div>
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
-      <q-btn
-        unelevated
-        label="Next"
-        color="primary"
-        @click="$emit('next')"
-      />
+      <q-btn unelevated label="Next" color="primary" @click="$emit('next')" />
     </template>
   </WizardBody>
 </template>

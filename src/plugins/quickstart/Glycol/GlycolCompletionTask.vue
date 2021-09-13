@@ -3,7 +3,14 @@ import { defineComponent, onMounted, PropType, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { QuickstartAction } from '../types';
-import { executeActions } from '../utils';
+import { createOutputActions, executeActions } from '../utils';
+import {
+  defineChangedBlocks,
+  defineCreatedBlocks,
+  defineDisplayedBlocks,
+  defineWidgets,
+} from './changes';
+import { defineLayouts } from './changes-layout';
 import { GlycolConfig } from './types';
 
 export default defineComponent({
@@ -22,10 +29,26 @@ export default defineComponent({
     const router = useRouter();
     const busy = ref(true);
 
-    onMounted(() =>
-      executeActions(props.actions, props.config)
-        .finally(() => busy.value = false),
-    );
+    async function execute(): Promise<void> {
+      const createdBlocks = defineCreatedBlocks(props.config);
+      const changedBlocks = defineChangedBlocks(props.config);
+      const layouts = defineLayouts(props.config);
+      const widgets = defineWidgets(props.config, layouts);
+      const displayedBlocks = defineDisplayedBlocks(props.config);
+
+      const finalizedConfig: GlycolConfig = {
+        ...props.config,
+        createdBlocks,
+        changedBlocks,
+        layouts,
+        widgets,
+        displayedBlocks,
+      };
+
+      await executeActions(createOutputActions(), finalizedConfig);
+    }
+
+    onMounted(() => execute().finally(() => (busy.value = false)));
 
     function done(): void {
       // Will cause dialog to autoclose
@@ -60,7 +83,10 @@ export default defineComponent({
             On your new dashboard, you will find:
             <ul>
               <li>An assistant widget to enable or disable temperature control.</li>
-              <li>A graphical representation of your setup. Parts are clickable for quick access to settings.</li>
+              <li>
+                A graphical representation of your setup.
+                Parts are clickable for quick access to settings.
+              </li>
               <li>A graph with the most important metrics.</li>
               <li>A temperature profile that can slowly change a setpoint over time.</li>
             </ul>

@@ -10,12 +10,17 @@ import { notify } from '@/utils/notify';
 import { BrewbloxDatabase, EventHandler } from './types';
 
 const isStoreEvent = (data: unknown): data is DatastoreEvent =>
-  isObjectLike(data)
-  && ('changed' in (data as any) || 'deleted' in (data as any));
+  isObjectLike(data) &&
+  ('changed' in (data as any) || 'deleted' in (data as any));
 
-function intercept(message: string, namespace: string): ((e: AxiosError) => never) {
+function intercept(
+  message: string,
+  namespace: string,
+): (e: AxiosError) => never {
   return (e: AxiosError) => {
-    notify.error(`DB error in ${message}(${namespace}): ${parseHttpError(e)}`, { shown: false });
+    notify.error(`DB error in ${message}(${namespace}): ${parseHttpError(e)}`, {
+      shown: false,
+    });
     throw e;
   };
 }
@@ -26,9 +31,8 @@ async function retryDatastore(): Promise<void> {
       await http.get('/history/datastore/ping', { timeout: 2000 });
       notify.done('Datastore connected');
       break;
-    }
-    catch (e) {
-      await new Promise<void>(resolve => setTimeout(resolve, 2000));
+    } catch (e) {
+      await new Promise<void>((resolve) => setTimeout(resolve, 2000));
     }
   }
 }
@@ -36,9 +40,10 @@ async function retryDatastore(): Promise<void> {
 async function checkDatastore(): Promise<void> {
   try {
     await http.get('/history/datastore/ping', { timeout: 2000 });
-  }
-  catch (e) {
-    notify.error(`Datastore error: ${parseHttpError(e, true)}`, { shown: false });
+  } catch (e) {
+    notify.error(`Datastore error: ${parseHttpError(e, true)}`, {
+      shown: false,
+    });
     await retryDatastore();
   }
 }
@@ -68,12 +73,11 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
   }
 
   private onChanged(changed: StoreObject[]): void {
-    changed.forEach(obj =>
-      this.handlers[obj.namespace!]?.onChanged(obj));
+    changed.forEach((obj) => this.handlers[obj.namespace!]?.onChanged(obj));
   }
 
   private onDeleted(deleted: string[]): void {
-    deleted.forEach(key => {
+    deleted.forEach((key) => {
       // The event uses the fully qualified ID
       // Separate the namespace from the ID here
       const idx = key.lastIndexOf(':');
@@ -95,27 +99,35 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
     this.subscribeChanged(namespace);
   }
 
-  public async fetchAll<T extends StoreObject>(namespace: string): Promise<T[]> {
+  public async fetchAll<T extends StoreObject>(
+    namespace: string,
+  ): Promise<T[]> {
     return http
       .post<{ values: T[] }>('/history/datastore/mget', {
         namespace,
         filter: '*',
       })
-      .then(resp => resp.data.values)
+      .then((resp) => resp.data.values)
       .catch(intercept('Fetch all objects', namespace));
   }
 
-  public async fetchById<T extends StoreObject>(namespace: string, objId: string): Promise<T | null> {
+  public async fetchById<T extends StoreObject>(
+    namespace: string,
+    objId: string,
+  ): Promise<T | null> {
     return http
       .post<{ value: T | null }>('/history/datastore/get', {
         namespace,
         id: objId,
       })
-      .then(resp => resp.data.value)
+      .then((resp) => resp.data.value)
       .catch(intercept(`Fetch '${objId}'`, namespace));
   }
 
-  public async persist<T extends StoreObject>(namespace: string, obj: T): Promise<T> {
+  public async persist<T extends StoreObject>(
+    namespace: string,
+    obj: T,
+  ): Promise<T> {
     return http
       .post<{ value: T }>('/history/datastore/set', {
         value: {
@@ -123,13 +135,16 @@ export class BrewbloxRedisDatabase implements BrewbloxDatabase {
           namespace,
         },
       })
-      .then(resp => resp.data.value)
+      .then((resp) => resp.data.value)
       .catch(intercept(`Persist '${obj.id}'`, namespace));
   }
 
   public create = this.persist;
 
-  public async remove<T extends StoreObject>(namespace: string, obj: T): Promise<T> {
+  public async remove<T extends StoreObject>(
+    namespace: string,
+    obj: T,
+  ): Promise<T> {
     await http
       .post('/history/datastore/delete', {
         namespace,

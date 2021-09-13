@@ -21,50 +21,47 @@ export default defineComponent({
     const { inDialog } = useContext.setup();
     const { block, serviceId } = useBlockWidget.setup<SysInfoBlock>();
 
-    const service = computed<SparkService | null>(
-      () => serviceStore.serviceById(serviceId),
+    const service = computed<SparkService | null>(() =>
+      serviceStore.serviceById(serviceId),
     );
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(serviceId),
+    const sparkModule = computed<SparkServiceModule | null>(() =>
+      sparkStore.moduleById(serviceId),
     );
 
-    const lastBlocks = computed<string>(
-      () => shortDateString(sparkModule.value?.lastBlocks, 'Unknown'),
+    const lastBlocks = computed<string>(() =>
+      shortDateString(sparkModule.value?.lastBlocks, 'Unknown'),
     );
 
-    const sysInfo = computed<SysInfoBlock>(
-      () => block.value,
+    const sysInfo = computed<SysInfoBlock>(() => block.value);
+
+    const ticks = computed<TicksBlock | undefined>(() =>
+      getTicksBlock(serviceId),
     );
 
-    const ticks = computed<TicksBlock | undefined>(
-      () => getTicksBlock(serviceId),
+    const wifi = computed<WiFiSettingsBlock | undefined>(() =>
+      getWiFiSettingsBlock(serviceId),
     );
 
-    const wifi = computed<WiFiSettingsBlock | undefined>(
-      () => getWiFiSettingsBlock(serviceId),
+    const uptime = computed<string>(() =>
+      durationString(ticks.value?.data.millisSinceBoot),
     );
 
-    const uptime = computed<string>(
-      () => durationString(ticks.value?.data.millisSinceBoot),
-    );
-
-    const sysDate = computed<string>(
-      () => ticks.value
+    const sysDate = computed<string>(() =>
+      ticks.value
         ? new Date(ticks.value.data.secondsSinceEpoch * 1000).toLocaleString()
         : 'Unknown',
     );
 
-    const ipAddress = computed<string>(
-      () => wifi.value
-        ? wifi.value.data.ip
-        : '0.0.0.0',
+    const ipAddress = computed<string>(() =>
+      wifi.value ? wifi.value.data.ip : '0.0.0.0',
     );
 
     const ready = computed<boolean>(
-      () => service.value !== null
-        && sparkModule.value !== null
-        && sparkModule.value.lastBlocks !== null,
+      () =>
+        service.value !== null &&
+        sparkModule.value !== null &&
+        sparkModule.value.lastBlocks !== null,
     );
 
     return {
@@ -90,7 +87,10 @@ export default defineComponent({
     <div>
       <div class="widget-body row">
         <LabeledField label="Firmware version" class="col-lg-5 col-11">
-          {{ sysInfo.data.version.substring(0, 8) /* We only use first 8 characters of version hash */ }}
+          {{
+            /* We only use first 8 characters of version hash */
+            sysInfo.data.version.substring(0, 8)
+          }}
         </LabeledField>
         <LabeledField label="Firmware release date" class="col-lg-5 col-11">
           {{ sysInfo.data.releaseDate }}
@@ -104,7 +104,11 @@ export default defineComponent({
         <LabeledField label="Service ID" class="col-lg-5 col-11">
           {{ serviceId }}
         </LabeledField>
-        <LabeledField label="Controller ID" class="col-lg-5 col-11" tag-style="word-wrap: break-word;">
+        <LabeledField
+          label="Controller ID"
+          class="col-lg-5 col-11"
+          tag-style="word-wrap: break-word;"
+        >
           {{ sysInfo.data.deviceId }}
         </LabeledField>
         <LabeledField label="IP address" class="col-lg-5 col-11">

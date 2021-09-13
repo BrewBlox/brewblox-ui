@@ -1,6 +1,6 @@
 import { Quantity } from '@/shared-types';
 
-import { PinChannel, QuickstartConfig } from '../types';
+import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export interface FridgeConfigNames {
   fridgeSensor: string;
@@ -15,13 +15,14 @@ export interface FridgeConfigNames {
   heatPid: string;
 }
 
-export interface FridgeConfig extends QuickstartConfig {
-  names: FridgeConfigNames;
-  heatPin: PinChannel;
-  coolPin: PinChannel;
-  fridgeSensor: string;
-}
-
 export interface FridgeOpts {
   fridgeSetting: Quantity;
+}
+
+export interface FridgeConfig extends QuickstartConfig {
+  names: FridgeConfigNames;
+  heatChannel: IoChannelAddress;
+  coolChannel: IoChannelAddress;
+  fridgeSensor: string;
+  fridgeOpts: FridgeOpts;
 }

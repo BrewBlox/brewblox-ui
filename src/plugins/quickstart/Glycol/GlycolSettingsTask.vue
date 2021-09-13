@@ -5,9 +5,6 @@ import { Quantity } from '@/shared-types';
 import { tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
-import { createOutputActions } from '../utils';
-import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
-import { defineLayouts } from './changes-layout';
 import { GlycolConfig, GlycolOpts } from './types';
 
 export default defineComponent({
@@ -22,38 +19,18 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'update:actions',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
     const beerSetting = ref<Quantity>(tempQty(20));
     const glycolSetting = ref<Quantity>(tempQty(4));
 
     function done(): void {
-      const opts: GlycolOpts = {
+      const glycolOpts: GlycolOpts = {
         beerSetting: beerSetting.value,
         glycolSetting: glycolSetting.value,
       };
 
-      const createdBlocks = defineCreatedBlocks(props.config, opts);
-      const changedBlocks = defineChangedBlocks(props.config);
-      const layouts = defineLayouts(props.config);
-      const widgets = defineWidgets(props.config, layouts);
-      const displayedBlocks = defineDisplayedBlocks(props.config);
-
-      const updates: Partial<GlycolConfig> = {
-        createdBlocks,
-        changedBlocks,
-        layouts,
-        widgets,
-        displayedBlocks,
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('update:actions', createOutputActions());
+      emit('update:config', { ...props.config, glycolOpts });
       emit('next');
     }
 
@@ -75,7 +52,8 @@ export default defineComponent({
             Initial setpoints
           </q-item-label>
           <p v-if="config.glycolControl === 'Control'">
-            The setup creates a setpoint for your beer temperature and your glycol temperature.
+            The setup creates a setpoint for your beer temperature and your
+            glycol temperature.
           </p>
           <p v-else>
             The setup creates a setpoint for your beer temperature.
@@ -93,7 +71,7 @@ export default defineComponent({
         </q-item-section>
         <q-item-section>
           <QuantityField
-            v-if="config.glycolControl==='Control'"
+            v-if="config.glycolControl === 'Control'"
             v-model="glycolSetting"
             title="Glycol setting"
             label="Glycol setpoint"
@@ -103,18 +81,9 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
-      <q-btn
-        unelevated
-        label="Done"
-        color="primary"
-        @click="done"
-      />
+      <q-btn unelevated label="Done" color="primary" @click="done" />
     </template>
   </WizardBody>
 </template>

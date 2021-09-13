@@ -2,7 +2,12 @@ import { Plugin } from 'vue';
 
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockSpec, BlockType, DS2408Block, DS2408ConnectMode } from '@/plugins/spark/types';
+import {
+  BlockSpec,
+  BlockType,
+  DS2408Block,
+  DS2408ConnectMode,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 
@@ -12,13 +17,13 @@ const type = BlockType.DS2408;
 
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<DS2408Block> = {
       type,
       generate: () => ({
+        oneWireBusId: 0,
         address: '',
         connected: false,
-        pins: [],
+        channels: [],
         connectMode: DS2408ConnectMode.CONNECT_VALVE,
       }),
     };

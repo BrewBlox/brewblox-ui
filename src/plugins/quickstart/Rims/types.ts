@@ -1,4 +1,4 @@
-import { PinChannel, QuickstartConfig } from '../types';
+import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export interface RimsBlockNames {
   kettleSensor: string;
@@ -17,8 +17,8 @@ export interface RimsBlockNames {
 
 export interface RimsConfig extends QuickstartConfig {
   names: RimsBlockNames;
-  tubePin: PinChannel;
-  pumpPin: PinChannel;
+  tubeChannel: IoChannelAddress;
+  pumpChannel: IoChannelAddress;
   kettleSensor: string;
   tubeSensor: string;
 }

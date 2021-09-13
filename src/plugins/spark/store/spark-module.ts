@@ -16,14 +16,14 @@ import type {
   SparkSessionConfig,
   SparkStatus,
 } from '@/plugins/spark/types';
-import { isBlockVolatile, isSparkPatch, isSparkState } from '@/plugins/spark/utils';
+import {
+  isBlockVolatile,
+  isSparkPatch,
+  isSparkState,
+} from '@/plugins/spark/utils';
 import { serviceStore } from '@/store/services';
 import { widgetStore } from '@/store/widgets';
-import {
-  concatById,
-  filterById,
-  findById,
-} from '@/utils/collections';
+import { concatById, filterById, findById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
@@ -57,7 +57,7 @@ export class SparkServiceModule extends VuexModule {
   public status: SparkStatus | null = null;
   public lastBlocks: Date | null = null;
   public lastStatus: Date | null = null;
-  public sessionConfig: SparkSessionConfig = defaultSessionConfig()
+  public sessionConfig: SparkSessionConfig = defaultSessionConfig();
 
   public constructor(serviceId: string, options: RegisterOptions) {
     super(options);
@@ -66,7 +66,7 @@ export class SparkServiceModule extends VuexModule {
   }
 
   public get blockIds(): string[] {
-    return this.blocks.map(v => v.id);
+    return this.blocks.map((v) => v.id);
   }
 
   public get drivenChains(): string[][] {
@@ -74,7 +74,7 @@ export class SparkServiceModule extends VuexModule {
   }
 
   public get drivenBlocks(): string[] {
-    return this.drivenChains.map(c => c[0]);
+    return this.drivenChains.map((c) => c[0]);
   }
 
   public get relations(): RelationEdge[] {
@@ -102,12 +102,9 @@ export class SparkServiceModule extends VuexModule {
 
   @Mutation
   public patchBlocks({ changed, deleted }: SparkPatchEvent['data']): void {
-    const affected = [
-      ...changed.map(block => block.id),
-      ...deleted,
-    ];
+    const affected = [...changed.map((block) => block.id), ...deleted];
     this.blocks = [
-      ...this.blocks.filter(v => !affected.includes(v.id)),
+      ...this.blocks.filter((v) => !affected.includes(v.id)),
       ...changed,
     ];
   }
@@ -124,40 +121,76 @@ export class SparkServiceModule extends VuexModule {
     this.lastBlocks = null;
   }
 
-  private findById<T extends Block>(blocks: Block[], id: Maybe<string>): T | null {
+  private findById<T extends Block>(
+    blocks: Block[],
+    id: Maybe<string>,
+  ): T | null {
     return findById(blocks, id) as T | null;
   }
 
-  private findByAddress<T extends Block>(blocks: Block[], addr: T | Maybe<BlockAddress>): T | null {
-    if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) { return null; }
-    return blocks.find(v => v.id === addr.id && (!addr.type || addr.type === v.type)) as T ?? null;
+  private findByAddress<T extends Block>(
+    blocks: Block[],
+    addr: T | Maybe<BlockAddress>,
+  ): T | null {
+    if (!addr || !addr.id || (addr.serviceId && addr.serviceId !== this.id)) {
+      return null;
+    }
+    return (
+      (blocks.find(
+        (v) => v.id === addr.id && (!addr.type || addr.type === v.type),
+      ) as T) ?? null
+    );
   }
 
-  private findByLink<T extends Block>(blocks: Block[], link: Maybe<Link>): T | null {
-    if (!link || !link.id) { return null; }
+  private findByLink<T extends Block>(
+    blocks: Block[],
+    link: Maybe<Link>,
+  ): T | null {
+    if (!link || !link.id) {
+      return null;
+    }
     return this.findById<T>(blocks, link.id);
   }
 
-  private findFieldByAddress(blocks: Block[], addr: Maybe<BlockFieldAddress>): any | null {
+  private findFieldByAddress(
+    blocks: Block[],
+    addr: Maybe<BlockFieldAddress>,
+  ): any | null {
     const block = this.findByAddress(blocks, addr);
-    if (!block || !addr?.field) { return null; }
+    if (!block || !addr?.field) {
+      return null;
+    }
     return block.data[addr.field] ?? null;
   }
 
   public blockById<T extends Block>(blockId: Maybe<string>): T | null {
-    return this.findById<T>(this.blocks, blockId) ?? this.findById<T>(this.volatileBlocks, blockId);
+    return (
+      this.findById<T>(this.blocks, blockId) ??
+      this.findById<T>(this.volatileBlocks, blockId)
+    );
   }
 
-  public blockByAddress<T extends Block>(addr: T | Maybe<BlockAddress>): T | null {
-    return this.findByAddress<T>(this.blocks, addr) ?? this.findByAddress<T>(this.volatileBlocks, addr);
+  public blockByAddress<T extends Block>(
+    addr: T | Maybe<BlockAddress>,
+  ): T | null {
+    return (
+      this.findByAddress<T>(this.blocks, addr) ??
+      this.findByAddress<T>(this.volatileBlocks, addr)
+    );
   }
 
   public blockByLink<T extends Block>(link: Maybe<Link>): T | null {
-    return this.findByLink<T>(this.blocks, link) ?? this.findByLink<T>(this.volatileBlocks, link);
+    return (
+      this.findByLink<T>(this.blocks, link) ??
+      this.findByLink<T>(this.volatileBlocks, link)
+    );
   }
 
   public fieldByAddress(addr: Maybe<BlockFieldAddress>): any {
-    return this.findFieldByAddress(this.blocks, addr) ?? this.findFieldByAddress(this.volatileBlocks, addr);
+    return (
+      this.findFieldByAddress(this.blocks, addr) ??
+      this.findFieldByAddress(this.volatileBlocks, addr)
+    );
   }
 
   public blocksByType<T extends Block>(type: T['type']): T[] {
@@ -198,13 +231,15 @@ export class SparkServiceModule extends VuexModule {
   public async saveBlock(block: Block): Promise<void> {
     if (isBlockVolatile(block)) {
       this.volatileBlocks = concatById(this.volatileBlocks, deepCopy(block));
-    }
-    else {
+    } else {
       await api.persistBlock(block); // triggers patch event
     }
   }
 
-  public async modifyBlock<T extends Block>(block: T, func: ((v: T) => void)): Promise<void> {
+  public async modifyBlock<T extends Block>(
+    block: T,
+    func: (v: T) => void,
+  ): Promise<void> {
     const actual = deepCopy(this.blockByAddress<T>(block));
     if (actual) {
       func(actual);
@@ -216,8 +251,7 @@ export class SparkServiceModule extends VuexModule {
   public async removeBlock(block: Block): Promise<void> {
     if (isBlockVolatile(block)) {
       this.volatileBlocks = filterById(this.volatileBlocks, block);
-    }
-    else {
+    } else {
       await api.deleteBlock(block); // triggers patch event
     }
   }
@@ -228,7 +262,10 @@ export class SparkServiceModule extends VuexModule {
   }
 
   @Action
-  public async renameBlock([currentId, newId]: [string, string]): Promise<void> {
+  public async renameBlock([currentId, newId]: [
+    string,
+    string,
+  ]): Promise<void> {
     if (this.blockById(newId)) {
       throw new Error(`Block ${newId} already exists`);
     }
@@ -245,8 +282,11 @@ export class SparkServiceModule extends VuexModule {
     await api.renameBlock(this.id, currentId, newId);
     await this.fetchBlocks();
     widgetStore.widgets
-      .filter(({ config }) => config.serviceId === this.id && config.blockId === currentId)
-      .forEach(widget => {
+      .filter(
+        ({ config }) =>
+          config.serviceId === this.id && config.blockId === currentId,
+      )
+      .forEach((widget) => {
         widget.config.blockId = newId;
         widget.title = newId;
         widgetStore.saveWidget(widget);
@@ -266,7 +306,9 @@ export class SparkServiceModule extends VuexModule {
 
   @Action
   public async fetchDiscoveredBlocks(): Promise<string[]> {
-    const discovered = (await api.fetchDiscoveredBlocks(this.id)).map(v => v.id);
+    const discovered = (await api.fetchDiscoveredBlocks(this.id)).map(
+      (v) => v.id,
+    );
     this.discoveredBlocks = [...this.discoveredBlocks, ...discovered];
     return discovered;
   }
@@ -287,10 +329,7 @@ export class SparkServiceModule extends VuexModule {
     this.updateStatus(status);
     serviceStore.updateStatus(asServiceStatus(status));
     if (status.isSynchronized) {
-      await Promise.all([
-        this.fetchDiscoveredBlocks(),
-        this.fetchBlocks(),
-      ]);
+      await Promise.all([this.fetchDiscoveredBlocks(), this.fetchBlocks()]);
     }
     return !!status.isSynchronized;
   }
@@ -329,19 +368,22 @@ export class SparkServiceModule extends VuexModule {
       this.sessionConfig = rawConfig
         ? JSON.parse(rawConfig)
         : defaultSessionConfig();
-    }
-    catch (e) {
+    } catch (e) {
       this.sessionConfig = defaultSessionConfig();
     }
   }
 
   @Action
-  public async updateSessionConfig(updates: Partial<SparkSessionConfig>): Promise<void> {
+  public async updateSessionConfig(
+    updates: Partial<SparkSessionConfig>,
+  ): Promise<void> {
     this.sessionConfig = { ...this.sessionConfig, ...updates };
     try {
-      sessionStorage.setItem(this.storageKey, JSON.stringify(this.sessionConfig));
-    }
-    catch (e) {
+      sessionStorage.setItem(
+        this.storageKey,
+        JSON.stringify(this.sessionConfig),
+      );
+    } catch (e) {
       // ignore
     }
   }
@@ -359,7 +401,8 @@ export class SparkServiceModule extends VuexModule {
           this.updateStatus(status);
           serviceStore.updateStatus(asServiceStatus(status));
         }
-      });
+      },
+    );
     this.patchListenerId = eventbus.addListener(
       `${STATE_TOPIC}/${this.id}/patch`,
       (_, evt) => {
@@ -368,9 +411,10 @@ export class SparkServiceModule extends VuexModule {
           const { deleted } = evt.data;
           this.patchBlocks({ changed, deleted });
         }
-      });
+      },
+    );
 
-    await this.fetchAll().catch(() => { });
+    await this.fetchAll().catch(() => {});
     await this.loadSessionConfig();
   }
 

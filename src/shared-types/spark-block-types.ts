@@ -2,12 +2,14 @@ import type {
   AnalogCompareOp,
   BlockOrIntfType,
   BlockType,
-  ChannelConfig,
   DigitalCompareOp,
   DigitalState,
   DisplayTempUnit,
   DS2408ConnectMode,
   FilterChoice,
+  GpioDeviceType,
+  GpioModuleStatus,
+  GpioPins,
   LogicResult,
   ReferenceKind,
   SensorCombiFunc,
@@ -60,16 +62,17 @@ export interface DefinedLink extends Link {
   type: BlockOrIntfType;
 }
 
-// #region IoPin
+// #region IoChannel
 export interface IoChannel {
-  config: ChannelConfig;
-  state: DigitalState;
+  id: number;
 }
 
-export interface IoPin {
-  [pinId: string]: IoChannel;
+export interface IoArrayBlock extends Block {
+  data: {
+    channels: IoChannel[];
+  };
 }
-// #endregion IoPin
+// #endregion IoChannel
 
 // #region Constraints
 export interface MinConstraint {
@@ -124,14 +127,14 @@ export interface DelayedOffConstraint {
 export type AnalogConstraint =
   | MinConstraint
   | MaxConstraint
-  | BalancedConstraint
+  | BalancedConstraint;
 
 export type DigitalConstraint =
   | MutexedConstraint
   | MinOnConstraint
   | MinOffConstraint
   | DelayedOnConstraint
-  | DelayedOffConstraint
+  | DelayedOffConstraint;
 
 export interface AnalogConstraintsObj {
   constraints: AnalogConstraint[];
@@ -143,9 +146,7 @@ export interface DigitalConstraintsObj {
 // #endregion Constraints
 
 // #region AnyConstraint
-export type AnyConstraint =
-  | AnalogConstraint
-  | DigitalConstraint
+export type AnyConstraint = AnalogConstraint | DigitalConstraint;
 
 export interface AnyConstraintsObj {
   constraints: AnyConstraint[];
@@ -296,6 +297,7 @@ export interface DisplaySettingsBlock extends Block {
     tempUnit: DisplayTempUnit;
     widgets: DisplaySlot[];
     brightness: number;
+    timeZone: string;
   };
 }
 // #endregion DisplaySettings
@@ -305,9 +307,10 @@ export interface DS2408Block extends Block {
   type: 'DS2408';
   data: {
     address: string;
-    pins: Readonly<IoPin[]>;
-    connected: Readonly<boolean>;
+    channels: Readonly<IoChannel[]>;
     connectMode: DS2408ConnectMode;
+    connected: Readonly<boolean>;
+    oneWireBusId: Readonly<number>;
   };
 }
 // #endregion DS2408
@@ -317,8 +320,9 @@ export interface DS2413Block extends Block {
   type: 'DS2413';
   data: {
     address: string;
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
     connected: Readonly<boolean>;
+    oneWireBusId: Readonly<number>;
   };
 }
 // #endregion DS2413
@@ -345,7 +349,7 @@ export interface GroupsBlock extends Block {
 export interface MockPinsBlock extends Block {
   type: 'MockPins';
   data: {
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
   };
 }
 // #endregion MockPins
@@ -390,6 +394,38 @@ export interface OneWireBusBlock extends Block {
   };
 }
 // #endregion OneWireBus
+
+// #region OneWireGpioModule
+export interface GpioModuleChannel extends IoChannel {
+  id: number;
+  name: string;
+  deviceType: GpioDeviceType;
+  pinsMask: GpioPins;
+  width: number;
+}
+
+export interface OneWireGpioModuleBlock extends Block {
+  type: 'OneWireGpioModule';
+  data: {
+    channels: GpioModuleChannel[];
+    modulePosition: number;
+    moduleStatus: GpioModuleStatus;
+    moduleStatusClear: GpioPins; // write-only
+    useExternalPower: boolean;
+
+    pullUpDesired: Readonly<GpioPins>;
+    pullUpStatus: Readonly<GpioPins>;
+    pullUpWhenActive: Readonly<GpioPins>;
+    pullUpWhenInactive: Readonly<GpioPins>;
+    pullDownDesired: Readonly<GpioPins>;
+    pullDownStatus: Readonly<GpioPins>;
+    pullDownWhenActive: Readonly<GpioPins>;
+    pullDownWhenInactive: Readonly<GpioPins>;
+    overCurrent: Readonly<GpioPins>;
+    openLoad: Readonly<GpioPins>;
+  };
+}
+// #endregion OneWireGpioModule
 
 // #region Pid
 export interface PidBlock extends Block {
@@ -470,7 +506,7 @@ export interface Spark2PinsBlock extends Block {
   type: 'Spark2Pins';
   data: {
     soundAlarm: boolean;
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
     hardware: Readonly<Spark2Hardware>;
   };
 }
@@ -483,7 +519,7 @@ export interface Spark3PinsBlock extends Block {
     enableIoSupply5V: boolean;
     enableIoSupply12V: boolean;
     soundAlarm: boolean;
-    pins: Readonly<IoPin[]>;
+    channels: Readonly<IoChannel[]>;
     voltage5: Readonly<number>;
     voltage12: Readonly<number>;
   };
@@ -543,6 +579,7 @@ export interface TempSensorOneWireBlock extends Block {
     offset: Quantity;
     address: string;
     value: Readonly<Quantity>;
+    oneWireBusId: Readonly<Link>;
   };
 }
 // #endregion TempSensorOneWire

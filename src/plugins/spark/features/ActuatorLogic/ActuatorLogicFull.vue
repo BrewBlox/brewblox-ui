@@ -42,12 +42,8 @@ const validTypes: BlockIntfType[] = [
 export default defineComponent({
   name: 'ActuatorLogicFull',
   setup() {
-    const {
-      serviceId,
-      block,
-      saveBlock,
-      sparkModule,
-    } = useBlockWidget.setup<ActuatorLogicBlock>();
+    const { serviceId, block, saveBlock, sparkModule } =
+      useBlockWidget.setup<ActuatorLogicBlock>();
     const localExpression = ref<string | null>(null);
     const delayedSave = ref<number | null>(null);
 
@@ -73,60 +69,62 @@ export default defineComponent({
       }
     });
 
-    const validBlocks = computed<Block[]>(
-      () => sparkModule.blocks
-        .filter(block => isCompatible(block.type, validTypes)),
+    const validBlocks = computed<Block[]>(() =>
+      sparkModule.blocks.filter((block) =>
+        isCompatible(block.type, validTypes),
+      ),
     );
 
     const expression = computed<string>(
       () => localExpression.value ?? block.value.data.expression,
     );
 
-    const characters = computed<{ char: string, pretty: string }[]>(
-      () => '()!&|^'
+    const characters = computed<{ char: string; pretty: string }[]>(() =>
+      '()!&|^'
         .split('')
-        .map(char => ({ char, pretty: characterTitles[char] ?? char })),
+        .map((char) => ({ char, pretty: characterTitles[char] ?? char })),
     );
 
-    const digital = computed<{ key: string; cmp: DigitalCompare; pretty: string }[]>(
-      () => block.value.data.digital
-        .map((cmp, idx) => ({
+    const digital = computed<
+      { key: string; cmp: DigitalCompare; pretty: string }[]
+    >(() =>
+      block.value.data.digital.map((cmp, idx) => ({
+        cmp,
+        key: digitalKey(idx),
+        pretty: prettyDigital(cmp),
+      })),
+    );
+
+    const analog = computed<
+      { key: string; cmp: AnalogCompare; pretty: string }[]
+    >(() =>
+      block.value.data.analog.map((cmp, idx) => ({
+        cmp,
+        key: analogKey(idx),
+        pretty: prettyAnalog(
           cmp,
-          key: digitalKey(idx),
-          pretty: prettyDigital(cmp),
-        })),
+          sparkModule.blockById(cmp.id.id)?.type ?? null,
+        ),
+      })),
     );
 
-    const analog = computed<{ key: string; cmp: AnalogCompare; pretty: string }[]>(
-      () => block.value.data.analog
-        .map((cmp, idx) => ({
-          cmp,
-          key: analogKey(idx),
-          pretty: prettyAnalog(
-            cmp,
-            sparkModule.blockById(cmp.id.id)?.type ?? null,
-          ),
-        })),
-    );
-
-    const firmwareError = computed<ExpressionError | null>(
-      () => {
-        const { result, errorPos } = block.value.data;
-        const index = Math.max(0, errorPos - 1);
-        return nonErrorResults.includes(result)
-          ? null
-          : {
+    const firmwareError = computed<ExpressionError | null>(() => {
+      const { result, errorPos } = block.value.data;
+      const index = Math.max(0, errorPos - 1);
+      return nonErrorResults.includes(result)
+        ? null
+        : {
             index,
             message: logicResultTitles[result],
             indicator: '-'.repeat(index) + '^',
           };
-      },
-    );
+    });
 
     const err = computed<ExpressionError | null>(
-      () => syntaxCheck(expression.value)
-        ?? comparisonCheck(block.value.data)
-        ?? (localExpression.value === null ? firmwareError.value : null),
+      () =>
+        syntaxCheck(expression.value) ??
+        comparisonCheck(block.value.data) ??
+        (localExpression.value === null ? firmwareError.value : null),
     );
 
     function addComparison(compared: Block): void {
@@ -137,8 +135,9 @@ export default defineComponent({
           rhs: DigitalState.STATE_ACTIVE,
           result: LogicResult.RESULT_EMPTY,
         });
-      }
-      else if (isCompatible(compared.type, BlockIntfType.ProcessValueInterface)) {
+      } else if (
+        isCompatible(compared.type, BlockIntfType.ProcessValueInterface)
+      ) {
         block.value.data.analog.push({
           op: AnalogCompareOp.OP_VALUE_GE,
           id: bloxLink(compared.id, compared.type),
@@ -157,11 +156,10 @@ export default defineComponent({
           serviceId,
           title: 'Edit comparison',
         },
-      })
-        .onOk(cmp => {
-          block.value.data.digital.splice(digitalIdx(key), 1, cmp);
-          saveBlock();
-        });
+      }).onOk((cmp) => {
+        block.value.data.digital.splice(digitalIdx(key), 1, cmp);
+        saveBlock();
+      });
     }
 
     function editAnalog(key: string, cmp: AnalogCompare): void {
@@ -172,22 +170,27 @@ export default defineComponent({
           title: 'Edit comparison',
           modelValue: cmp,
         },
-      })
-        .onOk(cmp => {
-          block.value.data.analog.splice(analogIdx(key), 1, cmp);
-          saveBlock();
-        });
+      }).onOk((cmp) => {
+        block.value.data.analog.splice(analogIdx(key), 1, cmp);
+        saveBlock();
+      });
     }
 
     function removeDigital(key: string): void {
       block.value.data.digital.splice(digitalIdx(key), 1);
-      block.value.data.expression = shiftRemainingComparisons(expression.value, key);
+      block.value.data.expression = shiftRemainingComparisons(
+        expression.value,
+        key,
+      );
       saveBlock();
     }
 
     function removeAnalog(key: string): void {
       block.value.data.analog.splice(analogIdx(key), 1);
-      block.value.data.expression = shiftRemainingComparisons(expression.value, key);
+      block.value.data.expression = shiftRemainingComparisons(
+        expression.value,
+        key,
+      );
       saveBlock();
     }
 
@@ -236,27 +239,26 @@ export default defineComponent({
             round
             icon="mdi-backspace"
             class="hoverless"
-            @click="saveExpression(expression.substring(0, expression.length -1))"
+            @click="
+              saveExpression(expression.substring(0, expression.length - 1))
+            "
           />
         </template>
       </q-input>
 
       <div
         class="error-indicator q-pa-md text-negative"
-        :style="{visibility: err ? '' : 'hidden'}"
+        :style="{ visibility: err ? 'inherit' : 'hidden' }"
       >
         <div>{{ expression }}</div>
         <div>{{ err ? err.indicator : '---' }}</div>
         <div>{{ err ? err.message : '---' }}</div>
       </div>
 
-      <LabeledField
-        label="Active comparisons"
-        tag-class="col-grow"
-      >
+      <LabeledField label="Active comparisons" tag-class="col-grow">
         <div class="row q-gutter-xs col-grow">
           <q-chip
-            v-for="{key, cmp, pretty} in digital"
+            v-for="{ key, cmp, pretty } in digital"
             :key="`digital-${key}`"
             removable
             clickable
@@ -266,10 +268,7 @@ export default defineComponent({
             @remove="removeDigital(key)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div
-                class="text-lime-6 text-bold col-auto"
-                style="width: 1em"
-              >
+              <div class="text-lime-6 text-bold col-auto" style="width: 1em">
                 {{ key }}
               </div>
               <q-icon
@@ -283,13 +282,11 @@ export default defineComponent({
               <div class="col ellipsis-left">
                 {{ pretty }}
               </div>
-              <q-tooltip>
-                {{ prettyLink(cmp.id) }} [{{ pretty }}]
-              </q-tooltip>
+              <q-tooltip> {{ prettyLink(cmp.id) }} [{{ pretty }}] </q-tooltip>
             </div>
           </q-chip>
           <q-chip
-            v-for="{key, cmp, pretty} in analog"
+            v-for="{ key, cmp, pretty } in analog"
             :key="`analog-${key}`"
             removable
             clickable
@@ -299,10 +296,7 @@ export default defineComponent({
             @remove="removeAnalog(key)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div
-                class="text-orange-6 text-bold col-auto"
-                style="width: 1em"
-              >
+              <div class="text-orange-6 text-bold col-auto" style="width: 1em">
                 {{ key }}
               </div>
               <q-icon
@@ -316,9 +310,7 @@ export default defineComponent({
               <div class="col ellipsis-left">
                 {{ pretty }}
               </div>
-              <q-tooltip>
-                {{ prettyLink(cmp.id) }} [{{ pretty }}]
-              </q-tooltip>
+              <q-tooltip> {{ prettyLink(cmp.id) }} [{{ pretty }}] </q-tooltip>
             </div>
           </q-chip>
         </div>
@@ -327,7 +319,7 @@ export default defineComponent({
       <LabeledField label="Add character">
         <div class="row wrap q-gutter-xs">
           <q-chip
-            v-for="{char, pretty} in characters"
+            v-for="{ char, pretty } in characters"
             :key="`suggestion-${char}`"
             class="hoverable"
             color="blue-grey-8"
@@ -338,7 +330,7 @@ export default defineComponent({
             <q-tooltip>{{ pretty }}</q-tooltip>
           </q-chip>
           <q-chip
-            v-for="{key, cmp, pretty} in digital"
+            v-for="{ key, cmp, pretty } in digital"
             :key="`digital-add-${key}`"
             class="hoverable text-bold"
             color="blue-grey-8"
@@ -350,7 +342,7 @@ export default defineComponent({
             <q-tooltip>{{ prettyLink(cmp.id) }} [{{ pretty }}]</q-tooltip>
           </q-chip>
           <q-chip
-            v-for="{key, cmp, pretty} in analog"
+            v-for="{ key, cmp, pretty } in analog"
             :key="`analog-add-${key}`"
             class="hoverable text-bold"
             color="blue-grey-8"
@@ -367,14 +359,14 @@ export default defineComponent({
       <LabeledField label="Add comparison based on">
         <div class="row wrap q-gutter-xs">
           <q-chip
-            v-for="block in validBlocks"
-            :key="`block-${block.id}`"
+            v-for="compBlock in validBlocks"
+            :key="`block-${compBlock.id}`"
             class="hoverable"
             color="blue-grey-8"
             clickable
-            @click="addComparison(block)"
+            @click="addComparison(compBlock)"
           >
-            {{ block.id }}
+            {{ compBlock.id }}
           </q-chip>
         </div>
       </LabeledField>
@@ -384,7 +376,12 @@ export default defineComponent({
         :service-id="serviceId"
         title="Digital Actuator target"
         label="Digital Actuator target"
-        @update:model-value="v => { block.data.targetId = v; saveBlock(); }"
+        @update:model-value="
+          (v) => {
+            block.data.targetId = v;
+            saveBlock();
+          }
+        "
       />
     </div>
   </div>

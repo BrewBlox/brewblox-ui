@@ -5,11 +5,11 @@
 ## Requirements
 
 * Node.js
-* NPM
+* Yarn
 * Docker
 * Docker-compose
 
-Due to limitations in the way Docker is handled on Windows, Linux or Mac are required for development.
+Due to limitations in the way Docker is handled on Windows, Linux or Mac is required for development.
 
 ## Installation
 
@@ -22,9 +22,10 @@ sudo apt update
 sudo apt upgrade -y
 sudo apt install -y build-essential libssl-dev curl git python3-pip
 
-# Install Node Version Manager + Node.js
+# Install Node Version Manager + Node.js + Yarn
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 nvm install --lts
+npm install -g yarn
 
 # Install Docker
 curl -sL https://get.docker.com | bash
@@ -42,15 +43,15 @@ reboot
 After the reboot, run the following commands in the `brewblox-ui` directory:
 
 ``` bash
-npm install -g @quasar/cli
-npm ci -d
+yarn global add @quasar/cli
+yarn ci
 docker-compose pull
 ```
 
 ## Run
 
 ``` bash
-npm start
+yarn start
 ```
 
 The UI will be served with hot reloading at https://localhost:8080/ui
@@ -59,32 +60,32 @@ The UI will be served with hot reloading at https://localhost:8080/ui
 
 ```bash
 # Restart backend containers
-npm run compose:new
+yarn compose:new
 
 # Reset widgets
-npm run datastore:load
+yarn datastore:load
 
 # Reset Spark blocks
-npm run spark:load
+yarn spark:load
 
 # Build a production version of the software
 # This is served at https://localhost:9001
-npm run devbuild
+yarn devbuild
 ```
 
 ## Loading and saving backend data
 
-Every time you run `npm start`, data on the backend is reset to defaults.
+Every time you run `yarn start`, data on the backend is reset to defaults.
 The default data can be found in dev/presets/.
 
 The dev scripts allow for partially applying data, or replacing the defaults.
 
 Some examples:
-* `npm run redis` only resets widgets
-* `npm run spark` only resets blocks
-* `npm run spark -- sparkey` only resets blocks on Sparkey
+* `yarn redis` only resets widgets
+* `yarn spark` only resets blocks
+* `yarn spark -- sparkey` only resets blocks on Sparkey
 
-You can use `npm run redis:save` and `npm run spark:save` to replace the defaults.
+You can use `yarn redis:save` and `yarn spark:save` to replace the defaults.
 The files are indexed in git. Commit them to make the change permanent.
 
 ---

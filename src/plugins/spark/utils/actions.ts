@@ -23,9 +23,13 @@ import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 
 import { makeBlockIdRules } from './configuration';
-import { isBlockDisplayed, isBlockDisplayReady, isBlockVolatile, isCompatible } from './info';
+import {
+  isBlockDisplayed,
+  isBlockDisplayReady,
+  isBlockVolatile,
+  isCompatible,
+} from './info';
 import { getDisplaySettingsBlock } from './system';
-
 
 export function startChangeBlockId(block: Block | null): void {
   if (!block) {
@@ -41,19 +45,16 @@ export function startChangeBlockId(block: Block | null): void {
       clearable: false,
       rules: makeBlockIdRules(block.serviceId),
     },
-  })
-    .onOk((newId: string) => {
-      const module = sparkStore.moduleById(block.serviceId);
-      if (!module) {
-        return;
-      }
-      else if (isBlockVolatile(block)) {
-        module.saveBlock({ ...block, id: newId });
-      }
-      else {
-        module.renameBlock([block.id, newId]).catch(() => { });
-      }
-    });
+  }).onOk((newId: string) => {
+    const module = sparkStore.moduleById(block.serviceId);
+    if (!module) {
+      return;
+    } else if (isBlockVolatile(block)) {
+      module.saveBlock({ ...block, id: newId });
+    } else {
+      module.renameBlock([block.id, newId]).catch(() => {});
+    }
+  });
 }
 
 export function startRemoveBlock(block: Block | null): void {
@@ -61,17 +62,20 @@ export function startRemoveBlock(block: Block | null): void {
     return;
   }
 
-  const widgets = widgetStore
-    .widgets
-    .filter(v => v.feature === block.type
-      && isMatch(v.config, { serviceId: block.serviceId, blockId: block.id }));
+  const widgets = widgetStore.widgets.filter(
+    (v) =>
+      v.feature === block.type &&
+      isMatch(v.config, { serviceId: block.serviceId, blockId: block.id }),
+  );
 
   // Has dedicated dashboard widgets
   if (widgets.length) {
-    const selectOptions = [{
-      label: 'Also remove widgets from dashboards',
-      value: 0,
-    }];
+    const selectOptions = [
+      {
+        label: 'Also remove widgets from dashboards',
+        value: 0,
+      },
+    ];
     createDialog({
       component: 'CheckboxDialog',
       componentProps: {
@@ -81,13 +85,12 @@ export function startRemoveBlock(block: Block | null): void {
         modelValue: [0], // pre-check the default action
         selectOptions,
       },
-    })
-      .onOk((selected: number[]) => {
-        sparkStore.removeBlock(block);
-        if (selected.includes(0)) {
-          widgets.forEach(widgetStore.removeWidget);
-        }
-      });
+    }).onOk((selected: number[]) => {
+      sparkStore.removeBlock(block);
+      if (selected.includes(0)) {
+        widgets.forEach(widgetStore.removeWidget);
+      }
+    });
   }
   // No dashboard widgets found
   else {
@@ -98,22 +101,22 @@ export function startRemoveBlock(block: Block | null): void {
         message: `Are you sure you want to remove <i>${block.id}</i>?`,
         html: true,
       },
-    })
-      .onOk(() => {
-        sparkStore.removeBlock(block);
-      });
+    }).onOk(() => {
+      sparkStore.removeBlock(block);
+    });
   }
 }
 
-export async function startAddBlockToGraphWidget(block: Block | null): Promise<void> {
+export async function startAddBlockToGraphWidget(
+  block: Block | null,
+): Promise<void> {
   if (!block) {
     return;
   }
 
-  const graphOpts = widgetStore
-    .widgets
-    .filter(v => v.feature === graphType)
-    .map(v => ({
+  const graphOpts = widgetStore.widgets
+    .filter((v) => v.feature === graphType)
+    .map((v) => ({
       label: `[${dashboardStore.dashboardTitle(v.dashboard)}] ${v.title}`,
       value: v.id,
     }));
@@ -132,13 +135,12 @@ export async function startAddBlockToGraphWidget(block: Block | null): Promise<v
           selectOptions: graphOpts,
         },
       })
-        .onOk(value => resolve(value))
+        .onOk((value) => resolve(value))
         .onCancel(() => resolve(null))
         .onDismiss(() => resolve(null));
-    }
-    else {
+    } else {
       createWidgetWizard(graphType)
-        .onOk(output => resolve(output.widget?.id ?? null))
+        .onOk((output) => resolve(output.widget?.id ?? null))
         .onCancel(() => resolve(null))
         .onDismiss(() => resolve(null));
     }
@@ -149,14 +151,19 @@ export async function startAddBlockToGraphWidget(block: Block | null): Promise<v
   }
 }
 
-export async function startAddBlockToDisplay(addr: BlockAddress, options: Partial<DisplayOpts> = {}): Promise<void> {
+export async function startAddBlockToDisplay(
+  addr: BlockAddress,
+  options: Partial<DisplayOpts> = {},
+): Promise<void> {
   const display = getDisplaySettingsBlock(addr?.serviceId);
-  if (!addr || !addr.id || !addr.type || !display) { return; }
+  if (!addr || !addr.id || !addr.type || !display) {
+    return;
+  }
 
   const { widgets } = display.data;
-  const takenPos = widgets.map(w => w.pos);
+  const takenPos = widgets.map((w) => w.pos);
   const opts: DisplayOpts = {
-    pos: range(1, 7).find(v => !takenPos.includes(v)),
+    pos: range(1, 7).find((v) => !takenPos.includes(v)),
     color: '4169E1',
     name: addr.id,
     unique: true,
@@ -166,15 +173,17 @@ export async function startAddBlockToDisplay(addr: BlockAddress, options: Partia
   };
 
   if (!isBlockDisplayReady(addr)) {
-    notify.warn(`Block <i>${addr.id}</i> can't be shown on the Spark display`, { shown: opts.showNotify });
-  }
-  else if (opts.unique && isBlockDisplayed(addr)) {
-    notify.info(`Block <i>${addr.id}</i> is already shown on the Spark display`, { shown: opts.showNotify });
-  }
-  else if (!opts.pos) {
+    notify.warn(`Block <i>${addr.id}</i> can't be shown on the Spark display`, {
+      shown: opts.showNotify,
+    });
+  } else if (opts.unique && isBlockDisplayed(addr)) {
+    notify.info(
+      `Block <i>${addr.id}</i> is already shown on the Spark display`,
+      { shown: opts.showNotify },
+    );
+  } else if (!opts.pos) {
     notify.info('Spark display is already full', { shown: opts.showNotify });
-  }
-  else {
+  } else {
     const { id, type } = addr;
 
     const link = bloxLink(id, type as BlockType);
@@ -185,20 +194,22 @@ export async function startAddBlockToDisplay(addr: BlockAddress, options: Partia
     };
     if (isCompatible(type, BlockIntfType.TempSensorInterface)) {
       slot.tempSensor = link;
-    }
-    else if (isCompatible(type, BlockIntfType.SetpointSensorPairInterface)) {
+    } else if (isCompatible(type, BlockIntfType.SetpointSensorPairInterface)) {
       slot.setpointSensorPair = link;
-    }
-    else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
+    } else if (isCompatible(type, BlockIntfType.ActuatorAnalogInterface)) {
       slot.actuatorAnalog = link;
-    }
-    else if (isCompatible(type, BlockType.Pid)) {
+    } else if (isCompatible(type, BlockType.Pid)) {
       slot.pid = link;
     }
 
-    display.data.widgets = [slot, ...display.data.widgets.filter(w => w.pos !== opts.pos)];
+    display.data.widgets = [
+      slot,
+      ...display.data.widgets.filter((w) => w.pos !== opts.pos),
+    ];
     await sparkStore.saveBlock(display);
-    notify.info(`Added <i>${addr.id}</i> to the Spark display`, { shown: opts.showNotify });
+    notify.info(`Added <i>${addr.id}</i> to the Spark display`, {
+      shown: opts.showNotify,
+    });
   }
 
   if (opts.showDialog) {
@@ -210,38 +221,37 @@ export function saveHwInfo(serviceId: string): void {
   const linked: string[] = [];
   const addressed: string[] = [];
 
-  sparkStore.serviceBlocks(serviceId)
-    .forEach(block => {
-      if (matchesType<MotorValveBlock>(BlockType.MotorValve, block)) {
-        const { hwDevice, startChannel } = block.data;
-        if (hwDevice.id === null || !startChannel) {
-          return;
-        }
-        const target = sparkStore.blockById(serviceId, hwDevice.id);
-        const pin = target?.data.pins[startChannel - 1];
-        if (target && pin !== undefined) {
-          const [name] = Object.keys(pin);
-          linked.push(`${block.id}: ${target.id} ${name}`);
-        }
+  sparkStore.serviceBlocks(serviceId).forEach((block) => {
+    if (matchesType<MotorValveBlock>(BlockType.MotorValve, block)) {
+      const { hwDevice, startChannel } = block.data;
+      if (hwDevice.id === null || !startChannel) {
+        return;
       }
+      const target = sparkStore.blockById(serviceId, hwDevice.id);
+      const pin = target?.data.pins[startChannel - 1];
+      if (target && pin !== undefined) {
+        const [name] = Object.keys(pin);
+        linked.push(`${block.id}: ${target.id} ${name}`);
+      }
+    }
 
-      if (matchesType<DigitalActuatorBlock>(BlockType.DigitalActuator, block)) {
-        const { hwDevice, channel } = block.data;
-        if (hwDevice.id === null || !channel) {
-          return;
-        }
-        const target = sparkStore.blockById(serviceId, hwDevice.id);
-        const pin = target?.data.pins[channel - 1];
-        if (target && pin !== undefined) {
-          const [name] = Object.keys(pin);
-          linked.push(`${block.id}: ${target.id} ${name}`);
-        }
+    if (matchesType<DigitalActuatorBlock>(BlockType.DigitalActuator, block)) {
+      const { hwDevice, channel } = block.data;
+      if (hwDevice.id === null || !channel) {
+        return;
       }
+      const target = sparkStore.blockById(serviceId, hwDevice.id);
+      const pin = target?.data.pins[channel - 1];
+      if (target && pin !== undefined) {
+        const [name] = Object.keys(pin);
+        linked.push(`${block.id}: ${target.id} ${name}`);
+      }
+    }
 
-      if ('address' in block.data) {
-        addressed.push(`${block.id}: ${block.data.address}`);
-      }
-    });
+    if ('address' in block.data) {
+      addressed.push(`${block.id}: ${block.data.address}`);
+    }
+  });
 
   const lines = [
     `Service: ${serviceId}`,
@@ -254,7 +264,10 @@ export function saveHwInfo(serviceId: string): void {
   saveFile(lines.join('\n'), `spark-hardware-${serviceId}.txt`, true);
 }
 
-export async function resetBlocks(serviceId: string, opts: { restore: boolean; download: boolean }): Promise<void> {
+export async function resetBlocks(
+  serviceId: string,
+  opts: { restore: boolean; download: boolean },
+): Promise<void> {
   try {
     const addresses: Mapped<string> = {};
     const module = sparkStore.moduleById(serviceId);
@@ -269,10 +282,12 @@ export async function resetBlocks(serviceId: string, opts: { restore: boolean; d
 
     if (opts.restore) {
       module.blocks
-        .filter(block =>
-          isCompatible(block.type, BlockIntfType.OneWireDeviceInterface)
-          && !block.id.startsWith('New|'))
-        .forEach(block => addresses[block.data.address] = block.id);
+        .filter(
+          (block) =>
+            isCompatible(block.type, BlockIntfType.OneWireDeviceInterface) &&
+            !block.id.startsWith('New|'),
+        )
+        .forEach((block) => (addresses[block.data.address] = block.id));
     }
 
     await module.clearBlocks();
@@ -281,13 +296,18 @@ export async function resetBlocks(serviceId: string, opts: { restore: boolean; d
 
     if (opts.restore) {
       const renameArgs: [string, string][] = module.blocks
-        .filter(block =>
-          isCompatible(block.type, BlockIntfType.OneWireDeviceInterface)
-          && !!addresses[block.data.address])
-        .map(block => [block.id, addresses[block.data.address]]);
+        .filter(
+          (block) =>
+            isCompatible(block.type, BlockIntfType.OneWireDeviceInterface) &&
+            !!addresses[block.data.address],
+        )
+        .map((block) => [block.id, addresses[block.data.address]]);
       await Promise.all(renameArgs.map(module.renameBlock));
     }
-    notify.done('Removed all blocks' + (opts.restore ? ', and restored discovered blocks' : ''));
+    notify.done(
+      'Removed all blocks' +
+        (opts.restore ? ', and restored discovered blocks' : ''),
+    );
   } catch (e) {
     notify.error(`Failed to remove blocks: ${e.toString()}`);
   }
@@ -307,9 +327,10 @@ export function startResetBlocks(serviceId: string): void {
       ],
       modelValue: [0, 1], // pre-check default actions
     },
-  })
-    .onOk((selected: number[]) => resetBlocks(serviceId, {
+  }).onOk((selected: number[]) =>
+    resetBlocks(serviceId, {
       restore: selected.includes(0),
       download: selected.includes(1),
-    }));
+    }),
+  );
 }

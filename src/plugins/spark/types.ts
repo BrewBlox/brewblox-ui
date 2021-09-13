@@ -4,20 +4,19 @@ export * from '@/shared-types/spark-service-types';
 
 import { Layout } from 'plotly.js';
 
-import { GraphAxis, GraphValueAxes, QueryParams } from '@/plugins/history/types';
+import {
+  GraphAxis,
+  GraphValueAxes,
+  QueryParams,
+} from '@/plugins/history/types';
 import { Block, BlockOrIntfType, Quantity, StoreObject } from '@/shared-types';
 import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 import { Widget } from '@/store/widgets';
 
-export type ComparedBlockType =
-  | BlockOrIntfType
-  | BlockOrIntfType[]
-  | null;
+export type ComparedBlockType = BlockOrIntfType | BlockOrIntfType[] | null;
 
-export type PageMode =
-  | 'Relations'
-  | 'List'
+export type PageMode = 'Relations' | 'List';
 
 export interface SparkSessionConfig {
   pageMode: PageMode;
@@ -39,6 +38,7 @@ export interface SparkStatus {
   deviceAddress: string | null;
   connectionKind: 'simulation' | 'usb' | 'wifi' | null;
 
+  devicePlatform?: string;
   isCompatibleFirmware?: boolean;
   isLatestFirmware?: boolean;
   isValidDeviceId?: boolean;
@@ -84,12 +84,6 @@ export interface StoredDataPreset<DataT = any> extends StoreObject {
   data: Partial<DataT>;
 }
 
-export interface ChannelMapping {
-  id: string;
-  nid: number;
-  name: string;
-}
-
 export interface ProfileValues {
   prev: Quantity;
   current: Quantity;
@@ -114,7 +108,7 @@ export interface BlockConfig {
   graphLayout?: Partial<Layout>;
 }
 
-export type BlockWidget = Widget<BlockConfig>
+export type BlockWidget = Widget<BlockConfig>;
 
 export interface BlockIds {
   id?: string;

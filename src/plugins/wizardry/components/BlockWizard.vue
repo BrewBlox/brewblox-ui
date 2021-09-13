@@ -5,8 +5,18 @@ import { DialogChainObject } from 'quasar';
 import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { Block, BlockConfig, BlockIntfType, ComparedBlockType, UserBlockType } from '@/plugins/spark/types';
-import { isCompatible, isSystemBlockType, makeBlockIdRules } from '@/plugins/spark/utils';
+import {
+  Block,
+  BlockConfig,
+  BlockIntfType,
+  ComparedBlockType,
+  UserBlockType,
+} from '@/plugins/spark/types';
+import {
+  isCompatible,
+  isSystemBlockType,
+  makeBlockIdRules,
+} from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
@@ -33,23 +43,14 @@ export default defineComponent({
       default: () => true,
     },
   },
-  emits: [
-    ...useWizard.emits,
-  ],
+  emits: [...useWizard.emits],
   setup(props) {
-    const {
-      onBack,
-      onClose,
-      onDone,
-      setDialogTitle,
-    } = useWizard.setup();
+    const { onBack, onClose, onDone, setDialogTitle } = useWizard.setup();
 
     const selected = ref<SelectOption<UserBlockType> | null>(null);
     const lastGeneratedId = ref<string>('');
     const serviceId = ref<string | null>(
-      props.activeServiceId
-      ?? sparkStore.serviceIds[0]
-      ?? null,
+      props.activeServiceId ?? sparkStore.serviceIds[0] ?? null,
     );
     const widgetId = nanoid();
     const dashboardId = ref<string | null>(null);
@@ -61,64 +62,63 @@ export default defineComponent({
     const activeDialog = ref<DialogChainObject | null>(null);
     const discoveryActive = ref<boolean>(false);
 
-    const serviceOpts = computed<string[]>(
-      () => sparkStore.serviceIds,
-    );
+    const serviceOpts = computed<string[]>(() => sparkStore.serviceIds);
 
-    const wizardOpts = computed<SelectOption<UserBlockType>[]>(
-      () => sparkStore
-        .blockSpecs
-        .filter(spec =>
-          !isSystemBlockType(spec.type)
-          && isCompatible(spec.type, props.compatible)
-          && props.filter(spec.type))
-        .map(spec => {
+    const wizardOpts = computed<SelectOption<UserBlockType>[]>(() =>
+      sparkStore.blockSpecs
+        .filter(
+          (spec) =>
+            !isSystemBlockType(spec.type) &&
+            isCompatible(spec.type, props.compatible) &&
+            props.filter(spec.type),
+        )
+        .map((spec) => {
           const feature = featureStore.widgetById(spec.type);
           return feature
             ? {
-              value: spec.type as UserBlockType,
-              label: feature.title,
-            }
+                value: spec.type as UserBlockType,
+                label: feature.title,
+              }
             : null;
         })
         .filter(nullFilter)
         .sort(makeObjectSorter('label')),
     );
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(serviceId.value),
+    const sparkModule = computed<SparkServiceModule | null>(() =>
+      sparkStore.moduleById(serviceId.value),
     );
 
-    const activeBlockIdRules = computed<InputRule[]>(
-      () => serviceId.value
+    const activeBlockIdRules = computed<InputRule[]>(() =>
+      serviceId.value
         ? makeBlockIdRules(serviceId.value)
         : [() => 'No service selected'],
     );
 
-    const validator = computed<(v: any) => boolean>(
-      () => makeRuleValidator(activeBlockIdRules.value),
+    const validator = computed<(v: any) => boolean>(() =>
+      makeRuleValidator(activeBlockIdRules.value),
     );
 
     const createReady = computed<boolean>(
-      () => selected.value !== null
-        && sparkModule.value !== null
-        && (activeBlock.value !== null || validator.value(blockId.value)),
+      () =>
+        selected.value !== null &&
+        sparkModule.value !== null &&
+        (activeBlock.value !== null || validator.value(blockId.value)),
     );
 
-    const discoveredType = computed<boolean>(
-      () => isCompatible(selected.value?.value, BlockIntfType.OneWireDeviceInterface),
+    const discoveredType = computed<boolean>(() =>
+      isCompatible(selected.value?.value, BlockIntfType.OneWireDeviceInterface),
     );
 
-    const searchedOpts = computed<SelectOption[]>(
-      () => {
-        if (!searchFilter.value) {
-          return wizardOpts.value;
-        }
-        const needle = searchFilter.value.toLowerCase();
-        return wizardOpts.value
-          .filter(opt => opt.label.toLowerCase().match(needle));
-      },
-    );
+    const searchedOpts = computed<SelectOption[]>(() => {
+      if (!searchFilter.value) {
+        return wizardOpts.value;
+      }
+      const needle = searchFilter.value.toLowerCase();
+      return wizardOpts.value.filter((opt) =>
+        opt.label.toLowerCase().match(needle),
+      );
+    });
 
     function showSearchKeyboard(): void {
       createDialog({
@@ -126,8 +126,7 @@ export default defineComponent({
         componentProps: {
           modelValue: searchFilter.value,
         },
-      })
-        .onOk(v => searchFilter.value = v);
+      }).onOk((v) => (searchFilter.value = v));
     }
 
     function showNameKeyboard(): void {
@@ -137,26 +136,29 @@ export default defineComponent({
           modelValue: blockId.value,
           rules: activeBlockIdRules.value,
         },
-      })
-        .onOk(v => blockId.value = v);
+      }).onOk((v) => (blockId.value = v));
     }
 
     function ensureVolatile(): void {
-      if (activeBlock.value
-        && !isMatch(activeBlock.value, {
+      if (
+        activeBlock.value &&
+        !isMatch(activeBlock.value, {
           id: blockId.value,
           serviceId: serviceId.value,
           type: selected.value?.value,
-        })) {
+        })
+      ) {
         sparkStore.removeVolatileBlock(activeBlock.value);
         activeBlock.value = null;
       }
 
-      if (!activeBlock.value
-        && selected.value
-        && blockId.value
-        && serviceId.value
-        && createReady.value) {
+      if (
+        !activeBlock.value &&
+        selected.value &&
+        blockId.value &&
+        serviceId.value &&
+        createReady.value
+      ) {
         sparkStore.setVolatileBlock({
           id: blockId.value,
           serviceId: serviceId.value,
@@ -164,7 +166,10 @@ export default defineComponent({
           groups: [0],
           data: sparkStore.blockSpecByType(selected.value.value).generate(),
         });
-        activeBlock.value = sparkStore.blockById(serviceId.value, blockId.value);
+        activeBlock.value = sparkStore.blockById(
+          serviceId.value,
+          blockId.value,
+        );
       }
 
       if (activeBlock.value) {
@@ -191,8 +196,7 @@ export default defineComponent({
       selected.value = opt;
       if (opt === null) {
         return;
-      }
-      else if (!blockId.value || blockId.value === lastGeneratedId.value) {
+      } else if (!blockId.value || blockId.value === lastGeneratedId.value) {
         blockId.value = suggestId(opt.label, validator.value);
         lastGeneratedId.value = blockId.value;
       }
@@ -329,7 +333,12 @@ export default defineComponent({
         option-value="value"
         option-label="label"
         @update:model-value="selectOpt"
-        @confirm="v => { selectOpt(v); createBlock(); }"
+        @confirm="
+          (v) => {
+            selectOpt(v);
+            createBlock();
+          }
+        "
       />
     </div>
 
@@ -347,13 +356,15 @@ export default defineComponent({
           <q-icon name="mdi-information">
             <q-tooltip>
               The name of the Spark Controller block.
-              <br>Multiple widgets can display the same block.
-              <br>Rules:
+              <br>Multiple widgets can display the same block. <br>Rules:
               <ul>
                 <li>The name must not be empty.</li>
                 <li>The name must be unique.</li>
                 <li>The name must begin with a letter.</li>
-                <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
+                <li>
+                  The name may only contain alphanumeric characters, space, and
+                  _-()|.
+                </li>
                 <li>The name must be less than 200 characters.</li>
               </ul>
             </q-tooltip>

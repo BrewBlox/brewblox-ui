@@ -1,32 +1,31 @@
-import { ActuatorLogicBlock, AnalogCompare, BlockIntfType, DigitalCompare } from '@/plugins/spark/types';
+import {
+  ActuatorLogicBlock,
+  AnalogCompare,
+  BlockIntfType,
+  DigitalCompare,
+} from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { tempQty } from '@/utils/quantity';
 
 import { analogOpTitles, digitalOpTitles, digitalStateTitles } from './const';
 import { ExpressionError } from './types';
 
-export const keyCode = (s: string): number =>
-  s.charCodeAt(0);
+export const keyCode = (s: string): number => s.charCodeAt(0);
 
-export const codeKey = (c: number): string =>
-  String.fromCharCode(c);
+export const codeKey = (c: number): string => String.fromCharCode(c);
 
 export const digitalStart = keyCode('a');
 export const digitalEnd = keyCode('z');
 export const analogStart = keyCode('A');
 export const analogEnd = keyCode('Z');
 
-export const digitalIdx = (s: string): number =>
-  keyCode(s) - digitalStart;
+export const digitalIdx = (s: string): number => keyCode(s) - digitalStart;
 
-export const analogIdx = (s: string): number =>
-  keyCode(s) - analogStart;
+export const analogIdx = (s: string): number => keyCode(s) - analogStart;
 
-export const digitalKey = (c: number): string =>
-  codeKey(c + digitalStart);
+export const digitalKey = (c: number): string => codeKey(c + digitalStart);
 
-export const analogKey = (c: number): string =>
-  codeKey(c + analogStart);
+export const analogKey = (c: number): string => codeKey(c + analogStart);
 
 export const isDigital = (s: string): boolean =>
   digitalStart <= keyCode(s) && keyCode(s) <= digitalEnd;
@@ -34,8 +33,7 @@ export const isDigital = (s: string): boolean =>
 export const isAnalog = (s: string): boolean =>
   analogStart <= keyCode(s) && keyCode(s) <= analogEnd;
 
-export const isKey = (s: string): boolean =>
-  isDigital(s) || isAnalog(s);
+export const isKey = (s: string): boolean => isDigital(s) || isAnalog(s);
 
 export const sanitize = (expression: string): string =>
   expression.replace(/[^a-zA-Z\(\)\^\|!&]/g, '');
@@ -50,7 +48,7 @@ export function syntaxCheck(expression: string): ExpressionError | null {
   // Check for ? characters before we use them as generic comparison character
   const questionIdx = expression.indexOf('?');
   if (questionIdx >= 0) {
-    return fmt(questionIdx, 'Invalid character \'?\'');
+    return fmt(questionIdx, "Invalid character '?'");
   }
 
   const str = expression.replace(/[a-zA-Z]/g, '?');
@@ -90,7 +88,7 @@ export function syntaxCheck(expression: string): ExpressionError | null {
         return fmt(idx, 'Multiple operators');
       }
       if (' '.includes(prev)) {
-        return fmt(idx, 'First character can\'t be an operator');
+        return fmt(idx, "First character can't be an operator");
       }
     }
 
@@ -123,7 +121,10 @@ export function syntaxCheck(expression: string): ExpressionError | null {
   return null;
 }
 
-type ComparisonData = Pick<ActuatorLogicBlock['data'], 'expression' | 'digital' | 'analog'>;
+type ComparisonData = Pick<
+  ActuatorLogicBlock['data'],
+  'expression' | 'digital' | 'analog'
+>;
 
 export function comparisonCheck(data: ComparisonData): ExpressionError | null {
   const numDigital = data.digital.length;
@@ -153,7 +154,10 @@ export function comparisonCheck(data: ComparisonData): ExpressionError | null {
  * @param key Removed comparison
  * @returns the updated expression
  */
-export function shiftRemainingComparisons(expression: string, key: string): string {
+export function shiftRemainingComparisons(
+  expression: string,
+  key: string,
+): string {
   if (!isKey(key)) {
     return expression;
   }
@@ -161,9 +165,9 @@ export function shiftRemainingComparisons(expression: string, key: string): stri
   const end = isDigital(key) ? digitalEnd : analogEnd;
   return expression
     .split('')
-    .map(v => v === key ? '?' : v)
+    .map((v) => (v === key ? '?' : v))
     .map(keyCode)
-    .map(v => code < v && v <= end ? v - 1 : v)
+    .map((v) => (code < v && v <= end ? v - 1 : v))
     .map(codeKey)
     .join('');
 }
@@ -172,7 +176,10 @@ export function prettyDigital(cmp: DigitalCompare): string {
   return `${digitalOpTitles[cmp.op]} ${digitalStateTitles[cmp.rhs]}`;
 }
 
-export function prettyAnalog(cmp: AnalogCompare, blockType: string | null): string {
+export function prettyAnalog(
+  cmp: AnalogCompare,
+  blockType: string | null,
+): string {
   const rhs = isCompatible(blockType, BlockIntfType.SetpointSensorPairInterface)
     ? tempQty(cmp.rhs)
     : `${cmp.rhs}%`;

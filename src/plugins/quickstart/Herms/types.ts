@@ -1,6 +1,6 @@
 import { Quantity } from '@/shared-types';
 
-import { PinChannel, QuickstartConfig } from '../types';
+import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export interface HermsBlockNames {
   hltSensor: string;
@@ -24,19 +24,20 @@ export interface HermsBlockNames {
   balancer: string;
 }
 
-export interface HermsConfig extends QuickstartConfig {
-  names: HermsBlockNames;
-  hltPin: PinChannel;
-  bkPin: PinChannel;
-  mutex: boolean;
-  hltSensor: string;
-  mtSensor: string;
-  bkSensor: string;
-}
-
 export interface HermsOpts {
   hltKp: Quantity;
   bkKp: Quantity;
   mtKp: Quantity;
   driverMax: Quantity;
+}
+
+export interface HermsConfig extends QuickstartConfig {
+  names: HermsBlockNames;
+  hltChannel: IoChannelAddress;
+  bkChannel: IoChannelAddress;
+  mutex: boolean;
+  hltSensor: string;
+  mtSensor: string;
+  bkSensor: string;
+  hermsOpts: HermsOpts;
 }

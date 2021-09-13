@@ -6,9 +6,6 @@ import { systemStore } from '@/store/system';
 import { bloxQty, deltaTempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
-import { createOutputActions } from '../utils';
-import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
-import { defineLayouts } from './changes-layout';
 import { BrewKettleConfig, BrewKettleOpts } from './types';
 
 export default defineComponent({
@@ -23,44 +20,22 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'update:actions',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
     const fullPowerDelta = ref<Quantity>(deltaTempQty(2));
 
-    const userTemp = computed<string>(
-      () => systemStore.units.temperature,
-    );
+    const userTemp = computed<string>(() => systemStore.units.temperature);
 
-    const kp = computed<Quantity>(
-      () => bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+    const kp = computed<Quantity>(() =>
+      bloxQty(100 / (fullPowerDelta.value.value || 2), `1/${userTemp.value}`),
     );
 
     function taskDone(): void {
-      const opts: BrewKettleOpts = {
+      const kettleOpts: BrewKettleOpts = {
         kp: kp.value,
       };
 
-      const createdBlocks = defineCreatedBlocks(props.config, opts);
-      const changedBlocks = defineChangedBlocks(props.config);
-      const layouts = defineLayouts(props.config);
-      const widgets = defineWidgets(props.config, opts, layouts);
-      const displayedBlocks = defineDisplayedBlocks(props.config);
-
-      const updates: Partial<BrewKettleConfig> = {
-        layouts,
-        widgets,
-        changedBlocks,
-        createdBlocks,
-        displayedBlocks,
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('update:actions', createOutputActions());
+      emit('update:config', { ...props.config, kettleOpts });
       emit('next');
     }
 
@@ -83,8 +58,11 @@ export default defineComponent({
           </q-item-label>
           <p>
             If the temperature is more than
-            <InlineQuantityField v-model="fullPowerDelta" title="Full power delta" /> too low,
-            run at full power (100%).
+            <InlineQuantityField
+              v-model="fullPowerDelta"
+              title="Full power delta"
+            />
+            too low, run at full power (100%).
           </p>
           <p class="text-italic">
             Proportional gain Kp of the Kettle PID will be set to {{ kp }}.

@@ -8,13 +8,10 @@ import { prettyQty, prettyUnit } from '@/utils/formatting';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
-import { createOutputActions } from '../utils';
-import { defineChangedBlocks, defineCreatedBlocks, defineDisplayedBlocks, defineWidgets } from './changes';
-import { defineLayouts } from './changes-layout';
 import { HermsConfig, HermsOpts } from './types';
 
 const volumeRules: InputRule[] = [
-  v => Number(v) !== 0 || 'Volume can\'t be 0',
+  (v) => Number(v) !== 0 || "Volume can't be 0",
 ];
 
 export default defineComponent({
@@ -29,13 +26,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'update:actions',
-    'back',
-    'next',
-    'close',
-  ],
+  emits: ['update:config', 'back', 'next', 'close'],
   setup(props, { emit }) {
     const hltFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const bkFullPowerDelta = ref<Quantity>(deltaTempQty(2));
@@ -45,58 +36,49 @@ export default defineComponent({
     const mashTarget = ref<Quantity>(tempQty(67));
     const mashActual = ref<Quantity>(tempQty(65));
 
-    const userTemp = computed<string>(
-      () => systemStore.units.temperature,
+    const userTemp = computed<string>(() => systemStore.units.temperature);
+
+    const hltKp = computed<Quantity>(() =>
+      bloxQty(
+        100 / (hltFullPowerDelta.value.value || 2),
+        `1/${userTemp.value}`,
+      ),
     );
 
-    const hltKp = computed<Quantity>(
-      () => bloxQty(100 / (hltFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+    const bkKp = computed<Quantity>(() =>
+      bloxQty(100 / (bkFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
     );
 
-    const bkKp = computed<Quantity>(
-      () => bloxQty(100 / (bkFullPowerDelta.value.value || 2), `1/${userTemp.value}`),
+    const mtKp = computed<Quantity>(() =>
+      bloxQty(mashVolume.value / (hltVolume.value || 1), `1/${userTemp.value}`),
     );
 
-    const mtKp = computed<Quantity>(
-      () => bloxQty(mashVolume.value / (hltVolume.value || 1), `1/${userTemp.value}`),
-    );
+    const hltSetting = computed<Quantity>(() => {
+      if (
+        mashTarget.value.value &&
+        mtKp.value.value &&
+        mashActual.value.value &&
+        driverMax.value.value
+      ) {
+        const upperLimit = mashTarget.value.value + driverMax.value.value;
+        const setting =
+          mashTarget.value.value +
+          (mashTarget.value.value - mashActual.value.value) * mtKp.value.value;
 
-    const hltSetting = computed<Quantity>(
-      () => {
-        if (mashTarget.value.value && mtKp.value.value && mashActual.value.value && driverMax.value.value) {
-          const upperLimit = mashTarget.value.value + driverMax.value.value;
-          const setting = mashTarget.value.value + (mashTarget.value.value - mashActual.value.value) * mtKp.value.value;
-
-          return bloxQty(Math.min(upperLimit, setting), userTemp.value);
-        }
-        return bloxQty(null, userTemp.value);
-      },
-    );
+        return bloxQty(Math.min(upperLimit, setting), userTemp.value);
+      }
+      return bloxQty(null, userTemp.value);
+    });
 
     function done(): void {
-      const opts: HermsOpts = {
+      const hermsOpts: HermsOpts = {
         hltKp: hltKp.value,
         bkKp: bkKp.value,
         mtKp: mtKp.value,
         driverMax: driverMax.value,
       };
 
-      const createdBlocks = defineCreatedBlocks(props.config, opts);
-      const changedBlocks = defineChangedBlocks(props.config);
-      const layouts = defineLayouts(props.config);
-      const widgets = defineWidgets(props.config, layouts);
-      const displayedBlocks = defineDisplayedBlocks(props.config);
-
-      const updates: Partial<HermsConfig> = {
-        layouts,
-        widgets,
-        changedBlocks,
-        createdBlocks,
-        displayedBlocks,
-      };
-
-      emit('update:config', { ...props.config, ...updates });
-      emit('update:actions', createOutputActions());
+      emit('update:config', { ...props.config, hermsOpts });
       emit('next');
     }
 
@@ -108,8 +90,7 @@ export default defineComponent({
           modelValue: hltVolume.value,
           rules: volumeRules,
         },
-      })
-        .onOk(v => hltVolume.value = v);
+      }).onOk((v) => (hltVolume.value = v));
     }
 
     function showMashVolumeKeyboard(): void {
@@ -120,8 +101,7 @@ export default defineComponent({
           type: 'number',
           rules: volumeRules,
         },
-      })
-        .onOk(v => mashVolume.value = v);
+      }).onOk((v) => (mashVolume.value = v));
     }
 
     function showDriverMaxKeyboard(): void {
@@ -132,8 +112,7 @@ export default defineComponent({
           type: 'number',
           suffix: prettyUnit(driverMax.value),
         },
-      })
-        .onOk(v => driverMax.value = v);
+      }).onOk((v) => (driverMax.value = v));
     }
 
     return {
@@ -169,8 +148,8 @@ export default defineComponent({
             PID configuration
           </q-item-label>
           <p>
-            This HERMS setup uses 3 PIDs to control your temperatures.
-            Click the underlined values below to edit.
+            This HERMS setup uses 3 PIDs to control your temperatures. Click the
+            underlined values below to edit.
           </p>
         </q-item-section>
       </q-item>
@@ -181,11 +160,15 @@ export default defineComponent({
           </q-item-label>
           <p>
             If the temperature is more than
-            <InlineQuantityField v-model="hltFullPowerDelta" title="Full power delta" /> too low,
-            run at full power (100%).
+            <InlineQuantityField
+              v-model="hltFullPowerDelta"
+              title="Full power delta"
+            />
+            too low, run at full power (100%).
           </p>
           <p class="text-italic">
-            Proportional gain Kp of the HLT PID will be set to {{ prettyQty(hltKp) }}.
+            Proportional gain Kp of the HLT PID will be set to
+            {{ prettyQty(hltKp) }}.
           </p>
         </q-item-section>
       </q-item>
@@ -196,11 +179,15 @@ export default defineComponent({
           </q-item-label>
           <p>
             If the temperature is more than
-            <InlineQuantityField v-model="bkFullPowerDelta" title="Full power delta" /> too low,
-            run at full power (100%).
+            <InlineQuantityField
+              v-model="bkFullPowerDelta"
+              title="Full power delta"
+            />
+            too low, run at full power (100%).
           </p>
           <p class="text-italic">
-            Proportional gain Kp of the BK PID will be set to {{ prettyQty(bkKp) }}.
+            Proportional gain Kp of the BK PID will be set to
+            {{ prettyQty(bkKp) }}.
           </p>
         </q-item-section>
       </q-item>
@@ -210,20 +197,25 @@ export default defineComponent({
             Mash tun heating
           </q-item-label>
           <p>
-            To heat the wort in your mash tun, it is pumped through a coil in the HLT.
+            To heat the wort in your mash tun, it is pumped through a coil in
+            the HLT.
             <br>
-            We don't want to use a static HLT temperature a bit higher than the mash tun.
+            We don't want to use a static HLT temperature a bit higher than the
+            mash tun.
             <br>
-            We can do better than that, by using a third PID to change the HLT setpoint dynamically.
+            We can do better than that, by using a third PID to change the HLT
+            setpoint dynamically.
           </p>
           <p>
-            More water in the HLT means it builds up more heat to eventually transfer to the MT,
-            so with less water in the HLT, we can use a higher temperature without overshooting.
-            Best is to only fill your HLT to just above your HERMS coil while step mashing.
+            More water in the HLT means it builds up more heat to eventually
+            transfer to the MT, so with less water in the HLT, we can use a
+            higher temperature without overshooting. Best is to only fill your
+            HLT to just above your HERMS coil while step mashing.
           </p>
           <p>
-            To calculate your Kp, enter the actual amount of water used, not the Kettle size.
-            The unit doesn't matter. Also set the maximum difference between MT and HLT setting.
+            To calculate your Kp, enter the actual amount of water used, not the
+            Kettle size. The unit doesn't matter. Also set the maximum
+            difference between MT and HLT setting.
           </p>
         </q-item-section>
       </q-item>
@@ -274,11 +266,16 @@ export default defineComponent({
       <q-item>
         <q-item-section>
           <p class="text-italic">
-            Kp will be set to {{ prettyQty(mtKp) }}.
-            If your mash temperature is
-            <InlineQuantityField v-model="mashActual" style="font-style: normal" />
+            Kp will be set to {{ prettyQty(mtKp) }}. If your mash temperature is
+            <InlineQuantityField
+              v-model="mashActual"
+              style="font-style: normal"
+            />
             and should be
-            <InlineQuantityField v-model="mashTarget" style="font-style: normal" />
+            <InlineQuantityField
+              v-model="mashTarget"
+              style="font-style: normal"
+            />
             the HLT will be set to
             {{ prettyQty(hltSetting) }}.
           </p>

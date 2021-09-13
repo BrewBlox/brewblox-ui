@@ -5,12 +5,12 @@ import { cref } from '@/utils/component-ref';
 
 import GlycolCompletionTask from './GlycolCompletionTask.vue';
 import GlycolHardwareTask from './GlycolHardwareTask.vue';
+import GlycolIoTask from './GlycolIoTask.vue';
 import GlycolNamingTask from './GlycolNamingTask.vue';
 import GlycolSettingsTask from './GlycolSettingsTask.vue';
 
 const plugin: Plugin = {
   install(app) {
-
     const feature: QuickstartFeature = {
       id: 'Glycol',
       title: 'Glycol-cooled fermenter',
@@ -19,6 +19,7 @@ const plugin: Plugin = {
         'QuickstartDiscoveryTask',
         cref(app, GlycolNamingTask),
         cref(app, GlycolHardwareTask),
+        cref(app, GlycolIoTask),
         cref(app, GlycolSettingsTask),
         cref(app, GlycolCompletionTask),
       ],

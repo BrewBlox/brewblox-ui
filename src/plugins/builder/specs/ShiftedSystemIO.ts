@@ -1,4 +1,10 @@
-import { CENTER, DEFAULT_IO_PRESSURE, MAX_IO_PRESSURE, MIN_IO_PRESSURE, UP } from '@/plugins/builder/const';
+import {
+  CENTER,
+  DEFAULT_IO_PRESSURE,
+  MAX_IO_PRESSURE,
+  MIN_IO_PRESSURE,
+  UP,
+} from '@/plugins/builder/const';
 import { PartSpec, PersistentPart } from '@/plugins/builder/types';
 
 const SIZE_X = 2;
@@ -26,12 +32,14 @@ const spec: PartSpec = {
       ? part.settings.onPressure ?? DEFAULT_IO_PRESSURE
       : 0;
     return {
-      [CENTER]: [{
-        outCoords: UP,
-        pressure,
-        liquids: enabled ? part.settings.liquids || [] : [],
-        source: true,
-      }],
+      [CENTER]: [
+        {
+          outCoords: UP,
+          pressure,
+          liquids: enabled ? part.settings.liquids || [] : [],
+          source: true,
+        },
+      ],
       [UP]: [{ outCoords: CENTER, sink: true }],
     };
   },

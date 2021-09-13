@@ -1,6 +1,6 @@
 import { Quantity } from '@/shared-types';
 
-import { PinChannel, QuickstartConfig } from '../types';
+import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export interface GlycolBlockNames {
   beerSensor: string;
@@ -26,22 +26,23 @@ export interface GlycolBlockNames {
   glycolAct: string;
 }
 
-export type GlycolControlMode = 'No' | 'Measure' | 'Control'
-
-export interface GlycolConfig extends QuickstartConfig {
-  names: GlycolBlockNames;
-  heated: boolean;
-  coolPin: PinChannel;
-  heatPin: PinChannel | null;
-
-  glycolPin: PinChannel | null;
-  glycolSensor: string;
-  beerSensor: string;
-
-  glycolControl: GlycolControlMode;
-}
+export type GlycolControlMode = 'No' | 'Measure' | 'Control';
 
 export interface GlycolOpts {
   beerSetting: Quantity;
   glycolSetting: Quantity;
+}
+
+export interface GlycolConfig extends QuickstartConfig {
+  names: GlycolBlockNames;
+  heated: boolean;
+  coolChannel: IoChannelAddress;
+  heatChannel: IoChannelAddress | null;
+
+  glycolChannel: IoChannelAddress | null;
+  glycolSensor: string;
+  beerSensor: string;
+
+  glycolControl: GlycolControlMode;
+  glycolOpts: GlycolOpts;
 }

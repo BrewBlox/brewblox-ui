@@ -1,61 +1,52 @@
 <script lang="ts">
-import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { BlockType, DigitalActuatorBlock } from '@/plugins/spark/types';
-import { Block, DigitalState, IoChannel, IoPin } from '@/plugins/spark/types';
-import { isBlockDriven } from '@/plugins/spark/utils';
-import { Link } from '@/shared-types';
+import { Block, DigitalState, IoChannel } from '@/plugins/spark/types';
+import { channelName, isBlockDriven } from '@/plugins/spark/utils';
+import { IoArrayBlock, Link } from '@/shared-types';
 import { findById } from '@/utils/collections';
-import { makeObjectSorter, makeTypeFilter } from '@/utils/functional';
+import { makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 
 interface EditableChannel extends IoChannel {
-  id: number;
   name: string;
   driver: DigitalActuatorBlock | null;
 }
 
-interface IoArrayBlock extends Block {
-  data: {
-    pins: IoPin[];
-  };
+interface Claim {
+  driverId: string;
+  channelId: number;
 }
 
-interface ClaimDict {
-  [channel: number]: string; // block ID of driver
-}
-
-const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(BlockType.DigitalActuator);
+const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
+  BlockType.DigitalActuator,
+);
 
 export default defineComponent({
   name: 'IoArray',
   setup() {
-    const {
-      serviceId,
-      sparkModule,
-      block,
-    } = useBlockWidget.setup<IoArrayBlock>();
+    const { serviceId, sparkModule, block } =
+      useBlockWidget.setup<IoArrayBlock>();
 
-    const claimedChannels = computed<ClaimDict>(
-      () => sparkModule
-        .blocks
+    const claims = computed<Claim[]>(() =>
+      sparkModule.blocks
         .filter(actuatorFilter)
-        .filter(v => v.data.hwDevice.id === block.value.id)
-        .reduce((acc, v) => set(acc, v.data.channel, v.id), {}),
+        .filter((b) => b.data.hwDevice.id === block.value.id)
+        .map((b) => ({ driverId: b.id, channelId: b.data.channel })),
     );
 
-    const channels = computed<EditableChannel[]>(
-      () => block.value.data.pins
-        .map((pin, idx) => {
-          const id = idx + 1;
-          const driverId = claimedChannels.value[id];
-          const [name] = Object.keys(pin);
-          const driver = sparkModule.blockById<DigitalActuatorBlock>(driverId);
-          return { ...pin[name], id, driver, name };
-        })
-        .sort(makeObjectSorter('name')),
+    const channels = computed<EditableChannel[]>(() =>
+      block.value.data.channels.map((channel: IoChannel) => {
+        const { id } = channel;
+        const claim = claims.value.find((c) => c.channelId === id);
+        const name = channelName(block.value, id) ?? 'Unknown';
+        const driver = sparkModule.blockById<DigitalActuatorBlock>(
+          claim?.driverId,
+        );
+        return { id, driver, name };
+      }),
     );
 
     function driverLink(channel: EditableChannel): Link {
@@ -67,13 +58,16 @@ export default defineComponent({
     }
 
     function driverLimitations(block: Block): string | null {
-      return findById(sparkModule.limitations, block.id)
-        ?.limitedBy
-        .join(', ')
-        || null;
+      return (
+        findById(sparkModule.limitations, block.id)?.limitedBy.join(', ') ||
+        null
+      );
     }
 
-    async function saveDriver(channel: EditableChannel, link: Link): Promise<void> {
+    async function saveDriver(
+      channel: EditableChannel,
+      link: Link,
+    ): Promise<void> {
       const currentDriver = channel.driver;
       if (currentDriver && currentDriver.id === link.id) {
         return;
@@ -91,7 +85,10 @@ export default defineComponent({
       }
     }
 
-    async function saveState(channel: EditableChannel, state: DigitalState): Promise<void> {
+    async function saveState(
+      channel: EditableChannel,
+      state: DigitalState,
+    ): Promise<void> {
       if (channel.driver) {
         channel.driver.data.desiredState = state;
         await sparkModule.saveBlock(channel.driver);
@@ -116,7 +113,13 @@ export default defineComponent({
     <div
       v-for="channel in channels"
       :key="channel.id"
-      class="col row q-gutter-x-sm q-gutter-y-xs q-mt-none items-stretch justify-start"
+      class="
+        col
+        row
+        q-gutter-x-sm q-gutter-y-xs q-mt-none
+        items-stretch
+        justify-start
+      "
     >
       <div class="col-auto q-pt-sm self-baseline text-h6 min-width-sm">
         {{ channel.name }}
@@ -126,10 +129,12 @@ export default defineComponent({
           v-if="channel.driver"
           :disable="driverDriven(channel.driver)"
           :model-value="channel.driver.data.desiredState"
-          :pending="channel.driver.data.state !== channel.driver.data.desiredState"
+          :pending="
+            channel.driver.data.state !== channel.driver.data.desiredState
+          "
           :pending-reason="driverLimitations(channel.driver)"
           class="col-auto self-center"
-          @update:model-value="v => saveState(channel, v)"
+          @update:model-value="(v) => saveState(channel, v)"
         />
         <div v-else class="darkened text-italic q-pa-sm">
           Not set
@@ -142,7 +147,7 @@ export default defineComponent({
         label="Driver"
         dense
         class="col-grow"
-        @update:model-value="link => saveDriver(channel, link)"
+        @update:model-value="(link) => saveDriver(channel, link)"
       />
     </div>
   </div>

@@ -27,7 +27,7 @@ export default defineComponent({
       },
     ];
 
-    const local = ref({ ...props.config });
+    const local = ref<GraphConfig>({ ...props.config });
     watch(props.config, cfg => { local.value = { ...cfg }; });
 
     function saveConfig(config: GraphConfig = local.value): void {

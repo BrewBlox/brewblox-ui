@@ -2,7 +2,13 @@ import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockSpec, BlockType, SensorCombiFunc, TempSensorCombiBlock } from '@/plugins/spark/types';
+import {
+  BlockFieldSpec,
+  BlockSpec,
+  BlockType,
+  SensorCombiFunc,
+  TempSensorCombiBlock,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector, enumHint } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { tempQty } from '@/utils/quantity';
@@ -13,7 +19,6 @@ const type = BlockType.TempSensorCombi;
 
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<TempSensorCombiBlock> = {
       type,
       generate: () => ({

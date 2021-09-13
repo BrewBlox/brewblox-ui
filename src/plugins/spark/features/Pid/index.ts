@@ -2,7 +2,14 @@ import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
 import { sparkStore } from '@/plugins/spark/store';
-import { BlockFieldSpec, BlockIntfType, BlockSpec, BlockType, FilterChoice, PidBlock } from '@/plugins/spark/types';
+import {
+  BlockFieldSpec,
+  BlockIntfType,
+  BlockSpec,
+  BlockType,
+  FilterChoice,
+  PidBlock,
+} from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
@@ -22,7 +29,6 @@ const type = BlockType.Pid;
 
 const plugin: Plugin = {
   install(app) {
-
     const blockSpec: BlockSpec<PidBlock> = {
       type,
       generate: () => ({
@@ -88,7 +94,8 @@ const plugin: Plugin = {
         key: 'inputId',
         title: 'Input',
         component: 'LinkValEdit',
-        generate: () => bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
+        generate: () =>
+          bloxLink(null, BlockIntfType.SetpointSensorPairInterface),
       },
       {
         type,

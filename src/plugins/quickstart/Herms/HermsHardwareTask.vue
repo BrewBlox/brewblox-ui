@@ -1,11 +1,18 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, PropType, ref } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  PropType,
+  reactive,
+  ref,
+} from 'vue';
 
 import { sparkStore } from '@/plugins/spark/store';
 import { createBlockWizard } from '@/plugins/wizardry';
 
-import { PinChannel } from '../types';
-import { hasShared } from '../utils';
+import { GpioChange, IoChannelAddress } from '../types';
+import { hasShared, resetGpioChanges } from '../utils';
 import { HermsConfig } from './types';
 
 export default defineComponent({
@@ -16,37 +23,39 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:config',
-    'back',
-    'next',
-  ],
+  emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
-    const hltPin = ref<PinChannel | null>(props.config.hltPin ?? null);
-    const bkPin = ref<PinChannel | null>(props.config.bkPin ?? null);
+    const hltChannel = ref<IoChannelAddress | null>(
+      props.config.hltChannel ?? null,
+    );
+    const bkChannel = ref<IoChannelAddress | null>(
+      props.config.bkChannel ?? null,
+    );
     const hltSensor = ref<string | null>(props.config.hltSensor ?? null);
     const mtSensor = ref<string | null>(props.config.mtSensor ?? null);
     const bkSensor = ref<string | null>(props.config.bkSensor ?? null);
-
-    const pinSame = computed<boolean>(
-      () => hasShared([hltPin.value, bkPin.value]),
+    const changedGpio = reactive<GpioChange[]>(
+      props.config.changedGpio ?? resetGpioChanges(props.config.serviceId),
     );
 
-    const sensorSame = computed<boolean>(
-      () => hasShared([hltSensor.value, mtSensor.value, bkSensor.value]),
+    const channelSame = computed<boolean>(() =>
+      hasShared([hltChannel.value, bkChannel.value]),
     );
 
-    const valuesOk = computed<boolean>(
-      () => [
-        hltPin.value,
-        bkPin.value,
-        !pinSame.value,
+    const sensorSame = computed<boolean>(() =>
+      hasShared([hltSensor.value, mtSensor.value, bkSensor.value]),
+    );
+
+    const valuesOk = computed<boolean>(() =>
+      [
+        hltChannel.value,
+        bkChannel.value,
+        !channelSame.value,
         hltSensor.value,
         mtSensor.value,
         bkSensor.value,
         !sensorSame.value,
-      ]
-        .every(Boolean),
+      ].every(Boolean),
     );
 
     function discover(): void {
@@ -63,8 +72,9 @@ export default defineComponent({
       }
 
       const updates: Partial<HermsConfig> = {
-        hltPin: hltPin.value!,
-        bkPin: bkPin.value!,
+        changedGpio,
+        hltChannel: hltChannel.value!,
+        bkChannel: bkChannel.value!,
         hltSensor: hltSensor.value!,
         mtSensor: mtSensor.value!,
         bkSensor: bkSensor.value!,
@@ -82,12 +92,13 @@ export default defineComponent({
     onBeforeMount(() => discover());
 
     return {
-      hltPin,
-      bkPin,
+      hltChannel,
+      bkChannel,
       hltSensor,
       mtSensor,
       bkSensor,
-      pinSame,
+      changedGpio,
+      channelSame,
       sensorSame,
       valuesOk,
       discover,
@@ -122,11 +133,16 @@ export default defineComponent({
         <q-item-section>
           <p>
             Select which hardware should be used for each function.<br>
-            You can unplug or heat sensors to identify them.
-            The current value will be shown under each dropdown menu.
+            You can unplug or heat sensors to identify them. The current value
+            will be shown under each dropdown menu.
           </p>
           <p>
-            Use the buttons above to discover new OneWire blocks or manually create a block.
+            Use the buttons above to discover new OneWire blocks or manually
+            create a block.
+          </p>
+          <p v-if="changedGpio.length">
+            The GPIO modules are shown below. You can create IO channels there
+            to add them to the dropdown menus.
           </p>
         </q-item-section>
       </q-item>
@@ -138,24 +154,6 @@ export default defineComponent({
           config.names.bkSensor,
         ]"
       />
-      <q-item>
-        <q-item-section>
-          <QuickstartPinField
-            v-model="hltPin"
-            :service-id="config.serviceId"
-            :error="pinSame"
-            label="HLT output"
-          />
-        </q-item-section>
-        <q-item-section>
-          <QuickstartPinField
-            v-model="bkPin"
-            :service-id="config.serviceId"
-            :error="pinSame"
-            label="BK output"
-          />
-        </q-item-section>
-      </q-item>
       <q-item>
         <q-item-section>
           <QuickstartSensorField
@@ -185,24 +183,42 @@ export default defineComponent({
         </q-item-section>
         <q-item-section />
       </q-item>
-      <CardWarning v-if="pinSame">
+      <q-item>
+        <q-item-section>
+          <QuickstartChannelField
+            v-model="hltChannel"
+            :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
+            :desc="`${config.prefix} HLT`"
+            label="HLT output"
+          />
+        </q-item-section>
+        <q-item-section>
+          <QuickstartChannelField
+            v-model="bkChannel"
+            :service-id="config.serviceId"
+            :changed-gpio="changedGpio"
+            :error="channelSame"
+            :desc="`${config.prefix} BK`"
+            label="BK output"
+          />
+        </q-item-section>
+      </q-item>
+      <CardWarning v-if="channelSame">
         <template #message>
-          Multiple outputs are using the same Pin.
+          Multiple outputs are using the same IO Channel.
         </template>
       </CardWarning>
       <CardWarning v-if="sensorSame">
         <template #message>
-          Multiple sensors are using the same Block.
+          Multiple sensors are using the same block.
         </template>
       </CardWarning>
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="$emit('back')"
-      />
+      <q-btn unelevated label="Back" @click="$emit('back')" />
       <q-space />
       <q-btn
         :disable="!valuesOk"

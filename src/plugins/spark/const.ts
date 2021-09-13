@@ -1,8 +1,9 @@
+import { DS2408ConnectMode } from '@/shared-types';
+
 import {
   AnalogConstraintKey,
   BlockIntfType,
   BlockType,
-  ChannelMapping,
   DigitalConstraintKey,
   DisplayTempUnit,
   FilterChoice,
@@ -25,11 +26,6 @@ export const analogConstraintLabels: Record<AnalogConstraintKey, string> = {
   max: 'Maximum',
   balanced: 'Balanced',
 };
-
-export const DS2408StartChannels: ChannelMapping[] = [
-  { id: 'A', nid: 1, name: 'B' },
-  { id: 'E', nid: 5, name: 'A' },
-];
 
 export const constraintLabels = {
   ...digitalConstraintLabels,
@@ -68,37 +64,75 @@ export const compatibleTypes: Record<BlockIntfType, BlockType[]> = {
     BlockType.TempSensorMock,
     BlockType.TempSensorOneWire,
   ],
-  SetpointSensorPairInterface: [
-    BlockType.SetpointSensorPair,
-  ],
+  SetpointSensorPairInterface: [BlockType.SetpointSensorPair],
   ActuatorAnalogInterface: [
     BlockType.ActuatorAnalogMock,
     BlockType.ActuatorOffset,
     BlockType.ActuatorPwm,
   ],
-  ActuatorDigitalInterface: [
-    BlockType.DigitalActuator,
-    BlockType.MotorValve,
-  ],
-  BalancerInterface: [
-    BlockType.Balancer,
-  ],
-  MutexInterface: [
-    BlockType.Mutex,
-  ],
+  ActuatorDigitalInterface: [BlockType.DigitalActuator, BlockType.MotorValve],
+  BalancerInterface: [BlockType.Balancer],
+  MutexInterface: [BlockType.Mutex],
+  OneWireBusInterface: [BlockType.OneWireGpioModule],
   OneWireDeviceInterface: [
     BlockType.TempSensorOneWire,
     BlockType.DS2408,
     BlockType.DS2413,
   ],
+  IoModuleInterface: [],
   IoArrayInterface: [
     BlockType.DS2408,
     BlockType.DS2413,
     BlockType.Spark2Pins,
     BlockType.Spark3Pins,
+    BlockType.OneWireGpioModule,
     BlockType.MockPins,
   ],
-  DS2408Interface: [
-    BlockType.DS2408,
-  ],
+  DS2408Interface: [BlockType.DS2408],
+};
+
+export const ioChannelNames = {
+  [BlockType.DS2408]: {
+    [DS2408ConnectMode.CONNECT_ACTUATOR]: {
+      1: 'A',
+      2: 'B',
+      3: 'C',
+      4: 'D',
+      5: 'E',
+      6: 'F',
+      7: 'G',
+      8: 'H',
+    },
+    [DS2408ConnectMode.CONNECT_VALVE]: {
+      1: 'B',
+      5: 'A',
+    },
+  },
+  [BlockType.DS2413]: {
+    1: 'A',
+    2: 'B',
+  },
+  [BlockType.MockPins]: {
+    1: 'A',
+    2: 'B',
+    3: 'C',
+    4: 'D',
+    5: 'E',
+    6: 'F',
+    7: 'G',
+    8: 'H',
+  },
+  [BlockType.Spark2Pins]: {
+    1: 'Bottom 1',
+    2: 'Bottom 2',
+    3: 'Bottom 3',
+    4: 'Bottom 4',
+  },
+  [BlockType.Spark3Pins]: {
+    1: 'Top 1',
+    2: 'Top 2',
+    3: 'Top 3',
+    4: 'Bottom 1',
+    5: 'Bottom 2',
+  },
 };

@@ -33,15 +33,9 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup() {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
 
     return {
       dialogRef,
@@ -65,7 +59,15 @@ export default defineComponent({
         <Toolbar :title="title" subtitle="Relations diagram" />
       </template>
       <div class="fit bg-dark">
-        <RelationsDiagram v-bind="$props" />
+        <RelationsDiagram
+          v-bind="{
+            serviceId,
+            nodes,
+            edges,
+            hideUnrelated,
+            canCreate,
+          }"
+        />
       </div>
     </Card>
   </q-dialog>

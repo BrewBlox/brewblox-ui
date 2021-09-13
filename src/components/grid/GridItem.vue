@@ -6,12 +6,7 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import { Widget, widgetStore } from '@/store/widgets';
 import { deepCopy } from '@/utils/objects';
 
-import {
-  GRID_GAP_SIZE,
-  GRID_SQUARE_SIZE,
-  MIN_COLS,
-  MIN_ROWS,
-} from './const';
+import { GRID_GAP_SIZE, GRID_SQUARE_SIZE, MIN_COLS, MIN_ROWS } from './const';
 
 const MAX_TICK_DELTA = 15;
 
@@ -36,10 +31,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'position',
-    'size',
-  ],
+  emits: ['position', 'size'],
   setup(props, { emit }) {
     const widget = computed<Widget>(
       () => widgetStore.widgetById(props.widgetId)!,
@@ -49,7 +41,7 @@ export default defineComponent({
 
     watch(
       () => widget.value,
-      v => localWidget.value = deepCopy(v),
+      (v) => (localWidget.value = deepCopy(v)),
     );
 
     const resizing = ref(false);
@@ -76,26 +68,26 @@ export default defineComponent({
     const containerRef = ref<Element | null>(null);
     const dragOverlayRef = ref<Element | null>(null);
 
-    const style = computed<Mapped<string>>(
-      () => {
-        const { pinnedPosition, cols, rows } = localWidget.value;
-        const pinned = pinnedPosition || zeroPos();
+    const style = computed<Mapped<string>>(() => {
+      const { pinnedPosition, cols, rows } = localWidget.value;
+      const pinned = pinnedPosition || zeroPos();
 
-        return {
-          gridColumnStart: `${current.value.x || pinned.x || resizePos.value.x || 'auto'}`,
-          gridRowStart: `${current.value.y || pinned.y || resizePos.value.y || 'auto'}`,
-          gridColumnEnd: `span ${currentCols.value || cols}`,
-          gridRowEnd: `span ${currentRows.value || rows}`,
-        };
-      },
-    );
+      return {
+        gridColumnStart: `${
+          current.value.x || pinned.x || resizePos.value.x || 'auto'
+        }`,
+        gridRowStart: `${
+          current.value.y || pinned.y || resizePos.value.y || 'auto'
+        }`,
+        gridColumnEnd: `span ${currentCols.value || cols}`,
+        gridRowEnd: `span ${currentRows.value || rows}`,
+      };
+    });
 
-    const dragStyle = computed<Mapped<string>>(
-      () => ({
-        width: `${dragWidth.value}px`,
-        height: `${dragHeight.value}px`,
-      }),
-    );
+    const dragStyle = computed<Mapped<string>>(() => ({
+      width: `${dragWidth.value}px`,
+      height: `${dragHeight.value}px`,
+    }));
 
     function updatePosition(pinnedPosition: XYPosition | null): void {
       // set in local widget to avoid jumps while parents are handling update loops
@@ -110,7 +102,7 @@ export default defineComponent({
     }
 
     function onInteractionStart(e: MouseEvent | TouchEvent): void {
-      const touch = (e instanceof MouseEvent) ? e : e.touches[0];
+      const touch = e instanceof MouseEvent ? e : e.touches[0];
 
       touchStart.value = {
         x: touch.pageX,
@@ -121,7 +113,9 @@ export default defineComponent({
       const container = containerRect();
       const parent = containerParentRect();
 
-      gridWidth.value = Math.floor((parent.width + GRID_GAP_SIZE) / (GRID_GAP_SIZE + GRID_SQUARE_SIZE));
+      gridWidth.value = Math.floor(
+        (parent.width + GRID_GAP_SIZE) / (GRID_GAP_SIZE + GRID_SQUARE_SIZE),
+      );
 
       dragWidth.value = container.width;
       dragHeight.value = container.height;
@@ -144,8 +138,12 @@ export default defineComponent({
     }
 
     function changeSize(): void {
-      const newCols = Math.round((dragWidth.value + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE));
-      const newRows = Math.round((dragHeight.value + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE));
+      const newCols = Math.round(
+        (dragWidth.value + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE),
+      );
+      const newRows = Math.round(
+        (dragHeight.value + GRID_GAP_SIZE) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE),
+      );
 
       if (newCols !== currentCols.value && newCols <= gridWidth.value) {
         currentCols.value = Math.max(newCols, MIN_COLS);
@@ -157,7 +155,7 @@ export default defineComponent({
     }
 
     function calcMoveDelta(e: MouseEvent | TouchEvent): XYPosition {
-      const touch = (e instanceof MouseEvent) ? e : e.touches[0];
+      const touch = e instanceof MouseEvent ? e : e.touches[0];
       const { x, y } = lastDelta.value;
       const raw = {
         x: touch.pageX - touchStart.value.x,
@@ -189,12 +187,23 @@ export default defineComponent({
     }
 
     function findDragGridPosition(delta: XYPosition = zeroPos()): XYPosition {
-      if (!dragStart.value.x || !dragStart.value.y || !dragStartParent.value.x || !dragStartParent.value.y) {
+      if (
+        !dragStart.value.x ||
+        !dragStart.value.y ||
+        !dragStartParent.value.x ||
+        !dragStartParent.value.y
+      ) {
         throw new Error('No starting drag positions known');
       }
 
-      const x = (((dragStart.value.x + delta.x) - dragStartParent.value.x) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1;
-      const y = (((dragStart.value.y + delta.y) - dragStartParent.value.y) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1;
+      const x =
+        (dragStart.value.x + delta.x - dragStartParent.value.x) /
+          (GRID_SQUARE_SIZE + GRID_GAP_SIZE) +
+        1;
+      const y =
+        (dragStart.value.y + delta.y - dragStartParent.value.y) /
+          (GRID_SQUARE_SIZE + GRID_GAP_SIZE) +
+        1;
       const cols = (currentCols.value || localWidget.value.cols) - 1;
 
       return {
@@ -214,8 +223,8 @@ export default defineComponent({
       const parentY = parent.y;
 
       return {
-        x: ((touchX - parentX) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1,
-        y: ((touchY - parentY) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE)) + 1,
+        x: (touchX - parentX) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE) + 1,
+        y: (touchY - parentY) / (GRID_SQUARE_SIZE + GRID_GAP_SIZE) + 1,
       };
     }
 
@@ -246,11 +255,9 @@ export default defineComponent({
     function movePanHandler(args: PanArguments): void {
       if (args.isFirst) {
         onDragStart(args.evt);
-      }
-      else if (args.isFinal) {
+      } else if (args.isFinal) {
         onDragStop();
-      }
-      else {
+      } else {
         onDragMove(args.evt);
       }
     }
@@ -280,11 +287,9 @@ export default defineComponent({
     function resizePanHandler(args: PanArguments): void {
       if (args.isFirst) {
         onResizeStart(args.evt);
-      }
-      else if (args.isFinal) {
+      } else if (args.isFinal) {
         onResizeStop();
-      }
-      else {
+      } else {
         onResizeMove(args.evt);
       }
     }
@@ -294,9 +299,8 @@ export default defineComponent({
     }
 
     function pin(): void {
-      const pos = current.value.x > 0
-        ? current.value
-        : findAutomaticGridPosition();
+      const pos =
+        current.value.x > 0 ? current.value : findAutomaticGridPosition();
       updatePosition(pos);
     }
 
@@ -316,7 +320,8 @@ export default defineComponent({
         evt.preventDefault();
 
         if (current.value.x === 0) {
-          current.value = localWidget.value.pinnedPosition ?? findAutomaticGridPosition();
+          current.value =
+            localWidget.value.pinnedPosition ?? findAutomaticGridPosition();
         }
 
         current.value.x += delta.x;
@@ -386,9 +391,7 @@ export default defineComponent({
     >
       <div class="column q-gutter-sm items-center">
         <q-icon name="mdi-gesture-swipe-horizontal" size="50px" />
-        <div>
-          Drag to reposition
-        </div>
+        <div>Drag to reposition</div>
         <q-btn
           :icon="localWidget.pinnedPosition ? 'mdi-pin' : undefined"
           :label="localWidget.pinnedPosition ? 'Pinned' : 'Pin position'"

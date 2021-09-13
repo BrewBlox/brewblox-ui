@@ -20,14 +20,23 @@ import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock } from '../types';
-import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';
-import { BrewKettleConfig, BrewKettleOpts } from './types';
+import {
+  changedIoModules,
+  pidDefaults,
+  unlinkedActuators,
+  withoutPrefix,
+  withPrefix,
+} from '../utils';
+import { BrewKettleConfig } from './types';
 
 export function defineChangedBlocks(config: BrewKettleConfig): Block[] {
-  return unlinkedActuators(config.serviceId, [config.kettlePin]);
+  return [
+    ...unlinkedActuators(config.serviceId, [config.kettleChannel]),
+    ...changedIoModules(config.serviceId, config.changedGpio),
+  ];
 }
 
-export function defineCreatedBlocks(config: BrewKettleConfig, opts: BrewKettleOpts): Block[] {
+export function defineCreatedBlocks(config: BrewKettleConfig): Block[] {
   const groups = [0];
   const { serviceId, names } = config;
 
@@ -37,80 +46,82 @@ export function defineCreatedBlocks(config: BrewKettleConfig, opts: BrewKettleOp
     ActuatorPwmBlock,
     PidBlock,
   ] = [
-      {
-        id: names.kettleSetpoint,
-        type: BlockType.SetpointSensorPair,
-        serviceId,
-        groups,
-        data: {
-          sensorId: bloxLink(names.kettleSensor),
-          storedSetting: tempQty(70),
-          settingEnabled: false,
-          setting: tempQty(null),
-          value: tempQty(null),
-          valueUnfiltered: tempQty(null),
-          filterThreshold: deltaTempQty(5),
-          filter: FilterChoice.FILTER_15s,
-          resetFilter: false,
+    {
+      id: names.kettleSetpoint,
+      type: BlockType.SetpointSensorPair,
+      serviceId,
+      groups,
+      data: {
+        sensorId: bloxLink(names.kettleSensor),
+        storedSetting: tempQty(70),
+        settingEnabled: false,
+        setting: tempQty(null),
+        value: tempQty(null),
+        valueUnfiltered: tempQty(null),
+        filterThreshold: deltaTempQty(5),
+        filter: FilterChoice.FILTER_15s,
+        resetFilter: false,
+      },
+    },
+    {
+      id: names.kettleAct,
+      type: BlockType.DigitalActuator,
+      serviceId,
+      groups,
+      data: {
+        hwDevice: bloxLink(config.kettleChannel.blockId),
+        channel: config.kettleChannel.channelId,
+        desiredState: DigitalState.STATE_INACTIVE,
+        state: DigitalState.STATE_INACTIVE,
+        invert: false,
+        constrainedBy: {
+          constraints: [],
         },
       },
-      {
-        id: names.kettleAct,
-        type: BlockType.DigitalActuator,
-        serviceId,
-        groups,
-        data: {
-          hwDevice: bloxLink(config.kettlePin.arrayId),
-          channel: config.kettlePin.pinId,
-          desiredState: DigitalState.STATE_INACTIVE,
-          state: DigitalState.STATE_INACTIVE,
-          invert: false,
-          constrainedBy: {
-            constraints: [],
-          },
+    },
+    {
+      id: names.kettlePwm,
+      type: BlockType.ActuatorPwm,
+      serviceId,
+      groups,
+      data: {
+        enabled: true,
+        period: bloxQty('2s'),
+        actuatorId: bloxLink(names.kettleAct),
+        drivenActuatorId: bloxLink(null),
+        setting: 0,
+        desiredSetting: 0,
+        value: 0,
+        constrainedBy: {
+          constraints: [],
         },
       },
-      {
-        id: names.kettlePwm,
-        type: BlockType.ActuatorPwm,
-        serviceId,
-        groups,
-        data: {
-          enabled: true,
-          period: bloxQty('2s'),
-          actuatorId: bloxLink(names.kettleAct),
-          drivenActuatorId: bloxLink(null),
-          setting: 0,
-          desiredSetting: 0,
-          value: 0,
-          constrainedBy: {
-            constraints: [],
-          },
-        },
+    },
+    {
+      id: names.kettlePid,
+      type: BlockType.Pid,
+      serviceId,
+      groups,
+      data: {
+        ...pidDefaults(),
+        enabled: true,
+        inputId: bloxLink(names.kettleSetpoint),
+        outputId: bloxLink(names.kettlePwm),
+        kp: config.kettleOpts.kp,
+        ti: bloxQty('10m'),
+        td: bloxQty('10s'),
+        boilMinOutput: 25,
       },
-      {
-        id: names.kettlePid,
-        type: BlockType.Pid,
-        serviceId,
-        groups,
-        data: {
-          ...pidDefaults(),
-          enabled: true,
-          inputId: bloxLink(names.kettleSetpoint),
-          outputId: bloxLink(names.kettlePwm),
-          kp: opts.kp,
-          ti: bloxQty('10m'),
-          td: bloxQty('10s'),
-          boilMinOutput: 25,
-        },
-      },
-    ];
+    },
+  ];
 
   return blocks;
 }
 
-
-export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, layouts: BuilderLayout[]): Widget[] {
+export function defineWidgets(
+  config: BrewKettleConfig,
+  layouts: BuilderLayout[],
+): Widget[] {
   const { serviceId, names, dashboardId, prefix } = config;
   const userTemp = systemStore.units.temperature;
   const genericSettings = {
@@ -140,7 +151,7 @@ export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, la
     pinnedPosition: { x: 1, y: 1 },
     config: {
       currentLayoutId: layouts[0].id,
-      layoutIds: layouts.map(l => l.id),
+      layoutIds: layouts.map((l) => l.id),
     },
   });
 
@@ -163,8 +174,10 @@ export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, la
         },
       ],
       renames: {
-        [`${serviceId}/${names.kettleSensor}/value[${userTemp}]`]: 'Temperature',
-        [`${serviceId}/${names.kettleSetpoint}/setting[${userTemp}]`]: 'Setting',
+        [`${serviceId}/${names.kettleSensor}/value[${userTemp}]`]:
+          'Temperature',
+        [`${serviceId}/${names.kettleSetpoint}/setting[${userTemp}]`]:
+          'Setting',
         [`${serviceId}/${names.kettlePwm}/value`]: 'PWM value',
       },
       axes: {
@@ -193,10 +206,13 @@ export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, la
           {
             id: modeId,
             title: 'Kettle',
-            setpoint: bloxLink(names.kettleSetpoint, BlockType.SetpointSensorPair),
+            setpoint: bloxLink(
+              names.kettleSetpoint,
+              BlockType.SetpointSensorPair,
+            ),
             coolConfig: null,
             heatConfig: {
-              kp: opts.kp,
+              kp: config.kettleOpts.kp,
               ti: bloxQty('10m'),
               td: bloxQty('10s'),
             },
@@ -206,14 +222,12 @@ export function defineWidgets(config: BrewKettleConfig, opts: BrewKettleOpts, la
     };
   };
 
-  return [
-    createBuilder(),
-    createGraph(),
-    createTempControl(),
-  ];
+  return [createBuilder(), createGraph(), createTempControl()];
 }
 
-export const defineDisplayedBlocks = (config: BrewKettleConfig): DisplayBlock[] => {
+export const defineDisplayedBlocks = (
+  config: BrewKettleConfig,
+): DisplayBlock[] => {
   const { kettlePid } = config.names;
   return [
     {

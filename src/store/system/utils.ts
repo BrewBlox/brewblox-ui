@@ -1,5 +1,6 @@
 import { DialogChainObject } from 'quasar';
 import KeyboardLayouts from 'simple-keyboard-layouts';
+import timezones from 'timezones/zones.json';
 
 import { systemStore } from '@/store/system';
 import { SystemConfig } from '@/store/system/types';
@@ -16,8 +17,7 @@ export function startChangeKeyboardLayout(): DialogChainObject {
         label: 'Layout',
       },
     },
-  })
-    .onOk(keyboardLayout => systemStore.saveConfig({ keyboardLayout }));
+  }).onOk((keyboardLayout) => systemStore.saveConfig({ keyboardLayout }));
 }
 
 export function startEditBuilderTouchDelay(): DialogChainObject {
@@ -40,8 +40,9 @@ export function startEditBuilderTouchDelay(): DialogChainObject {
       `,
       modelValue: systemStore.config.builderTouchDelayed,
     },
-  })
-    .onOk(builderTouchDelayed => systemStore.saveConfig({ builderTouchDelayed }));
+  }).onOk((builderTouchDelayed) =>
+    systemStore.saveConfig({ builderTouchDelayed }),
+  );
 }
 
 export function startChangeTempUnit(): DialogChainObject {
@@ -60,8 +61,10 @@ export function startChangeTempUnit(): DialogChainObject {
         This will affect how temperatures are displayed and logged.
       </p>
       <p>
-        Spark data with different units is logged under different field names to distinguish the values. <br>
-        After changing a unit, you will need to select different fields in your Graph and Metrics widgets.
+        Spark data with different units is logged
+        under different field names to distinguish the values. <br>
+        After changing a unit, you will need to select
+        different fields in your Graph and Metrics widgets.
       </p>
       `,
       html: true,
@@ -69,6 +72,35 @@ export function startChangeTempUnit(): DialogChainObject {
         label: 'Unit',
       },
     },
-  })
-    .onOk(temperature => systemStore.saveUnits({ temperature }));
+  }).onOk((temperature) => systemStore.saveUnits({ temperature }));
+}
+
+export function startChangeTimezone(): DialogChainObject {
+  return createDialog({
+    component: 'SelectDialog',
+    componentProps: {
+      selectOptions: Object.keys(timezones).map((value) => ({
+        value,
+        label: value.replaceAll('_', ' '),
+      })),
+      modelValue: systemStore.timeZone.name,
+      title: 'Choose timezone',
+      message: `
+      <p>
+        Choose the timezone for your Spark 4 services.
+        This will affect the time displayed on the display.
+      </p>
+      <p>
+        History data is always stored as UTC, and is unaffected by this setting.
+      </p>
+      `,
+      html: true,
+      selectProps: {
+        label: 'Timezone',
+      },
+    },
+  }).onOk((name: string) => {
+    const posixValue = timezones[name];
+    systemStore.saveTimeZone({ name, posixValue });
+  });
 }

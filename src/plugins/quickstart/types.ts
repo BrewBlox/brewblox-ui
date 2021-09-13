@@ -1,13 +1,19 @@
 import { BuilderLayout } from '@/plugins/builder/types';
 import { Block } from '@/plugins/spark/types';
 import { DisplayOpts } from '@/plugins/spark/types';
-import { PidBlock } from '@/shared-types';
+import { GpioModuleChannel, PidBlock } from '@/shared-types';
 import { Widget } from '@/store/widgets';
 
-export interface PinChannel {
-  arrayId: string;
-  pinId: number;
-  pinName: string;
+export interface IoChannelAddress {
+  blockId: string;
+  name: string;
+  channelId: number;
+}
+
+export interface GpioChange {
+  blockId: string;
+  modulePosition: number;
+  channels: GpioModuleChannel[];
 }
 
 export interface DisplayBlock {
@@ -23,6 +29,7 @@ export interface QuickstartConfig {
   names: AnyDict;
   layouts: BuilderLayout[];
   widgets: Widget[];
+  changedGpio: GpioChange[];
   createdBlocks: Block[];
   changedBlocks: Block[];
   renamedBlocks: { [old: string]: string };
@@ -31,4 +38,4 @@ export interface QuickstartConfig {
 
 export type QuickstartAction = (config: any) => Awaitable<unknown>;
 
-export type PidConfig = Pick<PidBlock['data'], 'kp' | 'ti' | 'td'>
+export type PidConfig = Pick<PidBlock['data'], 'kp' | 'ti' | 'td'>;

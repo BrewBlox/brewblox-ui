@@ -10,15 +10,9 @@ export default defineComponent({
   props: {
     ...useWizard.props,
   },
-  emits: [
-    ...useWizard.emits,
-  ],
+  emits: [...useWizard.emits],
   setup() {
-    const {
-      onBack,
-      onClose,
-      setDialogTitle,
-    } = useWizard.setup();
+    const { onBack, onClose, setDialogTitle } = useWizard.setup();
 
     const model = ref<QuickstartFeature | null>(null);
     const wizardActive = ref<boolean>(false);
@@ -79,30 +73,35 @@ export default defineComponent({
             Control blocks
           </q-item-label>
           <p>
-            Control blocks are small elements that run on the Brewblox Spark that are combined into a control system.
-            Examples of control blocks are setpoints, sensors, actuators and PIDs.
+            Control blocks are small elements that run on the Brewblox Spark
+            that are combined into a control system. Examples of control blocks
+            are setpoints, sensors, actuators and PIDs.
           </p>
           <p>
-            We have pre-configured sets of control blocks for common brewing setups.
-            This wizard creates new blocks and sets up relations between them.
+            We have pre-configured sets of control blocks for common brewing
+            setups. This wizard creates new blocks and sets up relations between
+            them.
           </p>
           <q-item-label class="text-subtitle1">
             Tuning
           </q-item-label>
           <p>
-            This wizard uses settings that we think will work for the average setup.
-            You might have a more powerful heater, a smaller kettle or a bigger fridge.
+            This wizard uses settings that we think will work for the average
+            setup. You might have a more powerful heater, a smaller kettle or a
+            bigger fridge.
           </p>
           <p>
-            Do some test runs, look at the PID graphs and make adjustments to tune them to your hardware.
+            Do some test runs, look at the PID graphs and make adjustments to
+            tune them to your hardware.
           </p>
           <q-item-label class="text-subtitle1">
             Dashboard
           </q-item-label>
           <p>
-            This wizard will create a new dashboard to show the most relevant values in your setup.
-            The dashboard will have a graph, a graphical overview of your system
-            and quick actions to change multiple blocks at once.
+            This wizard will create a new dashboard to show the most relevant
+            values in your setup. The dashboard will have a graph, a graphical
+            overview of your system and quick actions to change multiple blocks
+            at once.
           </p>
         </q-item-section>
       </q-item>

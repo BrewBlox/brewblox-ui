@@ -11,3 +11,8 @@ export interface SystemConfig {
 export interface UserUnits {
   temperature: TempUnit;
 }
+
+export interface UserTimeZone {
+  name: string;
+  posixValue: string;
+}

@@ -7,8 +7,10 @@ import { Service, serviceStore, ServiceStub } from '@/store/services';
 import { createDialog } from './dialog';
 import { notify } from './notify';
 
-
-export async function startCreateService(stub: ServiceStub, router: Maybe<Router> = null): Promise<void> {
+export async function startCreateService(
+  stub: ServiceStub,
+  router: Maybe<Router> = null,
+): Promise<void> {
   const feature = featureStore.serviceById(stub.type);
   if (feature === null) {
     notify.error(`Unknown service type '${stub.type}'`);
@@ -27,8 +29,7 @@ export async function startCreateService(stub: ServiceStub, router: Maybe<Router
         initialProps: { stub },
       },
     });
-  }
-  else {
+  } else {
     const service = await feature.wizard(stub);
     await serviceStore.appendService(service);
     notify.done(`Added ${feature.title} <b>${service.id}</b>`);
@@ -46,22 +47,25 @@ export function startChangeServiceTitle(service: Maybe<Service>): void {
     component: 'InputDialog',
     componentProps: {
       title: 'Rename service',
-      message: 'This changes the service display name, not its unique identifier.',
+      message:
+        'This changes the service display name, not its unique identifier.',
       modelValue: service.title,
     },
-  })
-    .onOk(async (newTitle: string) => {
-      const oldTitle = service.title;
-      if (!newTitle || oldTitle === newTitle) {
-        return;
-      }
+  }).onOk(async (newTitle: string) => {
+    const oldTitle = service.title;
+    if (!newTitle || oldTitle === newTitle) {
+      return;
+    }
 
-      await serviceStore.saveService({ ...service, title: newTitle });
-      notify.done(`Renamed service to <b>${newTitle}</b>`);
-    });
+    await serviceStore.saveService({ ...service, title: newTitle });
+    notify.done(`Renamed service to <b>${newTitle}</b>`);
+  });
 }
 
-export function startRemoveService(service: Maybe<Service>, router: Router): void {
+export function startRemoveService(
+  service: Maybe<Service>,
+  router: Router,
+): void {
   if (!service) {
     return;
   }
@@ -74,11 +78,10 @@ export function startRemoveService(service: Maybe<Service>, router: Router): voi
       ok: 'Confirm',
       cancel: 'Cancel',
     },
-  })
-    .onOk(() => {
-      if (router.currentRoute.value.path === `/service/${service.id}`) {
-        router.replace('/');
-      }
-      serviceStore.removeService(service);
-    });
+  }).onOk(() => {
+    if (router.currentRoute.value.path === `/service/${service.id}`) {
+      router.replace('/');
+    }
+    serviceStore.removeService(service);
+  });
 }

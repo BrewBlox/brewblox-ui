@@ -15,7 +15,9 @@ export const BlockIntfType = Enum(
   'ActuatorDigitalInterface',
   'BalancerInterface',
   'MutexInterface',
+  'OneWireBusInterface',
   'OneWireDeviceInterface',
+  'IoModuleInterface',
   'IoArrayInterface',
   'DS2408Interface',
 );
@@ -30,6 +32,7 @@ export const SystemBlockType = Enum(
   'WiFiSettings',
   'Spark2Pins',
   'Spark3Pins',
+  'OneWireGpioModule',
 );
 
 export const UserBlockType = Enum(
@@ -72,27 +75,63 @@ export const DigitalConstraintKey = Enum(
   'delayedOn',
 );
 
-export const AnalogConstraintKey = Enum(
-  'min',
-  'max',
-  'balanced',
+export const AnalogConstraintKey = Enum('min', 'max', 'balanced');
+
+// #region Gpio
+export const GpioDeviceType = Enum(
+  'GPIO_DEV_NONE',
+  'GPIO_DEV_SSR_2P',
+  'GPIO_DEV_SSR_1P',
+  'GPIO_DEV_MECHANICAL_RELAY_2P',
+  'GPIO_DEV_MECHANICAL_RELAY_1P_HIGH_SIDE',
+  'GPIO_DEV_MECHANICAL_RELAY_1P_LOW_SIDE',
+  'GPIO_DEV_COIL_2P',
+  'GPIO_DEV_COIL_2P_BIDIRECTIONAL',
+  'GPIO_DEV_COIL_1P_HIGH_SIDE',
+  'GPIO_DEV_COIL_1P_LOW_SIDE',
+  'GPIO_DEV_MOTOR_2P',
+  'GPIO_DEV_MOTOR_2P_BIDIRECTIONAL',
+  'GPIO_DEV_MOTOR_1P_HIGH_SIDE',
+  'GPIO_DEV_MOTOR_1P_LOW_SIDE',
+  'GPIO_DEV_LOAD_DETECT_2P',
+  'GPIO_DEV_LOAD_DETECT_1P_PULL_DOWN',
+  'GPIO_DEV_LOAD_DETECT_1P_PULL_UP',
+  'GPIO_DEV_POWER_1P',
+  'GPIO_DEV_POWER_1P_LOAD_DETECT',
+  'GPIO_DEV_GND_1P',
+  'GPIO_DEV_GND_1P_LOAD_DETECT',
 );
 
-// #region ChannelConfig
-export const ChannelConfig = Enum(
-  'CHANNEL_UNUSED',
-  'CHANNEL_ACTIVE_LOW',
-  'CHANNEL_ACTIVE_HIGH',
-  'CHANNEL_INPUT',
-  'CHANNEL_UNKNOWN',
-);
-// #endregion ChannelConfig
+export enum GpioPins {
+  NONE = 0,
+  PIN_1 = 1 << 0,
+  PIN_2 = 1 << 1,
+  PIN_3 = 1 << 2,
+  PIN_4 = 1 << 3,
+  PIN_5 = 1 << 4,
+  PIN_6 = 1 << 5,
+  PIN_7 = 1 << 6,
+  PIN_8 = 1 << 7,
+}
+
+export enum GpioModuleStatus {
+  NONE = 0,
+  POWER_ON_RESET = 1 << 0,
+  OVERVOLTAGE = 1 << 1,
+  UNDERVOLTAGE_LOCKOUT = 1 << 2,
+  OVERCURRENT = 1 << 3,
+  OPEN_LOAD = 1 << 4,
+  OVERTEMPERATURE_WARNING = 1 << 5,
+  OVERTEMPERATURE_SHUTDOWN = 1 << 6,
+}
+// #endregion Gpio
 
 // #region DigitalState
 export const DigitalState = Enum(
   'STATE_INACTIVE',
   'STATE_ACTIVE',
   'STATE_UNKNOWN',
+  'STATE_REVERSE',
 );
 // #endregion DigitalState
 
@@ -131,24 +170,15 @@ export const LogicResult = Enum(
 // #endregion Logic
 
 // #region ReferenceKind
-export const ReferenceKind = Enum(
-  'REF_SETTING',
-  'REF_VALUE',
-);
+export const ReferenceKind = Enum('REF_SETTING', 'REF_VALUE');
 // #endregion ReferenceKind
 
 // #region DisplayTempUnit
-export const DisplayTempUnit = Enum(
-  'TEMP_CELSIUS',
-  'TEMP_FAHRENHEIT',
-);
+export const DisplayTempUnit = Enum('TEMP_CELSIUS', 'TEMP_FAHRENHEIT');
 // #endregion DisplayTempUnit
 
 // #region DS2408ConnectMode
-export const DS2408ConnectMode = Enum(
-  'CONNECT_VALVE',
-  'CONNECT_ACTUATOR',
-);
+export const DS2408ConnectMode = Enum('CONNECT_VALVE', 'CONNECT_ACTUATOR');
 // #endregion DS2408ConnectMode
 
 // #region ValveState
@@ -184,11 +214,7 @@ export const SensorCombiFunc = Enum(
 // #endregion SensorCombiFunc
 
 // #region Spark2Hardware
-export const Spark2Hardware = Enum(
-  'HW_UNKNOWN',
-  'HW_SPARK1',
-  'HW_SPARK2',
-);
+export const Spark2Hardware = Enum('HW_UNKNOWN', 'HW_SPARK1', 'HW_SPARK2');
 // #endregion Spark2Hardware
 
 // #region SparkPlatform
@@ -207,6 +233,8 @@ export const TouchCalibrated = Enum(
   'CALIBRATED_NEW',
 );
 // #endregion TouchCalibrated
+
+// #region
 
 // #region Wifi
 export const WifiSecurityType = Enum(
@@ -234,7 +262,7 @@ export type BlockType = Enum<typeof BlockType>;
 export type BlockOrIntfType = Enum<typeof BlockOrIntfType>;
 export type DigitalConstraintKey = Enum<typeof DigitalConstraintKey>;
 export type AnalogConstraintKey = Enum<typeof AnalogConstraintKey>;
-export type ChannelConfig = Enum<typeof ChannelConfig>;
+export type GpioDeviceType = Enum<typeof GpioDeviceType>;
 export type DigitalState = Enum<typeof DigitalState>;
 export type DigitalCompareOp = Enum<typeof DigitalCompareOp>;
 export type AnalogCompareOp = Enum<typeof AnalogCompareOp>;

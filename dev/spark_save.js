@@ -15,8 +15,8 @@ async function run() {
     fs.writeFileSync(fname, JSON.stringify(resp.data, undefined, 2));
     console.log('Spark blocks saved', fname);
   }
-};
+}
 
 run()
   .then(() => console.log('Script done!', __filename))
-  .catch(e => console.log(e));
+  .catch((e) => console.log(e));

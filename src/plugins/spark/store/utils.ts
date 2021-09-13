@@ -3,7 +3,12 @@ import get from 'lodash/get';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 
-import { AnalogConstraintsObj, BlockType, DefinedLink, DigitalConstraintsObj } from '@/shared-types';
+import {
+  AnalogConstraintsObj,
+  BlockType,
+  DefinedLink,
+  DigitalConstraintsObj,
+} from '@/shared-types';
 import { ServiceStatus } from '@/store/services';
 import { prettyQty } from '@/utils/formatting';
 import { nullFilter } from '@/utils/functional';
@@ -20,6 +25,7 @@ const IGNORED_RELATIONS: (keyof Block['data'])[] = [
   'drivenOutputId', // PID
   'drivenTargetId', // Setpoint, Setpoint Driver, Logic Actuator
   'drivenActuatorId', // PWM
+  'oneWireBusId', // OneWireTempSensor, DS2408, DS2413
 ];
 
 /**
@@ -37,9 +43,7 @@ const INVERTED_RELATIONS: (keyof Block['data'])[] = [
  * Block types whose relations should be ignored altogether,
  * because they have no impact on control logic.
  */
-const IGNORED_BLOCK_RELATIONS: BlockType[] = [
-  BlockType.DisplaySettings,
-];
+const IGNORED_BLOCK_RELATIONS: BlockType[] = [BlockType.DisplaySettings];
 
 /**
  * Recursively traverses `value` to find all valid and defined links.
@@ -52,33 +56,33 @@ const IGNORED_BLOCK_RELATIONS: BlockType[] = [
  * @param value
  * @returns
  */
-function findNestedRelations(parentId: string, relation: string[], value: any): RelationEdge[] {
+function findNestedRelations(
+  parentId: string,
+  relation: string[],
+  value: any,
+): RelationEdge[] {
   if (IGNORED_RELATIONS.includes(relation[0])) {
     return [];
-  }
-  else if (isDefinedLink(value)) {
+  } else if (isDefinedLink(value)) {
     const [source, target] = INVERTED_RELATIONS.includes(relation[0])
       ? [value.id, parentId]
       : [parentId, value.id];
     return [{ source, target, relation }];
-  }
-  else if (isBloxField(value)) {
+  } else if (isBloxField(value)) {
     // Ignored:
     // - driven links
     // - unset links
     // - quantities
     return [];
-  }
-  else if (isObject(value) || isArray(value)) {
+  } else if (isObject(value) || isArray(value)) {
     // Increase recursion level
     // The output is flattened at each level
     // This way, empty return values are discarded,
     // and a flat output array is returned for any given object depth.
-    return Object
-      .entries(value)
-      .flatMap(([k, v]) => findNestedRelations(parentId, [...relation, k], v));
-  }
-  else {
+    return Object.entries(value).flatMap(([k, v]) =>
+      findNestedRelations(parentId, [...relation, k], v),
+    );
+  } else {
     return [];
   }
 }
@@ -91,7 +95,7 @@ function findNestedRelations(parentId: string, relation: string[], value: any): 
  * @returns
  */
 export function calculateRelations(blocks: Block[]): RelationEdge[] {
-  return blocks.flatMap(block => {
+  return blocks.flatMap((block) => {
     if (IGNORED_BLOCK_RELATIONS.includes(block.type)) {
       return [];
     }
@@ -100,7 +104,7 @@ export function calculateRelations(blocks: Block[]): RelationEdge[] {
 }
 
 interface DriverMapping {
-  [driven: string]: string[]
+  [driven: string]: string[];
 }
 
 /**
@@ -112,17 +116,22 @@ interface DriverMapping {
  * @param blockId Currently checked block ID
  * @returns
  */
-function generateChains(drivers: DriverMapping, chain: string[], blockId: string): string[][] {
+function generateChains(
+  drivers: DriverMapping,
+  chain: string[],
+  blockId: string,
+): string[][] {
   // Check if the driving block is in turn driven
   const superDrivers: string[] = drivers[blockId];
 
   if (superDrivers) {
     // One or more drivers are found: increase recursion level
     return superDrivers
-      .filter(driverId => !chain.includes(driverId)) // Short circuit circular relations
-      .flatMap(driverId => generateChains(drivers, [...chain, blockId], driverId));
-  }
-  else {
+      .filter((driverId) => !chain.includes(driverId)) // Short circuit circular relations
+      .flatMap((driverId) =>
+        generateChains(drivers, [...chain, blockId], driverId),
+      );
+  } else {
     // The chain stops here
     return [[...chain, blockId]];
   }
@@ -155,36 +164,41 @@ function generateChains(drivers: DriverMapping, chain: string[], blockId: string
  * @returns
  */
 export function calculateDrivenChains(blocks: Block[]): string[][] {
-  const drivers: DriverMapping =
-    blocks
-      // Collect all driven links
-      .flatMap(block =>
-        Object
-          .values(block.data)
-          .filter((obj: any): obj is DefinedLink => isDefinedLink(obj) && obj.driven === true)
-          .map((link): [driven: string, driver: string] => [link.id, block.id]),
-      )
-      // Collate all relations, with the key being the driven block,
-      // and the value array being all immediate drivers
-      .reduce(
-        (acc: Mapped<string[]>, [driven, driver]) => {
-          const existing = acc[driven] ?? [];
-          acc[driven] = [...existing, driver];
-          return acc;
-        },
-        {});
+  const drivers: DriverMapping = blocks
+    // Collect all driven links
+    .flatMap((block) =>
+      Object.values(block.data)
+        .filter(
+          (obj: any): obj is DefinedLink =>
+            isDefinedLink(obj) && obj.driven === true,
+        )
+        .map((link): [driven: string, driver: string] => [link.id, block.id]),
+    )
+    // Collate all relations, with the key being the driven block,
+    // and the value array being all immediate drivers
+    .reduce((acc: Mapped<string[]>, [driven, driver]) => {
+      const existing = acc[driven] ?? [];
+      acc[driven] = [...existing, driver];
+      return acc;
+    }, {});
 
-  return Object
-    .keys(drivers)
-    .flatMap(key => generateChains(drivers, [], key));
+  return Object.keys(drivers).flatMap((key) =>
+    generateChains(drivers, [], key),
+  );
 }
 
-function hasDigitalConstraints(data: any): data is { constrainedBy: DigitalConstraintsObj } {
+function hasDigitalConstraints(
+  data: any,
+): data is { constrainedBy: DigitalConstraintsObj } {
   return isQuantity(get(data, 'constrainedBy.constraints[0].remaining'));
 }
 
-function hasAnalogConstraints(data: any): data is { constrainedBy: AnalogConstraintsObj } {
-  return typeof get(data, 'constrainedBy.constraints[0].limiting') === 'boolean';
+function hasAnalogConstraints(
+  data: any,
+): data is { constrainedBy: AnalogConstraintsObj } {
+  return (
+    typeof get(data, 'constrainedBy.constraints[0].limiting') === 'boolean'
+  );
 }
 
 /**
@@ -202,40 +216,37 @@ export function calculateLimitations(blocks: Block[]): BlockLimitation[] {
       if (hasDigitalConstraints(block.data)) {
         return {
           id: block.id,
-          limitedBy: block
-            .data
-            .constrainedBy
-            .constraints
-            .filter(c => c.remaining?.value)
-            .map(c => {
-              const key = Object.keys(c).find(key => key !== 'remaining') ?? '??';
+          limitedBy: block.data.constrainedBy.constraints
+            .filter((c) => c.remaining?.value)
+            .map((c) => {
+              const key =
+                Object.keys(c).find((key) => key !== 'remaining') ?? '??';
               const label = constraintLabels[key] ?? key;
               return `${label} (${prettyQty(c.remaining)})`;
             }),
         };
-      }
-      else if (hasAnalogConstraints(block.data)) {
+      } else if (hasAnalogConstraints(block.data)) {
         return {
           id: block.id,
-          limitedBy: block
-            .data
-            .constrainedBy
-            .constraints
-            .filter(c => c.limiting)
-            .map(c => {
-              const key = Object.keys(c).find(key => key !== 'limiting') ?? '??';
+          limitedBy: block.data.constrainedBy.constraints
+            .filter((c) => c.limiting)
+            .map((c) => {
+              const key =
+                Object.keys(c).find((key) => key !== 'limiting') ?? '??';
               return constraintLabels[key];
             }),
         };
-      }
-      else {
+      } else {
         return null;
       }
     })
     .filter(nullFilter);
 }
 
-export function asSparkStatus(serviceId: string, status: ApiSparkStatus | null): SparkStatus {
+export function asSparkStatus(
+  serviceId: string,
+  status: ApiSparkStatus | null,
+): SparkStatus {
   if (!status) {
     return {
       serviceId,
@@ -249,6 +260,7 @@ export function asSparkStatus(serviceId: string, status: ApiSparkStatus | null):
     serviceId,
     isServiceReachable: true,
     deviceAddress: status.device_address,
+    devicePlatform: status.device_info?.platform,
     connectionKind: status.connection_kind,
     isCompatibleFirmware: status.handshake_info?.is_compatible_firmware,
     isLatestFirmware: status.handshake_info?.is_latest_firmware,
@@ -265,21 +277,16 @@ function statusDesc(status: SparkStatus): [string, string] {
   if (status.isConnected) {
     if (status.isSynchronized) {
       return ['synchronized', 'green'];
-    }
-    else if (status.isCompatibleFirmware) {
+    } else if (status.isCompatibleFirmware) {
       return ['synchronizing', 'yellow'];
-    }
-    else if (status.isAcknowledged) {
+    } else if (status.isAcknowledged) {
       return ['incompatible firmware', 'orange'];
-    }
-    else {
+    } else {
       return ['Waiting for handshake', 'yellow'];
     }
-  }
-  else if (status.isServiceReachable) {
+  } else if (status.isServiceReachable) {
     return ['waiting for connection', 'red'];
-  }
-  else {
+  } else {
     return ['unreachable', 'red'];
   }
 }

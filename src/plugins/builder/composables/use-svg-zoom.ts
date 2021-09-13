@@ -27,45 +27,41 @@ export interface UseSvgZoomComponent {
 }
 
 export interface UseSvgZoomComposable {
-  setup(dimensions: Ref<UseSvgZoomDimensions>, opts?: UseSvgZoomOpts): UseSvgZoomComponent;
+  setup(
+    dimensions: Ref<UseSvgZoomDimensions>,
+    opts?: UseSvgZoomOpts,
+  ): UseSvgZoomComponent;
 }
 
 export const useSvgZoom: UseSvgZoomComposable = {
   setup(dimensions: Ref<UseSvgZoomDimensions>, opts = {}): UseSvgZoomComponent {
     const svgRef = ref<SVGElement>();
     const svgContentRef = ref<SVGGElement>();
-    const {
-      dragEnabled,
-      wheelEnabled,
-    } = defaults(opts, defaultOpts());
+    const { dragEnabled, wheelEnabled } = defaults(opts, defaultOpts());
 
     function transformCenter(scaleOffset = -0.05): d3.ZoomTransform {
       if (!svgRef.value) {
-        return d3
-          .zoomIdentity
-          .translate(0, 0)
-          .scale(1);
+        return d3.zoomIdentity.translate(0, 0).scale(1);
       }
       const svg = svgRef.value.getBoundingClientRect();
       const content = dimensions.value;
-      const scale = (1 + scaleOffset) * Math.min(
-        (svg.width / content.width),
-        (svg.height / content.height),
-        1,
-      );
-      return d3
-        .zoomIdentity
-        .translate(toFinite(svg.width - content.width * scale) / 2, toFinite(svg.height - content.height * scale) / 2)
+      const scale =
+        (1 + scaleOffset) *
+        Math.min(svg.width / content.width, svg.height / content.height, 1);
+      return d3.zoomIdentity
+        .translate(
+          toFinite(svg.width - content.width * scale) / 2,
+          toFinite(svg.height - content.height * scale) / 2,
+        )
         .scale(scale);
     }
 
-    const gridZoom = d3.zoom<SVGElement, unknown>()
-      .on('zoom', function () {
-        const { transform } = d3.event;
-        if (isFinite(transform.x + transform.y + transform.k)) {
-          svgContentRef.value?.setAttribute('transform', transform);
-        }
-      });
+    const gridZoom = d3.zoom<SVGElement, unknown>().on('zoom', function () {
+      const { transform } = d3.event;
+      if (isFinite(transform.x + transform.y + transform.k)) {
+        svgContentRef.value?.setAttribute('transform', transform);
+      }
+    });
 
     function resetZoom(): void {
       if (svgRef.value) {
@@ -81,13 +77,13 @@ export const useSvgZoom: UseSvgZoomComposable = {
         return;
       }
 
-      const selection = d3.select(svgRef.value)
+      const selection = d3
+        .select(svgRef.value)
         .call(gridZoom)
         .on('dblclick.zoom', resetZoom);
 
       if (!wheelEnabled.value) {
-        selection
-          .on('wheel.zoom', null);
+        selection.on('wheel.zoom', null);
       }
 
       if (!dragEnabled.value) {
@@ -105,11 +101,9 @@ export const useSvgZoom: UseSvgZoomComposable = {
       }
     }
 
-    watch(
-      [svgRef, dragEnabled, wheelEnabled],
-      () => applyHandlers(),
-      { immediate: true },
-    );
+    watch([svgRef, dragEnabled, wheelEnabled], () => applyHandlers(), {
+      immediate: true,
+    });
 
     watch(
       [svgContentRef, dimensions],

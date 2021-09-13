@@ -1,6 +1,6 @@
 import { Quantity } from '@/shared-types';
 
-import { PinChannel, QuickstartConfig } from '../types';
+import { IoChannelAddress, QuickstartConfig } from '../types';
 
 export interface BrewKettleBlockNames {
   kettleSensor: string;
@@ -10,12 +10,13 @@ export interface BrewKettleBlockNames {
   kettleAct: string;
 }
 
-export interface BrewKettleConfig extends QuickstartConfig {
-  names: BrewKettleBlockNames;
-  kettlePin: PinChannel;
-  kettleSensor: string;
-}
-
 export interface BrewKettleOpts {
   kp: Quantity;
+}
+
+export interface BrewKettleConfig extends QuickstartConfig {
+  names: BrewKettleBlockNames;
+  kettleChannel: IoChannelAddress;
+  kettleSensor: string;
+  kettleOpts: BrewKettleOpts;
 }

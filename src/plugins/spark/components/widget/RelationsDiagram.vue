@@ -4,7 +4,14 @@ import dagre from 'dagre-d3';
 import graphlib from 'graphlib';
 import startCase from 'lodash/startCase';
 import toFinite from 'lodash/toFinite';
-import { computed, defineComponent, onMounted, PropType, ref, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  PropType,
+  ref,
+  watch,
+} from 'vue';
 
 import { RelationEdge, RelationNode } from '@/plugins/spark/types';
 import { createBlockWizard } from '@/plugins/wizardry';
@@ -43,18 +50,27 @@ export default defineComponent({
   },
   setup(props) {
     const renderFunc = new dagre.render();
-    const resetZoom = ref<() => void>(() => { });
+    const resetZoom = ref<() => void>(() => {});
 
     const svgRef = ref<SVGElement>();
     const diagramRef = ref<SVGGElement>();
 
-    const drawnNodes = computed<RelationNode[]>(
-      () => [...new Set(props.edges.flatMap(edge => [edge.target, edge.source]))]
-        .map(id => props.nodes.find(node => node.id === id) ?? { id, type: UNKNOWN_TYPE }),
+    const drawnNodes = computed<RelationNode[]>(() =>
+      [
+        ...new Set(props.edges.flatMap((edge) => [edge.target, edge.source])),
+      ].map(
+        (id) =>
+          props.nodes.find((node) => node.id === id) ?? {
+            id,
+            type: UNKNOWN_TYPE,
+          },
+      ),
     );
 
-    const loneNodes = computed<RelationNode[]>(
-      () => props.nodes.filter(node => !drawnNodes.value.find(n => n.id === node.id)),
+    const loneNodes = computed<RelationNode[]>(() =>
+      props.nodes.filter(
+        (node) => !drawnNodes.value.find((n) => n.id === node.id),
+      ),
     );
 
     function openSettings(id: string): void {
@@ -76,15 +92,16 @@ export default defineComponent({
     }
 
     function createGraph(): graphlib.Graph {
-      const graph = new graphlib
-        .Graph({ multigraph: true, compound: true })
-        .setGraph({ marginx: 20, marginy: 20 });
+      const graph = new graphlib.Graph({
+        multigraph: true,
+        compound: true,
+      }).setGraph({ marginx: 20, marginy: 20 });
 
       const nodes = props.hideUnrelated
         ? drawnNodes.value
         : [...drawnNodes.value, ...loneNodes.value];
 
-      nodes.forEach(node => {
+      nodes.forEach((node) => {
         graph.setNode(node.id, {
           id: node.id,
           label: nodeTemplate(node.name ?? node.id, node.type),
@@ -94,21 +111,23 @@ export default defineComponent({
           padding: 0,
           rx: 5,
           ry: 5,
-          style: node.type === UNKNOWN_TYPE
-            ? 'fill: gray'
-            : undefined,
+          style: node.type === UNKNOWN_TYPE ? 'fill: gray' : undefined,
         });
       });
 
-      props.edges.forEach(edge => {
+      props.edges.forEach((edge) => {
         const label = edge.relation[0].replace(/Id$/, '');
-        graph.setEdge(edge.source, edge.target, {
-          label: startCase(label),
-          labelStyle: 'fill: white; stroke: none;',
-          style: 'fill: none; stroke: red; stroke-width: 1.5px;',
-          arrowheadStyle: 'fill: red; stroke: red;',
-        },
-          edge.relation[0]);
+        graph.setEdge(
+          edge.source,
+          edge.target,
+          {
+            label: startCase(label),
+            labelStyle: 'fill: white; stroke: none;',
+            style: 'fill: none; stroke: red; stroke-width: 1.5px;',
+            arrowheadStyle: 'fill: red; stroke: red;',
+          },
+          edge.relation[0],
+        );
       });
 
       if (!props.hideUnrelated) {
@@ -117,7 +136,9 @@ export default defineComponent({
         // Add an invisible edge between lone nodes to force vertical ordering
         // Skip an edge every few nodes to create a new column
         loneNodes.value.forEach((node, idx) => {
-          if (idx % LONE_NODE_ROWS === 0) { return; }
+          if (idx % LONE_NODE_ROWS === 0) {
+            return;
+          }
           graph.setEdge(loneNodes.value[idx - 1].id, node.id, {
             label: '',
             labelStyle: invisible,
@@ -135,12 +156,14 @@ export default defineComponent({
       const diagram = d3.select(diagramRef.value!);
 
       try {
-        renderFunc(diagram, graph);
-      } catch (e) {
-        // Workaround for a bug in FireFox where getScreenCTM() returns null for hidden or 0x0 elements
+        // dagre typings for graphlib are outdated
+        renderFunc(diagram, graph as any);
+      } catch (e: any) {
+        // Workaround for a bug in FireFox where getScreenCTM()
+        // returns null for hidden or 0x0 elements
         // https://github.com/dagrejs/dagre-d3/issues/340
         if (e.name === 'TypeError') {
-          renderFunc(diagram, graph);
+          renderFunc(diagram, graph as any);
         } else {
           throw e;
         }
@@ -149,14 +172,17 @@ export default defineComponent({
       // Set custom formatting and onClick handlers for all nodes
       graph
         .nodes()
-        .map(id => graph.node(id))
+        .map((id) => graph.node(id))
         .forEach((node: { id: string; elem: SVGGElement }) => {
           const { id, elem } = node;
           const label = elem.querySelector('foreignObject');
           if (label) {
             label.setAttribute('width', `${LABEL_WIDTH}`);
             label.setAttribute('height', `${LABEL_HEIGHT}`);
-            label.parentElement!.setAttribute('transform', `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`);
+            label.parentElement!.setAttribute(
+              'transform',
+              `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`,
+            );
             label.onclick = () => openSettings(id);
           }
         });
@@ -165,23 +191,26 @@ export default defineComponent({
       const { width, height } = graph.graph() as any;
 
       // Enable zooming the graph
-      const zoom = d3.zoom<SVGElement, unknown>()
-        .on('zoom', function () {
-          diagramRef.value?.setAttribute('transform', d3.event.transform);
-        });
+      const zoom = d3.zoom<SVGElement, unknown>().on('zoom', function () {
+        const transform = d3.event.transform;
+        if (typeof transform === 'string' && transform.includes('NaN')) {
+          return; // invalid transformation
+        }
+        diagramRef.value?.setAttribute('transform', transform);
+      });
 
       // Enable centering the graph
       // Implemented as function to yield new values after window resize
       const centered = (scaleOffset = 0): d3.ZoomTransform => {
         const rect = svgRef.value!.getBoundingClientRect();
-        const scale = (DEFAULT_SCALE + scaleOffset) * Math.min(
-          (rect.width / width),
-          (rect.height / height),
-          1,
-        );
-        return d3
-          .zoomIdentity
-          .translate(toFinite(rect.width - width * scale) / 2, toFinite(rect.height - height * scale) / 2)
+        const scale =
+          (DEFAULT_SCALE + scaleOffset) *
+          Math.min(rect.width / width, rect.height / height, 1);
+        return d3.zoomIdentity
+          .translate(
+            toFinite(rect.width - width * scale) / 2,
+            toFinite(rect.height - height * scale) / 2,
+          )
           .scale(scale);
       };
 
@@ -235,10 +264,7 @@ export default defineComponent({
 
 <template>
   <div class="fit">
-    <svg
-      ref="svgRef"
-      class="fit"
-    >
+    <svg ref="svgRef" class="fit">
       <g ref="diagramRef" />
     </svg>
     <q-btn
@@ -248,9 +274,7 @@ export default defineComponent({
       icon="mdi-stretch-to-page-outline"
       @click="resetZoom"
     >
-      <q-tooltip>
-        Reset zoom
-      </q-tooltip>
+      <q-tooltip> Reset zoom </q-tooltip>
     </q-btn>
   </div>
 </template>

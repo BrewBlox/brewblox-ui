@@ -17,7 +17,6 @@ export default defineComponent({
   },
   emits: ['update:config'],
   setup(props, { emit }) {
-
     function saveConfig(config: MetricsConfig): void {
       emit('update:config', config);
     }
@@ -30,8 +29,7 @@ export default defineComponent({
           title: node.value,
           field: node.value,
         },
-      })
-        .onOk(config => saveConfig(config));
+      }).onOk((config) => saveConfig(config));
     }
 
     function renamed(node: QuasarNode): string {
@@ -39,7 +37,9 @@ export default defineComponent({
     }
 
     function freshDuration(node: QuasarNode): string {
-      return durationString(props.config.freshDuration[node.value] ?? DEFAULT_FRESH_DURATION);
+      return durationString(
+        props.config.freshDuration[node.value] ?? DEFAULT_FRESH_DURATION,
+      );
     }
 
     function decimals(node: QuasarNode): number {
@@ -59,14 +59,29 @@ export default defineComponent({
 
 <template>
   <QueryEditor :config="config" @update:config="saveConfig">
-    <template #leaf="{node}">
+    <template #leaf="{ node }">
       <div @click="editLeaf(node)">
         {{ node.label }}
         <q-tooltip>
           <i>Click to edit</i>
-          <LabeledField :model-value="renamed(node)" label="Label" dense class="q-mt-sm" />
-          <LabeledField :model-value="freshDuration(node)" label="Warn when older than" dense class="q-mt-sm" />
-          <LabeledField :model-value="decimals(node)" label="Rounded decimals" dense class="q-mt-sm" />
+          <LabeledField
+            :model-value="renamed(node)"
+            label="Label"
+            dense
+            class="q-mt-sm"
+          />
+          <LabeledField
+            :model-value="freshDuration(node)"
+            label="Warn when older than"
+            dense
+            class="q-mt-sm"
+          />
+          <LabeledField
+            :model-value="decimals(node)"
+            label="Rounded decimals"
+            dense
+            class="q-mt-sm"
+          />
         </q-tooltip>
       </div>
     </template>

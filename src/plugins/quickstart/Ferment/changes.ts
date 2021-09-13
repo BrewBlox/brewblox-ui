@@ -22,18 +22,35 @@ import { bloxQty, deltaTempQty, durationMs, tempQty } from '@/utils/quantity';
 
 import { TempControlWidget } from '../TempControl/types';
 import { DisplayBlock, PidConfig } from '../types';
-import { pidDefaults, unlinkedActuators, withoutPrefix, withPrefix } from '../utils';
-import { makeBeerCoolConfig, makeBeerHeatConfig, makeFridgeCoolConfig, makeFridgeHeatConfig } from '../utils';
-import { FermentConfig, FermentOpts } from './types';
+import {
+  changedIoModules,
+  pidDefaults,
+  unlinkedActuators,
+  withoutPrefix,
+  withPrefix,
+} from '../utils';
+import {
+  makeBeerCoolConfig,
+  makeBeerHeatConfig,
+  makeFridgeCoolConfig,
+  makeFridgeHeatConfig,
+} from '../utils';
+import { FermentConfig } from './types';
 
-export const defineChangedBlocks = (config: FermentConfig): Block[] => {
-  return unlinkedActuators(config.serviceId, [config.heatPin, config.coolPin]);
-};
+export function defineChangedBlocks(config: FermentConfig): Block[] {
+  return [
+    ...unlinkedActuators(config.serviceId, [
+      config.heatChannel,
+      config.coolChannel,
+    ]),
+    ...changedIoModules(config.serviceId, config.changedGpio),
+  ];
+}
 
-export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): Block[] => {
+export function defineCreatedBlocks(config: FermentConfig): Block[] {
   const groups = [0];
   const { serviceId, names } = config;
-  const { fridgeSetting, beerSetting, activeSetpoint } = opts;
+  const { fridgeSetting, beerSetting, activeSetpoint } = config.fermentOpts;
   const isBeer = activeSetpoint === 'beer';
   const activeSetpointId = isBeer ? names.beerSetpoint : names.fridgeSetpoint;
   const initialSetting = isBeer ? beerSetting : fridgeSetting;
@@ -56,210 +73,210 @@ export const defineCreatedBlocks = (config: FermentConfig, opts: FermentOpts): B
     ActuatorPwmBlock,
     SetpointProfileBlock,
     PidBlock,
-    PidBlock
+    PidBlock,
   ] = [
-      // setpoint sensor pair
-      {
-        id: names.fridgeSetpoint,
-        type: BlockType.SetpointSensorPair,
-        serviceId,
-        groups,
-        data: {
-          sensorId: bloxLink(names.fridgeSensor),
-          storedSetting: fridgeSetting,
-          settingEnabled: true,
-          setting: tempQty(null),
-          value: tempQty(null),
-          valueUnfiltered: tempQty(null),
-          filterThreshold: deltaTempQty(5),
-          filter: FilterChoice.FILTER_15s,
-          resetFilter: false,
-        },
+    // setpoint sensor pair
+    {
+      id: names.fridgeSetpoint,
+      type: BlockType.SetpointSensorPair,
+      serviceId,
+      groups,
+      data: {
+        sensorId: bloxLink(names.fridgeSensor),
+        storedSetting: fridgeSetting,
+        settingEnabled: true,
+        setting: tempQty(null),
+        value: tempQty(null),
+        valueUnfiltered: tempQty(null),
+        filterThreshold: deltaTempQty(5),
+        filter: FilterChoice.FILTER_15s,
+        resetFilter: false,
       },
-      {
-        id: names.beerSetpoint,
-        type: BlockType.SetpointSensorPair,
-        serviceId,
-        groups,
-        data: {
-          sensorId: bloxLink(names.beerSensor),
-          storedSetting: beerSetting,
-          settingEnabled: true,
-          setting: tempQty(null),
-          value: tempQty(null),
-          valueUnfiltered: tempQty(null),
-          filterThreshold: deltaTempQty(5),
-          filter: FilterChoice.FILTER_15s,
-          resetFilter: false,
-        },
+    },
+    {
+      id: names.beerSetpoint,
+      type: BlockType.SetpointSensorPair,
+      serviceId,
+      groups,
+      data: {
+        sensorId: bloxLink(names.beerSensor),
+        storedSetting: beerSetting,
+        settingEnabled: true,
+        setting: tempQty(null),
+        value: tempQty(null),
+        valueUnfiltered: tempQty(null),
+        filterThreshold: deltaTempQty(5),
+        filter: FilterChoice.FILTER_15s,
+        resetFilter: false,
       },
-      // Mutex
-      {
-        id: names.mutex,
-        type: BlockType.Mutex,
-        serviceId,
-        groups,
-        data: {
-          differentActuatorWait: bloxQty('0s'),
-          waitRemaining: bloxQty('0s'),
-        },
+    },
+    // Mutex
+    {
+      id: names.mutex,
+      type: BlockType.Mutex,
+      serviceId,
+      groups,
+      data: {
+        differentActuatorWait: bloxQty('0s'),
+        waitRemaining: bloxQty('0s'),
       },
-      // Digital Actuator
-      {
-        id: names.coolAct,
-        type: BlockType.DigitalActuator,
-        serviceId,
-        groups,
-        data: {
-          hwDevice: bloxLink(config.coolPin.arrayId),
-          channel: config.coolPin.pinId,
-          invert: false,
-          desiredState: DigitalState.STATE_INACTIVE,
-          state: DigitalState.STATE_INACTIVE,
-          constrainedBy: {
-            constraints: [
-              {
-                minOff: bloxQty('5m'),
-                remaining: bloxQty('0s'),
-              },
-              {
-                minOn: bloxQty('2m'),
-                remaining: bloxQty('0s'),
-              },
-              {
-                mutexed: {
-                  mutexId: bloxLink(names.mutex),
-                  extraHoldTime: bloxQty('45m'),
-                  hasCustomHoldTime: true,
-                  hasLock: false,
-                },
-                remaining: bloxQty('0s'),
-              },
-            ],
-          },
-        },
-      },
-      {
-        id: names.heatAct,
-        type: BlockType.DigitalActuator,
-        serviceId,
-        groups,
-        data: {
-          hwDevice: bloxLink(config.heatPin.arrayId),
-          channel: config.heatPin.pinId,
-          desiredState: DigitalState.STATE_INACTIVE,
-          state: DigitalState.STATE_INACTIVE,
-          invert: false,
-          constrainedBy: {
-            constraints: [
-              {
-                mutexed: {
-                  mutexId: bloxLink(names.mutex),
-                  extraHoldTime: bloxQty('20m'),
-                  hasCustomHoldTime: true,
-                  hasLock: false,
-                },
-                remaining: bloxQty('0s'),
-              },
-            ],
-          },
-        },
-      },
-      // PWM
-      {
-        id: names.coolPwm,
-        type: BlockType.ActuatorPwm,
-        serviceId,
-        groups,
-        data: {
-          enabled: true,
-          period: bloxQty('30m'),
-          actuatorId: bloxLink(names.coolAct),
-          drivenActuatorId: bloxLink(null),
-          setting: 0,
-          desiredSetting: 0,
-          value: 0,
-          constrainedBy: { constraints: [] },
-        },
-      },
-      {
-        id: names.heatPwm,
-        type: BlockType.ActuatorPwm,
-        serviceId,
-        groups,
-        data: {
-          enabled: true,
-          period: bloxQty('10s'),
-          actuatorId: bloxLink(names.heatAct),
-          drivenActuatorId: bloxLink(null),
-          setting: 0,
-          desiredSetting: 0,
-          value: 0,
-          constrainedBy: { constraints: [] },
-        },
-      },
-      // Setpoint Profile
-      {
-        id: names.tempProfile,
-        type: BlockType.SetpointProfile,
-        serviceId,
-        groups,
-        data: {
-          start: new Date().getTime() / 1000,
-          enabled: false,
-          targetId: bloxLink(activeSetpointId),
-          drivenTargetId: bloxLink(null),
-          points: [
+    },
+    // Digital Actuator
+    {
+      id: names.coolAct,
+      type: BlockType.DigitalActuator,
+      serviceId,
+      groups,
+      data: {
+        hwDevice: bloxLink(config.coolChannel.blockId),
+        channel: config.coolChannel.channelId,
+        invert: false,
+        desiredState: DigitalState.STATE_INACTIVE,
+        state: DigitalState.STATE_INACTIVE,
+        constrainedBy: {
+          constraints: [
             {
-              time: 0,
-              temperature: initialSetting,
+              minOff: bloxQty('5m'),
+              remaining: bloxQty('0s'),
             },
             {
-              time: durationMs('7d') / 1000,
-              temperature: initialSetting,
+              minOn: bloxQty('2m'),
+              remaining: bloxQty('0s'),
             },
             {
-              time: durationMs('10d') / 1000,
-              temperature: bloxQty(initialSetting).copy(initialSetting.value! + 3),
+              mutexed: {
+                mutexId: bloxLink(names.mutex),
+                extraHoldTime: bloxQty('45m'),
+                hasCustomHoldTime: true,
+                hasLock: false,
+              },
+              remaining: bloxQty('0s'),
             },
           ],
         },
       },
-      // PID
-      {
-        id: names.coolPid,
-        type: BlockType.Pid,
-        serviceId,
-        groups,
-        data: {
-          ...pidDefaults(),
-          ...coolPidConfig,
-          enabled: true,
-          inputId: bloxLink(activeSetpointId),
-          outputId: bloxLink(names.coolPwm),
+    },
+    {
+      id: names.heatAct,
+      type: BlockType.DigitalActuator,
+      serviceId,
+      groups,
+      data: {
+        hwDevice: bloxLink(config.heatChannel.blockId),
+        channel: config.heatChannel.channelId,
+        desiredState: DigitalState.STATE_INACTIVE,
+        state: DigitalState.STATE_INACTIVE,
+        invert: false,
+        constrainedBy: {
+          constraints: [
+            {
+              mutexed: {
+                mutexId: bloxLink(names.mutex),
+                extraHoldTime: bloxQty('20m'),
+                hasCustomHoldTime: true,
+                hasLock: false,
+              },
+              remaining: bloxQty('0s'),
+            },
+          ],
         },
       },
-      {
-        id: names.heatPid,
-        type: BlockType.Pid,
-        serviceId,
-        groups,
-        data: {
-          ...pidDefaults(),
-          ...heatPidConfig,
-          enabled: true,
-          inputId: bloxLink(activeSetpointId),
-          outputId: bloxLink(names.heatPwm),
-        },
+    },
+    // PWM
+    {
+      id: names.coolPwm,
+      type: BlockType.ActuatorPwm,
+      serviceId,
+      groups,
+      data: {
+        enabled: true,
+        period: bloxQty('30m'),
+        actuatorId: bloxLink(names.coolAct),
+        drivenActuatorId: bloxLink(null),
+        setting: 0,
+        desiredSetting: 0,
+        value: 0,
+        constrainedBy: { constraints: [] },
       },
-    ];
+    },
+    {
+      id: names.heatPwm,
+      type: BlockType.ActuatorPwm,
+      serviceId,
+      groups,
+      data: {
+        enabled: true,
+        period: bloxQty('10s'),
+        actuatorId: bloxLink(names.heatAct),
+        drivenActuatorId: bloxLink(null),
+        setting: 0,
+        desiredSetting: 0,
+        value: 0,
+        constrainedBy: { constraints: [] },
+      },
+    },
+    // Setpoint Profile
+    {
+      id: names.tempProfile,
+      type: BlockType.SetpointProfile,
+      serviceId,
+      groups,
+      data: {
+        start: new Date().getTime() / 1000,
+        enabled: false,
+        targetId: bloxLink(activeSetpointId),
+        drivenTargetId: bloxLink(null),
+        points: [
+          {
+            time: 0,
+            temperature: initialSetting,
+          },
+          {
+            time: durationMs('7d') / 1000,
+            temperature: initialSetting,
+          },
+          {
+            time: durationMs('10d') / 1000,
+            temperature: bloxQty(initialSetting).copy(
+              initialSetting.value! + 3,
+            ),
+          },
+        ],
+      },
+    },
+    // PID
+    {
+      id: names.coolPid,
+      type: BlockType.Pid,
+      serviceId,
+      groups,
+      data: {
+        ...pidDefaults(),
+        ...coolPidConfig,
+        enabled: true,
+        inputId: bloxLink(activeSetpointId),
+        outputId: bloxLink(names.coolPwm),
+      },
+    },
+    {
+      id: names.heatPid,
+      type: BlockType.Pid,
+      serviceId,
+      groups,
+      data: {
+        ...pidDefaults(),
+        ...heatPidConfig,
+        enabled: true,
+        inputId: bloxLink(activeSetpointId),
+        outputId: bloxLink(names.heatPwm),
+      },
+    },
+  ];
   return blocks;
-};
-
+}
 
 export const defineWidgets = (
   config: FermentConfig,
-  opts: FermentOpts,
   layouts: BuilderLayout[],
 ): Widget[] => {
   const genericSettings = {
@@ -269,7 +286,7 @@ export const defineWidgets = (
     order: 0,
   };
 
-  const { serviceId, names, prefix } = config;
+  const { serviceId, names, prefix, fermentOpts } = config;
   const tempUnit = systemStore.units.temperature;
 
   const createWidget = (name: string, type: string): Widget => ({
@@ -292,7 +309,7 @@ export const defineWidgets = (
     pinnedPosition: { x: 1, y: 1 },
     config: {
       currentLayoutId: layouts[0].id,
-      layoutIds: layouts.map(l => l.id),
+      layoutIds: layouts.map((l) => l.id),
     },
   });
 
@@ -320,10 +337,14 @@ export const defineWidgets = (
         },
       ],
       renames: {
-        [`${serviceId}/${names.fridgeSensor}/value[${tempUnit}]`]: 'Fridge temperature',
-        [`${serviceId}/${names.beerSensor}/value[${tempUnit}]`]: 'Beer temperature',
-        [`${serviceId}/${names.fridgeSetpoint}/setting[${tempUnit}]`]: 'Fridge setting',
-        [`${serviceId}/${names.beerSetpoint}/setting[${tempUnit}]`]: 'Beer setting',
+        [`${serviceId}/${names.fridgeSensor}/value[${tempUnit}]`]:
+          'Fridge temperature',
+        [`${serviceId}/${names.beerSensor}/value[${tempUnit}]`]:
+          'Beer temperature',
+        [`${serviceId}/${names.fridgeSetpoint}/setting[${tempUnit}]`]:
+          'Fridge setting',
+        [`${serviceId}/${names.beerSetpoint}/setting[${tempUnit}]`]:
+          'Beer setting',
         [`${serviceId}/${names.coolPwm}/value`]: 'Cool PWM value',
         [`${serviceId}/${names.heatPwm}/value`]: 'Heat PWM value',
         [`${serviceId}/${names.coolAct}/state`]: 'Cool Pin state',
@@ -343,9 +364,8 @@ export const defineWidgets = (
   const createTempControl = (): TempControlWidget => {
     const beerModeId = nanoid();
     const fridgeModeId = nanoid();
-    const activeMode = opts.activeSetpoint === 'beer'
-      ? beerModeId
-      : fridgeModeId;
+    const activeMode =
+      fermentOpts.activeSetpoint === 'beer' ? beerModeId : fridgeModeId;
 
     return {
       ...createWidget(withPrefix(prefix, 'Assistant'), 'TempControl'),
@@ -362,14 +382,20 @@ export const defineWidgets = (
           {
             id: beerModeId,
             title: 'Beer',
-            setpoint: bloxLink(names.beerSetpoint, BlockType.SetpointSensorPair),
+            setpoint: bloxLink(
+              names.beerSetpoint,
+              BlockType.SetpointSensorPair,
+            ),
             coolConfig: makeBeerCoolConfig(),
             heatConfig: makeBeerHeatConfig(),
           },
           {
             id: fridgeModeId,
             title: 'Fridge',
-            setpoint: bloxLink(names.fridgeSetpoint, BlockType.SetpointSensorPair),
+            setpoint: bloxLink(
+              names.fridgeSetpoint,
+              BlockType.SetpointSensorPair,
+            ),
             coolConfig: makeFridgeCoolConfig(),
             heatConfig: makeFridgeHeatConfig(),
           },
@@ -393,7 +419,9 @@ export const defineWidgets = (
   ];
 };
 
-export const defineDisplayedBlocks = (config: FermentConfig): DisplayBlock[] => {
+export const defineDisplayedBlocks = (
+  config: FermentConfig,
+): DisplayBlock[] => {
   const { coolPid, heatPid } = config.names;
   return [
     {

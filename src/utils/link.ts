@@ -3,22 +3,30 @@ import { BlockOrIntfType, Link } from '@/shared-types';
 import { prettyLink } from './formatting';
 import { isLink } from './identity';
 
-export function rawLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): Link;
+export function rawLink(
+  id: string | null,
+  type?: BlockOrIntfType | null,
+  driven?: boolean,
+): Link;
 export function rawLink(other: Link): Link;
-export function rawLink(value: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean): Link {
+export function rawLink(
+  value: Link | string | null,
+  type?: BlockOrIntfType | null,
+  driven?: boolean,
+): Link {
   return isLink(value)
     ? {
-      __bloxtype: 'Link',
-      id: value.id ?? null,
-      type: value.type ?? null,
-      driven: value.driven,
-    }
+        __bloxtype: 'Link',
+        id: value.id ?? null,
+        type: value.type ?? null,
+        driven: value.driven,
+      }
     : {
-      __bloxtype: 'Link',
-      id: value,
-      type: type ?? null,
-      driven,
-    };
+        __bloxtype: 'Link',
+        id: value,
+        type: type ?? null,
+        driven,
+      };
 }
 
 export class JSLink implements Link {
@@ -27,9 +35,17 @@ export class JSLink implements Link {
   public type: BlockOrIntfType | null;
   public driven: boolean;
 
-  public constructor(id?: string | null, type?: BlockOrIntfType | null, driven?: boolean);
+  public constructor(
+    id?: string | null,
+    type?: BlockOrIntfType | null,
+    driven?: boolean,
+  );
   public constructor(other: Link);
-  public constructor(value?: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean) {
+  public constructor(
+    value?: Link | string | null,
+    type?: BlockOrIntfType | null,
+    driven?: boolean,
+  ) {
     const obj = rawLink(value as any, type as any, driven as any);
     this.id = obj.id ?? null;
     this.type = obj.type as BlockOrIntfType;
@@ -61,9 +77,9 @@ export class JSLink implements Link {
 
   public eq(other: Link): boolean {
     // Type does not have to be equal
-    return isLink(other)
-      && this.id === other.id
-      && !!this.driven === !!other.driven;
+    return (
+      isLink(other) && this.id === other.id && !!this.driven === !!other.driven
+    );
   }
 }
 
@@ -80,8 +96,16 @@ export class JSLink implements Link {
  * https://brewblox.netlify.app/dev/decisions/20200723_typed_fields.html
  *
  */
-export function bloxLink(id: string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink;
+export function bloxLink(
+  id: string | null,
+  type?: BlockOrIntfType | null,
+  driven?: boolean,
+): JSLink;
 export function bloxLink(other?: Link): JSLink;
-export function bloxLink(value?: Link | string | null, type?: BlockOrIntfType | null, driven?: boolean): JSLink {
+export function bloxLink(
+  value?: Link | string | null,
+  type?: BlockOrIntfType | null,
+  driven?: boolean,
+): JSLink {
   return new JSLink(value as any, type, driven);
 }

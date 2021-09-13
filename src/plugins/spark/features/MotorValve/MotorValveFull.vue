@@ -1,14 +1,29 @@
 <script lang="ts">
-import set from 'lodash/set';
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { DS2408StartChannels } from '@/plugins/spark/const';
-import { Block, BlockType, DS2408Block, DS2408ConnectMode, MotorValveBlock } from '@/plugins/spark/types';
+import {
+  Block,
+  BlockType,
+  DS2408Block,
+  DS2408ConnectMode,
+  MotorValveBlock,
+} from '@/plugins/spark/types';
 import { makeTypeFilter } from '@/utils/functional';
+import { matchesType } from '@/utils/objects';
 
-interface ClaimDict {
-  [startChannel: number]: string; // block ID
+interface Claim {
+  driverId: string;
+  channelId: number;
+}
+
+function targetFilter(b: Block): boolean {
+  // DS2408 is only valid if in valve mode
+  if (matchesType<DS2408Block>(BlockType.DS2408, b)) {
+    return b.data.connectMode === DS2408ConnectMode.CONNECT_VALVE;
+  }
+  // Filter is in addition to the default compatibility check
+  return true;
 }
 
 const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
@@ -16,68 +31,48 @@ const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
 export default defineComponent({
   name: 'MotorValveFull',
   setup() {
-    const {
-      serviceId,
-      sparkModule,
-      block,
-      saveBlock,
-      limitations,
-      isDriven,
-    } = useBlockWidget.setup<MotorValveBlock>();
+    const { serviceId, sparkModule, block, saveBlock, limitations, isDriven } =
+      useBlockWidget.setup<MotorValveBlock>();
 
-    const hwBlock = computed<DS2408Block | null>(
-      () => sparkModule.blockById(block.value.data.hwDevice.id),
+    const hwBlock = computed<DS2408Block | null>(() =>
+      sparkModule.blockById(block.value.data.hwDevice.id),
     );
 
-    const claimedChannels = computed<ClaimDict>(
-      () => {
-        if (!hwBlock.value) {
-          return {};
-        }
-        const targetId = hwBlock.value.id;
-        return sparkModule
-          .blocks
-          .filter(motorValveFilter)
-          .filter(block => block.data.hwDevice.id === targetId)
-          .reduce((acc: ClaimDict, b) => set(acc, b.data.startChannel, b.id), {});
-      },
-    );
+    const claims = computed<Claim[]>(() => {
+      if (!hwBlock.value) {
+        return [];
+      }
+      const targetId = hwBlock.value.id;
+      return sparkModule.blocks
+        .filter(motorValveFilter)
+        .filter((b) => b.id !== block.value.id)
+        .filter((b) => b.data.hwDevice.id === targetId)
+        .map((b) => ({ driverId: b.id, channelId: b.data.startChannel }));
+    });
 
     function driverStr(startChannel: number): string {
-      const driver = claimedChannels.value[startChannel];
-      return driver && driver !== block.value.id
-        ? ` (replace '${driver}')`
-        : '';
+      const claim = claims.value.find((c) => c.channelId === startChannel);
+      return claim ? ` (replace '${claim.driverId}')` : '';
     }
 
-    const channelOpts = computed<SelectOption<number>[]>(
-      () => [
-        { label: 'Not set', value: 0 },
-        ...DS2408StartChannels
-          .map(({ name, nid }) => ({
-            label: `${name}${driverStr(nid)}`,
-            value: nid,
-          })),
-      ],
-    );
+    const channelOpts = computed<SelectOption<number>[]>(() => [
+      { value: 0, label: 'Not set' },
+      { value: 5, label: `A${driverStr(5)}` },
+      { value: 1, label: `B${driverStr(1)}` },
+    ]);
 
-    async function claimChannel(pinId: number): Promise<void> {
-      if (block.value.data.startChannel === pinId) {
+    async function claimChannel(channelId: number): Promise<void> {
+      if (block.value.data.startChannel === channelId) {
         return;
       }
-      const currentDriverId = claimedChannels.value[pinId] ?? null;
-      if (currentDriverId) {
-        const currentDriverBlock = sparkModule.blockById<MotorValveBlock>(currentDriverId)!;
-        currentDriverBlock.data.startChannel = 0;
-        await sparkModule.saveBlock(currentDriverBlock);
+      const claim = claims.value.find((c) => c.channelId === channelId);
+      if (claim) {
+        const driver = sparkModule.blockById<MotorValveBlock>(claim.driverId)!;
+        driver.data.startChannel = 0;
+        await sparkModule.saveBlock(driver);
       }
-      block.value.data.startChannel = pinId;
+      block.value.data.startChannel = channelId;
       await saveBlock();
-    }
-
-    function filterDS2408(b: Block): boolean {
-      return b.type !== BlockType.DS2408
-        || (b as DS2408Block).data.connectMode === DS2408ConnectMode.CONNECT_VALVE;
     }
 
     return {
@@ -88,7 +83,7 @@ export default defineComponent({
       isDriven,
       channelOpts,
       claimChannel,
-      filterDS2408,
+      targetFilter,
     };
   },
 });
@@ -103,11 +98,17 @@ export default defineComponent({
         :model-value="block.data.hwDevice"
         :service-id="serviceId"
         :creatable="false"
-        :block-filter="filterDS2408"
+        :block-filter="targetFilter"
         title="Target DS2408 Chip"
         label="Target DS2408 Chip"
         class="col-grow"
-        @update:model-value="v => { block.data.hwDevice = v; block.data.startChannel = 0; saveBlock(); }"
+        @update:model-value="
+          (v) => {
+            block.data.hwDevice = v;
+            block.data.startChannel = 0;
+            saveBlock();
+          }
+        "
       />
       <SelectField
         :model-value="block.data.startChannel"
@@ -119,16 +120,18 @@ export default defineComponent({
         @update:model-value="claimChannel"
       />
       <div class="col-break" />
-      <LabeledField
-        label="State"
-        class="col-grow"
-      >
+      <LabeledField label="State" class="col-grow">
         <DigitalStateButton
           :model-value="block.data.desiredState"
           :pending="block.data.state !== block.data.desiredState"
           :pending-reason="limitations"
           :disable="isDriven"
-          @update:model-value="v => { block.data.desiredState = v; saveBlock(); }"
+          @update:model-value="
+            (v) => {
+              block.data.desiredState = v;
+              saveBlock();
+            }
+          "
         />
       </LabeledField>
       <LabeledField
@@ -146,9 +149,13 @@ export default defineComponent({
         :model-value="block.data.constrainedBy"
         :service-id="serviceId"
         type="digital"
-
         class="col-grow"
-        @update:model-value="v => { block.data.constrainedBy = v; saveBlock(); }"
+        @update:model-value="
+          (v) => {
+            block.data.constrainedBy = v;
+            saveBlock();
+          }
+        "
       />
     </div>
   </div>
