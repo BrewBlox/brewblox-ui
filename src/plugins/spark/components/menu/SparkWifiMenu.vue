@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, reactive, ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
 import { sparkStore } from '@/plugins/spark/store';

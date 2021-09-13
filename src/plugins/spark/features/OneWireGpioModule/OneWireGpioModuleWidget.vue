@@ -1,7 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import LabeledField from '@/components/form/LabeledField.vue';
 import { GpioModuleChannel, OneWireGpioModuleBlock } from '@/shared-types';
 import { createDialogPromise } from '@/utils/dialog';
 
