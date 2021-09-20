@@ -270,7 +270,7 @@ export interface DigitalActuatorBlock extends Block {
     invert: boolean;
 
     desiredState: DigitalState;
-    state: Readonly<DigitalState>;
+    state: Readonly<DigitalState | null>;
 
     constrainedBy: DigitalConstraintsObj;
   };
@@ -362,8 +362,8 @@ export interface MotorValveBlock extends Block {
     startChannel: number;
 
     desiredState: DigitalState;
-    state: Readonly<DigitalState>;
-    valveState: Readonly<ValveState>;
+    state: Readonly<DigitalState | null>;
+    valveState: Readonly<ValveState | null>;
 
     constrainedBy: DigitalConstraintsObj;
   };
