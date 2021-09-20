@@ -4,11 +4,8 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 import { GpioDeviceType, GpioModuleChannel, GpioPins } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 
-interface DeviceSlot {
-  id: number;
-  name: string;
+interface DeviceSlot extends GpioModuleChannel {
   start: number;
-  width: number;
 }
 
 interface UnusedSlot {
@@ -18,6 +15,46 @@ interface UnusedSlot {
 
 function startBit(n: number): number {
   return n > 0 ? Math.log2(n & -n) : -1;
+}
+
+function pinLegend(channel: GpioModuleChannel): string[] {
+  const output: string[] = [];
+  const { width, deviceType } = channel;
+  output.length = width;
+
+  switch (deviceType) {
+    case GpioDeviceType.GPIO_DEV_SSR_2P:
+    case GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_2P:
+    case GpioDeviceType.GPIO_DEV_COIL_2P:
+    case GpioDeviceType.GPIO_DEV_COIL_2P_BIDIRECTIONAL:
+    case GpioDeviceType.GPIO_DEV_MOTOR_2P:
+    case GpioDeviceType.GPIO_DEV_MOTOR_2P_BIDIRECTIONAL:
+      output.fill('-', 0, width / 2);
+      output.fill('+', width / 2, width);
+      break;
+    case GpioDeviceType.GPIO_DEV_SSR_1P:
+    case GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_1P_HIGH_SIDE:
+    case GpioDeviceType.GPIO_DEV_COIL_1P_HIGH_SIDE:
+    case GpioDeviceType.GPIO_DEV_MOTOR_1P_HIGH_SIDE:
+      output.fill('+');
+      break;
+    case GpioDeviceType.GPIO_DEV_MECHANICAL_RELAY_1P_LOW_SIDE:
+    case GpioDeviceType.GPIO_DEV_COIL_1P_LOW_SIDE:
+    case GpioDeviceType.GPIO_DEV_MOTOR_1P_LOW_SIDE:
+      output.fill('-');
+      break;
+    case GpioDeviceType.GPIO_DEV_POWER_1P:
+      output.fill('P');
+      break;
+    case GpioDeviceType.GPIO_DEV_GND_1P:
+      output.fill('G');
+      break;
+    default:
+      output.fill('');
+      break;
+  }
+
+  return output;
 }
 
 export default defineComponent({
@@ -43,23 +80,13 @@ export default defineComponent({
     const unassigned = computed<DeviceSlot[]>(() =>
       props.channels
         .filter((c) => c.pinsMask === GpioPins.NONE)
-        .map((c) => ({
-          id: c.id,
-          name: c.name,
-          width: c.width,
-          start: -1,
-        })),
+        .map((c) => ({ ...c, start: -1 })),
     );
 
     const active = computed<DeviceSlot[]>(() =>
       props.channels
         .filter((c) => c.pinsMask !== GpioPins.NONE)
-        .map((c) => ({
-          id: c.id,
-          name: c.name,
-          width: c.width,
-          start: startBit(c.pinsMask),
-        })),
+        .map((c) => ({ ...c, start: startBit(c.pinsMask) })),
     );
 
     const unused = computed<UnusedSlot[]>(() => {
@@ -187,6 +214,7 @@ export default defineComponent({
     }
 
     return {
+      pinLegend,
       selectedId,
       selectedChannel,
       unassigned,
@@ -232,7 +260,7 @@ export default defineComponent({
         v-for="slot in active"
         :key="`active-${slot.start}`"
         :class="[
-          'content ellipsis',
+          'content',
           {
             'target-clickable': selectedId === slot.id,
           },
@@ -243,7 +271,17 @@ export default defineComponent({
         }"
         @click="clickActive(slot.id)"
       >
-        {{ slot.name }}
+        <div class="text-italic ellipsis q-ml-sm">
+          {{ slot.name }}
+        </div>
+        <div class="text-bold text-h5 row full-width justify-around">
+          <div
+            v-for="(p, idx) in pinLegend(slot)"
+            :key="`${slot.id}-pin-${idx}`"
+          >
+            {{ p }}
+          </div>
+        </div>
         <q-tooltip>{{ slot.name }}</q-tooltip>
       </div>
       <div
@@ -286,16 +324,23 @@ export default defineComponent({
         <div
           v-for="slot in unassigned"
           :key="`unassigned-${slot.start}`"
-          :class="[
-            'content ellipsis',
-            { 'target-clickable': selectedId === slot.id },
-          ]"
+          :class="['content', { 'target-clickable': selectedId === slot.id }]"
           :style="{
             gridColumnEnd: `span ${slot.width}`,
           }"
           @click.stop="clickUnassigned(slot.id)"
         >
-          {{ slot.name }}
+          <div class="text-italic ellipsis q-ml-sm">
+            {{ slot.name }}
+          </div>
+          <div class="text-bold text-h5 row full-width justify-around">
+            <div
+              v-for="(p, idx) in pinLegend(slot)"
+              :key="`${slot.id}-pin-${idx}`"
+            >
+              {{ p }}
+            </div>
+          </div>
           <q-tooltip>{{ slot.name }}</q-tooltip>
         </div>
       </div>
@@ -315,7 +360,6 @@ export default defineComponent({
     border: 1px solid white
     overflow: hidden
     padding-top: 2px
-    padding-left: 5px
   .filler
     border: 1px dotted $light-green
     overflow: hidden
