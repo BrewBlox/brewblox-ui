@@ -47,7 +47,7 @@ function pinLegend(channel: GpioModuleChannel): string[] {
       output.fill('P');
       break;
     case GpioDeviceType.GPIO_DEV_GND_1P:
-      output.fill('0');
+      output.fill('G');
       break;
     default:
       output.fill('');
