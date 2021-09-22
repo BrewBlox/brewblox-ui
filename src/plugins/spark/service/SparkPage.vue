@@ -3,9 +3,9 @@ import { computed, defineComponent, watch } from 'vue';
 
 import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
 import type {
+  BlockRelation,
+  BlockRelationNode,
   PageMode,
-  RelationEdge,
-  RelationNode,
   SparkService,
   SparkStatus,
 } from '@/plugins/spark/types';
@@ -31,10 +31,10 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const validTypes: BlockType[] = sparkStore.blockSpecs.map(s => s.type);
+    const validTypes: BlockType[] = sparkStore.blockSpecs.map((s) => s.type);
 
-    const service = computed<SparkService | null>(
-      () => serviceStore.serviceById(props.serviceId),
+    const service = computed<SparkService | null>(() =>
+      serviceStore.serviceById(props.serviceId),
     );
 
     const title = computed<string>(
@@ -48,18 +48,16 @@ export default defineComponent({
       },
     );
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.serviceId),
+    const sparkModule = computed<SparkServiceModule | null>(() =>
+      sparkStore.moduleById(props.serviceId),
     );
 
     const isAvailable = computed<boolean>(
-      () => service.value !== null
-        && sparkModule.value !== null,
+      () => service.value !== null && sparkModule.value !== null,
     );
 
     const isReady = computed<boolean>(
-      () => isAvailable.value
-        && sparkModule.value?.lastBlocks != null,
+      () => isAvailable.value && sparkModule.value?.lastBlocks != null,
     );
 
     const status = computed<SparkStatus | null>(
@@ -67,30 +65,30 @@ export default defineComponent({
     );
 
     const statusNok = computed<boolean>(
-      () => isAvailable.value
-        && status.value !== null
-        && (!status.value.isSynchronized || !!status.value.isUpdating),
+      () =>
+        isAvailable.value &&
+        status.value !== null &&
+        (!status.value.isSynchronized || !!status.value.isUpdating),
     );
 
     const pageMode = computed<PageMode>({
       get: () => sparkModule.value?.sessionConfig.pageMode ?? 'Relations',
-      set: v => sparkModule.value?.updateSessionConfig({ pageMode: v }),
+      set: (v) => sparkModule.value?.updateSessionConfig({ pageMode: v }),
     });
 
-    const nodes = computed<RelationNode[]>(
-      () => sparkStore.serviceBlocks(props.serviceId)
-        .filter(block => validTypes.includes(block.type))
-        .map(block => ({
+    const nodes = computed<BlockRelationNode[]>(() =>
+      sparkStore
+        .serviceBlocks(props.serviceId)
+        .filter((block) => validTypes.includes(block.type))
+        .map((block) => ({
           id: block.id,
           type: featureStore.widgetTitle(block.type),
-          name: block.type === BlockType.SysInfo
-            ? title.value
-            : undefined,
+          name: block.type === BlockType.SysInfo ? title.value : undefined,
         }))
         .sort(makeObjectSorter('type')),
     );
 
-    const edges = computed<RelationEdge[]>(
+    const edges = computed<BlockRelation[]>(
       () => sparkModule.value?.relations ?? [],
     );
 
@@ -147,9 +145,7 @@ export default defineComponent({
         size="12px"
         class="self-center"
       >
-        <q-tooltip>
-          Service actions
-        </q-tooltip>
+        <q-tooltip> Service actions </q-tooltip>
         <template #menus>
           <SparkActions :service-id="serviceId" />
         </template>
@@ -157,13 +153,8 @@ export default defineComponent({
     </ButtonsTeleport>
 
     <!-- Troubleshooter -->
-    <div
-      v-if="statusNok"
-      class="q-pa-lg row"
-    >
-      <Troubleshooter
-        :service-id="serviceId"
-      />
+    <div v-if="statusNok" class="q-pa-lg row">
+      <Troubleshooter :service-id="serviceId" />
     </div>
 
     <!-- Relations graph display -->
@@ -177,9 +168,6 @@ export default defineComponent({
     />
 
     <!-- Block list display -->
-    <SparkListView
-      v-else-if="pageMode === 'List'"
-      :service-id="serviceId"
-    />
+    <SparkListView v-else-if="pageMode === 'List'" :service-id="serviceId" />
   </q-page>
 </template>

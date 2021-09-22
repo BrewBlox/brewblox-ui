@@ -8,8 +8,8 @@ import type {
   BlockAddress,
   BlockFieldAddress,
   BlockLimitation,
+  BlockRelation,
   Link,
-  RelationEdge,
   SparkExported,
   SparkPatchEvent,
   SparkService,
@@ -29,13 +29,7 @@ import { deepCopy } from '@/utils/objects';
 import { deserialize } from '@/utils/parsing';
 
 import * as api from './api';
-import {
-  asServiceStatus,
-  asSparkStatus,
-  calculateDrivenChains,
-  calculateLimitations,
-  calculateRelations,
-} from './utils';
+import { asServiceStatus, asSparkStatus } from './utils';
 
 const defaultSessionConfig = (): SparkSessionConfig => ({
   pageMode: 'Relations',
@@ -55,6 +49,9 @@ export class SparkServiceModule extends VuexModule {
   public volatileBlocks: Block[] = [];
   public discoveredBlocks: string[] = [];
   public status: SparkStatus | null = null;
+  public relations: BlockRelation[] = [];
+  public drivenChains: string[][] = [];
+  public limitations: BlockLimitation[] = [];
   public lastBlocks: Date | null = null;
   public lastStatus: Date | null = null;
   public sessionConfig: SparkSessionConfig = defaultSessionConfig();
@@ -69,20 +66,8 @@ export class SparkServiceModule extends VuexModule {
     return this.blocks.map((v) => v.id);
   }
 
-  public get drivenChains(): string[][] {
-    return calculateDrivenChains(this.blocks);
-  }
-
   public get drivenBlocks(): string[] {
     return this.drivenChains.map((c) => c[0]);
-  }
-
-  public get relations(): RelationEdge[] {
-    return calculateRelations(this.blocks);
-  }
-
-  public get limitations(): BlockLimitation[] {
-    return calculateLimitations(this.blocks);
   }
 
   public get service(): SparkService {
@@ -118,6 +103,9 @@ export class SparkServiceModule extends VuexModule {
   @Mutation
   public invalidateBlocks(): void {
     this.blocks = [];
+    this.relations = [];
+    this.drivenChains = [];
+    this.limitations = [];
     this.lastBlocks = null;
   }
 
@@ -399,6 +387,9 @@ export class SparkServiceModule extends VuexModule {
 
           this.updateBlocks(blocks);
           this.updateStatus(status);
+          this.relations = evt.data.relations;
+          this.drivenChains = evt.data.drive_chains;
+          this.limitations = evt.data.limitations;
           serviceStore.updateStatus(asServiceStatus(status));
         }
       },

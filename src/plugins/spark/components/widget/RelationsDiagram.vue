@@ -13,7 +13,7 @@ import {
   watch,
 } from 'vue';
 
-import { RelationEdge, RelationNode } from '@/plugins/spark/types';
+import { BlockRelation, BlockRelationNode } from '@/plugins/spark/types';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { createBlockDialog } from '@/utils/dialog';
 import { isJsonEqual } from '@/utils/objects';
@@ -32,11 +32,11 @@ export default defineComponent({
       required: true,
     },
     nodes: {
-      type: Array as PropType<RelationNode[]>,
+      type: Array as PropType<BlockRelationNode[]>,
       required: true,
     },
     edges: {
-      type: Array as PropType<RelationEdge[]>,
+      type: Array as PropType<BlockRelation[]>,
       required: true,
     },
     hideUnrelated: {
@@ -55,7 +55,7 @@ export default defineComponent({
     const svgRef = ref<SVGElement>();
     const diagramRef = ref<SVGGElement>();
 
-    const drawnNodes = computed<RelationNode[]>(() =>
+    const drawnNodes = computed<BlockRelationNode[]>(() =>
       [
         ...new Set(props.edges.flatMap((edge) => [edge.target, edge.source])),
       ].map(
@@ -67,7 +67,7 @@ export default defineComponent({
       ),
     );
 
-    const loneNodes = computed<RelationNode[]>(() =>
+    const loneNodes = computed<BlockRelationNode[]>(() =>
       props.nodes.filter(
         (node) => !drawnNodes.value.find((n) => n.id === node.id),
       ),

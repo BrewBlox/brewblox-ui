@@ -13,11 +13,14 @@ import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { Block } from '@/shared-types';
 import { widgetStore } from '@/store/widgets';
-import { findById } from '@/utils/collections';
 
 import { SparkServiceModule, sparkStore } from '../store';
 import { BlockConfig, BlockSpec, BlockWidget } from '../types';
-import { isBlockVolatile, makeBlockGraphConfig } from '../utils';
+import {
+  isBlockVolatile,
+  limitationString,
+  makeBlockGraphConfig,
+} from '../utils';
 
 export interface UseBlockWidgetComponent<BlockT extends Block>
   extends UseWidgetComponent<BlockWidget> {
@@ -97,11 +100,12 @@ export const useBlockWidget: UseBlockWidgetComposable = {
       await sparkModule.saveBlock(v);
     }
 
-    const limitations = computed<string | null>(
-      () =>
-        findById(sparkModule.limitations, config.value.blockId)?.limitedBy.join(
-          ', ',
-        ) || null,
+    const limitations = computed<string | null>(() =>
+      limitationString(
+        sparkModule.limitations.filter(
+          (v) => v.target === config.value.blockId,
+        ),
+      ),
     );
 
     const hasGraph: boolean =

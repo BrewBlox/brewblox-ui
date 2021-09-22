@@ -60,22 +60,11 @@ export interface SparkExported {
   store: SparkStoreEntry[];
 }
 
-export interface RelationEdge {
-  source: string;
-  target: string;
-  relation: string[];
-}
-
-export interface RelationNode {
+export interface BlockRelationNode {
   id: string;
   type: string;
   name?: string; // overrides `id` for rendering
   title?: string; // overrides `type` for rendering
-}
-
-export interface BlockLimitation {
-  id: string; // block ID
-  limitedBy: string[]; // descriptions
 }
 
 export interface StoredDataPreset<DataT = any> extends StoreObject {
