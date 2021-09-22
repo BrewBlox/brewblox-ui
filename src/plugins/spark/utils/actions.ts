@@ -12,6 +12,8 @@ import {
   BlockType,
   DigitalActuatorBlock,
   DisplaySlot,
+  DS2408Block,
+  IoArrayBlock,
   MotorValveBlock,
 } from '@/shared-types';
 import { dashboardStore } from '@/store/dashboards';
@@ -23,6 +25,7 @@ import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 
 import { makeBlockIdRules } from './configuration';
+import { channelName } from './formatting';
 import {
   isBlockDisplayed,
   isBlockDisplayReady,
@@ -227,11 +230,11 @@ export function saveHwInfo(serviceId: string): void {
       if (hwDevice.id === null || !startChannel) {
         return;
       }
-      const target = sparkStore.blockById(serviceId, hwDevice.id);
-      const pin = target?.data.pins[startChannel - 1];
-      if (target && pin !== undefined) {
-        const [name] = Object.keys(pin);
-        linked.push(`${block.id}: ${target.id} ${name}`);
+      const target = sparkStore.blockById<DS2408Block>(serviceId, hwDevice.id);
+      if (target) {
+        linked.push(
+          `${block.id}: ${target.id} ${channelName(target, startChannel)}`,
+        );
       }
     }
 
@@ -240,11 +243,11 @@ export function saveHwInfo(serviceId: string): void {
       if (hwDevice.id === null || !channel) {
         return;
       }
-      const target = sparkStore.blockById(serviceId, hwDevice.id);
-      const pin = target?.data.pins[channel - 1];
-      if (target && pin !== undefined) {
-        const [name] = Object.keys(pin);
-        linked.push(`${block.id}: ${target.id} ${name}`);
+      const target = sparkStore.blockById<IoArrayBlock>(serviceId, hwDevice.id);
+      if (target) {
+        linked.push(
+          `${block.id}: ${target.id} ${channelName(target, channel)}`,
+        );
       }
     }
 
