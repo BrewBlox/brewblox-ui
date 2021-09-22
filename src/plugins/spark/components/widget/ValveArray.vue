@@ -4,9 +4,12 @@ import { computed, defineComponent } from 'vue';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { Block, BlockType, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel } from '@/plugins/spark/types';
-import { channelName, isBlockDriven } from '@/plugins/spark/utils';
+import {
+  channelName,
+  isBlockDriven,
+  limitationString,
+} from '@/plugins/spark/utils';
 import { IoArrayBlock, Link } from '@/shared-types';
-import { findById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 
@@ -54,9 +57,8 @@ export default defineComponent({
     }
 
     function driverLimitations(block: Block): string | null {
-      return (
-        findById(sparkModule.limitations, block.id)?.limitedBy.join(', ') ||
-        null
+      return limitationString(
+        sparkModule.limitations.filter((v) => v.target === block.id),
       );
     }
 

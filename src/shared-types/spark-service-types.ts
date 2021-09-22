@@ -1,4 +1,9 @@
-import { Block } from './spark-block-types';
+import {
+  AnalogConstraintKey,
+  DigitalConstraintKey,
+} from '@/plugins/spark/types';
+
+import { Block, Quantity } from './spark-block-types';
 
 // #region SparkFirmwareInfo
 export interface SparkFirmwareInfo {
@@ -43,6 +48,22 @@ export interface ApiSparkStatus {
 }
 // #endregion ApiSparkStatus
 
+// #region BlockRelation
+export interface BlockRelation {
+  source: string;
+  target: string;
+  relation: string[];
+}
+// #endregion BlockRelation
+
+// #region BlockLimitation
+export interface BlockLimitation {
+  target: string;
+  constraint: AnalogConstraintKey | DigitalConstraintKey;
+  remaining: Quantity | null;
+}
+// #endregion BlockLimitation
+
 // #region SparkStateEvent
 export interface SparkStateEvent {
   key: string; // Service ID
@@ -50,6 +71,9 @@ export interface SparkStateEvent {
   data: {
     status: ApiSparkStatus | null;
     blocks: Block[];
+    relations: BlockRelation[];
+    drive_chains: string[][];
+    limitations: BlockLimitation[];
   };
 }
 // #endregion SparkStateEvent

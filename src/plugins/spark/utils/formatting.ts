@@ -8,6 +8,7 @@ import {
 } from '@/plugins/spark/types';
 import {
   Block,
+  BlockLimitation,
   BlockType,
   DS2408Block,
   OneWireGpioModuleBlock,
@@ -17,7 +18,7 @@ import { notify } from '@/utils/notify';
 import { matchesType } from '@/utils/objects';
 import { durationString } from '@/utils/quantity';
 
-import { ioChannelNames } from '../const';
+import { constraintLabels, ioChannelNames } from '../const';
 
 export const prettyBlock = (v: BlockAddress | null | undefined): string =>
   v?.id || '<not set>';
@@ -92,4 +93,18 @@ export function channelName(block: Block, id: number): string | undefined {
     return block.data.channels.find((c) => c.id === id)?.name;
   }
   return ioChannelNames[block.type]?.[id];
+}
+
+export function limitationString(
+  limitations: BlockLimitation[],
+): string | null {
+  return (
+    limitations
+      .map(({ constraint, remaining }) =>
+        remaining
+          ? `${constraintLabels[constraint]} (${durationString(remaining)})`
+          : `${constraintLabels[constraint]}`,
+      )
+      .join(', ') ?? null
+  );
 }

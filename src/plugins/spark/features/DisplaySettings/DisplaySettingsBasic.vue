@@ -6,34 +6,30 @@ import { DisplaySettingsBlock, DisplaySlot } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/dialog';
 
 const footerRules: InputRule[] = [
-  v => !v || v.length <= 40 || 'Footer text can only be 40 characters',
+  (v) => !v || v.length <= 40 || 'Footer text can only be 40 characters',
 ];
 
 export default defineComponent({
   name: 'DisplaySettingsBasic',
   setup() {
-    const {
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<DisplaySettingsBlock>();
+    const { block, saveBlock } = useBlockWidget.setup<DisplaySettingsBlock>();
 
-    const slots = computed<(DisplaySlot | null)[]>(
-      () => {
-        const slots = Array(6).fill(null);
-        block.value.data.widgets
-          .forEach(w => { slots[w.pos - 1] = w; });
-        return slots;
-      },
-    );
+    const slots = computed<(DisplaySlot | null)[]>(() => {
+      const slots = Array(6).fill(null);
+      block.value.data.widgets.forEach((w) => {
+        slots[w.pos - 1] = w;
+      });
+      return slots;
+    });
 
     function slotStyle(slot: DisplaySlot | null): AnyDict {
       return slot
         ? {
-          gridColumnEnd: 'span 1',
-          borderColor: slot ? `#${slot.color} !important` : '',
-          borderStyle: 'solid',
-          borderWidth: slot ? '1px' : '0px',
-        }
+            gridColumnEnd: 'span 1',
+            borderColor: slot ? `#${slot.color} !important` : '',
+            borderStyle: 'solid',
+            borderWidth: slot ? '1px' : '0px',
+          }
         : {};
     }
 
@@ -69,7 +65,9 @@ export default defineComponent({
           <q-item-label caption>
             Slot {{ idx + 1 }}
           </q-item-label>
-          <span v-if="slot" class="text-bold ellipsis">{{ slot.name || '---' }}</span>
+          <span v-if="slot" class="text-bold ellipsis">{{
+            slot.name || '---'
+          }}</span>
           <span v-else class="darkened">Not set</span>
         </div>
       </div>
@@ -79,7 +77,12 @@ export default defineComponent({
         :rules="footerRules"
         label="Footer text"
         title="footer text"
-        @update:model-value="v => { block.data.name = v; saveBlock(); }"
+        @update:model-value="
+          (v) => {
+            block.data.name = v;
+            saveBlock();
+          }
+        "
       />
     </div>
   </div>
