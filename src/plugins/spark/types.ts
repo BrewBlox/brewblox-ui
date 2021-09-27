@@ -65,6 +65,8 @@ export interface BlockRelationNode {
   type: string;
   name?: string; // overrides `id` for rendering
   title?: string; // overrides `type` for rendering
+  placement?: 'top' | 'bottom';
+  lone?: boolean;
 }
 
 export interface StoredDataPreset<DataT = any> extends StoreObject {

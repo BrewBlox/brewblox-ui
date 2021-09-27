@@ -56,8 +56,8 @@ export const useSvgZoom: UseSvgZoomComposable = {
         .scale(scale);
     }
 
-    const gridZoom = d3.zoom<SVGElement, unknown>().on('zoom', function () {
-      const { transform } = d3.event;
+    const gridZoom = d3.zoom<SVGElement, unknown>().on('zoom', function (evt) {
+      const { transform } = evt;
       if (isFinite(transform.x + transform.y + transform.k)) {
         svgContentRef.value?.setAttribute('transform', transform);
       }

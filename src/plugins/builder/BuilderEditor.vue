@@ -635,7 +635,7 @@ export default defineComponent({
 
     // Return the exact position of the current event
     function d3EventPos(): XYPosition {
-      const [x, y] = d3.mouse(svgContentRef.value!);
+      const [x, y] = d3.pointer(svgContentRef.value!);
       return { x, y };
     }
 
@@ -723,13 +723,13 @@ export default defineComponent({
         const { x, y } = d3EventPos();
         updateDragSelect(x, y);
       })
-      .on('end', function () {
+      .on('end', function (evt: MouseEvent) {
         if (floater.value) {
           dropFloater(toCoords(d3EventPos()));
           return;
         }
 
-        const { altKey, shiftKey } = d3.event.sourceEvent as MouseEvent;
+        const { altKey, shiftKey } = evt;
 
         const sourceIds = deepCopy(selectedIds.value);
         const targetIds = flowParts.value
@@ -837,9 +837,9 @@ export default defineComponent({
           'delete',
         ].includes(tool)
       ) {
-        partSelection.on('click', function () {
+        partSelection.on('click', function (evt: Event) {
           builderToolActions[tool]('click');
-          d3.event.stopPropagation();
+          evt.stopPropagation();
         });
       } else {
         partSelection.on('click', null);

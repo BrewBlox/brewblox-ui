@@ -9,12 +9,13 @@ import type {
   SparkService,
   SparkStatus,
 } from '@/plugins/spark/types';
-import { BlockType } from '@/shared-types';
+import { Block, BlockIntfType, BlockType } from '@/shared-types';
 import { featureStore } from '@/store/features';
 import { serviceStore } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
 
+import { isCompatible } from '../utils';
 import SparkListView from './SparkListView.vue';
 import Troubleshooter from './Troubleshooter.vue';
 
@@ -76,6 +77,16 @@ export default defineComponent({
       set: (v) => sparkModule.value?.updateSessionConfig({ pageMode: v }),
     });
 
+    function blockPlacement(block: Block): 'top' | 'bottom' | undefined {
+      if (isCompatible(block.type, BlockIntfType.TempSensorInterface)) {
+        return 'top';
+      }
+      if (isCompatible(block.type, BlockIntfType.IoArrayInterface)) {
+        return 'bottom';
+      }
+      return undefined;
+    }
+
     const nodes = computed<BlockRelationNode[]>(() =>
       sparkStore
         .serviceBlocks(props.serviceId)
@@ -84,6 +95,7 @@ export default defineComponent({
           id: block.id,
           type: featureStore.widgetTitle(block.type),
           name: block.type === BlockType.SysInfo ? title.value : undefined,
+          placement: blockPlacement(block),
         }))
         .sort(makeObjectSorter('type')),
     );
