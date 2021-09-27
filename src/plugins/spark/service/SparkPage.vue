@@ -80,11 +80,13 @@ export default defineComponent({
       sparkStore
         .serviceBlocks(props.serviceId)
         .filter((block) => validTypes.includes(block.type))
-        .map((block) => ({
-          id: block.id,
-          type: featureStore.widgetTitle(block.type),
-          name: block.type === BlockType.SysInfo ? title.value : undefined,
-        }))
+        .map(
+          (block): BlockRelationNode => ({
+            id: block.id,
+            type: featureStore.widgetTitle(block.type),
+            name: block.type === BlockType.SysInfo ? title.value : undefined,
+          }),
+        )
         .sort(makeObjectSorter('type')),
     );
 
