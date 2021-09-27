@@ -634,8 +634,8 @@ export default defineComponent({
     }
 
     // Return the exact position of the current event
-    function d3EventPos(): XYPosition {
-      const [x, y] = d3.pointer(svgContentRef.value!);
+    function d3EventPos(evt: Event): XYPosition {
+      const [x, y] = d3.pointer(evt, svgContentRef.value!);
       return { x, y };
     }
 
@@ -649,21 +649,17 @@ export default defineComponent({
         }
       }, 50);
       return selection
-        .on('mouseenter', function () {
-          throttledMove(d3EventPos());
-        })
-        .on('mousemove', function () {
-          throttledMove(d3EventPos());
-        })
-        .on('mouseout', function () {
+        .on('mouseenter', (evt) => throttledMove(d3EventPos(evt)))
+        .on('mousemove', (evt) => throttledMove(d3EventPos(evt)))
+        .on('mouseout', () => {
           gridHoverPos.value = null;
         });
     }
 
     const gridResizeDragHandler = d3
       .drag<SVGElement, unknown>()
-      .on('start', function () {
-        const { x, y } = d3EventPos();
+      .on('start', (evt) => {
+        const { x, y } = d3EventPos(evt);
         const sqX = coord2grid(grid2coord(x));
         const sqY = coord2grid(grid2coord(y));
         startDragSelect({
@@ -673,13 +669,13 @@ export default defineComponent({
           endY: sqY,
         });
       })
-      .on('drag', function () {
-        const { x, y } = d3EventPos();
+      .on('drag', (evt) => {
+        const { x, y } = d3EventPos(evt);
         const sqX = coord2grid(grid2coord(x));
         const sqY = coord2grid(grid2coord(y));
         updateDragSelect(sqX, sqY);
       })
-      .on('end', function () {
+      .on('end', () => {
         if (activeSelectArea.value && layout.value) {
           const { startX, startY, endX, endY } = normalizeSelectArea(
             activeSelectArea.value,
@@ -708,9 +704,9 @@ export default defineComponent({
     const gridDragHandler = d3
       .drag<SVGElement, unknown>()
       .clickDistance(25)
-      .on('start', function () {
+      .on('start', (evt) => {
         if (!floater.value) {
-          const { x, y } = d3EventPos();
+          const { x, y } = d3EventPos(evt);
           startDragSelect({
             startX: x,
             startY: y,
@@ -719,13 +715,13 @@ export default defineComponent({
           });
         }
       })
-      .on('drag', function () {
-        const { x, y } = d3EventPos();
+      .on('drag', (evt) => {
+        const { x, y } = d3EventPos(evt);
         updateDragSelect(x, y);
       })
-      .on('end', function (evt: MouseEvent) {
+      .on('end', (evt) => {
         if (floater.value) {
-          dropFloater(toCoords(d3EventPos()));
+          dropFloater(toCoords(d3EventPos(evt)));
           return;
         }
 
@@ -750,14 +746,14 @@ export default defineComponent({
     const partDragHandler = d3
       .drag()
       .clickDistance(25)
-      .on('start', function () {
+      .on('start', (evt) => {
         // We're not sure yet whether this is a drag or a click
         // The action becomes a drag once the mouse leaves the square
         // The action is a click if the mouseup event is in the same square
-        partDragStart.value = toCoords(d3EventPos());
+        partDragStart.value = toCoords(d3EventPos(evt));
       })
-      .on('drag', function () {
-        const { x, y } = toCoords(d3EventPos());
+      .on('drag', function (this: Element, evt) {
+        const { x, y } = toCoords(d3EventPos(evt));
         const start = partDragStart.value;
 
         // We're already dragging.
@@ -783,9 +779,9 @@ export default defineComponent({
           makeFloater({ x, y, parts });
         }
       })
-      .on('end', function () {
+      .on('end', (evt) => {
         partDragStart.value = null;
-        dropFloater(toCoords(d3EventPos()));
+        dropFloater(toCoords(d3EventPos(evt)));
       });
 
     function selectGridHandlers(
@@ -795,9 +791,9 @@ export default defineComponent({
       const selection = d3.select(el);
       selection.call(gridHoverHandler);
 
-      selection.on('click', function () {
+      selection.on('click', (evt) => {
         if (floater.value) {
-          dropFloater(toCoords(d3EventPos()));
+          dropFloater(toCoords(d3EventPos(evt)));
         }
       });
 

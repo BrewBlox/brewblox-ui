@@ -1,21 +1,12 @@
 <script lang="ts">
 import * as d3 from 'd3';
+import ELK, { ElkExtendedEdge, ElkNode } from 'elkjs/lib/elk.bundled';
 import debounce from 'lodash/debounce';
-import startCase from 'lodash/startCase';
 import toFinite from 'lodash/toFinite';
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  PropType,
-  ref,
-  watch,
-} from 'vue';
+import { defineComponent, onMounted, PropType, ref, watch } from 'vue';
 
 import { BlockRelation, BlockRelationNode } from '@/plugins/spark/types';
-import { createBlockWizard } from '@/plugins/wizardry';
 import { createBlockDialog } from '@/utils/dialog';
-import { uniqueFilter } from '@/utils/functional';
 import { deepCopy, isJsonEqual } from '@/utils/objects';
 
 const DEFAULT_SCALE = 0.9;
@@ -23,8 +14,12 @@ const UNKNOWN_TYPE = '???';
 const LABEL_HEIGHT = 50;
 const LABEL_WIDTH = 150;
 
-type NodeT = BlockRelationNode & d3.SimulationNodeDatum;
-type LinkT = BlockRelation & d3.SimulationLinkDatum<NodeT>;
+interface ElkRelationNode extends BlockRelationNode, ElkNode {
+  x: number;
+  y: number;
+}
+
+interface ElkRelationEdge extends BlockRelation, ElkExtendedEdge {}
 
 export default defineComponent({
   name: 'RelationsDiagram',
@@ -51,31 +46,25 @@ export default defineComponent({
     },
   },
   setup(props) {
-    // const renderFunc = new dagre.render();
-    const resetZoom = ref<() => void>(() => {});
+    const elk = new ELK();
 
+    const resetZoom = ref<() => void>(() => {});
     const svgRef = ref<SVGElement>();
     const gRef = ref<SVGGElement>();
-    const currentScale = ref<number>(1);
+    const graphWidth = ref<number>(0);
+    const graphHeight = ref<number>(0);
 
-    function calcDrawnNodes(
-      edges: BlockRelation[],
+    function missingNodes(
       nodes: BlockRelationNode[],
+      edges: BlockRelation[],
     ): BlockRelationNode[] {
-      const relationalIds = edges
-        .flatMap((edge) => [edge.target, edge.source])
-        .filter(uniqueFilter);
-      const relationalNodes = relationalIds.map(
-        (id) =>
-          nodes.find((node) => node.id === id) ?? {
-            id,
-            type: UNKNOWN_TYPE,
-          },
+      const referencedIds = new Set(
+        edges.flatMap((edge) => [edge.target, edge.source]),
       );
-      const loneNodes = nodes
-        .filter((n) => !relationalIds.includes(n.id))
-        .map((n) => ({ ...n, lone: true }));
-      return [...relationalNodes, ...loneNodes];
+      const nodeIds = new Set(nodes.map((n) => n.id));
+      return [...referencedIds]
+        .filter((id) => !nodeIds.has(id))
+        .map((id) => ({ id, type: UNKNOWN_TYPE }));
     }
 
     function openSettings(id: string): void {
@@ -87,186 +76,152 @@ export default defineComponent({
       createBlockDialog(addr, { mode: 'Basic' });
     }
 
-    function addIndex<T>(v: T, index: number): T & { index: number } {
-      return {
-        ...v,
-        index,
-      };
+    function makeCenteringTransform(scaleOffset = 0): d3.ZoomTransform {
+      if (!svgRef.value) {
+        return d3.zoomIdentity;
+      }
+      const width = graphWidth.value || 1;
+      const height = graphHeight.value || 1;
+
+      const svgRect = svgRef.value!.getBoundingClientRect();
+      const scale =
+        (DEFAULT_SCALE + scaleOffset) *
+        Math.min(svgRect.width / width, svgRect.height / height, 1);
+      return d3.zoomIdentity
+        .translate(
+          toFinite(svgRect.width - width * scale) / 2,
+          toFinite(svgRect.height - height * scale) / 2,
+        )
+        .scale(scale);
     }
 
-    function drawGraph(): void {
+    async function drawGraph(
+      nodes: BlockRelationNode[],
+      edges: BlockRelation[],
+    ): Promise<void> {
       if (!svgRef.value || !gRef.value) {
         return;
       }
 
-      const svgRect = svgRef.value.getBoundingClientRect();
+      const graph = await elk.layout({
+        id: 'root',
+        layoutOptions: {
+          'elk.algorithm': 'layered',
+          'elk.direction': 'DOWN',
+        },
+        children: [...nodes, ...missingNodes(nodes, edges)].map((v) => ({
+          ...v,
+          width: LABEL_WIDTH,
+          height: LABEL_HEIGHT,
+        })),
+        edges: edges.map((v, idx) => ({
+          id: `${idx}__${v.source}__${v.target}`,
+          sources: [v.source],
+          targets: [v.target],
+        })),
+      });
 
+      // Set component variables
+      // These will be needed for centering the graph
+      graphWidth.value = graph.width || 1;
+      graphHeight.value = graph.height || 1;
+
+      // Start d3 configuration here by selecting the HTML elements
       const svg = d3.select(svgRef.value);
       const diagram = d3.select(gRef.value);
 
-      const nodesCopy = deepCopy(props.nodes);
-      const edgesCopy = deepCopy(props.edges);
+      // Create a path element for every edge in the graph
+      const edgeSelect = diagram
+        .selectAll<SVGPathElement, ElkRelationEdge>('.relation-edge')
+        .data(graph.edges as ElkRelationEdge[], (d) => d.id)
+        .join('path')
+        .attr('class', 'relation-edge');
 
-      const nodes: NodeT[] = calcDrawnNodes(edgesCopy, nodesCopy).map(addIndex);
-      const edges: LinkT[] = edgesCopy.map(addIndex);
-
-      const linkSelect = diagram
-        .selectAll('line')
-        .data(edges)
-        .join('line')
-        .style('stroke', '#aaa');
-
+      // Create a node element for every node in the graph
       const nodeSelect = diagram
-        .selectAll('foreignObject')
-        .data(nodes)
+        .selectAll<SVGForeignObjectElement, ElkRelationNode>('.relation-node')
+        .data(graph.children as ElkRelationNode[], (d) => d.id)
         .join('foreignObject')
+        .attr('class', 'relation-node');
+
+      // Edge configuration:
+      // Create a straight line between start, end, and all bend points of the edge
+      edgeSelect.attr('d', (d): string => {
+        const path: (string | number)[] = [];
+        d.sections.forEach((s) => {
+          path.push('M', s.startPoint.x, s.startPoint.y);
+          s.bendPoints?.forEach((bp) => path.push('L', bp.x, bp.y));
+          path.push('L', s.endPoint.x, s.endPoint.y);
+        });
+        return path.join(' ');
+      });
+
+      // Node configuration:
+      // Set overall position and size of the node element
+      // We'll add its children below
+      nodeSelect
+        .attr('x', (d) => d.x)
+        .attr('y', (d) => d.y)
         .attr('width', LABEL_WIDTH)
         .attr('height', LABEL_HEIGHT)
-        .attr(
-          'transform',
-          `translate(-${LABEL_WIDTH / 2}, -${LABEL_HEIGHT / 2})`,
-        )
-        .attr('class', 'node')
         .on('click', (evt, d) => openSettings(d.id));
 
+      // create the top-level divs in the SVG foreignObject elements
+      // Save the selection to a variable to easily add multiple children
       const nodeContentSelect = nodeSelect
         .append('xhtml:div')
-        .attr('class', 'node-content');
+        .attr('class', 'relation-node-content');
 
       nodeContentSelect
         .append('xhtml:div')
-        .attr('class', 'node-content-title')
+        .attr('class', 'title')
         .text((d) => d.type);
 
       nodeContentSelect
         .append('xhtml:div')
-        .attr('class', 'node-content-name')
+        .attr('class', 'name')
         .text((d) => d.name || d.id);
 
       // Enable zooming the graph
-      const zoom = d3
+      const zoomBehavior = d3
         .zoom<SVGElement, unknown>()
         .on('zoom', (e: d3.D3ZoomEvent<SVGElement, unknown>) => {
           diagram.attr('transform', e.transform.toString());
         });
 
-      // Enable centering the graph
-      // Implemented as function to yield new values after window resize
-      const centered = (scaleOffset = 0): d3.ZoomTransform => {
-        if (!svgRef.value) {
-          return d3.zoomIdentity;
-        }
-        const xCoords = nodes.map((n) => n.x || 0);
-        const yCoords = nodes.map((n) => n.y || 0);
-
-        const minX = Math.min(...xCoords, 0);
-        const minY = Math.min(...yCoords, 0);
-        const maxX = Math.max(...xCoords, 0);
-        const maxY = Math.max(...yCoords, 0);
-
-        const svgRect = svgRef.value!.getBoundingClientRect();
-        const diagramWidth = maxX - minX + 100;
-        const diagramHeight = maxY - minY + 100;
-        const scale =
-          (DEFAULT_SCALE + scaleOffset) *
-          Math.min(
-            svgRect.width / diagramWidth,
-            svgRect.height / diagramHeight,
-            1,
-          );
-        currentScale.value = scale;
-        return d3.zoomIdentity
-          .translate(
-            toFinite(svgRect.width - diagramWidth * scale) / 2 - minX * scale,
-            toFinite(svgRect.height - diagramHeight * scale) / 2 - minY * scale,
-          )
-          .scale(scale);
-      };
-
       // Provide functionality to reset zoom level
-      // This captures local variables
+      // We need to capture `zoomBehavior`
       resetZoom.value = () => {
         if (svgRef.value) {
           d3.select(svgRef.value)
             .transition()
             .duration(750)
-            .call(zoom.transform, centered());
+            .call(zoomBehavior.transform, () => makeCenteringTransform());
         }
       };
 
-      // Apply zoom handler
+      // Zoom the graph now to provide a sensible initial value
       svg
-        .call(zoom)
-        .call(zoom.transform, centered(0.05))
+        .call(zoomBehavior)
+        .call(zoomBehavior.transform, makeCenteringTransform(0.05))
         .on('dblclick.zoom', resetZoom.value);
-
-      // Apply forces
-      d3.forceSimulation(nodes)
-        .force(
-          'link',
-          d3
-            .forceLink<NodeT, LinkT>()
-            .id((d) => d.id)
-            .links(edges),
-        )
-        .force('charge', d3.forceManyBody().strength(100))
-        // .force('center', d3.forceCenter())
-        .force('collide', d3.forceCollide(90))
-        // .force('link', d3.forceLink(edges).iterations(5))
-        // .force('x', d3.forceX(rect.width))
-        // .force('y', d3.forceY(rect.height))
-        .force(
-          'y',
-          d3.forceY<NodeT>().y((d) => {
-            if (d.lone) {
-              return 0;
-            }
-            if (d.placement === 'top') {
-              return -1000;
-            }
-            if (d.placement === 'bottom') {
-              return 1000;
-            }
-            return 0;
-          }),
-        )
-        .force(
-          'x',
-          d3.forceX<NodeT>().x((d) => (d.lone ? 1000 : 0)),
-        )
-        .on('tick', () => {
-          // d3 replaced d.source / d.target strings with Node objects where x/y is set
-          linkSelect
-            .attr('x1', (d) => (d.source as any).x)
-            .attr('y1', (d) => (d.source as any).y + LABEL_HEIGHT / 2)
-            .attr('x2', (d) => (d.target as any).x)
-            .attr('y2', (d) => (d.target as any).y - LABEL_HEIGHT / 2);
-
-          nodeSelect.attr('x', (d) => d.x!).attr('y', (d) => d.y!);
-        })
-        .on('end', () => {
-          svg.transition().duration(750).call(zoom.transform, centered(0.05));
-          // Auto-zoom when the force simulation is done
-        });
     }
 
-    function startCreateBlock(): void {
-      if (props.canCreate) {
-        createBlockWizard(props.serviceId);
-      }
-    }
-
-    const debouncedDrawGraph = debounce(() => drawGraph(), 500, {
+    const debouncedDrawGraph = debounce(drawGraph, 500, {
       leading: true,
+      trailing: true,
     });
 
     onMounted(() => {
       watch(
         [() => props.nodes, () => props.edges],
-        (newV, oldV) => {
-          if (newV && !isJsonEqual(newV, oldV)) {
-            debouncedDrawGraph();
-            // drawGraph(createGraph());
+        ([nodes, edges], [oldNodes, oldEdges]) => {
+          if (
+            nodes &&
+            edges &&
+            !isJsonEqual([nodes, edges], [oldNodes, oldEdges])
+          ) {
+            debouncedDrawGraph(deepCopy(nodes), deepCopy(edges));
           }
         },
         { immediate: true },
@@ -276,9 +231,7 @@ export default defineComponent({
     return {
       svgRef,
       gRef,
-      drawGraph,
       resetZoom,
-      startCreateBlock,
     };
   },
 });
@@ -301,43 +254,31 @@ export default defineComponent({
   </div>
 </template>
 
-<style>
-.node {
-  fill: #fff;
-}
+<style lang="sass">
+.relation-node-content:hover
+  opacity: 0.8
 
-.node * {
-  cursor: pointer;
-}
+.relation-node-content
+  height: 50px
+  width: 150px
+  background-color: #fff
+  cursor: pointer
+  > div
+    width: 100%
+    text-align: center
+    font-weight: 300
+  > .title
+    font-size: 12px
+    color: green
+  > .name
+    font-size: 14px
+    color: black
+    padding: 10px
+    overflow: hidden
+    white-space: nowrap
+    text-overflow: ellipsis
 
-.node:hover {
-  fill-opacity: 0.8;
-}
-
-.node-content {
-  height: 50px;
-  width: 150px;
-  /* margin: 10px; */
-  background-color: #fff;
-}
-
-.node-content > div {
-  width: 100%;
-  text-align: center;
-  font-weight: 300;
-}
-
-.node-content-title {
-  font-size: 12px;
-  color: green;
-}
-
-.node-content-name {
-  font-size: 14px;
-  color: black;
-  padding: 10px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+.relation-edge
+  stroke: #aaa
+  fill: none
 </style>
