@@ -6,13 +6,13 @@ import {
   AnyConstraint,
   AnyConstraintsObj,
   BlockAddress,
+  BlockLimitation,
 } from '@/plugins/spark/types';
 import {
   AnalogConstraint,
   AnalogConstraintKey,
   AnyConstraintKey,
   Block,
-  BlockLimitation,
   BlockType,
   DigitalConstraint,
   DigitalConstraintKey,

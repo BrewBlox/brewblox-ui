@@ -20,6 +20,7 @@ import {
   isSparkPatch,
   isSparkState,
 } from '@/plugins/spark/utils';
+import { BlockDriveChain } from '@/shared-types';
 import { serviceStore } from '@/store/services';
 import { widgetStore } from '@/store/widgets';
 import { concatById, filterById, findById } from '@/utils/collections';
@@ -49,7 +50,7 @@ export class SparkServiceModule extends VuexModule {
   public discoveredBlocks: string[] = [];
   public status: SparkStatus | null = null;
   public relations: BlockRelation[] = [];
-  public drivenChains: string[][] = [];
+  public driveChains: BlockDriveChain[] = [];
   public lastBlocks: Date | null = null;
   public lastStatus: Date | null = null;
   public sessionConfig: SparkSessionConfig = defaultSessionConfig();
@@ -65,7 +66,7 @@ export class SparkServiceModule extends VuexModule {
   }
 
   public get drivenBlocks(): string[] {
-    return this.drivenChains.map((c) => c[0]);
+    return this.driveChains.map((c) => c[0]);
   }
 
   public get service(): SparkService {
@@ -102,7 +103,7 @@ export class SparkServiceModule extends VuexModule {
   public invalidateBlocks(): void {
     this.blocks = [];
     this.relations = [];
-    this.drivenChains = [];
+    this.driveChains = [];
     this.lastBlocks = null;
   }
 
@@ -385,7 +386,7 @@ export class SparkServiceModule extends VuexModule {
           this.updateBlocks(blocks);
           this.updateStatus(status);
           this.relations = evt.data.relations;
-          this.drivenChains = evt.data.drive_chains;
+          this.driveChains = evt.data.drive_chains;
           serviceStore.updateStatus(asServiceStatus(status));
         }
       },

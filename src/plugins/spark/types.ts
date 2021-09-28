@@ -9,7 +9,13 @@ import {
   GraphValueAxes,
   QueryParams,
 } from '@/plugins/history/types';
-import { Block, BlockOrIntfType, Quantity, StoreObject } from '@/shared-types';
+import {
+  AnyConstraintKey,
+  Block,
+  BlockOrIntfType,
+  Quantity,
+  StoreObject,
+} from '@/shared-types';
 import { WidgetFeature } from '@/store/features';
 import { Service } from '@/store/services';
 import { Widget } from '@/store/widgets';
@@ -58,6 +64,12 @@ export interface SparkStoreEntry {
 export interface SparkExported {
   blocks: Block[];
   store: SparkStoreEntry[];
+}
+
+export interface BlockLimitation {
+  target: string;
+  constraint: AnyConstraintKey;
+  remaining: Quantity | null;
 }
 
 export interface BlockRelationNode {

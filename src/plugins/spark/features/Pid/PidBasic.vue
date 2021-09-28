@@ -2,7 +2,11 @@
 import { computed, defineComponent } from 'vue';
 
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { Block, PidBlock, SetpointSensorPairBlock } from '@/plugins/spark/types';
+import {
+  Block,
+  PidBlock,
+  SetpointSensorPairBlock,
+} from '@/plugins/spark/types';
 import { isBlockDriven } from '@/plugins/spark/utils';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyQty } from '@/utils/formatting';
@@ -10,28 +14,22 @@ import { fixedNumber, prettyQty } from '@/utils/formatting';
 export default defineComponent({
   name: 'PidBasic',
   setup() {
-    const {
-      sparkModule,
-      blockId,
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<PidBlock>();
+    const { sparkModule, blockId, block, saveBlock } =
+      useBlockWidget.setup<PidBlock>();
 
-    const inputBlock = computed<SetpointSensorPairBlock | null>(
-      () => sparkModule.blockByLink(block.value.data.inputId),
+    const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
+      sparkModule.blockByLink(block.value.data.inputId),
     );
 
-    const inputDriven = computed<boolean>(
-      () => isBlockDriven(inputBlock.value),
+    const inputDriven = computed<boolean>(() =>
+      isBlockDriven(inputBlock.value),
     );
 
-    const outputBlock = computed<Block | null>(
-      () => sparkModule.blockByLink(block.value.data.outputId),
+    const outputBlock = computed<Block | null>(() =>
+      sparkModule.blockByLink(block.value.data.outputId),
     );
 
-    const kp = computed<number | null>(
-      () => block.value.data.kp.value,
-    );
+    const kp = computed<number | null>(() => block.value.data.kp.value);
 
     function fit(v: number): number {
       return Math.min(v, 100);
@@ -47,22 +45,24 @@ export default defineComponent({
     }
 
     function editInput(): void {
-      if (!inputBlock.value) { return; }
+      if (!inputBlock.value) {
+        return;
+      }
 
       const setpointId = inputBlock.value.id;
 
       if (sparkModule.drivenBlocks.includes(setpointId)) {
-        const driveChain = sparkModule
-          .drivenChains
-          .find(chain => chain[0] === setpointId);
+        const driveChain = sparkModule.driveChains.find(
+          (chain) => chain.target === setpointId,
+        );
 
-        const actual = driveChain !== undefined
-          ? sparkModule.blockById(driveChain[driveChain.length - 1])
-          : inputBlock.value;
+        const actual =
+          driveChain !== undefined
+            ? sparkModule.blockById(driveChain.source)
+            : inputBlock.value;
 
         createBlockDialog(actual);
-      }
-      else {
+      } else {
         createDialog({
           component: 'SetpointSettingDialog',
           componentProps: {
@@ -125,19 +125,16 @@ export default defineComponent({
           Output
         </template>
         <template #valueIcon>
-          <q-icon
-            v-if="kp === null"
-            name="mdi-calculator-variant"
-          />
+          <q-icon v-if="kp === null" name="mdi-calculator-variant" />
           <HeatingIcon
             v-else-if="kp > 0"
             color="red"
-            :svg-props="{'stroke-width': '2px'}"
+            :svg-props="{ 'stroke-width': '2px' }"
           />
           <CoolingIcon
             v-else-if="kp < 0"
             color="dodgerblue"
-            :svg-props="{'stroke-width': '2px'}"
+            :svg-props="{ 'stroke-width': '2px' }"
           />
         </template>
         <template #value>
@@ -187,10 +184,7 @@ export default defineComponent({
           v-if="!!block.data.boilMinOutput"
           :class="[
             'col-auto self-center text-bold',
-            `text-${block.data.boilModeActive
-              ? 'deep-orange'
-              : 'grey'
-            }`,
+            `text-${block.data.boilModeActive ? 'deep-orange' : 'grey'}`,
           ]"
         >
           boil

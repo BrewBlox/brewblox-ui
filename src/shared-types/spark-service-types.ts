@@ -1,6 +1,4 @@
-import { AnyConstraintKey } from '@/plugins/spark/types';
-
-import { Block, Quantity } from './spark-block-types';
+import { Block } from './spark-block-types';
 
 // #region SparkFirmwareInfo
 export interface SparkFirmwareInfo {
@@ -53,13 +51,13 @@ export interface BlockRelation {
 }
 // #endregion BlockRelation
 
-// #region BlockLimitation
-export interface BlockLimitation {
+// #region BlockDriveChain
+export interface BlockDriveChain {
+  source: string;
   target: string;
-  constraint: AnyConstraintKey;
-  remaining: Quantity | null;
+  intermediate: string[];
 }
-// #endregion BlockLimitation
+// #endregion BlockDriveChain
 
 // #region SparkStateEvent
 export interface SparkStateEvent {
@@ -69,7 +67,7 @@ export interface SparkStateEvent {
     status: ApiSparkStatus | null;
     blocks: Block[];
     relations: BlockRelation[];
-    drive_chains: string[][];
+    drive_chains: BlockDriveChain[];
   };
 }
 // #endregion SparkStateEvent

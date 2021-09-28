@@ -284,11 +284,11 @@ export function showDrivingBlockDialog(
 
   const driveChain = sparkStore
     .moduleById(block.serviceId)
-    ?.drivenChains.find((chain) => chain[0] === block.id);
+    ?.driveChains.find((chain) => chain.target === block.id);
 
   const actual =
     driveChain !== undefined
-      ? sparkStore.blockById(block.serviceId, driveChain[driveChain.length - 1])
+      ? sparkStore.blockById(block.serviceId, driveChain.source)
       : block;
 
   if (actual) {

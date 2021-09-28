@@ -83,7 +83,7 @@ export const isBlockDriven = (block: Block | null): boolean =>
     block &&
       sparkStore
         .moduleById(block.serviceId)
-        ?.drivenChains.some((chain: string[]) => chain[0] === block.id),
+        ?.driveChains.some((chain) => chain.target === block.id),
   );
 
 export const isSparkState = (data: unknown): data is SparkStateEvent =>
