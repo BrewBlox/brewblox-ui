@@ -54,7 +54,7 @@ export default defineComponent({
     const graphWidth = ref<number>(0);
     const graphHeight = ref<number>(0);
 
-    function missingNodes(
+    function relevantNodes(
       nodes: BlockRelationNode[],
       edges: BlockRelation[],
     ): BlockRelationNode[] {
@@ -62,9 +62,13 @@ export default defineComponent({
         edges.flatMap((edge) => [edge.target, edge.source]),
       );
       const nodeIds = new Set(nodes.map((n) => n.id));
-      return [...referencedIds]
+      const knownNodes = props.hideUnrelated
+        ? nodes.filter((n) => referencedIds.has(n.id))
+        : nodes;
+      const unknownNodes: BlockRelationNode[] = [...referencedIds]
         .filter((id) => !nodeIds.has(id))
         .map((id) => ({ id, type: UNKNOWN_TYPE }));
+      return [...knownNodes, ...unknownNodes];
     }
 
     function openSettings(id: string): void {
@@ -109,7 +113,7 @@ export default defineComponent({
           'elk.algorithm': 'layered',
           'elk.direction': 'DOWN',
         },
-        children: [...nodes, ...missingNodes(nodes, edges)].map((v) => ({
+        children: relevantNodes(nodes, edges).map((v) => ({
           ...v,
           width: LABEL_WIDTH,
           height: LABEL_HEIGHT,
