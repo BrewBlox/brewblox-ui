@@ -1,7 +1,4 @@
-import {
-  AnalogConstraintKey,
-  DigitalConstraintKey,
-} from '@/plugins/spark/types';
+import { AnyConstraintKey } from '@/plugins/spark/types';
 
 import { Block, Quantity } from './spark-block-types';
 
@@ -59,7 +56,7 @@ export interface BlockRelation {
 // #region BlockLimitation
 export interface BlockLimitation {
   target: string;
-  constraint: AnalogConstraintKey | DigitalConstraintKey;
+  constraint: AnyConstraintKey;
   remaining: Quantity | null;
 }
 // #endregion BlockLimitation
@@ -73,7 +70,6 @@ export interface SparkStateEvent {
     blocks: Block[];
     relations: BlockRelation[];
     drive_chains: string[][];
-    limitations: BlockLimitation[];
   };
 }
 // #endregion SparkStateEvent

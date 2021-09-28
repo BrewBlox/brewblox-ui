@@ -77,6 +77,11 @@ export const DigitalConstraintKey = Enum(
 
 export const AnalogConstraintKey = Enum('min', 'max', 'balanced');
 
+export const AnyConstraintKey = Enum(
+  ...Enum.values(DigitalConstraintKey),
+  ...Enum.values(AnalogConstraintKey),
+);
+
 // #region Gpio
 export const GpioDeviceType = Enum(
   'GPIO_DEV_NONE',
@@ -262,6 +267,7 @@ export type BlockType = Enum<typeof BlockType>;
 export type BlockOrIntfType = Enum<typeof BlockOrIntfType>;
 export type DigitalConstraintKey = Enum<typeof DigitalConstraintKey>;
 export type AnalogConstraintKey = Enum<typeof AnalogConstraintKey>;
+export type AnyConstraintKey = Enum<typeof AnyConstraintKey>;
 export type GpioDeviceType = Enum<typeof GpioDeviceType>;
 export type DigitalState = Enum<typeof DigitalState>;
 export type DigitalCompareOp = Enum<typeof DigitalCompareOp>;
