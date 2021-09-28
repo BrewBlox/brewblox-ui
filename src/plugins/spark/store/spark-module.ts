@@ -7,7 +7,6 @@ import type {
   Block,
   BlockAddress,
   BlockFieldAddress,
-  BlockLimitation,
   BlockRelation,
   Link,
   SparkExported,
@@ -51,7 +50,6 @@ export class SparkServiceModule extends VuexModule {
   public status: SparkStatus | null = null;
   public relations: BlockRelation[] = [];
   public drivenChains: string[][] = [];
-  public limitations: BlockLimitation[] = [];
   public lastBlocks: Date | null = null;
   public lastStatus: Date | null = null;
   public sessionConfig: SparkSessionConfig = defaultSessionConfig();
@@ -105,7 +103,6 @@ export class SparkServiceModule extends VuexModule {
     this.blocks = [];
     this.relations = [];
     this.drivenChains = [];
-    this.limitations = [];
     this.lastBlocks = null;
   }
 
@@ -389,7 +386,6 @@ export class SparkServiceModule extends VuexModule {
           this.updateStatus(status);
           this.relations = evt.data.relations;
           this.drivenChains = evt.data.drive_chains;
-          this.limitations = evt.data.limitations;
           serviceStore.updateStatus(asServiceStatus(status));
         }
       },

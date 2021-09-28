@@ -6,6 +6,7 @@ import { Block, BlockType, MotorValveBlock } from '@/plugins/spark/types';
 import { DigitalState, IoChannel } from '@/plugins/spark/types';
 import {
   channelName,
+  findLimitations,
   isBlockDriven,
   limitationString,
 } from '@/plugins/spark/utils';
@@ -57,9 +58,7 @@ export default defineComponent({
     }
 
     function driverLimitations(block: Block): string | null {
-      return limitationString(
-        sparkModule.limitations.filter((v) => v.target === block.id),
-      );
+      return limitationString(findLimitations(block));
     }
 
     async function saveDriver(

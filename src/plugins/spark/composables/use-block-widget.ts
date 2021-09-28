@@ -17,6 +17,7 @@ import { widgetStore } from '@/store/widgets';
 import { SparkServiceModule, sparkStore } from '../store';
 import { BlockConfig, BlockSpec, BlockWidget } from '../types';
 import {
+  findLimitations,
   isBlockVolatile,
   limitationString,
   makeBlockGraphConfig,
@@ -101,11 +102,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
     }
 
     const limitations = computed<string | null>(() =>
-      limitationString(
-        sparkModule.limitations.filter(
-          (v) => v.target === config.value.blockId,
-        ),
-      ),
+      limitationString(findLimitations(block.value)),
     );
 
     const hasGraph: boolean =
