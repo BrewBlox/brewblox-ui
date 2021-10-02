@@ -12,7 +12,7 @@ interface EditingChannel {
   name: string;
   kind: EditingKind;
   mode: EditingMode;
-  amps: number;
+  multiply: number;
 }
 
 function inferEditingKind({ deviceType }: GpioModuleChannel): EditingKind {
@@ -41,7 +41,10 @@ function inferEditingMode({ deviceType }: GpioModuleChannel): EditingMode {
   }
 }
 
-function inferEditingAmps({ deviceType, width }: GpioModuleChannel): number {
+function inferEditingMultiply({
+  deviceType,
+  width,
+}: GpioModuleChannel): number {
   const base = /_1P/.test(deviceType) ? 1 : 2;
   return clamp(width / base, 1, 4);
 }
@@ -89,13 +92,11 @@ function inferChannelDeviceType({
   return GpioDeviceType.GPIO_DEV_NONE;
 }
 
-function inferChannelWidth({ kind, mode, amps }: EditingChannel): number {
-  if (kind === 'SSR') {
-    return mode === 'PLUS' ? 1 : 2;
-  } else if (mode === 'BOTH' || mode === 'BIDIRECTIONAL') {
-    return 2 * amps;
+function inferChannelWidth({ mode, multiply }: EditingChannel): number {
+  if (mode === 'BOTH' || mode === 'BIDIRECTIONAL') {
+    return 2 * multiply;
   } else {
-    return amps;
+    return multiply;
   }
 }
 
@@ -117,7 +118,7 @@ export default defineComponent({
       name: props.channel.name,
       kind: inferEditingKind(props.channel),
       mode: inferEditingMode(props.channel),
-      amps: inferEditingAmps(props.channel),
+      multiply: inferEditingMultiply(props.channel),
     });
 
     const kindOpts: SelectOption<EditingKind>[] = [
@@ -141,22 +142,20 @@ export default defineComponent({
       return opts;
     });
 
-    const ampOpts: SelectOption<number>[] = [
-      { value: 1, label: '1A' },
-      { value: 2, label: '2A' },
-      { value: 3, label: '3A' },
-      { value: 4, label: '4A' },
+    const multiplyOpts: SelectOption<number>[] = [
+      { value: 1, label: 'x1 (1A)' },
+      { value: 2, label: 'x2 (2A)' },
+      { value: 3, label: 'x3 (3A)' },
+      { value: 4, label: 'x4 (4A)' },
     ];
-
-    const hasAmps = computed<boolean>(() => local.kind !== 'SSR');
 
     const error = computed<string | null>(() => {
       const type = inferChannelDeviceType(local);
       if (type === GpioDeviceType.GPIO_DEV_NONE) {
         return 'Invalid device type';
       }
-      if (hasAmps.value && (local.amps < 1 || local.amps > 4)) {
-        return 'Invalid amperage value';
+      if (local.multiply < 1 || local.multiply > 4) {
+        return 'Invalid multiplication value';
       }
       if (local.name.length >= 32) {
         return 'Invalid name: too long';
@@ -197,8 +196,7 @@ export default defineComponent({
       save,
       local,
       kindOpts,
-      ampOpts,
-      hasAmps,
+      multiplyOpts,
       modeOpts,
       error,
     };
@@ -239,13 +237,17 @@ export default defineComponent({
 
         <div class="col-break" />
 
-        <q-option-group
-          v-if="hasAmps"
-          v-model="local.amps"
-          :options="ampOpts"
-          type="radio"
-          class="col-grow"
-        />
+        <LabeledField label="Multiply pins" class="col-6">
+          <div class="text-weight-light">
+            Control parallel devices or deliver more power to a single device.
+          </div>
+          <q-option-group
+            v-model="local.multiply"
+            :options="multiplyOpts"
+            type="radio"
+          />
+        </LabeledField>
+
         <q-select
           v-model="local.mode"
           :options="modeOpts"
