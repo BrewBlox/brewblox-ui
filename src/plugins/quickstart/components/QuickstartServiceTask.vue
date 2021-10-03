@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { sparkType } from '@/plugins/spark/const';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { BlockType } from '@/plugins/spark/types';
 import { Service, serviceStore, ServiceStub } from '@/store/services';
 import { startCreateService } from '@/utils/services';
@@ -19,8 +19,10 @@ export default defineComponent({
   },
   emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
+    const sparkStore = useSparkStore();
+    const serviceId = computed<string>(() => props.config.serviceId);
     const service = ref<Service | null>(
-      serviceStore.serviceById(props.config.serviceId),
+      serviceStore.serviceById(serviceId.value),
     );
     const handleExisting = ref<'keep' | 'clear' | null>(null);
 
@@ -40,34 +42,31 @@ export default defineComponent({
       service.value = services.value[0];
     }
 
-    const sparkModule = computed<SparkServiceModule | null>(() =>
-      sparkStore.moduleById(service.value?.id),
-    );
-
     const hasBlocks = computed<boolean>(
       // Ignore discovered blocks
       // Any previous control chain will have included a PID
       () =>
-        sparkModule.value?.blocks.find((v) => v.type === BlockType.Pid) !==
-        undefined,
+        sparkStore
+          .blocksByService(serviceId.value)
+          .find((v) => v.type === BlockType.Pid) !== undefined,
     );
 
     const ready = computed<boolean>(
       () =>
-        sparkModule.value !== null &&
+        sparkStore.has(serviceId.value) &&
         (!hasBlocks.value || handleExisting.value !== null),
     );
 
     async function taskDone(): Promise<void> {
-      if (!sparkModule.value || !service.value || !ready.value) {
+      if (!service.value || !ready.value) {
         return;
       }
       if (handleExisting.value === 'clear') {
-        sparkModule.value.clearBlocks();
+        sparkStore.clearBlocks(serviceId.value);
       }
       emit('update:config', {
         ...props.config,
-        serviceId: service.value.id,
+        serviceId: serviceId.value,
       });
       emit('next');
     }

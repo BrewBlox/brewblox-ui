@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { systemBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   BlockFieldSpec,
   BlockSpec,
@@ -18,6 +18,8 @@ const type = BlockType.DisplaySettings;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+
     const blockSpec: BlockSpec<DisplaySettingsBlock> = {
       type,
       generate: () => ({
@@ -51,8 +53,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   BlockFieldSpec,
   BlockIntfType,
@@ -11,7 +11,11 @@ import {
   DigitalConstraintsObj,
   DigitalState,
 } from '@/plugins/spark/types';
-import { blockWidgetSelector, enumHint, prettifyConstraints } from '@/plugins/spark/utils';
+import {
+  blockWidgetSelector,
+  enumHint,
+  prettifyConstraints,
+} from '@/plugins/spark/utils';
 import { featureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 
@@ -19,9 +23,9 @@ import widget from './DigitalActuatorWidget.vue';
 
 const type = BlockType.DigitalActuator;
 
-
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
 
     const blockSpec: BlockSpec<DigitalActuatorBlock> = {
       type,
@@ -85,8 +89,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

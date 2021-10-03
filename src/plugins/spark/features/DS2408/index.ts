@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { discoveredBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   BlockSpec,
   BlockType,
@@ -17,6 +17,8 @@ const type = BlockType.DS2408;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+
     const blockSpec: BlockSpec<DS2408Block> = {
       type,
       generate: () => ({
@@ -40,7 +42,7 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
+    specStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

@@ -2,12 +2,8 @@
 import { computed, defineComponent } from 'vue';
 
 import { useWidget } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
-import {
-  BlockType,
-  PidBlock,
-  SetpointProfileBlock,
-} from '@/shared-types';
+import { useSparkStore } from '@/plugins/spark/store';
+import { BlockType, PidBlock, SetpointProfileBlock } from '@/shared-types';
 import { concatById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
@@ -17,7 +13,9 @@ import TempControlPidView from './TempControlPidView.vue';
 import { TempControlMode, TempControlWidget } from './types';
 
 const pidFilter = makeTypeFilter<PidBlock>(BlockType.Pid);
-const profileFilter = makeTypeFilter<SetpointProfileBlock>(BlockType.SetpointProfile);
+const profileFilter = makeTypeFilter<SetpointProfileBlock>(
+  BlockType.SetpointProfile,
+);
 
 export default defineComponent({
   name: 'TempControlFull',
@@ -25,18 +23,12 @@ export default defineComponent({
     TempControlPidView,
   },
   setup() {
-    const {
-      config,
-      saveConfig,
-    } = useWidget.setup<TempControlWidget>();
+    const { config, saveConfig } = useWidget.setup<TempControlWidget>();
+    const sparkStore = useSparkStore();
 
-    const serviceOpts = computed<string[]>(
-      () => sparkStore.serviceIds,
-    );
+    const serviceOpts = computed<string[]>(() => sparkStore.serviceIds);
 
-    const serviceId = computed<string | null>(
-      () => config.value.serviceId,
-    );
+    const serviceId = computed<string | null>(() => config.value.serviceId);
 
     function showMode(mode: TempControlMode): void {
       createDialog({
@@ -77,7 +69,12 @@ export default defineComponent({
       message="Which Spark controls your fermentation?"
       list-select
       clearable
-      @update:model-value="v => { config.serviceId = v; saveConfig(); }"
+      @update:model-value="
+        (v) => {
+          config.serviceId = v;
+          saveConfig();
+        }
+      "
     />
     <LinkField
       :model-value="config.coolPid"
@@ -86,7 +83,12 @@ export default defineComponent({
       title="Cool PID"
       label="Cool PID"
       class="col-grow"
-      @update:model-value="v => { config.coolPid = v; saveConfig(); }"
+      @update:model-value="
+        (v) => {
+          config.coolPid = v;
+          saveConfig();
+        }
+      "
     />
     <LinkField
       :model-value="config.heatPid"
@@ -95,7 +97,12 @@ export default defineComponent({
       title="Heat PID"
       label="Heat PID"
       class="col-grow"
-      @update:model-value="v => { config.heatPid = v; saveConfig(); }"
+      @update:model-value="
+        (v) => {
+          config.heatPid = v;
+          saveConfig();
+        }
+      "
     />
     <LinkField
       :model-value="config.profile"
@@ -104,11 +111,16 @@ export default defineComponent({
       title="Setpoint Profile"
       label="Setpoint Profile"
       class="col-grow"
-      @update:model-value="v => { config.profile = v; saveConfig(); }"
+      @update:model-value="
+        (v) => {
+          config.profile = v;
+          saveConfig();
+        }
+      "
     />
     <LabeledField
       v-for="mode in config.modes"
-      :key="'config-'+mode.id"
+      :key="'config-' + mode.id"
       class="clickable"
       @click="showMode(mode)"
     >

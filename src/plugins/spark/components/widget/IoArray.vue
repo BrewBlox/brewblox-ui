@@ -14,6 +14,8 @@ import { IoArrayBlock, Link } from '@/shared-types';
 import { makeTypeFilter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
 
+import { useSparkStore } from '../../store';
+
 interface EditableChannel extends IoChannel {
   name: string;
   driver: DigitalActuatorBlock | null;
@@ -31,11 +33,12 @@ const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
 export default defineComponent({
   name: 'IoArray',
   setup() {
-    const { serviceId, sparkModule, block } =
-      useBlockWidget.setup<IoArrayBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, block } = useBlockWidget.setup<IoArrayBlock>();
 
     const claims = computed<Claim[]>(() =>
-      sparkModule.blocks
+      sparkStore
+        .blocksByService(serviceId)
         .filter(actuatorFilter)
         .filter((b) => b.data.hwDevice.id === block.value.id)
         .map((b) => ({ driverId: b.id, channelId: b.data.channel })),
@@ -46,7 +49,8 @@ export default defineComponent({
         const { id } = channel;
         const claim = claims.value.find((c) => c.channelId === id);
         const name = channelName(block.value, id) ?? 'Unknown';
-        const driver = sparkModule.blockById<DigitalActuatorBlock>(
+        const driver = sparkStore.blockById<DigitalActuatorBlock>(
+          serviceId,
           claim?.driverId,
         );
         return { id, driver, name };
@@ -75,14 +79,17 @@ export default defineComponent({
       }
       if (currentDriver) {
         currentDriver.data.channel = 0;
-        await sparkModule.saveBlock(currentDriver);
+        await sparkStore.saveBlock(currentDriver);
       }
       if (link.id) {
-        const newDriver = sparkModule.blockById<DigitalActuatorBlock>(link.id)!;
+        const newDriver = sparkStore.blockById<DigitalActuatorBlock>(
+          serviceId,
+          link.id,
+        )!;
         const { id, type } = block.value;
         newDriver.data.hwDevice = bloxLink(id, type);
         newDriver.data.channel = channel.id;
-        await sparkModule.saveBlock(newDriver);
+        await sparkStore.saveBlock(newDriver);
       }
     }
 
@@ -92,7 +99,7 @@ export default defineComponent({
     ): Promise<void> {
       if (channel.driver) {
         channel.driver.data.desiredState = state;
-        await sparkModule.saveBlock(channel.driver);
+        await sparkStore.saveBlock(channel.driver);
       }
     }
 

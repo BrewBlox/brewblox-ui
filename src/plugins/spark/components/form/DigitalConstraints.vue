@@ -2,7 +2,7 @@
 import { defineComponent, PropType, ref, watch } from 'vue';
 
 import { digitalConstraintLabels } from '@/plugins/spark/const';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import type {
   DigitalConstraint,
   DigitalConstraintKey,
@@ -15,10 +15,9 @@ import { bloxLink } from '@/utils/link';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty } from '@/utils/quantity';
 
-
-const constraintOpts: SelectOption[] =
-  Object.entries(digitalConstraintLabels)
-    .map(([k, v]) => ({ value: k, label: v }));
+const constraintOpts: SelectOption[] = Object.entries(
+  digitalConstraintLabels,
+).map(([k, v]) => ({ value: k, label: v }));
 
 const defaultValues: Record<DigitalConstraintKey, DigitalConstraint> = {
   minOff: {
@@ -60,15 +59,14 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const sparkStore = useSparkStore();
     const constraints = ref<DigitalConstraint[]>([]);
 
     watch(
       () => props.modelValue,
-      (newV) => constraints.value = deepCopy(newV.constraints),
+      (newV) => (constraints.value = deepCopy(newV.constraints)),
       { deep: true, immediate: true },
     );
 
@@ -83,14 +81,13 @@ export default defineComponent({
     function holdTime(constraint: MutexedConstraint): Quantity {
       if (isCustom(constraint)) {
         return constraint.mutexed.extraHoldTime;
-      }
-      else if (constraint.mutexed.mutexId.id) {
+      } else if (constraint.mutexed.mutexId.id) {
         const mutex = sparkStore.blockById<MutexBlock>(
           props.serviceId,
-          constraint.mutexed.mutexId.id);
+          constraint.mutexed.mutexId.id,
+        );
         return mutex?.data.differentActuatorWait ?? bloxQty('0s');
-      }
-      else {
+      } else {
         return bloxQty('0s');
       }
     }
@@ -102,11 +99,12 @@ export default defineComponent({
           title: 'Add constraint',
           selectOptions: constraintOpts,
         },
-      })
-        .onOk(keys => {
-          constraints.value.push(...keys.map(type => deepCopy(defaultValues[type])));
-          save();
-        });
+      }).onOk((keys) => {
+        constraints.value.push(
+          ...keys.map((type) => deepCopy(defaultValues[type])),
+        );
+        save();
+      });
     }
 
     function remove(idx: number): void {
@@ -133,7 +131,7 @@ export default defineComponent({
       :key="idx"
       :class="[
         'row q-gutter-x-sm q-gutter-y-xs constraint',
-        { limiting: constraint.remaining.value }
+        { limiting: constraint.remaining.value },
       ]"
     >
       <template v-if="'mutexed' in constraint">
@@ -143,7 +141,12 @@ export default defineComponent({
           title="Mutex"
           label="Mutex"
           class="col-grow"
-          @update:model-value="v => { constraint.mutexed.mutexId = v; save(); }"
+          @update:model-value="
+            (v) => {
+              constraint.mutexed.mutexId = v;
+              save();
+            }
+          "
         />
         <DurationField
           :model-value="holdTime(constraint)"
@@ -156,11 +159,13 @@ export default defineComponent({
               ? null
               : 'Using default value from Mutex block.'
           "
-          @update:model-value="v => {
-            constraint.mutexed.extraHoldTime = v;
-            constraint.mutexed.hasCustomHoldTime = true;
-            save();
-          }"
+          @update:model-value="
+            (v) => {
+              constraint.mutexed.extraHoldTime = v;
+              constraint.mutexed.hasCustomHoldTime = true;
+              save();
+            }
+          "
         >
           <template #append>
             <template v-if="isCustom(constraint)">
@@ -169,7 +174,10 @@ export default defineComponent({
                 round
                 icon="mdi-backup-restore"
                 size="sm"
-                @click.stop="constraint.mutexed.hasCustomHoldTime = false; save()"
+                @click.stop="
+                  constraint.mutexed.hasCustomHoldTime = false;
+                  save();
+                "
               >
                 <q-tooltip>Use default value from Mutex block.</q-tooltip>
               </q-btn>
@@ -183,7 +191,12 @@ export default defineComponent({
         title="Minimum OFF period"
         label="Minimum OFF period"
         class="col-grow"
-        @update:model-value="v => { constraint.minOff = v; save(); }"
+        @update:model-value="
+          (v) => {
+            constraint.minOff = v;
+            save();
+          }
+        "
       />
       <DurationField
         v-if="'minOn' in constraint"
@@ -191,7 +204,12 @@ export default defineComponent({
         title="Minimum ON period"
         label="Minimum ON period"
         class="col-grow"
-        @update:model-value="v => { constraint.minOn = v; save(); }"
+        @update:model-value="
+          (v) => {
+            constraint.minOn = v;
+            save();
+          }
+        "
       />
       <DurationField
         v-if="'delayedOff' in constraint"
@@ -199,7 +217,12 @@ export default defineComponent({
         title="Delay OFF"
         label="Delay OFF"
         class="col-grow"
-        @update:model-value="v => { constraint.delayedOff = v; save(); }"
+        @update:model-value="
+          (v) => {
+            constraint.delayedOff = v;
+            save();
+          }
+        "
       />
       <DurationField
         v-if="'delayedOn' in constraint"
@@ -207,7 +230,12 @@ export default defineComponent({
         title="Delay ON"
         label="Delay ON"
         class="col-grow"
-        @update:model-value="v => { constraint.delayedOn = v; save(); }"
+        @update:model-value="
+          (v) => {
+            constraint.delayedOn = v;
+            save();
+          }
+        "
       />
 
       <div class="col-auto column justify-center darkish">

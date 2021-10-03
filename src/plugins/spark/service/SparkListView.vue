@@ -10,12 +10,12 @@ import { serviceStore } from '@/store/services';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
-import { SparkServiceModule, sparkStore } from '../store';
+import { useBlockSpecStore, useSparkStore } from '../store';
 import { SparkService } from '../types';
 import SparkListWidgetWrapper from './SparkListWidgetWrapper.vue';
 import { ListRenderAddress } from './types';
 
-type ItemSortFunction = (a: ListRenderAddress, b: ListRenderAddress) => number
+type ItemSortFunction = (a: ListRenderAddress, b: ListRenderAddress) => number;
 
 const roleIcons: Record<WidgetRole, string> = {
   Display: 'mdi-monitor-dashboard',
@@ -39,10 +39,8 @@ const allSorters: Mapped<ItemSortFunction> = {
   unsorted: () => 0,
   name: makeObjectSorter('id'),
   type: makeObjectSorter('title'),
-  role: (a, b): number =>
-    roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role),
+  role: (a, b): number => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role),
 };
-
 
 export default defineComponent({
   name: 'SparkListView',
@@ -57,29 +55,25 @@ export default defineComponent({
   },
   setup(props) {
     const { dense } = useGlobals.setup();
-    const {
-      getElementRef,
-      setElementRef,
-    } = useElementRefs.setup();
+    const { getElementRef, setElementRef } = useElementRefs.setup();
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
 
-    const validTypes: BlockType[] = sparkStore.blockSpecs.map(s => s.type);
+    const validTypes = specStore.blockSpecs.map((s) => s.type);
 
     const searchText = ref<string | null>(null);
-    const searchExpression = computed<RegExp>(
-      () => RegExp(searchText.value ?? '', 'i'),
+    const searchExpression = computed<RegExp>(() =>
+      RegExp(searchText.value ?? '', 'i'),
     );
 
-    const service = computed<SparkService | null>(
-      () => serviceStore.serviceById(props.serviceId),
-    );
-
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.serviceId),
+    const service = computed<SparkService | null>(() =>
+      serviceStore.serviceById(props.serviceId),
     );
 
     const sorting = computed<string>({
-      get: () => sparkModule.value?.sessionConfig.sorting ?? 'name',
-      set: v => sparkModule.value?.updateSessionConfig({ sorting: v }),
+      get: () => sparkStore.sessionConfigByService(props.serviceId).sorting,
+      set: (v) =>
+        sparkStore.updateSessionConfig(props.serviceId, { sorting: v }),
     });
 
     const sorter = computed<ItemSortFunction>(
@@ -87,16 +81,17 @@ export default defineComponent({
     );
 
     const expanded = computed<string[]>({
-      get: () => sparkModule.value?.sessionConfig.expanded ?? [],
-      set: v => sparkModule.value?.updateSessionConfig({ expanded: v }),
+      get: () => sparkStore.sessionConfigByService(props.serviceId).expanded,
+      set: (v) =>
+        sparkStore.updateSessionConfig(props.serviceId, { expanded: v }),
     });
 
-    const allRenderItems = computed<ListRenderAddress[]>(
-      () => {
-        const blockItems = sparkStore
-          .serviceBlocks(props.serviceId)
-          .filter(block => validTypes.includes(block.type))
-          .map(block => ({
+    const allRenderItems = computed<ListRenderAddress[]>(() => {
+      const blockItems =
+        sparkStore
+          .blocksByService(props.serviceId)
+          .filter((block) => validTypes.includes(block.type))
+          .map((block) => ({
             serviceId: props.serviceId,
             id: block.id,
             type: block.type,
@@ -104,29 +99,27 @@ export default defineComponent({
             title: featureStore.widgetTitle(block.type),
             role: featureStore.widgetRole(block.type),
           }))
-          .sort(sorter.value)
-          ?? [];
+          .sort(sorter.value) ?? [];
 
-        // Override sorting - Device Info should always come first
-        const sysIdx = blockItems.findIndex(v => v.type === BlockType.SysInfo);
-        if (sysIdx !== -1) {
-          blockItems.unshift(...blockItems.splice(sysIdx, 1));
-        }
+      // Override sorting - Device Info should always come first
+      const sysIdx = blockItems.findIndex((v) => v.type === BlockType.SysInfo);
+      if (sysIdx !== -1) {
+        blockItems.unshift(...blockItems.splice(sysIdx, 1));
+      }
 
-        return blockItems;
-      },
+      return blockItems;
+    });
+
+    const filteredRenderItems = computed<ListRenderAddress[]>(() =>
+      allRenderItems.value.filter((item) =>
+        `${item.id} ${item.title}`.match(searchExpression.value),
+      ),
     );
 
-    const filteredRenderItems = computed<ListRenderAddress[]>(
-      () => allRenderItems
-        .value
-        .filter(item => `${item.id} ${item.title}`.match(searchExpression.value)),
-    );
-
-    const expandedRenderItems = computed<ListRenderAddress[]>(
-      () => filteredRenderItems
-        .value
-        .filter(item => expanded.value.includes(item.id)),
+    const expandedRenderItems = computed<ListRenderAddress[]>(() =>
+      filteredRenderItems.value.filter((item) =>
+        expanded.value.includes(item.id),
+      ),
     );
 
     function scrollTo(id: string): void {
@@ -136,10 +129,8 @@ export default defineComponent({
     function setExpanded(id: string, enabled: boolean): void {
       const isExpanded = expanded.value.includes(id);
       if (isExpanded !== enabled) {
-        const base = expanded.value.filter(v => v !== id);
-        expanded.value = enabled
-          ? [...base, id]
-          : base;
+        const base = expanded.value.filter((v) => v !== id);
+        expanded.value = enabled ? [...base, id] : base;
       }
       if (enabled) {
         nextTick(() => scrollTo(id));
@@ -147,7 +138,7 @@ export default defineComponent({
     }
 
     function expandAll(): void {
-      expanded.value = filteredRenderItems.value.map(v => v.id);
+      expanded.value = filteredRenderItems.value.map((v) => v.id);
     }
 
     function expandNone(): void {
@@ -157,19 +148,17 @@ export default defineComponent({
     function onItemClick(item: ListRenderAddress): void {
       if (dense.value) {
         createBlockDialog(item, { mode: 'Basic' });
-      }
-      else {
+      } else {
         setExpanded(item.id, true);
       }
     }
 
     function startCreateBlock(): void {
-      createBlockWizard(props.serviceId)
-        .onOk(({ block }) => {
-          if (block) {
-            setExpanded(block.id, true);
-          }
-        });
+      createBlockWizard(props.serviceId).onOk(({ block }) => {
+        if (block) {
+          setExpanded(block.id, true);
+        }
+      });
     }
 
     function showSearchKeyboard(): void {
@@ -178,8 +167,7 @@ export default defineComponent({
         componentProps: {
           modelValue: searchText.value,
         },
-      })
-        .onOk(v => searchText.value = v);
+      }).onOk((v) => (searchText.value = v));
     }
 
     return {
@@ -210,10 +198,7 @@ export default defineComponent({
     class="q-pa-lg row no-wrap justify-start page-height"
     @dblclick="startCreateBlock"
   >
-    <q-scroll-area
-      visible
-      class="content-column rounded-borders bg-dark"
-    >
+    <q-scroll-area visible class="content-column rounded-borders bg-dark">
       <q-list class="q-pr-md" @dblclick.stop.prevent>
         <!-- Selection controls -->
         <q-item class="q-mb-md">
@@ -242,12 +227,22 @@ export default defineComponent({
             </q-btn>
           </q-item-section>
           <q-item-section v-if="!dense" class="col-auto">
-            <q-btn flat round icon="mdi-checkbox-multiple-blank-outline" @click="expandNone">
+            <q-btn
+              flat
+              round
+              icon="mdi-checkbox-multiple-blank-outline"
+              @click="expandNone"
+            >
               <q-tooltip>Unselect all</q-tooltip>
             </q-btn>
           </q-item-section>
           <q-item-section v-if="!dense" class="col-auto">
-            <q-btn flat round icon="mdi-checkbox-multiple-marked" @click="expandAll">
+            <q-btn
+              flat
+              round
+              icon="mdi-checkbox-multiple-marked"
+              @click="expandAll"
+            >
               <q-tooltip>Select all</q-tooltip>
             </q-btn>
           </q-item-section>
@@ -263,14 +258,11 @@ export default defineComponent({
             <ToggleButton
               :model-value="expanded.includes(val.id)"
               flat
-              @update:model-value="v => setExpanded(val.id, v)"
+              @update:model-value="(v) => setExpanded(val.id, v)"
             />
           </q-item-section>
           <q-item-section>
-            <q-item
-              clickable
-              @click="onItemClick(val)"
-            >
+            <q-item clickable @click="onItemClick(val)">
               <q-item-section avatar>
                 <q-icon :name="roleIcons[val.role]" />
                 <q-tooltip>{{ val.role }}</q-tooltip>
@@ -290,15 +282,11 @@ export default defineComponent({
     </q-scroll-area>
 
     <!-- Widget List -->
-    <q-scroll-area
-      v-if="!dense"
-      visible
-      class="content-column"
-    >
+    <q-scroll-area v-if="!dense" visible class="content-column">
       <q-list class="q-ml-lg q-pr-none" @dblclick.stop.prevent>
         <q-item
           v-for="item in expandedRenderItems"
-          :ref="el => setElementRef(item.id, el)"
+          :ref="(el) => setElementRef(item.id, el)"
           :key="`expanded-${serviceId}-${item.id}`"
           class="q-pt-none q-pb-md"
         >

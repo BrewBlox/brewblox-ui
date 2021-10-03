@@ -1,11 +1,13 @@
 <script lang="ts">
-
 import { computed, defineComponent } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
-import { BlockIntfType } from '@/plugins/spark/types';
+import { useSparkStore } from '@/plugins/spark/store';
+import { Block, BlockIntfType } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { prettyQty } from '@/utils/formatting';
+
+const sensorFilter = (block: Block): boolean =>
+  isCompatible(block.type, BlockIntfType.TempSensorInterface);
 
 export default defineComponent({
   name: 'QuickstartSensorField',
@@ -19,28 +21,26 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const sparkStore = useSparkStore();
 
     const local = computed<string>({
       get: () => props.modelValue,
-      set: v => emit('update:modelValue', v),
+      set: (v) => emit('update:modelValue', v),
     });
 
-    const opts = computed<string[]>(
-      () => sparkStore.serviceBlocks(props.serviceId)
-        .filter(block => isCompatible(block.type, BlockIntfType.TempSensorInterface))
-        .map(block => block.id),
+    const opts = computed<string[]>(() =>
+      sparkStore
+        .blocksByService(props.serviceId)
+        .filter(sensorFilter)
+        .map((block) => block.id),
     );
 
-    const sensorTemp = computed<string>(
-      () => {
-        const block = sparkStore.blockById(props.serviceId, local.value);
-        return prettyQty(block?.data.value);
-      },
-    );
+    const sensorTemp = computed<string>(() => {
+      const block = sparkStore.blockById(props.serviceId, local.value);
+      return prettyQty(block?.data.value);
+    });
 
     return {
       local,
@@ -56,6 +56,6 @@ export default defineComponent({
     v-model="local"
     :options="opts"
     :hint="sensorTemp"
-    :rules="[v => !!v || 'Sensor must be selected']"
+    :rules="[(v) => !!v || 'Sensor must be selected']"
   />
 </template>

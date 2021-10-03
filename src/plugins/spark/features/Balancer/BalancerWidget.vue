@@ -7,29 +7,27 @@ import { BalancerBlock } from '@/plugins/spark/types';
 import { Block } from '@/shared-types';
 import { fixedNumber } from '@/utils/formatting';
 
+import { useSparkStore } from '../../store';
+
 export default defineComponent({
   name: 'BalancerWidget',
   setup() {
-    const {
-      sparkModule,
-      block,
-    } = useBlockWidget.setup<BalancerBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, block } = useBlockWidget.setup<BalancerBlock>();
 
-    const clientNames = computed<Mapped<string>>(
-      () => {
-        const result = {};
-        sparkModule
-          .blocks
-          .forEach((v: Block) => {
-            const constraint = get(v, 'data.constrainedBy.constraints', [])
-              .find(constraint => get(constraint, 'balanced.balancerId.id') === block.value.id);
-            if (constraint) {
-              result[constraint.balanced.id] = v.id;
-            }
-          });
-        return result;
-      },
-    );
+    const clientNames = computed<Mapped<string>>(() => {
+      const result = {};
+      sparkStore.blocksByService(serviceId).forEach((v: Block) => {
+        const constraint = get(v, 'data.constrainedBy.constraints', []).find(
+          (constraint) =>
+            get(constraint, 'balanced.balancerId.id') === block.value.id,
+        );
+        if (constraint) {
+          result[constraint.balanced.id] = v.id;
+        }
+      });
+      return result;
+    });
 
     function clientName(id: number): string {
       return clientNames.value[id] || `${id}` || 'unknown';
@@ -37,7 +35,6 @@ export default defineComponent({
 
     return {
       fixedNumber,
-      sparkModule,
       block,
       clientName,
     };

@@ -1,5 +1,5 @@
 import { builderStore } from '@/plugins/builder/store';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockType,
   DigitalActuatorBlock,
@@ -31,8 +31,8 @@ const oneWireGpioFilter = makeTypeFilter<OneWireGpioModuleBlock>(
 );
 
 export function resetGpioChanges(serviceId: string): GpioChange[] {
-  return sparkStore
-    .serviceBlocks(serviceId)
+  return useSparkStore()
+    .blocksByService(serviceId)
     .filter(oneWireGpioFilter)
     .sort((a, b) => a.data.modulePosition - b.data.modulePosition)
     .map((block) => ({
@@ -47,8 +47,8 @@ export function unlinkedActuators(
   channels: IoChannelAddress[],
 ): DigitalActuatorBlock[] {
   return (
-    sparkStore
-      .serviceBlocks(serviceId)
+    useSparkStore()
+      .blocksByService(serviceId)
       .filter(digitalActuatorFilter)
       // Find existing drivers
       .filter((block) =>
@@ -70,6 +70,7 @@ export function changedIoModules(
   serviceId: string,
   changes: GpioChange[],
 ): OneWireGpioModuleBlock[] {
+  const sparkStore = useSparkStore();
   return changes
     .map((change) => {
       const block = sparkStore.blockById<OneWireGpioModuleBlock>(
@@ -85,10 +86,11 @@ export function changedIoModules(
 }
 
 export function createOutputActions(): QuickstartAction[] {
+  const sparkStore = useSparkStore();
+
   return [
     // Rename blocks
     async (config: QuickstartConfig) => {
-      const module = sparkStore.moduleById(config.serviceId)!;
       await Promise.all(
         Object.entries(config.renamedBlocks)
           .filter(
@@ -96,7 +98,7 @@ export function createOutputActions(): QuickstartAction[] {
               newVal && currVal !== newVal,
           )
           .map(([currVal, newVal]: [string, string]) =>
-            module.renameBlock([currVal, newVal]),
+            sparkStore.renameBlock(config.serviceId, currVal, newVal),
           ),
       );
     },
@@ -186,7 +188,7 @@ export function withoutPrefix(prefix: string, val: string): string {
 }
 
 export const pidDefaults = (): PidBlock['data'] =>
-  sparkStore.blockSpecByType(BlockType.Pid).generate();
+  useBlockSpecStore().blockSpecByType(BlockType.Pid).generate();
 
 export const makeBeerCoolConfig = (): PidConfig => ({
   kp: inverseTempQty(-50),

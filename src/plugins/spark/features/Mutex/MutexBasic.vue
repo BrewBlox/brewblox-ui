@@ -5,6 +5,8 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { MutexBlock, MutexedConstraint, Quantity } from '@/plugins/spark/types';
 import { durationString } from '@/utils/quantity';
 
+import { useSparkStore } from '../../store';
+
 interface MutexClient {
   id: string;
   remaining: Quantity;
@@ -15,29 +17,31 @@ interface MutexClient {
 export default defineComponent({
   name: 'MutexBasic',
   setup() {
-    const {
-      sparkModule,
-      block,
-    } = useBlockWidget.setup<MutexBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, block } = useBlockWidget.setup<MutexBlock>();
 
-    const mutexClients = computed<MutexClient[]>(
-      () => sparkModule.blocks
+    const mutexClients = computed<MutexClient[]>(() =>
+      sparkStore
+        .blocksByService(serviceId)
         // Does the block have -any- digital constraint?
-        .filter(b => b.data.constrainedBy?.constraints[0]?.remaining)
-        .flatMap(b => {
+        .filter((b) => b.data.constrainedBy?.constraints[0]?.remaining)
+        .flatMap((b) => {
           // Cast to MutexedConstraint for typing reasons
           // We haven't yet checked whether this is actually true
-          const constraints: MutexedConstraint[] = b.data.constrainedBy.constraints;
-          return constraints
-            // Is this a mutexed constraint?
-            // Is this mutexed constraint using this Mutex block?
-            .filter(c => c.mutexed?.mutexId.id === block.value.id)
-            .map(c => ({
-              id: b.id,
-              remaining: c.remaining,
-              limited: !!c.remaining.value,
-              hasLock: c.mutexed.hasLock,
-            }));
+          const constraints: MutexedConstraint[] =
+            b.data.constrainedBy.constraints;
+          return (
+            constraints
+              // Is this a mutexed constraint?
+              // Is this mutexed constraint using this Mutex block?
+              .filter((c) => c.mutexed?.mutexId.id === block.value.id)
+              .map((c) => ({
+                id: b.id,
+                remaining: c.remaining,
+                limited: !!c.remaining.value,
+                hasLock: c.mutexed.hasLock,
+              }))
+          );
         }),
     );
 
@@ -55,12 +59,9 @@ export default defineComponent({
     <slot name="warnings" />
 
     <div class="widget-body row items-start">
-      <LabeledField
-        label="Clients"
-        class="col-grow"
-      >
+      <LabeledField label="Clients" class="col-grow">
         <div
-          v-for="{id, limited, hasLock} in mutexClients"
+          v-for="{ id, limited, hasLock } in mutexClients"
           :key="id"
           :class="[
             'q-px-sm q-py-xs',
@@ -73,10 +74,7 @@ export default defineComponent({
           {{ id }}
         </div>
       </LabeledField>
-      <LabeledField
-        label="Lock time remaining"
-        class="col-grow"
-      >
+      <LabeledField label="Lock time remaining" class="col-grow">
         {{ durationString(block.data.waitRemaining) }}
       </LabeledField>
     </div>

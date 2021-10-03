@@ -79,10 +79,10 @@ export interface BlockRelationNode {
   title?: string; // overrides `type` for rendering
 }
 
-export interface StoredDataPreset<DataT = any> extends StoreObject {
-  type: string;
+export interface BlockDataSnippet<T extends Block = Block> extends StoreObject {
   name: string;
-  data: Partial<DataT>;
+  type: T['type'];
+  data: Partial<T['data']>;
 }
 
 export interface ProfileValues {

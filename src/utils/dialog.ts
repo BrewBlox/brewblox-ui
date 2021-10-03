@@ -1,12 +1,12 @@
 import { Dialog, DialogChainObject, QDialogOptions } from 'quasar';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { WidgetMode } from '@/store/features';
 
 import { notify } from './notify';
 
-type DialogOpts = Pick<QDialogOptions, 'component' | 'componentProps'>
+type DialogOpts = Pick<QDialogOptions, 'component' | 'componentProps'>;
 
 interface BlockDialogOpts {
   props?: any;
@@ -49,7 +49,7 @@ export function createDialog(opts: DialogOpts): DialogChainObject {
  * @returns
  */
 export function createDialogPromise(opts: DialogOpts): Promise<any> {
-  return new Promise<any>(resolve => {
+  return new Promise<any>((resolve) => {
     createDialog(opts)
       .onOk((v: any[]) => resolve(v))
       .onDismiss(() => resolve(undefined));
@@ -73,7 +73,10 @@ export function createBlockDialog(
   if (!addr || !addr.id) {
     return null;
   }
-  if (opts.verify !== false && !sparkStore.blockById(addr.serviceId, addr.id)) {
+  if (
+    opts.verify !== false &&
+    useSparkStore().blockById(addr.serviceId, addr.id) == null
+  ) {
     notify.warn(`Block not found: <i>${addr.id}</i>`);
     return null;
   }
@@ -106,6 +109,6 @@ export async function createBlockDialogPromise(
 ): Promise<boolean> {
   const chain = createBlockDialog(addr, opts);
   return chain
-    ? new Promise<boolean>(resolve => chain.onDismiss(() => resolve(true)))
+    ? new Promise<boolean>((resolve) => chain.onDismiss(() => resolve(true)))
     : false;
 }

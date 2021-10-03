@@ -8,7 +8,7 @@ import { computed, defineComponent, PropType } from 'vue';
 
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   BlockType,
   PidBlock,
@@ -51,34 +51,33 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const sparkStore = useSparkStore();
     const { address, block, isBroken } =
       useSettingsBlock.setup<SetpointSensorPairBlock>(
         props.part,
         props.settingsKey,
         [BlockType.SetpointSensorPair],
       );
+    const { serviceId } = address.value;
 
     const textColor = computed<string>(() =>
       props.backgroundColor ? contrastColor(props.backgroundColor) : 'white',
-    );
-
-    const sparkModule = computed<SparkServiceModule | null>(() =>
-      sparkStore.moduleById(address.value.serviceId),
     );
 
     const isUsed = computed<boolean>(
       () =>
         block.value !== null &&
         block.value.data.settingEnabled &&
-        sparkModule
-          .value!.blocks.filter(pidFilter)
+        sparkStore
+          .blocksByService(serviceId)
+          .filter(pidFilter)
           .some((blk) => blk.data.inputId.id === address.value.id),
     );
 
-    const isDriven = computed<boolean>(
-      () =>
-        block.value !== null &&
-        sparkModule.value!.drivenBlocks.includes(block.value.id),
+    const isDriven = computed<boolean>(() =>
+      sparkStore
+        .driveChainsByService(serviceId)
+        .some((v) => v.target === block.value?.id),
     );
 
     const setpointSetting = computed<number | null>(() =>

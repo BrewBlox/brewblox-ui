@@ -2,10 +2,15 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { ProfileValues } from '@/plugins/spark/types';
 import { calculateProfileValues } from '@/plugins/spark/utils';
-import { PidBlock, Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
+import {
+  PidBlock,
+  Quantity,
+  SetpointProfileBlock,
+  SetpointSensorPairBlock,
+} from '@/shared-types';
 import { concatById } from '@/utils/collections';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { prettyQty, shortDateString } from '@/utils/formatting';
@@ -24,45 +29,44 @@ export default defineComponent({
     TempControlSyncView,
   },
   setup() {
-    const {
-      context,
-    } = useContext.setup();
-    const {
-      config,
-      saveConfig,
-    } = useWidget.setup<TempControlWidget>();
+    const { context } = useContext.setup();
+    const { config, saveConfig } = useWidget.setup<TempControlWidget>();
+    const sparkStore = useSparkStore();
 
     const problems = ref<TempControlProblem[]>([]);
     const detected = ref<Date | null>(null);
 
-    const serviceId = computed<string | null>(
-      () => config.value.serviceId,
-    );
+    const serviceId = computed<string | null>(() => config.value.serviceId);
 
-    const module = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(serviceId.value),
-    );
+    // const module = computed<SparkServiceModule | null>(
+    //   () => sparkStore.moduleById(serviceId.value),
+    // );
 
     const tempMode = computed<TempControlMode | null>(
-      () => config.value.modes.find(v => v.id === config.value.activeMode) ?? null,
+      () =>
+        config.value.modes.find((v) => v.id === config.value.activeMode) ??
+        null,
     );
 
-    const coolPid = computed<PidBlock | null>(
-      () => module.value?.blockByLink(config.value.coolPid) ?? null,
+    const coolPid = computed<PidBlock | null>(() =>
+      sparkStore.blockByLink(serviceId.value, config.value.coolPid),
     );
 
-    const heatPid = computed<PidBlock | null>(
-      () => module.value?.blockByLink(config.value.heatPid) ?? null,
+    const heatPid = computed<PidBlock | null>(() =>
+      sparkStore.blockByLink(serviceId.value, config.value.heatPid),
     );
 
-    const differentSetpoints = computed<boolean>(
-      () => Boolean(module.value
-        && coolPid.value && heatPid.value
-        && coolPid.value.data.inputId.id !== heatPid.value.data.inputId.id),
+    const differentSetpoints = computed<boolean>(() =>
+      Boolean(
+        sparkStore.has(serviceId.value) &&
+          coolPid.value &&
+          heatPid.value &&
+          coolPid.value.data.inputId.id !== heatPid.value.data.inputId.id,
+      ),
     );
 
-    const setpoint = computed<SetpointSensorPairBlock | null>(
-      () => module.value && !differentSetpoints.value
+    const setpoint = computed<SetpointSensorPairBlock | null>(() =>
+      sparkStore.has(serviceId.value) && !differentSetpoints.value
         ? pidSetpoint(coolPid.value) ?? pidSetpoint(heatPid.value)
         : null,
     );
@@ -74,33 +78,33 @@ export default defineComponent({
           : setpoint.value?.data.storedSetting;
         return value ?? tempQty(null);
       },
-      set: value => {
-        if (module.value && setpoint.value) {
+      set: (value) => {
+        if (setpoint.value) {
           setpoint.value.data.storedSetting = value;
-          module.value.saveBlock(setpoint.value);
+          sparkStore.saveBlock(setpoint.value);
         }
       },
     });
 
     const setpointEnabled = computed<boolean | null>({
       get: () => setpoint.value?.data.settingEnabled ?? null,
-      set: value => setControl(!!value),
+      set: (value) => setControl(!!value),
     });
 
-    const profile = computed<SetpointProfileBlock | null>(
-      () => module.value?.blockByLink(config.value.profile) ?? null,
+    const profile = computed<SetpointProfileBlock | null>(() =>
+      sparkStore.blockByLink(serviceId.value, config.value.profile),
     );
 
     const profileEnabled = computed<boolean>({
       get: () => Boolean(setpointEnabled.value && profile.value?.data.enabled),
-      set: value => {
+      set: (value) => {
         if (!profile.value || !setpoint.value) {
           return;
         }
 
         if (!value) {
           profile.value.data.enabled = false;
-          module.value?.saveBlock(profile.value);
+          sparkStore.saveBlock(profile.value);
           return;
         }
 
@@ -116,46 +120,47 @@ export default defineComponent({
             nok: 'No',
             ok: 'Yes',
           },
-        })
-          .onOk(async (reset: boolean) => {
-            if (!profile.value || !setpoint.value) { return; }
-            if (reset) {
-              profile.value.data.start = new Date().getTime() / 1000;
-            }
-            profile.value.data.enabled = true;
-            setpoint.value.data.settingEnabled = true;
+        }).onOk(async (reset: boolean) => {
+          if (!profile.value || !setpoint.value) {
+            return;
+          }
+          if (reset) {
+            profile.value.data.start = new Date().getTime() / 1000;
+          }
+          profile.value.data.enabled = true;
+          setpoint.value.data.settingEnabled = true;
 
-            await module.value?.saveBlock(setpoint.value);
-            await module.value?.saveBlock(profile.value);
-          });
+          await sparkStore.saveBlock(setpoint.value);
+          await sparkStore.saveBlock(profile.value);
+        });
       },
     });
 
-    const profileValues = computed<ProfileValues | null>(
-      () => calculateProfileValues(profile.value),
+    const profileValues = computed<ProfileValues | null>(() =>
+      calculateProfileValues(profile.value),
     );
 
-    function checkMismatch(pid: PidBlock | null, config: PidConfig | null | undefined): boolean {
+    function checkMismatch(
+      pid: PidBlock | null,
+      config: PidConfig | null | undefined,
+    ): boolean {
       return pid && config
-        ? ['kp', 'ti', 'td'].some(k => !bloxQty(pid.data[k]).eq(config[k]))
+        ? ['kp', 'ti', 'td'].some((k) => !bloxQty(pid.data[k]).eq(config[k]))
         : false;
     }
 
-    const coolConfigMismatch = computed<boolean>(
-      () => checkMismatch(coolPid.value, tempMode.value?.coolConfig),
+    const coolConfigMismatch = computed<boolean>(() =>
+      checkMismatch(coolPid.value, tempMode.value?.coolConfig),
     );
 
-    const heatConfigMismatch = computed<boolean>(
-      () => checkMismatch(heatPid.value, tempMode.value?.heatConfig),
+    const heatConfigMismatch = computed<boolean>(() =>
+      checkMismatch(heatPid.value, tempMode.value?.heatConfig),
     );
-
 
     function applySync(kind: 'cool' | 'heat', leading: 'pid' | 'mode'): void {
-      const pid = kind === 'cool'
-        ? coolPid.value
-        : heatPid.value;
+      const pid = kind === 'cool' ? coolPid.value : heatPid.value;
 
-      if (!module.value || !tempMode.value || !pid) {
+      if (!tempMode.value || !pid) {
         return;
       }
 
@@ -170,13 +175,13 @@ export default defineComponent({
         const config: PidConfig = tempMode.value[`${kind}Config`];
         if (config) {
           pid.data = { ...pid.data, ...config };
-          module.value.saveBlock(pid);
+          sparkStore.saveBlock(pid);
         }
       }
     }
 
     function pidSetpoint(pid: PidBlock | null): SetpointSensorPairBlock | null {
-      return module.value?.blockByLink(pid?.data.inputId ?? null) ?? null;
+      return sparkStore.blockByLink(serviceId.value, pid?.data.inputId);
     }
 
     function showProfile(): void {
@@ -186,17 +191,17 @@ export default defineComponent({
     async function setControl(enabled: boolean): Promise<void> {
       if (profile.value && !enabled) {
         profile.value.data.enabled = false;
-        await module.value?.saveBlock(profile.value);
+        await sparkStore.saveBlock(profile.value);
       }
 
       if (setpoint.value) {
         setpoint.value.data.settingEnabled = enabled;
-        await module.value?.saveBlock(setpoint.value);
+        await sparkStore.saveBlock(setpoint.value);
       }
     }
 
     async function setControlMode(id: string): Promise<void> {
-      const mode = config.value.modes.find(v => v.id === id);
+      const mode = config.value.modes.find((v) => v.id === id);
 
       if (!mode) {
         config.value.activeMode = null;
@@ -216,21 +221,18 @@ export default defineComponent({
             saveConfig();
           },
         },
-      })
-        .onOk(async () => {
-          try {
-            await applyMode(config.value, mode);
-            config.value.activeMode = mode.id;
-            notify.done(`Applied ${mode.title} mode`);
-          }
-          catch (e) {
-            config.value.activeMode = null;
-            notify.error(e.message);
-          }
-          finally {
-            await saveConfig();
-          }
-        });
+      }).onOk(async () => {
+        try {
+          await applyMode(config.value, mode);
+          config.value.activeMode = mode.id;
+          notify.done(`Applied ${mode.title} mode`);
+        } catch (e) {
+          config.value.activeMode = null;
+          notify.error(e.message);
+        } finally {
+          await saveConfig();
+        }
+      });
     }
 
     function selectControlMode(): void {
@@ -239,20 +241,20 @@ export default defineComponent({
         componentProps: {
           modelValue: config.value.activeMode ?? '',
           title: 'Select control mode',
-          message: 'Pick a control mode. You can edit its settings before it is applied.',
+          message:
+            'Pick a control mode. You can edit its settings before it is applied.',
           listSelect: true,
           selectOptions: [
             { value: '', label: 'Manual' },
-            ...config.value.modes.map(v => ({ value: v.id, label: v.title })),
+            ...config.value.modes.map((v) => ({ value: v.id, label: v.title })),
           ],
         },
-      })
-        .onOk(setControlMode);
+      }).onOk(setControlMode);
     }
 
     function troubleshoot(): void {
       problems.value = findControlProblems(config.value, {
-        showConfig: () => context.mode = 'Full',
+        showConfig: () => (context.mode = 'Full'),
       });
       detected.value = new Date();
     }
@@ -291,7 +293,6 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <div class="widget-body">
     <slot name="warnings" />
@@ -307,15 +308,9 @@ export default defineComponent({
         tag-class="text-secondary"
       />
 
-      <LabeledField
-        v-if="!setpoint"
-        label="Setpoint setting"
-        class="col-grow"
-      >
+      <LabeledField v-if="!setpoint" label="Setpoint setting" class="col-grow">
         <b>{{
-          differentSetpoints
-            ? 'PID setpoints mismatched'
-            : 'No setpoint set'
+          differentSetpoints ? 'PID setpoints mismatched' : 'No setpoint set'
         }}</b>
       </LabeledField>
 
@@ -327,18 +322,13 @@ export default defineComponent({
         @click="showProfile"
       >
         <span v-if="profileValues">
-          {{ prettyQty(profileValues.prev) }} to {{ prettyQty(profileValues.next) }}
+          {{ prettyQty(profileValues.prev) }} to
+          {{ prettyQty(profileValues.next) }}
         </span>
-        <span v-else>
-          ---
-        </span>
+        <span v-else> --- </span>
       </LabeledField>
 
-      <LabeledField
-        v-if="!profile"
-        label="Setpoint Profile"
-        class="col-grow"
-      >
+      <LabeledField v-if="!profile" label="Setpoint Profile" class="col-grow">
         Not set
       </LabeledField>
     </div>
@@ -348,12 +338,10 @@ export default defineComponent({
         <q-item-label>Control mode</q-item-label>
       </q-item-section>
       <q-item-section avatar class="q-pr-sm text-big">
-        <span v-if="tempMode" class="text-primary ">
+        <span v-if="tempMode" class="text-primary">
           {{ tempMode.title }}
         </span>
-        <span v-else>
-          Manual
-        </span>
+        <span v-else> Manual </span>
       </q-item-section>
     </q-item>
 
@@ -362,24 +350,16 @@ export default defineComponent({
         <q-item-label>Setpoint enabled</q-item-label>
       </q-item-section>
       <q-item-section avatar>
-        <q-toggle
-          v-model="setpointEnabled"
-        />
+        <q-toggle v-model="setpointEnabled" />
       </q-item-section>
     </q-item>
 
-    <q-item
-      tag="label"
-      :disable="!profile"
-    >
+    <q-item tag="label" :disable="!profile">
       <q-item-section>
         <q-item-label>Setpoint driven by Profile</q-item-label>
       </q-item-section>
       <q-item-section avatar>
-        <q-toggle
-          v-model="profileEnabled"
-          :disable="!profile"
-        />
+        <q-toggle v-model="profileEnabled" :disable="!profile" />
       </q-item-section>
     </q-item>
 
@@ -403,7 +383,7 @@ export default defineComponent({
         :readonly="!problem.autofix"
         :class="[
           'row items-center',
-          !problem.autofix && 'cursor-not-allowed dashed'
+          !problem.autofix && 'cursor-not-allowed dashed',
         ]"
         tag-class="row"
         @click="autofix(problem)"
@@ -411,31 +391,31 @@ export default defineComponent({
         <template #before>
           <q-icon name="warning" color="warning" size="lg" />
         </template>
-        <div
-          v-html="problem.desc"
-        />
+        <div v-html="problem.desc" />
       </LabeledField>
     </div>
 
     <TempControlSyncView
-      v-if="coolPid && tempMode && coolConfigMismatch"
+      v-if="coolPid && tempMode && tempMode.coolConfig && coolConfigMismatch"
       :block-config="coolPid.data"
       :mode-config="tempMode.coolConfig"
-      @apply="v => applySync('cool', v)"
+      @apply="(v) => applySync('cool', v)"
     >
       <template #message>
-        Settings in cool PID do not match settings stored in {{ tempMode.title }} mode.
+        Settings in cool PID do not match settings stored in
+        {{ tempMode.title }} mode.
       </template>
     </TempControlSyncView>
 
     <TempControlSyncView
-      v-if="heatPid && tempMode && heatConfigMismatch"
+      v-if="heatPid && tempMode && tempMode.heatConfig && heatConfigMismatch"
       :block-config="heatPid.data"
       :mode-config="tempMode.heatConfig"
-      @apply="v => applySync('heat', v)"
+      @apply="(v) => applySync('heat', v)"
     >
       <template #message>
-        Settings in heat PID do not match settings stored in {{ tempMode.title }} mode.
+        Settings in heat PID do not match settings stored in
+        {{ tempMode.title }} mode.
       </template>
     </TempControlSyncView>
   </div>

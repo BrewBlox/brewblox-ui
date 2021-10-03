@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { systemBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { SparkPlatform, SysInfoBlock } from '@/shared-types';
@@ -11,9 +11,9 @@ import widget from './SysInfoWidget.vue';
 
 const type = BlockType.SysInfo;
 
-
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
 
     const blockSpec: BlockSpec<SysInfoBlock> = {
       type,
@@ -41,7 +41,7 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
+    specStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

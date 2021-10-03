@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, ref } from 'vue';
 
 import { useGlobals, useWidget } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress } from '@/plugins/spark/types';
 import { Block } from '@/shared-types';
 import { filterById, spliceById } from '@/utils/collections';
@@ -26,15 +26,14 @@ export default defineComponent({
     },
   },
   setup() {
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
     const { dense } = useGlobals.setup();
-    const {
-      config,
-      saveConfig,
-    } = useWidget.setup<QuickActionsWidget>();
+    const { config, saveConfig } = useWidget.setup<QuickActionsWidget>();
     const draggingStep = ref(false);
 
-    const actions = computed<ChangeAction[]>(
-      () => deserialize(config.value.actions ?? config.value.steps),
+    const actions = computed<ChangeAction[]>(() =>
+      deserialize(config.value.actions ?? config.value.steps),
     );
 
     function saveActions(acs: ChangeAction[] = actions.value): void {
@@ -51,7 +50,10 @@ export default defineComponent({
       actions.value.push({
         id: nanoid(),
         name: `${action.name} (copy)`,
-        changes: action.changes.map(change => ({ ...deepCopy(change), id: nanoid() })),
+        changes: action.changes.map((change) => ({
+          ...deepCopy(change),
+          id: nanoid(),
+        })),
       });
       saveActions();
     }
@@ -65,15 +67,13 @@ export default defineComponent({
           title: 'Change ChangeAction name',
           message: `Choose a new name for '${action.name}'`,
         },
-      })
-        .onOk(newName => {
-          if (newName !== stepName) {
-            action.name = newName;
-            saveAction(action);
-          }
-        });
+      }).onOk((newName) => {
+        if (newName !== stepName) {
+          action.name = newName;
+          saveAction(action);
+        }
+      });
     }
-
 
     function startRemoveStep(action: ChangeAction): void {
       createDialog({
@@ -84,8 +84,7 @@ export default defineComponent({
           ok: 'Confirm',
           cancel: 'Cancel',
         },
-      })
-        .onOk(() => saveActions(filterById(actions.value, action)));
+      }).onOk(() => saveActions(filterById(actions.value, action)));
     }
 
     function startAddChange(action: ChangeAction): void {
@@ -100,23 +99,21 @@ export default defineComponent({
           title: 'Choose a Block',
           anyService: true,
           clearable: false,
-          blockFilter: (block: Block) => sparkStore
-            .fieldSpecsByType(block.type)
-            .some(f => !f.readonly),
+          blockFilter: (block: Block) =>
+            specStore.fieldSpecsByType(block.type).some((f) => !f.readonly),
         },
-      })
-        .onOk((addr: BlockAddress) => {
-          if (addr && addr.id && addr.serviceId) {
-            action.changes.push({
-              id: nanoid(),
-              blockId: addr.id,
-              serviceId: addr.serviceId,
-              data: {},
-              confirmed: {},
-            });
-            saveAction(action);
-          }
-        });
+      }).onOk((addr: BlockAddress) => {
+        if (addr && addr.id && addr.serviceId) {
+          action.changes.push({
+            id: nanoid(),
+            blockId: addr.id,
+            serviceId: addr.serviceId,
+            data: {},
+            confirmed: {},
+          });
+          saveAction(action);
+        }
+      });
     }
 
     function saveChanges(action: ChangeAction, changes: BlockChange[]): void {
@@ -143,16 +140,16 @@ export default defineComponent({
           modelValue: currentBlock,
           title: `Switch target block '${blockId}'`,
           anyService: true,
-          blockFilter: block => currentBlock === null || block.type === currentBlock.type,
+          blockFilter: (block) =>
+            currentBlock === null || block.type === currentBlock.type,
         },
-      })
-        .onOk((addr: BlockAddress) => {
-          if (addr && addr.id && addr.serviceId) {
-            change.blockId = addr.id;
-            change.serviceId = addr.serviceId;
-            saveChange(action, change);
-          }
-        });
+      }).onOk((addr: BlockAddress) => {
+        if (addr && addr.id && addr.serviceId) {
+          change.blockId = addr.id;
+          change.serviceId = addr.serviceId;
+          saveChange(action, change);
+        }
+      });
     }
 
     return {
@@ -184,8 +181,8 @@ export default defineComponent({
         :model-value="actions"
         item-key="id"
         @update:model-value="saveActions"
-        @start="draggingStep=true"
-        @end="draggingStep=false"
+        @start="draggingStep = true"
+        @end="draggingStep = false"
       >
         <template #item="action">
           <q-expansion-item
@@ -201,13 +198,13 @@ export default defineComponent({
               :disabled="dense"
               :model-value="action.element.changes"
               item-key="id"
-              @update:model-value="v => saveChanges(action.element, v)"
+              @update:model-value="(v) => saveChanges(action.element, v)"
             >
               <template #item="change">
                 <QuickActionChange
                   :model-value="change.element"
                   class="q-mr-sm q-my-sm"
-                  @update:model-value="v => saveChange(action.element, v)"
+                  @update:model-value="(v) => saveChange(action.element, v)"
                   @remove="removeChange(action.element, change.element)"
                   @switch="startSwitchBlock(action.element, change.element)"
                 />

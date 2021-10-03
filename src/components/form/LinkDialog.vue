@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
@@ -48,40 +48,37 @@ export default defineComponent({
       default: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
+    const sparkStore = useSparkStore();
 
     const local = ref<Link>(bloxLink(props.modelValue));
 
     const blockTypeFilter = computed<(block: Block) => boolean>(
-      () => block => isCompatible(block.type, props.compatible ?? props.modelValue?.type ?? null),
+      () => (block) =>
+        isCompatible(
+          block.type,
+          props.compatible ?? props.modelValue?.type ?? null,
+        ),
     );
 
-    const linkOpts = computed<Link[]>(
-      () => sparkStore.serviceBlocks(props.serviceId)
+    const linkOpts = computed<Link[]>(() =>
+      sparkStore
+        .blocksByService(props.serviceId)
         .filter(blockTypeFilter.value)
         .filter(props.blockFilter)
-        .map(block => bloxLink(block.id, block.type))
+        .map((block) => bloxLink(block.id, block.type))
         .sort(makeObjectSorter('id')),
     );
 
-    const block = computed<Block | null>(
-      () => sparkStore.blockById(props.serviceId, local.value.id),
+    const block = computed<Block | null>(() =>
+      sparkStore.blockById(props.serviceId, local.value.id),
     );
 
-    const tooltip = computed<string | null>(
-      () => block.value
-        ? featureStore.widgetTitle(block.value.type)
-        : null,
+    const tooltip = computed<string | null>(() =>
+      block.value ? featureStore.widgetTitle(block.value.type) : null,
     );
 
     const localOk = computed<boolean>(
@@ -89,9 +86,8 @@ export default defineComponent({
     );
 
     function update(link: Link | null): void {
-      local.value = link !== null
-        ? bloxLink(link)
-        : bloxLink(null, props.modelValue.type);
+      local.value =
+        link !== null ? bloxLink(link) : bloxLink(null, props.modelValue.type);
     }
 
     function configureBlock(): void {
@@ -99,13 +95,15 @@ export default defineComponent({
     }
 
     function createBlock(): void {
-      createBlockWizard(props.serviceId, props.compatible ?? local.value.type)
-        .onOk(({ block }) => {
-          if (block) {
-            // Retain original type
-            local.value = bloxLink(block.id, props.modelValue.type);
-          }
-        });
+      createBlockWizard(
+        props.serviceId,
+        props.compatible ?? local.value.type,
+      ).onOk(({ block }) => {
+        if (block) {
+          // Retain original type
+          local.value = bloxLink(block.id, props.modelValue.type);
+        }
+      });
     }
 
     function save(): void {
@@ -140,7 +138,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <q-select
         :model-value="local"
         :options="linkOpts"
@@ -172,32 +170,15 @@ export default defineComponent({
           >
             <q-tooltip>Edit {{ local.id }}</q-tooltip>
           </q-btn>
-          <q-btn
-            v-else
-            flat
-            round
-            icon="mdi-launch"
-            disable
-          />
+          <q-btn v-else flat round icon="mdi-launch" disable />
 
-          <q-btn
-            v-if="creatable"
-            flat
-            round
-            icon="add"
-            @click="createBlock"
-          >
+          <q-btn v-if="creatable" flat round icon="add" @click="createBlock">
             <q-tooltip>Create new Block</q-tooltip>
           </q-btn>
         </template>
       </q-select>
       <template #actions>
-        <q-btn
-          flat
-          label="Cancel"
-          color="primary"
-          @click="onDialogCancel"
-        />
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
           :disable="!localOk"
           flat

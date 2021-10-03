@@ -2,7 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 
 import SparkEspWifiCard from './SparkEspWifiCard.vue';
 import SparkParticleWifiCard from './SparkParticleWifiCard.vue';
@@ -22,13 +22,15 @@ export default defineComponent({
   },
   emits: [...useDialog.emits],
   setup(props) {
+    const sparkStore = useSparkStore();
     const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
     const { dense } = useGlobals.setup();
 
     const platformVendor = computed<'esp' | 'particle' | 'sim' | 'unknown'>(
       () => {
-        const module = sparkStore.moduleById(props.serviceId);
-        const platform = module?.status?.devicePlatform;
+        const platform = sparkStore.statusByService(
+          props.serviceId,
+        )?.devicePlatform;
         if (platform === 'p1' || platform === 'photon') {
           return 'particle';
         }

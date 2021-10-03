@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   BlockIntfType,
   BlockType,
@@ -45,6 +45,8 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const sparkStore = useSparkStore();
+
     const local = computed<IoChannelAddress | null>({
       get: () => props.modelValue,
       set: (addr) => {
@@ -73,7 +75,7 @@ export default defineComponent({
       return [
         // Existing channels from blocks except GPIO
         ...sparkStore
-          .serviceBlocks(props.serviceId)
+          .blocksByService(props.serviceId)
           .filter(
             (block): block is IoArrayBlock =>
               isCompatible(block.type, BlockIntfType.IoArrayInterface) &&

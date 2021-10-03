@@ -1,8 +1,13 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeUnmount, PropType, ref } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockAddress, BlockConfig, BlockType } from '@/plugins/spark/types';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
+import {
+  Block,
+  BlockAddress,
+  BlockConfig,
+  BlockType,
+} from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
@@ -10,7 +15,6 @@ import { widgetStore } from '@/store/widgets';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
-
 
 type CreateMode = 'new' | 'existing';
 
@@ -32,10 +36,10 @@ export default defineComponent({
       default: undefined,
     },
   },
-  emits: [
-    ...useWidgetWizard.emits,
-  ],
+  emits: [...useWidgetWizard.emits],
   setup(props) {
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
     const {
       widgetId,
       featureTitle,
@@ -50,35 +54,35 @@ export default defineComponent({
     const serviceId = ref<string | null>(sparkStore.serviceIds[0] ?? null);
     const dashboardId = ref<string | null>(props.activeDashboardId ?? null);
 
-    const serviceOpts = computed<string[]>(
-      () => sparkStore.serviceIds,
-    );
+    const serviceOpts = computed<string[]>(() => sparkStore.serviceIds);
 
-    const blockOpts = computed<Block[]>(
-      () => sparkStore.serviceBlocks(serviceId.value)
-        .filter(block => block.type === props.featureId)
+    const blockOpts = computed<Block[]>(() =>
+      sparkStore
+        .blocksByService(serviceId.value)
+        .filter((block) => block.type === props.featureId)
         .sort(makeObjectSorter('id')),
     );
 
-    const blockIdRules = computed<InputRule[]>(
-      () => serviceId.value
-        ? makeBlockIdRules(serviceId.value)
-        : [],
+    const blockIdRules = computed<InputRule[]>(() =>
+      serviceId.value ? makeBlockIdRules(serviceId.value) : [],
     );
 
-    const blockIdValidator = computed<(v: string) => boolean>(
-      () => makeRuleValidator(blockIdRules.value),
+    const blockIdValidator = computed<(v: string) => boolean>(() =>
+      makeRuleValidator(blockIdRules.value),
     );
 
-    const newBlockId = ref<string>(suggestId(featureTitle, blockIdValidator.value));
-    const newBlockData = ref(sparkStore.blockSpecByType(props.featureId)!.generate());
+    const newBlockId = ref<string>(
+      suggestId(featureTitle, blockIdValidator.value),
+    );
+    const newBlockData = ref(
+      specStore.blockSpecByType(props.featureId)!.generate(),
+    );
 
-    const newBlockAddress = computed<BlockAddress>(
-      () => ({
-        serviceId: serviceId.value,
-        id: newBlockId.value,
-        type: props.featureId,
-      }));
+    const newBlockAddress = computed<BlockAddress>(() => ({
+      serviceId: serviceId.value,
+      id: newBlockId.value,
+      type: props.featureId,
+    }));
 
     const existingBlockId = ref<string | null>(null);
     const existingBlockAddress = computed<BlockAddress>({
@@ -87,29 +91,27 @@ export default defineComponent({
         id: existingBlockId.value,
         type: props.featureId,
       }),
-      set: addr => existingBlockId.value = addr.id,
+      set: (addr) => (existingBlockId.value = addr.id),
     });
 
-    const existingBlock = computed<Block | null>(
-      () => sparkStore.blockByAddress(existingBlockAddress.value),
+    const existingBlock = computed<Block | null>(() =>
+      sparkStore.blockByAddress(existingBlockAddress.value),
     );
 
     const newWidgetConfig = ref<BlockConfig | null>(null);
 
-    const canCreate = computed<boolean>(
-      () => {
-        if (!serviceId.value || !dashboardId.value) {
-          return false;
-        }
-        if (createMode.value === 'new') {
-          return blockIdValidator.value(newBlockId.value);
-        }
-        if (createMode.value === 'existing') {
-          return existingBlock.value !== null;
-        }
-        return true;
-      },
-    );
+    const canCreate = computed<boolean>(() => {
+      if (!serviceId.value || !dashboardId.value) {
+        return false;
+      }
+      if (createMode.value === 'new') {
+        return blockIdValidator.value(newBlockId.value);
+      }
+      if (createMode.value === 'existing') {
+        return existingBlock.value !== null;
+      }
+      return true;
+    });
 
     function showIdKeyboard(): void {
       createDialog({
@@ -136,9 +138,8 @@ export default defineComponent({
         });
       }
 
-      const blockId = createMode.value === 'new'
-        ? newBlockId.value
-        : existingBlockId.value!;
+      const blockId =
+        createMode.value === 'new' ? newBlockId.value : existingBlockId.value!;
 
       widgetStore.setVolatileWidget({
         id: widgetId,
@@ -210,9 +211,10 @@ export default defineComponent({
         }
       }
 
-      const block = createMode.value === 'new'
-        ? sparkStore.blockByAddress(newBlockAddress.value)
-        : sparkStore.blockByAddress(existingBlockAddress.value);
+      const block =
+        createMode.value === 'new'
+          ? sparkStore.blockByAddress(newBlockAddress.value)
+          : sparkStore.blockByAddress(existingBlockAddress.value);
 
       return onDone({ block, widget });
     }
@@ -281,13 +283,15 @@ export default defineComponent({
             <q-icon name="mdi-information">
               <q-tooltip>
                 The name of the Spark Controller block.
-                <br>Multiple widgets can display the same block.
-                <br>Rules:
+                <br>Multiple widgets can display the same block. <br>Rules:
                 <ul>
                   <li>The name must not be empty.</li>
                   <li>The name must be unique.</li>
                   <li>The name must begin with a letter.</li>
-                  <li>The name may only contain alphanumeric characters, space, and _-()|.</li>
+                  <li>
+                    The name may only contain alphanumeric characters, space,
+                    and _-()|.
+                  </li>
                   <li>The name must be less than 200 characters.</li>
                 </ul>
               </q-tooltip>

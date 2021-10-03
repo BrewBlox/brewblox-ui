@@ -14,7 +14,7 @@ import { featureStore } from '@/store/features';
 import { isLink } from '@/utils/identity';
 
 import { compatibleTypes } from '../const';
-import { sparkStore } from '../store';
+import { useSparkStore } from '../store';
 import { BlockAddress, ComparedBlockType } from '../types';
 import { getDisplaySettingsBlock } from './system';
 
@@ -66,25 +66,23 @@ export function isBlockDisplayed(addr: BlockAddress): boolean {
   );
 }
 
-export function isBlockVolatile(block: Block | null): boolean {
+export function isBlockVolatile(block: Maybe<Block>): boolean {
   return block?.meta?.volatile === true;
 }
 
-export function isBlockRemovable(block: Block | null): boolean {
+export function isBlockRemovable(block: Maybe<Block>): boolean {
   return (
-    block !== null &&
+    block != null &&
     !isBlockVolatile(block) &&
     featureStore.widgetRemoveActions(block.type).length > 0
   );
 }
 
-export const isBlockDriven = (block: Block | null): boolean =>
-  Boolean(
-    block &&
-      sparkStore
-        .moduleById(block.serviceId)
-        ?.driveChains.some((chain) => chain.target === block.id),
-  );
+export const isBlockDriven = (block: Maybe<Block>): boolean =>
+  block != null &&
+  useSparkStore()
+    .driveChainsByService(block.serviceId)
+    .some((chain) => chain.target === block.id);
 
 export const isSparkState = (data: unknown): data is SparkStateEvent =>
   (data as SparkStateEvent).type === 'Spark.state';

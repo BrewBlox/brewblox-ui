@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   ActuatorLogicBlock,
   BlockFieldSpec,
@@ -21,6 +21,8 @@ const type = BlockType.ActuatorLogic;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+
     const blockSpec: BlockSpec<ActuatorLogicBlock> = {
       type,
       generate: () => ({
@@ -28,7 +30,11 @@ const plugin: Plugin = {
         result: LogicResult.RESULT_EMPTY,
         errorPos: 0,
         targetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
-        drivenTargetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface, true),
+        drivenTargetId: bloxLink(
+          null,
+          BlockIntfType.ActuatorDigitalInterface,
+          true,
+        ),
         analog: [],
         digital: [],
         expression: '',
@@ -61,8 +67,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

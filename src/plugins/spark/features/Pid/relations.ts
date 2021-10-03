@@ -1,4 +1,4 @@
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   BlockRelation,
   BlockRelationNode,
@@ -10,7 +10,7 @@ import { createDialog } from '@/utils/dialog';
 import { isLink } from '@/utils/identity';
 
 function findLinks(serviceId: string, id: string | null): BlockRelation[] {
-  const block = sparkStore.blockById(serviceId, id);
+  const block = useSparkStore().blockById(serviceId, id);
   if (!id || !block) {
     return [];
   }
@@ -47,8 +47,8 @@ function relations(block: PidBlock): BlockRelation[] {
 
   return [
     ...chain,
-    ...sparkStore
-      .serviceBlocks(block.serviceId)
+    ...useSparkStore()
+      .blocksByService(block.serviceId)
       .filter((block) => block.data.targetId?.id === setpointId)
       .map((block) => ({
         source: block.id,
@@ -59,10 +59,12 @@ function relations(block: PidBlock): BlockRelation[] {
 }
 
 function nodes(serviceId: string): BlockRelationNode[] {
-  return sparkStore.serviceBlocks(serviceId).map((block) => ({
-    id: block.id,
-    type: featureStore.widgetTitle(block.type),
-  }));
+  return useSparkStore()
+    .blocksByService(serviceId)
+    .map((block) => ({
+      id: block.id,
+      type: featureStore.widgetTitle(block.type),
+    }));
 }
 
 export function startRelationsDialog(block: PidBlock): void {

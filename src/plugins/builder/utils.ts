@@ -3,7 +3,7 @@ import range from 'lodash/range';
 import reduce from 'lodash/reduce';
 import { nanoid } from 'nanoid';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
@@ -55,7 +55,7 @@ export function settingsBlock<T extends Block>(
   intf: ComparedBlockType,
 ): T | null {
   const addr = settingsAddress(part, key);
-  const block = sparkStore.blockByAddress<T>(addr);
+  const block = useSparkStore().blockByAddress<T>(addr);
   return block && isCompatible(block.type, intf) ? block : null;
 }
 
@@ -276,6 +276,7 @@ export function showDrivingBlockDialog(
   settingsKey: string,
   intf: ComparedBlockType,
 ): void {
+  const sparkStore = useSparkStore();
   const block = settingsBlock(part, settingsKey, intf);
 
   if (!block) {
@@ -283,8 +284,8 @@ export function showDrivingBlockDialog(
   }
 
   const driveChain = sparkStore
-    .moduleById(block.serviceId)
-    ?.driveChains.find((chain) => chain.target === block.id);
+    .driveChainsByService(block.serviceId)
+    .find((chain) => chain.target === block.id);
 
   const actual =
     driveChain !== undefined

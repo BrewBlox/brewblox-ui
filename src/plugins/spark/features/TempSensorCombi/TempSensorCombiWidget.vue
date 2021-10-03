@@ -4,33 +4,34 @@ import { computed, defineComponent } from 'vue';
 import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
 import { combineFuncLabels } from '@/plugins/spark/const';
-import { BlockIntfType, Link, TempSensorCombiBlock } from '@/plugins/spark/types';
+import {
+  BlockIntfType,
+  Link,
+  TempSensorCombiBlock,
+} from '@/plugins/spark/types';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/formatting';
 import { bloxLink } from '@/utils/link';
 
-const combineFuncOpts: SelectOption[] =
-  Object.entries(combineFuncLabels)
-    .map(([value, label]) => ({ label, value }));
+import { useSparkStore } from '../../store';
+
+const combineFuncOpts: SelectOption[] = Object.entries(combineFuncLabels).map(
+  ([value, label]) => ({ label, value }),
+);
 
 export default defineComponent({
   name: 'TempSensorCombiWidget',
   setup() {
     const { context, inDialog } = useContext.setup();
-    const {
-      serviceId,
-      sparkModule,
-      block,
-      saveBlock,
-    } = useBlockWidget.setup<TempSensorCombiBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, block, saveBlock } =
+      useBlockWidget.setup<TempSensorCombiBlock>();
 
     const hasValue = computed<boolean>(
       () => block.value.data.value.value !== null,
     );
 
-    const sensors = computed<Link[]>(
-      () => block.value.data.sensors,
-    );
+    const sensors = computed<Link[]>(() => block.value.data.sensors);
 
     function addSensor(): void {
       createDialog({
@@ -38,15 +39,15 @@ export default defineComponent({
         componentProps: {
           modelValue: bloxLink(null, BlockIntfType.TempSensorInterface),
           title: 'Add sensor',
-          message: 'All linked sensors are evaluated to determine the output value',
+          message:
+            'All linked sensors are evaluated to determine the output value',
           label: 'Sensor',
           serviceId,
         },
-      })
-        .onOk((value: Link) => {
-          block.value.data.sensors.push(value);
-          saveBlock();
-        });
+      }).onOk((value: Link) => {
+        block.value.data.sensors.push(value);
+        saveBlock();
+      });
     }
 
     function removeSensor(idx): void {
@@ -60,7 +61,7 @@ export default defineComponent({
     }
 
     function sensorValue(link: Link): string {
-      const block = sparkModule.blockByLink(link);
+      const block = sparkStore.blockByLink(serviceId, link);
       return prettyQty(block?.data.value ?? null);
     }
 
@@ -131,7 +132,12 @@ export default defineComponent({
             title="Select function"
             label="Value calculation"
             class="col-grow"
-            @update:model-value="v => { block.data.combineFunc = v; saveBlock(); }"
+            @update:model-value="
+              (v) => {
+                block.data.combineFunc = v;
+                saveBlock();
+              }
+            "
           />
 
           <div class="col-break" />
@@ -139,21 +145,18 @@ export default defineComponent({
           <div
             v-for="(link, idx) in sensors"
             :key="`link-${idx}-${link.id}`"
-            class="col-12 row q-gutter-xs q-mt-none "
+            class="col-12 row q-gutter-xs q-mt-none"
           >
             <LinkField
               :model-value="link"
               :service-id="serviceId"
               title="Sensor Block"
-              :label="`Sensor ${idx+1}`"
+              :label="`Sensor ${idx + 1}`"
               tag="span"
               class="col-grow"
-              @update:model-value="v => updateSensor(idx, v)"
+              @update:model-value="(v) => updateSensor(idx, v)"
             />
-            <LabeledField
-              label="Value"
-              class="col-auto min-width-sm"
-            >
+            <LabeledField label="Value" class="col-auto min-width-sm">
               {{ sensorValue(link) }}
             </LabeledField>
             <q-btn

@@ -2,7 +2,7 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { dashboardStore } from '@/store/dashboards';
 import { systemStore } from '@/store/system';
 
@@ -32,13 +32,14 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
     const { dense } = useGlobals.setup();
+    const sparkStore = useSparkStore();
 
     const dialogTitle = ref<string>('Wizardry');
     const activeWizard = ref<string | null>(props.initialWizard);
     const activeProps = ref(props.initialProps);
 
     const sparkServiceAvailable = computed<boolean>(
-      () => sparkStore.modules.length > 0,
+      () => sparkStore.serviceIds.length > 0,
     );
 
     const primaryDashboardId = computed<string | null>(() => {

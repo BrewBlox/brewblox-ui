@@ -2,8 +2,13 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useField } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
-import { Block, BlockFieldAddress, BlockFieldSpec, ComparedBlockType } from '@/plugins/spark/types';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
+import {
+  Block,
+  BlockFieldAddress,
+  BlockFieldSpec,
+  ComparedBlockType,
+} from '@/plugins/spark/types';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { prettyAny } from '@/utils/formatting';
 
@@ -56,38 +61,37 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
     const { activeSlots } = useField.setup();
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
 
     function save(addr: BlockFieldAddress): void {
       emit('update:modelValue', addr);
     }
 
-    const block = computed<Block | null>(
-      () => sparkStore.blockByAddress(props.modelValue),
+    const block = computed<Block | null>(() =>
+      sparkStore.blockByAddress(props.modelValue),
     );
 
-    const fieldSpec = computed<BlockFieldSpec | null>(
-      () => sparkStore.fieldSpecByAddress(props.modelValue),
+    const fieldSpec = computed<BlockFieldSpec | null>(() =>
+      specStore.fieldSpecByFieldAddress(props.modelValue),
     );
 
-    const fieldDisplayValue = computed<string>(
-      () => prettyAny(sparkStore.fieldByAddress(props.modelValue)),
+    const fieldDisplayValue = computed<string>(() =>
+      prettyAny(sparkStore.fieldByAddress(props.modelValue)),
     );
 
     const broken = computed<boolean>(
-      () => block.value === null
-        && props.modelValue.serviceId !== null
-        && props.modelValue.id !== null,
+      () =>
+        block.value === null &&
+        props.modelValue.serviceId !== null &&
+        props.modelValue.id !== null,
     );
 
     const canEdit = computed<boolean>(
-      () => block.value !== null
-        && props.configurable
-        && props.show,
+      () => block.value !== null && props.configurable && props.show,
     );
 
     function editBlock(): void {
@@ -112,10 +116,8 @@ export default defineComponent({
           fieldFilter: props.fieldFilter,
           ...props.dialogProps,
         },
-      })
-        .onOk(save);
+      }).onOk(save);
     }
-
 
     return {
       activeSlots,
@@ -133,15 +135,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <LabeledField v-bind="{...$attrs, ...$props}" @click="openDialog">
+  <LabeledField v-bind="{ ...$attrs, ...$props }" @click="openDialog">
     <div v-if="fieldSpec" class="q-gutter-y-xs">
-      <span>
-        {{ modelValue.id }} &raquo; {{ fieldSpec.title }}
-      </span>
-      <span
-        v-if="showValue"
-        class="text-secondary"
-      >
+      <span> {{ modelValue.id }} &raquo; {{ fieldSpec.title }} </span>
+      <span v-if="showValue" class="text-secondary">
         &raquo; {{ fieldDisplayValue }}
       </span>
     </div>
@@ -164,11 +161,7 @@ export default defineComponent({
       >
         <q-tooltip>Show {{ modelValue.id }}</q-tooltip>
       </q-btn>
-      <q-icon
-        v-if="broken"
-        name="error"
-        color="negative"
-      />
+      <q-icon v-if="broken" name="error" color="negative" />
     </template>
 
     <template v-for="slot in activeSlots" #[slot] :name="slot">

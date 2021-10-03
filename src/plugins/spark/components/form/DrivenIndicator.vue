@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { BlockDriveChain } from '@/shared-types';
 import { createBlockDialog } from '@/utils/dialog';
 
@@ -18,10 +18,12 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const sparkModule = sparkStore.moduleById(props.serviceId)!;
+    const sparkStore = useSparkStore();
 
     const driveChains = computed<BlockDriveChain[]>(() =>
-      sparkModule.driveChains.filter((chain) => chain.target === props.blockId),
+      sparkStore
+        .driveChainsByService(props.serviceId)
+        .filter((chain) => chain.target === props.blockId),
     );
 
     const textChains = computed<string[][]>(() =>

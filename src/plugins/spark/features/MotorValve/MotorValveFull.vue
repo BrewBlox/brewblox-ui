@@ -12,6 +12,8 @@ import {
 import { makeTypeFilter } from '@/utils/functional';
 import { matchesType } from '@/utils/objects';
 
+import { useSparkStore } from '../../store';
+
 interface Claim {
   driverId: string;
   channelId: number;
@@ -31,11 +33,12 @@ const motorValveFilter = makeTypeFilter<MotorValveBlock>(BlockType.MotorValve);
 export default defineComponent({
   name: 'MotorValveFull',
   setup() {
-    const { serviceId, sparkModule, block, saveBlock, limitations, isDriven } =
+    const sparkStore = useSparkStore();
+    const { serviceId, block, saveBlock, limitations, isDriven } =
       useBlockWidget.setup<MotorValveBlock>();
 
     const hwBlock = computed<DS2408Block | null>(() =>
-      sparkModule.blockById(block.value.data.hwDevice.id),
+      sparkStore.blockByLink(serviceId, block.value.data.hwDevice),
     );
 
     const claims = computed<Claim[]>(() => {
@@ -43,7 +46,8 @@ export default defineComponent({
         return [];
       }
       const targetId = hwBlock.value.id;
-      return sparkModule.blocks
+      return sparkStore
+        .blocksByService(serviceId)
         .filter(motorValveFilter)
         .filter((b) => b.id !== block.value.id)
         .filter((b) => b.data.hwDevice.id === targetId)
@@ -67,9 +71,12 @@ export default defineComponent({
       }
       const claim = claims.value.find((c) => c.channelId === channelId);
       if (claim) {
-        const driver = sparkModule.blockById<MotorValveBlock>(claim.driverId)!;
+        const driver = sparkStore.blockById<MotorValveBlock>(
+          serviceId,
+          claim.driverId,
+        )!;
         driver.data.startChannel = 0;
-        await sparkModule.saveBlock(driver);
+        await sparkStore.saveBlock(driver);
       }
       block.value.data.startChannel = channelId;
       await saveBlock();

@@ -13,6 +13,8 @@ import {
 import { isCompatible } from '@/plugins/spark/utils';
 import { createDialog } from '@/utils/dialog';
 
+import { useSparkStore } from '../../store';
+
 const connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
   { label: '2 valves', value: DS2408ConnectMode.CONNECT_VALVE },
   { label: '8 IO channels', value: DS2408ConnectMode.CONNECT_ACTUATOR },
@@ -21,9 +23,9 @@ const connectModeOpts: SelectOption<DS2408ConnectMode>[] = [
 export default defineComponent({
   name: 'DS2408Widget',
   setup() {
+    const sparkStore = useSparkStore();
     const { context } = useContext.setup();
-    const { sparkModule, block, saveBlock } =
-      useBlockWidget.setup<DS2408Block>();
+    const { serviceId, block, saveBlock } = useBlockWidget.setup<DS2408Block>();
 
     const valveMode = computed<boolean>(
       () => block.value.data.connectMode === DS2408ConnectMode.CONNECT_VALVE,
@@ -33,7 +35,8 @@ export default defineComponent({
       if (!mode || block.value.data.connectMode === mode) {
         return;
       }
-      const linked = sparkModule.blocks
+      const linked = sparkStore
+        .blocksByService(serviceId)
         .filter((b): b is DigitalActuatorBlock | MotorValveBlock =>
           isCompatible(b.type, BlockIntfType.ActuatorDigitalInterface),
         )
@@ -53,7 +56,7 @@ export default defineComponent({
             saveFunc: () =>
               linked.forEach((block) => {
                 block.data.hwDevice.id = null;
-                sparkModule.saveBlock(block);
+                sparkStore.saveBlock(block);
               }),
           },
         }).onOk(() => {

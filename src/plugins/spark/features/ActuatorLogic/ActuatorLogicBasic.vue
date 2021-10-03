@@ -11,12 +11,14 @@ import {
 import { createDialog } from '@/utils/dialog';
 import { prettyLink } from '@/utils/formatting';
 
+import { useSparkStore } from '../../store';
 import AnalogCompareEditDialog from './AnalogCompareEditDialog.vue';
 import { logicResultTitles, nonErrorResults } from './const';
 import DigitalCompareEditDialog from './DigitalCompareEditDialog.vue';
 import { ExpressionError } from './types';
 import {
-  analogIdx, analogKey,
+  analogIdx,
+  analogKey,
   comparisonCheck,
   digitalIdx,
   digitalKey,
@@ -30,76 +32,73 @@ import {
 export default defineComponent({
   name: 'ActuatorLogicBasic',
   setup() {
-    const {
-      serviceId,
-      block,
-      sparkModule,
-      saveBlock,
-    } = useBlockWidget.setup<ActuatorLogicBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, block, saveBlock } =
+      useBlockWidget.setup<ActuatorLogicBlock>();
 
-    const digital = computed<{ key: string; cmp: DigitalCompare; pretty: string }[]>(
-      () => block.value.data.digital
-        .map((cmp, idx) => ({
-          cmp,
-          key: digitalKey(idx),
-          pretty: prettyDigital(cmp),
-        })),
+    const digital = computed<
+      { key: string; cmp: DigitalCompare; pretty: string }[]
+    >(() =>
+      block.value.data.digital.map((cmp, idx) => ({
+        cmp,
+        key: digitalKey(idx),
+        pretty: prettyDigital(cmp),
+      })),
     );
 
-    const analog = computed<{ key: string; cmp: AnalogCompare; pretty: string }[]>(
-      () => block.value.data.analog
-        .map((cmp, idx) => ({
+    const analog = computed<
+      { key: string; cmp: AnalogCompare; pretty: string }[]
+    >(() =>
+      block.value.data.analog.map((cmp, idx) => ({
+        cmp,
+        key: analogKey(idx),
+        pretty: prettyAnalog(
           cmp,
-          key: analogKey(idx),
-          pretty: prettyAnalog(
-            cmp,
-            sparkModule.blockById(cmp.id.id)?.type ?? null,
-          ),
-        })),
+          sparkStore.blockByLink(serviceId, cmp.id)?.type ?? null,
+        ),
+      })),
     );
 
     function keyColor(key: string): string {
-      if (!isKey(key)) { return 'white'; }
+      if (!isKey(key)) {
+        return 'white';
+      }
       const arr: { key: string; cmp: AnalogCompare | DigitalCompare }[] =
-        isDigital(key)
-          ? digital.value
-          : analog.value;
-      return arr.find(v => v.key === key)?.cmp.result === LogicResult.RESULT_TRUE
+        isDigital(key) ? digital.value : analog.value;
+      return arr.find((v) => v.key === key)?.cmp.result ===
+        LogicResult.RESULT_TRUE
         ? 'positive'
         : 'negative';
     }
 
-    const expression = computed<{ char: string; color: string }[]>(
-      () => block.value.data.expression
-        .split('')
-        .map(char => ({
-          char,
-          color: keyColor(char),
-        })),
+    const expression = computed<{ char: string; color: string }[]>(() =>
+      block.value.data.expression.split('').map((char) => ({
+        char,
+        color: keyColor(char),
+      })),
     );
 
-    const firmwareError = computed<ExpressionError | null>(
-      () => {
-        const { result, errorPos } = block.value.data;
-        const index = Math.max(0, errorPos - 1);
-        return nonErrorResults.includes(result)
-          ? null
-          : {
+    const firmwareError = computed<ExpressionError | null>(() => {
+      const { result, errorPos } = block.value.data;
+      const index = Math.max(0, errorPos - 1);
+      return nonErrorResults.includes(result)
+        ? null
+        : {
             index,
             message: logicResultTitles[result],
             indicator: '-'.repeat(index) + '^',
           };
-      },
-    );
+    });
 
     const err = computed<ExpressionError | null>(
-      () => syntaxCheck(block.value.data.expression)
-        ?? comparisonCheck(block.value.data)
-        ?? firmwareError.value,
+      () =>
+        syntaxCheck(block.value.data.expression) ??
+        comparisonCheck(block.value.data) ??
+        firmwareError.value,
     );
 
-    const result = computed<string>(
-      () => err.value
+    const result = computed<string>(() =>
+      err.value
         ? `Error: ${err.value.message}`
         : logicResultTitles[block.value.data.result],
     );
@@ -112,11 +111,10 @@ export default defineComponent({
           serviceId,
           title: 'Edit comparison',
         },
-      })
-        .onOk(cmp => {
-          block.value.data.digital.splice(digitalIdx(key), 1, cmp);
-          saveBlock();
-        });
+      }).onOk((cmp) => {
+        block.value.data.digital.splice(digitalIdx(key), 1, cmp);
+        saveBlock();
+      });
     }
 
     function editAnalog(key: string, cmp: AnalogCompare): void {
@@ -127,11 +125,10 @@ export default defineComponent({
           serviceId,
           title: 'Edit comparison',
         },
-      })
-        .onOk(cmp => {
-          block.value.data.analog.splice(analogIdx(key), 1, cmp);
-          saveBlock();
-        });
+      }).onOk((cmp) => {
+        block.value.data.analog.splice(analogIdx(key), 1, cmp);
+        saveBlock();
+      });
     }
 
     return {
@@ -154,35 +151,26 @@ export default defineComponent({
 
     <div class="widget-body">
       <div class="row wrap q-pa-sm">
-        <LabeledField
-          label="Expression"
-          class="col-grow"
-        >
+        <LabeledField label="Expression" class="col-grow">
           <span
-            v-for="({char, color}, idx) in expression"
+            v-for="({ char, color }, idx) in expression"
             :key="`expression-${idx}`"
             :class="[`text-${color}`, 'expression-field']"
           >
             {{ char }}
           </span>
         </LabeledField>
-        <LabeledField
-          label="Result"
-          class="col-grow"
-        >
+        <LabeledField label="Result" class="col-grow">
           <div :class="err && 'text-negative'">
             {{ result }}
           </div>
         </LabeledField>
       </div>
 
-      <LabeledField
-        label="Active comparisons"
-        tag-class="col-grow"
-      >
+      <LabeledField label="Active comparisons" tag-class="col-grow">
         <div class="row q-gutter-xs col-grow">
           <q-chip
-            v-for="{key, cmp, pretty} in digital"
+            v-for="{ key, cmp, pretty } in digital"
             :key="`digital-${key}`"
             color="blue-grey-8"
             class="hoverable full-width"
@@ -190,10 +178,7 @@ export default defineComponent({
             @click="editDigital(key, cmp)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div
-                class="text-lime-6 text-bold col-auto"
-                style="width: 1em"
-              >
+              <div class="text-lime-6 text-bold col-auto" style="width: 1em">
                 {{ key }}
               </div>
               <q-icon
@@ -207,13 +192,11 @@ export default defineComponent({
               <div class="col ellipsis-left">
                 {{ pretty }}
               </div>
-              <q-tooltip>
-                {{ prettyLink(cmp.id) }} [{{ pretty }}]
-              </q-tooltip>
+              <q-tooltip> {{ prettyLink(cmp.id) }} [{{ pretty }}] </q-tooltip>
             </div>
           </q-chip>
           <q-chip
-            v-for="{key, cmp, pretty} in analog"
+            v-for="{ key, cmp, pretty } in analog"
             :key="`analog-${key}`"
             color="blue-grey-8"
             class="hoverable full-width"
@@ -221,10 +204,7 @@ export default defineComponent({
             @click="editAnalog(key, cmp)"
           >
             <div class="row wrap q-gutter-x-sm col-grow">
-              <div
-                class="text-orange-6 text-bold col-auto"
-                style="width: 1em"
-              >
+              <div class="text-orange-6 text-bold col-auto" style="width: 1em">
                 {{ key }}
               </div>
               <q-icon
@@ -238,9 +218,7 @@ export default defineComponent({
               <div class="col ellipsis-left">
                 {{ pretty }}
               </div>
-              <q-tooltip>
-                {{ prettyLink(cmp.id) }} [{{ pretty }}]
-              </q-tooltip>
+              <q-tooltip> {{ prettyLink(cmp.id) }} [{{ pretty }}] </q-tooltip>
             </div>
           </q-chip>
         </div>

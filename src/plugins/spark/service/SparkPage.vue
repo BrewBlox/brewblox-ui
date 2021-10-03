@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, watch } from 'vue';
 
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type {
   BlockRelation,
   BlockRelationNode,
@@ -31,7 +31,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const validTypes: BlockType[] = sparkStore.blockSpecs.map((s) => s.type);
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
+    const validTypes = specStore.blockSpecs.map((s) => s.type);
 
     const service = computed<SparkService | null>(() =>
       serviceStore.serviceById(props.serviceId),
@@ -48,20 +50,18 @@ export default defineComponent({
       },
     );
 
-    const sparkModule = computed<SparkServiceModule | null>(() =>
-      sparkStore.moduleById(props.serviceId),
-    );
-
     const isAvailable = computed<boolean>(
-      () => service.value !== null && sparkModule.value !== null,
+      () => service.value !== null && sparkStore.has(props.serviceId),
     );
 
     const isReady = computed<boolean>(
-      () => isAvailable.value && sparkModule.value?.lastBlocks != null,
+      () =>
+        isAvailable.value &&
+        sparkStore.lastBlocksAtByService(props.serviceId) != null,
     );
 
-    const status = computed<SparkStatus | null>(
-      () => sparkModule.value?.status ?? null,
+    const status = computed<SparkStatus | null>(() =>
+      sparkStore.statusByService(props.serviceId),
     );
 
     const statusNok = computed<boolean>(
@@ -72,13 +72,16 @@ export default defineComponent({
     );
 
     const pageMode = computed<PageMode>({
-      get: () => sparkModule.value?.sessionConfig.pageMode ?? 'Relations',
-      set: (v) => sparkModule.value?.updateSessionConfig({ pageMode: v }),
+      get: () =>
+        sparkStore.sessionConfigByService(props.serviceId).pageMode ??
+        'Relations',
+      set: (v) =>
+        sparkStore.updateSessionConfig(props.serviceId, { pageMode: v }),
     });
 
     const nodes = computed<BlockRelationNode[]>(() =>
       sparkStore
-        .serviceBlocks(props.serviceId)
+        .blocksByService(props.serviceId)
         .filter((block) => validTypes.includes(block.type))
         .map(
           (block): BlockRelationNode => ({
@@ -90,8 +93,8 @@ export default defineComponent({
         .sort(makeObjectSorter('type')),
     );
 
-    const edges = computed<BlockRelation[]>(
-      () => sparkModule.value?.relations ?? [],
+    const edges = computed<BlockRelation[]>(() =>
+      sparkStore.relationsByService(props.serviceId),
     );
 
     function editTitle(): void {

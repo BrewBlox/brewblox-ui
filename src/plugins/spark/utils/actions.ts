@@ -3,7 +3,7 @@ import range from 'lodash/range';
 
 import { typeName as graphType } from '@/plugins/history/Graph/const';
 import { addBlockGraph } from '@/plugins/history/Graph/utils';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { BlockAddress, DisplayOpts } from '@/plugins/spark/types';
 import { createWidgetWizard } from '@/plugins/wizardry';
 import {
@@ -49,13 +49,13 @@ export function startChangeBlockId(block: Block | null): void {
       rules: makeBlockIdRules(block.serviceId),
     },
   }).onOk((newId: string) => {
-    const module = sparkStore.moduleById(block.serviceId);
-    if (!module) {
+    const sparkStore = useSparkStore();
+    if (!sparkStore.has(block.serviceId)) {
       return;
     } else if (isBlockVolatile(block)) {
-      module.saveBlock({ ...block, id: newId });
+      sparkStore.saveBlock({ ...block, id: newId });
     } else {
-      module.renameBlock([block.id, newId]).catch(() => {});
+      sparkStore.renameBlock(block.serviceId, block.id, newId).catch(() => {});
     }
   });
 }
@@ -64,6 +64,7 @@ export function startRemoveBlock(block: Block | null): void {
   if (!block) {
     return;
   }
+  const sparkStore = useSparkStore();
 
   const widgets = widgetStore.widgets.filter(
     (v) =>
@@ -209,7 +210,7 @@ export async function startAddBlockToDisplay(
       slot,
       ...display.data.widgets.filter((w) => w.pos !== opts.pos),
     ];
-    await sparkStore.saveBlock(display);
+    await useSparkStore().saveBlock(display);
     notify.info(`Added <i>${addr.id}</i> to the Spark display`, {
       shown: opts.showNotify,
     });
@@ -223,8 +224,9 @@ export async function startAddBlockToDisplay(
 export function saveHwInfo(serviceId: string): void {
   const linked: string[] = [];
   const addressed: string[] = [];
+  const sparkStore = useSparkStore();
 
-  sparkStore.serviceBlocks(serviceId).forEach((block) => {
+  sparkStore.blocksByService(serviceId).forEach((block) => {
     if (matchesType<MotorValveBlock>(BlockType.MotorValve, block)) {
       const { hwDevice, startChannel } = block.data;
       if (hwDevice.id === null || !startChannel) {
@@ -273,7 +275,7 @@ export async function resetBlocks(
 ): Promise<void> {
   try {
     const addresses: Mapped<string> = {};
-    const module = sparkStore.moduleById(serviceId);
+    const sparkStore = useSparkStore();
 
     if (!module) {
       throw new Error(`Service <b>${serviceId}</b> not found`);
@@ -284,7 +286,8 @@ export async function resetBlocks(
     }
 
     if (opts.restore) {
-      module.blocks
+      sparkStore
+        .blocksByService(serviceId)
         .filter(
           (block) =>
             isCompatible(block.type, BlockIntfType.OneWireDeviceInterface) &&
@@ -293,19 +296,26 @@ export async function resetBlocks(
         .forEach((block) => (addresses[block.data.address] = block.id));
     }
 
-    await module.clearBlocks();
-    await module.fetchDiscoveredBlocks();
-    await module.fetchBlocks();
+    await sparkStore.clearBlocks(serviceId);
+    await sparkStore.fetchDiscoveredBlocks(serviceId);
+    await sparkStore.fetchBlocks(serviceId);
 
     if (opts.restore) {
-      const renameArgs: [string, string][] = module.blocks
+      const renaming: Promise<void>[] = sparkStore
+        .blocksByService(serviceId)
         .filter(
           (block) =>
             isCompatible(block.type, BlockIntfType.OneWireDeviceInterface) &&
             !!addresses[block.data.address],
         )
-        .map((block) => [block.id, addresses[block.data.address]]);
-      await Promise.all(renameArgs.map(module.renameBlock));
+        .map((block) =>
+          sparkStore.renameBlock(
+            serviceId,
+            block.id,
+            addresses[block.data.address],
+          ),
+        );
+      await Promise.all(renaming);
     }
     notify.done(
       'Removed all blocks' +

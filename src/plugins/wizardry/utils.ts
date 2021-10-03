@@ -1,4 +1,4 @@
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { featureStore } from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
@@ -23,6 +23,7 @@ export async function tryCreateWidget<T>(
 
 export async function tryCreateBlock(block: Block): Promise<Block | null> {
   try {
+    const sparkStore = useSparkStore();
     await sparkStore.createBlock(block);
     const featureTitle = featureStore.widgetTitle(block.type);
     notify.done(`Created ${featureTitle} block <i>${block.id}</i>`);

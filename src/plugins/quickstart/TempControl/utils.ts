@@ -1,4 +1,4 @@
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   ActuatorOffsetBlock,
   ActuatorPwmBlock,
@@ -69,6 +69,7 @@ function adjust<T extends Block>(
   func: (v: T) => unknown,
 ): () => Awaitable<unknown> {
   return () => {
+    const sparkStore = useSparkStore();
     const actual = sparkStore.blockByAddress<T>(block);
     if (actual) {
       func(actual);
@@ -81,16 +82,18 @@ function getBlocks(
   config: TempControlConfig,
   mode: TempControlMode | null = null,
 ): TempControlBlocks {
-  const module = sparkStore.moduleById(config.serviceId);
-  if (!module) {
-    throw new Error(
-      `Spark service with ID <b>${config.serviceId}</b> not found`,
-    );
+  const sparkStore = useSparkStore();
+  const { serviceId } = config;
+  if (!sparkStore.has(serviceId)) {
+    throw new Error(`Spark service with ID <b>${serviceId}</b> not found`);
   }
 
-  const coolPid = module.blockByLink<PidBlock>(config.coolPid);
-  const heatPid = module.blockByLink<PidBlock>(config.heatPid);
-  const profile = module.blockByLink<SetpointProfileBlock>(config.profile);
+  const coolPid = sparkStore.blockByLink<PidBlock>(serviceId, config.coolPid);
+  const heatPid = sparkStore.blockByLink<PidBlock>(serviceId, config.heatPid);
+  const profile = sparkStore.blockByLink<SetpointProfileBlock>(
+    serviceId,
+    config.profile,
+  );
 
   const setpointLink = [
     mode?.setpoint,
@@ -102,7 +105,10 @@ function getBlocks(
     throw new Error('No Setpoint defined');
   }
 
-  const setpoint = module.blockByLink<SetpointSensorPairBlock>(setpointLink);
+  const setpoint = sparkStore.blockByLink<SetpointSensorPairBlock>(
+    serviceId,
+    setpointLink,
+  );
   if (!setpoint) {
     throw new Error(`Setpoint ${linkStr(setpointLink)} not found`);
   }
@@ -140,6 +146,8 @@ export async function applyMode(
   config: TempControlConfig,
   mode: TempControlMode,
 ): Promise<void> {
+  const sparkStore = useSparkStore();
+  const { serviceId } = config;
   const { coolPid, heatPid, setpoint, profile } = getBlocks(config, mode);
 
   if (mode.coolConfig && !coolPid) {
@@ -161,7 +169,7 @@ export async function applyMode(
   // Disable all blocks driving target setpoint
   await Promise.all(
     sparkStore
-      .serviceBlocks(config.serviceId)
+      .blocksByService(serviceId)
       .filter(isDriver)
       .filter((block) => block.data.targetId.id === setpoint.id)
       .map((block) => {
@@ -189,10 +197,9 @@ export async function applyMode(
   }
 }
 
-function findPidProblems(
-  module: SparkServiceModule,
-  pid: PidBlock,
-): TempControlProblem[] {
+function findPidProblems(pid: PidBlock): TempControlProblem[] {
+  const sparkStore = useSparkStore();
+  const { serviceId } = pid;
   const issues: TempControlProblem[] = [];
 
   if (!pid.data.enabled) {
@@ -211,7 +218,7 @@ function findPidProblems(
     return issues;
   }
 
-  const analog = module.blockByLink(analogLink);
+  const analog = sparkStore.blockByLink(serviceId, analogLink);
   if (!analog) {
     issues.push({
       desc: `PID output not found: ${linkStr(pid, analogLink)}`,
@@ -237,9 +244,9 @@ function findPidProblems(
       return issues;
     }
 
-    const digital = module.blockByLink<DigitalActuatorBlock | MotorValveBlock>(
-      analog.data.actuatorId,
-    );
+    const digital = sparkStore.blockByLink<
+      DigitalActuatorBlock | MotorValveBlock
+    >(serviceId, analog.data.actuatorId);
     if (!digital) {
       issues.push({
         desc: `Digital Actuator not found: ${linkStr(
@@ -265,7 +272,7 @@ function findPidProblems(
       return issues;
     }
 
-    const device = module.blockByLink(deviceLink);
+    const device = sparkStore.blockByLink(serviceId, deviceLink);
     if (!device) {
       issues.push({
         desc: `Pin Array not found: ${linkStr(
@@ -297,7 +304,7 @@ function findPidProblems(
       return issues;
     }
 
-    const reference = module.blockByLink(referenceLink);
+    const reference = sparkStore.blockByLink(serviceId, referenceLink);
     if (!reference) {
       issues.push({
         desc: `Reference block not found: ${linkStr(
@@ -327,7 +334,7 @@ function findPidProblems(
       return issues;
     }
 
-    const driven = module.blockByLink(drivenLink);
+    const driven = sparkStore.blockByLink(serviceId, drivenLink);
     if (!driven) {
       issues.push({
         desc: `Driven block not found: ${linkStr(pid, analog, drivenLink)}`,
@@ -353,7 +360,8 @@ export function findControlProblems(
   callbacks: AutofixCallbacks,
 ): TempControlProblem[] {
   const issues: TempControlProblem[] = [];
-  const module = sparkStore.moduleById(config.serviceId);
+  const { serviceId } = config;
+  const sparkStore = useSparkStore();
 
   if (!config.serviceId) {
     issues.push({
@@ -363,7 +371,7 @@ export function findControlProblems(
     return issues;
   }
 
-  if (!module) {
+  if (!sparkStore.has(serviceId)) {
     issues.push({
       desc: `Spark service not found: <b>${config.serviceId}</b>`,
       autofix: callbacks.showConfig,
@@ -371,9 +379,12 @@ export function findControlProblems(
     return issues;
   }
 
-  const coolPid = module.blockByLink<PidBlock>(config.coolPid);
-  const heatPid = module.blockByLink<PidBlock>(config.heatPid);
-  const profile = module.blockByLink<SetpointProfileBlock>(config.profile);
+  const coolPid = sparkStore.blockByLink<PidBlock>(serviceId, config.coolPid);
+  const heatPid = sparkStore.blockByLink<PidBlock>(serviceId, config.heatPid);
+  const profile = sparkStore.blockByLink<SetpointProfileBlock>(
+    serviceId,
+    config.profile,
+  );
 
   if (!config.coolPid.id && !config.heatPid.id) {
     issues.push({
@@ -425,7 +436,10 @@ export function findControlProblems(
     return issues;
   }
 
-  const setpoint = module.blockByLink<SetpointSensorPairBlock>(setpointLink);
+  const setpoint = sparkStore.blockByLink<SetpointSensorPairBlock>(
+    serviceId,
+    setpointLink,
+  );
   if (!setpoint) {
     issues.push({
       desc: `Setpoint not found: ${linkStr(setpointLink)}`,
@@ -460,7 +474,7 @@ export function findControlProblems(
   }
 
   const sensorLink = setpoint.data.sensorId;
-  const sensor = module.blockByLink<TempSensorBlock>(sensorLink);
+  const sensor = sparkStore.blockByLink<TempSensorBlock>(serviceId, sensorLink);
 
   if (!sensorLink.id) {
     issues.push({
@@ -475,11 +489,11 @@ export function findControlProblems(
   }
 
   if (coolPid) {
-    issues.push(...findPidProblems(module, coolPid));
+    issues.push(...findPidProblems(coolPid));
   }
 
   if (heatPid) {
-    issues.push(...findPidProblems(module, heatPid));
+    issues.push(...findPidProblems(heatPid));
   }
 
   return issues;

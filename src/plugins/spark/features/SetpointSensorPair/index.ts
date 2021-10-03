@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   BlockFieldSpec,
   BlockIntfType,
@@ -21,6 +21,8 @@ const type = BlockType.SetpointSensorPair;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+
     const blockSpec: BlockSpec<SetpointSensorPairBlock> = {
       type,
       generate: () => ({
@@ -106,8 +108,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

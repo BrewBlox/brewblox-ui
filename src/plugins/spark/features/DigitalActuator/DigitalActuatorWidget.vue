@@ -15,6 +15,8 @@ import { IoArrayBlock } from '@/shared-types';
 import { makeTypeFilter } from '@/utils/functional';
 import { matchesType } from '@/utils/objects';
 
+import { useSparkStore } from '../../store';
+
 interface Claim {
   driverId: string;
   channelId: number;
@@ -37,12 +39,13 @@ const actuatorFilter = makeTypeFilter<DigitalActuatorBlock>(
 export default defineComponent({
   name: 'DigitalActuatorWidget',
   setup() {
+    const sparkStore = useSparkStore();
     const { inDialog, context } = useContext.setup();
-    const { serviceId, sparkModule, block, saveBlock, isDriven, limitations } =
+    const { serviceId, block, saveBlock, isDriven, limitations } =
       useBlockWidget.setup<DigitalActuatorBlock>();
 
     const hwBlock = computed<IoArrayBlock | null>(() =>
-      sparkModule.blockById(block.value.data.hwDevice.id),
+      sparkStore.blockById(serviceId, block.value.data.hwDevice.id),
     );
 
     const claims = computed<Claim[]>(() => {
@@ -50,7 +53,8 @@ export default defineComponent({
         return [];
       }
       const targetId = hwBlock.value.id;
-      return sparkModule.blocks
+      return sparkStore
+        .blocksByService(serviceId)
         .filter(actuatorFilter)
         .filter((b) => b.id !== block.value.id)
         .filter((b) => b.data.hwDevice.id === targetId)
@@ -79,11 +83,12 @@ export default defineComponent({
       }
       const claim = claims.value.find((c) => c.channelId === channelId);
       if (claim) {
-        const driver = sparkModule.blockById<DigitalActuatorBlock>(
+        const driver = sparkStore.blockById<DigitalActuatorBlock>(
+          serviceId,
           claim.driverId,
         )!;
         driver.data.channel = 0;
-        await sparkModule.saveBlock(driver);
+        await sparkStore.saveBlock(driver);
       }
       block.value.data.channel = channelId;
       await saveBlock();

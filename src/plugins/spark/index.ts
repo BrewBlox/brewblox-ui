@@ -12,7 +12,7 @@ import features from './features';
 import SparkActions from './service/SparkActions.vue';
 import SparkPage from './service/SparkPage.vue';
 import SparkWatcher from './service/SparkWatcher.vue';
-import { sparkStore } from './store';
+import { useBlockSnippetStore, useSparkStore } from './store';
 import { isSparkState } from './utils';
 
 // Allows lookups based on the old type ID
@@ -40,14 +40,17 @@ const plugin: Plugin = {
       props: {},
     });
 
+    const sparkStore = useSparkStore();
+    const snippetStore = useBlockSnippetStore();
+
     featureStore.addServiceFeature({
       id: sparkType,
       title: 'Spark Service',
       pageComponent: cref(app, SparkPage),
       configComponent: cref(app, SparkActions),
-      onStart: service => sparkStore.addService(service.id),
-      onRemove: service => sparkStore.removeService(service.id),
-      wizard: stub => ({
+      onStart: (service) => sparkStore.addService(service.id),
+      onRemove: (service) => sparkStore.removeService(service.id),
+      wizard: (stub) => ({
         ...stub,
         title: stub.id,
         order: 0,
@@ -68,7 +71,7 @@ const plugin: Plugin = {
       }
     });
 
-    startup.onStart(() => sparkStore.start());
+    startup.onStart(() => snippetStore.start());
   },
 };
 

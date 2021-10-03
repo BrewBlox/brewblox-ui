@@ -3,9 +3,14 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, onUnmounted, PropType } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
-import { ComponentResult, featureStore, WidgetContext, WidgetMode } from '@/store/features';
+import {
+  ComponentResult,
+  featureStore,
+  WidgetContext,
+  WidgetMode,
+} from '@/store/features';
 import { Widget, widgetStore } from '@/store/widgets';
 
 export default defineComponent({
@@ -29,25 +34,18 @@ export default defineComponent({
       default: () => ({}),
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide } = useDialog.setup();
     const { dense } = useGlobals.setup();
     const widgetId = nanoid();
+    const sparkStore = useSparkStore();
 
-    const block = computed<Block | null>(
-      () => sparkStore.blockById(props.serviceId, props.blockId),
+    const block = computed<Block | null>(() =>
+      sparkStore.blockById(props.serviceId, props.blockId),
     );
 
-    const blockType = computed<string>(
-      () => block.value?.type ?? '',
-    );
+    const blockType = computed<string>(() => block.value?.type ?? '');
 
     widgetStore.setVolatileWidget({
       id: widgetId,
@@ -67,27 +65,21 @@ export default defineComponent({
       widgetStore.removeVolatileWidget({ id: widgetId });
     });
 
-    const widget = computed<Widget | null>(
-      () => widgetStore.widgetById(widgetId),
+    const widget = computed<Widget | null>(() =>
+      widgetStore.widgetById(widgetId),
     );
 
-    const context = computed<WidgetContext>(
-      () => ({
-        container: 'Dialog',
-        mode: props.mode,
-        size: 'Fixed',
-      }),
+    const context = computed<WidgetContext>(() => ({
+      container: 'Dialog',
+      mode: props.mode,
+      size: 'Fixed',
+    }));
+
+    const widgetComponent = computed<ComponentResult | null>(() =>
+      widget.value ? featureStore.widgetComponent(widget.value) : null,
     );
 
-    const widgetComponent = computed<ComponentResult | null>(
-      () => widget.value
-        ? featureStore.widgetComponent(widget.value)
-        : null,
-    );
-
-    const widgetProps = computed<AnyDict>(
-      () => props.getProps() ?? {},
-    );
+    const widgetProps = computed<AnyDict>(() => props.getProps() ?? {});
 
     return {
       dialogRef,
@@ -110,7 +102,7 @@ export default defineComponent({
     :maximized="dense"
     transition-show="fade"
     class="row"
-    v-bind="{...dialogProps, ...$attrs}"
+    v-bind="{ ...dialogProps, ...$attrs }"
     @hide="onDialogHide"
   >
     <WidgetProvider :widget-id="widgetId" :context="context">

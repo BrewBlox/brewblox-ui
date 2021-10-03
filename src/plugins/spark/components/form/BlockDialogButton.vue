@@ -2,7 +2,7 @@
 import isString from 'lodash/isString';
 import { computed, defineComponent } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/dialog';
 
@@ -24,9 +24,10 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const sparkStore = useSparkStore();
 
-    const block = computed<Block | null>(
-      () => sparkStore.blockById(props.serviceId, props.blockId),
+    const block = computed<Block | null>(() =>
+      sparkStore.blockById(props.serviceId, props.blockId),
     );
 
     return {
