@@ -13,7 +13,7 @@ import {
   blockWidgetSelector,
   prettifyConstraints,
 } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorAnalogMockWidget.vue';
 const type = BlockType.ActuatorAnalogMock;
@@ -21,6 +21,7 @@ const type = BlockType.ActuatorAnalogMock;
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<ActuatorAnalogMockBlock> = {
       type,

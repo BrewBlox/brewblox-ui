@@ -7,11 +7,11 @@ import { useSparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 import {
   ComponentResult,
-  featureStore,
+  useFeatureStore,
   WidgetContext,
   WidgetMode,
 } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 
 export default defineComponent({
   name: 'BlockWidgetDialog',
@@ -40,6 +40,8 @@ export default defineComponent({
     const { dense } = useGlobals.setup();
     const widgetId = nanoid();
     const sparkStore = useSparkStore();
+    const widgetStore = useWidgetStore();
+    const featureStore = useFeatureStore();
 
     const block = computed<Block | null>(() =>
       sparkStore.blockById(props.serviceId, props.blockId),

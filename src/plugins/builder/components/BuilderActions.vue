@@ -3,10 +3,10 @@ import { nanoid } from 'nanoid';
 import { defineComponent, PropType } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { loadFile } from '@/utils/import-export';
 
-import { builderStore } from '../store';
 import { startAddLayout } from '../utils';
 
 export default defineComponent({
@@ -18,10 +18,11 @@ export default defineComponent({
     },
   },
   setup() {
+    const builderStore = useBuilderStore();
     const router = useRouter();
 
     function selectLayout(id: string): void {
-      router.push(`/builder/${id}`).catch(() => { });
+      router.push(`/builder/${id}`).catch(() => {});
     }
 
     async function createLayout(): Promise<void> {
@@ -32,7 +33,7 @@ export default defineComponent({
     }
 
     async function importLayout(): Promise<void> {
-      loadFile<BuilderLayout>(async layout => {
+      loadFile<BuilderLayout>(async (layout) => {
         const id = nanoid();
         await builderStore.createLayout({ ...layout, id });
         selectLayout(id);
@@ -48,16 +49,11 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <ActionMenu>
     <template #actions>
       <slot name="actions" />
-      <ActionItem
-        icon="add"
-        label="New Layout"
-        @click="createLayout"
-      />
+      <ActionItem icon="add" label="New Layout" @click="createLayout" />
       <ActionItem
         icon="mdi-file-import"
         label="Import Layout"
@@ -65,10 +61,7 @@ export default defineComponent({
       />
     </template>
     <template #menus>
-      <LayoutActions
-        :layout="layout"
-        @selected="selectLayout"
-      />
+      <LayoutActions :layout="layout" @selected="selectLayout" />
       <slot name="menus" />
     </template>
     <slot />

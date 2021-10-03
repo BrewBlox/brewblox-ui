@@ -1,4 +1,4 @@
-import { historyStore } from '@/plugins/history/store';
+import { useHistoryStore } from '@/plugins/history/store';
 import {
   DisplayNames,
   HistorySource,
@@ -14,7 +14,7 @@ function metricsTransformer(
   return {
     ...source,
     updated: new Date(),
-    values: result.metrics.map(res => ({
+    values: result.metrics.map((res) => ({
       field: res.metric,
       time: res.timestamp,
       value: res.value,
@@ -28,7 +28,7 @@ export async function addSource(
   renames: DisplayNames,
   fields: string[],
 ): Promise<void> {
-  const validFields = fields.filter(field => !!field);
+  const validFields = fields.filter((field) => !!field);
   if (validFields.length === 0) {
     return;
   }
@@ -42,5 +42,5 @@ export async function addSource(
     updated: new Date(),
     values: [],
   };
-  await historyStore.addSource(source);
+  await useHistoryStore().addSource(source);
 }

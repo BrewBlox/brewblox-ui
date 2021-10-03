@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { PropType } from 'vue';
 
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 
 import {
   useWizard,
@@ -12,9 +12,9 @@ import {
 
 export interface UseWidgetWizardProps extends UseWizardProps {
   featureId: {
-    type: PropType<string>,
-    required: true
-  }
+    type: PropType<string>;
+    required: true;
+  };
 }
 
 export type UseWidgetWizardEmits = UseWizardEmits;
@@ -39,11 +39,10 @@ export const useWidgetWizard: UseWidgetWizardComposable = {
       required: true,
     },
   },
-  emits: [
-    ...useWizard.emits,
-  ],
+  emits: [...useWizard.emits],
   setup(featureId: string) {
     const widgetId = nanoid();
+    const featureStore = useFeatureStore();
     const featureTitle = featureStore.widgetTitle(featureId);
     const defaultWidgetSize = featureStore.widgetSize(featureId);
 

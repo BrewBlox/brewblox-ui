@@ -1,4 +1,4 @@
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 
 /**
  * Vue/VueX have the concept of lifecycle hooks for individual components,
@@ -14,13 +14,13 @@ import { systemStore } from '@/store/system';
 export class BrewbloxStartup {
   private startFuncs: (() => Awaitable<unknown>)[] = [];
 
-  public onStart(func: (() => Awaitable<unknown>)): void {
+  public onStart(func: () => Awaitable<unknown>): void {
     this.startFuncs.push(func);
   }
 
   public async start(): Promise<void> {
-    await Promise.all(this.startFuncs.map(f => f()));
-    systemStore.startupDone = true;
+    await Promise.all(this.startFuncs.map((f) => f()));
+    useSystemStore().startupDone = true;
   }
 }
 

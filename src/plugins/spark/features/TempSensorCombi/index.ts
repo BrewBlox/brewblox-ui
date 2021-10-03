@@ -10,7 +10,7 @@ import {
   TempSensorCombiBlock,
 } from '@/plugins/spark/types';
 import { blockWidgetSelector, enumHint } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { tempQty } from '@/utils/quantity';
 
 import widget from './TempSensorCombiWidget.vue';
@@ -20,6 +20,7 @@ const type = BlockType.TempSensorCombi;
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<TempSensorCombiBlock> = {
       type,

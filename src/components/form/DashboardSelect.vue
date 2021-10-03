@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount } from 'vue';
 
-import { dashboardStore } from '@/store/dashboards';
+import { useDashboardStore } from '@/store/dashboards';
 
 export default defineComponent({
   name: 'DashboardSelect',
@@ -19,18 +19,19 @@ export default defineComponent({
       default: 'Dashboard',
     },
   },
-  emits: [
-    'update:modelValue',
-  ],
+  emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const dashboardStore = useDashboardStore();
     const local = computed<string | null>({
       get: () => props.modelValue,
-      set: v => emit('update:modelValue', v),
+      set: (v) => emit('update:modelValue', v),
     });
 
-    const options = computed<SelectOption[]>(
-      () => dashboardStore.dashboards
-        .map(dash => ({ label: dash.title, value: dash.id })),
+    const options = computed<SelectOption[]>(() =>
+      dashboardStore.dashboards.map((dash) => ({
+        label: dash.title,
+        value: dash.id,
+      })),
     );
 
     onBeforeMount(() => {

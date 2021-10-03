@@ -9,8 +9,8 @@ import {
   Link,
   SparkPatchEvent,
 } from '@/shared-types';
-import { serviceStore } from '@/store/services';
-import { widgetStore } from '@/store/widgets';
+import { useServiceStore } from '@/store/services';
+import { useWidgetStore } from '@/store/widgets';
 import { concatById, filterById } from '@/utils/collections';
 import { makeTypeFilter } from '@/utils/functional';
 import { deepCopy } from '@/utils/objects';
@@ -160,8 +160,6 @@ export const useSparkStore = defineStore('sparkStore', () => {
   }
 
   function setVolatileBlock(block: Block): void {
-    // debugger;
-    // console.dir(deepCopy(block));
     const { serviceId } = block;
     if (!has(serviceId)) {
       throw new Error(`Service ${block.serviceId} does not exist in store`);
@@ -232,6 +230,7 @@ export const useSparkStore = defineStore('sparkStore', () => {
 
     // Block was not volatile
     // Rename block in API
+    const widgetStore = useWidgetStore();
     await sparkApi.renameBlock(serviceId, currentId, newId);
     await fetchBlocks(serviceId);
 
@@ -311,6 +310,7 @@ export const useSparkStore = defineStore('sparkStore', () => {
   }
 
   async function fetchAll(serviceId: string): Promise<boolean> {
+    const serviceStore = useServiceStore();
     const status = await sparkApi.fetchSparkStatus(serviceId);
     updateStatus(status);
     serviceStore.updateStatus(asServiceStatus(status));
@@ -430,6 +430,7 @@ export const useSparkStore = defineStore('sparkStore', () => {
       `${STATE_TOPIC}/${serviceId}`,
       (_, evt) => {
         if (isSparkState(evt)) {
+          const serviceStore = useServiceStore();
           const status = asSparkStatus(serviceId, evt.data.status);
           const blocks = evt.data.blocks.map(deserialize);
 

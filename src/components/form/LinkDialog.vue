@@ -6,7 +6,7 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType, Link } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { bloxLink } from '@/utils/link';
@@ -53,6 +53,7 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
     const sparkStore = useSparkStore();
+    const featureStore = useFeatureStore();
 
     const local = ref<Link>(bloxLink(props.modelValue));
 

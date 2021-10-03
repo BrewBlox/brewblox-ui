@@ -57,9 +57,7 @@
     "timezones": "nayarsystems/posix_tz_db#master",
     "typescript-string-enums": "^1.0.0",
     "vue-router": "^4.0.11",
-    "vuedraggable": "^4.1.0",
-    "vuex": "^4.0.2",
-    "vuex-class-modules": "^1.3.0"
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",

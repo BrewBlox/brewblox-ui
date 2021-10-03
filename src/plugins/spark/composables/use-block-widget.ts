@@ -12,7 +12,7 @@ import {
 import { useWidget, UseWidgetComponent } from '@/composables';
 import { GraphConfig } from '@/plugins/history/types';
 import { Block } from '@/shared-types';
-import { widgetStore } from '@/store/widgets';
+import { useWidgetStore } from '@/store/widgets';
 
 import { useBlockSpecStore, useSparkStore } from '../store';
 import { BlockConfig, BlockSpec, BlockWidget } from '../types';
@@ -50,6 +50,7 @@ export const useBlockWidget: UseBlockWidgetComposable = {
 
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
+    const widgetStore = useWidgetStore();
 
     // We assume that serviceId/blockId are constant while the widget is mounted
     // If we rename the block, we invalidate the rendering dialog

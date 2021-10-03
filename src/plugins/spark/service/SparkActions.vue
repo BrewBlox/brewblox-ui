@@ -9,8 +9,8 @@ import {
   startResetBlocks,
 } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { Service, serviceStore } from '@/store/services';
-import { systemStore } from '@/store/system';
+import { Service, useServiceStore } from '@/store/services';
+import { useSystemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 
@@ -27,6 +27,8 @@ export default defineComponent({
   },
   setup(props) {
     const router = useRouter();
+    const systemStore = useSystemStore();
+    const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
 
     const service = computed<SparkService | null>(() =>

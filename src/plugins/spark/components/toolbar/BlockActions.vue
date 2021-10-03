@@ -10,13 +10,14 @@ import {
   startChangeBlockId,
   startRemoveBlock,
 } from '@/plugins/spark/utils';
-import { serviceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { saveFile } from '@/utils/import-export';
 import { startCopyWidget } from '@/utils/widgets';
 
 export default defineComponent({
   name: 'BlockActions',
   setup() {
+    const serviceStore = useServiceStore();
     const { serviceId, widget, block, isVolatileWidget, hasGraph } =
       useBlockWidget.setup();
 

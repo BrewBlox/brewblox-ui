@@ -7,9 +7,8 @@ import { useRouter } from 'vue-router';
 
 import { emptyGraphConfig } from '@/plugins/history/const';
 import { GraphConfig, QueryParams } from '@/plugins/history/types';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useWidgetStore,Widget } from '@/store/widgets';
 import { isJsonEqual } from '@/utils/objects';
-
 
 export default defineComponent({
   name: 'GraphPage',
@@ -20,10 +19,11 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const widgetStore = useWidgetStore();
     const router = useRouter();
 
-    const widget = computed<Widget<GraphConfig> | null>(
-      () => widgetStore.widgetById(props.routeId),
+    const widget = computed<Widget<GraphConfig> | null>(() =>
+      widgetStore.widgetById(props.routeId),
     );
 
     const title = computed<string>(
@@ -40,7 +40,6 @@ export default defineComponent({
     const renderRevision = ref<Date>(new Date());
     const config = ref<GraphConfig>(cloned());
     const graphId = nanoid();
-
 
     async function saveConfig(config: GraphConfig): Promise<void> {
       if (widget.value) {

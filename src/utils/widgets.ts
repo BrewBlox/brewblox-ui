@@ -1,8 +1,8 @@
 import { nanoid } from 'nanoid';
 
-import { dashboardStore } from '@/store/dashboards';
-import { featureStore } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useDashboardStore } from '@/store/dashboards';
+import { useFeatureStore } from '@/store/features';
+import { useWidgetStore, Widget } from '@/store/widgets';
 
 import { createDialog } from './dialog';
 import { notify } from './notify';
@@ -19,10 +19,11 @@ export function startChangeWidgetTitle(widget: Widget): void {
       html: true,
       clearable: false,
     },
-  }).onOk((title: string) => widgetStore.saveWidget({ ...widget, title }));
+  }).onOk((title: string) => useWidgetStore().saveWidget({ ...widget, title }));
 }
 
 export function startCopyWidget(widget: Widget): void {
+  const dashboardStore = useDashboardStore();
   const id = nanoid();
   const selectOptions = dashboardStore.dashboards.map((dashboard) => ({
     label: dashboard.title,
@@ -41,7 +42,7 @@ export function startCopyWidget(widget: Widget): void {
     },
   }).onOk((dashboard: string) => {
     if (dashboard) {
-      widgetStore.appendWidget({
+      useWidgetStore().appendWidget({
         ...deepCopy(widget),
         id,
         dashboard,
@@ -55,6 +56,9 @@ export function startCopyWidget(widget: Widget): void {
 }
 
 export function startMoveWidget(widget: Widget): void {
+  const widgetStore = useWidgetStore();
+  const dashboardStore = useDashboardStore();
+
   const selectOptions = dashboardStore.dashboards
     .filter((dashboard) => dashboard.id !== widget.dashboard)
     .map((dashboard) => ({ label: dashboard.title, value: dashboard.id }));
@@ -71,7 +75,11 @@ export function startMoveWidget(widget: Widget): void {
     },
   }).onOk((dashboard: string) => {
     if (dashboard) {
-      widgetStore.saveWidget({ ...widget, dashboard, pinnedPosition: null });
+      widgetStore.saveWidget({
+        ...widget,
+        dashboard,
+        pinnedPosition: null,
+      });
       const dashTitle = dashboardStore.dashboardTitle(dashboard);
       notify.done(`Moved <b>${widget.title}</b> to <b>${dashTitle}</b>`);
     }
@@ -79,6 +87,8 @@ export function startMoveWidget(widget: Widget): void {
 }
 
 export function startRemoveWidget(widget: Widget): void {
+  const widgetStore = useWidgetStore();
+  const featureStore = useFeatureStore();
   const actions = featureStore.widgetRemoveActions(widget.feature);
 
   if (actions.length === 0) {

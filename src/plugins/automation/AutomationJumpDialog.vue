@@ -3,7 +3,7 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
 
-import { automationStore } from './store';
+import { useAutomationStore } from './store';
 import { AutomationProcess, AutomationStep } from './types';
 
 export default defineComponent({
@@ -19,33 +19,25 @@ export default defineComponent({
       default: 'Jump to process step',
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const automationStore = useAutomationStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const local = ref<AutomationStep | null>(null);
 
-    const process = computed<AutomationProcess | null>(
-      () => automationStore.processById(props.processId),
+    const process = computed<AutomationProcess | null>(() =>
+      automationStore.processById(props.processId),
     );
 
-    const desc = computed<string>(
-      () => process.value
+    const desc = computed<string>(() =>
+      process.value
         ? `This will immediately start the selected step in process '${process.value.title}'.`
         : 'Error: process not found',
     );
 
-    const steps = computed<AutomationStep[]>(
-      () => process.value?.steps ?? [],
-    );
+    const steps = computed<AutomationStep[]>(() => process.value?.steps ?? []);
 
     function save(step: AutomationStep | null): void {
       if (step) {
@@ -75,7 +67,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save(local)"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <div class="q-mb-md">
         {{ desc }}
       </div>
@@ -84,15 +76,10 @@ export default defineComponent({
         :options="steps"
         option-value="id"
         option-label="title"
-        @confirm="v => save(v)"
+        @confirm="(v) => save(v)"
       />
       <template #actions>
-        <q-btn
-          flat
-          label="Cancel"
-          color="primary"
-          @click="onDialogCancel"
-        />
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn
           :disable="!local"
           flat

@@ -17,7 +17,7 @@ import {
   enumHint,
   prettifyConstraints,
 } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 
 import widget from './MotorValveWidget.vue';
@@ -27,6 +27,7 @@ const type = BlockType.MotorValve;
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<MotorValveBlock> = {
       type,

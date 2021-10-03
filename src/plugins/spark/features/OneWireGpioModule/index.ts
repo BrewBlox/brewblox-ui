@@ -9,7 +9,7 @@ import {
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
 import { GpioModuleStatus, GpioPins } from '@/shared-types';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 
 import widget from './OneWireGpioModuleWidget.vue';
 
@@ -18,6 +18,7 @@ const type = BlockType.OneWireGpioModule;
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<OneWireGpioModuleBlock> = {
       type,

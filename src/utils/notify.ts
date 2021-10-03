@@ -1,11 +1,11 @@
 import isString from 'lodash/isString';
 import { Notify } from 'quasar';
 
-import { loggingStore, LogLevel } from '@/store/logging';
+import { LogLevel, useLoggingStore } from '@/store/logging';
 
 type NotifyFunc = (message: QNotifyArgs, options?: Partial<RecordOpts>) => void;
 
-export type QNotifyArgs = Parameters<Notify['create']>[0]
+export type QNotifyArgs = Parameters<Notify['create']>[0];
 
 export interface RecordOpts {
   shown: boolean;
@@ -28,7 +28,11 @@ export const notifyIcons: Record<LogLevel, string> = {
   ERROR: 'error',
 };
 
-function basicNotify(level: LogLevel, message: QNotifyArgs, opts: Partial<RecordOpts> = {}): void {
+function basicNotify(
+  level: LogLevel,
+  message: QNotifyArgs,
+  opts: Partial<RecordOpts> = {},
+): void {
   const args = {
     message: '',
     html: true,
@@ -38,7 +42,7 @@ function basicNotify(level: LogLevel, message: QNotifyArgs, opts: Partial<Record
   };
 
   if (opts.logged ?? true) {
-    loggingStore.addEntry({
+    useLoggingStore().addEntry({
       level,
       time: new Date(),
       message: args.message,

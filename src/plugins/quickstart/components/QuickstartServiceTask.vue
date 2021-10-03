@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 import { sparkType } from '@/plugins/spark/const';
 import { useSparkStore } from '@/plugins/spark/store';
 import { BlockType } from '@/plugins/spark/types';
-import { Service, serviceStore, ServiceStub } from '@/store/services';
+import { Service, ServiceStub,useServiceStore } from '@/store/services';
 import { startCreateService } from '@/utils/services';
 
 import { QuickstartConfig } from '../types';
@@ -19,6 +19,7 @@ export default defineComponent({
   },
   emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
+    const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
     const serviceId = computed<string>(() => props.config.serviceId);
     const service = ref<Service | null>(

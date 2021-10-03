@@ -10,13 +10,14 @@ import {
   WiFiSettingsBlock,
 } from '@/plugins/spark/types';
 import { getTicksBlock, getWiFiSettingsBlock } from '@/plugins/spark/utils';
-import { serviceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { shortDateString } from '@/utils/formatting';
 import { durationString } from '@/utils/quantity';
 
 export default defineComponent({
   name: 'SysInfoWidget',
   setup() {
+    const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
     const { block, serviceId } = useBlockWidget.setup<SysInfoBlock>();
 

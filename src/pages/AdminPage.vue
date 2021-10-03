@@ -1,17 +1,17 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 
-import { builderStore } from '@/plugins/builder/store';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
-import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { featureStore } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { Dashboard, useDashboardStore } from '@/store/dashboards';
+import { useFeatureStore } from '@/store/features';
+import { useServiceStore } from '@/store/services';
 import {
   startChangeKeyboardLayout,
   startChangeTempUnit,
   startChangeTimezone,
   startEditBuilderTouchDelay,
-  systemStore,
+  useSystemStore,
 } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
@@ -27,6 +27,11 @@ const orderSorter = makeObjectSorter<{ order: number }>('order');
 export default defineComponent({
   name: 'AdminPage',
   setup() {
+    const systemStore = useSystemStore();
+    const dashboardStore = useDashboardStore();
+    const featureStore = useFeatureStore();
+    const serviceStore = useServiceStore();
+    const builderStore = useBuilderStore();
     const startupDone = computed<boolean>(() => systemStore.startupDone);
 
     const experimental = computed<boolean>({

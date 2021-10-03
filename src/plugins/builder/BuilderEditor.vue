@@ -14,7 +14,7 @@ import {
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { rotatedSize } from '@/utils/coordinates';
 import { createDialog } from '@/utils/dialog';
 import { keyEventString } from '@/utils/events';
@@ -30,7 +30,7 @@ import {
   UseSvgZoomDimensions,
 } from './composables';
 import { builderTools, SQUARE_SIZE } from './const';
-import { builderStore } from './store';
+import { useBuilderStore } from './store';
 import {
   BuilderLayout,
   BuilderTool,
@@ -78,6 +78,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const systemStore = useSystemStore();
+    const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const router = useRouter();
 

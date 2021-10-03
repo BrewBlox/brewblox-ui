@@ -5,8 +5,8 @@ import { computed, defineComponent, nextTick, ref } from 'vue';
 import { useElementRefs, useGlobals } from '@/composables';
 import { createBlockWizard } from '@/plugins/wizardry';
 import { BlockType } from '@/shared-types';
-import { featureStore, WidgetRole } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { useFeatureStore, WidgetRole } from '@/store/features';
+import { useServiceStore } from '@/store/services';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
@@ -58,6 +58,8 @@ export default defineComponent({
     const { getElementRef, setElementRef } = useElementRefs.setup();
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
+    const serviceStore = useServiceStore();
 
     const validTypes = specStore.blockSpecs.map((s) => s.type);
 

@@ -10,7 +10,7 @@ import {
 } from '@/plugins/builder/utils';
 import { useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { preciseNumber, prettyUnit } from '@/utils/formatting';
 import { deltaTempQty } from '@/utils/quantity';
 
@@ -27,6 +27,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const systemStore = useSystemStore();
     const sparkStore = useSparkStore();
     const { scale, bordered } = usePart.setup(props.part);
 

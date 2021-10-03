@@ -18,8 +18,8 @@ import {
   makeBlockIdRules,
 } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
-import { featureStore } from '@/store/features';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useFeatureStore } from '@/store/features';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter, nullFilter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
@@ -45,6 +45,8 @@ export default defineComponent({
   },
   emits: [...useWizard.emits],
   setup(props) {
+    const widgetStore = useWidgetStore();
+    const featureStore = useFeatureStore();
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const { onBack, onClose, onDone, setDialogTitle } = useWizard.setup();

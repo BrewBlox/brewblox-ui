@@ -16,7 +16,7 @@ import {
   ReferenceKind,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { prettyAny } from '@/utils/formatting';
 import { isQuantity } from '@/utils/identity';
 import { deltaTempQty } from '@/utils/quantity';
@@ -41,6 +41,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const systemStore = useSystemStore();
     const sparkStore = useSparkStore();
     const { scale, bordered } = usePart.setup(props.part);
 

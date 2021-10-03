@@ -9,7 +9,6 @@ import {
   MotorValveBlock,
 } from '@/shared-types';
 
-import { builderStore } from '../store';
 import { settingsAddress, settingsBlock } from '../utils';
 
 export type ValveT = DigitalActuatorBlock | MotorValveBlock;
@@ -64,7 +63,6 @@ const spec: PartSpec = {
       }
     } else {
       part.settings[CLOSED_KEY] = !part.settings[CLOSED_KEY];
-      builderStore;
       savePart(part);
     }
   },

@@ -2,10 +2,10 @@
 import { computed, defineComponent, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { builderStore } from '@/plugins/builder/store';
-import { dashboardStore } from '@/store/dashboards';
-import { serviceStore } from '@/store/services';
-import { systemStore } from '@/store/system';
+import { useBuilderStore } from '@/plugins/builder/store';
+import { useDashboardStore } from '@/store/dashboards';
+import { useServiceStore } from '@/store/services';
+import { useSystemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
@@ -14,33 +14,34 @@ const dashboardSorter = makeObjectSorter('order');
 export default defineComponent({
   name: 'IndexPage',
   setup() {
+    const systemStore = useSystemStore();
+    const dashboardStore = useDashboardStore();
+    const serviceStore = useServiceStore();
+    const builderStore = useBuilderStore();
     const router = useRouter();
 
-    const homePage = computed<string | null>(
-      () => {
-        const { homePage } = systemStore.config;
+    const homePage = computed<string | null>(() => {
+      const { homePage } = systemStore.config;
 
-        const defaultPage = [...dashboardStore.dashboards]
+      const defaultPage =
+        [...dashboardStore.dashboards]
           .sort(dashboardSorter)
-          .map(v => `/dashboard/${v.id}`)[0] ?? null;
+          .map((v) => `/dashboard/${v.id}`)[0] ?? null;
 
-        // Defaults to first dashboard
-        if (!homePage) {
-          return defaultPage;
-        }
+      // Defaults to first dashboard
+      if (!homePage) {
+        return defaultPage;
+      }
 
-        const [, section, pageId] = homePage.split('/');
-        const valid = (
-          (section === 'dashboard' && dashboardStore.dashboardIds.includes(pageId)) ||
-          (section === 'service' && serviceStore.serviceIds.includes(pageId)) ||
-          (section === 'brewery' && builderStore.layoutIds.includes(pageId))
-        );
+      const [, section, pageId] = homePage.split('/');
+      const valid =
+        (section === 'dashboard' &&
+          dashboardStore.dashboardIds.includes(pageId)) ||
+        (section === 'service' && serviceStore.serviceIds.includes(pageId)) ||
+        (section === 'brewery' && builderStore.layoutIds.includes(pageId));
 
-        return valid
-          ? homePage
-          : defaultPage;
-      },
-    );
+      return valid ? homePage : defaultPage;
+    });
 
     function showWizard(): void {
       createDialog({ component: 'WizardDialog' });
@@ -48,7 +49,7 @@ export default defineComponent({
 
     watch(
       () => homePage.value,
-      v => v && router.replace(v),
+      (v) => v && router.replace(v),
       { immediate: true },
     );
 

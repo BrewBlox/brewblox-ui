@@ -3,15 +3,15 @@ import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType } from 'vue';
 import { useRoute } from 'vue-router';
 
-import { builderStore } from '@/plugins/builder/store';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderConfig, BuilderLayout } from '@/plugins/builder/types';
 import {
   startAddLayout,
   startChangeLayoutTitle,
 } from '@/plugins/builder/utils';
-import { dashboardStore } from '@/store/dashboards';
-import { systemStore } from '@/store/system';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useDashboardStore } from '@/store/dashboards';
+import { useSystemStore } from '@/store/system';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { notify } from '@/utils/notify';
@@ -30,6 +30,10 @@ export default defineComponent({
   },
   emits: ['selected'],
   setup(props, { emit }) {
+    const systemStore = useSystemStore();
+    const dashboardStore = useDashboardStore();
+    const widgetStore = useWidgetStore();
+    const builderStore = useBuilderStore();
     const route = useRoute();
 
     const layoutIds = computed<string[]>(() => builderStore.layoutIds);

@@ -9,7 +9,7 @@ import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 
 import { emptyGraphConfig } from '../const';
-import { historyStore } from '../store';
+import { useHistoryStore } from '../store';
 import {
   LoggedSession,
   SessionGraphNote,
@@ -28,6 +28,7 @@ export default defineComponent({
     SessionHeaderField,
   },
   setup() {
+    const historyStore = useHistoryStore();
     const { dense } = useGlobals.setup();
     const { config } = useWidget.setup<SessionLogWidget>();
 

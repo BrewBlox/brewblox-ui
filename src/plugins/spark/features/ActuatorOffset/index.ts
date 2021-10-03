@@ -15,7 +15,7 @@ import {
   blockWidgetSelector,
   prettifyConstraints,
 } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 
 import widget from './ActuatorOffsetWidget.vue';
@@ -25,6 +25,7 @@ const type = BlockType.ActuatorOffset;
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<ActuatorOffsetBlock> = {
       type,

@@ -1,8 +1,8 @@
 import isString from 'lodash/isString';
 import { Router } from 'vue-router';
 
-import { featureStore } from '@/store/features';
-import { Service, serviceStore, ServiceStub } from '@/store/services';
+import { useFeatureStore } from '@/store/features';
+import { Service, ServiceStub, useServiceStore } from '@/store/services';
 
 import { createDialog } from './dialog';
 import { notify } from './notify';
@@ -11,6 +11,8 @@ export async function startCreateService(
   stub: ServiceStub,
   router: Maybe<Router> = null,
 ): Promise<void> {
+  const serviceStore = useServiceStore();
+  const featureStore = useFeatureStore();
   const feature = featureStore.serviceById(stub.type);
   if (feature === null) {
     notify.error(`Unknown service type '${stub.type}'`);
@@ -52,6 +54,7 @@ export function startChangeServiceTitle(service: Maybe<Service>): void {
       modelValue: service.title,
     },
   }).onOk(async (newTitle: string) => {
+    const serviceStore = useServiceStore();
     const oldTitle = service.title;
     if (!newTitle || oldTitle === newTitle) {
       return;
@@ -79,6 +82,7 @@ export function startRemoveService(
       cancel: 'Cancel',
     },
   }).onOk(() => {
+    const serviceStore = useServiceStore();
     if (router.currentRoute.value.path === `/service/${service.id}`) {
       router.replace('/');
     }

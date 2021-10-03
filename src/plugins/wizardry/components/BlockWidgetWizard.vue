@@ -11,7 +11,7 @@ import {
 import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { tryCreateBlock, tryCreateWidget } from '@/plugins/wizardry';
 import { useWidgetWizard } from '@/plugins/wizardry/composables';
-import { widgetStore } from '@/store/widgets';
+import { useWidgetStore } from '@/store/widgets';
 import { createDialog, createDialogPromise } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
@@ -38,6 +38,7 @@ export default defineComponent({
   },
   emits: [...useWidgetWizard.emits],
   setup(props) {
+    const widgetStore = useWidgetStore();
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const {

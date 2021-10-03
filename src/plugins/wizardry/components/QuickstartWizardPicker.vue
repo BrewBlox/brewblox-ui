@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
-import { featureStore, QuickstartFeature } from '@/store/features';
+import { QuickstartFeature, useFeatureStore } from '@/store/features';
 
 import { useWizard } from '../composables';
 
@@ -12,6 +12,7 @@ export default defineComponent({
   },
   emits: [...useWizard.emits],
   setup() {
+    const featureStore = useFeatureStore();
     const { onBack, onClose, setDialogTitle } = useWizard.setup();
 
     const model = ref<QuickstartFeature | null>(null);

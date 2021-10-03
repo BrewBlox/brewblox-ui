@@ -10,7 +10,7 @@ import {
   DisplayTempUnit,
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 
 import widget from './DisplaySettingsWidget.vue';
 
@@ -19,6 +19,7 @@ const type = BlockType.DisplaySettings;
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<DisplaySettingsBlock> = {
       type,

@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { featureStore, QuickstartFeature } from '@/store/features';
+import { QuickstartFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 
 import FridgeCompletionTask from './FridgeCompletionTask.vue';
@@ -11,6 +11,7 @@ import FridgeSettingsTask from './FridgeSettingsTask.vue';
 
 const plugin: Plugin = {
   install(app) {
+    const featureStore = useFeatureStore();
     const feature: QuickstartFeature = {
       id: 'Fridge',
       title: 'Fridge without beer sensor',

@@ -2,9 +2,9 @@
 import { computed, defineComponent, PropType } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { clampRotation } from '@/utils/formatting';
 
-import { builderStore } from '../store';
 import { CardSpec, FlowPart, PartSpec } from '../types';
 import { coord2grid } from '../utils';
 
@@ -21,55 +21,38 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-    'update:part',
-    'remove:part',
-    'dirty',
-  ],
+  emits: [...useDialog.emits, 'update:part', 'remove:part', 'dirty'],
   setup(props, { emit }) {
+    const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
-    const {
-      dialogRef,
-      onDialogHide,
-    } = useDialog.setup();
+    const { dialogRef, onDialogHide } = useDialog.setup();
 
-    const spec = computed<PartSpec>(
-      () => builderStore.spec(props.part),
-    );
+    const spec = computed<PartSpec>(() => builderStore.spec(props.part));
 
-    const cards = computed<CardSpec[]>(
-      () => [
-        { component: 'PlacementCard' },
-        ...spec.value.cards,
-      ],
-    );
+    const cards = computed<CardSpec[]>(() => [
+      { component: 'PlacementCard' },
+      ...spec.value.cards,
+    ]);
 
     const partTitle = computed<string>(
       () => `${spec.value.title} ${props.part.x},${props.part.y}`,
     );
 
-    const rotatedSize = computed<[number, number]>(
-      () => {
-        const [x, y] = props.part.size;
-        return clampRotation(props.part.rotate) % 180
-          ? [y, x]
-          : [x, y];
-      },
-    );
+    const rotatedSize = computed<[number, number]>(() => {
+      const [x, y] = props.part.size;
+      return clampRotation(props.part.rotate) % 180 ? [y, x] : [x, y];
+    });
 
-    const displayScale = computed<number>(
-      () => {
-        const maxSize = Math.max(...props.part.size);
-        if (maxSize >= 6) {
-          return 0.5;
-        }
-        if (maxSize >= 4) {
-          return 1;
-        }
-        return 2;
-      },
-    );
+    const displayScale = computed<number>(() => {
+      const maxSize = Math.max(...props.part.size);
+      if (maxSize >= 6) {
+        return 0.5;
+      }
+      if (maxSize >= 4) {
+        return 1;
+      }
+      return 2;
+    });
 
     function updatePart(part: FlowPart): void {
       emit('update:part', part);
@@ -121,7 +104,9 @@ export default defineComponent({
           <svg
             :width="`${coord2grid(rotatedSize[0]) * displayScale}px`"
             :height="`${coord2grid(rotatedSize[1] * displayScale)}px`"
-            :viewBox="`0, 0, ${coord2grid(rotatedSize[0])}, ${coord2grid(rotatedSize[1])}`"
+            :viewBox="`0, 0, ${coord2grid(rotatedSize[0])}, ${coord2grid(
+              rotatedSize[1],
+            )}`"
             class="col-auto"
           >
             <PartWrapper :key="`menu-${part.id}-${rev}`" :part="part" />

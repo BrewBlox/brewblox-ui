@@ -2,10 +2,10 @@ import debounce from 'lodash/debounce';
 import { nanoid } from 'nanoid';
 import { computed, Ref, ref, watch, WritableComputedRef } from 'vue';
 
+import { useBuilderStore } from '@/plugins/builder/store';
 import { deepCopy } from '@/utils/objects';
 
 import { calculateNormalizedFlows } from '../calculateFlows';
-import { builderStore } from '../store';
 import { BuilderLayout, FlowPart, PersistentPart } from '../types';
 import { asPersistentPart, asStatePart, vivifyParts } from '../utils';
 
@@ -26,8 +26,11 @@ export interface UseFlowPartsComposable {
 
 export const useFlowParts: UseFlowPartsComposable = {
   setup(layoutId: Ref<string | null>): UseFlowPartsComponent {
+    const builderStore = useBuilderStore();
 
-    const layout = ref<BuilderLayout | null>(builderStore.layoutById(layoutId.value));
+    const layout = ref<BuilderLayout | null>(
+      builderStore.layoutById(layoutId.value),
+    );
 
     const saveLayout = debounce(
       () => {
@@ -41,7 +44,7 @@ export const useFlowParts: UseFlowPartsComposable = {
 
     const parts = computed<PersistentPart[]>({
       get: () => vivifyParts(layout.value?.parts),
-      set: values => {
+      set: (values) => {
         if (layout.value) {
           layout.value.parts = values.map(asPersistentPart);
           saveLayout();
@@ -54,7 +57,7 @@ export const useFlowParts: UseFlowPartsComposable = {
 
     const flowParts = computed<FlowPart[]>({
       get: () => _flowParts.value,
-      set: values => {
+      set: (values) => {
         _flowParts.value = values;
         flowPartsRevision.value = nanoid(6);
       },
@@ -71,7 +74,7 @@ export const useFlowParts: UseFlowPartsComposable = {
 
     watch(
       () => builderStore.layoutById(layoutId.value),
-      newV => layout.value = newV,
+      (newV) => (layout.value = newV),
     );
 
     watch(

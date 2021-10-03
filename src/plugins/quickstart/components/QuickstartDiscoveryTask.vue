@@ -16,7 +16,7 @@ import {
   isCompatible,
   makeBlockIdRules,
 } from '@/plugins/spark/utils';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/formatting';
 import { makeObjectSorter } from '@/utils/functional';
@@ -36,6 +36,7 @@ export default defineComponent({
   setup(props) {
     const serviceId = computed<string>(() => props.config.serviceId);
     const sparkStore = useSparkStore();
+    const featureStore = useFeatureStore();
 
     const discoveredBlocks = computed<Block[]>(
       () =>

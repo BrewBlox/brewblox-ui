@@ -6,7 +6,7 @@ import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 import { BlockSpec } from '@/plugins/spark/types';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 
@@ -34,6 +34,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const block = computed<Block | null>(() => {
       const { blockId, serviceId } = props.modelValue;

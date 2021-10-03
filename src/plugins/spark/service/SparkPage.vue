@@ -10,8 +10,8 @@ import type {
   SparkStatus,
 } from '@/plugins/spark/types';
 import { BlockType } from '@/shared-types';
-import { featureStore } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { useFeatureStore } from '@/store/features';
+import { useServiceStore } from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
 
@@ -31,6 +31,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const serviceStore = useServiceStore();
+    const featureStore = useFeatureStore();
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
     const validTypes = specStore.blockSpecs.map((s) => s.type);

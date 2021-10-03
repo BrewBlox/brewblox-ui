@@ -10,7 +10,7 @@ import {
   SparkUpdateEvent,
   SystemBlockType,
 } from '@/shared-types';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { isLink } from '@/utils/identity';
 
 import { compatibleTypes } from '../const';
@@ -74,7 +74,7 @@ export function isBlockRemovable(block: Maybe<Block>): boolean {
   return (
     block != null &&
     !isBlockVolatile(block) &&
-    featureStore.widgetRemoveActions(block.type).length > 0
+    useFeatureStore().widgetRemoveActions(block.type).length > 0
   );
 }
 

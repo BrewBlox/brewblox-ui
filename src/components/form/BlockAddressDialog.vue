@@ -10,7 +10,7 @@ import type {
 } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { createBlockDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
@@ -62,6 +62,7 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogCancel, onDialogHide, onDialogOK } =
       useDialog.setup();
     const sparkStore = useSparkStore();
+    const featureStore = useFeatureStore();
     const local = ref<BlockAddress | null>(null);
 
     const serviceIds = computed<string[]>(() => sparkStore.serviceIds);

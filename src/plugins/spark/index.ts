@@ -3,8 +3,8 @@ import { Plugin } from 'vue';
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
 import { startup } from '@/startup';
-import { featureStore, WidgetFeature } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
+import { useServiceStore } from '@/store/services';
 import { autoRegister, cref } from '@/utils/component-ref';
 
 import { sparkType } from './const';
@@ -29,6 +29,11 @@ const deprecated: WidgetFeature[] = [
 
 const plugin: Plugin = {
   install(app) {
+    const serviceStore = useServiceStore();
+    const featureStore = useFeatureStore();
+    const sparkStore = useSparkStore();
+    const snippetStore = useBlockSnippetStore();
+
     autoRegister(app, require.context('./components', true));
 
     deprecated.forEach(featureStore.addWidgetFeature);
@@ -39,9 +44,6 @@ const plugin: Plugin = {
       component: cref(app, SparkWatcher),
       props: {},
     });
-
-    const sparkStore = useSparkStore();
-    const snippetStore = useBlockSnippetStore();
 
     featureStore.addServiceFeature({
       id: sparkType,

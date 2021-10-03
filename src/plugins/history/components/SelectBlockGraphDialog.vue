@@ -13,7 +13,7 @@ import {
   SparkService,
 } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils';
-import { serviceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { createBlockDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
 
@@ -36,6 +36,7 @@ export default defineComponent({
   setup(props) {
     const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
+    const serviceStore = useServiceStore();
     const sparkStore = useSparkStore();
     const specStore = useBlockSpecStore();
 

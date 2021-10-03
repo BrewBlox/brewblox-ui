@@ -1,4 +1,4 @@
-import { builderStore } from '@/plugins/builder/store';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   BlockType,
@@ -7,8 +7,8 @@ import {
   PidBlock,
 } from '@/plugins/spark/types';
 import { startAddBlockToDisplay } from '@/plugins/spark/utils';
-import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { widgetStore } from '@/store/widgets';
+import { Dashboard, useDashboardStore } from '@/store/dashboards';
+import { useWidgetStore } from '@/store/widgets';
 import { makeTypeFilter, nullFilter, uniqueFilter } from '@/utils/functional';
 import { notify } from '@/utils/notify';
 import { deepCopy } from '@/utils/objects';
@@ -87,6 +87,9 @@ export function changedIoModules(
 
 export function createOutputActions(): QuickstartAction[] {
   const sparkStore = useSparkStore();
+  const widgetStore = useWidgetStore();
+  const dashboardStore = useDashboardStore();
+  const builderStore = useBuilderStore();
 
   return [
     // Rename blocks

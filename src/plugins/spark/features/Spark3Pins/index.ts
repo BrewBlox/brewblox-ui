@@ -9,7 +9,7 @@ import {
   Spark3PinsBlock,
 } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 
 import widget from './Spark3PinsWidget.vue';
 
@@ -18,6 +18,7 @@ const type = BlockType.Spark3Pins;
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<Spark3PinsBlock> = {
       type,

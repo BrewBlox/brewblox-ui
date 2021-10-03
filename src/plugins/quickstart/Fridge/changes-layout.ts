@@ -1,12 +1,13 @@
 import { nanoid } from 'nanoid';
 
-import { builderStore } from '@/plugins/builder/store';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 
 import { withPrefix } from '../utils';
 import { FridgeConfig } from './types';
 
 export const defineLayouts = (config: FridgeConfig): BuilderLayout[] => {
+  const builderStore = useBuilderStore();
   const { serviceId, names } = config;
   return [
     {

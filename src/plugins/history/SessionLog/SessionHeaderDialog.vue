@@ -4,7 +4,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 import { useDialog } from '@/composables';
 import { deepCopy } from '@/utils/objects';
 
-import { historyStore } from '../store';
+import { useHistoryStore } from '../store';
 import { LoggedSession } from '../types';
 
 export default defineComponent({
@@ -16,17 +16,11 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const historyStore = useHistoryStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const local = ref<LoggedSession>(deepCopy(props.modelValue));
 
@@ -34,9 +28,7 @@ export default defineComponent({
       onDialogOK(local.value);
     }
 
-    const knownTags = computed<string[]>(
-      () => historyStore.sessionTags,
-    );
+    const knownTags = computed<string[]>(() => historyStore.sessionTags);
 
     return {
       dialogRef,
@@ -50,7 +42,6 @@ export default defineComponent({
   },
 });
 </script>
-
 
 <template>
   <q-dialog
@@ -76,10 +67,7 @@ export default defineComponent({
         dense
         item-aligned
       />
-      <TagSelectField
-        v-model="local.tags"
-        :existing="knownTags"
-      />
+      <TagSelectField v-model="local.tags" :existing="knownTags" />
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
         <q-btn flat label="OK" color="primary" @click="save" />

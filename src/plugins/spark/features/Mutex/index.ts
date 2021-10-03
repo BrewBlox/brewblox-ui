@@ -4,7 +4,7 @@ import { genericBlockFeature } from '@/plugins/spark/generic';
 import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BlockSpec, BlockType, MutexBlock } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxQty } from '@/utils/quantity';
 
 import widget from './MutexWidget.vue';
@@ -14,6 +14,7 @@ const type = BlockType.Mutex;
 const plugin: Plugin = {
   install(app) {
     const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<MutexBlock> = {
       type,

@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { Quantity } from '@/shared-types';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { bloxQty, deltaTempQty } from '@/utils/quantity';
 
 import { QuickstartAction } from '../types';
@@ -22,6 +22,7 @@ export default defineComponent({
   },
   emits: ['update:config', 'back', 'next'],
   setup(props, { emit }) {
+    const systemStore = useSystemStore();
     const fullPowerDelta = ref<Quantity>(deltaTempQty(2));
 
     const userTemp = computed<string>(() => systemStore.units.temperature);

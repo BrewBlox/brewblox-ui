@@ -23,7 +23,6 @@ module.exports = configure(function (ctx) {
 
     sourceFiles: {
       router: 'src/router.ts',
-      store: 'src/store/index.ts',
     },
 
     boot: ['externals', 'register', 'plugins', 'providers'],
@@ -78,7 +77,7 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history',
 
       distDir: 'dist',
-      analyze: false,
+      analyze: true,
       gzip: true,
       extractCSS: true,
 

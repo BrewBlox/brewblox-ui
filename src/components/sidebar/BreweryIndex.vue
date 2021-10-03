@@ -3,7 +3,7 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { builderStore } from '@/plugins/builder/store';
+import { useBuilderStore } from '@/plugins/builder/store';
 import { BuilderLayout } from '@/plugins/builder/types';
 import { startAddLayout } from '@/plugins/builder/utils';
 import { makeObjectSorter } from '@/utils/functional';
@@ -18,6 +18,7 @@ export default defineComponent({
   },
   emits: ['update:editing'],
   setup() {
+    const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const dragging = ref(false);
     const route = useRoute();

@@ -3,8 +3,8 @@ import { computed, defineComponent, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
 import { useSparkStore } from '@/plugins/spark/store';
-import { dashboardStore } from '@/store/dashboards';
-import { systemStore } from '@/store/system';
+import { useDashboardStore } from '@/store/dashboards';
+import { useSystemStore } from '@/store/system';
 
 export default defineComponent({
   name: 'WizardDialog',
@@ -32,7 +32,9 @@ export default defineComponent({
     const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
     const { dense } = useGlobals.setup();
+    const systemStore = useSystemStore();
     const sparkStore = useSparkStore();
+    const dashboardStore = useDashboardStore();
 
     const dialogTitle = ref<string>('Wizardry');
     const activeWizard = ref<string | null>(props.initialWizard);

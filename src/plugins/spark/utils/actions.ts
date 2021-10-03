@@ -16,8 +16,8 @@ import {
   IoArrayBlock,
   MotorValveBlock,
 } from '@/shared-types';
-import { dashboardStore } from '@/store/dashboards';
-import { widgetStore } from '@/store/widgets';
+import { useDashboardStore } from '@/store/dashboards';
+import { useWidgetStore } from '@/store/widgets';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { saveFile } from '@/utils/import-export';
 import { bloxLink } from '@/utils/link';
@@ -65,6 +65,7 @@ export function startRemoveBlock(block: Block | null): void {
     return;
   }
   const sparkStore = useSparkStore();
+  const widgetStore = useWidgetStore();
 
   const widgets = widgetStore.widgets.filter(
     (v) =>
@@ -117,6 +118,9 @@ export async function startAddBlockToGraphWidget(
   if (!block) {
     return;
   }
+
+  const widgetStore = useWidgetStore();
+  const dashboardStore = useDashboardStore();
 
   const graphOpts = widgetStore.widgets
     .filter((v) => v.feature === graphType)

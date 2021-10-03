@@ -3,8 +3,13 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { featureStore, ServiceFeature } from '@/store/features';
-import { Service, ServiceStatus, serviceStore, ServiceStub } from '@/store/services';
+import { ServiceFeature, useFeatureStore } from '@/store/features';
+import {
+  Service,
+  ServiceStatus,
+  ServiceStub,
+  useServiceStore,
+} from '@/store/services';
 import { makeObjectSorter } from '@/utils/functional';
 import { startCreateService } from '@/utils/services';
 
@@ -23,10 +28,10 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:editing',
-  ],
+  emits: ['update:editing'],
   setup() {
+    const serviceStore = useServiceStore();
+    const featureStore = useFeatureStore();
     const router = useRouter();
     const { dense } = useGlobals.setup();
     const dragging = ref(false);
@@ -34,13 +39,13 @@ export default defineComponent({
     const services = computed<Service[]>({
       // avoid modifying the store object
       get: () => [...serviceStore.services].sort(serviceSorter),
-      set: services => serviceStore.updateServiceOrder(services.map(v => v.id)),
+      set: (services) =>
+        serviceStore.updateServiceOrder(services.map((v) => v.id)),
     });
 
-    const suggestions = computed<ServiceSuggestion[]>(
-      () => serviceStore
-        .stubs
-        .map(stub => {
+    const suggestions = computed<ServiceSuggestion[]>(() =>
+      serviceStore.stubs
+        .map((stub) => {
           const feature = featureStore.serviceById(stub.type)!;
           return { stub, feature };
         })
@@ -48,7 +53,7 @@ export default defineComponent({
     );
 
     function status(service: Service): ServiceStatus | null {
-      return serviceStore.statuses.find(v => v.id === service.id) ?? null;
+      return serviceStore.statuses.find((v) => v.id === service.id) ?? null;
     }
 
     function createService(stub: ServiceStub): void {
@@ -72,8 +77,8 @@ export default defineComponent({
     v-model="services"
     :disabled="dense || !editing"
     item-key="id"
-    @start="dragging=true"
-    @end="dragging=false"
+    @start="dragging = true"
+    @end="dragging = false"
   >
     <template #header>
       <q-item class="q-pb-none">
@@ -92,25 +97,20 @@ export default defineComponent({
             size="sm"
             @click="$emit('update:editing', !editing)"
           >
-            <q-tooltip>
-              Rearrange services
-            </q-tooltip>
+            <q-tooltip> Rearrange services </q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>
     </template>
 
-    <template #item="{element}">
+    <template #item="{ element }">
       <q-item
         :to="editing ? undefined : `/service/${element.id}`"
         :inset-level="0.2"
-        :class="[
-          'q-pb-sm',
-          editing && 'bordered pointer',
-        ]"
+        :class="['q-pb-sm', editing && 'bordered pointer']"
         style="min-height: 0px"
       >
-        <q-item-section :class="['ellipsis', {'text-italic': editing}]">
+        <q-item-section :class="['ellipsis', { 'text-italic': editing }]">
           {{ element.title }}
         </q-item-section>
         <template v-if="status(element) !== null">
@@ -129,7 +129,7 @@ export default defineComponent({
 
     <template #footer>
       <q-item
-        v-for="({stub, feature}) in suggestions"
+        v-for="{ stub, feature } in suggestions"
         :key="stub.id"
         :inset-level="0.2"
         class="q-pb-sm darkish"

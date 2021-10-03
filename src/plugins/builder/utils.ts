@@ -7,7 +7,7 @@ import { useSparkStore } from '@/plugins/spark/store';
 import { Block, ComparedBlockType } from '@/plugins/spark/types';
 import { BlockAddress } from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
-import { widgetStore } from '@/store/widgets';
+import { useWidgetStore } from '@/store/widgets';
 import {
   Coordinates,
   CoordinatesParam,
@@ -27,7 +27,7 @@ import {
   deprecatedTypes,
   SQUARE_SIZE,
 } from './const';
-import { builderStore } from './store';
+import { useBuilderStore } from './store';
 import {
   BuilderLayout,
   FlowPart,
@@ -69,7 +69,7 @@ export function asPersistentPart(
 }
 
 export function asStatePart(part: PersistentPart): StatePart {
-  const spec = builderStore.spec(part);
+  const spec = useBuilderStore().spec(part);
   return {
     ...part,
     transitions: spec.transitions(part),
@@ -301,6 +301,7 @@ export function showLinkedWidgetDialog(
   part: PersistentPart,
   key: string,
 ): void {
+  const widgetStore = useWidgetStore();
   const widgetId = part.settings[key];
   if (!widgetId) {
     return;
@@ -351,6 +352,7 @@ export function vivifyParts(
   if (!parts) {
     return [];
   }
+  const builderStore = useBuilderStore();
   const sizes: Mapped<number> = {};
   return (
     parts
@@ -406,6 +408,7 @@ export async function startAddLayout(
     return null;
   }
   const id = nanoid();
+  const builderStore = useBuilderStore();
   await builderStore.createLayout({
     id,
     title,
@@ -421,6 +424,7 @@ export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
   if (!layout) {
     return;
   }
+  const builderStore = useBuilderStore();
   createDialog({
     component: 'InputDialog',
     componentProps: {
@@ -428,7 +432,7 @@ export function startChangeLayoutTitle(layout: BuilderLayout | null): void {
       message: `Choose a new name for ${layout.title}`,
       modelValue: layout.title,
     },
-  }).onOk((title) => {
+  }).onOk((title: string) => {
     if (layout) {
       builderStore.saveLayout({ ...layout, title });
     }

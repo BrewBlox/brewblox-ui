@@ -5,7 +5,7 @@ import {
   PidBlock,
 } from '@/plugins/spark/types';
 import { Link } from '@/shared-types';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { createDialog } from '@/utils/dialog';
 import { isLink } from '@/utils/identity';
 
@@ -59,12 +59,12 @@ function relations(block: PidBlock): BlockRelation[] {
 }
 
 function nodes(serviceId: string): BlockRelationNode[] {
-  return useSparkStore()
-    .blocksByService(serviceId)
-    .map((block) => ({
-      id: block.id,
-      type: featureStore.widgetTitle(block.type),
-    }));
+  const featureStore = useFeatureStore();
+  const sparkStore = useSparkStore();
+  return sparkStore.blocksByService(serviceId).map((block) => ({
+    id: block.id,
+    type: featureStore.widgetTitle(block.type),
+  }));
 }
 
 export function startRelationsDialog(block: PidBlock): void {
