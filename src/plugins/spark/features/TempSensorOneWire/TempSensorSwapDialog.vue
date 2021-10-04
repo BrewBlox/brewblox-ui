@@ -2,8 +2,12 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
-import { BlockAddress, BlockType, TempSensorOneWireBlock } from '@/plugins/spark/types';
+import { useSparkStore } from '@/plugins/spark/store';
+import {
+  BlockAddress,
+  BlockType,
+  TempSensorOneWireBlock,
+} from '@/plugins/spark/types';
 
 export default defineComponent({
   name: 'TempSensorSwapDialog',
@@ -30,17 +34,11 @@ export default defineComponent({
       default: 'Pick two sensors to exchange their OneWire bus address.',
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const sparkStore = useSparkStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
 
     const leftAddr = ref<BlockAddress>({
       id: props.leftId,
@@ -53,32 +51,33 @@ export default defineComponent({
       serviceId: props.serviceId,
     });
 
-    const sparkModule = computed<SparkServiceModule>(
-      () => sparkStore.moduleById(props.serviceId)!,
+    const leftBlock = computed<TempSensorOneWireBlock | null>(() =>
+      sparkStore.blockByAddress<TempSensorOneWireBlock>(leftAddr.value),
     );
 
-    const leftBlock = computed<TempSensorOneWireBlock | null>(
-      () => sparkModule.value.blockByAddress<TempSensorOneWireBlock>(leftAddr.value),
-    );
-
-    const rightBlock = computed<TempSensorOneWireBlock | null>(
-      () => sparkModule.value.blockByAddress<TempSensorOneWireBlock>(rightAddr.value),
+    const rightBlock = computed<TempSensorOneWireBlock | null>(() =>
+      sparkStore.blockByAddress<TempSensorOneWireBlock>(rightAddr.value),
     );
 
     const valid = computed<boolean>(
-      () => leftBlock.value !== null
-        && rightBlock.value !== null
-        && leftBlock.value.id !== rightBlock.value.id,
+      () =>
+        leftBlock.value !== null &&
+        rightBlock.value !== null &&
+        leftBlock.value.id !== rightBlock.value.id,
     );
 
     function save(): void {
       if (valid.value && leftBlock.value && rightBlock.value) {
-        const left = leftBlock.value.data.address;
-        const right = rightBlock.value.data.address;
-        leftBlock.value.data.address = right;
-        rightBlock.value.data.address = left;
-        sparkModule.value.saveBlock(leftBlock.value);
-        sparkModule.value.saveBlock(rightBlock.value);
+        const leftData = leftBlock.value.data;
+        const rightData = rightBlock.value.data;
+        const addresses = [leftData.address, rightData.address];
+        const busIds = [leftData.oneWireBusId, rightData.oneWireBusId];
+        leftData.address = addresses[1];
+        leftData.oneWireBusId = busIds[1];
+        rightData.address = addresses[0];
+        rightData.oneWireBusId = busIds[0];
+        sparkStore.saveBlock(leftBlock.value);
+        sparkStore.saveBlock(rightBlock.value);
         onDialogOK();
       }
     }
@@ -104,7 +103,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <BlockAddressField
         v-model="leftAddr"
         label="Sensor A"
@@ -117,7 +116,13 @@ export default defineComponent({
       />
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn :disable="!valid" flat label="OK" color="primary" @click="save" />
+        <q-btn
+          :disable="!valid"
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

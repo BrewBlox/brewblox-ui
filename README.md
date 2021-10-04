@@ -119,7 +119,7 @@ Implementation beyond proof-of-concept would require too much effort for a featu
 
 ## [Datastore](src/database/types.ts)
 
-Local application state is kept using [VueX](https://vuex.vuejs.org/guide/). Persistent data (eg. `Dashboard`, `Widget`, `Service`) is saved using the Redis [datastore](https://redis.io/).
+Local application state is kept using [Pinia](https://pinia.esm.dev/). Persistent data (eg. `Dashboard`, `Widget`, `Service`) is saved using the Redis [datastore](https://redis.io/).
 
 The full datastore state is loaded on startup. After that, two-way synchronization is maintained between VueX (local), and Redis (remote).
 

@@ -3,11 +3,11 @@ import { useQuasar } from 'quasar';
 import { computed, defineComponent, ref, watch } from 'vue';
 
 import { useGlobals } from '@/composables';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { concatById } from '@/utils/collections';
 
 import { useFlowParts, useSvgZoom, UseSvgZoomDimensions } from './composables';
-import { builderStore } from './store';
+import { useBuilderStore } from './store';
 import { FlowPart, PersistentPart } from './types';
 import { coord2grid, startChangeLayoutTitle } from './utils';
 
@@ -20,47 +20,35 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const systemStore = useSystemStore();
+    const builderStore = useBuilderStore();
     const { dense } = useGlobals.setup();
     const { localStorage } = useQuasar();
 
     const pending = ref<FlowPart | null>(null);
 
-    const startupDone = computed<boolean>(
-      () => systemStore.startupDone,
-    );
+    const startupDone = computed<boolean>(() => systemStore.startupDone);
 
-    const delayTouch = computed<boolean>(
-      () => {
-        const { builderTouchDelayed } = systemStore.config;
-        return builderTouchDelayed === 'always'
-          || (builderTouchDelayed === 'dense' && dense.value);
-      },
-    );
+    const delayTouch = computed<boolean>(() => {
+      const { builderTouchDelayed } = systemStore.config;
+      return (
+        builderTouchDelayed === 'always' ||
+        (builderTouchDelayed === 'dense' && dense.value)
+      );
+    });
 
-    const layoutId = computed<string | null>(
-      () => props.routeId,
-    );
+    const layoutId = computed<string | null>(() => props.routeId);
 
-    const {
-      layout,
-      parts,
-      flowParts,
-      flowPartsRevision,
-      calculateFlowParts,
-    } = useFlowParts.setup(layoutId);
+    const { layout, parts, flowParts, flowPartsRevision, calculateFlowParts } =
+      useFlowParts.setup(layoutId);
 
-    const gridDimensions = computed<UseSvgZoomDimensions>(
-      () => ({
-        width: coord2grid(layout.value?.width || 10),
-        height: coord2grid(layout.value?.height || 10),
-      }),
-    );
+    const gridDimensions = computed<UseSvgZoomDimensions>(() => ({
+      width: coord2grid(layout.value?.width || 10),
+      height: coord2grid(layout.value?.height || 10),
+    }));
 
-    const {
-      svgRef,
-      svgContentRef,
-      resetZoom,
-    } = useSvgZoom.setup(gridDimensions);
+    const { svgRef, svgContentRef, resetZoom } =
+      useSvgZoom.setup(gridDimensions);
 
     const layoutTitle = computed<string>(
       () => layout.value?.title ?? 'Builder layout',
@@ -85,11 +73,9 @@ export default defineComponent({
       if (pending.value && pending.value.id === part.id) {
         handler(part, { savePart });
         pending.value = null;
-      }
-      else if (delayTouch.value) {
+      } else if (delayTouch.value) {
         pending.value = part;
-      }
-      else {
+      } else {
         handler(part, { savePart });
       }
     }
@@ -100,7 +86,7 @@ export default defineComponent({
 
     watch(
       () => layoutTitle.value,
-      title => document.title = `Brewblox | ${title}`,
+      (title) => (document.title = `Brewblox | ${title}`),
       { immediate: true },
     );
 
@@ -112,8 +98,9 @@ export default defineComponent({
         }
         try {
           localStorage.set('brewery-page', layoutId.value);
+        } catch (e) {
+          /* ignore */
         }
-        catch (e) { /* ignore */ }
       },
     );
 
@@ -148,9 +135,7 @@ export default defineComponent({
       class="text-h5 darkened absolute-center column items-center q-gutter-md"
     >
       <q-spinner size="30px" />
-      <div>
-        Waiting for datastore...
-      </div>
+      <div>Waiting for datastore...</div>
     </div>
     <template v-else>
       <TitleTeleport>
@@ -166,11 +151,7 @@ export default defineComponent({
         >
           <q-tooltip>Open editor</q-tooltip>
         </q-btn>
-        <ActionMenu
-          round
-          class="self-center"
-          label="Layout actions"
-        >
+        <ActionMenu round class="self-center" label="Layout actions">
           <template #menus>
             <LayoutActions :layout="layout" />
           </template>
@@ -193,11 +174,13 @@ export default defineComponent({
             <g
               v-for="part in flowParts"
               :key="`${flowPartsRevision}-${part.id}`"
-              :transform="`translate(${coord2grid(part.x)}, ${coord2grid(part.y)})`"
+              :transform="`translate(${coord2grid(part.x)}, ${coord2grid(
+                part.y,
+              )})`"
               :class="{
                 [part.type]: true,
                 pointer: isClickable(part),
-                inactive: !!pending
+                inactive: !!pending,
               }"
               @click.stop="interact(part)"
               @dblclick.stop
@@ -217,7 +200,9 @@ export default defineComponent({
                 @click.stop="pending = null"
               />
               <g
-                :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(pending.y)})`"
+                :transform="`translate(${coord2grid(pending.x)}, ${coord2grid(
+                  pending.y,
+                )})`"
                 class="pointer"
                 @click.stop="interact(pending)"
                 @dblclick.stop

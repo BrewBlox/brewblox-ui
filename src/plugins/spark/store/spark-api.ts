@@ -24,12 +24,14 @@ export const fetchBlock = ({ id, serviceId }: Block): Promise<Block> =>
 
 export const fetchStoredBlock = (
   serviceId: string,
-  id: BlockIds,
+  nid: number,
 ): Promise<Block> =>
   http
-    .post<Block>(`/${encodeURIComponent(serviceId)}/blocks/read/stored`, { id })
+    .post<Block>(`/${encodeURIComponent(serviceId)}/blocks/read/stored`, {
+      nid,
+    })
     .then((resp) => resp.data)
-    .catch(intercept(`Failed to fetch stored block ${id}`));
+    .catch(intercept(`Failed to fetch stored block ${nid}`));
 
 export const createBlock = (block: Block): Promise<Block> =>
   http

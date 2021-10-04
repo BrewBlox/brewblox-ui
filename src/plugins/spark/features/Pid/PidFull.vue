@@ -13,6 +13,8 @@ import { createBlockDialog } from '@/utils/dialog';
 import { fixedNumber, prettyQty } from '@/utils/formatting';
 import { tempQty } from '@/utils/quantity';
 
+import { useSparkStore } from '../../store';
+
 interface GridOpts {
   start?: number;
   span?: number;
@@ -21,11 +23,11 @@ interface GridOpts {
 export default defineComponent({
   name: 'PidFull',
   setup() {
-    const { sparkModule, serviceId, block, saveBlock } =
-      useBlockWidget.setup<PidBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, block, saveBlock } = useBlockWidget.setup<PidBlock>();
 
     const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
-      sparkModule.blockByLink(block.value.data.inputId),
+      sparkStore.blockByLink(serviceId, block.value.data.inputId),
     );
 
     const inputDriven = computed<boolean>(() =>
@@ -37,13 +39,13 @@ export default defineComponent({
       set: (q) => {
         if (inputBlock.value && q) {
           inputBlock.value.data.storedSetting = q;
-          sparkModule.saveBlock(inputBlock.value);
+          sparkStore.saveBlock(inputBlock.value);
         }
       },
     });
 
     const outputBlock = computed<Block | null>(() =>
-      sparkModule.blockByLink(block.value.data.outputId),
+      sparkStore.blockByLink(serviceId, block.value.data.outputId),
     );
 
     const baseOutput = computed<number>(() => {

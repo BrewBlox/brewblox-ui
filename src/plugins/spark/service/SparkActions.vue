@@ -9,12 +9,12 @@ import {
   startResetBlocks,
 } from '@/plugins/spark/utils';
 import { createBlockWizard } from '@/plugins/wizardry';
-import { Service, serviceStore } from '@/store/services';
-import { systemStore } from '@/store/system';
+import { Service, useServiceStore } from '@/store/services';
+import { useSystemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 
-import { SparkServiceModule, sparkStore } from '../store';
+import { useSparkStore } from '../store';
 import { SparkService } from '../types';
 
 export default defineComponent({
@@ -27,10 +27,9 @@ export default defineComponent({
   },
   setup(props) {
     const router = useRouter();
-
-    const sparkModule = computed<SparkServiceModule | null>(() =>
-      sparkStore.moduleById(props.serviceId),
-    );
+    const systemStore = useSystemStore();
+    const serviceStore = useServiceStore();
+    const sparkStore = useSparkStore();
 
     const service = computed<SparkService | null>(() =>
       serviceStore.serviceById(props.serviceId),
@@ -46,15 +45,15 @@ export default defineComponent({
     });
 
     function serviceReboot(): void {
-      sparkModule.value?.serviceReboot();
+      sparkStore.serviceReboot(props.serviceId);
     }
 
     function controllerReboot(): void {
-      sparkModule.value?.controllerReboot();
+      sparkStore.controllerReboot(props.serviceId);
     }
 
     function startDialog(component: string): void {
-      if (sparkModule.value) {
+      if (sparkStore.has(props.serviceId)) {
         createDialog({
           component,
           componentProps: {
@@ -76,7 +75,6 @@ export default defineComponent({
       cleanUnusedNames,
       startChangeServiceTitle,
       removeService,
-      sparkModule,
       service,
       isHomePage,
       serviceReboot,
@@ -89,7 +87,7 @@ export default defineComponent({
 
 <template>
   <ActionSubmenu>
-    <CardWarning v-if="!sparkModule">
+    <CardWarning v-if="!service">
       <template #message>
         Service is not available
       </template>

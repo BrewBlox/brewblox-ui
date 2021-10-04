@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import { Enum } from 'typescript-string-enums';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   AnyConstraint,
   AnyConstraintsObj,
@@ -71,11 +71,11 @@ export const prettifyConstraints = (
 export async function cleanUnusedNames(
   serviceId: string | null,
 ): Promise<void> {
-  const module = sparkStore.moduleById(serviceId);
-  if (!module) {
+  const sparkStore = useSparkStore();
+  if (!sparkStore.has(serviceId)) {
     return;
   }
-  const names = await module.cleanUnusedNames();
+  const names = await sparkStore.cleanUnusedNames(serviceId);
 
   const message =
     names.length > 0

@@ -4,7 +4,7 @@ import { debounce } from 'quasar';
 import { computed, defineComponent } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockFieldSpec } from '@/plugins/spark/types';
 import { Quantity } from '@/shared-types';
 import { prettyAny, prettyQty, roundedNumber } from '@/utils/formatting';
@@ -16,28 +16,22 @@ import { QuickValuesWidget } from './types';
 export default defineComponent({
   name: 'QuickValuesWidget',
   setup() {
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
     const { context } = useContext.setup();
-    const {
-      widget,
-      config,
-      saveConfig,
-    } = useWidget.setup<QuickValuesWidget>();
+    const { widget, config, saveConfig } = useWidget.setup<QuickValuesWidget>();
 
-    const fieldValue = computed<Quantity | number | null>(
-      () => sparkStore.fieldByAddress(config.value.addr),
+    const fieldValue = computed<Quantity | number | null>(() =>
+      sparkStore.fieldByAddress(config.value.addr),
     );
 
-    const numValue = computed<number | null>(
-      () => {
-        const v = fieldValue.value;
-        return roundedNumber(isQuantity(v) ? v.value : v);
-      },
-    );
+    const numValue = computed<number | null>(() => {
+      const v = fieldValue.value;
+      return roundedNumber(isQuantity(v) ? v.value : v);
+    });
 
     function blockFilter(block: Block): boolean {
-      return sparkStore
-        .fieldSpecsByType(block.type)
-        .some(f => !f.readonly);
+      return specStore.fieldSpecsByType(block.type).some((f) => !f.readonly);
     }
 
     function fieldFilter(field: BlockFieldSpec): boolean {
@@ -57,31 +51,32 @@ export default defineComponent({
         : value;
     }
 
-    const debouncedSave = debounce((value: number): void => {
-      const { field } = config.value.addr;
-      const block = sparkStore.blockByAddress(config.value.addr);
-      if (block && field) {
-        block.data[field] = appliedValue(value);
-        sparkStore.saveBlock(block);
-      }
-    }, 300, true);
+    const debouncedSave = debounce(
+      (value: number): void => {
+        const { field } = config.value.addr;
+        const block = sparkStore.blockByAddress(config.value.addr);
+        if (block && field) {
+          block.data[field] = appliedValue(value);
+          sparkStore.saveBlock(block);
+        }
+      },
+      300,
+      true,
+    );
 
-    function addValue(value: string, done: ((v?: number) => void)): void {
+    function addValue(value: string, done: (v?: number) => void): void {
       const parsed = Number(value);
 
       if (Number.isFinite(parsed)) {
         done(parsed);
-      }
-      else {
+      } else {
         notify.warn(`Input value is not a number: '${value}'`);
         done();
       }
     }
 
-    function addSliderValue(value: string, done: ((v?: number[]) => void)): void {
-      const parsed = value
-        .split(/[,:]/)
-        .map(Number);
+    function addSliderValue(value: string, done: (v?: number[]) => void): void {
+      const parsed = value.split(/[,:]/).map(Number);
 
       let [min, max, step] = parsed;
 
@@ -99,7 +94,7 @@ export default defineComponent({
         return done();
       }
 
-      if ([min, max, step].some(v => !Number.isFinite(v))) {
+      if ([min, max, step].some((v) => !Number.isFinite(v))) {
         notify.warn(`Unable to parse: '${value}'`);
         return done();
       }
@@ -126,17 +121,13 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <Card>
     <template #toolbar>
       <WidgetToolbar has-mode-toggle />
     </template>
 
-    <div
-      v-if="context.mode === 'Basic'"
-      class="widget-body row justify-center"
-    >
+    <div v-if="context.mode === 'Basic'" class="widget-body row justify-center">
       <template v-if="widget.rows > 2 && widget.cols > 2">
         <BlockFieldAddressField
           :model-value="config.addr"
@@ -144,8 +135,12 @@ export default defineComponent({
           :field-filter="fieldFilter"
           class="col-grow fade-2"
           show-value
-
-          @update:model-value="v => { config.addr = v; saveConfig(); }"
+          @update:model-value="
+            (v) => {
+              config.addr = v;
+              saveConfig();
+            }
+          "
         />
       </template>
       <template v-else>
@@ -173,10 +168,7 @@ export default defineComponent({
         :key="`slider-${idx}_${min}_${max}_${step}`"
         class="col-11 q-mr-xs row q-gutter-x-sm"
       >
-        <div
-          class="col-auto self-center fade-3"
-          style="min-width: 15pt"
-        >
+        <div class="col-auto self-center fade-3" style="min-width: 15pt">
           {{ min }}
         </div>
         <q-slider
@@ -188,26 +180,25 @@ export default defineComponent({
           class="col-grow"
           @change="debouncedSave"
         />
-        <div
-          class="col-auto self-center fade-3"
-          style="min-width: 15pt"
-        >
+        <div class="col-auto self-center fade-3" style="min-width: 15pt">
           {{ max }}
         </div>
       </div>
     </div>
 
-    <div
-      v-if="context.mode === 'Full'"
-      class="widget-body column"
-    >
+    <div v-if="context.mode === 'Full'" class="widget-body column">
       <BlockFieldAddressField
         :model-value="config.addr"
         :block-filter="blockFilter"
         :field-filter="fieldFilter"
         class="col-grow"
         show-value
-        @update:model-value="v => { config.addr = v; saveConfig(); }"
+        @update:model-value="
+          (v) => {
+            config.addr = v;
+            saveConfig();
+          }
+        "
       />
       <q-select
         :model-value="config.values"
@@ -218,11 +209,14 @@ export default defineComponent({
         hide-dropdown-icon
         class="col-grow"
         @new-value="addValue"
-        @update:model-value="v => { config.values = v; saveConfig(); }"
+        @update:model-value="
+          (v) => {
+            config.values = v;
+            saveConfig();
+          }
+        "
       >
-        <q-tooltip>
-          Add a new value, and press ENTER.
-        </q-tooltip>
+        <q-tooltip> Add a new value, and press ENTER. </q-tooltip>
       </q-select>
       <q-select
         :model-value="config.sliders"
@@ -233,7 +227,12 @@ export default defineComponent({
         hide-dropdown-icon
         class="col-grow"
         @new-value="addSliderValue"
-        @update:model-value="v => { config.sliders = v; saveConfig(); }"
+        @update:model-value="
+          (v) => {
+            config.sliders = v;
+            saveConfig();
+          }
+        "
       >
         <template #selected-item="scope">
           <q-chip

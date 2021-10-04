@@ -1,13 +1,13 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 
+import { useBuilderStore } from '@/plugins/builder/store';
 import { FlowPart } from '@/plugins/builder/types';
 import { coord2grid } from '@/plugins/builder/utils';
 import { Coordinates, rotatedSize } from '@/utils/coordinates';
 
 import { usePart } from '../composables';
 import parts from '../parts';
-import { builderStore } from '../store';
 
 export default defineComponent({
   name: 'PartWrapper',
@@ -29,38 +29,37 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      sizeX,
-      sizeY,
-    } = usePart.setup(props.part);
+    const builderStore = useBuilderStore();
+    const { sizeX, sizeY } = usePart.setup(props.part);
 
-    const component = computed<string>(
-      () => builderStore.component(props.part),
+    const component = computed<string>(() =>
+      builderStore.component(props.part),
     );
 
-    const rotateTransform = computed<string>(
-      () => {
-        const [partSizeX, partSizeY] = props.part.size;
-        const [renderSizeX, renderSizeY] = rotatedSize(props.part.rotate, props.part.size);
+    const rotateTransform = computed<string>(() => {
+      const [partSizeX, partSizeY] = props.part.size;
+      const [renderSizeX, renderSizeY] = rotatedSize(
+        props.part.rotate,
+        props.part.size,
+      );
 
-        const farEdge = new Coordinates([partSizeX, partSizeY, 0])
-          .rotate(props.part.rotate, [0, 0, 0]);
+      const farEdge = new Coordinates([partSizeX, partSizeY, 0]).rotate(
+        props.part.rotate,
+        [0, 0, 0],
+      );
 
-        const trX = farEdge.x < 0 ? coord2grid(renderSizeX) : 0;
-        const trY = farEdge.y < 0 ? coord2grid(renderSizeY) : 0;
+      const trX = farEdge.x < 0 ? coord2grid(renderSizeX) : 0;
+      const trY = farEdge.y < 0 ? coord2grid(renderSizeY) : 0;
 
-        return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
-      },
-    );
+      return `translate(${trX}, ${trY}) rotate(${props.part.rotate})`;
+    });
 
-    const flipTransform = computed<string>(
-      () => {
-        if (!props.part.flipped) {
-          return '';
-        }
-        return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
-      },
-    );
+    const flipTransform = computed<string>(() => {
+      if (!props.part.flipped) {
+        return '';
+      }
+      return `translate(${coord2grid(sizeX.value)}, 0) scale(-1, 1)`;
+    });
 
     const transformation = computed<string>(
       () => `${rotateTransform.value} ${flipTransform.value}`,
@@ -90,7 +89,7 @@ export default defineComponent({
     <rect
       :width="coord2grid(sizeX)"
       :height="coord2grid(sizeY)"
-      :class="{showhover: showHover, selected}"
+      :class="{ showhover: showHover, selected }"
       opacity="0"
     />
   </g>

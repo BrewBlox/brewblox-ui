@@ -3,13 +3,12 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useWizard } from '@/plugins/wizardry/composables';
-import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { makeDashboardIdRules } from '@/utils/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { notify } from '@/utils/notify';
 import { makeRuleValidator, suggestId } from '@/utils/rules';
 import { makeUrlSafe } from '@/utils/url';
-
 
 const idRules = makeDashboardIdRules();
 const idValidator = makeRuleValidator(idRules);
@@ -19,16 +18,11 @@ export default defineComponent({
   props: {
     ...useWizard.props,
   },
-  emits: [
-    ...useWizard.emits,
-  ],
+  emits: [...useWizard.emits],
   setup() {
-    const {
-      onBack,
-      onClose,
-      setDialogTitle,
-    } = useWizard.setup();
+    const { onBack, onClose, setDialogTitle } = useWizard.setup();
     const router = useRouter();
+    const dashboardStore = useDashboardStore();
 
     setDialogTitle('Dashboard wizard');
 
@@ -36,15 +30,16 @@ export default defineComponent({
 
     const _dashboardId = ref<string | null>(null);
     const dashboardId = computed<string>({
-      get: () => _dashboardId.value !== null
-        ? _dashboardId.value
-        : suggestId(makeUrlSafe(dashboardTitle.value), idValidator),
-      set: id => _dashboardId.value = id,
+      get: () =>
+        _dashboardId.value !== null ? _dashboardId.value : suggestDashboardId(),
+      set: (id) => (_dashboardId.value = id),
     });
 
-    const valid = computed<boolean>(
-      () => idValidator(dashboardId.value),
-    );
+    const valid = computed<boolean>(() => idValidator(dashboardId.value));
+
+    function suggestDashboardId(): string {
+      return suggestId(makeUrlSafe(dashboardTitle.value), idValidator);
+    }
 
     function showTitleKeyboard(): void {
       createDialog({
@@ -52,8 +47,7 @@ export default defineComponent({
         componentProps: {
           modelValue: dashboardTitle.value,
         },
-      })
-        .onOk(v => dashboardTitle.value = v);
+      }).onOk((v) => (dashboardTitle.value = v));
     }
 
     function showIdKeyboard(): void {
@@ -63,8 +57,7 @@ export default defineComponent({
           modelValue: dashboardId.value,
           rules: idRules,
         },
-      })
-        .onOk(v => dashboardId.value = v);
+      }).onOk((v) => (dashboardId.value = v));
     }
 
     async function createDashboard(): Promise<void> {
@@ -86,6 +79,7 @@ export default defineComponent({
     return {
       onBack,
       dashboardId,
+      suggestDashboardId,
       idRules,
       valid,
       dashboardTitle,
@@ -102,10 +96,7 @@ export default defineComponent({
     <q-card-section>
       <q-item>
         <q-item-section>
-          <q-input
-            v-model="dashboardTitle"
-            label="Dashboard Title"
-          >
+          <q-input v-model="dashboardTitle" label="Dashboard Title">
             <template #append>
               <KeyboardButton @click="showTitleKeyboard" />
             </template>
@@ -114,11 +105,7 @@ export default defineComponent({
       </q-item>
       <q-item>
         <q-item-section>
-          <q-input
-            v-model="dashboardId"
-            :rules="idRules"
-            label="Dashboard URL"
-          >
+          <q-input v-model="dashboardId" :rules="idRules" label="Dashboard URL">
             <template #append>
               <KeyboardButton @click="showIdKeyboard" />
             </template>
@@ -131,7 +118,7 @@ export default defineComponent({
             round
             size="sm"
             color="white"
-            @click="chosenId = null"
+            @click="dashboardId = suggestDashboardId()"
           >
             <q-tooltip>Reset to default</q-tooltip>
           </q-btn>
@@ -140,11 +127,7 @@ export default defineComponent({
     </q-card-section>
 
     <template #actions>
-      <q-btn
-        unelevated
-        label="Back"
-        @click="onBack"
-      />
+      <q-btn unelevated label="Back" @click="onBack" />
       <q-space />
       <q-btn
         :disable="!valid"

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, provide, reactive } from 'vue';
 
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { SparkStatus } from '@/plugins/spark/types';
 import { WidgetContext } from '@/store/features';
 import { ContextKey } from '@/symbols';
@@ -16,22 +16,25 @@ export default defineComponent({
     },
   },
   setup(props) {
-    provide(ContextKey, reactive<WidgetContext>({
-      container: 'Dashboard',
-      size: 'Content',
-      mode: 'Basic',
-    }));
-
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.serviceId),
+    provide(
+      ContextKey,
+      reactive<WidgetContext>({
+        container: 'Dashboard',
+        size: 'Content',
+        mode: 'Basic',
+      }),
     );
 
-    const status = computed<SparkStatus | null>(
-      () => sparkModule.value?.status ?? null,
+    const sparkStore = useSparkStore();
+
+    const status = computed<SparkStatus | null>(() =>
+      sparkStore.statusByService(props.serviceId),
     );
 
     const lastStatus = computed<string>(
-      () => sparkModule.value?.lastStatus?.toLocaleString() ?? 'Unknown',
+      () =>
+        sparkStore.lastStatusAtByService(props.serviceId)?.toLocaleString() ??
+        'Unknown',
     );
 
     function triStateDesc(
@@ -43,61 +46,59 @@ export default defineComponent({
       if (value == null) {
         return nullDesc;
       }
-      return value
-        ? trueDesc
-        : falseDesc;
+      return value ? trueDesc : falseDesc;
     }
 
-    const isReachableDesc = computed<string>(
-      () => triStateDesc(
+    const isReachableDesc = computed<string>(() =>
+      triStateDesc(
         status.value?.isServiceReachable,
         'Service running',
         'Unable to connect to service',
       ),
     );
 
-    const autoconnectingDesc = computed<string>(
-      () => triStateDesc(
+    const autoconnectingDesc = computed<string>(() =>
+      triStateDesc(
         status.value?.isAutoconnecting,
         'Service automatically connects to controller',
         'Service does not automatically connect to controller',
       ),
     );
 
-    const isConnectedDesc = computed<string>(
-      () => triStateDesc(
+    const isConnectedDesc = computed<string>(() =>
+      triStateDesc(
         status.value?.isConnected,
         'Service connected to controller',
         'Service not connected to controller',
       ),
     );
 
-    const isAcknowledgedDesc = computed<string>(
-      () => triStateDesc(
+    const isAcknowledgedDesc = computed<string>(() =>
+      triStateDesc(
         status.value?.isAcknowledged,
         'Handshake performed',
         'Handshake not performed',
       ),
     );
 
-    const isCompatibleDesc = computed<string>(
-      () => triStateDesc(
+    const isCompatibleDesc = computed<string>(() =>
+      triStateDesc(
         status.value?.isCompatibleFirmware,
         'Firmware compatible',
         'Firmware not compatible',
       ),
     );
 
-    const isValidDesc = computed<string>(
-      () => triStateDesc(
+    const isValidDesc = computed<string>(() =>
+      triStateDesc(
         status.value?.isValidDeviceId,
         'Valid device ID',
         'Invalid device ID',
       ),
     );
 
-    const isSynchronizedDesc = computed<string>(
-      () => triStateDesc(
+    const isSynchronizedDesc = computed<string>(() =>
+      triStateDesc(
         status.value?.isSynchronized,
         'Service synchronized',
         'Service not synchronized',
@@ -105,11 +106,14 @@ export default defineComponent({
     );
 
     async function refresh(): Promise<void> {
-      await sparkModule.value?.fetchAll();
+      await sparkStore.fetchAll(props.serviceId);
     }
 
     async function toggleAutoconnecting(): Promise<void> {
-      await sparkModule.value?.saveAutoConnecting(!status.value?.isAutoconnecting);
+      await sparkStore.saveAutoConnecting(
+        props.serviceId,
+        !status.value?.isAutoconnecting,
+      );
       await refresh();
     }
 
@@ -132,7 +136,7 @@ export default defineComponent({
     }
 
     function serviceReboot(): void {
-      sparkModule.value?.serviceReboot();
+      sparkStore.serviceReboot(props.serviceId);
     }
 
     return {
@@ -160,26 +164,14 @@ export default defineComponent({
     <template #toolbar>
       <Toolbar :title="serviceId" subtitle="Troubleshooter">
         <template #buttons>
-          <q-btn
-            flat
-            dense
-            icon="refresh"
-            @click="refresh"
-          />
+          <q-btn flat dense icon="refresh" @click="refresh" />
         </template>
       </Toolbar>
     </template>
 
     <div v-if="status" class="widget-body row items-center">
-      <q-spinner
-        size="24px"
-        class="col-auto self-center"
-      />
-      <LabeledField
-        label="Last update"
-        tag="big"
-        class="col-grow"
-      >
+      <q-spinner size="24px" class="col-auto self-center" />
+      <LabeledField label="Last update" tag="big" class="col-grow">
         {{ lastStatus }}
       </LabeledField>
 
@@ -190,9 +182,7 @@ export default defineComponent({
           color="secondary"
           name="mdi-progress-download"
         />
-        <div>
-          Update is in progress
-        </div>
+        <div>Update is in progress</div>
       </template>
 
       <div class="col-break" />
@@ -212,16 +202,14 @@ export default defineComponent({
         <div class="row q-gutter-x-sm q-pl-lg">
           <q-btn
             flat
-            :label="status.isAutoconnecting
-              ? 'Pause autoconnect'
-              : 'Resume autoconnect'"
+            :label="
+              status.isAutoconnecting
+                ? 'Pause autoconnect'
+                : 'Resume autoconnect'
+            "
             @click="toggleAutoconnecting"
           />
-          <q-btn
-            flat
-            label="Reboot service"
-            @click="serviceReboot"
-          />
+          <q-btn flat label="Reboot service" @click="serviceReboot" />
         </div>
       </template>
 
@@ -282,7 +270,8 @@ export default defineComponent({
         </span>
         <!-- not autoconnecting -->
         <span v-else-if="!status.isAutoconnecting">
-          Your Spark service is paused, and not automatically connecting to your controller.<br>
+          Your Spark service is paused, and not automatically connecting to your
+          controller.<br>
           This status can be toggled manually.
         </span>
         <!-- not connected -->
@@ -293,7 +282,10 @@ export default defineComponent({
             <li>Does your controller have the correct firmware?</li>
             <li>WiFi: Does your controller display its IP address?</li>
             <li>Are there any error messages in your service logs?</li>
-            <li>USB: Your service must have been (re)started after plugging in the USB cable.</li>
+            <li>
+              USB: Your service must have been (re)started after plugging in the
+              USB cable.
+            </li>
             <li>USB: Can your service access USB devices? (Mac hosts)</li>
           </ul>
         </span>
@@ -304,9 +296,13 @@ export default defineComponent({
           <b>This status is usually temporary</b>
           <br>
           <br>
-          If your Spark is showing a blank screen, you may need to flash the bootloader.
+          If your Spark is showing a blank screen, you may need to flash the
+          bootloader.
           <br>
-          To do so, run <span class="monospace">brewblox-ctl particle -c flash-bootloader</span>
+          To do so, run
+          <span
+            class="monospace"
+          >brewblox-ctl particle -c flash-bootloader</span>
         </span>
         <!-- not compatible -->
         <span v-else-if="!status.isCompatibleFirmware">
@@ -316,17 +312,21 @@ export default defineComponent({
         </span>
         <!-- not valid -->
         <span v-else-if="!status.isValidDeviceId">
-          The controller device ID doesn't match the service <i>--device-id</i> setting.
+          The controller device ID doesn't match the service
+          <i>--device-id</i> setting.
           <br>
           <b>Please check your connection settings</b>
         </span>
         <!-- not synchronized -->
         <span v-else-if="!status.isSynchronized">
-          Your Spark service is connected to your controller, but not yet synchronized.
+          Your Spark service is connected to your controller, but not yet
+          synchronized.
           <b>This status is usually temporary.</b>
           <ul>
             <li>Is your datastore service running?</li>
-            <li>Are there any error messages in your service container logs?</li>
+            <li>
+              Are there any error messages in your service container logs?
+            </li>
           </ul>
         </span>
       </div>

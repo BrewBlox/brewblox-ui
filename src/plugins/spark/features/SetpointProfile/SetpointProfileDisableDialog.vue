@@ -2,14 +2,17 @@
 import { defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { calculateProfileValues } from '@/plugins/spark/utils';
-import { Quantity, SetpointProfileBlock, SetpointSensorPairBlock } from '@/shared-types';
+import {
+  Quantity,
+  SetpointProfileBlock,
+  SetpointSensorPairBlock,
+} from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { prettyUnit } from '@/utils/formatting';
 import { deepCopy } from '@/utils/objects';
 import { bloxQty, tempQty } from '@/utils/quantity';
-
 
 export default defineComponent({
   name: 'SetpointProfileDisableDialog',
@@ -24,20 +27,16 @@ export default defineComponent({
       default: 'Desired Setpoint settings',
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const sparkStore = useSparkStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
     const profile: SetpointProfileBlock = deepCopy(props.block);
-    const setpoint: SetpointSensorPairBlock | null =
-      sparkStore.blockByLink(profile.serviceId, profile.data.targetId);
+    const setpoint: SetpointSensorPairBlock | null = sparkStore.blockByLink(
+      profile.serviceId,
+      profile.data.targetId,
+    );
 
     if (!setpoint) {
       profile.data.enabled = false;
@@ -51,9 +50,7 @@ export default defineComponent({
     const setpointEnabled = ref<boolean>(true);
     const setpointSetting = ref<Quantity>(
       bloxQty(
-        profileValue?.current
-        ?? setpoint?.data.storedSetting
-        ?? tempQty(20),
+        profileValue?.current ?? setpoint?.data.storedSetting ?? tempQty(20),
       ).round(),
     );
 
@@ -65,18 +62,17 @@ export default defineComponent({
           suffix: setpointSetting.value.unit,
           type: 'number',
         },
-      })
-        .onOk(v => setpointSetting.value.value = v);
+      }).onOk((v) => (setpointSetting.value.value = v));
     }
 
     function confirm(): void {
       if (setpoint) {
-        sparkStore.modifyBlock(setpoint, block => {
+        sparkStore.modifyBlock(setpoint, (block) => {
           block.data.settingEnabled = setpointEnabled.value;
           block.data.storedSetting = setpointSetting.value;
         });
       }
-      sparkStore.modifyBlock(profile, block => block.data.enabled = false);
+      sparkStore.modifyBlock(profile, (block) => (block.data.enabled = false));
       onDialogOK();
     }
 
@@ -103,7 +99,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="confirm"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <template #title>
         Desired Setpoint settings
       </template>
@@ -135,18 +131,8 @@ export default defineComponent({
       </q-input>
 
       <template #actions>
-        <q-btn
-          flat
-          label="Cancel"
-          color="primary"
-          @click="onDialogCancel"
-        />
-        <q-btn
-          flat
-          label="OK"
-          color="primary"
-          @click="confirm"
-        />
+        <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
+        <q-btn flat label="OK" color="primary" @click="confirm" />
       </template>
     </DialogCard>
   </q-dialog>

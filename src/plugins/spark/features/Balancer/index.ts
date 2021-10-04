@@ -1,18 +1,20 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import { BalancerBlock, BlockSpec, BlockType } from '@/plugins/spark/types';
 import { blockWidgetSelector } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 
 import widget from './BalancerWidget.vue';
 
 const type = BlockType.Balancer;
 
-
 const plugin: Plugin = {
   install(app) {
+    const featureStore = useFeatureStore();
+    const specStore = useBlockSpecStore();
+
     const blockSpec: BlockSpec<BalancerBlock> = {
       type,
       generate: () => ({
@@ -32,7 +34,7 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
+    specStore.addBlockSpec(blockSpec);
     featureStore.addWidgetFeature(feature);
   },
 };

@@ -1,10 +1,10 @@
 <script lang="ts">
 import { computed, defineComponent, provide, reactive, watch } from 'vue';
 
-import { tiltStore } from '@/plugins/tilt/store';
+import { useTiltStore } from '@/plugins/tilt/store';
 import { TiltService, TiltStateValue } from '@/plugins/tilt/types';
 import { WidgetContext } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { useServiceStore } from '@/store/services';
 import { ContextKey } from '@/symbols';
 import { makeObjectSorter } from '@/utils/functional';
 import { startChangeServiceTitle } from '@/utils/services';
@@ -24,10 +24,13 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const tiltStore = useTiltStore();
+    const serviceStore = useServiceStore();
+
     provide(ContextKey, reactive<WidgetContext>(context));
 
-    const service = computed<TiltService | null>(
-      () => serviceStore.serviceById(props.serviceId),
+    const service = computed<TiltService | null>(() =>
+      serviceStore.serviceById(props.serviceId),
     );
 
     const title = computed<string>(
@@ -45,9 +48,9 @@ export default defineComponent({
       },
     );
 
-    const values = computed<TiltStateValue[]>(
-      () => tiltStore.values
-        .filter(v => v.serviceId === props.serviceId)
+    const values = computed<TiltStateValue[]>(() =>
+      tiltStore.values
+        .filter((v) => v.serviceId === props.serviceId)
         .sort(makeObjectSorter('color')),
     );
 
@@ -67,31 +70,18 @@ export default defineComponent({
       <span class="cursor-pointer" @click="editTitle">{{ title }}</span>
     </TitleTeleport>
     <ButtonsTeleport>
-      <ActionMenu
-        round
-        size="12px"
-        class="self-center"
-      >
-        <q-tooltip>
-          Service actions
-        </q-tooltip>
+      <ActionMenu round size="12px" class="self-center">
+        <q-tooltip> Service actions </q-tooltip>
         <template #menus>
           <TiltActions :service-id="serviceId" />
         </template>
       </ActionMenu>
     </ButtonsTeleport>
     <div class="q-pa-lg q-gutter-md row">
-      <div
-        v-for="value in values"
-        :key="value.id"
-        style="max-width: 500px"
-      >
+      <div v-for="value in values" :key="value.id" style="max-width: 500px">
         <Card>
           <template #toolbar>
-            <Toolbar
-              :title="value.color"
-              subtitle="Tilt"
-            />
+            <Toolbar :title="value.color" subtitle="Tilt" />
           </template>
           <TiltValues :state="value" class="widget-body" />
         </Card>

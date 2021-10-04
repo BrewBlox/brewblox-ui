@@ -2,7 +2,7 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block } from '@/plugins/spark/types';
 import { makeBlockIdRules } from '@/plugins/spark/utils';
 import { createDialog } from '@/utils/dialog';
@@ -19,18 +19,12 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogCancel,
-    } = useDialog.setup();
+    const { dialogRef, dialogProps, onDialogHide, onDialogCancel } =
+      useDialog.setup();
     const { dense } = useGlobals.setup();
-    const sparkModule = sparkStore.moduleById(props.serviceId)!;
+    const sparkStore = useSparkStore();
     const importBusy = ref<boolean>(false);
     const messages = ref<string[]>([]);
 
@@ -38,20 +32,26 @@ export default defineComponent({
       try {
         importBusy.value = true;
         messages.value = [];
-        messages.value = await sparkModule.serviceImport(values);
-        messages.value
-          .forEach(msg => notify.info('Block import error: ' + msg, { shown: false }));
-        notify.done(messages.value.length
-          ? 'Block import completed with warnings. See the notification center for details.'
-          : 'Block import done!');
+        messages.value = await sparkStore.serviceImport(
+          props.serviceId,
+          values,
+        );
+        messages.value.forEach((msg) =>
+          notify.info('Block import error: ' + msg, { shown: false }),
+        );
+        notify.done(
+          messages.value.length
+            ? 'Block import completed with warnings. See the notification center for details.'
+            : 'Block import done!',
+        );
       } catch (e) {
         notify.error(`Failed to import blocks: ${e.toString()}`);
       }
       importBusy.value = false;
     }
 
-    const blockIdValidator = computed<(v: string) => boolean>(
-      () => makeRuleValidator(makeBlockIdRules(props.serviceId)),
+    const blockIdValidator = computed<(v: string) => boolean>(() =>
+      makeRuleValidator(makeBlockIdRules(props.serviceId)),
     );
 
     async function importSingleBlock(block: Block): Promise<void> {
@@ -77,15 +77,15 @@ export default defineComponent({
         component: 'ConfirmDialog',
         componentProps: {
           title: 'Reset blocks',
-          message: 'This will remove all blocks, and import new ones from file. Are you sure?',
+          message:
+            'This will remove all blocks, and import new ones from file. Are you sure?',
           noBackdropDismiss: true,
         },
-      })
-        .onOk(() => importBlocks(values));
+      }).onOk(() => importBlocks(values));
     }
 
     async function startExport(): Promise<void> {
-      const exported = await sparkModule.serviceExport();
+      const exported = await sparkStore.serviceExport(props.serviceId);
       saveFile(exported, `brewblox-blocks-${props.serviceId}.json`);
     }
 

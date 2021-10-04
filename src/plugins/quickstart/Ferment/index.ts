@@ -1,6 +1,6 @@
 import { Plugin } from 'vue';
 
-import { featureStore, QuickstartFeature } from '@/store/features';
+import { QuickstartFeature, useFeatureStore } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 
 import FermentCompletionTask from './FermentCompletionTask.vue';
@@ -11,6 +11,7 @@ import FermentSettingsTask from './FermentSettingsTask.vue';
 
 const plugin: Plugin = {
   install(app) {
+    const featureStore = useFeatureStore();
     const feature: QuickstartFeature = {
       id: 'Ferment',
       title: 'Fermentation fridge',

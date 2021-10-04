@@ -3,8 +3,8 @@ import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { TiltService } from '@/plugins/tilt/types';
-import { Service, serviceStore } from '@/store/services';
-import { systemStore } from '@/store/system';
+import { Service, useServiceStore } from '@/store/services';
+import { useSystemStore } from '@/store/system';
 import { startChangeServiceTitle, startRemoveService } from '@/utils/services';
 
 export default defineComponent({
@@ -16,10 +16,12 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const systemStore = useSystemStore();
+    const serviceStore = useServiceStore();
     const router = useRouter();
 
-    const service = computed<TiltService | null>(
-      () => serviceStore.serviceById(props.serviceId),
+    const service = computed<TiltService | null>(() =>
+      serviceStore.serviceById(props.serviceId),
     );
 
     const serviceTitle = computed<string>(
@@ -28,8 +30,9 @@ export default defineComponent({
 
     const isHomePage = computed<boolean>({
       get: () => systemStore.config.homePage === `/service/${props.serviceId}`,
-      set: v => {
-        const homePage = (v && service.value) ? `/service/${props.serviceId}` : null;
+      set: (v) => {
+        const homePage =
+          v && service.value ? `/service/${props.serviceId}` : null;
         systemStore.saveConfig({ homePage });
       },
     });

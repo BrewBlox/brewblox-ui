@@ -4,11 +4,12 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useGlobals } from '@/composables';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 
 export default defineComponent({
   name: 'DefaultLayout',
   setup() {
+    const systemStore = useSystemStore();
     const { localStorage } = useQuasar();
     const { dense } = useGlobals.setup();
     const router = useRouter();
@@ -18,18 +19,21 @@ export default defineComponent({
     const serviceEditing = ref<boolean>(false);
     const builderEditing = ref<boolean>(false);
 
-    const _drawerOpen = ref<boolean>(localStorage.getItem('drawer') ?? !dense.value);
+    const _drawerOpen = ref<boolean>(
+      localStorage.getItem('drawer') ?? !dense.value,
+    );
     const drawerOpen = computed<boolean>({
       get: () => _drawerOpen.value,
-      set: v => {
+      set: (v) => {
         _drawerOpen.value = v;
         localStorage.set('drawer', v);
       },
     });
 
     const showSidebarLayouts = computed<boolean>(
-      () => systemStore.config.showSidebarLayouts
-        || /^\/(builder|brewery)/.test(router.currentRoute.value.path),
+      () =>
+        systemStore.config.showSidebarLayouts ||
+        /^\/(builder|brewery)/.test(router.currentRoute.value.path),
     );
 
     function stopEditing(): void {
@@ -73,9 +77,15 @@ export default defineComponent({
     <q-drawer v-model="drawerOpen" class="column" elevated>
       <SidebarNavigator />
 
-      <q-scroll-area class="col" :thumb-style="{opacity: 0.5, background: 'silver'}">
+      <q-scroll-area
+        class="col"
+        :thumb-style="{ opacity: 0.5, background: 'silver' }"
+      >
         <DashboardIndex v-model:editing="dashboardEditing" />
-        <BreweryIndex v-if="showSidebarLayouts" v-model:editing="builderEditing" />
+        <BreweryIndex
+          v-if="showSidebarLayouts"
+          v-model:editing="builderEditing"
+        />
         <ServiceIndex v-model:editing="serviceEditing" />
       </q-scroll-area>
 
@@ -87,17 +97,12 @@ export default defineComponent({
           to="/styles"
           :color="routeActive('/styles') ? 'primary' : ''"
         >
-          <q-tooltip>
-            Theming
-          </q-tooltip>
+          <q-tooltip> Theming </q-tooltip>
         </q-btn>
       </div>
     </q-drawer>
 
-    <q-page-container
-      style="overflow: hidden"
-      @click="stopEditing"
-    >
+    <q-page-container style="overflow: hidden" @click="stopEditing">
       <router-view />
     </q-page-container>
   </q-layout>

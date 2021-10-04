@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   WifiCipherType,
   WifiSecurityType,
@@ -40,6 +40,7 @@ export default defineComponent({
   },
   emits: ['cancel'],
   setup(props) {
+    const sparkStore = useSparkStore();
     const busy = ref(false);
     const isPwd = ref(true);
     const values = reactive<WiFiSettingsBlock['data']>({

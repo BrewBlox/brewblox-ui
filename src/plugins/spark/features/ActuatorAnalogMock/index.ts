@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   ActuatorAnalogMockBlock,
   AnalogConstraintsObj,
@@ -9,14 +9,20 @@ import {
   BlockSpec,
   BlockType,
 } from '@/plugins/spark/types';
-import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import {
+  blockWidgetSelector,
+  prettifyConstraints,
+} from '@/plugins/spark/utils';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 
 import widget from './ActuatorAnalogMockWidget.vue';
 const type = BlockType.ActuatorAnalogMock;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
+
     const blockSpec: BlockSpec<ActuatorAnalogMockBlock> = {
       type,
       generate: () => ({
@@ -105,8 +111,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

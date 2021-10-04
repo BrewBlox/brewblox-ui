@@ -1,7 +1,7 @@
 import { LEFT, RIGHT, UP } from '@/plugins/builder/const';
 import { PartSpec, PersistentPart, Transitions } from '@/plugins/builder/types';
 import { settingsBlock } from '@/plugins/builder/utils';
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   BlockType,
   DigitalActuatorBlock,
@@ -51,7 +51,7 @@ const spec: PartSpec = {
         block.data.state === DigitalState.STATE_ACTIVE
           ? DigitalState.STATE_INACTIVE
           : DigitalState.STATE_ACTIVE;
-      sparkStore.saveBlock(block);
+      useSparkStore().saveBlock(block);
     } else {
       part.settings.closed = !part.settings.closed;
       savePart(part);

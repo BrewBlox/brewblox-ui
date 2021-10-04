@@ -23,7 +23,6 @@ module.exports = configure(function (ctx) {
 
     sourceFiles: {
       router: 'src/router.ts',
-      store: 'src/store/index.ts',
     },
 
     boot: ['externals', 'register', 'plugins', 'providers'],

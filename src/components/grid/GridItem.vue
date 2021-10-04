@@ -3,7 +3,7 @@ import clamp from 'lodash/clamp';
 import debounce from 'lodash/debounce';
 import { computed, defineComponent, ref, watch } from 'vue';
 
-import { Widget, widgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 import { deepCopy } from '@/utils/objects';
 
 import { GRID_GAP_SIZE, GRID_SQUARE_SIZE, MIN_COLS, MIN_ROWS } from './const';
@@ -33,6 +33,8 @@ export default defineComponent({
   },
   emits: ['position', 'size'],
   setup(props, { emit }) {
+    const widgetStore = useWidgetStore();
+
     const widget = computed<Widget>(
       () => widgetStore.widgetById(props.widgetId)!,
     );

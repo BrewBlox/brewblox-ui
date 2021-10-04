@@ -2,22 +2,24 @@
 import Keyboard from 'simple-keyboard';
 import KeyboardLayouts from 'simple-keyboard-layouts';
 import 'simple-keyboard/build/css/index.css';
-import { computed, defineComponent, nextTick, onMounted, PropType, ref } from 'vue';
+import {
+  computed,
+  defineComponent,
+  nextTick,
+  onMounted,
+  PropType,
+  ref,
+} from 'vue';
 
 import { useDialog } from '@/composables';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { isDurationString } from '@/utils/identity';
 import { makeRuleValidator } from '@/utils/rules';
 
 type BoardType = 'text' | 'number' | 'duration';
 
 const typeValidator = (v: BoardType): boolean =>
-  [
-    'text',
-    'number',
-    'duration',
-  ]
-    .includes(v);
+  ['text', 'number', 'duration'].includes(v);
 
 const customLayouts = {
   // text layout is fetched from system store
@@ -31,12 +33,8 @@ const customLayouts = {
 
 const basicRules: Record<BoardType, InputRule[]> = {
   text: [],
-  number: [
-    v => isFinite(Number(v)) || 'Value is not a number',
-  ],
-  duration: [
-    v => isDurationString(v) || 'Value is not a duration',
-  ],
+  number: [(v) => isFinite(Number(v)) || 'Value is not a number'],
+  duration: [(v) => isDurationString(v) || 'Value is not a duration'],
 };
 
 export default defineComponent({
@@ -65,17 +63,11 @@ export default defineComponent({
       default: () => [],
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogProps,
-      dialogRef,
-      onDialogHide,
-      onDialogCancel,
-      onDialogOK,
-    } = useDialog.setup();
+    const systemStore = useSystemStore();
+    const { dialogProps, dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+      useDialog.setup();
 
     const keyboard = ref<Keyboard | null>(null);
     const local = ref<string>(`${props.modelValue ?? ''}`);
@@ -84,15 +76,13 @@ export default defineComponent({
     const shiftActive = ref(false);
     const pwdActive = ref(true);
 
-    const localRules = computed<InputRule[]>(
-      () => [
-        ...basicRules[props.type],
-        ...props.rules,
-      ],
-    );
+    const localRules = computed<InputRule[]>(() => [
+      ...basicRules[props.type],
+      ...props.rules,
+    ]);
 
-    const valid = computed<boolean>(
-      () => makeRuleValidator(localRules.value)(local.value),
+    const valid = computed<boolean>(() =>
+      makeRuleValidator(localRules.value)(local.value),
     );
 
     function findLayout(): any {
@@ -107,7 +97,7 @@ export default defineComponent({
 
     function applyShift(): void {
       keyboard.value?.setOptions({
-        layoutName: (lockActive.value || shiftActive.value) ? 'shift' : 'default',
+        layoutName: lockActive.value || shiftActive.value ? 'shift' : 'default',
       });
       lockActive.value
         ? keyboard.value?.addButtonTheme('{lock}', 'text-primary')
@@ -117,17 +107,14 @@ export default defineComponent({
         : keyboard.value?.removeButtonTheme('{shift}', 'text-primary');
     }
 
-
     function clearInput(): void {
       local.value = '';
       keyboard.value?.clearInput();
     }
 
-
     function save(): void {
-      const actual = props.type === 'number'
-        ? Number(local.value)
-        : local.value;
+      const actual =
+        props.type === 'number' ? Number(local.value) : local.value;
       onDialogOK(actual);
     }
 
@@ -140,17 +127,14 @@ export default defineComponent({
         lockActive.value = !lockActive.value;
         shiftActive.value = false;
         applyShift();
-      }
-      else if (button === '{shift}') {
+      } else if (button === '{shift}') {
         shiftActive.value = !shiftActive.value;
         applyShift();
-      }
-      else if (shiftActive.value) {
+      } else if (shiftActive.value) {
         shiftActive.value = false;
         applyShift();
       }
     }
-
 
     onMounted(async () => {
       await nextTick();
@@ -169,9 +153,7 @@ export default defineComponent({
           '{space}': ' ',
           '{esc}': '⊗',
         },
-        buttonTheme: [
-          { buttons: '-', class: 'text-h5' },
-        ],
+        buttonTheme: [{ buttons: '-', class: 'text-h5' }],
       });
       keyboard.value.setInput(local.value);
     });
@@ -194,7 +176,6 @@ export default defineComponent({
 });
 </script>
 
-
 <template>
   <q-dialog
     ref="dialogRef"
@@ -204,11 +185,11 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{message, html}">
+    <DialogCard v-bind="{ message, html }">
       <q-input
         :model-value="local"
         :suffix="suffix"
-        :type="(password && pwdActive) ? 'password' : 'textarea'"
+        :type="password && pwdActive ? 'password' : 'textarea'"
         autogrow
         label=""
         item-aligned
@@ -235,7 +216,13 @@ export default defineComponent({
       <div class="simple-keyboard" />
       <template #actions>
         <q-btn flat label="Cancel" color="primary" @click="onDialogCancel" />
-        <q-btn :disable="!valid" flat label="OK" color="primary" @click="save" />
+        <q-btn
+          :disable="!valid"
+          flat
+          label="OK"
+          color="primary"
+          @click="save"
+        />
       </template>
     </DialogCard>
   </q-dialog>

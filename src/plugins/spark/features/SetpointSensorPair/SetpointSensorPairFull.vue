@@ -6,6 +6,8 @@ import { filterLabels } from '@/plugins/spark/const';
 import { Block, SetpointSensorPairBlock } from '@/plugins/spark/types';
 import { createBlockDialog } from '@/utils/dialog';
 
+import { useSparkStore } from '../../store';
+
 const filterOpts: SelectOption[] = Object.entries(filterLabels).map(
   ([value, label]) => ({ label, value }),
 );
@@ -13,21 +15,17 @@ const filterOpts: SelectOption[] = Object.entries(filterLabels).map(
 export default defineComponent({
   name: 'SetpointSensorPairFull',
   setup() {
-    const {
-      serviceId,
-      blockId,
-      sparkModule,
-      block,
-      saveBlock,
-      isVolatileBlock,
-      isDriven,
-    } = useBlockWidget.setup<SetpointSensorPairBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, blockId, block, saveBlock, isVolatileBlock, isDriven } =
+      useBlockWidget.setup<SetpointSensorPairBlock>();
 
     const usedBy = computed<Block[]>(() => {
       if (isVolatileBlock.value) {
         return [];
       }
-      return sparkModule.blocks.filter((b) => b.data.inputId?.id === blockId);
+      return sparkStore
+        .blocksByService(serviceId)
+        .filter((b) => b.data.inputId?.id === blockId);
     });
 
     return {

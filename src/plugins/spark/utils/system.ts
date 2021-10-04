@@ -1,4 +1,4 @@
-import { sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   DisplaySettingsBlock,
@@ -19,9 +19,9 @@ export function getSysBlock<BlockT extends Block>(
   serviceId: string | null | undefined,
   type: BlockT['type'] & SystemBlockType,
 ): BlockT | undefined {
-  return serviceId
-    ? sparkStore.serviceBlocks(serviceId).find(makeTypeFilter<BlockT>(type))
-    : undefined;
+  return useSparkStore()
+    .blocksByService(serviceId)
+    .find(makeTypeFilter<BlockT>(type));
 }
 
 export const getDisplaySettingsBlock: SysBlockFn<DisplaySettingsBlock> = (

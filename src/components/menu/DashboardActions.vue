@@ -2,8 +2,8 @@
 import { computed, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { systemStore } from '@/store/system';
+import { Dashboard, useDashboardStore } from '@/store/dashboards';
+import { useSystemStore } from '@/store/system';
 import {
   startChangeDashboardId,
   startChangeDashboardTitle,
@@ -20,10 +20,12 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const systemStore = useSystemStore();
+    const dashboardStore = useDashboardStore();
     const router = useRouter();
 
-    const dashboard = computed<Dashboard | null>(
-      () => dashboardStore.dashboardById(props.dashboardId),
+    const dashboard = computed<Dashboard | null>(() =>
+      dashboardStore.dashboardById(props.dashboardId),
     );
 
     const title = computed<string>(
@@ -51,19 +53,29 @@ export default defineComponent({
     }
 
     function changeDashboardId(): void {
-      if (!dashboard.value) { return; }
+      if (!dashboard.value) {
+        return;
+      }
       const oldId = props.dashboardId;
-      startChangeDashboardId(dashboard.value, newId => onIdChanged(oldId, newId));
+      startChangeDashboardId(dashboard.value, (newId) =>
+        onIdChanged(oldId, newId),
+      );
     }
 
     function changeDashboardTitle(): void {
-      if (!dashboard.value) { return; }
+      if (!dashboard.value) {
+        return;
+      }
       const oldId = props.dashboardId;
-      startChangeDashboardTitle(dashboard.value, newId => onIdChanged(oldId, newId));
+      startChangeDashboardTitle(dashboard.value, (newId) =>
+        onIdChanged(oldId, newId),
+      );
     }
 
     function removeDashboard(): void {
-      if (!dashboard.value) { return; }
+      if (!dashboard.value) {
+        return;
+      }
       startRemoveDashboard(dashboard.value);
     }
 
@@ -83,11 +95,7 @@ export default defineComponent({
 <template>
   <ActionSubmenu>
     <template v-if="dashboard">
-      <ActionItem
-        icon="add"
-        label="New widget"
-        @click="showWizard"
-      />
+      <ActionItem icon="add" label="New widget" @click="showWizard" />
       <ToggleAction
         v-model="isHomePage"
         icon="home"

@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   ActuatorLogicBlock,
   BlockFieldSpec,
@@ -11,7 +11,7 @@ import {
   LogicResult,
 } from '@/plugins/spark/types';
 import { blockWidgetSelector, enumHint } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 
 import widget from './ActuatorLogicWidget.vue';
@@ -21,6 +21,9 @@ const type = BlockType.ActuatorLogic;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
+
     const blockSpec: BlockSpec<ActuatorLogicBlock> = {
       type,
       generate: () => ({
@@ -28,7 +31,11 @@ const plugin: Plugin = {
         result: LogicResult.RESULT_EMPTY,
         errorPos: 0,
         targetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
-        drivenTargetId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface, true),
+        drivenTargetId: bloxLink(
+          null,
+          BlockIntfType.ActuatorDigitalInterface,
+          true,
+        ),
         analog: [],
         digital: [],
         expression: '',
@@ -61,8 +68,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };

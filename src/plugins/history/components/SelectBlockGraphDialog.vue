@@ -3,7 +3,8 @@ import mapValues from 'lodash/mapValues';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
+import { sparkType } from '@/plugins/spark/const';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   BlockAddress,
@@ -12,7 +13,9 @@ import {
   SparkService,
 } from '@/plugins/spark/types';
 import { makeBlockGraphConfig } from '@/plugins/spark/utils';
+import { useServiceStore } from '@/store/services';
 import { createBlockDialog } from '@/utils/dialog';
+import { makeTypeFilter } from '@/utils/functional';
 
 import { GraphConfig } from '../types';
 
@@ -33,9 +36,12 @@ export default defineComponent({
   setup(props) {
     const { dialogRef, dialogProps, onDialogHide, onDialogCancel, onDialogOK } =
       useDialog.setup();
+    const serviceStore = useServiceStore();
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
 
     const services = computed<SparkService[]>(() =>
-      sparkStore.modules.map((m) => m.service),
+      serviceStore.services.filter(makeTypeFilter<SparkService>(sparkType)),
     );
 
     const block = ref<Block | null>(sparkStore.blockByAddress(props.address));
@@ -44,18 +50,18 @@ export default defineComponent({
     );
     const selectedFields = ref<BlockFieldSpec[]>([]);
 
-    const graphedTypes: BlockType[] = sparkStore.fieldSpecs
+    const graphedTypes: BlockType[] = specStore.fieldSpecs
       .filter((f) => f.graphed)
       .map((s) => s.type);
 
     const blocks = computed<Block[]>(() =>
       sparkStore
-        .serviceBlocks(service.value?.id)
+        .blocksByService(service.value?.id)
         .filter((block) => graphedTypes.includes(block.type)),
     );
 
     const fields = computed<BlockFieldSpec[]>(() =>
-      sparkStore.fieldSpecsByType(block.value?.type).filter((f) => f.graphed),
+      specStore.fieldSpecsByType(block.value?.type).filter((f) => f.graphed),
     );
 
     function selectService(v: SparkService | null): void {

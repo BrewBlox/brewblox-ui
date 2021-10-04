@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { Plugin } from 'vue';
 
 import { BlockType } from '@/shared-types';
-import { featureStore, WidgetFeature } from '@/store/features';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { cref } from '@/utils/component-ref';
 import { bloxLink } from '@/utils/link';
 
@@ -17,6 +17,8 @@ import { TempControlConfig } from './types';
 
 const plugin: Plugin = {
   install(app) {
+    const featureStore = useFeatureStore();
+
     const feature: WidgetFeature<TempControlConfig> = {
       id: 'TempControl',
       title: 'Temp Control Assistant',

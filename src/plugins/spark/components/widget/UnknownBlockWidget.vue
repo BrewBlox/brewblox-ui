@@ -2,7 +2,7 @@
 import { computed, defineComponent } from 'vue';
 
 import { useWidget } from '@/composables';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { BlockWidget } from '@/plugins/spark/types';
 
 interface AbsenceReason {
@@ -13,28 +13,23 @@ interface AbsenceReason {
 export default defineComponent({
   name: 'UnknownBlockWidget',
   setup() {
-    const {
-      config,
-    } = useWidget.setup<BlockWidget>();
+    const { config } = useWidget.setup<BlockWidget>();
+    const sparkStore = useSparkStore();
 
-    const sparkModule = computed<SparkServiceModule>(
-      () => sparkStore.moduleById(config.value.serviceId)!,
-    );
-
-    const reason = computed<AbsenceReason>(
-      () => sparkModule.value.lastBlocks
+    const reason = computed<AbsenceReason>(() =>
+      sparkStore.lastBlocksAtByService(config.value.serviceId)
         ? {
-          message: `Block ${config.value.blockId} not found on service ${config.value.serviceId}`,
-          temporary: false,
-        }
+            message: `Block ${config.value.blockId} not found on service ${config.value.serviceId}`,
+            temporary: false,
+          }
         : {
-          message: 'Waiting for service...',
-          temporary: true,
-        },
+            message: 'Waiting for service...',
+            temporary: true,
+          },
     );
 
     function fetch(): void {
-      sparkModule.value.fetchAll();
+      sparkStore.fetchAll(config.value.serviceId);
     }
 
     return {

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, PropType } from 'vue';
 
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import {
   Block,
   BlockIntfType,
@@ -16,7 +16,7 @@ import {
   isCompatible,
   makeBlockIdRules,
 } from '@/plugins/spark/utils';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { prettyQty } from '@/utils/formatting';
 import { makeObjectSorter } from '@/utils/functional';
@@ -35,14 +35,13 @@ export default defineComponent({
   emits: ['back', 'next'],
   setup(props) {
     const serviceId = computed<string>(() => props.config.serviceId);
-
-    const sparkModule = computed<SparkServiceModule | null>(() =>
-      sparkStore.moduleById(serviceId.value),
-    );
+    const sparkStore = useSparkStore();
+    const featureStore = useFeatureStore();
 
     const discoveredBlocks = computed<Block[]>(
       () =>
-        sparkModule.value?.blocks
+        sparkStore
+          .blocksByService(serviceId.value)
           .filter((block) =>
             isCompatible(block.type, [
               BlockIntfType.OneWireDeviceInterface,
@@ -80,7 +79,7 @@ export default defineComponent({
     async function discover(): Promise<void> {
       const discovered = await discoverBlocks(serviceId.value);
       if (discovered.length) {
-        await sparkModule.value?.fetchBlocks();
+        await sparkStore.fetchBlocks(serviceId.value);
       }
     }
 
@@ -99,7 +98,7 @@ export default defineComponent({
           modelValue: block.id,
         },
       }).onOk((newId: string) => {
-        sparkModule.value?.renameBlock([block.id, newId]);
+        sparkStore.renameBlock(block.serviceId, block.id, newId);
       });
     }
 

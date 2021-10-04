@@ -11,14 +11,17 @@ import { isBlockDriven } from '@/plugins/spark/utils';
 import { createBlockDialog, createDialog } from '@/utils/dialog';
 import { fixedNumber, prettyQty } from '@/utils/formatting';
 
+import { useSparkStore } from '../../store';
+
 export default defineComponent({
   name: 'PidBasic',
   setup() {
-    const { sparkModule, blockId, block, saveBlock } =
+    const sparkStore = useSparkStore();
+    const { serviceId, blockId, block, saveBlock } =
       useBlockWidget.setup<PidBlock>();
 
     const inputBlock = computed<SetpointSensorPairBlock | null>(() =>
-      sparkModule.blockByLink(block.value.data.inputId),
+      sparkStore.blockByLink(serviceId, block.value.data.inputId),
     );
 
     const inputDriven = computed<boolean>(() =>
@@ -26,7 +29,7 @@ export default defineComponent({
     );
 
     const outputBlock = computed<Block | null>(() =>
-      sparkModule.blockByLink(block.value.data.outputId),
+      sparkStore.blockByLink(serviceId, block.value.data.outputId),
     );
 
     const kp = computed<number | null>(() => block.value.data.kp.value);
@@ -50,15 +53,14 @@ export default defineComponent({
       }
 
       const setpointId = inputBlock.value.id;
+      const setpointChain = sparkStore
+        .driveChainsByService(serviceId)
+        .find((chain) => chain.target === setpointId);
 
-      if (sparkModule.drivenBlocks.includes(setpointId)) {
-        const driveChain = sparkModule.driveChains.find(
-          (chain) => chain.target === setpointId,
-        );
-
+      if (setpointChain) {
         const actual =
-          driveChain !== undefined
-            ? sparkModule.blockById(driveChain.source)
+          setpointChain !== undefined
+            ? sparkStore.blockById(serviceId, setpointChain.source)
             : inputBlock.value;
 
         createBlockDialog(actual);

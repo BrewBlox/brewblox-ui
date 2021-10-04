@@ -5,7 +5,7 @@ import round from 'lodash/round';
 import parseDuration from 'parse-duration';
 
 import { Quantity, TempUnit } from '@/shared-types';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 
 import { prettyQty } from './formatting';
 import {
@@ -206,7 +206,7 @@ const converted = (
   valueDegC: number | null,
   fmt: (unit: TempUnit) => string,
 ): Quantity =>
-  bloxQty(valueDegC, fmt('degC')).to(fmt(systemStore.units.temperature));
+  bloxQty(valueDegC, fmt('degC')).to(fmt(useSystemStore().units.temperature));
 
 export const tempQty: TempFunc = (v) => converted(v, (u) => u);
 export const inverseTempQty: TempFunc = (v) => converted(v, (u) => `1 / ${u}`);

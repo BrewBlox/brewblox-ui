@@ -2,7 +2,7 @@
 import { computed, defineComponent, ref } from 'vue';
 
 import { useGlobals } from '@/composables';
-import { Dashboard, dashboardStore } from '@/store/dashboards';
+import { Dashboard, useDashboardStore } from '@/store/dashboards';
 import { createDialog } from '@/utils/dialog';
 import { makeObjectSorter } from '@/utils/functional';
 
@@ -18,13 +18,15 @@ export default defineComponent({
   },
   emits: ['update:editing'],
   setup() {
+    const dashboardStore = useDashboardStore();
     const { dense } = useGlobals.setup();
     const dragging = ref(false);
 
     const dashboards = computed<Dashboard[]>({
       // Avoid modifying the store object when calling sort()
       get: () => [...dashboardStore.dashboards].sort(dashboardSorter),
-      set: dashboards => dashboardStore.updateDashboardOrder(dashboards.map(v => v.id)),
+      set: (dashboards) =>
+        dashboardStore.updateDashboardOrder(dashboards.map((v) => v.id)),
     });
 
     function startWizard(): void {
@@ -53,13 +55,7 @@ export default defineComponent({
         Dashboards
       </q-item-section>
       <q-item-section class="col-auto">
-        <q-btn
-          icon="add"
-          round
-          flat
-          size="sm"
-          @click="startWizard"
-        >
+        <q-btn icon="add" round flat size="sm" @click="startWizard">
           <q-tooltip>Add dashboard</q-tooltip>
         </q-btn>
       </q-item-section>
@@ -73,9 +69,7 @@ export default defineComponent({
           size="sm"
           @click="$emit('update:editing', !editing)"
         >
-          <q-tooltip>
-            Rearrange dashboards
-          </q-tooltip>
+          <q-tooltip> Rearrange dashboards </q-tooltip>
         </q-btn>
       </q-item-section>
     </q-item>
@@ -84,23 +78,18 @@ export default defineComponent({
       v-model="dashboards"
       :disabled="dense || !editing"
       item-key="id"
-      @start="dragging=true"
-      @end="dragging=false"
+      @start="dragging = true"
+      @end="dragging = false"
     >
-      <template #item="{element}">
+      <template #item="{ element }">
         <q-item
           :to="editing ? undefined : `/dashboard/${element.id}`"
           :inset-level="0.2"
-          :class="[
-            'q-pb-sm',
-            editing && 'bordered pointer',
-          ]"
+          :class="['q-pb-sm', editing && 'bordered pointer']"
           style="min-height: 0px"
         >
           <!-- {{ element }} -->
-          <q-item-section
-            :class="['ellipsis', editing && 'text-italic']"
-          >
+          <q-item-section :class="['ellipsis', editing && 'text-italic']">
             {{ element.title }}
           </q-item-section>
         </q-item>

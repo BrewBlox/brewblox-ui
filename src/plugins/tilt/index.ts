@@ -2,17 +2,20 @@ import { Plugin } from 'vue';
 
 import { STATE_TOPIC } from '@/const';
 import { eventbus } from '@/eventbus';
-import { featureStore } from '@/store/features';
-import { serviceStore } from '@/store/services';
+import { useFeatureStore } from '@/store/features';
+import { useServiceStore } from '@/store/services';
 import { autoRegister } from '@/utils/component-ref';
 
-import { tiltStore } from './store';
+import { useTiltStore } from './store';
 import TiltWidget from './Tilt';
 import { TiltService } from './types';
 import { isTiltState } from './utils';
 
 const plugin: Plugin = {
   install(app) {
+    const tiltStore = useTiltStore();
+    const featureStore = useFeatureStore();
+    const serviceStore = useServiceStore();
     autoRegister(app, require.context('./components', true));
 
     featureStore.addServiceFeature({

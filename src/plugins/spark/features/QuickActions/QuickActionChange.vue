@@ -3,15 +3,14 @@ import difference from 'lodash/difference';
 import { nanoid } from 'nanoid';
 import { computed, defineComponent, PropType, reactive, ref, watch } from 'vue';
 
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore, useSparkStore } from '@/plugins/spark/store';
 import type { Block } from '@/plugins/spark/types';
 import { BlockSpec } from '@/plugins/spark/types';
-import { featureStore } from '@/store/features';
+import { useFeatureStore } from '@/store/features';
 import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 
 import { BlockChange, EditableBlockField } from './types';
-
 
 interface EditableBlockChange {
   id: string;
@@ -31,24 +30,21 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    'update:modelValue',
-    'remove',
-    'switch',
-  ],
+  emits: ['update:modelValue', 'remove', 'switch'],
   setup(props, { emit }) {
+    const sparkStore = useSparkStore();
+    const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
-    const block = computed<Block | null>(
-      () => {
-        const { blockId, serviceId } = props.modelValue;
-        return sparkStore.blockById(serviceId, blockId);
-      },
-    );
+    const block = computed<Block | null>(() => {
+      const { blockId, serviceId } = props.modelValue;
+      return sparkStore.blockById(serviceId, blockId);
+    });
 
     function makeChange(): EditableBlockChange {
       const { id, blockId, serviceId } = props.modelValue;
-      const spec = sparkStore.blockSpecByAddress(block.value);
-      const fieldSpecs = sparkStore.fieldSpecsByType(block.value?.type);
+      const spec = specStore.blockSpecByAddress(block.value);
+      const fieldSpecs = specStore.fieldSpecsByType(block.value?.type);
 
       const data = props.modelValue.data ?? {};
       const confirmed = props.modelValue.confirmed ?? {};
@@ -60,15 +56,15 @@ export default defineComponent({
         spec,
         block: block.value,
         title: featureStore.widgetTitle(block.value?.type),
-        fields: fieldSpecs
-          .filter(f => !f.readonly)
-          .map(f => ({
-            id: f.key,
-            specField: f,
-            value: data[f.key] ?? null,
-            confirmed: confirmed[f.key] ?? false,
-          }))
-          ?? [],
+        fields:
+          fieldSpecs
+            .filter((f) => !f.readonly)
+            .map((f) => ({
+              id: f.key,
+              specField: f,
+              value: data[f.key] ?? null,
+              confirmed: confirmed[f.key] ?? false,
+            })) ?? [],
       });
     }
 
@@ -77,27 +73,26 @@ export default defineComponent({
 
     watch(
       () => props.modelValue,
-      () => { change.value = makeChange(); rev.value = nanoid(6); },
-    );
-
-    const unknownValues = computed<string[]>(
       () => {
-        const keys = Object.keys(props.modelValue.data ?? {});
-        const fieldSpecs = sparkStore.fieldSpecsByType(block.value?.type);
-        const validKeys = fieldSpecs
-          .filter(f => !f.readonly)
-          .map(f => f.key);
-        return difference(keys, validKeys);
+        change.value = makeChange();
+        rev.value = nanoid(6);
       },
     );
+
+    const unknownValues = computed<string[]>(() => {
+      const keys = Object.keys(props.modelValue.data ?? {});
+      const fieldSpecs = specStore.fieldSpecsByType(block.value?.type);
+      const validKeys = fieldSpecs.filter((f) => !f.readonly).map((f) => f.key);
+      return difference(keys, validKeys);
+    });
 
     function saveChange(): void {
       const data = {};
       const confirmed = {};
 
       change.value.fields
-        .filter(field => field.value !== null)
-        .forEach(field => {
+        .filter((field) => field.value !== null)
+        .forEach((field) => {
           data[field.id] = field.value;
           confirmed[field.id] = field.confirmed;
         });
@@ -115,9 +110,7 @@ export default defineComponent({
     }
 
     function toggleField(field: EditableBlockField): void {
-      field.value = field.value === null
-        ? field.specField.generate()
-        : null;
+      field.value = field.value === null ? field.specField.generate() : null;
       saveField(field);
     }
 
@@ -133,11 +126,10 @@ export default defineComponent({
           },
           title: `${change.value.blockId} ${field.specField.title}`,
         },
-      })
-        .onOk(value => {
-          field.value = value;
-          saveField(field);
-        });
+      }).onOk((value) => {
+        field.value = value;
+        saveField(field);
+      });
     }
 
     return {
@@ -182,9 +174,11 @@ export default defineComponent({
       class="row q-gutter-x-sm q-ml-none items-center"
     >
       <q-btn
-        :icon="field.value === null
-          ? 'mdi-checkbox-blank-outline'
-          : 'mdi-checkbox-marked-outline'"
+        :icon="
+          field.value === null
+            ? 'mdi-checkbox-blank-outline'
+            : 'mdi-checkbox-marked-outline'
+        "
         flat
         dense
         class="col-auto"
@@ -193,31 +187,34 @@ export default defineComponent({
         <q-tooltip>Change value when the step is applied.</q-tooltip>
       </q-btn>
       <q-btn
-        :class="['col-auto', {darkened: !field.confirmed}]"
+        :class="['col-auto', { darkened: !field.confirmed }]"
         :disable="field.value === null"
-        :icon="field.value === null
-          ? ''
-          : 'mdi-comment-question-outline'"
+        :icon="field.value === null ? '' : 'mdi-comment-question-outline'"
         flat
         dense
-        @click="field.confirmed = !field.confirmed; saveField(field)"
+        @click="
+          field.confirmed = !field.confirmed;
+          saveField(field);
+        "
       >
         <q-tooltip>Edit value in popup when the step is applied.</q-tooltip>
       </q-btn>
       <div class="col-shrink">
         {{ field.specField.title }}
       </div>
-      <div
-        v-if="field.value !== null"
-        class="col row justify-end q-pr-md"
-      >
+      <div v-if="field.value !== null" class="col row justify-end q-pr-md">
         <component
           :is="field.specField.component"
           v-bind="field.specField.componentProps"
           :service-id="change.serviceId"
           :block-id="change.blockId"
           :model-value="field.value"
-          @update:model-value="v => { field.value = v; saveField(field)}"
+          @update:model-value="
+            (v) => {
+              field.value = v;
+              saveField(field);
+            }
+          "
           @edit="editField(field)"
         />
       </div>
@@ -227,7 +224,7 @@ export default defineComponent({
         <q-icon name="warning" color="warning" />
       </q-item-section>
       <q-item-section>
-        Unknown fields: {{ unknownValues.map(v => `'${v}'`).join(', ') }}
+        Unknown fields: {{ unknownValues.map((v) => `'${v}'`).join(', ') }}
       </q-item-section>
       <q-item-section class="col-auto">
         <q-btn flat label="Remove" @click="saveChange()" />
@@ -237,9 +234,7 @@ export default defineComponent({
       <q-item-section avatar>
         <q-icon name="warning" color="warning" />
       </q-item-section>
-      <q-item-section>
-        Block not found
-      </q-item-section>
+      <q-item-section> Block not found </q-item-section>
     </q-item>
   </div>
 </template>

@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { Quantity } from '@/shared-types';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { prettyQty, prettyUnit } from '@/utils/formatting';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
@@ -28,6 +28,8 @@ export default defineComponent({
   },
   emits: ['update:config', 'back', 'next', 'close'],
   setup(props, { emit }) {
+    const systemStore = useSystemStore();
+
     const hltFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const bkFullPowerDelta = ref<Quantity>(deltaTempQty(2));
     const hltVolume = ref<number>(25);

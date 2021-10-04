@@ -6,8 +6,13 @@ import { spliceById } from '@/utils/collections';
 import { createDialog } from '@/utils/dialog';
 import { shortDateString } from '@/utils/formatting';
 
-import { historyStore } from '../store';
-import { GraphAnnotation, LoggedSession, SessionGraphNote, SessionNote } from '../types';
+import { useHistoryStore } from '../store';
+import {
+  GraphAnnotation,
+  LoggedSession,
+  SessionGraphNote,
+  SessionNote,
+} from '../types';
 import SessionGraphNoteDialog from './SessionGraphNoteDialog.vue';
 import SessionHeaderField from './SessionHeaderField.vue';
 import SessionTextNoteDialog from './SessionTextNoteDialog.vue';
@@ -18,16 +23,13 @@ export default defineComponent({
   components: {
     SessionHeaderField,
   },
-  emits: [
-    'add',
-  ],
+  emits: ['add'],
   setup() {
-    const {
-      config,
-    } = useWidget.setup<SessionLogWidget>();
+    const historyStore = useHistoryStore();
+    const { config } = useWidget.setup<SessionLogWidget>();
 
-    const session = computed<LoggedSession | null>(
-      () => historyStore.sessionById(config.value.currentSession),
+    const session = computed<LoggedSession | null>(() =>
+      historyStore.sessionById(config.value.currentSession),
     );
 
     function saveSession(sess: LoggedSession | null = session.value): void {
@@ -36,16 +38,17 @@ export default defineComponent({
       }
     }
 
-    const notes = computed<SessionNote[]>(
-      () => session.value?.notes ?? [],
-    );
+    const notes = computed<SessionNote[]>(() => session.value?.notes ?? []);
 
     function saveNote(note: SessionNote): void {
       spliceById(notes.value, note);
       saveSession();
     }
 
-    function saveAnnotations(note: SessionGraphNote, annotations: GraphAnnotation[]): void {
+    function saveAnnotations(
+      note: SessionGraphNote,
+      annotations: GraphAnnotation[],
+    ): void {
       note.config.layout.annotations = annotations;
       saveNote(note);
     }
@@ -60,8 +63,7 @@ export default defineComponent({
             type: 'text',
             label: 'Content',
           },
-        })
-          .onOk(value => saveNote({ ...note, value }));
+        }).onOk((value) => saveNote({ ...note, value }));
       }
 
       if (note.type === 'Graph') {
@@ -70,7 +72,7 @@ export default defineComponent({
           componentProps: {
             graphId: note.id,
             annotated: true,
-            saveAnnotations: v => saveAnnotations(note, v),
+            saveAnnotations: (v) => saveAnnotations(note, v),
             config: {
               ...note.config,
               params: {
@@ -103,15 +105,14 @@ export default defineComponent({
           message: 'You can choose graph lines in the widget settings.',
           label: 'Dates',
         },
-      })
-        .onOk(({ start, end }) => {
-          const actual = notes.value.find(n => n.id === note.id);
-          if (actual && actual.type === 'Graph') {
-            actual.start = start;
-            actual.end = end;
-            saveSession();
-          }
-        });
+      }).onOk(({ start, end }) => {
+        const actual = notes.value.find((n) => n.id === note.id);
+        if (actual && actual.type === 'Graph') {
+          actual.start = start;
+          actual.end = end;
+          saveSession();
+        }
+      });
     }
 
     return {
@@ -127,7 +128,6 @@ export default defineComponent({
   },
 });
 </script>
-
 
 <template>
   <div>
@@ -174,15 +174,18 @@ export default defineComponent({
               <div
                 :class="[
                   'col-grow row wrap',
-                  {'text-negative': note.start && note.end && note.start > note.end}
+                  {
+                    'text-negative':
+                      note.start && note.end && note.start > note.end,
+                  },
                 ]"
               >
-                <span :class="{'text-grey': note.start === null}">
+                <span :class="{ 'text-grey': note.start === null }">
                   {{ shortDateString(note.start, 'No start date') }}
                 </span>
                 <span
                   v-if="note.start || note.end"
-                  :class="['q-ml-xs', {'text-grey': note.end === null}]"
+                  :class="['q-ml-xs', { 'text-grey': note.end === null }]"
                 >
                   <q-icon name="mdi-arrow-right" />
                   {{ shortDateString(note.end, 'In progress') }}

@@ -5,7 +5,7 @@ import { computed, defineComponent, onBeforeMount } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { TempUnit } from '@/shared-types';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { createDialog } from '@/utils/dialog';
 import { isQuantity } from '@/utils/identity';
 import { deserialize } from '@/utils/parsing';
@@ -28,6 +28,7 @@ export default defineComponent({
     },
   },
   setup() {
+    const systemStore = useSystemStore();
     const { context } = useContext.setup();
     const { config, saveConfig } = useWidget.setup<QuickActionsWidget>();
 

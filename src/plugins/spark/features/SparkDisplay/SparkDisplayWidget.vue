@@ -3,7 +3,7 @@ import { computed, defineComponent, onBeforeUnmount, ref, watch } from 'vue';
 
 import { useContext, useWidget } from '@/composables';
 import { WS_HOST } from '@/const';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 
 import { SparkDisplayWidget } from './types';
 
@@ -13,11 +13,9 @@ const HEIGHT = 240;
 export default defineComponent({
   name: 'SparkDisplayWidget',
   setup() {
+    const sparkStore = useSparkStore();
     const { context } = useContext.setup();
-    const {
-      config,
-      saveConfig,
-    } = useWidget.setup<SparkDisplayWidget>();
+    const { config, saveConfig } = useWidget.setup<SparkDisplayWidget>();
 
     const connected = ref(true);
     let preventReconnection = false;
@@ -35,41 +33,33 @@ export default defineComponent({
 
     const serviceId = computed<string | null>({
       get: () => config.value.serviceId,
-      set: serviceId => saveConfig({ ...config.value, serviceId }),
+      set: (serviceId) => saveConfig({ ...config.value, serviceId }),
     });
 
     const url = computed<string>(
       () => `${WS_HOST}/${serviceId.value}/sim/display`,
     );
 
-    const sparkModule = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(serviceId.value),
-    );
-
     const isValid = computed<boolean>(
-      () => sparkModule.value
-        ?.status
-        ?.connectionKind === 'simulation',
+      () =>
+        sparkStore.statusByService(serviceId.value)?.connectionKind ===
+        'simulation',
     );
 
-    const error = computed<string | null>(
-      () => {
-        if (!sparkModule.value) {
-          return 'No service configured';
-        }
-        if (!sparkModule.value.status?.isSynchronized) {
-          return 'Service is not connected';
-        }
-        if (!isValid.value) {
-          return 'Service is not a simulation';
-        }
-        return null;
-      },
-    );
+    const error = computed<string | null>(() => {
+      if (!sparkStore.has(serviceId.value)) {
+        return 'No service configured';
+      }
+      if (!sparkStore.statusByService(serviceId.value)?.isSynchronized) {
+        return 'Service is not connected';
+      }
+      if (!isValid.value) {
+        return 'Service is not a simulation';
+      }
+      return null;
+    });
 
-    const serviceIds = computed<string[]>(
-      () => sparkStore.serviceIds,
-    );
+    const serviceIds = computed<string[]>(() => sparkStore.serviceIds);
 
     watch(
       () => serviceId.value,
@@ -135,13 +125,13 @@ export default defineComponent({
     function getMousePos(evt): XYPosition {
       return canvasRef.value != null
         ? {
-          x: evt.clientX - canvasRef.value.offsetLeft,
-          y: evt.clientY - canvasRef.value.offsetTop,
-        }
+            x: evt.clientX - canvasRef.value.offsetLeft,
+            y: evt.clientY - canvasRef.value.offsetTop,
+          }
         : {
-          x: 0,
-          y: 0,
-        };
+            x: 0,
+            y: 0,
+          };
     }
 
     function onMouseDown(evt): void {
@@ -176,8 +166,7 @@ export default defineComponent({
         view.setUint16(1, x, true);
         view.setUint16(3, y, true);
         ws.send(buf);
-      }
-      else {
+      } else {
         log('no touch event sent - not connected');
       }
     }
@@ -192,8 +181,7 @@ export default defineComponent({
     function setupSocket(): void {
       try {
         createSocket();
-      }
-      catch (e) {
+      } catch (e) {
         log(e);
         rescheduleSetup();
       }
@@ -248,9 +236,9 @@ export default defineComponent({
         const addr = buffer.getUint32(index, true);
         const color = buffer.getUint32(index + 4, true);
 
-        const rr = ((color >>> 11) % 32);
-        const gg = ((color >>> 5) % 64);
-        const bb = ((color >>> 0) % 32);
+        const rr = (color >>> 11) % 32;
+        const gg = (color >>> 5) % 64;
+        const bb = (color >>> 0) % 32;
 
         const r = (rr << 3) | ((rr >>> 2) & 7);
         const g = (gg << 2) | ((gg >>> 3) & 3);
@@ -322,10 +310,7 @@ export default defineComponent({
       </div>
     </div>
 
-    <div
-      v-if="context.mode === 'Full'"
-      class="widget-body row"
-    >
+    <div v-if="context.mode === 'Full'" class="widget-body row">
       <q-select
         v-model="serviceId"
         :options="serviceIds"
@@ -337,7 +322,6 @@ export default defineComponent({
     </div>
   </Card>
 </template>
-
 
 <style lang="sass" scoped>
 .display

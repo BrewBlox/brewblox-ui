@@ -3,8 +3,13 @@ import { Enum } from 'typescript-string-enums';
 import { computed, defineComponent, PropType, ref } from 'vue';
 
 import { useDialog } from '@/composables';
-import { sparkStore } from '@/plugins/spark/store';
-import { AnalogCompare, AnalogCompareOp, BlockIntfType, Quantity } from '@/plugins/spark/types';
+import { useSparkStore } from '@/plugins/spark/store';
+import {
+  AnalogCompare,
+  AnalogCompareOp,
+  BlockIntfType,
+  Quantity,
+} from '@/plugins/spark/types';
 import { isCompatible } from '@/plugins/spark/utils';
 import { isQuantity } from '@/utils/identity';
 import { deepCopy } from '@/utils/objects';
@@ -12,8 +17,10 @@ import { bloxQty, tempQty } from '@/utils/quantity';
 
 import { analogOpTitles } from './const';
 
-const operatorOpts = Enum.values(AnalogCompareOp)
-  .map(value => ({ value, label: analogOpTitles[value] }));
+const operatorOpts = Enum.values(AnalogCompareOp).map((value) => ({
+  value,
+  label: analogOpTitles[value],
+}));
 
 export default defineComponent({
   name: 'AnalogCompareEdit',
@@ -28,38 +35,28 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: [
-    ...useDialog.emits,
-  ],
+  emits: [...useDialog.emits],
   setup(props) {
-    const {
-      dialogRef,
-      dialogProps,
-      onDialogHide,
-      onDialogOK,
-      onDialogCancel,
-    } = useDialog.setup();
+    const sparkStore = useSparkStore();
+    const { dialogRef, dialogProps, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialog.setup();
     const local = ref<AnalogCompare>(deepCopy(props.modelValue));
-    const sparkModule = sparkStore.moduleById(props.serviceId)!;
 
-    const isTemp = computed<boolean>(
-      () => {
-        const block = sparkModule.blockById(local.value.id.id);
-        return !!block && isCompatible(block.type, BlockIntfType.SetpointSensorPairInterface);
-      },
-    );
+    const isTemp = computed<boolean>(() => {
+      const block = sparkStore.blockById(props.serviceId, local.value.id.id);
+      return (
+        block != null &&
+        isCompatible(block.type, BlockIntfType.SetpointSensorPairInterface)
+      );
+    });
 
     const rhs = computed<Quantity | number>({
       get: () => {
         const cmp = local.value;
-        return isTemp.value
-          ? tempQty(cmp.rhs)
-          : cmp.rhs;
+        return isTemp.value ? tempQty(cmp.rhs) : cmp.rhs;
       },
-      set: v => {
-        local.value.rhs = isQuantity(v)
-          ? bloxQty(v).to('degC').value ?? 0
-          : v;
+      set: (v) => {
+        local.value.rhs = isQuantity(v) ? bloxQty(v).to('degC').value ?? 0 : v;
       },
     });
 
@@ -89,7 +86,7 @@ export default defineComponent({
     @hide="onDialogHide"
     @keyup.enter="save"
   >
-    <DialogCard v-bind="{title, message, html}">
+    <DialogCard v-bind="{ title, message, html }">
       <LinkField
         v-model="local.id"
         :service-id="serviceId"

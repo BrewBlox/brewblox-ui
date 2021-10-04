@@ -3,9 +3,9 @@ import { mdiTextSubject } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent, PropType } from 'vue';
 
 // import type { SessionLogWidget } from '@/plugins/history/SessionLog/types';
-import { historyStore } from '@/plugins/history/store';
+import { useHistoryStore } from '@/plugins/history/store';
 import { LoggedSession } from '@/plugins/history/types';
-import { Widget, widgetStore } from '@/store/widgets';
+import { useWidgetStore, Widget } from '@/store/widgets';
 
 import { usePart } from '../composables';
 import { WIDGET_KEY } from '../specs/SessionLogDisplay';
@@ -21,33 +21,30 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      sizeX,
-      sizeY,
-      bordered,
-    } = usePart.setup(props.part);
+    const widgetStore = useWidgetStore();
+    const historyStore = useHistoryStore();
+    const { sizeX, sizeY, bordered } = usePart.setup(props.part);
 
-    const isLinked = computed<boolean>(
-      () => Boolean(props.part.settings[WIDGET_KEY]),
+    const isLinked = computed<boolean>(() =>
+      Boolean(props.part.settings[WIDGET_KEY]),
     );
 
-    const widget = computed<Widget | null>( // TODO(Bob)
-      () => widgetStore.widgetById(props.part.settings[WIDGET_KEY]),
+    const widget = computed<Widget | null>(() =>
+      // TODO(Bob)
+      widgetStore.widgetById(props.part.settings[WIDGET_KEY]),
     );
 
-    const isBroken = computed<boolean>(
-      () => isLinked.value && !widget.value,
-    );
+    const isBroken = computed<boolean>(() => isLinked.value && !widget.value);
 
-    const session = computed<LoggedSession | null>(
-      () => widget.value?.config.currentSession
+    const session = computed<LoggedSession | null>(() =>
+      widget.value?.config.currentSession
         ? historyStore.sessionById(widget.value.config.currentSession)
         : null,
     );
 
-    const displayText = computed<string>(
-      () => isLinked.value
-        ? (session.value?.title ?? 'no active session')
+    const displayText = computed<string>(() =>
+      isLinked.value
+        ? session.value?.title ?? 'no active session'
         : 'Not linked',
     );
 
@@ -68,10 +65,7 @@ export default defineComponent({
 
 <template>
   <g>
-    <SvgEmbedded
-      :width="coord2grid(sizeX)"
-      :height="coord2grid(sizeY)"
-    >
+    <SvgEmbedded :width="coord2grid(sizeX)" :height="coord2grid(sizeY)">
       <div class="col row no-wrap items-center q-pa-sm full-width">
         <BrokenIcon v-if="isBroken" />
         <q-icon
@@ -93,8 +87,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(sizeX)-2"
-        :height="coord2grid(sizeY)-2"
+        :width="coord2grid(sizeX) - 2"
+        :height="coord2grid(sizeY) - 2"
         x="1"
         y="1"
         rx="6"
@@ -106,8 +100,8 @@ export default defineComponent({
         :transform="textTransformation(part, part.size)"
         x1="10"
         y1="10"
-        :x2="coord2grid(sizeX)-10"
-        :y2="coord2grid(sizeY)-10"
+        :x2="coord2grid(sizeX) - 10"
+        :y2="coord2grid(sizeY) - 10"
       />
     </g>
   </g>

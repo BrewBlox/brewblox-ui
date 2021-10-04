@@ -14,7 +14,7 @@ import {
 
 import { defaultPresets } from '@/plugins/history/const';
 import { addSource } from '@/plugins/history/sources/graph';
-import { historyStore } from '@/plugins/history/store';
+import { useHistoryStore } from '@/plugins/history/store';
 import {
   GraphConfig,
   GraphSource,
@@ -61,6 +61,7 @@ export default defineComponent({
   },
   emits: ['params', 'layout'],
   setup(props, { emit }) {
+    const historyStore = useHistoryStore();
     const presets = defaultPresets();
     const revision = ref(new Date());
     const displayRef = ref(null);
@@ -81,41 +82,34 @@ export default defineComponent({
       return `${props.graphId}/${target.measurement}`;
     }
 
-    const targets = computed<QueryTarget[]>(
-      () => props.config.targets ?? [],
+    const targets = computed<QueryTarget[]>(() => props.config.targets ?? []);
+
+    const fields = computed<string[]>(() =>
+      targets.value.flatMap((t) =>
+        t.fields.map((f) => `${t.measurement}/${f}`),
+      ),
     );
 
-    const fields = computed<string[]>(
-      () => targets.value
-        .flatMap(t => t.fields.map(f => `${t.measurement}/${f}`)),
-    );
-
-    const layout = computed<Partial<Layout>>(
-      () => props.config.layout ?? {},
-    );
+    const layout = computed<Partial<Layout>>(() => props.config.layout ?? {});
 
     const source = computed<GraphSource | null>(
       () => historyStore.sourceById(props.graphId) as GraphSource | null,
     );
 
-    const error = computed<string | null>(
-      () => {
-        if (!source.value) {
-          return fields.value.length > 0
-            ? 'No data sources'
-            : 'No fields selected';
-        }
-        if (!graphData.value.some(data => data.x && data.x.length > 0)) {
-          return 'No data (yet) for selected period';
-        }
-        return null;
-      },
-    );
+    const error = computed<string | null>(() => {
+      if (!source.value) {
+        return fields.value.length > 0
+          ? 'No data sources'
+          : 'No fields selected';
+      }
+      if (!graphData.value.some((data) => data.x && data.x.length > 0)) {
+        return 'No data (yet) for selected period';
+      }
+      return null;
+    });
 
-    const graphData = computed<Partial<PlotData>[]>(
-      () => source.value
-        ? Object.values(source.value.values)
-        : [],
+    const graphData = computed<Partial<PlotData>[]>(() =>
+      source.value ? Object.values(source.value.values) : [],
     );
 
     function createSource(): void {
@@ -160,8 +154,7 @@ export default defineComponent({
     onMounted(() => {
       if (!props.sharedSources) {
         createSource();
-      }
-      else {
+      } else {
         nextTick(refresh);
       }
     });
@@ -191,28 +184,15 @@ export default defineComponent({
 <template>
   <div class="fit column">
     <component
-      :is="useTeleport
-        ? 'ButtonsTeleport'
-        : 'div'"
-      :class="useTeleport
-        ? ''
-        : 'col-auto row justify-end z-top'"
+      :is="useTeleport ? 'ButtonsTeleport' : 'div'"
+      :class="useTeleport ? '' : 'col-auto row justify-end z-top'"
     >
-      <ActionMenu
-        v-if="useRange"
-        icon="mdi-arrow-expand-vertical"
-      >
+      <ActionMenu v-if="useRange" icon="mdi-arrow-expand-vertical">
         <template #menus>
-          <GraphRangeSubmenu
-            :layout="layout"
-            :save="v => saveLayout(v)"
-          />
+          <GraphRangeSubmenu :layout="layout" :save="(v) => saveLayout(v)" />
         </template>
       </ActionMenu>
-      <ActionMenu
-        v-if="usePresets"
-        icon="mdi-timelapse"
-      >
+      <ActionMenu v-if="usePresets" icon="mdi-timelapse">
         <template #menus>
           <ActionSubmenu label="Presets">
             <ActionItem
@@ -227,7 +207,10 @@ export default defineComponent({
       </ActionMenu>
       <slot name="controls" />
     </component>
-    <div v-if="error" class="col row justify-center items-center text-h5 q-gutter-x-md">
+    <div
+      v-if="error"
+      class="col row justify-center items-center text-h5 q-gutter-x-md"
+    >
       <q-icon name="warning" color="negative" />
       <div class="col-auto">
         {{ error }}

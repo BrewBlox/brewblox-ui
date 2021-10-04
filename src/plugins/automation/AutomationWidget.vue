@@ -10,7 +10,7 @@ import { shortDateString } from '@/utils/formatting';
 import AutomationInfoDialog from './AutomationInfoDialog.vue';
 import AutomationJumpDialog from './AutomationJumpDialog.vue';
 import { settableStates } from './const';
-import { automationStore } from './store';
+import { useAutomationStore } from './store';
 import {
   AutomationProcess,
   AutomationStatus,
@@ -30,6 +30,7 @@ interface ProcessDisplay {
 export default defineComponent({
   name: 'AutomationWidget',
   setup() {
+    const automationStore = useAutomationStore();
     const { context } = useContext.setup();
 
     const automationAvailable = computed<boolean>(

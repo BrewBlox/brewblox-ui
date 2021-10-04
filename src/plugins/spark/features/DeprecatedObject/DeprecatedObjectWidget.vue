@@ -1,29 +1,24 @@
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from 'vue';
 
-import { useContext } from '@/composables';
 import { useBlockWidget } from '@/plugins/spark/composables';
-import { sparkStore } from '@/plugins/spark/store';
-import { fetchStoredBlock } from '@/plugins/spark/store/api';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block, DeprecatedObjectBlock } from '@/plugins/spark/types';
 
 export default defineComponent({
   name: 'DeprecatedObjectWidget',
   setup() {
-    const {
-      inDialog,
-    } = useContext.setup();
-    const {
-      serviceId,
-      widget,
-      featureTitle,
-      block,
-    } = useBlockWidget.setup<DeprecatedObjectBlock>();
+    const sparkStore = useSparkStore();
+    const { serviceId, widget, featureTitle, block } =
+      useBlockWidget.setup<DeprecatedObjectBlock>();
 
     const actual = ref<Block | null>(null);
 
     onBeforeMount(async () => {
-      actual.value = await fetchStoredBlock(serviceId, { nid: block.value.data.actualId });
+      actual.value = await sparkStore.fetchStoredBlock(
+        serviceId,
+        block.value.data.actualId,
+      );
     });
 
     function removeBlock(): void {
@@ -31,8 +26,6 @@ export default defineComponent({
     }
 
     return {
-      inDialog,
-      serviceId,
       widget,
       featureTitle,
       actual,
@@ -45,10 +38,7 @@ export default defineComponent({
 <template>
   <Card>
     <template #toolbar>
-      <Toolbar
-        :title="widget.title"
-        :subtitle="featureTitle"
-      />
+      <Toolbar :title="widget.title" :subtitle="featureTitle" />
     </template>
 
     <div class="widget-body">
@@ -62,12 +52,7 @@ export default defineComponent({
         label="Type"
         class="col-grow"
       />
-      <q-btn
-        icon="delete"
-        flat
-        class="col-grow"
-        @click="removeBlock"
-      />
+      <q-btn icon="delete" flat class="col-grow" @click="removeBlock" />
     </div>
   </Card>
 </template>

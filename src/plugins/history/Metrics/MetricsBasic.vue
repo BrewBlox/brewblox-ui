@@ -11,7 +11,7 @@ import {
 
 import { useContext, useWidget } from '@/composables';
 import { addSource } from '@/plugins/history/sources/metrics';
-import { historyStore } from '@/plugins/history/store';
+import { useHistoryStore } from '@/plugins/history/store';
 import { MetricsSource, MetricValue } from '@/plugins/history/types';
 import { fixedNumber } from '@/utils/formatting';
 import { isJsonEqual } from '@/utils/objects';
@@ -35,6 +35,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const historyStore = useHistoryStore();
     const metricsId = nanoid();
     const { context } = useContext.setup();
     const { widget } = useWidget.setup<MetricsWidget>();

@@ -3,10 +3,14 @@ import { mdiCalculatorVariant, mdiPlusMinus } from '@quasar/extras/mdi-v5';
 import { computed, defineComponent, PropType } from 'vue';
 
 import { CENTER, COLD_WATER, HOT_WATER } from '@/plugins/builder/const';
-import { coord2grid, liquidOnCoord, textTransformation } from '@/plugins/builder/utils';
-import { sparkStore } from '@/plugins/spark/store';
+import {
+  coord2grid,
+  liquidOnCoord,
+  textTransformation,
+} from '@/plugins/builder/utils';
+import { useSparkStore } from '@/plugins/spark/store';
 import { Block, BlockType, PidBlock } from '@/plugins/spark/types';
-import { systemStore } from '@/store/system';
+import { useSystemStore } from '@/store/system';
 import { preciseNumber, prettyUnit } from '@/utils/formatting';
 import { deltaTempQty } from '@/utils/quantity';
 
@@ -23,60 +27,58 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const {
-      scale,
-      bordered,
-    } = usePart.setup(props.part);
+    const systemStore = useSystemStore();
+    const sparkStore = useSparkStore();
+    const { scale, bordered } = usePart.setup(props.part);
 
-    const {
-      block,
-      isBroken,
-    } = useSettingsBlock.setup<PidBlock>(props.part, PID_KEY, PID_TYPES);
-
-    const outputValue = computed<number | null>(
-      () => block.value?.data.enabled
-        ? block.value.data.outputValue
-        : null,
+    const { block, isBroken } = useSettingsBlock.setup<PidBlock>(
+      props.part,
+      PID_KEY,
+      PID_TYPES,
     );
 
-    const outputSetting = computed<number | null>(
-      () => block.value?.data.enabled
-        ? block.value.data.outputSetting
-        : null,
+    const outputValue = computed<number | null>(() =>
+      block.value?.data.enabled ? block.value.data.outputValue : null,
+    );
+
+    const outputSetting = computed<number | null>(() =>
+      block.value?.data.enabled ? block.value.data.outputSetting : null,
     );
 
     const kp = computed<number | null>(
       () => block.value?.data.kp.value ?? null,
     );
 
-    const target = computed<Block | null>(
-      () => block.value !== null
-        ? sparkStore.blockById(block.value.serviceId, block.value.data.inputId.id)
+    const target = computed<Block | null>(() =>
+      block.value !== null
+        ? sparkStore.blockById(
+            block.value.serviceId,
+            block.value.data.inputId.id,
+          )
         : null,
     );
 
     const drivingOffset = computed<boolean>(
-      () => target.value !== null
-        && target.value.type === BlockType.ActuatorOffset,
+      () =>
+        target.value !== null && target.value.type === BlockType.ActuatorOffset,
     );
 
     const deltaTempUnit = computed<string>(
       () => `delta_${systemStore.units.temperature}`,
     );
 
-    const convertedOutputSetting = computed<number | null>(
-      () => drivingOffset.value
-        && block.value !== null
+    const convertedOutputSetting = computed<number | null>(() =>
+      drivingOffset.value && block.value !== null
         ? deltaTempQty(outputSetting.value).value
         : outputSetting.value,
     );
 
-    const suffix = computed<string>(
-      () => outputSetting.value === null
+    const suffix = computed<string>(() =>
+      outputSetting.value === null
         ? ''
         : drivingOffset.value
-          ? prettyUnit(deltaTempUnit.value)
-          : '%',
+        ? prettyUnit(deltaTempUnit.value)
+        : '%',
     );
 
     const color = computed<string>(
@@ -111,7 +113,7 @@ export default defineComponent({
 <template>
   <g :transform="`scale(${scale} ${scale})`">
     <SvgEmbedded
-      :transform="textTransformation(part, [1,1])"
+      :transform="textTransformation(part, [1, 1])"
       :width="coord2grid(1)"
       :height="coord2grid(1)"
       content-class="column items-center q-pt-xs"
@@ -151,8 +153,8 @@ export default defineComponent({
     <g class="outline">
       <rect
         v-show="bordered"
-        :width="coord2grid(1)-2"
-        :height="coord2grid(1)-2"
+        :width="coord2grid(1) - 2"
+        :height="coord2grid(1) - 2"
         :stroke="color"
         x="1"
         y="1"

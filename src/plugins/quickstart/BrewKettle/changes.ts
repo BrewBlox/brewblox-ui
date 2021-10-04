@@ -12,8 +12,8 @@ import {
   PidBlock,
   SetpointSensorPairBlock,
 } from '@/plugins/spark/types';
-import { featureStore } from '@/store/features';
-import { systemStore } from '@/store/system';
+import { useFeatureStore } from '@/store/features';
+import { useSystemStore } from '@/store/system';
 import { Widget } from '@/store/widgets';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, deltaTempQty, tempQty } from '@/utils/quantity';
@@ -122,6 +122,8 @@ export function defineWidgets(
   config: BrewKettleConfig,
   layouts: BuilderLayout[],
 ): Widget[] {
+  const systemStore = useSystemStore();
+  const featureStore = useFeatureStore();
   const { serviceId, names, dashboardId, prefix } = config;
   const userTemp = systemStore.units.temperature;
   const genericSettings = {

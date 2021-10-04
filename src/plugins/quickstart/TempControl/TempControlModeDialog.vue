@@ -2,7 +2,7 @@
 import { computed, defineComponent, PropType, reactive } from 'vue';
 
 import { useDialog, useGlobals } from '@/composables';
-import { SparkServiceModule, sparkStore } from '@/plugins/spark/store';
+import { useSparkStore } from '@/plugins/spark/store';
 import { BlockType, Quantity, SetpointSensorPairBlock } from '@/shared-types';
 import { createDialog } from '@/utils/dialog';
 import { makeTypeFilter } from '@/utils/functional';
@@ -58,17 +58,14 @@ export default defineComponent({
       onDialogCancel,
     } = useDialog.setup();
     const tempMode = reactive<TempControlMode>(deepCopy(props.modelValue));
+    const sparkStore = useSparkStore();
 
     function save(): void {
       props.saveMode(tempMode);
     }
 
-    const module = computed<SparkServiceModule | null>(
-      () => sparkStore.moduleById(props.serviceId),
-    );
-
     const setpoint = computed<SetpointSensorPairBlock | null>(
-      () => module.value?.blockByLink(tempMode.setpoint) ?? null,
+      () => sparkStore.blockByLink(props.serviceId, tempMode.setpoint),
     );
 
     function removeConfig(kind: 'cool' | 'heat'): void {

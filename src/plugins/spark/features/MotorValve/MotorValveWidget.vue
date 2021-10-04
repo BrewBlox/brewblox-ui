@@ -6,6 +6,7 @@ import { useBlockWidget } from '@/plugins/spark/composables';
 import { MotorValveBlock, Spark3PinsBlock } from '@/plugins/spark/types';
 import { getSpark3PinsBlock } from '@/plugins/spark/utils';
 
+import { useSparkStore } from '../../store';
 import MotorValveBasic from './MotorValveBasic.vue';
 import MotorValveFull from './MotorValveFull.vue';
 
@@ -16,15 +17,9 @@ export default defineComponent({
     Full: MotorValveFull,
   },
   setup() {
-    const {
-      context,
-      inDialog,
-    } = useContext.setup();
-    const {
-      serviceId,
-      sparkModule,
-      block,
-    } = useBlockWidget.setup<MotorValveBlock>();
+    const sparkStore = useSparkStore();
+    const { context, inDialog } = useContext.setup();
+    const { serviceId, block } = useBlockWidget.setup<MotorValveBlock>();
 
     // Spark 2 pins have no support for toggling 12V
     const spark3Pins = computed<Spark3PinsBlock | null>(
@@ -38,7 +33,7 @@ export default defineComponent({
     function enable12V(): void {
       if (spark3Pins.value) {
         spark3Pins.value.data.enableIoSupply12V = true;
-        sparkModule.saveBlock(spark3Pins.value);
+        sparkStore.saveBlock(spark3Pins.value);
       }
     }
 
@@ -70,10 +65,17 @@ export default defineComponent({
             <span>12V is disabled.</span>
           </template>
           <template #actions>
-            <q-btn text-color="white" flat label="Enable 12V" @click="enable12V" />
+            <q-btn
+              text-color="white"
+              flat
+              label="Enable 12V"
+              @click="enable12V"
+            />
           </template>
         </CardWarning>
-        <CardWarning v-else-if="!block.data.hwDevice.id || !block.data.startChannel">
+        <CardWarning
+          v-else-if="!block.data.hwDevice.id || !block.data.startChannel"
+        >
           <template #message>
             <span>This Motor Valve has no channel selected.</span>
           </template>

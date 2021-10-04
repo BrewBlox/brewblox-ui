@@ -1,6 +1,6 @@
-import { Dashboard, dashboardStore } from '@/store/dashboards';
-import { systemStore } from '@/store/system';
-import { widgetStore } from '@/store/widgets';
+import { Dashboard, useDashboardStore } from '@/store/dashboards';
+import { useSystemStore } from '@/store/system';
+import { useWidgetStore } from '@/store/widgets';
 
 import { createDialog } from './dialog';
 import { notify } from './notify';
@@ -11,7 +11,8 @@ type IdChangedCallback = (id: string) => void;
 
 export const makeDashboardIdRules = (): InputRule[] => [
   (v) => !!v || 'Value is required',
-  (v) => !dashboardStore.dashboardIds.includes(v) || 'Value must be unique',
+  (v) =>
+    !useDashboardStore().dashboardIds.includes(v) || 'Value must be unique',
   (v) => isUrlSafe(v) || 'Value must be URL-safe',
 ];
 
@@ -20,6 +21,9 @@ async function execDashboardIdChange(
   newId: string,
   onIdChanged?: IdChangedCallback,
 ): Promise<void> {
+  const dashboardStore = useDashboardStore();
+  const widgetStore = useWidgetStore();
+  const systemStore = useSystemStore();
   const dashboard = dashboardStore.dashboardById(oldId);
   if (!dashboard) {
     return;
@@ -74,6 +78,7 @@ export function startChangeDashboardTitle(
       modelValue: dashboard.title,
     },
   }).onOk(async (newTitle: string) => {
+    const dashboardStore = useDashboardStore();
     const oldId = dashboard.id;
     const oldTitle = dashboard.title;
     if (!newTitle || oldTitle === newTitle) {
@@ -116,6 +121,8 @@ export function startRemoveDashboard(dashboard: Dashboard): void {
       html: true,
     },
   }).onOk(async () => {
+    const widgetStore = useWidgetStore();
+    const dashboardStore = useDashboardStore();
     await dashboardStore.removeDashboard(dashboard);
     await Promise.all(
       widgetStore.widgets

@@ -1,7 +1,7 @@
 import { Plugin } from 'vue';
 
 import { genericBlockFeature } from '@/plugins/spark/generic';
-import { sparkStore } from '@/plugins/spark/store';
+import { useBlockSpecStore } from '@/plugins/spark/store';
 import {
   ActuatorPwmBlock,
   AnalogConstraintsObj,
@@ -10,8 +10,11 @@ import {
   BlockSpec,
   BlockType,
 } from '@/plugins/spark/types';
-import { blockWidgetSelector, prettifyConstraints } from '@/plugins/spark/utils';
-import { featureStore, WidgetFeature } from '@/store/features';
+import {
+  blockWidgetSelector,
+  prettifyConstraints,
+} from '@/plugins/spark/utils';
+import { useFeatureStore, WidgetFeature } from '@/store/features';
 import { bloxLink } from '@/utils/link';
 import { bloxQty, durationString } from '@/utils/quantity';
 
@@ -21,12 +24,18 @@ const type = BlockType.ActuatorPwm;
 
 const plugin: Plugin = {
   install(app) {
+    const specStore = useBlockSpecStore();
+    const featureStore = useFeatureStore();
 
     const blockSpec: BlockSpec<ActuatorPwmBlock> = {
       type,
       generate: () => ({
         actuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface),
-        drivenActuatorId: bloxLink(null, BlockIntfType.ActuatorDigitalInterface, true),
+        drivenActuatorId: bloxLink(
+          null,
+          BlockIntfType.ActuatorDigitalInterface,
+          true,
+        ),
         period: bloxQty('4s'),
         desiredSetting: 0,
         setting: 0,
@@ -109,8 +118,8 @@ const plugin: Plugin = {
       },
     };
 
-    sparkStore.addBlockSpec(blockSpec);
-    sparkStore.addFieldSpecs(fieldSpecs);
+    specStore.addBlockSpec(blockSpec);
+    specStore.addFieldSpecs(fieldSpecs);
     featureStore.addWidgetFeature(feature);
   },
 };
