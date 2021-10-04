@@ -77,7 +77,7 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history',
 
       distDir: 'dist',
-      analyze: true,
+      analyze: false,
       gzip: true,
       extractCSS: true,
 
