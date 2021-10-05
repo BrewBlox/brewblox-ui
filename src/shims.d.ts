@@ -1,5 +1,4 @@
 declare module 'url-safe-string';
-declare module 'parse-duration';
 declare module 'fromentries';
 declare module 'simple-keyboard-layouts';
 declare module '*.svg';

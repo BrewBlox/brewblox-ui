@@ -82,7 +82,7 @@ function transformer(
     if (source.params.duration && !source.params.start && !source.params.end) {
       // timestamp in Ms that should be discarded
       const boundary =
-        new Date().getTime() - parseDuration(source.params.duration);
+        new Date().getTime() - (parseDuration(source.params.duration) ?? 0);
       forEach(source.values, (val) => {
         const boundaryIdx = val.x.findIndex((x: number) => x > boundary);
         if (boundaryIdx > 0) {

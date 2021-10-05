@@ -155,7 +155,7 @@ export function durationMs(duration: Maybe<DurationCompatible>): number {
   } else if (isFinite(duration)) {
     return Number(duration);
   } else if (isDurationString(duration)) {
-    return parseDuration(duration);
+    return parseDuration(duration) ?? 0;
   } else {
     return 0;
   }
