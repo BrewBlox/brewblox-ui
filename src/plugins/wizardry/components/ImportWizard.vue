@@ -105,7 +105,7 @@ export default defineComponent({
           `Created ${featureTitle.value} <b>${widget.value.title}</b>`,
         );
         onDone({ widget: widget.value });
-      } catch (e) {
+      } catch (e: any) {
         notify.error(`Failed to create widget: ${e.toString()}`);
       }
     }

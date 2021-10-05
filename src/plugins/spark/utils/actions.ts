@@ -325,7 +325,7 @@ export async function resetBlocks(
       'Removed all blocks' +
         (opts.restore ? ', and restored discovered blocks' : ''),
     );
-  } catch (e) {
+  } catch (e: any) {
     notify.error(`Failed to remove blocks: ${e.toString()}`);
   }
 }

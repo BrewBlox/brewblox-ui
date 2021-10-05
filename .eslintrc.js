@@ -14,7 +14,7 @@ module.exports = {
   rules: {
     quotes: ['error', 'single', { avoidEscape: true }],
     'class-methods-use-this': 0,
-    'simple-import-sort/sort': 'error',
+    'simple-import-sort/imports': 'error',
     'sort-imports': 'off',
     'import/order': 'off',
     'import/first': 0,

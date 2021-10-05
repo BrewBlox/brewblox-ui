@@ -1,7 +1,8 @@
 <script lang="ts">
+import 'simple-keyboard/build/css/index.css';
+
 import Keyboard from 'simple-keyboard';
 import KeyboardLayouts from 'simple-keyboard-layouts';
-import 'simple-keyboard/build/css/index.css';
 import {
   computed,
   defineComponent,

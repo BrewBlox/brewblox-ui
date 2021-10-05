@@ -172,7 +172,7 @@ export default defineComponent({
       }
 
       if (leading === 'mode') {
-        const config: PidConfig = tempMode.value[`${kind}Config`];
+        const config = tempMode.value[`${kind}Config`];
         if (config) {
           pid.data = { ...pid.data, ...config };
           sparkStore.saveBlock(pid);
@@ -226,7 +226,7 @@ export default defineComponent({
           await applyMode(config.value, mode);
           config.value.activeMode = mode.id;
           notify.done(`Applied ${mode.title} mode`);
-        } catch (e) {
+        } catch (e: any) {
           config.value.activeMode = null;
           notify.error(e.message);
         } finally {

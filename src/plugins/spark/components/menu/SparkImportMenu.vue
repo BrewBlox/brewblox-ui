@@ -44,7 +44,7 @@ export default defineComponent({
             ? 'Block import completed with warnings. See the notification center for details.'
             : 'Block import done!',
         );
-      } catch (e) {
+      } catch (e: any) {
         notify.error(`Failed to import blocks: ${e.toString()}`);
       }
       importBusy.value = false;
@@ -66,7 +66,7 @@ export default defineComponent({
           serviceId: props.serviceId,
         });
         notify.done(`Imported block <i>${id}</i>`);
-      } catch (e) {
+      } catch (e: any) {
         notify.error(`Failed to import block: ${e.toString()}`);
       }
       importBusy.value = false;
