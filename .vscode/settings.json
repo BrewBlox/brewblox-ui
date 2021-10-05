@@ -15,5 +15,9 @@
   },
   "[javascript]": {
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+  },
+  "jest.autoRun": {
+    "watch": false,
+    "onSave": "test-file"
   }
 }
