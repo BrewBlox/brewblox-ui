@@ -2,9 +2,23 @@
 import capitalize from 'lodash/capitalize';
 import get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
-import Plotly, { Config, Frame, Layout, PlotData, PlotlyHTMLElement } from 'plotly.js';
+import Plotly, {
+  Config,
+  Frame,
+  Layout,
+  PlotData,
+  PlotlyHTMLElement,
+} from 'plotly.js';
 import { debounce } from 'quasar';
-import { computed, defineComponent, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  PropType,
+  ref,
+  watch,
+} from 'vue';
 
 const plotlyEvents = [
   'plotly_afterexport',
@@ -78,14 +92,13 @@ export default defineComponent({
       default: '100%',
     },
     plotlyClass: {
-      type: [String, Array, Object] as PropType<string | string[] | Mapped<string>>,
+      type: [String, Array, Object] as PropType<
+        string | string[] | Mapped<string>
+      >,
       default: '',
     },
   },
-  emits: [
-    'error',
-    ...plotlyEvents,
-  ],
+  emits: ['error', ...plotlyEvents],
   setup(props, { emit, attrs }) {
     const plotlyElement = ref<PlotlyHTMLElement>();
     let zoomed = false;
@@ -93,8 +106,12 @@ export default defineComponent({
 
     function attachListeners(): void {
       plotlyEvents
-        .filter(ev => typeof attrs[`on${capitalize(ev)}`] === 'function')
-        .forEach(ev => plotlyElement.value!.on(ev as any, (...args: any[]) => emit(ev, ...args)));
+        .filter((ev) => typeof attrs[`on${capitalize(ev)}`] === 'function')
+        .forEach((ev) =>
+          plotlyElement.value!.on(ev as any, (...args: any[]) =>
+            emit(ev, ...args),
+          ),
+        );
       plotlyElement.value!.on('plotly_relayout', onRelayout);
       plotlyElement.value!.on('plotly_doubleclick', onDoubleClick);
     }
@@ -154,11 +171,11 @@ export default defineComponent({
       }
     }
 
-    const extendedConfig = computed<Partial<Config>>(
-      () => ({
-        ...props.config,
-        modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
-        modeBarButtonsToAdd: [{
+    const extendedConfig = computed<Partial<Config>>(() => ({
+      ...props.config,
+      modeBarButtonsToRemove: ['toImage', 'sendDataToCloud'],
+      modeBarButtonsToAdd: [
+        {
           name: 'toImageLarge',
           title: 'Download plot as a jpeg',
           icon: Plotly['Icons'].camera,
@@ -167,11 +184,12 @@ export default defineComponent({
               format: 'jpeg',
               width: 3000,
               height: 1500,
-              filename: get(props.layout, 'title.text', props.layout.title) || 'graph',
+              filename:
+                get(props.layout, 'title.text', props.layout.title) || 'graph',
             }),
-        }],
-      }),
-    );
+        },
+      ],
+    }));
 
     async function createPlot(): Promise<void> {
       if (!plotlyElement.value) {
@@ -186,7 +204,7 @@ export default defineComponent({
           extendedConfig.value,
         );
         attachListeners();
-      } catch (e) {
+      } catch (e: any) {
         emit('error', e.message);
       }
     }
@@ -200,10 +218,8 @@ export default defineComponent({
         return;
       }
       try {
-        layoutChanged
-          ? await relayoutPlot()
-          : await reactPlot();
-      } catch (e) {
+        layoutChanged ? await relayoutPlot() : await reactPlot();
+      } catch (e: any) {
         emit('error', e.message);
       }
     }

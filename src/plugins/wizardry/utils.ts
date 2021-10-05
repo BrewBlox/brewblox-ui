@@ -17,7 +17,7 @@ export async function tryCreateWidget<T>(
     const featureTitle = featureStore.widgetTitle(widget.feature);
     notify.done(`Created ${featureTitle} widget <b>${widget.title}</b>`);
     return widgetStore.widgetById(widget.id);
-  } catch (e) {
+  } catch (e: any) {
     notify.error(`Failed to create widget: ${e.toString()}`);
     return null;
   }
@@ -31,7 +31,7 @@ export async function tryCreateBlock(block: Block): Promise<Block | null> {
     const featureTitle = featureStore.widgetTitle(block.type);
     notify.done(`Created ${featureTitle} block <i>${block.id}</i>`);
     return sparkStore.blockByAddress(block);
-  } catch (e) {
+  } catch (e: any) {
     notify.error(`Failed to create block: ${e.toString()}`);
     return null;
   }

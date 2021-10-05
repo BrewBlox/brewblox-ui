@@ -14,15 +14,19 @@ export const http = axios.create({ baseURL: HOST });
  * @param verbose
  * @returns
  */
-export function parseHttpError(e: AxiosError, verbose = false): string {
-  const resp = get(e, 'response.data', e.message ?? null);
-  const err = (resp instanceof Object) ? JSON.stringify(resp) : resp;
-  if (!verbose) {
-    return err;
+export function parseHttpError(e: unknown, verbose = false): string {
+  if (axios.isAxiosError(e)) {
+    const resp = get(e, 'response.data', e.message ?? null);
+    const err = resp instanceof Object ? JSON.stringify(resp) : resp;
+    if (!verbose) {
+      return err;
+    }
+    const url = get(e, 'response.config.url');
+    const status = get(e, 'response.status');
+    return `url=${url}, status=${status}, response=${err}`;
+  } else {
+    return `Unknown HTTP error: ${e}`;
   }
-  const url = get(e, 'response.config.url');
-  const status = get(e, 'response.status');
-  return `url=${url}, status=${status}, response=${err}`;
 }
 
 /**
@@ -41,7 +45,7 @@ export function parseHttpError(e: AxiosError, verbose = false): string {
  * @param desc
  * @returns
  */
-export function intercept(desc: string): ((e: AxiosError) => never) {
+export function intercept(desc: string): (e: AxiosError) => never {
   return (e: AxiosError) => {
     notify.warn(`${desc}: ${parseHttpError(e)}`);
     throw e;
