@@ -8,10 +8,7 @@ import { StopwatchSession, StopwatchWidget } from './types';
 export default defineComponent({
   name: 'StopwatchWidget',
   setup() {
-    const {
-      config,
-      saveConfig,
-    } = useWidget.setup<StopwatchWidget>();
+    const { config, saveConfig } = useWidget.setup<StopwatchWidget>();
 
     const time = ref<string>('00:00:00.0');
     let tickTimer: NodeJS.Timer | null = null;
@@ -20,20 +17,31 @@ export default defineComponent({
       () => config.value.session,
     );
 
-    function renderTime(elapsed: Date): void {
-      const hour = elapsed.getUTCHours().toString().padStart(2, '0');
-      const min = elapsed.getUTCMinutes().toString().padStart(2, '0');
-      const sec = elapsed.getUTCSeconds().toString().padStart(2, '0');
-      const ms = Math.floor(elapsed.getUTCMilliseconds() / 100).toString().padStart(1, '0');
-      time.value = `${hour}:${min}:${sec}.${ms}`;
+    function renderTime(elapsed: number): void {
+      let value: number = elapsed;
+      const hour = Math.floor(value / 3600_000)
+        .toString()
+        .padStart(2, '0');
+      value %= 3600_000;
+      const min = Math.floor(value / 60_000)
+        .toString()
+        .padStart(2, '0');
+      value %= 60_000;
+      const sec = Math.floor(value / 1000)
+        .toString()
+        .padStart(2, '0');
+      value %= 1000;
+      const ds = Math.floor(value / 100)
+        .toString()
+        .padStart(1, '0');
+      time.value = `${hour}:${min}:${sec}.${ds}`;
     }
 
     function tick(): void {
       if (session.value) {
         const { timeStarted, stoppedDuration } = session.value;
         const now = new Date().getTime();
-        const elapsed = new Date(now - timeStarted - stoppedDuration);
-        renderTime(elapsed);
+        renderTime(now - timeStarted - stoppedDuration);
       }
     }
 
@@ -62,7 +70,8 @@ export default defineComponent({
       };
 
       if (newSession.timeStopped) {
-        newSession.stoppedDuration += (new Date().getTime() - newSession.timeStopped);
+        newSession.stoppedDuration +=
+          new Date().getTime() - newSession.timeStopped;
       }
 
       newSession.running = true;
@@ -91,13 +100,12 @@ export default defineComponent({
 
     onBeforeMount(() => {
       if (session.value) {
-        const { running, timeStarted, stoppedDuration, timeStopped } = session.value;
+        const { running, timeStarted, stoppedDuration, timeStopped } =
+          session.value;
         if (running) {
           startTick();
-        }
-        else if (timeStopped) {
-          const elapsed = new Date(timeStopped - timeStarted - stoppedDuration);
-          renderTime(elapsed);
+        } else if (timeStopped) {
+          renderTime(timeStopped - timeStarted - stoppedDuration);
         }
       }
     });
